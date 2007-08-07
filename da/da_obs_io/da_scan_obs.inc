@@ -29,6 +29,8 @@ subroutine da_scan_obs (ob, xp, filename)
 
    integer                        :: ndup, n
 
+   if (trace_use) call da_trace_entry("da_scan_obs")
+
    ! default value
 
    ob%ob_numb(ob%current_ob_time)%sound    = ob%num_sound
@@ -49,9 +51,6 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
-   ! WHY?
-   ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
-   ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
    ! open file
    ! ---------
@@ -105,22 +104,20 @@ subroutine da_scan_obs (ob, xp, filename)
 
    report = 0 ! report number in file
 
-   reports: &
-   do
-
+   reports: do
       report = report+1
 
       ! read station general info
 
       read (iunit, fmt = fmt_info, iostat = iost) &
-                   platform%info%platform,    &
-                   platform%info%date_char,   &
-                   platform%info%name,        &
-                   platform%info%levels,      &
-                   platform%info%lat,         &
-                   platform%info%lon,         &
-                   platform%info%elv,         &
-                   platform%info%id
+         platform%info%platform,    &
+         platform%info%date_char,   &
+         platform%info%name,        &
+         platform%info%levels,      &
+         platform%info%lat,         &
+         platform%info%lon,         &
+         platform%info%elv,         &
+         platform%info%id
 
       if (iost /= 0) then
          ! FIX? This is expected, but its unclear how we handle failure
@@ -131,14 +128,14 @@ subroutine da_scan_obs (ob, xp, filename)
 
       if (print_detail_obs) then
          write(unit=stdout, fmt = fmt_info) &
-               platform%info%platform,    &
-               platform%info%date_char,   &
-               platform%info%name,        &
-               platform%info%levels,      &
-               platform%info%lat,         &
-               platform%info%lon,         &
-               platform%info%elv,         &
-               platform%info%id
+            platform%info%platform,    &
+            platform%info%date_char,   &
+            platform%info%name,        &
+            platform%info%levels,      &
+            platform%info%lat,         &
+            platform%info%lon,         &
+            platform%info%elv,         &
+            platform%info%id
       end if
 
       if (platform%info%lon == 180.0) platform%info%lon =-180.000
@@ -190,13 +187,8 @@ subroutine da_scan_obs (ob, xp, filename)
 
       ! Restrict to a range of reports, useful for debugging
 
-      if (report < report_start) then
-         cycle
-      end if
-
-      if (report > report_end) then
-         exit
-      end if
+      if (report < report_start) cycle
+      if (report > report_end) exit
 
       call da_ll_to_xy (platform%info, platform%loc, xp, outside, outside_all)
 
@@ -422,10 +414,7 @@ subroutine da_scan_obs (ob, xp, filename)
          - ob%num_bogus_glo - ob%num_airsr_glo , &
          '  reports unprocessed.'
 
-   ! WHY?
-   ! write(unit=stdout, fmt='(5x,a,i6,a)') &
-   !    'Scan:  ', ob%num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-   !    'Scan:  ', ob%num_ssmi_tb        , ' SSMI_TB        reports.'
+   if (trace_use) call da_trace_exit("da_scan_obs")
 
 end subroutine da_scan_obs
 

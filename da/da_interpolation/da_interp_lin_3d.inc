@@ -1,5 +1,4 @@
-subroutine da_interp_lin_3d(fm3d, i, j, dx, dy, dxm, dym, &
-   fo3d, ml, zk, nl)
+subroutine da_interp_lin_3d(fm3d, loc, fo3d, ml, zk, nl)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD 
@@ -7,18 +6,24 @@ subroutine da_interp_lin_3d(fm3d, i, j, dx, dy, dxm, dym, &
 
    implicit none
 
-   integer, intent(in)    :: i, j
-   real,    intent(in)    :: dx, dxm, dy, dym
-   real,    intent(in)    :: fm3d(ims:ime,jms:jme,kms:kme)    ! Input variable
-   integer, intent(in)    :: ml, nl                        
-   real,    intent(inout) :: fo3d(ml)  ! Output variable 
-   real,    intent(in)    :: zk(nl)
+   real,                  intent(in)    :: fm3d(ims:ime,jms:jme,kms:kme)
+   type (model_loc_type), intent(in)    :: loc
+   integer,               intent(in)    :: ml, nl                        
+   real,                  intent(inout) :: fo3d(ml)
+   real,                  intent(in)    :: zk(nl)
 
-   integer                             :: kk, k
-   real                                :: dz, dzm
-   real, dimension(kms:kme)      :: fmz
+   integer :: i,j,k, kk
+   real    :: dx, dxm, dy, dym,dz, dzm
+   real    :: fmz(kms:kme)
 
    if (trace_use_frequent) call da_trace_entry("da_interp_lin_3d")
+
+   i   = loc%i
+   j   = loc%j
+   dx  = loc%dx
+   dy  = loc%dy
+   dxm = loc%dxm
+   dym = loc%dym
 
    fmz(:) = 0.0
 

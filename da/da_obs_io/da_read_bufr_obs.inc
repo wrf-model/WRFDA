@@ -6,10 +6,9 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in) :: xp           ! Domain decomposition vars.
-   type (ob_type), intent(inout) :: ob
-
-   character(*),   intent (in), optional :: filename
+   type (xpose_type),          intent(in)    :: xp ! Domain decomposition vars
+   type (ob_type),             intent(inout) :: ob
+   character(len=*), optional, intent(in)    :: filename
 
 #ifdef BUFR
 
@@ -36,10 +35,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
    character(len=40)     :: obstr,drift,hdstr,qmstr,oestr
    character(len=8)      :: subset, c8id
-   real,dimension(7)     :: hdr
-   real,dimension(2,1)   :: pmo
-   ! real,dimension(9,255) :: drf
-   real,dimension(9,255) :: obs,qms,oes
+   real                  :: hdr(7)
+   real                  :: pmo(2,1)
+   ! real :: drf9,255)
+   real                  :: obs(9,255),qms(9,255),oes(9,255)
    real                  :: time,woe,qob,toe,qoe,poe,pob,tob,zob,rob,roe
 
    integer               :: iost, ndup, n, i, j, k, surface_level, report
@@ -183,7 +182,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
       t29 = int(0.1 + hdr(7))
       kx=int(0.1+hdr(5))
 
-      if (kx .eq. 183) then          ! reset kx based on t29
+      if (kx == 183) then          ! reset kx based on t29
          if (t29 .eq. 511) kx = 181
          if (t29 .eq. 512) kx = 187
          if (t29 .eq. 522) kx = 180
@@ -280,13 +279,13 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          pob=obs(1,k)
          ! scale q and compute t from tv and set units to Kelvin, if they aren't missing
 
-         if (obs(2,k) .gt. 0.0 .and. obs(2,k) .lt. 1e9) then   
+         if (obs(2,k) > 0.0 .and. obs(2,k) < 1e9) then   
             obs(2,k) = obs(2,k)*1e-6
-            if (obs(3,k) .gt. -200.0 .and. obs(3,k) .lt. 300.0) then
+            if (obs(3,k) > -200.0 .and. obs(3,k) < 300.0) then
                obs(3,k) = (obs(3,k)+t_kelvin) / (1.0 + 0.608 * obs(2,k))
             end if
          else
-            if (obs(3,k) .gt. -200.0 .and. obs(3,k) .lt. 300.0) then
+            if (obs(3,k) > -200.0 .and. obs(3,k) < 300.0) then
                obs(3,k) = obs(3,k) + t_kelvin
            end if
          end if
@@ -350,8 +349,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                platform % each (k) % u % inv, &
                platform % each (k) % v % inv, &
                platform%info%lon)
-            if (platform % each (k) % u % inv == 0.0 .and. &
-                platform % each (k) % v % inv == 0.0) then
+            if (platform % each (k) % u % inv == 0.0 .and. platform % each (k) % v % inv == 0.0) then
                platform % each (k) % u % inv =  missing_r  
                platform % each (k) % v % inv = missing_r  
                platform % each (k) % u % qc  = missing_data
@@ -390,29 +388,28 @@ subroutine da_read_bufr_obs (ob, xp, filename)
       if (nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(unit=stderr, fmt='(/a/)') &
-               'Warning: Too many levels.'
+         write(unit=stderr, fmt='(/a/)') 'Warning: Too many levels.'
 
-          write(unit=stderr, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
-               'Subset:   ', platform%info%name(1:8), &
-               'Platfrom: ', trim(platform%info%platform), &
-               'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
-               'elv:   ', platform%info%elv, &
-               'pstar: ', platform%info%pstar, &
-               'level: ', platform%info%levels, &
-               'kx:    ', kx
+         write(unit=stderr, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+            'Subset:   ', platform%info%name(1:8), &
+            'Platfrom: ', trim(platform%info%platform), &
+            'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
+            'elv:   ', platform%info%elv, &
+            'pstar: ', platform%info%pstar, &
+            'level: ', platform%info%levels, &
+            'kx:    ', kx
       else if ((nlevels < 1) .and. ((kx /= 164) .or. (kx /= 174))) then
          write(unit=stderr, fmt='(/a/)') &
-               'Warning: Too few levels.'
+            'Warning: Too few levels.'
   
          write(unit=stderr, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
-               'Subset:   ', platform%info%name(1:8), &
-               'Platfrom: ', trim(platform%info%platform), &
-               'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
-               'elv:   ', platform%info%elv, &
-               'pstar: ', platform%info%pstar, &
-               'level: ', platform%info%levels, &
-               'kx:    ', kx
+            'Subset:   ', platform%info%name(1:8), &
+            'Platfrom: ', trim(platform%info%platform), &
+            'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
+            'elv:   ', platform%info%elv, &
+            'pstar: ', platform%info%pstar, &
+            'level: ', platform%info%levels, &
+            'kx:    ', kx
 
          cycle reports
       end if
@@ -897,59 +894,59 @@ subroutine da_read_bufr_obs (ob, xp, filename)
    close(iunit)
    call da_free_unit(iunit)
 
-   if ((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
-      (ob%ob_numb(ob%current_ob_time)%synop /= ob%num_synop) .or. &
-      (ob%ob_numb(ob%current_ob_time)%pilot /= ob%num_pilot) .or. &
-      (ob%ob_numb(ob%current_ob_time)%satem /= ob%num_satem) .or. &
-      (ob%ob_numb(ob%current_ob_time)%geoamv /= ob%num_geoamv) .or. &
-      (ob%ob_numb(ob%current_ob_time)%polaramv /= ob%num_polaramv) .or. &
-      (ob%ob_numb(ob%current_ob_time)%airep /= ob%num_airep) .or. &
-      (ob%ob_numb(ob%current_ob_time)%gpspw /= ob%num_gpspw) .or. &
-      (ob%ob_numb(ob%current_ob_time)%gpsref /= ob%num_gpsref) .or. &
-      (ob%ob_numb(ob%current_ob_time)%metar /= ob%num_metar) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ships /= ob%num_ships) .or. &
-      (ob%ob_numb(ob%current_ob_time)%qscat /= ob%num_qscat) .or. &
-      (ob%ob_numb(ob%current_ob_time)%buoy  /= ob%num_buoy) .or. &
-      (ob%ob_numb(ob%current_ob_time)%bogus /= ob%num_bogus) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt1) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
-      (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
+   if ((ob%ob_numb(ob%current_ob_time)%sound   /= num_sound) .or. &
+      (ob%ob_numb(ob%current_ob_time)%synop    /= num_synop) .or. &
+      (ob%ob_numb(ob%current_ob_time)%pilot    /= num_pilot) .or. &
+      (ob%ob_numb(ob%current_ob_time)%satem    /= num_satem) .or. &
+      (ob%ob_numb(ob%current_ob_time)%geoamv   /= num_geoamv) .or. &
+      (ob%ob_numb(ob%current_ob_time)%polaramv /= num_polaramv) .or. &
+      (ob%ob_numb(ob%current_ob_time)%airep    /= num_airep) .or. &
+      (ob%ob_numb(ob%current_ob_time)%gpspw    /= num_gpspw) .or. &
+      (ob%ob_numb(ob%current_ob_time)%gpsref   /= num_gpsref) .or. &
+      (ob%ob_numb(ob%current_ob_time)%metar    /= num_metar) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ships    /= num_ships) .or. &
+      (ob%ob_numb(ob%current_ob_time)%qscat    /= num_qscat) .or. &
+      (ob%ob_numb(ob%current_ob_time)%buoy     /= num_buoy) .or. &
+      (ob%ob_numb(ob%current_ob_time)%bogus    /= num_bogus) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ssmt2    /= num_ssmt1) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ssmt2    /= num_ssmt2) .or. &
+      (ob%ob_numb(ob%current_ob_time)%profiler /= num_profiler)) then
 
       write(unit=stderr, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
-           'ob%num_sound=', ob%num_sound, &
+           'ob%num_sound=', num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &
-           'ob%num_synop=', ob%num_synop, &
+           'ob%num_synop=', num_synop, &
            'ob%ob_numb(ob%current_ob_time)%pilot=', ob%ob_numb(ob%current_ob_time)%pilot, &
-           'ob%num_pilot=', ob%num_pilot, &
+           'ob%num_pilot=', num_pilot, &
            'ob%ob_numb(ob%current_ob_time)%satem=', ob%ob_numb(ob%current_ob_time)%satem, &
-           'ob%num_satem=', ob%num_satem, &
+           'ob%num_satem=', num_satem, &
            'ob%ob_numb(ob%current_ob_time)%geoamv=', ob%ob_numb(ob%current_ob_time)%geoamv, &
-           'ob%num_geoamv=', ob%num_geoamv, &
+           'ob%num_geoamv=', num_geoamv, &
            'ob%ob_numb(ob%current_ob_time)%polaramv=', ob%ob_numb(ob%current_ob_time)%polaramv, &
-           'ob%num_polaramv=', ob%num_polaramv, &
+           'ob%num_polaramv=', num_polaramv, &
            'ob%ob_numb(ob%current_ob_time)%airep=', ob%ob_numb(ob%current_ob_time)%airep, &
-           'ob%num_airep=', ob%num_airep, &
+           'ob%num_airep=', num_airep, &
            'ob%ob_numb(ob%current_ob_time)%gpspw=', ob%ob_numb(ob%current_ob_time)%gpspw, &
-           'ob%num_gpspw=', ob%num_gpspw, &
+           'ob%num_gpspw=', num_gpspw, &
            'ob%ob_numb(ob%current_ob_time)%gpsref=', ob%ob_numb(ob%current_ob_time)%gpsref,&
-           'ob%num_gpsref=', ob%num_gpsref, &
+           'ob%num_gpsref=', num_gpsref, &
            'ob%ob_numb(ob%current_ob_time)%metar=', ob%ob_numb(ob%current_ob_time)%metar, &
-           'ob%num_metar=', ob%num_metar, &
+           'ob%num_metar=', num_metar, &
            'ob%ob_numb(ob%current_ob_time)%ships=', ob%ob_numb(ob%current_ob_time)%ships, &
-           'ob%num_ships=', ob%num_ships, &
+           'ob%num_ships=', num_ships, &
            'ob%ob_numb(ob%current_ob_time)%qscat=', ob%ob_numb(ob%current_ob_time)%qscat, &
-           'ob%num_qscat=', ob%num_qscat, &
+           'ob%num_qscat=', num_qscat, &
            'ob%ob_numb(ob%current_ob_time)%buoy =', ob%ob_numb(ob%current_ob_time)%buoy , &
-           'ob%num_buoy =', ob%num_buoy , &
+           'ob%num_buoy =', num_buoy , &
            'ob%ob_numb(ob%current_ob_time)%bogus=', ob%ob_numb(ob%current_ob_time)%bogus, &
-           'ob%num_bogus=', ob%num_bogus, &
+           'ob%num_bogus=', num_bogus, &
            'ob%ob_numb(ob%current_ob_time)%ssmt1=', ob%ob_numb(ob%current_ob_time)%ssmt1, &
-           'ob%num_ssmt1=', ob%num_ssmt1, &
+           'ob%num_ssmt1=', num_ssmt1, &
            'ob%ob_numb(ob%current_ob_time)%ssmt2=', ob%ob_numb(ob%current_ob_time)%ssmt2, &
-           'ob%num_ssmt2=', ob%num_ssmt2, &
+           'ob%num_ssmt2=', num_ssmt2, &
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
-           'ob%num_profiler=', ob%num_profiler
+           'ob%num_profiler=', num_profiler
 
       call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
    end if

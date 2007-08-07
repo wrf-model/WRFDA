@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_rv(grid, oi, y)
+subroutine da_transform_xtoy_ssmi_rv(grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,30 +6,18 @@ subroutine da_transform_xtoy_ssmi_rv(grid, oi, y)
 
    implicit none
 
-   type (domain),  intent(in)   :: grid
-   type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
-   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: iv       ! obs. increment vector (o-b).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
-   integer                      :: n        ! loop counter.
-   integer                      :: i, j
-   real                         :: dx, dy, dxm, dym
+   integer :: n        ! loop counter.
 
-   !  SSMI observation operator y = H(x):
+   ! SSMI observation operator y = H(x):
 
-   do n=1, oi % num_ssmi_retrieval
-      i = oi%ssmi_retrieval(n)%loc%i
-      j = oi%ssmi_retrieval(n)%loc%j
-      dx = oi%ssmi_retrieval(n)%loc%dx
-      dy = oi%ssmi_retrieval(n)%loc%dy
-      dxm = oi%ssmi_retrieval(n)%loc%dxm
-      dym = oi%ssmi_retrieval(n)%loc%dym
-
+   do n=1, iv % num_ssmi_retrieval
       ! Interpolating from 4 grid points to obs location
-
-      call da_interp_lin_2d(grid%xa%tpw, ims, ime, jms, jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d(grid%xa%speed, ims, ime, jms, jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)      
+      call da_interp_lin_2d(grid%xa%tpw,   iv%ssmi_retrieval(n)%loc, y%ssmi_retrieval(n)%tpw)
+      call da_interp_lin_2d(grid%xa%speed, iv%ssmi_retrieval(n)%loc, y%ssmi_retrieval(n)%speed)      
    end do
 
 end subroutine da_transform_xtoy_ssmi_rv

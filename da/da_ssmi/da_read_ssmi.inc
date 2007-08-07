@@ -1,19 +1,18 @@
 subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Read the header of a SSMI 2.0 GTS observation file
+   ! Purpose: Read a SSMI 2.0 GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none
 
    type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
    type(ob_type),    intent(inout) :: ob
-   character(*), intent(in)        :: filename
+   character(len=*), intent(in)    :: filename
 
    character (LEN =  10)        :: fmt_name
 
-   character (LEN = 160)        :: fmt_info,    &
-                                   fmt_loc
+   character (LEN = 160)        :: fmt_info, fmt_loc
    character (LEN = 120)        :: char_ned
 
    integer                      :: iost, fm,iunit
@@ -32,6 +31,13 @@ subroutine da_read_ssmi (ob, xp, filename)
    logical                      :: outside, outside_all
    integer                      :: irain, iprecip
    integer                      :: n, ndup
+   integer                      :: num_ssmi_tb
+   integer                      :: num_ssmi_retrieval
+
+   if (trace_use) call da_trace_entry("da_read_ssmi")
+
+   num_ssmi_retrieval = 0
+   num_ssmi_tb        = 0
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -43,11 +49,11 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    call da_get_unit(iunit)
    open(unit   = iunit,     &
-        FILE   = trim(filename), &
-        FORM   = 'FORMATTED',  &
-        ACCESS = 'SEQUENTIAL', &
-        iostat =  iost,     &
-        STATUS = 'OLD')
+      FILE   = trim(filename), &
+      FORM   = 'FORMATTED',  &
+      ACCESS = 'SEQUENTIAL', &
+      iostat =  iost,     &
+      STATUS = 'OLD')
 
    if (iost /= 0) then
       call da_warning(__FILE__,__LINE__, &
@@ -78,21 +84,16 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    do
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
-
       if (iost /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot read SSMI file"//trim(filename)/))
       end if
-
       if (char_ned(1:6) == 'NESTIX') exit
-
    end do
 
    do
-
      read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
      if (char_ned(1:6) == 'INFO  ') exit
-
    end do
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
@@ -100,11 +101,9 @@ subroutine da_read_ssmi (ob, xp, filename)
    ! read formats
    ! ------------
 
-   read (unit=iunit, fmt = '(A,1X,A)') &
-        fmt_name, fmt_info, &
-        fmt_name, fmt_loc
+   read (unit=iunit, fmt = '(A,1X,A)') fmt_name, fmt_info, fmt_name, fmt_loc
 
-   !  SKIP 1 line
+   !  skip 1 line
    !  -----------
 
    read (unit=iunit, fmt = '(A)') fmt_name
@@ -113,27 +112,21 @@ subroutine da_read_ssmi (ob, xp, filename)
    !  -----------------
 
    reports: do
-
       ! read station general info
       ! =========================
 
       read (unit=iunit, fmt = fmt_info, iostat = iost) &
-                   info % platform,    &
-                   info % date_char,   &
-                   info % name,        &
-                   info % levels,      &
-                   info % lat,         &
-                   info % lon,         &
-                   info % elv,         &
-                   info % id
+         info % platform,    &
+         info % date_char,   &
+         info % name,        &
+         info % levels,      &
+         info % lat,         &
+         info % lon,         &
+         info % elv,         &
+         info % id
 
       read(unit=info % platform (4:6),fmt='(I3)') fm
-
-      if (iost /= 0) then
-         exit reports
-      end if
-
-      ob % total_obs = ob % total_obs + 1
+      if (iost /= 0) exit reports
 
       select case(fm)
          case (125)    ;
@@ -170,12 +163,11 @@ subroutine da_read_ssmi (ob, xp, filename)
 
       loc % pw  % inv = missing_r
       loc % pw  % qc  = missing_data
-      loc % slp = loc % pw
+      loc % slp       = loc % pw
 
       ! Loop over duplicating obs for global
       ndup = 1
-      if (global .and. &
-         (loc%i < xp%ids .or. loc%i >= xp%ide)) ndup= 2
+      if (global .and. (loc%i < xp%ids .or. loc%i >= xp%ide)) ndup= 2
 
       ! It is possible that logic for counting obs is incorrect for the
       ! global case with >1 MPI tasks due to obs duplication, halo, etc.
@@ -195,9 +187,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
             write(unit=stdout, fmt = '(a,2i5,4e20.10)') &
                ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
-               loc%i,  loc%j,   &
-               loc%dx, loc%dxm, &
-               loc%dy, loc%dym
+               loc%i, loc%j, loc%dx, loc%dxm, loc%dy, loc%dym
          end if
       end if
 
@@ -205,25 +195,21 @@ subroutine da_read_ssmi (ob, xp, filename)
 
       select case(fm)
          case (125) ;
+            if (.not. use_ssmiretrievalobs) cycle reports
 
             if (n==1) ob%num_ssmi_retrieval_glo = ob%num_ssmi_retrieval_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not. use_ssmiretrievalobs) cycle reports
+            if (outside) cycle reports
 
             ! Check if at least one field is present
             if ((tpw % qc == missing_data) .AND. (speed % qc == missing_data)) then
-               count_obs_ssmir % num_missing = &
-               count_obs_ssmir % num_missing + 1
+               count_obs_ssmir % num_missing = count_obs_ssmir % num_missing + 1
                cycle reports
             end if
 
             ! fill permanent structure
             ! ========================
 
-            ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
+            num_ssmi_retrieval = num_ssmi_retrieval + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit
             ! tests with different numbers of MPI tasks.  
             loc%obs_global_index = ob%num_ssmi_retrieval_glo
@@ -234,23 +220,20 @@ subroutine da_read_ssmi (ob, xp, filename)
       
             !  Initialize other non read fields
 
-            ob % ssmi_retrieval (ob%num_ssmi_retrieval) % loc = loc
+            ob % ssmi_retrieval (num_ssmi_retrieval) % loc = loc
 
             !  Initialize with read fields
 
-            ob % ssmi_retrieval (ob%num_ssmi_retrieval) % info = info
+            ob % ssmi_retrieval (num_ssmi_retrieval) % info = info
 
-            ob % ssmi_retrieval (ob%num_ssmi_retrieval) % speed = speed
-            ob % ssmi_retrieval (ob%num_ssmi_retrieval) % tpw   = tpw
+            ob % ssmi_retrieval (num_ssmi_retrieval) % speed = speed
+            ob % ssmi_retrieval (num_ssmi_retrieval) % tpw   = tpw
 
          case (126) ;
+            if (.not. use_ssmitbobs) cycle reports
 
             if (n==1) ob%num_ssmi_tb_glo = ob%num_ssmi_tb_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not. use_ssmitbobs) cycle reports
+            if (outside) cycle reports
 
             ! Check if at least one field is present
 
@@ -291,7 +274,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
             ! One more data read in
 
-            ob % num_ssmi_tb = ob % num_ssmi_tb + 1
+            num_ssmi_tb = num_ssmi_tb + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit
             ! tests with different numbers of MPI tasks.  
             loc%obs_global_index = ob%num_ssmi_tb_glo
@@ -302,19 +285,19 @@ subroutine da_read_ssmi (ob, xp, filename)
 
             !  Initialize other non read fields
 
-            ob % ssmi_tb (ob%num_ssmi_tb) % loc = loc
+            ob % ssmi_tb (num_ssmi_tb) % loc = loc
 
             !  Initialize with read fields
 
-            ob % ssmi_tb (ob % num_ssmi_tb) % info = info
+            ob % ssmi_tb (num_ssmi_tb) % info = info
 
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb19v = tb19v
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb19h = tb19h
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb22v = tb22v
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb37v = tb37v
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb37h = tb37h
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb85v = tb85v
-            ob % ssmi_tb (ob % num_ssmi_tb) % tb85h = tb85h
+            ob % ssmi_tb (num_ssmi_tb) % tb19v = tb19v
+            ob % ssmi_tb (num_ssmi_tb) % tb19h = tb19h
+            ob % ssmi_tb (num_ssmi_tb) % tb22v = tb22v
+            ob % ssmi_tb (num_ssmi_tb) % tb37v = tb37v
+            ob % ssmi_tb (num_ssmi_tb) % tb37h = tb37h
+            ob % ssmi_tb (num_ssmi_tb) % tb85v = tb85v
+            ob % ssmi_tb (num_ssmi_tb) % tb85h = tb85h
 
          case default;
             ! Do nothing.
@@ -344,6 +327,8 @@ subroutine da_read_ssmi (ob, xp, filename)
  "------------------------------------------------------------------------------"
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+
+   if (trace_use) call da_trace_exit("da_read_ssmi")
 
 end subroutine da_read_ssmi
 

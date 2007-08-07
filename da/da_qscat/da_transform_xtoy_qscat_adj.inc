@@ -11,30 +11,12 @@ subroutine da_transform_xtoy_qscat_adj(iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer                       :: n        ! Loop counter.
-   integer                       :: i, j     ! Index dimension.
-   real                          :: dx, dxm  ! 
-   real                          :: dy, dym  !
 
-   if (iv%num_qscat > 0) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, &
-         iv%ob_numb(iv%current_ob_time)%qscat
-      
-         ! [1.1] Get horizontal interpolation weights:
-
-         i = iv%qscat(n)%loc%i
-         dy = iv%qscat(n)%loc%dy
-         dym = iv%qscat(n)%loc%dym
-         j = iv%qscat(n)%loc%j
-         dx = iv%qscat(n)%loc%dx
-         dxm = iv%qscat(n)%loc%dxm
-
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d_adj(jo_grad_x % u, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%qscat(n)%u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % v, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
-      end do
-   end if
+   do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
+      ! [1.2] Interpolate horizontally:
+      call da_interp_obs_lin_2d_adj(jo_grad_x%u, iv%qscat(n)%loc, jo_grad_y%qscat(n)%u, iv%qscat(n)%zk)
+      call da_interp_obs_lin_2d_adj(jo_grad_x%v, iv%qscat(n)%loc, jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
+   end do
 
 end subroutine da_transform_xtoy_qscat_adj
 

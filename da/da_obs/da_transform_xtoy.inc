@@ -13,133 +13,37 @@ subroutine da_transform_xtoy(grid, iv, y)
    if (trace_use) call da_trace_entry("da_transform_xtoy")
    
    !--------------------------------------------------------------------------
-   ! [1.0] Radiosonde observation operator y = H(x):
+   ! [1.0] observation operator y = H(x):
    !--------------------------------------------------------------------------
   
-   call da_transform_xtoy_sound (grid, iv, y) 
-   call da_transform_xtoy_sonde_sfc (grid, iv, y) 
+   if (iv % num_sound > 0) then
+      call da_transform_xtoy_sound (grid, iv, y) 
+      call da_transform_xtoy_sonde_sfc (grid, iv, y) 
+   end if
 
-   !---------------------------------------------------------------------------
-   ! [2.0] Surface observation operator y = H(x):
-   !---------------------------------------------------------------------------
+   if (iv % num_synop          > 0) call da_transform_xtoy_synop    (grid, iv, y)
+   if (iv % num_geoamv         > 0) call da_transform_xtoy_geoamv   (grid, iv, y)
+   if (iv % num_polaramv       > 0) call da_transform_xtoy_polaramv (grid, iv, y)
+   if (iv % num_airep          > 0) call da_transform_xtoy_airep    (grid, iv, y)
+   if (iv % num_metar          > 0) call da_transform_xtoy_metar    (grid, iv, y)
+   if (iv % num_ships          > 0) call da_transform_xtoy_ships    (grid, iv, y)
+   if (iv % num_gpspw          > 0) call da_transform_xtoy_gpspw    (grid, iv, y)
+   if (iv % num_gpsref         > 0) call da_transform_xtoy_gpsref   (grid, iv, y)
+   if (iv % num_ssmi_tb        > 0) call da_transform_xtoy_ssmi_tb  (grid, iv, y)
+   if (iv % num_ssmi_retrieval > 0) call da_transform_xtoy_ssmi_rv  (grid, iv, y)
+   if (iv % num_pilot          > 0) call da_transform_xtoy_pilot    (grid, iv, y)
+   if (iv % num_satem          > 0) call da_transform_xtoy_satem    (grid, iv, y)
+   if (iv % num_ssmt1          > 0) call da_transform_xtoy_ssmt1    (grid, iv, y)
+   if (iv % num_ssmt2          > 0) call da_transform_xtoy_ssmt2    (grid, iv, y)
+   if (iv % num_qscat          > 0) call da_transform_xtoy_qscat    (grid, iv, y)
+   if (iv % num_profiler       > 0) call da_transform_xtoy_profiler (grid, iv, y)
+   if (iv % num_buoy           > 0) call da_transform_xtoy_buoy     (grid, iv, y)
+   if (iv % num_gpsref         > 0) call da_transform_xtoy_gpsref   (grid, iv, y)
+   if (iv % num_radar          > 0) call da_transform_xtoy_radar    (grid, iv, y)
+   if (iv % num_bogus          > 0) call da_transform_xtoy_bogus    (grid, iv, y)
+   if (iv % num_airsr          > 0) call da_transform_xtoy_airsr    (grid, iv, y)
 
-   call da_transform_xtoy_synop (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [3.0] Cloud track wind observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   ! Geostationary Satellite
-   call da_transform_xtoy_geoamv(grid, iv, y)
-   ! Polar orbiting Satellite
-   call da_transform_xtoy_polaramv(grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [4.0] Aircraft observation operator y = H(x):
-   !---------------------------------------------------------------------------
-   
-   call da_transform_xtoy_airep (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [5.0] Metar observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_metar (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [6.0] Ship observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_ships (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [7.0] GPS TPW/ZTD observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_gpspw (grid, iv, y)
-
-
-   !---------------------------------------------------------------------------
-   ! [8.0] SSMI observation operator y = H(x):
-   !------------------------------------------------------------------------------
-
-   call da_transform_xtoy_ssmi (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [9.0] Pilot observation operator y = H(x):
-   !---------------------------------------------------------------------------
-  
-   call da_transform_xtoy_pilot (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [10.0] Pseudo obs observation operator y = H(x):
-   !----------------------------------------------------------------------------
-
-   call da_transform_xtoy_pseudo (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [11.0] satem observation operator y = H(x):
-   !---------------------------------------------------------------------------
-   
-   call da_transform_xtoy_satem (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [12.0] SSM/T1 observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_ssmt1 (grid, iv, y)
-   
-   !---------------------------------------------------------------------------
-   ! [13.0] SSM/T2 observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_ssmt2 (grid, iv, y)
-   
-   !---------------------------------------------------------------------------
-   ! [14.0] Scatterometer observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_qscat (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [15.0] Profiler observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_profiler (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [16.0] Buoy observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_buoy  (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [17.0] GPS Refractivity observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_gpsref (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [18.0] radar observation operator y = H(x):
-   !------------------------------------------------------------------------------
-
-   call da_transform_xtoy_radar (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [19.0] TC bogus observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_bogus (grid, iv, y)
-
-   !---------------------------------------------------------------------------
-   ! [20.0] AIRS retrievals observation operator y = H(x):
-   !---------------------------------------------------------------------------
-
-   call da_transform_xtoy_airsr (grid, iv, y) 
-
-   !---------------------------------------------------------------------------
-   ! [20.0] Radiance observation operator y = H(x):
-   !---------------------------------------------------------------------------
+   if (num_pseudo              > 0) call da_transform_xtoy_pseudo   (grid, iv, y)
 
    if (use_rad) then
       if (rtm_option == rtm_option_rttov) then

@@ -10,32 +10,16 @@ subroutine da_transform_xtoy_airsr (grid, iv, y)
    type (ob_type),    intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),     intent(inout) :: y        ! y = h (grid%xa) (linear)
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j, k  ! Index dimension.
-   real                         :: dx, dxm  ! 
-   real                         :: dy, dym  !
+   integer :: n  ! Loop counter.
+   integer :: k  ! Index dimension.
 
    if (iv%num_airsr > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
-
-         ! [1.1] Get horizontal interpolation weights:
-
-         i = iv%airsr(n)%loc%i
-         j = iv%airsr(n)%loc%j
-         dx = iv%airsr(n)%loc%dx
-         dy = iv%airsr(n)%loc%dy
-         dxm = iv%airsr(n)%loc%dxm
-         dym = iv%airsr(n)%loc%dym
-
          k = iv % airsr(n) % info % levels
-
          if (k < 1) cycle
-
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d(grid%xa % t, i, j, dx, dy, dxm, dym, &
-                           y%airsr(n)%t, k, iv%airsr(n)%zk, k)
-         call da_interp_lin_3d(grid%xa % q, i, j, dx, dy, dxm, dym, &
-                           y%airsr(n)%q, k, iv%airsr(n)%zk, k)
+         call da_interp_lin_3d(grid%xa%t, iv%airsr(n)%loc, y%airsr(n)%t, k, iv%airsr(n)%zk, k)
+         call da_interp_lin_3d(grid%xa%q, iv%airsr(n)%loc, y%airsr(n)%q, k, iv%airsr(n)%zk, k)
       end do
    end if
 

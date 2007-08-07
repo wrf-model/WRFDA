@@ -15,9 +15,6 @@ subroutine da_residual_ssmt2(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                        np_missing  , np_bad_data
-
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 

@@ -6,44 +6,21 @@ subroutine da_transform_xtoy_airep (grid, iv, y)
 
    implicit none
 
-   type (domain),  intent(in)   :: grid
-   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (y_type), intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: iv       ! Innovation vector (O-B).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j, k  ! Index dimension.
-   real                         :: dx, dxm  ! 
-   real                         :: dy, dym  !
+   integer :: n  ! Loop counter.
+   integer :: k  ! Index dimension.
 
-   if (iv%num_airep > 0) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
-         k = iv % airep(n) % info % levels
-         if (k < 1) cycle
-
-         ! xyh         y%airep(n)%u(:) = 0.0
-         ! xyh         y%airep(n)%v(:) = 0.0
-         ! xyh         y%airep(n)%t(:) = 0.0
-
-         ! [1.1] Get horizontal interpolation weights:
-
-         i = iv%airep(n)%loc%i
-         dy = iv%airep(n)%loc%dy
-         dym = iv%airep(n)%loc%dym
-         j = iv%airep(n)%loc%j
-         dx = iv%airep(n)%loc%dx
-         dxm = iv%airep(n)%loc%dxm
-
-         ![1.2] Interpolate horizontally:
-         call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &
-            y%airep(n)%u, k, iv%airep(n)%zk, k)
-
-         call da_interp_lin_3d(grid%xa % v, i, j, dx, dy, dxm, dym, &
-            y%airep(n)%v, k, iv%airep(n)%zk, k)
-
-         call da_interp_lin_3d(grid%xa % t, i, j, dx, dy, dxm, dym, &
-            y%airep(n)%t, k, iv%airep(n)%zk, k)
-      end do
-   end if
+   do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
+      k = iv % airep(n) % info % levels
+      if (k < 1) cycle
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d(grid%xa % u, iv%airep(n)%loc, y%airep(n)%u, k, iv%airep(n)%zk, k)
+      call da_interp_lin_3d(grid%xa % v, iv%airep(n)%loc, y%airep(n)%v, k, iv%airep(n)%zk, k)
+      call da_interp_lin_3d(grid%xa % t, iv%airep(n)%loc, y%airep(n)%t, k, iv%airep(n)%zk, k)
+   end do
 
 end subroutine da_transform_xtoy_airep
 

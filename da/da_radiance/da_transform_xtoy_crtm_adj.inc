@@ -35,6 +35,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    type (CRTM_GeometryInfo_type ) :: GeometryInfo
    !type(CRTM_Options_type )      :: Options
 
+   type (model_loc_type) :: loc
+
 !---------------------------------------------------------
 
    if ( iv%num_inst < 1 ) return
@@ -268,30 +270,26 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             ! [1.6] Get horizontal interpolation weights:
             !-----------------------------------------------------
 
-            i = iv%instid(inst)%loc_i(n)
-            j = iv%instid(inst)%loc_j(n)
-            dx = iv%instid(inst)%loc_dx(n)
-            dy = iv%instid(inst)%loc_dy(n)
-            dxm = iv%instid(inst)%loc_dxm(n)
-            dym = iv%instid(inst)%loc_dym(n)
+            loc%i = iv%instid(inst)%loc_i(n)
+            loc%j = iv%instid(inst)%loc_j(n)
+            loc%dx = iv%instid(inst)%loc_dx(n)
+            loc%dy = iv%instid(inst)%loc_dy(n)
+            loc%dxm = iv%instid(inst)%loc_dxm(n)
+            loc%dym = iv%instid(inst)%loc_dym(n)
 
             ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
 
             do k=kts,kte ! from bottem to top
                q_ad = Atmosphere_AD%Absorber(kte-k+1,1)
                if (atmosphere%pressure(kte-k+1) < 75.0) q_ad = 0.0
-               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), ims, ime, jms, &
-                                          jme, i, j, dx, dy, dxm, dym, &
-                                          Atmosphere_AD%Temperature(kte-k+1))
+               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), loc, &
+                  Atmosphere_AD%Temperature(kte-k+1))
 
-               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), ims, ime, jms, & 
-                                           jme, i, j, dx, dy, dxm, dym, &
-                                           q_ad )
+               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), loc, q_ad )
             end do
 
-               call da_interp_lin_2d_adj(jo_grad_x% psfc, ims, ime, jms, &
-                                         jme, i, j, dx, dy, dxm, dym,  &
-                                         Atmosphere_AD%Level_Pressure(atmosphere%n_layers) )
+               call da_interp_lin_2d_adj(jo_grad_x% psfc, loc,  &
+                  Atmosphere_AD%Level_Pressure(atmosphere%n_layers) )
 
                !if (n <=10 ) then
                !   write(6,'(15f8.2)') rtsolution(:)%brightness_temperature

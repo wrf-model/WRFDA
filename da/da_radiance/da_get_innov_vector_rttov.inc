@@ -222,25 +222,9 @@ real,allocatable :: temp(:)
 
       do n=n1,n2
          if (iv%instid(inst)%isflg(n) == 0) then   ! over sea using SST
-            call da_interp_lin_2d( xb % tgrn, &
-               ims, ime, jms, jme, &
-               iv%instid(inst)%loc_i(n), &
-               iv%instid(inst)%loc_j(n), &
-               iv%instid(inst)%loc_dx(n), &
-               iv%instid(inst)%loc_dy(n), &
-               iv%instid(inst)%loc_dxm(n), &
-               iv%instid(inst)%loc_dym(n), &
-               iv%instid(inst)%ts(n))
+            call da_interp_lin_2d (xb % tgrn, iv%instid(inst)%loc(n), iv%instid(inst)%ts(n))
          else
-            call da_interp_lin_2d( xb % tsk, &
-               ims, ime, jms, jme, &
-               iv%instid(inst)%loc_i(n), &
-               iv%instid(inst)%loc_j(n), &
-               iv%instid(inst)%loc_dx(n), &
-               iv%instid(inst)%loc_dy(n), &
-               iv%instid(inst)%loc_dxm(n), &
-               iv%instid(inst)%loc_dym(n), &
-               iv%instid(inst)%ts(n))
+            call da_interp_lin_2d (xb % tsk, iv%instid(inst)%loc(n), iv%instid(inst)%ts(n))
          end if
 
       end do
@@ -434,20 +418,20 @@ real,allocatable :: temp(:)
       if (coefs(inst)%id_sensor == 2) then ! microwave
          call da_trace("da_get_innov_vector_rttov",message="Calling gsi_emiss")
          call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
-              iv%instid(inst)%satzen * deg2rad, &
-              iv%instid(inst)%satazi * deg2rad, polar, &
-              iv%instid(inst)%isflg,pemsv,pemsh,pems5, &
-              iv%instid(inst)%ts, &
-              iv%instid(inst)%soiltyp, &
-              iv%instid(inst)%tslb, &
-              iv%instid(inst)%smois, &
-              iv%instid(inst)%vegtyp, &
-              iv%instid(inst)%vegfra, &
-              iv%instid(inst)%snowh, &
-              sensor_type,n1n2,nchan, &
-              iv%instid(inst)%tb_inv(:,:),amsua,amsub,ssmi, &
-              iv%instid(inst)%u10, &
-              iv%instid(inst)%v10)
+            iv%instid(inst)%satzen * deg2rad, &
+            iv%instid(inst)%satazi * deg2rad, polar, &
+            iv%instid(inst)%isflg,pemsv,pemsh,pems5, &
+            iv%instid(inst)%ts, &
+            iv%instid(inst)%soiltyp, &
+            iv%instid(inst)%tslb, &
+            iv%instid(inst)%smois, &
+            iv%instid(inst)%vegtyp, &
+            iv%instid(inst)%vegfra, &
+            iv%instid(inst)%snowh, &
+            sensor_type,n1n2,nchan, &
+            iv%instid(inst)%tb_inv(:,:),amsua,amsub,ssmi, &
+            iv%instid(inst)%u10, &
+            iv%instid(inst)%v10)
       end if
 
       do n=n1,n2

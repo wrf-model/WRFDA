@@ -76,8 +76,7 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb % t, i, j, dx, dy, dxm, dym, &
-         model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
+      call da_interp_lin_3d( xb % t, iv%ssmt1(n)%loc, model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
 
       !---------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:

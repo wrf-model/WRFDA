@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
+subroutine da_transform_xtoy_ssmi_tb(grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,13 +6,11 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
 
    implicit none
 
-   type (domain),  intent(in)   :: grid
-   type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
-   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: iv       ! obs. increment vector (o-b).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! loop counter.
-   integer                      :: i,j
-   real                         :: dx, dy, dxm, dym
 
    ! real, dimension(mix,mjy)     :: TGL_dotspeed
    ! real, dimension(mix,mjy)     :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
@@ -33,7 +31,7 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
    ! real, dimension(mkz+1)       :: zf
    !----------------------------------------------------------------------------
 
-   ! Wind at 1st level at dot points
+   ! Wind at 1st level at dot pivnts
 
    ! speed, surface wind speed (m/sec)    (0 - 30) , take 10 m wind
 
@@ -91,12 +89,12 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
    !       alw(i,j)     = 0.0
    !       TGL_alw(i,j) = 0.0
 
-   !       ! Column height weighted moisture density on the grid locally 
+   !       ! Column height weighted mivsture density on the grid locally 
 
    !       call da_transform_xtozrhoq(grid%xb, i, j, zh, zf, zrhom)
    !       call da_transform_xtozrhoq_lin(grid%xb, grid%xa, i, j, zh, zf, TGL_zrhom)
 
-   !       ! Column moisture density on the grid locally
+   !       ! Column mivsture density on the grid locally
 
    !       htpw(i,j)     = zrhom/tpw(i,j)/1000.0
    !       TGL_htpw(i,j) = TGL_zrhom/tpw(i,j)/1000.0 &
@@ -138,13 +136,7 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
    !    end do
    ! end do
 
-   do n=1, oi % num_ssmi_tb
-      i = oi%ssmi_tb(n)%loc%i
-      j = oi%ssmi_tb(n)%loc%j
-      dx = oi%ssmi_tb(n)%loc%dx
-      dy = oi%ssmi_tb(n)%loc%dy
-      dxm = oi%ssmi_tb(n)%loc%dxm
-      dym = oi%ssmi_tb(n)%loc%dym
+   do n=1, iv % num_ssmi_tb
 
       ! Interpolating from 4 grid points to obs location
 
@@ -152,20 +144,13 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
       !     grid%xb%landmask(i,j+1) .eq. 0 .and. grid%xb%landmask(i+1,j+1) .eq. 0) then       
       !    ! only calculate over water
 
-      call da_interp_lin_2d(grid%xa%tb19v, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-      call da_interp_lin_2d(grid%xa%tb19h, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-      call da_interp_lin_2d(grid%xa%tb22v, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-      call da_interp_lin_2d(grid%xa%tb37v, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-      call da_interp_lin_2d(grid%xa%tb37h, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-      call da_interp_lin_2d(grid%xa%tb85v, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-      call da_interp_lin_2d(grid%xa%tb85h, ims, ime, jms, jme, &
-                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
+      call da_interp_lin_2d(grid%xa%tb19v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb19v)
+      call da_interp_lin_2d(grid%xa%tb19h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb19h)
+      call da_interp_lin_2d(grid%xa%tb22v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb22v)
+      call da_interp_lin_2d(grid%xa%tb37v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb37v)
+      call da_interp_lin_2d(grid%xa%tb37h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb37h)
+      call da_interp_lin_2d(grid%xa%tb85v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb85v)
+      call da_interp_lin_2d(grid%xa%tb85h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb85h)
       ! end if
    end do
     

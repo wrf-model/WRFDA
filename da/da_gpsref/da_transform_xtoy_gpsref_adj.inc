@@ -11,28 +11,13 @@ subroutine da_transform_xtoy_gpsref_adj(iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer                       :: n        ! Loop counter.
-   integer                       :: i, j     ! Index dimension.
-   real                          :: dx, dxm  !
-   real                          :: dy, dym  !
    integer                       :: num_levs ! obs vertical levels
-
-   if (iv%num_gpsref < 1) return
 
    do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref
-
       num_levs = iv % gpsref(n) % info % levels
-
-      i = iv%gpsref(n)%loc%i
-      j = iv%gpsref(n)%loc%j
-      dx = iv%gpsref(n)%loc%dx
-      dy = iv%gpsref(n)%loc%dy
-      dxm = iv%gpsref(n)%loc%dxm
-      dym = iv%gpsref(n)%loc%dym
-
-      call da_interp_lin_3d_adj(jo_grad_x %ref, i, j, dx, dy, dxm, dym, &
-                             jo_grad_y%gpsref(n)%ref, num_levs, &
-                             iv%gpsref(n)%zk, num_levs)
+      call da_interp_lin_3d_adj(jo_grad_x %ref, iv%gpsref(n)%loc,jo_grad_y%gpsref(n)%ref, num_levs, &
+         iv%gpsref(n)%zk, num_levs)
    end do
 
 end subroutine da_transform_xtoy_gpsref_adj

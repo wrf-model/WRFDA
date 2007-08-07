@@ -75,10 +75,8 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb%t, i, j, dx, dy, dxm, dym, &
-         model_t, max_ob_levels, iv%airsr(n)%zk, num_levs)
-      call da_interp_lin_3d( xb%q, i, j, dx, dy, dxm, dym, &
-         model_q, max_ob_levels, iv%airsr(n)%zk, num_levs)
+      call da_interp_lin_3d( xb%t, iv%airsr(n)%loc, model_t, max_ob_levels, iv%airsr(n)%zk, num_levs)
+      call da_interp_lin_3d( xb%q, iv%airsr(n)%loc, model_q, max_ob_levels, iv%airsr(n)%zk, num_levs)
 
       ! call da_interp_lin_3d( xb%h, xp, i, j, dx, dy, dxm, dym, &
       !   model_h, max_ob_levels, iv%airsr(n)%zk, num_levs)

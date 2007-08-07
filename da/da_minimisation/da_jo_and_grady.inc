@@ -28,7 +28,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    ! [1.0] Compute components of Grad_y(Jo):
    !-------------------------------------------------------------------------
 
-   if (use_soundobs .and. iv%num_sound > 0) then
+   if (iv%num_sound > 0) then
       call da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
       jo_sound = jo%sound_u + jo%sound_v + jo%sound_t + jo%sound_q
 
@@ -58,7 +58,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_sound = 0.0
    end if
 
-   if (use_synopobs .and. iv%num_synop > 0) then
+   if (iv%num_synop > 0) then
       call da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
       jo_synop = jo%synop_u + jo%synop_v + jo%synop_t + jo%synop_p + jo%synop_q
 
@@ -75,7 +75,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_synop = 0.0
    end if
 
-   if (use_geoamvobs .and. iv%num_geoamv > 0) then
+   if (iv%num_geoamv > 0) then
       call da_jo_and_grady_geoamv(iv, re, jo, jo_grad_y)
       jo_geoamv = jo%geoamv_u + jo%geoamv_v
       if (print_detail_grad) then
@@ -88,7 +88,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_geoamv = 0.0
    end if
 
-   if (use_polaramvobs .and. iv%num_polaramv > 0) then
+   if (iv%num_polaramv > 0) then
       call da_jo_and_grady_polaramv(iv, re, jo, jo_grad_y)
       jo_polaramv = jo%polaramv_u + jo%polaramv_v
       if (print_detail_grad) then
@@ -101,74 +101,74 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_polaramv = 0.0
    end if
 
-   if (use_airepobs .and. iv%num_airep > 0) then
+   if (iv%num_airep > 0) then
       call da_jo_and_grady_airep(iv, re, jo, jo_grad_y)
       jo_airep = jo%airep_u + jo%airep_v + jo%airep_t
    else
       jo_airep = 0.0
    end if
 
-   if (use_pilotobs .and. iv%num_pilot > 0) then
+   if (iv%num_pilot > 0) then
       call da_jo_and_grady_pilot(iv, re, jo, jo_grad_y)
       jo_pilot = jo%pilot_u + jo%pilot_v
    else
       jo_pilot = 0.0
    end if
 
-   if (use_satemobs .and. iv%num_satem > 0) then
+   if (iv%num_satem > 0) then
       call da_jo_and_grady_satem(iv, re, jo, jo_grad_y)
       jo_satem = jo%satem_thickness
    else
       jo_satem = 0.0
    end if
 
-   if (use_metarobs .and. iv%num_metar > 0) then
+   if (iv%num_metar > 0) then
       call da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
       jo_metar = jo%metar_u + jo%metar_v + jo%metar_t + jo%metar_p + jo%metar_q
    else
       jo_metar = 0.0
    end if
 
-   if (use_shipsobs .and. iv%num_ships > 0) then
+   if (iv%num_ships > 0) then
       call da_jo_and_grady_ships(iv, re, jo, jo_grad_y)
       jo_ships = jo%ships_u + jo%ships_v + jo%ships_t + jo%ships_p + jo%ships_q
    else
       jo_ships = 0.0
    end if
 
-   if (use_gpspwobs .and. iv%num_gpspw > 0) then
+   if (iv%num_gpspw > 0) then
       call da_jo_and_grady_gpspw(iv, re, jo, jo_grad_y)
       jo_gpspw = jo%gpspw_tpw
    else
       jo_gpspw = 0.0
    end if
 
-   if (use_gpsrefobs .and. iv%num_gpsref > 0) then
+   if (iv%num_gpsref > 0) then
       call da_jo_and_grady_gpsref(iv, re, jo, jo_grad_y)
       jo_gpsref = jo%gpsref_ref
    else
       jo_gpsref = 0.0
    end if
 
-   if (use_ssmiretrievalobs .or. use_ssmitbobs) then
+   if (iv%num_ssmi_tb > 0 .or. iv%num_ssmi_retrieval > 0) then
       call da_jo_and_grady_ssmi(iv, re, jo, jo_ssmi, jo_grad_y)
    end if
 
-   if (use_ssmt1obs .and. iv%num_ssmt1 > 0) then
+   if (iv%num_ssmt1 > 0) then
       call da_jo_and_grady_ssmt1(iv, re, jo, jo_grad_y)
       jo_ssmt1 = jo%ssmt1_t
    else
       jo_ssmt1 = 0.0
    end if
 
-   if (use_ssmt2obs .and. iv%num_ssmt2 > 0) then
+   if (iv%num_ssmt2 > 0) then
       call da_jo_and_grady_ssmt2(iv, re, jo, jo_grad_y)  
       jo_ssmt2 = jo%ssmt2_rh
    else
       jo_ssmt2 = 0.0
    end if
 
-   if (use_radarobs .and. iv%num_radar > 0) then
+   if (iv%num_radar > 0) then
       call da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
       jo_radar = jo%radar_rv + jo%radar_rf
    else
@@ -182,35 +182,35 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_pseudo = 0.0
    end if
 
-   if (use_qscatobs .and. iv%num_qscat > 0) then
+   if (iv%num_qscat > 0) then
       call da_jo_and_grady_qscat(iv, re, jo, jo_grad_y)
       jo_qscat = jo%qscat_u + jo%qscat_v
    else
       jo_qscat = 0.0
    end if
 
-   if (use_profilerobs .and. iv%num_profiler > 0) then
+   if (iv%num_profiler > 0) then
       call da_jo_and_grady_profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo%profiler_u + jo%profiler_v
    else
       jo_profiler = 0.0
    end if
 
-   if (use_bogusobs .and. iv%num_bogus > 0) then
+   if (iv%num_bogus > 0) then
       call da_jo_and_grady_bogus (iv, re, jo, jo_grad_y)
       jo_bogus = jo%bogus_u + jo%bogus_v + jo%bogus_slp + jo%bogus_t + jo%bogus_q
    else
       jo_bogus = 0.0
    end if
 
-   if (use_buoyobs .and. iv%num_buoy > 0) then
+   if (iv%num_buoy > 0) then
       call da_jo_and_grady_buoy (iv, re, jo, jo_grad_y)
       jo_buoy = jo%buoy_u + jo%buoy_v + jo%buoy_t + jo%buoy_p + jo%buoy_q
    else
       jo_buoy = 0.0
    end if
 
-   if (use_rad .and. iv%num_inst > 0) then
+   if (iv%num_inst > 0) then
       call da_jo_and_grady_rad (iv, re, jo, jo_grad_y)
 
       jo_radiance = 0.0 
@@ -233,7 +233,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_radiance = 0.0
    end if
 
-   if (use_airsretobs .and. iv%num_airsr > 0) then
+   if (iv%num_airsr > 0) then
       call da_jo_and_grady_airsr(iv, re, jo, jo_grad_y)
       jo_airsr = jo%airsr_t + jo%airsr_q
 

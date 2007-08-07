@@ -67,10 +67,8 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
       end do
 
       ! [1.4] Interpolate horizontally:
-      call da_interp_lin_3d( xb % u, i, j, dx, dy, dxm, dym, &
-         model_u, max_ob_levels, iv%profiler(n)%zk, num_levs)
-      call da_interp_lin_3d( xb % v, i, j, dx, dy, dxm, dym, &
-         model_v, max_ob_levels, iv%profiler(n)%zk, num_levs)
+      call da_interp_lin_3d( xb%u, iv%profiler(n)%loc, model_u, max_ob_levels, iv%profiler(n)%zk, num_levs)
+      call da_interp_lin_3d( xb%v, iv%profiler(n)%loc, model_v, max_ob_levels, iv%profiler(n)%zk, num_levs)
 
       !------------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:

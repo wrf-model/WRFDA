@@ -24,17 +24,17 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
    itpw = 0 ; itpwf = 0 ; ispeed = 0 ; ispeedf = 0 
    do n=1, iv % num_ssmi_retrieval
 
-      ! COMPUTE inNOVATION VECTOR
+      ! compute innovation vector
       ! =========================
 
       ! Obs coordinates on model grid
 
       ! TPW
 
-      i = iv%ssmi_retrieval(n)%loc%i
-      j = iv%ssmi_retrieval(n)%loc%j
-      dx = iv%ssmi_retrieval(n)%loc%dx
-      dy = iv%ssmi_retrieval(n)%loc%dy
+      i   = iv%ssmi_retrieval(n)%loc%i
+      j   = iv%ssmi_retrieval(n)%loc%j
+      dx  = iv%ssmi_retrieval(n)%loc%dx
+      dy  = iv%ssmi_retrieval(n)%loc%dy
       dxm = iv%ssmi_retrieval(n)%loc%dxm
       dym = iv%ssmi_retrieval(n)%loc%dym
 
@@ -47,7 +47,7 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
          iv % ssmi_retrieval(n) % tpw % inv = ob % ssmi_retrieval(n) % tpw - model_tpw
       end if
 
-      ! SURFACE WinD SPEED
+      ! surface wind speed
 
       iv % ssmi_retrieval(n) % speed % inv  = 0.0
       if (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1.0 .and.     &

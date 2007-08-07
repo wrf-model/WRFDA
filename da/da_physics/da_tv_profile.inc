@@ -1,4 +1,4 @@
-subroutine da_tv_profile(grid, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
+subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
 
    !--------------------------------------------------------------------------
    ! Purpose: Calculates virtual temperature (tv_ma) on each level
@@ -8,15 +8,24 @@ subroutine da_tv_profile(grid, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 
    implicit none
 
-   type (domain), intent(in)  :: grid
-   integer,       intent(in)  :: i, j     ! OBS location
-   real,          intent(in)  :: dx, dxm  ! interpolation weights.
-   real,          intent(in)  :: dy, dym  ! interpolation weights.
-   real,          intent(out) :: pre_ma(kts-1:kte+1)
-   real,          intent(out) :: tv_ma(kts-1:kte+1)
+   type (domain),         intent(in)  :: grid
+   type (model_loc_type), intent(in)  :: loc
+   real,                  intent(out) :: pre_ma(kts-1:kte+1)
+   real,                  intent(out) :: tv_ma(kts-1:kte+1)
                           
-   integer                        :: ii,jj    ! index dimension.
-   real, dimension(2,2,kts:kte)   :: tv_m     ! Virtual temperatures
+   integer :: ii,jj    ! index dimension.
+   real    :: tv_m(2,2,kts:kte)     ! Virtual temperatures
+
+   integer :: i, j      ! OBS location
+   real    :: dx, dxm   ! interpolation weights.
+   real    :: dy, dym   ! interpolation weights.
+
+   i   = loc%i
+   j   = loc%j
+   dx  = loc%dx
+   dy  = loc%dy
+   dxm = loc%dxm
+   dym = loc%dym
 
    ! Virtual temperature
 
@@ -30,10 +39,10 @@ subroutine da_tv_profile(grid, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
    ! Horizontal interpolation to the obs. pt.
 
    pre_ma(kts:kte) = dym* ( dxm * grid%xb%p(i,j,kts:kte) + dx * grid%xb%p(i+1,j,kts:kte) ) + &
-                   dy * ( dxm * grid%xb%p(i,j+1,kts:kte) + dx * grid%xb%p(i+1,j+1,kts:kte) )
+      dy * ( dxm * grid%xb%p(i,j+1,kts:kte) + dx * grid%xb%p(i+1,j+1,kts:kte) )
 
    tv_ma (kts:kte) = dym* ( dxm * tv_m (1,1,kts:kte) + dx * tv_m (2,1,kts:kte) ) + &
-                   dy * ( dxm * tv_m (1,2,kts:kte) + dx * tv_m (2,2,kts:kte) )
+      dy * ( dxm * tv_m (1,2,kts:kte) + dx * tv_m (2,2,kts:kte) )
 
 end subroutine da_tv_profile
 

@@ -73,14 +73,9 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
       num_levs = iv % airep(n) % info % levels
 
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d( xb % u, i, j, dx, dy, dxm, dym, &
-         model_u, max_ob_levels, iv%airep(n)%zk, num_levs)
-
-      call da_interp_lin_3d( xb % v, i, j, dx, dy, dxm, dym, &
-         model_v, max_ob_levels, iv%airep(n)%zk, num_levs)
-
-      call da_interp_lin_3d( xb % t, i, j, dx, dy, dxm, dym, &
-          model_t, max_ob_levels, iv%airep(n)%zk, num_levs)
+      call da_interp_lin_3d (xb % u, iv%airep(n)%loc, model_u, max_ob_levels, iv%airep(n)%zk, num_levs)
+      call da_interp_lin_3d (xb % v, iv%airep(n)%loc, model_v, max_ob_levels, iv%airep(n)%zk, num_levs)
+      call da_interp_lin_3d (xb % t, iv%airep(n)%loc, model_t, max_ob_levels, iv%airep(n)%zk, num_levs)
 
       !-------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:

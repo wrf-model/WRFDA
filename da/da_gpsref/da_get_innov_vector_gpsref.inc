@@ -145,8 +145,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          iv % gpsref(1)%zk(1) = pseudo_z
       end if
 
-      call da_interp_lin_3d( xb%ref, i, j, dx, dy, dxm, dym, &
-         model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
+      call da_interp_lin_3d(xb%ref, iv%gpsref(n)%loc, model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
 
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
          do k = 1, num_levs

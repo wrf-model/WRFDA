@@ -111,16 +111,11 @@ subroutine da_get_innov_vector_ships( it, xb, xp, ob, iv)
             iv % ships(n) % p % qc = missing
          else
             !------------[1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
-               model_u, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
-               model_v, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d( xb % t, i, j, dx, dy, dxm, dym, &
-               model_t, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d( xb % q, i, j, dx, dy, dxm, dym, &
-               model_q, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d( xb % p, i, j, dx, dy, dxm, dym, &
-               model_p, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d( xb % u, iv%ships(n)%loc, model_u, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d( xb % v, iv%ships(n)%loc, model_v, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d( xb % t, iv%ships(n)%loc, model_t, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d( xb % q, iv%ships(n)%loc, model_q, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d( xb % p, iv%ships(n)%loc, model_p, iv%ships(n)%zk)
          end if
       else if (sfc_assi_options == 2) then
 
@@ -129,23 +124,17 @@ subroutine da_get_innov_vector_ships( it, xb, xp, ob, iv)
          ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and 
          ! sfc_p)
 
-         call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_u)
-         call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_v)
-         call da_interp_lin_2d( xb % t2, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_t)
-         call da_interp_lin_2d( xb % q2, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_q)
-         call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_p)
+         call da_interp_lin_2d( xb % u10,  iv%ships(n)%loc, model_u)
+         call da_interp_lin_2d( xb % v10,  iv%ships(n)%loc, model_v)
+         call da_interp_lin_2d( xb % t2,   iv%ships(n)%loc, model_t)
+         call da_interp_lin_2d( xb % q2,   iv%ships(n)%loc, model_q)
+         call da_interp_lin_2d( xb % psfc, iv%ships(n)%loc, model_p)
 
          if (iv%ships(n)%p%qc >= 0) then
 
             ! model surface p, t, q, h at observed site:
 
-            call da_interp_lin_2d( xb % terr, ims, ime, jms,jme,&
-               i, j, dx, dy, dxm, dym, hsm)
+            call da_interp_lin_2d( xb % terr, iv%ships(n)%loc, hsm)
 
             ho = iv%ships(n)%h
             to = -888888.0

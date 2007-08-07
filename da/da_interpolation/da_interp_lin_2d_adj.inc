@@ -1,6 +1,4 @@
-subroutine da_interp_lin_2d_adj(fm2d, is, ie, js, je,&
-                             i, j, dx, dy, dxm, dym, &
-                             fo2d)
+subroutine da_interp_lin_2d_adj(fm2d, loc, fo2d)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,14 +6,21 @@ subroutine da_interp_lin_2d_adj(fm2d, is, ie, js, je,&
 
    implicit none
 
-   integer,            intent(in)     :: is, ie, js, je
-   integer,            intent(in)     :: i, j
-   real   ,            intent(in)     :: dx, dxm, dy, dym
-   real   ,            intent(in)     :: fo2d   
+   real,                  intent(inout) :: fm2d(ims:ime,jms:jme) ! Input variable
+   type (model_loc_type), intent(in)    :: loc
+   real,                  intent(in)    :: fo2d   
 
-   real   ,            intent(inout)  :: fm2d(is:ie,js:je) ! Input variable
+   integer :: i, j
+   real    :: dx, dxm, dy, dym
 
    if (trace_use_frequent) call da_trace_entry("da_interp_lin_2d_adj")
+
+   i   = loc%i
+   dy  = loc%dy
+   dym = loc%dym
+   j   = loc%j
+   dx  = loc%dx
+   dxm = loc%dxm
 
    fm2d(i  ,j ) = dym*dxm* fo2d + fm2d(i  ,j )
    fm2d(i+1,j ) = dym*dx * fo2d + fm2d(i+1,j )

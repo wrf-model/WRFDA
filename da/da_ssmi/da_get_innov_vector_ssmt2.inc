@@ -79,7 +79,7 @@ subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb % rh, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % rh, iv%ssmt2(n)%loc, &
          model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 
       !--------------------------------------------------------------------

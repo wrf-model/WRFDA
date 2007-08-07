@@ -106,8 +106,9 @@ module da_minimisation
    use da_ssmi, only : da_calculate_grady_ssmi,da_calculate_grady_ssmt1, &
       da_calculate_grady_ssmt2, da_ao_stats_ssmi,da_ao_stats_ssmt2, &
       da_ao_stats_ssmt2, da_oi_stats_ssmt1, da_oi_stats_ssmt2, &
-      da_oi_stats_ssmi,da_ao_stats_ssmt1,da_get_innov_vector_ssmi, &
-      da_get_innov_vector_ssmt1,da_get_innov_vector_ssmt2, da_residual_ssmi, &
+      da_oi_stats_ssmi,da_ao_stats_ssmt1,da_get_innov_vector_ssmi_tb, &
+      da_get_innov_vector_ssmi_rv, da_residual_ssmi_rv, da_residual_ssmi_tb, &
+      da_get_innov_vector_ssmt1,da_get_innov_vector_ssmt2, &
       da_jo_and_grady_ssmt1, da_jo_and_grady_ssmt2,da_jo_and_grady_ssmi, &
       da_residual_ssmt1,da_residual_ssmt2
    use da_synop, only : da_calculate_grady_synop, da_ao_stats_synop, &

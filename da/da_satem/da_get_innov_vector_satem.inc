@@ -48,7 +48,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
       ! [2.0] Calculate vertical profile of virtual temperature at obs pt.
 
-      call da_tv_profile(grid,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
+      call da_tv_profile(grid,iv%satem(n)%loc,pre_ma,tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 

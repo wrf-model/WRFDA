@@ -159,42 +159,34 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
          ! [1.2] Interpolate horizontally to ob:
          do k=kts,kte ! from bottem to top
-            call da_interp_lin_2d( xb%t(:,:,k), ims, ime, jms, jme, &
-               i, j, dx, dy, dxm, dym, &      ! temperature (in K)
+            call da_interp_lin_2d( xb%t(:,:,k), iv%instid(inst)%loc(n), &
                Atmosphere%Temperature(kte-k+1) )
-            call da_interp_lin_2d( xb%q(:,:,k), ims, ime, jms, jme, &
-               i, j, dx, dy, dxm, dym, &  ! mixture ratio (in kg/kg)
+            call da_interp_lin_2d( xb%q(:,:,k), iv%instid(inst)%loc(n), &
                Atmosphere%Absorber(kte-k+1,1) ) 
             Atmosphere%Absorber(kte-k+1,1) = 1000.0*Atmosphere%Absorber(kte-k+1,1) ! in g/kg
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d( xb%qcw(:,:,k), ims, ime, jms, jme, &
-               i, j, dx, dy, dxm, dym, &   ! cloud water
-               model_qcw(kte-k+1) )
+            call da_interp_lin_2d( xb%qcw(:,:,k), iv%instid(inst)%loc(n), model_qcw(kte-k+1) )
             
             if (crtm_cloud) then
                Atmosphere%Cloud(1)%Effective_Radius(kte-k+1)=10.0
                Atmosphere%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1)
 
                Atmosphere%Cloud(2)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qci(:,:,k), ims, ime, jms, jme, &
-                  i, j, dx, dy, dxm, dym, &  ! cloud ice
+               call da_interp_lin_2d( xb%qci(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere%Cloud(2)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(3)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qrn(:,:,k), ims, ime, jms, jme, &
-                  i, j, dx, dy, dxm, dym, &  ! rain
+               call da_interp_lin_2d( xb%qrn(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere%Cloud(3)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(4)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qsn(:,:,k), ims, ime, jms, jme, &
-                  i, j, dx, dy, dxm, dym, &  ! snow
+               call da_interp_lin_2d( xb%qsn(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere%Cloud(4)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(5)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qgr(:,:,k), ims, ime, jms, jme, &
-                  i, j, dx, dy, dxm, dym, &  ! grauple
+               call da_interp_lin_2d( xb%qgr(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere%Cloud(5)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(6)%Effective_Radius(kte-k+1)=200.0
@@ -212,12 +204,9 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             Surface%Water_Coverage, Surface%Ice_Coverage, &
             Surface%Land_Coverage, Surface%Snow_Coverage )
 
-         call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_u10 )
-         call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_v10 )
-         call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_psfc )
+         call da_interp_lin_2d (xb % u10,  iv%instid(inst)%loc(n), model_u10 )
+         call da_interp_lin_2d (xb % v10,  iv%instid(inst)%loc(n), model_v10 )
+         call da_interp_lin_2d (xb % psfc, iv%instid(inst)%loc(n), model_psfc )
 
          model_psfc = 0.01*model_psfc           ! convert to hPa
          model_ptop = 0.01*xb%ptop
@@ -240,26 +229,19 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          end if
 
          if ( model_isflg == 0 ) then   ! over sea using SST
-             call da_interp_lin_2d( xb % tgrn, ims, ime, jms, jme, &
-                i, j, dx, dy, dxm, dym, model_ts )
+            call da_interp_lin_2d (xb % tgrn, iv%instid(inst)%loc(n), model_ts)
          else
-             call da_interp_lin_2d( xb % tsk, ims, ime, jms, jme, &
-                i, j, dx, dy, dxm, dym, model_ts )
+            call da_interp_lin_2d (xb % tsk,  iv%instid(inst)%loc(n), model_ts)
          end if
 
-         call da_interp_lin_2d( xb % terr, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_elv )
+         call da_interp_lin_2d (xb % terr, iv%instid(inst)%loc(n), model_elv)
 
          ! variables for emissivity calculations
          !---------------------------------------- 
-         call da_interp_lin_2d( xb % smois, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_smois )
-         call da_interp_lin_2d( xb % tslb, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_tslb )
-         call da_interp_lin_2d( xb % snowh, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_snowh )
-         call da_interp_lin_2d( xb % vegfra, ims, ime, jms, jme, &
-            i, j, dx, dy, dxm, dym, model_vegfra )
+         call da_interp_lin_2d (xb % smois,  iv%instid(inst)%loc(n), model_smois )
+         call da_interp_lin_2d (xb % tslb,   iv%instid(inst)%loc(n), model_tslb )
+         call da_interp_lin_2d (xb % snowh,  iv%instid(inst)%loc(n), model_snowh )
+         call da_interp_lin_2d (xb % vegfra, iv%instid(inst)%loc(n), model_vegfra )
 
          ! model_snowh = model_snowh*100.0   ! convert from m to mm
          model_vegfra = 0.01*model_vegfra  ! convert range to 0~1
