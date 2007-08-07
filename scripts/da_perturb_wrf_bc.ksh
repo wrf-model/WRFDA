@@ -78,11 +78,11 @@ export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
-export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
+export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
 
 #From WRF (namelist.input):
 #&time_control:
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
 #&physics:

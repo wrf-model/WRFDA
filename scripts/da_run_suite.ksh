@@ -16,9 +16,9 @@
 # extended period assessment of scientific impact. I have
 # successfully run the script for month long periods with 6 
 # hourly cycling all the above. 
-
+#
 # Before running da_run_suite.ksh, you must do the following:
-
+#
 # 1) Compile the executables for the WRF components you wish to 
 # test.
 # 3) Restore input datasets (e.g. AVN fields, observations, etc).
@@ -46,7 +46,7 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-#Decide which stages to run (run if true):
+# Decide which stages to run (run if true):
 export RUN_RESTORE_DATA_GRIB=${RUN_RESTORE_DATA_GRIB:-false}
 export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}
 export RUN_WPS=${RUN_WPS:-false}
@@ -144,7 +144,7 @@ export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.}
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
 #&domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
@@ -220,7 +220,7 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
 
-while ( $DATE -le $FINAL_DATE ) ; do 
+while [[ $DATE -le $FINAL_DATE ]] ; do 
    export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
 
@@ -319,25 +319,25 @@ while ( $DATE -le $FINAL_DATE ) ; do
    export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 
    if $NL_VAR4D; then
-     if $CYCLING; then
-       if test $CYCLE_NUMBER -gt 0; then
-         if $RUN_UPDATE_BC; then
-           export RUN_DIR=$EXP_DIR/run/$DATE/update_bc_4dvar
-           export PHASE=true
-           mkdir -p $RUN_DIR
+      if $CYCLING; then
+         if test $CYCLE_NUMBER -gt 0; then
+            if $RUN_UPDATE_BC; then
+               export RUN_DIR=$EXP_DIR/run/$DATE/update_bc_4dvar
+               export PHASE=true
+               mkdir -p $RUN_DIR
 
-           $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
-           $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
-           RC=$?
-           if [[ $? != 0 ]]; then
-              echo $(date) "${ERR}Failed with error $RC$END"
-              exit 1
-           fi
-           export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
-         else
-           export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
-         fi 
-       fi
+               $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
+               $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
+               RC=$?
+               if [[ $? != 0 ]]; then
+        	  echo $(date) "${ERR}Failed with error $RC$END"
+        	  exit 1
+               fi
+               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
+            else
+               export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
+            fi 
+         fi
       fi
    fi
 

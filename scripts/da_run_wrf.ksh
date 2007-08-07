@@ -54,8 +54,10 @@ if $NL_VAR4D; then
 fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.} 
-export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true} 
+export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-"wrfinput_d<domain>_<date>"} 
+export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
+export NL_INPUTOUT_INTERVAL_M=$NL_HISTORY_INTERVAL
 # &domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   #
@@ -77,7 +79,7 @@ export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 # &dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
-export NL_PD_MOIST=${NL_PD_MOIST:-.false.}             # 
+export NL_PD_MOIST=${NL_PD_MOIST:-false}             # 
 
 # The recommended value for real data cases for the eddy coefficient
 # option is 4, but Registry.EM has value 1, so modify for WRFVAR
@@ -85,7 +87,7 @@ export NL_KM_OPT=${NL_KM_OPT:-4}               #
 
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    # 
 # &bdy_control:
-export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
+export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
 
 # For WRF:
 export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
@@ -151,51 +153,47 @@ cp namelist.input $RUN_DIR
 
 echo '<A HREF="namelist.input">Namelist input</a>'
 
-# WHY
-# if [[ ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 ]]; then
-
-   if $DUMMY; then
-      echo Dummy wrf
-      LOCAL_DATE=$DATE
-      while [[ $LOCAL_DATE -le $END_DATE ]]; do
-         export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
-         export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
-         export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
-         export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
-         echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
-      done
-   else
-      if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then
-         touch wrfnl_go_ahead
-      fi
-      $RUN_CMD ./wrf.exe
-      RC=$?
-
-      rm -rf $RUN_DIR/rsl
-      mkdir -p $RUN_DIR/rsl
-      mv rsl* $RUN_DIR/rsl > /dev/null 2>&1
-      cd $RUN_DIR/rsl
-      for FILE in rsl*; do
-         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-         cat $FILE >> $FILE.html
-         echo "</PRE></BODY></HTML>" >> $FILE.html
-         rm $FILE
-      done
-      cd $WORK_DIR
-      cp namelist.output $RUN_DIR
-
-      echo '<A HREF="namelist.output">Namelist output</a>'
-      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-      echo '<A HREF="rsl">Other RSL output</a>'
-      echo $(date +'%D %T') "Ended $RC"
+if $DUMMY; then
+   echo Dummy wrf
+   LOCAL_DATE=$DATE
+   while [[ $LOCAL_DATE -le $END_DATE ]]; do
+      export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
+      export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
+      export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
+      export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
+      echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
+      LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
+   done
+else
+   if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then
+      touch wrfnl_go_ahead
    fi
-   mv wrfout* $FC_DIR/$DATE
-# else
-#    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
-# fi
+   $RUN_CMD ./wrf.exe
+   RC=$?
+
+   rm -rf $RUN_DIR/rsl
+   mkdir -p $RUN_DIR/rsl
+   mv rsl* $RUN_DIR/rsl > /dev/null 2>&1
+   cd $RUN_DIR/rsl
+   for FILE in rsl*; do
+      echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+      echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+      cat $FILE >> $FILE.html
+      echo "</PRE></BODY></HTML>" >> $FILE.html
+      rm $FILE
+   done
+   cd $WORK_DIR
+   cp namelist.output $RUN_DIR
+
+   echo '<A HREF="namelist.output">Namelist output</a>'
+   echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+   echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+   echo '<A HREF="rsl">Other RSL output</a>'
+   echo $(date +'%D %T') "Ended $RC"
+fi
+
+mv wrfinput_d01_* $FC_DIR/$DATE
+mv wrfout_* $FC_DIR/$DATE
 
 if $CLEAN; then
    rm -rf $WORK_DIR

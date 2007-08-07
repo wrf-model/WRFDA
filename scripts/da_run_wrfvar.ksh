@@ -102,7 +102,6 @@ export NL_T_EXTRAP_TYPE=${NL_T_EXTRAP_TYPE:-1}
 export NL_I_PARENT_START=${NL_I_PARENT_START:-0}
 export NL_J_PARENT_START=${NL_J_PARENT_START:-0}
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-0}
-export NL_NPROC_X=${NL_NPROC_X:-1}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
@@ -174,9 +173,8 @@ echo "WINDOW_END            $WINDOW_END"
       export D_HOUR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c9-10)
    done
 
-   export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
    if $NL_GLOBAL; then
-      export NPROC_X=1
+      export NL_NPROC_X=1
    fi
 
    export YEAR=$(echo $DATE | cut -c1-4)
