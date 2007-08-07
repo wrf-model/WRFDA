@@ -174,14 +174,14 @@ program da_advance_time
               write(unit=stdout, fmt='(a)') formatdate(ccyymmddhhnnss, out_date_format)
               i = i+2
            case ('-j')
-              write(unit=stdout, fmt='I4,I4') ccyy, julian_day(ccyy,mm,dd)
+              write(unit=stdout, fmt='(I4,I4)') ccyy, julian_day(ccyy,mm,dd)
               i = i+1
            case ('-J')
-              write(unit=stdout, fmt='I4,I4,I3,I3,I3') ccyy, julian_day(ccyy,mm,dd),hh,nn,ss
+              write(unit=stdout, fmt='(I4,I4,I3,I3,I3)') ccyy, julian_day(ccyy,mm,dd),hh,nn,ss
               i = i+1
            case ('-g','-G')
               call gregorian_day_sec(ccyy,mm,dd,hh,nn,ss,gday,gsec)
-              write(unit=stdout, fmt='I8,I8') gday, gsec
+              write(unit=stdout, fmt='(I8,I8)') gday, gsec
               i = i+1
            case default
               i = i+1
