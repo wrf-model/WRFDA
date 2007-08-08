@@ -24,38 +24,41 @@
 # 
 #########################################################################
 
-export RUN_WPS=true
-export RUN_REAL=true
+#export RUN_WPS=true
+#export RUN_REAL=true
 #export RUN_OBSPROC=true
+export RUN_WRFVAR=true
+export RUN_UPDATE_BC=true
 export RUN_WRF=true
-#export RUN_WRFVAR=true
-#export RUN_UPDATE_BC=true
-#export CYCLING=true
-#export FIRST=true
 
 #Experiment details:
 export REGION=amps2
-export EXPT=noda
-export CYCLE_PERIOD=12
-#export CYCLING=true
-#export FIRST=false
+export EXPT=cy1
+export CYCLE_PERIOD=6
+export CYCLING=true
+export FIRST=false
 export CLEAN=true
 
 #Scheduling:
-export PROJECT_ID=25000026        # JNT GAUs (1200/month).
+export SCHEDULER=lsf
+export RUN_CMD=mpirun.lsf
 #export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 #export PROJECT_ID=48503001       # DATC GAUs.
+export PROJECT_ID=64000510        # MMM WRF-Var GAUs 
 export QUEUE=premium
 #export QUEUE=regular
 #export QUEUE=share
 export NUM_PROCS=64
-export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=180
 export LSF_EXCLUSIVE=" "
 export LL_PTILE=16
+export JOBNAME=${EXPT}_job2
+#export SUBMIT_OPTIONS1=" "
+export PREV_JOBNAME=${EXPT}_job1
+export SUBMIT_OPTIONS1="#BSUB -w \"done(${PREV_JOBNAME})\""
 
 #Time info:
-export INITIAL_DATE=2006101612
+export INITIAL_DATE=2006101012
 export FINAL_DATE=2006102800
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=24
@@ -117,9 +120,20 @@ export NL_DAMPCOEF=0.01
 export NL_TIME_STEP_SOUND=4
 export NL_MP_ZERO_OUT=0
 
+#WRF-Var:
+export NL_USE_GPSREFOBS=.false.
+export NL_USE_AIRSRETOBS=.false.
+export NL_CV_OPTIONS_HUM=1
+export NL_ANALYSIS_TYPE=QC-OBS
+export NL_CHECK_MAX_IV=.true.
+export NL_LEN_SCALING1=0.5
+export NL_LEN_SCALING2=0.5
+export NL_LEN_SCALING3=0.5
+export NL_LEN_SCALING4=0.5
+export NL_LEN_SCALING5=0.5
+
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.${SCHEDULER}.ksh
 
 exit 0
 

@@ -41,6 +41,7 @@ export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and 
 export FG_TYPE=${FG_TYPE:-fnl}
 
 #Scheduling:
+export SCHEDULER=${SCHEDULER:-lsf}
 export PROJECT_ID=${PROJECT_ID:-48500053}
 export QUEUE=${QUEUE:-regular}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
@@ -48,8 +49,13 @@ export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
 export LL_PTILE=${LL_PTILE:-1} # minutes
-export PREV_JOBID=${PREV_JOBID:-test}
+export JOBNAME=${JOBNAME:-test}
+export PREV_JOBNAME=${PREV_JOBNAME:-" "}
 export POE=${POE:-false}
+export SUBMIT_OPTIONS1=${SUBMIT_OPTIONS1:-" "}
+export SUBMIT_OPTIONS2=${SUBMIT_OPTIONS2:-" "}
+export SUBMIT_OPTIONS3=${SUBMIT_OPTIONS3:-" "}
+export SUBMIT_OPTIONS4=${SUBMIT_OPTIONS4:-" "}
 export HOSTS=${HOSTS:-${HOME}/hosts}
 if test -f $HOSTS; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
