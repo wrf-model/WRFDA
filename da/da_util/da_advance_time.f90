@@ -111,6 +111,10 @@ program da_advance_time
       stop 'wrong input date'
    endif
 
+   if (.not. validdate(ccyy,mm,dd,hh,nn,ss)) then
+      stop 'Start date is not valid, or has wrong format'
+   endif
+
    i = 0
 
    dtime = trim(argum(2))
@@ -143,12 +147,12 @@ program da_advance_time
    ! advance day according to hour
    do while (hh < 0) 
       hh = hh + 24
-      call change_date ( ccyy, mm, dd, -1 )
+      dday = dday - 1
    end do
 
    do while (hh > 23) 
       hh = hh - 24
-      call change_date ( ccyy, mm, dd, 1 )
+      dday = dday + 1
    end do
 
    ! advance day if dday /= 0
@@ -199,6 +203,7 @@ subroutine change_date( ccyy, mm, dd, delta )
    integer, intent(in)    :: delta
 
    integer, dimension(12) :: mmday
+   integer                :: dday, direction
 
    mmday = (/31,28,31,30,31,30,31,31,30,31,30,31/)
 
@@ -216,25 +221,35 @@ subroutine change_date( ccyy, mm, dd, delta )
       end if
    end if
 
-   dd = dd + delta
+   dday = abs(delta)
+   direction = sign(1,delta)
 
-   if (dd == 0) then
-      mm = mm - 1
+   do while (dday > 0) 
 
-      if (mm == 0) then
-         mm = 12
-         ccyy = ccyy - 1
+      dd = dd + direction
+
+      if (dd == 0) then
+         mm = mm - 1
+
+         if (mm == 0) then
+            mm = 12
+            ccyy = ccyy - 1
+         end if
+
+         dd = mmday(mm)
+      elseif ( dd > mmday(mm)) then
+         dd = 1
+         mm = mm + 1
+         if(mm > 12 ) then
+            mm = 1
+            ccyy = ccyy + 1
+         end if
       end if
 
-      dd = mmday(mm)
-   elseif ( dd > mmday(mm)) then
-      dd = 1
-      mm = mm + 1
-      if(mm > 12 ) then
-         mm = 1
-         ccyy = ccyy + 1
-      end if
-   end if
+      dday = dday - 1
+
+   end do
+   return
 end subroutine change_date
 
 #ifdef crayx1
@@ -387,5 +402,22 @@ subroutine gregorian_day_sec(year,month,day,hours,minutes,seconds,gday,gsec)
    gday = day - 1 + ndays + 365*(year - base_year - nleapyr) + 366*(nleapyr)
    return
 end subroutine gregorian_day_sec
+
+function validdate(ccyy,mm,dd,hh,nn,ss)
+   integer :: ccyy,mm,dd,hh,nn,ss
+   logical :: validdate
+
+   validdate = .true.
+
+   if(ss > 59 .or. ss < 0 .or. &
+      nn > 59 .or. nn < 0 .or. &
+      hh > 23 .or. hh < 0 .or. &
+                   dd < 1 .or. &
+      mm > 12 .or. mm < 1 ) validdate = .false.
+
+   if (mm == 2 .and. ( dd > 29 .or. &
+                     ((.not. isleapyear(ccyy)) .and. dd > 28))) &
+      validdate = .false.
+end function validdate
 
 end program da_advance_time
