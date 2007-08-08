@@ -33,9 +33,9 @@ Step (2) and (3) can be done by running a single ksh with proper settings (direc
 plotting options, and mapping information). The ksh provided is quite self-explanatory.
 
 #########################################################################
-# Script: rad_diags.ksh  (radiance diagnostics)
+# Script: da_rad_diags.ksh  (radiance diagnostics)
 #
-# Purpose: run inv*/oma* data processing program (rw_rad_diags.f90)
+# Purpose: run inv*/oma* data processing program (da_rad_diags.f90)
 # to generate files in netcdf format and use NCL plotting script
 # (plot_rad_diags.ncl and advance_cymdh.ncl) to make plots.
 #
@@ -43,11 +43,11 @@ plotting options, and mapping information). The ksh provided is quite self-expla
 #
 ### Data processing:
 #
-# to compile: xlf -o rw_rad_diags.exe  rw_rad_diags.f90  \
+# to compile: xlf -o da_rad_diags.exe  da_rad_diags.f90  \
 #                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-#             g95 -o rw_rad_diags.exe  rw_rad_diags.f90  \
+#             g95 -o da_rad_diags.exe  da_rad_diags.f90  \
 #                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-# input files: (1)  namelist.rw_rad_diags
+# input files: (1)  namelist.da_rad_diags
 #                   &record1
 #                    nproc = 16   (the proc numbers WRF-Var used)
 #                    instid = 'noaa-17-amsub', 'dmsp-16-ssmis'  (inst names)
@@ -57,7 +57,7 @@ plotting options, and mapping information). The ksh provided is quite self-expla
 #                    cycle_period  = 6
 #                   /
 #              (2) inv_* or oma_* from WRF-Var
-#                  (note: rw_rad_diags.f90 expects the files are in the date directory
+#                  (note: da_rad_diags.f90 expects the files are in the date directory
 #                   in the program working directory, therefore, it's necessary to link
 #                   or copy inv_* or oma_* to the required dirctory structure.)
 #

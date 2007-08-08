@@ -199,7 +199,8 @@ da_utils : setup \
            da_bias_sele.exe \
            da_bias_scan.exe \
            da_bias_scan.exe \
-           da_bias_verif.exe
+           da_bias_verif.exe \
+           da_rad_diags.exe
 
 da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
 	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
@@ -231,6 +232,9 @@ da_bias_scan.exe : da_bias_scan.o rad_bias.o
 
 da_bias_verif.exe : da_bias_verif.o rad_bias.o
 	$(FFC) -o da_bias_verif.exe da_bias_verif.o rad_bias.o
+
+da_rad_diags.exe : da_rad_diags.o $(NETCDF_LIBS)
+	$(FFC) -o da_rad_diags.exe da_rad_diags.o -L. $(NETCDF_LIB) 
 
 
 # Special cases, either needing special include files or too big to 

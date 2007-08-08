@@ -1,8 +1,8 @@
 #!/bin/ksh
 #########################################################################
-# Script: rad_diags.ksh  (radiance time-series diagnostics)
+# Script: da_rad_diags.ksh  (radiance time-series diagnostics)
 #
-# Purpose: run inv*/oma* data processing program (rw_rad_diags.f90)
+# Purpose: run inv*/oma* data processing program (da_rad_diags.exe)
 # to generate files in netcdf format and use NCL plotting script
 # (plot_rad_diags.ncl and advance_cymdh.ncl) to make plots.
 #
@@ -10,11 +10,11 @@
 #
 ### Data processing:
 #
-# to compile: xlf -o rw_rad_diags.exe  rw_rad_diags.f90  \
+# to compile: xlf -o da_rad_diags.exe  da_rad_diags.f90  \
 #                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-#             g95 -o rw_rad_diags.exe  rw_rad_diags.f90  \
+#             g95 -o da_rad_diags.exe  da_rad_diags.f90  \
 #                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-# input files: (1)  namelist.rw_rad_diags
+# input files: (1)  namelist.da_rad_diags
 #                   &record1
 #                    nproc = 16   (the proc numbers WRF-Var used)
 #                    instid = 'noaa-17-amsub', 'dmsp-16-ssmis'  (inst names)
@@ -24,7 +24,7 @@
 #                    cycle_period  = 6
 #                   /
 #              (2) inv_* or oma_* from WRF-Var
-#                  (note: rw_rad_diags.f90 expects the files are in the date directory
+#                  (note: da_rad_diags.f90 expects the files are in the date directory
 #                   in the program working directory, therefore, it's necessary to link
 #                   or copy inv_* or oma_* to the required dirctory structure.)
 #
@@ -37,21 +37,16 @@
 #---------------------------------------------------------------------
 # user-defined options
 #---------------------------------------------------------------------
-#
-export START_DATE=2006082915
-export END_DATE=2006082915
-export CYCLE_PERIOD=12
-#
-export REGION=ernesto4
-export EXPT=cloud_04km_k_reff
-export NUM_PROCS=16
-export WRFVAR_DIR=/ptmp/hclin/code/V2.2/WRFVAR_r2522
-export EXP_DIR=/ptmp/hclin/exps/$REGION/$EXPT
+
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export VAR_RUN_DIR1=$EXP_DIR/run
 export VAR_RUN_DIR2=wrfvar/working
 #
 export DIAG_RUN_DIR=$EXP_DIR/diag
-export DIAG_SRC_DIR=$HOME/code/plotrad
 export FILE_PREFIX=inv    # or oma
 
 set -A INSTIDS noaa-17-amsub noaa-18-amsua noaa-18-mhs
@@ -145,7 +140,7 @@ if $LINK_DATA; then
       fi
       cd $DIAG_RUN_DIR/$DATE
       ln -sf $VAR_RUN_DIR1/$DATE/$VAR_RUN_DIR2/$FILE_PREFIX* .
-      DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD`
+      DATE=`$WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD`
    done
 fi
 
@@ -156,18 +151,8 @@ cd $DIAG_RUN_DIR
 #---------------------------------------------------------------------
 #
 if $PROC_DATA; then
-#
-# fisrt check if rw_rad_diags.exe is available in the working dir
-# if not, link or compile rw_rad_diags.exe
-#
-   if [[ ! -e rw_rad_diags.exe ]]; then
-      if [[ -e $DIAG_SRC_DIR/rw_rad_diags.exe ]]; then
-         ln -sf $DIAG_SRC_DIR/rw_rad_diags.exe ./rw_rad_diags.exe
-      else
-         xlf -o rw_rad_diags.exe $DIAG_SRC_DIR/rw_rad_diags.f90  \
-              -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-      fi
-   fi
+   ln -sf $WRFVAR_DIR/build/da_rad_diags.exe ./da_rad_diags.exe
+
 #
 # create namelist
 #
@@ -178,10 +163,10 @@ if $PROC_DATA; then
       INSTID=" ${INSTID} '${instID}', "
    done
 
-   if [[ -e namelist.rw_rad_diags ]]; then
-      rm -f namelist.rw_rad_diags
+   if [[ -e namelist.da_rad_diags ]]; then
+      rm -f namelist.da_rad_diags
    fi
-   cat > namelist.rw_rad_diags << EOF
+   cat > namelist.da_rad_diags << EOF
 &record1
 nproc = ${NUM_PROCS}
 instid = ${INSTID}
@@ -194,7 +179,7 @@ EOF
 #
 # run the format convertor
 #
-   rw_rad_diags.exe
+   da_rad_diags.exe
 
 fi
 #
@@ -202,8 +187,8 @@ fi
 # plot
 #---------------------------------------------------------------------
 #
-ln -sf $DIAG_SRC_DIR/advance_cymdh.ncl ./advance_cymdh.ncl
-cp -p $DIAG_SRC_DIR/plot_rad_diags.ncl ./plot_rad_diags.ncl
+ln -sf $WRFVAR_DIR/graphics/ncl/advance_cymdh.ncl ./advance_cymdh.ncl
+cp -p $WRFVAR_DIR/graphics/ncl/plot_rad_diags.ncl ./plot_rad_diags.ncl
 
 if $PROC_PLOT; then
    if $MAPINFO_FROM_FILE; then

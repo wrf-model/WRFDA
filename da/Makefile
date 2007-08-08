@@ -1264,6 +1264,10 @@ da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.f90
 			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth2.f90 > da_tune_obs_hollingsworth2.f
 			$(FC) -o da_tune_obs_hollingsworth2.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_hollingsworth2.f
 
+da_rad_diags.exe: da_rad_diags.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_rad_diags.f90 > da_rad_diags.f
+			$(FC) -o da_rad_diags.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_rad_diags.f
+
 ##############################################################################
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

@@ -1,4 +1,4 @@
-program rw_rad_diags
+program da_rad_diags
 !
 ! Author: Hui-Chuan Lin
 !
@@ -20,9 +20,9 @@ program rw_rad_diags
 
    implicit none
 
-   include 'netcdf.inc'
+#include "netcdf.inc"
 !
-! namelist varaibles
+! namelist variables
 !
    namelist /record1/ nproc, instid, file_prefix, start_date, end_date, cycle_period
            ! nproc: number of processsors used when writing out inv files
@@ -85,7 +85,7 @@ program rw_rad_diags
 !
 ! read namelist
 !
-   open(unit=nml_unit, file='namelist.rw_rad_diags', status='old', form='formatted')
+   open(unit=nml_unit, file='namelist.da_rad_diags', status='old', form='formatted')
    read(unit=nml_unit, nml=record1, iostat=ios)
    write(0,nml=record1)
    if ( ios /= 0 ) then
@@ -738,7 +738,7 @@ end do ntime_loop
 
 deallocate ( datestr1 )
 
-end program rw_rad_diags
+end program da_rad_diags
 
 subroutine advance_cymdh(currentdate,dh,newdate)
    
