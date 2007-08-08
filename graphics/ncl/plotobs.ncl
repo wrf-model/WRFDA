@@ -18,8 +18,8 @@ plot_radar    = True
 
 out_type     = "pdf"
 plotdir      = "/ptmp/hclin/plot/obs/"
-datdir1      = "/ptmp/george/data/india_30km/radiance_sea_fixh/run/"
-datdir2      = "/wrfvar/working/"
+datdir1      = "/ptmp/george/data/india_30km/radiance_sea_fixh/run/"  ; the path before DATE
+datdir2      = "/wrfvar/working/"                                     ; the path after DATE
 ; datdir1      = "/ptmp/hclin/plot/obs/"
 ; datdir2      = "/"
 filename_gts   = "gts_omb_oma"
@@ -52,11 +52,6 @@ hlevs  = (/ (/2000., 5000./), (/5000., 8500./) /)
   mapinfo_from_file = True
 ; fname = "/ptmp/hclin/plot/obs/fg01"
   fname = "/ptmp/george/data/india_30km/rc/2005080100/wrfinput_d01"
-if ( mapinfo_from_file .and. .not.isfilepresent(fname) ) then
-   print("file: "+fname+" does not exist")
-   print("Can not extract mapping info. Stop.")
-   exit
-end if
 
 ; subdomain = True
   subdomain = False
@@ -95,9 +90,33 @@ linecolor    = "gray"
 ;==============================================================================
 ; end of plot options
 ;==============================================================================
+if ( .not. ismissing(getenv("INITIAL_DATE")) ) then
+   ; probably running from a script
+   ; replace some selected variables with those from environment variables
+   delete(plotdir)
+   delete(datdir1)
+   delete(start_date)
+   delete(end_date)
+   delete(cycle_period)
+   delete(fname)
+   plotdir = getenv("RUN_DIR")+"/"
+   datdir1 = getenv("RUN_DIR")+"/"  ; datdir1 is the path before date
+                                    ; Here I assume wrfvar is running under
+                                    ; $RUN_DIR/$DATE/wrfvar/working
+   start_date = getenv("INITIAL_DATE")
+   end_date   = getenv("FINAL_DATE")
+   cycle_period = stringtointeger(getenv("CYCLE_PERIOD"))
+   fname = getenv("DA_FIRST_GUESS")
+end if
 
 plotwnd = False
 colormap = "rainbow+gray"
+
+if ( mapinfo_from_file .and. .not.isfilepresent(fname) ) then
+   print("file: "+fname+" does not exist")
+   print("Can not extract mapping info. Stop.")
+   exit
+end if
 
 if ( mapinfo_from_file .and. isfilepresent(fname) ) then
    wrf_file=addfile(fname+".nc","r")
