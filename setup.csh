@@ -178,9 +178,6 @@ endif
 if ($?COMPILER) then
    echo "COMPILER        " $COMPILER       
 endif
-if ($?RUN_CMD) then
-   echo "RUN_CMD         " $RUN_CMD
-endif
 if ($?MPIHOME) then
    echo "MPIHOME         " $MPIHOME
 endif
