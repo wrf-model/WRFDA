@@ -374,6 +374,8 @@ echo "WINDOW_END            $WINDOW_END"
          export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
       fi
       export NL_INPUTOUT_INTERVAL=60
+      export NL_INPUTOUT_BEGIN_H=0    # Output input format start.
+      export NL_INPUTOUT_END_H=6       # Output input format end.
       export NL_AUXHIST2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_FRAMES_PER_AUXHIST2=1
       export NL_HISTORY_INTERVAL=9999

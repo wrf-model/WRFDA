@@ -54,7 +54,8 @@ if  $NL_VAR4D ; then
 fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.} 
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
+export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-"wrfinput_d<domain>_<date>"}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
 # &domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
@@ -191,7 +192,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
       echo `date +'%D %T'` "Ended $RC"
    fi
-   mv wrfout* $FC_DIR/$DATE
+   mv wrfout* wrfinput* $FC_DIR/$DATE
 # else
 #    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
 # fi

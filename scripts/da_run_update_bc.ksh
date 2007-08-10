@@ -53,7 +53,7 @@ if $NL_VAR4D ; then
         export HOUR=`echo $DATE | cut -c9-10`
         export PREV_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
         export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
-        export DA_ANALYSIS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+        export DA_ANALYSIS=${FC_DIR}/${PREV_DATE}/wrfinput_d${DOMAIN}_${ANALYSIS_DATE}
       else
         export DA_ANALYSIS=${DA_ANALYSIS:-$FC_DIR/$DATE/analysis}  # Input analysis.
       fi

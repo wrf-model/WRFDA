@@ -144,7 +144,7 @@ export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.}
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
 #&domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
