@@ -5,8 +5,6 @@ program da_rad_diags
 ! program to read multiple-time of radiance innovation files and write out in
 ! netcdf format for ncl time-series plotting
 !
-! to compile: xlf rw_rad_diags.f90 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-!             g95 rw_rad_diags.f90 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
 ! input files: (1)  namelist.rw_rad_diags
 !                   &record1
 !                    nproc = 16   (the proc numbers used when inv files were written out)
@@ -24,7 +22,6 @@ program da_rad_diags
 !
 ! namelist variables
 !
-   namelist /record1/ nproc, instid, file_prefix, start_date, end_date, cycle_period
            ! nproc: number of processsors used when writing out inv files
            ! instid, eg dmsp-16-ssmis
            ! file_prefix, inv or oma
@@ -37,6 +34,7 @@ program da_rad_diags
    character(len=20), dimension(maxnum)   :: instid
    character(len=3)                       :: file_prefix
    character(len=10)                      :: start_date, end_date
+   namelist /record1/ nproc, instid, file_prefix, start_date, end_date, cycle_period
 !
 ! netcdf variables
 !
