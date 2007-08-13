@@ -171,11 +171,11 @@ program da_advance_time
         select case ( trim(argum(i)) )
            case ('-w', '-W', '-wrf','-WRF')
               out_date_format = 'ccyy-mm-dd_hh:nn:ss'
-              write(unit=stdout, fmt='(a)') formatdate(ccyymmddhhnnss, out_date_format)
+              write(unit=stdout, fmt='(a)') trim(formatdate(ccyymmddhhnnss, out_date_format))
               i = i+1
            case ('-f', '-F')
               out_date_format = trim(argum(i+1))
-              write(unit=stdout, fmt='(a)') formatdate(ccyymmddhhnnss, out_date_format)
+              write(unit=stdout, fmt='(a)') trim(formatdate(ccyymmddhhnnss, out_date_format))
               i = i+2
            case ('-j')
               write(unit=stdout, fmt='(I4,I4)') ccyy, julian_day(ccyy,mm,dd)
