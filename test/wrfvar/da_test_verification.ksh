@@ -11,8 +11,13 @@ export EXP_LEGENDS='(/"stable","opt"/)'
 
 export INTERVAL=12
 export PLOT_WKS=pdf
-export CLEAN=${CLEAN:-true}
+export CLEAN=${CLEAN:-false}
 
-export WORK_DIR=$PWD/${MACHINE}_verification
+export RUN_DIR=$PWD/${MACHINE}_verification
+
+. ./setup.ksh
+
+export START_DATE=$INITIAL_DATE
+export END_DATE=$FINAL_DATE
 
 $WRFVAR_DIR/scripts/da_verif_plot.ksh

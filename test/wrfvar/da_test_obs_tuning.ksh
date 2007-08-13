@@ -1,8 +1,12 @@
 #!/bin/ksh
 
 export REG_DIR=$PWD
+. ./setup.ksh
 
-TUNING_DIR=${MACHINE}_tuning
+export START_DATE=$INITIAL_DATE
+export END_DATE=$FINAL_DATE
+
+TUNING_DIR=$PWD/${MACHINE}_tuning
 rm -rf $TUNING_DIR; mkdir -p $TUNING_DIR; cd $TUNING_DIR
 
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
@@ -14,8 +18,11 @@ export PERT_ID=${MACHINE}_${COMPILER}_debug
 export Y_DIR=$REG_DIR/${UNPERT_ID}_suite_${NUM_PROCS}
 export YP_DIR=$REG_DIR/${PERT_ID}_suite_${NUM_PROCS}
 
+export RUN_DIR=$TUNING_DIR/desroziers
+
 $WRFVAR_DIR/scripts/da_tune_obs_desroziers.ksh
 
-export EXPT=${UNPERT_ID}_suite_${NUM_PROCS}
+export EXP_DIR=$Y_DIR
+export RUN_DIR=$TUNING_DIR/hollingsworth
 
 $WRFVAR_DIR/scripts/da_tune_obs_hollingsworth.ksh
