@@ -71,6 +71,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
                nrej_windowchanl = nrej_windowchanl + 1
            ! reject whole pixel if not over sea for global case
             if (global) iv%instid(i)%tb_qc(:,n)  = qc_bad
+            if (only_sea_rad) iv%instid(i)%tb_qc(:,n)  = qc_bad
          end if
 
          !  c.  reject channels 13,14(above top model 10mb),15 

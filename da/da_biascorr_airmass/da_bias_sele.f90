@@ -56,7 +56,7 @@ readloop:&
     elseif (ierr == 1) then  ! end
          exit
     else                     ! error
-         stop 'read error in cycle_sele'
+         stop 'read error in da_bias_sele'
     endif
 
     ntotal = ntotal + 1

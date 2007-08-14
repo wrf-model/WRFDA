@@ -168,6 +168,8 @@ loop1:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then ! mhs
+           call qc_amsub(tovs)
       endif
 
 !-------------------------
@@ -293,6 +295,8 @@ loop2:&
       if (tovs%sensor_id == 3) then
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then
            call qc_amsub(tovs)
       endif
 
