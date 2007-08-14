@@ -2,7 +2,6 @@
 
 export WRF_DIR=$1
 
-cp external/RSL/module_dm.F      $WRF_DIR/external/RSL
 cp external/RSL_LITE/module_dm.F $WRF_DIR/external/RSL_LITE
 cp main/wrf.F                    $WRF_DIR/main/wrf.F
 
