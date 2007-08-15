@@ -1,7 +1,8 @@
 #!/bin/ksh
 
-export REG_DIR=$PWD
 . ./setup.ksh
+
+export REG_DIR=$PWD
 
 export START_DATE=$INITIAL_DATE
 export END_DATE=$FINAL_DATE

@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+. ./setup.ksh
+
 export EXPT=vartest
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export RUN=${ID}_gen_be
@@ -12,7 +14,6 @@ export EXP_DIR=$PWD/$EXPT
 export RUN_DIR=$EXP_DIR/$RUN
 rm -rf $RUN_DIR
 
-. ./setup.ksh
 . $EXP_DIR/setup.ksh
 
 export LOCAL=true
