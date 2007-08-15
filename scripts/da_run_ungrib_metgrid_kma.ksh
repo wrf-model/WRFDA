@@ -22,17 +22,26 @@ export DATE_SAVE=$DATE
 export FCST_RANGE_SAVE=$FCST_RANGE
 export WORK_DIR=$RUN_DIR/working.run_ungrib_metgrid_kma
 
-if test ! -d $WORK_DIR; then mkdir -p $WORK_DIR; cd $WORK_DIR; fi
+if test ! -d $WORK_DIR;   then mkdir -p $WORK_DIR; cd $WORK_DIR; fi
 
-#-----------------------------------------------------------------------
-# [2] Run ungrib for GFS surface fields:
-#-----------------------------------------------------------------------
+# Create new sub-directories for intermediate ungrib files:
+
+if test ! -d GFS_DIR;    then mkdir GFS_DIR;   fi 
+if test ! -d GDAPS_DIR;  then mkdir GDAPS_DIR; fi 
 
 ln -fs $WPS_DIR/ungrib.exe .
 
 export DATE=$DATE_SAVE # Restore true date.
 export FCST_RANGE=0
-export FCST_HOUR=00
+export FCST_HOUR=0
+
+while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
+
+if test $FCST_HOUR -lt 10; then export FCST_HOUR=0$FCST_HOUR; fi
+
+#-----------------------------------------------------------------------
+# [2] Run ungrib for GFS surface fields:
+#-----------------------------------------------------------------------
 
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 export FG_TYPE=gfs
@@ -54,18 +63,15 @@ if test $RC != 0; then
 fi
 
 mv FILE:* GFS.GDAPS
+
 rm Vtable GRIBFILE*
 
 #-----------------------------------------------------------------------
 # [2] Run ungrib for GDAPS:
 #-----------------------------------------------------------------------
 
-export FCST_HOUR=0
-export FCST_RANGE=0
-
-while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
-
-   if test $FCST_HOUR -lt 10; then export FCST_HOUR=0$FCST_HOUR; fi
+#export FCST_HOUR=0
+#export FCST_RANGE=0
 
    ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
    export FG_TYPE=gdaps
@@ -86,13 +92,6 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
       exit $RC
    fi
 
-#  Move to next forecast hour:
-
-   export DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
-   export FCST_HOUR=`expr $FCST_HOUR + $LBC_FREQ`
-
-done
-
 rm Vtable GRIBFILE*
 
 #-----------------------------------------------------------------------
@@ -105,8 +104,8 @@ rm Vtable GRIBFILE*
 export CONSTANTS1=./GFS.GDAPS
 #export CONSTANTS2=./NAVYSST
 
-export DATE=$DATE_SAVE              # Restore true date.
-export FCST_RANGE=$FCST_RANGE_SAVE  # Restore true range.
+#export DATE=$DATE_SAVE              # Restore true date.
+#export FCST_RANGE=$FCST_RANGE_SAVE  # Restore true range.
 
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 cp namelist.wps namelist.wps.metgrid
@@ -127,9 +126,23 @@ fi
 if test $RC != 0; then
    echo metgrid failed with error $RC
    exit $RC
+ else
+
+   mv met_em.d${DOMAIN}* $RC_DIR/${DATE_SAVE}   
+   
+# Move GFS and GDAPS intermediate files to their own directories.   
+   mv GFS.GDAPS GFS_DIR/GFS.GDAPS_$DATE   
+   mv FILE:* GDAPS_DIR/.
+   
 fi
 
-mv met_em.d${DOMAIN}* $RC_DIR/$DATE
+#  Move to next forecast hour:
+
+   export DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+   export FCST_HOUR=`expr $FCST_HOUR + $LBC_FREQ`
+
+done
+
 
 if $CLEAN; then rm -rf $WORK_DIR; fi
 
