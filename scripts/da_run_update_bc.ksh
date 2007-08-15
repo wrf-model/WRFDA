@@ -16,7 +16,7 @@ export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}                            # Domain name.
 export EXPT=${EXPT:-test}                              # Experiment name.
-export CLEAN=${CLEAN:-true}
+export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}
 
 #Time info:
