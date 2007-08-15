@@ -61,6 +61,7 @@ export PROC_PLOT=true   # make plots
 export OUT_TYPE=ncgm            # ncgm, pdf (pdf will be much slower than ncgm and 
                                 #            generate huge output if plots are not splitted)
                                 # pdf will generated plots in higher resolution
+export PLOT_STATS_ONLY=false
 export PLOT_OPT=all             # all, sea_only, land_only
 export PLOT_QCED=false          # true, false.
 export PLOT_SPLIT=false         # true, false. Set true to plot one frame in one file.

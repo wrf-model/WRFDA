@@ -1900,17 +1900,19 @@ begin ; begin of function read_info
       info = new(sum(nlevel),float)
    end if
    do n = 0, ndata-1
-      if ( n .eq. 0 ) then
-         is = 0
-         ie = nlevel(n) - 1
-      else
-         is = ie + 1
-         ie = is + nlevel(n) - 1
-      end if
-      if ( type .eq. "id" ) then
-         info(is:ie) = charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg:iend))
-      else
-         info(is:ie) = stringtofloat(charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg:iend)))
+      if ( nlevel(n) .gt. 0 ) then
+         if ( n .eq. 0 ) then
+            is = 0
+            ie = nlevel(n) - 1
+         else
+            is = ie + 1
+            ie = is + nlevel(n) - 1
+         end if
+         if ( type .eq. "id" ) then
+            info(is:ie) = charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg:iend))
+         else
+            info(is:ie) = stringtofloat(charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg:iend)))
+         end if
       end if
    end do
    return(info)
@@ -2029,16 +2031,18 @@ begin ; begin of function read_data
    end if
 
    do n = 0, ndata-1
-      if ( n .eq. 0 ) then
-         is = 0
-         ie = nlevel(n) - 1
-      else
-         is = ie + 1
-         ie = is + nlevel(n) - 1
+      if ( nlevel(n) .gt. 0 ) then
+         if ( n .eq. 0 ) then
+            is = 0
+            ie = nlevel(n) - 1
+         else
+            is = ie + 1
+            ie = is + nlevel(n) - 1
+         end if
+         do k = 0, 4   ; obs, inv, qc, err, inc
+            data(is:ie,k) = stringtofloat(charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg(k):iend(k))))
+         end do
       end if
-      do k = 0, 4   ; obs, inv, qc, err, inc
-         data(is:ie,k) = stringtofloat(charactertostring(cdata(ilevel(n)+1:ilevel(n)+nlevel(n),ibeg(k):iend(k))))
-      end do
    end do
    return(data)
 end ; end of function read_data

@@ -11,6 +11,8 @@ begin
 ; plot options
 ;*******************************************************************************
  
+   plot_stats_only = False
+
    plot_ch_all = True                ; True to plot all channels
 ;   plot_ch_all = False                 ; False to plot user-selected plot_ch channels
    if ( .not. plot_ch_all ) then
@@ -212,6 +214,11 @@ begin
       else
          plot_qced = False
       end if
+      if ( getenv("PLOT_STATS_ONLY").eq."true" .or. getenv("PLOT_STATS_ONLY").eq."True" ) then
+         plot_stats_only = True
+      else
+         plot_stats_only = False
+      end if
    end if
 
    inst = systemfunc("echo "+instrument+" | cut -f3 -d-")
@@ -359,7 +366,7 @@ begin
          qc&chan = ichan
       end if
 
-      if ( .not. plot_split .and. itproc ) then
+      if ( (.not. plot_stats_only) .and. (.not. plot_split) .and. itproc ) then
          outname = instrument + "_" + date(itime)
          wks = gsn_open_wks(out_type,plotdir+outname)
          gsn_define_colormap(wks,colormap)
@@ -443,7 +450,9 @@ begin
                end if
 
                info = instrument+"_ch"+sprinti("%0.4i",plot_ch(ich))
-               print("Plotting "+subname+" data distribution of "+info)
+               if ( .not. plot_stats_only ) then
+                  print("Plotting "+subname+" data distribution of "+info)
+               end if
         
                npts(ich,itime) = num(.not.ismissing(data))
                npts_land(ich,itime) = num(.not.ismissing(mask(data, isflg, 2)))
@@ -542,6 +551,8 @@ begin
                      stats_info = " "
                   end if
                end if
+
+if ( .not. plot_stats_only ) then
 
                if ( ip .eq. 1 .or. ip .eq. 2 ) then
                   plot_min_val = minval(ich)
@@ -702,9 +713,11 @@ begin
                delete(lon_new)
                end if
 
+end if
+
             end do  ; end loop for plotting obs, bak, omb_nobc, omb_bc, oma, end do ip_loop
 
-            if ( npts(ich,itime) .gt. 1 .and. npts_sele(ich,itime) .gt. 1 ) then
+            if ( (.not. plot_stats_only) .and. npts(ich,itime) .gt. 1 .and. npts_sele(ich,itime) .gt. 1 ) then
                ;
                ; scatter plot (BAK vs OBS)
                ;
@@ -924,7 +937,7 @@ begin
 
             end if   ; end of npts and npts_sele if check for scatter plot and histogram
 
-            if ( ich .eq. (nchan-1) .and. npts_sele(ich,itime) .gt. 0 ) then
+            if ( (.not. plot_stats_only) .and. ich .eq. (nchan-1) .and. npts_sele(ich,itime) .gt. 0 ) then
                ;
                ; surface type isflg plot
                ;
@@ -981,6 +994,9 @@ begin
                frame(wks)    ; Advance the frame.
                delete(data_lon)
                delete(data_lat)
+               if ( plot_split ) then
+                  destroy(wks)
+               end if
 
             end if   ; end of if plot surface flag 
 
@@ -1009,7 +1025,7 @@ begin
             ;
             ; plot OMB/OMA (number/mean/rms) vs channels
             ;
-            if ( plot_split ) then
+            if ( plot_stats_only .or. plot_split ) then
                outname = instrument + "_" + date(itime) + "_stats"
                wks = gsn_open_wks(out_type,plotdir+outname)
                setvalues wks
@@ -1066,7 +1082,7 @@ begin
 
             delete(res_stats)
             delete(plot)
-            if ( plot_split ) then
+            if ( plot_stats_only .or. plot_split ) then
                destroy(wks)
             end if
 
@@ -1077,7 +1093,9 @@ begin
 
       end if   ; end of itproc_if block
 
-      destroy(wks)
+      if ( (.not. plot_stats_only) .and. (.not. plot_split) .and. itproc ) then
+         destroy(wks)
+      end if
 
    end do  ; end loop for ntime, end do ntime_loop
 
