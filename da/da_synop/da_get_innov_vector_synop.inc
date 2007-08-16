@@ -31,19 +31,18 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
     
-   if (trace_use) call da_trace_entry("da_get_innov_vector_synop")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_synop")
 
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, &
-      iv%ob_numb(iv%current_ob_time)%synop
+   do n=iv%plocal(iv%time-1,synop) + 1, iv%plocal(iv%time,synop)
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%synop(n)%loc%i
-      j = iv%synop(n)%loc%j
-      dx = iv%synop(n)%loc%dx
-      dy = iv%synop(n)%loc%dy
+      i   = iv%synop(n)%loc%i
+      j   = iv%synop(n)%loc%j
+      dx  = iv%synop(n)%loc%dx
+      dy  = iv%synop(n)%loc%dy
       dxm = iv%synop(n)%loc%dxm
       dym = iv%synop(n)%loc%dym
 
@@ -213,7 +212,7 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
          itu +itvv +itp +itt +itqv
    end if
     
-   if (trace_use) call da_trace_exit("da_get_innov_vector_synop")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_synop")
 
 end subroutine da_get_innov_vector_synop
 

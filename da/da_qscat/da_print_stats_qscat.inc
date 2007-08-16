@@ -6,11 +6,13 @@ subroutine da_print_stats_qscat(stats_unit, nu, nv, qscat)
 
    implicit none
 
-   integer,           intent(in)    :: stats_unit
-   integer,           intent(inout) :: nu, nv
-   type (stats_qscat_type), intent(in):: qscat
-   
-   write(unit=stats_unit, fmt='(3a/)') &
+   integer,                 intent(in)    :: stats_unit  
+   integer,                 intent(inout) :: nu, nv      
+   type (stats_qscat_type), intent(in)    :: qscat
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_qscat")
+
+      write(unit=stats_unit, fmt='(3a/)') &
         '   var             ', &
         'u (m/s)     n    k    ', &
         'v (m/s)     n    k    '
@@ -29,6 +31,8 @@ subroutine da_print_stats_qscat(stats_unit, nu, nv, qscat)
         ' Average     : ', qscat%average%u/real(nu), qscat%average%v/real(nv), &
         '    RMSE     : ', sqrt(qscat%rms_err%u/real(nu)), &
                       sqrt(qscat%rms_err%v/real(nv))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_qscat")
    
 end subroutine da_print_stats_qscat
 

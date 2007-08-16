@@ -70,8 +70,6 @@ module da_wrfvar_top
 
    implicit none
 
-   real    :: time
-
    integer :: loop, levels_to_process
 
    type (domain) , pointer :: keep_grid, grid_ptr, null_domain

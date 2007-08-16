@@ -6,15 +6,15 @@ subroutine da_transform_vtovv_global (cv_size, xbx, be, cv, vv)
 
    implicit none
 
-   integer, intent(in)          :: cv_size ! Size of cv array.
-   type (xbx_type),intent(in)   :: xbx  ! For header & non-grid arrays.
-   type (be_type), intent(in)   :: be   ! background errors.
-   real, intent(in)             :: cv(1:cv_size)   ! control variables.
-   type (vp_type),intent(inout) :: vv   ! grdipt/eof cv (local).
+   integer,        intent(in)    :: cv_size       ! Size of cv array.
+   type(xbx_type), intent(in)    :: xbx           ! For header & non-grid arrays.
+   type(be_type),  intent(in)    :: be            ! background errors.
+   real,           intent(in)    :: cv(1:cv_size) ! control variables.
+   type(vp_type),  intent(inout) :: vv            ! grdipt/eof cv (local).
 
-   integer                      :: k, m ! Loop counters.
-   integer                      :: cv_s ! Counter.
-   integer                      :: cv_e ! Counter.
+   integer :: k, m ! Loop counters.
+   integer :: cv_s ! Counter.
+   integer :: cv_e ! Counter.
 
    if (trace_use) call da_trace_entry("da_transform_vtovv_global")
 
@@ -64,7 +64,6 @@ subroutine da_transform_vtovv_global (cv_size, xbx, be, cv, vv)
    end do
 
    do k = 1, be%v5%mz
-
      cv_e = cv_s + 2 * be % cv % size5c - 1
      call da_vtovv_spectral(be % v5 % max_wave, be % cv % size5c, &
         xbx % lenr, xbx % lenwrk, xbx % lensav, &

@@ -11,9 +11,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    type (ob_type),    intent(out)   :: iv  ! O-B structure.
    type (xb_type),    intent(inout) :: xb  ! First guess structure
 
-   character(len=120)           :: filename
-   integer                      :: n
-   integer                      :: i, j, k
+   character(len=120)  :: filename
+   integer             :: n
+   integer             :: i, j, k
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
 
@@ -25,12 +25,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       filename = ' '
 
       do n=1, num_fgat_time
-         iv%current_ob_time = n
+         iv%time = n
 
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! scan main body of gts observation file
-         call da_scan_obs (iv, xp, filename)
+         call da_scan_gts (iv, xp, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
@@ -45,9 +45,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          end if
       end do
    else
-      iv%current_ob_time = 1
+      iv%time = 1
 
-      call da_scan_obs(iv, xp,'ob01.ascii')
+      call da_scan_gts(iv, xp,'ob01.ascii')
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
@@ -70,12 +70,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    if (num_fgat_time > 1) then
       do n=1, num_fgat_time
-         iv%current_ob_time = n
+         iv%time = n
 
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! Read gts observation file
-         call da_read_obs (iv, xp, filename)
+         call da_read_gts (iv, xp, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
@@ -90,9 +90,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          end if
       end do
    else
-      iv%current_ob_time = 1
+      iv%time = 1
 
-      call da_read_obs(iv, xp, 'ob01.ascii')
+      call da_read_gts(iv, xp, 'ob01.ascii')
 
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
@@ -117,7 +117,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
             end do
         end do
 
-        do n = 1, iv % num_radar
+        do n = 1, iv%nlocal(radar)
            do i=int(iv%radar(n)%loc%i), int(iv%radar(n)%loc%i)+1
               do j=int(iv%radar(n)%loc%j), int(iv%radar(n)%loc%j)+1
                  do k=xp%kts, xp%kte
@@ -145,7 +145,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    call da_fill_obs_structures(xp, iv, ob)
 
-   iv%current_ob_time = 1
+   iv%time = 1
 
    if (trace_use) call da_trace_exit("da_setup_obs_structures_ascii")
 

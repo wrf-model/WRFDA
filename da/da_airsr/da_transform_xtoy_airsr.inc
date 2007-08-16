@@ -13,15 +13,17 @@ subroutine da_transform_xtoy_airsr (grid, iv, y)
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
 
-   if (iv%num_airsr > 0) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
-         k = iv % airsr(n) % info % levels
-         if (k < 1) cycle
-         ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d(grid%xa%t, iv%airsr(n)%loc, y%airsr(n)%t, k, iv%airsr(n)%zk, k)
-         call da_interp_lin_3d(grid%xa%q, iv%airsr(n)%loc, y%airsr(n)%q, k, iv%airsr(n)%zk, k)
-      end do
-   end if
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airsr")
+
+   do n=iv%plocal(iv%time-1,airsr) + 1, iv%plocal(iv%time,airsr)
+      k = iv % airsr(n) % info % levels
+      if (k < 1) cycle
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d(grid%xa%t, iv%airsr(n)%loc, y%airsr(n)%t, k, iv%airsr(n)%zk, k)
+      call da_interp_lin_3d(grid%xa%q, iv%airsr(n)%loc, y%airsr(n)%q, k, iv%airsr(n)%zk, k)
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airsr")
 
 end subroutine da_transform_xtoy_airsr
 

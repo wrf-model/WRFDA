@@ -9,9 +9,11 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
    type (ob_type), intent (in)      :: oi            ! O-B
 
-   type (stats_pseudo_type)         :: pseudo
+   type (stats_pseudo_type)         :: stats
    integer                          :: nu, nv, nt, np, nq
    integer                          :: n
+
+   if (trace_use_dull) call da_trace_entry("da_oi_stats_pseudo")
 
    nu = 0
    nv = 0
@@ -19,46 +21,43 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    np = 0
    nq = 0
    
-   pseudo%maximum%u = maxmin_type(missing_r, 0, 0)
-   pseudo%maximum%v = maxmin_type(missing_r, 0, 0)
-   pseudo%maximum%t = maxmin_type(missing_r, 0, 0)
-   pseudo%maximum%p = maxmin_type(missing_r, 0, 0)
-   pseudo%maximum%q = maxmin_type(missing_r, 0, 0)
-   pseudo%minimum%u = maxmin_type(-missing_r, 0, 0)
-   pseudo%minimum%v = maxmin_type(-missing_r, 0, 0)
-   pseudo%minimum%t = maxmin_type(-missing_r, 0, 0)
-   pseudo%minimum%p = maxmin_type(-missing_r, 0, 0)
-   pseudo%minimum%q = maxmin_type(-missing_r, 0, 0)
-   pseudo%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   pseudo%rms_err = pseudo%average
-   
-   if (oi%num_pseudo > 0) then
-      do n=1, oi%num_pseudo
-         if (oi%pseudo(n)%loc%proc_domain) then
+   stats%maximum%u = maxmin_type(missing_r, 0, 0)
+   stats%maximum%v = maxmin_type(missing_r, 0, 0)
+   stats%maximum%t = maxmin_type(missing_r, 0, 0)
+   stats%maximum%p = maxmin_type(missing_r, 0, 0)
+   stats%maximum%q = maxmin_type(missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
+   stats%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-            call da_stats_calculate(n, 0, oi%pseudo(n)%u%qc, & 
-                               oi%pseudo(n)%u%inv, nu, & 
-                               pseudo%minimum%u, pseudo%maximum%u, &
-                               pseudo%average%u, pseudo%rms_err%u)
-            call da_stats_calculate(n, 0, oi%pseudo(n)%v%qc, & 
-                               oi%pseudo(n)%v%inv, nv, & 
-                               pseudo%minimum%v, pseudo%maximum%v, &
-                               pseudo%average%v, pseudo%rms_err%v)
-            call da_stats_calculate(n, 0, oi%pseudo(n)%t%qc, & 
-                               oi%pseudo(n)%t%inv, nt, & 
-                               pseudo%minimum%t, pseudo%maximum%t, &
-                               pseudo%average%t, pseudo%rms_err%t)
-            call da_stats_calculate(n, 0, oi%pseudo(n)%p%qc, & 
-                               oi%pseudo(n)%p%inv, np, & 
-                               pseudo%minimum%p, pseudo%maximum%p, &
-                               pseudo%average%p, pseudo%rms_err%p)
-            call da_stats_calculate(n, 0, oi%pseudo(n)%q%qc, & 
-                               oi%pseudo(n)%q%inv, nq, & 
-                               pseudo%minimum%q, pseudo%maximum%q, &
-                               pseudo%average%q, pseudo%rms_err%q)
-         end if    ! end if (oi%pseudo(n)%loc%proc_domain)
-      end do    
-   end if
+   do n=1, oi%nlocal(pseudo)
+      if (oi%pseudo(n)%loc%proc_domain) then
+         call da_stats_calculate(n, 0, oi%pseudo(n)%u%qc, & 
+            oi%pseudo(n)%u%inv, nu, & 
+            stats%minimum%u, stats%maximum%u, &
+            stats%average%u, stats%rms_err%u)
+         call da_stats_calculate(n, 0, oi%pseudo(n)%v%qc, & 
+            oi%pseudo(n)%v%inv, nv, & 
+            stats%minimum%v, stats%maximum%v, &
+            stats%average%v, stats%rms_err%v)
+         call da_stats_calculate(n, 0, oi%pseudo(n)%t%qc, & 
+            oi%pseudo(n)%t%inv, nt, & 
+            stats%minimum%t, stats%maximum%t, &
+            stats%average%t, stats%rms_err%t)
+         call da_stats_calculate(n, 0, oi%pseudo(n)%p%qc, & 
+            oi%pseudo(n)%p%inv, np, & 
+            stats%minimum%p, stats%maximum%p, &
+            stats%average%p, stats%rms_err%p)
+         call da_stats_calculate(n, 0, oi%pseudo(n)%q%qc, & 
+            oi%pseudo(n)%q%inv, nq, & 
+            stats%minimum%q, stats%maximum%q, &
+            stats%average%q, stats%rms_err%q)
+      end if    ! end if (oi%pseudo(n)%loc%proc_domain)
+   end do    
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int(nu)
@@ -67,33 +66,35 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    call da_proc_sum_int(np)
    call da_proc_sum_int(nq)
    
-   call da_proc_stats_combine(Pseudo%average%u, Pseudo%rms_err%u, &
-                           Pseudo%minimum%u%value, Pseudo%maximum%u%value, &
-                           Pseudo%minimum%u%n, Pseudo%maximum%u%n, &
-                           Pseudo%minimum%u%l, Pseudo%maximum%u%l)
-   call da_proc_stats_combine(Pseudo%average%v, Pseudo%rms_err%v, &
-                           Pseudo%minimum%v%value, Pseudo%maximum%v%value, &
-                           Pseudo%minimum%v%n, Pseudo%maximum%v%n, &
-                           Pseudo%minimum%v%l, Pseudo%maximum%v%l)
-   call da_proc_stats_combine(Pseudo%average%t, Pseudo%rms_err%t, &
-                           Pseudo%minimum%t%value, Pseudo%maximum%t%value, &
-                           Pseudo%minimum%t%n, Pseudo%maximum%t%n, &
-                           Pseudo%minimum%t%l, Pseudo%maximum%t%l)
-   call da_proc_stats_combine(Pseudo%average%p, Pseudo%rms_err%p, &
-                           Pseudo%minimum%p%value, Pseudo%maximum%p%value, &
-                           Pseudo%minimum%p%n, Pseudo%maximum%p%n, &
-                           Pseudo%minimum%p%l, Pseudo%maximum%p%l)
-   call da_proc_stats_combine(Pseudo%average%q, Pseudo%rms_err%q, &
-                           Pseudo%minimum%q%value, Pseudo%maximum%q%value, &
-                           Pseudo%minimum%q%n, Pseudo%maximum%q%n, &
-                           Pseudo%minimum%q%l, Pseudo%maximum%q%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
+      stats%minimum%p%value, stats%maximum%p%value, &
+      stats%minimum%p%n, stats%maximum%p%n, &
+      stats%minimum%p%l, stats%maximum%p%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
    
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .OR. nt /= 0 .or. np /= 0 .OR. nq /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' O-B Diagnostics for pseudo'
-         call da_print_stats_pseudo(stats_unit, nu, nv, nt, np, nq, pseudo)
+         call da_print_stats_pseudo(stats_unit, nu, nv, nt, np, nq, stats)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_oi_stats_pseudo")
 
 end subroutine da_oi_stats_pseudo
 

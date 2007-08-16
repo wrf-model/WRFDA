@@ -1,4 +1,4 @@
-subroutine da_ao_stats_buoy (stats_unit, oi, re)
+subroutine da_ao_stats_buoy (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,61 +6,61 @@ subroutine da_ao_stats_buoy (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent(inout) :: iv            ! iv
+   type (y_type),  intent(in)    :: re            ! A - O
 
-   type (stats_buoy_type)           :: Buoy
-   integer                          :: nu, nv, nt, np, nq
-   integer                          :: n
+   type (stats_buoy_type) :: stats
+   integer                :: nu, nv, nt, np, nq
+   integer                :: n
+   
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_buoy")    
 
    nu = 0
    nv = 0
    nt = 0
    np = 0
    nq = 0
-   num_Buoy_tot = 0
 
-   Buoy%maximum%u = maxmin_type (missing_r, 0, 0)
-   Buoy%maximum%v = maxmin_type (missing_r, 0, 0)
-   Buoy%maximum%t = maxmin_type (missing_r, 0, 0)
-   Buoy%maximum%p = maxmin_type (missing_r, 0, 0)
-   Buoy%maximum%q = maxmin_type (missing_r, 0, 0)
-   Buoy%minimum%u = maxmin_type(-missing_r, 0, 0)
-   Buoy%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Buoy%minimum%t = maxmin_type(-missing_r, 0, 0)
-   Buoy%minimum%p = maxmin_type(-missing_r, 0, 0)
-   Buoy%minimum%q = maxmin_type(-missing_r, 0, 0)
-   Buoy%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   Buoy%rms_err = Buoy%average
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%t = maxmin_type (missing_r, 0, 0)
+   stats%maximum%p = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_Buoy > 0) then
-      do n=1, oi%num_Buoy
-         if (oi%Buoy(n)%loc%proc_domain) then
-            call da_stats_calculate (n, 0, oi%Buoy(n)%u%qc, & 
-                               re%Buoy(n)%u, nu, & 
-                               buoy%minimum%u, Buoy%maximum%u, &
-                               buoy%average%u, Buoy%rms_err%u)
-            call da_stats_calculate (n, 0, oi%Buoy(n)%v%qc, & 
-                               re%Buoy(n)%v, nv, & 
-                               buoy%minimum%v, Buoy%maximum%v, &
-                               buoy%average%v, Buoy%rms_err%v)
-            call da_stats_calculate (n, 0, oi%Buoy(n)%t%qc, & 
-                               re%Buoy(n)%t, nt, & 
-                               buoy%minimum%t, Buoy%maximum%t, &
-                               buoy%average%t, Buoy%rms_err%t)
-            call da_stats_calculate (n, 0, oi%Buoy(n)%p%qc, & 
-                               re%Buoy(n)%p, np, & 
-                               buoy%minimum%p, Buoy%maximum%p, &
-                               buoy%average%p, Buoy%rms_err%p)
-            call da_stats_calculate (n, 0, oi%Buoy(n)%q%qc, & 
-                               re%Buoy(n)%q, nq, & 
-                               Buoy%minimum%q, Buoy%maximum%q, &
-                               Buoy%average%q, Buoy%rms_err%q)
+   stats%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-          end if    ! end if (oi%Buoy(n)%loc%proc_domain)
-       end do
-   end if
+   do n=1, iv%nlocal(buoy)
+      if (iv%buoy(n)%loc%proc_domain) then
+         call da_stats_calculate (n, 0, iv%buoy(n)%u%qc, & 
+             re%buoy(n)%u, nu, & 
+             stats%minimum%u, stats%maximum%u, &
+             stats%average%u, stats%rms_err%u)
+         call da_stats_calculate (n, 0, iv%buoy(n)%v%qc, & 
+            re%buoy(n)%v, nv, & 
+            stats%minimum%v, stats%maximum%v, &
+            stats%average%v, stats%rms_err%v)
+         call da_stats_calculate (n, 0, iv%buoy(n)%t%qc, & 
+            re%buoy(n)%t, nt, & 
+            stats%minimum%t, stats%maximum%t, &
+            stats%average%t, stats%rms_err%t)
+         call da_stats_calculate (n, 0, iv%buoy(n)%p%qc, & 
+            re%buoy(n)%p, np, & 
+            stats%minimum%p, stats%maximum%p, &
+            stats%average%p, stats%rms_err%p)
+         call da_stats_calculate (n, 0, iv%buoy(n)%q%qc, & 
+            re%buoy(n)%q, nq, & 
+            stats%minimum%q, stats%maximum%q, &
+            stats%average%q, stats%rms_err%q)
+
+      end if
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (nu)
@@ -68,35 +68,37 @@ subroutine da_ao_stats_buoy (stats_unit, oi, re)
    call da_proc_sum_int (nt)
    call da_proc_sum_int (np)
    call da_proc_sum_int (nq)
-   num_Buoy_tot = nu + nv + nt + np + nq
+   iv%nstats(buoy) = nu + nv + nt + np + nq
 
-   call da_proc_stats_combine(Buoy%average%u, Buoy%rms_err%u, &
-                           Buoy%minimum%u%value, Buoy%maximum%u%value, &
-                           Buoy%minimum%u%n, Buoy%maximum%u%n, &
-                           Buoy%minimum%u%l, Buoy%maximum%u%l)
-   call da_proc_stats_combine(Buoy%average%v, Buoy%rms_err%v, &
-                           Buoy%minimum%v%value, Buoy%maximum%v%value, &
-                           Buoy%minimum%v%n, Buoy%maximum%v%n, &
-                           Buoy%minimum%v%l, Buoy%maximum%v%l)
-   call da_proc_stats_combine(Buoy%average%t, Buoy%rms_err%t, &
-                           Buoy%minimum%t%value, Buoy%maximum%t%value, &
-                           Buoy%minimum%t%n, Buoy%maximum%t%n, &
-                           Buoy%minimum%t%l, Buoy%maximum%t%l)
-   call da_proc_stats_combine(Buoy%average%p, Buoy%rms_err%p, &
-                           Buoy%minimum%p%value, Buoy%maximum%p%value, &
-                           Buoy%minimum%p%n, Buoy%maximum%p%n, &
-                           Buoy%minimum%p%l, Buoy%maximum%p%l)
-   call da_proc_stats_combine(Buoy%average%q, Buoy%rms_err%q, &
-                           Buoy%minimum%q%value, Buoy%maximum%q%value, &
-                           Buoy%minimum%q%n, Buoy%maximum%q%n, &
-                           Buoy%minimum%q%l, Buoy%maximum%q%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
+      stats%minimum%p%value, stats%maximum%p%value, &
+      stats%minimum%p%n, stats%maximum%p%n, &
+      stats%minimum%p%l, stats%maximum%p%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for buoy'
-         call da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, Buoy)
+         call da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, stats)
       end if
    end if
+   
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_buoy")    
 
  end subroutine da_ao_stats_buoy
 

@@ -15,23 +15,25 @@ subroutine da_residual_ssmt2(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   type (bad_data_type)              :: n_obs_bad
-   integer                           :: n, k
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_residual_ssmt2")
 
    n_obs_bad % rh % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_ssmt2
+   do n=1, iv%nlocal(ssmt2)
       do k=1, iv%ssmt2(n)%info%levels
          np_available = np_available + 1
-
-         re%ssmt2(n)%rh(k) = &
-            da_residual(n, k, y%ssmt2(n)%rh(k), iv%ssmt2(n)%rh(k), n_obs_bad % rh)
+         re%ssmt2(n)%rh(k) = da_residual(n, k, y%ssmt2(n)%rh(k), iv%ssmt2(n)%rh(k), n_obs_bad % rh)
       end do
    end do
 
-   np_missing = np_missing + n_obs_bad % rh % num % miss
+   np_missing  = np_missing  + n_obs_bad % rh % num % miss
    np_bad_data = np_bad_data + n_obs_bad % rh % num % bad
    np_obs_used = np_obs_used + n_obs_bad % rh % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_ssmt2")
 
 end subroutine da_residual_ssmt2
 

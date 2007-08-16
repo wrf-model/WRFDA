@@ -16,19 +16,21 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    implicit none
 
-   type(synop_type),       intent(inout) :: sfc_obs
-   type(xb_type),          intent(in)    :: xb
+   type(synop_type), intent(inout) :: sfc_obs
+   type(xb_type),    intent(in)    :: xb
 
-   real                                  :: roughness, psfc, &
-                                            mslp, dx, dxm, dy, dym,    &
-                                            ho, po, to, qo,   &
-                                            hm, pm, tm, qm, um, vm, correc, val
+   real    :: roughness, psfc, mslp, dx, dxm, dy, dym, ho, po, to, qo
+   real    :: hm, pm, tm, qm, um, vm, correc, val
 
-   integer                               :: i, j, k
+   integer :: i, j, k
+   real    :: t_mdl(kts:kte)
+   real    :: q_mdl(kts:kte)
+   real    :: u_mdl(kts:kte)
+   real    :: v_mdl(kts:kte)
+   real    :: height(kts:kte)
+   real    :: pressure(kts:kte)
 
-   real, dimension(kts:kte)        :: t_mdl, q_mdl, u_mdl, v_mdl, &
-                                            height, pressure
-
+   if (trace_use) call da_trace_entry("da_obs_sfc_correction")
 
    ! 1. Check if it needs to do the surface correction at the first level
  
@@ -36,38 +38,25 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
  
    ! 2. Model profile at OBS site for surface correction
 
-   i = sfc_obs%loc%i
-   j = sfc_obs%loc%j
-   dx = sfc_obs%loc%dx
-   dy = sfc_obs%loc%dy
+   i   = sfc_obs%loc%i
+   j   = sfc_obs%loc%j
+   dx  = sfc_obs%loc%dx
+   dy  = sfc_obs%loc%dy
    dxm = sfc_obs%loc%dxm
    dym = sfc_obs%loc%dym
 
    ! Model roughness at the obs site
 
    roughness = dym*(dxm*xb%rough(i,j)   + dx*xb%rough(i+1,j)) &
-             + dy *(dxm*xb%rough(i,j+1) + dx*xb%rough(i+1,j+1))
+      + dy *(dxm*xb%rough(i,j+1) + dx*xb%rough(i+1,j+1))
 
    do k = kts, kte
-
-      pressure(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                  + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-
-      height(k)   = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                  + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-
-      t_mdl(k)    = dym*(dxm*xb%t(i,j  ,k) + dx*xb% t(i+1,j  ,k)) &
-                  + dy *(dxm*xb%t(i,j+1,k) + dx*xb% t(i+1,j+1,k))
-
-      q_mdl(k)    = dym*(dxm*xb%q(i,j  ,k) + dx*xb% q(i+1,j  ,k)) &
-                  + dy *(dxm*xb%q(i,j+1,k) + dx*xb% q(i+1,j+1,k))
-
-      u_mdl(k)    = dym*(dxm*xb%u(i,j  ,k) + dx*xb% u(i+1,j  ,k)) &
-                  + dy *(dxm*xb%u(i,j+1,k) + dx*xb% u(i+1,j+1,k))
-
-      v_mdl(k)    = dym*(dxm*xb%v(i,j  ,k) + dx*xb% v(i+1,j  ,k)) &
-                  + dy *(dxm*xb%v(i,j+1,k) + dx*xb% v(i+1,j+1,k))
-
+      pressure(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) + dy*(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+      height(k)   = dym*(dxm*xb%h(i,j,k) + dx*xb%h(i+1,j,k)) + dy*(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
+      t_mdl(k)    = dym*(dxm*xb%t(i,j,k) + dx*xb%t(i+1,j,k)) + dy*(dxm*xb%t(i,j+1,k) + dx*xb%t(i+1,j+1,k))
+      q_mdl(k)    = dym*(dxm*xb%q(i,j,k) + dx*xb%q(i+1,j,k)) + dy*(dxm*xb%q(i,j+1,k) + dx*xb%q(i+1,j+1,k))
+      u_mdl(k)    = dym*(dxm*xb%u(i,j,k) + dx*xb%u(i+1,j,k)) + dy*(dxm*xb%u(i,j+1,k) + dx*xb%u(i+1,j+1,k))
+      v_mdl(k)    = dym*(dxm*xb%v(i,j,k) + dx*xb%v(i+1,j,k)) + dy*(dxm*xb%v(i,j+1,k) + dx*xb%v(i+1,j+1,k))
    end do 
 
    ! 3. OBS data and recover the surface pressure from the
@@ -85,11 +74,9 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       psfc = missing_r
       if (abs(ho - missing_r) > 1.0) then
          if (abs(to - missing_r) > 1.0) then
-            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, &
-                         height, psfc, mslp, ho, to)
+            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, height, psfc, mslp, ho, to)
          else
-            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, &
-                         height, psfc, mslp, ho)
+            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, height, psfc, mslp, ho)
          end if
       end if
       sfc_obs % p % inv = psfc
@@ -106,8 +93,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    ! 3.2 Check that obs pressure and height are present
    !     ----------------------------------------------
 
-   if (abs(po - missing_r) < 1.0  .OR. &
-       abs(ho - missing_r) < 1.0) then
+   if (abs(po - missing_r) < 1.0  .OR. abs(ho - missing_r) < 1.0) then
 
       return
 
@@ -140,19 +126,15 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.2 Correction wind based on similarity laws
       !     -------------------------------------------
 
-      if ((abs(sfc_obs % u % inv - missing_r) > 1.0).AND.&
-          (abs(sfc_obs % v % inv - missing_r) > 1.0))then
-
+      if ((abs(sfc_obs%u%inv - missing_r) > 1.0) .AND. (abs(sfc_obs%v%inv - missing_r) > 1.0)) then
          ! 3.2.1 Correction factor
 
          ! temperature and moisture at sigma level:
 
          if (abs(to - missing_r) < 1.0) then
-            correc = da_mo_correction(ho, po, tm, qo, &
-                                     hm, pm, tm, qm, um ,vm, roughness)
+            correc = da_mo_correction(ho, po, tm, qo, hm, pm, tm, qm, um ,vm, roughness)
          else
-            correc = da_mo_correction(ho, po, to, qo, &
-                                    hm, pm, tm, qm, um ,vm, roughness)
+            correc = da_mo_correction(ho, po, to, qo, hm, pm, tm, qm, um ,vm, roughness)
          end if
 
          ! 3.2.2 Wind correction 
@@ -171,13 +153,9 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.4 Correct pressure
       !     ----------------
 
-
       if (sfc_obs % p % qc >= 0) then
-
          !  Correct data
-
-         if (abs(to  - missing_r) > 1.0 .and. &
-            abs(qo - missing_r) > 1.0) then
+         if (abs(to  - missing_r) > 1.0 .and. abs(qo - missing_r) > 1.0) then
             call da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
          else if (abs(to  - missing_r) > 1.0) then
             call da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
@@ -196,27 +174,24 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
       if (abs(sfc_obs % t % inv - missing_r) > 1.0) then
          !  Correct data
-
-         call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, &
-            kts, kte)
+         call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, kts, kte)
 
          sfc_obs % t % inv = val
 
          !  Replace any previous temperature qc by the surface correction
-
          sfc_obs % t % qc  = surface_correction
       end if
 
       ! 3.6 Assign model lowest level height + 1m to observation
       !      ----------------------------------------------------- 
-
       ! sfc_obs % h = height(kts) + 1.0
 
       ! 3.7 Height QC
       !     ---------
- 
       ! sfc_obs % height_qc = surface_correction
    end if
+
+   if (trace_use) call da_trace_exit("da_obs_sfc_correction")
 
 end  subroutine da_obs_sfc_correction
 

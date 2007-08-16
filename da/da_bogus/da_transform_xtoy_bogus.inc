@@ -23,7 +23,9 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
    real    :: model_p_c9(kts:kte)
    real    :: psfc_loc,terr_loc,psfc_loc9
 
-   do n = iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_bogus")      
+
+   do n = iv%plocal(iv%time-1,bogus)+1, iv%plocal(iv%time,bogus)
       num_levs = iv % bogus(n) % info % levels
 
       if (num_levs < 1) cycle
@@ -74,6 +76,8 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
       call da_interp_lin_3d(grid%xa % q, iv%bogus(n)%loc, &
          y%bogus(n)%q, num_levs, iv%bogus(n)%zk, num_levs) 
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_bogus") 
 
 end subroutine da_transform_xtoy_bogus
 

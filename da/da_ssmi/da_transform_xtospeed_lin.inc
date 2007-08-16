@@ -6,10 +6,11 @@ subroutine da_transform_xtospeed_lin(TGL_speed,U,V,TGL_u,TGL_v)
 
    implicit none
 
-   real,     intent (out )    :: TGL_speed
-   real,     intent (in  )    :: U,V
-   real,     intent (in  )    :: TGL_u,TGL_v
-   real                        :: speed
+   real, intent(out) :: TGL_speed
+   real, intent(in)  :: U,V
+   real, intent(in)  :: TGL_u,TGL_v
+
+   real :: speed
 
    if (trace_use) call da_trace_entry("da_transform_xtospeed_lin")
 

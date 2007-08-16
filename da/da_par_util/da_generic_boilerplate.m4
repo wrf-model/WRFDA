@@ -8,7 +8,7 @@
 ! definitions, which are then included in another source file.  
 !
 
-! $1 = specific ob namme, $2 = specific ob type, $3 = ob counter
+! $1 = specific ob name, $2 = specific ob type, $3 = ob counter
 
 
 define( macro_y_type_extract, 
@@ -31,7 +31,7 @@ SUBROUTINE da_y_type_ex_$1( iv, re, slice )
    ! Local declarations
    INTEGER :: n
 
-   CALL da_y_facade_create( slice, iv%$3, iv%$3_glo )
+   CALL da_y_facade_create( slice, iv%nlocal($1), iv%ntotal($1) )
    DO n=1, slice%num_obs
      CALL da_res_generic_set_info( slice%obs(n),                     &
                                      iv%$1(n)%loc%proc_domain,      &
@@ -72,7 +72,7 @@ SUBROUTINE da_y_type_ins_$1_global( slice_glob, re_glob )
    DO n=1, slice_glob%num_obs
      CALL da_res_$2_from_generic( slice_glob%obs(n), re_glob%$1(n) )
    ENDDO
-   re_glob%$3 = slice_glob%num_obs  ! duplication!
+   re_glob%nlocal($1) = slice_glob%num_obs  ! duplication!
    CALL da_y_facade_free( slice_glob )
 
 END SUBROUTINE da_y_type_ins_$1_global ')
@@ -100,11 +100,11 @@ SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
    INTEGER :: n
 
    ! allocate and initialize needed bits of iv_glob (ugly)
-   iv_glob%$3 = slice_glob%num_obs
-   iv_glob%$3_glo = slice_glob%num_obs_glo
+   iv_glob%nlocal($1) = slice_glob%num_obs
+   iv_glob%ntotal($1) = slice_glob%num_obs_glo
    ! deallocation is done in free_global_$1()
-   ALLOCATE( iv_glob%$1(iv_glob%$3) )
-   DO n=1, iv_glob%$3
+   ALLOCATE( iv_glob%$1(iv_glob%nlocal($1)) )
+   DO n=1, iv_glob%nlocal($1)
      iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
      iv_glob%$1(n)%loc%obs_global_index = &
                                         slice_glob%obs(n)%obs_global_index

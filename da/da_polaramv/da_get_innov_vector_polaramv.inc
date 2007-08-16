@@ -25,12 +25,12 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_polaramv")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_polaramv")
 
    itu   = 0; itvv    = 0;
    ituf  = 0; itvvf   = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+   do n=iv%plocal(iv%time-1,polaramv) + 1, iv%plocal(iv%time,polaramv)
       ! [1.3] Get horizontal interpolation weights:
 
       num_levs = iv % polaramv(n) % info % levels
@@ -86,8 +86,7 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
       ! Perform optional maximum error check:
       !------------------------------------------------------------------------
 
-      if (check_max_iv) &
-         call da_check_max_iv_polaramv(it, iv % polaramv(n), itu,ituf,itvv,itvvf)
+      if (check_max_iv) call da_check_max_iv_polaramv(it, iv % polaramv(n), itu,ituf,itvv,itvvf)
    end do
 
    if (rootproc .and. check_max_iv_print) then
@@ -99,7 +98,7 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
          'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_polaramv")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_polaramv")
 
 end subroutine da_get_innov_vector_polaramv
 

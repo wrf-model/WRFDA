@@ -18,12 +18,14 @@ subroutine da_residual_sound(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
+   if (trace_use_dull) call da_trace_entry("da_residual_sound")
+
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
    n_obs_bad % t % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_sound
+   do n=1, iv%nlocal(sound)
       do k=1, iv%sound(n)%info%levels
          np_available = np_available + 4
 
@@ -43,6 +45,8 @@ subroutine da_residual_sound(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
       n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
       n_obs_bad % q % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_sound")
 
 end subroutine da_residual_sound
 

@@ -18,15 +18,15 @@ subroutine da_deallocate_y(y)
    ! [1.0] Deallocate:
    !---------------------------------------------------------------------------
 
-   if (y % num_synop > 0) deallocate (y % synop)
+   if (y % nlocal(synop) > 0) deallocate (y % synop)
 
-   if (y % num_ships > 0) deallocate (y % ships)
+   if (y % nlocal(ships) > 0) deallocate (y % ships)
 
-   if (y % num_metar > 0) deallocate (y % metar)
+   if (y % nlocal(metar) > 0) deallocate (y % metar)
 
 
-   if (y % num_sound > 0) then
-      do n = 1, y % num_sound
+   if (y % nlocal(sound) > 0) then
+      do n = 1, y % nlocal(sound)
          deallocate (y % sound(n)%u)
          deallocate (y % sound(n)%v)
          deallocate (y % sound(n)%t)
@@ -38,16 +38,16 @@ subroutine da_deallocate_y(y)
       deallocate (y % sonde_sfc)
    end if
 
-   if (y % num_pilot > 0) then
-      do n = 1, y % num_pilot
+   if (y % nlocal(pilot) > 0) then
+      do n = 1, y % nlocal(pilot)
          deallocate (y % pilot(n)%u)
          deallocate (y % pilot(n)%v)
       end do
       deallocate (y % pilot)
    end if
 
-   if (y % num_bogus > 0) then
-      do n = 1, y % num_bogus
+   if (y % nlocal(bogus) > 0) then
+      do n = 1, y % nlocal(bogus)
          deallocate (y % bogus(n)%u)
          deallocate (y % bogus(n)%v)
          deallocate (y % bogus(n)%t)
@@ -56,8 +56,8 @@ subroutine da_deallocate_y(y)
       deallocate (y % bogus)
    end if
 
-    if (y % num_radar > 0) then
-       do n = 1, y % num_radar
+    if (y % nlocal(radar) > 0) then
+       do n = 1, y % nlocal(radar)
           deallocate (y % radar(n)%rv)
           deallocate (y % radar(n)%rf)
        end do
@@ -65,8 +65,8 @@ subroutine da_deallocate_y(y)
     end if
 
 
-   if (y % num_airep > 0) then
-      do n = 1, y % num_airep
+   if (y % nlocal(airep) > 0) then
+      do n = 1, y % nlocal(airep)
          deallocate (y % airep(n)%u)
          deallocate (y % airep(n)%v)
          deallocate (y % airep(n)%t)
@@ -74,26 +74,26 @@ subroutine da_deallocate_y(y)
       deallocate (y % airep)
    end if
 
-   if (y % num_geoamv > 0) then
-      do n=1, y % num_geoamv
+   if (y % nlocal(geoamv) > 0) then
+      do n=1, y % nlocal(geoamv)
          deallocate (y % geoamv(n) % u)
          deallocate (y % geoamv(n) % v)
       end do
       deallocate (y % geoamv)
    end if
 
-   if (y % num_polaramv > 0) then
-      do n=1, y % num_polaramv
+   if (y % nlocal(polaramv) > 0) then
+      do n=1, y % nlocal(polaramv)
          deallocate (y % polaramv(n) % u)
          deallocate (y % polaramv(n) % v)
       end do
       deallocate (y % polaramv)
    end if
 
-   if (y % num_gpspw > 0) deallocate (y % gpspw)
+   if (y % nlocal(gpspw) > 0) deallocate (y % gpspw)
 
-   if (y % num_gpsref > 0) then
-      do n = 1, y % num_gpsref
+   if (y % nlocal(gpsref) > 0) then
+      do n = 1, y % nlocal(gpsref)
          deallocate (y % gpsref(n)%ref)
          deallocate (y % gpsref(n)%  p)
          deallocate (y % gpsref(n)%  t)
@@ -102,42 +102,42 @@ subroutine da_deallocate_y(y)
       deallocate (y % gpsref)
    end if
 
-   if (y % num_satem > 0) then
-      do n = 1, y % num_satem
+   if (y % nlocal(satem) > 0) then
+      do n = 1, y % nlocal(satem)
          deallocate (y % satem(n) % thickness)
       end do
       deallocate (y % satem)
    end if
 
-   if (y % num_ssmi_tb > 0) deallocate (y % ssmi_tb)
-   if (y % num_ssmi_retrieval > 0) deallocate (y % ssmi_retrieval)
-   if (y % num_pseudo > 0) deallocate (y % pseudo)
+   if (y % nlocal(ssmi_tb) > 0) deallocate (y % ssmi_tb)
+   if (y % nlocal(ssmi_rv) > 0) deallocate (y % ssmi_rv)
+   if (y % nlocal(pseudo)  > 0) deallocate (y % pseudo)
 
-   if (y % num_ssmt1 > 0) then
-      do n = 1, y % num_ssmt1
+   if (y % nlocal(ssmt1) > 0) then
+      do n = 1, y % nlocal(ssmt1)
          deallocate (y % ssmt1(n) % t)
       end do
       deallocate (y % ssmt1)
    end if
 
-   if (y % num_ssmt2 > 0) then
-      do n = 1, y % num_ssmt2
+   if (y % nlocal(ssmt2) > 0) then
+      do n = 1, y % nlocal(ssmt2)
          deallocate (y % ssmt2(n) % rh)
       end do
       deallocate (y % ssmt2)
    end if
 
-   if (y % num_qscat > 0) deallocate (y % qscat)
+   if (y % nlocal(qscat) > 0) deallocate (y % qscat)
 
-   if (y % num_profiler > 0) then
-      do n = 1, y % num_profiler
+   if (y % nlocal(profiler) > 0) then
+      do n = 1, y % nlocal(profiler)
          deallocate (y % profiler(n)%u)
          deallocate (y % profiler(n)%v)
       end do
       deallocate (y % profiler)
    end if
 
-   if (y % num_buoy  > 0) deallocate (y % buoy)
+   if (y % nlocal(buoy)  > 0) deallocate (y % buoy)
 
    !  radiance:
  
@@ -149,8 +149,8 @@ subroutine da_deallocate_y(y)
       end do
       deallocate (y % instid)
    end if
-   if (y % num_airsr > 0) then
-      do n = 1, y % num_airsr
+   if (y % nlocal(airsr) > 0) then
+      do n = 1, y % nlocal(airsr)
          deallocate (y % airsr(n)%t)
          deallocate (y % airsr(n)%q)
       end do

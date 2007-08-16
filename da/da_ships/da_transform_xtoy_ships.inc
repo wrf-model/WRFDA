@@ -12,9 +12,10 @@ subroutine da_transform_xtoy_ships (grid, iv, y)
 
    integer :: n ! Loop counter.
 
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_ships")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
+      do n=iv%plocal(iv%time-1,ships) + 1, iv%plocal(iv%time,ships)
          call da_interp_obs_lin_2d(grid%xa % u, iv%ships(n)%loc, y%ships(n)%u, iv%ships(n)%zk)
          call da_interp_obs_lin_2d(grid%xa % v, iv%ships(n)%loc, y%ships(n)%v, iv%ships(n)%zk)
          call da_interp_obs_lin_2d(grid%xa % t, iv%ships(n)%loc, y%ships(n)%t, iv%ships(n)%zk)
@@ -24,11 +25,13 @@ subroutine da_transform_xtoy_ships (grid, iv, y)
       end do
    else if (sfc_assi_options == sfc_assi_options_2) then
        ! [2.0] Surface assimilation approach 2
-       do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
-          iv%ob_numb(iv%current_ob_time)%ships
+       do n=iv%plocal(iv%time-1,ships) + 1, &
+          iv%plocal(iv%time,ships)
           call da_transform_xtopsfc(grid,iv%ships(n),y%ships(n))
       end do
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_ships")
 
 end subroutine da_transform_xtoy_ships
 

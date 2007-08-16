@@ -12,13 +12,17 @@ subroutine da_transform_xtoy_ssmi_rv_adj(grid, iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout)    :: jo_grad_x   ! grad_x(jo)
 
    integer :: n
+
+   if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_rv_adj")
         
-   do n=1, iv % num_ssmi_retrieval
-      call da_interp_lin_2d_adj(jo_grad_x%tpw, iv%ssmi_retrieval(n)%loc, &
-         jo_grad_y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d_adj(jo_grad_x%speed, iv%ssmi_retrieval(n)%loc, &
-         jo_grad_y%ssmi_retrieval(n)%speed)
+   do n=1, iv % nlocal(ssmi_rv)
+      call da_interp_lin_2d_adj(jo_grad_x%tpw, iv%ssmi_rv(n)%loc, &
+         jo_grad_y%ssmi_rv(n)%tpw)
+      call da_interp_lin_2d_adj(jo_grad_x%speed, iv%ssmi_rv(n)%loc, &
+         jo_grad_y%ssmi_rv(n)%speed)
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_ssmi_rv_adj")
 
 end subroutine da_transform_xtoy_ssmi_rv_adj
 

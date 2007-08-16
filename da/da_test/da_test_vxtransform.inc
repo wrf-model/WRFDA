@@ -11,23 +11,27 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
 
    implicit none
 
-   type (domain), intent(inout)        :: grid
-   type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
-   type (be_type), intent(in)        :: be    ! background error structure.
+   type(domain),   intent(inout) :: grid
+   type(xbx_type), intent(in)    :: xbx   ! Header & non-gridded vars.
+   type(be_type),  intent(in)    :: be    ! background error structure.
+   type(vp_type),  intent(out)   :: vp    ! Test CV structure.
+   type(vp_type),  intent(out)   :: vv    ! Test CV structure.
 
-   type (vp_type), intent(out)       :: vp          ! Test CV structure.
-   type (vp_type), intent(out)       :: vv          ! Test CV structure.
-
-   real, dimension(1:cv_size)        :: cv          ! Test control variable.
-   integer            :: i   
-   type (vp_type)                    :: vp1, vv1    ! Test CV structure.
-   real, dimension(ims:ime, jms:jme) :: field
-
-
-   real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
-                                                 xa2_p, xa2_q, xa2_rh, xa2_rho, &
-                                                 xa2_qt, xa2_qcw, xa2_qrn
-   real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_w
+   real          :: cv(1:cv_size) ! Test control variable.
+   integer       :: i   
+   type(vp_type) :: vp1, vv1     ! Test CV structure.
+   real          :: field(ims:ime, jms:jme)
+   real          :: xa2_u  (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_v  (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_t  (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_p  (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_q  (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_rh (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_rho(ims:ime, jms:jme, kms:kme)
+   real          :: xa2_qt (ims:ime, jms:jme, kms:kme)
+   real          :: xa2_qcw(ims:ime, jms:jme, kms:kme)
+   real          :: xa2_qrn(ims:ime, jms:jme, kms:kme)
+   real          :: xa2_w  (ims:ime, jms:jme, kms:kme)
 
    if (trace_use) call da_trace_entry("da_test_vxtransform")
 
@@ -46,11 +50,9 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    call da_zero_vp_type(vp1)
    call da_zero_vp_type(vv1)
 
-   write(unit=stdout, fmt='(/a/)') &
-        'da_testvxtransform:'
+   write(unit=stdout, fmt='(/a/)') 'da_testvxtransform:'
 
-   write(unit=stdout, fmt='(/a/)') &
-        '---------------------------------------'
+   write(unit=stdout, fmt='(/a/)') '---------------------------------------'
 
    ! Make cv all constant value 1.0
 
@@ -59,14 +61,12 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    call da_zero_x(grid%xa)
    
    if ( global ) then
-      write(unit=stdout, fmt='(/a/)') &
-      ' Inverse tests not performed for global application'
+      write(unit=stdout, fmt='(/a/)') ' Inverse tests not performed for global application'
       go to 1111
    end if
 
 #ifdef DM_PARALLEL
-   write(unit=stdout, fmt='(/a/)') &
-         ' Inverse tests will not be done as it is MPP run'
+   write(unit=stdout, fmt='(/a/)') ' Inverse tests will not be done as it is MPP run'
 #else
    write(unit=stdout, fmt='(/a/)') &
          ' Inverse tests follows:'
@@ -105,9 +105,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
 
    if ( vert_corr == vert_corr_2 ) then
       ! perform vv = u_v^{-1} vp transform:
-      call da_vertical_transform( 'u_inv', be, &
-                            grid%xb % vertical_inner_product, &
-                            vv, vp)
+      call da_vertical_transform ('u_inv', be, grid%xb % vertical_inner_product, vv, vp)
    else
       vv % v1(its:ite,jts:jte,1:kz_vv(1)) = vp % v1(its:ite,jts:jte,1:kz_vp(1))
       vv % v2(its:ite,jts:jte,1:kz_vv(2)) = vp % v2(its:ite,jts:jte,1:kz_vp(2))
@@ -116,40 +114,34 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
       vv % v5(its:ite,jts:jte,1:kz_vv(5)) = vp % v5(its:ite,jts:jte,1:kz_vp(5))
    end if
 
+   write(unit=stdout, fmt='(/a/)') 'da_check_vvtovptovv_errors'
 
-   write(unit=stdout, fmt='(/a/)') &
-        'da_check_vvtovptovv_errors'
-
-   call da_check_vp_errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
+   call da_check_vp_errors (vv1, vv, kz_vv, its,ite, jts,jte, kts,kte)
 
    !----------------------------------------------------------------------
    ! [2.0]: Perform VpToVvToVp test:                        
    !----------------------------------------------------------------------
    if ( vert_corr == vert_corr_2 ) then
       ! perform vp = u_v (vv) transform:
-      call da_vertical_transform( 'u', be, &
-                            grid%xb % vertical_inner_product, &
-                            vv, vp)
+      call da_vertical_transform ('u', be, grid%xb % vertical_inner_product, vv, vp)
    else
-
       vp % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
       vp % v2(its:ite,jts:jte,1:kz_vv(2)) = vv % v2(its:ite,jts:jte,1:kz_vv(2))
       vp % v3(its:ite,jts:jte,1:kz_vv(3)) = vv % v3(its:ite,jts:jte,1:kz_vv(3))
       vp % v4(its:ite,jts:jte,1:kz_vv(4)) = vv % v4(its:ite,jts:jte,1:kz_vv(4))
       vp % v5(its:ite,jts:jte,1:kz_vv(5)) = vv % v5(its:ite,jts:jte,1:kz_vv(5))
-
    end if
 
    ! Check inverse errors:
 
-   write(unit=stdout, fmt='(/a/)') &
-        'da_check_vptovvtovp_errors'
+   write(unit=stdout, fmt='(/a/)') 'da_check_vptovvtovp_errors'
 
    call da_check_vp_errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
 
    !----------------------------------------------------------------------
    ! [3.0] Check_CvToVv_Adjoint:
    !----------------------------------------------------------------------
+
    call da_check_cvtovv_adjoint( grid, xbx, be, cv, vv)
   
    !----------------------------------------------------------------------
@@ -157,7 +149,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    ! Note: Currently these test are developed for regional only
    !----------------------------------------------------------------------
 
-   if( .not. global ) then
+   if (.not. global) then
       call da_zero_x(grid%xa)
       call da_transform_vptox( grid, vp, be)
       ! [4.1] Test XToVpToX differences:
@@ -166,8 +158,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
          'da_check_xtovptox_errors'
    
       call da_check_xtovptox_errors( grid%xa, xa2_u, xa2_v, xa2_w, xa2_t, &
-                                 xa2_p, xa2_q,  xa2_rho, &
-                                 xa2_qt, xa2_qcw, xa2_qrn)
+         xa2_p, xa2_q,  xa2_rho, xa2_qt, xa2_qcw, xa2_qrn)
 
       ! [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
 
@@ -175,8 +166,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
       
       ! [2.4] Check inverse errors:
 
-      write(unit=stdout, fmt='(/a/)') &
-         'da_check_vptoxtovp_errors'
+      write(unit=stdout, fmt='(/a/)') 'da_check_vptoxtovp_errors'
 
       call da_check_vp_errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
    end if
@@ -208,8 +198,8 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
 
    if (global) then   
 #ifdef DM_PARALLEL
-    write (unit=stdout,fmt=*)  &
-       ' Inverse tests for spectral transforms will not be done as it is MPP run'
+      write (unit=stdout,fmt=*)  &
+         ' Inverse tests for spectral transforms will not be done as it is MPP run'
 #else
       call random_number(field(:,:) )
       field(:,:) = field(:,:) - 0.5

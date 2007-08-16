@@ -23,8 +23,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.1] Transfer surface obs:
 
-   if (iv % num_synop > 0) then
-      do n = 1, iv % num_synop
+   if (iv % nlocal(synop) > 0) then
+      do n = 1, iv % nlocal(synop)
          call da_random_omb(iv % synop(n) % u % error, ob % synop(n) % u, &
                            iv % synop(n) % u % qc, iv % synop(n) % u % inv)
          call da_random_omb(iv % synop(n) % v % error, ob % synop(n) % v, &
@@ -40,8 +40,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.2] Transfer metar obs:
 
-   if (iv % num_metar > 0) then
-      do n = 1, iv % num_metar
+   if (iv % nlocal(metar) > 0) then
+      do n = 1, iv % nlocal(metar)
          call da_random_omb(iv % metar(n) % u % error, ob % metar(n) % u, &
                            iv % metar(n) % u % qc, iv % metar(n) % u % inv)
          call da_random_omb(iv % metar(n) % v % error, ob % metar(n) % v, &
@@ -57,8 +57,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.3] Transfer ships obs:
 
-   if (iv % num_ships > 0) then
-      do n = 1, iv % num_ships
+   if (iv % nlocal(ships) > 0) then
+      do n = 1, iv % nlocal(ships)
          call da_random_omb(iv % ships(n) % u % error, ob % ships(n) % u, &
                            iv % ships(n) % u % qc, iv % ships(n) % u % inv)
          call da_random_omb(iv % ships(n) % v % error, ob % ships(n) % v, &
@@ -74,8 +74,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.4.1] Transfer Geo. AMVs Obs:
 
-   if (iv % num_geoamv > 0) then
-      do n = 1, iv % num_geoamv 
+   if (iv % nlocal(geoamv) > 0) then
+      do n = 1, iv % nlocal(geoamv) 
         do k = 1, iv % geoamv(n) % info % levels
          call da_random_omb(iv % geoamv(n) % u(k) % error, ob % geoamv(n) % u(k), &
                            iv % geoamv(n) % u(k) % qc, iv % geoamv(n) % u(k) % inv)
@@ -87,8 +87,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.4.2] Transfer Polar  AMVs Obs:
 
-   if (iv % num_polaramv > 0) then
-      do n = 1, iv % num_polaramv
+   if (iv % nlocal(polaramv) > 0) then
+      do n = 1, iv % nlocal(polaramv)
         do k = 1, iv % polaramv(n) % info % levels
          call da_random_omb(iv % polaramv(n) % u(k) % error, ob % polaramv(n) % u(k), &
                            iv % polaramv(n) % u(k) % qc, iv % polaramv(n) % u(k) % inv)
@@ -100,8 +100,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.5] Transfer gpspw obs:
 
-   if (iv % num_gpspw > 0) then
-      do n = 1, iv % num_gpspw
+   if (iv % nlocal(gpspw) > 0) then
+      do n = 1, iv % nlocal(gpspw)
          call da_random_omb(iv % gpspw(n) % tpw % error, ob % gpspw(n) % tpw, &
                            iv % gpspw(n) % tpw % qc, iv % gpspw(n) % tpw % inv)
       end do
@@ -109,8 +109,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.6] Transfer sonde obs:
 
-   if (iv % num_sound > 0) then
-      do n = 1, iv % num_sound
+   if (iv % nlocal(sound) > 0) then
+      do n = 1, iv % nlocal(sound)
          do k = 1, iv % sound(n) % info % levels
             call da_random_omb(iv % sound(n) % u(k) % error, ob % sound(n) % u(k), &
                               iv % sound(n) % u(k) % qc, iv % sound(n) % u(k) % inv)
@@ -137,8 +137,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.7] Transfer airep obs:
 
-   if (iv % num_airep > 0) then
-      do n = 1, iv % num_airep
+   if (iv % nlocal(airep) > 0) then
+      do n = 1, iv % nlocal(airep)
          do k = 1, iv % airep(n) % info % levels
             call da_random_omb(iv % airep(n) % u(k) % error, ob % airep(n) % u(k), &
                               iv % airep(n) % u(k) % qc, iv % airep(n) % u(k) % inv)
@@ -152,8 +152,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.8] Transfer pilot obs:
 
-   if (iv % num_pilot > 0) then
-      do n = 1, iv % num_pilot
+   if (iv % nlocal(pilot) > 0) then
+      do n = 1, iv % nlocal(pilot)
          do k = 1, iv % pilot(n) % info % levels
             call da_random_omb(iv % pilot(n) % u(k) % error, ob % pilot(n) % u(k), &
                               iv % pilot(n) % u(k) % qc, iv % pilot(n) % u(k) % inv)
@@ -165,21 +165,21 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.9] Transfer SSM/I obs:SSMI:
 
-   if (iv % num_ssmi_retrieval > 0) then
-      do n = 1, iv % num_ssmi_retrieval
-         call da_random_omb(iv % ssmi_retrieval(n) % speed % error, &
-                           ob % ssmi_retrieval(n) % speed, &
-                           iv % ssmi_retrieval(n) % speed % qc, &
-                           iv % ssmi_retrieval(n) % speed % inv)
-         call da_random_omb(iv % ssmi_retrieval(n) % tpw % error, &
-                           ob % ssmi_retrieval(n) % tpw, &
-                           iv % ssmi_retrieval(n) % tpw % qc, &
-                           iv % ssmi_retrieval(n) % tpw % inv)
+   if (iv % nlocal(ssmi_rv) > 0) then
+      do n = 1, iv % nlocal(ssmi_rv)
+         call da_random_omb(iv % ssmi_rv(n) % speed % error, &
+                           ob % ssmi_rv(n) % speed, &
+                           iv % ssmi_rv(n) % speed % qc, &
+                           iv % ssmi_rv(n) % speed % inv)
+         call da_random_omb(iv % ssmi_rv(n) % tpw % error, &
+                           ob % ssmi_rv(n) % tpw, &
+                           iv % ssmi_rv(n) % tpw % qc, &
+                           iv % ssmi_rv(n) % tpw % inv)
       end do
    end if
 
-   if (iv % num_ssmi_tb > 0) then
-      do n = 1, iv % num_ssmi_tb
+   if (iv % nlocal(ssmi_tb) > 0) then
+      do n = 1, iv % nlocal(ssmi_tb)
          call da_random_omb(iv % ssmi_tb(n) % tb19h % error, &
                            ob % ssmi_tb(n) % tb19h, &
                            iv % ssmi_tb(n) % tb19h % qc, &
@@ -213,8 +213,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.10] Transfer satem obs:
 
-   if (iv % num_satem > 0) then
-      do n = 1, iv % num_satem
+   if (iv % nlocal(satem) > 0) then
+      do n = 1, iv % nlocal(satem)
          do k = 1, iv % satem(n) % info % levels
             call da_random_omb(iv % satem(n) % thickness(k) % error, &
                               ob % satem(n) % thickness(k), &
@@ -226,8 +226,8 @@ subroutine da_random_omb_all(iv, ob)
    
    ! [2.11] Transfer ssmt1 obs:
 
-   if (iv % num_ssmt1 > 0) then
-      do n = 1, iv % num_ssmt1
+   if (iv % nlocal(ssmt1) > 0) then
+      do n = 1, iv % nlocal(ssmt1)
          do k = 1, iv % ssmt1(n) % info % levels
             call da_random_omb(iv % ssmt1(n) % t(k) % error, &
                               ob % ssmt1(n) % t(k), &
@@ -239,8 +239,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.12] Transfer ssmt2 obs:
 
-   if (iv % num_ssmt2 > 0) then
-      do n = 1, iv % num_ssmt2
+   if (iv % nlocal(ssmt2) > 0) then
+      do n = 1, iv % nlocal(ssmt2)
          do k = 1, iv % ssmt2(n) % info % levels
             call da_random_omb(iv % ssmt2(n) % rh(k) % error, &
                               ob % ssmt2(n) % rh(k), &
@@ -252,8 +252,8 @@ subroutine da_random_omb_all(iv, ob)
    
    ! [2.13] Transfer scatterometer obs:
 
-   if (iv % num_qscat > 0) then
-      do n = 1, iv % num_qscat
+   if (iv % nlocal(qscat) > 0) then
+      do n = 1, iv % nlocal(qscat)
          call da_random_omb(iv % qscat(n) % u % error, ob % qscat(n) % u, &
                            iv % qscat(n) % u % qc, iv % qscat(n) % u % inv)
          call da_random_omb(iv % qscat(n) % v % error, ob % qscat(n) % v, &
@@ -263,8 +263,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.14] Transfer buoy obs:
 
-   if (iv % num_buoy > 0) then
-      do n = 1, iv % num_buoy
+   if (iv % nlocal(buoy) > 0) then
+      do n = 1, iv % nlocal(buoy)
          call da_random_omb(iv % buoy(n) % u % error, ob % buoy(n) % u, &
                            iv % buoy(n) % u % qc, iv % buoy(n) % u % inv)
          call da_random_omb(iv % buoy(n) % v % error, ob % buoy(n) % v, &
@@ -280,8 +280,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.15] Transfer profiler obs:
 
-   if (iv % num_profiler > 0) then
-      do n = 1, iv % num_profiler
+   if (iv % nlocal(profiler) > 0) then
+      do n = 1, iv % nlocal(profiler)
          do k = 1, iv % profiler(n) % info % levels
             call da_random_omb(iv % profiler(n) % u(k) % error, &
                ob % profiler(n) % u(k), &
@@ -295,8 +295,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! [2.16] Transfer TC bogus obs:
 
-   if (iv % num_bogus > 0) then
-      do n = 1, iv % num_bogus
+   if (iv % nlocal(bogus) > 0) then
+      do n = 1, iv % nlocal(bogus)
          do k = 1, iv % bogus(n) % info % levels
             call da_random_omb(iv % bogus(n) % u(k) % error, &
                ob % bogus(n) % u(k), &
@@ -319,8 +319,8 @@ subroutine da_random_omb_all(iv, ob)
 
    ! Transfer AIRS retrievals:
 
-   if (iv % num_airsr > 0) then
-      do n = 1, iv % num_airsr
+   if (iv % nlocal(airsr) > 0) then
+      do n = 1, iv % nlocal(airsr)
          do k = 1, iv % airsr(n) % info % levels
             call da_random_omb(iv % airsr(n) % t(k) % error, &
                ob % airsr(n) % t(k), &

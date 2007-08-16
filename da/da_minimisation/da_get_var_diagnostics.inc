@@ -9,7 +9,7 @@ subroutine da_get_var_diagnostics( iv, j)
    type(ob_type), intent(inout):: iv      ! innovation vector.
    type(j_type), intent(inout) :: j       ! Cost function.
 
-   integer                      :: num_obs_tot
+   integer                      :: num_stats_tot
    integer                      :: i,k
    real                         :: jo_radiance
    real                         :: temp(63)
@@ -20,13 +20,7 @@ subroutine da_get_var_diagnostics( iv, j)
    ! [1.0] Sum up Jo across processors:
    !--------------------------------------------------------------------------
 
-   num_obs_tot = num_gpspw_tot + num_synop_tot + num_metar_tot + &
-                 num_pilot_tot + num_ssmi_tot  + num_ssmt1_tot + &
-                 num_ssmt2_tot + num_satem_tot + num_airep_tot + &
-                 num_geoamv_tot+ num_polaramv_tot+ num_ships_tot + &
-                 num_sound_tot + num_qscat_tot + num_profiler_tot+ &
-                 num_buoy_tot + num_gpsref_tot + num_bogus_tot   + &
-                 num_radiance_tot + num_airsr_tot
+   num_stats_tot = sum(iv%nstats(:))
 
    temp(1)  = j % jo % synop_u
    temp(2)  = j % jo % synop_v
@@ -178,14 +172,14 @@ subroutine da_get_var_diagnostics( iv, j)
       write(unit=stdout,fmt='(A,F12.2)')   '   Final cost function J       = ', j % total
       write(unit=stdout,fmt=*) ' '
 
-      write(unit=stdout,fmt='(a,i8)')    '   Total number of obs.        = ', num_obs_tot
+      write(unit=stdout,fmt='(a,i8)')    '   Total number of obs.        = ', num_stats_tot
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of J            = ', j % total
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Jo           = ', j % jo % total
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Jb           = ', j % jb
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Je           = ', j % je
-      if (num_obs_tot > 0) &
+      if (num_stats_tot > 0) &
          write(unit=stdout,fmt='(a,f15.5)') '   Final J / total num_obs     = ', j % total / &
-                                                          real(num_obs_tot)
+                                                          real(num_stats_tot)
       write(unit=stdout,fmt='(a,f15.5)') '   Jb factor used(1)           = ', var_scaling1
       write(unit=stdout,fmt='(a,f15.5)') '   Jb factor used(2)           = ', var_scaling2
       write(unit=stdout,fmt='(a,f15.5)') '   Jb factor used(3)           = ', var_scaling3
@@ -196,16 +190,16 @@ subroutine da_get_var_diagnostics( iv, j)
       write(unit=stdout,fmt=*) ' '
 
       if (use_rad) then
-         write(unit=stdout,fmt='(a,i8)')    '   Total number of radiances    = ', num_radiance_tot
+         write(unit=stdout,fmt='(a,i8)')    '   Total number of radiances    = ', iv%nstats(radiance)
          write(unit=stdout,fmt='(a,f15.5)') '   Cost function for radiances  = ', jo_radiance
          write(unit=stdout,fmt=*) ' '
       end if
 
       ! [4.2] Output components of Jo:
 
-      if (iv % num_synop_glo > 0) then
+      if (iv % ntotal(synop) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    synop obs, Jo(actual)  = ', &
-                                  iv % num_synop_glo, num_synop_tot, &
+                                  iv % ntotal(synop), iv%nstats(synop), &
                                   j % jo % synop_u, iv % synop_ef_u, &
                                   j % jo % synop_v, iv % synop_ef_v, &
                                   j % jo % synop_t, iv % synop_ef_t, &
@@ -217,9 +211,9 @@ subroutine da_get_var_diagnostics( iv, j)
       if (trace_use) call da_trace("da_get_var_diagnostics", &
          message="Memory increase from internal write")
 
-      if (iv % num_metar_glo > 0) then
+      if (iv % ntotal(metar) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    metar obs, Jo(actual)  = ', &
-                               iv % num_metar_glo, num_metar_tot, &
+                               iv % ntotal(metar), iv%nstats(metar), &
                                j % jo % metar_u, iv % metar_ef_u, &
                                j % jo % metar_v, iv % metar_ef_v, &
                                j % jo % metar_t, iv % metar_ef_t, &
@@ -227,9 +221,9 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % metar_q, iv % metar_ef_q    
       end if
 
-      if (iv % num_ships_glo > 0) then
+      if (iv % ntotal(ships) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ships obs, Jo(actual)  = ', &
-                               iv % num_ships_glo, num_ships_tot, &
+                               iv % ntotal(ships), iv%nstats(ships), &
                                j % jo % ships_u, iv % ships_ef_u, &
                                j % jo % ships_v, iv % ships_ef_v, &
                                j % jo % ships_t, iv % ships_ef_t, &
@@ -238,46 +232,46 @@ subroutine da_get_var_diagnostics( iv, j)
       end if
 
 
-      if (iv % num_geoamv_glo > 0) then
+      if (iv % ntotal(geoamv) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    geoamv ob, Jo(actual)  = ', &
-                               iv % num_geoamv_glo, num_geoamv_tot, &
+                               iv % ntotal(geoamv), iv%nstats(geoamv), &
                                j % jo % geoamv_u, iv % geoamv_ef_u, &
                                j % jo % geoamv_v, iv % geoamv_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_polaramv_glo > 0) then
+      if (iv % ntotal(polaramv) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    polaramv,  Jo(actual)  = ', &
-                               iv % num_polaramv_glo, num_polaramv_tot, &
+                               iv % ntotal(polaramv), iv%nstats(polaramv), &
                                j % jo % polaramv_u, iv % polaramv_ef_u, &
                                j % jo % polaramv_v, iv % polaramv_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
 
-      if (iv % num_gpspw_glo > 0) then
+      if (iv % ntotal(gpspw) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    gpspw obs, Jo(actual)  = ', &
-                               iv % num_gpspw_glo, num_gpspw_tot, &
+                               iv % ntotal(gpspw), iv%nstats(gpspw), &
                                j % jo % gpspw_tpw, iv % gpspw_ef_tpw, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_gpsref_glo > 0) then
+      if (iv % ntotal(gpsref) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    gpsref obs, Jo(actual)  = ', &
-                               iv % num_gpsref_glo, num_gpsref_tot, &
+                               iv % ntotal(gpsref), iv%nstats(gpsref), &
                                j % jo % gpsref_ref, iv % gpsref_ef_ref, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_sound_glo > 0) then
+      if (iv % ntotal(sound) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    sound obs, Jo(actual)  = ', &
-                               iv % num_sound_glo, num_sound_tot, &
+                               iv % ntotal(sound), iv%nstats(sound), &
                                j % jo % sound_u, iv % sound_ef_u, &
                                j % jo % sound_v, iv % sound_ef_v, &
                                j % jo % sound_t, iv % sound_ef_t, &
                                j % jo % sound_q, iv % sound_ef_q, 0.0, 1.0 
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    sonde obs, Jo(actual)  = ', &
-                               iv % num_sound_glo, num_sound_tot, &
+                               iv % ntotal(sound), iv%nstats(sound), &
                                j % jo % sonde_sfc_u, iv % synop_ef_u, &
                                j % jo % sonde_sfc_v, iv % synop_ef_v, &
                                j % jo % sonde_sfc_t, iv % synop_ef_t, &
@@ -285,18 +279,18 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % sonde_sfc_q, iv % synop_ef_q
       end if
 
-      if (iv % num_airep_glo > 0) then
+      if (iv % ntotal(airep) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    airep obs, Jo(actual)  = ', &
-                               iv % num_airep_glo, num_airep_tot, &
+                               iv % ntotal(airep), iv%nstats(airep), &
                                j % jo % airep_u, iv % airep_ef_u, &
                                j % jo % airep_v, iv % airep_ef_v, &
                                j % jo % airep_t, iv % airep_ef_t, &
                                0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_bogus_glo > 0) then
+      if (iv % ntotal(bogus) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    bogus obs, Jo(actual)  = ', &
-                               iv % num_bogus_glo, num_bogus_tot, &
+                               iv % ntotal(bogus), iv%nstats(bogus), &
                                j % jo % bogus_u, iv % bogus_ef_u, &
                                j % jo % bogus_v, iv % bogus_ef_v, &
                                j % jo % bogus_t, iv % bogus_ef_t, &
@@ -304,54 +298,54 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % bogus_slp, iv % bogus_ef_slp
       end if
 
-      if (iv % num_pilot_glo > 0) then
+      if (iv % ntotal(pilot) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    pilot obs, Jo(actual)  = ', &
-                               iv % num_pilot_glo, num_pilot_tot, &
+                               iv % ntotal(pilot), iv%nstats(pilot), &
                                j % jo % pilot_u, iv % pilot_ef_u, &
                                j % jo % pilot_v, iv % pilot_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_ssmi_retrieval_glo > 0) then
+      if (iv % ntotal(ssmi_rv) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmir obs, Jo(actual) = ', &
-                                  iv % num_ssmi_retrieval_glo, num_ssmi_tot, &
+                                  iv % ntotal(ssmi_rv), iv%nstats(ssmi_rv), &
                                   j % jo % ssmir_speed, iv % ssmir_ef_speed, &
                                   j % jo % ssmir_tpw, iv % ssmir_ef_tpw, &
                                   0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_satem_glo > 0) then
+      if (iv % ntotal(satem) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    satem obs, Jo(actual)  = ', &
-                               iv % num_satem_glo, num_satem_tot, &
+                               iv % ntotal(satem), iv%nstats(satem), &
                                j % jo % satem_thickness, iv % satem_ef_thickness, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_ssmt1_glo > 0) then
+      if (iv % ntotal(ssmt1) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmt1 obs, Jo(actual)  = ', &
-                               iv % num_ssmt1_glo, num_ssmt1_tot, &
+                               iv % ntotal(ssmt1), iv%nstats(ssmt1), &
                                j % jo % ssmt1_t, iv % ssmt1_ef_t, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_ssmt2_glo > 0) then
+      if (iv % ntotal(ssmt2) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmt2 obs, Jo(actual)  = ', &
-                               iv % num_ssmt2_glo, num_ssmt2_tot, &
+                               iv % ntotal(ssmt2), iv%nstats(ssmt2), &
                                j % jo % ssmt2_rh, iv % ssmt2_ef_rh, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_qscat_glo > 0) then
+      if (iv % ntotal(qscat) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    qscat obs, Jo(actual)  = ', &
-                               iv % num_qscat_glo, num_qscat_tot, &
+                               iv % ntotal(qscat), iv%nstats(qscat), &
                                j % jo % qscat_u, iv % qscat_ef_u, &
                                j % jo % qscat_v, iv % qscat_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % num_buoy_glo > 0) then
+      if (iv % ntotal(buoy) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    buoy  obs, Jo(actual)  = ', &
-                               iv % num_buoy_glo, num_buoy_tot, &
+                               iv % ntotal(buoy), iv%nstats(buoy), &
                                j % jo % buoy_u, iv % buoy_ef_u, &
                                j % jo % buoy_v, iv % buoy_ef_v, &
                                j % jo % buoy_t, iv % buoy_ef_t, &
@@ -359,29 +353,29 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % buoy_q, iv % buoy_ef_q                                
       end if
 
-      if (iv % num_profiler_glo > 0) then
+      if (iv % ntotal(profiler) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    profiler,  Jo(actual)  = ', &
-                               iv % num_profiler_glo, num_profiler_tot, &
+                               iv % ntotal(profiler), iv%nstats(profiler), &
                                j % jo % profiler_u, iv % profiler_ef_u, &
                                j % jo % profiler_v, iv % profiler_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
-      if (iv % num_airsr_glo > 0) then
+      if (iv % ntotal(airsr) > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    airsr obs, Jo(actual)  = ', &
-                               iv % num_airsr_glo, num_airsr_tot, &
+                               iv % ntotal(airsr), iv%nstats(airsr), &
                                j % jo % airsr_t, iv % airsr_ef_t, &
                                j % jo % airsr_q, iv % airsr_ef_q, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
       do i = 1, iv%num_inst                 ! loop for sensor
-       do k = 1, iv%instid(i)%nchan
-          if (j % jo % rad(i) % num_ichan(k) > 0) then
-            write(unit=jo_unit,fmt='(a30,a16,i5,i10,8f15.5)')'    radiance,  Jo(actual)  = ', &
-                               iv%instid(i)%rttovid_string, k , &
-                               j % jo % rad(i) % num_ichan(k), &
-                               j % jo % rad(i) % jo_ichan(k)
-          end if
-       end do
+         do k = 1, iv%instid(i)%nchan
+            if (j % jo % rad(i) % num_ichan(k) > 0) then
+               write(unit=jo_unit,fmt='(a30,a16,i5,i10,8f15.5)')'    radiance,  Jo(actual)  = ', &
+                  iv%instid(i)%rttovid_string, k , &
+                  j % jo % rad(i) % num_ichan(k), &
+                  j % jo % rad(i) % jo_ichan(k)
+            end if
+         end do
       end do
    end if
 

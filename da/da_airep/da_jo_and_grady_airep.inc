@@ -13,11 +13,13 @@ subroutine da_jo_and_grady_airep(iv, re, jo, jo_grad_y)
 
    integer :: n, k
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_airep")
+
    jo % airep_u = 0.0
    jo % airep_v = 0.0
    jo % airep_t = 0.0
 
-   do n=1, iv%num_airep
+   do n=1, iv%nlocal(airep)
       do k=1, iv%airep(n)%info%levels
          jo_grad_y%airep(n)%u(k) = -re%airep(n)%u(k) / &
             (iv%airep(n)%u(k)%error * iv%airep(n)%u(k)%error)
@@ -39,6 +41,8 @@ subroutine da_jo_and_grady_airep(iv, re, jo, jo_grad_y)
    jo % airep_u = 0.5 * jo % airep_u
    jo % airep_v = 0.5 * jo % airep_v
    jo % airep_t = 0.5 * jo % airep_t
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_airep")
 
 end subroutine da_jo_and_grady_airep
 

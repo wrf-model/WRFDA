@@ -6,9 +6,9 @@ subroutine da_transform_xtoseasfcwind_adj(grid)
 
    implicit none
 
-   type (domain),  intent(inout) :: grid
+   type (domain), intent(inout) :: grid
 
-   real :: const, rgh_fac, var, height
+   real    :: const, rgh_fac, var, height
    integer :: i, j, is, js, ie, je
 
    if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind_adj")

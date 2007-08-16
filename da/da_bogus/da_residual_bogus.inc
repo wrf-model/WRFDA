@@ -15,8 +15,10 @@ subroutine da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   type (bad_data_type)              :: n_obs_bad
-   integer                           :: n, k
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_residual_bogus")      
 
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
@@ -24,7 +26,7 @@ subroutine da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % q % num = number_type(0, 0, 0)
    n_obs_bad % slp % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_bogus
+   do n=1, iv%nlocal(bogus)
       do k=1, iv%bogus(n)%info%levels
          np_available = np_available + 4
          re%bogus(n)%u(k) = da_residual(n, k, y%bogus(n)%u(k), iv%bogus(n)%u(k), n_obs_bad % u)
@@ -46,6 +48,8 @@ subroutine da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
       n_obs_bad % v % num % use + n_obs_bad % slp % num % use  + &
       n_obs_bad % t % num % use + n_obs_bad % q % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_bogus")   
 
 end subroutine da_residual_bogus
 

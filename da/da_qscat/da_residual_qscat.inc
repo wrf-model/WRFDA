@@ -18,21 +18,22 @@ subroutine da_residual_qscat(iv, y, re, np_missing, np_bad_data,np_obs_used, np_
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
+   if (trace_use_dull) call da_trace_entry("da_residual_qscat")
+
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_qscat
+   do n=1, iv%nlocal(qscat)
       np_available = np_available + 2
       re%qscat(n)%u = da_residual(n, 0, y%qscat(n)%u, iv%qscat(n)%u, n_obs_bad % u)
       re%qscat(n)%v = da_residual(n, 0, y%qscat(n)%v, iv%qscat(n)%v, n_obs_bad % v)
    end do
 
-   np_missing = np_missing + n_obs_bad % u % num % miss + &
-                n_obs_bad % v % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-                 n_obs_bad % v % num % bad
-   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-                 n_obs_bad % v % num % use
+   np_missing  = np_missing  + n_obs_bad % u % num % miss + n_obs_bad % v % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % u % num % bad  + n_obs_bad % v % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % u % num % use  + n_obs_bad % v % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_qscat")
 
 end subroutine da_residual_qscat
 

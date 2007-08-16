@@ -34,8 +34,8 @@ subroutine da_final_write_obs(iv)
    end if
 
    num_obs = 0
-   if (iv % num_synop > 0) then
-      do n = 1, iv % num_synop
+   if (iv % nlocal(synop) > 0) then
+      do n = 1, iv % nlocal(synop)
          if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -53,8 +53,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_metar > 0) then
-      do n = 1, iv % num_metar
+   if (iv % nlocal(metar) > 0) then
+      do n = 1, iv % nlocal(metar)
          if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -72,8 +72,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_ships > 0) then
-      do n = 1, iv % num_ships
+   if (iv % nlocal(ships) > 0) then
+      do n = 1, iv % nlocal(ships)
          if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -91,8 +91,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_geoamv > 0) then
-       do n = 1, iv % num_geoamv
+   if (iv % nlocal(geoamv) > 0) then
+       do n = 1, iv % nlocal(geoamv)
           if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -110,8 +110,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_polaramv > 0) then
-      do n = 1, iv % num_polaramv
+   if (iv % nlocal(polaramv) > 0) then
+      do n = 1, iv % nlocal(polaramv)
          if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -129,8 +129,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_gpspw > 0) then
-      do n = 1, iv % num_gpspw
+   if (iv % nlocal(gpspw) > 0) then
+      do n = 1, iv % nlocal(gpspw)
          if(iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -148,8 +148,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_sound > 0) then
-      do n = 1, iv % num_sound
+   if (iv % nlocal(sound) > 0) then
+      do n = 1, iv % nlocal(sound)
          if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -175,8 +175,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_airep > 0) then
-      do n = 1, iv % num_airep
+   if (iv % nlocal(airep) > 0) then
+      do n = 1, iv % nlocal(airep)
          if(iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -194,8 +194,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
    
    num_obs = 0
-   if (iv % num_pilot > 0) then
-      do n = 1, iv % num_pilot
+   if (iv % nlocal(pilot) > 0) then
+      do n = 1, iv % nlocal(pilot)
          if(iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -209,13 +209,13 @@ subroutine da_final_write_obs(iv)
    end if
 
    !------------------------------------------------------------------
-   ! [9] writing SSMI_RETRIEVAL
+   ! [9] writing ssmi_rv
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_ssmi_retrieval > 0) then
-      do n = 1, iv % num_ssmi_retrieval
-         if(iv%ssmi_retrieval(n)%loc%proc_domain) num_obs = num_obs + 1
+   if (iv % nlocal(ssmi_rv) > 0) then
+      do n = 1, iv % nlocal(ssmi_rv)
+         if(iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
    call da_proc_sum_int(num_obs)
@@ -232,8 +232,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
    
    num_obs = 0
-   if (iv % num_ssmi_tb > 0) then
-      do n = 1, iv % num_ssmi_tb
+   if (iv % nlocal(ssmi_tb) > 0) then
+      do n = 1, iv % nlocal(ssmi_tb)
          if (iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -251,8 +251,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_satem > 0) then
-      do n = 1, iv % num_satem
+   if (iv % nlocal(satem) > 0) then
+      do n = 1, iv % nlocal(satem)
          if(iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -270,8 +270,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_ssmt1 > 0) then
-      do n = 1, iv % num_ssmt1
+   if (iv % nlocal(ssmt1) > 0) then
+      do n = 1, iv % nlocal(ssmt1)
          if(iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -289,8 +289,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_ssmt2 > 0) then
-      do n = 1, iv % num_ssmt2
+   if (iv % nlocal(ssmt2) > 0) then
+      do n = 1, iv % nlocal(ssmt2)
          if(iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -308,8 +308,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
    
    num_obs = 0
-   if (iv % num_qscat > 0) then
-      do n = 1, iv % num_qscat
+   if (iv % nlocal(qscat) > 0) then
+      do n = 1, iv % nlocal(qscat)
          if(iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -327,8 +327,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_profiler > 0) then
-      do n = 1, iv % num_profiler
+   if (iv % nlocal(profiler) > 0) then
+      do n = 1, iv % nlocal(profiler)
          if(iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -346,8 +346,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
    
    num_obs = 0
-   if (iv % num_buoy > 0) then
-      do n = 1, iv % num_buoy
+   if (iv % nlocal(buoy) > 0) then
+      do n = 1, iv % nlocal(buoy)
          if(iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -365,8 +365,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
    
    num_obs = 0
-   if (iv % num_bogus > 0) then
-      do n = 1, iv % num_bogus
+   if (iv % nlocal(bogus) > 0) then
+      do n = 1, iv % nlocal(bogus)
          if(iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -384,8 +384,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_airsr > 0) then
-      do n = 1, iv % num_airsr
+   if (iv % nlocal(airsr) > 0) then
+      do n = 1, iv % nlocal(airsr)
          if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
@@ -403,8 +403,8 @@ subroutine da_final_write_obs(iv)
    !------------------------------------------------------------------
 
    num_obs = 0
-   if (iv % num_gpsref > 0) then
-      do n = 1, iv % num_gpsref
+   if (iv % nlocal(gpsref) > 0) then
+      do n = 1, iv % nlocal(gpsref)
          if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if

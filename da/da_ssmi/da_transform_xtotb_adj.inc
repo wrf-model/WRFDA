@@ -6,36 +6,38 @@ subroutine da_transform_xtotb_adj (grid)
 
    implicit none
 
-   type (domain), intent(inout)    :: grid
+   type (domain), intent(inout) :: grid
 
-   integer                       :: i,j,k
-   integer                       :: is, js, ie, je
+   integer :: i,j,k
+   integer :: is, js, ie, je
 
-   real                          :: dx, dy, dxm, dym, zhmkz
-   real                          :: dum1, dum2, zrhom, ADJ_zrhom
+   real    :: dx, dy, dxm, dym, zhmkz
+   real    :: dum1, dum2, zrhom, ADJ_zrhom
 
-   real                          :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
-   real                          :: ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_tpw
-   real                          :: ADJ_htpw,ADJ_speed,ADJ_alw,ADJ_zcld         
+   real    :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
+   real    :: ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_tpw
+   real    :: ADJ_htpw,ADJ_speed,ADJ_alw,ADJ_zcld        
 
-   psfc=0.0
-   ta=0.0
-   gamma=0.0
-   sst=0.0
-   htpw=0.0
-   speed=0.0
-   alw=0.0
-   zcld=0.0
-   tpw=0.0
-   dx=0.0
-   dy=0.0
-   dxm=0.0
-   dym=0.0
-   zhmkz=0.0
-   dum1=0.0
-   dum2=0.0
-   zrhom=0.0
-   ADJ_zrhom=0.0
+   if (trace_use) call da_trace_entry("da_transform_xtotb_adj")        
+
+   psfc      = 0.0
+   ta        = 0.0
+   gamma     = 0.0
+   sst       = 0.0
+   htpw      = 0.0
+   speed     = 0.0
+   alw       = 0.0
+   zcld      = 0.0
+   tpw       = 0.0
+   dx        = 0.0
+   dy        = 0.0
+   dxm       = 0.0
+   dym       = 0.0
+   zhmkz     = 0.0
+   dum1      = 0.0
+   dum2      = 0.0
+   zrhom     = 0.0
+   ADJ_zrhom = 0.0
 
    is = its
    js = jts
@@ -61,7 +63,6 @@ subroutine da_transform_xtotb_adj (grid)
 
    do j=js, je
       do i=is, ie
-
          psfc  = 0.01*grid%xb%psfc(i,j)
          ! sst   = grid%xb%tgrn(i,j)
          ta    = grid%xb%tgrn(i,j) + &
@@ -155,7 +156,9 @@ subroutine da_transform_xtotb_adj (grid)
 
          grid%xa%psfc(i,j) = grid%xa%psfc(i,j) + ADJ_psfc*0.01 
       end do
-   end do
+   end do   
+
+   if (trace_use) call da_trace_exit("da_transform_xtotb_adj") 
 
 end subroutine da_transform_xtotb_adj
 

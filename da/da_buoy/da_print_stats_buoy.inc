@@ -6,9 +6,11 @@ subroutine da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, buoy)
 
    implicit none
 
-   integer,           intent(in)    :: stats_unit
-   integer,           intent(inout) :: nu, nv, nt, np, nq
-   type (stats_buoy_type), intent(in):: buoy
+   integer,                intent(in)    :: stats_unit
+   integer,                intent(inout) :: nu, nv, nt, np, nq
+   type (stats_buoy_type), intent(in)    :: buoy
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_buoy")
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &
@@ -41,6 +43,8 @@ subroutine da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, buoy)
                          sqrt(buoy%rms_err%t/real(nt)), &
                          sqrt(buoy%rms_err%p/real(np)), &
                          sqrt(buoy%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_buoy")
 
 end subroutine da_print_stats_buoy
 

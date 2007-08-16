@@ -12,9 +12,9 @@ subroutine da_check_xtoy_adjoint_sound(oi, y, adjtest_lhs, pertile_lhs)
 
    integer                        :: n, k          ! Loop counter.
 
-   if (oi%num_Sound < 1) return
+   if (oi%nlocal(sound) < 1) return
 
-   do n=1, oi%num_Sound
+   do n=1, oi%nlocal(sound)
       if (oi%sound(n)%loc%proc_domain) then
          do k=1, oi%sound(n)%info%levels
             adjtest_lhs = adjtest_lhs + &

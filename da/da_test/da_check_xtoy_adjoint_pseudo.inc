@@ -10,31 +10,33 @@ subroutine da_check_xtoy_adjoint_pseudo(oi, y, adjtest_lhs, pertile_lhs)
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   integer                        :: n             ! Loop counter.
+   integer :: n             ! Loop counter.
+   
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_pseudo")
 
-   if (oi%num_pseudo > 0) then
-      do n=1, oi%num_pseudo
-         if (oi%synop(n)%loc%proc_domain) then
-            adjtest_lhs = adjtest_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
-                          (y%pseudo(n)%v/typical_v_rms)**2 + &
-                          (y%pseudo(n)%v/typical_t_rms)**2 + &
-                          (y%pseudo(n)%v/typical_p_rms)**2 + &
-                          (y%pseudo(n)%v/typical_q_rms)**2
-         end if
+   do n=1, oi%nlocal(pseudo)
+      if (oi%synop(n)%loc%proc_domain) then
+         adjtest_lhs = adjtest_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
+            (y%pseudo(n)%v/typical_v_rms)**2 + &
+            (y%pseudo(n)%v/typical_t_rms)**2 + &
+            (y%pseudo(n)%v/typical_p_rms)**2 + &
+            (y%pseudo(n)%v/typical_q_rms)**2
+      end if
 
-         pertile_lhs = pertile_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
-                       (y%pseudo(n)%v/typical_v_rms)**2 + &
-                       (y%pseudo(n)%v/typical_t_rms)**2 + &
-                       (y%pseudo(n)%v/typical_p_rms)**2 + &
-                       (y%pseudo(n)%v/typical_q_rms)**2
+      pertile_lhs = pertile_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
+         (y%pseudo(n)%v/typical_v_rms)**2 + &
+         (y%pseudo(n)%v/typical_t_rms)**2 + &
+         (y%pseudo(n)%v/typical_p_rms)**2 + &
+         (y%pseudo(n)%v/typical_q_rms)**2
 
-         y%pseudo(n)%u = y%pseudo(n)%u/typical_u_rms ** 2
-         y%pseudo(n)%v = y%pseudo(n)%v/typical_v_rms ** 2
-         y%pseudo(n)%t = y%pseudo(n)%p/typical_t_rms ** 2
-         y%pseudo(n)%p = y%pseudo(n)%v/typical_p_rms ** 2
-         y%pseudo(n)%q = y%pseudo(n)%p/typical_q_rms ** 2
-      end do
-   end if
+      y%pseudo(n)%u = y%pseudo(n)%u/typical_u_rms ** 2
+      y%pseudo(n)%v = y%pseudo(n)%v/typical_v_rms ** 2
+      y%pseudo(n)%t = y%pseudo(n)%p/typical_t_rms ** 2
+      y%pseudo(n)%p = y%pseudo(n)%v/typical_p_rms ** 2
+      y%pseudo(n)%q = y%pseudo(n)%p/typical_q_rms ** 2
+   end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_pseudo")
 
 end subroutine da_check_xtoy_adjoint_pseudo
 

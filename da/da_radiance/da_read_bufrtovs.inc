@@ -13,9 +13,9 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
    implicit none
 
-   character(5)      ,  intent (in)  :: obstype
-   character(20)     ,  intent (in)  :: infile
-   type (xpose_type) ,  intent (in)  :: xp
+   character(5)      ,  intent (in)    :: obstype
+   character(20)     ,  intent (in)    :: infile
+   type (xpose_type) ,  intent (in)    :: xp
    type (ob_type)    ,  intent (inout) :: iv
 
 #ifdef BUFR
@@ -191,7 +191,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
    num_tovs_file     = 0    ! number of obs in file
    num_tovs_global   = 0    ! number of obs within whole domain
    num_tovs_local    = 0    ! number of obs within tile
-   num_tovs_thinned = 0    ! number of obs rejected by thinning
+   num_tovs_thinned  = 0    ! number of obs rejected by thinning
    num_tovs_used     = 0    ! number of obs entered into innovation computation
    num_tovs_selected = 0    ! number of obs limited for debuging
 
@@ -386,9 +386,11 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       end do
    end do obs
 
-   iv%total_obs         = iv%total_obs + num_tovs_used
-   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
+   iv%total_rad_pixel   = iv%total_rad_pixel   + num_tovs_used
    iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
+
+   iv%nlocal(radiance) = iv%nlocal(radiance) + num_tovs_used
+   iv%ntotal(radiance) = iv%ntotal(radiance) + num_tovs_global
 
    write(unit=stdout,fmt='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_tovs_thinned'
    write(unit=stdout,fmt='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_tovs_thinned

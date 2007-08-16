@@ -136,7 +136,9 @@ subroutine da_transform_xtoy_ssmi_tb(grid, iv, y)
    !    end do
    ! end do
 
-   do n=1, iv % num_ssmi_tb
+   if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_tb")
+
+   do n=1, iv % nlocal(ssmi_tb)
 
       ! Interpolating from 4 grid points to obs location
 
@@ -186,6 +188,8 @@ subroutine da_transform_xtoy_ssmi_tb(grid, iv, y)
    !    end if
 
    ! end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_ssmi_tb")
 
 end subroutine da_transform_xtoy_ssmi_tb
 

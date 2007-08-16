@@ -8,7 +8,9 @@ subroutine da_print_stats_sound(stats_unit, nu, nv, nt, nq, Sound)
 
    integer,                 intent(in)    :: stats_unit
    integer,                 intent(inout) :: nu, nv, nt, nq
-   type (stats_sound_type), intent(in)    :: Sound
+   type (stats_sound_type), intent(in)    :: sound
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_sound")
 
    write(unit=stats_unit, fmt='(5a/)') &
       '   var             ', &
@@ -26,19 +28,21 @@ subroutine da_print_stats_sound(stats_unit, nu, nv, nt, nq, Sound)
    if (nq < 1) nq = 1
 
    write(unit=stats_unit, fmt='((a,3(f12.4,2i5),e12.4,2i5))') &
-      ' Minimum(n,k): ', Sound%minimum%u, Sound%minimum%v, &
-                         Sound%minimum%t, Sound%minimum%q, &
-      ' Maximum(n,k): ', Sound%maximum%u, Sound%maximum%v, &
-                         Sound%maximum%t, Sound%maximum%q
+      ' Minimum(n,k): ', sound%minimum%u, sound%minimum%v, &
+                         sound%minimum%t, sound%minimum%q, &
+      ' Maximum(n,k): ', sound%maximum%u, sound%maximum%v, &
+                         sound%maximum%t, sound%maximum%q
    write(unit=stats_unit, fmt='((a,3(f12.4,10x),e12.4,10x))') &
-      ' Average     : ', Sound%average%u/real(nu), &
-                         Sound%average%v/real(nv), &
-                         Sound%average%t/real(nt), &
-                         Sound%average%q/real(nq), &
-      '    RMSE     : ', sqrt(Sound%rms_err%u/real(nu)), &
-                         sqrt(Sound%rms_err%v/real(nv)), &
-                         sqrt(Sound%rms_err%t/real(nt)), &
-                         sqrt(Sound%rms_err%q/real(nq))
+      ' Average     : ', sound%average%u/real(nu), &
+                         sound%average%v/real(nv), &
+                         sound%average%t/real(nt), &
+                         sound%average%q/real(nq), &
+      '    RMSE     : ', sqrt(sound%rms_err%u/real(nu)), &
+                         sqrt(sound%rms_err%v/real(nv)), &
+                         sqrt(sound%rms_err%t/real(nt)), &
+                         sqrt(sound%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_sound")
 
 end subroutine da_print_stats_sound
 

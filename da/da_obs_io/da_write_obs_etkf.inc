@@ -37,14 +37,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [1] Transfer surface obs:
 
-   if (iv % num_synop > 0) then
+   if (iv % nlocal(synop) > 0) then
       num_obs = 0
-      do n = 1, iv % num_synop
+      do n = 1, iv % nlocal(synop)
          if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_synop
+         do n = 1, iv % nlocal(synop)
             if (iv%synop(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%synop(n)%u%qc >= 0 ) then
@@ -69,14 +69,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [2] Transfer metar obs:
 
-   if (iv % num_metar > 0) then
+   if (iv % nlocal(metar) > 0) then
       num_obs = 0
-      do n = 1, iv % num_metar
+      do n = 1, iv % nlocal(metar)
          if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_metar
+         do n = 1, iv % nlocal(metar)
             if (iv%metar(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%metar(n)%u%qc >= 0 ) then
@@ -101,14 +101,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [3] Transfer ships obs:
 
-   if (iv % num_ships > 0) then
+   if (iv % nlocal(ships) > 0) then
       num_obs = 0
-      do n = 1, iv % num_ships
+      do n = 1, iv % nlocal(ships)
          if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_ships
+         do n = 1, iv % nlocal(ships)
             if (iv%ships(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%ships(n)%u%qc >= 0 ) then
@@ -133,14 +133,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
   ! [4.1] Transfer Geo AMVs Obs:
 
-   if (iv % num_geoamv > 0) then
+   if (iv % nlocal(geoamv) > 0) then
       num_obs = 0
-      do n = 1, iv % num_geoamv
+      do n = 1, iv % nlocal(geoamv)
         if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_geoamv
+         do n = 1, iv % nlocal(geoamv)
             if (iv%geoamv(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % geoamv(n) % info % levels
@@ -158,14 +158,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
   ! [4.2] Transfer Polar AMVs Obs:
 
-   if (iv % num_polaramv > 0) then
+   if (iv % nlocal(polaramv) > 0) then
       num_obs = 0
-      do n = 1, iv % num_polaramv
+      do n = 1, iv % nlocal(polaramv)
         if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_polaramv
+         do n = 1, iv % nlocal(polaramv)
             if (iv%polaramv(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % polaramv(n) % info % levels
@@ -183,14 +183,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [5] Transfer gpspw obs:
 
-   if (iv % num_gpspw > 0) then
+   if (iv % nlocal(gpspw) > 0) then
       num_obs = 0
-      do n = 1, iv % num_gpspw
+      do n = 1, iv % nlocal(gpspw)
          if (iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_gpspw
+         do n = 1, iv % nlocal(gpspw)
             if (iv%gpspw(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%gpspw(n)%tpw%qc >= 0 ) then
@@ -203,14 +203,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [6] Transfer sonde obs:
 
-   if (iv % num_sound > 0) then
+   if (iv % nlocal(sound) > 0) then
       num_obs = 0
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
         if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_sound
+         do n = 1, iv % nlocal(sound)
             if (iv%sound(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % sound(n) % info % levels
@@ -232,14 +232,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
       end if
    end if
 
-   if (iv % num_sound > 0) then
+   if (iv % nlocal(sound) > 0) then
       num_obs = 0
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
         if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_sound
+         do n = 1, iv % nlocal(sound)
             if (iv%sound(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                   if ( iv%sonde_sfc(n)%u%qc >= 0 ) then
@@ -264,14 +264,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
   ! [7] Transfer airep obs:
 
-   if (iv % num_airep > 0) then
+   if (iv % nlocal(airep) > 0) then
       num_obs = 0
-      do n = 1, iv % num_airep
+      do n = 1, iv % nlocal(airep)
         if (iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_airep
+         do n = 1, iv % nlocal(airep)
             if (iv%airep(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % airep(n) % info % levels
@@ -292,14 +292,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [8] Transfer pilot obs:
 
-   if (iv % num_pilot > 0) then
+   if (iv % nlocal(pilot) > 0) then
       num_obs = 0
-      do n = 1, iv % num_pilot
+      do n = 1, iv % nlocal(pilot)
         if (iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_pilot
+         do n = 1, iv % nlocal(pilot)
             if (iv%pilot(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % pilot(n) % info % levels
@@ -317,23 +317,23 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [9] Transfer SSM/I obs:SSMI:
 
-   if (iv % num_ssmi_retrieval > 0) then
+   if (iv % nlocal(ssmi_rv) > 0) then
       num_obs = 0
-      do n = 1, iv % num_ssmi_retrieval
-         if (iv%ssmi_retrieval(n)%loc%proc_domain) num_obs = num_obs + 1
+      do n = 1, iv % nlocal(ssmi_rv)
+         if (iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_ssmi_retrieval
-            if (iv%ssmi_retrieval(n)%loc%proc_domain) then
+         do n = 1, iv % nlocal(ssmi_rv)
+            if (iv%ssmi_rv(n)%loc%proc_domain) then
                num_obs = num_obs + 1
-               if ( iv%ssmi_retrieval(n)%speed%qc >= 0 ) then
-                  write(ounit,'(3f17.7)') ob%ssmi_retrieval(n)%speed, iv%ssmi_retrieval(n)%speed%inv, &
-                                          iv%ssmi_retrieval(n)%speed%error
+               if ( iv%ssmi_rv(n)%speed%qc >= 0 ) then
+                  write(ounit,'(3f17.7)') ob%ssmi_rv(n)%speed, iv%ssmi_rv(n)%speed%inv, &
+                                          iv%ssmi_rv(n)%speed%error
                end if
-               if ( iv%ssmi_retrieval(n)%tpw%qc >= 0 ) then
-                  write(ounit,'(3f17.7)') ob%ssmi_retrieval(n)%tpw, iv%ssmi_retrieval(n)%tpw%inv, &
-                                          iv%ssmi_retrieval(n)%tpw%error
+               if ( iv%ssmi_rv(n)%tpw%qc >= 0 ) then
+                  write(ounit,'(3f17.7)') ob%ssmi_rv(n)%tpw, iv%ssmi_rv(n)%tpw%inv, &
+                                          iv%ssmi_rv(n)%tpw%error
                end if
             end if
          end do
@@ -344,14 +344,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! [10] Transfer satem obs:
 
-   if (iv % num_satem > 0) then
+   if (iv % nlocal(satem) > 0) then
       num_obs = 0
-      do n = 1, iv % num_satem
+      do n = 1, iv % nlocal(satem)
         if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_satem
+         do n = 1, iv % nlocal(satem)
             if (iv%satem(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % satem(n) % info % levels
@@ -369,14 +369,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
   ! [11] Transfer scatterometer obs:
 
-   if (iv % num_qscat > 0) then
+   if (iv % nlocal(qscat) > 0) then
       num_obs = 0
-      do n = 1, iv % num_qscat
+      do n = 1, iv % nlocal(qscat)
          if (iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_qscat
+         do n = 1, iv % nlocal(qscat)
             if (iv%qscat(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%qscat(n)%u%qc >= 0 ) then
@@ -392,14 +392,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
   ! [12] Transfer profiler obs:
 
-   if (iv % num_profiler > 0) then
+   if (iv % nlocal(profiler) > 0) then
       num_obs = 0
-      do n = 1, iv % num_profiler
+      do n = 1, iv % nlocal(profiler)
         if (iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_profiler
+         do n = 1, iv % nlocal(profiler)
             if (iv%profiler(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % profiler(n) % info % levels
@@ -417,14 +417,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! Transfer Buoy obs:
 
-   if (iv % num_buoy > 0) then
+   if (iv % nlocal(buoy) > 0) then
       num_obs = 0
-      do n = 1, iv % num_buoy
+      do n = 1, iv % nlocal(buoy)
          if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_buoy
+         do n = 1, iv % nlocal(buoy)
             if (iv%buoy(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                if ( iv%buoy(n)%u%qc >= 0 ) then
@@ -449,14 +449,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! Transfer TC bogus obs:
 
-   if (iv % num_bogus > 0) then
+   if (iv % nlocal(bogus) > 0) then
       num_obs = 0
-      do n = 1, iv % num_bogus
+      do n = 1, iv % nlocal(bogus)
         if (iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_bogus
+         do n = 1, iv % nlocal(bogus)
             if (iv%bogus(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % bogus(n) % info % levels
@@ -480,14 +480,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! Transfer AIRS retrievals:
 
-   if (iv % num_airsr > 0) then
+   if (iv % nlocal(airsr) > 0) then
       num_obs = 0
-      do n = 1, iv % num_airsr
+      do n = 1, iv % nlocal(airsr)
         if (iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_airsr
+         do n = 1, iv % nlocal(airsr)
             if (iv%airsr(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % airsr(n) % info % levels
@@ -505,14 +505,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
 
    ! Transfer gpsref obs:
  
-   if (iv % num_gpsref > 0) then
+   if (iv % nlocal(gpsref) > 0) then
       num_obs = 0
-      do n = 1, iv % num_gpsref
+      do n = 1, iv % nlocal(gpsref)
         if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % num_gpsref
+         do n = 1, iv % nlocal(gpsref)
             if (iv%gpsref(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                do k = 1, iv % gpsref(n) % info % levels

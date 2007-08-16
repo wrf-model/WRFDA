@@ -23,13 +23,12 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
       filename = ' '
 
       do n=1, num_fgat_time
-         iv%current_ob_time = n
+         iv%time = n
 
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.bufr'
 
          ! scan prepbufr observation file
-         call da_scan_bufr_obs (iv, xp, filename)
-
+         call da_scan_bufr (iv, xp, filename)
 
          ! if (use_radarobs) then
          !    ! scan radar observation file
@@ -38,9 +37,9 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
          ! end if
       end do
    else
-      iv%current_ob_time = 1
+      iv%time = 1
       filename="ob.bufr"
-      call da_scan_bufr_obs(iv, xp, filename)
+      call da_scan_bufr(iv, xp, filename)
 
       ! scan main body of radar observation file
       ! if (use_radarobs) &
@@ -55,12 +54,12 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
    if (num_fgat_time > 1) then
       do n=1, num_fgat_time
-         iv%current_ob_time = n
+         iv%time = n
 
          write(filename(1:10), fmt='(a, i2.2)') 'ob.', n
 
          ! read prepbufr observation file
-         call da_read_bufr_obs (iv, xp, filename)
+         call da_read_bufr (iv, xp, filename)
 
          ! if (use_radarobs) then
          !    ! read radar observation file
@@ -70,10 +69,10 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
       end do
    else
 
-      iv%current_ob_time = 1
+      iv%time = 1
 
       filename="ob.bufr"
-      call da_read_bufr_obs(iv, xp,filename)
+      call da_read_bufr(iv, xp,filename)
 
       ! if (use_radarobs) then
       !    ! read radar observation file
@@ -87,7 +86,7 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
    call da_fill_obs_structures(xp, iv, ob)
 
-   iv%current_ob_time = 1
+   iv%time = 1
 
    if (trace_use) call da_trace_exit("da_setup_obs_structures_bufr")
 

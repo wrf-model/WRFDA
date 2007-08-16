@@ -1,18 +1,19 @@
 subroutine da_transform_xtotpw(grid)
 
    !---------------------------------------------------------------------
-   ! Purpose: TBD
+   ! Purpose: weighted sum of vertical column
    !---------------------------------------------------------------------
 
    implicit none
    
    type (domain),  intent(inout) :: grid
 
-   integer :: i, j, K
+   integer :: i, j, k
 
    real    :: pw
 
-   ! WEIGHTED SUM OF VERTICAL COLUMN
+   if (trace_use) call da_trace_entry("da_transform_xtotpw")
+
    do j=jts, jte
       do i=its, ite
          pw = 0.0
@@ -26,6 +27,8 @@ subroutine da_transform_xtotpw(grid)
          grid%xa%tpw(i,j) = 0.1*pw
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtotpw")
  
 end subroutine da_transform_xtotpw
 

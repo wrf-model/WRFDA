@@ -13,7 +13,9 @@ subroutine da_transform_xtoy_ssmi_tb_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    integer                       :: n                ! loop counter.
 
-   do n=1, iv % num_ssmi_tb
+   if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_tb_adj")
+
+   do n=1, iv % nlocal(ssmi_tb)
       call da_interp_lin_2d_adj(jo_grad_x%tb19v, iv%ssmi_tb(n)%loc, jo_grad_y%ssmi_tb(n)%tb19v)
       call da_interp_lin_2d_adj(jo_grad_x%tb19h, iv%ssmi_tb(n)%loc, jo_grad_y%ssmi_tb(n)%tb19h)
       call da_interp_lin_2d_adj(jo_grad_x%tb22v, iv%ssmi_tb(n)%loc, jo_grad_y%ssmi_tb(n)%tb22v)
@@ -22,6 +24,8 @@ subroutine da_transform_xtoy_ssmi_tb_adj(grid, iv, jo_grad_y, jo_grad_x)
       call da_interp_lin_2d_adj(jo_grad_x%tb85v, iv%ssmi_tb(n)%loc, jo_grad_y%ssmi_tb(n)%tb85v)
       call da_interp_lin_2d_adj(jo_grad_x%tb85h, iv%ssmi_tb(n)%loc, jo_grad_y%ssmi_tb(n)%tb85h)
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_ssmi_tb_adj")
 
 end subroutine da_transform_xtoy_ssmi_tb_adj
 

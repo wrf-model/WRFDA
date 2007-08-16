@@ -18,9 +18,11 @@ subroutine da_residual_gpspw(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
+   if (trace_use_dull) call da_trace_entry("da_residual_gpspw")
+
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_gpspw
+   do n=1, iv%nlocal(gpspw)
       np_available = np_available + 1
       re%gpspw(n)%tpw = da_residual(n, 0, y%gpspw(n)%tpw, iv%gpspw(n)%tpw, n_obs_bad % q)
    end do
@@ -29,6 +31,7 @@ subroutine da_residual_gpspw(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    np_bad_data = np_bad_data + n_obs_bad % q % num % bad
    np_obs_used = np_obs_used + n_obs_bad % q % num % use
 
+   if (trace_use_dull) call da_trace_exit("da_residual_gpspw")
 
 end subroutine da_residual_gpspw
 

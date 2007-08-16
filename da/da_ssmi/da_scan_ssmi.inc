@@ -10,9 +10,9 @@ subroutine da_scan_ssmi (ob, xp, filename)
    type(ob_type),    intent(inout) :: ob
    character(len=*), intent(in)    :: filename
 
-   character (LEN =  10)        :: fmt_name
-   character (LEN = 160)        :: fmt_info, fmt_loc
-   character (LEN = 120)        :: char_ned
+   character (len =  10)        :: fmt_name
+   character (len = 160)        :: fmt_info, fmt_loc
+   character (len = 120)        :: char_ned
 
    integer                      :: iost, fm,iunit
 
@@ -32,9 +32,6 @@ subroutine da_scan_ssmi (ob, xp, filename)
    isfilter = .true. ! filter out rain points
    irain = 0
 
-   ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
-   ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
-
    ! open FILE
    call da_get_unit(iunit)
    open(unit   = iunit,     &
@@ -45,41 +42,29 @@ subroutine da_scan_ssmi (ob, xp, filename)
       STATUS = 'OLD')
 
    if (iost /= 0) then
-      call da_warning(__FILE__,__LINE__, &
-         (/"Cannot open SSMI file "//trim(filename)/))
+      call da_warning(__FILE__,__LINE__, (/"Cannot open SSMI file "//trim(filename)/))
       call da_free_unit(iunit)
       return
    end if
 
    rewind (unit = iunit)
 
-   ! 2.  read HEADER
+   ! 2.  read header
    ! ===============
 
-   ! 2.1 read FIRST LINE
+   ! 2.1 read first line
    !     ---------------
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
-
-   ! 2.2 PROCESS ERROR
-   !     -------------
-
    if (iost /= 0) then
-      call da_error(__FILE__,__LINE__, &
-         (/"Cannot read SSMI file "//trim(filename)/))
-   else
-      write(unit=stdout, fmt='(/2a/)') &
-           'in da_scan_ssmi.inc, char_ned=', trim(char_ned)
+      call da_error(__FILE__,__LINE__, (/"Cannot read SSMI file "//trim(filename)/))
    end if
 
-   ! 2.3 read NUMBER OF REPORTS
-   !     ---------------------
-
+   ! 2.3 read number of reports
    do
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
       if (iost /= 0) then
-         call da_error(__FILE__,__LINE__, &
-            (/"Cannot read SSMI file "//trim(filename)/))
+         call da_error(__FILE__,__LINE__, (/"Cannot read SSMI file "//trim(filename)/))
       end if
       if (char_ned(1:6) == 'NESTIX') exit
    end do
@@ -92,31 +77,16 @@ subroutine da_scan_ssmi (ob, xp, filename)
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
    ! read formats
-   ! ------------
-
    read (unit=iunit, fmt = '(A,1X,A)') &
       fmt_name, fmt_info, &
       fmt_name, fmt_loc
 
    ! skip 1 line
-   ! -----------
-
    read (unit=iunit, fmt = '(A)') fmt_name
 
-   !  write (unit = stdout, fmt = '(/,2(A,F3.0,/))')  &
-   !     'Error max test ratio for SWS = ',max_error_uv,  &
-   !     'Error max test ratio for PW  = ',max_error_pw,  &
-   !     'Error max test ratio for PW  = ',max_error_tb
-
-
    ! loop over records
-   ! -----------------
-
    reports: do
-
       ! read station general info
-      ! =========================
-
       read (unit=iunit, fmt = fmt_info, iostat = iost) &
          info % platform,    &
          info % date_char,   &
@@ -130,32 +100,24 @@ subroutine da_scan_ssmi (ob, xp, filename)
       read(unit=info % platform (4:6),fmt='(I3)') fm
       if (iost /= 0) exit reports
 
-      ob % total_obs = ob % total_obs + 1
-
       select case(fm)
       case (125)    ;
          ! read surface wind speed and precipitable water
          read (unit=iunit, fmt = fmt_loc) speed, tpw
       case (126)    ;
-         read (unit=iunit, fmt = fmt_loc) &
-            tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
+         read (unit=iunit, fmt = fmt_loc) tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
       case default;
-         write(unit=stdout, fmt='(/a/)') &
-            'warning   warning   warning   warning   warning :'
-         write(unit=stdout, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
-         write(unit=stdout, fmt='(a, 2f12.6)') &
-            'info%(lon,lat)=', info%lon, info%lat
+         write(unit=message(1), fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
+         write(unit=message(2), fmt='(a, 2f12.6)') 'info%(lon,lat)=', info%lon, info%lat
+         call da_warning(__FILE__,__LINE__,message(1:2))
       end select
 
       ! check if obs is in horizontal domain
-      ! ====================================
 
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
       call da_ll_to_xy (info, loc, xp, outside)
-
-      if (outside) cycle reports
 
       select case(fm)
       case (125) ;
@@ -165,8 +127,10 @@ subroutine da_scan_ssmi (ob, xp, filename)
          if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
             cycle reports
          end if
+         ob % ntotal(ssmi_rv) = ob % ntotal(ssmi_rv) + 1
+         if (outside) cycle reports
 
-         ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
+         ob % nlocal(ssmi_rv) = ob % nlocal(ssmi_rv) + 1
 
       case (126) ;
          if (.not. use_ssmitbobs) cycle reports
@@ -195,7 +159,9 @@ subroutine da_scan_ssmi (ob, xp, filename)
             end if
          end if
 
-         ob % num_ssmi_tb = ob % num_ssmi_tb + 1
+         ob % ntotal(ssmi_tb) = ob % ntotal(ssmi_tb) + 1
+         if (outside) cycle reports
+         ob % nlocal(ssmi_tb) = ob % nlocal(ssmi_tb) + 1
 
       case default;
          ! Do nothing.
@@ -205,17 +171,14 @@ subroutine da_scan_ssmi (ob, xp, filename)
 
    close(unit=iunit)
    call da_free_unit(iunit)
- 
-   write(unit=stdout, fmt='(5x,a,i6,a)') &
-      'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-      'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
-      'Read:  ', ob % total_obs, ' Total Observations.'
 
-   write(unit=stdout, fmt='(/,5x,a,i6/)') &
-      '** Rain contaminated SSMI_Tb =', irain
+   if (irain > 0) then
+      write(unit=stdout, fmt='(/,5x,a,i6/)') 'Rejected rain contaminated ssmi_tb =', irain
+      write(unit=stdout, fmt='(A)') ' '
+   end if
 
-   ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
-   ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
+   ob%plocal(ob%time,:) = ob%nlocal(:)
+   ob%ptotal(ob%time,:) = ob%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_ssmi")
 

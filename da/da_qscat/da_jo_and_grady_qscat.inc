@@ -13,10 +13,12 @@ subroutine da_jo_and_grady_qscat(iv, re, jo, jo_grad_y)
 
    integer :: n
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_qscat")
+
    jo % qscat_u = 0.0
    jo % qscat_v = 0.0
 
-   do n=1, iv%num_qscat
+   do n=1, iv%nlocal(qscat)
       jo_grad_y%qscat(n)%u = -re%qscat(n)%u / &
          (iv%qscat(n)%u%error * iv%qscat(n)%u%error)
       jo_grad_y%qscat(n)%v = -re%qscat(n)%v / &
@@ -30,6 +32,9 @@ subroutine da_jo_and_grady_qscat(iv, re, jo, jo_grad_y)
 
    jo % qscat_u = 0.5 * jo % qscat_u
    jo % qscat_v = 0.5 * jo % qscat_v
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_qscat")
+
      
 end subroutine da_jo_and_grady_qscat
 

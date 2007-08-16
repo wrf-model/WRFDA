@@ -95,9 +95,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    !-------------------------------------------------------
    do inst = 1, iv%num_inst                 ! loop for sensor
       ! if ( iv%instid(inst)%num_rad < 1 ) cycle
-      if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
-          iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
-      write(unit=stdout,FMT='(A,A)') ' Computing Innovation : ',iv%instid(inst)%rttovid_string
+      if (iv%plocal_rad(iv%time,inst) <= iv%plocal_rad(iv%time-1,inst) ) cycle
       num_levs  = kte-kts+1 
       ! CRTM channel information structure
       Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -132,8 +130,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             (/"Error in allocating CRTM Surface Structure Structure"/))
       end if
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
-         iv%ob_numb(iv%current_ob_time)%radiance(inst)
+      do n= iv%plocal_rad(iv%time-1,inst)+1, iv%plocal_rad(iv%time,inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
          model_ts   = 0.0
          model_u10  = 0.0

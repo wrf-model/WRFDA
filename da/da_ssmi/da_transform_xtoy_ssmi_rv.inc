@@ -12,13 +12,17 @@ subroutine da_transform_xtoy_ssmi_rv(grid, iv, y)
 
    integer :: n        ! loop counter.
 
+   if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_rv")
+
    ! SSMI observation operator y = H(x):
 
-   do n=1, iv % num_ssmi_retrieval
+   do n=1, iv % nlocal(ssmi_rv)
       ! Interpolating from 4 grid points to obs location
-      call da_interp_lin_2d(grid%xa%tpw,   iv%ssmi_retrieval(n)%loc, y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d(grid%xa%speed, iv%ssmi_retrieval(n)%loc, y%ssmi_retrieval(n)%speed)      
+      call da_interp_lin_2d(grid%xa%tpw,   iv%ssmi_rv(n)%loc, y%ssmi_rv(n)%tpw)
+      call da_interp_lin_2d(grid%xa%speed, iv%ssmi_rv(n)%loc, y%ssmi_rv(n)%speed)      
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_ssmi_rv")
 
 end subroutine da_transform_xtoy_ssmi_rv
 

@@ -13,9 +13,11 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
    type (x_type),              intent(inout) :: jo_grad_x   ! grad_x(jo)
    
 
-   real    :: hsm, to, qo
-   real    :: tsm, qsm, psm
-   real    :: psm_prime
+   real :: hsm, to, qo
+   real :: tsm, qsm, psm
+   real :: psm_prime
+
+   if (trace_use) call da_trace_entry("da_transform_xtopsfc_adj")
 
    psm_prime = 0.0
 
@@ -59,7 +61,6 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
          call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
             psm, tsm, qsm, hsm, synop%h)
       end if
-
    end if
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
@@ -68,6 +69,8 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
    call da_interp_lin_2d_adj(jo_grad_x%u10,  synop%loc, j_synop_y%u)
    call da_interp_lin_2d_adj(jo_grad_x%v10,  synop%loc, j_synop_y%v)
    call da_interp_lin_2d_adj(jo_grad_x%psfc, synop%loc, psm_prime)
+
+   if (trace_use) call da_trace_exit("da_transform_xtopsfc_adj")
 
 end subroutine da_transform_xtopsfc_adj
 

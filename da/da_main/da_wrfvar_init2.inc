@@ -69,13 +69,11 @@ subroutine da_wrfvar_init2
    !</DESCRIPTION>
 
    call da_trace("da_wrfvar_init2",message="calling alloc_and_configure_domain")
-   call alloc_and_configure_domain (domain_id  = 1 ,                  &
-                                     grid       = head_grid ,          &
-                                     parent     = null_domain ,        &
-                                     kid        = -1                  )
+
+   call alloc_and_configure_domain (domain_id=1, grid=head_grid, parent=null_domain, kid=-1)
 
    call da_trace("da_wrfvar_init2",message="calling model_to_grid_config_rec")
-   call model_to_grid_config_rec (head_grid%id , model_config_rec , config_flags)
+   call model_to_grid_config_rec (head_grid%id, model_config_rec, config_flags)
 
    call da_trace("da_wrfvar_init2",message="calling set_scalar_indices_from_config")
    call set_scalar_indices_from_config (head_grid%id , idum1, idum2)
@@ -84,9 +82,9 @@ subroutine da_wrfvar_init2
    call init_wrfio
 
 #ifdef DM_PARALLEL
-   call get_config_as_buffer(configbuf, configbuflen, nbytes)
-   call wrf_dm_bcast_bytes(configbuf, nbytes)
-   call set_config_as_buffer(configbuf, configbuflen)
+   call get_config_as_buffer (configbuf, configbuflen, nbytes)
+   call wrf_dm_bcast_bytes (configbuf, nbytes)
+   call set_config_as_buffer (configbuf, configbuflen)
 #endif
 
    call setup_timekeeping (head_grid)
@@ -116,7 +114,7 @@ subroutine da_wrfvar_init2
 
    if ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) then
-      call da_med_initialdata_input(head_grid , config_flags,'fg01')
+      call da_med_initialdata_input (head_grid, config_flags, 'fg01')
    end if
 
    ! FIX?
@@ -125,11 +123,11 @@ subroutine da_wrfvar_init2
    ! head_grid%stop_subtime = head_grid%stop_time
 
    if (rootproc) then
-      call da_get_unit(cost_unit)
-      call da_get_unit(grad_unit)
-      call da_get_unit(stats_unit)
-      call da_get_unit(jo_unit)
-      call da_get_unit(check_max_iv_unit)
+      call da_get_unit (cost_unit)
+      call da_get_unit (grad_unit)
+      call da_get_unit (stats_unit)
+      call da_get_unit (jo_unit)
+      call da_get_unit (check_max_iv_unit)
       open(unit=cost_unit,file="cost_fn",status="replace")
       open(unit=grad_unit,file="grad_fn",status="replace")
       open(unit=stats_unit,file="statistics",status="replace")

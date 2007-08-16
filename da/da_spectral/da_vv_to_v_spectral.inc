@@ -38,6 +38,8 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
    real                :: work(1:lenwrk)         ! FFT work array. 
 #endif
 
+!   if (trace_use) call da_trace_entry("da_vv_to_v_spectral")
+
    sizec = int(0.5 * r_cvsize)
    allocate (ccv(1:sizec))
 
@@ -97,6 +99,8 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
       rcv(mm+1) = aimag(ccv(i))
    end do
    deallocate (ccv)
+
+!   if (trace_use) call da_trace_exit("da_vv_to_v_spectral")
 
 end subroutine da_vv_to_v_spectral
 

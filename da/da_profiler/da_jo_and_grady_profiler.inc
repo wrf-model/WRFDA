@@ -11,13 +11,14 @@ subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
    type(y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
    type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
-
    integer :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_profiler")
 
    jo % profiler_u = 0.0
    jo % profiler_v = 0.0
 
-   do n=1, iv%num_profiler
+   do n=1, iv%nlocal(profiler)
       do k=1, iv%profiler(n)%info%levels
          jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
             (iv%profiler(n)%u(k)%error * iv%profiler(n)%u(k)%error)
@@ -37,6 +38,8 @@ subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
 
    jo % profiler_u = 0.5 * jo % profiler_u
    jo % profiler_v = 0.5 * jo % profiler_v
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_profiler")
 
 end subroutine da_jo_and_grady_profiler
 

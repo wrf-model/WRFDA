@@ -48,7 +48,7 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
    itb85h  = 0
    itb85hf = 0
 
-   do n=1, iv % num_ssmi_tb
+   do n=1, iv % nlocal(ssmi_tb)
       ! compute innovation vector
       ! =========================
 

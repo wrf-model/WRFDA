@@ -25,14 +25,14 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_geoamv")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_geoamv")
 
    itu   = 0
    itvv  = 0
    ituf  = 0
    itvvf = 0
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%geoamv + 1, iv%ob_numb(iv%current_ob_time)%geoamv
+   do n=iv%plocal(iv%time-1,geoamv) + 1, iv%plocal(iv%time,geoamv)
 
       ! [1.3] Get horizontal interpolation weights:
 
@@ -99,7 +99,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
          'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_geoamv")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_geoamv")
    
 end subroutine da_get_innov_vector_geoamv
 

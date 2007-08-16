@@ -6,14 +6,13 @@ subroutine da_transform_vtovv_adj(grid, cv_size, be, cv, vv)
 
    implicit none
 
-   type(domain), intent(inout)      :: grid
+   type(domain),  intent(inout) :: grid
+   integer,       intent(in)    :: cv_size ! Size of cv array.
+   type(be_type), intent(in)    :: be   ! Background error structure.
+   real,          intent(inout) :: cv(1:cv_size)   ! control variables.
+   type(vp_type), intent(inout) :: vv   ! Grid point/EOF control var.
 
-   integer, intent(in)              :: cv_size ! Size of cv array.
-   type (be_type), intent(in)       :: be   ! Background error structure.
-   real, intent(inout)              :: cv(1:cv_size)   ! control variables.
-   type (vp_type), intent(inout)    :: vv   ! Grid point/EOF control var.
-
-   integer                          :: mz   ! Vertical truncation.
+   integer :: mz   ! Vertical truncation.
 
    if (trace_use) call da_trace_entry("da_transform_vtovv_adj")
 
@@ -74,11 +73,9 @@ subroutine da_transform_vtovv_adj(grid, cv_size, be, cv, vv)
    !-------------------------------------------------------------------------
 
    call da_vv_to_cv(vv, grid%xp, &
-      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), &
-      cv_size, cv)
+      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), cv_size, cv)
 
    if (trace_use) call da_trace_exit("da_transform_vtovv_adj")
-
 
 end subroutine da_transform_vtovv_adj
 

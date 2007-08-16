@@ -5,12 +5,14 @@ subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
    !-----------------------------------------------------------------------
 
    implicit none
-   integer,           intent (in)         ::  it      ! outer iteration
-   integer,           intent (inout)      ::  itt, ittf                
-   type (ssmt1_type), intent(inout)       :: ssmt1
+   integer,           intent(in)    ::  it      ! outer iteration
+   integer,           intent(inout) ::  itt, ittf                
+   type (ssmt1_type), intent(inout) :: ssmt1
 
-   integer                                ::  k
-   logical                                :: failed
+   integer ::  k
+   logical :: failed
+
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_ssmt1")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -32,11 +34,12 @@ subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
    failed = .false.
 
    do k = 1, ssmt1 % info % levels
-      !  Temperature
+      ! Temperature
       call da_max_error_qc (it, ssmt1 % info, ssmt1 % t(k),&
-              max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
-                             failed, check_max_iv_print)
+         max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_ssmt1")
 
 end subroutine da_check_max_iv_ssmt1
 

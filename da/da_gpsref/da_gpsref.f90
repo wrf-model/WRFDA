@@ -4,14 +4,14 @@ module da_gpsref
    use module_dm, only : wrf_dm_sum_real
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, check_max_iv_print, &
+      v_interp_p, v_interp_h, check_max_iv_print, trace_use, &
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
-      max_error_bt, max_error_buv, num_gpsref_tot,max_error_thickness, &
-      pseudo_var, num_pseudo, kms,kme,kts,kte, &
+      max_error_bt, max_error_buv, gpsref,max_error_thickness, &
+      pseudo_var, num_pseudo, kms,kme,kts,kte, trace_use_dull, &
       anal_type_verify,fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
-      use_gpsrefobs,pseudo_z,pseudo_val,max_error_ref
+      use_gpsrefobs,pseudo_z,pseudo_val,max_error_ref, pseudo
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       gpsref_type, maxmin_type
@@ -21,6 +21,7 @@ module da_gpsref
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_gpsref_type" is ONLY used locally in da_gpsref:
 

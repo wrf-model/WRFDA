@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_geoamv (grid, iv, y)
    integer                      :: n ! Loop counter.
    integer                      :: k ! Index dimension.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%geoamv+1, iv%ob_numb(iv%current_ob_time)%geoamv
+   do n=iv%plocal(iv%time-1,geoamv)+1, iv%plocal(iv%time,geoamv)
       k = iv % geoamv(n) % info % levels
       if (k < 1) cycle
       ! Interpolate horizontally:

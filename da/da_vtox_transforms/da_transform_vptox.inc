@@ -12,7 +12,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    type (be_type), intent(in), optional :: be  ! Background errors.
    type (ep_type), intent(in), optional :: ep  ! Ensemble perturbations.
 
-   integer              :: k, j, k1            ! Loop counters.
+   integer :: k, j, k1            ! Loop counters.
 
    if (trace_use) call da_trace_entry("da_transform_vptox") 
 
@@ -21,8 +21,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    !---------------------------------------------------------------------------
 
    if (be % ne > 0 .and. alphacv_method == 1) then
-      call da_add_flow_dependence_vp(be % ne, ep, vp, &
-                                      its,ite, jts,jte, kts,kte)
+      call da_add_flow_dependence_vp(be % ne, ep, vp, its,ite, jts,jte, kts,kte)
    end if
 
    !--------------------------------------------------------------------------
@@ -32,8 +31,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    ! Chi:
    do k = kts, kte
       do j = jts, jte
-         vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) + &
-                              be%reg_chi(j,k)* vp%v1(its:ite,j,k)
+         vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) + be%reg_chi(j,k)* vp%v1(its:ite,j,k)
       end do
    end do
   
@@ -42,18 +40,16 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    do k1 = kts, kte
       do k = kts, kte
          do j = jts, jte
-            grid%xa%t(its:ite,j,k) = grid%xa%t(its:ite,j,k)  + &
-                                be%reg_t(j,k,k1)*vp%v1(its:ite,j,k1)
+            grid%xa%t(its:ite,j,k) = grid%xa%t(its:ite,j,k) + be%reg_t(j,k,k1)*vp%v1(its:ite,j,k1)
          end do
-     end do
+      end do
    end do
 
    ! Surface Pressure
    grid%xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,1) 
    do k = kts,kte
       do j = jts,jte
-         grid%xa%psfc(its:ite,j) = grid%xa%psfc(its:ite,j) + &
-            be%reg_ps(j,k)*vp%v1(its:ite,j,k)
+         grid%xa%psfc(its:ite,j) = grid%xa%psfc(its:ite,j) + be%reg_ps(j,k)*vp%v1(its:ite,j,k)
       end do
    end do
 

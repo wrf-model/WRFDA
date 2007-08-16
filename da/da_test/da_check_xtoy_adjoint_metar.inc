@@ -12,9 +12,9 @@ subroutine da_check_xtoy_adjoint_metar(oi, y, adjtest_lhs, pertile_lhs)
 
    integer                        :: n             ! Loop counter.
 
-   if (oi%num_metar < 1) return
+   if (oi%nlocal(metar) < 1) return
 
-   do n=1, oi%num_metar
+   do n=1, oi%nlocal(metar)
       if (oi%metar(n)%zk < 1.0) then
          y%metar(n)%u = 0.0
          y%metar(n)%v = 0.0

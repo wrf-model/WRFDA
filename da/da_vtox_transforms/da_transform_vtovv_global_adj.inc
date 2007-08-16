@@ -6,15 +6,15 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    implicit none
 
-   integer, intent(in)        :: cv_size ! Size of cv array.
-   type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
-   type (be_type), intent(in) :: be   ! background errors.
-   real, intent(out)          :: cv(1:cv_size) ! control variables.
-   type (vp_type),intent(in)  :: vv   ! grdipt/eof cv (local).
+   integer,        intent(in)  :: cv_size       ! Size of cv array.
+   type(xbx_type), intent(in)  :: xbx           ! For header & non-grid arrays.
+   type(be_type),  intent(in)  :: be            ! background errors.
+   real,           intent(out) :: cv(1:cv_size) ! control variables.
+   type(vp_type),  intent(in)  :: vv            ! grdipt/eof cv (local).
 
-   integer                    :: k, m ! Loop counters.
-   integer                    :: cv_s ! Counter.
-   integer                    :: cv_e ! Counter.
+   integer :: k, m ! Loop counters.
+   integer :: cv_s ! Counter.
+   integer :: cv_e ! Counter.
 
    if (trace_use) call da_trace_entry("da_transform_vtovv_global_adj")
 

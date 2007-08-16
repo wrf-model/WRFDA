@@ -8,12 +8,14 @@ subroutine da_transform_xtotb_lin(grid)
 
    type (domain), intent(inout) :: grid
 
-   integer                      :: i,j,k
-   real                         :: dum1, dum2, zrhom, TGL_zrhom
+   integer :: i,j,k
+   real    :: dum1, dum2, zrhom, TGL_zrhom
 
-   real                         :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
-   real                         :: TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,TGL_tpw
-   real                         :: TGL_htpw,TGL_speed,TGL_alw,TGL_zcld         
+   real    :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
+   real    :: TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,TGL_tpw
+   real    :: TGL_htpw,TGL_speed,TGL_alw,TGL_zcld         
+
+   if (trace_use) call da_trace_entry("da_transform_xtotb_lin")
 
    ! WHY?
    ! call da_transform_xtotpw(grid)
@@ -115,7 +117,9 @@ subroutine da_transform_xtotb_lin(grid)
             TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
             TGL_zcld,grid%xa%tb85v(i,j),grid%xa%tb85h(i,j)             )
       end do
-   end do
+   end do       
+
+   if (trace_use) call da_trace_exit("da_transform_xtotb_lin")
 
 end subroutine da_transform_xtotb_lin
 

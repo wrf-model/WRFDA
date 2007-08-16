@@ -1,6 +1,5 @@
-subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
-                                  xbx, y, &
-                                  grid, config_flags, cg_jcdf)
+subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
+   grid, config_flags, cg_jcdf)
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -8,20 +7,19 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
    implicit none
 
-   integer, intent(in)              :: iter
-   integer, intent(in)              :: cv_size ! Size of cv array.
-   type (be_type), intent(in)       :: be     ! background error structure.
-   type (ep_type), intent(in)       :: ep     ! ensemble perturbation structure.
-   real, intent(out)                :: cv(1:cv_size) ! control variables.
-   type (ob_type), intent(inout)    :: iv     ! innovation vector (o-b).
-   type (vp_type), intent(inout)    :: vp     ! Grdipt/level CV.
-   type (vp_type), intent(inout)    :: vv     ! Grdipt/EOF CV.
-   type (xbx_type),intent(in)       :: xbx    ! For header & non-grid arrays.
-   type (y_type) , intent(inout)    :: y      ! y = H(x_inc).
-
-   type(domain), intent(inout) :: grid
+   integer,                    intent(in)    :: iter
+   integer,                    intent(in)    :: cv_size ! Size of cv array.
+   type(be_type),              intent(in)    :: be     ! background error structure.
+   type(ep_type),              intent(in)    :: ep     ! ensemble perturbation structure.
+   real,                       intent(out)   :: cv(1:cv_size) ! control variables.
+   type(ob_type),              intent(inout) :: iv     ! innovation vector (o-b).
+   type(vp_type),              intent(inout) :: vp     ! Grdipt/level CV.
+   type(vp_type),              intent(inout) :: vv     ! Grdipt/EOF CV.
+   type(xbx_type),             intent(in)    :: xbx    ! For header & non-grid arrays.
+   type(y_type),               intent(inout) :: y      ! y = H(x_inc).
+   type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
-   integer, intent(in) :: cg_jcdf
+   integer,                    intent(in)    :: cg_jcdf
 
    integer :: nobwin,ndynopt
 #ifdef DM_PARALLEL
@@ -34,7 +32,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
    if (var4d) then
       do nobwin=num_fgat_time,1,-1
-         iv%current_ob_time = nobwin
+         iv%time = nobwin
          call da_zero_x(grid%xa)
          call da_transform_xtoy_adj(grid, iv, y, grid%xa)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin

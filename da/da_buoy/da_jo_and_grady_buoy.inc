@@ -13,13 +13,15 @@ subroutine da_jo_and_grady_buoy(iv, re, jo, jo_grad_y)
 
    integer :: n
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_buoy")
+
    jo % buoy_u = 0.0
    jo % buoy_v = 0.0
    jo % buoy_t = 0.0
    jo % buoy_p = 0.0
    jo % buoy_q = 0.0
 
-   do n=1, iv%num_buoy
+   do n=1, iv%nlocal(buoy)
       jo_grad_y%buoy(n)%u = -re%buoy(n)%u / (iv%buoy(n)%u%error * iv%buoy(n)%u%error)
       jo_grad_y%buoy(n)%v = -re%buoy(n)%v / (iv%buoy(n)%v%error * iv%buoy(n)%v%error)
       jo_grad_y%buoy(n)%t = -re%buoy(n)%t / (iv%buoy(n)%t%error * iv%buoy(n)%t%error)
@@ -40,6 +42,8 @@ subroutine da_jo_and_grady_buoy(iv, re, jo, jo_grad_y)
    jo % buoy_t = 0.5 * jo % buoy_t
    jo % buoy_p = 0.5 * jo % buoy_p
    jo % buoy_q = 0.5 * jo % buoy_q
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_buoy")
      
 end subroutine da_jo_and_grady_buoy
 

@@ -13,12 +13,16 @@ subroutine da_transform_xtoy_pilot_adj(iv, jo_grad_y, jo_grad_x)
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%pilot + 1, iv%ob_numb(iv%current_ob_time)%pilot
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_pilot_adj")
+
+   do n=iv%plocal(iv%time-1,pilot) + 1, iv%plocal(iv%time,pilot)
       k = iv % pilot(n) % info % levels
       if (k < 1) cycle
       call da_interp_lin_3d_adj(jo_grad_x%u, iv%pilot(n)%loc, jo_grad_y%pilot(n)%u, k, iv%pilot(n)%zk, k)
       call da_interp_lin_3d_adj(jo_grad_x%v, iv%pilot(n)%loc, jo_grad_y%pilot(n)%v, k, iv%pilot(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_pilot_adj")
 
 end subroutine da_transform_xtoy_pilot_adj
 

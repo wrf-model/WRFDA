@@ -26,14 +26,14 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_pilot")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_pilot")
 
    itu   = 0
    itvv  = 0
    ituf  = 0
    itvvf = 0
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%pilot + 1, iv%ob_numb(iv%current_ob_time)%pilot
+   do n=iv%plocal(iv%time-1,pilot) + 1, iv%plocal(iv%time,pilot)
 
       num_levs = iv % pilot(n) % info % levels
 
@@ -111,7 +111,7 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
          'Finally Total Pilot rejections ',ituf+itvvf,' on ',itu+itvv
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_pilot")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_pilot")
 
 end subroutine da_get_innov_vector_pilot
 

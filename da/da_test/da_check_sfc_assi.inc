@@ -59,7 +59,7 @@ subroutine da_check_sfc_assi(grid, iv, y)
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
-   do n=1, iv%num_synop
+   do n=1, iv%nlocal(synop)
       call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
 
 
@@ -86,7 +86,7 @@ subroutine da_check_sfc_assi(grid, iv, y)
 
    call da_zero_x(grid%xa)
 
-   do n=1, iv%num_synop
+   do n=1, iv%nlocal(synop)
       call da_transform_xtopsfc_adj(grid,iv%synop(n),y%synop(n),grid%xa)
    end do
 

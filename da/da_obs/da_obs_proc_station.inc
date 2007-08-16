@@ -12,9 +12,10 @@ subroutine da_obs_proc_station(obs)
                              
    type (multi_level_type), intent(inout) :: obs
 
-   real :: po, to, rho, es, qs, qvo
+   real    :: po, to, rho, es, qs, qvo
    integer :: i
 
+   if (trace_use_frequent) call da_trace_entry("da_obs_proc_station")
 
    do i = 1, obs % info % levels
       !-----------------------------------------------------------------------
@@ -58,6 +59,8 @@ subroutine da_obs_proc_station(obs)
          obs % each(i) % q  % error = obs % each(i) % rh % error
       end if
    end do
+
+   if (trace_use_frequent) call da_trace_exit("da_obs_proc_station")
 
 end subroutine da_obs_proc_station
 

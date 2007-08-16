@@ -19,7 +19,11 @@ module da_obs_io
       max_profiler_input,max_ssmi_ret_input, max_sound_input, max_ships_input, &
       max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
       max_synop_input,max_ssmt2_input, max_ssmi_tb_input, max_qscat_input, &
-      max_airsret_input
+      max_airsret_input, obs_names, num_ob_indexes, &
+      sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
+      metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
+      radar, radiance, airsr
+
    use da_define_structures, only : ob_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type
@@ -41,8 +45,8 @@ module da_obs_io
 
 contains
 
-#include "da_read_obs.inc"
-#include "da_scan_obs.inc"
+#include "da_read_gts.inc"
+#include "da_scan_gts.inc"
 #include "da_read_radar.inc"
 #include "da_scan_radar.inc"
 #include "da_read_errfac.inc"
@@ -51,8 +55,8 @@ contains
 #include "da_write_obs_etkf.inc"
 #include "da_write_filtered_obs.inc"
 #include "da_write_y.inc"
-#include "da_read_bufr_obs.inc"
-#include "da_scan_bufr_obs.inc"
+#include "da_read_bufr.inc"
+#include "da_scan_bufr.inc"
 #include "da_final_write_obs.inc"
 #include "da_final_write_y.inc"
 #include "da_read_y_unit.inc"

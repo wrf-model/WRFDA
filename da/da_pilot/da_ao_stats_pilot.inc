@@ -1,4 +1,4 @@
-subroutine da_ao_stats_pilot (stats_unit, oi, re)
+subroutine da_ao_stats_pilot (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,62 +6,64 @@ subroutine da_ao_stats_pilot (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent(inout) :: iv            ! iv
+   type  (y_type), intent(in)    :: re            ! A - O
 
-   type (stats_pilot_type)          :: Pilot
-   integer                          :: nu, nv
-   integer                          :: n, k
+   type (stats_pilot_type) :: stats
+   integer                 :: nu, nv
+   integer                 :: n, k
+   
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_pilot")
 
    nu = 0
    nv = 0
-   num_pilot_tot = 0
 
-   Pilot%maximum%u = maxmin_type (missing_r, 0, 0)
-   Pilot%maximum%v = maxmin_type (missing_r, 0, 0)
-   Pilot%minimum%u = maxmin_type(-missing_r, 0, 0)
-   Pilot%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Pilot%average = residual_pilot1_type(0.0, 0.0)
-   Pilot%rms_err = Pilot%average
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_Pilot > 0) then
-      do n=1, oi%num_Pilot
-         if (oi%pilot(n)%loc%proc_domain) then
-            do k=1, oi%Pilot(n)%info%levels
-               call da_stats_calculate (n, k, oi%Pilot(n)%u(k)%qc, & 
-                               re%pilot(n)%u(k), nu, & 
-                               pilot%minimum%u, Pilot%maximum%u, &
-                               pilot%average%u, Pilot%rms_err%u)
-               call da_stats_calculate (n, k, oi%Pilot(n)%v(k)%qc, & 
-                               re%Pilot(n)%v(k), nv, & 
-                               Pilot%minimum%v, Pilot%maximum%v, &
-                               Pilot%average%v, Pilot%rms_err%v)
-            end do
-         end if    ! end if (oi%pilot(n)%loc%proc_domain)
-      end do
-   end if
+   stats%average = residual_pilot1_type(0.0, 0.0)
+   stats%rms_err = stats%average
 
-   ! Do inter-processor communication to gather statistics.
+   do n=1, iv%nlocal(pilot)
+      if (iv%pilot(n)%loc%proc_domain) then
+         do k=1, iv%pilot(n)%info%levels
+            call da_stats_calculate (n, k, iv%pilot(n)%u(k)%qc, & 
+               re%pilot(n)%u(k), nu, & 
+               stats%minimum%u, stats%maximum%u, &
+               stats%average%u, stats%rms_err%u)
+            call da_stats_calculate (n, k, iv%pilot(n)%v(k)%qc, & 
+               re%pilot(n)%v(k), nv, & 
+               stats%minimum%v, stats%maximum%v, &
+               stats%average%v, stats%rms_err%v)
+         end do
+      end if    ! end if (iv%pilot(n)%loc%proc_domain)
+   end do
+
+   ! do inter-processor communication to gather statistics.
    call da_proc_sum_int (nu)
    call da_proc_sum_int (nv)
-   num_pilot_tot = nu + nv
+   iv%nstats(pilot) = nu + nv
 
-   call da_proc_stats_combine(Pilot%average%u, Pilot%rms_err%u, &
-                           Pilot%minimum%u%value, Pilot%maximum%u%value, &
-                           Pilot%minimum%u%n, Pilot%maximum%u%n, &
-                           Pilot%minimum%u%l, Pilot%maximum%u%l)
-   call da_proc_stats_combine(Pilot%average%v, Pilot%rms_err%v, &
-                           Pilot%minimum%v%value, Pilot%maximum%v%value, &
-                           Pilot%minimum%v%n, Pilot%maximum%v%n, &
-                           Pilot%minimum%v%l, Pilot%maximum%v%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for pilot'
-         call da_print_stats_pilot(stats_unit, nu, nv, Pilot)
+         call da_print_stats_pilot(stats_unit, nu, nv, stats)
       end if
    end if
+   
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_pilot")
 
 end subroutine da_ao_stats_pilot
 

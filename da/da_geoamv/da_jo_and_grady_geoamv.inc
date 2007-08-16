@@ -16,8 +16,8 @@ subroutine da_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
    jo % geoamv_u = 0.0
    jo % geoamv_v = 0.0
 
-   if (iv%num_geoamv > 0) then
-      do n=1, iv%num_geoamv
+   if (iv%nlocal(geoamv) > 0) then
+      do n=1, iv%nlocal(geoamv)
          do k=1, iv%geoamv(n)%info%levels
             jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
                                         ( iv%geoamv(n)%u(k)%error * &

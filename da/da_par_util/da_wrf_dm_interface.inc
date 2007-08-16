@@ -37,24 +37,6 @@ subroutine da_local_to_global(xp, x, xg, dim)
 
 end subroutine da_local_to_global
 
-subroutine da_proc_sum_count_obs (count_obs)
-
-   !---------------------------------------------------------------------------
-   ! Purpose: Do MPI sum operation across processors to get the global sum of
-   !          count_obs. The sum is returned only on the root processor,
-   !          i.e., processor 0. (In this way, we do not have to do all-to-all 
-   !          communication.)
-   !
-   ! IMPORTANT!!!
-   !          The length of sumval and procval arrays are currently 56. This is
-   !          the number of obs types (currently 14) times 4. This length should
-   !          be changed accordingly if more observation types are added.
-   !---------------------------------------------------------------------------
-
-   type (count_obs_type), intent(inout)     :: count_obs
-
-end subroutine da_proc_sum_count_obs
-
 subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
                                nobs_min, nobs_max, klev_min, klev_max)
 

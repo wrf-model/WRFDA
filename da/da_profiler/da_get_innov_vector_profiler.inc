@@ -25,14 +25,12 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
    real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
    integer :: itu,ituf,itvv,itvvf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_profiler")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_profiler")
    
    itu   = 0; itvv    = 0;
    ituf  = 0; itvvf   = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, &
-      iv%ob_numb(iv%current_ob_time)%profiler
-
+   do n=iv%plocal(iv%time-1,profiler) + 1, iv%plocal(iv%time,profiler)
       num_levs = iv % profiler(n) % info % levels
 
       if (num_levs < 1) cycle
@@ -111,7 +109,7 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
          'Finally Total Profiler rejections ',ituf+itvvf,' on ',itu +itvv
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_profiler")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_profiler")
 
 end subroutine da_get_innov_vector_profiler
 

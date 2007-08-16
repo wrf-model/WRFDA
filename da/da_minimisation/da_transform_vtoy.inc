@@ -8,17 +8,16 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 
    implicit none
 
-   integer, intent(in)                :: cv_size ! Size of cv array.
-   type (be_type), intent(in)         :: be     ! background error structure.
-   type (ep_type), intent(in)         :: ep     ! Ensemble perturbation structure.
-   real, intent(in)                   :: cv(1:cv_size)     ! control variables.
-   type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
-   type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
-   type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
-   type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.
-   type (y_type) , intent(inout)      :: y      ! y = H(x_inc).
-
-   type(domain), intent(inout)           :: grid
+   integer,                    intent(in)    :: cv_size ! Size of cv array.
+   type(be_type),              intent(in)    :: be     ! background error structure.
+   type(ep_type),              intent(in)    :: ep     ! Ensemble perturbation structure.
+   real,                       intent(in)    :: cv(1:cv_size)     ! control variables.
+   type(ob_type),              intent(inout) :: iv     ! innovation vector (o-b).
+   type(vp_type),              intent(inout) :: vp     ! Grdipt/level CV.
+   type(vp_type),              intent(inout) :: vv     ! Grdipt/EOF CV.
+   type(xbx_type),             intent(in)    :: xbx    ! For header & non-grid arrays.
+   type(y_type),               intent(inout) :: y      ! y = H(x_inc).
+   type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin
@@ -28,14 +27,14 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 
    character(len=4) :: filnam
 
-   call da_trace_entry("da_transform_vtoy")
+   if (trace_use) call da_trace_entry("da_transform_vtoy")
 
    call da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
 
-      call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
+      if (trace_use) call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
          call da_system("da_run_wrfplus_tl.ksh pre")
@@ -61,10 +60,10 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 #else
       call da_system("da_run_wrfplus_tl.ksh")
 #endif
-      call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
+      if (trace_use) call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
 
       do nobwin=1, num_fgat_time
-         iv%current_ob_time = nobwin
+         iv%time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoy(grid, iv, y)
@@ -73,7 +72,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d
 
-   call da_trace_exit("da_transform_vtoy")
+   if (trace_use) call da_trace_exit("da_transform_vtoy")
 
 end subroutine da_transform_vtoy
 

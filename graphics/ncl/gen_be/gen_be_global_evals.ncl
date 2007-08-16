@@ -11,12 +11,10 @@ begin
 
  works = "pdf"
 
- region = "t46_45km"
- nrow = 41
-; region = "con200"
-; nrow = 27
+ region = getenv("REGION")
+ dir    = getenv("BE_DIR")
+ nrow   = stringtointeger(getenv("BE_NROW"))
 
- dir =  "/smoke/dmbarker/data/"+region+"/noda/fc/gen_be/"
  ncol = 2
 
  y1 = new((/nrow/),float)
@@ -30,25 +28,25 @@ begin
  var1="psi"
  filename1="fort.175"
  units1 = "(m^4/s^-2)"
- data1=asciiread(dir+filename1,(/nrow,ncol/),"float")
+ data1=asciiread(dir+"/"+filename1,(/nrow,ncol/),"float")
  y1(:) = data1(:,1)
 
  var2="chi_u"
  filename2="fort.179"
  units2 = "(m^4/s^-2)"
- data2=asciiread(dir+filename2,(/nrow,ncol/),"float")
+ data2=asciiread(dir+"/"+filename2,(/nrow,ncol/),"float")
  y2(:) = data2(:,1)
 
  var3="t_u"
  filename3 = "fort.183"
  units3 = "(degK^2)"
- data3=asciiread(dir+filename3,(/nrow,ncol/),"float")
+ data3=asciiread(dir+"/"+filename3,(/nrow,ncol/),"float")
  y3(:) = data3(:,1)
 
  var4="rh"
  filename4 = "fort.187"
  units4 = "(%^2)"
- data4=asciiread(dir+filename4,(/nrow,ncol/),"float")
+ data4=asciiread(dir+"/"+filename4,(/nrow,ncol/),"float")
  y4(:) = data4(:,1)
 
 ;************************************************

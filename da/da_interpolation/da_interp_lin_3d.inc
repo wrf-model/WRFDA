@@ -27,10 +27,8 @@ subroutine da_interp_lin_3d(fm3d, loc, fo3d, ml, zk, nl)
 
    fmz(:) = 0.0
 
-   fmz(kts:kte) = dym*(dxm*fm3d(i  ,j  ,kts:kte) &
-                            +dx *fm3d(i+1,j  ,kts:kte)) &
-                      + dy *(dxm*fm3d(i  ,j+1,kts:kte) &
-                            +dx *fm3d(i+1,j+1,kts:kte))
+   fmz(kts:kte) = dym*(dxm*fm3d(i,j,kts:kte) + dx *fm3d(i+1,j,kts:kte)) &
+      + dy *(dxm*fm3d(i,j+1,kts:kte) + dx *fm3d(i+1,j+1,kts:kte))
 
    fo3d(:) = 0.0
 

@@ -1,6 +1,5 @@
-subroutine da_stats_calculate(n, k, qc_flag, x, nn, &
-                            minimum, maximum, &
-                            average, rms_err)
+subroutine da_stats_calculate(n, k, qc_flag, x, nn, minimum, maximum, &
+   average, rms_err)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,13 +7,15 @@ subroutine da_stats_calculate(n, k, qc_flag, x, nn, &
 
    implicit none
 
-   integer, intent(in)    :: n             ! Number of obs.
-   integer, intent(in)    :: k             ! Level.
-   integer, intent(in)    :: qc_flag       ! QC flag.
-   real, intent(in)       :: x             ! Value.
-   integer, intent(inout) :: nn            ! Number of ok obs.
+   integer,            intent(in)    :: n             ! Sequence number of ob.
+   integer,            intent(in)    :: k             ! Level of ob.
+   integer,            intent(in)    :: qc_flag       ! QC flag.
+   real,               intent(in)    :: x             ! Value.
+   integer,            intent(inout) :: nn            ! Number of ok obs.
    type (maxmin_type), intent(inout) :: minimum, maximum
-   real, intent(inout)    :: average, rms_err
+   real,               intent(inout) :: average, rms_err
+
+   if (trace_use_dull) call da_trace_entry("da_stats_calculate")
 
    if (qc_flag >= obs_qc_pointer) then
       nn = nn + 1
@@ -34,6 +35,8 @@ subroutine da_stats_calculate(n, k, qc_flag, x, nn, &
       average = average + x
       rms_err = rms_err + x * x
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_stats_calculate")
 
 end subroutine da_stats_calculate
 

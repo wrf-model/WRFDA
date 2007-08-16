@@ -6,7 +6,7 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   type (domain),     intent(in)     :: grid       ! first guess state.
+   type (domain),     intent(in)     :: grid
    type (ob_type),    intent(in)     :: iv          ! obs. inc vector (o-b).
    type (y_type) ,    intent(inout)  :: jo_grad_y   ! grad_y(jo)
    type (x_type) ,    intent(inout)  :: jo_grad_x   ! grad_x(jo)
@@ -25,19 +25,31 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
    real    :: pp(kms:kme)
    real    :: psfc_loc,terr_loc,ppsfc                     
 
-   do n= iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_bogus_adj")
+
+   do n= iv%plocal(iv%time-1,bogus)+1, iv%plocal(iv%time,bogus)
       num_levs = iv % bogus(n) % info % levels
       if (num_levs < 1) cycle
 
+      ! [1.1] Get cross pt. horizontal interpolation weights:
+
+      i   = iv%bogus(n)%loc%i
+      dy  = iv%bogus(n)%loc%dy
+      dym = iv%bogus(n)%loc%dym
+      j   = iv%bogus(n)%loc%j
+      dx  = iv%bogus(n)%loc%dx
+      dxm = iv%bogus(n)%loc%dxm
+
       ! [1.1] Adjoint feedback from Y to X for u and v:
-      call da_interp_lin_3d_adj(jo_grad_x%u, iv%bogus(n)%loc, &
-         jo_grad_y%bogus(n)%u, num_levs,iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x%v, iv%bogus(n)%loc, &
-         jo_grad_y%bogus(n)%v, num_levs,iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x%t, iv%bogus(n)%loc, &
-         jo_grad_y%bogus(n)%t, num_levs,iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x%q, iv%bogus(n)%loc, &
-         jo_grad_y%bogus(n)%q, num_levs,iv%bogus(n)%zk, num_levs)
+
+      call da_interp_lin_3d_adj(jo_grad_x % u, iv%bogus(n)%loc, jo_grad_y%bogus(n)%u, &
+         num_levs, iv%bogus(n)%zk, num_levs)
+      call da_interp_lin_3d_adj(jo_grad_x % v, iv%bogus(n)%loc, jo_grad_y%bogus(n)%v, &
+         num_levs, iv%bogus(n)%zk, num_levs)
+      call da_interp_lin_3d_adj(jo_grad_x % t, iv%bogus(n)%loc, jo_grad_y%bogus(n)%t, &
+         num_levs, iv%bogus(n)%zk, num_levs)
+      call da_interp_lin_3d_adj(jo_grad_x % q, iv%bogus(n)%loc, jo_grad_y%bogus(n)%q, &
+         num_levs, iv%bogus(n)%zk, num_levs)
 
       ! [1.2] Compute the feedback from SLP to t and q:
 
@@ -67,28 +79,30 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
 
       ! 1.2.3.1 for Psfc
 
-      jo_grad_x % psfc(i,j) = jo_grad_x % psfc(i,j) + dym*dxm*ppsfc
-      jo_grad_x % psfc(i+1,j) = jo_grad_x % psfc(i+1,j)+ dym*dx*ppsfc
-      jo_grad_x % psfc(i,j+1) = jo_grad_x % psfc(i,j+1)+ dy*dxm*ppsfc
-      jo_grad_x % psfc(i+1,j+1)=jo_grad_x % psfc(i+1,j+1)+dy*dx*ppsfc
+      jo_grad_x % psfc(i,j)     = jo_grad_x % psfc(i,j) + dym*dxm*ppsfc
+      jo_grad_x % psfc(i+1,j)   = jo_grad_x % psfc(i+1,j)+ dym*dx*ppsfc
+      jo_grad_x % psfc(i,j+1)   = jo_grad_x % psfc(i,j+1)+ dy*dxm*ppsfc
+      jo_grad_x % psfc(i+1,j+1) = jo_grad_x % psfc(i+1,j+1)+dy*dx*ppsfc
 
       ! 1.2.3.2 for t, q, p
 
       do k = kts, kte
-         jo_grad_x % t(i,j,k) = jo_grad_x % t(i,j,k)+dym*dxm*tt(k)
-         jo_grad_x % t(i+1,j,k) = jo_grad_x % t(i+1,j,k)+ dym*dx*tt(k)
-         jo_grad_x % t(i,j+1,k) = jo_grad_x % t(i,j+1,k)+ dy*dxm*tt(k)
-         jo_grad_x % t(i+1,j+1,k)=jo_grad_x % t(i+1,j+1,k)+dy*dx*tt(k)
-         jo_grad_x % q(i,j,k) = jo_grad_x % q(i,j,k)+dym*dxm*qq(k)
-         jo_grad_x % q(i+1,j,k) = jo_grad_x % q(i+1,j,k)+ dym*dx*qq(k)
-         jo_grad_x % q(i,j+1,k) = jo_grad_x % q(i,j+1,k)+ dy*dxm*qq(k)
-         jo_grad_x % q(i+1,j+1,k)=jo_grad_x % q(i+1,j+1,k)+dy*dx*qq(k)
-         jo_grad_x % p(i,j,k) = jo_grad_x % p(i,j,k)+dym*dxm*pp(k)
-         jo_grad_x % p(i+1,j,k) = jo_grad_x % p(i+1,j,k)+ dym*dx*pp(k)
-         jo_grad_x % p(i,j+1,k) = jo_grad_x % p(i,j+1,k)+ dy*dxm*pp(k)
-         jo_grad_x % p(i+1,j+1,k)=jo_grad_x % p(i+1,j+1,k)+dy*dx*pp(k)
+         jo_grad_x % t(i,j,k)     = jo_grad_x % t(i,j,k)+dym*dxm*tt(k)
+         jo_grad_x % t(i+1,j,k)   = jo_grad_x % t(i+1,j,k)+ dym*dx*tt(k)
+         jo_grad_x % t(i,j+1,k)   = jo_grad_x % t(i,j+1,k)+ dy*dxm*tt(k)
+         jo_grad_x % t(i+1,j+1,k) = jo_grad_x % t(i+1,j+1,k)+dy*dx*tt(k)
+         jo_grad_x % q(i,j,k)     = jo_grad_x % q(i,j,k)+dym*dxm*qq(k)
+         jo_grad_x % q(i+1,j,k)   = jo_grad_x % q(i+1,j,k)+ dym*dx*qq(k)
+         jo_grad_x % q(i,j+1,k)   = jo_grad_x % q(i,j+1,k)+ dy*dxm*qq(k)
+         jo_grad_x % q(i+1,j+1,k) = jo_grad_x % q(i+1,j+1,k)+dy*dx*qq(k)
+         jo_grad_x % p(i,j,k)     = jo_grad_x % p(i,j,k)+dym*dxm*pp(k)
+         jo_grad_x % p(i+1,j,k)   = jo_grad_x % p(i+1,j,k)+ dym*dx*pp(k)
+         jo_grad_x % p(i,j+1,k)   = jo_grad_x % p(i,j+1,k)+ dy*dxm*pp(k)
+         jo_grad_x % p(i+1,j+1,k) = jo_grad_x % p(i+1,j+1,k)+dy*dx*pp(k)
       end do
-   end do
+   end do                  
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_bogus_adj")
 
 end subroutine da_transform_xtoy_bogus_adj
 

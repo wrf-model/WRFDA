@@ -29,10 +29,11 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    real    :: xr,yr,zr
 
+   if (trace_use) call da_trace_entry("da_transform_xtoy_radar_adj")
+
    ! W_HALF is vertical velocity at half-sigma levels.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
-      iv%ob_numb(iv%current_ob_time)%radar
+   do n=iv%plocal(iv%time-1,radar) + 1, iv%plocal(iv%time,radar)
       do k = 1, max_ob_levels
          model_u(k) = 0.0
          model_v(k) = 0.0
@@ -91,6 +92,8 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
       call da_interp_lin_3d_adj(jo_grad_x % u, iv%radar(n)%loc, &
          model_u, num_levs, iv%radar(n)%zk, num_levs)
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_radar_adj")
 
 end subroutine da_transform_xtoy_radar_adj
 

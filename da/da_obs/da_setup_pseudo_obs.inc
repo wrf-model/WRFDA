@@ -14,7 +14,7 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
    integer                       :: i, j ! local variables
    integer                       :: n    ! Loop counters.
 
-   if (trace_use) call da_trace_entry("da_setup_pseudo_obs")
+   if (trace_use_dull) call da_trace_entry("da_setup_pseudo_obs")
 
    outside = .false.
    i = int(pseudo_x)
@@ -32,19 +32,19 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
    end if
 
    if (outside) then
-      iv%num_pseudo = 0
-      iv%ob_numb(iv%current_ob_time)%pseudo = 0
+      iv%nlocal(pseudo) = 0
+      iv%plocal(iv%time,pseudo) = 0
       return
    else
-      iv % num_pseudo = num_pseudo
-      ob % num_pseudo = num_pseudo
-      iv%num_pseudo_glo = num_pseudo
-      iv%ob_numb(iv%current_ob_time)%pseudo = iv%num_pseudo
+      iv % nlocal(pseudo)         = num_pseudo
+      ob % nlocal(pseudo)         = num_pseudo
+      iv % ntotal(pseudo)         = num_pseudo
+      iv % plocal(iv%time,pseudo) = num_pseudo
    end if
 
-   allocate (iv % pseudo(1:ob % num_pseudo))
+   allocate (iv % pseudo(1:ob % nlocal(pseudo)))
 
-   do n=1, iv % num_pseudo
+   do n=1, iv%nlocal(pseudo)
 
       iv % pseudo(n) % u % inv = missing_r
       iv % pseudo(n) % v % inv = missing_r
@@ -112,7 +112,7 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
       write(unit=stdout,fmt='(3f15.5)')pseudo_x, pseudo_y, pseudo_z
    end do
 
-   if (trace_use) call da_trace_exit("da_setup_pseudo_obs")
+   if (trace_use_dull) call da_trace_exit("da_setup_pseudo_obs")
 
 end subroutine da_setup_pseudo_obs
 

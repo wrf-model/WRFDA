@@ -8,9 +8,12 @@ module da_define_structures
 
    use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
       vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
-      max_ob_levels,da_array_print, trace_use, &
+      max_ob_levels,da_array_print, trace_use, num_ob_indexes, &
       vert_corr_1, vert_corr_2, vert_evalue_global, &
-      put_rand_seed, seed_array1, seed_array2
+      put_rand_seed, seed_array1, seed_array2, &
+      sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
+      metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, &
+      pseudo, radar, radiance, airsr
 
    use da_tracing, only : da_trace_entry, da_trace_exit
 
@@ -354,13 +357,13 @@ module da_define_structures
       type (field_type)       :: tpw  ! Toatl precipitable water cm from GPS
    end type gpspw_type
 
-   type ssmi_retrieval_type
+   type ssmi_rv_type
       type (info_type)        :: info
       type (model_loc_type)   :: loc
 
       type (field_type)       :: Speed          ! Wind speed in m/s
       type (field_type)       :: tpw            ! Toatl precipitable water cm
-   end type ssmi_retrieval_type
+   end type ssmi_rv_type
 
    type ssmi_tb_type
       type (info_type)        :: info
@@ -497,7 +500,7 @@ module da_define_structures
       type (model_loc_type), pointer   :: loc(:)
    end type instid_type
 
-   type ob_numb_type
+   type num_type
       integer :: total, &
                  synop, & 
                  sound, &
@@ -512,7 +515,7 @@ module da_define_structures
                  gpspw, &
                  gpsref, &
                  ssmi_tb, &
-                 ssmi_retrieval, &
+                 ssmi_rv, &
                  ssmt1, &
                  ssmt2, &
                  pseudo, &
@@ -522,34 +525,21 @@ module da_define_structures
                  radar, &
                  radiance(maxsensor), &
                  airsr
-   end type ob_numb_type
+   end type num_type
 
    type ob_type
-      type(ob_numb_type) :: ob_numb(0:max_fgat_time)
+      integer :: nlocal(num_ob_indexes)
+      integer :: ntotal(num_ob_indexes)
+      integer :: plocal(0:max_fgat_time,num_ob_indexes)
+      integer :: ptotal(0:max_fgat_time,num_ob_indexes)
 
-      integer :: current_ob_time
+      integer :: plocal_rad(0:max_fgat_time,maxsensor)
 
-      integer :: total_obs, num_synop, num_airsr, &
-                 num_sound, num_geoamv, num_polaramv, &
-                 num_pilot, num_satem, &
-                 num_airep, num_metar, &
-                 num_ships, num_gpspw, &
-                 num_ssmi_tb, num_ssmi_retrieval, &
-                 num_ssmt1, num_ssmt2, num_pseudo, &
-                 num_qscat, num_profiler, num_buoy, &
-                 num_radar, num_gpsref, num_bogus, &
-                 num_inst, total_rad_pixel, total_rad_channel
+      integer :: nstats(num_ob_indexes)
 
-      integer :: num_synop_glo, num_airsr_glo, &
-                 num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
-                 num_pilot_glo, num_satem_glo, &
-                 num_airep_glo, num_metar_glo, &
-                 num_ships_glo, num_gpspw_glo, &
-                 num_ssmi_tb_glo, num_ssmi_retrieval_glo, &
-                 num_ssmt1_glo, num_ssmt2_glo, num_pseudo_glo, &
-                 num_qscat_glo, num_profiler_glo, num_buoy_glo, &
-                 num_radar_glo, num_gpsref_glo, num_bogus_glo, &
-                 num_inst_glo
+      integer :: time
+
+      integer :: num_inst, total_rad_pixel, total_rad_channel
 
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
       real    :: metar_ef_u, metar_ef_v, metar_ef_t, metar_ef_p, metar_ef_q
@@ -570,30 +560,30 @@ module da_define_structures
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
       real    :: airsr_ef_t,  airsr_ef_q
 
-      type (airsr_type)         , pointer :: airsr(:)
-      type (sound_type)         , pointer :: sound(:)
-      type (synop_type)         , pointer :: sonde_sfc(:)
-      type (airep_type)         , pointer :: airep(:)
-      type (pilot_type)         , pointer :: pilot(:)
-      type (satem_type)         , pointer :: satem(:)
-      type (geoamv_type)        , pointer :: geoamv(:)
-      type (polaramv_type)        , pointer :: polaramv(:)
-      type (synop_type)         , pointer :: synop(:)
-      type (synop_type)         , pointer :: metar(:)
-      type (synop_type)         , pointer :: ships(:)
-      type (gpspw_type)         , pointer :: gpspw(:)
-      type (gpsref_type)        , pointer :: gpsref(:)
-      type (ssmi_tb_type)       , pointer :: ssmi_tb(:)
-      type (ssmi_retrieval_type), pointer :: ssmi_retrieval(:)
-      type (ssmt1_type)         , pointer :: ssmt1(:)
-      type (ssmt2_type)         , pointer :: ssmt2(:)
-      type (pseudo_type)        , pointer :: pseudo(:)
-      type (qscat_type)         , pointer :: qscat(:)
-      type (synop_type)         , pointer :: buoy(:)
-      type (pilot_type)         , pointer :: profiler(:)
-      type (bogus_type)         , pointer :: bogus(:)
-      type (radar_type)         , pointer :: radar(:)
-      type (instid_type)        , pointer :: instid(:)
+      type (airsr_type)    , pointer :: airsr(:)
+      type (sound_type)    , pointer :: sound(:)
+      type (synop_type)    , pointer :: sonde_sfc(:)
+      type (airep_type)    , pointer :: airep(:)
+      type (pilot_type)    , pointer :: pilot(:)
+      type (satem_type)    , pointer :: satem(:)
+      type (geoamv_type)   , pointer :: geoamv(:)
+      type (polaramv_type) , pointer :: polaramv(:)
+      type (synop_type)    , pointer :: synop(:)
+      type (synop_type)    , pointer :: metar(:)
+      type (synop_type)    , pointer :: ships(:)
+      type (gpspw_type)    , pointer :: gpspw(:)
+      type (gpsref_type)   , pointer :: gpsref(:)
+      type (ssmi_tb_type)  , pointer :: ssmi_tb(:)
+      type (ssmi_rv_type)  , pointer :: ssmi_rv(:)
+      type (ssmt1_type)    , pointer :: ssmt1(:)
+      type (ssmt2_type)    , pointer :: ssmt2(:)
+      type (pseudo_type)   , pointer :: pseudo(:)
+      type (qscat_type)    , pointer :: qscat(:)
+      type (synop_type)    , pointer :: buoy(:)
+      type (pilot_type)    , pointer :: profiler(:)
+      type (bogus_type)    , pointer :: bogus(:)
+      type (radar_type)    , pointer :: radar(:)
+      type (instid_type)   , pointer :: instid(:)
 
       real :: missing
       real :: ptop
@@ -636,23 +626,6 @@ module da_define_structures
       integer                                 :: num_max_err_chk
       integer                                 :: num_missing
    end type count_obs_number_type
- 
-   type count_obs_type
-      type (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
-         num_sound, num_geoamv, num_polaramv,&
-         num_pilot, num_satem, &
-         num_airep, num_metar, &
-         num_ships, num_gpspw, &
-         num_gpsref, &
-         num_ssmi_retrieval,   &
-         num_ssmi_tb, &
-         num_ssmt1, num_ssmt2, &
-         num_qscat, &
-         num_profiler, &
-         num_buoy, &
-         num_radar, num_bogus, &
-         num_other  
-   end type count_obs_type
 
    !--------------------------------------------------------------------------
    ! [3.0] Observation/residual structure definition:
@@ -727,10 +700,10 @@ module da_define_structures
       real, pointer :: q  (:)         ! q from NCEP used by CDAAC in retrieval
    end type residual_gpsref_type
 
-   type residual_ssmi_retrieval_type
+   type residual_ssmi_rv_type
       real                    :: tpw      ! Toatl precipitable water cm
       real                    :: Speed    ! Wind speed m/s
-   end type residual_ssmi_retrieval_type
+   end type residual_ssmi_rv_type
 
    type residual_ssmi_tb_type
       real                    :: tb19v          ! Brightness T (k) 19V
@@ -771,43 +744,35 @@ module da_define_structures
    end type residual_instid_type
 
    type y_type
-      type(ob_numb_type) :: ob_numb
+      integer :: nlocal(num_ob_indexes)
+      integer :: ntotal(num_ob_indexes)
 
-      integer :: total_obs, num_synop, num_airsr, &
-         num_sound, num_geoamv, num_polaramv, &
-         num_pilot, num_satem, &
-         num_airep, num_metar, &
-         num_ships, num_gpspw, &
-         num_ssmi_tb, num_ssmi_retrieval, &
-         num_ssmt1, num_ssmt2, num_pseudo, &
-         num_qscat, num_profiler, num_buoy, &
-         num_radar, num_gpsref, num_bogus, &
-         num_inst
+      integer :: num_inst
 
-      type (residual_synop_type), pointer :: synop(:)
-      type (residual_synop_type), pointer :: metar(:) ! Same as synop type
-      type (residual_synop_type), pointer :: ships(:) ! Same as synop type
-      type (residual_geoamv_type), pointer :: geoamv(:)
+      type (residual_synop_type),    pointer :: synop(:)
+      type (residual_synop_type),    pointer :: metar(:) ! Same as synop type
+      type (residual_synop_type),    pointer :: ships(:) ! Same as synop type
+      type (residual_geoamv_type),   pointer :: geoamv(:)
       type (residual_polaramv_type), pointer :: polaramv(:)
-      type (residual_gpspw_type ), pointer :: gpspw (:)
-      type (residual_gpsref_type), pointer :: gpsref(:)
-      type (residual_sound_type), pointer :: sound(:)
-      type (residual_airsr_type), pointer :: airsr(:)
-      type (residual_bogus_type), pointer :: bogus(:)
-      type (residual_synop_type), pointer :: sonde_sfc(:) ! Same as synop type
-      type (residual_airep_type), pointer :: airep(:)
-      type (residual_pilot_type), pointer :: pilot(:)
-      type (residual_satem_type), pointer :: satem(:)
-      type (residual_ssmi_tb_type), pointer        :: ssmi_tb(:)
-      type (residual_ssmi_retrieval_type), pointer :: ssmi_retrieval(:)
-      type (residual_ssmt1_type), pointer :: ssmt1(:)
-      type (residual_ssmt2_type), pointer :: ssmt2(:)
-      type (residual_pseudo_type), pointer:: pseudo(:)
-      type (residual_qscat_type), pointer :: qscat(:)
-      type (residual_synop_type),  pointer :: buoy(:) ! Same as synop type
-      type (residual_pilot_type), pointer :: profiler(:) ! Same as pilot type
-      type (residual_radar_type), pointer :: radar(:)
-      type (residual_instid_type), pointer :: instid(:)
+      type (residual_gpspw_type),    pointer :: gpspw (:)
+      type (residual_gpsref_type),   pointer :: gpsref(:)
+      type (residual_sound_type),    pointer :: sound(:)
+      type (residual_airsr_type),    pointer :: airsr(:)
+      type (residual_bogus_type),    pointer :: bogus(:)
+      type (residual_synop_type),    pointer :: sonde_sfc(:) ! Same as synop type
+      type (residual_airep_type),    pointer :: airep(:)
+      type (residual_pilot_type),    pointer :: pilot(:)
+      type (residual_satem_type),    pointer :: satem(:)
+      type (residual_ssmi_tb_type),  pointer :: ssmi_tb(:)
+      type (residual_ssmi_rv_type),  pointer :: ssmi_rv(:)
+      type (residual_ssmt1_type),    pointer :: ssmt1(:)
+      type (residual_ssmt2_type),    pointer :: ssmt2(:)
+      type (residual_pseudo_type),   pointer :: pseudo(:)
+      type (residual_qscat_type),    pointer :: qscat(:)
+      type (residual_synop_type),    pointer :: buoy(:) ! Same as synop type
+      type (residual_pilot_type),    pointer :: profiler(:) ! Same as pilot type
+      type (residual_radar_type),    pointer :: radar(:)
+      type (residual_instid_type),   pointer :: instid(:)
    end type y_type
 
    !--------------------------------------------------------------------------

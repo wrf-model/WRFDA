@@ -1,5 +1,4 @@
-subroutine da_interp_lin_3d_new(fm3d, i, j, k, dx, dy, dz, dxm, dym, dzm, &
-   fo3d, nl,num)
+subroutine da_interp_lin_3d_new(fm3d, i, j, k, dx, dy, dz, dxm, dym, dzm, fo3d, nl,num)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -16,8 +15,8 @@ subroutine da_interp_lin_3d_new(fm3d, i, j, k, dx, dy, dz, dxm, dym, dzm, &
    real,    intent(in)    :: fm3d(ims:ime,jms:jme,kms:kme) ! Input variable            
    real,    intent(inout) :: fo3d(nl,num)  ! Output variable 
 
-   integer                             :: n, kk
-   real                                :: fmz(kms:kme)
+   integer :: n, kk
+   real    :: fmz(kms:kme)
 
    if (trace_use) call da_trace_entry("da_interp_lin_3d_new")
 
@@ -26,10 +25,8 @@ subroutine da_interp_lin_3d_new(fm3d, i, j, k, dx, dy, dz, dxm, dym, dzm, &
    do n=1,num
       fmz(:)=0.0
 
-      fmz(kts:kte) = dym(n)*(dxm(n)*fm3d(i(n), j(n), kts:kte) &
-                            +dx(n) *fm3d(i(n)+1,j(n), kts:kte)) &
-                      + dy(n) *(dxm(n)*fm3d(i(n), j(n)+1, kts:kte) &
-                            +dx(n) * fm3d(i(n)+1, j(n)+1, kts:kte))
+      fmz(kts:kte) = dym(n)*(dxm(n)*fm3d(i(n), j(n), kts:kte) + dx(n) *fm3d(i(n)+1,j(n), kts:kte)) &
+         + dy(n) *(dxm(n)*fm3d(i(n), j(n)+1, kts:kte) + dx(n) * fm3d(i(n)+1, j(n)+1, kts:kte))
       do kk = 1, nl
          if (k(kk,n) > 0) then
             fo3d(kk,n) = dzm(kk,n)*fmz(k(kk,n)) + dz(kk,n)*fmz(k(kk,n)+1)

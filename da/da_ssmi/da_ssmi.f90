@@ -8,19 +8,20 @@ module da_ssmi
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, t_roughem, t_kelvin, &
-      missing, max_error_uv, max_error_t, rootproc, pi, &
+      missing, max_error_uv, max_error_t, rootproc, pi, trace_use_dull, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, max_error_thickness, mkz, &
-      num_ssmt2_tot,num_ssmt1_tot,max_error_rh,max_error_tb, max_error_pw, &
+      max_error_rh,max_error_tb, max_error_pw, &
       trace_use,test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
-      num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot, global, print_detail_obs, &
-      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme,ids,ide,jds,jde
+      global, print_detail_obs, &
+      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme,ids,ide,jds,jde, &
+      ssmi_tb, ssmi_rv, num_ob_indexes, ssmt1, ssmt2
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      maxmin_type,residual_ssmi_retrieval_type, &
+      maxmin_type,residual_ssmi_rv_type, &
       residual_ssmi_tb_type, model_loc_type, info_type, field_type, &
-      count_obs_number_type, ssmi_retrieval_type, ssmi_tb_type, ssmt1_type, &
+      count_obs_number_type, ssmi_rv_type, ssmi_tb_type, ssmt1_type, &
       ssmt2_type
    use da_interpolation, only : da_interp_lin_2d, da_interp_lin_2d_adj, &
       da_interp_lin_3d,da_interp_lin_3d_adj,da_to_zk
@@ -39,10 +40,10 @@ module da_ssmi
       type (maxmin_type)         :: Speed    ! Wind speed (m/s)
    end type maxmin_ssmi_rv_stats_type
 
-   type stats_ssmi_retrieval_type
+   type stats_ssmi_rv_type
       type (maxmin_ssmi_rv_stats_type)      :: maximum, minimum
-      type (residual_ssmi_retrieval_type)   :: average, rms_err
-   end type stats_ssmi_retrieval_type
+      type (residual_ssmi_rv_type)   :: average, rms_err
+   end type stats_ssmi_rv_type
 
    ! The "stats_ssmi_tb_type" is ONLY used locally in da_ssmi_tb:
 
@@ -64,17 +65,14 @@ module da_ssmi
 
 contains
 
-#include "da_ao_stats_ssmi.inc"
 #include "da_ao_stats_ssmi_rv.inc"
 #include "da_ao_stats_ssmi_tb.inc"
 #include "da_read_ssmi.inc"
 #include "da_scan_ssmi.inc"
-#include "da_jo_and_grady_ssmi.inc"
 #include "da_jo_and_grady_ssmi_rv.inc"
 #include "da_jo_and_grady_ssmi_tb.inc"
 #include "da_residual_ssmi_rv.inc"
 #include "da_residual_ssmi_tb.inc"
-#include "da_oi_stats_ssmi.inc"
 #include "da_oi_stats_ssmi_rv.inc"
 #include "da_oi_stats_ssmi_tb.inc"
 #include "da_transform_xtospeed.inc"

@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
-                     itpw, itpwf, ispeed, ispeedf)
+subroutine da_check_max_iv_ssmi_rv(it, ssmi_rv, itpw, itpwf, ispeed, ispeedf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,11 +6,13 @@ subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
 
    implicit none
 
-   integer,    intent (in)                :: it ! Outer loop 
-   integer,    intent (inout)             :: itpw, itpwf, ispeed, ispeedf
-   type (ssmi_retrieval_type), intent(inout)       :: ssmi_retrieval
+   integer,                    intent(in)    :: it ! Outer loop 
+   integer,                    intent(inout) :: itpw, itpwf, ispeed, ispeedf
+   type (ssmi_rv_type), intent(inout) :: ssmi_rv
 
-   logical                                :: failed
+   logical :: failed
+
+   if (trace_use) call da_trace_entry("da_check_max_iv_ssmi_rv")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -33,17 +34,17 @@ subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
 
    failed = .false.
 
-   ! TPW
+   ! tpw
 
-   call da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % tpw, &
-                            max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', &
-                            failed, check_max_iv_print)
+   call da_max_error_qc(it, ssmi_rv % info, ssmi_rv % tpw, &
+      max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
 
-   ! SPEED
+   ! speed
 
-   call da_max_error_qc(it, ssmi_retrieval % info, ssmi_retrieval % speed, &
-                            max_error_uv, ispeed, ispeedf, check_max_iv_unit, 'SPEED', &
-                            failed, check_max_iv_print)
+   call da_max_error_qc(it, ssmi_rv % info, ssmi_rv % speed, &
+      max_error_uv, ispeed, ispeedf, check_max_iv_unit, 'SPEED', failed, check_max_iv_print)
+
+   if (trace_use) call da_trace_exit("da_check_max_iv_ssmi_rv")
 
 end subroutine da_check_max_iv_ssmi_rv
 

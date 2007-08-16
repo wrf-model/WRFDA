@@ -40,16 +40,15 @@ begin
    plot_split = False
 
    out_type = "ncgm"
-;   out_type = "pdf"   ; pdf not recommened since the file size will be way too large
+;   out_type = "pdf"   ; pdf not recommended since the file size will be way too large
                        ; and it will take much much longer to make plots
 ;   instrument = "eos-2-airs"
    instrument = "noaa-15-amsua"
    datdir = "./"
    plotdir = "./"
 
-   start_date   = "2005082712"
-   end_date     = "2005082712"
-   cycle_period = 12
+   date         = getenv("DATE")
+   rc_dir       = getenv("RC_DIR")
 
 ;   colormap = "rainbow"
    colormap = "gui_default"
@@ -58,7 +57,7 @@ begin
    subdomain = False
    mapinfo_from_file = True
 
-   fname = "/ptmp/george/data/india_30km/rc/2005080100/wrfinput_d01"
+   fname = rc_dir+"/"+date+"/"+"/wrfinput_d01"
    if ( mapinfo_from_file .and. isfilepresent(fname) ) then
       wrf_file=addfile(fname+".nc","r")
       if ( wrf_file@MAP_PROJ .eq. 1 ) then

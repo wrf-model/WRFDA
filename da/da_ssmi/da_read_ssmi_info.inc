@@ -18,33 +18,34 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
    integer                      :: nssmis,nothers
    integer                      :: ixc, jxc, iproj, idd, maxnes
-   integer,  dimension(10)      :: nestix, nestjx, numnc, nesti, nestj
+   integer                      :: nestix(10) , nestjx(10) , numnc(10) , nesti(10) , nestj(10) 
    real                         :: phic   , xlonc  , &
                                    truelat1_3dv, truelat2_3dv, &
                                    local_ts0    , local_ps0    , local_tlp     , ptop
-   real   ,  dimension(10)      :: dis
+   real                         :: dis(10)
 
-   logical                      :: CHECK_WRONG, CHECK_SUBdoMAin
+   logical                      :: check_wrong, check_subdomain
+
+   if (trace_use) call da_trace_entry("da_read_ssmi_info")
 
    iost = -99999
 
    ! 1. open file
    !    ---------
 
-   if (use_ssmiretrievalobs .or. use_ssmitbobs .or. &
-       use_ssmt1obs .or. use_ssmt2obs) then
+   if (use_ssmiretrievalobs .or. use_ssmitbobs .or. use_ssmt1obs .or. use_ssmt2obs) then
       open (unit   = iunit,     &
-           FORM   = 'FORMATTED',  &
-           ACCESS = 'SEQUENTIAL', &
-           iostat =  iost,     &
-           STATUS = 'OLD')
+         FORM   = 'FORMATTED',  &
+         ACCESS = 'SEQUENTIAL', &
+         iostat =  iost,     &
+         STATUS = 'OLD')
 
       if (iost /= 0) then
+         call da_warning(__FILE__,__LINE__, (/"Cannot open SSMI file"/))
          use_ssmiretrievalobs = .false.
          use_ssmitbobs  = .false.
          use_ssmt1obs   = .false.
          use_ssmt2obs   = .false.
-
          return
       end if
    else
@@ -61,22 +62,12 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    !     ---------------
 
    read (unit = iunit, fmt = '(a)', iostat = iost) char_ned
-
-   ! 2.2 process error
-   !     -------------
-
    if (iost /= 0) then
       use_ssmiretrievalobs = .false.
       use_ssmitbobs  = .false.
       use_ssmt1obs   = .false.
       use_ssmt2obs   = .false.
-      call da_warning(__FILE__,__LINE__, &
-         (/"Cannot read SSMI file"/))
-
-      return
-   else
-      write(unit=stdout, fmt='(/2a/)') &
-         'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
+      call da_error(__FILE__,__LINE__, (/"Cannot read SSMI file"/))
    end if
 
    ! 2.3 read NUMBER OF REPORTS
@@ -89,9 +80,9 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
          case ('SSMI ') ; 
             if (use_ssmiretrievalobs) &
                read (char_ned (I+9:I+14),'(I6)', iostat = iost) &
-                  ob%num_ssmi_retrieval
+                  ob%nlocal(ssmi_rv)
             if (use_ssmitbobs) then
-               read (char_ned (I+9:I+14),'(I6)', iostat = iost) ob%num_ssmi_tb
+               read (char_ned (I+9:I+14),'(I6)', iostat = iost) ob%nlocal(ssmi_tb)
             end if
          case ('OTHER') ; 
             read (char_ned (I+9:I+14),'(I6)', iostat = iost) nothers
@@ -142,7 +133,6 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
          return
       end if
       if (char_ned(1:6) == 'NESTIX') exit
-
    end do
 
    do
@@ -168,6 +158,8 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    end do
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
+
+   if (trace_use) call da_trace_exit("da_read_ssmi_info")
 
 contains
 

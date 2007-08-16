@@ -10,6 +10,8 @@ subroutine da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
    integer,                     intent(inout) :: nu, nv, nt, np, nq
    type (stats_sonde_sfc_type), intent(in)    :: sonde_sfc
 
+   if (trace_use_dull) call da_trace_entry("da_print_stats_sonde_sfc")
+
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &
       'u (m/s)     n    k    ', &
@@ -43,6 +45,8 @@ subroutine da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
       sqrt(sonde_sfc%rms_err%t/real(nt)), &
       sqrt(sonde_sfc%rms_err%p/real(np)), &
       sqrt(sonde_sfc%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_sonde_sfc")
 
 end subroutine da_print_stats_sonde_sfc
 

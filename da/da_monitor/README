@@ -43,10 +43,6 @@ plotting options, and mapping information). The ksh provided is quite self-expla
 #
 ### Data processing:
 #
-# to compile: xlf -o da_rad_diags.exe  da_rad_diags.f90  \
-#                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-#             g95 -o da_rad_diags.exe  da_rad_diags.f90  \
-#                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
 # input files: (1)  namelist.da_rad_diags
 #                   &record1
 #                    nproc = 16   (the proc numbers WRF-Var used)

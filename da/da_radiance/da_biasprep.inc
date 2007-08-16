@@ -16,8 +16,7 @@ subroutine da_biasprep(inst,ob,iv)
    real               :: pred(6), q(43)
    type (bias_type)   :: radbias
 
-   num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
-                      iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
+   num_rad = iv%plocal_rad(iv%time,inst) - iv%plocal_rad(iv%time-1,inst)
 
    if (num_rad < 1) return
 
@@ -44,8 +43,7 @@ subroutine da_biasprep(inst,ob,iv)
    allocate(radbias%cloud_flag(nchan))
    allocate(radbias%pred(npred))
 
-   do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
-      iv%ob_numb(iv%current_ob_time)%radiance(inst)
+   do n= iv%plocal_rad(iv%time-1,inst)+1, iv%plocal_rad(iv%time,inst)
       if (iv%instid(inst)%proc_domain(n)) then 
 
         if (rtm_option==rtm_option_rttov) then

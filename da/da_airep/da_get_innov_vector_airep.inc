@@ -21,18 +21,17 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
    real    :: model_v(1:max_ob_levels)  ! Model value v at ob location.
    real    :: model_t(1:max_ob_levels)  ! Model value t at ob location.
 
-
    real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
    real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
    integer :: itu,ituf,itvv,itvvf,itt,ittf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_airep")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_airep")
 
    itu   = 0; itvv    = 0; itt  = 0;
    ituf  = 0; itvvf   = 0; ittf = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
+   do n=iv%plocal(iv%time-1,airep) + 1, iv%plocal(iv%time,airep)
       num_levs = iv % airep(n) % info % levels
       if (num_levs < 1) cycle
 
@@ -124,7 +123,7 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
          itu +itvv +itt
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_airep")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_airep")
 
 end subroutine da_get_innov_vector_airep
 

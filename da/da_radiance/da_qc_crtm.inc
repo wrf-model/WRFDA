@@ -20,8 +20,6 @@ subroutine da_qc_crtm (ob, iv)
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
 
-      write(UNIT=stdout,FMT='(A,A)') ' Performing QC : ', iv%instid(i)%rttovid_string
-
       amsua = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsua'
       amsub = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsub'
       hirs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'hirs'
@@ -32,12 +30,9 @@ subroutine da_qc_crtm (ob, iv)
       mhs   = trim(rttov_inst_name(rtminit_sensor(i))) == 'mhs'
 
       if (hirs) then
-         ! 1.0 QC for HIRS
          call da_qc_hirs(i,nchan,ob,iv)
-         !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HIRS'/))
       else if (airs) then
          call da_qc_airs(i,nchan,ob,iv)
-         !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for AIRS'/))
       else if ( hsb ) then
          ! call da_qc_hsb(i,nchan,ob,iv)
          call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HSB'/))
@@ -50,10 +45,8 @@ subroutine da_qc_crtm (ob, iv)
          call da_warning(__FILE__,__LINE__,(/'QC Not implemented for MSU'/))
       else if (ssmis) then
          call da_qc_ssmis(i,nchan,ob,iv)
-!         call da_warning(__FILE__,__LINE__,(/'QC Not implemented for SSMIS'/))
       else if (mhs) then
          call da_qc_mhs(i,nchan,ob,iv)
-!         call da_warning(__FILE__,__LINE__,(/'QC Not implemented for MHS'/))
       else
          write(unit=message(1),fmt='(A,A)') &
             "Unrecognized instrument",trim(rttov_inst_name(rtminit_sensor(i)))

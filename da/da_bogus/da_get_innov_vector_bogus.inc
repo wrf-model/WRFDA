@@ -29,12 +29,12 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_bogus")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_bogus")
 
    itu   = 0; itvv    = 0; itt  = 0; itqv  = 0; itslp  = 0;
    ituf  = 0; itvvf   = 0; ittf = 0; itqvf = 0; itslpf = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%bogus+1,iv%ob_numb(iv%current_ob_time)%bogus
+   do n=iv%plocal(iv%time-1,bogus)+1,iv%plocal(iv%time,bogus)
       num_levs = iv % bogus(n) % info % levels
 
       if (num_levs < 1) cycle
@@ -156,7 +156,7 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
                                          itu +itvv +itt +itqv +itslp
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_bogus")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_bogus")
 
 end subroutine da_get_innov_vector_bogus
 

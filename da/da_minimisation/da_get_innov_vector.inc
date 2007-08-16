@@ -27,7 +27,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    filename = ' '
    
    do n=1, num_fgat_time
-      iv%current_ob_time = n
+      iv%time = n
 
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
@@ -35,30 +35,30 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_setup_firstguess (xbx, grid)
       end if
 
-      if (iv%num_sound > 0) then
+      if (iv%nlocal(sound) > 0) then
          call da_get_innov_vector_sound     (it, grid%xb, grid%xp, ob, iv)
          call da_get_innov_vector_sonde_sfc (it, grid%xb, grid%xp, ob, iv)
       end if
 
-      if (iv%num_synop          > 0) call da_get_innov_vector_synop    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_geoamv         > 0) call da_get_innov_vector_geoamv   (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_polaramv       > 0) call da_get_innov_vector_polaramv (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_airep          > 0) call da_get_innov_vector_airep    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_pilot          > 0) call da_get_innov_vector_pilot    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_bogus          > 0) call da_get_innov_vector_bogus    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_metar          > 0) call da_get_innov_vector_metar    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_ships          > 0) call da_get_innov_vector_ships    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_gpspw          > 0) call da_get_innov_vector_gpspw    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_gpsref         > 0) call da_get_innov_vector_gpsref   (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_ssmi_tb        > 0) call da_get_innov_vector_ssmi_tb  (it, grid%xb, ob, iv) 
-      if (iv%num_ssmi_retrieval > 0) call da_get_innov_vector_ssmi_rv  (it, grid%xb, ob, iv)
-      if (iv%num_ssmt1          > 0) call da_get_innov_vector_ssmt1    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_ssmt2          > 0) call da_get_innov_vector_ssmt2    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_satem          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
-      if (iv%num_radar          > 0) call da_get_innov_vector_radar    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_qscat          > 0) call da_get_innov_vector_qscat    (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_profiler       > 0) call da_get_innov_vector_profiler (it, grid%xb, grid%xp, ob, iv)
-      if (iv%num_buoy           > 0) call da_get_innov_vector_buoy     (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(synop)          > 0) call da_get_innov_vector_synop    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(geoamv)         > 0) call da_get_innov_vector_geoamv   (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(polaramv)       > 0) call da_get_innov_vector_polaramv (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(airep)          > 0) call da_get_innov_vector_airep    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(pilot)          > 0) call da_get_innov_vector_pilot    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(bogus)          > 0) call da_get_innov_vector_bogus    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(metar)          > 0) call da_get_innov_vector_metar    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(ships)          > 0) call da_get_innov_vector_ships    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(gpspw)          > 0) call da_get_innov_vector_gpspw    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(gpsref)         > 0) call da_get_innov_vector_gpsref   (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(ssmi_tb)        > 0) call da_get_innov_vector_ssmi_tb  (it, grid%xb, ob, iv) 
+      if (iv%nlocal(ssmi_rv) > 0) call da_get_innov_vector_ssmi_rv  (it, grid%xb, ob, iv)
+      if (iv%nlocal(ssmt1)          > 0) call da_get_innov_vector_ssmt1    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(ssmt2)          > 0) call da_get_innov_vector_ssmt2    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(satem)          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
+      if (iv%nlocal(radar)          > 0) call da_get_innov_vector_radar    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(qscat)          > 0) call da_get_innov_vector_qscat    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(profiler)       > 0) call da_get_innov_vector_profiler (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(buoy)           > 0) call da_get_innov_vector_buoy     (it, grid%xb, grid%xp, ob, iv)
 
       if (iv%num_inst > 0) then
          if (rtm_option == rtm_option_rttov) then
@@ -77,10 +77,10 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       end if
 
       if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid%xb, grid%xp, ob, iv)
-      if (iv%num_airsr > 0) call da_get_innov_vector_airsr  (it, grid%xb, grid%xp, ob, iv)
+      if (iv%nlocal(airsr) > 0) call da_get_innov_vector_airsr  (it, grid%xb, grid%xp, ob, iv)
    end do
 
-   iv%current_ob_time = 1
+   iv%time = 1
 
    !-----------------------------------------------------------------------
    ! [2] Having calculated the real O-Bs, optionally overwrite with scaled,

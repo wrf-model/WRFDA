@@ -21,16 +21,16 @@ subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
    real    :: model_p  ! Model value p at oblocation.
    real    :: model_q  ! Model value q at oblocation.
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_pseudo")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_pseudo")
 
-   do n=1, iv % num_pseudo
+   do n=1, iv % nlocal(pseudo)
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%pseudo(n)%loc%i
-      dy = iv%pseudo(n)%loc%dy
+      i   = iv%pseudo(n)%loc%i
+      dy  = iv%pseudo(n)%loc%dy
       dym = iv%pseudo(n)%loc%dym
-      j = iv%pseudo(n)%loc%j
-      dx = iv%pseudo(n)%loc%dx
+      j   = iv%pseudo(n)%loc%j
+      dx  = iv%pseudo(n)%loc%dx
       dxm = iv%pseudo(n)%loc%dxm
 
       write(unit=stdout, fmt='(/a,2i5/a,4f15.5/)') &
@@ -60,7 +60,7 @@ subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
       end if 
    end do
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_pseudo")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_pseudo")
 
 end subroutine da_get_innov_vector_pseudo
 

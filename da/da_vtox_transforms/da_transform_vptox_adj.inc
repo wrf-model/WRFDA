@@ -7,12 +7,11 @@ subroutine da_transform_vptox_adj(grid, vp, be, ep)
    implicit none
 
    type (domain),  intent(inout)        :: grid
-
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbation.
    type (be_type), intent(in), optional :: be  ! Background errors.
 
-   integer         :: k, j, k1              ! Loop counters.
+   integer :: k, j, k1              ! Loop counters.
 
    if (trace_use) call da_trace_entry("da_transform_vptox_adj")
 

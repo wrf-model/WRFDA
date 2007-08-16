@@ -12,7 +12,7 @@ subroutine da_transform_xtoy_geoamv_adj (iv, jo_grad_y, jo_grad_x)
 
    integer                       :: n, k     ! Loop counter.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%geoamv+1, iv%ob_numb(iv%current_ob_time)%geoamv
+   do n=iv%plocal(iv%time-1,geoamv)+1, iv%plocal(iv%time,geoamv)
       k = iv % geoamv(n) % info % levels
       if (k < 1) cycle
       call da_interp_lin_3d_adj(jo_grad_x%u,iv%geoamv(n)%loc, jo_grad_y%geoamv(n)%u,k, iv%geoamv(n)%zk, k)

@@ -14,7 +14,9 @@ subroutine da_jo_sonde_sfc_uvtq(iv, re, jo_grad_y, jo)
   
    integer :: n
 
-   do n=1, iv%num_sound
+   if (trace_use_dull) call da_trace_entry("da_jo_sonde_sfc_uvtq")
+
+   do n=1, iv%nlocal(sound)
       if (iv%sonde_sfc(n)%loc%proc_domain) then
         jo % sonde_sfc_u = jo % sonde_sfc_u - re%sonde_sfc(n)%u * jo_grad_y%sonde_sfc(n)%u
         jo % sonde_sfc_v = jo % sonde_sfc_v - re%sonde_sfc(n)%v * jo_grad_y%sonde_sfc(n)%v
@@ -23,6 +25,8 @@ subroutine da_jo_sonde_sfc_uvtq(iv, re, jo_grad_y, jo)
         jo % sonde_sfc_q = jo % sonde_sfc_q - re%sonde_sfc(n)%q * jo_grad_y%sonde_sfc(n)%q
       end if
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_jo_sonde_sfc_uvtq")
 
 end subroutine da_jo_sonde_sfc_uvtq
 

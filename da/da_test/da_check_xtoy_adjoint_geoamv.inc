@@ -12,8 +12,8 @@ subroutine da_check_xtoy_adjoint_geoamv (oi, y, adjtest_lhs, pertile_lhs)
 
    integer                        :: n, k          ! Loop counter.
 
-   if (oi%num_geoamv > 0) then
-      do n=1, oi%num_geoamv
+   if (oi%nlocal(geoamv) > 0) then
+      do n=1, oi%nlocal(geoamv)
          if (oi%geoamv(n)%loc%proc_domain) then
             do k=1, oi%geoamv(n)%info%levels
                adjtest_lhs = adjtest_lhs + &

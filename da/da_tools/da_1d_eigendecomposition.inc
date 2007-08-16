@@ -22,6 +22,8 @@ subroutine da_1d_eigendecomposition( bx, e, l )
    real, allocatable        :: lcopy(:)
    real, allocatable        :: work_array(:)
 
+   if (trace_use_dull) call da_trace_entry("da_1d_eigendecomposition")
+
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:
    !-------------------------------------------------------------------------
@@ -60,9 +62,11 @@ subroutine da_1d_eigendecomposition( bx, e, l )
       e(1:kz,m) = ecopy(1:kz,kz+1-m)
    end do
    
-   deallocate( work_array )
-   deallocate( ecopy )
-   deallocate( lcopy )
+   deallocate (work_array)
+   deallocate (ecopy)
+   deallocate (lcopy)
+
+   if (trace_use_dull) call da_trace_exit("da_1d_eigendecomposition")
    
 end subroutine da_1d_eigendecomposition
 

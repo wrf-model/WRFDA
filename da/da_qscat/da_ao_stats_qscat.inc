@@ -1,4 +1,4 @@
-subroutine da_ao_stats_qscat (stats_unit, oi, re)
+subroutine da_ao_stats_qscat (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,60 +6,61 @@ subroutine da_ao_stats_qscat (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent(inout) :: iv            ! iv
+   type  (y_type), intent(in)    :: re            ! A - O
 
-   type (stats_qscat_type)          :: qscat
+   type (stats_qscat_type)          :: stats
    integer                          :: nu, nv
    integer                          :: n
+   
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_qscat")
 
    nu = 0
    nv = 0
-   num_qscat_tot = 0
 
-   qscat%maximum%u = maxmin_type(-1.0E+20, 0, 0)
-   qscat%maximum%v = maxmin_type(-1.0E+20, 0, 0)
-   qscat%minimum%u = maxmin_type (1.0E+20, 0, 0)
-   qscat%minimum%v = maxmin_type (1.0E+20, 0, 0)
-   qscat%average = residual_qscat1_type(0.0, 0.0)
-   qscat%rms_err = qscat%average
+   stats%maximum%u = maxmin_type(-1.0E+20, 0, 0)
+   stats%maximum%v = maxmin_type(-1.0E+20, 0, 0)
+   stats%minimum%u = maxmin_type (1.0E+20, 0, 0)
+   stats%minimum%v = maxmin_type (1.0E+20, 0, 0)
+   stats%average = residual_qscat1_type(0.0, 0.0)
+   stats%rms_err = stats%average
 
-   if (oi%num_qscat > 0) then
-      do n=1, oi%num_qscat
-         if (oi%qscat(n)%loc%proc_domain) then
-            call da_stats_calculate (n, 0, oi%qscat(n)%u%qc, & 
-                               re%qscat(n)%u, nu, & 
-                               qscat%minimum%u, qscat%maximum%u, &
-                               qscat%average%u, qscat%rms_err%u)
-            call da_stats_calculate (n, 0, oi%qscat(n)%v%qc, & 
-                               re%qscat(n)%v, nv, & 
-                               qscat%minimum%v, qscat%maximum%v, &
-                               qscat%average%v, qscat%rms_err%v)
-         end if    ! end if (oi%qscat(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, iv%nlocal(qscat)
+      if (iv%qscat(n)%loc%proc_domain) then
+         call da_stats_calculate (n, 0, iv%qscat(n)%u%qc, & 
+            re%qscat(n)%u, nu, & 
+            stats%minimum%u, stats%maximum%u, &
+            stats%average%u, stats%rms_err%u)
+         call da_stats_calculate (n, 0, iv%qscat(n)%v%qc, & 
+            re%qscat(n)%v, nv, & 
+            stats%minimum%v, stats%maximum%v, &
+            stats%average%v, stats%rms_err%v)
+      end if    ! end if (iv%qscat(n)%loc%proc_domain)
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (nu)
    call da_proc_sum_int (nv)
-   num_qscat_tot = nu + nv
+   iv%nstats(qscat) = nu + nv
    
-   call da_proc_stats_combine(qscat%average%u, qscat%rms_err%u, &
-                           qscat%minimum%u%value, qscat%maximum%u%value, &
-                           qscat%minimum%u%n, qscat%maximum%u%n, &
-                           qscat%minimum%u%l, qscat%maximum%u%l)
-   call da_proc_stats_combine(qscat%average%v, qscat%rms_err%v, &
-                           qscat%minimum%v%value, qscat%maximum%v%value, &
-                           qscat%minimum%v%n, qscat%maximum%v%n, &
-                           qscat%minimum%v%l, qscat%maximum%v%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
    
    if (rootproc) then  
       if (nu /= 0 .or. nv /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for qscat'
-         call da_print_stats_qscat(stats_unit, nu, nv, qscat)
+         call da_print_stats_qscat(stats_unit, nu, nv, stats)
       end if
    end if
+   
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_qscat")
 
 end subroutine da_ao_stats_qscat
 

@@ -11,21 +11,21 @@ subroutine da_calculate_grady_gpsref(iv, re, jo_grad_y)
    type (y_type),  intent(inout)  :: re          ! Residual vector.
    type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-
    integer :: n, k
 
-   if (iv%num_GPSRef < 1) return
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_gpsref")
    
-   do n=1, iv%num_GPSRef
+   do n=1, iv%nlocal(gpsref)
       do k=1, iv%gpsref(n)%info%levels
-         if (iv%GPSRef(n)%ref(k)%qc < obs_qc_pointer) then
-            re%GPSRef(n)%ref(k) = 0.0
+         if (iv%gpsref(n)%ref(k)%qc < obs_qc_pointer) then
+            re%gpsref(n)%ref(k) = 0.0
          end if
-         jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
-                                   (iv%GPSRef(n)%ref(k)%error * &
-                                     iv%GPSRef(n)%ref(k)%error)
+         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
+             (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
       end do
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_gpsref")
 
 end subroutine da_calculate_grady_gpsref
 

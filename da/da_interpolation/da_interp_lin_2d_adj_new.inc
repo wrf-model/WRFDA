@@ -1,6 +1,4 @@
-subroutine da_interp_lin_2d_adj_new(fm2d, is, ie, js, je,&
-                             i, j, dx, dy, dxm, dym, &
-                             fo2d,num)
+subroutine da_interp_lin_2d_adj_new(fm2d, is, ie, js, je,i, j, dx, dy, dxm, dym, fo2d,num)
 
 
    !-----------------------------------------------------------------------
@@ -8,13 +6,13 @@ subroutine da_interp_lin_2d_adj_new(fm2d, is, ie, js, je,&
    !-----------------------------------------------------------------------
    implicit none
 
-   integer,            intent(in)     :: num
-   integer,            intent(in)     :: is, ie, js, je
-   integer,            intent(in)     :: i(num), j(num)
-   real   ,            intent(in)     :: dx(num), dxm(num), dy(num), dym(num)
-   real   ,            intent(in)     :: fo2d(num)
+   integer, intent(in)     :: num
+   integer, intent(in)     :: is, ie, js, je
+   integer, intent(in)     :: i(num), j(num)
+   real   , intent(in)     :: dx(num), dxm(num), dy(num), dym(num)
+   real   , intent(in)     :: fo2d(num)
 
-   real   ,            intent(inout)  :: fm2d(is:ie,js:je) ! Input variable
+   real   , intent(inout)  :: fm2d(is:ie,js:je) ! Input variable
 
    integer :: point
 

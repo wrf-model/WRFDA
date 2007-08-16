@@ -13,22 +13,23 @@ subroutine da_jo_and_grady_gpspw(iv, re, jo, jo_grad_y)
 
    integer                      :: n
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_gpspw")
+
    jo % gpspw_tpw = 0.0
 
-   if (iv%num_Gpspw > 0) then
-      do n=1, iv%num_Gpspw
-         jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
-                                   (iv%Gpspw(n)%tpw%error * &
-                                     iv%Gpspw(n)%tpw%error)
+   if (iv%nlocal(gpspw) > 0) then
+      do n=1, iv%nlocal(gpspw)
+         jo_grad_y%gpspw(n)%tpw = -re%gpspw(n)%tpw / (iv%gpspw(n)%tpw%error * iv%gpspw(n)%tpw%error)
 
          if (iv%gpspw(n)%loc%proc_domain) then
-           jo % gpspw_tpw = jo % gpspw_tpw - re%Gpspw(n)%tpw * &
-              jo_grad_y%Gpspw(n)%tpw
+            jo % gpspw_tpw = jo % gpspw_tpw - re%gpspw(n)%tpw * jo_grad_y%gpspw(n)%tpw
          end if
       end do
 
       jo % gpspw_tpw = 0.5 * jo % gpspw_tpw
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_gpspw")
 
 end subroutine da_jo_and_grady_gpspw
 

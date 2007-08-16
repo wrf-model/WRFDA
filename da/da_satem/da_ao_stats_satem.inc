@@ -1,4 +1,4 @@
-subroutine da_ao_stats_satem (stats_unit, oi, re)
+subroutine da_ao_stats_satem (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,58 +6,59 @@ subroutine da_ao_stats_satem (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (inout) :: iv            ! iv
+   type  (y_type), intent (in)    :: re            ! A - O
 
-   type (stats_satem_type)          :: satem
-   integer                          :: nthickness
-   integer                          :: n, k
+   type (stats_satem_type) :: stats
+   integer                 :: nthickness
+   integer                 :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_satem")
 
    nthickness = 0
-   num_satem_tot = 0
 
-   satem%maximum%thickness = maxmin_type (missing_r, 0, 0)
-   satem%minimum%thickness = maxmin_type(-missing_r, 0, 0)
-   satem%average = residual_satem1_type(0.0)
-   satem%rms_err = satem%average
+   stats%maximum%thickness = maxmin_type (missing_r, 0, 0)
+   stats%minimum%thickness = maxmin_type(-missing_r, 0, 0)
+   stats%average = residual_satem1_type(0.0)
+   stats%rms_err = stats%average
 
-   if (oi%num_satem > 0) then
-      nthickness = 0
+   nthickness = 0
 
-      satem%maximum%thickness = maxmin_type(0.0, 0, 0)
+   stats%maximum%thickness = maxmin_type(0.0, 0, 0)
 
-      satem%minimum = satem%maximum
-      satem%average = residual_satem1_type(0.0)
-      satem%rms_err = satem%average
+   stats%minimum = stats%maximum
+   stats%average = residual_satem1_type(0.0)
+   stats%rms_err = stats%average
 
-      do n=1, oi%num_satem
-         if (oi%satem(n)%loc%proc_domain) then
-            do k=1, oi%satem(n)%info%levels
-               call da_stats_calculate (n, k, oi%satem(n)%thickness(k)%qc, & 
-                          re%satem(n)%thickness(k), nthickness, &
-                          satem%minimum%thickness, satem%maximum%thickness, &
-                          satem%average%thickness, satem%rms_err%thickness)
-            end do
-         end if    ! end if (oi%satem(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, iv%nlocal(satem)
+      if (iv%satem(n)%loc%proc_domain) then
+         do k=1, iv%satem(n)%info%levels
+            call da_stats_calculate (n, k, iv%satem(n)%thickness(k)%qc, & 
+               re%satem(n)%thickness(k), nthickness, &
+               stats%minimum%thickness, stats%maximum%thickness, &
+               stats%average%thickness, stats%rms_err%thickness)
+         end do
+      end if    ! end if (iv%satem(n)%loc%proc_domain)
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (nthickness)
-   num_satem_tot = nthickness
+   iv%nstats(satem) = nthickness
 
-   call da_proc_stats_combine(satem%average%thickness, satem%rms_err%thickness, &
-             satem%minimum%thickness%value, satem%maximum%thickness%value, &
-             satem%minimum%thickness%n, satem%maximum%thickness%n, &
-             satem%minimum%thickness%l, satem%maximum%thickness%l)
+   call da_proc_stats_combine(stats%average%thickness, stats%rms_err%thickness, &
+      stats%minimum%thickness%value, stats%maximum%thickness%value, &
+      stats%minimum%thickness%n, stats%maximum%thickness%n, &
+      stats%minimum%thickness%l, stats%maximum%thickness%l)
 
    if (rootproc) then
       if (nthickness /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for satem'
-         call da_print_stats_satem(stats_unit, nthickness, satem)
+         call da_print_stats_satem(stats_unit, nthickness, stats)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_satem")
 
 end subroutine da_ao_stats_satem
 

@@ -22,6 +22,9 @@ subroutine da_add_noise_to_ob( iv, ob )
    integer                       :: ounit     ! Output unit
    integer                       :: num_obs, ios                 
    character(len=20)             :: ob_name, filename
+
+   if (trace_use_dull) call da_trace_entry("da_add_noise_to_ob")
+
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
@@ -51,15 +54,15 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.1] Transfer surface obs:
 
-   if ( iv % num_synop > 0 ) then
+   if ( iv % nlocal(synop) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_synop
+      do n = 1, iv % nlocal(synop)
        if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'synop', num_obs   
       num_obs = 0 
 
-      do n = 1, iv % num_synop
+      do n = 1, iv % nlocal(synop)
        if(iv%synop(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')  1
@@ -82,14 +85,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.2] Transfer metar obs:
 
-   if ( iv % num_metar > 0 ) then
+   if ( iv % nlocal(metar) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_metar
+      do n = 1, iv % nlocal(metar)
        if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'metar', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_metar
+      do n = 1, iv % nlocal(metar)
        if(iv%metar(n)%loc%proc_domain) then
          num_obs = num_obs + 1 
          write(ounit,'(i8)')  1
@@ -113,14 +116,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.3] Transfer ships obs:
 
-   if ( iv % num_ships > 0 ) then
+   if ( iv % nlocal(ships) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_ships
+      do n = 1, iv % nlocal(ships)
        if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ships', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_ships 
+      do n = 1, iv % nlocal(ships) 
        if(iv%ships(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')  1
@@ -144,14 +147,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.4.1] Transfer Geostationary AMVs obs:
 
-   if ( iv % num_geoamv > 0 ) then
+   if ( iv % nlocal(geoamv) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_geoamv
+      do n = 1, iv % nlocal(geoamv)
        if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'geoamv', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_geoamv
+      do n = 1, iv % nlocal(geoamv)
        if(iv%geoamv(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % geoamv(n) % info % levels
@@ -172,14 +175,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.4.2] Transfer Polar AMVs obs:
 
-   if ( iv % num_polaramv > 0 ) then
+   if ( iv % nlocal(polaramv) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_polaramv
+      do n = 1, iv % nlocal(polaramv)
        if(iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'polaramv', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_polaramv
+      do n = 1, iv % nlocal(polaramv)
        if(iv%polaramv(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % polaramv(n) % info % levels
@@ -200,14 +203,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.5] Transfer gpspw obs:
 
-   if ( iv % num_gpspw > 0 ) then
+   if ( iv % nlocal(gpspw) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_gpspw
+      do n = 1, iv % nlocal(gpspw)
        if(iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'gpspw', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_gpspw
+      do n = 1, iv % nlocal(gpspw)
        if(iv%gpspw(n)%loc%proc_domain) then
         num_obs = num_obs + 1
         write(ounit,'(i8)')  1
@@ -223,14 +226,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.6] Transfer sonde obs:
 
-   if ( iv % num_sound > 0 ) then
+   if ( iv % nlocal(sound) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
        if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'sound', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
        if(iv%sound(n)%loc%proc_domain) then
           num_obs = num_obs + 1
          write(ounit,'(i8)')iv % sound(n) % info % levels
@@ -253,12 +256,12 @@ subroutine da_add_noise_to_ob( iv, ob )
       end do
 ! Now do surface level
       num_obs = 0
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
        if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'sonde_sfc', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_sound
+      do n = 1, iv % nlocal(sound)
        if(iv%sound(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
@@ -281,14 +284,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.7] Transfer airep obs:
 
-   if ( iv % num_airep > 0 ) then
+   if ( iv % nlocal(airep) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_airep
+      do n = 1, iv % nlocal(airep)
        if(iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'airep', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_airep
+      do n = 1, iv % nlocal(airep)
        if(iv%airep(n)%loc%proc_domain)then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % airep(n) % info % levels
@@ -311,14 +314,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.8] Transfer pilot obs:
 
-   if ( iv % num_pilot > 0 ) then
+   if ( iv % nlocal(pilot) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_pilot
+      do n = 1, iv % nlocal(pilot)
        if(iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'pilot', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_pilot
+      do n = 1, iv % nlocal(pilot)
        if(iv%pilot(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % pilot(n) % info % levels
@@ -339,40 +342,40 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.9] Transfer SSM/I obs:SSMI:
 
-   if ( iv % num_ssmi_retrieval > 0 ) then
+   if ( iv % nlocal(ssmi_rv) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_ssmi_retrieval
-       if(iv%ssmi_retrieval(n)%loc%proc_domain) num_obs = num_obs + 1
+      do n = 1, iv % nlocal(ssmi_rv)
+       if(iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmir', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_ssmi_retrieval
-       if(iv%ssmi_retrieval(n)%loc%proc_domain) then
+      do n = 1, iv % nlocal(ssmi_rv)
+       if(iv%ssmi_rv(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1 
  
 !        Add random perturbation:
-         call da_add_noise( iv % ssmi_retrieval(n) % speed, &
-                            ob % ssmi_retrieval(n) % speed, z1 )
-         call da_add_noise( iv % ssmi_retrieval(n) % tpw, &
-                            ob % ssmi_retrieval(n) % tpw, z2 )
+         call da_add_noise( iv % ssmi_rv(n) % speed, &
+                            ob % ssmi_rv(n) % speed, z1 )
+         call da_add_noise( iv % ssmi_rv(n) % tpw, &
+                            ob % ssmi_rv(n) % tpw, z2 )
 !        Write out data:
          write(ounit,'(2i8,10e15.7)')num_obs, 1, &
-                                  iv % ssmi_retrieval(n) % speed % error, z1, &
-                                  iv % ssmi_retrieval(n) % tpw % error, z2,   & 
+                                  iv % ssmi_rv(n) % speed % error, z1, &
+                                  iv % ssmi_rv(n) % tpw % error, z2,   & 
                                   dum, dum, dum, dum, dum, dum
        end if
       end do
    end if
 
-   if ( iv % num_ssmi_tb > 0 ) then
+   if ( iv % nlocal(ssmi_tb) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_ssmi_tb
+      do n = 1, iv % nlocal(ssmi_tb)
        if(iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmiT', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_ssmi_tb
+      do n = 1, iv % nlocal(ssmi_tb)
        if(iv%ssmi_tb(n)%loc%proc_domain) then
          num_obs = num_obs + 1
 !        Add random perturbation:
@@ -407,14 +410,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.10] Transfer satem obs:
 
-   if ( iv % num_satem > 0 ) then
+   if ( iv % nlocal(satem) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_satem
+      do n = 1, iv % nlocal(satem)
        if(iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'satem', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_satem
+      do n = 1, iv % nlocal(satem)
        if(iv%satem(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % satem(n) % info % levels
@@ -433,15 +436,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    
 !  [2.11] Transfer ssmt1 obs:
 
-   if ( iv % num_ssmt1 > 0 ) then
+   if ( iv % nlocal(ssmt1) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_ssmt1
+      do n = 1, iv % nlocal(ssmt1)
        if(iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmt1', num_obs   
       num_obs = 0 
 
-      do n = 1, iv % num_ssmt1
+      do n = 1, iv % nlocal(ssmt1)
        if(iv%ssmt1(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % ssmt1(n) % info % levels
@@ -461,15 +464,15 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.12] Transfer ssmt2 obs:
 
-   if ( iv % num_ssmt2 > 0 ) then
+   if ( iv % nlocal(ssmt2) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_ssmt2
+      do n = 1, iv % nlocal(ssmt2)
        if(iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmt2', num_obs   
       num_obs = 0 
 
-      do n = 1, iv % num_ssmt2
+      do n = 1, iv % nlocal(ssmt2)
        if(iv%ssmt2(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % ssmt2(n) % info % levels
@@ -489,14 +492,14 @@ subroutine da_add_noise_to_ob( iv, ob )
    
 !  [2.13] Transfer scatterometer obs:
 
-   if ( iv % num_qscat > 0 ) then
+   if ( iv % nlocal(qscat) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_qscat
+      do n = 1, iv % nlocal(qscat)
        if(iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'qscat', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_qscat
+      do n = 1, iv % nlocal(qscat)
        if(iv%qscat(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
@@ -515,14 +518,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.14] Transfer buoy obs:
 
-   if ( iv % num_buoy > 0 ) then
+   if ( iv % nlocal(buoy) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_buoy
+      do n = 1, iv % nlocal(buoy)
        if(iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'buoy', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_buoy
+      do n = 1, iv % nlocal(buoy)
        if(iv%buoy(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
@@ -546,14 +549,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.15] Transfer profiler obs:
 
-   if ( iv % num_profiler > 0 ) then
+   if ( iv % nlocal(profiler) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_profiler
+      do n = 1, iv % nlocal(profiler)
        if(iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'profiler', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_profiler
+      do n = 1, iv % nlocal(profiler)
        if(iv%profiler(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % profiler(n) % info % levels
@@ -573,15 +576,15 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  [2.16] Transfer TC bogus obs:
 
-   if ( iv % num_bogus > 0 ) then
+   if ( iv % nlocal(bogus) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_bogus
+      do n = 1, iv % nlocal(bogus)
        if(iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'bogus', num_obs   
       num_obs = 0 
 
-      do n = 1, iv % num_bogus
+      do n = 1, iv % nlocal(bogus)
        if(iv%bogus(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
@@ -612,14 +615,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 !
 !  Transfer AIRS retrievals:
 !
-   if ( iv % num_airsr > 0 ) then
+   if ( iv % nlocal(airsr) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_airsr
+      do n = 1, iv % nlocal(airsr)
        if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'airsr', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_airsr
+      do n = 1, iv % nlocal(airsr)
        if(iv%airsr(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % airsr(n) % info % levels
@@ -640,14 +643,14 @@ subroutine da_add_noise_to_ob( iv, ob )
 
 !  Transfer gpsref obs:
 
-   if ( iv % num_gpsref > 0 ) then
+   if ( iv % nlocal(gpsref) > 0 ) then
       num_obs = 0
-      do n = 1, iv % num_gpsref
+      do n = 1, iv % nlocal(gpsref)
        if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'gpsref', num_obs   
       num_obs = 0 
-      do n = 1, iv % num_gpsref
+      do n = 1, iv % nlocal(gpsref)
        if(iv%gpsref(n)%loc%proc_domain) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')iv % gpsref(n) % info % levels
@@ -706,4 +709,8 @@ subroutine da_add_noise_to_ob( iv, ob )
   close (ounit)
   call da_free_unit(ounit)
 
+   if (trace_use_dull) call da_trace_exit("da_add_noise_to_ob")
+
 end subroutine da_add_noise_to_ob
+
+

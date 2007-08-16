@@ -14,7 +14,7 @@ subroutine da_transform_xtogpsref_adj(grid)
    real    :: partone, parttwo, dividnd
    real    :: partone9,parttwo9,dividnd9
 
-   if (trace_use) call da_trace_entry("da_transform_xtogpsref_adj")
+   if (trace_use_dull) call da_trace_entry("da_transform_xtogpsref_adj")
 
    ! 1.0 Get the range for a tile
 
@@ -43,7 +43,6 @@ subroutine da_transform_xtogpsref_adj(grid)
    do k = ks, ke
       do j = js, je
          do i = is, ie
-
             !  Note: p in Pascal, q is the specific humidity
 
             !   2.1 basic state
@@ -74,12 +73,11 @@ subroutine da_transform_xtogpsref_adj(grid)
             !  [3.0] Clean the grid%xa%ref    
 
             grid%xa%ref(i,j,k) = 0.0
-
          end do
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_transform_xtogpsref_adj")
+   if (trace_use_dull) call da_trace_exit("da_transform_xtogpsref_adj")
 
 end subroutine da_transform_xtogpsref_adj
 

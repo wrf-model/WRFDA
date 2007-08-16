@@ -151,7 +151,6 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       nullify (p%next)
    end do
    
-   iv%total_obs = iv%total_obs + size
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchanl
 

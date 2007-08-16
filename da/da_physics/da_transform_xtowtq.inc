@@ -8,8 +8,10 @@ subroutine da_transform_xtowtq (grid)
 
    type (domain), intent(inout) :: grid
 
-   integer                      :: i, j
-   real                         :: height
+   integer :: i, j
+   real    :: height
+
+   if (trace_use) call da_trace_entry("da_transform_xtowtq")
 
    !------------------------------------------------------------------------
    ! [1.0] Calculate surface variable(1-m wind, 2-m moisture and temperature)
@@ -41,6 +43,8 @@ subroutine da_transform_xtowtq (grid)
             grid%xa%t2(i,j),  grid%xa%q2(i,j))
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtowtq")
 
 end subroutine da_transform_xtowtq
  

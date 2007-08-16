@@ -16,10 +16,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;===========================================================================================;
 begin
+
+run_dir=getenv("RUN_DIR")+"/"
+
 ;===========================================================================================;
 ; open file and read in data
 ;-----------------------------------------------------------
-run_dir=run_dir+"/"
 plot_dir = run_dir
 read_headers = asciiread("header_main",-1,"string")
 ;-----------------------------------------------------------

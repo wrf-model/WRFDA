@@ -11,12 +11,10 @@ begin
 
  works = "pdf"
 
- region = "t46_45km"
- nrow = 41
-; region = "con200"
-; nrow = 27
+ region = getenv("REGION")
+ dir    = getenv("BE_DIR")
+ nrow   = stringtointeger(getenv("BE_NROW"))
 
- dir = "/smoke/dmbarker/data/"+region+"/noda/fc/gen_be/"
  ncol = 6
  y = new((/nrow/),float)
  x = new((/5,nrow/),float)
@@ -33,10 +31,10 @@ begin
  var4="rh"
  filename4 = "fort.186"
 
- data1=asciiread(dir+filename1,(/nrow,ncol/),"float")
- data2=asciiread(dir+filename2,(/nrow,ncol/),"float")
- data3=asciiread(dir+filename3,(/nrow,ncol/),"float")
- data4=asciiread(dir+filename4,(/nrow,ncol/),"float")
+ data1=asciiread(dir+"/"+filename1,(/nrow,ncol/),"float")
+ data2=asciiread(dir+"/"+filename2,(/nrow,ncol/),"float")
+ data3=asciiread(dir+"/"+filename3,(/nrow,ncol/),"float")
+ data4=asciiread(dir+"/"+filename4,(/nrow,ncol/),"float")
 
 ;************************************************
 ; plotting parameters

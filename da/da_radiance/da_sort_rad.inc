@@ -21,15 +21,15 @@ subroutine da_sort_rad (iv)
 
    if (num_fgat_time == 1) then
       do i=1,rtminit_nsensor
-         iv%ob_numb(:)%radiance(i) = 0
-         iv%ob_numb(num_fgat_time)%radiance(i) = iv%instid(i)%num_rad
+         iv%plocal_rad(:,i) = 0
+         iv%plocal_rad(num_fgat_time,i) = iv%instid(i)%num_rad
       end do
       if (trace_use) call da_trace_exit("da_sort_rad")
       return
    end if
 
    do i=1,rtminit_nsensor
-      iv%ob_numb(:)%radiance(i) = 0
+      iv%plocal_rad(:,i) = 0
       if (iv%instid(i)%num_rad < 1) cycle
 
       allocate (info        (iv%instid(i)%num_rad))
@@ -74,11 +74,11 @@ subroutine da_sort_rad (iv)
 
             tb_inv(1:iv%instid(i)%nchan,j) = iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) 
          end do
-         iv%ob_numb(t)%radiance(i) = j
+         iv%plocal_rad(t,i) = j
       end do
 
       write(unit=stdout,fmt='(a,2x,a,2x,10i7)') &
-         ' FGAT: ',iv%instid(i)%rttovid_string, iv%ob_numb(1:num_fgat_time)%radiance(i)
+         ' FGAT: ',iv%instid(i)%rttovid_string, iv%plocal_rad(1:num_fgat_time,i)
 
       do n = 1,iv%instid(i)%num_rad
          iv%instid(i)%ifgat(n)        = ifgat(n)

@@ -31,6 +31,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    character(len=4) :: filnam
    integer :: wrf_done_unit
 
+   if (trace_use) call da_trace_entry("da_check_xtoy_adjoint")
 
    write (unit=stdout, fmt='(/a)') ' da_check_xtoy_adjoint: Adjoint Test Results:'
 
@@ -68,7 +69,6 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
 
    if (var4d) then
-
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
 
 #ifdef DM_PARALLEL
@@ -149,67 +149,31 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
       !       Rescale input to adjoint routine :
       !----------------------------------------------------------------------
 
-      if (use_soundobs) then
-         call da_check_xtoy_adjoint_sound(iv, y, partial_lhs, pertile_lhs)
-         call da_check_xtoy_adjoint_sonde_sfc(iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(sound) > 0) then
+         call da_check_xtoy_adjoint_sound     (iv, y, partial_lhs, pertile_lhs)
+         call da_check_xtoy_adjoint_sonde_sfc (iv, y, partial_lhs, pertile_lhs)
       end if
 
-      if (use_synopobs) &
-         call da_check_xtoy_adjoint_synop(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_geoamvobs) &
-         call da_check_xtoy_adjoint_geoamv(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_polaramvobs) &
-         call da_check_xtoy_adjoint_polaramv(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_airepobs) &
-         call da_check_xtoy_adjoint_airep(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_pilotobs) &
-         call da_check_xtoy_adjoint_pilot(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_radarobs) &
-         call da_check_xtoy_adjoint_radar(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_satemobs) &
-         call da_check_xtoy_adjoint_satem(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_metarobs) &
-         call da_check_xtoy_adjoint_metar(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_shipsobs) &
-         call da_check_xtoy_adjoint_ships(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_gpspwobs) &
-         call da_check_xtoy_adjoint_gpspw(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_gpsrefobs) &
-         call da_check_xtoy_adjoint_gpsref(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_ssmitbobs .or. use_ssmiretrievalobs) &
-         call da_check_xtoy_adjoint_ssmi (iv, y, partial_lhs, pertile_lhs)
-
-      if (use_ssmt1obs) &
-         call da_check_xtoy_adjoint_ssmt1(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_ssmt2obs) &
-         call da_check_xtoy_adjoint_ssmt2(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_qscatobs) &
-         call da_check_xtoy_adjoint_qscat(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_profilerobs) &
-      call da_check_xtoy_adjoint_profiler(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_buoyobs) &
-         call da_check_xtoy_adjoint_buoy(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_bogusobs) &
-         call da_check_xtoy_adjoint_bogus(iv, y, partial_lhs, pertile_lhs)
-
-      if (use_rad) &
-         call da_check_xtoy_adjoint_rad(iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(synop)    > 0) call da_check_xtoy_adjoint_synop    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(geoamv)   > 0) call da_check_xtoy_adjoint_geoamv   (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(polaramv) > 0) call da_check_xtoy_adjoint_polaramv (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(airep)    > 0) call da_check_xtoy_adjoint_airep    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(pilot)    > 0) call da_check_xtoy_adjoint_pilot    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(radar)    > 0) call da_check_xtoy_adjoint_radar    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(satem)    > 0) call da_check_xtoy_adjoint_satem    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(metar)    > 0) call da_check_xtoy_adjoint_metar    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(ships)    > 0) call da_check_xtoy_adjoint_ships    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(gpspw)    > 0) call da_check_xtoy_adjoint_gpspw    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(gpsref)   > 0) call da_check_xtoy_adjoint_gpsref   (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(ssmi_tb)  > 0) call da_check_xtoy_adjoint_ssmi_tb  (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(ssmi_rv)  > 0) call da_check_xtoy_adjoint_ssmi_rv  (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(ssmt1)    > 0) call da_check_xtoy_adjoint_ssmt1    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(ssmt2)    > 0) call da_check_xtoy_adjoint_ssmt2    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(qscat)    > 0) call da_check_xtoy_adjoint_qscat    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(profiler) > 0) call da_check_xtoy_adjoint_profiler (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(buoy)     > 0) call da_check_xtoy_adjoint_buoy     (iv, y, partial_lhs, pertile_lhs)
+      if (iv%nlocal(bogus)    > 0) call da_check_xtoy_adjoint_bogus    (iv, y, partial_lhs, pertile_lhs)
+      if (iv%num_inst     > 0) call da_check_xtoy_adjoint_rad      (iv, y, partial_lhs, pertile_lhs)
 
       !----------------------------------------------------------------------
       ! [5.0] Perform adjoint operation:
@@ -415,8 +379,9 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
       write (unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write (unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    end if
-   
 
+   if (trace_use) call da_trace_exit("da_check_xtoy_adjoint")
+   
 end subroutine da_check_xtoy_adjoint
 
 

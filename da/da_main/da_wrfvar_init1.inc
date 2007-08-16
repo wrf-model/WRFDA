@@ -26,12 +26,12 @@ subroutine da_wrfvar_init1(no_init1)
    ! Initialize WRF modules:  
    ! Phase 1 returns after mpi_init() (if it is called)
    if (.NOT. present(no_init1)) then
-      call init_modules(1)
+      call init_modules (1)
       ! Initialize utilities (time manager, etc.)
-      call wrfu_initialize(defaultCalendar=WRFU_CAL_GREGORIAN)
+      call wrfu_initialize (defaultCalendar=WRFU_CAL_GREGORIAN)
    end if
    ! Phase 2 resumes after mpi_init() (if it is called)
-   call init_modules(2)
+   call init_modules (2)
 
    !<DESCRIPTION>
    ! The wrf namelist.input file is read and stored in the use associated
@@ -52,8 +52,8 @@ subroutine da_wrfvar_init1(no_init1)
 
 #ifdef DM_PARALLEL
    call wrf_get_dm_communicator (comm)
-   call mpi_comm_size(comm, num_procs, ierr)
-   call mpi_comm_rank(comm, myproc, ierr)
+   call mpi_comm_size (comm, num_procs, ierr)
+   call mpi_comm_rank (comm, myproc, ierr)
 #else
    num_procs = 1
    myproc = 0
@@ -70,9 +70,9 @@ subroutine da_wrfvar_init1(no_init1)
    if (rootproc) then
       call initial_config
    end if
-   call get_config_as_buffer(configbuf, configbuflen, nbytes)
-   call wrf_dm_bcast_bytes(configbuf, nbytes)
-   call set_config_as_buffer(configbuf, configbuflen)
+   call get_config_as_buffer (configbuf, configbuflen, nbytes)
+   call wrf_dm_bcast_bytes (configbuf, nbytes)
+   call set_config_as_buffer (configbuf, configbuflen)
    call wrf_dm_initialize
 #else
    call initial_config

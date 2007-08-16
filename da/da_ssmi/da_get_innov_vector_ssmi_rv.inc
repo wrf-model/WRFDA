@@ -22,7 +22,7 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
    if (trace_use) call da_trace_entry("da_get_innov_vector_ssmi_rv")
 
    itpw = 0 ; itpwf = 0 ; ispeed = 0 ; ispeedf = 0 
-   do n=1, iv % num_ssmi_retrieval
+   do n=1, iv % nlocal(ssmi_rv)
 
       ! compute innovation vector
       ! =========================
@@ -31,32 +31,32 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
 
       ! TPW
 
-      i   = iv%ssmi_retrieval(n)%loc%i
-      j   = iv%ssmi_retrieval(n)%loc%j
-      dx  = iv%ssmi_retrieval(n)%loc%dx
-      dy  = iv%ssmi_retrieval(n)%loc%dy
-      dxm = iv%ssmi_retrieval(n)%loc%dxm
-      dym = iv%ssmi_retrieval(n)%loc%dym
+      i   = iv%ssmi_rv(n)%loc%i
+      j   = iv%ssmi_rv(n)%loc%j
+      dx  = iv%ssmi_rv(n)%loc%dx
+      dy  = iv%ssmi_rv(n)%loc%dy
+      dxm = iv%ssmi_rv(n)%loc%dxm
+      dym = iv%ssmi_rv(n)%loc%dym
 
-      iv % ssmi_retrieval(n) % tpw % inv  = 0.0
-      if (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.0  .and.  &  
-            iv % ssmi_retrieval(n) % tpw % qc >= obs_qc_pointer) then
+      iv % ssmi_rv(n) % tpw % inv  = 0.0
+      if (abs(ob % ssmi_rv(n) % tpw - missing_r) > 1.0  .and.  &  
+            iv % ssmi_rv(n) % tpw % qc >= obs_qc_pointer) then
          model_tpw = dym*(dxm*xb%tpw(i,j) + dx*xb%tpw(i+1,j)) + &
             dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
 
-         iv % ssmi_retrieval(n) % tpw % inv = ob % ssmi_retrieval(n) % tpw - model_tpw
+         iv % ssmi_rv(n) % tpw % inv = ob % ssmi_rv(n) % tpw - model_tpw
       end if
 
       ! surface wind speed
 
-      iv % ssmi_retrieval(n) % speed % inv  = 0.0
-      if (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1.0 .and.     &
-          iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer) then
+      iv % ssmi_rv(n) % speed % inv  = 0.0
+      if (abs(ob % ssmi_rv(n) % speed - missing_r) > 1.0 .and.     &
+          iv % ssmi_rv(n) % speed % qc >= obs_qc_pointer) then
 
          model_speed = dym*(dxm*xb%speed(i,j ) + dx*xb%speed(i+1,j )) &
             + dy *(dxm*xb%speed(i,j+1) + dx*xb%speed(i+1,j+1))
-         iv % ssmi_retrieval(n) % speed % inv =  &
-            ob % ssmi_retrieval(n) % speed - model_speed
+         iv % ssmi_rv(n) % speed % inv =  &
+            ob % ssmi_rv(n) % speed - model_speed
       end if
 
       !------------------------------------------------------------------
@@ -64,7 +64,7 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
       !------------------------------------------------------------------
 
       if (check_max_iv) then
-         call da_check_max_iv_ssmi_rv(it, iv % ssmi_retrieval(n),&
+         call da_check_max_iv_ssmi_rv(it, iv % ssmi_rv(n),&
             itpw,itpwf, ispeed,ispeedf)
       end if
    end do

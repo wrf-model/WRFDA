@@ -13,9 +13,10 @@ subroutine da_transform_xtoy_buoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    integer :: n        ! Loop counter.
 
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_buoy_adj")
+
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, &
-         iv%ob_numb(iv%current_ob_time)%buoy
+      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
 
          ! [1.2] Interpolate horizontally:
          call da_interp_obs_lin_2d_adj(jo_grad_x%u, iv%buoy(n)%loc, jo_grad_y%buoy(n)%u, iv%buoy(n)%zk)
@@ -25,11 +26,13 @@ subroutine da_transform_xtoy_buoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 
          call da_interp_lin_2d_adj(jo_grad_x % psfc, iv%buoy(n)%loc, jo_grad_y%buoy(n)%p)
       end do
-   else if (sfc_assi_options == 2) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
+   else if (sfc_assi_options == sfc_assi_options_2) then
+      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
          call da_transform_xtopsfc_adj(grid,iv%buoy(n), jo_grad_y%buoy(n), jo_grad_x)
       end do
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_buoy_adj")
 
 end subroutine da_transform_xtoy_buoy_adj
 

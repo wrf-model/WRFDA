@@ -13,12 +13,16 @@ subroutine da_transform_xtoy_polaramv (grid, iv, y)
    integer :: n ! Loop counter.
    integer :: k ! Index dimension.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_polaramv")
+
+   do n=iv%plocal(iv%time-1,polaramv) + 1, iv%plocal(iv%time,polaramv)
       k = iv % polaramv(n) % info % levels
       if (k < 1) cycle
       call da_interp_lin_3d(grid%xa % u, iv%polaramv(n)%loc, y%polaramv(n)%u, k, iv%polaramv(n)%zk, k)
       call da_interp_lin_3d(grid%xa % v, iv%polaramv(n)%loc, y%polaramv(n)%v, k, iv%polaramv(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_polaramv")
 
 end subroutine da_transform_xtoy_polaramv
 

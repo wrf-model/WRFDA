@@ -12,8 +12,10 @@ subroutine da_transform_xtoy_buoy (grid, iv, y)
 
    integer :: n        ! Loop counter.
 
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_buoy")
+
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
+      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
          ! [1.2] Interpolate horizontally:
          call da_interp_obs_lin_2d(grid%xa % u, iv%buoy(n)%loc, y%buoy(n)%u, iv%buoy(n)%zk)
          call da_interp_obs_lin_2d(grid%xa % v, iv%buoy(n)%loc, y%buoy(n)%v, iv%buoy(n)%zk)
@@ -24,10 +26,12 @@ subroutine da_transform_xtoy_buoy (grid, iv, y)
       end do
    else if (sfc_assi_options == sfc_assi_options_2) then
       ! [2.0] Surface assimilation approach 2
-      do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
+      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
          call da_transform_xtopsfc(grid,iv%buoy(n),y%buoy(n))
       end do
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_buoy")
 
 end subroutine da_transform_xtoy_buoy
 

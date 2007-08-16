@@ -18,13 +18,15 @@ subroutine da_residual_buoy(iv, y, re, np_missing, np_bad_data, np_obs_used, np_
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
+   if (trace_use_dull) call da_trace_entry("da_residual_buoy")
+
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
    n_obs_bad % t % num = number_type(0, 0, 0)
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_buoy
+   do n=1, iv%nlocal(buoy)
       np_available = np_available + 5
       re%buoy(n)%u = da_residual(n, 0, y%buoy(n)%u, iv%buoy(n)%u, n_obs_bad % u)
       re%buoy(n)%v = da_residual(n, 0, y%buoy(n)%v, iv%buoy(n)%v, n_obs_bad % v)
@@ -42,6 +44,8 @@ subroutine da_residual_buoy(iv, y, re, np_missing, np_bad_data, np_obs_used, np_
    np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
       n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
       n_obs_bad % p % num % use + n_obs_bad % q % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_buoy")
 
 end subroutine da_residual_buoy
 

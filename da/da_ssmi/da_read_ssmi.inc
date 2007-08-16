@@ -10,10 +10,11 @@ subroutine da_read_ssmi (ob, xp, filename)
    type(ob_type),    intent(inout) :: ob
    character(len=*), intent(in)    :: filename
 
-   character (LEN =  10)        :: fmt_name
+   character (len =  10)        :: fmt_name
 
-   character (LEN = 160)        :: fmt_info, fmt_loc
-   character (LEN = 120)        :: char_ned
+   character (len = 160)        :: fmt_info
+   character (len = 160)        :: fmt_loc
+   character (len = 120)        :: char_ned
 
    integer                      :: iost, fm,iunit
 
@@ -31,13 +32,13 @@ subroutine da_read_ssmi (ob, xp, filename)
    logical                      :: outside, outside_all
    integer                      :: irain, iprecip
    integer                      :: n, ndup
-   integer                      :: num_ssmi_tb
-   integer                      :: num_ssmi_retrieval
+   integer                      :: nlocal(num_ob_indexes)
+   integer                      :: ntotal(num_ob_indexes)
 
    if (trace_use) call da_trace_entry("da_read_ssmi")
 
-   num_ssmi_retrieval = 0
-   num_ssmi_tb        = 0
+   nlocal(:) = ob%plocal(ob%time-1,:)
+   ntotal(:) = ob%ptotal(ob%time-1,:)
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -197,7 +198,7 @@ subroutine da_read_ssmi (ob, xp, filename)
          case (125) ;
             if (.not. use_ssmiretrievalobs) cycle reports
 
-            if (n==1) ob%num_ssmi_retrieval_glo = ob%num_ssmi_retrieval_glo + 1
+            if (n==1) ntotal(ssmi_rv) = ntotal(ssmi_rv)
             if (outside) cycle reports
 
             ! Check if at least one field is present
@@ -209,10 +210,10 @@ subroutine da_read_ssmi (ob, xp, filename)
             ! fill permanent structure
             ! ========================
 
-            num_ssmi_retrieval = num_ssmi_retrieval + 1
+            nlocal(ssmi_rv) = nlocal(ssmi_rv) + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit
             ! tests with different numbers of MPI tasks.  
-            loc%obs_global_index = ob%num_ssmi_retrieval_glo
+            loc%obs_global_index = ntotal(ssmi_rv)
 
             !  One more data used
 
@@ -220,19 +221,20 @@ subroutine da_read_ssmi (ob, xp, filename)
       
             !  Initialize other non read fields
 
-            ob % ssmi_retrieval (num_ssmi_retrieval) % loc = loc
+            ob % ssmi_rv (nlocal(ssmi_rv)) % loc = loc
 
             !  Initialize with read fields
 
-            ob % ssmi_retrieval (num_ssmi_retrieval) % info = info
+            ob%ssmi_rv(nlocal(ssmi_rv))%info                 = info
+            ob%ssmi_rv(nlocal(ssmi_rv))%loc%obs_global_index = ntotal(ssmi_rv)
 
-            ob % ssmi_retrieval (num_ssmi_retrieval) % speed = speed
-            ob % ssmi_retrieval (num_ssmi_retrieval) % tpw   = tpw
+            ob % ssmi_rv (nlocal(ssmi_rv)) % speed = speed
+            ob % ssmi_rv (nlocal(ssmi_rv)) % tpw   = tpw
 
          case (126) ;
             if (.not. use_ssmitbobs) cycle reports
 
-            if (n==1) ob%num_ssmi_tb_glo = ob%num_ssmi_tb_glo + 1
+            if (n==1) ntotal(ssmi_tb) = ntotal(ssmi_tb) + 1
             if (outside) cycle reports
 
             ! Check if at least one field is present
@@ -254,8 +256,7 @@ subroutine da_read_ssmi (ob, xp, filename)
                ipass = .false.
                iprecip = 0
                call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
-                          tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
-                          info%lat)
+                  tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, info%lat)
                if (iprecip .eq. 1) then
                   tb19v % qc    = -88.0
                   tb19h % qc    = -88.0
@@ -274,10 +275,10 @@ subroutine da_read_ssmi (ob, xp, filename)
 
             ! One more data read in
 
-            num_ssmi_tb = num_ssmi_tb + 1
+            nlocal(ssmi_tb) = nlocal(ssmi_tb) + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit
             ! tests with different numbers of MPI tasks.  
-            loc%obs_global_index = ob%num_ssmi_tb_glo
+            loc%obs_global_index = ntotal(ssmi_tb)
 
             !  One more data used
 
@@ -285,19 +286,20 @@ subroutine da_read_ssmi (ob, xp, filename)
 
             !  Initialize other non read fields
 
-            ob % ssmi_tb (num_ssmi_tb) % loc = loc
+            ob % ssmi_tb (nlocal(ssmi_tb)) % loc = loc
 
             !  Initialize with read fields
 
-            ob % ssmi_tb (num_ssmi_tb) % info = info
+            ob%ssmi_tb(nlocal(ssmi_tb))%info                 = info
+            ob%ssmi_tb(nlocal(ssmi_tb))%loc%obs_global_index = ntotal(ssmi_tb)
 
-            ob % ssmi_tb (num_ssmi_tb) % tb19v = tb19v
-            ob % ssmi_tb (num_ssmi_tb) % tb19h = tb19h
-            ob % ssmi_tb (num_ssmi_tb) % tb22v = tb22v
-            ob % ssmi_tb (num_ssmi_tb) % tb37v = tb37v
-            ob % ssmi_tb (num_ssmi_tb) % tb37h = tb37h
-            ob % ssmi_tb (num_ssmi_tb) % tb85v = tb85v
-            ob % ssmi_tb (num_ssmi_tb) % tb85h = tb85h
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb19v = tb19v
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb19h = tb19h
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb22v = tb22v
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb37v = tb37v
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb37h = tb37h
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb85v = tb85v
+            ob % ssmi_tb (nlocal(ssmi_tb)) % tb85h = tb85h
 
          case default;
             ! Do nothing.
@@ -307,26 +309,16 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    close(iunit)
    call da_free_unit(iunit)
- 
-   write(unit=stdout, fmt='(5x,a,i6,a)') &
-      'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-      'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
-      'Read:  ', ob % total_obs, ' Total reports.', &
-      'There are ', ob % total_obs                  &
-                  - ob % num_ssmi_retrieval         &
-                  - ob % num_ssmi_tb,               &
-                '  reports unsaved.'
 
-   write(unit=stdout, fmt='(/,25x,a)') &
-                        '     used   outdomain  max_er_chk   missing' 
-   write(unit=stdout, fmt='(4x,a,4i11)') &
-                   'SSMI_RETRIEVAL_diag: ', count_obs_ssmir
-   write(unit=stdout, fmt='(4x,a,4i11)') &
-                   'SSMI_Tb_diag:        ', count_obs_ssmit
-   write(unit=stdout, fmt='(/,a)') &
- "------------------------------------------------------------------------------"
+   write(unit=stdout, fmt='(/,25x,a)')   '     used   outdomain  max_er_chk   missing' 
+   write(unit=stdout, fmt='(4x,a,4i11)') 'ssmi_rv_diag:        ', count_obs_ssmir
+   write(unit=stdout, fmt='(4x,a,4i11)') 'ssmi_tb_diag:        ', count_obs_ssmit
 
-   write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+   if (irain > 0) then
+      write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
+   end if
+
+   write(unit=stdout, fmt='(/,a)') ' '
 
    if (trace_use) call da_trace_exit("da_read_ssmi")
 

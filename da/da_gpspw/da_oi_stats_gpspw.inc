@@ -6,48 +6,51 @@ subroutine da_oi_stats_gpspw (stats_unit, oi)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
+   integer,        intent (in) :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in) :: oi            ! OI
 
-   type (stats_gpspw_type)                :: Gpspw
-   integer                          :: ntpw
-   integer                          :: n
+   type (stats_gpspw_type) :: stats
+   integer                 :: ntpw
+   integer                 :: n
+
+   if (trace_use_dull) call da_trace_entry("da_oi_stats_gpspw")
 
    ntpw = 0
 
-   Gpspw%maximum%tpw = maxmin_type(missing_r, 0, 0)
-   Gpspw%minimum%tpw = maxmin_type(-missing_r, 0, 0)
-   Gpspw%average = residual_gpspw1_type(0.0)
-   Gpspw%rms_err = Gpspw%average
+   stats%maximum%tpw = maxmin_type(missing_r, 0, 0)
+   stats%minimum%tpw = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_Gpspw > 0) then
-      do n=1, oi%num_Gpspw
-         if (oi%gpspw(n)%loc%proc_domain) then
-            call da_stats_calculate(oi%Gpspw(n)%loc%obs_global_index, &
-                               0, oi%gpspw(n)%tpw%qc, &
-                              oi%gpspw(n)%tpw%inv, ntpw, &
-                              gpspw%minimum%tpw  , gpspw%maximum%tpw, &
-                              gpspw%average%tpw  , gpspw%rms_err%tpw)
+   stats%average = residual_gpspw1_type(0.0)
+   stats%rms_err = stats%average
 
-         end if    ! end if (oi%gpspw(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, oi%nlocal(gpspw)
+      if (oi%gpspw(n)%loc%proc_domain) then
+         call da_stats_calculate(oi%gpspw(n)%loc%obs_global_index, &
+            0, oi%gpspw(n)%tpw%qc, &
+            oi%gpspw(n)%tpw%inv, ntpw, &
+            stats%minimum%tpw  , stats%maximum%tpw, &
+            stats%average%tpw  , stats%rms_err%tpw)
 
-   ! Do inter-processor communication to gather statistics.
+      end if    ! end if (oi%gpspw(n)%loc%proc_domain)
+   end do
+
+   ! do inter-processor communication to gather statistics.
 
    call da_proc_sum_int(ntpw)
 
-   call da_proc_stats_combine(Gpspw%average%tpw, Gpspw%rms_err%tpw, &
-                           Gpspw%minimum%tpw%value, Gpspw%maximum%tpw%value, &
-                           Gpspw%minimum%tpw%n, Gpspw%maximum%tpw%n, &
-                           Gpspw%minimum%tpw%l, Gpspw%maximum%tpw%l)
+   call da_proc_stats_combine(stats%average%tpw, stats%rms_err%tpw, &
+      stats%minimum%tpw%value, stats%maximum%tpw%value, &
+      stats%minimum%tpw%n, stats%maximum%tpw%n, &
+      stats%minimum%tpw%l, stats%maximum%tpw%l)
 
    if (rootproc) then
       if (ntpw /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for gpspw'
-         call da_print_stats_gpspw(stats_unit, ntpw, Gpspw)
+         call da_print_stats_gpspw(stats_unit, ntpw, stats)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_oi_stats_gpspw")
 
 end subroutine da_oi_stats_gpspw
 

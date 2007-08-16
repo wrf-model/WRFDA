@@ -16,17 +16,17 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 plot_gts      = True
 plot_radar    = True
 
-out_type     = "pdf"
-plotdir      = "/ptmp/hclin/plot/obs/"
-datdir1      = "/ptmp/george/data/india_30km/radiance_sea_fixh/run/"  ; the path before DATE
-datdir2      = "/wrfvar/working/"                                     ; the path after DATE
-; datdir1      = "/ptmp/hclin/plot/obs/"
-; datdir2      = "/"
-filename_gts   = "gts_omb_oma"
-prefix_radar   = "oma_radar"
-start_date   = "2005080100"
-end_date     = "2005080200"
-cycle_period = 12
+out_type     = "pdf" ; or "ncgm"
+plotdir      = getenv("RUN_DIR")+"/plotobs/"
+datdir1      = getenv("RUN_DIR")+"/"  ; the path before DATE
+datdir2      = "/wrfvar/working/"     ; the path after DATE
+filename_gts = "gts_omb_oma"
+prefix_radar = "oma_radar"
+start_date   = getenv("START_DATE")
+end_date     = getenv("END_DATE")
+cycle_period = stringtointeger(getenv("CYCLE_PERIOD"))
+
+system("mkdir -p "+plotdir)
 ;
 ; set pressure levels for plotting AIREP, GEOAMV, POLARAMV, PILOT, PROFILER, SOUND, BOGUS, AIRSR
 ; method 1: set a 2-D array of bounded pressure levels in hPa
@@ -50,8 +50,6 @@ hlevs  = (/ (/2000., 5000./), (/5000., 8500./) /)
 
 ; mapinfo_from_file = False
   mapinfo_from_file = True
-; fname = "/ptmp/hclin/plot/obs/fg01"
-  fname = "/ptmp/george/data/india_30km/rc/2005080100/wrfinput_d01"
 
 ; subdomain = True
   subdomain = False
@@ -90,27 +88,11 @@ linecolor    = "gray"
 ;==============================================================================
 ; end of plot options
 ;==============================================================================
-if ( .not. ismissing(getenv("INITIAL_DATE")) ) then
-   ; probably running from a script
-   ; replace some selected variables with those from environment variables
-   delete(plotdir)
-   delete(datdir1)
-   delete(start_date)
-   delete(end_date)
-   delete(cycle_period)
-   delete(fname)
-   plotdir = getenv("RUN_DIR")+"/"
-   datdir1 = getenv("RUN_DIR")+"/"  ; datdir1 is the path before date
-                                    ; Here I assume wrfvar is running under
-                                    ; $RUN_DIR/$DATE/wrfvar/working
-   start_date = getenv("INITIAL_DATE")
-   end_date   = getenv("FINAL_DATE")
-   cycle_period = stringtointeger(getenv("CYCLE_PERIOD"))
-   fname = getenv("DA_FIRST_GUESS")
-end if
 
 plotwnd = False
 colormap = "rainbow+gray"
+
+fname=datdir1+"rc/"+start_date+"/wrfinput_d01"
 
 if ( mapinfo_from_file .and. .not.isfilepresent(fname) ) then
    print("file: "+fname+" does not exist")

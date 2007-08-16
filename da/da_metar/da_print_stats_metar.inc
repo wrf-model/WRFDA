@@ -10,7 +10,7 @@ subroutine da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
    integer,           intent(inout) :: nu, nv, nt, np, nq
    type (stats_metar_type), intent(in)    :: metar
 
-   if (trace_use) call da_trace_entry("da_print_stats_metar")
+   if (trace_use_dull) call da_trace_entry("da_print_stats_metar")
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &
@@ -44,7 +44,7 @@ subroutine da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
                        sqrt(metar%rms_err%p/real(np)), &
                        sqrt(metar%rms_err%q/real(nq))
 
-   if (trace_use) call da_trace_exit("da_print_stats_metar")
+   if (trace_use_dull) call da_trace_exit("da_print_stats_metar")
 
 end subroutine da_print_stats_metar
 

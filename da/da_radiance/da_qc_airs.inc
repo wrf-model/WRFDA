@@ -38,7 +38,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
    character(len=30)  :: filename
 
-   if (trace_use) call da_trace_entry("da_qc_airs")
+   if (trace_use_dull) call da_trace_entry("da_qc_airs")
 
 !! TV change: new diagnosic locals
    ngood(:)        = 0
@@ -59,15 +59,14 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 !! TV end change
 
    nrej_limb       = 0
-   num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
-                      iv%ob_numb(iv%current_ob_time-1)%radiance(i)
+   num_rad         = iv%plocal_rad(iv%time,i)- iv%plocal_rad(iv%time-1,i)
    ! num_rad        = iv%instid(i)%num_rad
    num_proc_domain = 0
 
    if (num_rad > 0) then
 
       ! do n= 1, iv%instid(i)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, iv%ob_numb(iv%current_ob_time)%radiance(i)
+      do n= iv%plocal_rad(iv%time-1,i)+1, iv%plocal_rad(iv%time,i)
 
          if (iv%instid(i)%proc_domain(n)) &
                num_proc_domain = num_proc_domain + 1
@@ -230,13 +229,13 @@ subroutine da_qc_airs (i, nchan, ob, iv)
  
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (num_proc_domain)
-!! TV change
+   !! TV change
    call da_proc_sum_int ( nrej_landsurface )
    call da_proc_sum_int ( nrej_windowchlong)
    call da_proc_sum_int ( nrej_windowchshort)
    call da_proc_sum_int ( nrej_sst)
-!   call da_proc_sum_int ( nrej_si   )
-!! TV end change
+   ! call da_proc_sum_int ( nrej_si   )
+   !! TV end change
    call da_proc_sum_int ( nrej_clw  )
    call da_proc_sum_int ( nrej_topo )
    call da_proc_sum_int (nrej_limb)
@@ -247,7 +246,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
    if (rootproc) then
       if (num_fgat_time > 1) then
-         write(filename,'(a,i2.2)') 'qcstat_'//trim(iv%instid(i)%rttovid_string)//'_',iv%current_ob_time
+         write(filename,'(a,i2.2)') 'qcstat_'//trim(iv%instid(i)%rttovid_string)//'_',iv%time
       else
          filename = 'qcstat_'//trim(iv%instid(i)%rttovid_string)
       end if
@@ -261,15 +260,15 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
       write(fgat_rad_unit, fmt='(/a/)') ' Quality Control Statistics for '//iv%instid(i)%rttovid_string
       write(fgat_rad_unit,'(a20,i7)') ' num_proc_domain  = ', num_proc_domain
-!!TV change
+      !!TV change
       write(fgat_rad_unit,'(a20,i7)') ' nrej_landsurface  = ', nrej_landsurface
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchlong = ', nrej_windowchlong
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchshort = ', nrej_windowchshort
       write(fgat_rad_unit,'(a20,i7)') ' nrej_sst = ', nrej_sst
-!      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
-!      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
-!      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
-!!TV end change
+      !      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
+      !      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
+      !      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
+      !!TV end change
       write(fgat_rad_unit,'(a20,i7)') ' nrej_clw         = ', nrej_clw
       write(fgat_rad_unit,'(a20,i7)') ' nrej_topo        = ', nrej_topo
       write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb
@@ -286,7 +285,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
       call da_free_unit(fgat_rad_unit)
    end if
 
-   if (trace_use) call da_trace_exit("da_qc_airs")
+   if (trace_use_dull) call da_trace_exit("da_qc_airs")
 
 end subroutine da_qc_airs
 

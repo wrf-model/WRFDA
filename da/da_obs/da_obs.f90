@@ -18,7 +18,10 @@ module da_obs
       pseudo_var, pseudo_val,stdout, num_pseudo, pseudo_y, pseudo_z, &
       pseudo_err,obs_qc_pointer,myproc,rtm_option,rtm_option_rttov, &
       rtm_option_crtm,use_rad, base_temp, base_lapse, base_pres, &
-      ob_format,ob_format_ascii,filename_len  
+      ob_format,ob_format_ascii,filename_len, trace_use_dull, &
+      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
+      bogus, buoy, qscat,pseudo, num_ob_indexes, trace_use_frequent
    ! use_crtm_kmatrix,use_crtm_kmatrix_fast
 #ifdef CRTM
    use da_crtm, only : da_transform_xtoy_crtm, da_transform_xtoy_crtm_adj

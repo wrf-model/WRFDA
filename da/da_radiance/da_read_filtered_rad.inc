@@ -9,8 +9,8 @@ subroutine da_read_filtered_rad( xp, iv )
    type (xpose_type), intent(in)     :: xp       ! Domain decomposition vars.
    type (ob_type),    intent(inout)  :: iv       ! O-B structure.
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: i        ! Index dimension.
+   integer            :: n        ! Loop counter.
+   integer            :: i        ! Index dimension.
 
    integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename
@@ -51,29 +51,26 @@ subroutine da_read_filtered_rad( xp, iv )
       allocate (iv%instid(i)%tb_error(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
       do n=1,iv%instid(i)%num_rad
          read(unit=filtered_rad_unit) ndomain, &
-                  iv%instid(i)%info(n)%date_char, &
-                  iv%instid(i)%scanpos(n)       , &
-                  iv%instid(i)%ifgat(n)         , &
-                  iv%instid(i)%landsea_mask(n)  , &
-                  iv%instid(i)%info(n)%elv      , &
-                  iv%instid(i)%info(n)%lat      , &
-                  iv%instid(i)%info(n)%lon      , &
-                  iv%instid(i)%satzen(n)        , &
-                  iv%instid(i)%satazi(n)        , &
-                  iv%instid(i)%tb_inv(:,n)      , &
-                  iv%instid(i)%tb_error(:,n)    , &
-                  iv%instid(i)%tb_qc(:,n)
+            iv%instid(i)%info(n)%date_char, &
+            iv%instid(i)%scanpos(n)       , &
+            iv%instid(i)%ifgat(n)         , &
+            iv%instid(i)%landsea_mask(n)  , &
+            iv%instid(i)%info(n)%elv      , &
+            iv%instid(i)%info(n)%lat      , &
+            iv%instid(i)%info(n)%lon      , &
+            iv%instid(i)%satzen(n)        , &
+            iv%instid(i)%satazi(n)        , &
+            iv%instid(i)%tb_inv(:,n)      , &
+            iv%instid(i)%tb_error(:,n)    , &
+            iv%instid(i)%tb_qc(:,n)
 
-         call da_ll_to_xy (iv%instid(i)%info(n), &
-                            iv%instid(i)%loc(n),  &
-                            xp, outside)
+         call da_ll_to_xy (iv%instid(i)%info(n), iv%instid(i)%loc(n), xp, outside)
          ! if (outside) cycle
 
       end do     ! end do pixels
       close(filtered_rad_unit)
       call da_free_unit(filtered_rad_unit)
 
-      iv%total_obs = iv%total_obs + iv%instid(i)%num_rad
       iv%total_rad_pixel   = iv%total_rad_pixel + iv%instid(i)%num_rad
       iv%total_rad_channel = iv%total_rad_channel + iv%instid(i)%num_rad*iv%instid(i)%nchan
    end do      ! end do instruments

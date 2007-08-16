@@ -6,10 +6,9 @@ subroutine da_read_radar (ob, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)   :: xp    ! Domain decomposition vars.
-   type (ob_type), intent (inout)  :: ob
-
-   character(len=*), intent(in)    :: filename
+   type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
+   type (ob_type),    intent(inout) :: ob
+   character(len=*),  intent(in)    :: filename
 
    character (len = 120)         :: char_total_radar
    character (len = 120)         :: char_ned
@@ -20,14 +19,16 @@ subroutine da_read_radar (ob, xp, filename)
 
    logical                       :: outside
 
-   integer                       :: total_obs, num_radar, total_radar
-   integer                        ::n_dup, ndup, iunit
+   integer                       :: total_radar
+   integer                       :: n_dup, ndup, iunit
+   integer                       :: nlocal(num_ob_indexes)
+   integer                       :: ntotal(num_ob_indexes)
 
    if (trace_use) call da_trace_entry("da_read_radar")
 
-   total_obs = ob%total_obs
-   num_radar = ob%num_radar
-
+   nlocal(:) = ob%plocal(ob%time-1,:)
+   ntotal(:) = ob%ptotal(ob%time-1,:)
+ 
    ! 1. open file
 
    call da_get_unit(iunit)
@@ -102,27 +103,27 @@ subroutine da_read_radar (ob, xp, filename)
       read (unit=char_ned (40:47),fmt='(F8.1)', iostat = iost) platform % stn % elv
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,2(F8.3,2X),F8.1)')  &
-                           'The station longitude, latutude, and altitude are: ', &
-                            platform % stn % lon, &
-                            platform % stn % lat, platform % stn % elv
+         'The station longitude, latutude, and altitude are: ', &
+         platform % stn % lon, &
+         platform % stn % lat, platform % stn % elv
 
       read (unit=char_ned (50:68),fmt='(A19)', iostat = iost) platform % stn % date_char
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,A19)')   &
-                           'The observation time for this data is ',     &
-                           platform % stn % date_char
+         'The observation time for this data is ',     &
+         platform % stn % date_char
 
       read (unit=char_ned (69:74),fmt='(I6)', iostat = iost) platform % stn % numobs
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,I6)')   &
-                           'Total number of Super-observations is ', &
-                           platform % stn % numobs
+         'Total number of Super-observations is ', &
+         platform % stn % numobs
 
       read (unit=char_ned (75:80),fmt='(I6)', iostat = iost) platform % stn % levels
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,I6)')   &
-                           'Vertical layers for each Super-observation is ', &
-                           platform % stn % levels
+         'Vertical layers for each Super-observation is ', &
+         platform % stn % levels
 
       ! 3.4 skip two lines
 
@@ -145,8 +146,6 @@ subroutine da_read_radar (ob, xp, filename)
                       platform % info % levels
 
          read(platform % info % platform (4:6), '(I3)') fm
-
-         total_obs = total_obs + 1
 
          ! 3.5.2 read each level
 
@@ -186,10 +185,6 @@ subroutine da_read_radar (ob, xp, filename)
 
          call da_ll_to_xy (platform%info, platform%loc, xp, outside)
 
-         if (outside) then
-            cycle reports
-         end if
-
          nlevels = platform%info%levels
 
          if (nlevels > max_ob_levels) then
@@ -210,37 +205,32 @@ subroutine da_read_radar (ob, xp, filename)
             select case (fm)
 
             case (128)
+               if (n==1) ntotal(radar) = ntotal(radar) + 1
+               if (outside) cycle reports
+               nlocal(radar) = nlocal(radar) + 1
+               if (nlocal(radar) > ob%nlocal(radar)) cycle reports
 
-               if (ndup==1) ob%num_radar_glo = ob%num_radar_glo + 1
+               platform % loc%obs_global_index = ntotal(radar)
 
-               num_radar = num_radar + 1
+               ob % radar (nlocal(radar)) % stn_loc % lon = platform % stn % lon
+               ob % radar (nlocal(radar)) % stn_loc % lat = platform % stn % lat
+               ob % radar (nlocal(radar)) % stn_loc % elv = platform % stn % elv
 
-               if (num_radar > max_radar) then
-                 write(unit=message(1),fmt='(A,I6,A,I6)') &
-                   "radar #= ",ob % num_radar, " > max_radar = ", max_radar
-                 call da_error(__FILE__,__LINE__,message(1:1))
-               end if
-               platform % loc%obs_global_index = ob%num_radar_glo
+               ob % radar (nlocal(radar)) % info = platform % info
+               ob % radar (nlocal(radar)) % loc  = platform % loc
 
-               ob % radar (num_radar) % stn_loc % lon = platform % stn % lon
-               ob % radar (num_radar) % stn_loc % lat = platform % stn % lat
-               ob % radar (num_radar) % stn_loc % elv = platform % stn % elv
-
-               ob % radar (num_radar) % info = platform % info
-               ob % radar (num_radar) % loc  = platform % loc
-
-               allocate (ob % radar (num_radar) % height   (1:nlevels))
-               allocate (ob % radar (num_radar) % height_qc(1:nlevels))
-               allocate (ob % radar (num_radar) % zk       (1:nlevels))
-               allocate (ob % radar (num_radar) % rv       (1:nlevels))
-               allocate (ob % radar (num_radar) % rf       (1:nlevels))
+               allocate (ob % radar (nlocal(radar)) % height   (1:nlevels))
+               allocate (ob % radar (nlocal(radar)) % height_qc(1:nlevels))
+               allocate (ob % radar (nlocal(radar)) % zk       (1:nlevels))
+               allocate (ob % radar (nlocal(radar)) % rv       (1:nlevels))
+               allocate (ob % radar (nlocal(radar)) % rf       (1:nlevels))
 
                do i = 1, nlevels
-                  ob % radar (num_radar) % height(i)    = platform % each(i) % height
-                  ob % radar (num_radar) % height_qc(i) = platform % each(i) % height_qc
-                  ob % radar (num_radar) % zk(i)        = platform % each(i) % zk
-                  ob % radar (num_radar) % rv(i)        = platform % each(i) % rv
-                  ob % radar (num_radar) % rf(i)        = platform % each(i) % rf
+                  ob % radar (nlocal(radar)) % height(i)    = platform % each(i) % height
+                  ob % radar (nlocal(radar)) % height_qc(i) = platform % each(i) % height_qc
+                  ob % radar (nlocal(radar)) % zk(i)        = platform % each(i) % zk
+                  ob % radar (nlocal(radar)) % rv(i)        = platform % each(i) % rv
+                  ob % radar (nlocal(radar)) % rf(i)        = platform % each(i) % rf
                end do
 
             case default;
@@ -264,24 +254,6 @@ subroutine da_read_radar (ob, xp, filename)
          end do        !  loop over duplicate
       end do reports
    end do
-
-   ob % num_radar = num_radar
-
-   ! 4. print out
- 
-   if (print_detail_radar) then
-      write(unit=stdout, fmt='(a)')  ' '
-      write(unit=stdout, fmt='(5x,a,i6,a)') &
-         ' Read:  ', ob % num_radar, ' radar reports '
-   end if
-
-   if (ob%ob_numb(ob%current_ob_time)%radar /= ob%num_radar) then
-      write(unit=message(1),fmt='(a, i6, 2x, a, i6)') &
-         'radar obs mismatch ob%ob_numb(ob%current_ob_time)%radar=', &
-         ob%ob_numb(ob%current_ob_time)%radar, &
-         'ob%num_radar=', ob%num_radar
-      call da_error(__FILE__,__LINE__,message(1:1))
-   end if
 
    close(iunit)
    call da_free_unit(iunit)

@@ -6,20 +6,20 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),   intent(inout) :: grid
+   integer,        intent(in)    :: cv_size ! Size of cv array.
+   type(xbx_type), intent(in)    :: xbx  ! For header & non-grid arrays.
+   type(be_type),  intent(in)    :: be   ! background errors.
+   type(ep_type),  intent(in)    :: ep   ! Ensemble perturbations.
+   real,           intent(in)    :: cv(1:cv_size)   ! control variables.
+   type(vp_type),  intent(out)   :: vv   ! grdipt/eof cv (local).
+   type(vp_type),  intent(inout) :: vp   ! grdipt/level cv (local).
 
-   integer, intent(in)                  :: cv_size ! Size of cv array.
-   type (xbx_type),intent(in)           :: xbx  ! For header & non-grid arrays.
-   type (be_type), intent(in)           :: be   ! background errors.
-   type (ep_type), intent(in)           :: ep   ! Ensemble perturbations.
-   real, intent(in)                     :: cv(1:cv_size)   ! control variables.
-   type (vp_type),intent(out)           :: vv   ! grdipt/eof cv (local).
-   type (vp_type),intent(inout)         :: vp   ! grdipt/level cv (local).
-
-   integer                              :: i, j, k
-
-   real :: sdmd, s1md, mu
-   real, dimension(kms:kme) :: p, mr_a, mr_b
+   integer :: i, j, k
+   real    :: sdmd, s1md, mu
+   real    :: p(kms:kme)
+   real    :: mr_a(kms:kme)
+   real    :: mr_b(kms:kme)
    real    :: PU, PD, coeff
 
    if (trace_use) call da_trace_entry("da_transform_vtox")
@@ -41,10 +41,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
    !----------------------------------------------------------------------
 
    if (vert_corr == vert_corr_2) then      
-      call da_vertical_transform('u', be, &
-                                  grid%xb % vertical_inner_product, &
-                                  vv, vp)
-
+      call da_vertical_transform('u', be, grid%xb % vertical_inner_product, vv, vp)
    else
       vp % v1(its:ite,jts:jte,kts:kte) = vv % v1(its:ite,jts:jte,kts:kte)
       vp % v2(its:ite,jts:jte,kts:kte) = vv % v2(its:ite,jts:jte,kts:kte)
@@ -129,7 +126,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
       end if
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
-           use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
+          use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
 
          ! Now do something for PW
          call da_transform_xtotpw(grid)
@@ -174,9 +171,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
  
       if (use_radarobs .and. use_radar_rf) then
          ! Partition of hydrometeor increments via warm rain process
-
          call da_moist_phys_lin(grid)
-
       end if
    end if
 
@@ -186,26 +181,16 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    if (global)  then   
       call da_get_vpoles(grid%xa%u,grid%xa%v, &
-            ids, ide, jds, jde, &
-            ims, ime, jms, jme, kms, kme, &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(grid%xa%t,             &
-            ids, ide, jds, jde,   &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(grid%xa%p,             &
-            ids, ide, jds, jde,   &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(grid%xa%q,             &
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(grid%xa%psfc,          &
-            ids, ide, jds, jde,   &
-            ims, ime, jms, jme,   1,   1,  &
-            its, ite, jts, jte,   1,   1  )
-       call da_set_boundary_xa(grid)
+         ids, ide, jds, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+      call da_get_spoles(grid%xa%t, &
+         ids, ide, jds, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+      call da_get_spoles(grid%xa%p, &
+         ids, ide, jds, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+      call da_get_spoles(grid%xa%q, &
+         ids, ide, jds, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+      call da_get_spoles(grid%xa%psfc, &
+         ids, ide, jds, jde, ims, ime, jms, jme,   1,   1, its, ite, jts, jte,   1,   1)
+      call da_set_boundary_xa(grid)
    end if   
 
    if (trace_use) call da_trace_exit("da_transform_vtox")

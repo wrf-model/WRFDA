@@ -29,12 +29,12 @@ subroutine da_get_innov_vector_sound (it, xb, xp, ob, iv)
 
    integer :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_sound")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_sound")
 
    itu   = 0; itvv    = 0;  itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0;  ittf = 0; itqvf = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
+   do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
       num_levs = iv%sound(n)%info%levels
 
       if (num_levs < 1) cycle
@@ -143,7 +143,7 @@ subroutine da_get_innov_vector_sound (it, xb, xp, ob, iv)
                                             itu +itvv+itt +itqv
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_sound")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_sound")
 
 end subroutine da_get_innov_vector_sound
 

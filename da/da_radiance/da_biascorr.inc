@@ -21,8 +21,8 @@ subroutine da_biascorr ( i, ob, iv)
    npred=4
    nlevels=iv%instid(i)%nlevels-1
 
-   n1 = iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1
-   n2 = iv%ob_numb(iv%current_ob_time)%radiance(i)
+   n1 = iv%plocal_rad(iv%time-1,i)+1
+   n2 = iv%plocal_rad(iv%time,i)
 
    do n=n1,n2
       ! get airmass predictors

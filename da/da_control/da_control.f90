@@ -307,17 +307,7 @@ module da_control
    integer, parameter     :: max_ob_levels = 1001 ! Maximum levels for single ob
    integer, parameter     :: max_fgat_time = 100  ! Maximum levels for FGAT.
 
-   integer                :: current_ob_time
-
-   integer                :: num_gpspw_tot, num_synop_tot, num_metar_tot, &
-                             num_pilot_tot, num_ssmi_rv_tot, num_ssmi_tb_tot, &
-                             num_ssmi_tot,  num_ssmt1_tot, num_ssmt2_tot, &
-                             num_satem_tot, num_geoamv_tot,num_polaramv_tot, &
-                             num_ships_tot, &
-                             num_sound_tot, num_airep_tot, num_qscat_tot, &
-                             num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                             num_radar_tot, num_bogus_tot,num_airsr_tot, &
-                             num_radiance_tot
+   integer                :: time
 
    logical       :: gaussian_lats  
 
@@ -444,54 +434,79 @@ module da_control
 
    integer, parameter :: num_ob_indexes = 23
 
-   integer, parameter :: sound_index          = 1
-   integer, parameter :: synop_index          = 2
-   integer, parameter :: pilot_index          = 3
-   integer, parameter :: satem_index          = 4
-   integer, parameter :: geoamv_index         = 5
-   integer, parameter :: polaramv_index       = 6
-   integer, parameter :: airep_index          = 7
-   integer, parameter :: gpspw_index          = 8
-   integer, parameter :: gpsref_index         = 9
-   integer, parameter :: metar_index          = 10
-   integer, parameter :: ships_index          = 11
-   integer, parameter :: ssmi_retrieval_index = 12
-   integer, parameter :: ssmi_tb_index        = 13
-   integer, parameter :: ssmt1_index          = 14
-   integer, parameter :: ssmt2_index          = 15
-   integer, parameter :: qscat_index          = 16
-   integer, parameter :: profiler_index       = 17
-   integer, parameter :: buoy_index           = 18
-   integer, parameter :: bogus_index          = 19
-   integer, parameter :: pseudo_index         = 20
-   integer, parameter :: radar_index          = 21
-   integer, parameter :: radiance_index       = 22
-   integer, parameter :: airsr_index          = 23
+   integer, parameter :: sound_index    = 1
+   integer, parameter :: synop_index    = 2
+   integer, parameter :: pilot_index    = 3
+   integer, parameter :: satem_index    = 4
+   integer, parameter :: geoamv_index   = 5
+   integer, parameter :: polaramv_index = 6
+   integer, parameter :: airep_index    = 7
+   integer, parameter :: gpspw_index    = 8
+   integer, parameter :: gpsref_index   = 9
+   integer, parameter :: metar_index    = 10
+   integer, parameter :: ships_index    = 11
+   integer, parameter :: ssmi_rv_index  = 12
+   integer, parameter :: ssmi_tb_index  = 13
+   integer, parameter :: ssmt1_index    = 14
+   integer, parameter :: ssmt2_index    = 15
+   integer, parameter :: qscat_index    = 16
+   integer, parameter :: profiler_index = 17
+   integer, parameter :: buoy_index     = 18
+   integer, parameter :: bogus_index    = 19
+   integer, parameter :: pseudo_index   = 20
+   integer, parameter :: radar_index    = 21
+   integer, parameter :: radiance_index = 22
+   integer, parameter :: airsr_index    = 23
+
+   integer, parameter :: sound     = 1
+   integer, parameter :: sonde_sfc = 1 ! identical to sound
+   integer, parameter :: synop     = 2
+   integer, parameter :: pilot     = 3
+   integer, parameter :: satem     = 4
+   integer, parameter :: geoamv    = 5
+   integer, parameter :: polaramv  = 6
+   integer, parameter :: airep     = 7
+   integer, parameter :: gpspw     = 8
+   integer, parameter :: gpsref    = 9
+   integer, parameter :: metar     = 10
+   integer, parameter :: ships     = 11
+   integer, parameter :: ssmi_rv   = 12
+   integer, parameter :: ssmi_tb   = 13
+   integer, parameter :: ssmt1     = 14
+   integer, parameter :: ssmt2     = 15
+   integer, parameter :: qscat     = 16
+   integer, parameter :: profiler  = 17
+   integer, parameter :: buoy      = 18
+   integer, parameter :: bogus     = 19
+   integer, parameter :: pseudo    = 20
+   integer, parameter :: radar     = 21
+   integer, parameter :: radiance  = 22
+   integer, parameter :: airsr     = 23
 
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
-      "SOUND         ", &
-      "SYNOP         ", &
-      "PILOT         ", &
-      "SATEM         ", &
-      "Geo AMV       ", &
-      "Polar AMV     ", &
-      "AIREP         ", &
-      "GPSPW         ", &
-      "GPSRF         ", &
-      "METAR         ", &
-      "SHIP          ", &
-      "SSMI_RETRIEVAL", &
-      "SSMI_TB       ", &
-      "SSMT1         ", &
-      "SSMT2         ", &
-      "QSCAT         ", &
-      "Profiler      ", &
-      "Buoy          ", &
-      "Bogus         ", &
-      "Pseudo        ", &
+      "sound         ", &
+      "synop         ", &
+      "pilot         ", &
+      "satem         ", &
+      "geo amv       ", &
+      "polar amv     ", &
+      "airep         ", &
+      "gpspw         ", &
+      "gpsrf         ", &
+      "metar         ", &
+      "ship          ", &
+      "ssmi_rv       ", &
+      "ssmi_tb       ", &
+      "ssmt1         ", &
+      "ssmt2         ", &
+      "qscat         ", &
+      "profiler      ", &
+      "buoy          ", &
+      "bogus         ", &
+      "pseudo        ", &
       "radar         ", &
-      "Radiance      ", &
-      "AIRS retrieval"  &
+      "radiance      ", &
+      "airs retrieval"  &
    /)
 
    integer, parameter :: max_no_fm = 290

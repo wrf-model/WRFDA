@@ -1,5 +1,4 @@
-subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, var, &
-                                   failed, print)
+subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, var, failed, print)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -19,6 +18,8 @@ subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, va
 
    real                               :: err, err_max
    integer                            :: qc_flag
+
+   if (trace_use) call da_trace_entry("da_max_error_qc_radar")
 
    failed = .false.
 
@@ -51,6 +52,8 @@ subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, va
       end if
       field % inv = 0.0
    end if
+
+   if (trace_use) call da_trace_exit("da_max_error_qc_radar")
 
 end subroutine da_max_error_qc_radar
 

@@ -13,7 +13,9 @@ subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airep_adj")
+
+   do n=iv%plocal(iv%time-1,airep) + 1, iv%plocal(iv%time,airep)
       k = iv % airep(n) % info % levels
       if (k < 1) cycle
       ! [1.2] Interpolate horizontally:
@@ -21,6 +23,8 @@ subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
       call da_interp_lin_3d_adj(jo_grad_x%v, iv%airep(n)%loc, jo_grad_y%airep(n)%v, k, iv%airep(n)%zk, k)
       call da_interp_lin_3d_adj(jo_grad_x%t, iv%airep(n)%loc, jo_grad_y%airep(n)%t, k, iv%airep(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airep_adj")
 
 end subroutine da_transform_xtoy_airep_adj
 

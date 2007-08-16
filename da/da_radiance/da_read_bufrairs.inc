@@ -1,18 +1,18 @@
 subroutine da_read_bufrairs(obstype,iv,xp,infile)
-!--------------------------------------------------------
-!  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
-!            to innovation structure
-!
-!   METHOD: use F90 sequantial data structure to avoid read file twice
-!            so that da_scan_bufrairs is not necessary any more.
-!            1. read file radiance data in sequential data structure
-!            2. do gross QC check
-!            3. assign sequential data structure to innovation structure
-!                  and deallocate sequential data structure
-!
-!  HISTORY: 2006/01/03 - Creation            Zhiquan Liu
-!
-!------------------------------------------------------------------------------
+   !--------------------------------------------------------
+   !  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
+   !            to innovation structure
+   !
+   !   METHOD: use F90 sequantial data structure to avoid read file twice
+   !            so that da_scan_bufrairs is not necessary any more.
+   !            1. read file radiance data in sequential data structure
+   !            2. do gross QC check
+   !            3. assign sequential data structure to innovation structure
+   !                  and deallocate sequential data structure
+   !
+   !  HISTORY: 2006/01/03 - Creation            Zhiquan Liu
+   !
+   !------------------------------------------------------------------------------
 
   implicit none
 
@@ -132,6 +132,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   type(info_type)            :: info
   type(model_loc_type)       :: loc
   type (datalink_type), pointer   :: head, p, current
+
+   if (trace_use_dull) call da_trace_entry("da_read_bufrairs")
 
 !  0.0  Initialize variables
 !-----------------------------------
@@ -422,7 +424,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
   end do loop_obspoints
 
-   iv%total_obs = iv%total_obs + size
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchan
 
@@ -598,6 +599,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       close(airs_table_unit)
       call da_free_unit(airs_table_unit)
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_read_bufrairs")
 
 #endif
 

@@ -6,14 +6,13 @@ subroutine da_transform_vtovv(grid, cv_size, be, cv, vv)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),  intent(inout) :: grid
+   integer,       intent(in)    :: cv_size ! Size of cv array.
+   type(be_type), intent(in)    :: be   ! Background error structure.
+   real,          intent(in)    :: cv(1:cv_size)   ! control variables.
+   type(vp_type), intent(inout) :: vv   ! Grid point/EOF equivalent.
 
-   integer, intent(in)              :: cv_size ! Size of cv array.
-   type (be_type), intent(in)       :: be   ! Background error structure.
-   real, intent(in)                 :: cv(1:cv_size)   ! control variables.
-   type (vp_type), intent(inout)    :: vv   ! Grid point/EOF equivalent.
-
-   integer                          :: mz   ! Vertical truncation.
+   integer :: mz   ! Vertical truncation.
 
    if (trace_use) call da_trace_entry("da_transform_vtovv")
 
@@ -77,7 +76,6 @@ subroutine da_transform_vtovv(grid, cv_size, be, cv, vv)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vtovv")
-
 
 end subroutine da_transform_vtovv
 

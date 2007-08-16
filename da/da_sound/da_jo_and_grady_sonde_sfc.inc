@@ -17,6 +17,8 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    type(y_type)  :: re_glob         ! Global Residual vector(O-A).
    type(y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_sonde_sfc")
+
    jo % sonde_sfc_u = 0.0
    jo % sonde_sfc_v = 0.0
    jo % sonde_sfc_t = 0.0
@@ -24,22 +26,17 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    jo % sonde_sfc_q = 0.0
 
    if (test_dm_exact) then
-      if (iv%num_sound_glo == 0) return
+      if (iv%ntotal(sound) == 0) return
    else
-      if (iv%num_sound < 1) return
+      if (iv%nlocal(sound) < 1) return
    end if
 
-   do n=1, iv%num_sound
-      jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / &
-        ( iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
-      jo_grad_y%sonde_sfc(n)%v = -re%sonde_sfc(n)%v / &
-        ( iv%sonde_sfc(n)%v%error * iv%sonde_sfc(n)%v%error)
-      jo_grad_y%sonde_sfc(n)%t = -re%sonde_sfc(n)%t / &
-        ( iv%sonde_sfc(n)%t%error * iv%sonde_sfc(n)%t%error)
-      jo_grad_y%sonde_sfc(n)%p = -re%sonde_sfc(n)%p / &
-        ( iv%sonde_sfc(n)%p%error * iv%sonde_sfc(n)%p%error)
-      jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / &
-        ( iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
+   do n=1, iv%nlocal(sound)
+      jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / (iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
+      jo_grad_y%sonde_sfc(n)%v = -re%sonde_sfc(n)%v / (iv%sonde_sfc(n)%v%error * iv%sonde_sfc(n)%v%error)
+      jo_grad_y%sonde_sfc(n)%t = -re%sonde_sfc(n)%t / (iv%sonde_sfc(n)%t%error * iv%sonde_sfc(n)%t%error)
+      jo_grad_y%sonde_sfc(n)%p = -re%sonde_sfc(n)%p / (iv%sonde_sfc(n)%p%error * iv%sonde_sfc(n)%p%error)
+      jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / (iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
    end do
 
    ! Bitwise-exact reduction preserves operation order of serial code for
@@ -47,8 +44,7 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    ! testing.  This will always be .false. for a serial run.
    if (test_dm_exact) then
       ! collect all obs in serial order and allocate global objects
-      call da_to_global_sonde_sfc( iv,      re,      jo_grad_y, &
-                           iv_glob, re_glob, jo_grad_y_glob)
+      call da_to_global_sonde_sfc( iv, re, jo_grad_y, iv_glob, re_glob, jo_grad_y_glob)
       ! perform remaining computations
       call da_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
       ! free global objects
@@ -64,7 +60,7 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    jo % sonde_sfc_p = 0.5 * jo % sonde_sfc_p
    jo % sonde_sfc_q = 0.5 * jo % sonde_sfc_q
 
-   return
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_sonde_sfc")
 
 end subroutine da_jo_and_grady_sonde_sfc
 

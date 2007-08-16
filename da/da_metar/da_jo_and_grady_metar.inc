@@ -13,7 +13,7 @@ subroutine da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
 
    integer                      :: n
 
-   if (trace_use) call da_trace_entry("da_jo_and_grady_metar")
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_metar")
 
 
    jo % metar_u = 0.0
@@ -22,8 +22,8 @@ subroutine da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
    jo % metar_p = 0.0
    jo % metar_q = 0.0
 
-   if (iv%num_metar > 0) then
-      do n=1, iv%num_metar
+   if (iv%nlocal(metar) > 0) then
+      do n=1, iv%nlocal(metar)
          jo_grad_y%metar(n)%u = -re%metar(n)%u / &
                               (iv%metar(n)%u%error * iv%metar(n)%u%error)
          jo_grad_y%metar(n)%v = -re%metar(n)%v / &
@@ -51,7 +51,7 @@ subroutine da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
       jo % metar_q = 0.5 * jo % metar_q
    end if
 
-   if (trace_use) call da_trace_exit("da_jo_and_grady_metar")
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_metar")
 
 end subroutine da_jo_and_grady_metar
 

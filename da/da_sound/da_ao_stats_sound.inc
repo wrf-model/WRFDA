@@ -1,4 +1,4 @@
-subroutine da_ao_stats_sound (stats_unit, oi, re)
+subroutine da_ao_stats_sound (stats_unit, iv, re)
 
    !-------------------------------------------------------------
    ! Purpose: TBD   
@@ -6,55 +6,55 @@ subroutine da_ao_stats_sound (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (inout) :: iv            ! iv
+   type (y_type),  intent (in)    :: re            ! A - O
 
-   type (stats_sound_type)          :: Sound
-   integer                          :: nu, nv, nt, nq
-   integer                          :: n, k
+   type (stats_sound_type) :: stats
+   integer                 :: nu, nv, nt, nq
+   integer                 :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_sound")
 
    nu = 0
    nv = 0
    nt = 0
    nq = 0
 
-   Sound%maximum%u = maxmin_type (missing_r, 0, 0)
-   Sound%maximum%v = maxmin_type (missing_r, 0, 0)
-   Sound%maximum%t = maxmin_type (missing_r, 0, 0)
-   Sound%maximum%q = maxmin_type (missing_r, 0, 0)
-   Sound%minimum%u = maxmin_type(-missing_r, 0, 0)
-   Sound%minimum%v = maxmin_type(-missing_r, 0, 0)
-   Sound%minimum%t = maxmin_type(-missing_r, 0, 0)
-   Sound%minimum%q = maxmin_type(-missing_r, 0, 0)
-   Sound%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
-   Sound%rms_err = Sound%average
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%t = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_Sound > 0) then
-      do n=1, oi%num_Sound
-         if (oi%sound(n)%loc%proc_domain) then
-            do k=1, oi%sound(n)%info%levels
+   stats%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-               call da_stats_calculate (n, k, oi%Sound(n)%u(k)%qc, & 
-                               re%sound(n)%u(k), nu, &
-                               sound%minimum%u, Sound%maximum%u, &
-                               sound%average%u, Sound%rms_err%u)
-               call da_stats_calculate (n, k, oi%Sound(n)%v(k)%qc, & 
-                               re%sound(n)%v(k), nv, &
-                               sound%minimum%v, Sound%maximum%v, &
-                               sound%average%v, Sound%rms_err%v)
-               call da_stats_calculate (n, k, oi%Sound(n)%t(k)%qc, & 
-                               re%sound(n)%t(k), nt, &
-                               sound%minimum%t, Sound%maximum%t, &
-                               sound%average%t, Sound%rms_err%t)
-               call da_stats_calculate (n, k, oi%Sound(n)%q(k)%qc, & 
-                               re%Sound(n)%q(k), nq, &
-                               Sound%minimum%q, Sound%maximum%q, &
-                               Sound%average%q, Sound%rms_err%q)
-            end do
-         end if    ! end if (oi%sound(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, iv%nlocal(sound)
+      if (iv%sound(n)%loc%proc_domain) then
+         do k=1, iv%sound(n)%info%levels
+            call da_stats_calculate (n, k, iv%sound(n)%u(k)%qc, & 
+               re%sound(n)%u(k), nu, &
+               stats%minimum%u, stats%maximum%u, &
+               stats%average%u, stats%rms_err%u)
+            call da_stats_calculate (n, k, iv%sound(n)%v(k)%qc, & 
+               re%sound(n)%v(k), nv, &
+               stats%minimum%v, stats%maximum%v, &
+               stats%average%v, stats%rms_err%v)
+            call da_stats_calculate (n, k, iv%sound(n)%t(k)%qc, & 
+               re%sound(n)%t(k), nt, &
+               stats%minimum%t, stats%maximum%t, &
+               stats%average%t, stats%rms_err%t)
+            call da_stats_calculate (n, k, iv%sound(n)%q(k)%qc, & 
+               re%sound(n)%q(k), nq, &
+               stats%minimum%q, stats%maximum%q, &
+               stats%average%q, stats%rms_err%q)
+         end do
+      end if
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (nu)
@@ -62,31 +62,33 @@ subroutine da_ao_stats_sound (stats_unit, oi, re)
    call da_proc_sum_int (nt)
    call da_proc_sum_int (nq)
 
-    num_sound_tot = nu + nv + nt + nq
+   iv%nstats(sound) = nu + nv + nt + nq
 
-   call da_proc_stats_combine(Sound%average%u, Sound%rms_err%u, &
-                           Sound%minimum%u%value, Sound%maximum%u%value, &
-                           Sound%minimum%u%n, Sound%maximum%u%n, &
-                           Sound%minimum%u%l, Sound%maximum%u%l)
-   call da_proc_stats_combine(Sound%average%v, Sound%rms_err%v, &
-                           Sound%minimum%v%value, Sound%maximum%v%value, &
-                           Sound%minimum%v%n, Sound%maximum%v%n, &
-                           Sound%minimum%v%l, Sound%maximum%v%l)
-   call da_proc_stats_combine(Sound%average%t, Sound%rms_err%t, &
-                           Sound%minimum%t%value, Sound%maximum%t%value, &
-                           Sound%minimum%t%n, Sound%maximum%t%n, &
-                           Sound%minimum%t%l, Sound%maximum%t%l)
-   call da_proc_stats_combine(Sound%average%q, Sound%rms_err%q, &
-                           Sound%minimum%q%value, Sound%maximum%q%value, &
-                           Sound%minimum%q%n, Sound%maximum%q%n, &
-                           Sound%minimum%q%l, Sound%maximum%q%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for sound'
-         call da_print_stats_sound(stats_unit, nu, nv, nt, nq, Sound)
+         call da_print_stats_sound(stats_unit, nu, nv, nt, nq, stats)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_sound")
 
 end subroutine da_ao_stats_sound
 

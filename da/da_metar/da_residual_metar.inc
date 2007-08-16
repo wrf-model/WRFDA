@@ -18,7 +18,7 @@ subroutine da_residual_metar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   if (trace_use) call da_trace_entry("da_residual_metar")
+   if (trace_use_dull) call da_trace_entry("da_residual_metar")
 
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
@@ -26,7 +26,7 @@ subroutine da_residual_metar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_metar
+   do n=1, iv%nlocal(metar)
       np_available = np_available + 5
       re%metar(n)%u = da_residual(n, 0, y%metar(n)%u, iv%metar(n)%u, n_obs_bad % u)
       re%metar(n)%v = da_residual(n, 0, y%metar(n)%v, iv%metar(n)%v, n_obs_bad % v)
@@ -45,7 +45,7 @@ subroutine da_residual_metar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
       n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
       n_obs_bad % p % num % use + n_obs_bad % q % num % use
 
-   if (trace_use) call da_trace_exit("da_residual_metar")
+   if (trace_use_dull) call da_trace_exit("da_residual_metar")
 
 end subroutine da_residual_metar
 

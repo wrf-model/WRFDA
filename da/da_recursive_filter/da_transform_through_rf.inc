@@ -13,19 +13,17 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
-
-   type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
-   integer, intent(in) :: mz                ! Vertical truncation.
-
-   real, intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 
-   real, intent(in)    :: val(jds:jde,mz)   ! Error standard deviation.
-   real, intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
+   type(domain),     intent(inout) :: grid
+   type(xpose_type), intent(inout) :: xp                ! Dimensions and xpose buffers.
+   integer,          intent(in)    :: mz                ! Vertical truncation.
+   real,             intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 
+   real,             intent(in)    :: val(jds:jde,mz)   ! Error standard deviation.
+   real,             intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
       
-   integer             :: rf_passes_over_two ! rf_passes / 2
-   integer             :: i, j, m, n, pass   ! Loop counters.
-   real                :: p_x(ims:ime,jms:jme)! sqrt(Grid box area).
-   real                :: val_j(xp%jtsy:xp%jtey)
+   integer :: rf_passes_over_two ! rf_passes / 2
+   integer :: i, j, m, n, pass   ! Loop counters.
+   real    :: p_x(ims:ime,jms:jme)! sqrt(Grid box area).
+   real    :: val_j(xp%jtsy:xp%jtey)
 
    !----------------------------------------------------------------------
    ! [1.0]: Initialise:
@@ -43,8 +41,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
    ! [1.2] Transform to nondimensional v_hat space:
 
    do m = 1, mz
-      xp % v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) / &
-                                    p_x(its:ite,jts:jte)
+      xp % v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) / p_x(its:ite,jts:jte)
    end do
 
    !-------------------------------------------------------------------------
@@ -62,8 +59,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
    do m = xp%ktsx, min(xp%ktex,mz)
       do j = xp%jtsx, xp%jtex
          do pass = 1, rf_passes_over_two
-            call da_recursive_filter_1d(pass, rf_alpha(m), &
-                        xp % v1x(xp%itsx:xp%itex,j,m), n)
+            call da_recursive_filter_1d(pass, rf_alpha(m), xp % v1x(xp%itsx:xp%itex,j,m), n)
          end do
       end do
    end do
@@ -84,8 +80,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
       do i = xp%itsy, xp%itey
          val_j(xp%jtsy:xp%jtey) = xp%v1y(i,xp%jtsy:xp%jtey,m)
          do pass = 1, rf_passes_over_two
-            call da_recursive_filter_1d(pass, rf_alpha(m), &
-                                         val_j, n)
+            call da_recursive_filter_1d(pass, rf_alpha(m), val_j, n)
          end do
          xp % v1y(i,xp%jtsy:xp%jtey,m) = val_j(xp%jtsy:xp%jtey)
       end do
@@ -103,8 +98,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
    ! [4.2] Transform filtered field to dimensional space:
 
    do m = 1, mz
-      field(its:ite,jts:jte,m) = xp % v1z(its:ite,jts:jte,m) *  &
-                                 p_x(its:ite,jts:jte)
+      field(its:ite,jts:jte,m) = xp % v1z(its:ite,jts:jte,m) * p_x(its:ite,jts:jte)
    end do
 
    ! [4.3] Optionally scale by background error:
@@ -115,9 +109,9 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
 
    if (vert_corr == vert_corr_1) then
       do m = 1, mz
-      do i = its, ite
-         field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
-      end do
+         do i = its, ite
+            field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
+         end do
       end do
    end if
 

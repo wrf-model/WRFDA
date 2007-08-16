@@ -6,9 +6,11 @@ subroutine da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, ships)
 
    implicit none
 
-   integer,           intent(in)    :: stats_unit
-   integer,           intent(inout) :: nu, nv, nt, np, nq
-   type (stats_ships_type), intent(in):: ships
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv, nt, np, nq
+   type (stats_ships_type), intent(in)    :: ships
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_ships")
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &
@@ -41,6 +43,8 @@ subroutine da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, ships)
                          sqrt(ships%rms_err%t/real(nt)), &
                          sqrt(ships%rms_err%p/real(np)), &
                          sqrt(ships%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_ships")
 
 end subroutine da_print_stats_ships
 

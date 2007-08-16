@@ -13,11 +13,11 @@ module da_radiance1
    use module_radiance, only : rttov_inst_name
 #endif
 
-   use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
+   use da_control, only : trace_use,missing_r, rootproc, &
       stdout,myproc,qc_good,num_fgat_time,qc_bad, &
       use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
-      print_detail_rad, rtm_option, &
-      rtm_option_rttov,rtm_option_crtm, &
+      print_detail_rad, rtm_option, trace_use_dull, &
+      rtm_option_rttov,rtm_option_crtm, radiance, &
       global, gas_constant, gravity
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       ob_type, y_type, jo_type,bad_data_type,bad_data_type,number_type

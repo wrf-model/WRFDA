@@ -6,52 +6,44 @@ subroutine da_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)   :: iv          ! Innovation vector.
-   type (y_type), intent(in)    :: re          ! Residual vector.
-   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), intent(inout):: jo          ! Obs cost function.
+   type (ob_type), intent(in)    :: iv          ! Innovation vector.
+   type (y_type),  intent(in)    :: re          ! Residual vector.
+   type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout) :: jo          ! Obs cost function.
 
-   integer                      :: n, k
+   integer :: n, k
 
-   jo%Bogus_u   = 0.0
-   jo%Bogus_v   = 0.0
-   jo%Bogus_t   = 0.0
-   jo%Bogus_q   = 0.0
-   jo%Bogus_slp = 0.0
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_bogus") 
 
-   if (iv%num_Bogus > 0) then
-      do n=1, iv%num_Bogus
-         jo_grad_y%Bogus(n)%slp = -re%Bogus(n)%slp /  &
-                                  (iv%Bogus(n)%slp%error * &
-                                    iv%Bogus(n)%slp%error)
+   jo%bogus_u   = 0.0
+   jo%bogus_v   = 0.0
+   jo%bogus_t   = 0.0
+   jo%bogus_q   = 0.0
+   jo%bogus_slp = 0.0
+
+   if (iv%nlocal(bogus) > 0) then
+      do n=1, iv%nlocal(bogus)
+         jo_grad_y%bogus(n)%slp = -re%bogus(n)%slp &
+            / (iv%bogus(n)%slp%error * iv%bogus(n)%slp%error)
          do k=1, iv%bogus(n)%info%levels
-            jo_grad_y%Bogus(n)%u(k) = -re%Bogus(n)%u(k) / &
-                                       (iv%Bogus(n)%u(k)%error * &
-                                         iv%Bogus(n)%u(k)%error)
-            jo_grad_y%Bogus(n)%v(k) = -re%Bogus(n)%v(k) / &
-                                       (iv%Bogus(n)%v(k)%error * &
-                                         iv%Bogus(n)%v(k)%error)
-            jo_grad_y%Bogus(n)%t(k) = -re%Bogus(n)%t(k) / &
-                                       (iv%Bogus(n)%t(k)%error * &
-                                         iv%Bogus(n)%t(k)%error)
-            jo_grad_y%Bogus(n)%q(k) = -re%Bogus(n)%q(k) / &
-                                       (iv%Bogus(n)%q(k)%error * &
-                                         iv%Bogus(n)%q(k)%error)
+            jo_grad_y%bogus(n)%u(k) = -re%bogus(n)%u(k) &
+               / (iv%bogus(n)%u(k)%error *iv%bogus(n)%u(k)%error)
+            jo_grad_y%bogus(n)%v(k) = -re%bogus(n)%v(k) &
+               /(iv%bogus(n)%v(k)%error * iv%bogus(n)%v(k)%error)
+            jo_grad_y%bogus(n)%t(k) = -re%bogus(n)%t(k) &
+               / (iv%bogus(n)%t(k)%error * iv%bogus(n)%t(k)%error)
+            jo_grad_y%bogus(n)%q(k) = -re%bogus(n)%q(k) &
+               / (iv%bogus(n)%q(k)%error * iv%bogus(n)%q(k)%error)
          end do
 
          if (iv%bogus(n)%loc%proc_domain) then
-            jo%Bogus_slp = jo%Bogus_slp -   &
-                           re%Bogus(n)%slp * jo_grad_y%Bogus(n)%slp
+            jo%bogus_slp = jo%bogus_slp - re%bogus(n)%slp * jo_grad_y%bogus(n)%slp
 
             do k=1, iv%bogus(n)%info%levels
-               jo%Bogus_u = jo%Bogus_u - &
-                             re%Bogus(n)%u(k) * jo_grad_y%Bogus(n)%u(k)
-               jo%Bogus_v = jo%Bogus_v - &
-                             re%Bogus(n)%v(k) * jo_grad_y%Bogus(n)%v(k)
-               jo%Bogus_t = jo%Bogus_t - &
-                             re%Bogus(n)%t(k) * jo_grad_y%Bogus(n)%t(k)
-               jo%Bogus_q = jo%Bogus_q - &
-                             re%Bogus(n)%q(k) * jo_grad_y%Bogus(n)%q(k)
+               jo%bogus_u = jo%bogus_u - re%bogus(n)%u(k) * jo_grad_y%bogus(n)%u(k)
+               jo%bogus_v = jo%bogus_v - re%bogus(n)%v(k) * jo_grad_y%bogus(n)%v(k)
+               jo%bogus_t = jo%bogus_t - re%bogus(n)%t(k) * jo_grad_y%bogus(n)%t(k)
+               jo%bogus_q = jo%bogus_q - re%bogus(n)%q(k) * jo_grad_y%bogus(n)%q(k)
             end do
          end if 
       end do
@@ -62,6 +54,8 @@ subroutine da_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
       jo % bogus_t = 0.5 * jo % bogus_t
       jo % bogus_q = 0.5 * jo % bogus_q
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_bogus") 
 
 end subroutine da_jo_and_grady_bogus
 

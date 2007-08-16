@@ -10,27 +10,29 @@ subroutine da_transform_xtoy_satem_adj(grid, iv, jo_grad_y, jo_grad_x)
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
-   type (domain),  intent(in)    :: grid
 
-   integer                       :: n        ! Loop counter.
-   integer                       :: num_levs ! obs vertical levels
+   integer :: n        ! Loop counter.
+   integer :: num_levs ! obs vertical levels
 
-   integer                        :: k
-   real, dimension(kts-1:kte+1)       :: pre_ma,tv_ma
-   integer                        :: layer1,layer2
-   real                           :: tv1,tv2,pres2
+   integer :: k
+   real    :: pre_ma(kts-1:kte+1)
+   real    :: tv_ma(kts-1:kte+1)
+   integer :: layer1,layer2
+   real    :: tv1,tv2,pres2
 
-   real, dimension(kts-1:kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
-   real                           :: ADJ_tv1,ADJ_tv2
+   real    :: ADJ_pre_ma(kts-1:kte+1)
+   real    :: ADJ_tv_ma(kts-1:kte+1)
+   real    :: ADJ_tv1,ADJ_tv2
+
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_satem_adj")
 
    ADJ_pre_ma(:) = 0.0
    ADJ_tv_ma(:)  = 0.0
    ADJ_tv1 = 0.0
    ADJ_tv2 = 0.0
 
-   if (iv%num_satem > 0) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
-         iv%ob_numb(iv%current_ob_time)%satem
+   if (iv%nlocal(satem) > 0) then
+      do n=iv%plocal(iv%time-1,satem) + 1, iv%plocal(iv%time,satem)
          num_levs = iv % satem(n) % info % levels
 
          ! [2.0] Virtual temperature at obs pt.
@@ -73,6 +75,8 @@ subroutine da_transform_xtoy_satem_adj(grid, iv, jo_grad_y, jo_grad_x)
             pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
       end do
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_satem_adj")
 
 end subroutine da_transform_xtoy_satem_adj
 

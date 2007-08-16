@@ -24,6 +24,8 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
    real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
    real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m
 
+   if (trace_use) call da_trace_entry("da_uv_to_divergence_adj")
+
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
@@ -155,6 +157,8 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
    end do
 
    div = 0.0
+
+   if (trace_use) call da_trace_exit("da_uv_to_divergence_adj")
 
 end subroutine da_uv_to_divergence_adj
 

@@ -6,10 +6,12 @@ subroutine da_obs_missing (obs, miss)
 
    implicit none
 
-   type(multi_level_type),    intent(inout) :: obs
-   logical,                   intent(out)   :: miss
+   type(multi_level_type), intent(inout) :: obs
+   logical,                intent(out)   :: miss
 
-   integer            :: i
+   integer :: i
+
+   if (trace_use_frequent) call da_trace_entry("da_obs_missing")
 
    miss = .true.
 
@@ -94,6 +96,8 @@ subroutine da_obs_missing (obs, miss)
             obs % each(i) % speed % qc = missing_data
       end if
    end do 
+
+   if (trace_use_frequent) call da_trace_exit("da_obs_missing")
  
 end subroutine da_obs_missing
 

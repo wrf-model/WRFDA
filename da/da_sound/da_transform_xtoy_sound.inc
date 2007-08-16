@@ -13,7 +13,9 @@ subroutine da_transform_xtoy_sound (grid, iv, y)
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_sound")
+
+   do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
       k = iv % sound(n) % info % levels
 
       if (k < 1) cycle
@@ -23,6 +25,8 @@ subroutine da_transform_xtoy_sound (grid, iv, y)
       call da_interp_lin_3d(grid%xa % t, iv%sound(n)%loc, y%sound(n)%t, k, iv%sound(n)%zk, k)
       call da_interp_lin_3d(grid%xa % q, iv%sound(n)%loc, y%sound(n)%q, k, iv%sound(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_sound")
 
 end subroutine da_transform_xtoy_sound
 

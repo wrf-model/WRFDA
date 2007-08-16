@@ -13,92 +13,92 @@ subroutine da_setup_obs_interp_wts (xp, iv)
 
    if (trace_use) call da_trace_entry("da_setup_obs_interp_wts")
 
-   do n=1, iv % num_sound
+   do n=1, iv % nlocal(sound)
       call da_store_obs_grid_info (xp, iv%sound(n)%loc)
       call da_store_obs_grid_info (xp, iv%sonde_sfc(n)%loc)
    end do
 
-   do n=1, iv % num_synop
+   do n=1, iv % nlocal(synop)
       call da_store_obs_grid_info (xp, iv%synop(n)%loc)
    end do
 
-   do n=1, iv % num_geoamv
+   do n=1, iv % nlocal(geoamv)
       call da_store_obs_grid_info (xp, iv%geoamv(n)%loc)
    end do
 
-   do n=1, iv % num_polaramv
+   do n=1, iv % nlocal(polaramv)
       call da_store_obs_grid_info (xp, iv%polaramv(n)%loc)
    end do
 
-   do n=1, iv % num_airep
+   do n=1, iv % nlocal(airep)
       call da_store_obs_grid_info (xp, iv%airep(n)%loc)
    end do
 
-   do n=1, iv % num_metar
+   do n=1, iv % nlocal(metar)
       call da_store_obs_grid_info (xp, iv%metar(n)%loc)
    end do
 
-   do n=1, iv % num_ships
+   do n=1, iv % nlocal(ships)
       call da_store_obs_grid_info (xp, iv%ships(n)%loc)
    end do
 
-   do n=1, iv % num_gpspw
+   do n=1, iv % nlocal(gpspw)
       call da_store_obs_grid_info (xp, iv%gpspw(n)%loc)
    end do
 
-   do n=1, iv % num_gpsref
+   do n=1, iv % nlocal(gpsref)
       call da_store_obs_grid_info (xp, iv%gpsref(n)%loc)
    end do
 
-   do n=1, iv % num_ssmi_tb
+   do n=1, iv % nlocal(ssmi_tb)
       call da_store_obs_grid_info (xp, iv%ssmi_tb(n)%loc)
    end do
 
-   do n=1, iv % num_ssmi_retrieval
-      call da_store_obs_grid_info (xp, iv%ssmi_retrieval(n)%loc)
+   do n=1, iv % nlocal(ssmi_rv)
+      call da_store_obs_grid_info (xp, iv%ssmi_rv(n)%loc)
    end do
 
-   do n=1, iv % num_pilot
+   do n=1, iv % nlocal(pilot)
       call da_store_obs_grid_info (xp, iv%pilot(n)%loc)
    end do
 
-   do n=1, iv % num_radar
+   do n=1, iv % nlocal(radar)
       call da_store_obs_grid_info (xp, iv%radar(n)%loc)
    end do
 
-   do n=1, iv % num_pseudo
+   do n=1, iv % nlocal(pseudo)
       call da_store_obs_grid_info (xp, iv%pseudo(n)%loc)
    end do
 
-   do n=1, iv % num_satem
+   do n=1, iv % nlocal(satem)
       call da_store_obs_grid_info (xp, iv%satem(n)%loc)
    end do
 
-   do n=1, iv % num_ssmt1
+   do n=1, iv % nlocal(ssmt1)
       call da_store_obs_grid_info (xp, iv%ssmt1(n)%loc)
    end do
 
-   do n=1, iv % num_ssmt2
+   do n=1, iv % nlocal(ssmt2)
       call da_store_obs_grid_info (xp, iv%ssmt2(n)%loc)
    end do
    
-   do n=1, iv % num_qscat
+   do n=1, iv % nlocal(qscat)
       call da_store_obs_grid_info (xp, iv%qscat(n)%loc)
    end do
 
-   do n=1, iv % num_profiler
+   do n=1, iv % nlocal(profiler)
       call da_store_obs_grid_info (xp, iv%profiler(n)%loc)
    end do
 
-   do n=1, iv % num_buoy
+   do n=1, iv % nlocal(buoy)
       call da_store_obs_grid_info (xp, iv%buoy(n)%loc)
    end do
 
-   do n=1, iv % num_bogus
+   do n=1, iv % nlocal(bogus)
       call da_store_obs_grid_info (xp, iv%bogus(n)%loc)
    end do
 
-   do n=1, iv % num_airsr
+   do n=1, iv % nlocal(airsr)
       call da_store_obs_grid_info (xp, iv%airsr(n)%loc)
    end do
 

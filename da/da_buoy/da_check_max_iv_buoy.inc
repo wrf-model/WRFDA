@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_buoy(it, buoy, &
-   itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_buoy(it, buoy, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -12,7 +11,9 @@ subroutine da_check_max_iv_buoy(it, buoy, &
    integer,           intent(inout)      :: itu,ituf,itvv,itvvf,itp,itpf,itt
    integer,           intent(inout)      :: ittf,itqv,itqvf
 
-   logical                               :: failed        
+   logical :: failed 
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_buoy")       
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -62,6 +63,8 @@ subroutine da_check_max_iv_buoy(it, buoy, &
    call da_max_error_qc (it, buoy % info, buoy % q, &
       max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
       failed, check_max_iv_print)
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_buoy")       
 
 end subroutine da_check_max_iv_buoy
 

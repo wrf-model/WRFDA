@@ -24,10 +24,10 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    implicit none
 
    ! task-local objects  (really intent(in   ))
-   type (y_facade_type), intent(inout) :: re_slice      ! residual vector
-   type (residual_template_type), intent(in) :: template  ! allocation info
+   type (y_facade_type),          intent(inout) :: re_slice      ! residual vector
+   type (residual_template_type), intent(in)    :: template  ! allocation info
    ! task-global objects (really intent(  out))
-   type (y_facade_type), intent(inout) :: re_glob_slice ! residual vector
+   type (y_facade_type),          intent(inout) :: re_glob_slice ! residual vector
 
    ! Local declarations
 #ifdef DM_PARALLEL
@@ -52,31 +52,35 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    real,allocatable             :: re_vals_all(:)
    integer                      :: i
 
-   ! TOdo:  later, upgrade from "allgather" to "gather-broadcast"
+   if (trace_use) call da_trace_entry("da_y_facade_to_global")
+
+   ! todo:  later, upgrade from "allgather" to "gather-broadcast"
 
    ! collect information about all observations
    num_obs_send = 0
    obs_global_index = -1
    do n=1, re_slice%num_obs
-      if ( re_slice%obs(n)%proc_domain ) then
+      if (re_slice%obs(n)%proc_domain) then
          num_obs_send = num_obs_send + 1
          obs_global_index(num_obs_send) = re_slice%obs(n)%obs_global_index
       end if
    end do
    do n=1, num_obs_send
-      if ( obs_global_index(n) < 0 ) then
+      if (obs_global_index(n) < 0) then
          call da_error(__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  bad local value of obs_global_index'/))
       end if
    end do
+
    ! exchange num_obs_send and obs_global_index
-   allocate( num_obs_send_all(0:num_procs-1),     &
-              num_send_buf_all(0:num_procs-1),     &
-              recv_counts(0:num_procs-1),          &
-              recv_displs(0:num_procs-1) )
+   allocate (num_obs_send_all(0:num_procs-1))
+   allocate (num_send_buf_all(0:num_procs-1))
+   allocate (recv_counts(0:num_procs-1))
+   allocate (recv_displs(0:num_procs-1))
+
    ! gather num_obs_send
    call mpi_allgather( num_obs_send, 1, mpi_integer, num_obs_send_all, 1, &
-                        mpi_integer, comm, ierr )
+      mpi_integer, comm, ierr )
    num_obs_all = sum( num_obs_send_all )
    if ( num_obs_all /= re_slice%num_obs_glo ) then
       call da_error (__FILE__,__LINE__, &
@@ -88,14 +92,16 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    do proc=1, num_procs-1
       recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
    end do
-   allocate( num_values_all(num_obs_all),       &
-              obs_global_index_all(num_obs_all), &
-              obs_global_index_inv(num_obs_all), &
-              obs_start_all(num_obs_all) )
+   allocate (num_values_all(num_obs_all))
+   allocate (obs_global_index_all(num_obs_all))
+   allocate (obs_global_index_inv(num_obs_all))
+   allocate (obs_start_all(num_obs_all))
+
    ! gather obs_global_index
    call mpi_allgatherv( obs_global_index, num_obs_send, mpi_integer,    &
-                         obs_global_index_all, recv_counts, recv_displs, &
-                         mpi_integer, comm, ierr )
+      obs_global_index_all, recv_counts, recv_displs, &
+      mpi_integer, comm, ierr )
+
    ! invert obs_global_index_all
    ! initialize to "invalid" value
    obs_global_index_inv = -1
@@ -120,8 +126,7 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
 
    ! Create re_glob_slice and populate with residual_generic_type objects 
    ! allocated to match template.  
-   call da_y_facade_create( re_glob_slice, num_obs_all, num_obs_all, &
-                          template=template )
+   call da_y_facade_create( re_glob_slice, num_obs_all, num_obs_all, template=template )
 
    ! NOTE:  This i loop should be inside the n loops.  
    ! Ideally, residual_generic class should know how to pack/unpack 
@@ -217,21 +222,20 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
          ! note that we only collected obs someone owns
          re_glob_slice%obs(n)%proc_domain = .true.
          re_glob_slice%obs(n)%obs_global_index = obs_global_index_all(serial_n)
-         call da_res_generic_alloc_and_set( re_glob_slice%obs(n), i, &
-            re_vals_all(buf_idx:(buf_idx+serial_numvals-1)) )
+         call da_res_generic_alloc_and_set (re_glob_slice%obs(n), i, &
+            re_vals_all(buf_idx:(buf_idx+serial_numvals-1)))
       end do
       ! deallocate communication buffers, etc.
-      deallocate( re_vals_all )
-      deallocate( re_vals_lcl ) 
-
+      deallocate (re_vals_all)
+      deallocate (re_vals_lcl) 
    end do  ! end of i loop
 
-   call da_y_facade_free( re_slice )
+   call da_y_facade_free (re_slice)
 
-   deallocate( num_values_all, obs_global_index_all, &
-                obs_global_index_inv, obs_start_all )
-   deallocate( num_obs_send_all, num_send_buf_all, &
-                recv_counts, recv_displs )
+   deallocate (num_values_all, obs_global_index_all, obs_global_index_inv, obs_start_all)
+   deallocate (num_obs_send_all, num_send_buf_all, recv_counts, recv_displs)
+
+   if (trace_use) call da_trace_exit("da_y_facade_to_global")
 
 #else
    call da_error (__FILE__,__LINE__, &

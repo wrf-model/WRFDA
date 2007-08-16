@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_airep(it, airep , &
-                  itu,ituf,itvv,itvvf,itt,ittf)
+subroutine da_check_max_iv_airep(it, airep, itu,ituf,itvv,itvvf,itt,ittf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,17 +6,18 @@ subroutine da_check_max_iv_airep(it, airep , &
 
    implicit none
 
-   integer,           intent (in)         :: it      ! Outer iteration
+   integer,           intent(in)    :: it      ! Outer iteration
+   type (airep_type), intent(inout) :: airep
+   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itt,ittf
 
-   type (airep_type), intent(inout)       :: airep
-   integer, intent(inout) :: itu,ituf,itvv,itvvf,itt,ittf
    integer                                :: k
    logical                                :: failed
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_airep")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
-
 
    if (rootproc .and. check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
@@ -39,20 +39,18 @@ subroutine da_check_max_iv_airep(it, airep , &
    do k = 1, airep % info % levels
       if (airep % zk(k) > 0.0) then
          ! U-wind
-         call da_max_error_qc(it, airep % info, airep % u(k), &
-                    max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-                                  failed, check_max_iv_print)
+         call da_max_error_qc(it, airep % info, airep % u(k), max_error_uv, itu, ituf, &
+            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
          ! V-wind
-         call da_max_error_qc (it, airep % info, airep % v(k),&
-                    max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-                                   failed, check_max_iv_print)                           
-
+         call da_max_error_qc (it, airep % info, airep % v(k), max_error_uv, itvv, itvvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
          ! Temperature
-         call da_max_error_qc (it, airep % info, airep % t(k),&
-                    max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
-                                   failed, check_max_iv_print)
+         call da_max_error_qc (it, airep % info, airep % t(k),max_error_t, itt, ittf, &
+            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
       end if
    end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_airep")
 
 end subroutine da_check_max_iv_airep
 

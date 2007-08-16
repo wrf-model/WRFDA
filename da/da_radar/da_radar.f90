@@ -7,7 +7,7 @@ module da_radar
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
-      max_error_bt, max_error_buv, num_radar_tot,fails_error_max, &
+      max_error_bt, max_error_buv, radar,fails_error_max, &
       use_radar_rv, use_radar_rf,below_model_surface,mkz,above_model_lid,&
       fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
       far_below_model_surface,kms,kme,kts,kte

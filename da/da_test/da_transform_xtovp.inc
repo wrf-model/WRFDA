@@ -6,21 +6,22 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),            intent(inout) :: grid
+   type(xb_type),           intent(in)    :: xb         ! First guess structure.
+   type(xbx_type),          intent(in)    :: xbx        ! Header/non-gridded vars.
+   type(x_type),            intent(inout) :: xa         ! Analysis increments.
+   type(xpose_type),        intent(inout) :: xp         ! Dimensions and xpose buffers. 
+   type(vp_type),           intent(out)   :: vp         ! CV on grid structure.
+   type(be_type), optional, intent(in)    :: be         ! Background errors.
 
-   type (xb_type), intent(in)           :: xb         ! First guess structure.
-   type (xbx_type),intent(in)           :: xbx        ! Header/non-gridded vars.
-   type (x_type), intent(inout)         :: xa         ! Analysis increments.
-   type (xpose_type), intent(inout)     :: xp         ! Dimensions and xpose buffers. 
-   type (vp_type), intent(out)          :: vp         ! CV on grid structure.
-   type (be_type), intent(in), optional :: be         ! Background errors.
+   real    :: vor(ims:ime,jms:jme,kms:kme) ! Vorticity.
+   real    :: div(ims:ime,jms:jme,kms:kme) ! Divergence.
 
-   real, dimension(ims:ime,jms:jme,kms:kme) :: vor, & ! Vorticity.
-                                               div    ! Divergence.
+   real    :: one_over_m2(ims:ime,jms:jme) !   Multiplicative coeff.
 
-   real, dimension(ims:ime,jms:jme)         :: one_over_m2    !   Multiplicative coeff.
+   integer :: i, j, k                      ! Loop counters.
 
-   integer :: i, j, k                             ! Loop counters.
+   if (trace_use) call da_trace_entry("da_transform_xtovp")
 
    !----------------------------------------------------------------
    ! [1.0] Perform transform v = U^{-1} x
@@ -104,7 +105,7 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
    
    call da_message((/' calculating psudo rh'/))
    vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
-                                      xb % qs (its:ite,jts:jte,kts:kte) 
+      xb % qs (its:ite,jts:jte,kts:kte) 
 
    ! [2.7] Choice of surface pressure control variable: 
       
@@ -112,10 +113,11 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
    call da_message((/' calculating psfc_u '/))
    do j=jts,jte
       do i=its,ite
-          vp % v5(i,j,1) = xa%psfc(i,j) - &
-             sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
+         vp % v5(i,j,1) = xa%psfc(i,j) - sum(be%reg_ps(j,kts:kte)*vp%v1(i,j,kts:kte))
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtovp")
 
 end subroutine da_transform_xtovp
 

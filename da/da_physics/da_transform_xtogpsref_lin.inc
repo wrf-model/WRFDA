@@ -12,14 +12,13 @@ subroutine da_transform_xtogpsref_lin(grid)
    real    :: partone, parttwo, dividnd
    real    :: partone9,parttwo9,dividnd9
 
-   call da_trace_entry("da_transform_xtogpsref_lin")
+   if (trace_use_dull) call da_trace_entry("da_transform_xtogpsref_lin")
 
    ! 2.0 Loop for a tile
 
    do k = kts, kte
       do j = jts, jte
          do i = its, ite
-
             !-----calculate refractivity
             !     Note: p in Pascal, q its the specific humidity
 
@@ -42,13 +41,12 @@ subroutine da_transform_xtogpsref_lin(grid)
 
             ! 2.3 Total refractivity
 
-            grid%xa%ref(i,j,k)= partone9 * parttwo &
-                         + partone  * parttwo9
+            grid%xa%ref(i,j,k)= partone9 * parttwo + partone  * parttwo9
          end do
       end do
    end do
 
-   call da_trace_exit("da_transform_xtogpsref_lin")
+   if (trace_use_dull) call da_trace_exit("da_transform_xtogpsref_lin")
    
 end subroutine da_transform_xtogpsref_lin
 

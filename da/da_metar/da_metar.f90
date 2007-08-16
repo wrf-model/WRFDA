@@ -7,8 +7,8 @@ module da_metar
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
-      max_error_bt, max_error_buv, num_metar_tot,max_error_thickness, &
-      sfc_assi_options, trace_use, anal_type_verify, ims,ime,jms,jme,kts,kte, &
+      max_error_bt, max_error_buv, metar,max_error_thickness, &
+      sfc_assi_options, trace_use_dull, anal_type_verify, ims,ime,jms,jme,kts,kte, &
       kms,kme,sfc_assi_options_1,sfc_assi_options_2
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &

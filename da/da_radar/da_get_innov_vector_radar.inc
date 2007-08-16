@@ -40,7 +40,7 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
 
    irv = 0; irvf = 0; irf = 0; irff = 0
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
+   do n=iv%plocal(iv%time-1,radar) + 1, iv%plocal(iv%time,radar)
 
       num_levs = iv % radar(n) % info % levels
 

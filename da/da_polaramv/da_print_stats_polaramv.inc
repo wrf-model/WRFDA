@@ -6,9 +6,11 @@ subroutine da_print_stats_polaramv(stats_unit, nu, nv, polaramv)
 
    implicit none
 
-   integer,           intent(in)    :: stats_unit
-   integer,           intent(inout) :: nu, nv
+   integer,                    intent(in)    :: stats_unit
+   integer,                    intent(inout) :: nu, nv
    type (stats_polaramv_type), intent(in)    :: polaramv
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_polaramv")
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k'
@@ -28,6 +30,8 @@ subroutine da_print_stats_polaramv(stats_unit, nu, nv, polaramv)
       polaramv%average%v/real(nv), &
       '    RMSE     : ', sqrt(polaramv%rms_err%u/real(nu)), &
                       sqrt(polaramv%rms_err%v/real(nv))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_polaramv")
 
 end subroutine da_print_stats_polaramv
 

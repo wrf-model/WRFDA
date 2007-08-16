@@ -6,8 +6,9 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
    implicit none
 
-   type(domain),                intent(inout) :: grid
-   type (grid_config_rec_type), intent(inout) :: config_flags
+   type(domain),               intent(inout) :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
+
    integer :: idum1, idum2
 
    call da_trace_entry("da_wrfvar_interface")

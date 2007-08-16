@@ -14,20 +14,20 @@ subroutine da_jo_sound_uvtq(iv, re, jo_grad_y, jo)
  
    integer :: n, k
 
-   do n=1, iv%num_sound
+   if (trace_use_dull) call da_trace_entry("da_jo_sound_uvtq")
+
+   do n=1, iv%nlocal(sound)
       if (iv%sound(n)%loc%proc_domain) then
          do k=1, iv%sound(n)%info%levels
-            jo % sound_u = jo % sound_u - &
-                       re%sound(n)%u(k) * jo_grad_y%sound(n)%u(k)
-           jo % sound_v = jo % sound_v - &
-                       re%sound(n)%v(k) * jo_grad_y%sound(n)%v(k)
-           jo % sound_t = jo % sound_t - &
-                       re%sound(n)%t(k) * jo_grad_y%sound(n)%t(k)
-           jo % sound_q = jo % sound_q - &
-                       re%sound(n)%q(k) * jo_grad_y%sound(n)%q(k)
-        end do
-     end if
-  end do
+            jo % sound_u = jo % sound_u - re%sound(n)%u(k) * jo_grad_y%sound(n)%u(k)
+            jo % sound_v = jo % sound_v - re%sound(n)%v(k) * jo_grad_y%sound(n)%v(k)
+            jo % sound_t = jo % sound_t - re%sound(n)%t(k) * jo_grad_y%sound(n)%t(k)
+            jo % sound_q = jo % sound_q - re%sound(n)%q(k) * jo_grad_y%sound(n)%q(k)
+         end do
+      end if
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_jo_sound_uvtq")
 
 end subroutine da_jo_sound_uvtq
 

@@ -6,12 +6,14 @@ subroutine da_oi_stats_synop (stats_unit, oi)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
+   integer,        intent (in) :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in) :: oi            ! OI
 
-   type (stats_synop_type)          :: synop
-   integer                          :: nu, nv, nt, np, nq
-   integer                          :: n
+   type (stats_synop_type) :: stats
+   integer                 :: nu, nv, nt, np, nq
+   integer                 :: n
+
+   if (trace_use_dull) call da_trace_entry("da_oi_stats_synop")
 
    nu = 0
    nv = 0
@@ -19,52 +21,49 @@ subroutine da_oi_stats_synop (stats_unit, oi)
    np = 0
    nq = 0
 
-   synop%maximum%u = maxmin_type(missing_r, 0, 0)
-   synop%maximum%v = maxmin_type(missing_r, 0, 0)
-   synop%maximum%t = maxmin_type(missing_r, 0, 0)
-   synop%maximum%p = maxmin_type(missing_r, 0, 0)
-   synop%maximum%q = maxmin_type(missing_r, 0, 0)
-   synop%minimum%u = maxmin_type(-missing_r, 0, 0)
-   synop%minimum%v = maxmin_type(-missing_r, 0, 0)
-   synop%minimum%t = maxmin_type(-missing_r, 0, 0)
-   synop%minimum%p = maxmin_type(-missing_r, 0, 0)
-   synop%minimum%q = maxmin_type(-missing_r, 0, 0)
-   synop%average = residual_synop1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   synop%rms_err = synop%average
+   stats%maximum%u = maxmin_type(missing_r, 0, 0)
+   stats%maximum%v = maxmin_type(missing_r, 0, 0)
+   stats%maximum%t = maxmin_type(missing_r, 0, 0)
+   stats%maximum%p = maxmin_type(missing_r, 0, 0)
+   stats%maximum%q = maxmin_type(missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_synop > 0) then
-      do n=1, oi%num_synop
-         if (oi%synop(n)%loc%proc_domain) then
-           call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-                               0, oi%synop(n)%u%qc, &
-                               oi%synop(n)%u%inv, nu, &
-                               synop%minimum%u, synop%maximum%u, &
-                               synop%average%u, synop%rms_err%u)
-           call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-                               0, oi%synop(n)%v%qc, &
-                               oi%synop(n)%v%inv, nv, &
-                               synop%minimum%v, synop%maximum%v, &
-                               synop%average%v, synop%rms_err%v)
-           call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-                               0, oi%synop(n)%t%qc, &
-                               oi%synop(n)%t%inv, nt, &
-                               synop%minimum%t, synop%maximum%t, &
-                               synop%average%t, synop%rms_err%t)
-           call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-                               0, oi%synop(n)%p%qc, &
-                               oi%synop(n)%p%inv, np, &
-                               synop%minimum%p, synop%maximum%p, &
-                               synop%average%p, synop%rms_err%p)
+   stats%average = residual_synop1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-           call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-                               0, oi%synop(n)%q%qc, &
-                               oi%synop(n)%q%inv, nq, &
-                               synop%minimum%q, synop%maximum%q, &
-                               synop%average%q, synop%rms_err%q)
-
-         end if    ! end if (oi%synop(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, oi%nlocal(synop)
+      if (oi%synop(n)%loc%proc_domain) then
+        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
+           0, oi%synop(n)%u%qc, &
+           oi%synop(n)%u%inv, nu, &
+           stats%minimum%u, stats%maximum%u, &
+           stats%average%u, stats%rms_err%u)
+        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
+           0, oi%synop(n)%v%qc, &
+           oi%synop(n)%v%inv, nv, &
+           stats%minimum%v, stats%maximum%v, &
+           stats%average%v, stats%rms_err%v)
+        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
+           0, oi%synop(n)%t%qc, &
+           oi%synop(n)%t%inv, nt, &
+           stats%minimum%t, stats%maximum%t, &
+           stats%average%t, stats%rms_err%t)
+        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
+           0, oi%synop(n)%p%qc, &
+           oi%synop(n)%p%inv, np, &
+           stats%minimum%p, stats%maximum%p, &
+           stats%average%p, stats%rms_err%p)
+        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
+            0, oi%synop(n)%q%qc, &
+            oi%synop(n)%q%inv, nq, &
+            stats%minimum%q, stats%maximum%q, &
+            stats%average%q, stats%rms_err%q)
+      end if
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int(nu)
@@ -73,51 +72,53 @@ subroutine da_oi_stats_synop (stats_unit, oi)
    call da_proc_sum_int(np)
    call da_proc_sum_int(nq)
 
-   call da_proc_stats_combine(Synop%average%u, Synop%rms_err%u, &
-                           Synop%minimum%u%value, Synop%maximum%u%value, &
-                           Synop%minimum%u%n, Synop%maximum%u%n, &
-                           Synop%minimum%u%l, Synop%maximum%u%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
 
-   call da_proc_stats_combine(Synop%average%v, Synop%rms_err%v, &
-                           Synop%minimum%v%value, Synop%maximum%v%value, &
-                           Synop%minimum%v%n, Synop%maximum%v%n, &
-                           Synop%minimum%v%l, Synop%maximum%v%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
 
-   call da_proc_stats_combine(Synop%average%t, Synop%rms_err%t, &
-                           Synop%minimum%t%value, Synop%maximum%t%value, &
-                           Synop%minimum%t%n, Synop%maximum%t%n, &
-                           Synop%minimum%t%l, Synop%maximum%t%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
 
-   call da_proc_stats_combine(Synop%average%p, Synop%rms_err%p, &
-                           Synop%minimum%p%value, Synop%maximum%p%value, &
-                           Synop%minimum%p%n, Synop%maximum%p%n, &
-                           Synop%minimum%p%l, Synop%maximum%p%l)
+   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
+      stats%minimum%p%value, stats%maximum%p%value, &
+      stats%minimum%p%n, stats%maximum%p%n, &
+      stats%minimum%p%l, stats%maximum%p%l)
 
-   call da_proc_stats_combine(Synop%average%q, Synop%rms_err%q, &
-                           Synop%minimum%q%value, Synop%maximum%q%value, &
-                           Synop%minimum%q%n, Synop%maximum%q%n, &
-                           Synop%minimum%q%l, Synop%maximum%q%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for synop'
-         call da_print_stats_synop(stats_unit, nu, nv, nt, np, nq, synop)
+         call da_print_stats_synop(stats_unit, nu, nv, nt, np, nq, stats)
 
          ! min_val = -50.0
          ! max_val = 50.0
          ! bin_width = 1.0
-         ! call da_data_distribution('synop u ', oi%num_synop, min_val, max_val, &
+         ! call da_data_distribution('synop u ', oi%total(synop), min_val, max_val, &
          !                            bin_width, oi%synop(:)%u%inv)
-         ! call da_data_distribution('synop v ', oi%num_synop, min_val, max_val, &
+         ! call da_data_distribution('synop v ', oi%total(synop), min_val, max_val, &
          !                            bin_width, oi%synop(:)%v%inv)
-         ! call da_data_distribution('synop t ', oi%num_synop, min_val, max_val, &
+         ! call da_data_distribution('synop t ', oi%total(synop), min_val, max_val, &
          !                            bin_width, oi%synop(:)%t%inv)
-         ! call da_data_distribution('synop p ', oi%num_synop, -1000.0, 1000.0, &
+         ! call da_data_distribution('synop p ', oi%total(synop), -1000.0, 1000.0, &
          !                            50.0, oi%synop(:)%p%inv)
-         ! call da_data_distribution('synop q ', oi%num_synop, -0.03, 0.03, &
+         ! call da_data_distribution('synop q ', oi%total(synop), -0.03, 0.03, &
          !                               0.001, oi%synop(:)%q%inv)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_oi_stats_synop")
 
 end subroutine da_oi_stats_synop
 

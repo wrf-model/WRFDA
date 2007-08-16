@@ -1,5 +1,4 @@
-subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
-                                    vp, vv, mz, levels)
+subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, vp, vv, mz, levels)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_transform_vvtovp.
@@ -7,17 +6,17 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
 
    implicit none
    
-   integer, intent(in)   :: mz                         ! # vertical modes.
-   integer, intent(in)   :: levels                     ! no. of vertical levels
+   integer, intent(in) :: mz                         ! # vertical modes.
+   integer, intent(in) :: levels                     ! no. of vertical levels
 
-   real, intent(in)      :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
-   real, intent(in)      :: eval(jds:jde,1:mz)         ! Eigenvalues.
-   real, intent(in)      :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
-   real, intent(inout)   :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
-   real, intent(out)     :: vv(ims:ime,jms:jme,kms:kme)! CV in EOF space.
+   real, intent(in)    :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
+   real, intent(in)    :: eval(jds:jde,1:mz)         ! Eigenvalues.
+   real, intent(in)    :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
+   real, intent(inout) :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
+   real, intent(out)   :: vv(ims:ime,jms:jme,kms:kme)! CV in EOF space.
  
-   integer               :: i, j, m, k                 ! Loop counters.
-   real                  :: temp
+   integer :: i, j, m, k                 ! Loop counters.
+   real    :: temp
 
    if (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
 

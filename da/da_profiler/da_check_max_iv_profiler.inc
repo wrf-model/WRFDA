@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_profiler(it, profiler , &
-                        itu,ituf,itvv,itvvf)
+subroutine da_check_max_iv_profiler(it, profiler, itu,ituf,itvv,itvvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -11,8 +10,10 @@ subroutine da_check_max_iv_profiler(it, profiler , &
    type (pilot_type), intent(inout)       :: profiler
    integer, intent(inout) :: itu,ituf,itvv,itvvf
 
-   integer                                :: k
-   logical                                :: failed
+   integer :: k
+   logical :: failed
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_profiler")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -43,6 +44,8 @@ subroutine da_check_max_iv_profiler(it, profiler , &
          max_error_uv, itvv, itvvf, check_max_iv_unit, 'V   ', &
          failed, check_max_iv_print)
    end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_profiler")
 
 end subroutine da_check_max_iv_profiler
 

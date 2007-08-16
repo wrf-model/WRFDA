@@ -8,7 +8,9 @@ subroutine da_print_stats_profiler(stats_unit, nu, nv, Profiler)
 
    integer,                    intent(in)    :: stats_unit
    integer,                    intent(inout) :: nu, nv
-   type (stats_profiler_type), intent(in)    :: Profiler
+   type (stats_profiler_type), intent(in)    :: profiler
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_profiler")
    
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k  '
@@ -27,6 +29,8 @@ subroutine da_print_stats_profiler(stats_unit, nu, nv, Profiler)
                     Profiler%average%v/real(nv),      &
       '    RMSE     : ', sqrt(Profiler%rms_err%u/real(nu)), &
                     sqrt(Profiler%rms_err%v/real(nv))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_profiler")
 
 end subroutine da_print_stats_profiler
 

@@ -24,11 +24,11 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
    integer :: layer1,layer2
    real    :: tv1,tv2,pres2
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_satem")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_satem")
 
    ithickness = 0 ; ithicknessf = 0
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
+   do n=iv%plocal(iv%time-1,satem) + 1, iv%plocal(iv%time,satem)
       num_levs = iv % satem(n) % info % levels
 
       if (num_levs < 1) cycle
@@ -105,7 +105,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
          ithicknessf, ' on ',ithickness
    end if
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_satem")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_satem")
 
 end subroutine da_get_innov_vector_satem
 

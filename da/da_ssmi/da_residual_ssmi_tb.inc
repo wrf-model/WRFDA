@@ -15,12 +15,14 @@ subroutine da_residual_ssmi_tb(iv, y, re, np_missing, np_bad_data, np_obs_used, 
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   type (bad_data_type)              :: n_obs_bad
-   integer                           :: n
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n
+
+   if (trace_use) call da_trace_entry("da_residual_ssmi_tb")
 
    n_obs_bad % t % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_ssmi_tb
+   do n=1, iv%nlocal(ssmi_tb)
       np_available = np_available + 7
 
       re%ssmi_tb(n)%tb19v = da_residual(n, 0, y%ssmi_tb(n)%tb19v, iv%ssmi_tb(n)%tb19v, n_obs_bad % t)
@@ -33,10 +35,10 @@ subroutine da_residual_ssmi_tb(iv, y, re, np_missing, np_bad_data, np_obs_used, 
    end do
 
    np_missing  = np_missing  + n_obs_bad % t % num % miss  
-
    np_bad_data = np_bad_data + n_obs_bad % t % num % bad  
+   np_obs_used = np_obs_used + n_obs_bad % t % num % use    
 
-   np_obs_used = np_obs_used + n_obs_bad % t % num % use     
+   if (trace_use) call da_trace_exit("da_residual_ssmi_tb") 
 
 end subroutine da_residual_ssmi_tb
 

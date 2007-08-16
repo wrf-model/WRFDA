@@ -6,11 +6,14 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
 
    implicit none
 
-   integer, intent(in)            :: it       ! External iteration.
-   type (satem_type), intent(inout)       :: satem
-   integer, intent(inout)                 :: ith,ithf
-   integer                                :: k
-   logical                                :: failed
+   integer,           intent(in)    :: it       ! External iteration.
+   type (satem_type), intent(inout) :: satem
+   integer,           intent(inout) :: ith,ithf
+
+   integer  :: k
+   logical  :: failed
+
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_satem")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -37,6 +40,8 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
          max_error_thickness, ith, ithf, check_max_iv_unit, &
          'Thickness    ', failed, check_max_iv_print)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_satem")
 
 end subroutine da_check_max_iv_satem
 

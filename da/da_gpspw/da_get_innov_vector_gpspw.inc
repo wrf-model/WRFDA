@@ -28,14 +28,16 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
    real    :: model_z(kts:kte) ! model z at GPS site [m]
    real    :: model_rho(kts:kte) ! model rho at GPS site [kg/m^3]
 
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_gpspw")
+
    ! unit_gps = myproc + 140
    !---------------------------------------------------------------------------
 
    ! GPS TPW Pseudo OBS test:
    if (pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0) then
       ! Deallocate:
-      if (iv%num_gpspw > 0) then
-         write(unit=stdout, fmt='(a,i4)') 'iv%num_gpspw =', iv%num_gpspw
+      if (iv%nlocal(gpspw) > 0) then
+         write(unit=stdout, fmt='(a,i4)') 'iv%nlocal(gpspw) =', iv%nlocal(gpspw)
          deallocate(iv % gpspw)
          deallocate(ob % gpspw)
       end if
@@ -43,9 +45,9 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
       use_gpspwobs = .true.
 
       ! Allocate:
-      iv % num_gpspw  = num_pseudo
-      iv % ob_numb(1)%gpspw = num_pseudo
-      iv % num_pseudo = 0
+      iv % nlocal(gpspw)   = num_pseudo
+      iv % plocal(1,gpspw) = num_pseudo
+      iv % nlocal(pseudo)  = 0
 
       allocate(iv % gpspw(1:num_pseudo))
       allocate(ob % gpspw(1:num_pseudo))
@@ -69,10 +71,10 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
       ! To consider the site elevation effect, set the model terrain height
       ! to elevation for pseudo OBS:
 
-      i = iv%gpspw(1)%loc%i
-      j = iv%gpspw(1)%loc%j
-      dx = iv%gpspw(1)%loc%dx
-      dy = iv%gpspw(1)%loc%dy
+      i   = iv%gpspw(1)%loc%i
+      j   = iv%gpspw(1)%loc%j
+      dx  = iv%gpspw(1)%loc%dx
+      dy  = iv%gpspw(1)%loc%dy
       dxm = iv%gpspw(1)%loc%dxm
       dym = iv%gpspw(1)%loc%dym
 
@@ -100,7 +102,7 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
       write(unit=stdout,fmt='(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
    end if 
 
-   if (iv % num_gpspw > 0) then
+   if (iv % nlocal(gpspw) > 0) then
 
       ittpw   = 0
       ittpwf  = 0
@@ -110,14 +112,14 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
       !   ' obsh-mdlh', '   obs pw ', '  model pw',  &
       !   '   O-B pw ', '    Dpw   ', '  O-B+Dpw '
 
-      do n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
+      do n=iv%plocal(iv%time-1,gpspw) + 1, iv%plocal(iv%time,gpspw)
 
          ! [1.1] Get horizontal interpolation weights:
 
-         i = iv%gpspw(n)%loc%i
-         j = iv%gpspw(n)%loc%j
-         dx = iv%gpspw(n)%loc%dx
-         dy = iv%gpspw(n)%loc%dy
+         i   = iv%gpspw(n)%loc%i
+         j   = iv%gpspw(n)%loc%j
+         dx  = iv%gpspw(n)%loc%dx
+         dy  = iv%gpspw(n)%loc%dy
          dxm = iv%gpspw(n)%loc%dxm
          dym = iv%gpspw(n)%loc%dym
 
@@ -194,6 +196,8 @@ subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
             'Finally all Gpspw rejections ',ittpwf,' on ',ittpw
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_gpspw")
 
 end subroutine da_get_innov_vector_gpspw
 

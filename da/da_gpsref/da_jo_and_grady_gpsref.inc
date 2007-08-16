@@ -10,34 +10,34 @@ subroutine da_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type(ob_type), intent(in)   :: iv          ! Innovation vector.
-   type(y_type), intent(in)    :: re          ! Residual vector.
-   type(y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
-   type(jo_type), intent(inout):: jo          ! Obs cost function.
+   type(ob_type), intent(in)    :: iv          ! Innovation vector.
+   type(y_type),  intent(in)    :: re          ! Residual vector.
+   type(y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
-   integer                      :: n, k
+   integer :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_gpsref")
 
    jo % gpsref_ref = 0.0
 
-   if (iv%num_GPSRef > 0) then
-      do n=1, iv%num_GPSRef
-         do k=1, iv%gpsref(n)%info%levels
-            jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
-                                  ( iv%GPSRef(n)%ref(k)%error * &
-                                     iv%GPSRef(n)%ref(k)%error)
-         end do
-
-         if (iv%gpsref(n)%loc%proc_domain) then
-            do k=1, iv%gpsref(n)%info%levels
-               jo % gpsref_ref = jo % gpsref_ref - &
-                   re%GPSRef(n)%ref(k) * jo_grad_y%GPSRef(n)%ref(k)
-            end do
-         end if
+   do n=1, iv%nlocal(gpsref)
+      do k=1, iv%gpsref(n)%info%levels
+         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
+            ( iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
       end do
-      
-      jo % gpsref_ref = 0.5 * jo % gpsref_ref
-      
-   end if
+
+      if (iv%gpsref(n)%loc%proc_domain) then
+         do k=1, iv%gpsref(n)%info%levels
+            jo % gpsref_ref = jo % gpsref_ref - &
+                re%gpsref(n)%ref(k) * jo_grad_y%gpsref(n)%ref(k)
+         end do
+      end if
+
+      jo % gpsref_ref = 0.5 * jo % gpsref_ref    
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_gpsref")
 
 end subroutine da_jo_and_grady_gpsref
 

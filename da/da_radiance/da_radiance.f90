@@ -26,9 +26,9 @@ module da_radiance
 #endif
 
    use da_control, only : max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, &
+      v_interp_p, v_interp_h, trace_use_dull, &
       missing, max_error_uv, max_error_t, rootproc, &
-      max_error_p,max_error_q,  &
+      max_error_p,max_error_q, radiance, &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, rtminit_platform,rtminit_satid, &
       rtminit_nsensor,rtminit_sensor,filename_len,read_biascoef,analysis_date, &

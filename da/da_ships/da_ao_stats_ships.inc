@@ -1,4 +1,4 @@
-subroutine da_ao_stats_ships (stats_unit, oi, re)
+subroutine da_ao_stats_ships (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,62 +6,60 @@ subroutine da_ao_stats_ships (stats_unit, oi, re)
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
-   type  (y_type), intent (in)      :: re            ! A - O
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (inout) :: iv            ! iv
+   type  (y_type), intent (in)    :: re            ! A - O
 
-   type (stats_ships_type)          :: ships
-   integer                          :: nu, nv, nt, np, nq
-   integer                          :: n
+   type (stats_ships_type) :: stats
+   integer                 :: nu, nv, nt, np, nq
+   integer                 :: n
+
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_ships")
 
    nu = 0
    nv = 0
    nt = 0
    np = 0
    nq = 0
-   num_ships_tot = 0
 
-   ships%maximum%u = maxmin_type (missing_r, 0, 0)
-   ships%maximum%v = maxmin_type (missing_r, 0, 0)
-   ships%maximum%t = maxmin_type (missing_r, 0, 0)
-   ships%maximum%p = maxmin_type (missing_r, 0, 0)
-   ships%maximum%q = maxmin_type (missing_r, 0, 0)
-   ships%minimum%u = maxmin_type(-missing_r, 0, 0)
-   ships%minimum%v = maxmin_type(-missing_r, 0, 0)
-   ships%minimum%t = maxmin_type(-missing_r, 0, 0)
-   ships%minimum%p = maxmin_type(-missing_r, 0, 0)
-   ships%minimum%q = maxmin_type(-missing_r, 0, 0)
-   ships%average = residual_ships1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   ships%rms_err = ships%average
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%t = maxmin_type (missing_r, 0, 0)
+   stats%maximum%p = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-   if (oi%num_ships > 0) then
-      do n=1, oi%num_ships
-         if (oi%ships(n)%loc%proc_domain) then
+   stats%average = residual_ships1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-            call da_stats_calculate (n, 0, oi%ships(n)%u%qc, & 
-                                  re%ships(n)%u, nu, & 
-                                  ships%minimum%u, ships%maximum%u, &
-                                  ships%average%u, ships%rms_err%u)
-            call da_stats_calculate (n, 0, oi%ships(n)%v%qc, & 
-                                  re%ships(n)%v, nv, & 
-                                  ships%minimum%v, ships%maximum%v, &
-                                  ships%average%v, ships%rms_err%v)
-            call da_stats_calculate (n, 0, oi%ships(n)%t%qc, & 
-                                  re%ships(n)%t, nt, & 
-                                  ships%minimum%t, ships%maximum%t, &
-                                  ships%average%t, ships%rms_err%t)
-            call da_stats_calculate (n, 0, oi%ships(n)%p%qc, & 
-                                  re%ships(n)%p, np, & 
-                                  ships%minimum%p, ships%maximum%p, &
-                                  ships%average%p, ships%rms_err%p)
-            call da_stats_calculate (n, 0, oi%ships(n)%q%qc, & 
-                                  re%ships(n)%q, nq, & 
-                                  ships%minimum%q, ships%maximum%q, &
-                                  ships%average%q, ships%rms_err%q)
-
-         end if    ! end if (oi%ships(n)%loc%proc_domain)
-      end do
-   end if
+   do n=1, iv%nlocal(ships)
+      if (iv%ships(n)%loc%proc_domain) then
+         call da_stats_calculate (n, 0, iv%ships(n)%u%qc, & 
+             re%ships(n)%u, nu, & 
+             stats%minimum%u, stats%maximum%u, &
+             stats%average%u, stats%rms_err%u)
+         call da_stats_calculate (n, 0, iv%ships(n)%v%qc, & 
+            re%ships(n)%v, nv, & 
+            stats%minimum%v, stats%maximum%v, &
+            stats%average%v, stats%rms_err%v)
+         call da_stats_calculate (n, 0, iv%ships(n)%t%qc, & 
+            re%ships(n)%t, nt, & 
+            stats%minimum%t, stats%maximum%t, &
+            stats%average%t, stats%rms_err%t)
+         call da_stats_calculate (n, 0, iv%ships(n)%p%qc, & 
+            re%ships(n)%p, np, & 
+            stats%minimum%p, stats%maximum%p, &
+            stats%average%p, stats%rms_err%p)
+         call da_stats_calculate (n, 0, iv%ships(n)%q%qc, & 
+            re%ships(n)%q, nq, & 
+            stats%minimum%q, stats%maximum%q, &
+            stats%average%q, stats%rms_err%q)
+      end if    ! end if (iv%ships(n)%loc%proc_domain)
+   end do
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (nu)
@@ -69,35 +67,37 @@ subroutine da_ao_stats_ships (stats_unit, oi, re)
    call da_proc_sum_int (nt)
    call da_proc_sum_int (np)
    call da_proc_sum_int (nq)
-   num_ships_tot = nu + nv + nt + np + nq
+   iv%nstats(ships) = nu + nv + nt + np + nq
 
-   call da_proc_stats_combine(Ships%average%u, Ships%rms_err%u, &
-                           Ships%minimum%u%value, Ships%maximum%u%value, &
-                           Ships%minimum%u%n, Ships%maximum%u%n, &
-                           Ships%minimum%u%l, Ships%maximum%u%l)
-   call da_proc_stats_combine(Ships%average%v, Ships%rms_err%v, &
-                           Ships%minimum%v%value, Ships%maximum%v%value, &
-                           Ships%minimum%v%n, Ships%maximum%v%n, &
-                           Ships%minimum%v%l, Ships%maximum%v%l)
-   call da_proc_stats_combine(Ships%average%t, Ships%rms_err%t, &
-                           Ships%minimum%t%value, Ships%maximum%t%value, &
-                           Ships%minimum%t%n, Ships%maximum%t%n, &
-                           Ships%minimum%t%l, Ships%maximum%t%l)
-   call da_proc_stats_combine(Ships%average%p, Ships%rms_err%p, &
-                           Ships%minimum%p%value, Ships%maximum%p%value, &
-                           Ships%minimum%p%n, Ships%maximum%p%n, &
-                           Ships%minimum%p%l, Ships%maximum%p%l)
-   call da_proc_stats_combine(Ships%average%q, Ships%rms_err%q, &
-                           Ships%minimum%q%value, Ships%maximum%q%value, &
-                           Ships%minimum%q%n, Ships%maximum%q%n, &
-                           Ships%minimum%q%l, Ships%maximum%q%l)
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
+      stats%minimum%p%value, stats%maximum%p%value, &
+      stats%minimum%p%n, stats%maximum%p%n, &
+      stats%minimum%p%l, stats%maximum%p%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for ships'
-         call da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, ships)
+         call da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, stats)
       end if
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_ships")
 
 end subroutine da_ao_stats_ships
 

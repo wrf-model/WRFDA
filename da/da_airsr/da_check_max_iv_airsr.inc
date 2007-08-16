@@ -6,12 +6,14 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
 
    implicit none
 
-   integer,           intent (in)         :: it      ! Outer iteration
-   type (airsr_type), intent(inout)       :: airsr
-   integer, intent(inout)                 :: itt,ittf,itqv,itqvf
+   integer,           intent(in)    :: it      ! Outer iteration
+   type (airsr_type), intent(inout) :: airsr
+   integer,           intent(inout) :: itt,ittf,itqv,itqvf
 
-   integer                                :: k
-   logical                                :: failed
+   integer :: k
+   logical :: failed
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_airsr")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -48,6 +50,8 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
                          failed, check_max_iv_print)
       end if
    end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_airsr")
 
 end subroutine da_check_max_iv_airsr
 

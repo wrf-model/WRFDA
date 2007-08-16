@@ -1,5 +1,5 @@
 ;===========================================================================================;
-;  time_series.ncl
+;  time_average.ncl
 ;ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ; Copyright (C) 2006
 ; University Corporation for Atmospheric Research

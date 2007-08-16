@@ -24,21 +24,18 @@ subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
    real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
 
    integer  :: itu, itvv, ituf, itvvf
-
-   if (iv % num_qscat < 1) return 
    
-   if (trace_use) call da_trace_entry("da_get_innov_vector_qscat")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_qscat")
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
-
+   do n=iv%plocal(iv%time-1,qscat) + 1, iv%plocal(iv%time,qscat)
       itu = 0 ; itvv = 0 ;  ituf = 0 ; itvvf = 0
 
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%qscat(n)%loc%i
-      j = iv%qscat(n)%loc%j
-      dx = iv%qscat(n)%loc%dx
-      dy = iv%qscat(n)%loc%dy
+      i   = iv%qscat(n)%loc%i
+      j   = iv%qscat(n)%loc%j
+      dx  = iv%qscat(n)%loc%dx
+      dy  = iv%qscat(n)%loc%dy
       dxm = iv%qscat(n)%loc%dxm
       dym = iv%qscat(n)%loc%dym
 
@@ -108,7 +105,7 @@ subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
          'Number of failed v-wind observations:     ',itvvf,' on ',itvv
    end if 
    
-   if (trace_use) call da_trace_exit("da_get_innov_vector_qscat")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_qscat")
 
 end subroutine da_get_innov_vector_qscat
 

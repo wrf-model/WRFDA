@@ -10,7 +10,9 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
    integer,           intent (inout)      :: itu, itvv, ituf, itvvf
    type (qscat_type), intent(inout)       :: qscat
 
-   logical                                :: failed
+   logical :: failed
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_qscat")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -33,15 +35,12 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
    failed = .false.
 
    ! U-wind
+   call da_max_error_qc(it, qscat % info, qscat % u, max_error_uv, itu, ituf, check_max_iv_unit, &
+      'U    ', failed, check_max_iv_print)
 
-   call da_max_error_qc(it, qscat % info, qscat % u, &
-              max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-                            failed, check_max_iv_print)
    ! V-wind
-
-   call da_max_error_qc (it, qscat % info, qscat % v,&
-              max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-                             failed, check_max_iv_print)                           
+   call da_max_error_qc (it, qscat % info, qscat % v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
+      'V    ', failed, check_max_iv_print)                           
 
    !---------------------------------------------------------------------------
    ! [3.0] Output test failed results:
@@ -54,6 +53,8 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
          'Number of failed qscat v-wind observations:       ', &
          itvvf,  ' on ',itvv
    end if
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_qscat")
 
 end subroutine da_check_max_iv_qscat
 

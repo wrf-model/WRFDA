@@ -9,17 +9,20 @@ subroutine da_uvprho_to_w_lin(grid)
 
    implicit none
 
-   type (domain), intent(inout)     :: grid
+   type (domain), intent(inout) :: grid
 
-   integer                       :: is, ie       ! 1st dim. end points.
-   integer                       :: js, je       ! 2nd dim. end points.
+   integer :: is, ie       ! 1st dim. end points.
+   integer :: js, je       ! 2nd dim. end points.
 
-   integer                       :: I,J,K
+   integer :: I,J,K
 
-   real, dimension(ims:ime,jms:jme,kms:kme) :: URHO, VRHO
-   real, dimension(ims:ime,jms:jme,kms:kme) :: DIV, WZ
-   real                                     :: TERM3
+   real    :: urho(ims:ime,jms:jme,kms:kme)
+   real    :: vrho(ims:ime,jms:jme,kms:kme)
+   real    :: div(ims:ime,jms:jme,kms:kme)
+   real    :: wz(ims:ime,jms:jme,kms:kme)
+   real    :: term3
 
+   if (trace_use) call da_trace_entry("da_uvprho_to_w_lin")
    
    ! Computation to check for edge of domain:
    is = its
@@ -61,37 +64,33 @@ subroutine da_uvprho_to_w_lin(grid)
    ! boundary too simple? (It is the same as fill in interpf, fill can be used)
 
    if (its == ids) then
-      i = its
       do K=kts,kte
          do J=js,je
-            WZ(I,J,K)=WZ(I+1,J,K)
+            WZ(its,J,K)=WZ(its+1,J,K)
          end do
       end do
    end if
 
    if (ite == ide) then
-      i = ite
       do K=kts,kte
          do J=js,je
-            WZ(I,J,K)=WZ(I-1,J,K)
+            WZ(ite,J,K)=WZ(ite-1,J,K)
          end do
       end do
    end if
 
    if (jts == jds) then
-      j = jts
       do K=kts,kte
          do I=its, ite
-            WZ(I,J,K)=WZ(I,J+1,K)       
+            WZ(I,jts,K)=WZ(I,jts+1,K)       
          end do
       end do
    end if
 
    if (jte == jde) then
-      j = jte
       do K=kts,kte
          do I=its, ite
-            WZ(I,J,K)=WZ(I,J-1,K)
+            WZ(I,jte,K)=WZ(I,jte-1,K)
          end do
       end do
    end if
@@ -116,8 +115,8 @@ subroutine da_uvprho_to_w_lin(grid)
       do J=jts,jte
          do I=its,ite
             WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xa%p(I,J,K)*DIV(I,J,K)
+         end do
       end do
-   end do
    end do
 
    ! Computation to check for edge of domain:
@@ -143,8 +142,7 @@ subroutine da_uvprho_to_w_lin(grid)
          TERM3=0.0
 
          do K=kte-1,kts,-1
-            TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &
-                *(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
+            TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5 *(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             WZ(I,J,K)=WZ(I,J,K)+TERM3
          end do
       end do
@@ -168,8 +166,7 @@ subroutine da_uvprho_to_w_lin(grid)
          TERM3=0.0
 
          do K=kte-1,kts,-1
-            TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &
-               *(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
+            TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5*(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             WZ(I,J,K)=WZ(I,J,K)+TERM3
          end do
       end do
@@ -181,7 +178,7 @@ subroutine da_uvprho_to_w_lin(grid)
       do I=its,ite
          do K=kts,kte
             WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xa%p(I,J,K)*(grid%xb%w(I,J,K+1)-grid%xb%w(I,J,K))/  &
-                      (grid%xb%hf(I,J,K+1)-grid%xb%hf(I,J,K))
+               (grid%xb%hf(I,J,K+1)-grid%xb%hf(I,J,K))
          end do
       end do
    end do
@@ -204,11 +201,12 @@ subroutine da_uvprho_to_w_lin(grid)
       do I=its,ite
          grid%xa%w(I,J,kte+1)=0.0
          do K=kte,kts,-1
-            grid%xa%w(I,J,K)=grid%xa%w(I,J,K+1)+   &
-                     WZ(I,J,K)*(grid%xb%hf(I,J,K)-grid%xb%hf(I,J,K+1))
+            grid%xa%w(I,J,K)=grid%xa%w(I,J,K+1) + WZ(I,J,K)*(grid%xb%hf(I,J,K)-grid%xb%hf(I,J,K+1))
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_uvprho_to_w_lin")
 
 end subroutine da_uvprho_to_w_lin
 

@@ -33,11 +33,14 @@ module da_setup_structures
       print_detail_regression,gas_constant,da_array_print , use_airsretobs, &
       filename_len, use_ssmisobs, gravity, t_triple, use_hirs4obs, use_mhsobs, &
       ims,ime,jms,jme,kms,kme,kds, vert_corr_2, alphacv_method_xa, vert_evalue_global, &
-      vert_evalue_local
+      vert_evalue_local, obs_names, num_ob_indexes, &
+      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
+      bogus, buoy, qscat,pseudo
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
-   use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &
-      da_scan_radar,da_scan_obs,da_read_obs
+   use da_obs_io, only : da_scan_bufr,da_read_bufr,da_read_radar, &
+      da_scan_radar,da_scan_gts,da_read_gts
    use da_par_util, only : da_patch_to_global
    use da_radiance, only : da_setup_bufrtovs_structures
    use da_reporting, only : da_error,message, da_warning, da_message

@@ -28,12 +28,15 @@ module da_par_util
 
    use da_define_structures, only : be_subtype, &
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
-      y_type, count_obs_number_type, count_obs_type, maxmin_field_type
+      y_type, count_obs_number_type, maxmin_field_type
 
    use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &
       rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &
       kts,kte,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe, &
-      kps, kpe, grid_stagger, grid_ordering
+      kps, kpe, grid_stagger, grid_ordering, trace_use_dull, &
+      sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
+      metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, &
+      pseudo, radar, radiance, airsr, sonde_sfc
    use da_reporting, only : da_error
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_wrf_interfaces, only : &
@@ -79,7 +82,6 @@ module da_par_util
 #include "da_system.inc"
 
 #ifdef DM_PARALLEL
-#include "da_proc_sum_count_obs.inc"
 #include "da_proc_stats_combine.inc"
 #include "da_proc_maxmin_combine.inc"
 #else

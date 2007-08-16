@@ -36,13 +36,15 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
    real    :: height_below(5000)
    character(len=40) :: name_qc(5000)
 
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_gpsref")
+
    ! GPS REF Pseudo OBS test:
 
    if (pseudo_var(1:3) == 'ref' .and. num_pseudo > 0) then
 
       ! Deallocate:
-      if (iv%num_gpsref > 0) then
-         do n = 1, iv%num_gpsref
+      if (iv%nlocal(gpsref) > 0) then
+         do n = 1, iv%nlocal(gpsref)
             deallocate(iv % gpsref(n) %  h)
             deallocate(iv % gpsref(n) %  zk)
             deallocate(iv % gpsref(n) % ref)
@@ -58,9 +60,9 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
       use_gpsrefobs = .true.
 
       ! Allocate:
-      iv%num_gpsref = num_pseudo
-      iv%ob_numb(1)%gpsref = num_pseudo
-      iv%num_pseudo = 0
+      iv%nlocal(gpsref) = num_pseudo
+      iv%plocal(1,gpsref) = num_pseudo
+      iv%nlocal(pseudo) = 0
 
       allocate(iv % gpsref(1:num_pseudo))
       allocate(iv%gpsref(num_pseudo)%zk(1:1))
@@ -104,12 +106,12 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
       write(stdout,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
    end if
 
-   if (iv%num_gpsref < 1) return
+   if (iv%nlocal(gpsref) < 1) return
 
    ntotal = 0
    pref = 0 ; fref = 0
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
+   do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
       num_levs = iv%gpsref(n)%info%levels
 
       if (num_levs < 1) cycle
@@ -203,7 +205,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          height_below = 0.0
          name_qc      = '                                       '
 
-         do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
+         do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
              nn = nn + 1
              num_levs = iv%gpsref(n)%info%levels
              do k=1, num_levs
@@ -223,7 +225,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          nqc2   = 0
          nqc3   = 0
 
-         do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
+         do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
             num_levs = iv%gpsref(n)%info%levels
 
             do n1 = 1,nn
@@ -255,6 +257,8 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          'Number of failed GPSRef observations:', &
          fref, ' on ',pref
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_gpsref")
 
 end subroutine da_get_innov_vector_gpsref
 

@@ -6,15 +6,14 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    implicit none
 
-   type(domain), intent(inout)      :: grid
-
-   integer, intent(in)              :: cv_size ! Size of cv array.
-   type (xbx_type),intent(in)       :: xbx  ! For header & non-grid arrays.
-   type (be_type), intent(in)       :: be   ! background errors.
-   type (ep_type), intent(in)       :: ep   ! ensemble perturbation structure.
-   type (vp_type),intent(out)       :: vp   ! grdipt/level cv (local).
-   type (vp_type),intent(out)       :: vv   ! grdipt/eof cv (local).
-   real, intent(inout)              :: cv(1:cv_size) ! control variables.
+   type(domain),   intent(inout) :: grid
+   integer,        intent(in)    :: cv_size ! Size of cv array.
+   type(xbx_type), intent(in)    :: xbx  ! For header & non-grid arrays.
+   type(be_type),  intent(in)    :: be   ! background errors.
+   type(ep_type),  intent(in)    :: ep   ! ensemble perturbation structure.
+   type(vp_type),  intent(out)   :: vp   ! grdipt/level cv (local).
+   type(vp_type),  intent(out)   :: vv   ! grdipt/eof cv (local).
+   real,           intent(inout) :: cv(1:cv_size) ! control variables.
 
    integer :: i, j, k
    real    :: sdmd, s1md, mu

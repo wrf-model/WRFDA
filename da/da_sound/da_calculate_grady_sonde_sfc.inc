@@ -13,9 +13,9 @@ subroutine da_calculate_grady_sonde_sfc(iv, re, jo_grad_y)
 
    integer                      :: n
 
-   if (iv%num_sound < 1) return
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_sonde_sfc")
 
-   do n=1, iv%num_sound
+   do n=1, iv%nlocal(sound)
       if (iv%sonde_sfc(n)%u%qc < obs_qc_pointer) re%sonde_sfc(n)%u = 0.0
       if (iv%sonde_sfc(n)%v%qc < obs_qc_pointer) re%sonde_sfc(n)%v = 0.0
       if (iv%sonde_sfc(n)%t%qc < obs_qc_pointer) re%sonde_sfc(n)%t = 0.0
@@ -39,6 +39,8 @@ subroutine da_calculate_grady_sonde_sfc(iv, re, jo_grad_y)
       jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / &
           (iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_sonde_sfc")
      
 end subroutine da_calculate_grady_sonde_sfc
 

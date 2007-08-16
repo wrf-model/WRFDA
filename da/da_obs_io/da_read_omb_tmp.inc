@@ -35,7 +35,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
       call da_error(__FILE__,__LINE__, (/"Cannot open file"//trim(filename)/))
    end if
 
-reports: do
+   reports: do
 
       read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs
       if_write = .false.

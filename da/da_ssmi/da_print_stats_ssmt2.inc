@@ -7,12 +7,14 @@ subroutine da_print_stats_ssmt2(stats_unit, nrh, minimum, maximum, &
 
    implicit none
 
-   integer,           intent(in)    :: stats_unit
-   integer,           intent(inout) :: nrh
-   type (maxmin_type), intent(in)   :: minimum
-   type (maxmin_type), intent(in)   :: maximum
-   real, intent(in)                 :: average
-   real, intent(in)                 :: rms_err
+   integer,            intent(in)    :: stats_unit
+   integer,            intent(inout) :: nrh
+   type (maxmin_type), intent(in)    :: minimum
+   type (maxmin_type), intent(in)    :: maximum
+   real,               intent(in)    :: average
+   real,               intent(in)    :: rms_err
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_ssmt2")
    
    write(unit=stats_unit, fmt='(a/)') '   var             rh(K)     n    k'
 

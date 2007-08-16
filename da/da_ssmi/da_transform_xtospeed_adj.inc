@@ -6,10 +6,11 @@ subroutine da_transform_xtospeed_adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
 
    implicit none
 
-   real,   intent (in  ) :: ADJ_speed
-   real,   intent (in  ) :: U, V
-   real,   intent (inout) :: ADJ_u, ADJ_v
-   real                   :: speed
+   real, intent (in)    :: ADJ_speed
+   real, intent (in)    :: U, V
+   real, intent (inout) :: ADJ_u, ADJ_v
+
+   real :: speed
 
    if (trace_use) call da_trace_entry("da_transform_xtospeed_adj")
 

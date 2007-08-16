@@ -8,14 +8,14 @@ subroutine da_ao_stats_rad ( stats_unit, iv, re )
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! output unit for stats.
-   type (ob_type), intent (in)      :: iv            ! innovation
-   type (y_type),  intent (in)      :: re            ! o-a
+   integer,        intent (in)    :: stats_unit    ! output unit for stats.
+   type (ob_type), intent (inout) :: iv            ! innovation
+   type (y_type),  intent (in)    :: re            ! o-a
 
-   type (stats_rad_type),    pointer  :: rad(:)
-   integer                          :: n, k, i
+   type (stats_rad_type), pointer  :: rad(:)
+   integer                         :: n, k, i
 
-   num_radiance_tot = 0
+   iv%nstats(radiance) = 0
 
    if ( iv%num_inst < 1 ) return
 
@@ -63,7 +63,7 @@ subroutine da_ao_stats_rad ( stats_unit, iv, re )
                            rad(i)%ichan(k)%minimum%n, rad(i)%ichan(k)%maximum%n, &
                            rad(i)%ichan(k)%minimum%l, rad(i)%ichan(k)%maximum%l )
  
-         num_radiance_tot = num_radiance_tot + rad(i)%ichan(k)%num
+         iv%nstats(radiance) = iv%nstats(radiance) + rad(i)%ichan(k)%num
       end do                        !  end loop for channels
 
       if (rootproc) then

@@ -12,14 +12,18 @@ subroutine da_transform_xtoy_profiler (grid, iv, y)
 
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
+
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_profiler")
    
-   do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
+   do n=iv%plocal(iv%time-1,profiler) + 1, iv%plocal(iv%time,profiler)
       k = iv % profiler(n) % info % levels
       if (k < 1) cycle
       ! [1.4] Interpolate horizontally:
       call da_interp_lin_3d(grid%xa % u, iv%profiler(n)%loc, y%profiler(n)%u, k, iv%profiler(n)%zk, k)
       call da_interp_lin_3d(grid%xa % v, iv%profiler(n)%loc, y%profiler(n)%v, k, iv%profiler(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_profiler")
 
 end subroutine da_transform_xtoy_profiler 
 

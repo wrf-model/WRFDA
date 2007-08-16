@@ -37,15 +37,14 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    nrej_clw        = 0
    nrej_topo       = 0
    nrej_limb       = 0
-   num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
-                      iv%ob_numb(iv%current_ob_time-1)%radiance(i)
+   num_rad         = iv%plocal_rad(iv%time,i) - iv%plocal_rad(iv%time-1,i)
    ! num_rad        = iv%instid(i)%num_rad
    num_proc_domain = 0
 
    if (num_rad > 0) then
 
       ! do n= 1, iv%instid(i)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, iv%ob_numb(iv%current_ob_time)%radiance(i)
+      do n= iv%plocal_rad(iv%time-1,i)+1, iv%plocal_rad(iv%time,i)
 
          if (iv%instid(i)%proc_domain(n)) &
                num_proc_domain = num_proc_domain + 1
@@ -198,7 +197,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
 
    if (rootproc) then
       if (num_fgat_time > 1) then
-         write(filename,'(a,i2.2)') 'qcstat_'//trim(iv%instid(i)%rttovid_string)//'_',iv%current_ob_time
+         write(filename,'(a,i2.2)') 'qcstat_'//trim(iv%instid(i)%rttovid_string)//'_',iv%time
       else
          filename = 'qcstat_'//trim(iv%instid(i)%rttovid_string)
       end if

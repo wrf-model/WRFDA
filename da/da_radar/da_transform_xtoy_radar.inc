@@ -25,8 +25,10 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
 
    real    :: xr,yr,zr
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
-      iv%ob_numb(iv%current_ob_time)%radar
+   if (trace_use) call da_trace_entry("da_transform_xtoy_radar")
+
+   do n=iv%plocal(iv%time-1,radar) + 1, &
+      iv%plocal(iv%time,radar)
       num_levs = iv % radar(n) % info % levels
 
       do k = 1, num_levs
@@ -71,6 +73,8 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
          end if
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_radar")
 
 end subroutine da_transform_xtoy_radar 
 

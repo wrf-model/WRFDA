@@ -6,7 +6,7 @@ subroutine da_wrfvar_finalize
 
    implicit none
 
-   integer :: i
+   integer               :: i
    type(domain), pointer :: grid
 
    if (trace_use) call da_trace_entry ("da_wrfvar_finalize")
@@ -15,8 +15,8 @@ subroutine da_wrfvar_finalize
 
    if ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) then
-      call da_med_initialdata_output (head_grid , config_flags)
-      call med_shutdown_io (head_grid , config_flags)
+      call da_med_initialdata_output (head_grid, config_flags)
+      call med_shutdown_io (head_grid, config_flags)
    end if
 
    grid => head_grid

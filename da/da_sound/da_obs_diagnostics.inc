@@ -11,11 +11,13 @@ subroutine da_obs_diagnostics(num_sound, ob, iv, re)
    type (sound_type),          intent(in) :: iv(:)
    type (residual_sound_type), intent(in) :: re(:)
 
-   integer                                :: n, k
+   integer :: n, k
    integer :: sound_diag_unit1
    integer :: sound_diag_unit2
    integer :: sound_diag_unit3
    integer :: sound_diag_unit4
+
+   if (trace_use) call da_trace_entry("da_obs_diagnostics")
 
    call da_get_unit(sound_diag_unit1)
    call da_get_unit(sound_diag_unit2)
@@ -93,16 +95,18 @@ subroutine da_obs_diagnostics(num_sound, ob, iv, re)
      '00000',0.0,0.0,0.0,0.0,0.0,0.0,0.0,0
 
    write(unit=sound_diag_unit4,fmt='(a5,2f9.3,5f17.7,i8)') &
-     '00000',0.0,0.0,0.0,0.0,0.0,0.0,0.0,0
+      '00000',0.0,0.0,0.0,0.0,0.0,0.0,0.0,0
 
-    close(sound_diag_unit1)
-    close(sound_diag_unit2)
-    close(sound_diag_unit3)
-    close(sound_diag_unit4)
-    call da_free_unit(sound_diag_unit1)
-    call da_free_unit(sound_diag_unit2)
-    call da_free_unit(sound_diag_unit3)
-    call da_free_unit(sound_diag_unit4)
+   close(sound_diag_unit1)
+   close(sound_diag_unit2)
+   close(sound_diag_unit3)
+   close(sound_diag_unit4)
+   call da_free_unit(sound_diag_unit1)
+   call da_free_unit(sound_diag_unit2)
+   call da_free_unit(sound_diag_unit3)
+   call da_free_unit(sound_diag_unit4)
+
+   if (trace_use) call da_trace_exit("da_obs_diagnostics")
 
  end subroutine da_obs_diagnostics
 

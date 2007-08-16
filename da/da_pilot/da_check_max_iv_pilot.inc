@@ -6,11 +6,14 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
 
    implicit none
 
-   integer,           intent (in)         :: it      ! Outer iteration
-   type (pilot_type), intent(inout)       :: pilot
-   integer, intent(inout) :: itu,ituf,itvv,itvvf
-   integer                                :: k
-   logical                                :: failed
+   integer,           intent(in)    :: it      ! Outer iteration
+   type (pilot_type), intent(inout) :: pilot
+   integer,           intent(inout) :: itu,ituf,itvv,itvvf
+
+   integer :: k
+   logical :: failed
+   
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_pilot")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -21,8 +24,8 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
       write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for Pilot_U   = ',max_error_uv, &
-         'Error max test ratio for Pilot_V   = ',max_error_uv
+         'Error max test ratio for pilot_u   = ',max_error_uv, &
+         'Error max test ratio for pilot_v   = ',max_error_uv
    end if
 
    !---------------------------------------------------------------------------
@@ -33,15 +36,15 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
 
    do k = 1, pilot % info % levels
       ! U-wind
-      call da_max_error_qc(it, pilot % info, pilot % u(k), &
-         max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-         failed, check_max_iv_print)
+      call da_max_error_qc(it, pilot % info, pilot % u(k), max_error_uv, itu, ituf, &
+         check_max_iv_unit, 'U    ', failed, check_max_iv_print)
 
       ! V-wind
-      call da_max_error_qc (it, pilot % info, pilot % v(k),&
-         max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-         failed, check_max_iv_print)
+      call da_max_error_qc (it, pilot % info, pilot % v(k), max_error_uv, itvv, itvvf, &
+         check_max_iv_unit, 'V    ', failed, check_max_iv_print)
    end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_pilot")
 
 end subroutine da_check_max_iv_pilot
 

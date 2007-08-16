@@ -10,9 +10,11 @@ subroutine da_transform_xtopsfc(grid, synop, y_synop)
    type (synop_type),          intent(in)  :: synop
    type (residual_synop_type), intent(out) :: y_synop
 
-   real    :: hsm, to, qo
-   real    :: tsm, qsm, psm    
-   real    :: psm_prime
+   real :: hsm, to, qo
+   real :: tsm, qsm, psm    
+   real :: psm_prime
+
+   if (trace_use) call da_trace_entry("da_transform_xtopsfc")
 
    ! 2.0 Surface assimilation approach 2 (2-m t and q, 10-m u and v)
 
@@ -70,6 +72,8 @@ subroutine da_transform_xtopsfc(grid, synop, y_synop)
       call da_sfc_pre_lin(y_synop%p, psm_prime, y_synop%t, y_synop%q, &
          psm, tsm, qsm, hsm, synop%h)
    end if
+
+   if (trace_use) call da_trace_exit("da_transform_xtopsfc")
 
 end subroutine da_transform_xtopsfc
 

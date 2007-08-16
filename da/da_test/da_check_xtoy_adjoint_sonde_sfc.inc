@@ -10,11 +10,11 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   integer                        :: n             ! Loop counter.
+   integer :: n             ! Loop counter.
 
-   if (oi%num_sound < 1) return
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sonde_sfc")
 
-   do n=1, oi%num_sound
+   do n=1, oi%nlocal(sound)
       if (oi%sonde_sfc(n)%zk < 1.0) then
          y%sonde_sfc(n)%u = 0.0
          y%sonde_sfc(n)%v = 0.0
@@ -53,6 +53,8 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
       y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
       y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_sonde_sfc")
 
 end subroutine da_check_xtoy_adjoint_sonde_sfc
 

@@ -9,6 +9,8 @@ subroutine da_print_stats_radar(stats_unit, nrv, nrf, radar)
    integer,                 intent(in)    :: stats_unit
    integer,                 intent(inout) :: nrv, nrf
    type (stats_radar_type), intent(in)    :: radar
+
+   if (trace_use) call da_trace_entry("da_print_stats_radar")
    
    write(unit=stats_unit, fmt='(a/)') &
       '   var             rv (m/s)        n    k         rf (dBZ)        n    k  '
@@ -26,6 +28,8 @@ subroutine da_print_stats_radar(stats_unit, nrv, nrf, radar)
       ' Average     : ', radar%average%rv/real(nrv), radar%average%rf/real(nrf), &
       '    RMSE     : ', sqrt(radar%rms_err%rv/real(nrv)), &
       sqrt(radar%rms_err%rf/real(nrf))
+
+   if (trace_use) call da_trace_exit("da_print_stats_radar")
 
 end subroutine da_print_stats_radar
 

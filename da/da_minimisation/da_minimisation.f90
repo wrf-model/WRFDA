@@ -31,19 +31,18 @@ module da_minimisation
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
       rtm_option,rtm_option_rttov, rtm_option_crtm, anal_type_verify, &
-      write_filtered_rad,omb_set_rand, num_airsr_tot,jo_unit,num_airep_tot, &
-      num_buoy_tot,num_geoamv_tot,num_gpsref_tot,num_pilot_tot, &
-      num_polaramv_tot,num_radiance_tot,num_qscat_tot,num_profiler_tot, &
-      num_metar_tot,num_gpspw_tot,num_bogus_tot,num_sound_tot,num_ssmi_tot, &
-      num_ships_tot,num_ssmt2_tot,use_rad,var_scaling2,var_scaling1, &
-      num_synop_tot,var_scaling4,var_scaling5,var_scaling3,num_ssmt1_tot, &
-      num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
+      write_filtered_rad,omb_set_rand,use_rad,var_scaling2,var_scaling1, &
+      var_scaling4,var_scaling5,var_scaling3, jo_unit, &
+      print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
       cv_size_domain_je,cv_size_domain_jb, use_bogusobs, use_satemobs, &
       use_pilotobs, use_ssmt1obs, use_ssmt2obs, use_buoyobs, &
       use_airsretobs, use_profilerobs, use_qscatobs, use_radarobs, &
       use_polaramvobs, use_airepobs, use_geoamvobs, use_soundobs, &
       use_synopobs, use_metarobs, use_ssmiretrievalobs, use_ssmitbobs, &
-      use_gpsrefobs, use_shipsobs, use_gpspwobs, num_pseudo
+      use_gpsrefobs, use_shipsobs, use_gpspwobs, num_pseudo, &
+      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
+      bogus, buoy, qscat,pseudo, radiance
 
 #ifdef CRTM
    use da_crtm, only : da_get_innov_vector_crtm
@@ -104,13 +103,14 @@ module da_minimisation
       da_get_innov_vector_sonde_sfc,da_jo_and_grady_sound, da_residual_sound, &
       da_jo_and_grady_sound,da_jo_and_grady_sonde_sfc,da_residual_sonde_sfc
    use da_ssmi, only : da_calculate_grady_ssmi,da_calculate_grady_ssmt1, &
-      da_calculate_grady_ssmt2, da_ao_stats_ssmi,da_ao_stats_ssmt2, &
+      da_calculate_grady_ssmt2, da_ao_stats_ssmi_tb ,da_ao_stats_ssmt2, &
       da_ao_stats_ssmt2, da_oi_stats_ssmt1, da_oi_stats_ssmt2, &
-      da_oi_stats_ssmi,da_ao_stats_ssmt1,da_get_innov_vector_ssmi_tb, &
+      da_oi_stats_ssmi_tb,da_oi_stats_ssmi_rv,da_ao_stats_ssmt1,da_get_innov_vector_ssmi_tb, &
       da_get_innov_vector_ssmi_rv, da_residual_ssmi_rv, da_residual_ssmi_tb, &
       da_get_innov_vector_ssmt1,da_get_innov_vector_ssmt2, &
-      da_jo_and_grady_ssmt1, da_jo_and_grady_ssmt2,da_jo_and_grady_ssmi, &
-      da_residual_ssmt1,da_residual_ssmt2
+      da_jo_and_grady_ssmt1, da_jo_and_grady_ssmt2,da_jo_and_grady_ssmi_tb, &
+      da_jo_and_grady_ssmi_rv, &
+      da_residual_ssmt1,da_residual_ssmt2, da_ao_stats_ssmi_rv
    use da_synop, only : da_calculate_grady_synop, da_ao_stats_synop, &
       da_oi_stats_synop, da_get_innov_vector_synop, da_residual_synop, &
       da_jo_and_grady_synop

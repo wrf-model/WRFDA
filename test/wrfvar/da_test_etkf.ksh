@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+export NUM_PROCS=1
+
 . ./setup.ksh
 
 export EXPT=vartest

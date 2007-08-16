@@ -14,10 +14,11 @@ subroutine da_transform_xtogpsref(grid)
    integer :: i, j, k
    real    :: partone, parttwo, dividnd
 
+   if (trace_use_dull) call da_trace_entry("da_transform_xtogpsref")
+
    do k = kts, kte
       do j = jts, jte
          do i = its, ite
-
             ! calculate refractivity
 
             !  1, Hydrostatic part of refractivity:
@@ -36,6 +37,8 @@ subroutine da_transform_xtogpsref(grid)
          end do
       end do
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtogpsref")
    
 end subroutine da_transform_xtogpsref
 

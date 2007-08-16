@@ -15,11 +15,10 @@ subroutine da_residual_synop(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                        np_missing  , np_bad_data
-
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
+
+   if (trace_use_dull) call da_trace_entry("da_residual_synop")
 
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
@@ -27,7 +26,7 @@ subroutine da_residual_synop(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_synop
+   do n=1, iv%nlocal(synop)
       np_available = np_available + 5
 
       re%synop(n)%u = da_residual(n, 0, y%synop(n)%u, iv%synop(n)%u, n_obs_bad % u)
@@ -46,6 +45,8 @@ subroutine da_residual_synop(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
       n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
       n_obs_bad % p % num % use + n_obs_bad % q % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_synop")
 
 end subroutine da_residual_synop
 

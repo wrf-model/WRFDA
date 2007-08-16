@@ -632,6 +632,7 @@ rconfig   integer   trace_repeat_body       namelist,wrfvar9  1  10        - "tr
 rconfig   integer   trace_max_depth         namelist,wrfvar9  1  30        - "trace_max_depth"         ""  ""
 rconfig   logical   trace_use               namelist,wrfvar9  1  .true.    - "trace_use"               ""  ""
 rconfig   logical   trace_use_frequent      namelist,wrfvar9  1  .true.    - "trace_use_frequent"      ""  ""
+rconfig   logical   trace_use_dull          namelist,wrfvar9  1  .false.    - "trace_use_dull"          ""  ""
 rconfig   logical   trace_memory            namelist,wrfvar9  1  .true.    - "trace_memory"            ""  ""
 rconfig   logical   trace_all_pes           namelist,wrfvar9  1  .false.   - "trace_all_pes"           ""  ""
 rconfig   logical   trace_csv               namelist,wrfvar9  1  .true.    - "trace_csv"               ""  ""

@@ -6,14 +6,14 @@ subroutine da_transform_xtoseasfcwind_lin(grid)
 
    implicit none
 
-   type (domain),  intent(inout) :: grid
+   type (domain), intent(inout) :: grid
 
-   real :: const, rgh_fac, height
+   real    :: const, rgh_fac, height
    integer :: i, j, k
 
    if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind_lin")
 
-   const = log(10./0.0001)
+   const = log(10.0/0.0001)
    k = grid%xb%kts
     
    do j=jts,jte
@@ -29,8 +29,7 @@ subroutine da_transform_xtoseasfcwind_lin(grid)
 
          rgh_fac = const/log(height/0.0001) ! roughness = 0.0001
          grid%xa%speed(i,j) = (grid%xa%u(i,j,k)*grid%xb%u(i,j,k) &
-                    +  grid%xa%v(i,j,k)*grid%xb%v(i,j,k)) &
-                    *  rgh_fac*rgh_fac / grid%xb%speed(i,j)
+            + grid%xa%v(i,j,k)*grid%xb%v(i,j,k)) * rgh_fac*rgh_fac / grid%xb%speed(i,j)
       end do
    end do
 

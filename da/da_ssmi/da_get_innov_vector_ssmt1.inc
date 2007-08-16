@@ -26,10 +26,10 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
 
    integer :: itt, ittf
     
-   if (trace_use) call da_trace_entry("da_get_innov_vector_ssmt1")
+   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_ssmt1")
 
    itt = 0 ; ittf = 0
-   do n=1, iv % num_ssmt1
+   do n=1, iv % nlocal(ssmt1)
 
       num_levs = iv % ssmt1(n) % info % levels
 
@@ -109,7 +109,7 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
          'Number of failed RH(T1) observations:    ',ittf, ' on ',itt
    end if
     
-   if (trace_use) call da_trace_exit("da_get_innov_vector_ssmt1")
+   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_ssmt1")
 
 end subroutine da_get_innov_vector_ssmt1
 

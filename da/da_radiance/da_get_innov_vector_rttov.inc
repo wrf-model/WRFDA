@@ -65,10 +65,9 @@ real,allocatable :: temp(:)
       ssmi  = trim( inst_name(rtminit_sensor(inst))) == 'ssmi'
       sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
 
-      if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
-          iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
-      n1 = iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1
-      n2 = iv%ob_numb(iv%current_ob_time)%radiance(inst)
+      if (iv%plocal_rad(iv%time,inst) <= iv%plocal_rad(iv%time-1,inst)) cycle
+      n1 = iv%plocal_rad(iv%time-1,inst)+1
+      n2 = iv%plocal_rad(iv%time,inst)
 
       n1n2=n2-n1+1
 

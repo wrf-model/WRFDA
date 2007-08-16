@@ -13,13 +13,15 @@ subroutine da_jo_and_grady_ships(iv, re, jo, jo_grad_y)
 
    integer :: n
 
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_ships")
+
    jo % ships_u = 0.0
    jo % ships_v = 0.0
    jo % ships_t = 0.0
    jo % ships_p = 0.0
    jo % ships_q = 0.0
 
-   do n=1, iv%num_ships
+   do n=1, iv%nlocal(ships)
       jo_grad_y%ships(n)%u = -re%ships(n)%u / &
          (iv%ships(n)%u%error * iv%ships(n)%u%error)
       jo_grad_y%ships(n)%v = -re%ships(n)%v / &
@@ -45,6 +47,8 @@ subroutine da_jo_and_grady_ships(iv, re, jo, jo_grad_y)
    jo % ships_t = 0.5 * jo % ships_t
    jo % ships_p = 0.5 * jo % ships_p
    jo % ships_q = 0.5 * jo % ships_q
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_ships")
      
 end subroutine da_jo_and_grady_ships
 

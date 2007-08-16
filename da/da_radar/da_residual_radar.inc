@@ -15,13 +15,15 @@ subroutine da_residual_radar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    integer       , intent(inout) :: np_missing
    integer       , intent(inout) :: np_bad_data
 
-   type (bad_data_type)              :: n_obs_bad
-   integer                           :: n, k
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n, k
+
+   if (trace_use) call da_trace_entry("da_residual_radar")
 
    n_obs_bad % rv % num = number_type(0, 0, 0)
    n_obs_bad % rf % num = number_type(0, 0, 0)
 
-   do n=1, iv%num_radar
+   do n=1, iv%nlocal(radar)
       do k=1, iv%radar(n)%info%levels
          if (use_radar_rv) then
             np_available = np_available + 1
@@ -35,12 +37,11 @@ subroutine da_residual_radar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
       end do
    end do
 
-   np_missing  = np_missing  + n_obs_bad % rv % num % miss  &
-      + n_obs_bad % rf % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % rv % num % bad   &
-      + n_obs_bad % rf % num % bad
-   np_obs_used = np_obs_used + n_obs_bad % rv % num % use   &
-      + n_obs_bad % rf % num % use
+   np_missing  = np_missing  + n_obs_bad % rv % num % miss + n_obs_bad % rf % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % rv % num % bad  + n_obs_bad % rf % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % rv % num % use  + n_obs_bad % rf % num % use
+
+   if (trace_use) call da_trace_exit("da_residual_radar")
 
 end subroutine da_residual_radar
 

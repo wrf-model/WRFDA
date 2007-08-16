@@ -6,27 +6,24 @@ subroutine da_scan_radar (ob, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (ob_type), intent (inout) :: ob
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (ob_type),    intent(inout) :: ob
+   character(len=*),  intent(in)    :: filename
 
-   character(len=*), intent(in)   :: filename
-
-   integer                       :: i, j, n, iost, nlevels, num_radar, fm
+   integer                       :: i, j, n, iost, nlevels, fm
    integer                       :: total_radar
+   integer                       :: file_radar
    integer                       :: iunit
 
    type (radar_multi_level_type) :: platform
 
-   character (LEN = 120)         :: char_total_radar
+   character (LEN = 120)         :: char_file_radar
    character (LEN = 120)         :: char_ned
 
    logical                       :: outside
-   integer                        ::n_dup, ndup
+   integer                       :: n_dup, ndup
 
    if (trace_use) call da_trace_entry("da_scan_radar")
-
-   ! default value.
-   ob%ob_numb(ob%current_ob_time)%radar = ob%num_radar
 
    ! 1. open file
    ! ============
@@ -48,15 +45,13 @@ subroutine da_scan_radar (ob, xp, filename)
       return
    end if
 
-   num_radar = 0
-
    ! 2. read total radar
    ! ===================
 
    ! 2.1 read first line
    !     ---------------
 
-   read (unit=iunit, fmt = '(A)', iostat = iost) char_total_radar
+   read (unit=iunit, fmt = '(A)', iostat = iost) char_file_radar
    if (iost /= 0) then
       ! Does matter if present and unreadable
       call da_error(__FILE__,__LINE__, &
@@ -65,7 +60,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
    ! 2.3 total radar number
 
-   read (unit=char_total_radar (15:17),fmt='(I3)', iostat = iost) total_radar
+   read (unit=char_file_radar (15:17),fmt='(I3)', iostat = iost) file_radar
 
    ! 2.4 skip one lines
 
@@ -73,7 +68,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
    ! 3. read radar data
 
-   do n = 1, total_radar
+   do n = 1, file_radar
 
       ! 3.1 skip one blank line
 
@@ -109,8 +104,6 @@ subroutine da_scan_radar (ob, xp, filename)
 
          read(unit=platform % info % platform (4:6), fmt='(I3)') fm
 
-         ob % total_obs = ob % total_obs + 1
-
          !     3.5.2 read each level
 
          do i = 1, platform % info % levels
@@ -131,10 +124,6 @@ subroutine da_scan_radar (ob, xp, filename)
 
          call da_ll_to_xy (platform%info, platform%loc, xp, outside)
 
-         if (outside) then
-            cycle reports
-         end if
-
          nlevels = platform%info%levels
 
          if (nlevels > max_ob_levels) then
@@ -148,6 +137,11 @@ subroutine da_scan_radar (ob, xp, filename)
             cycle reports
          end if
 
+         ob%ntotal(radar) = ob%ntotal(radar) + 1
+         if (outside) then
+            cycle reports
+         end if
+
          ! Loop over duplicating obs for global
          n_dup = 1
          if (global .and. &
@@ -157,16 +151,16 @@ subroutine da_scan_radar (ob, xp, filename)
             select case (fm)
 
             case (128)
-               num_radar = num_radar + 1
+               ob%nlocal(radar) = ob%nlocal(radar) + 1
 
-               if (num_radar > max_radar) then
+               if (ob%nlocal(radar) > max_radar) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &
-                     ' radar #= ',ob % num_radar, ' > max_radar = ', max_radar
+                     ' radar #= ',ob % nlocal(radar), ' > max_radar = ', max_radar
                   call da_error(__FILE__,__LINE__,message(1:1))
                end if
 
             case default;
-               write(unit=stdout, fmt='(a)') 'Warining: unsaved obs found:'
+               write(unit=stdout, fmt='(a)') 'Warning: unsaved obs found:'
 
                write(unit=stdout, fmt='(2a)') &
                   'platform % info % platform=', platform % info % platform
@@ -180,13 +174,9 @@ subroutine da_scan_radar (ob, xp, filename)
 
    close (iunit)
    call da_free_unit(iunit)
- 
-   if (print_detail_radar) write(unit=stdout, fmt='(/5x,a,i6,a)') &
-      ' Read:  ', num_radar, ' radar reports '
 
-   ob%num_radar = ob%num_radar + num_radar
-
-   ob%ob_numb(ob%current_ob_time)%radar = ob%num_radar
+   ob%plocal((ob%time),:) = ob%nlocal(:)
+   ob%ptotal((ob%time),:) = ob%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_radar")
 

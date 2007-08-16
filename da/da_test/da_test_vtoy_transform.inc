@@ -9,29 +9,27 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, xbx, be, iv, y)
    implicit none
 
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type(domain) ,   target              :: grid
-   type (vp_type),    intent(inout)     :: vv    ! Grdipt/EOF CV.
-   type (vp_type),    intent(inout)     :: vp    ! Grdipt/level CV.
-   type (xbx_type),   intent(in)        :: xbx   ! Header & non-gridded vars.
-   type (be_type),    intent(in)        :: be    ! background error structure.
-   type (ob_type),    intent(inout)     :: iv    ! ob. increment vector.
-   type (y_type),     intent(inout)     :: y     ! y = h (xa)
+   type(domain),               intent(inout) :: grid
+   type(vp_type),              intent(inout) :: vv    ! Grdipt/EOF CV.
+   type(vp_type),              intent(inout) :: vp    ! Grdipt/level CV.
+   type(xbx_type),             intent(in)    :: xbx   ! Header & non-gridded vars.
+   type(be_type),              intent(in)    :: be    ! background error structure.
+   type(ob_type),              intent(inout) :: iv    ! ob. increment vector.
+   type(y_type),               intent(inout) :: y     ! y = h (xa)
 
 
-   real, dimension(1:cv_size)        :: cv          ! Test control variable.
-   real, dimension(1:cv_size)        :: cv_2
+   real    :: cv(1:cv_size)          ! Test control variable.
+   real    :: cv_2(1:cv_size)
+   real    :: field(ims:ime, jms:jme)
+   real    :: adj_sum_lhs               ! < y, y >
+   real    :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
+   real    :: partial_lhs   ! < y, y >
+   real    :: pertile_lhs   ! < y, y >
 
-   real, dimension(ims:ime, jms:jme) :: field
+   if (trace_use) call da_trace_entry("da_test_vtoy_transform")
 
-   real                           :: adj_sum_lhs               ! < y, y >
-   real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
-   real                           :: partial_lhs   ! < y, y >
-   real                           :: pertile_lhs   ! < y, y >
-
-   write(unit=stdout, fmt='(/a/a)') &
-        '       da_test_vtoy_transform:',&
-        '---------------------------------------'
-
+   write(unit=stdout, fmt='(a)') '       da_test_vtoy_transform:'
+   write(unit=stdout, fmt='(a)') '---------------------------------------'
 
    call random_number(cv(:))
    cv(:) = cv(:) - 0.5
@@ -69,8 +67,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, xbx, be, iv, y)
   if( global ) then
      adj_sum_rhs = adj_rhs
   else
-     call mpi_allreduce( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
-                       comm, ierr)
+     call mpi_allreduce( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, comm, ierr)
   end if
 #else
    adj_sum_rhs = adj_rhs
@@ -91,6 +88,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, xbx, be, iv, y)
       'Whole Domain  < v, v_adj > = ', adj_sum_rhs
 #endif
 
+   if (trace_use) call da_trace_exit("da_test_vtoy_transform")
 
 end subroutine da_test_vtoy_transform
 
