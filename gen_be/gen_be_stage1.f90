@@ -145,9 +145,6 @@ program gen_be_stage1
             rh_mean(:,:,:) = 0.0
             ps_mean(:,:) = 0.0
 
-            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                                 lat_min, lat_max, binwidth_lat, &
-                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
          end if
 
          read(iunit)psi_prime
@@ -158,6 +155,13 @@ program gen_be_stage1
          read(iunit)height
          read(iunit)latitude
          close(iunit)
+
+
+         if ( count == 1 ) then
+            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
+                                 lat_min, lat_max, binwidth_lat, &
+                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
+         end if
 
 !---------------------------------------------------------------------------------------------
 !        write(6,(2a)) [2] Calculate time/ensemble mean.

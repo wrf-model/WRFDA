@@ -161,21 +161,6 @@ program gen_be_stage1_1dvar
             allocate( bin(1:ni,1:nj,1:nk) )
             allocate( bin2d(1:ni,1:nj) )
 
-            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                                 lat_min, lat_max, binwidth_lat, &
-                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
-
-!           Write bin info:
-            filename = 'bin.data'
-            open (ounit, file = filename, form='unformatted')
-            write(ounit)bin_type
-            write(ounit)lat_min, lat_max, binwidth_lat
-            write(ounit)hgt_min, hgt_max, binwidth_hgt
-            write(ounit)num_bins, num_bins2d
-            write(ounit)bin(1:ni,1:nj,1:nk)
-            write(ounit)bin2d(1:ni,1:nj)
-            close(ounit)
-
             allocate( t_mean(1:num_bins) )
             allocate( q_mean(1:num_bins) )
             allocate( ps_mean(1:num_bins2d) )
@@ -209,7 +194,6 @@ program gen_be_stage1_1dvar
             bin_pts(:) = 0
             bin_pts2d(:) = 0
 
-            first_time = .false.
          end if
 
          read(iunit)dummy ! Read psi
@@ -217,8 +201,28 @@ program gen_be_stage1_1dvar
          read(iunit)t_prime ! Finally, get to T!
          read(iunit)dummy ! Read rh
          read(iunit)ps_prime
+         read(iunit)height
+         read(iunit)latitude
          close(iunit)
 
+         if ( first_time ) then
+            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
+                                 lat_min, lat_max, binwidth_lat, &
+                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
+
+!           Write bin info:
+            filename = 'bin.data'
+            open (ounit, file = filename, form='unformatted')
+            write(ounit)bin_type
+            write(ounit)lat_min, lat_max, binwidth_lat
+            write(ounit)hgt_min, hgt_max, binwidth_hgt
+            write(ounit)num_bins, num_bins2d
+            write(ounit)bin(1:ni,1:nj,1:nk)
+            write(ounit)bin2d(1:ni,1:nj)
+            close(ounit)
+
+            first_time = .false.
+         end if
 !        Get q data from q_diff files:
          filename = 'q_diff.'//date(1:4)//'-'//date(5:6)//'-'//date(7:8)//'_'//date(9:10)//':00:00'
          if ( be_method == 'ENS' ) filename = trim(filename)//'.'//trim(ce)
