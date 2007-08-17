@@ -246,11 +246,11 @@ echo "WINDOW_END            $WINDOW_END"
          done
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi + ob.ssmi01
          for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob.ssmi${I}
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi - ob.ssmi07
 
          ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
          for I in 02 03 04 05 06; do
@@ -288,7 +288,7 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      ln -fs $OB_DIR/${DATE}/ssmi.dat  ssmi01.dat
+      ln -fs $OB_DIR/${DATE}/ob.ssmi  ob.ssmi01
       ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
    fi
 
@@ -587,6 +587,14 @@ echo "WINDOW_END            $WINDOW_END"
 
       if test -f grad_fn; then
          cp grad_fn $RUN_DIR
+      fi
+
+      if test -f filtered_obs; then
+         cp filtered_obs $RUN_DIR
+      fi
+
+      if test -f gts_omb_oma; then
+         cp gts_omb_oma $RUN_DIR
       fi
 
       # remove intermediate output files
