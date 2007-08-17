@@ -1,8 +1,0 @@
-#!/bin/ksh
-cd src
-make clean
-rm -f *.a
-make g95
-rm *.o
-cd ..
-ln -fs src/libCRTM.a libcrtm.a
