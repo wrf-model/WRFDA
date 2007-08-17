@@ -25,19 +25,16 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 
 . ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
 
-if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
-if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
+if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi
+if [[ ! -d $STAGE0_DIR ]]; then mkdir -p $STAGE0_DIR; fi
 
-#List of control variables:
-for SV in fullflds psi chi t rh ps; do
-   if [[ ! -d ${RUN_DIR}/$SV ]]; then mkdir ${RUN_DIR}/$SV; fi
-done
+mkdir -p $WORK_DIR
+cd $WORK_DIR
 
-for CV in $CONTROL_VARIABLES; do
-   if [[ ! -d ${RUN_DIR}/$CV ]]; then mkdir ${RUN_DIR}/$CV; fi
-done
+# List of control variables:
+for SV in fullflds psi chi t rh ps; do mkdir -p $SV; done
 
-cd $RUN_DIR
+for CV in $CONTROL_VARIABLES; do mkdir -p $CV; done
 
 #------------------------------------------------------------------------
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
@@ -343,6 +340,13 @@ if $RUN_GEN_BE_MULTICOV; then
       exit 1
    fi
 fi
+
+# Preserve the interesting log files
+cp $WORK_DIR/*log $RUN_DIR
+cp $STAGE0_DIR/*log $RUN_DIR
+cp $WORK_DIR/be.dat $RUN_DIR
+
+if $CLEAN; then rm -rf $WORK_DIR; fi
 
 export END_CPU=$(date)
 echo "Ending CPU time: ${END_CPU}"

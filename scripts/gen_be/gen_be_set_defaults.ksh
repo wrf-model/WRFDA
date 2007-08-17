@@ -65,9 +65,9 @@ export ID=${ID:-gen_be}
 export ID1=${ID1:-${BE_METHOD}.bin_type${BIN_TYPE}}
 export VARIABLE1=${VARIABLE1:-chi_u}              # For cov3d
 export VARIABLE2=${VARIABLE2:-chi}                # For cov3d
+export CLEAN=false
 
 # Directories:
-export DATA_DISK=${DATA_DISK:-/smoke}             # Directory containing codes.
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var code build directory.
@@ -76,7 +76,8 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/gen_be}        # Run dir.
-export STAGE0_DIR=${STAGE0_DIR:-$RUN_DIR/stage0}  # Output for stage0.
+export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Working directory
+export STAGE0_DIR=${STAGE0_DIR:-$WORK_DIR/stage0} # Output for stage0.
 
 if $GLOBAL; then
    export UH_METHOD=power

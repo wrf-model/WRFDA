@@ -24,8 +24,8 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 . ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
 
 for CV in $CONTROL_VARIABLES; do
-   if [[ ! -d ${RUN_DIR}/$CV ]]; then
-      echo "Input data directory ${RUN_DIR}/$CV is missing. Exiting"
+   if [[ ! -d ${WORK_DIR}/$CV ]]; then
+      echo "Input data directory ${WORK_DIR}/$CV is missing. Exiting"
       exit
    fi
 done

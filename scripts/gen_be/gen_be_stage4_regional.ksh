@@ -23,14 +23,14 @@ echo "---------------------------------------------------------------"
 export BEGIN_CPU=$(date)
 echo "Beginning CPU time: ${BEGIN_CPU}"
 
-export TMP_DIR=${RUN_DIR}/gen_be_stage4_regional.${STRIDE}
+export TMP_DIR=${WORK_DIR}/gen_be_stage4_regional.${STRIDE}
 if [[ ! -d $TMP_DIR ]]; then mkdir $TMP_DIR 2> /dev/null; fi
 
 for VARIABLE in $CONTROL_VARIABLES; do
 
    # Check data exists:
-   if [[ ! -d ${RUN_DIR}/$VARIABLE ]]; then
-      echo "Input data directory ${RUN_DIR}/$VARIABLE is missing. Exiting"
+   if [[ ! -d ${WORK_DIR}/$VARIABLE ]]; then
+      echo "Input data directory ${WORK_DIR}/$VARIABLE is missing. Exiting"
       exit 1
    fi
 
@@ -60,7 +60,7 @@ for VARIABLE in $CONTROL_VARIABLES; do
     ne = ${NE},
     k = ${VINDEX},
     stride = ${STRIDE},
-    run_dir = '${RUN_DIR}' /
+    run_dir = '${WORK_DIR}' /
 EOF
  
       if $LOCAL; then
@@ -87,12 +87,12 @@ EOF
    # Collect files together: 
 
    let VINDEX=1
-   cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${RUN_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+   cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
 
    if [[ $MAX_VINDEX -gt 1 ]]; then
       let VINDEX=2
       while [[ $VINDEX -le $MAX_VINDEX ]]; do
-         cat ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* >> ${RUN_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+         cat ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* >> ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
          let VINDEX=$VINDEX+1
       done
    fi

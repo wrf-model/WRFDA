@@ -29,7 +29,7 @@ export DATE=$START_DATE_STAGE0
 
 while test $DATE -le $END_DATE_STAGE0; do
 
-   export TMP_DIR=${RUN_DIR}/${DATE}
+   export TMP_DIR=${WORK_DIR}/${DATE}
    rm -rf ${TMP_DIR} 2>/dev/null
    mkdir ${TMP_DIR}  2>/dev/null
    cd ${TMP_DIR}
