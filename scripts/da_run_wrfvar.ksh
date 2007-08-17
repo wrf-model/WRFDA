@@ -289,12 +289,12 @@ echo "WINDOW_END            $WINDOW_END"
          done
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         if [[ -e $OB_DIR/${D_DATE[01]}/ssmi.dat+ ]]; then
-            ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+         if [[ -e $OB_DIR/${D_DATE[01]}/ob.ssmi+ ]]; then
+            ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob.ssmi01
             for I in 02 03 04 05 06; do
-               ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
+               ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob.ssmi${I}
             done
-            ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
+            ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi - ob.ssmi07
          fi
 
          if [[ -e $OB_DIR/${D_DATE[01]}/radar.dat+ ]]; then
@@ -335,8 +335,8 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      if [[ -e $OB_DIR/${DATE}/ssmi.dat ]]; then
-         ln -fs $OB_DIR/${DATE}/ssmi.dat ssmi01.dat
+      if [[ -e $OB_DIR/${DATE}/ob.ssmi ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.ssmi ob.ssmi01
       fi
       if [[ -e $OB_DIR/${DATE}/radar.dat ]]; then
          ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
