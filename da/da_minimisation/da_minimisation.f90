@@ -34,12 +34,7 @@ module da_minimisation
       write_filtered_rad,omb_set_rand,use_rad,var_scaling2,var_scaling1, &
       var_scaling4,var_scaling5,var_scaling3, jo_unit, &
       print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
-      cv_size_domain_je,cv_size_domain_jb, use_bogusobs, use_satemobs, &
-      use_pilotobs, use_ssmt1obs, use_ssmt2obs, use_buoyobs, &
-      use_airsretobs, use_profilerobs, use_qscatobs, use_radarobs, &
-      use_polaramvobs, use_airepobs, use_geoamvobs, use_soundobs, &
-      use_synopobs, use_metarobs, use_ssmiretrievalobs, use_ssmitbobs, &
-      use_gpsrefobs, use_shipsobs, use_gpspwobs, num_pseudo, &
+      cv_size_domain_je,cv_size_domain_jb, num_pseudo, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, radiance

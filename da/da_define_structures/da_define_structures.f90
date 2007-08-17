@@ -7,7 +7,7 @@ module da_define_structures
    use module_domain, only: vp_type, x_type
 
    use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
-      vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
+      vert_corr, global, vert_evalue,print_detail_be, maxsensor, &
       max_ob_levels,da_array_print, trace_use, num_ob_indexes, &
       vert_corr_1, vert_corr_2, vert_evalue_global, &
       put_rand_seed, seed_array1, seed_array2, &

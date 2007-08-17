@@ -11,15 +11,15 @@ module da_obs_io
       report_end, global, print_detail_obs, stdout, t_kelvin, stderr, &
       max_ob_levels, missing_data, max_bogus_input, myproc,convert_uv2fd, &
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &
-      max_radar, print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
+      print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
       use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity, &
       filename_len, t0, max_airep_input, max_bogus_input, &
       max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &
-      max_airsret_input, max_polaramv_input, max_radar_input, &
-      max_profiler_input,max_ssmi_ret_input, max_sound_input, max_ships_input, &
+      max_airsr_input, max_polaramv_input, max_radar_input, &
+      max_profiler_input, max_sound_input, max_ships_input, &
       max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
-      max_synop_input,max_ssmt2_input, max_ssmi_tb_input, max_qscat_input, &
-      max_airsret_input, obs_names, num_ob_indexes, &
+      max_synop_input,max_ssmt2_input,  max_qscat_input, &
+      obs_names, num_ob_indexes, &
       sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
       metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
       radar, radiance, airsr

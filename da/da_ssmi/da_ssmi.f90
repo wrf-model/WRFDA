@@ -1,21 +1,20 @@
 module da_ssmi
 
 
-   use module_dm, only : wrf_dm_sum_integer
    use module_domain, only : xpose_type, xb_type, domain
    use module_ssmi, only : cal_sigma_v,tb,effht,epsalt,spemiss,tbatmos,&
       roughem,effang,tbatmos,filter
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, t_roughem, t_kelvin, &
-      missing, max_error_uv, max_error_t, rootproc, pi, trace_use_dull, &
+      missing, max_error_uv, max_error_t, rootproc, pi, trace_use, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, max_error_thickness, mkz, &
-      max_error_rh,max_error_tb, max_error_pw, &
-      trace_use,test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
-      global, print_detail_obs, &
-      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme,ids,ide,jds,jde, &
+      max_error_rh,max_error_tb, max_error_pw, trace_use_dull, &
+      test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
+      global, print_detail_obs, max_ssmi_rv_input, max_ssmi_tb_input, &
+      its,ite,jts,jte,kts,kte,kms,kme,ids,ide,jds,jde, &
       ssmi_tb, ssmi_rv, num_ob_indexes, ssmt1, ssmt2
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &

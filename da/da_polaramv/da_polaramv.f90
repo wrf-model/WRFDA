@@ -3,7 +3,7 @@ module da_polaramv
    use module_domain, only : xpose_type, xb_type, domain
    
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, check_max_iv_print, trace_use, trace_use_dull, &
+      v_interp_p, v_interp_h, check_max_iv_print, trace_use_dull, &
       missing, max_error_uv, max_error_t, rootproc, kms,kme,kts,kte, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &

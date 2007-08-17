@@ -34,7 +34,7 @@ program da_advance_time
 
    integer :: ccyy, mm, dd, hh, nn, ss, dday, dh, dn, ds, gday, gsec
 
-   integer :: nargum, i, n, id, ih, in, is
+   integer :: nargum, i, n
 
    character(len=80), dimension(10) :: argum
 
@@ -43,8 +43,6 @@ program da_advance_time
    character(len=80) :: out_date_format, dtime
 
    integer :: datelen
-
-   character(len=1) :: ch
    
    integer, parameter :: stdout=6
 
@@ -265,7 +263,8 @@ end subroutine change_date
 #endif
 
 function parsedate(datein)
-   character(len=80) :: datein
+   character(len=80), intent(in) :: datein
+
    character(len=14) :: parsedate
    character(len=1 ) :: ch
    integer :: n, i
@@ -287,8 +286,9 @@ function parsedate(datein)
 end function parsedate
 
 subroutine parsedt(dt,dday,dh,dn,ds)
-   character(len=80) :: dt
-   integer :: dday, dh, dn, ds
+   character(len=80), intent(in) :: dt
+   integer,           intent(inout) :: dday, dh, dn, ds
+
    character(len=1 ) :: ch
    integer :: n,i,d,s,nounit
    ! initialize time and sign
@@ -332,8 +332,8 @@ subroutine parsedt(dt,dday,dh,dn,ds)
 end subroutine parsedt
 
 function formatdate(datein,dateform)
-   character(len=14) :: datein
-   character(len=80) :: dateform
+   character(len=14), intent(in) :: datein
+   character(len=80), intent(in) :: dateform
    character(len=80) :: formatdate
    integer :: ic,iy,im,id,ih,in,is
    ic=index(dateform,'cc')
@@ -355,7 +355,7 @@ function formatdate(datein,dateform)
 end function formatdate
 
 function julian_day(ccyy,mm,dd)
-   integer :: ccyy,mm,dd
+   integer, intent(in) :: ccyy,mm,dd
    integer :: julian_day
    integer, parameter, dimension( 13) :: &
       bgn_day = (/ 0,  31,  59,  90, 120, 151, &
@@ -382,8 +382,9 @@ function isleapyear(year)
 end function isleapyear
 
 subroutine gregorian_day_sec(year,month,day,hours,minutes,seconds,gday,gsec)
-   integer :: day, month, year, hours, minutes, seconds
-   integer :: gday, gsec
+   integer, intent(in)  :: day, month, year, hours, minutes, seconds
+   integer, intent(out) :: gday, gsec
+
    integer :: ndays, m, nleapyr
    integer :: base_year = 1601
    integer :: days_per_month(12) = (/31,28,31,30,31,30,31,31,30,31,30,31/)
@@ -404,7 +405,8 @@ subroutine gregorian_day_sec(year,month,day,hours,minutes,seconds,gday,gsec)
 end subroutine gregorian_day_sec
 
 function validdate(ccyy,mm,dd,hh,nn,ss)
-   integer :: ccyy,mm,dd,hh,nn,ss
+   integer, intent(in) :: ccyy,mm,dd,hh,nn,ss
+
    logical :: validdate
 
    validdate = .true.

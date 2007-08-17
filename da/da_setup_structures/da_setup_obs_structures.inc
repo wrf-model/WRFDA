@@ -10,7 +10,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    type (y_type),     intent(out)   :: ob  ! Observation structure.
    type (ob_type),    intent(out)   :: iv  ! O-B structure.
 
-   integer :: i,j,n
+   integer :: i,j
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures")
 

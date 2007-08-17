@@ -20,10 +20,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
 #ifdef CRTM
 
-   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: k  ! Index dimension.
    integer                        :: num_rad  ! Number of radiance obs
-   real                           :: dx, dxm  ! Interpolation weights.
-   real                           :: dy, dym  ! Interpolation weights.
    integer                        :: inst, nchanl, n
    real                           :: q_ad
 

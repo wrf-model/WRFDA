@@ -4,7 +4,7 @@ module da_gpsref
    use module_dm, only : wrf_dm_sum_real
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, check_max_iv_print, trace_use, &
+      v_interp_p, v_interp_h, check_max_iv_print, &
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &

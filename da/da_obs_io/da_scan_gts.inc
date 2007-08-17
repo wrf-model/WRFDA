@@ -290,7 +290,7 @@ subroutine da_scan_gts (ob, xp, filename)
             ob%nlocal(buoy) = ob%nlocal(buoy) + 1
 
          case (133) ;               ! AIRS retrievals
-            if (.not.use_airsretobs .or. ob%ntotal(airsr) == max_airsret_input) cycle reports
+            if (.not.use_airsretobs .or. ob%ntotal(airsr) == max_airsr_input) cycle reports
             if (n==1) ob%ntotal(airsr) = ob%ntotal(airsr) + 1
             if (outside) cycle reports
             ob%nlocal(airsr) = ob%nlocal(airsr) + 1

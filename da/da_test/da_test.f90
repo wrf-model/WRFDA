@@ -27,11 +27,7 @@ module da_test
 #endif
 
    use da_control, only : trace_use,ims,ime,jms,jme,kms,kme, &
-      use_soundobs,ierr,use_buoyobs,use_bogusobs, trace_use_dull, &
-      use_geoamvobs,use_polaramvobs,use_pilotobs,use_metarobs,use_gpsrefobs, &
-      use_gpspwobs,use_qscatobs,use_satemobs,use_shipsobs,use_radarobs, &
-      use_profilerobs,use_ssmitbobs,use_synopobs,use_ssmt2obs,use_ssmt1obs, &
-      use_ssmiretrievalobs,use_airepobs,comm,global,stdout,rootproc, &
+      ierr, trace_use_dull, comm,global,stdout,rootproc, &
       its,ite,jts,jte,kts,kte,sfc_assi_options,typical_qrn_rms, &
       typical_u_rms,typical_v_rms,typical_w_rms,typical_t_rms, typical_p_rms, &
       typical_q_rms,typical_qcw_rms,print_detail_testing,typical_rh_rms, &
@@ -39,14 +35,15 @@ module da_test
       typical_thickness_rms, typical_tb19v_rms,typical_tb37h_rms, &
       typical_tb85h_rms,typical_tb37v_rms,typical_tb85v_rms,typical_tb22v_rms, &
       typical_tb19h_rms,typical_speed_rms,typical_tpw_rms,typical_ref_rms, &
-      use_rad,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
+      cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
       balance_geocyc, var4d, num_fgat_time,cv_options_hum_specific_humidity, &
       cv_options_hum_relative_humidity, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo
+      bogus, buoy, qscat,pseudo, use_radarobs, use_ssmiretrievalobs, &
+      use_gpsrefobs, use_ssmt1obs, use_ssmitbobs, use_ssmt2obs, use_gpspwobs
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &
       da_deallocate_y,be_type, xbx_type, ob_type, y_type
    use da_dynamics, only : da_uv_to_divergence,da_uv_to_vorticity, &

@@ -11,7 +11,6 @@ subroutine da_scan_radar (ob, xp, filename)
    character(len=*),  intent(in)    :: filename
 
    integer                       :: i, j, n, iost, nlevels, fm
-   integer                       :: total_radar
    integer                       :: file_radar
    integer                       :: iunit
 
@@ -153,9 +152,9 @@ subroutine da_scan_radar (ob, xp, filename)
             case (128)
                ob%nlocal(radar) = ob%nlocal(radar) + 1
 
-               if (ob%nlocal(radar) > max_radar) then
+               if (ob%nlocal(radar) > max_radar_input) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &
-                     ' radar #= ',ob % nlocal(radar), ' > max_radar = ', max_radar
+                     ' radar #= ',ob % nlocal(radar), ' > max_radar_input = ', max_radar_input
                   call da_error(__FILE__,__LINE__,message(1:1))
                end if
 

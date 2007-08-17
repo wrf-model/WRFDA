@@ -1,8 +1,0 @@
-&record1
- nproc = 16
- instid = 'noaa-15-amsua',  'noaa-15-amsub',  'noaa-16-amsua',  'noaa-16-amsub',  'noaa-16-hirs', 'noaa-17-amsub',  'noaa-17-hirs',  'eos-2-amsua',  'eos-2-airs',  'noaa-18-amsua',  'noaa-18-hirs',  'noaa-18-mhs',
- file_prefix = 'inv'
- start_date = '2005082700'
- end_date   = '2005082700'
- cycle_period  = 6
-/

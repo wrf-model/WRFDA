@@ -50,9 +50,9 @@ program da_rad_diags
    character(len=7)                       :: numbuf
    character(len=datelen1)                :: valid_date
    integer                                :: ninst, iinst, iproc, ipixel, ifirst
-   integer                                :: ios, i, j, n, ips, ipe, nerr, itime
+   integer                                :: ios, i, n, ips, ipe, nerr, itime
    integer                                :: ntime, nchan, total_npixel
-   integer, dimension(:), allocatable     :: ichan, npixel, iunit, ounit, scanpos, isflg
+   integer, dimension(:), allocatable     :: ichan, npixel, iunit, scanpos, isflg
    integer, dimension(:), allocatable     :: landsea_mask, soiltyp, vegtyp
    real,    dimension(:), allocatable     :: lat, lon, elv, elev
    real,    dimension(:), allocatable     :: satzen, satazi, t2m, mr2m, u10, v10, ps, ts
@@ -67,7 +67,7 @@ program da_rad_diags
    real,    dimension(:,:,:), allocatable :: prf_rain_jac, prf_snow_jac, prf_grau_jac, prf_hail_jac
    real,    dimension(:,:,:), allocatable :: prf_water_reff_jac, prf_ice_reff_jac, prf_rain_reff_jac
    real,    dimension(:,:,:), allocatable :: prf_snow_reff_jac, prf_grau_reff_jac, prf_hail_reff_jac
-   character(len=80), dimension(:), allocatable      :: inpname, outname
+   character(len=80), dimension(:), allocatable      :: inpname
    character(len=datelen1), dimension(:), allocatable :: datestr1          ! date string
    character(len=datelen2), dimension(:), allocatable :: datestr2          ! date string
 !
@@ -747,7 +747,6 @@ subroutine advance_cymdh(currentdate,dh,newdate)
    character(len=10), intent(out) :: newdate
    
    integer :: ccyy, mm, dd, hh
-   integer :: i, n
 
    read(currentdate(1:10), fmt='(i4, 3i2)')  ccyy, mm, dd, hh
    hh = hh + dh

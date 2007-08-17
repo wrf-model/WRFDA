@@ -411,8 +411,6 @@ module da_control
 
    ! Observations:
 
-   integer, parameter     :: max_radar = 10000    ! Maximum Number of radar obs.
-
    integer                :: num_procs            ! Number of total processors.
    integer                :: myproc               ! My processor ID.
    integer, parameter     :: root = 0             ! Number of root processor
