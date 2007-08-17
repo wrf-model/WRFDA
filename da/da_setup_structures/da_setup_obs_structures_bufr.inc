@@ -29,12 +29,6 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
          ! scan prepbufr observation file
          call da_scan_bufr (iv, xp, filename)
-
-         ! if (use_radarobs) then
-         !    ! scan radar observation file
-         !    write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'.dat'
-         !    call da_scan_bufr_radar(iv, xp, filename)
-         ! end if
       end do
    else
       iv%time = 1

@@ -34,13 +34,13 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
-            write(filename(1:10), fmt='(a, i2.2,a)') 'ssmi', n,'.dat'
+            write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ssmi'
             call da_scan_ssmi (iv, xp, filename)
          end if
 
          if (use_radarobs) then
             ! scan radar observation file
-            write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'dat'
+            write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.radar'
             call da_scan_radar(iv, xp, filename)
          end if
       end do
@@ -53,12 +53,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
-         call da_scan_ssmi(iv, xp,'ssmi01.dat')
+         call da_scan_ssmi(iv, xp,'ob01.ssmi')
       end if
 
       ! scan main body of radar observation file
       if (use_radarobs) then
-         call da_scan_radar(iv, xp,'radar01.dat')
+         call da_scan_radar(iv, xp,'ob01.radar')
       end if
    end if
 
@@ -79,13 +79,13 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
-            write(filename(1:10), fmt='(a, i2.2)') 'ssmi', n,'.dat'
+            write(filename(1:10), fmt='(a, i2.2)') 'ob', n,'.ssmi'
             call da_read_ssmi (iv, xp, filename)
          end if
 
          if (use_radarobs) then
             ! read radar observation file
-            write(filename(1:11), fmt='(a, i2.2)') 'radar', n,'.dat'
+            write(filename(1:11), fmt='(a, i2.2)') 'ob', n,'.radar'
             call da_read_radar(iv, xp, filename)
          end if
       end do
@@ -96,12 +96,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
-         call da_read_ssmi (iv, xp,'ssmi01.dat')
+         call da_read_ssmi (iv, xp,'ob01.ssmi')
       end if
 
       if (use_radarobs) then
          ! read radar observation file
-         call da_read_radar(iv, xp,'radar01.dat')
+         call da_read_radar(iv, xp,'ob01.radar')
       end if
    end if
 

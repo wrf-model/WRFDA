@@ -57,8 +57,7 @@ subroutine da_read_ssmi (ob, xp, filename)
       STATUS = 'OLD')
 
    if (iost /= 0) then
-      call da_warning(__FILE__,__LINE__, &
-         (/"Cannot open SSMI file "//trim(filename)/))
+      call da_warning(__FILE__,__LINE__, (/"Cannot open SSMI file "//trim(filename)/))
       call da_free_unit(iunit)
       return
    end if
@@ -73,11 +72,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
    if (iost /= 0) then
-      call da_error(__FILE__,__LINE__, &
-         (/"Cannot read SSMI file"//trim(filename)/))
-   else
-      write(unit=stdout, fmt='(/2a/)') &
-           'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
+      call da_error(__FILE__,__LINE__, (/"Cannot read SSMI file"//trim(filename)/))
    end if
 
    ! 2.3 read number of reports
@@ -86,8 +81,7 @@ subroutine da_read_ssmi (ob, xp, filename)
    do
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
       if (iost /= 0) then
-         call da_error(__FILE__,__LINE__, &
-            (/"Cannot read SSMI file"//trim(filename)/))
+         call da_error(__FILE__,__LINE__, (/"Cannot read SSMI file"//trim(filename)/))
       end if
       if (char_ned(1:6) == 'NESTIX') exit
    end do
