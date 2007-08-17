@@ -327,7 +327,8 @@ begin  ; begin of function do_scatterplot
    if ( npts .gt. 0 ) then
       xmean = sum(data)/tofloat(npts)
       xrms  = sqrt(sum(data*data)/tofloat(npts))
-      info  = "mean: "+sprintf("%12.4f",xmean)+"   rms: "+sprintf("%12.4f",xrms)
+      xstd  = stddev(data)
+      info  = "mean: "+sprintf("%10.4f",xmean)+"   rmse: "+sprintf("%10.4f",xrms)+"   std: "+sprintf("%10.4f",xstd)
    end if
    minXY   = min( (/ min(xdata), min(ydata) /) )
    maxXY   = max( (/ max(xdata), max(ydata) /) )
@@ -640,28 +641,28 @@ begin  ; begin of procedure plot_sfc
             ombplot = new(4,graphic)
             data1 = u(:,0)               ; OBS
             data2 = u(:,0)-u(:,1)        ; BAK = OBS - OMB
-            ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U", "BAK U",  \
+            ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
                             "All  "+num(.not.ismissing(data2)),               \
                             markertype1, markersize2, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(u(:,0),u(:,2).ge.0,True)               ; OBS
             data2 = mask(u(:,0)-u(:,1),u(:,2).ge.0,True)        ; BAK
-            ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS U", "BAK U",  \
+            ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
                              "QCed  "+num(.not.ismissing(data2)),              \
                              markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = v(:,0)               ; OBS
             data2 = v(:,0)-v(:,1)        ; BAK
-            ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS V", "BAK V",  \
+            ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
                              "All  "+num(.not.ismissing(data2)),               \
                              markertype1, markersize1, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(v(:,0),v(:,2).ge.0,True)               ; OBS
             data2 = mask(v(:,0)-v(:,1),v(:,2).ge.0,True)        ; BAK
-            ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS V", "BAK V",  \
+            ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
                              "QCed  "+num(.not.ismissing(data2)),              \
                              markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
@@ -675,7 +676,7 @@ begin  ; begin of procedure plot_sfc
             omaplot(0) = ombplot(1)
             data1 = mask(u(:,0),u(:,2).ge.0,True)               ; OBS
             data2 = mask(u(:,0)-u(:,4),u(:,2).ge.0,True)        ; ANA = OBS - OMA
-            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U", "ANA U",  \
+            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
                              "QCed  "+num(.not.ismissing(data2)),              \
                              markertype1, markersize1, markercolor3, linesize, linecolor)
             delete(data1)
@@ -683,7 +684,7 @@ begin  ; begin of procedure plot_sfc
             omaplot(2) = ombplot(3)
             data1 = mask(v(:,0),v(:,2).ge.0,True)               ; OBS
             data2 = mask(v(:,0)-v(:,4),v(:,2).ge.0,True)        ; ANA = OBS - OMA
-            omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V", "ANA V",  \
+            omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
                              "QCed  "+num(.not.ismissing(data2)),              \
                              markertype1, markersize1, markercolor3, linesize, linecolor)
             delete(data1)
@@ -702,14 +703,14 @@ begin  ; begin of procedure plot_sfc
                ombplot = new(4,graphic)
                data1 = t(:,0)               ; OBS
                data2 = t(:,0)-t(:,1)        ; BAK
-               ombplot(0) =  do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(0) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                 "All  "+num(.not.ismissing(data2)),               \
                                 markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
                data1 = mask(t(:,0),t(:,2).ge.0,True)               ; OBS
                data2 = mask(t(:,0)-t(:,1),t(:,2).ge.0,True)        ; BAK
-               ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                 "QCed  "+num(.not.ismissing(data2)),              \
                                 markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
@@ -722,14 +723,14 @@ begin  ; begin of procedure plot_sfc
                end if
                data1 = q(:,0)               ; OBS
                data2 = q(:,0)-q(:,1)        ; BAK
-               ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS Q", "BAK Q",  \
+               ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "BAK Q",  \
                                 "All  "+num(.not.ismissing(data2)),               \
                                 markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
                data1 = mask(q(:,0),q(:,2).ge.0,True)               ; OBS
                data2 = mask(q(:,0)-q(:,1),q(:,2).ge.0,True)        ; BAK
-               ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q", "BAK Q",  \
+               ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "BAK Q",  \
                                 "QCed  "+num(.not.ismissing(data2)),              \
                                 markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
@@ -748,7 +749,7 @@ begin  ; begin of procedure plot_sfc
                omaplot(0) = ombplot(1)
                data1 = mask(t(:,0),t(:,2).ge.0,True)               ; OBS
                data2 = mask(t(:,0)-t(:,4),t(:,2).ge.0,True)        ; ANA = OBS - OMA
-               omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T", "ANA T",  \
+               omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T",  \
                                 "QCed  "+num(.not.ismissing(data2)),              \
                                 markertype1, markersize1, markercolor3, linesize, linecolor)
                delete(data1)
@@ -762,7 +763,7 @@ begin  ; begin of procedure plot_sfc
                omaplot(2) = ombplot(3)
                data1 = mask(q(:,0),q(:,2).ge.0,True)               ; OBS
                data2 = mask(q(:,0)-q(:,4),q(:,2).ge.0,True)        ; ANA = OBS - OMA
-               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q", "ANA Q",  \
+               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "ANA Q",  \
                                 "QCed  "+num(.not.ismissing(data2)),              \
                                 markertype1, markersize1, markercolor3, linesize, linecolor)
                delete(data1)
@@ -782,21 +783,21 @@ begin  ; begin of procedure plot_sfc
             plot = new(4,graphic)
             data1 = 0.01*p(:,0)               ; OBS
             data2 = 0.01*(p(:,0)-p(:,1))      ; BAK
-            plot(0) =  do_scatterplot(wks, data1, data2, "OBS P", "BAK P",  \
+            plot(0) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "BAK P",  \
                           "All  "+num(.not.ismissing(data2)),               \
                           markertype1, markersize1, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = 0.01*(mask(p(:,0),p(:,2).ge.0,True))              ; OBS
             data2 = 0.01*(mask(p(:,0)-p(:,1),p(:,2).ge.0,True))       ; BAK
-            plot(1) =  do_scatterplot(wks, data1, data2, "OBS P", "BAK P",  \
+            plot(1) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "BAK P",  \
                           "QCed  "+num(.not.ismissing(data2)),              \
                           markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = 0.01*mask(p(:,0),p(:,2).ge.0,True)               ; OBS
             data2 = 0.01*mask(p(:,0)-p(:,4),p(:,2).ge.0,True)        ; ANA = OBS - OMA
-            plot(3) =  do_scatterplot(wks, data1, data2, "OBS P", "ANA P",  \
+            plot(3) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "ANA P",  \
                           "QCed  "+num(.not.ismissing(data2)),              \
                           markertype1, markersize1, markercolor3, linesize, linecolor)
             delete(data1)
@@ -863,21 +864,21 @@ begin  ; begin of procedure plot_sfc
             plot = new(4,graphic)
             data1 = tpw(:,0)               ; OBS
             data2 = tpw(:,0)-tpw(:,1)      ; BAK
-            plot(0) = do_scatterplot(wks, data1, data2, "OBS TPW", "BAK TPW",  \
+            plot(0) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "BAK TPW",  \
                          "All  "+num(.not.ismissing(data2)),                   \
                          markertype1, markersize2, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(tpw(:,0),tpw(:,2).ge.0,True)               ; OBS
             data2 = mask(tpw(:,0)-tpw(:,1),tpw(:,2).ge.0,True)      ; BAK
-            plot(1) = do_scatterplot(wks, data1, data2, "OBS TPW", "BAK TPW",  \
+            plot(1) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "BAK TPW",  \
                          "QCed  "+num(.not.ismissing(data2)),                  \
                          markertype1, markersize2, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(tpw(:,0),tpw(:,2).ge.0,True)               ; OBS
             data2 = mask(tpw(:,0)-tpw(:,4),tpw(:,2).ge.0,True)      ; ANA
-            plot(3) = do_scatterplot(wks, data1, data2, "OBS TPW", "ANA TPW",  \
+            plot(3) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "ANA TPW",  \
                          "QCed  "+num(.not.ismissing(data2)),                  \
                          markertype1, markersize2, markercolor3, linesize, linecolor)
             delete(data1)
@@ -1225,21 +1226,21 @@ begin
          plot = new(4,graphic)
          data1 = pslp(:,0)               ; OBS
          data2 = pslp(:,0)-pslp(:,1)     ; BAK
-         plot(0) = do_scatterplot(wks, data1, data2, "OBS SLP", "BAK SLP",  \
+         plot(0) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "BAK SLP",  \
                       "All  "+num(.not.ismissing(data2)),                   \
                       markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pslp_qc(:,0),pslp_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pslp_qc(:,0)-pslp_qc(:,1),pslp_qc(:,2).ge.0,True)  ; BAK
-         plot(1) = do_scatterplot(wks, data1, data2, "OBS SLP", "BAK SLP",  \
+         plot(1) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "BAK SLP",  \
                       "QCed  "+num(.not.ismissing(data2)),                  \
                       markertype1, markersize2, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pslp(:,0),pslp(:,2).ge.0,True)               ; OBS
          data2 = mask(pslp(:,0)-pslp(:,4),pslp(:,2).ge.0,True)     ; ANA
-         plot(3) = do_scatterplot(wks, data1, data2, "OBS SLP", "ANA SLP",  \
+         plot(3) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "ANA SLP",  \
                       "QCed  "+num(.not.ismissing(data2)),                  \
                       markertype1, markersize2, markercolor3, linesize, linecolor)
          delete(data1)
@@ -1259,28 +1260,28 @@ begin
          ;
          data1 = pu(:,0)               ; OBS
          data2 = pu(:,0)-pu(:,1)       ; BAK
-         ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U", "BAK U",  \
+         ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
                          "All  "+num(.not.ismissing(data2)),               \
                          markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pu_qc(:,0),pu_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pu_qc(:,0)-pu_qc(:,1),pu_qc(:,2).ge.0,True)    ; BAK
-         ombplot(1) = do_scatterplot(wks, data1, data2, "OBS U", "BAK U",  \
+         ombplot(1) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
                          "QCed  "+num(.not.ismissing(data2)),              \
                          markertype1, markersize2, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = pv(:,0)               ; OBS
          data2 = pv(:,0)-pv(:,1)       ; BAK
-         ombplot(2) = do_scatterplot(wks, data1, data2, "OBS V", "BAK V",  \
+         ombplot(2) = do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
                          "All  "+num(.not.ismissing(data2)),               \
                          markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pv_qc(:,0),pv_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pv_qc(:,0)-pv_qc(:,1),pv_qc(:,2).ge.0,True)    ; BAK
-         ombplot(3) = do_scatterplot(wks, data1, data2, "OBS V", "BAK V",  \
+         ombplot(3) = do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
                          "QCed  "+num(.not.ismissing(data2)),              \
                          markertype1, markersize2, markercolor2, linesize, linecolor)
          delete(data1)
@@ -1295,7 +1296,7 @@ begin
          omaplot(0) = ombplot(1)
          data1 = mask(pu_qc(:,0),pu_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pu_qc(:,0)-pu_qc(:,4),pu_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-         omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U", "ANA U",  \
+         omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
                           "QCed  "+num(.not.ismissing(data2)),              \
                           markertype1, markersize1, markercolor3, linesize, linecolor)
          delete(data1)
@@ -1303,7 +1304,7 @@ begin
          omaplot(2) = ombplot(3)
          data1 = mask(pv_qc(:,0),pv_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pv_qc(:,0)-pv_qc(:,4),pv_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-         omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V", "ANA V",  \
+         omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
                           "QCed  "+num(.not.ismissing(data2)),              \
                           markertype1, markersize1, markercolor3, linesize, linecolor)
          delete(data1)
@@ -1324,11 +1325,11 @@ begin
             data1 = pt(:,0)               ; OBS
             data2 = pt(:,0)-pt(:,1)       ; BAK
             if ( otype .eq. "AIRSR" ) then
-               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                "All  "+num(.not.ismissing(data2)),               \
                                markertype1, markersize1, markercolor1, linesize, linecolor)
             else
-               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                "All  "+num(.not.ismissing(data2)),               \
                                markertype1, markersize2, markercolor1, linesize, linecolor)
             end if
@@ -1337,11 +1338,11 @@ begin
             data1 = mask(pt_qc(:,0),pt_qc(:,2).ge.0,True)               ; OBS
             data2 = mask(pt_qc(:,0)-pt_qc(:,1),pt_qc(:,2).ge.0,True)    ; BAK
             if ( otype .eq. "AIRSR" ) then
-               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                "QCed  "+num(.not.ismissing(data2)), \
                                markertype1, markersize1, markercolor2, linesize, linecolor)
             else
-               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T", "BAK T",  \
+               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
                                "QCed  "+num(.not.ismissing(data2)),              \
                                markertype1, markersize2, markercolor2, linesize, linecolor)
             end if
@@ -1356,14 +1357,14 @@ begin
                end if
                data1 = pq(:,0)               ; OBS
                data2 = pq(:,0)-pq(:,1)       ; BAK
-               ombplot(2) = do_scatterplot(wks, data1, data2, "OBS Q", "BAK Q", \
+               ombplot(2) = do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "BAK Q", \
                                "All  "+num(.not.ismissing(data2)),              \
                                markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
                data1 = mask(pq_qc(:,0),pq_qc(:,2).ge.0,True)               ; OBS
                data2 = mask(pq_qc(:,0)-pq_qc(:,1),pq_qc(:,2).ge.0,True)    ; BAK
-               ombplot(3) = do_scatterplot(wks, data1, data2, "OBS Q", "BAK Q", \
+               ombplot(3) = do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "BAK Q", \
                                "QCed  "+num(.not.ismissing(data2)),             \
                                markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
@@ -1384,7 +1385,7 @@ begin
             omaplot(0) = ombplot(1)
             data1 = mask(pt_qc(:,0),pt_qc(:,2).ge.0,True)               ; OBS
             data2 = mask(pt_qc(:,0)-pt_qc(:,4),pt_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T", "ANA T", \
+            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T", \
                              "QCed  "+num(.not.ismissing(data2)),             \
                              markertype1, markersize1, markercolor3, linesize, linecolor)
             delete(data1)
@@ -1399,7 +1400,7 @@ begin
                omaplot(2) = ombplot(3)
                data1 = mask(pq_qc(:,0),pq_qc(:,2).ge.0,True)               ; OBS
                data2 = mask(pq_qc(:,0)-pq_qc(:,4),pq_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q", "ANA Q", \
+               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (kg/kg)", "ANA Q", \
                                 "QCed  "+num(.not.ismissing(data2)),             \
                                 markertype1, markersize1, markercolor3, linesize, linecolor)
                delete(data1)
