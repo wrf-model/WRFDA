@@ -40,18 +40,12 @@ cd $RUN_DIR
 echo "<HTML><BODY><PRE>" > index.html
 $WRFVAR_DIR/scripts/gen_be/gen_be.ksh >> index.html 2>&1
 
-if $NL_GLOBAL; then
-   # Produce graphics
-   export BE_DIR=$RUN_DIR/working
-   ncl $WRFVAR_DIR/graphics/ncl/gen_be/gen_be_global_evals.ncl
-   ncl $WRFVAR_DIR/graphics/ncl/gen_be/gen_be_global_evecs.ncl
-   echo "<A HREF="gen_be_global_evecs_"$REGION".pdf">Evecs plots</A><BR>" >> index.html
-   echo "<A HREF="gen_be_global_evals_"$REGION".pdf">Evals plots</A><BR>" >> index.html
-fi
-
-# Preserve the interesting log files
-# cp $RUN_DIR/*log $EXP_DIR
-# cp $RUN_DIR/stage0/*log $EXP_DIR
+# Produce graphics
+export BE_DIR=$RUN_DIR/working
+ncl $WRFVAR_DIR/graphics/ncl/gen_be/gen_be_global_evals.ncl
+ncl $WRFVAR_DIR/graphics/ncl/gen_be/gen_be_global_evecs.ncl
+echo "<A HREF="gen_be_global_evecs_"$REGION".pdf">Evecs plots</A><BR>" >> index.html
+echo "<A HREF="gen_be_global_evals_"$REGION".pdf">Evals plots</A><BR>" >> index.html
 
 echo "</PRE><UL>" >>index.html
 for FILE in *.log; do

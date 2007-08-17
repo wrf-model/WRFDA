@@ -4,7 +4,7 @@ export DAT_DIR=${DAT_DIR:-~/data}
 
 export FULL=${FULL:-false}
 export COMPILE=${COMPILE:-true}
-export RUN=${RUN:-true}
+export EXECUTE=${EXECUTE:-true}
 export CLEAN=${CLEAN:-true}
 
 # Need a cleaner mapping between compiler and configure options
@@ -19,7 +19,7 @@ export TARGET=${TARGET:-all}
 echo "TYPE      $TYPE"
 echo "COMPILE   $COMPILE"
 echo "FULL      $FULL"
-echo "RUN       $RUN"
+echo "EXECUTE   $EXECUTE"
 echo "CLEAN     $CLEAN"
 echo "COMPILERS $COMPILERS"
 echo "REGIONS   $REGIONS"
@@ -47,10 +47,10 @@ for COMPILER in $COMPILERS; do
       rm -f build/links
       ./compile $TARGET > compile.out 2>&1
       if $CLEAN; then ./clean > /dev/null 2>&1; fi
-      echo `ls -l build/*.exe | wc -l` executables
+      echo $(ls -l build/*.exe | wc -l) executables
       let COUNT=$COUNT+1
    fi
-   if $RUN; then
+   if $EXECUTE; then
       for REGION in $REGIONS; do
          for NUM_PROCS in $PROCS; do
             export NUM_PROCS

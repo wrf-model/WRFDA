@@ -6,7 +6,7 @@ export EXPT=vartest
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export RUN=${RUN:-${ID}_${NUM_PROCS}}
 
-export REL_DIR=$HOME/code/$ID
+export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 export REG_DIR=$PWD
@@ -47,4 +47,5 @@ export NL_JCDFI_ERROR_T=1.0
 export NL_JCDFI_ERROR_Q=0.001
 export NL_JCDFI_ERROR_MU=1000.0
 
+export SCRIPT=$WRFVAR_DIR/scripts/da_run_wrfvar.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
