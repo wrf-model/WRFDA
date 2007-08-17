@@ -1,0 +1,27 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/06/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add CRTM as an external library in the same way as RTTOV
+
+------------------------------------------------------
+
+bluesky: Runs con200 
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060906c.jrb
+M    setup.ksh
+M    arch/postamble_new
+M    arch/preamble_new
+M    arch/Config_new.pl
+M    configure_new
+M    setup.csh

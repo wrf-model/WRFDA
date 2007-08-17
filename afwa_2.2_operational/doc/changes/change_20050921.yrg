@@ -1,0 +1,379 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	S. Rizvi
+Reviewer: 	Yong-Run Guo (This changes file written by Y.-R. Guo)
+Date: 		09/21/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1, Bugs fix for writing out (fort.192) QCed observations
+
+   Bugs: a) preesure in the surface OBS (SYNOP, METAR, SHIPS,etc.)
+            is increect;
+         b) QCed moisture is incorrect;
+         c) QCed SATEM data are wrong;
+         d) With the QCed OBS as input, the results (DAProg_WRF-Var.statistics)
+            are different by setting check_max_iv =.TRUE. and .FALSE.
+
+         After bugs fix, all the above mistakes were corrected.
+
+Note: The original DAProg_WRF-Var.statistics from the ORIGINAL OBS file with
+      check_max_iv =.TRUE. may still be different from that from the QCed OBS
+      file. 
+
+      This is because there is no OBS consistent check in current WRFVAR. 
+      For example, when U-component passed the "check_max_iv" while V-component
+      failed to pass "check_max_iv", the U-component is still assimilated. 
+      However, in QCed OBS, when one of the wind component failed, no 
+      wind-speed and direction will be written out to fort.192. Similar 
+      situation may happen in case of the conversion between the T, P, RH, 
+      and Q.
+
+      Suggestion: in WRFVAR, the consistent check may be introduced after
+                  Quality controlled data. 
+
+
+
+Expected Differences
+--------------------
+
+Accuracy:       
+
+Case: CWB 2003-08-30_12:00:00 (Because this case has a variety of observations):
+
+1, DAProg_WRF-Var.statistics for Original OBS with check_max_iv = .TRUE.
+
+Diagnostics of OI for Sound
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    q (kg/kg)   n    k
+
+  Number:             2534                  2534                  3083                  2486
+ Minimum(n,k):     -15.3545   50    5    -14.9168    5   22     -4.9973  108   10 -0.5999E-02   19    4
+ Maximum(n,k):      15.2268    7   23     14.6299  160   13      4.9448   58    6  0.8616E-02  124    1
+ Average     :      -0.0917                0.1035               -0.2930            0.9772E-05
+    RMSE     :       4.1515                3.9639                1.7533            0.1272E-02
+
+ Diagnostics of OI for sonde_sfc
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               57                    57                    70                    66                    71
+ Minimum(n,k):      -5.3531    9    0     -5.4275   68    0     -4.5660  116    0   -454.5273  122    0 -0.5206E-02  151    0
+ Maximum(n,k):       5.0245  146    0      3.6877   97    0      2.3026    5    0    473.8661  141    0  0.5951E-02   21    0
+ Average     :      -0.7334               -0.7253               -1.0471              153.9632            0.5024E-03
+    RMSE     :       2.8181                2.4225                1.8618              228.6716            0.1797E-02
+
+ Diagnostics of OI for synop
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:              325                   325                   478                   429                   476
+ Minimum(n,k):      -5.4682  173    0     -5.4843  249    0     -7.8093   61    0   -478.6766   43    0 -0.4643E-02 1110    0
+ Maximum(n,k):       5.3843 1130    0      5.3822  103    0      5.5965  149    0    478.3871  875    0  0.9810E-02   79    0
+ Average     :      -0.8246               -0.4436               -1.2859              137.8461            0.9369E-03
+    RMSE     :       2.7192                2.6576                2.4031              220.8207            0.2051E-02
+
+ Diagnostics of OI for geoamv
+
+   var             u (m/s)     n    k    v (m/s)     n    k
+
+  Number:             8428                  8428
+ Minimum(n,k):     -21.8900 5439    0    -21.6497 2510    0
+ Maximum(n,k):      21.6481 2221    0     18.5913 7417    0
+ Average     :      -0.6134               -0.7569
+    RMSE     :       5.0488                5.0166
+
+ Diagnostics of OI for Airep
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    
+
+  Number:              181                   181                   191
+ Minimum(n,k):     -13.3195   53    1    -11.7710    8    1     -3.3957  173    1
+ Maximum(n,k):      16.6336   93    1     12.3397  166    1      3.9360    2    1
+ Average     :      -1.9601               -2.4649                0.5130
+    RMSE     :       5.1707                5.0170                1.4263
+
+ Diagnostics of OI for Pilot
+
+   var             u (m/s)     n    k    v (m/s)     n    k  
+
+  Number:              633                   633
+ Minimum(n,k):     -11.4909   27   12    -12.0753   31   16
+ Maximum(n,k):      15.2249   13    6     13.8664   46   22
+ Average     :       0.1552               -0.0993
+    RMSE     :       3.8627                3.7176
+
+ Diagnostics of OI for metar
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               92                    92                   115                     0                   115
+ Minimum(n,k):      -5.4803  202    0     -5.4819  140    0     -5.0971  127    0 888888.0000    0    0 -0.4132E-02  178    0
+ Maximum(n,k):       4.2576  177    0      4.2695   98    0      4.7116   51    0-888888.0000    0    0  0.5393E-02  209    0
+ Average     :      -0.3974               -1.0651               -0.5322                0.0000            0.4705E-03
+    RMSE     :       2.2714                2.6123                1.9688                0.0000            0.2033E-02
+
+ Diagnostics of OI for ships
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               53                    53                    76                    76                    50
+ Minimum(n,k):      -5.2985   41    0     -5.4437    3    0     -5.5071   56    0   -585.2916   19    0 -0.2710E-02   56    0
+ Maximum(n,k):       5.2151   78    0      4.3115   66    0      9.4995   66    0    771.8666   56    0  0.6862E-02   66    0
+ Average     :      -0.1745               -0.5035                0.1389              143.2047            0.7286E-03
+    RMSE     :       2.6178                2.6783                1.8081              263.8582            0.2108E-02
+
+ Diagnostics of OI for Satem
+
+   var           thickness(m)  n    k
+
+  Number:             1492
+ Minimum(n,k):     -32.0852   40    8
+ Maximum(n,k):      32.2262   47   11
+ Average     :       1.4797
+    RMSE     :       9.9972
+
+ Diagnostics of OI for buoy
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               35                    35                    16                    35                     0
+ Minimum(n,k):      -3.1379   17    0     -5.3613    9    0     -2.0247   34    0   -126.2379   10    0  0.8889E+06    0    0
+ Maximum(n,k):       4.3720   18    0      6.3387    5    0      2.2856   36    0    385.6973   22    0 -0.8889E+06    0    0
+ Average     :       1.2175               -0.5808               -0.1689              149.9529            0.0000E+00
+    RMSE     :       2.5428                2.7349                1.3105              209.9273            0.0000E+00
+
+
+2, DAProg_WRF-Var.statistics for QCed OBS with check_max_iv = .TRUE.
+
+ Diagnostics of OI for Sound
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    q (kg/kg)   n    k
+
+  Number:             2534                  2534                  3083                  2437
+ Minimum(n,k):     -15.3545   50    5    -14.9168    5   22     -4.9973  108   10 -0.5329E-02  164    8
+ Maximum(n,k):      15.2268    7   23     14.6299  160   13      4.9448   58    6  0.7489E-02    6    2
+ Average     :      -0.0917                0.1035               -0.2930            0.1908E-04
+    RMSE     :       4.1515                3.9639                1.7533            0.1241E-02
+
+ Diagnostics of OI for sonde_sfc
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               57                    57                    70                    66                    59
+ Minimum(n,k):      -5.3531    9    0     -5.4275   68    0     -4.5660  116    0   -459.8614  122    0 -0.5206E-02  151    0
+ Maximum(n,k):       5.0245  146    0      3.6877   97    0      2.7550   95    0    473.8661  141    0  0.5951E-02   21    0
+ Average     :      -0.7334               -0.7253               -1.0097              154.4771            0.3352E-03
+    RMSE     :       2.8181                2.4225                1.9425              229.2968            0.1716E-02
+
+ Diagnostics of OI for synop
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:              325                   325                   478                   428                   427
+ Minimum(n,k):      -5.4682  173    0     -5.4843  249    0     -7.8093   61    0   -478.6766   43    0 -0.4643E-02 1110    0
+ Maximum(n,k):       5.3843 1130    0      5.3822  103    0      5.5965  149    0    478.3871  875    0  0.9810E-02   79    0
+ Average     :      -0.8246               -0.4436               -1.2227              137.7147            0.9664E-03
+    RMSE     :       2.7192                2.6576                2.3537              220.8794            0.2118E-02
+
+ Diagnostics of OI for geoamv
+
+   var             u (m/s)     n    k    v (m/s)     n    k
+
+  Number:             8428                  8428
+ Minimum(n,k):     -21.8900 5439    0    -21.6497 2510    0
+ Maximum(n,k):      21.6481 2221    0     18.5913 7417    0
+ Average     :      -0.6134               -0.7569
+    RMSE     :       5.0488                5.0166
+
+ Diagnostics of OI for Airep
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    
+
+  Number:              181                   181                   191
+ Minimum(n,k):     -13.3195   53    1    -11.7710    8    1     -3.3957  173    1
+ Maximum(n,k):      16.6336   93    1     12.3397  166    1      3.9360    2    1
+ Average     :      -1.9601               -2.4649                0.5130
+    RMSE     :       5.1707                5.0170                1.4263
+
+ Diagnostics of OI for Pilot
+
+   var             u (m/s)     n    k    v (m/s)     n    k  
+
+  Number:              633                   633
+ Minimum(n,k):     -11.4909   27   12    -12.0753   31   16
+ Maximum(n,k):      15.2249   13    6     13.8664   46   22
+ Average     :       0.1552               -0.0993
+    RMSE     :       3.8627                3.7176
+
+ Diagnostics of OI for metar
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               92                    92                   115                     0                     0
+ Minimum(n,k):      -5.4803  202    0     -5.4819  140    0     -5.2077  127    0 888888.0000    0    0  0.8889E+06    0    0
+ Maximum(n,k):       4.2576  177    0      4.2695   98    0      4.9137   51    0-888888.0000    0    0 -0.8889E+06    0    0
+ Average     :      -0.3973               -1.0650               -0.7888                0.0000            0.0000E+00
+    RMSE     :       2.2715                2.6122                1.9864                0.0000            0.0000E+00
+
+ Diagnostics of OI for ships
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               53                    53                    76                    76                    50
+ Minimum(n,k):      -5.2985   41    0     -5.4437    3    0     -5.5071   56    0   -585.2916   19    0 -0.2710E-02   56    0
+ Maximum(n,k):       5.2151   78    0      4.3115   66    0      9.4995   66    0    771.8666   56    0  0.6862E-02   66    0
+ Average     :      -0.1745               -0.5035                0.1389              143.2047            0.7286E-03
+    RMSE     :       2.6178                2.6783                1.8081              263.8582            0.2108E-02
+
+ Diagnostics of OI for Satem
+
+   var           thickness(m)  n    k
+
+  Number:             1399
+ Minimum(n,k):     -32.0852   40    8
+ Maximum(n,k):      32.2262   47   11
+ Average     :       1.5239
+    RMSE     :      10.0316
+
+ Diagnostics of OI for buoy
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               35                    35                    16                    35                     0
+ Minimum(n,k):      -3.1379   17    0     -5.3613    9    0     -2.0247   34    0   -126.2379   10    0  0.8889E+06    0    0
+ Maximum(n,k):       4.3720   18    0      6.3387    5    0      2.2856   36    0    385.6973   22    0 -0.8889E+06    0    0
+ Average     :       1.2175               -0.5808               -0.1689              149.9529            0.0000E+00
+    RMSE     :       2.5428                2.7349                1.3105              209.9273            0.0000E+00
+
+3, DAProg_WRF-Var.statistics for QCed OBS with check_max_iv = .FALSE.
+
+ Diagnostics of OI for Sound
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    q (kg/kg)   n    k
+
+  Number:             2534                  2534                  3083                  2437
+ Minimum(n,k):     -15.3545   50    5    -14.9168    5   22     -4.9973  108   10 -0.5329E-02  164    8
+ Maximum(n,k):      15.2268    7   23     14.6299  160   13      4.9448   58    6  0.7489E-02    6    2
+ Average     :      -0.0917                0.1035               -0.2930            0.1908E-04
+    RMSE     :       4.1515                3.9639                1.7533            0.1241E-02
+
+ Diagnostics of OI for sonde_sfc
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               57                    57                    70                    66                    59
+ Minimum(n,k):      -5.3531    9    0     -5.4275   68    0     -4.5660  116    0   -459.8614  122    0 -0.5206E-02  151    0
+ Maximum(n,k):       5.0245  146    0      3.6877   97    0      2.7550   95    0    473.8661  141    0  0.5951E-02   21    0
+ Average     :      -0.7334               -0.7253               -1.0097              154.4771            0.3352E-03
+    RMSE     :       2.8181                2.4225                1.9425              229.2968            0.1716E-02
+
+ Diagnostics of OI for synop
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:              325                   325                   478                   428                   427
+ Minimum(n,k):      -5.4682  173    0     -5.4843  249    0     -7.8093   61    0   -478.6766   43    0 -0.4643E-02 1110    0
+ Maximum(n,k):       5.3843 1130    0      5.3822  103    0      5.5965  149    0    478.3871  875    0  0.9810E-02   79    0
+ Average     :      -0.8246               -0.4436               -1.2227              137.7147            0.9664E-03
+    RMSE     :       2.7192                2.6576                2.3537              220.8794            0.2118E-02
+
+ Diagnostics of OI for geoamv
+
+   var             u (m/s)     n    k    v (m/s)     n    k
+
+  Number:             8428                  8428
+ Minimum(n,k):     -21.8900 5439    0    -21.6497 2510    0
+ Maximum(n,k):      21.6481 2221    0     18.5913 7417    0
+ Average     :      -0.6134               -0.7569
+    RMSE     :       5.0488                5.0166
+
+ Diagnostics of OI for Airep
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    
+
+  Number:              181                   181                   191
+ Minimum(n,k):     -13.3195   53    1    -11.7710    8    1     -3.3957  173    1
+ Maximum(n,k):      16.6336   93    1     12.3397  166    1      3.9360    2    1
+ Average     :      -1.9601               -2.4649                0.5130
+    RMSE     :       5.1707                5.0170                1.4263
+
+ Diagnostics of OI for Pilot
+
+   var             u (m/s)     n    k    v (m/s)     n    k  
+
+  Number:              633                   633
+ Minimum(n,k):     -11.4909   27   12    -12.0753   31   16
+ Maximum(n,k):      15.2249   13    6     13.8664   46   22
+ Average     :       0.1552               -0.0993
+    RMSE     :       3.8627                3.7176
+
+ Diagnostics of OI for metar
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               92                    92                   115                     0                     0
+ Minimum(n,k):      -5.4803  202    0     -5.4819  140    0     -5.2077  127    0 888888.0000    0    0  0.8889E+06    0    0
+ Maximum(n,k):       4.2576  177    0      4.2695   98    0      4.9137   51    0-888888.0000    0    0 -0.8889E+06    0    0
+ Average     :      -0.3973               -1.0650               -0.7888                0.0000            0.0000E+00
+    RMSE     :       2.2715                2.6122                1.9864                0.0000            0.0000E+00
+
+ Diagnostics of OI for ships
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               53                    53                    76                    76                    50
+ Minimum(n,k):      -5.2985   41    0     -5.4437    3    0     -5.5071   56    0   -585.2916   19    0 -0.2710E-02   56    0
+ Maximum(n,k):       5.2151   78    0      4.3115   66    0      9.4995   66    0    771.8666   56    0  0.6862E-02   66    0
+ Average     :      -0.1745               -0.5035                0.1389              143.2047            0.7286E-03
+    RMSE     :       2.6178                2.6783                1.8081              263.8582            0.2108E-02
+
+ Diagnostics of OI for Satem
+
+   var           thickness(m)  n    k
+
+  Number:             1399
+ Minimum(n,k):     -32.0852   40    8
+ Maximum(n,k):      32.2262   47   11
+ Average     :       1.5239
+    RMSE     :      10.0316
+
+ Diagnostics of OI for buoy
+
+   var             u (m/s)     n    k    v (m/s)     n    k    t (K)       n    k    p (Pa)      n    k    q (kg/kg)   n    k
+
+  Number:               35                    35                    16                    35                     0
+ Minimum(n,k):      -3.1379   17    0     -5.3613    9    0     -2.0247   34    0   -126.2379   10    0  0.8889E+06    0    0
+ Maximum(n,k):       4.3720   18    0      6.3387    5    0      2.2856   36    0    385.6973   22    0 -0.8889E+06    0    0
+ Average     :       1.2175               -0.5808               -0.1689              149.9529            0.0000E+00
+    RMSE     :       2.5428                2.7349                1.3105              209.9273            0.0000E+00
+
+   
+CPU/memory:	no change in CPU and memory
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+PC Linux (she.cosmic.ucar.edu)
+
+Files added:
+
+------------
+
+None
+
+Files modified:
+---------------
+
+M da_3dvar/src/Makefile
+M da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+M da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+M da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+M da_3dvar/src/DA_Satem/da_get_innov_vector_satem.inc
+
+Minor-tag:
+---------
+
+

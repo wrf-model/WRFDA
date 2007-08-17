@@ -1,0 +1,30 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/08/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+To get be to compile with pgi on ocotillo, pretect parallel code 
+in da_tracing with #ifdef DM_PARALLEL, remove USE of module_utility 
+from module_wrf_error.F and add module_driver_constants to GEN_BE_OBJS
+
+This allows be to compile with minimal code
+
+Test results
+------------------------------------------------------
+
+ocotillo: be compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060808g.jrb
+M    da/da_tracing/da_tracing.f90
+M    frame/module_wrf_error.F
+M    build/gen_be.make

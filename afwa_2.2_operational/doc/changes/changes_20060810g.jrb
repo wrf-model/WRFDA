@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/10/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove ENDIAN from FIXEDFLAGS_BUFR, as we DO NOT want
+bufrlib compiled with -byteswapio etc
+
+
+Test results
+------------------------------------------------------
+
+ocotillo: Handles little_endian bufr files
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060810g.jrb
+M    arch/postamble_new

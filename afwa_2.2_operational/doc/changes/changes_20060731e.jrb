@@ -1,0 +1,33 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Switch off debugging for platforms we are not actively
+working on.
+
+Wrap lines at 80 columns
+
+FCDEBUG no longer part of FCBASE for Aix
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+hazel: Compiles
+bluesky: Compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+
+M      arch/configure.defaults_new
+A      doc/changes/changes_20060731e.jrb

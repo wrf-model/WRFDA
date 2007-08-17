@@ -1,0 +1,25 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/11/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Move checking of observation flags from da_solve.f90 to da_setup_obs_structures
+
+------------------------------------------------------
+Tests:
+
+bluesky: kma_t63 and con200 run
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060911b.jrb
+M    da/da_solve/da_solve.f90
+M    da/da_setup_structures/da_setup_obs_structures.inc

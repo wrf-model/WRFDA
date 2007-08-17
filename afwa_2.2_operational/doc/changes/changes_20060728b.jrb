@@ -1,0 +1,43 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/28/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Debugging changes
+
+1) If environment variable DEBUGGER defined on Aix, run the wrfvar
+executable through it. To use
+
+ export DEBUGGER=totalview
+ da_run_job.ksh or test.ksh wrapper
+
+and wait for the graphical display to appear once the job starts running
+in the queue
+
+2) Move all the bounds check logic (-C) and other detailed compile checks into
+the FCDEBUG compile variable. Using this variable will generate slow 
+instrumented code, using FCOPTIM will generate optimised code. More work is
+needed to select one or other at compile time.
+
+3) Disable FCDEBUG options for AIX builds to allow module_configure.o to compile. Needs
+more investigation as to whether this occurs with wrf setup
+
+
+Test results
+------------------------------------------------------
+
+bluesky: totalview debugger starts up
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060728b.jrb (this file)
+M      run/da_run_wrfvar.ksh
+M      arch/configure.defaults_new

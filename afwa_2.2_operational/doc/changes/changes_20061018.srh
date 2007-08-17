@@ -1,0 +1,54 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer: 
+Date: 10/18/2006
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+ (a) Update for Observation error tuning program and script.                   
+ (b) Bug fix for initializing error factors & "num_radiance_tot"
+
+Expected Differences
+--------------------
+ No differences are expected for WRF-Var run
+ 
+Files added:
+-------------------------------------
+
+?      doc/changes/changes_20061018.srh
+
+Files Modified:
+-------------------------------------
+
+M      da/da_util/da_tune.csh
+M      da/da_util/da_tune.f90
+M      da/da_obs/da_scan_bufr_obs.inc
+M      da/da_obs/da_write_noise_to_ob.inc
+M      da/da_obs/da_read_fort50.inc
+M      da/da_obs/da_read_rand_unit.inc
+M      da/da_obs/da_final_write_y.inc
+M      da/da_obs/da_fill_obs_structures.inc
+M      da/da_obs/da_write_obs.inc
+M      da/da_obs/da_final_write_obs.inc
+M      da/da_obs/da_read_bufr_obs.inc
+M      da/da_obs/da_read_y_unit.inc
+M      da/da_minimisation/da_get_innov_vector.inc
+M      da/da_minimisation/da_get_var_diagnostics.inc
+M      da/da_minimisation/da_write_diagnostics.inc
+
+cvs commit ?
+
+CHANGES:
+
+changes/changes_20061018.srh
+
+Test results:
+ 
+
+Tag:
+
+                  
+

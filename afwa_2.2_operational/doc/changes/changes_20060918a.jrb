@@ -1,0 +1,49 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/14/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Implement wrf trunk changes
+
+TB*
+Fix memory leak in dyn_nmm/module_si_io_nmm.F.
+TB*
+
+ECMWF layers of soil temp and moisture, required since NMM uses the optional io module
+
+vert interp options
+
+remove 0 level debug about scary file=not-found message
+
+clean up vert interp, consistency checks, add EC layers of soil temp and moisture
+
+
+------------------------------------------------------
+Tests:
+
+balsam: con200 run
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060918a.jrb
+M      dyn_nmm/module_si_io_nmm.F
+M      share/module_soil_pre.F
+M      Registry/Registry.EM_SST
+M      Registry/Registry.EM_NL
+M      Registry/Registry.EM_CHEM
+M      Registry/Registry.CONVERT
+M      Registry/Registry.NMM_NEST
+M      Registry/Registry.EM
+M      Registry/Registry.NMM
+M      Registry/Registry.wrfvar
+M      dyn_em/module_initialize_real.F
+M      main/real_em.F
+

@@ -1,0 +1,88 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : Syed RH Rizvi
+Reviewer: 
+Date: 05/16/2006
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+ (a) WRF-Var update for MPI run to get consolidated filtered_obs,  
+     OMB and OMA diagnostics. 
+ 
+ (b) All the diagnostics for SATOB have been changed correspondigly
+     to polaramv & geoamv
+
+ (c) All the programs to read diagnostics for tuning Obs error statistics
+     have been adjusted to read properly the corresponding diag files
+                                             
+ (d) For global options in case the observation is duplicated, the global count was not
+     proper and the same has been fixed.
+
+Expected Differences
+--------------------
+ No differences is expected for WRF-Var analysis or increments.
+ Size of diagnostic file (fort.50) will be large as it is now corresponding 
+ to all the obs (conventional). Size of filtered obs (Qcd's Obs written on 
+ unit 192 ) will be large as it holds all observations.
+
+ In fort.48 unit the global counts will be different.
+
+Note: The order of diagnostics written will be different for single and multi 
+      processor run. However, the final content of iof these files like fort.50,
+      fort.47 etc.  should be same. 
+ 
+Accuracy: 
+ 
+CPU:
+  Slight increase in CPU, if run in MPI mode. Also due to increase in I/O
+
+memory:
+  Slight increase is expected when with "ANALYSIS_TYEP" = "QC-OBS". 
+  This is due to the fact that for SATEM a new array "org_thicknss" 
+  is introduced to store the original SATEM thicknesses and errors.
+ 
+
+Files added:
+-------------------------------------
+
+ wrfvar/da/da_obs/da_read_fort50.inc
+ wrfvar/da/da_obs/da_read_y_unit.inc
+ wrfvar/da/da_obs/da_read_rand_unit.inc
+ wrfvar/da/da_obs/da_final_write_obs.inc
+ wrfvar/da/da_obs/da_write_noise_to_ob.inc
+ wrfvar/da/da_obs/da_final_write_y.inc
+ wrfvar/doc/changes/changes_20060623.srh
+
+Files Modified:
+-------------------------------------
+
+ wrfvar/da/da_constants/da_da_constants.f90                        
+ wrfvar/da/da_obs/da_obs.f90                        
+ wrfvar/da/da_define_structures/da_define_structures.f90
+ wrfvar/da/da_obs/da_read_obs.inc                        
+ wrfvar/da/da_obs/da_write_obs.inc        
+ wrfvar/da/da_obs/da_write_filtered_obs.inc        
+ wrfvar/da/da_obs/da_count_filtered_obs.inc
+ wrfvar/da/da_obs/da_add_noise_to_ob.inc      
+ wrfvar/da/da_minimisation/da_write_diagnostics.inc
+ wrfvar/da/da_minimisation/da_get_var_diagnostics.inc
+ wrfvar/da/da_solve_v3d/da_solve_v3d.f90              
+ wrfvar/da/da_util/daprog_diagnostics.f90       
+ wrfvar/da/da_util/da_tune.f90                     
+ wrfvar/da/da_util/da_tune.csh                     
+
+cvs commit ?
+
+CHANGES:
+
+changes/changes_20060516.srh
+
+Test results:
+ 
+
+Tag:
+
+                  
+

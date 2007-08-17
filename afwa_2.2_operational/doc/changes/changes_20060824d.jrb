@@ -1,0 +1,29 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/24/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Tidy code layout
+
+Test results
+------------------------------------------------------
+
+balsam: con200 and kma_t63 pgi no change
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060824d.jrb
+M      da/da_physics/da_integrat_dz.inc
+M      da/da_physics/da_sfc_wtq.inc
+M      da/da_physics/da_wrf_tpq_2_slp.inc
+M      da/da_physics/da_tpq_to_rh.inc
+M      da/da_setup_structures/da_cloud_model.inc
+M      da/da_setup_structures/da_transfer_wrftoxb.inc

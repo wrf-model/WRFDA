@@ -1,0 +1,32 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+To get old compilation system working, add
+add WRFVAR_INC and WRFVAR_LIB so no need to change 
+INCLUDE_MODULES and LIB for non wrfvar code
+
+
+Test results
+------------------------------------------------------
+
+No change to results possible
+
+balsam: Compiles wrfvar and wrfplus
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+M    arch/postamble
+M    arch/configure_defaults
+M    main/Makefile
+M    da/Makefile
+A    doc/changes/changes_20060731f.jrb

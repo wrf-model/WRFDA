@@ -1,0 +1,25 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/07/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove -v -np $NUM_PROCS from lsf mpirun.lsf submission, as bluevista
+doesn't like them, and lightning doesn't mind
+
+------------------------------------------------------
+Tests:
+
+bluevista and lightning: con200 jobs start
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060907d.jrb
+M    scripts/da_run_job.ksh
+

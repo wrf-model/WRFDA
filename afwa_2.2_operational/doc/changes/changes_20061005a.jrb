@@ -1,0 +1,35 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 10/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add more tracing to radiance code
+
+Add tovs even redistribution code before rttov_ad. Default is to have this 
+switched off, it has not been tested yet
+
+makedepf90 now an external program, not compiled locally, as that keeps
+tripping up csh users on bluesky
+
+Add fixes to get code to compile and run on sgi
+
+Automatic documentation generation update
+
+------------------------------------------------------
+Tests:
+
+jrb* code compiled everywhere and a full set of regression tests done
+against trunk*
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20061005a.jrb
+

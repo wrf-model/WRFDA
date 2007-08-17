@@ -1,0 +1,77 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/27/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Get old compilation system working again
+
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+balsam. Old and new compilation both work
+
+--------------------------------------------------------------------------------------
+
+M    da/da_vtox_transforms/da_transform_vtox_adj.inc
+M    da/da_obs/da_add_noise_to_ob.inc
+M    da/da_obs/da_write_noise_to_ob.inc
+M    da/da_obs/da_write_y.inc
+M    da/da_obs/da_final_write_y.inc
+M    da/da_obs/da_write_obs.inc
+M    da/da_obs/da_final_write_obs.inc
+M    da/da_obs/da_write_filtered_obs.inc
+M    da/da_define_structures/da_deallocate_background_errors.inc
+M    da/da_modules/da_wrfvar_top.f90
+M    da/Makefile
+M    compile
+M    tools/gen_mod_state_descr.c
+M    Registry/Registry.EM_4DVAR
+A    dyn_em/couple_or_uncouple_em.F
+M    Makefile
+M    arch/configure.defaults
+M    arch/preamble
+AM   compile_wrfvar
+M    clean
+M    external/blas/xerbla.inc
+M    external/blas/Makefile
+M    external/io_int/io_int.F90
+M    external/io_netcdf/ext_ncd_put_dom_ti.code
+M    external/io_netcdf/wrf_io.F90
+M    external/io_netcdf/ext_ncd_put_var_td.code
+M    external/io_netcdf/ext_ncd_get_dom_ti.code
+M    external/io_netcdf/transpose.code
+M    external/io_netcdf/ext_ncd_put_var_ti.code
+M    external/io_netcdf/ext_ncd_get_var_td.code
+M    external/io_netcdf/ext_ncd_get_var_ti.code
+M    external/io_netcdf/module_wrfsi_static.F90
+M    external/io_netcdf/field_routines.F90
+M    external/io_netcdf/Makefile
+M    external/lapack/Makefile
+M    external/RSL/module_dm.F
+M    external/bufr_ncep_nco/Makefile
+M    external/fftpack5/fftpack5.f90
+M    external/fftpack5/Makefile
+M    external/RSL_LITE/module_dm.F
+M    external/Makefile
+M    main/Makefile
+M    frame/module_io.F
+M    frame/module_io_quilt.F
+M    build/frame.make
+M    build/makefile
+
+
+Files added:
+------------
+doc/changes/changes_20060726c.jrb (this file)
+
+
+Files modified:
+---------------
+
+doc/da_tutorial/wrfvar-system.ppt

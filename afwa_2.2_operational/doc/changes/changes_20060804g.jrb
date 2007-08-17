@@ -1,0 +1,29 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/04/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Setup scripts will use mpich2 if mpich1 not available 
+(as is the case for gfortran, which has problems with mpich1)
+
+Test results
+------------------------------------------------------
+
+No effect on non-gfortran systems. Gfortran compiles go on to
+fail, so further work needed on them
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060804g.jrb
+M      setup.ksh
+M      setup.csh
+
+

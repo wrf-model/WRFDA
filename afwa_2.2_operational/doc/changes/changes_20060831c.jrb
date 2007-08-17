@@ -1,0 +1,35 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/31/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bring in line with WRF trunk
+
+  Time checks in module_domain and input_wrf
+
+  Reduce openmp optimisations and don't compile solve_em with optimisation, old
+  compilation system 
+
+  Check xlf compiler version in regtest
+
+------------------------------------------------------
+
+balsam: Compiles wrfvar, runs con200
+bluesky: Runs wrfvar con200
+
+dummy mode scripts
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060831b.jrb
+M      tools/regtest.csh
+M      share/input_wrf.F
+M      arch/configure.defaults
+M      frame/module_domain.F

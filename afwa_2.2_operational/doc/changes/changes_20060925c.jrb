@@ -1,0 +1,123 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/25/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Replace calls to wrf_dm_monitor with a central logical rootproc in da_constants
+
+------------------------------------------------------
+Tests:
+
+hazel: kma_t63 and con200 run as trunk
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060925c.jrb
+M      da/da_ssmi/da_oi_stats_ssmi_tb.inc
+M      da/da_ssmi/da_ao_stats_ssmi_rv.inc
+M      da/da_ssmi/da_ao_stats_ssmt1.inc
+M      da/da_ssmi/da_ao_stats_ssmt2.inc
+M      da/da_ssmi/da_ao_stats_ssmi_tb.inc
+M      da/da_ssmi/da_oi_stats_ssmi_rv.inc
+M      da/da_ssmi/da_oi_stats_ssmt1.inc
+M      da/da_ssmi/da_oi_stats_ssmt2.inc
+M      da/da_constants/da_constants.f90
+M      da/da_polaramv/da_oi_stats_polaramv.inc
+M      da/da_polaramv/da_ao_stats_polaramv.inc
+M      da/da_profiler/da_oi_stats_profiler.inc
+M      da/da_profiler/da_ao_stats_profiler.inc
+M      da/da_obs/da_write_noise_to_ob.inc
+M      da/da_obs/da_final_write_y.inc
+M      da/da_obs/da_final_write_obs.inc
+M      da/da_obs/da_write_filtered_obs.inc
+M      da/da_solve/da_solve.f90
+M      da/da_sound/da_calculate_jo_and_grady_sound.inc
+M      da/da_sound/da_oi_stats_sonde_sfc.inc
+M      da/da_sound/da_ao_stats_sound.inc
+M      da/da_sound/da_oi_stats_sound.inc
+M      da/da_sound/da_ao_stats_sonde_sfc.inc
+M      da/da_sound/da_get_jo_and_grady_sonde_sfc.inc
+M      da/da_radar/da_ao_stats_radar.inc
+M      da/da_radar/da_oi_stats_radar.inc
+M      da/da_statistics/da_analysis_stats.inc
+M      da/da_minimisation/da_transform_vtoy_adj.inc
+M      da/da_minimisation/da_dot_cv.inc
+M      da/da_minimisation/da_get_var_diagnostics.inc
+M      da/da_minimisation/da_write_diagnostics.inc
+M      da/da_minimisation/da_minimisation.f90
+M      da/da_minimisation/da_transform_vtoy.inc
+M      da/da_airep/da_oi_stats_airep.inc
+M      da/da_airep/da_ao_stats_airep.inc
+M      da/da_setup_structures/da_transfer_xatowrftl_adj.inc
+M      da/da_setup_structures/da_write_increments.inc
+M      da/da_setup_structures/da_transfer_xatowrftl.inc
+M      da/da_setup_structures/da_write_kma_increments.inc
+M      da/da_setup_structures/da_transfer_xatowrf.inc
+M      da/da_modules/da_wrfvar_esmf_super.f90
+M      da/da_modules/da_wrfvar_init.inc
+M      da/da_modules/da_esmf_init.inc
+M      da/da_modules/da_wrfvar_top.f90
+M      da/da_metar/da_ao_stats_metar.inc
+M      da/da_metar/da_oi_stats_metar.inc
+M      da/da_satem/da_ao_stats_satem.inc
+M      da/da_satem/da_oi_stats_satem.inc
+M      da/da_qscat/da_ao_stats_qscat.inc
+M      da/da_qscat/da_oa_stats_qscat.inc
+M      da/da_qscat/da_ob_stats_qscat.inc
+M      da/da_qscat/da_oi_stats_qscat.inc
+M      da/da_buoy/da_oi_stats_buoy.inc
+M      da/da_buoy/da_ao_stats_buoy.inc
+M      da/da_geoamv/da_oi_stats_geoamv.inc
+M      da/da_geoamv/da_ao_stats_geoamv.inc
+M      da/da_par_util/da_proc_maxmin_combine.inc
+M      da/da_par_util/da_y_facade_to_global.inc
+M      da/da_par_util/da_proc_stats_combine.inc
+M      da/da_par_util/da_wv_patch_to_global_2d.inc
+M      da/da_par_util/da_system_4dvar.inc
+M      da/da_par_util/da_cv_to_global.inc
+M      da/da_par_util/da_proc_sum_real.inc
+M      da/da_par_util/da_proc_diagnostics_collect.inc
+M      da/da_par_util/da_proc_sum_int.inc
+M      da/da_par_util/da_proc_sum_count_obs.inc
+M      da/da_bogus/da_oi_stats_bogus.inc
+M      da/da_bogus/da_ao_stats_bogus.inc
+M      da/da_test/da_check_psfc.inc
+M      da/da_test/da_check_vtox_adjoint.inc
+M      da/da_test/da_check_vtoy_adjoint.inc
+M      da/da_test/da_check_xtoy_adjoint.inc
+M      da/da_test/da_check_vvtovp_adjoint.inc
+M      da/da_test/da_check_vptox_adjoint.inc
+M      da/da_test/da_check_sfc_assi.inc
+M      da/da_test/da_test_vtoy_transform.inc
+M      da/da_test/da_check_cvtovv_adjoint.inc
+M      da/da_airsr/da_oi_stats_airsr.inc
+M      da/da_airsr/da_ao_stats_airsr.inc
+M      da/da_airsr/da_calculate_jo_and_grady_airsr.inc
+M      da/da_gpsref/da_ao_stats_gpsref.inc
+M      da/da_gpsref/da_oi_stats_gpsref.inc
+M      da/da_ships/da_ao_stats_ships.inc
+M      da/da_ships/da_oi_stats_ships.inc
+M      da/da_pilot/da_ao_stats_pilot.inc
+M      da/da_pilot/da_oi_stats_pilot.inc
+M      da/da_pseudo/da_oi_stats_pseudo.inc
+M      da/da_pseudo/da_ao_stats_pseudo.inc
+M      da/da_pseudo/da_oa_stats_pseudo.inc
+M      da/da_pseudo/da_ob_stats_pseudo.inc
+M      da/da_gpspw/da_oi_stats_gpspw.inc
+M      da/da_gpspw/da_get_innov_vector_gpspw.inc
+M      da/da_gpspw/da_ao_stats_gpspw.inc
+M      da/da_radiance/da_oma_stats_rad.inc
+M      da/da_radiance/da_omb_stats_rad.inc
+M      da/da_radiance/da_qc_amsua.inc
+M      da/da_radiance/da_qc_amsub.inc
+M      da/da_synop/da_ao_stats_synop.inc
+M      da/da_synop/da_calculate_jo_and_grady_synop.inc
+M      da/da_synop/da_oi_stats_synop.inc

@@ -1,0 +1,29 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/25/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Change wrf_error_fatal calls in da* code to da_error ones
+
+------------------------------------------------------
+Tests:
+
+balsam: con200 and kma_t63 run identically to trunk
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060925b.jrb
+M      da/da_setup_structures/da_setup_obs_structures.inc
+M      da/da_modules/da_med_initialdata_input.inc
+M      da/da_modules/da_med_initialdata_output.inc
+M      da/da_par_util/da_y_facade_to_global.inc
+M      da/da_par_util/da_generic_methods.inc
+M      da/da_radiance/da_qc_rad.inc

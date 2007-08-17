@@ -1,0 +1,28 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 10/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Remove Dec alpha configuration options.
+
+Remove -DKLUDGE options from PGI compiles, as latest compilers don't benefit (indeed
+it runs slower with them)
+
+------------------------------------------------------
+Tests:
+
+balsam: con200 runs in 39 seconds with kludge, 30 without
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20061003a.jrb
+M      arch/configure.defaults_new
+

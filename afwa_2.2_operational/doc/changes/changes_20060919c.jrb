@@ -1,0 +1,48 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/19/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bring external/esmf_time_f90 in line with wrf trunk
+
+remove tools/run_wrf (scripts now in scripts directory)
+
+------------------------------------------------------
+Tests:
+
+balsam: runs con200
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060919c.jrb
+D      tools/run_wrf
+D      tools/run_wrf/get_mss_files.csh
+D      tools/run_wrf/update_wrf_bc.csh
+D      tools/run_wrf/preprocess_ob.csh
+D      tools/run_wrf/get_date_range.csh
+D      tools/run_wrf/restore_data.csh
+D      tools/run_wrf/create_namelist.input.csh
+D      tools/run_wrf/run_wrfsi.csh
+D      tools/run_wrf/run_wrf.csh
+D      tools/run_wrf/run_wrf_wrapper.csh
+M      external/esmf_time_f90/ESMF_AlarmClock.F90
+M      external/esmf_time_f90/ESMF_Calendar.F90
+M      external/esmf_time_f90/ESMF_Base.F90
+M      external/esmf_time_f90/Meat.F90
+M      external/esmf_time_f90/ESMF_Mod.F90
+M      external/esmf_time_f90/ESMF_TimeMgr.inc
+M      external/esmf_time_f90/ESMF_BaseTime.F90
+M      external/esmf_time_f90/ESMF_Clock.F90
+M      external/esmf_time_f90/ESMF_Alarm.F90
+M      external/esmf_time_f90/ESMF_Time.F90
+M      external/esmf_time_f90/ESMF_Stubs.F90
+M      external/esmf_time_f90/ESMF_TimeInterval.F90
+M      external/esmf_time_f90/Makefile

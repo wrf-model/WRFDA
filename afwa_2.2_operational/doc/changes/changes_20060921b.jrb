@@ -1,0 +1,48 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/21/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bug fixes in scripts and tracing
+
+Add svn:ignore for old wrf compilation output
+
+
+------------------------------------------------------
+Tests:
+
+bluesky: con200 noobs/coldstart/cycling run with real executables
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060922a.jrb
+M      da/da_tracing/da_trace_report.inc
+M      da/da_tracing/da_tracing.f90
+M      da/da_reporting/da_warning.inc
+M      scripts/da_run_obsproc.ksh
+M      scripts/da_run_wrfvar.ksh
+M      scripts/da_run_wps.ksh
+M      scripts/da_run_real.ksh
+M      scripts/da_run_suite.ksh
+M      scripts/da_run_wrf.ksh
+M      scripts/da_update_bc.ksh
+M      share
+M      frame
+M      tools
+M      dyn_em
+M      main
+M      external/esmf_time_f90
+M      external/io_netcdf
+M      external/io_grib_share
+M      build/da.make
+
+
+

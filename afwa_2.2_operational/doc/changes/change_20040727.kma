@@ -1,0 +1,119 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author &
+Reviewer: 	KMA visitors, Rizvi, and Wei
+Date: 		07/27/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add convertor for KMA.
+
+Expected Differences
+--------------------
+
+No impacts on 3DVAR.
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Files added:
+---------------
+ convertor/Makefile
+ convertor/module_kma2netcdf_interface.F
+ convertor/module_netcdf2kma_interface.F
+ convertor/kma_wave2grid/BSSLZ1.inc
+ convertor/kma_wave2grid/CUT.inc
+ convertor/kma_wave2grid/FFT991.inc
+ convertor/kma_wave2grid/G2W.inc
+ convertor/kma_wave2grid/G2WDZ.inc
+ convertor/kma_wave2grid/G2WPP.inc
+ convertor/kma_wave2grid/GAUSS.inc
+ convertor/kma_wave2grid/GOUT.inc
+ convertor/kma_wave2grid/IDCMP.inc
+ convertor/kma_wave2grid/LGNDR1.inc
+ convertor/kma_wave2grid/LGNUV.inc
+ convertor/kma_wave2grid/LGNW2G.inc
+ convertor/kma_wave2grid/LT2GAU.inc
+ convertor/kma_wave2grid/MNMX.inc
+ convertor/kma_wave2grid/MOVEC.inc
+ convertor/kma_wave2grid/PACK.inc
+ convertor/kma_wave2grid/RADB2M.inc
+ convertor/kma_wave2grid/RADB3M.inc
+ convertor/kma_wave2grid/RADB4M.inc
+ convertor/kma_wave2grid/RADB5M.inc
+ convertor/kma_wave2grid/RADBGM.inc
+ convertor/kma_wave2grid/RADF2M.inc
+ convertor/kma_wave2grid/RADF3M.inc
+ convertor/kma_wave2grid/RADF4M.inc
+ convertor/kma_wave2grid/RADF5M.inc
+ convertor/kma_wave2grid/RADFGM.inc
+ convertor/kma_wave2grid/REDDAT.inc
+ convertor/kma_wave2grid/REDHED.inc
+ convertor/kma_wave2grid/REDIEG.inc
+ convertor/kma_wave2grid/REOWAV.inc
+ convertor/kma_wave2grid/REOWV.inc
+ convertor/kma_wave2grid/RESET.inc
+ convertor/kma_wave2grid/RFFTBM.inc
+ convertor/kma_wave2grid/RFFTFM.inc
+ convertor/kma_wave2grid/RFFTIM.inc
+ convertor/kma_wave2grid/RFTB1M.inc
+ convertor/kma_wave2grid/RFTB2M.inc
+ convertor/kma_wave2grid/RFTB9M.inc
+ convertor/kma_wave2grid/RFTF1M.inc
+ convertor/kma_wave2grid/RFTF2M.inc
+ convertor/kma_wave2grid/RFTF3M.inc
+ convertor/kma_wave2grid/RFTF9M.inc
+ convertor/kma_wave2grid/RFTI1M.inc
+ convertor/kma_wave2grid/SETARY.inc
+ convertor/kma_wave2grid/W2G.inc
+ convertor/kma_wave2grid/W2GCONV.inc
+ convertor/kma_wave2grid/W2GPXY.inc
+ convertor/kma_wave2grid/W2GUV.inc
+ convertor/kma_wave2grid/WAVMAG.inc
+ convertor/kma_wave2grid/WEIHT2.inc
+ convertor/kma_wave2grid/ZNME2PXX.inc
+ convertor/kma_wave2grid/module_kma_wave2grid.F
+ convertor/wave2grid_kma/BSSLZ1.inc
+ convertor/wave2grid_kma/CR8I2V.inc
+ convertor/wave2grid_kma/CVDATE.inc
+ convertor/wave2grid_kma/GAUSS.inc
+ convertor/wave2grid_kma/GH2TV.inc
+ convertor/wave2grid_kma/GPLHGT.inc
+ convertor/wave2grid_kma/LT2GAU.inc
+ convertor/wave2grid_kma/MINMAX.inc
+ convertor/wave2grid_kma/MONTWO.inc
+ convertor/wave2grid_kma/MOVEC.inc
+ convertor/wave2grid_kma/OUTZ.inc
+ convertor/wave2grid_kma/PACK.inc
+ convertor/wave2grid_kma/PREGSM.F
+ convertor/wave2grid_kma/PREGSM.inc
+ convertor/wave2grid_kma/PRESUB.inc
+ convertor/wave2grid_kma/REDANL.inc
+ convertor/wave2grid_kma/REDDAT.inc
+ convertor/wave2grid_kma/REDDAT_ASCII.inc
+ convertor/wave2grid_kma/REDDAT_BIN.inc
+ convertor/wave2grid_kma/REDGES.inc
+ convertor/wave2grid_kma/REDHED.inc
+ convertor/wave2grid_kma/RESET.inc
+ convertor/wave2grid_kma/SPLDIF3_H.inc
+ convertor/wave2grid_kma/TETEN.inc
+ convertor/wave2grid_kma/VPRM.inc
+ convertor/wave2grid_kma/WRTDAT.inc
+ convertor/wave2grid_kma/WRTEOF.inc
+ convertor/wave2grid_kma/WRTHED.inc
+ convertor/wave2grid_kma/ZE2TVE.inc
+ convertor/wave2grid_kma/ZMNLAT.inc
+ convertor/wave2grid_kma/ZMNT.inc
+ convertor/wave2grid_kma/module_wave2grid_kma.F
+
+Files modified:
+---------------
+
+ Makefile
+
+Minor-tag:
+
+None.
+

@@ -1,0 +1,28 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 07/26/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+clean_new needs to remove main/*exe
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+balsam. Script run. No compilation needed
+
+--------------------------------------------------------------------------------------
+
+Files added:
+------------
+doc/changes/changes_20060726a.jrb (this file)
+
+
+Files modified:
+---------------
+
+clean_new

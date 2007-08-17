@@ -1,0 +1,50 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/24/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add tar file containing proposed changes by KMA, about which Hyun Cheol Shin
+says:
+
+
+I want you to know what we changed from Apr version(2006.04.17 version) before
+you test your new version. 
+
+We modified configure.defaults, configure.defaults_wrfvar,
+postamble_wrfvar.cray1e, preamble_wrfvar, and Makefile to make Apr. version
+work in our Cray machine. 
+
+Also, we changed many source codes which are related with radar data
+assimilation, atovs data assimilation, and pre/post converter . 
+
+Please check the attached tar file: TODALE.tar . ( Remmeber that '*.org' files
+are original sources of Apr. version. ) 
+
+I need you to apply our changes in your new version as much as as possible. If
+you have any question about our modification, mail to me. 
+
+And Eun Joo Lee found that Apr. version did not manage surface
+data(u10,v10,q2,t2,SST) which were necessary for ATOVS data assimilation. Only
+landmask data was being treated. Eun Joo said that she and Rizvi changed some
+programs to introduce surface data in NetCDF file while she visited NCAR.
+Please check if your new version deal with surface data with Rizvi.  Reapply
+INTENT fix needed by g95. Lost when reverting to wrf trunk, which still has
+the bug
+
+Test results
+------------------------------------------------------
+
+N/A
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060824b.jrb
+A    doc/changes/kma_proposed/TODALE.tar

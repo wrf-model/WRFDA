@@ -1,0 +1,96 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Dale Barker
+Reviewer: Syed Rizvi
+Date: 04/13/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Update gen_be code to work with latest wrfvar
+
+Added additional bin_type options (still recommend
+1 for global, and 5 for regional).
+
+Expected Differences
+--------------------
+
+The gen_be code did not work for global as it hadn't
+been updated for a while.
+
+No changes to calculation of gen_be statistics are
+expected.
+
+Size of gen_be output file (used in 3D-Var) changes
+slightly, hence change to backgroud error read routine.
+
+CPU:
+
+Same.
+
+memory:
+
+Same.
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+Spectral tests pass (test_spectral=.true.).
+
+Regression coefficients, eigenvectors, eigenvalues, and 
+power spectra plotted and compared with previous
+standalone code.
+
+--------------------------------------------------------------------------------------
+Files removed:
+--------------
+share/module_bdyzone.F
+
+Files added:
+------------
+
+da_3dvar/src/DA_Recursive_Filter/da_perform_2drf.inc
+da_3dvar/src/da_gen_be/da_filter_regcoeffs.inc
+gen_be/gen_be_stage2a.f
+run/gen_be/da_wrf_stage0_ens.csh
+run/gen_be/da_wrf_stage0_nmc.csh
+run/gen_be/gen_be_nmc_global.csh
+run/gen_be/gen_be_nmc_regional.csh
+changes/change_20050413.db
+
+Files modified:
+---------------
+
+da_3dvar/src/Makefile
+da_3dvar/src/DA_Recursive_Filter/DA_Recursive_Filter.F
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors4.inc
+da_3dvar/src/da_gen_be/da_create_bins.inc
+da_3dvar/src/da_gen_be/da_gen_be.F
+da_3dvar/src/da_gen_be/da_print_be_stats_p.inc
+da_3dvar/src/da_gen_be/da_print_be_stats_v.inc
+da_3dvar/src/da_gen_be/da_readwrite_be_stage2.inc
+da_3dvar/src/da_gen_be/da_readwrite_be_stage3.inc
+da_3dvar/src/da_gen_be/da_readwrite_be_stage4.inc
+da_3dvar/src/da_spectral/da_calc_power.inc
+da_3dvar/src/da_spectral/da_vv_to_v_spectral.inc
+da_3dvar/utl/daprog_diagnostics.csh
+da_3dvar/utl/daprog_diagnostics.f90
+da_3dvar/utl/daprog_ominusb.f90
+gen_be/Makefile
+gen_be/gen_be_cov2d.f
+gen_be/gen_be_cov3d.f
+gen_be/gen_be_diags.f
+gen_be/gen_be_diags_read.f
+gen_be/gen_be_stage1.f
+gen_be/gen_be_stage2.f
+gen_be/gen_be_stage3.f
+gen_be/gen_be_stage4.f
+run/DA_Run_3DVAR.csh
+run/gen_be/gen_be_cov2d.csh
+run/gen_be/gen_be_cov3d.csh
+
+Tag:
+
+version_2_?
+

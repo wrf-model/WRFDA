@@ -1,0 +1,464 @@
+Change Log for update to WRF V2.1
+---------------------------------------
+
+Author: 	Wei
+Reviewer: 	
+Date: 		07/13/05
+
+Reason for changes:
+--------------------------------------------------
+
+Update wrfvar frame to WRF v2.1
+
+Expected Differences
+--------------------
+
+None.
+
+Test results (run on Zebra (DEC OSF1)
+------------------------------------------------------
+Case: CONUS 2000-01-24_12:00:00
+
+old results:
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    1.05556335D+03   4.39481858D+01   2.27540678D-02
+     1    2    1.04687269D+03   5.09479263D+01   2.27540678D-02
+     2    3    1.03538996D+03   2.05213529D+01   1.00000000D+00
+     3    4    1.02952257D+03   1.58830448D+01   1.00000000D+00
+     4    5    1.02077615D+03   2.18057785D+01   1.00000000D+00
+     5    6    1.00990439D+03   2.31995732D+01   1.00000000D+00
+     6    7    9.97362183D+02   2.77387897D+01   1.00000000D+00
+     7    8    9.90339817D+02   1.92554913D+01   1.00000000D+00
+     8    9    9.85560215D+02   6.25748234D+00   1.00000000D+00
+     9   10    9.84441751D+02   6.73100434D+00   1.00000000D+00
+    10   11    9.83764412D+02   5.51176371D+00   1.00000000D+00
+    11   12    9.83297497D+02   3.75721773D+00   1.00000000D+00
+    12   13    9.82582196D+02   3.09688244D+00   1.00000000D+00
+    13   14    9.82198411D+02   2.04191259D+00   1.00000000D+00
+    14   15    9.82103496D+02   4.00439415D+00   1.00000000D+00
+    15   16    9.81969754D+02   1.98563304D+00   1.00000000D+00
+    16   17    9.81910116D+02   1.80400307D+00   1.00000000D+00
+    17   18    9.81747142D+02   2.21093604D+00   1.00000000D+00
+    18   20    9.81683213D+02   1.86645665D+00   4.46977933D-01
+    19   21    9.81633582D+02   8.68281395D-01   1.00000000D+00
+    20   22    9.81610857D+02   5.56395997D-01   1.00000000D+00
+    21   23    9.81603959D+02   1.08086008D+00   1.00000000D+00
+    22   24    9.81595413D+02   4.34300613D-01   1.00000000D+00
+
+    The minimization terminated without detecting errors.
+ 
+    Final cost function J  =    981.595413083709     
+
+
+new results:
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    1.05556335D+03   4.39481858D+01   2.27540678D-02
+     1    2    1.04687269D+03   5.09479263D+01   2.27540678D-02
+     2    3    1.03538996D+03   2.05213529D+01   1.00000000D+00
+     3    4    1.02952257D+03   1.58830448D+01   1.00000000D+00
+     4    5    1.02077615D+03   2.18057785D+01   1.00000000D+00
+     5    6    1.00990439D+03   2.31995732D+01   1.00000000D+00
+     6    7    9.97362183D+02   2.77387897D+01   1.00000000D+00
+     7    8    9.90339817D+02   1.92554913D+01   1.00000000D+00
+     8    9    9.85560215D+02   6.25748234D+00   1.00000000D+00
+     9   10    9.84441751D+02   6.73100434D+00   1.00000000D+00
+    10   11    9.83764412D+02   5.51176371D+00   1.00000000D+00
+    11   12    9.83297497D+02   3.75721773D+00   1.00000000D+00
+    12   13    9.82582196D+02   3.09688244D+00   1.00000000D+00
+    13   14    9.82198411D+02   2.04191259D+00   1.00000000D+00
+    14   15    9.82103496D+02   4.00439415D+00   1.00000000D+00
+    15   16    9.81969754D+02   1.98563304D+00   1.00000000D+00
+    16   17    9.81910116D+02   1.80400307D+00   1.00000000D+00
+    17   18    9.81747142D+02   2.21093604D+00   1.00000000D+00
+    18   20    9.81683213D+02   1.86645665D+00   4.46977933D-01
+    19   21    9.81633582D+02   8.68281395D-01   1.00000000D+00
+    20   22    9.81610857D+02   5.56395997D-01   1.00000000D+00
+    21   23    9.81603959D+02   1.08086008D+00   1.00000000D+00
+    22   24    9.81595413D+02   4.34300613D-01   1.00000000D+00
+
+    The minimization terminated without detecting errors.
+ 
+    Final cost function J  =    981.595413083709     
+ 
+    Total number of obs.    =      535
+
+
+Files added
+---------------
+ da_3dvar/module_gen_be_top.F
+ da_3dvar/module_wrfvar_top.F
+ dyn_em/shift_domain_em.F
+ external/io_esmf	(dir)
+ external/ioapi_share	(dir)
+ external/esmf_time_f90/ESMF_AlarmClock.F90
+ external/esmf_time_f90/module_symbols_util.F90
+ external/esmf_time_f90/module_utility.F90
+ external/io_netcdf/vort.F90
+ external/io_netcdf/wrf_io_flags.h
+ external/io_netcdf/main/wrfvar.F
+ phys/module_gfs_funcphys.F
+ phys/module_gfs_machine.F
+ phys/module_gfs_physcons.F
+ phys/module_microphysics_zero_out.F
+ phys/module_mp_thompson.F
+ phys/module_progtm.F
+ phys/module_sf_gfs.F
+ phys/mediation_nest_move.F
+ phys/module_compute_geop.F
+ share/module_wrf_top.F
+
+Files modified:
+---------------
+ Makefile
+ README.NMM
+ Registry/Registry.3DVAR
+ Registry/Registry.EM
+ Registry/Registry.EM.PET
+ Registry/Registry.EM_CHEM
+ Registry/Registry.NMM
+ Registry/Registry.gen_be
+ arch/Config.pl
+ arch/configure.defaults
+ arch/configure.defaults_3dvar
+ arch/postamble
+ arch/preamble
+ chem/chem_driver.F
+ chem/module_ctrans_grell.F
+ chem/module_input_chem_data.F
+ da_3dvar/Makefile
+ da_3dvar/src/DA_Setup_Structures/da_transfer_kmatoxb.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftltoxa.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftltoxa_adj.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatokma.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrftl.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrftl_adj.inc
+ dyn_em/Makefile
+ dyn_em/couple_or_uncouple_em.F
+ dyn_em/module_big_step_utilities_em.F
+ dyn_em/module_diffusion_em.F
+ dyn_em/module_em.F
+ dyn_em/module_initialize_b_wave.F
+ dyn_em/module_initialize_grav2d_x.F
+ dyn_em/module_initialize_hill2d_x.F
+ dyn_em/module_initialize_quarter_ss.F
+ dyn_em/module_initialize_real.F
+ dyn_em/module_initialize_squall2d_x.F
+ dyn_em/module_initialize_squall2d_y.F
+ dyn_em/module_small_step_em.F
+ dyn_em/nest_init_utils.F
+ dyn_em/solve_em.F
+ dyn_em/start_em.F
+ dyn_nmm/module_DIFFUSION_NMM.F
+ dyn_nmm/module_PHYSICS_CALLS.F
+ dyn_nmm/module_initialize_real.F
+ dyn_nmm/solve_nmm.F
+ dyn_nmm/start_domain_nmm.F
+ external/Makefile
+ external/RSL/gen_comms.c
+ external/RSL/module_dm.F
+ external/RSL/RSL/makefile
+ external/RSL/RSL/makefile.altix
+ external/RSL/RSL/makefile.o2k
+ external/RSL/RSL/rsl_error_dup.c
+ external/RSL/RSL/rsl_malloc.c
+ external/RSL_LITE/c_code.c
+ external/RSL_LITE/gen_comms.c
+ external/RSL_LITE/module_dm.F
+ external/RSL_LITE/rsl_bcast.c
+ external/RSL_LITE/rsl_lite.h
+ external/RSL_LITE/rsl_malloc.c
+ external/RSL_LITE/task_for_point.c
+ external/esmf_time_f90/ESMF_Alarm.F90
+ external/esmf_time_f90/ESMF_Base.F90
+ external/esmf_time_f90/ESMF_BaseTime.F90
+ external/esmf_time_f90/ESMF_Calendar.F90
+ external/esmf_time_f90/ESMF_Clock.F90
+ external/esmf_time_f90/ESMF_Fraction.F90
+ external/esmf_time_f90/ESMF_Macros.inc
+ external/esmf_time_f90/ESMF_Mod.F90
+ external/esmf_time_f90/ESMF_Stubs.F90
+ external/esmf_time_f90/ESMF_Time.F90
+ external/esmf_time_f90/ESMF_TimeInterval.F90
+ external/esmf_time_f90/ESMF_TimeMgr.inc
+ external/esmf_time_f90/Makefile
+ external/esmf_time_f90/Meat.F90
+ external/esmf_time_f90/Test1.F90
+ external/io_grib1/makefile
+ external/io_grib1/wrf_io_flags.h
+ external/io_grib1/wrf_status_codes.h
+ external/io_grib1/write_grib.c
+ external/io_int/diffwrf.F
+ external/io_int/io_int.F90
+ external/io_int/makefile
+ external/io_mcel/ext_mcel_read_field.F90
+ external/io_mcel/io_mcel.F90
+ external/io_mcel/makefile
+ external/io_netcdf/makefile
+ external/io_phdf5/wrf-phdf5.F90
+ external/io_phdf5/wrf-phdf5attr.F90
+ external/io_phdf5/wrf-phdf5attr.F90btg
+ external/io_phdf5/wrf-phdf5support.F90
+ frame/Makefile
+ frame/collect_on_comm.c
+ frame/libmassv.F
+ frame/module_dm_stubs.F
+ frame/module_domain.F
+ frame/module_integrate.F
+ frame/module_io.F
+ frame/module_io_quilt.F
+ frame/module_nesting.F
+ frame/module_wrf_error.F
+ gen_be/gen_be_diags_read.f
+ gen_be/gen_be_stage0.f
+ main/Makefile
+ main/convert_nmm.F
+ main/ideal.F
+ main/ndown_em.F
+ main/real_em.F
+ main/real_nmm.F
+ main/wrf.F
+ main/wrf_ESMFApp.F
+ phys/Makefile
+ phys/module_bl_gfs.F
+ phys/module_bl_mrf.F
+ phys/module_bl_myjpbl.F
+ phys/module_bl_ysu.F
+ phys/module_cu_bmj.F
+ phys/module_cu_kfeta.F
+ phys/module_cu_sas.F
+ phys/module_microphysics_driver.F
+ phys/module_mp_etanew.F
+ phys/module_mp_kessler.F
+ phys/module_mp_lin.F
+ phys/module_mp_ncloud3.F
+ phys/module_mp_ncloud5.F
+ phys/module_mp_wsm3.F
+ phys/module_mp_wsm5.F
+ phys/module_mp_wsm6.F
+ phys/module_pbl_driver.F
+ phys/module_physics_addtendc.F
+ phys/module_physics_init.F
+ phys/module_ra_gfdleta.F
+ phys/module_ra_gsfcsw.F
+ phys/module_ra_rrtm.F
+ phys/module_ra_sw.F
+ phys/module_radiation_driver.F
+ phys/module_sf_lsm_nmm.F
+ phys/module_sf_myjsfc.F
+ phys/module_sf_noahlsm.F
+ phys/module_sf_slab.F
+ phys/module_surface_driver.F
+ run/LANDUSE.TBL
+ run/README.namelist
+ run/gen_be/gen_be_ens.csh
+ run/gen_be/gen_be_nmc.csh
+ share/Makefile
+ share/input_wrf.F
+ share/interp_fcn.F
+ share/landread.c
+ share/mediation_feedback_domain.F
+ share/mediation_force_domain.F
+ share/mediation_integrate.F
+ share/mediation_interp_domain.F
+ share/mediation_wrfmain.F
+ share/module_bc.F
+ share/module_bc_time_utilities.F
+ share/module_date_time.F
+ share/module_interp_fcn.F
+ share/module_io_domain.F
+ share/module_soil_pre.F
+ share/output_wrf.F
+ share/set_timekeeping.F
+ share/solve_interface.F
+ share/start_domain.F
+ share/wrf_auxhist1in.F
+ share/wrf_auxhist1out.F
+ share/wrf_auxhist2in.F
+ share/wrf_auxhist2out.F
+ share/wrf_auxhist3in.F
+ share/wrf_auxhist3out.F
+ share/wrf_auxhist4in.F
+ share/wrf_auxhist4out.F
+ share/wrf_auxhist5in.F
+ share/wrf_auxhist5out.F
+ share/wrf_auxinput1in.F
+ share/wrf_auxinput1out.F
+ share/wrf_auxinput2in.F
+ share/wrf_auxinput2out.F
+ share/wrf_auxinput3in.F
+ share/wrf_auxinput3out.F
+ share/wrf_auxinput4in.F
+ share/wrf_auxinput4out.F
+ share/wrf_auxinput5in.F
+ share/wrf_auxinput5out.F
+ share/wrf_bdyin.F
+ share/wrf_bdyout.F
+ share/wrf_histin.F
+ share/wrf_histout.F
+ share/wrf_inputin.F
+ share/wrf_inputout.F
+ share/wrf_restartin.F
+ share/wrf_restartout.F
+ test/em_b_wave/namelist.input
+ test/em_hill2d_x/namelist.input
+ test/em_quarter_ss/namelist.input
+ test/em_real/namelist.input
+ test/em_real/namelist.input.jan00
+ test/em_real/namelist.input.jun01
+ test/em_squall2d_x/namelist.input
+ test/em_squall2d_y/namelist.input
+ test/exp_real/namelist.input
+ test/nmm_real/namelist.input
+ test/nmm_real/namelist.input.hi_regtest
+ tools/all_reg.csh
+ tools/danger
+ tools/data.h
+ tools/gen_allocs.c
+ tools/gen_args.c
+ tools/gen_config.c
+ tools/gen_defs.c
+ tools/gen_interp.c
+ tools/gen_wrf_io.c
+ tools/misc.c
+ tools/protos.h
+ tools/reg_parse.c
+ tools/registry.c
+ tools/registry.h
+ tools/regtest.csh
+ tools/type.c
+
+Minor-tag:
+
+wei_updated2pre_wrfv21
+
+
+
+Code changed (add/modify) from WRF V2.1 during July 13-18, 2005
+----------------------------------------------------------------
+
+M Registry/Registry.EM
+M Registry/Registry.EM_CHEM
+M Registry/Registry.NMM
+M arch/configure.defaults
+M arch/postamble
+M da_3dvar/changes/change_20050713.wh
+M dyn_em/module_big_step_utilities_em.F
+M dyn_em/module_initialize_real.F
+M dyn_em/nest_init_utils.F
+M dyn_em/solve_em.F
+M dyn_em/start_em.F
+M external/RSL_LITE/gen_comms.c
+M external/RSL_LITE/module_dm.F
+M external/RSL_LITE/rsl_bcast.c
+M external/RSL_LITE/rsl_lite.h
+M external/esmf_time_f90/module_symbols_util.F90
+M external/io_grib1/README.io_grib1
+A external/io_grib1/grib1_routines.c
+A external/io_grib1/grib1_routines.h
+M external/io_grib1/gribmap.c
+M external/io_grib1/gribmap.h
+A external/io_grib1/gribmap.txt
+M external/io_grib1/gridnav.c
+M external/io_grib1/io_grib1.F
+M external/io_grib1/makefile
+M external/io_grib1/open_file.c
+A external/io_grib1/test.F
+A external/io_grib1/test.F90
+A external/io_grib1/test.c
+A external/io_grib1/test.grb
+A external/io_grib1/test_grib1_routines.F90
+A external/io_grib1/test_gribmap.F90
+A external/io_grib1/test_grid_info.F90
+M external/io_grib1/test_read_gribmap.c
+M external/io_grib1/test_write_grib.c
+A external/io_grib1/trim.c
+M external/io_grib1/wrf_io_flags.h
+A external/io_grib1/MEL_grib1/FTP_getfile.c
+A external/io_grib1/MEL_grib1/Makefile
+A external/io_grib1/MEL_grib1/README
+A external/io_grib1/MEL_grib1/apply_bitmap.c
+A external/io_grib1/MEL_grib1/display_gribhdr.c
+A external/io_grib1/MEL_grib1/dprints.h
+A external/io_grib1/MEL_grib1/gbyte.c
+A external/io_grib1/MEL_grib1/grib.h
+A external/io_grib1/MEL_grib1/grib_dec.c
+A external/io_grib1/MEL_grib1/grib_enc.c
+A external/io_grib1/MEL_grib1/grib_lookup.h
+A external/io_grib1/MEL_grib1/grib_seek.c
+A external/io_grib1/MEL_grib1/grib_uthin.c
+A external/io_grib1/MEL_grib1/gribfuncs.h
+A external/io_grib1/MEL_grib1/gribgetbds.c
+A external/io_grib1/MEL_grib1/gribgetbms.c
+A external/io_grib1/MEL_grib1/gribgetgds.c
+A external/io_grib1/MEL_grib1/gribgetpds.c
+A external/io_grib1/MEL_grib1/gribhdr2file.c
+A external/io_grib1/MEL_grib1/gribputbds.c
+A external/io_grib1/MEL_grib1/gribputgds.c
+A external/io_grib1/MEL_grib1/gribputpds.c
+A external/io_grib1/MEL_grib1/hdr_print.c
+A external/io_grib1/MEL_grib1/init_dec_struct.c
+A external/io_grib1/MEL_grib1/init_enc_struct.c
+A external/io_grib1/MEL_grib1/init_gribhdr.c
+A external/io_grib1/MEL_grib1/init_struct.c
+A external/io_grib1/MEL_grib1/input.h
+A external/io_grib1/MEL_grib1/isdb.h
+A external/io_grib1/MEL_grib1/ld_dec_lookup.c
+A external/io_grib1/MEL_grib1/ld_enc_input.c
+A external/io_grib1/MEL_grib1/ld_enc_lookup.c
+A external/io_grib1/MEL_grib1/ld_grib_origctrs.c
+A external/io_grib1/MEL_grib1/make_default_grbfn.c
+A external/io_grib1/MEL_grib1/make_grib_log.c
+A external/io_grib1/MEL_grib1/map_lvl.c
+A external/io_grib1/MEL_grib1/map_parm.c
+A external/io_grib1/MEL_grib1/pack_spatial.c
+A external/io_grib1/MEL_grib1/prt_badmsg.c
+A external/io_grib1/MEL_grib1/prt_inp_struct.c
+A external/io_grib1/MEL_grib1/swap.c
+A external/io_grib1/MEL_grib1/upd_child_errmsg.c
+A external/io_grib1/build/application_rules.mk
+A external/io_grib1/build/binary_rules.mk
+A external/io_grib1/build/compile_rules.mk
+A external/io_grib1/build/config_rules.mk
+A external/io_grib1/build/depend_rules.mk
+A external/io_grib1/build/library_rules.mk
+A external/io_grib1/build/package_rules.mk
+A external/io_grib1/build/script_rules.mk
+A external/io_grib1/build/tcl_script_rules.mk
+A external/io_grib1/build/utest_rules.mk
+A external/io_grib1/build/utility_rules.mk
+A external/io_grib1/grib1_util/Makefile
+A external/io_grib1/grib1_util/a.out
+A external/io_grib1/grib1_util/alloc_2d.c
+A external/io_grib1/grib1_util/alloc_2d.h
+A external/io_grib1/grib1_util/cfortran.h
+A external/io_grib1/grib1_util/dump
+A external/io_grib1/grib1_util/gribsize.incl
+A external/io_grib1/grib1_util/read_grib.c
+A external/io_grib1/grib1_util/read_grib.h
+A external/io_grib1/grib1_util/test_advance_time_str.c
+A external/io_grib1/grib1_util/test_rg
+A external/io_grib1/grib1_util/test_rg2
+A external/io_grib1/grib1_util/test_rg_gribmap.c
+A external/io_grib1/grib1_util/write_grib.c
+M external/io_int/makefile
+M frame/md_calls.m4
+M frame/module_io.F
+M frame/module_io_quilt.F
+M frame/module_quilt_outbuf_ops.F
+M phys/module_cu_sas.F
+M phys/module_physics_init.F
+M phys/module_ra_gfdleta.F
+M phys/module_sf_noahlsm.F
+M phys/module_sf_ruclsm.F
+M phys/module_sf_slab.F
+M phys/module_surface_driver.F
+M run/LANDUSE.TBL
+M run/gribmap.txt
+M share/mediation_force_domain.F
+M share/mediation_interp_domain.F
+M share/mediation_nest_move.F
+M share/module_soil_pre.F
+M tools/gen_config.c
+M tools/regtest.csh

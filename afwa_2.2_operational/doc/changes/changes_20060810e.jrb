@@ -1,0 +1,24 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/10/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Change version variables in da_constants to V2.2
+
+Test results
+------------------------------------------------------
+
+balsam: Still compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060810e.jrb
+M    da/da_constants/da_constants.f90

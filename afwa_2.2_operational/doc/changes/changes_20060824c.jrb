@@ -1,0 +1,49 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/22/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Initial version of revised suite scripts. More changes to come
+
+Test results
+------------------------------------------------------
+
+balsam: con200 standalone continues to work, some sucess with suites in
+dummy mode
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060824c.jrb
+A      scripts/da_get_date_range.ksh
+M      scripts/da_run_wrfplus_ad.ksh
+M      scripts/da_run_wrfvar.ksh
+A      scripts/da_run_obsproc.ksh
+A      scripts/da_run_wps.ksh
+A      scripts/da_trace.ksh
+M      scripts/da_run_job.ksh
+A      scripts/da_run_real.ksh
+A      scripts/da_run_suite.ksh
+A      scripts/da_run_suite_wrapper.ksh
+A      scripts/da_run_wrfsi.ksh
+M      scripts/da_run_wrfplus_nl.ksh
+A      scripts/da_restore_data_ncep.ksh
+A      scripts/da_run_wrf.ksh
+A      scripts/da_get_mss_files.ksh
+M      scripts/da_run_wrfplus_tl.ksh
+A      scripts/da_update_bc.ksh
+
+M      tools/run_wrf/update_wrf_bc.csh
+M      tools/run_wrf/preprocess_ob.csh
+D      tools/run_wrf/advance_cymdh.f90
+D      tools/run_wrf/run_wrf-var.csh
+D      tools/run_wrf/DA_Run_WRF-Var.global.csh
+D      tools/run_wrf/nodes
+M      tools/run_wrf/run_wrf.csh
+M      tools/run_wrf/run_wrf_wrapper.csh

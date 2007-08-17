@@ -1,0 +1,32 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/06/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Make WRFVAR_OBJS list comprehensive, so libwrfvar.a contains all code
+we need for wrfvar, so libwrflib is not a depeadancy. This reduces the
+number of compiled objects from 268 to 190odd, and allows us to miss out
+much of the wrf code, and so start slimming down the Registry. This in turn
+will give smaller code sizes and even faster compiles.
+
+
+------------------------------------------------------
+
+bluesky: Runs con200 
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060906b.jrb
+M    arch/postamble_new
+M    configure_new
+M    build/da.make
+M    build/main.make
+M    build/tools.make
+M    build/makefile

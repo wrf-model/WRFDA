@@ -1,0 +1,7 @@
+#!/bin/ksh
+export CPPFLAGS="-C -P -traditional"
+export FFCFLAGS="-O2 -r8"
+export FFC=ifort
+rm *.a
+make clean
+make

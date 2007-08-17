@@ -1,0 +1,27 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/25/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add links to convertor/kma_netcdf to build
+make k2n and n2k aliases for kma2netcdf and netcdf2kma
+
+Test results
+------------------------------------------------------
+
+balsam: compiles n2k and k2n serially
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060825c.jrb
+M      build/main.make
+M      build/makefile
+

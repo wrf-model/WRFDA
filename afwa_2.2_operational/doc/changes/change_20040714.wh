@@ -1,0 +1,102 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Wei
+Reviewer: 	Mi-Seon
+Date: 		07/14/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add capability of F_GAT.
+
+Expected Differences
+--------------------
+
+Accuracy: 	Results unchanged if no F_GAT.
+CPU/memory:	Memory increases if F_GAT is used.
+		Otherwise, no change.
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Mi-Seon's 2002010112 case.
+
+Files removed:
+--------------
+
+ da_3dvar/src/DA_Obs/da_get_innov_vector.inc
+
+Files added:
+------------
+ da_3dvar/src/DA_Minimisation/DA_Minimise_CG.inc
+ da_3dvar/src/DA_Minimisation/DA_Minimise_QN.inc
+ da_3dvar/src/DA_Minimisation/da_get_innov_vector.inc
+ da_3dvar/src/DA_Obs/DA_Scan_Obs.inc
+ da_3dvar/src/DA_Obs/DA_Scan_Radar.inc
+ da_3dvar/src/DA_SSMI/DA_Scan_SSMI.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_background_errors2.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_assci.inc
+
+Files modified:
+---------------
+
+ Makefile
+ Registry/Registry_3dvar
+ da_3dvar/module_wrf_3dvar_interface.F
+ da_3dvar/module_wrf_3dvar_io.F
+ da_3dvar/changes/tag-info
+ da_3dvar/src/Makefile
+ da_3dvar/src/DA_Airep/da_get_innov_vector_airep.inc
+ da_3dvar/src/DA_Buoy/da_get_innov_vector_buoy.inc
+ da_3dvar/src/DA_Constants/DA_Constants.F
+ da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+ da_3dvar/src/DA_Gpspw/da_get_innov_vector_gpspw.inc
+ da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref_Adj.inc
+ da_3dvar/src/DA_Metar/da_get_innov_vector_metar.inc
+ da_3dvar/src/DA_Minimisation/DA_Add_PBL_And_SFC_Info.inc
+ da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+ da_3dvar/src/DA_Minimisation/da_add_increments.inc
+ da_3dvar/src/DA_Minimisation/da_calculate_j.inc
+ da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+ da_3dvar/src/DA_Minimisation/da_minimise.inc
+ da_3dvar/src/DA_Obs/DA_Obs.F
+ da_3dvar/src/DA_Obs/DA_Obs_Proc_Station.inc
+ da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+ da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+ da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+ da_3dvar/src/DA_Physics/DA_Physics.F
+ da_3dvar/src/DA_Physics/DA_Transform_XToGPSRef_Lin.inc
+ da_3dvar/src/DA_Pilot/da_get_innov_vector_pilot.inc
+ da_3dvar/src/DA_Profiler/da_get_innov_vector_profiler.inc
+ da_3dvar/src/DA_SSMI/DA_Read_SSMI.inc
+ da_3dvar/src/DA_SSMI/DA_SSMI.F
+ da_3dvar/src/DA_Satem/da_get_innov_vector_satem.inc
+ da_3dvar/src/DA_Satob/da_get_innov_vector_satob.inc
+ da_3dvar/src/DA_Setup_Structures/DA_Setup_Structures.F
+ da_3dvar/src/DA_Setup_Structures/da_setup_background_errors.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_background_errors3.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_wrf.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+ da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_bufr.inc
+ da_3dvar/src/DA_Ships/da_get_innov_vector_ships.inc
+ da_3dvar/src/DA_Sound/da_get_innov_vector_sound.inc
+ da_3dvar/src/DA_Sound/DA_Sonde_sfc/da_get_innov_vector_sonde_sfc.inc
+ da_3dvar/src/DA_Synop/da_get_innov_vector_synop.inc
+ da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc
+ da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+ da_3dvar/src/DA_Tools/DA_ll_to_xy.inc
+ da_3dvar/src/DA_VToX_Transforms/DA_VToX_Transforms.F
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+ da_3dvar/src/da_qscat/da_get_innov_vector_qscat.inc
+ da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+ da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+ run/DA_Run_3DVAR.csh
+ share/module_io_wrf.F
+
+Minor-tag:
+
+version_2_1_0
+

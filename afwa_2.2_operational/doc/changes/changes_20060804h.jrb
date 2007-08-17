@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/04/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Allow ifort compilation on x86_64 machines
+
+Test results
+------------------------------------------------------
+
+lightning: Compiles wrfvar and runs con200 1 PE case
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060804h.jrb
+M      arch/configure_defaults_new
+
+

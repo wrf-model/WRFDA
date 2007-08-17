@@ -1,0 +1,37 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+trim strings in da_error and da_warning output
+
+Tidy obs writing code, adding tracing and calls to da_error
+
+
+Test results
+------------------------------------------------------
+
+No change possible to results
+
+bluesky: katrina_45km runs as before
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+M    da/da_obs/da_obs_proc_station.inc
+M    da/da_obs/da_final_write_y.inc
+M    da/da_obs/da_write_obs.inc
+M    da/da_obs/da_final_write_obs.inc
+M    da/da_obs/da_use_obs_errfac.inc
+M    da/da_obs/da_obs_count.inc
+M    da/da_obs/da_read_y_unit.inc
+M    da/da_reporting/da_warning.inc
+M    da/da_reporting/da_error.inc
+A    doc/changes/changes_20060803b.jrb

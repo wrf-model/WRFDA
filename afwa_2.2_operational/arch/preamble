@@ -1,0 +1,160 @@
+#=============================
+# Start of preamble
+#=============================
+
+# System properties
+
+SHELL           =       /bin/sh
+
+# Macros, these should be generic for all machines
+
+LN      = ln -sf
+MAKE    = make -i -r
+RM      = /bin/rm -f
+MV      = /bin/mv -f
+CP      = /bin/cp -f
+AR      = ar ru
+M4      = m4
+RANLIB  = ranlib
+CPP     = /lib/cpp
+
+.SUFFIXES: .f90 .F90 .F .i .o .f .c
+
+#### Single location for defining total number of domains.  You need
+#### at least 1 + 2*(number of total nests).  For example, 1 coarse
+#### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
+
+MAX_DOMAINS = 1
+MAX_PROC    = 1024
+
+# Substituted by Config_new.pl
+
+DEVTOP        = CONFIGURE_DEVTOP
+PERL          = CONFIGURE_PERL_PATH
+REGISTRY      = CONFIGURE_REGISTRY
+NETCDF_PATH   = CONFIGURE_NETCDF_PATH
+NETCDF_LIB    = CONFIGURE_NETCDF_LIB
+NETCDF_INC    = $(NETCDF_PATH)/include
+PHDF5_PATH    = CONFIGURE_PHDF5_PATH
+HDF_LIB       = CONFIGURE_HDF_LIB
+HDF_INC       = CONFIGURE_HDF_INC
+HDFEOS_LIB    = CONFIGURE_HDFEOS_LIB
+HDFEOS_INC    = CONFIGURE_HDFEOS_INC
+RTTOV_PATH    = CONFIGURE_RTTOV_PATH
+RTTOV_LIB     = CONFIGURE_RTTOV_LIB
+RTTOV_INC     = CONFIGURE_RTTOV_INC
+CRTM_PATH     = CONFIGURE_CRTM_PATH
+CRTM_LIB      = CONFIGURE_CRTM_LIB
+CRTM_INC      = CONFIGURE_CRTM_INC
+BUFR_PATH     = CONFIGURE_BUFR_PATH
+BUFR_LIB      = CONFIGURE_BUFR_LIB
+BUFR_INC      = CONFIGURE_BUFR_INC
+FFTPACK_PATH = CONFIGURE_FFTPACK_PATH
+FFTPACK_LIB  = CONFIGURE_FFTPACK_LIB
+FFTPACK_INC  = CONFIGURE_FFTPACK_INC
+LAPACK_PATH   = CONFIGURE_LAPACK_PATH
+LAPACK_LIB    = CONFIGURE_LAPACK_LIB
+LAPACK_INC    = CONFIGURE_LAPACK_INC
+BLAS_PATH     = CONFIGURE_BLAS_PATH
+BLAS_LIB      = CONFIGURE_BLAS_LIB
+BLAS_INC      = CONFIGURE_BLAS_INC
+ENVCOMPDEFS = CONFIGURE_COMPILEFLAGS
+DA_CORE     = CONFIGURE_DA_CORE
+EM_CORE     = CONFIGURE_EM_CORE
+NMM_CORE    = CONFIGURE_NMM_CORE
+COAMPS_CORE = CONFIGURE_COAMPS_CORE
+EXP_CORE    = CONFIGURE_EXP_CORE
+FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
+    CONFIGURE_CRTM_FLAG CONFIGURE_BUFR_FLAG CONFIGURE_FFTPACK_FLAG \
+    $(WORDSIZE_DEF) \
+    -DLIMIT_ARGS -DPROMOTE_FLOAT -DINTIO \
+    -DGRIB1 CONFIGURE_GRIB2_FLAG \
+    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
+    -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
+    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DEM_CORE=1
+CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DLANDREAD_STUB
+WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
+INCS        = -I. -I./inc
+LDFLAGS1    = CONFIGURE_LDFLAGS
+
+# switch to use separately installed ESMF library for coupling:  1==true
+ESMF_COUPLING       = CONFIGURE_ESMF_COUPLING
+ESMF_MOD_DEPENDENCE = CONFIGURE_ESMF_MOD_DEPENDENCE
+ESMF_MOD_INC        = CONFIGURE_ESMF_MOD_INC
+ESMF_IO_INC         = CONFIGURE_ESMF_IO_INC
+ESMF_IO_DEFS        = CONFIGURE_ESMF_IO_DEFS
+ESMF_TARGET         = CONFIGURE_ESMF_TARGET
+
+SOLVER=em
+IDEAL_CASE=real
+
+NETCDF_LIB_PATH = ${NETCDF_PATH}/lib
+
+# Short cuts to directories
+
+ARCH      = $(DEVTOP)/arch
+BUILD     = $(DEVTOP)/build
+CHEM      = $(DEVTOP)/chem
+CONVERTOR = $(DEVTOP)/convertor
+DA        = $(DEVTOP)/da
+DYN_NMM   = $(DEVTOP)/dyn_nmm
+DYN_EM    = $(DEVTOP)/dyn_em
+DYN_EXP   = $(DEVTOP)/dyn_exp
+DYNAMICS  = $(DEVTOP)/dyn_$(SOLVER)
+EXTERNAL  = $(DEVTOP)/external
+FRAME     = $(DEVTOP)/frame
+GEN_BE    = $(DEVTOP)/gen_be
+INC       = $(DEVTOP)/inc
+MAIN      = $(DEVTOP)/main
+PHYS      = $(DEVTOP)/phys
+RUN       = $(DEVTOP)/run
+SCRIPTS   = $(DEVTOP)/scripts
+SHARE     = $(DEVTOP)/share
+TEST      = $(DEVTOP)/test
+TOOLS     = $(DEVTOP)/tools
+
+IO_GRIB1      = $(EXTERNAL)/io_grib1
+IO_GRIB2      = $(EXTERNAL)/io_grib2
+IO_GRIB_SHARE = $(EXTERNAL)/io_grib_share
+IO_INT        = $(EXTERNAL)/io_int
+ESMF_TIME_F90 = $(EXTERNAL)/esmf_time_f90
+IO_NETCDF     = $(EXTERNAL)/io_netcdf
+IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
+RSL           = $(EXTERNAL)/RSL
+RSL_LITE      = $(EXTERNAL)/RSL_LITE
+RSL_STUBS     = $(EXTERNAL)/RSL_STUBS
+
+PHDF5_LIB     = -L$(EXTERNAL)/io_phdf5 -lwrfio_phdf5 -L$(PHDF5_PATH)/lib \
+  -lhdf5_fortran -lhdf5 -lm -lz -L$(PHDF5PATH)/lib -lsz
+ESMF_TIME_LIB = -lesmf_time
+GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
+GRIB1_LIB       = -L$(IO_GRIB1) -lio_grib1
+GRIB2_LIB       = -L$(IO_GRIB2) -lio_grib2
+
+#### Get core settings from environment (set in compile script)
+#### Note to add a core, this has to be added to.
+
+COREDEFS = -DEM_CORE=$(EM_CORE) -DDA_CORE=$(DA_CORE) -DNMM_CORE=$(NMM_CORE) \
+   -DCOAMPS_CORE=$(COAMPS_CORE) -DEXP_CORE=$(EXP_CORE)
+
+#### For wrfvar, always use RWORDSIZE 8
+
+RWORDSIZE       = 8
+
+DWORDSIZE       = 8
+WORDSIZE_DEF    = -DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
+
+#### DM buffer length for the configuration flags.
+
+CONFIG_BUF_LEN = 8192
+
+# defaults for occasional architecture specific settings
+
+SED_FTN         = sed -f standard.sed
+OMP             =
+OMPCPP          =
+MPI_LIB         =
+DM_CPPFLAGS     =
+DM_FPPFLAGS     =
+#### Architecture specific settings ####
+

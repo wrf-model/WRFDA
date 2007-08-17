@@ -1,0 +1,31 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+If pressures below 200mb slip through observation
+pre-processing, trap them inside WRFVAR as missing data
+
+This was proposed to AFWA to fix problems with bad data in
+their input stream in April 06, but never seems to have been
+implemented in the trunk here 
+
+
+Test results
+------------------------------------------------------
+
+On Ocotilllo with afwa_conus, before program aborts, with
+this fix it runs through
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+M    da/da_tools/da_intpsfc_tem.inc
+A    doc/changes/changes_20060803d.jrb

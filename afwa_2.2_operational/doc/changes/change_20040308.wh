@@ -1,0 +1,376 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Wei Huang
+Reviewer: 
+Date: 03/08/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Expected Differences
+--------------------
+
+Accuracy: 
+
+Not reproducible as obs. operator changed.
+
+CPU:
+
+No (significant) difference.
+
+memory:
+
+There is minor increase.
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Standard 2002/08/03/00 CONUS (Low resolution)
+
+cape_adj_1_cv_2_mo_1_bufr.out
+
+ Tile < y, y     > =   2.14533730623607E+05
+ Tile < x, x_adj > =   2.14533730623605E+05
+ Whole Domain < y, y     > =   2.14533730623607E+05
+ Whole Domain < x, x_adj > =   2.14533730623605E+05
+
+cape_adj_1_cv_2_mo_1_ascii.out
+ Tile < y, y     > =   1.79254970636614E+04
+ Tile < x, x_adj > =   1.79254970636613E+04
+ Whole Domain < y, y     > =   1.79254970636614E+04
+ Whole Domain < x, x_adj > =   1.79254970636613E+04
+
+cape_min_1_cv_2_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    1.58769367D+04   8.19818489D+02   1.21978220D-03
+     1    2    1.52746609D+04   4.60981253D+02   1.21978220D-03
+...
+    47   50    1.31175772D+04   1.02527721D+01   1.00000000D+00
+    48   51    1.31171038D+04   6.68961653D+00   1.00000000D+00
+
+cape_min_1_cv_3_mo_1_ascii.out
+   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    1.58769367D+04   1.33031862D+03   7.51699622D-04
+     1    2    1.48923991D+04   8.83536832D+02   7.51699622D-04
+...
+    88   98    7.93413974D+03   1.68897837D+01   3.31940981D-01
+    89   99    7.93373233D+03   1.07458717D+01   1.00000000D+00
+
+cape_min_1_cv_2_mo_1_bufr.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    6.80405263D+04   4.39314000D+03   2.27627619D-04
+     1    2    6.62796394D+04   2.79357140D+03   2.27627619D-04
+...
+    99  106    6.04178989D+04   6.77740249D+01   1.00000000D+00
+   100  107    6.04159173D+04   5.59924899D+01   1.00000000D+00
+
+cape_min_1_cv_3_mo_1_bufr.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    6.80405263D+04   5.33101879D+03   1.87581406D-04
+     1    2    6.38974403D+04   3.38806494D+03   1.87581406D-04
+...
+    99  106    4.32721006D+04   1.18354335D+02   1.00000000D+00
+   100  107    4.32609846D+04   1.90657562D+02   1.00000000D+00
+
+
+case_2002061212:
+
+bluesky_min_16_cv_2_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    6.73017332D+03   2.63892541D+02   3.78942123D-03
+     1    2    6.53891876D+03   1.61625939D+02   3.78942123D-03
+bluesky_min_16_cv_3_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    6.73017332D+03   8.62650081D+02   1.15921858D-03
+     1    2    6.43221520D+03   7.64102021D+02   1.15921858D-03
+bluesky_adj_16_cv_3_mo_1_ascii.out
+ Tile < y, y     > =   6.33220034609839E-01
+ Tile < x, x_adj > =   6.33220034609839E-01
+ Whole Domain < y, y     > =   7.62266984829280E+03
+ Whole Domain < x, x_adj > =   7.62266984829280E+03
+
+case_2002083000:
+bluesky_min_16_cv_2_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    9.63682681D+03   7.36531138D+02   1.35771585D-03
+     1    2    9.00192016D+03   5.39089624D+02   1.35771585D-03
+bluesky_min_16_cv_3_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    9.63682681D+03   2.51290812D+03   3.97945310D-04
+     1    2    8.61372847D+03   1.06112965D+03   3.97945310D-04
+bluesky_adj_16_cv_3_mo_1_ascii.out
+ Tile < y, y     > =   6.31919416930456E+02
+ Tile < x, x_adj > =   6.31919416930456E+02
+ Whole Domain < y, y     > =   1.24454536555263E+04
+ Whole Domain < x, x_adj > =   1.24454536555264E+04
+
+case_2003070806:
+
+bluesky_min_16_cv_2_mo_1_ascii.out
+
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    5.97461727D+03   3.16537632D+02   3.15918203D-03
+     1    3    4.65860359D+03   2.14763698D+02   1.57959102D-02
+
+bluesky_min_16_cv_3_mo_1_ascii.out
+     I   NFN          FUNC          GNORM          STEPLENGTH
+     0    1    5.97461727D+03   9.08040631D+02   1.10127231D-03
+     1    2    5.15937858D+03   7.18541816D+02   1.10127231D-03
+
+
+bluesky_adj_16_cv_3_mo_1_ascii.out
+ Tile < y, y     > =   0.00000000000000E+00
+ Tile < x, x_adj > =   0.00000000000000E+00
+ Whole Domain < y, y     > =   9.23220875179949E+07
+ Whole Domain < x, x_adj > =   9.23220875179927E+07
+
+
+------------------------------------------------------
+
+Files removed:
+--------------
+
+cvs remove ?
+
+ put_xpad_y.inc
+ get_xpad_y.inc
+ restore_xpad.inc
+ set_pad_coeffs.inc
+ spread_xpad.inc
+ w_local_to_global.inc
+
+ tools/wrf_3dvar_reg_test.csh
+ tools/mm5_3dvar_reg_test.csh
+ tools/reg_3dvar_test.csh
+
+Files added:
+------------
+
+cvs add ?
+
+ da_3dvar/changes/change_20040308.wh
+ da_3dvar/src/DA_Sound/DA_AO_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Calculate_GradY_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Calculate_Jo_and_GradY_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Calculate_Residual_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_OI_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Print_Stats_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Transform_XToY_Sonde_sfc.inc
+ da_3dvar/src/DA_Sound/DA_Transform_XToY_Sonde_sfc_Adj.inc
+ da_3dvar/src/DA_Sound/da_check_max_iv_sonde_sfc.inc
+ da_3dvar/src/DA_Sound/da_get_innov_vector_sonde_sfc.inc
+ da_3dvar/src/DA_Test/DA_Check_CvToVv_Adjoint.inc
+ da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Sonde_sfc.inc
+ da_3dvar/src/DA_VToX_Transforms/da_apply_rf_1v_adj.inc
+ da_3dvar/src/DA_VToX_Transforms/da_apply_rf_1v.inc
+ da_3dvar/utl/grabbufr.f90
+
+
+Files modified:
+---------------
+
+cvs commit ?
+
+CHANGES
+share/module_io_wrf.F
+tools/data.h
+tools/gen_wrf_io.c
+tools/registry.c
+Registry/Registry_3dvar
+arch/configure.defaults_3dvar
+arch/postamble_3dvar
+da_3dvar/module_wrf_3dvar_io.F
+da_3dvar/src/Makefile
+da_3dvar/src/DA_Airep/da_get_innov_vector_airep.inc
+da_3dvar/src/DA_Buoy/da_get_innov_vector_buoy.inc
+da_3dvar/src/DA_Constants/DA_Array_Print.inc
+da_3dvar/src/DA_Constants/DA_Constants.F
+da_3dvar/src/DA_Define_Structures/DA_Allocate_MM5_Model.inc
+da_3dvar/src/DA_Define_Structures/DA_Allocate_Observations.inc
+da_3dvar/src/DA_Define_Structures/DA_Allocate_Y.inc
+da_3dvar/src/DA_Define_Structures/DA_Deallocate_MM5_Model.inc
+da_3dvar/src/DA_Define_Structures/DA_Deallocate_Observations.inc
+da_3dvar/src/DA_Define_Structures/DA_Deallocate_Y.inc
+da_3dvar/src/DA_Define_Structures/DA_Define_Structures.F
+da_3dvar/src/DA_Define_Structures/DA_Zero_X.inc
+da_3dvar/src/DA_Define_Structures/DA_Zero_Y.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_CycloTerm_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_Equation_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_Equation_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_GeoTerm.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_GeoTerm_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_Balance_GeoTerm_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_HydrostaticP_To_Rho_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_HydrostaticP_To_Rho_Lin.inc
+da_3dvar/src/DA_Dynamics/DA_PsiChi_To_UV.inc
+da_3dvar/src/DA_Dynamics/DA_PsiChi_To_UV_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Divergence_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_UV_To_Vorticity.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Adj.inc
+da_3dvar/src/DA_Dynamics/DA_W_Adjustment_Lin.inc
+da_3dvar/src/DA_FFTs/DA_FFTs.F
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FCT.inc
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FCT_Adj.inc
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FST.inc
+da_3dvar/src/DA_FFTs/DA_Solve_PoissonEqn_FST_Adj.inc
+da_3dvar/src/DA_Gpspw/DA_Calculate_GradY_Gpspw.inc
+da_3dvar/src/DA_Gpspw/DA_Transform_XToY_Gpspw.inc
+da_3dvar/src/DA_Gpspw/DA_Transform_XToY_Gpspw_Adj.inc
+da_3dvar/src/DA_Gpspw/da_get_innov_vector_gpspw.inc
+da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref.inc
+da_3dvar/src/DA_Gpsref/DA_Transform_XToY_Gpsref_Adj.inc
+da_3dvar/src/DA_Gpsref/da_get_innov_vector_gpsref.inc
+da_3dvar/src/DA_Interpolation/Interp_Obs_lin_2D.inc
+da_3dvar/src/DA_Interpolation/Interp_Obs_lin_2D_adj.inc
+da_3dvar/src/DA_Interpolation/Interp_lin_2D.inc
+da_3dvar/src/DA_Metar/da_check_max_iv_metar.inc
+da_3dvar/src/DA_Metar/da_get_innov_vector_metar.inc
+da_3dvar/src/DA_Minimisation/DA_Add_PBL_And_SFC_Info.inc
+da_3dvar/src/DA_Minimisation/DA_CG_Minimise.inc
+da_3dvar/src/DA_Minimisation/DA_Calculate_GradY.inc
+da_3dvar/src/DA_Minimisation/DA_Minimisation.F
+da_3dvar/src/DA_Minimisation/da_add_increments.inc
+da_3dvar/src/DA_Minimisation/da_calculate_j.inc
+da_3dvar/src/DA_Minimisation/da_calculate_jo_and_grady.inc
+da_3dvar/src/DA_Minimisation/da_calculate_residual.inc
+da_3dvar/src/DA_Minimisation/da_get_var_diagnostics.inc
+da_3dvar/src/DA_Minimisation/da_write_diagnostics.inc
+da_3dvar/src/DA_Obs/DA_Read_Obs.inc
+da_3dvar/src/DA_Obs/DA_Read_Obs_Info.inc
+da_3dvar/src/DA_Obs/DA_Read_Radar.inc
+da_3dvar/src/DA_Obs/DA_Read_Radar_Info.inc
+da_3dvar/src/DA_Obs/DA_Transform_XToY.inc
+da_3dvar/src/DA_Obs/DA_Transform_XToY_Adj.inc
+da_3dvar/src/DA_Obs/da_add_noise_to_ob.inc
+da_3dvar/src/DA_Obs/da_fill_obs_structures.inc
+da_3dvar/src/DA_Obs/da_get_innov_vector.inc
+da_3dvar/src/DA_Obs/da_random_omb_all.inc
+da_3dvar/src/DA_Obs/da_setup_pseudo_obs.inc
+da_3dvar/src/DA_Obs/da_store_obs_grid_info.inc
+da_3dvar/src/DA_Obs/da_use_obs_errfac.inc
+da_3dvar/src/DA_Obs/da_write_obs.inc
+da_3dvar/src/DA_Obs/da_write_y.inc
+da_3dvar/src/DA_Physics/DA_Transform_XToTPW.inc
+da_3dvar/src/DA_Physics/DA_Transform_XToTPW_Adj.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Adj.inc
+da_3dvar/src/DA_Physics/DA_UVPRho_To_W_Lin.inc
+da_3dvar/src/DA_Pilot/da_get_innov_vector_pilot.inc
+da_3dvar/src/DA_Profiler/da_get_innov_vector_profiler.inc
+da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar.inc
+da_3dvar/src/DA_Radar/DA_Transform_XToY_Radar_Adj.inc
+da_3dvar/src/DA_Radar/da_get_innov_vector_Radar.inc
+da_3dvar/src/DA_ReadWrite_MM5/DA_Read_MM5.inc
+da_3dvar/src/DA_ReadWrite_MM5/DA_Write_Analysis_MM5.inc
+da_3dvar/src/DA_Recursive_Filter/DA_Calculate_RF_Factors.inc
+da_3dvar/src/DA_Recursive_Filter/DA_Transform_Through_RF.inc
+da_3dvar/src/DA_Recursive_Filter/DA_Transform_Through_RF_Adj.inc
+da_3dvar/src/DA_SSMI/DA_AO_Stats_SSMI_Rv.inc
+da_3dvar/src/DA_SSMI/DA_Read_SSMI.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToSeaSfcWind.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToSeaSfcWind_Adj.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToSeaSfcWind_Lin.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI_Rv_Adj.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI_Tb.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToY_SSMI_Tb_Adj.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToZRhoQ.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToZRhoQ_Adj.inc
+da_3dvar/src/DA_SSMI/DA_Transform_XToZRhoQ_Lin.inc
+da_3dvar/src/DA_SSMI/da_get_innov_vector_ssmi_rv.inc
+da_3dvar/src/DA_SSMI/da_get_innov_vector_ssmi_tb.inc
+da_3dvar/src/DA_SSMI/da_get_innov_vector_ssmt1.inc
+da_3dvar/src/DA_SSMI/da_get_innov_vector_ssmt2.inc
+da_3dvar/src/DA_Satem/DA_Transform_XToY_Satem.inc
+da_3dvar/src/DA_Satem/DA_Transform_XToY_Satem_Adj.inc
+da_3dvar/src/DA_Satem/da_get_innov_vector_satem.inc
+da_3dvar/src/DA_Satob/da_get_innov_vector_satob.inc
+da_3dvar/src/DA_Setup_Structures/da_chgvres.inc
+da_3dvar/src/DA_Setup_Structures/da_interpolate_regcoeff.inc
+da_3dvar/src/DA_Setup_Structures/da_interpolate_stats.inc
+da_3dvar/src/DA_Setup_Structures/da_rescale_background_errors.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors3.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_mm5.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_firstguess_wrf.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_interp_wts.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_bufr.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_obs_structures_mm5.inc
+da_3dvar/src/DA_Setup_Structures/da_setup_runconstants.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_mm5toxb.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+da_3dvar/src/DA_Setup_Structures/da_write_analysis.inc
+da_3dvar/src/DA_Setup_Structures/da_write_interpolated_be.inc
+da_3dvar/src/DA_Ships/da_get_innov_vector_ships.inc
+da_3dvar/src/DA_Sound/DA_AO_Stats_Sound.inc
+da_3dvar/src/DA_Sound/DA_Calculate_Jo_and_GradY_Sound.inc
+da_3dvar/src/DA_Sound/DA_Calculate_Residual_Sound.inc
+da_3dvar/src/DA_Sound/DA_OI_Stats_Sound.inc
+da_3dvar/src/DA_Sound/DA_Print_Stats_Sound.inc
+da_3dvar/src/DA_Sound/DA_Sound.F
+da_3dvar/src/DA_Sound/DA_Transform_XToY_Sound.inc
+da_3dvar/src/DA_Sound/DA_Transform_XToY_Sound_Adj.inc
+da_3dvar/src/DA_Sound/da_get_innov_vector_sound.inc
+? da_3dvar/src/DA_Sound/DA_Sonde_sfc
+da_3dvar/src/DA_Statistics/DA_Analysis_Stats.inc
+da_3dvar/src/DA_Synop/DA_Transform_XToY_Synop.inc
+da_3dvar/src/DA_Synop/DA_Transform_XToY_Synop_Adj.inc
+da_3dvar/src/DA_Synop/da_get_innov_vector_synop.inc
+da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_VpToX_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_XToVpToX_Errors.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Metar.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Ships.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Sound.inc
+da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_Synop.inc
+da_3dvar/src/DA_Test/DA_Test.F
+da_3dvar/src/DA_Test/DA_Test_VXTransform.inc
+da_3dvar/src/DA_Test/DA_Transform_XToVp.inc
+da_3dvar/src/DA_Test/check_sfc_assi.inc
+da_3dvar/src/DA_Test/da_check.inc
+da_3dvar/src/DA_Test/da_setup_testfield.inc
+da_3dvar/src/DA_Tools/DA_Diff_Seconds.inc
+da_3dvar/src/DA_Tools/DA_Obs_Sfc_correction.inc
+da_3dvar/src/DA_Tools/DA_Read_Namelist.inc
+da_3dvar/src/DA_Tools/DA_ll_to_xy.inc
+da_3dvar/src/DA_Tools/toGrid.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Check_EOF_Decomposition.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToVv.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VpToX_Adj.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VvToVp.inc
+da_3dvar/src/DA_VToX_Transforms/DA_Transform_VvToVp_Adj.inc
+da_3dvar/src/DA_VToX_Transforms/DA_VToX_Transforms.F
+da_3dvar/src/DA_VToX_Transforms/DA_Vertical_Transform.inc
+da_3dvar/src/DA_VToX_Transforms/da_apply_be.inc
+da_3dvar/src/DA_VToX_Transforms/da_apply_be_adj.inc
+da_3dvar/src/DA_VToX_Transforms/da_apply_rf.inc
+da_3dvar/src/DA_VToX_Transforms/da_apply_rf_adj.inc
+da_3dvar/src/DA_VToX_Transforms/da_calc_covariance.inc
+da_3dvar/src/DA_VToX_Transforms/da_rfz.f
+da_3dvar/src/DA_VToX_Transforms/da_transform_bal.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_bal_adj.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+da_3dvar/src/LAPACK/LAPACK.f
+da_3dvar/src/LAPACK/dlamc1.inc
+da_3dvar/src/LAPACK/dlamc2.inc
+da_3dvar/src/LAPACK/dlamch.inc
+da_3dvar/src/LAPACK/dlartg.inc
+da_3dvar/src/da_qscat/da_get_innov_vector_qscat.inc
+da_3dvar/src/da_solve_v3d/da_init_3dvar.inc
+da_3dvar/src/da_solve_v3d/da_solve_v3d.F
+da_3dvar/src/par_util/par_util.F
+da_3dvar/src/par_util/proc_diagnostics_collect.inc
+da_3dvar/src/par_util/proc_sum_count_obs.inc
+da_3dvar/utl/Makefile
+da_3dvar/utl/daprog_ominusb.f90
+run/DA_Run_3DVAR.csh
+

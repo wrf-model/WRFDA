@@ -1,0 +1,32 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: Zhiquan Liu
+Date: 09/27/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Finish renaming da_rtm* to da_rttov*
+------------------------------------------------------
+Tests:
+
+bluesky: katrina_48km runs on 1,2,4,8,16 PEs the same
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060928a.jrb
+M      da/da_radiance/da_radiance.f90
+M      da/da_radiance/da_transform_xtoy_rad_adj.inc
+M      da/da_radiance/da_rttov_direct.inc
+M      da/da_radiance/da_rttov_tl.inc
+D      da/da_radiance/da_write_iv_rad_binary.inc
+M      da/da_radiance/da_rttov_ad.inc
+M      da/da_radiance/da_transform_xtoy_rad.inc
+M      da/da_radiance/da_setup_bufrtovs_structures.inc
+M      da/da_radiance/da_get_innov_vector_rad.inc
+M      da/da_radiance/da_rttov_init.inc

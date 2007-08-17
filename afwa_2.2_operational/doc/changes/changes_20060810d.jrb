@@ -1,0 +1,26 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/10/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+add -DMPI2_SUPPORT for pathscale
+
+Waffle
+
+Test results
+------------------------------------------------------
+
+lightning: Now compiles
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060810d.jrb
+M    arch/configure.defaults_new

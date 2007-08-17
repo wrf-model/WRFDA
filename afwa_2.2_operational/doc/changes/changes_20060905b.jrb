@@ -1,0 +1,111 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 09/05/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Track wrf trunk changes
+
+TB*
+(1) Enable telescoping nests in NMM
+(a) share/mediation_integrate.F
+(b) dyn_nmm/NMM_NEST_UTILS1.F
+(2) Move increased divergence damping of outer 3 integration rows
+out of solve.
+(a) dyn_nmm/solve_nmm.F
+(b) dyn_nmm/module_initialize_real.F
+TB*
+
+moving nest topography fix from JM
+
+fdda additions and consistency between EM and EM_CHEM CAM radiation fields
+
+Mac and Compaq de-optimization to enable compile of new solve_em and other related fixes
+
+fdda additional tendency handling and new fdda driver
+
+README.namelist fdda additions
+
+remove present check on removed swuptc array for CAM radiation
+
+add fdda to physics
+
+add fdda namelist
+
+add fdda to real
+
+add benchmark stuff for fdda
+
+TBH: Today only: two commits for the price of one! 
+TBH: 
+TBH: 1) Reduce compiler optimization level for module_integrate.F in AIX 
+TBH: serial build. This works around a problem seen with the new xlf 
+TBH: 10.1 compiler on bluevista. Note that module_integrate.F doesn't do 
+TBH: any computations, so optimization is not critical.
+TBH: 
+TBH: 2) Add upgrades for various Cray platforms contributed by Peter Johnsen.
+TBH: 
+
+Note the mu_tend/mu_tendf changes have not been carried into the TL or AD
+code
+
+------------------------------------------------------
+
+balsam: Runs con200 
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20060905b.jrb
+M    tools/gen_config.c
+M    dyn_nmm/module_initialize_real.F
+M    dyn_nmm/NMM_NEST_UTILS1.F
+M    dyn_nmm/solve_nmm.F
+M    share/mediation_feedback_domain.F
+M    Registry/Registry.EM_CHEM
+M    Registry/Registry.EM
+M    Registry/Registry.EM_4DVAR
+M    Registry/Registry.wrfvar
+M    dyn_em/Makefile
+M    dyn_em/module_em.F
+M    dyn_em/solve_em.F
+M    dyn_em/module_check.F
+M    arch/configure.defaults
+M    test/em_squall2d_x/namelist.input
+M    test/em_squall2d_y/namelist.input
+M    test/em_b_wave/namelist.input
+M    test/em_b_wave/namelist.input.backwards
+M    test/em_real/namelist.input.jan00
+M    test/em_real/namelist.input.jun01
+M    test/em_real/namelist.input
+M    test/em_hill2d_x/namelist.input
+M    test/em_quarter_ss/namelist.input
+M    test/em_grav2d_x/namelist.input.100m
+M    test/em_grav2d_x/namelist.input.200m
+M    test/em_grav2d_x/namelist.input.400m
+M    test/em_grav2d_x/namelist.input
+M    external/io_grib1/MEL_grib1/gribputgds.c
+M    external/io_grib1/MEL_grib1/gribputpds.c
+M    external/io_grib1/MEL_grib1/pack_spatial.c
+M    external/io_grib1/MEL_grib1/Makefile
+M    external/io_grib1/MEL_grib1/grib_enc.c
+M    external/RSL_LITE/rsl_malloc.c
+M    phys/Makefile
+M    phys/module_radiation_driver.F
+M    phys/module_physics_init.F
+M    phys/module_physics_addtendc.F
+A    phys/module_fdda_psufddagd.F
+A    phys/module_fddagd_driver.F
+M    main/real_em.F
+M    frame/module_wrf_error.F
+M    run/README.namelist
+M    inc/bench_solve_em_init.h
+M    inc/bench_solve_em_end.h
+M    inc/bench_solve_em_def.h
+
+

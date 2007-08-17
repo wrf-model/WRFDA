@@ -1,0 +1,30 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 08/08/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Simplify da_run_wrfvar.ksh script by removing environment variables:
+RELEASE
+DA_BUILD_DIR
+DA_INC_DIR
+WRFPLUS_BUILD_DIR
+WRFPLUS_INC_DIR
+
+Test results
+------------------------------------------------------
+
+bluesky: con200 unchanged
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A      doc/changes/changes_20060808c.jrb
+M      run/da_run_wrfvar.ksh
+
