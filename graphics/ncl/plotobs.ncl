@@ -327,8 +327,8 @@ begin  ; begin of function do_scatterplot
    if ( npts .gt. 0 ) then
       xmean = sum(data)/tofloat(npts)
       xrms  = sqrt(sum(data*data)/tofloat(npts))
-      xstd  = stddev(data)
-      info  = "mean: "+sprintf("%10.4f",xmean)+"   rmse: "+sprintf("%10.4f",xrms)+"   std: "+sprintf("%10.4f",xstd)
+      xstd  = sqrt(sum((data-xmean)*(data-xmean))/tofloat(npts))
+      info  = "mean: "+sprintf("%10.4f",xmean)+"   rms: "+sprintf("%10.4f",xrms)+"   std: "+sprintf("%10.4f",xstd)
    end if
    minXY   = min( (/ min(xdata), min(ydata) /) )
    maxXY   = max( (/ max(xdata), max(ydata) /) )
