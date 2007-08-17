@@ -21,7 +21,9 @@ subroutine da_wrfvar_init1(no_init1)
    !
    !</DESCRIPTION>
 
-   program_name = "WRFVAR "//release_version
+   ! FIX? keep this version so netcdf files are the same until near release
+   program_name = "WRFVAR V2.2 (COMPATIBLE WITH WRF V2.2) MODEL"
+   ! program_name = "WRFVAR "//release_version
 
    ! Initialize WRF modules:  
    ! Phase 1 returns after mpi_init() (if it is called)
