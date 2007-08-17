@@ -30,7 +30,7 @@ export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
 export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXPT=${EXPT:-test}
+export EXPT=${EXPT:-control}
 export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 
@@ -38,11 +38,11 @@ export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfvar}
 export WORK_DIR=$RUN_DIR/working
 
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
+export OB_DIR=${OB_DIR:-$EXP_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}
-export FC_DIR=${FC_DIR:-$REG_DIR/fc}
-export BIASCORR_DIR=${BIASCORR_DIR:-$WRFVAR_DIR/run/biascorr}
+export RC_DIR=${RC_DIR:-$EXP_DIR/rc}
+export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
+export BIASCORR_DIR=${BIASCORR_DIR:-$EXP_DIR/biascorr}
 export OBS_TUNING_DIR=${OBS_TUNING_DIR:-$WRFVAR_DIR/run/obs_tuning}
 
 # Do we remove the WORK_DIR at the end to save space
@@ -290,19 +290,19 @@ echo "WINDOW_END            $WINDOW_END"
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
          if [[ -e $OB_DIR/${D_DATE[01]}/ob.ssmi+ ]]; then
-            ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob.ssmi01
+            ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob01.ssmi
             for I in 02 03 04 05 06; do
-               ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob.ssmi${I}
+               ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${I}.ssmi
             done
-            ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi - ob.ssmi07
+            ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi- ob07.ssmi
          fi
 
-         if [[ -e $OB_DIR/${D_DATE[01]}/radar.dat+ ]]; then
-            ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+         if [[ -e $OB_DIR/${D_DATE[01]}/ob.radar+ ]]; then
+            ln -fs $OB_DIR/${D_DATE[01]}/ob.radar+ ob01.radar
             for I in 02 03 04 05 06; do
-               ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
+               ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ob${I}.radar
             done
-            ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+            ln -fs $OB_DIR/${D_DATE[07]}/ob.radar- ob07.radar
          fi
       else
          if [[ $DATE -eq $START_DATE ]]; then
@@ -336,10 +336,10 @@ echo "WINDOW_END            $WINDOW_END"
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
       if [[ -e $OB_DIR/${DATE}/ob.ssmi ]]; then
-         ln -fs $OB_DIR/${DATE}/ob.ssmi ob.ssmi01
+         ln -fs $OB_DIR/${DATE}/ob.ssmi ob01.ssmi
       fi
-      if [[ -e $OB_DIR/${DATE}/radar.dat ]]; then
-         ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
+      if [[ -e $OB_DIR/${DATE}/ob.radar ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
       fi
    fi
 

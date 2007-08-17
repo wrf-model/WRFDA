@@ -34,7 +34,7 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_name         = ${REGION}_${EXPT}
+# @ job_name         = ${REGION}_${EXPT}_${RUN}
 # @ total_tasks      = $NUM_PROCS
 # @ node             = $NODES
 # @ output           = job.output
@@ -53,7 +53,7 @@ $SUBMIT_OPTIONS10
 # @ queue            = $QUEUE
 
 export RUN_CMD="$DEBUGGER " # Space important
-$SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $RUN_DIR/index.html 2>&1
 EOF
 elif [[ $SUBMIT == "LSF" ]]; then 
    cat > job.ksh <<EOF
@@ -61,7 +61,7 @@ elif [[ $SUBMIT == "LSF" ]]; then
 #
 # LSF batch script
 #
-#BSUB -J ${REGION}_${EXPT}             
+#BSUB -J ${REGION}_${EXPT}_${RUN}
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
@@ -82,7 +82,7 @@ $SUBMIT_OPTIONS10
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $RUN_DIR/index.html 2>&1
 
 EOF
 elif [[ $SUBMIT == "PBS" ]]; then 
@@ -91,7 +91,7 @@ elif [[ $SUBMIT == "PBS" ]]; then
    if [[ $TEMP -gt 4 ]]; then
       TEMP=4
    fi
-   typeset -L15 JOBNAME=${REGION}_${EXPT}
+   typeset -L15 JOBNAME=${REGION}_${EXPT}_${RUN}
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -119,7 +119,7 @@ $SUBMIT_OPTIONS10
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="aprun -m exclusive -N$TEMP -n$NUM_PROCS"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $RUN_DIR/index.html 2>&1
 
 EOF
 elif [[ $SUBMIT == none ]]; then
@@ -133,7 +133,7 @@ elif [[ $SUBMIT == none ]]; then
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="$RUN_CMD_DEFAULT"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $RUN_DIR/index.html 2>&1
 EOF
 fi
 

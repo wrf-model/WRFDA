@@ -17,7 +17,6 @@ export RUN_GEN_BE_DIAGS=true
 export RUN_GEN_BE_DIAGS_READ=true
 export RUN_GEN_BE_MULTICOV=true
 
-export DATA_DISK=/smoke
 export WRFVAR_DIR=/smoke/dmbarker/code/trunk/wrfvar_be
 
 #t46 45km:

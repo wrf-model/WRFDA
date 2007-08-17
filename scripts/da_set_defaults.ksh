@@ -91,6 +91,7 @@ export FINAL_DATE=${FINAL_DATE:-2003012800}       # Final date of test period.
 export LBC_FREQ=${LBC_FREQ:-06}
 let LBC_FREQ_SS=$LBC_FREQ*3600
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
+export CYCLE_NUMBER=${CYCLE_NUMBER:-0}
 export OBS_FREQ=${OBS_FREQ:-12}
 export WINDOW_START=${WINDOW_START:-0}                 # Start ob window difference (hrs).
 export WINDOW_END=${WINDOW_END:-0}                     # End ob window difference (hrs).

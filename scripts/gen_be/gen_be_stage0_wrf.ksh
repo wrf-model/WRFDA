@@ -27,8 +27,7 @@ export START_DATE_STAGE0=$(${BUILD_DIR}/da_advance_time.exe $START_DATE -$FCST_R
 export END_DATE_STAGE0=$(${BUILD_DIR}/da_advance_time.exe $END_DATE   -$FCST_RANGE1)
 export DATE=$START_DATE_STAGE0
 
-while test $DATE -le $END_DATE_STAGE0; do
-
+while [[ $DATE -le $END_DATE_STAGE0 ]]; do
    export TMP_DIR=${WORK_DIR}/${DATE}
    rm -rf ${TMP_DIR} 2>/dev/null
    mkdir ${TMP_DIR}  2>/dev/null
@@ -53,9 +52,9 @@ while test $DATE -le $END_DATE_STAGE0; do
    export FILE3=wrfout_d01_${FILE_DATE}.e002
    export NEXT_DATE=$(${BUILD_DIR}/da_advance_time.exe $DATE $FCST_RANGE2)
    if [[ $BE_METHOD == NMC ]]; then
-     ln -sf $FILE $FILE1
-     ln -sf $FILE $FILE2
-     ln -sf ${FC_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} $FILE3
+      ln -sf $FILE $FILE1
+      ln -sf $FILE $FILE2
+      ln -sf ${FC_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} $FILE3
    fi
 
    ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
@@ -65,7 +64,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
    # mv mean.${FCST_TIME}* ${STAGE0_DIR}
    mv gen_be_stage0_wrf.${FCST_TIME}.log ${STAGE0_DIR}
-#   rm -rf $TMP_DIR 2> /dev/null
+   # rm -rf $TMP_DIR 2> /dev/null
 
    echo $DATE $FILE ${FC_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
    export DATE=$(${BUILD_DIR}/da_advance_time.exe $DATE $INTERVAL)

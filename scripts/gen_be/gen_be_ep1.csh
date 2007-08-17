@@ -43,10 +43,9 @@
  if ( ! $?REL_DIR )       setenv REL_DIR       ${HOME}/code/${RELEASE}
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR    ${REL_DIR}/wrfvar
  if ( ! $?BUILD_DIR )     setenv BUILD_DIR     ${WRFVAR_DIR}/build
- if ( ! $?DATA_DISK )     setenv DATA_DISK     /smoke
  if ( ! $?REGION )        setenv REGION        con200
- if ( ! $?EXPT )          setenv EXPT          xwang  
- if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
+ if ( ! $?EXPT )          setenv EXPT          test
+ if ( ! $?DAT_DIR )       setenv DAT_DIR       ${HOME}/data/${REGION}/${EXPT}
  if ( ! $?BE_FILE )       setenv BE_FILE       ${DAT_DIR}/be/be.dat
  if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/${DATE}/ep1
 
