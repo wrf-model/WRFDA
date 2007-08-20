@@ -5,7 +5,7 @@ module da_rttov
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use da_define_structures, only : ob_type, y_type, x_type
+   use da_define_structures, only : iv_type, y_type, x_type
    use module_domain, only : xpose_type, xb_type, domain
    use da_reporting, only : da_error
 

@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_metar(oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 

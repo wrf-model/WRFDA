@@ -7,7 +7,7 @@ subroutine da_ao_stats_buoy (stats_unit, iv, re)
    implicit none
 
    integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent(inout) :: iv            ! iv
+   type (iv_type), intent(inout) :: iv            ! iv
    type (y_type),  intent(in)    :: re            ! A - O
 
    type (stats_buoy_type) :: stats

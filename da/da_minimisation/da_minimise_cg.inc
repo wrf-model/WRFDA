@@ -17,7 +17,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
    integer, intent(in)               :: cv_size          ! Total cv size
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
    type (be_type), intent(in)        :: be    ! background error structure.
-   type (ob_type), intent(inout)     :: iv    ! ob. increment vector.
+   type (iv_type), intent(inout)     :: iv    ! ob. increment vector.
    real, intent(inout)               :: j_grad_norm_target ! Target norm.
    real, intent(out)                 :: xhat(1:cv_size)  ! control variable (local).
    real, intent(inout)               :: cv(1:cv_size)    ! control variable (local).

@@ -7,7 +7,7 @@ subroutine da_transform_xtoy_airsr (grid, iv, y)
    implicit none
 
    type (domain),     intent(in)    :: grid     ! gridded analysis increment.
-   type (ob_type),    intent(in)    :: iv       ! Innovation vector (O-B).
+   type (iv_type),    intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),     intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.

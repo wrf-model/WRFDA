@@ -163,7 +163,7 @@ program da_tune_obs_desroziers
    end type gpsref_type
 
 
-   type ob_type
+   type iv_type
       integer :: total_obs
       integer :: num_synop, num_metar, num_ships, &
                  num_polaramv, num_geoamv,num_gpspw, num_sound, &
@@ -262,8 +262,8 @@ program da_tune_obs_desroziers
       type (bogus_type), pointer :: bogus(:)
       type (radiance_type), pointer :: rad(:)
 
-      end type ob_type
-   type (ob_type)       :: ob
+      end type iv_type
+   type (iv_type)       :: ob
    
    !--------------------------------------------------------------------------
    ! Initialise the counter
@@ -345,7 +345,7 @@ subroutine da_count_obs( y_unit, ob )
    implicit none
    
    integer, intent(in)               :: y_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20         :: ob_name, dummy
    integer              :: times, num_obs, k, num_levs
@@ -590,7 +590,7 @@ subroutine da_read_y( y_unit, ob )
    implicit none
    
    integer, intent(in)               :: y_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs   
@@ -923,7 +923,7 @@ subroutine da_read_yp( yp_unit, ob )
    implicit none
    
    integer, intent(in)               :: yp_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs   
@@ -1208,7 +1208,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
    implicit none
    
    integer, intent(in)               :: rand_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs
@@ -1550,7 +1550,7 @@ subroutine da_calc_jo_expected( ob )
 
    implicit none
 
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    integer              :: n, k
    integer              :: count1, count2, count3, count4, count5
@@ -2131,7 +2131,7 @@ subroutine da_read_jo_actual( ob )
 
    implicit none
 
-   type (ob_type), intent(inout) :: ob
+   type (iv_type), intent(inout) :: ob
    
    character (len=46)            :: str
    character (len=15)            :: str1, str2, str3, str4, str5
@@ -2404,7 +2404,7 @@ subroutine da_calc_new_factors( ob )
 
    implicit none
 
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
    integer                           :: n, ichan
 
    write(6,*)
@@ -2613,7 +2613,7 @@ subroutine da_get_j( ob )
 
    implicit none
 
-   type (ob_type), intent(in)    :: ob
+   type (iv_type), intent(in)    :: ob
    
    character (len=80)            :: str
    integer                       :: icount

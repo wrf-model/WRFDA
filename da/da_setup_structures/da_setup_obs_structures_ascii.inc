@@ -8,7 +8,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    type (xpose_type), intent(in)    :: xp  ! Domain decomposition vars.
    type (y_type),     intent(out)   :: ob  ! Observation structure.
-   type (ob_type),    intent(out)   :: iv  ! O-B structure.
+   type (iv_type),    intent(out)   :: iv  ! O-B structure.
    type (xb_type),    intent(inout) :: xb  ! First guess structure
 
    character(len=120)  :: filename
@@ -30,35 +30,35 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! scan main body of gts observation file
-         call da_scan_gts (iv, xp, filename)
+         call da_scan_obs_ascii (iv, xp, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ssmi'
-            call da_scan_ssmi (iv, xp, filename)
+            call da_scan_obs_ssmi (iv, xp, filename)
          end if
 
          if (use_radarobs) then
             ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.radar'
-            call da_scan_radar(iv, xp, filename)
+            call da_scan_obs_radar(iv, xp, filename)
          end if
       end do
    else
       iv%time = 1
 
-      call da_scan_gts(iv, xp,'ob01.ascii')
+      call da_scan_obs_ascii(iv, xp,'ob01.ascii')
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
-         call da_scan_ssmi(iv, xp,'ob01.ssmi')
+         call da_scan_obs_ssmi(iv, xp,'ob01.ssmi')
       end if
 
       ! scan main body of radar observation file
       if (use_radarobs) then
-         call da_scan_radar(iv, xp,'ob01.radar')
+         call da_scan_obs_radar(iv, xp,'ob01.radar')
       end if
    end if
 
@@ -75,33 +75,33 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! Read gts observation file
-         call da_read_gts (iv, xp, filename)
+         call da_read_obs_ascii (iv, xp, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ob', n,'.ssmi'
-            call da_read_ssmi (iv, xp, filename)
+            call da_read_obs_ssmi (iv, xp, filename)
          end if
 
          if (use_radarobs) then
             ! read radar observation file
             write(filename(1:11), fmt='(a, i2.2)') 'ob', n,'.radar'
-            call da_read_radar(iv, xp, filename)
+            call da_read_obs_radar(iv, xp, filename)
          end if
       end do
    else
       iv%time = 1
 
-      call da_read_gts(iv, xp, 'ob01.ascii')
+      call da_read_obs_ascii(iv, xp, 'ob01.ascii')
 
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
-         call da_read_ssmi (iv, xp,'ob01.ssmi')
+         call da_read_obs_ssmi (iv, xp,'ob01.ssmi')
       end if
 
       if (use_radarobs) then
          ! read radar observation file
-         call da_read_radar(iv, xp,'ob01.radar')
+         call da_read_obs_radar(iv, xp,'ob01.radar')
       end if
    end if
 

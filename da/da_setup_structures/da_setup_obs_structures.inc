@@ -8,7 +8,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    
    type (domain),     intent(inout) :: grid ! Model data
    type (y_type),     intent(out)   :: ob  ! Observation structure.
-   type (ob_type),    intent(out)   :: iv  ! O-B structure.
+   type (iv_type),    intent(out)   :: iv  ! O-B structure.
 
    integer :: i,j
 

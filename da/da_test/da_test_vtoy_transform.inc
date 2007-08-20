@@ -14,7 +14,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, xbx, be, iv, y)
    type(vp_type),              intent(inout) :: vp    ! Grdipt/level CV.
    type(xbx_type),             intent(in)    :: xbx   ! Header & non-gridded vars.
    type(be_type),              intent(in)    :: be    ! background error structure.
-   type(ob_type),              intent(inout) :: iv    ! ob. increment vector.
+   type(iv_type),              intent(inout) :: iv    ! ob. increment vector.
    type(y_type),               intent(inout) :: y     ! y = h (xa)
 
 

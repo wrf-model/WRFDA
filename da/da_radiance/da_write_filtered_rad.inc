@@ -9,7 +9,7 @@ subroutine da_write_filtered_rad(ob, iv)
    implicit none
 
    type (y_type),     intent(in)  :: ob       ! Observation structure.
-   type (ob_type),    intent(in)  :: iv       ! O-B structure.
+   type (iv_type),    intent(in)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i        ! Index dimension.

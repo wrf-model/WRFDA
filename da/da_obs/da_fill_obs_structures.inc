@@ -7,7 +7,7 @@ subroutine da_fill_obs_structures(xp, iv, ob)
    implicit none
 
    type (xpose_type), intent(in) :: xp   ! Domain decomposition vars.
-   type (ob_type), intent(inout) :: iv   ! Obs and header structure.
+   type (iv_type), intent(inout) :: iv   ! Obs and header structure.
    type (y_type), intent(out)    :: ob   ! (Smaller) observation structure.
 
    integer                       :: n, k     ! Loop counters.

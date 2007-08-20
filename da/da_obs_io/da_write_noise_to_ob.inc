@@ -6,7 +6,7 @@ subroutine da_write_noise_to_ob (iv)
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv   ! Obs and header structure.
+   type (iv_type), intent(in)    :: iv   ! Obs and header structure.
    integer                       :: n, k,kk,i, iunit
    integer                       :: num_obs
    character(len=filename_len), allocatable     :: filename(:)   

@@ -16,7 +16,7 @@ module da_ssmi
       global, print_detail_obs, max_ssmi_rv_input, max_ssmi_tb_input, &
       its,ite,jts,jte,kts,kte,kms,kme,ids,ide,jds,jde, &
       ssmi_tb, ssmi_rv, num_ob_indexes, ssmt1, ssmt2
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_rv_type, &
       residual_ssmi_tb_type, model_loc_type, info_type, field_type, &
@@ -66,8 +66,8 @@ contains
 
 #include "da_ao_stats_ssmi_rv.inc"
 #include "da_ao_stats_ssmi_tb.inc"
-#include "da_read_ssmi.inc"
-#include "da_scan_ssmi.inc"
+#include "da_read_obs_ssmi.inc"
+#include "da_scan_obs_ssmi.inc"
 #include "da_jo_and_grady_ssmi_rv.inc"
 #include "da_jo_and_grady_ssmi_tb.inc"
 #include "da_residual_ssmi_rv.inc"

@@ -10,7 +10,7 @@ subroutine da_biascorr ( i, ob, iv)
 
    integer,        intent(in)    :: i       ! sensor index.
    type (y_type),  intent(in)    :: ob      ! Observation structure.
-   type (ob_type), intent(inout) :: iv      ! O-B structure.
+   type (iv_type), intent(inout) :: iv      ! O-B structure.
 
    ! Local variables
    integer   :: k,iband,iscan, n1,n2,n,j,npred,nlevels

@@ -6,7 +6,7 @@ module da_airep
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       airep, anal_type_verify, kms,kme,kts,kte, trace_use_dull
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, airep_type, number_type, bad_data_type
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
       da_interp_lin_3d_adj

@@ -12,7 +12,7 @@ module da_gpspw
       pseudo_var, num_pseudo, use_gpspwobs, max_error_pw, &
       fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
       pseudo_z,pseudo_val,max_error_ref, trace_use_dull, pseudo
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       gpspw_type, maxmin_type
    use da_par_util, only : da_proc_stats_combine

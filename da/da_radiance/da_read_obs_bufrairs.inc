@@ -19,7 +19,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   character(9)      ,  intent (in)  :: obstype
   character(100)    ,  intent (in)  :: infile
   type (xpose_type) ,  intent (in)  :: xp
-  type (ob_type)    ,intent (inout) :: iv
+  type (iv_type)    ,intent (inout) :: iv
 
 #ifdef BUFR
 

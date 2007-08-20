@@ -8,7 +8,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    integer,                    intent(in)    :: it
    type(y_type),               intent(inout) :: ob ! Observations.
-   type(ob_type),              intent(inout) :: iv ! Innovation vector(O-B).
+   type(iv_type),              intent(inout) :: iv ! Innovation vector(O-B).
    type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 

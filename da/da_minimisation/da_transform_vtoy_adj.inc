@@ -12,7 +12,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    type(be_type),              intent(in)    :: be     ! background error structure.
    type(ep_type),              intent(in)    :: ep     ! ensemble perturbation structure.
    real,                       intent(out)   :: cv(1:cv_size) ! control variables.
-   type(ob_type),              intent(inout) :: iv     ! innovation vector (o-b).
+   type(iv_type),              intent(inout) :: iv     ! innovation vector (o-b).
    type(vp_type),              intent(inout) :: vp     ! Grdipt/level CV.
    type(vp_type),              intent(inout) :: vv     ! Grdipt/EOF CV.
    type(xbx_type),             intent(in)    :: xbx    ! For header & non-grid arrays.

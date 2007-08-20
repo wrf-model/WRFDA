@@ -17,7 +17,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
 
    type (domain),  intent(in)      :: grid
    type (y_type),  intent(inout)  :: y        ! H' delta_x
-   type (ob_type), intent(in)     :: iv       ! O-B structure.
+   type (iv_type), intent(in)     :: iv       ! O-B structure.
 
 #ifdef CRTM
    integer                        :: k  ! Index dimension.

@@ -14,7 +14,7 @@ subroutine da_solve ( grid , config_flags)
    real, allocatable            :: cvt(:)      ! Control variable structure.
    real, allocatable            :: xhat(:)     ! Control variable structure.
    type (y_type)                :: ob          ! Observation structure.
-   type (ob_type)               :: iv          ! Obs. increment structure.
+   type (iv_type)               :: iv          ! Obs. increment structure.
    type (y_type)                :: re          ! Residual (o-a) structure.
    type (y_type)                :: y           ! y = H(x_inc) structure.
    integer                      :: it          ! External loop counter.

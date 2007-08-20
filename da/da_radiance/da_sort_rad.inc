@@ -6,7 +6,7 @@ subroutine da_sort_rad (iv)
 
    implicit none
 
-   type (ob_type), intent (inout) :: iv
+   type (iv_type), intent (inout) :: iv
 
    integer                   :: i,j, n,t, error
    type(info_type), pointer  :: info(:)

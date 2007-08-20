@@ -7,7 +7,7 @@ subroutine da_transform_xtoy_ssmi_tb(grid, iv, y)
    implicit none
 
    type (domain),  intent(in)    :: grid
-   type (ob_type), intent(in)    :: iv       ! obs. increment vector (o-b).
+   type (iv_type), intent(in)    :: iv       ! obs. increment vector (o-b).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! loop counter.

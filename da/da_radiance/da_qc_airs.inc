@@ -9,7 +9,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
    integer, intent(in)             :: i          ! sensor index.
    integer, intent(in)             :: nchan      ! number of channel
    type (y_type),  intent(in)      :: ob         ! Observation structure.
-   type (ob_type), intent(inout)   :: iv         ! O-B structure.
+   type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
 
    ! local variables

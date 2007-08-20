@@ -6,7 +6,7 @@ subroutine da_write_y (iv, y)
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv   ! O-B structure.
+   type (iv_type), intent(in)    :: iv   ! O-B structure.
    type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
 
    integer                       :: ounit ! Output file unit.

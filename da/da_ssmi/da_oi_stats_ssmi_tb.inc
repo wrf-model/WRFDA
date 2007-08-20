@@ -7,7 +7,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: oi            ! OI
 
    integer                   :: ntb19v,ntb19h,ntb22v,ntb37v,ntb37h, ntb85v,ntb85h
    integer                   :: n

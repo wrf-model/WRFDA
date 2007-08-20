@@ -11,7 +11,7 @@ module da_radar
       use_radar_rv, use_radar_rf,below_model_surface,mkz,above_model_lid,&
       fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
       far_below_model_surface,kms,kme,kts,kte
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       radar_type, info_type, field_type
    use da_interpolation, only : da_to_zk, da_interp_lin_3d,da_interp_lin_3d_adj

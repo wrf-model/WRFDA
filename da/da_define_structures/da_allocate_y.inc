@@ -6,7 +6,7 @@ subroutine da_allocate_y (iv, y)
 
    implicit none
    
-   type (ob_type), intent(in)    :: iv      ! Ob type input.
+   type (iv_type), intent(in)    :: iv      ! Ob type input.
    type (y_type),  intent(inout) :: y       ! Residual type structure.
 
    integer :: n, i    ! Loop counter.

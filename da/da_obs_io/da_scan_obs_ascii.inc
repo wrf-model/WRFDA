@@ -1,4 +1,4 @@
-subroutine da_scan_gts (ob, xp, filename)
+subroutine da_scan_obs_ascii (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan WRFVAR GTS observation file
@@ -7,7 +7,7 @@ subroutine da_scan_gts (ob, xp, filename)
    implicit none
 
    type (xpose_type), intent(in)    :: xp           ! Domain decomposition vars.
-   type (ob_type),    intent(inout) :: ob
+   type (iv_type),    intent(inout) :: ob
    character(*),      intent(in)    :: filename
 
    character (len =  10)   :: fmt_name
@@ -22,7 +22,7 @@ subroutine da_scan_gts (ob, xp, filename)
    real                    :: height_error
    integer                 :: ndup, n
 
-   if (trace_use) call da_trace_entry("da_scan_gts")
+   if (trace_use) call da_trace_entry("da_scan_obs_ascii")
 
    ! open file
    ! ---------
@@ -313,8 +313,8 @@ subroutine da_scan_gts (ob, xp, filename)
    ob%plocal(ob%time,:) = ob%nlocal(:)
    ob%ptotal(ob%time,:) = ob%ntotal(:)
 
-   if (trace_use) call da_trace_exit("da_scan_gts")
+   if (trace_use) call da_trace_exit("da_scan_obs_ascii")
 
-end subroutine da_scan_gts
+end subroutine da_scan_obs_ascii
 
 

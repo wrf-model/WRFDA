@@ -76,7 +76,7 @@ module da_define_structures
    ! [3.0] Innovation vector structure definition:
    !--------------------------------------------------------------------------
 
-   ! [3.1] Generic sub-structures used in ob_type:
+   ! [3.1] Generic sub-structures used in iv_type:
 
    type field_type
       real                   :: inv             ! Innovation vector
@@ -282,34 +282,6 @@ module da_define_structures
       type (field_type), pointer :: q  (:)      ! From NCEP analysis.
    end type gpsref_type
 
-   ! type metar_type
-   !    type (info_type)        :: info
-   !    type (model_loc_type)   :: loc
-
-   !    real                    :: h              ! Height in m
-   !    real                    :: zk             ! k-coordinates
-
-   !    type (field_type)       :: u              ! u-wind.
-   !    type (field_type)       :: v              ! v-wind.
-   !    type (field_type)       :: t              ! temperature.
-   !    type (field_type)       :: p              ! pressure.
-   !    type (field_type)       :: q              ! q.
-   ! end type metar_type
-
-   ! type ships_type
-   !    type (info_type)        :: info
-   !    type (model_loc_type)   :: loc
-
-   !    real                    :: h              ! Height in m
-   !    real                    :: zk             ! k-coordinates
-
-   !    type (field_type)       :: u              ! u-wind.
-   !    type (field_type)       :: v              ! v-wind.
-   !    type (field_type)       :: t              ! temperature.
-   !    type (field_type)       :: p              ! pressure.
-   !    type (field_type)       :: q              ! q.
-   ! end type ships_type
-
    type synop_type
       type (info_type)        :: info
       type (model_loc_type)   :: loc
@@ -500,34 +472,7 @@ module da_define_structures
       type (model_loc_type), pointer   :: loc(:)
    end type instid_type
 
-   type num_type
-      integer :: total, &
-                 synop, & 
-                 sound, &
-                 geoamv,&
-                 polaramv,&
-                 pilot, &
-                 bogus, &
-                 satem, &
-                 airep, &
-                 metar, &
-                 ships, &
-                 gpspw, &
-                 gpsref, &
-                 ssmi_tb, &
-                 ssmi_rv, &
-                 ssmt1, &
-                 ssmt2, &
-                 pseudo, &
-                 qscat, &
-                 profiler, &
-                 buoy, &
-                 radar, &
-                 radiance(maxsensor), &
-                 airsr
-   end type num_type
-
-   type ob_type
+   type iv_type
       integer :: nlocal(num_ob_indexes)
       integer :: ntotal(num_ob_indexes)
       integer :: plocal(0:max_fgat_time,num_ob_indexes)
@@ -587,7 +532,7 @@ module da_define_structures
 
       real :: missing
       real :: ptop
-   end type ob_type
+   end type iv_type
 
    ! [3.3] Where are these used:?
 

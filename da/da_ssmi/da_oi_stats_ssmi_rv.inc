@@ -7,7 +7,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, iv)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in) :: iv            ! iv
+   type (iv_type), intent (in) :: iv            ! iv
 
    integer                   :: ntpw, nspeed, n
    type (stats_ssmi_rv_type) :: stats

@@ -7,7 +7,7 @@ subroutine da_read_bufr (ob, xp, filename)
    implicit none
 
    type (xpose_type),          intent(in)    :: xp ! Domain decomposition vars
-   type (ob_type),             intent(inout) :: ob
+   type (iv_type),             intent(inout) :: ob
    character(len=*), optional, intent(in)    :: filename
 
 #ifdef BUFR

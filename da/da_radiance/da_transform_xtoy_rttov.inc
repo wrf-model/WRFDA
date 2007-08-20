@@ -16,7 +16,7 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
 
    type (domain),     intent(in)     :: grid
    type (y_type),     intent(inout)  :: y        ! H' delta_x
-   type (ob_type),    intent(in)     :: iv       ! O-B structure.
+   type (iv_type),    intent(in)     :: iv       ! O-B structure.
 
 #ifdef RTTOV
 

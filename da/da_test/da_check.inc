@@ -13,7 +13,7 @@ subroutine da_check(grid, config_flags, cv_size, xbx, be, ep, iv, vv, vp, y)
    type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.
    type (be_type),    intent(in)    :: be    ! background error structure.
    type (ep_type),    intent(in)    :: ep    ! Ensemble perturbation structure.
-   type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
+   type (iv_type),    intent(in)    :: iv    ! ob. increment vector.
    type (vp_type),    intent(inout) :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout) :: vp    ! Grdipt/level CV.
    type (y_type),     intent(inout) :: y             ! y = h (xa)

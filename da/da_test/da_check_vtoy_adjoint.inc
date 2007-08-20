@@ -18,7 +18,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    type (be_type),    intent(in)    :: be    ! background error structure.
    type (ep_type),    intent(in)    :: ep     ! ensemble perturbation structure.
 
-   type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
+   type (iv_type),    intent(inout) :: iv    ! ob. increment vector.
    type (y_type),     intent(inout) :: y     ! y = h (xa)
 
    real, dimension(1:cv_size)        :: cv          ! Test control variable.

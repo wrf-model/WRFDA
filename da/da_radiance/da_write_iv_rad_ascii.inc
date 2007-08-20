@@ -8,7 +8,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
 
    type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
    type (y_type),     intent(in)  :: ob       ! Observation structure.
-   type (ob_type),    intent(in)  :: iv       ! O-B structure.
+   type (iv_type),    intent(in)  :: iv       ! O-B structure.
 
 #ifdef RTTOV
 

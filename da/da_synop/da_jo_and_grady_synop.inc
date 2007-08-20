@@ -6,7 +6,7 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (iv_type), intent(in)   :: iv          ! Innovation vector.
    type (y_type),  intent(in)   :: re          ! Residual vector.
    type (y_type),  intent(inout):: jo_grad_y   ! Grad_y(Jo)
    type (jo_type), intent(inout):: jo          ! Obs cost function.
@@ -14,7 +14,7 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
    integer        :: n
 
    ! the following "global" objects are used only when testing
-   type (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
+   type (iv_type) :: iv_glob         ! Global Innovation vector (O-B).
    type (y_type)  :: re_glob         ! Global Residual vector (O-A).
    type (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
 

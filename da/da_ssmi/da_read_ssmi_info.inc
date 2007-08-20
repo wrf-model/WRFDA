@@ -1,4 +1,4 @@
-subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
+subroutine da_read_obs_ssmi_info (iunit, ob, xb, xbx)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read the header of a SSMI GTS observation file
@@ -9,7 +9,7 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    integer,        intent (in)  :: iunit
    type (xb_type), intent (in)  :: xb
    type (xbx_type),intent (in)  :: xbx     ! Header & non-gridded vars.
-   type (ob_type), intent (out) :: ob
+   type (iv_type), intent (out) :: ob
 
 
    integer                      :: iost, i, ii
@@ -26,7 +26,7 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
    logical                      :: check_wrong, check_subdomain
 
-   if (trace_use) call da_trace_entry("da_read_ssmi_info")
+   if (trace_use) call da_trace_entry("da_read_obs_ssmi_info")
 
    iost = -99999
 
@@ -140,17 +140,17 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       ! Model domains definition
 
       case ('NESTIX') ;
-         call da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
+         call da_read_obs_ssmi_integer_array(nestix, maxnes, 8, 9)
       case ('NESTJX') ; 
-         call da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
+         call da_read_obs_ssmi_integer_array(nestjx, maxnes, 8, 9)
       case ('NUMC  ') ; 
-         call da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
+         call da_read_obs_ssmi_integer_array(numnc , maxnes, 8, 9)
       case ('DIS   ') ; 
-         call da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
+         call da_read_obs_ssmi_real_array   (dis   , maxnes, 8, 9)
       case ('NESTI ') ; 
-         call da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
+         call da_read_obs_ssmi_integer_array(nesti , maxnes, 8, 9)
       case ('NESTJ ') ; 
-         call da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
+         call da_read_obs_ssmi_integer_array(nestj , maxnes, 8, 9)
       end select
 
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
@@ -159,13 +159,13 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
-   if (trace_use) call da_trace_exit("da_read_ssmi_info")
+   if (trace_use) call da_trace_exit("da_read_obs_ssmi_info")
 
 contains
 
-#include "da_read_ssmi_integer_array.inc"
-#include "da_read_ssmi_real_array.inc"
+#include "da_read_obs_ssmi_integer_array.inc"
+#include "da_read_obs_ssmi_real_array.inc"
 
-end subroutine da_read_ssmi_info
+end subroutine da_read_obs_ssmi_info
 
 

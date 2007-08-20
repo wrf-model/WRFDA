@@ -6,7 +6,7 @@ subroutine da_use_obs_errfac(iv)
 
    implicit none
 
-   type (ob_type), intent(inout) :: iv              ! Obs and header structure.
+   type (iv_type), intent(inout) :: iv              ! Obs and header structure.
 
    integer                       :: n, k            ! Loop counters.
    real                          :: d1, d2, d3, d4  ! Dummy values.

@@ -7,7 +7,7 @@ subroutine da_oi_stats_gpsref (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: oi            ! OI
 
    type (stats_gpsref_type) :: stats
    integer                  :: ngpsref

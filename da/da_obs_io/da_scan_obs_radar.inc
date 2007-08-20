@@ -1,4 +1,4 @@
-subroutine da_scan_radar (ob, xp, filename)
+subroutine da_scan_obs_radar (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan the radar observation file
@@ -7,7 +7,7 @@ subroutine da_scan_radar (ob, xp, filename)
    implicit none
 
    type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
-   type (ob_type),    intent(inout) :: ob
+   type (iv_type),    intent(inout) :: ob
    character(len=*),  intent(in)    :: filename
 
    integer                       :: i, j, n, iost, nlevels, fm
@@ -22,7 +22,7 @@ subroutine da_scan_radar (ob, xp, filename)
    logical                       :: outside
    integer                       :: n_dup, ndup
 
-   if (trace_use) call da_trace_entry("da_scan_radar")
+   if (trace_use) call da_trace_entry("da_scan_obs_radar")
 
    ! 1. open file
    ! ============
@@ -40,7 +40,7 @@ subroutine da_scan_radar (ob, xp, filename)
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open radar file "//trim(filename)/))
       call da_free_unit(iunit) 
-      if (trace_use) call da_trace_exit("da_scan_radar")
+      if (trace_use) call da_trace_exit("da_scan_obs_radar")
       return
    end if
 
@@ -177,9 +177,9 @@ subroutine da_scan_radar (ob, xp, filename)
    ob%plocal((ob%time),:) = ob%nlocal(:)
    ob%ptotal((ob%time),:) = ob%ntotal(:)
 
-   if (trace_use) call da_trace_exit("da_scan_radar")
+   if (trace_use) call da_trace_exit("da_scan_obs_radar")
 
 
-end subroutine da_scan_radar
+end subroutine da_scan_obs_radar
 
 

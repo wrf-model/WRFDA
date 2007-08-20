@@ -6,7 +6,7 @@ subroutine da_calculate_grady_ssmi(oi, re, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)   :: oi          ! Ob Inc. structure.
+   type (iv_type), intent(in)   :: oi          ! Ob Inc. structure.
    type (y_type), intent(inout) :: re          ! Residual structure.
    type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 

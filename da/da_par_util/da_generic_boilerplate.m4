@@ -25,7 +25,7 @@ SUBROUTINE da_y_type_ex_$1( iv, re, slice )
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
-   type (ob_type),       INTENT(IN   ) :: iv     ! Innovation vector
+   type (iv_type),       INTENT(IN   ) :: iv     ! Innovation vector
    type (y_type),        INTENT(IN   ) :: re     ! all residual obs
    type (y_facade_type), INTENT(INOUT) :: slice  ! selected residual obs
    ! Local declarations
@@ -89,13 +89,13 @@ SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
 ! PURPOSE:  Eliminate redundant code for many obs types.  
 !
 ! METHOD:   Insert meta-data from generic object slice_glob into 
-!           globally-scoped ob_type iv_glob.  iv_glob is 
+!           globally-scoped iv_type iv_glob.  iv_glob is 
 !           allocated minimally.  Caller must deallocate.  
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
    type (y_facade_type), INTENT(IN   ) :: slice_glob ! selected residual obs
-   type (ob_type),       INTENT(INOUT) :: iv_glob    ! partial Innovation vector
+   type (iv_type),       INTENT(INOUT) :: iv_glob    ! partial Innovation vector
    ! Local declarations
    INTEGER :: n
 
@@ -137,11 +137,11 @@ define( macro_to_global,
     IMPLICIT NONE
 
     ! task-local objects
-    type (ob_type), INTENT( IN) :: iv             ! Innovation vector
+    type (iv_type), INTENT( IN) :: iv             ! Innovation vector
     type (y_type),  INTENT( IN) :: re             ! residual vector
     type (y_type),  INTENT( IN) :: jo_grad_y      ! Grad_y(Jo)
     ! task-global objects
-    type (ob_type), INTENT(OUT) :: iv_glob        ! Innovation vector
+    type (iv_type), INTENT(OUT) :: iv_glob        ! Innovation vector
     type (y_type),  INTENT(OUT) :: re_glob        ! residual vector
     type (y_type),  INTENT(OUT) :: jo_grad_y_glob ! Grad_y(Jo)
 

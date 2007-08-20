@@ -14,7 +14,7 @@ subroutine da_add_noise_to_ob( iv, ob )
    implicit none
 
 
-   type (ob_type), intent(inout) :: iv   ! Obs and header structure.
+   type (iv_type), intent(inout) :: iv   ! Obs and header structure.
    type (y_type), intent(inout)  :: ob   ! (Smaller) observation structure.
 
    real                          :: z1, z2, z3, z4, z5, z6, z7, dum ! Random numbers.

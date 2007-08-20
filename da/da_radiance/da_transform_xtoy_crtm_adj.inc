@@ -16,7 +16,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
    type (x_type), intent(inout)   :: jo_grad_x ! 
    type (y_type),  intent(in)     :: jo_grad_y ! H' delta_x
-   type (ob_type), intent(in)     :: iv        ! O-B structure.
+   type (iv_type), intent(in)     :: iv        ! O-B structure.
 
 #ifdef CRTM
 

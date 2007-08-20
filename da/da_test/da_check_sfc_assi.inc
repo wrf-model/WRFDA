@@ -8,7 +8,7 @@ subroutine da_check_sfc_assi(grid, iv, y)
 
    type (domain), intent(inout)     :: grid
   
-   type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
+   type (iv_type),    intent(inout) :: iv    ! ob. increment vector.
    type (y_type),     intent(inout) :: y     ! y = h (grid%xa)
 
    real                           :: adj_ttl_lhs   ! < y, y >

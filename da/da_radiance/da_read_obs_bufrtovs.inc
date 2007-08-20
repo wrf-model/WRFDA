@@ -16,7 +16,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
    character(5)      ,  intent (in)    :: obstype
    character(20)     ,  intent (in)    :: infile
    type (xpose_type) ,  intent (in)    :: xp
-   type (ob_type)    ,  intent (inout) :: iv
+   type (iv_type)    ,  intent (inout) :: iv
 
 #ifdef BUFR
 

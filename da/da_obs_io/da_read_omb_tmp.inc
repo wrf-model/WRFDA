@@ -12,7 +12,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    integer      ,intent (in)    :: nc      
 
    integer      :: num_obs, ios 
-   character*20 :: ob_type               
+   character*20 :: iv_type               
    logical   :: if_write
    
    character*5  :: stn_id               
@@ -37,11 +37,11 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 
    reports: do
 
-      read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs
+      read(unit_in,'(a20,i8)', end = 999, err = 1000) iv_type,num_obs
       if_write = .false.
-      if (index(ob_type,OBS_type_in(1:nc)) > 0) if_write = .true.
+      if (index(iv_type,OBS_type_in(1:nc)) > 0) if_write = .true.
 
-      select case (trim(adjustl(ob_type)))
+      select case (trim(adjustl(iv_type)))
 
       case ('synop' , 'metar' , 'ships' , 'buoy' , 'sonde_sfc' )
          if (num_obs > 0) then
@@ -440,7 +440,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
       case default;
 
          write(unit=message(1), fmt='(a,a20,a,i3)') &
-            'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
+            'Got unknown obs_type string:', trim(iv_type),' on unit ',unit_in
          call da_error(__FILE__,__LINE__,message(1:1))
       end select
    end do reports 

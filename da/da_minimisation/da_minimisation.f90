@@ -43,7 +43,7 @@ module da_minimisation
    use da_crtm, only : da_get_innov_vector_crtm
                        !da_get_innov_vector_crtmk
 #endif
-   use da_define_structures, only : ob_type, y_type, j_type, be_type, &
+   use da_define_structures, only : iv_type, y_type, j_type, be_type, &
       xbx_type, jo_type, da_allocate_y,da_zero_x,da_deallocate_y
    use da_obs, only : da_transform_xtoy_adj,da_transform_xtoy, &
       da_add_noise_to_ob,da_random_omb_all

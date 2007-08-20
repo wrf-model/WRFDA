@@ -6,7 +6,7 @@ subroutine da_allocate_observations  (ob)
 
    implicit none
 
-   type (ob_type), intent(inout) :: ob     ! Observation structure.
+   type (iv_type), intent(inout) :: ob     ! Observation structure.
 
    if (trace_use) call da_trace_entry("da_allocate_observations")
 

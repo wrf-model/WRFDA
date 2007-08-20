@@ -6,7 +6,7 @@ subroutine da_final_write_obs(iv)
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv      ! O-B structure.
+   type (iv_type), intent(in)    :: iv      ! O-B structure.
  
    integer                       :: n, k, iunit
    integer                       :: ios  ! Error code from MPI routines.

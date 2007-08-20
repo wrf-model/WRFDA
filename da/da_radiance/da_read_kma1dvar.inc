@@ -17,7 +17,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    character(20)     ,  intent (in)    :: infile
    type (xpose_type) ,  intent (in)    :: xp
    type (y_type)     ,  intent (inout) :: ob
-   type (ob_type)    ,  intent (inout) :: iv
+   type (iv_type)    ,  intent (inout) :: iv
 
    ! local variables
    integer          :: iost, n, i, j,inunit

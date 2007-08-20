@@ -159,7 +159,7 @@ program da_tune_obs_hollingsworth1
       type (field_type), pointer :: ref(:)
    end type gpsref_type
 
-   type ob_type
+   type iv_type
       integer                    :: num_synop, num_metar, num_ships, &
                                     num_polaramv, num_qscat, num_geoamv, num_gpspw, num_sound, &
                                     num_airep, num_pilot, num_ssmir, num_airsret, &
@@ -186,9 +186,9 @@ program da_tune_obs_hollingsworth1
       type (ssmt2_type), pointer :: ssmt2(:)
       type (bogus_type), pointer :: bogus(:)
       type (gpsref_type), pointer :: gpsref(:)
-   end type ob_type
+   end type iv_type
 
-   type (ob_type)       :: ob
+   type (iv_type)       :: ob
    
 !--------------------------------------------------------------------------
 !  [1.0] Count total number of observations and allocate arrays:
@@ -686,7 +686,7 @@ subroutine da_count_obs( y_unit, ob )
    implicit none
    
    integer, intent(in)               :: y_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20         :: ob_name, dummy
    integer              :: num_obs, num_times, levels,k, kk
@@ -900,7 +900,7 @@ subroutine da_read_y( y_unit, ob )
    implicit none
 
    integer, intent(in)               :: y_unit
-   type (ob_type), intent(inout)     :: ob
+   type (iv_type), intent(inout)     :: ob
 
    character*20         :: ob_name, dummy
    integer              :: n, ndum, k, kdum, num_obs, num_levs

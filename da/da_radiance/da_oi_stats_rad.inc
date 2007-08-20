@@ -9,7 +9,7 @@ subroutine da_oi_stats_rad ( stats_unit, iv )
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: iv            ! Innovation
+   type (iv_type), intent (in)      :: iv            ! Innovation
 
    type (stats_rad_type),    pointer  :: rad(:)
    integer                          :: n, k, i

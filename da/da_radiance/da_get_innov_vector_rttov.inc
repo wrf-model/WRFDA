@@ -17,7 +17,7 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    type (xb_type),    intent(in)    :: xb       ! first guess state.
    type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
    type (y_type),     intent(inout) :: ob       ! Observation structure.
-   type (ob_type),    intent(inout) :: iv       ! O-B structure.
+   type (iv_type),    intent(inout) :: iv       ! O-B structure.
 
 #if defined(RTTOV)
 

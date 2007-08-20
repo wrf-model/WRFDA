@@ -6,7 +6,7 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
 
    implicit none
 
-   type (ob_type), intent(inout) :: iv   ! Obs and header structure.
+   type (iv_type), intent(inout) :: iv   ! Obs and header structure.
    type (y_type), intent(inout)  :: ob   ! (Smaller) observation structure.
    type(xpose_type), intent(in)  :: xp   ! Domain decomposition vars.
 

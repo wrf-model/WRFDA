@@ -1,4 +1,4 @@
-subroutine da_scan_ssmi (ob, xp, filename)
+subroutine da_scan_obs_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read the header of a SSMI 2.0 GTS observation file
@@ -7,7 +7,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
    implicit none
 
    type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type(ob_type),    intent(inout) :: ob
+   type(iv_type),    intent(inout) :: ob
    character(len=*), intent(in)    :: filename
 
    character (len =  10)        :: fmt_name
@@ -27,7 +27,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
    logical                      :: outside
    integer                      :: irain, iprecip
 
-   if (trace_use) call da_trace_entry("da_scan_ssmi")
+   if (trace_use) call da_trace_entry("da_scan_obs_ssmi")
 
    isfilter = .true. ! filter out rain points
    irain = 0
@@ -180,8 +180,8 @@ subroutine da_scan_ssmi (ob, xp, filename)
    ob%plocal(ob%time,:) = ob%nlocal(:)
    ob%ptotal(ob%time,:) = ob%ntotal(:)
 
-   if (trace_use) call da_trace_exit("da_scan_ssmi")
+   if (trace_use) call da_trace_exit("da_scan_obs_ssmi")
 
-end subroutine da_scan_ssmi
+end subroutine da_scan_obs_ssmi
 
 

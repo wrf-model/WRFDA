@@ -1,4 +1,4 @@
-subroutine da_read_ssmi (ob, xp, filename)
+subroutine da_read_obs_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read a SSMI 2.0 GTS observation file
@@ -7,7 +7,7 @@ subroutine da_read_ssmi (ob, xp, filename)
    implicit none
 
    type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type(ob_type),    intent(inout) :: ob
+   type(iv_type),    intent(inout) :: ob
    character(len=*), intent(in)    :: filename
 
    character (len =  10)        :: fmt_name
@@ -35,7 +35,7 @@ subroutine da_read_ssmi (ob, xp, filename)
    integer                      :: nlocal(num_ob_indexes)
    integer                      :: ntotal(num_ob_indexes)
 
-   if (trace_use) call da_trace_entry("da_read_ssmi")
+   if (trace_use) call da_trace_entry("da_read_obs_ssmi")
 
    nlocal(:) = ob%plocal(ob%time-1,:)
    ntotal(:) = ob%ptotal(ob%time-1,:)
@@ -314,8 +314,8 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    write(unit=stdout, fmt='(/,a)') ' '
 
-   if (trace_use) call da_trace_exit("da_read_ssmi")
+   if (trace_use) call da_trace_exit("da_read_obs_ssmi")
 
-end subroutine da_read_ssmi
+end subroutine da_read_obs_ssmi
 
 

@@ -7,7 +7,7 @@ subroutine da_write_obs_etkf(ob, iv, re)
    implicit none
 
    type (y_type), intent(in)     :: ob      ! Observation structure.
-   type (ob_type), intent(in)    :: iv      ! O-B structure.
+   type (iv_type), intent(in)    :: iv      ! O-B structure.
    type (y_type), intent(inout)  :: re      ! residual vector.
       
    integer                       :: n, k, num_obs, ios

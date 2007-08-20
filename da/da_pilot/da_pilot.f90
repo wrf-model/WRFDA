@@ -7,7 +7,7 @@ module da_pilot
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       pilot, max_error_p,max_error_q, trace_use_dull, &
       max_stheight_diff, anal_type_verify, kms,kme,kts,kte
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, pilot_type, number_type, bad_data_type
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
       da_interp_lin_3d_adj

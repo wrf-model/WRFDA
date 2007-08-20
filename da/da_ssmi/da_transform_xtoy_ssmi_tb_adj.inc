@@ -7,7 +7,7 @@ subroutine da_transform_xtoy_ssmi_tb_adj(grid, iv, jo_grad_y, jo_grad_x)
    implicit none
 
    type (domain),  intent(in)    :: grid
-   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
+   type (iv_type), intent(in)    :: iv          ! obs. inc vector (o-b).
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 

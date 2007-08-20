@@ -7,7 +7,7 @@ subroutine da_read_filtered_rad( xp, iv )
    implicit none
 
    type (xpose_type), intent(in)     :: xp       ! Domain decomposition vars.
-   type (ob_type),    intent(inout)  :: iv       ! O-B structure.
+   type (iv_type),    intent(inout)  :: iv       ! O-B structure.
 
    integer            :: n        ! Loop counter.
    integer            :: i        ! Index dimension.

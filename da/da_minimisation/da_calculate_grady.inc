@@ -6,7 +6,7 @@ subroutine da_calculate_grady(iv, re, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv          ! Innovation vector (O-B).
+   type (iv_type), intent(in)    :: iv          ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: re          ! Residual vector (O-A).
    type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 

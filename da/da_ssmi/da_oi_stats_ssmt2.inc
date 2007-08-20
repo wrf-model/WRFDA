@@ -7,7 +7,7 @@ subroutine da_oi_stats_ssmt2 (stats_unit, iv)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: iv            ! O-B
+   type (iv_type), intent (in)      :: iv            ! O-B
 
    type (maxmin_type) :: minimum
    type (maxmin_type) :: maximum

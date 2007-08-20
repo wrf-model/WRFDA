@@ -6,7 +6,7 @@ subroutine da_get_var_diagnostics( iv, j)
 
    implicit none
 
-   type(ob_type), intent(inout):: iv      ! innovation vector.
+   type(iv_type), intent(inout):: iv      ! innovation vector.
    type(j_type), intent(inout) :: j       ! Cost function.
 
    integer                      :: num_stats_tot

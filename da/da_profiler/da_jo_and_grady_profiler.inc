@@ -6,7 +6,7 @@ subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type(ob_type), intent(in)    :: iv          ! Innovation vector.
+   type(iv_type), intent(in)    :: iv          ! Innovation vector.
    type(y_type),  intent(in)    :: re          ! Residual vector.
    type(y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
    type(jo_type), intent(inout) :: jo          ! Obs cost function.

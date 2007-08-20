@@ -37,7 +37,7 @@ module da_wrfvar_top
 
    ! too many namelist options to list
    use da_control
-   use da_define_structures, only : y_type, j_type, ob_type, be_type, &
+   use da_define_structures, only : y_type, j_type, iv_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
       da_deallocate_y

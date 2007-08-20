@@ -6,7 +6,7 @@ subroutine da_deallocate_global_synop(iv_glob, re_glob, jo_grad_y_glob)
 
    implicit none
 
-   type (ob_type), intent(inout) :: iv_glob        ! Innovation vector
+   type (iv_type), intent(inout) :: iv_glob        ! Innovation vector
    type (y_type),  intent(inout) :: re_glob        ! residual vector
    type (y_type),  intent(inout) :: jo_grad_y_glob ! Grad_y(Jo)
 

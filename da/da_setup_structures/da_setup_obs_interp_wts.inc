@@ -7,7 +7,7 @@ subroutine da_setup_obs_interp_wts (xp, iv)
    implicit none
 
    type (xpose_type), intent(in)  :: xp         ! Domain decomposition vars.
-   type (ob_type), intent(inout)  :: iv         ! Innovation vector (O-B).
+   type (iv_type), intent(inout)  :: iv         ! Innovation vector (O-B).
 
    integer                        :: i, n          ! Loop counter.
 

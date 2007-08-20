@@ -1,4 +1,4 @@
-subroutine da_read_gts (ob, xp, filename)
+subroutine da_read_obs_ascii (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read a GTS observation file
@@ -27,7 +27,7 @@ subroutine da_read_gts (ob, xp, filename)
    implicit none
 
    type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type (ob_type),    intent(inout) :: ob
+   type (iv_type),    intent(inout) :: ob
    character(len=*),  intent(in)    :: filename
 
    character (len =  10)        :: fmt_name
@@ -49,7 +49,7 @@ subroutine da_read_gts (ob, xp, filename)
 
    integer                      :: ndup, n, report
 
-   if (trace_use) call da_trace_entry("da_read_gts")
+   if (trace_use) call da_trace_entry("da_read_obs_ascii")
 
    ! Local counts of obs, initialise from end of last file
 
@@ -869,8 +869,8 @@ subroutine da_read_gts (ob, xp, filename)
    close(iunit)
    call da_free_unit(iunit)
 
-   if (trace_use) call da_trace_exit("da_read_gts")
+   if (trace_use) call da_trace_exit("da_read_obs_ascii")
 
-end subroutine da_read_gts
+end subroutine da_read_obs_ascii
 
 

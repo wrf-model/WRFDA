@@ -10,8 +10,8 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
    integer,          intent(in)           :: line
    type(y_type),     intent(in), optional :: y1
    type(y_type),     intent(in), optional :: y2
-   type(ob_type)   , intent(in), optional :: ob1
-   type(ob_type),    intent(in), optional :: ob2
+   type(iv_type)   , intent(in), optional :: ob1
+   type(iv_type),    intent(in), optional :: ob2
 
    integer :: i
    real :: sum_y1

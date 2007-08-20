@@ -12,7 +12,7 @@ subroutine da_rttov_init(iv,ob)
 
    implicit none 
 
-   type (ob_type), intent (inout) :: iv
+   type (iv_type), intent (inout) :: iv
    type (y_type) , intent (inout) :: ob
 
 #ifdef RTTOV

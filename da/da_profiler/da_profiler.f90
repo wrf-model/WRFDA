@@ -7,7 +7,7 @@ module da_profiler
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       profiler, max_error_p,max_error_q, &
       max_stheight_diff, anal_type_verify, kms,kme,kts,kte, trace_use_dull
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       pilot_type
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &

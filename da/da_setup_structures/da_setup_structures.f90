@@ -7,7 +7,7 @@ module da_setup_structures
    use module_domain, only : xb_type, xpose_type, ep_type, domain
 
    use da_define_structures, only : xbx_type,be_subtype, be_type, y_type, &
-      ob_type,da_allocate_background_errors,da_allocate_observations
+      iv_type,da_allocate_background_errors,da_allocate_observations
    use da_control, only : trace_use,vert_evalue,stdout,rootproc, &
       analysis_date,coarse_ix,coarse_ds,map_projection,coarse_jy, c2,dsm,phic, &
       pole, cone_factor, start_x,base_pres,ptop,psi1,start_y, base_lapse,base_temp,truelat2_3dv, &
@@ -39,14 +39,14 @@ module da_setup_structures
       bogus, buoy, qscat,pseudo
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
-   use da_obs_io, only : da_scan_bufr,da_read_bufr,da_read_radar, &
-      da_scan_radar,da_scan_gts,da_read_gts
+   use da_obs_io, only : da_scan_bufr,da_read_bufr,da_read_obs_radar, &
+      da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
    use da_par_util, only : da_patch_to_global
    use da_radiance, only : da_setup_bufrtovs_structures
    use da_reporting, only : da_error,message, da_warning, da_message
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_spectral, only : da_initialize_h,da_calc_power_spectrum
-   use da_ssmi, only : da_read_ssmi,da_scan_ssmi
+   use da_ssmi, only : da_read_obs_ssmi,da_scan_obs_ssmi
    use da_tools1, only : da_get_unit, da_free_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_vtox_transforms, only : da_check_eof_decomposition

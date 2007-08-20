@@ -27,7 +27,7 @@ module da_par_util
 #endif
 
    use da_define_structures, only : be_subtype, &
-      x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
+      x_type, vp_type, residual_synop_type, residual_sound_type, iv_type, &
       y_type, count_obs_number_type, maxmin_field_type
 
    use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &

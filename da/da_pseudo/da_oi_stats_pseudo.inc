@@ -7,7 +7,7 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! O-B
+   type (iv_type), intent (in)      :: oi            ! O-B
 
    type (stats_pseudo_type)         :: stats
    integer                          :: nu, nv, nt, np, nq

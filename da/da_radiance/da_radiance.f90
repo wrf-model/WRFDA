@@ -47,7 +47,7 @@ module da_radiance
 #ifdef CRTM
    use da_crtm, only : da_crtm_init
 #endif
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       airsr_type,info_type, model_loc_type
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
@@ -89,9 +89,9 @@ contains
 #include "da_calculate_grady_rad.inc"
 #include "da_read_filtered_rad.inc"
 #include "da_write_filtered_rad.inc"
-#include "da_read_bufrtovs.inc"
-#include "da_read_bufrairs.inc"
-#include "da_read_bufrssmis.inc"
+#include "da_read_obs_bufrtovs.inc"
+#include "da_read_obs_bufrairs.inc"
+#include "da_read_obs_bufrssmis.inc"
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"

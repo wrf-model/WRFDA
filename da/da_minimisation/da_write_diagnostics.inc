@@ -8,7 +8,7 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    type (domain),  intent(in)    :: grid
    type (y_type),  intent(in)    :: ob      ! Observation structure.
-   type (ob_type), intent(inout) :: iv      ! innovation vector.
+   type (iv_type), intent(inout) :: iv      ! innovation vector.
    type (y_type),  intent(inout) :: re      ! residual vector.
    type (y_type),  intent(in)    :: y       ! y = H(x_inc) structure.
    type (j_type),  intent(inout) :: j       ! Cost function.

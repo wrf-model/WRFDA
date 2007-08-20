@@ -45,7 +45,7 @@ module da_test
       bogus, buoy, qscat,pseudo, use_radarobs, use_ssmiretrievalobs, &
       use_gpsrefobs, use_ssmt1obs, use_ssmitbobs, use_ssmt2obs, use_gpspwobs
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &
-      da_deallocate_y,be_type, xbx_type, ob_type, y_type
+      da_deallocate_y,be_type, xbx_type, iv_type, y_type
    use da_dynamics, only : da_uv_to_divergence,da_uv_to_vorticity, &
       da_psichi_to_uv, da_psichi_to_uv_adj
    use da_ffts, only : da_solve_poissoneqn_fct

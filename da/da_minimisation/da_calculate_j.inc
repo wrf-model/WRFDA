@@ -16,7 +16,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    integer, intent(in)                :: cv_size_je ! Je cv size.
    type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.
    type (be_type), intent(in)         :: be     ! background error structure.
-   type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
+   type (iv_type), intent(inout)      :: iv     ! innovation vector (o-b).
    real, intent(in)                   :: xhat(1:cv_size) ! control variables.
    real, intent(in)                   :: cv(1:cv_size)   ! control variables.
    type (y_type) , intent(inout)      :: re     ! residual vector (o-a).

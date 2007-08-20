@@ -8,7 +8,7 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
 
    type (domain) ,  intent (in)    :: grid       ! model data
    type ( y_type), intent(inout)   :: ob         ! Observation structure.
-   type (ob_type), intent(inout)   :: iv         ! O-B structure.
+   type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
    character(len=200)          :: filename
    integer                     :: i, j, n, ios

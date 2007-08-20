@@ -24,7 +24,7 @@ module da_obs_io
       metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
       radar, radiance, airsr
 
-   use da_define_structures, only : ob_type, multi_level_type, &
+   use da_define_structures, only : iv_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type
    use da_grid_definitions, only : da_ffdduv
@@ -45,18 +45,18 @@ module da_obs_io
 
 contains
 
-#include "da_read_gts.inc"
-#include "da_scan_gts.inc"
-#include "da_read_radar.inc"
-#include "da_scan_radar.inc"
+#include "da_read_obs_ascii.inc"
+#include "da_scan_obs_ascii.inc"
+#include "da_read_obs_radar.inc"
+#include "da_scan_obs_radar.inc"
 #include "da_read_errfac.inc"
 #include "da_use_obs_errfac.inc"
 #include "da_write_obs.inc"
 #include "da_write_obs_etkf.inc"
 #include "da_write_filtered_obs.inc"
 #include "da_write_y.inc"
-#include "da_read_bufr.inc"
-#include "da_scan_bufr.inc"
+#include "da_read_obs_bufr.inc"
+#include "da_scan_obs_bufr.inc"
 #include "da_final_write_obs.inc"
 #include "da_final_write_y.inc"
 #include "da_read_y_unit.inc"

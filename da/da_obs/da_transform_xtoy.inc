@@ -7,7 +7,7 @@ subroutine da_transform_xtoy(grid, iv, y)
    implicit none
    
    type (domain),  intent(inout) :: grid
-   type (ob_type), intent(in)    :: iv       ! obs. increment vector (o-b).
+   type (iv_type), intent(in)    :: iv       ! obs. increment vector (o-b).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
    if (trace_use) call da_trace_entry("da_transform_xtoy")

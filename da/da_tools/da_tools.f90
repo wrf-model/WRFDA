@@ -21,7 +21,7 @@ module da_tools
       t_kelvin
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
-      ob_type, y_type, da_random_seed
+      iv_type, y_type, da_random_seed
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error, message, da_warning
    

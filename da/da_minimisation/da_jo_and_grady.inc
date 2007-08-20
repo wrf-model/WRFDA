@@ -6,7 +6,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)   :: iv          ! Innovation vector (O-B).
+   type (iv_type), intent(in)   :: iv          ! Innovation vector (O-B).
    type (y_type),  intent(in)   :: re          ! Residual vector (O-A).
    real,           intent(out)  :: jot         ! Obs cost function.
    type (jo_type), intent(out)  :: jo          ! Obs cost function.

@@ -9,7 +9,7 @@ subroutine da_qc_crtm (ob, iv)
    implicit none
 
    type (y_type),  intent(in)      :: ob         ! Observation structure.
-   type (ob_type), intent(inout)   :: iv         ! O-B structure.
+   type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
    integer :: i, nchan
    logical   :: amsua, amsub, hirs, msu,airs,hsb, ssmis, mhs

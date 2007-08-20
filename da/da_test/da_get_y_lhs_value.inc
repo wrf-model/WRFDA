@@ -6,7 +6,7 @@ subroutine da_get_y_lhs_value (iv, y, partial_lhs, pertile_lhs, adj_ttl_lhs)
     
    implicit none
    
-   type(ob_type), intent(in)    :: iv    ! ob. increment vector.
+   type(iv_type), intent(in)    :: iv    ! ob. increment vector.
    type(y_type),  intent(inout) :: y     ! y = h(xa)
    real,          intent(out)   :: partial_lhs, pertile_lhs, adj_ttl_lhs
 

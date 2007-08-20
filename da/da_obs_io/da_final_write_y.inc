@@ -6,7 +6,7 @@ subroutine da_final_write_y(iv)
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv   ! O-B structure.
+   type (iv_type), intent(in)    :: iv   ! O-B structure.
       
    integer                       :: n, k,kk,i, ounit
    integer                       :: sound_num_obs, num_obs, ios

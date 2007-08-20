@@ -12,7 +12,7 @@ module da_gpsref
       pseudo_var, num_pseudo, kms,kme,kts,kte, trace_use_dull, &
       anal_type_verify,fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
       use_gpsrefobs,pseudo_z,pseudo_val,max_error_ref, pseudo
-   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+   use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       gpsref_type, maxmin_type
    use da_interpolation, only : da_interp_lin_3d,da_interp_lin_3d_adj, &

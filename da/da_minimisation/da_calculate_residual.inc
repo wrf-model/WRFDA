@@ -6,7 +6,7 @@ subroutine da_calculate_residual(iv, y, re)
 
    implicit none
       
-   type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
+   type (iv_type), intent(in)        :: iv     ! Innovation vector (O-B).
    type (y_type),  intent(in)        :: y      ! y = H (xa)
    type (y_type),  intent(inout)     :: re     ! Residual (O-A).
 

@@ -41,7 +41,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
    type (domain),     intent(in)  :: grid
    type (y_type),     intent(in)  :: ob      ! Observation structure.
-   type (ob_type),    intent(inout) :: iv      ! O-B structure.
+   type (iv_type),    intent(inout) :: iv      ! O-B structure.
    integer, intent(in)            :: coarse_ix, coarse_jy
    real, intent(in)               :: start_x, start_y
 

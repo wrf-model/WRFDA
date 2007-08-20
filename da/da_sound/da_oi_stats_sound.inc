@@ -7,7 +7,7 @@ subroutine da_oi_stats_sound (stats_unit, oi)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (ob_type), intent (in)      :: oi            ! OI
+   type (iv_type), intent (in)      :: oi            ! OI
 
    type (stats_sound_type)          :: stats
    integer                          :: nu, nv, nt, nq
