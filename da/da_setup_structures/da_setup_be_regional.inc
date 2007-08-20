@@ -234,7 +234,8 @@ subroutine da_setup_be_regional(xb, be)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
    be % v1 % name = variable
-   do j=1,nj
+!rizvi   do j=1,nj
+   do j=1,jy
       b = bin2d(1,j)
       be1_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be1_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
@@ -254,7 +255,8 @@ subroutine da_setup_be_regional(xb, be)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
    be % v2 % name = variable
-   do j=1,nj
+!rizvi   do j=1,nj
+   do j=1,jy
       b = bin2d(1,j)
       be2_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be2_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
@@ -273,7 +275,8 @@ subroutine da_setup_be_regional(xb, be)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
    be % v3 % name = variable
-   do j=1,nj
+!rizvi   do j=1,nj
+   do j=1,jy
       b = bin2d(1,j)
       be3_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be3_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
@@ -293,7 +296,8 @@ subroutine da_setup_be_regional(xb, be)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
    be % v4 % name = variable
-   do j=1,nj
+!rizvi   do j=1,nj
+   do j=1,jy
       b = bin2d(1,j)
       be4_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be4_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
@@ -318,7 +322,8 @@ subroutine da_setup_be_regional(xb, be)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
    be % v5 % name = variable
-   do j=1,nj
+!rizvi   do j=1,nj
+   do j=1,jy
       b = bin2d(1,j)
       be5_evec_loc(j,1:1,1:1) = evec_loc(1:1,1:1,b)
       be5_eval_loc(j,1:1 ) = eval_loc(1:1,b)
@@ -326,7 +331,6 @@ subroutine da_setup_be_regional(xb, be)
 
    deallocate (evec_loc)
    deallocate (eval_loc)
-
    ! 3.0 Check and get the truncated number of the vertical modes
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -472,6 +476,7 @@ subroutine da_setup_be_regional(xb, be)
    deallocate (be5_eval_loc)
 
    if (vert_corr == 2) then
+
       deallocate (be1_eval_glo)
       deallocate (be2_eval_glo)
       deallocate (be3_eval_glo)
