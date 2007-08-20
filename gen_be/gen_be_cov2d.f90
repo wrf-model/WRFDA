@@ -64,7 +64,7 @@ program gen_be_cov2d
    end_date = '2004033112'
    interval = 24
    ne = 1
-   bin_type = 1
+   bin_type = 5
    lat_min = -90.0
    lat_max = 90.0
    binwidth_lat = 10.0
