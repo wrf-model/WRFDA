@@ -97,7 +97,14 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
            write(unit=stdout,fmt='(A)') &
               'Change be std dev to variance in NMC code'
          end if
-         be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
+         if (vert_evalue == vert_evalue_global) then
+            ! use global eigenvalues:
+          do k = 1, mz
+          be_sub % val(1:jy,m) = l(m)
+          end do 
+         else
+          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
+         end if
       end if
 
       !-----------------------------------------------------------------------
