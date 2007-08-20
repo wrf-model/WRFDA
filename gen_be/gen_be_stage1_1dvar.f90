@@ -100,7 +100,7 @@ program gen_be_stage1_1dvar
    interval = 24
    be_method = 'NMC'
    ne = 1
-   bin_type = 1         ! 0 = Every pt, 1 = x direction, 2 = latitude, ....
+   bin_type = 5         ! 0 = Every pt, 1 = x direction, 2 = latitude, ....
    lat_min = -90.0
    lat_max = 90.0
    binwidth_lat = 10.0
