@@ -74,7 +74,7 @@ SUBROUTINE THIN_OB (max_number_of_obs, obs, number_of_obs, mix, mjx, &
        allocate (Ob_index(mix,mjx,LV,max_box))
 
        WRITE(0,'(/"Thining OBS ==> ",A,1X,"FM=",I3,2X,      &
-       &                   "mix, mjx, LV, max_bos:",4I6)') &
+       &                   "mix, mjx, LV, max_box:",4I6)') &
        &    Ob_name, Ob_fm, mix, mjx, LV, max_box 
 !
 ! 2.0  To count the number of OBS within the grid boxes
@@ -182,9 +182,6 @@ stations_valid: &
              X = X + .5
              Y = Y + .5
            endif
-             X = X + .5
-             Y = Y + .5
-             
              J = INT(X + .5)
              I = INT(Y + .5)
              K = 1
@@ -384,6 +381,9 @@ stations_valid: &
                   X = X + .5
                   Y = Y + .5
                 endif
+                X = X + .5
+                Y = Y + .5
+
              dx = X - float(J)
              dy = Y - float(I)
              RR = dx*dx + dy*dy
