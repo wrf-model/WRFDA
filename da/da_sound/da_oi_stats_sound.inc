@@ -1,4 +1,4 @@
-subroutine da_oi_stats_sound (stats_unit, oi)
+subroutine da_oi_stats_sound (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_sound (stats_unit, oi)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in)      :: oi            ! OI
+   type (iv_type), intent (in)      :: iv            ! OI
 
    type (stats_sound_type)          :: stats
    integer                          :: nu, nv, nt, nq
@@ -31,20 +31,20 @@ subroutine da_oi_stats_sound (stats_unit, oi)
    stats%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(sound)
-      if (oi%sound(n)%loc%proc_domain) then
-         do k=1, oi%sound(n)%info%levels
-            call da_stats_calculate(oi%sound(n)%loc%obs_global_index, &
-               k, oi%sound(n)%u(k)%qc, oi%sound(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(sound)
+      if (iv%sound(n)%loc%proc_domain) then
+         do k=1, iv%sound(n)%info%levels
+            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+               k, iv%sound(n)%u(k)%qc, iv%sound(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%sound(n)%loc%obs_global_index, &
-               k, oi%sound(n)%v(k)%qc, oi%sound(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+               k, iv%sound(n)%v(k)%qc, iv%sound(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(oi%sound(n)%loc%obs_global_index, &
-               k, oi%sound(n)%t(k)%qc, oi%sound(n)%t(k)%inv, nt, &
+            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+               k, iv%sound(n)%t(k)%qc, iv%sound(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(oi%sound(n)%loc%obs_global_index, &
-               k, oi%sound(n)%q(k)%qc, oi%sound(n)%q(k)%inv, nq, &
+            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+               k, iv%sound(n)%q(k)%qc, iv%sound(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, stats%average%q, stats%rms_err%q)
          end do
       end if

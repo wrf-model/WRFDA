@@ -1,4 +1,4 @@
-subroutine da_scan_obs_radar (ob, xp, filename)
+subroutine da_scan_obs_radar (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan the radar observation file
@@ -7,7 +7,7 @@ subroutine da_scan_obs_radar (ob, xp, filename)
    implicit none
 
    type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
-   type (iv_type),    intent(inout) :: ob
+   type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
    integer                       :: i, j, n, iost, nlevels, fm
@@ -136,7 +136,7 @@ subroutine da_scan_obs_radar (ob, xp, filename)
             cycle reports
          end if
 
-         ob%ntotal(radar) = ob%ntotal(radar) + 1
+         iv%ntotal(radar) = iv%ntotal(radar) + 1
          if (outside) then
             cycle reports
          end if
@@ -150,11 +150,11 @@ subroutine da_scan_obs_radar (ob, xp, filename)
             select case (fm)
 
             case (128)
-               ob%nlocal(radar) = ob%nlocal(radar) + 1
+               iv%nlocal(radar) = iv%nlocal(radar) + 1
 
-               if (ob%nlocal(radar) > max_radar_input) then
+               if (iv%nlocal(radar) > max_radar_input) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &
-                     ' radar #= ',ob % nlocal(radar), ' > max_radar_input = ', max_radar_input
+                     ' radar #= ',iv % nlocal(radar), ' > max_radar_input = ', max_radar_input
                   call da_error(__FILE__,__LINE__,message(1:1))
                end if
 
@@ -174,8 +174,8 @@ subroutine da_scan_obs_radar (ob, xp, filename)
    close (iunit)
    call da_free_unit(iunit)
 
-   ob%plocal((ob%time),:) = ob%nlocal(:)
-   ob%ptotal((ob%time),:) = ob%ntotal(:)
+   iv%plocal((iv%time),:) = iv%nlocal(:)
+   iv%ptotal((iv%time),:) = iv%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_obs_radar")
 

@@ -1,4 +1,4 @@
-subroutine da_oi_stats_satem (stats_unit, oi)
+subroutine da_oi_stats_satem (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_satem (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_satem_type) :: stats
    integer                 :: nthickness
@@ -23,12 +23,12 @@ subroutine da_oi_stats_satem (stats_unit, oi)
    stats%average = residual_satem1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(satem)
-      if (oi%satem(n)%loc%proc_domain) then
-         do k=1, oi%satem(n)%info%levels
-            call da_stats_calculate(oi%satem(n)%loc%obs_global_index, &
-               k, oi%satem(n)%thickness(k)%qc, &
-               oi%satem(n)%thickness(k)%inv, nthickness, &
+   do n=1, iv%nlocal(satem)
+      if (iv%satem(n)%loc%proc_domain) then
+         do k=1, iv%satem(n)%info%levels
+            call da_stats_calculate(iv%satem(n)%loc%obs_global_index, &
+               k, iv%satem(n)%thickness(k)%qc, &
+               iv%satem(n)%thickness(k)%inv, nthickness, &
                stats%minimum%thickness, stats%maximum%thickness, &
                stats%average%thickness, stats%rms_err%thickness)
          end do

@@ -1,4 +1,4 @@
-subroutine da_oi_stats_airsr (stats_unit, oi)
+subroutine da_oi_stats_airsr (stats_unit, iv)
 
   !----------------------------------------------------------------------
   ! Purpose: Prints out innov diagnostics for AIRS retrievals  
@@ -7,7 +7,7 @@ subroutine da_oi_stats_airsr (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_airsr_type) :: stats
    integer                 :: nt, nq
@@ -26,21 +26,21 @@ subroutine da_oi_stats_airsr (stats_unit, oi)
    stats%average = residual_airsr1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(airsr)
-      if (oi%airsr(n)%loc%proc_domain) then
-         do k=1, oi%airsr(n)%info%levels
-            call da_stats_calculate(oi%airsr(n)%loc%obs_global_index, &
-               k, oi%airsr(n)%t(k)%qc, &
-               oi%airsr(n)%t(k)%inv, nt, &
+   do n=1, iv%nlocal(airsr)
+      if (iv%airsr(n)%loc%proc_domain) then
+         do k=1, iv%airsr(n)%info%levels
+            call da_stats_calculate(iv%airsr(n)%loc%obs_global_index, &
+               k, iv%airsr(n)%t(k)%qc, &
+               iv%airsr(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(oi%airsr(n)%loc%obs_global_index, &
-               k, oi%airsr(n)%q(k)%qc, &
-               oi%airsr(n)%q(k)%inv, nq, &
+            call da_stats_calculate(iv%airsr(n)%loc%obs_global_index, &
+               k, iv%airsr(n)%q(k)%qc, &
+               iv%airsr(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, &
                stats%average%q, stats%rms_err%q)
          end do
-      end if    ! end if (oi%airsr(n)%loc%proc_domain)
+      end if    ! end if (iv%airsr(n)%loc%proc_domain)
    end do
 
    ! Do inter-processor communication to gather statistics.

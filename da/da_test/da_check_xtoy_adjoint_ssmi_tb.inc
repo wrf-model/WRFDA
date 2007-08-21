@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_ssmi_tb (oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_ssmi_tb (iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_ssmi_tb (oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
@@ -15,7 +15,7 @@ subroutine da_check_xtoy_adjoint_ssmi_tb (oi, y, adjtest_lhs, pertile_lhs)
 
    if (trace_use) call da_trace_entry("da_check_xtoy_adjoint_ssmi_tb")
 
-   do n=1, oi%nlocal(ssmi_tb)
+   do n=1, iv%nlocal(ssmi_tb)
       y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms
       y%ssmi_tb(n)%tb19h = y%ssmi_tb(n)%tb19h/typical_tb19h_rms
       y%ssmi_tb(n)%tb22v = y%ssmi_tb(n)%tb22v/typical_tb22v_rms
@@ -34,7 +34,7 @@ subroutine da_check_xtoy_adjoint_ssmi_tb (oi, y, adjtest_lhs, pertile_lhs)
 
       pertile_lhs = pertile_lhs + var
 
-      if (oi%ssmi_tb(n)%loc%proc_domain) then
+      if (iv%ssmi_tb(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs + var
       end if
       y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms

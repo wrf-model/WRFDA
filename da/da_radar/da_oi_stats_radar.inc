@@ -1,4 +1,4 @@
-subroutine da_oi_stats_radar (stats_unit, oi)
+subroutine da_oi_stats_radar (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_radar (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_radar_type) :: stats
    integer                 :: nrv, nrf
@@ -26,21 +26,21 @@ subroutine da_oi_stats_radar (stats_unit, oi)
    stats%average = residual_radar1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(radar)
-      if (oi%radar(n)%loc%proc_domain) then
-         do k=1, oi%radar(n)%info%levels
+   do n=1, iv%nlocal(radar)
+      if (iv%radar(n)%loc%proc_domain) then
+         do k=1, iv%radar(n)%info%levels
             if (use_radar_rv) then
-               call da_stats_calculate(oi%radar(n)%loc%obs_global_index, &
-                  k, oi%radar(n)%rv(k)%qc, &
-                  oi%radar(n)%rv(k)%inv, nrv, &
+               call da_stats_calculate(iv%radar(n)%loc%obs_global_index, &
+                  k, iv%radar(n)%rv(k)%qc, &
+                  iv%radar(n)%rv(k)%inv, nrv, &
                   stats%minimum%rv, stats%maximum%rv, &
                   stats%average%rv, stats%rms_err%rv)
             end if
 
             if (use_radar_rf) then
-               call da_stats_calculate(oi%radar(n)%loc%obs_global_index, &
-                  k, oi%radar(n)%rf(k)%qc, &
-                  oi%radar(n)%rf(k)%inv, nrf, &
+               call da_stats_calculate(iv%radar(n)%loc%obs_global_index, &
+                  k, iv%radar(n)%rf(k)%qc, &
+                  iv%radar(n)%rf(k)%inv, nrf, &
                   stats%minimum%rf, stats%maximum%rf, &
                   stats%average%rf, stats%rms_err%rf)
             end if

@@ -1,4 +1,4 @@
-subroutine da_oi_stats_polaramv(stats_unit, oi)
+subroutine da_oi_stats_polaramv(stats_unit, iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates (Obs - Analysis) statistics for Polar AMVs
@@ -7,7 +7,7 @@ subroutine da_oi_stats_polaramv(stats_unit, oi)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in)      :: oi            ! OI
+   type (iv_type), intent (in)      :: iv            ! OI
 
    type (stats_polaramv_type)       :: stats
    integer                          :: nu, nv
@@ -26,17 +26,17 @@ subroutine da_oi_stats_polaramv(stats_unit, oi)
    stats%average = residual_polaramv1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(polaramv)
-      if (oi%polaramv(n)%loc%proc_domain) then
-         do k=1, oi%polaramv(n)%info%levels
-            call da_stats_calculate(oi%polaramv(n)%loc%obs_global_index, &
-               0, oi%polaramv(n)%u(k)%qc, &
-               oi%polaramv(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(polaramv)
+      if (iv%polaramv(n)%loc%proc_domain) then
+         do k=1, iv%polaramv(n)%info%levels
+            call da_stats_calculate(iv%polaramv(n)%loc%obs_global_index, &
+               0, iv%polaramv(n)%u(k)%qc, &
+               iv%polaramv(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%polaramv(n)%loc%obs_global_index, &
-               0, oi%polaramv(n)%v(k)%qc, &
-               oi%polaramv(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%polaramv(n)%loc%obs_global_index, &
+               0, iv%polaramv(n)%v(k)%qc, &
+               iv%polaramv(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
          end do

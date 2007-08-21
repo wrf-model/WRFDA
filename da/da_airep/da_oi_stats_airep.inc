@@ -1,4 +1,4 @@
-subroutine da_oi_stats_airep (stats_unit, oi)
+subroutine da_oi_stats_airep (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_airep (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_airep_type) :: stats
    integer                 :: nu, nv, nt
@@ -28,26 +28,26 @@ subroutine da_oi_stats_airep (stats_unit, oi)
    stats%average = residual_airep1_type(0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(airep)
-      if (oi%airep(n)%loc%proc_domain) then
-         do k=1, oi%airep(n)%info%levels
-            call da_stats_calculate(oi%airep(n)%loc%obs_global_index, &
-               k, oi%airep(n)%u(k)%qc, &
-               oi%airep(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(airep)
+      if (iv%airep(n)%loc%proc_domain) then
+         do k=1, iv%airep(n)%info%levels
+            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+               k, iv%airep(n)%u(k)%qc, &
+               iv%airep(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%airep(n)%loc%obs_global_index, &
-               k, oi%airep(n)%v(k)%qc, &
-               oi%airep(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+               k, iv%airep(n)%v(k)%qc, &
+               iv%airep(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(oi%airep(n)%loc%obs_global_index, &
-               k, oi%airep(n)%t(k)%qc, &
-               oi%airep(n)%t(k)%inv, nt, &
+            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+               k, iv%airep(n)%t(k)%qc, &
+               iv%airep(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
          end do
-      end if    ! end if (oi%airep(n)%loc%proc_domain)
+      end if    ! end if (iv%airep(n)%loc%proc_domain)
    end do
 
    ! do inter-processor communication to gather statistics.

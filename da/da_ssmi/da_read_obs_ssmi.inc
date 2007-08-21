@@ -1,4 +1,4 @@
-subroutine da_read_obs_ssmi (ob, xp, filename)
+subroutine da_read_obs_ssmi (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read a SSMI 2.0 GTS observation file
@@ -7,7 +7,7 @@ subroutine da_read_obs_ssmi (ob, xp, filename)
    implicit none
 
    type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type(iv_type),    intent(inout) :: ob
+   type(iv_type),    intent(inout) :: iv
    character(len=*), intent(in)    :: filename
 
    character (len =  10)        :: fmt_name
@@ -37,8 +37,8 @@ subroutine da_read_obs_ssmi (ob, xp, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_ssmi")
 
-   nlocal(:) = ob%plocal(ob%time-1,:)
-   ntotal(:) = ob%ptotal(ob%time-1,:)
+   nlocal(:) = iv%plocal(iv%time-1,:)
+   ntotal(:) = iv%ptotal(iv%time-1,:)
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -215,15 +215,15 @@ subroutine da_read_obs_ssmi (ob, xp, filename)
       
             !  Initialize other non read fields
 
-            ob % ssmi_rv (nlocal(ssmi_rv)) % loc = loc
+            iv % ssmi_rv (nlocal(ssmi_rv)) % loc = loc
 
             !  Initialize with read fields
 
-            ob%ssmi_rv(nlocal(ssmi_rv))%info                 = info
-            ob%ssmi_rv(nlocal(ssmi_rv))%loc%obs_global_index = ntotal(ssmi_rv)
+            iv%ssmi_rv(nlocal(ssmi_rv))%info                 = info
+            iv%ssmi_rv(nlocal(ssmi_rv))%loc%obs_global_index = ntotal(ssmi_rv)
 
-            ob % ssmi_rv (nlocal(ssmi_rv)) % speed = speed
-            ob % ssmi_rv (nlocal(ssmi_rv)) % tpw   = tpw
+            iv % ssmi_rv (nlocal(ssmi_rv)) % speed = speed
+            iv % ssmi_rv (nlocal(ssmi_rv)) % tpw   = tpw
 
          case (126) ;
             if (.not. use_ssmitbobs) cycle reports
@@ -280,20 +280,20 @@ subroutine da_read_obs_ssmi (ob, xp, filename)
 
             !  Initialize other non read fields
 
-            ob % ssmi_tb (nlocal(ssmi_tb)) % loc = loc
+            iv % ssmi_tb (nlocal(ssmi_tb)) % loc = loc
 
             !  Initialize with read fields
 
-            ob%ssmi_tb(nlocal(ssmi_tb))%info                 = info
-            ob%ssmi_tb(nlocal(ssmi_tb))%loc%obs_global_index = ntotal(ssmi_tb)
+            iv%ssmi_tb(nlocal(ssmi_tb))%info                 = info
+            iv%ssmi_tb(nlocal(ssmi_tb))%loc%obs_global_index = ntotal(ssmi_tb)
 
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb19v = tb19v
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb19h = tb19h
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb22v = tb22v
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb37v = tb37v
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb37h = tb37h
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb85v = tb85v
-            ob % ssmi_tb (nlocal(ssmi_tb)) % tb85h = tb85h
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb19v = tb19v
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb19h = tb19h
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb22v = tb22v
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb37v = tb37v
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb37h = tb37h
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb85v = tb85v
+            iv % ssmi_tb (nlocal(ssmi_tb)) % tb85h = tb85h
 
          case default;
             ! Do nothing.

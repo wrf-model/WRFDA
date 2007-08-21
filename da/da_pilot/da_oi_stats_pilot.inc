@@ -1,4 +1,4 @@
-subroutine da_oi_stats_pilot (stats_unit, oi)
+subroutine da_oi_stats_pilot (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_pilot (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_pilot_type) :: stats
    integer                 :: nu, nv
@@ -25,17 +25,17 @@ subroutine da_oi_stats_pilot (stats_unit, oi)
    stats%average = residual_pilot1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(pilot)
-      if (oi%pilot(n)%loc%proc_domain) then
-         do k=1, oi%pilot(n)%info%levels
-            call da_stats_calculate(oi%pilot(n)%loc%obs_global_index, &
-               k, oi%pilot(n)%u(k)%qc,  &
-               oi%pilot(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(pilot)
+      if (iv%pilot(n)%loc%proc_domain) then
+         do k=1, iv%pilot(n)%info%levels
+            call da_stats_calculate(iv%pilot(n)%loc%obs_global_index, &
+               k, iv%pilot(n)%u(k)%qc,  &
+               iv%pilot(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%pilot(n)%loc%obs_global_index, &
-               k, oi%pilot(n)%v(k)%qc, &
-               oi%pilot(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%pilot(n)%loc%obs_global_index, &
+               k, iv%pilot(n)%v(k)%qc, &
+               iv%pilot(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
          end do

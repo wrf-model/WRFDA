@@ -1,4 +1,4 @@
-subroutine da_oi( str,line,y1,y2,ob1,ob2)
+subroutine da_oi( str,line,y1,y2,iv1,iv2)
 
    !-----------------------------------------------------------------------
    ! Purpose: quick way of showing location
@@ -10,19 +10,19 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
    integer,          intent(in)           :: line
    type(y_type),     intent(in), optional :: y1
    type(y_type),     intent(in), optional :: y2
-   type(iv_type)   , intent(in), optional :: ob1
-   type(iv_type),    intent(in), optional :: ob2
+   type(iv_type)   , intent(in), optional :: iv1
+   type(iv_type),    intent(in), optional :: iv2
 
    integer :: i
    real :: sum_y1
    real :: sum_y2
-   real :: sum_ob1
-   real :: sum_ob2
+   real :: sum_iv1
+   real :: sum_iv2
 
    sum_y1=-1.0
    sum_y2=-1.0
-   sum_ob1=-1.0
-   sum_ob2=-1.0
+   sum_iv1=-1.0
+   sum_iv2=-1.0
 
    if (.not. oi_use) return
 
@@ -48,155 +48,155 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
       sum_y2=-1.0
    end if
 
-   if (present(ob1)) then
-      sum_ob1=0.0
-      do i=1,ob1%num_inst
-         if (associated(ob1%instid(i)%tb_xb)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_xb(:,:)) 
+   if (present(iv1)) then
+      sum_iv1=0.0
+      do i=1,iv1%num_inst
+         if (associated(iv1%instid(i)%tb_xb)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_xb(:,:)) 
          end if
 
-         if (associated(ob1%instid(i)%tb_inv)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_inv(:,:)) 
+         if (associated(iv1%instid(i)%tb_inv)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_inv(:,:)) 
          end if
 
-         if (associated(ob1%instid(i)%tb_qc)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_qc(:,:)) 
+         if (associated(iv1%instid(i)%tb_qc)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_qc(:,:)) 
          end if
 
-         if (associated(ob1%instid(i)%tb_error)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_error(:,:)) 
+         if (associated(iv1%instid(i)%tb_error)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_error(:,:)) 
          end if
 
-         if (associated(ob1%instid(i)%t)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%t(:,:)) 
+         if (associated(iv1%instid(i)%t)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%t(:,:)) 
          end if
-         if (associated(ob1%instid(i)%mr)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%mr(:,:)) 
+         if (associated(iv1%instid(i)%mr)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%mr(:,:)) 
          end if
-         if (associated(ob1%instid(i)%t2m)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%t2m(:)) 
+         if (associated(iv1%instid(i)%t2m)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%t2m(:)) 
          end if
-         if (associated(ob1%instid(i)%u10)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%u10(:)) 
+         if (associated(iv1%instid(i)%u10)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%u10(:)) 
          end if
-         if (associated(ob1%instid(i)%v10)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%v10(:)) 
+         if (associated(iv1%instid(i)%v10)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%v10(:)) 
          end if
-         if (associated(ob1%instid(i)%mr2m)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%mr2m(:)) 
+         if (associated(iv1%instid(i)%mr2m)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%mr2m(:)) 
          end if
-         if (associated(ob1%instid(i)%ps)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%ps(:)) 
-         end if
-
-         if (associated(ob1%instid(i)%emiss)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%emiss(:,:)) 
+         if (associated(iv1%instid(i)%ps)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%ps(:)) 
          end if
 
-         if (associated(ob1%instid(i)%ts)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%ts(:)) 
+         if (associated(iv1%instid(i)%emiss)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%emiss(:,:)) 
          end if
 
-         if (associated(ob1%instid(i)%elevation)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%elevation(:)) 
+         if (associated(iv1%instid(i)%ts)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%ts(:)) 
          end if
 
-         if (associated(ob1%instid(i)%clwp)) then
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%clwp(:)) 
+         if (associated(iv1%instid(i)%elevation)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%elevation(:)) 
          end if
 
-         if (associated(ob1%instid(i)%pm)) &
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%pm(:,:)) 
+         if (associated(iv1%instid(i)%clwp)) then
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%clwp(:)) 
+         end if
 
-         if (associated(ob1%instid(i)%tm)) &
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%tm(:,:)) 
+         if (associated(iv1%instid(i)%pm)) &
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%pm(:,:)) 
 
-         if (associated(ob1%instid(i)%qm)) &
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%qm(:,:)) 
+         if (associated(iv1%instid(i)%tm)) &
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%tm(:,:)) 
 
-         if (associated(ob1%instid(i)%cloud_flag)) &
-            sum_ob1=sum_ob1+sum(ob1%instid(i)%cloud_flag(:,:)) 
+         if (associated(iv1%instid(i)%qm)) &
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%qm(:,:)) 
+
+         if (associated(iv1%instid(i)%cloud_flag)) &
+            sum_iv1=sum_iv1+sum(iv1%instid(i)%cloud_flag(:,:)) 
       end do
    else
-      sum_ob1=-1.0
+      sum_iv1=-1.0
    end if
 
-   if (present(ob2)) then
-      sum_ob2=0.0
-      do i=1,ob2%num_inst
-         if (associated(ob2%instid(i)%tb_xb)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_xb(:,:)) 
+   if (present(iv2)) then
+      sum_iv2=0.0
+      do i=1,iv2%num_inst
+         if (associated(iv2%instid(i)%tb_xb)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_xb(:,:)) 
          end if
 
-         if (associated(ob2%instid(i)%tb_inv)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_inv(:,:)) 
+         if (associated(iv2%instid(i)%tb_inv)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_inv(:,:)) 
          end if
 
-         if (associated(ob2%instid(i)%tb_qc)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_qc(:,:)) 
+         if (associated(iv2%instid(i)%tb_qc)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_qc(:,:)) 
          end if
 
-         if (associated(ob2%instid(i)%tb_error)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_error(:,:)) 
+         if (associated(iv2%instid(i)%tb_error)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_error(:,:)) 
          end if
 
-         if (associated(ob2%instid(i)%t)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%t(:,:)) 
+         if (associated(iv2%instid(i)%t)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%t(:,:)) 
          end if
-         if (associated(ob2%instid(i)%mr)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%mr(:,:)) 
+         if (associated(iv2%instid(i)%mr)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%mr(:,:)) 
          end if
-         if (associated(ob2%instid(i)%t2m)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%t2m(:)) 
+         if (associated(iv2%instid(i)%t2m)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%t2m(:)) 
          end if
-         if (associated(ob2%instid(i)%u10)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%u10(:)) 
+         if (associated(iv2%instid(i)%u10)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%u10(:)) 
          end if
-         if (associated(ob2%instid(i)%v10)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%v10(:)) 
+         if (associated(iv2%instid(i)%v10)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%v10(:)) 
          end if
-         if (associated(ob2%instid(i)%mr2m)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%mr2m(:)) 
+         if (associated(iv2%instid(i)%mr2m)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%mr2m(:)) 
          end if
-         if (associated(ob2%instid(i)%ps)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%ps(:)) 
-         end if
-
-         if (associated(ob2%instid(i)%emiss)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%emiss(:,:)) 
+         if (associated(iv2%instid(i)%ps)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%ps(:)) 
          end if
 
-         if (associated(ob2%instid(i)%ts)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%ts(:)) 
+         if (associated(iv2%instid(i)%emiss)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%emiss(:,:)) 
          end if
 
-         if (associated(ob2%instid(i)%elevation)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%elevation(:)) 
+         if (associated(iv2%instid(i)%ts)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%ts(:)) 
          end if
 
-         if (associated(ob2%instid(i)%clwp)) then
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%clwp(:)) 
+         if (associated(iv2%instid(i)%elevation)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%elevation(:)) 
          end if
 
-         if (associated(ob2%instid(i)%pm)) &
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%pm(:,:)) 
+         if (associated(iv2%instid(i)%clwp)) then
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%clwp(:)) 
+         end if
 
-         if (associated(ob2%instid(i)%tm)) &
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%tm(:,:)) 
+         if (associated(iv2%instid(i)%pm)) &
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%pm(:,:)) 
 
-         if (associated(ob2%instid(i)%qm)) &
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%qm(:,:)) 
+         if (associated(iv2%instid(i)%tm)) &
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%tm(:,:)) 
 
-         if (associated(ob2%instid(i)%cloud_flag)) &
-            sum_ob2=sum_ob2+sum(ob2%instid(i)%cloud_flag(:,:)) 
+         if (associated(iv2%instid(i)%qm)) &
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%qm(:,:)) 
+
+         if (associated(iv2%instid(i)%cloud_flag)) &
+            sum_iv2=sum_iv2+sum(iv2%instid(i)%cloud_flag(:,:)) 
       end do
    else
-      sum_ob2=-1.0
+      sum_iv2=-1.0
    end if
 
 100 continue
 
-   write(unit=stderr,fmt='(A,3(E18.10,1X),A,I6)') "oi:", sum_y1, sum_y2, sum_ob1, str, line
+   write(unit=stderr,fmt='(A,3(E18.10,1X),A,I6)') "oi:", sum_y1, sum_y2, sum_iv1, str, line
 
 end subroutine da_oi
 

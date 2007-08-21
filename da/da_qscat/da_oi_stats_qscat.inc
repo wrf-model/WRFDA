@@ -1,4 +1,4 @@
-subroutine da_oi_stats_qscat (stats_unit, oi)
+subroutine da_oi_stats_qscat (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_qscat (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_qscat_type) :: stats
    integer                 :: nu, nv
@@ -25,13 +25,13 @@ subroutine da_oi_stats_qscat (stats_unit, oi)
    stats%average = residual_qscat1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(qscat)
-      if (oi%qscat(n)%loc%proc_domain) then
-         call da_stats_calculate(n, 0, oi%qscat(n)%u%qc, oi%qscat(n)%u%inv, nu, &
+   do n=1, iv%nlocal(qscat)
+      if (iv%qscat(n)%loc%proc_domain) then
+         call da_stats_calculate(n, 0, iv%qscat(n)%u%qc, iv%qscat(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(n, 0, oi%qscat(n)%v%qc, oi%qscat(n)%v%inv, nv, &
+         call da_stats_calculate(n, 0, iv%qscat(n)%v%qc, iv%qscat(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, stats%average%v, stats%rms_err%v)
-      end if    ! end if (oi%qscat(n)%loc%proc_domain)
+      end if    ! end if (iv%qscat(n)%loc%proc_domain)
    end do
 
    ! Do inter-processor communication to gather statistics.

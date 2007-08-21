@@ -1,4 +1,4 @@
-subroutine da_oi_stats_pseudo (stats_unit, oi)
+subroutine da_oi_stats_pseudo (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in)      :: oi            ! O-B
+   type (iv_type), intent (in)      :: iv            ! O-B
 
    type (stats_pseudo_type)         :: stats
    integer                          :: nu, nv, nt, np, nq
@@ -34,29 +34,29 @@ subroutine da_oi_stats_pseudo (stats_unit, oi)
    stats%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(pseudo)
-      if (oi%pseudo(n)%loc%proc_domain) then
-         call da_stats_calculate(n, 0, oi%pseudo(n)%u%qc, & 
-            oi%pseudo(n)%u%inv, nu, & 
+   do n=1, iv%nlocal(pseudo)
+      if (iv%pseudo(n)%loc%proc_domain) then
+         call da_stats_calculate(n, 0, iv%pseudo(n)%u%qc, & 
+            iv%pseudo(n)%u%inv, nu, & 
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(n, 0, oi%pseudo(n)%v%qc, & 
-            oi%pseudo(n)%v%inv, nv, & 
+         call da_stats_calculate(n, 0, iv%pseudo(n)%v%qc, & 
+            iv%pseudo(n)%v%inv, nv, & 
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(n, 0, oi%pseudo(n)%t%qc, & 
-            oi%pseudo(n)%t%inv, nt, & 
+         call da_stats_calculate(n, 0, iv%pseudo(n)%t%qc, & 
+            iv%pseudo(n)%t%inv, nt, & 
             stats%minimum%t, stats%maximum%t, &
             stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(n, 0, oi%pseudo(n)%p%qc, & 
-            oi%pseudo(n)%p%inv, np, & 
+         call da_stats_calculate(n, 0, iv%pseudo(n)%p%qc, & 
+            iv%pseudo(n)%p%inv, np, & 
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
-         call da_stats_calculate(n, 0, oi%pseudo(n)%q%qc, & 
-            oi%pseudo(n)%q%inv, nq, & 
+         call da_stats_calculate(n, 0, iv%pseudo(n)%q%qc, & 
+            iv%pseudo(n)%q%inv, nq, & 
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
-      end if    ! end if (oi%pseudo(n)%loc%proc_domain)
+      end if    ! end if (iv%pseudo(n)%loc%proc_domain)
    end do    
 
    ! Do inter-processor communication to gather statistics.

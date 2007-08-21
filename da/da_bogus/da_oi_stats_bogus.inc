@@ -1,4 +1,4 @@
-subroutine da_oi_stats_bogus (stats_unit, oi)
+subroutine da_oi_stats_bogus (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_bogus (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_bogus_type) :: stats
    integer                 :: nu, nv, nt, nq, nslp
@@ -35,33 +35,33 @@ subroutine da_oi_stats_bogus (stats_unit, oi)
    stats%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(bogus)
-      if (oi%bogus(n)%loc%proc_domain) then
-         do k=1, oi%bogus(n)%info%levels
-            call da_stats_calculate(oi%bogus(n)%loc%obs_global_index, &
-               k, oi%bogus(n)%u(k)%qc, &
-               oi%bogus(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(bogus)
+      if (iv%bogus(n)%loc%proc_domain) then
+         do k=1, iv%bogus(n)%info%levels
+            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+               k, iv%bogus(n)%u(k)%qc, &
+               iv%bogus(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%bogus(n)%loc%obs_global_index, &
-               k, oi%bogus(n)%v(k)%qc, &
-               oi%bogus(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+               k, iv%bogus(n)%v(k)%qc, &
+               iv%bogus(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(oi%bogus(n)%loc%obs_global_index, &
-               k, oi%bogus(n)%t(k)%qc, &
-               oi%bogus(n)%t(k)%inv, nt, &
+            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+               k, iv%bogus(n)%t(k)%qc, &
+               iv%bogus(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(oi%bogus(n)%loc%obs_global_index, &
-               k, oi%bogus(n)%q(k)%qc, &
-               oi%bogus(n)%q(k)%inv, nq, &
+            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+               k, iv%bogus(n)%q(k)%qc, &
+               iv%bogus(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, &
                stats%average%q, stats%rms_err%q)
          end do
-         call da_stats_calculate( oi%bogus(n)%loc%obs_global_index, &
-            0, oi%bogus(n)%slp%qc, &
-            oi%bogus(n)%slp%inv, nslp,  &
+         call da_stats_calculate( iv%bogus(n)%loc%obs_global_index, &
+            0, iv%bogus(n)%slp%qc, &
+            iv%bogus(n)%slp%inv, nslp,  &
             stats%minimum%slp, stats%maximum%slp, &
             stats%average%slp, stats%rms_err%slp)
       end if

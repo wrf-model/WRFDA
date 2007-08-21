@@ -1,4 +1,4 @@
-subroutine da_read_bufr (ob, xp, filename)
+subroutine da_read_bufr (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read BUFR observation file for input to wrfvar
@@ -7,7 +7,7 @@ subroutine da_read_bufr (ob, xp, filename)
    implicit none
 
    type (xpose_type),          intent(in)    :: xp ! Domain decomposition vars
-   type (iv_type),             intent(inout) :: ob
+   type (iv_type),             intent(inout) :: iv
    character(len=*), optional, intent(in)    :: filename
 
 #ifdef BUFR
@@ -35,8 +35,8 @@ subroutine da_read_bufr (ob, xp, filename)
 
    if (trace_use) call da_trace_entry("da_read_bufr")
 
-   nlocal(:) = ob%plocal(ob%time-1,:)
-   ntotal(:) = ob%ptotal(ob%time-1,:)
+   nlocal(:) = iv%plocal(iv%time-1,:)
+   ntotal(:) = iv%ptotal(iv%time-1,:)
 
    ! open file
    !  ---------
@@ -434,8 +434,8 @@ subroutine da_read_bufr (ob, xp, filename)
                ! bit-for-bit tests with different numbers of MPI tasks.
                platform%loc%obs_global_index = ntotal(sound)
 
-               ob%sonde_sfc(nlocal(sound))%info = platform%info
-               ob%sonde_sfc(nlocal(sound))%loc  = platform%loc
+               iv%sonde_sfc(nlocal(sound))%info = platform%info
+               iv%sonde_sfc(nlocal(sound))%loc  = platform%loc
 
                ! Search to see if we have surface obs.
 
@@ -448,59 +448,59 @@ subroutine da_read_bufr (ob, xp, filename)
                      surface_level = i
 
                      ! Save surface pressure.
-                     ob%sonde_sfc(nlocal(sound))%h = platform%each(i)%height
-                     ob%sonde_sfc(nlocal(sound))%u = platform%each(i)%u
-                     ob%sonde_sfc(nlocal(sound))%v = platform%each(i)%v
-                     ob%sonde_sfc(nlocal(sound))%t = platform%each(i)%t
-                     ob%sonde_sfc(nlocal(sound))%q = platform%each(i)%q
-                     ob%sonde_sfc(nlocal(sound))%p = platform%each(i)%p
+                     iv%sonde_sfc(nlocal(sound))%h = platform%each(i)%height
+                     iv%sonde_sfc(nlocal(sound))%u = platform%each(i)%u
+                     iv%sonde_sfc(nlocal(sound))%v = platform%each(i)%v
+                     iv%sonde_sfc(nlocal(sound))%t = platform%each(i)%t
+                     iv%sonde_sfc(nlocal(sound))%q = platform%each(i)%q
+                     iv%sonde_sfc(nlocal(sound))%p = platform%each(i)%p
                      exit
                   end if
                end do
 
                ! processing the sound_sfc data:
 
-               ob%sound(nlocal(sound))%info = platform%info
-               ob%sound(nlocal(sound))%loc  = platform%loc
+               iv%sound(nlocal(sound))%info = platform%info
+               iv%sound(nlocal(sound))%loc  = platform%loc
 
                if (surface_level > 0) then
                   nlevels = nlevels - 1
                else
-                  ob%sonde_sfc(nlocal(sound))%h = missing_r
-                  ob%sonde_sfc(nlocal(sound))%u%inv   = missing_r
-                  ob%sonde_sfc(nlocal(sound))%u%qc    = missing
-                  ob%sonde_sfc(nlocal(sound))%u%error = abs(missing_r)
-                  ob%sonde_sfc(nlocal(sound))%v = ob%sonde_sfc(nlocal(sound))%u
-                  ob%sonde_sfc(nlocal(sound))%t = ob%sonde_sfc(nlocal(sound))%u
-                  ob%sonde_sfc(nlocal(sound))%p = ob%sonde_sfc(nlocal(sound))%u
-                  ob%sonde_sfc(nlocal(sound))%q = ob%sonde_sfc(nlocal(sound))%u
+                  iv%sonde_sfc(nlocal(sound))%h = missing_r
+                  iv%sonde_sfc(nlocal(sound))%u%inv   = missing_r
+                  iv%sonde_sfc(nlocal(sound))%u%qc    = missing
+                  iv%sonde_sfc(nlocal(sound))%u%error = abs(missing_r)
+                  iv%sonde_sfc(nlocal(sound))%v = iv%sonde_sfc(nlocal(sound))%u
+                  iv%sonde_sfc(nlocal(sound))%t = iv%sonde_sfc(nlocal(sound))%u
+                  iv%sonde_sfc(nlocal(sound))%p = iv%sonde_sfc(nlocal(sound))%u
+                  iv%sonde_sfc(nlocal(sound))%q = iv%sonde_sfc(nlocal(sound))%u
                end if
 
                if (nlevels < 1) cycle reports
 
-               allocate (ob%sound(nlocal(sound))%h (1:nlevels))
-               allocate (ob%sound(nlocal(sound))%p (1:nlevels))
-               allocate (ob%sound(nlocal(sound))%zk(1:nlevels))
-               allocate (ob%sound(nlocal(sound))%u (1:nlevels))
-               allocate (ob%sound(nlocal(sound))%v (1:nlevels))
-               allocate (ob%sound(nlocal(sound))%t (1:nlevels))
-               allocate (ob%sound(nlocal(sound))%q (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%h (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%p (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%zk(1:nlevels))
+               allocate (iv%sound(nlocal(sound))%u (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%v (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%t (1:nlevels))
+               allocate (iv%sound(nlocal(sound))%q (1:nlevels))
 
                j = 0
-               do i = 1, ob%sound(nlocal(sound))%info%levels
+               do i = 1, iv%sound(nlocal(sound))%info%levels
                   if (i == surface_level) cycle
 
                   j=j+1
 
-                  ob%sound(nlocal(sound))%h(j) = platform%each(i)%height
-                  ob%sound(nlocal(sound))%p(j) = platform%each(i)%p%inv
-                  ob%sound(nlocal(sound))%u(j) = platform%each(i)%u
-                  ob%sound(nlocal(sound))%v(j) = platform%each(i)%v
-                  ob%sound(nlocal(sound))%t(j) = platform%each(i)%t
-                  ob%sound(nlocal(sound))%q(j) = platform%each(i)%q
+                  iv%sound(nlocal(sound))%h(j) = platform%each(i)%height
+                  iv%sound(nlocal(sound))%p(j) = platform%each(i)%p%inv
+                  iv%sound(nlocal(sound))%u(j) = platform%each(i)%u
+                  iv%sound(nlocal(sound))%v(j) = platform%each(i)%v
+                  iv%sound(nlocal(sound))%t(j) = platform%each(i)%t
+                  iv%sound(nlocal(sound))%q(j) = platform%each(i)%q
                end do
 
-               ob%sound(nlocal(sound))%info%levels = nlevels
+               iv%sound(nlocal(sound))%info%levels = nlevels
             case (221) ;           ! Pilot 
                ntotal(pilot) = ntotal(pilot) + 1
                if (outside) then
@@ -513,18 +513,18 @@ subroutine da_read_bufr (ob, xp, filename)
                   ! bit-for-bit tests with different numbers of MPI tasks.
                   platform%loc%obs_global_index = ntotal(pilot)
 
-                  ob%pilot(nlocal(pilot))%info = platform%info
-                  ob%pilot(nlocal(pilot))%loc  = platform%loc
+                  iv%pilot(nlocal(pilot))%info = platform%info
+                  iv%pilot(nlocal(pilot))%loc  = platform%loc
 
-                  allocate (ob%pilot(nlocal(pilot))%p (1:nlevels))
-                  allocate (ob%pilot(nlocal(pilot))%zk(1:nlevels))
-                  allocate (ob%pilot(nlocal(pilot))%u (1:nlevels))
-                  allocate (ob%pilot(nlocal(pilot))%v (1:nlevels))
+                  allocate (iv%pilot(nlocal(pilot))%p (1:nlevels))
+                  allocate (iv%pilot(nlocal(pilot))%zk(1:nlevels))
+                  allocate (iv%pilot(nlocal(pilot))%u (1:nlevels))
+                  allocate (iv%pilot(nlocal(pilot))%v (1:nlevels))
 
                   do i = 1, nlevels
-                     ob%pilot(nlocal(pilot))%p(i) = platform%each(i)%p%inv
-                     ob%pilot(nlocal(pilot))%u(i) = platform%each(i)%u
-                     ob%pilot(nlocal(pilot))%v(i) = platform%each(i)%v
+                     iv%pilot(nlocal(pilot))%p(i) = platform%each(i)%p%inv
+                     iv%pilot(nlocal(pilot))%u(i) = platform%each(i)%u
+                     iv%pilot(nlocal(pilot))%v(i) = platform%each(i)%v
                   end do
             end select
 
@@ -543,24 +543,24 @@ subroutine da_read_bufr (ob, xp, filename)
             ! bit-for-bit tests with different numbers of MPI tasks.  
             platform%loc%obs_global_index = ntotal(airep)
 
-            ob % airep (nlocal(airep)) % info = platform % info
-            ob % airep (nlocal(airep)) % loc  = platform % loc
+            iv % airep (nlocal(airep)) % info = platform % info
+            iv % airep (nlocal(airep)) % loc  = platform % loc
 
-            nlevels= ob % airep (nlocal(airep)) % info % levels
-            allocate (ob % airep (nlocal(airep)) % h (1:nlevels))
-            allocate (ob % airep (nlocal(airep)) % p (1:nlevels))
-            allocate (ob % airep (nlocal(airep)) % zk(1:nlevels))
-            allocate (ob % airep (nlocal(airep)) % u (1:nlevels))
-            allocate (ob % airep (nlocal(airep)) % v (1:nlevels))
-            allocate (ob % airep (nlocal(airep)) % t (1:nlevels))
+            nlevels= iv % airep (nlocal(airep)) % info % levels
+            allocate (iv % airep (nlocal(airep)) % h (1:nlevels))
+            allocate (iv % airep (nlocal(airep)) % p (1:nlevels))
+            allocate (iv % airep (nlocal(airep)) % zk(1:nlevels))
+            allocate (iv % airep (nlocal(airep)) % u (1:nlevels))
+            allocate (iv % airep (nlocal(airep)) % v (1:nlevels))
+            allocate (iv % airep (nlocal(airep)) % t (1:nlevels))
 
             do i = 1, nlevels
-               ob % airep (nlocal(airep)) % h(i) = platform % each(i) % height
-               ob % airep (nlocal(airep)) % p(i) = platform % each(i) % p % inv
-               ob % airep (nlocal(airep)) % u(i) = platform % each(i) % u
-               ob % airep (nlocal(airep)) % v(i) = platform % each(i) % v
-               ob % airep (nlocal(airep)) % t(i) = platform % each(i) % t
-               ob % airep (nlocal(airep)) %zk(i) = platform % each(i) % zk
+               iv % airep (nlocal(airep)) % h(i) = platform % each(i) % height
+               iv % airep (nlocal(airep)) % p(i) = platform % each(i) % p % inv
+               iv % airep (nlocal(airep)) % u(i) = platform % each(i) % u
+               iv % airep (nlocal(airep)) % v(i) = platform % each(i) % v
+               iv % airep (nlocal(airep)) % t(i) = platform % each(i) % t
+               iv % airep (nlocal(airep)) %zk(i) = platform % each(i) % zk
             end do
 
             ! case (180, 182, 280, 282) ;         ! Ships and  buoys
@@ -579,18 +579,18 @@ subroutine da_read_bufr (ob, xp, filename)
             ! bit-for-bit tests with different numbers of MPI tasks.  
             platform%loc%obs_global_index = ntotal(ships)
 
-            ob % ships (nlocal(ships)) % info = platform % info
-            ob % ships (nlocal(ships)) % loc  = platform % loc
+            iv % ships (nlocal(ships)) % info = platform % info
+            iv % ships (nlocal(ships)) % loc  = platform % loc
 
-            ob % ships (nlocal(ships)) % h = platform % each(1) % height
-            ob % ships (nlocal(ships)) % u = platform % each(1) % u
-            ob % ships (nlocal(ships)) % v = platform % each(1) % v
-            ob % ships (nlocal(ships)) % t = platform % each(1) % t
+            iv % ships (nlocal(ships)) % h = platform % each(1) % height
+            iv % ships (nlocal(ships)) % u = platform % each(1) % u
+            iv % ships (nlocal(ships)) % v = platform % each(1) % v
+            iv % ships (nlocal(ships)) % t = platform % each(1) % t
             ! WHY?
-            ! ob % ships (nlocal(ships)) % p = platform % loc     % slp
-            ob % ships (nlocal(ships)) % p = platform % each(1) % p
-            ob % ships (nlocal(ships)) % q = platform % each(1) % q
-            ob % ships (nlocal(ships)) % zk= platform % each(1) % zk
+            ! iv % ships (nlocal(ships)) % p = platform % loc     % slp
+            iv % ships (nlocal(ships)) % p = platform % each(1) % p
+            iv % ships (nlocal(ships)) % q = platform % each(1) % q
+            iv % ships (nlocal(ships)) % zk= platform % each(1) % zk
 
          case (531, 561, 562) ;          ! Buoy  
             ntotal(buoy) = ntotal(buoy) + 1
@@ -603,15 +603,15 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(buoy)  = nlocal(buoy)  + 1
             platform%loc%obs_global_index = ntotal(buoy)
 
-            ob%buoy(nlocal(buoy))%info = platform%info
-            ob%buoy(nlocal(buoy))%loc  = platform%loc
+            iv%buoy(nlocal(buoy))%info = platform%info
+            iv%buoy(nlocal(buoy))%loc  = platform%loc
 
-            ob%buoy(nlocal(buoy))%h = platform%each(1)%height
-            ob%buoy(nlocal(buoy))%u = platform%each(1)%u
-            ob%buoy(nlocal(buoy))%v = platform%each(1)%v
-            ob%buoy(nlocal(buoy))%t = platform%each(1)%t
-            ob%buoy(nlocal(buoy))%p = platform%each(1)%p
-            ob%buoy(nlocal(buoy))%q = platform%each(1)%q
+            iv%buoy(nlocal(buoy))%h = platform%each(1)%height
+            iv%buoy(nlocal(buoy))%u = platform%each(1)%u
+            iv%buoy(nlocal(buoy))%v = platform%each(1)%v
+            iv%buoy(nlocal(buoy))%t = platform%each(1)%t
+            iv%buoy(nlocal(buoy))%p = platform%each(1)%p
+            iv%buoy(nlocal(buoy))%q = platform%each(1)%q
 
          case (511)
             ! case (181, 281) ;                   ! Synop
@@ -628,21 +628,21 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(synop)  = nlocal(synop)  + 1
             platform%loc%obs_global_index = ntotal(synop)
 
-            ob % synop (nlocal(synop)) % info = platform % info
-            ob % synop (nlocal(synop)) % loc  = platform % loc
+            iv % synop (nlocal(synop)) % info = platform % info
+            iv % synop (nlocal(synop)) % loc  = platform % loc
 
-            ob % synop (nlocal(synop)) % h = platform % each(1) % height
-            ob % synop (nlocal(synop)) % u = platform % each(1) % u
-            ob % synop (nlocal(synop)) % v = platform % each(1) % v
-            ob % synop (nlocal(synop)) % t = platform % each(1) % t
+            iv % synop (nlocal(synop)) % h = platform % each(1) % height
+            iv % synop (nlocal(synop)) % u = platform % each(1) % u
+            iv % synop (nlocal(synop)) % v = platform % each(1) % v
+            iv % synop (nlocal(synop)) % t = platform % each(1) % t
             ! WHY?
-            ! ob % synop (nlocal(synop)) % p = platform % loc     % slp
-            ob % synop (nlocal(synop)) % p = platform % each(1) % p
-            ob % synop (nlocal(synop)) % q = platform % each(1) % q
-            ob % synop (nlocal(synop)) % zk= platform % each(1) % zk
+            ! iv % synop (nlocal(synop)) % p = platform % loc     % slp
+            iv % synop (nlocal(synop)) % p = platform % each(1) % p
+            iv % synop (nlocal(synop)) % q = platform % each(1) % q
+            iv % synop (nlocal(synop)) % zk= platform % each(1) % zk
 
-            if (ob % synop(nlocal(synop)) % h < ob % synop (nlocal(synop)) % info % elv) then
-               ob % synop(nlocal(synop)) % h = ob % synop (nlocal(synop)) % info % elv
+            if (iv % synop(nlocal(synop)) % h < iv % synop (nlocal(synop)) % info % elv) then
+               iv % synop(nlocal(synop)) % h = iv % synop (nlocal(synop)) % info % elv
             end if
 
          case (512)
@@ -658,16 +658,16 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(metar)  = nlocal(metar)  + 1
             platform%loc%obs_global_index = ntotal(metar)
 
-            ob % metar (nlocal(metar)) % info = platform % info
-            ob % metar (nlocal(metar)) % loc  = platform % loc
+            iv % metar (nlocal(metar)) % info = platform % info
+            iv % metar (nlocal(metar)) % loc  = platform % loc
 
-            ob % metar (nlocal(metar)) % h = platform % each(1) % height
-            ob % metar (nlocal(metar)) % u = platform % each(1) % u
-            ob % metar (nlocal(metar)) % v = platform % each(1) % v
-            ob % metar (nlocal(metar)) % t = platform % each(1) % t
-            ob % metar (nlocal(metar)) % p = platform % each(1) % p
-            ob % metar (nlocal(metar)) % q = platform % each(1) % q
-            ob % metar (nlocal(metar)) % zk= platform % each(1) % zk
+            iv % metar (nlocal(metar)) % h = platform % each(1) % height
+            iv % metar (nlocal(metar)) % u = platform % each(1) % u
+            iv % metar (nlocal(metar)) % v = platform % each(1) % v
+            iv % metar (nlocal(metar)) % t = platform % each(1) % t
+            iv % metar (nlocal(metar)) % p = platform % each(1) % p
+            iv % metar (nlocal(metar)) % q = platform % each(1) % q
+            iv % metar (nlocal(metar)) % zk= platform % each(1) % zk
 
          case (63)
             ! case (242:246, 252:253, 255) ;         ! Geo. CMVs
@@ -681,18 +681,18 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(geoamv) = nlocal(geoamv) + 1  
             platform%loc%obs_global_index = ntotal(geoamv)
 
-            ob % geoamv (nlocal(geoamv)) % info = platform % info
-            ob % geoamv (nlocal(geoamv)) % loc  = platform % loc
-            allocate (ob%geoamv(nlocal(geoamv))%p (1:nlevels))
-            allocate (ob%geoamv(nlocal(geoamv))%zk(1:nlevels))
-            allocate (ob%geoamv(nlocal(geoamv))%u (1:nlevels))
-            allocate (ob%geoamv(nlocal(geoamv))%v (1:nlevels))
+            iv % geoamv (nlocal(geoamv)) % info = platform % info
+            iv % geoamv (nlocal(geoamv)) % loc  = platform % loc
+            allocate (iv%geoamv(nlocal(geoamv))%p (1:nlevels))
+            allocate (iv%geoamv(nlocal(geoamv))%zk(1:nlevels))
+            allocate (iv%geoamv(nlocal(geoamv))%u (1:nlevels))
+            allocate (iv%geoamv(nlocal(geoamv))%v (1:nlevels))
 
             do i = 1, nlevels
-               ob % geoamv (nlocal(geoamv)) % p(i)  = platform % each(i) % p % inv
-               ob % geoamv (nlocal(geoamv)) % u(i)  = platform % each(i) % u
-               ob % geoamv (nlocal(geoamv)) % v(i)  = platform % each(i) % v
-                  ob % geoamv (nlocal(geoamv)) %zk(i)  = platform % each(i) % zk
+               iv % geoamv (nlocal(geoamv)) % p(i)  = platform % each(i) % p % inv
+               iv % geoamv (nlocal(geoamv)) % u(i)  = platform % each(i) % u
+               iv % geoamv (nlocal(geoamv)) % v(i)  = platform % each(i) % v
+                  iv % geoamv (nlocal(geoamv)) %zk(i)  = platform % each(i) % zk
             end do
 
          case (582)
@@ -706,17 +706,17 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(qscat) = nlocal(qscat)  + 1 
             platform%loc%obs_global_index = ntotal(qscat)
 
-            ob%qscat(nlocal(qscat))%info = platform%info
-            ob%qscat(nlocal(qscat))%loc  = platform%loc
+            iv%qscat(nlocal(qscat))%info = platform%info
+            iv%qscat(nlocal(qscat))%loc  = platform%loc
             ! WHY?
-            ! ob%qscat(nlocal(qscat))%h = platform%each(1)%height
+            ! iv%qscat(nlocal(qscat))%h = platform%each(1)%height
             ! prepbufr uses pressure not height, so hardwire height to 
             ! 0 (sea-level)
-            ob%qscat(nlocal(qscat))%h = 0.0
-            ob%qscat(nlocal(qscat))%u = platform%each(1)%u
-            ob%qscat(nlocal(qscat))%v = platform%each(1)%v
-            ob%qscat(nlocal(qscat))%u%error = max(platform%each(1)%u%error,1.0)
-            ob%qscat(nlocal(qscat))%v%error = max(platform%each(1)%v%error,1.0)
+            iv%qscat(nlocal(qscat))%h = 0.0
+            iv%qscat(nlocal(qscat))%u = platform%each(1)%u
+            iv%qscat(nlocal(qscat))%v = platform%each(1)%v
+            iv%qscat(nlocal(qscat))%u%error = max(platform%each(1)%u%error,1.0)
+            iv%qscat(nlocal(qscat))%v%error = max(platform%each(1)%v%error,1.0)
 
          case (583)       ! GPS PW
             ntotal(gpspw) = ntotal(gpspw) + 1
@@ -729,9 +729,9 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(gpspw)  = nlocal(gpspw) + 1
             platform%loc%obs_global_index = ntotal(gpspw)
 
-            ob%gpspw(nlocal(gpspw))%info = platform%info
-            ob%gpspw(nlocal(gpspw))%loc  = platform%loc 
-            ob%gpspw(nlocal(gpspw))%tpw  = platform%loc%pw
+            iv%gpspw(nlocal(gpspw))%info = platform%info
+            iv%gpspw(nlocal(gpspw))%loc  = platform%loc 
+            iv%gpspw(nlocal(gpspw))%tpw  = platform%loc%pw
 
          case (584)       ! GPS REF
             ntotal(gpsref) = ntotal(gpsref) + 1
@@ -744,24 +744,24 @@ subroutine da_read_bufr (ob, xp, filename)
             nlocal(gpsref)  = nlocal(gpsref) + 1
             platform%loc%obs_global_index = ntotal(gpsref)
 
-            ob%gpsref(nlocal(gpsref))%info = platform%info
-            ob%gpsref(nlocal(gpsref))%loc  = platform%loc
+            iv%gpsref(nlocal(gpsref))%info = platform%info
+            iv%gpsref(nlocal(gpsref))%loc  = platform%loc
 
-            allocate (ob%gpsref(nlocal(gpsref))%h (1:nlevels))
-            allocate (ob%gpsref(nlocal(gpsref))%zk(1:nlevels))
-            allocate (ob%gpsref(nlocal(gpsref))%ref(1:nlevels))
-            allocate (ob%gpsref(nlocal(gpsref))%  p(1:nlevels))
-            allocate (ob%gpsref(nlocal(gpsref))%  t(1:nlevels))
-            allocate (ob%gpsref(nlocal(gpsref))%  q(1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%h (1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%zk(1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%ref(1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%  p(1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%  t(1:nlevels))
+            allocate (iv%gpsref(nlocal(gpsref))%  q(1:nlevels))
 
             do i = 1, nlevels
-               ob%gpsref(nlocal(gpsref))%h(i)   = platform%each(i)%height
+               iv%gpsref(nlocal(gpsref))%h(i)   = platform%each(i)%height
                ! u is used to store ref in this routine (ascii version uses td)
-               ob%gpsref(nlocal(gpsref))%ref(i) = platform%each(i)%u
+               iv%gpsref(nlocal(gpsref))%ref(i) = platform%each(i)%u
                ! Keep the retrieved p and t (and q) as "field_type":
-               ob%gpsref(nlocal(gpsref))%p(i)   = platform%each(i)%p
-               ob%gpsref(nlocal(gpsref))%t(i)   = platform%each(i)%t
-               ob%gpsref(nlocal(gpsref))%q(i)   = platform%each(i)%q
+               iv%gpsref(nlocal(gpsref))%p(i)   = platform%each(i)%p
+               iv%gpsref(nlocal(gpsref))%t(i)   = platform%each(i)%t
+               iv%gpsref(nlocal(gpsref))%q(i)   = platform%each(i)%q
             end do
 
          case (71, 72)
@@ -778,18 +778,18 @@ subroutine da_read_bufr (ob, xp, filename)
             ! tests with different numbers of MPI tasks.  
             platform%loc%obs_global_index = ntotal(profiler)
 
-            ob%profiler(nlocal(profiler))%info = platform%info
-            ob%profiler(nlocal(profiler))%loc  = platform%loc
+            iv%profiler(nlocal(profiler))%info = platform%info
+            iv%profiler(nlocal(profiler))%loc  = platform%loc
 
-            allocate (ob%profiler(nlocal(profiler))%p (1:nlevels))
-            allocate (ob%profiler(nlocal(profiler))%zk(1:nlevels))
-            allocate (ob%profiler(nlocal(profiler))%u (1:nlevels))
-            allocate (ob%profiler(nlocal(profiler))%v (1:nlevels))
+            allocate (iv%profiler(nlocal(profiler))%p (1:nlevels))
+            allocate (iv%profiler(nlocal(profiler))%zk(1:nlevels))
+            allocate (iv%profiler(nlocal(profiler))%u (1:nlevels))
+            allocate (iv%profiler(nlocal(profiler))%v (1:nlevels))
 
             do i = 1, nlevels
-               ob%profiler(nlocal(profiler))%p(i) = platform%each(i)%p%inv
-               ob%profiler(nlocal(profiler))%u(i) = platform%each(i)%u
-               ob%profiler(nlocal(profiler))%v(i) = platform%each(i)%v
+               iv%profiler(nlocal(profiler))%p(i) = platform%each(i)%p%inv
+               iv%profiler(nlocal(profiler))%u(i) = platform%each(i)%u
+               iv%profiler(nlocal(profiler))%v(i) = platform%each(i)%v
             end do
 
          case default 
@@ -814,27 +814,27 @@ subroutine da_read_bufr (ob, xp, filename)
                  call da_error(__FILE__,__LINE__,message(1:1))
                end if
 
-               ob%bogus(nlocal(bogus))%info = platform%info
-               ob%bogus(nlocal(bogus))%loc  = platform%loc
+               iv%bogus(nlocal(bogus))%info = platform%info
+               iv%bogus(nlocal(bogus))%loc  = platform%loc
 
-               allocate (ob%bogus(nlocal(bogus))%h (1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%p (1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%zk(1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%u (1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%v (1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%t (1:nlevels))
-               allocate (ob%bogus(nlocal(bogus))%q (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%h (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%p (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%zk(1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%u (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%v (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%t (1:nlevels))
+               allocate (iv%bogus(nlocal(bogus))%q (1:nlevels))
 
                do i = 1, nlevels
-                  ob%bogus(nlocal(bogus))%h(i) = platform%each(i)%height
-                  ob%bogus(nlocal(bogus))%p(i) = platform%each(i)%p%inv
-                  ob%bogus(nlocal(bogus))%u(i) = platform%each(i)%u
-                  ob%bogus(nlocal(bogus))%v(i) = platform%each(i)%v
-                  ob%bogus(nlocal(bogus))%t(i) = platform%each(i)%t
-                  ob%bogus(nlocal(bogus))%q(i) = platform%each(i)%q
+                  iv%bogus(nlocal(bogus))%h(i) = platform%each(i)%height
+                  iv%bogus(nlocal(bogus))%p(i) = platform%each(i)%p%inv
+                  iv%bogus(nlocal(bogus))%u(i) = platform%each(i)%u
+                  iv%bogus(nlocal(bogus))%v(i) = platform%each(i)%v
+                  iv%bogus(nlocal(bogus))%t(i) = platform%each(i)%t
+                  iv%bogus(nlocal(bogus))%q(i) = platform%each(i)%q
                end do
 
-               ob%bogus(nlocal(bogus))%slp    = platform%loc%slp
+               iv%bogus(nlocal(bogus))%slp    = platform%loc%slp
 
             case default
                write(unit=message(1), fmt='(a, i12)') &

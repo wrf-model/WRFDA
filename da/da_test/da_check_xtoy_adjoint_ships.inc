@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_ships(oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_ships(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_ships(oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
@@ -14,8 +14,8 @@ subroutine da_check_xtoy_adjoint_ships(oi, y, adjtest_lhs, pertile_lhs)
 
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_ships")
 
-   do n=1, oi%nlocal(ships)
-      if (oi%ships(n)%zk < 1.0) then
+   do n=1, iv%nlocal(ships)
+      if (iv%ships(n)%zk < 1.0) then
          y%ships(n)%u = 0.0
          y%ships(n)%v = 0.0
          y%ships(n)%t = 0.0
@@ -31,7 +31,7 @@ subroutine da_check_xtoy_adjoint_ships(oi, y, adjtest_lhs, pertile_lhs)
       y%ships(n)%p = y%ships(n)%p/typical_p_rms
       y%ships(n)%q = y%ships(n)%q/typical_q_rms
 
-      if (oi%ships(n)%loc%proc_domain) then
+      if (iv%ships(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
             + (y%ships(n)%u)**2 &
             + (y%ships(n)%v)**2 &

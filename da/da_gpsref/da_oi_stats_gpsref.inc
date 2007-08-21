@@ -1,4 +1,4 @@
-subroutine da_oi_stats_gpsref (stats_unit, oi)
+subroutine da_oi_stats_gpsref (stats_unit, iv)
 
    ! -------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_gpsref (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_gpsref_type) :: stats
    integer                  :: ngpsref
@@ -23,12 +23,12 @@ subroutine da_oi_stats_gpsref (stats_unit, oi)
    stats%average = residual_gpsref1_type(0.0,0.0,0.0,0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(gpsref)
-      if (oi%gpsref(n)%loc%proc_domain) then
-         do k=1, oi%gpsref(n)%info%levels
-            call da_stats_calculate(oi%gpsref(n)%loc%obs_global_index, &
-               k, oi%gpsref(n)%ref(k)%qc, &
-               oi%gpsref(n)%ref(k)%inv, ngpsref, &
+   do n=1, iv%nlocal(gpsref)
+      if (iv%gpsref(n)%loc%proc_domain) then
+         do k=1, iv%gpsref(n)%info%levels
+            call da_stats_calculate(iv%gpsref(n)%loc%obs_global_index, &
+               k, iv%gpsref(n)%ref(k)%qc, &
+               iv%gpsref(n)%ref(k)%inv, ngpsref, &
                stats%minimum%ref, stats%maximum%ref, &
                stats%average%ref, stats%rms_err%ref)
          end do

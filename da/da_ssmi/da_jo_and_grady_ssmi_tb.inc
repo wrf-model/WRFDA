@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_ssmi_tb(iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
 
    implicit none
 
-   type (iv_type), intent(in)    :: oi          ! Ob Inc. structure.
+   type (iv_type), intent(in)    :: iv          ! Ob Inc. structure.
    type (y_type),  intent(in)    :: re          ! Residual structure.
    type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
    type (jo_type), intent(out)   :: jo          ! Obs cost function.
@@ -23,30 +23,30 @@ subroutine da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
    jo % ssmi_tb85v = 0.0
    jo % ssmi_tb85h = 0.0
 
-   do n=1, oi%nlocal(ssmi_tb)
+   do n=1, iv%nlocal(ssmi_tb)
 
       jo_grad_y%ssmi_tb(n)%tb19v = - re%ssmi_tb(n)%tb19v / &
-         (oi%ssmi_tb(n)%tb19v%error * oi%ssmi_tb(n)%tb19v%error)
+         (iv%ssmi_tb(n)%tb19v%error * iv%ssmi_tb(n)%tb19v%error)
 
       jo_grad_y%ssmi_tb(n)%tb19h = - re%ssmi_tb(n)%tb19h / &
-          (oi%ssmi_tb(n)%tb19h%error * oi%ssmi_tb(n)%tb19h%error)
+          (iv%ssmi_tb(n)%tb19h%error * iv%ssmi_tb(n)%tb19h%error)
 
       jo_grad_y%ssmi_tb(n)%tb22v = - re%ssmi_tb(n)%tb22v / &
-         (oi%ssmi_tb(n)%tb22v%error * oi%ssmi_tb(n)%tb22v%error)
+         (iv%ssmi_tb(n)%tb22v%error * iv%ssmi_tb(n)%tb22v%error)
 
       jo_grad_y%ssmi_tb(n)%tb37v = - re%ssmi_tb(n)%tb37v / &
-         (oi%ssmi_tb(n)%tb37v%error * oi%ssmi_tb(n)%tb37v%error)
+         (iv%ssmi_tb(n)%tb37v%error * iv%ssmi_tb(n)%tb37v%error)
 
       jo_grad_y%ssmi_tb(n)%tb37h = - re%ssmi_tb(n)%tb37h / &
-         (oi%ssmi_tb(n)%tb37h%error * oi%ssmi_tb(n)%tb37h%error)
+         (iv%ssmi_tb(n)%tb37h%error * iv%ssmi_tb(n)%tb37h%error)
 
       jo_grad_y%ssmi_tb(n)%tb85v = - re%ssmi_tb(n)%tb85v / &
-         (oi%ssmi_tb(n)%tb85v%error * oi%ssmi_tb(n)%tb85v%error)
+         (iv%ssmi_tb(n)%tb85v%error * iv%ssmi_tb(n)%tb85v%error)
 
       jo_grad_y%ssmi_tb(n)%tb85h = - re%ssmi_tb(n)%tb85h / &
-         (oi%ssmi_tb(n)%tb85h%error * oi%ssmi_tb(n)%tb85h%error)
+         (iv%ssmi_tb(n)%tb85h%error * iv%ssmi_tb(n)%tb85h%error)
 
-      if (oi%ssmi_tb(n)%loc%proc_domain) then
+      if (iv%ssmi_tb(n)%loc%proc_domain) then
          jo % ssmi_tb19v = jo % ssmi_tb19v - re%ssmi_tb(n)%tb19v * jo_grad_y%ssmi_tb(n)%tb19v 
          jo % ssmi_tb19h = jo % ssmi_tb19h - re%ssmi_tb(n)%tb19h * jo_grad_y%ssmi_tb(n)%tb19h
          jo % ssmi_tb22v = jo % ssmi_tb22v - re%ssmi_tb(n)%tb22v * jo_grad_y%ssmi_tb(n)%tb22v

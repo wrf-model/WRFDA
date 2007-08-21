@@ -41,7 +41,7 @@ subroutine da_oi_stats_rad ( stats_unit, iv )
                   rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                   rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
 
-            end if          ! end if( oi%sound(n)%loc%proc_domain )
+            end if          ! end if( iv%sound(n)%loc%proc_domain )
          end do                                 !! end loop for pixels
       end do                        !  end loop for channels
    end do                         !  end loop for sensor

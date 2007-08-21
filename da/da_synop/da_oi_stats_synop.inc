@@ -1,4 +1,4 @@
-subroutine da_oi_stats_synop (stats_unit, oi)
+subroutine da_oi_stats_synop (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_synop (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_synop_type) :: stats
    integer                 :: nu, nv, nt, np, nq
@@ -35,31 +35,31 @@ subroutine da_oi_stats_synop (stats_unit, oi)
    stats%average = residual_synop1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(synop)
-      if (oi%synop(n)%loc%proc_domain) then
-        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-           0, oi%synop(n)%u%qc, &
-           oi%synop(n)%u%inv, nu, &
+   do n=1, iv%nlocal(synop)
+      if (iv%synop(n)%loc%proc_domain) then
+        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+           0, iv%synop(n)%u%qc, &
+           iv%synop(n)%u%inv, nu, &
            stats%minimum%u, stats%maximum%u, &
            stats%average%u, stats%rms_err%u)
-        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-           0, oi%synop(n)%v%qc, &
-           oi%synop(n)%v%inv, nv, &
+        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+           0, iv%synop(n)%v%qc, &
+           iv%synop(n)%v%inv, nv, &
            stats%minimum%v, stats%maximum%v, &
            stats%average%v, stats%rms_err%v)
-        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-           0, oi%synop(n)%t%qc, &
-           oi%synop(n)%t%inv, nt, &
+        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+           0, iv%synop(n)%t%qc, &
+           iv%synop(n)%t%inv, nt, &
            stats%minimum%t, stats%maximum%t, &
            stats%average%t, stats%rms_err%t)
-        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-           0, oi%synop(n)%p%qc, &
-           oi%synop(n)%p%inv, np, &
+        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+           0, iv%synop(n)%p%qc, &
+           iv%synop(n)%p%inv, np, &
            stats%minimum%p, stats%maximum%p, &
            stats%average%p, stats%rms_err%p)
-        call da_stats_calculate(oi%synop(n)%loc%obs_global_index, &
-            0, oi%synop(n)%q%qc, &
-            oi%synop(n)%q%inv, nq, &
+        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+            0, iv%synop(n)%q%qc, &
+            iv%synop(n)%q%inv, nq, &
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
       end if
@@ -105,16 +105,16 @@ subroutine da_oi_stats_synop (stats_unit, oi)
          ! min_val = -50.0
          ! max_val = 50.0
          ! bin_width = 1.0
-         ! call da_data_distribution('synop u ', oi%total(synop), min_val, max_val, &
-         !                            bin_width, oi%synop(:)%u%inv)
-         ! call da_data_distribution('synop v ', oi%total(synop), min_val, max_val, &
-         !                            bin_width, oi%synop(:)%v%inv)
-         ! call da_data_distribution('synop t ', oi%total(synop), min_val, max_val, &
-         !                            bin_width, oi%synop(:)%t%inv)
-         ! call da_data_distribution('synop p ', oi%total(synop), -1000.0, 1000.0, &
-         !                            50.0, oi%synop(:)%p%inv)
-         ! call da_data_distribution('synop q ', oi%total(synop), -0.03, 0.03, &
-         !                               0.001, oi%synop(:)%q%inv)
+         ! call da_data_distribution('synop u ', iv%total(synop), min_val, max_val, &
+         !                            bin_width, iv%synop(:)%u%inv)
+         ! call da_data_distribution('synop v ', iv%total(synop), min_val, max_val, &
+         !                            bin_width, iv%synop(:)%v%inv)
+         ! call da_data_distribution('synop t ', iv%total(synop), min_val, max_val, &
+         !                            bin_width, iv%synop(:)%t%inv)
+         ! call da_data_distribution('synop p ', iv%total(synop), -1000.0, 1000.0, &
+         !                            50.0, iv%synop(:)%p%inv)
+         ! call da_data_distribution('synop q ', iv%total(synop), -0.03, 0.03, &
+         !                               0.001, iv%synop(:)%q%inv)
       end if
    end if
 

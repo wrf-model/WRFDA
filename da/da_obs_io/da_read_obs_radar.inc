@@ -1,4 +1,4 @@
-subroutine da_read_obs_radar (ob, xp, filename)
+subroutine da_read_obs_radar (iv, xp, filename)
 
    !-----------------------------------------------------------------------
    ! Purpose: Read the radar observation file
@@ -7,7 +7,7 @@ subroutine da_read_obs_radar (ob, xp, filename)
    implicit none
 
    type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type (iv_type),    intent(inout) :: ob
+   type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
    character (len = 120)         :: char_total_radar
@@ -26,8 +26,8 @@ subroutine da_read_obs_radar (ob, xp, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_radar")
 
-   nlocal(:) = ob%plocal(ob%time-1,:)
-   ntotal(:) = ob%ptotal(ob%time-1,:)
+   nlocal(:) = iv%plocal(iv%time-1,:)
+   ntotal(:) = iv%ptotal(iv%time-1,:)
  
    ! 1. open file
 
@@ -208,29 +208,29 @@ subroutine da_read_obs_radar (ob, xp, filename)
                if (n==1) ntotal(radar) = ntotal(radar) + 1
                if (outside) cycle reports
                nlocal(radar) = nlocal(radar) + 1
-               if (nlocal(radar) > ob%nlocal(radar)) cycle reports
+               if (nlocal(radar) > iv%nlocal(radar)) cycle reports
 
                platform % loc%obs_global_index = ntotal(radar)
 
-               ob % radar (nlocal(radar)) % stn_loc % lon = platform % stn % lon
-               ob % radar (nlocal(radar)) % stn_loc % lat = platform % stn % lat
-               ob % radar (nlocal(radar)) % stn_loc % elv = platform % stn % elv
+               iv % radar (nlocal(radar)) % stn_loc % lon = platform % stn % lon
+               iv % radar (nlocal(radar)) % stn_loc % lat = platform % stn % lat
+               iv % radar (nlocal(radar)) % stn_loc % elv = platform % stn % elv
 
-               ob % radar (nlocal(radar)) % info = platform % info
-               ob % radar (nlocal(radar)) % loc  = platform % loc
+               iv % radar (nlocal(radar)) % info = platform % info
+               iv % radar (nlocal(radar)) % loc  = platform % loc
 
-               allocate (ob % radar (nlocal(radar)) % height   (1:nlevels))
-               allocate (ob % radar (nlocal(radar)) % height_qc(1:nlevels))
-               allocate (ob % radar (nlocal(radar)) % zk       (1:nlevels))
-               allocate (ob % radar (nlocal(radar)) % rv       (1:nlevels))
-               allocate (ob % radar (nlocal(radar)) % rf       (1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % height   (1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % height_qc(1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % zk       (1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % rv       (1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % rf       (1:nlevels))
 
                do i = 1, nlevels
-                  ob % radar (nlocal(radar)) % height(i)    = platform % each(i) % height
-                  ob % radar (nlocal(radar)) % height_qc(i) = platform % each(i) % height_qc
-                  ob % radar (nlocal(radar)) % zk(i)        = platform % each(i) % zk
-                  ob % radar (nlocal(radar)) % rv(i)        = platform % each(i) % rv
-                  ob % radar (nlocal(radar)) % rf(i)        = platform % each(i) % rf
+                  iv % radar (nlocal(radar)) % height(i)    = platform % each(i) % height
+                  iv % radar (nlocal(radar)) % height_qc(i) = platform % each(i) % height_qc
+                  iv % radar (nlocal(radar)) % zk(i)        = platform % each(i) % zk
+                  iv % radar (nlocal(radar)) % rv(i)        = platform % each(i) % rv
+                  iv % radar (nlocal(radar)) % rf(i)        = platform % each(i) % rf
                end do
 
             case default;

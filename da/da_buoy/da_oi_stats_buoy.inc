@@ -1,4 +1,4 @@
-subroutine da_oi_stats_buoy (stats_unit, oi)
+subroutine da_oi_stats_buoy (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_buoy (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_buoy_type) :: stats	
    integer                :: nu, nv, nt, np, nq
@@ -35,34 +35,34 @@ subroutine da_oi_stats_buoy (stats_unit, oi)
    stats%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(buoy)
-      if (oi%buoy(n)%loc%proc_domain) then
-         call da_stats_calculate(oi%buoy(n)%loc%obs_global_index, &
-            0, oi%buoy(n)%u%qc, &
-            oi%buoy(n)%u%inv, nu, &
+   do n=1, iv%nlocal(buoy)
+      if (iv%buoy(n)%loc%proc_domain) then
+         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+            0, iv%buoy(n)%u%qc, &
+            iv%buoy(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(oi%buoy(n)%loc%obs_global_index, &
-            0, oi%buoy(n)%v%qc, &
-            oi%buoy(n)%v%inv, nv, &
+         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+            0, iv%buoy(n)%v%qc, &
+            iv%buoy(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(oi%buoy(n)%loc%obs_global_index, &
-             0, oi%buoy(n)%t%qc, &
-             oi%buoy(n)%t%inv, nt, &
+         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+             0, iv%buoy(n)%t%qc, &
+             iv%buoy(n)%t%inv, nt, &
              stats%minimum%t, stats%maximum%t, &
              stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(oi%buoy(n)%loc%obs_global_index, &
-            0, oi%buoy(n)%p%qc, &
-            oi%buoy(n)%p%inv, np, &
+         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+            0, iv%buoy(n)%p%qc, &
+            iv%buoy(n)%p%inv, np, &
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
-         call da_stats_calculate(oi%buoy(n)%loc%obs_global_index, &
-             0, oi%buoy(n)%q%qc, &
-             oi%buoy(n)%q%inv, nq, &
+         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+             0, iv%buoy(n)%q%qc, &
+             iv%buoy(n)%q%inv, nq, &
              stats%minimum%q, stats%maximum%q, &
              stats%average%q, stats%rms_err%q)
-      end if    ! end if (oi%buoy(n)%loc%proc_domain)
+      end if    ! end if (iv%buoy(n)%loc%proc_domain)
    end do
 
    ! Do inter-processor communication to gather statistics.

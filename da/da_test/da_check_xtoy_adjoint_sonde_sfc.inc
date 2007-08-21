@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_sonde_sfc(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
@@ -14,8 +14,8 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
 
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sonde_sfc")
 
-   do n=1, oi%nlocal(sound)
-      if (oi%sonde_sfc(n)%zk < 1.0) then
+   do n=1, iv%nlocal(sound)
+      if (iv%sonde_sfc(n)%zk < 1.0) then
          y%sonde_sfc(n)%u = 0.0
          y%sonde_sfc(n)%v = 0.0
          y%sonde_sfc(n)%t = 0.0
@@ -31,7 +31,7 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(oi, y, adjtest_lhs, pertile_lhs)
       y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
       y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
 
-      if (oi%sonde_sfc(n)%loc%proc_domain) then
+      if (iv%sonde_sfc(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
                      + (y%sonde_sfc(n)%u)**2 &
                      + (y%sonde_sfc(n)%v)**2 &

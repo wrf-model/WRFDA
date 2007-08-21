@@ -1,4 +1,4 @@
-subroutine da_scan_obs_ssmi (ob, xp, filename)
+subroutine da_scan_obs_ssmi (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read the header of a SSMI 2.0 GTS observation file
@@ -7,7 +7,7 @@ subroutine da_scan_obs_ssmi (ob, xp, filename)
    implicit none
 
    type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
-   type(iv_type),    intent(inout) :: ob
+   type(iv_type),    intent(inout) :: iv
    character(len=*), intent(in)    :: filename
 
    character (len =  10)        :: fmt_name
@@ -121,19 +121,19 @@ subroutine da_scan_obs_ssmi (ob, xp, filename)
 
       select case(fm)
       case (125) ;
-         if (.not. use_ssmiretrievalobs .or. ob%ntotal(ssmi_rv) == max_ssmi_rv_input) cycle reports
+         if (.not. use_ssmiretrievalobs .or. iv%ntotal(ssmi_rv) == max_ssmi_rv_input) cycle reports
 
          ! Check if at least one field is present
          if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
             cycle reports
          end if
-         ob % ntotal(ssmi_rv) = ob % ntotal(ssmi_rv) + 1
+         iv % ntotal(ssmi_rv) = iv % ntotal(ssmi_rv) + 1
          if (outside) cycle reports
 
-         ob % nlocal(ssmi_rv) = ob % nlocal(ssmi_rv) + 1
+         iv % nlocal(ssmi_rv) = iv % nlocal(ssmi_rv) + 1
 
       case (126) ;
-         if (.not. use_ssmitbobs .or. ob%ntotal(ssmi_tb) == max_ssmi_tb_input) cycle reports
+         if (.not. use_ssmitbobs .or. iv%ntotal(ssmi_tb) == max_ssmi_tb_input) cycle reports
 
          ! Check if at least one field is present
 
@@ -159,9 +159,9 @@ subroutine da_scan_obs_ssmi (ob, xp, filename)
             end if
          end if
 
-         ob % ntotal(ssmi_tb) = ob % ntotal(ssmi_tb) + 1
+         iv % ntotal(ssmi_tb) = iv % ntotal(ssmi_tb) + 1
          if (outside) cycle reports
-         ob % nlocal(ssmi_tb) = ob % nlocal(ssmi_tb) + 1
+         iv % nlocal(ssmi_tb) = iv % nlocal(ssmi_tb) + 1
 
       case default;
          ! Do nothing.
@@ -177,8 +177,8 @@ subroutine da_scan_obs_ssmi (ob, xp, filename)
       write(unit=stdout, fmt='(A)') ' '
    end if
 
-   ob%plocal(ob%time,:) = ob%nlocal(:)
-   ob%ptotal(ob%time,:) = ob%ntotal(:)
+   iv%plocal(iv%time,:) = iv%nlocal(:)
+   iv%ptotal(iv%time,:) = iv%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_obs_ssmi")
 

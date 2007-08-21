@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_bogus(oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_bogus(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_bogus(oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
@@ -14,9 +14,9 @@ subroutine da_check_xtoy_adjoint_bogus(oi, y, adjtest_lhs, pertile_lhs)
    
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_bogus")
 
-   do n=1, oi%nlocal(bogus)
-      if (oi%bogus(n)%loc%proc_domain) then
-         do k=1, oi%bogus(n)%info%levels
+   do n=1, iv%nlocal(bogus)
+      if (iv%bogus(n)%loc%proc_domain) then
+         do k=1, iv%bogus(n)%info%levels
             adjtest_lhs = adjtest_lhs + &
                           (y%bogus(n)%u(k)/typical_u_rms)**2 + &
                           (y%bogus(n)%v(k)/typical_v_rms)**2 + &
@@ -26,7 +26,7 @@ subroutine da_check_xtoy_adjoint_bogus(oi, y, adjtest_lhs, pertile_lhs)
          adjtest_lhs = adjtest_lhs + (y%bogus(n)%slp/typical_p_rms)**2
       end if
 
-      do k=1, oi%bogus(n)%info%levels
+      do k=1, iv%bogus(n)%info%levels
          pertile_lhs = pertile_lhs + &
                        (y%bogus(n)%u(k)/typical_u_rms)**2 + &
                        (y%bogus(n)%v(k)/typical_v_rms)**2 + &

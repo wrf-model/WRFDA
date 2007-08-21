@@ -1,4 +1,4 @@
-subroutine da_oi_stats_gpspw (stats_unit, oi)
+subroutine da_oi_stats_gpspw (stats_unit, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_oi_stats_gpspw (stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_gpspw_type) :: stats
    integer                 :: ntpw
@@ -23,15 +23,15 @@ subroutine da_oi_stats_gpspw (stats_unit, oi)
    stats%average = residual_gpspw1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(gpspw)
-      if (oi%gpspw(n)%loc%proc_domain) then
-         call da_stats_calculate(oi%gpspw(n)%loc%obs_global_index, &
-            0, oi%gpspw(n)%tpw%qc, &
-            oi%gpspw(n)%tpw%inv, ntpw, &
+   do n=1, iv%nlocal(gpspw)
+      if (iv%gpspw(n)%loc%proc_domain) then
+         call da_stats_calculate(iv%gpspw(n)%loc%obs_global_index, &
+            0, iv%gpspw(n)%tpw%qc, &
+            iv%gpspw(n)%tpw%inv, ntpw, &
             stats%minimum%tpw  , stats%maximum%tpw, &
             stats%average%tpw  , stats%rms_err%tpw)
 
-      end if    ! end if (oi%gpspw(n)%loc%proc_domain)
+      end if    ! end if (iv%gpspw(n)%loc%proc_domain)
    end do
 
    ! do inter-processor communication to gather statistics.

@@ -1,4 +1,4 @@
-subroutine da_oi_stats_geoamv(stats_unit, oi)
+subroutine da_oi_stats_geoamv(stats_unit, iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates (Obs - Analysis) statistics for Geo. AMV's
@@ -7,7 +7,7 @@ subroutine da_oi_stats_geoamv(stats_unit, oi)
    implicit none
 
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (in) :: oi            ! OI
+   type (iv_type), intent (in) :: iv            ! OI
 
    type (stats_geoamv_type) :: stats
    integer                  :: nu, nv
@@ -26,21 +26,21 @@ subroutine da_oi_stats_geoamv(stats_unit, oi)
    stats%average = residual_geoamv1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, oi%nlocal(geoamv)
-      if (oi%geoamv(n)%loc%proc_domain) then
-         do k=1, oi%geoamv(n)%info%levels
-            call da_stats_calculate(oi%geoamv(n)%loc%obs_global_index, &
-               0, oi%geoamv(n)%u(k)%qc, &
-               oi%geoamv(n)%u(k)%inv, nu, &
+   do n=1, iv%nlocal(geoamv)
+      if (iv%geoamv(n)%loc%proc_domain) then
+         do k=1, iv%geoamv(n)%info%levels
+            call da_stats_calculate(iv%geoamv(n)%loc%obs_global_index, &
+               0, iv%geoamv(n)%u(k)%qc, &
+               iv%geoamv(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(oi%geoamv(n)%loc%obs_global_index, &
-               0, oi%geoamv(n)%v(k)%qc, &
-               oi%geoamv(n)%v(k)%inv, nv, &
+            call da_stats_calculate(iv%geoamv(n)%loc%obs_global_index, &
+               0, iv%geoamv(n)%v(k)%qc, &
+               iv%geoamv(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
         end do
-     end if    ! end if (oi%geoamv(n)%loc%proc_domain)
+     end if    ! end if (iv%geoamv(n)%loc%proc_domain)
    end do
 
    ! Do inter-processor communication to gather statistics.

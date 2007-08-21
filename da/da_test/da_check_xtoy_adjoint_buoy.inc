@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_buoy(oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_buoy(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,7 @@ subroutine da_check_xtoy_adjoint_buoy(oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
    type (y_type) , intent(inout)  :: y             ! y = h (xa)
    real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
@@ -14,8 +14,8 @@ subroutine da_check_xtoy_adjoint_buoy(oi, y, adjtest_lhs, pertile_lhs)
    
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_buoy")
 
-   do n=1, oi%nlocal(buoy)
-      if (oi%buoy(n)%zk < 1.0) then
+   do n=1, iv%nlocal(buoy)
+      if (iv%buoy(n)%zk < 1.0) then
          y%buoy(n)%u = 0.0
          y%buoy(n)%v = 0.0
          y%buoy(n)%t = 0.0
@@ -31,7 +31,7 @@ subroutine da_check_xtoy_adjoint_buoy(oi, y, adjtest_lhs, pertile_lhs)
       y%buoy(n)%p = y%buoy(n)%p/typical_p_rms
       y%buoy(n)%q = y%buoy(n)%q/typical_q_rms
 
-      if (oi%buoy(n)%loc%proc_domain) then
+      if (iv%buoy(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
                      + (y%buoy(n)%u)**2 &
                      + (y%buoy(n)%v)**2 &
