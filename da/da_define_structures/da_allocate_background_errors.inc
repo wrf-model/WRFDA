@@ -99,7 +99,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
          end if
          if (vert_evalue == vert_evalue_global) then
             ! use global eigenvalues:
-          do k = 1, mz
+          do m = 1, mz
           be_sub % val(1:jy,m) = l(m)
           end do 
          else
