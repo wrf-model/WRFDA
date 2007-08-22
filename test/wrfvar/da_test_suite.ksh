@@ -1,5 +1,7 @@
 # Define for your run
 
+. ./setup.ksh
+
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export EXPT=${ID}_suite_${NUM_PROCS}
 
@@ -12,8 +14,6 @@ export NL_NTMAX=${NL_NTMAX:-2}
 export REG_DIR=$PWD
 export EXP_DIR=$PWD/$EXPT
 export RUN_DIR=$EXP_DIR/run
-
-. ./setup.ksh
 
 export SUBMIT_FLAGS=$SUBMIT_WAIT_FLAG
 
