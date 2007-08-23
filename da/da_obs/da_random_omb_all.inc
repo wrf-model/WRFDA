@@ -11,6 +11,8 @@ subroutine da_random_omb_all(iv, ob)
 
    integer                       :: n, k ! Loop counters.
 
+   if (trace_use) call da_trace_entry("da_random_omb_all")
+
    !----------------------------------------------------------------------
    ! [1.0] Initialise random number sequence:
    !----------------------------------------------------------------------
@@ -331,6 +333,8 @@ subroutine da_random_omb_all(iv, ob)
          end do
       end do
    end if
+
+   if (trace_use) call da_trace_exit("da_random_omb_all")
 
 end subroutine da_random_omb_all
 

@@ -20,6 +20,8 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
    real              :: flp, flpp, r, cell, cel1, cel2
    real              :: rcone_factor, psx, conv
    real              :: cntri, cntrj, x, y, xcntr
+
+   if (trace_use) call da_trace_entry("da_xyll")
    
    conv = 180.0 / pi
 
@@ -30,59 +32,61 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
       return
    end if
 
-   CNTRI = real(coarse_ix+1)/2.0
-   CNTRJ = real(coarse_jy+1)/2.0
+   cntri = real(coarse_ix+1)/2.0
+   cntrj = real(coarse_jy+1)/2.0
 
    xcntr = 0.0
 
-   ! CALCULATE X AND Y POSITIONS OF GRID
+   ! calculate x and y positions of grid
 
    x = (xx - 0.5)*dsm/coarse_ds + start_x
    y = (yy - 0.5)*dsm/coarse_ds + start_y
    x = xcntr + (x-cntri)*coarse_ds
    y = ycntr + (y-cntrj)*coarse_ds
 
-   ! NOW CALCULATE LAT AND LON OF THIS POinT
+   ! now calculate lat and lon of this point
 
-   if (map_projection.NE.3) then
-      if(Y.EQ.0.0) then      
-         if (X.GE.0.0) FLP =  90.0/CONV 
-         if (X.LT.0.0) FLP = -90.0/CONV
+   if (map_projection.ne.3) then
+      if(y.eq.0.0) then      
+         if (x.ge.0.0) flp =  90.0/conv 
+         if (x.lt.0.0) flp = -90.0/conv
       else
-         if (PHIC.LT.0.0)then
-            FLP = ATAN2(X,Y)   
+         if (phic.lt.0.0)then
+            flp = atan2(x,y)   
          else
-            FLP = ATAN2(X,-Y) 
+            flp = atan2(x,-y) 
          end if
       end if 
-      FLPP = (FLP/cone_factor)*CONV+XLONC  
-      if (FLPP.LT.-180.0) FLPP = FLPP + 360.0    
-      if (FLPP.GT.180.0)  FLPP = FLPP - 360.0  
-      XLON = FLPP 
-      ! NOW SOLVE FOR LATITUDE
-      R = sqrt(X*X+Y*Y)  
-      if (PHIC.LT.0.0) R = -R  
-      if (map_projection.EQ.1) then   
-         CELL = (R*cone_factor)/(earth_radius*Sin(PSI1))    
-         Rcone_factor  = 1.0/cone_factor   
-         CEL1 = TAN(PSI1/2.0)*(CELL)**Rcone_factor    
+      flpp = (flp/cone_factor)*conv+xlonc  
+      if (flpp.lt.-180.0) flpp = flpp + 360.0    
+      if (flpp.gt.180.0)  flpp = flpp - 360.0  
+      xlon = flpp 
+      ! now solve for latitude
+      r = sqrt(x*x+y*y)  
+      if (phic.lt.0.0) r = -r  
+      if (map_projection.eq.1) then   
+         cell = (r*cone_factor)/(earth_radius*sin(psi1))    
+         rcone_factor  = 1.0/cone_factor   
+         cel1 = tan(psi1/2.0)*(cell)**rcone_factor    
       end if 
-      if (map_projection.EQ.2) then
-         CELL = R/earth_radius        
-         CEL1 = CELL/(1.0+COS(PSI1))  
+      if (map_projection.eq.2) then
+         cell = r/earth_radius        
+         cel1 = cell/(1.0+cos(psi1))  
       end if 
-      CEL2 = ATAN(CEL1)    
-      PSX  = 2.0*CEL2*CONV
-      XLAT = POLE-PSX 
+      cel2 = atan(cel1)    
+      psx  = 2.0*cel2*conv
+      xlat = pole-psx 
    end if   
-   ! CALCULATIONS FOR MERCATOR LAT,LON    
-   if (map_projection.EQ.3) then   
-      XLON = XLONC + ((X-XCNTR)/C2)*CONV 
-      if (XLON.LT.-180.0) XLON = XLON + 360.0
-      if (XLON.GT.180.0)  XLON = XLON - 360.0
-      CELL = EXP(Y/C2)  
-      XLAT = 2.0*(CONV*ATAN(CELL))-90.0 
+   ! calculations for mercator lat,lon    
+   if (map_projection.eq.3) then   
+      xlon = xlonc + ((x-xcntr)/c2)*conv 
+      if (xlon.lt.-180.0) xlon = xlon + 360.0
+      if (xlon.gt.180.0)  xlon = xlon - 360.0
+      cell = exp(y/c2)  
+      xlat = 2.0*(conv*atan(cell))-90.0 
    end if  
+
+   if (trace_use) call da_trace_exit("da_xyll")
 
 end subroutine da_xyll
 

@@ -9,6 +9,8 @@ subroutine da_random_seed
    integer              :: seed_size
    integer, allocatable :: seed_array(:)
 
+   if (trace_use) call da_trace_entry("da_random_seed")
+
    !----------------------------------------------------------------------------
    !  Check that right seed_size is being used:
    !----------------------------------------------------------------------------
@@ -35,6 +37,8 @@ subroutine da_random_seed
    end if
    
    deallocate(seed_array)
+
+   if (trace_use) call da_trace_exit("da_random_seed")
 
 end subroutine da_random_seed
 

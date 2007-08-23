@@ -19,6 +19,8 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    real                                :: gi2, r2
    real                                :: arccos
 
+   if (trace_use_frequent) call da_trace_entry("da_ijll_ps")
+
    ! Compute the reference longitude by rotating 90 degrees to the east
    ! to find the longitude line parallel to the positive x-axis.
    reflon = proj%stdlon + 90.0
@@ -49,6 +51,8 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    ! Convert to a -180 -> 180 East convention
    if (lon > 180.0) lon = lon - 360.0
    if (lon < -180.0) lon = lon + 360.0
+
+   if (trace_use_frequent) call da_trace_exit("da_ijll_ps")
    
   
 end subroutine da_ijll_ps

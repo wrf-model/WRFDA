@@ -22,6 +22,8 @@ subroutine da_llij_ps(lat,lon,proj,i,j)
    real                           :: alo
    real                           :: rm
 
+   if (trace_use_frequent) call da_trace_entry("da_llij_ps")
+
    reflon = proj%stdlon + 90.0
    
    ! Compute numerator term of map scale factor
@@ -34,6 +36,8 @@ subroutine da_llij_ps(lat,lon,proj,i,j)
    alo = (lon - reflon) * rad_per_deg
    i = proj%polei + rm * COS(alo)
    j = proj%polej + proj%hemi * rm * Sin(alo)
+
+   if (trace_use_frequent) call da_trace_exit("da_llij_ps")
  
 end subroutine da_llij_ps
 

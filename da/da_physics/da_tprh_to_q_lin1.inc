@@ -1,5 +1,4 @@
-subroutine da_tprh_to_q_lin1( t, p, es, q, rh, &
-                              t_prime, p_prime, rh_prime, q_prime )
+subroutine da_tprh_to_q_lin1( t, p, es, q, rh, t_prime, p_prime, rh_prime, q_prime )
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert T/pressure/rh to specific humidity increments.
@@ -9,17 +8,19 @@ subroutine da_tprh_to_q_lin1( t, p, es, q, rh, &
 
    implicit none
 
-   real, intent(in)              :: t        ! Temperature.
-   real, intent(in)              :: p        ! Pressure.
-   real, intent(in)              :: es       ! Saturation vapour pressure.
-   real, intent(in)              :: q        ! Specific humidity.
-   real, intent(in)              :: rh       ! Relative Humidity.
-   real, intent(in)              :: t_prime  ! Temperature increment.
-   real, intent(in)              :: p_prime  ! Pressure increment.
-   real, intent(in)              :: rh_prime ! Pressure increment.
-   real, intent(out)             :: q_prime  ! Pressure increment.
+   real, intent(in)  :: t        ! Temperature.
+   real, intent(in)  :: p        ! Pressure.
+   real, intent(in)  :: es       ! Saturation vapour pressure.
+   real, intent(in)  :: q        ! Specific humidity.
+   real, intent(in)  :: rh       ! Relative Humidity.
+   real, intent(in)  :: t_prime  ! Temperature increment.
+   real, intent(in)  :: p_prime  ! Pressure increment.
+   real, intent(in)  :: rh_prime ! Pressure increment.
+   real, intent(out) :: q_prime  ! Pressure increment.
    
-   real                          :: qs_prime_over_qs ! qs~/qs.
+   real :: qs_prime_over_qs ! qs~/qs.
+
+   if (trace_use) call da_trace_entry("da_tprh_to_q_lin1")
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
@@ -32,6 +33,8 @@ subroutine da_tprh_to_q_lin1( t, p, es, q, rh, &
    !---------------------------------------------------------------------------
 
    q_prime = q * ( rh_prime / rh + qs_prime_over_qs )
+
+   if (trace_use) call da_trace_exit("da_tprh_to_q_lin1")
 
 end subroutine da_tprh_to_q_lin1
 

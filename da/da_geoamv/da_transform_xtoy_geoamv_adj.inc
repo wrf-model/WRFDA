@@ -10,7 +10,9 @@ subroutine da_transform_xtoy_geoamv_adj (iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer                       :: n, k     ! Loop counter.
+   integer :: n, k     ! Loop counter.
+
+   if (trace_use_dull) call da_trace_entry("da_transform_xtoy_geoamv_adj")
 
    do n=iv%plocal(iv%time-1,geoamv)+1, iv%plocal(iv%time,geoamv)
       k = iv % geoamv(n) % info % levels
@@ -18,6 +20,8 @@ subroutine da_transform_xtoy_geoamv_adj (iv, jo_grad_y, jo_grad_x)
       call da_interp_lin_3d_adj(jo_grad_x%u,iv%geoamv(n)%loc, jo_grad_y%geoamv(n)%u,k, iv%geoamv(n)%zk, k)
       call da_interp_lin_3d_adj(jo_grad_x%v,iv%geoamv(n)%loc, jo_grad_y%geoamv(n)%v,k, iv%geoamv(n)%zk, k)
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_transform_xtoy_geoamv_adj")
 
 end subroutine da_transform_xtoy_geoamv_adj
 

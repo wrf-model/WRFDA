@@ -1,4 +1,4 @@
-subroutine da_wdt(H,W,TERR,DT)
+subroutine da_wdt(h,w,terr,dt)
 
    !----------------------------------------------------------------------
    ! Purpose: Calculate DT
@@ -6,12 +6,14 @@ subroutine da_wdt(H,W,TERR,DT)
 
    implicit none
 
-   real, dimension(kts:kte),intent(in)   :: h
-   real, dimension(kts:kte),intent(out)  :: dt
-   real, dimension(kts:kte+1),intent(in) :: w
-   real,intent(in)                       :: terr
+   real, intent(in)  :: h(kts:kte)
+   real, intent(out) :: dt(kts:kte)
+   real, intent(in)  :: w(kts:kte+1)
+   real, intent(in)  :: terr
 
-   integer                     :: k
+   integer :: k
+
+   if (trace_use) call da_trace_entry("da_wdt")
 
    do k=kte,kts+1,-1
       if (w(k) >= 0.1) then
@@ -26,6 +28,8 @@ subroutine da_wdt(H,W,TERR,DT)
    else
       dt(kts)=0.0
    end if
+
+   if (trace_use) call da_trace_exit("da_wdt")
 
 end subroutine da_wdt
 

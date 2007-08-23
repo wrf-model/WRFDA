@@ -7,14 +7,16 @@ subroutine da_tp_to_qs_adj (grid, qs_prime_over_qs )
    implicit none
 
    type (domain), intent(inout)  :: grid
-   real, intent(in) :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
+   real,          intent(in)     :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
 
-   integer                       :: is, ie       ! 1st dim. end points.
-   integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
-   integer                       :: i, j, k      ! Loop counters.
-   real                          :: temp         ! Temporary array.
-   real                          :: es_prime_over_es ! Sat Vap pressure ratio.
+   integer :: is, ie       ! 1st dim. end points.
+   integer :: js, je       ! 2nd dim. end points.
+   integer :: ks, ke       ! 3rd dim. end points.
+   integer :: i, j, k      ! Loop counters.
+   real    :: temp         ! Temporary array.
+   real    :: es_prime_over_es ! Sat Vap pressure ratio.
+
+   if (trace_use) call da_trace_entry("da_tp_to_qs_adj")
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
@@ -64,6 +66,8 @@ subroutine da_tp_to_qs_adj (grid, qs_prime_over_qs )
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_tp_to_qs_adj")
 
 end subroutine da_tp_to_qs_adj
 

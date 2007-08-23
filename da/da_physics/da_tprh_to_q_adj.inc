@@ -8,11 +8,13 @@ subroutine da_tprh_to_q_adj (grid)
 
    type (domain), intent(inout)  :: grid
 
-   integer                       :: is, ie   ! 1st dim. end points.
-   integer                       :: js, je   ! 2nd dim. end points.
-   integer                       :: ks, ke   ! 3rd dim. end points.
-   integer                       :: i, j, k  ! Loop counter.
-   real :: qs_prime_over_qs(its:ite,jts:jte,kts:kte) ! Temp.
+   integer :: is, ie   ! 1st dim. end points.
+   integer :: js, je   ! 2nd dim. end points.
+   integer :: ks, ke   ! 3rd dim. end points.
+   integer :: i, j, k  ! Loop counter.
+   real    :: qs_prime_over_qs(its:ite,jts:jte,kts:kte) ! Temp.
+
+   if (trace_use) call da_trace_entry("da_tprh_to_q_adj")
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
@@ -56,6 +58,8 @@ subroutine da_tprh_to_q_adj (grid)
    !---------------------------------------------------------------------------
 
    call da_tp_to_qs_adj (grid, qs_prime_over_qs )
+
+   if (trace_use) call da_trace_exit("da_tprh_to_q_adj")
 
 end subroutine da_tprh_to_q_adj
 

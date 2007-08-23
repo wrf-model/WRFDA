@@ -15,18 +15,21 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
 
    implicit none
 
-   real,                intent(in)               :: terr, psfc
-   real, dimension(kms:kme), intent(in)    :: t, q, p
-   real,                intent(inout)            :: slp
+   real, intent(in)    :: terr, psfc
+   real, intent(in)    :: t(kms:kme)
+   real, intent(in)    :: q(kms:kme)
+   real, intent(in)    :: p(kms:kme)
+   real, intent(inout) :: slp
 
-   integer              :: k, klo, khi
-   real                 :: pl, t0, ts, xterm,    &
-                           tlo, thi, tl
-                                               
-   real, parameter      :: gamma = 6.5e-3,  &
-                           tc=t_kelvin+17.5,  &
-                           pconst=10000.0 ,  &
-                           eps   = 0.622
+   integer         :: k, klo, khi
+   real            :: pl, t0, ts, xterm,tlo, thi, tl
+                                          
+   real, parameter :: gamma  = 6.5e-3
+   real, parameter :: tc     = t_kelvin+17.5
+   real, parameter :: pconst = 10000.0
+   real, parameter :: eps    = 0.622
+
+   if (trace_use) call da_trace_entry("da_tpq_to_slp")
                                                                        
    ! sea level pressure                                            
                                                                          
@@ -82,6 +85,8 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
    ! compute sea level pressure                                    
 
    slp=psfc*exp(2.0*gravity*terr/(gas_constant*(ts+t0)))
+
+   if (trace_use) call da_trace_exit("da_tpq_to_slp")
 
 end subroutine da_tpq_to_slp
 

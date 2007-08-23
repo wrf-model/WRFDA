@@ -15,6 +15,8 @@ subroutine da_ll_to_xy (info, loc, xp, &
    logical      ,         intent(out)   :: outside      !wrt local domain
    logical, optional,     intent(out)   :: outside_all  !wrt all domains
 
+   if (trace_use_frequent) call da_trace_entry("da_ll_to_xy")
+
    outside = .false.
    loc % x   = -1.0
    loc % y   = -1.0
@@ -93,6 +95,8 @@ subroutine da_ll_to_xy (info, loc, xp, &
          end if
       end if
    end if
+
+   if (trace_use_frequent) call da_trace_exit("da_ll_to_xy")
 
 end subroutine da_ll_to_xy
 

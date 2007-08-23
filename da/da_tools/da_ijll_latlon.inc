@@ -17,6 +17,8 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
    real                         :: latinc
    real                         :: loninc
 
+   if (trace_use_frequent) call da_trace_entry("da_ijll_latlon")
+
    ! Extract the latitude and longitude increments for this grid
    ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
    ! loninc is saved in the stdlon tag and latinc is saved in truelat1
@@ -40,6 +42,8 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
       lon = MOD(lon,360.0)
       if (lon > 180.0) lon = lon -360.0
    end if
+
+   if (trace_use_frequent) call da_trace_exit("da_ijll_latlon")
 
 end subroutine da_ijll_latlon
 

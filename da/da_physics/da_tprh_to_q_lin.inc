@@ -12,6 +12,8 @@ subroutine da_tprh_to_q_lin(grid)
    
    real :: qs_prime_over_qs(its:ite,jts:jte,kts:kte) ! qs~/qs.
 
+   if (trace_use) call da_trace_entry("da_tprh_to_q_lin")
+
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
    !---------------------------------------------------------------------------
@@ -26,6 +28,8 @@ subroutine da_tprh_to_q_lin(grid)
                                ( grid%xa % rh(its:ite,jts:jte,kts:kte) / &
                                  grid%xb % rh(its:ite,jts:jte,kts:kte) + &
                                  qs_prime_over_qs(its:ite,jts:jte,kts:kte) )
+
+   if (trace_use) call da_trace_exit("da_tprh_to_q_lin")
 
 end subroutine da_tprh_to_q_lin
 

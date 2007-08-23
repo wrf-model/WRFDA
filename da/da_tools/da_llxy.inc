@@ -1,11 +1,6 @@
 subroutine da_llxy (xlati,xloni,x,y)
 
    !----------------------------------------------------------------------------
-   !
-   !                 routine llxy
-   !                **************
-   !
-   !
    ! Purpose:  calculates the (x,y) location (dot) in the mesoscale grids
    ! -------   from latitudes and longitudes
    !
@@ -36,6 +31,8 @@ subroutine da_llxy (xlati,xloni,x,y)
    real              :: ratio
    real              :: bb
    real, parameter   :: conv = 180.0 / pi
+
+   if (trace_use_frequent) call da_trace_entry("da_llxy")
    
    xlon = xloni
    xlat = xlati
@@ -103,6 +100,8 @@ subroutine da_llxy (xlati,xloni,x,y)
 
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5
+
+   if (trace_use_frequent) call da_trace_exit("da_llxy")
 
 end subroutine da_llxy
 

@@ -24,6 +24,7 @@ subroutine da_transform_vptovv (evec, eval, vertical_wgt, vp, vv, mz, &
    real    :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
 
    ! Do not add trace, as routine used by gen_be
+   ! if (trace_use) call da_trace_entry("da_transform_vptovv")
    
    !-------------------------------------------------------------------
    ! [1.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0

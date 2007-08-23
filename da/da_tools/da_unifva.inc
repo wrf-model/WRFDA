@@ -30,6 +30,8 @@ real function da_unifva (kdum)
    save NIV,NIY
    DATA NIV /JPNTAB*0/, NIY /0/
 
+   if (trace_use_frequent) call da_trace_entry("da_unifva")
+
    ! begin main
    ! ----------
 
@@ -57,6 +59,8 @@ real function da_unifva (kdum)
    NIY      = NIV(IJJ)
    NIV(IJJ) = KDUM
    DA_UNifVA   = Min(PPAM*NIY , PPRNMX)
+
+   if (trace_use_frequent) call da_trace_exit("da_unifva")
 
 end function da_unifva
 

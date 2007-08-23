@@ -11,6 +11,8 @@ subroutine da_global_ll_to_xy(lat,lon,x,y)
    real, intent(out) :: x, y
 
    real              :: xlat, xlon
+
+   if (trace_use_frequent) call da_trace_entry("da_global_ll_to_xy")
    
    xlat = lat - start_lat
    xlon = lon - start_lon
@@ -20,6 +22,8 @@ subroutine da_global_ll_to_xy(lat,lon,x,y)
 
    x = start_x + xlon/delt_lon
    y = start_y + xlat/delt_lat
+
+   if (trace_use_frequent) call da_trace_exit("da_global_ll_to_xy")
    
 end subroutine da_global_ll_to_xy
 

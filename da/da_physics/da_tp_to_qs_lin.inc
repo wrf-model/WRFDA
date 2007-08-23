@@ -10,12 +10,14 @@ subroutine da_tp_to_qs_lin(grid, qs_prime_over_qs )
 
    implicit none
 
-   type (domain), intent(inout)  :: grid
-   real, intent(out) :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
+   type (domain), intent(inout) :: grid
+   real,          intent(out)   :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
 
-   integer                       :: i, j, k      ! Loop counters.
-   real                          :: temp         ! Temporary array.
-   real                          :: es_prime_over_es ! Sat Vap pressure ratio.
+   integer :: i, j, k      ! Loop counters.
+   real    :: temp         ! Temporary array.
+   real    :: es_prime_over_es ! Sat Vap pressure ratio.
+
+   if (trace_use) call da_trace_entry("da_tp_to_qs_lin")
 
    do k = kts, kte
       do j = jts, jte
@@ -38,6 +40,8 @@ subroutine da_tp_to_qs_lin(grid, qs_prime_over_qs )
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_tp_to_qs_lin")
 
 end subroutine da_tp_to_qs_lin
 

@@ -12,12 +12,14 @@ subroutine da_tp_to_qs1 (grid, es, qs)
 
    implicit none
 
-   type (domain), intent(in)    :: grid
-   real, dimension(its:ite,jts:jte,kts:kte), intent(out):: &
-                                    es, qs
+   type (domain), intent(in)  :: grid
+   real,          intent(out) :: es(its:ite,jts:jte,kts:kte)
+   real,          intent(out) :: qs(its:ite,jts:jte,kts:kte)
 
-   integer                       :: i, j, k      ! Loop counters.
-   real                          :: t_c          ! Working variable.
+   integer :: i, j, k      ! Loop counters.
+   real    :: t_c          ! Working variable.
+
+   if (trace_use) call da_trace_entry("da_tp_to_qs1")
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
@@ -50,6 +52,8 @@ subroutine da_tp_to_qs1 (grid, es, qs)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_tp_to_qs1")
 
 end subroutine da_tp_to_qs1
 

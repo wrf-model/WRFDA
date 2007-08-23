@@ -18,7 +18,11 @@ subroutine da_tpq_to_rh_lin(grid)
    
    type (domain),  intent(inout) ::grid
    
-   real, dimension(its:ite,jts:jte,kts:kte) :: qs, es, qs_prime_over_qs
+   real :: qs(its:ite,jts:jte,kts:kte)
+   real :: es(its:ite,jts:jte,kts:kte)
+   real :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
+
+   if (trace_use) call da_trace_entry("da_tpq_to_rh_lin")
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
@@ -41,6 +45,8 @@ subroutine da_tpq_to_rh_lin(grid)
                                       qs(its:ite,jts:jte,kts:kte) ) - &
                                   grid%xb % rh(its:ite,jts:jte,kts:kte) * &
                                   qs_prime_over_qs(its:ite,jts:jte,kts:kte)
+
+   if (trace_use) call da_trace_exit("da_tpq_to_rh_lin")
 
 end subroutine da_tpq_to_rh_lin
 

@@ -11,6 +11,8 @@ subroutine da_togrid (x, ib, ie, i, dx, dxm)
    integer,                  intent(in)  :: ib, ie
    real,                     intent(out) :: dx, dxm
    integer,                  intent(out) :: i
+
+   if (trace_use_frequent) call da_trace_entry("da_togrid")
    
    i = int (x)
 
@@ -22,6 +24,8 @@ subroutine da_togrid (x, ib, ie, i, dx, dxm)
 
    dx = x - real(i)
    dxm= 1.0 - dx
+
+   if (trace_use_frequent) call da_trace_exit("da_togrid")
 
 end subroutine da_togrid
 
