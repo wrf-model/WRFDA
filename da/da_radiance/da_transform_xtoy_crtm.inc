@@ -135,6 +135,10 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
       allocate (absorber(atmosphere%n_layers, num_rad))
       allocate (psfc(num_rad))
 
+      temperature (:,:) = 0.0
+      absorber    (:,:) = 0.0
+      psfc        (:)   = 0.0
+
       do k=xp%kts,xp%kte ! from bottem to top
          call da_interp_lin_2d_new( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
             iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &

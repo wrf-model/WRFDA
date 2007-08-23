@@ -246,17 +246,17 @@ echo "WINDOW_END            $WINDOW_END"
          done
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi + ob.ssmi01
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob01.ssmi
          for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob.ssmi${I}
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${I}.ssmi
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi - ob.ssmi07
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi- ob07.ssmi
 
-         ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.radar+ ob01.radar
          for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ${I}.radar
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.radar- ob07.radar
       else
          if [[ $DATE = $START_DATE ]]; then
             ln -fs $OB_DIR/$DATE/ob.ascii+ ob01.ascii
@@ -287,9 +287,9 @@ echo "WINDOW_END            $WINDOW_END"
          done
       fi
    else
-      ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      ln -fs $OB_DIR/${DATE}/ob.ssmi  ob.ssmi01
-      ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
+      ln -fs $OB_DIR/${DATE}/ob.ascii ob01.ascii
+      ln -fs $OB_DIR/${DATE}/ob.ssmi  ob01.ssmi
+      ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
