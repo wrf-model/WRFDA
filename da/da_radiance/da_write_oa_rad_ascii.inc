@@ -58,12 +58,12 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
          if (iv%instid(i)%proc_domain(n)) then
             ndomain=ndomain+1
             write(unit=oma_rad_unit,fmt='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
-                                   iv%instid(i)%info(n)%date_char, &
+                                   iv%instid(i)%new_info%date_char(n), &
                                    iv%instid(i)%scanpos(n),   &
                                    iv%instid(i)%landsea_mask(n), &
-                                   iv%instid(i)%info(n)%elv,  &
-                                   iv%instid(i)%info(n)%lat,  &
-                                   iv%instid(i)%info(n)%lon, &
+                                   iv%instid(i)%new_info%elv(n),  &
+                                   iv%instid(i)%new_info%lat(1,n),  &
+                                   iv%instid(i)%new_info%lon(1,n), &
                                    iv%instid(i)%satzen(n),    &
                                    iv%instid(i)%satazi(n)
              if (iv%instid(i)%isflg(n)==0) then

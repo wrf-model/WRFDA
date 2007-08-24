@@ -5,40 +5,13 @@
 # Purpose: Creates observation file for input to WRFVAR (ob_format_2).
 #-----------------------------------------------------------------------
 
-#--------------------------------------------
-# [1] Set up various environment variables:
-#--------------------------------------------
-
-export EXPT=${EXPT:-test}
-export DATE=${DATE:-2004051300}
-export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
-
-export REGION=${REGION:-con200}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/obsproc}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/obsproc}
 export WORK_DIR=$RUN_DIR/working
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
-export DUMMY=${DUMMY:-false}
 
 mkdir -p $RUN_DIR $OB_DIR/$DATE
-
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-
-# Namelist variables used in obs. preprocessor:
-
-export NL_E_WE=${NL_E_WE:-110}
-export NL_E_SN=${NL_E_SN:-145}
-export MAP_PROJ=${MAP_PROJ:-polar}
-export REF_LAT=${REF_LAT:--87.396970}
-export REF_LON=${REF_LON:-180.0}
-export TRUELAT1=${TRUELAT1:--90.0}
-export TRUELAT2=${TRUELAT2:--90.0}
-export STAND_LON=${STAND_LON:-180.0}
-export NL_DX=${NL_DX:-90000}
-export PTOP_PA=${PTOP_PA:-5000.0}
 
 echo "<HTML><HEAD><TITLE>$EXPT obsproc</TITLE></HEAD><BODY><H1>$EXPT obsproc</H1><PRE>"
 
@@ -54,7 +27,7 @@ echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 mkdir -p $WORK_DIR
 cd $WORK_DIR
 
-export NL_DX_KM=$(expr $NL_DX \/ 1000)
+let NL_DX_KM=$NL_DX/1000
 
 export NL_BASE_PRES=${NL_BASE_PRES:-100000.0}
 export NL_BASE_TEMP=${NL_BASE_TEMP:-300.0}

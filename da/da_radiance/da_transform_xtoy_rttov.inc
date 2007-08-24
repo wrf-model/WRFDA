@@ -75,35 +75,10 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
          model_mr(:,:)=0.0
          model_psfc(:)=0.0
 
-         call da_interp_lin_3d_new( grid%xa%t, &
-           iv%instid(i)%loc_i, &
-           iv%instid(i)%loc_j, &
-           iv%instid(i)%loc_k, &
-           iv%instid(i)%loc_dx, &
-           iv%instid(i)%loc_dy, &
-           iv%instid(i)%loc_dz, &
-           iv%instid(i)%loc_dxm, &
-           iv%instid(i)%loc_dym, &
-           iv%instid(i)%loc_dzm, &
-           model_t, nlevels, num_rad)
+         call da_interp_lin_3d_newer (grid%xa%t, iv%instid(i)%new_loc, nlevels, 1, num_rad, model_t)
+         call da_interp_lin_3d_newer (grid%xa%q, iv%instid(i)%new_loc, nlevels, 1, num_rad, model_q)
 
-         call da_interp_lin_3d_new (grid%xa%q, &
-           iv%instid(i)%loc_i, &
-           iv%instid(i)%loc_j, &
-           iv%instid(i)%loc_k, &
-           iv%instid(i)%loc_dx, &
-           iv%instid(i)%loc_dy, &
-           iv%instid(i)%loc_dz, &
-           iv%instid(i)%loc_dxm, &
-           iv%instid(i)%loc_dym, &
-           iv%instid(i)%loc_dzm, &
-           model_q, nlevels, num_rad)
-
-         call da_interp_lin_2d_new (grid%xa % psfc, ims, ime, jms, jme, &
-            iv%instid(i)%loc_i, iv%instid(i)%loc_j, &
-            iv%instid(i)%loc_dx, iv%instid(i)%loc_dy, &
-            iv%instid(i)%loc_dxm, iv%instid(i)%loc_dym, &
-            model_psfc,num_rad)
+         call da_interp_lin_2d_newer (grid%xa%psfc, iv%instid(i)%new_loc, 1, 1, num_rad, model_psfc)
 
          model_psfc(:) = 0.01*model_psfc(:)  ! convert to hPa 
          con_vars(:) % nlevels = nlevels 

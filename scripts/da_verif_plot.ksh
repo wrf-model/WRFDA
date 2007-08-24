@@ -1,15 +1,14 @@
 #!/bin/ksh
 
-export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/trunk/wrfvar}
-export REG_DIR=${REG_DIR:-$HOME/data/con200}
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/verification}
+export WORK_DIR=$RUN_DIR/working
+
 export NUM_EXPT=${NUM_EXPT:-1}
-export EXP_NAMES=${EXP_NAMES:-test test1}
+export EXP_NAMES=${EXP_NAMES:-control expt}
 export EXP_LEGENDS=${EXP_LEGENDS:-(/"no_noise","with_noise"/)}
-
-export START_DATE=${START_DATE:-2003010100}
-export END_DATE=${END_DATE:-2003010100}
-
-export WORK_DIR=${WORK_DIR:-$PWD/verification}
 
 export INTERVAL=${INTERVAL:-06}
 export Verify_Date_Range="01 - 28 October 2006 (${INTERVAL} hour Cycle)"
@@ -22,7 +21,6 @@ export DESIRED_SCORES='(/"RMSE","BIAS","ABIAS"/)'
 export EXP_LINES_COLORS='(/"blue","green","orange"/)'
 
 export PLOT_WKS=${PLOT_WKS:-x11}
-export CLEAN=${CLEAN:-false}
 
 #=========================================================
 #=========================================================
@@ -186,7 +184,7 @@ BAR_LABEL_ANGLE=45
 
 # Run NCL scripts now 
 
-NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${WORK_DIR}\"' \
+NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${PWD}\"' \
    'exp_legends=${EXP_LEGENDS}' 'exp_line_cols=${EXP_LINES_COLORS}' \
    'select_levs=${DESIRED_LEVELS}' 'select_scores=${DESIRED_SCORES}' 'bar_label_angle=${BAR_LABEL_ANGLE}'"
 
@@ -204,7 +202,7 @@ chmod +x run3
 
 echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>" > index.html
 echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>" >> index.html
-for FILE in *.pdf *.log; do
+for FILE in *.pdf; do
    if [[ -f $FILE ]]; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi
@@ -219,9 +217,10 @@ done
 
 echo "</UL></BODY></HTML>" >> index.html
 
-if $CLEAN; then
-   rm -rf $EXP_NAMES run1 run2 run3 tmp_sfc tmp_upr namelist.plot_diag fnames_sfc fnames_upr da_verif.out
-fi
+# Move useful files
+mv *pdf *log *html $RUN_DIR
+
+if $CLEAN; then rm -rf $WORK_DIR; fi
 
 echo "da_verif_plot.ksh successfully completed..."
 

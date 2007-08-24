@@ -4,58 +4,14 @@
 #
 # Purpose: Run WPS
 
-#-----------------------------------------------------------------------
-# [1] Set defaults for required environment variables:
-#-----------------------------------------------------------------------
-
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export LBC_FREQ=${LBC_FREQ:-06}
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}
-export EXPT=${EXPT:-test}
-export HOSTS=${HOSTS:-$HOME/hosts}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-export CLEAN=${CLEAN:-false}
-export RUN_GEOGRID=${RUN_GEOGRID:-true}
-
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}
-export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wps}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/wps}
 export WORK_DIR=$RUN_DIR/working
 
-#WPS:
 export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
 export WPS_OUTPUT_DIR=${WPS_OUTPUT_DIR:-$RC_DIR}
-export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
-export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
-export NL_E_WE=${NL_E_WE:-45}
-export NL_E_SN=${NL_E_SN:-45}
-export MAP_PROJ=${MAP_PROJ:-lambert}
-export REF_LAT=${REF_LAT:-40.0}
-export REF_LON=${REF_LON:--98.0}
-export TRUELAT1=${TRUELAT1:-30.0}
-export TRUELAT2=${TRUELAT2:-60.0}
-export STAND_LON=${STAND_LON:--98.0}
-export NL_DX=${NL_DX:-200000}
-export NL_DY=${NL_DY:-200000}
-export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
-export FG_TYPE=${FG_TYPE:-GFS}
-
-let LBC_FREQ_SS=$LBC_FREQ*3600
 
 if [[ ! -d $REG_DIR ]]; then mkdir $REG_DIR; fi 
 if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi 
@@ -139,79 +95,81 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
 # [3.0] Run WPS:
 #-----------------------------------------------------------------------
 
-   if $DUMMY; then
-      echo "Dummy wps"
-      LOCAL_DATE=$DATE
-      while [[ $LOCAL_DATE -le $END_DATE ]]; do
-         export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
-         export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
-         export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
-         export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
+if $DUMMY; then
+   echo "Dummy wps"
+   LOCAL_DATE=$DATE
+   while [[ $LOCAL_DATE -le $END_DATE ]]; do
+      export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
+      export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
+      export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
+      export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
+      for DOMAIN in $DOMAINS; do
          echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
       done
-   else
-      if $RUN_GEOGRID; then
-         # Run geogrid:
-	 ln -fs $WPS_DIR/geogrid.exe .
-	 ${RUN_CMD} ./geogrid.exe
-
-	 RC=$?
-	 mv geogrid.log* $RUN_DIR
-	 if [[ -f $RUN_DIR/geogrid.log.0000 ]]; then
-            echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
-	 else
-            echo '<A HREF="geogrid.log">geogrid.log</a>'
-	 fi
-
-	 if [[ $RC != 0 ]]; then
-            echo geogrid failed with error $RC
-            exit $RC
-	 fi
-      fi
-
-      # Run ungrib:
-      ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      LOCAL_DATE=$DATE
-      FILES=''
-      while [[ $LOCAL_DATE -le $END_DATE ]]; do
-         FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
-      done
-      $WPS_DIR/link_grib.csh $FILES
-
-      ln -fs $WPS_DIR/ungrib.exe .
-
-      ./ungrib.exe > ungrib.log 2>&1
+      LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
+   done
+else
+   if $RUN_GEOGRID; then
+      # Run geogrid:
+      ln -fs $WPS_DIR/geogrid.exe .
+      ${RUN_CMD} ./geogrid.exe
 
       RC=$?
-      mv ungrib.log $RUN_DIR
-      echo '<A HREF="ungrib.log">ungrib.log</a>'
-
-      if [[ $RC != 0 ]]; then
-         echo ungrib failed with error $RC
-         exit $RC
-      fi
-
-      # Run metgrid:
-      ln -fs $WPS_DIR/metgrid.exe .
-      ${RUN_CMD} ./metgrid.exe
-
-      RC=$?
-      
-      mv metgrid.log* $RUN_DIR
-      if [[ -f $RUN_DIR/metgrid.log.0000 ]]; then
-         echo '<A HREF="metgrid.log.0000">metgrid.log.0000</a>'
+      mv geogrid.log* $RUN_DIR
+      if [[ -f $RUN_DIR/geogrid.log.0000 ]]; then
+         echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
       else
-         echo '<A HREF="metgrid.log">metgrid.log</a>'
+         echo '<A HREF="geogrid.log">geogrid.log</a>'
       fi
-      
+
       if [[ $RC != 0 ]]; then
-         echo metgrid failed with error $RC
+         echo geogrid failed with error $RC
          exit $RC
       fi
-      
    fi
+
+   # Run ungrib:
+   ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
+   LOCAL_DATE=$DATE
+   FILES=''
+   while [[ $LOCAL_DATE -le $END_DATE ]]; do
+      FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
+      LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
+   done
+   $WPS_DIR/link_grib.csh $FILES
+
+   ln -fs $WPS_DIR/ungrib.exe .
+
+   ./ungrib.exe > ungrib.log 2>&1
+
+   RC=$?
+   mv ungrib.log $RUN_DIR
+   echo '<A HREF="ungrib.log">ungrib.log</a>'
+
+   if [[ $RC != 0 ]]; then
+      echo ungrib failed with error $RC
+      exit $RC
+   fi
+
+   # Run metgrid:
+   ln -fs $WPS_DIR/metgrid.exe .
+   ${RUN_CMD} ./metgrid.exe
+
+   RC=$?
+
+   mv metgrid.log* $RUN_DIR
+   if [[ -f $RUN_DIR/metgrid.log.0000 ]]; then
+      echo '<A HREF="metgrid.log.0000">metgrid.log.0000</a>'
+   else
+      echo '<A HREF="metgrid.log">metgrid.log</a>'
+   fi
+
+   if [[ $RC != 0 ]]; then
+      echo metgrid failed with error $RC
+      exit $RC
+   fi
+
+fi
 
 cd $OLDPWD
 

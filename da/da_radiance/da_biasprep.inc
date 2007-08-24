@@ -63,16 +63,16 @@ subroutine da_biasprep(inst,ob,iv)
          radbias%satellite_id = iv%instid(inst)%satellite_id
          radbias%sensor_id    = iv%instid(inst)%sensor_id
 
-         read(iv%instid(inst)%info(n)%date_char,'(i4,5(a1,i2))') &
+         read(iv%instid(inst)%new_info%date_char(n),'(i4,5(a1,i2))') &
                                    radbias%year,s1, radbias%month,s1, radbias%day, &
                                    s1,radbias%hour, s1,radbias%min, s1,radbias%sec
 
          radbias%scanline     = iv%instid(inst)%scanline(n)    ! not available
          radbias%scanpos      = iv%instid(inst)%scanpos(n)
          radbias%landmask     = iv%instid(inst)%landsea_mask(n)
-         radbias%elevation    = iv%instid(inst)%info(n)%elv
-         radbias%lat          = iv%instid(inst)%info(n)%lat
-         radbias%lon          = iv%instid(inst)%info(n)%lon
+         radbias%elevation    = iv%instid(inst)%new_info%elv(n)
+         radbias%lat          = iv%instid(inst)%new_info%lat(1,n)
+         radbias%lon          = iv%instid(inst)%new_info%lon(1,n)
          radbias%surf_flag    = iv%instid(inst)%isflg(n)
          radbias%ps           = iv%instid(inst)%ps(n)
          radbias%t2m          = iv%instid(inst)%t2m(n)

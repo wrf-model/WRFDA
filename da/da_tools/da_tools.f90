@@ -19,9 +19,9 @@ module da_tools
       y_start_sub_domain, start_lat, delt_lat, delt_lon, start_lon, cp, &
       missing, surface_correction,print_detail_map, oi_use, use_rad, stderr, &
       t_kelvin, trace_use_frequent
-   use da_define_structures, only : info_type, field_type, x_type,  &
+   use da_define_structures, only : info_type, info_type_new, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
-      iv_type, y_type, da_random_seed
+      iv_type, y_type, da_random_seed, model_loc_type_new
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error, message, da_warning
    
@@ -34,18 +34,23 @@ contains
 
 #include "da_ijll_lc.inc"
 #include "da_llij_lc.inc"
+#include "da_llij_lc_new.inc"
 #include "da_set_lc.inc"
 #include "da_ijll_ps.inc"
 #include "da_llij_ps.inc"
+#include "da_llij_ps_new.inc"
 #include "da_set_ps.inc"
 #include "da_map_init.inc"
 #include "da_llij_latlon.inc"
+#include "da_llij_latlon_new.inc"
 #include "da_ijll_latlon.inc"
 #include "da_latlon_to_ij.inc"
+#include "da_latlon_to_ij_new.inc"
 #include "da_ij_to_latlon.inc"
 #include "da_map_set.inc"
 #include "da_ijll_merc.inc"
 #include "da_llij_merc.inc"
+#include "da_llij_merc_new.inc"
 #include "da_set_merc.inc"
 #include "da_lc_cone.inc"
 
@@ -57,7 +62,9 @@ contains
 #include "da_mo_correction.inc"
 #include "da_diff_seconds.inc"
 #include "da_global_ll_to_xy.inc"
+#include "da_global_ll_to_xy_new.inc"
 #include "da_ll_to_xy.inc"
+#include "da_ll_to_xy_new.inc"
 #include "da_residual.inc"
 #include "da_residual_new.inc"
 #include "da_add_noise.inc"
@@ -67,6 +74,7 @@ contains
 #include "da_set_randomcv.inc"
 #include "da_gaus_noise.inc"
 #include "da_llxy.inc"
+#include "da_llxy_new.inc"
 #include "da_openfile.inc"
 #include "da_smooth_anl.inc"
 #include "da_togrid_new.inc"

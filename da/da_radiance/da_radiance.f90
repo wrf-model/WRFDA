@@ -73,7 +73,7 @@ module da_radiance
    use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, &
-      da_ll_to_xy, da_togrid_new
+      da_ll_to_xy, da_ll_to_xy_new, da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer

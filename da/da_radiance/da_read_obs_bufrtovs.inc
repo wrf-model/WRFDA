@@ -421,20 +421,33 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       end if
 #endif
 
-      allocate (iv%instid(i)%info(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_i(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_j(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_k(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dz(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dzm(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%old_info(iv%instid(i)%num_rad))
+
+      allocate (iv%instid(i)%new_info%name(iv%instid(i)%num_rad))       ! Station name
+      allocate (iv%instid(i)%new_info%platform(iv%instid(i)%num_rad))   ! Instrument platform
+      allocate (iv%instid(i)%new_info%id(iv%instid(i)%num_rad))	      ! 5 digit station identifer
+      allocate (iv%instid(i)%new_info%date_char(iv%instid(i)%num_rad))  ! CCYY-MM-DD_HH:MM:SS date
+      allocate (iv%instid(i)%new_info%levels(iv%instid(i)%num_rad))     ! number of levels
+      allocate (iv%instid(i)%new_info%lat(iv%instid(i)%nlevels,iv%instid(i)%num_rad))      ! Latitude in degree
+      allocate (iv%instid(i)%new_info%lon(iv%instid(i)%nlevels,iv%instid(i)%num_rad))      ! Longitude in degree
+      allocate (iv%instid(i)%new_info%elv(iv%instid(i)%num_rad))        ! Elevation in m
+      allocate (iv%instid(i)%new_info%pstar(iv%instid(i)%num_rad))      ! Surface pressure
+
+      allocate (iv%instid(i)%old_loc(iv%instid(i)%num_rad))
+
+      allocate (iv%instid(i)%new_loc%i   (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%j   (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%k   (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dx  (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dxm (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dy  (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dym (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dz  (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%new_loc%dzm (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+
       allocate (iv%instid(i)%zk(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%t(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%mr(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dx(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dy(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dxm(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dym(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tm(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%qm(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%qrn(xp%kms:xp%kme,iv%instid(i)%num_rad))
@@ -496,17 +509,30 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
    do n = 1, num_tovs_used
       i = p%sensor_index
       nread(i) = nread(i) + 1
-      iv%instid(i)%info(nread(i))         = p%info
-      iv%instid(i)%loc(nread(i))          = p%loc
-      iv%instid(i)%loc_i(nread(i))        = p%loc%i
-      iv%instid(i)%loc_j(nread(i))        = p%loc%j
-      iv%instid(i)%loc_k(:,nread(i))      = 0
-      iv%instid(i)%loc_dx(nread(i))       = p%loc%dx
-      iv%instid(i)%loc_dy(nread(i))       = p%loc%dy
-      iv%instid(i)%loc_dz(:,nread(i))     = 0.0
-      iv%instid(i)%loc_dxm(nread(i))      = p%loc%dxm
-      iv%instid(i)%loc_dym(nread(i))      = p%loc%dym
-      iv%instid(i)%loc_dzm(:,nread(i))    = 0.0
+      iv%instid(i)%old_info(nread(i))         = p%info
+
+      iv%instid(i)%new_info%name(nread(i))	    = p%info%name
+      iv%instid(i)%new_info%platform(nread(i))  = p%info%platform
+      iv%instid(i)%new_info%id(nread(i)) 	    = p%info%id
+      iv%instid(i)%new_info%date_char(nread(i)) = p%info%date_char
+      iv%instid(i)%new_info%levels(nread(i))    = p%info%levels
+      iv%instid(i)%new_info%lat(:,nread(i))	    = p%info%lat
+      iv%instid(i)%new_info%lon(:,nread(i))	    = p%info%lon
+      iv%instid(i)%new_info%elv(nread(i))	    = p%info%elv
+      iv%instid(i)%new_info%pstar(nread(i))     = p%info%pstar
+
+      iv%instid(i)%old_loc(nread(i))   = p%loc
+
+      iv%instid(i)%new_loc%i  (:,nread(i))  = p%loc%i
+      iv%instid(i)%new_loc%j  (:,nread(i))  = p%loc%j
+      iv%instid(i)%new_loc%k  (:,nread(i))  = 0
+      iv%instid(i)%new_loc%dx (:,nread(i))  = p%loc%dx
+      iv%instid(i)%new_loc%dy (:,nread(i))  = p%loc%dy
+      iv%instid(i)%new_loc%dz (:,nread(i))  = 0.0
+      iv%instid(i)%new_loc%dxm(:,nread(i))  = p%loc%dxm
+      iv%instid(i)%new_loc%dym(:,nread(i))  = p%loc%dym
+      iv%instid(i)%new_loc%dzm(:,nread(i))  = 0.0
+
       ! z done in da_get_innov_vector_rad
       iv%instid(i)%t(:,nread(i))          = 0.0
       iv%instid(i)%mr(:,nread(i))         = 0.0

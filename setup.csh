@@ -15,23 +15,10 @@ endif
 bjobs >& /dev/null
 if ($status == 0) then
    setenv SUBMIT LSF
-   if (! $?LSF_PTILE) then
-      # Use SMT on a 8 processor node
-      setenv LSF_PTILE 16
-   endif
-   setenv SUBMIT_OPTIONS1 "#BSUB -R span[ptile=$LSF_PTILE]"
-   setenv SUBMIT_WAIT_FLAG "-K"
 else
    llq >& /dev/null
    if ($status == 0) then
       setenv SUBMIT LoadLeveller
-      setenv SUBMIT_OPTIONS1 '# @ job_type         = parallel'
-      setenv SUBMIT_OPTIONS2 '# @ environment      = COPY_ALL'
-      setenv SUBMIT_OPTIONS3 '# @ notification     = never'
-      setenv SUBMIT_OPTIONS4 '# @ network.MPI      = css0,shared,ip'
-      setenv SUBMIT_OPTIONS5 '# @ checkpoint       = no'
-      setenv SUBMIT_OPTIONS6 '# @ class            = share'
-      setenv SUBMIT_OPTIONS7 '# @ node_usage       = shared'
    else
       which qsub >& /dev/null
       # could be SGE of course, so might need better way to check

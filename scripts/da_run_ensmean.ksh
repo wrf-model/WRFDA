@@ -9,43 +9,13 @@
 #
 #########################################################################
 
-#export FCST_RANGE=12
-#export EXPT=noda
-#export NUM_MEMBERS=30
-#export REL_DIR=/smoke/dmbarker/code/trunk
-#export DAT_DIR=/smoke/dmbarker/data
-#export FILE_TYPE=wrf_3dvar_input
-
-#########################################################################
-# Ideally, you should not need to change the code below, but if you 
-# think it necessary then please email wrfhelp@ucar.edu with details.
-#########################################################################
-
-#Experiment details:
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export REGION=${REGION:-con200}
-export EXPT=${EXPT:-test}                              # Experiment name.
-export NUM_MEMBERS=${NUM_MEMBERS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/${DATE}/run_ensmean}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/ensmean}
+export WORK_DIR=$RUN_DIR/working
 
-#Ensemble mean parameters:
-export FILE_TYPE=${FILE_TYPE:-wrf_3dvar_input}
+# Ensemble mean parameters:
 export NV=${NV:-15}                               # Number of variables to average.
 export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
                 "'QCLOUD'", "'QRAIN'", "'QVAPOR'", "'U10'", "'V10'", "'T2'", "'Q2'"} # Variable names

@@ -16,21 +16,10 @@ if test $COMPILER = xlf; then export COMPILER=ibm; fi
 bjobs > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
-   # Use SMT on an 8 processor node
-   export LSF_PTILE=${LSF_PTILE:-16}
-   export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
-   export SUBMIT_WAIT_FLAG="-K"
 else
    llq > /dev/null 2>&1
    if test $? = 0 ; then
       export SUBMIT=LoadLeveller
-      export SUBMIT_OPTIONS1='# @ job_type         = parallel'
-      export SUBMIT_OPTIONS2='# @ environment      = COPY_ALL'
-      export SUBMIT_OPTIONS3='# @ notification     = never'
-      export SUBMIT_OPTIONS4='# @ network.MPI      = css0,shared,ip'
-      export SUBMIT_OPTIONS5='# @ checkpoint       = no'
-      export SUBMIT_OPTIONS6='# @ class            = share'
-      export SUBMIT_OPTIONS7='# @ node_usage       = shared'
    else
       csh -c "which qsub" >/dev/null 2>&1
       # could be SGE of course, so need better way to check

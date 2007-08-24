@@ -1,5 +1,21 @@
 #!/bin/ksh
 #########################################################################
+# Script: da_run_suite_wrapper.ksh
+#
+# Purpose: Provide user-modifiable interface to da_run_suite.ksh script
+#          specific to KMA Project setting.
+#
+#  Important to note:
+#  * LBC frequency is not the same for all run hours as listed:
+#     - LBC_FREQ=12 # For 00/12Z KMA runs
+#     - LBC_FREQ=6  # For 06/18Z KMA runs
+#   The user may run this script separately for above listed run hours
+#   separately to accommodate different settings of LBC frequencies. 
+#
+#  * RUN_UNGRIB_METGRID_KMA should be set to "true" to run KMA Project
+#    specific WPS script.
+#
+#########################################################################
 
 #Decide which stages to run (run if true):
 export RUN_WPS=true
@@ -20,8 +36,7 @@ export CLEAN=true
 export PROJECT_ID=25000026
 #export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 #export PROJECT_ID=48503001       # DATC GAUs.
-export QUEUE=premium
-#export QUEUE=share
+export QUEUE=premium  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=180

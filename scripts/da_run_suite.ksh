@@ -41,156 +41,10 @@
 # Thank you, and good luck.
 #########################################################################
 
-#########################################################################
-# Ideally, you should not need to change the code below, but if you 
-# think it necessary then please email wrfhelp@ucar.edu with details.
-#########################################################################
-
-# Decide which stages to run (run if true):
-export RUN_RESTORE_DATA_GRIB=${RUN_RESTORE_DATA_GRIB:-false}
-export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}
-export RUN_WPS=${RUN_WPS:-false}
-export RUN_REAL=${RUN_REAL:-false}
-export RUN_IDEAL=${RUN_IDEAL:-false}
-export RUN_OBSPROC=${RUN_OBSPROC:-false}
-export RUN_WRFVAR=${RUN_WRFVAR:-false}
-export RUN_UPDATE_BC=${RUN_UPDATE_BC:-false}
-export RUN_WRF=${RUN_WRF:-false}
-export RUN_NDOWN=${RUN_NDOWN:-false}
-export RUN_NUP=${RUN_NUP:-false}
-
-#Experiment details:
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}                            # Domain name. 
-export EXPT=${EXPT:-test}                              # Experiment name.
-export SOLVER=${SOLVER:-em}
-export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
-export HOSTS=${HOSTS:-${HOME}/hosts}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-export CLEAN=${CLEAN:-false}
-export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
-export CYCLE_NUMBER=${CYCLE_NUMBER:-0}              # Number of assimilation cycles run so far. 
-
-#Time info:
-export INITIAL_DATE=${INITIAL_DATE:-2003010100}        # Start date of test period
-export FINAL_DATE=${FINAL_DATE:-2003010200}            # Final date of test period.
-export LBC_FREQ=${LBC_FREQ:-06}
-export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
-export OBS_FREQ=${OBS_FREQ:-12}
-export WINDOW_START=${WINDOW_START:-0}                 # Start ob window difference (hrs).
-export WINDOW_END=${WINDOW_END:-0}                     # End ob window difference (hrs). 
-export LONG_FCST_TIME_1=${LONG_FCST_TIME_1:-99}
-export LONG_FCST_TIME_2=${LONG_FCST_TIME_2:-99}
-export LONG_FCST_TIME_3=${LONG_FCST_TIME_3:-99}
-export LONG_FCST_TIME_4=${LONG_FCST_TIME_4:-99}
-export LONG_FCST_RANGE_1=${LONG_FCST_RANGE_1:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
-
-#Directories:
-export REL_DIR=${REL_DIR:-$HOME/trunk} 
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
-export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export MSS_GRIB_DIR=${MSS_GRIB_DIR:-mss:/DSS/DS083.2/data}
-export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}     # GRIB data.
-export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
-export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs}     # Real-time observation directory.
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
-
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}                
-
-export OK='<FONT COLOR="green">'
-export ERR='<FONT COLOR="red">'
-export END='</FONT>'
-
-if [[ ! -d $DAT_DIR ]]; then mkdir $DAT_DIR; fi
-if [[ ! -d $REG_DIR ]]; then mkdir $REG_DIR; fi
-if [[ ! -d $EXP_DIR ]]; then mkdir $EXP_DIR; fi
-if [[ ! -d $EXP_DIR/run ]]; then mkdir $EXP_DIR/run; fi
-
-#From WPS (namelist.wps):
-export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
-export RUN_GEOGRID=${RUN_GEOGRID:-true}
-export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
-export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
-export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
-export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
-export NL_E_WE=${NL_E_WE:-45}
-export NL_E_SN=${NL_E_SN:-45}
-export MAP_PROJ=${MAP_PROJ:-lambert}
-export REF_LAT=${REF_LAT:-40.0}
-export REF_LON=${REF_LON:--98.0}
-export TRUELAT1=${TRUELAT1:-30.0}
-export TRUELAT2=${TRUELAT2:-60.0}
-export STAND_LON=${STAND_LON:--98.0}
-export NL_DX=${NL_DX:-200000}
-export NL_DY=${NL_DY:-200000}
-export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
-export FG_TYPE=${FG_TYPE:-GFS}
-
-#From WRF (namelist.input):
-export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}
-export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl} 
-#&time_control:
-export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
-export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
-#&domains:
-export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
-export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
-                                        " 0.922, 0.894, 0.860, 0.817, 0.766, "\
-                                        " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
-                                        " 0.324, 0.273, 0.228, 0.188, 0.152,"\
-                                        " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
-export NL_E_VERT=${NL_E_VERT:-28}                   #
-export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
-export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
-export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
-#&physics:
-export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
-export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
-export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
-export NL_RADT=${NL_RADT:-30}                #
-export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
-export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
-export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
-export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
-export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
-export NL_CUDT=${NL_CUDT:-5}
-export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
-#&dynamics:
-export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
-export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
-export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
-export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
-#&bdy_control:
-export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
-
-#From OBSPROC:
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
-export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
-
-#From WRF-Var:
-export NL_VAR4D=${NL_VAR4D:-false}
-export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
-export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # background errors.
-
-export NL_OB_FORMAT=${NL_OB_FORMAT:-2} # Observation format: 1=BUFR, 2=ASCII "little_r"
-
-#From Update_BC:
-export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
-#------------------------------------------------------------------------------------------
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export SUITE_DIR=${SUITE_DIR:-$RUN_DIR}
 
 echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 
@@ -238,7 +92,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    if [[ $HOUR -eq $LONG_FCST_TIME_4 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
 
    if $RUN_RESTORE_DATA_GRIB; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_grib
+      export RUN_DIR=$SUITE_DIR/$DATE/restore_data_grib
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_restore_data_grib $RUN_DIR
@@ -251,7 +105,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_RESTORE_DATA_RTOBS; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_rtobs
+      export RUN_DIR=$SUITE_DIR/$DATE/restore_data_rtobs
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_restore_data_rtobs $RUN_DIR
@@ -264,7 +118,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
   
    if $RUN_WPS; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/wps
+      export RUN_DIR=$SUITE_DIR/$DATE/wps
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
@@ -278,7 +132,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_REAL; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/real
+      export RUN_DIR=$SUITE_DIR/$DATE/real
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
@@ -291,7 +145,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_IDEAL; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/ideal
+      export RUN_DIR=$SUITE_DIR/$DATE/ideal
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_ideal $RUN_DIR
@@ -304,7 +158,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_OBSPROC; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/obsproc
+      export RUN_DIR=$SUITE_DIR/$DATE/obsproc
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
@@ -320,9 +174,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
    if $NL_VAR4D; then
       if $CYCLING; then
-         if test $CYCLE_NUMBER -gt 0; then
+         if [[ $CYCLE_NUMBER -gt 0 ]]; then
             if $RUN_UPDATE_BC; then
-               export RUN_DIR=$EXP_DIR/run/$DATE/update_bc_4dvar
+               export RUN_DIR=$SUITE_DIR/$DATE/update_bc_4dvar
                export PHASE=true
                mkdir -p $RUN_DIR
 
@@ -333,22 +187,22 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
         	  echo $(date) "${ERR}Failed with error $RC$END"
         	  exit 1
                fi
-               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
+               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d01
             else
-               export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
+               export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d01
             fi 
          fi
       fi
    fi
 
    if $RUN_WRFVAR; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar
+      export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
       mkdir -p $RUN_DIR
 
-      export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
+      export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d01
       if $CYCLING; then
-         if test $CYCLE_NUMBER -gt 0; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+         if [[ $CYCLE_NUMBER -gt 0 ]]; then
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
          fi
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
@@ -364,32 +218,85 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
-         if test $CYCLE_NUMBER -gt 0; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+         if [[ $CYCLE_NUMBER -gt 0 ]]; then
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
          fi
       fi
    fi
 
-   if $RUN_UPDATE_BC; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
-      export PHASE=false
+   if $RUN_ETKF; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/run_etkf
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
-      $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh gen_be_etkf $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_etkf.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $? != 0 ]]; then
          echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
-      export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
-#DALE remove
+   fi
+
+   if $RUN_UPDATE_BC; then
+      if [[ $NUM_MEMBERS -gt 0 ]]; then
+         export MEM=1
+         export JOB=1
+
+         while [[ $MEM -le $NUM_MEMBERS ]]; do
+            export CMEM=e$MEM
+            if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+            if [[ $MEM -lt 10  ]]; then export CMEM=e00$MEM; fi
+
+            export RUN_DIR=$EXP_DIR/run/$DATE/update_bc.${CMEM}
+            export PHASE=false
+            mkdir -p $RUN_DIR
+
+            export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d01
+            export BDYIN=$RC_DIR/$DATE/wrfbdy_d01.${CMEM}
+            export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d01.${CMEM}
+            export BDYOUT=$FC_DIR/$DATE/wrfbdy_d01}.${CMEM}
+
+            $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
+            $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1 &
+            RC=$?
+            if [[ $? != 0 ]]; then
+               echo $(date) "${ERR}Failed with error $RC$END"
+               exit 1
+            fi
+
+            let MEM=$MEM+1
+            let JOB=$JOB+1
+
+            if [[ $JOB -gt $NUM_JOBS || $MEM -gt $NUM_MEMBERS ]]; then
+               export JOB=1
+               wait # Wait for current jobs to finish
+            fi
+            sleep 1 # Leave 1s gap between job start
+         done
+      else
+         export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
+         export PHASE=false
+         mkdir -p $RUN_DIR
+
+         export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d01
+         export BDYIN=$RC_DIR/$DATE/wrfbdy_d01
+         export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d01
+         export BDYOUT=$FC_DIR/$DATE/wrfbdy_d01
+
+         $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
+         $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
+         RC=$?
+         if [[ $? != 0 ]]; then
+            echo $(date) "${ERR}Failed with error $RC$END"
+            exit 1
+         fi
+      fi
    else
       export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
    fi
 
    if $RUN_NDOWN; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/ndown
+      export RUN_DIR=$SUITE_DIR/$DATE/ndown
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_ndown $RUN_DIR
@@ -402,7 +309,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_NUP; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/nup
+      export RUN_DIR=$SUITE_DIR/$DATE/nup
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_nup $RUN_DIR
@@ -415,13 +322,69 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_WRF; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/wrf
+      if test $NUM_MEMBERS -gt 0; then
+         export MEM=1
+         export JOB=1
+
+         while [[ $MEM -le $NUM_MEMBERS ]]; do
+            export CMEM=e$MEM
+            if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+            if [[ $MEM -lt 10  ]]; then export CMEM=e00$MEM; fi
+
+            export RUN_DIR=$EXP_DIR/run/$DATE/wrf.${CMEM}
+            mkdir -p $RUN_DIR
+
+            export WRF_INPUT_DIR=$RC_DIR/$DATE/wrfinput_d${DOMAIN}
+            export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
+            if [[ $CYCLE_NUMBER -gt 0 && $CYCLING ]]; then
+               export WRF_INPUT=$FC_DIR/$DATE/wrfinput_d01
+               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d01
+            fi
+
+            $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
+            $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1 &
+            RC=$?
+            if [[ $RC != 0 ]]; then
+               echo $(date) "${ERR}Failed with error $RC$END"
+               exit 1
+            fi
+
+            let MEM=$MEM+1
+            let JOB=$JOB+1
+
+            if [[ $JOB -gt $NUM_JOBS || $MEM -gt $NUM_MEMBERS ]]; then
+               export JOB=1
+               wait # Wait for current jobs to finish
+            fi
+            sleep 1 # Leave 1s gap between job start
+         done
+      else
+         export RUN_DIR=$EXP_DIR/run/$DATE/wrf
+         mkdir -p $RUN_DIR
+
+         export WRF_INPUT_DIR=$RC_DIR
+         if [[ $CYCLE_NUMBER -gt 0 && $CYCLING ]]; then
+            export WRF_INPUT_DIR=$FC_DIR
+         fi
+
+         $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
+         $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
+         RC=$?
+         if [[ $RC != 0 ]]; then
+            echo $(date) "${ERR}Failed with error $RC$END"
+            exit 1
+         fi
+      fi
+   fi
+
+   if $RUN_ENSMEAN; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/ensmean
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
-      $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh gen_be_ensmean $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_ensmean.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if [[ $RC != 0 ]]; then
+      if [[ $? != 0 ]]; then
          echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
@@ -429,7 +392,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
    export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
-   export CYCLE_NUMBER=`expr $CYCLE_NUMBER + 1`
+   let CYCLE_NUMBER=$CYCLE_NUMBER+1
 
 done
 

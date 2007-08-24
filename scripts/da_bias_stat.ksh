@@ -3,16 +3,12 @@
 #  Bias correction off-line statistics script
 #  Author: Zhiquan Liu NCAR/MMM 02/2007
 ###############################################
-export USER=liuz
-export WRFVAR_DIR=/ptmp/${USER}/wrfvar/trunk
-export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2274_gts_crtm_mix_8/run
-#export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2299_gts_crtm_noaa18_8/run
-export BUILD_DIR=${WRFVAR_DIR}/build
-export WORKDIR=/ptmp/${USER}/wrfvar/trunk/scripts/work
 
-export START_DATE=2003010100
-export END_DATE=2003010200
-export CYCLE_PERIOD=6
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/bias_stat}
+export WORK_DIR=$RUN_DIR/working
 
 export PLATFORM=noaa
 export PLATFORM_ID=1
@@ -22,10 +18,10 @@ export SENSOR_ID=$3   # 3 , 4
 export NSCAN=$4      # 30, 90
 
 
- echo 'WORKING directory is $WORKDIR'
+ echo 'WORKING directory is $WORK_DIR'
 
- mkdir $WORKDIR; cd $WORKDIR
- cp $WRFVAR_DIR/run/mask_asc $WORKDIR
+ mkdir $WORK_DIR; cd $WORK_DIR
+ cp $WRFVAR_DIR/run/mask_asc $WORK_DIR
 
  CDATE=$START_DATE
 
@@ -36,8 +32,8 @@ export NSCAN=$4      # 30, 90
 #------------------------------------
  while [[ $CDATE -le $END_DATE ]]; do
    echo $CDATE
-   cat ${DATA_DIR}/${CDATE}/wrfvar/working/biasprep_${PLATFORM}-${SATELLITE}-${SENSOR}.* >> biasprep_${sensor}
-   CDATE=$(${BUILD_DIR}/da_advance_time.exe ${CDATE} ${CYCLE_PERIOD})
+   cat ${WORK_DIR}/${CDATE}/wrfvar/working/biasprep_${PLATFORM}-${SATELLITE}-${SENSOR}.* >> biasprep_${sensor}
+   CDATE=$(${WRFVAR_DIR}/build/da_advance_time.exe ${CDATE} ${CYCLE_PERIOD})
  done
 
 #--------------------------------------------------
@@ -59,7 +55,7 @@ EOF
 
          \rm -f fort.*
          ln -fs biasprep_${sensor}  fort.10  # input: fort.10
-         $BUILD_DIR/da_bias_sele.exe < nml_sele > da_bias_sele_${sensor}.log
+         $WRFVAR_DIR/build/da_bias_sele.exe < nml_sele > da_bias_sele_${sensor}.log
          mv fort.11 biassele_${sensor}      # output fort.11
 echo '  End da_bias_sele'
 
@@ -80,7 +76,7 @@ EOF
 
        \rm -f fort.*
        ln -fs biassele_${sensor}  fort.10  # input : fort.10
-       $BUILD_DIR/da_bias_scan.exe < nml_scan > da_bias_scan_${sensor}.log
+       $WRFVAR_DIR/build/da_bias_scan.exe < nml_scan > da_bias_scan_${sensor}.log
        mv fort.11 scan_core_${sensor}     # output: fort.11, statistics not divided by nobs
        mv fort.12 scan_bias_${sensor}     # scan bias both band/noband 
 echo '  End da_bias_scan'
@@ -106,7 +102,7 @@ EOF
        \rm -f fort.*
        ln -fs scan_bias_${sensor} fort.12
        ln -fs biassele_${sensor}  fort.10
-       $BUILD_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
+       $WRFVAR_DIR/build/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
        mv bcor.asc ${sensor}.scor
 
 echo "  End da_bias_airmass"
@@ -131,7 +127,7 @@ EOF
        \rm -f fort.*
        ln -fs biassele_${sensor}    fort.10
        ln -fs ${sensor}.scor    scor.asc
-       $BUILD_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
+       $WRFVAR_DIR/build/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
        mv fort.11 bias_verif_${sensor}
        mv bcor.asc ${sensor}.bcor
 

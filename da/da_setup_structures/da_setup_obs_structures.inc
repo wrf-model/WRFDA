@@ -156,6 +156,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
          call da_setup_obs_structures_bufr (grid%xp, ob, iv)
       else if (ob_format == ob_format_ascii) then
          call da_message((/'Using ASCII format observation input'/))
+write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
          call da_setup_obs_structures_ascii (grid%xp, ob, iv, grid%xb)
       end if
    end if

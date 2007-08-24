@@ -13,12 +13,13 @@ subroutine da_predictor_rttov(pred,npred,temp,hum,T_skin)
    ! pred(5) - 10 -2 thickness    43  10.37-2.61 thickness
    ! pred(6) - 50 -10thickness    43  45.29-10.37 thickness
 
+   integer, parameter :: JPRTLEV = 43
 
    integer, intent(in)  :: npred
-   real,    intent(in)  :: temp(JPRTLEV), hum(JPRTLEV), T_skin
+   real,    intent(in)  :: temp(JPRTLEV)
+   real,    intent(in)  :: hum(JPRTLEV)
+   real,    intent(in)  :: T_skin
    real,    intent(out) :: pred(npred)
-
-   integer, parameter :: JPRTLEV = 43
 
    real, parameter :: Kth = gas_constant*0.5/gravity
    real, parameter :: Kpc = 100.0*0.5/gravity

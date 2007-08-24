@@ -455,21 +455,33 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   n = 0
   p => head
 
-      allocate (iv%instid(inst)%info(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%old_info(iv%instid(inst)%num_rad))
 
-      allocate (iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_info%name(iv%instid(inst)%num_rad))       ! Station name
+      allocate (iv%instid(inst)%new_info%platform(iv%instid(inst)%num_rad))   ! Instrument platform
+      allocate (iv%instid(inst)%new_info%id(iv%instid(inst)%num_rad))	      ! 5 digit station identifer
+      allocate (iv%instid(inst)%new_info%date_char(iv%instid(inst)%num_rad))  ! CCYY-MM-DD_HH:MM:SS date
+      allocate (iv%instid(inst)%new_info%levels(iv%instid(inst)%num_rad))     ! number of levels
+      allocate (iv%instid(inst)%new_info%lat(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))      ! Latitude in degree
+      allocate (iv%instid(inst)%new_info%lon(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))      ! Longitude in degree
+      allocate (iv%instid(inst)%new_info%elv(iv%instid(inst)%num_rad))        ! Elevation in m
+      allocate (iv%instid(inst)%new_info%pstar(iv%instid(inst)%num_rad))      ! Surface pressure
+
+      allocate (iv%instid(inst)%old_loc(iv%instid(inst)%num_rad))
+
+      allocate (iv%instid(inst)%new_loc%i   (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%j   (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%k   (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dz  (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dzm (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dx  (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dy  (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dxm (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%new_loc%dym (iv%instid(inst)%nlevels, iv%instid(inst)%num_rad))
+
       allocate (iv%instid(inst)%zk(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%t(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%mr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dx(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dy(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dxm(iv%instid(inst)%num_rad))
-      allocate (iv%instid(inst)%loc_dym(iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%tm(xp%kms:xp%kme,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%qm(xp%kms:xp%kme,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%qrn(xp%kms:xp%kme,iv%instid(inst)%num_rad))
@@ -525,16 +537,29 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 !   inst = p%sensor_index
    n = n + 1
 
-   iv%instid(inst)%info(n)   =  p%info
-   iv%instid(inst)%loc_i(n)        = p%loc%i
-   iv%instid(inst)%loc_j(n)        = p%loc%j
-   iv%instid(inst)%loc_k(:,n)      = 0
-   iv%instid(inst)%loc_dx(n)       = p%loc%dx
-   iv%instid(inst)%loc_dy(n)       = p%loc%dy
-   iv%instid(inst)%loc_dz(:,n)     = 0.0
-   iv%instid(inst)%loc_dxm(n)      = p%loc%dxm
-   iv%instid(inst)%loc_dym(n)      = p%loc%dym
-   iv%instid(inst)%loc_dzm(:,n)    = 0.0
+   iv%instid(inst)%old_info(n)   =  p%info
+
+      iv%instid(inst)%new_info%name(n)	= p%info%name
+      iv%instid(inst)%new_info%platform(n)  = p%info%platform
+      iv%instid(inst)%new_info%id(n) 	= p%info%id
+      iv%instid(inst)%new_info%date_char(n) = p%info%date_char
+      iv%instid(inst)%new_info%levels(n)    = p%info%levels
+      iv%instid(inst)%new_info%lat(:,n)	= p%info%lat
+      iv%instid(inst)%new_info%lon(:,n)	= p%info%lon
+      iv%instid(inst)%new_info%elv(n)	= p%info%elv
+      iv%instid(inst)%new_info%pstar(n)     = p%info%pstar
+
+   iv%instid(inst)%old_loc(n)     = p%loc
+
+   iv%instid(inst)%new_loc%i(:,n)   = p%loc%i
+   iv%instid(inst)%new_loc%j(:,n)   = p%loc%j
+   iv%instid(inst)%new_loc%k(:,n)   = 0
+   iv%instid(inst)%new_loc%dx(:,n)  = p%loc%dx
+   iv%instid(inst)%new_loc%dy(:,n)  = p%loc%dy
+   iv%instid(inst)%new_loc%dz(:,n)  = 0.0
+   iv%instid(inst)%new_loc%dxm(:,n) = p%loc%dxm
+   iv%instid(inst)%new_loc%dym(:,n) = p%loc%dym
+   iv%instid(inst)%new_loc%dzm(:,n) = 0.0
 
       ! z done in da_get_innov_vector_rad
       iv%instid(inst)%t(:,n)          = 0.0

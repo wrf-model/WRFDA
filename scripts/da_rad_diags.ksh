@@ -10,10 +10,6 @@
 #
 ### Data processing:
 #
-# to compile: xlf -o da_rad_diags.exe  da_rad_diags.f90  \
-#                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
-#             g95 -o da_rad_diags.exe  da_rad_diags.f90  \
-#                 -L/usr/local/netcdf/lib -lnetcdf -lm -I/usr/local/netcdf/include
 # input files: (1)  namelist.da_rad_diags
 #                   &record1
 #                    nproc = 16   (the proc numbers WRF-Var used)
@@ -112,7 +108,7 @@ if ! $MAPINFO_FROM_FILE; then   # MAPINFO_FROM_FILE=false
       export MINLON=-89.0
    fi
 else   # MAPINFO_FROM_FILE = true
-   export MAP_PROJ=`ncdump -h $FGFILE | grep "MAP_PROJ =" | awk '{print $3}'`
+   export MAP_PROJ=$(ncdump -h $FGFILE | grep "MAP_PROJ =" | awk '{print $3}')
    if $SUBDOMAIN; then
       if [[ $MAP_PROJ == 1 ]]; then
          export MAPINFO_FROM_FILE=false # subdomain has to be a latlon box
@@ -141,7 +137,7 @@ if $LINK_DATA; then
       fi
       cd $DIAG_RUN_DIR/$DATE
       ln -sf $VAR_RUN_DIR1/$DATE/$VAR_RUN_DIR2/$FILE_PREFIX* .
-      DATE=`$WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD`
+      DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD)
    done
 fi
 
@@ -193,10 +189,10 @@ cp -p $WRFVAR_DIR/graphics/ncl/plot_rad_diags.ncl ./plot_rad_diags.ncl
 
 if $PROC_PLOT; then
    if $MAPINFO_FROM_FILE; then
-      export MAP_PROJ=`ncdump -h $FGFILE | grep "MAP_PROJ =" | awk '{print $3}'`
-      export TRUELAT1=`ncdump -h $FGFILE | grep "TRUELAT1 =" | awk '{print $3}'`
-      export TRUELAT2=`ncdump -h $FGFILE | grep "TRUELAT2 =" | awk '{print $3}'`
-      export STAND_LON=`ncdump -h $FGFILE | grep "STAND_LON =" | awk '{print $3}'`
+      export MAP_PROJ=$(ncdump -h $FGFILE | grep "MAP_PROJ =" | awk '{print $3}')
+      export TRUELAT1=$(ncdump -h $FGFILE | grep "TRUELAT1 =" | awk '{print $3}')
+      export TRUELAT2=$(ncdump -h $FGFILE | grep "TRUELAT2 =" | awk '{print $3}')
+      export STAND_LON=$(ncdump -h $FGFILE | grep "STAND_LON =" | awk '{print $3}')
    fi
    for instID in ${INSTIDS[*]}; do    # loop for instruments
       export INSTRUMENT=$instID

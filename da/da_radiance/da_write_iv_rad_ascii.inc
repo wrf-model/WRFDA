@@ -67,23 +67,23 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
             ndomain=ndomain+1
             if ( ssmis ) then
                write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2,i3)') 'INFO : ', ndomain, &
-                                iv%instid(i)%info(n)%date_char, &
+                                iv%instid(i)%new_info%date_char(n), &
                                 iv%instid(i)%scanpos(n),   &
                                 iv%instid(i)%landsea_mask(n), &
-                                iv%instid(i)%info(n)%elv,  &
-                                iv%instid(i)%info(n)%lat,  &
-                                iv%instid(i)%info(n)%lon, &
+                                iv%instid(i)%new_info%elv(n),  &
+                                iv%instid(i)%new_info%lat(1,n),  &
+                                iv%instid(i)%new_info%lon(1,n), &
                                 iv%instid(i)%satzen(n),    &
                                 iv%instid(i)%satazi(n),    &
                                 iv%instid(i)%ssmis_subinst(n)
             else
                write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
-                                iv%instid(i)%info(n)%date_char, &
+                                iv%instid(i)%new_info%date_char(n), &
                                 iv%instid(i)%scanpos(n),   &
                                 iv%instid(i)%landsea_mask(n), &
-                                iv%instid(i)%info(n)%elv,  &
-                                iv%instid(i)%info(n)%lat,  &
-                                iv%instid(i)%info(n)%lon, &
+                                iv%instid(i)%new_info%elv(n),  &
+                                iv%instid(i)%new_info%lat(1,n),  &
+                                iv%instid(i)%new_info%lon(1,n), &
                                 iv%instid(i)%satzen(n),    &
                                 iv%instid(i)%satazi(n)
             end if

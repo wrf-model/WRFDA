@@ -16,20 +16,15 @@
 #
 #-------------------------------------------------------------------------------------------
 
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/desroziers}
+export WORK_DIR=$RUN_DIR/working
+
 echo ""
 echo "Running script da_tune_obs_desroziers.ksh"
 echo ""
-
-export REL_DIR=${REL_DIR:-$HOME/code/trunk}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REGION=${REGION:-con200}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export WORK_DIR=${WORK_DIR:-$PWD/desroziers}
-
-export START_DATE=${START_DATE:-2003010100}
-export END_DATE=${END_DATE:-2003010200}
-export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
 
 export YP_DIR=${YP_DIR:-$REG_DIR/with_noise}      # perturbed run
 export Y_DIR=${Y_DIR:-$REG_DIR/no_noise}         # unperturbed run
@@ -46,7 +41,7 @@ export NL_RTMINIT_SATID=${NL_RTMINIT_SATID:-15,16}
 export NL_RTMINIT_SENSOR=${NL_RTMINIT_SENSOR:-3,3}
 export NL_RTMINIT_NCHAN=${NL_RTMINIT_NCHAN:-15,15} # Not a Registry name
 
-rm -rf $WORK_DIR; mkdir $WORK_DIR; cd $WORK_DIR
+rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
  
 cat > namelist.radiance << EOF
 &rtminit

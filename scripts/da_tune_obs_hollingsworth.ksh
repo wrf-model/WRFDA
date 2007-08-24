@@ -5,30 +5,21 @@
 #        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
 #-------------------------------------------------------------------------
 
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/hollingsworth}
+export WORK_DIR=$RUN_DIR/working
+
 echo ""
 echo "Running da_tune_obs_hollingsworth.ksh"
 echo ""
-
-export REL_DIR=${REL_DIR:-$HOME/code/trunk}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REGION=${REGION:-con200}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} 
-export EXPT=${EXPT:-test}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-
-export START_DATE=${START_DATE:-2003010100}
-export END_DATE=${END_DATE:-2003010200}
-export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
-
-export WORK_DIR=${WORK_DIR:-$PWD/hollingsworth}
 
 rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
 
 echo "WRFVAR_DIR    = $WRFVAR_DIR"
 echo "EXP_DIR       = $EXP_DIR"
-echo "WORK_DIR      = $WORK_DIR"
+echo "RUN_DIR       = $RUN_DIR"
 echo "START_DATE    = $START_DATE"
 echo "END_DATE      = $END_DATE"
   
@@ -57,7 +48,9 @@ for FILE1 in *.dat; do
    mv hollingsworth2.out $FILE2.out
 done
 
-rm fort.35 *.dat
+mv *.log *.out $RUN_DIR
+
+if $CLEAN; then rm -rf $WORK_DIR; fi
 
 exit 0
 echo ""

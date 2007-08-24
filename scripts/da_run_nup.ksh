@@ -5,40 +5,16 @@
 # Purpose: Run WRF's nup utility.
 #########################################################################
 
-#########################################################################
-# Ideally, you should not need to change the code below, but if you 
-# think it necessary then please email wrfhelp@ucar.edu with details.
-#########################################################################
-
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export LBC_FREQ=${LBC_FREQ:-06}
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}
-export EXPT=${EXPT:-test}
-export SOLVER=${SOLVER:-em}
-export NUM_PROCS=${NUM_PROCS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-export CLEAN=${CLEAN:-false}
-
-# Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/nup}
+export WORK_DIR=$RUN_DIR/working
+
+
 export NUP_INPUT1_DIR=${NUP_INPUT1_DIR:-$RC_DIR}
 export NUP_INPUT2_DIR=${NUP_INPUT2_DIR:-$RC_DIR}
 export NUP_OUTPUT_DIR=${NUP_OUTPUT_DIR:-$RC_DIR}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/nup}
-export WORK_DIR=$RUN_DIR/working
 
 if [[ ! -d $NUP_OUTPUT_DIR/$DATE ]]; then mkdir -p $NUP_OUTPUT_DIR/$DATE; fi
 

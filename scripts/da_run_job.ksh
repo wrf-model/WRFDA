@@ -1,17 +1,13 @@
 #!/bin/ksh
+
+# da_run_job.ksh
+
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
-export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
-export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
-export REGION=${REGION:-con200}
-export EXPT=${EXPT:-test}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
 export WORK_DIR=$RUN_DIR/working
+
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 export POE=false
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
@@ -52,7 +48,6 @@ $SUBMIT_OPTIONS9
 $SUBMIT_OPTIONS10
 # @ queue            = $QUEUE
 
-export RUN_CMD="$DEBUGGER " # Space important
 $SCRIPT > $RUN_DIR/index.html 2>&1
 EOF
 elif [[ $SUBMIT == "LSF" ]]; then 
@@ -61,7 +56,7 @@ elif [[ $SUBMIT == "LSF" ]]; then
 #
 # LSF batch script
 #
-#BSUB -J ${REGION}_${EXPT}_${RUN}
+#BSUB -J ${REGION}_${EXPT}_${RUN} 
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
@@ -79,9 +74,6 @@ $SUBMIT_OPTIONS8
 $SUBMIT_OPTIONS9
 $SUBMIT_OPTIONS10
 
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun.lsf"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $RUN_DIR/index.html 2>&1
 
 EOF
@@ -115,24 +107,12 @@ $SUBMIT_OPTIONS8
 $SUBMIT_OPTIONS9
 $SUBMIT_OPTIONS10
 
-# Options for Cray X1 
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="aprun -m exclusive -N$TEMP -n$NUM_PROCS"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $RUN_DIR/index.html 2>&1
 
 EOF
 elif [[ $SUBMIT == none ]]; then
-   if [[ -f $HOSTS ]]; then
-      export RUN_CMD_DEFAULT="mpirun -machinefile $HOSTS -np $NUM_PROCS"
-   else
-      export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS"
-   fi
    cat > job.ksh <<EOF
 #!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="$RUN_CMD_DEFAULT"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $RUN_DIR/index.html 2>&1
 EOF
 fi
@@ -162,7 +142,7 @@ EOF
 
 chmod +x job.ksh
 
-echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
+echo "Running with $NUM_PROCS processors, output to $RUN_DIR"
 if [[ $SUBMIT == "LoadLeveller" ]]; then 
    llsubmit $SUBMIT_FLAGS job.ksh
 elif [[ $SUBMIT == "LSF" ]]; then 

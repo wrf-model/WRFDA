@@ -184,13 +184,25 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    allocate (iv%instid(inst)%tb_qc(1:nchanl,size))
    allocate (ob%instid(inst)%tb(1:nchanl,size))
    do n = 1, size
-      iv%instid(inst)%info(n)   =  p%info
-      iv%instid(inst)%loc_i(n)        = p%loc%i
-      iv%instid(inst)%loc_j(n)        = p%loc%j
-      iv%instid(inst)%loc_dx(n)       = p%loc%dx
-      iv%instid(inst)%loc_dy(n)       = p%loc%dy
-      iv%instid(inst)%loc_dxm(n)      = p%loc%dxm
-      iv%instid(inst)%loc_dym(n)      = p%loc%dym
+      iv%instid(inst)%old_info(n)         = p%info
+
+      iv%instid(i)%new_info%name(n)	    = p%info%name
+      iv%instid(i)%new_info%platform(n)  = p%info%platform
+      iv%instid(i)%new_info%id(n) 	    = p%info%id
+      iv%instid(i)%new_info%date_char(n) = p%info%date_char
+      iv%instid(i)%new_info%levels(n)    = p%info%levels
+      iv%instid(i)%new_info%lat(:,n)	    = p%info%lat
+      iv%instid(i)%new_info%lon(:,n)	    = p%info%lon
+      iv%instid(i)%new_info%elv(n)	    = p%info%elv
+      iv%instid(i)%new_info%pstar(n)     = p%info%pstar
+
+      iv%instid(inst)%old_loc(n)      = p%loc
+      iv%instid(inst)%new_loc%i(:,n)    = p%loc%i
+      iv%instid(inst)%new_loc%j(:,n)    = p%loc%j
+      iv%instid(inst)%new_loc%dx(:,n)   = p%loc%dx
+      iv%instid(inst)%new_loc%dy(:,n)   = p%loc%dy
+      iv%instid(inst)%new_loc%dxm(:,n)  = p%loc%dxm
+      iv%instid(inst)%new_loc%dym(:,n)  = p%loc%dym
       iv%instid(inst)%landsea_mask(n) = p%landsea_mask
       iv%instid(inst)%scanpos(n)      = p%scanpos
       iv%instid(inst)%satzen(n) = p%satzen
@@ -221,7 +233,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    !    p => p%next
    ! end do
 
-   if (trace_use) call da_trace_exit("da_readkma1dvar")
+   if (trace_use) call da_trace_exit("da_read_kma1dvar")
 
 end subroutine da_read_kma1dvar
 

@@ -1,5 +1,20 @@
 #!/bin/ksh 
+
 #########################################################################
+# Script: da_run_suite_wrapper.ksh
+#
+# Purpose: Provide user-modifiable interface to da_run_suite.ksh script
+#          specific to AFWA Project t46 setting.
+#
+#  Important to note:
+#  * RUN_UNGRIB_METGRID_AFWA should be set to "true" to run AFWA Project
+#    specific WPS script.
+#
+#  * METGRID_TABLE_TYPE should be set to "AFWA" in upper cases to make
+#    "metgrid" code to use the AFWA specific METGRID_TABLE.
+#
+#########################################################################
+
 set echo 
 
 #Decide which stages to run (run if true):
@@ -21,26 +36,12 @@ export UPDATE_CYCLING=true
 #Scheduling:
 export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 #export PROJECT_ID=48503001      # DATC GAUs.
-export QUEUE=debug #economy #debug #economy #regular #premium # share queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
+export QUEUE=share  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=1  #64 is for WRF and WRF-VAR # 1 is for WPS, REAL, UPDATE_BC and OBS_PROC
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=10   
 export LSF_EXCLUSIVE=" "
 export LL_PTILE=16 
-
-# ungrib needs 2 min, metgrid needs less than 1 min: at least 128 min for WPS per day 4 runs. 
-# real needs 2 min per file: 8 min is required per day 4 runs.
-# if NUM_PROCS=64 used with exclusive queues:
-# 2 min per wrf_out: at least 48 min is required per day 4 runs.
-# 1 min for WRF-VAR: 4 min is required per day 4 runs. 
-# 5 sec or less  for UPDATE_BC: 20 sec is required per day 4 runs. 
-
-# if NUM_PROCS=16 used with share and debug queues:
-#wrfvar: 1min
-#update_bc 10sec or so.
-#wrf: 8 min per output file.
-#Consider 12min for share queue for 00 and 12 test runs which only 6hrs runs.
-#Consider 20min for share queue for 06 and 18 test runs which only 12hrs runs.
 
 #Time info:
 export INITIAL_DATE=2007070300

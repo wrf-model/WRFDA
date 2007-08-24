@@ -10,88 +10,24 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-export DATE=${DATE:-2003010100}                        # Time of analysis (unchanged on exit).
-export FCST_RANGE=${FCST_RANGE:-6}
-export LBC_FREQ=${LBC_FREQ:-06}
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}
-export EXPT=${EXPT:-test}
-export SOLVER=${SOLVER:-em}
-export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
-export HOSTS=${HOSTS:-${HOME}/hosts}
-export NL_VAR4D=${NL_VAR4D:-false}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-export CLEAN=${CLEAN:-false}
-
-# Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wrf}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
-# From WPS (namelist.wps):
-export NL_E_WE=${NL_E_WE:-45}                          #
-export NL_E_SN=${NL_E_SN:-45}                          #
-export NL_DX=${NL_DX:-200000}                # Resolution (m).
-export NL_DY=${NL_DY:-200000}                # Resolution (m).
-
-# From WRF (namelist.input):
-# &time_control:
-export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
 if $NL_VAR4D; then
     export NL_RUN_HOURS=$FCST_RANGE
 fi
-export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
-export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true} 
-export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-"wrfinput_d<domain>_<date>"} 
-export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
-export NL_INPUTOUT_INTERVAL_M=$NL_HISTORY_INTERVAL
-# &domains:
-export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
-export NL_E_VERT=${NL_E_VERT:-28}                   #
-export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
-export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
-export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
-# &physics:
-export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
-export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
-export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
-export NL_RADT=${NL_RADT:-30}                # 
-export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
-export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
-export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
-export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
-export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
-export NL_CUDT=${NL_CUDT:-5}
-export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
-# &dynamics:
-export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
-export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
-export NL_PD_MOIST=${NL_PD_MOIST:-false}             # 
 
-# The recommended value for real data cases for the eddy coefficient
-# option is 4, but Registry.EM has value 1, so modify for WRFVAR
-export NL_KM_OPT=${NL_KM_OPT:-4}               # 
-
-export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    # 
-# &bdy_control:
-export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
-
-# For WRF:
-export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
-export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
+# allow for ensemble members identified by CMEM
+if [[ ! -z $CMEM ]]; thhen
+   export WRF_INPUT_DIR=${WRF_INPUT_DIR:-$RC_DIR/$DATE}.$CMEM
+   export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d01}.$CMEM
+else
+   export WRF_INPUT_DIR=${WRF_INPUT_DIR:-$RC_DIR/$DATE}
+   export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d01}
+fi
 
 if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
 rm -rf $WORK_DIR
@@ -106,18 +42,19 @@ echo "<H1>$EXPT wrf</H1><PRE>"
 
 date
 
-echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
-echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
-echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
-echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
-echo 'FC_DIR     <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
-echo "DATE       $DATE"
-echo "END_DATE   $END_DATE"
-echo "FCST_RANGE $FCST_RANGE"
-echo "LBC_FREQ   $LBC_FREQ"
-echo "WRF_INPUT  $WRF_INPUT"
-echo "WRF_BDY    $WRF_BDY"
+echo 'REL_DIR        <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'         
+echo 'WRF_DIR        <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN 
+echo 'RUN_DIR        <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'         
+echo 'WORK_DIR       <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'       
+echo 'RC_DIR         <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'           
+echo 'FC_DIR         <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'           
+echo "DATE           $DATE"                                            
+echo "END_DATE       $END_DATE"                                        
+echo "FCST_RANGE     $FCST_RANGE"                                      
+echo "LBC_FREQ       $LBC_FREQ"                                        
+echo "WRF_INPUT_DIR  $WRF_INPUT_DIR"
+echo "WRF_BDY        $WRF_BDY"
+echo "MEM            $MEM"
 
 # Copy necessary info (better than link as not overwritten):
 ln -fs ${WRF_DIR}/main/wrf.exe .
@@ -128,10 +65,12 @@ ln -fs ${WRF_DIR}/run/LANDUSE.TBL .
 ln -fs ${WRF_DIR}/run/SOILPARM.TBL .
 ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
 ln -fs ${WRF_DIR}/run/gribmap.txt .
-ln -fs ${WRF_INPUT} wrfinput_d${DOMAIN}
-ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
-# WHY
-# cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+for DOMAIN in $DOMAINS; do
+   ln -fs $WRF_INPUT_DIR/wrfinput_d${DOMAIN} wrfinput_d${DOMAIN}
+   # WHY
+   # cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+done
+ln -fs $WRF_INPUT_DIR/wrfbdy_d01 .
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
@@ -161,7 +100,10 @@ if $DUMMY; then
       export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
       export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
       export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
-      echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
+      for DOMAIN in $DOMAINS; do
+         echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
+         echo Dummy wrf > wrfinput_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
+      done
       LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
    done
 else
@@ -192,7 +134,7 @@ else
    echo $(date +'%D %T') "Ended $RC"
 fi
 
-mv wrfinput_d01_* $FC_DIR/$DATE
+mv wrfinput_* $FC_DIR/$DATE
 mv wrfout_* $FC_DIR/$DATE
 
 if $CLEAN; then
