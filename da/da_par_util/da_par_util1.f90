@@ -1,7 +1,6 @@
 module da_par_util1
 
    use da_control, only : rootproc, ierr, comm, root
-
 #ifdef DM_PARALLEL
 
 #if ( DWORDSIZE != RWORDSIZE )

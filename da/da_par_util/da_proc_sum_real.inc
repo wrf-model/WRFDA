@@ -13,16 +13,21 @@ subroutine da_proc_sum_real (value)
 
    implicit none
 
-   real,    intent(inout)      :: value(:) ! Array to be summed componentwise.
+   real, intent(inout) :: value(:) ! Array to be summed componentwise.
 
 #ifdef DM_PARALLEL
    real              :: apsum(size(value))             ! Sum across processors.
+
+   ! Don't trace, as called within trace routines
+   !if (trace_use_frequent) call da_trace_entry("da_proc_sum_real")
 
    apsum(:)=0
    call mpi_reduce(value, apsum, SIZE(value), true_mpi_real, mpi_sum, root, &
       comm, ierr)
 
    if (rootproc) value = apsum
+
+   !if (trace_use_frequent) call da_trace_exit("da_proc_sum_real")
 #endif
 
 end subroutine da_proc_sum_real

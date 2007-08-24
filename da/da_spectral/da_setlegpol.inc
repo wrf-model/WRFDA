@@ -15,9 +15,9 @@ subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
    integer, intent(in)  :: nj                         ! Latitude dimension.
    integer, intent(in)  :: max_wavenumber             ! Maximum zonal wavenumber.
    integer, intent(in)  :: alp_size                   ! Ass. Leg. Pol. array size.
-   real, intent(in)     :: sinlat(1:nj)               ! sine(latitude).
-   real, intent(in)     :: coslat(1:nj)               ! cosine(latitude).
-   real, intent(out)    :: alp(1:alp_size)            ! Associated Legendre Polynomial.
+   real,    intent(in)  :: sinlat(1:nj)               ! sine(latitude).
+   real,    intent(in)  :: coslat(1:nj)               ! cosine(latitude).
+   real,    intent(out) :: alp(1:alp_size)            ! Associated Legendre Polynomial.
 
    integer              :: j, l, m, mm                ! Loop counters.
    integer              :: l1, l2, m2                 ! Markers.
@@ -28,6 +28,8 @@ subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
    real                 :: c(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
    real                 :: d(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
    real                 :: e(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
+
+   if (trace_use) call da_trace_entry("da_setlegpol")
 
    alp(:) = 0.0
 
@@ -91,6 +93,8 @@ subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_setlegpol")
 
 end subroutine da_setlegpol
 

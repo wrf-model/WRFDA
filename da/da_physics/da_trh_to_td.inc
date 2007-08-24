@@ -58,7 +58,7 @@ subroutine da_trh_to_td (rh, t, td, xp)
 
    real    :: invdifftd, invtd
 
-   if (trace_use) call da_trace_entry("da_trh_to_td")
+   if (trace_use_dull) call da_trace_entry("da_trh_to_td")
 
    do j=jts,jte
       do k=kts,kte
@@ -81,7 +81,7 @@ subroutine da_trh_to_td (rh, t, td, xp)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_trh_to_td")
+   if (trace_use_dull) call da_trace_exit("da_trh_to_td")
 
 end subroutine da_trh_to_td
 

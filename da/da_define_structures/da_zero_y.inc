@@ -12,7 +12,7 @@ subroutine da_zero_y( iv, y )
    integer                               :: n       ! Loop counter.
    integer                               :: nlevels ! Number of levels.
 
-   if (trace_use) call da_trace_entry("da_zero_y")
+   if (trace_use_dull) call da_trace_entry("da_zero_y")
 
    !---------------------------------------------------------------------------
    ! [1.0] Copy number of observations:
@@ -244,7 +244,7 @@ subroutine da_zero_y( iv, y )
    end if
 
 
-   if (trace_use) call da_trace_exit("da_zero_y")
+   if (trace_use_dull) call da_trace_exit("da_zero_y")
 
 end subroutine da_zero_y        
 

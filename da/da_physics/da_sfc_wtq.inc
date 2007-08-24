@@ -1,6 +1,5 @@
 subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
-                     hs, roughness, xland, &
-                     u10, v10, t2, q2, regime) 
+   hs, roughness, xland, u10, v10, t2, q2, regime) 
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculate the  10m wind, 2m temperature and moisture based on the
@@ -46,12 +45,11 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    implicit none
 
-   real, intent (in)                :: ps , ts , qs , us, vs
-   real, intent (in)                :: ps2, ts2, qs2, psfc, tg
-   real, intent (in)                :: hs, roughness, xland
-
-   real,    intent (out)            :: regime
-   real   , intent (out)            :: u10, v10, t2, q2
+   real, intent (in)  :: ps , ts , qs , us, vs
+   real, intent (in)  :: ps2, ts2, qs2, psfc, tg
+   real, intent (in)  :: hs, roughness, xland
+   real, intent (out) :: regime
+   real, intent (out) :: u10, v10, t2, q2
 
    ! Maximum number of iterations in computing psim, psih
 
@@ -85,6 +83,8 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    real :: zq0, z0
 
    real, parameter :: ka = 2.4E-5
+
+   if (trace_use_dull) call da_trace_entry("da_sfc_wtq")
 
    rcp = gas_constant/cp
 
@@ -327,6 +327,8 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    v10 = vs * psiz / psiw
    t2 = (thg + (ths - thg)*psit2/psit)*((psfc/100.0)/1000.0)**rcp
    q2 = qg + (qs - qg)*psiq2/psiq 
+
+   if (trace_use_dull) call da_trace_exit("da_sfc_wtq")
 
 end subroutine da_sfc_wtq
 

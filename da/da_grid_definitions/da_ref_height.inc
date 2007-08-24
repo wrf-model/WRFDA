@@ -14,6 +14,8 @@ subroutine da_ref_height(pres, ref_height)
 
    real, parameter   :: rovg = gas_constant/gravity
 
+   if (trace_use) call da_trace_entry("da_ref_height")
+
    aa = 0.5 * rovg * base_lapse
    bb = rovg * t0
 
@@ -29,6 +31,8 @@ subroutine da_ref_height(pres, ref_height)
          ref_height=ziso+rovg*base_temp*log(p0iso/pres)
       end if
    end if
+
+   if (trace_use) call da_trace_exit("da_ref_height")
 
 end subroutine da_ref_height
 

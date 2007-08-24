@@ -14,16 +14,18 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi)
 
    implicit none
    
-   real, intent(inout):: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
-   real, intent(inout):: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
-   real, intent(inout):: psi(ims:ime,jms:jme,kms:kme) ! Stream function
-   real, intent(inout):: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
-   real, intent(in)   :: coefx(ims:ime,jms:jme)       ! Multiplicative coeff.
-   real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
+   real, intent(inout) :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
+   real, intent(inout) :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
+   real, intent(inout) :: psi(ims:ime,jms:jme,kms:kme) ! Stream function
+   real, intent(inout) :: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
+   real, intent(in)    :: coefx(ims:ime,jms:jme)       ! Multiplicative coeff.
+   real, intent(in)    :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
    
-   integer            :: i, j, k                      ! Loop counters.
-   integer            :: is, ie                       ! 1st dim. end points.
-   integer            :: js, je                       ! 2nd dim. end points.
+   integer :: i, j, k                      ! Loop counters.
+   integer :: is, ie                       ! 1st dim. end points.
+   integer :: js, je                       ! 2nd dim. end points.
+
+   if (trace_use) call da_trace_entry("da_psichi_to_uv_adj")
 
    !---------------------------------------------------------------------------
    ! [5.0] For Global application, set Wast-Eest Periodic boundary
@@ -198,6 +200,8 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi)
        call da_set_boundary_3d(psi)
        call da_set_boundary_3d(chi)
    end if
+
+   if (trace_use) call da_trace_exit("da_psichi_to_uv_adj")
 
 end subroutine da_psichi_to_uv_adj
 

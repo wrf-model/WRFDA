@@ -7,11 +7,13 @@ subroutine da_set_boundary_3d(var)
 
    implicit none
 
-   real, dimension(ims:ime, jms:jme, kms:kme),intent(inout) :: var
+   real, intent(inout) :: var(ims:ime, jms:jme, kms:kme)
 
    integer :: n, j, k
 
    if ((its /= ids) .or. (ite /= ide)) return
+
+   if (trace_use) call da_trace_entry("da_set_boundary_3d")
 
    do k=kts, kte
       do j=jts, jte
@@ -21,6 +23,8 @@ subroutine da_set_boundary_3d(var)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_set_boundary_3d")
 
 end subroutine da_set_boundary_3d
 

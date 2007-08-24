@@ -12,6 +12,8 @@ subroutine da_setup_testfield(grid)
 
    integer :: i, j
 
+   if (trace_use) call da_trace_entry("da_setup_testfield")
+
    !-------------------------------------------------------------------------
    ! [1.0]: initialise:
    !-------------------------------------------------------------------------
@@ -78,8 +80,7 @@ subroutine da_setup_testfield(grid)
       if (use_gpsrefobs) &
          call da_transform_xtogpsref_lin(grid)
 
-      if (use_ssmt1obs .or. use_ssmt2obs .or. &
-           use_ssmitbobs .or. use_ssmiretrievalobs) then
+      if (use_ssmt1obs .or. use_ssmt2obs .or. use_ssmitbobs .or. use_ssmiretrievalobs) then
          call da_transform_xtoseasfcwind_lin(grid)
       end if
 
@@ -88,8 +89,9 @@ subroutine da_setup_testfield(grid)
 #endif
    end if
 
-   write(unit=stdout, fmt='(/a/)') &
-      'End of da_setup_testfield.'
+   write(unit=stdout, fmt='(/a/)') 'End of da_setup_testfield.'
+
+   if (trace_use) call da_trace_exit("da_setup_testfield")
 
 end subroutine da_setup_testfield
 

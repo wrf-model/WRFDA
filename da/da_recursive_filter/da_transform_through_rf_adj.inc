@@ -28,7 +28,7 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
    ! [1.0]: Initialise:
    !-------------------------------------------------------------------------  
 
-   if (trace_use) call da_trace_entry("da_transform_through_rf_adj")
+   if (trace_use_dull) call da_trace_entry("da_transform_through_rf_adj")
 
    rf_passes_over_two = rf_passes / 2
 
@@ -118,7 +118,7 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
       field(its:ite,jts:jte,m) = xp % v1z(its:ite,jts:jte,m) / p_x(its:ite,jts:jte)
    end do
 
-   if (trace_use) call da_trace_exit("da_transform_through_rf_adj")
+   if (trace_use_dull) call da_trace_exit("da_transform_through_rf_adj")
 
 end subroutine da_transform_through_rf_adj
 

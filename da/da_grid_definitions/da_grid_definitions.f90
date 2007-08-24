@@ -5,9 +5,11 @@ module da_grid_definitions
    !---------------------------------------------------------------------------
    
    use da_control, only : gravity, convert_fd2uv, gas_constant, convert_uv2fd, &
-      pi, cone_factor, map_projection, phic,psi1,earth_radius,c2,pole, &
-      ycntr,truelat1_3dv,xlonc,ptop,t0,base_pres,base_lapse,base_temp
+      pi, cone_factor, map_projection, phic,psi1,earth_radius,c2,pole, trace_use, &
+      ycntr,truelat1_3dv,xlonc,ptop,t0,base_pres,base_lapse,base_temp, trace_use_dull, &
+      trace_use_frequent
    use da_reporting, only : da_error,message
+   use da_tracing, only : da_trace_entry, da_trace_exit
    
    implicit none
    

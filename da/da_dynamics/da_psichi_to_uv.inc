@@ -15,15 +15,17 @@ subroutine da_psichi_to_uv(psi, chi, coefx,coefy, u, v)
    
    real, intent(inout) :: psi(ims:ime,jms:jme,kms:kme) ! Stream function
    real, intent(inout) :: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
-   real, intent(in)   :: coefx(ims:ime,jms:jme)       ! Multiplicative coeff.
-   real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
-   real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
-   real, intent(out)  :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
+   real, intent(in)    :: coefx(ims:ime,jms:jme)       ! Multiplicative coeff.
+   real, intent(in)    :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
+   real, intent(out)   :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
+   real, intent(out)   :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
 
 
    integer            :: i, j, k                      ! Loop counters.
    integer            :: is, ie                       ! 1st dim. end points.
    integer            :: js, je                       ! 2nd dim. end points.
+
+   if (trace_use) call da_trace_entry("da_psichi_to_uv")
 
    !---------------------------------------------------------------------------
    ! [1.0] For Global application, set Wast-Eest Periodic boundary
@@ -158,6 +160,8 @@ subroutine da_psichi_to_uv(psi, chi, coefx,coefy, u, v)
       call da_set_boundary_3d(u)
       call da_set_boundary_3d(v)
    end if
+
+   if (trace_use) call da_trace_exit("da_psichi_to_uv")
 
 end subroutine da_psichi_to_uv
 

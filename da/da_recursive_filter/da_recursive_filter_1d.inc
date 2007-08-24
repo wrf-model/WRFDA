@@ -9,15 +9,17 @@ subroutine da_recursive_filter_1d(pass, alpha, field, n)
    implicit none
 
    integer, intent(in)    :: pass           ! Current pass of filter.
-   real, intent(in)       :: alpha          ! Alpha coefficient for RF.
-   real, intent(inout)    :: field(:)       ! Array to be filtered.
+   real,    intent(in)    :: alpha          ! Alpha coefficient for RF.
+   real,    intent(inout) :: field(:)       ! Array to be filtered.
    integer, intent(in)    :: n              ! Size of field array.
 
-   integer                :: j              ! Loop counter.
-   real                   :: one_alpha      ! 1 - alpha.
-   real                   :: a(1:n)         ! Input field.
-   real                   :: b(1:n)         ! Field after left-right pass.
-   real                   :: c(1:n)         ! Field after right-left pass.
+   integer :: j              ! Loop counter.
+   real    :: one_alpha      ! 1 - alpha.
+   real    :: a(1:n)         ! Input field.
+   real    :: b(1:n)         ! Field after left-right pass.
+   real    :: c(1:n)         ! Field after right-left pass.
+
+   if (trace_use_dull) call da_trace_entry("da_recursive_filter_1d")
    
    !-------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -66,6 +68,8 @@ subroutine da_recursive_filter_1d(pass, alpha, field, n)
    end do
         
    field(1:n) = c(1:n)
+
+   if (trace_use_dull) call da_trace_exit("da_recursive_filter_1d")
    
 end subroutine da_recursive_filter_1d
 

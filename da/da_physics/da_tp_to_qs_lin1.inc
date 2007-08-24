@@ -19,7 +19,7 @@ subroutine da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
    real :: temp           ! Temporary value.
    real :: es_prime_over_es ! es~/es
 
-   if (trace_use) call da_trace_entry("da_tp_to_qs_lin1")
+   if (trace_use_dull) call da_trace_entry("da_tp_to_qs_lin1")
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
@@ -39,7 +39,7 @@ subroutine da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
 
    qs_prime_over_qs = (p * es_prime_over_es - p_prime) / (p - rd_over_rv1 * es)
 
-   if (trace_use) call da_trace_exit("da_tp_to_qs_lin1")
+   if (trace_use_dull) call da_trace_exit("da_tp_to_qs_lin1")
 
 
 end subroutine da_tp_to_qs_lin1

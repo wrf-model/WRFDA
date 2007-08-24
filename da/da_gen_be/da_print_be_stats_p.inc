@@ -32,6 +32,8 @@ subroutine da_print_be_stats_p(outunit, ni, nj, nk, num_bins, num_bins2d, bin, &
 
    integer             :: k1, k2, i, k, j, b, number      ! Loop counters.
 
+   if (trace_use) call da_trace_entry("da_print_be_stats_p")
+
    write(unit=stdout,fmt='(a,i5)')' psi/chi regression coefficient in unit ', outunit
 
    open(unit=outunit)
@@ -104,6 +106,8 @@ subroutine da_print_be_stats_p(outunit, ni, nj, nk, num_bins, num_bins2d, bin, &
    write(unit=stdout,fmt=*) ' '
 
    outunit = outunit + 1
+
+   if (trace_use) call da_trace_exit("da_print_be_stats_p")
 
 end subroutine da_print_be_stats_p
 

@@ -1,5 +1,4 @@
-subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
-                                     coefy, term_x, term_y)
+subroutine da_balance_cycloterm_adj (rho, ub, vb, u, v, coefx, coefy, term_x, term_y)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_balance_cycloterm
@@ -7,16 +6,16 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
    implicit none
    
-   real, dimension(ims:ime,jms:jme), &
-      intent(in) :: rho, &       ! Density.
-                    ub, &        ! Background u wind
-                    vb, &        ! Background u wind
-                    term_x, &    ! x component of term
-                    term_y, &    ! y component of term
-                    coefx, coefy ! Mulplicative coeff. 
+   real, intent(in)    :: rho(ims:ime,jms:jme)    ! Density.
+   real, intent(in)    :: ub(ims:ime,jms:jme)     ! Background u wind
+   real, intent(in)    :: vb(ims:ime,jms:jme)     ! Background u wind
+   real, intent(in)    :: term_x(ims:ime,jms:jme) ! x component of term
+   real, intent(in)    :: term_y(ims:ime,jms:jme) ! y component of term
+   real, intent(in)    :: coefx(ims:ime,jms:jme)
+   real, intent(in)    :: coefy(ims:ime,jms:jme)  ! Mulplicative coeff. 
 
-   real, dimension(ims:ime,jms:jme), intent(inout) :: u, & ! u wind increment
-                                                      v    ! v wind increment
+   real, intent(inout) :: u(ims:ime,jms:jme)      ! u wind increment
+   real, intent(inout) :: v(ims:ime,jms:jme)      ! v wind increment
 
    integer              :: i, j                         ! Loop counters.
    integer              :: is, ie                       ! 1st dim. end points.
@@ -25,16 +24,18 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
    real                 :: var, varb, uar
 
+   if (trace_use) call da_trace_entry("da_balance_cycloterm_adj")
+
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
 
    ! Computation to check for edge of domain:
    is = its; ie = ite; js = jts; je = jte
-   if (.not. global .and. its == ids ) is = ids+1
-   if (.not. global .and. ite == ide ) ie = ide-1
-   if (jts == jds ) js = jds+1
-   if (jte == jde ) je = jde-1
+   if (.not. global .and. its == ids) is = ids+1
+   if (.not. global .and. ite == ide) ie = ide-1
+   if (jts == jds) js = jds+1
+   if (jte == jde) je = jde-1
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate term_y = rho M ( u'dv/dx + v'dv/dy + udv'/dx + vdv'/dy ):
@@ -292,7 +293,6 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
    do j = je, js, -1
       do i = ie, is, -1
-
          uar = coefx(i,j) * ub(i,j) * data(i,j)
          var = coefy(i,j) * vb(i,j) * data(i,j)
 
@@ -304,6 +304,8 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
          u(i,j-1) = u(i,j-1) - var  
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_balance_cycloterm_adj")
 
 end subroutine da_balance_cycloterm_adj
 

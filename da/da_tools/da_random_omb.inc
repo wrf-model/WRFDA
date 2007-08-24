@@ -11,11 +11,12 @@ subroutine da_random_omb(std_dev, yo, qc_flag, omb)
    integer, intent(in)  :: qc_flag      ! Ob QC flag.
    real, intent(inout)  :: omb          ! O-B.
 
-   real                 :: xb           ! Background value.
-   real                 :: z            ! Gaussian noise.
+   real :: xb           ! Background value.
+   real :: z            ! Gaussian noise.
+
+   if (trace_use) call da_trace_entry("da_random_omb")
 
    if (qc_flag >= obs_qc_pointer) then
-
       ! [1] Calculate background value from old O, O-B:
       xb = yo - omb
    
@@ -26,8 +27,9 @@ subroutine da_random_omb(std_dev, yo, qc_flag, omb)
 
       ! [3] Recalculate corresponding observation:
       yo = xb + omb
-
    end if
+
+   if (trace_use) call da_trace_exit("da_random_omb")
 
 end subroutine da_random_omb
 

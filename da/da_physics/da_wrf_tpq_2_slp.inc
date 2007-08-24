@@ -27,7 +27,7 @@ subroutine da_wrf_tpq_2_slp (grid)
                           PCONST=10000.0 ,  &
                           EPS   = 0.622
 
-   if (trace_use) call da_trace_entry("da_wrf_tpq_2_slp")
+   if (trace_use_dull) call da_trace_entry("da_wrf_tpq_2_slp")
 
                                                                      
    ! sea level pressure                                            
@@ -92,7 +92,7 @@ subroutine da_wrf_tpq_2_slp (grid)
       end do i_loop
    end do j_loop
 
-   if (trace_use) call da_trace_exit("da_wrf_tpq_2_slp")
+   if (trace_use_dull) call da_trace_exit("da_wrf_tpq_2_slp")
 
 end subroutine da_wrf_tpq_2_slp
 

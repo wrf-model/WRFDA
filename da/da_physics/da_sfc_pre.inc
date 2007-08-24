@@ -29,6 +29,8 @@ subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
    real, parameter      :: GASR =  gas_constant
    real, parameter      :: G = gravity
 
+   if (trace_use) call da_trace_entry("da_sfc_pre")
+
    ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
 
@@ -55,6 +57,8 @@ subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
    arg = arg0    / tv 
 
    psfcm = psm * exp (arg)
+
+   if (trace_use) call da_trace_exit("da_sfc_pre")
 
 end subroutine da_sfc_pre
 

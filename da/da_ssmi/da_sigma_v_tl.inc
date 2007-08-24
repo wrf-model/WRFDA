@@ -61,12 +61,15 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
 
    ! data wvcor/1.01,0.95,1.06,0.92/
    data wvcor/1.02,0.98,1.02,0.88/
+
+   if (trace_use) call da_trace_entry("da_sigma_v_tl")
+
    ! use modified water vapor value to correct for errors in theoretical absorption
 
-   wvc     =     wv*wvcor(ifreq)
+   wvc     = wv*wvcor(ifreq)
    TGL_wvc = TGL_wv*wvcor(ifreq)
 
-   if (ifreq.eq.1) then
+   if (ifreq==1) then
       pbar1 = p0/(1.0 + hwv/h1)
       TGL_pbar1  = TGL_p0/(1.0 + hwv/h1)-pbar1*TGL_hwv/(h1*(1.0 + hwv/h1))
       voh1       = wv/hwv
@@ -74,8 +77,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       term21     = a21*voh1
       TGL_term21 = a21*TGL_voh1
       otbar1     =  1.0/(ta - const1*gamma*hwv)
-      TGL_otbar1 = -otbar1*otbar1*(TGL_ta-const1*gamma*TGL_hwv &
-                                        -const1*TGL_gamma*hwv)
+      TGL_otbar1 = -otbar1*otbar1*(TGL_ta-const1*gamma*TGL_hwv - const1*TGL_gamma*hwv)
       term31     = a31*otbar1
       TGL_term31 = a31*TGL_otbar1
       term61     = a61*otbar1*otbar1
@@ -87,7 +89,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       sigv       = a11 + term21 + term31 + term41 + term51 + term61
       TGL_sigv   = TGL_term21+TGL_term31+TGL_term41+TGL_term51+TGL_term61
 
-   else if (ifreq.eq.2) then
+   else if (ifreq==2) then
       pbar2      = p0/(1.0 + hwv/h2)
       TGL_pbar2  = TGL_p0/(1.0 + hwv/h2)-pbar2*TGL_hwv/h2/(1.0 + hwv/h2)
       term22     = a22*pbar2
@@ -108,7 +110,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       sigv       = a12 + term22 + term32 + term42 + term52 + term62
       TGL_sigv   = TGL_term22 + TGL_term32 + TGL_term42 + TGL_term52 + TGL_term62
 
-   else if (ifreq.eq.3) then
+   else if (ifreq == 3) then
       pbar3      = p0/(1.0 + hwv/h3)
       TGL_pbar3  = TGL_p0/(1.0 + hwv/h3)-pbar3*TGL_hwv/h3/(1.0 + hwv/h3)
       term43     = a43*pbar3*pbar3
@@ -128,37 +130,34 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       TGL_term63 = a63*(TGL_otbar3*voh3+otbar3*TGL_voh3)
       sigv       = a13 + term23 + term33 + term43 + term53 + term63
       TGL_sigv   = TGL_term23 + TGL_term33 + TGL_term43 + TGL_term53 + TGL_term63
+   else if (ifreq == 4) then
+      pbar4      = p0/(1.0 + hwv/h4)
+      TGL_pbar4  = TGL_p0/(1.0 + hwv/h4)-pbar4*TGL_hwv/h4/(1.0 + hwv/h4)
+      term44     = a44*pbar4*pbar4
+      TGL_term44 = 2.0*a44*pbar4*TGL_pbar4
+      voh4       = wv/hwv
+      TGL_voh4   = TGL_wv/hwv-voh4*TGL_hwv/hwv
+      term24     = a24*voh4
+      TGL_term24 = a24*TGL_voh4
+      otbar4     = 1.0/(ta - const4*gamma*hwv)
+      TGL_otbar4 = -otbar4*otbar4*(TGL_ta-const4*gamma*TGL_hwv -const4*TGL_gamma*hwv)
+      term34     = a34*otbar4
+      TGL_term34 = a34*TGL_otbar4
+      term54     = a54*pbar4*voh4
+      TGL_term54 = a54*(TGL_pbar4*voh4+pbar4*TGL_voh4)
+      term64     = a64*otbar4*voh4
+      TGL_term64 = a64*(TGL_otbar4*voh4+otbar4*TGL_voh4)
+      sigv       = a14 + term24 + term34 + term44 + term54 + term64
+      TGL_sigv   = TGL_term24 + TGL_term34 + TGL_term44 + TGL_term54 + TGL_term64
+   else
+      sigv     = 0.0
+      TGL_sigv = 0.0
+   end if
 
-   else if (ifreq.eq.4) then
+   sigma_v     = sigv*wvc
+   TGL_sigma_v = TGL_sigv*wvc+sigv*TGL_wvc
 
-             pbar4 = p0/(1.0 + hwv/h4)
-         TGL_pbar4 = TGL_p0/(1.0 + hwv/h4)-pbar4*TGL_hwv/h4/(1.0 + hwv/h4)
-            term44 = a44*pbar4*pbar4
-        TGL_term44 = 2.0*a44*pbar4*TGL_pbar4
-              voh4 = wv/hwv
-          TGL_voh4 = TGL_wv/hwv-voh4*TGL_hwv/hwv
-            term24 = a24*voh4
-        TGL_term24 = a24*TGL_voh4
-            otbar4 = 1.0/(ta - const4*gamma*hwv)
-        TGL_otbar4 = -otbar4*otbar4*(TGL_ta-const4*gamma*TGL_hwv &
-                                           -const4*TGL_gamma*hwv)
-            term34 = a34*otbar4
-        TGL_term34 = a34*TGL_otbar4
-            term54 = a54*pbar4*voh4
-        TGL_term54 = a54*(TGL_pbar4*voh4+pbar4*TGL_voh4)
-            term64 = a64*otbar4*voh4
-        TGL_term64 = a64*(TGL_otbar4*voh4+otbar4*TGL_voh4)
-              sigv = a14 + term24 + term34 + term44 + term54 + term64
-          TGL_sigv = TGL_term24 + TGL_term34 + TGL_term44 + TGL_term54 + TGL_term64
-
-      else
-              sigv = 0.0
-          TGL_sigv = 0.0
-
-      end if
-
-           sigma_v = sigv*wvc
-       TGL_sigma_v = TGL_sigv*wvc+sigv*TGL_wvc
+   if (trace_use) call da_trace_exit("da_sigma_v_tl")
 
 end subroutine da_sigma_v_tl
 

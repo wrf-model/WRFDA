@@ -13,7 +13,7 @@ subroutine da_final_write_y(iv)
    character(len=filename_len), allocatable     :: filename(:)
    character(len=filename_len)                  :: ob_name, file_prefix  
 
-   if (trace_use) call da_trace_entry("da_final_write_y")
+   if (trace_use_dull) call da_trace_entry("da_final_write_y")
 
 #ifdef DM_PARALLEL
    ! Ensure other processors have written their temporary files
@@ -464,7 +464,7 @@ subroutine da_final_write_y(iv)
       deallocate (filename)
    end if
 
-   if (trace_use) call da_trace_exit("da_final_write_y")
+   if (trace_use_dull) call da_trace_exit("da_final_write_y")
    
 end subroutine da_final_write_y
 

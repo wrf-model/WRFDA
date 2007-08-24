@@ -30,6 +30,8 @@ subroutine da_stage0_initialize(input_file, var, dim1, dim2, dim3, ds)
    integer                        :: dims(1:4)        ! Dimensions of field. 
    real (kind=4), allocatable     :: value_real(:)    ! real attribute value. 
 
+   ! if (trace_use) call da_trace_entry("da_stage0_initialize")
+
    ! Check file exists:
    length = len_trim(input_file)
    rcode = nf_open(input_file(1:length), NF_NOwrite, cdfid)
@@ -65,6 +67,8 @@ subroutine da_stage0_initialize(input_file, var, dim1, dim2, dim3, ds)
    deallocate(value_real)
 
    rcode = nf_close(cdfid)
+
+   ! if (trace_use) call da_trace_exit("da_stage0_initialize")
 
 end subroutine da_stage0_initialize
 

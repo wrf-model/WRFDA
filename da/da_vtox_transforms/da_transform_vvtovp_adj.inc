@@ -18,7 +18,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, vp, vv, mz, levels)
    integer :: i, j, m, k                 ! Loop counters.
    real    :: temp
 
-   if (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
+   if (trace_use_dull) call da_trace_entry("da_transform_vvtovp_adj")
 
    !-------------------------------------------------------------------
    ! [1.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0:
@@ -26,7 +26,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, vp, vv, mz, levels)
 
    if (vertical_ip /= vertical_ip_0) then
       vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
-                                    vertical_wgt(its:ite,jts:jte,kts:levels)
+         vertical_wgt(its:ite,jts:jte,kts:levels)
    end if
 
    !-------------------------------------------------------------------
@@ -46,7 +46,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, vp, vv, mz, levels)
       end do
    end do
 
-  if (trace_use) call da_trace_exit("da_transform_vvtovp_adj")
+  if (trace_use_dull) call da_trace_exit("da_transform_vvtovp_adj")
 
 end subroutine da_transform_vvtovp_adj
 

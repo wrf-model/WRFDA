@@ -18,7 +18,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
    integer                          :: mz                 ! Vertical truncation.
    integer                          :: j, m, k            ! Loop counter.
 
-   if (trace_use) call da_trace_entry("da_allocate_background_errors")
+   if (trace_use_dull) call da_trace_entry("da_allocate_background_errors")
 
    !--------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -116,7 +116,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
       be_sub % rf_alpha(1:mz) = 1.0    
    end if
 
-   if (trace_use) call da_trace_exit("da_allocate_background_errors")
+   if (trace_use_dull) call da_trace_exit("da_allocate_background_errors")
 
 end subroutine da_allocate_background_errors
 

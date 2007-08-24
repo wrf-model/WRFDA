@@ -12,23 +12,24 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, del2b, b)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
-
-   type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
-   real, intent(in)           :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
-   real, intent(out)          :: b(ims:ime,jms:jme,kms:kme)  ! B.
+   type (domain),   intent(inout) :: grid
+   type (xbx_type), intent(in)    :: xbx           ! Header & non-gridded vars.
+   real,            intent(in)    :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
+   real,            intent(out)   :: b(ims:ime,jms:jme,kms:kme)  ! B.
    
-   integer                  :: vector_inc    ! Increment between FST data.
-   integer                  :: vector_jump   ! Jump between start of vectors.
-   integer                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
-   integer                  :: num_vectors   ! Number of FSTs to perform.
-   integer                  :: work_area     ! Dimension for FST routine.
-   integer                  :: idim          ! Size of 1st dimension for FST.
-   integer                  :: jdim          ! Size of 2nd dimension for FST.
+   integer           :: vector_inc    ! Increment between FST data.
+   integer           :: vector_jump   ! Jump between start of vectors.
+   integer           :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
+   integer           :: num_vectors   ! Number of FSTs to perform.
+   integer           :: work_area     ! Dimension for FST routine.
+   integer           :: idim          ! Size of 1st dimension for FST.
+   integer           :: jdim          ! Size of 2nd dimension for FST.
 
-   integer                  :: i, j, k, n, ij     ! loop counter
+   integer           :: i, j, k, n, ij     ! loop counter
 
-   real, allocatable, dimension(:) :: work_1d     ! FFT work array
+   real, allocatable :: work_1d(:)     ! FFT work array
+
+   if (trace_use) call da_trace_entry("da_solve_poissoneqn_fst")
 
    !------------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -260,6 +261,8 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, del2b, b)
    ! [2.5] Write data array into b:
 
    b(its:ite,jts:jte,kts:kte) = grid%xp%v1z(its:ite,jts:jte,kts:kte)
+
+   if (trace_use) call da_trace_exit("da_solve_poissoneqn_fst")
 
 end subroutine da_solve_poissoneqn_fst
 

@@ -9,19 +9,23 @@ subroutine da_put_att_cdf(file, var, att_name, text, debug)
 #include "netcdf.inc"
 
    character (len=80), intent(in) :: file
-   character (len=*), intent(in) :: var, att_name, text
-   logical, intent(in) :: debug
+   character (len=*),  intent(in) :: var, att_name, text
+   logical,            intent(in) :: debug
 
    integer :: cdfid, status, varid, n, natts
    character (len=256) :: loc_att_name
 
+
+   ! not for update_bc
+   ! if (trace_use) call da_trace_entry("da_put_att_cdf")
+
    status = NF_OPEN(file, NF_WRITE, cdfid)
 
    if (status == 0) then
-     if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
+      if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-     write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
-     stop
+      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
+      stop
    end if
 
    status = NF_inQ_VARID(cdfid, var, varid)
@@ -61,6 +65,8 @@ subroutine da_put_att_cdf(file, var, att_name, text, debug)
    end do
 
    status = NF_close(cdfid)
+
+   !if (trace_use) call da_trace_exit("da_put_att_cdf")
 
 end subroutine da_put_att_cdf
 

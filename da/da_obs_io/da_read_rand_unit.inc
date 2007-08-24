@@ -19,6 +19,8 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    real         :: fld(10), fld1_rad , fld2_rad                         
    integer      :: n, k, n1,n2, levels, ios
 
+   if (trace_use) call da_trace_entry("da_read_rand_unit")
+
    open(unit=unit_in,   file=trim(filename), status='old',iostat=ios)
    if (ios /= 0) then
       call da_error(__FILE__,__LINE__, &
@@ -62,13 +64,17 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    goto 1
 
 999 continue
-     close (unit_in)
-     return
+   close (unit_in)
+   if (trace_use) call da_trace_exit("da_read_rand_unit")
+   return
+
 1000  continue 
    write(unit=message(1), fmt='(/a,i3/a/)') &
               'read error on unit: ',unit_in, &
               'in da_read_rand_unit'
    call da_warning(__FILE__,__LINE__,message(1:1))
+
+   if (trace_use) call da_trace_exit("da_read_rand_unit")
 
 end subroutine da_read_rand_unit
 

@@ -11,24 +11,24 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),   intent(inout) :: grid
+   type(xbx_type), intent(in)    :: xbx                            ! Header & non-gridded vars. 
+   real,           intent(in)    :: u(ims:ime,jms:jme,kms:kme)     ! u wind comp.
+   real,           intent(in)    :: v(ims:ime,jms:jme,kms:kme)     ! v wind comp.
+   real,           intent(out)   :: phi_b(ims:ime,jms:jme,kms:kme) ! Balanced mass increment.
 
-   type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars. 
+   integer :: i, j, k                 ! Loop counters.
+   integer :: is, ie                  ! 1st dim. end points.
+   integer :: js, je                  ! 2nd dim. end points.
 
-   real, intent(in)  :: u(ims:ime,jms:jme,kms:kme) ! u wind comp.
-   real, intent(in)  :: v(ims:ime,jms:jme,kms:kme) ! v wind comp.
-   real, intent(out) :: phi_b(ims:ime,jms:jme,kms:kme) ! Balanced mass increment.
-
-   integer              :: i, j, k                ! Loop counters.
-   integer              :: is, ie                 ! 1st dim. end points.
-   integer              :: js, je                 ! 2nd dim. end points.
-
-   real, dimension(ims:ime,jms:jme) :: coefx, &   ! Multiplicative coefficient.
-                                       coefy, &   ! Multiplicative coefficient.
-                                       term_x, &  ! Balance eqn x term
-                                       term_y     ! Balance eqn y term
+   real    :: coefx(ims:ime,jms:jme)  ! Multiplicative coefficient.
+   real    :: coefy(ims:ime,jms:jme)  ! Multiplicative coefficient.
+   real    :: term_x(ims:ime,jms:jme) ! Balance eqn x term
+   real    :: term_y(ims:ime,jms:jme) ! Balance eqn y term
    
-   real, dimension(ims:ime,jms:jme,kms:kme) :: del2phi_b  ! Del**2 phi_b/M**2
+   real    :: del2phi_b(ims:ime,jms:jme,kms:kme)  ! Del**2 phi_b/M**2
+
+   if (trace_use) call da_trace_entry("da_balance_equation_lin")
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise iand set Multipilactive constants
@@ -37,11 +37,11 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
    ! Computation to check for edge of domain:
 
    is = its; ie = ite; js = jts; je = jte
-   if (.not.global .and. its == ids ) is = ids+1
-   if (.not.global .and. ite == ide ) ie = ide-1
-   if (jts == jds ) js = jds+1; if (jte == jde ) je = jde-1
+   if (.not.global .and. its == ids) is = ids+1
+   if (.not.global .and. ite == ide) ie = ide-1
+   if (jts == jds ) js = jds+1; if (jte == jde) je = jde-1
 
-   if( fg_format == fg_format_kma_global) then
+   if (fg_format == fg_format_kma_global) then
       coefx = grid%xb%coefx
       coefy = grid%xb%coefy
    else if( fg_format == fg_format_wrf) then
@@ -55,7 +55,6 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
 
    do k = kts, kte
-   
       term_x(ims:ime,jms:jme) = 0.0
       term_y(ims:ime,jms:jme) = 0.0
 
@@ -65,21 +64,17 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
 
       ! [2.1] Include geostrophic terms in balance eqn if requested:
 
-      if (balance_type == balance_geo .OR. &
-           balance_type == balance_geocyc ) then
-         call da_balance_geoterm_lin( grid%xb % cori, grid%xb % rho(:,:,k), &
-                                      u(:,:,k), v(:,:,k), &
-                                      term_x, term_y)
+      if (balance_type == balance_geo .OR. balance_type == balance_geocyc ) then
+         call da_balance_geoterm_lin (grid%xb % cori, grid%xb % rho(:,:,k), u(:,:,k), v(:,:,k), &
+            term_x, term_y)
       end if
       
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      if (balance_type == balance_cyc .OR. &
-           balance_type == balance_geocyc ) then
-         call da_balance_cycloterm_lin( grid%xb % rho(:,:,k), grid%xb % u(:,:,k),   &
-                                        grid%xb % v(:,:,k), u(:,:,k), v(:,:,k),&
-                                        grid%xb % coefx(:,:), grid%xb % coefy(:,:), &
-                                        term_x(:,:), term_y(:,:))
+      if (balance_type == balance_cyc .OR. balance_type == balance_geocyc ) then
+         call da_balance_cycloterm_lin (grid%xb % rho(:,:,k), grid%xb % u(:,:,k),   &
+            grid%xb % v(:,:,k), u(:,:,k), v(:,:,k), grid%xb % coefx(:,:), grid%xb % coefy(:,:), &
+            term_x(:,:), term_y(:,:))
       end if
       
       ! [2.3] Take divergence to get Del**2 phi_b/M**2:
@@ -101,8 +96,7 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
       if (.not. global .and. (its == ids .and. jts == jds) ) del2phi_b(its,jts,k) = 0.0
       if (.not. global .and. (its == ids .and. jte == jde) ) del2phi_b(its,jte,k) = 0.0
       if (.not. global .and. (ite == ide .and. jts == jds) ) del2phi_b(ite,jts,k) = 0.0
-      if (.not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0
-      
+      if (.not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0     
    end do
 
    !------------------------------------------------------------------------------
@@ -110,6 +104,8 @@ subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
    !------------------------------------------------------------------------------
 
    call da_solve_poissoneqn_fst(grid, xbx, del2phi_b, phi_b) 
+
+   if (trace_use) call da_trace_exit("da_balance_equation_lin")
 
 end subroutine da_balance_equation_lin
 

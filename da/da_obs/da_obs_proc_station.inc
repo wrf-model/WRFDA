@@ -15,7 +15,7 @@ subroutine da_obs_proc_station(obs)
    real    :: po, to, rho, es, qs, qvo
    integer :: i
 
-   if (trace_use_frequent) call da_trace_entry("da_obs_proc_station")
+   if (trace_use_dull) call da_trace_entry("da_obs_proc_station")
 
    do i = 1, obs % info % levels
       !-----------------------------------------------------------------------
@@ -60,7 +60,7 @@ subroutine da_obs_proc_station(obs)
       end if
    end do
 
-   if (trace_use_frequent) call da_trace_exit("da_obs_proc_station")
+   if (trace_use_dull) call da_trace_exit("da_obs_proc_station")
 
 end subroutine da_obs_proc_station
 

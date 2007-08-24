@@ -1,4 +1,5 @@
-subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
+subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,&
+   naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
 
    !-----------------------------------------------------------------------
    ! Purpose: ETKF perturbation updates 
@@ -75,6 +76,8 @@ subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1
  ! real :: proj2sum1
  ! real :: squareinnosum, squareinnosum1
  real :: squareinno
+
+   if (trace_use) call da_trace_entry("da_solve_etkf")
 
    filename_factor = "inflation_factor.dat"
    open(109,form="unformatted",file=filename_factor,access="direct",recl=8)
@@ -182,6 +185,8 @@ subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1
 !------------------------------------------------------------------------------
 
    call da_matmultiover(ens, tr, ndim, nanals)
+
+   if (trace_use) call da_trace_exit("da_solve_etkf")
 
 end subroutine da_solve_etkf
 

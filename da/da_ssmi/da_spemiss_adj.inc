@@ -1,5 +1,4 @@
-subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
-                       ADJ_tk,ADJ_ev,ADJ_eh                              )
+subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh, ADJ_tk,ADJ_ev,ADJ_eh)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -26,6 +25,8 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
    real      tmp1r,tmp1i,tmp2r,tmp2i,tmp0r,tmp0i,rnorm
    real      ADJ_tc,ADJ_tmp0r,ADJ_tmp0i,ADJ_rnorm,ADJ_tmp1r
    real      ADJ_tmp1i,ADJ_tmp2r,ADJ_tmp2i
+
+   if (trace_use) call da_trace_entry("da_spemiss_adj")
 
    epsr=0.0
    epsi=0.0
@@ -116,6 +117,7 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
 
    ADJ_tk      =  ADJ_tc + ADJ_tk
 
+   if (trace_use) call da_trace_exit("da_spemiss_adj")
 
 end subroutine da_spemiss_adj
 

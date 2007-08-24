@@ -1,4 +1,4 @@
-subroutine da_test_spectral( max_wave, sizec, xbx, field)
+subroutine da_test_spectral (max_wave, sizec, xbx, field)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,22 +6,22 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
 
    implicit none
 
-   integer, intent(in)        :: max_wave ! Maximum wavenumber.
-   integer, intent(in)        :: sizec    ! Size of complex cv.
-   type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
+   integer,         intent(in) :: max_wave ! Maximum wavenumber.
+   integer,         intent(in) :: sizec    ! Size of complex cv.
+   type (xbx_type), intent(in) :: xbx  ! For header & non-grid arrays.
+   real,            intent(in) :: field(its:ite,jts:jte)    ! Gridpoint field.
 
-   real, dimension(its:ite,jts:jte), intent(in) :: field    ! Gridpoint field.
+   real    :: field_out(its:ite,jts:jte)
+   real    :: power(0:max_wave)   ! Power spectrum
+   real    :: rcv(1:2*sizec)      ! Spectral modes.
+   real    :: rcv_out(1:2*sizec)  ! Spectral modes.
+   integer :: m,mm, index_start, index_end
+   complex :: r_leg(1:jde)     
+   complex :: ccv(1:sizec)     ! Spectral modes.
+   complex :: ccv1(1:sizec)    ! Spectral modes.
+   real    :: den, num, xx
 
-   real, dimension(its:ite,jts:jte)      :: field_out
-   real, dimension(0:max_wave)           :: power   ! Power spectrum
-   real, dimension(1:2*sizec)    :: rcv     ! Spectral modes.
-   real, dimension(1:2*sizec)    :: rcv_out ! Spectral modes.
-
-   integer             :: m,mm, index_start, index_end
-
-   complex             :: r_leg(1:jde)     
-   complex, dimension(1:sizec) :: ccv, ccv1    ! Spectral modes.
-   real                :: den, num, xx
+   if (trace_use) call da_trace_entry("da_test_spectral")
 
    write (unit=stdout, fmt='(A)') &
       ' Test orthogonality of Associated Legendre Polynomials:'
@@ -119,6 +119,8 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
                aimag(ccv1(index_start:index_end)) )
       write(unit=stdout,fmt='(a,i5,a,e30.20,/)') 'For Wave = ',m,' X.L^TLX  = ',xx
    end do
+
+   if (trace_use) call da_trace_exit("da_test_spectral")
 
 end subroutine da_test_spectral
 

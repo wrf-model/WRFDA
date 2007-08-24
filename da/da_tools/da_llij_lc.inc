@@ -20,7 +20,7 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
    real                          :: rm
    real                          :: ctl1r
 
-   if (trace_use_frequent) call da_trace_entry("da_llij_lc")
+   if (trace_use_dull) call da_trace_entry("da_llij_lc")
     
    ! Compute deltalon between known longitude and standard lon and ensure
    ! it is not in the cut zone
@@ -51,7 +51,7 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
       j = 2.0 - j
    end if
 
-   if (trace_use_frequent) call da_trace_exit("da_llij_lc")
+   if (trace_use_dull) call da_trace_exit("da_llij_lc")
 
 end subroutine da_llij_lc
 

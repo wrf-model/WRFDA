@@ -6,12 +6,13 @@ module da_ffts
 
    use module_domain, only :domain, xpose_type
    use da_control, only : ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
-      Inverse_FFT,  Forward_FFT, ids,jds, &
+      Inverse_FFT,  Forward_FFT, ids,jds, trace_use, &
       ide,jde, stdout
    use da_define_structures, only : xbx_type
    use da_par_util, only : da_transpose_x2z, da_transpose_y2x, &
       da_transpose_y2x_v2, da_transpose_z2x, da_transpose_x2y, &
       da_transpose_x2y_v2
+   use da_tracing, only : da_trace_entry, da_trace_exit
    use da_wrf_interfaces, only : wrf_debug
    use module_dm, only : wrf_dm_sum_reals
 #ifdef RSL_LITE

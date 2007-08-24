@@ -1,5 +1,4 @@
-subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
-                                     coefy, term_x, term_y)
+subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx, coefy, term_x, term_y)
                                      
    !---------------------------------------------------------------------------
    ! Purpose: Calculates linearised cyclostrophic term in balance equation.
@@ -9,24 +8,25 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
    implicit none
    
-   real, dimension(ims:ime,jms:jme), intent(in) :: rho, &   ! Density.
-                                                   ub, &    ! Background u wind
-                                                   vb, &    ! Background u wind
-                                                   u, &     ! u wind increment
-                                                   v, &     ! v wind increment
-                                                   coefx, & ! Multiplicative const.
-                                                   coefy
+   real, intent(in)    :: rho(ims:ime,jms:jme)    ! Density.
+   real, intent(in)    :: ub(ims:ime,jms:jme)     ! Background u wind
+   real, intent(in)    :: vb(ims:ime,jms:jme)     ! Background u wind
+   real, intent(in)    :: u(ims:ime,jms:jme)      ! u wind increment
+   real, intent(in)    :: v(ims:ime,jms:jme)      ! v wind increment
+   real, intent(in)    :: coefx(ims:ime,jms:jme)  ! Multiplicative const.
+   real, intent(in)    :: coefy(ims:ime,jms:jme)
+   real, intent(inout) :: term_x(ims:ime,jms:jme) ! x component of term.
+   real, intent(inout) :: term_y(ims:ime,jms:jme) ! y component of term.
 
-   real, dimension(ims:ime,jms:jme), intent(inout) :: term_x, &     ! x component of term.
-                                                      term_y        ! y component of term.
-
-   integer              :: i, j                         ! Loop counters.
-   integer              :: is, ie                       ! 1st dim. end points.
-   integer              :: js, je                       ! 2nd dim. end points.
+   integer :: i, j                         ! Loop counters.
+   integer :: is, ie                       ! 1st dim. end points.
+   integer :: js, je                       ! 2nd dim. end points.
    
-   real                 :: data(ims:ime,jms:jme)        ! Temporary storage.
+   real    :: data(ims:ime,jms:jme)        ! Temporary storage.
 
-   real                 :: varb, var
+   real    :: varb, var
+
+   if (trace_use) call da_trace_entry("da_balance_cycloterm_lin")
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -244,8 +244,9 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
    ! [3.7] Multiply by  rho and add to term_y
 
-   term_y(its:ite,jts:jte) = rho(its:ite,jts:jte) * data(its:ite,jts:jte) + &
-                             term_y(its:ite,jts:jte)
+   term_y(its:ite,jts:jte) = rho(its:ite,jts:jte) * data(its:ite,jts:jte) + term_y(its:ite,jts:jte)
+
+   if (trace_use) call da_trace_exit("da_balance_cycloterm_lin")
 
 end subroutine da_balance_cycloterm_lin
 

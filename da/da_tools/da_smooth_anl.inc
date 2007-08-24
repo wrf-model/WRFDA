@@ -7,58 +7,62 @@ subroutine da_smooth_anl(slab,imx,jmx,kx,npass,icrsdot)
 
    implicit none
    
-   real, intent(inout)                :: SLAB(:,:,:)
-   integer, intent(in)                :: imx, jmx, kx
-   integer, intent(in)                :: npass
-   integer, intent(in)                :: icrsdot
+   real,    intent(inout) :: SLAB(:,:,:)
+   integer, intent(in)    :: imx, jmx, kx
+   integer, intent(in)    :: npass
+   integer, intent(in)    :: icrsdot
    
-   real, allocatable                  :: SLABNEW(:,:)
-   real                               :: XNU(1:2)
-   integer                            :: ie, je, k 
-   integer                            :: loop, n, i, j
+   real, allocatable :: SLABNEW(:,:)
+   real              :: XNU(1:2)
+   integer           :: ie, je, k 
+   integer           :: loop, n, i, j
+
+   if (trace_use) call da_trace_entry("da_smooth_anl")
    
-   allocate (SLABNEW(IMX,JMX))
+   allocate (slabnew(imx,jmx))
 
-   IE=IMX-1-ICRSdoT
-   JE=JMX-1-ICRSdoT
-   XNU(1)=0.50
-   XNU(2)=-0.52
-   do K=1,KX
-      do LOOP=1,NPASS*2
-         N=2-MOD(LOOP,2)
+   ie=imx-1-icrsdot
+   je=jmx-1-icrsdot
+   xnu(1)=0.50
+   xnu(2)=-0.52
+   do k=1,kx
+      do loop=1,npass*2
+         n=2-mod(loop,2)
  
-         ! FIRST SMOOTH in THE IMX DIRECTION
+         ! first smooth in the imx direction
  
-         do I=2,IE
-            do J=2,JE
-               SLABNEW(I,J)=SLAB(I,J,K)+XNU(N) * &
-               ((SLAB(I,J+1,K)+SLAB(I,J-1,K))*0.5-SLAB(I,J,K))
+         do i=2,ie
+            do j=2,je
+               slabnew(i,j)=slab(i,j,k)+xnu(n) * &
+               ((slab(i,j+1,k)+slab(i,j-1,k))*0.5-slab(i,j,k))
             end do
          end do
-         do I=2,IE
-            do J=2,JE
-               SLAB(I,J,K)=SLABNEW(I,J)
+         do i=2,ie
+            do j=2,je
+               slab(i,j,k)=slabnew(i,j)
             end do
          end do
  
-         ! NOW SMOOTH in THE JMX DIRECTION
+         ! now smooth in the jmx direction
  
-         do J=2,JE
-            do I=2,IE
-               SLABNEW(I,J)=SLAB(I,J,K)+XNU(N) * &
-               ((SLAB(I+1,J,K)+SLAB(I-1,J,K))*0.5-SLAB(I,J,K))
+         do j=2,je
+            do i=2,ie
+               slabnew(i,j)=slab(i,j,k)+xnu(n) * &
+               ((slab(i+1,j,k)+slab(i-1,j,k))*0.5-slab(i,j,k))
             end do
          end do
 
-         do I=2,IE
-            do J=2,JE
-               SLAB(I,J,K)=SLABNEW(I,J)
+         do i=2,ie
+            do j=2,je
+               slab(i,j,k)=slabnew(i,j)
             end do
          end do
       end do
    end do
 
-   deallocate (SLABNEW)
+   deallocate (slabnew)
+
+   if (trace_use) call da_trace_exit("da_smooth_anl")
 
 end subroutine da_smooth_anl
 

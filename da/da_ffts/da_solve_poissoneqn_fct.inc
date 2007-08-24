@@ -11,32 +11,26 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
-   
-   type (xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
-   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
+   type(domain),     intent(inout) :: grid
+   type(xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
+   type(xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
+   real,             intent(in)    :: del2b(ims:ime,jms:jme,kms:kme)   ! Del**2 B.
+   real,             intent(out)   :: b(ims:ime,jms:jme,kms:kme)       ! B
 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      intent(in)    :: del2b   ! Del**2 B.
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      intent(out)   :: b       ! B
+   integer           :: vector_inc    ! Increment between FST data.
+   integer           :: vector_jump   ! Jump between start of vectors.
+   integer           :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
+   integer           :: num_vectors   ! Number of FSTs to perform.
+   integer           :: work_area     ! Dimension for FST routine.
+   integer           :: idim          ! Size of 1st dimension for FST.
+   integer           :: jdim          ! Size of 2nd dimension for FST.
+   integer           :: i, j, k, n, ij     ! loop counter
+   real, allocatable :: work_1d(:)     ! FFT work array
+   real              :: global_mean(kts:kte)
+   real              :: local_mean(kts:kte)
+   real              :: rij
 
-
-   integer                  :: vector_inc    ! Increment between FST data.
-   integer                  :: vector_jump   ! Jump between start of vectors.
-   integer                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
-   integer                  :: num_vectors   ! Number of FSTs to perform.
-   integer                  :: work_area     ! Dimension for FST routine.
-   integer                  :: idim          ! Size of 1st dimension for FST.
-   integer                  :: jdim          ! Size of 2nd dimension for FST.
-
-   integer                  :: i, j, k, n, ij     ! loop counter
-
-   real, allocatable, dimension(:) :: work_1d     ! FFT work array
-
-   real, dimension(xp%kts:xp%kte) :: global_mean, local_mean
-
-   real :: rij
+   if (trace_use) call da_trace_entry("da_solve_poissoneqn_fct")
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -52,11 +46,10 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
 
    ! Copy del2b for transpose.
 
-   xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
-    del2b(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   xp%v1z(its:ite,jts:jte,kts:kte) = del2b(its:ite,jts:jte,kts:kte)
 
-   ! if (xp%ite == xp%ide) xp%v1z(xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = 0.0
-   ! if (xp%jte == xp%jde) xp%v1z(xp%its:xp%ite,xp%jte,xp%kts:xp%kte) = 0.0
+   ! if (ite == ide) xp%v1z(ite,jts:jte,kts:kte) = 0.0
+   ! if (jte == jde) xp%v1z(its:ite,jte,kts:kte) = 0.0
 
    !---------------------------------------------------------------------------
    ! [2.0] Perform calculation of gridpoint b level by level:
@@ -85,7 +78,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
    do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+         do i=ids, ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
          end do
@@ -102,7 +95,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
       
       ij = 0
       do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+         do i=ids, ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)
          end do
@@ -142,7 +135,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
 
    do k = xp%ktsy, xp%ktey
       ij = 0
-      do j=xp%jds, xp%jde
+      do j=jds, jde
          do i=xp%itsy, xp%itey
             ij=ij+1
             work_1d(ij) = xp%v1y(i,j,k)
@@ -192,7 +185,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
                                    work_1d(1), work_area)
 
       ij = 0
-      do j=xp%jds, xp%jde
+      do j=jds, jde
          do i=xp%itsy, xp%itey
             ij=ij+1
             xp%v1y(i,j,k) = work_1d(ij)
@@ -231,7 +224,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
    do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+         do i=ids, ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
          end do
@@ -249,7 +242,7 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
                                      work_1d(1), work_area)
       ij = 0
       do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+         do i=ids, ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)
          end do
@@ -264,24 +257,23 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
 
    ! Remove mean b (set arbitrary constant to zero):
 
-   rij = 1.0/real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
+   rij = 1.0/real((ide-ids+1)*(jde-jds+1))
 
-   do k=xp%kts, xp%kte
-      local_mean(k) = sum(xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
+   do k=kts, kte
+      local_mean(k) = sum(xp%v1z(its:ite,jts:jte,k))*rij
    end do
 
    call wrf_dm_sum_reals (local_mean, global_mean)
 
-   do k=xp%kts,xp%kte
+   do k=kts,kte
       write (unit=stdout,fmt=*) 'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT:  global_mean(', &
          k,') = ', global_mean(k)
    end do
 
    ! [2.5] Write data array into b:
 
-   do k=xp%kts, xp%kte
-      b(xp%its:xp%ite,xp%jts:xp%jte,k) = &
-         xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k) - global_mean(k)
+   do k=kts, kte
+      b(its:ite,jts:jte,k) = xp%v1z(its:ite,jts:jte,k) - global_mean(k)
    end do
 
    !---------------------------------------------------------------------------
@@ -289,6 +281,8 @@ subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
    !---------------------------------------------------------------------------
 
    if (allocated(work_1d)) deallocate(work_1d)
+
+   if (trace_use) call da_trace_exit("da_solve_poissoneqn_fct")
 
 end subroutine da_solve_poissoneqn_fct
 

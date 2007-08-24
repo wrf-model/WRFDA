@@ -25,7 +25,7 @@ subroutine da_tpq_to_rh_lin1( t, p, es, rh, t_prime, p_prime, q_prime, rh_prime 
    real :: es1, qs  ! Saturation specific humidity.
    real :: qs_prime_over_qs ! qs~/qs.
 
-   if (trace_use) call da_trace_entry("da_tpq_to_rh_lin1")
+   if (trace_use_dull) call da_trace_entry("da_tpq_to_rh_lin1")
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
@@ -45,7 +45,7 @@ subroutine da_tpq_to_rh_lin1( t, p, es, rh, t_prime, p_prime, q_prime, rh_prime 
 
    rh_prime = 100.0 * (q_prime / qs) - rh * qs_prime_over_qs
 
-   if (trace_use) call da_trace_exit("da_tpq_to_rh_lin1")
+   if (trace_use_dull) call da_trace_exit("da_tpq_to_rh_lin1")
 
 end subroutine da_tpq_to_rh_lin1
 

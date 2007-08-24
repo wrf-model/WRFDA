@@ -1,8 +1,6 @@
 subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
-                        tbup,tbdn,tauatm,                         &
-                        ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,   &
-                        ADJ_lw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,        &
-                        ADJ_tauatm                                )
+   tbup,tbdn,tauatm, ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,   &
+   ADJ_lw,ADJ_zcld,ADJ_tbup,ADJ_tbdn, ADJ_tauatm)
 
    implicit none
 
@@ -14,12 +12,11 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    ! Output mean fields : tbup,tbdn,tauatm
    !-----------------------------------------------------------------
 
-   integer,intent(in   ) :: ifreq
-   real   ,intent(in   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
-   real   ,intent(inout) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,       &
-                            ADJ_gamma,ADJ_lw,ADJ_zcld,ADJ_theta
-   real   ,intent(inout) :: ADJ_tbup,ADJ_tbdn,ADJ_tauatm
-   real, intent(out)     :: tbup,tbdn,tauatm
+   integer, intent(in)    :: ifreq
+   real,    intent(in)    :: theta,p0,wv,hwv,ta,gamma,lw,zcld
+   real,    intent(inout) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta, ADJ_gamma,ADJ_lw,ADJ_zcld,ADJ_theta
+   real,    intent(inout) :: ADJ_tbup,ADJ_tbdn,ADJ_tauatm
+   real,    intent(out)   :: tbup,tbdn,tauatm
 
    real :: tbdn_save
 
@@ -40,7 +37,6 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    real :: ADJ_teffdn,ADJ_teffup,ADJ_tbclrdn,ADJ_tbclrup,ADJ_tb1dn,ADJ_tb1up
    real :: ADJ_tb2dn,ADJ_tb2up,ADJ_alph
 
-
    data b1/-.46847e-1,-.57752e-1,-.18885,.10990/
    data b2/.26640e-4,.31662e-4,.9832e-4,.60531e-4/
    data b3/.87560e+1,.10961e+2,.36678e+2,-.37578e+2/
@@ -53,6 +49,8 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    data kw1/-.230e-2,-.296e-2,-.673e-2,-.107e-1/
    data kw2/ .448e-4, .557e-4, .975e-4,-.535e-4/
    data kw3/-.464e-6,-.558e-6,-.724e-6, .115e-5/
+
+   if (trace_use) call da_trace_entry("da_tbatmos_adj")
 
    mu=0.0;hdn=0.0;hup=0.0;hdninf=0.0;hupinf=0.0;ADJ_mu=0.0
    tcld=0.0;tc=0.0;em=0.0;em1=0.0
@@ -289,6 +287,7 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 
    ADJ_theta = mu*mu*0.0174533*ADJ_mu*sin(theta*0.0174533) + ADJ_theta
 
+   if (trace_use) call da_trace_exit("da_tbatmos_adj")
 
 end subroutine da_tbatmos_adj
 

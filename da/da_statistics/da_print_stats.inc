@@ -10,6 +10,8 @@ subroutine da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
    integer,           intent(inout) :: nu, nv, nt, np, nq
    type (stats_type), intent(in)    :: sound
 
+   if (trace_use) call da_trace_entry("da_print_stats")
+
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &
       'u (m/s)     n    k    ', &
@@ -41,6 +43,8 @@ subroutine da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
                          sqrt(sound%rms_err%t/real(nt)), &
                          sqrt(sound%rms_err%p/real(np)), &
                          sqrt(sound%rms_err%q/real(nq))
+
+   if (trace_use) call da_trace_exit("da_print_stats")
 
 end subroutine da_print_stats
 

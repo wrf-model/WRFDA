@@ -25,21 +25,23 @@ subroutine da_balance_equation_adj(grid, xbx, phi_b, u, v)
    real, dimension(ims:ime,jms:jme,kms:kme) :: del2phi_b  ! Del**2 phi_b/M**2
    real                       :: coeff1, coeff2   ! Multiplicative coefficient.
 
+   if (trace_use) call da_trace_entry("da_balance_equation_adj")
+
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
 
    ! Computation to check for edge of domain:
    is = its-1; ie = ite+1; js = jts-1; je = jte+1
-   if (.not. global .and. its == ids ) is = ids+1
-   if (.not. global .and. ite == ide ) ie = ide-1
+   if (.not. global .and. its == ids) is = ids+1
+   if (.not. global .and. ite == ide) ie = ide-1
    if (jts == jds ) js = jds+1
    if (jte == jde ) je = jde-1
 
-   if( fg_format == fg_format_kma_global) then
+   if (fg_format == fg_format_kma_global) then
       coefx(is:ie,js:je) = grid%xb%coefx(is:ie,js:je)
       coefy(is:ie,js:je) = grid%xb%coefy(is:ie,js:je)
-   else if( fg_format == fg_format_wrf) then
+   else if (fg_format == fg_format_wrf) then
       coefx(is:ie,js:je) = grid%xb%coefz(is:ie,js:je)
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
@@ -83,24 +85,22 @@ subroutine da_balance_equation_adj(grid, xbx, phi_b, u, v)
 
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      if (balance_type == balance_cyc .OR. &
-           balance_type == balance_geocyc ) then
-         call da_balance_cycloterm_adj( grid%xb % rho(:,:,k),grid%xb % u(:,:,k),&
-                                        grid%xb % v(:,:,k), u(:,:,k), v(:,:,k),&
-                                        grid%xb % coefx(:,:), grid%xb % coefy(:,:),&
-                                        term_x(:,:), term_y(:,:))
+      if (balance_type == balance_cyc .OR. balance_type == balance_geocyc ) then
+         call da_balance_cycloterm_adj (grid%xb%rho(:,:,k),grid%xb%u(:,:,k),&
+            grid%xb%v(:,:,k), u(:,:,k), v(:,:,k), grid%xb%coefx(:,:), grid%xb%coefy(:,:),&
+            term_x(:,:), term_y(:,:))
       end if
 
       
       ! [2.1] Calculate geostrophic terms in balance eqn:
  
-      if (balance_type == balance_geo .OR. &
-           balance_type == balance_geocyc ) then
-         call da_balance_geoterm_adj( grid%xb % cori, grid%xb % rho(:,:,k), &
-                                      term_x, term_y, &
-                                      u(:,:,k), v(:,:,k))
+      if (balance_type == balance_geo .OR. balance_type == balance_geocyc ) then
+         call da_balance_geoterm_adj (grid%xb%cori, grid%xb%rho(:,:,k), term_x, term_y, &
+            u(:,:,k), v(:,:,k))
       end if
    end do
+
+   if (trace_use) call da_trace_exit("da_balance_equation_adj")
 
 end subroutine da_balance_equation_adj
 

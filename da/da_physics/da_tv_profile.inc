@@ -20,6 +20,9 @@ subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
    real    :: dx, dxm   ! interpolation weights.
    real    :: dy, dym   ! interpolation weights.
 
+   if (trace_use_dull) call da_trace_entry("da_tv_profile")
+
+
    i   = loc%i
    j   = loc%j
    dx  = loc%dx
@@ -43,6 +46,8 @@ subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
 
    tv_ma (kts:kte) = dym* ( dxm * tv_m (1,1,kts:kte) + dx * tv_m (2,1,kts:kte) ) + &
       dy * ( dxm * tv_m (1,2,kts:kte) + dx * tv_m (2,2,kts:kte) )
+
+   if (trace_use_dull) call da_trace_exit("da_tv_profile")
 
 end subroutine da_tv_profile
 

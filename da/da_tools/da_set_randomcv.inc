@@ -15,12 +15,11 @@ subroutine da_set_randomcv(cv_size, rcv)
    real                :: mean_cv, rms_cv, std_dev_cv
    real                :: sum_cv, sum_cv2
 
+   if (trace_use) call da_trace_entry("da_set_randomcv")
+
    ! [1] Initialize random number generator and scalars:
 
-write(stdout,'(a)')'calling da_random_seed'
-write(stdout,*)put_rand_seed
-    call da_random_seed
-write(stdout,'(a)')'called da_random_seed'
+   call da_random_seed
 
    sum_cv = 0.0
    sum_cv2 = 0.0
@@ -43,6 +42,8 @@ write(stdout,'(a)')'called da_random_seed'
    write(unit=stdout,fmt='(a,f15.5)')' Mean = ',mean_cv
    write(unit=stdout,fmt='(a,f15.5)')' RMS = ', rms_cv
    write(unit=stdout,fmt='(a,f15.5)')' STD DEV = ', std_dev_cv
+
+   if (trace_use) call da_trace_exit("da_set_randomcv")
 
 end subroutine da_set_randomcv
 

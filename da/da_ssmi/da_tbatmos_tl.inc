@@ -1,8 +1,8 @@
 subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
-                        tbup,tbdn,tauatm,                         &
-                        TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,   &
-                        TGL_lw,TGL_zcld,TGL_tbup,TGL_tbdn,        &
-                        TGL_tauatm                               )
+   tbup,tbdn,tauatm,                         &
+   TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,   &
+   TGL_lw,TGL_zcld,TGL_tbup,TGL_tbdn,        &
+   TGL_tauatm                               )
 
    !-----------------------------------------------------------------
    ! Purpose: TBD
@@ -13,22 +13,20 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 
    implicit none
 
-   integer,intent(in  ) :: ifreq
-   real   ,intent(in  ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
-   real   ,intent(in  ) :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,       &
-                            TGL_gamma,TGL_lw,TGL_zcld,TGL_theta
-   real   ,intent( out) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, &
-                            TGL_tauatm
+   integer,intent(in)  :: ifreq
+   real   ,intent(in)  :: theta,p0,wv,hwv,ta,gamma,lw,zcld
+   real   ,intent(in)  :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_lw,TGL_zcld,TGL_theta
+   real   ,intent(out) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, TGL_tauatm
 
    real :: mu,hdn,hup,hdninf,hupinf,TGL_mu
 
-   real b1(4),b2(4),b3(4)
-   real c(4),d1(4),d2(4),d3(4),zeta(4),kw0(4),kw1(4),kw2(4),kw3(4)
-   real tau,tau1,tau2,taucld
-   real tcld,tc,em,em1
-   real sigv,sigo,sig,sig1,sigcld
-   real teff1dn,teff1up,teffdn,teffup
-   real tbcld,tbclrdn,tbclrup,tb1dn,tb1up,tb2dn,tb2up
+   real :: b1(4),b2(4),b3(4)
+   real :: c(4),d1(4),d2(4),d3(4),zeta(4),kw0(4),kw1(4),kw2(4),kw3(4)
+   real :: tau,tau1,tau2,taucld
+   real :: tcld,tc,em,em1
+   real :: sigv,sigo,sig,sig1,sigcld
+   real :: teff1dn,teff1up,teffdn,teffup
+   real :: tbcld,tbclrdn,tbclrup,tb1dn,tb1up,tb2dn,tb2up
    real :: otbar,tc2,tc3,hv,ho,alph
    real :: TGL_sigv,TGL_otbar,TGL_sigo,TGL_tcld,TGL_tc,TGL_tc2,TGL_tc3
    real :: TGL_sigcld,TGL_taucld,TGL_tbcld,TGL_hv,TGL_ho
@@ -49,6 +47,8 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    data kw1/-.230e-2,-.296e-2,-.673e-2,-.107e-1/
    data kw2/ .448e-4, .557e-4, .975e-4,-.535e-4/
    data kw3/-.464e-6,-.558e-6,-.724e-6, .115e-5/
+
+   if (trace_use) call da_trace_entry("da_tbatmos_tl")
 
    ! mu = secant(theta)
    ! somtime theta is a variable
@@ -182,6 +182,8 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    TGL_tbdn = - TGL_alph*tbdn + (1.0-alph)*TGL_tbdn &
               + TGL_em*alph*ta + em*TGL_alph*ta + em*alph*TGL_ta 
    tbdn = (1.0-alph)*tbdn + em*alph*ta
+
+   if (trace_use) call da_trace_exit("da_tbatmos_tl")
 
 end subroutine da_tbatmos_tl
 

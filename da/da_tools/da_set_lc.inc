@@ -7,12 +7,14 @@ subroutine da_set_lc(proj)
 
    implicit none
     
-   type(proj_info), intent(inout)     :: proj
+   type(proj_info), intent(inout) :: proj
 
-   real                               :: arg
-   real                               :: deltalon1
-   real                               :: tl1r
-   real                               :: ctl1r
+   real :: arg
+   real :: deltalon1
+   real :: tl1r
+   real :: ctl1r
+
+   if (trace_use_dull) call da_trace_entry("da_set_lc")
 
    ! Compute cone factor
    call da_lc_cone(proj%truelat1, proj%truelat2, proj%cone)
@@ -41,6 +43,8 @@ subroutine da_set_lc(proj)
    if (print_detail_map) then
       write(unit=stdout,fmt='(A,2F10.3)') 'Computed pole i/j = ', proj%polei, proj%polej
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_set_lc")
 
 end subroutine da_set_lc                             
 

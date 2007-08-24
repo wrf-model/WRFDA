@@ -19,7 +19,7 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
    integer                          :: m
    real, allocatable                :: rf_scale_factor(:)! RF rescaling.
 
-   if (trace_use) call da_trace_entry("da_rescale_background_errors")
+   if (trace_use_dull) call da_trace_entry("da_rescale_background_errors")
 
    !--------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -64,7 +64,7 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
 
    end if
 
-   if (trace_use) call da_trace_exit("da_rescale_background_errors")
+   if (trace_use_dull) call da_trace_exit("da_rescale_background_errors")
 
 end subroutine da_rescale_background_errors
 

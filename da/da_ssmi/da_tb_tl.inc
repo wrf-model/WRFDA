@@ -1,7 +1,7 @@
 subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
-!                  tbv,tbh,                                                  &
-                  TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
-                  TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh           )\
+!  tbv,tbh,                                                  &
+  TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
+  TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh           )\
 
    !---------------------------------------------------------------------------
    ! Purpose: TBD
@@ -12,12 +12,11 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    implicit none
 
-   integer, intent(in  ) :: ifreq
-   real   , intent(in  ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
-   real   , intent(in  ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
-                             TGL_hwv,TGL_u,TGL_alw,TGL_zcld
-!   real   , intent(in  ) :: tbv,tbh
-   real   , intent( out) :: TGL_tbv,TGL_tbh 
+   integer, intent(in) :: ifreq
+   real,    intent(in) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
+   real,    intent(in) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv, TGL_hwv,TGL_u,TGL_alw,TGL_zcld
+!   real   , intent(in) :: tbv,tbh
+   real,    intent(out) :: TGL_tbv,TGL_tbh 
 
    real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
@@ -48,6 +47,8 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    ! 'foam' emissivity
    data fem /1.0/
+
+   if (trace_use) call da_trace_entry("da_tb_tl")
 
    f = freq(ifreq)
    costhet = cos(theta*0.017453)
@@ -140,6 +141,8 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ! tbh     =     tbup + tauatm*(semh + scath)
    TGL_tbh = TGL_tbup + TGL_tauatm*(semh + scath)   &
                          + tauatm*(TGL_semh + TGL_scath)
+
+   if (trace_use) call da_trace_exit("da_tb_tl")
 
 end subroutine da_tb_tl
 

@@ -7,16 +7,18 @@ subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, &
 
    implicit none 
 
-   integer, intent(inout)   :: outunit        ! Output file unit.
-   character*10, intent(in) :: variable       ! Variable name.
-   integer, intent(in)      :: k              ! Vertical index.
-   integer, intent(in)      :: max_wavenumber ! Smallest scale required (ni/2-1)
+   integer,      intent(inout) :: outunit        ! Output file unit.
+   character*10, intent(in)    :: variable       ! Variable name.
+   integer,      intent(in)    :: k              ! Vertical index.
+   integer,      intent(in)    :: max_wavenumber ! Smallest scale required (ni/2-1)
 
    ! Total Power spectrum (averaged over time/members)
-   real, intent(in) :: total_power(0:max_wavenumber)
+   real,         intent(in) :: total_power(0:max_wavenumber)
 
-   integer             :: n                     ! Loop counter.
-   real                :: accum_power, variance ! Accumulated power, variance.
+   integer :: n                     ! Loop counter.
+   real    :: accum_power, variance ! Accumulated power, variance.
+
+   if (trace_use) call da_trace_entry("da_print_be_stats_h_global")
 
    accum_power = 0.0
    variance = sum(total_power(0:max_wavenumber))
@@ -32,6 +34,8 @@ subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, &
 
    outunit = outunit + 1
    write(unit=stdout,fmt=*) ''
+
+   if (trace_use) call da_trace_exit("da_print_be_stats_h_global")
 
 end subroutine da_print_be_stats_h_global
 

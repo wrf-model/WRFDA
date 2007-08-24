@@ -8,7 +8,7 @@ subroutine da_zero_x ( x )
 
    type (x_type), intent(inout)        :: x      ! Analysis incrs structure.
 
-   if (trace_use) call da_trace_entry("da_zero_x")
+   if (trace_use_dull) call da_trace_entry("da_zero_x")
 
    x % u(:,:,:) = 0.0
    x % v(:,:,:) = 0.0
@@ -45,7 +45,7 @@ subroutine da_zero_x ( x )
    x % tb85v(:,:) = 0.0
    x % tb85h(:,:) = 0.0
 
-   if (trace_use) call da_trace_exit("da_zero_x")
+   if (trace_use_dull) call da_trace_exit("da_zero_x")
 
 end subroutine da_zero_x
 

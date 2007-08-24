@@ -1,4 +1,4 @@
-subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
+subroutine da_autoc_adj(dt,scr2,prc,scr29,prc9,kts,kte,kms,kme)
 
    !-----------------------------------------------------------------------
    ! Purpose: Auto-conversion
@@ -6,23 +6,31 @@ subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
 
    implicit none
 
-   integer, intent(in)                     :: kts, kte, kms, kme
-   real, dimension(kms:kme), intent(in)    :: DT, SCR2
-   real, dimension(kms:kme), intent(in)    :: PRC, PRC9
-   real, dimension(kms:kme), intent(inout) :: SCR29
+   integer, intent(in)    :: kts, kte, kms, kme
+   real,    intent(in)    :: dt(kms:kme)
+   real,    intent(in)    :: scr2(kms:kme)
+   real,    intent(in)    :: prc(kms:kme)
+   real,    intent(in)    :: prc9(kms:kme)
+   real,    intent(inout) :: scr29(kms:kme)
 
-   integer      :: k
-   real         :: QCTH, alpha
+   integer :: k
+   real    :: qcth, alpha
 
-   QCTH = 0.5E-3
+   if (trace_use) call da_trace_entry("da_autoc_adj")
+
+   qcth = 0.5e-3
    alpha = 0.001
 
    do k = kts, kte
-      if ( DT(k) <= 0.0 ) cycle
+      if ( dt(k) <= 0.0 ) cycle
 
-      if ( SCR2(k) >= QCTH ) then
-         SCR29(K) = SCR29(K) + alpha * PRC9(K)
+      if ( scr2(k) >= qcth ) then
+         scr29(k) = scr29(k) + alpha * prc9(k)
       end if
    end do
 
+   if (trace_use) call da_trace_exit("da_autoc_adj")
+
 end subroutine da_autoc_adj
+
+

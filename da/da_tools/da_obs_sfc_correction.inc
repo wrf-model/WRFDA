@@ -30,7 +30,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    real    :: height(kts:kte)
    real    :: pressure(kts:kte)
 
-   if (trace_use) call da_trace_entry("da_obs_sfc_correction")
+   if (trace_use_dull) call da_trace_entry("da_obs_sfc_correction")
 
    ! 1. Check if it needs to do the surface correction at the first level
  
@@ -191,7 +191,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! sfc_obs % height_qc = surface_correction
    end if
 
-   if (trace_use) call da_trace_exit("da_obs_sfc_correction")
+   if (trace_use_dull) call da_trace_exit("da_obs_sfc_correction")
 
 end  subroutine da_obs_sfc_correction
 

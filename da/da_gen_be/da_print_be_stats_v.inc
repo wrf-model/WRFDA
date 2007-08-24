@@ -1,5 +1,5 @@
 subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
-                                e_vec, e_val, e_vec_loc, e_val_loc)
+   e_vec, e_val, e_vec_loc, e_val_loc)
 
    !----------------------------------------------------------------------------
    ! Purpose: To print out the first global and local eigenvector and 
@@ -32,6 +32,8 @@ subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
    real, intent(in) :: e_val_loc(1:nk,1:num_bins2d)       ! Latitudinally varying eigenvalues.
 
    integer                  :: k, m, b, mn                ! Loop counters.
+
+   if (trace_use) call da_trace_entry("da_print_be_stats_v")
 
    if (nk > 5) then
       mn = 5
@@ -92,6 +94,8 @@ subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
 
    outunit = outunit + 1 
    write(unit=stdout,fmt=*) ' '
+
+   if (trace_use) call da_trace_exit("da_print_be_stats_v")
 
 end subroutine da_print_be_stats_v
 

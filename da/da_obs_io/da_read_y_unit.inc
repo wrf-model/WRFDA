@@ -18,6 +18,8 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    real         :: fld(7), fld_rad                          
    integer      :: n, k, n1,n2, levels
 
+   if (trace_use_dull) call da_trace_entry("da_read_y_unit")
+
    iv_type="Unknown"
 
    call da_get_unit(unit_in)
@@ -68,6 +70,8 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
  999  continue 
    close (unit_in)
    call da_free_unit(unit_in)
+
+   if (trace_use_dull) call da_trace_exit("da_read_y_unit")
 
 end subroutine da_read_y_unit
 

@@ -9,10 +9,12 @@ subroutine da_set_ps(proj)
  
    type(proj_info), intent(inout)    :: proj
 
-   real                              :: ala1
-   real                              :: alo1
-   real                              :: reflon
-   real                              :: scale_top
+   real :: ala1
+   real :: alo1
+   real :: reflon
+   real :: scale_top
+
+   if (trace_use) call da_trace_entry("da_set_ps")
 
    ! To define the cone factor for polar stereographic projection 
    proj%cone = 1.0
@@ -33,6 +35,8 @@ subroutine da_set_ps(proj)
    if (print_detail_map) then
       write(unit=stdout,fmt='(A,2F10.1)') 'Computed (I,J) of pole point: ',proj%polei,proj%polej
    end if
+
+   if (trace_use) call da_trace_exit("da_set_ps")
 
 end subroutine da_set_ps
 

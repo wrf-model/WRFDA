@@ -12,11 +12,15 @@ subroutine da_prho_to_t_lin(grid)
    
    type (domain), intent(inout)    :: grid
 
+   if (trace_use) call da_trace_entry("da_prho_to_t_lin")
+
    grid%xa % t(its:ite,jts:jte,kts:kte) = grid%xb % t(its:ite,jts:jte,kts:kte) * &
                             (grid%xa % p(its:ite,jts:jte,kts:kte) / &
                               grid%xb % p(its:ite,jts:jte,kts:kte) - &
                               grid%xa % rho(its:ite,jts:jte,kts:kte) / &
-                              grid%xb % rho(its:ite,jts:jte,kts:kte))     
+                              grid%xb % rho(its:ite,jts:jte,kts:kte)) 
+
+   if (trace_use) call da_trace_exit("da_prho_to_t_lin")    
 
 end subroutine da_prho_to_t_lin
 

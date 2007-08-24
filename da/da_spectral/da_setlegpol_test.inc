@@ -24,6 +24,8 @@ subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
    real    :: eq_term             ! Summation scalar.
    integer :: spec_unit
 
+   if (trace_use) call da_trace_entry("da_setlegpol_test")
+
    call da_get_unit(spec_unit)
    open(unit=spec_unit,file="spec_pol",status="replace")
 
@@ -93,6 +95,8 @@ subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
 
    close(spec_unit)
    call da_free_unit(spec_unit)
+
+   if (trace_use) call da_trace_exit("da_setlegpol_test")
 
 end subroutine da_setlegpol_test
 

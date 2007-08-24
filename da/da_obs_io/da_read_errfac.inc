@@ -25,7 +25,7 @@ subroutine da_read_errfac(ob_name, f1, f2, f3, f4, f5)
    f4 = 1.0
    f5 = 1.0
 
-   if (trace_use) call da_trace_entry("da_read_errfac")
+   if (trace_use_dull) call da_trace_entry("da_read_errfac")
 
    call da_get_unit(fac_unit)
    open(unit=fac_unit, status='old', file = 'errfac.dat', iostat=ierr)
@@ -61,7 +61,7 @@ subroutine da_read_errfac(ob_name, f1, f2, f3, f4, f5)
    close(fac_unit)
    call da_free_unit(fac_unit)
 
-   if (trace_use) call da_trace_exit("da_read_errfac")
+   if (trace_use_dull) call da_trace_exit("da_read_errfac")
 
 end subroutine da_read_errfac
 

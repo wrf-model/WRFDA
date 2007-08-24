@@ -8,8 +8,10 @@ subroutine da_setup_cv(be)
 
    type (be_type), intent(inout) :: be       ! background error.
 
-   integer                       :: iy, jx   ! Local horizontal domain dimensions.
-   integer                       :: ij       ! Product of horizontal dims.
+   integer :: iy, jx   ! Local horizontal domain dimensions.
+   integer :: ij       ! Product of horizontal dims.
+
+   if (trace_use) call da_trace_entry("da_setup_cv")
 
    !--------------------------------------------------------------
    ! 1] Define standard control variable size:
@@ -74,6 +76,8 @@ subroutine da_setup_cv(be)
    end if
 
    cv_size_domain = cv_size_domain_jb + cv_size_domain_je
+
+   if (trace_use) call da_trace_exit("da_setup_cv")
 
 end subroutine da_setup_cv
 

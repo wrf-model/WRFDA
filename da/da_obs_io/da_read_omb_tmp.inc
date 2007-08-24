@@ -28,7 +28,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                    spd_obs, spd_inv, spd_err, spd_inc
    integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, ref_qc
 
-   if (trace_use) call da_trace_entry("da_read_omb_tmp")
+   if (trace_use_dull) call da_trace_entry("da_read_omb_tmp")
 
    open(unit=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
    if (ios /= 0) then
@@ -448,7 +448,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 999 continue
    close (unit_in)
 
-   if (trace_use) call da_trace_exit("da_read_omb_tmp")
+   if (trace_use_dull) call da_trace_exit("da_read_omb_tmp")
    return
 
 1000 continue

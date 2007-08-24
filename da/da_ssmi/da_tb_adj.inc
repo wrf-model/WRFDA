@@ -50,6 +50,8 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ! 'foam' emissivity
    data fem /1.0/
 
+   if (trace_use) call da_trace_entry("da_tb_adj")
+
    f=0.0;costhet=0.0;gx2=0.0;tbup=0.0;tbdn=0.0;tauatm=0.0
    sigma=0.0;remv=0.0;remh=0.0;effangv=0.0;effangh=0.0
    tbdnv=0.0;foam=0.0;foam_save=0.0;emissv=0.0;emissh=0.0
@@ -77,8 +79,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    ! get upwelling atmospheric brightness temperature
 
-   call tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
-                   tbup,tbdn,tauatm)
+   call tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, tbup,tbdn,tauatm)
 
    ! convert transmittance to optical depth
 
@@ -94,11 +95,9 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    ! get effective sky brightness temperatures for scattered radiation
 
-   call tbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,zcld, &
-                   dum,tbdnv,dum)
+   call tbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,zcld, dum,tbdnv,dum)
 
-   call tbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,zcld, &
-                   dum,tbdnh,dum)
+   call tbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,zcld, dum,tbdnh,dum)
 
    ! compute 'foam' coverage
 
@@ -223,6 +222,8 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ! write (unit=stdout,fmt=*) 'ifreq 5',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
    !              ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
    ! end
+
+   if (trace_use) call da_trace_exit("da_tb_adj")
 
 end subroutine da_tb_adj
 

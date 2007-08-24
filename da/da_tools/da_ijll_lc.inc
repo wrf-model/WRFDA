@@ -21,7 +21,7 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    real                          :: xx
    real                          :: yy
 
-   if (trace_use_frequent) call da_trace_entry("da_ijll_lc")
+   if (trace_use_dull) call da_trace_entry("da_ijll_lc")
 
 
    chi1 = (90.0 - proj%hemi*proj%truelat1)*rad_per_deg
@@ -69,7 +69,7 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    if (lon > +180.0) lon = lon - 360.0
    if (lon < -180.0) lon = lon + 360.0
 
-   if (trace_use_frequent) call da_trace_exit("da_ijll_lc")
+   if (trace_use_dull) call da_trace_exit("da_ijll_lc")
 
 end subroutine da_ijll_lc
 

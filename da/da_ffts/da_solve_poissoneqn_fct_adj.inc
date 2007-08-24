@@ -11,31 +11,30 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
-   
-   type (xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
-   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
+   type(domain),     intent(inout) :: grid
+   type(xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
+   type(xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
+   real,             intent(inout) :: del2b(ims:ime,jms:jme,kms:kme)   ! Del**2 B.
+   real,             intent(in)    :: b(ims:ime,jms:jme,kms:kme)       ! B
 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      intent(inout) :: del2b   ! Del**2 B.
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      intent(in)    :: b       ! B
+   integer           :: vector_inc    ! Increment between FST data.
+   integer           :: vector_jump   ! Jump between start of vectors.
+   integer           :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
+   integer           :: num_vectors   ! Number of FSTs to perform.
+   integer           :: work_area     ! Dimension for FST routine.
+   integer           :: idim          ! Size of 1st dimension for FST.
+   integer           :: jdim          ! Size of 2nd dimension for FST.
 
-   integer                  :: vector_inc    ! Increment between FST data.
-   integer                  :: vector_jump   ! Jump between start of vectors.
-   integer                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
-   integer                  :: num_vectors   ! Number of FSTs to perform.
-   integer                  :: work_area     ! Dimension for FST routine.
-   integer                  :: idim          ! Size of 1st dimension for FST.
-   integer                  :: jdim          ! Size of 2nd dimension for FST.
+   integer           :: i, j, k, n, ij     ! loop counter
 
-   integer                  :: i, j, k, n, ij     ! loop counter
+   real, allocatable :: work_1d(:)     ! FFT work array
 
-   real, allocatable, dimension(:) :: work_1d     ! FFT work array
+   real              :: global_mean(kts:kte)
+   real              :: local_mean(kts:kte)
 
-   real, dimension(xp%kts:xp%kte) :: global_mean, local_mean
+   real              :: rij
 
-   real :: rij
+   if (trace_use) call da_trace_entry("da_solve_poissoneqn_fct_adj")
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -279,15 +278,15 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [2.5] Write data array into del2b:
 
-   del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) = &
-   del2b(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) + &
-   xp%v1z(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)
+   del2b(ims:ime,jms:jme,kms:kme) = del2b(ims:ime,jms:jme,kms:kme) + xp%v1z(ims:ime,jms:jme,kms:kme)
 
    !---------------------------------------------------------------------------
    ! [5.0] Tidy up:
    !---------------------------------------------------------------------------
 
    if (allocated(work_1d)) deallocate (work_1d)
+
+   if (trace_use) call da_trace_exit("da_solve_poissoneqn_fct_adj")
 
 end subroutine da_solve_poissoneqn_fct_adj
 

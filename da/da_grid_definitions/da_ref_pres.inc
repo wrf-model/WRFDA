@@ -13,6 +13,8 @@ subroutine da_ref_pres(height, ref_pres)
 
    real :: aa, bb, cc, hh, htop, ziso, p0iso
 
+   if (trace_use_frequent) call da_trace_entry("da_ref_pres")
+
    call da_ref_height(ptop, htop)
 
    bb = rovg * t0
@@ -31,6 +33,8 @@ subroutine da_ref_pres(height, ref_pres)
          ref_pres = p0iso/exp((height-ziso)/(rovg*base_temp))
       end if
    end if
+
+   if (trace_use_frequent) call da_trace_exit("da_ref_pres")
 
 end subroutine da_ref_pres
 

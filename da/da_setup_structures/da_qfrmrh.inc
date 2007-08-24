@@ -1,4 +1,4 @@
-subroutine da_qfrmrh ( P, T, RH, Q )
+subroutine da_qfrmrh ( p, t, rh, q )
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,18 +6,22 @@ subroutine da_qfrmrh ( P, T, RH, Q )
 
    implicit none
 
-   real, intent(in)    :: P, T, RH
-   real, intent(out)   :: Q
+   real, intent(in)  :: p, t, rh
+   real, intent(out) :: q
 
-   real   :: A, B, E, QS
+   real   :: a, b, e, qs
 
-   A=17.26
-   B=35.86
-   if (T <= 263.0) A=21.87
-   if (T <= 263.0) B= 7.66
-   E=6.11*EXP(A*(T-t_triple)/(T-B))
-   QS=0.622*E/(P-0.378*E)
-   Q=QS*RH/100.0
+   if (trace_use) call da_trace_entry("da_qfrmrh")
+
+   a=17.26
+   b=35.86
+   if (t <= 263.0) a=21.87
+   if (t <= 263.0) b= 7.66
+   e  = 6.11*exp(a*(t-t_triple)/(t-b))
+   qs = 0.622*e/(p-0.378*e)
+   q  = qs*rh/100.0
+
+   if (trace_use) call da_trace_exit("da_qfrmrh")
 
 end subroutine da_qfrmrh
 

@@ -14,6 +14,8 @@ subroutine da_set_boundary_xb(grid)
 
    if ((its /= ids) .or. (ite /= ide)) return
 
+   if (trace_use) call da_trace_entry("da_set_boundary_xb")
+
    ! 2d
    k = kte + 1
    do j=jms, jme
@@ -95,6 +97,8 @@ subroutine da_set_boundary_xb(grid)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_set_boundary_xb")
 
 end subroutine da_set_boundary_xb
 

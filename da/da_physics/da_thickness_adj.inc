@@ -1,5 +1,5 @@
 subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
-                         ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
+   ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
 
    !-----------------------------------------------------------------------
    ! Purpose: adjoint routine for thickness
@@ -7,18 +7,22 @@ subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
 
    implicit none
 
-   integer, intent(in)      :: layer1,layer2
-   integer, intent(in)                  :: ks,ke
-   real, dimension(ks-1:ke+1), intent(in) :: pre_ma,tv_ma
-   real, dimension(ks-1:ke+1), intent(inout) :: ADJ_pre_ma,ADJ_tv_ma
-   real, intent(in)                     :: tv1,tv2
-   real, intent(inout)                  :: ADJ_tv1,ADJ_tv2
-   real, intent(in)                    :: pre1,pre2
-   real, intent(inout)                 :: ADJ_thk
+   integer, intent(in)    :: layer1,layer2
+   integer, intent(in)    :: ks,ke
+   real,    intent(in)    :: pre_ma(ks-1:ke+1)
+   real,    intent(in)    :: tv_ma(ks-1:ke+1)
+   real,    intent(inout) :: ADJ_pre_ma(ks-1:ke+1)
+   real,    intent(inout) :: ADJ_tv_ma(ks-1:ke+1)
+   real,    intent(in)    :: tv1,tv2
+   real,    intent(inout) :: ADJ_tv1,ADJ_tv2
+   real,    intent(in)    :: pre1,pre2
+   real,    intent(inout) :: ADJ_thk
 
-   integer                 :: k
-   real, dimension(ks-1:ke+1) :: p_tmp
-   real, dimension(ks-1:ke+1) :: ADJ_p_tmp
+   integer :: k
+   real    :: p_tmp(ks-1:ke+1)
+   real    :: ADJ_p_tmp(ks-1:ke+1)
+
+   if (trace_use_dull) call da_trace_entry("da_thickness_adj")
 
    ! p_tmp and ADJ_p_tmp are temporary (local) variables
 
@@ -49,6 +53,8 @@ subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
    ADJ_pre_ma(layer1-1) = ADJ_pre_ma(layer1-1) +              &
                           ADJ_thk*tv1/pre_ma(layer1-1)
    ADJ_tv1 = ADJ_tv1 + ADJ_thk*log(pre_ma(layer1-1)/pre1)
+
+   if (trace_use_dull) call da_trace_exit("da_thickness_adj")
 
 end subroutine da_thickness_adj
 

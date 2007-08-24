@@ -84,8 +84,8 @@ export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export CRTM=${CRTM:-$HOME/crtm}
 export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coefs}
 
-# Error Tunning namelist parameters
-# Assign Random seeds
+# Error tuning namelist parameters
+# Assign random seeds
 
 export NL_SEED_ARRAY1=$DATE
 export NL_SEED_ARRAY2=$DATE

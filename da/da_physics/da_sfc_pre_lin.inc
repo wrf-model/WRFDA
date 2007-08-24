@@ -1,5 +1,4 @@
-subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
-                                        psm, tsm, qsm, hsm, ho, to, qvo)
+subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, psm, tsm, qsm, hsm, ho, to, qvo)
 
    !---------------------------------------------------------------------------
    ! Purpose: Correct pressure between two levels. 
@@ -21,20 +20,21 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
 
    ! Perturbation:
    real, intent (out)   :: psfcm_prime          ! model pressure at ho
-   real, intent (in)    :: psm_prime, tsm_prime, &
-                           qsm_prime            ! model surface p, t, q 
+   real, intent (in)    :: psm_prime, tsm_prime, qsm_prime            ! model surface p, t, q 
    ! Basic state:
    real, intent (in)    :: psm, tsm, qsm ! model pressure at ho and
                                                 ! model surface p, t, q 
-   ! Constant variables:
    real, intent (in)           :: hsm, ho
    real, intent (in), optional :: to, qvo
+
    ! working array:
    real                 :: tvo, tvsm, tv, dz, arg0
    real                 :: tvsm_prime, tvo_prime, tv_prime, arg, arg_prime
 
    real, parameter      :: GASR =  gas_constant
    real, parameter      :: G = gravity
+
+   if (trace_use) call da_trace_entry("da_sfc_pre_lin")
 
    ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
@@ -70,6 +70,8 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    arg = arg0    / tv 
 
    psfcm_prime = exp(arg) *(psm_prime + psm * arg_prime)
+
+   if (trace_use) call da_trace_exit("da_sfc_pre_lin")
 
 end subroutine da_sfc_pre_lin
 

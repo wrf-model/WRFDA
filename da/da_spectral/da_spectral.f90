@@ -9,7 +9,7 @@ module da_spectral
       gaussian_lats, earth_radius, alpha_corr_type, alpha_corr_scale, &
       alpha_corr_unit1, alpha_corr_unit2, filename_len, num_alpha_corr_types, &
       earth_radius, alpha_corr_type_exp, alpha_corr_type_soar, &
-      alpha_corr_type_gaussian
+      alpha_corr_type_gaussian, trace_use
 #ifdef FFTPACK
    use da_control, only : ide
 #endif

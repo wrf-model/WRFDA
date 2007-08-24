@@ -17,7 +17,11 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
    type (xpose_type), intent (in)    :: xp
    type (iv_type),    intent (inout) :: iv
 
+   if (trace_use) call da_trace_entry("da_read_bufrssmis")
+
    write(*,*) ' To be implemented for SSMIS'
+
+   if (trace_use) call da_trace_exit("da_read_bufrssmis")
 
 end subroutine da_read_bufrssmis
 

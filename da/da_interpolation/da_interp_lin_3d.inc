@@ -16,7 +16,7 @@ subroutine da_interp_lin_3d(fm3d, loc, fo3d, ml, zk, nl)
    real    :: dx, dxm, dy, dym,dz, dzm
    real    :: fmz(kms:kme)
 
-   if (trace_use_frequent) call da_trace_entry("da_interp_lin_3d")
+   if (trace_use_dull) call da_trace_entry("da_interp_lin_3d")
 
    i   = loc%i
    j   = loc%j
@@ -39,7 +39,7 @@ subroutine da_interp_lin_3d(fm3d, loc, fo3d, ml, zk, nl)
       end if
    end do
 
-   if (trace_use_frequent) call da_trace_exit("da_interp_lin_3d")
+   if (trace_use_dull) call da_trace_exit("da_interp_lin_3d")
 
 end subroutine da_interp_lin_3d
 

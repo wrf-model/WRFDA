@@ -11,7 +11,7 @@ module da_test
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
-   use da_control, only : ids,ide,ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
+   use da_control, only : jps,jpe,kps,kpe
 #endif
 #ifdef RSL
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
@@ -39,7 +39,7 @@ module da_test
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
       balance_geocyc, var4d, num_fgat_time,cv_options_hum_specific_humidity, &
-      cv_options_hum_relative_humidity, &
+      cv_options_hum_relative_humidity, ids, ide, jds, jde, kds, kde, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, use_radarobs, use_ssmiretrievalobs, &

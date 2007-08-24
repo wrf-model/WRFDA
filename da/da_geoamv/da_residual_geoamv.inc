@@ -19,6 +19,8 @@ subroutine da_residual_geoamv(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
+   if (trace_use_dull) call da_trace_entry("da_residual_geoamv")
+
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
 
@@ -33,6 +35,8 @@ subroutine da_residual_geoamv(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    np_missing = np_missing + n_obs_bad % u % num % miss + n_obs_bad % v % num % miss
    np_bad_data = np_bad_data + n_obs_bad % u % num % bad + n_obs_bad % v % num % bad
    np_obs_used = np_obs_used + n_obs_bad % u % num % use + n_obs_bad % v % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_geoamv")
 
 end subroutine da_residual_geoamv
 

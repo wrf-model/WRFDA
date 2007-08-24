@@ -7,7 +7,10 @@ subroutine da_set_merc(proj)
    implicit none
 
    type(proj_info), intent(inout)       :: proj
-   real                                 :: clain
+
+   real :: clain
+
+   if (trace_use) call da_trace_entry("da_set_merc")
 
    !  Preliminary variables
 
@@ -21,6 +24,8 @@ subroutine da_set_merc(proj)
    if (proj%lat1 .NE. 0.0) then
       proj%rsw = (alog(tan(0.5*((proj%lat1+90.)*rad_per_deg))))/proj%dlon
    end if
+
+   if (trace_use) call da_trace_exit("da_set_merc")
 
 end subroutine da_set_merc
 

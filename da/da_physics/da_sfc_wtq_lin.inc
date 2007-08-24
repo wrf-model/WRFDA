@@ -1,7 +1,7 @@
 subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
-                       psfc_prime,tg_prime,ps_prime,ts_prime,qs_prime, &
-                       us_prime,vs_prime, hs,roughness,xland,          &
-                       u10_prime,v10_prime,t2_prime,q2_prime) 
+   psfc_prime,tg_prime,ps_prime,ts_prime,qs_prime, &
+   us_prime,vs_prime, hs,roughness,xland,          &
+   u10_prime,v10_prime,t2_prime,q2_prime) 
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculate the  10m wind, 2m temperature and moisture based on the
@@ -44,13 +44,11 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    implicit none
 
-   real   , intent (in)          :: regime
-   real   , intent (in)          :: ps , ts , qs , us, vs, psfc, tg
-   real   , intent (in)          :: ps_prime, ts_prime, qs_prime  , &
-                                    us_prime, vs_prime, psfc_prime, tg_prime
-   real   , intent (in)          :: hs, roughness, xland
-
-   real   , intent (out)         :: u10_prime, v10_prime, t2_prime, q2_prime
+   real, intent (in)  :: regime
+   real, intent (in)  :: ps , ts , qs , us, vs, psfc, tg
+   real, intent (in)  :: ps_prime, ts_prime, qs_prime, us_prime, vs_prime, psfc_prime, tg_prime
+   real, intent (in)  :: hs, roughness, xland
+   real, intent (out) :: u10_prime, v10_prime, t2_prime, q2_prime
 
    ! Maximum number of iterations in computing psim, psih
 
@@ -97,6 +95,8 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    real, parameter :: ka = 2.4E-5
 
    integer :: iregime
+
+   if (trace_use) call da_trace_entry("da_sfc_wtq_lin")
 
    rcp = gas_constant/cp
 
@@ -524,6 +524,8 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    q2_prime = (1.0-psiq2/psiq) * qg_prime + psiq2/psiq * qs_prime + &
               (qs -qg)*(psiq2/psiq) * (psiq2_prime/psiq2 - psiq_prime/psiq)
+
+   if (trace_use) call da_trace_exit("da_sfc_wtq_lin")
 
 end subroutine da_sfc_wtq_lin
 

@@ -1,5 +1,4 @@
-subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
-                       TGL_tk,TGL_ev,TGL_eh                               )
+subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,TGL_tk,TGL_ev,TGL_eh                               )
 
    !-----------------------------------------------------------------------
    ! Purpose: returns the specular emissivity of sea water for given 
@@ -15,29 +14,30 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
 
    implicit none
 
-   real, intent(in  ) :: f, tk, theta, TGL_tk
+   real, intent(in)    :: f, tk, theta, TGL_tk
    real, intent(inout) :: ssw
-   real, intent( out) :: TGL_ev, TGL_eh, ev, eh
+   real, intent(out)   :: TGL_ev, TGL_eh, ev, eh
 
-   real   epsr,epsi,TGL_epsr,TGL_epsi
+   real :: epsr,epsi,TGL_epsr,TGL_epsi
 
-   real      tc,costh,sinth,rthet
-   complex   etav,etah,eps,cterm1v,cterm1h,cterm2,cterm3v,cterm3h,epsnew
-   complex   TGL_etav,TGL_eps,TGL_cterm1v,TGL_cterm2,TGL_cterm3v
-   complex   TGL_cterm3h,TGL_epsnew
+   real    ::  tc,costh,sinth,rthet
+   complex ::  etav,etah,eps,cterm1v,cterm1h,cterm2,cterm3v,cterm3h,epsnew
+   complex ::  TGL_etav,TGL_eps,TGL_cterm1v,TGL_cterm2,TGL_cterm3v
+   complex ::  TGL_cterm3h,TGL_epsnew
    ! complex   uniti
-   real      tmp1r,tmp1i,tmp2r,tmp2i
+   real    ::  tmp1r,tmp1i,tmp2r,tmp2i
    ! real :: rnorm,tmp0i,tmp0r
-   real      TGL_tc,TGL_tmp1r
+   real    ::  TGL_tc,TGL_tmp1r
    ! real :: TGL_tmp0r,TGL_tmp0i,TGL_rnorm
-   real      TGL_tmp1i,TGL_tmp2r,TGL_tmp2i
+   real    ::  TGL_tmp1i,TGL_tmp2r,TGL_tmp2i 
+
+   if (trace_use) call da_trace_entry("da_spemiss_tl")
 
 
    tc          =      tk - t_kelvin
    TGL_tc      =  TGL_tk
 
-   call da_epsalt_tl(f,tc,ssw,epsr,epsi,         &
-                   TGL_tc, TGL_epsr, TGL_epsi )
+   call da_epsalt_tl(f,tc,ssw,epsr,epsi,TGL_tc, TGL_epsr, TGL_epsi )
 
        eps     =  cmplx(epsr,epsi)
    TGL_eps     =  cmplx(TGL_epsr,TGL_epsi)
@@ -111,6 +111,8 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    ! eh      =  1.0 - cabs(cterm3h)**2
        eh      =  1.0 - (tmp2r*tmp2r+tmp2i*tmp2i)
    TGL_eh      = -2.0*tmp2r*TGL_tmp2r - 2.0*tmp2i*TGL_tmp2i
+
+   if (trace_use) call da_trace_exit("da_spemiss_tl")
 
 end subroutine da_spemiss_tl
 

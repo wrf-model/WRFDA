@@ -1,5 +1,5 @@
 subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
-                                        psm, tsm, qsm, hsm, ho, to, qvo)
+   psm, tsm, qsm, hsm, ho, to, qvo)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -26,8 +26,7 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
 
    ! Perturbation:
    real, intent (in)     :: psfcm_prime          ! model pressure at ho
-   real, intent (inout)  :: psm_prime, tsm_prime, &
-                            qsm_prime            ! model surface p, t, q 
+   real, intent (inout)  :: psm_prime, tsm_prime, qsm_prime            ! model surface p, t, q 
    ! Basic state:
    real, intent (in)     :: psm, tsm, qsm        ! model pressure at ho and
                                                  ! model surface p, t, q 
@@ -40,6 +39,8 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
 
    real, parameter      :: GASR =  gas_constant
    real, parameter      :: G = gravity
+
+   if (trace_use) call da_trace_entry("da_sfc_pre_adj")
 
    !---------------------------------------------------------------------------
    ! 1.0 Basic state
@@ -107,6 +108,8 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
 
    tsm_prime = tvsm_prime * (1.0 + 0.608 * qsm) + tsm_prime
    qsm_prime = tvsm_prime * tsm * 0.608 + qsm_prime
+
+   if (trace_use) call da_trace_exit("da_sfc_pre_adj")
 
 end subroutine da_sfc_pre_adj
 

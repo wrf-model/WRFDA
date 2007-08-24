@@ -17,6 +17,8 @@ subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
    real                   :: b(1:n)         ! Field after left-right pass.
    real                   :: c(1:n)         ! Field after right-left pass.
 
+   if (trace_use_dull) call da_trace_entry("da_recursive_filter_1d_adj")
+
    !-------------------------------------------------------------------------
    ! [1.0] Initialise:
    !-------------------------------------------------------------------------
@@ -76,6 +78,8 @@ subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
    end if
 
    field(1:n) = a(1:n)
+
+   if (trace_use_dull) call da_trace_exit("da_recursive_filter_1d_adj")
    
 end subroutine da_recursive_filter_1d_adj
 

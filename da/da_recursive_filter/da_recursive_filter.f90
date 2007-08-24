@@ -7,7 +7,7 @@ module da_recursive_filter
    use module_domain, only : domain, xpose_type
   
    use da_control, only : ims,ime,jms,jme,kms,kme,jds,jde, &
-      rf_passes, its,ite,jts,jte,vert_corr, trace_use, vert_corr_1
+      rf_passes, its,ite,jts,jte,vert_corr, trace_use, vert_corr_1, trace_use_dull
    use da_par_util, only : da_transpose_z2y, da_transpose_x2y, &
       da_transpose_y2z, da_transpose_y2x, da_transpose_x2z, &
       da_transpose_z2x

@@ -1,9 +1,10 @@
 module da_be_spectral
 
-   use da_control, only : da_zero_complex,ierr, &
+   use da_control, only : da_zero_complex,ierr, trace_use, &
       pi,gaussian_lats
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit
+   use da_gen_be, only : da_trace_entry, da_trace_exit
 
    !--------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform

@@ -6,39 +6,44 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
     
    implicit none
 
-   integer,            intent(in)  :: kts, kte
-   real, dimension(kts:kte), intent(in)  :: HEIGHT, P, T, Q
-   real,               intent(in)  :: H_OBS, PSLV    
-   real,               intent(out) :: PSFC    
-   real, optional     ,intent(in)  :: T_OBS    
+   integer,        intent(in)  :: kts, kte
+   real,           intent(in)  :: height(kts:kte)
+   real,           intent(in)  :: p(kts:kte)
+   real,           intent(in)  :: t(kts:kte)
+   real,           intent(in)  :: q(kts:kte)
+   real,           intent(in)  :: h_obs, pslv    
+   real,           intent(out) :: psfc    
+   real, optional, intent(in)  :: t_obs    
 
-   real,          parameter :: G = gravity
-   real,          parameter :: R =  gas_constant
-   real,          parameter :: ROV2 = R / 2.0
-   real,          parameter :: gamma  = 6.5E-3, &   ! temperature Lapse rate
-                      gammarg= gamma*gas_constant/g
+   real, parameter :: g = gravity
+   real, parameter :: r =  gas_constant
+   real, parameter :: rov2 = r / 2.0
+   real, parameter :: gamma  = 6.5e-3   ! temperature lapse rate
+   real, parameter :: gammarg= gamma*gas_constant/g
 
-   real,       dimension(3)    :: PLMB                   
+   real    :: plmb(3)                   
 
-   integer                     :: K
-   integer                     :: K500
-   integer                     :: K700
-   integer                     :: K850
+   integer :: k
+   integer :: k500
+   integer :: k700
+   integer :: k850
 
-   logical                     :: L1
-   logical                     :: L2
-   logical                     :: L3
+   logical :: l1
+   logical :: l2
+   logical :: l3
 
-   real                        :: GAMMA78, GAMMA57  
-   real                        :: HT    
-   real                        :: P1 
-   real                        :: T1       
-   real                        :: T500       
-   real                        :: T700    
-   real                        :: T850    
-   real                        :: TC
-   real                        :: TFIXED 
-   real                        :: TSLV, TSFC  
+   real    :: gamma78, gamma57  
+   real    :: ht    
+   real    :: p1 
+   real    :: t1       
+   real    :: t500       
+   real    :: t700    
+   real    :: t850    
+   real    :: tc
+   real    :: tfixed 
+   real    :: tslv, tsfc  
+
+   if (trace_use_dull) call da_trace_entry("da_sfcprs")
 
    TC   = t_kelvin + 17.5
    PLMB = (/85000.0, 70000.0, 50000.0/)
@@ -61,7 +66,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
   
    end do
 
-   if ((K850 .EQ. 0) .OR. (K700 .EQ. 0) .OR. (K500 .EQ. 0)) then
+   if ((K850 == 0) .OR. (K700 == 0) .OR. (K500 == 0)) then
       ! write(unit=message(1),fmt='(A,3f8.0,A)') &
       !    'Error in finding p level for ',PLMB(1), PLMB(2), PLMB(3),' Pa.'
       ! do K = 1, KX
@@ -165,6 +170,8 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    !  Surface pressure and sea-level pressure are the same at sea level.
 
    if (ABS (h_obs) < 0.1) psfc = pslv
+
+   if (trace_use_dull) call da_trace_exit("da_sfcprs")
 
 end subroutine da_sfcprs
 

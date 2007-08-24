@@ -1,5 +1,5 @@
 subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
-                               nobs_min, nobs_max, klev_min, klev_max)
+   nobs_min, nobs_max, klev_min, klev_max)
 
    !---------------------------------------------------------------------------
    !  Purpose: Do MPI reduction operations across processors to get the average, 
@@ -28,6 +28,8 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
    real    :: buf(1)
 
 #ifdef DM_PARALLEL
+
+   if (trace_use_frequent) call da_trace_entry("da_proc_stats_combine")
 
    ! Sum average and rms error over all processors and store on monitor processor.
    call mpi_reduce(proc_ave, average, 1, true_mpi_real, mpi_sum, root, comm, ierr)
@@ -88,6 +90,8 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
          call mpi_send(klev_max, 1, mpi_integer, root, 11, comm, ierr)
       end if
    end if
+
+   if (trace_use_frequent) call da_trace_exit("da_proc_stats_combine")
 #endif
 
 end subroutine da_proc_stats_combine

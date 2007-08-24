@@ -7,13 +7,31 @@ module da_gen_be
 
    use da_control, only : stdout,vertical_ip, t0,es_beta,es_alpha, &
       es_gamma,kappa,base_pres,rd_over_rv,rd_over_rv1,t_kelvin, gravity, &
-      da_array_print, filename_len,vertical_ip_0
+      da_array_print, filename_len,vertical_ip_0, trace_use, trace_use_dull
    use da_reporting, only : da_error, message
    use da_tools1, only : da_get_unit, da_free_unit
 
    implicit none
 
 contains
+
+! Stubs to avoid picking up vast ammounts of unnecessary stuff from wrfvar
+
+subroutine da_trace_entry(name, message, messages, maxnocalls)    
+   implicit none
+   character (len=*),           intent(in) :: name         
+   character (len=*), optional, intent(in) :: message      
+   character (len=*), optional, intent(in) :: messages(:)  
+   integer, optional,           intent(in) :: maxnocalls   
+end subroutine da_trace_entry
+
+subroutine da_trace_exit(name, message, messages, maxnocalls)
+   implicit none
+   character (len=*), intent(in)           :: name         
+   character (len=*), optional, intent(in) :: message      
+   character (len=*), optional, intent(in) :: messages(:)  
+   integer, optional, intent(in)           :: maxnocalls  
+end subroutine da_trace_exit
 
 #include "da_create_bins.inc"
 #include "da_filter_regcoeffs.inc"

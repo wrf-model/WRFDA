@@ -12,7 +12,7 @@ subroutine da_proc_maxmin_combine(n, max, min)
    
    implicit none
 
-   integer,   intent(in)                    :: n       ! Length of input fields.
+   integer,                  intent(in)     :: n       ! Length of input fields.
    type (maxmin_field_type), intent(inout)  :: max(n)  ! Max values over proc.
    type (maxmin_field_type), intent(inout)  :: min(n)  ! Min values over proc.
 
@@ -24,19 +24,20 @@ subroutine da_proc_maxmin_combine(n, max, min)
 
 #ifdef DM_PARALLEL
 
+   if (trace_use_frequent) call da_trace_entry("da_proc_maxmin_combine")
+
    ! Get minimum value and associated processor index.
    do i = 1, n
       in(2*i-1) = min(i)%value
-      in(2*i) = myproc
+      in(2*i)   = myproc
    end do
 
-   call mpi_reduce(in, out, n, mpi_2double_precision, mpi_minloc, &
-                                     root, comm, ierr)
+   call mpi_reduce(in, out, n, mpi_2double_precision, mpi_minloc, root, comm, ierr)
 
    if (rootproc) then
       do i = 1, n
          min(i)%value = out(2*i-1)
-         proc_id(i) = int(out(2*i))
+         proc_id(i)   = int(out(2*i))
       end do
    end if
 
@@ -46,15 +47,11 @@ subroutine da_proc_maxmin_combine(n, max, min)
    do i = 1, n
       if (proc_id(i) .ne. 0) then
          if (rootproc) then
-            call mpi_recv(min(i)%i, 1, mpi_integer, proc_id(i), &
-                           10, comm, STATUS, ierr)
-            call mpi_recv(min(i)%j, 1, mpi_integer, proc_id(i), &
-                           11, comm, STATUS, ierr)
-          else if (myproc == proc_id(i)) then
-             call mpi_send(min(i)%i, 1, mpi_integer, root, &
-                             10, comm, ierr)
-            call mpi_send(min(i)%j, 1, mpi_integer, root, &
-                             11, comm, ierr)
+            call mpi_recv(min(i)%i, 1, mpi_integer, proc_id(i), 10, comm, STATUS, ierr)
+            call mpi_recv(min(i)%j, 1, mpi_integer, proc_id(i), 11, comm, STATUS, ierr)
+         else if (myproc == proc_id(i)) then
+            call mpi_send(min(i)%i, 1, mpi_integer, root, 10, comm, ierr)
+            call mpi_send(min(i)%j, 1, mpi_integer, root, 11, comm, ierr)
          end if
       end if
    end do
@@ -62,15 +59,14 @@ subroutine da_proc_maxmin_combine(n, max, min)
    ! Get maximum value and associated processor index.
    do i = 1, n
       in(2*i-1) = max(i)%value
-      in(2*i) = myproc
+      in(2*i)   = myproc
    end do
-   call mpi_reduce(in, out, n, mpi_2double_precision, mpi_maxloc, &
-                                     root, comm, ierr)
+   call mpi_reduce(in, out, n, mpi_2double_precision, mpi_maxloc, root, comm, ierr)
 
    if (rootproc) then
       do i = 1, n
          max(i)%value = out(2*i-1)
-         proc_id(i) = int(out(2*i))
+         proc_id(i)   = int(out(2*i))
       end do
    end if
 
@@ -80,18 +76,16 @@ subroutine da_proc_maxmin_combine(n, max, min)
    do i = 1, n
       if (proc_id(i) .ne. root) then
          if (rootproc) then
-            call mpi_recv(max(i)%i, 1, mpi_integer, proc_id(i), &
-                           10, comm, STATUS, ierr)
-            call mpi_recv(max(i)%j, 1, mpi_integer, proc_id(i), &
-                           11, comm, STATUS, ierr)
+            call mpi_recv(max(i)%i, 1, mpi_integer, proc_id(i), 10, comm, STATUS, ierr)
+            call mpi_recv(max(i)%j, 1, mpi_integer, proc_id(i), 11, comm, STATUS, ierr)
          else if (myproc == proc_id(i)) then
-            call mpi_send(max(i)%i, 1, mpi_integer, root, &
-                             10, comm, ierr)
-            call mpi_send(max(i)%j, 1, mpi_integer, root, &
-                             11, comm, ierr)
+            call mpi_send(max(i)%i, 1, mpi_integer, root, 10, comm, ierr)
+            call mpi_send(max(i)%j, 1, mpi_integer, root, 11, comm, ierr)
          end if
       end if
    end do
+
+   if (trace_use_frequent) call da_trace_exit("da_proc_maxmin_combine")
 #endif
 
 end subroutine da_proc_maxmin_combine

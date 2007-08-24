@@ -29,7 +29,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
    ! [1.0]: Initialise:
    !----------------------------------------------------------------------  
 
-   if (trace_use) call da_trace_entry("da_transform_through_rf")
+   if (trace_use_dull) call da_trace_entry("da_transform_through_rf")
 
    rf_passes_over_two = rf_passes / 2
    
@@ -115,7 +115,7 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
       end do
    end if
 
-   if (trace_use) call da_trace_exit("da_transform_through_rf")
+   if (trace_use_dull) call da_trace_exit("da_transform_through_rf")
 
 end subroutine da_transform_through_rf
 

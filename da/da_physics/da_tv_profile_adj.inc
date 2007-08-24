@@ -1,5 +1,4 @@
-subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, &
-   ADJ_tv_ma)
+subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, ADJ_tv_ma)
 
    !-----------------------------------------------------------------------
    ! Purpose: adjoint routine for da_tv_profile
@@ -20,6 +19,8 @@ subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, &
    integer :: i, j      ! OBS location
    real    :: dx, dxm   ! interpolation weights.
    real    :: dy, dym   ! interpolation weights.
+
+   if (trace_use_dull) call da_trace_entry("da_tv_profile_adj")
 
    i   = loc%i
    j   = loc%j
@@ -49,6 +50,8 @@ subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, &
             0.61*grid%xb%t(ii,jj,kts:kte)*ADJ_tv_m(ii-i+1,jj-j+1,kts:kte)
       end do
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_tv_profile_adj")
 
 end subroutine da_tv_profile_adj
 

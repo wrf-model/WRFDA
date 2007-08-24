@@ -1,5 +1,4 @@
-subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, &
-   max_wave_trunc)
+subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, max_wave_trunc)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,13 +8,15 @@ subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, &
 
    integer, intent(in)  :: max_wave         ! Smallest wave for domain.
    integer, intent(in)  :: nw               ! Dimension of input power spectrum.
-   real, intent(in)     :: power_trunc      ! Power truncation (fraction).
-   real, intent(in)     :: power(0:nw)      ! Power spectrum.
+   real,    intent(in)  :: power_trunc      ! Power truncation (fraction).
+   real,    intent(in)  :: power(0:nw)      ! Power spectrum.
    integer, intent(out) :: max_wave_trunc   ! Smallest wave after truncation.
 
-   integer              :: l                ! Loop counter.
-   real                 :: truncated_power  ! Truncated power.
-   real                 :: cumul_power      ! Cumulative power.
+   integer :: l                ! Loop counter.
+   real    :: truncated_power  ! Truncated power.
+   real    :: cumul_power      ! Cumulative power.
+
+   if (trace_use) call da_trace_entry("da_truncate_spectra")
 
    truncated_power = power_trunc * sum(power(0:nw))
 
@@ -39,6 +40,8 @@ subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, &
       call da_warning(__FILE__,__LINE__,message(1:3))
       max_wave_trunc = max_wave
    end if
+
+   if (trace_use) call da_trace_exit("da_truncate_spectra")
 
 end subroutine da_truncate_spectra
 
