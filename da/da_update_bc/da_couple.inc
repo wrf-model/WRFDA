@@ -1,16 +1,16 @@
-subroutine da_couple (mut, field, msf, &
-                    ids, ide, jds, jde, kds, kde)
+subroutine da_couple (mut, field, msf, ids, ide, jds, jde, kds, kde)
 
    implicit none
 
-   integer, intent(in) :: ids, ide, jds, jde, kds, kde
-
-   real, dimension(ids:ide, jds:jde),          intent(in  ) :: mut, msf
-  
-   real, dimension(ids:ide, jds:jde, kds:kde), intent(inout) :: field
-  
+   integer, intent(in)    :: ids, ide, jds, jde, kds, kde
+   real,    intent(in)    :: mut(ids:ide, jds:jde)
+   real,    intent(in)    :: msf(ids:ide, jds:jde)
+   real,    intent(inout) :: field(ids:ide, jds:jde, kds:kde)
   
    integer :: i, j, k
+
+   ! update_bc
+   ! if (trace_use) call da_trace_entry("da_couple")
   
    do j=jds,jde
       do k=kds,kde
@@ -19,5 +19,7 @@ subroutine da_couple (mut, field, msf, &
          end do
       end do
    end do
+
+   ! if (trace_use) call da_trace_exit("da_couple")
 
 end subroutine da_couple

@@ -26,21 +26,15 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    real    :: dy, dym  ! Interpolation weights.
    integer :: alloc_status(40)
 
-   real, allocatable :: model_u10(:)
-   real, allocatable :: model_v10(:)
-   real, allocatable :: model_psfc(:)
-   real, allocatable :: model_ts(:)
-   real, allocatable :: model_elv(:)
-   real, allocatable :: model_smois(:)
-   real, allocatable :: model_tslb(:)
-   real, allocatable :: model_snowh(:)
-   real, allocatable :: model_vegfra(:)
-   real, allocatable :: model_qcw(:,:)
-   real :: model_ptop
-   real    :: model_isltyp, model_ivgtyp
+   real    :: model_u10, model_v10
+   real    :: model_psfc, model_ptop
+   real    :: model_ts, model_elv
+   real    :: model_smois, model_tslb, model_snowh
+   real    :: model_isltyp, model_ivgtyp, model_vegfra
    integer :: model_isflg
 
    real    :: v_p(kms:kme)  ! Model value p at ob hor. location.
+   real    :: model_qcw(kms:kme)
 
    ! real    :: model_tm(kms:kme)
 
@@ -50,7 +44,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    real    :: clw(kms:kme), dpf(kms:kme)
    real    :: clwp
 
-   ! CRTM local variables and types
+   ! CRTM local varaibles and types
    integer :: wmo_sensor_id,Error_Status, Allocate_Status
 
    type (CRTM_RTSolution_type), allocatable :: RTSolution(:)
@@ -135,33 +129,22 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          call da_error(__FILE__,__LINE__, &
             (/"Error in allocating CRTM Surface Structure Structure"/))
       end if
-
-      allocate (model_ts    (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_u10   (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_v10   (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_psfc  (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_elv   (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_smois (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_tslb  (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_snowh (iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_vegfra(iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-      allocate (model_qcw   (kms:kme,iv%plocal_rad(iv%time-1,inst)+1: iv%plocal_rad(iv%time,inst)))
-
+      ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
       do n= iv%plocal_rad(iv%time-1,inst)+1, iv%plocal_rad(iv%time,inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
-         model_ts(n)   = 0.0
-         model_u10(n)  = 0.0
-         model_v10(n)  = 0.0
-         model_psfc(n) = 0.0
+         model_ts   = 0.0
+         model_u10  = 0.0
+         model_v10  = 0.0
+         model_psfc = 0.0
 
          ! [1.1] Get horizontal interpolation weights:
 
-         i = iv%instid(inst)%new_loc%i(1,n)
-         j = iv%instid(inst)%new_loc%j(1,n)
-         dx = iv%instid(inst)%new_loc%dx(1,n)
-         dy = iv%instid(inst)%new_loc%dy(1,n)
-         dxm = iv%instid(inst)%new_loc%dxm(1,n)
-         dym = iv%instid(inst)%new_loc%dym(1,n)
+         i = iv%instid(inst)%loc_i(n)
+         j = iv%instid(inst)%loc_j(n)
+         dx = iv%instid(inst)%loc_dx(n)
+         dy = iv%instid(inst)%loc_dy(n)
+         dxm = iv%instid(inst)%loc_dxm(n)
+         dym = iv%instid(inst)%loc_dym(n)
          ! horizontal interpolate xb pressure to ob position for every xb layer
          ! get CRTM pressure Layers 
          do k=kts,kte ! from bottem to top
@@ -173,33 +156,35 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
          ! [1.2] Interpolate horizontally to ob:
          do k=kts,kte ! from bottem to top
-            call da_interp_lin_2d_newer (xb%t(:,:,k), iv%instid(inst)%new_loc,k,n,n,Atmosphere%Temperature(kte-k+1:kte-k+1))
-            call da_interp_lin_2d_newer (xb%q(:,:,k), iv%instid(inst)%new_loc,k,n,n,Atmosphere%Absorber(kte-k+1:kte-k+1,1)) 
+            call da_interp_lin_2d( xb%t(:,:,k), iv%instid(inst)%loc(n), &
+               Atmosphere%Temperature(kte-k+1) )
+            call da_interp_lin_2d( xb%q(:,:,k), iv%instid(inst)%loc(n), &
+               Atmosphere%Absorber(kte-k+1,1) ) 
             Atmosphere%Absorber(kte-k+1,1) = 1000.0*Atmosphere%Absorber(kte-k+1,1) ! in g/kg
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d_newer (xb%qcw(:,:,k), iv%instid(inst)%new_loc,k,n,n, model_qcw(kte-k+1,n:n))
+            call da_interp_lin_2d( xb%qcw(:,:,k), iv%instid(inst)%loc(n), model_qcw(kte-k+1) )
             
             if (crtm_cloud) then
                Atmosphere%Cloud(1)%Effective_Radius(kte-k+1)=10.0
-               Atmosphere%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1,n)
+               Atmosphere%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1)
 
                Atmosphere%Cloud(2)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d_newer (xb%qci(:,:,k), iv%instid(inst)%new_loc,k,n,n, &
-                  Atmosphere%Cloud(2)%Water_Content(kte-k+1:kte-k+1) )
+               call da_interp_lin_2d( xb%qci(:,:,k), iv%instid(inst)%loc(n), &
+                  Atmosphere%Cloud(2)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(3)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d_newer (xb%qrn(:,:,k), iv%instid(inst)%new_loc,k,n,n, &
-                  Atmosphere%Cloud(3)%Water_Content(kte-k+1:kte-k+1) )
+               call da_interp_lin_2d( xb%qrn(:,:,k), iv%instid(inst)%loc(n), &
+                  Atmosphere%Cloud(3)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(4)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d_newer (xb%qsn(:,:,k), iv%instid(inst)%new_loc, k,n,n, &
-                  Atmosphere%Cloud(4)%Water_Content(kte-k+1:kte-k+1) )
+               call da_interp_lin_2d( xb%qsn(:,:,k), iv%instid(inst)%loc(n), &
+                  Atmosphere%Cloud(4)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(5)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d_newer (xb%qgr(:,:,k), iv%instid(inst)%new_loc, k,n,n, &
-                  Atmosphere%Cloud(5)%Water_Content(kte-k+1:kte-k+1) )
+               call da_interp_lin_2d( xb%qgr(:,:,k), iv%instid(inst)%loc(n), &
+                  Atmosphere%Cloud(5)%Water_Content(kte-k+1) )
 
                Atmosphere%Cloud(6)%Effective_Radius(kte-k+1)=200.0
                Atmosphere%Cloud(6)%Water_Content(kte-k+1) = 0.0
@@ -216,18 +201,18 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             Surface%Water_Coverage, Surface%Ice_Coverage, &
             Surface%Land_Coverage, Surface%Snow_Coverage )
 
-         call da_interp_lin_2d_newer (xb % u10,  iv%instid(inst)%new_loc, 1, n, n, model_u10(n:n))
-         call da_interp_lin_2d_newer (xb % v10,  iv%instid(inst)%new_loc, 1, n, n, model_v10(n:n))
-         call da_interp_lin_2d_newer (xb % psfc, iv%instid(inst)%new_loc, 1, n, n, model_psfc(n:n))
+         call da_interp_lin_2d (xb % u10,  iv%instid(inst)%loc(n), model_u10 )
+         call da_interp_lin_2d (xb % v10,  iv%instid(inst)%loc(n), model_v10 )
+         call da_interp_lin_2d (xb % psfc, iv%instid(inst)%loc(n), model_psfc )
 
-         model_psfc(n) = 0.01*model_psfc(n)           ! convert to hPa
+         model_psfc = 0.01*model_psfc           ! convert to hPa
          model_ptop = 0.01*xb%ptop
 
          ! get CRTM levels (0.005hPa at top) /model full level
          Atmosphere%Level_Pressure(0)=model_ptop   ! to sigma level 51-->sigmaf=0
-         Atmosphere%Level_Pressure(Atmosphere%n_Layers)=model_psfc(n) ! to sigma level 1->sigmaf=1
+         Atmosphere%Level_Pressure(Atmosphere%n_Layers)=model_psfc ! to sigma level 1->sigmaf=1
          do k=kts+1,kte
-            Atmosphere%Level_Pressure(kte-k+1)= xb%sigmaf(k)*(model_psfc(n)-model_ptop)+model_ptop
+            Atmosphere%Level_Pressure(kte-k+1)= xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
          end do
  
          ! convert cloud content unit from kg/kg to kg/m^2        
@@ -241,28 +226,28 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          end if
 
          if ( model_isflg == 0 ) then   ! over sea using SST
-            call da_interp_lin_2d_newer (xb % tgrn, iv%instid(inst)%new_loc, 1, n, n, model_ts(n:n))
+            call da_interp_lin_2d (xb % tgrn, iv%instid(inst)%loc(n), model_ts)
          else
-            call da_interp_lin_2d_newer (xb % tsk,  iv%instid(inst)%new_loc, 1, n, n, model_ts(n:n))
+            call da_interp_lin_2d (xb % tsk,  iv%instid(inst)%loc(n), model_ts)
          end if
 
-         call da_interp_lin_2d_newer (xb % terr, iv%instid(inst)%new_loc, 1, n, n, model_elv(n:n))
+         call da_interp_lin_2d (xb % terr, iv%instid(inst)%loc(n), model_elv)
 
          ! variables for emissivity calculations
          !---------------------------------------- 
-         call da_interp_lin_2d_newer (xb % smois,  iv%instid(inst)%new_loc, 1, n, n, model_smois(n:n) )
-         call da_interp_lin_2d_newer (xb % tslb,   iv%instid(inst)%new_loc, 1, n, n, model_tslb(n:n) )
-         call da_interp_lin_2d_newer (xb % snowh,  iv%instid(inst)%new_loc, 1, n, n, model_snowh(n:n) )
-         call da_interp_lin_2d_newer (xb % vegfra, iv%instid(inst)%new_loc, 1, n, n, model_vegfra(n:n) )
+         call da_interp_lin_2d (xb % smois,  iv%instid(inst)%loc(n), model_smois )
+         call da_interp_lin_2d (xb % tslb,   iv%instid(inst)%loc(n), model_tslb )
+         call da_interp_lin_2d (xb % snowh,  iv%instid(inst)%loc(n), model_snowh )
+         call da_interp_lin_2d (xb % vegfra, iv%instid(inst)%loc(n), model_vegfra )
 
-         ! model_snowh(n) = model_snowh(n)*100.0   ! convert from m to mm
-         model_vegfra(n) = 0.01*model_vegfra(n)  ! convert range to 0~1
+         ! model_snowh = model_snowh*100.0   ! convert from m to mm
+         model_vegfra = 0.01*model_vegfra  ! convert range to 0~1
 
          ! ADD for computing cloud liquid water path (mm) from guess
          clwp = 0.0
          do k = kts,kte ! from top to bottom
             dpf(k) = 100.0*(atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
-            clw(k) = model_qcw(k,n)*dpf(k)/gravity ! kg/m2 or mm
+            clw  (k) = model_qcw(k)*dpf(k)/gravity ! kg/m2 or mm
             if (atmosphere%pressure(k)<100.0) clw(k) = 0.0
             clwp  = clwp + clw(k)
          end do
@@ -280,29 +265,29 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
          if (Surface%Land_Coverage > 0.0) then
             Surface%Land_Type=GRASS_SOIL           ! land type (User guide appendix 3)
-            Surface%Land_Temperature=model_ts(n)      ! K
-            Surface%Soil_Moisture_Content= model_smois(n) !0.05    ! volumetric water content (g/cm**3)
+            Surface%Land_Temperature=model_ts      ! K
+            Surface%Soil_Moisture_Content= model_smois !0.05    ! volumetric water content (g/cm**3)
             ! Surface%Canopy_Water_Content=0.05      ! gravimetric water content
-            Surface%Vegetation_Fraction=model_vegfra(n)
-            Surface%Soil_Temperature=model_tslb(n)
+            Surface%Vegetation_Fraction=model_vegfra
+            Surface%Soil_Temperature=model_tslb
          end if
          if (Surface%Water_Coverage > 0.0) then
             ! Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
-            Surface%Water_Temperature=model_ts(n)     ! K
-            Surface%Wind_Speed=sqrt(model_u10(n)**2+model_v10(n)**2)  ! m/sec
+            Surface%Water_Temperature=model_ts     ! K
+            Surface%Wind_Speed=sqrt(model_u10**2+model_v10**2)  ! m/sec
             ! surface%Wind_Direction=0.0            ! NOT used
             Surface%Salinity=33.                   ! ppmv
          end if
          if (Surface%Snow_Coverage > 0.0) then
             Surface%Snow_Type=NEW_SNOW             ! User guide appendix 3
-            Surface%Snow_Temperature=model_ts(n)      ! K
-            Surface%Snow_Depth=model_snowh(n)         ! mm
+            Surface%Snow_Temperature=model_ts      ! K
+            Surface%Snow_Depth=model_snowh         ! mm
             ! Surface%Snow_Density=0.2               ! g/cm**3
             ! Surface%Snow_Grain_Size=2.0            ! mm
          end if
          if (Surface%Ice_Coverage > 0.0) then
             ! Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
-            Surface%Ice_Temperature=model_ts(n)       ! K
+            Surface%Ice_Temperature=model_ts       ! K
             Surface%Ice_Thickness=10.0              ! mm
             ! Surface%Ice_Density=0.9                ! g/cm**3
             ! Surface%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO
@@ -373,20 +358,20 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
                iv%instid(inst)%qgr(k,n) = atmosphere%cloud(5)%water_content(k)
             end if
          end do
-         iv%instid(inst)%u10(n)       = model_u10(n)
-         iv%instid(inst)%v10(n)       = model_v10(n)
+         iv%instid(inst)%u10(n)       = model_u10
+         iv%instid(inst)%v10(n)       = model_v10
          iv%instid(inst)%t2m(n)       = 0.01*missing_r !model_t2m
          iv%instid(inst)%mr2m(n)      = 0.01*missing_r !model_mr2m
-         iv%instid(inst)%ps(n)        = model_psfc(n)
-         iv%instid(inst)%ts(n)        = model_ts(n)
-         iv%instid(inst)%smois(n)     = model_smois(n)
-         iv%instid(inst)%tslb(n)      = model_tslb(n)
-         iv%instid(inst)%snowh(n)     = model_snowh(n)
+         iv%instid(inst)%ps(n)        = model_psfc
+         iv%instid(inst)%ts(n)        = model_ts
+         iv%instid(inst)%smois(n)     = model_smois
+         iv%instid(inst)%tslb(n)      = model_tslb
+         iv%instid(inst)%snowh(n)     = model_snowh
          iv%instid(inst)%isflg(n)     = model_isflg
-         iv%instid(inst)%elevation(n) = model_elv(n)
+         iv%instid(inst)%elevation(n) = model_elv
          iv%instid(inst)%soiltyp(n)   = model_isltyp
          iv%instid(inst)%vegtyp(n)    = model_ivgtyp
-         iv%instid(inst)%vegfra(n)    = model_vegfra(n)
+         iv%instid(inst)%vegfra(n)    = model_vegfra
          iv%instid(inst)%clwp(n)      = clwp
          iv%instid(inst)%water_coverage(n) = surface%water_coverage
          iv%instid(inst)%land_coverage(n)  = surface%land_coverage
@@ -405,17 +390,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          call da_error(__FILE__,__LINE__, &
             (/"Error in deallocating CRTM Surface Structure"/))
       end if
-
-      deallocate (model_ts)
-      deallocate (model_u10)
-      deallocate (model_v10)
-      deallocate (model_psfc)
-      deallocate (model_elv)
-      deallocate (model_smois)
-      deallocate (model_tslb)
-      deallocate (model_snowh)
-      deallocate (model_vegfra)
-      deallocate (model_qcw)
    end do        ! end loop for sensor
 
    !------------------------------------------

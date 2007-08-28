@@ -1,4 +1,4 @@
-subroutine da_eof_decomposition( kz, bx, e, l )
+subroutine da_eof_decomposition (kz, bx, e, l)
    
    !---------------------------------------------------------------------------
    ! Purpose: Compute eigenvectors E and eigenvalues L of vertical covariance 
@@ -9,18 +9,20 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    
    implicit none
 
-   integer, intent(in)      :: kz               ! Dimension of error matrix. 
-   real, intent(in)         :: bx(1:kz,1:kz)    ! Vert. background error.
-   real, intent(out)        :: e(1:kz,1:kz)     ! Eigenvectors of Bx.
-   real, intent(out)        :: l(1:kz)          ! Eigenvalues of Bx.
+   integer, intent(in)  :: kz               ! Dimension of error matrix. 
+   real,    intent(in)  :: bx(1:kz,1:kz)    ! Vert. background error.
+   real,    intent(out) :: e(1:kz,1:kz)     ! Eigenvectors of Bx.
+   real,    intent(out) :: l(1:kz)          ! Eigenvalues of Bx.
 
-   integer                  :: work             ! Size of work array.
-   integer                  :: m                ! Loop counters
-   integer                  :: info             ! Info code.
+   integer :: work             ! Size of work array.
+   integer :: m                ! Loop counters
+   integer :: info             ! Info code.
 
-   real                     :: work_array(1:3*kz-1)
-   real                     :: ecopy(1:kz,1:kz)
-   real                     :: lcopy(1:kz)
+   real    :: work_array(1:3*kz-1)
+   real    :: ecopy(1:kz,1:kz)
+   real    :: lcopy(1:kz)   
+
+   if (trace_use) call da_trace_entry("da_eof_decomposition")    
 
    !-------------------------------------------------------------------------
    ! [5.0]: Perform global eigenvalue decomposition using LAPACK software:
@@ -43,7 +45,9 @@ subroutine da_eof_decomposition( kz, bx, e, l )
    do m = 1, kz
       l(m) = lcopy(kz+1-m)
       e(1:kz,m) = ecopy(1:kz,kz+1-m)
-   end do
+   end do  
+
+   if (trace_use) call da_trace_exit("da_eof_decomposition")    
    
 end subroutine da_eof_decomposition
 

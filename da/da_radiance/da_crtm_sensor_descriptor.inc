@@ -7,6 +7,8 @@ subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
  integer :: i,platform_id,satellite_id,sensor_id
  character (len=80) :: crtm_sat, crtm_sensor
 
+   if (trace_use) call da_trace_entry("da_crtm_sensor_descriptor")  
+
   do i=1,nsensor
      
      platform_id  = rtminit_platform(i)
@@ -38,7 +40,8 @@ subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
      sensor_descriptor(i)=trim(crtm_sensor)//'_'//trim(crtm_sat)
 
   end do
-     write(6,*) sensor_descriptor
+
+   if (trace_use) call da_trace_exit("da_crtm_sensor_descriptor")  
 
 end subroutine da_crtm_sensor_descriptor
 #endif

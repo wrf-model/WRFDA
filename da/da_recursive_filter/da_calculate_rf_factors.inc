@@ -1,4 +1,4 @@
-subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
+subroutine da_calculate_rf_factors (rf_lengthscale, rf_alpha, rf_scale_factor)
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculate:
@@ -24,6 +24,8 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
 
    real, dimension(-n:n) :: field_in, field_out  ! Working field.
    ! real, dimension(-n:n) :: field_out1  ! Working field.
+
+   if (trace_use_dull) call da_trace_entry("da_calculate_rf_factors")
 
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:
@@ -80,6 +82,8 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
       ! end do
 
    end do ! End loop over k
+
+   if (trace_use_dull) call da_trace_exit("da_calculate_rf_factors")
    
 end subroutine da_calculate_rf_factors
       

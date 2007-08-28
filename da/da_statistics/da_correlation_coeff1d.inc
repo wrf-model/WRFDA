@@ -7,20 +7,22 @@ subroutine da_correlation_coeff1d(field1, field2, corr_coeff, &
    
    implicit none
    
-   real, intent(in)           :: field1(:)       ! input field 1.
-   real, intent(in)           :: field2(:)       ! input field 2.
-   real, intent(out)          :: corr_coeff      ! correlation coefficient
-   real, intent(out)          :: rel_acc       ! relative error.
+   real, intent(in)  :: field1(:)       ! input field 1.
+   real, intent(in)  :: field2(:)       ! input field 2.
+   real, intent(out) :: corr_coeff      ! correlation coefficient
+   real, intent(out) :: rel_acc       ! relative error.
    
-   integer                    :: jx              ! 2nd dimension of field.
-   real                       :: j_inv           ! 1/(jx)
-   real                       :: coeff0          ! coefficient.
-   real                       :: coeff1          ! coefficient.
-   real                       :: coeff2          ! coefficient.
-   real                       :: coeff3          ! coefficient.
-   real                       :: field_mean      ! mean of field.
-   real, allocatable          :: data1(:)
-   real, allocatable          :: data2(:)
+   integer           :: jx              ! 2nd dimension of field.
+   real              :: j_inv           ! 1/(jx)
+   real              :: coeff0          ! coefficient.
+   real              :: coeff1          ! coefficient.
+   real              :: coeff2          ! coefficient.
+   real              :: coeff3          ! coefficient.
+   real              :: field_mean      ! mean of field.
+   real, allocatable :: data1(:)
+   real, allocatable :: data2(:)
+
+   if (trace_use) call da_trace_entry("da_correlation_coeff1d")
    
    ! [1.0] Set up scalars:
    
@@ -61,6 +63,8 @@ subroutine da_correlation_coeff1d(field1, field2, corr_coeff, &
    
    deallocate(data1)
    deallocate(data2)
+
+   if (trace_use) call da_trace_exit("da_correlation_coeff1d")
    
 end subroutine da_correlation_coeff1d
 

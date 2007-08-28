@@ -1,7 +1,5 @@
-subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, &
-                           bin, bin2d, &
-                           lat_min, lat_max, binwidth_lat, &
-                              hgt_min, hgt_max, binwidth_hgt, latitude, height)
+subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
+   lat_min, lat_max, binwidth_lat, hgt_min, hgt_max, binwidth_hgt, latitude, height)
 
    !----------------------------------------------------------------------------
    !
@@ -32,19 +30,19 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, &
 
    implicit none
 
-   integer, intent(in)  :: ni, nj, nk          ! Dimensions read in.
-   integer, intent(in)  :: bin_type            ! Type of bin to average over
-   integer, intent(out) :: num_bins            ! Number of bins.
-   integer, intent(out) :: num_bins2d          ! Number of bins for 2D fields
-   integer, intent(out) :: bin(1:ni,1:nj,1:nk) ! Bin at each 3D point
-   integer, intent(out) :: bin2d(1:ni,1:nj)    ! Bin at each 2D point
+   integer,        intent(in)  :: ni, nj, nk          ! Dimensions read in.
+   integer,        intent(in)  :: bin_type            ! Type of bin to average over
+   integer,        intent(out) :: num_bins            ! Number of bins.
+   integer,        intent(out) :: num_bins2d          ! Number of bins for 2D fields
+   integer,        intent(out) :: bin(1:ni,1:nj,1:nk) ! Bin at each 3D point
+   integer,        intent(out) :: bin2d(1:ni,1:nj)    ! Bin at each 2D point
 
-   real, intent(in),optional:: lat_min, lat_max    ! Used if bin_type = 2 (deg)
-   real, intent(in),optional:: binwidth_lat        ! Used if bin_type = 2 (deg)
-   real, intent(in),optional:: hgt_min, hgt_max    ! Used if bin_type = 2 (deg)
-   real, intent(in),optional:: binwidth_hgt        ! Used if bin_type = 2 (m).
-   real, intent(in),optional:: latitude(1:ni,1:nj) ! Latitude (degrees).
-   real, intent(in),optional:: height(1:ni,1:nj,1:nk)     ! Height (m).
+   real, optional, intent(in)  :: lat_min, lat_max    ! Used if bin_type = 2 (deg)
+   real, optional, intent(in)  :: binwidth_lat        ! Used if bin_type = 2 (deg)
+   real, optional, intent(in)  :: hgt_min, hgt_max    ! Used if bin_type = 2 (deg)
+   real, optional, intent(in)  :: binwidth_hgt        ! Used if bin_type = 2 (m).
+   real, optional, intent(in)  :: latitude(1:ni,1:nj) ! Latitude (degrees).
+   real, optional, intent(in)  :: height(1:ni,1:nj,1:nk)     ! Height (m).
 
    integer           :: b, i, j, k                 ! Loop counters.
    integer           :: count                      ! Counter
@@ -57,6 +55,8 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, &
    integer           :: bin_i(1:ni), bin_j(1:nj)   ! Used if bin_type = 4.
    real, allocatable :: binstart_lat(:)            ! Used if bin_type = 2 (deg)
    real, allocatable :: binstart_hgt(:)            ! Used if bin_type = 2 (deg)
+
+   if (trace_use) call da_trace_entry("da_create_bins")
 
    if (bin_type == 0) then         ! No averaging in space
 
@@ -255,6 +255,8 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, &
       bin(:,:,:) = 1
       bin2d(:,:) = 1
    end if
+
+   if (trace_use) call da_trace_exit("da_create_bins")
 
 end subroutine da_create_bins
 

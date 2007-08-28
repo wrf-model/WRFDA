@@ -1,5 +1,5 @@
 subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
-                      TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh )
+   TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh )
  
    !--------------------------------------------------------------------------
    ! Purpose : Calculate the effective zenith angle of reflected microwave 
@@ -11,9 +11,9 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
 
    implicit none
 
-   integer, intent(in  ) :: ifreq
-   real   , intent(in  ) :: theta,gx2,sigma,TGL_gx2, TGL_sigma
-   real   , intent( out) :: TGL_effangv,TGL_effangh,effangv,effangh
+   integer, intent(in)  :: ifreq
+   real,    intent(in)  :: theta,gx2,sigma,TGL_gx2, TGL_sigma
+   real,    intent(out) :: TGL_effangv,TGL_effangh,effangv,effangh
 
    real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
    real s19v(6),s19h(6),s22v(6),s22h(6), &
@@ -36,6 +36,8 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
    data s37h /.869E+1,.571E+2,-.257E+2,-.302E+1,.237E+0,.386E+1/
    data s85v /.116E+2,.263E+2,-.101E+2,-.358E+1,.270E+0,.175E+1/
    data s85h /.736E+1,.568E+2,-.254E+2,-.248E+1,.196E+0,.387E+1/
+
+   if (trace_use) call da_trace_entry("da_effang_tl")
 
    if (gx2 .le. 0.0 .or. sigma .le. 0.0) then
          effangv = theta
@@ -258,6 +260,8 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
    TGL_effangv = TGL_angv + TGL_dth
        effangh =     angh +     dth
    TGL_effangh = TGL_angh + TGL_dth
+
+   if (trace_use) call da_trace_exit("da_effang_tl")
 
 end subroutine da_effang_tl
 

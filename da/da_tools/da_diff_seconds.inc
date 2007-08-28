@@ -1,4 +1,4 @@
-real function da_diff_seconds(date_char_1, date_char_2)
+real function da_diff_seconds (date_char_1, date_char_2)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,13 +8,15 @@ real function da_diff_seconds(date_char_1, date_char_2)
 
    character(len=24), intent(in) :: date_char_1, date_char_2
   
-   integer                :: ccyy_1,mo_1,dd_1,hh_1,mi_1,ss_1,jd_1
-   integer                :: ccyy_2,mo_2,dd_2,hh_2,mi_2,ss_2,jd_2
-   integer                :: i, year, diff_days
-   integer                :: start_year, end_year
-   integer, dimension(12) :: mmday
+   integer :: ccyy_1,mo_1,dd_1,hh_1,mi_1,ss_1,jd_1
+   integer :: ccyy_2,mo_2,dd_2,hh_2,mi_2,ss_2,jd_2
+   integer :: i, year, diff_days
+   integer :: start_year, end_year
+   integer :: mmday(12)
  
-   real                   :: s_1, s_2
+   real    :: s_1, s_2
+
+   if (trace_use_dull) call da_trace_entry("da_diff_seconds")
   
    mmday=(/31,28,31,30,31,30,31,31,30,31,30,31/)
   
@@ -98,6 +100,8 @@ real function da_diff_seconds(date_char_1, date_char_2)
        + 24.0* real(jd_2)))
 
    da_diff_seconds = abs(s_1 - s_2)
+
+   if (trace_use_dull) call da_trace_exit("da_diff_seconds")
 
 end function da_diff_seconds
 

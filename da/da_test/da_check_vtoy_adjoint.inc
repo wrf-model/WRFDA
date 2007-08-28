@@ -8,33 +8,30 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
 
    implicit none
 
-   integer, intent(in)                  :: cv_size
+   integer,                    intent(in)    :: cv_size
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type(domain), intent(inout)          :: grid 
+   type(domain),               intent(inout) :: grid 
+   type(vp_type),              intent(inout) :: vv    ! Grdipt/EOF CV.
+   type(vp_type),              intent(inout) :: vp    ! Grdipt/level CV.
+   type(xbx_type),             intent(in)    :: xbx   ! Header & non-gridded vars.
+   type(be_type),              intent(in)    :: be    ! background error structure.
+   type(ep_type),              intent(in)    :: ep     ! ensemble perturbation structure.
+   type(iv_type),              intent(inout) :: iv    ! ob. increment vector.
+   type(y_type),               intent(inout) :: y     ! y = h (xa)
 
-   type (vp_type),    intent(inout) :: vv    ! Grdipt/EOF CV.
-   type (vp_type),    intent(inout) :: vp    ! Grdipt/level CV.
-   type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.
-   type (be_type),    intent(in)    :: be    ! background error structure.
-   type (ep_type),    intent(in)    :: ep     ! ensemble perturbation structure.
+   real    :: cv(1:cv_size)          ! Test control variable.
+   real    :: cv_2(1:cv_size)
+   real    :: adj_sum_lhs               ! < y, y >
+   real    :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
+   real    :: partial_lhs   ! < y, y >
+   real    :: pertile_lhs   ! < y, y >   
+   integer :: cg_jcdf
 
-   type (iv_type),    intent(inout) :: iv    ! ob. increment vector.
-   type (y_type),     intent(inout) :: y     ! y = h (xa)
-
-   real, dimension(1:cv_size)        :: cv          ! Test control variable.
-   real, dimension(1:cv_size)        :: cv_2
-
-   real                           :: adj_sum_lhs               ! < y, y >
-   real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
-   real                           :: partial_lhs   ! < y, y >
-   real                           :: pertile_lhs   ! < y, y >
-   
-   integer                        :: cg_jcdf
+   if (trace_use_dull) call da_trace_entry("da_check_vtoy_adjoint")
 
    write(unit=stdout, fmt='(/a/a)') &
         '       da_check_vtoy_adjoint:',&
         '---------------------------------------'
-
 
    call random_number(cv(:))
    cv(:) = cv(:) - 0.5
@@ -53,7 +50,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    !-------------------------------------------------------------------------
 
    call da_get_y_lhs_value(iv, y, partial_lhs, pertile_lhs, adj_sum_lhs)
-
 
    cv = 0.0
    cg_jcdf = 1
@@ -98,6 +94,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
       'Whole Domain  < v, v_adj > = ', adj_sum_rhs
 #endif
 
+   if (trace_use_dull) call da_trace_exit("da_check_vtoy_adjoint")
 
 end subroutine da_check_vtoy_adjoint
 

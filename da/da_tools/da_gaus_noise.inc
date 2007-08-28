@@ -46,10 +46,13 @@ real function da_gaus_noise(KDUM)
 
    integer             :: niset
    real                :: gset
+
    save niset,gset
    data niset/0/
 
    real zfac,zrsq,zv1,zv2
+
+   if (trace_use) call da_trace_entry("da_gaus_noise")
 
    if (niset.eq.0) then
 
@@ -68,8 +71,8 @@ real function da_gaus_noise(KDUM)
       da_gaus_noise = gset
       niset = 0
    end if
-      
-   return
+
+   if (trace_use) call da_trace_exit("da_gaus_noise")
 
 end function da_gaus_noise
 

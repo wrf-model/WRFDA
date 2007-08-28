@@ -10,7 +10,7 @@ subroutine da_copy_tile_dims(grid)
 
    integer                  :: ij   ! Loop counter
 
-   if (trace_use) call da_trace_entry("da_copy_tile_dims")
+   if (trace_use_dull) call da_trace_entry("da_copy_tile_dims")
 
    ! De-reference tile indices stored in the grid data structure.
 
@@ -44,7 +44,7 @@ subroutine da_copy_tile_dims(grid)
       end if
    end do
 
-   if (trace_use) call da_trace_exit("da_copy_tile_dims")
+   if (trace_use_dull) call da_trace_exit("da_copy_tile_dims")
 
 end subroutine da_copy_tile_dims
 

@@ -12,13 +12,12 @@ subroutine da_patch_to_global_2d (xp, vlocal, vglobal)
    real,              intent(in)  :: vlocal(:,:)
    real,              intent(out) :: vglobal(:,:)
 
-   ! Local declarations
    real, allocatable :: vlocal3d(:,:,:), vglobal3d(:,:,:)
-write(0,*) __FILE__,__LINE__,"ims,ime,jms,jme,ids,ide,jds,jde",ims,ime,jms,jme,ids,ide,jds,jde
+
+   if (trace_use_frequent) call da_trace_entry("da_patch_to_global_2d")
+
    allocate(vlocal3d (ims:ime, jms:jme, 1:1))
-write (0,*) __FILE__,__LINE__
    allocate(vglobal3d(ids:ide, jds:jde, 1:1))
-write (0,*) __FILE__,__LINE__
 
    vlocal3d(:,:,1) = vlocal(:,:)
    call da_patch_to_global_3d(xp, vlocal3d, vglobal3d, 1)
@@ -28,6 +27,8 @@ write (0,*) __FILE__,__LINE__
 
    deallocate(vlocal3d)
    deallocate(vglobal3d)
+
+   if (trace_use_frequent) call da_trace_exit("da_patch_to_global_2d")
 
 end subroutine da_patch_to_global_2d
 

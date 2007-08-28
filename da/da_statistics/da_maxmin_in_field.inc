@@ -6,10 +6,11 @@ subroutine da_maxmin_in_field(field, max, min)
 
    implicit none
 
-   real, intent(in)         :: field(its:ite,jts:jte,kts:kte)
+   real,                    intent(in)  :: field(its:ite,jts:jte,kts:kte)
+   type(maxmin_field_type), intent(out) :: max(kts:kte)
+   type(maxmin_field_type), intent(out) :: min(kts:kte)
 
-   type (maxmin_field_type), intent(out) :: max(kts:kte)
-   type (maxmin_field_type), intent(out) :: min(kts:kte)
+   if (trace_use_dull) call da_trace_entry("da_maxmin_in_field")
 
    do k = kts, kte
       max(k)%value = -1.0e20
@@ -29,6 +30,8 @@ subroutine da_maxmin_in_field(field, max, min)
          end do
       end do
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_maxmin_in_field")
 
 end subroutine da_maxmin_in_field
 

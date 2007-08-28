@@ -8,21 +8,23 @@ subroutine da_get_var_2d_int_cdf(file, var, data, i1, i2, time, debug)
 
 #include "netcdf.inc"
 
-   integer, intent(in)  ::  i1, i2, time
-   character (len=80), intent(in) :: file
-   logical, intent(in) :: debug
-   character (len=*), intent(in) :: var
-   integer, dimension(i1,i2), intent(out) :: data
+   integer,            intent(in)  ::  i1, i2, time
+   character (len=80), intent(in)  :: file
+   logical,            intent(in)  :: debug
+   character (len=*),  intent(in)  :: var
+   integer,            intent(out) :: data(i1,i2)
 
-   integer cdfid, rcode, id_data
+   integer            :: cdfid, rcode, id_data
    character (len=80) :: varnam
-   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
-   integer :: i, ivtype
+   integer            :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
+   integer            :: i, ivtype
+
+   ! if (trace_use) call da_trace_entry("da_get_var_2d_int_cdf")
 
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode /= 0) then
-      write(unit=stdout, fmt='(2a)') ' error openiing netcdf file ', trim(file)
+      write(unit=stdout, fmt='(2a)') ' error opening netcdf file ', trim(file)
       stop
    end if
 
@@ -74,6 +76,8 @@ subroutine da_get_var_2d_int_cdf(file, var, data, i1, i2, time, debug)
    end if
 
    call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_var_2d_int_cdf")
 
 end subroutine da_get_var_2d_int_cdf
 

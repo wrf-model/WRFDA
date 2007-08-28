@@ -1,6 +1,4 @@
-subroutine da_evapo_lin(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
-                        SCR39,SCR59,QV_A,PRE9,SCR69, &
-                        kts,kte,kms,kme)
+subroutine da_evapo_lin(dt,scr3,scr5,qv_b,pre,scr6, scr39,scr59,qv_a,pre9,scr69, kts,kte,kms,kme)
 
    !-----------------------------------------------------------------------
    ! Purpose: Rainwater evaporation
@@ -8,45 +6,54 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
 
    implicit none
 
-   integer, intent(in)                   :: kts, kte, kms, kme
-   real, dimension(kms:kme), intent(in)  :: DT, SCR3, SCR5, SCR6, QV_B
-   real, dimension(kms:kme), intent(out) :: PRE, PRE9
-   real, dimension(kms:kme), intent(in)  :: SCR39, SCR59, SCR69, QV_A
+   integer, intent(in)  :: kts, kte, kms, kme
+   real,    intent(in)  :: dt(kms:kme)
+   real,    intent(in)  :: scr3(kms:kme)
+   real,    intent(in)  :: scr5(kms:kme)
+   real,    intent(in)  :: scr6(kms:kme)
+   real,    intent(in)  :: qv_b(kms:kme)
+   real,    intent(out) :: pre(kms:kme)
+   real,    intent(out) :: pre9(kms:kme)
+   real,    intent(in)  :: scr39(kms:kme)
+   real,    intent(in)  :: scr59(kms:kme)
+   real,    intent(in)  :: scr69(kms:kme)
+   real,    intent(in)  :: qv_a(kms:kme)
 
-   integer           :: k
-   real              :: beta, QRTH
-   real              :: TMP, TMP2
+   integer :: k
+   real    :: beta, qrth
+   real    :: tmp, tmp2
 
-   QRTH = 1.0e-6
+   if (trace_use) call da_trace_entry("da_evapo_lin")
+
+   qrth = 1.0e-6
    beta = 0.0486   ! original
 
-   do K = kts, kte
+   do k = kts, kte
+      if (dt(k) <= 0.0) cycle
 
-      if (DT(k) <= 0.0) cycle
-
-      if ( SCR3(k) > QRTH .and. QV_B(k) < SCR5(k) ) then
-         TMP  = beta * ( QV_B(k)-SCR5(k) )* 0.65 * ( SCR6(k)*SCR3(k) )**(-0.35)
-         TMP2 = beta * ( SCR6(k)*SCR3(k) )**0.65
-         PRE9(k) = TMP * ( SCR69(k)*SCR3(k)+SCR6(k)*SCR39(k) ) + &
-                   TMP2 * ( QV_A(k)-SCR59(k) )
-         PRE(k)  = beta * ( QV_B(k)-SCR5(k) ) * ( SCR6(k)*SCR3(k) )**0.65
-      else if ( SCR3(k) <= QRTH .and. SCR3(k) > 0.0 .and. QV_B(k) < SCR5(k) ) then
-         TMP  = beta * ( QV_B(k)-SCR5(k) ) * 0.65 * ( SCR6(k)*QRTH )**(-0.35)
-         TMP2 = beta * ( SCR6(k)*QRTH )**0.65
-         PRE9(k) = TMP * ( SCR69(k)*QRTH ) + &
-                   TMP2 * ( QV_A(k)-SCR59(k) )
-         PRE(k)  = beta * ( QV_B(k)-SCR5(k) ) * ( SCR6(k)*QRTH )**0.65
+      if ( scr3(k) > qrth .and. qv_b(k) < scr5(k) ) then
+         tmp  = beta * ( qv_b(k)-scr5(k) )* 0.65 * ( scr6(k)*scr3(k) )**(-0.35)
+         tmp2 = beta * ( scr6(k)*scr3(k) )**0.65
+         pre9(k) = tmp * ( scr69(k)*scr3(k)+scr6(k)*scr39(k) ) + &
+                   tmp2 * ( qv_a(k)-scr59(k) )
+         pre(k)  = beta * ( qv_b(k)-scr5(k) ) * ( scr6(k)*scr3(k) )**0.65
+      else if ( scr3(k) <= qrth .and. scr3(k) > 0.0 .and. qv_b(k) < scr5(k) ) then
+         tmp  = beta * ( qv_b(k)-scr5(k) ) * 0.65 * ( scr6(k)*qrth )**(-0.35)
+         tmp2 = beta * ( scr6(k)*qrth )**0.65
+         pre9(k) = tmp * ( scr69(k)*qrth ) + tmp2 * ( qv_a(k)-scr59(k) )
+         pre(k)  = beta * ( qv_b(k)-scr5(k) ) * ( scr6(k)*qrth )**0.65
       else
-         PRE9(k) = 0.0
-         PRE(k) = 0.0
+         pre9(k) = 0.0
+         pre(k) = 0.0
       end if
 
-      if ( PRE(k) < -SCR3(k)/DT(k) ) then
-         PRE9(k) = -SCR39(k) / DT(k)
-         PRE(k)  = -SCR3(k) / DT(k)
+      if ( pre(k) < -scr3(k)/dt(k) ) then
+         pre9(k) = -scr39(k) / dt(k)
+         pre(k)  = -scr3(k) / dt(k)
       end if
-
    end do
+
+   if (trace_use) call da_trace_exit("da_evapo_lin")
 
 end subroutine da_evapo_lin
 

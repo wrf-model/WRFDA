@@ -8,16 +8,18 @@ subroutine da_get_times_cdf(file, times, n_times, max_times, debug)
 
 #include "netcdf.inc"
 
-   integer, intent(in)  ::  max_times  
-   integer, intent(out) ::  n_times
-   character (len=80), intent(in) :: file
+   integer,            intent(in)  ::  max_times  
+   integer,            intent(out) ::  n_times
+   character (len=80), intent(in)  :: file
    character (len=80), intent(out) :: times(max_times)
-   logical, intent(in) :: debug
+   logical,            intent(in)  :: debug
 
-   integer cdfid, rcode, id_time
+   integer            :: cdfid, rcode, id_time
    character (len=80) :: varnam, time1
-   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
-   integer :: i, ivtype
+   integer            :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
+   integer            :: i, ivtype
+
+   ! if (trace_use) call da_trace_entry("da_get_times_cdf")
 
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
@@ -60,6 +62,8 @@ subroutine da_get_times_cdf(file, times, n_times, max_times, debug)
    write(unit=stdout,fmt=*) ' exiting get_times_cdf '
 
    call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_times_cdf")
 
 end subroutine da_get_times_cdf
 

@@ -215,9 +215,6 @@ subroutine da_read_obs_ssmi (iv, xp, filename)
       
             !  Initialize other non read fields
 
-write (0,*) __FILE__,__LINE__,"ssmi_rv,nlocal(ssmi_rv)",ssmi_rv,nlocal(ssmi_rv)
-write (0,*) __FILE__,__LINE__,"SIZE(iv % ssmi_rv)",SIZE(iv % ssmi_rv)
-
             iv % ssmi_rv (nlocal(ssmi_rv)) % loc = loc
 
             !  Initialize with read fields

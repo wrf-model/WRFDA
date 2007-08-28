@@ -20,6 +20,8 @@ subroutine da_ludcmp(n, np, indx, a, d)
    integer              :: i , imax , j , k
    real                 :: vv(1:np)
 
+   if (trace_use) call da_trace_entry("da_ludcmp")
+
    d = 1.0
    do i = 1 , n
       aamax = 0.0
@@ -83,6 +85,8 @@ subroutine da_ludcmp(n, np, indx, a, d)
    end do
 
    if (a(n,n) == 0.0) a(n,n) = tiny
+
+   if (trace_use) call da_trace_exit("da_ludcmp")
 
 end subroutine da_ludcmp
 

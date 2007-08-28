@@ -24,11 +24,11 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
    !  This gives slightly better results than finding the roots of Pn(sin(lat))
    ! (Algorithm from Numerical Recipies(Fortran version), 1989, p 258)
 
-   integer, intent(in)    :: nj                ! Gridpoints in N-S direction.
-   real, intent(out)      :: glats(1:nj)       ! Gaussian latitudes(S->N, radians).
-   real, intent(out)      :: gwgts(1:nj)       ! Gaussian weights.
-   real, intent(out), optional :: sinlat(1:nj) ! sin(Latitude).
-   real, intent(out), optional :: coslat(1:nj) ! cos(Latitude).
+   integer, intent(in)            :: nj           ! Gridpoints in N-S direction.
+   real,    intent(out)           :: glats(1:nj)  ! Gaussian latitudes(S->N, radians).
+   real,    intent(out)           :: gwgts(1:nj)  ! Gaussian weights.
+   real,    intent(out), optional :: sinlat(1:nj) ! sin(Latitude).
+   real,    intent(out), optional :: coslat(1:nj) ! cos(Latitude).
 
    integer, parameter     :: maxiter = 100     ! Maximum number of iterations.
    integer                :: i, j, k           ! Loop counters.
@@ -42,6 +42,8 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
    real                   :: fn1               ! Pn-1(x)
    real                   :: dfr               ! 1/Pn'(x)
    real                   :: dx, dxold         ! step size, previous step
+
+   if (trace_use) call da_trace_entry("da_get_gausslats")
 
    k =(nj + 2) / 2
    xj = 0.0
@@ -147,6 +149,8 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
       sinlat(nj/2+1) = 0.0
       coslat(nj/2+1) = 1.0
    end if
+
+   if (trace_use) call da_trace_exit("da_get_gausslats")
 
 end subroutine da_get_gausslats
 

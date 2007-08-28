@@ -1,5 +1,4 @@
-subroutine da_get_var_3d_real_cdf(file, var, data, &
-                                  i1, i2, i3, time, debug)
+subroutine da_get_var_3d_real_cdf(file, var, data, i1, i2, i3, time, debug)
  
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,13 +8,14 @@ subroutine da_get_var_3d_real_cdf(file, var, data, &
 
 #include "netcdf.inc"
 
-   integer, intent(in)  ::  i1, i2, i3, time
-   character (len=80), intent(in) :: file
-   logical, intent(in) :: debug
-   character (len=*), intent(in) :: var
-   real, dimension(i1,i2,i3), intent(out) :: data
-   real(kind=8), dimension(i1,i2,i3) :: tmp
-   real(kind=4), dimension(i1,i2,i3) :: tmp4
+   integer,            intent(in)  ::  i1, i2, i3, time
+   character (len=80), intent(in)  :: file
+   logical,            intent(in)  :: debug
+   character (len=*),  intent(in)  :: var
+   real,               intent(out)  :: data(i1,i2,i3)
+
+   real(kind=8) :: tmp(i1,i2,i3)
+   real(kind=4) :: tmp4(i1,i2,i3)
 
    character (len=80) :: varnam
 
@@ -23,10 +23,12 @@ subroutine da_get_var_3d_real_cdf(file, var, data, &
    integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
    integer :: i, ivtype
 
+   ! if (trace_use) call da_trace_entry("da_get_var_3d_real_cdf")
+
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode /= 0) then
-      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
+      write(unit=stdout,fmt=*) ' error opening netcdf file ', trim(file)
       stop
    end if
 
@@ -93,7 +95,9 @@ subroutine da_get_var_3d_real_cdf(file, var, data, &
       write(unit=stdout, fmt='(a,e24.12)') ' Sample data=', data(1,1,1)
    end if
 
-    call ncclos(cdfid,rcode)
+   call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_var_3d_real_cdf")
 
 end subroutine da_get_var_3d_real_cdf
 

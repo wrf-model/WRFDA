@@ -88,7 +88,7 @@ module da_define_structures
       type (field_type)       :: slp            ! Pressure in Pa
       ! type (field_type)       :: psfc           ! Pressure in Pa
       ! Remove the following in future (needed now for obs i/o only):
-      type (field_type)       :: pw             ! Total precipitable water cm
+      type (field_type)       :: pw             ! Toatl precipitable water cm
 
       real                    :: x
       real                    :: y
@@ -109,35 +109,6 @@ module da_define_structures
                                                 ! 1, vertical interpolate in pressure
                                                 ! 2, vertical interpolate in height
    end type model_loc_type
-
-   type model_loc_type_new
-      type (field_type)       :: slp            ! Pressure in Pa
-      ! type (field_type)       :: psfc           ! Pressure in Pa
-      ! Remove the following in future (needed now for obs i/o only):
-      type (field_type)       :: pw             ! Total precipitable water cm
-
-      real, allocatable       :: x  (:,:)
-      real, allocatable       :: y  (:,:)
-      integer, allocatable    :: i  (:,:)
-      integer, allocatable    :: j  (:,:)
-      integer, allocatable    :: k  (:,:)
-      real, allocatable       :: dx (:,:)
-      real, allocatable       :: dxm(:,:)
-      real, allocatable       :: dy (:,:)
-      real, allocatable       :: dym(:,:)
-      real, allocatable       :: dz (:,:)
-      real, allocatable       :: dzm(:,:)
-      logical                 :: proc_domain
-      ! obs_global_index is the original index of this obs in the serial 
-      ! code.  It is used to reassemble obs in serial-code-order to replicate 
-      ! summation order for bitwise-exact testing of distributed-memory 
-      ! parallel configurations.  
-      integer                 :: obs_global_index
-
-      integer                 :: v_interp_optn  ! 0, not specified
-                                                ! 1, vertical interpolate in pressure
-                                                ! 2, vertical interpolate in height
-   end type model_loc_type_new
 
    type each_level_type
       real                    :: height         ! Height in m
@@ -172,18 +143,6 @@ module da_define_structures
       real                   :: elv           ! Elevation in m
       real                   :: pstar         ! Surface pressure
    end type info_type
-
-   type info_type_new
-      character (len = 40) , allocatable  :: name(:)       ! Station name
-      character (len = 12), allocatable   :: platform(:)   ! Instrument platform
-      character (len =  5), allocatable   :: id(:)         ! 5 digit station identifer
-      character (len = 19), allocatable   :: date_char(:)  ! CCYY-MM-DD_HH:MM:SS date
-      integer, allocatable                :: levels(:)     ! number of levels
-      real, allocatable                   :: lat(:,:)      ! Latitude in degree
-      real, allocatable                   :: lon(:,:)      ! Longitude in degree
-      real, allocatable                   :: elv(:)        ! Elevation in m
-      real, allocatable                   :: pstar(:)      ! Surface pressure
-   end type info_type_new
 
    type stn_loc_type
       real                    :: lon                  ! radar site loc
@@ -448,6 +407,15 @@ module da_define_structures
       integer, pointer     :: ssmis_subinst(:)
       integer, pointer     :: ichan(:)
       logical, pointer     :: proc_domain(:)
+      integer, pointer     :: loc_i(:)
+      integer, pointer     :: loc_j(:)
+      integer, pointer     :: loc_k(:,:)
+      real,    pointer     :: loc_dx(:)  
+      real,    pointer     :: loc_dy(:)  
+      real,    pointer     :: loc_dz(:,:)  
+      real,    pointer     :: loc_dxm(:) 
+      real,    pointer     :: loc_dym(:) 
+      real,    pointer     :: loc_dzm(:,:) 
       real,    pointer     :: zk(:,:) 
       real,    pointer     :: tb_inv(:,:)
       integer, pointer     :: tb_qc(:,:)
@@ -500,10 +468,8 @@ module da_define_structures
       real,    pointer     :: ice_coverage(:)
       real,    pointer     :: snow_coverage(:)
 
-      type (info_type), pointer   :: old_info(:)
-      type (info_type_new) :: new_info
-      type (model_loc_type), pointer   :: old_loc(:)
-      type (model_loc_type_new) :: new_loc
+      type (info_type), pointer   :: info(:)
+      type (model_loc_type), pointer   :: loc(:)
    end type instid_type
 
    type iv_type
@@ -538,8 +504,6 @@ module da_define_structures
       real    :: radar_ef_rv, radar_ef_rf
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
       real    :: airsr_ef_t,  airsr_ef_q
-
-      type (model_loc_type) :: loc
 
       type (airsr_type)    , pointer :: airsr(:)
       type (sound_type)    , pointer :: sound(:)

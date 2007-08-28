@@ -1,5 +1,4 @@
-subroutine da_get_var_2d_real_cdf(file, var, data, &
-                                  i1, i2, time, debug)
+subroutine da_get_var_2d_real_cdf(file, var, data, i1, i2, time, debug)
  
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,18 +8,20 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
 
 #include "netcdf.inc"
 
-   integer, intent(in)  ::  i1, i2, time
-   character (len=80), intent(in) :: file
-   logical, intent(in) :: debug
-   character (len=*), intent(in) :: var
-   real, dimension(i1,i2), intent(out) :: data
-   real(kind=8), dimension(i1,i2) :: tmp
-   real(kind=4), dimension(i1,i2) :: tmp4
+   integer,            intent(in)  ::  i1, i2, time
+   character (len=80), intent(in)  :: file
+   logical,            intent(in)  :: debug
+   character (len=*),  intent(in)  :: var
+   real,               intent(out) :: data(i1,i2)
 
-   integer cdfid, rcode, id_data
+   real(kind=8)       :: tmp(i1,i2)
+   real(kind=4)       :: tmp4(i1,i2)
+   integer            :: cdfid, rcode, id_data
    character (len=80) :: varnam
-   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
-   integer :: i, ivtype
+   integer            :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
+   integer            :: i, ivtype
+
+   ! if (trace_use) call da_trace_entry("da_get_var_2d_real_cdf")
 
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
@@ -90,6 +91,8 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
    end if
 
    call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_var_2d_real_cdf")
 
 end subroutine da_get_var_2d_real_cdf
 

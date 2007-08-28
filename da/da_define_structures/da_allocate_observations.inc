@@ -10,9 +10,6 @@ subroutine da_allocate_observations  (ob)
 
    if (trace_use) call da_trace_entry("da_allocate_observations")
 
-write (0,*) __FILE__,__LINE__,"ob%nlocal",ob%nlocal
-write (0,*) __FILE__,__LINE__,"ob%nlocal(sound)",ob%nlocal(sound)
-
    if (ob%nlocal(sound) > 0) then
       allocate(ob%sound     (1:ob%nlocal(sound)))
       allocate(ob%sonde_sfc (1:ob%nlocal(sound)))

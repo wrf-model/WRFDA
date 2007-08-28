@@ -7,12 +7,15 @@ subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
 
    implicit none
 
-   type(proj_info),intent(in)          :: proj
-   real, intent(in)                    :: ii
-   real, intent(in)                    :: jj
-   real, intent(out)                   :: lat
-   real, intent(out)                   :: lon
-   real                                :: i, j
+   type(proj_info), intent(in)  :: proj
+   real,            intent(in)  :: ii
+   real,            intent(in)  :: jj
+   real,            intent(out) :: lat
+   real,            intent(out) :: lon
+
+   real :: i, j
+
+   if (trace_use) call da_trace_entry("da_ij_to_latlon")
 
    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
@@ -46,6 +49,8 @@ subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
          call da_error(__FILE__,__LINE__,message(1:1))
 
    end select
+
+   if (trace_use) call da_trace_exit("da_ij_to_latlon")
 
 end subroutine da_ij_to_latlon
 

@@ -1,5 +1,4 @@
-subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, &
-                                 bin_width, ob)
+subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, bin_width, ob)
    
    !---------------------------------------------------------------------------
    ! Purpose: Bin ob data to get distribution.
@@ -7,27 +6,29 @@ subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, &
 
    implicit none
    
-   character (len=*), intent(in)    :: ob_name       ! Data description.
-   integer, intent(in)              :: num_obs       ! Number of obs.
-   real, intent(in)                 :: min_val       ! Minimum bin value.
-   real, intent(in)                 :: max_val       ! Maximum bin value.
-   real, intent(in)                 :: bin_width     ! Bin width.
-   real, intent(in)                 :: ob(:)         ! Ob data.
+   character (len=*), intent(in) :: ob_name       ! Data description.
+   integer,           intent(in) :: num_obs       ! Number of obs.
+   real,              intent(in) :: min_val       ! Minimum bin value.
+   real,              intent(in) :: max_val       ! Maximum bin value.
+   real,              intent(in) :: bin_width     ! Bin width.
+   real,              intent(in) :: ob(:)         ! Ob data.
    
-   integer                          :: num_bins      ! Number of bins
-   integer                          :: bin           ! Bin counter.
-   integer                          :: n             ! Data counter.
-   integer                          :: num_missing   ! Number of missing data.
+   integer              :: num_bins      ! Number of bins
+   integer              :: bin           ! Bin counter.
+   integer              :: n             ! Data counter.
+   integer              :: num_missing   ! Number of missing data.
    
-   real, allocatable                :: bin_val(:)    ! Central value of bin.
-   real, allocatable                :: bin_min(:)    ! Minimum value of bin.
-   integer, allocatable             :: num_in_bin(:) ! Number of values in bin.   
+   real, allocatable    :: bin_val(:)    ! Central value of bin.
+   real, allocatable    :: bin_min(:)    ! Minimum value of bin.
+   integer, allocatable :: num_in_bin(:) ! Number of values in bin. 
+
+   if (trace_use) call da_trace_entry("da_data_distribution")      
    
    !---------------------------------------------------------------------------
    ! [1.0] Initialise bins:
    !---------------------------------------------------------------------------
 
-   num_bins = inT((max_val - min_val) / bin_width) + 1
+   num_bins = int((max_val - min_val) / bin_width) + 1
 
    allocate(bin_val(1:num_bins))
    bin_val(1) = min_val
@@ -87,6 +88,8 @@ subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, &
    deallocate(bin_val)
    deallocate(bin_min)
    deallocate(num_in_bin)
+
+   if (trace_use) call da_trace_exit("da_data_distribution")      
 
 end subroutine da_data_distribution
 

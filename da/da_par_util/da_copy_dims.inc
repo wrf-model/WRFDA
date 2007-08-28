@@ -8,7 +8,7 @@ subroutine da_copy_dims(grid)
 
    type(domain), intent(inout)         :: grid
 
-   if (trace_use) call da_trace_entry("da_copy_dims")
+   if (trace_use_dull) call da_trace_entry("da_copy_dims")
 
    ! De-reference dimension information stored in the grid data structure.
 
@@ -185,7 +185,7 @@ subroutine da_copy_dims(grid)
            'grid%xp%kpsy =', grid%xp%kpsy, 'grid%xp%kpey=', grid%xp%kpey
    end if
 
-   if (trace_use) call da_trace_exit("da_copy_dims")
+   if (trace_use_dull) call da_trace_exit("da_copy_dims")
 
 end subroutine da_copy_dims
 

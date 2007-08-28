@@ -8,7 +8,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    type (xpose_type), intent(in)    :: xp  ! Domain decomposition vars.
    type (y_type),     intent(out)   :: ob  ! Observation structure.
-   type (iv_type),    intent(inout) :: iv  ! O-B structure.
+   type (iv_type),    intent(out)   :: iv  ! O-B structure.
    type (xb_type),    intent(inout) :: xb  ! First guess structure
 
    character(len=120)  :: filename
@@ -21,7 +21,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    ! [1.0] Scan GTS observation header and get idea of number of obs:
    !--------------------------------------------------------------------------
   
-write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
    if (num_fgat_time > 1) then
       filename = ' '
 
@@ -48,9 +47,7 @@ write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
    else
       iv%time = 1
 
-write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
       call da_scan_obs_ascii(iv, xp,'ob01.ascii')
-write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
@@ -69,7 +66,6 @@ write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
    ! Allocate the ob based on input number of obs:
    !--------------------------------------------------------------------------
 
-write (0,*) __FILE__,__LINE__,"iv%nlocal",iv%nlocal
    call da_allocate_observations (iv)
 
    if (num_fgat_time > 1) then

@@ -8,24 +8,26 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3,k,field)
 
 #include "netcdf.inc"
    
-   character(len=200), intent(in):: input_file       ! NETCDF file nane.
-   character(len=10), intent(in) :: var              ! Variable to search for.
-   integer, intent(in)            :: field_dims       ! # Dimensions of field. 
-   integer, intent(in)            :: dim1             ! Dimension 1 of field. 
-   integer, intent(in)            :: dim2             ! Dimension 2 of field. 
-   integer, intent(in)            :: dim3             ! Dimension 3 of field. 
-   integer, intent(in)            :: k                ! Vertical index.
-   real, intent(out)              :: field(1:dim1,1:dim2) ! Output field
+   character(len=200), intent(in)  :: input_file       ! NETCDF file nane.
+   character(len=10),  intent(in)  :: var              ! Variable to search for.
+   integer,            intent(in)  :: field_dims       ! # Dimensions of field. 
+   integer,            intent(in)  :: dim1             ! Dimension 1 of field. 
+   integer,            intent(in)  :: dim2             ! Dimension 2 of field. 
+   integer,            intent(in)  :: dim3             ! Dimension 3 of field. 
+   integer,            intent(in)  :: k                ! Vertical index.
+   real,               intent(out) :: field(1:dim1,1:dim2) ! Output field
 
-   integer                        :: cdfid            ! NETCDF file id.
-   integer                        :: rcode            ! Return code(0=ok).
-   integer                        :: length           ! Length of filename.
-   integer                        :: id_var           ! NETCDF variable ID. 
+   integer                   :: cdfid            ! NETCDF file id.
+   integer                   :: rcode            ! Return code(0=ok).
+   integer                   :: length           ! Length of filename.
+   integer                   :: id_var           ! NETCDF variable ID. 
 
-   integer                        :: istart(4)        ! Start value of arrays.
-   integer                        :: iend(4)          ! End value of arrays.
-   real(kind=4), allocatable     :: field2d(:,:)     ! Used if 2D field read. 
-   real(kind=4), allocatable     :: field3d(:,:,:)   ! Used if 3D field read. 
+   integer                   :: istart(4)        ! Start value of arrays.
+   integer                   :: iend(4)          ! End value of arrays.
+   real(kind=4), allocatable :: field2d(:,:)     ! Used if 2D field read. 
+   real(kind=4), allocatable :: field3d(:,:,:)   ! Used if 3D field read. 
+
+   if (trace_use_dull) call da_trace_entry("da_get_field")
 
    length = len_trim(input_file)
    rcode = nf_open( input_file(1:length), NF_NOwrite, cdfid)
@@ -58,6 +60,8 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3,k,field)
    end if
 
    rcode = nf_close( cdfid)
+
+   if (trace_use_dull) call da_trace_exit("da_get_field")
 
 end subroutine da_get_field
 

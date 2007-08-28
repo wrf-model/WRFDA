@@ -6,69 +6,74 @@ subroutine da_find_fft_factors(n, n_ok, fft_factors)
 
    implicit none
 
-   integer, intent(in)        :: n
-   logical, intent(out)       :: n_ok
-   integer, intent(out)       :: fft_factors(:)
+   integer, intent(in)  :: n
+   logical, intent(out) :: n_ok
+   integer, intent(out) :: fft_factors(:)
 
-   integer                    :: i, k, l
-   integer                    :: nfax, nu, ifac
-   integer                    :: jfax(num_fft_factors)
-   integer                    :: lfax(7)
+   integer :: i, k, l
+   integer :: nfax, nu, ifac
+   integer :: jfax(num_fft_factors)
+   integer :: lfax(7)
 
-   DATA lfax /6,8,5,4,3,2,1/
+   data lfax /6,8,5,4,3,2,1/
+
+   ! in da_control
+   !if (trace_use) call da_trace_entry("da_find_fft_factors")
 
    !---------------------------------------------------------------------------
-   ! [1.0] Find factors of vector size (8,6,5,4,3,2; ONLY ONE 8 ALLOWED):
+   ! [1.0] Find factors of vector size (8,6,5,4,3,2; only one 8 allowed):
    !---------------------------------------------------------------------------
 
    n_ok = .false.
    fft_factors(:) = 0
 
-   ! LOOK FOR SIXES FIRST, STORE FACTORS in DESCendinG ORDER
-   NU=N
-   ifAC=6
-   K=0
-   L=1
+   ! look for sixes first, store factors in descending order
+   nu=n
+   ifac=6
+   k=0
+   l=1
 
 20 continue
 
-   if (MOD(NU,ifAC).NE.0) goto 30
+   if (mod(nu,ifac).ne.0) goto 30
    
    ! 6 is a factor:
-   K=K+1
-   JFAX(K)=ifAC
-   if (ifAC.NE.8) goto 25
-   if (K.EQ.1) goto 25
-   JFAX(1)=8
-   JFAX(K)=6
+   k=k+1
+   jfax(k)=ifac
+   if (ifac.ne.8) goto 25
+   if (k.eq.1) goto 25
+   jfax(1)=8
+   jfax(k)=6
 
 25 continue
-   NU=NU/ifAC
-   if (NU.EQ.1) goto 50
-   if (ifAC.NE.8) goto 20
+   nu=nu/ifac
+   if (nu.eq.1) goto 50
+   if (ifac.ne.8) goto 20
 
 30 continue
-   L=L+1
-   ifAC=LFAX(L)
-   if (ifAC .GT. 1) goto 20
+   l=l+1
+   ifac=lfax(l)
+   if (ifac .gt. 1) goto 20
 
-   ! Illegal factors:
-   ! write (unit=message(1),fmt='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
-   ! call da_warning(__FILE__,__LINE__,message(1:1))
+   ! illegal factors:
+   ! write (unit=message(1),fmt='(a,i4,a)') 'n = ', n, ' contains illegal factors.'
+   ! call da_warning(__file__,__line__,message(1:1))
    
    goto 9
 
-   ! NOW REVERSE ORDER OF FACTORS
+   ! now reverse order of factors
 50 continue
-   NFAX=K
-   fft_factors(1)=NFAX
-   do I=1,NFAX
-      fft_factors(NFAX+2-I)=JFAX(I)
+   nfax=k
+   fft_factors(1)=nfax
+   do i=1,nfax
+      fft_factors(nfax+2-i)=jfax(i)
    end do
    
    n_ok = .true.
       
 9  continue
+
+   !if (trace_use) call da_trace_exit("da_find_fft_factors")
 
 end subroutine da_find_fft_factors
 

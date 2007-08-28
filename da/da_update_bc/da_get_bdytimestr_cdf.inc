@@ -16,6 +16,8 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
    integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
    integer :: i, ivtype
 
+   ! if (trace_use) call da_trace_entry("da_get_bdytimestr_cdf")
+
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode == 0) then
@@ -58,6 +60,8 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
    end do
 
    call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_bdytimestr_cdf")
 
 end subroutine da_get_bdytimestr_cdf
 

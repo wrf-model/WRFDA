@@ -6,33 +6,40 @@ subroutine da_evapo(DT,SCR3,SCR5,QV,PRE,SCR6,kts,kte,kms,kme)
 
    implicit none
 
-   integer, intent(in)                   :: kts, kte, kms, kme
-   real, dimension(kms:kme), intent(in)  :: DT, SCR3, SCR5, SCR6, QV
-   real, dimension(kms:kme), intent(out) :: PRE
+   integer, intent(in)  :: kts, kte, kms, kme
+   real,    intent(in)  :: dt(kms:kme)
+   real,    intent(in)  :: scr3(kms:kme)
+   real,    intent(in)  :: scr5(kms:kme)
+   real,    intent(in)  :: scr6(kms:kme)
+   real,    intent(in)  :: qv(kms:kme)
+   real,    intent(out) :: pre(kms:kme)
 
    integer                   :: k
-   real                      :: beta, QRTH
+   real                      :: beta, qrth
 
-   QRTH = 1.0e-6
+   if (trace_use) call da_trace_entry("da_evapo")
+
+   qrth = 1.0e-6
    beta = 0.0486   ! original
 
-   do K = kts, kte
-      if ( DT(k) <= 0.0 ) cycle
+   do k = kts, kte
+      if (dt(k) <= 0.0) cycle
 
-      if ( SCR3(K) > QRTH .and. QV(k) < SCR5(k) ) then
-         PRE(k) = beta * ( QV(K)-SCR5(K) ) * ( SCR6(k)*SCR3(K) )**0.65
-      else if ( SCR3(K) <= QRTH .and. SCR3(k) > 0.0 &
-                          .and. QV(k) < SCR5(k) ) then
-         PRE(k) = beta * ( QV(K)-SCR5(K) ) * ( SCR6(k)*QRTH )**0.65
+      if (scr3(k) > qrth .and. qv(k) < scr5(k)) then
+         pre(k) = beta * (qv(k)-scr5(k) ) * (scr6(k)*scr3(k))**0.65
+      else if (scr3(k) <= qrth .and. scr3(k) > 0.0 .and. qv(k) < scr5(k)) then
+         pre(k) = beta * (qv(k)-scr5(k)) * (scr6(k)*qrth)**0.65
       else
-         PRE(k) = 0.0
+         pre(k) = 0.0
       end if
 
-     ! PRE(k) = AMAX1( -SCR3(k)/DT(k), PRE(k) )
-     if ( PRE(k) < -SCR3(k)/DT(k) ) then
-        PRE(k) = -SCR3(k) / DT(k)
-     end if
+      ! pre(k) = amax1( -scr3(k)/dt(k), pre(k) )
+      if ( pre(k) < -scr3(k)/dt(k) ) then
+         pre(k) = -scr3(k) / dt(k)
+      end if
    end do
+
+   if (trace_use) call da_trace_exit("da_evapo")
 
 end subroutine da_evapo
 

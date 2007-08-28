@@ -1,5 +1,5 @@
 subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
-                      ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh  )
+   ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh  )
 
    implicit none
 
@@ -11,11 +11,11 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
    ! Input: ADJ_effangv,ADJ_effangh,effangv,effangh
    !-----------------------------------------------------------------
  
-   integer, intent(in   ) :: ifreq
-   real   , intent(in   ) :: theta,gx2,sigma
-   real   , intent(inout) :: ADJ_gx2,ADJ_sigma
-   real   , intent(inout) :: ADJ_effangv,ADJ_effangh
-   real   , intent(out)   :: effangv,effangh
+   integer, intent(in)    :: ifreq
+   real,    intent(in)    :: theta,gx2,sigma
+   real,    intent(inout) :: ADJ_gx2,ADJ_sigma
+   real,    intent(inout) :: ADJ_effangv,ADJ_effangh
+   real,    intent(out)   :: effangv,effangh
 
    real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
    real s19v(6),s19h(6),s22v(6),s22h(6), &
@@ -38,6 +38,8 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
    data s37h /.869E+1,.571E+2,-.257E+2,-.302E+1,.237E+0,.386E+1/
    data s85v /.116E+2,.263E+2,-.101E+2,-.358E+1,.270E+0,.175E+1/
    data s85h /.736E+1,.568E+2,-.254E+2,-.248E+1,.196E+0,.387E+1/
+
+   if (trace_use) call da_trace_entry("da_effang_adj")
 
    alnsig=0.0;gg=0.0;ggg=0.0;xd=0.0;xx=0.0;xd_save=0.0;xx_save=0.0
    z1=0.0;z2=0.0;z3=0.0;z4=0.0;z5=0.0;z6=0.0;y=0.0;dth=0.0;angh=0.0
@@ -445,6 +447,8 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
    ! else
    !    ADJ_sigma = 0.0
    end if
+
+   if (trace_use) call da_trace_exit("da_effang_adj")
 
 end subroutine da_effang_adj
 

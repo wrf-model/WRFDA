@@ -6,15 +6,15 @@ subroutine da_filter(grid, var)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
-
-   real, dimension(ims:ime,jms:jme,kms:kme), intent(inout) :: var
+   type(domain), intent(inout) :: grid
+   real,         intent(inout) :: var(ims:ime,jms:jme,kms:kme)
 
    integer :: i, j, k
-
-   real, dimension (3) :: w
+   real    :: w(3)
 
    data  w/0.25,0.5,0.25/
+
+   if (trace_use) call da_trace_entry("da_filter")
 
    ! Copy var for transpose.
 
@@ -71,6 +71,8 @@ subroutine da_filter(grid, var)
    call da_transpose_y2z (grid)
 
    var(its:ite,jts:jte,kts:kte) = grid%xp%v1z(its:ite,jts:jte,kts:kte)
+
+   if (trace_use) call da_trace_exit("da_filter")
 
 end subroutine da_filter
 

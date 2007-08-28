@@ -21,14 +21,15 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
    implicit none
 
-   real,    intent (inout) :: F,D
-   real,    intent (inout) :: U, V
-   real,    intent (in)    :: YLON
-   integer, intent (in)    :: ID
+   real,    intent (inout) :: f,d
+   real,    intent (inout) :: u, v
+   real,    intent (in)    :: ylon
+   integer, intent (in)    :: id
 
-   real :: AEARTH, UEARTH, VEARTH
-   real :: XLONRT, ANG, conv
+   real :: aearth, uearth, vearth
+   real :: xlonrt, ang, conv
 
+   if (trace_use_frequent) call da_trace_entry("da_ffdduv")
 
    conv = 180.0 / pi
 
@@ -117,6 +118,8 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
          call da_error(__FILE__,__LINE__,message(1:1))
 
    end select
+
+   if (trace_use_frequent) call da_trace_exit("da_ffdduv")
 
 end subroutine da_ffdduv
 

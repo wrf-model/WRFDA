@@ -14,31 +14,35 @@ subroutine da_julian_day(NY,NM,ND,JD,METHOD)
    integer                 :: LOOP
    integer, dimension(12)  :: MDAY = (/31,28,31,30,31,30,31,31,30,31,30,31/)
 
-   if (MOD(NY,4) == 0) then
-      MDAY(2)=29      
-      if (MOD(NY,100) == 0) then
-         MDAY(2)=28
-         if (MOD(NY,400) == 0) then
-            MDAY(2)=29
+   if (trace_use_dull) call da_trace_entry("da_julian_day")
+
+   if (mod(ny,4) == 0) then
+      mday(2)=29      
+      if (mod(ny,100) == 0) then
+         mday(2)=28
+         if (mod(ny,400) == 0) then
+            mday(2)=29
          end if
       end if
    end if
 
-   if (METHOD == 1) then                  
-      JD=ND
-      JuDAY: do LOOP=1,NM-1                  
-         JD=JD+MDAY(LOOP)                
-      end do JuDAY                           
-   else if (METHOD == 2) then             
-      NM=1                               
-      ND=JD
-      do LOOP=1,11                    
-         if (ND <= MDAY(LOOP)) exit
+   if (method == 1) then                  
+      jd=nd
+      juday: do loop=1,nm-1                  
+         jd=jd+mday(loop)                
+      end do juday                           
+   else if (method == 2) then             
+      nm=1                               
+      nd=jd
+      do loop=1,11                    
+         if (nd <= mday(loop)) exit
 
-         ND=ND-MDAY(LOOP)     
-         NM=NM+1                      
+         nd=nd-mday(loop)     
+         nm=nm+1                      
       end do
-   end if                                
+   end if   
+
+   if (trace_use_dull) call da_trace_exit("da_julian_day")                             
 
 end subroutine da_julian_day
 

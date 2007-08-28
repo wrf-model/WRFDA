@@ -6,13 +6,13 @@ subroutine da_check_xtoy_adjoint_metar(iv, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
-   type (y_type) , intent(inout)  :: y             ! y = h (xa)
-   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
+   type(iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type(y_type) , intent(inout)  :: y             ! y = h (xa)
+   real,          intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   integer                        :: n             ! Loop counter.
+   integer :: n             ! Loop counter.
 
-   if (iv%nlocal(metar) < 1) return
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_metar")
 
    do n=1, iv%nlocal(metar)
       if (iv%metar(n)%zk < 1.0) then
@@ -53,6 +53,8 @@ subroutine da_check_xtoy_adjoint_metar(iv, y, adjtest_lhs, pertile_lhs)
       y%metar(n)%p = y%metar(n)%p/typical_p_rms
       y%metar(n)%q = y%metar(n)%q/typical_q_rms
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_metar")
 
 end subroutine da_check_xtoy_adjoint_metar
 

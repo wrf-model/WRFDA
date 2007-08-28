@@ -15,6 +15,8 @@ subroutine da_interp_obs_lin_2d(fm2d, loc, fo2d, z)
    real    :: dx, dxm, dy, dym, dz, dzm
    real    :: fmz(kms:kme)
 
+   if (trace_use_frequent) call da_trace_entry("da_interp_obs_lin_2d")
+
    i   = loc%i
    j   = loc%j
    dx  = loc%dx
@@ -30,6 +32,8 @@ subroutine da_interp_obs_lin_2d(fm2d, loc, fo2d, z)
    end do
 
    fo2d = dzm*fmz(k) + dz*fmz(k+1)
+
+   if (trace_use_frequent) call da_trace_exit("da_interp_obs_lin_2d")
 
 end subroutine da_interp_obs_lin_2d
 

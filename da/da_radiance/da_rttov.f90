@@ -1,5 +1,6 @@
 module da_rttov
 
+
    !---------------------------------------------------------------------------
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
@@ -32,9 +33,9 @@ module da_rttov
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
       qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme
-   use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_newer, &
-      da_interp_lin_3d_newer,da_interp_lin_2d,da_interp_lin_3d_adj_newer, &
-      da_interp_lin_2d_adj_newer
+   use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_new, &
+      da_interp_lin_3d_new,da_interp_lin_2d,da_interp_lin_3d_adj_new, &
+      da_interp_lin_2d_adj_new
    use da_tools1, only : da_get_unit, da_free_unit
 #ifdef DM_PARALLEL
    use da_par_util, only :  true_mpi_real

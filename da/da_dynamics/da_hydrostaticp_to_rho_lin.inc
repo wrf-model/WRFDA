@@ -12,14 +12,16 @@ subroutine da_hydrostaticp_to_rho_lin(grid, p, rho )
 
    implicit none
    
-   type (domain), intent(in)     :: grid
-   real, intent(in)  :: p(ims:ime,jms:jme,kms:kme)   ! Pressure inc. (cross pts)
-   real, intent(out) :: rho(ims:ime,jms:jme,kms:kme) ! Density inc. (cross pts)
+   type(domain), intent(in)  :: grid
+   real,         intent(in)  :: p(ims:ime,jms:jme,kms:kme)   ! Pressure inc. (cross pts)
+   real,         intent(out) :: rho(ims:ime,jms:jme,kms:kme) ! Density inc. (cross pts)
 
-   integer                    :: i, j, k      ! Loop counters.
-   real                       :: delta1       ! Height difference.
-   real                       :: delta2       ! Height difference.
-   real                       :: dPdz         ! Vertical pressure graditent.
+   integer :: i, j, k      ! Loop counters.
+   real    :: delta1       ! Height difference.
+   real    :: delta2       ! Height difference.
+   real    :: dPdz         ! Vertical pressure gradient.
+
+   if (trace_use) call da_trace_entry("da_hydrostaticp_to_rho_lin")
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate density increments at all levels except top/bottom:
@@ -71,6 +73,8 @@ subroutine da_hydrostaticp_to_rho_lin(grid, p, rho )
          rho(i,j,k) = -dPdz / gravity
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_hydrostaticp_to_rho_lin")
    
 end subroutine da_hydrostaticp_to_rho_lin
 

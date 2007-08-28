@@ -9,11 +9,13 @@ subroutine da_get_att_cdf(file, var, debug)
 #include "netcdf.inc"
 
    character (len=80), intent(in) :: file
-   character (len=*), intent(in) :: var
-   logical, intent(in) :: debug
+   character (len=*),  intent(in) :: var
+   logical,            intent(in) :: debug
 
-   integer :: cdfid, status, varid, n, natts
+   integer             :: cdfid, status, varid, n, natts
    character (len=256) :: att_name
+
+   ! if (trace_use) call da_trace_entry("da_get_att_cdf")
 
    status = NF_OPEN(file, NF_NOWRITE, cdfid)
 
@@ -36,6 +38,8 @@ subroutine da_get_att_cdf(file, var, debug)
    end do
 
    status = NF_close(cdfid)
+
+   ! if (trace_use) call da_trace_exit("da_get_att_cdf")
 
 end subroutine da_get_att_cdf
 

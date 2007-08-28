@@ -1,4 +1,4 @@
-subroutine da_eof_decomposition_test( kz, bx, e, l )
+subroutine da_eof_decomposition_test (kz, bx, e, l)
    
    !------------------------------------------------------------------------------
    ! Purpose: 
@@ -10,10 +10,10 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    
    implicit none
 
-   integer, intent(in)      :: kz               ! Dimension of BE matrix   
-   real, intent(in)         :: bx(1:kz,1:kz)    ! Global vert. background error.
-   real, intent(in)         :: e(1:kz,1:kz)     ! Eigenvectors of Bx.
-   real, intent(in)         :: l(1:kz)          ! Eigenvalues of Bx.
+   integer, intent(in) :: kz               ! Dimension of BE matrix   
+   real,    intent(in) :: bx(1:kz,1:kz)    ! Global vert. background error.
+   real,    intent(in) :: e(1:kz,1:kz)     ! Eigenvectors of Bx.
+   real,    intent(in) :: l(1:kz)          ! Eigenvalues of Bx.
    
    integer                  :: k, k1, k2, m     ! Loop counters
    real                     :: tot_variance     ! Total variance.
@@ -23,6 +23,8 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    real                     :: work(1:kz,1:kz)  ! 2D Work matrix.
    real                     :: bc(1:kz,1:kz)    ! 2D Work matrix.
    logical                  :: array_mask(1:kz) ! Array mask for MAXVAL.
+
+   if (trace_use) call da_trace_entry("da_eof_decomposition_test")
 
    !------------------------------------------------------------------------- 
    ! [1] Print eigenvalues:
@@ -115,6 +117,8 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
         write(unit=stdout,fmt='(I5,2F20.5)') k1, bx(k1,k2), bc(k1,k2)
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_eof_decomposition_test")
    
 end subroutine da_eof_decomposition_test
 

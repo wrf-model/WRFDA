@@ -8,14 +8,16 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
 
 #include "netcdf.inc"
 
-   character (len=80), intent(in) :: file
-   character (len=*), intent(in) :: att_name
-   logical, intent(in) :: debug
-   real,    intent(out) :: value
+   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: att_name
+   logical,            intent(in)  :: debug
+   real,               intent(out) :: value
+
    real(kind=8)         :: tmp
    real(kind=4)         :: tmp4
+   integer              :: cdfid, rcode, ivtype
 
-   integer :: cdfid, rcode, ivtype
+   ! if (trace_use_dull) call da_trace_entry("da_get_gl_att_real_cdf")
 
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
@@ -53,6 +55,8 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
    call ncclos(cdfid,rcode)
 
    if (debug) write(unit=stdout,fmt=*) ' global attribute ',att_name,' is ',value
+
+   ! if (trace_use_dull) call da_trace_exit("da_get_gl_att_real_cdf")
 
 end subroutine da_get_gl_att_real_cdf
 

@@ -1,6 +1,6 @@
 subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
-                     ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu,        &
-                     ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf )
+   ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu,        &
+   ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf )
 
    implicit none
 
@@ -10,11 +10,10 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ! Input   : ADJ_hdn, ADJ_hup, ADJ_hdninf, ADJ_hupinf
    !--------------------------------------------------------------------
 
-   real,   intent(in   ) :: ho,hv,sigo,sigv,mu,zcld
-   real,   intent(inout) :: ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_zcld, &
-                            ADJ_mu
-   real,   intent(inout) :: hdn,hup,hdninf,hupinf
-   real,   intent(   in) :: ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf
+   real, intent(in)    :: ho,hv,sigo,sigv,mu,zcld
+   real, intent(inout) :: ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_zcld, ADJ_mu
+   real, intent(inout) :: hdn,hup,hdninf,hupinf
+   real, intent(in)    :: ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf
 
    real :: gint,zgint,hint,zhint
    real :: ginf,zginf,hinf,zhinf
@@ -46,6 +45,8 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    real :: ADJ_ezhoov,ADJ_ezhovv,ADJ_ezhvvv
    real :: ADJ_s,ADJ_sprim,ADJ_t,ADJ_tprim
    real :: ADJ_u,ADJ_uprim,ADJ_term1,ADJ_term2,ADJ_term3
+
+   if (trace_use) call da_trace_entry("da_effht_adj")
 
     ! initial zero
    gint=0.0
@@ -565,7 +566,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_hv    = -1.0d0*hvinv*hvinv*ADJ_hvinv + ADJ_hv
    ADJ_ho    = -1.0d0*hoinv*hoinv*ADJ_hoinv + ADJ_ho
 
-   ! end
+   if (trace_use) call da_trace_exit("da_effht_adj")
 
 end subroutine da_effht_adj
 

@@ -6,12 +6,14 @@ subroutine da_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type(iv_type), intent(in)   :: iv          ! Innovation vector.
-   type(y_type), intent(in)    :: re          ! Residual vector.
-   type(y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
-   type(jo_type), intent(inout):: jo          ! Obs cost function.
+   type(iv_type), intent(in)    :: iv          ! Innovation vector.
+   type(y_type),  intent(in)    :: re          ! Residual vector.
+   type(y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
-   integer                      :: n, k
+   integer :: n, k
+
+   if (trace_use_dull) call da_trace_entry("da_jo_and_grady_geoamv")
 
    jo % geoamv_u = 0.0
    jo % geoamv_v = 0.0
@@ -39,8 +41,9 @@ subroutine da_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
 
       jo % geoamv_u = 0.5 * jo % geoamv_u
       jo % geoamv_v = 0.5 * jo % geoamv_v
-
    end if
+
+   if (trace_use_dull) call da_trace_exit("da_jo_and_grady_geoamv")
      
 end subroutine da_jo_and_grady_geoamv
 

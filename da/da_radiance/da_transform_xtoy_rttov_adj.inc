@@ -397,21 +397,49 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_t(:,n) = con_vars_ad(n)% t(:)
          end do
-         call da_interp_lin_3d_adj_newer (jo_grad_x%t, iv%instid(i)%new_loc, nlevels, 1, num_rad, temp_t)
+         call da_interp_lin_3d_adj_new( jo_grad_x%t, &
+            iv%instid(i)%loc_i, &
+            iv%instid(i)%loc_j, &
+            iv%instid(i)%loc_k, &
+            iv%instid(i)%loc_dx, &
+            iv%instid(i)%loc_dy, &
+            iv%instid(i)%loc_dz, &
+            iv%instid(i)%loc_dxm, &
+            iv%instid(i)%loc_dym, &
+            iv%instid(i)%loc_dzm, &
+            temp_t, nlevels,num_rad )
          deallocate(temp_t)
 
          allocate(temp_q(nlevels,num_rad))
          do n=1,num_rad
             temp_q(:,n) = con_vars_ad(n)% q(:)
          end do
-         call da_interp_lin_3d_adj_newer (jo_grad_x%q, iv%instid(i)%new_loc, nlevels, 1, num_rad, temp_q)
+         call da_interp_lin_3d_adj_new( jo_grad_x%q, &
+            iv%instid(i)%loc_i, &
+            iv%instid(i)%loc_j, &
+            iv%instid(i)%loc_k, &
+            iv%instid(i)%loc_dx, &
+            iv%instid(i)%loc_dy, &
+            iv%instid(i)%loc_dz, &
+            iv%instid(i)%loc_dxm, &
+            iv%instid(i)%loc_dym, &
+            iv%instid(i)%loc_dzm, &
+            temp_q, nlevels,num_rad )
          deallocate(temp_q)
 
          allocate(temp_ps(num_rad))
          do n=1,num_rad
             temp_ps(n) = con_vars_ad(n)% ps
          end do
-         call da_interp_lin_2d_adj_newer (jo_grad_x% psfc, iv%instid(i)%new_loc, 1, 1, num_rad, temp_ps)
+         call da_interp_lin_2d_adj_new(jo_grad_x% psfc, ims, ime, jms, &
+            jme, &
+            iv%instid(i)%loc_i, &
+            iv%instid(i)%loc_j, &
+            iv%instid(i)%loc_dx, &
+            iv%instid(i)%loc_dy, &
+            iv%instid(i)%loc_dxm, &
+            iv%instid(i)%loc_dym, &
+            temp_ps,num_rad)
          deallocate(temp_ps)
       end if
 

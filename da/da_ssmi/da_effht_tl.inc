@@ -11,11 +11,10 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
 
    implicit none
 
-   real,   intent(in  ) :: ho,hv,sigo,sigv,mu,zcld
-   real,   intent(in  ) :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, &
-                            TGL_mu
-   real,   intent( out) :: hdn,hup,hdninf,hupinf
-   real,   intent( out) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
+   real,   intent(in)  :: ho,hv,sigo,sigv,mu,zcld
+   real,   intent(in)  :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, TGL_mu
+   real,   intent(out) :: hdn,hup,hdninf,hupinf
+   real,   intent(out) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
 
    real :: gint,zgint,hint,zhint
    real :: ginf,zginf,hinf,zhinf
@@ -46,6 +45,8 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    real :: TGL_ezhoov,TGL_ezhovv,TGL_ezhvvv
    real :: TGL_s,TGL_sprim,TGL_t,TGL_tprim
    real :: TGL_u,TGL_uprim,TGL_term1,TGL_term2,TGL_term3
+
+   if (trace_use) call da_trace_entry("da_effht_tl")
 
        hoinv =  1.0d0/ho
    TGL_hoinv = -1.0d0*hoinv*hoinv*TGL_ho
@@ -309,6 +310,8 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
 
        hupinf = zhinf/hinf
    TGL_hupinf = TGL_zhinf/hinf - hupinf*TGL_hinf/hinf
+
+   if (trace_use) call da_trace_exit("da_effht_tl")
 
 end subroutine da_effht_tl
 

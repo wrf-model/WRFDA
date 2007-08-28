@@ -7,14 +7,18 @@ real function da_dot(n,x,y)
 
    implicit none
 
-   integer, intent(in)               :: n
-   real, dimension(n), intent(in)    :: x,y
+   integer, intent(in) :: n
+   real,    intent(in) :: x(n)
+   real,    intent(in) :: y(n)
 
-   real dtemp1
-   integer i,m,mp1
+   real    :: dtemp1
+   integer :: i,m,mp1
+
+   if (n <= 0) return
+
+   if (trace_use) call da_trace_entry("da_dot")    
 
    da_dot = 0.0
-   if (n <= 0)return
    dtemp1 = 0.0
 
    ! code for both increments equal to 1
@@ -37,6 +41,9 @@ real function da_dot(n,x,y)
    end if
 
    da_dot = dtemp1
+
+   if (trace_use) call da_trace_exit("da_dot")    
+
 
 end function da_dot
 

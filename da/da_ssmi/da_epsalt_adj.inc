@@ -1,5 +1,4 @@
-subroutine da_epsalt_adj(f,t,ssw,                                    &
-                      ADJ_t, ADJ_epsr, ADJ_epsi                             )
+subroutine da_epsalt_adj(f,t,ssw,ADJ_t, ADJ_epsr, ADJ_epsi)
 
    implicit none
 
@@ -9,18 +8,20 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
    ! Input: ADJ_epsr, ADJ_epsi, epsr, epsi
    !---------------------------------------------------------------------------
 
-   real, intent(in   ) :: f, t
+   real, intent(in)    :: f, t
    real, intent(inout) :: ADJ_t
    real, intent(inout) :: ssw
-   real, intent(in   ) :: ADJ_epsr, ADJ_epsi
+   real, intent(in)    :: ADJ_epsr, ADJ_epsi
 
    complex :: cdum1,cdum2,cdum3
    complex :: ADJ_cdum1,ADJ_cdum2,ADJ_cdum3
-   real :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
-   real :: delt,delt2,beta,signew,om,d1,d2
-   real :: ADJ_t2,ADJ_t3,ADJ_es,ADJ_a,ADJ_esnew,ADJ_tau,ADJ_b,ADJ_taunew
-   real :: ADJ_delt,ADJ_delt2,ADJ_beta,ADJ_signew
-   real :: ADJ_d1,ADJ_d2
+   real    :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
+   real    :: delt,delt2,beta,signew,om,d1,d2
+   real    :: ADJ_t2,ADJ_t3,ADJ_es,ADJ_a,ADJ_esnew,ADJ_tau,ADJ_b,ADJ_taunew
+   real    :: ADJ_delt,ADJ_delt2,ADJ_beta,ADJ_signew
+   real    :: ADJ_d1,ADJ_d2
+
+   if (trace_use) call da_trace_entry("da_epsalt_adj")
 
    ssw2=0.0
    ssw3=0.0 
@@ -126,6 +127,8 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
    ADJ_t2     = ADJ_t3*t     + ADJ_t2
    ADJ_t      = t2*ADJ_t3    + ADJ_t
    ADJ_t      = 2.0*t*ADJ_t2  + ADJ_t
+
+   if (trace_use) call da_trace_exit("da_epsalt_adj")
 
 end subroutine da_epsalt_adj
 

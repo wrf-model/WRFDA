@@ -11,17 +11,18 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
 
    implicit none
 
-   integer, intent(in)          :: cv_size           ! Size of array (tile).
-   integer, intent(in)          :: cv_size_domain    ! Size of array (domain).
-   real, dimension(1:cv_size), intent(in) :: x       ! 1st vector.
-   real, dimension(1:cv_size), intent(in) :: y       ! 1st vector.
-        type (xpose_type),  intent(in) :: xp         ! decomposed dimensions
-        integer,            intent(in) :: mzs(:)     ! mz for each variable
+   integer,          intent(in) :: cv_size           ! Size of array (tile).
+   integer,          intent(in) :: cv_size_domain    ! Size of array (domain).
+   real,             intent(in) :: x(cv_size)       ! 1st vector.
+   real,             intent(in) :: y(cv_size)       ! 1st vector.
+   type(xpose_type), intent(in) :: xp         ! decomposed dimensions
+   integer,          intent(in) :: mzs(:)     ! mz for each variable
                                                      ! (to identify 2D arrays)
 
-   real, pointer                :: xg(:), yg(:)      ! Serial data arrays.
+   real, pointer :: xg(:), yg(:)      ! Serial data arrays.
+   real          :: dtemp1(1), dtemp1x   ! Temporary.
 
-   real                         :: dtemp1(1), dtemp1x   ! Temporary.
+   if (trace_use) call da_trace_entry("da_dot_cv")
 
    dtemp1(1) = 0.0
 
@@ -65,6 +66,8 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
    end if
 
    da_dot_cv = dtemp1(1)
+
+   if (trace_use) call da_trace_exit("da_dot_cv")
 
 end function da_dot_cv
 

@@ -1,4 +1,4 @@
-subroutine da_lcl(P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
+subroutine da_lcl(p0, z0, t0, q0, plcl, zlcl, tlcl, qlcl)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,36 +6,40 @@ subroutine da_lcl(P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
 
    implicit none
 
-   real, intent(in)   :: P0, Z0, T0, Q0
-   real, intent(out)  :: PLCL, ZLCL, TLCL, QLCL
+   real, intent(in)   :: p0, z0, t0, q0
+   real, intent(out)  :: plcl, zlcl, tlcl, qlcl
 
-   real   :: DP, QS, EPS
+   real   :: dp, qs, eps
 
-   DP=5.0
-   PLCL=300.0
+   if (trace_use) call da_trace_entry("da_lcl")
+
+   dp=5.0
+   plcl=300.0
 
    do
-      TLCL=T0*((PLCL/P0)**0.286)
+      tlcl=t0*((plcl/p0)**0.286)
 
-      call da_qfrmrh(PLCL, TLCL, 100.0, QS)
+      call da_qfrmrh(plcl, tlcl, 100.0, qs)
 
-      EPS=QS-Q0
+      eps=qs-q0
 
-      if (EPS >= 0.0) then
-         ZLCL=(1004.0/gravity)*(T0-TLCL)+Z0
-         QLCL=QS
+      if (eps >= 0.0) then
+         zlcl=(1004.0/gravity)*(t0-tlcl)+z0
+         qlcl=qs
          return
       else
-         PLCL=PLCL+DP
+         plcl=plcl+dp
 
-         if (PLCL >= P0) then
-            ZLCL=Z0
-            QLCL=Q0
-            PLCL=P0
+         if (plcl >= p0) then
+            zlcl=z0
+            qlcl=q0
+            plcl=p0
             return
         end if
       end if
    end do
+
+   if (trace_use) call da_trace_exit("da_lcl")
 
 end subroutine da_lcl
 

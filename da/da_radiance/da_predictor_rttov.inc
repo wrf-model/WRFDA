@@ -16,9 +16,7 @@ subroutine da_predictor_rttov(pred,npred,temp,hum,T_skin)
    integer, parameter :: JPRTLEV = 43
 
    integer, intent(in)  :: npred
-   real,    intent(in)  :: temp(JPRTLEV)
-   real,    intent(in)  :: hum(JPRTLEV)
-   real,    intent(in)  :: T_skin
+   real,    intent(in)  :: temp(JPRTLEV), hum(JPRTLEV), T_skin
    real,    intent(out) :: pred(npred)
 
    real, parameter :: Kth = gas_constant*0.5/gravity

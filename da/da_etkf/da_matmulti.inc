@@ -6,11 +6,13 @@ subroutine da_matmulti(mata,matb,matc,ni,nj,nab)
 
    implicit none
 
-   integer, intent(in) :: ni, nj, nab
-   real, intent(in) :: mata(ni,nab), matb(nab, nj)
-   real, intent(out) :: matc(ni,nj)
+   integer, intent(in)  :: ni, nj, nab
+   real,    intent(in)  :: mata(ni,nab), matb(nab, nj)
+   real,    intent(out) :: matc(ni,nj)
 
-   integer             :: i, j, k            ! Loop counters
+   integer :: i, j, k            ! Loop counters
+
+   if (trace_use) call da_trace_entry("da_matmultiover")
 
    matc = 0.0
 
@@ -21,6 +23,8 @@ subroutine da_matmulti(mata,matb,matc,ni,nj,nab)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_matmultiover")
 
 end subroutine da_matmulti
 

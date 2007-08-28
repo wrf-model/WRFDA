@@ -1,5 +1,4 @@
-subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
-                     Z, T, Q, LCB, LCT, PCT, ZCT, kts, kte)
+subroutine da_cumulus (zcb, tcb, qcb, pcb, pk, te, z, t, q, lcb, lct, pct, zct, kts, kte)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,100 +6,107 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
 
    implicit none
 
-   integer, intent(in)                      :: kts, kte
-   real, intent(inout)                      :: ZCB, TCB, QCB, PCB
-   real, intent(in),   dimension(kts:kte)   :: PK, TE
-   real, intent(out),  dimension(kts:kte)   :: Z, T, Q
-   integer, intent(out)                     :: LCB, LCT
-   real, intent(out)                        :: PCT, ZCT
+   integer, intent(in)    :: kts, kte
+   real,    intent(inout) :: zcb, tcb, qcb, pcb
+   real,    intent(in)    :: pk(kts:kte)
+   real,    intent(in)    :: te(kts:kte)
+   real,    intent(out)   :: z(kts:kte)
+   real,    intent(out)   :: t(kts:kte)
+   real,    intent(out)   :: q(kts:kte)
+   integer, intent(out)   :: lcb, lct
+   real,    intent(out)   :: pct, zct
 
-   integer   :: k, IA, L, NCB
-   real      :: CP, R, HL, EM, ET, P
-   real      :: TLL, QLL, PLL, ZLL, TBAR, PBAR, QBAR
-   real      :: DP, DZ, DDT, DT
+   integer   :: k, ia, l, ncb
+   real      :: cp, r, hl, em, et, p
+   real      :: tll, qll, pll, zll, tbar, pbar, qbar
+   real      :: dp, dz, ddt, dt 
 
-   CP=1004.0
-   R=2000.0/7.0
-   HL=2.49E06
-   DT=0.1
-   IA=1000
+   if (trace_use) call da_trace_entry("da_cumulus")    
+
+   cp=1004.0
+   r=2000.0/7.0
+   hl=2.49e06
+   dt=0.1
+   ia=1000
 
    do k = kts, kte
-      Z(k) = 0.0
-      T(k) = 0.0
-      Q(k) = 0.0
+      z(k) = 0.0
+      t(k) = 0.0
+      q(k) = 0.0
    end do
 
-   EM=gravity*ZCB+CP*TCB+HL*QCB
+   em=gravity*zcb+cp*tcb+hl*qcb
 
-   NCB=kts
+   ncb=kts
 
-   if (PK(kte) > PCB) then
-      NCB=kte
+   if (pk(kte) > pcb) then
+      ncb=kte
    end if
 
-   do L=kte-1,kts,-1
-      if (PK(L) > PCB) then
-         NCB=L+1
+   do l=kte-1,kts,-1
+      if (pk(l) > pcb) then
+         ncb=l+1
          exit
       end if
    end do
 
-   do L=NCB,kte
-      P=PK(L)
-      do K=1,IA
-         if (L == NCB) then
-            TLL=TCB
-            QLL=QCB
-            PLL=PCB
-            ZLL=ZCB
+   do l=ncb,kte
+      p=pk(l)
+      do k=1,ia
+         if (l == ncb) then
+            tll=tcb
+            qll=qcb
+            pll=pcb
+            zll=zcb
          else
-            TLL=T(L-1)
-            QLL=Q(L-1)
-            PLL=PK(L-1)
-            ZLL=Z(L-1)
+            tll=t(l-1)
+            qll=q(l-1)
+            pll=pk(l-1)
+            zll=z(l-1)
          end if
 
-         T(L)=TLL-(K*DT)
+         t(l)=tll-(k*dt)
 
-         call da_qfrmrh(P, T(L), 100.0, Q(L))
+         call da_qfrmrh(p, t(l), 100.0, q(l))
 
-         TBAR=0.5*(T(L)+TLL)
-         QBAR=0.5*(Q(L)+QLL)
-         PBAR=0.5*(P+PLL)
-         DP=PLL-P
-         DZ=(R*TBAR*(1.0+0.61*QBAR)*DP)/(gravity*PBAR)
-         Z(L)=ZLL+DZ
-         ET=gravity*Z(L)+CP*T(L)+HL*Q(L)
-         if ((ET-EM) <= 0.0) exit
+         tbar=0.5*(t(l)+tll)
+         qbar=0.5*(q(l)+qll)
+         pbar=0.5*(p+pll)
+         dp=pll-p
+         dz=(r*tbar*(1.0+0.61*qbar)*dp)/(gravity*pbar)
+         z(l)=zll+dz
+         et=gravity*z(l)+cp*t(l)+hl*q(l)
+         if ((et-em) <= 0.0) exit
       end do
    end do
 
-   LCT=NCB
+   lct=ncb
 
-   do K=kte,NCB+1,-1
-      DDT=T(K)-TE(K)
+   do k=kte,ncb+1,-1
+      ddt=t(k)-te(k)
 
-      if (DDT >= 0.0) then
-         LCT=K
+      if (ddt >= 0.0) then
+         lct=k
          exit
       end if
    end do
 
-   LCB=LCT
+   lcb=lct
 
-   do K=NCB,kte
-      DDT=T(K)-TE(K)
-      if (DDT >= 0.0) then
-         LCB=K
+   do k=ncb,kte
+      ddt=t(k)-te(k)
+      if (ddt >= 0.0) then
+         lcb=k
          exit
       end if
    end do
 
-   PCT=PK(LCT)
-   ZCT=Z(LCT)
-   PCB=PK(LCB)
-   ZCB=Z(LCB)
+   pct=pk(lct)
+   zct=z(lct)
+   pcb=pk(lcb)
+   zcb=z(lcb)
+
+   if (trace_use) call da_trace_exit("da_cumulus")    
 
 end subroutine da_cumulus
 

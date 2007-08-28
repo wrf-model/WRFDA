@@ -8,7 +8,10 @@ subroutine da_get_unit(unit)
 
    integer, intent(out) :: unit
 
-   integer i
+   integer :: i
+
+   ! Do not trace as called by tracing
+   ! if (trace_use_dull) call da_trace_entry("da_get_unit")
 
    unit = -1
 
@@ -22,6 +25,9 @@ subroutine da_get_unit(unit)
 
    if (unit == -1) then
       call da_error(__FILE__,__LINE__,(/"No free units"/))
+
+   ! if (trace_use_dull) call da_trace_exit("da_get_unit")
+
    end if
 
 end subroutine da_get_unit

@@ -1,12 +1,7 @@
 subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
-
    !----------------------------------------------------------------------------
-   !
-   ! Correct pressure between two levels. 
+   ! Purpose: Correct pressure between two levels. 
    !
    ! Reference: make use of the hydrosatic equation:
    !
@@ -23,12 +18,14 @@ subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 
    implicit none
 
-   real, intent (out)   :: val
-   real, intent (in)    :: ho, po
+   real, intent (out)          :: val
+   real, intent (in)           :: ho, po
+   real, intent (in)           :: hm, tm, qm    
    real, intent (in), optional :: to, qo
-   real, intent (in)    :: hm, tm, qm    
-   real                 :: tvo, tvm, tv, dz, arg
 
+   real :: tvo, tvm, tv, dz, arg
+
+   if (trace_use) call da_trace_entry("da_intpsfc_prs")
 
    ! 1.  model and observation virtual temperature
    ! ---------------------------------------------
@@ -49,13 +46,15 @@ subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 
    dz = hm - ho
  
-   ! 3.  EXTRAPOLATE PRESSURE OBS TO MODEL SURFACE
+   ! 3.  extrapolate pressure obs to model surface
    ! ---------------------------------------------
 
    arg = dz * gravity / gas_constant
    arg = arg    / tv 
 
    val = po * exp (-arg)
+
+   if (trace_use) call da_trace_exit("da_intpsfc_prs")
 
 end subroutine da_intpsfc_prs
 

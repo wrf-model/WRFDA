@@ -1,5 +1,4 @@
-subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
-                         failed, print)
+subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, failed, print)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,18 +6,20 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
 
    implicit none
 
-   integer          ,   intent (in)   :: it
-   type (info_type) ,   intent(in)    :: info
-   type (field_type),   intent(inout) :: field
-   real             ,   intent(in)    :: max_error
-   integer          ,   intent(inout) :: ix, ixf
-   integer          ,   intent(in)    :: iunit
-   character (len=*),   intent(in)    :: var
-   logical          ,   intent(out)   :: failed
-   logical          ,   intent(in)    :: print
+   integer,           intent (in)   :: it
+   type(info_type) ,  intent(in)    :: info
+   type(field_type),  intent(inout) :: field
+   real,              intent(in)    :: max_error
+   integer,           intent(inout) :: ix, ixf
+   integer,           intent(in)    :: iunit
+   character (len=*), intent(in)    :: var
+   logical,           intent(out)   :: failed
+   logical,           intent(in)    :: print
 
    real                               :: err, err_max
    integer                            :: qc_flag
+
+   if (trace_use_frequent) call da_trace_entry("da_max_error_qc")
 
    failed = .false.
 
@@ -51,6 +52,8 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
       end if
       field % inv = 0.0
    end if
+
+   if (trace_use_frequent) call da_trace_exit("da_max_error_qc")
 
 end subroutine da_max_error_qc
 

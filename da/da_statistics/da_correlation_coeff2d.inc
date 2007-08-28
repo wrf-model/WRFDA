@@ -1,5 +1,4 @@
-subroutine da_correlation_coeff2d(field1, field2, corr_coeff, &
-                                   rel_acc)
+subroutine da_correlation_coeff2d(field1, field2, corr_coeff, rel_acc)
    
    !--------------------------------------------------------------------------
    ! Purpose: Calculate correlation coefficient between two fields.
@@ -7,21 +6,23 @@ subroutine da_correlation_coeff2d(field1, field2, corr_coeff, &
 
    implicit none
    
-   real, intent(in)           :: field1(:,:)     ! input field 1.
-   real, intent(in)           :: field2(:,:)     ! input field 2.
-   real, intent(out)          :: corr_coeff      ! correlation coefficient
-   real, intent(out)          :: rel_acc      ! relative error.
+   real, intent(in)  :: field1(:,:)     ! input field 1.
+   real, intent(in)  :: field2(:,:)     ! input field 2.
+   real, intent(out) :: corr_coeff      ! correlation coefficient
+   real, intent(out) :: rel_acc      ! relative error.
    
-   integer                    :: iy              ! size of field dim1.
-   integer                    :: jx              ! size of field dim2.
-   real                       :: ij_inv          ! 1/(ij)
-   real                       :: coeff0          ! coefficient.
-   real                       :: coeff1          ! coefficient.
-   real                       :: coeff2          ! coefficient.
-   real                       :: coeff3          ! coefficient.
-   real                       :: field_mean      ! mean of field.
-   real, allocatable          :: data1(:,:)
-   real, allocatable          :: data2(:,:)
+   integer           :: iy              ! size of field dim1.
+   integer           :: jx              ! size of field dim2.
+   real              :: ij_inv          ! 1/(ij)
+   real              :: coeff0          ! coefficient.
+   real              :: coeff1          ! coefficient.
+   real              :: coeff2          ! coefficient.
+   real              :: coeff3          ! coefficient.
+   real              :: field_mean      ! mean of field.
+   real, allocatable :: data1(:,:)
+   real, allocatable :: data2(:,:)
+
+   if (trace_use) call da_trace_entry("da_correlation_coeff2d")
    
    ! [1.0] Set up scalars:
    
@@ -63,6 +64,8 @@ subroutine da_correlation_coeff2d(field1, field2, corr_coeff, &
    
    deallocate(data1)
    deallocate(data2)
+
+   if (trace_use) call da_trace_exit("da_correlation_coeff2d")
    
 end subroutine da_correlation_coeff2d
 

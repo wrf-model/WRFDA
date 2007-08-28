@@ -8,10 +8,12 @@ subroutine da_map_init(proj)
 
    type(proj_info), intent(inout)  :: proj
 
-   proj%lat1 =    -999.9
-   proj%lon1 =    -999.9
-   proj%dx    =    -999.9
-   proj%stdlon =   -999.9
+   if (trace_use_dull) call da_trace_entry("da_map_init")
+
+   proj%lat1     = -999.9
+   proj%lon1     = -999.9
+   proj%dx       = -999.9
+   proj%stdlon   = -999.9
    proj%truelat1 = -999.9
    proj%truelat2 = -999.9
    proj%hemi     = 0.0
@@ -22,6 +24,8 @@ subroutine da_map_init(proj)
    proj%knowni   = -999.9
    proj%knownj   = -999.9
    proj%init     = .false.
+
+   if (trace_use_dull) call da_trace_exit("da_map_init")
 
 end subroutine da_map_init
 

@@ -8,16 +8,18 @@ subroutine da_get_dims_cdf(file, var, dims, ndims, debug)
 
 #include "netcdf.inc"
 
-   character (len=80), intent(in) :: file
-   character (len=*), intent(in) :: var
-   logical, intent(in) :: debug
-   integer, intent(out), dimension(4) :: dims
-   integer, intent(out) :: ndims
+   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: var
+   logical,            intent(in)  :: debug
+   integer,            intent(out) :: dims(4)
+   integer,            intent(out) :: ndims
 
-   integer cdfid, rcode, id_time
+   integer            :: cdfid, rcode, id_time
    character (len=80) :: varnam
-   integer :: natts, dimids(10)
-   integer :: i, ivtype
+   integer            :: natts, dimids(10)
+   integer            :: i, ivtype
+
+   ! if (trace_use) call da_trace_entry("da_get_dims_cdf")
 
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
@@ -40,6 +42,8 @@ subroutine da_get_dims_cdf(file, var, dims, ndims, debug)
    end do
 
    call ncclos(cdfid,rcode)
+
+   ! if (trace_use) call da_trace_exit("da_get_dims_cdf")
 
 end subroutine da_get_dims_cdf
 

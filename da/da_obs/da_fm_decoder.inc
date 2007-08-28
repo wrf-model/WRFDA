@@ -35,13 +35,15 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
 
     integer,              intent (in)    :: fm
     character (LEN = 40), intent (out)   :: platform
-    integer,              intent (inout), optional :: synop, ship,  metar, &
-                                                      pilot, sound, satem, &
-                                                      satob, airep, gpspw, &
-                                                      ssmi_retrieval, ssmi_tb,&
-                                                      ssmt1, ssmt2, qscat, &
-                                                      profiler, buoy, gpsref, &
-                                                      other
+    integer, optional,    intent (inout) :: synop, ship,  metar, &
+                                            pilot, sound, satem, &
+                                            satob, airep, gpspw, &
+                                            ssmi_retrieval, ssmi_tb,&
+                                            ssmt1, ssmt2, qscat, &
+                                            profiler, buoy, gpsref, &
+                                            other
+
+   if (trace_use_frequent) call da_trace_entry("da_fm_decoder")
 
    select case(fm)
 
@@ -362,6 +364,8 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
       case default;                                       platform = "OTHER";
 
    end select
+
+   if (trace_use_frequent) call da_trace_exit("da_fm_decoder")
      
 end subroutine da_fm_decoder 
 

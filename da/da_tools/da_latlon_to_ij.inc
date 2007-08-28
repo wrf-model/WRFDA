@@ -6,11 +6,14 @@ subroutine da_latlon_to_ij(proj, lat, lon, i, j)
    !-----------------------------------------------------------------------
 
    implicit none
-   type(proj_info), intent(in)          :: proj
-   real, intent(in)                     :: lat
-   real, intent(in)                     :: lon
-   real, intent(out)                    :: i
-   real, intent(out)                    :: j
+
+   type(proj_info), intent(in)  :: proj
+   real,            intent(in)  :: lat
+   real,            intent(in)  :: lon
+   real,            intent(out) :: i
+   real,            intent(out) :: j
+
+   if (trace_use_frequent) call da_trace_entry("da_latlon_to_ij")
 
    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
@@ -40,6 +43,8 @@ subroutine da_latlon_to_ij(proj, lat, lon, i, j)
             'Unrecognized map projection code: ', proj%code
          call da_error(__FILE__,__LINE__,message(1:1))
    end select
+
+   if (trace_use_frequent) call da_trace_exit("da_latlon_to_ij")
 
 end subroutine da_latlon_to_ij
 

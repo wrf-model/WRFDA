@@ -22,6 +22,8 @@ subroutine da_legtra (nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
    complex              :: sum_legtra              ! Summation scalar.
    complex              :: eq_term                 ! Summation scalar.
 
+   if (trace_use) call da_trace_entry("da_legtra")
+
    index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
 
    if ((nj+1) / 2 == nj/2 + 1) then
@@ -60,6 +62,8 @@ subroutine da_legtra (nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
 
       v(l) = 0.5 * (sum_legtra + eq_coeff * eq_term)
    end do
+
+   if (trace_use) call da_trace_exit("da_legtra")
 
 end subroutine da_legtra
 

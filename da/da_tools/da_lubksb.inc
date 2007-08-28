@@ -9,14 +9,16 @@ subroutine da_lubksb(n, np, indx, a, b)
 
    implicit none
 
-   integer, intent(in)  :: n              ! Logical size of array.
-   integer, intent(in)  :: np             ! Physical size of array.
-   integer, intent(in)  :: indx(1:n)      ! Permutation vector returned by LUDCMP. 
-   real, intent(in)     :: a(1:np,1:np)   ! LU decomposition of matrix A in A.x=B.
-   real, intent(inout)  :: b(1:n)         ! On input = B, on output = x.
+   integer, intent(in)    :: n              ! Logical size of array.
+   integer, intent(in)    :: np             ! Physical size of array.
+   integer, intent(in)    :: indx(1:n)      ! Permutation vector returned by LUDCMP. 
+   real,    intent(in)    :: a(1:np,1:np)   ! LU decomposition of matrix A in A.x=B.
+   real,    intent(inout) :: b(1:n)         ! On input = B, on output = x.
 
-   integer              :: i , ii , j , ll
-   real                 :: sum
+   integer :: i , ii , j , ll
+   real    :: sum
+
+   if (trace_use) call da_trace_entry("da_lubksb")
 
    ii = 0
    do i = 1 , n
@@ -43,6 +45,8 @@ subroutine da_lubksb(n, np, indx, a, b)
       end if
       b(i) = sum / a(i,i)
    end do
+
+   if (trace_use) call da_trace_exit("da_lubksb")
 
 end subroutine da_lubksb
 

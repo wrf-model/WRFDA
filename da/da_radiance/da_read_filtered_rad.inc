@@ -15,7 +15,7 @@ subroutine da_read_filtered_rad( xp, iv )
    integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename
    integer            :: ndomain
-   logical, allocatable :: outside(:,:)
+   logical            :: outside
 
    if (trace_use) call da_trace_entry("da_read_filtered_rad")
 
@@ -51,24 +51,23 @@ subroutine da_read_filtered_rad( xp, iv )
       allocate (iv%instid(i)%tb_error(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
       do n=1,iv%instid(i)%num_rad
          read(unit=filtered_rad_unit) ndomain, &
-            iv%instid(i)%new_info%date_char(n), &
+            iv%instid(i)%info(n)%date_char, &
             iv%instid(i)%scanpos(n)       , &
             iv%instid(i)%ifgat(n)         , &
             iv%instid(i)%landsea_mask(n)  , &
-            iv%instid(i)%new_info%elv(n)      , &
-            iv%instid(i)%new_info%lat(1,n)      , &
-            iv%instid(i)%new_info%lon(1,n)      , &
+            iv%instid(i)%info(n)%elv      , &
+            iv%instid(i)%info(n)%lat      , &
+            iv%instid(i)%info(n)%lon      , &
             iv%instid(i)%satzen(n)        , &
             iv%instid(i)%satazi(n)        , &
             iv%instid(i)%tb_inv(:,n)      , &
             iv%instid(i)%tb_error(:,n)    , &
             iv%instid(i)%tb_qc(:,n)
+
+         call da_ll_to_xy (iv%instid(i)%info(n), iv%instid(i)%loc(n), xp, outside)
+         ! if (outside) cycle
+
       end do     ! end do pixels
-
-      allocate (outside(iv%instid(i)%nlevels, iv%instid(i)%num_rad))
-      call da_ll_to_xy_new (iv%instid(i)%new_info, iv%instid(i)%new_loc, xp, outside)
-      deallocate (outside)
-
       close(filtered_rad_unit)
       call da_free_unit(filtered_rad_unit)
 
@@ -79,5 +78,4 @@ subroutine da_read_filtered_rad( xp, iv )
    if (trace_use) call da_trace_exit("da_read_filtered_rad")
  
 end subroutine da_read_filtered_rad
-
 

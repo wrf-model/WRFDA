@@ -11,15 +11,17 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
 
    implicit none
    
-   integer, intent(in)               :: proj_code
-   real, intent(in)                  :: lat1
-   real, intent(in)                  :: lon1
-   real, intent(in)                  :: dx
-   real, intent(in)                  :: stdlon
-   real, intent(in)                  :: truelat1
-   real, intent(in)                  :: truelat2
-   real, intent(in)                  :: knowni , knownj
-   type(proj_info), intent(out)      :: proj
+   integer,         intent(in)  :: proj_code
+   real,            intent(in)  :: lat1
+   real,            intent(in)  :: lon1
+   real,            intent(in)  :: dx
+   real,            intent(in)  :: stdlon
+   real,            intent(in)  :: truelat1
+   real,            intent(in)  :: truelat2
+   real,            intent(in)  :: knowni , knownj
+   type(proj_info), intent(out) :: proj
+
+   if (trace_use_dull) call da_trace_entry("da_map_set")
 
    ! First, check for validity of mandatory variables in proj
    if (ABS(lat1) > 90.0) then
@@ -101,6 +103,8 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
          call da_error(__FILE__,__LINE__,message(1:1))
    end select pick_proj
    proj%init = .true.
+
+   if (trace_use_dull) call da_trace_exit("da_map_set")
 
 end subroutine da_map_set
 

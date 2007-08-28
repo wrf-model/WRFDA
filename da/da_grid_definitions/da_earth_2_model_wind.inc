@@ -14,11 +14,13 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    implicit none
 
-   real,    intent (in)  :: eu, ev
-   real,    intent (out) :: mu, mv
-   real,    intent (in)  :: lon
+   real, intent(in)  :: eu, ev
+   real, intent(out) :: mu, mv
+   real, intent(in)  :: lon
 
-   real :: XLONRT, ANG
+   real :: xlonrt, ang
+
+   if (trace_use) call da_trace_entry("da_earth_2_model_wind")
 
    ! for mercator projection, the winds are as in earth coordinates
 
@@ -32,17 +34,19 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
    ! see program datamap, subr vect, and
    ! ANTHES METEO. 597 NOTES, EQUA. 2.23, 2.25, 2.28.
 
-   XLONRT = XLONC-LON
+   xlonrt = xlonc-lon
 
-   if (XLONRT > 180.0) XLONRT=XLONRT-360.0
-   if (XLONRT <-180.0) XLONRT=XLONRT+360.0
+   if (xlonrt > 180.0) xlonrt=xlonrt-360.0
+   if (xlonrt <-180.0) xlonrt=xlonrt+360.0
 
-   ANG=XLONRT*CONE_FACTOR*pi/180.0
+   ang=xlonrt*cone_factor*pi/180.0
 
-   if (PHIC < 0.0) ANG=-ANG
+   if (phic < 0.0) ang=-ang
 
-   mu = ev*Sin(ANG) + eu*COS(ANG)
-   mv = ev*COS(ANG) - eu*Sin(ANG)
+   mu = ev*sin(ang) + eu*cos(ang)
+   mv = ev*cos(ang) - eu*sin(ang)
+
+   if (trace_use) call da_trace_exit("da_earth_2_model_wind")
 
 end subroutine da_earth_2_model_wind
 

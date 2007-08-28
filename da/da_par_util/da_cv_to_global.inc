@@ -10,13 +10,13 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
 
    implicit none
 
-   integer,           intent(in) :: cv_size        ! Size of local cv-array
-   integer,           intent(in) :: cv_size_global ! Size of domain cv-array
-   real,              intent(in) :: x(1:cv_size)   ! local cv-array
-   type (xpose_type), intent(in) :: xp   ! decomposed dimensions
-   integer,           intent(in) :: mzs(:)  ! mz for each variable
+   integer,          intent(in)    :: cv_size        ! Size of local cv-array
+   integer,          intent(in)    :: cv_size_global ! Size of domain cv-array
+   real,             intent(in)    :: x(1:cv_size)   ! local cv-array
+   type(xpose_type), intent(in)    :: xp   ! decomposed dimensions
+   integer,          intent(in)    :: mzs(:)  ! mz for each variable
                                          ! (to identify empty or 2D arrays)
-   real,           intent(inout) :: xg(1:cv_size_global) ! global cv-array
+   real,             intent(inout) :: xg(1:cv_size_global) ! global cv-array
 
 #ifdef DM_PARALLEL
 
@@ -26,7 +26,9 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
    type (xpose_type) :: xpg  ! global dimensions
    integer :: ids, ide, jds, jde, kds, &
               ims, ime, jms, jme, kms, &
-              ips, ipe, jps, jpe, kps
+              ips, ipe, jps, jpe, kps 
+
+   if (trace_use) call da_trace_entry("da_cv_to_global")      
 
    !
    ! Gather to mimic serial summation order.  
@@ -97,6 +99,8 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
 
    ! deallocate vv_xg
    deallocate(vv_xg%v1, vv_xg%v2, vv_xg%v3, vv_xg%v4, vv_xg%v5, vv_xg%alpha)
+
+   if (trace_use) call da_trace_exit("da_cv_to_global")    
 
 #endif
 

@@ -104,8 +104,8 @@ subroutine da_setup_obs_interp_wts (xp, iv)
 
    do i = 1, iv % num_inst
       if (iv % instid(i) % num_rad < 1) cycle
-      call da_store_obs_grid_info_new (xp, iv%instid(i)%new_loc%i(1,:), &
-         iv%instid(i)%new_loc%j(1,:), iv%instid(i)%proc_domain(:))
+      call da_store_obs_grid_info_new (xp, iv % instid(i) % loc_i(:), &
+         iv % instid(i) % loc_j(:), iv%instid(i)%proc_domain(:))
    end do
 
    if (trace_use) call da_trace_exit("da_setup_obs_interp_wts")

@@ -13,12 +13,14 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
    implicit none
 
-   real,    intent (out):: val
-   integer, intent (in) :: kts, kte
-   real,    intent (in) :: ho, po, to
-   real, dimension (kts:kte), intent (in) :: height, pressure, temp
+   real,    intent (out) :: val
+   integer, intent (in)  :: kts, kte
+   real,    intent (in)  :: ho, po, to
+   real,    intent (in)  :: height(kts:kte)
+   real,    intent (in)  :: pressure(kts:kte)
+   real,    intent (in)  :: temp(kts:kte)
 
-   real, dimension (kts:kte) :: prs_mb
+   real    :: prs_mb(kts:kte)
    ! calculated but never used
    !      real    :: dth_12, dth_21, dth_sfc, dth_obs
    !     real    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
@@ -29,6 +31,8 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    real    :: pdif, rcp
    integer :: k_100mb, k_200mb, jk
    integer :: inc_100mb, inc_200mb
+
+   if (trace_use_dull) call da_trace_entry("da_intpsfc_tem")
 
    rcp = gas_constant/cp
 
@@ -78,7 +82,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
       return
    end if
 
-   ! 2.  POTENTIAL TEMPERATURE 
+   ! 2.  potential temperature 
    ! =========================
 
    ! 2.1 Potential temperature at 100hPa above model surface
@@ -94,7 +98,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    th_obs   = to * (1000.0 / (po/100.0)) ** rcp
 
 
-   ! 3.  LAPSE RATE BETWEEN SURFACE+200hPA AND SURFACE+100hPa
+   ! 3.  lapse rate between surface+200hpa and surface+100hpa
    ! =========================================================
 
    ! 3.1 Potential temperature increment
@@ -138,6 +142,8 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    ! 4.3 Corresponding Temperature
 
    val  = th_sfc * (prs_mb (kts) / 1000.0)**rcp
+
+   if (trace_use_dull) call da_trace_exit("da_intpsfc_tem")
 
 end subroutine da_intpsfc_tem
 

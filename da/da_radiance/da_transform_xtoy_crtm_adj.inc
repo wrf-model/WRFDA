@@ -23,7 +23,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    integer                        :: k  ! Index dimension.
    integer                        :: num_rad  ! Number of radiance obs
    integer                        :: inst, nchanl, n
-   real, allocatable              :: q_ad(:)
+   real                           :: q_ad
 
    ! CRTM local varaibles and types
    integer :: wmo_sensor_id, Error_Status, Allocate_Status
@@ -32,6 +32,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    type (CRTM_Surface_type )      :: Surface, Surface_AD
    type (CRTM_GeometryInfo_type ) :: GeometryInfo
    !type(CRTM_Options_type )      :: Options
+
+   type (model_loc_type) :: loc
 
 !---------------------------------------------------------
 
@@ -121,8 +123,6 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
       !  call da_error(__FILE__,__LINE__, &
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
-
-      allocate (q_ad(1:num_rad))
 
       do n=1,num_rad
 
@@ -264,19 +264,30 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
                  Atmosphere_AD%Level_Pressure(atmosphere%n_layers)*0.01 
          Atmosphere_AD%Absorber(:,1) = 1000.0*Atmosphere_AD%Absorber(:,1) ! in g/kg
 
+            !-----------------------------------------------------
+            ! [1.6] Get horizontal interpolation weights:
+            !-----------------------------------------------------
+
+            loc%i = iv%instid(inst)%loc_i(n)
+            loc%j = iv%instid(inst)%loc_j(n)
+            loc%dx = iv%instid(inst)%loc_dx(n)
+            loc%dy = iv%instid(inst)%loc_dy(n)
+            loc%dxm = iv%instid(inst)%loc_dxm(n)
+            loc%dym = iv%instid(inst)%loc_dym(n)
+
             ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
 
-            do k=kts,kte ! from bottom to top
-               q_ad(n) = Atmosphere_AD%Absorber(kte-k+1,1)
-               if (atmosphere%pressure(kte-k+1) < 75.0) q_ad(n) = 0.0
-               call da_interp_lin_2d_adj_newer( jo_grad_x%t(:,:,k), iv%instid(inst)%new_loc, k,n,n, &
-                  Atmosphere_AD%Temperature(kte-k+1:kte-k+1))
+            do k=kts,kte ! from bottem to top
+               q_ad = Atmosphere_AD%Absorber(kte-k+1,1)
+               if (atmosphere%pressure(kte-k+1) < 75.0) q_ad = 0.0
+               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), loc, &
+                  Atmosphere_AD%Temperature(kte-k+1))
 
-               call da_interp_lin_2d_adj_newer (jo_grad_x%q(:,:,k), iv%instid(inst)%new_loc, k,n,n, q_ad(n:n) )
+               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), loc, q_ad )
             end do
 
-               call da_interp_lin_2d_adj_newer(jo_grad_x% psfc, iv%instid(inst)%new_loc, 1,n,n, &
-                  Atmosphere_AD%Level_Pressure(atmosphere%n_layers:atmosphere%n_layers) )
+               call da_interp_lin_2d_adj(jo_grad_x% psfc, loc,  &
+                  Atmosphere_AD%Level_Pressure(atmosphere%n_layers) )
 
                !if (n <=10 ) then
                !   write(6,'(15f8.2)') rtsolution(:)%brightness_temperature
@@ -299,8 +310,6 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             end if
 
          end do       !  end loop for pixels
-
-         deallocate (q_ad)
 
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures

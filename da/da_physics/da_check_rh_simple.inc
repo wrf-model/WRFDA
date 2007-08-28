@@ -8,11 +8,13 @@ subroutine da_check_rh_simple (grid)
 
    type (domain),  intent(inout)  :: grid
 
-   integer                        :: i, j, k ! Loop counters.
-   real                           :: q_new   ! Modified rh.
-   real                           :: es      ! Dummy output.
-   real                           :: t_new, p_new
-   real                           :: ramax,ramin,dqmax,dqmin            
+   integer :: i, j, k ! Loop counters.
+   real    :: q_new   ! Modified rh.
+   real    :: es      ! Dummy output.
+   real    :: t_new, p_new
+   real    :: ramax,ramin,dqmax,dqmin    
+
+   if (trace_use_dull) call da_trace_entry("da_check_rh_simple")        
 
    ramax=maximum_rh/100.0
    ramin=minimum_rh/100.0
@@ -29,7 +31,9 @@ subroutine da_check_rh_simple (grid)
             grid%xa % q(i,j,k)=min(max(grid%xa % q(i,j,k),dqmin),dqmax)
          end do
       end do
-   end do
+   end do  
+
+   if (trace_use_dull) call da_trace_exit("da_check_rh_simple") 
 
 end subroutine da_check_rh_simple
 

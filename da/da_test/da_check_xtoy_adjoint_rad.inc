@@ -6,13 +6,13 @@ subroutine da_check_xtoy_adjoint_rad(iv, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
-   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
-   type (y_type) , intent(inout)  :: y             ! y = h (xa)
-   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
+   type(iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type(y_type),  intent(inout)  :: y             ! y = h (xa)
+   real,          intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   integer                        :: inst, n, k          ! Loop counter.
+   integer :: inst, n, k          ! Loop counter.
 
-   if (iv%num_inst < 1) return
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_rad")
 
    do inst = 1, iv%num_inst                 ! loop for sensor
       if (iv%instid(inst)%num_rad < 1) cycle
@@ -39,6 +39,8 @@ subroutine da_check_xtoy_adjoint_rad(iv, y, adjtest_lhs, pertile_lhs)
          ! end if
       end do
    end do 
+
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_rad")
 
 end subroutine da_check_xtoy_adjoint_rad
 

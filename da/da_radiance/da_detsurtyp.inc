@@ -1,8 +1,5 @@
-subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, & 
-                         is, ie, js, je, &
-                         i, j, dx, dy, dxm, dym, &
-                         isflg,ob_vegtyp,ob_soiltyp, &
-                         seap, icep, lndp, snop)
+subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, is, ie, js, je, &
+   i, j, dx, dy, dxm, dym, isflg,ob_vegtyp,ob_soiltyp, seap, icep, lndp, snop)
 
    !---------------------------------------------------------------------------
    ! Purpose: determine surface type at obs locations.
@@ -43,6 +40,8 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    integer   ::  n, xbflag(4)   ! surface type at xb location
                                ! 0:sea  1:sea-ice 2:land  3:snow
    real      ::  w(4),minw      ! weight at 4 xb locations
+
+   if (trace_use) call da_trace_entry("da_detsurtyp")    
 
    ! 1.0 determine surface type of xb at 4 location around obs
    !-------------------------------------------------------
@@ -159,7 +158,7 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
       ob_soiltyp = float(soiltyp(i,j))
    end if
 
-   return
+   if (trace_use) call da_trace_exit("da_detsurtyp")    
 
 end subroutine da_detsurtyp
 

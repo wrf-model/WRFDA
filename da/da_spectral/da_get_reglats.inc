@@ -6,14 +6,16 @@ subroutine da_get_reglats( nj, lat, sinlat, coslat, int_wgts)
 
    implicit none
 
-   integer, intent(in)    :: nj             ! Number of latitudes
-   real,    intent(out)   :: lat(1:nj)      ! Latitude(radians, from south).
-   real,    intent(out)   :: sinlat(1:nj)   ! sin(Latitude).
-   real,    intent(out)   :: coslat(1:nj)   ! cos(Latitude).
-   real,    intent(out)   :: int_wgts(1:nj) ! Legendre Integration weights. 
+   integer, intent(in)  :: nj             ! Number of latitudes
+   real,    intent(out) :: lat(1:nj)      ! Latitude(radians, from south).
+   real,    intent(out) :: sinlat(1:nj)   ! sin(Latitude).
+   real,    intent(out) :: coslat(1:nj)   ! cos(Latitude).
+   real,    intent(out) :: int_wgts(1:nj) ! Legendre Integration weights. 
 
-   integer                :: j              ! Loop counter.
-   real                   :: delta_phi      ! Regular latitude interval.
+   integer :: j              ! Loop counter.
+   real    :: delta_phi      ! Regular latitude interval.
+
+   if (trace_use) call da_trace_entry("da_get_reglats")
 
    delta_phi = pi / real(nj-1) 
 
@@ -36,6 +38,8 @@ subroutine da_get_reglats( nj, lat, sinlat, coslat, int_wgts)
       coslat(nj/2+1) = 1.0
       int_wgts(nj/2+1) = delta_phi
    end if
+
+   if (trace_use) call da_trace_exit("da_get_reglats")
 
 end subroutine da_get_reglats
 

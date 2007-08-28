@@ -15,9 +15,14 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
    real,              intent(out) :: vglobal(ids:ide,jds:jde,kds:kde)
    integer, optional, intent(in)  :: mz
 
+#ifdef DM_PARALLEL
+
    integer :: local_kde
    integer :: local_kme
    integer :: local_kpe
+#endif
+
+   if (trace_use_frequent) call da_trace_entry("da_patch_to_global_3d")
 
 #ifdef DM_PARALLEL
 
@@ -41,6 +46,8 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
 #else
    vglobal(ids:ide,jds:jde,kds:kde) = vlocal(ids:ide,jds:jde,kds:kde)
 #endif
+
+   if (trace_use_frequent) call da_trace_exit("da_patch_to_global_3d")
 
 end subroutine da_patch_to_global_3d
 

@@ -1,5 +1,4 @@
-subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
-                      TGL_t, TGL_epsr, TGL_epsi                            )
+subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,TGL_t, TGL_epsr, TGL_epsi)
 
    !-----------------------------------------------------------------------
    ! Purpose: returns the complex dielectric constant of sea water, using the
@@ -15,17 +14,18 @@ subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
 
    implicit none
 
-
-   real, intent(in  ) :: f, t, TGL_t
+   real, intent(in)    :: f, t, TGL_t
    real, intent(inout) :: ssw
-   real, intent( out) :: TGL_epsr, TGL_epsi, epsr, epsi
+   real, intent(out)   :: TGL_epsr, TGL_epsi, epsr, epsi
 
    complex :: cdum1,cdum2,cdum3
    complex :: TGL_cdum1,TGL_cdum2,TGL_cdum3
-   real :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
-   real :: delt,delt2,beta,signew,om
-   real :: TGL_t2,TGL_t3,TGL_es,TGL_a,TGL_esnew,TGL_tau,TGL_b,TGL_taunew
-   real :: TGL_delt,TGL_delt2,TGL_beta,TGL_signew
+   real    :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
+   real    :: delt,delt2,beta,signew,om
+   real    :: TGL_t2,TGL_t3,TGL_es,TGL_a,TGL_esnew,TGL_tau,TGL_b,TGL_taunew
+   real    :: TGL_delt,TGL_delt2,TGL_beta,TGL_signew
+
+   if (trace_use) call da_trace_entry("da_epsalt_tl")
 
    if (ssw .lt. 0.0) ssw = 32.54
    ssw2       = ssw*ssw
@@ -78,6 +78,8 @@ subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
    TGL_epsr   = real(TGL_cdum3)
    epsi       = -aimag(cdum3)
    TGL_epsi   = -aimag(TGL_cdum3)
+
+   if (trace_use) call da_trace_exit("da_epsalt_tl")
 
 end subroutine da_epsalt_tl
 

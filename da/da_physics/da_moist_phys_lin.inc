@@ -15,31 +15,63 @@ subroutine da_moist_phys_lin(grid)
 
    type(domain), intent(inout)               :: grid
 
-   real, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: Q_OLD,Q_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: QCW_OLD,QCW_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: QRN_OLD,QRN_NEW
+   real :: T_OLD(ims:ime,jms:jme,kms:kme),T_NEW(ims:ime,jms:jme,kms:kme)
+   real :: Q_OLD(ims:ime,jms:jme,kms:kme),Q_NEW(ims:ime,jms:jme,kms:kme)
+   real :: QCW_OLD(ims:ime,jms:jme,kms:kme),QCW_NEW(ims:ime,jms:jme,kms:kme)
+   real :: QRN_OLD(ims:ime,jms:jme,kms:kme),QRN_NEW(ims:ime,jms:jme,kms:kme)
 
-   real, dimension(kms:kme)                 :: EES, QVSS
-   real, dimension(kms:kme)                 :: EES9, QVSS9
-
-   real, dimension(kms:kme)                   :: DT
-   real, dimension(kms:kme)                   :: QVT,QCT,QRT,TTT
-   real, dimension(kms:kme)                   :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6
-   real, dimension(kms:kme) :: DUM31
-   real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
-   real, dimension(kms:kme) :: SCR31,SCR42,SCR71
-   real, dimension(kms:kme) :: DUM112,DUM113,DUM211,DUM411
-
-   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69
-   real, dimension(kms:kme) :: DUM319
-   real, dimension(kms:kme) :: PRA9,PRC9,PRD9,PRE9
-   real, dimension(kms:kme) :: SCR319,SCR429,SCR719
-   real, dimension(kms:kme) :: DUM1129,DUM1139,DUM2119,DUM4119
-   real, dimension(kms:kme) :: TMP
+   real    :: EES(kms:kme)
+   real    :: QVSS(kms:kme)
+   real    :: EES9(kms:kme)
+   real    :: QVSS9(kms:kme)
+   real    :: DT(kms:kme)
+   real    :: QVT(kms:kme)
+   real    :: QCT(kms:kme)
+   real    :: QRT(kms:kme)
+   real    :: TTT(kms:kme)
+   real    :: QVT9(kms:kme)
+   real    :: QCT9(kms:kme)
+   real    :: QRT9(kms:kme)
+   real    :: TTT9(kms:kme)
+   real    :: SCR2(kms:kme)
+   real    :: SCR3(kms:kme)
+   real    :: SCR4(kms:kme)
+   real    :: SCR5(kms:kme)
+   real    :: SCR6(kms:kme)
+   real    :: DUM31(kms:kme)
+   real    :: PRA(kms:kme)
+   real    :: PRC(kms:kme)
+   real    :: PRD(kms:kme)
+   real    :: PRE(kms:kme)
+   real    :: SCR31(kms:kme)
+   real    :: SCR42(kms:kme)
+   real    :: SCR71(kms:kme)
+   real    :: DUM112(kms:kme)
+   real    :: DUM113(kms:kme)
+   real    :: DUM211(kms:kme)
+   real    :: DUM411(kms:kme)
+   real    :: SCR29(kms:kme)
+   real    :: SCR39(kms:kme)
+   real    :: SCR49(kms:kme)
+   real    :: SCR59(kms:kme)
+   real    :: SCR69(kms:kme)
+   real    :: DUM319(kms:kme)
+   real    :: PRA9(kms:kme)
+   real    :: PRC9(kms:kme)
+   real    :: PRD9(kms:kme)
+   real    :: PRE9(kms:kme)
+   real    :: SCR319(kms:kme)
+   real    :: SCR429(kms:kme)
+   real    :: SCR719(kms:kme)
+   real    :: DUM1129(kms:kme)
+   real    :: DUM1139(kms:kme)
+   real    :: DUM2119(kms:kme)
+   real    :: DUM4119(kms:kme)
+   real    :: TMP(kms:kme)
 
    integer :: i, j, k
+
+   if (trace_use) call da_trace_entry("da_moist_phys_lin")
 
    do k=kts,kte
       do j=jts,jte
@@ -223,6 +255,8 @@ subroutine da_moist_phys_lin(grid)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_moist_phys_lin")
 
 end subroutine da_moist_phys_lin
 

@@ -25,19 +25,22 @@ subroutine da_integrat_dz(grid)
 
    real    :: pw
 
+   if (trace_use) call da_trace_entry("da_integrat_dz")
+
    ! weighted sum of vertical column 
 
    do j=jts, jte
       do i=its, ite
          pw = 0.0
          do k=kts, kte
-            pw = pw + (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k)) &
-                 *  grid%xb%q(i,j,k)*grid%xb%rho(i,j,k)
+            pw = pw + (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k)) * grid%xb%q(i,j,k)*grid%xb%rho(i,j,k)
          end do
 
          grid%xb%tpw(i,j) = 0.1*pw
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_integrat_dz")
 
 end subroutine da_integrat_dz
 

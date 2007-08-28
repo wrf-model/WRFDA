@@ -6,11 +6,13 @@ subroutine da_innerprod(mata,matc,ni,nj)
 
    implicit none
 
-   integer, intent(in) :: ni, nj
-   real, intent(in) :: mata(ni,nj)
-   real, intent(out) :: matc(nj,nj)
+   integer, intent(in)  :: ni, nj
+   real,    intent(in)  :: mata(ni,nj)
+   real,    intent(out) :: matc(nj,nj)
 
    integer             :: i1, i2, k       ! Loop counters.
+
+   if (trace_use) call da_trace_entry("da_innerprod")
 
    matc = 0.0
 
@@ -21,6 +23,8 @@ subroutine da_innerprod(mata,matc,ni,nj)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_innerprod")
 
 end subroutine da_innerprod
 
