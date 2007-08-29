@@ -71,7 +71,8 @@ while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
    fi
 
    if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
-      diff -q $DIR1/$FILE1 $DIR2/$FILE2
+      # Can't use -q option as missing from braindead Aix
+      diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
       if [[ $? != 0 ]] && $FULL; then
          diff $DIR1/$FILE1 $DIR2/$FILE2
       fi
@@ -81,24 +82,24 @@ done
 
 # binary files
 
-OLD_BINARY_FILE[1]=wrf-var/wrf_3dvar_output
+OLD_NETCDF_FILE[1]=wrf-var/wrf_3dvar_output
 
-NEW_BINARY_FILE[1]=working/analysis
+NEW_NETCDF_FILE[1]=working/analysis
 
 COUNT=1
 
-while [[ $COUNT -le ${#NEW_BINARY_FILE[@]} ]]; do
+while [[ $COUNT -le ${#NEW_NETCDF_FILE[@]} ]]; do
    if $TYPE1_OLD; then
-      FILE1=${OLD_BINARY_FILE[$COUNT]}
+      FILE1=${OLD_NETCDF_FILE[$COUNT]}
    else
-      FILE1=${NEW_BINARY_FILE[$COUNT]}
+      FILE1=${NEW_NETCDF_FILE[$COUNT]}
    fi
    if $TYPE2_OLD; then
-      FILE2=${OLD_BINARY_FILE[$COUNT]}
+      FILE2=${OLD_NETCDF_FILE[$COUNT]}
    else
-      FILE2=${NEW_BINARY_FILE[$COUNT]}
+      FILE2=${NEW_NETCDF_FILE[$COUNT]}
    fi
-   if [[ -f $FILE1 && -f $FILE2 ]]; then
+   if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
       cmp $DIR1/$FILE1 $DIR2/$FILE2
       if [[ $? != 0 ]] && $FULL; then
         ncdump $DIR1/$FILE1 > tmp1
