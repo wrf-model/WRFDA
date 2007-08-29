@@ -18,7 +18,7 @@ module da_spectral
    use da_par_util1, only : true_mpi_complex
 #endif
    use da_reporting, only : da_error, message
-   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tools_serial, only : da_get_unit, da_free_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    !-----------------------------------------------------------------------

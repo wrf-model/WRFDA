@@ -34,7 +34,7 @@ WRFVAR_OBJS = da_par_util.o \
    module_ffts.o \
    da_test.o \
    da_tools.o \
-   da_tools1.o \
+   da_tools_serial.o \
    da_wrf_interfaces.o \
    da_rsl_interfaces.o \
    da_recursive_filter.o \

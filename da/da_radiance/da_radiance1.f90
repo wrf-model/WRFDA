@@ -26,7 +26,7 @@ module da_radiance1
    use da_reporting, only : da_error, message
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_residual_new
-   use da_tools1, only : da_free_unit, da_get_unit
+   use da_tools_serial, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace_int_sort
 
 #if defined(RTTOV) || defined(CRTM)

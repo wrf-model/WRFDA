@@ -13,9 +13,8 @@ program gen_be_stage1_1dvar
 !
 !----------------------------------------------------------------------
 !
-   use da_control, only : filename_len,gaussian_lats, &
-      da_advance_cymdh
-   use da_tools1, only : da_get_unit
+   use da_control, only : filename_len,gaussian_lats
+   use da_tools_serial, only : da_get_unit, da_advance_cymdh
    use da_gen_be, only : da_create_bins
 
    implicit none

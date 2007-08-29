@@ -1,10 +1,9 @@
 program gen_be_stage4_global
 
-   use da_control, only : stderr, stdout, filename_len, pi, gaussian_lats, &
-      da_advance_cymdh
+   use da_control, only : stderr, stdout, filename_len, pi, gaussian_lats
    use da_be_spectral, only : da_vv_to_v_spectral, da_initialize_h, &
       da_calc_power
-   use da_tools1, only : da_get_unit
+   use da_tools_serial, only : da_get_unit,da_advance_cymdh
 
    implicit none
 

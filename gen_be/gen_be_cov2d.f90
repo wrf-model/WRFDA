@@ -1,7 +1,7 @@
 program gen_be_cov2d
 
-   use da_control, only : stdout, stderr, filename_len,da_advance_cymdh
-   use da_tools1, only : da_get_unit
+   use da_control, only : stdout, stderr, filename_len
+   use da_tools_serial, only : da_get_unit,da_advance_cymdh
    use da_gen_be, only : da_create_bins
 
    implicit none

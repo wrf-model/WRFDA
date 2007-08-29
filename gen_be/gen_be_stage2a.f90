@@ -1,8 +1,8 @@
 program gen_be_stage2a
 
-   use da_control, only : stderr, stdout, filename_len, da_advance_cymdh
+   use da_control, only : stderr, stdout, filename_len
    use da_gen_be, only : da_filter_regcoeffs
-   use da_tools1, only : da_get_unit
+   use da_tools_serial, only : da_get_unit, da_advance_cymdh
 
    implicit none
 

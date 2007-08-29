@@ -15,7 +15,7 @@ program gen_be_ep2
 #endif
 
    use da_control, only : stderr, stdout, filename_len
-   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tools_serial, only : da_get_unit, da_free_unit
    use da_gen_be, only : da_stage0_initialize, da_get_field, da_get_trh
 
    implicit none

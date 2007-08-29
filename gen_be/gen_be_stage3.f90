@@ -1,10 +1,9 @@
 program gen_be_stage3
 
-   use da_control, only : stderr, stdout, filename_len, vertical_ip, &
-      da_advance_cymdh
+   use da_control, only : stderr, stdout, filename_len, vertical_ip
    use da_gen_be, only : da_eof_decomposition_test, da_eof_decomposition, &
       da_transform_vptovv, da_create_bins
-   use da_tools1, only : da_get_unit
+   use da_tools_serial, only : da_get_unit, da_advance_cymdh
 
    implicit none
 

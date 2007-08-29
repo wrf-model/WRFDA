@@ -590,12 +590,4 @@ module da_control
    integer :: itsy,itey,jtsy,jtey,ktsy,ktey
    integer :: itsx,itex,jtsx,jtex,ktsx,ktex
 
-contains
-
-#include "da_advance_cymdh.inc"
-#include "da_array_print.inc"
-#include "da_change_date.inc"
-#include "da_find_fft_factors.inc"
-#include "da_find_fft_trig_funcs.inc"
-
 end module da_control

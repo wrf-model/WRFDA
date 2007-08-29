@@ -10,7 +10,7 @@ module da_tools
 
    use da_control, only : pi, gravity, gas_constant, ims, ime, jms,jme, &
       kms,kme,its,ite,jts,jte,kts,kte,ids,ide,stdout, trace_use_dull, &
-      trace_use, da_array_print, fg_format_kma_global, coarse_ds, coarse_ix, &
+      trace_use, fg_format_kma_global, coarse_ds, coarse_ix, &
       coarse_jy, fg_format, c2, cone_factor, earth_radius, dsm, &
       map_projection, psi1, pole, start_x, phic, start_y, xlonc, ycntr, &
       put_rand_seed, obs_qc_pointer, &
@@ -22,6 +22,7 @@ module da_tools
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
       iv_type, y_type, da_random_seed
+   use da_tools_serial, only : da_array_print
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error, message, da_warning
    

@@ -18,11 +18,11 @@ program gen_be_stage0_wrf
 #endif
 
    use da_control, only : num_fft_factors, pi, stdout, stderr, &
-      da_find_fft_factors,da_find_fft_trig_funcs,filename_len, base_pres, &
-      base_temp, base_lapse
+      filename_len, base_pres, base_temp, base_lapse
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
-   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tools_serial, only : da_get_unit, da_free_unit,da_find_fft_factors, &
+      da_find_fft_trig_funcs
    use module_ffts, only : fft551, fft661
 
    implicit none

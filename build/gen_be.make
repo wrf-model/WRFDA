@@ -8,7 +8,7 @@ GEN_BE_OBJS = da_etkf.o \
 	module_driver_constants.o \
 	da_memory.o \
 	da_reporting.o \
-	da_tools1.o \
+	da_tools_serial.o \
 	module_ffts.o
 
 be : setup \

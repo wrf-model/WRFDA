@@ -16,7 +16,7 @@ module da_sound
       da_interp_lin_2d, da_interp_lin_2d_adj
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction
-   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tools_serial, only : da_get_unit, da_free_unit
    use da_par_util, only : da_proc_stats_combine, &
       da_deallocate_global_sound, da_to_global_sound, da_to_global_sonde_sfc, &
       da_deallocate_global_sonde_sfc

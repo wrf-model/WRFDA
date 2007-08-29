@@ -50,7 +50,7 @@ module da_obs
       da_transform_xtoy_ssmi_tb_adj, da_transform_xtoy_ssmi_rv_adj, &
       da_transform_xtoy_ssmt1_adj, da_transform_xtoy_ssmt2_adj
    use da_synop,     only : da_transform_xtoy_synop,da_transform_xtoy_synop_adj
-   use da_tools1,    only : da_free_unit, da_get_unit
+   use da_tools_serial,    only : da_free_unit, da_get_unit
    use da_tools,     only : da_add_noise, da_add_noise_new,da_random_omb
    use da_tracing,   only : da_trace_entry, da_trace_exit 
 

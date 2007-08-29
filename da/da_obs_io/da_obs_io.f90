@@ -33,7 +33,7 @@ module da_obs_io
    use da_physics, only : da_tp_to_qs
    use da_reporting, only : da_warning, message, da_error
    use da_tools, only : da_ll_to_xy
-   use da_tools1, only : da_free_unit, da_get_unit
+   use da_tools_serial, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
 
 #ifdef BUFR

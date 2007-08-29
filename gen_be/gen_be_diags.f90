@@ -1,7 +1,7 @@
 program gen_be_diags
 
    use da_control, only : stderr, stdout, filename_len
-   use da_tools1, only : da_get_unit
+   use da_tools_serial, only : da_get_unit
    use da_gen_be, only : da_readwrite_be_stage2, da_readwrite_be_stage3, &
       da_readwrite_be_stage4
 

@@ -12,7 +12,7 @@ module da_setup_structures
       analysis_date,coarse_ix,coarse_ds,map_projection,coarse_jy, c2,dsm,phic, &
       pole, cone_factor, start_x,base_pres,ptop,psi1,start_y, base_lapse,base_temp,truelat2_3dv, &
       truelat1_3dv,xlonc,t0,num_fft_factors,pi,print_detail_spectral, global, &
-      da_find_fft_factors,da_find_fft_trig_funcs, use_radar_rf, &
+      use_radar_rf, &
       max_fgat_time, num_fgat_time, dt_cloud_model, &
       use_ssmiretrievalobs,use_radarobs,use_ssmitbobs,use_qscatobs, num_procs, &
       num_pseudo, missing, ob_format, ob_format_bufr,ob_format_ascii, &
@@ -30,7 +30,7 @@ module da_setup_structures
       max_vert_var2,max_vert_var3,max_vert_var4,print_detail_be, &
       test_statistics, var_scaling1,var_scaling2,var_scaling3,var_scaling4, &
       var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
-      print_detail_regression,gas_constant,da_array_print , use_airsretobs, &
+      print_detail_regression,gas_constant, use_airsretobs, &
       filename_len, use_ssmisobs, gravity, t_triple, use_hirs4obs, use_mhsobs, &
       ims,ime,jms,jme,kms,kme,kds, vert_corr_2, alphacv_method_xa, vert_evalue_global, &
       vert_evalue_local, obs_names, num_ob_indexes, &
@@ -47,7 +47,8 @@ module da_setup_structures
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_spectral, only : da_initialize_h,da_calc_power_spectrum
    use da_ssmi, only : da_read_obs_ssmi,da_scan_obs_ssmi
-   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tools_serial, only : da_get_unit, da_free_unit, da_array_print, da_find_fft_factors, &
+      da_find_fft_trig_funcs
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_vtox_transforms, only : da_check_eof_decomposition
 

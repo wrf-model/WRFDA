@@ -9,9 +9,9 @@ program gen_be_stage2_1dvar
 ! Creation (from gen_be_stage_2)   Dale Barker       01/07/2005.
 !---------------------------------------------------------------------------------------
 
-   use da_control, only : filename_len, da_advance_cymdh
+   use da_control, only : filename_len
    use da_gen_be, only : da_eof_decomposition, da_eof_decomposition_test
-   use da_tools1, only : da_get_unit
+   use da_tools_serial, only : da_get_unit,da_advance_cymdh
 
    implicit none
 
