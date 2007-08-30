@@ -1,4 +1,4 @@
-subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
+subroutine da_ij_to_latlon(proj, xx, yy, lat, lon)
 
    !-----------------------------------------------------------------------
    ! Purpose: Computes geographical latitude and longitude for a given (i,j) 
@@ -8,12 +8,12 @@ subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
    implicit none
 
    type(proj_info), intent(in)  :: proj
-   real,            intent(in)  :: ii
-   real,            intent(in)  :: jj
+   real,            intent(in)  :: xx
+   real,            intent(in)  :: yy
    real,            intent(out) :: lat
    real,            intent(out) :: lon
 
-   real :: i, j
+   real :: x, y
 
    if (trace_use) call da_trace_entry("da_ij_to_latlon")
 
@@ -22,26 +22,26 @@ subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
          (/"You have not called map_set for this projection!"/))
    end if
 
-   i = ii
-   j = jj
+   x = xx
+   y = yy
 
    select case (proj%code)
       case (PROJ_LATLON)
-         call da_ijll_latlon(i, j, proj, lat, lon)
+         call da_xyll_latlon(x, y, proj, lat, lon)
 
       case (PROJ_MERC)
-         i = ii - proj%knowni + 1.0
-         j = jj - proj%knownj + 1.0
-         call da_ijll_merc(i, j, proj, lat, lon)
+         x = xx - proj%knowni + 1.0
+         y = yy - proj%knownj + 1.0
+         call da_xyll_merc(x, y, proj, lat, lon)
 
       case (PROJ_PS)
-         call da_ijll_ps(i, j, proj, lat, lon)
+         call da_xyll_ps(x, y, proj, lat, lon)
 
       case (PROJ_LC)
 
-         i = ii - proj%knowni + 1.0
-         j = jj - proj%knownj + 1.0
-         call da_ijll_lc(i, j, proj, lat, lon)
+         x = xx - proj%knowni + 1.0
+         y = yy - proj%knownj + 1.0
+         call da_xyll_lc(x, y, proj, lat, lon)
 
       case default
          write(unit=message(1),fmt='(A,I2)') &

@@ -1,4 +1,4 @@
-subroutine da_llij_lc(lat, lon, proj, i, j)
+subroutine da_llxy_lc(lat, lon, proj, x, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: compute the geographical latitude and longitude values
@@ -11,8 +11,8 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
    real, intent(in)              :: lon      ! Longitude (-180->180 E)
    type(proj_info),intent(in)      :: proj     ! Projection info structure
 
-   real, intent(out)             :: i        ! Cartesian X coordinate
-   real, intent(out)             :: j        ! Cartesian Y coordinate
+   real, intent(out)             :: x        ! Cartesian X coordinate
+   real, intent(out)             :: y        ! Cartesian Y coordinate
 
    real                          :: arg
    real                          :: deltalon
@@ -20,7 +20,7 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
    real                          :: rm
    real                          :: ctl1r
 
-   if (trace_use_dull) call da_trace_entry("da_llij_lc")
+   if (trace_use_dull) call da_trace_entry("da_llxy_lc")
     
    ! Compute deltalon between known longitude and standard lon and ensure
    ! it is not in the cut zone
@@ -38,8 +38,8 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
         TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
    arg = proj%cone*(deltalon*rad_per_deg)
-   i = proj%polei + proj%hemi * rm * Sin(arg)
-   j = proj%polej - rm * COS(arg)
+   x = proj%polei + proj%hemi * rm * Sin(arg)
+   y = proj%polej - rm * COS(arg)
 
    ! Finally, if we are in the southern hemisphere, flip the i/j
    ! values to a coordinate system where (1,1) is the SW corner
@@ -47,12 +47,12 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
    ! algorithms which used the NE corner as the origin in the 
    ! southern hemisphere (left-hand vs. right-hand coordinate?)
    if (proj%hemi == -1.0) then
-      i = 2.0 - i  
-      j = 2.0 - j
+      x = 2.0 - x  
+      y = 2.0 - y
    end if
 
-   if (trace_use_dull) call da_trace_exit("da_llij_lc")
+   if (trace_use_dull) call da_trace_exit("da_llxy_lc")
 
-end subroutine da_llij_lc
+end subroutine da_llxy_lc
 
 

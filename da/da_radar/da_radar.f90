@@ -18,7 +18,7 @@ module da_radar
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_residual, map_info, da_latlon_to_ij, da_llxy
+   use da_tools, only : da_residual, map_info, da_llxy_wrf, da_llxy_default
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_radar_type" is ONLY used locally in da_radar:

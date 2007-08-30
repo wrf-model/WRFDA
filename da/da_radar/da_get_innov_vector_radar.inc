@@ -105,11 +105,11 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
       ! innovation vector:
 
       if (fg_format == fg_format_wrf) then
-         call da_latlon_to_ij(map_info, &
+         call da_llxy_wrf(map_info, &
             iv%radar(n)%stn_loc%lat, iv%radar(n)%stn_loc%lon, &
             iv%radar(n)%stn_loc%x,   iv%radar(n)%stn_loc%y)
       else
-         call da_llxy( iv%radar(n)%stn_loc%lat, iv%radar(n)%stn_loc%lon, &
+         call da_llxy_default( iv%radar(n)%stn_loc%lat, iv%radar(n)%stn_loc%lon, &
             iv%radar(n)%stn_loc%x,   iv%radar(n)%stn_loc%y)
       end if
 

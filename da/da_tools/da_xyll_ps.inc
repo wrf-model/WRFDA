@@ -1,13 +1,13 @@
-subroutine da_ijll_ps(i, j, proj, lat, lon)
+subroutine da_xyll_ps(x, y, proj, lat, lon)
 
    ! This is the inverse subroutine da_of llij_ps.  It returns the 
-   ! latitude and longitude of an i/j point given the projection info 
+   ! latitude and longitude of an x/y point given the projection info 
    ! structure.  
 
    implicit none
 
-   real, intent(in)                    :: i    ! Column
-   real, intent(in)                    :: j    ! Row
+   real, intent(in)                    :: x    ! Column
+   real, intent(in)                    :: y    ! Row
    type (proj_info), intent(in)        :: proj
     
    real, intent(out)                   :: lat     ! -90 -> 90 North
@@ -19,7 +19,7 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    real                                :: gi2, r2
    real                                :: arccos
 
-   if (trace_use_frequent) call da_trace_entry("da_ijll_ps")
+   if (trace_use_frequent) call da_trace_entry("da_xyll_ps")
 
    ! Compute the reference longitude by rotating 90 degrees to the east
    ! to find the longitude line parallel to the positive x-axis.
@@ -29,8 +29,8 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    scale_top = 1.0 + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
    ! Compute radius to point of interest
-   xx = i - proj%polei
-   yy = (j - proj%polej) * proj%hemi
+   xx = x - proj%polei
+   yy = (y - proj%polej) * proj%hemi
    r2 = xx**2 + yy**2
 
    ! Now the magic code
@@ -52,9 +52,8 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    if (lon > 180.0) lon = lon - 360.0
    if (lon < -180.0) lon = lon + 360.0
 
-   if (trace_use_frequent) call da_trace_exit("da_ijll_ps")
-   
-  
-end subroutine da_ijll_ps
+   if (trace_use_frequent) call da_trace_exit("da_xyll_ps")
+     
+end subroutine da_xyll_ps
 
 

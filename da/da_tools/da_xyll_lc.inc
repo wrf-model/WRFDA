@@ -1,12 +1,12 @@
-subroutine da_ijll_lc(i, j, proj, lat, lon)
+subroutine da_xyll_lc(x, y, proj, lat, lon)
 
-   ! subroutine da_to convert from the (i,j) cartesian coordinate to the 
+   ! subroutine da_to convert from the (x,y) cartesian coordinate to the 
    ! geographical latitude and longitude for a Lambert Conformal projection.
 
    implicit none
 
-   real, intent(in)              :: i        ! Cartesian X coordinate
-   real, intent(in)              :: j        ! Cartesian Y coordinate
+   real, intent(in)              :: x        ! Cartesian X coordinate
+   real, intent(in)              :: y        ! Cartesian Y coordinate
    type(proj_info),intent(in)    :: proj     ! Projection info structure
 
                 
@@ -21,7 +21,7 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    real                          :: xx
    real                          :: yy
 
-   if (trace_use_dull) call da_trace_entry("da_ijll_lc")
+   if (trace_use_dull) call da_trace_entry("da_xyll_lc")
 
 
    chi1 = (90.0 - proj%hemi*proj%truelat1)*rad_per_deg
@@ -30,11 +30,11 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    ! See if we are in the southern hemispere and flip the indices
    ! if we are. 
    if (proj%hemi == -1.0) then 
-      inew = -i + 2.0
-      jnew = -j + 2.0
+      inew = -x + 2.0
+      jnew = -y + 2.0
    else
-      inew = i
-      jnew = j
+      inew = x
+      jnew = y
    end if
 
    ! Compute radius**2 to i/j location
@@ -69,8 +69,8 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    if (lon > +180.0) lon = lon - 360.0
    if (lon < -180.0) lon = lon + 360.0
 
-   if (trace_use_dull) call da_trace_exit("da_ijll_lc")
+   if (trace_use_dull) call da_trace_exit("da_xyll_lc")
 
-end subroutine da_ijll_lc
+end subroutine da_xyll_lc
 
 

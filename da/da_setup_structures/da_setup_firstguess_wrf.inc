@@ -133,7 +133,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
       message(1)="Check the map_set correctness::::::::::::::::::::::::"
 
       ! Domain center:
-      call  da_latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
+      call  da_llxy_wrf(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
       write(unit=message(2),fmt='("Center: latc,lonc,x,y, Xc, Yc:",6f10.3)') &
                   grid%cen_lat, grid%cen_lon, start_x, start_y, &
                   real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0
@@ -172,7 +172,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
       write(unit=message(3),fmt='(a)')  &
          '## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##'
 
-      call da_latlon_to_ij(map_info, phic        , xlonc       , xxx, yyy)
+      call da_llxy_wrf(map_info, phic        , xlonc       , xxx, yyy)
 
       i_grid = nint(xxx-xxc)
       j_grid = nint(yyy-yyc)
@@ -194,8 +194,8 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
 
    call da_set_map_para ! set up the map background parameters
 
-   ! call da_llxy(PHIC,XLONC,X,Y)
-   call da_llxy(grid%cen_lat,grid%cen_lon,x,y)
+   ! call da_llxy_default(PHIC,XLONC,X,Y)
+   call da_llxy_default(grid%cen_lat,grid%cen_lon,x,y)
 
    !--------------------------------------------------------------------------
    ! [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 

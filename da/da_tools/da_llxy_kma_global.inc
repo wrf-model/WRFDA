@@ -1,4 +1,4 @@
-subroutine da_global_ll_to_xy(lat,lon,x,y)
+subroutine da_llxy_kma_global(lat,lon,x,y)
 
    !----------------------------------------------------------------------------
    ! Purpose:  calculates the(x,y) location(dot) in the global grids
@@ -12,7 +12,7 @@ subroutine da_global_ll_to_xy(lat,lon,x,y)
 
    real              :: xlat, xlon
 
-   if (trace_use_frequent) call da_trace_entry("da_global_ll_to_xy")
+   if (trace_use_frequent) call da_trace_entry("da_llxy_kma_global")
    
    xlat = lat - start_lat
    xlon = lon - start_lon
@@ -23,8 +23,8 @@ subroutine da_global_ll_to_xy(lat,lon,x,y)
    x = start_x + xlon/delt_lon
    y = start_y + xlat/delt_lat
 
-   if (trace_use_frequent) call da_trace_exit("da_global_ll_to_xy")
+   if (trace_use_frequent) call da_trace_exit("da_llxy_kma_global")
    
-end subroutine da_global_ll_to_xy
+end subroutine da_llxy_kma_global
 
 

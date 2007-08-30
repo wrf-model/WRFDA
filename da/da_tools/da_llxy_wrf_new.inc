@@ -1,7 +1,7 @@
-subroutine da_latlon_to_ij_new(proj, lat, lon, i, j)
+subroutine da_llxy_wrf_new(proj, lat, lon, x, y)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Converts input lat/lon values to the cartesian (i,j) value
+   ! Purpose: Converts input lat/lon values to the cartesian (x,y) value
    ! for the given projection. 
    !-----------------------------------------------------------------------
 
@@ -10,10 +10,10 @@ subroutine da_latlon_to_ij_new(proj, lat, lon, i, j)
    type(proj_info), intent(in)          :: proj
    real, intent(in)                     :: lat(:,:)
    real, intent(in)                     :: lon(:,:)
-   real, intent(out)                    :: i(:,:)
-   real, intent(out)                    :: j(:,:)
+   real, intent(out)                    :: x(:,:)
+   real, intent(out)                    :: y(:,:)
 
-   if (trace_use) call da_trace_entry("da_latlon_to_ij_new")
+   if (trace_use) call da_trace_entry("da_llxy_wrf_new")
 
    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
@@ -23,20 +23,20 @@ subroutine da_latlon_to_ij_new(proj, lat, lon, i, j)
    select case(proj%code)
  
       case(PROJ_LATLON)
-         call da_llij_latlon_new(lat,lon,proj,i,j)
+         call da_llxy_latlon_new(lat,lon,proj,x,y)
 
       case(PROJ_MERC)
-         call da_llij_merc_new(lat,lon,proj,i,j)
-         i(:,:) = i(:,:) + proj%knowni - 1.0
-         j(:,:) = j(:,:) + proj%knownj - 1.0
+         call da_llxy_merc_new(lat,lon,proj,x,y)
+         x(:,:) = x(:,:) + proj%knowni - 1.0
+         y(:,:) = y(:,:) + proj%knownj - 1.0
 
       case(PROJ_PS)
-         call da_llij_ps_new(lat,lon,proj,i,j)
+         call da_llxy_ps_new(lat,lon,proj,x,y)
       
       case(PROJ_LC)
-         call da_llij_lc_new(lat,lon,proj,i,j)
-         i(:,:) = i(:,:) + proj%knowni - 1.0
-         j(:,:) = j(:,:) + proj%knownj - 1.0
+         call da_llxy_lc_new(lat,lon,proj,x,y)
+         x(:,:) = x(:,:) + proj%knowni - 1.0
+         y(:,:) = y(:,:) + proj%knownj - 1.0
 
       case default
          write(unit=message(1),fmt='(A,I2)') &
@@ -44,8 +44,8 @@ subroutine da_latlon_to_ij_new(proj, lat, lon, i, j)
          call da_error(__FILE__,__LINE__,message(1:1))
    end select
 
-   if (trace_use) call da_trace_exit("da_latlon_to_ij_new")
+   if (trace_use) call da_trace_exit("da_llxy_wrf_new")
 
-end subroutine da_latlon_to_ij_new
+end subroutine da_llxy_wrf_new
 
 

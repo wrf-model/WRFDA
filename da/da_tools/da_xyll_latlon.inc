@@ -1,13 +1,13 @@
-subroutine da_ijll_latlon(i, j, proj, lat, lon)
+subroutine da_xyll_latlon(x, y, proj, lat, lon)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Compute the lat/lon location of an i/j on a LATLON grid.
+   ! Purpose: Compute the lat/lon location of an x/y on a LATLON grid.
    !-----------------------------------------------------------------------
 
    implicit none
 
-   real, intent(in)             :: i
-   real, intent(in)             :: j
+   real, intent(in)             :: x
+   real, intent(in)             :: y
    type(proj_info), intent(in)  :: proj
    real, intent(out)            :: lat
    real, intent(out)            :: lon
@@ -17,7 +17,7 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
    real                         :: latinc
    real                         :: loninc
 
-   if (trace_use_frequent) call da_trace_entry("da_ijll_latlon")
+   if (trace_use_frequent) call da_trace_entry("da_xyll_latlon")
 
    ! Extract the latitude and longitude increments for this grid
    ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
@@ -28,8 +28,8 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
 
    ! Compute deltalat and deltalon 
 
-   deltalat = (j-1.0)*latinc
-   deltalon = (i-1.0)*loninc
+   deltalat = (x-1.0)*latinc
+   deltalon = (y-1.0)*loninc
    lat = proj%lat1 + deltalat
    lon = proj%lon1 + deltalon
 
@@ -43,8 +43,8 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
       if (lon > 180.0) lon = lon -360.0
    end if
 
-   if (trace_use_frequent) call da_trace_exit("da_ijll_latlon")
+   if (trace_use_frequent) call da_trace_exit("da_xyll_latlon")
 
-end subroutine da_ijll_latlon
+end subroutine da_xyll_latlon
 
 

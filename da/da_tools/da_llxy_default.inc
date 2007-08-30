@@ -1,4 +1,4 @@
-subroutine da_llxy (xlati,xloni,x,y)
+subroutine da_llxy_default (xlati,xloni,x,y)
 
    !----------------------------------------------------------------------------
    ! Purpose:  calculates the (x,y) location (dot) in the mesoscale grids
@@ -32,7 +32,7 @@ subroutine da_llxy (xlati,xloni,x,y)
    real              :: bb
    real, parameter   :: conv = 180.0 / pi
 
-   if (trace_use_frequent) call da_trace_entry("da_llxy")
+   if (trace_use_frequent) call da_trace_entry("da_llxy_default")
    
    xlon = xloni
    xlat = xlati
@@ -101,8 +101,8 @@ subroutine da_llxy (xlati,xloni,x,y)
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5
 
-   if (trace_use_frequent) call da_trace_exit("da_llxy")
+   if (trace_use_frequent) call da_trace_exit("da_llxy_default")
 
-end subroutine da_llxy
+end subroutine da_llxy_default
 
 

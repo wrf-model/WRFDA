@@ -1,4 +1,4 @@
-subroutine da_llij_lc_new(lat, lon, proj, i, j)
+subroutine da_llxy_lc_new(lat, lon, proj, x, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: compute the geographical latitude and longitude values
@@ -11,8 +11,8 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
    real, intent(in)              :: lon(:,:)      ! Longitude (-180->180 E)
    type(proj_info),intent(in)      :: proj     ! Projection info structure
 
-   real, intent(out)             :: i(:,:)        ! Cartesian X coordinate
-   real, intent(out)             :: j(:,:)        ! Cartesian Y coordinate
+   real, intent(out)             :: x(:,:)        ! Cartesian X coordinate
+   real, intent(out)             :: y(:,:)        ! Cartesian Y coordinate
 
 
    real    :: tl1r
@@ -23,7 +23,7 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
 
    integer :: a,b
 
-   if (trace_use) call da_trace_entry("da_llij_lc_new")
+   if (trace_use) call da_trace_entry("da_llxy_lc_new")
 
 ! FAST
     
@@ -37,19 +37,19 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
    ! it is not in the cut zone
 
 !   where (lon - proj%stdlon > +180.0)
-!      i = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
+!      x = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
 !         * SIN(proj%cone*((lon - proj%stdlon-360.0)*rad_per_deg))
-!      j = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
+!      y = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
 !         * COS(proj%cone*((lon - proj%stdlon-360.0)*rad_per_deg))
 !   elsewhere  (lon - proj%stdlon - -180.0)
-!      i = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1) &
+!      x = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1) &
 !         * SIN(proj%cone*((lon - proj%stdlon+360.0)*rad_per_deg))
-!      j = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
+!      y = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
 !         * COS(proj%cone*((lon - proj%stdlon+360.0)*rad_per_deg))
 !   else
-!      i = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1) &
+!      x = proj%polei + proj%hemi * (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1) &
 !         * SIN(proj%cone*((lon - proj%stdlon)*rad_per_deg))
-!      j = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
+!      y = proj%polej - (temp2 * (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / temp1)**proj%cone &
 !         * COS(proj%cone*((lon - proj%stdlon)*rad_per_deg))
 !   end where
 
@@ -59,8 +59,8 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
    ! algorithms which used the NE corner as the origin in the 
    ! southern hemisphere (left-hand vs. right-hand coordinate?)
 !   if (proj%hemi == -1.0) then
-!      i(:,:) = 2.0 - i(:,:)
-!      j(:,:) = 2.0 - j(:,:)
+!      x(:,:) = 2.0 - i(:,:)
+!      y(:,:) = 2.0 - j(:,:)
 !   end if
 
 ! SLOW
@@ -84,8 +84,8 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
               TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
 	 arg = proj%cone*(deltalon*rad_per_deg)
-	 i(a,b) = proj%polei + proj%hemi * rm * Sin(arg)
-	 j(a,b) = proj%polej - rm * COS(arg)
+	 x(a,b) = proj%polei + proj%hemi * rm * Sin(arg)
+	 y(a,b) = proj%polej - rm * COS(arg)
 
 	 ! Finally, if we are in the southern hemisphere, flip the i/j
 	 ! values to a coordinate system where (1,1) is the SW corner
@@ -93,14 +93,14 @@ subroutine da_llij_lc_new(lat, lon, proj, i, j)
 	 ! algorithms which used the NE corner as the origin in the 
 	 ! southern hemisphere (left-hand vs. right-hand coordinate?)
 	 if (proj%hemi == -1.0) then
-	    i(a,b) = 2.0 - i(a,b)  
-	    j(a,b) = 2.0 - j(a,b)
+	    x(a,b) = 2.0 - x(a,b)  
+	    y(a,b) = 2.0 - y(a,b)
 	 end if
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_llij_lc_new")
+   if (trace_use) call da_trace_exit("da_llxy_lc_new")
 
-end subroutine da_llij_lc_new
+end subroutine da_llxy_lc_new
 
 

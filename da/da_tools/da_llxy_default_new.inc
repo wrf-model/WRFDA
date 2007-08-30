@@ -1,4 +1,4 @@
-subroutine da_llxy_new (xlati,xloni,x,y)
+subroutine da_llxy_default_new (xlati,xloni,x,y)
 
    !----------------------------------------------------------------------------
    !
@@ -41,7 +41,7 @@ subroutine da_llxy_new (xlati,xloni,x,y)
 
    integer :: i,j
 
-   if (trace_use) call da_trace_entry("da_llxy_new")
+   if (trace_use) call da_trace_entry("da_llxy_default_new")
 
    ! Slow, but I can't be arsed to do all the temporary arrays
 
@@ -118,8 +118,8 @@ subroutine da_llxy_new (xlati,xloni,x,y)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_llxy_new")
+   if (trace_use) call da_trace_exit("da_llxy_default_new")
 
-end subroutine da_llxy_new
+end subroutine da_llxy_default_new
 
 

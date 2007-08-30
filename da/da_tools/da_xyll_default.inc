@@ -1,4 +1,4 @@
-subroutine da_xyll(XX,YY,XLAT,XLON)
+subroutine da_xyll_default(XX,YY,XLAT,XLON)
 
    !-----------------------------------------------------------------------
    ! Purpose: calculates the latitudes and longitudes from the
@@ -21,7 +21,7 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
    real              :: rcone_factor, psx, conv
    real              :: cntri, cntrj, x, y, xcntr
 
-   if (trace_use) call da_trace_entry("da_xyll")
+   if (trace_use) call da_trace_entry("da_xyll_default")
    
    conv = 180.0 / pi
 
@@ -86,8 +86,8 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
       xlat = 2.0*(conv*atan(cell))-90.0 
    end if  
 
-   if (trace_use) call da_trace_exit("da_xyll")
+   if (trace_use) call da_trace_exit("da_xyll_default")
 
-end subroutine da_xyll
+end subroutine da_xyll_default
 
 

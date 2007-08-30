@@ -25,11 +25,11 @@ subroutine da_ll_to_xy (info, loc, xp, &
    ! get the (x, y) coordinates
 
    if (fg_format == fg_format_wrf) then
-      call da_latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_wrf(map_info, info%lat, info%lon, loc%x, loc%y)
    else if (fg_format == fg_format_kma_global) then
-      call da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_kma_global (info%lat, info%lon, loc%x, loc%y)
    else
-      call da_llxy (info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_default (info%lat, info%lon, loc%x, loc%y)
    end if
 
    call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)!
