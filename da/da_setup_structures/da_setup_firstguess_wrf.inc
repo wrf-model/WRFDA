@@ -142,7 +142,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
       start_y = real(grid%xp%jde-grid%xp%jds+2)/2.0
       lat_cen = -999.9
       lon_cen = -999.9
-      call  da_ij_to_latlon(map_info, start_x, start_y, lat_cen, lon_cen)
+      call  da_xyll(map_info, start_x, start_y, lat_cen, lon_cen)
       write(unit=message(3), &
          fmt='("Center: X, Y, latc, lonc, phic, xlonc:",6f10.3)') &
          start_x, start_y, lat_cen, lon_cen,   &

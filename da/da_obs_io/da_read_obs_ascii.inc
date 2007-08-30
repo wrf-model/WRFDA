@@ -257,7 +257,7 @@ subroutine da_read_obs_ascii (iv, xp, filename)
          exit
       end if
 
-      call da_ll_to_xy (platform%info, platform%loc, xp, outside, outside_all)
+      call da_llxy (platform%info, platform%loc, xp, outside, outside_all)
 
       if (outside_all) then
          cycle reports

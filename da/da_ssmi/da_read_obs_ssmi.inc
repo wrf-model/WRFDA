@@ -152,7 +152,7 @@ subroutine da_read_obs_ssmi (iv, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_ll_to_xy (info, loc, xp, outside, outside_all)
+      call da_llxy (info, loc, xp, outside, outside_all)
 
       if (outside_all) cycle reports
 

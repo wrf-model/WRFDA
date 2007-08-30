@@ -221,7 +221,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
          info%lat  =  bfr1bhdr(bufr_lat)
          info%lon  =  bfr1bhdr(bufr_lon)
-         call da_ll_to_xy (info, loc, xp, outside, outside_all)
+         call da_llxy (info, loc, xp, outside, outside_all)
 
          if (outside_all) cycle
 

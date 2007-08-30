@@ -144,7 +144,7 @@
    !       of the following routines:
    !       
    !       da_latlon_to_ij(proj, lat, lon, i, j)
-   !       da_ij_to_latlon(proj, i, j, lat, lon)
+   !       da_xyll(proj, i, j, lat, lon)
    !
    !       It is incumbent upon the calling routine to determine whether or
    !       not the values returned are within your domain's bounds.  All values

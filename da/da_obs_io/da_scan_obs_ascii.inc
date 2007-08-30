@@ -160,7 +160,7 @@ subroutine da_scan_obs_ascii (iv, xp, filename)
       if (report < report_start) cycle
       if (report > report_end) exit
 
-      call da_ll_to_xy (platform%info, platform%loc, xp, outside, outside_all)
+      call da_llxy (platform%info, platform%loc, xp, outside, outside_all)
 
       if (platform%info%levels < 1) then
          if (fm /= 111) then

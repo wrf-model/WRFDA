@@ -1,4 +1,4 @@
-subroutine da_ij_to_latlon(proj, xx, yy, lat, lon)
+subroutine da_xyll(proj, xx, yy, lat, lon)
 
    !-----------------------------------------------------------------------
    ! Purpose: Computes geographical latitude and longitude for a given (i,j) 
@@ -15,7 +15,7 @@ subroutine da_ij_to_latlon(proj, xx, yy, lat, lon)
 
    real :: x, y
 
-   if (trace_use) call da_trace_entry("da_ij_to_latlon")
+   if (trace_use) call da_trace_entry("da_xyll")
 
    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
@@ -50,8 +50,8 @@ subroutine da_ij_to_latlon(proj, xx, yy, lat, lon)
 
    end select
 
-   if (trace_use) call da_trace_exit("da_ij_to_latlon")
+   if (trace_use) call da_trace_exit("da_xyll")
 
-end subroutine da_ij_to_latlon
+end subroutine da_xyll
 
 

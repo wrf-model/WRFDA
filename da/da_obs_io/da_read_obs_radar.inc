@@ -183,7 +183,7 @@ subroutine da_read_obs_radar (iv, xp, filename)
             end if
          end do
 
-         call da_ll_to_xy (platform%info, platform%loc, xp, outside)
+         call da_llxy (platform%info, platform%loc, xp, outside)
 
          nlevels = platform%info%levels
 

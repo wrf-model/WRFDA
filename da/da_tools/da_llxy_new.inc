@@ -1,4 +1,4 @@
-subroutine da_ll_to_xy_new (info, loc, xp, outside, outside_all)
+subroutine da_llxy_new (info, loc, xp, outside, outside_all)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -14,7 +14,7 @@ subroutine da_ll_to_xy_new (info, loc, xp, outside, outside_all)
    logical,               intent(inout) :: outside(:,:)      ! wrt local domain
    logical, optional,     intent(out)   :: outside_all(:,:)  ! wrt all domains
 
-   if (trace_use) call da_trace_entry("da_ll_to_xy_new")
+   if (trace_use) call da_trace_entry("da_llxy_new")
 
    outside(:,:) = .false.
    loc%x(:,:)   = -1.0
@@ -88,8 +88,8 @@ subroutine da_ll_to_xy_new (info, loc, xp, outside, outside_all)
       end where 
    end if
 
-   if (trace_use) call da_trace_exit("da_ll_to_xy_new")
+   if (trace_use) call da_trace_exit("da_llxy_new")
 
-end subroutine da_ll_to_xy_new
+end subroutine da_llxy_new
 
 

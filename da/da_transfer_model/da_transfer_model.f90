@@ -45,7 +45,7 @@ module da_transfer_model
       da_write_kma_increments,da_cloud_model
    use da_ssmi, only : da_transform_xtotb
    use da_tools, only : map_info, proj_merc, proj_ps,proj_lc,proj_latlon, &
-      da_llxy_default,da_llxy_wrf,da_ij_to_latlon,da_diff_seconds,da_map_set, &
+      da_llxy_default,da_llxy_wrf,da_xyll,da_diff_seconds,da_map_set, &
       da_set_boundary_xb
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_vtox_transforms, only : da_get_vpoles

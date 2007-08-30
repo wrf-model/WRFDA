@@ -64,7 +64,7 @@ subroutine da_read_filtered_rad( xp, iv )
             iv%instid(i)%tb_error(:,n)    , &
             iv%instid(i)%tb_qc(:,n)
 
-         call da_ll_to_xy (iv%instid(i)%info(n), iv%instid(i)%loc(n), xp, outside)
+         call da_llxy (iv%instid(i)%info(n), iv%instid(i)%loc(n), xp, outside)
          ! if (outside) cycle
 
       end do     ! end do pixels

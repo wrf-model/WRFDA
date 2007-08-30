@@ -1,4 +1,4 @@
-subroutine da_ll_to_xy (info, loc, xp, &
+subroutine da_llxy (info, loc, xp, &
                         outside, outside_all)
 
    !-----------------------------------------------------------------------
@@ -16,7 +16,7 @@ subroutine da_ll_to_xy (info, loc, xp, &
    logical, optional,     intent(out)   :: outside_all  !wrt all domains
 
    ! too many return statments to trace
-   ! if (trace_use_frequent) call da_trace_entry("da_ll_to_xy")
+   ! if (trace_use_frequent) call da_trace_entry("da_llxy")
 
    outside = .false.
    loc % x   = -1.0
@@ -97,8 +97,8 @@ subroutine da_ll_to_xy (info, loc, xp, &
       end if
    end if
 
-   ! if (trace_use_frequent) call da_trace_exit("da_ll_to_xy")
+   ! if (trace_use_frequent) call da_trace_exit("da_llxy")
 
-end subroutine da_ll_to_xy
+end subroutine da_llxy
 
 

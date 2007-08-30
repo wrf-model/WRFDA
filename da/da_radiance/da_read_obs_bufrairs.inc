@@ -297,7 +297,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
         info%lat  = airsspot%clath
         info%lon  = airsspot%clonh 
-        call da_ll_to_xy (info, loc, xp, outside, inside_halo )
+        call da_llxy (info, loc, xp, outside, inside_halo )
         if (outside) cycle LOOP_OBSPOinTS
 
 !  4.1  Check obs time

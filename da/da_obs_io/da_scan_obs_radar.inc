@@ -121,7 +121,7 @@ subroutine da_scan_obs_radar (iv, xp, filename)
                              platform % each (i) % rf % error
          end do
 
-         call da_ll_to_xy (platform%info, platform%loc, xp, outside)
+         call da_llxy (platform%info, platform%loc, xp, outside)
 
          nlevels = platform%info%levels
 
