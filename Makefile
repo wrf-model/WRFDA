@@ -385,6 +385,6 @@ da_tracing.o : da/da_tracing/da_tracing.f90
 
 da_memory.o : da/da_tracing/da_memory.c
 	$(RM) $@
-	$(CC) -c $(CCFLAGS) -DNOUNDERSCORE -DMACOS da/da_tracing/da_memory.c
+	$(CC) -c $(CFLAGS) -DMACOS da/da_tracing/da_memory.c
 
 # DO NOT DELETE

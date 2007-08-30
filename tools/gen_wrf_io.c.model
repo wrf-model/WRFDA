@@ -399,34 +399,14 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
           else                      sprintf(memord,"0") ;
 	  if ( sw_io == GEN_INPUT )
 	  {
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-            } 
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-            }
-/*End Wei's change for 4dvar*/
+            if ( !strncmp( p->use, "dyn_", 4 ) )
+              fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
             if ( ok_to_collect_distribute )
 	      fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-/*Wei's change for 4dvar*/
-            if(var)
-              fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
-              fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-/*End Wei's change for 4dvar*/
+            fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
             fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
             fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
             fprintf(fp,"                       grid%%communicator , &  ! Comm\n") ;
@@ -454,32 +434,12 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
 	  {
             if ( ok_to_collect_distribute )
               fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-              {
-                if ( p->var_name[var] == 'a' )
-                  fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s_AD ) THEN\n",p->use) ;
-                else if ( p->var_name[var] == 'g' )
-	          fprintf(fp,"IF ((grid%%dyn_opt .EQ. %s_TL) .or. (grid%%dyn_opt .EQ. %s_AD)) THEN\n",p->use,p->use) ;
-              }
-            } 
-            else
-            {
-              if ( !strncmp( p->use, "dyn_", 4 ) )
-                fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-            }
-/*End Wei's change for 4dvar*/
+            if ( !strncmp( p->use, "dyn_", 4 ) )
+              fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
             fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
-/*Wei's change for 4dvar*/
-            if(var)
-              fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
-              fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
-/*End Wei's change for 4dvar*/
+            fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
             fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
             fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
             fprintf(fp,"                       grid%%communicator , &  ! Comm\n") ;
@@ -492,17 +452,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
             fprintf(fp,"                       '%s'               , &  ! Dimname 1 \n",dimname[0] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 2 \n",dimname[1] ) ;
             fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimname[2] ) ;
-/*Wei's change for 4dvar*/
-            if(var)
-            {
-              if(p->var_name[var] == 'a')
-                 fprintf(fp,"                       'GRADIENT %s'               , &  ! Desc  \n",p->descrip ) ;
-              else
-                 fprintf(fp,"                       'PETURBATION %s'               , &  ! Desc  \n",p->descrip ) ;
-            }
-            else
-              fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
-/*End Wei's change for 4dvar*/
+            fprintf(fp,"                       '%s'               , &  ! Desc  \n",p->descrip ) ;
             fprintf(fp,"                       '%s'               , &  ! Units \n",p->units ) ;
             fprintf(fp,"'%s ext_write_field %s memorder %s' , & ! Debug message\n",fname,dname,memord ) ;
             /* global dimensions */

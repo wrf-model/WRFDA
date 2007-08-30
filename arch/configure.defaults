@@ -4372,7 +4372,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSI
                          CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -4479,7 +4479,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -4590,7 +4590,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSI
                          CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -4700,7 +4700,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -4815,7 +4815,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../chem -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -4928,7 +4928,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARA
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../chem -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -5281,7 +5281,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSI
                          CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -5393,7 +5393,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -5511,7 +5511,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARA
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -5974,7 +5974,7 @@ FCOPTIM		=
 FCFLAGS		=	$(FCOPTIM) $(FCBASEOPTS) $(OMP)
 CFLAGS		=       -w
 EXTRAMODULES    =       
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLIMIT_ARGS -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
                         -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE -DIFORT_KLUDGE
@@ -6095,7 +6095,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 			-DLIMIT_ARGS -DSTUBMPI -DIFORT_KLUDGE
 CFLAGS          =       -w -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -6321,7 +6321,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 			-DLIMIT_ARGS -DSTUBMPI -DIFORT_KLUDGE
 CFLAGS          =       -w -DDM_PARALLEL -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL $(ARCHFLAGS)
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -6438,7 +6438,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 			-DLIMIT_ARGS -DIFORT_KLUDGE 
 CFLAGS          =       -w -DDM_PARALLEL -DWRF_RSL_IO $(ARCHFLAGS) \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -6554,7 +6554,7 @@ ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DWRF_RSL
 			-DLIMIT_ARGS -DIFORT_KLUDGE 
 CFLAGS          =       -w -DDM_PARALLEL -DWRF_RSL_IO $(ARCHFLAGS) \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL/RSL
-INCLUDE_MODULES =       -module ../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
+INCLUDE_MODULES =       -I../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../external -I../frame -I../share -I../phys -I../inc
 EXTRAMODULES    =       
 PERL            =       perl
@@ -8632,7 +8632,7 @@ mediation_force_domain.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt $*.f
 
 ###########################################################
-#ARCH Darwin		(single-threaded, no nesting, g95 compiler)
+#ARCH Intel xeon i686 ia32 Xeon Linux, g95 compiler (single-threaded, no nesting)
 #     
 #     Using -qfloat=nomaf option can result in identical results with
 #           non-optimized and optimized results (suggested by Fovell of UCLA)
