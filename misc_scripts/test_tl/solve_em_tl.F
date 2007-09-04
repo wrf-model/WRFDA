@@ -2651,6 +2651,11 @@ BENCH_END(bc_end_tim)
 
  END DO Runge_Kutta_loop
 
+#ifndef NO_HALO_FIX
+  filecount = 10000
+#include <all_g_debug_halo.h>
+#endif
+
 !----------------
 !----------------
 !  goto 6789 !zzma
@@ -2719,6 +2724,10 @@ BENCH_START(moist_physics_prep_tim)
                                    min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 BENCH_END(moist_physics_prep_tim)
 
+#ifndef NO_HALO_FIX
+  filecount = 15000
+#include <all_g_debug_halo.h>
+#endif
 
     CALL g_lscond ( t_2,g_t_2,p_phy,g_p_phy,moist_2(ims,kms,jms,P_QV),    &
                     g_moist_2(ims,kms,jms,P_QV),rho,g_rho,                &
@@ -2733,6 +2742,11 @@ BENCH_END(moist_physics_prep_tim)
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )
 BENCH_START(moist_phys_end_tim)
 
+#ifndef NO_HALO_FIX
+  filecount = 16000
+#include <all_g_debug_halo.h>
+#endif
+
        CALL  g_moist_physics_finish_em( t_2, g_t_2, t_1, g_t_1, t0, muts, &
                                         g_muts, h_diabatic, g_h_diabatic, dtm, config_flags, &
                                         ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, &
@@ -2741,6 +2755,11 @@ BENCH_START(moist_phys_end_tim)
                                         max(grid%j_start(ij),jds+sz),          &
                                         min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 
+#ifndef NO_HALO_FIX
+  filecount = 17000
+#include <all_g_debug_halo.h>
+#endif
+
     call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb,mu_2,   &
                            g_mu_2,muts,g_muts,ph_2,g_ph_2,p,g_p,pb,t_2,g_t_2,p0,t0,dnw,&
                            rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
@@ -2748,6 +2767,11 @@ BENCH_START(moist_phys_end_tim)
                            min(grid%i_end(ij),ide-1-sz),          &
                            max(grid%j_start(ij),jds+sz),          &
                            min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
+
+#ifndef NO_HALO_FIX
+  filecount = 18000
+#include <all_g_debug_halo.h>
+#endif
 
       IF (.not. non_hydrostatic) THEN
       call g_diagnose_w( ph_tend,g_ph_tend,ph_2,g_ph_2,ph_1,g_ph_1,w_2,   &
@@ -2760,6 +2784,11 @@ BENCH_START(moist_phys_end_tim)
       ENDIF
 
 BENCH_END(moist_phys_end_tim)
+
+#ifndef NO_HALO_FIX
+  filecount = 19000
+#include <all_g_debug_halo.h>
+#endif
 
   ENDIF
 
@@ -2808,6 +2837,11 @@ BENCH_END(time_filt_tim)
 
     END IF
     endif
+
+#ifndef NO_HALO_FIX
+  filecount = 20000
+#include <all_g_debug_halo.h>
+#endif
 
    !  We're finished except for boundary condition (and patch) update
 
