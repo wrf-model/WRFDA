@@ -92,10 +92,6 @@ for tlfile in $( ls -1 ${tlout}* ) ; do
   $( $cmd ) | wc
 done
 
-exit 0
-
-#$$$here...  haven't finished the scp'ing bits yet...
-
 # transfer ASCII output files
 scp $errfile hender@loquat.mmm.ucar.edu:${targetdir}/${errfilescp} || \
   ErrorNoExit "failed to scp file ${errfile}"

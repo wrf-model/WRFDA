@@ -3062,8 +3062,8 @@ BENCH_END(bc_2d_tim)
 #ifndef NO_HALO_FIX
   filecount = 99999
 #include <all_g_debug_halo.h>
-  call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
-  call wrf_shutdown
+!  call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
+!  call wrf_shutdown
 #endif
 
    RETURN
