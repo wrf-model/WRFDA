@@ -319,7 +319,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 0
-#include <all_debug_halo.h>
+#include <all_g_debug_halo.h>
 #endif
 
  Runge_Kutta_loop:  DO rk_step = 1, rk_order
@@ -380,7 +380,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 3
-#include <all_debug_halo.h>
+#include <all_g_debug_halo.h>
 #endif
 
 !
@@ -3027,7 +3027,7 @@ BENCH_END(bc_2d_tim)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 99999
-#include <all_debug_halo.h>
+#include <all_g_debug_halo.h>
   call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
   call wrf_shutdown
 #endif
