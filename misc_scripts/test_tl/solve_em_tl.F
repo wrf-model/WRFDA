@@ -1,6 +1,7 @@
 !WRF:MEDIATION_LAYER:SOLVER
 ! TBH:  Use this to turn off halo tests.  
-#define NO_HALO_FIX
+! #define NO_HALO_FIX
+#undef NO_HALO_FIX
 
 SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Actual arguments generated from Registry
@@ -3022,6 +3023,14 @@ BENCH_END(bc_2d_tim)
 !----------------
 !6789 continue !zzma
 !----------------
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 99999
+#include <all_debug_halo.h>
+  call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
+  call wrf_shutdown
+#endif
 
    RETURN
 
