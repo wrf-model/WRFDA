@@ -75,9 +75,19 @@ chmod a+x ${jobscript} || ErrorExit "failed to chmod job script ${jobscript}"
 # run wrfplus
 bsub -K < ${jobscript}
 
-# test
+# compare vs. baseline run with same number of tasks (even if baseline is wrong)
+print
+print "compare vs. baseline ${num_tasks}-task(s) run"
 for tlfile in $( ls -1 ${tlout}* ) ; do
   cmd="cmp -l ${baselinedir}/${tlfile} ${tlfile}"
+  print $cmd
+  $( $cmd ) | wc
+done
+print
+print "compare vs. baseline 1-task run"
+# compare vs. 1-task baseline run
+for tlfile in $( ls -1 ${tlout}* ) ; do
+  cmd="cmp -l 1proc_me/${tlfile} ${tlfile}"
   print $cmd
   $( $cmd ) | wc
 done
