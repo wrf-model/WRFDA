@@ -1,4 +1,6 @@
 !WRF:MEDIATION_LAYER:SOLVER
+! TBH:  Use this to turn off halo tests.  
+#define NO_HALO_FIX
 
 SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Actual arguments generated from Registry
@@ -68,6 +70,15 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    INTEGER                         :: ijds, ijde
    INTEGER                         :: itmpstep
    INTEGER                         :: sz
+
+#ifndef NO_HALO_FIX
+   INTEGER                         :: filecount
+   INTEGER,PARAMETER               :: min_filecount=0
+!   INTEGER,PARAMETER               :: max_filecount=1026
+!   INTEGER,PARAMETER               :: min_filecount=19000
+   INTEGER,PARAMETER               :: max_filecount=99999
+   CHARACTER*256     :: msg
+#endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
@@ -304,6 +315,12 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
  IF(rk_ord == 1) leapfrog = .true.
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 0
+#include <all_debug_halo.h>
+#endif
+
  Runge_Kutta_loop:  DO rk_step = 1, rk_order
 
    !  Set the step size and number of small timesteps for
@@ -358,6 +375,12 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
       CALL wrf_error_fatal( wrf_err_message )
 
    END IF
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 3
+#include <all_debug_halo.h>
+#endif
 
 !
 !  Time level t is in the *_2 variable in the first part 
