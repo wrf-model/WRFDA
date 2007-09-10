@@ -430,6 +430,12 @@ BENCH_START(step_prep_tim)
 
    END DO
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 4
+#include <all_g_debug_halo.h>
+#endif
+
    !$OMP END PARALLEL DO
 BENCH_END(step_prep_tim)
 
@@ -476,6 +482,12 @@ BENCH_END(step_prep_tim)
 #endif
 
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 5
+#include <all_g_debug_halo.h>
+#endif
 
 BENCH_START(set_phys_bc_tim)
    if(dyn_opt == DYN_EM) then
@@ -544,6 +556,8 @@ BENCH_END(init_zero_tend_tim)
 #ifdef DM_PARALLEL
 #     include "HALO_EM_PHYS_A.inc"
 #     include "HALO_EM_PHYS_TL_A.inc"
+! TBH:  OVERWRITE u_2,v_2
+! TBH:  OVERWRITE g_u_2,g_v_2
 #endif
 
 !<DESCRIPTION>
@@ -560,6 +574,12 @@ BENCH_END(init_zero_tend_tim)
 !              3D TKE and mixing.
 !<pre>
 !</DESCRIPTION>
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 6
+#include <all_g_debug_halo.h>
+#endif
 
 
 BENCH_START(phy_prep_tim)
@@ -742,6 +762,12 @@ BENCH_END(cu_driver_tim)
 
 ! calculate_phy_tend
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 7
+#include <all_g_debug_halo.h>
+#endif
+
 BENCH_START(cal_phy_tend)
       if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
@@ -793,6 +819,12 @@ BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL
 #  include "PERIOD_BDY_EM_A1.inc"
+#endif
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 8
+#include <all_g_debug_halo.h>
 #endif
 
 BENCH_START(tke_diff_bc_tim)
@@ -1113,6 +1145,12 @@ BENCH_END(hor_diff_tim)
 
      END IF rk_step_is_one
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 9
+#include <all_g_debug_halo.h>
+#endif
+
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
@@ -1151,6 +1189,13 @@ BENCH_END(hor_diff_tim)
 &cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog,ids,ide,jds,jde,kde,ims,&
 &ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 10
+#include <all_g_debug_halo.h>
+! all fields OK here
+#endif
+
 !--------------------------------------------------------------------------
 !! Xiaoyan Zhang Add surface drag TL here 11/28/2006  !!
 !--------------------------------------------------------------------------
@@ -1167,7 +1212,21 @@ BENCH_END(hor_diff_tim)
 #endif
    
    
+#ifdef DM_PARALLEL
+#     include "HALO_EM_SD_TL.inc"
+#endif
+
 !call TL
+! TBH:  OVERWRITE g_ru_tendf, g_rv_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [i-1,i,   ], [   ,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  g_v_2    ( [i-1,i,   ], [   ,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [   ,i,i+1], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  g_u_2    ( [   ,i,i+1], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xland    ( [i-1,i,   ], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  g_z      ( [i-1,i,   ], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  g_z_at_w ( [i-1,i,   ], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  z        ( [i-1,i,   ], [j-1,j,   ] )
+! TBH:  HORIZONTAL DEPENDENCE:  z_at_w   ( [i-1,i,   ], [j-1,j,   ] )
   call   g_surface_drag( ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, u_2, g_u_2, v_2, g_v_2, xland, muu, g_muu, muv, &
   &g_muv, z, g_z, z_at_w, g_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, grid%i_start(ij), grid%i_end(ij),  grid%j_start(ij), grid%j_end(ij) , k_start, k_end )
 
@@ -1183,6 +1242,13 @@ BENCH_END(hor_diff_tim)
    END DO
    !$OMP END PARALLEL DO
 BENCH_END(rk_tend_tim)
+
+! TBH:  turn this off once halo debugging is finished
+! g_rv_tendf has gone bad by this point
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 11
+#include <all_g_debug_halo.h>
+#endif
 
 BENCH_START(relax_bdy_dry_tim)
    !$OMP PARALLEL DO   &
@@ -1262,6 +1328,12 @@ BENCH_START(relax_bdy_dry_tim)
    END DO
    !$OMP END PARALLEL DO
 BENCH_END(relax_bdy_dry_tim)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 12
+#include <all_g_debug_halo.h>
+#endif
 
 
 !<DESCRIPTION>
@@ -1360,6 +1432,12 @@ BENCH_START(small_step_prep_tim)
 
    !$OMP END PARALLEL DO
 BENCH_END(small_step_prep_tim)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 13
+#include <all_g_debug_halo.h>
+#endif
 
 !----------------
 !----------------
@@ -1492,6 +1570,12 @@ BENCH_START(set_phys_bc2_tim)
     endif
 BENCH_END(set_phys_bc2_tim)
 
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 14
+#include <all_g_debug_halo.h>
+#endif
 
    small_steps : DO iteration = 1 , number_of_small_timesteps
 
@@ -1861,6 +1945,12 @@ BENCH_END(phys_bc_tim)
 
    END DO small_steps
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 15
+#include <all_g_debug_halo.h>
+#endif
+
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
@@ -1913,6 +2003,12 @@ BENCH_END(small_step_finish_tim)
    END DO
    !$OMP END PARALLEL DO
 
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 16
+#include <all_g_debug_halo.h>
+#endif
 
 
 #ifdef DM_PARALLEL
@@ -2237,6 +2333,12 @@ BENCH_END(flow_depbdy_tim)
 
  ENDIF moist_scalar_advance
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 17
+#include <all_g_debug_halo.h>
+#endif
+
 BENCH_START(tke_adv_tim)
  if(dyn_opt == DYN_EM) then
  TKE_advance: IF (km_opt .eq. 2) then
@@ -2326,6 +2428,12 @@ BENCH_START(tke_adv_tim)
    END IF TKE_advance
    endif
 BENCH_END(tke_adv_tim)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 18
+#include <all_g_debug_halo.h>
+#endif
 
 !  next the chemical species
 
@@ -2417,6 +2525,12 @@ BENCH_END(tke_adv_tim)
 
  ENDIF chem_scalar_advance
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 19
+#include <all_g_debug_halo.h>
+#endif
+
  !  update the pressure and density at the new time level
 
    !$OMP PARALLEL DO   &
@@ -2460,6 +2574,12 @@ BENCH_END(diag_w_tim)
 
    ENDDO
    !$OMP END PARALLEL DO
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 20
+#include <all_g_debug_halo.h>
+#endif
 
 !  Reset the boundary conditions if there is another corrector step.
 !  (rk_step < rk_order), else we'll handle it at the end of everything
@@ -2641,6 +2761,12 @@ BENCH_END(bc_end_tim)
 !----------------
 !6788 continue !zzma
 !----------------
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 21
+#include <all_g_debug_halo.h>
+#endif
 
 
 !**********************************************************
