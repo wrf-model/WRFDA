@@ -57,11 +57,6 @@ export SUBMIT_OPTIONS2=${SUBMIT_OPTIONS2:-" "}
 export SUBMIT_OPTIONS3=${SUBMIT_OPTIONS3:-" "}
 export SUBMIT_OPTIONS4=${SUBMIT_OPTIONS4:-" "}
 export HOSTS=${HOSTS:-${HOME}/hosts}
-if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.

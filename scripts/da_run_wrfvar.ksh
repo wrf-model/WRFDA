@@ -2,11 +2,6 @@
 DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
 
 #-----------------------------------------------------------------------
 # [1.0] Specify default environment variables:
