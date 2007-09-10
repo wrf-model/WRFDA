@@ -33,6 +33,10 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
 #endif
     end if
 
+    do n = 1, rtminit_nsensor
+       iv%instid(n)%rad_monitoring = rad_monitoring(n)
+    enddo
+
    !-------------------------------
    ! 1.1 Make thinning grids
    !------------------------------

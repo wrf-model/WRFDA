@@ -30,7 +30,7 @@ module module_radiance
    USE CRTM_Module, only : graupel_cloud, rain_cloud, snow_cloud,crtm_adjoint, &
       crtm_allocate_atmosphere, crtm_allocate_surface, crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_destroy_atmosphere,crtm_destroy_surface, &
-      crtm_forward,crtm_init,crtm_k_matrix,crtm_set_channelinfo, &
+      crtm_forward,crtm_init,crtm_k_matrix, &
       crtm_tangent_linear, grass_soil, h2o_id,hail_cloud,ice_cloud,new_snow, &
       o3_id, water_cloud, crtm_rtsolution_type, crtm_channelinfo_type, &
       crtm_atmosphere_type, crtm_surface_type, crtm_geometryinfo_type, &
@@ -108,7 +108,7 @@ module module_radiance
 
    type (satinfo_type), pointer :: satinfo(:)
 
-   CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
+   CHARACTER( 80 ), allocatable, save :: Sensor_Descriptor(:)
 
 contains
 

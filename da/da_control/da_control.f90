@@ -87,6 +87,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    logical :: anal_type_randomcv=.false.
    logical :: anal_type_qcobs=.false.
 
+   integer,parameter :: monitor_on  = 1
+   integer,parameter :: monitor_off = 0
+
    integer,parameter :: qc_good = 1
    integer,parameter :: qc_bad  = -1
 

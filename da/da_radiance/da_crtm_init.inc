@@ -185,38 +185,34 @@ subroutine da_crtm_init(iv,ob)
 !---------------------------------------------------------------------
   allocate(Sensor_Descriptor(nsensor))
   call da_crtm_sensor_descriptor(nsensor,Sensor_Descriptor)
+  allocate(ChannelInfo(nsensor))
 
 ! CRTM load coefficients
 !-----------------------------------------------------------
 ! 3.1 call CRTM_Init to load coefficients and fill ChannelInfo structure
 !-----------------------------------------------------------
   ! INPUT: 
-     SpcCoeff_File     = 'CRTM_SpcCoeff.bin'
-     TauCoeff_File     = 'CRTM_TauCoeff.bin'
      !SpcCoeff_File     = 'CRTM_amsua_n15-n16.SpcCoeff.bin'
      !TauCoeff_File     = 'CRTM_amsua_n15-n16.TauCoeff.bin'
      AerosolCoeff_File = 'CRTM_AerosolCoeff.bin'
-     CloudCoeff_File   = 'CRTM_CldCoeff.bin'
+     CloudCoeff_File   = 'CRTM_CloudCoeff.bin'
      EmisCoeff_File    = 'CRTM_EmisCoeff.bin'
   !   File_Path         - path to coefficient files (if not specified current directory is used)
-  ! WARNING: Coefficient file names specified in the source code for test only
-  !          Must be replaced with dynamic assign of file names 
   !----------------------------------------------------------------
   ! ChannelInfo structure contains on output: 
   !
   ! n_channels - integer, total number of channels
+  ! Sensor_Index - integer
   ! Channel_Index - integer pointer, index of the channels loaded during initialization
   ! Sensor_Channel - integer pointer, the sensor channel #
-  ! Sensor_Descriptor - character pointer, character string containing satellite and sensor descr
+  ! SensorID - character pointer, character string containing satellite and sensor descr
   !                                        example: amsre_aqua (Appendix B in User guide)
-  ! NCEP_Sensor_ID - integer pointer
   ! WMO_Satellite_ID - integer pointer
   ! WMO_Sensor_ID - integer pointer
   !----------------------------------------------------------------- 
 
      Error_Status = CRTM_Init( ChannelInfo, &
-                              SpcCoeff_File = SpcCoeff_File, &
-                              TauCoeff_File = TauCoeff_File, &
+                              SensorID = Sensor_Descriptor, &
                               AerosolCoeff_File = AerosolCoeff_File, &
                               EmisCoeff_File = EmisCoeff_File , &
                               CloudCoeff_File = CloudCoeff_File) 
@@ -228,11 +224,14 @@ subroutine da_crtm_init(iv,ob)
          (/"Error in initializing CRTM"/))
      END IF
 
-!   write (6,*) 'ChannelInfo content'
-!   write (6,*) 'n_channels ',ChannelInfo%n_channels
-!   write (6,*) 'Channel_Index ',ChannelInfo%Channel_Index
-!   write (6,*) 'Sensor_Channel ',ChannelInfo%Sensor_Channel
-!   write (6,*) 'Sensor_Descriptor ',ChannelInfo%Sensor_Descriptor
+!    do n = 1, nsensor
+!       write (6,*) 'in da_crtm_init: ChannelInfo content'
+!       write (6,*) 'Sensor_Index ',ChannelInfo(n)%Sensor_Index
+!       write (6,*) 'n_channels ',ChannelInfo(n)%n_channels
+!       write (6,*) 'Channel_Index ',ChannelInfo(n)%Channel_Index(:)
+!       write (6,*) 'Sensor_Channel ',ChannelInfo(n)%Sensor_Channel(:)
+!       write (6,*) 'SensorID ',ChannelInfo(n)%SensorID
+!    end do
 
 !-------------------------------------------------------
 !  4.0 read bias correction coefs files

@@ -21,7 +21,7 @@ subroutine da_calculate_grady_rad( iv, re, jo_grad_y )
    if (trace_use) call da_trace_entry("da_calculate_grady_rad")
 
    do i =1, iv%num_inst
-      if ( iv%instid(i)%num_rad < 1 ) cycle
+      if ( iv%instid(i)%num_rad < 1 .or. iv%instid(i)%rad_monitoring == monitor_on ) cycle
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             jo_grad_y%instid(i)%tb(k,n) = -re%instid(i)%tb(k,n) / &

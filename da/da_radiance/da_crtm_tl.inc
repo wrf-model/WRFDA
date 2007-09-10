@@ -1,5 +1,5 @@
 #ifdef CRTM
-subroutine da_crtm_tl(  nchan, Atmosphere,   &
+subroutine da_crtm_tl( nsensor,  nchan, nprof, Atmosphere,   &
                             Surface,      &
                             Atmosphere_TL,&
                             Surface_TL,   &
@@ -8,12 +8,12 @@ subroutine da_crtm_tl(  nchan, Atmosphere,   &
                             RTSolution,   &
                             RTSolution_TL)
 
-   integer, intent(in)            :: nchan
-   TYPE (CRTM_RTSolution_type ),  intent(inout)  :: RTSolution(nchan),RTSolution_TL(nchan)
-   TYPE (CRTM_ChannelInfo_type),  intent(in)  :: ChannelInfo
-   TYPE( CRTM_Atmosphere_type ),  intent(inout)  :: Atmosphere, Atmosphere_TL
-   TYPE( CRTM_Surface_type ),     intent(in)  :: Surface,Surface_TL
-   TYPE( CRTM_GeometryInfo_type ),intent(inout)  :: GeometryInfo
+   integer, intent(in)            :: nsensor, nchan, nprof
+   TYPE (CRTM_RTSolution_type ),  intent(inout)  :: RTSolution(nchan,nprof),RTSolution_TL(nchan,nprof)
+   TYPE (CRTM_ChannelInfo_type),  intent(in)  :: ChannelInfo(nsensor)
+   TYPE( CRTM_Atmosphere_type ),  intent(in)  :: Atmosphere(nprof), Atmosphere_TL(nprof)
+   TYPE( CRTM_Surface_type ),     intent(in)  :: Surface(nprof),Surface_TL(nprof)
+   TYPE( CRTM_GeometryInfo_type ),intent(inout)  :: GeometryInfo(nprof)
 
    integer :: Error_Status
 

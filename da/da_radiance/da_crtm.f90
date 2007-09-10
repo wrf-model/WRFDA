@@ -12,7 +12,7 @@ module da_crtm
       CRTM_Allocate_Atmosphere,H2O_ID,GRAUPEL_CLOUD,ICE_CLOUD,HAIL_CLOUD, &
       INVALID_WMO_SENSOR_ID,NEW_SNOW,rain_cloud,snow_cloud,O3_ID, GRASS_SOIL, &
       WMO_AMSRE, WATER_CLOUD, WMO_AMSUB, WMO_AMSUA,WMO_SSMI, Sensor_Descriptor, &
-      crtm_destroy_atmosphere,crtm_set_channelinfo,crtm_sensor_name, &
+      crtm_destroy_atmosphere,crtm_sensor_name, &
       crtm_allocate_surface,crtm_destroy_surface,crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere, satinfo, &
       time_slots,crtm_platform_name, crtm_init, &
@@ -38,7 +38,7 @@ module da_crtm
    use da_tracing, only : da_trace_entry, da_trace_exit
 
 #ifdef CRTM
-    TYPE (CRTM_ChannelInfo_type),save :: ChannelInfo
+    TYPE (CRTM_ChannelInfo_type), allocatable, save :: ChannelInfo(:)
 #endif
 
 contains

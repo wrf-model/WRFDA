@@ -39,7 +39,7 @@ module da_minimisation
       num_ships_tot,num_ssmt2_tot,use_rad,var_scaling2,var_scaling1, &
       num_synop_tot,var_scaling4,var_scaling5,var_scaling3,num_ssmt1_tot, &
       num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
-      cv_size_domain_je,cv_size_domain_jb
+      cv_size_domain_je,cv_size_domain_jb, monitor_on
 #ifdef CRTM
    use da_crtm, only : da_get_innov_vector_crtm
                        !da_get_innov_vector_crtmk
