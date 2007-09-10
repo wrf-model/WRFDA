@@ -34,7 +34,7 @@ fi
 
 initdir=$( pwd )
 
-tlout="tl_d01_2005-07-16"
+tlout="tl_d01_2005-07-16_00:10:00"
 wrfout="wrfout_d01_2005-07-16_00:00:00"
 namelist="namelist.input"
 namelistout="namelist.output"
@@ -78,19 +78,26 @@ bsub -K < ${jobscript}
 # compare vs. baseline run with same number of tasks (even if baseline is wrong)
 print
 print "compare vs. baseline ${num_tasks}-task(s) run"
-for tlfile in $( ls -1 ${tlout}* ) ; do
-  cmd="cmp -l ${baselinedir}/${tlfile} ${tlfile}"
-  print $cmd
-  $( $cmd ) | wc
-done
+print "cmp -l ${baselinedir}/${tlout} ${tlout} | wc"
+cmp -l ${baselinedir}/${tlout} ${tlout} | wc
+# HACK:  This loop chokes due to bug in ksh88 on AIX.  Error message is:  
+# HACK:  "0403-029 There is not enough memory available now".  
+# HACK:  http://unix.derkeiler.com/Newsgroups/comp.unix.aix/2004-10/0226.html
+# HACK:  suggests replacing "for" loop with "while" or removing the loop.  
+# HACK:  Even removing the loop doesn't help...  
+# HACK:  Thus ugly the hackery above...  
+#for tlfile in $( ls -1 ${tlout}* ) ; do
+#  cmd="cmp -l ${baselinedir}/${tlfile} ${tlfile}"
+#  print $cmd
+#  $( $cmd ) | wc
+#done
+
+# compare vs. 1-task baseline run
 print
 print "compare vs. baseline 1-task run"
-# compare vs. 1-task baseline run
-for tlfile in $( ls -1 ${tlout}* ) ; do
-  cmd="cmp -l 1proc_me/${tlfile} ${tlfile}"
-  print $cmd
-  $( $cmd ) | wc
-done
+print "cmp -l 1proc_me/${tlout} ${tlout} | wc"
+cmp -l 1proc_me/${tlout} ${tlout} | wc
+# HACK:  See above for explanation of this hackery...  
 
 # transfer ASCII output files
 scp $errfile hender@loquat.mmm.ucar.edu:${targetdir}/${errfilescp} || \
