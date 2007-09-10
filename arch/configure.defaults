@@ -178,7 +178,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, debug       (RSL_LITE, MPI)
+#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, debug, EXPERIMENTAL (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -218,7 +218,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, optimised   (RSL_LITE, MPI)
+#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, optimised, EXPERIMENTAL (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -389,7 +389,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, GNU compilers, debug       (RSL_LITE, MPI)
+#ARCH Settings for PC Linux i486 i586 i686, GNU compilers, debug, EXPERIMENTAL (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -432,7 +432,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, GNU compilers, optimised   (RSL_LITE, MPI)
+#ARCH Settings for PC Linux i486 i586 i686, GNU compilers, optimised, EXPERIMENTAL (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -1303,7 +1303,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for AIX, IBM compilers, debug                           (RSL_LITE, IBM-MPI)
+#ARCH Settings for AIX, IBM compilers, debug, EXPERIMENTAL                           (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1348,7 +1348,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, IBM compilers, optimised                       (RSL_LITE, IBM-MPI)
+#ARCH Settings for AIX, IBM compilers, optimised, EXPERIMENTAL          (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1497,7 +1497,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for AIX, IBM compilers, debug 4 byte experimental (RSL_LITE, IBM-MPI)
+#ARCH Settings for AIX, IBM compilers, debug 4 byte EXPERIMENTAL (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1544,7 +1544,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, IBM compilers, optimised 4 byte experimental (RSL_LITE, IBM-MPI)
+#ARCH Settings for AIX, IBM compilers, optimised 4 byte EXPERIMENTAL (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
