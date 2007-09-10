@@ -38,7 +38,8 @@ module da_radiance
       use_ssmisobs, use_filtered_rad,print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
-      qc_good, qc_bad,myproc,biascorr,thinning,thinning_mesh,                &
+      qc_good, qc_bad,myproc,biascorr,thinning,thinning_mesh, &
+      rad_monitoring, monitor_on, &
       use_hirs4obs, use_mhsobs,bufr_year, bufr_month,bufr_day,bufr_hour, &
       bufr_minute, bufr_second,bufr_solzen, bufr_station_height, &
       bufr_landsea_mask,tovs_end, max_tovs_input, bufr_satzen, nchan_mhs, &
@@ -92,6 +93,8 @@ contains
 #include "da_read_obs_bufrtovs.inc"
 #include "da_read_obs_bufrairs.inc"
 #include "da_read_obs_bufrssmis.inc"
+#include "da_allocate_rad_iv.inc"
+#include "da_initialize_rad_iv.inc"
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"

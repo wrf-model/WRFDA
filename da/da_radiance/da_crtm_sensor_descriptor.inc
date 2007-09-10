@@ -2,7 +2,7 @@
 subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
 
  integer,        intent(in)  :: nsensor
- character(len=80), intent(out) :: sensor_descriptor(nsensor)
+ character(len=80), intent(inout) :: sensor_descriptor(nsensor)
 
  integer :: i,platform_id,satellite_id,sensor_id
  character (len=80) :: crtm_sat, crtm_sensor

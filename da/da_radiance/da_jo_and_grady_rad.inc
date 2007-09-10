@@ -23,7 +23,7 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
       jo % rad(i)%jo_ichan(:) = 0.0
       jo % rad(i)%num_ichan(:) = 0
 
-      if (iv%instid(i)%num_rad < 1) cycle
+      if (iv%instid(i)%num_rad < 1 .or. iv%instid(i)%rad_monitoring == monitor_on ) cycle
 
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan

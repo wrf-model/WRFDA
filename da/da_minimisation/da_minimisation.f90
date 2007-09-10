@@ -37,7 +37,7 @@ module da_minimisation
       cv_size_domain_je,cv_size_domain_jb, num_pseudo, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, radiance
+      bogus, buoy, qscat,pseudo, radiance, monitor_on
 
 #ifdef CRTM
    use da_crtm, only : da_get_innov_vector_crtm

@@ -401,6 +401,10 @@ module da_define_structures
    type instid_type
       ! Instrument triplet, follow the convension of RTTOV
       integer              :: platform_id, satellite_id, sensor_id
+      integer              :: rad_monitoring ! 0 (monitor_off): assimilating
+                                             !    (default in Registry.wrfvar),
+                                             ! 1 (monitor_on):  monitoring
+                                             ! monitor_on and monitor_off defined in da_control.f90
       character(len=20)    :: rttovid_string
       integer              :: num_rad, nchan, nlevels
       integer              :: nchannels, nfrequencies,nbtout
@@ -439,7 +443,14 @@ module da_define_structures
       real,    pointer     :: qci(:,:)
       real,    pointer     :: qsn(:,:)
       real,    pointer     :: qgr(:,:)
+      real,    pointer     :: qhl(:,:)
       real,    pointer     :: pm(:,:)
+      real,    pointer     :: rcw(:,:) ! cloud water effectiv radius
+      real,    pointer     :: rci(:,:) ! cloud ice effective radius
+      real,    pointer     :: rrn(:,:) ! rain effective radius
+      real,    pointer     :: rsn(:,:) ! snow effective radius
+      real,    pointer     :: rgr(:,:) ! graupel effective radius
+      real,    pointer     :: rhl(:,:) ! hail effective radius
       real,    pointer     :: pf(:,:)  ! full level pressure for CRTM
       real,    pointer     :: emiss(:,:)
       real,    pointer     :: u10(:)

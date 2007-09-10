@@ -670,6 +670,7 @@ rconfig   integer   rtminit_nsensor         namelist,wrfvar14  1  1        - "rt
 rconfig   integer   rtminit_platform        namelist,wrfvar14  30 -1       - "rtminit_platform"        ""  ""  
 rconfig   integer   rtminit_satid           namelist,wrfvar14  30 -1.0     - "rtminit_satid"           ""  ""  
 rconfig   integer   rtminit_sensor          namelist,wrfvar14  30 -1.0     - "rtminit_sensor"          ""  ""  
+rconfig   integer   rad_monitoring          namelist,wrfvar14  30 0        - "rad_monitoring"          ""  ""
 rconfig   real      thinning_mesh           namelist,wrfvar14  30 60.0     - "thinning_mesh"           ""  ""
 rconfig   logical   thinning                namelist,wrfvar14  1  .false.  - "thinning "               ""  ""
 rconfig   logical   read_biascoef           namelist,wrfvar14  1  .true.   - "read_biascoef"           ""  ""   
