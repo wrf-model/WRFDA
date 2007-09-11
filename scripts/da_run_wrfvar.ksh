@@ -65,7 +65,7 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background erro
 export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export CRTM=${CRTM:-$HOME/crtm}
-export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coefs}
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coeffs}
 
 # Error Tunning namelist parameters
 # Assign Random seeds
@@ -205,7 +205,7 @@ echo "WINDOW_END            $WINDOW_END"
    fi
  
    if test -d $DA_CRTM_COEFFS; then
-      ln -fs $DA_CRTM_COEFFS/* .
+      ln -fs $DA_CRTM_COEFFS crtm_coeffs
    fi
 
    ln -fs $WRFVAR_DIR/run/gribmap.txt .

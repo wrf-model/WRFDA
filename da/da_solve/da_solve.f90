@@ -384,9 +384,9 @@ subroutine da_solve ( grid , config_flags)
                deallocate(iv%instid(i)%land_coverage)
                deallocate(iv%instid(i)%ice_coverage)
                deallocate(iv%instid(i)%snow_coverage)
-               deallocate(iv%instid(i)%ps_jacobian)
-               deallocate(iv%instid(i)%t_jacobian)
-               deallocate(iv%instid(i)%q_jacobian)
+               !deallocate(iv%instid(i)%ps_jacobian)
+               !deallocate(iv%instid(i)%t_jacobian)
+               !deallocate(iv%instid(i)%q_jacobian)
             end if
          end if
 #ifdef RTTOV

@@ -515,9 +515,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
         allocate(iv%instid(inst)%land_coverage(iv%instid(inst)%num_rad))
         allocate(iv%instid(inst)%ice_coverage(iv%instid(inst)%num_rad))
         allocate(iv%instid(inst)%snow_coverage(iv%instid(inst)%num_rad))
-        allocate(iv%instid(inst)%ps_jacobian(nchan,iv%instid(inst)%num_rad))
-        allocate(iv%instid(inst)%t_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
-        allocate(iv%instid(inst)%q_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
+        !allocate(iv%instid(inst)%ps_jacobian(nchan,iv%instid(inst)%num_rad))
+        !allocate(iv%instid(inst)%t_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
+        !allocate(iv%instid(inst)%q_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
       end if
 
   do i = 1, size
