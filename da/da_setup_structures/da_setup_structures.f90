@@ -47,7 +47,6 @@ module da_setup_structures
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_spectral, only : da_initialize_h,da_calc_power_spectrum
    use da_ssmi, only : da_read_obs_ssmi,da_scan_obs_ssmi
-   use da_tools, only : da_xyll
    use da_tools_serial, only : da_get_unit, da_free_unit, da_array_print, da_find_fft_factors, &
       da_find_fft_trig_funcs
    use da_tracing, only : da_trace_entry, da_trace_exit
