@@ -1,11 +1,13 @@
 #!/usr/local/bin/perl
 
-$USAGE="generate_html.pl source_directory sink_directory";
+# da_generate_html.pl
+
+$USAGE="da_generate_html.pl source_directory sink_directory";
 
 open (ERR,">&2");
 
 if ($#ARGV != 1){
-  print ERR "generate_html.pl: Wrong number of arguments\n";
+  print ERR "da_generate_html.pl: Wrong number of arguments\n";
   print ERR "USAGE: $USAGE\n";
   die ;
 }
@@ -99,10 +101,10 @@ if ($#files >= 0) {
       close (OUT);
       close (IN);
 
-# ensure html file has same timestamp as source file
+      # ensure html file has same timestamp as source file
       `touch -r $Infile $SINKDIR/$NAME.html`;
 
-# make files group readable
+      # make files group readable
 
       `chmod g+r $SINKDIR/$NAME.html`;
     }

@@ -1,6 +1,8 @@
 #!/bin/ksh
 
-USAGE="list_refs.ksh [directory]"
+# da_list_refs.ksh
+
+USAGE="da_list_refs.ksh [directory]"
 
 DIR=${1:-$PWD}
 
@@ -91,7 +93,7 @@ done <$TEMP1
 
 rm -f $TEMP1 $TEMP2 $TEMP3 $TEMP4 $TEMP5 $TEMP6
 
-echo "list_refs.ksh finished"
+echo "da_list_refs.ksh finished"
 
 exit 0
 
