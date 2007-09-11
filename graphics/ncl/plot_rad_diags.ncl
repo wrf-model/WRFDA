@@ -14,35 +14,35 @@ begin
    plot_stats_only = False
 
    plot_ch_all = True                ; True to plot all channels
-;   plot_ch_all = False                 ; False to plot user-selected plot_ch channels
+   ;   plot_ch_all = False                 ; False to plot user-selected plot_ch channels
    if ( .not. plot_ch_all ) then
       plot_ch  = (/ 5, 6/)          ; edit this line to set the channels to plot
    end if
 
    plot_opt = "all"
-;   plot_opt = "land_only"
-;   plot_opt = "sea_only"
+   ;   plot_opt = "land_only"
+   ;   plot_opt = "sea_only"
 
    plot_cloudy = True
-;   plot_cloudy = False
+   ;   plot_cloudy = False
 
    plot_cloudy_opt = "clwp"
-;   plot_cloudy_opt = "si"
-;   plot_cloudy_opt = "si_clwp"
+   ;   plot_cloudy_opt = "si"
+   ;   plot_cloudy_opt = "si_clwp"
 
    clwp_value = 0.
    si_value   = 3.
 
    plot_qced = True        ; True to plot qc=good data
-;   plot_qced = False
+   ;   plot_qced = False
 
-;   plot_split = True
+   ;   plot_split = True
    plot_split = False
 
    out_type = "ncgm"
-;   out_type = "pdf"   ; pdf not recommended since the file size will be way too large
+   ;   out_type = "pdf"   ; pdf not recommended since the file size will be way too large
                        ; and it will take much much longer to make plots
-;   instrument = "eos-2-airs"
+   ;   instrument = "eos-2-airs"
    instrument = "noaa-15-amsua"
    datdir = "./"
    plotdir = "./"
@@ -50,7 +50,7 @@ begin
    date         = getenv("DATE")
    rc_dir       = getenv("RC_DIR")
 
-;   colormap = "rainbow"
+   ;   colormap = "rainbow"
    colormap = "gui_default"
 
    ; subdomain = True
@@ -113,9 +113,9 @@ begin
    end if
 
 
-;*******************************************************************************
-; end of plot options
-;*******************************************************************************
+   ;*******************************************************************************
+   ; end of plot options
+   ;*******************************************************************************
 
    ; if running this ncl script from a csh script
    ; replace the following settings with the ones in the script
@@ -231,13 +231,13 @@ begin
       end if
    end if
 
-;*******************************************************************************
-; real end of plot options
-;*******************************************************************************
-;
-; define and setup the lablebar colors
-; only needs to be done once
-;
+   ;*******************************************************************************
+   ; real end of plot options
+   ;*******************************************************************************
+   
+   ; define and setup the lablebar colors
+   ; only needs to be done once
+   
    wks = gsn_open_wks(out_type,plotdir+"tmp")
    gsn_define_colormap(wks,colormap)                 ; define colormap
    cmap = gsn_retrieve_colormap(wks)                 ; retreive colormap
@@ -266,9 +266,9 @@ begin
    end do
    destroy(wks)
    dummy = systemfunc("\rm -f "+plotdir+"tmp."+out_type)
-;
-; find out how many dates to process
-;
+
+   ; find out how many dates to process
+
    ntime = 0
    valid_date = start_date
    do while ( valid_date .le. end_date )
@@ -282,9 +282,9 @@ begin
    end do
    print(date)
    xc = ispan(1,ntime,1)   ; set the x-axis values for statistics time-series plot
-;
-; begin the big ntime loop
-;
+
+   ; begin the big ntime loop
+ 
    doneit = False   ; to check if the variables for statistics are already defined
 
    do itime = 0, ntime-1   ; this is ntime_loop
@@ -1166,9 +1166,9 @@ end if
       destroy(wks)
 
    end if   ; end of if ntime and xmean check
-;
-; numbers
-;
+
+   ; numbers
+   ;
    if ( ntime .gt. 1 .and. num(.not.ismissing(npts)) .gt. 0 ) then
 
       data = new((/4,nchan,ntime/),integer)

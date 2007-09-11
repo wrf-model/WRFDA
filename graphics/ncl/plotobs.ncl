@@ -30,9 +30,9 @@ system("mkdir -p "+plotdir)
 ;
 ; set pressure levels for plotting AIREP, GEOAMV, POLARAMV, PILOT, PROFILER, SOUND, BOGUS, AIRSR
 ; method 1: set a 2-D array of bounded pressure levels in hPa
- plevs  = (/ (/1005.,995./),(/930.,920./),(/855.,845/),(/705.,695./),(/505.,495./),(/405.,395./),\
-             (/305.,295./),(/255.,245./),(/205.,195./),(/155.,145./),(/105.,95./),(/75.,65./), \
-             (/55.,45./), (/45.,0./)  /)
+plevs  = (/ (/1005.,995./),(/930.,920./),(/855.,845/),(/705.,695./),(/505.,495./),(/405.,395./),\
+            (/305.,295./),(/255.,245./),(/205.,195./),(/155.,145./),(/105.,95./),(/75.,65./), \
+            (/55.,45./), (/45.,0./)  /)
 ; plevs    = (/ (/1050.,0./),(/-999.,-999./) /)   ; a (/-999.,-999./) pair is required if only
                                                   ; one bounded pair is desired
 ;
@@ -49,10 +49,10 @@ hlevs  = (/ (/2000., 5000./), (/5000., 8500./) /)
 ; hlevs  = (/ 1000., 2000., 3000., 4000., 5000., 6000., 7000., 8000., 10000. /)
 
 ; mapinfo_from_file = False
-  mapinfo_from_file = True
+mapinfo_from_file = True
 
 ; subdomain = True
-  subdomain = False
+subdomain = False
 if ( subdomain ) then   ; subdomain needs to be a lat-lon box
    maxlat = 35.
    minlat = 25.
@@ -2075,7 +2075,7 @@ begin
       end if
    end if
    newday = ccyy*10000 + mm*100 + dd
-;   newday = sprinti("%0.4i",ccyy)+sprinti("%0.2i",mm)+sprinti("%0.2i",dd)
+   ;   newday = sprinti("%0.4i",ccyy)+sprinti("%0.2i",mm)+sprinti("%0.2i",dd)
    return(newday)
 end 
 
@@ -2090,7 +2090,7 @@ begin
    hh   = stringtointeger((/currentdate(8:9)/))
    hh = hh + dh
    newday = ccyy*10000 + mm*100 + dd
-;   newday = sprinti("%0.4i",ccyy)+sprinti("%0.2i",mm)+sprinti("%0.2i",dd)
+   ;   newday = sprinti("%0.4i",ccyy)+sprinti("%0.2i",mm)+sprinti("%0.2i",dd)
    do while (hh .lt. 0)
       hh = hh + 24
       newday = change_date( ccyy, mm, dd, -1 )
@@ -2099,7 +2099,7 @@ begin
       hh = hh - 24
       newday = change_date( ccyy, mm, dd, 1 )
    end do
-;   newdate = newday*100 + hh
+   ;   newdate = newday*100 + hh
    newdatestr = sprinti("%0.8i",newday) + sprinti("%0.2i",hh)
    return(newdatestr)
 end
@@ -2107,9 +2107,9 @@ end
 ; main script
 ;---------------------------------------------------------------------------
 begin;  begin of the main script
-;
-; find out how many dates to process
-;
+
+   ; find out how many dates to process
+
    ndate = 0   ; number of dates
    valid_date = start_date
    do while ( valid_date .le. end_date )
@@ -2479,7 +2479,7 @@ begin;  begin of the main script
                   delete(synop_p)
                   delete(synop_q)
                end if  ; end of nsynop check
-;
+
                if ( nmetar .gt. 0 ) then
                   metar_id  = read_info(nmetar, imetar, cdata, nlevel_metar, ilevel_metar, "id")
                   metar_lat = read_info(nmetar, imetar, cdata, nlevel_metar, ilevel_metar, "lat")
@@ -2507,7 +2507,7 @@ begin;  begin of the main script
                   delete(metar_p)
                   delete(metar_q)
                end if   ; end of nmetar check
-;
+
                if ( nships .gt. 0 ) then
                   ships_id  = read_info(nships, iships, cdata, nlevel_ships, ilevel_ships, "id")
                   ships_lat = read_info(nships, iships, cdata, nlevel_ships, ilevel_ships, "lat")
@@ -2535,7 +2535,7 @@ begin;  begin of the main script
                   delete(ships_p)
                   delete(ships_q)
                end if  ; end of nships check
-;
+
                if ( nbuoy .gt. 0 ) then
                   buoy_id  = read_info(nbuoy, ibuoy, cdata, nlevel_buoy, ilevel_buoy, "id")
                   buoy_lat = read_info(nbuoy, ibuoy, cdata, nlevel_buoy, ilevel_buoy, "lat")
@@ -2563,7 +2563,7 @@ begin;  begin of the main script
                   delete(buoy_p)
                   delete(buoy_q)
                end if   ; end of nbuoy check
-;
+
                if ( nsonde_sfc .gt. 0 ) then
                   sonde_sfc_id  = read_info(nsonde_sfc, isonde_sfc, cdata, nlevel_sonde_sfc, ilevel_sonde_sfc, "id")
                   sonde_sfc_lat = read_info(nsonde_sfc, isonde_sfc, cdata, nlevel_sonde_sfc, ilevel_sonde_sfc, "lat")
@@ -2627,7 +2627,7 @@ begin;  begin of the main script
                   delete(geoamv_u)
                   delete(geoamv_v)
                end if   ; end of ngeoamv check
-;
+
                if ( npolaramv .gt. 0 ) then
                   polaramv_id  = read_info(npolaramv, ipolaramv, cdata, nlevel_polaramv, ilevel_polaramv, "id")
                   polaramv_lat = read_info(npolaramv, ipolaramv, cdata, nlevel_polaramv, ilevel_polaramv, "lat")
@@ -2662,7 +2662,7 @@ begin;  begin of the main script
                   delete(polaramv_u)
                   delete(polaramv_v)
                end if   ; end of npolaramv check
-;
+
                if ( ngpspw .gt. 0 ) then
                   gpspw_id  = read_info(ngpspw, igpspw, cdata, nlevel_gpspw, ilevel_gpspw, "id")
                   gpspw_lat = read_info(ngpspw, igpspw, cdata, nlevel_gpspw, ilevel_gpspw, "lat")
@@ -2683,7 +2683,7 @@ begin;  begin of the main script
                   delete(gpspw_lon)
                   delete(gpspw_tpw)
                end if   ; end of ngpspw check
-;
+
                if ( nsound .gt. 0 ) then
                   sound_id  = read_info(nsound, isound, cdata, nlevel_sound, ilevel_sound, "id")
                   sound_lat = read_info(nsound, isound, cdata, nlevel_sound, ilevel_sound, "lat")
@@ -2794,7 +2794,7 @@ begin;  begin of the main script
                   delete(pilot_u)
                   delete(pilot_v)
                end if   ; end of npilot check
-;
+
                if ( nprofiler .gt. 0 ) then
                   profiler_id  = read_info(nprofiler, iprofiler, cdata, nlevel_profiler, ilevel_profiler, "id")
                   profiler_lat = read_info(nprofiler, iprofiler, cdata, nlevel_profiler, ilevel_profiler, "lat")
@@ -2829,7 +2829,7 @@ begin;  begin of the main script
                   delete(profiler_u)
                   delete(profiler_v)
                end if   ; end of nprofiler check
-;
+
                if ( nssmir .gt. 0 ) then
                   ssmir_id  = read_info(nssmir, issmir, cdata, nlevel_ssmir, ilevel_ssmir, "id")
                   ssmir_lat = read_info(nssmir, issmir, cdata, nlevel_ssmir, ilevel_ssmir, "lat")
@@ -2845,7 +2845,7 @@ begin;  begin of the main script
                   delete(ssmir_lon)
                   delete(ssmir_spd)
                end if   ; end of nssmir check
-;
+
                if ( nqscat .gt. 0 ) then
                   qscat_id  = read_info(nqscat, iqscat, cdata, nlevel_qscat, ilevel_qscat, "id")
                   qscat_lat = read_info(nqscat, iqscat, cdata, nlevel_qscat, ilevel_qscat, "lat")
@@ -2867,7 +2867,7 @@ begin;  begin of the main script
                   delete(qscat_u)
                   delete(qscat_v)
                end if   ; end of nqscat check
-;
+
                if ( nbogus .gt. 0 ) then
                   ; bogus_id  = read_info(nbogus, ibogus, cdata, nlevel_bogus, ilevel_bogus, "id")
                   bogus_lat = read_info(nbogus, ibogus, cdata, nlevel_bogus, ilevel_bogus, "lat")
@@ -2904,7 +2904,7 @@ begin;  begin of the main script
                   delete(bogus_u)
                   delete(bogus_v)
                end if   ; end of nbogus check
-;
+
                if ( nairsr .gt. 0 ) then
                   airsr_id  = read_info(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "id")
                   airsr_lat = read_info(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "lat")
