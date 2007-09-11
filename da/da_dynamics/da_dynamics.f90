@@ -8,7 +8,7 @@ module da_dynamics
       gamma, gravity, ids,ide,jds,jde,kds,kde, global, test_wrfvar, &
       fg_format, fg_format_kma_global, balance_geo,balance_geocyc, fg_format_wrf, &
       balance_type, balance_cyc, gravity, convert_fd2uv, trace_use
-   use module_domain, only : domain,xb_type,xpose_type
+   use module_domain, only : domain,xb_type
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xy, mytask, &

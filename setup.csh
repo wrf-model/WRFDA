@@ -86,8 +86,8 @@ endif
 if (-d ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}) then
    setenv RTTOV ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}) then
-   setenv CRTM ${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}
+if (-d ${EXT_DIR}/crtm/CRTM_08_27_07/${COMPILER}_${PROCESSOR}) then
+   setenv CRTM ${EXT_DIR}/crtm/CRTM_08_27_07/${COMPILER}_${PROCESSOR}
 endif
 if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}) then
    setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}

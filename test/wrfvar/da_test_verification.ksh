@@ -20,4 +20,4 @@ export RUN_DIR=$PWD/${MACHINE}_verification
 export START_DATE=$INITIAL_DATE
 export END_DATE=$FINAL_DATE
 
-$WRFVAR_DIR/scripts/da_verif_plot.ksh
+$WRFVAR_DIR/scripts/da_verif_plot.ksh > $RUN_DIR/index.html 2>&1

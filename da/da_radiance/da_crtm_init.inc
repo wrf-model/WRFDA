@@ -29,6 +29,7 @@ subroutine da_crtm_init(iv,ob)
   character( 256 ) :: AerosolCoeff_File
   character( 256 ) :: CloudCoeff_File
   character( 256 ) :: EmisCoeff_File 
+  character( 256 ) :: File_Path
 !  character( 80 ), pointer :: Sensor_Descriptor(:)
 !
 ! end of CRTM local
@@ -195,12 +196,12 @@ subroutine da_crtm_init(iv,ob)
 ! 3.1 call CRTM_Init to load coefficients and fill ChannelInfo structure
 !-----------------------------------------------------------
   ! input: 
-     !SpcCoeff_File     = 'CRTM_amsua_n15-n16.SpcCoeff.bin'
-     !TauCoeff_File     = 'CRTM_amsua_n15-n16.TauCoeff.bin'
-     AerosolCoeff_File = 'CRTM_AerosolCoeff.bin'
-     CloudCoeff_File   = 'CRTM_CloudCoeff.bin'
-     EmisCoeff_File    = 'CRTM_EmisCoeff.bin'
-  !   File_Path         - path to coefficient files (if not specified current directory is used)
+     !SpcCoeff_File     = 'amsua_n15-n16.SpcCoeff.bin'
+     !TauCoeff_File     = 'amsua_n15-n16.TauCoeff.bin'
+     AerosolCoeff_File = 'AerosolCoeff.bin'
+     CloudCoeff_File   = 'CloudCoeff.bin'
+     EmisCoeff_File    = 'EmisCoeff.bin'
+     File_Path         = 'crtm_coeffs/'
   !----------------------------------------------------------------
   ! ChannelInfo structure contains on output: 
   !
@@ -218,7 +219,8 @@ subroutine da_crtm_init(iv,ob)
                               SensorID = Sensor_Descriptor, &
                               AerosolCoeff_File = AerosolCoeff_File, &
                               EmisCoeff_File = EmisCoeff_File , &
-                              CloudCoeff_File = CloudCoeff_File) 
+                              CloudCoeff_File = CloudCoeff_File, &
+                              File_Path = File_Path) 
 
 !   Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(1),ChannelInfo)
 
