@@ -13,7 +13,7 @@ if test $COMPILER = xlf; then export COMPILER=ibm; fi
 
 # Search for queuing systems.
 # Don't use which, as it always returns 0 on BSD
-bjobs > /dev/null 2>&1
+bjobs -V > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
 else
