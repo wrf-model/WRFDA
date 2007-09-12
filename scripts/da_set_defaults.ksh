@@ -47,9 +47,11 @@ export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and 
 export FG_TYPE=${FG_TYPE:-GFS}
 
 #Scheduling:
+export SUBMIT=${SUBMIT:-LSF}
 export PROJECT_ID=${PROJECT_ID:-48500053}
 export QUEUE=${QUEUE:-regular}
-export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
+export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors
+export MAX_PROCS=${MAX_PROCS:-$NUM_PROCS}              # Maximum number of possible processors
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes

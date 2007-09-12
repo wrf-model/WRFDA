@@ -8,16 +8,11 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
 export WORK_DIR=$RUN_DIR/working
 
+if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
+   export NUM_PROCS=$MAX_PROCS
+fi
+
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
-export POE=false
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-
-export SUBMIT=${SUBMIT:-LSF}
-export NUM_PROCS=${NUM_PROCS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-
-export QUEUE=${QUEUE:-regular}
-export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
