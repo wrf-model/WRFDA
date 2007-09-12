@@ -15,7 +15,7 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-#Decide which stages to run (run if true):
+# Decide which stages to run (run if true):
 
 export RUN_ENSMEAN=${RUN_ENSMEAN:-false}
 export RUN_ETKF=${RUN_ETKF:-false}
@@ -32,26 +32,23 @@ export RUN_WPS=${RUN_WPS:-false}
 export RUN_WRF=${RUN_WRF:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
 
-#Experiment details:
+# Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAINS=${DOMAINS:-01}                            # Domain names.
 export EXPT=${EXPT:-expt}                             # Experiment name.
-export RUN=${RUN:-run}
+export ID=${ID:-test}
 export SOLVER=${SOLVER:-em}
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
-export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
 export FG_TYPE=${FG_TYPE:-GFS}
 
-#Scheduling:
+# Scheduling:
 export SUBMIT=${SUBMIT:-LSF}
 export PROJECT_ID=${PROJECT_ID:-48500053}
 export QUEUE=${QUEUE:-regular}
-export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors
-export MAX_PROCS=${MAX_PROCS:-$NUM_PROCS}              # Maximum number of possible processors
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
@@ -59,6 +56,15 @@ export LL_PTILE=${LL_PTILE:-1}
 export PREV_JOBID=${PREV_JOBID:-test}
 export POE=${POE:-false}
 export HOSTS=${HOSTS:-${HOME}/hosts}
+
+export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors
+export MAX_PROCS=${MAX_PROCS:-$NUM_PROCS}              # Maximum number of possible processors
+
+if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
+   export NUM_PROCS=$MAX_PROCS
+fi
+
+export RUN=${RUN:-${ID}_${NUM_PROCS}}
 
 # Cannot put - options inside default substitution
 if [[ $SUBMIT == "LoadLeveller" ]]; then
@@ -88,7 +94,7 @@ fi
 
 export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
 
-#Directories:
+# Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
@@ -113,7 +119,7 @@ export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 
-#Time info:
+# Time info:
 export DATE=${DATE:-2003010100}                   # Current date.
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}   # Start date of test period
 export FINAL_DATE=${FINAL_DATE:-2003012800}       # Final date of test period.
@@ -137,18 +143,18 @@ export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
 
-#Diagnostics:
+# Diagnostics:
 export OK='<FONT COLOR="green">'
 export ERR='<FONT COLOR="red">'
 export END='</FONT>'
 
-#WPS:
+# WPS:
 export RUN_GEOGRID=${RUN_GEOGRID:-true}                 # Run GEOGRID, or not.
 export RUN_UNGRIB_METGRID_AFWA=${RUN_UNGRIB_METGRID_AFWA:-false}
 export RUN_UNGRIB_METGRID_KMA=${RUN_UNGRIB_METGRID_KMA:-false}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
-#export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
+# export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-/mmm/users/wrfhelp/WPS_GEOG} 
 export NL_E_WE=${NL_E_WE:-45}
 export NL_E_SN=${NL_E_SN:-45}
@@ -169,17 +175,17 @@ export CONSTANTS1=${CONSTANTS1:-*}
 export CONSTANTS2=${CONSTANTS2:-*}
 export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
 
-#WRF real (not already covered above):
+# WRF real (not already covered above):
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-720}          # (minutes)
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
-                                        " 0.922, 0.894, 0.860, 0.817, 0.766, "\
-                                        " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
-                                        " 0.324, 0.273, 0.228, 0.188, 0.152,"\
-                                        " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
+                                      " 0.922, 0.894, 0.860, 0.817, 0.766, "\
+                                      " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
+                                      " 0.324, 0.273, 0.228, 0.188, 0.152,"\
+                                      " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
 export NL_E_VERT=${NL_E_VERT:-28}                   #
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
@@ -199,7 +205,7 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
 export NL_PD_MOIST=${NL_PD_MOIST:-false} 
 
-#WRF (not already covered above):
+# WRF (not already covered above):
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrfinput_d<domain>_<date>'}
@@ -211,7 +217,7 @@ export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
 export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 
-#OBSPROC (not covered above):
+# OBSPROC (not covered above):
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 export MAX_NUMBER_OF_OBS=${MAX_NUMBER_OF_OBS:-70000}
 export THINING_SATOB=${THINING_SATOB:-false}
@@ -222,7 +228,7 @@ export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}
 export PTOP_PA=${PTOP_PA:-5000.0}
 
-#WRF-Var (not covered above):
+# WRF-Var (not covered above):
 export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.
 export NL_VAR4D=${NL_VAR4D:-false}
 export NL_GLOBAL=${NL_GLOBAL:-false}
@@ -237,10 +243,10 @@ export NL_CHECK_MAX_IV=${NL_CHECK_MAX_IV:-true} # QC on O-B differences.
 export NL_NTMAX=${NL_NTMAX:-100}         # Maximum number of inner loop iterations.
 export NL_CHECK_RH=${NL_CHECK_RH:-2}     # RH bounds check.
 
-#From Update_BC:
+# From Update_BC:
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
 
-#Ensemble parameters:
+# Ensemble parameters:
 export NUM_JOBS=${NUM_JOBS:-1}                         # Number of parallel jobs to run.
 export NUM_MEMBERS=${NUM_MEMBERS:-1}                   # Number of ensemble members.
 export MEM=${MEM:-1}                                   # Ensemble member.

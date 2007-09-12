@@ -4,15 +4,12 @@
 
 export EXPT=vartest
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export RUN=${RUN:-${ID}_${NUM_PROCS}}
 
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 export REG_DIR=$PWD
 export EXP_DIR=$PWD/$EXPT
-export RUN_DIR=$EXP_DIR/$RUN
-rm -rf $RUN_DIR
 
 . $EXP_DIR/setup.ksh
 
@@ -23,9 +20,8 @@ export NL_VAR4D=true
 export NL_INPUTOUT_BEGIN_H=0
 let NL_NUM_FGAT_TIME=$WINDOW_END+1
 export NL_NUM_FGAT_TIME
-export FIRST=true
 
-#WRF:
+# WRF:
 export NL_TIME_STEP=600
 export NL_SMOOTH_OPTION=0
 export NL_MP_PHYSICS=4

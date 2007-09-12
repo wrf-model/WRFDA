@@ -1,7 +1,7 @@
 #!/bin/ksh
 # da_update_html.ksh
 
-# Assuming starting from wrfvar/doc directory
+# Assuming starting from wrfvar/scripts directory
 cd ..
 svn update
 ./clean -a
@@ -12,7 +12,7 @@ make -r setup
 ln -fs inc/* .
 # This file causes da_generate_html.pl to stall
 rm -rf RELHUM.inc
-cd ../doc
+cd ..
 mkdir -p html
-./da_generate_html.pl ../build html
-./da_list_refs.ksh html
+scripts/da_generate_html.pl build html
+scripts/da_list_refs.ksh html

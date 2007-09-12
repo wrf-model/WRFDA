@@ -3,7 +3,7 @@
 . ./setup.ksh
 
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export EXPT=${ID}_suite_${NUM_PROCS}
+export EXPT=${ID}_suite
 
 export REL_DIR=$HOME/code/$ID
 

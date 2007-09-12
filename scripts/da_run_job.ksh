@@ -5,15 +5,12 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 . ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$RUN}
 export WORK_DIR=$RUN_DIR/working
-
-if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
-   export NUM_PROCS=$MAX_PROCS
-fi
 
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 
+rm -rf $RUN_DIR
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
