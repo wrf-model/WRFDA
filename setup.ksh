@@ -11,7 +11,7 @@ CC=${2:-gcc}
 
 # Search for queuing systems.
 # Don't use which, as it always returns 0 on BSD
-bjobs > /dev/null 2>&1
+bjobs -V > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
    export LSF_PTILE=${LSF_PTILE:-8}

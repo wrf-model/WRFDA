@@ -12,7 +12,7 @@ endif
 
 # Search for queuing systems.
 # Don't use which, as it always returns 0 on BSD
-bjobs >& /dev/null
+bjobs -V >& /dev/null
 if ($status == 0) then
    setenv SUBMIT LSF
    if (! $?LSF_PTILE) then
