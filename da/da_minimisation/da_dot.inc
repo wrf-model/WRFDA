@@ -14,11 +14,11 @@ real function da_dot(n,x,y)
    real    :: dtemp1
    integer :: i,m,mp1
 
+   da_dot = 0.0
    if (n <= 0) return
 
    if (trace_use) call da_trace_entry("da_dot")    
 
-   da_dot = 0.0
    dtemp1 = 0.0
 
    ! code for both increments equal to 1

@@ -11,7 +11,7 @@ module da_test
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
-   use da_control, only : jps,jpe,kps,kpe
+   use da_control, only : ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
 #ifdef RSL
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
