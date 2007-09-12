@@ -1143,6 +1143,10 @@ BENCH_END(hor_diff_tim)
 #endif
    
    
+#ifdef DM_PARALLEL
+#     include "HALO_EM_SD_TL.inc"
+#endif
+
 !call TL
   call   g_surface_drag( ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, u_2, g_u_2, v_2, g_v_2, xland, muu, g_muu, muv, &
   &g_muv, z, g_z, z_at_w, g_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, grid%i_start(ij), grid%i_end(ij),  grid%j_start(ij), grid%j_end(ij) , k_start, k_end )

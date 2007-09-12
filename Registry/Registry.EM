@@ -1332,6 +1332,8 @@ halo   HALO_ADJ_A dyn_em  8:a_ru,a_rv,a_rw,a_ww,a_php,a_alt,a_al,a_p,a_muu,a_muv
 
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
 halo   HALO_EM_PHYS_TL_A  dyn_em 4:g_u_2,g_v_2
+# Could probably trim this halo update down by a few variables...
+halo      HALO_EM_SD_TL  dyn_em 4:u_2,v_2,z,z_at_w,g_u_2,g_v_2,g_z,g_z_at_w,xland
 halo      HALO_EM_PHYS_PBL dyn_em        4:rublten,rvblten
 halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
 halo      HALO_EM_TKE_ADVECT_3 dyn_em 24:tke_2
