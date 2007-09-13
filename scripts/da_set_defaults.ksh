@@ -42,12 +42,13 @@ export SOLVER=${SOLVER:-em}
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
+# Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
+export UPDATE_CYCLING=${UPDATE_CYCLING:-false}
 export FG_TYPE=${FG_TYPE:-GFS}
 
 # Scheduling:
 export SUBMIT=${SUBMIT:-LSF}
-export PROJECT_ID=${PROJECT_ID:-48500053}
+export PROJECT=${PROJECT:-48500053}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
