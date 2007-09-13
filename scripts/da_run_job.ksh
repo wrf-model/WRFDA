@@ -12,6 +12,7 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 
 export WORK_DIR=$RUN_DIR/working
 
+rm -rf $RUN_DIR
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
@@ -50,7 +51,7 @@ elif test $SUBMIT = "LSF"; then
 #
 # LSF batch script
 #
-#BSUB -J ${REGION}_${EXPT}             
+#BSUB -J ${REGION}_${EXPT}_${RUN}          
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
@@ -80,7 +81,7 @@ elif test $SUBMIT = "PBS"; then
    if test $TEMP -gt 4; then
       TEMP=4
    fi
-   typeset -L15 JOBNAME=${REGION}_${EXPT}
+   typeset -L15 JOBNAME=${REGION}_${EXPT}_${RUN}
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -140,7 +141,7 @@ EOF
 
 chmod +x job.ksh
 
-echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
+echo "Running with $NUM_PROCS processors, output to $RUN_DIR"
 if test $SUBMIT = "LoadLeveller"; then 
    llsubmit job.ksh
 elif test $SUBMIT = "LSF"; then 

@@ -193,11 +193,11 @@ subroutine da_crtm_init(iv,ob)
 ! 3.1 call CRTM_Init to load coefficients and fill ChannelInfo structure
 !-----------------------------------------------------------
   ! INPUT: 
-     !SpcCoeff_File     = 'CRTM_amsua_n15-n16.SpcCoeff.bin'
-     !TauCoeff_File     = 'CRTM_amsua_n15-n16.TauCoeff.bin'
-     AerosolCoeff_File = 'CRTM_AerosolCoeff.bin'
-     CloudCoeff_File   = 'CRTM_CloudCoeff.bin'
-     EmisCoeff_File    = 'CRTM_EmisCoeff.bin'
+     !SpcCoeff_File     = 'amsua_n15-n16.SpcCoeff.bin'
+     !TauCoeff_File     = 'amsua_n15-n16.TauCoeff.bin'
+     AerosolCoeff_File = 'AerosolCoeff.bin'
+     CloudCoeff_File   = 'CloudCoeff.bin'
+     EmisCoeff_File    = 'EmisCoeff.bin'
      File_Path         = 'crtm_coeffs/' ! path to coefficient files (if not specified current directory is used)
   !----------------------------------------------------------------
   ! ChannelInfo structure contains on output: 
