@@ -494,6 +494,10 @@ else
    if $NL_VAR4D; then
       if [[ $NUM_PROCS -gt 1 ]]; then
          # JRB kludge until we work out what we are doing here
+         if [[ $SUBMIT != "LSF" ]]; then
+            echo "da_run_wrfvar.ksh: Can only handle LSF at present, aborting"
+            exit 1
+         fi
          export MP_PGMMODEL=mpmd
          export MP_CMDFILE=poe.cmdfile
          if [[ $NUM_PROCS -lt 3 ]]; then

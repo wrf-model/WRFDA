@@ -51,11 +51,7 @@ export SUBMIT=${SUBMIT:-LSF}
 export PROJECT=${PROJECT:-48500053}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
-export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
-export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
-export LL_PTILE=${LL_PTILE:-1}
 export PREV_JOBID=${PREV_JOBID:-test}
-export POE=${POE:-false}
 export HOSTS=${HOSTS:-${HOME}/hosts}
 
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors
@@ -77,9 +73,12 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
    export SUBMIT_OPTIONS6='# @ class            = share'
    export SUBMIT_OPTIONS7='# @ node_usage       = shared'
    export RUN_CMD_DEFAULT=" " # space important
+   export LL_PTILE=${LL_PTILE:-1}
 elif [[ $SUBMIT == "LSF" ]]; then 
    # Use SMT on an 8 processor node
    export LSF_PTILE=${LSF_PTILE:-16}
+   export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
+   export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
    export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
    export SUBMIT_WAIT_FLAG="-K"
    export RUN_CMD_DEFAULT="mpirun.lsf"
