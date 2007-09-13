@@ -167,7 +167,6 @@ SED_FTN         = sed -f standard.sed
 OMP             =
 OMPCPP          =
 MPI_LIB         =
-DM_CPPFLAGS     =
-DM_FPPFLAGS     =
+DM_PPFLAGS      =
 #### Architecture specific settings ####
 
