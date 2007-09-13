@@ -15,10 +15,6 @@ module da_dynamics
       ntasks
    use da_control, only : ips,ipe,jps,jpe,kps
 #endif
-#ifdef RSL
-   use module_dm, only : invalid_message_value, setup_halo_rsl, &
-      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
-#endif
 
    use da_define_structures, only : xbx_type
    use da_reporting, only : message, da_error   

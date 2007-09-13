@@ -140,7 +140,6 @@ IO_NETCDF     = $(EXTERNAL)/io_netcdf
 IO_PNETCDF    = $(EXTERNAL)/io_pnetcdf
 IO_PHDF5      = $(EXTERNAL)/io_phdf5
 IOAPI_SHARE   = $(EXTERNAL)/ioapi_share
-RSL           = $(EXTERNAL)/RSL
 RSL_LITE      = $(EXTERNAL)/RSL_LITE
 RSL_STUBS     = $(EXTERNAL)/RSL_STUBS
 

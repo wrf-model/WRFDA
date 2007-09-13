@@ -20,10 +20,6 @@ module da_ffts
       ntasks_x, ntasks_y, data_order_xyz, mytask, ntasks
    use da_control, only : ids,ide,ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
-#ifdef RSL
-   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
-      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
-#endif
 
    use module_ffts, only : fft661, fft551
 

@@ -17,10 +17,6 @@ module da_transfer_model
       ntasks, data_order_xy
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
-#ifdef RSL
-   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
-      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real,add_msg_24pt_integer
-#endif
 
    use da_control, only : cos_xls, sin_xls, cos_xle, sin_xle, trace_use, &
       coarse_jy, coarse_ix, cone_factor, delt_lon, delt_lat, gas_constant, &
