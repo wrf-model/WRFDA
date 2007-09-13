@@ -32,19 +32,19 @@ export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}                            # Domain name.
 export EXPT=${EXPT:-test}                              # Experiment name.
+export ID=${ID:-test}
 export SOLVER=${SOLVER:-em}
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
+export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
 export FG_TYPE=${FG_TYPE:-fnl}
 
 #Scheduling:
 export SCHEDULER=${SCHEDULER:-lsf}
 export PROJECT_ID=${PROJECT_ID:-48500053}
 export QUEUE=${QUEUE:-regular}
-export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
@@ -57,6 +57,15 @@ export SUBMIT_OPTIONS2=${SUBMIT_OPTIONS2:-" "}
 export SUBMIT_OPTIONS3=${SUBMIT_OPTIONS3:-" "}
 export SUBMIT_OPTIONS4=${SUBMIT_OPTIONS4:-" "}
 export HOSTS=${HOSTS:-${HOME}/hosts}
+
+export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
+export MAX_PROCS=${MAX_PROCS:-$NUM_PROCS}
+
+if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
+   NUM_PROCS=$MAX_PROCS
+fi
+
+export RUN=${RUN:-${ID}_${NUM_PROCS}}
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
@@ -78,7 +87,7 @@ export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs}     # Real-time observation direct
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}              # Observation data dir.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}           # Run dir.
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/$RUN}          # Run dir.
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
