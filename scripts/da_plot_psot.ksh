@@ -1,6 +1,6 @@
 #!/bin/ksh
 #########################################################################
-# Script: plot_psot.ksh
+# Script: da_plot_psot.ksh
 #
 # Purpose:  A script to plot pseudo single observation test
 #          
@@ -16,8 +16,8 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 echo "expt_dir= $EXP_DIR"
-export PLOT_DIR=${PLOT_DIR:-$EXP_DIR/plot} #where will be the plots
-CURRENT_DIR=`pwd`
+export PLOT_DIR=${PLOT_DIR:-$EXP_DIR/plotpsot} #where will be the plots
+CURRENT_DIR=$(pwd)
 
 if test ! -d $PLOT_DIR; then mkdir $PLOT_DIR; fi
 cd $PLOT_DIR
@@ -29,38 +29,38 @@ export PLOT_WKS=${PLOT_WKS:-pdf}
 #-------------------------------------------------------------------------
 ivar=0
 for var in $PSEUDO_VAR_LIST; do
-(( ivar=ivar+1 ))
-export PSEUDO_VAR[$ivar]=$var
+   (( ivar=ivar+1 ))
+   export PSEUDO_VAR[$ivar]=$var
 done
 
 ival=0
 for var in $PSEUDO_VAL_LIST; do
-(( ival=ival+1 ))
-export PSEUDO_VAL[$ival]=$var
+   (( ival=ival+1 ))
+   export PSEUDO_VAL[$ival]=$var
 done
 
 ierr=0
 for var in $PSEUDO_ERR_LIST; do
-(( ierr=ierr+1 ))
-export PSEUDO_ERR[$ierr]=$var
+   (( ierr=ierr+1 ))
+   export PSEUDO_ERR[$ierr]=$var
 done
 
 ix=0
 for var in $PSEUDO_X_LIST; do
-(( ix=ix+1 ))
-export PSEUDO_X[$ix]=$var
+   (( ix=ix+1 ))
+   export PSEUDO_X[$ix]=$var
 done
 
 iy=0
 for var in $PSEUDO_Y_LIST; do
-(( iy=iy+1 ))
-export PSEUDO_Y[$iy]=$var
+   (( iy=iy+1 ))
+   export PSEUDO_Y[$iy]=$var
 done
 
 iz=0
 for var in $PSEUDO_Z_LIST; do
-(( iz=iz+1 ))
-export PSEUDO_Z[$iz]=$var
+   (( iz=iz+1 ))
+   export PSEUDO_Z[$iz]=$var
 done
 
 #-------------------------------------------------------------------------
@@ -69,16 +69,16 @@ done
 iv=1
 for var in ${PSEUDO_VAR[*]}; do
 
-  expt=${EXPT}_psot$iv
-  xlon=${PSEUDO_X[$iv]}
-  xlat=${PSEUDO_Y[$iv]}
-    kl=${PSEUDO_Z[$iv]}
-   omb=${PSEUDO_VAL[$iv]}
-   err=${PSEUDO_ERR[$iv]}
-  
+   expt = ${EXPT}_psot$iv
+   xlon = ${PSEUDO_X[$iv]}
+   xlat = ${PSEUDO_Y[$iv]}
+   kl   = ${PSEUDO_Z[$iv]}
+   omb  = ${PSEUDO_VAL[$iv]}
+   err  = ${PSEUDO_ERR[$iv]}
 
-  DATE=$INITIAL_DATE
-  while test $DATE -le $FINAL_DATE; do
+
+   DATE=$INITIAL_DATE
+   while test $DATE -le $FINAL_DATE; do
 
       export FIRST_GUESS=${EXP_DIR}/run/$DATE/wrfvar_psot${iv}/working/wrfinput_d01
       export ANALYSIS=${EXP_DIR}/fc/psot${iv}/$DATE/analysis
@@ -102,11 +102,11 @@ for var in ${PSEUDO_VAR[*]}; do
       chmod +x run3
       ./run3
 
-      export NEXT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+      export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
       export DATE=$NEXT_DATE
 
-  done
-  (( iv=iv+1 ))
+   done
+   (( iv=iv+1 ))
 done
 
 cd $CURRENT_DIR
