@@ -59,7 +59,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, iv)
 
    if (rootproc) then
       if (ntpw > 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_rv'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_retrieval'
          write(unit=stats_unit, fmt='(a/)') '   var           tpw(cm)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntpw
          write(unit=stats_unit, fmt='(a, f12.4,i9)') &
@@ -71,7 +71,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, iv)
       end if
 
       if (nspeed > 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_rv'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_retrieval'
          write(unit=stats_unit, fmt='(a/)') '   var           speed(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', nspeed
          write(unit=stats_unit, fmt='(a, f12.4,i9)') &

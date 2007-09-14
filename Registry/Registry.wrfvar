@@ -128,8 +128,6 @@ state    real   a_t            ijkb     dyn_em      2         -     \
 state    real   g_t            ijkb     dyn_em      2         -     \
        i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
 
-state    real   t_init         ijk     dyn_em      1         -      ir        "t_init" "initial potential temperature" "K"                                             
-
 # Mass
 state    real   mu              ijb     dyn_em      2         -     \
      irh0usdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
@@ -1092,7 +1090,7 @@ package   io_pnetcdf  io_form_restart==11                     -             -
 
 halo      HALO_EM_INIT_1 dyn_em 48:u_1,u_2,v_1,v_2,w_1,w_2,ph_1,ph_2
 halo      HALO_EM_INIT_2 dyn_em 48:t_1,t_2,mu_1,mu_2,phb
-halo      HALO_EM_INIT_3 dyn_em 48:t_init,mub,mu0,p
+halo      HALO_EM_INIT_3 dyn_em 48:mub,mu0,p
 halo      HALO_EM_INIT_4 dyn_em 48:h_diabatic,msft,msfu,msfv,f,e,sina,cosa,ht
 halo      HALO_EM_INIT_5 dyn_em 48:moist,scalar
 halo      HALO_EM_A dyn_em  8:p
@@ -1128,7 +1126,7 @@ halo      em_shift_halo_x  dyn_em 48:imask_nostag,imask_xstag,imask_ystag,imask_
 
 # Periodic Boundary Communications
 
-period    PERIOD_BDY_EM_INIT dyn_em 3:u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,t_init,phb,mu_1,mu_2,mub,mu0,ht,msft,msfu,msfv,sina,cosa,e,f
+period    PERIOD_BDY_EM_INIT dyn_em 3:u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,phb,mu_1,mu_2,mub,mu0,ht,msft,msfu,msfv,sina,cosa,e,f
 period    PERIOD_BDY_EM_MOIST dyn_em 3:moist
 period    PERIOD_BDY_EM_SCALAR dyn_em 3:scalar
 period    PERIOD_BDY_EM_A dyn_em 2:p,ph_2

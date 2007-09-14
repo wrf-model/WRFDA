@@ -24,8 +24,8 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
       write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for pilot_u   = ',max_error_uv, &
-         'Error max test ratio for pilot_v   = ',max_error_uv
+         'Error max test ratio for Pilot_U   = ',max_error_uv, &
+         'Error max test ratio for Pilot_V   = ',max_error_uv
    end if
 
    !---------------------------------------------------------------------------

@@ -10,9 +10,11 @@ subroutine da_fill_obs_structures(xp, iv, ob)
    type (iv_type), intent(inout) :: iv   ! Obs and header structure.
    type (y_type), intent(out)    :: ob   ! (Smaller) observation structure.
 
-   integer                       :: n, k     ! Loop counters.
-   real                          :: rh_error ! RH obs. error.
-   real                          :: q_error  ! q obs. error.
+   integer :: n, k     ! Loop counters.
+   real    :: rh_error ! RH obs. error.
+   real    :: q_error  ! q obs. error.
+   integer :: i,j
+   logical :: outside
 
    if (trace_use) call da_trace_entry("da_fill_obs_structures")
 
@@ -96,6 +98,37 @@ subroutine da_fill_obs_structures(xp, iv, ob)
 
    iv % airsr_ef_t = 1.0
    iv % airsr_ef_q = 1.0
+
+   !-------------------------------
+   ! Find out if pseudo ob is local
+   !-------------------------------
+
+   if (num_pseudo > 0) then
+      outside = .false.
+      i = int(pseudo_x)
+      j = int(pseudo_y)
+
+      if (fg_format == fg_format_kma_global) then
+         if ((j < jts-1) .or. (j > jte)) outside = .true.
+      else
+         if ((i < ids)   .or. (i >= ide) .or. (j < jds)   .or. (j >= jde)) outside = .true.
+         if ((i < its-1) .or. (i >  ite) .or. (j < jts-1) .or. (j >  jte)) outside = .true.
+      end if
+   else
+      outside = .true.
+   end if
+
+   if (outside) then
+      iv%nlocal(pseudo) = 0
+      ob%nlocal(pseudo) = 0
+      iv%ntotal(pseudo) = 0
+      iv%plocal(iv%time,pseudo) = 0
+   else
+      iv % nlocal(pseudo)         = num_pseudo
+      ob % nlocal(pseudo)         = num_pseudo
+      iv % ntotal(pseudo)         = num_pseudo
+      iv % plocal(iv%time,pseudo) = num_pseudo
+   end if
 
    !---------------------------------------------------------------------------
    ! [1.0] Allocate innovation vector and observation structures:
@@ -349,7 +382,7 @@ subroutine da_fill_obs_structures(xp, iv, ob)
    
    ! [2.14] Setup pseudo observations:
 
-   if (num_pseudo > 0) call da_setup_pseudo_obs(xp, iv, ob)
+   if (iv%nlocal(pseudo) > 0) call da_setup_pseudo_obs(xp, iv, ob)
 
    ! [2.15] Transfer scatterometer obs:
 

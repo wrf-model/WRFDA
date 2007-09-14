@@ -25,7 +25,7 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
       write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for satem_thickness   = ',max_error_thickness
+         'Error max test ratio for Satem_thickness   = ',max_error_thickness
    end if
 
    !---------------------------------------------------------------------------

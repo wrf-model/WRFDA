@@ -203,7 +203,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total rejections for buoy follows:'
+         ', Total Rejections for Buoy follows:'
 
       write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
@@ -211,7 +211,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
          'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
          'Number of failed temperature observations:',ittf, ' on ',itt,   &
          'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-         'Finally total buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+         'Finally Total Buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                             itu +itvv +itp +itt +itqv
    end if
    
