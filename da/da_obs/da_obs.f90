@@ -21,7 +21,7 @@ module da_obs
       ob_format,ob_format_ascii,filename_len, trace_use_dull, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, num_ob_indexes
+      bogus, buoy, qscat,pseudo, num_ob_indexes, its,ite,jds,jts,jte,ids
    ! use_crtm_kmatrix,use_crtm_kmatrix_fast
 #ifdef CRTM
    use da_crtm, only : da_transform_xtoy_crtm, da_transform_xtoy_crtm_adj
