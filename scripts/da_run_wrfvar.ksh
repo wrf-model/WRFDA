@@ -231,7 +231,7 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
       done
       ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-      if [[ -e $OB_DIR/${D_DATE[01]}/ob.ssmi+ ]]; then
+      if [[ -s $OB_DIR/${D_DATE[01]}/ob.ssmi+ ]]; then
          ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob01.ssmi
          for I in 02 03 04 05 06; do
             ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${I}.ssmi
@@ -239,7 +239,7 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi- ob07.ssmi
       fi
 
-      if [[ -e $OB_DIR/${D_DATE[01]}/ob.radar+ ]]; then
+      if [[ -s $OB_DIR/${D_DATE[01]}/ob.radar+ ]]; then
          ln -fs $OB_DIR/${D_DATE[01]}/ob.radar+ ob01.radar
          for I in 02 03 04 05 06; do
             ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ob${I}.radar
@@ -277,10 +277,10 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
    fi
 else
    ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-   if [[ -e $OB_DIR/${DATE}/ob.ssmi ]]; then
+   if [[ -s $OB_DIR/${DATE}/ob.ssmi ]]; then
       ln -fs $OB_DIR/${DATE}/ob.ssmi ob01.ssmi
    fi
-   if [[ -e $OB_DIR/${DATE}/ob.radar ]]; then
+   if [[ -s $OB_DIR/${DATE}/ob.radar ]]; then
       ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
    fi
 fi

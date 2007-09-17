@@ -300,6 +300,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
                "Max number of tovs",max_tovs_input," reached"
             call da_warning(__FILE__,__LINE__,message(1:1))
             num_tovs_selected = num_tovs_selected-1
+            num_tovs_global   = num_tovs_global-1
             exit obs
          end if
 

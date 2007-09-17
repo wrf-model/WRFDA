@@ -13,10 +13,6 @@ module da_test
       ntasks, data_order_xy
    use da_control, only : ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
-#ifdef RSL
-   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
-      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
-#endif
 
    use module_domain, only : xpose_type, vp_type, xb_type, x_type, ep_type, &
       domain

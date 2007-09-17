@@ -109,7 +109,6 @@ include io_phdf5.make
 include io_grib.make
 include ioapi_share.make
 include main.make
-include RSL.make
 include RSL_LITE.make
 
 libwrf.a : $(WRF_OBJS)
@@ -120,13 +119,13 @@ libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
-clean : arch_clean
+clean : 
 	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
           inc/dm_comm_cpp_flags
 
-superclean : clean arch_superclean
+superclean : clean
 	@ ( cd ../external; make superclean )
 	@ rm -rf *.exe *.f90 *.F90 *.F *.inc inc/*.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \

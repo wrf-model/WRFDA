@@ -11,10 +11,6 @@ module da_vtox_transforms
       ntasks_y, data_order_xy, data_order_xyz
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
-#ifdef RSL
-   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
-      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
-#endif
    use module_domain, only : ep_type, vp_type, x_type, domain
 
    use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
