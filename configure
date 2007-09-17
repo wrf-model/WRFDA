@@ -21,21 +21,21 @@ option=$1
 # Change default options if not configuring a wrfvar target
 # (wrfvar, be, all_wrfvar)
 
-if [ "$option" = "wrf" -o "$option" = "wrf_em" -o "$option" = "em_real" ] ; then
+if [ "$option" = "arw" -o "$option" = "arw_em" -o "$option" = "em_real" ] ; then
     SOLVER=em
     REGISTRY=Registry.EM
     EM_CORE=1
     SOLVER=em
-elif [ "$option" = "wrf_em_nl" ] ; then
+elif [ "$option" = "arw_em_nl" ] ; then
     SOLVER=em
     REGISTRY=Registry.EM_NL
     EM_CORE=1
-elif [ "$option" = "wrf_em_chem" ] ; then
+elif [ "$option" = "arw_em_chem" ] ; then
     SOLVER=em
     REGISTRY=Registry.EM_CHEM
     EM_CORE=1
     WRF_CHEM=1
-elif [ "$option" = "wrf_nmm" ] ; then
+elif [ "$option" = "nmm" ] ; then
     SOLVER=nmm
     NMM_CORE=1
     REGISTRY=Registry.NMM  

@@ -31,11 +31,11 @@ foreach a ( $argv )
 
     set arglist = ( $arglist $a )
 
-    if ( "$a" == "wrf" || "$a" == "all_wrf" || "$a" == "all_em" || "$a" == "wrf_em" || \
+    if ( "$a" == "arw" || "$a" == "all_arw" || "$a" == "all_em" || "$a" == "wrf_em" || \
          "$a" == "chem" || "$a" == "diffwrf" ) then
       set valid_arg = 1
       setenv WRF_EM_CORE 1
-    else if ( "$a" == "all_nmm" || "$a" == "wrf_nmm" ) then
+    else if ( "$a" == "all_nmm" || "$a" == "nmm" ) then
       set valid_arg = 1
       setenv WRF_NMM_CORE 1
     else if ( "$a" == "decode_airs" ) then
