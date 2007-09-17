@@ -55,6 +55,7 @@ fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
+export NL_INPUTOUT_INTERVAL=`expr $CYCLE_PERIOD \* 60`
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-"wrfinput_d<domain>_<date>"}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
 # &domains:
