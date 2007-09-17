@@ -55,6 +55,7 @@ NEW_FILE[6]=working/check_max_iv
 NEW_FILE[7]=working/gts_omb_oma
 NEW_FILE[8]=working/filtered_obs
 NEW_FILE[9]=working/rand_obs_error
+NEW_FILE[10]=namelist.output
 
 COUNT=1
 
@@ -73,8 +74,11 @@ while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
    if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
       # Can't use -q option as missing from braindead Aix
       diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
-      if [[ $? != 0 ]] && $FULL; then
-         diff $DIR1/$FILE1 $DIR2/$FILE2
+      if [[ $? != 0 ]] then
+         echo "$DIR1/$FILE1 $DIR2/$FILE2 differ"
+         if $FULL; then
+            diff $DIR1/$FILE1 $DIR2/$FILE2
+         fi
       fi
    fi 
    let COUNT=$COUNT+1

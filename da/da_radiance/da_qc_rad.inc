@@ -81,7 +81,6 @@ subroutine da_qc_rad (ob, iv)
       num_tovs_before(i,myproc+1)=iv%instid(i)%num_rad
       temp(:)= num_tovs_before(i,:)
       call da_proc_sum_ints(temp(:))
-
 #ifdef DM_PARALLEL
       call wrf_dm_bcast_integer(temp(:),num_procs)
 #endif

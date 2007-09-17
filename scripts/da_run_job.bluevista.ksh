@@ -28,7 +28,7 @@ cat > job.ksh <<EOF
 #BSUB -o $EXPT.out               
 #BSUB -e $EXPT.err               
 #BSUB -q $QUEUE 
-#BSUB -P $PROJECT_ID
+#BSUB -P $PROJECT
 #BSUB -W $LSF_MAX_RUNTIME
 #BSUB -R "span[ptile=$LL_PTILE]"
 ############BSUB -w \"done(${PREV_JOBID})\"

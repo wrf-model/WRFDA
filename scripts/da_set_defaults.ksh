@@ -42,19 +42,16 @@ export SOLVER=${SOLVER:-em}
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
+# Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
+export UPDATE_CYCLING=${UPDATE_CYCLING:-false}
 export FG_TYPE=${FG_TYPE:-GFS}
 
 # Scheduling:
 export SUBMIT=${SUBMIT:-LSF}
-export PROJECT_ID=${PROJECT_ID:-48500053}
+export PROJECT=${PROJECT:-48500053}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
-export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
-export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
-export LL_PTILE=${LL_PTILE:-1}
 export PREV_JOBID=${PREV_JOBID:-test}
-export POE=${POE:-false}
 export HOSTS=${HOSTS:-${HOME}/hosts}
 
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors
@@ -76,9 +73,12 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
    export SUBMIT_OPTIONS6='# @ class            = share'
    export SUBMIT_OPTIONS7='# @ node_usage       = shared'
    export RUN_CMD_DEFAULT=" " # space important
+   export LL_PTILE=${LL_PTILE:-1}
 elif [[ $SUBMIT == "LSF" ]]; then 
    # Use SMT on an 8 processor node
    export LSF_PTILE=${LSF_PTILE:-16}
+   export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
+   export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
    export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
    export SUBMIT_WAIT_FLAG="-K"
    export RUN_CMD_DEFAULT="mpirun.lsf"
@@ -261,4 +261,23 @@ export NSTARTACCUM2=${NSTARTACCUM2:-1}                 # ETKF parameter.
 export CYCLE_NUMBER=${CYCLE_NUMBER:-0}                 # ETKF parameter.
 export TAINFLATINPUT=${TAINFLATINPUT:-1.0}             # ETKF parameter.
 export RHOINPUT=${RHOINPUT:-1.0}                       # ETKF parameter.
+
+#PSOT:
+let HALF_E_WE=$NL_E_WE/2                               # Center of w-e domain
+let HALF_E_SN=$NL_E_SN/2                               # Center of s-n domain
+export PSEUDO_VAR_SIZE=${PSEUDO_VAR_SIZE:-5}           # Number of tests
+export PSEUDO_VAR_LIST=${PSEUDO_VAR_LIST:-"u u t t q"} # Variables for each of the PSOTs
+export PSEUDO_VAL_LIST=${PSEUDO_VAL_LIST:-"1.0 1.0 1.0 1.0 1.0"}
+                                                       # Obs. values
+export PSEUDO_ERR_LIST=${PSEUDO_ERR_LIST:-"1.0 1.0 1.0 1.0 1.0"}
+                                                       # Sigma_b (O-B) values
+export PSEUDO_X_LIST=${PSEUDO_X_LIST:-"$HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE"}
+                                                       # Grid indice for lon.
+export PSEUDO_Y_LIST=${PSEUDO_Y_LIST:-"$HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN"}
+                                                       # Grid indice for lat.
+export PSEUDO_Z_LIST=${PSEUDO_Z_LIST:-"7 19  7 13  7"}
+                                                       # level indice for half mass Eta levels
+                                                       # Level  7: eta=0.86
+                                                       # Level 19: eta=0.273
+                                                       # Level 13: eta=0.507
 

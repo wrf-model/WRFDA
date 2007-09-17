@@ -18,7 +18,6 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
    let NODES=$TEMP/8+1
-   export POE=true
 
    cat > job.ksh <<EOF
 #!/bin/ksh

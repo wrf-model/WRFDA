@@ -616,10 +616,10 @@ BENCH_START(surf_driver_tim)
      &        ,IVGTYP=grid%ivgtyp      ,LH=grid%lh              ,LOWLYR=grid%lowlyr      &
      &        ,MAVAIL=grid%mavail      ,NUM_SOIL_LAYERS=config_flags%num_soil_layers        &
      &        ,P8W=p8w            ,PBLH=grid%pblh          ,PI_PHY=pi_phy      &
-     &        ,PSFC=grid%psfc          ,PSHLTR=pshltr      ,PSIH=psih          &
-     &        ,PSIM=psim          ,P_PHY=p_phy        ,Q10=q10            &
+     &        ,PSFC=grid%psfc          ,PSHLTR=grid%pshltr      ,PSIH=psih          &
+     &        ,PSIM=psim          ,P_PHY=p_phy        ,Q10=grid%q10            &
      &        ,Q2=grid%q2              ,QFX=grid%qfx            ,QSFC=grid%qsfc          &
-     &        ,QSHLTR=qshltr      ,QZ0=grid%qz0            ,RAINCV=grid%raincv      &
+     &        ,QSHLTR=grid%qshltr      ,QZ0=grid%qz0            ,RAINCV=grid%raincv      &
      &        ,RA_LW_PHYSICS=config_flags%ra_lw_physics            ,RHO=rho            &
      &        ,RMOL=grid%rmol          ,SFCEVP=grid%sfcevp      ,SFCEXC=grid%sfcexc      &
      &        ,SFCRUNOFF=grid%sfcrunoff                                        &
@@ -629,9 +629,9 @@ BENCH_START(surf_driver_tim)
      &        ,SMSTAV=grid%smstav      ,SMSTOT=grid%smstot      ,SNOALB=grid%snoalb      &
      &        ,SNOW=grid%snow          ,SNOWC=grid%snowc        ,SNOWH=grid%snowh        &
      &        ,SST=grid%sst            ,SST_UPDATE=grid%sst_update                  &
-     &        ,STEPBL=grid%stepbl      ,TH10=th10          ,TH2=grid%th2            &
+     &        ,STEPBL=grid%stepbl      ,TH10=grid%th10          ,TH2=grid%th2            &
      &        ,THZ0=grid%thz0          ,TH_PHY=th_phy      ,TKE_MYJ=grid%tke_myj    &
-     &        ,TMN=grid%tmn            ,TSHLTR=tshltr      ,TSK=grid%tsk            &
+     &        ,TMN=grid%tmn            ,TSHLTR=grid%tshltr      ,TSK=grid%tsk            &
      &        ,TSLB=grid%tslb          ,T_PHY=t_phy        ,U10=grid%u10            &
      &        ,URATX=grid%uratx        ,VRATX=grid%vratx   ,TRATX=grid%tratx        &
      &        ,UDRUNOFF=grid%udrunoff  ,UST=grid%ust       ,UZ0=grid%uz0            &
@@ -1726,7 +1726,7 @@ BENCH_END(sumflux_tim)
 
 BENCH_START(advance_w_tim)
         IF ( config_flags%non_hydrostatic ) THEN
-          CALL advance_w( grid%em_w_2, rw_tend, grid%em_ww, grid%em_u_2, grid%em_v_2,       &
+          CALL advance_w( grid%em_w_2, rw_tend, grid%em_ww, w_save, grid%em_u_2, grid%em_v_2,       &
                           grid%em_mu_2, grid%em_mut, muave, grid%em_muts,           &
                           t_2save, grid%em_t_2, grid%em_t_save,             &
                           grid%em_ph_2, ph_save, grid%em_phb, ph_tend,      &
