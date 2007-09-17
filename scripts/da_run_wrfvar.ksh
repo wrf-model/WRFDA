@@ -283,8 +283,12 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii ob01.ascii
-      ln -fs $OB_DIR/${DATE}/ob.ssmi  ob01.ssmi
-      ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
+      if [[ -s $OB_DIR/${DATE}/ob.ssmi ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.ssmi ob01.ssmi
+      fi
+      if [[ -s $OB_DIR/${DATE}/ob.radar ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
+      fi
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
