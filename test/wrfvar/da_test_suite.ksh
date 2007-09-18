@@ -13,6 +13,10 @@ export NL_NTMAX=${NL_NTMAX:-2}
 
 export REG_DIR=$PWD
 export EXP_DIR=$PWD/$EXPT
+export FC_DIR=$EXP_DIR/fc
+export RC_DIR=$EXP_DIR/rc
+export OB_DIR=$EXP_DIR/ob
+
 export RUN_DIR=$EXP_DIR/run
 
 export SUBMIT_FLAGS=$SUBMIT_WAIT_FLAG
