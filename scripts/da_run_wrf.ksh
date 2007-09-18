@@ -21,12 +21,10 @@ if $NL_VAR4D; then
 fi
 
 # allow for ensemble members identified by CMEM
-if [[ ! -z $CMEM ]]; thhen
+if [[ ! -z $CMEM ]]; then
    export WRF_INPUT_DIR=${WRF_INPUT_DIR:-$RC_DIR/$DATE}.$CMEM
-   export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d01}.$CMEM
 else
    export WRF_INPUT_DIR=${WRF_INPUT_DIR:-$RC_DIR/$DATE}
-   export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d01}
 fi
 
 if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
@@ -47,13 +45,12 @@ echo 'WRF_DIR        <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'RUN_DIR        <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'         
 echo 'WORK_DIR       <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'       
 echo 'RC_DIR         <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'           
-echo 'FC_DIR         <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'           
+echo 'FC_DIR         <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'              
+echo 'WRF_INPUT_DIR  <A HREF="file:'$WRF_INPUT_DIR'">'$WRF_INPUT_DIR'</a>'         
 echo "DATE           $DATE"                                            
 echo "END_DATE       $END_DATE"                                        
 echo "FCST_RANGE     $FCST_RANGE"                                      
-echo "LBC_FREQ       $LBC_FREQ"                                        
-echo "WRF_INPUT_DIR  $WRF_INPUT_DIR"
-echo "WRF_BDY        $WRF_BDY"
+echo "LBC_FREQ       $LBC_FREQ"  
 echo "MEM            $MEM"
 
 # Copy necessary info (better than link as not overwritten):
@@ -66,7 +63,9 @@ ln -fs ${WRF_DIR}/run/SOILPARM.TBL .
 ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
 ln -fs ${WRF_DIR}/run/gribmap.txt .
 for DOMAIN in $DOMAINS; do
-   ln -fs $WRF_INPUT_DIR/wrfinput_d${DOMAIN} wrfinput_d${DOMAIN}
+   # Copy this file, so the copy back of wrfinput files later does
+   # not create a recursive link
+   cp $WRF_INPUT_DIR/wrfinput_d${DOMAIN} wrfinput_d${DOMAIN}
    # WHY
    # cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 done

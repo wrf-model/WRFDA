@@ -50,7 +50,7 @@ mkdir -p ${WORK_DIR}
 cd ${WORK_DIR}
 
 echo 'REL_DIR        <A HREF="'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF_BC_DIR     <A HREF="'$WRF_BC_DIR'">'$WRF_BC_DIR'</a>'
+echo 'WRFVAR_DIR     <A HREF="'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>'
 echo "DATE           $DATE"
 echo "DA_REAL_OUTPUT $DA_REAL_OUTPUT"
 echo "BDYIN          $BDYIN"
@@ -78,7 +78,7 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d01
 else
 
-   ln -fs $WRF_BC_DIR/build/da_update_bc.exe .
+   ln -fs $WRFVAR_DIR/build/da_update_bc.exe .
    ./da_update_bc.exe
 
    RC=$?

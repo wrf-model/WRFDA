@@ -100,7 +100,6 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC}  # Update_bc dir.
 export WPB_DIR=${WPB_DIR:-$REL_DIR/wpb}           # Perturbed LBC dir.
 export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}         # WRF directory.
 export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
@@ -161,8 +160,6 @@ export NL_E_SN=${NL_E_SN:-45}
 export MAP_PROJ=${MAP_PROJ:-lambert}
 export REF_LAT=${REF_LAT:-40.0}
 export REF_LON=${REF_LON:--98.0}
-export REF_X=${REF_X:-NAN}
-export REF_Y=${REF_Y:-NAN}
 export TRUELAT1=${TRUELAT1:-30.0}
 export TRUELAT2=${TRUELAT2:-60.0}
 export STAND_LON=${STAND_LON:--98.0}
@@ -247,8 +244,8 @@ export NL_CHECK_RH=${NL_CHECK_RH:-2}     # RH bounds check.
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
 
 # Ensemble parameters:
-export NUM_JOBS=${NUM_JOBS:-1}                         # Number of parallel jobs to run.
-export NUM_MEMBERS=${NUM_MEMBERS:-1}                   # Number of ensemble members.
+export NUM_JOBS=${NUM_JOBS:-0}                         # Number of parallel jobs to run.
+export NUM_MEMBERS=${NUM_MEMBERS:-0}                   # Number of ensemble members.
 export MEM=${MEM:-1}                                   # Ensemble member.
 export FILE_TYPE=${FILE_TYPE:-wrfinput}                # ETKF input file-type.
 export NV=${NV:-15}                                    # Number of ETKF variables.

@@ -34,58 +34,7 @@ echo 'WPS_OUTPUT_DIR <A HREF="file:'$WPS_OUTPUT_DIR'"</a>'$WPS_OUTPUT_DIR'</a>'
 echo 'RUN_DIR        <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
 echo 'WORK_DIR       <A HREF="file:'$WORK_DIR'"</a>'$WORK_DIR'</a>'
 
-cat >namelist.wps <<EOF
-&share
- wrf_core = 'ARW',
- max_dom = 1,
- start_year = $NL_START_YEAR,
- start_month = $NL_START_MONTH,
- start_day = $NL_START_DAY,
- start_hour = $NL_START_HOUR,
- end_year = $NL_END_YEAR,
- end_month = $NL_END_MONTH,
- end_day = $NL_END_DAY,
- end_hour = $NL_END_HOUR,
- interval_seconds = $LBC_FREQ_SS,
- io_form_geogrid = 2,
- opt_output_from_geogrid_path = '$WPS_OUTPUT_DIR',
- debug_level = 0
-/
-
-&geogrid
- parent_id =           1,
- parent_grid_ratio =   1,
- i_parent_start =      1,
- j_parent_start =      1,
- s_we           = 1,
- e_we           = $NL_E_WE,
- s_sn           = 1,
- e_sn           = $NL_E_SN,
- geog_data_res  = '$GEOG_DATA_RES',
- dx = $NL_DX,
- dy = $NL_DY,
- map_proj = '$MAP_PROJ',
- ref_lat   = $REF_LAT,
- ref_lon   = $REF_LON,
- truelat1  = $TRUELAT1,
- truelat2  = $TRUELAT2,
- stand_lon = $STAND_LON,
- geog_data_path = '$WPS_GEOG_DIR',
- opt_geogrid_tbl_path = '$WPS_DIR/geogrid'
-/
-
-&ungrib
- out_format = 'SI'
-/
-
-&metgrid
- fg_name = './FILE'
- io_form_metgrid = 2, 
- opt_output_from_metgrid_path = '$WPS_OUTPUT_DIR/$DATE',
- opt_metgrid_tbl_path         = '$WPS_DIR/metgrid',
- opt_ignore_dom_center        = .false.
-/
-EOF
+${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
 
 cp $WORK_DIR/namelist.wps $RUN_DIR
 
@@ -152,6 +101,7 @@ else
    fi
 
    # Run metgrid:
+   ln -fs $WPS_DIR/metgrid/METGRID.TBL.${METGRID_TABLE_TYPE} METGRID.TBL
    ln -fs $WPS_DIR/metgrid.exe .
    ${RUN_CMD} ./metgrid.exe
 

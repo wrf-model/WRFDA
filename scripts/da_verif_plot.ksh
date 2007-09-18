@@ -1,5 +1,5 @@
 #!/bin/ksh
-
+set -x
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 . ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
@@ -80,7 +80,7 @@ ln -sf ${WRFVAR_DIR}/build/da_verif.exe .
 
 nfile=$(ls *${DIAG_VAR}.diag 2>/dev/null | wc -l)
 if [[ $nfile -eq 0 ]]; then
-   ./da_verif.exe > da_verif.out 2>&1
+   ./da_verif.exe > da_verif.log 2>&1
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "da_verif.exe failed with error $RC"
@@ -200,16 +200,20 @@ echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/vert_profile.ncl" > run
 chmod +x run3
 ./run3 > run3.log 2>&1
 
-echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>" > index.html
-echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>" >> index.html
-for FILE in *.pdf; do
+echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD><BODY>" > index.html
+
+echo 'WORK_DIR <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>' >> index.html
+
+echo "<P>Output logs<UL>" >> index.html
+for FILE in *.log; do
    if [[ -f $FILE ]]; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi
 done
 
-echo "</UL>Output logs<UL>" >> index.html
-for FILE in *.log; do
+echo "</UL>Plots<UL>" >> index.html
+
+for FILE in *.pdf; do
    if [[ -f $FILE ]]; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi
@@ -218,7 +222,7 @@ done
 echo "</UL></BODY></HTML>" >> index.html
 
 # Move useful files
-mv *pdf *log *html $RUN_DIR
+mv *pdf *html $RUN_DIR
 
 if $CLEAN; then rm -rf $WORK_DIR; fi
 

@@ -52,8 +52,16 @@ cat >namelist.wps <<EOF
  map_proj = '$MAP_PROJ',
  ref_lat   = $REF_LAT,
  ref_lon   = $REF_LON,
- ref_x     = $REF_X,
- ref_y     = $REF_Y,
+EOF
+
+if [[ ! -z "$REF_X" ]]; then
+   echo " ref_x     = $REF_X," >> namelist.wps
+fi
+if [[ ! -z "$REF_Y" ]]; then
+   echo " ref_y     = $REF_Y," >> namelist.wps
+fi
+
+cat >>namelist.wps <<EOF
  truelat1  = $TRUELAT1,
  truelat2  = $TRUELAT2,
  stand_lon = $STAND_LON,

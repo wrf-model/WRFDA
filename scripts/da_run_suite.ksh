@@ -8,7 +8,7 @@
 # The da_run_suite.ksh script is designed for end-to-end real data 
 # testing of the following components of the WRF system:
 #
-# WRF real, OBSPROC, WRFVAR, UPDATE_BC, NDOWN, NUP and WRF.
+# WRF_REAL, OBSPROC, WRFVAR, UPDATE_BC, NDOWN, NUP, ETKF and WRF.
 #
 # Any stage can be switched on/off via environment variables as
 # described below. The da_run_suite.ksh script can also cycle the
@@ -21,11 +21,11 @@
 #
 # 1) Compile the executables for the WRF components you wish to 
 # test.
-# 3) Restore input datasets (e.g. AVN fields, observations, etc).
+# 2) Restore input datasets (e.g. AVN fields, observations, etc).
 # A template da_restore_data_mss.ksh script is called from da_run_suite.ksh, 
 # which I use when working on machines that have access to NCAR's 
 # Mass Store).
-# 4) Overwrite default directories, filenames, namelist parameters,
+# 3) Overwrite default directories, filenames, namelist parameters,
 # etc in script da_run_wrf_wrapper.ksh. This is done via environment
 # variables. (TO DO: Automate vertical levels ENV variable)
 #
@@ -187,9 +187,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
         	  echo $(date) "${ERR}Failed with error $RC$END"
         	  exit 1
                fi
-               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d01
-            else
-               export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d01
             fi 
          fi
       fi
@@ -205,7 +202,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
          fi
       fi
-      export DA_ANALYSIS=$FC_DIR/$DATE/analysis
+      export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d01
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
@@ -215,7 +212,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
-      export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
          if [[ $CYCLE_NUMBER -gt 0 ]]; then
@@ -291,8 +287,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             exit 1
          fi
       fi
-   else
-      export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
    fi
 
    if $RUN_NDOWN; then
@@ -322,7 +316,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_WRF; then
-      if test $NUM_MEMBERS -gt 0; then
+      if [[ $NUM_MEMBERS -gt 0 ]]; then
          export MEM=1
          export JOB=1
 
@@ -334,11 +328,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             export RUN_DIR=$EXP_DIR/run/$DATE/wrf.${CMEM}
             mkdir -p $RUN_DIR
 
-            export WRF_INPUT_DIR=$RC_DIR/$DATE/wrfinput_d${DOMAIN}
-            export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
-            if [[ $CYCLE_NUMBER -gt 0 && $CYCLING ]]; then
-               export WRF_INPUT=$FC_DIR/$DATE/wrfinput_d01
-               export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d01
+            export WRF_INPUT_DIR=$RC_DIR/$DATE
+            if [[ $CYCLE_NUMBER -gt 0 ]] && $CYCLING; then
+               export WRF_INPUT_DIR=$FC_DIR/$DATE
             fi
 
             $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
@@ -362,9 +354,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          export RUN_DIR=$EXP_DIR/run/$DATE/wrf
          mkdir -p $RUN_DIR
 
-         export WRF_INPUT_DIR=$RC_DIR
-         if [[ $CYCLE_NUMBER -gt 0 && $CYCLING ]]; then
-            export WRF_INPUT_DIR=$FC_DIR
+         export WRF_INPUT_DIR=$RC_DIR/$DATE
+         if [[ $CYCLE_NUMBER -gt 0 ]] && $CYCLING; then
+            export WRF_INPUT_DIR=$FC_DIR/$DATE
          fi
 
          $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
@@ -393,7 +385,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
    let CYCLE_NUMBER=$CYCLE_NUMBER+1
-
 done
 
 echo

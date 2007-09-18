@@ -14,11 +14,12 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;==============================================================================
 ;
 plot_gts      = True
-plot_radar    = True
+plot_radar    = False ; does not work at the moment
 
 out_type     = "pdf" ; or "ncgm"
-plotdir      = getenv("RUN_DIR")+"/plotobs/"
-datdir1      = getenv("RUN_DIR")+"/"  ; the path before DATE
+plotdir      = getenv("EXP_DIR")+"/plotobs/"
+exp_dir      = getenv("EXP_DIR")+"/"
+run_dir      = getenv("RUN_DIR")+"/"
 datdir2      = "/wrfvar/working/"     ; the path after DATE
 filename_gts = "gts_omb_oma"
 prefix_radar = "oma_radar"
@@ -92,7 +93,7 @@ linecolor    = "gray"
 plotwnd = False
 colormap = "rainbow+gray"
 
-fname=datdir1+"rc/"+start_date+"/wrfinput_d01"
+fname=exp_dir+"rc/"+start_date+"/wrfinput_d01"
 
 if ( mapinfo_from_file .and. .not.isfilepresent(fname) ) then
    print("file: "+fname+" does not exist")
@@ -2127,14 +2128,14 @@ begin;  begin of the main script
          ; and collect all oma_radar.nnn into one file
          ;
          nradar = 0
-         radar_files = systemfunc("cd "+datdir1+date+datdir2+";"+"\ls "+prefix_radar+".*")
+         radar_files = systemfunc("cd "+run_dir+date+datdir2+";"+"\ls "+prefix_radar+".*")
          if ( num(.not.ismissing(radar_files)) .eq. 0 ) then
             print("Can not find "+prefix_radar+".* files  Will skip them")
          else
             system("\rm -f "+plotdir+"tmp.oma_radar")
             print("Collecting oma_radar files, this may take a while...")
             do i = 0, dimsizes(radar_files)-1
-               fullname = datdir1+date+datdir2+radar_files(i)
+               fullname = run_dir+date+datdir2+radar_files(i)
                if ( stringtointeger(systemfunc("wc -l "+fullname)) .gt. 0 ) then
                   system("touch "+plotdir+"tmp.oma_radar")
                   nradar = nradar + stringtointeger(systemfunc("head -1 "+fullname+" | cut -c21-28"))
@@ -2199,7 +2200,7 @@ begin;  begin of the main script
       end if   ; end of if plot_radar
 
       if ( plot_gts ) then
-         fullname = datdir1+date+datdir2+filename_gts
+         fullname = run_dir+date+datdir2+filename_gts
          if ( .not. isfilepresent(fullname) ) then
             print("Can not find the file "+fullname+"  Will skip it")
          else
