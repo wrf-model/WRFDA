@@ -181,16 +181,6 @@ subroutine da_solve ( grid , config_flags)
          stop
       end if
 
-      ! Write "clean" QCed observations if requested:
-      if (anal_type_qcobs) then
-         if (it == 1) then
-            call da_write_filtered_obs (grid, ob, iv, &
-               coarse_ix, coarse_jy, start_x, start_y)
-          end if     
-      end if
-
-      ! [8.3] Interpolate x_g to low resolution grid
-
       ! [8.4] Minimize cost function:
 
       call da_allocate_y (iv, re)
@@ -219,6 +209,16 @@ subroutine da_solve ( grid , config_flags)
       ! [8.7] Write out diagnostics
 
       call da_write_diagnostics (grid, ob, iv, re, y, j)
+
+      ! Write "clean" QCed observations if requested:
+      if (anal_type_qcobs) then
+         if (it == 1) then
+            call da_write_filtered_obs (grid, ob, iv, &
+               coarse_ix, coarse_jy, start_x, start_y)
+          end if     
+      end if
+
+      ! [8.3] Interpolate x_g to low resolution grid
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 

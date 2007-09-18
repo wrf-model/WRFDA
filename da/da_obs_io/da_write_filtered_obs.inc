@@ -1016,8 +1016,8 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             speed = missing_r
             dir   = missing_r
             speed_error = xmiss
-            iv%qscat(i)%u%qc = missing_data
-            iv%qscat(i)%v%qc = missing_data
+            speed_qc = missing_data
+            dir_qc   = missing_data
          end if
 
          write(ounit, fmt = trim (fmt_each))          &
@@ -1070,14 +1070,14 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                speed = missing_r
                dir   = missing_r
                speed_error = 1.1
-               iv%profiler(i)%u(n)%qc = missing_data
-               iv%profiler(i)%v(n)%qc = missing_data
+               speed_qc = missing_data
+               dir_qc   = missing_data
            end if
 
            write(ounit, fmt = trim (fmt_each))          &
               iv%profiler(i)%p(n),zero,pr_error,        &
-              speed,iv%profiler(i)%u(n)%qc,speed_error, &
-              dir  ,iv%profiler(i)%v(n)%qc,dir_error,   &
+              speed,speed_qc              ,speed_error, &
+              dir  ,dir_qc                ,dir_error,   &
               iv%profiler(i)%info%elv, zero, elv_error, &
               missing_r, missing_data, xmiss,           & 
               missing_r, missing_data, xmiss,           & 
