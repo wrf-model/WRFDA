@@ -33,8 +33,8 @@ cat >namelist.wps <<EOF
  end_hour = $NL_END_HOUR,
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
- opt_output_from_geogrid_path = '$RC_DIR',
- debug_level = $DEBUG_LEVEL
+ opt_output_from_geogrid_path = '$WPS_OUTPUT_DIR',
+ debug_level = $NL_DEBUG_LEVEL
 /
 
 &geogrid
@@ -77,7 +77,7 @@ cat >>namelist.wps <<EOF
  fg_name = './FILE'
  constants_name = '$CONSTANTS1', '$CONSTANTS2'
  io_form_metgrid = 2, 
- opt_output_from_metgrid_path = '$WORK_DIR',
+ opt_output_from_metgrid_path = '$WPS_OUTPUT_DIR/$DATE',
  opt_metgrid_tbl_path         = './',
  opt_ignore_dom_center        = .false.
 /

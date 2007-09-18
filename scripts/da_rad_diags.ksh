@@ -92,11 +92,6 @@ if ! $MAPINFO_FROM_FILE; then   # MAPINFO_FROM_FILE=false
 #
    if ! $SUBDOMAIN; then  # SUBDOMAIN=false, the map is bounded by corner points
       export MAP_PROJ=3     # for now, only 1 (lambert) or 3 (mercator)
-      if [[ $MAP_PROJ == 1 ]]; then
-         export TRUELAT1=30.
-         export TRUELAT2=60.
-         export STAND_LON=-98.
-      fi
       export LAT_LL=0.1810659   # Lower-Left corner latitude
       export LON_LL=60.26209    # Lower-Left corner longitude
       export LAT_UR=37.62015    # Upper-Right corner latitude

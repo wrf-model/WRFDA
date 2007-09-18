@@ -101,7 +101,7 @@ export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
 export WPB_DIR=${WPB_DIR:-$REL_DIR/wpb}           # Perturbed LBC dir.
-export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}         # WRF directory.
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}           # WRF directory.
 export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus} # WRF TL/ADJ directory.
 export DAT_DIR=${DAT_DIR:-$HOME/data}             # Top-level data directory.
@@ -153,8 +153,7 @@ export RUN_UNGRIB_METGRID_AFWA=${RUN_UNGRIB_METGRID_AFWA:-false}
 export RUN_UNGRIB_METGRID_KMA=${RUN_UNGRIB_METGRID_KMA:-false}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
-# export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-/mmm/users/wrfhelp/WPS_GEOG} 
+export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
 export NL_E_WE=${NL_E_WE:-45}
 export NL_E_SN=${NL_E_SN:-45}
 export MAP_PROJ=${MAP_PROJ:-lambert}
@@ -170,7 +169,7 @@ export VTABLE_TYPE=${VTABLE_TYPE:-GFS}
 export METGRID_TABLE_TYPE=${METGRID_TABLE_TYPE:-ARW}
 export CONSTANTS1=${CONSTANTS1:-*}
 export CONSTANTS2=${CONSTANTS2:-*}
-export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
+export NL_DEBUG_LEVEL=${NL_DEBUG_LEVEL:-0}
 
 # WRF real (not already covered above):
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}

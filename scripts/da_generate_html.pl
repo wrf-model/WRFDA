@@ -90,7 +90,6 @@ if ($#files >= 0) {
         s/[(]c[)]/\&copy;/g ;
         s/exe.html/html/g ;
         s/pl.html/html/g ;
-        s/(needs[ ]*|optional[ ]*|provides[ ]*)(DA_[0-9a-zA-Z_]*)/\1<A HREF="http:\/\/manse.johnbray.org.uk\/mmmwiki\/index.php\/Env_Vars#\2">\2<\/a>/g ;
          print OUT "$i $_\n";
       }
 
