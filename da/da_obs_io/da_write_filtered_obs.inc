@@ -1019,14 +1019,14 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
             speed = missing_r
             dir   = missing_r
             speed_error = xmiss
-            iv%qscat(i)%u%qc = missing_data
-            iv%qscat(i)%v%qc = missing_data
+            speed_qc = missing_data
+            dir_qc = missing_data
          end if
 
          write(ounit, fmt = trim (fmt_each))          &
             iv%qscat(i)%h,iv%qscat(i)%u%qc,slp_error, &  
-            speed,iv%qscat(i)%u%qc,speed_error,       &
-            dir  ,iv%qscat(i)%u%qc,dir_error,         &
+            speed,speed_qc        ,speed_error,       &
+            dir  ,dir_qc          ,dir_error,         &
             iv%qscat(i)%info%elv, zero, elv_error,    &
             missing_r, missing_data, xmiss,           & 
             missing_r, missing_data, xmiss,           & 
@@ -1073,14 +1073,14 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
                speed = missing_r
                dir   = missing_r
                speed_error = 1.1
-               iv%profiler(i)%u(n)%qc = missing_data
-               iv%profiler(i)%v(n)%qc = missing_data
+               speed_qc = missing_data
+               dir_qc = missing_data
            end if
 
            write(ounit, fmt = trim (fmt_each))          &
               iv%profiler(i)%p(n),zero,pr_error,        &
-              speed,iv%profiler(i)%u(n)%qc,speed_error, &
-              dir  ,iv%profiler(i)%v(n)%qc,dir_error,   &
+              speed,speed_qc        ,speed_error,       &
+              dir  ,dir_qc          ,dir_error,         &
               iv%profiler(i)%info%elv, zero, elv_error, &
               missing_r, missing_data, xmiss,           & 
               missing_r, missing_data, xmiss,           & 

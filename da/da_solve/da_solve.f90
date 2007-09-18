@@ -233,16 +233,6 @@ subroutine da_solve ( grid , config_flags)
          stop
       end if
 
-      ! Write "clean" QCed observations if requested:
-      if (anal_type_qcobs) then
-        if (it == 1) then
-        call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
-                          grid%moad_cen_lat, grid%stand_lon,&
-                          grid%truelat1, grid%truelat2,     &
-                          coarse_ix, coarse_jy, start_x, start_y)
-         end if     
-      end if
-
       ! [8.3] Interpolate x_g to low resolution grid
 
       ! [8.4] Minimize cost function:
@@ -276,6 +266,16 @@ subroutine da_solve ( grid , config_flags)
 
       call da_write_diagnostics( ob, iv, re, y, grid%xp, grid%xa, j )
 
+
+      ! Write "clean" QCed observations if requested:
+      if (anal_type_qcobs) then
+        if (it == 1) then
+        call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
+                          grid%moad_cen_lat, grid%stand_lon,&
+                          grid%truelat1, grid%truelat2,     &
+                          coarse_ix, coarse_jy, start_x, start_y)
+         end if     
+      end if
       ! [8.8] Write Ascii radiance OMB and OMA file
 
       if (write_oa_rad_ascii) then
