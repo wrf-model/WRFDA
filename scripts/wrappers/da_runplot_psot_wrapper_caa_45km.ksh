@@ -12,7 +12,7 @@ runplot_psot=2
 
 #Experiment
 export REGION=caa1
-export EXPT=test_newscript
+export EXPT=psot
 export NUM_PROCS=2
 export QUEUE=share
 export LSF_MAX_RUNTIME=10
@@ -52,9 +52,9 @@ export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.995, 0.988, 0.98 , 0.97 , "\
 
 #Single observation(s) (X,Y and Z are grid/level indice of the obs locations)  
 export PSEUDO_VAR_SIZE=5 
-export PSEUDO_VAR_LIST="u u t t q"
-export PSEUDO_VAL_LIST="1.0 1.0 1.0 1.0 1.0"
-export PSEUDO_ERR_LIST="1.0 1.0 1.0 1.0 1.0"
+#export PSEUDO_VAR_LIST="u u t t q" #default
+#export PSEUDO_VAL_LIST="1.0 1.0 1.0 1.0 0.001" #default
+#export PSEUDO_ERR_LIST="1.0 1.0 1.0 1.0 0.001" #default
 export PSEUDO_X_LIST="112 112 112 112 112"
 export PSEUDO_Y_LIST="64 64 64 64 64"
 export PSEUDO_Z_LIST="12 29 12 21 12"
