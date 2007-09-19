@@ -133,7 +133,7 @@ while test $iv -le $PSEUDO_VAR_SIZE; do
   if test ! -d $EXP_DIR; then mkdir $EXP_DIR; fi
   if test ! -d $EXP_DIR/run; then mkdir $EXP_DIR/run; fi
   if test ! -d $FC_DIR_SAVE; then mkdir $FC_DIR_SAVE; fi
-  if test ! -d $FC_DIR; then mkidr $FC_DIR; fi
+  if test ! -d $FC_DIR; then mkdir $FC_DIR; fi
 
   export DATE=$INITIAL_DATE
 
