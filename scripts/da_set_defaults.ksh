@@ -233,9 +233,9 @@ let HALF_E_WE=$NL_E_WE/2                               # Center of w-e domain
 let HALF_E_SN=$NL_E_SN/2                               # Center of s-n domain
 export PSEUDO_VAR_SIZE=${PSEUDO_VAR_SIZE:-5}           # Number of tests
 export PSEUDO_VAR_LIST=${PSEUDO_VAR_LIST:-"u u t t q"} # Variables for each of the PSOTs
-export PSEUDO_VAL_LIST=${PSEUDO_VAL_LIST:-"1.0 1.0 1.0 1.0 1.0"}
+export PSEUDO_VAL_LIST=${PSEUDO_VAL_LIST:-"1.0 1.0 1.0 1.0 0.001"}
                                                        # Obs. values
-export PSEUDO_ERR_LIST=${PSEUDO_ERR_LIST:-"1.0 1.0 1.0 1.0 1.0"}
+export PSEUDO_ERR_LIST=${PSEUDO_ERR_LIST:-"1.0 1.0 1.0 1.0 0.001"}
                                                        # Sigma_b (O-B) values
 export PSEUDO_X_LIST=${PSEUDO_X_LIST:-"$HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE"}
                                                        # Grid indice for lon.
