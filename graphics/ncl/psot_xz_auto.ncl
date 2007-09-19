@@ -1,6 +1,49 @@
 ;********************************************************
 ; WRF: color height-x [west-east] cross-section
 ;********************************************************
+; Description:
+;    This ncl script works with da_plot_psot.ksh in $WRFVAR_DIR/scripts.
+;    It was designed for plotting PSOT figures.  
+;    If used without da_run_plot.ksh, it requires the following variables
+;    defined beforehand:
+;      works: string for the type of workstation to open.
+;      expt : string for experiment name (for plot title)
+;      date=2006120100: date for data
+;      kl=12: grid number of PSO eta level(z) 
+;      xlon=112: grid number of PSO longitude(x)
+;      xlat=64 : grid number of PSO latitude(y)
+;      var="q" : variable name for this PSOT
+;      varunit : variable unit for this PSOT
+;      omb="1" : observation-background value
+;      err="1" : sigma_o (error for observation)
+;      bakfile : path for the background file  "wrfinput_d01"
+;      analfile: path for the analysis file "analysis"
+; Usage:
+;    An example to use this script:
+;    (1) define all environment variables in NCL command line:
+;    run the following command:
+;    >ncl 'works="pdf"' 'expt="psot_psot5"' \
+;         'kl=12' 'xlon=112' 'xlat=64' 'var="q"' 'date="2006120100"' \
+;         'omb="0.001"' 'err="0.001"' 'varunit="kg kg-1"'\
+;         'bakfile="/rap/datc/huishao/data/caa1/rc/2006120100/wrfinput_d01"'\                      
+;         'analfile="/ptmp/huishao/data/caa1/psot/fc/psot5/2006120100/analysis"' psot_xz_auto.ncl
+;     (2) define all enrivonment variables in the ncl script:
+;     add the following line into the script:
+;       works="pdf"
+;       expt="psot"
+;       kl=12
+;       xlon=112
+;       xlat=64
+;       var="q"
+;       date=2006120100
+;       omb="0.001"
+;       err="0.001"
+;       varunit="kg/kg"
+;       bakfile="/rap/datc/huishao/data/caa1/rc/2006120100/wrfinput_d01"
+;       analfile="/ptmp/huishao/data/caa1/psot/fc/psot5/2006120100/analysis"
+;  Author: 
+;    Hui Shao NCAR/DATC 09/19/2007
+;********************************************************
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"   
@@ -25,7 +68,7 @@ begin
   plat = first_guess->XLAT(0,xlat-1,xlon-1)
 
   title="PSOT"+" - "+var
-  subtitle="Date="+date+",Lon="+plong+",Lat="+plat+",Eta = "+znu(kl-1)+",Val="+omb+",Err="+err
+  subtitle="Date="+date+",Lon="+plong+",Lat="+plat+",Eta = "+znu(kl-1)+",Val="+omb+varunit+",Err="+err+varunit
 
 ;********************************************************
 ; Read W at Time=6, south_north=0, convert to cm/sec
@@ -68,7 +111,7 @@ begin
   df4 = an4
   df4 = an4 - fg4
   df4 = 1000.0 * df4
-  df4@units = "g/kg"
+  df4@units = "g kg-1"
   df4!0 = "lev"
   df4&lev = znu
   df4!1 = "lon"
