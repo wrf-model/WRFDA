@@ -1,6 +1,6 @@
 #!/bin/ksh
 #########################################################################
-# Script: plot_psot.ksh
+# Script: da_plot_psot.ksh
 #
 # Purpose:  A script to plot pseudo single observation test
 #          
@@ -75,8 +75,13 @@ for var in ${PSEUDO_VAR[*]}; do
     kl=${PSEUDO_Z[$iv]}
    omb=${PSEUDO_VAL[$iv]}
    err=${PSEUDO_ERR[$iv]}
-  
 
+  if [[ $var = u ]]; then unit="m s-1"; fi
+  if [[ $var = v ]]; then unit="m s-1"; fi
+  if [[ $var = t ]]; then unit="K"; fi
+  if [[ $var = q ]]; then unit="kg kg-1"; fi
+
+  
   DATE=$INITIAL_DATE
   while test $DATE -le $FINAL_DATE; do
 
@@ -85,8 +90,8 @@ for var in ${PSEUDO_VAR[*]}; do
 
       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
                       'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' 'var=\"$var\"' 'date=\"$DATE\"'  \
-                      'omb=\"$omb\"' 'err=\"$err\"' 'bakfile=\"$FIRST_GUESS\"' \
-                      'analfile=\"$ANALYSIS\"'"
+                      'omb=\"$omb\"' 'err=\"$err\"' 'varunit=\"$unit\"' \
+                      'bakfile=\"$FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
 
       rm -f run1 run2 run3
 
