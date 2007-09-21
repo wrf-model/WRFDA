@@ -194,7 +194,15 @@ fi
 
 ln -fs $WRFVAR_DIR/run/gribmap.txt .
 ln -fs $WRFVAR_DIR/run/*.TBL .
-ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+if $DOUBLE; then
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -fs $WRFVAR_DIR/run/ETAMPNEW_DATA_DBL ETAMPNEW_DATA
+else
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA .
+   ln -fs $WRFVAR_DIR/run/ETAMPNEW_DATA .
+fi
+ln -fs $WRFVAR_DIR/run/CAM_ABS_DATA .
+ln -fs $WRFVAR_DIR/run/CAM_AEROPT_DATA .
 ln -fs $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
 ln -fs $WRFVAR_DIR/build/da_wrfvar.exe .
 export PATH=$WRFVAR_DIR/scripts:$PATH

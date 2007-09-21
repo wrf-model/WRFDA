@@ -3,7 +3,7 @@
 cont1:
 
 if ( !  -e configure.wrf  ) then
-   ./configure $1
+   ./configure_old $1
    set dontask
 endif
 
@@ -28,7 +28,7 @@ if ( ! $?dontask && $?prompt ) then
   set resp=$<
 
   if ( "$resp" == "c" ) then
-    ./configure
+    ./configure_old
     goto cont1
   endif
 

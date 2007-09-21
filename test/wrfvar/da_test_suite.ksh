@@ -6,7 +6,7 @@ export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export EXPT=${EXPT:-${ID}_suite}
 export RUN=${RUN:-run}
 
-export REL_DIR=$HOME/code/$ID
+export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 

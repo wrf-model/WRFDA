@@ -91,7 +91,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_pack_count_obs.inc             \
 			da_proc_maxmin_combine.inc        \
 			da_proc_stats_combine.inc         \
-			da_proc_sum_count_obs.inc         \
 			da_proc_sum_int.inc               \
 			da_proc_sum_ints.inc              \
 			da_proc_sum_real.inc              \
@@ -269,13 +268,13 @@ da_obs.o:		da_obs.f90 \
                         da_tracing.o \
 			da_par_util.o \
 	                da_obs_proc_station.inc \
-			da_read_obs.inc \
-			da_scan_obs.inc \
+			da_read_obs_ascii.inc \
+			da_scan_obs_ascii.inc \
                         da_count_filtered_obs.inc \
-			da_read_bufr_obs.inc \
-			da_scan_bufr_obs.inc \
-			da_read_radar.inc \
-			da_scan_radar.inc \
+			da_read_obs_bufr.inc \
+			da_scan_obs_bufr.inc \
+			da_read_obs_radar.inc \
+			da_scan_obs_radar.inc \
 			da_transform_xtoy.inc \
 			da_transform_xtoy_adj.inc \
 			da_add_noise_to_ob.inc \
@@ -311,7 +310,9 @@ da_pseudo.o:		da_pseudo.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_pseudo.f90 > da_pseudo.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pseudo.f
 
-da_obs_io.o:		da_obs_io.f90
+da_obs_io.o:		da_obs_io.f90 \
+                        da_grid_definitions.o \
+                        da_obs.o
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_obs_io.f90 > da_obs_io.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_obs_io.f
@@ -606,7 +607,7 @@ da_gpsref.o:		da_gpsref.f90 \
 
 da_ssmi.o:		da_ssmi.f90 \
 		        module_ssmi.o \
-			da_tools1.o \
+			da_tools_serial.o \
 			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -615,18 +616,14 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_physics.o \
 			da_statistics.o \
 			da_tools.o \
-			da_ao_stats_ssmi.inc \
 			da_ao_stats_ssmi_rv.inc \
 			da_ao_stats_ssmi_tb.inc \
-			da_read_ssmi.inc \
-			da_scan_ssmi.inc \
-			da_jo_and_grady_ssmi.inc \
+			da_read_obs_ssmi.inc \
+			da_scan_obs_ssmi.inc \
 			da_jo_and_grady_ssmi_rv.inc \
 			da_jo_and_grady_ssmi_tb.inc \
-			da_residual_ssmi.inc \
 			da_residual_ssmi_rv.inc \
 			da_residual_ssmi_tb.inc \
-			da_oi_stats_ssmi.inc \
 			da_oi_stats_ssmi_rv.inc \
 			da_oi_stats_ssmi_tb.inc \
 			da_transform_xtospeed.inc \
@@ -638,8 +635,6 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_transform_xtotb.inc \
 			da_transform_xtotb_lin.inc \
 			da_transform_xtotb_adj.inc \
-			da_transform_xtoy_ssmi.inc \
-			da_transform_xtoy_ssmi_adj.inc \
 			da_transform_xtoy_ssmi_rv.inc \
 			da_transform_xtoy_ssmi_rv_adj.inc \
 			da_transform_xtoy_ssmi_tb.inc \
@@ -655,7 +650,6 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_check_max_iv_ssmi_tb.inc \
 			da_check_max_iv_ssmt1.inc \
 			da_check_max_iv_ssmt2.inc \
-			da_get_innov_vector_ssmi.inc \
 			da_get_innov_vector_ssmi_rv.inc \
 			da_get_innov_vector_ssmi_tb.inc \
 			da_get_innov_vector_ssmt1.inc \
@@ -859,8 +853,6 @@ da_tools.o:		\
 			da_1d_eigendecomposition.inc \
 			da_diff_seconds.inc \
 			da_obs_sfc_correction.inc \
-			da_global_ll_to_xy.inc \
-			da_ll_to_xy.inc \
 			da_residual.inc \
 			da_add_noise.inc \
 			da_eof_decomposition.inc       \
@@ -869,6 +861,21 @@ da_tools.o:		\
 			da_random_omb.inc \
 			da_gaus_noise.inc \
 			da_llxy.inc \
+			da_llxy_default.inc \
+			da_llxy_default_new.inc \
+			da_llxy_kma_global.inc \
+			da_llxy_kma_global_new.inc \
+			da_llxy_latlon.inc \
+			da_llxy_latlon_new.inc \
+			da_llxy_lc.inc \
+			da_llxy_lc_new.inc \
+			da_llxy_merc.inc \
+			da_llxy_merc_new.inc \
+			da_llxy_new.inc \
+			da_llxy_ps.inc \
+			da_llxy_ps_new.inc \
+			da_llxy_wrf.inc \
+			da_llxy_wrf_new.inc \
 			da_openfile.inc \
 			da_smooth_anl.inc \
 			da_togrid.inc \
@@ -878,17 +885,32 @@ da_tools.o:		\
 			da_get_2d_sum.inc \
 			da_get_3d_sum.inc \
 			da_oi.inc \
-			da_xyll.inc    
+			da_xyll.inc \
+			da_xyll_default.inc \
+			da_xyll_latlon.inc \
+			da_xyll_lc.inc \
+			da_xyll_merc.inc \
+			da_xyll_ps.inc \
+                        da_tools_serial.o
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_tools.f90 > da_tools.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools.f
 
-da_tools1.o:		da_tools1.f90   
+da_tools_serial.o:	da_tools_serial.f90 \
+			da_get_unit.inc \
+			da_free_unit.inc \
+			da_array_print.inc \
+			da_advance_cymdh.inc \
+			da_change_date.inc \
+			da_find_fft_factors.inc \
+			da_find_fft_trig_funcs.inc   
 			$(RM) $@
-			$(CPP) $(CPPFLAGS) -I../inc da_tools1.f90 > da_tools1.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools1.f
+			$(CPP) $(CPPFLAGS) -I../inc da_tools_serial.f90 > da_tools_serial.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools_serial.f
 
-module_radiance.o:	module_radiance.f90
+module_radiance.o:	module_radiance.f90 \
+                        gsi_kinds.o \
+                        gsi_constants.o
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc module_radiance.f90 > module_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) module_radiance.f
@@ -951,6 +973,7 @@ da_statistics.o:	da_statistics.f90 \
 
 da_define_structures.o:	da_define_structures.f90 \
 			da_control.o \
+                        da_tools_serial.o \
                         da_tracing.o \
 			da_allocate_background_errors.inc \
 			da_allocate_observations.inc \
@@ -969,11 +992,6 @@ da_define_structures.o:	da_define_structures.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_define_structures.f
 
 da_control.o:		da_control.f90 \
-			da_array_print.inc \
-			da_advance_time.inc \
-			da_change_date.inc \
-			da_find_fft_factors.inc \
-			da_find_fft_trig_funcs.inc \
                         ../frame/module_driver_constants.o 
 			$(RM) $@
 			$(CPP) -I../inc $(CPPFLAGS) -I../inc da_control.f90 > da_control.f
@@ -1018,7 +1036,6 @@ da_test.o:		da_test.f90 \
 			da_check_xtoy_adjoint_gpsref.inc \
 			da_check_xtoy_adjoint_metar.inc \
 			da_check_xtoy_adjoint_pilot.inc \
-			da_check_xtoy_adjoint_ssmi.inc \
 			da_check_xtoy_adjoint_ssmi_rv.inc \
 			da_check_xtoy_adjoint_ssmi_tb.inc \
 			da_check_xtoy_adjoint_geoamv.inc \
@@ -1134,7 +1151,8 @@ da_tracing.o:           da_tracing.f90           \
 			$(CPP) $(CPPFLAGS) -I../inc da_tracing.f90 > da_tracing.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tracing.f
 
-da_reporting.o:         da_reporting.f90       \
+da_reporting.o:         da_control.o \
+                        da_reporting.f90       \
                         da_error.inc           \
                         da_warning.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_reporting.f90 > da_reporting.f
@@ -1178,9 +1196,9 @@ da_radiance.o:		da_radiance.f90 \
 			da_qc_rad.inc \
 			da_qc_amsua.inc \
 			da_qc_amsub.inc \
-			da_read_bufrtovs.inc \
-			da_read_bufrairs.inc \
-			da_read_bufrssmis.inc \
+			da_read_obs_bufrtovs.inc \
+			da_read_obs_bufrairs.inc \
+			da_read_obs_bufrssmis.inc \
 			da_read_kma1dvar.inc \
 			da_setup_bufrtovs_structures.inc \
 			da_print_stats_rad.inc \
