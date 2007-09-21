@@ -12,11 +12,7 @@ setup : depend
 links : 
 	@ cp makefile makefile.old
 	@ $(LN) $(CHEM)/* .
-	@ $(LN) $(DYN_EM)/* .
-	@ mv module_initialize_real.F module_initialize_real_em.F
-	@ $(LN) $(DYN_NMM)/* .
-	@ mv module_initialize_real.F module_initialize_real_nmm.F
-	@ $(LN) $(DYN_EXP)/* .
+	@ $(LN) $(DYNAMICS)/* .
 	@ $(LN) $(GEN_BE)/* .
 	@ $(LN) $(INC)/* .
 	@ $(LN) $(SHARE)/* .

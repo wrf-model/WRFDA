@@ -31,8 +31,7 @@ foreach a ( $argv )
 
     set arglist = ( $arglist $a )
 
-    if ( "$a" == "arw" || "$a" == "all_arw" || "$a" == "all_em" || "$a" == "wrf_em" || \
-         "$a" == "chem" || "$a" == "diffwrf" ) then
+    if ( "$a" == "em" || "$a" == "all_em" || \ "$a" == "chem" || "$a" == "diffwrf" ) then
       set valid_arg = 1
       setenv WRF_EM_CORE 1
     else if ( "$a" == "all_nmm" || "$a" == "nmm" ) then
@@ -57,13 +56,11 @@ if( $valid_arg != 1 ) then
   echo "Type <compile all_wrfvar>  Compile wrfvar be and da_utils"
   echo "Type <compile convertor>   Convertors for converting KMA data to and from NetCDF data format"
   echo "Type <compile decode_airs> AIRS decoding"
-  echo "Type <compile wrf>         wrf_em"
-  echo "Type <compile wrf_em>      WRF (EM) model"
-  echo "Type <compile wrf_nmm>     WRF (NMM) model"
+  echo "Type <compile em>          WRF (EM) model"
+  echo "Type <compile nmm>         WRF (NMM) model"
   echo "Type <compile all_em>      wrf_em and EM test routines"
   echo "Type <compile all_nmm>     wrf_nmm and NMM test routines"
   echo "Type <compile diffwrf>     diffwrf"
-  echo "Type <compile all_wrf>     all_em diffwrf"
   exit 2
 endif
 

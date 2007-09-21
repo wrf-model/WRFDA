@@ -3176,7 +3176,7 @@ include "mpif.h"
 #if (DA_CORE == 1)
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
-             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
@@ -3248,7 +3248,7 @@ include "mpif.h"
 #if (DA_CORE == 1)
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
-             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
@@ -3311,8 +3311,18 @@ include "mpif.h"
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
+             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
+                             my_count                       , &    ! sendcount
+                             globbuf, 1+idx2                , &    ! recvbuf
+                             counts                         , &    ! recvcounts
+                             displs                         , &    ! displs
+                             collective_root                , &    ! root
+                             communicator                   , &    ! communicator
+                             ierr )
 #if (DA_CORE == 1)
-             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+
+             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
@@ -3321,17 +3331,6 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 #endif
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-
-             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
-                             my_count                       , &    ! sendcount
-                             globbuf, 1+idx2                , &    ! recvbuf
-                             counts                         , &    ! recvcounts
-                             displs                         , &    ! displs
-                             collective_root                , &    ! root
-                             communicator                   , &    ! communicator
-                             ierr )
-
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
@@ -3385,7 +3384,7 @@ include "mpif.h"
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
 #if (DA_CORE == 1)
-             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
@@ -3396,7 +3395,7 @@ include "mpif.h"
 #endif
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
-             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts

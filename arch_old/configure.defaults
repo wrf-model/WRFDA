@@ -1095,7 +1095,7 @@ LD              =       mpxlf90_r
 CC              =       mpcc_r
 RWORDSIZE       =       $(NATIVE_RWORDSIZE)
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
-CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
+CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DNCARIBM_NOC99
 FCOPTIM         =       -O2 -qarch=auto
 #FCOPTIM         =       -O3 -qhot

@@ -5,7 +5,7 @@
 
 !-----------------------------------------------------------------------
 
-MODULE module_initialize_real_nmm
+MODULE module_initialize
 
    USE module_bc
    USE module_configure
@@ -4219,4 +4219,4 @@ CONTAINS
 
 !---------------------------------------------------------------------
 
-END MODULE module_initialize_real_nmm
+END MODULE module_initialize

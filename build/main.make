@@ -17,8 +17,8 @@ $(SOLVER)_wrf_ESMFApp : setup $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ES
 	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o $(WRF_LIB)
 	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o $(WRF_LIB)
 
-$(SOLVER)_real : setup $(WRF_LIBS) module_initialize_real_$(SOLVER).o real_$(SOLVER).o
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_real_$(SOLVER).o $(WRF_LIB)
+$(SOLVER)_real : setup $(WRF_LIBS) module_initialize_real.o real_$(SOLVER).o
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_real.o $(WRF_LIB)
 	(cd ../main; $(LN) ../build/real.exe .)
 
 em_quarter_ss : setup $(WRF_LIBS) module_initialize_quarter_ss.o ideal.o
@@ -101,7 +101,7 @@ ndown_em.o: \
 	module_io_domain.o \
 	module_get_file_names.o \
 	module_soil_pre.o \
-	module_initialize_real_em.o \
+	module_initialize_real.o \
 	module_big_step_utilities_em.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
