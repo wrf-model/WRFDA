@@ -39,7 +39,7 @@ module da_setup_structures
       bogus, buoy, qscat,pseudo, trace_use_dull
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
-   use da_obs_io, only : da_scan_bufr,da_read_bufr,da_read_obs_radar, &
+   use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
       da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
    use da_par_util, only : da_patch_to_global
    use da_radiance, only : da_setup_bufrtovs_structures

@@ -1,4 +1,4 @@
-subroutine da_scan_bufr (iv, xp, filename)
+subroutine da_scan_obs_bufr (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan BUFR observation file for input to wrfvar
@@ -26,7 +26,7 @@ subroutine da_scan_bufr (iv, xp, filename)
    integer           :: iret,idate, kx, nrecs,miscd, t29
    integer           :: iunit
 
-   if (trace_use) call da_trace_entry("da_scan_bufr")
+   if (trace_use) call da_trace_entry("da_scan_obs_bufr")
 
    ! open FILE
    ! ---------
@@ -271,9 +271,9 @@ subroutine da_scan_bufr (iv, xp, filename)
    close(iunit)
    call da_free_unit(iunit)
 
-   if (trace_use) call da_trace_exit("da_scan_bufr")
+   if (trace_use) call da_trace_exit("da_scan_obs_bufr")
 #endif
 
-end subroutine da_scan_bufr
+end subroutine da_scan_obs_bufr
 
 

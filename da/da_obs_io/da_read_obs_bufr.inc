@@ -1,4 +1,4 @@
-subroutine da_read_bufr (iv, xp, filename)
+subroutine da_read_obs_bufr (iv, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read BUFR observation file for input to wrfvar
@@ -33,7 +33,7 @@ subroutine da_read_bufr (iv, xp, filename)
    integer, parameter    :: qflag=4         ! Flag for retaining data
    equivalence     (hdr(1), c8id)
 
-   if (trace_use) call da_trace_entry("da_read_bufr")
+   if (trace_use) call da_trace_entry("da_read_obs_bufr")
 
    nlocal(:) = iv%plocal(iv%time-1,:)
    ntotal(:) = iv%ptotal(iv%time-1,:)
@@ -859,10 +859,10 @@ subroutine da_read_bufr (iv, xp, filename)
    close(iunit)
    call da_free_unit(iunit)
 
-   if (trace_use) call da_trace_exit("da_read_bufr")
+   if (trace_use) call da_trace_exit("da_read_obs_bufr")
 
 #endif
 
-end subroutine da_read_bufr
+end subroutine da_read_obs_bufr
 
 
