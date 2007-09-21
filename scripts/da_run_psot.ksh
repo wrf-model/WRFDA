@@ -56,7 +56,7 @@ for var in $PSEUDO_VAR_LIST; do
    (( ivar=ivar+1 ))
    export PSEUDO_VAR[$ivar]=$var
 done
-if [[ ivar != $PSEUDO_VAR_SIZE ]]; then
+if [[ $ivar != $PSEUDO_VAR_SIZE ]]; then
    echo "Error: Size of PSEUDO_VAR_LIST($ivar) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)! "
    exit 1
 fi
@@ -66,7 +66,7 @@ for var in $PSEUDO_VAL_LIST; do
    (( ival=ival+1 ))
    export PSEUDO_VAL[$ival]=$var
 done
-if [[ ival != $PSEUDO_VAR_SIZE ]] ; then
+if [[ $ival != $PSEUDO_VAR_SIZE ]] ; then
    echo "Error: Size of PSEUDO_VAL_LIST($ival) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)!"
    exit 1
 fi
@@ -76,7 +76,7 @@ for var in $PSEUDO_ERR_LIST; do
    (( ierr=ierr+1 ))
 export PSEUDO_ERR[$ierr]=$var
 done
-if [[ ierr != $PSEUDO_VAR_SIZE ]]; then
+if [[ $ierr != $PSEUDO_VAR_SIZE ]]; then
    echo "Error: Size of PSEUDO_ERR_LIST($ierr) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)!"
    exit 1
 fi
@@ -86,7 +86,7 @@ for var in $PSEUDO_X_LIST; do
    (( ix=ix+1 ))
    export PSEUDO_X[$ix]=$var
 done
-if [[ ix != $PSEUDO_VAR_SIZE ]]; then
+if [[ $ix != $PSEUDO_VAR_SIZE ]]; then
    echo "Error: Size of PSEUDO_X_LIST($ix) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)!"
    exit 1
 fi
@@ -96,7 +96,7 @@ for var in $PSEUDO_Y_LIST; do
    (( iy=iy+1 ))
    export PSEUDO_Y[$iy]=$var
 done
-if [[ iy != $PSEUDO_VAR_SIZE ]]; then
+if [[ $iy != $PSEUDO_VAR_SIZE ]]; then
    echo "Error: Size of PSEUDO_Y_LIST($iy) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)!"
    exit 1
 fi
@@ -106,13 +106,14 @@ for var in $PSEUDO_Z_LIST; do
    (( iz=iz+1 ))
    export PSEUDO_Z[$iz]=$var
 done
-if [[ iz != $PSEUDO_VAR_SIZE ]]; then
+if [[ $iz != $PSEUDO_VAR_SIZE ]]; then
    echo "Error: Size of PSEUDO_Z_LIST($iz) does not match with PSEUDO_VAR_SIZE($PSEUDO_VAR_SIZE)!"
    exit 1
 fi
 
 #------------------------------------------------------------------------
 #PSOT: loop for different variables
+ cd  ${EXP_DIR}
 #------------------------------------------------------------------------
 export FC_DIR_SAVE=$FC_DIR
 iv=1
@@ -137,23 +138,12 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
 
    export DATE=$INITIAL_DATE
 
-   #-----------------------------------------------------------------------
-   #PSOT: loop for date
-   #-----------------------------------------------------------------------
-   while test $DATE -le $FINAL_DATE ; do
-      export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
-      export HOUR=$(echo $DATE | cut -c9-10)
-
       if test ! -d $FC_DIR/$DATE; then mkdir -p $FC_DIR/$DATE; fi
  
-      echo "=========="
-      echo $DATE
-      echo "=========="
-
       export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar_psot$iv
       mkdir -p $RUN_DIR
  
-      export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
+      export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAINS}
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
 
       #-----------------------------------------------------------------------
@@ -165,6 +155,7 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
           echo "Only works with LSF queueing system"
           exit 1
       fi
+
 
       cat > job.ksh <<EOF
 #!/bin/ksh
@@ -189,18 +180,13 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
 EOF
 
       chmod +x job.ksh
-      bsub -q $QUEUE -n $NUM_PROCS < $PWD/job.ksh  
+      bsub -q $QUEUE -n $NUM_PROCS < job.ksh  
 
       RC=$?
       if test $RC != 0; then
          echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
-
-      export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null)
-      export DATE=$NEXT_DATE
-
-   done #end of loop for date
 
    echo
 

@@ -17,7 +17,6 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 
 echo "expt_dir= $EXP_DIR"
 export PLOT_DIR=${PLOT_DIR:-$EXP_DIR/plotpsot} #where will be the plots
-CURRENT_DIR=$(pwd)
 
 if test ! -d $PLOT_DIR; then mkdir $PLOT_DIR; fi
 cd $PLOT_DIR
@@ -69,12 +68,12 @@ done
 iv=1
 for var in ${PSEUDO_VAR[*]}; do
 
-   expt = ${EXPT}_psot$iv
-   xlon = ${PSEUDO_X[$iv]}
-   xlat = ${PSEUDO_Y[$iv]}
-   kl   = ${PSEUDO_Z[$iv]}
-   omb  = ${PSEUDO_VAL[$iv]}
-   err  = ${PSEUDO_ERR[$iv]}
+   expt=${EXPT}_psot$iv
+   xlon=${PSEUDO_X[$iv]}
+   xlat=${PSEUDO_Y[$iv]}
+   kl=${PSEUDO_Z[$iv]}
+   omb=${PSEUDO_VAL[$iv]}
+   err=${PSEUDO_ERR[$iv]}
 
    if [[ $var = u ]]; then unit="m s-1"; fi
    if [[ $var = v ]]; then unit="m s-1"; fi
@@ -82,10 +81,10 @@ for var in ${PSEUDO_VAR[*]}; do
    if [[ $var = q ]]; then unit="kg kg-1"; fi
 
    DATE=$INITIAL_DATE
-   while test $DATE -le $FINAL_DATE; do
 
-      export FIRST_GUESS=${EXP_DIR}/run/$DATE/wrfvar_psot${iv}/working/wrfinput_d01
+      export FIRST_GUESS=${EXP_DIR}/run/$DATE/wrfvar_psot${iv}/working/wrfinput_d${DOMAINS}
       export ANALYSIS=${EXP_DIR}/fc/psot${iv}/$DATE/analysis
+
 
       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
                       'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' 'var=\"$var\"' 'date=\"$DATE\"'  \
@@ -106,12 +105,7 @@ for var in ${PSEUDO_VAR[*]}; do
       chmod +x run3
       ./run3
 
-      export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
-      export DATE=$NEXT_DATE
-
-   done
    (( iv=iv+1 ))
 done
 
-cd $CURRENT_DIR
 exit 0
