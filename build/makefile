@@ -70,10 +70,6 @@ WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
 GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
         $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
-# makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
-# which is wrong, try to encourage it to use the correct one by manually defining
-# the test cases in main.make
-
 #IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
 IGNORE="ideal"
 

@@ -6,7 +6,7 @@
 
 !-----------------------------------------------------------------------
 
-MODULE module_initialize
+MODULE module_initialize_real
 
    USE module_bc
    USE module_configure
@@ -4360,5 +4360,5 @@ print *,'namelist p_top (Pa) = ',p_top
 
 !---------------------------------------------------------------------
 
-END MODULE module_initialize
+END MODULE module_initialize_real
 #endif
