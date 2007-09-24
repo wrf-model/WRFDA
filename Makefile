@@ -15,8 +15,8 @@ include ./configure.wrf
 EM_MODULE_DIR = -I../dyn_em
 EM_MODULES =  $(EM_MODULE_DIR)
 
-DA_3DVAR_MODULES = $(INCLUDE_MODULES)
-DA_3DVAR_MODULES_2 = $(INC_MOD_3DVAR)
+DA_WRFVAR_MODULES = $(INCLUDE_MODULES)
+DA_WRFVAR_MODULES_2 = $(INC_MOD_WRFVAR)
 
 DA_CONVERTOR_MOD_DIR = -I../convertor -p../convertor
 DA_CONVERTOR_MODULES = $(DA_CONVERTOR_MOD_DIR) $(INCLUDE_MODULES)
@@ -69,18 +69,18 @@ wrf : framework_only
 
 all_wrfvar : 
 	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	( cd da; make -r all_wrfvar )
 
 be : 
 	/bin/rm -f main/libwrflib.a
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" ext
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" toolsdir
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" REGISTRY="Registry" framework
-	$(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	( cd da; $(MAKE) all_wrfvar )
 	( cd gen_be; $(MAKE) gen_be )
 
@@ -347,7 +347,7 @@ em_core :
 
 wrfvar_code :
 	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_3DVAR_MODULES_2)" 3dvar )
+	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" all_wrfvar )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

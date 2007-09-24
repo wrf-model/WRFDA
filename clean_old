@@ -18,6 +18,7 @@ end
 
 
 if ( "$1" == '-a' ) then
+  ( cd da ; make -i superclean )
   if ( -f configure.wrf ) then
     /bin/cp configure.wrf configure.wrf.backup
     /bin/rm -f configure.wrf

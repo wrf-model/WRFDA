@@ -2,6 +2,12 @@
 
 include ../configure.wrf
 
+
+LN      =       ln -sf
+MAKE    =       make -i -r
+RM      =       rm -f
+
+
 OBJS_FOR_ALL =		da_memory.o             \
                         da_tracing.o            \
 			da_par_util.o           \
@@ -1119,13 +1125,14 @@ da_wrfvar_io.o : da_wrfvar_io.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_io.f90 > da_wrfvar_io.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_io.f
 
-da_wrfvar_top.o : esmf_time wrfio_esmf da_wrfvar_top.f90 \
+da_wrfvar_top.o : esmf_time da_wrfvar_top.f90 \
                              da_wrfvar_run.inc \
                              da_wrfvar_interface.inc \
                   da_wrfvar_io.o \
                       da_tracing.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_top.f90 > da_wrfvar_top.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_top.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) \
+                           -I../external/esmf_time_f90 da_wrfvar_top.f
 
 da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
                              da_esmf_init.inc \
