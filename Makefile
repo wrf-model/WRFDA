@@ -57,6 +57,7 @@ framework_only : configcheck
 
 wrf : framework_only
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
+	$(MAKE) dyn_share
 	if [ $(WRF_CHEM) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" chemics ; fi
 	if [ $(WRF_EM_CORE) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core ; fi
 	if [ $(WRF_NMM_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" nmm_core ; fi
@@ -340,6 +341,10 @@ chemics :
 physics :
 	@ echo '--------------------------------------'
 	( cd phys ; $(MAKE) )
+
+dyn_share :
+	@ echo '--------------------------------------'
+	( cd dyn_share ; $(MAKE) )
 
 em_core :
 	@ echo '--------------------------------------'

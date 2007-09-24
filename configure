@@ -13,7 +13,7 @@ export JPEG=${JPEG:-}
 export JASPER=${JASPER:-}  
 export compileflags=""
 export MAX_DOMAINS=21
-export RWORDSIZE='$(NATIVE_RWORDSIZE)'
+export RWORDSIZE=${RWORDSIZE:-'$(NATIVE_RWORDSIZE)'}
 export COREFLAGS="-DNEW_BDYS"
 
 option=$1
