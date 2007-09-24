@@ -12,6 +12,7 @@ setup : depend
 links : 
 	@ cp makefile makefile.old
 	@ $(LN) $(CHEM)/* .
+	@ $(LN) $(DYN_SHARE)/* .
 	@ $(LN) $(DYNAMICS)/* .
 	@ $(LN) $(GEN_BE)/* .
 	@ $(LN) $(INC)/* .

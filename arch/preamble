@@ -115,6 +115,7 @@ BUILD     = $(DEVTOP)/build
 CHEM      = $(DEVTOP)/chem
 CONVERTOR = $(DEVTOP)/convertor
 DA        = $(DEVTOP)/da
+DYN_SHARE = $(DEVTOP)/dyn_share
 DYN_NMM   = $(DEVTOP)/dyn_nmm
 DYN_EM    = $(DEVTOP)/dyn_em
 DYN_EXP   = $(DEVTOP)/dyn_exp
