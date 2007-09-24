@@ -51,17 +51,25 @@ echo "DATE           $DATE"
 echo "END_DATE       $END_DATE"                                        
 echo "FCST_RANGE     $FCST_RANGE"                                      
 echo "LBC_FREQ       $LBC_FREQ"  
+echo "DOMAINS        $DOMAINS"
 echo "MEM            $MEM"
 
 # Copy necessary info (better than link as not overwritten):
-ln -fs ${WRF_DIR}/main/wrf.exe .
-ln -fs ${WRF_DIR}/run/RRTM_DATA .
-ln -fs ${WRF_DIR}/run/GENPARM.TBL .
-ln -fs ${WRF_DIR}/run/LANDUSE.TBL .
+ln -fs $WRF_DIR/main/wrf.exe .
+ln -fs $WRF_DIR/run/gribmap.txt .
+ln -fs $WRF_DIR/run/ozone* .
+ln -fs $WRF_DIR/run/*.TBL .
+ln -fs $WRF_DIR/run/*.tbl .
+if $DOUBLE; then
+   ln -fs $WRF_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -fs $WRF_DIR/run/ETAMPNEW_DATA_DBL ETAMPNEW_DATA
+else
+   ln -fs $WRF_DIR/run/RRTM_DATA .
+   ln -fs $WRF_DIR/run/ETAMPNEW_DATA .
+fi
+ln -fs $WRF_DIR/run/CAM_ABS_DATA .
+ln -fs $WRF_DIR/run/CAM_AEROPT_DATA .
 
-ln -fs ${WRF_DIR}/run/SOILPARM.TBL .
-ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
-ln -fs ${WRF_DIR}/run/gribmap.txt .
 for DOMAIN in $DOMAINS; do
    # Copy this file, so the copy back of wrfinput files later does
    # not create a recursive link
