@@ -90,7 +90,7 @@ scalar_derefs1 ( FILE * fp , char * corename, node_t * node, int direction )
         char * x ;
         /* if this is a core-specific variable, prepend the name of the core to */
         /* the variable at the driver level */
-       if ( (!strncmp("dyn_",p->use,4)&&!strcmp(corename,p->use+4)) ) { x = "C" ; } else { x = "" ; }
+        if ((!strncmp("dyn_",p->use,4)&&!strcmp(corename,p->use+4)) ) { x = "C" ; } else { x = "" ; }
         strcpy(fname,field_name(t4,p,(p->ntl>1)?tag:0)) ;
         /* generate deref */
         if ( direction == DIR_COPY_OUT ) {
