@@ -118,6 +118,7 @@ else
       touch wrfnl_go_ahead
    fi
    $RUN_CMD ./wrf.exe
+   grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
    RC=$?
 
    rm -rf $RUN_DIR/rsl
@@ -152,5 +153,5 @@ date
 
 echo "</BODY></HTML>"
 
-exit 0
+exit $RC
 

@@ -62,8 +62,8 @@ else
       # Run geogrid:
       ln -fs $WPS_DIR/geogrid.exe .
       ${RUN_CMD} ./geogrid.exe
-
       RC=$?
+
       mv geogrid.log* $RUN_DIR
       if [[ -f $RUN_DIR/geogrid.log.0000 ]]; then
          echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
@@ -88,10 +88,9 @@ else
    $WPS_DIR/link_grib.csh $FILES
 
    ln -fs $WPS_DIR/ungrib.exe .
-
    ./ungrib.exe > ungrib.log 2>&1
-
    RC=$?
+
    mv ungrib.log $RUN_DIR
    echo '<A HREF="ungrib.log">ungrib.log</a>'
 
@@ -104,7 +103,6 @@ else
    ln -fs $WPS_DIR/metgrid/METGRID.TBL.${METGRID_TABLE_TYPE} METGRID.TBL
    ln -fs $WPS_DIR/metgrid.exe .
    ${RUN_CMD} ./metgrid.exe
-
    RC=$?
 
    mv metgrid.log* $RUN_DIR

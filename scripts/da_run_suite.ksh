@@ -99,7 +99,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_restore_data_grib.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error$RC$END"
+         echo $(date) "${ERR}restore_data_grib failed with error$RC$END"
+         echo restore_data_grib > FAIL
          exit 1
       fi
    fi
@@ -112,7 +113,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error$RC$END"
+         echo $(date) "${ERR}restore_data_rtobs failed with error$RC$END"
+         echo restore_data_rtobs > FAIL
          exit 1
       fi
    fi
@@ -125,7 +127,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}wps failed with error $RC$END"
+         echo wps > FAIL
          exit 1
       fi
       export RUN_GEOGRID=false # Only need to run it once.
@@ -139,7 +142,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}real failed with error $RC$END"
+         echo real > FAIL
          exit 1
       fi
    fi
@@ -152,7 +156,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_run_ideal.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}ideal failed with error $RC$END"
+         echo ideal > FAIL
          exit 1
       fi
    fi
@@ -165,7 +170,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}obsproc failed with error $RC$END"
+         echo obsproc > FAIL
          exit 1
       fi
    fi
@@ -184,7 +190,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
                $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
                RC=$?
                if [[ $? != 0 ]]; then
-        	  echo $(date) "${ERR}Failed with error $RC$END"
+        	  echo $(date) "${ERR}update_bc failed with error $RC$END"
+                  echo update_bc > FAIL
         	  exit 1
                fi
             fi 
@@ -209,7 +216,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}wrfvar failed with error $RC$END"
+         echo wrfvar > FAIL
          exit 1
       fi
    else     
@@ -228,7 +236,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       $WRFVAR_DIR/scripts/da_run_etkf.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $? != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}etkf failed with error $RC$END"
+         echo etkf > FAIL
          exit 1
       fi
    fi
@@ -256,7 +265,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1 &
             RC=$?
             if [[ $? != 0 ]]; then
-               echo $(date) "${ERR}Failed with error $RC$END"
+               echo $(date) "${ERR}update_bc failed with error $RC$END"
+               echo update_bc > FAIL
                exit 1
             fi
 
@@ -283,8 +293,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
          RC=$?
          if [[ $? != 0 ]]; then
-            echo $(date) "${ERR}Failed with error $RC$END"
+            echo $(date) "${ERR}update_bc failed with error $RC$END"
             exit 1
+            echo update_bc > FAIL
          fi
       fi
    fi
@@ -297,7 +308,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       $WRFVAR_DIR/scripts/da_run_ndown.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}ndown failed with error $RC$END"
+         echo ndown > FAIL
          exit 1
       fi
    fi
@@ -310,7 +322,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       $WRFVAR_DIR/scripts/da_run_nup.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}nup failed with error $RC$END"
+         echo nup > FAIL
          exit 1
       fi
    fi
@@ -337,7 +350,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1 &
             RC=$?
             if [[ $RC != 0 ]]; then
-               echo $(date) "${ERR}Failed with error $RC$END"
+               echo $(date) "${ERR}wrf failed with error $RC$END"
+               echo wrf > FAIL
                exit 1
             fi
 
@@ -363,7 +377,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
          RC=$?
          if [[ $RC != 0 ]]; then
-            echo $(date) "${ERR}Failed with error $RC$END"
+            echo $(date) "${ERR}wrf failed with error $RC$END"
+            echo wrf > FAIL
             exit 1
          fi
       fi
@@ -377,7 +392,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       $WRFVAR_DIR/scripts/da_run_ensmean.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $? != 0 ]]; then
-         echo $(date) "${ERR}Failed with error $RC$END"
+         echo $(date) "${ERR}ensmean failed with error $RC$END"
+         echo ensmean > FAIL
          exit 1
       fi
    fi
@@ -389,6 +405,9 @@ done
 
 echo
 echo $(date) "Suite finished"
+
+rm FAIL
+touch SUCCESS
 
 echo "</PRE></BODY></HTML>"
 
