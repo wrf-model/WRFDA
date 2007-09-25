@@ -16,6 +16,7 @@ if [[ ! -d $DIR2 ]]; then
 fi
 
 cd $DIR1
+DIR1=$PWD # expand out partial directories
 
 for RUN in ${MACHINE}_*; do
    if [[ -d $DIR1/$RUN && -d $DIR2/$RUN ]]; then

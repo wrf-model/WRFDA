@@ -15,12 +15,11 @@ if [[ ! -d $DIR2 ]]; then
    exit 1
 fi
 
-set -x
-
 cd $DIR1
+DIR1=$PWD # expand partial directories
 
 for REG in *; do
-   if [[ -d $DIR1/$RUN && -d $DIR2/$RUN ]]; then
+   if [[ -d $DIR1/$REG && -d $DIR2/$REG ]]; then
       da_compare_region.ksh $DIR1/$REG $DIR2/$REG
    fi
 done
