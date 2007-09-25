@@ -2,7 +2,7 @@
 
 . ./setup.ksh
 
-export EXPT=vartest
+export EXPT=${EXPT:-vartest}
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export RUN=${ID}_gen_be
 

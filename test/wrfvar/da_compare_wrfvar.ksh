@@ -59,6 +59,8 @@ NEW_FILE[10]=namelist.output
 
 COUNT=1
 
+DIFFER=0
+
 while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
    if $TYPE1_OLD; then
       FILE1=${OLD_FILE[$COUNT]}
@@ -76,6 +78,7 @@ while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
       diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
       if [[ $? != 0 ]] then
          echo "$DIR1/$FILE1 $DIR2/$FILE2 differ"
+         DIFFER=1
          if $FULL; then
             diff $DIR1/$FILE1 $DIR2/$FILE2
          fi
@@ -105,12 +108,17 @@ while [[ $COUNT -le ${#NEW_NETCDF_FILE[@]} ]]; do
    fi
    if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
       cmp $DIR1/$FILE1 $DIR2/$FILE2
-      if [[ $? != 0 ]] && $FULL; then
-        ncdump $DIR1/$FILE1 > tmp1
-        ncdump $DIR2/$FILE2 > tmp2
-        sdiff tmp1 tmp2
-        rm -rf tmp1 tmp2
+      if [[ $? != 0 ]]; then
+         DIFFER=1
+         if $FULL; then
+            ncdump $DIR1/$FILE1 > tmp1
+            ncdump $DIR2/$FILE2 > tmp2
+            sdiff tmp1 tmp2
+            rm -rf tmp1 tmp2
+         fi
       fi
    fi 
    let COUNT=$COUNT+1
 done
+
+exit $DIFFER

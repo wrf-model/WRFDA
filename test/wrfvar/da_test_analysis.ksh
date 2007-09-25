@@ -1,8 +1,10 @@
 #!/bin/ksh
 
+# da_test_analysis.ksh
+
 . ./setup.ksh
 
-export EXPT=vartest
+export EXPT=${EXPT:-vartest}
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}

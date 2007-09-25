@@ -4,7 +4,7 @@ export NUM_PROCS=1
 
 . ./setup.ksh
 
-export EXPT=vartest
+export EXPT=${EXPT:-vartest}
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export RUN=${RUN:-${ID}_etkf}
 
