@@ -8,7 +8,7 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/$ID/wrfvar}
 export REG_DIR=$PWD
 
 export NUM_EXPT=2
-export EXP_NAMES="${MACHINE}_${COMPILER}_stable_suite ${MACHINE}_${COMPILER}_opt_suite"
+export EXP_NAMES="${MACHINE}_${COMPILER}_stable_quick_${NUM_PROCS) ${MACHINE}_${COMPILER}_opt_quick_${NUM_PROCS)"
 export EXP_LEGENDS='(/"stable","opt"/)'
 
 export INTERVAL=12

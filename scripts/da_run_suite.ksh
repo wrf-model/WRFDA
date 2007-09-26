@@ -406,7 +406,6 @@ done
 echo
 echo $(date) "Suite finished"
 
-rm FAIL
 touch SUCCESS
 
 echo "</PRE></BODY></HTML>"

@@ -54,6 +54,7 @@ if $RUN_GEN_BE_STAGE0; then
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 0 for WRF failed with error" $RC
+      echo "stage 0" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -96,6 +97,7 @@ EOF
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 1 failed with error" $RC
+      echo "stage 1" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -130,6 +132,7 @@ EOF
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 2 failed with error" $RC
+      echo "stage 2" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -166,6 +169,7 @@ EOF
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 2a failed with error" $RC
+      echo "stage 2a" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -214,6 +218,7 @@ EOF
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 3 for $CV failed with error" $RC
+         echo "stage 3" > $RUN_DIR/FAIL
          exit 1
       fi
    done
@@ -247,6 +252,7 @@ if $RUN_GEN_BE_STAGE4; then
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 4 failed with error" $RC
+         echo "stage 4" > $RUN_DIR/FAIL
          exit 1
       fi
    fi 
@@ -272,6 +278,7 @@ EOF
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage gen_be_diags failed with error" $RC
+      echo "gen_be_diags" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -295,6 +302,7 @@ EOF
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage gen_be_diags_read failed with error" $RC
+      echo "gen_be_diags_read" > $RUN_DIR/FAIL
       exit 1
    fi
 fi
@@ -313,6 +321,7 @@ if $RUN_GEN_BE_MULTICOV; then
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "gen_be_cov3d (chi) failed with error" $RC
+      echo "gen_be_cov3d (chi)" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -325,6 +334,7 @@ if $RUN_GEN_BE_MULTICOV; then
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "gen_be_cov3d (T) failed with error" $RC
+      echo "gen_be_cov3d (T)" > $RUN_DIR/FAIL
       exit 1
    fi
 
@@ -337,6 +347,7 @@ if $RUN_GEN_BE_MULTICOV; then
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "gen_be_cov2d failed with error" $RC
+      echo gen_be_cov2d > $RUN_DIR/FAIL
       exit 1
    fi
 fi
@@ -350,5 +361,7 @@ if $CLEAN; then rm -rf $WORK_DIR; fi
 
 export END_CPU=$(date)
 echo "Ending CPU time: ${END_CPU}"
+
+touch $RUN_DIR/SUCCESS
 
 exit 0
