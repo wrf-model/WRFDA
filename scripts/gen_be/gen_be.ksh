@@ -40,6 +40,8 @@ for CV in $CONTROL_VARIABLES; do mkdir -p $CV; done
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
 #------------------------------------------------------------------------
 
+echo 
+echo $(date) "Start"
 echo "WRFVAR_DIR is" $WRFVAR_DIR $(svnversion $WRFVAR_DIR)
 
 if $RUN_GEN_BE_STAGE0; then
@@ -348,7 +350,7 @@ cp $WORK_DIR/be.dat $RUN_DIR
 
 if $CLEAN; then rm -rf $WORK_DIR; fi
 
-export END_CPU=$(date)
-echo "Ending CPU time: ${END_CPU}"
+echo
+echo $(date) "Finished"
 
 exit 0

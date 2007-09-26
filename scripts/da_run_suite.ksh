@@ -88,6 +88,8 @@ echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
+echo 
+echo $(date) "Start"
 
 export DATE=$INITIAL_DATE
 
@@ -130,6 +132,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"
+         echo restore_data_grib > FAIL
          exit 1
       fi
    fi
@@ -143,6 +146,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"
+         echo restore_data_rtobs > FAIL
          exit 1
       fi
    fi
@@ -156,6 +160,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo wrfsi > FAIL
          exit 1
       fi
    fi
@@ -170,6 +175,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo wps > FAIL
          exit 1
       fi
       export RUN_GEOGRID=false # Only need to run it once.
@@ -185,6 +191,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo real > FAIL
          exit 1
       fi
    fi
@@ -199,6 +206,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo obsproc > FAIL
          exit 1
       fi
    fi
@@ -218,6 +226,7 @@ while test $DATE -le $FINAL_DATE; do
            RC=$?
            if test $? != 0; then
               echo `date` "${ERR}Failed with error $RC$END"
+              echo update_bc > FAIL
               exit 1
            fi
            export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
@@ -246,6 +255,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo wrfvar > FAIL
          exit 1
       fi
       export WRF_INPUT=$DA_ANALYSIS
@@ -268,6 +278,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo update_bc > FAIL
          exit 1
       fi
       export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
@@ -286,6 +297,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
+         echo wrf > FAIL
          exit 1
       fi
    fi
@@ -297,7 +309,9 @@ while test $DATE -le $FINAL_DATE; do
 done
 
 echo
-echo `date` "Suite finished"
+echo $(date) "Finished"
+
+touch SUCCESS
 
 echo "</PRE></BODY></HTML>"
 

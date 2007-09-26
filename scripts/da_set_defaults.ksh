@@ -40,6 +40,7 @@ export FIRST=${FIRST:-true}                            # Cold start (false), cyc
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
 export FG_TYPE=${FG_TYPE:-fnl}
+export DOMAINS=${DOMAINS:-01}
 
 #Scheduling:
 export SCHEDULER=${SCHEDULER:-lsf}
@@ -229,18 +230,20 @@ export TAINFLATINPUT=${TAINFLATINPUT:-1.0}             # ETKF parameter.
 export RHOINPUT=${RHOINPUT:-1.0}                       # ETKF parameter.
 
 #PSOT:
-let HALF_E_WE=$NL_E_WE/2                               # Center of w-e domain
-let HALF_E_SN=$NL_E_SN/2                               # Center of s-n domain
+if [[ $DOMAINS == 01 ]]; then
+   # This logic only works for a single domain
+   let HALF_E_WE=$NL_E_WE/2                               # Center of w-e domain
+   let HALF_E_SN=$NL_E_SN/2                               # Center of s-n domain
+   export PSEUDO_X_LIST=${PSEUDO_X_LIST:-"$HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE"}
+                                                       # Grid indice for lon.
+   export PSEUDO_Y_LIST=${PSEUDO_Y_LIST:-"$HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN"}
+fi
 export PSEUDO_VAR_SIZE=${PSEUDO_VAR_SIZE:-5}           # Number of tests
 export PSEUDO_VAR_LIST=${PSEUDO_VAR_LIST:-"u u t t q"} # Variables for each of the PSOTs
 export PSEUDO_VAL_LIST=${PSEUDO_VAL_LIST:-"1.0 1.0 1.0 1.0 0.001"}
                                                        # Obs. values
 export PSEUDO_ERR_LIST=${PSEUDO_ERR_LIST:-"1.0 1.0 1.0 1.0 0.001"}
                                                        # Sigma_b (O-B) values
-export PSEUDO_X_LIST=${PSEUDO_X_LIST:-"$HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE $HALF_E_WE"}
-                                                       # Grid indice for lon.
-export PSEUDO_Y_LIST=${PSEUDO_Y_LIST:-"$HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN $HALF_E_SN"}
-                                                       # Grid indice for lat.
 export PSEUDO_Z_LIST=${PSEUDO_Z_LIST:-"7 19  7 13  7"}
                                                        # level indice for half mass Eta levels
                                                        # Level  7: eta=0.86
