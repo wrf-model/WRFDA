@@ -39,6 +39,7 @@ echo 'RUN_DIR           <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR          <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo 'IDEAL_OUTPUT_DIR  <A HREF="file:'$IDEAL_OUTPUT_DIR'">'$IDEAL_OUTPUT_DIR'</a>'
 echo "SCENARIO          $SCENARIO"
+echo "DOMAINS           $DOMAINS"
 echo "DATE              $DATE"
 echo "END_DATE          $END_DATE"
 
@@ -62,9 +63,11 @@ echo '<A HREF="namelist.input">Namelist input</a>'
 
 if $DUMMY; then
    echo "Dummy ideal"
-   echo Dummy ideal > wrfinput_d${DOMAIN}
-   echo Dummy ideal > wrfbdy_d${DOMAIN}
-   # echo Dummy ideal > wrflowinp_d${DOMAIN}
+   for DOMAIN in $DOMAINS; do
+      echo Dummy ideal > wrfinput_d${DOMAIN}
+   done
+   echo Dummy ideal > wrfbdy_d01
+   # echo Dummy ideal > wrflowinp_d01
 else
    ln -fs ${WRF_DIR}/main/ideal_${SCENARIO}.exe .
    $RUN_CMD ./ideal_${SCENARIO}.exe
@@ -95,18 +98,16 @@ else
    echo $(date +'%D %T') "Ended $RC"
 fi
 
-if [[ -f $WORK_DIR/wrfinput_d${DOMAIN} ]]; then
-   mv $WORK_DIR/wrfinput_d${DOMAIN} $IDEAL_OUTPUT_DIR/$DATE
-fi
-
-if [[ -f $WORK_DIR/wrfbdy_d${DOMAIN} ]]; then
-   mv $WORK_DIR/wrfbdy_d${DOMAIN} $IDEAL_OUTPUT_DIR/$DATE
-fi
-
-#   mv $WORK_DIR/wrflowinp_d${DOMAIN} $IDEAL_OUTPUT_DIR/$DATE
+for DOMAIN in $DOMAINS; do
+   if [[ -f $WORK_DIR/wrfinput_d${DOMAIN} ]]; then
+      mv $WORK_DIR/wrfinput_d${DOMAIN} $IDEAL_OUTPUT_DIR/$DATE
+   fi
+done
+mv $WORK_DIR/wrfbdy_d01 $IDEAL_OUTPUT_DIR/$DATE
+# mv $WORK_DIR/wrflowinp_d01 $IDEAL_OUTPUT_DIR/$DATE
 
 date
 
 echo "</BODY></HTML>"
 
-exit 0
+exit $RC

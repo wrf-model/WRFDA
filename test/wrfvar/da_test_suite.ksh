@@ -3,7 +3,8 @@
 # da_test_suite.ksh
 
 if [[ $# != 1 ]]; then
-   echo "Arguments test (one of wrfvar wrfvar_tests wrfvar_verbose quick)"
+   echo "Arguments test"
+   echo "(one of wrfvar wrfvar_tests wrfvar_verbose ideal wrf wrf_real wrf_ideal quick)"
    exit 1
 fi
 
@@ -17,6 +18,10 @@ export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export RUN=${RUN:-run}
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+
+if [[ $TYPE == serial ]]; then
+   export NUM_PROCS=1
+fi
 
 export EXPT=${EXPT:-${ID}_${TEST}_${NUM_PROCS}}
 export EXP_DIR=$PWD/$EXPT
@@ -43,6 +48,9 @@ elif [[ $TEST == wrfvar_verbose ]]; then
    export RC_DIR=$PWD/$CASE/rc
    export OB_DIR=$PWD/$CASE/ob
    export NL_NTMAX=${NL_NTMAX:-2}
+   export NL_TRACE_USE_DULL=true
+   export NL_TRACE_USE_FREQUENT=true
+   export NL_TRACE_ALL_PES=true
    export NL_PRINT_DETAIL_AIREP=true
    export NL_PRINT_DETAIL_RADAR=true
    export NL_PRINT_DETAIL_RAD=true
@@ -75,6 +83,14 @@ elif [[ $TEST == wrfvar_verbose ]]; then
    # stop hitting bug at line 247 of da_write_iv_rad_ascii where rttov coefficient
    # used in crtm run. Zhiquan has fix in local code.
    export NL_WRITE_PROFILE=false
+elif [[ $TEST == wrf ]]; then
+   export RUN_WRF=${RUN_WRF:-true}
+elif [[ $TEST == wrf_ideal ]]; then
+   export RUN_WRF=${RUN_WRF:-true}
+   export RUN_IDEAL=${RUN_IDEAL:-true}
+elif [[ $TEST == wrf_real ]]; then
+   export RUN_WRF=${RUN_WRF:-true}
+   export RUN_REAL=${RUN_REAL:-true}
 elif [[ $TEST == quick ]]; then
    export RUN_WPS=${RUN_WPS:-true}
    export RUN_REAL=${RUN_REAL:-true}

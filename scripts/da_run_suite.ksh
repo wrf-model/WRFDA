@@ -71,6 +71,8 @@ echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
+echo 
+echo $(date) "Start"
 
 export DATE=$INITIAL_DATE
 
@@ -404,7 +406,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 done
 
 echo
-echo $(date) "Suite finished"
+echo $(date) "Finished"
 
 touch SUCCESS
 

@@ -42,6 +42,7 @@ echo 'REAL_OUTPUT_DIR <A HREF="file:'$REAL_OUTPUT_DIR'">'$REAL_OUTPUT_DIR'</a>'
 echo "DATE            $DATE"
 echo "END_DATE        $END_DATE"
 echo "FCST_RANGE      $FCST_RANGE"
+echo "DOMAINS         $DOMAINS"
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
@@ -117,4 +118,4 @@ date
 
 echo "</BODY></HTML>"
 
-exit 0
+exit $RC
