@@ -2,7 +2,7 @@
 
 # Purpose: Compare files between wrfvar runs
 
-if test $# != 2; then
+if [[ $# != 2 ]]; then
    echo "Arguments dir1 dir2"
    exit 1
 fi
@@ -10,23 +10,23 @@ fi
 DIR1=$1
 DIR2=$2
 
-if test ! -d $DIR1; then
+if [[ ! -d $DIR1 ]]; then
    echo "Directory $DIR1 does not exist"
    exit 1
 fi
 
-if test ! -d $DIR2; then
+if [[ ! -d $DIR2 ]]; then
    echo "Directory $DIR2 does not exist"
    exit 1
 fi
 
-if test -d $DIR1/wrf-var; then
+if [[ -d $DIR1/wrf-var ]]; then
    TYPE1_OLD=true
 else
    TYPE1_OLD=false
 fi
 
-if test -d $DIR2/wrf-var; then
+if [[ -d $DIR2/wrf-var ]]; then
    TYPE2_OLD=true
 else
    TYPE2_OLD=false
@@ -55,10 +55,13 @@ NEW_FILE[6]=working/check_max_iv
 NEW_FILE[7]=working/gts_omb_oma
 NEW_FILE[8]=working/filtered_obs
 NEW_FILE[9]=working/rand_obs_error
+NEW_FILE[10]=namelist.output
 
 COUNT=1
 
-while test $COUNT -le ${#NEW_FILE[@]}; do
+DIFFER=0
+
+while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
    if $TYPE1_OLD; then
       FILE1=${OLD_FILE[$COUNT]}
    else
@@ -70,10 +73,15 @@ while test $COUNT -le ${#NEW_FILE[@]}; do
       FILE2=${NEW_FILE[$COUNT]}
    fi
 
-   if test -f $DIR1/$FILE1 && test -f $DIR2/$FILE2; then
-      diff -q $DIR1/$FILE1 $DIR2/$FILE2
-      if test $? != 0 && $FULL; then
-         diff $DIR1/$FILE1 $DIR2/$FILE2
+   if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
+      # Can't use -q option as missing from braindead Aix
+      diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
+      if [[ $? != 0 ]] then
+         echo "$DIR1/$FILE1 $DIR2/$FILE2 differ"
+         DIFFER=1
+         if $FULL; then
+            diff $DIR1/$FILE1 $DIR2/$FILE2
+         fi
       fi
    fi 
    let COUNT=$COUNT+1
@@ -81,31 +89,36 @@ done
 
 # binary files
 
-OLD_BINARY_FILE[1]=wrf-var/wrf_3dvar_output
+OLD_NETCDF_FILE[1]=wrf-var/wrf_3dvar_output
 
-NEW_BINARY_FILE[1]=working/analysis
+NEW_NETCDF_FILE[1]=working/analysis
 
 COUNT=1
 
-while test $COUNT -le ${#NEW_BINARY_FILE[@]}; do
+while [[ $COUNT -le ${#NEW_NETCDF_FILE[@]} ]]; do
    if $TYPE1_OLD; then
-      FILE1=${OLD_BINARY_FILE[$COUNT]}
+      FILE1=${OLD_NETCDF_FILE[$COUNT]}
    else
-      FILE1=${NEW_BINARY_FILE[$COUNT]}
+      FILE1=${NEW_NETCDF_FILE[$COUNT]}
    fi
    if $TYPE2_OLD; then
-      FILE2=${OLD_BINARY_FILE[$COUNT]}
+      FILE2=${OLD_NETCDF_FILE[$COUNT]}
    else
-      FILE2=${NEW_BINARY_FILE[$COUNT]}
+      FILE2=${NEW_NETCDF_FILE[$COUNT]}
    fi
-   if test -f $FILE1 && -f $FILE2; then
+   if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
       cmp $DIR1/$FILE1 $DIR2/$FILE2
-      if test $? != 0 && $FULL; then
-        ncdump $DIR1/$FILE1 > tmp1
-        ncdump $DIR2/$FILE2 > tmp2
-        sdiff tmp1 tmp2
-        rm -rf tmp1 tmp2
+      if [[ $? != 0 ]]; then
+         DIFFER=1
+         if $FULL; then
+            ncdump $DIR1/$FILE1 > tmp1
+            ncdump $DIR2/$FILE2 > tmp2
+            sdiff tmp1 tmp2
+            rm -rf tmp1 tmp2
+         fi
       fi
    fi 
    let COUNT=$COUNT+1
 done
+
+exit $DIFFER

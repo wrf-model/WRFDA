@@ -47,7 +47,7 @@ for COMPILER in $COMPILERS; do
       rm -f build/links
       ./compile $TARGET > compile.out 2>&1
       if $CLEAN; then ./clean > /dev/null 2>&1; fi
-      echo `ls -l build/*.exe | wc -l` executables
+      echo $(ls -l build/*.exe | wc -l) executables
       let COUNT=$COUNT+1
    fi
    if $EXECUTE; then

@@ -1,10 +1,11 @@
 #!/bin/ksh
 
 . ./setup.ksh
+. $CASE/setup.ksh
 
-export EXPT=vartest
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export RUN=${ID}_gen_be
+export EXPT=${ID}_gen_be
+export RUN=run
 
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
@@ -14,7 +15,7 @@ export EXP_DIR=$PWD/$EXPT
 export RUN_DIR=$EXP_DIR/$RUN
 rm -rf $RUN_DIR
 
-. $EXP_DIR/setup.ksh
+export FC_DIR=$PWD/$CASE/fc
 
 export LOCAL=true
 export NUM_PROCS=1
