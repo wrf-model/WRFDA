@@ -13,11 +13,11 @@
 ; Date: 01/17/07
 ;=========================================================;
 ;
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/contributed.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/shea_util.ncl"
-
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+;=========================================================;
 ; Note:  Make sure following.
 ;         a) You have NCL Version: 4.2.0.a.034 upward
 ;         b) "wrf_user_fortran_util_0.so" file is created by using 
@@ -26,9 +26,9 @@ load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;
 ;****************Change lines below *****************************************
 ;
-load "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/WRF_contributed.ncl.test"
-load "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/WRFUserARW.ncl"
-external wrf_user_fortaran_util_0 "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/wrf_user_fortran_util_0.so"
+load "/ptmp/rizvi/trunk/graphics/ncl/WRF_contributed.ncl.test"
+load "/ptmp/rizvi/trunk/graphics/ncl/WRFUserARW.ncl"
+external wrf_user_fortaran_util_0 "/ptmp/rizvi/trunk/graphics/ncl/wrf_user_fortran_util_0.so"
 ;
 begin
    ;***************************************************************************
@@ -37,7 +37,7 @@ begin
 
    works = "x11"
    sigma_lev=25
-   analysis   = addfile("/mmmtmp/rizvi/analysis.nc", "r")    ; analysis file name
+   analysis   = addfile("/mmm/mmmtmp/rizvi/data/india_30km/run_cv_options_hum_rh_md1/fc/2005080500/wrfinput_d01.nc", "r")    ; analysis file name
 
    var_U="U"
    var_V="V"

@@ -8,17 +8,36 @@ MODULE da_verif_control
 !   defining unit numbers and cosnstants
 !
 !  Author:   Syed RH Rizvi     NCAR/MMM         05/25/2006
+! Updates:
+!            Syed RH Rizvi     NCAR/MMM         05/08/2007
+!            Significance test & error bars are added
 !----------------------------------------------------------------------------   
    implicit none
 
-  integer, parameter       :: maxnum = 10, nstd = 16
+  integer, parameter       :: maxnum = 10, nstd = 16, nstdh = 125
   integer, parameter       :: num_verif_var =5        
   real,    dimension(nstd) :: stdp
+  real,    dimension(nstdh):: stdh
   real                     :: rmiss = -99.99
   integer                  :: num_miss = -99
+  real, parameter          :: missing_r = -888888.
 
   data stdp/1000.0, 925.0, 850.0, 700.0, 500.0, 400.0, 300.0, &
              250.0, 200.0, 150.0, 100.0,  70.0,  50.0 ,30.0, 20.0 ,10.0/ 
+  data stdh/0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, &
+            2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, &
+            4.2, 4.4, 4.6, 4.8, 5.0, 5.2, 5.4, 5.6, 5.8, 6.0, &
+            6.2, 6.4, 6.6, 6.8, 7.0, 7.2, 7.4, 7.6, 7.8, 8.0, &
+            8.2, 8.4, 8.6, 8.8, 9.0, 9.2, 9.4, 9.6, 9.8,10.0, &
+           10.2,10.4,10.6,10.8,11.0,11.2,11.4,11.6,11.8,12.0, &
+           12.2,12.4,12.6,12.8,13.0,13.2,13.4,13.6,13.8,14.0, &
+           14.2,14.4,14.6,14.8,15.0,15.2,15.4,15.6,15.8,16.0, &
+           16.2,16.4,16.6,16.8,17.0,17.2,17.4,17.6,17.8,18.0, &
+           18.2,18.4,18.6,18.8,19.0,19.2,19.4,19.6,19.8,20.0, &
+           20.2,20.4,20.6,20.8,21.0,21.2,21.4,21.6,21.8,22.0, &
+           22.2,22.4,22.6,22.8,23.0,23.2,23.4,23.6,23.8,24.0, &
+           24.2,24.4,24.6,24.8,25.0/
+
 
   character (len=1)   :: verif_var(num_verif_var)
   character (len= 2)  :: verif_type(2)
@@ -52,7 +71,7 @@ MODULE da_verif_control
   end type gpspw_type
 
   type gpsref_type
-    type (stats_value)          :: refomb, refoma         
+    type (stats_value)          :: refomb(nstdh), refoma(nstdh)         
   end type gpsref_type
 
 ! namelist.varstats variables
@@ -108,6 +127,6 @@ MODULE da_verif_control
   NAMELIST /Record5/ file_path_string
 !
 ! Namelist declaration over
-
-  integer      :: nml_unit, diag_unit_in, diag_unit_out, info_unit
+  integer      :: nml_unit, diag_unit_in, diag_unit_out, info_unit, plot_stats_unit
+  real, dimension(34,2) :: alpha
 end MODULE da_verif_control

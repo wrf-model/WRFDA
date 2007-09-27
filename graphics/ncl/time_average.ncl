@@ -7,155 +7,195 @@
 ;ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ; Author: Ananda Kumar Das (Visiting Scientist)
 ;         National Center for Atmospheric Research 
-;         Boulder, CO 80301
+;         Boulder, CO 80301  Date: 11/27/06
+; Purpose : Plots time averaged bar of verification scores
+; Updates:
 ;
-; Date: 11/27/06
+;         06/08/2007  Hui Shao NCAR/RAL/DATC 
+;         (1) corrected data format
+;         (2) added AVG file type
+;
+;         08/31/2007      Syed RH Rizvi ,  MMM/NCAR
+;         Added parallel option for reading OMA along with OMB
 ;=========================================================;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;===========================================================================================;
 begin
-;===========================================================================================;
-; open file and read in data
-;-----------------------------------------------------------
-run_dir=run_dir+"/"
-plot_dir = run_dir
-read_headers = asciiread(run_dir+"header_main",-1,"string")
-;-----------------------------------------------------------
-Xaxis_title = read_headers(0)
-diag_var = read_headers(1)
-num_expt = stringtointeger(read_headers(2))
-pdat_dirs = (/read_headers(3 : 2+num_expt(0))/)
-;-----------------------------------------------------------
-num_legend=num_expt
-legend_line_cols=new((/num_legend/),"string")
-legend_line_cols(0:num_legend-1)=exp_line_cols(0:num_legend-1)
+   Fill_ValueF = -99.99
+   Fill_ValueI = -99
+   ;-----Assign all possible file names in header_main -------
+   sfc_file="fnames_sfc"
+   upr_file="fnames_upr"
+   gupr_file="fnames_gupr"
+   gpsref_file="fnames_gpsref"
+   ggpsref_file="fnames_ggpsref"
+   ;-----------------------------------------------------------
+   ;===========================================================================================;
+   ; open file and read in data
+   ;-----------------------------------------------------------
+   run_dir=getenv("RUN_DIR")+"/"
+   plot_dir = run_dir
+   read_headers = asciiread(run_dir+"header_main",-1,"string")
+   ;-----------------------------------------------------------
+   Xaxis_title = read_headers(0)
+   diag_var1 = read_headers(1)
+   diag_var2 = read_headers(2)
+   num_expt = stringtointeger(read_headers(3))
+   pdat_dirs = (/read_headers(4 : 3+num_expt(0))/)
+   if (get_omboma_plots .eq. "True" .or. \
+       get_omboma_plots .eq. "true" .or. \
+       get_omboma_plots .eq. ".True." .or. \
+       get_omboma_plots .eq. ".true."      ) then
 
-delete(num_legend)
-num_legend=num_expt
-new_legends=new((/num_legend/),"string")
-new_legends(0:num_legend-1)=exp_legends(0:num_legend-1)
-;-----------------------------------------------------------
-num_d_levs=dimsizes(select_levs)
-num_d_scor=dimsizes(select_scores)
-;-----------------------------------------------------------
-num_obs = dimsizes(read_headers) - (num_expt + 3)
-fnames_obs = new((/num_obs/),"string")
-do iob = 1, num_obs
-fnames_obs(iob-1)= read_headers(num_expt+3+iob-1)
-end do
-;-----------------------------------------------------------
-;-----------------------------------------------------------
-do iob = 1, num_obs
-;------------------
-;------------------
-varheads = asciiread(run_dir+fnames_obs(iob-1),-1,"string")
-nrow = stringtointeger(varheads(0))
-ncol = stringtointeger(varheads(1))
-varnames = (/varheads(2 : :)/) 
-
-num_vars = dimsizes(varnames)/2
-varfiles = new((/num_vars/),"string")
-varunits = new((/num_vars/),"string")
-
-do iv = 1, num_vars
-  varfiles(iv-1)= varnames(2*(iv-1))
-  varunits(iv-1)= varnames(2*(iv-1)+1)
-end do
-;----------------------------------------------------------
-dfile=pdat_dirs(0)+varfiles(0)
-dates = new((/nrow/),"float")
-dates = stringtofloat(systemfunc("cut -c8-9 " + dfile)) 
-;----------------------------------------------------------
-sfc_file="fnames_sfc"
-if ( fnames_obs(iob-1) .eq. sfc_file ) then
- nlev =1
- ifsfc = True
- out_name="Time_Average_SFC_"
-else
- nlev = 16
- ifsfc = False
- out_name="Time_Average_UPA_"
-end if
-;--------------------------------------------
-q_levels = 8
-nv = num_vars
-nexp = num_expt
-;
-data = new ((/nv,nexp,nrow,ncol/),"float")
-
-do iexp = 1, nexp
-do iv = 1, nv
-  data((iv-1),(iexp-1),:,:)=asciiread(pdat_dirs(iexp-1)+varfiles(iv-1),(/nrow,ncol/),"float")
-end do
-end do
-;********************************************************************************************
-; Data Format:  In each row total (1 + 16 x 4 = 65) values for Upper-air
-; Data Format:  In each row total (1 + 1 x 4 = 5) values for Surface
-;
-; Date,  For each level triplets for NUM, BIAS Absolute BIAS & RMSE 
-; levels:  1000 925 850 700 500 400 300 250 200 150 100 70 50 30 20 10
-; index      1   2   3   4   5   6   7   8   9  10  11  12 13 14 15 16
-;
-;   Type :   1     2       3
-;          BIAS  ABIAS    RMSE
-;********************************************************************************************
- plevels=(/1000,925,850,700,500,400,300,250,200,150,100,70,50,30,20,10/)
-;********************************************************************************************
- diag_types=(/"RMSE","BIAS","ABIAS"/)
- diag_names=(/"RMSE","Bias","Absolute Bias"/)
-;----------------------------------------------------------
- Fill_ValueF = -99.99
-;----------------------------------------------------------
-do idtype =1, num_d_scor  
-  do ii = 1, 3
-    if ( select_scores(idtype-1) .eq. diag_types(ii-1) ) then
-      Type = ii
-    end if
-  end do
-  diag_name=diag_names(Type-1)
-;----------------------------------------------------------
-first = True
-do idlev = 1, num_d_levs 
-   do ll = 1, nlev
-     if ( select_levs(idlev-1) .eq. plevels(ll-1) ) then
-        ilev = ll
-     end if
+   omboma_string="omboma_"
+   omboma=1
+   nexp=2*num_expt
+   legend_line_cols=new((/2*num_expt/),"string")
+   new_legends=new((/2*num_expt/),"string")
+   do i=1,num_expt
+   legend_line_cols(2*i-2)=exp_line_cols(i-1)
+   legend_line_cols(2*i-1)= legend_line_cols(2*i-2)
+   new_legends(2*i-2)=exp_legends(i-1)+" omb"
+   new_legends(2*i-1)= exp_legends(i-1)+" oma"
    end do
-;----------------------------------------------------------
-if (first) then
-  wks   = gsn_open_wks (wksdev,plot_dir+out_name+select_scores(idtype-1)+"-"+select_levs(idlev-1))   ; open workstation
-  first = False
-end if
-;----------------------------------------------------------
- if (ifsfc) then
-   level = 1
-   plevel = "Surface  "
- else
-   level=ilev
-   plevel = plevels(level-1)+" hPa  "
- end if
+   else
+   omboma_string=""
+   omboma=0
+   nexp=num_expt
+   legend_line_cols=new((/num_expt/),"string")
+   new_legends=new((/num_expt/),"string")
+   do i=1,num_expt
+   legend_line_cols(i-1)=exp_line_cols(i-1)
+   new_legends(i-1)     = exp_legends(i-1)
+   end do
+   end if
+   ;-----------------------------------------------------------
+   num_d_levs=dimsizes(select_levs)
+   num_d_scor=dimsizes(select_scores)
+   ;-----------------------------------------------------------
+   num_obs = dimsizes(read_headers) - (num_expt + 4)
+   fnames_obs = new((/num_obs/),"string")
+   do iob = 1, num_obs
+   fnames_obs(iob-1)= read_headers(num_expt+4+iob-1)
+   end do
 
-;----------------------------------------------------------
- plts                      = new (nv,"graphic")   ; define number of panels
+   ;-----------------------------------------------------------
+   do iob = 1, num_obs
+   ;------------------
+   if (     fnames_obs(iob-1) .eq. upr_file    \
+       .or. fnames_obs(iob-1) .eq. gpsref_file  \
+       .or. fnames_obs(iob-1) .eq. ggpsref_file) then
+   continue
+   end if
+   ;-----------------------------------------------------------
+   varheads = asciiread(run_dir+fnames_obs(iob-1),-1,"string")
+   nrow = stringtointeger(varheads(0))
+   ncol = stringtointeger(varheads(1))
+   varnames = (/varheads(2 : :)/)
 
- x = new((/nexp/),"integer")
- y_bar = new((/nv,nexp/),"float")
+   num_vars = dimsizes(varnames)/3
+   varfiles = new((/2,num_vars/),"string")
+   varunits = new((/num_vars/),"string")
 
- x = ispan(1,nexp,1)
- data@_FillValue = Fill_ValueF
-;----------------------------------------------------------
-do iv = 1, nv
-   do iexp = 1, nexp
-        if (iv .eq. 4) then
-        y_bar(iv-1,iexp-1) = 1000.0*avg(data((iv-1),(iexp-1),:,(1+(level-1)*4+Type)))
-        else
-        y_bar(iv-1,iexp-1) = avg(data((iv-1),(iexp-1),:,(1+(level-1)*4+Type)))
+   do iv = 1, num_vars
+     varfiles(0,iv-1)= varnames(3*(iv-1))
+     varfiles(1,iv-1)= varnames(3*(iv-1)+1)
+     varunits(iv-1)  = varnames(3*(iv-1)+2)
+   end do
+
+   ;----------------------------------------------------------
+   sfc_file="fnames_sfc"
+   if ( fnames_obs(iob-1) .eq. sfc_file ) then
+   nlev =1
+   ifsfc = True
+   out_name="Time_Average_SFC_"+omboma_string
+   else
+   nlev = 16
+   ifsfc = False
+   out_name="Time_Average_UPA_"+omboma_string
+   end if
+   ;--------------------------------------------
+   q_levels = 9
+   nv = num_vars
+   data_omb = new ((/nv,num_expt,nrow,ncol/),"float",Fill_ValueF)
+   data_oma = new ((/nv,num_expt,nrow,ncol/),"float",Fill_ValueF)
+
+   do iexp = 1, num_expt
+      do iv = 1, nv
+        data_omb((iv-1),(iexp-1),:,:)=\
+        asciiread(pdat_dirs(iexp-1)+varfiles(0,iv-1),(/nrow,ncol/),"float")
+        data_oma((iv-1),(iexp-1),:,:)=\
+        asciiread(pdat_dirs(iexp-1)+varfiles(1,iv-1),(/nrow,ncol/),"float")
+      end do
+   end do
+   ;********************************************************************************************
+   ; Data Format:  In each row total (1 + 16 x 6 = 97) values for Upper-air
+   ; Data Format:  In each row total (1 + 1 x 6 = 7) values for Surface
+   ;
+   ; Date,  For each level triplets for NUM, BIAS Absolute BIAS & RMSE 
+   ; levels:  1000 925 850 700 500 400 300 250 200 150 100 70 50 30 20 10
+   ; index      1   2   3   4   5   6   7   8   9  10  11  12 13 14 15 16
+   ;
+   ;   Type :   1     2       3     4     5
+   ;          BIAS  ABIAS    RMSE  error significance
+   ;********************************************************************************************
+    plevels=(/1000,925,850,700,500,400,300,250,200,150,100,70,50,30,20,10/)
+   ;********************************************************************************************
+   diag_types=(/"BIAS","ABIAS","RMSE"/)	
+   diag_names=(/"Bias","Absolute Bias","RMSE"/) 
+   ;----------------------------------------------------------
+   ;----------------------------------------------------------
+   do idtype =1, num_d_scor  
+     do ii = 1, 3
+       if ( select_scores(idtype-1) .eq. diag_types(ii-1) ) then
+         Type = ii
+       end if
+     end do
+     diag_name=diag_names(Type-1)
+   ;----------------------------------------------------------
+   first = True
+   do idlev = 1, num_d_levs 
+      do ll = 1, nlev
+        if ( select_levs(idlev-1) .eq. plevels(ll-1) ) then
+           ilev = ll
         end if
    end do
+   ;----------------------------------------------------------
+   if (first) then
+     wks   = gsn_open_wks (wksdev,plot_dir+out_name+select_scores(idtype-1))   ; open workstation
+     first = False
+   end if
+   ;----------------------------------------------------------
+   if (ifsfc) then
+      level = 1
+      plevel = "Surface  "
+   else
+     level=ilev
+     plevel = plevels(level-1)+" hPa  "
+   end if
+
+   ;----------------------------------------------------------
+   plts                      = new (nv,"graphic")   ; define number of panels
+
+
+ x = new((/nexp/),"integer",Fill_ValueI)
+ y_bar = new((/nv,nexp/),"float",Fill_ValueF)
+
+ x = ispan(1,nexp,1)
+;----------------------------------------------------------
+do iv = 1, nv
+  do iexp = 1, num_expt
+   if( omboma .eq. 1) then
+   y_bar(iv-1,2*iexp-2) = avg(data_omb((iv-1),(iexp-1),:,(1+(level-1)*6+Type)))
+   y_bar(iv-1,2*iexp-1) = avg(data_oma((iv-1),(iexp-1),:,(1+(level-1)*6+Type)))
+   else
+   y_bar(iv-1,iexp-1) = avg(data_omb((iv-1),(iexp-1),:,(1+(level-1)*6+Type)))
+   end if
+ end do
 end do
-y_bar@_FillValue = Fill_ValueF
+
 ;----------------------------------------------------------
  res                       = True                   ; plot mods desired
  res@gsnDraw               = False                  ; (a) do not draw
@@ -239,7 +279,7 @@ frame(wks)
  if (ifsfc) then
    break
  end if
-  
+
 end do                            ; level loop over
   delete(wks)
   delete(x)
@@ -250,7 +290,8 @@ delete(varheads)
 delete(varnames)
 delete(varfiles)
 delete(varunits)
-delete(data)
+delete(data_omb)
+delete(data_oma)
 delete(plts)
 
 end do

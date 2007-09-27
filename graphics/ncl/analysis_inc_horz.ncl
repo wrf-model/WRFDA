@@ -12,25 +12,24 @@
 ;         Boulder, CO 80301
 ;
 ; Date: 01/17/07
+;
+;
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;=========================================================;
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/contributed.ncl"   
-load "/usr/local/ncl-4.2.0.a034/lib/ncarg/nclscripts/csm/shea_util.ncl"
-
 ; Note:  Make sure following.
 ;         a) You have NCL Version: 4.2.0.a.034 upward
-;         b) "wrf_user_fortran_util_0.so" file is created by using 
+;         b) "wrf_user_fortran_util_0.so" file is created by using
 ;            "RWRAPIT wrf_user_fortran_util_0.f" command
 ;****************************************************************************
 ;
 ;****************Change lines below *****************************************
 ;
-load "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/WRF_contributed.ncl.test"
-;load "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/WRFUserARW.ncl"
-;external wrf_user_fortaran_util_0 "/Volumes/mahua/rizvi/trunk/trunk/graphics/ncl/wrf_user_fortran_util_0.so"
-;
-
+load "/ptmp/rizvi/trunk/graphics/ncl/WRF_contributed.ncl.test"
+load "/ptmp/rizvi/trunk/graphics/ncl/WRFUserARW.ncl"
+external wrf_user_fortaran_util_0 "/ptmp/rizvi/trunk/graphics/ncl/wrf_user_fortran_util_0.so"
 ;=========================================================;
 begin
    ;********************************************************
@@ -48,10 +47,10 @@ begin
    ;   expt = var_name+"_"+n1+"_"+n2+"_"+lev
    expt="test" 
 
-   sigma_lev=10 
+   sigma_lev=12 
 
    ;************ here read input file ***************
-   filename_inc = "/mmmtmp/huishao/ANALYSIS_INCREMENT"
+   filename_inc = "/mmm/mmmtmp/rizvi/data/india_30km/psot_with_cv_options_hum_rh_md2/run/2005080500/wrfvar_psot1/working/analysis_increments"
    setfileoption("bin","ReadByteOrder","BigEndian") ; Read BigEndian(IBM) file in LittleEndian(Linux) Mach.
    ;*************************************************
    var1="T"
