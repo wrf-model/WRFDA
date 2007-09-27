@@ -353,4 +353,6 @@ if $CLEAN; then rm -rf $WORK_DIR; fi
 echo
 echo $(date) "Finished"
 
+touch $RUN_DIR/SUCCESS
+
 exit 0

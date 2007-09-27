@@ -18,7 +18,13 @@ export RUN=${RUN:-run}
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-export EXPT=${EXPT:-${ID}_${TEST}_${NUM_PROCS}}
+. $WRFVAR_DIR/scripts/da_set_defaults.ksh
+
+if [[ $TYPE == serial ]]; then
+   export NUM_PROCS=1
+fi
+
+export EXPT=${ID}_${TEST}_${NUM_PROCS}
 export EXP_DIR=$PWD/$EXPT
 
 if [[ $TEST == wrfvar ]]; then
