@@ -315,7 +315,36 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
-	@ touch arch
+	@ touch arch	
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, gfortran, serial          (Single-threaded) EXPERIMENTAL
+#
+FC              = gfortran
+FFC             = $(FC)
+SFC             = $(FC)
+CC              = gcc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM
+
+FCOPTIM         = 
+FCDEBUG         = 
+FCFREE          = -ffree-form -ffree-line-length-none
+FCFIXED         = -ffixed-form
+FCENDIAN        =
+EXTRA_FCFLAGS   = -fno-second-underscore
+FCTYPE          = -fdefault-real-$(RWORDSIZE)
+
+LOCAL_LIB       = -L/usr/local/lib
+
+arch : 
+		$(LN) $(RSL_STUBS)/* .
+		@ touch arch
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compilers, serial             (Single-threaded)
