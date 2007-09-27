@@ -132,6 +132,36 @@ arch : librsl_lite.a
 	@ touch arch
 	
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, SM         (OpenMP) EXPERIMENTAL
+#
+FC              = pgf90
+FFC             = $(FC)
+SFC             = $(FC)
+CC              = gcc
+CC_TOOLS        = $(CC)
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -D_OPENMP
+
+FCOPTIM         =
+FCDEBUG         =
+FCTYPE          = -r$(RWORDSIZE)
+FCFREE          = -Mfree
+FCFIXED         = -Mfixed
+FCENDIAN        = -byteswapio
+EXTRA_FCFLAGS   = -Ktrap=fp -mp
+EXTRA_LDFLAGS   = -mp
+
+LOCAL_LIB       = -L/usr/local/lib
+
+arch : 
+		$(LN) $(RSL_STUBS)/* .
+		@ touch arch
+
+###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, GNU compilers, serial     (Single-threaded)
 #
 FC              = g95
@@ -865,6 +895,39 @@ MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
 	@ touch arch
+
+###########################################################
+#ARCH Settings for AIX, IBM compilers, SM                             (OpenMP) EXPERIMENTAL
+#
+M4              = m4 -B24000
+FC              = xlf90_r
+FFC             = xlf_r
+SFC             = $(FC)
+CC              = cc_r
+CC_TOOLS        = $(CC)
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        =
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -D_OPENMP
+FCOPTIM         =
+FCDEBUG         = 
+FCTYPE          = -qrealsize=$(RWORDSIZE)
+FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
+FCENDIAN        =
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
+
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -qcpluscmt
+
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000 -qsmp=noauto:noopt
+
+LOCAL_LIB       = -lmass -lmassv
+
+arch : 
+		$(LN) $(RSL_STUBS)/* .
+		@ touch arch
 
 ###########################################################
 #ARCH Settings for cray_x1 UNICOS/mp CRAY X1, serial                  (Single-threaded) 

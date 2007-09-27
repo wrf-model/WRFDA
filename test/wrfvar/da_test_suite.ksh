@@ -4,7 +4,9 @@
 
 if [[ $# != 1 ]]; then
    echo "Arguments test"
-   echo "(one of wrfvar wrfvar_tests wrfvar_verbose ideal wrf wrf_real wrf_ideal quick)"
+   echo "One of : wrfvar wrfvar_tests wrfvar_verbose ideal"
+   echo "wrf wrf_real wrf_ideal quick"
+   echo "em_real_1 em_real_2 em_real_3 em_real_4 em_real_5"
    exit 1
 fi
 
@@ -19,10 +21,19 @@ export RUN=${RUN:-run}
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. $WRFVAR_DIR/scripts/da_set_defaults.ksh
-
 if [[ $TYPE == serial ]]; then
    export NUM_PROCS=1
+fi
+
+MAX_PROCS=${MAX_PROCS:-$NUM_PROCS}
+
+if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
+   export NUM_PROCS=$MAX_PROCS
+fi
+
+if [[ $TYPE == openmp ]]; then
+   export OMP_NUM_THREADS=$NUM_PROCS
+   export RUN_CMD=" "
 fi
 
 export EXPT=${ID}_${TEST}_${NUM_PROCS}
@@ -86,21 +97,102 @@ elif [[ $TEST == wrfvar_verbose ]]; then
    # used in crtm run. Zhiquan has fix in local code.
    export NL_WRITE_PROFILE=false
 elif [[ $TEST == wrf ]]; then
-   export RUN_WRF=${RUN_WRF:-true}
+   export RUN_WRF=true
 elif [[ $TEST == wrf_ideal ]]; then
-   export RUN_WRF=${RUN_WRF:-true}
+   export RUN_WRF=true
    export RUN_IDEAL=${RUN_IDEAL:-true}
 elif [[ $TEST == wrf_real ]]; then
-   export RUN_WRF=${RUN_WRF:-true}
-   export RUN_REAL=${RUN_REAL:-true}
+   export RUN_WRF=true
+   export RUN_REAL=true
 elif [[ $TEST == quick ]]; then
-   export RUN_WPS=${RUN_WPS:-true}
-   export RUN_REAL=${RUN_REAL:-true}
-   export RUN_OBSPROC=${RUN_OBSPROC:-true}
-   export RUN_WRFVAR=${RUN_WRFVAR:-true}
-   export RUN_UPDATE_BC=${RUN_UPDATE_BC:-true}
-   export RUN_WRF=${RUN_WRF:-true}
+   export RUN_WPS=true
+   export RUN_REAL=true
+   export RUN_OBSPROC=true
+   export RUN_WRFVAR=true
+   export RUN_UPDATE_BC=true
+   export RUN_WRF=true
    export NL_NTMAX=${NL_NTMAX:-2}
+elif [[ $TEST == em_real_1 ]]; then
+   export RUN_REAL=true
+   export RUN_WRF=true
+   export REAL_INPUT_DIR=$PWD/$CASE/rc
+   export NL_MP_PHYSICS=3
+   export NL_RA_LW_PHYSICS=1
+   export NL_RA_SW_PHYSICS=1
+   export NL_SF_SFCLAY_PHYSICS=1
+   export NL_SF_SURFACE_PHYSICS=1
+   export NL_BL_PBL_PHYSICS=1
+   export NL_CU_PHYSICS=1
+   export NL_NUM_SOIL_LAYERS=5
+   export NL_NESTED=F
+   export NL_TIME_STEP_SOUND=4
+   export NL_MP_ZERO_OUT=0
+elif [[ $TEST == em_real_2 ]]; then
+   export RUN_REAL=true
+   export RUN_WRF=true
+   export REAL_INPUT_DIR=$PWD/$CASE/rc
+   export NL_MP_PHYSICS=4
+   export NL_RA_LW_PHYSICS=1
+   export NL_RA_SW_PHYSICS=2
+   export NL_SF_SFCLAY_PHYSICS=2
+   export NL_SF_SURFACE_PHYSICS=2
+   export NL_BL_PBL_PHYSICS=2
+   export NL_CU_PHYSICS=2
+   export NL_NUM_SOIL_LAYERS=4
+   export NL_NESTED=F
+   export NL_TIME_STEP_SOUND=4
+   export NL_MP_ZERO_OUT=0
+elif [[ $TEST == em_real_3 ]]; then
+   export RUN_REAL=true
+   export RUN_WRF=true
+   export REAL_INPUT_DIR=$PWD/$CASE/rc
+   export NL_MP_PHYSICS=5
+   export NL_RA_LW_PHYSICS=1
+   export NL_RA_SW_PHYSICS=2
+   export NL_SF_SFCLAY_PHYSICS=2
+   export NL_SF_SURFACE_PHYSICS=3
+   export NL_BL_PBL_PHYSICS=2
+   export NL_CU_PHYSICS=3
+   export NL_NUM_SOIL_LAYERS=6
+   export NL_NESTED=F
+   export NL_TIME_STEP_SOUND=4
+   export NL_MP_ZERO_OUT=0
+elif [[ $TEST == em_real_4 ]]; then
+   export RUN_REAL=true
+   export RUN_WRF=true
+   export REAL_INPUT_DIR=$PWD/$CASE/rc
+   export NL_MP_PHYSICS=5
+   export NL_RA_LW_PHYSICS=1
+   export NL_RA_SW_PHYSICS=2
+   export NL_SF_SFCLAY_PHYSICS=2
+   export NL_SF_SURFACE_PHYSICS=3
+   export NL_BL_PBL_PHYSICS=2
+   export NL_CU_PHYSICS=3
+   export NL_NUM_SOIL_LAYERS=6
+   export NL_NESTED=F
+   export NL_TIME_STEP_SOUND=4
+   export NL_MP_ZERO_OUT=0
+elif [[ $TEST == em_real_5 ]]; then
+   export RUN_REAL=true
+   export RUN_WRF=true
+   export REAL_INPUT_DIR=$PWD/$CASE/rc
+   export NL_MP_PHYSICS=4
+   export NL_RA_LW_PHYSICS=3
+   export NL_RA_SW_PHYSICS=3
+   export NL_SF_SFCLAY_PHYSICS=2
+   export NL_SF_SURFACE_PHYSICS=2
+   export NL_BL_PBL_PHYSICS=2
+   export NL_CU_PHYSICS=2
+   export NL_NUM_SOIL_LAYERS=4
+   export NL_NESTED=F
+   export NL_TIME_STEP_SOUND=4
+   export NL_MP_ZERO_OUT=0
+   export NL_UCMCALL=1
+   export NL_LEVSIZ=59
+   export NL_PAERLEV=29
+   export NL_CAM_ABS_FREQ_S=21600
+   export NL_CAM_ABS_DIM1=4
+   export NL_CAM_ABS_DIM2=28
 else
    echo "Unknown test $TEST"
    exit 1

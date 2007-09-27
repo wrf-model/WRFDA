@@ -614,9 +614,23 @@ else
       echo '<A HREF="namelist.output">Namelist.output</a>'
    fi
 
-   echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
-   echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
-   echo '<A HREF="rsl">Other RSL output</a>'
+   if [[ -f rsl.out.0000 ]]; then
+      rm -rf $RUN_DIR/rsl
+      mkdir -p $RUN_DIR/rsl
+      mv rsl* $RUN_DIR/rsl
+      cd $RUN_DIR/rsl
+      for FILE in rsl*; do
+         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
+         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
+         cat $FILE >> $FILE.html
+         echo "</PRE></BODY></HTML>" >> $FILE.html
+         rm $FILE
+      done
+      echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
+      echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
+      echo '<A HREF="rsl">Other RSL output</a>'
+   fi
+
    echo '<A HREF="trace/0.html">PE 0 trace</a>'
    echo '<A HREF="trace">Other tracing</a>'
    echo '<A HREF="cost_fn">Cost function</a>'
