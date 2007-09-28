@@ -93,11 +93,11 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
 
-      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_u_2), grid%em_g_u_2 , grid%em_g_u_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_t_2), grid%em_g_t_2 , grid%em_g_t_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_moist),  grid%g_moist,   grid%g_moist)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_u_2),   grid%g_u_2,   grid%g_u_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_v_2),   grid%g_v_2,   grid%g_v_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_t_2),   grid%g_t_2,   grid%g_t_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_mu_2),  grid%g_mu_2,  grid%g_mu_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_moist), grid%g_moist, grid%g_moist)
 
    end if
 

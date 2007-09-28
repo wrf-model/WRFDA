@@ -215,12 +215,12 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
       if (var4d) then
 
-         grid%em_g_u_2 = 0.0
-         grid%em_g_v_2 = 0.0
-         grid%em_g_w_2 = 0.0
-         grid%em_g_t_2 = 0.0
-         grid%em_g_ph_2 = 0.0
-         grid%em_g_mu_2 = 0.0
+         grid%g_u_2 = 0.0
+         grid%g_v_2 = 0.0
+         grid%g_w_2 = 0.0
+         grid%g_t_2 = 0.0
+         grid%g_ph_2 = 0.0
+         grid%g_mu_2 = 0.0
          grid%g_moist = 0.0
 
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
@@ -233,12 +233,12 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
          grid%dyn_opt = DYN_EM_TL
          call nl_set_dyn_opt (1 , DYN_EM_TL)
          call da_med_initialdata_input(grid , config_flags, filnam)
-         grid%em_a_u_2 =   grid%em_g_u_2
-         grid%em_a_v_2 =   grid%em_g_v_2
-         grid%em_a_w_2 =   grid%em_g_w_2
-         grid%em_a_t_2 =   grid%em_g_t_2
-         grid%em_a_ph_2 =   grid%em_g_ph_2
-         grid%em_a_mu_2 =   grid%em_g_mu_2
+         grid%a_u_2 =   grid%g_u_2
+         grid%a_v_2 =   grid%g_v_2
+         grid%a_w_2 =   grid%g_w_2
+         grid%a_t_2 =   grid%g_t_2
+         grid%a_ph_2 =   grid%g_ph_2
+         grid%a_mu_2 =   grid%g_mu_2
          grid%a_moist =   grid%g_moist
 
          grid%dyn_opt = DYN_EM_AD
@@ -247,19 +247,19 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
          grid%dyn_opt = ndynopt
          call nl_set_dyn_opt (1 , DYN_EM)
-         grid%em_g_u_2 = 0.0
-         grid%em_g_v_2 = 0.0
-         grid%em_g_w_2 = 0.0
-         grid%em_g_t_2 = 0.0
-         grid%em_g_ph_2 = 0.0
-         grid%em_g_mu_2 = 0.0
+         grid%g_u_2 = 0.0
+         grid%g_v_2 = 0.0
+         grid%g_w_2 = 0.0
+         grid%g_t_2 = 0.0
+         grid%g_ph_2 = 0.0
+         grid%g_mu_2 = 0.0
          grid%g_moist = 0.0
-         grid%em_a_u_2 = 0.0
-         grid%em_a_v_2 = 0.0
-         grid%em_a_w_2 = 0.0
-         grid%em_a_t_2 = 0.0
-         grid%em_a_ph_2 = 0.0
-         grid%em_a_mu_2 = 0.0
+         grid%a_u_2 = 0.0
+         grid%a_v_2 = 0.0
+         grid%a_w_2 = 0.0
+         grid%a_t_2 = 0.0
+         grid%a_ph_2 = 0.0
+         grid%a_mu_2 = 0.0
          grid%a_moist = 0.0
 #endif
          !!!!!!
@@ -274,12 +274,12 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
       call nl_set_dyn_opt (1 , DYN_EM_TL)
 
       call da_med_initialdata_input(grid , config_flags, 'tldf')
-      grid%em_g_u_2 = 0.0
-      grid%em_g_v_2 = 0.0
-      grid%em_g_w_2 = 0.0
-      grid%em_g_t_2 = 0.0
-      grid%em_g_ph_2 = 0.0
-      grid%em_g_mu_2 = 0.0
+      grid%g_u_2 = 0.0
+      grid%g_v_2 = 0.0
+      grid%g_w_2 = 0.0
+      grid%g_t_2 = 0.0
+      grid%g_ph_2 = 0.0
+      grid%g_mu_2 = 0.0
       grid%g_moist = 0.0
 
       call med_hist_out(grid , 3 , config_flags)
@@ -318,12 +318,12 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
       grid%xa%psfc(its:ite, jts:jte) = 0.0
 
       call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01')
-      grid%em_a_u_2 =   grid%xa%u
-      grid%em_a_v_2 =   grid%xa%v
-      grid%em_a_w_2 =   grid%xa%w
-      grid%em_a_t_2 =   grid%xa%t
-      grid%em_a_ph_2 =   grid%xa%p
-      grid%em_a_mu_2 =   grid%xa%psfc
+      grid%a_u_2 =   grid%xa%u
+      grid%a_v_2 =   grid%xa%v
+      grid%a_w_2 =   grid%xa%w
+      grid%a_t_2 =   grid%xa%t
+      grid%a_ph_2 =   grid%xa%p
+      grid%a_mu_2 =   grid%xa%psfc
       grid%a_moist(:,:,:,p_a_qv) =   grid%xa%q(:,:,:)
 
       grid%dyn_opt = DYN_EM_AD

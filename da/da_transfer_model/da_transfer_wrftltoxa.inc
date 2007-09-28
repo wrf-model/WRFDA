@@ -72,7 +72,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
             sdmd=sdmd+grid%g_moist(i,j,k,P_G_QV)*grid%em_dnw(k)
             s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
-         grid%xa%psfc(i,j)=-grid%xb%psac(i,j)*sdmd-grid%em_g_mu_2(i,j)*s1md
+         grid%xa%psfc(i,j)=-grid%xb%psac(i,j)*sdmd-grid%g_mu_2(i,j)*s1md
       end do
    end do
 
@@ -85,7 +85,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
          g_press(i,j,ke+1)=0.0
          do k=ke,ks,-1
             g_press(i,j,k)=g_press(i,j,k+1) &
-               -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
+               -(grid%g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
                +(grid%em_mu_2(i,j)+grid%em_mub(i,j))* &
                grid%g_moist(i,j,k,P_G_QV))*grid%em_dn(k)
             grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
@@ -100,7 +100,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%xa%t(i,j,k)=grid%xb%t(i,j,k)*(grid%em_g_t_2(i,j,k)/ &
+            grid%xa%t(i,j,k)=grid%xb%t(i,j,k)*(grid%g_t_2(i,j,k)/ &
                (t0+grid%em_t_2(i,j,k)) &
                +kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
          end do
@@ -118,13 +118,13 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    utmp=grid%xa%u
    vtmp=grid%xa%v
    ptmp=grid%xa%psfc
-   grid%xa%u=grid%em_g_u_2
-   grid%xa%v=grid%em_g_v_2
+   grid%xa%u=grid%g_u_2
+   grid%xa%v=grid%g_v_2
 #ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
 #endif
-   grid%em_g_u_2=grid%xa%u
-   grid%em_g_v_2=grid%xa%v
+   grid%g_u_2=grid%xa%u
+   grid%g_v_2=grid%xa%v
    grid%xa%u=utmp
    grid%xa%v=vtmp
    grid%xa%psfc=ptmp
@@ -132,8 +132,8 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%xa%u(i,j,k)=0.5*(grid%em_g_u_2(i+1,j,  k)+grid%em_g_u_2(i,j,k))
-            grid%xa%v(i,j,k)=0.5*(grid%em_g_v_2(i  ,j+1,k)+grid%em_g_v_2(i,j,k))
+            grid%xa%u(i,j,k)=0.5*(grid%g_u_2(i+1,j,  k)+grid%g_u_2(i,j,k))
+            grid%xa%v(i,j,k)=0.5*(grid%g_v_2(i  ,j+1,k)+grid%g_v_2(i,j,k))
          end do
       end do
    end do
@@ -145,7 +145,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    do j=js,je
       do k=ks,ke+1
          do i=is,ie
-            grid%xa%w(i,j,k)=grid%em_g_w_2(i,j,k)
+            grid%xa%w(i,j,k)=grid%g_w_2(i,j,k)
          end do
       end do
    end do

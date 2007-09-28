@@ -47,12 +47,12 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       if (jcdfi_use .AND. iter > 0 .AND. cg_jcdf == 1) then
          call da_med_initialdata_input(grid , config_flags, 'tldf')
       else
-         grid%em_g_u_2 = 0.0
-         grid%em_g_v_2 = 0.0
-         grid%em_g_w_2 = 0.0
-         grid%em_g_t_2 = 0.0
-         grid%em_g_ph_2 = 0.0
-         grid%em_g_mu_2 = 0.0
+         grid%g_u_2 = 0.0
+         grid%g_v_2 = 0.0
+         grid%g_w_2 = 0.0
+         grid%g_t_2 = 0.0
+         grid%g_ph_2 = 0.0
+         grid%g_mu_2 = 0.0
          grid%g_moist = 0.0
       end if
 

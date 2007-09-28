@@ -98,42 +98,42 @@ state    real   qv_gc          igj      dyn_em      1        -     i1   "QV"    
 #
 # U Vel
 state    real   u              ijkb    dyn_em      2         X      i01rh0usdf=(bdy_interp:dt)     "U"                      "x-wind component"   "m s-1"
-state    real   a_u            ijkb    dyn_em      2         X      i01rh03usdf=(bdy_interp:dt)     "A_U"                    "x-wind component"   "m s-1"
-state    real   g_u            ijkb    dyn_em      2         X      i01rh03usdf=(bdy_interp:dt)     "G_U"                    "x-wind component"   "m s-1"
+state    real   a_u            ijkb    misc        2         X      i01rh03usdf=(bdy_interp:dt)     "A_U"                    "x-wind component"   "m s-1"
+state    real   g_u            ijkb    misc        2         X      i01rh03usdf=(bdy_interp:dt)     "G_U"                    "x-wind component"   "m s-1"
 #                                               
 # V Vel
 state    real   v              ijkb    dyn_em      2         Y     i01rh0usdf=(bdy_interp:dt)      "V"                     "y-wind component"   "m s-1"
-state    real   a_v            ijkb    dyn_em      2         Y     i01rh03usdf=(bdy_interp:dt)      "A_V"                     "y-wind component"   "m s-1"
-state    real   g_v            ijkb    dyn_em      2         Y     i01rh03usdf=(bdy_interp:dt)      "G_V"                     "y-wind component"   "m s-1"
+state    real   a_v            ijkb    misc        2         Y     i01rh03usdf=(bdy_interp:dt)      "A_V"                     "y-wind component"   "m s-1"
+state    real   g_v            ijkb    misc        2         Y     i01rh03usdf=(bdy_interp:dt)      "G_V"                     "y-wind component"   "m s-1"
 #                                               
 # Vertical Vel                                          
 state    real   w              ijkb    dyn_em      2         Z     irh0usdf=(bdy_interp:dt)  "w"                          "z-wind component"   "m s-1"
-state    real   a_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "a_w"                        "z-wind component"   "m s-1"
-state    real   g_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "g_w"                        "z-wind component"   "m s-1"
+state    real   a_w            ijkb    misc        2         Z     irh03usdf=(bdy_interp:dt)  "a_w"                        "z-wind component"   "m s-1"
+state    real   g_w            ijkb    misc        2         Z     irh03usdf=(bdy_interp:dt)  "g_w"                        "z-wind component"   "m s-1"
 
 # Geopotential
 state    real   ph             ijkb     dyn_em      2         Z     \
        irh0usdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
-state    real   a_ph           ijkb     dyn_em      2         Z     \
+state    real   a_ph           ijkb     misc        2         Z     \
        irh03usdf=(bdy_interp:dt)   "a_ph"   "perturbation geopotential"  "m2 s-2"
-state    real   g_ph           ijkb     dyn_em      2         Z     \
+state    real   g_ph           ijkb     misc        2         Z     \
        irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ijk     dyn_em      1         Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
 
 # Potential Temperature
 state    real   t              ijkb     dyn_em      2         -     \
        i01rh0usdf=(bdy_interp:dt)   "t"      "perturbation potential temperature (theta-t0)" "K"
-state    real   a_t            ijkb     dyn_em      2         -     \
+state    real   a_t            ijkb     misc        2         -     \
        i01rh03usdf=(bdy_interp:dt)   "a_t"      "perturbation potential temperature (theta-t0)" "K"
-state    real   g_t            ijkb     dyn_em      2         -     \
+state    real   g_t            ijkb     misc        2         -     \
        i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
 
 # Mass
 state    real   mu              ijb     dyn_em      2         -     \
      irh0usdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
-state    real   a_mu            ijb     dyn_em      2         -     \
+state    real   a_mu            ijb     misc        2         -     \
      irh03usdf=(bdy_interp:dt)   "a_mu"  "perturbation dry air mass in column" "Pa"
-state    real   g_mu            ijb     dyn_em      2         -     \
+state    real   g_mu            ijb     misc        2         -     \
      irh03usdf=(bdy_interp:dt)   "g_mu"  "perturbation dry air mass in column" "Pa"
 state    real   mub             ij     dyn_em      1         -     irhdus       "mub" "base state dry air mass in column" "Pa"
 state    real   mu0             ij     dyn_em      1         -     i01rdu       "mu0" "initial dry mass in column" "Pa"
@@ -167,8 +167,8 @@ state    real    znu            k       dyn_em      1         -     irh       "z
 state    real    znw            k       dyn_em      1         Z     i01rh0    "znw"  "eta values on full (w) levels"  ""
 state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATET T IN IDEALIZED CASES"         "K"      
 state    real    z              ijk     dyn_em      1         Z     -         " " " " " "
-state    real    a_z            ijk     dyn_em      1         Z     -         " " " " " "
-state    real    g_z            ijk     dyn_em      1         Z     -         " " " " " "
+state    real    a_z            ijk     misc        1         Z     -         " " " " " "
+state    real    g_z            ijk     misc        1         Z     -         " " " " " "
 i1       real    mu_3d          ijk     dyn_em      1         -                                          
 i1       real    z_at_w         ijk     dyn_em      1         Z 
 state    real    cfn            -       misc      -         -     irh       "cfn"    "extrapolation constant"  ""
