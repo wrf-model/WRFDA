@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_geoamv( it, grid, ob, iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates innovation vector does QC for geoamv
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it      ! External iteration.
-   type(xb_type),    intent(in)    :: xb      ! first guess state.
-   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid    ! first guess state.
    type(y_type),     intent(in)    :: ob      ! Observation structure.
    type(iv_type),    intent(inout) :: iv      ! O-B structure.
 
@@ -50,14 +49,14 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
       dym = iv%geoamv(n)%loc%dym
 
       do k=kts,kte
-         v_p(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+         v_p(k) = dym*(dxm*grid%xb%p(i,j,k) + dx*grid%xb%p(i+1,j,k)) + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
       end do
 
       do k=1, iv % geoamv(n) % info % levels
          iv%geoamv(n)%zk(k)=missing_r
 
          if (iv % geoamv(n) % p(k) > 1.0) then
-            call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
+            call da_to_zk(iv % geoamv(n) % p(k), v_p, v_interp_p, iv%geoamv(n)%zk(k))
          end if
 
          if (iv%geoamv(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
@@ -66,8 +65,8 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
          end if
       end do
 
-      call da_interp_lin_3d( xb % u, iv%geoamv(n)%loc, model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-      call da_interp_lin_3d( xb % v, iv%geoamv(n)%loc, model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
+      call da_interp_lin_3d( grid%xb % u, iv%geoamv(n)%loc, model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
+      call da_interp_lin_3d( grid%xb % v, iv%geoamv(n)%loc, model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
 
       do k = 1, iv % geoamv(n) % info % levels
          iv % geoamv(n) % u(k) % inv = 0.0

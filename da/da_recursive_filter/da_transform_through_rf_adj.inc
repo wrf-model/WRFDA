@@ -1,4 +1,4 @@
-subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
+subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, field)
 
    !---------------------------------------------------------------------------
    ! Purpose: Control variable transform through the recursive filter.
@@ -17,12 +17,11 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
    real,             intent(in)    :: rf_alpha(mz)                   ! RF scale parameter. 
    real,             intent(in)    :: val(jds:jde,mz)                ! Error standard deviation.
    real,             intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
-   type(xpose_type), intent(inout) :: xp                             ! Dimensions and xpose buffers.
       
    integer :: rf_passes_over_two    ! rf_passes / 2
    integer :: i, j, m, n, pass      ! Loop counters.
    real    :: p_x(ims:ime,jms:jme)  ! sqrt(Grid box area).
-   real    :: val_j(xp%jtsy:xp%jtey)
+   real    :: val_j(grid%xp%jtsy:grid%xp%jtey)
 
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:
@@ -56,11 +55,11 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
    ! [4.2] Transform filtered field to dimensional space:
 
    do m = 1, mz
-      xp % v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) * &
+      grid%xp%v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) * &
                                     p_x(its:ite,jts:jte)
    end do
 
-   ! [4.1] Apply (i',j',k -> i',j,k') (xp % v1z -> xp % v1y)
+   ! [4.1] Apply (i',j',k -> i',j,k') (grid%xp%v1z -> grid%xp%v1y)
    ! convert vertical column to y-stripe
 
    call da_transpose_z2y (grid)
@@ -71,18 +70,18 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
 
    !  [3.2] Apply 1D filter in y direction:
 
-   n=xp%jtey-xp%jtsy+1
-   do m = xp%ktsy, min(xp%ktey, mz)
-      do i = xp%itsy, xp%itey
-         val_j(xp%jtsy:xp%jtey) = xp % v1y(i,xp%jtsy:xp%jtey,m)
+   n=grid%xp%jtey-grid%xp%jtsy+1
+   do m = grid%xp%ktsy, min(grid%xp%ktey, mz)
+      do i = grid%xp%itsy, grid%xp%itey
+         val_j(grid%xp%jtsy:grid%xp%jtey) = grid%xp%v1y(i,grid%xp%jtsy:grid%xp%jtey,m)
          do pass = rf_passes_over_two, 1, -1
             call da_recursive_filter_1d_adj(pass, rf_alpha(m), val_j, n)
          end do
-         xp % v1y(i,xp%jtsy:xp%jtey,m) = val_j(xp%jtsy:xp%jtey)
+         grid%xp%v1y(i,grid%xp%jtsy:grid%xp%jtey,m) = val_j(grid%xp%jtsy:grid%xp%jtey)
       end do
    end do
 
-   ! [3.1] Apply (i',j,k' -> i,j',k') (xp % v1y -> xp % v1x)
+   ! [3.1] Apply (i',j,k' -> i,j',k') (grid%xp%v1y -> grid%xp%v1x)
    ! convert from y-stripe to x-stripe
 
    call da_transpose_y2x (grid)
@@ -93,17 +92,17 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
 
    ! [2.2] Apply 1D filter in x direction:
 
-   n = xp%itex-xp%itsx+1
+   n = grid%xp%itex-grid%xp%itsx+1
 
-   do m = xp%ktsx, min(xp%ktex,mz)
-      do j = xp%jtsx, xp%jtex
+   do m = grid%xp%ktsx, min(grid%xp%ktex,mz)
+      do j = grid%xp%jtsx, grid%xp%jtex
          do pass = rf_passes_over_two, 1, -1
-            call da_recursive_filter_1d_adj(pass, rf_alpha(m), xp % v1x(xp%itsx:xp%itex,j,m), n)
+            call da_recursive_filter_1d_adj(pass, rf_alpha(m), grid%xp%v1x(grid%xp%itsx:grid%xp%itex,j,m), n)
          end do
       end do
    end do
 
-   ! [2.1] Apply (i,j',k' -> i',j',k) (xp % v1x -> xp % v1z)
+   ! [2.1] Apply (i,j',k' -> i',j',k) (grid%xp%v1x -> grid%xp%v1z)
    ! convert from x-stripe to vertical column
 
    call da_transpose_x2z (grid)
@@ -115,7 +114,7 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, xp, field)
    ! [1.2] Transform to nondimensional v_hat space:
 
    do m = 1, mz
-      field(its:ite,jts:jte,m) = xp % v1z(its:ite,jts:jte,m) / p_x(its:ite,jts:jte)
+      field(its:ite,jts:jte,m) = grid%xp%v1z(its:ite,jts:jte,m) / p_x(its:ite,jts:jte)
    end do
 
    if (trace_use_dull) call da_trace_exit("da_transform_through_rf_adj")

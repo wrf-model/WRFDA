@@ -111,7 +111,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
 
    j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
-       cv_xhat_jb, cv_xhat_jb, grid%xp, &
+       cv_xhat_jb, cv_xhat_jb, grid, &
        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    j % jb = jb_factor * j % jb
@@ -126,7 +126,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
       cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
       j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
-          cv_xhat_je, cv_xhat_je, grid%xp, &
+          cv_xhat_je, cv_xhat_je, grid, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    end if
    j % je = je_factor * j % je
@@ -179,7 +179,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [6.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo) + grad_v (je):
    !-------------------------------------------------------------------------
 
-   gnorm_jo = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
+   gnorm_jo = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid, &
       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    ! Add Del_v (Jb)
@@ -195,11 +195,11 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    end if
    cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
    gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
-                         cv_xhat_jb, cv_xhat_jb, grid%xp, &
+                         cv_xhat_jb, cv_xhat_jb, grid, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
    gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
-                         cv_xhat_je, cv_xhat_je, grid%xp, &
+                         cv_xhat_je, cv_xhat_je, grid, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    if (print_detail_grad) then
@@ -217,7 +217,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       write (unit=stdout,fmt='(A)') " " 
    end if
 
-   gnorm_j = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
+   gnorm_j = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid, &
                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    gnorm_jo= sqrt(gnorm_jo)

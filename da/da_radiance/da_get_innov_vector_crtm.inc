@@ -1,10 +1,10 @@
-subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculate innovation vector for radiance data.
    !
    !  METHOD:  d = y - H(x)
-   !       1. interpolate xb to obs location
+   !       1. interpolate grid%xb to obs location
    !       2. call foreward RTM to get simulated bright temperature 
    !       3. obs BT - simulated BT
    !---------------------------------------------------------------------------
@@ -12,8 +12,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    implicit none
    
    integer,           intent(in)    :: it       ! External iteration.
-   type (xb_type),    intent(in)    :: xb       ! first guess state.
-   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (domain),     intent(in)    :: grid     ! first guess state.
    type (y_type),     intent(inout) :: ob       ! Observation structure.
    type (iv_type),    intent(inout) :: iv       ! O-B structure.
 
@@ -145,45 +144,45 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          dy = iv%instid(inst)%loc_dy(n)
          dxm = iv%instid(inst)%loc_dxm(n)
          dym = iv%instid(inst)%loc_dym(n)
-         ! horizontal interpolate xb pressure to ob position for every xb layer
+         ! horizontal interpolate grid%xb pressure to ob position for every grid%xb layer
          ! get CRTM pressure Layers 
          do k=kts,kte ! from bottem to top
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+            v_p(k) = dym*(dxm*grid%xb%p(i,j  ,k) + dx*grid%xb%p(i+1,j  ,k)) &
+                + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
             v_p(k) = 0.01*v_p(k)  ! convert Pa to hPa
             Atmosphere(1)%Pressure(kte-k+1)=v_p(k) ! from top to bottom
          end do
 
          ! [1.2] Interpolate horizontally to ob:
          do k=kts,kte ! from bottem to top
-            call da_interp_lin_2d( xb%t(:,:,k), iv%instid(inst)%loc(n), &
+            call da_interp_lin_2d( grid%xb%t(:,:,k), iv%instid(inst)%loc(n), &
                Atmosphere(1)%Temperature(kte-k+1) )
-            call da_interp_lin_2d( xb%q(:,:,k), iv%instid(inst)%loc(n), &
+            call da_interp_lin_2d( grid%xb%q(:,:,k), iv%instid(inst)%loc(n), &
                Atmosphere(1)%Absorber(kte-k+1,1) ) 
             Atmosphere(1)%Absorber(kte-k+1,1) = 1000.0*Atmosphere(1)%Absorber(kte-k+1,1) ! in g/kg
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere(1)%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d( xb%qcw(:,:,k), iv%instid(inst)%loc(n), model_qcw(kte-k+1) )
+            call da_interp_lin_2d( grid%xb%qcw(:,:,k), iv%instid(inst)%loc(n), model_qcw(kte-k+1) )
             
             if (crtm_cloud) then
                Atmosphere(1)%Cloud(1)%Effective_Radius(kte-k+1)=10.0
                Atmosphere(1)%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1)
 
                Atmosphere(1)%Cloud(2)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qci(:,:,k), iv%instid(inst)%loc(n), &
+               call da_interp_lin_2d( grid%xb%qci(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere(1)%Cloud(2)%Water_Content(kte-k+1) )
 
                Atmosphere(1)%Cloud(3)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qrn(:,:,k), iv%instid(inst)%loc(n), &
+               call da_interp_lin_2d( grid%xb%qrn(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere(1)%Cloud(3)%Water_Content(kte-k+1) )
 
                Atmosphere(1)%Cloud(4)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qsn(:,:,k), iv%instid(inst)%loc(n), &
+               call da_interp_lin_2d( grid%xb%qsn(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere(1)%Cloud(4)%Water_Content(kte-k+1) )
 
                Atmosphere(1)%Cloud(5)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d( xb%qgr(:,:,k), iv%instid(inst)%loc(n), &
+               call da_interp_lin_2d( grid%xb%qgr(:,:,k), iv%instid(inst)%loc(n), &
                   Atmosphere(1)%Cloud(5)%Water_Content(kte-k+1) )
 
                Atmosphere(1)%Cloud(6)%Effective_Radius(kte-k+1)=200.0
@@ -193,26 +192,26 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
          ! determine surface type of obs location
          !-----------------------------------------
-         call da_detsurtyp ( xb%snow, xb%xice, xb%landmask,  &
-            xb%ivgtyp, xb%isltyp, &
+         call da_detsurtyp ( grid%xb%snow, grid%xb%xice, grid%xb%landmask,  &
+            grid%xb%ivgtyp, grid%xb%isltyp, &
             ims, ime, jms, jme, &
             i, j, dx, dy, dxm, dym, &
             model_isflg,model_ivgtyp, model_isltyp, &
             Surface(1)%Water_Coverage, Surface(1)%Ice_Coverage, &
             Surface(1)%Land_Coverage, Surface(1)%Snow_Coverage )
 
-         call da_interp_lin_2d (xb % u10,  iv%instid(inst)%loc(n), model_u10 )
-         call da_interp_lin_2d (xb % v10,  iv%instid(inst)%loc(n), model_v10 )
-         call da_interp_lin_2d (xb % psfc, iv%instid(inst)%loc(n), model_psfc )
+         call da_interp_lin_2d (grid%xb % u10,  iv%instid(inst)%loc(n), model_u10 )
+         call da_interp_lin_2d (grid%xb % v10,  iv%instid(inst)%loc(n), model_v10 )
+         call da_interp_lin_2d (grid%xb % psfc, iv%instid(inst)%loc(n), model_psfc )
 
          model_psfc = 0.01*model_psfc           ! convert to hPa
-         model_ptop = 0.01*xb%ptop
+         model_ptop = 0.01*grid%xb%ptop
 
          ! get CRTM levels (0.005hPa at top) /model full level
          Atmosphere(1)%Level_Pressure(0)=model_ptop   ! to sigma level 51-->sigmaf=0
          Atmosphere(1)%Level_Pressure(Atmosphere(1)%n_Layers)=model_psfc ! to sigma level 1->sigmaf=1
          do k=kts+1,kte
-            Atmosphere(1)%Level_Pressure(kte-k+1)= xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
+            Atmosphere(1)%Level_Pressure(kte-k+1)= grid%xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
          end do
  
          ! convert cloud content unit from kg/kg to kg/m^2        
@@ -226,19 +225,19 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          end if
 
          if ( model_isflg == 0 ) then   ! over sea using SST
-            call da_interp_lin_2d (xb % tgrn, iv%instid(inst)%loc(n), model_ts)
+            call da_interp_lin_2d (grid%xb % tgrn, iv%instid(inst)%loc(n), model_ts)
          else
-            call da_interp_lin_2d (xb % tsk,  iv%instid(inst)%loc(n), model_ts)
+            call da_interp_lin_2d (grid%xb % tsk,  iv%instid(inst)%loc(n), model_ts)
          end if
 
-         call da_interp_lin_2d (xb % terr, iv%instid(inst)%loc(n), model_elv)
+         call da_interp_lin_2d (grid%xb % terr, iv%instid(inst)%loc(n), model_elv)
 
          ! variables for emissivity calculations
          !---------------------------------------- 
-         call da_interp_lin_2d (xb % smois,  iv%instid(inst)%loc(n), model_smois )
-         call da_interp_lin_2d (xb % tslb,   iv%instid(inst)%loc(n), model_tslb )
-         call da_interp_lin_2d (xb % snowh,  iv%instid(inst)%loc(n), model_snowh )
-         call da_interp_lin_2d (xb % vegfra, iv%instid(inst)%loc(n), model_vegfra )
+         call da_interp_lin_2d (grid%xb % smois,  iv%instid(inst)%loc(n), model_smois )
+         call da_interp_lin_2d (grid%xb % tslb,   iv%instid(inst)%loc(n), model_tslb )
+         call da_interp_lin_2d (grid%xb % snowh,  iv%instid(inst)%loc(n), model_snowh )
+         call da_interp_lin_2d (grid%xb % vegfra, iv%instid(inst)%loc(n), model_vegfra )
 
          ! model_snowh = model_snowh*100.0   ! convert from m to mm
          model_vegfra = 0.01*model_vegfra  ! convert range to 0~1

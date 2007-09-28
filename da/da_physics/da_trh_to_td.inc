@@ -1,4 +1,4 @@
-subroutine da_trh_to_td (rh, t, td, xp)
+subroutine da_trh_to_td (rh, t, td)
 
    !---------------------------------------------------------------------
    !
@@ -44,8 +44,6 @@ subroutine da_trh_to_td (rh, t, td, xp)
    !-------------------------------------------------------------------------
 
    implicit none
-
-   type (xpose_type), intent(in)      :: xp    ! domain decomposition vars.
 
    real, dimension(ims:ime,jms:jme,kms:kme), &
       intent(inout) :: rh ! relative humidity.

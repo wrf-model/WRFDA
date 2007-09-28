@@ -1,7 +1,7 @@
 module da_ssmi
 
 
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
    use module_ssmi, only : cal_sigma_v,tb,effht,epsalt,spemiss,tbatmos,&
       roughem,effang,tbatmos,filter
 

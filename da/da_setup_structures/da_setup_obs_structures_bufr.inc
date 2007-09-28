@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures_bufr(xp, ob, iv)
+subroutine da_setup_obs_structures_bufr(ob, iv)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read observation structure.
@@ -6,7 +6,6 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
    implicit none
    
-   type (xpose_type), intent(in)  :: xp         ! Domain decomposition vars.
    type (y_type),     intent(out) :: ob          ! Observation structure.
    type (iv_type),    intent(out) :: iv          ! O-B structure.
 
@@ -28,16 +27,16 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.bufr'
 
          ! scan prepbufr observation file
-         call da_scan_obs_bufr (iv, xp, filename)
+         call da_scan_obs_bufr (iv, filename)
       end do
    else
       iv%time = 1
       filename="ob.bufr"
-      call da_scan_obs_bufr(iv, xp, filename)
+      call da_scan_obs_bufr(iv, filename)
 
       ! scan main body of radar observation file
       ! if (use_radarobs) &
-      !    call da_scan_bufr_radar(iv, xp,'radar.dat')
+      !    call da_scan_bufr_radar(iv, 'radar.dat')
    end if
 
    !-------------------------------------------------------------------------
@@ -53,12 +52,12 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
          write(filename(1:10), fmt='(a, i2.2)') 'ob.', n
 
          ! read prepbufr observation file
-         call da_read_obs_bufr (iv, xp, filename)
+         call da_read_obs_bufr (iv, filename)
 
          ! if (use_radarobs) then
          !    ! read radar observation file
          !    write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-         !    call da_read_bufr_radar(iv, xp, filename)
+         !    call da_read_bufr_radar(iv, filename)
          ! end if
       end do
    else
@@ -66,11 +65,11 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
       iv%time = 1
 
       filename="ob.bufr"
-      call da_read_obs_bufr(iv, xp,filename)
+      call da_read_obs_bufr(iv, filename)
 
       ! if (use_radarobs) then
       !    ! read radar observation file
-      !    call da_read_bufr_radar(iv, xp)
+      !    call da_read_bufr_radar(iv)
       ! end if
    end if
 
@@ -78,7 +77,7 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   call da_fill_obs_structures(xp, iv, ob)
+   call da_fill_obs_structures(iv, ob)
 
    iv%time = 1
 

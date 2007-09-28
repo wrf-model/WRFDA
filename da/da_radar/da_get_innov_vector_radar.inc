@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_radar (it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it       ! External iteration.
-   type(xb_type),    intent(in)    :: xb       ! first guess state.
-   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid     ! first guess state.
    type(y_type),     intent(inout) :: ob       ! Observation structure.
    type(iv_type),    intent(inout) :: iv       ! O-B structure.
 
@@ -63,11 +62,11 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
       dym = iv%radar(n)%loc%dym
 
       do k=kts,kte
-         v_h(k) = dym*(dxm*xb%h(i,j,k)+dx*xb%h(i+1,j,k)) + dy*(dxm*xb%h(i,j+1,k)+dx*xb%h(i+1,j+1,k))
+         v_h(k) = dym*(dxm*grid%xb%h(i,j,k)+dx*grid%xb%h(i+1,j,k)) + dy*(dxm*grid%xb%h(i,j+1,k)+dx*grid%xb%h(i+1,j+1,k))
       end do
 
       do k=1, num_levs
-         call da_to_zk(iv%radar(n)%height(k), v_h, xp, v_interp_h, iv%radar(n)%zk(k))
+         call da_to_zk(iv%radar(n)%height(k), v_h, v_interp_h, iv%radar(n)%zk(k))
 
          if (iv%radar(n)%zk(k) < 1.0) then
             iv%radar(n)%height_qc(k) = below_model_surface
@@ -79,12 +78,12 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
 
       ! [2.0] Interpolate horizontally to ob points:
 
-      call da_interp_lin_3d(xb % p,   iv%radar(n)%loc, model_p,   max_ob_levels, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d(xb % u,   iv%radar(n)%loc, model_u,   max_ob_levels, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d(xb % v,   iv%radar(n)%loc, model_v,   max_ob_levels, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d(xb % wh,  iv%radar(n)%loc, model_w,   max_ob_levels, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d(xb % rho, iv%radar(n)%loc, model_rho, max_ob_levels, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d(xb % qrn, iv%radar(n)%loc, model_qrn, max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % p,   iv%radar(n)%loc, model_p,   max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % u,   iv%radar(n)%loc, model_u,   max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % v,   iv%radar(n)%loc, model_v,   max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % wh,  iv%radar(n)%loc, model_w,   max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % rho, iv%radar(n)%loc, model_rho, max_ob_levels, iv%radar(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb % qrn, iv%radar(n)%loc, model_qrn, max_ob_levels, iv%radar(n)%zk, num_levs)
 
       ! Test 5.0E-5 as critical value. It can not be smaller.
 
@@ -92,9 +91,9 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
          model_qrn(k)=amax1(5.0E-5,model_qrn(k))
       end do
 
-      model_ps = dxm *(dym * xb % psac(i,  j) + dy * xb%psac(i+1,  j)) + &
-                 dx  *(dym * xb % psac(i,j+1) + dy * xb%psac(i+1,j+1)) + &
-                 xb % ptop
+      model_ps = dxm *(dym * grid%xb % psac(i,  j) + dy * grid%xb%psac(i+1,  j)) + &
+                 dx  *(dym * grid%xb % psac(i,j+1) + dy * grid%xb%psac(i+1,j+1)) + &
+                 grid%xb % ptop
 
       iv%radar(n)%model_p(1:num_levs) = model_p(1:num_levs)
       iv%radar(n)%model_rho(1:num_levs) = model_rho(1:num_levs)
@@ -113,8 +112,8 @@ subroutine da_get_innov_vector_radar (it, xb, xp, ob, iv)
             iv%radar(n)%stn_loc%x,   iv%radar(n)%stn_loc%y)
       end if
 
-      xr = xb%ds *(iv%radar(n)%loc%x - iv%radar(n)%stn_loc%x)
-      yr = xb%ds *(iv%radar(n)%loc%y - iv%radar(n)%stn_loc%y)
+      xr = grid%xb%ds *(iv%radar(n)%loc%x - iv%radar(n)%stn_loc%x)
+      yr = grid%xb%ds *(iv%radar(n)%loc%y - iv%radar(n)%stn_loc%y)
 
       model_rv(:) = 0.0
       model_rf(:) = 0.0

@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_qscat (it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it      ! External iteration.
-   type(xb_type),    intent(in)    :: xb      ! first guess state.
-   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid    ! first guess state.
    type(y_type),     intent(inout) :: ob      ! Observation structure.
    type(iv_type),    intent(inout) :: iv      ! O-B structure.
 
@@ -40,13 +39,13 @@ subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
       dym = iv%qscat(n)%loc%dym
 
       do k=kts,kte
-         v_h(k) = dym*(dxm*xb%h(i,j,k)+dx*xb%h(i+1,j,k)) + dy*(dxm*xb%h(i,j+1,k)+dx*xb%h(i+1,j+1,k))
+         v_h(k) = dym*(dxm*grid%xb%h(i,j,k)+dx*grid%xb%h(i+1,j,k)) + dy*(dxm*grid%xb%h(i,j+1,k)+dx*grid%xb%h(i+1,j+1,k))
       end do
 
       zk=missing_r
 
       if (iv % qscat(n) % h > missing_r) then
-         call da_to_zk(iv % qscat(n) % h, v_h, xp, v_interp_h, zk)
+         call da_to_zk(iv % qscat(n) % h, v_h, v_interp_h, zk)
          if (zk < 1.0) then
             zk = 1.0
          end if
@@ -67,8 +66,8 @@ subroutine da_get_innov_vector_qscat (it, xb, xp, ob, iv)
       else
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d( xb % u, iv%qscat(n)%loc, model_u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d( xb % v, iv%qscat(n)%loc, model_v, iv%qscat(n)%zk)
+         call da_interp_obs_lin_2d( grid%xb % u, iv%qscat(n)%loc, model_u, iv%qscat(n)%zk)
+         call da_interp_obs_lin_2d( grid%xb % v, iv%qscat(n)%loc, model_v, iv%qscat(n)%zk)
 
          !------------------------------------------------------------------------
          ! [2.0] Initialise components of innovation vector:

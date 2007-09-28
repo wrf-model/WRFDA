@@ -4,7 +4,6 @@ module da_radiance1
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xpose_type
    use module_radiance, only : satinfo,q2ppmv
 #ifdef RTTOV
    use module_radiance, only : coefs,inst_name
@@ -18,7 +17,7 @@ module da_radiance1
       use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
       print_detail_rad, rtm_option, trace_use_dull, &
       rtm_option_rttov,rtm_option_crtm, radiance, &
-      global, gas_constant, gravity, monitor_on
+      global, gas_constant, gravity, monitor_on,kts,kte
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       iv_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
    use da_par_util, only : da_proc_stats_combine

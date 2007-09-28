@@ -1,5 +1,4 @@
-subroutine da_llxy (info, loc, xp, &
-                        outside, outside_all)
+subroutine da_llxy (info, loc, outside, outside_all)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -11,7 +10,6 @@ subroutine da_llxy (info, loc, xp, &
 
    type(info_type),       intent(in)    :: info
    type(model_loc_type),  intent(inout) :: loc
-   type(xpose_type),      intent(in)    :: xp           !Domain decomposition vars.
    logical      ,         intent(out)   :: outside      !wrt local domain
    logical, optional,     intent(out)   :: outside_all  !wrt all domains
 
@@ -32,17 +30,17 @@ subroutine da_llxy (info, loc, xp, &
       call da_llxy_default (info%lat, info%lon, loc%x, loc%y)
    end if
 
-   call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)!
+   call da_togrid (loc%x, its-2, ite+2, loc%i, loc%dx, loc%dxm)!
 
-   call da_togrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
+   call da_togrid (loc%y, jts-2, jte+2, loc%j, loc%dy, loc%dym)
 
    ! refactor to remove this ugly duplication later
    if (present(outside_all)) then
       outside_all = .false.
       ! Do not check for global options 
       if (.not. global) then 
-         if ((int(loc%x) < xp%ids) .or. (int(loc%x) >= xp%ide) .or. &
-            (int(loc%y) < xp%jds) .or. (int(loc%y) >= xp%jde)) then
+         if ((int(loc%x) < ids) .or. (int(loc%x) >= ide) .or. &
+            (int(loc%y) < jds) .or. (int(loc%y) >= jde)) then
             outside_all = .true. 
             outside = .true. 
             return
@@ -59,12 +57,12 @@ subroutine da_llxy (info, loc, xp, &
    end if
 
    if (fg_format == fg_format_kma_global) then
-      if ((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
+      if ((loc%j < jts-1) .or. (loc%j > jte)) then
          outside = .true.
          return
       end if
 
-      if (loc%j == xp%jde) then
+      if (loc%j == jde) then
          loc%j = loc%j - 1
          loc%dy  = 1.0
          loc%dym = 0.0
@@ -75,17 +73,17 @@ subroutine da_llxy (info, loc, xp, &
 
    ! Check for edge of domain:
 
-   if ((loc%i < xp%ids) .or. (loc%i >= xp%ide) .or. &
-      (loc%j < xp%jds) .or. (loc%j >= xp%jde)) then
+   if ((loc%i < ids) .or. (loc%i >= ide) .or. &
+      (loc%j < jds) .or. (loc%j >= jde)) then
       outside     = .true. 
       return
    end if
 
    ! FIX? hack
-   if ((loc%i < xp%its-1) .or. (loc%i > xp%ite) .or. &
-      (loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
-   ! if ((loc%i < xp%its-1) .or. (loc%i >= xp%ite) .or. &
-   !     (loc%j < xp%jts-1) .or. (loc%j >= xp%jte)) then
+   if ((loc%i < its-1) .or. (loc%i > ite) .or. &
+      (loc%j < jts-1) .or. (loc%j > jte)) then
+   ! if ((loc%i < its-1) .or. (loc%i >= ite) .or. &
+   !     (loc%j < jts-1) .or. (loc%j >= jte)) then
       outside = .true.
       return
 

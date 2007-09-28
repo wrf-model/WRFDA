@@ -1,4 +1,4 @@
-subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
+subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Solve Del**2 B = A for B with zero gradient boundary conditions.
@@ -13,7 +13,6 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    type(domain),     intent(inout) :: grid
    type(xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
-   type(xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
    real,             intent(inout) :: del2b(ims:ime,jms:jme,kms:kme)   ! Del**2 B.
    real,             intent(in)    :: b(ims:ime,jms:jme,kms:kme)       ! B
 
@@ -42,22 +41,22 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! Calculate work space needed.
 
-   n = max(xbx%fft_ix*(xp%jtex-xp%jtsx+1), &
-           xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
+   n = max(xbx%fft_ix*(grid%xp%jtex-grid%xp%jtsx+1), &
+           xbx%fft_jy*(grid%xp%itey-grid%xp%itsy+1+xbx%pad_num))
 
    ! Allocate work arrays.
    allocate(work_1d(1:n))
 
    ! Remove mean b (set arbitrary constant to zero):
 
-   rij = 1.0/real((xp%ite-xp%its)*(xp%jte-xp%jts))
+   rij = 1.0/real((grid%xp%ite-grid%xp%its)*(grid%xp%jte-grid%xp%jts))
 
-   do k=xp%kts, xp%kte
-      local_mean(k) = sum(b(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
+   do k=grid%xp%kts, grid%xp%kte
+      local_mean(k) = sum(b(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte,k))*rij
    end do
 
    call wrf_dm_sum_reals (local_mean, global_mean)
-   do k=xp%kts,xp%kte
+   do k=grid%xp%kts,grid%xp%kte
       write (unit=stdout,fmt=*)  &
          'TEST_COVERAGE_da_solve_poissoneqn_fct_adj:  global_mean(',k,') = ', &
          global_mean(k)
@@ -65,8 +64,8 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [2.5] Write data array into b:
 
-   do k=xp%kts, xp%kte
-      xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k) = b(xp%its:xp%ite,xp%jts:xp%jte,k) &
+   do k=grid%xp%kts, grid%xp%kte
+      grid%xp%v1z(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte,k) = b(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte,k) &
          - global_mean(k)
    end do
       
@@ -81,7 +80,7 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
    ! [2.2] Set up FFT parameters:
   
    idim = xbx%fft_ix
-   jdim = xp%jtex - xp%jtsx + 1
+   jdim = grid%xp%jtex - grid%xp%jtsx + 1
 
    vector_inc  = 1
    vector_jump = idim
@@ -93,12 +92,12 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [2.3] Perform forward FFT:
 
-   do k = xp%ktsx, xp%ktex
+   do k = grid%xp%ktsx, grid%xp%ktex
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=grid%xp%ids, grid%xp%ide
             ij=ij+1
-            work_1d(ij) = xp%v1x(i,j,k)
+            work_1d(ij) = grid%xp%v1x(i,j,k)
          end do
 
          do n=1, xbx%fft_pad_i
@@ -112,16 +111,16 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
                                      xbx % fft_factors_x, xbx % trig_functs_x, &
                                      work_1d(1), work_area)
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=grid%xp%ids, grid%xp%ide
             ij=ij+1
-            xp%v1x(i,j,k) = work_1d(ij)
+            grid%xp%v1x(i,j,k) = work_1d(ij)
          end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc+1
             ij=ij+1
-            xp%v2x(i,j,k) = work_1d(ij)
+            grid%xp%v2x(i,j,k) = work_1d(ij)
          end do
       end do
    end do
@@ -138,7 +137,7 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [3.2] Set up FFT parameters:
 
-   idim = xp%itey - xp%itsy + 1 + xbx%pad_num
+   idim = grid%xp%itey - grid%xp%itsy + 1 + xbx%pad_num
    jdim = xbx%fft_jy
 
    vector_inc  = idim
@@ -148,23 +147,23 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    work_area   = (vector_size+1)*num_vectors
 
-   do k = xp%ktsy, xp%ktey
+   do k = grid%xp%ktsy, grid%xp%ktey
       ij = 0
-      do j=xp%jds, xp%jde
-         do i=xp%itsy, xp%itey
+      do j=grid%xp%jds, grid%xp%jde
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
-            work_1d(ij) = xp%v1y(i,j,k)
+            work_1d(ij) = grid%xp%v1y(i,j,k)
          end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
-            work_1d(ij) = xp%v2y(i,j,k)
+            work_1d(ij) = grid%xp%v2y(i,j,k)
          end do
       end do
 
       do j=1, xbx%fft_pad_j
-         do i=xp%itsy, xp%itey+xbx%pad_num
+         do i=grid%xp%itsy, grid%xp%itey+xbx%pad_num
             ij=ij+1
             work_1d(ij) = 0.0
          end do
@@ -180,8 +179,8 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
       !------------------------------------------------------------------------
 
       ij = 0
-      do j=xp%jds, xbx%fft_jy
-         do i=xp%itsy, xp%itey
+      do j=grid%xp%jds, xbx%fft_jy
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)/xbx%fft_adjoint_factor
          end do
@@ -199,16 +198,16 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area)
       ij = 0
-      do j=xp%jds, xp%jde
-         do i=xp%itsy, xp%itey
+      do j=grid%xp%jds, grid%xp%jde
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
-            xp%v1y(i,j,k) = work_1d(ij)
+            grid%xp%v1y(i,j,k) = work_1d(ij)
          end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
-            xp%v2y(i,j,k) = work_1d(ij)
+            grid%xp%v2y(i,j,k) = work_1d(ij)
          end do
       end do
    end do
@@ -225,7 +224,7 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
    ! Set up FFT parameters:
 
    idim = xbx%fft_ix
-   jdim = xp%jtex - xp%jtsx + 1
+   jdim = grid%xp%jtex - grid%xp%jtsx + 1
 
    vector_inc  = 1
    vector_jump = idim
@@ -237,18 +236,18 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [2.3] Perform forward FFT:
 
-   do k = xp%ktsx, xp%ktex
+   do k = grid%xp%ktsx, grid%xp%ktex
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=grid%xp%ids, grid%xp%ide
             ij=ij+1
-            work_1d(ij) = xp%v1x(i,j,k)
+            work_1d(ij) = grid%xp%v1x(i,j,k)
          end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc+1
             ij=ij+1
-            work_1d(ij) = xp%v2x(i,j,k)
+            work_1d(ij) = grid%xp%v2x(i,j,k)
          end do
       end do
 
@@ -258,10 +257,10 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
                                    work_1d(1), work_area)
 
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=grid%xp%ids, grid%xp%ide
             ij=ij+1
-            xp%v1x(i,j,k) = work_1d(ij)*xbx%fft_adjoint_factor
+            grid%xp%v1x(i,j,k) = work_1d(ij)*xbx%fft_adjoint_factor
          end do
 
          ij=ij+xbx%fft_pad_i
@@ -278,7 +277,7 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    ! [2.5] Write data array into del2b:
 
-   del2b(ims:ime,jms:jme,kms:kme) = del2b(ims:ime,jms:jme,kms:kme) + xp%v1z(ims:ime,jms:jme,kms:kme)
+   del2b(ims:ime,jms:jme,kms:kme) = del2b(ims:ime,jms:jme,kms:kme) + grid%xp%v1z(ims:ime,jms:jme,kms:kme)
 
    !---------------------------------------------------------------------------
    ! [5.0] Tidy up:

@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_profiler( it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD    
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it       ! External iteration.
-   type(xb_type),    intent(in)    :: xb       ! first guess state.
-   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid     ! first guess state.
    type(y_type),     intent(inout) :: ob       ! Observation structure.
    type(iv_type),    intent(inout) :: iv       ! O-B structure.
 
@@ -48,14 +47,14 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
       dym = iv%profiler(n)%loc%dym
 
       do k=kts,kte
-         v_p(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+         v_p(k) = dym*(dxm*grid%xb%p(i,j,k) + dx*grid%xb%p(i+1,j,k)) + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
       end do
 
       do k=1, iv % profiler(n) % info % levels
          iv%profiler(n)%zk(k)=missing_r
 
          if (iv % profiler(n) % p(k) > 1.0) then
-            call da_to_zk(iv % profiler(n) % p(k), v_p, xp, v_interp_p, iv%profiler(n)%zk(k))
+            call da_to_zk(iv % profiler(n) % p(k), v_p, v_interp_p, iv%profiler(n)%zk(k))
          end if
 
          if (iv%profiler(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
@@ -65,8 +64,8 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
       end do
 
       ! [1.4] Interpolate horizontally:
-      call da_interp_lin_3d( xb%u, iv%profiler(n)%loc, model_u, max_ob_levels, iv%profiler(n)%zk, num_levs)
-      call da_interp_lin_3d( xb%v, iv%profiler(n)%loc, model_v, max_ob_levels, iv%profiler(n)%zk, num_levs)
+      call da_interp_lin_3d( grid%xb%u, iv%profiler(n)%loc, model_u, max_ob_levels, iv%profiler(n)%zk, num_levs)
+      call da_interp_lin_3d( grid%xb%v, iv%profiler(n)%loc, model_v, max_ob_levels, iv%profiler(n)%zk, num_levs)
 
       !------------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:

@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
+subroutine da_get_innov_vector_pseudo(grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,8 +6,7 @@ subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
 
    implicit none
    
-   type(xb_type),    intent(in)    :: xb          ! Background structure 
-   type(xpose_type), intent(in)    :: xp          ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid        ! Background structure 
    type(y_type),     intent(inout) :: ob          ! Observation structure.
    type(iv_type),    intent(inout) :: iv          ! O-B structure.
 
@@ -37,11 +36,11 @@ subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
          'pseudo: i,j=', i,j, 'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 
       ! [1.2] Interpolate horizontally:
-      call da_interp_obs_lin_2d (xb % u, iv%pseudo(n)%loc, model_u, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d (xb % v, iv%pseudo(n)%loc, model_v, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d (xb % t, iv%pseudo(n)%loc, model_t, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d (xb % p, iv%pseudo(n)%loc, model_p, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d (xb % q, iv%pseudo(n)%loc, model_q, iv%pseudo(n)%zk)
+      call da_interp_obs_lin_2d (grid%xb % u, iv%pseudo(n)%loc, model_u, iv%pseudo(n)%zk)
+      call da_interp_obs_lin_2d (grid%xb % v, iv%pseudo(n)%loc, model_v, iv%pseudo(n)%zk)
+      call da_interp_obs_lin_2d (grid%xb % t, iv%pseudo(n)%loc, model_t, iv%pseudo(n)%zk)
+      call da_interp_obs_lin_2d (grid%xb % p, iv%pseudo(n)%loc, model_p, iv%pseudo(n)%zk)
+      call da_interp_obs_lin_2d (grid%xb % q, iv%pseudo(n)%loc, model_q, iv%pseudo(n)%zk)
 
       !---------------------------------------------------------------
       ! [3.0] Calculate observation O = B +(O-B):

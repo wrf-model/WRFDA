@@ -1,4 +1,4 @@
-subroutine da_read_bufrairs(obstype,iv,xp,infile)
+subroutine da_read_bufrairs(obstype,iv,infile)
    !--------------------------------------------------------
    !  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
    !            to innovation structure
@@ -18,7 +18,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
   character(9)      ,  intent (in)  :: obstype
   character(100)    ,  intent (in)  :: infile
-  type (xpose_type) ,  intent (in)  :: xp
   type (iv_type)    ,intent (inout) :: iv
 
 #ifdef BUFR
@@ -297,8 +296,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
         info%lat  = airsspot%clath
         info%lon  = airsspot%clonh 
-        call da_llxy (info, loc, xp, outside, inside_halo )
-        if (outside) cycle LOOP_OBSPOinTS
+        call da_llxy (info, loc, outside, inside_halo )
+        if (outside) cycle loop_obspoints
 
 !  4.1  Check obs time
 !-------------------------------------
@@ -436,7 +435,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
         'Allocating space for radiance innov structure', &
          inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       if (rtm_option == rtm_option_crtm) then
-         iv%instid(inst)%nlevels = xp%kme-xp%kms+1
+         iv%instid(inst)%nlevels = kme-kms+1
          iv%instid(inst)%nchannels=nchan
       end if
    end if
@@ -455,7 +454,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   n = 0
   p => head
 
-  call da_allocate_rad_iv (inst, nchan, iv, xp)
+  call da_allocate_rad_iv (inst, nchan, iv)
 
   do i = 1, size
 !   inst = p%sensor_index

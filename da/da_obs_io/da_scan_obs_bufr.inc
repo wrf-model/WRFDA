@@ -1,4 +1,4 @@
-subroutine da_scan_obs_bufr (iv, xp, filename)
+subroutine da_scan_obs_bufr (iv, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan BUFR observation file for input to wrfvar
@@ -6,7 +6,6 @@ subroutine da_scan_obs_bufr (iv, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp           ! Domain decomposition vars.
    type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
@@ -120,7 +119,7 @@ subroutine da_scan_obs_bufr (iv, xp, filename)
       if (report < report_start) cycle
       if (report > report_end) exit  
 
-      call da_llxy (platform%info, platform%loc, xp, outside, outside_all)
+      call da_llxy (platform%info, platform%loc, outside, outside_all)
 
       if (outside_all) cycle reports
 
@@ -144,7 +143,7 @@ subroutine da_scan_obs_bufr (iv, xp, filename)
 
       ! Loop over duplicating obs for global
       ndup = 1
-      if (global .and. (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
+      if (global .and. (platform%loc%i < ids .or. platform%loc%i >= ide)) ndup= 2
 
       if (test_wrfvar) ndup = 1
 

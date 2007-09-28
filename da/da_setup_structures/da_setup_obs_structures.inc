@@ -153,10 +153,10 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       ! Conventional obs can be in BUFR or ascii format
       if (ob_format == ob_format_bufr) then
          call da_message((/'Using BUFR format observation input'/))
-         call da_setup_obs_structures_bufr (grid%xp, ob, iv)
+         call da_setup_obs_structures_bufr (ob, iv)
       else if (ob_format == ob_format_ascii) then
          call da_message((/'Using ASCII format observation input'/))
-         call da_setup_obs_structures_ascii (grid%xp, ob, iv, grid%xb)
+         call da_setup_obs_structures_ascii (ob, iv, grid)
       end if
    end if
 
@@ -182,7 +182,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
   
    ! Get horizontal interpolation weights.
 
-   call da_setup_obs_interp_wts (grid%xp, iv) 
+   call da_setup_obs_interp_wts (iv) 
 
    if (trace_use) call da_trace_exit("da_setup_obs_structures")    
 

@@ -1,4 +1,4 @@
-subroutine da_scan_obs_ssmi (iv, xp, filename)
+subroutine da_scan_obs_ssmi (iv, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read the header of a SSMI 2.0 GTS observation file
@@ -6,7 +6,6 @@ subroutine da_scan_obs_ssmi (iv, xp, filename)
 
    implicit none
 
-   type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
    type(iv_type),    intent(inout) :: iv
    character(len=*), intent(in)    :: filename
 
@@ -117,7 +116,7 @@ subroutine da_scan_obs_ssmi (iv, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_llxy (info, loc, xp, outside)
+      call da_llxy (info, loc, outside)
 
       select case(fm)
       case (125) ;

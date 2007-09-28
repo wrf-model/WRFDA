@@ -71,7 +71,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
    ghat  = j_grad
    phat  = - ghat
 
-   rrmold = da_dot_cv(cv_size, cv_size_domain, ghat, ghat, grid%xp, & 
+   rrmold = da_dot_cv(cv_size, cv_size_domain, ghat, ghat, grid, & 
       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    if (j%total == 0.0) go to 1004
@@ -119,7 +119,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
       fhat(1:cv_size_jb) = - fhat(1:cv_size_jb) + jb_factor*phat(1:cv_size_jb)
       fhat(je_start:je_end) = - fhat(je_start:je_end) + &
          je_factor*phat(je_start:je_end)
-      apdotp = da_dot_cv(cv_size, cv_size_domain, fhat, phat, grid%xp, & 
+      apdotp = da_dot_cv(cv_size, cv_size_domain, fhat, phat, grid, & 
          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
       step = 0.0
@@ -134,12 +134,12 @@ subroutine da_minimise_cg(grid, config_flags,            &
             re, y, j, j_grad,         &
             grid, config_flags                       )
             ob_grad = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, &
-            grid%xp, &
+            grid, &
             (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
          ob_grad = sqrt(ob_grad)
       end if
 
-      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, grid%xp, &
+      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, grid, &
          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
       rrmnew_norm = sqrt(rrmnew)
@@ -189,7 +189,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
          grid, config_flags                       )
 
       rrmnew_norm = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, &
-         grid%xp, &
+         grid, &
          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
       rrmnew_norm = sqrt(rrmnew_norm)
     end if

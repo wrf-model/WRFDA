@@ -1,4 +1,4 @@
-subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
+subroutine da_patch_to_global_3d(grid, vlocal, vglobal, mz)
 
    !----------------------------------------------------------------------
    ! Purpose: Gathers local 3D array vlocal into global array vglobal.  
@@ -10,7 +10,7 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
 
    implicit none
 
-   type (xpose_type), intent(in)  :: xp
+   type(domain),      intent(in)  :: grid
    real,              intent(in)  :: vlocal(ims:ime,jms:jme,kms:kme)
    real,              intent(out) :: vglobal(ids:ide,jds:jde,kds:kde)
    integer, optional, intent(in)  :: mz
@@ -37,7 +37,7 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
    end if
 
    if (local_kde > 0) then
-      call wrf_patch_to_global_real (vlocal, vglobal, xp%domdesc, &
+      call wrf_patch_to_global_real (vlocal, vglobal, grid%xp%domdesc, &
          trim(grid_stagger), trim(grid_ordering), &
          ids, ide, jds, jde, kds, local_kde,  &
          ims, ime, jms, jme, kms, local_kme,  &

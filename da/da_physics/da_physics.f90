@@ -4,7 +4,7 @@ module da_physics
    !  Purpose: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   use module_domain, only : domain, xpose_type, x_type
+   use module_domain, only : domain, x_type
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, &
       ntasks_y, data_order_xyz

@@ -1,4 +1,4 @@
-subroutine da_setup_pseudo_obs(xp, iv, ob)
+subroutine da_setup_pseudo_obs(iv, ob)
 
    !-------------------------------------------------------------------------
    ! Purpose: Sets up pseudo ob part of observation structure.
@@ -8,7 +8,6 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
 
    type(iv_type),    intent(inout) :: iv   ! Obs and header structure.
    type(y_type),     intent(inout) :: ob   ! (Smaller) observation structure.
-   type(xpose_type), intent(in)    :: xp   ! Domain decomposition vars.
 
    integer                       :: n    ! Loop counters.
 

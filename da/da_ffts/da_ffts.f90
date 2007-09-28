@@ -4,7 +4,7 @@ module da_ffts
    ! Purpose: Routines to perform Fourier transforms.
    !---------------------------------------------------------------------------
 
-   use module_domain, only :domain, xpose_type
+   use module_domain, only :domain
    use da_control, only : ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
       Inverse_FFT,  Forward_FFT, ids,jds, trace_use, &
       ide,jde, stdout

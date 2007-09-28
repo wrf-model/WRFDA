@@ -4,7 +4,7 @@ module da_radiance
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
    use module_radiance, only : satinfo, coefs_scatt_instname, &
       time_slots, &
       i_kind,r_kind, r_double, &
@@ -39,7 +39,7 @@ module da_radiance
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr,thinning,thinning_mesh, &
-      rad_monitoring, monitor_on, &
+      rad_monitoring, monitor_on, kms,kme,&
       use_hirs4obs, use_mhsobs,bufr_year, bufr_month,bufr_day,bufr_hour, &
       bufr_minute, bufr_second,bufr_solzen, bufr_station_height, &
       bufr_landsea_mask,tovs_end, max_tovs_input, bufr_satzen, nchan_mhs, &

@@ -1,4 +1,4 @@
-subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
+subroutine da_to_zk_new(obs_v, mdl_v, v_interp_optn, zk,num,nlevels)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,9 +7,8 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
    implicit none
 
    integer,          intent(in)  :: v_interp_optn
-   type(xpose_type), intent(in)  :: xp!Domain decomposition vars.
    real,             intent(in)  :: obs_v(nlevels)
-   real,             intent(in)  :: mdl_v(xp%kms:xp%kme,num)
+   real,             intent(in)  :: mdl_v(kms:kme,num)
    real,             intent(out) :: zk(nlevels,num)
    integer,          intent(in)  :: num
    integer,          intent(in)  :: nlevels
@@ -21,23 +20,23 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
 
    zk(:,:) = missing_r
 
-   r_ktsplus  = real(xp%kts+1)
-   r_kteminus = real(xp%kte-1)
+   r_ktsplus  = real(kts+1)
+   r_kteminus = real(kte-1)
 
    if (v_interp_optn == v_interp_p) then
       if (anal_type_verify) then
          do n=1,num
             do k=1,nlevels
-               if (obs_v(k) > mdl_v(xp%kts,n)) then
+               if (obs_v(k) > mdl_v(kts,n)) then
                   ! below the lowest level:
                   zk(k,n) = r_ktsplus - &
-                     (obs_v(k)-mdl_v(xp%kts+1,n))/(mdl_v(xp%kts,n)-mdl_v(xp%kts+1,n))
-               else if (obs_v(k) < mdl_v(xp%kts,n)) then
+                     (obs_v(k)-mdl_v(kts+1,n))/(mdl_v(kts,n)-mdl_v(kts+1,n))
+               else if (obs_v(k) < mdl_v(kts,n)) then
                   ! above the highest level:
                   zk(k,n) = r_kteminus + &
-                     (obs_v(k)-mdl_v(xp%kte-1,n))/(mdl_v(xp%kte,n)-mdl_v(xp%kte-1,n))
+                     (obs_v(k)-mdl_v(kte-1,n))/(mdl_v(kte,n)-mdl_v(kte-1,n))
                else
-                  do kk = xp%kts,xp%kte-1
+                  do kk = kts,kte-1
                      if (obs_v(k) <= mdl_v(kk,n) .and. obs_v(k) >= mdl_v(kk+1,n)) then
                         zk(k,n) = real(kk) + (mdl_v(kk,n) - obs_v(k))/(mdl_v(kk,n) - mdl_v(kk+1,n))
                         exit
@@ -49,7 +48,7 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
       else
          do n=1,num
             do k=1,nlevels
-               do kk = xp%kts,xp%kte-1
+               do kk = kts,kte-1
                   if (obs_v(k) <= mdl_v(kk,n) .and. obs_v(k) >= mdl_v(kk+1,n)) then
                      zk(k,n) = real(kk) + (mdl_v(kk,n) - obs_v(k))/(mdl_v(kk,n) - mdl_v(kk+1,n))
                      exit
@@ -62,16 +61,16 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
       if (anal_type_verify) then
          do n=1,num
             do k=1,nlevels
-               if (obs_v(k) < mdl_v(xp%kts,n)) then
+               if (obs_v(k) < mdl_v(kts,n)) then
                    ! below the lowest level:
                    zk(k,n) = r_ktsplus - &
-                     (obs_v(k)-mdl_v(xp%kts+1,n))/(mdl_v(xp%kts,n)-mdl_v(xp%kts+1,n))
-               else if (obs_v(k) > mdl_v(xp%kts,n)) then
+                     (obs_v(k)-mdl_v(kts+1,n))/(mdl_v(kts,n)-mdl_v(kts+1,n))
+               else if (obs_v(k) > mdl_v(kts,n)) then
                   ! above the highest level:
                   zk(k,n) = r_kteminus + &
-                     (obs_v(k)-mdl_v(xp%kte-1,n))/(mdl_v(xp%kte,n)-mdl_v(xp%kte-1,n))
+                     (obs_v(k)-mdl_v(kte-1,n))/(mdl_v(kte,n)-mdl_v(kte-1,n))
                else
-                  do kk = xp%kts,xp%kte-1
+                  do kk = kts,kte-1
                      if (obs_v(k) >= mdl_v(kk,n) .and. obs_v(k) <= mdl_v(kk+1,n)) then
                         zk(k,n) = real(kk) + (mdl_v(kk,n) - obs_v(k))/(mdl_v(kk,n) - mdl_v(kk+1,n))
                         exit
@@ -83,7 +82,7 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
       else
          do n=1,num
             do k=1,nlevels
-               do kk = xp%kts,xp%kte-1
+               do kk = kts,kte-1
                   if (obs_v(k) >= mdl_v(kk,n) .and. obs_v(k) <= mdl_v(kk+1,n)) then
                      zk(k,n) = real(kk) + (mdl_v(kk,n) - obs_v(k))/(mdl_v(kk,n) - mdl_v(kk+1,n))
                      exit

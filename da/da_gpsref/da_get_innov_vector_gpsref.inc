@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it       ! External iteration.
-   type(xb_type),    intent(in)    :: xb       ! first guess state.
-   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid     ! first guess state.
    type(y_type),     intent(inout) :: ob       ! Observation structure.
    type(iv_type),    intent(inout) :: iv       ! O-B structure.
 
@@ -90,14 +89,14 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
       iv % gpsref(1) %ref(1) % qc = 0
 
       ! Set halo:
-      if ((iv%gpsref(1)%loc%i < xp%its-1) .or.(iv%gpsref(1)%loc%i > xp%ite) .or. &
-          (iv%gpsref(1)%loc%j < xp%jts-1) .or.(iv%gpsref(1)%loc%j > xp%jte)) then
+      if ((iv%gpsref(1)%loc%i < its-1) .or.(iv%gpsref(1)%loc%i > ite) .or. &
+          (iv%gpsref(1)%loc%j < jts-1) .or.(iv%gpsref(1)%loc%j > jte)) then
          iv%gpsref(1)%loc%proc_domain = .false.
       else
          iv%gpsref(1)%loc%proc_domain = .false. 
 
-         if (iv%gpsref(1)%loc%i >= xp%its .and. iv%gpsref(1)%loc%i <= xp%ite .and. & 
-             iv%gpsref(1)%loc%j >= xp%jts .and. iv%gpsref(1)%loc%j <= xp%jte) then 
+         if (iv%gpsref(1)%loc%i >= its .and. iv%gpsref(1)%loc%i <= ite .and. & 
+             iv%gpsref(1)%loc%j >= jts .and. iv%gpsref(1)%loc%j <= jte) then 
             iv%gpsref(1)%loc%proc_domain = .true. 
          end if 
       end if
@@ -132,13 +131,13 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          ! Get the gpsref%zk from gpsref%h:
 
          do k=kts,kte
-            v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                   + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
+            v_h(k) = dym*(dxm*grid%xb%h(i,j  ,k) + dx*grid%xb%h(i+1,j  ,k)) &
+                   + dy *(dxm*grid%xb%h(i,j+1,k) + dx*grid%xb%h(i+1,j+1,k))
          end do
          do k=1, num_levs
             iv%gpsref(n)%zk(k)=missing_r
             if (iv%gpsref(n)%h(k) > 0.0) &
-               call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, iv%gpsref(n)%zk(k))
+               call da_to_zk(iv%gpsref(n)%h(k), v_h, v_interp_h, iv%gpsref(n)%zk(k))
             if (iv%gpsref(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
                iv%gpsref(n)%ref(k)%qc = missing
             end if
@@ -147,7 +146,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          iv % gpsref(1)%zk(1) = pseudo_z
       end if
 
-      call da_interp_lin_3d(xb%ref, iv%gpsref(n)%loc, model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
+      call da_interp_lin_3d(grid%xb%ref, iv%gpsref(n)%loc, model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
 
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
          do k = 1, num_levs

@@ -1,4 +1,4 @@
-subroutine da_read_obs_radar (iv, xp, filename)
+subroutine da_read_obs_radar (iv, filename)
 
    !-----------------------------------------------------------------------
    ! Purpose: Read the radar observation file
@@ -6,7 +6,6 @@ subroutine da_read_obs_radar (iv, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
    type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
@@ -183,7 +182,7 @@ subroutine da_read_obs_radar (iv, xp, filename)
             end if
          end do
 
-         call da_llxy (platform%info, platform%loc, xp, outside)
+         call da_llxy (platform%info, platform%loc, outside)
 
          nlevels = platform%info%levels
 
@@ -200,7 +199,7 @@ subroutine da_read_obs_radar (iv, xp, filename)
          ! Loop over duplicating obs for global
          n_dup = 1
          if (global .and. &
-            (platform%loc%i == xp%ids .or. platform%loc%i == xp%ide)) n_dup= 2
+            (platform%loc%i == ids .or. platform%loc%i == ide)) n_dup= 2
          do ndup = 1, n_dup
             select case (fm)
 
@@ -243,11 +242,11 @@ subroutine da_read_obs_radar (iv, xp, filename)
             end select
 
             if (global .and. ndup == 1) then
-               if (platform%loc % i >= xp % ide) then
-                  platform%loc%i = xp % ids
+               if (platform%loc % i >= ide) then
+                  platform%loc%i = ids
                   platform%loc%proc_domain = .false.
-               else if (platform%loc % i <= xp % ids) then
-                  platform%loc%i = xp % ide
+               else if (platform%loc % i <= ids) then
+                  platform%loc%i = ide
                   platform%loc%proc_domain = .false.
                end if
             end if

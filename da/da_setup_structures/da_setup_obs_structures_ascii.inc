@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
+subroutine da_setup_obs_structures_ascii( ob, iv, grid )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of observation structure.
@@ -6,10 +6,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp  ! Domain decomposition vars.
    type (y_type),     intent(out)   :: ob  ! Observation structure.
    type (iv_type),    intent(out)   :: iv  ! O-B structure.
-   type (xb_type),    intent(inout) :: xb  ! First guess structure
+   type (domain),     intent(inout) :: grid  ! First guess structure
 
    character(len=120)  :: filename
    integer             :: n
@@ -30,35 +29,35 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! scan main body of gts observation file
-         call da_scan_obs_ascii (iv, xp, filename)
+         call da_scan_obs_ascii (iv, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ssmi'
-            call da_scan_obs_ssmi (iv, xp, filename)
+            call da_scan_obs_ssmi (iv, filename)
          end if
 
          if (use_radarobs) then
             ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.radar'
-            call da_scan_obs_radar(iv, xp, filename)
+            call da_scan_obs_radar(iv, filename)
          end if
       end do
    else
       iv%time = 1
 
-      call da_scan_obs_ascii(iv, xp,'ob01.ascii')
+      call da_scan_obs_ascii(iv, 'ob01.ascii')
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
-         call da_scan_obs_ssmi(iv, xp,'ob01.ssmi')
+         call da_scan_obs_ssmi(iv, 'ob01.ssmi')
       end if
 
       ! scan main body of radar observation file
       if (use_radarobs) then
-         call da_scan_obs_radar(iv, xp,'ob01.radar')
+         call da_scan_obs_radar(iv, 'ob01.radar')
       end if
    end if
 
@@ -75,33 +74,33 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! Read gts observation file
-         call da_read_obs_ascii (iv, xp, filename)
+         call da_read_obs_ascii (iv, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ob', n,'.ssmi'
-            call da_read_obs_ssmi (iv, xp, filename)
+            call da_read_obs_ssmi (iv, filename)
          end if
 
          if (use_radarobs) then
             ! read radar observation file
             write(filename(1:11), fmt='(a, i2.2)') 'ob', n,'.radar'
-            call da_read_obs_radar(iv, xp, filename)
+            call da_read_obs_radar(iv, filename)
          end if
       end do
    else
       iv%time = 1
 
-      call da_read_obs_ascii(iv, xp, 'ob01.ascii')
+      call da_read_obs_ascii(iv, 'ob01.ascii')
 
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
-         call da_read_obs_ssmi (iv, xp,'ob01.ssmi')
+         call da_read_obs_ssmi (iv, 'ob01.ssmi')
       end if
 
       if (use_radarobs) then
          ! read radar observation file
-         call da_read_obs_radar(iv, xp,'ob01.radar')
+         call da_read_obs_radar(iv, 'ob01.radar')
       end if
    end if
 
@@ -109,10 +108,10 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    if (use_radarobs .and. use_radar_rf) then
       if (.not. DT_cloud_model) then
-         do j = xp%jts, xp%jte
-            do i = xp%its, xp%ite
-               do k = xp%kts, xp%kte
-                   xb%delt(i,j,k) = 0.0
+         do j = jts,jte
+            do i = its, ite
+               do k = kts, kte
+                   grid%xb%delt(i,j,k) = 0.0
                end do
             end do
         end do
@@ -120,18 +119,18 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
         do n = 1, iv%nlocal(radar)
            do i=int(iv%radar(n)%loc%i), int(iv%radar(n)%loc%i)+1
               do j=int(iv%radar(n)%loc%j), int(iv%radar(n)%loc%j)+1
-                 do k=xp%kts, xp%kte
-                    xb%delt(i,j,k) = 1800.0
-                    xb%qrn(i,j,k) = amax1(5.0E-5, xb%qrn(i,j,k))
-                    xb%qcw(i,j,k) = amax1(5.0E-12, xb%qcw(i,j,k))
+                 do k=kts, kte
+                    grid%xb%delt(i,j,k) = 1800.0
+                    grid%xb%qrn(i,j,k) = amax1(5.0E-5, grid%xb%qrn(i,j,k))
+                    grid%xb%qcw(i,j,k) = amax1(5.0E-12, grid%xb%qcw(i,j,k))
                   end do
-                  ! do k=xp%kts, xp%kte
-                  !    v_h(k)=xb%h(i,j  ,k)
+                  ! do k=kts, kte
+                  !    v_h(k)=grid%xb%h(i,j  ,k)
                   ! end do
                   ! do k = 1, iv % radar(n) % info % levels
-                  !    call zk(iv%radar(n)%height(k), v_h, xp, zkk)
-                  !    xb%delt(i,j,int(zkk))=1800.0
-                  !    xb%delt(i,j,int(zkk)+1)=1800.0
+                  !    call zk(iv%radar(n)%height(k), v_h, zkk)
+                  !    grid%xb%delt(i,j,int(zkk))=1800.0
+                  !    grid%xb%delt(i,j,int(zkk)+1)=1800.0
                   ! end do
                end do
             end do
@@ -143,7 +142,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   call da_fill_obs_structures(xp, iv, ob)
+   call da_fill_obs_structures(iv, ob)
 
    iv%time = 1
 

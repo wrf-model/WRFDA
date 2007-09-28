@@ -1,4 +1,4 @@
-subroutine da_write_iv_rad_ascii ( xp, ob, iv )
+subroutine da_write_iv_rad_ascii (ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: write out innovation vector structure for radiance data.
@@ -6,7 +6,6 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
 
    implicit none
 
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
    type (y_type),     intent(in)  :: ob       ! Observation structure.
    type (iv_type),    intent(in)  :: iv       ! O-B structure.
 
@@ -59,7 +58,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
       else
          write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
       end if
-      write(unit=innov_rad_unit,fmt=*) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
+      write(unit=innov_rad_unit,fmt=*) ' grid%xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                     & soiltyp vegtyp vegfra elev clwp'
       ndomain = 0
       do n =1,iv%instid(i)%num_rad
@@ -242,7 +241,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
                nlevelss  = iv%instid(i)%nlevels
                write(unit=innov_rad_unit,fmt=*) &
                   'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
-               do k=xp%kts,xp%kte
+               do k=kts,kte
                   if (k <= nlevelss) then
                      write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
                         k, &                             ! RTTOV levels

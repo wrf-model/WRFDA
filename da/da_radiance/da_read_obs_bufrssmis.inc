@@ -1,4 +1,4 @@
-subroutine da_read_bufrssmis (obstype,iv,xp,infile)
+subroutine da_read_bufrssmis (obstype,iv,infile)
 
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr SSM/IS data to innovation structure
@@ -14,7 +14,6 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
 
    character(5) ,     intent (in)    :: obstype    ! ssmis
    character(20),     intent (in)    :: infile     ! ssmis.bufr
-   type (xpose_type), intent (in)    :: xp
    type (iv_type),    intent (inout) :: iv
 
    if (trace_use) call da_trace_entry("da_read_bufrssmis")

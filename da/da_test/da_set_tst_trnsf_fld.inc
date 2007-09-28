@@ -1,4 +1,4 @@
-subroutine da_set_tst_trnsf_fld(xp, va, vb, typical_rms)
+subroutine da_set_tst_trnsf_fld(grid, va, vb, typical_rms)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,10 @@ subroutine da_set_tst_trnsf_fld(xp, va, vb, typical_rms)
 
    implicit none
 
-   type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.
-   real,              intent(out) :: va(ims:ime, jms:jme, kms:kme)
-   real,              intent(in)  :: vb(ims:ime, jms:jme, kms:kme)
-   real,              intent(in)  :: typical_rms
+   type(domain), intent(in)  :: grid   ! model state
+   real,         intent(out) :: va(ims:ime, jms:jme, kms:kme)
+   real,         intent(in)  :: vb(ims:ime, jms:jme, kms:kme)
+   real,         intent(in)  :: typical_rms
 
    real    :: gbuf(ids:ide, jds:jde, kds:kde) 
    integer :: size3d
@@ -23,7 +23,7 @@ subroutine da_set_tst_trnsf_fld(xp, va, vb, typical_rms)
 
    size3d = (ide-ids+1)*(jde-jds+1)*(kde-kds+1)
 
-   call da_patch_to_global(xp, vb, gbuf)
+   call da_patch_to_global(grid, vb, gbuf)
    call wrf_dm_bcast_real(gbuf, size3d)
 
    xy_dim_inv  = 1.0 / real((ide-ids+1)*(jde-jds+1))

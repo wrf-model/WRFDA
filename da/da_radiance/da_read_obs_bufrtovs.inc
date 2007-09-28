@@ -1,4 +1,4 @@
-subroutine da_read_bufrtovs (obstype,iv, xp,infile)
+subroutine da_read_bufrtovs (obstype,iv, infile)
 
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
@@ -15,7 +15,6 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
    character(5)      ,  intent (in)    :: obstype
    character(20)     ,  intent (in)    :: infile
-   type (xpose_type) ,  intent (in)    :: xp
    type (iv_type)    ,  intent (inout) :: iv
 
 #ifdef BUFR
@@ -221,7 +220,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
          info%lat  =  bfr1bhdr(bufr_lat)
          info%lon  =  bfr1bhdr(bufr_lon)
-         call da_llxy (info, loc, xp, outside, outside_all)
+         call da_llxy (info, loc, outside, outside_all)
 
          if (outside_all) cycle
 
@@ -410,7 +409,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
         'Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       if (rtm_option == rtm_option_crtm) then
-         iv%instid(i)%nlevels = xp%kme-xp%kms+1
+         iv%instid(i)%nlevels = kme-kms+1
          iv%instid(i)%nchannels=nchan
       end if
 
@@ -422,7 +421,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       end if
 #endif
 
-      call da_allocate_rad_iv(i,nchan,iv,xp)
+      call da_allocate_rad_iv(i,nchan,iv)
 
    end do
    

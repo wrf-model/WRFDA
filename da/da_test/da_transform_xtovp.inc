@@ -1,4 +1,4 @@
-subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
+subroutine da_transform_xtovp(grid, xb, xbx, xa, vp, be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transforms analysis to control variables (Vp-type)
@@ -10,7 +10,6 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
    type(xb_type),           intent(in)    :: xb         ! First guess structure.
    type(xbx_type),          intent(in)    :: xbx        ! Header/non-gridded vars.
    type(x_type),            intent(inout) :: xa         ! Analysis increments.
-   type(xpose_type),        intent(inout) :: xp         ! Dimensions and xpose buffers. 
    type(vp_type),           intent(out)   :: vp         ! CV on grid structure.
    type(be_type), optional, intent(in)    :: be         ! Background errors.
 
@@ -55,7 +54,7 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
 
    ! Calculate psi:
    write (unit=stdout,fmt=*) ' calling Solve_PoissonEquation for Psi'
-   call da_solve_poissoneqn_fct(grid,xbx, vor, vp%v1, xp)
+   call da_solve_poissoneqn_fct(grid,xbx, vor, vp%v1)
 
    ! [2.3] Transform u, v to velocity potential via divergence:
 
@@ -79,7 +78,7 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
    ! Calculate chi:
 
    call da_message((/' calling Solve_PoissonEquation for Chi'/))
-   call da_solve_poissoneqn_fct(grid,xbx, div, vp%v2, xp)
+   call da_solve_poissoneqn_fct(grid,xbx, div, vp%v2)
 
    ! [2.4] Transform chi to chi_u:
    call da_message((/' calculating chi_u'/))

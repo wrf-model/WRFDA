@@ -8,7 +8,7 @@ module da_pseudo
       max_error_bt, max_error_buv, pseudo_var,stdout
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
    use da_interpolation, only :  &
       da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj
    use da_statistics, only : da_stats_calculate

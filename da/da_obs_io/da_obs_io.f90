@@ -1,6 +1,6 @@
 module da_obs_io
 
-   use module_domain, only : xpose_type, domain
+   use module_domain, only : domain
 
    use da_control, only : missing_r, fmt_each, fmt_info, trace_use, &
       fmt_srfc, filtered_obs_unit, num_procs,missing, ierr,comm, rand_unit, &
@@ -19,7 +19,7 @@ module da_obs_io
       max_profiler_input, max_sound_input, max_ships_input, &
       max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
       max_synop_input,max_ssmt2_input,  max_qscat_input, &
-      obs_names, num_ob_indexes, &
+      obs_names, num_ob_indexes, ids,ide, &
       sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
       metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
       radar, radiance, airsr, trace_use_dull

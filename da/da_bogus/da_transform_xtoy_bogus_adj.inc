@@ -73,7 +73,7 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
       !       at the observed location:
 
       call da_tpq_to_slp_adj(model_t, model_q ,model_p_c, terr_loc, psfc_loc, &
-         tt, qq, pp, ppsfc, jo_grad_y%bogus(n)%slp, grid%xp)  
+         tt, qq, pp, ppsfc, jo_grad_y%bogus(n)%slp)  
 
       ! 1.2.3 feedback from the observed location to grid space:
 

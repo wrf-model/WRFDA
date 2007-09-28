@@ -1,4 +1,4 @@
-subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
+subroutine da_cv_to_global(cv_size, cv_size_global, x, grid, mzs, xg)
 
 
    !-----------------------------------------------------------------------
@@ -13,7 +13,7 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
    integer,          intent(in)    :: cv_size        ! Size of local cv-array
    integer,          intent(in)    :: cv_size_global ! Size of domain cv-array
    real,             intent(in)    :: x(1:cv_size)   ! local cv-array
-   type(xpose_type), intent(in)    :: xp   ! decomposed dimensions
+   type(domain),     intent(in)    :: grid
    integer,          intent(in)    :: mzs(:)  ! mz for each variable
                                          ! (to identify empty or 2D arrays)
    real,             intent(inout) :: xg(1:cv_size_global) ! global cv-array
@@ -35,29 +35,29 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
    !
 
    ! k?e varies with variable v1 - v5
-   ids = xp%ids; ide = xp%ide; jds = xp%jds; jde = xp%jde; kds = xp%kds
-   ims = xp%ims; ime = xp%ime; jms = xp%jms; jme = xp%jme; kms = xp%kms
-   ips = xp%ips; ipe = xp%ipe; jps = xp%jps; jpe = xp%jpe; kps = xp%kps
+   ids = ids; ide = ide; jds = jds; jde = jde; kds = kds
+   ims = ims; ime = ime; jms = jms; jme = jme; kms = grid%xp%kms
+   ips = grid%xp%ips; ipe = grid%xp%ipe; jps = grid%xp%jps; jpe = grid%xp%jpe; kps = grid%xp%kps
 
    ! TOdo:  encapsulate this crap!  
    ! allocate vv_x
-   allocate(vv_x%v1(xp%ims:xp%ime,xp%jms:xp%jme,mzs(1)))
-   allocate(vv_x%v2(xp%ims:xp%ime,xp%jms:xp%jme,mzs(2)))
-   allocate(vv_x%v3(xp%ims:xp%ime,xp%jms:xp%jme,mzs(3)))
-   allocate(vv_x%v4(xp%ims:xp%ime,xp%jms:xp%jme,mzs(4)))
-   allocate(vv_x%v5(xp%ims:xp%ime,xp%jms:xp%jme,mzs(5)))
-   allocate(vv_x%alpha(xp%ims:xp%ime,xp%jms:xp%jme,mzs(6)))
+   allocate(vv_x%v1(ims:ime,jms:jme,mzs(1)))
+   allocate(vv_x%v2(ims:ime,jms:jme,mzs(2)))
+   allocate(vv_x%v3(ims:ime,jms:jme,mzs(3)))
+   allocate(vv_x%v4(ims:ime,jms:jme,mzs(4)))
+   allocate(vv_x%v5(ims:ime,jms:jme,mzs(5)))
+   allocate(vv_x%alpha(ims:ime,jms:jme,mzs(6)))
 
-   call da_cv_to_vv (cv_size, x, xp, mzs, vv_x)
+   call da_cv_to_vv (cv_size, x, mzs, vv_x)
 
    if (rootproc) then
       ! allocate vv_xg
-      allocate(vv_xg%v1(xp%ids:xp%ide,xp%jds:xp%jde,mzs(1)))
-      allocate(vv_xg%v2(xp%ids:xp%ide,xp%jds:xp%jde,mzs(2)))
-      allocate(vv_xg%v3(xp%ids:xp%ide,xp%jds:xp%jde,mzs(3)))
-      allocate(vv_xg%v4(xp%ids:xp%ide,xp%jds:xp%jde,mzs(4)))
-      allocate(vv_xg%v5(xp%ids:xp%ide,xp%jds:xp%jde,mzs(5)))
-      allocate(vv_xg%alpha(xp%ids:xp%ide,xp%jds:xp%jde,mzs(6)))
+      allocate(vv_xg%v1(ids:ide,jds:jde,mzs(1)))
+      allocate(vv_xg%v2(ids:ide,jds:jde,mzs(2)))
+      allocate(vv_xg%v3(ids:ide,jds:jde,mzs(3)))
+      allocate(vv_xg%v4(ids:ide,jds:jde,mzs(4)))
+      allocate(vv_xg%v5(ids:ide,jds:jde,mzs(5)))
+      allocate(vv_xg%alpha(ids:ide,jds:jde,mzs(6)))
    else
       ! Allocate dummy array for non-monitor process to keep Fortran
       ! CICO happy...
@@ -73,27 +73,27 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
    ! gather to global data structures
    ! it is possible to gather straight into a globally-sized cv-array
    ! TOdo:  add this optimization later
-   call da_patch_to_global(xp, vv_x%v1,    vv_xg%v1,    mzs(1))
-   call da_patch_to_global(xp, vv_x%v2,    vv_xg%v2,    mzs(2))
-   call da_patch_to_global(xp, vv_x%v3,    vv_xg%v3,    mzs(3))
-   call da_patch_to_global(xp, vv_x%v4,    vv_xg%v4,    mzs(4))
-   call da_patch_to_global(xp, vv_x%v5,    vv_xg%v5,    mzs(5))
-   call da_patch_to_global(xp, vv_x%alpha, vv_xg%alpha, mzs(6))
+   call da_patch_to_global(grid, vv_x%v1,    vv_xg%v1,    mzs(1))
+   call da_patch_to_global(grid, vv_x%v2,    vv_xg%v2,    mzs(2))
+   call da_patch_to_global(grid, vv_x%v3,    vv_xg%v3,    mzs(3))
+   call da_patch_to_global(grid, vv_x%v4,    vv_xg%v4,    mzs(4))
+   call da_patch_to_global(grid, vv_x%v5,    vv_xg%v5,    mzs(5))
+   call da_patch_to_global(grid, vv_x%alpha, vv_xg%alpha, mzs(6))
 
    ! deallocate vv_x
    deallocate (vv_x%v1, vv_x%v2, vv_x%v3, vv_x%v4, vv_x%v5)
 
    if (rootproc) then
       ! finally, collapse data back into a globally-sized cv-array
-      xpg%ids = xp%ids; xpg%ide = xp%ide
-      xpg%ims = xp%ids; xpg%ime = xp%ide
-      xpg%its = xp%ids; xpg%ite = xp%ide
-      xpg%jds = xp%jds; xpg%jde = xp%jde
-      xpg%jms = xp%jds; xpg%jme = xp%jde
-      xpg%jts = xp%jds; xpg%jte = xp%jde
-      xpg%kds = xp%kds; xpg%kde = xp%kde
-      xpg%kms = xp%kds; xpg%kme = xp%kde
-      xpg%kts = xp%kds; xpg%kte = xp%kde
+      xpg%ids = ids; xpg%ide = ide
+      xpg%ims = ids; xpg%ime = ide
+      xpg%its = ids; xpg%ite = ide
+      xpg%jds = jds; xpg%jde = jde
+      xpg%jms = jds; xpg%jme = jde
+      xpg%jts = jds; xpg%jte = jde
+      xpg%kds = kds; xpg%kde = kde
+      xpg%kms = kds; xpg%kme = kde
+      xpg%kts = kds; xpg%kte = kde
       call da_vv_to_cv(vv_xg, xpg, mzs, cv_size_global, xg)
    end if
 

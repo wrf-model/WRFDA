@@ -6,7 +6,7 @@ module da_tools
    
    use module_bc, only : bdyzone
    use module_dm, only : wrf_dm_sum_real
-   use module_domain, only : xb_type, xpose_type, domain
+   use module_domain, only : xb_type, domain
 
    use da_control, only : pi, gravity, gas_constant, ims, ime, jms,jme, &
       kms,kme,its,ite,jts,jte,kts,kte,ids,ide,stdout, trace_use_dull, &
@@ -18,7 +18,7 @@ module da_tools
       fg_format_wrf, x_end_sub_domain, y_end_sub_domain, def_sub_domain, &
       y_start_sub_domain, start_lat, delt_lat, delt_lon, start_lon, cp, &
       missing, surface_correction,print_detail_map, oi_use, use_rad, stderr, &
-      t_kelvin, trace_use_frequent
+      t_kelvin, trace_use_frequent, jds, jde
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
       iv_type, y_type, da_random_seed

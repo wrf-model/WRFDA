@@ -1,6 +1,6 @@
 module da_airsr
 
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
    
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &

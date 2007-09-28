@@ -1,4 +1,4 @@
-subroutine da_read_obs_ssmi (iv, xp, filename)
+subroutine da_read_obs_ssmi (iv, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read a SSMI 2.0 GTS observation file
@@ -6,7 +6,6 @@ subroutine da_read_obs_ssmi (iv, xp, filename)
 
    implicit none
 
-   type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
    type(iv_type),    intent(inout) :: iv
    character(len=*), intent(in)    :: filename
 
@@ -152,7 +151,7 @@ subroutine da_read_obs_ssmi (iv, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_llxy (info, loc, xp, outside, outside_all)
+      call da_llxy (info, loc, outside, outside_all)
 
       if (outside_all) cycle reports
 
@@ -162,7 +161,7 @@ subroutine da_read_obs_ssmi (iv, xp, filename)
 
       ! Loop over duplicating obs for global
       ndup = 1
-      if (global .and. (loc%i < xp%ids .or. loc%i >= xp%ide)) ndup= 2
+      if (global .and. (loc%i < ids .or. loc%i >= ide)) ndup= 2
 
       ! It is possible that logic for counting obs is incorrect for the
       ! global case with >1 MPI tasks due to obs duplication, halo, etc.

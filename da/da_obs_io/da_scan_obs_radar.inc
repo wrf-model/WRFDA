@@ -1,4 +1,4 @@
-subroutine da_scan_obs_radar (iv, xp, filename)
+subroutine da_scan_obs_radar (iv, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan the radar observation file
@@ -6,7 +6,6 @@ subroutine da_scan_obs_radar (iv, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
    type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
@@ -121,7 +120,7 @@ subroutine da_scan_obs_radar (iv, xp, filename)
                              platform % each (i) % rf % error
          end do
 
-         call da_llxy (platform%info, platform%loc, xp, outside)
+         call da_llxy (platform%info, platform%loc, outside)
 
          nlevels = platform%info%levels
 
@@ -144,7 +143,7 @@ subroutine da_scan_obs_radar (iv, xp, filename)
          ! Loop over duplicating obs for global
          n_dup = 1
          if (global .and. &
-            (platform%loc%i == xp%ids .or. platform%loc%i == xp%ide)) n_dup= 2
+            (platform%loc%i == ids .or. platform%loc%i == ide)) n_dup= 2
    
          do ndup = 1, n_dup
             select case (fm)

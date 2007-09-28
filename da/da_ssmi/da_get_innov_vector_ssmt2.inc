@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,8 +7,7 @@ subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
    implicit none
 
    integer,          intent(in)    :: it       ! External iteration.
-   type(xb_type),    intent(in)    :: xb       ! first guess state.
-   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(domain),     intent(in)    :: grid       ! first guess state.
    type(y_type),     intent(inout) :: ob       ! Observation structure.
    type(iv_type),    intent(inout) :: iv       ! O-B structure.
 
@@ -46,10 +45,10 @@ subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
       dym = iv%ssmt2(n)%loc%dym
 
       do k=kts,kte
-         v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+         v_h(k) = dym*(dxm*grid%xb%h(i,j  ,k) + dx*grid%xb%h(i+1,j  ,k)) &
+                + dy *(dxm*grid%xb%h(i,j+1,k) + dx*grid%xb%h(i+1,j+1,k))
+         v_p(k) = dym*(dxm*grid%xb%p(i,j  ,k) + dx*grid%xb%p(i+1,j  ,k)) &
+                + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
       end do
 
       num_levs=0
@@ -58,9 +57,9 @@ subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
          zk=missing_r
 
          if (iv % ssmt2(n) % h(k) > 0.0) then
-            call da_to_zk(iv % ssmt2(n) % h(k), v_h, xp, v_interp_h, zk)
+            call da_to_zk(iv % ssmt2(n) % h(k), v_h, v_interp_h, zk)
          else if (iv % ssmt2(n) % p(k) > 1.0) then
-            call da_to_zk(iv % ssmt2(n) % p(k), v_p, xp, v_interp_p, zk)
+            call da_to_zk(iv % ssmt2(n) % p(k), v_p, v_interp_p, zk)
          end if
 
          if (zk > 0.0) then
@@ -79,7 +78,7 @@ subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb % rh, iv%ssmt2(n)%loc, &
+      call da_interp_lin_3d( grid%xb % rh, iv%ssmt2(n)%loc, &
          model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 
       !--------------------------------------------------------------------

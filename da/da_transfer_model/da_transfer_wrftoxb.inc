@@ -1,7 +1,7 @@
 subroutine da_transfer_wrftoxb(xbx, grid)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Transfers fitelds from WRF to first guess structure.
+   ! Purpose: Transfers fields from WRF to first guess structure.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -519,7 +519,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! Calculate dew point temperature:
    !---------------------------------------------------------------------------
 
-   call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
+   call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td)
 
    if (print_detail_xb) then
       i=its; j=jts; k=kts
@@ -606,7 +606,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! testing.  Thits will always be .false. for a serial or 1-process MPI run.
    if (test_dm_exact) then
       allocate(arrayglobal(ids:ide, jds:jde))
-      call da_patch_to_global(grid%xp,grid%xb%psac, arrayglobal)
+      call da_patch_to_global(grid,grid%xb%psac, arrayglobal)
       loc_psac_mean = tmpvar*sum(arrayglobal(ids:ide,jds:jde))
       deallocate(arrayglobal)
    else
@@ -617,7 +617,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    if (test_dm_exact) then
       allocate(arrayglobal(ids:ide, jds:jde))
-      call da_patch_to_global(grid%xp,grid%xb%lat, arrayglobal)
+      call da_patch_to_global(grid,grid%xb%lat, arrayglobal)
       do j=jds,jde
          loc_latc_mean(j) = tmpvar*sum(arrayglobal(ids:ide, j))
       end do

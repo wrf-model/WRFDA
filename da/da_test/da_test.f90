@@ -14,7 +14,7 @@ module da_test
    use da_control, only : ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
 
-   use module_domain, only : xpose_type, vp_type, xb_type, x_type, ep_type, &
+   use module_domain, only : vp_type, xb_type, x_type, ep_type, &
       domain
    use module_state_description, only : dyn_em,dyn_em_tl,dyn_em_ad,p_a_qv
 

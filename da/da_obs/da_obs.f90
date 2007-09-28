@@ -2,7 +2,7 @@ module da_obs
 
    use da_define_structures, only : multi_level_type, y_type, iv_type, &
       model_loc_type, field_type, each_level_type,da_allocate_y, da_random_seed
-   use module_domain, only : domain, x_type, xpose_type
+   use module_domain, only : domain, x_type
 
    use da_airep, only : da_transform_xtoy_airep, da_transform_xtoy_airep_adj 
    use da_airsr, only : da_transform_xtoy_airsr, da_transform_xtoy_airsr_adj 

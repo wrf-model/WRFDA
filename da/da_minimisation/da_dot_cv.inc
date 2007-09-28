@@ -1,4 +1,4 @@
-real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
+real function da_dot_cv(cv_size, cv_size_domain, x, y, grid, mzs)
 
    !-----------------------------------------------------------------------
    ! Purpose: Forms the dot product of two vectors that are organized in the 
@@ -15,7 +15,7 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
    integer,          intent(in) :: cv_size_domain    ! Size of array (domain).
    real,             intent(in) :: x(cv_size)       ! 1st vector.
    real,             intent(in) :: y(cv_size)       ! 1st vector.
-   type(xpose_type), intent(in) :: xp         ! decomposed dimensions
+   type(domain),     intent(in) :: grid             ! decomposed dimensions
    integer,          intent(in) :: mzs(:)     ! mz for each variable
                                                      ! (to identify 2D arrays)
 
@@ -42,8 +42,8 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
          allocate(yg(1:cv_size_domain))
       end if
 
-      call da_cv_to_global(cv_size, cv_size_domain, x, xp, mzs, xg)
-      call da_cv_to_global(cv_size, cv_size_domain, y, xp, mzs, yg)
+      call da_cv_to_global(cv_size, cv_size_domain, x, grid, mzs, xg)
+      call da_cv_to_global(cv_size, cv_size_domain, y, grid, mzs, yg)
 
       if (rootproc) then
          dtemp1(1) = da_dot(cv_size_domain, xg, yg)

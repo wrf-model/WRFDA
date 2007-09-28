@@ -1,4 +1,4 @@
-subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
+subroutine da_write_oa_rad_ascii ( ob, iv, re )
 
    !---------------------------------------------------------------------------
    ! Purpose: write out OMB and OMA vector structure for radiance data.
@@ -6,7 +6,6 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
 
    implicit none
 
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
    type (y_type),     intent(in)  :: ob       ! Observation structure.
    type (iv_type),    intent(in)  :: iv       ! O-B structure.
    type (y_type),     intent(in)  :: re       ! O-A structure.
@@ -223,7 +222,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                nlevelss  = iv%instid(i)%nlevels
                write(unit=oma_rad_unit,fmt=*) &
                   'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
-               do k=xp%kts,xp%kte
+               do k=kts,kte
                   if (k <= nlevelss) then
                      write(unit=oma_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
                         k, &                             ! RTTOV levels

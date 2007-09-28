@@ -1,7 +1,7 @@
 module da_gpspw
 
    use module_dm, only : wrf_dm_sum_real
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print,kts,kte, &
@@ -11,7 +11,7 @@ module da_gpspw
       max_error_bt, max_error_buv, gpspw,max_error_thickness, &
       pseudo_var, num_pseudo, use_gpspwobs, max_error_pw, &
       fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
-      pseudo_z,pseudo_val,max_error_ref, trace_use_dull, pseudo
+      pseudo_z,pseudo_val,max_error_ref, trace_use_dull, pseudo, its,ite,jts,jte
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       gpspw_type, maxmin_type

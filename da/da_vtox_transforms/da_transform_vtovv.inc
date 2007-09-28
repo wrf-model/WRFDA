@@ -20,8 +20,7 @@ subroutine da_transform_vtovv(grid, cv_size, be, cv, vv)
    ! [1.0] Fill vv arrays from 1-dimensional cv array.
    !-------------------------------------------------------------------------
 
-   call da_cv_to_vv(cv_size, cv, grid%xp, &
-      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), vv)
+   call da_cv_to_vv(cv_size, cv, (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), vv)
 
    !-------------------------------------------------------------------------
    ! [2.0] Perform VToVV Transform:
@@ -31,48 +30,42 @@ subroutine da_transform_vtovv(grid, cv_size, be, cv, vv)
 
    mz = be % v1 % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid,mz, &
-         be % v1 % rf_alpha, be % v1 % val, grid%xp, vv % v1)
+      call da_transform_through_rf(grid,mz, be % v1 % rf_alpha, be % v1 % val, vv % v1)
    end if
 
    ! [2.2] Transform 2nd control variable:
 
    mz = be % v2 % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid, mz, &
-         be % v2 % rf_alpha, be % v2 % val, grid%xp, vv % v2)
+      call da_transform_through_rf(grid, mz, be % v2 % rf_alpha, be % v2 % val, vv % v2)
    end if
 
    ! [2.3] Transform 3rd control variable
 
    mz = be % v3 % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid, mz, &
-         be % v3 % rf_alpha,be % v3 % val, grid%xp, vv % v3)
+      call da_transform_through_rf(grid, mz, be % v3 % rf_alpha,be % v3 % val, vv % v3)
    end if
 
    ! [2.4] Transform 4th control variable
       
    mz = be % v4 % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid, mz, &
-         be % v4 % rf_alpha, be % v4 % val, grid%xp, vv % v4)
+      call da_transform_through_rf(grid, mz, be % v4 % rf_alpha, be % v4 % val, vv % v4)
    end if
 
    ! [2.5] Transform 5th control variable
 
    mz = be % v5 % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid, mz, &
-         be % v5 % rf_alpha, be % v5 % val, grid%xp, vv % v5)
+      call da_transform_through_rf(grid, mz, be % v5 % rf_alpha, be % v5 % val, vv % v5)
    end if
 
    ! [2.6] Transform alpha control variable
 
    mz = be % alpha % mz
    if (mz > 0) then
-      call da_transform_through_rf(grid, mz, &
-         be % alpha % rf_alpha, be % alpha % val, grid%xp, vv % alpha)
+      call da_transform_through_rf(grid, mz, be % alpha % rf_alpha, be % alpha % val, vv % alpha)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vtovv")

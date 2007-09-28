@@ -1,6 +1,6 @@
 module da_gpsref
 
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xb_type, domain
    use module_dm, only : wrf_dm_sum_real
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
@@ -11,7 +11,7 @@ module da_gpsref
       max_error_bt, max_error_buv, gpsref,max_error_thickness, &
       pseudo_var, num_pseudo, kms,kme,kts,kte, trace_use_dull, &
       anal_type_verify,fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
-      use_gpsrefobs,pseudo_z,pseudo_val,max_error_ref, pseudo
+      use_gpsrefobs,pseudo_z,pseudo_val,max_error_ref, pseudo, jts, jte,its,ite
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       gpsref_type, maxmin_type

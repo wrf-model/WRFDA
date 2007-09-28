@@ -1,4 +1,4 @@
-subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
+subroutine da_read_kma1dvar (inst,iv, ob, infile)
 
    !---------------------------------------------------------------------------
    ! Purpose: read in kma 1dvar innovation output to innovation and obs structure
@@ -15,7 +15,6 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    ! subroutine argument
    integer           ,  intent (in)    :: inst
    character(20)     ,  intent (in)    :: infile
-   type (xpose_type) ,  intent (in)    :: xp
    type (y_type)     ,  intent (inout) :: ob
    type (iv_type)    ,  intent (inout) :: iv
 
@@ -102,7 +101,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
       info%lat  =  rlat
       info%lon  =  rlon
-      call da_llxy (info, loc, xp, outside, inside_halo )
+      call da_llxy (info, loc, outside, inside_halo )
       if (outside) cycle
 
       info%elv = srf_height

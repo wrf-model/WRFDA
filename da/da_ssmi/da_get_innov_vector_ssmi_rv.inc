@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
+subroutine da_get_innov_vector_ssmi_rv (it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
    implicit none
 
    integer,       intent(in)    :: it         ! External iteration.
-   type(xb_type), intent(in)    :: xb         ! first guess state.
+   type(domain),  intent(in)    :: grid       ! first guess state.
    type(y_type),  intent(in)    :: ob         ! Observation structure.
    type(iv_type), intent(inout) :: iv         ! O-B structure.
 
@@ -41,8 +41,8 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
       iv % ssmi_rv(n) % tpw % inv  = 0.0
       if (abs(ob % ssmi_rv(n) % tpw - missing_r) > 1.0  .and.  &  
             iv % ssmi_rv(n) % tpw % qc >= obs_qc_pointer) then
-         model_tpw = dym*(dxm*xb%tpw(i,j) + dx*xb%tpw(i+1,j)) + &
-            dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
+         model_tpw = dym*(dxm*grid%xb%tpw(i,j) + dx*grid%xb%tpw(i+1,j)) + &
+            dy *(dxm*grid%xb%tpw(i,j+1) + dx*grid%xb%tpw(i+1,j+1))
 
          iv % ssmi_rv(n) % tpw % inv = ob % ssmi_rv(n) % tpw - model_tpw
       end if
@@ -53,8 +53,8 @@ subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
       if (abs(ob % ssmi_rv(n) % speed - missing_r) > 1.0 .and.     &
           iv % ssmi_rv(n) % speed % qc >= obs_qc_pointer) then
 
-         model_speed = dym*(dxm*xb%speed(i,j ) + dx*xb%speed(i+1,j )) &
-            + dy *(dxm*xb%speed(i,j+1) + dx*xb%speed(i+1,j+1))
+         model_speed = dym*(dxm*grid%xb%speed(i,j ) + dx*grid%xb%speed(i+1,j )) &
+            + dy *(dxm*grid%xb%speed(i,j+1) + dx*grid%xb%speed(i+1,j+1))
          iv % ssmi_rv(n) % speed % inv =  &
             ob % ssmi_rv(n) % speed - model_speed
       end if

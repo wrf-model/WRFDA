@@ -1,4 +1,4 @@
-subroutine da_read_obs_ascii (iv, xp, filename)
+subroutine da_read_obs_ascii (iv, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Read a GTS observation file
@@ -26,7 +26,6 @@ subroutine da_read_obs_ascii (iv, xp, filename)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
    type (iv_type),    intent(inout) :: iv
    character(len=*),  intent(in)    :: filename
 
@@ -257,7 +256,7 @@ subroutine da_read_obs_ascii (iv, xp, filename)
          exit
       end if
 
-      call da_llxy (platform%info, platform%loc, xp, outside, outside_all)
+      call da_llxy (platform%info, platform%loc, outside, outside_all)
 
       if (outside_all) then
          cycle reports
@@ -310,7 +309,7 @@ subroutine da_read_obs_ascii (iv, xp, filename)
       nlevels = platform%info%levels
       ! Loop over duplicating obs for global
       ndup = 1
-      if (global .and. (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
+      if (global .and. (platform%loc%i < ids .or. platform%loc%i >= ide)) ndup= 2
 
       ! It is possible that logic for counting obs is incorrect for the 
       ! global case with >1 MPI tasks due to obs duplication, halo, etc.  
@@ -855,10 +854,10 @@ subroutine da_read_obs_ascii (iv, xp, filename)
 
          if (global .and. n < 2) then
             if (test_wrfvar) exit dup_loop
-            if (platform%loc % i >= xp % ide) then
-               platform%loc%i = platform%loc % i - xp % ide
-            else if (platform%loc % i < xp % ids) then
-               platform%loc%i = platform%loc % i + xp % ide
+            if (platform%loc % i >= ide) then
+               platform%loc%i = platform%loc % i - ide
+            else if (platform%loc % i < ids) then
+               platform%loc%i = platform%loc % i + ide
             end if
 
             platform%loc%proc_domain = .not. platform%loc%proc_domain

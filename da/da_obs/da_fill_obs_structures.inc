@@ -1,4 +1,4 @@
-subroutine da_fill_obs_structures(xp, iv, ob)
+subroutine da_fill_obs_structures(iv, ob)
 
    !----------------------------------------------------------------------------   
    ! Purpose: Allocates observation structure and fills it from iv.
@@ -6,7 +6,6 @@ subroutine da_fill_obs_structures(xp, iv, ob)
 
    implicit none
 
-   type (xpose_type), intent(in) :: xp   ! Domain decomposition vars.
    type (iv_type), intent(inout) :: iv   ! Obs and header structure.
    type (y_type), intent(out)    :: ob   ! (Smaller) observation structure.
 
@@ -382,7 +381,7 @@ subroutine da_fill_obs_structures(xp, iv, ob)
    
    ! [2.14] Setup pseudo observations:
 
-   if (iv%nlocal(pseudo) > 0) call da_setup_pseudo_obs(xp, iv, ob)
+   if (iv%nlocal(pseudo) > 0) call da_setup_pseudo_obs(iv, ob)
 
    ! [2.15] Transfer scatterometer obs:
 

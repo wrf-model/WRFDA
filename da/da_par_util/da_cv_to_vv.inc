@@ -1,4 +1,4 @@
-subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
+subroutine da_cv_to_vv (cv_size, rcv, mzs, vv)
 
    !---------------------------------------------------------------------------
    ! Purpose: Fill (local) vv arrays from 1D (local) cv array.
@@ -8,7 +8,6 @@ subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
 
    integer,        intent(in)    :: cv_size     ! Length of CV array.
    real,           intent(in)    :: rcv(1:cv_size) ! Control variables v.
-   type (xpose_type), intent(in) :: xp          ! Dimensions and xpose buffers.
    integer,        intent(in)    :: mzs(:) ! Background error structure levels.
    type (vp_type), intent(inout) :: vv          ! Grdipt/EOF cv_array.
 
@@ -21,10 +20,10 @@ subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
 
    if (trace_use) call da_trace_entry("da_cv_to_vv")
 
-   is = xp % its
-   ie = xp % ite
-   js = xp % jts
-   je = xp % jte
+   is = its
+   ie = ite
+   js = jts
+   je = jte
    ix = ie-is+1
    jy = je-js+1
    cv_e = 0

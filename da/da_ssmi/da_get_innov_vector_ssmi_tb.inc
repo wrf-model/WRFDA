@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
+subroutine da_get_innov_vector_ssmi_tb (it, grid, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,7 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
    implicit none
 
    integer,       intent(in)    :: it         ! External iteration.
-   type(xb_type), intent(in)    :: xb         ! first guess state.
+   type(domain),  intent(in)    :: grid       ! first guess state.
    type(y_type),  intent(in)    :: ob         ! Observation structure.
    type(iv_type), intent(inout) :: iv         ! O-B structure.
 
@@ -66,8 +66,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb19h
 
       if (abs(ob % ssmi_tb(n) % tb19h - missing_r) > 1.0) then
-         model_tb19h = dym*(dxm*xb%tb19h(i,j)   + dx*xb%tb19h(i+1,j)) &
-            + dy *(dxm*xb%tb19h(i,j+1) + dx*xb%tb19h(i+1,j+1))
+         model_tb19h = dym*(dxm*grid%xb%tb19h(i,j)   + dx*grid%xb%tb19h(i+1,j)) &
+            + dy *(dxm*grid%xb%tb19h(i,j+1) + dx*grid%xb%tb19h(i+1,j+1))
          iv % ssmi_tb(n) % tb19h % inv = ob % ssmi_tb(n) % tb19h - &
             model_tb19h
       else
@@ -77,8 +77,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb19v
 
       if (abs(ob % ssmi_tb(n) % tb19v - missing_r) > 1.0) then
-         model_tb19v = dym*(dxm*xb%tb19v(i,j)   + dx *xb%tb19v(i+1,j)) &
-            + dy *(dxm*xb%tb19v(i,j+1) + dx *xb%tb19v(i+1,j+1))
+         model_tb19v = dym*(dxm*grid%xb%tb19v(i,j)   + dx *grid%xb%tb19v(i+1,j)) &
+            + dy *(dxm*grid%xb%tb19v(i,j+1) + dx *grid%xb%tb19v(i+1,j+1))
          iv % ssmi_tb(n) % tb19v % inv = ob % ssmi_tb(n) % tb19v - &
             model_tb19v
       else
@@ -88,8 +88,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
      ! Tb19v
 
       if (abs(ob % ssmi_tb(n) % tb22v - missing_r) > 1.0) then
-         model_tb22v = dym*(dxm*xb%tb22v(i,j) + dx *xb%tb22v(i+1,j)) &
-            + dy *(dxm*xb%tb22v(i,j+1) + dx *xb%tb22v(i+1,j+1))
+         model_tb22v = dym*(dxm*grid%xb%tb22v(i,j) + dx *grid%xb%tb22v(i+1,j)) &
+            + dy *(dxm*grid%xb%tb22v(i,j+1) + dx *grid%xb%tb22v(i+1,j+1))
          iv % ssmi_tb(n) % tb22v % inv = ob % ssmi_tb(n) % tb22v - &
             model_tb22v
       else
@@ -99,8 +99,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb37h
 
       if (abs(ob % ssmi_tb(n) % tb37h - missing_r) > 1.0) then
-         model_tb37h = dym*(dxm*xb%tb37h(i,j)  + dx *xb%tb37h(i+1,j)) &
-            + dy *(dxm*xb%tb37h(i,j+1) + dx *xb%tb37h(i+1,j+1))
+         model_tb37h = dym*(dxm*grid%xb%tb37h(i,j)  + dx *grid%xb%tb37h(i+1,j)) &
+            + dy *(dxm*grid%xb%tb37h(i,j+1) + dx *grid%xb%tb37h(i+1,j+1))
          iv % ssmi_tb(n) % tb37h % inv = ob % ssmi_tb(n) % tb37h - &
             model_tb37h
       else
@@ -110,8 +110,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb37v
 
       if (abs(ob % ssmi_tb(n) % tb37v - missing_r) > 1.0) then
-         model_tb37v = dym*(dxm*xb%tb37v(i,j)  + dx *xb%tb37v(i+1,j)) &
-            + dy *(dxm*xb%tb37v(i,j+1) + dx *xb%tb37v(i+1,j+1))
+         model_tb37v = dym*(dxm*grid%xb%tb37v(i,j)  + dx *grid%xb%tb37v(i+1,j)) &
+            + dy *(dxm*grid%xb%tb37v(i,j+1) + dx *grid%xb%tb37v(i+1,j+1))
          iv % ssmi_tb(n) % tb37v % inv = ob % ssmi_tb(n) % tb37v - &
             model_tb37v
       else
@@ -121,8 +121,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb85h
 
       if (abs(ob % ssmi_tb(n) % tb85h - missing_r) > 1.0) then
-         model_tb85h = dym*(dxm*xb%tb85h(i,j) + dx *xb%tb85h(i+1,j)) &
-            + dy *(dxm*xb%tb85h(i,j+1) + dx *xb%tb85h(i+1,j+1))
+         model_tb85h = dym*(dxm*grid%xb%tb85h(i,j) + dx *grid%xb%tb85h(i+1,j)) &
+            + dy *(dxm*grid%xb%tb85h(i,j+1) + dx *grid%xb%tb85h(i+1,j+1))
          iv % ssmi_tb(n) % tb85h % inv = ob % ssmi_tb(n) % tb85h - &
             model_tb85h
       else
@@ -132,8 +132,8 @@ subroutine da_get_innov_vector_ssmi_tb (it, xb, ob, iv)
       ! Tb85v
 
       if (abs(ob % ssmi_tb(n) % tb85v - missing_r) > 1.0) then
-         model_tb85v = dym*(dxm*xb%tb85v(i,j) + dx *xb%tb85v(i+1,j)) &
-            + dy *(dxm*xb%tb85v(i,j+1) + dx *xb%tb85v(i+1,j+1))
+         model_tb85v = dym*(dxm*grid%xb%tb85v(i,j) + dx *grid%xb%tb85v(i+1,j)) &
+            + dy *(dxm*grid%xb%tb85v(i,j+1) + dx *grid%xb%tb85v(i+1,j+1))
          iv % ssmi_tb(n) % tb85v % inv = ob % ssmi_tb(n) % tb85v -  &
             model_tb85v
       else
