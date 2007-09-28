@@ -1,9 +1,7 @@
 ;********************************************************
 ;ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ; Author : Syed RH Rizvi   MMM/NCAR   09/22/2007
-; Purpose: Plots WRF-Var analysis output
-;          Horizntal crossection for 
-;          u,v, theeta & q (gm/Kg) ) in one panel
+; Purpose: Plots difference of two wrfinput or wrfout files     
 ;=========================================================;
 ;
 ; 
@@ -16,33 +14,50 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;         b) "wrf_user_fortran_util_0.so" file is created by using 
 ;            "WRAPIT wrf_user_fortran_util_0.f" command
 ;****************************************************************************
-;  Fix WRFVAR_DIR & location of analysis file here                               
+;****************Change lines below *****************************************
+;
+;  Fix WRFVAR_DIR & location of analysis file here
 ;
 load "/ptmp/rizvi/trunk/graphics/ncl/WRF_contributed.ncl.test"
-;analysis = addfile("/mmm/mmmtmp/rizvi/data/india_30km/trunk_with_radar/fc/2005090806/wrfinput_d01"+".nc", "r") 
-analysis = addfile("/mmm/mmmtmp/rizvi/data/india_30km/run_cv_options_hum_rh_md2/fc/2005080500/wrfinput_d01"+".nc", "r") 
-;
+file1 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/with_density_update/fc/2005090806/wrfinput_d01"+".nc", "r")
+;file2 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/without_density_update/fc/2005090806/wrfinput_d01"+".nc", "r")
+file2 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/rc/2005090806/wrfinput_d01"+".nc", "r")
+
 ;****************************************************************************
 begin
-;****************************************************************************
+   ;***************************************************************************
+   ; open file 
+   ;***************************************************************************
 
    works = "x11"
+   sigma_lev=25
    thinning_factor = 0.025
-   vector_magnitude = 20.0
-   vector_length    = 0.05  
+   vector_magnitude = 1.0
+   vector_length    = 0.05
 
-   sigma_lev=10
-   var_U="U"
-   var_V="V"
-   var_T="T"
-   var_Q="Q"
 
    unit_Q="gm/Kg"
 
-   T = analysis->T(0,sigma_lev-1,:,:)      ; Theta
-   U = analysis->U(0,sigma_lev-1,:,:)       ; u-wind compt.
-   V = analysis->V(0,sigma_lev-1,:,:)       ; v-wind compt.
-   Q = analysis->QVAPOR(0,sigma_lev-1,:,:)  ; qvapor    
+
+   T1 = file1->T(0,sigma_lev-1,:,:)      ; Theta
+   U1 = file1->U(0,sigma_lev-1,:,:)      ; u-wind compt.
+   V1 = file1->V(0,sigma_lev-1,:,:)      ; v-wind compt.
+   Q1 = file1->QVAPOR(0,sigma_lev-1,:,:)      ; QVAPOR       
+
+
+   T2 = file2->T(0,sigma_lev-1,:,:)      ; Theta
+   U2 = file2->U(0,sigma_lev-1,:,:)      ; u-wind compt.
+   V2 = file2->V(0,sigma_lev-1,:,:)      ; v-wind compt.
+   Q2 = file2->QVAPOR(0,sigma_lev-1,:,:)      ; VAPOR       
+
+   T = T1 - T2     
+   U = U1 - U2     
+   V = V1 - V2     
+   Q = Q1 - Q2     
+
+   U@units = U1@units
+   V@units = V1@units
+   T@units = T1@units
 
    QgmpKg = 1000.0 * Q
    unit_Q="gm/Kg"
@@ -53,12 +68,11 @@ begin
   print ("max U = "+max(U))
   print ("min V = "+min(V))
   print ("max V = "+max(V))
-  print ("min QV (gm/Kg.) = "+min(Q))
-  print ("max QV (gm/Kg.) = "+max(Q))
+  print ("min QV (gm/Kg.) = "+min(QgmpKg))
+  print ("max QV (gm/Kg.) = "+max(QgmpKg))
 
-
-   lat = analysis->XLAT(0,:,:)
-   lon = analysis->XLONG(0,:,:)
+   lat = file1->XLAT(0,:,:)
+   lon = file1->XLONG(0,:,:)
    dims = dimsizes(lat)
 
    dimU  = dimsizes(U)
@@ -73,13 +87,14 @@ begin
    UU@units = U@units
    VV@units = V@units
 
+
    ;**********************No need change lines here onward **********************
-   ; create plots  
+   ; create plots
    ;********************************************************
 
    plts                      = new (4,"graphic")
 
-   wks = gsn_open_wks(works,"analysis_sigma_"+sigma_lev)          ; ps,pdf,x11,ncgm,eps
+   wks = gsn_open_wks(works,"diff_sigma_"+sigma_lev)          ; ps,pdf,x11,ncgm,eps
    gsn_define_colormap(wks,"gui_default")           ; select color map
 
    res                       = True            ; plot mods desired
@@ -106,7 +121,7 @@ begin
   res@vcRefLengthF       = vector_length      ; define vector ref length
   res@vcMinDistanceF        = thinning_factor  ; larger means sparser
 
-   WRF_map_c(analysis,res,0)                ; set map resources
+   WRF_map_c(file1,res,0)                ; set map resources
 
    ;
    ; Select portion of the map to view.
@@ -135,11 +150,11 @@ begin
    res@gsnSpreadColors       = True           ; use entire color map
    res@gsnLeftString         = "U"
    res@gsnRightString        = UU@units
-   plts(0)                   = gsn_csm_vector_scalar_map(wks,UU,VV,UU,res) ;vector overlaid 
-   res@gsnLeftString         = "V"    
+   plts(0)                   = gsn_csm_vector_scalar_map(wks,UU,VV,UU,res) ;vector overlaid
+   res@gsnLeftString         = "V"
    res@gsnRightString        = VV@units
    res@cnFillOn              = True           ; turn on color
-   plts(1)                   = gsn_csm_vector_scalar_map(wks,UU,VV,VV,res) ;vector overlaid 
+   plts(1)                   = gsn_csm_vector_scalar_map(wks,UU,VV,VV,res) ;vector overlaid
 
 ; resource for T and QV (contour)
   res1                       = True           ; plot mods desired
@@ -152,7 +167,7 @@ begin
   res1@cnLineLabelsOn        = False          ; turn off contour line labels
   res1@gsnSpreadColors       = True           ; use entire color map
 
-  WRF_map_c(analysis,res1,0)                ; set map resources
+  WRF_map_c(file1,res1,0)                ; set map resources
 
 
   res1@mpGridAndLimbOn       = True           ; trun on lat/lon lines
@@ -163,12 +178,12 @@ begin
 
 
 
-   res1@gsnLeftString         = "Theta"   
+   res1@gsnLeftString         = "Theta"
    res1@gsnRightString        = T@units
    plts(2)                   = gsn_csm_contour_map(wks,T,res1)
 
    res1@gsnLeftString         = "QV"
-   res1@gsnRightString        = unit_Q 
+   res1@gsnRightString        = unit_Q
    plts(3)                   = gsn_csm_contour_map(wks,QgmpKg,res1)
 
    ;************************************************
@@ -176,15 +191,14 @@ begin
    ;************************************************
    resP                  = True                   ; modify the panel plot
    resP@gsnFrame         = False                  ; don't advance panel plot
-   resP@txString         = "Analysis"
+   resP@txString         = "Difference"   
    resP@gsnMaximize      = True                   ; maximize panel area
    resP@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
    gsn_panel(wks,plts,(/2,2/),resP)               ; now draw as one plot
   txres               = True
   txres@txFontHeightF = 0.012
- 
+
   gsn_text_ndc(wks,"Horizontal Cross-section at sigma_level="+sigma_lev ,0.5,0.94,txres)
   frame(wks)
-
 
 end
