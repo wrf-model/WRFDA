@@ -86,77 +86,77 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs2.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'hirs2.bufr'
-         call da_read_bufrtovs ('hirs2', iv, filename)
+         call da_read_obs_bufrtovs ('hirs2', iv, filename)
       end if
 
       if (use_msuobs) then
          filename = ' '
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from msu.bufr'
          write(filename(1:8), fmt='(a)') 'msu.bufr'
-         call da_read_bufrtovs ('msu  ', iv, filename)
+         call da_read_obs_bufrtovs ('msu  ', iv, filename)
       end if
 
       if (use_hirs3obs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs3.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'hirs3.bufr'
-         call da_read_bufrtovs('hirs3', iv, filename)
+         call da_read_obs_bufrtovs('hirs3', iv, filename)
       end if
 
       if (use_amsuaobs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from amsua.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'amsua.bufr'
-         call da_read_bufrtovs ('amsua', iv, filename)
+         call da_read_obs_bufrtovs ('amsua', iv, filename)
       end if
 
       if (use_amsubobs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from amsub.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'amsub.bufr'
-         call da_read_bufrtovs ('amsub', iv, filename)
+         call da_read_obs_bufrtovs ('amsub', iv, filename)
       end if
 
       if (use_hirs4obs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs4.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'hirs4.bufr'
-         call da_read_bufrtovs('hirs4', iv, filename)
+         call da_read_obs_bufrtovs('hirs4', iv, filename)
       end if
 
       if (use_mhsobs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from mhs.bufr'
          filename = ' '
          write(filename(1:8), fmt='(a)') 'mhs.bufr'
-         call da_read_bufrtovs('mhs  ', iv, filename)
+         call da_read_obs_bufrtovs('mhs  ', iv, filename)
       end if
 
       if (use_airsobs) then
          write(unit=stdout,fmt='(a)') 'Reading airs 1b data from airs.bufr'
          filename = ' '
          write(filename(1:9), fmt='(a)') 'airs.bufr'
-         call da_read_bufrairs ('airs     ',iv, filename)
+         call da_read_obs_bufrairs ('airs     ',iv, filename)
       end if
 
       if (use_eos_amsuaobs) then
          write(unit=stdout,fmt='(a)') 'Reading eos_amsua 1b data from airs.bufr'
          filename = ' '
          write(filename(1:9), fmt='(a)') 'airs.bufr'
-         call da_read_bufrairs ('eos_amsua',iv, filename)
+         call da_read_obs_bufrairs ('eos_amsua',iv, filename)
       end if
 
       if (use_hsbobs) then
          write(unit=stdout,fmt='(a)') 'Reading hsb 1b data from airs.bufr'
          filename = ' '
          write(filename(1:9), fmt='(a)') 'airs.bufr'
-         call da_read_bufrairs ('hsb      ',iv, filename)
+         call da_read_obs_bufrairs ('hsb      ',iv, filename)
       end if
 
       if (use_ssmisobs) then
          write(unit=stdout,fmt='(a)') 'Reading ssmis data from ssmis.bufr'
          filename = ' '
          write(filename(1:10), fmt='(a)') 'ssmis.bufr'
-         call da_read_bufrssmis ('ssmis',iv, filename)
+         call da_read_obs_bufrssmis ('ssmis',iv, filename)
       end if
 
    else

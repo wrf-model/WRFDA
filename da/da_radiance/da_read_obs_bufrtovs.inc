@@ -1,4 +1,4 @@
-subroutine da_read_bufrtovs (obstype,iv, infile)
+subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
@@ -78,7 +78,7 @@ subroutine da_read_bufrtovs (obstype,iv, infile)
    integer :: lnbufr
    integer :: n
 
-   call da_trace_entry("da_read_bufrtovs")
+   call da_trace_entry("da_read_obs_bufrtovs")
 
    ! Initialize variables
 
@@ -156,7 +156,7 @@ subroutine da_read_bufrtovs (obstype,iv, infile)
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open file "//trim(infile)/))
       call da_free_unit(lnbufr)
-      call da_trace_exit("da_read_bufrtovs")
+      call da_trace_exit("da_read_obs_bufrtovs")
       return
    end if
 
@@ -457,9 +457,9 @@ subroutine da_read_bufrtovs (obstype,iv, infile)
    !    p => p%next
    ! end do
 
-   call da_trace_exit("da_read_bufrtovs")
+   call da_trace_exit("da_read_obs_bufrtovs")
 #endif
 
-end subroutine da_read_bufrtovs
+end subroutine da_read_obs_bufrtovs
 
 

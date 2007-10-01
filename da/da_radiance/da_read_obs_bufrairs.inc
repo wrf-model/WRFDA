@@ -1,4 +1,4 @@
-subroutine da_read_bufrairs(obstype,iv,infile)
+subroutine da_read_obs_bufrairs(obstype,iv,infile)
    !--------------------------------------------------------
    !  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
    !            to innovation structure
@@ -132,7 +132,7 @@ subroutine da_read_bufrairs(obstype,iv,infile)
   type(model_loc_type)       :: loc
   type (datalink_type), pointer   :: head, p, current
 
-   if (trace_use_dull) call da_trace_entry("da_read_bufrairs")
+   if (trace_use_dull) call da_trace_entry("da_read_obs_bufrairs")
 
 !  0.0  Initialize variables
 !-----------------------------------
@@ -480,8 +480,8 @@ subroutine da_read_bufrairs(obstype,iv,infile)
       call da_free_unit(airs_table_unit)
    end if
 
-   if (trace_use_dull) call da_trace_exit("da_read_bufrairs")
+   if (trace_use_dull) call da_trace_exit("da_read_obs_bufrairs")
 
 #endif
 
-end subroutine da_read_bufrairs
+end subroutine da_read_obs_bufrairs
