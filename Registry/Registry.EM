@@ -734,7 +734,7 @@ state    real  XLONG_U          ij      dyn_em      1         X     i012rh01du=(
 state    real  XLAT_V           ij      dyn_em      1         Y     i012rh01du=(copy_fcnm)       "XLAT_V"              "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
 state    real  XLONG_V          ij      dyn_em      1         Y     i012rh01du=(copy_fcnm)       "XLONG_V"             "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
 state    real  ALBEDO           ij      misc        1         -      rh          "ALBEDO"                   "ALBEDO"
-state    real  ALBBCK           ij      misc        1         -     i012r        "ALBBCK"                   "BACKGROUND ALBEDO"        ""
+state    real  ALBBCK           ij      misc        1         -     i012rh       "ALBBCK"                   "BACKGROUND ALBEDO"        ""
 state    real  EMISS            ij      misc        1         -      r        "EMISS"                 "SURFACE EMISSIVITY"         "" 
 
 state    real  CLDEFI           ij      misc        1         -      r        "CLDEFI"                "precipitation efficiency in BMJ SCHEME"    ""      
@@ -1155,14 +1155,6 @@ state integer nodyn_dummy - dyn_nodyn -  -  -  "" "" ""
 
 package   dyn_nodyn    dyn_opt==0                   -             -
 package   dyn_em       dyn_opt==2                   -             -
-ifdef DA_CORE=1
-# 4DVAR
-package   dyn_em_sn    dyn_opt==102                 -             -
-package   dyn_em_tl    dyn_opt==202                 -             -
-package   dyn_em_ad    dyn_opt==302                 -             -
-package   dyn_em_tst   dyn_opt==402                 -             -
-package   dyn_em_var   dyn_opt==502                 -             -
-endif
 
 #package   passivec1     chem_opt==0                  -             
 package   passiveqv     mp_physics==0                -             moist:qv
