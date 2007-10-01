@@ -2,7 +2,7 @@
 
 . ./setup.ksh
 
-export EXPT=${EXPT:-vartest}
+export EXPT=${EXPT:-expt}
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}

@@ -576,7 +576,7 @@ else
 
    if [[ -f wrfvar_output ]]; then
       if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
-         mv wrfvar_output $DA_ANALYSIS
+         cp wrfvar_output $DA_ANALYSIS
       fi
    fi
 
@@ -585,32 +585,17 @@ else
       mv trace/* $RUN_DIR/trace
    fi
 
-   rm -rf $RUN_DIR/rsl
-   mkdir -p $RUN_DIR/rsl
-   cd $RUN_DIR/rsl
-   for FILE in $WORK_DIR/rsl*; do
-      if [[ -f $FILE ]]; then
-         FILE1=$(basename $FILE)
-         echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
-         echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
-         cat $FILE >> $FILE1.html
-         echo "</PRE></BODY></HTML>" >> $FILE1.html
-         rm $FILE
-      fi
-   done
-   cd $RUN_DIR
-
    if $NL_VAR4D; then
-      cp $WORK_DIR/namelist_wrfvar.output namelist_wrfvar.output
-      cp $WORK_DIR/nl/namelist.output     namelist_nl.output
-      cp $WORK_DIR/tl/namelist.output     namelist_tl.output
-      cp $WORK_DIR/ad/namelist.output     namelist_ad.output
+      cp $WORK_DIR/namelist_wrfvar.output $RUN_DIR/namelist_wrfvar.output
+      cp $WORK_DIR/nl/namelist.output     $RUN_DIR/namelist_nl.output
+      cp $WORK_DIR/tl/namelist.output     $RUN_DIR/namelist_tl.output
+      cp $WORK_DIR/ad/namelist.output     $RUN_DIR/namelist_ad.output
       echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
       echo '<A HREF="namelist_nl.output">NL namelist.output</a>'
       echo '<A HREF="namelist_tl.output">TL namelist.output</a>'
       echo '<A HREF="namelist_ad.output">AD namelist.output</a>'
    else
-      cp $WORK_DIR/namelist.output .
+      cp $WORK_DIR/namelist.output $RUN_DIR
       echo '<A HREF="namelist.output">Namelist.output</a>'
    fi
 

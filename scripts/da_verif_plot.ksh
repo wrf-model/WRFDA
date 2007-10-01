@@ -7,9 +7,10 @@
 #
 #============================================================;
 
-export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/codee/trunk/wrfvar}
-export REG_DIR=${REG_DIR:-$HOME/data/con200}
+export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/trunk/wrfvar}
+export REG_DIR=${REG_DIR:-$HOME/data/trunk/con200}
 export NUM_EXPT=${NUM_EXPT:-2}
+export EXP_DIRS=${1:-${REG_DIR}/NO_NOISE ${REG_DIR}/NOISE}
 export EXP_NAMES=${EXP_NAMES:-"NO_NOISE" "NOISE"}
 export EXP_LEGENDS=${EXP_LEGENDS:-(/"no_noise","noise"/)}
 
@@ -46,10 +47,12 @@ rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
 iexp=0
 exp_dirs=''
 out_dirs=''
-for EXP in $EXP_NAMES; do
-   exp_dirs="$exp_dirs '$REG_DIR/$EXP/run',"
-   out_dirs="$out_dirs '$EXP',"
-   pdat_dirs[$iexp]="$EXP/"
+for EXP_DIR in $EXP_DIRS; do
+   exp_dirs="$exp_dirs '$EXP_DIR/run',"
+done
+for EXP_NAME in $EXP_NAMES; do
+   out_dirs="$out_dirs '$EXP_NAME',"
+   pdat_dirs[$iexp]="$EXP_NAME/"
    mkdir -p $EXP
    iexp=$((iexp + 1))
 done

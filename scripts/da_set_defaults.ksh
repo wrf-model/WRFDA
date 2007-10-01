@@ -34,6 +34,7 @@ export RUN_WRFVAR=${RUN_WRFVAR:-false}
 
 # Experiment details:
 export DUMMY=${DUMMY:-false}
+export RELEASE=${RELEASE:-trunk}
 export REGION=${REGION:-con200}
 export DOMAINS=${DOMAINS:-01}                            # Domain names.
 export EXPT=${EXPT:-expt}                             # Experiment name.
@@ -96,7 +97,7 @@ fi
 export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
 
 # Directories:
-export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
+export REL_DIR=${REL_DIR:-$HOME/code/$RELEASE}    # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.

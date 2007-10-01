@@ -5,7 +5,7 @@
 . ./setup.ksh
 
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export EXPT=${ID}_suite
+export EXPT=${ID}
 
 export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}

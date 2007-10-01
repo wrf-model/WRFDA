@@ -17,7 +17,7 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
 if $NL_VAR4D; then
-    export NL_RUN_HOURS=$FCST_RANGE
+   export NL_RUN_HOURS=$FCST_RANGE
 fi
 
 # allow for ensemble members identified by CMEM
@@ -118,21 +118,9 @@ else
       touch wrfnl_go_ahead
    fi
    $RUN_CMD ./wrf.exe
-   RC=$?
    grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
+   RC=$?
 
-   rm -rf $RUN_DIR/rsl
-   mkdir -p $RUN_DIR/rsl
-   mv rsl* $RUN_DIR/rsl > /dev/null 2>&1
-   cd $RUN_DIR/rsl
-   for FILE in rsl*; do
-      echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-      echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-      cat $FILE >> $FILE.html
-      echo "</PRE></BODY></HTML>" >> $FILE.html
-      rm $FILE
-   done
-   cd $WORK_DIR
    cp namelist.output $RUN_DIR
    echo '<A HREF="namelist.output">Namelist output</a>'
 
@@ -156,8 +144,8 @@ else
    echo $(date +'%D %T') "Ended $RC"
 fi
 
-mv wrfinput_* $FC_DIR/$DATE
-mv wrfout_* $FC_DIR/$DATE
+mv $WORK_DIR/wrfinput_* $FC_DIR/$DATE
+mv $WORK_DIR/wrfout_* $FC_DIR/$DATE
 
 if $CLEAN; then
    rm -rf $WORK_DIR

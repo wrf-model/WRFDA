@@ -21,7 +21,7 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_name         = ${REGION}_${EXPT}_${RUN}
+# @ job_name         = ${RELEASE}_${REGION}_${EXPT}_${RUN}
 # @ total_tasks      = $NUM_PROCS
 # @ node             = $NODES
 # @ output           = job.output
@@ -47,7 +47,7 @@ elif [[ $SUBMIT == "LSF" ]]; then
 #
 # LSF batch script
 #
-#BSUB -J ${REGION}_${EXPT}_${RUN} 
+#BSUB -J ${RELEASE}_${REGION}_${EXPT}_${RUN} 
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               

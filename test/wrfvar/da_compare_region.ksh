@@ -18,12 +18,8 @@ fi
 cd $DIR1
 DIR1=$PWD # expand out partial directories
 
-for SUITE in *suite*; do
-   if [[ -d $DIR1/$SUITE && -d $DIR2/$SUITE ]]; then
+for SUITE in *; do
+   if [[ -d $DIR1/$SUITE/run && -d $DIR2/$SUITE/run ]]; then
       da_compare_suite.ksh $DIR1/$SUITE $DIR2/$SUITE
    fi
 done
-
-if [[ -d $DIR1/vartest && -d $DIR2/vartest ]]; then
-   da_compare_vartest.ksh $DIR1/vartest $DIR2/vartest
-fi

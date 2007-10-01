@@ -38,24 +38,25 @@ export FULL=${FULL:-false}
 
 OLD_FILE[1]=cost_fn
 OLD_FILE[2]=grad_fn
-OLD_FILE[3]=statistics
-OLD_FILE[4]=Missing
-OLD_FILE[5]=Missing
-OLD_FILE[6]=wrf-var/fort.60
-OLD_FILE[7]=wrf-var/fort.50
-OLD_FILE[8]=wrf-var/fort.192
-OLD_FILE[9]=wrf-var/fort.45
+OLD_FILE[3]=Missing
+OLD_FILE[4]=statistics
+#OLD_FILE[5]=Missing
+#OLD_FILE[6]=Missing
+#OLD_FILE[7]=wrf-var/fort.60
+#OLD_FILE[8]=wrf-var/fort.50
+#OLD_FILE[9]=wrf-var/fort.192
+#OLD_FILE[10]=wrf-var/fort.45
 
 NEW_FILE[1]=cost_fn
 NEW_FILE[2]=grad_fn
-NEW_FILE[3]=statistics
-NEW_FILE[4]=working/unpert_obs
-NEW_FILE[5]=working/pert_obs
-NEW_FILE[6]=working/check_max_iv
-NEW_FILE[7]=working/gts_omb_oma
-NEW_FILE[8]=working/filtered_obs
-NEW_FILE[9]=working/rand_obs_error
-NEW_FILE[10]=namelist.output
+NEW_FILE[3]=namelist.output
+NEW_FILE[4]=statistics
+#NEW_FILE[5]=working/unpert_obs
+#NEW_FILE[6]=working/pert_obs
+#NEW_FILE[7]=working/check_max_iv
+#NEW_FILE[8]=working/gts_omb_oma
+#NEW_FILE[9]=working/filtered_obs
+#NEW_FILE[10]=working/rand_obs_error
 
 COUNT=1
 
@@ -91,7 +92,7 @@ done
 
 OLD_NETCDF_FILE[1]=wrf-var/wrf_3dvar_output
 
-NEW_NETCDF_FILE[1]=working/analysis
+NEW_NETCDF_FILE[1]=working/wrfvar_output
 
 COUNT=1
 
