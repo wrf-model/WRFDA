@@ -10,5 +10,3 @@ cp main/wrf.F                    $WRFNL_DIR/main/wrf.F
 # Allow namelist_script to be automatically generated
 # Remove -DNO_NAMELIST_PRINT, as we want them printed
 cp arch/configure.defaults       $WRFNL_DIR/arch
-cp tools/*                       $WRFNL_DIR/tools
-cp frame/module_configure.F      $WRFNL_DIR/frame
