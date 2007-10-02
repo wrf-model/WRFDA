@@ -610,7 +610,7 @@ echo "WINDOW_END            $WINDOW_END"
 
       if test -f wrfvar_output; then
          if test $DA_ANALYSIS != wrfvar_output; then 
-            mv wrfvar_output $DA_ANALYSIS
+            cp wrfvar_output $DA_ANALYSIS
          fi
       fi
 
