@@ -14,6 +14,11 @@ io_int.o : io_int.F90 module_internal_header_util.o
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) io_int.F90 | $(M4) $(IO_INT_M4) - > io_int.f
 	$(FC) $(FCFLAGS_NOWARN) -c io_int.f
 
+diffwrf_int.o : diffwrf_int.F
+	$(CPP) $(CPPFLAGS) $(FPPFLAGS) diffwrf_int.F > diffwrf_int.f
+	$(SFC) -c $(FCFLAGS) diffwrf_int.f
+
 diffwrf_int.exe : $(WRF_LIBS) diffwrf_int.o
-	$(FC) $(LDFLAGS) -o diffwrf_int.exe diffwrf_int.o $(WRF_LIB)
+	$(SFC) $(LDFLAGS) -o diffwrf_int.exe diffwrf_int.o $(WRF_LIB)
+	(cd ../main; $(LN) ../build/diffwrf_int.exe .)
 

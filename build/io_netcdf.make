@@ -23,11 +23,12 @@ vort.o : vort.F90 $(IO_NETCDF_CODE)
 
 diffwrf_netcdf.o : diffwrf_netcdf.F
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) $(IO_NETCDF_CPPFLAGS) diffwrf_netcdf.F > diffwrf_netcdf.f
-	$(FC) -c $(FCFLAGS) diffwrf_netcdf.f
+	$(SFC) -c $(FCFLAGS) diffwrf_netcdf.f
 
 field_routines.o: field_routines.F90 wrf_io.o
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) field_routines.F90 > field_routines.f
 	$(FC) -c $(FCFLAGS_NOWARN) $(IO_NETCDF_FCFLAGS) field_routines.f
 
 diffwrf_netcdf.exe : $(WRF_LIBS) diffwrf_netcdf.o
-	$(FC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o $(WRF_LIB)
+	$(SFC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o $(WRF_LIB)
+	(cd ../main; $(LN) ../build/diffwrf_netcdf.exe .)

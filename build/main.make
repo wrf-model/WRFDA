@@ -5,7 +5,7 @@ all_wrf : all_$(SOLVER) diffwrf
 chem : convert_bioemiss convert_emiss
 
 all_em : wrf em_real em_quarter_ss em_squall2d_x em_squall2d_y em_b_wave em_hill2d_x \
-   em_grav2d_x
+   em_grav2d_x diffwrf
 
 all_nmm : wrf nmm_real
 

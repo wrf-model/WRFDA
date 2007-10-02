@@ -441,11 +441,10 @@ logical function iveceq( a, b, n )
   return
 end function iveceq
 
-! Does not need to be a stub, as module_io version available
-! stubs for routines called by module_wrf_error (used by this implementation of IO api)
-!SUBROUTINE wrf_abort
-!  STOP
-!END SUBROUTINE wrf_abort
+! Needs to be a stub to avoid picking up parallel module_dm version
+SUBROUTINE wrf_abort
+  STOP
+END SUBROUTINE wrf_abort
 
 ! Does not need to be a stub, as module_domain version available
 !SUBROUTINE get_current_time_string( time_str )
