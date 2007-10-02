@@ -30,15 +30,14 @@ if $FULL; then
    $WRF_DIR/build/diffwrf_netcdf.exe $FILE1 $FILE2
 fi
 
-TMPFILE=$TMPDIR/$$
+TMPFILE=da_compare_netcdf.temp
 $WRF_DIR/build/diffwrf_netcdf.exe $FILE1 $FILE2 | tail +5 > $TMPFILE
-cat $TMPFILE
+
 MIN_DIGITS=0
 
 if [[ -s $TMPFILE ]]; then
    MIN_DIGITS=100
    { while read A A A A A B A; do
-echo "B $B"
       if [[ $B -lt $MIN_DIGITS ]]; then
          MIN_DIGITS=$B
       fi
@@ -48,7 +47,7 @@ else
 fi
 rm $TMPFILE
 
-if [[ $MIN_DIGITS -lt $DIGITS ]]; then
+if [[ $MIN_DIGITS -gt 0 && $MIN_DIGITS -lt $DIGITS ]]; then
    echo $FILE1 $FILE2 differ at $MIN_DIGITS dp
    exit $MIN_DIGITS
 else 

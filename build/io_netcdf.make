@@ -31,5 +31,5 @@ field_routines.o: field_routines.F90 wrf_io.o
 
 diffwrf_netcdf.exe : diffwrf_netcdf.o wrf_debug.o module_wrf_error.o $(NETCDF_LIBS)
 	$(SFC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o wrf_debug.o module_wrf_error.o \
-           $(NETCDF_LIB) 
+           $(NETCDF_LIB) $(LOCAL_LIB)
 	(cd ../main; $(LN) ../build/diffwrf_netcdf.exe .)
