@@ -233,7 +233,7 @@ if ( Justplot ) then
     call ext_int_get_next_time(dh1, DateStr, Status_next_time)
   enddo
 else
-  print*,'Diffing ',trim(flnm),' ',trim(flnm2)
+  write (6,FMT='(4A)') 'Diffing ',trim(flnm),' ',trim(flnm2)
 
   call ext_int_get_next_time(dh1, DateStr, Status_next_time)
   call ext_int_get_next_time(dh2, DateStr2, Status_next_time2)
