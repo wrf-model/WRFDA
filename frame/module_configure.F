@@ -78,8 +78,13 @@ CONTAINS
       INTEGER              :: io_status
       INTEGER              :: i
 
+      LOGICAL              :: nml_read_error
+
+      CHARACTER (LEN=1024) :: nml_name
+
       INTEGER, PARAMETER :: nml_write_unit= 9
       INTEGER, PARAMETER :: nml_read_unit = 10
+
 
 ! define as temporaries
 #include <namelist_defines.inc>

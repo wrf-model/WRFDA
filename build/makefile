@@ -3,7 +3,7 @@ include configure.wrfvar
 all_wrfvar: serial parallel
 # Do not add convertor to serial target, as it does
 # not compile with pgi and g95 compilers
-serial: wrfvar be da_utils
+serial: wrfvar be da_utils diffwrf
 parallel : wrfvar
 
 setup : depend

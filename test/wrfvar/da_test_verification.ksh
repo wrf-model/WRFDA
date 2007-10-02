@@ -1,9 +1,10 @@
 #!/bin/ksh
 
-. ./setup.ksh
+# da_test_verification.ksh
 
-export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/$ID/wrfvar}
+. da_test_defaults.ksh
+
+. ./setup.ksh
 
 export REG_DIR=$PWD
 

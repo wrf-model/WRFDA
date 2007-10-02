@@ -18,7 +18,9 @@ diffwrf_int.o : diffwrf_int.F
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) diffwrf_int.F > diffwrf_int.f
 	$(SFC) -c $(FCFLAGS) diffwrf_int.f
 
-diffwrf_int.exe : $(WRF_LIBS) diffwrf_int.o
-	$(SFC) $(LDFLAGS) -o diffwrf_int.exe diffwrf_int.o $(WRF_LIB)
+diffwrf_int.exe : diffwrf_int.o io_int.o module_internal_header_util.o module_wrf_error.o \
+   module_machine.o  pack_utils.o $(NETCDF_LIBS)
+	$(SFC) $(LDFLAGS) -o diffwrf_int.exe io_int.o diffwrf_int.o module_internal_header_util.o \
+           module_wrf_error.o module_machine.o pack_utils.o $(NETCDF_LIB)
 	(cd ../main; $(LN) ../build/diffwrf_int.exe .)
 

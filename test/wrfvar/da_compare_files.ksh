@@ -2,6 +2,8 @@
 
 # da_compare_files.ksh
 
+. da_test_defaults.ksh
+
 if [[ $# != 2 ]]; then
    echo "Arguments dir1 dir2"
    exit 1
@@ -19,8 +21,6 @@ if [[ ! -d $DIR2 ]]; then
    echo "Directory $DIR2 does not exist"
    exit 1
 fi
-
-export FULL=${FULL:-false}
 
 COUNT=1
 

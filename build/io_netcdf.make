@@ -29,6 +29,7 @@ field_routines.o: field_routines.F90 wrf_io.o
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) field_routines.F90 > field_routines.f
 	$(FC) -c $(FCFLAGS_NOWARN) $(IO_NETCDF_FCFLAGS) field_routines.f
 
-diffwrf_netcdf.exe : $(WRF_LIBS) diffwrf_netcdf.o
-	$(SFC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o $(WRF_LIB)
+diffwrf_netcdf.exe : diffwrf_netcdf.o wrf_debug.o module_wrf_error.o $(NETCDF_LIBS)
+	$(SFC) $(LDFLAGS) -o diffwrf_netcdf.exe diffwrf_netcdf.o wrf_debug.o module_wrf_error.o \
+           $(NETCDF_LIB) 
 	(cd ../main; $(LN) ../build/diffwrf_netcdf.exe .)

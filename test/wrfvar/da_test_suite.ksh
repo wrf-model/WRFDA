@@ -2,6 +2,8 @@
 
 # da_test_suite.ksh
 
+. da_test_defaults.ksh
+
 if [[ $# != 1 ]]; then
    echo "Arguments test"
    echo "One of : wrfvar wrfvar_tests wrfvar_verbose ideal"
