@@ -1,5 +1,4 @@
 #!/bin/ksh
-
 # da_compare_files.ksh
 
 . da_test_defaults.ksh
@@ -34,11 +33,25 @@ while [[ $COUNT -le ${#TEXT_FILES[@]} ]]; do
       # Can't use -q option as missing from braindead Aix
       diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
       if [[ $? != 0 ]] then
-         DIFFER=1
+         let DIFFER=$DIFFER+1
          echo "$DIR1/$FILE1 $DIR2/$FILE2 differ"
          if $FULL; then
             diff $DIR1/$FILE1 $DIR2/$FILE2
          fi
+      fi
+   fi 
+   let COUNT=$COUNT+1
+done
+
+COUNT=1
+
+while [[ $COUNT -le ${#NETCDF_FILES[@]} ]]; do
+   FILE=${NETCDF_FILES[$COUNT]}
+
+   if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
+      da_compare_netcdf.ksh $DIR1/$FILE $DIR2/$FILE
+      if [[ $? != 0 ]]; then
+         let DIFFER=$DIFFER+1
       fi
    fi 
    let COUNT=$COUNT+1

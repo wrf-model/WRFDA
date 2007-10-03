@@ -1,6 +1,6 @@
 #!/bin/ksh
-
 # da_compare_data.ksh
+# Purpose: Compare top level data directories
 
 DIR1=$1
 DIR2=$2

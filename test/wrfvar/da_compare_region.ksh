@@ -1,6 +1,6 @@
 #!/bin/ksh
-
 # da_compare_region.ksh
+# Purpose: Compare files between regions
 
 DIR1=$1
 DIR2=$2

@@ -1,5 +1,4 @@
 #!/bin/ksh
-
 # da_compare_netcdf.ksh
 # Purpose: Compare netcdf files
 

@@ -76,6 +76,8 @@ echo $(date) "Start"
 
 export DATE=$INITIAL_DATE
 
+RC=0
+
 while [[ $DATE -le $FINAL_DATE ]] ; do 
    export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
@@ -103,7 +105,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}restore_data_grib failed with error$RC$END"
          echo restore_data_grib > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -117,7 +119,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}restore_data_rtobs failed with error$RC$END"
          echo restore_data_rtobs > FAIL
-         exit 1
+         break
       fi
    fi
   
@@ -131,7 +133,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}wps failed with error $RC$END"
          echo wps > FAIL
-         exit 1
+         break
       fi
       export RUN_GEOGRID=false # Only need to run it once.
    fi
@@ -146,7 +148,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}real failed with error $RC$END"
          echo real > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -160,7 +162,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}ideal failed with error $RC$END"
          echo ideal > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -174,7 +176,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}obsproc failed with error $RC$END"
          echo obsproc > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -194,7 +196,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
                if [[ $? != 0 ]]; then
         	  echo $(date) "${ERR}update_bc failed with error $RC$END"
                   echo update_bc > FAIL
-        	  exit 1
+                  break
                fi
             fi 
          fi
@@ -220,7 +222,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}wrfvar failed with error $RC$END"
          echo wrfvar > FAIL
-         exit 1
+         break
       fi
    else     
       if $CYCLING; then
@@ -240,7 +242,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $? != 0 ]]; then
          echo $(date) "${ERR}etkf failed with error $RC$END"
          echo etkf > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -269,7 +271,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             if [[ $? != 0 ]]; then
                echo $(date) "${ERR}update_bc failed with error $RC$END"
                echo update_bc > FAIL
-               exit 1
+               break 2
             fi
 
             let MEM=$MEM+1
@@ -296,8 +298,8 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          RC=$?
          if [[ $? != 0 ]]; then
             echo $(date) "${ERR}update_bc failed with error $RC$END"
-            exit 1
             echo update_bc > FAIL
+            break
          fi
       fi
    fi
@@ -312,7 +314,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}ndown failed with error $RC$END"
          echo ndown > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -326,7 +328,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}nup failed with error $RC$END"
          echo nup > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -354,7 +356,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             if [[ $RC != 0 ]]; then
                echo $(date) "${ERR}wrf failed with error $RC$END"
                echo wrf > FAIL
-               exit 1
+               break 2
             fi
 
             let MEM=$MEM+1
@@ -381,7 +383,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          if [[ $RC != 0 ]]; then
             echo $(date) "${ERR}wrf failed with error $RC$END"
             echo wrf > FAIL
-            exit 1
+            break
          fi
       fi
    fi
@@ -396,7 +398,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       if [[ $? != 0 ]]; then
          echo $(date) "${ERR}ensmean failed with error $RC$END"
          echo ensmean > FAIL
-         exit 1
+         break
       fi
    fi
 
@@ -408,9 +410,11 @@ done
 echo
 echo $(date) "Finished"
 
-touch SUCCESS
+if [[ $RC == 0 ]]; then
+   touch SUCCESS
+fi
 
 echo "</PRE></BODY></HTML>"
 
-exit 0
+exit $RC
 

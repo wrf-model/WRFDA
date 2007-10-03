@@ -1,5 +1,4 @@
 #!/bin/ksh
-
 # da_compare_gen_be.ksh
 # Purpose: Compare files between gen_be runs
 

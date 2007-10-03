@@ -1,6 +1,6 @@
 #!/bin/ksh
-
 # da_compare_suite.ksh
+# Purpose: Compare files between suite runs
 
 DIR1=$1
 DIR2=$2

@@ -1,5 +1,4 @@
 #!/bin/ksh
-
 # da_compare_wrfvar.ksh
 # Purpose: Compare files between wrfvar runs
 
@@ -23,54 +22,18 @@ fi
 
 # Text files
 
-FILES[1]=cost_fn
-FILES[2]=grad_fn
-#FILES[3]=namelist.output
-#FILES[4]=statistics
-#FILES[5]=working/unpert_obs
-#FILES[6]=working/pert_obs
-#FILES[7]=working/check_max_iv
-#FILES[8]=working/gts_omb_oma
-#FILES[9]=working/filtered_obs
-#FILES[10]=working/rand_obs_error
-
-COUNT=1
-
-DIFFER=0
-
-while [[ $COUNT -le ${#FILES[@]} ]]; do
-   FILE=${FILES[$COUNT]}
-
-   if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
-      # Can't use -q option as missing from braindead Aix
-      diff $DIR1/$FILE $DIR2/$FILE >/dev/null 2>&1
-      if [[ $? != 0 ]] then
-         echo "$DIR1/$FILE $DIR2/$FILE differ"
-         DIFFER=1
-         if $FULL; then
-            diff $DIR1/$FILE $DIR2/$FILE
-         fi
-      fi
-   fi 
-   let COUNT=$COUNT+1
-done
-
-# binary files
+TEXT_FILES[1]=cost_fn
+TEXT_FILES[2]=grad_fn
+#TEXT_FILES[3]=namelist.output
+#TEXT_FILES[4]=statistics
+#TEXT_FILES[5]=working/unpert_obs
+#TEXT_FILES[6]=working/pert_obs
+#TEXT_FILES[7]=working/check_max_iv
+#TEXT_FILES[8]=working/gts_omb_oma
+#TEXT_FILES[9]=working/filtered_obs
+#TEXT_FILES[10]=working/rand_obs_error
 
 NETCDF_FILES[1]=working/wrfvar_output
 
-COUNT=1
-
-while [[ $COUNT -le ${#NETCDF_FILES[@]} ]]; do
-   FILE=${NETCDF_FILES[$COUNT]}
-
-   if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
-      da_compare_netcdf.ksh $DIR1/$FILE $DIR2/$FILE
-      if [[ $? != 0 ]]; then
-         DIFFER=1
-      fi
-   fi 
-   let COUNT=$COUNT+1
-done
-
-exit $DIFFER
+da_compare_files.ksh $1 $2
+exit $?

@@ -1,7 +1,5 @@
 #!/bin/ksh
-
 # da_compare_wps.ksh
-
 # Purpose: Compare files between wps runs
 
 # Text files

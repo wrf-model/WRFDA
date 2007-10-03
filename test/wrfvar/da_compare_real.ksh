@@ -1,7 +1,5 @@
 #!/bin/ksh
-
 # da_compare_real.ksh
-
 # Purpose: Compare files between real runs
 
 # Text files
