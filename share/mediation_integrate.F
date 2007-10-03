@@ -39,6 +39,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
   ! Local
    INTEGER                                    :: rc
+   CHARACTER*256          :: message
 
    IF( WRFU_AlarmIsRinging( grid%alarms( HISTORY_ALARM ), rc=rc ) ) THEN
      CALL med_hist_out ( grid , 0, config_flags )
@@ -136,6 +137,10 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 #ifndef WRF_CHEM
    IF( WRFU_AlarmIsRinging( grid%alarms( AUXINPUT5_ALARM ), rc=rc ) ) THEN
      CALL med_auxinput5_in ( grid , config_flags )
+     WRITE ( message , FMT='(A,A,A,i3)' )  "Input data processed for " , &
+                                        TRIM(config_flags%auxinput5_inname) , &
+                                        " for domain ",grid%id
+     CALL wrf_debug ( 0 , message )
      CALL WRFU_AlarmRingerOff( grid%alarms( AUXINPUT5_ALARM ), rc=rc )
    ENDIF
 #endif
@@ -798,7 +803,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-#if (EM_CORE == 1) && (DA_CORE == 0)
+#if (EM_CORE == 1)
    CALL init_domain_constants_em ( parent, nest )
 #endif
 END SUBROUTINE init_domain_constants
@@ -1315,19 +1320,6 @@ SUBROUTINE med_auxinput3_in ( grid , config_flags )
    RETURN
 END SUBROUTINE med_auxinput3_in
 
-#if (DA_CORE == 1)
-SUBROUTINE med_auxinput3dfi_in ( grid , config_flags )
-   USE module_domain
-   USE module_configure
-   IMPLICIT NONE
-
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   CALL med_auxinputdfi_in( grid , 3 , config_flags )
-   RETURN
-END SUBROUTINE med_auxinput3dfi_in
-#endif
-
 SUBROUTINE med_auxinput4_in ( grid , config_flags )
    USE module_domain
    USE module_configure
@@ -1347,157 +1339,6 @@ SUBROUTINE med_auxinput5_in ( grid , config_flags )
    CALL med_auxinput_in( grid , 5 , config_flags )
    RETURN
 END SUBROUTINE med_auxinput5_in
-#if (DA_CORE == 1)
-SUBROUTINE med_auxinputdfi_in ( grid , stream, config_flags )
-  ! Driver layer
-   USE module_domain
-   USE module_io_domain
-  ! Model layer
-   USE module_configure
-   USE module_bc_time_utilities
-   USE module_utility
-
-   IMPLICIT NONE
-  ! Arguments
-   TYPE(domain)                               :: grid
-   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
-   INTEGER , INTENT(IN)                       :: stream
-  ! Local
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-   CHARACTER*80                           :: rstname , outname, auxname, n1, n2
-   INTEGER                                :: fid , rid
-   CHARACTER (LEN=256)                    :: message
-   INTEGER                                :: ierr
-   INTEGER                                :: myproc
-   TYPE(WRFU_Time)                        :: CurrTime
-   CHARACTER*80                           :: timestr
-
-   IF ( stream .LT. 1 .OR. stream .GT. 5 ) THEN
-     WRITE(message,*)'med_auxinput_in: invalid inputory stream ',stream
-     CALL wrf_error_fatal( message )
-   ENDIF
-
-   IF(stream == 2) THEN
-     CALL WRFU_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL wrf_timetoa ( CurrTime, timestr )
-     CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
-     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
-     CALL wrf_debug( 1, message )
-     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
-     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
-     CALL wrf_debug( 1, message )
-
-     CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
-
-     IF ( ierr .NE. 0 ) THEN
-       CALL wrf_message( message )
-     ENDIF
-
-     CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
-
-     CALL close_dataset ( grid%auxinput2_oid , config_flags , n2)
-
-     return
-   ENDIF
-
-   IF(stream == 3) THEN
-     CALL WRFU_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL wrf_timetoa ( CurrTime, timestr )
-     CALL construct_filename2a ( auxname , config_flags%auxinput3_inname , grid%id , 2 , timestr )
-     auxname = auxname(1:14)//'dfi'
-     WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
-     CALL wrf_debug( 1, message )
-     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
-     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
-     CALL wrf_debug( 1, message )
-
-     CALL open_r_dataset ( grid%auxinput3_oid, TRIM(auxname), grid , config_flags , n2, ierr )
-
-     IF ( ierr .NE. 0 ) THEN
-       CALL wrf_message( message )
-     ENDIF
-
-     CALL input_aux_model_input3 ( grid%auxinput3_oid, grid , config_flags , ierr )
-
-     CALL close_dataset ( grid%auxinput3_oid , config_flags , n2)
-
-     return
-   ENDIF
-
-   IF (      ( stream .eq. 1 .and. grid%auxinput1_oid .eq. 0 )    &
-        .or. ( stream .eq. 2 .and. grid%auxinput2_oid .eq. 0 )    &
-        .or. ( stream .eq. 3 .and. grid%auxinput3_oid .eq. 0 )    &
-        .or. ( stream .eq. 4 .and. grid%auxinput4_oid .eq. 0 )    &
-        .or. ( stream .eq. 5 .and. grid%auxinput5_oid .eq. 0 )    &
-      ) THEN
-     CALL WRFU_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
-     CALL wrf_timetoa ( CurrTime, timestr )
-     SELECT CASE( stream )
-       CASE ( 1 )
-         CALL construct_filename2a ( auxname , config_flags%auxinput1_inname, grid%id , 2 , timestr )
-       CASE ( 2 )
-         CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
-       CASE ( 3 )
-         CALL construct_filename2a ( auxname , config_flags%auxinput3_inname , grid%id , 2 , timestr )
-       CASE ( 4 )
-         CALL construct_filename2a ( auxname , config_flags%auxinput4_inname , grid%id , 2 , timestr )
-       CASE ( 5 )
-         CALL construct_filename2a ( auxname , config_flags%auxinput5_inname , grid%id , 2 , timestr )
-     END SELECT
-     WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
-     WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
-     CALL wrf_debug( 1, message )
-
-!<DESCRIPTION>
-!
-!Open_u_dataset is called rather than open_r_dataset to allow interfaces
-!that can do blending or masking to update an existing field. (MCEL IO does this).
-!No effect for other interfaces; open_u_dataset is equivalent to open_r_dataset 
-!in those cases.
-!
-!</DESCRIPTION>
-
-     SELECT CASE( stream )
-       CASE ( 1 )
-         CALL open_u_dataset ( grid%auxinput1_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input1 , n2, ierr )
-       CASE ( 2 )
-         CALL open_r_dataset ( grid%auxinput2_oid, TRIM(auxname), grid , config_flags , n2, ierr )
-!        CALL open_u_dataset ( grid%auxinput2_oid, TRIM(auxname), grid ,  &
-!                              config_flags , input_aux_model_input2 , n2, ierr )
-       CASE ( 3 )
-         CALL open_r_dataset ( grid%auxinput3_oid, TRIM(auxname), grid , config_flags , n2, ierr )
-!        CALL open_u_dataset ( grid%auxinput3_oid, TRIM(auxname), grid ,  &
-!                              config_flags , input_aux_model_input3 , n2, ierr )
-       CASE ( 4 )
-         CALL open_u_dataset ( grid%auxinput4_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input4 , n2, ierr )
-       CASE ( 5 )
-         CALL open_u_dataset ( grid%auxinput5_oid, TRIM(auxname), grid ,  &
-                               config_flags , input_aux_model_input5 , n2, ierr )
-     END SELECT
-     IF ( ierr .NE. 0 ) THEN
-       CALL wrf_message( message )
-     ENDIF
-   END IF
-
-
-   SELECT CASE( stream )
-     CASE ( 1 )
-       CALL input_aux_model_input1 ( grid%auxinput1_oid, grid , config_flags , ierr )
-     CASE ( 2 )
-       CALL input_aux_model_input2 ( grid%auxinput2_oid, grid , config_flags , ierr )
-     CASE ( 3 )
-       CALL input_aux_model_input3 ( grid%auxinput3_oid, grid , config_flags , ierr )
-     CASE ( 4 )
-       CALL input_aux_model_input4 ( grid%auxinput4_oid, grid , config_flags , ierr )
-     CASE ( 5 )
-       CALL input_aux_model_input5 ( grid%auxinput5_oid, grid , config_flags , ierr )
-   END SELECT
-
-   RETURN
-END SUBROUTINE med_auxinputdfi_in
-#endif
 
 SUBROUTINE med_auxinput6_in ( grid , config_flags )
    USE module_domain
