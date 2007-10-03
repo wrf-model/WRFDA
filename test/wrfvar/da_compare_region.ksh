@@ -15,10 +15,8 @@ if [[ ! -d $DIR2 ]]; then
    exit 1
 fi
 
-cd $DIR1
-DIR1=$PWD # expand out partial directories
-
-for SUITE in *; do
+for DIR in $DIR1/*; do
+   SUITE=$(basename $DIR)
    if [[ -d $DIR1/$SUITE/run && -d $DIR2/$SUITE/run ]]; then
       da_compare_suite.ksh $DIR1/$SUITE $DIR2/$SUITE
    fi

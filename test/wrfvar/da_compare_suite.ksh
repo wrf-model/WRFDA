@@ -15,9 +15,8 @@ if [[ ! -d $DIR2 ]]; then
    exit 1
 fi
 
-cd $DIR1/run
-
-for DATE in 2*; do
+for DIR in $DIR1/run/2*; do
+   DATE=$(basename $DIR)
    if [[ -d $DIR1/run/$DATE/wrfvar && -d $DIR2/run/$DATE/wrfvar ]]; then
       da_compare_wrfvar.ksh $DIR1/run/$DATE/wrfvar $DIR2/run/$DATE/wrfvar
    fi

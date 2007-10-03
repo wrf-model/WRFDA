@@ -44,7 +44,7 @@ if [[ -s $TMPFILE ]]; then
 else
    export MIN_DIGITS=0
 fi
-rm $TMPFILE
+rm -rf $TMPFILE fort.88 fort.98
 
 if [[ $MIN_DIGITS -gt 0 && $MIN_DIGITS -lt $DIGITS ]]; then
    echo $FILE1 $FILE2 differ at $MIN_DIGITS dp
