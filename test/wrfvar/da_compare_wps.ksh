@@ -3,7 +3,7 @@
 # Purpose: Compare files between wps runs
 
 # Text files
-TEXT_FILES[1]=namelist.wps
+export TEXT_FILES="namelist.wps"
 
 da_compare_files.ksh $1 $2
 exit $?

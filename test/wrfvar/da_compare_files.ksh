@@ -25,37 +25,36 @@ COUNT=1
 
 DIFFER=0
 
-while [[ $COUNT -le ${#TEXT_FILES[@]} ]]; do
-   FILE1=${TEXT_FILES[$COUNT]}
-   FILE2=${TEXT_FILES[$COUNT]}
-
-   if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
-      # Can't use -q option as missing from braindead Aix
-      diff $DIR1/$FILE1 $DIR2/$FILE2 >/dev/null 2>&1
-      if [[ $? != 0 ]] then
-         let DIFFER=$DIFFER+1
-         echo "$DIR1/$FILE1 $DIR2/$FILE2 differ"
-         if $FULL; then
-            diff $DIR1/$FILE1 $DIR2/$FILE2
+if [[ ! -z $TEXT_FILES ]]; then
+   for FILE in $TEXT_FILES; do
+      if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
+         # Can't use -q option as missing from braindead Aix
+         diff $DIR1/$FILE $DIR2/$FILE >/dev/null 2>&1
+         if [[ $? != 0 ]] then
+            let DIFFER=$DIFFER+1
+            echo "$DIR1/$FILE $DIR2/$FILE differ"
+            if $FULL; then
+               diff $DIR1/$FILE $DIR2/$FILE
+            fi
          fi
-      fi
-   fi 
-   let COUNT=$COUNT+1
-done
+      fi 
+      let COUNT=$COUNT+1
+   done
+fi
 
 COUNT=1
 
-while [[ $COUNT -le ${#NETCDF_FILES[@]} ]]; do
-   FILE=${NETCDF_FILES[$COUNT]}
-
-   if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
-      da_compare_netcdf.ksh $DIR1/$FILE $DIR2/$FILE
-      if [[ $? != 0 ]]; then
-         let DIFFER=$DIFFER+1
-      fi
-   fi 
-   let COUNT=$COUNT+1
-done
+if [[ ! -z $NETCDF_FILES ]]; then
+   for FILE in $NETCDF_FILES; do
+      if [[ -f $DIR1/$FILE && -f $DIR2/$FILE ]]; then
+         da_compare_netcdf.ksh $DIR1/$FILE $DIR2/$FILE
+         if [[ $? != 0 ]]; then
+            let DIFFER=$DIFFER+1
+         fi
+      fi 
+      let COUNT=$COUNT+1
+   done
+fi
 
 exit $DIFFER
 

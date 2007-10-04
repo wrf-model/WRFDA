@@ -123,8 +123,8 @@ superclean : clean
 	@ rm -rf *.exe *.f90 *.F90 *.F *.inc inc/*.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
-          scl_plotting_routines configure.wrfvar ../configure.wrfvar \
+          *.bsh *.csh Utl* macros_utl module_dm_warning \
+          scl_plotting_routines \
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
           da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
           landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \

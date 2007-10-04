@@ -22,18 +22,17 @@ fi
 
 # Text files
 
-TEXT_FILES[1]=cost_fn
-TEXT_FILES[2]=grad_fn
-#TEXT_FILES[3]=namelist.output
-#TEXT_FILES[4]=statistics
-#TEXT_FILES[5]=working/unpert_obs
-#TEXT_FILES[6]=working/pert_obs
-#TEXT_FILES[7]=working/check_max_iv
-#TEXT_FILES[8]=working/gts_omb_oma
-#TEXT_FILES[9]=working/filtered_obs
-#TEXT_FILES[10]=working/rand_obs_error
+export TEXT_FILES="cost_fn grad_fn"
+#namelist.output
+#statistics
+#working/unpert_obs
+#working/pert_obs
+#working/check_max_iv
+#working/gts_omb_oma
+#working/filtered_obs
+#working/rand_obs_error
 
-NETCDF_FILES[1]=working/wrfvar_output
+export NETCDF_FILES=working/wrfvar_output
 
-da_compare_files.ksh $1 $2
+da_compare_files.ksh $DIR1 $DIR2
 exit $?
