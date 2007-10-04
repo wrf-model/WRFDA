@@ -1079,7 +1079,12 @@ write(0,*)'reordering mesh'
 	! should already be stored and use that.
 	CALL mpi_init ( ierr )
         CALL wrf_termio_dup
+#ifdef WRFNL
+        CALL mpi_comm_split( MPI_COMM_WORLD , 3 , 1 , mpi_comm_local, ierr )
+        CALL wrf_set_dm_communicator ( mpi_comm_local )
+#else
 	CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
+#endif
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
    END SUBROUTINE init_module_dm
