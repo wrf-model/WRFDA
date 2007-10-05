@@ -93,8 +93,7 @@ elif [[ $TEST == wrfvar_verbose ]]; then
    export NL_WRITE_IV_RAD_ASCII=true
    export NL_WRITE_OA_RAD_ASCII=true
    export NL_BIASPREP=true
-   # Changes the results, so avoid
-   #export NL_OMB_ADD_NOISE=true
+   export NL_OMB_ADD_NOISE=true
    # stop hitting bug at line 247 of da_write_iv_rad_ascii where rttov coefficient
    # used in crtm run. Zhiquan has fix in local code.
    export NL_WRITE_PROFILE=false

@@ -20,6 +20,7 @@ module da_ffts
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, ntasks
    use da_control, only : ids,ide,ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
+   use module_comm_dm, only : halo_bal_eqn_adj_sub
 #endif
 
    use module_ffts, only : fft661, fft551

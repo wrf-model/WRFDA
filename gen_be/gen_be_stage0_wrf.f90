@@ -692,7 +692,6 @@ subroutine da_uv_to_vor_c( dim1, dim2, ds, &
 !  [2] Calculate vorticity field:
 !------------------------------------------------------------------------------
 
-write (0,*) __FILE__,__LINE__,"dim2",dim2
    do j = 1, dim2  
       do i = 1, dim1+1
          um(i,j) = u(i,j) / mapfac_u(i,j)
@@ -708,7 +707,6 @@ write (0,*) __FILE__,__LINE__,"dim2",dim2
          end if
       end do
    end do
-write (0,*) __FILE__,__LINE__
 
    do j = 2, dim2
       do i = 2, dim1

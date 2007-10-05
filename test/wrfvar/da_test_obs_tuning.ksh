@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+. da_test_defaults.ksh
+
 . ./setup.ksh
 
 export REG_DIR=$PWD
@@ -16,8 +18,8 @@ export WRFVAR_DIR=${WRFVAR_DIR:-~/code/${ID}/wrfvar}
 export UNPERT_ID=${MACHINE}_${COMPILER}_opt
 export PERT_ID=${MACHINE}_${COMPILER}_debug
 
-export Y_DIR=$REG_DIR/${UNPERT_ID}_wrfvar_${NUM_PROCS)
-export YP_DIR=$REG_DIR/${PERT_ID}_wrfvar_verbose_${NUM_PROCS)
+export Y_DIR=$REG_DIR/${UNPERT_ID}_wrfvar_${NUM_PROCS}
+export YP_DIR=$REG_DIR/${PERT_ID}_wrfvar_verbose_${NUM_PROCS}
 
 export RUN_DIR=$TUNING_DIR/desroziers
 
