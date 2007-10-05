@@ -13,7 +13,7 @@ FRAME_OBJS = module_internal_header_util.o \
 	module_state_description.o \
 	module_sm.o \
 	module_io.o \
-	module_dm.o \
+	module_dm.o module_comm_dm.o \
 	module_quilt_outbuf_ops.o \
 	module_io_quilt.o \
 	wrf_num_bytes_between.o \

@@ -11,6 +11,8 @@ module da_test
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
+   use module_comm_dm, only : halo_psichi_uv_adj_sub, halo_xa_sub, &
+      halo_sfc_xa_sub, halo_ssmi_xa_sub
    use da_control, only : ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
 

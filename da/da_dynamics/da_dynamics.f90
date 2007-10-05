@@ -13,7 +13,8 @@ module da_dynamics
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xy, mytask, &
       ntasks
-   use da_control, only : ips,ipe,jps,jpe,kps
+   use module_comm_dm, only : halo_2d_work_sub
+   use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
 
    use da_define_structures, only : xbx_type

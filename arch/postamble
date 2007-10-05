@@ -21,7 +21,6 @@ wrf_bdyout.o wrf_bdyin.o \
    wrf_restartout.o \
    wrf_restartin.o \
    wrf_inputin.o \
-   wrf_inputout.o \
    wrf_histin.o \
    wrf_histout.o \
    module_si_io.o \
@@ -36,7 +35,7 @@ wrf_bdyout.o wrf_bdyin.o \
    module_initialize_squall2d_x.o \
    module_initialize_squall2d_y.o \
    module_initialize_real.o \
-   module_dm.o start_domain.o \
+   module_dm.o start_domain.o module_comm_dm.o \
    mediation_force_domain.o \
    mediation_integrate.o \
    mediation_interp_domain.o \

@@ -15,6 +15,7 @@ module da_ffts
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_wrf_interfaces, only : wrf_debug
    use module_dm, only : wrf_dm_sum_reals
+   use module_comm_dm, only : halo_bal_eqn_adj_sub
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, ntasks

@@ -73,6 +73,7 @@ WRFVAR_OBJS = da_par_util.o \
    module_io_domain.o \
    module_io_quilt.o \
    module_dm.o \
+   module_comm_dm.o \
    module_bc.o \
    module_model_constants.o \
    module_internal_header_util.o \
