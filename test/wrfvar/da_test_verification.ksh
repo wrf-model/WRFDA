@@ -8,8 +8,8 @@
 
 export REG_DIR=$PWD
 
-export EXP1=${1:-~/data/afwa_2.2/${ID}_quick_${NUM_PROCS}}
-export EXP2=${2:-~/data/trunk/${ID}_quick_${NUM_PROCS}}
+export EXP1=${1:-~/data/afwa_2.2/$REGION/${ID}_quick_${NUM_PROCS}}
+export EXP2=${2:-~/data/trunk/$REGION/${ID}_quick_${NUM_PROCS}}
 
 NAME1=$(basename $EXP1)
 NAME2=$(basename $EXP2)

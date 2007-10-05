@@ -69,8 +69,8 @@ end module read_util_module
   implicit none
 #include "wrf_status_codes.h"
 #include "netcdf.inc"
-  character(len=120) :: flnm
-  character(len=120) :: flnm2
+  character(len=255) :: flnm
+  character(len=255) :: flnm2
   character(len=120) :: arg3
   character(len=19) :: DateStr
   character(len=19) :: DateStr2

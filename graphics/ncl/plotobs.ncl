@@ -20,6 +20,7 @@ out_type     = "pdf" ; or "ncgm"
 plotdir      = getenv("EXP_DIR")+"/plotobs/"
 exp_dir      = getenv("EXP_DIR")+"/"
 run_dir      = getenv("RUN_DIR")+"/"
+rc_dir       = getenv("RC_DIR")+"/"
 datdir2      = "/wrfvar/working/"     ; the path after DATE
 filename_gts = "gts_omb_oma"
 prefix_radar = "oma_radar"
@@ -93,7 +94,7 @@ linecolor    = "gray"
 plotwnd = False
 colormap = "rainbow+gray"
 
-fname=exp_dir+"rc/"+start_date+"/wrfinput_d01"
+fname=rc_dir+start_date+"/wrfinput_d01"
 
 if ( mapinfo_from_file .and. .not.isfilepresent(fname) ) then
    print("file: "+fname+" does not exist")

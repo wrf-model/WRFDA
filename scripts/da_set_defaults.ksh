@@ -201,7 +201,6 @@ export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}               #
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
-export NL_PD_MOIST=${NL_PD_MOIST:-false} 
 
 # WRF (not already covered above):
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}

@@ -10,14 +10,15 @@
 export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/trunk/wrfvar}
 export REG_DIR=${REG_DIR:-$HOME/data/trunk/con200}
 export NUM_EXPT=${NUM_EXPT:-2}
-export EXP_DIRS=${1:-${REG_DIR}/NO_NOISE ${REG_DIR}/NOISE}
+export EXP_DIRS=${EXP_DIRS:-${REG_DIR}/NO_NOISE ${REG_DIR}/NOISE}
 export EXP_NAMES=${EXP_NAMES:-"NO_NOISE" "NOISE"}
 export EXP_LEGENDS=${EXP_LEGENDS:-(/"no_noise","noise"/)}
 
 export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010100}
 
-export WORK_DIR=${WORK_DIR:-$PWD/verification}
+export RUN_DIR=${RUN_DIR:-$PWD/verification}
+export WORK_DIR=${WORK_DIR:-$RUN_DIR}
 
 export INTERVAL=${INTERVAL:-12}
 export Verify_Date_Range=${Verify_Date_Range:-"01 - 28 October 2006 (${INTERVAL} hour Cycle)"}
