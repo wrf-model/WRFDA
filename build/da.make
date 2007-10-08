@@ -217,7 +217,7 @@ da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.o
 da_tune_obs_desroziers.exe: da_tune_obs_desroziers.o
 	$(SFC) -o $@ da_tune_obs_desroziers.o
 
-da_update_bc.exe : da_update_bc.o
+da_update_bc.exe : da_update_bc.o libwrfio_nf.a
 	$(SFC) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)

@@ -11,7 +11,7 @@ GEN_BE_OBJS = da_etkf.o \
 	da_tools_serial.o \
 	module_ffts.o
 
-be : setup \
+be : setup libwrfio_nf.a \
 	$(GEN_BE_OBJS) \
 	gen_be_stage0_wrf.exe \
 	gen_be_ep1.exe \

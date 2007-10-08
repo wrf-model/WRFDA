@@ -2,6 +2,10 @@
 
 cd build
 
+cat > configure.wrfvar <<EOF
+RM=rm -rf
+EOF
+
 if ( ! -f depend.txt ) then
    touch depend.txt
 endif

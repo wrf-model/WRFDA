@@ -155,7 +155,9 @@ module_ssmi.o \
 
 # Remove implicit rules to ensure our multi-stage process works
 
-.f.o :
+.f90 : 
+.F90 : 
+.F : 
 
 .f90.o : 
 	@ $(RM) $@
