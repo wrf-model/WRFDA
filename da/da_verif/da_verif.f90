@@ -817,11 +817,11 @@ subroutine write_diag_multi_level(out_dir,ounit,ldate,obs_type,omb,oma)
    close(ounit2)
      
 end subroutine write_diag_multi_level     
-     subroutine write_diag_multi_level_h(out_dir,ounit,date,obs_type,omb,oma)
+     subroutine write_diag_multi_level_h(out_dir,ounit,ldate,obs_type,omb,oma)
      implicit none
      integer, intent(in)            :: ounit
      character*512,intent(in)       :: out_dir
-     character*10,intent(in)        :: date
+     character*10,intent(in)        :: ldate
      character*(*),intent(in)       :: obs_type
      type (stats_value),intent(in)  :: omb(nstdh)
      type (stats_value),intent(in)  :: oma(nstdh)
@@ -867,7 +867,7 @@ end subroutine write_diag_multi_level
        endif
      endif
      enddo
-     write(ounit1,'(1x,a10,1x,125(1x,i9,5(1x,f6.2)))')date, (num(k), bias(k), abias(k), &
+     write(ounit1,'(1x,a10,1x,125(1x,i9,5(1x,f6.2)))')ldate, (num(k), bias(k), abias(k), &
            rmse(k),bar(k),sigt(k), k=1,nstdh)
 
      do k = 1, nstdh
@@ -895,7 +895,7 @@ end subroutine write_diag_multi_level
        endif
      endif
      enddo
-     write(ounit2,'(1x,a10,1x,125(1x,i9,5(1x,f6.2)))')date, (num(k), bias(k), abias(k), &                  
+     write(ounit2,'(1x,a10,1x,125(1x,i9,5(1x,f6.2)))')ldate, (num(k), bias(k), abias(k), &                  
            rmse(k),bar(k),sigt(k), k=1,nstdh)
 
 !

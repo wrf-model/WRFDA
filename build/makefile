@@ -70,14 +70,9 @@ WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
 GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
         $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
-#IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
-IGNORE="ideal"
-
 depend : links arch registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	makedepf90 -free $(FPPFLAGS) \
-           *.F *.f90 *.F90 2>/dev/null \
-           | grep -vEe $(IGNORE) > depend.txt
+	makedepf90 -free $(FPPFLAGS) *.F *.f90 *.F90 2>/dev/null > depend.txt
 	touch depend
 	
 include depend.txt
