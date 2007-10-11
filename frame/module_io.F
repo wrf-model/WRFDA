@@ -2609,26 +2609,6 @@ INTEGER FUNCTION use_package ( io_form )
   use_package = MOD( io_form, 100 )
 END FUNCTION use_package
 
-#if (DA_CORE == 1)
-SUBROUTINE real8_to_real4(d, r, n)
-!<DESCRIPTION>
-!<PRE>
-! Casts an array of real*8 onto array of real*4
-!</PRE>
-!</DESCRIPTION>
-   
-   IMPLICIT NONE
-
-   ! Arguments
-   REAL (KIND=8), DIMENSION(*), INTENT(IN) :: d
-   REAL (KIND=4), DIMENSION(*), INTENT(OUT) :: r
-   INTEGER, INTENT(IN) :: n
-
-   r(1:n) = d(1:n)
-
-END SUBROUTINE real8_to_real4
-#endif
-
 
 SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                                       &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2668,9 +2648,6 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
   INTEGER                       ,INTENT(OUT)   :: Status
   LOGICAL donotcollect
   INTEGER ndims, nproc
-#if DA_CORE==1
-  REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
-#endif
 
   CALL dim_from_memorder( MemoryOrder , ndims)
   CALL wrf_get_nproc( nproc )
@@ -2678,28 +2655,12 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
 
   IF ( donotcollect ) THEN
 
-#if (DA_CORE == 1)
-    IF ( FieldType == WRF_DOUBLE) THEN
-       ALLOCATE(rcast((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
-       CALL real8_to_real4(Field,rcast,(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1))
-       CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
-                  DomainDesc , MemoryOrder , Stagger , DimNames ,                &
-                  DomainStart , DomainEnd ,                                      &
-                  MemoryStart , MemoryEnd ,                                      &
-                  PatchStart , PatchEnd ,                                        &
-                  Status )
-       DEALLOCATE(rcast)
-    ELSE
-#endif
     CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                DomainDesc , MemoryOrder , Stagger , DimNames ,                &
                DomainStart , DomainEnd ,                                      &
                MemoryStart , MemoryEnd ,                                      &
                PatchStart , PatchEnd ,                                        &
                Status )
-#if (DA_CORE == 1)
-    END IF
-#endif
 
   ELSE IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
 
@@ -2721,17 +2682,6 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                      &
                Status )
 
-#if (DA_CORE == 1)
-  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-
-     CALL collect_real_and_call_pkg ( fcn,                                        &
-               Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
-               DomainStart , DomainEnd ,                                    &
-               MemoryStart , MemoryEnd ,                                    &
-               PatchStart , PatchEnd ,                                      &
-               Status )
-#endif
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
      CALL collect_int_and_call_pkg ( fcn,                                        &
@@ -3047,9 +2997,7 @@ include "mpif.h"
   LOGICAL     distributed_field
   INTEGER i,j,k,idx,lx,idx2,lx2
   INTEGER collective_root
-#if (DA_CORE == 1)
-  REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
-#endif
+
   CALL wrf_get_nproc( nproc )
   CALL wrf_get_dm_communicator ( communicator )
 
@@ -3105,13 +3053,6 @@ include "mpif.h"
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-#if (DA_CORE == 1)
-      ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-        CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
-#endif
       ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
         CALL wrf_patch_to_global_integer ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
@@ -3173,18 +3114,6 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-#if (DA_CORE == 1)
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-
-             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
-                             my_count ,                       &    ! sendcount
-                             globbuf, 1+idx2 ,                &    ! recvbuf
-                             counts                         , &    ! recvcounts
-                             displs                         , &    ! displs
-                             collective_root                , &    ! root
-                             communicator                   , &    ! communicator
-                             ierr )
-#endif
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
@@ -3245,18 +3174,6 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
-#if (DA_CORE == 1)
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-
-             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
-                             my_count ,                       &    ! sendcount
-                             globbuf, 1+idx2 ,                &    ! recvbuf
-                             counts                         , &    ! recvcounts
-                             displs                         , &    ! displs
-                             collective_root                , &    ! root
-                             communicator                   , &    ! communicator
-                             ierr )
-#endif
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
@@ -3319,18 +3236,7 @@ include "mpif.h"
                              collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
-#if (DA_CORE == 1)
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
-             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
-                             my_count                       , &    ! sendcount
-                             globbuf, 1+idx2                , &    ! recvbuf
-                             counts                         , &    ! recvcounts
-                             displs                         , &    ! displs
-                             collective_root                , &    ! root
-                             communicator                   , &    ! communicator
-                             ierr )
-#endif
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
@@ -3383,18 +3289,6 @@ include "mpif.h"
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
-#if (DA_CORE == 1)
-             CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
-                             my_count                       , &    ! sendcount
-                             globbuf, 1+idx2                , &    ! recvbuf
-                             counts                         , &    ! recvcounts
-                             displs                         , &    ! displs
-                             collective_root                , &    ! root
-                             communicator                   , &    ! communicator
-                             ierr )
-#endif
-           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
-
              CALL wrf_gatherv_real( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
@@ -3425,51 +3319,19 @@ include "mpif.h"
   END SELECT
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( distributed_field ) THEN
-#if (DA_CORE == 1)
-      IF (FieldType == WRF_DOUBLE) THEN
-        ALLOCATE(rcast((dom_end_rev(1)-domainstart(1)+1)*(dom_end_rev(2)-domainstart(2)+1)*(dom_end_rev(3)-domainstart(3)+1)))
-        CALL real8_to_real4(globbuf,rcast,(dom_end_rev(1)-domainstart(1)+1)*(dom_end_rev(2)-domainstart(2)+1)*(dom_end_rev(3)-domainstart(3)+1))
-        CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
-                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                   DomainStart , DomainEnd ,                                        &
-                   DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
-                   DomainStart , DomainEnd ,                                        &
-                   Status )
-        DEALLOCATE(rcast)
-      ELSE
-#endif
-        CALL fcn ( Hndl , DateStr , VarName , globbuf , FieldType , Comm , IOComm , &
-                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                   DomainStart , DomainEnd ,                                        &
-                   DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
-                   DomainStart , DomainEnd ,                                        &
-                   Status )
-#if (DA_CORE == 1)
-      ENDIF
-#endif
+      CALL fcn ( Hndl , DateStr , VarName , globbuf , FieldType , Comm , IOComm , &
+                 DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                 DomainStart , DomainEnd ,                                        &
+                 DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
+                 DomainStart , DomainEnd ,                                        &
+                 Status )
     ELSE
-#if (DA_CORE == 1)
-      IF (FieldType == WRF_DOUBLE) THEN
-        ALLOCATE(rcast((memoryend(1)-memorystart(1)+1)*(memoryend(2)-memorystart(2)+1)*(memoryend(3)-memorystart(3)+1)))
-        CALL real8_to_real4(Field,rcast,(memoryend(1)-memorystart(1)+1)*(memoryend(2)-memorystart(2)+1)*(memoryend(3)-memorystart(3)+1))
-        CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
-                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                   DomainStart , DomainEnd ,                                        &
-                   MemoryStart , MemoryEnd ,                                        &
-                   PatchStart  , PatchEnd  ,                                        &
-                   Status )
-        DEALLOCATE(rcast)
-      ELSE
-#endif
-        CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                   DomainStart , DomainEnd ,                                        &
-                   MemoryStart , MemoryEnd ,                                        &
-                   PatchStart  , PatchEnd  ,                                        &
-                   Status )
-#if (DA_CORE == 1)
-      ENDIF
-#endif
+      CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
+                 DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                 DomainStart , DomainEnd ,                                        &
+                 MemoryStart , MemoryEnd ,                                        &
+                 PatchStart  , PatchEnd  ,                                        &
+                 Status )
     ENDIF
   ENDIF
   CALL wrf_dm_bcast_bytes( Status , IWORDSIZE )

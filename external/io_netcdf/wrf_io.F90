@@ -54,6 +54,7 @@ module wrf_data
 
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.
+  logical                                 :: R4OnOutput          = .true.
 
   type :: wrf_data_handle
     character (255)                       :: FileName
@@ -836,6 +837,63 @@ LOGICAL FUNCTION ncd_is_first_operation( DataHandle )
 END FUNCTION ncd_is_first_operation
 
 end module ext_ncd_support_routines
+
+subroutine TransposeToR4(IO,MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
+                                      ,XField,x1,x2,y1,y2,z1,z2 &
+                                             ,i1,i2,j1,j2,k1,k2 )
+
+  use ext_ncd_support_routines 
+
+  character*(*)     ,intent(in)    :: IO
+  character*(*)     ,intent(in)    :: MemoryOrder
+  integer           ,intent(in)    :: l1,l2,m1,m2,n1,n2
+  integer           ,intent(in)    :: di
+  integer           ,intent(in)    :: x1,x2,y1,y2,z1,z2
+  integer           ,intent(in)    :: i1,i2,j1,j2,k1,k2
+  real (kind=8)     ,intent(inout) :: Field(di,l1:l2,m1:m2,n1:n2)
+  real (kind=4)     ,intent(inout) :: XField(di,(i2-i1+1)*(j2-j1+1)*(k2-k1+1))
+  character*3                      :: MemOrd
+  character*3                      :: MemO
+  integer           ,parameter     :: MaxUpperCase=IACHAR('Z')
+  integer                          :: i,j,k,ix,jx,kx
+
+  call LowerCase(MemoryOrder,MemOrd)
+  select case (MemOrd)
+
+!#define XDEX(A,B,C) A-A ## 1+1+(A ## 2-A ## 1+1)*((B-B ## 1)+(C-C ## 1)*(B ## 2-B ## 1+1))
+! define(`XDEX',($1-``$1''1+1+(``$1''2-``$1''1+1)*(($2-``$2''1)+($3-``$3''1)*(``$2''2-``$2''1+1))))
+
+    case ('xzy')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(i,k,j))
+#include "transpose.code"
+    case ('xyz','xsz','xez','ysz','yez','xy','xs','xe','ys','ye','z','c','0')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(i,j,k))
+#include "transpose.code"
+    case ('yxz')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(j,i,k))
+#include "transpose.code"
+    case ('zxy')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(k,i,j))
+#include "transpose.code"
+    case ('yzx')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(j,k,i))
+#include "transpose.code"
+    case ('zyx')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(k,j,i))
+#include "transpose.code"
+    case ('yx')
+#undef  DFIELD
+#define DFIELD XField(1:di,XDEX(j,i,k))
+#include "transpose.code"
+  end select
+  return
+end subroutine TransposeToR4
 
 subroutine ext_ncd_open_for_read(DatasetName, Comm1, Comm2, SysDepInfo, DataHandle, Status)
   use wrf_data
@@ -2210,8 +2268,8 @@ subroutine ext_ncd_get_dom_td_char(DataHandle,Element,DateStr,Data,Status)
 end subroutine ext_ncd_get_dom_td_char
 
 
-subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
-  IOComm, DomainDesc, MemoryOrdIn, Stagger,  DimNames,                      &
+subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldTypeIn,  &
+  Comm, IOComm, DomainDesc, MemoryOrdIn, Stagger,  DimNames,              &
   DomainStart,DomainEnd,MemoryStart,MemoryEnd,PatchStart,PatchEnd,Status)
   use wrf_data
   use ext_ncd_support_routines
@@ -2222,7 +2280,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   character*(*)                 ,intent(in)    :: DateStr
   character*(*)                 ,intent(in)    :: Var
   integer                       ,intent(inout) :: Field(*)
-  integer                       ,intent(in)    :: FieldType
+  integer                       ,intent(in)    :: FieldTypeIn
   integer                       ,intent(inout) :: Comm
   integer                       ,intent(inout) :: IOComm
   integer                       ,intent(in)    :: DomainDesc
@@ -2233,6 +2291,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   integer       ,dimension(*)   ,intent(in)    :: MemoryStart, MemoryEnd
   integer       ,dimension(*)   ,intent(in)    :: PatchStart,  PatchEnd
   integer                       ,intent(out)   :: Status
+  integer                                      :: FieldType
   character (3)                                :: MemoryOrder
   type(wrf_data_handle)         ,pointer       :: DH
   integer                                      :: NCID
@@ -2256,6 +2315,12 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   integer                                      :: di
   character (80)                               :: NullName
   logical                                      :: NotFound
+
+  if ( R4OnOutput .and. FieldTypeIn == WRF_DOUBLE ) then
+     FieldType = WRF_REAL
+  else
+     FieldType = FieldTypeIn
+  end if
 
   MemoryOrder = trim(adjustl(MemoryOrdIn))
   NullName=char(0)
@@ -2462,9 +2527,15 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
       call wrf_debug ( FATAL , TRIM(msg))
       return
     endif
-    call Transpose('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
-                                         ,XField,x1,x2,y1,y2,z1,z2 &
-                                                ,i1,i2,j1,j2,k1,k2 )
+    if (R4OnOutput .and. FieldTypeIn == WRF_DOUBLE) then
+       call TransposeToR4('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
+                                                ,XField,x1,x2,y1,y2,z1,z2 &
+                                                   ,i1,i2,j1,j2,k1,k2 )
+    else
+       call Transpose('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
+                                            ,XField,x1,x2,y1,y2,z1,z2 &
+                                                   ,i1,i2,j1,j2,k1,k2 )
+    end if
     call FieldIO('write',DataHandle,DateStr,Length,MemoryOrder, &
                   FieldType,NCID,VarID,XField,Status)
     if(Status /= WRF_NO_ERR) then
