@@ -96,9 +96,8 @@ buffer_for_proc( P, size, code )
 {
   int p ;
   int i, j ;
-  char * ret ;
-
   char mess[1024] ;
+  char * ret ;
 
   ret = NULL ;
   if ( first )
