@@ -1,6 +1,6 @@
 module da_metar
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, &
@@ -12,8 +12,8 @@ module da_metar
       kms,kme,sfc_assi_options_1,sfc_assi_options_2
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      synop_type, maxmin_type
-   use da_interpolation, only : da_to_zk,da_interp_lin_2d_newest, da_interp_lin_3d_newer, &
+      maxmin_type
+   use da_interpolation, only : da_to_zk,da_interp_lin_2d_newest, &
       da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest,da_interp_lin_2d_adj_newest
       
    use da_par_util, only : da_proc_stats_combine

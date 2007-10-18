@@ -13,7 +13,6 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
 
    integer :: n        ! Loop counter.
    integer :: i, j, k  ! Index dimension.
-   integer :: num_levs ! Number of obs levels.
    real    :: dx, dxm  ! Interpolation weights.
    real    :: dy, dym  ! Interpolation weights.
 

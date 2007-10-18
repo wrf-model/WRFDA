@@ -10,8 +10,7 @@ subroutine da_transform_xtoy_airep (grid, iv, y)
    type(iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type(y_type),  intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
 
-   integer :: n,n1,n2  ! Loop counter.
-   integer :: k        ! Index dimension.
+   integer :: n        ! Loop counter.
 
    real, allocatable :: u(:,:)
    real, allocatable :: v(:,:)

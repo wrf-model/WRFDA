@@ -1,6 +1,6 @@
 module da_geoamv
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, &
@@ -10,13 +10,13 @@ module da_geoamv
       max_error_bt, max_error_buv, geoamv, anal_type_verify
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      geoamv_type, maxmin_type
+      maxmin_type
   use da_interpolation, only : da_interp_lin_3d_newest, da_to_zk, &
       da_interp_lin_3d_adj_newest
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_max_error_qc_new, da_residual, da_convert_zk
+   use da_tools, only : da_max_error_qc_new, da_residual, da_convert_zk
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_geoamv_type" is ONLY used locally in da_geoamv:

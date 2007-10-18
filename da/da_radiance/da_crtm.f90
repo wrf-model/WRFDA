@@ -4,8 +4,8 @@ module da_crtm
    ! Purpose: module for CRTM radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : x_type, xb_type, domain
-   use da_define_structures, only : y_type, iv_type,model_loc_type
+   use module_domain, only : x_type, domain
+   use da_define_structures, only : y_type, iv_type
 
 #ifdef CRTM
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &

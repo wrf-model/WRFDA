@@ -20,8 +20,7 @@ module da_ssmi
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_rv_type, &
       residual_ssmi_tb_type, model_loc_type, info_type, field_type, &
-      count_obs_number_type, ssmi_rv_type, ssmi_tb_type, ssmt1_type, &
-      ssmt2_type
+      count_obs_number_type
    use da_interpolation, only : da_to_zk,da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest, &
       da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
    use da_par_util, only : da_proc_stats_combine

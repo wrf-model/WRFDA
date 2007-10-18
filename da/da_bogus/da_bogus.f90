@@ -1,6 +1,6 @@
 module da_bogus
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
@@ -9,8 +9,7 @@ module da_bogus
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, anal_type_verify, kms,kme,kts,kte
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
-      bad_data_type, x_type, number_type, bad_data_type, &
-      bogus_type
+      bad_data_type, x_type, number_type, bad_data_type
    use da_interpolation, only : da_interp_lin_3d_newest, da_to_zk, &
       da_interp_lin_3d_adj_newest
    use da_par_util, only : da_proc_stats_combine

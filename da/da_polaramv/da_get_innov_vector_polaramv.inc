@@ -21,8 +21,6 @@ subroutine da_get_innov_vector_polaramv( it, grid, ob, iv)
    real, allocatable :: model_u(:,:)  ! Model value u at ob location.
    real, allocatable :: model_v(:,:)  ! Model value v at ob location.
 
-   integer :: num_levs ! Number of obs levels.
-
    real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
    integer :: itu,ituf,itvv,itvvf

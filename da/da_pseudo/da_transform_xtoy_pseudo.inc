@@ -6,7 +6,7 @@ subroutine da_transform_xtoy_pseudo(grid, iv, y)
 
    implicit none
 
-   type (domain),  intent(in)    :: grid
+   type (domain),  intent(inout) :: grid
    type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 

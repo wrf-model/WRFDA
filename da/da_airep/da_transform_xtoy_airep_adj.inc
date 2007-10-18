@@ -15,7 +15,6 @@ subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
    real, allocatable :: u(:,:)
    real, allocatable :: v(:,:)
    real, allocatable :: t(:,:)
-   integer :: k  ! Index dimension.
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airep_adj")
 

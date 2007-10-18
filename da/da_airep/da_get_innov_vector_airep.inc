@@ -19,7 +19,6 @@ subroutine da_get_innov_vector_airep( it, grid, ob, iv)
    real    :: dy (kms:kme)
    real    :: dym(kms:kme)  
    integer :: k                   ! Index dimension.
-   integer :: num_levs                  ! Number of obs levels. 
 
    real, allocatable :: model_u(:,:)  ! Model value u at ob location.
    real, allocatable :: model_v(:,:)  ! Model value v at ob location.

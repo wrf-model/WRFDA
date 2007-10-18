@@ -12,8 +12,8 @@ subroutine da_llxy_lc_new(proj, info)
 
 
    real    :: tl1r
-   real    :: temp1
-   real    :: temp2
+!   real    :: temp1
+!   real    :: temp2
    real    :: ctl1r
    real    :: deltalon, rm, arg
    integer :: n

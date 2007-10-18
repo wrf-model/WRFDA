@@ -1,6 +1,6 @@
 module da_ships
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, sfc_assi_options, check_max_iv_print, &
@@ -10,8 +10,7 @@ module da_ships
       max_error_bt, max_error_buv,anal_type_verify, ships, &
       kms,kme,kts,kte,sfc_assi_options_1,sfc_assi_options_2
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
-      bad_data_type, x_type, number_type, bad_data_type, &
-      synop_type
+      bad_data_type, x_type, number_type, bad_data_type
    use da_interpolation, only : da_to_zk, &
       da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest, da_interp_lin_2d_newer, &
       da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest

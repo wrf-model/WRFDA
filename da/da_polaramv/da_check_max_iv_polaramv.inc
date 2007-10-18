@@ -6,7 +6,7 @@ subroutine da_check_max_iv_polaramv(iv,it,itu,ituf,itv,itvf)
 
    implicit none
 
-   type(iv_type),        intent(in)    :: iv
+   type(iv_type),        intent(inout) :: iv
    integer,              intent(in)    :: it      ! Outer iteration
    integer,              intent(inout) :: itu,ituf,itv,itvf
 

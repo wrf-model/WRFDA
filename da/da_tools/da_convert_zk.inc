@@ -7,7 +7,7 @@ subroutine da_convert_zk (info)
 
    implicit none
 
-   type(infa_type) :: info
+   type(infa_type), intent(inout) :: info
 
    if (trace_use) call da_trace_entry("da_convert_zk")
 

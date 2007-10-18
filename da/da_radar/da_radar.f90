@@ -1,6 +1,6 @@
 module da_radar
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, trace_use, &
@@ -13,7 +13,7 @@ module da_radar
       far_below_model_surface,kms,kme,kts,kte, trace_use_frequent
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      radar_type, info_type, field_type, infa_type
+      field_type, infa_type
    use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int

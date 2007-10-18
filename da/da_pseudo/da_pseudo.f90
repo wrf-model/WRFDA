@@ -5,10 +5,10 @@ module da_pseudo
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, pseudo, &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
-      max_error_bt, max_error_buv, pseudo_var,stdout
+      max_error_bt, max_error_buv, pseudo_var
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    use da_interpolation, only : da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_residual, da_convert_zk
