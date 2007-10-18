@@ -1,51 +1,33 @@
-subroutine da_add_flow_dependence_vp_adj (ne, ep, vp)
+subroutine da_lc_cone(truelat1, truelat2, cone)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Add flow-dependent increments in control variable space (vp).
-   !-----------------------------------------------------------------------
-                                      
+   !------------------------------------------------------------------------
+   ! Purpose: compute the cone factor of a Lambert Conformal projection
+   !------------------------------------------------------------------------
+
    implicit none
-   
-   integer, intent(in)                  :: ne  ! Ensemble size.
-   type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
-   type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
-   
-   integer                              :: n, k! Loop counters.
+    
+   real, intent(in)             :: truelat1  ! (-90 -> 90 degrees N)
+   real, intent(in)             :: truelat2  !   "   "  "   "     "
+   real, intent(out)            :: cone
 
-   vp % alpha(:,:,:) = 0.0
+   if (trace_use_dull) call da_trace_entry("da_lc_cone")
 
-   do n = ne, 1, -1
-      do k = kte, kts, -1
+   ! First, see if this is a secant or tangent projection.  For tangent
+   ! projections, truelat1 = truelat2 and the cone is tangent to the 
+   ! Earth's surface at this latitude.  For secant projections, the cone
+   ! intersects the Earth's surface at each of the distinctly different
+   ! latitudes
+   if (abs(truelat1-truelat2) > 0.1) then
+      cone = alog10(cos(truelat1*rad_per_deg)) - &
+             alog10(cos(truelat2*rad_per_deg))
+      cone = cone /(alog10(tan((45.0 - abs(truelat1)/2.0) * rad_per_deg)) - &
+             alog10(tan((45.0 - abs(truelat2)/2.0) * rad_per_deg)))        
+   else
+      cone = sin(abs(truelat1)*rad_per_deg)  
+   end if
 
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v5(its:ite,jts:jte,k,n) * &
-                                         vp % v5(its:ite,jts:jte,k)
+   if (trace_use_dull) call da_trace_exit("da_lc_cone")
 
-         ! rh:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v4(its:ite,jts:jte,k,n) * &
-                                         vp % v4(its:ite,jts:jte,k)
-
-         ! t_u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v3(its:ite,jts:jte,k,n) * &
-                                         vp % v3(its:ite,jts:jte,k)
-
-         ! chi_u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v2(its:ite,jts:jte,k,n) * &
-                                         vp % v2(its:ite,jts:jte,k)
-
-         ! psi:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v1(its:ite,jts:jte,k,n) * &
-                                         vp % v1(its:ite,jts:jte,k)
-
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_add_flow_dependence_vp_adj")
-
-end subroutine da_add_flow_dependence_vp_adj
+end subroutine da_lc_cone
 
 

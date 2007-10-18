@@ -26,7 +26,7 @@ subroutine da_oi_stats_polaramv(stats_unit, iv)
    stats%average = residual_polaramv1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(polaramv)
+   do n=1, iv%info(polaramv)%nlocal
       do k=1, iv%info(polaramv)%levels(n)
          if (iv%info(polaramv)%proc_domain(n,k)) then
             call da_stats_calculate(iv%info(polaramv)%obs_global_index(n), &

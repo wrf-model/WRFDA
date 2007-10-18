@@ -1,22 +1,40 @@
-subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val, field)
+subroutine da_add_noise_new (qc, error, inv, yo, z)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Control variable transform through the recursive filter.
-   !
-   ! Method: 1) Transform to nondimensional v_hat space.
-   !         2) Perform recursive filter in non-dimensional space (ds = 1).
-   !         3) Scale recursive filter output.
-   !         4) Transform filtered field to dimensional space.
-   !         5) Optionally scale by background error.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   type(domain),     intent(inout) :: grid
-   integer,          intent(in)    :: mz                             ! Vertical truncation.
-   real,             intent(in)    :: rf_alpha(mz)                   ! RF scale parameter. 
-   real,             intent(in)    :: val(jds:jde,mz)                ! Error standard deviation.
-   real,             intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
+   integer, intent(in)              :: qc
+   real, intent(in)                 :: error
+   real, intent(inout)              :: inv
+   real, intent(inout)              :: yo      ! Observation.
+   real, intent(out)                :: z       ! Random number.
+
+   real                             :: noise
+
+   if (trace_use) call da_trace_entry("da_add_noise_new")
+
+   z = missing_r
+
+   if (qc >= obs_qc_pointer) then
+      ! [1] Calculate scaled Gaussian noise:
+
+      call da_gauss_noise (z)      
+      noise = error * z
+      
+      ! [3] Recalculate corresponding O and O-B:
+      yo = yo + noise
+      inv = inv + noise
+   end if
+
+   if (trace_use) call da_trace_exit("da_add_noise_new")
+
+end subroutine da_add_noise_new
+
+
+ intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
       
    integer :: rf_passes_over_two    ! rf_passes / 2
    integer :: i, j, m, n, pass      ! Loop counters.

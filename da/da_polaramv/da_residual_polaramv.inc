@@ -23,7 +23,7 @@ subroutine da_residual_polaramv(iv, y, re,np_missing, np_bad_data,np_obs_used, n
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(polaramv)
+   do n=1, iv%info(polaramv)%nlocal
       do k=1, iv%info(polaramv)%levels(n)
          np_available = np_available + 2
          re%polaramv(n)%u(k) = da_residual(n, 0, y%polaramv(n)%u(k), iv%polaramv(n)%u(k), n_obs_bad % u)

@@ -25,3 +25,6 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
 end subroutine da_read_obs_bufrssmis
 
 
+ubroutine da_calculate_grady_satem
+
+

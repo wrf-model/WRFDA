@@ -1,69 +1,65 @@
-subroutine da_scan_obs_ascii (iv, filename)
+subroutine da_check_xtoy_adjoint_metar(iv, y, adjtest_lhs, pertile_lhs)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Scan WRFVAR GTS observation file
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type),    intent(inout) :: iv
-   character(*),      intent(in)    :: filename
+   type(iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type(y_type) , intent(inout)  :: y             ! y = h (xa)
+   real,          intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   character (len =  10)   :: fmt_name
-   character (len = 160)   :: info_string
-   character (len = 160)   :: fmt_info
-   character (len = 160)   :: fmt_loc
-   character (len = 160)   :: fmt_each
+   integer :: n             ! Loop counter.
 
-   integer                 :: i, iost, fm, report, iunit
-   type (multi_level_type) :: platform
-   logical                 :: outside, outside_all
-   real                    :: height_error
-   integer                 :: ndup, n
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_metar")
 
-   if (trace_use) call da_trace_entry("da_scan_obs_ascii")
+   do n=1, iv%info(metar)%nlocal
+      if (iv%info(metar)%zk(1,n) < 1.0) then
+         y%metar(n)%u = 0.0
+         y%metar(n)%v = 0.0
+         y%metar(n)%t = 0.0
+         y%metar(n)%p = 0.0
+         y%metar(n)%q = 0.0
 
-   ! open file
-   ! ---------
-   call da_get_unit(iunit)
-   open(unit   = iunit,     &
-      FILE   = trim(filename), &
-      FORM   = 'FORMATTED',  &
-      ACCESS = 'SEQUENTIAL', &
-      iostat =  iost,     &
-      STATUS = 'OLD')
-
-   if (iost /= 0) then
-      write(unit=message(1),fmt='(A,I5,A)') &
-         "Error",iost," opening gts obs file "//trim(filename)
-      call da_warning(__FILE__,__LINE__,message(1:1))
-      call da_free_unit(iunit)
-      return
-   end if
-
-   ! read header
-
-   head_info: do
-      read (unit = iunit, fmt = '(A)', iostat = iost) info_string
-      if (iost /= 0) then
-         write(unit=message(1),fmt='(A,I3,A,I3)') &
-            "Error",iost,"reading gts obs header on unit",iunit
-         call da_warning(__FILE__,__LINE__,message(1:1))
-         return
+         cycle
       end if
-      if (info_string(1:6) == 'EACH  ') exit
-   end do head_info
 
-   ! read formats
+      y%metar(n)%u = y%metar(n)%u/typical_u_rms
+      y%metar(n)%v = y%metar(n)%v/typical_v_rms
+      y%metar(n)%t = y%metar(n)%t/typical_t_rms
+      y%metar(n)%p = y%metar(n)%p/typical_p_rms
+      y%metar(n)%q = y%metar(n)%q/typical_q_rms
 
-   read (iunit, fmt = '(A,1X,A)', iostat = iost) &
-       fmt_name, fmt_info, &
-       fmt_name, fmt_loc,  &
-       fmt_name, fmt_each
+      if (iv%info(metar)%proc_domain(1,n)) then
+         adjtest_lhs = adjtest_lhs  &
+                     + (y%metar(n)%u)**2 &
+                     + (y%metar(n)%v)**2 &
+                     + (y%metar(n)%t)**2 &
+                     + (y%metar(n)%p)**2 &
+                     + (y%metar(n)%q)**2
+      end if
 
-   if (iost /= 0) then
-      write(unit=message(1),fmt='(A,I3,A,I3)') &
-         "Error",iost,"reading gts obs formats on unit",iunit
+      pertile_lhs = pertile_lhs &
+                  + (y%metar(n)%u)**2 &
+                  + (y%metar(n)%v)**2 &
+                  + (y%metar(n)%t)**2 &
+                  + (y%metar(n)%p)**2 &
+                  + (y%metar(n)%q)**2
+
+      y%metar(n)%u = y%metar(n)%u/typical_u_rms
+      y%metar(n)%v = y%metar(n)%v/typical_v_rms
+      y%metar(n)%t = y%metar(n)%t/typical_t_rms
+      y%metar(n)%p = y%metar(n)%p/typical_p_rms
+      y%metar(n)%q = y%metar(n)%q/typical_q_rms
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_metar")
+
+end subroutine da_check_xtoy_adjoint_metar
+
+
+ on unit",iunit
          call da_warning(__FILE__,__LINE__,message(1:1))
       return
    end if
@@ -192,7 +188,7 @@ subroutine da_scan_obs_ascii (iv, filename)
             if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
             if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
 
          case (32:34) ;
             if (.not.use_pilotobs .or. iv%ntotal(pilot) == max_pilot_input) cycle reports
@@ -205,9 +201,9 @@ subroutine da_scan_obs_ascii (iv, filename)
             if (n==1) iv%ntotal(sound)     = iv%ntotal(sound) + 1
             if (n==1) iv%ntotal(sonde_sfc) = iv%ntotal(sonde_sfc) + 1
             if (outside) cycle reports
-            iv%nlocal(sound)     = iv%nlocal(sound) + 1
-            iv%nlocal(sonde_sfc) = iv%nlocal(sonde_sfc) + 1
-
+            iv%info(sound)%nlocal     = iv%info(sound)%nlocal + 1
+            iv%info(sonde_sfc)%nlocal = iv%info(sonde_sfc)%nlocal + 1
+write (0,*) "iv%info(sonde_sfc)%nlocal",iv%info(sonde_sfc)%nlocal
          case (86) ;
             if (.not.use_satemobs .or. iv%ntotal(satem) == max_satem_input) cycle reports
             ! Reject cloudy satem obs.
@@ -216,7 +212,7 @@ subroutine da_scan_obs_ascii (iv, filename)
             end if
             if (n==1) iv%ntotal(satem) = iv%ntotal(satem) + 1
             if (outside) cycle reports
-            iv%nlocal(satem) = iv%nlocal(satem) + 1
+            iv%info(satem)%nlocal = iv%info(satem)%nlocal + 1
 
          case (88)    ;
             ! Geostationary or Polar orbitting Satellite AMVs:
@@ -225,12 +221,12 @@ subroutine da_scan_obs_ascii (iv, filename)
                if (.not.use_polaramvobs .or. iv%ntotal(polaramv) == max_polaramv_input) cycle reports
                if (n==1) iv%ntotal(polaramv) = iv%ntotal(polaramv) + 1
                if (outside) cycle reports
-               iv%nlocal(polaramv) = iv%nlocal(polaramv) + 1
+               iv%info(polaramv)%nlocal = iv%info(polaramv)%nlocal + 1
             else
                if (.not.use_geoamvobs .or. iv%ntotal(geoamv) == max_geoamv_input) cycle reports
                if (n==1) iv%ntotal(geoamv) = iv%ntotal(geoamv) + 1
                if (outside) cycle reports
-               iv%nlocal(geoamv) = iv%nlocal(geoamv) + 1
+               iv%info(geoamv)%nlocal = iv%info(geoamv)%nlocal + 1
             end if
 
          case (42,96:97) ;
@@ -243,20 +239,20 @@ subroutine da_scan_obs_ascii (iv, filename)
             if (.not.use_gpspwobs .or. iv%ntotal(gpspw) == max_gpspw_input) cycle reports
             if (n==1) iv%ntotal(gpspw) = iv%ntotal(gpspw) + 1
             if (outside) cycle reports
-            iv%nlocal(gpspw) = iv%nlocal(gpspw) + 1
+            iv%info(gpspw)%nlocal = iv%info(gpspw)%nlocal + 1
 
          case (116) ;
             if (.not.use_gpsrefobs .or. iv%ntotal(gpsref) == max_gpsref_input) cycle reports
             if (n==1) iv%ntotal(gpsref) = iv%ntotal(gpsref) + 1
             if (outside) cycle reports
-            iv%nlocal(gpsref) = iv%nlocal(gpsref) + 1
+            iv%info(gpsref)%nlocal = iv%info(gpsref)%nlocal + 1
 
           case (121) ;
             ! SSM/T1 temperatures
             if (.not.use_ssmt1obs .or. iv%ntotal(ssmt1) == max_ssmt1_input) cycle reports
             if (n==1) iv%ntotal(ssmt1) = iv%ntotal(ssmt1) + 1
             if (outside) cycle reports
-            iv%nlocal(ssmt1) = iv%nlocal(ssmt1) + 1
+            iv%info(ssmt1)%nlocal = iv%info(ssmt1)%nlocal + 1
 
          case (122) ;
             ! SSM/T2 relative humidities:
@@ -276,7 +272,7 @@ subroutine da_scan_obs_ascii (iv, filename)
             if (.not.use_profilerobs .or. iv%ntotal(profiler) == max_profiler_input) cycle reports
             if (n==1) iv%ntotal(profiler) = iv%ntotal(profiler) + 1
             if (outside) cycle reports
-            iv%nlocal(profiler) = iv%nlocal(profiler) + 1
+            iv%info(profiler)%nlocal = iv%info(profiler)%nlocal + 1
 
          case (135) ;
             if (.not.use_bogusobs .or. iv%ntotal(bogus) == max_bogus_input) cycle reports

@@ -18,7 +18,7 @@ subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
    jo % profiler_u = 0.0
    jo % profiler_v = 0.0
 
-   do n=1, iv%nlocal(profiler)
+   do n=1, iv%info(profiler)%nlocal
       do k=1, iv%info(profiler)%levels(n)
          jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
             (iv%profiler(n)%u(k)%error * iv%profiler(n)%u(k)%error)

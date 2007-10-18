@@ -27,10 +27,10 @@ subroutine da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
    if (test_dm_exact) then
       if (iv%ntotal(sound) == 0) return
    else
-      if (iv%nlocal(sound) < 1) return
+      if (iv%info(sound)%nlocal < 1) return
    end if
 
-   do n=1, iv%nlocal(sound)
+   do n=1, iv%info(sound)%nlocal
        do k=1, iv%info(sound)%levels(n)
           jo_grad_y%sound(n)%u(k) = -re%sound(n)%u(k) / (iv%sound(n)%u(k)%error * iv%sound(n)%u(k)%error)
           jo_grad_y%sound(n)%v(k) = -re%sound(n)%v(k) / (iv%sound(n)%v(k)%error * iv%sound(n)%v(k)%error)

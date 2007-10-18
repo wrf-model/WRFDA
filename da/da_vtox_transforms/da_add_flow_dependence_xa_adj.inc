@@ -1,52 +1,51 @@
-subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp)
+subroutine da_perform_2drf(ni, nj, num_passes, rf_scale, field)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Add flow-dependent increments in model space (xa).
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
-                                      
+
    implicit none
-   
-   integer, intent(in)                  :: ne  ! Ensemble size.
-   type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
-   type (x_type), intent(in)            :: xa  ! Analysis increments.
-   type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
-   
-   integer                              :: n, k! Loop counters.
 
-   vp % alpha(:,:,:) = 0.0
+   integer, intent(in)    :: ni               ! Array dimension 1.
+   integer, intent(in)    :: nj               ! Array dimension 2.
+   integer, intent(in)    :: num_passes       ! Number of passes of RF.
+   real,    intent(in)    :: rf_scale         ! Recursive filter scaling parameter.
+   real,    intent(inout) :: field(1:ni,1:nj) ! Field to be filtered.
 
-   do n = ne, 1, -1
-      ! ps:
-      vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                      ep % v5(its:ite,jts:jte,1,n) * & ! v5 = ps
-                                      xa % psfc(its:ite,jts:jte)
+   integer               :: i, j, pass       ! Loop counters.
+   real                  :: e, alpha         ! Recursive filter parameters.
+   real                  :: mean_field       ! Mean field.
 
-      do k = kte, kts, -1
+   if (trace_use) call da_trace_entry("da_perform_2drf")
 
-         ! q:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v4(its:ite,jts:jte,k,n) * & ! v4 = q
-                                         xa % q(its:ite,jts:jte,k)
+   e = 0.25 * num_passes / (rf_scale * rf_scale)
+   alpha = 1 + e - sqrt(e * (e + 2.0))
 
-         ! t:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v3(its:ite,jts:jte,k,n) * & ! v3 = t
-                                         xa % t(its:ite,jts:jte,k)
+   mean_field = sum(field(1:ni,1:nj)) / real(ni*nj)
 
-         ! v:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v2(its:ite,jts:jte,k,n) * & ! v2 = v
-                                         xa % v(its:ite,jts:jte,k)
+   do pass = 1, num_passes
+      ! Perform filter in I-direction:
+      do j = 1, nj
+         call da_recursive_filter_1d(pass, alpha, field(1:ni,j), ni)
+      end do
 
-         ! u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v1(its:ite,jts:jte,k,n) * & ! v1 = u
-                                         xa % u(its:ite,jts:jte,k)
+      ! Perform filter in J-direction:
+      do i = 1, ni
+         call da_recursive_filter_1d(pass, alpha, field(i,1:nj), nj)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_add_flow_dependence_xa_adj")
+   if (trace_use) call da_trace_exit("da_perform_2drf")
 
-end subroutine da_add_flow_dependence_xa_adj
+end subroutine da_perform_2drf
+
+
+%xa%v(i,j,kts)+var*grid%xa%speed(i,j)*grid%xb%v(i,j,kts)
+      end do
+   end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtoseasfcwind_adj")
+
+end subroutine da_transform_xtoseasfcwind_adj
 
 

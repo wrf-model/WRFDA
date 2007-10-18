@@ -1,98 +1,112 @@
-subroutine da_put_var_3d_real_cdf(file, var, data, i1, i2, i3, time, debug)
- 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
-        
+subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
+
+   !---------------------------------------------------------------------------
+   !  Purpose: Calculates balanced mass increment phi_b from wind increments.
+   !
+   !  Method:  Solve grad**2 Phi_b = - div[ k x rho f u + rho (u.grad ) u ] by
+   !           1) Calculate RHS of balance equation in gridpt space.
+   !           2) Solve Del**2 phi_b = RHS for phi_b using double (FCT).
+   !
+   !---------------------------------------------------------------------------
+
    implicit none
 
-#include "netcdf.inc"
+   type(domain),   intent(inout) :: grid
+   type(xbx_type), intent(in)    :: xbx                            ! Header & non-gridded vars. 
+   real,           intent(in)    :: u(ims:ime,jms:jme,kms:kme)     ! u wind comp.
+   real,           intent(in)    :: v(ims:ime,jms:jme,kms:kme)     ! v wind comp.
+   real,           intent(out)   :: phi_b(ims:ime,jms:jme,kms:kme) ! Balanced mass increment.
 
-   integer,            intent(in) ::  i1, i2, i3, time
-   character (len=80), intent(in) :: file
-   logical,            intent(in) :: debug
-   character (len=*),  intent(in) :: var
-   real,               intent(in) :: data(i1,i2,i3)
+   integer :: i, j, k                 ! Loop counters.
+   integer :: is, ie                  ! 1st dim. end points.
+   integer :: js, je                  ! 2nd dim. end points.
 
-   real(kind=8) :: tmp(i1,i2,i3)
-   real(kind=4) :: tmp4(i1,i2,i3)
+   real    :: coefx(ims:ime,jms:jme)  ! Multiplicative coefficient.
+   real    :: coefy(ims:ime,jms:jme)  ! Multiplicative coefficient.
+   real    :: term_x(ims:ime,jms:jme) ! Balance eqn x term
+   real    :: term_y(ims:ime,jms:jme) ! Balance eqn y term
+   
+   real    :: del2phi_b(ims:ime,jms:jme,kms:kme)  ! Del**2 phi_b/M**2
 
-   integer            :: cdfid, rcode, id_data
-   character (len=80) :: varnam
-   integer            :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
-   integer            :: i, ivtype
+   if (trace_use) call da_trace_entry("da_balance_equation_lin")
 
-   ! not for update_bc
-   ! if (trace_use) call da_trace_entry("da_put_var_3d_real_cdf")
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise iand set Multipilactive constants
+   !---------------------------------------------------------------------------
 
-   cdfid = ncopn(file, NCWRITE, rcode)
+   ! Computation to check for edge of domain:
 
-   if (rcode /= 0) then
-      write(unit=stdout, fmt='(2a)') ' error openiing netcdf file ', trim(file)
-      stop
+   is = its; ie = ite; js = jts; je = jte
+   if (.not.global .and. its == ids) is = ids+1
+   if (.not.global .and. ite == ide) ie = ide-1
+   if (jts == jds ) js = jds+1; if (jte == jde) je = jde-1
+
+   if (fg_format == fg_format_kma_global) then
+      coefx = grid%xb%coefx
+      coefy = grid%xb%coefy
+   else if( fg_format == fg_format_wrf) then
+      coefx = grid%xb%coefz
+      coefy = coefx   
+   else
+      write(unit=message(1),fmt='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   id_data = ncvid(cdfid, var, rcode)
+   ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
 
-   rcode = nf_inq_var(cdfid, id_data, varnam, ivtype, ndims, dimids, natts)
+   do k = kts, kte
+      term_x(ims:ime,jms:jme) = 0.0
+      term_y(ims:ime,jms:jme) = 0.0
 
-   if (debug) then
-      write(unit=stdout, fmt='(3a,i6)') ' put_var_3d_real_cdf: dims for ',var,' ',ndims
-   end if
+      !---------------------------------------------------------------------------
+      ! [2.0] Calculate RHS of balance equation in gridpt space:
+      !---------------------------------------------------------------------------
 
-   do i=1,ndims
-      rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
-      if (debug) write(unit=stdout,fmt=*) ' dimension ',i,idims(i)
+      ! [2.1] Include geostrophic terms in balance eqn if requested:
+
+      if (balance_type == balance_geo .OR. balance_type == balance_geocyc ) then
+         call da_balance_geoterm_lin (grid%xb % cori, grid%xb % rho(:,:,k), u(:,:,k), v(:,:,k), &
+            term_x, term_y)
+      end if
+      
+      ! [2.2] Include cyclostrophic terms in balance eqn if requested:
+
+      if (balance_type == balance_cyc .OR. balance_type == balance_geocyc ) then
+         call da_balance_cycloterm_lin (grid%xb % rho(:,:,k), grid%xb % u(:,:,k),   &
+            grid%xb % v(:,:,k), u(:,:,k), v(:,:,k), grid%xb % coefx(:,:), grid%xb % coefy(:,:), &
+            term_x(:,:), term_y(:,:))
+      end if
+      
+      ! [2.3] Take divergence to get Del**2 phi_b/M**2:
+
+      do j = js, je
+         do i = is, ie
+          del2phi_b(i,j,k) = -coefx(i,j)*( term_x(i+1,j) - term_x(i-1,j)) &
+                             -coefy(i,j)*( term_y(i,j+1) - term_y(i,j-1)) 
+         end do
+      end do
+
+      ! [2.4] Del**2 Phi_b  boundary conditions:
+
+      if (.not. global .and. its == ids ) del2phi_b(its,js:je,k) = 0.0
+      if (.not. global .and. ite == ide ) del2phi_b(ite,js:je,k) = 0.0
+      if (jts == jds ) del2phi_b(is:ie,jts,k) = 0.0
+      if (jte == jde ) del2phi_b(is:ie,jte,k) = 0.0
+
+      if (.not. global .and. (its == ids .and. jts == jds) ) del2phi_b(its,jts,k) = 0.0
+      if (.not. global .and. (its == ids .and. jte == jde) ) del2phi_b(its,jte,k) = 0.0
+      if (.not. global .and. (ite == ide .and. jts == jds) ) del2phi_b(ite,jts,k) = 0.0
+      if (.not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0     
    end do
 
-   ! check the dimensions
+   !------------------------------------------------------------------------------
+   !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
+   !------------------------------------------------------------------------------
 
-   if ((i1 /= idims(1)) .or.  &
-       (i2 /= idims(2)) .or.  &
-       (i3 /= idims(3)) .or.  &
-       (time > idims(4))    )  then
+   call da_solve_poissoneqn_fst(grid, xbx, del2phi_b, phi_b) 
 
-      write(unit=stdout,fmt=*) ' error in 3d_var_real read, dimension problem '
-      write(unit=stdout,fmt=*) i1, idims(1)
-      write(unit=stdout,fmt=*) i2, idims(2)
-      write(unit=stdout,fmt=*) i3, idims(3)
-      write(unit=stdout,fmt=*) time, idims(4)
-      write(unit=stdout,fmt=*) ' error stop '
-      stop
-   end if
+   if (trace_use) call da_trace_exit("da_balance_equation_lin")
 
-   ! get the data
-  
-   istart(1) = 1
-   iend(1) = i1
-   istart(2) = 1
-   iend(2) = i2
-   istart(3) = 1
-   iend(3) = i3
-   istart(4) = time
-   iend(4) = 1
-
-   if ((ivtype == NF_real) .and. (kind(data) == 4)) then
-      call ncvpt(cdfid,id_data,istart,iend,data,rcode)
-   else if ((ivtype == NF_DOUBLE) .and. (kind(data) == 8)) then
-      tmp = data
-      call ncvpt(cdfid,id_data,istart,iend,tmp,rcode)
-   else if ((ivtype == NF_DOUBLE) .and. (kind(data) == 4)) then
-      tmp = data
-      call ncvpt(cdfid,id_data,istart,iend,tmp,rcode)
-   else if ((ivtype == NF_REAL) .and. (kind(data) == 8)) then
-      tmp4 = data
-      call ncvpt(cdfid,id_data,istart,iend,tmp4,rcode)
-   else
-      write(unit=stdout, fmt='(a, 4i6)') &
-         'Unrecognizable ivtype:', ivtype,nf_double,nf_real,kind(data)
-      stop
-   end if
-
-   call ncclos(cdfid,rcode)
-
-   ! if (trace_use) call da_trace_exit("da_put_var_3d_real_cdf")
-
-end subroutine da_put_var_3d_real_cdf
+end subroutine da_balance_equation_lin
 
 

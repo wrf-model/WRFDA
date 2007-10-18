@@ -41,8 +41,8 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
    if (pseudo_var(1:3) == 'ref' .and. num_pseudo > 0) then
 
       ! Deallocate:
-      if (iv%nlocal(gpsref) > 0) then
-         do n = 1, iv%nlocal(gpsref)
+      if (iv%info(gpsref)%nlocal > 0) then
+         do n = 1, iv%info(gpsref)%nlocal
             deallocate(iv % gpsref(n) %  h)
             deallocate(iv % gpsref(n) % ref)
             deallocate(iv % gpsref(n) %   p)
@@ -57,7 +57,7 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
       use_gpsrefobs = .true.
 
       ! Allocate:
-      iv%nlocal(gpsref) = num_pseudo
+      iv%info(gpsref)%nlocal = num_pseudo
       iv%plocal(1,gpsref) = num_pseudo
       iv%nlocal(pseudo) = 0
 
@@ -102,7 +102,7 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
       write(stdout,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
    end if
 
-   if (iv%nlocal(gpsref) < 1) return
+   if (iv%info(gpsref)%nlocal < 1) return
 
    ntotal = 0
    pref = 0 ; fref = 0

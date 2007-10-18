@@ -28,7 +28,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    ! [1.0] Compute components of Grad_y(Jo):
    !-------------------------------------------------------------------------
 
-   if (iv%nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       call da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
       jo_sound = jo%sound_u + jo%sound_v + jo%sound_t + jo%sound_q
 
@@ -75,7 +75,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_synop = 0.0
    end if
 
-   if (iv%nlocal(geoamv) > 0) then
+   if (iv%info(geoamv)%nlocal > 0) then
       call da_jo_and_grady_geoamv(iv, re, jo, jo_grad_y)
       jo_geoamv = jo%geoamv_u + jo%geoamv_v
       if (print_detail_grad) then
@@ -88,7 +88,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_geoamv = 0.0
    end if
 
-   if (iv%nlocal(polaramv) > 0) then
+   if (iv%info(polaramv)%nlocal > 0) then
       call da_jo_and_grady_polaramv(iv, re, jo, jo_grad_y)
       jo_polaramv = jo%polaramv_u + jo%polaramv_v
       if (print_detail_grad) then
@@ -115,14 +115,14 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_pilot = 0.0
    end if
 
-   if (iv%nlocal(satem) > 0) then
+   if (iv%info(satem)%nlocal > 0) then
       call da_jo_and_grady_satem(iv, re, jo, jo_grad_y)
       jo_satem = jo%satem_thickness
    else
       jo_satem = 0.0
    end if
 
-   if (iv%nlocal(metar) > 0) then
+   if (iv%info(metar)%nlocal > 0) then
       call da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
       jo_metar = jo%metar_u + jo%metar_v + jo%metar_t + jo%metar_p + jo%metar_q
    else
@@ -136,14 +136,14 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_ships = 0.0
    end if
 
-   if (iv%nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
       call da_jo_and_grady_gpspw(iv, re, jo, jo_grad_y)
       jo_gpspw = jo%gpspw_tpw
    else
       jo_gpspw = 0.0
    end if
 
-   if (iv%nlocal(gpsref) > 0) then
+   if (iv%info(gpsref)%nlocal > 0) then
       call da_jo_and_grady_gpsref(iv, re, jo, jo_grad_y)
       jo_gpsref = jo%gpsref_ref
    else
@@ -166,7 +166,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_ssmi_rv = 0.0
    end if
 
-   if (iv%nlocal(ssmt1) > 0) then
+   if (iv%info(ssmt1)%nlocal > 0) then
       call da_jo_and_grady_ssmt1(iv, re, jo, jo_grad_y)
       jo_ssmt1 = jo%ssmt1_t
    else
@@ -180,7 +180,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_ssmt2 = 0.0
    end if
 
-   if (iv%nlocal(radar) > 0) then
+   if (iv%info(radar)%nlocal > 0) then
       call da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
       jo_radar = jo%radar_rv + jo%radar_rf
    else
@@ -201,7 +201,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_qscat = 0.0
    end if
 
-   if (iv%nlocal(profiler) > 0) then
+   if (iv%info(profiler)%nlocal > 0) then
       call da_jo_and_grady_profiler (iv, re, jo, jo_grad_y)
       jo_profiler = jo%profiler_u + jo%profiler_v
    else

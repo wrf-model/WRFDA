@@ -14,7 +14,7 @@ subroutine da_calculate_grady_gpspw(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_gpspw")
 
-   do n=1, iv%nlocal(gpspw)
+   do n=1, iv%info(gpspw)%nlocal
       if (iv%gpspw(n)%tpw%qc < obs_qc_pointer) then
          re%gpspw(n)%tpw = 0.0
       end if

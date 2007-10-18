@@ -207,7 +207,7 @@ subroutine da_read_obs_radar (iv, filename)
                if (n==1) ntotal(radar) = ntotal(radar) + 1
                if (outside) cycle reports
                nlocal(radar) = nlocal(radar) + 1
-               if (nlocal(radar) > iv%nlocal(radar)) cycle reports
+               if (nlocal(radar) > iv%info(radar)%nlocal) cycle reports
 
                iv % radar (nlocal(radar)) % stn_loc % lon = platform % stn % lon
                iv % radar (nlocal(radar)) % stn_loc % lat = platform % stn % lat

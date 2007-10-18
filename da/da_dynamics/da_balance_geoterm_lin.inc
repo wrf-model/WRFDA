@@ -1,52 +1,215 @@
-subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y)
+subroutine da_qc_amsub (i, nchan, ob, iv)
 
    !---------------------------------------------------------------------------
-   !  Purpose: calculates linearised geostrophic term in balance equation.
-   !
-   !  method:  term is k x rho f u on a single level.
-   !
-   !  assumptions: Various (see documentation).
+   ! Purpose: perform quality control for amsub data.
    !---------------------------------------------------------------------------
 
    implicit none
-   
-   real, intent(in)    :: cori(ims:ime,jms:jme)   ! Coriolis factor.
-   real, intent(in)    :: rho(ims:ime,jms:jme)    ! Density
-   real, intent(in)    :: u(ims:ime,jms:jme)      ! u wind increment
-   real, intent(in)    :: v(ims:ime,jms:jme)      ! v wind increment
-   real, intent(inout) :: term_x(ims:ime,jms:jme) ! x component of term.
-   real, intent(inout) :: term_y(ims:ime,jms:jme) ! y component of term.
 
-   integer :: is, js              ! i,j lower loop limits
-   integer :: ie, je              ! i,j upper loop limits
+   integer, intent(in)             :: i          ! sensor index.
+   integer, intent(in)             :: nchan      ! number of channel
+   type (y_type),  intent(in)      :: ob         ! Observation structure.
+   type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
-   if (trace_use) call da_trace_entry("da_balance_geoterm_lin")
+   ! local variables
+   integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
+   logical   :: lmix
+   real      :: si
+   ! real     :: satzen
+   integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
+                nrej_omb_std(nchan),      &
+                nrej_mixsurface,nrej_windowchanl, nrej_si,    &
+                nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
+                nrej_limb
 
-   ! Set loop limits
+   character(len=30)  :: filename
 
-   is = its-1
-   ie = ite+1
-   js = jts-1
-   je = jte+1
-   if (its == ids ) is = ids
-   if (ite == ide ) ie = ide
-   if (jts == jds ) js = jds
-   if (jte == jde ) je = jde
+   if (trace_use) call da_trace_entry("da_qc_amsub")
 
-   !---------------------------------------------------------------------------
-   ! [1.0] Calculate term_x = -f rho v~:
-   !---------------------------------------------------------------------------
+   ngood(:)        = 0
+   nrej(:)         = 0
+   nrej_omb_abs(:) = 0
+   nrej_omb_std(:) = 0
+   nrej_mixsurface = 0
+   nrej_windowchanl= 0
+   nrej_si         = 0
+   nrej_clw        = 0
+   nrej_topo       = 0
+   nrej_limb       = 0
+   num_rad         = iv%plocal_rad(iv%time,i) - iv%plocal_rad(iv%time-1,i)
 
-   term_x(is:ie,js:je) = term_x(is:ie,js:je) - rho(is:ie,js:je) * cori(is:ie,js:je) * v(is:ie,js:je)
+   num_proc_domain = 0
 
-   !---------------------------------------------------------------------------
-   ! [2.0] Calculate term_y = f rho u~:
-   !---------------------------------------------------------------------------
+   if (num_rad > 0) then
+      do n= iv%plocal_rad(iv%time-1,i)+1, iv%plocal_rad(iv%time,i)
 
-   term_y(is:ie,js:je) = term_y(is:ie,js:je) + rho(is:ie,js:je) * cori(is:ie,js:je) * u(is:ie,js:je)
+         if (iv%instid(i)%info%proc_domain(1,n)) &
+               num_proc_domain = num_proc_domain + 1
 
-   if (trace_use) call da_trace_exit("da_balance_geoterm_lin")
+         ! 0.0  initialise QC flags by assuming good obs
+         !---------------------------------------------
+         iv%instid(i)%tb_qc(:,n) = qc_good
 
-end subroutine da_balance_geoterm_lin
+         ! a.  reject all channels over mixture surface type
+         !------------------------------------------------------
+         isflg = iv%instid(i)%isflg(n)
+         lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
+         if (lmix) then 
+            iv%instid(i)%tb_qc(:,n)  =  qc_bad
+            if (iv%instid(i)%info%proc_domain(1,n)) &
+               nrej_mixsurface = nrej_mixsurface + 1
+         end if
+
+         !  b.  reject channels 1~2 over land/sea-ice/snow
+         !------------------------------------------------------
+         if (isflg > 0) then
+            iv%instid(i)%tb_qc(1:2,n)    = qc_bad
+            if (iv%instid(i)%info%proc_domain(1,n)) &
+               nrej_windowchanl = nrej_windowchanl + 1
+         end if
+
+         ! reject limb obs 
+         !------------------------------------------------------
+         scanpos = iv%instid(i)%scanpos(n)
+         if (scanpos <= 8 .or. scanpos >= 83) then
+             iv%instid(i)%tb_qc(:,n)  =  qc_bad
+             if (iv%instid(i)%info%proc_domain(1,n)) &
+                 nrej_limb = nrej_limb + 1
+         end if
+
+         ! satzen  = rad%satzen
+         ! if (abs(satzen) > 45.0) &
+         !    iv%instid(i)%tb_qc(:,n)  =  qc_bad
+
+         !  d. check cloud/precipitation 
+         !-----------------------------------------------------------
+         if (ob%instid(i)%tb(1,n) > 0.0 .and. &
+              ob%instid(i)%tb(2,n) > 0.0) then
+            si = ob%instid(i)%tb(1,n) - ob%instid(i)%tb(2,n)
+            if (si >= 3.0) then
+               iv%instid(i)%tb_qc(:,n) = qc_bad
+               iv%instid(i)%cloud_flag(:,n) = qc_bad
+               if (iv%instid(i)%info%proc_domain(1,n)) &
+                  nrej_si = nrej_si + 1
+            end if
+         end if
+
+         if (iv%instid(i)%clwp(n) >= 0.2) then
+            iv%instid(i)%tb_qc(:,n) = qc_bad
+            iv%instid(i)%cloud_flag(:,n) = qc_bad
+            if (iv%instid(i)%info%proc_domain(1,n)) &
+               nrej_clw = nrej_clw + 1
+         end if
+
+         !  e. check surface height/pressure
+         !------------------------------------------------------
+         ! sfchgt = ivrad%info(n)%elv
+         ! if (sfchgt >=) then
+         !
+         ! else 
+         ! end if
+
+         if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 800.0)) then
+            iv%instid(i)%tb_qc(5,n)  = qc_bad
+            if (iv%instid(i)%info%proc_domain(1,n)) &
+               nrej_topo = nrej_topo + 1
+         end if
+
+         !  g. check iuse (pre-rejected channels by .info files)
+         !------------------------------------------------------
+         do k = 1, nchan
+           if (satinfo(i)%iuse(k) .eq. -1) &
+                iv%instid(i)%tb_qc(k,n) = qc_bad
+         end do
+
+         !  f. check innovation
+         !-----------------------------------------------------------
+         do k = 1, nchan
+          ! absolute departure check
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
+               iv%instid(i)%tb_qc(k,n)  = qc_bad
+               if (iv%instid(i)%info%proc_domain(1,n)) &
+                  nrej_omb_abs(k) = nrej_omb_abs(k) + 1
+            end if
+
+          ! relative departure check
+            if (use_error_factor_rad) then
+                 iv%instid(i)%tb_error(k,n) =  &
+                    satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
+            else
+                 iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
+            end if
+
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
+               iv%instid(i)%tb_qc(k,n)  = qc_bad
+               if (iv%instid(i)%info%proc_domain(1,n)) &
+                     nrej_omb_std(k) = nrej_omb_std(k) + 1
+            end if
+
+           ! final QC decision
+            if (iv%instid(i)%tb_qc(k,n) == qc_bad) then
+               iv%instid(i)%tb_error(k,n) = 500.0
+               if (iv%instid(i)%info%proc_domain(1,n)) &
+                  nrej(k) = nrej(k) + 1
+            else
+               if (iv%instid(i)%info%proc_domain(1,n)) &
+                  ngood(k) = ngood(k) + 1
+            end if
+         end do ! chan
+      end do ! end loop pixel
+   end if
+
+   ! Do inter-processor communication to gather statistics.
+
+   call da_proc_sum_int (num_proc_domain)
+   call da_proc_sum_int (nrej_mixsurface)
+   call da_proc_sum_int (nrej_windowchanl)
+   call da_proc_sum_int (nrej_si)
+   call da_proc_sum_int (nrej_clw)
+   call da_proc_sum_int (nrej_topo)
+   call da_proc_sum_int (nrej_limb)
+   call da_proc_sum_ints (nrej_omb_abs(:))
+   call da_proc_sum_ints (nrej_omb_std(:))
+   call da_proc_sum_ints (nrej(:))
+   call da_proc_sum_ints (ngood(:))
+
+   if (rootproc) then
+      if (num_fgat_time > 1) then
+         write(filename,'(a,i2.2)') 'qcstat_'//trim(iv%instid(i)%rttovid_string)//'_',iv%time
+      else
+         filename = 'qcstat_'//trim(iv%instid(i)%rttovid_string)
+      end if
+      call da_get_unit(fgat_rad_unit)
+      open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
+      if (ios /= 0) then
+         write(unit=message(1),fmt='(A,A)') 'error opening the output file ', filename
+         call da_error(__FILE__,__LINE__,message(1:1))
+      end if
+
+      write(fgat_rad_unit, fmt='(/a/)') &
+         'Quality Control Statistics for '//iv%instid(i)%rttovid_string
+      write(fgat_rad_unit,'(a20,i7)') ' num_proc_domain  = ', num_proc_domain
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_clw         = ', nrej_clw
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_topo        = ', nrej_topo
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb
+      write(fgat_rad_unit,'(a20)')    ' nrej_omb_abs(:)  = '
+      write(fgat_rad_unit,'(10i7)')     nrej_omb_abs(:)
+      write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
+      write(fgat_rad_unit,'(10i7)')     nrej_omb_std(:)
+      write(fgat_rad_unit,'(a20)')    ' nrej(:)          = '
+      write(fgat_rad_unit,'(10i7)')     nrej(:)
+      write(fgat_rad_unit,'(a20)')    ' ngood(:)         = '
+      write(fgat_rad_unit,'(10i7)')     ngood(:)
+
+      close(fgat_rad_unit)
+      call da_free_unit(fgat_rad_unit)
+   end if
+
+   if (trace_use) call da_trace_exit("da_qc_amsub")
+
+end subroutine da_qc_amsub
 
 

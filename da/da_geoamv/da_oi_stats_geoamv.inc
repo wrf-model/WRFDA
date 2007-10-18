@@ -26,7 +26,7 @@ subroutine da_oi_stats_geoamv(stats_unit, iv)
    stats%average = residual_geoamv1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(geoamv)
+   do n=1, iv%info(geoamv)%nlocal
       do k=1, iv%info(geoamv)%levels(n)
          if (iv%info(geoamv)%proc_domain(k,n)) then
             call da_stats_calculate(iv%info(geoamv)%obs_global_index(n), &

@@ -1,35 +1,50 @@
-subroutine da_check_xtoy_adjoint_ssmt1(iv, y, adjtest_lhs, pertile_lhs)
+subroutine da_set_randomcv(cv_size, rcv)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Allocate components of control variable.
+   !
+   ! Method:  Allocate component in turn.
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
-   type (y_type) , intent(inout)  :: y             ! y = h (xa)
-   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
+   integer, intent(in) :: cv_size
+   real, intent(inout) :: rcv(1:cv_size)     ! Control variable structure.
 
-   integer  :: n, k          ! Loop counter.
+   integer             :: i
+   real                :: mean_cv, rms_cv, std_dev_cv
+   real                :: sum_cv, sum_cv2
 
-   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_ssmt1")
+   if (trace_use) call da_trace_entry("da_set_randomcv")
 
-   do n=1, iv%nlocal(ssmt1)
-      if (iv%info(ssmt1)%proc_domain(1,n)) then
-         do k=1, iv%info(ssmt1)%levels(n)
-            adjtest_lhs = adjtest_lhs + (y%ssmt1(n)%t(k)/typical_t_rms)**2
-         end do
-      end if
+   ! [1] Initialize random number generator and scalars:
 
-      do k=1, iv%info(ssmt1)%levels(n)
-         pertile_lhs = pertile_lhs + (y%ssmt1(n)%t(k)/typical_t_rms)**2
+   call da_random_seed
 
-         y%ssmt1(n)%t(k) = y%ssmt1(n)%t(k) / typical_t_rms ** 2
-      end do
+   sum_cv = 0.0
+   sum_cv2 = 0.0
+
+   ! [2] Calculate random numbers with Gaussian distribution:
+
+   do i = 1, cv_size
+      call da_gauss_noise(rcv(i))
+
+      sum_cv = sum_cv + rcv(i)
+      sum_cv2 = sum_cv2 + rcv(i) * rcv(i)
    end do
 
-   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_ssmt1")
+   mean_cv = sum_cv / real(cv_size)
+   rms_cv = sqrt(sum_cv2 / real(cv_size))
+   std_dev_cv = sqrt(rms_cv * rms_cv - mean_cv * mean_cv)
 
-end subroutine da_check_xtoy_adjoint_ssmt1
+   write(unit=stdout)
+   write(unit=stdout,fmt='(a)')' Gaussian (Normal) noise statistics:'
+   write(unit=stdout,fmt='(a,f15.5)')' Mean = ',mean_cv
+   write(unit=stdout,fmt='(a,f15.5)')' RMS = ', rms_cv
+   write(unit=stdout,fmt='(a,f15.5)')' STD DEV = ', std_dev_cv
+
+   if (trace_use) call da_trace_exit("da_set_randomcv")
+
+end subroutine da_set_randomcv
 
 

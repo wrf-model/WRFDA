@@ -49,3 +49,18 @@ subroutine da_print_stats_pseudo(stats_unit, nu, nv, nt, np, nq, pseudo)
 end subroutine da_print_stats_pseudo
 
 
+n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   
+   if (rootproc) then  
+      if (nu /= 0 .or. nv /= 0) then
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for qscat'
+         call da_print_stats_qscat(stats_unit, nu, nv, stats)
+      end if
+   end if
+   
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_qscat")
+
+end subroutine da_ao_stats_qscat
+
+

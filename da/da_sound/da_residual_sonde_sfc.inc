@@ -1,53 +1,149 @@
-subroutine da_residual_sonde_sfc(iv, y, re,np_missing, np_bad_data,np_obs_used, np_available)
+subroutine da_check_vp_errors(vp1, vp2, ne, &
+                               its,ite, jts,jte, kts,kte)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Calculate residuals for sonde surface obs
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Test invertibility of transform to/from Vp or Vv
+   !
+   ! Method:  Perform statistics on differences in initial and final Vv or Vp
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
+   type (vp_type), intent(in)     :: vp1         ! Test input
+   type (vp_type), intent(in)     :: vp2         ! Test output.
+   integer, intent(in)            :: ne          ! Ensemble size.
+   integer, intent(in)            :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   real                           :: inv_size    ! 1/size of array.
+   real                           :: rms_fild    ! RMS of field.
+   real                           :: rms_diff    ! RMS of differnce.
 
-   type (bad_data_type)  :: n_obs_bad
-   integer               :: n
+   real, dimension(its:ite, jts:jte, kts:kte) :: diff ! Difference
+   real                           :: diff_alpha(its:ite,jts:jte,1:ne)
 
-   if (trace_use_dull) call da_trace_entry("da_residual_sonde_sfc")
+   if (trace_use) call da_trace_entry("da_check_vp_errors")
 
-   n_obs_bad % u % num = number_type(0, 0, 0)
-   n_obs_bad % v % num = number_type(0, 0, 0)
-   n_obs_bad % t % num = number_type(0, 0, 0)
-   n_obs_bad % p % num = number_type(0, 0, 0)
-   n_obs_bad % q % num = number_type(0, 0, 0)
+   inv_size = 1.0 / real((ite-its+1) * (jte-jts+1) * (kte-kts+1))
 
-   do n=1, iv%nlocal(sound)
-      np_available = np_available + 5
+   !-------------------------------------------------------------------------
+   ! [1.0]: Check v1 differences:
+   !-------------------------------------------------------------------------
 
-      re%sonde_sfc(n)%u = da_residual(n, 0, y%sonde_sfc(n)%u, iv%sonde_sfc(n)%u, n_obs_bad % u)
-      re%sonde_sfc(n)%v = da_residual(n, 0, y%sonde_sfc(n)%v, iv%sonde_sfc(n)%v, n_obs_bad % v)
-      re%sonde_sfc(n)%t = da_residual(n, 0, y%sonde_sfc(n)%t, iv%sonde_sfc(n)%t, n_obs_bad % t)
-      re%sonde_sfc(n)%p = da_residual(n, 0, y%sonde_sfc(n)%p, iv%sonde_sfc(n)%p, n_obs_bad % p)
-      re%sonde_sfc(n)%q = da_residual(n, 0, y%sonde_sfc(n)%q, iv%sonde_sfc(n)%q, n_obs_bad % q)
-   end do
+   diff(its:ite,jts:jte, kts:kte) = vp2 % v1(its:ite,jts:jte,kts:kte) - &
+                                    vp1 % v1(its:ite,jts:jte,kts:kte)
 
-   np_missing = np_missing + n_obs_bad % u % num % miss + &
-      n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &
-      n_obs_bad % p % num % miss + n_obs_bad % q % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-      n_obs_bad % v % num % bad + n_obs_bad % t % num % bad + &
-      n_obs_bad % p % num % bad + n_obs_bad % q % num % bad
-   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-      n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
-      n_obs_bad % p % num % use + n_obs_bad % q % num % use
+   rms_fild = sqrt(sum(vp1 % v1(its:ite, jts:jte,kts:kte) &
+                       * vp1 % v1(its:ite, jts:jte,kts:kte)) * inv_size)
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte,kts:kte) &
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
+     
+   if (rms_fild == 0.0) then
+      write(unit=stdout, fmt='(a)') ' v1 is zero ' 
+   else
+      write(unit=stdout, fmt='(a,1pe10.4)') &
+           ' v1 RMS error/RMS field = ', rms_diff/rms_fild
+   end if      
 
-   if (trace_use_dull) call da_trace_exit("da_residual_sonde_sfc")
+   !-------------------------------------------------------------------------
+   ! [2.0]: Check v2 differences:
+   !-------------------------------------------------------------------------
 
-end subroutine da_residual_sonde_sfc
+   diff(its:ite,jts:jte, kts:kte) = vp2 % v2(its:ite,jts:jte,kts:kte) - &
+                                    vp1 % v2(its:ite,jts:jte,kts:kte)
+
+   rms_fild = sqrt(sum(vp1 % v2(its:ite, jts:jte,kts:kte) &
+                       * vp1 % v2(its:ite, jts:jte,kts:kte)) * inv_size)
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte,kts:kte) &
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
+     
+   if (rms_fild == 0.0) then
+      write(unit=stdout, fmt='(a)') ' v2 is zero ' 
+   else
+      write(unit=stdout, fmt='(a,1pe10.4)') &
+           ' v2 RMS error/RMS field = ', rms_diff/rms_fild
+   end if      
+
+   !-------------------------------------------------------------------------
+   ! [3.0]: Check v3 differences:
+   !-------------------------------------------------------------------------
+
+   diff(its:ite,jts:jte, kts:kte) = vp2 % v3(its:ite,jts:jte,kts:kte) - &
+                                    vp1 % v3(its:ite,jts:jte,kts:kte)
+
+   rms_fild = sqrt(sum(vp1 % v3(its:ite, jts:jte,kts:kte) &
+                       * vp1 % v3(its:ite, jts:jte,kts:kte)) * inv_size)
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte,kts:kte) &
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
+     
+   if (rms_fild == 0.0) then
+      write(unit=stdout, fmt='(a)') ' v3 is zero ' 
+   else
+      write(unit=stdout, fmt='(a,1pe10.4)') &
+         ' v3 RMS error/RMS field = ', rms_diff/rms_fild
+   end if      
+
+   !-------------------------------------------------------------------------
+   ! [4.0]: Check v4 differences:
+   !-------------------------------------------------------------------------
+
+   diff(its:ite,jts:jte, kts:kte) = vp2 % v4(its:ite,jts:jte,kts:kte) - &
+                                    vp1 % v4(its:ite,jts:jte,kts:kte)
+
+   rms_fild = sqrt(sum(vp1 % v4(its:ite, jts:jte,kts:kte) &
+                       * vp1 % v4(its:ite, jts:jte,kts:kte)) * inv_size)
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte,kts:kte) &
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
+     
+   if (rms_fild == 0.0) then
+      write(unit=stdout, fmt='(a)') ' v4 is zero ' 
+   else
+      write(unit=stdout, fmt='(a,1pe10.4)') &
+         ' v4 RMS error/RMS field = ', rms_diff/rms_fild
+   end if
+      
+   !-------------------------------------------------------------------------
+   ! [5.0]: Check v5 differences:
+   !-------------------------------------------------------------------------
+
+   inv_size = 1.0 / real((ite-its+1) * (jte-jts+1))
+
+   diff(its:ite, jts:jte,kts:kte) = vp2 % v5(its:ite, jts:jte,kts:kte) - &
+      vp1 % v5(its:ite, jts:jte,kts:kte)
+
+   rms_fild = sqrt(sum(vp1 % v5(its:ite, jts:jte,kts:kte) * &
+      vp1 % v5(its:ite, jts:jte,kts:kte)) * inv_size)
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte,1) * &
+      diff(its:ite, jts:jte,1)) * inv_size)
+     
+   if (rms_fild == 0.0) then
+      write(unit=stdout, fmt='(a)') ' v5 is zero ' 
+   else
+      write(unit=stdout, fmt='(a,1pe10.4)') &
+         ' v5 RMS error/RMS field = ', rms_diff/rms_fild
+   end if    
+      
+   !-------------------------------------------------------------------------
+   ! [6.0]: Check alpha differences:
+   !-------------------------------------------------------------------------
+ 
+   if (ne > 0) then
+      inv_size = 1.0 / real((ite-its+1) * (jte-jts+1) * ne)
+      diff_alpha(its:ite,jts:jte,1:ne) = vp2 % alpha(its:ite,jts:jte,1:ne) - &
+                                         vp1 % alpha(its:ite,jts:jte,1:ne)
+
+      rms_fild = sqrt(sum(vp1 % alpha(its:ite, jts:jte,1:ne) &
+                          * vp1 % alpha(its:ite, jts:jte,1:ne)) * inv_size)
+      rms_diff = sqrt(sum(diff_alpha(its:ite, jts:jte,1:ne) &
+                          * diff_alpha(its:ite, jts:jte,1:ne)) * inv_size)
+     
+      if (rms_fild /= 0.0) then
+         write(unit=stdout, fmt='(a,1pe10.4)') ' alpha RMS error/RMS field = ',&
+            rms_diff/rms_fild
+      end if
+   end if
+
+   if (trace_use) call da_trace_exit("da_check_vp_errors")
+
+end subroutine da_check_vp_errors
 
 

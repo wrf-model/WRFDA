@@ -1,70 +1,72 @@
-subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
+subroutine da_calculate_grady_ssmi(iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
-   ! read diagnostics written to temporary file by WRFVAR
+   ! Purpose: Applies obs inverse on re-vector
    !-------------------------------------------------------------------------
 
    implicit none
 
-   integer      ,intent (in)    :: unit_in
-   integer      ,intent (inout) :: num      
-   character*(*),intent (in)    :: obs_type_in, filename                 
-   integer      ,intent (in)    :: nc      
+   type (iv_type), intent(in)   :: iv          ! Ob Inc. structure.
+   type (y_type), intent(inout) :: re          ! Residual structure.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
-   integer      :: num_obs, ios 
-   character*20 :: iv_type               
-   logical   :: if_write
-   
-   character*5  :: stn_id               
-   integer      :: n, k, kk, l, levels, dummy_i
-   real         :: lat, lon, press, height, dummy           
-   real         :: tpw_obs, tpw_inv, tpw_err, tpw_inc
-   real         :: u_obs, u_inv, u_error, u_inc, & 
-                   v_obs, v_inv, v_error, v_inc, &
-                   t_obs, t_inv, t_error, t_inc, &
-                   p_obs, p_inv, p_error, p_inc, &
-                   q_obs, q_inv, q_error, q_inc, &
-                   ref_obs, ref_inv, ref_error, ref_inc, &
-                   spd_obs, spd_inv, spd_err, spd_inc
-   integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, ref_qc
+   integer                      :: n
 
-   if (trace_use_dull) call da_trace_entry("da_read_omb_tmp")
+   if (trace_use) call da_trace_entry("da_calculate_grady_ssmi")
 
-   open(unit=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
-   if (ios /= 0) then
-      call da_error(__FILE__,__LINE__, (/"Cannot open file"//trim(filename)/))
+   if (iv%nlocal(ssmi_tb) > 0) then
+      do n=1, iv%nlocal(ssmi_tb)
+
+         if (iv%ssmi_tb(n)%tb19v%qc < obs_qc_pointer) re%ssmi_tb(n)%tb19v = 0.0
+         jo_grad_y%ssmi_tb(n)%tb19v = - re%ssmi_tb(n)%tb19v / &
+             (iv%ssmi_tb(n)%tb19v%error * iv%ssmi_tb(n)%tb19v%error)
+
+         if (iv%ssmi_tb(n)%tb19h%qc < obs_qc_pointer) re%ssmi_tb(n)%tb19h = 0.0
+         jo_grad_y%ssmi_tb(n)%tb19h = - re%ssmi_tb(n)%tb19h / &
+             (iv%ssmi_tb(n)%tb19h%error * iv%ssmi_tb(n)%tb19h%error)
+
+         if (iv%ssmi_tb(n)%tb22v%qc < obs_qc_pointer) re%ssmi_tb(n)%tb22v = 0.0
+         jo_grad_y%ssmi_tb(n)%tb22v = - re%ssmi_tb(n)%tb22v / &
+             (iv%ssmi_tb(n)%tb22v%error * iv%ssmi_tb(n)%tb22v%error)
+
+         if (iv%ssmi_tb(n)%tb37v%qc < obs_qc_pointer) re%ssmi_tb(n)%tb37v = 0.0
+         jo_grad_y%ssmi_tb(n)%tb37v = - re%ssmi_tb(n)%tb37v / &
+            (iv%ssmi_tb(n)%tb37v%error * iv%ssmi_tb(n)%tb37v%error)
+
+         if (iv%ssmi_tb(n)%tb37h%qc < obs_qc_pointer) re%ssmi_tb(n)%tb37h = 0.0
+         jo_grad_y%ssmi_tb(n)%tb37h = - re%ssmi_tb(n)%tb37h / &
+            (iv%ssmi_tb(n)%tb37h%error * iv%ssmi_tb(n)%tb37h%error)
+
+         if (iv%ssmi_tb(n)%tb85v%qc < obs_qc_pointer) re%ssmi_tb(n)%tb85v = 0.0
+         jo_grad_y%ssmi_tb(n)%tb85v = - re%ssmi_tb(n)%tb85v / &
+            (iv%ssmi_tb(n)%tb85v%error * iv%ssmi_tb(n)%tb85v%error)
+
+         if (iv%ssmi_tb(n)%tb85h%qc < obs_qc_pointer) re%ssmi_tb(n)%tb85h = 0.0
+         jo_grad_y%ssmi_tb(n)%tb85h = - re%ssmi_tb(n)%tb85h / &
+            (iv%ssmi_tb(n)%tb85h%error * iv%ssmi_tb(n)%tb85h%error)
+      end do
+   else if (iv%nlocal(ssmi_rv) > 0) then
+      do n=1, iv%nlocal(ssmi_rv)
+        if (iv%ssmi_rv(n)%speed%qc < obs_qc_pointer) then
+            re%ssmi_rv(n)%speed = 0.0
+        end if
+        jo_grad_y%ssmi_rv(n)%Speed = - re%ssmi_rv(n)%Speed / &
+           (iv%ssmi_rv(n)%Speed%error * iv%ssmi_rv(n)%Speed%error)
+
+        if (iv%ssmi_rv(n)%tpw%qc < obs_qc_pointer) then
+           re%ssmi_rv(n)%tpw = 0.0
+        end if
+        jo_grad_y%ssmi_rv(n)%tpw = -re%ssmi_rv(n)%tpw / &
+           (iv%ssmi_rv(n)%tpw%error * iv%ssmi_rv(n)%tpw%error)
+      end do  
    end if
 
-   reports: do
+   if (trace_use) call da_trace_exit("da_calculate_grady_ssmi")
 
-      read(unit_in,'(a20,i8)', end = 999, err = 1000) iv_type,num_obs
-      if_write = .false.
-      if (index(iv_type,OBS_type_in(1:nc)) > 0) if_write = .true.
+end subroutine da_calculate_grady_ssmi
 
-      select case (trim(adjustl(iv_type)))
 
-      case ('synop' , 'metar' , 'ships' , 'buoy' , 'sonde_sfc' )
-         if (num_obs > 0) then
-            do n = 1, num_obs    
-               read(unit_in,'(i8)')levels
-               if (if_write) then
-                  write(omb_unit,'(i8)')levels
-               num = num + 1
-               end if
-               do k = 1, levels
-                  read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                     kk,l, stn_id, &          ! Station
-                     lat, lon, press, &       ! Lat/lon, pressure
-                     u_obs, u_inv, u_qc, u_error, u_inc, & 
-                     v_obs, v_inv, v_qc, v_error, v_inc, &
-                     t_obs, t_inv, t_qc, t_error, t_inc, &
-                     p_obs, p_inv, p_qc, p_error, p_inc, &
-                     q_obs, q_inv, q_qc, q_error, q_inc
-                  if (if_write) &
-                     write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
-                        num, k, stn_id, &          ! Station
-                        lat, lon, press, &       ! Lat/lon, pressure
-                        u_obs, u_inv, u_qc, u_error, u_inc, & 
+                       u_obs, u_inv, u_qc, u_error, u_inc, & 
                         v_obs, v_inv, v_qc, v_error, v_inc, &
                         t_obs, t_inv, t_qc, t_error, t_inc, &
                         p_obs, p_inv, p_qc, p_error, p_inc, &

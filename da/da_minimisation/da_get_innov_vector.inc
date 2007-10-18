@@ -37,29 +37,29 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_setup_firstguess (xbx, grid)
       end if
 
-      if (iv%nlocal(sound) > 0) then
+      if (iv%info(sound)%nlocal > 0) then
          call da_get_innov_vector_sound     (it, grid, ob, iv)
          call da_get_innov_vector_sonde_sfc (it, grid, ob, iv)
       end if
 
       if (iv%nlocal(synop)          > 0) call da_get_innov_vector_synop    (it, grid, ob, iv)
-      if (iv%nlocal(geoamv)         > 0) call da_get_innov_vector_geoamv   (it, grid, ob, iv)
-      if (iv%nlocal(polaramv)       > 0) call da_get_innov_vector_polaramv (it, grid, ob, iv)
+      if (iv%info(geoamv)%nlocal         > 0) call da_get_innov_vector_geoamv   (it, grid, ob, iv)
+      if (iv%info(polaramv)%nlocal       > 0) call da_get_innov_vector_polaramv (it, grid, ob, iv)
       if (iv%nlocal(airep)          > 0) call da_get_innov_vector_airep    (it, grid, ob, iv)
       if (iv%nlocal(pilot)          > 0) call da_get_innov_vector_pilot    (it, grid, ob, iv)
       if (iv%nlocal(bogus)          > 0) call da_get_innov_vector_bogus    (it, grid, ob, iv)
-      if (iv%nlocal(metar)          > 0) call da_get_innov_vector_metar    (it, grid, ob, iv)
+      if (iv%info(metar)%nlocal          > 0) call da_get_innov_vector_metar    (it, grid, ob, iv)
       if (iv%nlocal(ships)          > 0) call da_get_innov_vector_ships    (it, grid, ob, iv)
-      if (iv%nlocal(gpspw)          > 0) call da_get_innov_vector_gpspw    (it, grid, ob, iv)
-      if (iv%nlocal(gpsref)         > 0) call da_get_innov_vector_gpsref   (it, grid, ob, iv)
+      if (iv%info(gpspw)%nlocal          > 0) call da_get_innov_vector_gpspw    (it, grid, ob, iv)
+      if (iv%info(gpsref)%nlocal         > 0) call da_get_innov_vector_gpsref   (it, grid, ob, iv)
       if (iv%nlocal(ssmi_tb)        > 0) call da_get_innov_vector_ssmi_tb  (it, grid, ob, iv) 
       if (iv%nlocal(ssmi_rv) > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
-      if (iv%nlocal(ssmt1)          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
+      if (iv%info(ssmt1)%nlocal          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
       if (iv%nlocal(ssmt2)          > 0) call da_get_innov_vector_ssmt2    (it, grid, ob, iv)
-      if (iv%nlocal(satem)          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
-      if (iv%nlocal(radar)          > 0) call da_get_innov_vector_radar    (it, grid, ob, iv)
+      if (iv%info(satem)%nlocal          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
+      if (iv%info(radar)%nlocal          > 0) call da_get_innov_vector_radar    (it, grid, ob, iv)
       if (iv%nlocal(qscat)          > 0) call da_get_innov_vector_qscat    (it, grid, ob, iv)
-      if (iv%nlocal(profiler)       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
+      if (iv%info(profiler)%nlocal       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
       if (iv%nlocal(buoy)           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
 
       if (iv%num_inst > 0) then

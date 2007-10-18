@@ -31,7 +31,7 @@ subroutine da_oi_stats_sound (stats_unit, iv)
    stats%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(sound)
+   do n=1, iv%info(sound)%nlocal
       do k=1, iv%info(sound)%levels(n)
 !         if (iv%info(sound)%proc_domain(k,n)) then
          if (iv%info(sound)%proc_domain(1,n)) then

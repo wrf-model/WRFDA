@@ -1,46 +1,32 @@
-subroutine da_check_xtoy_adjoint_sound (iv, y, adjtest_lhs, pertile_lhs)
-
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+subroutine da_set_merc(proj)
+  
+   !--------------------------------------------------------------------------
+   ! Purpose: Sets up the remaining basic elements for the mercator projection
+   !--------------------------------------------------------------------------
 
    implicit none
 
-   type(iv_type), intent(in)    :: iv            ! obs. inc. vector (o-b).
-   type(y_type) , intent(inout) :: y             ! y = h (xa)
-   real,          intent(inout) :: adjtest_lhs, pertile_lhs   
+   type(proj_info), intent(inout)       :: proj
 
-   integer :: n, k          ! Loop counter.
+   real :: clain
 
-   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sound")
+   if (trace_use) call da_trace_entry("da_set_merc")
 
-   do n=1, iv%nlocal(sound)
-      do k=1, iv%info(sound)%levels(n)
-         if (iv%info(sound)%proc_domain(k,n)) then
-            adjtest_lhs = adjtest_lhs + &
-                          (y%sound(n)%u(k)/typical_u_rms)**2 + &
-                          (y%sound(n)%v(k)/typical_v_rms)**2 + &
-                          (y%sound(n)%t(k)/typical_t_rms)**2 + &
-                          (y%sound(n)%q(k)/typical_q_rms)**2
-         end if
-      end do
+   !  Preliminary variables
 
-      do k=1, iv%info(sound)%levels(n)
-         pertile_lhs = pertile_lhs + &
-                       (y%sound(n)%u(k)/typical_u_rms)**2 + &
-                       (y%sound(n)%v(k)/typical_v_rms)**2 + &
-                       (y%sound(n)%t(k)/typical_t_rms)**2 + &
-                       (y%sound(n)%q(k)/typical_q_rms)**2
+   clain = COS(rad_per_deg*proj%truelat1)
+   proj%dlon = proj%dx / (earth_radius_m * clain)
 
-         y%sound(n)%u(k) = y%sound(n)%u(k) / typical_u_rms ** 2
-         y%sound(n)%v(k) = y%sound(n)%v(k) / typical_v_rms ** 2
-         y%sound(n)%t(k) = y%sound(n)%t(k) / typical_t_rms ** 2
-         y%sound(n)%q(k) = y%sound(n)%q(k) / typical_q_rms ** 2
-      end do
-   end do
+   ! Compute distance from equator to origin, and store in the 
+   ! proj%rsw tag.
 
-   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_sound")
+   proj%rsw = 0.0
+   if (proj%lat1 .NE. 0.0) then
+      proj%rsw = (alog(tan(0.5*((proj%lat1+90.)*rad_per_deg))))/proj%dlon
+   end if
 
-end subroutine da_check_xtoy_adjoint_sound
+   if (trace_use) call da_trace_exit("da_set_merc")
+
+end subroutine da_set_merc
 
 

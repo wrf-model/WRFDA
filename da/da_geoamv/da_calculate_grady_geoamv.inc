@@ -14,8 +14,8 @@ subroutine da_calculate_grady_geoamv(iv, re, jo_grad_y)
 
    integer                      :: n , k
 
-   if (iv%nlocal(geoamv) > 0) then
-      do n=1, iv%nlocal(geoamv)
+   if (iv%info(geoamv)%nlocal > 0) then
+      do n=1, iv%info(geoamv)%nlocal
          do k=1, iv%info(geoamv)%levels(n)
             if (iv%geoamv(n)%u(k)%qc < obs_qc_pointer) re%geoamv(n)%u(k) = 0.0
             if (iv%geoamv(n)%v(k)%qc < obs_qc_pointer) re%geoamv(n)%v(k) = 0.0

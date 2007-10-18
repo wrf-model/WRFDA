@@ -1,37 +1,49 @@
-subroutine da_allocate_observations (iv)
+subroutine da_print_be_stats_h_regional(outunit, variable, nk, scale_length)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Allocate components of observation structure.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
-   implicit none
+   implicit none 
 
-   type (iv_type), intent(inout) :: iv     ! Observation structure.
+   integer,      intent(inout) :: outunit            ! Output file unit.
+   character*10, intent(in)    :: variable           ! Variable name.
+   integer,      intent(in)    :: nk                 ! Dimension of vertical index
+   real,         intent(in)    :: scale_length(1:nk) ! Correlation scale lengths
 
-   integer :: i
+   integer :: k                  ! Loop counter.
 
-   if (trace_use) call da_trace_entry("da_allocate_observations")
+   if (trace_use) call da_trace_entry("da_print_be_stats_h_regional")
 
-   if (iv%nlocal(sound)     > 0) allocate(iv%sound    (1:iv%nlocal(sound)))
-   if (iv%nlocal(sonde_sfc) > 0) allocate(iv%sonde_sfc(1:iv%nlocal(sonde_sfc)))
-   if (iv%nlocal(synop)     > 0) allocate(iv%synop    (1:iv%nlocal(synop)))
-   if (iv%nlocal(airep)     > 0) allocate(iv%airep    (1:iv%nlocal(airep)))
-   if (iv%nlocal(geoamv)    > 0) allocate(iv%geoamv   (1:iv%nlocal(geoamv)))
-   if (iv%nlocal(polaramv)  > 0) allocate(iv%polaramv (1:iv%nlocal(polaramv)))
-   if (iv%nlocal(satem)     > 0) allocate(iv%satem    (1:iv%nlocal(satem)))
-   if (iv%nlocal(metar)     > 0) allocate(iv%metar    (1:iv%nlocal(metar)))
+   write(unit=stdout,fmt='(3a,i5)') &
+      ' Scale length for variable ', trim(variable), ' in unit ', outunit
+
+   do k = 1, nk
+     write(unit=outunit,fmt='(i4,1pe15.5)')k, scale_length(k)
+   end do
+
+   outunit = outunit + 1
+   write(unit=stdout,fmt=*) ' '
+
+   if (trace_use) call da_trace_exit("da_print_be_stats_h_regional")
+
+end subroutine da_print_be_stats_h_regional
+
+
+tem)))
+   if (iv%info(metar)%nlocal     > 0) allocate(iv%metar    (1:iv%info(metar)%nlocal))
    if (iv%nlocal(ships)     > 0) allocate(iv%ships    (1:iv%nlocal(ships)))
    if (iv%nlocal(pilot)     > 0) allocate(iv%pilot    (1:iv%nlocal(pilot)))
-   if (iv%nlocal(gpspw)     > 0) allocate(iv%gpspw    (1:iv%nlocal(gpspw)))
-   if (iv%nlocal(gpsref)    > 0) allocate(iv%gpsref   (1:iv%nlocal(gpsref)))
+   if (iv%info(gpspw)%nlocal     > 0) allocate(iv%gpspw    (1:iv%info(gpspw)%nlocal))
+   if (iv%info(gpsref)%nlocal    > 0) allocate(iv%gpsref   (1:iv%info(gpsref)%nlocal))
    if (iv%nlocal(ssmi_tb)   > 0) allocate(iv%ssmi_tb  (1:iv%nlocal(ssmi_tb)))
    if (iv%nlocal(ssmi_rv)   > 0) allocate(iv%ssmi_rv  (1:iv%nlocal(ssmi_rv)))
-   if (iv%nlocal(ssmt1)     > 0) allocate(iv%ssmt1    (1:iv%nlocal(ssmt1)))
+   if (iv%info(ssmt1)%nlocal     > 0) allocate(iv%ssmt1    (1:iv%info(ssmt1)%nlocal))
    if (iv%nlocal(ssmt2)     > 0) allocate(iv%ssmt2    (1:iv%nlocal(ssmt2)))
    if (iv%nlocal(qscat)     > 0) allocate(iv%qscat    (1:iv%nlocal(qscat)))
-   if (iv%nlocal(profiler)  > 0) allocate(iv%profiler (1:iv%nlocal(profiler)))
+   if (iv%info(profiler)%nlocal  > 0) allocate(iv%profiler (1:iv%info(profiler)%nlocal))
    if (iv%nlocal(buoy)      > 0) allocate(iv%buoy     (1:iv%nlocal(buoy)))
-   if (iv%nlocal(radar)     > 0) allocate(iv%radar    (1:iv%nlocal(radar)))
+   if (iv%info(radar)%nlocal     > 0) allocate(iv%radar    (1:iv%info(radar)%nlocal))
    if (iv%nlocal(bogus)     > 0) allocate(iv%bogus    (1:iv%nlocal(bogus)))
    if (iv%nlocal(airsr)     > 0) allocate(iv%airsr    (1:iv%nlocal(airsr)))
 

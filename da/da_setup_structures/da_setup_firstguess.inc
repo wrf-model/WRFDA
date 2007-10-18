@@ -1,55 +1,72 @@
-subroutine da_setup_firstguess(xbx, grid)
-
-   !---------------------------------------------------------------------------
-   ! Purpose: Allocate and read in components of first guess state.
-   !---------------------------------------------------------------------------
+subroutine da_convertor_v_interp( v_in, z_in, n_in, &
+                                  v_out, z_out, n_out )
 
    implicit none
 
-   type (xbx_type),intent(out)  :: xbx   ! Header & non-gridded vars.
+   integer,                intent(in)  :: n_in, n_out
+   real, dimension(n_in),  intent(in)  :: v_in, z_in
+   real, dimension(n_out), intent(in)  :: z_out
+   real, dimension(n_out), intent(out) :: v_out
 
-   type(domain),intent(inout)   :: grid
+   integer :: k, kabv, kblw, i
+   real    :: w1, w2
 
-   integer :: is, ie, js, je
-   real    :: ddx , ddy    
+   logical :: increase_in_vertical
 
-   if (trace_use) call da_trace_entry("da_setup_firstguess")
+   ! does vertical coordinate increase or decrease with increasing k?
+   ! set offset appropriately
 
-   is = grid%xp % its
-   ie = grid%xp % ite
-   js = grid%xp % jts
-   je = grid%xp % jte
-
-   ! Calculate sin and cosine values used in da_get_avpoles
-
-   if (global) then
-      if (grid%xp%jts == grid%xp%jds) then
-
-         allocate(cos_xls(grid%xp%its:grid%xp%ite))
-         allocate(sin_xls(grid%xp%its:grid%xp%ite))
-         cos_xls(grid%xp%its:grid%xp%ite) = & 
-            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
-         sin_xls(grid%xp%its:grid%xp%ite) = &
-            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
-      end if
-
-      if (grid%xp%jte == grid%xp%jde) then 
-         allocate(cos_xle(grid%xp%its:grid%xp%ite))
-         allocate(sin_xle(grid%xp%its:grid%xp%ite))
-         cos_xle(grid%xp%its:grid%xp%ite) = &
-            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
-         sin_xle(grid%xp%its:grid%xp%ite) = &
-            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
-      end if
+   if (z_in(n_in) > z_in(1)) then
+      increase_in_vertical = .true.
+   else
+      increase_in_vertical = .false.
    end if
 
-   !---------------------------------------------------------------------------      
-   ! [1.0] Setup and read in fields from first guess:
-   !---------------------------------------------------------------------------      
+   if (increase_in_vertical) then
+      do k=1, n_out
+         if (z_out(k) <= z_in(1)) then
+            kabv = 2
+         else if (z_out(k) >= z_in(n_in)) then
+            kabv = n_in
+         else
+            i_loop: do i=2, n_in
+               if (z_out(k) <= z_in(i)) then
+                  kabv = i
+                  exit i_loop
+               end if
+            end do i_loop
+         end if
 
-   if (fg_format == fg_format_wrf) then
+         kblw = kabv - 1
+         w2 = (z_in(kabv)-z_out(k))/(z_in(kabv)-z_in(kblw))
+         w1 = 1.0-w2
+         v_out(k) = w1*v_in(kabv) + w2*v_in(kblw)
+      end do
+   else
+      do k=1, n_out
+         if (z_out(k) >= z_in(1)) then
+            kabv = 2
+         else if (z_out(k) <= z_in(n_in)) then
+            kabv = n_in
+         else
+            d_loop: do i=2, n_in
+               if (z_out(k) >= z_in(i)) then
+                  kabv = i
+                  exit d_loop
+               end if
+            end do d_loop
+         end if
 
-      ! First guess is a WRF C-grid format file:
+         kblw = kabv - 1
+         w2 = (z_in(kabv)-z_out(k))/(z_in(kabv)-z_in(kblw))
+         w1 = 1.0-w2
+         v_out(k) = w1*v_in(kabv) + w2*v_in(kblw)
+      end do
+   end if
+
+end subroutine da_convertor_v_interp
+
+WRF C-grid format file:
 
       call da_setup_firstguess_wrf(xbx, grid)
    else if (fg_format == fg_format_kma_global) then

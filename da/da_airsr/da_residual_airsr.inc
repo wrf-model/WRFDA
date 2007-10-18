@@ -40,3 +40,14 @@ subroutine da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np
 end subroutine da_residual_airsr
 
 
+   ', failed, check_max_iv_print)
+         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
+      end do
+   end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_profiler")
+
+end subroutine da_check_max_iv_profiler
+
+

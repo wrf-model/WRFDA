@@ -1,94 +1,121 @@
-subroutine da_ao_stats_sound (stats_unit, iv, re)
+subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
-   !-------------------------------------------------------------
-   ! Purpose: TBD   
-   !-------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (inout) :: iv            ! iv
-   type (y_type),  intent (in)    :: re            ! A - O
+   type(domain), intent(inout)                :: grid
+   type (grid_config_rec_type), intent(inout) :: config_flags
 
-   type (stats_sound_type) :: stats
-   integer                 :: nu, nv, nt, nq
-   integer                 :: n, k
+   character(*),  intent (in)                 :: filename
+   character(*),  intent (in),  optional      :: in_date
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_sound")
+   integer                 :: fid , status, n, nsave
 
-   nu = 0
-   nv = 0
-   nt = 0
-   nq = 0
+   integer :: julyr, julday
+   real    :: gmt
 
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%maximum%t = maxmin_type (missing_r, 0, 0)
-   stats%maximum%q = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
+   if (trace_use) call da_trace_entry("da_med_initialdata_input")
+   if (trace_use) call da_trace("da_med_initialdata_input", &
+      Message="Reading "//trim(filename))
 
-   stats%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
-   stats%rms_err = stats%average
+   ! Initialize the mother domain.
 
-   do n=1, iv%nlocal(sound)
-      do k=1, iv%info(sound)%levels(n)
-         if (iv%info(sound)%proc_domain(1,n)) then
-            call da_stats_calculate (n, k, iv%sound(n)%u(k)%qc, & 
-               re%sound(n)%u(k), nu, &
-               stats%minimum%u, stats%maximum%u, &
-               stats%average%u, stats%rms_err%u)
-            call da_stats_calculate (n, k, iv%sound(n)%v(k)%qc, & 
-               re%sound(n)%v(k), nv, &
-               stats%minimum%v, stats%maximum%v, &
-               stats%average%v, stats%rms_err%v)
-            call da_stats_calculate (n, k, iv%sound(n)%t(k)%qc, & 
-               re%sound(n)%t(k), nt, &
-               stats%minimum%t, stats%maximum%t, &
-               stats%average%t, stats%rms_err%t)
-            call da_stats_calculate (n, k, iv%sound(n)%q(k)%qc, & 
-               re%sound(n)%q(k), nq, &
-               stats%minimum%q, stats%maximum%q, &
-               stats%average%q, stats%rms_err%q)
-         end if
-      end do
-   end do
+   grid%input_from_file = .true.
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   call da_proc_sum_int (nt)
-   call da_proc_sum_int (nq)
-   iv%nstats(sound) = nu + nv + nt + nq
+   call ext_ncd_open_for_read(trim(filename), 0, 0, "", fid, ierr)
 
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
-      stats%minimum%t%value, stats%maximum%t%value, &
-      stats%minimum%t%n, stats%maximum%t%n, &
-      stats%minimum%t%l, stats%maximum%t%l)
-   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
-      stats%minimum%q%value, stats%maximum%q%value, &
-      stats%minimum%q%n, stats%maximum%q%n, &
-      stats%minimum%q%l, stats%maximum%q%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for sound'
-         call da_print_stats_sound(stats_unit, nu, nv, nt, nq, stats)
-      end if
+   if (ierr /= 0) then
+      write(unit=message(1), fmt='(2a)') &
+         'Netcdf error opening file:', trim(filename)
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_sound")
+   call ext_ncd_get_next_time(fid, current_date, Status)
 
-end subroutine da_ao_stats_sound
+   if (present(in_date)) then
+      ! Set start_date to current_date.
+      read(in_date(1:19), fmt='(i4, 5(1x, i2))') &
+         grid%start_year,   &
+         grid%start_month,  &
+         grid%start_day,    &
+         grid%start_hour,   &
+         grid%start_minute, &
+         grid%start_second 
+
+      nsave = -1
+      do n=1, 1000
+         if (current_date(1:19) == in_date(1:19)) then
+            nsave = n - 1
+            exit
+         end if
+         call ext_ncd_get_next_time(fid, current_date, Status)
+      end do
+
+      if (nsave < 0) then
+         call da_error(__FILE__,__LINE__,(/"Cannot find the needed time"/))
+      end if
+   else
+      ! Set start_date to current_date.
+      read(current_date(1:19), fmt='(i4, 5(1x, i2))') &
+           grid%start_year,  &
+           grid%start_month, &
+           grid%start_day,   &
+           grid%start_hour,  &
+           grid%start_minute,&
+           grid%start_second
+   end if
+
+   call geth_julgmt(julyr, julday, gmt)
+   call nl_set_gmt (grid%id, gmt)
+   call nl_set_julyr (grid%id, julyr)
+   call nl_set_julday (grid%id, julday)
+
+   call nl_set_iswater (grid%id, grid%iswater)
+   call nl_set_cen_lat (grid%id , grid%cen_lat)
+   call nl_set_cen_lon (grid%id , grid%cen_lon)
+   call nl_set_truelat1 (grid%id , grid%truelat1)
+   call nl_set_truelat2 (grid%id , grid%truelat2)
+   call nl_set_moad_cen_lat (grid%id , grid%moad_cen_lat)
+   call nl_set_stand_lon (grid%id , grid%stand_lon)
+   call nl_set_map_proj (grid%id , grid%map_proj)
+
+   start_date=current_date
+
+   call geth_julgmt(julyr, julday, gmt)
+   config_flags%gmt = gmt
+   config_flags%julyr = julyr
+   config_flags%julday = julday
+
+   call ext_ncd_ioclose(fid, ierr)
+
+   call da_trace("da_med_initialdata_input", &
+       message="open_r_dataset for "//trim(filename))
+   call open_r_dataset (fid, trim(filename), grid , config_flags , &
+      "DATASET=INPUT", ierr)
+
+   if (ierr .NE. 0) then
+      write(unit=message(1),fmt='(A,A,A,I5)') 'Error opening ', &
+        trim(filename),' for reading ierr=',ierr
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
+
+   if (present(in_date)) then
+      do n=1, nsave
+         call da_message((/"current_date="//trim(current_date)// &
+            ', in_date='//trim(in_date)/))
+         call ext_ncd_get_next_time(fid, current_date, Status)
+      end do
+   end if
+
+   call input_model_input (fid ,   grid , config_flags , ierr)
+
+   call close_dataset (fid , config_flags , "DATASET=INPUT")
+
+   if (trace_use) call da_trace_exit("da_med_initialdata_input")
+
+end subroutine da_med_initialdata_input
 
 

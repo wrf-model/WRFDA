@@ -1,43 +1,46 @@
-subroutine da_check_max_iv_profiler(iv, it, itu,ituf,itv,itvf)
+subroutine da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! Purpose: Calculates residual at AIRS retrieval locations                   
+   !----------------------------------------------------------------------
 
    implicit none
 
-   type(iv_type), intent(inout) :: iv
-   integer,       intent(in)    :: it      ! Outer iteration 
-   integer,       intent(inout) :: itu,ituf,itv,itvf
+   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer :: k,n
-   logical :: failed
-   
-   if (trace_use_dull) call da_trace_entry("da_check_max_iv_profiler")
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
-   !---------------------------------------------------------------------------
-   ! [1.0] Open diagnostic file:
-   !---------------------------------------------------------------------------
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n, k
 
-   if (rootproc .and. check_max_iv_print) then
-      write (check_max_iv_unit,'(A)')  &
-         '----------------------------------------------------------------'
-      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
-      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for Profiler_U   = ',max_error_uv, &
-         'Error max test ratio for Profiler_V   = ',max_error_uv
-   end if
+   if (trace_use_dull) call da_trace_entry("da_residual_airsr")
 
-   !---------------------------------------------------------------------------
-   ! [2.0] Perform maximum innovation vector check:
-   !---------------------------------------------------------------------------
+   n_obs_bad % t % num = number_type(0, 0, 0)
+   n_obs_bad % q % num = number_type(0, 0, 0)
 
-   failed = .false.
+   do n=1, iv%nlocal(airsr)
+      do k=1, iv%info(airsr)%levels(n)
+        np_available = np_available + 4
+        re%airsr(n)%t(k) = da_residual(n, k, y%airsr(n)%t(k), iv%airsr(n)%t(k), n_obs_bad % t)
+        re%airsr(n)%q(k) = da_residual(n, k, y%airsr(n)%q(k), iv%airsr(n)%q(k), n_obs_bad % q)
+      end do
+   end do
 
-   do n = iv%info(profiler)%n1,iv%info(profiler)%n2
-      do k = 1, iv%info(profiler)%levels(n)
-         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%u(k), max_error_uv, itu, ituf, &
-            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+   np_missing  = np_missing  + n_obs_bad % t % num % miss + n_obs_bad % q % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % t % num % bad  + n_obs_bad % q % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % t % num % use  + n_obs_bad % q % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_airsr")
+
+end subroutine da_residual_airsr
+
+
+   ', failed, check_max_iv_print)
          call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
       end do

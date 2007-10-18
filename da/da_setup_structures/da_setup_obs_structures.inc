@@ -139,10 +139,10 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%total_rad_pixel   = 0
    iv%total_rad_channel = 0
 
-   iv%nlocal(:) = 0
-   iv%ntotal(:) = 0
-   iv%plocal(:,:) = 0
-   iv%ptotal(:,:) = 0
+   iv%info(:)%nlocal = 0
+   iv%info(:)%ntotal = 0
+   iv%info(:)%plocal(:) = 0
+   iv%info(:)%ptotal(:) = 0
    iv%num_inst  = 0 
 
    ob%nlocal(:) = 0
@@ -169,14 +169,6 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       call da_setup_bufrtovs_structures(grid, ob, iv)
    end if
 
-   iv%info(:)%nlocal=iv%nlocal(:)
-   iv%info(:)%ntotal=iv%ntotal(:)
-
-   do j=1,num_ob_indexes
-      iv%info(j)%plocal(:)=iv%plocal(:,j)
-      iv%info(j)%ptotal(:)=iv%ptotal(:,j)
-   end do
-
    ! Summarize observations 
 
    write(unit=stdout, fmt='(a)')  'Observation summary'
@@ -184,8 +176,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       write(unit=stdout, fmt='(3x,a,i2)') 'ob time ', i
       do j=1,num_ob_indexes
          write(unit=stdout, fmt='(6x,a,i6,a,i6,a)') &
-            obs_names(j), iv%ptotal(i,j) - iv%ptotal(i-1,j), ' global,', &
-            iv%plocal(i,j) - iv%plocal(i-1,j), ' local'
+            obs_names(j), iv%info(j)%ptotal(i) - iv%info(j)%ptotal(i-1), ' global,', &
+            iv%info(j)%plocal(i) - iv%info(j)%plocal(i-1), ' local'
       end do
    end do
    write(unit=stdout, fmt='(a)') ' '

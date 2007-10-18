@@ -1,20 +1,46 @@
-subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
-   nobs_min, nobs_max, klev_min, klev_max)
-
-   !---------------------------------------------------------------------------
-   !  Purpose: Do MPI reduction operations across processors to get the average, 
-   !           rms error, minimum, and maximum values for an observation field.
-   !           These are stored only on the root processor, i.e., processor 0.
-   !           (In this way, we do not have to do all-to-all communication.)
-   !---------------------------------------------------------------------------
+subroutine da_atotime(date_char, st)
+ 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   real,      intent(inout)      :: proc_ave       ! Processor average.
-   real,      intent(inout)      :: proc_err       ! Processor rms error.
-   real,      intent(inout)      :: proc_min       ! Processor minumum.
-   real,      intent(inout)      :: proc_max       ! Processor maximum.
-   integer,   intent(inout)      :: nobs_min       ! Obs number of minimum.
+   character(len=80), intent(in) :: date_char
+   real,              intent(out) :: st
+  
+   integer                :: ccyy,mo,dd,hh,mi,ss,i
+   integer, dimension(12) :: mmday
+ 
+   mmday=(/31,28,31,30,31,30,31,31,30,31,30,31/)
+  
+   read(date_char(1:19),'(i4,1x,4(i2,1x),i2)') &
+        ccyy, mo, dd, hh, mi, ss
+  
+   if (mod(ccyy,4) == 0) then
+      mmday(2) = 29
+      if (mod(ccyy,400) == 0) then
+         mmday(2) = 29
+      else if (mod(ccyy,100) == 0) then
+         mmday(2) = 28
+      end if
+   end if
+  
+   dd=dd+365*(ccyy-2000)
+
+   do i=1,mo-1
+      dd=dd+mmday(i)
+   end do
+  
+   st = real(ss) &
+      + 60.0*(real(mi) &
+      + 60.0*(real(hh) &
+      + 24.0* real(dd)))
+
+end subroutine da_atotime
+
+
+  :: nobs_min       ! Obs number of minimum.
    integer,   intent(inout)      :: nobs_max       ! Obs number of maximum.
    integer,   intent(inout)      :: klev_min       ! Level of minimum.
    integer,   intent(inout)      :: klev_max       ! Level of maximum.

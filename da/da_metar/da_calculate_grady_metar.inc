@@ -14,8 +14,8 @@ subroutine da_calculate_grady_metar(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_metar")
 
-   if (iv%nlocal(metar) > 0) then
-      do n=1, iv%nlocal(metar)
+   if (iv%info(metar)%nlocal > 0) then
+      do n=1, iv%info(metar)%nlocal
          if (iv%metar(n)%u%qc < obs_qc_pointer) re%metar(n)%u = 0.0
          if (iv%metar(n)%v%qc < obs_qc_pointer) re%metar(n)%v = 0.0
          if (iv%metar(n)%t%qc < obs_qc_pointer) re%metar(n)%t = 0.0

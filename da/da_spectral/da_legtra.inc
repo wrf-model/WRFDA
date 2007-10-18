@@ -1,70 +1,120 @@
-subroutine da_legtra (nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
+subroutine da_transform_through_rf(grid,mz, rf_alpha, val,field)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Control variable transform through the recursive filter.  
+   !
+   ! Method: 1) Transform to nondimensional v_hat space.
+   !         2) Perform recursive filter in non-dimensional space (ds = 1).
+   !         3) Scale recursive filter output.
+   !         4) Transform filtered field to dimensional space.
+   !         5) Optionally scale by background error.
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)  :: nj                      ! Number of latitudes.
-   integer, intent(in)  :: max_wavenumber          ! Maximum wavenumber.
-   integer, intent(in)  :: alp_size                ! Dimension of ALPs.
-   integer, intent(in)  :: m                       ! Zonal wavenumber.
-   real,    intent(in)  :: int_wgts(1:nj)          ! Integration weights.
-   real,    intent(in)  :: alp(1:alp_size)         ! Associated Legendre Polynomials.
-   complex, intent(in)  :: r_leg(1:nj)             ! Field to transform.
-   complex, intent(out) :: v(m:max_wavenumber)     ! Output spectral coefficient.
+   type(domain),     intent(inout) :: grid
+   integer,          intent(in)    :: mz                ! Vertical truncation.
+   real,             intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 
+   real,             intent(in)    :: val(jds:jde,mz)   ! Error standard deviation.
+   real,             intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
+      
+   integer :: rf_passes_over_two ! rf_passes / 2
+   integer :: i, j, m, n, pass   ! Loop counters.
+   real    :: p_x(ims:ime,jms:jme)! sqrt(Grid box area).
+   real    :: val_j(grid%xp%jtsy:grid%xp%jtey)
 
-   integer              :: l, j, j1                ! Loop counters.
-   integer              :: index_m, index_j, index ! Markers.
-   integer              :: sign_switch             ! make use of symmetry of ALPs.
-   real                 :: eq_coeff                ! 1 if equator point, 0 otherwise.
-   complex              :: sum_legtra              ! Summation scalar.
-   complex              :: eq_term                 ! Summation scalar.
+   !----------------------------------------------------------------------
+   ! [1.0]: Initialise:
+   !----------------------------------------------------------------------  
 
-   if (trace_use) call da_trace_entry("da_legtra")
+   if (trace_use_dull) call da_trace_entry("da_transform_through_rf")
 
-   index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
+   rf_passes_over_two = rf_passes / 2
+   
+   ! [1.1] Define inner product (square root of grid box area):
+   p_x(its:ite,jts:jte) = sqrt(grid%xb%grid_box_area(its:ite,jts:jte))
 
-   if ((nj+1) / 2 == nj/2 + 1) then
-      eq_coeff = 1.0 ! Odd latitudes
-   else
-      eq_coeff = 0.0 ! Even latitudes
-      eq_term  = 0.0
-   end if
+   grid%xp%v1z(:,:,:) = 0.0
 
-   do l = m, max_wavenumber
+   ! [1.2] Transform to nondimensional v_hat space:
 
-      sign_switch = (-1)**(l + m)
-      sum_legtra = da_zero_complex
-
-      do j = 1, nj / 2
-         index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
-         index = index_j + index_m + l
-
-         ! Sum first quadrant:
-         sum_legtra = sum_legtra + int_wgts(j) * r_leg(j) * alp(index)
-
-         ! Add second quadrant (use symmetry ALP(-mu)=(-1)^{n+|m|}ALP(mu)):
-         j1 = nj + 1 - j
-         sum_legtra = sum_legtra + sign_switch * int_wgts(j1) * r_leg(j1) * &
-            alp(index)
-      end do
-     
-      if (eq_coeff > 0.0) then
-         ! Skip this step for Even lats    ! Syed RH Rizvi
-         ! Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
-         j = nj/2 + 1
-         index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber+2) / 2
-         index = index_j + index_m + l
-         eq_term = int_wgts(j) * r_leg(j) * alp(index)
-      end if
-
-      v(l) = 0.5 * (sum_legtra + eq_coeff * eq_term)
+   do m = 1, mz
+      grid%xp%v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) / p_x(its:ite,jts:jte)
    end do
 
-   if (trace_use) call da_trace_exit("da_legtra")
+   !-------------------------------------------------------------------------
+   ! [2.0]: Perform 1D recursive filter in x-direction:
+   !-------------------------------------------------------------------------
 
-end subroutine da_legtra
+   ! [2.1] Apply (i',j',k -> i,j',k') (grid%xp%v1z -> grid%xp%v1x)
+   ! convert from vertical column to x-stripe
+
+   call da_transpose_z2x (grid)
+
+   ! [2.2] Apply 1D filter in x direction:
+
+   n = grid%xp%itex - grid%xp%itsx + 1
+   do m = grid%xp%ktsx, min(grid%xp%ktex,mz)
+      do j = grid%xp%jtsx, grid%xp%jtex
+         do pass = 1, rf_passes_over_two
+            call da_recursive_filter_1d(pass, rf_alpha(m), grid%xp%v1x(grid%xp%itsx:grid%xp%itex,j,m), n)
+         end do
+      end do
+   end do
+
+   !-------------------------------------------------------------------------
+   ! [3.0]: Perform 1D recursive filter in y-direction:
+   !-------------------------------------------------------------------------
+
+   ! [3.1] Apply (i, j' ,k' -> i', j ,k') (grid%xp%v1x -> grid%xp%v1y)
+   ! convert from vertical column to y-stripe
+
+   call da_transpose_x2y (grid)
+
+   ! [3.2] Apply 1D filter in y direction:
+
+   n = grid%xp%jtey - grid%xp%jtsy + 1
+   do m = grid%xp%ktsy, min(grid%xp%ktey,mz)
+      do i = grid%xp%itsy, grid%xp%itey
+         val_j(grid%xp%jtsy:grid%xp%jtey) = grid%xp%v1y(i,grid%xp%jtsy:grid%xp%jtey,m)
+         do pass = 1, rf_passes_over_two
+            call da_recursive_filter_1d(pass, rf_alpha(m), val_j, n)
+         end do
+         grid%xp%v1y(i,grid%xp%jtsy:grid%xp%jtey,m) = val_j(grid%xp%jtsy:grid%xp%jtey)
+      end do
+   end do
+   
+   !-------------------------------------------------------------------------
+   ! [4.0]: Perform 1D recursive filter in y-direction:
+   !-------------------------------------------------------------------------
+
+   ! [4.1] Apply (i',j,k' -> i',j',k) (grid%xp%v1y -> grid%xp%v1z)
+   ! convert from y-stripe to vertical column.
+   
+   call da_transpose_y2z (grid)
+
+   ! [4.2] Transform filtered field to dimensional space:
+
+   do m = 1, mz
+      field(its:ite,jts:jte,m) = grid%xp%v1z(its:ite,jts:jte,m) * p_x(its:ite,jts:jte)
+   end do
+
+   ! [4.3] Optionally scale by background error:
+
+   ! be_s % val = Gridpoint standard deviation - only required for
+   ! vert_corr = vert_corr_1 as scaling is performed in vertical transform
+   ! for vert_corr = vert_corr_2:
+
+   if (vert_corr == vert_corr_1) then
+      do m = 1, mz
+         do i = its, ite
+            field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
+         end do
+      end do
+   end if
+
+   if (trace_use_dull) call da_trace_exit("da_transform_through_rf")
+
+end subroutine da_transform_through_rf
 
 

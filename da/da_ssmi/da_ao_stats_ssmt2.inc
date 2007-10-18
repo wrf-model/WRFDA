@@ -56,3 +56,10 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
 end subroutine da_ao_stats_ssmt2
 
 
+      sqrt(stats%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_synop")
+
+end subroutine da_print_stats_synop
+
+

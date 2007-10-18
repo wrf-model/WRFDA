@@ -26,7 +26,7 @@ subroutine da_oi_stats_radar (stats_unit, iv)
    stats%average = residual_radar1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(radar)
+   do n=1, iv%info(radar)%nlocal
       if (iv%info(radar)%proc_domain(1,n)) then
          do k=1, iv%info(radar)%levels(n)
             if (use_radar_rv) then

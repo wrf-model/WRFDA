@@ -1,4 +1,4 @@
-subroutine da_ao_stats_satem (stats_unit, iv, re)
+subroutine da_matmultiover(mata,matb,ni,nj)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,21 +6,33 @@ subroutine da_ao_stats_satem (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (inout) :: iv            ! iv
-   type  (y_type), intent (in)    :: re            ! A - O
+   integer, intent(in)    :: ni, nj
+   real,    intent(in)    :: matb(nj, nj)
+   real,    intent(inout) :: mata(ni,nj)
 
-   type (stats_satem_type) :: stats
-   integer                 :: nthickness
-   integer                 :: n, k
+   integer :: i, j, k          ! Loop counters
+   real    :: tmp(1:nj)
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_satem")
+   if (trace_use) call da_trace_entry("da_matmultiover")
 
-   nthickness = 0
+   do i=1,ni
+      tmp = 0.0
+      do j=1,nj 
+         do k=1,nj
+            tmp(j) = tmp(j) + mata(i,k)*matb(k,j)
+         end do
+      end do
+      do j=1,nj
+         mata(i,j) = tmp(j) 
+      end do
+   end do
 
-   stats%maximum%thickness = maxmin_type (missing_r, 0, 0)
-   stats%minimum%thickness = maxmin_type(-missing_r, 0, 0)
-   stats%average = residual_satem1_type(0.0)
+   if (trace_use) call da_trace_exit("da_matmultiover")
+
+end subroutine da_matmultiover
+
+
+0.0)
    stats%rms_err = stats%average
 
    nthickness = 0
@@ -31,7 +43,7 @@ subroutine da_ao_stats_satem (stats_unit, iv, re)
    stats%average = residual_satem1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(satem)
+   do n=1, iv%info(satem)%nlocal
       if (iv%satem(n)%loc%proc_domain) then
          do k=1, iv%satem(n)%info%levels
             call da_stats_calculate (n, k, iv%satem(n)%thickness(k)%qc, & 

@@ -28,10 +28,10 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    if (test_dm_exact) then
       if (iv%ntotal(sound) == 0) return
    else
-      if (iv%nlocal(sound) < 1) return
+      if (iv%info(sound)%nlocal < 1) return
    end if
 
-   do n=1, iv%nlocal(sound)
+   do n=1, iv%info(sound)%nlocal
       jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / (iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
       jo_grad_y%sonde_sfc(n)%v = -re%sonde_sfc(n)%v / (iv%sonde_sfc(n)%v%error * iv%sonde_sfc(n)%v%error)
       jo_grad_y%sonde_sfc(n)%t = -re%sonde_sfc(n)%t / (iv%sonde_sfc(n)%t%error * iv%sonde_sfc(n)%t%error)

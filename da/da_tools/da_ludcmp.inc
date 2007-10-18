@@ -1,93 +1,70 @@
-subroutine da_ludcmp(n, np, indx, a, d)
+subroutine da_ao_stats_profiler (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Adapted Numerical Recipes routine to solve the set of n linear 
-   ! equations 
-   ! A.X=B. Routine takes in to account possibility that B will begin with many 
-   ! zero elements, so it is efficient for matrix inversion.
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)    :: n           ! Logical size of array.
-   integer, intent(in)    :: np          ! Physical size of array.
-   integer, intent(out)   :: indx(1:n)   ! Permutation vector returned by LUDCMP 
-   real,    intent(inout) :: a(1:np,1:np)! LU decomposition of matrix A in A.x=B
-   real,    intent(out)   :: d           ! On input = B, on output = x.
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent(inout) :: iv            ! iv
+   type (y_type),  intent(in)    :: re            ! A - O
 
-   real, parameter      :: tiny = 1.0e-20
-   real                 :: aamax , dum , sum
-   integer              :: i , imax , j , k
-   real                 :: vv(1:np)
+   type (stats_profiler_type)       :: stats
+   integer                          :: nu, nv
+   integer                          :: n, k
+   
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_profiler")
 
-   if (trace_use) call da_trace_entry("da_ludcmp")
+   nu = 0
+   nv = 0
 
-   d = 1.0
-   do i = 1 , n
-      aamax = 0.0
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
 
-      do j = 1 , n
-         if (abs(a(i,j)) > aamax) aamax = abs(a(i,j))
-      end do
-      if (aamax == 0.0) then
-         call da_error(__FILE__,__LINE__,(/"Singular matrix"/))
-      end if
-      vv(i) = 1.0 / aamax
-   end do
+   stats%average = residual_profiler1_type(0.0, 0.0)
+   stats%rms_err = stats%average
 
-   do j = 1 , n
-      if (j > 1) then
-         do i = 1 , j - 1
-            sum = a(i,j)
-            if (i > 1) then
-               do k = 1 , i - 1
-                  sum = sum - a(i,k) * a(k,j)
-               end do
-               a(i,j) = sum
-            end if
+   do n=1, iv%info(profiler)%nlocal
+      if (iv%info(profiler)%proc_domain(1,n)) then
+         do k=1, iv%info(profiler)%levels(n)
+            call da_stats_calculate (n, k, iv%profiler(n)%u(k)%qc, & 
+               re%profiler(n)%u(k), nu, & 
+               stats%minimum%u, stats%maximum%u, &
+               stats%average%u, stats%rms_err%u)
+            call da_stats_calculate (n, k, iv%profiler(n)%v(k)%qc, & 
+               re%profiler(n)%v(k), nv, & 
+               stats%minimum%v, stats%maximum%v, &
+               stats%average%v, stats%rms_err%v)
          end do
-      end if
+      end if    ! end if (iv%info(profiler)%proc_domain(1,n))
+   end do 
 
-      aamax = 0.0
-      do i = j , n
-         sum = a(i,j)
-         if (j > 1) then
-            do k = 1 , j - 1
-               sum = sum - a(i,k) * a(k,j)
-            end do
-            a(i,j) = sum
-         end if
-         dum = vv(i) * abs(sum)
-         if (dum >= aamax) then
-            imax = i
-            aamax = dum
-         end if
-      end do
+   ! do inter-processor communication to gather statistics.
+   call da_proc_sum_int (nu)
+   call da_proc_sum_int (nv)
+   iv%nstats(profiler) = nu + nv
+   
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   
+   if (rootproc) then 
+      if (nu /= 0 .or. nv /= 0) then 
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for profiler'
+         call da_print_stats_profiler(stats_unit, nu, nv, stats)
+      end if 
+   end if
+   
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_profiler")
 
-      if (j /= imax) then
-         do k = 1 , n
-            dum = a(imax,k)
-            a(imax,k) = a(j,k)
-            a(j,k) = dum
-         end do
-         d = -d
-         vv(imax) = vv(j)
-      end if
-
-      indx(j) = imax
-      if (j /= n) then
-         if (a(j,j) == 0.0) a(j,j) = tiny
-         dum = 1.0 / a(j,j)
-         do i = j + 1 , n
-            a(i,j) = a(i,j) * dum
-         end do
-      end if
-   end do
-
-   if (a(n,n) == 0.0) a(n,n) = tiny
-
-   if (trace_use) call da_trace_exit("da_ludcmp")
-
-end subroutine da_ludcmp
+end subroutine da_ao_stats_profiler
 
 

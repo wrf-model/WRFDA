@@ -135,7 +135,7 @@ subroutine da_scan_obs_radar (iv, filename)
             cycle reports
          end if
 
-         iv%ntotal(radar) = iv%ntotal(radar) + 1
+         iv%info(radar)%ntotal = iv%info(radar)%ntotal + 1
          if (outside) then
             cycle reports
          end if
@@ -149,11 +149,11 @@ subroutine da_scan_obs_radar (iv, filename)
             select case (fm)
 
             case (128)
-               iv%nlocal(radar) = iv%nlocal(radar) + 1
+               iv%info(radar)%nlocal = iv%info(radar)%nlocal) + 1
 
-               if (iv%nlocal(radar) > max_radar_input) then
+               if (iv%info(radar)%nlocal > max_radar_input) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &
-                     ' radar #= ',iv % nlocal(radar), ' > max_radar_input = ', max_radar_input
+                     ' radar #= ',iv%info(radar)%nlocal, ' > max_radar_input = ', max_radar_input
                   call da_error(__FILE__,__LINE__,message(1:1))
                end if
 
@@ -174,9 +174,6 @@ subroutine da_scan_obs_radar (iv, filename)
 
    close (iunit)
    call da_free_unit(iunit)
-
-   iv%plocal((iv%time),:) = iv%nlocal(:)
-   iv%ptotal((iv%time),:) = iv%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_obs_radar")
 

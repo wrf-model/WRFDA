@@ -1,71 +1,51 @@
-subroutine da_ao_stats_geoamv (stats_unit, iv, re)
+subroutine da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, buoy)
 
-   !-------------------------------------------------------------------------
-   ! Purpose: Calculates (Obs - Analysis) statistics for Geo.  AMV's
-   !
-   !-------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! iv
-   type (y_type),  intent(in)    :: re            ! A - O
+   integer,                intent(in)    :: stats_unit
+   integer,                intent(inout) :: nu, nv, nt, np, nq
+   type (stats_buoy_type), intent(in)    :: buoy
 
-   type (stats_geoamv_type) :: stats
-   integer                  :: nu, nv
-   integer                  :: n, k
+   if (trace_use_dull) call da_trace_entry("da_print_stats_buoy")
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_geoamv")
+   write(unit=stats_unit, fmt='(6a/)') &
+      '   var             ', &
+      'u (m/s)     n    k    ', &
+      'v (m/s)     n    k    ', &
+      't (K)       n    k    ', &
+      'p (Pa)      n    k    ', &
+      'q (kg/kg)   n    k'
 
-   nu = 0
-   nv = 0
+   write(unit=stats_unit, fmt='(a,i16,4i22)') &
+      '  Number: ', nu, nv, nt, np, nq
 
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
+   if (nt < 1) nt = 1
+   if (np < 1) np = 1
+   if (nq < 1) nq = 1
 
-   stats%average = residual_geoamv1_type (0.0, 0.0)
-   stats%rms_err = stats%average
+   write(unit=stats_unit, fmt='((a,4(f12.4,2i5),e12.4,2i5))') &
+      ' Minimum(n,k): ', buoy%minimum%u, buoy%minimum%v, buoy%minimum%t, &
+                         buoy%minimum%p, buoy%minimum%q, &
+      ' Maximum(n,k): ', buoy%maximum%u, buoy%maximum%v, buoy%maximum%t, &
+                         buoy%maximum%p, buoy%maximum%q
+   write(unit=stats_unit, fmt='((a,4(f12.4,10x),e12.4,10x))') &
+      ' Average     : ', buoy%average%u/real(nu), buoy%average%v/real(nv), &
+                         buoy%average%t/real(nt), buoy%average%p/real(np), &
+                         buoy%average%q/real(nq), &
+      '    RMSE     : ', sqrt(buoy%rms_err%u/real(nu)), &
+                         sqrt(buoy%rms_err%v/real(nv)), &
+                         sqrt(buoy%rms_err%t/real(nt)), &
+                         sqrt(buoy%rms_err%p/real(np)), &
+                         sqrt(buoy%rms_err%q/real(nq))
 
-   do n=1, iv%nlocal(geoamv)
-      do k=1, iv%info(geoamv)%levels(n)
-         if (iv%info(geoamv)%proc_domain(k,n)) then
-            call da_stats_calculate (n, 0, iv%geoamv(n)%u(k)%qc, & 
-               re%geoamv(n)%u(k), nu, & 
-               stats%minimum%u, stats%maximum%u, &
-               stats%average%u, stats%rms_err%u)
-            call da_stats_calculate (n, 0, iv%geoamv(n)%v(k)%qc, & 
-               re%geoamv(n)%v(k), nv, & 
-               stats%minimum%v, stats%maximum%v, &
-               stats%average%v, stats%rms_err%v)
-         end if
-      end do
-   end do
+   if (trace_use_dull) call da_trace_exit("da_print_stats_buoy")
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   iv%nstats(geoamv) = nu + nv
-
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for geoamv'
-         call da_print_stats_geoamv (stats_unit, nu, nv, stats)
-      end if
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_geoamv")
-
-end subroutine da_ao_stats_geoamv  
+end subroutine da_print_stats_buoy
 
 

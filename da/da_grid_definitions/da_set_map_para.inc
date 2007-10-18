@@ -1,4 +1,4 @@
-subroutine da_set_map_para
+subroutine da_check_xtoy_adjoint_sonde_sfc(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,52 +6,56 @@ subroutine da_set_map_para
 
    implicit none
 
-   real :: phictr, r, conv
-   real :: cell, cell2, psx
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   if (trace_use_dull) call da_trace_entry("da_set_map_para")
+   integer :: n             ! Loop counter.
 
-   conv = 180.0 / pi
-                                                                  
-   ! define psi1:
-   if (map_projection==1 .or. map_projection==2) then
-      if (phic.lt.0) then 
-         psi1 = 90.0+truelat1_3dv
-         psi1 = -psi1
-      else
-        psi1 = 90.0-truelat1_3dv
-      end if          
-   else
-      psi1 = 0.0
-   end if 
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sonde_sfc")
 
-   psi1 = psi1/conv
-         
-   ! calculate r
-   if (map_projection.ne.3) then
-      psx = (pole-phic)/conv
-      if (map_projection==1) then
-         cell  = earth_radius*sin(psi1)/cone_factor  
-         cell2 = (tan(psx/2.0))/(tan(psi1/2.0))
-      end if 
-      if (map_projection==2) then
-         cell  = earth_radius*sin(psx)/cone_factor   
-         cell2 = (1.0 + cos(psi1))/(1.0 + cos(psx)) 
-      end if  
-      r = cell*(cell2)**cone_factor 
-      ycntr = -r
-   end if  
+   do n=1, iv%info(sound)%nlocal
+      if (iv%info(sound)%zk(1,n) < 1.0) then
+         y%sonde_sfc(n)%u = 0.0
+         y%sonde_sfc(n)%v = 0.0
+         y%sonde_sfc(n)%t = 0.0
+         y%sonde_sfc(n)%p = 0.0
+         y%sonde_sfc(n)%q = 0.0
 
-   ! for mercator projection, the projection is true at lat at phi1
-   if (map_projection==3) then
-      c2     = earth_radius*cos(psi1) 
-      phictr = phic/conv 
-      cell   = cos(phictr)/(1.0+sin(phictr)) 
-      ycntr  = - c2*log(cell)  
-   end if 
+         cycle
+      end if
 
-   if (trace_use_dull) call da_trace_exit("da_set_map_para")
+      y%sonde_sfc(n)%u = y%sonde_sfc(n)%u/typical_u_rms
+      y%sonde_sfc(n)%v = y%sonde_sfc(n)%v/typical_v_rms
+      y%sonde_sfc(n)%t = y%sonde_sfc(n)%t/typical_t_rms
+      y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
+      y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
 
-end subroutine da_set_map_para
+      if (iv%info(sound)%proc_domain(1,n)) then
+         adjtest_lhs = adjtest_lhs  &
+                     + (y%sonde_sfc(n)%u)**2 &
+                     + (y%sonde_sfc(n)%v)**2 &
+                     + (y%sonde_sfc(n)%t)**2 &
+                     + (y%sonde_sfc(n)%p)**2 &
+                     + (y%sonde_sfc(n)%q)**2
+      end if
+
+      pertile_lhs = pertile_lhs &
+                  + (y%sonde_sfc(n)%u)**2 &
+                  + (y%sonde_sfc(n)%v)**2 &
+                  + (y%sonde_sfc(n)%t)**2 &
+                  + (y%sonde_sfc(n)%p)**2 &
+                  + (y%sonde_sfc(n)%q)**2
+
+      y%sonde_sfc(n)%u = y%sonde_sfc(n)%u/typical_u_rms
+      y%sonde_sfc(n)%v = y%sonde_sfc(n)%v/typical_v_rms
+      y%sonde_sfc(n)%t = y%sonde_sfc(n)%t/typical_t_rms
+      y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
+      y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_sonde_sfc")
+
+end subroutine da_check_xtoy_adjoint_sonde_sfc
 
 

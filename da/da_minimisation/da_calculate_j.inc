@@ -1,17 +1,29 @@
-subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
-                           xbx, be, iv, xhat, cv, &
-                           re, y, j, j_grad,            &
-                           grid, config_flags                     )
+subroutine da_read_obs_ssmi_real_array(aa,nn,i0,i_step)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Initialises the Y-array
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)                :: it     ! external iteration #.
-   integer, intent(in)                :: iter   ! internal iteration #.
-   integer, intent(in)                :: cv_size    ! Total cv size.
+   integer, intent(in)  :: nn, i0, i_step
+   real   , intent(out) :: aa(:)
+
+   integer :: i, ii
+
+   if (trace_use_frequent) call da_trace_entry("da_read_obs_ssmi_real_array")
+
+   do i = 1, nn
+      ii = i_step*(i-1) + i0
+      read (unit=char_ned (ii:ii+8),fmt='((f7.2,2X))') aa(i)
+   end do
+
+   if (trace_use_frequent) call da_trace_exit("da_read_obs_ssmi_real_array")
+
+end subroutine da_read_obs_ssmi_real_array
+
+
+ ! Total cv size.
    integer, intent(in)                :: cv_size_jb ! Jb cv size.
    integer, intent(in)                :: cv_size_je ! Je cv size.
    type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.

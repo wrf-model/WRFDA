@@ -1,45 +1,43 @@
-subroutine da_scan_obs_bufr (iv, filename)
+subroutine da_check_xtoy_adjoint_pilot(iv, y, adjtest_lhs, pertile_lhs)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Scan BUFR observation file for input to wrfvar
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type),    intent(inout) :: iv
-   character(len=*),  intent(in)    :: filename
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs  
 
-#ifdef BUFR
+   integer  :: n, k          ! Loop counter.
+   
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_pilot")
 
-   type (multi_level_type)      :: platform
-   logical                      :: outside
-   logical                      :: outside_all
+   do n=1, iv%nlocal(pilot)
+      if (iv%info(pilot)%proc_domain(1,n)) then
+         do k=1, iv%info(pilot)%levels(n)
+            adjtest_lhs = adjtest_lhs + &
+                (y%pilot(n)%u(k)/typical_u_rms)**2 + (y%pilot(n)%v(k)/typical_v_rms)**2
+         end do
+      end if
 
-   character(len=40) :: hdstr
-   character(len=10) :: date
-   character(len=8)  :: subset
-   real              :: hdr(7)
+      do k=1, iv%info(pilot)%levels(n)
+         pertile_lhs = pertile_lhs + &
+            (y%pilot(n)%u(k)/typical_u_rms)**2 + (y%pilot(n)%v(k)/typical_v_rms)**2
 
-   integer           :: iost, ndup, n, report
-   integer           :: year,month, day,hour
-   integer           :: iret,idate, kx, nrecs,miscd, t29
-   integer           :: iunit
+         y%pilot(n)%u(k)= y%pilot(n)%u(k) / typical_u_rms ** 2
+         y%pilot(n)%v(k)= y%pilot(n)%v(k) / typical_v_rms ** 2
+      end do
+   end do
 
-   if (trace_use) call da_trace_entry("da_scan_obs_bufr")
+   
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_pilot")
 
-   ! open FILE
-   ! ---------
+end subroutine da_check_xtoy_adjoint_pilot
 
-   call da_get_unit(iunit)
-   open(unit   = iunit, FILE  = trim(filename), &
-      iostat =  iost, form = 'unformatted', STATUS = 'OLD')
 
-   if (iost /= 0) then
-      write(unit=message(1), fmt='(A,I3,A,A)') &
-         'error in obs input file unit ',iunit, &
-         'obs filename:', trim(filename)
-      message(2)="bufr gts observations cannot be found or cannot be opened"
-      call da_warning(__FILE__,__LINE__,message(1:2))
+warning(__FILE__,__LINE__,message(1:2))
       call da_free_unit(iunit)
       return
    end if
@@ -157,8 +155,8 @@ subroutine da_scan_obs_bufr (iv, filename)
                if (n==1) iv%ntotal(sound)     = iv%ntotal(sound) + 1
                if (n==1) iv%ntotal(sonde_sfc) = iv%ntotal(sonde_sfc) + 1
                if (outside) cycle reports
-               iv%nlocal(sound) = iv%nlocal(sound) + 1
-               iv%nlocal(sonde_sfc) = iv%nlocal(sonde_sfc) + 1
+               iv%info(sound)%nlocal = iv%info(sound)%nlocal + 1
+               iv%info(sonde_sfc)%nlocal = iv%info(sonde_sfc)%nlocal + 1
                platform%loc%obs_global_index  = iv%ntotal(sound)
 
             case (221) ;                   ! Pilot 
@@ -197,7 +195,7 @@ subroutine da_scan_obs_bufr (iv, filename)
             if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
             if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(metar)
 
          case (512)
@@ -205,7 +203,7 @@ subroutine da_scan_obs_bufr (iv, filename)
             if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
             if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(metar)
 
          case (63)
@@ -213,14 +211,14 @@ subroutine da_scan_obs_bufr (iv, filename)
             if (.not.use_geoamvobs .or. iv%ntotal(geoamv) == max_geoamv_input) cycle reports
             if (n==1) iv%ntotal(geoamv) = iv%ntotal(geoamv) + 1
             if (outside) cycle reports
-            iv%nlocal(geoamv) = iv%nlocal(geoamv) + 1
+            iv%info(geoamv)%nlocal = iv%info(geoamv)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(geoamv)
 
          case (71, 72)        ;         !  Profiler & VADWND - NEXRAD winds
             if (.not.use_polaramvobs .or. iv%ntotal(polaramv) == max_polaramv_input) cycle reports
             if (n==1) iv%ntotal(polaramv) = iv%ntotal(polaramv) + 1
             if (outside) cycle reports
-            iv%nlocal(polaramv) = iv%nlocal(polaramv) + 1
+            iv%info(polaramv)%nlocal = iv%info(polaramv)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(polaramv)
 
          case (582)    ;                 !  Quikscat
@@ -234,14 +232,14 @@ subroutine da_scan_obs_bufr (iv, filename)
             if (.not.use_gpspwobs .or. iv%ntotal(gpspw) == max_gpspw_input) cycle reports
             if (n==1) iv%ntotal(gpspw) = iv%ntotal(gpspw) + 1
             if (outside) cycle reports
-            iv%nlocal(gpspw) = iv%nlocal(gpspw) + 1
+            iv%info(gpspw)%nlocal = iv%info(gpspw)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(gpspw)
 
          case (584)    ;                 !  GPS REF 
             if (.not.use_gpsrefobs .or. iv%ntotal(gpsref) == max_gpsref_input) cycle reports
             if (n==1) iv%ntotal(gpsref) = iv%ntotal(gpsref) + 1
             if (outside) cycle reports
-            iv%nlocal(gpsref) = iv%nlocal(gpsref) + 1
+            iv%info(gpsref)%nlocal = iv%info(gpsref)%nlocal + 1
             platform%loc%obs_global_index  = iv%ntotal(gpsref)
 
          case default ;

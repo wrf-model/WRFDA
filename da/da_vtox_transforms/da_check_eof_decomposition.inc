@@ -1,57 +1,80 @@
-subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
+subroutine da_recursive_filter_1d(pass, alpha, field, n)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Check eigenvectors E of vertical covariance matrix B_{x} which 
-   ! have been read in from NMC-statistics file.
+   ! Purpose: Perform one pass of recursive filter on 1D array.
    !
-   ! Method:  E and L (eigenvalues) are computed using LAPACK/BLAS software in 
-   ! the NMC code using the definition E^{T} B_{x} E = L. This routine checks 
-   ! for eigenvector orthogonality and completeness as defined below.
+   ! Method:  Perform right-moving filter followed by left-moving filter.
    !---------------------------------------------------------------------------
 
    implicit none
-      
-   real, intent(in)              :: be_eigenval(:)   ! Back. error eigenvalues.
-   real, intent(in)              :: be_eigenvec(:,:) ! Back. error eigenvector
-   character(len=*), intent(in)  :: name             ! Variable name.
 
-   integer                       :: kz               ! Size of 3rd dimension.
-   integer                       :: k, k1, k2, m     ! Loop counters
-   real                          :: tot_variance     ! Total variance.
-   real                          :: cum_variance     ! Cumulative variance.
-   real                          :: max_off_diag     ! Maximum off-diagonal.
-      
-   real, allocatable             :: matrix2(:,:)     ! 2D Work matrix.
-   logical, allocatable          :: array_mask(:)    ! Array mask for MAXVAL.
+   integer, intent(in)    :: pass           ! Current pass of filter.
+   real,    intent(in)    :: alpha          ! Alpha coefficient for RF.
+   real,    intent(inout) :: field(:)       ! Array to be filtered.
+   integer, intent(in)    :: n              ! Size of field array.
 
-   if (trace_use) call da_trace_entry("da_check_eof_decomposition")
+   integer :: j              ! Loop counter.
+   real    :: one_alpha      ! 1 - alpha.
+   real    :: a(1:n)         ! Input field.
+   real    :: b(1:n)         ! Field after left-right pass.
+   real    :: c(1:n)         ! Field after right-left pass.
 
-   !----------------------------------------------------------------------
-   ! [1.0]: Initialise:
-   !----------------------------------------------------------------------  
+   if (trace_use_dull) call da_trace_entry("da_recursive_filter_1d")
+   
+   !-------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !-------------------------------------------------------------------------
 
-   kz = size(be_eigenval)
-                         
-   !----------------------------------------------------------------------
-   ! [2.0]: Print out global eigenvalues (used for truncation):
-   !----------------------------------------------------------------------  
+   one_alpha = 1.0 - alpha
+   
+   a(1:n) = field(1:n)
 
-   cum_variance = 0.0
-   tot_variance = sum(be_eigenval(1:kz))
+   !-------------------------------------------------------------------------
+   ! [2.0] Perform right-moving filter:
+   !-------------------------------------------------------------------------
 
-   write(unit=stdout,fmt='(A)') 'Name Mode  Eigenvalue Normalised Variance'
-   do k = 1, kz
-      cum_variance =  be_eigenval(k) + cum_variance
-      write(unit=stdout,fmt='(A,I4,e14.4,f10.4)') &
-         trim(name), k, be_eigenval(k), cum_variance / tot_variance
+   ! use turning conditions as in the appendix of Hayden & Purser (1995):
+
+   if (pass == 1) then
+      b(1) = one_alpha * a(1)
+   else if (pass == 2) then
+      b(1) = a(1) / (1.0 + alpha)
+   else
+      b(1) = one_alpha * (a(1) - alpha**3 * a(2)) / (1.0 - alpha**2)**2
+   end if
+
+   ! [2.2] Perform pass left to right:
+
+   do j = 2, n
+      b(j) = alpha * b(j-1) + one_alpha * a(j)
    end do
-   write(unit=stdout,fmt=*) ' '
-   write(unit=stdout,fmt='(A,e13.5)') 'Total variance = Tr(Bv) = ', tot_variance
-   write(unit=stdout,fmt=*) ' '
 
-   !--------------------------------------------------------------------------
-   ! [2.0]: Test global eigenvectors:
-   !--------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! [3.0] Perform left-moving filter:
+   !-------------------------------------------------------------------------
+
+   ! use turning conditions as in the appendix of Hayden & Purser (1995):
+
+   if (pass == 1) then
+      c(n) = b(n) / (1.0 + alpha)
+   else
+      c(n) = one_alpha * (b(n) - alpha**3 * b(n-1)) / (1.0 - alpha**2)**2
+   end if
+
+   ! [3.2] Perform pass left to right:
+
+   do j = n-1, 1, -1
+      c(j) = alpha * c(j+1) + one_alpha * b(j)
+   end do
+        
+   field(1:n) = c(1:n)
+
+   if (trace_use_dull) call da_trace_exit("da_recursive_filter_1d")
+   
+end subroutine da_recursive_filter_1d
+
+
+ !--------------------------------------------------------------------------
 
    ! [2.1] Print out global eigenvectors:
 

@@ -1,34 +1,44 @@
-subroutine da_residual_satem(iv, y, re,np_missing, np_bad_data,np_obs_used, np_available)
+subroutine da_check_rh_simple (grid)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Calculate residuals for satem obs
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
+   type (domain),  intent(inout)  :: grid
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   integer :: i, j, k ! Loop counters.
+   real    :: q_new   ! Modified rh.
+   real    :: es      ! Dummy output.
+   real    :: t_new, p_new
+   real    :: ramax,ramin,dqmax,dqmin    
 
-   type (bad_data_type) :: n_obs_bad
-   integer              :: n, k
+   if (trace_use_dull) call da_trace_entry("da_check_rh_simple")        
 
-   if (trace_use_dull) call da_trace_entry("da_residual_satem")
+   ramax=maximum_rh/100.0
+   ramin=minimum_rh/100.0
 
-   n_obs_bad % thickness % num = number_type(0, 0, 0)
+   do k = kts, kte
+      do j = jts, jte
+         do i = its, ite
+            p_new  = grid%xb % p(i,j,k) + grid%xa %  p(i,j,k)
+            t_new  = grid%xb % t(i,j,k) + grid%xa %  t(i,j,k)
 
-   do n=1, iv%nlocal(satem)
-       do k=1, iv%satem(n)%info%levels
-          np_available = np_available + 1
-          re%satem(n)%thickness(k) = &
-             da_residual(n, k, y%satem(n)%thickness(k), iv%satem(n)%thickness(k), n_obs_bad % thickness)
-       end do
-   end do
+            call da_tp_to_qs(t_new, p_new, es, q_new)
+            dqmax=q_new*ramax - grid%xb % q(i,j,k)        
+            dqmin=q_new*ramin - grid%xb % q(i,j,k)        
+            grid%xa % q(i,j,k)=min(max(grid%xa % q(i,j,k),dqmin),dqmax)
+         end do
+      end do
+   end do  
+
+   if (trace_use_dull) call da_trace_exit("da_check_rh_simple") 
+
+end subroutine da_check_rh_simple
+
+
+d do
 
    np_missing  = np_missing  + n_obs_bad % thickness % num % miss
    np_bad_data = np_bad_data + n_obs_bad % thickness % num % bad

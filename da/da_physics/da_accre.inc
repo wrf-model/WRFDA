@@ -1,34 +1,67 @@
-subroutine da_accre(DT,SCR2,SCR3,PRA,kts,kte,kms,kme)
+subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Accretion (Collection)
-   !-----------------------------------------------------------------------
+   !------------------------------------------------------------------------
+   ! Purpose: open an file and rewind
+   !
+   !   method:
+   !   ------
+   !
+   !   input:
+   !   -----
+   !      kunit:          logical unit
+   !      cdfile:         name of file for output of discared obs.
+   !      cda!ess:       a!ess (sequential or),
+   !      cdstatus:       status (old, new or unknown)
+   !      cdform:         form (formatted or unformatted)
+   !
+   !   output:
+   !   ------
+   !      opened file
+   !
+   !   common:                      no
+   !   -------
+   !   external:                    no
+   !   --------
+   !   references:                  no
+   !   ----------
+   !
+   !   modifications:
+   !   --------------
+   !       original :  98-07 (f. vandenberghe)
+   !       additions : 98-11 norm doctor (f. vandenberghe)
+   !--------------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)                   :: kts, kte, kms, kme
-   real, dimension(kms:kme), intent(in)  :: DT, SCR2, SCR3
-   real, dimension(kms:kme), intent(out) :: PRA
+   integer, intent(in) :: Kunit
+   character*(*), intent(in) :: CDFILE, CDACCESS, CDSTATUS, CDFORM
 
-   integer   :: k
-   real      :: gamma, QRTH
+   integer :: iost
 
-   gamma = 0.002
-   QRTH  = 1.0e-6
+   ! 1.  open FILE
+   ! -------------
 
-   do K = kts, kte
+   IOST = 0
 
-      if ( DT(k) <= 0.0 ) cycle
+   open (unit   = Kunit, &
+          FILE   = CDFILE, &
+          ACCESS = CDACCESS, &
+          STATUS = CDSTATUS, &
+          FORM   = CDFORM, &
+          ERR    =  2000, &
+          iostat = IOST       )
+ 
+   rewind (Kunit)
+ 
+   return
+ 
+  ! 2.  ERROR PROCESSinG
+   ! --------------------
+ 
+2000 continue
+   call da_error(__FILE__,__LINE__, &
+      (/"Cannot open file"//trim(CDFILE)/))
 
-      if ( SCR2(k) > 0.0 .and. SCR3(k) > QRTH ) then
-         PRA(k) = gamma * SCR2(k) * (SCR3(k)*1.0e3)**0.875
-      else if ( SCR2(k) > 0.0 .and. SCR3(k) <= QRTH ) then
-         PRA(k) = gamma * SCR2(k) * (QRTH*1.0e3)**0.875 
-      else
-         PRA(k) = 0.0
-      end if
+end subroutine da_openfile
 
-   end do
-
-end subroutine da_accre
 

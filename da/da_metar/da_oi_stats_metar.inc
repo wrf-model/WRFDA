@@ -34,7 +34,7 @@ subroutine da_oi_stats_metar (stats_unit, iv)
    stats%average = residual_metar1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(metar)
+   do n=1, iv%info(metar)%nlocal
       if (iv%info(metar)%proc_domain(1,n)) then
          call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
             0, iv%metar(n)%u%qc, &

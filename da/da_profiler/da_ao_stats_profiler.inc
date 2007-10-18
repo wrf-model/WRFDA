@@ -27,7 +27,7 @@ subroutine da_ao_stats_profiler (stats_unit, iv, re)
    stats%average = residual_profiler1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(profiler)
+   do n=1, iv%info(profiler)%nlocal
       if (iv%info(profiler)%proc_domain(1,n)) then
          do k=1, iv%info(profiler)%levels(n)
             call da_stats_calculate (n, k, iv%profiler(n)%u(k)%qc, & 

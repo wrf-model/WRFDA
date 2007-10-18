@@ -1,71 +1,121 @@
-subroutine da_correlation_coeff1d(field1, field2, corr_coeff, &
-                                   rel_acc)
-   
-   !---- -------------------------------------------------------------------------
-   ! Purpose: Calculate correlation coefficient between two fields.  
+subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
+
    !------------------------------------------------------------------------------
-   
+   ! Purpose: Setup structures for flow-dependent information and read it in.
+   !------------------------------------------------------------------------------
+
    implicit none
-   
-   real, intent(in)  :: field1(:)       ! input field 1.
-   real, intent(in)  :: field2(:)       ! input field 2.
-   real, intent(out) :: corr_coeff      ! correlation coefficient
-   real, intent(out) :: rel_acc       ! relative error.
-   
-   integer           :: jx              ! 2nd dimension of field.
-   real              :: j_inv           ! 1/(jx)
-   real              :: coeff0          ! coefficient.
-   real              :: coeff1          ! coefficient.
-   real              :: coeff2          ! coefficient.
-   real              :: coeff3          ! coefficient.
-   real              :: field_mean      ! mean of field.
-   real, allocatable :: data1(:)
-   real, allocatable :: data2(:)
 
-   if (trace_use) call da_trace_entry("da_correlation_coeff1d")
-   
-   ! [1.0] Set up scalars:
-   
-   jx = size(field1(:))
-   
-   j_inv = 1.0 / real(jx)
-   
-   ! [2.0] Calculate mean and remove from field:
-   
-   field_mean = sum(field1(:)) * j_inv
-   allocate(data1(1:jx))
-   data1(:) = field1(:) - field_mean
-   
-   field_mean = sum(field2(:)) * j_inv
-   allocate(data2(1:jx))
-   data2(:) = field2(:) - field_mean
-   
-   ! [3.0] Calculate correlation coefficient:
-   
-   coeff0 = sum(data1(:) * data2(:))
-   coeff1 = sum(data1(:) * data1(:))
-   coeff2 = sum(data2(:) * data2(:))
-   
-   if (coeff1 /= 0.0 .and. coeff2 /= 0.0) then
-      corr_coeff = coeff0 /  sqrt(coeff1 * coeff2)
-   else
-      corr_coeff = 0.0
-   end if
-   
-   ! [4.0] Calculate accuracy:
-   
-   coeff3 = sum((data2(:) - data1(:))**2)
-   if (coeff2 /= 0.0) then
-      rel_acc = 1.0 - min(coeff3/coeff2,1.0)
-   else
-      rel_acc = 0.0
-   end if
-   
-   deallocate(data1)
-   deallocate(data2)
+   integer, intent(in)         :: ix, jy, kz            ! EP grid dimensions.
+   integer, intent(in)         :: ne                    ! Ensemble size.
+   type (ep_type), intent(inout):: ep                   ! Flow-dependent info.
 
-   if (trace_use) call da_trace_exit("da_correlation_coeff1d")
-   
-end subroutine da_correlation_coeff1d
+   character*10                :: ce                    ! Member index -> character.
+   character(len=filename_len) :: filename              ! Input filename.
+   character*10                :: var(1:5)              ! Variable name.
+   integer                     :: ni, nj, nk            ! Grid dimensions.
+   integer                     :: e                     ! Loop counter
+   logical                     :: ldum1, ldum2,nkdum    ! Dummy.
+   real                        :: temp3d(1:ix,1:jy,1:kz)! Temporary, real*4 array.
+   real                        :: temp2d(1:ix,1:jy)     ! Temporary, real*4 array.
+
+   real                        :: ens_scaling_inv       ! Ensemble scaling of perturbations.
+
+   integer                     :: ep_unit
+
+   if (trace_use) call da_trace_entry("da_setup_flow_predictors")
+
+   call da_get_unit(ep_unit)
+
+   call da_message(&
+      (/"Setup structures for flow-dependent information and read in"/))
+
+   ep % ne = ne
+
+   ens_scaling_inv = 1.0
+   if (ne > 1) ens_scaling_inv = 1.0 / sqrt(real(ne-1))
+
+   ! Decide which space we are introducing flow-dependence:
+   if (alphacv_method == alphacv_method_xa) then    ! xa space
+      var(1) = 'u'
+      var(2) = 'v'
+      var(3) = 't'
+      var(4) = 'q'
+      var(5) = 'ps'
+   else                               ! vp space (default)
+      var(1) = 'psi'
+      var(2) = 'chi_u'
+      var(3) = 't_u'
+      var(4) = 'rh'
+      var(5) = 'ps_u'
+   end if
+
+   !---------------------------------------------------------------------------
+   ! Input ensemble perturbations
+   !---------------------------------------------------------------------------
+
+   do e = 1, ne
+
+      write(unit=ce,fmt='(i3.3)')e
+
+      ! v1:
+      filename = 'ep/'//trim(var(1))//'/'//trim(var(1))//'.e'//trim(ce)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old')
+      read(unit=ep_unit) ni, nj, nk
+
+      if (ni /= ix .or. nj /= jy .or. nk /= kz) then
+         write(unit=message(1),fmt='(a)') &
+            'Inconsistent grid dimensions'
+         write(unit=message(2),fmt='(a,3i6)') &
+            ' Grid dims for analysis grid: ', ix, jy
+         write(unit=message(3),fmt='(a,3i6)') &
+            ' Grid dims for flow predictors: ', ni, nj
+         call da_warning(__FILE__,__LINE__,message(1:3))
+      end if
+
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      close(unit=ep_unit)
+      ep % v1(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
+
+      ! v2:
+      filename = 'ep/'//trim(var(2))//'/'//trim(var(2))//'.e'//trim(ce)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old')
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      ep % v2(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
+      close(unit=ep_unit)
+
+      ! v3:
+      filename = 'ep/'//trim(var(3))//'/'//trim(var(3))//'.e'//trim(ce)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old')
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      ep % v3(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
+      close(unit=ep_unit)
+
+      ! v4:
+      filename = 'ep/'//trim(var(4))//'/'//trim(var(4))//'.e'//trim(ce)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old')
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      ep % v4(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
+      close(unit=ep_unit)
+
+      ! v5:
+      filename = 'ep/'//trim(var(5))//'/'//trim(var(5))//'.e'//trim(ce)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old')
+      read(unit=ep_unit) ni, nj, nkdum
+      read(unit=ep_unit) ldum1, ldum2
+      read(unit=ep_unit) temp2d(1:ix,1:jy)
+      ep % v5(1:ix,1:jy,1,e) = ens_scaling_inv * temp2d(1:ix,1:jy)
+      close(unit=ep_unit)
+
+   end do 
+
+   call da_free_unit(ep_unit)
+
+   if (trace_use) call da_trace_exit("da_setup_flow_predictors")
+
+end subroutine da_setup_flow_predictors
 
 

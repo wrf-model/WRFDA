@@ -206,7 +206,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    if (iv % nlocal(metar) > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for metar ',iv%nlocal(metar)
+            ' writing filtered obs for metar ',iv%info(metar)%nlocal
       end if
 
       do n = 1, iv % nlocal(metar)
@@ -502,7 +502,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    if (iv % nlocal(geoamv) > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for geoamv ',iv%nlocal(geoamv)
+            ' writing filtered obs for geoamv ',iv%info(geoamv)%nlocal
       end if
 
       do n = 1, iv % nlocal(geoamv)               
@@ -556,7 +556,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    if (iv % nlocal(polaramv) > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for polaramv ',iv%nlocal(polaramv)
+            ' writing filtered obs for polaramv ',iv%info(polaramv)%nlocal
       end if
 
       do n = 1, iv % nlocal(polaramv)               
@@ -611,7 +611,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    if (iv % nlocal(sound) > 0) then
       if (print_detail_f_obs) then
          write(stdout,fmt='(A,I5)') &
-            ' writing filtered obs for sound  ',iv%nlocal(sound) 
+            ' writing filtered obs for sound  ',iv%info(sound)%nlocal 
       end if
       mnz = 0
 
@@ -1035,7 +1035,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    if (iv % nlocal(profiler) > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for profiler  ',iv%nlocal(profiler) 
+            ' writing filtered obs for profiler  ',iv%info(profiler)%nlocal 
       end if
 
       do n = 1, iv % nlocal(profiler)            

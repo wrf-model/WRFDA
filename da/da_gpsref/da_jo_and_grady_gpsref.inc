@@ -21,7 +21,7 @@ subroutine da_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
 
    jo % gpsref_ref = 0.0
 
-   do n=1, iv%nlocal(gpsref)
+   do n=1, iv%info(gpsref)%nlocal
       do k=1, iv%info(gpsref)%levels(n)
          jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
             ( iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)

@@ -116,7 +116,7 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
             end do
         end do
 
-        do n = 1, iv%nlocal(radar)
+        do n = 1, iv%info(radar)%nlocal
            do i=int(iv%info(radar)%i(1,n)), int(iv%info(radar)%i(1,n))+1
               do j=int(iv%info(radar)%j(1,n)), int(iv%info(radar)%j(1,n))+1
                  do k=kts, kte

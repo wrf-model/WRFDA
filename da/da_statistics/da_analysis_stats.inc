@@ -1,227 +1,194 @@
-subroutine da_analysis_stats  (grid, stats_unit)
-   
-   !------------------------------------------------------------------------
-   ! Purpose: Calculate min, max, mean and RMS of input 1d field.
-   !------------------------------------------------------------------------
+subroutine da_llxy_lc(lat, lon, proj, x, y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: compute the geographical latitude and longitude values
+   ! to the cartesian x/y on a Lambert Conformal projection.
+   !-----------------------------------------------------------------------
+    
    implicit none
 
-   type (domain), intent (in) :: grid
-   integer,       intent (in) :: stats_unit ! Output unit for stats.
+   real, intent(in)              :: lat      ! Latitude (-90->90 deg N)
+   real, intent(in)              :: lon      ! Longitude (-180->180 E)
+   type(proj_info),intent(in)    :: proj     ! Projection info structure
+
+   real, intent(out)             :: x        ! Cartesian X coordinate
+   real, intent(out)             :: y        ! Cartesian Y coordinate
+
+   real                          :: arg
+   real                          :: deltalon
+   real                          :: tl1r
+   real                          :: rm
+   real                          :: ctl1r
+
+   if (trace_use_dull) call da_trace_entry("da_llxy_lc")
+    
+   ! Compute deltalon between known longitude and standard lon and ensure
+   ! it is not in the cut zone
+   deltalon = lon - proj%stdlon
+   if (deltalon > +180.0) deltalon = deltalon - 360.0
+   if (deltalon < -180.0) deltalon = deltalon + 360.0
+    
+   ! Convert truelat1 to radian and compute COS for later use
+   tl1r = proj%truelat1 * rad_per_deg
+   ctl1r = COS(tl1r)     
    
-   integer :: i, j, k
-   integer :: ij_g, ijk_g   ! ij, ijk for global domain. 
-   integer :: kdim  ! k range 
+   ! Radius to desired point
+   rm = proj%rebydx * ctl1r/proj%cone * &
+       (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / &
+        TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
-   real    :: um, vm, tm, pm, qm ! On local domain.
-   real    :: rij_g, rijk_g      ! On global domain.
+   arg = proj%cone*(deltalon*rad_per_deg)
+   x = proj%polei + proj%hemi * rm * Sin(arg)
+   y = proj%polej - rm * COS(arg)
 
-   type (maxmin_field_type) :: max_u(kts:kte), max_v(kts:kte), &
-                               max_t(kts:kte), max_p(kts:kte), &
-                               max_q(kts:kte), &
-                               min_u(kts:kte), min_v(kts:kte), &
-                               min_t(kts:kte), min_p(kts:kte), &
-                               min_q(kts:kte)
- 
-   real                        uv(kts:kte), vv(kts:kte), &
-                               tv(kts:kte), pv(kts:kte), &
-                               qv(kts:kte)
-
-   call da_trace_entry("da_analysis_stats")
-
-   kdim = kte-kts+1
-
-   ij_g = mix * mjy
-   ijk_g = ij_g * mkz
-   
-   rij_g  = 1.0/real(ij_g)
-   rijk_g = 1.0/real(ijk_g)
-  
-   if (rootproc) then
-      write(unit=stats_unit, fmt='(/a/)') &
-         ' Minimum of gridded analysis increments'
-
-      write(unit=stats_unit, fmt='(6a/)') &
-         ' Lvl         ', &
-         'u     i    j          ', &
-         'v     i    j          ', &
-         't     i    j          ', &
-         'p     i    j          ', &
-         'q     i    j          '
+   ! Finally, if we are in the southern hemisphere, flip the i/j
+   ! values to a coordinate system where (1,1) is the SW corner
+   ! (what we assume) which is different than the original NCEP
+   ! algorithms which used the NE corner as the origin in the 
+   ! southern hemisphere (left-hand vs. right-hand coordinate?)
+   if (proj%hemi == -1.0) then
+      x = 2.0 - x  
+      y = 2.0 - y
    end if
 
-   call da_maxmin_in_field(grid%xa%u(its:ite,jts:jte,kts:kte), max_u, min_u)
-   call da_proc_maxmin_combine(kdim, max_u, min_u)
-   call da_maxmin_in_field(grid%xa%v(its:ite,jts:jte,kts:kte), max_v, min_v)
-   call da_proc_maxmin_combine(kdim, max_v, min_v)
-   call da_maxmin_in_field(grid%xa%t(its:ite,jts:jte,kts:kte), max_t, min_t)
-   call da_proc_maxmin_combine(kdim, max_t, min_t)
-   call da_maxmin_in_field(grid%xa%p(its:ite,jts:jte,kts:kte), max_p, min_p)
-   call da_proc_maxmin_combine(kdim, max_p, min_p)
-   call da_maxmin_in_field(grid%xa%q(its:ite,jts:jte,kts:kte), max_q, min_q)
-   call da_proc_maxmin_combine(kdim, max_q, min_q)
+   if (trace_use_dull) call da_trace_exit("da_llxy_lc")
 
-   um = 999999.0
-   vm = 999999.0
-   tm = 999999.0
-   pm = 999999.0
-   qm = 999999.0
+end subroutine da_llxy_lc
 
-   do k = kts, kte   
-      if (rootproc) then
-         write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
-            min_u(k), min_v(k), min_t(k), min_p(k), min_q(k)
-      end if
 
-      um=minval(min_u(:)%value)
-      vm=minval(min_v(:)%value)
-      tm=minval(min_t(:)%value)
-      pm=minval(min_p(:)%value)
-      qm=minval(min_q(:)%value)
-   end do
-
-   if (rootproc) then
-      write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
-         um, vm, tm, pm, qm
-   
-  
-      write(unit=stats_unit, fmt='(/a/)') &
-         ' Maximum of gridded analysis increments'
-
-      write(unit=stats_unit, fmt='(6a/)') &
-         ' Lvl         ', &
-         'u     i    j          ', &
-         'v     i    j          ', &
-         't     i    j          ', &
-         'p     i    j          ', &
-         'q     i    j          '
-   end if
-
-   do k = kts, kte
-      if (rootproc) then
-         write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
-            max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
-      end if
-
-      um=maxval(max_u(:)%value)
-      vm=maxval(max_v(:)%value)
-      tm=maxval(max_t(:)%value)
-      pm=maxval(max_p(:)%value)
-      qm=maxval(max_q(:)%value)
-   end do
-
-   if (rootproc) then
-      write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
-         um, vm, tm, pm, qm
-   
-      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysis increments'
-
-      write(unit=stats_unit, fmt='(a/)') &
-         ' Lvl        u           v           t           p           q'
-   end if
-
-   um = 0.0
-   vm = 0.0
-   tm = 0.0
-   pm = 0.0
-   qm = 0.0
-
-   do k = kts, kte
-      uv(k) = sum(grid%xa%u(its:ite,jts:jte,k))
-      vv(k) = sum(grid%xa%v(its:ite,jts:jte,k))
-      tv(k) = sum(grid%xa%t(its:ite,jts:jte,k))
-      pv(k) = sum(grid%xa%p(its:ite,jts:jte,k))
-      qv(k) = sum(grid%xa%q(its:ite,jts:jte,k))
-   end do
-
-   call da_proc_sum_real  (uv)
-   call da_proc_sum_real  (vv)
-   call da_proc_sum_real  (tv)
-   call da_proc_sum_real  (pv)
-   call da_proc_sum_real  (qv)
-
-   if (rootproc) then
-      do k = kts, kte
-         write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
-            uv(k)*rij_g, vv(k)*rij_g, tv(k)*rij_g, &
-            pv(k)*rij_g, qv(k)*rij_g
-
-         um=um+uv(k)
-         vm=vm+vv(k)
-         tm=tm+tv(k)
-         pm=pm+pv(k)
-         qm=qm+qv(k)
-      end do
-   end if
-
-   if (rootproc) then
-      write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
-         um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
-
-      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
-
-      write(unit=stats_unit, fmt='(a/)') &
-         ' Lvl        u           v           t           p           q'
-   end if
-
-   um = 0.0
-   vm = 0.0
-   tm = 0.0
-   pm = 0.0
-   qm = 0.0
-   uv = 0.0
-   vv = 0.0
-   tv = 0.0
-   pv = 0.0
-   qv = 0.0
-
-   do k = kts, kte
-      do j=jts,jte
-         do i=its,ite
-            uv(k) = uv(k) + grid%xa%u(i,j,k) * grid%xa%u(i,j,k)
-            vv(k) = vv(k) + grid%xa%v(i,j,k) * grid%xa%v(i,j,k)
-            tv(k) = tv(k) + grid%xa%t(i,j,k) * grid%xa%t(i,j,k)
-            pv(k) = pv(k) + grid%xa%p(i,j,k) * grid%xa%p(i,j,k)
-            qv(k) = qv(k) + grid%xa%q(i,j,k) * grid%xa%q(i,j,k)
+          grid%xa%wh(i,j,k)=0.0
+            end do
          end do
       end do
+
+      call da_uvprho_to_w_adj(grid)
+ 
+      if (use_radarobs .and. use_radar_rf) then
+         ! Partition of hydrometeor increments via warm rain process
+         call da_moist_phys_adj(grid)
+      end if
+   end if
+
+   !-------------------------------------------------------------------------
+   ! If test_wrfvar = .true., not "XToY" transform needed to do here (YRG):
+
+   if (.not.test_wrfvar) then
+      if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
+          use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
+         if (use_ssmitbobs) call da_transform_xtotb_adj(grid)
+         if (use_ssmt1obs .or. use_ssmt2obs .or. &
+             use_ssmitbobs .or. use_ssmiretrievalobs) then
+            if (global) then
+               call da_error(__FILE__,__LINE__, &
+                  (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
+            end if
+            call da_transform_xtoseasfcwind_adj(grid)
+         end if
+
+         ! GPS Refractivity:
+         if (use_gpsrefobs) call da_transform_xtogpsref_adj(grid)
+
+         ! Now for PW.
+         call da_transform_xtotpw_adj(grid)
+      end if
+
+      if (sfc_assi_options == 2) call da_transform_xtowtq_adj(grid)
+   end if
+ 
+   call da_pt_to_rho_adj(grid)
+   do j=jts,jte
+      do i=its,ite
+         if (fg_format == fg_format_wrf) then
+            mu=0.0
+            s1md=0.0
+
+            p(:)=0.0
+
+            do k=kts,kte
+               mr_b(k) = grid%xb%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))
+               s1md=s1md+(1.0+mr_b(k))*grid%xb%dnw(k)
+
+               p(k) = p(k) + 0.5*grid%xa%p(i,j,k)
+               p(k+1) = p(k+1) + 0.5*grid%xa%p(i,j,k)
+
+               mu = mu - p(k)*(1.0+mr_b(k))*grid%xb%dnw(k)
+
+               mr_a(k) = - p(k)*grid%xb%psac(i,j)*grid%xb%dnw(k)
+               p(k+1) = p(k+1) + p(k)
+            end do
+
+            grid%xa%psfc(i,j) = grid%xa%psfc(i,j) - mu/s1md
+            sdmd=-mu*grid%xb%psac(i,j)/s1md
+
+            do k=kts,kte
+               mr_a(k) = mr_a(k) + sdmd*grid%xb%dnw(k)
+               grid%xa%q(i,j,k) = grid%xa%q(i,j,k) + mr_a(k)/(1.0 - grid%xb%q(i,j,k))**2
+            end do
+         else if (fg_format == fg_format_kma_global)then
+            do k=kts,kte
+               if (k == kte) then
+                  coeff = grid%xb%KMA_B(K)/(grid%xb%KMA_A(K)+grid%xb%KMA_B(K)* &
+                     grid%xb%psfc(I,J)/100.0)
+               else
+                  PU = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(I,J)/100.0
+                  PD = grid%xb%KMA_A(K ) + grid%xb%KMA_B(K )*grid%xb%psfc(I,J)/100.0
+                  coeff=grid%xb%KMA_B(K)*1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU)&
+                     + grid%xb%KMA_B(K+1)*1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
+               end if
+      
+               grid%xa%psfc(i,j) = grid%xa % psfc(i,j) + &
+                  grid%xb%p(i,j,k) * grid%xa % p(i,j,k)/100.0 * coeff 
+            end do
+         end if
+      end do
    end do
 
-   call da_proc_sum_real  (uv)
-   call da_proc_sum_real  (vv)
-   call da_proc_sum_real  (tv)
-   call da_proc_sum_real  (pv)
-   call da_proc_sum_real  (qv)
-
-   if (rootproc) then
-      do k = kts, kte
-         write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
-            sqrt(uv(k)*rij_g), &
-            sqrt(vv(k)*rij_g), &
-            sqrt(tv(k)*rij_g), &
-            sqrt(pv(k)*rij_g), &
-            sqrt(qv(k)*rij_g)
-
-         um=um+uv(k)
-         vm=vm+vv(k)
-         tm=tm+tv(k)
-         pm=pm+pv(k)
-         qm=qm+qv(k)
-      end do
+   if (global) then     
+      call da_set_boundary_xa(grid)
    end if
 
-   if (rootproc) then
-      write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
-         sqrt(um*rijk_g), sqrt(vm*rijk_g), sqrt(tm*rijk_g), &
-         sqrt(pm*rijk_g), sqrt(qm*rijk_g)
+   !-------------------------------------------------------------------------
+   ! [3.0]: Perform x = u_p vp transform::
+   !-------------------------------------------------------------------------
+
+   call da_zero_vp_type (vp)
+   call da_transform_vptox_adj(grid, vp, be, ep)
+
+   !-------------------------------------------------------------------------
+   ! [2.0]: Perform vp = u_v vv transform:
+   !-------------------------------------------------------------------------
+
+   call da_zero_vp_type (vv)
+
+   ! Uv for alpha is a null transform:
+   ! if (be % ne > 0) then
+   !    vv % alpha(its:ite,jts:jte,1:be%ne) = &
+   !    vp % alpha(its:ite,jts:jte,1:be%ne) 
+   ! end if
+
+   if (vert_corr == 2) then      
+      call da_vertical_transform('u_adj', be, &
+         grid%xb % vertical_inner_product, vv, vp)
+   else
+      vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)
+      vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)
+      vv % v3(its:ite,jts:jte,kts:kte) = vp % v3(its:ite,jts:jte,kts:kte)
+      vv % v4(its:ite,jts:jte,kts:kte) = vp % v4(its:ite,jts:jte,kts:kte)
+      vv % v5(its:ite,jts:jte,kts:kte) = vp % v5(its:ite,jts:jte,kts:kte)
    end if
 
-   call da_trace_exit("da_analysis_stats")
+   !-------------------------------------------------------------------------
+   ! [1.0]: perform vv = u_h cv transform:
+   !-------------------------------------------------------------------------
 
-contains
+   if (global) then
+      call da_transform_vtovv_global_adj(cv_size, xbx, be, cv, vv)
+   else
+      call da_transform_vtovv_adj(grid, cv_size, be, cv, vv)
+   end if
 
-#include "da_maxmin_in_field.inc"
-   
-end subroutine da_analysis_stats
+   if (trace_use) call da_trace_exit("da_transform_vtox_adj")
+
+end subroutine da_transform_vtox_adj
 
 

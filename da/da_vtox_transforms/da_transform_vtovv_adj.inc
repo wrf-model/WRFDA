@@ -1,75 +1,123 @@
-subroutine da_transform_vtovv_adj(grid, cv_size, be, cv, vv)
+subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
+                                           be_evec_loc, be_sub)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Allocate components of wrfvar background errors.
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type(domain),  intent(inout) :: grid
-   integer,       intent(in)    :: cv_size ! Size of cv array.
-   type(be_type), intent(in)    :: be   ! Background error structure.
-   real,          intent(inout) :: cv(1:cv_size)   ! control variables.
-   type(vp_type), intent(inout) :: vv   ! Grid point/EOF control var.
+   integer, intent(in)              :: jy                 ! i/y dimension.
+   integer, intent(in)              :: kz                 ! k/z dimension.
+   real, intent(in)                 :: l(:)               ! Global eigenvalue.
+   real, intent(in)                 :: e(:,:)             ! Global eigenvectors.
+   real, intent(in)                 :: be_eval_loc(:,:)   ! Std dev/local evalue.
+   real, intent(in)                 :: be_evec_loc(:,:,:) ! Local eigenvectors.
+   type (be_subtype), intent(inout) :: be_sub             ! Backgrd error struct.
+    
+   integer                          :: mz                 ! Vertical truncation.
+   integer                          :: j, m, k            ! Loop counter.
 
-   integer :: mz   ! Vertical truncation.
+   if (trace_use_dull) call da_trace_entry("da_allocate_background_errors")
 
-   if (trace_use) call da_trace_entry("da_transform_vtovv_adj")
+   !--------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !--------------------------------------------------------------------------
 
-   !-------------------------------------------------------------------------
-   ! [2.0] Perform VToVV Transform:
-   !-------------------------------------------------------------------------
-
-   ! [2.1] Transform 1st control variable:
-
-   mz = be % v1 % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % v1 % rf_alpha, be % v1 % val, vv % v1)
-   end if
-
-   ! [2.2] Transform 2nd control variable:
-
-   mz = be % v2 % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % v2 % rf_alpha, be % v2 % val, vv % v2)
-   end if
-
-   ! [2.3] Transform 3rd control variable
-
-   mz = be % v3 % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % v3 % rf_alpha, be % v3 % val, vv % v3)
-   end if
+   mz = be_sub % mz
    
-   ! [2.4] Transform 4th control variable
+   !--------------------------------------------------------------------------
+   ! [2.0] Allocate components of be_sub structure:
+   !--------------------------------------------------------------------------
+
+   if (mz > 0) then
+      allocate  (be_sub % val(1:jy,1:mz))
       
-   mz = be % v4 % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % v4 % rf_alpha, be % v4 % val, vv % v4)
+      if (vert_corr == vert_corr_2) then
+
+         !--------------------------------------------------------------------
+         ! [3.0] Allocate eigenvalues of vertical error covariance matrix:
+         !--------------------------------------------------------------------
+
+         if (vert_evalue == vert_evalue_global) then
+            ! use global eigenvalues:
+            do m = 1, mz
+               be_sub % val(1:jy,m) = sqrt (l(m))
+            end do
+         else
+            ! use eigenvalues varying with j-direction.
+            do j = 1, jy
+               do k = 1, mz
+                  if (be_eval_loc(j,k) <=0) then
+                     write (unit=message(1),fmt='(A,I5,A,I5,A,F10.2)') &
+                        "At lat= ",j," For mode = ",k," local eigen value= ",be_eval_loc(j,k)
+                     call da_error(__FILE__,__LINE__,message(1:1))
+                  end if
+               end do
+            end do
+            be_sub % val(1:jy,1:mz) = sqrt (be_eval_loc(1:jy,1:mz))            
+         end if
+ 
+         if (print_detail_be) then
+            write(unit=message(1),fmt='(A,A)') 'j*k Eigenvalues for ', be_sub % name
+            call da_array_print(2, be_sub % val(1:jy,1:mz), message(1))
+         end if
+
+         !----------------------------------------------------------------------- 
+         ! [4.0] Allocate global eigenvectors of vertical error cov.:
+         !-----------------------------------------------------------------------
+
+         allocate  (be_sub % evec(1:jy,1:kz,1:mz))
+         
+         if (vert_evalue == vert_evalue_global) then
+            ! use global eigenvectors:
+            do j = 1, jy
+               be_sub % evec(j,1:kz,1:mz) = e(1:kz,1:mz)
+            end do
+         else
+            ! use eigenvectors varying with i-direction.
+            be_sub % evec(1:jy,1:kz,1:mz) =  be_evec_loc(1:jy,1:kz,1:mz)
+         end if
+         
+         if (print_detail_be) then      
+            write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = 1 ', be_sub % name
+            call da_array_print (2, be_sub % evec(1,1:kz,1:mz), message(1))
+         
+            write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = jy ', be_sub % name
+            call da_array_print (2, be_sub % evec(jy,1:kz,1:mz), message(1))
+         end if
+
+         allocate (be_sub%val_g(1:mz))
+         allocate (be_sub%evec_g(1:kz,1:mz))
+  
+         be_sub % val_g(1:mz) = l(1:mz)
+         be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
+      else if (vert_corr == vert_corr_1) then
+         if (print_detail_be) then
+           write(unit=stdout,fmt='(A)') &
+              'Change be std dev to variance in NMC code'
+         end if
+         if (vert_evalue == vert_evalue_global) then
+            ! use global eigenvalues:
+          do m = 1, mz
+          be_sub % val(1:jy,m) = l(m)
+          end do 
+         else
+          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
+         end if
+      end if
+
+      !-----------------------------------------------------------------------
+      ! [2.2] Allocate recursive filter lengthscales and variance scaling factors:
+      !-----------------------------------------------------------------------
+
+      allocate (be_sub % rf_alpha(1:mz))
+
+      be_sub % rf_alpha(1:mz) = 1.0    
    end if
 
-   ! [2.5] Transform 5th control variable
+   if (trace_use_dull) call da_trace_exit("da_allocate_background_errors")
 
-   mz = be % v5 % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % v5 % rf_alpha, be % v5 % val, vv % v5)
-   end if
-
-   ! [2.6] Transform alpha control variable
-
-   mz = be % alpha % mz
-   if (mz > 0) then
-      call da_transform_through_rf_adj(grid, mz, be % alpha % rf_alpha, be % alpha % val, vv % alpha)
-   end if
-
-   !-------------------------------------------------------------------------
-   ! [1.0] Fill 1D cv array from 3-dimensional vv arrays.
-   !-------------------------------------------------------------------------
-
-   call da_vv_to_cv(vv, grid%xp, (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), cv_size, cv)
-
-   if (trace_use) call da_trace_exit("da_transform_vtovv_adj")
-
-end subroutine da_transform_vtovv_adj
+end subroutine da_allocate_background_errors
 
 

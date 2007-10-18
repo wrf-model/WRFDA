@@ -76,3 +76,34 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
 end subroutine da_read_y_unit
 
 
+     call da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%info(satem)%nlocal > 0) &
+      call da_residual_satem(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (num_pseudo > 0) &
+      call da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%nlocal(qscat) > 0) &
+      call da_residual_qscat(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%info(radar)%nlocal > 0) &
+      call da_residual_radar(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%info(profiler)%nlocal > 0) &
+      call da_residual_profiler(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%nlocal(buoy) > 0) &
+      call da_residual_buoy(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%num_inst > 0) &
+      call da_residual_rad(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (iv%nlocal(airsr) > 0) &
+      call da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+
+   if (trace_use) call da_trace_exit("da_calculate_residual")
+
+end subroutine da_calculate_residual
+
+

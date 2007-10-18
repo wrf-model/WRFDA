@@ -1,29 +1,35 @@
-subroutine da_radial_velocity(rv,p,u,v,w,qrn,ps,x,y,z)
+subroutine da_calculate_grady_airep(iv, re, jo_grad_y)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! Purpose: Applies obs inverse on re-vector
+   !-------------------------------------------------------------------------
 
    implicit none
 
-   real, intent(in)  :: x, y, z
-   real, intent(in)  :: p, u, v, w, qrn, ps
-   real, intent(out) :: rv
 
-   real :: r, alpha, vt
+   type (iv_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-   if (trace_use) call da_trace_entry("da_radial_velocity")
+   integer :: n, k
 
-   r=sqrt(x*x+y*y+z*z)
-   alpha=(ps/p)**0.4
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_airep")
 
-   if (qrn <= 0.0) vt=0.0
-   if (qrn >  0.0) vt=5.4*alpha*qrn**0.125
-   rv=u*x+v*y+(w-vt)*z
-   rv=rv/r
+   do n=1, iv%nlocal(airep)
+      do k=1, iv%info(airep)%levels(n)
+         if (iv%airep(n)%u(k)%qc < obs_qc_pointer) re%airep(n)%u(k) = 0.0
+         if (iv%airep(n)%v(k)%qc < obs_qc_pointer) re%airep(n)%v(k) = 0.0
+         if (iv%airep(n)%t(k)%qc < obs_qc_pointer) re%airep(n)%t(k) = 0.0
 
-   if (trace_use) call da_trace_exit("da_radial_velocity")
 
-end subroutine da_radial_velocity
+         jo_grad_y%airep(n)%u(k) = -re%airep(n)%u(k) / (iv%airep(n)%u(k)%error*iv%airep(n)%u(k)%error)
+         jo_grad_y%airep(n)%v(k) = -re%airep(n)%v(k) / (iv%airep(n)%v(k)%error*iv%airep(n)%v(k)%error)
+         jo_grad_y%airep(n)%t(k) = -re%airep(n)%t(k) / (iv%airep(n)%t(k)%error*iv%airep(n)%t(k)%error)
+      end do
+   end do
+   
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_airep")
+
+end subroutine da_calculate_grady_airep
 
 

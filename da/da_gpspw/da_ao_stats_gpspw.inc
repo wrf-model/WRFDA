@@ -27,7 +27,7 @@ subroutine da_ao_stats_gpspw (stats_unit, iv, re)
    stats%average = residual_gpspw1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(gpspw)
+   do n=1, iv%info(gpspw)%nlocal
       if (iv%info(gpspw)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%gpspw(n)%tpw%qc, &
             re%gpspw(n)%tpw, ntpw,   &

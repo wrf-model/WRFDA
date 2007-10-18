@@ -1,41 +1,47 @@
-subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
+subroutine da_residual_ssmi_rv(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Test V to X routine and adjoint for compatibility.
-   !
-   ! Method:  Standard adjoint test: < x, x > = < v_adj, v >.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type (iv_type), intent(in)    :: iv     ! Obs increment vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual structure.
 
-   integer, intent(in)             :: cv_size
-   type (xbx_type),intent(in)      :: xbx    ! For header & non-grid arrays.
-   type (be_type), intent(in)      :: be     ! background error structure.
-   type (ep_type), intent(in)      :: ep     ! Ensemble perturbation structure.
-   real, intent(in)                :: cv1(1:cv_size) ! control variable (local).
-   type (vp_type), intent(inout)   :: vv     ! Grdipt/EOF CV.
-   type (vp_type), intent(inout)   :: vp     ! Grdipt/level CV.
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
-   real                   :: cv2(1:cv_size)    ! control variable (local).
-   real                   :: adj_par_lhs ! < x, x >
-   real                   :: adj_par_rhs ! < x, x >
-   real                   :: adj_sum_lhs ! < x, x >
-   real                   :: adj_sum_rhs ! < v_adj, v >
+   type (bad_data_type) :: n_obs_bad
+   integer              :: n
 
-   if (trace_use) call da_trace_entry("da_check_vtox_adjoint")
+   if (trace_use) call da_trace_entry("da_residual_ssmi_rv")
 
-   write(unit=stdout, fmt='(/a/)') &
-      'da_check_vtox_adjoint: Adjoint Test Results:'
+   n_obs_bad % Speed % num = number_type(0, 0, 0)
+   n_obs_bad % q % num     = number_type(0, 0, 0)
 
-   !----------------------------------------------------------------------
-   ! [1.0] Initialise:
-   !----------------------------------------------------------------------
+   do n=1, iv%nlocal(ssmi_rv)
+      np_available = np_available + 2
 
-   cv2(:) = 0.0
-      
-   !----------------------------------------------------------------------
+      re%ssmi_rv(n)%Speed = da_residual(n, 0, y%ssmi_rv(n)%Speed, &
+         iv%ssmi_rv(n)%Speed, n_obs_bad % Speed)
+      re%ssmi_rv(n)%tpw   = da_residual(n, 0, y%ssmi_rv(n)%tpw,   &
+         iv%ssmi_rv(n)%tpw, n_obs_bad % q      )
+   end do
+
+   np_missing  = np_missing + n_obs_bad % Speed % num % miss + n_obs_bad % q % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % Speed % num % bad + n_obs_bad % q % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % Speed % num % use + n_obs_bad % q % num % use
+
+   if (trace_use) call da_trace_exit("da_residual_ssmi_rv")
+
+end subroutine da_residual_ssmi_rv
+
+
+---------------------------------------------------------
    ! [2.0] Perform x = U v transform:
    !----------------------------------------------------------------------
 

@@ -62,3 +62,25 @@ subroutine da_legtra_inv(jds, jde, jts, jte, max_wavenumber, alp_size, m, &
 end subroutine da_legtra_inv
 
 
+ratures to virtual temperatures
+   ! ----------------------------------------------------
+   tv =  temp/(1.0 - 0.6*qm)
+
+   ! 2.0 Construct averages for NESDIS thick layers
+   ! ----------------------------------------------
+
+   pred(1) = Kth*sum( tv(12:nlevels)*DLP(12:nlevels) )
+   pred(2) = Kth*sum( tv(1:11) *DLP(1:11) )
+   pred(3) = T_skin
+   pred(4) = Kpc*sum( qm(1:nlevels)*DP(1:nlevels) )
+
+   !if (npred == 6) then
+   ! pred(5) = Kth*sum((tv(5:8)  + tv(4:7))*DLP(4:7))
+   ! pred(6) = Kth*sum((tv(8:13)  + tv(7:12))*DLP(7:12))
+   !end if
+
+   if (trace_use) call da_trace_exit("da_predictor_crtm")
+
+
+end subroutine da_predictor_crtm
+

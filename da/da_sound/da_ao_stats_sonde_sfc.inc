@@ -1,4 +1,4 @@
-subroutine da_ao_stats_sonde_sfc (stats_unit, iv, re)
+subroutine da_maxmin_in_field(field, max, min)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,49 +6,55 @@ subroutine da_ao_stats_sonde_sfc (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (inout) :: iv            ! iv
-   type  (y_type), intent (in)    :: re            ! A - O
+   real,                    intent(in)  :: field(its:ite,jts:jte,kts:kte)
+   type(maxmin_field_type), intent(out) :: max(kts:kte)
+   type(maxmin_field_type), intent(out) :: min(kts:kte)
 
-   type (stats_sonde_sfc_type)      :: stats
-   integer                          :: nu, nv, nt, np, nq
-   integer                          :: n
+   if (trace_use_dull) call da_trace_entry("da_maxmin_in_field")
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_sonde_sfc")
+   do k = kts, kte
+      max(k)%value = -1.0e20
+      min(k)%value =  1.0e20
+      do j = jts, jte
+         do i = its, ite
+            if (field(i,j,k) > max(k)%value) then
+               max(k)%value = field(i,j,k)
+               max(k)%i     = i
+               max(k)%j     = j
+            end if
+            if (field(i,j,k) < min(k)%value) then
+               min(k)%value = field(i,j,k)
+               min(k)%i     = i
+               min(k)%j     = j
+            end if
+         end do
+      end do
+   end do
 
-   nu = 0
-   nv = 0
-   nt = 0
-   np = 0
-   nq = 0
+   if (trace_use_dull) call da_trace_exit("da_maxmin_in_field")
 
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%maximum%t = maxmin_type (missing_r, 0, 0)
-   stats%maximum%p = maxmin_type (missing_r, 0, 0)
-   stats%maximum%q = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
-   stats%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   stats%rms_err = stats%average
+end subroutine da_maxmin_in_field
 
-   do n=1, iv%nlocal(sound)
-      if (iv%info(sonde_sfc)%proc_domain(1,n)) then
-         call da_stats_calculate (n, 0, iv%sonde_sfc(n)%u%qc,  & 
-            re%sonde_sfc(n)%u, nu, & 
-            stats%minimum%u, stats%maximum%u, &
-            stats%average%u, stats%rms_err%u)
-         call da_stats_calculate (n, 0, iv%sonde_sfc(n)%v%qc,  & 
-            re%sonde_sfc(n)%v, nv, & 
-            stats%minimum%v, stats%maximum%v, &
-            stats%average%v, stats%rms_err%v)
-         call da_stats_calculate (n, 0, iv%sonde_sfc(n)%t%qc,  & 
-            re%sonde_sfc(n)%t, nt, & 
-            stats%minimum%t, stats%maximum%t, &
-            stats%average%t, stats%rms_err%t)  
+
+s%minimum%p, ships%minimum%q, &
+      ' Maximum(n,k): ', ships%maximum%u, ships%maximum%v, ships%maximum%t, &
+                         ships%maximum%p, ships%maximum%q
+   write(unit=stats_unit, fmt='((a,4(f12.4,10x),e12.4,10x))') &
+      ' Average     : ', ships%average%u/real(nu), ships%average%v/real(nv), &
+                         ships%average%t/real(nt), ships%average%p/real(np), &
+                         ships%average%q/real(nq), &
+      '    RMSE     : ', sqrt(ships%rms_err%u/real(nu)), &
+                         sqrt(ships%rms_err%v/real(nv)), &
+                         sqrt(ships%rms_err%t/real(nt)), &
+                         sqrt(ships%rms_err%p/real(np)), &
+                         sqrt(ships%rms_err%q/real(nq))
+
+   if (trace_use_dull) call da_trace_exit("da_print_stats_ships")
+
+end subroutine da_print_stats_ships
+
+
+           stats%average%t, stats%rms_err%t)  
          call da_stats_calculate (n, 0, iv%sonde_sfc(n)%p%qc,  & 
             re%sonde_sfc(n)%p, np, & 
             stats%minimum%p, stats%maximum%p, &

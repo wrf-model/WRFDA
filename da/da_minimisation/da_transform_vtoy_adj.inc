@@ -1,67 +1,74 @@
-subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
-   grid, config_flags, cg_jcdf)
+subroutine da_ao_stats_airsr (stats_unit, iv, re)
 
    !-------------------------------------------------------------------------
-   ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
+   ! Purpose: Compute analysis increment at AIRS retrieval locations
    !-------------------------------------------------------------------------
 
    implicit none
 
-   integer,                    intent(in)    :: iter
-   integer,                    intent(in)    :: cv_size ! Size of cv array.
-   type(be_type),              intent(in)    :: be     ! background error structure.
-   type(ep_type),              intent(in)    :: ep     ! ensemble perturbation structure.
-   real,                       intent(out)   :: cv(1:cv_size) ! control variables.
-   type(iv_type),              intent(inout) :: iv     ! innovation vector (o-b).
-   type(vp_type),              intent(inout) :: vp     ! Grdipt/level CV.
-   type(vp_type),              intent(inout) :: vv     ! Grdipt/EOF CV.
-   type(xbx_type),             intent(in)    :: xbx    ! For header & non-grid arrays.
-   type(y_type),               intent(inout) :: y      ! y = H(x_inc).
-   type(domain),               intent(inout) :: grid
-   type(grid_config_rec_type), intent(inout) :: config_flags
-   integer,                    intent(in)    :: cg_jcdf
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent(inout) :: iv            ! iv
+   type (y_type),  intent(in)    :: re            ! A - O
 
-   integer :: nobwin,ndynopt
-#ifdef DM_PARALLEL
-   integer :: wrf_done_unit
-#endif
+   type (stats_airsr_type) :: stats
+   integer                 :: nt, nq
+   integer                 :: n, k
 
-   character(len=4) :: filnam
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_airsr")
 
-   call da_trace_entry("da_transform_vtoy_adj")
+   nt = 0
+   nq = 0
 
-   if (var4d) then
-      do nobwin=num_fgat_time,1,-1
-         iv%time = nobwin
-         iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
-         iv%info(:)%n2 = iv%plocal(iv%time,:)
-         call da_zero_x(grid%xa)
-         call da_transform_xtoy_adj(grid, iv, y, grid%xa)
-         write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
+   stats%maximum%t = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q = maxmin_type (missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-         call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
-      end do
+   stats%average = residual_airsr1_type(0.0, 0.0)
+   stats%rms_err = stats%average
 
-      ndynopt      = grid%dyn_opt
-      grid%dyn_opt = DYN_EM_TL
-      call nl_set_dyn_opt (1 , DYN_EM_TL)
-
-      if (jcdfi_use .AND. iter > 0 .AND. cg_jcdf == 1) then
-         call da_med_initialdata_input(grid , config_flags, 'tldf')
-      else
-         grid%g_u_2 = 0.0
-         grid%g_v_2 = 0.0
-         grid%g_w_2 = 0.0
-         grid%g_t_2 = 0.0
-         grid%g_ph_2 = 0.0
-         grid%g_mu_2 = 0.0
-         grid%g_moist = 0.0
+   do n=1, iv%nlocal(airsr)
+      if (iv%info(airsr)%proc_domain(1,n)) then
+         do k=1, iv%info(airsr)%levels(n)
+            call da_stats_calculate (n, k, iv%airsr(n)%t(k)%qc, & 
+               re%airsr(n)%t(k), nt, &
+               stats%minimum%t, stats%maximum%t, &
+               stats%average%t, stats%rms_err%t)
+            call da_stats_calculate (n, k, iv%airsr(n)%q(k)%qc, & 
+               re%airsr(n)%q(k), nq, &
+               stats%minimum%q, stats%maximum%q, &
+               stats%average%q, stats%rms_err%q)
+         end do
       end if
+   end do
 
-      call med_hist_out(grid , 3 , config_flags)
+   ! Do inter-processor communication to gather statistics.
+   call da_proc_sum_int (nt)
+   call da_proc_sum_int (nq)
+   iv%nstats(airsr) = nt + nq
 
-      grid%dyn_opt = ndynopt
-      call nl_set_dyn_opt (1 , DYN_EM)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
+
+   if (rootproc) then
+      if (nt /= 0 .or. nq /= 0) then
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for airs retrievals'
+         call da_print_stats_airsr(stats_unit, nt, nq, stats)
+      end if
+   end if
+
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_airsr")
+
+end subroutine da_ao_stats_airsr
+
+
+, DYN_EM)
 
       call da_trace("da_transform_vtoy_adj","Starting da_run_wrfplus_ad.ksh")
 

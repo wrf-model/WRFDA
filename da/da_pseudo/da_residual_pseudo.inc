@@ -52,3 +52,13 @@ subroutine da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, n
 end subroutine da_residual_pseudo
 
 
+rint)
+      ! Mixing ratio, same ratio as relative humidity
+      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_synop")
+
+end subroutine da_check_max_iv_synop
+
+

@@ -17,7 +17,7 @@ subroutine da_jo_and_grady_satem(iv, re, jo, jo_grad_y)
 
    jo % satem_thickness = 0.0
 
-   do n=1, iv%nlocal(satem)
+   do n=1, iv%info(satem)%nlocal
       do k=1, iv%satem(n)%info%levels
          jo_grad_y%satem(n)%thickness(k) = -re%satem(n)%thickness(k) / &
             (iv%satem(n)%thickness(k)%error * iv%satem(n)%thickness(k)%error)

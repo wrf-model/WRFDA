@@ -22,8 +22,8 @@ subroutine da_jo_and_grady_metar(iv, re, jo, jo_grad_y)
    jo % metar_p = 0.0
    jo % metar_q = 0.0
 
-   if (iv%nlocal(metar) > 0) then
-      do n=1, iv%nlocal(metar)
+   if (iv%info(metar)%nlocal > 0) then
+      do n=1, iv%info(metar)%nlocal
          jo_grad_y%metar(n)%u = -re%metar(n)%u / &
                               (iv%metar(n)%u%error * iv%metar(n)%u%error)
          jo_grad_y%metar(n)%v = -re%metar(n)%v / &

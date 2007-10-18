@@ -23,7 +23,7 @@ subroutine da_oi_stats_satem (stats_unit, iv)
    stats%average = residual_satem1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(satem)
+   do n=1, iv%info(satem)%nlocal
       if (iv%satem(n)%loc%proc_domain) then
          do k=1, iv%satem(n)%info%levels
             call da_stats_calculate(iv%satem(n)%loc%obs_global_index, &

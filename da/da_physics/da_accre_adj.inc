@@ -1,34 +1,33 @@
-subroutine da_accre_adj(DT,SCR2,SCR3,PRA,SCR29,SCR39,PRA9,kts,kte,kms,kme)
+subroutine da_jo_synop_uvtq(iv, re, jo_grad_y, jo)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Accretion (Collection)
+   ! Purpose: Ensures that exactly the same code is used for both
+   ! serial and parallel computations when testing_dm_bitwise_exact is set.
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)                     :: kts, kte, kms, kme
-   real, dimension(kms:kme), intent(in)    :: DT, SCR2, SCR3
-   real, dimension(kms:kme), intent(in)    :: PRA, PRA9
-   real, dimension(kms:kme), intent(inout) :: SCR29, SCR39
+   type (iv_type), intent(in)    :: iv         ! Innovation vector.
+   type (y_type),  intent(in)    :: re         ! Residual vector.
+   type (y_type),  intent(inout) :: jo_grad_y  ! Grad_y(Jo)
+   type (jo_type), intent(inout) :: jo         ! Obs cost function.
 
-   !  local
-   integer   :: k
-   real      :: gamma, QRTH
+   integer :: n
 
-   gamma = 0.002
-   QRTH = 1.0e-6
+   if (trace_use_dull) call da_trace_entry("da_jo_synop_uvtq")
 
-   do K = kts, kte
+   do n=1, iv%nlocal(synop)
+      if (iv%info(synop)%proc_domain(1,n)) then
+         jo % synop_u = jo % synop_u - re%synop(n)%u * jo_grad_y%synop(n)%u
+         jo % synop_v = jo % synop_v - re%synop(n)%v * jo_grad_y%synop(n)%v
+         jo % synop_t = jo % synop_t - re%synop(n)%t * jo_grad_y%synop(n)%t
+         jo % synop_p = jo % synop_p - re%synop(n)%p * jo_grad_y%synop(n)%p
+         jo % synop_q = jo % synop_q - re%synop(n)%q * jo_grad_y%synop(n)%q
+     end if
+  end do
 
-      if ( DT(k) <= 0.0) cycle
+   if (trace_use_dull) call da_trace_exit("da_jo_synop_uvtq")
 
-      if ( SCR2(k) > 0.0 .and. SCR3(k) > QRTH ) then
-         SCR39(K) = SCR39(K) + gamma * 0.875 * SCR2(k) * (SCR3(K)*1.0e3)**(-0.125 ) * 1.0e3 * PRA9(K)
-         SCR29(K) = SCR29(K) + gamma * (SCR3(K)*1.0e3)**0.875 * PRA9(K)
-      else if (SCR2(k) > 0.0 .and. SCR3(k) <= QRTH ) then
-         SCR29(k) = SCR29(k) + gamma * (QRTH*1.0e3)**0.875 * PRA9(k)
-      end if
+end subroutine da_jo_synop_uvtq
 
-   end do
 
-end subroutine da_accre_adj

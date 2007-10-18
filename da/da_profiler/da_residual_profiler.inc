@@ -1,42 +1,49 @@
-subroutine da_residual_profiler(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+subroutine da_check_max_iv_ssmt2(iv, it, irh,irhf)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Calculate residuals for profilers
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
+   type(iv_type), intent(inout) :: iv
+   integer,           intent(in)    :: it     ! outer iteration
+   integer,           intent(inout) :: irh, irhf
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   integer :: k,n
+   logical :: failed
 
-   type (bad_data_type) :: n_obs_bad
-   integer              :: n, k
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_ssmt2")
 
-   if (trace_use_dull) call da_trace_entry("da_residual_profiler")
+   !---------------------------------------------------------------------------
+   ! [1.0] Open diagnostic file:
+   !---------------------------------------------------------------------------
 
-   n_obs_bad % u % num = number_type(0, 0, 0)
-   n_obs_bad % v % num = number_type(0, 0, 0)
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
+         '----------------------------------------------------------------'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-   do n=1, iv%nlocal(profiler)
-      do k=1, iv%info(profiler)%levels(n)
-         np_available = np_available + 2
-         re%profiler(n)%u(k) = da_residual(n, k, y%profiler(n)%u(k), iv%profiler(n)%u(k), n_obs_bad % u)
-         re%profiler(n)%v(k) = da_residual(n, k, y%profiler(n)%v(k), iv%profiler(n)%v(k), n_obs_bad % v)
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
+         'Error max test ratio for SSMT2_RH  = ',max_error_rh
+   end if
+
+   !---------------------------------------------------------------------------
+   !  [2.0] Perform maximum innovation vector check:
+   !---------------------------------------------------------------------------
+
+   failed = .false.
+
+   do n=iv%info(ssmt2)%n1,iv%info(ssmt2)%n2
+      do k = 1, iv%info(ssmt2)%levels(n)
+         ! Temperature
+         call da_max_error_qc_new (it, iv%info(ssmt2), n, iv%ssmt2(n)%rh(k),&
+            max_error_t, irh, irhf, check_max_iv_unit, 'RH  ', failed, check_max_iv_print)
       end do
    end do
 
-   np_missing  = np_missing  + n_obs_bad % u % num % miss + n_obs_bad % v % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % u % num % bad  + n_obs_bad % v % num % bad 
-   np_obs_used = np_obs_used + n_obs_bad % u % num % use  + n_obs_bad % v % num % use
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_ssmt2")
 
-   if (trace_use_dull) call da_trace_exit("da_residual_profiler")
-
-end subroutine da_residual_profiler
+end subroutine da_check_max_iv_ssmt2
 
 

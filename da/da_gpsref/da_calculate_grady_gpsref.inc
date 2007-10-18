@@ -1,32 +1,80 @@
-subroutine da_calculate_grady_gpsref(iv, re, jo_grad_y)
+subroutine da_read_biascoef(string,nchan,nscan,nband,npred,global, &
+      scanbias,scanbias_b,coef,coef0, vstd_dep)
 
-   !----------------------------------------------------------------------
-   ! Purpose: Applies obs inverse on re-vector         
-   !----------------------------------------------------------------------
+   integer,           intent(in)    :: nchan,nscan,nband,npred
+   logical,           intent(in)    :: global
+   character(len=20), intent(in)    :: string
+   real,              intent(inout) :: scanbias(nchan,nscan)
+   real,              intent(inout) :: scanbias_b(nchan,nscan,nband)
+   real,              intent(inout) :: coef(nchan,npred),coef0(nchan)
+   real,              intent(inout) :: vstd_dep(nchan)
 
-   implicit none
+   integer :: iunit,j,i, ii,jj, iost
+   integer :: nobs(nchan)
+   real    :: vmean_abs(nchan)
+   real    :: vstd_abs(nchan)
+   real    :: vmean_dep(nchan)
 
+   character(len=80) :: filename
 
-   type (iv_type), intent(in)     :: iv          ! Innovation vector.
-   type (y_type),  intent(inout)  :: re          ! Residual vector.
-   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
+   call da_trace_entry("da_read_biascoef")
 
-   integer :: n, k
+   call da_get_unit(iunit)
+   filename='biascorr/'//adjustl(trim(string))//'.bcor'
+   open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
+   if (iost /= 0) then
+      message(1)="Cannot open radiance biascorr file "//adjustl(filename)
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
 
-   if (trace_use_dull) call da_trace_entry("da_calculate_grady_gpsref")
-   
-   do n=1, iv%nlocal(gpsref)
-      do k=1, iv%info(gpsref)%levels(n)
-         if (iv%gpsref(n)%ref(k)%qc < obs_qc_pointer) then
-            re%gpsref(n)%ref(k) = 0.0
-         end if
-         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
-             (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
-      end do
+   ! read (iunit,'(4i6)') nchan,nscan,nband,npred
+   read (iunit,'(4i6)')
+   do i=1, nchan
+      read (iunit,'(i5,i10,4F8.2)') ii,nobs(i),vmean_abs(i),vstd_abs(i), vmean_dep(i),vstd_dep(i)
    end do
 
-   if (trace_use_dull) call da_trace_exit("da_calculate_grady_gpsref")
+   do i=1, nchan
+      read (iunit,'(i5,5F12.5)') ii,(coef(i,j),j=1,npred),coef0(i)
+   end do
 
-end subroutine da_calculate_grady_gpsref
+   read (iunit,*)
+   read (iunit,*)
+   if (global) then   ! global coefs not available now, use regional one
+      do j=1, nchan
+         ! do i=1, nband
+         if (nscan == 30) then ! amsua
+            ! read(iunit,'(i5,i3,30F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+            read(iunit,'(i5,30F7.2)') jj, scanbias(j,1:nscan)
+         else if (nscan == 90) then ! amsub
+            ! read(iunit,'(i5,i3,90F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+            read(iunit,'(i5,90F7.2)') jj, scanbias(j,1:nscan)
+         else if (nscan == 56) then ! hirs
+            ! read(iunit,'(i5,i3,56F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+            read(iunit,'(i5,56F7.2)') jj, scanbias(j,1:nscan)
+         else
+            write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+         end if
+      !end do
+      end do
+   else
+      do j=1, nchan
+         if (nscan == 30) then ! amsua
+            read(iunit,'(i5,30F7.2)') jj, scanbias(j,1:nscan)
+         else if (nscan == 90) then ! amsub
+            read(iunit,'(i5,90F7.2)') jj, scanbias(j,1:nscan)
+         else if (nscan == 56) then ! hirs
+            read(iunit,'(i5,56F7.2)') jj, scanbias(j,1:nscan)
+         else
+            write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+         end if
+      end do
+   end if
+
+   close(iunit)
+   call da_free_unit(iunit)
+
+   call da_trace_exit("da_read_biascoef")
+
+end subroutine da_read_biascoef
 
 

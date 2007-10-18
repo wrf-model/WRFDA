@@ -27,7 +27,7 @@ subroutine da_ao_stats_gpsref (stats_unit, iv, re)
    stats%average = residual_gpsref1_type(0.0,0.0,0.0,0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(gpsref)
+   do n=1, iv%info(gpsref)%nlocal
       if (iv%info(gpsref)%proc_domain(1,n)) then
          do k=1, iv%info(gpsref)%levels(n)
             call da_stats_calculate (n, k, iv%gpsref(n)%ref(k)%qc, & 

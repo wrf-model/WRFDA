@@ -35,8 +35,8 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
    ! GPS TPW Pseudo OBS test:
    if (pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0) then
       ! Deallocate:
-      if (iv%nlocal(gpspw) > 0) then
-         write(unit=stdout, fmt='(a,i4)') 'iv%nlocal(gpspw) =', iv%nlocal(gpspw)
+      if (iv%info(gpspw)%nlocal > 0) then
+         write(unit=stdout, fmt='(a,i4)') 'iv%info(gpspw)%nlocal =', iv%info(gpspw)%nlocal
          deallocate(iv % gpspw)
          deallocate(ob % gpspw)
       end if
