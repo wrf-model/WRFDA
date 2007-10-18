@@ -8,7 +8,7 @@ subroutine da_get_att_cdf(file, var, debug)
 
 #include "netcdf.inc"
 
-   character (len=80), intent(in) :: file
+   character (len=*),  intent(in) :: file
    character (len=*),  intent(in) :: var
    logical,            intent(in) :: debug
 

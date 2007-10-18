@@ -9,7 +9,7 @@ subroutine da_get_var_2d_int_cdf(file, var, data, i1, i2, time, debug)
 #include "netcdf.inc"
 
    integer,            intent(in)  ::  i1, i2, time
-   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: file
    logical,            intent(in)  :: debug
    character (len=*),  intent(in)  :: var
    integer,            intent(out) :: data(i1,i2)

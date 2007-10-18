@@ -6,7 +6,7 @@ subroutine da_atotime(date_char, st)
 
    implicit none
 
-   character(len=80), intent(in) :: date_char
+   character(len=*), intent(in) :: date_char
    real,              intent(out) :: st
   
    integer                :: ccyy,mo,dd,hh,mi,ss,i

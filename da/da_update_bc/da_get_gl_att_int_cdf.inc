@@ -8,7 +8,7 @@ subroutine da_get_gl_att_int_cdf(file, att_name, value, debug)
 
 #include "netcdf.inc"
 
-   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: file
    character (len=*),  intent(in)  :: att_name
    logical,            intent(in)  :: debug
    integer,            intent(out) :: value

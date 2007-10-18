@@ -6,7 +6,7 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
 
    integer,           intent(in) :: max_times
    logical,           intent(in) :: debug
-   character(len=80), intent(in) :: file
+   character(len=*),  intent(in) :: file
    character(len=*),  intent(in) :: time_flag
    character(len=80), intent(out) :: bdytimestr(max_times)
 

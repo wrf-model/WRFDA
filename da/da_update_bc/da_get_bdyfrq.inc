@@ -8,7 +8,7 @@ subroutine da_get_bdyfrq(this_datestr, next_datestr, bdyfrq, debug)
 
 #include "netcdf.inc"
 
-   character(len=80), intent(in)  :: this_datestr, next_datestr
+   character(len=*), intent(in)  :: this_datestr, next_datestr
    real,              intent(out) :: bdyfrq
    logical,           intent(in)  :: debug
 

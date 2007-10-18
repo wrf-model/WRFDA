@@ -195,7 +195,8 @@ da_utils : setup \
            da_tune_obs_desroziers.exe \
            da_update_bc.exe \
            da_advance_time.exe \
-           da_verif.exe \
+           da_verif_obs.exe \
+           da_verif_anal.exe \
            da_bias_airmass.exe \
            da_bias_sele.exe \
            da_bias_scan.exe \
@@ -203,8 +204,12 @@ da_utils : setup \
            da_bias_verif.exe \
            da_rad_diags.exe
 
-da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
-	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
+da_verif_obs.exe : da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
+	$(SFC) -o $@ da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
+
+da_verif_anal.exe : da_verif_anal.o da_verif_anal_control.o da_netcdf_interface.o $(NETCDF_LIBS)
+	$(SFC) $(LDFLAGS) -o $@ da_verif_anal.o da_netcdf_interface.o \
+           da_verif_anal_control.o $(NETCDF_LIB) $(LOCAL_LIB)
 
 da_tune_obs_hollingsworth1.exe: da_tune_obs_hollingsworth1.o
 	$(SFC) -o $@ da_tune_obs_hollingsworth1.o da_control.o \
@@ -248,7 +253,7 @@ da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
 
-da_netcdf_interface.o da_module_couple_uv.o gen_be_etkf.o :
+da_netcdf_interface.o da_module_couple_uv.o gen_be_etkf.o netcdf_interface.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f

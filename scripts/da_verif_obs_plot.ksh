@@ -32,7 +32,8 @@ export EXP_LINES_COLORS=${EXP_LINES_COLORS:-(/"blue","green", "orange"/)}
 
 export PLOT_WKS=${PLOT_WKS:-x11}
 export CLEAN=${CLEAN:-false}
-export GET_OMBOMA_PLOTS=${GET_OMBOMA_PLOTS:-true}
+export GET_OMBOMA_PLOTS=${GET_OMBOMA_PLOTS:-false}
+export FILE_PATH_STRING=${FILE_PATH_STRING:-'wrfvar/working/gts_omb_oma'}
 
 #=========================================================
 #=========================================================
@@ -41,7 +42,6 @@ export GET_OMBOMA_PLOTS=${GET_OMBOMA_PLOTS:-true}
 #=========================================================
 DIAG_VAR1="omb"
 DIAG_VAR2="oma"
-FILE_PATH_STRING=wrfvar/working/gts_omb_oma
 
 rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
 
@@ -49,12 +49,12 @@ iexp=0
 exp_dirs=''
 out_dirs=''
 for EXP_DIR in $EXP_DIRS; do
-   exp_dirs="$exp_dirs '$EXP_DIR/run',"
+   exp_dirs="$exp_dirs '$EXP_DIR',"
 done
 for EXP_NAME in $EXP_NAMES; do
    out_dirs="$out_dirs '$EXP_NAME',"
    pdat_dirs[$iexp]="$EXP_NAME/"
-   mkdir -p $EXP
+   mkdir -p $EXP_NAME
    iexp=$((iexp + 1))
 done
 
@@ -90,14 +90,14 @@ cat >> namelist.plot_diag << EOF
    file_path_string = '${FILE_PATH_STRING}' /
 EOF
 
-ln -sf ${WRFVAR_DIR}/build/da_verif.exe .
+ln -sf ${WRFVAR_DIR}/build/da_verif_obs.exe .
 
 nfile=$(ls *omb.diag 2>/dev/null | wc -l)
 if [[ $nfile -eq 0 ]]; then
-   ./da_verif.exe > da_verif.out 2>&1
+   ./da_verif_obs.exe > da_verif.out 2>&1
    RC=$?
    if [[ $RC != 0 ]]; then
-      echo "da_verif.exe failed with error $RC"
+      echo "da_verif_obs.exe failed with error $RC"
       exit 1
    fi
 else
@@ -125,8 +125,6 @@ num_upr=`ls ${pdat_dirs[0]}/upr*${DIAG_VAR1}.diag |wc -l`
 num_gupr=`ls ${pdat_dirs[0]}/gupr*${DIAG_VAR1}.diag |wc -l`
 num_gpsref=`ls ${pdat_dirs[0]}/gps_ref*${DIAG_VAR1}.diag |wc -l`
 num_ggpsref=`ls ${pdat_dirs[0]}/ggps_ref*${DIAG_VAR1}.diag |wc -l`
-
-
 
 cd ${pdat_dirs[0]}
 if [ "$num_sfc" -ne 0 ]; then
@@ -329,25 +327,25 @@ NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${WORK_DIR}\"' \
 
 #----------------
 if [ "$plotsfc" = "true" ] || [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/time_series.ncl" > run1
+echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/verif_obs_time_series.ncl" > run1
 chmod +x run1
 ./run1 > run1.log 2>&1
 fi
 #----------------
 if [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/vert_profile.ncl" > run2
+echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/verif_obs_vert_profile.ncl" > run2
 chmod +x run2
 ./run2 > run2.log 2>&1
 fi
 #----------------
 if [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/time_average.ncl" > run3
+echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/verif_obs_time_average.ncl" > run3
 chmod +x run3
 ./run3 > run3.log 2>&1
 fi
 #----------------
 if [ "$plotgpsref" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/vert_profile_gpsref.ncl" > run4
+echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/verif_obs_vert_profile_gpsref.ncl" > run4
 chmod +x run4
 ./run4 > run4.log 2>&1
 fi
@@ -377,6 +375,6 @@ if $CLEAN; then
 fi
 
 
-echo "da_verif_plot.ksh successfully completed..."
+echo "da_verif_obs_plot.ksh successfully completed..."
 
 exit 0
