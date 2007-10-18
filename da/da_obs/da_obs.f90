@@ -1,6 +1,6 @@
 module da_obs
 
-   use da_define_structures, only : multi_level_type, y_type, iv_type, &
+   use da_define_structures, only : multi_level_type, y_type, iv_type, infa_type, &
       model_loc_type, field_type, each_level_type,da_allocate_y, da_random_seed
    use module_domain, only : domain, x_type
 
@@ -21,7 +21,7 @@ module da_obs
       ob_format,ob_format_ascii,filename_len, trace_use_dull, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, num_ob_indexes, its,ite,jds,jts,jte,ids
+      bogus, buoy, qscat,pseudo, num_ob_indexes, trace_use_frequent, its,ite,jds,jts,jte,ids
    ! use_crtm_kmatrix,use_crtm_kmatrix_fast
 #ifdef CRTM
    use da_crtm, only : da_transform_xtoy_crtm, da_transform_xtoy_crtm_adj

@@ -8,12 +8,12 @@ module da_define_structures
 
    use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
       vert_corr, global, vert_evalue,print_detail_be, maxsensor, &
-      max_ob_levels, trace_use, num_ob_indexes, &
+      max_ob_levels, trace_use, num_ob_indexes, kms, kme, &
       vert_corr_1, vert_corr_2, vert_evalue_global, &
-      put_rand_seed, seed_array1, seed_array2, &
+      put_rand_seed, seed_array1, seed_array2, missing_r, &
       sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
       metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, &
-      pseudo, radar, radiance, airsr, trace_use_dull
+      pseudo, radar, radiance, airsr, sonde_sfc, trace_use_dull
 
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_tools_serial, only : da_array_print
@@ -105,10 +105,6 @@ module da_define_structures
       ! summation order for bitwise-exact testing of distributed-memory 
       ! parallel configurations.  
       integer                 :: obs_global_index
-
-      integer                 :: v_interp_optn  ! 0, not specified
-                                                ! 1, vertical interpolate in pressure
-                                                ! 2, vertical interpolate in height
    end type model_loc_type
 
    type each_level_type
@@ -145,6 +141,48 @@ module da_define_structures
       real                   :: pstar         ! Surface pressure
    end type info_type
 
+   type infa_type
+      integer                             :: max_lev
+      integer                             :: nlocal
+      integer                             :: ntotal
+      integer                             :: plocal(0:max_fgat_time)
+      integer                             :: ptotal(0:max_fgat_time)
+      integer                             :: n1
+      integer                             :: n2
+      character (len = 40) , allocatable  :: name(:)       ! Station name
+      character (len = 12), allocatable   :: platform(:)   ! Instrument platform
+      character (len =  5), allocatable   :: id(:)         ! 5 digit station identifer
+      character (len = 19), allocatable   :: date_char(:)  ! CCYY-MM-DD_HH:MM:SS date
+      integer, allocatable                :: levels(:)     ! number of levels
+      real, allocatable                   :: lat(:,:)      ! Latitude in degree
+      real, allocatable                   :: lon(:,:)      ! Longitude in degree
+      real, allocatable                   :: elv(:)        ! Elevation in m
+      real, allocatable                   :: pstar(:)      ! Surface pressure
+      type (field_type), allocatable :: slp(:)         ! Pressure in Pa
+      ! type (field_type)       :: psfc(:)           ! Pressure in Pa
+      ! Remove the following in future (needed now for obs i/o only):
+      type (field_type), allocatable :: pw(:)          ! Total precipitable water cm
+
+      real, allocatable       :: x  (:,:)
+      real, allocatable       :: y  (:,:)
+      integer, allocatable    :: i  (:,:)
+      integer, allocatable    :: j  (:,:)
+      integer, allocatable    :: k  (:,:)
+      real, allocatable       :: dx (:,:)
+      real, allocatable       :: dxm(:,:)
+      real, allocatable       :: dy (:,:)
+      real, allocatable       :: dym(:,:)
+      real, allocatable       :: dz (:,:)
+      real, allocatable       :: dzm(:,:)
+      real, allocatable       :: zk(:,:)
+      logical, allocatable    :: proc_domain(:,:)
+      ! obs_global_index is the original index of this obs in the serial 
+      ! code.  It is used to reassemble obs in serial-code-order to replicate 
+      ! summation order for bitwise-exact testing of distributed-memory 
+      ! parallel configurations.  
+      integer, allocatable                 :: obs_global_index(:)
+   end type infa_type
+
    type stn_loc_type
       real                    :: lon                  ! radar site loc
       real                    :: lat                  ! radar site loc
@@ -156,17 +194,14 @@ module da_define_structures
  
    type radar_type
       type (stn_loc_type)     :: stn_loc
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
 
-      real                    :: model_p(max_ob_levels)
-      real                    :: model_rho(max_ob_levels)
-      real                    :: model_qrn(max_ob_levels)
+      real, pointer           :: model_p(:)
+      real, pointer           :: model_rho(:)
+      real, pointer           :: model_qrn(:)
       real                    :: model_ps
 
       real                  , pointer :: height   (:) ! Height in m
       integer               , pointer :: height_qc(:) ! Height QC
-      real                  , pointer :: zk       (:) ! MM5 k-coordinates
 
       type (field_type)     , pointer :: rv       (:) ! Radial Velocity
       type (field_type)     , pointer :: rf       (:) ! Reflectivity
@@ -199,37 +234,22 @@ module da_define_structures
    ! [3.2] Innovation vector structure:
 
    type airep_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! Height QC
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
       type (field_type)     , pointer :: t        (:) ! temperature.
    end type airep_type
 
    type pilot_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                  , pointer :: p        (:) ! Height in m
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
    end type pilot_type
 
    type bogus_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! pressure.
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
       type (field_type)     , pointer :: t        (:) ! temperature.
@@ -249,34 +269,19 @@ module da_define_structures
    end type satem_type
 
    type geoamv_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                  , pointer :: p        (:) ! Height in Pa
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
    end type geoamv_type
 
    type polaramv_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                  , pointer :: p        (:) ! Height in Pa
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
    end type polaramv_type
 
    type gpsref_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real             , pointer :: h  (:)      ! Multi-level height
-      real             , pointer :: zk (:)      ! k-coordinates
-
       type (field_type), pointer :: ref(:)      ! GPS Refractivity
       type (field_type), pointer :: p  (:)      ! Retrieved P from Ref.
       type (field_type), pointer :: t  (:)      ! Retrieved T from Ref.
@@ -284,12 +289,7 @@ module da_define_structures
    end type gpsref_type
 
    type synop_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                    :: h              ! Height in m
-      real                    :: zk             ! k-coordinates
-
       type (field_type)       :: u              ! u-wind.
       type (field_type)       :: v              ! v-wind.
       type (field_type)       :: t              ! temperature.
@@ -298,12 +298,8 @@ module da_define_structures
    end type synop_type
 
    type sound_type
-      type (info_type)      :: info
-      type (model_loc_type) :: loc
-
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! pressure.
-      real                  , pointer :: zk       (:) ! k-coordinates
 
       type (field_type)     , pointer :: u        (:) ! u-wind.
       type (field_type)     , pointer :: v        (:) ! v-wind.
@@ -312,35 +308,22 @@ module da_define_structures
    end type sound_type
 
    type airsr_type
-      type (info_type)      :: info
-      type (model_loc_type) :: loc
-
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! pressure.
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: t        (:) ! temperature.
       type (field_type)     , pointer :: q        (:) ! q.
    end type airsr_type
 
    type gpspw_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       type (field_type)       :: tpw  ! Toatl precipitable water cm from GPS
    end type gpspw_type
 
    type ssmi_rv_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       type (field_type)       :: Speed          ! Wind speed in m/s
       type (field_type)       :: tpw            ! Toatl precipitable water cm
    end type ssmi_rv_type
 
    type ssmi_tb_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
 
       type (field_type)       :: tb19v          ! Brightness T (k) 19V
       type (field_type)       :: tb19h          ! Brightness T (k) 19H
@@ -351,35 +334,19 @@ module da_define_structures
       type (field_type)       :: tb85h          ! Brightness T (k) 85H
    end type ssmi_tb_type
    
-   type ssmt1_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-      
+   type ssmt1_type   
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! Pressure in Pa.
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: t        (:) ! temperature.
    end type ssmt1_type
 
    type ssmt2_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-      
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! Pressure in Pa.
-      real                  , pointer :: zk       (:) ! k-coordinates
-
       type (field_type)     , pointer :: rh       (:) ! Relative humidity.
    end type ssmt2_type
 
    type pseudo_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
-      ! real                    :: h              ! Height in m
-      real                    :: zk             ! k-coordinates
-
       type (field_type)       :: u              ! u-wind.
       type (field_type)       :: v              ! v-wind.
       type (field_type)       :: t              ! Temperature.
@@ -388,12 +355,7 @@ module da_define_structures
    end type pseudo_type
 
    type qscat_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                    :: h              ! Height in m
-      real                    :: zk             ! k-coordinates
-
       type (field_type)       :: u              ! u-wind.
       type (field_type)       :: v              ! v-wind.
    end type qscat_type
@@ -411,17 +373,6 @@ module da_define_structures
       integer              :: num_rad_glo
       integer, pointer     :: ssmis_subinst(:)
       integer, pointer     :: ichan(:)
-      logical, pointer     :: proc_domain(:)
-      integer, pointer     :: loc_i(:)
-      integer, pointer     :: loc_j(:)
-      integer, pointer     :: loc_k(:,:)
-      real,    pointer     :: loc_dx(:)  
-      real,    pointer     :: loc_dy(:)  
-      real,    pointer     :: loc_dz(:,:)  
-      real,    pointer     :: loc_dxm(:) 
-      real,    pointer     :: loc_dym(:) 
-      real,    pointer     :: loc_dzm(:,:) 
-      real,    pointer     :: zk(:,:) 
       real,    pointer     :: tb_inv(:,:)
       integer, pointer     :: tb_qc(:,:)
       real,    pointer     :: tb_error(:,:)
@@ -480,8 +431,7 @@ module da_define_structures
       real,    pointer     :: ice_coverage(:)
       real,    pointer     :: snow_coverage(:)
 
-      type (info_type), pointer   :: info(:)
-      type (model_loc_type), pointer   :: loc(:)
+      type (infa_type) :: info
    end type instid_type
 
    type iv_type
@@ -516,6 +466,8 @@ module da_define_structures
       real    :: radar_ef_rv, radar_ef_rf
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
       real    :: airsr_ef_t,  airsr_ef_q
+
+      type (infa_type) :: info(num_ob_indexes)
 
       type (airsr_type)    , pointer :: airsr(:)
       type (sound_type)    , pointer :: sound(:)
@@ -620,6 +572,10 @@ module da_define_structures
       real, pointer :: v(:)                     ! v-wind.
       real, pointer :: t(:)                     ! temperature.
       real, pointer :: q(:)                     ! specific humidity.
+      real, pointer :: new_u(:)                     ! u-wind.
+      real, pointer :: new_v(:)                     ! v-wind.
+      real, pointer :: new_t(:)                     ! temperature.
+      real, pointer :: new_q(:)                     ! specific humidity.
    end type residual_sound_type
 
    type residual_airsr_type

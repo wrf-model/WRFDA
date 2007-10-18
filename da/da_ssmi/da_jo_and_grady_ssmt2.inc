@@ -18,7 +18,7 @@ subroutine da_jo_and_grady_ssmt2(iv, re, jo, jo_grad_y)
    jo % ssmt2_rh = 0.0
    
    do n=1, iv%nlocal(ssmt2)
-      do k=1, iv%ssmt2(n)%info%levels
+      do k=1, iv%info(ssmt2)%levels(n)
          jo_grad_y%ssmt2(n)%rh(k) = -re%ssmt2(n)%rh(k) / &
             (iv%ssmt2(n)%rh(k)%error * iv%ssmt2(n)%rh(k)%error)
 

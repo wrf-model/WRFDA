@@ -15,47 +15,52 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
    integer :: i, j, k  ! Index dimension.
    real    :: dx, dxm  ! Interpolation weights.
    real    :: dy, dym  ! Interpolation weights.
-   real    :: model_u  ! Model value u at oblocation.
-   real    :: model_v  ! Model value v at oblocation.
-   real    :: model_t  ! Model value t at oblocation.
-   real    :: model_p  ! Model value p at oblocation.
-   real    :: model_q  ! Model value q at oblocation.
+   real, allocatable :: model_u(:,:)  ! Model value u at oblocation.
+   real, allocatable :: model_v(:,:)  ! Model value v at oblocation.
+   real, allocatable :: model_t(:,:)  ! Model value t at oblocation.
+   real, allocatable :: model_p(:,:)  ! Model value p at oblocation.
+   real, allocatable :: model_q(:,:)  ! Model value q at oblocation.
+   real, allocatable :: model_hsm(:,:)
 
    real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
    real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
    real    :: hd, psfcm
 
-   real    :: hsm , ho, to, qo
+   real    :: ho, to, qo
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
    
    if (trace_use_dull) call da_trace_entry("da_get_innov_vector_buoy")
 
+   allocate (model_u(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+   allocate (model_v(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+   allocate (model_t(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+   allocate (model_p(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+   allocate (model_q(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+   allocate (model_hsm(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
 
-   do n=iv%plocal(iv%time-1,buoy) + 1, &
-      iv%plocal(iv%time,buoy)
-      ! [1.1] Get horizontal interpolation weights:
+   if (sfc_assi_options == sfc_assi_options_1) then
+      do n=iv%info(buoy)%n1,iv%info(buoy)%n2
+         ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%buoy(n)%loc%i
-      j = iv%buoy(n)%loc%j
-      dx = iv%buoy(n)%loc%dx
-      dy = iv%buoy(n)%loc%dy
-      dxm = iv%buoy(n)%loc%dxm
-      dym = iv%buoy(n)%loc%dym
+         i   = iv%info(buoy)%i(1,n)
+         j   = iv%info(buoy)%j(1,n)
+         dx  = iv%info(buoy)%dx(1,n)
+         dy  = iv%info(buoy)%dy(1,n)
+         dxm = iv%info(buoy)%dxm(1,n)
+         dym = iv%info(buoy)%dym(1,n)
 
-      ! Surface correction
+         ! Surface correction
 
-      iv%buoy(n)%p%inv = ob%buoy(n)%p
-      iv%buoy(n)%t%inv = ob%buoy(n)%t
-      iv%buoy(n)%q%inv = ob%buoy(n)%q
-      iv%buoy(n)%u%inv = ob%buoy(n)%u
-      iv%buoy(n)%v%inv = ob%buoy(n)%v
-
-      if (sfc_assi_options == sfc_assi_options_1) then
-         iv%buoy(n)%zk=missing_r
+         iv%buoy(n)%p%inv = ob%buoy(n)%p
+         iv%buoy(n)%t%inv = ob%buoy(n)%t
+         iv%buoy(n)%q%inv = ob%buoy(n)%q
+         iv%buoy(n)%u%inv = ob%buoy(n)%u
+         iv%buoy(n)%v%inv = ob%buoy(n)%v
 
          if (iv % buoy(n) % h > missing_r) then
             do k=kts,kte
@@ -67,8 +72,8 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
 
             if (abs(hd) <= Max_StHeight_Diff .or. anal_type_verify) then
                if (iv % buoy(n) % h < v_h(kts)) then
-                  iv%buoy(n)%zk = 1.0+1.0e-6
-                  call da_obs_sfc_correction(iv%buoy(n), grid%xb)
+                  iv%info(buoy)%zk(:,n) = 1.0+1.0e-6
+                  call da_obs_sfc_correction(iv%info(buoy), iv%buoy(n), n, grid%xb)
 
                   ! To keep the original "ob" with no change for multiple 
                   ! outer-loops use:
@@ -79,10 +84,8 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
                   ! ob%buoy(n)%u = iv%buoy(n)%u%inv
                   ! ob%buoy(n)%v = iv%buoy(n)%v%inv
                else
-                  call da_to_zk(iv % buoy(n) % h, v_h, v_interp_h, iv%buoy(n)%zk)
+                  call da_to_zk(iv % buoy(n) % h, v_h, v_interp_h, iv%info(buoy)%zk(1,n))
                end if
-            else
-               iv%buoy(n)%zk = missing_r
             end if
          else if (ob % buoy(n) % p > 1.0) then
             do k=kts,kte
@@ -90,51 +93,55 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
                        + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
             end do
 
-            call da_to_zk(ob % buoy(n) % p, v_p, v_interp_p, iv%buoy(n)%zk)
+            call da_to_zk(ob % buoy(n) % p, v_p, v_interp_p, iv%info(buoy)%zk(1,n))
 
-            if (iv%buoy(n)%zk < 0.0 .and.  .not.anal_type_verify) then
+            if (iv%info(buoy)%zk(1,n) < 0.0 .and.  .not.anal_type_verify) then
                iv % buoy(n) % p % inv = missing_r
                iv % buoy(n) % p % qc  = missing
-               iv%buoy(n)%zk = 1.0+1.0e-6
+               iv%info(buoy)%zk(:,n) = 1.0+1.0e-6
             end if
          end if
+      end do
 
-         !------------------------------------------------------------------
-         ! [2.0] Initialise components of innovation vector:
-         !------------------------------------------------------------------
+      call da_convert_zk (iv%info(buoy))
 
-         if (iv%buoy(n)%zk < 0.0 .and.  .not.anal_type_verify) then
-            iv % buoy(n) % u % qc = missing
-            iv % buoy(n) % v % qc = missing
-            iv % buoy(n) % t % qc = missing
-            iv % buoy(n) % q % qc = missing
-            iv % buoy(n) % p % qc = missing
-         else
-            ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d( grid%xb % u, iv%buoy(n)%loc, model_u, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d( grid%xb % v, iv%buoy(n)%loc, model_v, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d( grid%xb % t, iv%buoy(n)%loc, model_t, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d( grid%xb % q, iv%buoy(n)%loc, model_q, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d( grid%xb % p, iv%buoy(n)%loc, model_p, iv%buoy(n)%zk)
-         end if
-      else if (sfc_assi_options == 2) then
+      if (.not.anal_type_verify) then
+         do n=iv%info(buoy)%n1,iv%info(buoy)%n2
+            if (iv%info(buoy)%zk(1,n) < 0.0) then
+               iv % buoy(n) % u % qc = missing
+               iv % buoy(n) % v % qc = missing
+               iv % buoy(n) % t % qc = missing
+               iv % buoy(n) % q % qc = missing
+               iv % buoy(n) % p % qc = missing
+            end if
+         end do
+      end if
 
-         ! Surface data assimilation approca 2
-         ! -----------------------------------
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d_newest (grid%xb%u, iv%info(buoy),model_u)
+      call da_interp_lin_3d_newest (grid%xb%v, iv%info(buoy),model_v)
+      call da_interp_lin_3d_newest (grid%xb%t, iv%info(buoy),model_t)
+      call da_interp_lin_3d_newest (grid%xb%q, iv%info(buoy),model_q)
+      call da_interp_lin_3d_newest (grid%xb%p, iv%info(buoy),model_p)
+   else if (sfc_assi_options == 2) then
 
-         ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, 
-         ! and sfc_p)
+      ! Surface data assimilation approach 2
+      ! -----------------------------------
 
-         call da_interp_lin_2d( grid%xb % u10,  iv%buoy(n)%loc, model_u)
-         call da_interp_lin_2d( grid%xb % v10,  iv%buoy(n)%loc, model_v)
-         call da_interp_lin_2d( grid%xb % t2,   iv%buoy(n)%loc, model_t)
-         call da_interp_lin_2d( grid%xb % q2,   iv%buoy(n)%loc, model_q)
-         call da_interp_lin_2d( grid%xb % psfc, iv%buoy(n)%loc, model_p)
+      ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, 
+      ! and sfc_p)
 
+      call da_interp_lin_2d_newest (grid%xb%u10,  iv%info(buoy), 1,model_u)
+      call da_interp_lin_2d_newest (grid%xb%v10,  iv%info(buoy), 1,model_v)
+      call da_interp_lin_2d_newest (grid%xb%t2,   iv%info(buoy), 1,model_t)
+      call da_interp_lin_2d_newest (grid%xb%q2,   iv%info(buoy), 1,model_q)
+      call da_interp_lin_2d_newest (grid%xb%psfc, iv%info(buoy), 1,model_p)
+
+      do n=iv%info(buoy)%n1,iv%info(buoy)%n2
          if (iv%buoy(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
-            call da_interp_lin_2d( grid%xb % terr, iv%buoy(n)%loc, hsm)
+            call da_interp_lin_2d_newer (grid%xb%terr, iv%info(buoy), 1, n, n, model_hsm(:,n))
 
             ho = iv%buoy(n)%h
             to = -888888.0
@@ -143,62 +150,62 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
             if (iv%buoy(n)%t%qc >= 0 .and. iv%buoy(n)%q%qc >= 0) then
                to = ob%buoy(n)%t
                qo = ob%buoy(n)%q
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho, to, qo)
+               call da_sfc_pre(psfcm, model_p(1,n), model_t(1,n), model_q(1,n), model_hsm(1,n), ho, to, qo)
             else if (iv%buoy(n)%t%qc >= 0 .and. iv%buoy(n)%q%qc < 0) then
                to = ob%buoy(n)%t
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho, to)
+               call da_sfc_pre(psfcm, model_p(1,n), model_t(1,n), model_q(1,n), model_hsm(1,n), ho, to)
             else
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho)
+               call da_sfc_pre(psfcm, model_p(1,n), model_t(1,n), model_q(1,n), model_hsm(1,n), ho)
             end if
 
             ! Pressure at the observed height:
-            model_p = psfcm
+            model_p(1,n) = psfcm
          end if
-      end if
+      end do
+   end if
+
+   do n=iv%info(buoy)%n1,iv%info(buoy)%n2
 
       !-----------------------------------------------------------------------
       ! [3.0] Fast interpolation: 
       !-----------------------------------------------------------------------
 
       if (ob % buoy(n) % u > missing_r .AND. iv % buoy(n) % u % qc >= obs_qc_pointer) then
-         iv % buoy(n) % u % inv = iv%buoy(n)%u%inv - model_u
+         iv % buoy(n) % u % inv = iv%buoy(n)%u%inv - model_u(1,n)
       else
          iv % buoy(n) % u % inv = 0.0
       end if
 
       if (ob % buoy(n) % v > missing_r .AND. iv % buoy(n) % v % qc >= obs_qc_pointer) then
-         iv % buoy(n) % v % inv = iv%buoy(n)%v%inv - model_v
+         iv % buoy(n) % v % inv = iv%buoy(n)%v%inv - model_v(1,n)
       else
          iv % buoy(n) % v % inv = 0.0
       end if
 
       if (ob % buoy(n) % p > 0.0 .AND. iv % buoy(n) % p % qc >= obs_qc_pointer) then
-         iv % buoy(n) % p % inv = iv%buoy(n)%p%inv - model_p
+         iv % buoy(n) % p % inv = iv%buoy(n)%p%inv - model_p(1,n)
       else
          iv % buoy(n) % p % inv = 0.0
       end if
 
       if (ob % buoy(n) % t > 0.0 .AND. iv % buoy(n) % t % qc >= obs_qc_pointer) then
-         iv % buoy(n) % t % inv = iv%buoy(n)%t%inv - model_t
+         iv % buoy(n) % t % inv = iv%buoy(n)%t%inv - model_t(1,n)
       else
          iv % buoy(n) % t % inv = 0.0
       end if
 
       if (ob % buoy(n) % q > 0.0 .AND. iv % buoy(n) % q % qc >= obs_qc_pointer) then
-         iv % buoy(n) % q % inv = iv%buoy(n)%q%inv - model_q
+         iv % buoy(n) % q % inv = iv%buoy(n)%q%inv - model_q(1,n)
       else
          iv % buoy(n) % q % inv = 0.0
       end if
-
-      ! -----------------------------------------------------------------------
-      ! [5.0] Perform optional maximum error check:
-      !-----------------------------------------------------------------------
-
-      if (check_max_iv) then
-         call da_check_max_iv_buoy(it, iv % buoy(n), &
-            itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
-      end if
    end do
+
+   ! -----------------------------------------------------------------------
+   ! [5.0] Perform optional maximum error check:
+   !-----------------------------------------------------------------------
+
+   if (check_max_iv) call da_check_max_iv_buoy(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
@@ -213,6 +220,13 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
          'Finally Total Buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                             itu +itvv +itp +itt +itqv
    end if
+
+   deallocate (model_u)
+   deallocate (model_v)
+   deallocate (model_t)
+   deallocate (model_p)
+   deallocate (model_q)
+   deallocate (model_hsm)
    
    if (trace_use_dull) call da_trace_exit("da_get_innov_vector_buoy")
 

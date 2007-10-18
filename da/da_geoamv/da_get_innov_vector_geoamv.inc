@@ -11,83 +11,116 @@ subroutine da_get_innov_vector_geoamv( it, grid, ob, iv)
    type(y_type),     intent(in)    :: ob      ! Observation structure.
    type(iv_type),    intent(inout) :: iv      ! O-B structure.
 
-   integer :: n        ! Loop counter.
-   integer :: i, j, k  ! Index dimension.
-   integer :: num_levs ! Number of obs levels.
+   integer :: n              ! Loop counter.
+   integer :: k              ! Index dimension.
+   integer :: num_levs       ! Number of obs levels.
 
-   real    :: dx, dxm  ! Interpolation weights.
-   real    :: dy, dym  ! Interpolation weights.
-   real    :: model_u(1:max_ob_levels)  ! Model value u at ob location.
-   real    :: model_v(1:max_ob_levels)  ! Model value v at ob location.
+   integer :: i  (kms:kme)
+   integer :: j  (kms:kme)
+   real    :: dx (kms:kme)
+   real    :: dxm(kms:kme)  
+   real    :: dy (kms:kme)
+   real    :: dym(kms:kme) 
+   real,allocatable :: model_u(:,:)
+   real,allocatable :: model_v(:,:)
 
-   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
+   real    :: v_p(kts:kte)      ! Model value p at ob hor. location.
 
    integer :: itu,ituf,itvv,itvvf
-   
-   if (trace_use_dull) call da_trace_entry("da_get_innov_vector_geoamv")
+
+   if (trace_use_dull) call da_trace_entry ("da_get_innov_vector_geoamv")
 
    itu   = 0
    itvv  = 0
    ituf  = 0
    itvvf = 0
 
-   do n=iv%plocal(iv%time-1,geoamv) + 1, iv%plocal(iv%time,geoamv)
+   allocate (model_u(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
+   allocate (model_v(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
 
+   model_u(:,:) = 0.0
+   model_v(:,:) = 0.0
+   
+   do n = iv%info(geoamv)%n1, iv%info(geoamv)%n2
       ! [1.3] Get horizontal interpolation weights:
 
-      num_levs = iv % geoamv(n) % info % levels
+      num_levs = iv%info(geoamv)%levels(n)
       if (num_levs < 1) cycle
 
-      model_u(:) = 0.0
-      model_v(:) = 0.0
+      ! slower
+      ! i(:)   = iv%info(geoamv)%i(:,n)
+      ! j(:)   = iv%info(geoamv)%j(:,n)
+      ! dx(:)  = iv%info(geoamv)%dx(:,n)
+      ! dy(:)  = iv%info(geoamv)%dy(:,n)
+      ! dxm(:) = iv%info(geoamv)%dxm(:,n)
+      ! dym(:) = iv%info(geoamv)%dym(:,n)
 
-      i   = iv%geoamv(n)%loc%i
-      j   = iv%geoamv(n)%loc%j
-      dx  = iv%geoamv(n)%loc%dx
-      dy  = iv%geoamv(n)%loc%dy
-      dxm = iv%geoamv(n)%loc%dxm
-      dym = iv%geoamv(n)%loc%dym
+      ! faster
+      i(1)   = iv%info(geoamv)%i(1,n)
+      j(1)   = iv%info(geoamv)%j(1,n)
+      dx(1)  = iv%info(geoamv)%dx(1,n)
+      dy(1)  = iv%info(geoamv)%dy(1,n)
+      dxm(1) = iv%info(geoamv)%dxm(1,n)
+      dym(1) = iv%info(geoamv)%dym(1,n)
 
-      do k=kts,kte
-         v_p(k) = dym*(dxm*grid%xb%p(i,j,k) + dx*grid%xb%p(i+1,j,k)) + dy *(dxm*grid%xb%p(i,j+1,k) + dx*grid%xb%p(i+1,j+1,k))
-      end do
+      ! if position varies with height, slower
+      ! do k=kts,kte
+      !    v_p(k) = dym(k)*(dxm(k)*grid%xb%p(i(k),j(k),k)+dx(k)*grid%xb%p(i(k)+1,j(k),k)) &
+      !       + dy(k)*(dxm(k)*grid%xb%p(i(k),j(k)+1,k)+dx(k)*grid%xb%p(i(k)+1,j(k)+1,k))
+      ! end do
+ 
+      ! If position does not, faster
+      v_p(kts:kte) = dym(1)*(dxm(1)*grid%xb%p(i(1),j(1),kts:kte) + dx(1)*grid%xb%p(i(1)+1,j(1),kts:kte)) &
+         + dy(1)*(dxm(1)*grid%xb%p(i(1),j(1)+1,kts:kte) + dx(1)*grid%xb%p(i(1)+1,j(1)+1,kts:kte))
 
-      do k=1, iv % geoamv(n) % info % levels
-         iv%geoamv(n)%zk(k)=missing_r
-
-         if (iv % geoamv(n) % p(k) > 1.0) then
-            call da_to_zk(iv % geoamv(n) % p(k), v_p, v_interp_p, iv%geoamv(n)%zk(k))
-         end if
-
-         if (iv%geoamv(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
-            iv % geoamv(n) % u(k) % qc = missing
-            iv % geoamv(n) % v(k) % qc = missing
-         end if
-      end do
-
-      call da_interp_lin_3d( grid%xb % u, iv%geoamv(n)%loc, model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-      call da_interp_lin_3d( grid%xb % v, iv%geoamv(n)%loc, model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-
-      do k = 1, iv % geoamv(n) % info % levels
-         iv % geoamv(n) % u(k) % inv = 0.0
-         iv % geoamv(n) % v(k) % inv = 0.0
-         if (ob % geoamv(n) % u(k) > missing_r .AND. iv % geoamv(n) % u(k) % qc >= obs_qc_pointer) then
-            iv % geoamv(n) % u(k) % inv = ob % geoamv(n) % u(k) - model_u(k)
-         end if
-
-         if (ob % geoamv(n) % v(k) > missing_r .AND. iv % geoamv(n) % v(k) % qc >= obs_qc_pointer) then
-            iv % geoamv(n) % v(k) % inv = ob % geoamv(n) % v(k) - model_v(k)
+      do k=1, iv%info(geoamv)%levels(n)
+         if (iv%geoamv(n)%p(k) > 1.0) then
+            call da_to_zk (iv%geoamv(n)%p(k), v_p, v_interp_p, iv%info(geoamv)%zk(k,n))
          end if
       end do
 
-      !------------------------------------------------------------------------
-      ! Perform optional maximum error check:
-      !------------------------------------------------------------------------
-
-      if (check_max_iv) then
-         call da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
-      end if
    end do
+
+   call da_convert_zk (iv%info(geoamv))
+
+   if (.not. anal_type_verify) then
+      do n = iv%info(geoamv)%n1, iv%info(geoamv)%n2
+         do k=1, iv%info(geoamv)%levels(n)
+            if (iv%info(geoamv)%zk(k,n) < 0.0) then
+               iv%geoamv(n)%u(k)% qc = missing
+               iv%geoamv(n)%v(k)% qc = missing
+            end if
+         end do
+      end do
+   end if
+
+   call da_interp_lin_3d_newest (grid%xb%u, iv%info(geoamv), model_u)
+   call da_interp_lin_3d_newest (grid%xb%v, iv%info(geoamv), model_v)
+
+   do n = iv%info(geoamv)%n1, iv%info(geoamv)%n2
+      do k = 1, iv%info(geoamv)%levels(n)
+         iv%geoamv(n)%u(k)%inv = 0.0
+         iv%geoamv(n)%v(k)%inv = 0.0
+         if (ob%geoamv(n)%u(k) > missing_r .AND. iv%geoamv(n)%u(k)%qc >= obs_qc_pointer) then
+            iv%geoamv(n)%u(k)%inv = ob%geoamv(n)%u(k) - model_u(k,n)
+         end if
+
+         if (ob%geoamv(n)%v(k) > missing_r .AND. iv%geoamv(n)%v(k)%qc >= obs_qc_pointer) then
+            iv%geoamv(n)%v(k)%inv = ob%geoamv(n)%v(k) - model_v(k,n)
+         end if
+      end do
+   end do
+
+   deallocate (model_u)
+   deallocate (model_v)
+   
+   !------------------------------------------------------------------------
+   ! Perform optional maximum error check:
+   !------------------------------------------------------------------------
+
+   if (check_max_iv) then
+      call da_check_max_iv_geoamv (iv,it,itu,ituf,itvv,itvvf)
+   end if
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
@@ -97,8 +130,9 @@ subroutine da_get_innov_vector_geoamv( it, grid, ob, iv)
          'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
          'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    end if
+
    
-   if (trace_use_dull) call da_trace_exit("da_get_innov_vector_geoamv")
+   if (trace_use_dull) call da_trace_exit ("da_get_innov_vector_geoamv")
    
 end subroutine da_get_innov_vector_geoamv
 

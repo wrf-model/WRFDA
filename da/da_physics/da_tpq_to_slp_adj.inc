@@ -48,6 +48,7 @@ subroutine da_tpq_to_slp_adj (T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
 
    if (terr <= 0.0) then
       psfc9=slp9
+      if (trace_use) call da_trace_exit("da_tpq_to_slp_adj")
       return
    end if
 

@@ -31,19 +31,16 @@ subroutine da_get_innov_vector_ssmi_rv (it, grid, ob, iv)
 
       ! TPW
 
-      i   = iv%ssmi_rv(n)%loc%i
-      j   = iv%ssmi_rv(n)%loc%j
-      dx  = iv%ssmi_rv(n)%loc%dx
-      dy  = iv%ssmi_rv(n)%loc%dy
-      dxm = iv%ssmi_rv(n)%loc%dxm
-      dym = iv%ssmi_rv(n)%loc%dym
+      i   = iv%info(ssmi_rv)%i(1,n)
+      j   = iv%info(ssmi_rv)%j(1,n)
+      dx  = iv%info(ssmi_rv)%dx(1,n)
+      dy  = iv%info(ssmi_rv)%dy(1,n)
+      dxm = iv%info(ssmi_rv)%dxm(1,n)
+      dym = iv%info(ssmi_rv)%dym(1,n)
 
       iv % ssmi_rv(n) % tpw % inv  = 0.0
-      if (abs(ob % ssmi_rv(n) % tpw - missing_r) > 1.0  .and.  &  
-            iv % ssmi_rv(n) % tpw % qc >= obs_qc_pointer) then
-         model_tpw = dym*(dxm*grid%xb%tpw(i,j) + dx*grid%xb%tpw(i+1,j)) + &
-            dy *(dxm*grid%xb%tpw(i,j+1) + dx*grid%xb%tpw(i+1,j+1))
-
+      if (abs(ob % ssmi_rv(n) % tpw - missing_r) > 1.0  .and. iv % ssmi_rv(n) % tpw % qc >= obs_qc_pointer) then
+         model_tpw = dym*(dxm*grid%xb%tpw(i,j) + dx*grid%xb%tpw(i+1,j)) + dy *(dxm*grid%xb%tpw(i,j+1) + dx*grid%xb%tpw(i+1,j+1))
          iv % ssmi_rv(n) % tpw % inv = ob % ssmi_rv(n) % tpw - model_tpw
       end if
 
@@ -55,19 +52,15 @@ subroutine da_get_innov_vector_ssmi_rv (it, grid, ob, iv)
 
          model_speed = dym*(dxm*grid%xb%speed(i,j ) + dx*grid%xb%speed(i+1,j )) &
             + dy *(dxm*grid%xb%speed(i,j+1) + dx*grid%xb%speed(i+1,j+1))
-         iv % ssmi_rv(n) % speed % inv =  &
-            ob % ssmi_rv(n) % speed - model_speed
-      end if
-
-      !------------------------------------------------------------------
-      ! Perform optional maximum error check:
-      !------------------------------------------------------------------
-
-      if (check_max_iv) then
-         call da_check_max_iv_ssmi_rv(it, iv % ssmi_rv(n),&
-            itpw,itpwf, ispeed,ispeedf)
+         iv % ssmi_rv(n) % speed % inv = ob % ssmi_rv(n) % speed - model_speed
       end if
    end do
+
+   !------------------------------------------------------------------
+   ! Perform optional maximum error check:
+   !------------------------------------------------------------------
+
+   if (check_max_iv) call da_check_max_iv_ssmi_rv(iv, it, itpw,itpwf, ispeed,ispeedf)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &

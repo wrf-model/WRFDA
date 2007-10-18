@@ -27,13 +27,13 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
 
    if (iv%nlocal(ssmt2) > 0) then
       do n=1, iv%nlocal(ssmt2)
-         if (iv%ssmt2(n)%loc%proc_domain) then
-            do k=1, iv%ssmt2(n)%info%levels
+         if (iv%info(ssmt2)%proc_domain(1,n)) then
+            do k=1, iv%info(ssmt2)%levels(n)
                call da_stats_calculate (n, k, iv%ssmt2(n)%rh(k)%qc, re%ssmt2(n)%rh(k), nrh, &
                   minimum, maximum, average, rms_err)
 
             end do
-         end if    ! end if (iv%ssmt2(n)%loc%proc_domain)
+         end if    ! end if (iv%info(ssmt2)%proc_domain(1,n))
       end do
    end if
 

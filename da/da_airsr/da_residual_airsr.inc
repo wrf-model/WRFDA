@@ -24,7 +24,7 @@ subroutine da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % q % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(airsr)
-      do k=1, iv%airsr(n)%info%levels
+      do k=1, iv%info(airsr)%levels(n)
         np_available = np_available + 4
         re%airsr(n)%t(k) = da_residual(n, k, y%airsr(n)%t(k), iv%airsr(n)%t(k), n_obs_bad % t)
         re%airsr(n)%q(k) = da_residual(n, k, y%airsr(n)%q(k), iv%airsr(n)%q(k), n_obs_bad % q)

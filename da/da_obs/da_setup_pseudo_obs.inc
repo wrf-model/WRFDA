@@ -44,17 +44,17 @@ subroutine da_setup_pseudo_obs(iv, ob)
       ! [1.0] Initialise components of innovation vector:
       !---------------------------------------------------------------
 
-      iv%pseudo(n)%loc%x = pseudo_x
-      iv%pseudo(n)%loc%y = pseudo_y
-      iv%pseudo(n)%zk    = pseudo_z
+      iv%info(pseudo)%x(:,n)  = pseudo_x
+      iv%info(pseudo)%y(:,n)  = pseudo_y
+      iv%info(pseudo)%zk(:,n) = pseudo_z
 
-      iv%pseudo(n)%loc%i = int(pseudo_x)
-      iv%pseudo(n)%loc%j = int(pseudo_y)
+      iv%info(pseudo)%i(:,n) = int(pseudo_x)
+      iv%info(pseudo)%j(:,n) = int(pseudo_y)
 
-      iv%pseudo(n)%loc%dx = pseudo_x-real(iv%pseudo(n)%loc%i)
-      iv%pseudo(n)%loc%dy = pseudo_y-real(iv%pseudo(n)%loc%j)
-      iv%pseudo(n)%loc%dxm=1.0-iv%pseudo(n)%loc%dx
-      iv%pseudo(n)%loc%dym=1.0-iv%pseudo(n)%loc%dy
+      iv%info(pseudo)%dx(:,n) = pseudo_x-real(iv%info(pseudo)%i(:,n))
+      iv%info(pseudo)%dy(:,n) = pseudo_y-real(iv%info(pseudo)%j(:,n))
+      iv%info(pseudo)%dxm(:,n)=1.0-iv%info(pseudo)%dx(:,n)
+      iv%info(pseudo)%dym(:,n)=1.0-iv%info(pseudo)%dy(:,n)
 
       if (pseudo_var(1:1) == 'u' .or. pseudo_var(1:1) == 'U') then
          iv%pseudo(n) % u % inv = pseudo_val

@@ -19,13 +19,13 @@ subroutine da_jo_and_grady_pilot(iv, re, jo, jo_grad_y)
    jo % pilot_v = 0.0
 
    do n=1, iv%nlocal(pilot)
-      do k=1, iv%pilot(n)%info%levels
+      do k=1, iv%info(pilot)%levels(n)
          jo_grad_y%pilot(n)%u(k) = -re%pilot(n)%u(k) / (iv%pilot(n)%u(k)%error * iv%pilot(n)%u(k)%error)
          jo_grad_y%pilot(n)%v(k) = -re%pilot(n)%v(k) / (iv%pilot(n)%v(k)%error * iv%pilot(n)%v(k)%error)
       end do
 
-     if (iv%pilot(n)%loc%proc_domain) then
-        do k=1, iv%pilot(n)%info%levels
+     if (iv%info(pilot)%proc_domain(1,n)) then
+        do k=1, iv%info(pilot)%levels(n)
            jo % pilot_u = jo % pilot_u - re%pilot(n)%u(k) * jo_grad_y%pilot(n)%u(k)
            jo % pilot_v = jo % pilot_v - re%pilot(n)%v(k) * jo_grad_y%pilot(n)%v(k)
         end do

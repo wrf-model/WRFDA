@@ -202,9 +202,11 @@ subroutine da_scan_obs_ascii (iv, filename)
 
          case (35:38) ;
             if (.not.use_soundobs .or. iv%ntotal(sound) == max_sound_input) cycle reports
-            if (n==1) iv%ntotal(sound) = iv%ntotal(sound) + 1
+            if (n==1) iv%ntotal(sound)     = iv%ntotal(sound) + 1
+            if (n==1) iv%ntotal(sonde_sfc) = iv%ntotal(sonde_sfc) + 1
             if (outside) cycle reports
-            iv%nlocal(sound) = iv%nlocal(sound) + 1
+            iv%nlocal(sound)     = iv%nlocal(sound) + 1
+            iv%nlocal(sonde_sfc) = iv%nlocal(sonde_sfc) + 1
 
          case (86) ;
             if (.not.use_satemobs .or. iv%ntotal(satem) == max_satem_input) cycle reports
@@ -302,8 +304,12 @@ subroutine da_scan_obs_ascii (iv, filename)
                  'platform%info%levels=', platform%info%levels
             call da_warning(__FILE__,__LINE__,message(1:3))
          end select
+
+         iv%info(fm_index(fm))%max_lev = max(iv%info(fm_index(fm))%max_lev, platform%info%levels)
       end do        !  loop over duplicate
    end do reports
+
+   iv%info(sonde_sfc)%max_lev=1
 
    close(iunit)
 

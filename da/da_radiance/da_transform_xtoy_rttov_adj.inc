@@ -375,7 +375,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
          do k=1, nlevels
             model_mr(k) = con_vars_ad(n) % q(k)
 
-            if (iv%instid(i)%zk(k,n) <= 0.0) then
+            if (iv%instid(i)%info%zk(k,n) <= 0.0) then
                con_vars_ad(n)%t(k)  = 0.0  !coefs(i) % ref_prfl_t(k,gas_id_watervapour)
                con_vars_ad(n)%q(k)  = 0.0  !coefs(i) % ref_prfl_mr(k,gas_id_watervapour)
             else
@@ -397,49 +397,21 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_t(:,n) = con_vars_ad(n)% t(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%t, &
-            iv%instid(i)%loc_i, &
-            iv%instid(i)%loc_j, &
-            iv%instid(i)%loc_k, &
-            iv%instid(i)%loc_dx, &
-            iv%instid(i)%loc_dy, &
-            iv%instid(i)%loc_dz, &
-            iv%instid(i)%loc_dxm, &
-            iv%instid(i)%loc_dym, &
-            iv%instid(i)%loc_dzm, &
-            temp_t, nlevels,num_rad )
+         call da_interp_lin_3d_adj_newer (jo_grad_x%t, iv%instid(i)%info, 1, num_rad, temp_t)
          deallocate(temp_t)
 
          allocate(temp_q(nlevels,num_rad))
          do n=1,num_rad
             temp_q(:,n) = con_vars_ad(n)% q(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%q, &
-            iv%instid(i)%loc_i, &
-            iv%instid(i)%loc_j, &
-            iv%instid(i)%loc_k, &
-            iv%instid(i)%loc_dx, &
-            iv%instid(i)%loc_dy, &
-            iv%instid(i)%loc_dz, &
-            iv%instid(i)%loc_dxm, &
-            iv%instid(i)%loc_dym, &
-            iv%instid(i)%loc_dzm, &
-            temp_q, nlevels,num_rad )
+         call da_interp_lin_3d_adj_newer (jo_grad_x%q, iv%instid(i)%info, 1, num_rad, temp_q)
          deallocate(temp_q)
 
          allocate(temp_ps(num_rad))
          do n=1,num_rad
             temp_ps(n) = con_vars_ad(n)% ps
          end do
-         call da_interp_lin_2d_adj_new(jo_grad_x% psfc, ims, ime, jms, &
-            jme, &
-            iv%instid(i)%loc_i, &
-            iv%instid(i)%loc_j, &
-            iv%instid(i)%loc_dx, &
-            iv%instid(i)%loc_dy, &
-            iv%instid(i)%loc_dxm, &
-            iv%instid(i)%loc_dym, &
-            temp_ps,num_rad)
+         call da_interp_lin_2d_adj_newer (jo_grad_x% psfc, iv%instid(i)%info, 1, 1, num_rad, temp_ps)
          deallocate(temp_ps)
       end if
 

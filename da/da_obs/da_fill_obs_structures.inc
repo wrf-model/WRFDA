@@ -222,7 +222,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(geoamv) > 0) then
       do n = 1, iv % nlocal(geoamv)
-         do k = 1, iv % geoamv(n) % info % levels
+         do k = 1, iv%info(geoamv)%levels(n)
             ob % geoamv(n) % u(k) = iv % geoamv(n) % u(k) % inv
             ob % geoamv(n) % v(k) = iv % geoamv(n) % v(k) % inv
          end do
@@ -233,7 +233,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(polaramv) > 0) then
       do n = 1, iv % nlocal(polaramv)
-         do k = 1, iv % polaramv(n) % info % levels
+         do k = 1,iv%info(polaramv)%levels(n)
             ob % polaramv(n) % u(k) = iv % polaramv(n) % u(k) % inv
             ob % polaramv(n) % v(k) = iv % polaramv(n) % v(k) % inv
          end do
@@ -253,7 +253,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(gpsref) > 0) then
       do n = 1, iv % nlocal(gpsref)
-         do k = 1, iv % gpsref(n) % info % levels
+         do k = 1, iv%info(gpsref)%levels(n)
             ob % gpsref(n) % ref(k) = iv % gpsref(n) % ref(k) % inv
             ob % gpsref(n) %   p(k) = iv % gpsref(n) %   p(k) % inv
             ob % gpsref(n) %   t(k) = iv % gpsref(n) %   t(k) % inv
@@ -266,7 +266,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(sound) > 0) then
       do n = 1, iv % nlocal(sound)
-         do k = 1, iv % sound(n) % info % levels
+         do k = 1, iv%info(sound)%levels(n)
             ob % sound(n) % u(k) = iv % sound(n) % u(k) % inv
             ob % sound(n) % v(k) = iv % sound(n) % v(k) % inv
             ob % sound(n) % t(k) = iv % sound(n) % t(k) % inv
@@ -308,7 +308,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(airep) > 0) then
       do n = 1, iv % nlocal(airep)
-         do k = 1, iv % airep(n) % info % levels
+         do k = 1, iv%info(airep)%levels(n)
             ob % airep(n) % u(k) = iv % airep(n) % u(k) % inv
             ob % airep(n) % v(k) = iv % airep(n) % v(k) % inv
             ob % airep(n) % t(k) = iv % airep(n) % t(k) % inv
@@ -320,7 +320,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(pilot) > 0) then
       do n = 1, iv % nlocal(pilot)
-         do k = 1, iv % pilot(n) % info % levels
+         do k = 1, iv%info(pilot)%levels(n)
             ob % pilot(n) % u(k) = iv % pilot(n) % u(k) % inv
             ob % pilot(n) % v(k) = iv % pilot(n) % v(k) % inv
          end do
@@ -362,7 +362,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(ssmt1) > 0) then
       do n = 1, iv % nlocal(ssmt1)
-         do k = 1, iv % ssmt1(n) % info % levels
+         do k = 1, iv%info(ssmt1)%levels(n)
             ob % ssmt1(n) % t(k) = iv % ssmt1(n) % t(k) % inv
          end do
       end do
@@ -373,7 +373,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(ssmt2) > 0) then
       do n = 1, iv % nlocal(ssmt2)
-         do k = 1, iv % ssmt2(n) % info % levels
+         do k = 1, iv%info(ssmt2)%levels(n)
             ob % ssmt2(n) % rh(k) = iv % ssmt2(n) % rh(k) % inv
          end do
       end do
@@ -396,7 +396,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(profiler) > 0) then
       do n = 1, iv % nlocal(profiler)
-         do k = 1, iv % profiler(n) % info % levels
+         do k = 1, iv%info(profiler)%levels(n)
             ob % profiler(n) % u(k) = iv % profiler(n) % u(k) % inv
             ob % profiler(n) % v(k) = iv % profiler(n) % v(k) % inv
          end do
@@ -433,7 +433,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(radar) > 0) then
       do n = 1, iv % nlocal(radar)
-         do k = 1, iv % radar(n) % info % levels
+         do k = 1, iv%info(radar)%levels(n)
             ! Copy observation variables:
             ob % radar(n) % rv(k) = iv % radar(n) % rv(k) % inv
            ob % radar(n) % rf(k) = iv % radar(n) % rf(k) % inv
@@ -445,7 +445,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(bogus) > 0) then
       do n = 1, iv % nlocal(bogus)
-         do k = 1, iv % bogus(n) % info % levels
+         do k = 1, iv%info(bogus)%levels(n)
 
             ! Copy observation variables:
 
@@ -475,7 +475,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv % nlocal(airsr) > 0) then
       do n = 1, iv % nlocal(airsr)
-         do k = 1, iv % airsr(n) % info % levels
+         do k = 1, iv%info(airsr)%levels(n)
 
             ! Copy observation variables:
 

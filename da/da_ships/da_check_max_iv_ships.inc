@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ships(it, ships, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_ships(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,12 @@ subroutine da_check_max_iv_ships(it, ships, itu,ituf,itvv,itvvf,itp,itpf,itt,itt
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (synop_type), intent(inout) :: ships
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
    logical :: failed
+   integer :: n
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_ships")
 
@@ -37,23 +38,14 @@ subroutine da_check_max_iv_ships(it, ships, itu,ituf,itvv,itvvf,itp,itpf,itt,itt
 
    failed = .false.
 
-   ! U-wind
-   call da_max_error_qc(it, ships % info, ships % u, max_error_uv, itu, ituf, check_max_iv_unit, &
-      'U    ', failed, check_max_iv_print)
-   ! V-wind
-   call da_max_error_qc (it, ships % info, ships % v,max_error_uv, itvv, itvvf, check_max_iv_unit, &
-      'V    ', failed, check_max_iv_print)                           
-   ! Pressure
-   call da_max_error_qc (it, ships % info, ships % p, max_error_p, itp, itpf, check_max_iv_unit, &
-      'Press', failed, check_max_iv_print)         
-
-   ! Temperature
-   call da_max_error_qc (it, ships % info, ships % t,max_error_t, itt, ittf, check_max_iv_unit, &
-      'TEMP ', failed, check_max_iv_print)
-
-   ! Mixing ratio, same ratio as relative humidity
-   call da_max_error_qc (it, ships % info, ships % q, max_error_q, itqv, itqvf, check_max_iv_unit, &
-      'QV   ', failed, check_max_iv_print)
+   do n=iv%info(ships)%n1,iv%info(ships)%n2
+      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      ! Mixing ratio, same ratio as relative humidity
+      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_ships")
 

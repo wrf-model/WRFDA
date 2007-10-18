@@ -20,7 +20,7 @@ subroutine da_to_zk(obs_v, mdl_v, v_interp_optn, zk)
    if (v_interp_optn == v_interp_p) then
       if (obs_v > mdl_v(kts) .or. obs_v < mdl_v(kte)) then
          if (anal_type_verify) then
-            ! Guo (02/06/2006), for VERifY, allow the extrapolation to obtain the zk:
+            ! Guo (02/06/2006), for VERIFY, allow the extrapolation to obtain the zk:
             if (obs_v > mdl_v(kts)) then
                ! below the lowest level:
                zk = real(kts+1) - &

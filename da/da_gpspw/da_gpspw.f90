@@ -5,7 +5,7 @@ module da_gpspw
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print,kts,kte, &
-      missing, max_error_uv, max_error_t, rootproc, &
+      missing, max_error_uv, max_error_t, rootproc, gpspw, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, gpspw,max_error_thickness, &
@@ -19,7 +19,7 @@ module da_gpspw
    use da_par_util1, only : da_proc_sum_int
    use da_reporting, only : da_error
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual
+   use da_tools, only : da_max_error_qc_new, da_residual
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_gpspw_type" is ONLY used locally in da_gpspw:

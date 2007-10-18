@@ -28,6 +28,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    
    do n=1, num_fgat_time
       iv%time = n
+      iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
+      iv%info(:)%n2 = iv%plocal(iv%time,:)
 
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
@@ -81,6 +83,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    end do
 
    iv%time = 1
+   iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
+   iv%info(:)%n2 = iv%plocal(iv%time,:)
 
    !-----------------------------------------------------------------------
    ! [2] Having calculated the real O-Bs, optionally overwrite with scaled,

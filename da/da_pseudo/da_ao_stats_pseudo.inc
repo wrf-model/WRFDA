@@ -38,7 +38,7 @@ subroutine da_ao_stats_pseudo  (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(pseudo)
-      if (iv%pseudo(n)%loc%proc_domain) then
+      if (iv%info(pseudo)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%pseudo(n)%u%qc, & 
             re%pseudo(n)%u, nu, & 
             stats%minimum%u, stats%maximum%u, &

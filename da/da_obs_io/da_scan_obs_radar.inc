@@ -166,6 +166,8 @@ subroutine da_scan_obs_radar (iv, filename)
                write(unit=stdout, fmt='(a, i3)') &
                   'platform % info % levels=', platform % info % levels
             end select
+
+         iv%info(radar)%max_lev = max(iv%info(radar)%max_lev, platform%info%levels)
          end do        !  loop over duplicate
       end do reports
    end do

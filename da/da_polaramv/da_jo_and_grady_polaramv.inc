@@ -19,19 +19,19 @@ subroutine da_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
    jo % polaramv_v = 0.0
 
    do n=1, iv%nlocal(polaramv)
-      do k=1, iv%polaramv(n)%info%levels
+      do k=1, iv%info(polaramv)%levels(n)
          jo_grad_y%polaramv(n)%u(k) = -re%polaramv(n)%u(k) / &
             ( iv%polaramv(n)%u(k)%error * iv%polaramv(n)%u(k)%error)
          jo_grad_y%polaramv(n)%v(k) = -re%polaramv(n)%v(k) / &
             ( iv%polaramv(n)%v(k)%error * iv%polaramv(n)%v(k)%error)
       end do
 
-      if (iv%polaramv(n)%loc%proc_domain) then
-         do k=1, iv%polaramv(n)%info%levels
+      do k=1, iv%info(polaramv)%levels(n)
+         if (iv%info(polaramv)%proc_domain(k,n)) then
             jo % polaramv_u = jo % polaramv_u - re%polaramv(n)%u(k) * jo_grad_y%polaramv(n)%u(k)
             jo % polaramv_v = jo % polaramv_v - re%polaramv(n)%v(k) * jo_grad_y%polaramv(n)%v(k)
-         end do
-      end if
+         end if
+      end do
    end do
 
    jo % polaramv_u = 0.5 * jo % polaramv_u

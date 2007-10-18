@@ -52,7 +52,7 @@ subroutine da_check_psfc(grid, iv, y)
                   + y%synop(n)%p * y%synop(n)%p &
                   + y%synop(n)%q * y%synop(n)%q
 
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          partial_lhs = partial_lhs & 
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
@@ -63,7 +63,7 @@ subroutine da_check_psfc(grid, iv, y)
    end do
 
    !-------------------------------------------------------------------------
-   ! [5.0] Perform adjivnt operation:
+   ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
    grid%xa%psfc(ims:ime, jms:jme) = 0.0

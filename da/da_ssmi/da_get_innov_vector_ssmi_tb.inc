@@ -56,12 +56,12 @@ subroutine da_get_innov_vector_ssmi_tb (it, grid, ob, iv)
 
       ! TB
 
-      i   = iv%ssmi_tb(n)%loc%i
-      j   = iv%ssmi_tb(n)%loc%j
-      dx  = iv%ssmi_tb(n)%loc%dx
-      dy  = iv%ssmi_tb(n)%loc%dy
-      dxm = iv%ssmi_tb(n)%loc%dxm
-      dym = iv%ssmi_tb(n)%loc%dym
+      i   = iv%info(ssmi_tb)%i(1,n)
+      j   = iv%info(ssmi_tb)%j(1,n)
+      dx  = iv%info(ssmi_tb)%dx(1,n)
+      dy  = iv%info(ssmi_tb)%dy(1,n)
+      dxm = iv%info(ssmi_tb)%dxm(1,n)
+      dym = iv%info(ssmi_tb)%dym(1,n)
 
       ! Tb19h
 
@@ -139,19 +139,19 @@ subroutine da_get_innov_vector_ssmi_tb (it, grid, ob, iv)
       else
          iv % ssmi_tb(n) % tb85v % inv = 0.0
       end if
-
-      !----------------------------------------------------------------
-      !     Perform optional maximum error check:
-      !----------------------------------------------------------------
-
-      if (check_max_iv) then
-         call da_check_max_iv_ssmi_tb(it, iv % ssmi_tb(n), &
-            itb19v, itb19vf, itb19h, itb19hf, &
-            itb22v, itb22vf,                  &
-            itb37v, itb37vf, itb37h, itb37hf, &
-            itb85v, itb85vf, itb85h, itb85hf )
-      end if
    end do
+
+   !----------------------------------------------------------------
+   !     Perform optional maximum error check:
+   !----------------------------------------------------------------
+
+   if (check_max_iv) then
+      call da_check_max_iv_ssmi_tb(iv, it, &
+         itb19v, itb19vf, itb19h, itb19hf, &
+         itb22v, itb22vf,                  &
+         itb37v, itb37vf, itb37h, itb37hf, &
+         itb85v, itb85vf, itb85h, itb85hf )
+   end if
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ', &

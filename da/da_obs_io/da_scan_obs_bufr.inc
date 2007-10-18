@@ -154,9 +154,11 @@ subroutine da_scan_obs_bufr (iv, filename)
             select case(kx)
             case (120, 122, 132, 220, 222, 232) ;         ! Sound
                if (.not.use_soundobs .or. iv%ntotal(sound) == max_sound_input) cycle reports
-               if (n==1) iv%ntotal(sound) = iv%ntotal(sound) + 1
+               if (n==1) iv%ntotal(sound)     = iv%ntotal(sound) + 1
+               if (n==1) iv%ntotal(sonde_sfc) = iv%ntotal(sonde_sfc) + 1
                if (outside) cycle reports
                iv%nlocal(sound) = iv%nlocal(sound) + 1
+               iv%nlocal(sonde_sfc) = iv%nlocal(sonde_sfc) + 1
                platform%loc%obs_global_index  = iv%ntotal(sound)
 
             case (221) ;                   ! Pilot 

@@ -24,7 +24,7 @@ subroutine da_jo_and_grady_qscat(iv, re, jo, jo_grad_y)
       jo_grad_y%qscat(n)%v = -re%qscat(n)%v / &
          (iv%qscat(n)%v%error * iv%qscat(n)%v%error)
 
-      if (iv%qscat(n)%loc%proc_domain) then
+      if (iv%info(qscat)%proc_domain(1,n)) then
          jo % qscat_u = jo % qscat_u - re%qscat(n)%u * jo_grad_y%qscat(n)%u
          jo % qscat_v = jo % qscat_v - re%qscat(n)%v * jo_grad_y%qscat(n)%v
       end if

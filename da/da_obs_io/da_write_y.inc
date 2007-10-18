@@ -47,13 +47,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(synop) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(synop)
-         if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(synop)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'synop', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(synop)
-            if (iv%synop(n)%loc%proc_domain) then
+            if (iv%info(synop)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%synop(n)%u%qc, y%synop(n)%u, f1)
@@ -73,13 +73,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(metar) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(metar)
-         if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+         if(iv%info(metar)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'metar', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(metar)
-            if (iv%metar(n)%loc%proc_domain) then
+            if (iv%info(metar)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%metar(n)%u%qc, y%metar(n)%u, f1)
@@ -99,13 +99,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(ships) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ships)
-        if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(ships)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ships', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(ships)
-            if (iv%ships(n)%loc%proc_domain) then
+            if (iv%info(ships)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%ships(n)%u%qc, y%ships(n)%u, f1)
@@ -125,16 +125,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(geoamv) > 0) then 
       num_obs = 0
       do n = 1, iv % nlocal(geoamv)
-         if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(geoamv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'geoamv', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(geoamv)
-            if (iv%geoamv(n)%loc%proc_domain) then
+            if (iv%info(geoamv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % geoamv(n) % info % levels
-               do k = 1, iv % geoamv(n) % info % levels
+               write(ounit,'(i8)')iv%info(geoamv)%levels(n)
+               do k = 1, iv%info(geoamv)%levels(n)
                   call da_check_missing(iv%geoamv(n)%u(k)%qc, &
                      y%geoamv(n)%u(k), f1)
                   call da_check_missing(iv%geoamv(n)%v(k)%qc, &
@@ -152,16 +152,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(polaramv) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(polaramv)
-         if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(polaramv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'polaramv', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(polaramv)
-            if (iv%polaramv(n)%loc%proc_domain) then
+            if (iv%info(polaramv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % polaramv(n) % info % levels
-               do k = 1, iv % polaramv(n) % info % levels
+               write(ounit,'(i8)') iv%info(polaramv)%levels(n)
+               do k = 1, iv%info(polaramv)%levels(n)
                   call da_check_missing(iv%polaramv(n)%u(k)%qc, &
                      y%polaramv(n)%u(k), f1)
                   call da_check_missing(iv%polaramv(n)%v(k)%qc, &
@@ -179,13 +179,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(gpspw) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(gpspw)
-         if (iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(gpspw)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'gpspw', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(gpspw)
-            if (iv%gpspw(n)%loc%proc_domain) then
+            if (iv%info(gpspw)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%gpspw(n)%tpw%qc, y%gpspw(n)%tpw, f1)
@@ -201,16 +201,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(sound) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-         if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sound', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(sound)
-            if (iv%sound(n)%loc%proc_domain) then
+            if (iv%info(sound)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % sound(n) % info % levels
-               do k = 1, iv % sound(n) % info % levels
+               write(ounit,'(i8)')iv%info(sound)%levels(n)
+               do k = 1, iv%info(sound)%levels(n)
                   call da_check_missing(iv%sound(n)%u(k)%qc, y%sound(n)%u(k), f1)
                   call da_check_missing(iv%sound(n)%v(k)%qc, y%sound(n)%v(k), f2)
                   call da_check_missing(iv%sound(n)%t(k)%qc, y%sound(n)%t(k), f3)
@@ -224,13 +224,13 @@ subroutine da_write_y (iv, y)
 
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-         if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sonde_sfc', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(sound)
-            if (iv%sound(n)%loc%proc_domain) then
+            if (iv%info(sound)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%sonde_sfc(n)%u%qc, y%sonde_sfc(n)%u, f1)
@@ -250,16 +250,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(airep) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(airep)
-         if (iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(airep)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airep', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(airep)
-            if (iv%airep(n)%loc%proc_domain) then
+            if (iv%info(airep)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % airep(n) % info % levels
-               do k = 1, iv % airep(n) % info % levels
+               write(ounit,'(i8)') iv%info(airep)%levels(n)
+               do k = 1, iv%info(airep)%levels(n)
                   call da_check_missing(iv%airep(n)%u(k)%qc, y%airep(n)%u(k), f1)
                   call da_check_missing(iv%airep(n)%v(k)%qc, y%airep(n)%v(k), f2)
                   call da_check_missing(iv%airep(n)%t(k)%qc, y%airep(n)%t(k), f3)
@@ -276,16 +276,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(pilot) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(pilot)
-         if (iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(pilot)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'pilot', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(pilot)
-            if (iv%pilot(n)%loc%proc_domain) then
+            if (iv%info(pilot)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % pilot(n) % info % levels
-               do k = 1, iv % pilot(n) % info % levels
+               write(ounit,'(i8)')iv%info(pilot)%levels(n)
+               do k = 1, iv%info(pilot)%levels(n)
                   call da_check_missing(iv%pilot(n)%u(k)%qc, y%pilot(n)%u(k), f1)
                   call da_check_missing(iv%pilot(n)%v(k)%qc, y%pilot(n)%v(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum,dum,dum, &
@@ -301,13 +301,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(ssmi_rv) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_rv)
-         if (iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmir', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(ssmi_rv)
-            if (iv%ssmi_rv(n)%loc%proc_domain) then
+            if (iv%info(ssmi_rv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%ssmi_rv(n)%speed%qc, &
@@ -324,13 +324,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(ssmi_tb) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_tb)            
-         if (iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ssmi_tb)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmit', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(ssmi_tb)
-            if (iv%ssmi_tb(n)%loc%proc_domain) then
+            if (iv%info(ssmi_tb)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%ssmi_tb(n)%tb19h%qc, &
@@ -383,16 +383,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(ssmt1) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmt1)            
-         if (iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ssmt1)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt1', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(ssmt1)
-            if (iv%ssmt1(n)%loc%proc_domain) then
+            if (iv%info(ssmt1)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % ssmt1(n) % info % levels
-               do k = 1, iv % ssmt1(n) % info % levels
+               write(ounit,'(i8)')iv%info(ssmt1)%levels(n)
+               do k = 1, iv%info(ssmt1)%levels(n)
                   call da_check_missing(iv%ssmt1(n)%t(k)%qc, &
                      y % ssmt1(n) % t(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &
@@ -408,16 +408,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(ssmt2) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmt2)            
-         if (iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ssmt2)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt2', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(ssmt2)
-            if (iv%ssmt2(n)%loc%proc_domain) then
+            if (iv%info(ssmt2)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % ssmt2(n) % info % levels
-               do k = 1, iv % ssmt2(n) % info % levels
+               write(ounit,'(i8)')iv%info(ssmt2)%levels(n)
+               do k = 1, iv%info(ssmt2)%levels(n)
                   call da_check_missing(iv%ssmt2(n)%rh(k)%qc, &
                   y % ssmt2(n) % rh(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &
@@ -433,13 +433,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(qscat) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(qscat)            
-         if (iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(qscat)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'qscat', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(qscat)
-            if (iv%qscat(n)%loc%proc_domain) then
+            if (iv%info(qscat)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%qscat(n)%u%qc, y%qscat(n)%u, f1)
@@ -456,16 +456,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(profiler) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(profiler)            
-         if (iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(profiler)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'profiler', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(profiler)
-            if (iv%profiler(n)%loc%proc_domain) then
+            if (iv%info(profiler)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % profiler(n) % info % levels
-               do k = 1, iv % profiler(n) % info % levels
+               write(ounit,'(i8)')iv%info(profiler)%levels(n)
+               do k = 1, iv%info(profiler)%levels(n)
                   call da_check_missing(iv%profiler(n)%u(k)%qc, &
                      y%profiler(n)%u(k), f1)
                   call da_check_missing(iv%profiler(n)%v(k)%qc, &
@@ -483,13 +483,13 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(buoy) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(buoy)            
-         if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(buoy)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'buoy', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(buoy)
-            if (iv%buoy(n)%loc%proc_domain) then
+            if (iv%info(buoy)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                call da_check_missing(iv%buoy(n)%u%qc, y%buoy(n)%u, f1)
@@ -509,18 +509,18 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(bogus) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(bogus)            
-         if (iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(bogus)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'bogus', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(bogus)
-            if (iv%bogus(n)%loc%proc_domain) then
+            if (iv%info(bogus)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, dum,dum,dum,dum,dum,dum
-               write(ounit,'(i8)')iv % bogus(n) % info % levels
-               do k = 1, iv % bogus(n) % info % levels
+               write(ounit,'(i8)')iv%info(bogus)%levels(n)
+               do k = 1, iv%info(bogus)%levels(n)
                   call da_check_missing(iv%bogus(n)%u(k)%qc, y%bogus(n)%u(k), f2)
                   call da_check_missing(iv%bogus(n)%v(k)%qc, y%bogus(n)%v(k), f3)
                   call da_check_missing(iv%bogus(n)%t(k)%qc, y%bogus(n)%t(k), f4)
@@ -538,16 +538,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(airsr) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(airsr)
-         if (iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(airsr)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airsr', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(airsr)
-            if (iv%airsr(n)%loc%proc_domain) then
+            if (iv%info(airsr)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % airsr(n) % info % levels
-               do k = 1, iv % airsr(n) % info % levels
+               write(ounit,'(i8)')iv%info(airsr)%levels(n)
+               do k = 1, iv%info(airsr)%levels(n)
                   call da_check_missing(iv%airsr(n)%t(k)%qc, y%airsr(n)%t(k), f1)
                   call da_check_missing(iv%airsr(n)%q(k)%qc, y%airsr(n)%q(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum, dum, &
@@ -567,7 +567,7 @@ subroutine da_write_y (iv, y)
             ! Counting number of obs for channel k
             num_obs = 0
             do n = 1,iv%instid(i)%num_rad      ! loop for pixel
-               if (iv%instid(i)%proc_domain(n) .and. &
+               if (iv%instid(i)%info%proc_domain(1,n) .and. &
                   (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                   num_obs = num_obs + 1
                end if
@@ -579,7 +579,7 @@ subroutine da_write_y (iv, y)
 
             num_obs = 0
             do n= 1, iv%instid(i)%num_rad      ! loop for pixel
-              if(iv%instid(i)%proc_domain(n) .and. &
+              if(iv%instid(i)%info%proc_domain(1,n) .and. &
                  (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                     num_obs = num_obs + 1
                     write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(i)%tb(k,n)
@@ -594,16 +594,16 @@ subroutine da_write_y (iv, y)
    if (iv % nlocal(gpsref) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(gpsref)
-         if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(gpsref)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'gpsref', num_obs
          num_obs = 0
          do n = 1, iv % nlocal(gpsref)
-            if (iv%gpsref(n)%loc%proc_domain) then
+            if (iv%info(gpsref)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % gpsref(n) % info % levels
-               do k = 1, iv % gpsref(n) % info % levels
+               write(ounit,'(i8)')iv%info(gpsref)%levels(n)
+               do k = 1, iv%info(gpsref)%levels(n)
                   call da_check_missing(iv%gpsref(n)%ref(k)%qc, y%gpsref(n)%ref(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum, dum, dum, dum, dum,dum
                end do

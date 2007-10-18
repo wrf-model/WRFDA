@@ -57,13 +57,13 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(synop) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(synop)
-       if(iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(synop)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'synop', num_obs   
       num_obs = 0 
 
       do n = 1, iv % nlocal(synop)
-       if(iv%synop(n)%loc%proc_domain) then
+       if(iv%info(synop)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')  1
 !        Add random perturbation:
@@ -88,12 +88,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(metar) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(metar)
-       if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(metar)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'metar', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(metar)
-       if(iv%metar(n)%loc%proc_domain) then
+       if(iv%info(metar)%proc_domain(1,n)) then
          num_obs = num_obs + 1 
          write(ounit,'(i8)')  1
 !        Add random perturbation:
@@ -119,12 +119,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(ships) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(ships)
-       if(iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(ships)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ships', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(ships) 
-       if(iv%ships(n)%loc%proc_domain) then
+       if(iv%info(ships)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)')  1
 !        Add random perturbation:
@@ -150,15 +150,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(geoamv) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(geoamv)
-       if(iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(geoamv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'geoamv', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(geoamv)
-       if(iv%geoamv(n)%loc%proc_domain) then
+       if(iv%info(geoamv)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % geoamv(n) % info % levels
-         do k = 1, iv % geoamv(n) % info % levels
+         write(ounit,'(i8)')iv%info(geoamv)%levels(n)
+         do k = 1, iv%info(geoamv)%levels(n)
 !        Add random perturbation:
             call da_add_noise( iv % geoamv(n) % u(k), ob % geoamv(n) % u(k), z1)
             call da_add_noise( iv % geoamv(n) % v(k), ob % geoamv(n) % v(k), z2)
@@ -178,15 +178,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(polaramv) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(polaramv)
-       if(iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
+       if (iv%info(polaramv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'polaramv', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(polaramv)
-       if(iv%polaramv(n)%loc%proc_domain) then
+       if (iv%info(polaramv)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % polaramv(n) % info % levels
-         do k = 1, iv % polaramv(n) % info % levels
+         write(ounit,'(i8)')iv%info(polaramv)%levels(n)
+         do k = 1, iv%info(polaramv)%levels(n)
 !        Add random perturbation:
             call da_add_noise( iv % polaramv(n) % u(k), ob % polaramv(n) % u(k), z1)
             call da_add_noise( iv % polaramv(n) % v(k), ob % polaramv(n) % v(k), z2)
@@ -206,12 +206,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(gpspw) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(gpspw)
-       if(iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(gpspw)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'gpspw', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(gpspw)
-       if(iv%gpspw(n)%loc%proc_domain) then
+       if(iv%info(gpspw)%proc_domain(1,n)) then
         num_obs = num_obs + 1
         write(ounit,'(i8)')  1
 !        Add random perturbation:
@@ -229,15 +229,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(sound) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-       if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'sound', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(sound)
-       if(iv%sound(n)%loc%proc_domain) then
+       if(iv%info(sound)%proc_domain(1,n)) then
           num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % sound(n) % info % levels
-         do k = 1, iv % sound(n) % info % levels
+         write(ounit,'(i8)')iv%info(sound)%levels(n)
+         do k = 1, iv%info(sound)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % sound(n) % u(k), ob % sound(n) % u(k), z1)
             call da_add_noise( iv % sound(n) % v(k), ob % sound(n) % v(k), z2)
@@ -257,12 +257,12 @@ subroutine da_add_noise_to_ob( iv, ob )
 ! Now do surface level
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-       if(iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'sonde_sfc', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(sound)
-       if(iv%sound(n)%loc%proc_domain) then
+       if(iv%info(sound)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
 !           Add random perturbation:
@@ -287,15 +287,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(airep) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(airep)
-       if(iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(airep)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'airep', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(airep)
-       if(iv%airep(n)%loc%proc_domain)then
+       if (iv%info(airep)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % airep(n) % info % levels
-         do k = 1, iv % airep(n) % info % levels
+         write(ounit,'(i8)')iv%info(airep)%levels(n)
+         do k = 1, iv%info(airep)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % airep(n) % u(k), ob % airep(n) % u(k), z1)
             call da_add_noise( iv % airep(n) % v(k), ob % airep(n) % v(k), z2)
@@ -317,15 +317,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(pilot) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(pilot)
-       if(iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(pilot)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'pilot', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(pilot)
-       if(iv%pilot(n)%loc%proc_domain) then
+       if(iv%info(pilot)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % pilot(n) % info % levels
-         do k = 1, iv % pilot(n) % info % levels
+         write(ounit,'(i8)') iv%info(pilot)%levels(n)
+         do k = 1, iv%info(pilot)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % pilot(n) % u(k), ob % pilot(n) % u(k), z1)
             call da_add_noise( iv % pilot(n) % v(k), ob % pilot(n) % v(k), z2)
@@ -345,12 +345,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(ssmi_rv) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_rv)
-       if(iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(ssmi_rv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmir', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(ssmi_rv)
-       if(iv%ssmi_rv(n)%loc%proc_domain) then
+       if(iv%info(ssmi_rv)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1 
  
@@ -371,12 +371,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(ssmi_tb) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_tb)
-       if(iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(ssmi_tb)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmiT', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(ssmi_tb)
-       if(iv%ssmi_tb(n)%loc%proc_domain) then
+       if(iv%info(ssmi_tb)%proc_domain(1,n)) then
          num_obs = num_obs + 1
 !        Add random perturbation:
          call da_add_noise( iv % ssmi_tb(n) % tb19h, &
@@ -439,17 +439,17 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(ssmt1) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmt1)
-       if(iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(ssmt1)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmt1', num_obs   
       num_obs = 0 
 
       do n = 1, iv % nlocal(ssmt1)
-       if(iv%ssmt1(n)%loc%proc_domain) then
+       if(iv%info(ssmt1)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % ssmt1(n) % info % levels
+         write(ounit,'(i8)')iv%info(ssmt1)%levels(n)
          
-         do k = 1, iv % ssmt1(n) % info % levels
+         do k = 1, iv%info(ssmt1)%levels(n)
 
 !           Add random perturbation:
             call da_add_noise( iv % ssmt1(n) % t(k), &
@@ -467,17 +467,17 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(ssmt2) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmt2)
-       if(iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(ssmt2)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'ssmt2', num_obs   
       num_obs = 0 
 
       do n = 1, iv % nlocal(ssmt2)
-       if(iv%ssmt2(n)%loc%proc_domain) then
+       if(iv%info(ssmt2)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % ssmt2(n) % info % levels
+         write(ounit,'(i8)')iv%info(ssmt2)%levels(n)
          
-         do k = 1, iv % ssmt2(n) % info % levels
+         do k = 1, iv%info(ssmt2)%levels(n)
 
 !           Add random perturbation:
             call da_add_noise( iv % ssmt2(n) % rh(k), &
@@ -495,12 +495,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(qscat) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(qscat)
-       if(iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(qscat)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'qscat', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(qscat)
-       if(iv%qscat(n)%loc%proc_domain) then
+       if(iv%info(qscat)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
 !        Add random perturbation:
@@ -521,12 +521,12 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(buoy) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(buoy)
-       if(iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(buoy)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'buoy', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(buoy)
-       if(iv%buoy(n)%loc%proc_domain) then
+       if(iv%info(buoy)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
 !        Add random perturbation:
@@ -552,15 +552,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(profiler) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(profiler)
-       if(iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
+         if(iv%info(profiler)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'profiler', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(profiler)
-       if(iv%profiler(n)%loc%proc_domain) then
+       if(iv%info(profiler)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % profiler(n) % info % levels
-         do k = 1, iv % profiler(n) % info % levels
+         write(ounit,'(i8)')iv%info(profiler)%levels(n)
+         do k = 1, iv%info(profiler)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % profiler(n) % u(k), ob % profiler(n) % u(k), z1)
             call da_add_noise( iv % profiler(n) % v(k), ob % profiler(n) % v(k), z2)
@@ -579,13 +579,13 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(bogus) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(bogus)
-       if(iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(bogus)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'bogus', num_obs   
       num_obs = 0 
 
       do n = 1, iv % nlocal(bogus)
-       if(iv%bogus(n)%loc%proc_domain) then
+       if(iv%info(bogus)%proc_domain(1,n)) then
          num_obs = num_obs + 1
          write(ounit,'(i8)') 1
          call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z1 )
@@ -593,8 +593,8 @@ subroutine da_add_noise_to_ob( iv, ob )
                                   iv % bogus(n) % slp % error, z1, &
                                   dum, dum, dum, dum, dum, dum, dum, dum
 
-         write(ounit,'(i8)')iv % bogus(n) % info % levels
-         do k = 1, iv % bogus(n) % info % levels
+         write(ounit,'(i8)')iv%info(bogus)%levels(n)
+         do k = 1, iv%info(bogus)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
             call da_add_noise( iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
@@ -618,15 +618,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(airsr) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(airsr)
-       if(iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(airsr)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'airsr', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(airsr)
-       if(iv%airsr(n)%loc%proc_domain) then
+       if(iv%info(airsr)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % airsr(n) % info % levels
-         do k = 1, iv % airsr(n) % info % levels
+         write(ounit,'(i8)')iv%info(airsr)%levels(n)
+         do k = 1, iv%info(airsr)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % airsr(n) % t(k), ob % airsr(n) % t(k), z1)
             call da_add_noise( iv % airsr(n) % q(k), ob % airsr(n) % q(k), z2)
@@ -646,15 +646,15 @@ subroutine da_add_noise_to_ob( iv, ob )
    if ( iv % nlocal(gpsref) > 0 ) then
       num_obs = 0
       do n = 1, iv % nlocal(gpsref)
-       if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+       if(iv%info(gpsref)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       write(ounit,'(a20,i8)')'gpsref', num_obs   
       num_obs = 0 
       do n = 1, iv % nlocal(gpsref)
-       if(iv%gpsref(n)%loc%proc_domain) then
+       if(iv%info(gpsref)%proc_domain(1,n)) then
          num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % gpsref(n) % info % levels
-         do k = 1, iv % gpsref(n) % info % levels
+         write(ounit,'(i8)')iv%info(gpsref)%levels(n)
+         do k = 1, iv%info(gpsref)%levels(n)
 !           Add random perturbation:
             call da_add_noise( iv % gpsref(n) % ref(k), ob % gpsref(n) % ref(k), z1)
 !           Write out data:
@@ -678,7 +678,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 !  Counting number of obs for channle k
          num_obs = 0
          do n = 1,iv%instid(i)%num_rad      ! loop for pixel
-           if(iv%instid(i)%proc_domain(n) .and. &
+           if(iv%instid(i)%info%proc_domain(1,n) .and. &
               (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                 num_obs = num_obs + 1
               end if
@@ -690,7 +690,7 @@ subroutine da_add_noise_to_ob( iv, ob )
 
          num_obs = 0
          do n= 1, iv%instid(i)%num_rad      ! loop for pixel
-               if(iv%instid(i)%proc_domain(n) .and. &
+               if(iv%instid(i)%info%proc_domain(1,n) .and. &
                   (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                      num_obs = num_obs + 1
                      call da_add_noise_new( iv%instid(i)%tb_qc(k,n), &

@@ -16,7 +16,7 @@ subroutine da_calculate_grady_ssmt1(iv, re, jo_grad_y)
 
    if (iv%nlocal(ssmt1) > 0) then  
       do n=1, iv%nlocal(ssmt1)
-         do k=1, iv%ssmt1(n)%info%levels
+         do k=1, iv%info(ssmt1)%levels(n)
             if (iv%ssmt1(n)%t(k)%qc < obs_qc_pointer) re%ssmt1(n)%t(k) = 0.0
             jo_grad_y%ssmt1(n)%t(k) = -re%ssmt1(n)%t(k) / &
                 (iv%ssmt1(n)%t(k)%error * iv%ssmt1(n)%t(k)%error)

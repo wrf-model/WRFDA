@@ -149,6 +149,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    ob%ntotal(:) = 0
    ob%num_inst  = 0
 
+   iv%info(:)%max_lev = 0
+
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
       if (ob_format == ob_format_bufr) then
@@ -166,6 +168,14 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
       call da_setup_bufrtovs_structures(grid, ob, iv)
    end if
+
+   iv%info(:)%nlocal=iv%nlocal(:)
+   iv%info(:)%ntotal=iv%ntotal(:)
+
+   do j=1,num_ob_indexes
+      iv%info(j)%plocal(:)=iv%plocal(:,j)
+      iv%info(j)%ptotal(:)=iv%ptotal(:,j)
+   end do
 
    ! Summarize observations 
 

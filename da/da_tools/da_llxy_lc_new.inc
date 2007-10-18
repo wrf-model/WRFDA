@@ -1,4 +1,4 @@
-subroutine da_llxy_lc_new(lat, lon, proj, x, y)
+subroutine da_llxy_lc_new(proj, info)
 
    !-----------------------------------------------------------------------
    ! Purpose: compute the geographical latitude and longitude values
@@ -7,12 +7,8 @@ subroutine da_llxy_lc_new(lat, lon, proj, x, y)
     
    implicit none
 
-   real, intent(in)              :: lat(:,:)      ! Latitude (-90->90 deg N)
-   real, intent(in)              :: lon(:,:)      ! Longitude (-180->180 E)
-   type(proj_info),intent(in)      :: proj     ! Projection info structure
-
-   real, intent(out)             :: x(:,:)        ! Cartesian X coordinate
-   real, intent(out)             :: y(:,:)        ! Cartesian Y coordinate
+   type(proj_info), intent(in)    :: proj     ! Projection info structure
+   type(infa_type), intent(inout) :: info
 
 
    real    :: tl1r
@@ -20,8 +16,7 @@ subroutine da_llxy_lc_new(lat, lon, proj, x, y)
    real    :: temp2
    real    :: ctl1r
    real    :: deltalon, rm, arg
-
-   integer :: a,b
+   integer :: n
 
    if (trace_use) call da_trace_entry("da_llxy_lc_new")
 
@@ -65,38 +60,35 @@ subroutine da_llxy_lc_new(lat, lon, proj, x, y)
 
 ! SLOW
 
-   do a=lbound(lat,1), ubound(lat,1)
-      do b=lbound(lat,2), ubound(lat,2)
+   do n=lbound(info%lat,2), ubound(info%lat,2)
+      ! Compute deltalon between known longitude and standard lon and ensure
+      ! it is not in the cut zone
+      deltalon = info%lon(1,n) - proj%stdlon
+      if (deltalon > +180.0) deltalon = deltalon - 360.0
+      if (deltalon < -180.0) deltalon = deltalon + 360.0
 
-	 ! Compute deltalon between known longitude and standard lon and ensure
-	 ! it is not in the cut zone
-	 deltalon = lon(a,b) - proj%stdlon
-	 if (deltalon > +180.0) deltalon = deltalon - 360.0
-	 if (deltalon < -180.0) deltalon = deltalon + 360.0
+      ! Convert truelat1 to radian and compute COS for later use
+      tl1r = proj%truelat1 * rad_per_deg
+      ctl1r = COS(tl1r)     
 
-	 ! Convert truelat1 to radian and compute COS for later use
-	 tl1r = proj%truelat1 * rad_per_deg
-	 ctl1r = COS(tl1r)     
+      ! Radius to desired point
+      rm = proj%rebydx * ctl1r/proj%cone * &
+          (TAN((90.0*proj%hemi-info%lat(1,n))*rad_per_deg/2.0) / &
+           TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
-	 ! Radius to desired point
-	 rm = proj%rebydx * ctl1r/proj%cone * &
-	     (TAN((90.0*proj%hemi-lat(a,b))*rad_per_deg/2.0) / &
-              TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
+      arg = proj%cone*(deltalon*rad_per_deg)
+      info%x(:,n) = proj%polei + proj%hemi * rm * Sin(arg)
+      info%y(:,n) = proj%polej - rm * COS(arg)
 
-	 arg = proj%cone*(deltalon*rad_per_deg)
-	 x(a,b) = proj%polei + proj%hemi * rm * Sin(arg)
-	 y(a,b) = proj%polej - rm * COS(arg)
-
-	 ! Finally, if we are in the southern hemisphere, flip the i/j
-	 ! values to a coordinate system where (1,1) is the SW corner
-	 ! (what we assume) which is different than the original NCEP
-	 ! algorithms which used the NE corner as the origin in the 
-	 ! southern hemisphere (left-hand vs. right-hand coordinate?)
-	 if (proj%hemi == -1.0) then
-	    x(a,b) = 2.0 - x(a,b)  
-	    y(a,b) = 2.0 - y(a,b)
-	 end if
-      end do
+      ! Finally, if we are in the southern hemisphere, flip the i/j
+      ! values to a coordinate system where (1,1) is the SW corner
+      ! (what we assume) which is different than the original NCEP
+      ! algorithms which used the NE corner as the origin in the 
+      ! southern hemisphere (left-hand vs. right-hand coordinate?)
+      if (proj%hemi == -1.0) then
+         info%x(:,n) = 2.0 - info%x(:,n)  
+	 info%y(:,n) = 2.0 - info%y(:,n)
+      end if
    end do
 
    if (trace_use) call da_trace_exit("da_llxy_lc_new")

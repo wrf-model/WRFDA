@@ -20,13 +20,12 @@ subroutine da_residual_airep(iv, y, re, np_missing, np_bad_data,np_obs_used, np_
 
    if (trace_use_dull) call da_trace_entry("da_residual_airep")
 
-
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
    n_obs_bad % t % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(airep)
-      do k=1, iv%airep(n)%info%levels
+      do k=1, iv%info(airep)%levels(n)
          np_available = np_available + 3
          re%airep(n)%u(k) = da_residual(n, k, y%airep(n)%u(k), iv%airep(n)%u(k), n_obs_bad % u)
          re%airep(n)%v(k) = da_residual(n, k, y%airep(n)%v(k), iv%airep(n)%v(k), n_obs_bad % v)

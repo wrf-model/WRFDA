@@ -1,4 +1,4 @@
-subroutine da_llxy_new (info, loc, outside, outside_all)
+subroutine da_llxy_new (info, outside, outside_all)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,44 +8,42 @@ subroutine da_llxy_new (info, loc, outside, outside_all)
 
    implicit none
 
-   type(info_type_new),       intent(in)    :: info
-   type(model_loc_type_new),  intent(inout) :: loc
-   logical,               intent(inout) :: outside(:,:)      ! wrt local domain
-   logical, optional,     intent(out)   :: outside_all(:,:)  ! wrt all domains
+   type(infa_type),   intent(inout) :: info
+   logical,           intent(inout) :: outside(:,:)      ! wrt local domain
+   logical, optional, intent(out)   :: outside_all(:,:)  ! wrt all domains
 
    if (trace_use) call da_trace_entry("da_llxy_new")
 
    outside(:,:) = .false.
-   loc%x(:,:)   = -1.0
-   loc%y(:,:)   = -1.0
+   info%x(:,:)   = -1.0
+   info%y(:,:)   = -1.0
    
    ! get the (x, y) coordinates
 
    if (fg_format == fg_format_wrf) then
-      call da_llxy_wrf_new(map_info, info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_wrf_new(map_info, info)
    else if (fg_format == fg_format_kma_global) then
-      call da_llxy_kma_global_new (info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_kma_global_new (info)
    else
-      call da_llxy_default_new (info%lat, info%lon, loc%x, loc%y)
+      call da_llxy_default_new (info)
    end if
 
-   call da_togrid_new (loc%x, its-2, ite+2, loc%i, loc%dx, loc%dxm)
-
-   call da_togrid_new (loc%y, jts-2, jte+2, loc%j, loc%dy, loc%dym)
+   call da_togrid_new (info%x, its-2, ite+2, info%i, info%dx, info%dxm)
+   call da_togrid_new (info%y, jts-2, jte+2, info%j, info%dy, info%dym)
 
    ! refactor to remove this ugly duplication later
    if (present(outside_all)) then
       outside_all(:,:) = .false.
       ! Do not check for global options 
       if (.not. global) then 
-         where ((int(loc%x(:,:)) < ids) .or. (int(loc%x(:,:)) >= ide) .or. &
-            (int(loc%y(:,:)) < jds) .or. (int(loc%y(:,:)) >= jde))
+         where ((int(info%x(:,:)) < ids) .or. (int(info%x(:,:)) >= ide) .or. &
+            (int(info%y(:,:)) < jds) .or. (int(info%y(:,:)) >= jde))
             outside_all(:,:) = .true. 
             outside(:,:) = .true. 
          end where
          if (def_sub_domain) then
-            where (x_start_sub_domain > loc%x(:,:) .or. y_start_sub_domain > loc%y(:,:) .or. &
-                x_end_sub_domain   < loc%x(:,:) .or. y_end_sub_domain   < loc%y(:,:))
+            where (x_start_sub_domain > info%x(:,:) .or. y_start_sub_domain > info%y(:,:) .or. &
+                x_end_sub_domain   < info%x(:,:) .or. y_end_sub_domain   < info%y(:,:))
                outside_all(:,:) = .true.
                outside(:,:) = .true. 
             end where
@@ -54,14 +52,14 @@ subroutine da_llxy_new (info, loc, outside, outside_all)
    end if
 
    if (fg_format == fg_format_kma_global) then
-      where ((loc%j(:,:) < jts-1) .or. (loc%j(:,:)  > jte))
+      where ((info%j(:,:) < jts-1) .or. (info%j(:,:)  > jte))
          outside(:,:) = .true.
       end where
 
-      where (loc%j(:,:) == jde)
-         loc%j(:,:) = loc%j(:,:) - 1
-         loc%dy(:,:)  = 1.0
-         loc%dym(:,:) = 0.0
+      where (info%j(:,:) == jde)
+         info%j(:,:) = info%j(:,:) - 1
+         info%dy(:,:)  = 1.0
+         info%dym(:,:) = 0.0
       end where
 
       return
@@ -69,20 +67,20 @@ subroutine da_llxy_new (info, loc, outside, outside_all)
 
    ! Check for edge of domain:
 
-   where ((loc%i(:,:) < ids) .or. (loc%i(:,:) >= ide) .or. &
-      (loc%j(:,:) < jds) .or. (loc%j(:,:) >= jde))
+   where ((info%i(:,:) < ids) .or. (info%i(:,:) >= ide) .or. &
+      (info%j(:,:) < jds) .or. (info%j(:,:) >= jde))
       outside     = .true. 
    end where
 
    ! FIX? hack
-   where ((loc%i(:,:) < its-1) .or. (loc%i(:,:) > ite) .or. &
-      (loc%j(:,:) < jts-1) .or. (loc%j(:,:) > jte))
+   where ((info%i(:,:) < its-1) .or. (info%i(:,:) > ite) .or. &
+      (info%j(:,:) < jts-1) .or. (info%j(:,:) > jte))
       outside(:,:) = .true.
    end where
 
    if (def_sub_domain) then
-      where (x_start_sub_domain > loc%x(:,:) .or. y_start_sub_domain > loc%y(:,:) .or. &
-             x_end_sub_domain   < loc%x(:,:) .or. y_end_sub_domain   < loc%y(:,:))
+      where (x_start_sub_domain > info%x(:,:) .or. y_start_sub_domain > info%y(:,:) .or. &
+             x_end_sub_domain   < info%x(:,:) .or. y_end_sub_domain   < info%y(:,:))
          outside = .true.
       end where 
    end if

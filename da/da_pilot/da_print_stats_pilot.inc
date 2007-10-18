@@ -22,13 +22,13 @@ subroutine da_print_stats_pilot(stats_unit, nu, nv, Pilot)
    if (nv < 1) nv = 1
 
    write(unit=stats_unit, fmt='((a,2(f12.4,2i5)))') &
-       ' Minimum(n,k): ', Pilot%minimum%u, Pilot%minimum%v, &
-       ' Maximum(n,k): ', Pilot%maximum%u, Pilot%maximum%v
+       ' Minimum(n,k): ', pilot%minimum%u, pilot%minimum%v, &
+       ' Maximum(n,k): ', pilot%maximum%u, pilot%maximum%v
    write(unit=stats_unit, fmt='((a,2(f12.4,10x)))')  &
-      ' Average     : ', Pilot%average%u/real(nu), &
-                         Pilot%average%v/real(nv),      &
-      '    RMSE     : ', sqrt(Pilot%rms_err%u/real(nu)), &
-                         sqrt(Pilot%rms_err%v/real(nv))
+      ' Average     : ', pilot%average%u/real(nu), &
+                         pilot%average%v/real(nv),      &
+      '    RMSE     : ', sqrt(pilot%rms_err%u/real(nu)), &
+                         sqrt(pilot%rms_err%v/real(nv))
 
    if (trace_use_dull) call da_trace_exit("da_print_stats_pilot")
 

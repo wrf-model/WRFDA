@@ -42,17 +42,17 @@ subroutine da_write_filtered_rad(ob, iv)
 
       do n =1,iv%instid(i)%num_rad
          write(unit=filtered_rad_unit) n, &
-                   iv%instid(i)%info(n)%date_char, &
-                   iv%instid(i)%scanpos(n)       , &
-                   iv%instid(i)%ifgat(n)         , &
-                   iv%instid(i)%landsea_mask(n)  , &
-                   iv%instid(i)%info(n)%elv      , &
-                   iv%instid(i)%info(n)%lat      , &
-                   iv%instid(i)%info(n)%lon      , &
-                   iv%instid(i)%satzen(n)        , &
-                   iv%instid(i)%satazi(n)        , &
-                   ob%instid(i)%tb(:,n)         , &
-                   iv%instid(i)%tb_error(:,n)   , &
+                   iv%instid(i)%info%date_char(n), &
+                   iv%instid(i)%scanpos(n)        , &
+                   iv%instid(i)%ifgat(n)          , &
+                   iv%instid(i)%landsea_mask(n)   , &
+                   iv%instid(i)%info%elv(n)   , &
+                   iv%instid(i)%info%lat(1,n) , &
+                   iv%instid(i)%info%lon(1,n) , &
+                   iv%instid(i)%satzen(n)         , &
+                   iv%instid(i)%satazi(n)         , &
+                   ob%instid(i)%tb(:,n)           , &
+                   iv%instid(i)%tb_error(:,n)     , &
                    iv%instid(i)%tb_qc(:,n)
 
       end do     ! end do pixels

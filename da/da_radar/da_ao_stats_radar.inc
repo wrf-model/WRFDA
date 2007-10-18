@@ -28,8 +28,8 @@ subroutine da_ao_stats_radar (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(radar)
-      if (iv%radar(n)%loc%proc_domain) then
-         do k=1, iv%radar(n)%info%levels
+      if (iv%info(radar)%proc_domain(1,n)) then
+         do k=1, iv%info(radar)%levels(n)
             if (use_radar_rv) then
                call da_stats_calculate (n, k, iv%radar(n)%rv(k)%qc, & 
                   re%radar(n)%rv(k), nrv, & 

@@ -26,7 +26,7 @@ subroutine da_residual_sound(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % q % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(sound)
-      do k=1, iv%sound(n)%info%levels
+      do k=1, iv%info(sound)%levels(n)
          np_available = np_available + 4
 
          re%sound(n)%u(k) = da_residual(n, k, y%sound(n)%u(k), iv%sound(n)%u(k), n_obs_bad % u)

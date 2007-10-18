@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_metar(it, metar, &
-             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_metar(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,11 +6,12 @@ subroutine da_check_max_iv_metar(it, metar, &
 
    implicit none
 
-   integer, intent(in)                    :: it    ! outer iteration
-   type (synop_type), intent(inout)       :: metar
-   integer, intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it    ! outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-   logical                                :: failed
+   logical :: failed
+   integer :: n,n1,n2
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -35,34 +35,18 @@ subroutine da_check_max_iv_metar(it, metar, &
    !---------------------------------------------------------------------------
 
    failed = .false.
+   
+   n1 = iv%plocal(iv%time-1,metar) + 1
+   n2 = iv%plocal(iv%time,metar)
 
-   ! U-wind
-
-   call da_max_error_qc(it, metar % info, metar % u, &
-           max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-                         failed, check_max_iv_print)
-   ! V-wind
-
-   call da_max_error_qc (it, metar % info, metar % v,&
-           max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-                          failed, check_max_iv_print)                           
-   ! Pressure
-
-   call da_max_error_qc (it, metar % info, metar % p,&
-           max_error_p, itp, itpf, check_max_iv_unit, 'Press', &
-                          failed, check_max_iv_print)         
-
-   ! Temperature
-
-   call da_max_error_qc (it, metar % info, metar % t,&
-           max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
-                          failed, check_max_iv_print)
-
-   ! Mixing ratio, same ratio as relative humidity
-
-   call da_max_error_qc (it, metar % info, metar % q, &
-           max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
-                          failed, check_max_iv_print)
+   do n=n1,n2
+      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      ! Mixing ratio, same ratio as relative humidity
+      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   end do
 
 end subroutine da_check_max_iv_metar
 

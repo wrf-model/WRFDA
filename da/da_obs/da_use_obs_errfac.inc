@@ -74,7 +74,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('geoamv', iv % geoamv_ef_u, iv % geoamv_ef_v, d1, d2, d3)
 
       do n = 1, iv % nlocal(geoamv)
-        do k = 1, iv % geoamv(n) % info % levels
+        do k = 1, iv%info(geoamv)%levels(n)
          iv % geoamv(n) % u(k) % error = iv % geoamv(n) % u(k) % error * iv % geoamv_ef_u
          iv % geoamv(n) % v(k) % error = iv % geoamv(n) % v(k) % error * iv % geoamv_ef_v
         end do
@@ -88,7 +88,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('polaramv', iv % polaramv_ef_u, iv % polaramv_ef_v, d1, d2, d3)
 
       do n = 1, iv % nlocal(polaramv)
-        do k = 1, iv % polaramv(n) % info % levels
+        do k = 1, iv%info(polaramv)%levels(n)
          iv % polaramv(n) % u(k) % error = iv % polaramv(n) % u(k) % error * iv % polaramv_ef_u
          iv % polaramv(n) % v(k) % error = iv % polaramv(n) % v(k) % error * iv % polaramv_ef_v
         end do
@@ -117,7 +117,7 @@ subroutine da_use_obs_errfac(iv)
                            iv % sound_ef_t, iv % sound_ef_q, d1)
 
       do n = 1, iv % nlocal(sound)
-         do k = 1, iv % sound(n) % info % levels
+         do k = 1, iv%info(sound)%levels(n)
             iv % sound(n) % u(k) % error = iv % sound(n) % u(k) % error * &
                                            iv % sound_ef_u
             iv % sound(n) % v(k) % error = iv % sound(n) % v(k) % error * &
@@ -144,7 +144,7 @@ subroutine da_use_obs_errfac(iv)
                            iv % airep_ef_t, d1, d2)
 
       do n = 1, iv % nlocal(airep)
-         do k = 1, iv % airep(n) % info % levels
+         do k = 1, iv%info(airep)%levels(n)
             iv % airep(n) % u(k) % error = iv % airep(n) % u(k) % error * &
                                            iv % airep_ef_u
             iv % airep(n) % v(k) % error = iv % airep(n) % v(k) % error * &
@@ -162,7 +162,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('pilot', iv % pilot_ef_u, iv % pilot_ef_v, d1, d2, d3)
 
       do n = 1, iv % nlocal(pilot)
-         do k = 1, iv % pilot(n) % info % levels
+         do k = 1, iv%info(pilot)%levels(n)
             iv % pilot(n) % u(k) % error = iv % pilot(n) % u(k) % error * &
                                            iv % pilot_ef_u
             iv % pilot(n) % v(k) % error = iv % pilot(n) % v(k) % error * &
@@ -230,7 +230,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('ssmt1', iv % ssmt1_ef_t, d1, d2, d3, d4)
       
       do n = 1, iv % nlocal(ssmt1)
-         do k = 1, iv % ssmt1(n) % info % levels   
+         do k = 1, iv%info(ssmt1)%levels(n)   
             iv % ssmt1(n) % t(k) % error = iv % ssmt1(n) % t(k) % error * &
                                         iv % ssmt1_ef_t
          end do
@@ -243,7 +243,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('ssmt2', iv % ssmt2_ef_rh, d1, d2, d3, d4)
 
       do n = 1, iv % nlocal(ssmt2)
-         do k = 1, iv % ssmt2(n) % info % levels      
+         do k = 1, iv%info(ssmt2)%levels(n)      
             iv % ssmt2(n) % rh(k) % error = iv % ssmt2(n) % rh(k) % error * &
                                          iv % ssmt2_ef_rh
          end do
@@ -268,7 +268,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('profi', iv % profiler_ef_u, iv % profiler_ef_v, d1, d2, d3)
 
       do n = 1, iv % nlocal(profiler)
-         do k = 1, iv % profiler(n) % info % levels
+         do k = 1, iv%info(profiler)%levels(n)
             iv % profiler(n) % u(k) % error = iv % profiler(n) % u(k) % error * &
                                            iv % profiler_ef_u
             iv % profiler(n) % v(k) % error = iv % profiler(n) % v(k) % error * &
@@ -301,7 +301,7 @@ subroutine da_use_obs_errfac(iv)
                            iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp)
 
       do n = 1, iv % nlocal(bogus)
-         do k = 1, iv % bogus(n) % info % levels
+         do k = 1, iv%info(bogus)%levels(n)
             iv % bogus(n) % u(k) % error = iv % bogus(n) % u(k) % error * &
                                            iv % bogus_ef_u
             iv % bogus(n) % v(k) % error = iv % bogus(n) % v(k) % error * &
@@ -323,7 +323,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('airsr', iv % airsr_ef_t, iv % airsr_ef_q, d1, d3, d3)
 
       do n = 1, iv % nlocal(airsr)
-         do k = 1, iv % airsr(n) % info % levels
+         do k = 1, iv%info(airsr)%levels(n)
             iv % airsr(n) % t(k) % error = iv % airsr(n) % t(k) % error * &
                                            iv % airsr_ef_t
             iv % airsr(n) % q(k) % error = iv % airsr(n) % q(k) % error * &

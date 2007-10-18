@@ -51,11 +51,7 @@ module da_radiance
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       airsr_type,info_type, model_loc_type
-   use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
-      da_interp_lin_3d_adj,da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj, &
-      da_interp_lin_2d, da_interp_lin_2d_adj,da_interp_lin_2d_new, &
-      da_interp_lin_3d_new, da_interp_lin_3d_adj_new, &
-      da_to_zk_new, da_interp_lin_2d_adj_new
+   use da_interpolation, only : da_to_zk, da_to_zk_new
    use da_tools_serial, only : da_get_unit, da_free_unit
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
 #ifdef DM_PARALLEL
@@ -74,7 +70,7 @@ module da_radiance
    use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, &
-      da_llxy, da_togrid_new
+      da_llxy, da_llxy_new, da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer

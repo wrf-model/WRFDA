@@ -15,7 +15,7 @@ subroutine da_calculate_grady_radar(iv, re, jo_grad_y)
    if (trace_use) call da_trace_entry("da_calculate_grady_radar")
 
    do n=1, iv%nlocal(radar)
-      do k=1, iv%radar(n)%info%levels
+      do k=1, iv%info(radar)%levels(n)
          if (use_radar_rv) then
             if (iv%radar(n)%rv(k)%qc < obs_qc_pointer) then
                re%radar(n)%rv(k) = 0.0

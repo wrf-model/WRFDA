@@ -13,14 +13,24 @@ subroutine da_transform_xtoy_ssmi_rv_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    integer :: n
 
+   real, allocatable :: tpw(:)
+   real, allocatable :: speed(:)
+
    if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_rv_adj")
-        
-   do n=1, iv % nlocal(ssmi_rv)
-      call da_interp_lin_2d_adj(jo_grad_x%tpw, iv%ssmi_rv(n)%loc, &
-         jo_grad_y%ssmi_rv(n)%tpw)
-      call da_interp_lin_2d_adj(jo_grad_x%speed, iv%ssmi_rv(n)%loc, &
-         jo_grad_y%ssmi_rv(n)%speed)
+
+   allocate (tpw(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
+   allocate (speed(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
+
+   do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
+      tpw(n)   = jo_grad_y%ssmi_rv(n)%tpw
+      speed(n) = jo_grad_y%ssmi_rv(n)%speed
    end do
+
+   call da_interp_lin_2d_adj_newest(jo_grad_x%tpw, iv%info(ssmi_rv), 1, tpw)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%speed, iv%info(ssmi_rv), 1, speed)
+   
+   deallocate (tpw)
+   deallocate (speed)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_ssmi_rv_adj")
 

@@ -15,7 +15,7 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(iv, y, adjtest_lhs, pertile_lhs)
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sonde_sfc")
 
    do n=1, iv%nlocal(sound)
-      if (iv%sonde_sfc(n)%zk < 1.0) then
+      if (iv%info(sound)%zk(1,n) < 1.0) then
          y%sonde_sfc(n)%u = 0.0
          y%sonde_sfc(n)%v = 0.0
          y%sonde_sfc(n)%t = 0.0
@@ -31,7 +31,7 @@ subroutine da_check_xtoy_adjoint_sonde_sfc(iv, y, adjtest_lhs, pertile_lhs)
       y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
       y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
 
-      if (iv%sonde_sfc(n)%loc%proc_domain) then
+      if (iv%info(sound)%proc_domain(1,n)) then
          adjtest_lhs = adjtest_lhs  &
                      + (y%sonde_sfc(n)%u)**2 &
                      + (y%sonde_sfc(n)%v)**2 &

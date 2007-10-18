@@ -136,25 +136,49 @@ subroutine da_transform_xtoy_ssmi_tb(grid, iv, y)
    !    end do
    ! end do
 
+   real, allocatable :: tb19v(:)
+   real, allocatable :: tb19h(:)
+   real, allocatable :: tb22v(:)
+   real, allocatable :: tb37v(:)
+   real, allocatable :: tb37h(:)
+   real, allocatable :: tb85v(:)
+   real, allocatable :: tb85h(:)
+
    if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_tb")
 
-   do n=1, iv % nlocal(ssmi_tb)
+   allocate(tb19v(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb19h(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb22v(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb37v(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb37h(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb85v(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
+   allocate(tb85v(iv%info(ssmi_tb)%n1:iv%info(ssmi_tb)%n2))
 
-      ! Interpolating from 4 grid points to obs location
+   call da_interp_lin_2d_newest (grid%xa%tb19v, iv%info(ssmi_tb), 1, tb19v)
+   call da_interp_lin_2d_newest (grid%xa%tb19h, iv%info(ssmi_tb), 1, tb19h)
+   call da_interp_lin_2d_newest (grid%xa%tb22v, iv%info(ssmi_tb), 1, tb22v)
+   call da_interp_lin_2d_newest (grid%xa%tb37v, iv%info(ssmi_tb), 1, tb37v)
+   call da_interp_lin_2d_newest (grid%xa%tb37h, iv%info(ssmi_tb), 1, tb37h)
+   call da_interp_lin_2d_newest (grid%xa%tb85v, iv%info(ssmi_tb), 1, tb85v)
+   call da_interp_lin_2d_newest (grid%xa%tb85h, iv%info(ssmi_tb), 1, tb85h)
 
-      ! if (grid%xb%landmask(i,j ) .eq. 0 .and. grid%xb%landmask(i+1,j ) .eq. 0 .and. &
-      !     grid%xb%landmask(i,j+1) .eq. 0 .and. grid%xb%landmask(i+1,j+1) .eq. 0) then       
-      !    ! only calculate over water
-
-      call da_interp_lin_2d(grid%xa%tb19v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb19v)
-      call da_interp_lin_2d(grid%xa%tb19h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb19h)
-      call da_interp_lin_2d(grid%xa%tb22v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb22v)
-      call da_interp_lin_2d(grid%xa%tb37v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb37v)
-      call da_interp_lin_2d(grid%xa%tb37h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb37h)
-      call da_interp_lin_2d(grid%xa%tb85v, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb85v)
-      call da_interp_lin_2d(grid%xa%tb85h, iv%ssmi_tb(n)%loc, y%ssmi_tb(n)%tb85h)
-      ! end if
+   do n=iv%info(ssmi_tb)%n1,iv%info(ssmi_tb)%n2
+      y%ssmi_tb(n)%tb19v = tb19v(n)
+      y%ssmi_tb(n)%tb19h = tb19h(n)
+      y%ssmi_tb(n)%tb22v = tb22v(n)
+      y%ssmi_tb(n)%tb37v = tb37v(n)
+      y%ssmi_tb(n)%tb37h = tb37h(n)
+      y%ssmi_tb(n)%tb85v = tb85v(n)
+      y%ssmi_tb(n)%tb85h = tb85h(n)
    end do
+
+   deallocate(tb19v)
+   deallocate(tb19h)
+   deallocate(tb22v)
+   deallocate(tb37v)
+   deallocate(tb37h)
+   deallocate(tb85v)
+   deallocate(tb85v)
     
    ! WHY?
    !          y%ssmi_tb(n)%tb19v = hor_interp(dxm,dx,dym,dy, &

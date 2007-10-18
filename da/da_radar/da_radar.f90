@@ -13,12 +13,12 @@ module da_radar
       far_below_model_surface,kms,kme,kts,kte, trace_use_frequent
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      radar_type, info_type, field_type
-   use da_interpolation, only : da_to_zk, da_interp_lin_3d,da_interp_lin_3d_adj
+      radar_type, info_type, field_type, infa_type
+   use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_residual, map_info, da_llxy_wrf, da_llxy_default
+   use da_tools, only : da_residual, map_info, da_llxy_wrf, da_llxy_default, da_convert_zk
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_radar_type" is ONLY used locally in da_radar:

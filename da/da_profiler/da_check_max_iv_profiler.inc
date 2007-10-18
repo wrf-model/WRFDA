@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_profiler(it, profiler, itu,ituf,itvv,itvvf)
+subroutine da_check_max_iv_profiler(iv, it, itu,ituf,itv,itvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_profiler(it, profiler, itu,ituf,itvv,itvvf)
 
    implicit none
 
-   integer,           intent (in)         :: it      ! Outer iteration 
-   type (pilot_type), intent(inout)       :: profiler
-   integer, intent(inout) :: itu,ituf,itvv,itvvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration 
+   integer,       intent(inout) :: itu,ituf,itv,itvf
 
-   integer :: k
+   integer :: k,n
    logical :: failed
    
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_profiler")
@@ -34,15 +34,13 @@ subroutine da_check_max_iv_profiler(it, profiler, itu,ituf,itvv,itvvf)
 
    failed = .false.
 
-   do k = 1, profiler % info % levels
-      ! U-wind
-      call da_max_error_qc(it, profiler % info, profiler % u(k), &
-         max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-         failed, check_max_iv_print)
-      ! V-wind
-      call da_max_error_qc (it, profiler % info, profiler % v(k),&
-         max_error_uv, itvv, itvvf, check_max_iv_unit, 'V   ', &
-         failed, check_max_iv_print)
+   do n = iv%info(profiler)%n1,iv%info(profiler)%n2
+      do k = 1, iv%info(profiler)%levels(n)
+         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%u(k), max_error_uv, itu, ituf, &
+            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
+      end do
    end do
    
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_profiler")

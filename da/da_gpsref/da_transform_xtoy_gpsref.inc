@@ -10,17 +10,21 @@ subroutine da_transform_xtoy_gpsref (grid, iv, y)
    type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
-   integer :: n        ! Loop counter.
-   integer :: num_levs ! obs vertical levels
+   integer :: n  ! Loop counter.
+
+   real, allocatable :: model_ref(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_gpsref")
 
-   do n=iv%plocal(iv%time-1,gpsref) + 1, &
-      iv%plocal(iv%time,gpsref)
-      num_levs = iv % gpsref(n) % info % levels
-      call da_interp_lin_3d(grid%xa%ref, iv%gpsref(n)%loc, y%gpsref(n)%ref, &
-         num_levs, iv%gpsref(n)%zk, num_levs)
+   allocate (model_ref(iv%info(gpsref)%max_lev,iv%info(gpsref)%n1:iv%info(gpsref)%n2))
+
+   call da_interp_lin_3d_newest (grid%xa%ref, iv%info(gpsref), model_ref)
+
+   do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
+      y%gpsref(n)%ref(:) = model_ref(1:iv%info(gpsref)%levels(n),n)
    end do
+
+   deallocate (model_ref)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_gpsref")
 

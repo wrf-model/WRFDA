@@ -34,8 +34,8 @@ subroutine da_ao_stats_sound (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(sound)
-      if (iv%sound(n)%loc%proc_domain) then
-         do k=1, iv%sound(n)%info%levels
+      do k=1, iv%info(sound)%levels(n)
+         if (iv%info(sound)%proc_domain(1,n)) then
             call da_stats_calculate (n, k, iv%sound(n)%u(k)%qc, & 
                re%sound(n)%u(k), nu, &
                stats%minimum%u, stats%maximum%u, &
@@ -52,8 +52,8 @@ subroutine da_ao_stats_sound (stats_unit, iv, re)
                re%sound(n)%q(k), nq, &
                stats%minimum%q, stats%maximum%q, &
                stats%average%q, stats%rms_err%q)
-         end do
-      end if
+         end if
+      end do
    end do
 
    ! Do inter-processor communication to gather statistics.
@@ -61,7 +61,6 @@ subroutine da_ao_stats_sound (stats_unit, iv, re)
    call da_proc_sum_int (nv)
    call da_proc_sum_int (nt)
    call da_proc_sum_int (nq)
-
    iv%nstats(sound) = nu + nv + nt + nq
 
    call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &

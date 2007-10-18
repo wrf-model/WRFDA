@@ -23,7 +23,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    integer                        :: k  ! Index dimension.
    integer                        :: num_rad  ! Number of radiance obs
    integer                        :: inst, nchanl, n
-   real                           :: q_ad
+   real, allocatable              :: q_ad(:)
 
    ! CRTM local varaibles and types
    integer :: wmo_sensor_id, Error_Status, Allocate_Status
@@ -33,7 +33,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    type (CRTM_GeometryInfo_type ) :: GeometryInfo(1)
    !type(CRTM_Options_type )      :: Options
 
-   type (model_loc_type) :: loc
+   real :: t(1),p(1)
 
 !---------------------------------------------------------
 
@@ -77,6 +77,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    do inst = 1, iv%num_inst                 ! loop for sensor
       if ( iv%instid(inst)%num_rad < 1 ) cycle
       num_rad = iv%instid(inst)%num_rad
+      allocate (q_ad(num_rad))
 
   ! CRTM channel information structure
       ! Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -264,30 +265,19 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
                  Atmosphere_AD(1)%Level_Pressure(Atmosphere(1)%n_layers)*0.01 
          Atmosphere_AD(1)%Absorber(:,1) = 1000.0*Atmosphere_AD(1)%Absorber(:,1) ! in g/kg
 
-            !-----------------------------------------------------
-            ! [1.6] Get horizontal interpolation weights:
-            !-----------------------------------------------------
-
-            loc%i = iv%instid(inst)%loc_i(n)
-            loc%j = iv%instid(inst)%loc_j(n)
-            loc%dx = iv%instid(inst)%loc_dx(n)
-            loc%dy = iv%instid(inst)%loc_dy(n)
-            loc%dxm = iv%instid(inst)%loc_dxm(n)
-            loc%dym = iv%instid(inst)%loc_dym(n)
-
             ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
 
-            do k=kts,kte ! from bottem to top
-               q_ad = Atmosphere_AD(1)%Absorber(kte-k+1,1)
-               if (Atmosphere(1)%pressure(kte-k+1) < 75.0) q_ad = 0.0
-               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), loc, &
-                  Atmosphere_AD(1)%Temperature(kte-k+1))
+            do k=kts,kte ! from bottom to top
+               q_ad(n) = Atmosphere_AD(1)%Absorber(kte-k+1,1)
+               if (atmosphere(1)%pressure(kte-k+1) < 75.0) q_ad(n) = 0.0
+               t(1)=Atmosphere_AD(1)%Temperature(kte-k+1)
+               call da_interp_lin_2d_adj_newer (jo_grad_x%t(:,:,k), iv%instid(inst)%info, k,n,n, t)
+               call da_interp_lin_2d_adj_newer (jo_grad_x%q(:,:,k), iv%instid(inst)%info, k,n,n, q_ad(n:n) )
 
-               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), loc, q_ad )
             end do
 
-               call da_interp_lin_2d_adj(jo_grad_x% psfc, loc,  &
-                  Atmosphere_AD(1)%Level_Pressure(Atmosphere(1)%n_layers) )
+            p(1) = Atmosphere_AD(1)%Level_Pressure(atmosphere(1)%n_layers)
+            call da_interp_lin_2d_adj_newer(jo_grad_x% psfc, iv%instid(inst)%info, 1,n,n, p)
 
                !if (n <=10 ) then
                !   write(6,'(15f8.2)') RTSolution(:,1)%brightness_temperature
@@ -325,7 +315,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Surface Structure"/))
          end if
-                                                                                                                          
+      deallocate (q_ad)
    end do        ! end loop for sensor
 
       !-------------------------------------------------------------------

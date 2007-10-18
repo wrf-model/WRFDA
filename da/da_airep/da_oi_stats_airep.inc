@@ -29,25 +29,25 @@ subroutine da_oi_stats_airep (stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(airep)
-      if (iv%airep(n)%loc%proc_domain) then
-         do k=1, iv%airep(n)%info%levels
-            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+      do k=1, iv%info(airep)%levels(n)
+         if (iv%info(airep)%proc_domain(k,n)) then
+            call da_stats_calculate(iv%info(airep)%obs_global_index(n), &
                k, iv%airep(n)%u(k)%qc, &
                iv%airep(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(airep)%obs_global_index(n), &
                k, iv%airep(n)%v(k)%qc, &
                iv%airep(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(iv%airep(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(airep)%obs_global_index(n), &
                k, iv%airep(n)%t(k)%qc, &
                iv%airep(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-         end do
-      end if    ! end if (iv%airep(n)%loc%proc_domain)
+         end if
+      end do
    end do
 
    ! do inter-processor communication to gather statistics.

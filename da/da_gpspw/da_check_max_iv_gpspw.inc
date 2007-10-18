@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
+subroutine da_check_max_iv_gpspw(iv, it, ittpw,ittpwf)
 
    !-------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,13 @@ subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (gpspw_type), intent(inout) :: gpspw
-   integer,           intent(inout) :: ittpw,ittpwf
+
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: ittpw,ittpwf
 
    logical :: failed 
+   integer :: n
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_gpspw")
 
@@ -29,8 +31,11 @@ subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
    failed = .false.
 
    ! TPW:
-   call da_max_error_qc(it, gpspw % info, gpspw % tpw, max_error_pw, ittpw, &
-     ittpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
+
+   do n=iv%info(gpspw)%n1,iv%info(gpspw)%n2
+      call da_max_error_qc_new(it, iv%info(gpspw), n, iv%gpspw(n)%tpw, max_error_pw, ittpw, &
+        ittpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
+   end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_gpspw")
 

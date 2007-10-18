@@ -37,19 +37,19 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(synop)
-      if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(synop)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
       do n = 1, iv % nlocal(synop)  
-         if (iv%synop(n)%loc%proc_domain) then
+         if (iv%info(synop)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1                                 
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-               num_obs , 1, iv % synop(n) % info % id, &  ! Station
-               iv % synop(n) % info % lat, &       ! Latitude
-               iv % synop(n) % info % lon, &       ! Longitude
+               num_obs , 1, iv%info(synop)%id(n), &  ! Station
+               iv%info(synop)%lat(1,n), &       ! Latitude
+               iv%info(synop)%lon(1,n), &       ! Longitude
                ob % synop(n) % p, &                ! Obs Pressure
                ob%synop(n)%u, iv%synop(n)%u, re%synop(n)%u, &! O, O-B, O-A u
                ob%synop(n)%v, iv%synop(n)%v, re%synop(n)%v, &! O, O-B, O-A v
@@ -62,19 +62,19 @@ subroutine da_write_obs(ob, iv, re)
 
   num_obs = 0
   do n = 1, iv % nlocal(metar)
-     if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+     if (iv%info(metar)%proc_domain(1,n)) num_obs = num_obs + 1
   end do
   if (num_obs > 0) then
      write(ounit,'(a20,i8)')'metar', num_obs  
      num_obs = 0
      do n = 1, iv % nlocal(metar)  
-        if (iv%metar(n)%loc%proc_domain) then
+        if (iv%info(metar)%proc_domain(1,n)) then
            num_obs = num_obs + 1
            write(ounit,'(i8)') 1                                 
            write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-              num_obs  , 1, iv % metar(n) % info % id, &  ! Station
-              iv % metar(n) % info % lat, &       ! Latitude
-              iv % metar(n) % info % lon, &       ! Longitude
+              num_obs  , 1, iv%info(metar)%id(n), &  ! Station
+              iv%info(metar)%lat(1,n), &       ! Latitude
+              iv%info(metar)%lon(1,n), &       ! Longitude
               ob % metar(n) % p, &                ! Obs Pressure
               ob%metar(n)%u, iv%metar(n)%u, re%metar(n)%u, &! O, O-B, O-A u
               ob%metar(n)%v, iv%metar(n)%v, re%metar(n)%v, &! O, O-B, O-A v
@@ -87,19 +87,19 @@ subroutine da_write_obs(ob, iv, re)
 
   num_obs = 0
   do n = 1, iv % nlocal(ships)
-     if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+     if (iv%info(ships)%proc_domain(1,n)) num_obs = num_obs + 1
   end do
   if (num_obs > 0) then
      write(ounit,'(a20,i8)')'ships', num_obs    
      num_obs = 0
      do n = 1, iv % nlocal(ships)  
-        if (iv%ships(n)%loc%proc_domain) then
+        if (iv%info(ships)%proc_domain(1,n)) then
            write(ounit,'(i8)') 1                                 
            num_obs = num_obs + 1
            write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-              num_obs,1, iv % ships(n) % info % id, &  ! Station
-              iv % ships(n) % info % lat, &       ! Latitude
-              iv % ships(n) % info % lon, &       ! Longitude
+              num_obs,1, iv%info(ships)%id(n), &  ! Station
+              iv%info(ships)%lat(1,n), &       ! Latitude
+              iv%info(ships)%lon(1,n), &       ! Longitude
               ob % ships(n) % p, &                ! Obs Pressure
               ob%ships(n)%u, iv%ships(n)%u, re%ships(n)%u, &! O, O-B, O-A u
               ob%ships(n)%v, iv%ships(n)%v, re%ships(n)%v, &! O, O-B, O-A v
@@ -112,20 +112,20 @@ subroutine da_write_obs(ob, iv, re)
 
   num_obs = 0
   do n = 1, iv % nlocal(geoamv)
-     if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+     if (iv%info(geoamv)%proc_domain(1,n)) num_obs = num_obs + 1
   end do
   if (num_obs > 0) then
      write(ounit,'(a20,i8)')'geoamv', num_obs    
      num_obs = 0
      do n = 1, iv % nlocal(geoamv)
-        if (iv%geoamv(n)%loc%proc_domain) then                  
+        if (iv%info(geoamv)%proc_domain(1,n)) then                  
            num_obs = num_obs + 1
-           write(ounit,'(i8)')iv % geoamv(n) % info % levels
-           do k = 1, iv % geoamv(n) % info % levels
+           write(ounit,'(i8)')iv%info(geoamv)%levels(n)
+           do k = 1, iv%info(geoamv)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs, 1, iv % geoamv(n) % info % id, &  ! Station
-                  iv % geoamv(n) % info % lat, &       ! Latitude
-                  iv % geoamv(n) % info % lon, &       ! Longitude
+                  num_obs, 1, iv%info(geoamv)%id(n), &  ! Station
+                  iv%info(geoamv)%lat(k,n), &       ! Latitude
+                  iv%info(geoamv)%lon(k,n), &       ! Longitude
                   iv % geoamv(n) % p(k), &                ! Obs Pressure
                   ob%geoamv(n)%u(k), iv%geoamv(n)%u(k), re%geoamv(n)%u(k), &! O, O-B, O-A u
                   ob%geoamv(n)%v(k), iv%geoamv(n)%v(k), re%geoamv(n)%v(k)
@@ -136,21 +136,21 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(polaramv)
-      if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(polaramv)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'polaramv', num_obs      
       num_obs = 0
       do n = 1, iv % nlocal(polaramv)
-         if (iv%polaramv(n)%loc%proc_domain) then                    
+         if (iv%info(polaramv)%proc_domain(1,n)) then                    
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % polaramv(n) % info % levels
-            do k = 1, iv % polaramv(n) % info % levels
+            write(ounit,'(i8)')iv%info(polaramv)%levels(n)
+            do k = 1, iv%info(polaramv)%levels(n)
                 write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                   num_obs, 1, iv % polaramv(n) % info % id, &  ! Station
-                   iv % polaramv(n) % info % lat, &       ! Latitude
-                   iv % polaramv(n) % info % lon, &       ! Longitude
-                   iv % polaramv(n) % p(k), &                ! Obs Pressure
+                   num_obs, 1, iv%info(polaramv)%id(n), &  ! Station
+                   iv%info(polaramv)%lat(k,n), &       ! Latitude
+                   iv%info(polaramv)%lon(k,n), &       ! Longitude
+                   iv%polaramv(n)%p(k), &                ! Obs Pressure
                    ob%polaramv(n)%u(k), iv%polaramv(n)%u(k), re%polaramv(n)%u(k), &! O, O-B, O-A u
                    ob%polaramv(n)%v(k), iv%polaramv(n)%v(k), re%polaramv(n)%v(k)
             end do
@@ -160,19 +160,19 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(gpspw)   
-      if (iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(gpspw)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'gpspw', num_obs    
       num_obs = 0
       do n = 1, iv % nlocal(gpspw)
-         if (iv%gpspw(n)%loc%proc_domain) then
+         if (iv%info(gpspw)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1                                 
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-               num_obs, 1, iv % gpspw(n) % info % id, &  ! Station
-               iv % gpspw(n) % info % lat, &       ! Latitude
-               iv % gpspw(n) % info % lon, &       ! Longitude
+               num_obs, 1, iv%info(gpspw)%id(n), &  ! Station
+               iv%info(gpspw)%lat(1,n), &       ! Latitude
+               iv%info(gpspw)%lon(1,n), &       ! Longitude
                missing_r, &
                ob%gpspw(n)%tpw, iv%gpspw(n)%tpw, re%gpspw(n)%tpw ! O, O-B, O-A u
          end if
@@ -181,21 +181,21 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(sound)
-     if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+     if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'sound', num_obs    
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-         if (iv%sound(n)%loc%proc_domain) then
+         if (iv%info(sound)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % sound(n) % info % levels
-            do k = 1, iv % sound(n) % info % levels
+            write(ounit,'(i8)')iv%info(sound)%levels(n)
+            do k = 1, iv%info(sound)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs,k, iv % sound(n) % info % id, &  ! Station
-                  iv % sound(n) % info % lat, &       ! Latitude
-                  iv % sound(n) % info % lon, &       ! Longitude
-                  iv % sound(n) % p(k), &             ! Obs Pressure
+                  num_obs,k, iv%info(sound)%id(n), &  ! Station
+                  iv%info(sound)%lat(k,n), &       ! Latitude
+                  iv%info(sound)%lon(k,n), &       ! Longitude
+                  iv%sound(n) % p(k), &             ! Obs Pressure
                   ob%sound(n)%u(k), iv%sound(n)%u(k), re%sound(n)%u(k), &! O,O-B,O-A u
                   ob%sound(n)%v(k), iv%sound(n)%v(k), re%sound(n)%v(k), &! O,O-B,O-A v
                   ob%sound(n)%t(k), iv%sound(n)%t(k), re%sound(n)%t(k), &! O,O-B,O-A t
@@ -208,14 +208,14 @@ subroutine da_write_obs(ob, iv, re)
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'sonde_sfc', num_obs    
       num_obs = 0
-      do n = 1, iv % nlocal(sound)
-         if (iv%sound(n)%loc%proc_domain) then 
+      do n = 1, iv % nlocal(sonde_sfc)
+         if (iv%info(sonde_sfc)%proc_domain(1,n)) then 
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-               num_obs , 1, iv % sonde_sfc(n) % info % id, &  ! Station
-               iv % sonde_sfc(n) % info % lat, &       ! Latitude
-               iv % sonde_sfc(n) % info % lon, &       ! Longitude
+               num_obs , 1, iv%info(sonde_sfc)%id(n), &  ! Station
+               iv%info(sonde_sfc)%lat(1,n), &       ! Latitude
+               iv%info(sonde_sfc)%lon(1,n), &       ! Longitude
                ob % sonde_sfc(n) % p, &                ! Obs Pressure
                ob%sonde_sfc(n)%u, iv%sonde_sfc(n)%u, re%sonde_sfc(n)%u, &! O, O-B, O-A u
                ob%sonde_sfc(n)%v, iv%sonde_sfc(n)%v, re%sonde_sfc(n)%v, &! O, O-B, O-A v
@@ -228,21 +228,21 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(airep)
-      if (iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(airep)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'airep', num_obs  
       num_obs = 0
       do n = 1, iv % nlocal(airep)
-         if (iv%airep(n)%loc%proc_domain) then                  
+         if (iv%info(airep)%proc_domain(1,n)) then                  
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % airep(n) % info % levels
-            do k = 1, iv % airep(n) % info % levels
+            write(ounit,'(i8)')iv%info(airep)%levels(n)
+            do k = 1, iv%info(airep)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs, k, iv % airep(n) % info % id, &  ! Station
-                  iv % airep(n) % info % lat, &       ! Latitude
-                  iv % airep(n) % info % lon, &       ! Longitude
-                  iv % airep(n) % p(k), &             ! Obs pressure
+                  num_obs, k, iv%info(airep)%id(n), &  ! Station
+                  iv%info(airep)%lat(k,n), &       ! Latitude
+                  iv%info(airep)%lon(k,n), &       ! Longitude
+                  iv%airep(n) % p(k), &             ! Obs pressure
                   ob%airep(n)%u(k), iv%airep(n)%u(k), re%airep(n)%u(k), &! O,O-B,O-A u
                   ob%airep(n)%v(k), iv%airep(n)%v(k), re%airep(n)%v(k), &! O,O-B,O-A v
                   ob%airep(n)%t(k), iv%airep(n)%t(k), re%airep(n)%t(k)
@@ -253,20 +253,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(pilot)
-      if (iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(pilot)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'pilot', num_obs   
       num_obs = 0
       do n = 1, iv % nlocal(pilot)
-         if (iv%pilot(n)%loc%proc_domain) then
+         if (iv%info(pilot)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % pilot(n) % info % levels
-            do k = 1, iv % pilot(n) % info % levels
+            write(ounit,'(i8)')iv%info(pilot)%levels(n)
+            do k = 1, iv%info(pilot)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs, k, iv % pilot(n) % info % id, &  ! Station
-                  iv % pilot(n) % info % lat, &       ! Latitude
-                  iv % pilot(n) % info % lon, &       ! Longitude
+                  num_obs, k, iv%info(pilot)%id(n), &  ! Station
+                  iv%info(pilot)%lat(1,n), &       ! Latitude
+                  iv%info(pilot)%lon(1,n), &       ! Longitude
                   iv % pilot(n) % p(k), &             ! Obs Pressure
                   ob%pilot(n)%u(k), iv%pilot(n)%u(k), re%pilot(n)%u(k), &! O,O-B,O-A u
                   ob%pilot(n)%v(k), iv%pilot(n)%v(k), re%pilot(n)%v(k) ! O,O-B,O-A v
@@ -277,19 +277,19 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(ssmi_rv)
-      if (iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(ssmi_rv)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'ssmir',  num_obs
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_rv)
-         if (iv%ssmi_rv(n)%loc%proc_domain) then
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
                num_obs, 1, 'SSMIR',              &       ! Station
-               iv % ssmi_rv(n) % info % lat, &! Latitude
-               iv % ssmi_rv(n) % info % lon, &! Longitude
+               iv%info(ssmi_rv)%lat(1,n), &! Latitude
+               iv%info(ssmi_rv)%lon(1,n), &! Longitude
                missing_r,                  &       ! Obs height
                ob%ssmi_rv(n)%speed, iv%ssmi_rv(n)%speed, re%ssmi_rv(n)%speed, & ! O, O-B, O-A speed
                ob%ssmi_rv(n)%tpw, iv%ssmi_rv(n)%tpw, re%ssmi_rv(n)%tpw ! O, O-B, O-A tpw
@@ -299,20 +299,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(ssmi_tb)
-      if (iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(ssmi_tb)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'ssmiT', num_obs     
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_tb)
          write(ounit,*)' SSMI radiance output not yet coded.'
-         if (iv%ssmi_tb(n)%loc%proc_domain) then
+         if (iv%info(ssmi_tb)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,7(2f17.7,i8,2f17.7))')&
                num_obs, 1, 'SSMIT',              &        ! Station
-               iv % ssmi_tb(n) % info % lat, &! Latitude
-               iv % ssmi_tb(n) % info % lon, &! Longitude
+               iv%info(ssmi_tb)%lat(1,n), &! Latitude
+               iv%info(ssmi_tb)%lon(1,n), &! Longitude
                missing_r,                  &       ! Obs height
                ob%ssmi_tb(n)%tb19h, iv%ssmi_tb(n)%tb19h, re%ssmi_tb(n)%tb19h, & ! O, O-B, O-A Tb19h
                ob%ssmi_tb(n)%tb19v, iv%ssmi_tb(n)%tb19v, re%ssmi_tb(n)%tb19v, & ! O, O-B, O-A Tb19v
@@ -352,20 +352,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(ssmt1)
-      if (iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(ssmt1)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'ssmt1', num_obs
       num_obs = 0
       do n = 1, iv % nlocal(ssmt1)
-         if (iv%ssmt1(n)%loc%proc_domain) then
+         if (iv%info(ssmt1)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % ssmt1(n) % info % levels
-            do k = 1, iv % ssmt1(n) % info % levels
+            write(ounit,'(i8)')iv%info(ssmt1)%levels(n)
+            do k = 1, iv%info(ssmt1)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs , k, iv % ssmt1(n) % info % id, &  ! Station
-                  iv % ssmt1(n) % info % lat, &       ! Latitude
-                  iv % ssmt1(n) % info % lon, &       ! Longitude
+                  num_obs , k, iv%info(ssmt1)%id(n), &  ! Station
+                  iv%info(ssmt1)%lat(1,n), &       ! Latitude
+                  iv%info(ssmt1)%lon(1,n), &       ! Longitude
                   iv % ssmt1(n) % h(k), &             ! Obs height
                   ob%ssmt1(n)%t(k), &
                   iv%ssmt1(n)%t(k), &
@@ -377,20 +377,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(ssmt2)
-      if (iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(ssmt2)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'ssmt2', num_obs    
       num_obs = 0
       do n = 1, iv % nlocal(ssmt2)
-         if (iv%ssmt2(n)%loc%proc_domain) then                   
+         if (iv%info(ssmt2)%proc_domain(1,n)) then                   
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % ssmt2(n) % info % levels
-            do k = 1, iv % ssmt2(n) % info % levels
+            write(ounit,'(i8)')iv%info(ssmt2)%levels(n)
+            do k = 1, iv%info(ssmt2)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs , k, iv % ssmt2(n) % info % id, &  ! Station
-                  iv % ssmt2(n) % info % lat, &       ! Latitude
-                  iv % ssmt2(n) % info % lon, &       ! Longitude
+                  num_obs , k, iv%info(ssmt2)%id(n), &  ! Station
+                  iv%info(ssmt2)%lat(1,n), &       ! Latitude
+                  iv%info(ssmt2)%lon(1,n), &       ! Longitude
                   iv % ssmt2(n) % h(k), &             ! Obs height
                   ob%ssmt2(n)%rh(k), &
                   iv%ssmt2(n)%rh(k), &
@@ -402,19 +402,19 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(qscat)  
-      if (iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(qscat)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'qscat', num_obs   
       num_obs = 0
       do n = 1, iv % nlocal(qscat)  
-         if (iv%qscat(n)%loc%proc_domain) then
+         if (iv%info(qscat)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                num_obs, 1, iv % qscat(n) % info % id, &  ! Station
-                iv % qscat(n) % info % lat, &       ! Latitude
-                iv % qscat(n) % info % lon, &       ! Longitude
+                num_obs, 1, iv%info(qscat)%id(n), &  ! Station
+                iv%info(qscat)%lat(1,n), &       ! Latitude
+                iv%info(qscat)%lon(1,n), &       ! Longitude
                 iv % qscat(n) % h, &                ! Obs height
                 ob%qscat(n)%u, iv%qscat(n)%u, re%qscat(n)%u, &! O, O-B, O-A u
                 ob%qscat(n)%v, iv%qscat(n)%v, re%qscat(n)%v   ! O, O-B, O-A v
@@ -424,20 +424,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(profiler)
-      if (iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(profiler)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'profiler',  num_obs
       num_obs = 0
       do n = 1, iv % nlocal(profiler)
-         if (iv%profiler(n)%loc%proc_domain) then
+         if (iv%info(profiler)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % profiler(n) % info % levels
-            do k = 1, iv % profiler(n) % info % levels
+            write(ounit,'(i8)')iv%info(profiler)%levels(n)
+            do k = 1, iv%info(profiler)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs, k, iv % profiler(n) % info % id, &  ! Station
-                  iv % profiler(n) % info % lat, &       ! Latitude
-                  iv % profiler(n) % info % lon, &       ! Longitude
+                  num_obs, k, iv%info(profiler)%id(n), &  ! Station
+                  iv%info(profiler)%lat(1,n), &       ! Latitude
+                  iv%info(profiler)%lon(1,n), &       ! Longitude
                   iv % profiler(n) % p(k), &             ! Obs Pressure
                   ob%profiler(n)%u(k), iv%profiler(n)%u(k), re%profiler(n)%u(k), &! O,O-B,O-A u
                   ob%profiler(n)%v(k), iv%profiler(n)%v(k), re%profiler(n)%v(k) ! O,O-B,O-A v
@@ -448,19 +448,19 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(buoy)  
-      if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(buoy)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'buoy', num_obs
       num_obs = 0
       do n = 1, iv % nlocal(buoy)  
-         if (iv%buoy(n)%loc%proc_domain) then
+         if (iv%info(buoy)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-               num_obs,1, iv % buoy(n) % info % id, &  ! Station
-               iv % buoy(n) % info % lat, &       ! Latitude
-               iv % buoy(n) % info % lon, &       ! Longitude
+               num_obs,1, iv%info(buoy)%id(n), &  ! Station
+               iv%info(buoy)%lat(1,n), &       ! Latitude
+               iv%info(buoy)%lon(1,n), &       ! Longitude
                ob % buoy(n) % p, &                ! Obs Pressure
                ob%buoy(n)%u, iv%buoy(n)%u, re%buoy(n)%u, &! O, O-B, O-A u
                ob%buoy(n)%v, iv%buoy(n)%v, re%buoy(n)%v, &! O, O-B, O-A v
@@ -473,27 +473,27 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(bogus)
-      if (iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(bogus)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'bogus', num_obs
       num_obs = 0
       do n = 1, iv % nlocal(bogus)
-         if (iv%bogus(n)%loc%proc_domain) then
+         if (iv%info(bogus)%proc_domain(1,n)) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                num_obs, 1, iv % bogus(n) % info % id, &  ! Station
-                iv % bogus(n) % info % lat, &       ! Latitude
-                iv % bogus(n) % info % lon, &       ! Longitude
+                num_obs, 1, iv%info(bogus)%id(n), &  ! Station
+                iv%info(bogus)%lat(1,n), &       ! Latitude
+                iv%info(bogus)%lon(1,n), &       ! Longitude
                 missing_r,                  &
                 ob%bogus(n)%slp, iv%bogus(n)%slp, re%bogus(n)%slp    ! O, O-B, O-A p
-            write(ounit,'(i8)')iv % bogus(n) % info % levels
-            do k = 1, iv % bogus(n) % info % levels
+            write(ounit,'(i8)')iv%info(bogus)%levels(n)
+            do k = 1, iv%info(bogus)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs , k, iv % bogus(n) % info % id, &  ! Station
-                  iv % bogus(n) % info % lat, &       ! Latitude
-                  iv % bogus(n) % info % lon, &       ! Longitude
+                  num_obs , k, iv%info(bogus)%id(n), &  ! Station
+                  iv%info(bogus)%lat(1,n), &       ! Latitude
+                  iv%info(bogus)%lon(1,n), &       ! Longitude
                   iv % bogus(n) % p(k), &             ! Obs Pressure
                   ob%bogus(n)%u(k), iv%bogus(n)%u(k), re%bogus(n)%u(k), &! O,O-B,O-A u
                   ob%bogus(n)%v(k), iv%bogus(n)%v(k), re%bogus(n)%v(k), &! O,O-B,O-A v
@@ -506,20 +506,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(airsr)
-      if (iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(airsr)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'airsr', num_obs    
       num_obs = 0
       do n = 1, iv % nlocal(airsr)
-         if (iv%airsr(n)%loc%proc_domain) then
+         if (iv%info(airsr)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % airsr(n) % info % levels
-            do k = 1, iv % airsr(n) % info % levels
+            write(ounit,'(i8)')iv%info(airsr)%levels(n)
+            do k = 1, iv%info(airsr)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs,k, iv % airsr(n) % info % id, &  ! Station
-                  iv % airsr(n) % info % lat, &       ! Latitude
-                  iv % airsr(n) % info % lon, &       ! Longitude
+                  num_obs,k, iv%info(airsr)%id(n), &  ! Station
+                  iv%info(airsr)%lat(1,n), &       ! Latitude
+                  iv%info(airsr)%lon(1,n), &       ! Longitude
                   iv % airsr(n) % p(k), &             ! Obs Pressure
                   ob%airsr(n)%t(k), iv%airsr(n)%t(k), re%airsr(n)%t(k), &! O,O-B,O-A t
                   ob%airsr(n)%q(k), iv%airsr(n)%q(k), re%airsr(n)%q(k)   ! O,O-B,O-A q
@@ -530,20 +530,20 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv % nlocal(gpsref)
-      if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(gpsref)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'gpsref', num_obs
       num_obs = 0
       do n = 1, iv % nlocal(gpsref)
-         if (iv%gpsref(n)%loc%proc_domain) then
+         if (iv%info(gpsref)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % gpsref(n) % info % levels
-            do k = 1, iv % gpsref(n) % info % levels
+            write(ounit,'(i8)')iv%info(gpsref)%levels(n)
+            do k = 1, iv%info(gpsref)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs,k, iv % gpsref(n) % info % id, &  ! Station
-                  iv % gpsref(n) % info % lat, &       ! Latitude
-                  iv % gpsref(n) % info % lon, &       ! Longitude
+                  num_obs,k, iv%info(gpsref)%id(n), &  ! Station
+                  iv%info(gpsref)%lat(1,n), &       ! Latitude
+                  iv%info(gpsref)%lon(1,n), &       ! Longitude
                   iv % gpsref(n) % h(k), &             ! Obs Height    
                   ob%gpsref(n)%ref(k), iv%gpsref(n)%ref(k), re%gpsref(n)%ref(k) ! O, O-B, O-A ref
             end do

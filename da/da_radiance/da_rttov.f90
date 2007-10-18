@@ -33,9 +33,11 @@ module da_rttov
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
       qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme
-   use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_new, &
-      da_interp_lin_3d_new,da_interp_lin_2d,da_interp_lin_3d_adj_new, &
-      da_interp_lin_2d_adj_new
+   use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_newer, &
+      da_interp_lin_2d_newest, da_interp_lin_3d_newer, &
+      da_interp_lin_3d_adj_newer, &
+      da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest, &
+      da_interp_lin_2d_adj_newer,da_interp_lin_2d_adj_newest
    use da_tools_serial, only : da_get_unit, da_free_unit
 #ifdef DM_PARALLEL
    use da_par_util, only :  true_mpi_real
@@ -46,7 +48,7 @@ module da_rttov
       da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
       da_qc_rad, da_read_biascoef
    use da_reporting, only : da_message, message, da_warning
-   use da_tools, only : da_togrid_new
+   use da_tools, only : da_convert_zk
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
    use da_reporting, only : da_warning

@@ -27,13 +27,13 @@ subroutine da_transform_xtoy_gpspw (grid, iv, y)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_gpspw")
 
-   do n=iv%plocal(iv%time-1,gpspw) + 1, iv%plocal(iv%time,gpspw)
-      i   = iv%gpspw(n)%loc%i
-      dy  = iv%gpspw(n)%loc%dy
-      dym = iv%gpspw(n)%loc%dym
-      j   = iv%gpspw(n)%loc%j
-      dx  = iv%gpspw(n)%loc%dx
-      dxm = iv%gpspw(n)%loc%dxm
+   do n=iv%info(gpspw)%n1,iv%info(gpspw)%n2
+      i   = iv%info(gpspw)%i(1,n)
+      dy  = iv%info(gpspw)%dy(1,n)
+      dym = iv%info(gpspw)%dym(1,n)
+      j   = iv%info(gpspw)%j(1,n)
+      dx  = iv%info(gpspw)%dx(1,n)
+      dxm = iv%info(gpspw)%dxm(1,n)
 
       ! Mathematical transformation:
 
@@ -43,7 +43,7 @@ subroutine da_transform_xtoy_gpspw (grid, iv, y)
       !    dy * (dxm * grid%xa%tpw(i,j+1) + &
       !    dx  * grid%xa%tpw(i+1,j+1))
       dpw = 0.0
-      obs_terr   = iv%gpspw(n)%info%elv
+      obs_terr   = iv%info(gpspw)%elv(n)
       model_terr = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + &
                    dy *(dxm*grid%xb%terr(i,j+1) + dx*grid%xb%terr(i+1,j+1))
 

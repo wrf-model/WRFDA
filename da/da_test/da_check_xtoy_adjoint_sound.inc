@@ -15,17 +15,17 @@ subroutine da_check_xtoy_adjoint_sound (iv, y, adjtest_lhs, pertile_lhs)
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_sound")
 
    do n=1, iv%nlocal(sound)
-      if (iv%sound(n)%loc%proc_domain) then
-         do k=1, iv%sound(n)%info%levels
+      do k=1, iv%info(sound)%levels(n)
+         if (iv%info(sound)%proc_domain(k,n)) then
             adjtest_lhs = adjtest_lhs + &
                           (y%sound(n)%u(k)/typical_u_rms)**2 + &
                           (y%sound(n)%v(k)/typical_v_rms)**2 + &
                           (y%sound(n)%t(k)/typical_t_rms)**2 + &
                           (y%sound(n)%q(k)/typical_q_rms)**2
-         end do
-      end if
+         end if
+      end do
 
-      do k=1, iv%sound(n)%info%levels
+      do k=1, iv%info(sound)%levels(n)
          pertile_lhs = pertile_lhs + &
                        (y%sound(n)%u(k)/typical_u_rms)**2 + &
                        (y%sound(n)%v(k)/typical_v_rms)**2 + &

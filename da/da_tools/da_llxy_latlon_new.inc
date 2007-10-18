@@ -1,4 +1,4 @@
-subroutine da_llxy_latlon_new(lat, lon, proj, ix, y)
+subroutine da_llxy_latlon_new(proj, info)
 
    !----------------------------------------------------------------------- 
    ! Purpose: Compute the x/y location of a lat/lon on a LATLON grid.
@@ -6,11 +6,10 @@ subroutine da_llxy_latlon_new(lat, lon, proj, ix, y)
 
    implicit none
 
-   real, intent(in)             :: lat(:,:)
-   real, intent(in)             :: lon(:,:)
-   type(proj_info), intent(in)  :: proj
-   real, intent(out)            :: x(:,:)
-   real, intent(out)            :: y(:,:)
+   type(proj_info), intent(in)    :: proj
+   type(infa_type), intent(inout) :: info
+
+   integer :: n
 
    if (trace_use) call da_trace_entry("da_llxy_latlon_new")
 
@@ -20,15 +19,20 @@ subroutine da_llxy_latlon_new(lat, lon, proj, ix, y)
 
    ! Compute the difference between the input lat/lon and the origin lat/lon
 
-   y(:,:) = (lat(:,:) - proj%lat1)/proj%truelat1 + 1.0
+   info%y(1,:) = (info%lat(1,:) - proj%lat1)/proj%truelat1 + 1.0
 
    ! To account for issues around the dateline, convert the incoming
    ! longitudes to be 0->360.0
-   where (lon(:,:) < 0)
-      x(:,:) = (lon(:,:) + 360.0  - proj%lon1)/proj%stdlon + 1.0
+   where (info%lon(1,:) < 0)
+      info%x(1,:) = (info%lon(1,:) + 360.0  - proj%lon1)/proj%stdlon + 1.0
    elsewhere
-      x(:,:) = (lon(:,:) - proj%lon1)/proj%stdlon + 1.0
+      info%x(1,:) = (info%lon(1,:) - proj%lon1)/proj%stdlon + 1.0
    end where
+
+   do n=1,ubound(info%x,2)
+      info%x(:,n) = info%x(1,n)
+      info%y(:,n) = info%y(1,n)
+   end do
 
    if (trace_use) call da_trace_exit("da_llxy_latlon_new")
 

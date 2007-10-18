@@ -46,7 +46,7 @@ subroutine da_jo_and_grady_ssmi_tb(iv, re, jo, jo_grad_y)
       jo_grad_y%ssmi_tb(n)%tb85h = - re%ssmi_tb(n)%tb85h / &
          (iv%ssmi_tb(n)%tb85h%error * iv%ssmi_tb(n)%tb85h%error)
 
-      if (iv%ssmi_tb(n)%loc%proc_domain) then
+      if (iv%info(ssmi_tb)%proc_domain(1,n)) then
          jo % ssmi_tb19v = jo % ssmi_tb19v - re%ssmi_tb(n)%tb19v * jo_grad_y%ssmi_tb(n)%tb19v 
          jo % ssmi_tb19h = jo % ssmi_tb19h - re%ssmi_tb(n)%tb19h * jo_grad_y%ssmi_tb(n)%tb19h
          jo % ssmi_tb22v = jo % ssmi_tb22v - re%ssmi_tb(n)%tb22v * jo_grad_y%ssmi_tb(n)%tb22v

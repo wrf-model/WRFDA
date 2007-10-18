@@ -26,12 +26,12 @@ subroutine da_oi_stats_qscat (stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(qscat)
-      if (iv%qscat(n)%loc%proc_domain) then
+      if (iv%info(qscat)%proc_domain(1,n)) then
          call da_stats_calculate(n, 0, iv%qscat(n)%u%qc, iv%qscat(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, stats%average%u, stats%rms_err%u)
          call da_stats_calculate(n, 0, iv%qscat(n)%v%qc, iv%qscat(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, stats%average%v, stats%rms_err%v)
-      end if    ! end if (iv%qscat(n)%loc%proc_domain)
+      end if    ! end if (iv%info(qscat)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

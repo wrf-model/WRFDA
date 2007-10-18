@@ -24,7 +24,7 @@ subroutine da_residual_pilot(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % v % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(pilot)
-      do k=1, iv%pilot(n)%info%levels
+      do k=1, iv%info(pilot)%levels(n)
          np_available = np_available + 2
          re%pilot(n)%u(k) = da_residual(n, k, y%pilot(n)%u(k), iv%pilot(n)%u(k), n_obs_bad % u)
          re%pilot(n)%v(k) = da_residual(n, k, y%pilot(n)%v(k), iv%pilot(n)%v(k), n_obs_bad % v)

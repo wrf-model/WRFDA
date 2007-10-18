@@ -117,8 +117,8 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
         end do
 
         do n = 1, iv%nlocal(radar)
-           do i=int(iv%radar(n)%loc%i), int(iv%radar(n)%loc%i)+1
-              do j=int(iv%radar(n)%loc%j), int(iv%radar(n)%loc%j)+1
+           do i=int(iv%info(radar)%i(1,n)), int(iv%info(radar)%i(1,n))+1
+              do j=int(iv%info(radar)%j(1,n)), int(iv%info(radar)%j(1,n))+1
                  do k=kts, kte
                     grid%xb%delt(i,j,k) = 1800.0
                     grid%xb%qrn(i,j,k) = amax1(5.0E-5, grid%xb%qrn(i,j,k))
@@ -127,7 +127,7 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
                   ! do k=kts, kte
                   !    v_h(k)=grid%xb%h(i,j  ,k)
                   ! end do
-                  ! do k = 1, iv % radar(n) % info % levels
+                  ! do k = 1, iv%info(radar)%levels(n)
                   !    call zk(iv%radar(n)%height(k), v_h, zkk)
                   !    grid%xb%delt(i,j,int(zkk))=1800.0
                   !    grid%xb%delt(i,j,int(zkk)+1)=1800.0

@@ -35,7 +35,7 @@ subroutine da_read_obs_ascii (iv, filename)
 
    character (len = 160)        :: fmt_info, fmt_loc, fmt_each
 
-   integer                      :: i, j, iost, nlevels, fm,iunit
+   integer                      :: i, j, iost, nlevels, old_nlevels, fm,iunit
 
    type (multi_level_type)      :: platform
 
@@ -229,20 +229,19 @@ subroutine da_read_obs_ascii (iv, filename)
 
          if (platform%each (i)%speed%qc /= missing_data .and. &
              platform%each (i)%v%qc /= missing_data) then
-            call da_ffdduv (platform%each (i)%speed%inv, &
-               platform%each (i)%v%inv,     &
+            call da_ffdduv (platform%each (i)%speed%inv, platform%each (i)%v%inv,     &
                U_comp, V_comp, platform%info%lon, convert_fd2uv)
                platform%each (i)%u = platform%each (i)%speed
                platform%each (i)%v = platform%each (i)%speed
-               platform%each (i)%u%inv = U_comp
-               platform%each (i)%v%inv = V_comp
+            platform%each (i)%u%inv = U_comp
+            platform%each (i)%v%inv = V_comp
          else
-            platform%each (i)%u%inv = missing_r
-            platform%each (i)%v%inv = missing_r
+            platform%each (i)%u%inv   = missing_r
+            platform%each (i)%v%inv   = missing_r
             platform%each (i)%u%error = missing_r
             platform%each (i)%v%error = missing_r
-            platform%each (i)%u%qc  = missing_data
-            platform%each (i)%v%qc  = missing_data
+            platform%each (i)%u%qc    = missing_data
+            platform%each (i)%v%qc    = missing_data
          end if
       end do
 
@@ -345,10 +344,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(synop) = nlocal(synop) + 1
             if (nlocal(synop) > iv%nlocal(synop)) cycle reports
 
-            iv%synop(nlocal(synop))%info                 = platform%info
-            iv%synop(nlocal(synop))%loc                  = platform%loc
-            iv%synop(nlocal(synop))%loc%obs_global_index = ntotal(synop)
-
             iv%synop(nlocal(synop))%h = platform%each(1)%height
             iv%synop(nlocal(synop))%u = platform%each(1)%u
             iv%synop(nlocal(synop))%v = platform%each(1)%v
@@ -362,10 +357,6 @@ subroutine da_read_obs_ascii (iv, filename)
             if (outside) cycle reports
             nlocal(ships) = nlocal(ships) + 1
             if (nlocal(ships) > iv%nlocal(ships)) cycle reports
-
-            iv%ships(nlocal(ships))%info                 = platform%info
-            iv%ships(nlocal(ships))%loc                  = platform%loc
-            iv%ships(nlocal(ships))%loc%obs_global_index = ntotal(ships)
 
             iv%ships(nlocal(ships))%h = platform%each(1)%height
             iv%ships(nlocal(ships))%u = platform%each(1)%u
@@ -381,10 +372,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(metar) = nlocal(metar) + 1
             if (nlocal(metar) > iv%nlocal(metar)) cycle reports
 
-            iv%metar(nlocal(metar))%info                 = platform%info 
-            iv%metar(nlocal(metar))%loc                  = platform%loc  
-            iv%metar(nlocal(metar))%loc%obs_global_index = ntotal(metar)
-
             iv%metar(nlocal(metar))%h = platform%each(1)%height
             iv%metar(nlocal(metar))%u = platform%each(1)%u
             iv%metar(nlocal(metar))%v = platform%each(1)%v
@@ -399,12 +386,7 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(pilot) = nlocal(pilot) + 1
             if (nlocal(pilot) > iv%nlocal(pilot)) cycle reports
 
-            iv%pilot(nlocal(pilot))%info                 = platform%info
-            iv%pilot(nlocal(pilot))%loc                  = platform%loc 
-            iv%pilot(nlocal(pilot))%loc%obs_global_index = ntotal(pilot)
-
             allocate (iv%pilot(nlocal(pilot))%p (1:nlevels))
-            allocate (iv%pilot(nlocal(pilot))%zk(1:nlevels))
             allocate (iv%pilot(nlocal(pilot))%u (1:nlevels))
             allocate (iv%pilot(nlocal(pilot))%v (1:nlevels))
 
@@ -417,13 +399,11 @@ subroutine da_read_obs_ascii (iv, filename)
          case (35:38) ;
             if (.not. use_soundobs) cycle reports
             if (n==1) ntotal(sound) = ntotal(sound) + 1 
+            if (n==1) ntotal(sonde_sfc) = ntotal(sonde_sfc) + 1 
             if (outside) cycle reports
             nlocal(sound) = nlocal(sound) + 1
+            nlocal(sonde_sfc) = nlocal(sonde_sfc) + 1
             if (nlocal(sound) > iv%nlocal(sound)) cycle reports
-
-            iv%sonde_sfc(nlocal(sound))%info                 = platform%info
-            iv%sonde_sfc(nlocal(sound))%loc                  = platform%loc
-            iv%sonde_sfc(nlocal(sound))%loc%obs_global_index = ntotal(sound)
 
             ! Search to see if we have surface obs.
 
@@ -435,48 +415,46 @@ subroutine da_read_obs_ascii (iv, filename)
                   surface_level = i
 
                   ! Save surface pressure.
-                  iv%sonde_sfc(nlocal(sound))%h = platform%each(i)%height
-                  iv%sonde_sfc(nlocal(sound))%u = platform%each(i)%u
-                  iv%sonde_sfc(nlocal(sound))%v = platform%each(i)%v
-                  iv%sonde_sfc(nlocal(sound))%t = platform%each(i)%t
-                  iv%sonde_sfc(nlocal(sound))%q = platform%each(i)%q
-                  iv%sonde_sfc(nlocal(sound))%p = platform%each(i)%p
+                  iv%sonde_sfc(nlocal(sonde_sfc))%h = platform%each(i)%height
+                  iv%sonde_sfc(nlocal(sonde_sfc))%u = platform%each(i)%u
+                  iv%sonde_sfc(nlocal(sonde_sfc))%v = platform%each(i)%v
+                  iv%sonde_sfc(nlocal(sonde_sfc))%t = platform%each(i)%t
+                  iv%sonde_sfc(nlocal(sonde_sfc))%q = platform%each(i)%q
+                  iv%sonde_sfc(nlocal(sonde_sfc))%p = platform%each(i)%p
 
                   exit
                end if
             end do
 
-            ! processing the sound_sfc data:
+            ! processing the sonde_sfc data:
 
-            iv%sound(nlocal(sound))%info                 = platform%info
-            iv%sound(nlocal(sound))%loc                  = platform%loc
-            iv%sound(nlocal(sound))%loc%obs_global_index = ntotal(sound)
+            old_nlevels = nlevels
 
             if (surface_level > 0) then
                nlevels = nlevels - 1
             else
-               iv%sonde_sfc(nlocal(sound))%h = missing_r
-               iv%sonde_sfc(nlocal(sound))%u%inv   = missing_r
-               iv%sonde_sfc(nlocal(sound))%u%qc    = missing
-               iv%sonde_sfc(nlocal(sound))%u%error = abs(missing_r)
-               iv%sonde_sfc(nlocal(sound))%v = iv%sonde_sfc(nlocal(sound))%u
-               iv%sonde_sfc(nlocal(sound))%t = iv%sonde_sfc(nlocal(sound))%u
-               iv%sonde_sfc(nlocal(sound))%p = iv%sonde_sfc(nlocal(sound))%u
-               iv%sonde_sfc(nlocal(sound))%q = iv%sonde_sfc(nlocal(sound))%u
+               iv%sonde_sfc(nlocal(sonde_sfc))%h = missing_r
+               iv%sonde_sfc(nlocal(sonde_sfc))%u%inv   = missing_r
+               iv%sonde_sfc(nlocal(sonde_sfc))%u%qc    = missing
+               iv%sonde_sfc(nlocal(sonde_sfc))%u%error = abs(missing_r)
+               iv%sonde_sfc(nlocal(sonde_sfc))%v = iv%sonde_sfc(nlocal(sonde_sfc))%u
+               iv%sonde_sfc(nlocal(sonde_sfc))%t = iv%sonde_sfc(nlocal(sonde_sfc))%u
+               iv%sonde_sfc(nlocal(sonde_sfc))%p = iv%sonde_sfc(nlocal(sonde_sfc))%u
+               iv%sonde_sfc(nlocal(sonde_sfc))%q = iv%sonde_sfc(nlocal(sonde_sfc))%u
             end if
 
             if (nlevels > 0) then
 
                allocate (iv%sound(nlocal(sound))%h (1:nlevels))
                allocate (iv%sound(nlocal(sound))%p (1:nlevels))
-               allocate (iv%sound(nlocal(sound))%zk(1:nlevels))
                allocate (iv%sound(nlocal(sound))%u (1:nlevels))
                allocate (iv%sound(nlocal(sound))%v (1:nlevels))
                allocate (iv%sound(nlocal(sound))%t (1:nlevels))
                allocate (iv%sound(nlocal(sound))%q (1:nlevels))
 
                j = 0
-               do i = 1, iv%sound(nlocal(sound))%info%levels
+!               do i = 1, iv%sound(nlocal(sound))%info%levels
+               do i = 1, old_nlevels
                   if (i == surface_level) cycle
 
                   j=j+1
@@ -490,7 +468,8 @@ subroutine da_read_obs_ascii (iv, filename)
                end do
             end if
 
-            iv%sound(nlocal(sound))%info%levels = nlevels
+!            iv%sound(nlocal(sound))%info%levels = nlevels
+
 
          case (86)    ;
             ! Reject cloudy satem obs.
@@ -559,12 +538,7 @@ subroutine da_read_obs_ascii (iv, filename)
                nlocal(polaramv) = nlocal(polaramv) + 1
                if (nlocal(polaramv) > iv%nlocal(polaramv)) cycle reports
 
-               iv%polaramv(nlocal(polaramv))%info                 = platform%info
-               iv%polaramv(nlocal(polaramv))%loc                  = platform%loc
-               iv%polaramv(nlocal(polaramv))%loc%obs_global_index = ntotal(polaramv)
-
                allocate (iv%polaramv(nlocal(polaramv))%p (1:nlevels))
-               allocate (iv%polaramv(nlocal(polaramv))%zk(1:nlevels))
                allocate (iv%polaramv(nlocal(polaramv))%u (1:nlevels))
                allocate (iv%polaramv(nlocal(polaramv))%v (1:nlevels))
 
@@ -580,12 +554,7 @@ subroutine da_read_obs_ascii (iv, filename)
                nlocal(geoamv) = nlocal(geoamv) + 1
                if (nlocal(geoamv) > iv%nlocal(geoamv)) cycle reports
 
-               iv%geoamv(nlocal(geoamv))%info                 = platform%info
-               iv%geoamv(nlocal(geoamv))%loc                  = platform%loc
-               iv%geoamv(nlocal(geoamv))%loc%obs_global_index = ntotal(geoamv)
-
                allocate (iv%geoamv(nlocal(geoamv))%p (1:nlevels))
-               allocate (iv%geoamv(nlocal(geoamv))%zk(1:nlevels))
                allocate (iv%geoamv(nlocal(geoamv))%u (1:nlevels))
                allocate (iv%geoamv(nlocal(geoamv))%v (1:nlevels))
 
@@ -603,13 +572,8 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(airep) = nlocal(airep) + 1
             if (nlocal(airep) > iv%nlocal(airep)) cycle reports
 
-            iv%airep(nlocal(airep))%info                 = platform%info
-            iv%airep(nlocal(airep))%loc                  = platform%loc
-            iv%airep(nlocal(airep))%loc%obs_global_index = ntotal(airep)
-
             allocate (iv%airep(nlocal(airep))%h        (1:nlevels))
             allocate (iv%airep(nlocal(airep))%p        (1:nlevels))
-            allocate (iv%airep(nlocal(airep))%zk       (1:nlevels))
             allocate (iv%airep(nlocal(airep))%u        (1:nlevels))
             allocate (iv%airep(nlocal(airep))%v        (1:nlevels))
             allocate (iv%airep(nlocal(airep))%t        (1:nlevels))
@@ -629,10 +593,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(gpspw) = nlocal(gpspw) + 1
             if (nlocal(gpspw) > iv%nlocal(gpspw)) cycle reports
 
-            iv%gpspw(nlocal(gpspw))%info                 = platform%info
-            iv%gpspw(nlocal(gpspw))%loc                  = platform%loc
-            iv%gpspw(nlocal(gpspw))%loc%obs_global_index = ntotal(gpspw)
-
             iv%gpspw(nlocal(gpspw))%tpw  = platform%loc%pw
 
          case (116) ;
@@ -642,12 +602,7 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(gpsref) = nlocal(gpsref) + 1
             if (nlocal(gpsref) > iv%nlocal(gpsref)) cycle reports
 
-            iv%gpsref(nlocal(gpsref))%info                 = platform%info
-            iv%gpsref(nlocal(gpsref))%loc                  = platform%loc
-            iv%gpsref(nlocal(gpsref))%loc%obs_global_index = ntotal(gpsref)
-
             allocate (iv%gpsref(nlocal(gpsref))%h (1:nlevels))
-            allocate (iv%gpsref(nlocal(gpsref))%zk(1:nlevels))
             allocate (iv%gpsref(nlocal(gpsref))%ref(1:nlevels))
             allocate (iv%gpsref(nlocal(gpsref))%  p(1:nlevels))
             allocate (iv%gpsref(nlocal(gpsref))%  t(1:nlevels))
@@ -671,14 +626,9 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(ssmt1) = nlocal(ssmt1) + 1
             if (nlocal(ssmt1) > iv%nlocal(ssmt1)) cycle reports
 
-            iv%ssmt1(nlocal(ssmt1))%info                 = platform%info
-            iv%ssmt1(nlocal(ssmt1))%loc                  = platform%loc
-            iv%ssmt1(nlocal(ssmt1))%loc%obs_global_index = ntotal(ssmt1)
-
             allocate (iv%ssmt1(nlocal(ssmt1))%h (1:nlevels))
             allocate (iv%ssmt1(nlocal(ssmt1))%p (1:nlevels))
             allocate (iv%ssmt1(nlocal(ssmt1))%t (1:nlevels))
-            allocate (iv%ssmt1(nlocal(ssmt1))%zk(1:nlevels))
 
             do i = 1, nlevels
               iv%ssmt1(nlocal(ssmt1))%h(i) = platform%each(i)%height
@@ -693,13 +643,8 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(ssmt2) = nlocal(ssmt2) + 1
             if (nlocal(ssmt2) > iv%nlocal(ssmt2)) cycle reports
 
-            iv%ssmt2(nlocal(ssmt2))%info                 = platform%info
-            iv%ssmt2(nlocal(ssmt2))%loc                  = platform%loc
-            iv%ssmt2(nlocal(ssmt2))%loc%obs_global_index = ntotal(ssmt2)
-
             allocate (iv%ssmt2(nlocal(ssmt2))%h (1:nlevels))
             allocate (iv%ssmt2(nlocal(ssmt2))%p (1:nlevels))
-            allocate (iv%ssmt2(nlocal(ssmt2))%zk(1:nlevels))
             allocate (iv%ssmt2(nlocal(ssmt2))%rh(1:nlevels))
 
             do i = 1, nlevels
@@ -714,10 +659,6 @@ subroutine da_read_obs_ascii (iv, filename)
             if (outside) cycle reports
             nlocal(qscat) = nlocal(qscat)  + 1
             if (nlocal(qscat) > iv%nlocal(qscat)) cycle reports
-
-            iv%qscat(nlocal(qscat))%info                 = platform%info
-            iv%qscat(nlocal(qscat))%loc                  = platform%loc
-            iv%qscat(nlocal(qscat))%loc%obs_global_index = ntotal(qscat)
 
             iv%qscat(nlocal(qscat))%h = platform%each(1)%height
             iv%qscat(nlocal(qscat))%u = platform%each(1)%u
@@ -734,12 +675,7 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(profiler) = nlocal(profiler) + 1
             if (nlocal(profiler) > iv%nlocal(profiler)) cycle reports
 
-            iv%profiler(nlocal(profiler))%info                 = platform%info
-            iv%profiler(nlocal(profiler))%loc                  = platform%loc
-            iv%profiler(nlocal(profiler))%loc%obs_global_index = ntotal(profiler)
-
             allocate (iv%profiler(nlocal(profiler))%p (1:nlevels))
-            allocate (iv%profiler(nlocal(profiler))%zk(1:nlevels))
             allocate (iv%profiler(nlocal(profiler))%u (1:nlevels))
             allocate (iv%profiler(nlocal(profiler))%v (1:nlevels))
 
@@ -762,13 +698,8 @@ subroutine da_read_obs_ascii (iv, filename)
                call da_error(__FILE__,__LINE__,message(1:1))
             end if
 
-            iv%bogus(nlocal(bogus))%info                 = platform%info
-            iv%bogus(nlocal(bogus))%loc                  = platform%loc
-            iv%bogus(nlocal(bogus))%loc%obs_global_index = ntotal(bogus)
-
             allocate (iv%bogus(nlocal(bogus))%h (1:nlevels))
             allocate (iv%bogus(nlocal(bogus))%p (1:nlevels))
-            allocate (iv%bogus(nlocal(bogus))%zk(1:nlevels))
             allocate (iv%bogus(nlocal(bogus))%u (1:nlevels))
             allocate (iv%bogus(nlocal(bogus))%v (1:nlevels))
             allocate (iv%bogus(nlocal(bogus))%t (1:nlevels))
@@ -807,10 +738,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(buoy) = nlocal(buoy)  + 1
             if (nlocal(buoy) > iv%nlocal(buoy)) cycle reports
 
-            iv%buoy(nlocal(buoy))%info                 = platform%info
-            iv%buoy(nlocal(buoy))%loc                  = platform%loc
-            iv%buoy(nlocal(buoy))%loc%obs_global_index = ntotal(buoy)
-
             iv%buoy(nlocal(buoy))%h = platform%each(1)%height
             iv%buoy(nlocal(buoy))%u = platform%each(1)%u
             iv%buoy(nlocal(buoy))%v = platform%each(1)%v
@@ -825,11 +752,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(airsr) = nlocal(airsr) + 1
             if (nlocal(airsr) > iv%nlocal(airsr)) cycle reports
 
-            iv%airsr(nlocal(airsr))%info                 = platform%info
-            iv%airsr(nlocal(airsr))%loc                  = platform%loc
-            iv%airsr(nlocal(airsr))%loc%obs_global_index = ntotal(airsr)
-
-            allocate (iv%airsr(nlocal(airsr))%zk(1:nlevels))
             allocate (iv%airsr(nlocal(airsr))%h (1:nlevels))
             allocate (iv%airsr(nlocal(airsr))%p (1:nlevels))
             allocate (iv%airsr(nlocal(airsr))%t (1:nlevels))
@@ -851,6 +773,58 @@ subroutine da_read_obs_ascii (iv, filename)
             call da_warning(__FILE__,__LINE__,message(1:3))
 
          end select
+
+         iv%info(fm_index(fm))%name(nlocal(fm_index(fm)))      = platform%info%name
+         iv%info(fm_index(fm))%platform(nlocal(fm_index(fm)))  = platform%info%platform
+         iv%info(fm_index(fm))%id(nlocal(fm_index(fm)))        = platform%info%id
+         iv%info(fm_index(fm))%date_char(nlocal(fm_index(fm))) = platform%info%date_char
+         ! nlevels adjusted for some obs types so use that
+         iv%info(fm_index(fm))%levels(nlocal(fm_index(fm)))    = nlevels
+         iv%info(fm_index(fm))%lat(:,nlocal(fm_index(fm)))     = platform%info%lat
+         iv%info(fm_index(fm))%lon(:,nlocal(fm_index(fm)))     = platform%info%lon
+         iv%info(fm_index(fm))%elv(nlocal(fm_index(fm)))       = platform%info%elv
+         iv%info(fm_index(fm))%pstar(nlocal(fm_index(fm)))     = platform%info%pstar
+
+         iv%info(fm_index(fm))%slp(nlocal(fm_index(fm)))           = platform%loc%slp
+         iv%info(fm_index(fm))%pw(nlocal(fm_index(fm)))            = platform%loc%pw
+         iv%info(fm_index(fm))%x(:,nlocal(fm_index(fm)))           = platform%loc%x
+         iv%info(fm_index(fm))%y(:,nlocal(fm_index(fm)))           = platform%loc%y 
+         iv%info(fm_index(fm))%i(:,nlocal(fm_index(fm)))           = platform%loc%i 
+         iv%info(fm_index(fm))%j(:,nlocal(fm_index(fm)))           = platform%loc%j 
+         iv%info(fm_index(fm))%dx(:,nlocal(fm_index(fm)))          = platform%loc%dx
+         iv%info(fm_index(fm))%dxm(:,nlocal(fm_index(fm)))         = platform%loc%dxm
+         iv%info(fm_index(fm))%dy(:,nlocal(fm_index(fm)))          = platform%loc%dy
+         iv%info(fm_index(fm))%dym(:,nlocal(fm_index(fm)))         = platform%loc%dym
+         iv%info(fm_index(fm))%proc_domain(:,nlocal(fm_index(fm))) = platform%loc%proc_domain
+
+         iv%info(fm_index(fm))%obs_global_index(nlocal(fm_index(fm))) = ntotal(fm_index(fm))
+
+         ! special case for sonde_sfc, duplicate sound info
+         if (fm_index(fm) == sound) then
+            iv%info(sonde_sfc)%name(nlocal(sonde_sfc))      = platform%info%name
+            iv%info(sonde_sfc)%platform(nlocal(sonde_sfc))  = platform%info%platform
+            iv%info(sonde_sfc)%id(nlocal(sonde_sfc))        = platform%info%id
+            iv%info(sonde_sfc)%date_char(nlocal(sonde_sfc)) = platform%info%date_char
+            iv%info(sonde_sfc)%levels(nlocal(sonde_sfc))    = 1
+            iv%info(sonde_sfc)%lat(:,nlocal(sonde_sfc))     = platform%info%lat
+            iv%info(sonde_sfc)%lon(:,nlocal(sonde_sfc))     = platform%info%lon
+            iv%info(sonde_sfc)%elv(nlocal(sonde_sfc))       = platform%info%elv
+            iv%info(sonde_sfc)%pstar(nlocal(sonde_sfc))     = platform%info%pstar
+
+            iv%info(sonde_sfc)%slp(nlocal(sonde_sfc))           = platform%loc%slp
+            iv%info(sonde_sfc)%pw(nlocal(sonde_sfc))            = platform%loc%pw
+            iv%info(sonde_sfc)%x(:,nlocal(sonde_sfc))           = platform%loc%x
+            iv%info(sonde_sfc)%y(:,nlocal(sonde_sfc))           = platform%loc%y 
+            iv%info(sonde_sfc)%i(:,nlocal(sonde_sfc))           = platform%loc%i 
+            iv%info(sonde_sfc)%j(:,nlocal(sonde_sfc))           = platform%loc%j 
+            iv%info(sonde_sfc)%dx(:,nlocal(sonde_sfc))          = platform%loc%dx
+            iv%info(sonde_sfc)%dxm(:,nlocal(sonde_sfc))         = platform%loc%dxm
+            iv%info(sonde_sfc)%dy(:,nlocal(sonde_sfc))          = platform%loc%dy
+            iv%info(sonde_sfc)%dym(:,nlocal(sonde_sfc))         = platform%loc%dym
+            iv%info(sonde_sfc)%proc_domain(:,nlocal(sonde_sfc)) = platform%loc%proc_domain
+
+            iv%info(sonde_sfc)%obs_global_index(nlocal(sonde_sfc)) = ntotal(sonde_sfc)
+         end if
 
          if (global .and. n < 2) then
             if (test_wrfvar) exit dup_loop

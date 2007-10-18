@@ -70,7 +70,7 @@ subroutine da_check_sfc_assi(grid, iv, y)
                   + y%synop(n)%p * y%synop(n)%p &
                   + y%synop(n)%q * y%synop(n)%q
 
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          partial_lhs = partial_lhs &
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &

@@ -183,13 +183,24 @@ subroutine da_read_kma1dvar (inst,iv, ob, infile)
    allocate (iv%instid(inst)%tb_qc(1:nchanl,size))
    allocate (ob%instid(inst)%tb(1:nchanl,size))
    do n = 1, size
-      iv%instid(inst)%info(n)   =  p%info
-      iv%instid(inst)%loc_i(n)        = p%loc%i
-      iv%instid(inst)%loc_j(n)        = p%loc%j
-      iv%instid(inst)%loc_dx(n)       = p%loc%dx
-      iv%instid(inst)%loc_dy(n)       = p%loc%dy
-      iv%instid(inst)%loc_dxm(n)      = p%loc%dxm
-      iv%instid(inst)%loc_dym(n)      = p%loc%dym
+
+      iv%instid(i)%info%name(n)	 = p%info%name
+      iv%instid(i)%info%platform(n)  = p%info%platform
+      iv%instid(i)%info%id(n) 	 = p%info%id
+      iv%instid(i)%info%date_char(n) = p%info%date_char
+      iv%instid(i)%info%levels(n)    = p%info%levels
+      iv%instid(i)%info%lat(:,n)	 = p%info%lat
+      iv%instid(i)%info%lon(:,n)	 = p%info%lon
+      iv%instid(i)%info%elv(n)	 = p%info%elv
+      iv%instid(i)%info%pstar(n)     = p%info%pstar
+
+      iv%instid(inst)%info%i(:,n)    = p%loc%i
+      iv%instid(inst)%info%j(:,n)    = p%loc%j
+      iv%instid(inst)%info%dx(:,n)   = p%loc%dx
+      iv%instid(inst)%info%dy(:,n)   = p%loc%dy
+      iv%instid(inst)%info%dxm(:,n)  = p%loc%dxm
+      iv%instid(inst)%info%dym(:,n)  = p%loc%dym
+
       iv%instid(inst)%landsea_mask(n) = p%landsea_mask
       iv%instid(inst)%scanpos(n)      = p%scanpos
       iv%instid(inst)%satzen(n) = p%satzen

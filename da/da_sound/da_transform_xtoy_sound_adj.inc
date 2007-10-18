@@ -10,20 +10,36 @@ subroutine da_transform_xtoy_sound_adj(iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+   integer :: n
+
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_sound_adj")
 
-   do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
-       k = iv % sound(n) % info % levels
-       if (k < 1) cycle
-       ! [1.2] Interpolate horizontally:
-       call da_interp_lin_3d_adj(jo_grad_x%u, iv%sound(n)%loc, jo_grad_y%sound(n)%u, k, iv%sound(n)%zk, k)
-       call da_interp_lin_3d_adj(jo_grad_x%v, iv%sound(n)%loc, jo_grad_y%sound(n)%v, k, iv%sound(n)%zk, k)
-       call da_interp_lin_3d_adj(jo_grad_x%q, iv%sound(n)%loc, jo_grad_y%sound(n)%q, k, iv%sound(n)%zk, k)
-       call da_interp_lin_3d_adj(jo_grad_x%t, iv%sound(n)%loc, jo_grad_y%sound(n)%t, k, iv%sound(n)%zk, k)
-    end do
+   allocate (u(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (v(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (t(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (q(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+
+   do n=iv%info(sound)%n1,iv%info(sound)%n2
+      u(1:size(jo_grad_y%sound(n)%u),n) = jo_grad_y%sound(n)%u(:)
+      v(1:size(jo_grad_y%sound(n)%v),n) = jo_grad_y%sound(n)%v(:)
+      t(1:size(jo_grad_y%sound(n)%t),n) = jo_grad_y%sound(n)%t(:)
+      q(1:size(jo_grad_y%sound(n)%q),n) = jo_grad_y%sound(n)%q(:)
+   end do
+
+   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(sound), u)
+   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(sound), v)
+   call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(sound), t)
+   call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(sound), q)
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_sound_adj")
 

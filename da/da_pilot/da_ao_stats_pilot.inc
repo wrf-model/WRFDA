@@ -28,8 +28,8 @@ subroutine da_ao_stats_pilot (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(pilot)
-      if (iv%pilot(n)%loc%proc_domain) then
-         do k=1, iv%pilot(n)%info%levels
+      if (iv%info(pilot)%proc_domain(1,n)) then
+         do k=1, iv%info(pilot)%levels(n)
             call da_stats_calculate (n, k, iv%pilot(n)%u(k)%qc, & 
                re%pilot(n)%u(k), nu, & 
                stats%minimum%u, stats%maximum%u, &
@@ -39,7 +39,7 @@ subroutine da_ao_stats_pilot (stats_unit, iv, re)
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
          end do
-      end if    ! end if (iv%pilot(n)%loc%proc_domain)
+      end if    ! end if (iv%info(pilot)%proc_domain(1,n))
    end do
 
    ! do inter-processor communication to gather statistics.

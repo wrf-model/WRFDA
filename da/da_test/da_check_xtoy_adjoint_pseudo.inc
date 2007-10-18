@@ -15,7 +15,7 @@ subroutine da_check_xtoy_adjoint_pseudo(iv, y, adjtest_lhs, pertile_lhs)
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_pseudo")
 
    do n=1, iv%nlocal(pseudo)
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          adjtest_lhs = adjtest_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
             (y%pseudo(n)%v/typical_v_rms)**2 + &
             (y%pseudo(n)%v/typical_t_rms)**2 + &

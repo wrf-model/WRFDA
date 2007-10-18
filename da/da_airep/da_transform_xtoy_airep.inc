@@ -6,23 +6,36 @@ subroutine da_transform_xtoy_airep (grid, iv, y)
 
    implicit none
 
-   type (domain),  intent(in)    :: grid
-   type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
-   type (y_type),  intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
+   type(domain),  intent(in)    :: grid
+   type(iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
+   type(y_type),  intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
 
-   integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+   integer :: n,n1,n2  ! Loop counter.
+   integer :: k        ! Index dimension.
+
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airep")
 
-   do n=iv%plocal(iv%time-1,airep) + 1, iv%plocal(iv%time,airep)
-      k = iv % airep(n) % info % levels
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % u, iv%airep(n)%loc, y%airep(n)%u, k, iv%airep(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % v, iv%airep(n)%loc, y%airep(n)%v, k, iv%airep(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % t, iv%airep(n)%loc, y%airep(n)%t, k, iv%airep(n)%zk, k)
+   allocate (u(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+   allocate (v(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+   allocate (t(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+  
+   call da_interp_lin_3d_newest (grid%xa%u, iv%info(airep), u)
+   call da_interp_lin_3d_newest (grid%xa%v, iv%info(airep), v)
+   call da_interp_lin_3d_newest (grid%xa%t, iv%info(airep), t)
+
+   do n=iv%info(airep)%n1,iv%info(airep)%n2
+      y%airep(n)%u(:) = u(1:size(y%airep(n)%u),n)
+      y%airep(n)%v(:) = v(1:size(y%airep(n)%v),n)
+      y%airep(n)%t(:) = t(1:size(y%airep(n)%t),n)
    end do
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airep")
 

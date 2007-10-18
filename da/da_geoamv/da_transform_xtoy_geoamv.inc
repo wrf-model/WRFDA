@@ -10,18 +10,25 @@ subroutine da_transform_xtoy_geoamv (grid, iv, y)
    type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
-   integer :: n ! Loop counter.
-   integer :: k ! Index dimension.
+   integer           :: n
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_geoamv")
 
-   do n=iv%plocal(iv%time-1,geoamv)+1, iv%plocal(iv%time,geoamv)
-      k = iv % geoamv(n) % info % levels
-      if (k < 1) cycle
-      ! Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % u,iv%geoamv(n)%loc, y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % v, iv%geoamv(n)%loc, y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
+   allocate (u(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
+   allocate (v(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
+
+   call da_interp_lin_3d_newest (grid%xa%u, iv%info(geoamv), u)
+   call da_interp_lin_3d_newest (grid%xa%v, iv%info(geoamv), v)
+
+   do n=iv%info(geoamv)%n1,iv%info(geoamv)%n2
+      y%geoamv(n)%u(:) = u(1:size(y%geoamv(n)%u),n)
+      y%geoamv(n)%v(:) = v(1:size(y%geoamv(n)%v),n)
    end do
+
+   deallocate (u)
+   deallocate (v)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_geoamv")
 

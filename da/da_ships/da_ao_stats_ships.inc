@@ -37,7 +37,7 @@ subroutine da_ao_stats_ships (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(ships)
-      if (iv%ships(n)%loc%proc_domain) then
+      if (iv%info(ships)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%ships(n)%u%qc, & 
              re%ships(n)%u, nu, & 
              stats%minimum%u, stats%maximum%u, &
@@ -58,7 +58,7 @@ subroutine da_ao_stats_ships (stats_unit, iv, re)
             re%ships(n)%q, nq, & 
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%ships(n)%loc%proc_domain)
+      end if    ! end if (iv%info(ships)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

@@ -23,7 +23,7 @@ subroutine da_residual_ssmt1(iv, y, re, np_missing, np_bad_data,np_obs_used, np_
    n_obs_bad % t % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(ssmt1)
-      do k=1, iv%ssmt1(n)%info%levels
+      do k=1, iv%info(ssmt1)%levels(n)
          np_available = np_available + 1
          re%ssmt1(n)%t(k) = da_residual(n, k, y%ssmt1(n)%t(k), iv%ssmt1(n)%t(k), n_obs_bad % t)
       end do

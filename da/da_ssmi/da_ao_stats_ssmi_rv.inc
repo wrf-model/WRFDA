@@ -27,7 +27,7 @@ subroutine da_ao_stats_ssmi_rv (stats_unit, iv, re)
 
    if (iv%nlocal(ssmi_rv) > 0) then
       do n=1, iv%nlocal(ssmi_rv)
-         if (iv%ssmi_rv(n)%loc%proc_domain) then
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) then
             call da_stats_calculate (n, 0, iv%ssmi_rv(n)%tpw%qc, &
                re%ssmi_rv(n)%tpw, ntpw,  &
                stats%minimum%tpw,  stats%maximum%tpw,&

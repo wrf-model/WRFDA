@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_airep(it, airep, itu,ituf,itvv,itvvf,itt,ittf)
+subroutine da_check_max_iv_airep(iv, it, itu,ituf,itv,itvf,itt,ittf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,12 +6,12 @@ subroutine da_check_max_iv_airep(it, airep, itu,ituf,itvv,itvvf,itt,ittf)
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (airep_type), intent(inout) :: airep
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itt,ittf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itv,itvf,itt,ittf
 
-   integer                                :: k
-   logical                                :: failed
+   integer :: k,n,n1,n2
+   logical :: failed
    
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_airep")
 
@@ -36,18 +36,18 @@ subroutine da_check_max_iv_airep(it, airep, itu,ituf,itvv,itvvf,itt,ittf)
 
    failed = .false.
 
-   do k = 1, airep % info % levels
-      if (airep % zk(k) > 0.0) then
-         ! U-wind
-         call da_max_error_qc(it, airep % info, airep % u(k), max_error_uv, itu, ituf, &
+   n1 = iv%plocal(iv%time-1,airep) + 1
+   n2 = iv%plocal(iv%time,airep)
+
+   do n = n1,n2
+      do k = 1, iv%info(airep)%levels(n)
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         ! V-wind
-         call da_max_error_qc (it, airep % info, airep % v(k), max_error_uv, itvv, itvvf, &
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-         ! Temperature
-         call da_max_error_qc (it, airep % info, airep % t(k),max_error_t, itt, ittf, &
-            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
-      end if
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%t(k), max_error_t,  itt, ittf, &
+            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)                          
+      end do
    end do
    
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_airep")

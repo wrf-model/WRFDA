@@ -12,12 +12,24 @@ subroutine da_transform_xtoy_qscat(grid, iv, y)
 
    integer :: n        ! Loop counter.
 
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_qscat")
 
-   do n=iv%plocal(iv%time-1,qscat) + 1, iv%plocal(iv%time,qscat)
-      call da_interp_obs_lin_2d(grid%xa % u, iv%qscat(n)%loc, y%qscat(n)%u, iv%qscat(n)%zk)
-      call da_interp_obs_lin_2d(grid%xa % v, iv%qscat(n)%loc, y%qscat(n)%v, iv%qscat(n)%zk)
+   allocate (u(1,iv%info(qscat)%n1:iv%info(qscat)%n2))
+   allocate (v(1,iv%info(qscat)%n1:iv%info(qscat)%n2))
+
+   call da_interp_lin_3d_newest (grid%xa%u, iv%info(qscat), u)
+   call da_interp_lin_3d_newest (grid%xa%v, iv%info(qscat), v)
+
+   do n=iv%info(qscat)%n1,iv%info(qscat)%n2
+      y%qscat(n)%u = u(1,n)
+      y%qscat(n)%v = v(1,n)
    end do
+
+   deallocate (u)
+   deallocate (v)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_qscat")
 

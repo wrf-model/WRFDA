@@ -18,6 +18,7 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
    real :: psm_prime
 
    if (trace_use) call da_trace_entry("da_transform_xtopsfc_adj")
+stop
 
    psm_prime = 0.0
 
@@ -28,10 +29,10 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
 
       ! 2.1 Terrain height at the observed site (xj, yi):
 
-      call da_interp_lin_2d(grid%xb%terr, synop%loc, hsm)
-      call da_interp_lin_2d(grid%xb%t2,   synop%loc, tsm)
-      call da_interp_lin_2d(grid%xb%q2,   synop%loc, qsm)
-      call da_interp_lin_2d(grid%xb%psfc, synop%loc, psm)
+!      call da_interp_lin_2d(grid%xb%terr, synop%loc, hsm)
+!      call da_interp_lin_2d(grid%xb%t2,   synop%loc, tsm)
+!      call da_interp_lin_2d(grid%xb%q2,   synop%loc, qsm)
+!      call da_interp_lin_2d(grid%xb%psfc, synop%loc, psm)
 
       to = -888888.0
       qo = -888888.0
@@ -64,11 +65,11 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
    end if
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
-   call da_interp_lin_2d_adj(jo_grad_x%t2,   synop%loc, j_synop_y%t)
-   call da_interp_lin_2d_adj(jo_grad_x%q2,   synop%loc, j_synop_y%q)
-   call da_interp_lin_2d_adj(jo_grad_x%u10,  synop%loc, j_synop_y%u)
-   call da_interp_lin_2d_adj(jo_grad_x%v10,  synop%loc, j_synop_y%v)
-   call da_interp_lin_2d_adj(jo_grad_x%psfc, synop%loc, psm_prime)
+!   call da_interp_lin_2d_adj(jo_grad_x%t2,   synop%loc, j_synop_y%t)
+!   call da_interp_lin_2d_adj(jo_grad_x%q2,   synop%loc, j_synop_y%q)
+!   call da_interp_lin_2d_adj(jo_grad_x%u10,  synop%loc, j_synop_y%u)
+!   call da_interp_lin_2d_adj(jo_grad_x%v10,  synop%loc, j_synop_y%v)
+!   call da_interp_lin_2d_adj(jo_grad_x%psfc, synop%loc, psm_prime)
 
    if (trace_use) call da_trace_exit("da_transform_xtopsfc_adj")
 

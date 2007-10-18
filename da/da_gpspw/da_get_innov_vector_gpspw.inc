@@ -54,14 +54,14 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
       write(unit=stdout,fmt='(a,i2)') &
         '==> GPS TPW pseudo OBS test: num_pseudo=',num_pseudo
 
-      iv % gpspw(1) % loc % x   = pseudo_x
-      iv % gpspw(1) % loc % y   = pseudo_y
-      iv % gpspw(1) % loc % i   = int(pseudo_x)
-      iv % gpspw(1) % loc % j   = int(pseudo_y)
-      iv % gpspw(1) % loc % dx  = pseudo_x-real(iv % gpspw(1) % loc % i)
-      iv % gpspw(1) % loc % dy  = pseudo_y-real(iv % gpspw(1) % loc % j)
-      iv % gpspw(1) % loc % dxm = 1.0 - iv % gpspw(1) % loc % dx
-      iv % gpspw(1) % loc % dym = 1.0 - iv % gpspw(1) % loc % dy
+      iv%info(gpspw)%x(:,1)   = pseudo_x
+      iv%info(gpspw)%y(:,1)   = pseudo_y
+      iv%info(gpspw)%i(:,1)   = int(pseudo_x)
+      iv%info(gpspw)%j(:,1)   = int(pseudo_y)
+      iv%info(gpspw)%dx(:,1)  = pseudo_x-real(iv%info(gpspw)%i(1,1))
+      iv%info(gpspw)%dy(:,1)  = pseudo_y-real(iv%info(gpspw)%j(1,1))
+      iv%info(gpspw)%dxm(:,1) = 1.0 - iv%info(gpspw)%dx(1,1)
+      iv%info(gpspw)%dym(:,1) = 1.0 - iv%info(gpspw)%dy(1,1)
 
       iv % gpspw(1) % tpw % inv   = pseudo_val
       iv % gpspw(1) % tpw % qc    = 0
@@ -70,35 +70,33 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
       ! To consider the site elevation effect, set the model terrain height
       ! to elevation for pseudo OBS:
 
-      i   = iv%gpspw(1)%loc%i
-      j   = iv%gpspw(1)%loc%j
-      dx  = iv%gpspw(1)%loc%dx
-      dy  = iv%gpspw(1)%loc%dy
-      dxm = iv%gpspw(1)%loc%dxm
-      dym = iv%gpspw(1)%loc%dym
+      i   = iv%info(gpspw)%i(1,1)
+      j   = iv%info(gpspw)%j(1,1)
+      dx  = iv%info(gpspw)%dx(1,1)
+      dy  = iv%info(gpspw)%dy(1,1)
+      dxm = iv%info(gpspw)%dxm(1,1)
+      dym = iv%info(gpspw)%dym(1,1)
 
-      iv%gpspw(1)%info%elv = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + & 
+      iv%info(gpspw)%elv(1) = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + & 
                              dy *(dxm*grid%xb%terr(i,j+1) + dx*grid%xb%terr(i+1,j+1))
 
       ! Set halo:
-      if ((iv%gpspw(1)%loc%i < its-1) .or.(iv%gpspw(1)%loc%i > ite) .or. & 
-          (iv%gpspw(1)%loc%j < jts-1) .or.(iv%gpspw(1)%loc%j > jte)) then 
+      if ((iv%info(gpspw)%i(1,1) < its-1) .or.(iv%info(gpspw)%i(1,1) > ite) .or. & 
+          (iv%info(gpspw)%j(1,1) < jts-1) .or.(iv%info(gpspw)%j(1,1) > jte)) then 
          call da_error(__FILE__,__LINE__,(/"Should never have obs outside halo by now"/))
-         ! iv%gpspw(1)%loc%proc_domain_with_halo = .false. 
-         iv%gpspw(1)%loc%proc_domain = .false. 
+         iv%info(gpspw)%proc_domain(:,1) = .false. 
       else 
-         ! iv%gpspw(1)%loc%proc_domain_with_halo = .true.  
-         iv%gpspw(1)%loc%proc_domain = .false.  
+         iv%info(gpspw)%proc_domain(:,1) = .false.  
 
-         if (iv%gpspw(1)%loc%i >= its .and. iv%gpspw(1)%loc%i <= ite .and. &  
-             iv%gpspw(1)%loc%j >= jts .and. iv%gpspw(1)%loc%j <= jte) then  
-            iv%gpspw(1)%loc%proc_domain = .true.  
+         if (iv%info(gpspw)%i(1,1) >= its .and. iv%info(gpspw)%i(1,1) <= ite .and. &  
+             iv%info(gpspw)%j(1,1) >= jts .and. iv%info(gpspw)%j(1,1) <= jte) then  
+            iv%info(gpspw)%proc_domain(:,1) = .true.  
          end if  
       end if 
 
       write(unit=stdout,fmt='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
       write(unit=stdout,fmt='(3f15.5)')    pseudo_x,  pseudo_y,  pseudo_z
-      write(unit=stdout,fmt='(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
+      write(unit=stdout,fmt='(a,f8.2)')    'iv%gpspw: elv=',iv%info(gpspw)%elv(1)
    end if 
 
    if (iv % nlocal(gpspw) > 0) then
@@ -111,16 +109,16 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
       !   ' obsh-mdlh', '   obs pw ', '  model pw',  &
       !   '   O-B pw ', '    Dpw   ', '  O-B+Dpw '
 
-      do n=iv%plocal(iv%time-1,gpspw) + 1, iv%plocal(iv%time,gpspw)
+      do n=iv%info(gpspw)%n1,iv%info(gpspw)%n2
 
          ! [1.1] Get horizontal interpolation weights:
 
-         i   = iv%gpspw(n)%loc%i
-         j   = iv%gpspw(n)%loc%j
-         dx  = iv%gpspw(n)%loc%dx
-         dy  = iv%gpspw(n)%loc%dy
-         dxm = iv%gpspw(n)%loc%dxm
-         dym = iv%gpspw(n)%loc%dym
+         i   = iv%info(gpspw)%i(1,n)
+         j   = iv%info(gpspw)%j(1,n)
+         dx  = iv%info(gpspw)%dx(1,n)
+         dy  = iv%info(gpspw)%dy(1,n)
+         dxm = iv%info(gpspw)%dxm(1,n)
+         dym = iv%info(gpspw)%dym(1,n)
 
          model_tpw = dym*(dxm*grid%xb%tpw(i,j)   + dx*grid%xb%tpw(i+1,j)) + &
                      dy *(dxm*grid%xb%tpw(i,j+1) + dx*grid%xb%tpw(i+1,j+1))
@@ -134,7 +132,7 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
             if (ob % gpspw(n) % tpw > missing_r .AND. &
                 iv % gpspw(n) % tpw % qc >= obs_qc_pointer) then
                dpw = 0.0
-               obs_terr   = iv%gpspw(n)%info%elv
+               obs_terr   = iv%info(gpspw)%elv(n)
                model_terr = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + &
                           dy *(dxm*grid%xb%terr(i,j+1) + dx*grid%xb%terr(i+1,j+1))
 
@@ -175,16 +173,10 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
          ! [5.0] Perform optional maximum error check:
          !------------------------------------------------------------------------
 
-         if ( check_max_iv) then
-            call da_check_max_iv_gpspw(it, iv % gpspw(n), ittpw,ittpwf)
-         end if
-
-         ! write(unit=unit_gps, fmt='(i4,10f10.3)') n, &
-         !    iv%gpspw(n)%info%lat, iv%gpspw(n)%info%lon, obs_terr, &
-         !    model_terr, obs_terr - model_terr, ob%gpspw(n)%tpw,   &
-         !    model_tpw , ob%gpspw(n)%tpw-model_tpw, 0.1*dpw,       &
-         !    ob%gpspw(n)%tpw-model_tpw+0.1*dpw
       end do
+      if ( check_max_iv) then
+         call da_check_max_iv_gpspw(iv, it, ittpw,ittpwf)
+      end if
 
       if (rootproc .and. check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &

@@ -37,7 +37,7 @@ subroutine da_ao_stats_synop (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(synop)
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%synop(n)%u%qc,  & 
             re%synop(n)%u, nu, & 
             stats%minimum%u, stats%maximum%u, &
@@ -58,7 +58,7 @@ subroutine da_ao_stats_synop (stats_unit, iv, re)
             re%synop(n)%q, nq, & 
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%synop(n)%loc%proc_domain)
+      end if    ! end if (iv%info(synop)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

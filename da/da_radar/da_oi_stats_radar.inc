@@ -27,10 +27,10 @@ subroutine da_oi_stats_radar (stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(radar)
-      if (iv%radar(n)%loc%proc_domain) then
-         do k=1, iv%radar(n)%info%levels
+      if (iv%info(radar)%proc_domain(1,n)) then
+         do k=1, iv%info(radar)%levels(n)
             if (use_radar_rv) then
-               call da_stats_calculate(iv%radar(n)%loc%obs_global_index, &
+               call da_stats_calculate(iv%info(radar)%obs_global_index(n), &
                   k, iv%radar(n)%rv(k)%qc, &
                   iv%radar(n)%rv(k)%inv, nrv, &
                   stats%minimum%rv, stats%maximum%rv, &
@@ -38,7 +38,7 @@ subroutine da_oi_stats_radar (stats_unit, iv)
             end if
 
             if (use_radar_rf) then
-               call da_stats_calculate(iv%radar(n)%loc%obs_global_index, &
+               call da_stats_calculate(iv%info(radar)%obs_global_index(n), &
                   k, iv%radar(n)%rf(k)%qc, &
                   iv%radar(n)%rf(k)%inv, nrf, &
                   stats%minimum%rf, stats%maximum%rf, &

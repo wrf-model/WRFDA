@@ -24,7 +24,7 @@ subroutine da_check_xtoy_adjoint_ssmi_rv(iv, y, adjtest_lhs, pertile_lhs)
 
          pertile_lhs = pertile_lhs + var
 
-         if (iv%ssmi_rv(n)%loc%proc_domain) then
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) then
             adjtest_lhs = adjtest_lhs + var
          end if
 

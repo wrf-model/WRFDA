@@ -25,7 +25,7 @@ subroutine da_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
       do n=1, iv%nlocal(bogus)
          jo_grad_y%bogus(n)%slp = -re%bogus(n)%slp &
             / (iv%bogus(n)%slp%error * iv%bogus(n)%slp%error)
-         do k=1, iv%bogus(n)%info%levels
+         do k=1, iv%info(bogus)%levels(n)
             jo_grad_y%bogus(n)%u(k) = -re%bogus(n)%u(k) &
                / (iv%bogus(n)%u(k)%error *iv%bogus(n)%u(k)%error)
             jo_grad_y%bogus(n)%v(k) = -re%bogus(n)%v(k) &
@@ -36,10 +36,10 @@ subroutine da_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
                / (iv%bogus(n)%q(k)%error * iv%bogus(n)%q(k)%error)
          end do
 
-         if (iv%bogus(n)%loc%proc_domain) then
+         if (iv%info(bogus)%proc_domain(1,n)) then
             jo%bogus_slp = jo%bogus_slp - re%bogus(n)%slp * jo_grad_y%bogus(n)%slp
 
-            do k=1, iv%bogus(n)%info%levels
+            do k=1, iv%info(bogus)%levels(n)
                jo%bogus_u = jo%bogus_u - re%bogus(n)%u(k) * jo_grad_y%bogus(n)%u(k)
                jo%bogus_v = jo%bogus_v - re%bogus(n)%v(k) * jo_grad_y%bogus(n)%v(k)
                jo%bogus_t = jo%bogus_t - re%bogus(n)%t(k) * jo_grad_y%bogus(n)%t(k)

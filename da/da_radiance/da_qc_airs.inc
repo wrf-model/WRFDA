@@ -68,7 +68,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
       ! do n= 1, iv%instid(i)%num_rad           ! loop for pixel
       do n= iv%plocal_rad(iv%time-1,i)+1, iv%plocal_rad(iv%time,i)
 
-         if (iv%instid(i)%proc_domain(n)) &
+         if (iv%instid(i)%info%proc_domain(1,n)) &
                num_proc_domain = num_proc_domain + 1
 
          !  0.0  initialise QC by flags assuming good obs
@@ -81,7 +81,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             isflg = iv%instid(i)%isflg(n) 
             if (isflg > 0) then
                iv%instid(i)%tb_qc(:,n)  =  -1
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_landsurface = nrej_landsurface + 1
             end if
 
@@ -91,7 +91,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 !         lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
 !         if (lmix) then
 !            iv%instid(i)%tb_qc(:,n)  =  qc_bad
-!            if (iv%instid(i)%proc_domain(n)) &
+!            if (iv%instid(i)%info%proc_domain(1,n)) &
 !               nrej_mixsurface = nrej_mixsurface + 1
 !         end if
 
@@ -99,7 +99,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 !         !------------------------------------------------------
 !         if (isflg > 0) then 
 !            iv%instid(i)%tb_qc(:,n)  = qc_bad
-!            if (iv%instid(i)%proc_domain(n)) &
+!            if (iv%instid(i)%info%proc_domain(1,n)) &
 !               nrej_windowchanl = nrej_windowchanl + 1
 !         end if
 
@@ -111,7 +111,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !scanpos = iv%instid(i)%scanpos(n)
          !if (scanpos <= 3 .or. scanpos >= 88) then
          !   iv%instid(i)%tb_qc(:,n)  =  qc_bad
-         !   if (iv%instid(i)%proc_domain(n)) &
+         !   if (iv%instid(i)%info%proc_domain(1,n)) &
          !         nrej_limb = nrej_limb + 1
          !end if
 
@@ -124,7 +124,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             if (iv%instid(i)%clwp(n) > 0.05) then
                iv%instid(i)%tb_qc(:,n) = qc_bad
                iv%instid(i)%cloud_flag(:,n) = -1
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_clw = nrej_clw + 1
             end if
 
@@ -135,7 +135,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             !
             if(ob%instid(i)%tb(129,n) < 271.0) then
                iv%instid(i)%tb_qc(:,n)  = qc_bad
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_windowchlong = nrej_windowchlong + 1
             end if
 
@@ -145,7 +145,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             SST_airs=ob%instid(i)%tb(272,n)   !! short wave window channel #2328 - 3.882 nm (2616.38 cm^-1)
             if(SST_airs > 307.0) then
                iv%instid(i)%tb_qc(257:281,n)  = qc_bad
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_windowchshort = nrej_windowchshort + 1
             end if
 
@@ -159,7 +159,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             diffSST=abs(SST_model-SST_airs)
             if(SST_airs < 307 .and. diffSST > 2.0) then
                iv%instid(i)%tb_qc(:,n)  = qc_bad
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_sst = nrej_sst + 1
             end if
 
@@ -174,7 +174,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
          !if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 850.0)) then
          !   iv%instid(i)%tb_qc(5,n)  = qc_bad
-         !   if (iv%instid(i)%proc_domain(n)) &
+         !   if (iv%instid(i)%info%proc_domain(1,n)) &
          !      nrej_topo = nrej_topo + 1
          !end if
 
@@ -193,7 +193,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !------------------------------------------------
             if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1
             end if
 
@@ -209,7 +209,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
             if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_omb_std(k) = nrej_omb_std(k) + 1
             end if
 
@@ -217,10 +217,10 @@ subroutine da_qc_airs (i, nchan, ob, iv)
            !---------------------------------------------
             if (iv%instid(i)%tb_qc(k,n) == qc_bad) then  ! bad obs
                iv%instid(i)%tb_error(k,n) = 500.0
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej(k) = nrej(k) + 1
             else                                         ! good obs
-               if (iv%instid(i)%proc_domain(n)) &
+               if (iv%instid(i)%info%proc_domain(1,n)) &
                   ngood(k) = ngood(k) + 1
             end if
          end do ! chan

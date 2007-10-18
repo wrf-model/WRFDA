@@ -12,7 +12,7 @@ module da_setup_structures
       analysis_date,coarse_ix,coarse_ds,map_projection,coarse_jy, c2,dsm,phic, &
       pole, cone_factor, start_x,base_pres,ptop,psi1,start_y, base_lapse,base_temp,truelat2_3dv, &
       truelat1_3dv,xlonc,t0,num_fft_factors,pi,print_detail_spectral, global, &
-      use_radar_rf, kts, kte, &
+      use_radar_rf, num_ob_indexes,kts, kte, &
       max_fgat_time, num_fgat_time, dt_cloud_model, &
       use_ssmiretrievalobs,use_radarobs,use_ssmitbobs,use_qscatobs, num_procs, &
       num_pseudo, missing, ob_format, ob_format_bufr,ob_format_ascii, &
@@ -36,7 +36,7 @@ module da_setup_structures
       vert_evalue_local, obs_names, num_ob_indexes, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, trace_use_dull
+      bogus, buoy, qscat,pseudo, trace_use_dull, kts,kte
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &

@@ -1,15 +1,16 @@
-subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
+subroutine da_check_max_iv_ssmt1(iv, it, itt,ittf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
-   integer,           intent(in)    ::  it      ! outer iteration
-   integer,           intent(inout) ::  itt, ittf                
-   type (ssmt1_type), intent(inout) :: ssmt1
 
-   integer ::  k
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    ::  it      ! outer iteration
+   integer,       intent(inout) ::  itt, ittf           
+
+   integer ::  k,n
    logical :: failed
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_ssmt1")
@@ -33,10 +34,12 @@ subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
 
    failed = .false.
 
-   do k = 1, ssmt1 % info % levels
-      ! Temperature
-      call da_max_error_qc (it, ssmt1 % info, ssmt1 % t(k),&
-         max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+   do n=iv%info(ssmt1)%n1,iv%info(ssmt1)%n2
+      do k = 1, iv%info(ssmt1)%levels(n)
+         ! Temperature
+         call da_max_error_qc_new (it, iv%info(ssmt1), n, iv%ssmt1(n)%t(k),&
+            max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      end do
    end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_ssmt1")

@@ -34,7 +34,7 @@ subroutine da_check_xtoy_adjoint_ssmi_tb (iv, y, adjtest_lhs, pertile_lhs)
 
       pertile_lhs = pertile_lhs + var
 
-      if (iv%ssmi_tb(n)%loc%proc_domain) then
+      if (iv%info(ssmi_tb)%proc_domain(1,n)) then
          adjtest_lhs = adjtest_lhs + var
       end if
       y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms

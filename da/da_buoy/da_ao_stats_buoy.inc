@@ -37,7 +37,7 @@ subroutine da_ao_stats_buoy (stats_unit, iv, re)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(buoy)
-      if (iv%buoy(n)%loc%proc_domain) then
+      if (iv%info(buoy)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%buoy(n)%u%qc, & 
              re%buoy(n)%u, nu, & 
              stats%minimum%u, stats%maximum%u, &

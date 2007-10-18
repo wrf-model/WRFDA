@@ -33,6 +33,8 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    if (var4d) then
       do nobwin=num_fgat_time,1,-1
          iv%time = nobwin
+         iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
+         iv%info(:)%n2 = iv%plocal(iv%time,:)
          call da_zero_x(grid%xa)
          call da_transform_xtoy_adj(grid, iv, y, grid%xa)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
@@ -92,6 +94,9 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
 
       call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01')
    else  ! var4d
+      iv%time = 1
+      iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
+      iv%info(:)%n2 = iv%plocal(iv%time,:)
       call da_zero_x(grid%xa)
       call da_transform_xtoy_adj(grid, iv, y,grid%xa)
    end if ! var4d

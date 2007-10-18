@@ -25,7 +25,7 @@ subroutine da_residual_geoamv(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    n_obs_bad % v % num = number_type(0, 0, 0)
 
    do n=1, iv%nlocal(geoamv)
-      do k=1, iv%geoamv(n)%info%levels
+      do k=1, iv%info(geoamv)%levels(n)
          np_available = np_available + 2
          re%geoamv(n)%u(k) = da_residual(n, 0, y%geoamv(n)%u(k), iv%geoamv(n)%u(k), n_obs_bad % u)
          re%geoamv(n)%v (k)= da_residual(n, 0, y%geoamv(n)%v(k), iv%geoamv(n)%v(k), n_obs_bad % v)

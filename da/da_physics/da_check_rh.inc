@@ -27,8 +27,6 @@ subroutine da_check_rh(grid)
    ! To get the grid%xa%rh for the moisture adjustments
 
    if (cv_options_hum == cv_options_hum_specific_humidity) then
-      write(unit=stdout,fmt='(a,i2,a)') &
-         'cv_options_hum=',cv_options_hum,' to get grid%xa%rh..'
       call da_tpq_to_rh_lin (grid)
    end if
 

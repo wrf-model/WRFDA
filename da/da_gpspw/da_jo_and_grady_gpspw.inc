@@ -21,7 +21,7 @@ subroutine da_jo_and_grady_gpspw(iv, re, jo, jo_grad_y)
       do n=1, iv%nlocal(gpspw)
          jo_grad_y%gpspw(n)%tpw = -re%gpspw(n)%tpw / (iv%gpspw(n)%tpw%error * iv%gpspw(n)%tpw%error)
 
-         if (iv%gpspw(n)%loc%proc_domain) then
+         if (iv%info(gpspw)%proc_domain(1,n)) then
             jo % gpspw_tpw = jo % gpspw_tpw - re%gpspw(n)%tpw * jo_grad_y%gpspw(n)%tpw
          end if
       end do

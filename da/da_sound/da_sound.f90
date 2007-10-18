@@ -6,16 +6,15 @@ module da_sound
       max_error_p,max_error_q, sfc_assi_options, &
       max_stheight_diff,test_dm_exact, trace_use, anal_type_verify, &
       kms,kme,kts,kte,sfc_assi_options_1,sfc_assi_options_2, &
-      trace_use_dull, sound
+      trace_use_dull, sound, sonde_sfc, position_lev_dependant
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, sound_type, number_type, bad_data_type, &
       residual_sound_type,synop_type
    use module_domain, only : xb_type, domain
-   use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
-      da_interp_lin_3d_adj,da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj, &
-      da_interp_lin_2d, da_interp_lin_2d_adj
+   use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest, &
+      da_interp_lin_3d_adj_newest, da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest, da_interp_lin_2d_newer
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction
+   use da_tools, only : da_max_error_qc_new, da_residual, da_obs_sfc_correction, da_convert_zk
    use da_tools_serial, only : da_get_unit, da_free_unit
    use da_par_util, only : da_proc_stats_combine, &
       da_deallocate_global_sound, da_to_global_sound, da_to_global_sonde_sfc, &
@@ -74,7 +73,6 @@ contains
 #include "da_transform_xtoy_sound_adj.inc"
 #include "da_check_max_iv_sound.inc"
 #include "da_get_innov_vector_sound.inc"
-#include "da_obs_diagnostics.inc"
 #include "da_calculate_grady_sound.inc"
 
 #include "da_ao_stats_sonde_sfc.inc"

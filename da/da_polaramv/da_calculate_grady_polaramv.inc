@@ -16,7 +16,7 @@ subroutine da_calculate_grady_polaramv(iv, re, jo_grad_y)
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_polaramv")
 
    do n=1, iv%nlocal(polaramv)
-      do k=1, iv%polaramv(n)%info%levels
+      do k=1, iv%info(polaramv)%levels(n)
          if (iv%polaramv(n)%u(k)%qc < obs_qc_pointer) then
             re%polaramv(n)%u(k) = 0.0
          end if

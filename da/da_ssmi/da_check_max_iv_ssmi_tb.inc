@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
+subroutine da_check_max_iv_ssmi_tb(iv, it, &
    itb19v, itb19vf, itb19h, itb19hf, itb22v, itb22vf,                  &
    itb37v, itb37vf, itb37h, itb37hf, itb85v, itb85vf, itb85h, itb85hf)
 
@@ -8,14 +8,15 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 
    implicit none
 
-   integer,             intent(in)    :: it
-   type (ssmi_tb_type), intent(inout) :: ssmi_tb
-   integer,             intent(inout) :: itb19h, itb19v, itb22v
-   integer,             intent(inout) :: itb37h, itb37v, itb85h, itb85v
-   integer,             intent(inout) :: itb19hf, itb19vf, itb22vf 
-   integer,             intent(inout) :: itb37hf, itb37vf, itb85hf, itb85vf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it
+   integer,       intent(inout) :: itb19h, itb19v, itb22v
+   integer,       intent(inout) :: itb37h, itb37v, itb85h, itb85v
+   integer,       intent(inout) :: itb19hf, itb19vf, itb22vf 
+   integer,       intent(inout) :: itb37hf, itb37vf, itb85hf, itb85vf
 
    logical :: failed
+   integer :: n
 
    if (trace_use) call da_trace_entry("da_check_max_iv_ssmi_tb")
 
@@ -49,40 +50,42 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    ! failed=.false. is defined inside the da_max_error_qc 
    ! failed = .false.
 
-   ! Tb19h
+   do n=iv%info(ssmi_tb)%n1, iv%info(ssmi_tb)%n2
+      ! Tb19h
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19h, max_error_tb, &
-      itb19h, itb19hf, check_max_iv_unit, 'TB19h', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb19h, max_error_tb, &
+         itb19h, itb19hf, check_max_iv_unit, 'TB19h', failed, check_max_iv_print)
 
-   ! Tb19v
+      ! Tb19v
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19v, &
-      max_error_tb, itb19v, itb19vf, check_max_iv_unit, 'TB19v', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb19v, &
+         max_error_tb, itb19v, itb19vf, check_max_iv_unit, 'TB19v', failed, check_max_iv_print)
 
-   ! Tb22v
+      ! Tb22v
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb22v, max_error_tb, &
-      itb22v, itb22vf, check_max_iv_unit, 'TB22v', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb22v, max_error_tb, &
+         itb22v, itb22vf, check_max_iv_unit, 'TB22v', failed, check_max_iv_print)
 
-   ! Tb37h
+      ! Tb37h
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37h, max_error_tb, &
-      itb37h, itb37hf, check_max_iv_unit, 'TB37h', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb37h, max_error_tb, &
+         itb37h, itb37hf, check_max_iv_unit, 'TB37h', failed, check_max_iv_print)
 
-   ! Tb37v
+      ! Tb37v
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37v, max_error_tb, &
-      itb37v, itb37vf, check_max_iv_unit, 'TB37v', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb37v, max_error_tb, &
+         itb37v, itb37vf, check_max_iv_unit, 'TB37v', failed, check_max_iv_print)
 
-   ! Tb85h
+      ! Tb85h
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85h, max_error_tb, &
-      itb85h, itb85hf, check_max_iv_unit, 'TB85h', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb85h, max_error_tb, &
+         itb85h, itb85hf, check_max_iv_unit, 'TB85h', failed, check_max_iv_print)
 
-   ! Tb85v
+      ! Tb85v
 
-   call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85v,max_error_tb, &
-      itb85v, itb85vf, check_max_iv_unit, 'TB85v', failed, check_max_iv_print)
+      call da_max_error_qc_new(it, iv%info(ssmi_tb), n, iv%ssmi_tb(n)%tb85v,max_error_tb, &
+         itb85v, itb85vf, check_max_iv_unit, 'TB85v', failed, check_max_iv_print)
+   end do
 
    !---------------------------------------------------------------------------
    ! [3.0] Output test failed results:

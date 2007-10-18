@@ -19,10 +19,10 @@ module da_obs_io
       max_profiler_input, max_sound_input, max_ships_input, &
       max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
       max_synop_input,max_ssmt2_input,  max_qscat_input, &
-      obs_names, num_ob_indexes, ids,ide, &
+      obs_names, num_ob_indexes, fm_index, ids,ide, &
       sound, synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
       metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
-      radar, radiance, airsr, trace_use_dull
+      radar, radiance, airsr, sonde_sfc, trace_use_dull
 
    use da_define_structures, only : iv_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &

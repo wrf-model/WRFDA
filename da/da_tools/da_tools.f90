@@ -21,7 +21,7 @@ module da_tools
       t_kelvin, trace_use_frequent, jds, jde
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
-      iv_type, y_type, da_random_seed
+      iv_type, y_type, da_random_seed, infa_type
    use da_tools_serial, only : da_array_print
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error, message, da_warning
@@ -33,22 +33,35 @@ module da_tools
 
 contains
 
-#include "da_xyll_lc.inc"
+#include "da_llxy.inc"
+#include "da_llxy_new.inc"
+#include "da_llxy_default.inc"
+#include "da_llxy_default_new.inc"
+#include "da_llxy_kma_global.inc"
+#include "da_llxy_kma_global_new.inc"
+#include "da_llxy_latlon.inc"
+#include "da_llxy_latlon_new.inc"
 #include "da_llxy_lc.inc"
-#include "da_set_lc.inc"
-#include "da_xyll_ps.inc"
+#include "da_llxy_lc_new.inc"
+#include "da_llxy_merc.inc"
+#include "da_llxy_merc_new.inc"
 #include "da_llxy_ps.inc"
+#include "da_llxy_ps_new.inc"
+#include "da_llxy_wrf.inc"
+#include "da_llxy_wrf_new.inc"
+#include "da_xyll.inc"
+#include "da_xyll_default.inc"
+#include "da_xyll_latlon.inc"
+#include "da_xyll_lc.inc"
+#include "da_xyll_merc.inc"
+#include "da_xyll_ps.inc"
+#include "da_set_lc.inc"
 #include "da_set_ps.inc"
 #include "da_map_init.inc"
-#include "da_llxy_latlon.inc"
-#include "da_xyll_latlon.inc"
-#include "da_llxy_wrf.inc"
-#include "da_xyll.inc"
 #include "da_map_set.inc"
-#include "da_xyll_merc.inc"
-#include "da_llxy_merc.inc"
 #include "da_set_merc.inc"
 #include "da_lc_cone.inc"
+#include "da_convert_zk.inc"
 
 #include "da_1d_eigendecomposition.inc"
 #include "da_obs_sfc_correction.inc"
@@ -57,23 +70,20 @@ contains
 #include "da_intpsfc_tem.inc"
 #include "da_mo_correction.inc"
 #include "da_diff_seconds.inc"
-#include "da_llxy_kma_global.inc"
-#include "da_llxy.inc"
 #include "da_residual.inc"
 #include "da_residual_new.inc"
 #include "da_add_noise.inc"
 #include "da_add_noise_new.inc"
 #include "da_max_error_qc.inc"
+#include "da_max_error_qc_new.inc"
 #include "da_random_omb.inc"
 #include "da_set_randomcv.inc"
 #include "da_gaus_noise.inc"
-#include "da_llxy_default.inc"
 #include "da_openfile.inc"
 #include "da_smooth_anl.inc"
 #include "da_togrid_new.inc"
 #include "da_togrid.inc"
 #include "da_unifva.inc"
-#include "da_xyll_default.inc"
 
 #include "da_eof_decomposition_test.inc"
 #include "da_eof_decomposition.inc"

@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_airsr(iv, it,itt,ittf,itqv,itqvf)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies max error check on AIRS retrievals
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (airsr_type), intent(inout) :: airsr
-   integer,           intent(inout) :: itt,ittf,itqv,itqvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itt,ittf,itqv,itqvf
 
-   integer :: k
+   integer :: k,n
    logical :: failed
    
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_airsr")
@@ -35,20 +35,22 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
 
    failed = .false.
 
-   do k = 1, airsr % info % levels
-      ! Temperature
-      if (airsr % t(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc (it, airsr % info, airsr % t(k),&
-            max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
-                         failed, check_max_iv_print)
+   do n=iv%info(airsr)%n1,iv%info(airsr)%n2
+      do k = 1, iv%info(airsr)%levels(n)
+         ! Temperature
+         if (iv%airsr(n)%t(k)%qc >= obs_qc_pointer) then
+            call da_max_error_qc_new (it, iv%info(airsr), n, iv%airsr(n)%t(k),&
+               max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
+                            failed, check_max_iv_print)
 
-      end if
-      ! Mixing ratio, same ratio as relative humidity
-      if (airsr % q(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc (it, airsr % info, airsr % q(k), &
-            max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
-                         failed, check_max_iv_print)
-      end if
+         end if
+         ! Mixing ratio, same ratio as relative humidity
+         if (iv%airsr(n)%q(k)%qc >= obs_qc_pointer) then
+            call da_max_error_qc_new  (it, iv%info(airsr), n, iv%airsr(n)%q(k), &
+               max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
+                            failed, check_max_iv_print)
+         end if
+      end do
    end do
    
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_airsr")

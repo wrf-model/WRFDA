@@ -10,22 +10,44 @@ subroutine da_transform_xtoy_synop (grid, iv, y)
    type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
-   integer :: n        ! Loop counter.
+   integer :: n       ! Loop counter.
+
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_t(:,:)
+   real, allocatable :: model_q(:,:)
+   real, allocatable :: model_psfc(:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_synop")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%plocal(iv%time-1,synop) + 1, iv%plocal(iv%time,synop)
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d(grid%xa % u, iv%synop(n)%loc, y%synop(n)%u, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % v, iv%synop(n)%loc, y%synop(n)%v, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % t, iv%synop(n)%loc, y%synop(n)%t, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % q, iv%synop(n)%loc, y%synop(n)%q, iv%synop(n)%zk)
+      allocate (model_u(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_v(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_t(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_q(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_psfc(iv%info(synop)%n1:iv%info(synop)%n2))
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d_newest (grid%xa%u, iv%info(synop), model_u)
+      call da_interp_lin_3d_newest (grid%xa%v, iv%info(synop), model_v)
+      call da_interp_lin_3d_newest (grid%xa%t, iv%info(synop), model_t)
+      call da_interp_lin_3d_newest (grid%xa%q, iv%info(synop), model_q)
 
-         call da_interp_lin_2d(grid%xa % psfc, iv%synop(n)%loc, y%synop(n)%p)
+      call da_interp_lin_2d_newest(grid%xa%psfc, iv%info(synop), 1, model_psfc)
+
+      do n=iv%info(synop)%n1,iv%info(synop)%n2
+         y%synop(n)%u = model_u(1,n)
+         y%synop(n)%v = model_v(1,n)
+         y%synop(n)%t = model_t(1,n)
+         y%synop(n)%q = model_q(1,n)
+         y%synop(n)%p = model_psfc(n)
       end do
+      deallocate (model_u)
+      deallocate (model_v)
+      deallocate (model_t)
+      deallocate (model_q)
+      deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%plocal(iv%time-1,synop) + 1, iv%plocal(iv%time,synop)
+      do n=iv%info(synop)%n1,iv%info(synop)%n2
          call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
       end do
    end if

@@ -1,4 +1,4 @@
-subroutine da_llxy_merc_new(lat, lon, proj, x,y)
+subroutine da_llxy_merc_new(proj, info)
 
    !-----------------------------------------------------------------------
    ! Purpose: Compute x/y coordinate from lat lon for mercator projection
@@ -6,14 +6,11 @@ subroutine da_llxy_merc_new(lat, lon, proj, x,y)
   
    implicit none
 
-   real, intent(in)              :: lat(:,:)
-   real, intent(in)              :: lon(:,:)
-   type(proj_info),intent(in)    :: proj
-   real,intent(out)              :: x(:,:)
-   real,intent(out)              :: y(:,:)
+   type(proj_info), intent(in)    :: proj
+   type(infa_type), intent(inout) :: info
 
-real :: deltalon
-integer :: a,b
+   real :: deltalon
+   integer :: n
 
 if (trace_use) call da_trace_entry("da_llxy_merc_new")
 
@@ -31,16 +28,13 @@ if (trace_use) call da_trace_entry("da_llxy_merc_new")
 
 ! SLOW
 
-do a=lbound(lat,1),ubound(lat,1)
-do b=lbound(lat,2),ubound(lat,2)
-   deltalon = lon(a,b) - proj%lon1
-   if (deltalon < -180.0) deltalon = deltalon + 360.0
-   if (deltalon > 180.0) deltalon = deltalon - 360.0
-   x(a,b) = 1.0 + (deltalon/(proj%dlon*deg_per_rad))
-   y(a,b) = 1.0 + (ALOG(TAN(0.5*((lat(a,b) + 90.0) * rad_per_deg)))) / &
-           proj%dlon - proj%rsw
-end do
-end do
+   do n=lbound(info%lat,2),ubound(info%lat,2)
+      deltalon = info%lon(1,n) - proj%lon1
+      if (deltalon < -180.0) deltalon = deltalon + 360.0
+      if (deltalon > 180.0) deltalon = deltalon - 360.0
+      info%x(:,n) = 1.0 + (deltalon/(proj%dlon*deg_per_rad))
+      info%y(:,n) = 1.0 + (ALOG(TAN(0.5*((info%lat(1,n) + 90.0) * rad_per_deg)))) / proj%dlon - proj%rsw
+   end do
 
 if (trace_use) call da_trace_exit("da_llxy_merc_new")
 

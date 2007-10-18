@@ -12,21 +12,39 @@ subroutine da_transform_xtoy_pseudo_adj(iv, jo_grad_y, jo_grad_x)
 
    integer :: n        ! Loop counter.
 
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: q(:,:)
+   real, allocatable :: p(:,:)
+   real, allocatable :: t(:,:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_pseudo_adj")
 
-   do n=iv%plocal(iv%time-1,pseudo) + 1, iv%plocal(iv%time,pseudo)
-      ! [1.2] Interpolate horizontally:
-      call da_interp_obs_lin_2d_adj(jo_grad_x%u, iv%pseudo(n)%loc, &
-         jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d_adj(jo_grad_x%v, iv%pseudo(n)%loc, &
-         jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d_adj(jo_grad_x%q, iv%pseudo(n)%loc, &
-         jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d_adj(jo_grad_x%p, iv%pseudo(n)%loc, &
-         jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
-      call da_interp_obs_lin_2d_adj(jo_grad_x%t, iv%pseudo(n)%loc, &
-         jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
+   allocate (u(1,iv%info(pseudo)%n1:iv%info(pseudo)%n2))
+   allocate (v(1,iv%info(pseudo)%n1:iv%info(pseudo)%n2))
+   allocate (q(1,iv%info(pseudo)%n1:iv%info(pseudo)%n2))
+   allocate (p(1,iv%info(pseudo)%n1:iv%info(pseudo)%n2))
+   allocate (t(1,iv%info(pseudo)%n1:iv%info(pseudo)%n2))
+
+   do n=iv%info(pseudo)%n1,iv%info(pseudo)%n2
+      u(1,n) = jo_grad_y%pseudo(n)%u
+      v(1,n) = jo_grad_y%pseudo(n)%v
+      q(1,n) = jo_grad_y%pseudo(n)%q
+      p(1,n) = jo_grad_y%pseudo(n)%p
+      t(1,n) = jo_grad_y%pseudo(n)%t
    end do
+
+   call da_interp_lin_3d_adj_newest(jo_grad_x%u, iv%info(pseudo), u)
+   call da_interp_lin_3d_adj_newest(jo_grad_x%v, iv%info(pseudo), v)
+   call da_interp_lin_3d_adj_newest(jo_grad_x%q, iv%info(pseudo), q)
+   call da_interp_lin_3d_adj_newest(jo_grad_x%p, iv%info(pseudo), p)
+   call da_interp_lin_3d_adj_newest(jo_grad_x%t, iv%info(pseudo), t)
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (q)
+   deallocate (p)
+   deallocate (t)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_pseudo_adj")
 

@@ -36,33 +36,33 @@ subroutine da_oi_stats_ships (stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(ships)
-      if (iv%ships(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%ships(n)%loc%obs_global_index, &
+      if (iv%info(ships)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(ships)%obs_global_index(n), &
             0, iv%ships(n)%u%qc, &
             iv%ships(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(iv%ships(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ships)%obs_global_index(n), &
             0, iv%ships(n)%v%qc, &
             iv%ships(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(iv%ships(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ships)%obs_global_index(n), &
             0, iv%ships(n)%t%qc, &
             iv%ships(n)%t%inv, nt, &
             stats%minimum%t, stats%maximum%t, &
             stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(iv%ships(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ships)%obs_global_index(n), &
             0, iv%ships(n)%p%qc, &
             iv%ships(n)%p%inv, np, &
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
-         call da_stats_calculate(iv%ships(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ships)%obs_global_index(n), &
             0, iv%ships(n)%q%qc, &
             iv%ships(n)%q%inv, nq, &
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%ships(n)%loc%proc_domain)
+      end if    ! end if (iv%info(ships)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

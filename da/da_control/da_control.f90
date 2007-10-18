@@ -433,34 +433,34 @@ module da_control
 
    integer :: trace_start_points=0   ! Number of routines to initiate trace
 
-   integer, parameter :: num_ob_indexes = 23
+   integer, parameter :: num_ob_indexes = 24
 
-   integer, parameter :: sound_index    = 1
-   integer, parameter :: synop_index    = 2
-   integer, parameter :: pilot_index    = 3
-   integer, parameter :: satem_index    = 4
-   integer, parameter :: geoamv_index   = 5
-   integer, parameter :: polaramv_index = 6
-   integer, parameter :: airep_index    = 7
-   integer, parameter :: gpspw_index    = 8
-   integer, parameter :: gpsref_index   = 9
-   integer, parameter :: metar_index    = 10
-   integer, parameter :: ships_index    = 11
-   integer, parameter :: ssmi_rv_index  = 12
-   integer, parameter :: ssmi_tb_index  = 13
-   integer, parameter :: ssmt1_index    = 14
-   integer, parameter :: ssmt2_index    = 15
-   integer, parameter :: qscat_index    = 16
-   integer, parameter :: profiler_index = 17
-   integer, parameter :: buoy_index     = 18
-   integer, parameter :: bogus_index    = 19
-   integer, parameter :: pseudo_index   = 20
-   integer, parameter :: radar_index    = 21
-   integer, parameter :: radiance_index = 22
-   integer, parameter :: airsr_index    = 23
+   integer, parameter :: sound_index     = 1
+   integer, parameter :: synop_index     = 2
+   integer, parameter :: pilot_index     = 3
+   integer, parameter :: satem_index     = 4
+   integer, parameter :: geoamv_index    = 5
+   integer, parameter :: polaramv_index  = 6
+   integer, parameter :: airep_index     = 7
+   integer, parameter :: gpspw_index     = 8
+   integer, parameter :: gpsref_index    = 9
+   integer, parameter :: metar_index     = 10
+   integer, parameter :: ships_index     = 11
+   integer, parameter :: ssmi_rv_index   = 12
+   integer, parameter :: ssmi_tb_index   = 13
+   integer, parameter :: ssmt1_index     = 14
+   integer, parameter :: ssmt2_index     = 15
+   integer, parameter :: qscat_index     = 16
+   integer, parameter :: profiler_index  = 17
+   integer, parameter :: buoy_index      = 18
+   integer, parameter :: bogus_index     = 19
+   integer, parameter :: pseudo_index    = 20
+   integer, parameter :: radar_index     = 21
+   integer, parameter :: radiance_index  = 22
+   integer, parameter :: airsr_index     = 23
+   integer, parameter :: sonde_sfc_index = 24
 
    integer, parameter :: sound     = 1
-   integer, parameter :: sonde_sfc = 1 ! identical to sound
    integer, parameter :: synop     = 2
    integer, parameter :: pilot     = 3
    integer, parameter :: satem     = 4
@@ -483,6 +483,7 @@ module da_control
    integer, parameter :: radar     = 21
    integer, parameter :: radiance  = 22
    integer, parameter :: airsr     = 23
+   integer, parameter :: sonde_sfc = 24
 
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
       "sound         ", &
@@ -507,7 +508,8 @@ module da_control
       "pseudo        ", &
       "radar         ", &
       "radiance      ", &
-      "airs retrieval"  &
+      "airs retrieval", &
+      "sonde_sfc     "  &
    /)
 
    integer, parameter :: max_no_fm = 290

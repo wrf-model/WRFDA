@@ -565,6 +565,7 @@ rconfig   logical   check_max_iv            namelist,wrfvar5  1  .true.   - "che
 rconfig   logical   put_rand_seed           namelist,wrfvar5  1  .false.  - "put_rand_seed"            ""  ""
 rconfig   logical   omb_set_rand            namelist,wrfvar5  1  .false.  - "omb_set_rand"             ""  ""
 rconfig   logical   omb_add_noise           namelist,wrfvar5  1  .false.  - "omb_add_noise"            ""  ""
+rconfig   logical   position_lev_dependant  namelist,wrfvar5  1  .false.  - "position_lev_dependant"   ""  ""
 rconfig   integer   obs_qc_pointer          namelist,wrfvar5  1  0        - "obs_qc_pointer"           ""  ""
 rconfig   integer   max_sound_input         namelist,wrfvar5  1  5000     - "max_sound_input"          ""  ""
 rconfig   integer   max_synop_input         namelist,wrfvar5  1  50000    - "max_synop_input"          ""  ""

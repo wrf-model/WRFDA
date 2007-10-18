@@ -44,7 +44,7 @@ subroutine da_ao_stats_ssmi_tb  (stats_unit, iv, re)
 
    if (iv%nlocal(ssmi_tb) .gt. 0) then
       do n=1, iv%nlocal(ssmi_tb) 
-         if (iv%ssmi_tb(n)%loc%proc_domain) then
+         if (iv%info(ssmi_tb)%proc_domain(1,n)) then
             call da_stats_calculate (n, 0, iv%ssmi_tb(n)%tb19v%qc, &
                re%ssmi_tb(n)%tb19v, ntb19v,  &
                stats%minimum%tb19v,  stats%maximum%tb19v,&
@@ -79,7 +79,7 @@ subroutine da_ao_stats_ssmi_tb  (stats_unit, iv, re)
                re%ssmi_tb(n)%tb85h, ntb85h,  &
                stats%minimum%tb85h,  stats%maximum%tb85h,&
                stats%average%tb85h,  stats%rms_err%tb85h)
-         end if    ! end if (iv%ssmi_tb(n)%loc%proc_domain)
+         end if    ! end if (iv%info(ssmi_tb)%proc_domain(1,n))
       end do
    end if
 

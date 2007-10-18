@@ -1,4 +1,4 @@
-subroutine da_store_obs_grid_info_new (i,j, proc_domain)
+subroutine da_store_obs_grid_info_new (info)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,17 +6,14 @@ subroutine da_store_obs_grid_info_new (i,j, proc_domain)
 
    implicit none
 
-   integer,           intent(in)  :: i(:)
-   integer,           intent(in)  :: j(:)
-   logical,           intent(out) :: proc_domain(:)
+   type(infa_type), intent(inout) :: info
 
    if (trace_use) call da_trace_entry("da_store_obs_grid_info_new")
 
-   proc_domain(:) = .false.
+   info%proc_domain(:,:) = .false.
    
-   where(i(:) >= its .and. i(:) <= ite .and. &
-      j(:) >= jts .and. j(:) <= jte)
-      proc_domain(:) = .true.
+   where(info%i(:,:) >= its .and. info%i(:,:) <= ite .and. info%j(:,:) >= jts .and. info%j(:,:) <= jte)
+      info%proc_domain(:,:) = .true.
    end where
 
    if (trace_use) call da_trace_exit("da_store_obs_grid_info_new")

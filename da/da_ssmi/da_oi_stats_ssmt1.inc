@@ -25,12 +25,12 @@ subroutine da_oi_stats_ssmt1 (stats_unit, iv)
    rms_err = 0.0
 
    do n=1, iv%nlocal(ssmt1)
-      if (iv%ssmt1(n)%loc%proc_domain) then
-         do k=1, iv%ssmt1(n)%info%levels   
+      if (iv%info(ssmt1)%proc_domain(1,n)) then
+         do k=1, iv%info(ssmt1)%levels(n)   
             call da_stats_calculate(n, k, iv%ssmt1(n)%t(k)%qc, iv%ssmt1(n)%t(k)%inv, nt, &
                minimum, maximum, average, rms_err)
          end do
-      end if    ! end if (iv%ssmt1(n)%loc%proc_domain)
+      end if    ! end if (iv%info(ssmt1)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

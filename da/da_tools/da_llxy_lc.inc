@@ -9,7 +9,7 @@ subroutine da_llxy_lc(lat, lon, proj, x, y)
 
    real, intent(in)              :: lat      ! Latitude (-90->90 deg N)
    real, intent(in)              :: lon      ! Longitude (-180->180 E)
-   type(proj_info),intent(in)      :: proj     ! Projection info structure
+   type(proj_info),intent(in)    :: proj     ! Projection info structure
 
    real, intent(out)             :: x        ! Cartesian X coordinate
    real, intent(out)             :: y        ! Cartesian Y coordinate

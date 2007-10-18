@@ -78,7 +78,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(geoamv) > 0) then
       do n = 1, iv % nlocal(geoamv) 
-        do k = 1, iv % geoamv(n) % info % levels
+        do k = 1, iv%info(geoamv)%levels(n)
          call da_random_omb(iv % geoamv(n) % u(k) % error, ob % geoamv(n) % u(k), &
                            iv % geoamv(n) % u(k) % qc, iv % geoamv(n) % u(k) % inv)
          call da_random_omb(iv % geoamv(n) % v(k) % error, ob % geoamv(n) % v(k), &
@@ -91,7 +91,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(polaramv) > 0) then
       do n = 1, iv % nlocal(polaramv)
-        do k = 1, iv % polaramv(n) % info % levels
+        do k = 1, iv%info(polaramv)%levels(n)
          call da_random_omb(iv % polaramv(n) % u(k) % error, ob % polaramv(n) % u(k), &
                            iv % polaramv(n) % u(k) % qc, iv % polaramv(n) % u(k) % inv)
          call da_random_omb(iv % polaramv(n) % v(k) % error, ob % polaramv(n) % v(k), &
@@ -113,7 +113,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(sound) > 0) then
       do n = 1, iv % nlocal(sound)
-         do k = 1, iv % sound(n) % info % levels
+         do k = 1, iv%info(sound)%levels(n)
             call da_random_omb(iv % sound(n) % u(k) % error, ob % sound(n) % u(k), &
                               iv % sound(n) % u(k) % qc, iv % sound(n) % u(k) % inv)
             call da_random_omb(iv % sound(n) % v(k) % error, ob % sound(n) % v(k), &
@@ -141,7 +141,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(airep) > 0) then
       do n = 1, iv % nlocal(airep)
-         do k = 1, iv % airep(n) % info % levels
+         do k = 1, iv%info(airep)%levels(n)
             call da_random_omb(iv % airep(n) % u(k) % error, ob % airep(n) % u(k), &
                               iv % airep(n) % u(k) % qc, iv % airep(n) % u(k) % inv)
             call da_random_omb(iv % airep(n) % v(k) % error, ob % airep(n) % v(k), &
@@ -156,7 +156,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(pilot) > 0) then
       do n = 1, iv % nlocal(pilot)
-         do k = 1, iv % pilot(n) % info % levels
+         do k = 1, iv%info(pilot)%levels(n)
             call da_random_omb(iv % pilot(n) % u(k) % error, ob % pilot(n) % u(k), &
                               iv % pilot(n) % u(k) % qc, iv % pilot(n) % u(k) % inv)
             call da_random_omb(iv % pilot(n) % v(k) % error, ob % pilot(n) % v(k), &
@@ -230,7 +230,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(ssmt1) > 0) then
       do n = 1, iv % nlocal(ssmt1)
-         do k = 1, iv % ssmt1(n) % info % levels
+         do k = 1, iv%info(ssmt1)%levels(n)
             call da_random_omb(iv % ssmt1(n) % t(k) % error, &
                               ob % ssmt1(n) % t(k), &
                               iv % ssmt1(n) % t(k) % qc, &
@@ -243,7 +243,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(ssmt2) > 0) then
       do n = 1, iv % nlocal(ssmt2)
-         do k = 1, iv % ssmt2(n) % info % levels
+         do k = 1, iv%info(ssmt2)%levels(n)
             call da_random_omb(iv % ssmt2(n) % rh(k) % error, &
                               ob % ssmt2(n) % rh(k), &
                               iv % ssmt2(n) % rh(k) % qc, &
@@ -284,7 +284,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(profiler) > 0) then
       do n = 1, iv % nlocal(profiler)
-         do k = 1, iv % profiler(n) % info % levels
+         do k = 1, iv%info(profiler)%levels(n)
             call da_random_omb(iv % profiler(n) % u(k) % error, &
                ob % profiler(n) % u(k), &
                iv % profiler(n) % u(k) % qc, iv % profiler(n) % u(k) % inv)
@@ -299,7 +299,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(bogus) > 0) then
       do n = 1, iv % nlocal(bogus)
-         do k = 1, iv % bogus(n) % info % levels
+         do k = 1, iv%info(bogus)%levels(n)
             call da_random_omb(iv % bogus(n) % u(k) % error, &
                ob % bogus(n) % u(k), &
                iv % bogus(n) % u(k) % qc, iv % bogus(n) % u(k) % inv)
@@ -323,7 +323,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv % nlocal(airsr) > 0) then
       do n = 1, iv % nlocal(airsr)
-         do k = 1, iv % airsr(n) % info % levels
+         do k = 1, iv%info(airsr)%levels(n)
             call da_random_omb(iv % airsr(n) % t(k) % error, &
                ob % airsr(n) % t(k), &
                iv % airsr(n) % t(k) % qc, iv % airsr(n) % t(k) % inv)

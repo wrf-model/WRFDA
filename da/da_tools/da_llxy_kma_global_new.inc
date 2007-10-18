@@ -1,4 +1,4 @@
-subroutine da_llxy_kma_global_new(lat,lon,x,y)
+subroutine da_llxy_kma_global_new(info)
 
    !----------------------------------------------------------------------------
    ! Purpose:  calculates the(x,y) location(dot) in the global grids
@@ -6,14 +6,11 @@ subroutine da_llxy_kma_global_new(lat,lon,x,y)
    !----------------------------------------------------------------------------
    
    implicit none
-   
-   real, intent(in)  :: lat(:,:)
-   real, intent(in)  :: lon(:,:)
-   real, intent(out) :: x(:,:)
-   real, intent(out) :: y(:,:)
 
-real :: xlat, xlon
-integer :: a,b
+   type(infa_type), intent(inout) :: info
+
+   real    :: xlat, xlon
+   integer :: n
 
    if (trace_use) call da_trace_entry("da_llxy_kma_global_new")
 
@@ -33,20 +30,14 @@ integer :: a,b
 
 ! SLOW
 
-do a=lbound(lat,1),ubound(lat,1)
-do b=lbound(lat,2),ubound(lat,2)
-   
-   xlat = lat(a,b) - start_lat
-   xlon = lon(a,b) - start_lon
-
-   if (xlat < 0.0) xlat = xlat + 180.0
-   if (xlon < 0.0) xlon = xlon + 360.0
-
-   x(a,b) = start_x + xlon/delt_lon
-   y(a,b) = start_y + xlat/delt_lat
-
-end do
-end do
+   do n=lbound(info%lat,2),ubound(info%lat,2)
+      xlat = info%lat(1,n) - start_lat
+      xlon = info%lon(1,n) - start_lon
+      if (xlat < 0.0) xlat = xlat + 180.0
+      if (xlon < 0.0) xlon = xlon + 360.0
+      info%x(:,n) = start_x + xlon/delt_lon
+      info%y(:,n) = start_y + xlat/delt_lat
+   end do
 
    if (trace_use) call da_trace_exit("da_llxy_kma_global_new")
    

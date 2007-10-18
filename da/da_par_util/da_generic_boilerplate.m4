@@ -33,11 +33,12 @@ SUBROUTINE da_y_type_ex_$1( iv, re, slice )
 
    CALL da_y_facade_create( slice, iv%nlocal($1), iv%ntotal($1) )
    DO n=1, slice%num_obs
-     CALL da_res_generic_set_info( slice%obs(n),                     &
-                                     iv%$1(n)%loc%proc_domain,      &
-                                     iv%$1(n)%loc%obs_global_index )
-     CALL da_res_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
-                                     slice%obs(n) )
+stop
+!     CALL da_res_generic_set_info( slice%obs(n),                     &
+!                                     iv%$1(n)%loc%proc_domain,      &
+!                                     iv%$1(n)%loc%obs_global_index )
+!     CALL da_res_$2_to_generic( re%$1(n), iv%$1(n)%info%levels, &
+!                                     slice%obs(n) )
    ENDDO
 
 END SUBROUTINE da_y_type_ex_$1 ' )
@@ -105,12 +106,13 @@ SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
    ! deallocation is done in free_global_$1()
    ALLOCATE( iv_glob%$1(iv_glob%nlocal($1)) )
    DO n=1, iv_glob%nlocal($1)
-     iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
-     iv_glob%$1(n)%loc%obs_global_index = &
-                                        slice_glob%obs(n)%obs_global_index
-     IF ( da_res_generic_has_vector( slice_glob%obs(n) ) ) THEN
-       iv_glob%$1(n)%info%levels = SIZE(slice_glob%obs(n)%values(1)%ptr)
-     ENDIF
+stop
+!     iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
+!     iv_glob%$1(n)%loc%obs_global_index = &
+!                                        slice_glob%obs(n)%obs_global_index
+!     IF ( da_res_generic_has_vector( slice_glob%obs(n) ) ) THEN
+!       iv_glob%$1(n)%info%levels = SIZE(slice_glob%obs(n)%values(1)%ptr)
+!     ENDIF
    ENDDO
 
 END SUBROUTINE da_iv_type_ins_$1_global ' )

@@ -35,28 +35,28 @@ subroutine da_oi_stats_metar (stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%nlocal(metar)
-      if (iv%metar(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%metar(n)%loc%obs_global_index, &
+      if (iv%info(metar)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
             0, iv%metar(n)%u%qc, &
             iv%metar(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(iv%metar(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
             0, iv%metar(n)%v%qc, &
             iv%metar(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(iv%metar(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
              0, iv%metar(n)%t%qc, &
              iv%metar(n)%t%inv, nt, &
              stats%minimum%t, stats%maximum%t, &
              stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(iv%metar(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
             0, iv%metar(n)%p%qc, &
             iv%metar(n)%p%inv, np, &
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
-         call da_stats_calculate(iv%metar(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(metar)%obs_global_index(n), &
             0, iv%metar(n)%q%qc, &
             iv%metar(n)%q%inv, nq, &
             stats%minimum%q, stats%maximum%q, &

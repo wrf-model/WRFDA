@@ -13,16 +13,24 @@ subroutine da_transform_xtoy_profiler_adj(iv, jo_grad_y, jo_grad_x)
    integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
 
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_profiler_adj")
 
-   do n=iv%plocal(iv%time-1,profiler) + 1, iv%plocal(iv%time,profiler)
-      k = iv % profiler(n) % info % levels
-      if (k < 1) cycle
-      call da_interp_lin_3d_adj(jo_grad_x % u, iv%profiler(n)%loc, &
-         jo_grad_y%profiler(n)%u, k, iv%profiler(n)%zk, k)
-      call da_interp_lin_3d_adj(jo_grad_x % v, iv%profiler(n)%loc, &
-         jo_grad_y%profiler(n)%v, k, iv%profiler(n)%zk, k)
-   end do 
+   allocate (model_u(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
+   allocate (model_v(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
+
+   do n=iv%info(profiler)%n1,iv%info(profiler)%n2
+      model_u(1:iv%info(profiler)%levels(n),n) = jo_grad_y%profiler(n)%u(:)
+      model_v(1:iv%info(profiler)%levels(n),n) = jo_grad_y%profiler(n)%v(:)
+   end do
+
+   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(profiler), model_u)
+   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(profiler), model_v)
+
+   deallocate(model_u)
+   deallocate(model_v)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_profiler_adj")
 

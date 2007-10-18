@@ -25,7 +25,7 @@ subroutine da_jo_and_grady_ssmi_rv(iv, re, jo, jo_grad_y)
       jo_grad_y%ssmi_rv(n)%tpw = -re%ssmi_rv(n)%tpw / &
           (iv%ssmi_rv(n)%tpw%error * iv%ssmi_rv(n)%tpw%error)
 
-      if (iv%ssmi_rv(n)%loc%proc_domain) then
+      if (iv%info(ssmi_rv)%proc_domain(1,n)) then
 
          jo%ssmir_speed = jo%ssmir_speed - re%ssmi_rv(n)%speed * jo_grad_y%ssmi_rv(n)%speed
          jo%ssmir_tpw   = jo%ssmir_tpw   - re%ssmi_rv(n)%tpw   * jo_grad_y%ssmi_rv(n)%tpw

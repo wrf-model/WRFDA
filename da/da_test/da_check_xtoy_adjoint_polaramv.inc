@@ -15,15 +15,13 @@ subroutine da_check_xtoy_adjoint_polaramv (iv, y, adjtest_lhs, pertile_lhs)
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_polaramv")
 
    do n=1, iv%nlocal(polaramv)
-      if (iv%polaramv(n)%loc%proc_domain) then
-         do k=1, iv%polaramv(n)%info%levels
-            adjtest_lhs = adjtest_lhs + &
-               (y%polaramv(n)%u(k)/typical_u_rms)**2 + (y%polaramv(n)%v(k)/typical_v_rms)**2
+      do k=1, iv%info(polaramv)%levels(n)
+         if (iv%info(polaramv)%proc_domain(k,n)) then
+            adjtest_lhs = adjtest_lhs + (y%polaramv(n)%u(k)/typical_u_rms)**2 + (y%polaramv(n)%v(k)/typical_v_rms)**2
+         end if
+      end do
 
-         end do
-      end if
-
-      do k=1, iv%polaramv(n)%info%levels
+      do k=1, iv%info(polaramv)%levels(n)
          pertile_lhs = pertile_lhs + &
             (y%polaramv(n)%u(k)/typical_u_rms)**2 + (y%polaramv(n)%v(k)/typical_v_rms)**2
 

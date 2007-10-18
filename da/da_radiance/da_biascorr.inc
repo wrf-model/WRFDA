@@ -39,7 +39,7 @@ subroutine da_biascorr ( i, ob, iv)
 #endif
         end if
         iscan = iv%instid(i)%scanpos(n)
-        iband = floor(iv%instid(i)%info(n)%lat/10.0001) + 10
+        iband = floor(iv%instid(i)%info%lat(1,n)/10.0001) + 10
       do k=1,iv%instid(i)%nchan
        ! scan bias correction
        !-----------------------

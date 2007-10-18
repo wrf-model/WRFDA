@@ -6,15 +6,16 @@ subroutine da_read_filtered_rad( iv )
 
    implicit none
 
-   type (iv_type),    intent(inout)  :: iv       ! O-B structure.
 
-   integer            :: n        ! Loop counter.
-   integer            :: i        ! Index dimension.
+   type (iv_type), intent(inout)  :: iv       ! O-B structure.
 
-   integer            :: ios, filtered_rad_unit
-   character(len=50)  :: filename
-   integer            :: ndomain
-   logical            :: outside
+   integer              :: n        ! Loop counter.
+   integer              :: i        ! Index dimension.
+
+   integer              :: ios, filtered_rad_unit
+   character(len=50)    :: filename
+   integer              :: ndomain
+   logical, allocatable :: outside(:,:)
 
    if (trace_use) call da_trace_entry("da_read_filtered_rad")
 
@@ -48,23 +49,27 @@ subroutine da_read_filtered_rad( iv )
       allocate (iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tb_qc(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tb_error(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
+
       do n=1,iv%instid(i)%num_rad
          read(unit=filtered_rad_unit) ndomain, &
-            iv%instid(i)%info(n)%date_char, &
-            iv%instid(i)%scanpos(n)       , &
-            iv%instid(i)%ifgat(n)         , &
-            iv%instid(i)%landsea_mask(n)  , &
-            iv%instid(i)%info(n)%elv      , &
-            iv%instid(i)%info(n)%lat      , &
-            iv%instid(i)%info(n)%lon      , &
-            iv%instid(i)%satzen(n)        , &
-            iv%instid(i)%satazi(n)        , &
-            iv%instid(i)%tb_inv(:,n)      , &
-            iv%instid(i)%tb_error(:,n)    , &
+            iv%instid(i)%info%date_char(n), &
+            iv%instid(i)%scanpos(n)        , &
+            iv%instid(i)%ifgat(n)          , &
+            iv%instid(i)%landsea_mask(n)   , &
+            iv%instid(i)%info%elv(n)   , &
+            iv%instid(i)%info%lat(1,n) , &
+            iv%instid(i)%info%lon(1,n) , &
+            iv%instid(i)%satzen(n)         , &
+            iv%instid(i)%satazi(n)         , &
+            iv%instid(i)%tb_inv(:,n)       , &
+            iv%instid(i)%tb_error(:,n)     , &
             iv%instid(i)%tb_qc(:,n)
+         iv%instid(i)%info%lat(2:,n) = iv%instid(i)%info%lat(1,n)
+         iv%instid(i)%info%lon(2:,n) = iv%instid(i)%info%lon(1,n)
 
-         call da_llxy (iv%instid(i)%info(n), iv%instid(i)%loc(n), outside)
-         ! if (outside) cycle
+         allocate (outside(iv%instid(i)%nlevels, iv%instid(i)%num_rad))
+         call da_llxy_new (iv%instid(i)%info, outside)
+         deallocate (outside)
 
       end do     ! end do pixels
       close(filtered_rad_unit)

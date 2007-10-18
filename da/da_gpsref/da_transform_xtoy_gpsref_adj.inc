@@ -10,16 +10,21 @@ subroutine da_transform_xtoy_gpsref_adj(iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer                       :: n        ! Loop counter.
-   integer                       :: num_levs ! obs vertical levels
+   integer                       :: n  ! Loop counter.
+
+   real, allocatable :: model_ref(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_gpsref_adj")
 
-   do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref)
-      num_levs = iv % gpsref(n) % info % levels
-      call da_interp_lin_3d_adj(jo_grad_x %ref, iv%gpsref(n)%loc,jo_grad_y%gpsref(n)%ref, num_levs, &
-         iv%gpsref(n)%zk, num_levs)
+   allocate (model_ref(iv%info(gpsref)%max_lev,iv%info(gpsref)%n1:iv%info(gpsref)%n2))
+
+   do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
+      model_ref(1:iv%info(gpsref)%levels(n),n) = jo_grad_y%gpsref(n)%ref(:)
    end do
+
+   call da_interp_lin_3d_adj_newest (jo_grad_x%ref, iv%info(gpsref), model_ref)
+
+   deallocate(model_ref)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_gpsref_adj")
 

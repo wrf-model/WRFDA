@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ssmi_rv(it, ssmi_rv, itpw, itpwf, ispeed, ispeedf)
+subroutine da_check_max_iv_ssmi_rv(iv, it, itpw, itpwf, ispeed, ispeedf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,12 @@ subroutine da_check_max_iv_ssmi_rv(it, ssmi_rv, itpw, itpwf, ispeed, ispeedf)
 
    implicit none
 
-   integer,                    intent(in)    :: it ! Outer loop 
-   integer,                    intent(inout) :: itpw, itpwf, ispeed, ispeedf
-   type (ssmi_rv_type), intent(inout) :: ssmi_rv
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it ! Outer loop 
+   integer,       intent(inout) :: itpw, itpwf, ispeed, ispeedf
 
    logical :: failed
+   integer :: n
 
    if (trace_use) call da_trace_entry("da_check_max_iv_ssmi_rv")
 
@@ -34,15 +35,12 @@ subroutine da_check_max_iv_ssmi_rv(it, ssmi_rv, itpw, itpwf, ispeed, ispeedf)
 
    failed = .false.
 
-   ! tpw
-
-   call da_max_error_qc(it, ssmi_rv % info, ssmi_rv % tpw, &
-      max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
-
-   ! speed
-
-   call da_max_error_qc(it, ssmi_rv % info, ssmi_rv % speed, &
-      max_error_uv, ispeed, ispeedf, check_max_iv_unit, 'SPEED', failed, check_max_iv_print)
+   do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
+      call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%tpw, &
+         max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
+      call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%speed, &
+         max_error_uv, ispeed, ispeedf, check_max_iv_unit, 'SPEED', failed, check_max_iv_print)
+   end do
 
    if (trace_use) call da_trace_exit("da_check_max_iv_ssmi_rv")
 

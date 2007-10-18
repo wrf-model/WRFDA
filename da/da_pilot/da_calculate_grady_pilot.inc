@@ -16,7 +16,7 @@ subroutine da_calculate_grady_pilot(iv, re, jo_grad_y)
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_pilot")
 
    do n=1, iv%nlocal(pilot)
-      do k=1, iv%pilot(n)%info%levels
+      do k=1, iv%info(pilot)%levels(n)
          if (iv%pilot(n)%u(k)%qc < obs_qc_pointer) re%pilot(n)%u(k) = 0.0
          if (iv%pilot(n)%v(k)%qc < obs_qc_pointer) re%pilot(n)%v(k) = 0.0
 

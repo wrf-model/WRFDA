@@ -10,21 +10,36 @@ subroutine da_transform_xtoy_sound (grid, iv, y)
    type (iv_type),    intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),     intent(inout) :: y        ! y = h (grid%xa) (linear)
 
-   integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
+
+   integer :: n
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_sound")
 
-   do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
-      k = iv % sound(n) % info % levels
+   allocate (u(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (v(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (t(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+   allocate (q(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
+  
+   call da_interp_lin_3d_newest (grid%xa%u, iv%info(sound), u)
+   call da_interp_lin_3d_newest (grid%xa%v, iv%info(sound), v)
+   call da_interp_lin_3d_newest (grid%xa%t, iv%info(sound), t)
+   call da_interp_lin_3d_newest (grid%xa%q, iv%info(sound), q)
 
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % u, iv%sound(n)%loc, y%sound(n)%u, k, iv%sound(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % v, iv%sound(n)%loc, y%sound(n)%v, k, iv%sound(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % t, iv%sound(n)%loc, y%sound(n)%t, k, iv%sound(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % q, iv%sound(n)%loc, y%sound(n)%q, k, iv%sound(n)%zk, k)
+   do n=iv%info(sound)%n1,iv%info(sound)%n2
+      y%sound(n)%u(:) = u(1:size(y%sound(n)%u),n)
+      y%sound(n)%v(:) = v(1:size(y%sound(n)%v),n)
+      y%sound(n)%t(:) = t(1:size(y%sound(n)%t),n)
+      y%sound(n)%q(:) = q(1:size(y%sound(n)%q),n)
    end do
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_sound")
 

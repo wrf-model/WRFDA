@@ -132,28 +132,17 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       absorber(:,:)    = 0.0
       psfc(:)          = 0.0
 
-      do k=kts,kte ! from bottem to top
-         call da_interp_lin_2d_new( grid%xa%t(:,:,k), ims, ime, jms, jme, &
-            iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
-            iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
-            iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-            temperature(kte-k+1,:), num_rad)
-
-         call da_interp_lin_2d_new( grid%xa%q(:,:,k), ims, ime, jms, jme, &
-            iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
-            iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
-            iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-            absorber(kte-k+1,:), num_rad)
-
-         where (iv%instid(inst)%pm(kte-k+1,:) < 75.0) &
-            absorber(kte-k+1,:) = 0.0
+      do k=kts,kte ! from bottom to top
+         call da_interp_lin_2d_newer (grid%xa%t(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+            temperature(kte-k+1,:))
+         call da_interp_lin_2d_newer (grid%xa%q(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+            absorber(kte-k+1,:))
+         do n=1,num_rad
+            if (iv%instid(inst)%pm(kte-k+1,n) < 75.0) absorber(kte-k+1,n) = 0.0
+         end do
       end do
 
-      call da_interp_lin_2d_new( grid%xa%psfc, ims, ime, jms, jme, &
-         iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
-         iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
-         iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-         psfc(:), num_rad )
+      call da_interp_lin_2d_newer (grid%xa%psfc, iv%instid(inst)%info, 1, 1, num_rad,psfc(:))
 
       do n= 1, num_rad           ! loop for pixel
             

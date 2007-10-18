@@ -15,14 +15,15 @@ subroutine da_transform_xtopsfc(grid, synop, y_synop)
    real :: psm_prime
 
    if (trace_use) call da_trace_entry("da_transform_xtopsfc")
+stop
 
    ! 2.0 Surface assimilation approach 2 (2-m t and q, 10-m u and v)
 
-   call da_interp_lin_2d(grid%xa%u10, synop%loc, y_synop%u)
-   call da_interp_lin_2d(grid%xa%v10, synop%loc, y_synop%v)
-   call da_interp_lin_2d(grid%xa%psfc, synop%loc, psm_prime)
-   call da_interp_lin_2d(grid%xa%t2, synop%loc, y_synop%t)
-   call da_interp_lin_2d(grid%xa%q2, synop%loc, y_synop%q)
+!   call da_interp_lin_2d(grid%xa%u10, synop%loc, y_synop%u)
+!   call da_interp_lin_2d(grid%xa%v10, synop%loc, y_synop%v)
+!   call da_interp_lin_2d(grid%xa%psfc, synop%loc, psm_prime)
+!   call da_interp_lin_2d(grid%xa%t2, synop%loc, y_synop%t)
+!   call da_interp_lin_2d(grid%xa%q2, synop%loc, y_synop%q)
    if (synop%p%qc < 0) then
       y_synop%p = 0.0
       return
@@ -39,10 +40,10 @@ subroutine da_transform_xtopsfc(grid, synop, y_synop)
 
    ! 3.2 model background surface p, t, q, h at observed site:
 
-   call da_interp_lin_2d(grid%xb%terr, synop%loc, hsm)
-   call da_interp_lin_2d(grid%xb%t2,   synop%loc, tsm)
-   call da_interp_lin_2d(grid%xb%q2,   synop%loc, qsm)
-   call da_interp_lin_2d(grid%xb%psfc, synop%loc, psm)
+!   call da_interp_lin_2d(grid%xb%terr, synop%loc, hsm)
+!   call da_interp_lin_2d(grid%xb%t2,   synop%loc, tsm)
+!   call da_interp_lin_2d(grid%xb%q2,   synop%loc, qsm)
+!   call da_interp_lin_2d(grid%xb%psfc, synop%loc, psm)
 
    ! 3.3 perturbations t, q, p at the model surface:
 

@@ -40,12 +40,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(synop) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(synop)
-         if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(synop)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(synop)
-            if (iv%synop(n)%loc%proc_domain) then
+            if (iv%info(synop)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%synop(n)%u%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%synop(n)%u, iv%synop(n)%u%inv, iv%synop(n)%u%error
@@ -72,12 +72,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(metar) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(metar)
-         if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(metar)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(metar)
-            if (iv%metar(n)%loc%proc_domain) then
+            if (iv%info(metar)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%metar(n)%u%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%metar(n)%u, iv%metar(n)%u%inv, iv%metar(n)%u%error
@@ -104,12 +104,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(ships) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ships)
-         if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ships)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(ships)
-            if (iv%ships(n)%loc%proc_domain) then
+            if (iv%info(ships)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%ships(n)%u%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%ships(n)%u, iv%ships(n)%u%inv, iv%ships(n)%u%error
@@ -136,14 +136,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(geoamv) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(geoamv)
-        if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(geoamv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(geoamv)
-            if (iv%geoamv(n)%loc%proc_domain) then
+            if (iv%info(geoamv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % geoamv(n) % info % levels
+               do k = 1, iv%info(geoamv)%levels(n)
                   if ( iv%geoamv(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%geoamv(n)%u(k), iv%geoamv(n)%u(k)%inv, iv%geoamv(n)%u(k)%error
                   end if
@@ -161,14 +161,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(polaramv) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(polaramv)
-        if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(polaramv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(polaramv)
-            if (iv%polaramv(n)%loc%proc_domain) then
+            if (iv%info(polaramv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % polaramv(n) % info % levels
+               do k = 1, iv%info(polaramv)%levels(n)
                   if ( iv%polaramv(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%polaramv(n)%u(k), iv%polaramv(n)%u(k)%inv, iv%polaramv(n)%u(k)%error
                   end if
@@ -186,12 +186,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(gpspw) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(gpspw)
-         if (iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(gpspw)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(gpspw)
-            if (iv%gpspw(n)%loc%proc_domain) then
+            if (iv%info(gpspw)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%gpspw(n)%tpw%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%gpspw(n)%tpw, iv%gpspw(n)%tpw%inv, iv%gpspw(n)%tpw%error
@@ -206,14 +206,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(sound) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(sound)
-        if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(sound)
-            if (iv%sound(n)%loc%proc_domain) then
+            if (iv%info(sound)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % sound(n) % info % levels
+               do k = 1, iv%info(sound)%levels(n)
                   if ( iv%sound(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%sound(n)%u(k), iv%sound(n)%u(k)%inv, iv%sound(n)%u(k)%error
                   end if
@@ -232,15 +232,15 @@ subroutine da_write_obs_etkf(ob, iv, re)
       end if
    end if
 
-   if (iv % nlocal(sound) > 0) then
+   if (iv % nlocal(sonde_sfc) > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(sound)
-        if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
+      do n = 1, iv % nlocal(sonde_sfc)
+        if (iv%info(sonde_sfc)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
-         do n = 1, iv % nlocal(sound)
-            if (iv%sound(n)%loc%proc_domain) then
+         do n = 1, iv % nlocal(sonde_sfc)
+            if (iv%info(sonde_sfc)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                   if ( iv%sonde_sfc(n)%u%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%sonde_sfc(n)%u, iv%sonde_sfc(n)%u%inv, iv%sonde_sfc(n)%u%error
@@ -267,14 +267,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(airep) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(airep)
-        if (iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(airep)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(airep)
-            if (iv%airep(n)%loc%proc_domain) then
+            if (iv%info(airep)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % airep(n) % info % levels
+               do k = 1, iv%info(airep)%levels(n)
                   if ( iv%airep(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%airep(n)%u(k), iv%airep(n)%u(k)%inv, iv%airep(n)%u(k)%error
                   end if
@@ -295,14 +295,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(pilot) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(pilot)
-        if (iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(pilot)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(pilot)
-            if (iv%pilot(n)%loc%proc_domain) then
+            if (iv%info(pilot)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % pilot(n) % info % levels
+               do k = 1, iv%info(pilot)%levels(n)
                   if ( iv%pilot(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%pilot(n)%u(k), iv%pilot(n)%u(k)%inv, iv%pilot(n)%u(k)%error
                   end if
@@ -320,12 +320,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(ssmi_rv) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(ssmi_rv)
-         if (iv%ssmi_rv(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(ssmi_rv)
-            if (iv%ssmi_rv(n)%loc%proc_domain) then
+            if (iv%info(ssmi_rv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%ssmi_rv(n)%speed%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%ssmi_rv(n)%speed, iv%ssmi_rv(n)%speed%inv, &
@@ -372,12 +372,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(qscat) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(qscat)
-         if (iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(qscat)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(qscat)
-            if (iv%qscat(n)%loc%proc_domain) then
+            if (iv%info(qscat)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%qscat(n)%u%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%qscat(n)%u, iv%qscat(n)%u%inv, iv%qscat(n)%u%error
@@ -395,14 +395,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(profiler) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(profiler)
-        if (iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(profiler)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(profiler)
-            if (iv%profiler(n)%loc%proc_domain) then
+            if (iv%info(profiler)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % profiler(n) % info % levels
+               do k = 1, iv%info(profiler)%levels(n)
                   if ( iv%profiler(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%profiler(n)%u(k), iv%profiler(n)%u(k)%inv, iv%profiler(n)%u(k)%error
                   end if
@@ -420,12 +420,12 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(buoy) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(buoy)
-         if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(buoy)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(buoy)
-            if (iv%buoy(n)%loc%proc_domain) then
+            if (iv%info(buoy)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                if ( iv%buoy(n)%u%qc >= 0 ) then
                   write(ounit,'(3f17.7)') ob%buoy(n)%u, iv%buoy(n)%u%inv, iv%buoy(n)%u%error
@@ -452,14 +452,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(bogus) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(bogus)
-        if (iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(bogus)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(bogus)
-            if (iv%bogus(n)%loc%proc_domain) then
+            if (iv%info(bogus)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % bogus(n) % info % levels
+               do k = 1, iv%info(bogus)%levels(n)
                   if ( iv%bogus(n)%u(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%bogus(n)%u(k), iv%bogus(n)%u(k)%inv, iv%bogus(n)%u(k)%error
                   end if
@@ -483,14 +483,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(airsr) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(airsr)
-        if (iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(airsr)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(airsr)
-            if (iv%airsr(n)%loc%proc_domain) then
+            if (iv%info(airsr)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % airsr(n) % info % levels
+               do k = 1, iv%info(airsr)%levels(n)
                   if ( iv%airsr(n)%t(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%airsr(n)%t(k), iv%airsr(n)%t(k)%inv, iv%airsr(n)%t(k)%error
                   end if
@@ -508,14 +508,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv % nlocal(gpsref) > 0) then
       num_obs = 0
       do n = 1, iv % nlocal(gpsref)
-        if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(gpsref)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv % nlocal(gpsref)
-            if (iv%gpsref(n)%loc%proc_domain) then
+            if (iv%info(gpsref)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % gpsref(n) % info % levels
+               do k = 1, iv%info(gpsref)%levels(n)
                   if ( iv%gpsref(n)%ref(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%gpsref(n)%ref(k), iv%gpsref(n)%ref(k)%inv, iv%gpsref(n)%ref(k)%error
                   end if

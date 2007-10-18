@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_sound(it, sound, itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_sound(iv, it, itu,ituf,itv,itvf,itt,ittf,itqv,itqvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_sound(it, sound, itu,ituf,itvv,itvvf,itt,ittf,itqv,it
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (sound_type), intent(inout) :: sound
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itv,itvf,itt,ittf,itqv,itqvf
 
-   integer :: k
+   integer :: k,n
    logical :: failed
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_sound")
@@ -37,30 +37,17 @@ subroutine da_check_max_iv_sound(it, sound, itu,ituf,itvv,itvvf,itt,ittf,itqv,it
 
    failed = .false.
 
-   do k = 1, sound % info % levels
-      ! U-wind
-      if (sound % u(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc(it, sound % info, sound % u(k), max_error_uv, itu, ituf, &
+   do n = iv%info(sound)%n1,iv%info(sound)%n2
+      do k = 1, iv%info(sound)%levels(n)
+         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-      end if
-
-      ! V-wind
-      if (sound % v(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc (it, sound % info, sound % v(k),max_error_uv, itvv, itvvf, &
+         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-      end if
-
-      ! Temperature
-      if (sound % t(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc (it, sound % info, sound % t(k), max_error_t, itt, ittf, &
-            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
-      end if
-
-      ! Mixing ratio, same ratio as relative humidity
-      if (sound % q(k) % qc >= obs_qc_pointer) then
-         call da_max_error_qc (it, sound % info, sound % q(k), max_error_q, itqv, itqvf, &
-         check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
-      end if
+         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%t(k), max_error_t,  itt, ittf, &
+            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)                           
+         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%q(k), max_error_q,  itqv, itqvf, &
+            check_max_iv_unit, 'QV   ', failed, check_max_iv_print)                           
+      end do
    end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_sound")
