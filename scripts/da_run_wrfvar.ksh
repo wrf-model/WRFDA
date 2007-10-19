@@ -558,6 +558,10 @@ else
       cp grad_fn $RUN_DIR
    fi
 
+   if [[ -f gts_omb_oma ]]; then
+      cp gts_omb_oma $RUN_DIR
+   fi
+
    if [[ -f ob.etkf.000 ]]; then
       cp ob.etkf.000 $RUN_DIR
    fi
