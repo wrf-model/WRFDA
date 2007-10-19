@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_polaramv(iv,it,itu,ituf,itv,itvf)
+subroutine da_residual_airep(iv, y, re, np_missing, np_bad_data,np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,45 +6,42 @@ subroutine da_check_max_iv_polaramv(iv,it,itu,ituf,itv,itvf)
 
    implicit none
 
-   type(iv_type),        intent(in)    :: iv
-   integer,              intent(in)    :: it      ! Outer iteration
-   integer,              intent(inout) :: itu,ituf,itv,itvf
+   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer  :: k,n
-   logical  :: failed
-   
-   if (trace_use_dull) call da_trace_entry("da_check_max_iv_polaramv")
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
-   !---------------------------------------------------------------------------
-   ! [1.0] Open diagnostic file:
-   !---------------------------------------------------------------------------
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k
 
-   if (rootproc .and. check_max_iv_print) then
-      write (check_max_iv_unit,'(A)')  &
-         '----------------------------------------------------------------'
-      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
-      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for Polar AMV_U   = ',max_error_uv, &
-         'Error max test ratio for Polar AMV_V   = ',max_error_uv
-   end if
+   if (trace_use_dull) call da_trace_entry("da_residual_airep")
 
-   !---------------------------------------------------------------------------
-   ! [2.0] Perform maximum innovation vector check:
-   !---------------------------------------------------------------------------
+   n_obs_bad % u % num = number_type(0, 0, 0)
+   n_obs_bad % v % num = number_type(0, 0, 0)
+   n_obs_bad % t % num = number_type(0, 0, 0)
 
-   failed = .false.
-
-   do n = iv%info(polaramv)%n1,iv%info(polaramv)%n2
-      do k = 1, iv%info(polaramv)%levels(n)
-         call da_max_error_qc_new (it, iv%info(polaramv), n, iv%polaramv(n)%u(k), max_error_uv, itu, ituf, &
-            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(polaramv), n, iv%polaramv(n)%v(k), max_error_uv, itv, itvf, &
-            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+   do n=1, iv%info(airep)%nlocal
+      do k=1, iv%info(airep)%levels(n)
+         np_available = np_available + 3
+         re%airep(n)%u(k) = da_residual(n, k, y%airep(n)%u(k), iv%airep(n)%u(k), n_obs_bad % u)
+         re%airep(n)%v(k) = da_residual(n, k, y%airep(n)%v(k), iv%airep(n)%v(k), n_obs_bad % v)
+         re%airep(n)%t(k) = da_residual(n, k, y%airep(n)%t(k), iv%airep(n)%t(k), n_obs_bad % t)
       end do
    end do
-   
-   if (trace_use_dull) call da_trace_exit("da_check_max_iv_polaramv")
 
-end subroutine da_check_max_iv_polaramv      
+   np_missing = np_missing + n_obs_bad % u % num % miss + &
+      n_obs_bad % v % num % miss + n_obs_bad % t % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
+      n_obs_bad % v % num % bad + n_obs_bad % t % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
+      n_obs_bad % v % num % use + n_obs_bad % t % num % use
+
+   if (trace_use_dull) call da_trace_exit("da_residual_airep")
+
+end subroutine da_residual_airep
 
 

@@ -1,47 +1,39 @@
-subroutine da_set_ps(proj)
+subroutine da_check_xtoy_adjoint_ssmi_rv(iv, y, adjtest_lhs, pertile_lhs)
 
-   ! Initializes a polar-stereographic map projection from the partially
-   ! filled proj structure. This routine computes the radius to the
-   ! southwest corner and computes the i/j location of the pole for use
-   ! in llij_ps and ijll_ps.
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
- 
-   type(proj_info), intent(inout)    :: proj
 
-   real :: ala1
-   real :: alo1
-   real :: reflon
-   real :: scale_top
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   if (trace_use) call da_trace_entry("da_set_ps")
+   integer :: n             ! loop counter.
+   real    :: var
 
-   ! To define the cone factor for polar stereographic projection 
-   proj%cone = 1.0
+   if (trace_use) call da_trace_entry("da_check_xtoy_adjoint_ssmi_rv")
 
-   reflon = proj%stdlon + 90.0
+   if (iv%info(ssmi_rv)%nlocal > 0) then
+      do n=1, iv%info(ssmi_rv)%nlocal
+         y%ssmi_rv(n)%speed = y%ssmi_rv(n)%speed/typical_speed_rms
+         y%ssmi_rv(n)%tpw   = y%ssmi_rv(n)%tpw/typical_tpw_rms
 
-   ! Compute numerator term of map scale factor
-   scale_top = 1.0 + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
+         var = (y%ssmi_rv(n)%speed) ** 2 + (y%ssmi_rv(n)%tpw) ** 2
 
-   ! Compute radius to lower-left (SW) corner
-   ala1 = proj%lat1 * rad_per_deg
-   proj%rsw = proj%rebydx*COS(ala1)*scale_top/(1.0+proj%hemi*Sin(ala1))
+         pertile_lhs = pertile_lhs + var
 
-   ! Find the pole point
-   alo1 = (proj%lon1 - reflon) * rad_per_deg
-   proj%polei = proj%knowni - proj%rsw * COS(alo1)
-   proj%polej = proj%knownj - proj%hemi * proj%rsw * Sin(alo1)
-   if (print_detail_map) then
-      write(unit=stdout,fmt='(A,2F10.1)') 'Computed (I,J) of pole point: ',proj%polei,proj%polej
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) then
+            adjtest_lhs = adjtest_lhs + var
+         end if
+
+         y%ssmi_rv(n)%speed = y%ssmi_rv(n)%speed/typical_speed_rms
+         y%ssmi_rv(n)%tpw   = y%ssmi_rv(n)%tpw/typical_tpw_rms
+      end do
    end if
 
-   if (trace_use) call da_trace_exit("da_set_ps")
-
-end subroutine da_set_ps
-
-
-i_rv")
+   if (trace_use) call da_trace_exit("da_check_xtoy_adjoint_ssmi_rv")
 
 end subroutine da_check_xtoy_adjoint_ssmi_rv
 

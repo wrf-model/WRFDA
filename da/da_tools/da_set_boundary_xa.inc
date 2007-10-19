@@ -1,47 +1,58 @@
-subroutine da_check_xtoy_adjoint_rad(iv, y, adjtest_lhs, pertile_lhs)
+subroutine da_set_boundary_xa(grid)
 
-   !------------------------------------------------------------------------------
-   ! Purpose: Calculate innovation vector for radiance data.
-   !------------------------------------------------------------------------------
+   !------------------------------------------------------------------------
+   !  Purpose: 
+   !
+   !  Merge East-West boundary values for the desired grid%xa-type variables
+   !------------------------------------------------------------------------
 
    implicit none
 
-   type(iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
-   type(y_type),  intent(inout)  :: y             ! y = h (xa)
-   real,          intent(inout)  :: adjtest_lhs, pertile_lhs   
+   type (domain),  intent(inout) :: grid
 
-   integer :: inst, n, k          ! Loop counter.
+   integer :: n, j, k
 
-   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_rad")
+   if ((its /= ids) .or. (ite /= ide)) return
 
-   do inst = 1, iv%num_inst                 ! loop for sensor
-      if (iv%instid(inst)%num_rad < 1) cycle
+   if (trace_use) call da_trace_entry("da_set_boundary_xa")
 
-      do n= 1, iv%instid(inst)%num_rad       ! loop for pixel
-         ! if (iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
-         if (iv%instid(inst)%info%proc_domain(1,n)) then
-            do k = 1, iv%instid(inst)%nchan
-               ! if ( iv%instid(inst)%tb_qc(k,n) >= obs_qc_pointer ) &
-               adjtest_lhs = adjtest_lhs + &
-                 ( y%instid(inst)%tb(k,n)/iv%instid(inst)%tb_error(k,n) )**2
-            end do
-         end if
+   ! 2d
 
-         do k=1, iv%instid(inst)%nchan
-            ! if ( iv%instid(inst)%tb_qc(k,n) >= obs_qc_pointer ) &
+   k = kte + 1
+   do j=jms, jme
+      do n=1,bdyzone
+         grid%xa%psfc(ids-n,j) = grid%xa%psfc(ide+1-n,j)
+         grid%xa%w(ids-n,j,k) = grid%xa%w(ide+1-n,j,k)
 
-            pertile_lhs = pertile_lhs + &
-             ( y%instid(inst)%tb(k,n)/iv%instid(inst)%tb_error(k,n) )**2
-
-            y%instid(inst)%tb(k,n) =  &
-              y%instid(inst)%tb(k,n) / (iv%instid(inst)%tb_error(k,n))**2
-         end do
-         ! end if
+         grid%xa%psfc(ide+n,j) = grid%xa%psfc(ids-1+n,j)
+         grid%xa%w(ide+n,j,k) = grid%xa%w(ids-1+n,j,k)
       end do
-   end do 
+   end do
 
-   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_rad")
+   ! 3d
 
-end subroutine da_check_xtoy_adjoint_rad
+   do k=kts, kte
+      do j=jms, jme
+         do n=1,bdyzone
+            grid%xa%u(ids-n,j,k) = grid%xa%u(ide+1-n,j,k)
+            grid%xa%v(ids-n,j,k) = grid%xa%v(ide+1-n,j,k)
+            grid%xa%t(ids-n,j,k) = grid%xa%t(ide+1-n,j,k)
+            grid%xa%p(ids-n,j,k) = grid%xa%p(ide+1-n,j,k)
+            grid%xa%q(ids-n,j,k) = grid%xa%q(ide+1-n,j,k)
+            grid%xa%w(ids-n,j,k) = grid%xa%w(ide+1-n,j,k)
+
+            grid%xa%u(ide+n,j,k) = grid%xa%u(ids-1+n,j,k)
+            grid%xa%v(ide+n,j,k) = grid%xa%v(ids-1+n,j,k)
+            grid%xa%t(ide+n,j,k) = grid%xa%t(ids-1+n,j,k)
+            grid%xa%p(ide+n,j,k) = grid%xa%p(ids-1+n,j,k)
+            grid%xa%q(ide+n,j,k) = grid%xa%q(ids-1+n,j,k)
+            grid%xa%w(ide+n,j,k) = grid%xa%w(ids-1+n,j,k)
+         end do
+      end do
+   end do
+
+   if (trace_use) call da_trace_exit("da_set_boundary_xa")
+
+end subroutine da_set_boundary_xa
 
 

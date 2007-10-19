@@ -1,4 +1,4 @@
-subroutine da_ao_stats_satem (stats_unit, iv, re)
+subroutine da_print_stats_radar(stats_unit, nrv, nrf, radar)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,60 +6,31 @@ subroutine da_ao_stats_satem (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (inout) :: iv            ! iv
-   type  (y_type), intent (in)    :: re            ! A - O
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nrv, nrf
+   type (stats_radar_type), intent(in)    :: radar
 
-   type (stats_satem_type) :: stats
-   integer                 :: nthickness
-   integer                 :: n, k
+   if (trace_use) call da_trace_entry("da_print_stats_radar")
+   
+   write(unit=stats_unit, fmt='(a/)') &
+      '   var             rv (m/s)        n    k         rf (dBZ)        n    k  '
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_satem")
+   write(unit=stats_unit, fmt='(a,i16,i31)') &
+      '  Number: ', nrv, nrf
 
-   nthickness = 0
+   if (nrv < 1) nrv = 1
+   if (nrf < 1) nrf = 1
+   
+   write(unit=stats_unit, fmt='((a,f12.4,i9,i5, f17.4,i9,i5))')  &
+      ' Minimum(n,k): ', radar%minimum%rv, radar%minimum%rf, &
+      ' Maximum(n,k): ', radar%maximum%rv, radar%maximum%rf
+   write(unit=stats_unit, fmt='((a,2(f12.4,19x)))')              &
+      ' Average     : ', radar%average%rv/real(nrv), radar%average%rf/real(nrf), &
+      '    RMSE     : ', sqrt(radar%rms_err%rv/real(nrv)), &
+      sqrt(radar%rms_err%rf/real(nrf))
 
-   stats%maximum%thickness = maxmin_type (missing_r, 0, 0)
-   stats%minimum%thickness = maxmin_type(-missing_r, 0, 0)
-   stats%average = residual_satem1_type(0.0)
-   stats%rms_err = stats%average
+   if (trace_use) call da_trace_exit("da_print_stats_radar")
 
-   nthickness = 0
-
-   stats%maximum%thickness = maxmin_type(0.0, 0, 0)
-
-   stats%minimum = stats%maximum
-   stats%average = residual_satem1_type(0.0)
-   stats%rms_err = stats%average
-
-   do n=1, iv%info(satem)%nlocal
-      if (iv%satem(n)%loc%proc_domain) then
-         do k=1, iv%satem(n)%info%levels
-            call da_stats_calculate (n, k, iv%satem(n)%thickness(k)%qc, & 
-               re%satem(n)%thickness(k), nthickness, &
-               stats%minimum%thickness, stats%maximum%thickness, &
-               stats%average%thickness, stats%rms_err%thickness)
-         end do
-      end if    ! end if (iv%satem(n)%loc%proc_domain)
-   end do
-
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nthickness)
-   iv%nstats(satem) = nthickness
-
-   call da_proc_stats_combine(stats%average%thickness, stats%rms_err%thickness, &
-      stats%minimum%thickness%value, stats%maximum%thickness%value, &
-      stats%minimum%thickness%n, stats%maximum%thickness%n, &
-      stats%minimum%thickness%l, stats%maximum%thickness%l)
-
-   if (rootproc) then
-      if (nthickness /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for satem'
-         call da_print_stats_satem(stats_unit, nthickness, stats)
-      end if
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_satem")
-
-end subroutine da_ao_stats_satem
+end subroutine da_print_stats_radar
 
 

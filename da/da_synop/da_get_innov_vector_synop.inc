@@ -122,10 +122,10 @@ subroutine da_get_innov_vector_synop( it, grid, ob, iv)
       call da_interp_lin_3d_newest (grid%xb%q, iv%info(synop), model_q)
       call da_interp_lin_3d_newest (grid%xb%p, iv%info(synop), model_p)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      ! Surface data assimilation approach 2
+      ! Surface data assmiilation approach 2
       !------------------------------------
 
-      ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
+      ! 1.2.1 Surface assmiilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
       call da_interp_lin_2d_newest (grid%xb%u10,  iv%info(synop), 1, model_u(1,:))
       call da_interp_lin_2d_newest (grid%xb%v10,  iv%info(synop), 1, model_v(1,:))

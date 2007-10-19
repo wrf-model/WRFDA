@@ -1,311 +1,59 @@
-subroutine da_moist_phys_adj(grid)
+subroutine da_array_print(direction, a, ch)
 
-   !---------------------------------------------------------------------------
-   !  Purpose: Partition of the hydrometeors via the moist egrid%xplicit scheme.
-   !           A warm rain process is used in this subroutine. 
-   !           This is the adjoint code of the scheme.
-   !
-   !  Method: The warm rain process is according to Hsie and Anthes (1984)
-   !          and Dudhia (1989)
-   !
-   !  Assumptions: 1) Model level stored top down.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   integer, intent(in)            :: direction
+   real, intent(in)               :: a(:,:)
+   character (len=*), intent(in)  :: ch
 
-   real, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: Q_OLD,Q_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: QCW_OLD,QCW_NEW
-   real, dimension(ims:ime,jms:jme,kms:kme) :: QRN_OLD,QRN_NEW
+   real                           :: amax
+   integer                        :: i, j
+   integer                        :: len1, len2
+   integer                        :: jstart
+   integer                        :: jend
+   integer                        :: jump
 
-   real, dimension(kms:kme)                 :: EES, QVSS
-   real, dimension(kms:kme)                 :: EES9, QVSS9
+   len1 = size(a(:,:),dim=1)
+   len2 = size(a(:,:),dim=2)
 
-   real, dimension(kms:kme)                   :: DT
-   real, dimension(kms:kme)                   :: QVT,QCT,QRT,TTT
-   real, dimension(kms:kme)                   :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6
-   real, dimension(kms:kme) :: DUM31
-   real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
-   real, dimension(kms:kme) :: SCR31,SCR42,SCR71
-   real, dimension(kms:kme) :: DUM112,DUM113,DUM211,DUM411
-   real, dimension(kms:kme) :: PRA2,PRC2
+   ! Writes the scalar field a
 
-   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69
-   real, dimension(kms:kme) :: DUM319
-   real, dimension(kms:kme) :: PRA9,PRC9,PRD9,PRE9
-   real, dimension(kms:kme) :: SCR319,SCR429,SCR719
-   real, dimension(kms:kme) :: DUM1129,DUM1139,DUM2119,DUM4119
-   real, dimension(kms:kme) :: TMP
+   write(unit=stdout,fmt='(A)') trim(ch)
 
-   integer :: i, j, k
+   amax = MAXVAL(abs(a))
+   write(unit=stdout, fmt='(a, 1pe15.8, 4i8)') &
+        '   max(a)=', amax, shape(a)
 
-   if (trace_use) call da_trace_entry("da_moist_phys_adj")
+   write(unit=stdout,fmt='(a, 1pe15.8, a)') &
+        '   max(a)=', amax, ', i down, j horiz.'
 
-   do k=kts,kte
-      do j=jts,jte
-         do i=its,ite
-            QRN_NEW(i,j,k) = grid%xa % qrn (i,j,k) 
-            QRN_OLD(i,j,k) = grid%xa % qrn (i,j,k)
-            QCW_NEW(i,j,k) = grid%xa % qcw (i,j,k)
-            QCW_OLD(i,j,k) = grid%xa % qcw (i,j,k)
-            Q_NEW(i,j,k) = grid%xa % q (i,j,k)
-            Q_OLD(i,j,k) = grid%xa % q (i,j,k)
-            T_NEW(i,j,k) = grid%xa % t (i,j,k)
-            T_OLD(i,j,k) = grid%xa % t (i,j,k)
-         end do
+   write(unit=stdout,fmt='(6x,288i3)') (i,i=1,len2)
+
+   ! Direction indicates the order of the rows of the print out:
+
+   if (direction == 1) then
+      jstart = 1
+      jend = len1
+      jump = 1
+   else
+      jstart = len1
+      jend = 1
+      jump = -1
+   end if
+
+   if (amax.ne.0.0)then
+      do j=jstart,jend,jump
+         write(unit=stdout,fmt='(1x,i5,288i3)') &
+            j, (inT(a(j,i)/amax*99.0),i=1,len2)
       end do
-   end do
+   end if
 
-   call da_filter_adj(grid,t_new)
-   call da_filter_adj(grid,q_new)
-   call da_filter_adj(grid,qcw_new)
-   call da_filter_adj(grid,qrn_new)
+   write (unit=stdout,fmt='(A)') " "
 
-   do k=kts,kte
-      do j=jts,jte
-         do i=its,ite
-            grid%xa % qrn (i,j,k) = QRN_NEW(i,j,k)
-            QRN_OLD(i,j,k) = QRN_OLD(i,j,k) - QRN_NEW(i,j,k)
-            grid%xa % qcw (i,j,k) = QCW_NEW(i,j,k)
-            QCW_OLD(i,j,k) = QCW_OLD(i,j,k) - QCW_NEW(i,j,k)
-            grid%xa % q (i,j,k) = Q_NEW(i,j,k)
-            Q_OLD(i,j,k) = Q_OLD(i,j,k) - Q_NEW(i,j,k)
-            grid%xa % t (i,j,k) = T_NEW(i,j,k)
-            T_OLD(i,j,k) = T_OLD(i,j,k) - T_NEW(i,j,k)
-         end do
-      end do
-   end do
-
-   do j=jts,jte
-      do i=its,ite
-
-         ! Preparation
-
-         do K=kts,kte
-            DT(k) = grid%xb%delt(i,j,k)
-         end do
-
-         do K=kts,kte
-
-            if (DT(k) <= 0.0) cycle
-
-            if( grid%xb%t(I,J,K) > TO )then
-               EES(K)=SVP1*EXP(SVP2*(grid%xb%t(I,J,K)-SVPT0)/(grid%xb%t(I,J,K)-SVP3))
-            else
-               EES(K)=.611*EXP(22.514-6.15E3/grid%xb%t(I,J,K))
-            end if
-
-            QVSS(K)=622.0*EES(K)/(grid%xb%p(I,J,K)-EES(K))
-
-            SCR4(K)=grid%xb%q(I,J,K)/QVSS(K)
-
-         end do
-
-         do K=kts,kte
-
-            if (DT(k) <= 0.0) cycle
-
-            if(grid%xb%qcw(I,J,K) > 0.0) then
-               SCR2(K)=grid%xb%qcw(I,J,K)
-            else
-               SCR2(K)=0.0
-            end if
-            if(grid%xb%qrn(I,J,K) > 1.0e-25) then
-               SCR3(K)=grid%xb%qrn(I,J,K)
-            else
-               SCR3(K)=1.0e-25
-            end if
-            SCR5(K)=grid%xb%q(I,J,K)/SCR4(K)
-
-            SCR6(K)=grid%xb%p(I,J,K)/(gas_constant*grid%xb%t(I,J,K))
-
-            DUM31(K)=3.1484E6-XLV1*grid%xb%t(I,J,K)
-
-         end do
-
-         call da_autoc(DT,SCR2,PRC,kts,kte,kms,kme)
-
-         do k=kts,kte
-            PRC2(K)=PRC(K)
-         end do
-
-         call da_accre(DT,SCR2,SCR3,PRA,kts,kte,kms,kme)
-
-         do k=kts,kte
-            PRA2(K)=PRA(K)
-         end do
-
-         call da_evapo(DT,SCR3,SCR5,grid%xb%q(I,J,:),PRE,SCR6,kts,kte,kms,kme)
-
-         do K=kts, kte
-
-            if (DT(k) <= 0.0) cycle
-
-            !  Readjust
-
-            DUM112(K)=(PRC(k)+PRA(k))*DT(k)
-            if (DUM112(K) > SCR2(k)) then
-               PRC(k)=SCR2(K)*PRC(K)/DUM112(K)
-               PRA(k)=SCR2(K)*PRA(K)/DUM112(K)
-            end if
-            QVT(K)=-PRE(K)
-            QCT(K)=-PRC(K)-PRA(K)
-            QRT(K)=PRC(K)+PRA(K)+PRE(K)
-            if(grid%xb%t(I,J,K).GT.TO)then
-               DUM411(K)=DUM31(K)
-            else
-               DUM411(K)=XLS
-            end if
-            PRD(K)=cp*(1.0+0.887*grid%xb%q(I,J,K))
-            TTT(K)=-DUM411(K)*QVT(K)/PRD(K)
-
-            DUM113(K)=grid%xb%q(I,J,K)+DT(K)*QVT(K)
-            if(DUM113(K) > 1.0E-12 ) then
-               SCR42(K)=DUM113(K)
-            else
-               SCR42(K)=1.0E-12
-            end if
-            DUM211(K)=grid%xb%qcw(I,J,K)+QCT(K)*DT(k)
-            if(DUM211(K) > 0.0) then
-               SCR31(K)=DUM211(K)
-            else
-               SCR31(K)=0.0
-            end if
-            SCR71(K)=grid%xb%t(I,J,K)+TTT(K)*DT(k)
-         end do
-
-         call da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,       &
-                             QVT,QCT,QRT,TTT,                      &
-                             grid%xb%p(I,J,:),grid%xb%t(I,J,:),grid%xb%q(I,J,:),  &
-                             grid%xb%qcw(I,J,:),grid%xb%qrn(I,J,:),          &
-                             SCR319,SCR429,SCR719,DUM319,PRD9,     &
-                             QVT9,QCT9,QRT9,TTT9,                  &
-                             grid%xa%p(I,J,:),grid%xa%t(I,J,:),grid%xa%q(I,J,:),  &
-                             grid%xa%qcw(I,J,:),grid%xa%qrn(I,J,:),kts,kte)
-
-         do K=kts, kte
-            if (DT(k) <= 0.0) cycle
-
-            !  Readjust
-
-            grid%xa%t(I,J,K)=grid%xa%t(I,J,K)+SCR719(K)
-            TTT9(K)=TTT9(K)+DT(k)*SCR719(K)
-            DUM2119(K)=0.0
-            if(DUM211(K) > 0.0) then
-               DUM2119(K)=SCR319(K)
-            end if
-            grid%xa%qcw(I,J,K)=grid%xa%qcw(I,J,K)+DUM2119(K)
-            QCT9(K)=QCT9(K)+DT(K)*DUM2119(K)
-            DUM1139(K)=0.0
-            if(DUM113(K) > 1.0e-12 ) then
-               DUM1139(K)=SCR429(K)
-            end if
-            grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+DUM1139(K)
-            QVT9(K)=QVT9(K)+DT(K)*DUM1139(K)
-            PRD9(K)=PRD9(K)+DUM411(K)*QVT(K)/(PRD(K)*PRD(K))*TTT9(K)
-            QVT9(K)=QVT9(K)-DUM411(K)/PRD(K)*TTT9(K)
-            DUM4119(K)=-QVT(K)/PRD(K)*TTT9(K)
-            grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+cp*0.887*PRD9(K)
-
-            if(grid%xb%t(I,J,K).GT.TO)then
-               DUM319(K)=DUM319(K)+DUM4119(K)
-            end if
-            PRC9(K)=QRT9(K)
-            PRA9(K)=QRT9(K)
-            PRE9(K)=QRT9(K)
-            PRC9(K)=PRC9(K)-QCT9(K)
-            PRA9(K)=PRA9(K)-QCT9(K)
-            PRE9(K)=PRE9(K)-QVT9(K)
-
-            SCR29(K)=0.0
-            DUM1129(K)=0.0
-            if (DUM112(K) > SCR2(k)) then
-               DUM1129(K)=-SCR2(K)*PRA2(K)/(DUM112(K)*DUM112(K))*PRA9(K)
-               SCR29(K)=PRA2(K)/DUM112(K)*PRA9(K)
-               PRA9(K)=PRA9(K)*SCR2(K)/DUM112(K)
-               DUM1129(K)=DUM1129(K)-SCR2(K)*PRC2(K)/(DUM112(K)*DUM112(K))*PRC9(K)
-               SCR29(K)=SCR29(K)+PRC2(K)/DUM112(K)*PRC9(K)
-               PRC9(K)=PRC9(K)*SCR2(K)/DUM112(K)
-            end if
-            PRC9(K)=PRC9(K)+DT(K)*DUM1129(K)
-            PRA9(K)=PRA9(K)+DT(K)*DUM1129(K)
-
-         end do
-
-         call da_evapo_adj(DT,SCR3,SCR5,grid%xb%q(I,J,:),PRE,SCR6,  &
-                           SCR39,SCR59,grid%xa%q(I,J,:),PRE9,SCR69, &
-                           kts,kte,kms,kme)
-
-         call da_accre_adj(DT,SCR2,SCR3,PRA,SCR29,SCR39,PRA9,kts,kte,kms,kme)
-
-         call da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
-
-         !  Preparation
-
-         do K=kts,kte
-
-            if (DT(k) <= 0.0) cycle
-
-            grid%xa%t(I,J,K)=grid%xa%t(I,J,K)-XLV1*DUM319(K)
-
-            grid%xa%p(I,J,K)=grid%xa%p(I,J,K)+SCR69(K)/(gas_constant*grid%xb%t(I,J,K))
-            grid%xa%t(I,J,K)=grid%xa%t(I,J,K)-grid%xb%p(I,J,K)/  &
-                        (gas_constant*grid%xb%t(I,J,K)**2)*SCR69(K)
-            grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+SCR59(K)/SCR4(K)
-            SCR49(K)=-grid%xb%q(I,J,K)/SCR4(K)**2*SCR59(K)
-
-            if(grid%xb%qrn(I,J,K) > 1.0e-25) then
-               grid%xa%qrn(I,J,K)=grid%xa%qrn(I,J,K)+SCR39(K)
-            end if
-            if(grid%xb%qcw(I,J,K) > 0.0) then
-               grid%xa%qcw(I,J,K)=grid%xa%qcw(I,J,K)+SCR29(K)
-            end if
-
-         end do
-
-         do K=kts,kte
-
-            if (DT(k) <= 0.0) cycle
-
-            grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+SCR49(K)/QVSS(K)
-            QVSS9(K)=-grid%xb%q(I,J,K)/QVSS(K)**2*SCR49(K)
-            TMP(K)=622.0/((grid%xb%p(I,J,K)-EES(K))**2)
-            EES9(K)=TMP(K)*grid%xb%p(I,J,K)*QVSS9(K)
-            grid%xa%p(I,J,K)=grid%xa%p(I,J,K)-TMP(K)*EES(K)*QVSS9(K)
-            if( grid%xb%t(I,J,K) > TO )then
-               grid%xa%t(I,J,K)=grid%xa%t(I,J,K)+EES(K)*SVP2*(SVPT0-SVP3)/   &
-                           ((grid%xb%t(I,J,K)-SVP3)*(grid%xb%t(I,J,K)-SVP3))*EES9(K)
-            else
-               grid%xa%t(I,J,K)=grid%xa%t(I,J,K)+EES(K)*6.15E3/(grid%xb%t(I,J,K)*   &
-                           grid%xb%t(I,J,K))*EES9(K)
-            end if
-
-         end do
-
-         do K=kts,kte
-            grid%xa % qt (i,j,k) = grid%xa % qt (i,j,k) + grid%xa % q(i,j,k)
-            grid%xa % qcw(i,j,k) = grid%xa % qcw(i,j,k) - grid%xa % q(i,j,k)
-            grid%xa % qrn(i,j,k) = grid%xa % qrn(i,j,k) - grid%xa % q(i,j,k)
-         end do
-      end do
-   end do
-
-   do k=kts,kte
-      do j=jts,jte
-         do i=its,ite
-            grid%xa % qrn (i,j,k) = grid%xa % qrn (i,j,k) + QRN_OLD(i,j,k)
-            grid%xa % qcw (i,j,k) = grid%xa % qcw (i,j,k) + QCW_OLD(i,j,k)
-            grid%xa % q (i,j,k) = grid%xa % q (i,j,k) + Q_OLD(i,j,k)
-            grid%xa % t (i,j,k) = grid%xa % t (i,j,k) + T_OLD(i,j,k)
-         end do
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_moist_phys_adj")
-
-end subroutine da_moist_phys_adj
+end subroutine da_array_print
 
 

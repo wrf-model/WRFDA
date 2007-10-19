@@ -26,7 +26,7 @@ subroutine da_residual_buoy(iv, y, re, np_missing, np_bad_data, np_obs_used, np_
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(buoy)
+   do n=1, iv%info(buoy)%nlocal
       np_available = np_available + 5
       re%buoy(n)%u = da_residual(n, 0, y%buoy(n)%u, iv%buoy(n)%u, n_obs_bad % u)
       re%buoy(n)%v = da_residual(n, 0, y%buoy(n)%v, iv%buoy(n)%v, n_obs_bad % v)

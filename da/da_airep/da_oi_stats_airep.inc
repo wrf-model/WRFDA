@@ -28,7 +28,7 @@ subroutine da_oi_stats_airep (stats_unit, iv)
    stats%average = residual_airep1_type(0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(airep)
+   do n=1, iv%info(airep)%nlocal
       do k=1, iv%info(airep)%levels(n)
          if (iv%info(airep)%proc_domain(k,n)) then
             call da_stats_calculate(iv%info(airep)%obs_global_index(n), &

@@ -19,7 +19,7 @@ subroutine da_jo_and_grady_airsr(iv, re, jo, jo_grad_y)
    jo % airsr_t = 0.0
    jo % airsr_q = 0.0
 
-   do n=1, iv%nlocal(airsr)
+   do n=1, iv%info(airsr)%nlocal
       do k=1, iv%info(airsr)%levels(n)
          jo_grad_y%airsr(n)%t(k) = -re%airsr(n)%t(k) / (iv%airsr(n)%t(k)%error * iv%airsr(n)%t(k)%error)
          jo_grad_y%airsr(n)%q(k) = -re%airsr(n)%q(k) / (iv%airsr(n)%q(k)%error * iv%airsr(n)%q(k)%error)

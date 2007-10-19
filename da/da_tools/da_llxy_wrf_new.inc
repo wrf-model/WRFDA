@@ -46,34 +46,3 @@ subroutine da_llxy_wrf_new(proj, info)
 end subroutine da_llxy_wrf_new
 
 
- &
-                       metar%average%t/real(nt), metar%average%p/real(np), &
-                       metar%average%q/real(nq), &
-      '    RMSE     : ', sqrt(metar%rms_err%u/real(nu)), &
-                       sqrt(metar%rms_err%v/real(nv)), &
-                       sqrt(metar%rms_err%t/real(nt)), &
-                       sqrt(metar%rms_err%p/real(np)), &
-                       sqrt(metar%rms_err%q/real(nq))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_metar")
-
-end subroutine da_print_stats_metar
-
-
-ne(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for pilot'
-         call da_print_stats_pilot(stats_unit, nu, nv, stats)
-      end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_pilot")
-
-end subroutine da_ao_stats_pilot
-
-

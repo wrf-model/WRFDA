@@ -1,211 +1,104 @@
-subroutine da_minimise_cg(grid, config_flags,            &
-                           it, cv_size, xbx, be, iv, &
-                           j_grad_norm_target, xhat, cv, &
-                           re, y, j)
+subroutine da_ao_stats_synop (stats_unit, iv, re)
 
-   !-------------------------------------------------------------------------
-   ! Purpose:         Main Conjugate Gradient minimisation routine 
-   !
-   ! Here 
-   !    cv   is updated in outer-loop.
-   !    xhat is the control variable in inner-loop.
-   !-------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)               :: it    ! external iteration.
-   integer, intent(in)               :: cv_size          ! Total cv size
-   type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
-   type (be_type), intent(in)        :: be    ! background error structure.
-   type (iv_type), intent(inout)     :: iv    ! ob. increment vector.
-   real, intent(inout)               :: j_grad_norm_target ! Target norm.
-   real, intent(out)                 :: xhat(1:cv_size)  ! control variable (local).
-   real, intent(inout)               :: cv(1:cv_size)    ! control variable (local).
-   type (y_type), intent(inout)      :: re    ! residual (o-a) structure.
-   type (y_type), intent(inout)      :: y     ! y = H(x_inc) structure.
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent (inout) :: iv            ! iv
+   type  (y_type), intent (in)    :: re            ! A - O
 
-   type (j_type), intent(out)    :: j                         ! cost function
+   type (stats_synop_type) :: stats
+   integer                 :: nu, nv, nt, np, nq
+   integer                 :: n
 
-   type(domain), intent(inout)   :: grid
-   type(grid_config_rec_type), intent(inout) :: config_flags
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_synop")
 
-   integer                           :: iter            
-   integer                           :: je_start, je_end       ! Start/end indices of Je.
-   integer                           :: cv_size_jb             ! end indices of Jb.
-   real                              :: j_grad(1:cv_size)      ! grad_v j (local-grid)
-   real                              :: fhat(1:cv_size)        ! cv copy.
-   real                              :: ghat(1:cv_size)        ! cv copy.
-   real                              :: phat(1:cv_size)        ! cv copy.
-   real                              :: apdotp,step,rrmold,rrmnew,ratio 
-   real                              :: ob_grad,rrmnew_norm
+   nu = 0
+   nv = 0
+   nt = 0
+   np = 0
+   nq = 0
 
-   type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%t = maxmin_type (missing_r, 0, 0)
+   stats%maximum%p = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
 
-   integer                           :: cg_jcdf
+   stats%average = residual_synop1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-   if (trace_use) call da_trace_entry("da_minimise_cg")
-
-   write(unit=stdout,fmt='(A)') 'Minimize cost function using CG method'
-   if (calculate_cg_cost_fn) then
-      write(unit=stdout,fmt='(A)') &
-         'For this run cost function diagnostics will be written'
-   else
-      write(unit=stdout,fmt='(A)') &
-         'For this run cost function diagnostics will not be written'
-   end if
-   write(unit=stdout,fmt=*) ' '
-
-   ! Initialize temporary cv structures:
-   if ( .not. anal_type_randomcv ) xhat = 0.0
-   j_grad = 0.0
-   fhat = 0.0
-
-   call da_allocate_y(iv, jo_grad_y)
-
-
-   call da_calculate_j(it, 0, cv_size, be % cv % size_jb, be % cv % size_je, &
-                        xbx, be, iv, xhat, cv, &
-                        re, y, j, j_grad,         &
-                        grid, config_flags                       )
-
-   ghat  = j_grad
-   phat  = - ghat
-
-   rrmold = da_dot_cv(cv_size, cv_size_domain, ghat, ghat, grid, & 
-      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-
-   if (j%total == 0.0) go to 1004
-
-   if (it == 1) j_grad_norm_target = sqrt (rrmold)
-
-   write(unit=stdout,fmt='("Starting outer iteration : ",i3)') it
-   write(unit=stdout,fmt=11) j_grad_norm_target,eps(it)*j_grad_norm_target, &
-              j%total, sqrt(rrmold)
-11 format('Original gradient is ',1PD15.8,/,&
-          'For this outer iteration gradient target is ',1PD15.8,/,&
-          'Starting cost function: ' ,1PD15.8,' gradient= ',1PD15.8)
-   write(unit=stdout,fmt='(A)') &
-      '----------------------------------------------------------'
-   if (calculate_cg_cost_fn) then
-      write(unit=stdout,fmt='(A)') &
-         'Iter    Cost Function         Gradient             Step'
-   else
-      write(unit=stdout,fmt='(A)')'Iter      Gradient             Step'
-   end if
-
-   !-------------------------------------------------------------------------
-   ! [2.0] iteratively solve for minimum of cost function:
-   !-------------------------------------------------------------------------
-
-   do iter=1, ntmax
-      if (rrmold == 0.0) go to 1002
-      fhat = phat
-      cg_jcdf = 1
-
-      call da_transform_vtoy(cv_size, be, grid%ep, fhat, iv, grid%vp, &
-         grid%vv, xbx, y,         &
-         grid, config_flags                               )
-
-      call da_calculate_grady(iv, y , jo_grad_y)
-
-      call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, fhat, iv, &
-         grid%vp, grid%vv, xbx, jo_grad_y, &
-         grid, config_flags, cg_jcdf)
-
-      je_start = be % cv % size_jb + 1
-      je_end = be % cv % size_jb + be % cv % size_je
-      cv_size_jb = be % cv % size_jb
-
-      fhat(1:cv_size_jb) = - fhat(1:cv_size_jb) + jb_factor*phat(1:cv_size_jb)
-      fhat(je_start:je_end) = - fhat(je_start:je_end) + &
-         je_factor*phat(je_start:je_end)
-      apdotp = da_dot_cv(cv_size, cv_size_domain, fhat, phat, grid, & 
-         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-
-      step = 0.0
-      if (apdotp .gt. 0.0) step = rrmold/apdotp
-      ghat = ghat + step * fhat
-      xhat = xhat + step * phat
-      if (calculate_cg_cost_fn) then
-         j_grad = 0.0
-         call da_calculate_j(it, iter, cv_size, be % cv % size_jb, &
-            be % cv % size_je, &
-            xbx, be, iv, xhat, cv, &
-            re, y, j, j_grad,         &
-            grid, config_flags                       )
-            ob_grad = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, &
-            grid, &
-            (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-         ob_grad = sqrt(ob_grad)
-      end if
-
-      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, grid, &
-         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-
-      rrmnew_norm = sqrt(rrmnew)
-
-      if (rrmnew_norm  < eps(it) * j_grad_norm_target) go to 1002
-      ratio = 0.0
-      if (rrmold .gt. 0.0) ratio = rrmnew/rrmold
-
-      phat = - ghat       + ratio * phat
-
-      rrmold=rrmnew
-      if (calculate_cg_cost_fn) then
-         write(unit=stdout,fmt=12)iter, j%total, ob_grad, step
-      else
-         write(unit=stdout,fmt=14)iter, rrmnew_norm , step
-      end if
-12    format(i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
-14    format(i3,5x,1PD15.8,5x,1PD15.8)
+   do n=1, iv%info(synop)%nlocal
+      if (iv%info(synop)%proc_domain(1,n)) then
+         call da_stats_calculate (n, 0, iv%synop(n)%u%qc,  & 
+            re%synop(n)%u, nu, & 
+            stats%minimum%u, stats%maximum%u, &
+            stats%average%u, stats%rms_err%u)
+         call da_stats_calculate (n, 0, iv%synop(n)%v%qc,  & 
+            re%synop(n)%v, nv, & 
+            stats%minimum%v, stats%maximum%v, &
+            stats%average%v, stats%rms_err%v)
+         call da_stats_calculate (n, 0, iv%synop(n)%t%qc,  & 
+            re%synop(n)%t, nt, & 
+            stats%minimum%t, stats%maximum%t, &
+            stats%average%t, stats%rms_err%t)
+         call da_stats_calculate (n, 0, iv%synop(n)%p%qc,  & 
+            re%synop(n)%p, np, & 
+            stats%minimum%p, stats%maximum%p, &
+            stats%average%p, stats%rms_err%p)
+         call da_stats_calculate (n, 0, iv%synop(n)%q%qc,  & 
+            re%synop(n)%q, nq, & 
+            stats%minimum%q, stats%maximum%q, &
+            stats%average%q, stats%rms_err%q)
+      end if    ! end if (iv%info(synop)%proc_domain(1,n))
    end do
 
-   !-------------------------------------------------------------------------
-   ! End of the minimization of cost function
-   !-------------------------------------------------------------------------
-   iter = iter -1
-   go to 1003
-1002 continue
-   if (calculate_cg_cost_fn) then
-      write(unit=stdout,fmt=12)iter, j%total, ob_grad, step
-   else
-      write(unit=stdout,fmt=14)iter, rrmnew_norm , step
+   ! Do inter-processor communication to gather statistics.
+   call da_proc_sum_int (nu)
+   call da_proc_sum_int (nv)
+   call da_proc_sum_int (nt)
+   call da_proc_sum_int (np)
+   call da_proc_sum_int (nq)
+   iv%nstats(synop) = nu + nv + nt + np + nq
+
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
+      stats%minimum%v%value, stats%maximum%v%value, &
+      stats%minimum%v%n, stats%maximum%v%n, &
+      stats%minimum%v%l, stats%maximum%v%l)
+   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
+      stats%minimum%t%value, stats%maximum%t%value, &
+      stats%minimum%t%n, stats%maximum%t%n, &
+      stats%minimum%t%l, stats%maximum%t%l)
+   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
+      stats%minimum%p%value, stats%maximum%p%value, &
+      stats%minimum%p%n, stats%maximum%p%n, &
+      stats%minimum%p%l, stats%maximum%p%l)
+   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
+      stats%minimum%q%value, stats%maximum%q%value, &
+      stats%minimum%q%n, stats%maximum%q%n, &
+      stats%minimum%q%l, stats%maximum%q%l)
+
+   if (rootproc) then
+      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for synop'
+         call da_print_stats_synop(stats_unit, nu, nv, nt, np, nq, stats)
+      end if
    end if
-1003 continue
-   write(unit=stdout,fmt='(A)') &
-      '----------------------------------------------------------'
-   write(unit=stdout,fmt='(A)') " "
-   write(unit=stdout, &
-      fmt='("Inner iteration stopped after ",i4," iterations")') iter
-   write(unit=stdout,fmt='(A)') " "
 
-   if (calculate_cg_cost_fn) then 
-      rrmnew_norm = ob_grad
-   else
-      call da_calculate_j(it, iter, cv_size, be % cv % size_jb, &
-         be % cv % size_je, &
-         xbx, be, iv, xhat, cv, &
-         re, y, j, j_grad,         &
-         grid, config_flags                       )
+   if (trace_use_dull) call da_trace_exit("da_ao_stats_synop")
 
-      rrmnew_norm = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, &
-         grid, &
-         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-      rrmnew_norm = sqrt(rrmnew_norm)
-    end if
-
-    write(unit=stdout,fmt=15) iter, j%total , rrmnew_norm
-15  format('Final: ',I3,' iter, J=',1PD15.8,', g=',1PD15.8)
-    write(unit=stdout,fmt='(A)') &
-      '----------------------------------------------------------'
-1004 continue
-
-   cv = cv + xhat
-
-   call da_deallocate_y(jo_grad_y)   
-
-   if (trace_use) call da_trace_exit("da_minimise_cg")
-
-end subroutine da_minimise_cg
+end subroutine da_ao_stats_synop
 
 

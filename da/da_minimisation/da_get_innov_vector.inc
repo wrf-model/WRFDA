@@ -28,8 +28,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    
    do n=1, num_fgat_time
       iv%time = n
-      iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
-      iv%info(:)%n2 = iv%plocal(iv%time,:)
+      iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
+      iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
 
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
@@ -42,25 +42,25 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_get_innov_vector_sonde_sfc (it, grid, ob, iv)
       end if
 
-      if (iv%nlocal(synop)          > 0) call da_get_innov_vector_synop    (it, grid, ob, iv)
+      if (iv%info(synop)%nlocal          > 0) call da_get_innov_vector_synop    (it, grid, ob, iv)
       if (iv%info(geoamv)%nlocal         > 0) call da_get_innov_vector_geoamv   (it, grid, ob, iv)
       if (iv%info(polaramv)%nlocal       > 0) call da_get_innov_vector_polaramv (it, grid, ob, iv)
-      if (iv%nlocal(airep)          > 0) call da_get_innov_vector_airep    (it, grid, ob, iv)
-      if (iv%nlocal(pilot)          > 0) call da_get_innov_vector_pilot    (it, grid, ob, iv)
-      if (iv%nlocal(bogus)          > 0) call da_get_innov_vector_bogus    (it, grid, ob, iv)
+      if (iv%info(airep)%nlocal          > 0) call da_get_innov_vector_airep    (it, grid, ob, iv)
+      if (iv%info(pilot)%nlocal          > 0) call da_get_innov_vector_pilot    (it, grid, ob, iv)
+      if (iv%info(bogus)%nlocal          > 0) call da_get_innov_vector_bogus    (it, grid, ob, iv)
       if (iv%info(metar)%nlocal          > 0) call da_get_innov_vector_metar    (it, grid, ob, iv)
-      if (iv%nlocal(ships)          > 0) call da_get_innov_vector_ships    (it, grid, ob, iv)
+      if (iv%info(ships)%nlocal          > 0) call da_get_innov_vector_ships    (it, grid, ob, iv)
       if (iv%info(gpspw)%nlocal          > 0) call da_get_innov_vector_gpspw    (it, grid, ob, iv)
       if (iv%info(gpsref)%nlocal         > 0) call da_get_innov_vector_gpsref   (it, grid, ob, iv)
-      if (iv%nlocal(ssmi_tb)        > 0) call da_get_innov_vector_ssmi_tb  (it, grid, ob, iv) 
-      if (iv%nlocal(ssmi_rv) > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
-      if (iv%info(ssmt1)%nlocal          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
-      if (iv%nlocal(ssmt2)          > 0) call da_get_innov_vector_ssmt2    (it, grid, ob, iv)
+      if (iv%info(ssmi_tb)%nlocal        > 0) call da_get_innov_vector_ssmi_tb  (it, grid, ob, iv) 
+      if (iv%info(ssmi_rv)%nlocal > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
+      if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
+      if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt2    (it, grid, ob, iv)
       if (iv%info(satem)%nlocal          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
       if (iv%info(radar)%nlocal          > 0) call da_get_innov_vector_radar    (it, grid, ob, iv)
-      if (iv%nlocal(qscat)          > 0) call da_get_innov_vector_qscat    (it, grid, ob, iv)
+      if (iv%info(qscat)%nlocal          > 0) call da_get_innov_vector_qscat    (it, grid, ob, iv)
       if (iv%info(profiler)%nlocal       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
-      if (iv%nlocal(buoy)           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
+      if (iv%info(buoy)%nlocal           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
 
       if (iv%num_inst > 0) then
          if (rtm_option == rtm_option_rttov) then
@@ -79,12 +79,12 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       end if
 
       if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid, ob, iv)
-      if (iv%nlocal(airsr) > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
+      if (iv%info(airsr)%nlocal > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
    end do
 
    iv%time = 1
-   iv%info(:)%n1 = iv%plocal(iv%time-1,:) + 1
-   iv%info(:)%n2 = iv%plocal(iv%time,:)
+   iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
+   iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
 
    !-----------------------------------------------------------------------
    ! [2] Having calculated the real O-Bs, optionally overwrite with scaled,

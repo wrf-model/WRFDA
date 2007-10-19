@@ -43,7 +43,7 @@ subroutine da_check_psfc(grid, iv, y)
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
       pertile_lhs = pertile_lhs &
                   + y%synop(n)%u * y%synop(n)%u &
@@ -73,7 +73,7 @@ subroutine da_check_psfc(grid, iv, y)
    grid%xa%t2  (ims:ime, jms:jme) = 0.0
    grid%xa%q2  (ims:ime, jms:jme) = 0.0
    
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       call da_transform_xtopsfc_adj(grid,iv%synop(n),y%synop(n),grid%xa)
    end do
 

@@ -1,4 +1,4 @@
-subroutine da_roughness_from_lanu(ltbl, mminlu, date, lanu, rough)
+subroutine da_check_xtoy_adjoint_bogus(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,87 +6,44 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, lanu, rough)
 
    implicit none
 
-   integer             ,   intent(in)    :: ltbl
-   character (len=4)   ,   intent(in)    :: mminlu
-   character (len=19)  ,   intent(in)    :: date
-   real, dimension(ims:ime,jms:jme),   intent(in)    :: lanu 
-   real, dimension(ims:ime,jms:jme),   intent(out)   :: rough 
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   integer                               :: LS, LC, LI, LUCATS, LuseAS, &
-                                           LUMATCH, year, month, day,  &
-                                           julday, Isn, io_error, &
-                                           m1, m2, n1, n2 
-   real                                  :: albd, slmo, sfem
-   real(kind=4), dimension(50,2)         :: sfz0
-   character (len=4)                     :: LUtype
-   logical                               :: exist
+   integer  :: n, k          ! Loop counter.
+   
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_bogus")
 
-   if (trace_use) call da_trace_entry("da_roughness_from_lanu")
+   do n=1, iv%info(bogus)%nlocal
+      if (iv%info(bogus)%proc_domain(1,n)) then
+         do k=1, iv%info(bogus)%levels(n)
+            adjtest_lhs = adjtest_lhs + &
+                          (y%bogus(n)%u(k)/typical_u_rms)**2 + &
+                          (y%bogus(n)%v(k)/typical_v_rms)**2 + &
+                          (y%bogus(n)%t(k)/typical_t_rms)**2 + &
+                          (y%bogus(n)%q(k)/typical_q_rms)**2 
+         end do
+         adjtest_lhs = adjtest_lhs + (y%bogus(n)%slp/typical_p_rms)**2
+      end if
 
-   read(unit=date,fmt='(I4,1x,I2,1X,I2)') year, month, day
-   call da_julian_day(year,month,day,Julday, 1)
-   Isn = 1
-   if (JULDAY < 105 .OR. JULDAY > 288) Isn=2
+      do k=1, iv%info(bogus)%levels(n)
+         pertile_lhs = pertile_lhs + &
+                       (y%bogus(n)%u(k)/typical_u_rms)**2 + &
+                       (y%bogus(n)%v(k)/typical_v_rms)**2 + &
+                       (y%bogus(n)%t(k)/typical_t_rms)**2 + &
+                       (y%bogus(n)%q(k)/typical_q_rms)**2
 
-   inquire (file = 'LANDUSE.TBL', exist = exist)
-
-   if (exist) then
-      open (unit = ltbl, file = 'LANDUSE.TBL', form='formatted', &
-                     action = 'read', iostat = io_error)
-   else
-      call da_error(__FILE__,__LINE__,&
-         (/"Cannot open file LANDUSE.TBL for conversion of roughness"/))
-   end if
-
-   lumatch=0  
-
-   do
-      read (unit=ltbl,fmt='(A4)', iostat=io_error) lutype
-      if (io_error /= 0) exit
-      read (unit=ltbl,fmt=*, iostat=io_error) lucats,luseas
-
-      if (lutype == mminlu) lumatch=1 
-
-      do LS=1,LuseAS 
-         read (unit=ltbl,fmt=*)  
-         do lc=1,lucats 
-            if (lutype == mminlu) then 
-               read (unit=ltbl,fmt=*) li, albd, slmo, sfem, sfz0(lc,ls)
-               ! prevent compiler whinge
-               if (albd == 0.0 .or. sfem == 0.0 .or. slmo == 0.0) then
-               end if
-               if (LC /= LI) then
-                 call da_error(__FILE__,__LINE__, &
-                   (/"Missing landuse: lc"/))
-               end if
-            else 
-               read (unit=ltbl,fmt=*) 
-            end if 
-         end do 
+         y%bogus(n)%u(k) = y%bogus(n)%u(k) / typical_u_rms ** 2
+         y%bogus(n)%v(k) = y%bogus(n)%v(k) / typical_v_rms ** 2
+         y%bogus(n)%t(k) = y%bogus(n)%t(k) / typical_t_rms ** 2
+         y%bogus(n)%q(k) = y%bogus(n)%q(k) / typical_q_rms ** 2
       end do
+      pertile_lhs = pertile_lhs + (y%bogus(n)%slp/typical_p_rms)**2
+      y%bogus(n)%slp = y%bogus(n)%slp / typical_p_rms ** 2
    end do
+   
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_bogus")
 
-   close (unit=ltbl)
-
-   if (lumatch == 0)then
-    call da_error(__FILE__,__LINE__,&
-      (/"landuse in input file does not match lutable"/))
-   end if   
-
-   m1 = its
-   m2 = ite
-   n1 = jts
-   n2 = jte
-
-   do lc = m1,m2
-      do ls = n1,n2
-         Li = int(lanu(lc,ls)+0.001)
-         rough(lc,ls) =  sfz0(Li,Isn)/100.0
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_roughness_from_lanu")
-
-end subroutine da_roughness_from_lanu
+end subroutine da_check_xtoy_adjoint_bogus
 
 

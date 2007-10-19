@@ -26,7 +26,7 @@ subroutine da_oi_stats_airsr (stats_unit, iv)
    stats%average = residual_airsr1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(airsr)
+   do n=1, iv%info(airsr)%nlocal
       if (iv%info(airsr)%proc_domain(1,n)) then
          do k=1, iv%info(airsr)%levels(n)
             call da_stats_calculate(iv%info(airsr)%obs_global_index(n), &

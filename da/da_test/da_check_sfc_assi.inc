@@ -1,57 +1,65 @@
-subroutine da_residual_ships(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+subroutine da_check_sfc_assi(grid, iv, y)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Calculate residuals for ship obs
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
-
+   
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
+   type (domain), intent(inout)     :: grid
+  
+   type (iv_type),    intent(inout) :: iv    ! ob. increment vector.
+   type (y_type),     intent(inout) :: y     ! y = h (grid%xa)
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   real                           :: adj_ttl_lhs   ! < y, y >
+   real                           :: adj_ttl_rhs   ! < x, x_adj >
 
-   type (bad_data_type) :: n_obs_bad
-   integer              :: n
+   real                           :: partial_lhs   ! < y, y >
+   real                           :: partial_rhs   ! < x, x_adj >
 
-   if (trace_use_dull) call da_trace_entry("da_residual_ships")
+   real                           :: pertile_lhs   ! < y, y >
+   real                           :: pertile_rhs   ! < x, x_adj >
 
-   n_obs_bad % u % num = number_type(0, 0, 0)
-   n_obs_bad % v % num = number_type(0, 0, 0)
-   n_obs_bad % t % num = number_type(0, 0, 0)
-   n_obs_bad % p % num = number_type(0, 0, 0)
-   n_obs_bad % q % num = number_type(0, 0, 0)
+   integer                        :: n
 
-   do n=1, iv%nlocal(ships)
-      np_available = np_available + 5
-
-      re%ships(n)%u = da_residual(n, 0, y%ships(n)%u, iv%ships(n)%u, n_obs_bad % u)
-      re%ships(n)%v = da_residual(n, 0, y%ships(n)%v, iv%ships(n)%v, n_obs_bad % v)
-      re%ships(n)%t = da_residual(n, 0, y%ships(n)%t, iv%ships(n)%t, n_obs_bad % t)
-      re%ships(n)%p = da_residual(n, 0, y%ships(n)%p, iv%ships(n)%p, n_obs_bad % p)
-      re%ships(n)%q = da_residual(n, 0, y%ships(n)%q, iv%ships(n)%q, n_obs_bad % q)
-   end do
-
-   np_missing = np_missing + n_obs_bad % u % num % miss + &
-      n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &
-      n_obs_bad % p % num % miss + n_obs_bad % q % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-      n_obs_bad % v % num % bad + n_obs_bad % t % num % bad + &
-      n_obs_bad % p % num % bad + n_obs_bad % q % num % bad
-   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-      n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
-      n_obs_bad % p % num % use + n_obs_bad % q % num % use
-
-   if (trace_use_dull) call da_trace_exit("da_residual_ships")
-
-end subroutine da_residual_ships
+   real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
+                                                 xa2_p, xa2_q
+ 
+   real, dimension(ims:ime, jms:jme)          :: xa2_u10, xa2_v10, xa2_t2, &
+                                                 xa2_q2, xa2_tgrn, xa2_psfc
 
 
-(synop)
+   if (trace_use) call da_trace_entry("da_check_sfc_assi")
+  
+   call da_message((/"check_sfc_assi: Adjoint Test Results:"/))
+    
+   xa2_u(ims:ime, jms:jme, kms:kme) = grid%xa%u(ims:ime, jms:jme, kms:kme)
+   xa2_v(ims:ime, jms:jme, kms:kme) = grid%xa%v(ims:ime, jms:jme, kms:kme)
+   xa2_t(ims:ime, jms:jme, kms:kme) = grid%xa%t(ims:ime, jms:jme, kms:kme)
+   xa2_p(ims:ime, jms:jme, kms:kme) = grid%xa%p(ims:ime, jms:jme, kms:kme)
+   xa2_q(ims:ime, jms:jme, kms:kme) = grid%xa%q(ims:ime, jms:jme, kms:kme)
+
+   xa2_psfc(ims:ime, jms:jme) = grid%xa%psfc(ims:ime, jms:jme)
+   xa2_tgrn(ims:ime, jms:jme) = grid%xa%tgrn(ims:ime, jms:jme)
+   xa2_u10 (ims:ime, jms:jme) = grid%xa%u10 (ims:ime, jms:jme)
+   xa2_v10 (ims:ime, jms:jme) = grid%xa%v10 (ims:ime, jms:jme)
+   xa2_t2  (ims:ime, jms:jme) = grid%xa%t2  (ims:ime, jms:jme)
+   xa2_q2  (ims:ime, jms:jme) = grid%xa%q2  (ims:ime, jms:jme)
+
+   ! WHY?
+   ! call check_psfc(grid, iv, y)
+
+   call da_transform_xtowtq (grid)
+
+#ifdef DM_PARALLEL
+#include "HALO_SFC_XA.inc"
+#endif
+
+
+   partial_lhs = 0.0
+   pertile_lhs = 0.0
+
+   do n=1, iv%info(synop)%nlocal
       call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
 
 
@@ -78,7 +86,7 @@ end subroutine da_residual_ships
 
    call da_zero_x(grid%xa)
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       call da_transform_xtopsfc_adj(grid,iv%synop(n),y%synop(n),grid%xa)
    end do
 

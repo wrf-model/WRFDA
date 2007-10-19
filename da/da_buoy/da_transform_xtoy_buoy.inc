@@ -47,7 +47,7 @@ subroutine da_transform_xtoy_buoy (grid, iv, y)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      ! [2.0] Surface assimilation approach 2
+      ! [2.0] Surface assmiilation approach 2
       do n=iv%info(buoy)%n1,iv%info(buoy)%n2
          call da_transform_xtopsfc(grid,iv%buoy(n),y%buoy(n))
       end do

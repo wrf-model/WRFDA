@@ -1,49 +1,50 @@
-subroutine da_residual_ssmi_tb(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep, iv, y)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  Purpose: Perform V To Y Adjoint transform test                             
+   !
+   !  Method:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.!
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Obs increment vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual structure.
+   integer,                    intent(in)    :: cv_size
+   type(grid_config_rec_type), intent(inout) :: config_flags
+   type(domain),               intent(inout) :: grid 
+   type(vp_type),              intent(inout) :: vv    ! Grdipt/EOF CV.
+   type(vp_type),              intent(inout) :: vp    ! Grdipt/level CV.
+   type(xbx_type),             intent(in)    :: xbx   ! Header & non-gridded vars.
+   type(be_type),              intent(in)    :: be    ! background error structure.
+   type(ep_type),              intent(in)    :: ep     ! ensemble perturbation structure.
+   type(iv_type),              intent(inout) :: iv    ! ob. increment vector.
+   type(y_type),               intent(inout) :: y     ! y = h (xa)
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   real    :: cv(1:cv_size)          ! Test control variable.
+   real    :: cv_2(1:cv_size)
+   real    :: adj_sum_lhs               ! < y, y >
+   real    :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
+   real    :: partial_lhs   ! < y, y >
+   real    :: pertile_lhs   ! < y, y >   
+   integer :: cg_jcdf
 
-   type (bad_data_type) :: n_obs_bad
-   integer              :: n
+   if (trace_use_dull) call da_trace_entry("da_check_vtoy_adjoint")
 
-   if (trace_use) call da_trace_entry("da_residual_ssmi_tb")
+   write(unit=stdout, fmt='(/a/a)') &
+        '       da_check_vtoy_adjoint:',&
+        '---------------------------------------'
 
-   n_obs_bad % t % num = number_type(0, 0, 0)
+   call random_number(cv(:))
+   cv(:) = cv(:) - 0.5
 
-   do n=1, iv%nlocal(ssmi_tb)
-      np_available = np_available + 7
+   cv_2(1:cv_size) = cv(1:cv_size)
 
-      re%ssmi_tb(n)%tb19v = da_residual(n, 0, y%ssmi_tb(n)%tb19v, iv%ssmi_tb(n)%tb19v, n_obs_bad % t)
-      re%ssmi_tb(n)%tb19h = da_residual(n, 0, y%ssmi_tb(n)%tb19h, iv%ssmi_tb(n)%tb19h, n_obs_bad % t)
-      re%ssmi_tb(n)%tb22v = da_residual(n, 0, y%ssmi_tb(n)%tb22v, iv%ssmi_tb(n)%tb22v, n_obs_bad % t)
-      re%ssmi_tb(n)%tb37v = da_residual(n, 0, y%ssmi_tb(n)%tb37v, iv%ssmi_tb(n)%tb37v, n_obs_bad % t)
-      re%ssmi_tb(n)%tb37h = da_residual(n, 0, y%ssmi_tb(n)%tb37h, iv%ssmi_tb(n)%tb37h, n_obs_bad % t)
-      re%ssmi_tb(n)%tb85v = da_residual(n, 0, y%ssmi_tb(n)%tb85v, iv%ssmi_tb(n)%tb85v, n_obs_bad % t)
-      re%ssmi_tb(n)%tb85h = da_residual(n, 0, y%ssmi_tb(n)%tb85h, iv%ssmi_tb(n)%tb85h, n_obs_bad % t)
-   end do
+   call da_zero_x(grid%xa)
+   call da_zero_vp_type(vp)
+   call da_zero_vp_type(vv)
 
-   np_missing  = np_missing  + n_obs_bad % t % num % miss  
-   np_bad_data = np_bad_data + n_obs_bad % t % num % bad  
-   np_obs_used = np_obs_used + n_obs_bad % t % num % use    
+   call da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, y, grid, config_flags)
 
-   if (trace_use) call da_trace_exit("da_residual_ssmi_tb") 
-
-end subroutine da_residual_ssmi_tb
-
-
------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation and
    !        Rescale input to adjoint routine :
    !-------------------------------------------------------------------------

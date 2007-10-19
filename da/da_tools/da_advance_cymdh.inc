@@ -1,108 +1,33 @@
-subroutine da_llxy_default (xlati,xloni,x,y)
+subroutine da_advance_cymdh (start_date, dh, end_date)
 
-   !----------------------------------------------------------------------------
-   ! Purpose:  calculates the (x,y) location (dot) in the mesoscale grids
-   ! -------   from latitudes and longitudes
-   !
-   !           for global domain co-ordinates
-   !
-   !  input:
-   !  -----
-   !   xlat:    latitudes
-   !   xlon:    longitudes
-   !
-   ! output:
-   ! -----
-   !   x:        the coordinate in x (i)-direction.
-   !   y:        the coordinate in y (j)-direction.
-   !
-   !----------------------------------------------------------------------------
-   
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
-   
-   real, intent(in)  :: xlati, xloni
-   real, intent(out) :: x, y
 
-   real              :: dxlon
-   real              :: xlat, xlon
-   real              :: xx, yy, xc, yc
-   real              :: cell, psi0, psx, r, flp
-   real              :: centri, centrj
-   real              :: ratio
-   real              :: bb
-   real, parameter   :: conv = 180.0 / pi
+   character (len=10), intent(in)  :: start_date ! In date (ccyymmddhh).
+   integer, intent(in)             :: dh         ! Period to advance (-ve for past).
+   character (len=10), intent(out) :: end_date   ! Out date (ccyymmddhh).
 
-   if (trace_use_frequent) call da_trace_entry("da_llxy_default")
-   
-   xlon = xloni
-   xlat = xlati
+   integer :: ccyy, mm, dd, hh
 
-   xlat = max (xlat, -89.95)
-   xlat = min (xlat, +89.95)
-   
-   dxlon = xlon - xlonc
-   if (dxlon >  180) dxlon = dxlon - 360.0
-   if (dxlon < -180) dxlon = dxlon + 360.0
-   
-   if (map_projection == 3) then
-      xc = 0.0
-      yc = YCNTR
+   read(start_date(1:10), fmt='(i4, 3i2)')  ccyy, mm, dd, hh
 
-      cell = cos(xlat/conv)/(1.0+sin(xlat/conv))
-      yy = -c2*alog(cell)
-      xx = c2*dxlon/conv
-   else
-      psi0 = (pole - phic)/conv
-      xc = 0.0
+   hh = hh + dh
 
-      ! calculate x,y coords. relative to pole
+   do while (hh < 0) 
+      hh = hh + 24
+      call da_change_date  (ccyy, mm, dd, -1)
+   end do
 
-      flp = cone_factor*dxlon/conv
-   
-      psx = (pole - xlat)/conv
-   
-      if (map_projection == 2) then
-         ! Polar stereographics:
-         bb = 2.0*(cos(psi1/2.0)**2)
-         yc = -earth_radius*bb*tan(psi0/2.0)
-          r = -earth_radius*bb*tan(psx/2.0)
-      else
-         ! Lambert conformal:
-         bb = -earth_radius/cone_factor*sin(psi1)
-         yc = bb*(tan(psi0/2.0)/tan(psi1/2.0))**cone_factor
-          r = bb*(tan(psx /2.0)/tan(psi1/2.0))**cone_factor
-      end if
+   do while (hh > 23) 
+      hh = hh - 24
+      call da_change_date  (ccyy, mm, dd, 1)
+   end do
 
-      if (phic < 0.0) then
-         xx = r*sin(flp)
-         yy = r*cos(flp)
-      else
-         xx = -r*sin(flp)
-         yy =  r*cos(flp)
-      end if
+   write(unit=end_date(1:10), fmt='(i4.4, 3i2.2)')  ccyy, mm, dd, hh
 
-   end if
-
-   ! transform (1,1) to the origin
-   ! the location of the center in the coarse domain
-
-   centri = real (coarse_ix + 1)/2.0  
-   centrj = real (coarse_jy + 1)/2.0  
-
-   ! the (x,y) coordinates in the coarse domain
-
-   x = (xx - xc)/coarse_ds + centri 
-   y = (yy - yc)/coarse_ds + centrj  
-
-   ratio = coarse_ds / dsm
-
-   ! only add 0.5 so that x/y is relative to first cross points:
-
-   x = (x - start_x)*ratio + 0.5
-   y = (y - start_y)*ratio + 0.5
-
-   if (trace_use_frequent) call da_trace_exit("da_llxy_default")
-
-end subroutine da_llxy_default
+end subroutine da_advance_cymdh
 
 

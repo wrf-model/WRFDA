@@ -13,9 +13,9 @@ subroutine da_setup_pseudo_obs(iv, ob)
 
    if (trace_use_dull) call da_trace_entry("da_setup_pseudo_obs")
 
-   allocate (iv%pseudo(1:iv%nlocal(pseudo)))
+   allocate (iv%pseudo(1:iv%info(pseudo)%nlocal))
 
-   do n=1, iv%nlocal(pseudo)
+   do n=1, iv%info(pseudo)%nlocal
       iv%pseudo(n) % u % inv = missing_r
       iv%pseudo(n) % v % inv = missing_r
       iv%pseudo(n) % t % inv = missing_r

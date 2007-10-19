@@ -1,36 +1,41 @@
-subroutine da_random_omb(std_dev, yo, qc_flag, omb)
+subroutine da_calculate_grady_bogus(iv, re, jo_grad_y)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! Purpose: Applies obs inverse on re-vector
+   !----------------------------------------------------------------------
 
    implicit none
+
+   type (iv_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
+
+   integer                      :: n, k
    
-   real, intent(in)     :: std_dev      ! Standard deviation scaling.
-   real, intent(inout)  :: yo           ! Observatopn.
-   integer, intent(in)  :: qc_flag      ! Ob QC flag.
-   real, intent(inout)  :: omb          ! O-B.
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_bogus")
 
-   real :: xb           ! Background value.
-   real :: z            ! Gaussian noise.
+   do n=1, iv%info(bogus)%nlocal
+      if (iv%bogus(n)%slp%qc < obs_qc_pointer) then
+         re%bogus(n)%slp = 0.0
+      end if
 
-   if (trace_use) call da_trace_entry("da_random_omb")
+      jo_grad_y%bogus(n)%slp = -re%bogus(n)%slp / (iv%bogus(n)%slp%error * iv%bogus(n)%slp%error)
 
-   if (qc_flag >= obs_qc_pointer) then
-      ! [1] Calculate background value from old O, O-B:
-      xb = yo - omb
+      do k=1, iv%info(bogus)%levels(n)
+         if (iv%bogus(n)%u(k)%qc < obs_qc_pointer) re%bogus(n)%u(k) = 0.0
+         if (iv%bogus(n)%v(k)%qc < obs_qc_pointer) re%bogus(n)%v(k) = 0.0
+         if (iv%bogus(n)%t(k)%qc < obs_qc_pointer) re%bogus(n)%t(k) = 0.0
+         if (iv%bogus(n)%q(k)%qc < obs_qc_pointer) re%bogus(n)%q(k) = 0.0
+
+         jo_grad_y%bogus(n)%u(k) = -re%bogus(n)%u(k) / (iv%bogus(n)%u(k)%error * iv%bogus(n)%u(k)%error)
+         jo_grad_y%bogus(n)%v(k) = -re%bogus(n)%v(k) / (iv%bogus(n)%v(k)%error * iv%bogus(n)%v(k)%error)
+         jo_grad_y%bogus(n)%t(k) = -re%bogus(n)%t(k) / (iv%bogus(n)%t(k)%error * iv%bogus(n)%t(k)%error)
+         jo_grad_y%bogus(n)%q(k) = -re%bogus(n)%q(k) / (iv%bogus(n)%q(k)%error * iv%bogus(n)%q(k)%error)
+      end do
+   end do
    
-      ! [2] Calculate new O-B as scaled Gaussian noise:
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_bogus")
 
-      call da_gauss_noise(z)   
-      omb = set_omb_rand_fac * std_dev * z
-
-      ! [3] Recalculate corresponding observation:
-      yo = xb + omb
-   end if
-
-   if (trace_use) call da_trace_exit("da_random_omb")
-
-end subroutine da_random_omb
+end subroutine da_calculate_grady_bogus
 
 

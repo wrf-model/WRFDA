@@ -1,70 +1,53 @@
-subroutine da_ao_stats_polaramv (stats_unit, iv, re)
+subroutine da_lubksb(n, np, indx, a, b)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
+   ! Purpose: Adapted Numerical Recipes routine to solve the set of n linear 
+   ! equations A.X=B.
+   ! Routine takes in to account possibility that B will begin with many zero elements, 
+   ! so it is efficient for matrix inversion.
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! iv
-   type  (y_type), intent(in)    :: re            ! A - O
+   integer, intent(in)    :: n              ! Logical size of array.
+   integer, intent(in)    :: np             ! Physical size of array.
+   integer, intent(in)    :: indx(1:n)      ! Permutation vector returned by LUDCMP. 
+   real,    intent(in)    :: a(1:np,1:np)   ! LU decomposition of matrix A in A.x=B.
+   real,    intent(inout) :: b(1:n)         ! On input = B, on output = x.
 
-   type (stats_polaramv_type) :: stats
-   integer                    :: nu, nv
-   integer                    :: n, k
-   
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_polaramv")
+   integer :: i , ii , j , ll
+   real    :: sum
 
-   nu = 0
-   nv = 0
-   
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   if (trace_use) call da_trace_entry("da_lubksb")
 
-   stats%average = residual_polaramv1_type(0.0, 0.0)
-   stats%rms_err = stats%average
+   ii = 0
+   do i = 1 , n
+      ll = indx(i)
+      sum = b(ll)
+      b(ll) = b(i)
 
-   do n=1, iv%info(polaramv)%nlocal
-      do k=1, iv%info(polaramv)%levels(n)
-         if (iv%info(polaramv)%proc_domain(k,n)) then
-            call da_stats_calculate (n, 0, iv%polaramv(n)%u(k)%qc, & 
-               re%polaramv(n)%u(k), nu, & 
-               stats%minimum%u, stats%maximum%u, &
-               stats%average%u, stats%rms_err%u)
-            call da_stats_calculate (n, 0, iv%polaramv(n)%v(k)%qc, & 
-               re%polaramv(n)%v(k), nv, & 
-               stats%minimum%v, stats%maximum%v, &
-               stats%average%v, stats%rms_err%v)
-         end if
-      end do
+      if (ii /= 0) then
+         do j = ii , i - 1
+            sum = sum - a(i,j) * b(j)
+         end do
+      else if (sum /= 0.0) then
+         ii = i
+      end if
+      b(i) = sum
    end do
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   iv%nstats(polaramv) = nu + nv
-   
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-      
-   if (rootproc) then   
-      if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for polaramv'
-         call da_print_stats_polaramv (stats_unit, nu, nv, stats)
+   do i = n , 1 , -1
+      sum = b(i)
+      if (i < n) then
+         do j = i + 1 , n
+            sum = sum - a(i,j) * b(j)
+         end do
       end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_polaramv")
+      b(i) = sum / a(i,i)
+   end do
 
-end subroutine da_ao_stats_polaramv  
+   if (trace_use) call da_trace_exit("da_lubksb")
+
+end subroutine da_lubksb
 
 

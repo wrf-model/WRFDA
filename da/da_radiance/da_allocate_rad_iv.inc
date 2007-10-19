@@ -1,113 +1,71 @@
-subroutine da_llxy_latlon(lat, lon, proj, x, y)
+subroutine da_allocate_rad_iv (i, nchan, iv)
 
-   !----------------------------------------------------------------------- 
-   ! Purpose: Compute the x/y location of a lat/lon on a LATLON grid.
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  Purpose: allocate radiance innovation structure
+   !---------------------------------------------------------------------------
+
+   use da_control
 
    implicit none
 
-   real, intent(in)             :: lat
-   real, intent(in)             :: lon
-   type(proj_info), intent(in)  :: proj
-   real, intent(out)            :: x
-   real, intent(out)            :: y
+   integer           ,  intent (in)    :: i, nchan
+   type (iv_type)    ,  intent (inout) :: iv
 
-   real                         :: deltalat
-   real                         :: deltalon
-   real                         :: lon360
-   real                         :: latinc
-   real                         :: loninc
+   call da_trace_entry("da_allocate_rad_iv")
 
-   if (trace_use_frequent) call da_trace_entry("da_llxy_latlon")
+      allocate (iv%instid(i)%info%levels(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%lat(kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%lon(kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%elv(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%i  (kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%j  (kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dx (kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dy (kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dxm(kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dym(kts:kte,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%k  (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dz (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%dzm(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%zk (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%info%proc_domain(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
 
-   ! Extract the latitude and longitude increments for this grid
-   ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
-   ! loninc is saved in the stdlon tag and latinc is saved in truelat1
-
-   latinc = proj%truelat1
-   loninc = proj%stdlon
-
-   ! Compute deltalat and deltalon as the difference between the input 
-   ! lat/lon and the origin lat/lon
-
-   deltalat = lat - proj%lat1
-
-   ! To account for issues around the dateline, convert the incoming
-   ! longitudes to be 0->360.0
-   if (lon < 0) then 
-      lon360 = lon + 360.0 
-   else 
-      lon360 = lon
-   end if    
-   deltalon = lon360 - proj%lon1      
-    
-   ! Compute x/y
-   x = deltalon/loninc + 1.0
-   y = deltalat/latinc + 1.0
-
-   if (trace_use_frequent) call da_trace_exit("da_llxy_latlon")
-
-end subroutine da_llxy_latlon
-
-
- max_wave, be % cv % size2c, &
-         xbx % lenr, xbx % lenwrk, xbx % lensav, &
-         xbx % inc, xbx % alp_size, xbx % alp, &
-         xbx % wsave, be%v2%power(0:be % v2 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v2(its:ite,jts:jte,k))
-      cv_s = cv_e + 1
-   end do
-
-   do k = 1, be%v3%mz
-      cv_e = cv_s + 2 * be % cv % size3c - 1
-      call da_vtovv_spectral_adj(be % v3 % max_wave, be % cv % size3c, &
-         xbx % lenr, xbx % lenwrk, xbx % lensav, &
-         xbx % inc, xbx % alp_size, xbx % alp, &
-         xbx % wsave, be%v3%power(0:be % v3 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v3(its:ite,jts:jte,k))
-      cv_s = cv_e + 1
-   end do
-
-   do k = 1, be%v4%mz
-      cv_e = cv_s + 2 * be % cv % size4c - 1
-      call da_vtovv_spectral_adj(be % v4 % max_wave, be % cv % size4c, &
-         xbx % lenr, xbx % lenwrk, xbx % lensav, &
-         xbx % inc, xbx % alp_size, xbx % alp, &
-         xbx % wsave, be%v4%power(0:be % v4 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v4(its:ite,jts:jte,k))
-      cv_s = cv_e + 1
-   end do
-
-   do k = 1, be%v5%mz
-     cv_e = cv_s + 2 * be % cv % size5c - 1 
-     call da_vtovv_spectral_adj(be % v5 % max_wave, be % cv % size5c, &
-        xbx % lenr, xbx % lenwrk, xbx % lensav, &
-        xbx % inc, xbx % alp_size, xbx % alp, &
-        xbx % wsave, be%v5%power(0:be % v5 % max_wave,k), &
-        cv(cv_s:cv_e), vv%v5(its:ite,jts:jte,kts:kte))
-     cv_s = cv_e + 1
-   end do
-
-   !-------------------------------------------------------------------------
-   ! [2] Spectral to grid transform for flow-dependent control variables:
-   !-------------------------------------------------------------------------
-
-   do m = 1, be % ne
-      cv_e = cv_s + 2 * be % cv % size_alphac - 1
-      call da_vtovv_spectral_adj(be % alpha % max_wave, be % cv % size_alphac, &
-         xbx % lenr, xbx % lenwrk, xbx % lensav, &
-         xbx % inc, xbx % alp_size, xbx % alp, &
-         xbx % wsave, be % alpha % power(0:be%alpha%max_wave,1), &
-         cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m))
-      cv_s = cv_e + 1
-   end do
-
-   if (trace_use) call da_trace_exit("da_transform_vtovv_global_adj")
-
-end subroutine da_transform_vtovv_global_adj
-
-
-     allocate (iv%instid(i)%tb_xb(nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%t  (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%mr (iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tm (kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qm (kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qrn(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qcw(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qci(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qsn(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qgr(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qhl(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%pm (kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rcw(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rci(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rrn(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rsn(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rgr(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%rhl(kms:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%pf (0:kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%u10(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%v10(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%t2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%q2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%mr2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%psfc(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%ts(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%smois(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tslb(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%snowh(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%isflg(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%landsea_mask(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%elevation(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%vegfra(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%vegtyp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%soiltyp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%clwp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%ps(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_xb(nchan,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tb_qc(nchan,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tb_inv(nchan,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tb_error(nchan,iv%instid(i)%num_rad))

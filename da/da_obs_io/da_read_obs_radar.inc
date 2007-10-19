@@ -25,8 +25,8 @@ subroutine da_read_obs_radar (iv, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_radar")
 
-   nlocal(:) = iv%plocal(iv%time-1,:)
-   ntotal(:) = iv%ptotal(iv%time-1,:)
+   nlocal(:) = iv%info(:)%plocal(iv%time-1)
+   ntotal(:) = iv%info(:)%ptotal(iv%time-1)
  
    ! 1. open file
 

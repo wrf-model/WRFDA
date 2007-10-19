@@ -197,9 +197,9 @@ subroutine da_get_var_diagnostics( iv, j)
 
       ! [4.2] Output components of Jo:
 
-      if (iv % ntotal(synop) > 0) then
+      if (iv%info(synop)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    synop obs, Jo(actual)  = ', &
-                                  iv % ntotal(synop), iv%nstats(synop), &
+                                  iv%info(synop)%ntotal, iv%nstats(synop), &
                                   j % jo % synop_u, iv % synop_ef_u, &
                                   j % jo % synop_v, iv % synop_ef_v, &
                                   j % jo % synop_t, iv % synop_ef_t, &
@@ -211,9 +211,9 @@ subroutine da_get_var_diagnostics( iv, j)
       if (trace_use) call da_trace("da_get_var_diagnostics", &
          message="Memory increase from internal write")
 
-      if (iv % ntotal(metar) > 0) then
+      if (iv%info(metar)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    metar obs, Jo(actual)  = ', &
-                               iv % ntotal(metar), iv%nstats(metar), &
+                               iv%info(metar)%ntotal, iv%nstats(metar), &
                                j % jo % metar_u, iv % metar_ef_u, &
                                j % jo % metar_v, iv % metar_ef_v, &
                                j % jo % metar_t, iv % metar_ef_t, &
@@ -221,9 +221,9 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % metar_q, iv % metar_ef_q    
       end if
 
-      if (iv % ntotal(ships) > 0) then
+      if (iv%info(ships)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ships obs, Jo(actual)  = ', &
-                               iv % ntotal(ships), iv%nstats(ships), &
+                               iv%info(ships)%ntotal, iv%nstats(ships), &
                                j % jo % ships_u, iv % ships_ef_u, &
                                j % jo % ships_v, iv % ships_ef_v, &
                                j % jo % ships_t, iv % ships_ef_t, &
@@ -232,46 +232,46 @@ subroutine da_get_var_diagnostics( iv, j)
       end if
 
 
-      if (iv % ntotal(geoamv) > 0) then
+      if (iv%info(geoamv)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    geoamv ob, Jo(actual)  = ', &
-                               iv % ntotal(geoamv), iv%nstats(geoamv), &
+                               iv%info(geoamv)%ntotal, iv%nstats(geoamv), &
                                j % jo % geoamv_u, iv % geoamv_ef_u, &
                                j % jo % geoamv_v, iv % geoamv_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(polaramv) > 0) then
+      if (iv%info(polaramv)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    polaramv,  Jo(actual)  = ', &
-                               iv % ntotal(polaramv), iv%nstats(polaramv), &
+                               iv%info(polaramv)%ntotal, iv%nstats(polaramv), &
                                j % jo % polaramv_u, iv % polaramv_ef_u, &
                                j % jo % polaramv_v, iv % polaramv_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
 
-      if (iv % ntotal(gpspw) > 0) then
+      if (iv%info(gpspw)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    gpspw obs, Jo(actual)  = ', &
-                               iv % ntotal(gpspw), iv%nstats(gpspw), &
+                               iv%info(gpspw)%ntotal, iv%nstats(gpspw), &
                                j % jo % gpspw_tpw, iv % gpspw_ef_tpw, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(gpsref) > 0) then
+      if (iv%info(gpsref)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    gpsref obs, Jo(actual)  = ', &
-                               iv % ntotal(gpsref), iv%nstats(gpsref), &
+                               iv%info(gpsref)%ntotal, iv%nstats(gpsref), &
                                j % jo % gpsref_ref, iv % gpsref_ef_ref, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(sound) > 0) then
+      if (iv%info(sound)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    sound obs, Jo(actual)  = ', &
-                               iv % ntotal(sound), iv%nstats(sound), &
+                               iv%info(sound)%ntotal, iv%nstats(sound), &
                                j % jo % sound_u, iv % sound_ef_u, &
                                j % jo % sound_v, iv % sound_ef_v, &
                                j % jo % sound_t, iv % sound_ef_t, &
                                j % jo % sound_q, iv % sound_ef_q, 0.0, 1.0 
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    sonde obs, Jo(actual)  = ', &
-                               iv % ntotal(sound), iv%nstats(sound), &
+                               iv%info(sound)%ntotal, iv%nstats(sound), &
                                j % jo % sonde_sfc_u, iv % synop_ef_u, &
                                j % jo % sonde_sfc_v, iv % synop_ef_v, &
                                j % jo % sonde_sfc_t, iv % synop_ef_t, &
@@ -279,18 +279,18 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % sonde_sfc_q, iv % synop_ef_q
       end if
 
-      if (iv % ntotal(airep) > 0) then
+      if (iv%info(airep)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    airep obs, Jo(actual)  = ', &
-                               iv % ntotal(airep), iv%nstats(airep), &
+                               iv%info(airep)%ntotal, iv%nstats(airep), &
                                j % jo % airep_u, iv % airep_ef_u, &
                                j % jo % airep_v, iv % airep_ef_v, &
                                j % jo % airep_t, iv % airep_ef_t, &
                                0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(bogus) > 0) then
+      if (iv%info(bogus)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    bogus obs, Jo(actual)  = ', &
-                               iv % ntotal(bogus), iv%nstats(bogus), &
+                               iv%info(bogus)%ntotal, iv%nstats(bogus), &
                                j % jo % bogus_u, iv % bogus_ef_u, &
                                j % jo % bogus_v, iv % bogus_ef_v, &
                                j % jo % bogus_t, iv % bogus_ef_t, &
@@ -298,54 +298,54 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % bogus_slp, iv % bogus_ef_slp
       end if
 
-      if (iv % ntotal(pilot) > 0) then
+      if (iv%info(pilot)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    pilot obs, Jo(actual)  = ', &
-                               iv % ntotal(pilot), iv%nstats(pilot), &
+                               iv%info(pilot)%ntotal, iv%nstats(pilot), &
                                j % jo % pilot_u, iv % pilot_ef_u, &
                                j % jo % pilot_v, iv % pilot_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(ssmi_rv) > 0) then
+      if (iv%info(ssmi_rv)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmir obs, Jo(actual) = ', &
-                                  iv % ntotal(ssmi_rv), iv%nstats(ssmi_rv), &
+                                  iv%info(ssmi_rv)%ntotal, iv%nstats(ssmi_rv), &
                                   j % jo % ssmir_speed, iv % ssmir_ef_speed, &
                                   j % jo % ssmir_tpw, iv % ssmir_ef_tpw, &
                                   0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(satem) > 0) then
+      if (iv%info(satem)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    satem obs, Jo(actual)  = ', &
-                               iv % ntotal(satem), iv%nstats(satem), &
+                               iv%info(satem)%ntotal, iv%nstats(satem), &
                                j % jo % satem_thickness, iv % satem_ef_thickness, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(ssmt1) > 0) then
+      if (iv%info(ssmt1)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmt1 obs, Jo(actual)  = ', &
-                               iv % ntotal(ssmt1), iv%nstats(ssmt1), &
+                               iv%info(ssmt1)%ntotal, iv%nstats(ssmt1), &
                                j % jo % ssmt1_t, iv % ssmt1_ef_t, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(ssmt2) > 0) then
+      if (iv%info(ssmt2)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmt2 obs, Jo(actual)  = ', &
-                               iv % ntotal(ssmt2), iv%nstats(ssmt2), &
+                               iv%info(ssmt2)%ntotal, iv%nstats(ssmt2), &
                                j % jo % ssmt2_rh, iv % ssmt2_ef_rh, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(qscat) > 0) then
+      if (iv%info(qscat)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    qscat obs, Jo(actual)  = ', &
-                               iv % ntotal(qscat), iv%nstats(qscat), &
+                               iv%info(qscat)%ntotal, iv%nstats(qscat), &
                                j % jo % qscat_u, iv % qscat_ef_u, &
                                j % jo % qscat_v, iv % qscat_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
 
-      if (iv % ntotal(buoy) > 0) then
+      if (iv%info(buoy)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    buoy  obs, Jo(actual)  = ', &
-                               iv % ntotal(buoy), iv%nstats(buoy), &
+                               iv%info(buoy)%ntotal, iv%nstats(buoy), &
                                j % jo % buoy_u, iv % buoy_ef_u, &
                                j % jo % buoy_v, iv % buoy_ef_v, &
                                j % jo % buoy_t, iv % buoy_ef_t, &
@@ -353,16 +353,16 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % buoy_q, iv % buoy_ef_q                                
       end if
 
-      if (iv % ntotal(profiler) > 0) then
+      if (iv%info(profiler)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    profiler,  Jo(actual)  = ', &
-                               iv % ntotal(profiler), iv%nstats(profiler), &
+                               iv%info(profiler)%ntotal, iv%nstats(profiler), &
                                j % jo % profiler_u, iv % profiler_ef_u, &
                                j % jo % profiler_v, iv % profiler_ef_v, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
-      if (iv % ntotal(airsr) > 0) then
+      if (iv%info(airsr)%ntotal > 0) then
          write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    airsr obs, Jo(actual)  = ', &
-                               iv % ntotal(airsr), iv%nstats(airsr), &
+                               iv%info(airsr)%ntotal, iv%nstats(airsr), &
                                j % jo % airsr_t, iv % airsr_ef_t, &
                                j % jo % airsr_q, iv % airsr_ef_q, &
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0

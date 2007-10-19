@@ -1,86 +1,55 @@
-subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
+subroutine da_check_max_iv_airep(iv, it, itu,ituf,itv,itvf,itt,ittf)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Perform one pass of recursive filter on 1D array - adjoint.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)    :: pass           ! Current pass of filter.
-   real, intent(in)       :: alpha          ! Alpha coefficient for RF.
-   real, intent(inout)    :: field(:)       ! Array to be filtered.
-   integer, intent(in)    :: n              ! Size of field array.
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itv,itvf,itt,ittf
+
+   integer :: k,n
+   logical :: failed
    
-   integer                :: j              ! Loop counter.
-   real                   :: one_alpha      ! 1 - alpha.
-   real                   :: a(1:n)         ! Input field.
-   real                   :: b(1:n)         ! Field after left-right pass.
-   real                   :: c(1:n)         ! Field after right-left pass.
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_airep")
 
-   if (trace_use_dull) call da_trace_entry("da_recursive_filter_1d_adj")
+   !---------------------------------------------------------------------------
+   ! [1.0] Open diagnostic file:
+   !---------------------------------------------------------------------------
 
-   !-------------------------------------------------------------------------
-   ! [1.0] Initialise:
-   !-------------------------------------------------------------------------
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
+         '----------------------------------------------------------------'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-   one_alpha = 1.0 - alpha
-
-   !-------------------------------------------------------------------------
-   ! [4.0] Copy and tidy up:
-   !-------------------------------------------------------------------------
-
-   c(1:n) = field(1:n)
-   
-   !-------------------------------------------------------------------------
-   ! [3.0] Perform left-moving filter:
-   !-------------------------------------------------------------------------
-
-   ! [3.2] Perform pass left to right:
-
-   b(1:n) = 0.0   
-
-   do j = 1, n-1
-      c(j+1) = c(j+1) + alpha * c(j)
-      b(j) = one_alpha * c(j)
-   end do
-
-   ! use turning conditions as in the appendix of Hayden & Purser (1995):
-
-   if (pass == 1) then
-      b(n) = b(n) + c(n) / (1.0 + alpha)
-   else
-      b(n) = b(n) + one_alpha * c(n) / (1.0 - alpha**2)**2
-      b(n-1) = b(n-1) - one_alpha * alpha**3 * c(n) / (1.0 - alpha**2)**2
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
+         'Error max test ratio for Airep_U   = ',max_error_uv, &
+         'Error max test ratio for Airep_V   = ',max_error_uv, &
+         'Error max test ratio for Airep_T   = ',max_error_t
    end if
 
-   !-------------------------------------------------------------------------
-   ! [2.0] Perform right-moving filter:
-   !-------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Perform maximum innovation vector check:
+   !---------------------------------------------------------------------------
 
-   a(1:n) = 0.0
+   failed = .false.
 
-   ! [2.2] Perform pass left to right:
 
-   do j = n, 2, -1
-      b(j-1) = b(j-1) + alpha * b(j)
-      a(j) = a(j) + one_alpha * b(j)
+   do n = iv%info(airep)%n1,iv%info(airep)%n2
+      do k = 1, iv%info(airep)%levels(n)
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%u(k), max_error_uv, itu, ituf, &
+            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%v(k), max_error_uv, itv, itvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+         call da_max_error_qc_new (it, iv%info(airep), n, iv%airep(n)%t(k), max_error_t,  itt, ittf, &
+            check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)                          
+      end do
    end do
-
-   ! use turning conditions as in the appendix of Hayden & Purser (1995):
-
-   if (pass == 1) then
-      a(1) = a(1) + one_alpha * b(1)
-   else if (pass == 2) then
-      a(1) = a(1) + b(1) / (1.0 + alpha)
-   else
-      a(1) = a(1) + one_alpha * b(1) / (1.0 - alpha**2)**2
-      a(2) = a(2) - one_alpha * alpha**3 * b(1) / (1.0 - alpha**2)**2
-   end if
-
-   field(1:n) = a(1:n)
-
-   if (trace_use_dull) call da_trace_exit("da_recursive_filter_1d_adj")
    
-end subroutine da_recursive_filter_1d_adj
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_airep")
+
+end subroutine da_check_max_iv_airep
 
 

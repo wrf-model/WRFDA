@@ -9,7 +9,6 @@ subroutine da_sort_rad (iv)
    type (iv_type), intent (inout) :: iv
 
    integer                           :: i,j, n,t, error
-   type(info_type), pointer          :: info(:)
    integer, allocatable              :: ifgat(:),landsea_mask(:)
    integer, allocatable              :: loc_i(:,:), loc_j(:,:),loc_k(:,:)
    real, allocatable                 :: loc_dx(:,:),loc_dy(:,:),loc_dz(:,:)
@@ -41,7 +40,6 @@ subroutine da_sort_rad (iv)
       iv%plocal_rad(:,i) = 0
       if (iv%instid(i)%num_rad < 1) cycle
 
-      allocate (info        (iv%instid(i)%num_rad))
       allocate (ifgat       (iv%instid(i)%num_rad)) 
       allocate (landsea_mask(iv%instid(i)%num_rad))
       allocate (loc_i       (max_ob_levels, iv%instid(i)%num_rad))
@@ -139,7 +137,6 @@ subroutine da_sort_rad (iv)
          iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) = tb_inv(1:iv%instid(i)%nchan,n)
       end do
 
-      deallocate (info)
       deallocate (ifgat) 
       deallocate (landsea_mask)
       deallocate (name)

@@ -1,4 +1,4 @@
-subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
+subroutine da_print_stats_synop(stats_unit, nu, nv, nt, np, nq, stats)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,57 +6,43 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! OI
-   type (y_type),  intent(in)    :: re            ! O-A
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv, nt, np, nq
+   type (stats_synop_type), intent(in)    :: stats
 
-   type (maxmin_type) :: minimum
-   type (maxmin_type) :: maximum
-   integer            :: nrh
-   integer            :: n, k
-   real               :: average, rms_err
+   if (trace_use_dull) call da_trace_entry("da_print_stats_synop")
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_ssmt2")
+   write(unit=stats_unit, fmt='(6a/)') &
+      '   var             ', &
+      'u (m/s)     n    k    ', &
+      'v (m/s)     n    k    ', &
+      't (K)       n    k    ', &
+      'p (Pa)      n    k    ', &
+      'q (kg/kg)   n    k'
 
-   nrh = 0
-   
-   maximum = maxmin_type(-1.0E+20, 0, 0)
-   minimum = maxmin_type (1.0E+20, 0, 0)
-   average = 0.0
-   rms_err = 0.0
+   write(unit=stats_unit, fmt='(a,i16,4i22)') &
+      '  Number: ', nu, nv, nt, np, nq
 
-   if (iv%nlocal(ssmt2) > 0) then
-      do n=1, iv%nlocal(ssmt2)
-         if (iv%info(ssmt2)%proc_domain(1,n)) then
-            do k=1, iv%info(ssmt2)%levels(n)
-               call da_stats_calculate (n, k, iv%ssmt2(n)%rh(k)%qc, re%ssmt2(n)%rh(k), nrh, &
-                  minimum, maximum, average, rms_err)
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
+   if (nt < 1) nt = 1
+   if (np < 1) np = 1
+   if (nq < 1) nq = 1
 
-            end do
-         end if    ! end if (iv%info(ssmt2)%proc_domain(1,n))
-      end do
-   end if
-
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nrh)
-   iv%nstats(ssmt2) = nrh
-      
-   call da_proc_stats_combine(average, rms_err, minimum%value, maximum%value, &
-      minimum%n, maximum%n, minimum%l, maximum%l)
-   
-   if (rootproc) then 
-      if (nrh /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-A for SSMT2'
-         call da_print_stats_ssmt2 (stats_unit, nrh, minimum, maximum, average, rms_err)
-      end if
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_ssmt2")
-
-end subroutine da_ao_stats_ssmt2
-
-
-      sqrt(stats%rms_err%q/real(nq))
+   write(unit=stats_unit, fmt='((a,4(f12.4,2i5),e12.4,2i5))') &
+     ' Minimum(n,k): ', stats%minimum%u, stats%minimum%v, stats%minimum%t, &
+                        stats%minimum%p, stats%minimum%q, &
+     ' Maximum(n,k): ', stats%maximum%u, stats%maximum%v, stats%maximum%t, &
+                        stats%maximum%p, stats%maximum%q
+   write(unit=stats_unit, fmt='((a,4(f12.4,10x),e12.4,10x))') &
+      ' Average     : ', stats%average%u/real(nu), stats%average%v/real(nv), &
+                         stats%average%t/real(nt), stats%average%p/real(np), &
+                         stats%average%q/real(nq), &
+      '    RMSE     : ', sqrt(stats%rms_err%u/real(nu)), &
+                         sqrt(stats%rms_err%v/real(nv)), &
+                         sqrt(stats%rms_err%t/real(nt)), &
+                         sqrt(stats%rms_err%p/real(np)), &
+                         sqrt(stats%rms_err%q/real(nq))
 
    if (trace_use_dull) call da_trace_exit("da_print_stats_synop")
 

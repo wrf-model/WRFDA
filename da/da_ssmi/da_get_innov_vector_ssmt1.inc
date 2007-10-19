@@ -30,7 +30,7 @@ subroutine da_get_innov_vector_ssmt1( it, grid, ob, iv)
    allocate (model_t(1:iv%info(ssmt1)%max_lev,iv%info(ssmt1)%n1:iv%info(ssmt1)%n2))
    model_t(:,:) = 0.0
 
-   do n=1, iv % nlocal(ssmt1)
+   do n=1, iv%info(ssmt1)%nlocal
 
       num_levs = iv%info(ssmt1)%levels(n)
 

@@ -19,7 +19,7 @@ subroutine da_jo_and_grady_airep(iv, re, jo, jo_grad_y)
    jo % airep_v = 0.0
    jo % airep_t = 0.0
 
-   do n=1, iv%nlocal(airep)
+   do n=1, iv%info(airep)%nlocal
       do k=1, iv%info(airep)%levels(n)
          jo_grad_y%airep(n)%u(k) = -re%airep(n)%u(k) / &
             (iv%airep(n)%u(k)%error * iv%airep(n)%u(k)%error)

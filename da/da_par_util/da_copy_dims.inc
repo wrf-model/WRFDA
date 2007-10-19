@@ -1,97 +1,110 @@
-subroutine da_setup_firstguess_kma(xbx, grid)
+subroutine da_copy_dims(grid)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Define/allocate components of WRF model state.
+   ! Purpose: Copy dimensioning information from grid structure.
    !---------------------------------------------------------------------------
 
    implicit none
 
-   type (xbx_type),intent(out)         :: xbx    ! Header & non-gridded vars.
+   type(domain), intent(inout)         :: grid
 
-   type (domain), intent(inout)        :: grid
+   if (trace_use_dull) call da_trace_entry("da_copy_dims")
 
-   integer           :: i, j
-   integer           :: is, ie, js, je, ks, ke
-   integer           :: max_wavenumber
+   ! De-reference dimension information stored in the grid data structure.
 
-   if (trace_use) call da_trace_entry("da_setup_firstguess_kma")
+   ids = grid%sd31 
+   ide = grid%ed31 - 1
+   jds = grid%sd32 
+   jde = grid%ed32 - 1
+   kds = grid%sd33 
+   kde = grid%ed33 - 1
 
-   is = grid%xp % its
-   ie = grid%xp % ite
-   js = grid%xp % jts
-   je = grid%xp % jte
-   ks = grid%xp % kts
-   ke = grid%xp % kte
+   ims = grid%sm31 
+   ime = grid%em31 
+   jms = grid%sm32 
+   jme = grid%em32 
+   kms = grid%sm33 
+   kme = grid%em33 
 
-   !------------------------------------------------------------------------
-   ! [2.0] Copy header info:
-   !------------------------------------------------------------------------
+   ips = grid%sp31 
+   ipe = grid%ep31 
+   jps = grid%sp32 
+   jpe = grid%ep32 
+   kps = grid%sp33 
+   kpe = grid%ep33 
 
-   ! rizvi set it to 1 . Actually it should be decided by KMA 
-   grid%map_proj = 0
-   map_projection = grid%map_proj
-   coarse_ix = grid%e_we - grid%s_we + 1
-   coarse_jy = grid%e_sn - grid%s_sn + 1
+   ! Indices for yz decomposition
 
-   grid%xb % mix = grid%xp%ide - grid%xp%ids + 1
-   grid%xb % mjy = grid%xp%jde - grid%xp%jds + 1
-   grid%xb % mkz = grid%xp%kde - grid%xp%kds + 1
+   grid%xp%idsx = grid%sd31
+   grid%xp%idex = grid%ed31 - 1
+   grid%xp%jdsx = grid%sd32
+   grid%xp%jdex = grid%ed32 - 1
+   grid%xp%kdsx = grid%sd33
+   grid%xp%kdex = grid%ed33 - 1
 
-   mix = grid%xb % mix
-   mjy = grid%xb % mjy
-   mkz = grid%xb % mkz
+   grid%xp%imsx = grid%sm31x
+   grid%xp%imex = grid%em31x
+   grid%xp%jmsx = grid%sm32x
+   grid%xp%jmex = grid%em32x
+   grid%xp%kmsx = grid%sm33x
+   grid%xp%kmex = grid%em33x
 
-   grid%xb % ds  = 0.001 * grid%dx
+   grid%xp%itsx = grid%sp31x
+   grid%xp%itex = grid%ep31x
+   grid%xp%jtsx = grid%sp32x
+   grid%xp%jtex = grid%ep32x
+   grid%xp%ktsx = grid%sp33x
+   grid%xp%ktex = grid%ep33x
 
-   start_x = 1.0
-   start_y = 1.0
-   start_lat = -90.0
-   start_lon = -180.0
-   delt_lat = 180.0/real(grid%e_sn - grid%s_sn - 1)
-   delt_lon = 360.0/real(grid%e_we - grid%s_we)
+   grid%xp%ipsx = grid%sp31x
+   grid%xp%ipex = grid%ep31x
+   grid%xp%jpsx = grid%sp32x
+   grid%xp%jpex = grid%ep32x
+   grid%xp%kpsx = grid%sp33x
+   grid%xp%kpex = grid%ep33x
 
-   phic        = 0.0
-   xlonc       = 0.0
-   cone_factor = 0.0
+   ! Indices for xz decomposition
 
+   grid%xp%idsy = grid%sd31
+   grid%xp%idey = grid%ed31 - 1
+   grid%xp%jdsy = grid%sd32
+   grid%xp%jdey = grid%ed32 - 1
+   grid%xp%kdsy = grid%sd33
+   grid%xp%kdey = grid%ed33 - 1
 
-   do j = js,je
-      do i = is,ie
-         grid%xlat(i,j) = start_lat + real(j-1)*delt_lat
-         grid%xlong(i,j) = start_lon + real(i-1)*delt_lon
-      end do
-   end do
+   grid%xp%imsy = grid%sm31y
+   grid%xp%imey = grid%em31y
+   grid%xp%jmsy = grid%sm32y
+   grid%xp%jmey = grid%em32y
+   grid%xp%kmsy = grid%sm33y
+   grid%xp%kmey = grid%em33y
 
-   ! Avoid assigning -90,90 value                                           
-   if (grid%xb%jts == grid%xb%jds) then
-      grid%xlat(is:ie,j) = -89.9                               
-   end if
+   grid%xp%itsy = grid%sp31y
+   grid%xp%itey = grid%ep31y
+   grid%xp%jtsy = grid%sp32y
+   grid%xp%jtey = grid%ep32y
+   grid%xp%ktsy = grid%sp33y
+   grid%xp%ktey = grid%ep33y
 
-   if (grid%xb%jte == grid%xb%jde) then
-      grid%xlat(is:ie,j) = 89.9                               
-   end if
+   grid%xp%ipsy = grid%sp31y
+   grid%xp%ipey = grid%ep31y
+   grid%xp%jpsy = grid%sp32y
+   grid%xp%jpey = grid%ep32y
+   grid%xp%kpsy = grid%sp33y
+   grid%xp%kpey = grid%ep33y
 
-   ! fix map factor and coriolis parameter
-      
-   grid%f(is:ie,js:je) = 2.0 *earth_omega*sin(pi*grid%xlat(is:ie,js:je)/180.0)
+   if (ipe > ide) ipe = ide
+   if (jpe > jde) jpe = jde
+   if (kpe > kde) kpe = kde
 
-   xbx%inc = 1
-   xbx%ni  = grid%e_we - grid%s_we
-   xbx%nj  = grid%e_sn - grid%s_sn
-   xbx%nk  = grid%e_vert - 1
-   xbx% lenwrk    = xbx%ni
-   xbx% lenr           = xbx%inc * (xbx%ni - 1) + 1
-   max_wavenumber = xbx%ni/2-1
-   xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
+   ! Indices for yz decomposition
 
-   call da_transfer_kmatoxb(xbx, grid)
+   if (grid%xp%itex > ide) grid%xp%itex = ide
+   if (grid%xp%jtex > jde) grid%xp%jtex = jde
+   if (grid%xp%ktex > kde) grid%xp%ktex = kde
 
-   if (trace_use) call da_trace_exit("da_setup_firstguess_kma")
-
-end subroutine da_setup_firstguess_kma
-
-
-
+   if (grid%xp%ipex > ide) grid%xp%ipex = ide
+   if (grid%xp%jpex > jde) grid%xp%jpex = jde
    if (grid%xp%kpex > kde) grid%xp%kpex = kde
 
    ! Indices for xz decomposition

@@ -25,8 +25,8 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
    average = 0.0
    rms_err = 0.0
 
-   if (iv%nlocal(ssmt2) > 0) then
-      do n=1, iv%nlocal(ssmt2)
+   if (iv%info(ssmt2)%nlocal > 0) then
+      do n=1, iv%info(ssmt2)%nlocal
          if (iv%info(ssmt2)%proc_domain(1,n)) then
             do k=1, iv%info(ssmt2)%levels(n)
                call da_stats_calculate (n, k, iv%ssmt2(n)%rh(k)%qc, re%ssmt2(n)%rh(k), nrh, &
@@ -54,12 +54,5 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
    if (trace_use_dull) call da_trace_exit("da_ao_stats_ssmt2")
 
 end subroutine da_ao_stats_ssmt2
-
-
-      sqrt(stats%rms_err%q/real(nq))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_synop")
-
-end subroutine da_print_stats_synop
 
 

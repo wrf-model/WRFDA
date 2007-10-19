@@ -33,27 +33,3 @@ subroutine da_patch_to_global_2d (grid, vlocal, vglobal)
 end subroutine da_patch_to_global_2d
 
 
-        ! chi_u:
-         vp % v2(its:ite,jts:jte,k) = vp % v2(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v2(its:ite,jts:jte,k,n)
-         ! t_u:
-         vp % v3(its:ite,jts:jte,k) = vp % v3(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v3(its:ite,jts:jte,k,n)
-         ! rh:
-         vp % v4(its:ite,jts:jte,k) = vp % v4(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v4(its:ite,jts:jte,k,n)
-        ! ps_u
-        vp % v5(its:ite,jts:jte,k) = vp % v5(its:ite,jts:jte,k) + &
-                                     vp % alpha(its:ite,jts:jte,n) * &
-                                     ep % v5(its:ite,jts:jte,k,n)
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_add_flow_dependence_vp")
-
-end subroutine da_add_flow_dependence_vp
-
-

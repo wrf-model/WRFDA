@@ -1,58 +1,48 @@
-subroutine da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+subroutine da_check_max_iv_synop(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Calculate residuals for pseudo obs
-   !-----------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! Purpose: TBD
+   !-------------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(in)    :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)    :: y      ! y = H (xa)
-   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-   integer       , intent(inout) :: np_available
-   integer       , intent(inout) :: np_obs_used
-   integer       , intent(inout) :: np_missing
-   integer       , intent(inout) :: np_bad_data
+   logical :: failed
+   integer :: n
 
-   type (bad_data_type) :: n_obs_bad
-   integer              :: n
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_synop")
 
-   if (trace_use_dull) call da_trace_entry("da_residual_pseudo")
+   !---------------------------------------------------------------------------
+   ! [1.0] Open diagnostic file:
+   !---------------------------------------------------------------------------
 
-   n_obs_bad % u % num = number_type(0, 0, 0)
-   n_obs_bad % v % num = number_type(0, 0, 0)
-   n_obs_bad % t % num = number_type(0, 0, 0)
-   n_obs_bad % p % num = number_type(0, 0, 0)
-   n_obs_bad % q % num = number_type(0, 0, 0)
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
+         '----------------------------------------------------------------'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-   do n=1, iv%nlocal(pseudo)
-      if (iv%info(pseudo)%proc_domain(1,n)) then
-         np_available = np_available + 5
-         re%pseudo(n)%u = da_residual(n, 0, y%pseudo(n)%u, iv%pseudo(n)%u, n_obs_bad % u)
-         re%pseudo(n)%v = da_residual(n, 0, y%pseudo(n)%v, iv%pseudo(n)%v, n_obs_bad % v)
-         re%pseudo(n)%t = da_residual(n, 0, y%pseudo(n)%t, iv%pseudo(n)%t, n_obs_bad % t)
-         re%pseudo(n)%p = da_residual(n, 0, y%pseudo(n)%p, iv%pseudo(n)%p, n_obs_bad % p)
-         re%pseudo(n)%q = da_residual(n, 0, y%pseudo(n)%q, iv%pseudo(n)%q, n_obs_bad % q)
-      end if
-   end do
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
+         'Error max test ratio for Synop_U   = ',max_error_uv, &
+         'Error max test ratio for Synop_V   = ',max_error_uv, &
+         'Error max test ratio for Synop_P   = ',max_error_p,  &
+         'Error max test ratio for Synop_T   = ',max_error_t,  &
+         'Error max test ratio for Synop_QV  = ',max_error_q
+   end if
 
-   np_missing = np_missing + n_obs_bad % u % num % miss + &
-      n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &
-      n_obs_bad % p % num % miss + n_obs_bad % q % num % miss 
-   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-      n_obs_bad % v % num % bad + n_obs_bad % t % num % bad + &
-      n_obs_bad % p % num % bad + n_obs_bad % q % num % bad 
-   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-      n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
-      n_obs_bad % p % num % use + n_obs_bad % q % num % use
+   !---------------------------------------------------------------------------
+   ! [2.0] Perform maximum innovation vector check:
+   !---------------------------------------------------------------------------
 
-   if (trace_use_dull) call da_trace_exit("da_residual_pseudo")
+   failed = .false.
 
-end subroutine da_residual_pseudo
-
-
-rint)
+   do n=iv%info(synop)%n1,iv%info(synop)%n2
+      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
       ! Mixing ratio, same ratio as relative humidity
       call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
    end do

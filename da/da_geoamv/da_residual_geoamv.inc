@@ -41,17 +41,3 @@ subroutine da_residual_geoamv(iv, y, re, np_missing, np_bad_data, np_obs_used, n
 end subroutine da_residual_geoamv
 
 
-2
-      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
-      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
-      ! Mixing ratio, same ratio as relative humidity
-      call da_max_error_qc_new (it, iv%info(ships), n, iv%ships(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
-   end do
-
-   if (trace_use_dull) call da_trace_exit("da_check_max_iv_ships")
-
-end subroutine da_check_max_iv_ships
-
-

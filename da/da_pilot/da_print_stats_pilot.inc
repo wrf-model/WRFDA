@@ -1,4 +1,4 @@
-subroutine da_ao_stats_polaramv (stats_unit, iv, re)
+subroutine da_print_stats_pilot(stats_unit, nu, nv, Pilot)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,65 +6,32 @@ subroutine da_ao_stats_polaramv (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! iv
-   type  (y_type), intent(in)    :: re            ! A - O
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv
+   type (stats_pilot_type), intent(in)    :: pilot
 
-   type (stats_polaramv_type) :: stats
-   integer                    :: nu, nv
-   integer                    :: n, k
-   
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_polaramv")
+   if (trace_use_dull) call da_trace_entry("da_print_stats_pilot")
 
-   nu = 0
-   nv = 0
-   
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
+   write(unit=stats_unit, fmt='(a/)') &
+      '   var             u (m/s)     n    k    v (m/s)     n    k  '
 
-   stats%average = residual_polaramv1_type(0.0, 0.0)
-   stats%rms_err = stats%average
+   write(unit=stats_unit, fmt='(a,i16,i22)') &
+      '  Number: ', nu, nv
 
-   do n=1, iv%info(polaramv)%nlocal
-      do k=1, iv%info(polaramv)%levels(n)
-         if (iv%info(polaramv)%proc_domain(k,n)) then
-            call da_stats_calculate (n, 0, iv%polaramv(n)%u(k)%qc, & 
-               re%polaramv(n)%u(k), nu, & 
-               stats%minimum%u, stats%maximum%u, &
-               stats%average%u, stats%rms_err%u)
-            call da_stats_calculate (n, 0, iv%polaramv(n)%v(k)%qc, & 
-               re%polaramv(n)%v(k), nv, & 
-               stats%minimum%v, stats%maximum%v, &
-               stats%average%v, stats%rms_err%v)
-         end if
-      end do
-   end do
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   iv%nstats(polaramv) = nu + nv
-   
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-      
-   if (rootproc) then   
-      if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for polaramv'
-         call da_print_stats_polaramv (stats_unit, nu, nv, stats)
-      end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_polaramv")
+   write(unit=stats_unit, fmt='((a,2(f12.4,2i5)))') &
+       ' Minimum(n,k): ', pilot%minimum%u, pilot%minimum%v, &
+       ' Maximum(n,k): ', pilot%maximum%u, pilot%maximum%v
+   write(unit=stats_unit, fmt='((a,2(f12.4,10x)))')  &
+      ' Average     : ', pilot%average%u/real(nu), &
+                         pilot%average%v/real(nv),      &
+      '    RMSE     : ', sqrt(pilot%rms_err%u/real(nu)), &
+                         sqrt(pilot%rms_err%v/real(nv))
 
-end subroutine da_ao_stats_polaramv  
+   if (trace_use_dull) call da_trace_exit("da_print_stats_pilot")
+
+end subroutine da_print_stats_pilot
 
 

@@ -1,60 +1,58 @@
-subroutine da_transform_vvtovp(evec, eval, vertical_wgt, vv, vp, mz, levels)
+subroutine da_ao_stats_bogus (stats_unit, iv, re)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Transform from fields on vertical EOFS to fields on vertical 
-   ! levels.
-   !
-   ! Method:  Perform vp(i,j,k) = P E L^{1/2} vv(i,j,m) transform.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
+
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent (inout) :: iv            ! iv
+   type (y_type),  intent (in)    :: re            ! A - O
+
+   type (stats_bogus_type) :: stats
+   integer                 :: nu, nv, nt, nq, nslp
+   integer                 :: n, k
    
-   integer, intent(in)  :: mz                         ! # vertical modes.
-   integer, intent(in)  :: levels                     ! # no. of levels  
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_bogus")
 
-   real,    intent(in)  :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
-   real,    intent(in)  :: eval(jds:jde,1:mz)         ! Eigenvalues.
-   real,    intent(in)  :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
-   real,    intent(in)  :: vv(ims:ime,jms:jme,kms:kme)   ! CV in EOF space.
-   real,    intent(out) :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
-   
-   integer :: i, j, k, m                 ! Loop counters.
-   real    :: temp
+   nu = 0
+   nv = 0
+   nt = 0
+   nq = 0
+   nslp = 0
 
-   if (trace_use_dull) call da_trace_entry("da_transform_vvtovp")
+   stats%maximum%u   = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v   = maxmin_type (missing_r, 0, 0)
+   stats%maximum%t   = maxmin_type (missing_r, 0, 0)
+   stats%maximum%q   = maxmin_type (missing_r, 0, 0)
+   stats%maximum%slp = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u   = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v   = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%t   = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%q   = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%slp = maxmin_type(-missing_r, 0, 0)
 
-   !-------------------------------------------------------------------
-   ! [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
-   !------------------------------------------------------------------- 
+   stats%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
+   stats%rms_err = stats%average
 
-   vp = 0.0
-   do k = kts, levels
-      do m = 1, mz
-         do j = jts, jte
-            temp = evec(j,k,m) * eval(j,m)
+   do n=1, iv%info(bogus)%nlocal
+      if (iv%info(bogus)%proc_domain(1,n)) then
+         call da_stats_calculate (n, 0, iv%bogus(n)%slp%qc,  &
+            re%bogus(n)%slp, nslp,     &
+            stats%minimum%slp, stats%maximum%slp,  &
+            stats%average%slp, stats%rms_err%slp)
 
-            do i = its, ite
-               vp(i,j,k) = vp(i,j,k) + temp*vv(i,j,m)
-            end do
-         end do
-      end do
-   end do
-   
-   !-------------------------------------------------------------------
-   ! [2.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0:
-   !------------------------------------------------------------------- 
-
-   if (vertical_ip /= vertical_ip_0) then
-      vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
-         vertical_wgt(its:ite,jts:jte,kts:levels)                          
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_transform_vvtovp")
-
-end subroutine da_transform_vvtovp
-
-
-iv%bogus(n)%t(k)%qc, & 
+         do k=1, iv%info(bogus)%levels(n)
+            call da_stats_calculate (n, k, iv%bogus(n)%u(k)%qc, & 
+               re%bogus(n)%u(k), nu, &
+               stats%minimum%u, stats%maximum%u, &
+               stats%average%u, stats%rms_err%u)
+            call da_stats_calculate (n, k, iv%bogus(n)%v(k)%qc, & 
+               re%bogus(n)%v(k), nv, &
+               stats%minimum%v, stats%maximum%v, &
+               stats%average%v, stats%rms_err%v)
+            call da_stats_calculate (n, k, iv%bogus(n)%t(k)%qc, & 
                re%bogus(n)%t(k), nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)

@@ -38,14 +38,3 @@ subroutine da_check_rh_simple (grid)
 end subroutine da_check_rh_simple
 
 
-d do
-
-   np_missing  = np_missing  + n_obs_bad % thickness % num % miss
-   np_bad_data = np_bad_data + n_obs_bad % thickness % num % bad
-   np_obs_used = np_obs_used + n_obs_bad % thickness % num % use
-
-   if (trace_use_dull) call da_trace_exit("da_residual_satem")
-
-end subroutine da_residual_satem
-
-

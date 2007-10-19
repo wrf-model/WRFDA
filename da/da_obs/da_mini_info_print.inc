@@ -1,4 +1,4 @@
-subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
+subroutine da_mini_info_print(print_unit, oi_each, re_each, gr_each, k)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,60 +6,27 @@ subroutine da_ao_stats_ssmt2 (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! OI
-   type (y_type),  intent(in)    :: re            ! O-A
+   type (each_level_type), intent(in) :: oi_each
+   type (residual_type),   intent(in) :: re_each, gr_each
+   integer,                intent(in) :: print_unit, k
 
-   type (maxmin_type) :: minimum
-   type (maxmin_type) :: maximum
-   integer            :: nrh
-   integer            :: n, k
-   real               :: average, rms_err
+   if (trace_use) call da_trace_entry("da_mini_info_print")
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_ssmt2")
+   write(unit=print_unit, fmt='(a,i3,8e12.4)') &
+        '  oi  ', k, &
+        oi_each%u%inv, oi_each%v%inv, &
+        oi_each%t%inv, oi_each%p%inv, oi_each%q%inv
 
-   nrh = 0
-   
-   maximum = maxmin_type(-1.0E+20, 0, 0)
-   minimum = maxmin_type (1.0E+20, 0, 0)
-   average = 0.0
-   rms_err = 0.0
+   write(unit=print_unit, fmt='(a,i3,8e12.4)') &
+        '  re  ', k, &
+        re_each%u, re_each%v, re_each%t, re_each%p, re_each%q
 
-   if (iv%nlocal(ssmt2) > 0) then
-      do n=1, iv%nlocal(ssmt2)
-         if (iv%info(ssmt2)%proc_domain(1,n)) then
-            do k=1, iv%info(ssmt2)%levels(n)
-               call da_stats_calculate (n, k, iv%ssmt2(n)%rh(k)%qc, re%ssmt2(n)%rh(k), nrh, &
-                  minimum, maximum, average, rms_err)
+   write(unit=print_unit, fmt='(a,i3,8e12.4)') &
+        ' grad ', k, &
+        gr_each%u, gr_each%v, gr_each%t, gr_each%p, gr_each%q
 
-            end do
-         end if    ! end if (iv%info(ssmt2)%proc_domain(1,n))
-      end do
-   end if
+   if (trace_use) call da_trace_exit("da_mini_info_print")
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nrh)
-   iv%nstats(ssmt2) = nrh
-      
-   call da_proc_stats_combine(average, rms_err, minimum%value, maximum%value, &
-      minimum%n, maximum%n, minimum%l, maximum%l)
-   
-   if (rootproc) then 
-      if (nrh /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-A for SSMT2'
-         call da_print_stats_ssmt2 (stats_unit, nrh, minimum, maximum, average, rms_err)
-      end if
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_ssmt2")
-
-end subroutine da_ao_stats_ssmt2
-
-
-      sqrt(stats%rms_err%q/real(nq))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_synop")
-
-end subroutine da_print_stats_synop
+end subroutine da_mini_info_print
 
 

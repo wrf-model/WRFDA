@@ -47,8 +47,8 @@ subroutine da_transform_xtoy_metar (grid, iv, y)
       deallocate (model_q)
       deallocate (model_p)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      ! [2.0] Surface assimilation approach 2
-      do n=iv%plocal(iv%time-1,metar) + 1, iv%plocal(iv%time,metar)
+      ! [2.0] Surface assmiilation approach 2
+      do n=iv%info(metar)%n1,iv%info(metar)%n2
          call da_transform_xtopsfc(grid,iv%metar(n),y%metar(n))
       end do
    end if

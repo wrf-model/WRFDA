@@ -1,46 +1,34 @@
-subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, &
-  total_power)
+subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
+                                           be_evec_loc, be_sub)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Allocate components of wrfvar background errors.
+   !---------------------------------------------------------------------------
 
-   implicit none 
+   implicit none
 
-   integer,      intent(inout) :: outunit        ! Output file unit.
-   character*10, intent(in)    :: variable       ! Variable name.
-   integer,      intent(in)    :: k              ! Vertical index.
-   integer,      intent(in)    :: max_wavenumber ! Smallest scale required (ni/2-1)
+   integer, intent(in)              :: jy                 ! i/y dimension.
+   integer, intent(in)              :: kz                 ! k/z dimension.
+   real, intent(in)                 :: l(:)               ! Global eigenvalue.
+   real, intent(in)                 :: e(:,:)             ! Global eigenvectors.
+   real, intent(in)                 :: be_eval_loc(:,:)   ! Std dev/local evalue.
+   real, intent(in)                 :: be_evec_loc(:,:,:) ! Local eigenvectors.
+   type (be_subtype), intent(inout) :: be_sub             ! Backgrd error struct.
+    
+   integer                          :: mz                 ! Vertical truncation.
+   integer                          :: j, m, k            ! Loop counter.
 
-   ! Total Power spectrum (averaged over time/members)
-   real,         intent(in) :: total_power(0:max_wavenumber)
+   if (trace_use_dull) call da_trace_entry("da_allocate_background_errors")
 
-   integer :: n                     ! Loop counter.
-   real    :: accum_power, variance ! Accumulated power, variance.
+   !--------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !--------------------------------------------------------------------------
 
-   if (trace_use) call da_trace_entry("da_print_be_stats_h_global")
-
-   accum_power = 0.0
-   variance = sum(total_power(0:max_wavenumber))
-
-   write(unit=stdout,fmt='(3a,i5,a,i5)')' Power spectra for variable ', trim(variable), &
-                          ' and level ', k, ' in unit ', outunit
-
-   do n = 0, max_wavenumber
-      accum_power = accum_power + total_power(n)
-      write(unit=outunit,fmt='(2i4,2f18.5,f8.3)')k, n, total_power(n), accum_power, &
-                                        accum_power / variance
-   end do
-
-   outunit = outunit + 1
-   write(unit=stdout,fmt=*) ''
-
-   if (trace_use) call da_trace_exit("da_print_be_stats_h_global")
-
-end subroutine da_print_be_stats_h_global
-
-
- !--------------------------------------------------------------------------
+   mz = be_sub % mz
+   
+   !--------------------------------------------------------------------------
+   ! [2.0] Allocate components of be_sub structure:
+   !--------------------------------------------------------------------------
 
    if (mz > 0) then
       allocate  (be_sub % val(1:jy,1:mz))

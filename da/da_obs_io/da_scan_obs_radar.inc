@@ -149,7 +149,7 @@ subroutine da_scan_obs_radar (iv, filename)
             select case (fm)
 
             case (128)
-               iv%info(radar)%nlocal = iv%info(radar)%nlocal) + 1
+               iv%info(radar)%nlocal = iv%info(radar)%nlocal + 1
 
                if (iv%info(radar)%nlocal > max_radar_input) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &

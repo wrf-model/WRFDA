@@ -1,4 +1,4 @@
-subroutine da_ao_stats_ships (stats_unit, iv, re)
+subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, failed, print)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,99 +6,55 @@ subroutine da_ao_stats_ships (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent (inout) :: iv            ! iv
-   type  (y_type), intent (in)    :: re            ! A - O
+   integer,           intent (in)   :: it
+   type(info_type) ,  intent(in)    :: info
+   type(field_type),  intent(inout) :: field
+   real,              intent(in)    :: max_error
+   integer,           intent(inout) :: ix, ixf
+   integer,           intent(in)    :: iunit
+   character (len=*), intent(in)    :: var
+   logical,           intent(out)   :: failed
+   logical,           intent(in)    :: print
 
-   type (stats_ships_type) :: stats
-   integer                 :: nu, nv, nt, np, nq
-   integer                 :: n
+   real                               :: err, err_max
+   integer                            :: qc_flag
 
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_ships")
+   if (trace_use_frequent) call da_trace_entry("da_max_error_qc")
 
-   nu = 0
-   nv = 0
-   nt = 0
-   np = 0
-   nq = 0
+   failed = .false.
 
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%maximum%t = maxmin_type (missing_r, 0, 0)
-   stats%maximum%p = maxmin_type (missing_r, 0, 0)
-   stats%maximum%q = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
+   qc_flag = field % qc
+   err_max = field % error * max_error
+   err     = field % inv
+   err     = ABS (err)
 
-   stats%average = residual_ships1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   stats%rms_err = stats%average
+   ix     = ix + 1
+   if (it > 1 .and. qc_flag == fails_error_max) field%qc = 0
+   if (err > err_max) then
+      if (field % qc > fails_error_max) field % qc = fails_error_max 
 
-   do n=1, iv%nlocal(ships)
-      if (iv%info(ships)%proc_domain(1,n)) then
-         call da_stats_calculate (n, 0, iv%ships(n)%u%qc, & 
-             re%ships(n)%u, nu, & 
-             stats%minimum%u, stats%maximum%u, &
-             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate (n, 0, iv%ships(n)%v%qc, & 
-            re%ships(n)%v, nv, & 
-            stats%minimum%v, stats%maximum%v, &
-            stats%average%v, stats%rms_err%v)
-         call da_stats_calculate (n, 0, iv%ships(n)%t%qc, & 
-            re%ships(n)%t, nt, & 
-            stats%minimum%t, stats%maximum%t, &
-            stats%average%t, stats%rms_err%t)
-         call da_stats_calculate (n, 0, iv%ships(n)%p%qc, & 
-            re%ships(n)%p, np, & 
-            stats%minimum%p, stats%maximum%p, &
-            stats%average%p, stats%rms_err%p)
-         call da_stats_calculate (n, 0, iv%ships(n)%q%qc, & 
-            re%ships(n)%q, nq, & 
-            stats%minimum%q, stats%maximum%q, &
-            stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%info(ships)%proc_domain(1,n))
-   end do
+      ixf = ixf + 1
+      failed = .true.
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   call da_proc_sum_int (nt)
-   call da_proc_sum_int (np)
-   call da_proc_sum_int (nq)
-   iv%nstats(ships) = nu + nv + nt + np + nq
+      if (print .and. failed) then
+         if (err_max .LE. 0.0) then
+            write (unit=iunit , fmt = '(A,3(F10.1,1X),A,A,A,A5,A,A,3f10.2)')   &
+                   "Err_max < 0 ==> ",err,err_max,max_error, " for ", var, &
+                   " OBS ID: ", info % id, info % platform,     &
+                   " LA/LON/ELV:", info % lat, info % lon, info % elv
+            ! call da_error(__FILE__,__LINE__,(/"Erk"/))
+         end if
 
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
-      stats%minimum%t%value, stats%maximum%t%value, &
-      stats%minimum%t%n, stats%maximum%t%n, &
-      stats%minimum%t%l, stats%maximum%t%l)
-   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
-      stats%minimum%p%value, stats%maximum%p%value, &
-      stats%minimum%p%n, stats%maximum%p%n, &
-      stats%minimum%p%l, stats%maximum%p%l)
-   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
-      stats%minimum%q%value, stats%maximum%q%value, &
-      stats%minimum%q%n, stats%maximum%q%n, &
-      stats%minimum%q%l, stats%maximum%q%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for ships'
-         call da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, stats)
+         write (unit=iunit , fmt = '(A,A5,A,A,I5,A,I3,A,F4.1,A,A,A,2e13.6)') &
+                "Err_max failed:ID=", info % id, info % platform,&
+                "Ix=", ix, " Ixf=", ixf, " Err_max ratio =",err/err_max, &
+                " for ", var, " inv, error:",field % inv, field % error
       end if
+      field % inv = 0.0
    end if
 
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_ships")
+   if (trace_use_frequent) call da_trace_exit("da_max_error_qc")
 
-end subroutine da_ao_stats_ships
+end subroutine da_max_error_qc
 
 

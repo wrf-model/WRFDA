@@ -1,248 +1,224 @@
-subroutine da_oi( str,line,y1,y2,iv1,iv2)
+subroutine da_balance_cycloterm (xb, k, term_x, term_y)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: quick way of showing location
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  Purpose: Calculates cyclostrophic term in balance equation.
+   !
+   !  Method:  Term is rho (u.grad) u on a single level.
+   !---------------------------------------------------------------------------
 
    implicit none
+   
+   type(xb_type), intent(in)    :: xb           ! First guess structure.
+   integer,       intent(in)    :: k            ! Model level.
+   real,          intent(inout) :: term_x(:,:)  ! x component of term.
+   real,          intent(inout) :: term_y(:,:)  ! y component of term.
 
-   character(len=*), intent(in)           :: str
-   integer,          intent(in)           :: line
-   type(y_type),     intent(in), optional :: y1
-   type(y_type),     intent(in), optional :: y2
-   type(iv_type)   , intent(in), optional :: iv1
-   type(iv_type),    intent(in), optional :: iv2
+   integer :: i, j                         ! Loop counters.
+   integer :: is, ie                       ! 1st dim. end points.
+   integer :: js, je                       ! 2nd dim. end points.
+   
+   real    :: data(ims:ime,jms:jme)        ! Temporary storage.
 
-   integer :: i
-   real :: sum_y1
-   real :: sum_y2
-   real :: sum_iv1
-   real :: sum_iv2
+   real    :: varb
 
-   sum_y1=-1.0
-   sum_y2=-1.0
-   sum_iv1=-1.0
-   sum_iv2=-1.0
+   if (trace_use) call da_trace_entry("da_balance_cycloterm")
 
-   if (.not. oi_use) return
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
+   
+   ! Computation to check for edge of domain:
+   is = its; ie = ite; js = jts; je = jte
+   if (.not. global .and. its==ids) is = ids+1
+   if (.not. global .and. ite==ide) ie = ide-1
+   if (jts==jds) js = jds+1
+   if (jte==jde) je = jde-1
+   
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate term_x = rho M (u.du/dx + v.du/dy):
+   !---------------------------------------------------------------------------
 
-   if (.not. use_rad) goto 100
+   ! [2.1] Interior points:
 
-   if (present(y1)) then
-      sum_y1=0.0
-      do i=1,y1%num_inst
-         if (associated(y1%instid(i)%tb)) &
-            sum_y1=sum_y1+sum(y1%instid(i)%tb(:,:))
+   do j = js, je
+      do i = is, ie
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)*(xb%u(i+1,j,k) - &
+            xb%u(i-1,j,k)) + xb%v(i,j,k) * xb%coefy(i,j)*(xb%u(i,j+1,k) - &
+            xb%u(i,j-1,k))
       end do
-   else
-      sum_y1=-1.0
-   end if
+   end do
+   
+   if (.NOT. global) then ! For global only interior points
 
-   if (present(y2)) then
-      sum_y2=0.0
-      do i=1,y2%num_inst
-         if (associated(y2%instid(i)%tb)) &
-            sum_y2=sum_y2+sum(y2%instid(i)%tb(:,:))
-      end do
-   else
-      sum_y2=-1.0
-   end if
+      ! [2.2] Bottom boundaries:
 
-   if (present(iv1)) then
-      sum_iv1=0.0
-      do i=1,iv1%num_inst
-         if (associated(iv1%instid(i)%tb_xb)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_xb(:,:)) 
-         end if
+      if (its==ids) then
+         i = its
 
-         if (associated(iv1%instid(i)%tb_inv)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_inv(:,:)) 
-         end if
+         do j = js, je 
+            varb = -3.0*xb%u(i,j,k)+4.0*xb%u(i+1,j,k)-xb%u(i+2,j,k)
 
-         if (associated(iv1%instid(i)%tb_qc)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_qc(:,:)) 
-         end if
-
-         if (associated(iv1%instid(i)%tb_error)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%tb_error(:,:)) 
-         end if
-
-         if (associated(iv1%instid(i)%t)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%t(:,:)) 
-         end if
-         if (associated(iv1%instid(i)%mr)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%mr(:,:)) 
-         end if
-         if (associated(iv1%instid(i)%t2m)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%t2m(:)) 
-         end if
-         if (associated(iv1%instid(i)%u10)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%u10(:)) 
-         end if
-         if (associated(iv1%instid(i)%v10)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%v10(:)) 
-         end if
-         if (associated(iv1%instid(i)%mr2m)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%mr2m(:)) 
-         end if
-         if (associated(iv1%instid(i)%ps)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%ps(:)) 
-         end if
-
-         if (associated(iv1%instid(i)%emiss)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%emiss(:,:)) 
-         end if
-
-         if (associated(iv1%instid(i)%ts)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%ts(:)) 
-         end if
-
-         if (associated(iv1%instid(i)%elevation)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%elevation(:)) 
-         end if
-
-         if (associated(iv1%instid(i)%clwp)) then
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%clwp(:)) 
-         end if
-
-         if (associated(iv1%instid(i)%pm)) &
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%pm(:,:)) 
-
-         if (associated(iv1%instid(i)%tm)) &
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%tm(:,:)) 
-
-         if (associated(iv1%instid(i)%qm)) &
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%qm(:,:)) 
-
-         if (associated(iv1%instid(i)%cloud_flag)) &
-            sum_iv1=sum_iv1+sum(iv1%instid(i)%cloud_flag(:,:)) 
-      end do
-   else
-      sum_iv1=-1.0
-   end if
-
-   if (present(iv2)) then
-      sum_iv2=0.0
-      do i=1,iv2%num_inst
-         if (associated(iv2%instid(i)%tb_xb)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_xb(:,:)) 
-         end if
-
-         if (associated(iv2%instid(i)%tb_inv)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_inv(:,:)) 
-         end if
-
-         if (associated(iv2%instid(i)%tb_qc)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_qc(:,:)) 
-         end if
-
-         if (associated(iv2%instid(i)%tb_error)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%tb_error(:,:)) 
-         end if
-
-         if (associated(iv2%instid(i)%t)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%t(:,:)) 
-         end if
-         if (associated(iv2%instid(i)%mr)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%mr(:,:)) 
-         end if
-         if (associated(iv2%instid(i)%t2m)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%t2m(:)) 
-         end if
-         if (associated(iv2%instid(i)%u10)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%u10(:)) 
-         end if
-         if (associated(iv2%instid(i)%v10)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%v10(:)) 
-         end if
-         if (associated(iv2%instid(i)%mr2m)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%mr2m(:)) 
-         end if
-         if (associated(iv2%instid(i)%ps)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%ps(:)) 
-         end if
-
-         if (associated(iv2%instid(i)%emiss)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%emiss(:,:)) 
-         end if
-
-         if (associated(iv2%instid(i)%ts)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%ts(:)) 
-         end if
-
-         if (associated(iv2%instid(i)%elevation)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%elevation(:)) 
-         end if
-
-         if (associated(iv2%instid(i)%clwp)) then
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%clwp(:)) 
-         end if
-
-         if (associated(iv2%instid(i)%pm)) &
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%pm(:,:)) 
-
-         if (associated(iv2%instid(i)%tm)) &
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%tm(:,:)) 
-
-         if (associated(iv2%instid(i)%qm)) &
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%qm(:,:)) 
-
-         if (associated(iv2%instid(i)%cloud_flag)) &
-            sum_iv2=sum_iv2+sum(iv2%instid(i)%cloud_flag(:,:)) 
-      end do
-   else
-      sum_iv2=-1.0
-   end if
-
-100 continue
-
-   write(unit=stderr,fmt='(A,3(E18.10,1X),A,I6)') "oi:", sum_y1, sum_y2, sum_iv1, str, line
-
-end subroutine da_oi
-
-
-  ,j,k) = psi(i  ,j,k) - coefx(i,j) * v(i,j,k)
-               chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
-               chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
-
-               psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
-               psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
-               chi(i+2,j,k) = chi(i+2,j,k) + coefx(i,j) * u(i,j,k)
-               chi(i,  j,k) = chi(i,  j,k) - coefx(i,j) * u(i,j,k)
-            end do
-         end if
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * varb + &
+               xb%v(i,j,k) * xb%coefy(i,j) * (xb%u(i,j+1,k) - xb%u(i,j-1,k))
+         end do
       end if
 
-      !------------------------------------------------------------------------
-      ! [2.0] Compute u, v at interior points (2nd order central finite diffs):
-      !------------------------------------------------------------------------
+      ! [2.3] Top boundaries:
 
-      do j = je, js, -1
-         do i = ie, is, -1
-            psi(i+1,j,k) = psi(i+1,j,k) + coefx(i,j) * v(i,j,k)
-            psi(i-1,j,k) = psi(i-1,j,k) - coefx(i,j) * v(i,j,k)
-            chi(i,j+1,k) = chi(i,j+1,k) + coefy(i,j) * v(i,j,k)
-            chi(i,j-1,k) = chi(i,j-1,k) - coefy(i,j) * v(i,j,k)
+      if (ite==ide) then
+         i = ite
 
-            psi(i,j+1,k) = psi(i,j+1,k) - coefy(i,j) * u(i,j,k)
-            psi(i,j-1,k) = psi(i,j-1,k) + coefy(i,j) * u(i,j,k)
-            chi(i+1,j,k) = chi(i+1,j,k) + coefx(i,j) * u(i,j,k)
-            chi(i-1,j,k) = chi(i-1,j,k) - coefx(i,j) * u(i,j,k)
+         do j = js, je
+            varb = 3.0*xb%u(i,j,k)-4.0*xb%u(i-1,j,k)+xb%u(i-2,j,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * varb + &
+               xb%v(i,j,k) * xb%coefy(i,j) * (xb%u(i,j+1,k) - xb%u(i,j-1,k))
          end do
+      end if
+
+      ! [2.4] Left boundaries:
+
+      if (jts==jds) then
+         j = jts
+
+         do i = is, ie
+            varb = -3.0*xb%u(i,j,k)+4.0*xb%u(i,j+1,k)-xb%u(i,j+2,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * (xb%u(i+1,j,k) - &
+               xb%u(i-1,j,k)) + xb%v(i,j,k) * xb%coefy(i,j) * varb
+         end do
+      end if
+
+      ! [2.5] Right boundaries:
+
+      if (jte==jde) then
+         j = jte
+
+         do i = is, ie
+            varb = 3.0*xb%u(i,j,k)-4.0*xb%u(i,j-1,k)+xb%u(i,j-2,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j) * (xb%u(i+1,j,k) - &
+               xb%u(i-1,j,k)) + xb%v(i,j,k) * xb%coefy(i,j) * varb
+         end do
+      end if
+
+      ! [2.6] Corner points:
+
+      if (its==ids .AND. jts==jds) then
+         data(its,jts) = 0.5 * (data(its,jts+1) + data(its+1,jts))
+      end if
+
+      if (ite==ide .AND. jts==jds) then
+         data(ite,jts) = 0.5 * (data(ite-1,jts) + data(ite,jts+1))
+      end if
+
+      if (its==ids .AND. jte==jde) then
+         data(its,jde) = 0.5 * (data(its,jde-1) + data(its+1,jde))
+      end if
+
+      if (ite==ide .AND. jte==jde) then 
+         data(ite,jte) = 0.5 * (data(ite-1,jte) + data(ite,jte-1))
+      end if
+   end if ! not global
+
+   !  [2.7] Multiply by rho  and add to term_x:
+      
+   term_x(its:ite,jts:jte) = xb%rho(its:ite,jts:jte,k)*data(its:ite,jts:jte) + term_x(its:ite,jts:jte)
+
+   !---------------------------------------------------------------------------
+   ! [3.0] Calculate term_y = rho M (u.dv/dx + v.dv/dy):
+   !---------------------------------------------------------------------------
+
+   ! [3.1] Interior points:
+
+   do j = js, je
+      do i = is, ie
+         data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)*(xb%v(i+1,j,k) - xb%v(i-1,j,k)) + &
+                     xb%v(i,j,k) * xb%coefy(i,j)*(xb%v(i,j+1,k) - xb%v(i,j-1,k))
       end do
-   end do    !  loop over levels
+   end do
+   
+   
+   if (.NOT. global) then ! For global only interior points
 
-   !---------------------------------------------------------------------------
-   ! [5.0] For Global application, set Wast-Eest Periodic boundary
-   !---------------------------------------------------------------------------
+      ! [3.2] Bottom boundaries:
 
-   if (global) then
-       call da_set_boundary_3d(psi)
-       call da_set_boundary_3d(chi)
-   end if
+      if (its==ids) then
+         i = its
 
-   if (trace_use) call da_trace_exit("da_psichi_to_uv_adj")
+         do j = js, je
+            varb = -3.0*xb%v(i,j,k)+4.0*xb%v(i+1,j,k)-xb%v(i+2,j,k)
 
-end subroutine da_psichi_to_uv_adj
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* varb + &
+                        xb%v(i,j,k) * xb%coefy(i,j)* (xb%v(i,j+1,k) - xb%v(i,j-1,k))
+         end do
+      end if
+
+      !  [3.3] Top boundaries:
+
+      if (ite==ide) then
+         i = ite
+
+         do j = js, je
+            varb = 3.0*xb%v(i,j,k)-4.0*xb%v(i-1,j,k)+xb%v(i-2,j,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* varb + &
+                        xb%v(i,j,k) * xb%coefy(i,j)* (xb%v(i,j+1,k) - xb%v(i,j-1,k))
+         end do
+      end if
+
+      ! [3.4] Left boundaries:
+
+      if (jts==jds) then
+         j = jts
+
+         do i = is, ie
+            varb = -3.0*xb%v(i,j,k)+4.0*xb%v(i,j+1,k)-xb%v(i,j+2,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* (xb%v(i+1,j,k) - xb%v(i-1,j,k)) + &
+                        xb%v(i,j,k) * xb%coefy(i,j)* varb
+         end do
+      end if
+
+      ! [3.5] Right boundaries:
+
+      if (jte==jde) then
+         j = jte
+
+         do i = is, ie
+            varb = 3.0*xb%v(i,j,k)-4.0*xb%v(i,j+1,k)+xb%v(i,j+2,k)
+
+            data(i,j) = xb%u(i,j,k) * xb%coefx(i,j)* (xb%v(i+1,j,k) - xb%v(i-1,j,k)) + &
+                        xb%v(i,j,k) * xb%coefy(i,j)* varb
+         end do
+      end if
+
+      ! [3.6] Corner points:
+
+      if (its==ids .AND. jts==jds) then
+         data(its,jts) = 0.5 * (data(its,jts+1) + data(its+1,jts))
+      end if
+
+      if (ite==ide .AND. jts==jds) then
+         data(ite,jts) = 0.5 * (data(ite-1,jts) + data(ite,jts+1))
+      end if
+
+      if (its==ids .AND. jte==jde) then
+         data(its,jde) = 0.5 * (data(its,jde-1) + data(its+1,jde))
+      end if
+
+      if (ite==ide .AND. jte==jde) then 
+         data(ite,jte) = 0.5 * (data(ite-1,jte) + data(ite,jte-1))
+      end if
+   end if ! not global
+
+   ! [3.7] Multiply by rho and add to term_y
+
+   term_y(its:ite,jts:jte)=xb%rho(its:ite,jts:jte,k)* data(its:ite,jts:jte) + &
+      term_y(its:ite,jts:jte)
+
+   if (trace_use) call da_trace_exit("da_balance_cycloterm")
+
+end subroutine da_balance_cycloterm
 
 

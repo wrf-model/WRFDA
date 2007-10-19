@@ -34,8 +34,8 @@ subroutine da_read_obs_bufr (iv, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_bufr")
 
-   nlocal(:) = iv%plocal(iv%time-1,:)
-   ntotal(:) = iv%ptotal(iv%time-1,:)
+   nlocal(:) = iv%info(:)%plocal(iv%time-1)
+   ntotal(:) = iv%info(:)%ptotal(iv%time-1)
 
    ! open file
    !  ---------

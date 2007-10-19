@@ -1,4 +1,4 @@
-subroutine da_ao_stats_buoy (stats_unit, iv, re)
+subroutine da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, Bogus)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,100 +6,48 @@ subroutine da_ao_stats_buoy (stats_unit, iv, re)
 
    implicit none
 
-   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
-   type (iv_type), intent(inout) :: iv            ! iv
-   type (y_type),  intent(in)    :: re            ! A - O
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv, nt, nq, nslp
+   type (stats_bogus_type), intent(in)    :: bogus
 
-   type (stats_buoy_type) :: stats
-   integer                :: nu, nv, nt, np, nq
-   integer                :: n
-   
-   if (trace_use_dull) call da_trace_entry("da_ao_stats_buoy")    
+   if (trace_use_dull) call da_trace_entry("da_print_stats_bogus") 
 
-   nu = 0
-   nv = 0
-   nt = 0
-   np = 0
-   nq = 0
+   write(unit=stats_unit, fmt='(6a/)') &
+      '   var             ', &
+      'u (m/s)     n    k    ', &
+      'v (m/s)     n    k    ', &
+      't (K)       n    k    ', &
+      'q (kg/kg)   n    k    ', &
+      'slp (pa)    n    k'
 
-   stats%maximum%u = maxmin_type (missing_r, 0, 0)
-   stats%maximum%v = maxmin_type (missing_r, 0, 0)
-   stats%maximum%t = maxmin_type (missing_r, 0, 0)
-   stats%maximum%p = maxmin_type (missing_r, 0, 0)
-   stats%maximum%q = maxmin_type (missing_r, 0, 0)
-   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%t = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%p = maxmin_type(-missing_r, 0, 0)
-   stats%minimum%q = maxmin_type(-missing_r, 0, 0)
+   write(unit=stats_unit, fmt='(a,i16,4i22)') &
+      '  Number: ', nu, nv, nt, nq, nslp
 
-   stats%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
-   stats%rms_err = stats%average
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
+   if (nt < 1) nt = 1
+   if (nq < 1) nq = 1
+   if (nslp < 1) nslp = 1
 
-   do n=1, iv%nlocal(buoy)
-      if (iv%info(buoy)%proc_domain(1,n)) then
-         call da_stats_calculate (n, 0, iv%buoy(n)%u%qc, & 
-             re%buoy(n)%u, nu, & 
-             stats%minimum%u, stats%maximum%u, &
-             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate (n, 0, iv%buoy(n)%v%qc, & 
-            re%buoy(n)%v, nv, & 
-            stats%minimum%v, stats%maximum%v, &
-            stats%average%v, stats%rms_err%v)
-         call da_stats_calculate (n, 0, iv%buoy(n)%t%qc, & 
-            re%buoy(n)%t, nt, & 
-            stats%minimum%t, stats%maximum%t, &
-            stats%average%t, stats%rms_err%t)
-         call da_stats_calculate (n, 0, iv%buoy(n)%p%qc, & 
-            re%buoy(n)%p, np, & 
-            stats%minimum%p, stats%maximum%p, &
-            stats%average%p, stats%rms_err%p)
-         call da_stats_calculate (n, 0, iv%buoy(n)%q%qc, & 
-            re%buoy(n)%q, nq, & 
-            stats%minimum%q, stats%maximum%q, &
-            stats%average%q, stats%rms_err%q)
+   write(unit=stats_unit, fmt='((a,3(f12.4,2i5),e12.4,2i5,f12.4,2i5))') &
+      ' Minimum(n,k): ', Bogus%minimum%u, Bogus%minimum%v, Bogus%minimum%t, &
+                         Bogus%minimum%q, Bogus%minimum%slp,                &
+      ' Maximum(n,k): ', Bogus%maximum%u, Bogus%maximum%v, Bogus%maximum%t, &
+                         Bogus%maximum%q, Bogus%maximum%slp
+   write(unit=stats_unit, fmt='((a,3(f12.4,10x),e12.4,10x,f12.4,10x))') &
+      ' Average     : ', Bogus%average%u/real(nu), &
+                         Bogus%average%v/real(nv), &
+                         Bogus%average%t/real(nt), &
+                         Bogus%average%q/real(nq), &
+                         Bogus%average%slp/real(nslp),  &
+      '    RMSE     : ', sqrt(Bogus%rms_err%u/real(nu)), &
+                         sqrt(Bogus%rms_err%v/real(nv)), &
+                         sqrt(Bogus%rms_err%t/real(nt)), &
+                         sqrt(Bogus%rms_err%q/real(nq)), &
+                         sqrt(Bogus%rms_err%slp/real(nslp))
 
-      end if
-   end do
+   if (trace_use_dull) call da_trace_exit("da_print_stats_bogus") 
 
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   call da_proc_sum_int (nt)
-   call da_proc_sum_int (np)
-   call da_proc_sum_int (nq)
-   iv%nstats(buoy) = nu + nv + nt + np + nq
-
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
-      stats%minimum%t%value, stats%maximum%t%value, &
-      stats%minimum%t%n, stats%maximum%t%n, &
-      stats%minimum%t%l, stats%maximum%t%l)
-   call da_proc_stats_combine(stats%average%p, stats%rms_err%p, &
-      stats%minimum%p%value, stats%maximum%p%value, &
-      stats%minimum%p%n, stats%maximum%p%n, &
-      stats%minimum%p%l, stats%maximum%p%l)
-   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
-      stats%minimum%q%value, stats%maximum%q%value, &
-      stats%minimum%q%n, stats%maximum%q%n, &
-      stats%minimum%q%l, stats%maximum%q%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for buoy'
-         call da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, stats)
-      end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_buoy")    
-
- end subroutine da_ao_stats_buoy
+end subroutine da_print_stats_bogus
 
 

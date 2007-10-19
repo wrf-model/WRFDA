@@ -36,7 +36,7 @@ subroutine da_ao_stats_ships (stats_unit, iv, re)
    stats%average = residual_ships1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(ships)
+   do n=1, iv%info(ships)%nlocal
       if (iv%info(ships)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%ships(n)%u%qc, & 
              re%ships(n)%u, nu, & 

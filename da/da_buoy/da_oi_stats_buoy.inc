@@ -35,7 +35,7 @@ subroutine da_oi_stats_buoy (stats_unit, iv)
    stats%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(buoy)
+   do n=1, iv%info(buoy)%nlocal
       if (iv%info(buoy)%proc_domain(1,n)) then
          call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
             0, iv%buoy(n)%u%qc, &

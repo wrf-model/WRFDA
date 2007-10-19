@@ -141,8 +141,10 @@ subroutine da_setup_obs_structures( grid, ob, iv)
 
    iv%info(:)%nlocal = 0
    iv%info(:)%ntotal = 0
-   iv%info(:)%plocal(:) = 0
-   iv%info(:)%ptotal(:) = 0
+   do i=1,num_ob_indexes
+      iv%info(i)%plocal(:) = 0
+      iv%info(i)%ptotal(:) = 0
+   end do
    iv%num_inst  = 0 
 
    ob%nlocal(:) = 0

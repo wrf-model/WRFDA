@@ -31,8 +31,8 @@ subroutine da_transform_xtoy_satem_adj(grid, iv, jo_grad_y, jo_grad_x)
    ADJ_tv1 = 0.0
    ADJ_tv2 = 0.0
 
-   if (iv%nlocal(satem) > 0) then
-      do n=iv%plocal(iv%time-1,satem) + 1, iv%plocal(iv%time,satem)
+   if (iv%info(satem)%nlocal > 0) then
+      do n=iv%info(satem)%n1,iv%info(satem)%n2
          num_levs = iv % satem(n) % info % levels
 
          ! [2.0] Virtual temperature at obs pt.

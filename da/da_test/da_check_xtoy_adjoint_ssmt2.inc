@@ -1,4 +1,4 @@
-subroutine da_set_tst_trnsf_fld(grid, va, vb, typical_rms)
+subroutine da_check_xtoy_adjoint_ssmt2(iv, y, adjtest_lhs, pertile_lhs)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,42 +6,30 @@ subroutine da_set_tst_trnsf_fld(grid, va, vb, typical_rms)
 
    implicit none
 
-   type(domain), intent(in)  :: grid   ! model state
-   real,         intent(out) :: va(ims:ime, jms:jme, kms:kme)
-   real,         intent(in)  :: vb(ims:ime, jms:jme, kms:kme)
-   real,         intent(in)  :: typical_rms
+   type (iv_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   real    :: gbuf(ids:ide, jds:jde, kds:kde) 
-   integer :: size3d
-   integer :: k             ! loop counter.
-   real    :: scale         ! scale factor.
-   real    :: xy_dim_inv    ! 1 / real(iy * jx)
-   real    :: field_mean    ! mean field.
-   real    :: field_rms     ! rms field.
+   integer :: n, k          ! Loop counter.
 
-   if (trace_use) call da_trace_entry("da_set_tst_trnsf_fld")
+   if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_ssmt2")
 
-   size3d = (ide-ids+1)*(jde-jds+1)*(kde-kds+1)
+   do n=1, iv%info(ssmt2)%nlocal
+      if (iv%info(ssmt2)%proc_domain(1,n)) then
+         do k=1, iv%info(ssmt2)%levels(n)
+            adjtest_lhs = adjtest_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
+         end do
+      end if
 
-   call da_patch_to_global(grid, vb, gbuf)
-   call wrf_dm_bcast_real(gbuf, size3d)
+      do k=1, iv%info(ssmt2)%levels(n)
+         pertile_lhs = pertile_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
 
-   xy_dim_inv  = 1.0 / real((ide-ids+1)*(jde-jds+1))
-
-   do k = kts,kte
-      field_mean = sum(gbuf(ids:ide, jds:jde, k)) * xy_dim_inv
-
-      gbuf(ids:ide, jds:jde, k) = gbuf(ids:ide, jds:jde, k) - field_mean
-
-      field_rms = sqrt(1.0e-6+sum(gbuf(ids:ide, jds:jde, k)**2) * xy_dim_inv)
-
-      scale = typical_rms / field_rms
-
-      va(its:ite, jts:jte, k) = scale * gbuf(its:ite, jts:jte, k)
+         y%ssmt2(n)%rh(k) = y%ssmt2(n)%rh(k) / typical_rh_rms ** 2
+      end do
    end do
 
-   if (trace_use) call da_trace_exit("da_set_tst_trnsf_fld")
+   if (trace_use_dull) call da_trace_exit("da_check_xtoy_adjoint_ssmt2")
 
-end subroutine da_set_tst_trnsf_fld
+end subroutine da_check_xtoy_adjoint_ssmt2
 
 

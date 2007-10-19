@@ -1,53 +1,71 @@
-subroutine da_check_max_iv_metar(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_rescale_background_errors (var_scaling, len_scaling, &
+                                          ds, s, be_sub)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Rescale wrfvar background errors.
+   !
+   ! Method:  Empirical scaling and inclusion of recursive filter rescaling.
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type(iv_type), intent(inout) :: iv
-   integer,       intent(in)    :: it    ! outer iteration
-   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   real, intent(in)                 :: var_scaling       ! Variance factor.
+   real, intent(in)                 :: len_scaling       ! Lengthscale factor.
+   real, intent(in)                 :: ds                ! Resolution (m)
+   real, intent(inout)              :: s(:)              ! RF lengthscale.
+   type (be_subtype), intent(inout) :: be_sub            ! Backgrd error struct.
+    
+   integer                          :: mz                ! Vertical truncation.
+   integer                          :: m
+   real, allocatable                :: rf_scale_factor(:)! RF rescaling.
 
-   logical :: failed
-   integer :: n,n1,n2
+   if (trace_use_dull) call da_trace_entry("da_rescale_background_errors")
 
-   !---------------------------------------------------------------------------
-   ! [1.0] Open diagnostic file:
-   !---------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !--------------------------------------------------------------------------
 
-   if (rootproc .and. check_max_iv_print) then
-      write (check_max_iv_unit,'(A)')  &
-         '----------------------------------------------------------------'
-      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+   mz = be_sub % mz
 
-      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
-         'Error max test ratio for Metar_U   = ',max_error_uv, &
-         'Error max test ratio for Metar_V   = ',max_error_uv, &
-         'Error max test ratio for Metar_P   = ',max_error_p,  &
-         'Error max test ratio for Metar_T   = ',max_error_t,  &
-         'Error max test ratio for Metar_QV  = ',max_error_q
-    end if
+   !--------------------------------------------------------------------------
+   ! [2.0] Perform various rescalings:
+   !--------------------------------------------------------------------------
 
-   !---------------------------------------------------------------------------
-   ! [2.0] Perform maximum innovation vector check:
-   !---------------------------------------------------------------------------
+   if (mz > 0) then
 
-   failed = .false.
+      ! [2.1] Empirical rescaling of lengthscales:
+      s(1:mz) = len_scaling * s(1:mz)
    
-   n1 = iv%plocal(iv%time-1,metar) + 1
-   n2 = iv%plocal(iv%time,metar)
+      if (print_detail_be) then
+         write(unit=stdout,fmt='(a,a)')trim(be_sub % name), ' Error Lengthscales (m):'
+         do m = 1, mz
+            write(unit=stdout,fmt='(a,i4,1pe13.5)')be_sub % name, m, s(m)
+         end do
+      end if
+      
+      ! [2.2] Make lengthscale nondimensional:
+      s(1:mz) = s(1:mz) / ds
 
-   do n=n1,n2
-      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
-      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
-      ! Mixing ratio, same ratio as relative humidity
-      call da_max_error_qc_new (it, iv%info(metar), n, iv%metar(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
-   end do
+      ! [2.3] Empirical rescaling of variances:
+      be_sub % val(:,:) = var_scaling * be_sub % val(:,:)
 
-end subroutine da_check_max_iv_metar
+      ! Calculate recursive filter rescaling:
+
+      allocate(rf_scale_factor(1:mz))
+
+      call da_calculate_rf_factors(s(:), be_sub % rf_alpha(:), &
+                                    rf_scale_factor(:))
+
+      do m = 1, mz
+         be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
+      end do
+                                       
+      deallocate (rf_scale_factor)   
+
+   end if
+
+   if (trace_use_dull) call da_trace_exit("da_rescale_background_errors")
+
+end subroutine da_rescale_background_errors
 
 

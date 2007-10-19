@@ -14,7 +14,7 @@ subroutine da_calculate_grady_airsr(iv, re, jo_grad_y)
    
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_airsr")
 
-   do n=1, iv%nlocal(airsr)
+   do n=1, iv%info(airsr)%nlocal
       do k=1, iv%info(airsr)%levels(n)
          if (iv%airsr(n)%t(k)%qc < obs_qc_pointer) re%airsr(n)%t(k) = 0.0
          if (iv%airsr(n)%q(k)%qc < obs_qc_pointer) re%airsr(n)%q(k) = 0.0

@@ -21,8 +21,8 @@ subroutine da_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
    jo%bogus_q   = 0.0
    jo%bogus_slp = 0.0
 
-   if (iv%nlocal(bogus) > 0) then
-      do n=1, iv%nlocal(bogus)
+   if (iv%info(bogus)%nlocal > 0) then
+      do n=1, iv%info(bogus)%nlocal
          jo_grad_y%bogus(n)%slp = -re%bogus(n)%slp &
             / (iv%bogus(n)%slp%error * iv%bogus(n)%slp%error)
          do k=1, iv%info(bogus)%levels(n)

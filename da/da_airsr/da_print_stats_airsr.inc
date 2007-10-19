@@ -1,109 +1,36 @@
-subroutine da_transform_vvtovp(evec, eval, vertical_wgt, vv, vp, mz, levels)
+subroutine da_print_stats_airsr(stats_unit, nt, nq, airsr)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Transform from fields on vertical EOFS to fields on vertical 
-   ! levels.
-   !
-   ! Method:  Perform vp(i,j,k) = P E L^{1/2} vv(i,j,m) transform.
-   !---------------------------------------------------------------------------
+   !-----------------------------------------------------------------------
+   ! Purpose: Prints out table for AIRS diagnostics
+   !----------------------------------------------------------------------
 
    implicit none
+
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nt, nq
+   type (stats_airsr_type), intent(in)    :: airsr
+
+   if (trace_use_dull) call da_trace_entry("da_print_stats_airsr")
    
-   integer, intent(in)  :: mz                         ! # vertical modes.
-   integer, intent(in)  :: levels                     ! # no. of levels  
+   write(unit=stats_unit, fmt='(5a/)') &
+      '   var             ', &
+      't (K)       n    k    ', 'q (kg/kg)   n    k'
 
-   real,    intent(in)  :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
-   real,    intent(in)  :: eval(jds:jde,1:mz)         ! Eigenvalues.
-   real,    intent(in)  :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
-   real,    intent(in)  :: vv(ims:ime,jms:jme,kms:kme)   ! CV in EOF space.
-   real,    intent(out) :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
+   write(unit=stats_unit, fmt='(a,i16,i22)') &
+      '  Number: ', nt, nq
+
+   if (nt < 1) nt = 1
+   if (nq < 1) nq = 1
    
-   integer :: i, j, k, m                 ! Loop counters.
-   real    :: temp
+   write(unit=stats_unit, fmt='((a,2(f12.4,2i5)))') &
+      ' Minimum(n,k): ', airsr%minimum%t, airsr%minimum%q, &
+      ' Maximum(n,k): ', airsr%maximum%t, airsr%maximum%q
+   write(unit=stats_unit, fmt='((a,2(f12.4,10x)))')  &
+      ' Average     : ', airsr%average%t/real(nt), airsr%average%q/real(nq),      &
+      '    RMSE     : ', sqrt(airsr%rms_err%t/real(nt)), sqrt(airsr%rms_err%q/real(nq))
 
-   if (trace_use_dull) call da_trace_entry("da_transform_vvtovp")
+   if (trace_use_dull) call da_trace_exit("da_print_stats_airsr")
 
-   !-------------------------------------------------------------------
-   ! [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
-   !------------------------------------------------------------------- 
-
-   vp = 0.0
-   do k = kts, levels
-      do m = 1, mz
-         do j = jts, jte
-            temp = evec(j,k,m) * eval(j,m)
-
-            do i = its, ite
-               vp(i,j,k) = vp(i,j,k) + temp*vv(i,j,m)
-            end do
-         end do
-      end do
-   end do
-   
-   !-------------------------------------------------------------------
-   ! [2.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0:
-   !------------------------------------------------------------------- 
-
-   if (vertical_ip /= vertical_ip_0) then
-      vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
-         vertical_wgt(its:ite,jts:jte,kts:levels)                          
-   end if
-
-   if (trace_use_dull) call da_trace_exit("da_transform_vvtovp")
-
-end subroutine da_transform_vvtovp
-
-
-iv%bogus(n)%t(k)%qc, & 
-               re%bogus(n)%t(k), nt, &
-               stats%minimum%t, stats%maximum%t, &
-               stats%average%t, stats%rms_err%t)
-            call da_stats_calculate (n, k, iv%bogus(n)%q(k)%qc, & 
-               re%bogus(n)%q(k), nq, &
-               stats%minimum%q, stats%maximum%q, &
-               stats%average%q, stats%rms_err%q)
-         end do
-      end if
-   end do
-
-   ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (nu)
-   call da_proc_sum_int (nv)
-   call da_proc_sum_int (nt)
-   call da_proc_sum_int (nq)
-   call da_proc_sum_int (nslp)
-   iv%nstats(bogus) = nu + nv + nt + nq + nslp 
-
-   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
-      stats%minimum%u%value, stats%maximum%u%value, &
-      stats%minimum%u%n, stats%maximum%u%n, &
-      stats%minimum%u%l, stats%maximum%u%l)
-   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-   call da_proc_stats_combine(stats%average%t, stats%rms_err%t, &
-      stats%minimum%t%value, stats%maximum%t%value, &
-      stats%minimum%t%n, stats%maximum%t%n, &
-      stats%minimum%t%l, stats%maximum%t%l)
-   call da_proc_stats_combine(stats%average%q, stats%rms_err%q, &
-      stats%minimum%q%value, stats%maximum%q%value, &
-      stats%minimum%q%n, stats%maximum%q%n, &
-      stats%minimum%q%l, stats%maximum%q%l)
-   call da_proc_stats_combine(stats%average%slp, stats%rms_err%slp, &
-      stats%minimum%slp%value, stats%maximum%slp%value, &
-      stats%minimum%slp%n, stats%maximum%slp%n, &
-      stats%minimum%slp%l, stats%maximum%slp%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for bogus'
-         call da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, stats)
-      end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_bogus")
-
-end subroutine da_ao_stats_bogus
+end subroutine da_print_stats_airsr
 
 

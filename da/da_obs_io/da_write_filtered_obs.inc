@@ -15,7 +15,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !       observations to "surface_correction (= 2)" even if it is bad
    !       quality obs (qc < fails_error_max), such obs (element) is 
    !       made missing. Otherwise the bad obs (element) will also get 
-   !       assimilated with "max_iv_check = .false."
+   !       assmiilated with "max_iv_check = .false."
    !   (f) AMV's from Geostationary and Polar orbiting satellite are
    !       seperated & used as profile
    !   (g) Currently only MODIS winds from Polar orbiting satellite are used
@@ -102,13 +102,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !  Write Synop:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(synop) > 0) then
+   if (iv%info(synop)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout, fmt='(A,I6)') ' writing filtered obs for synop ', &
-            iv%nlocal(synop)
+            iv%info(synop)%nlocal
       end if
 
-      do n = 1, iv % nlocal(synop)
+      do n = 1, iv%info(synop)%nlocal
          if (.not.iv%info(synop)%proc_domain(1,n)) cycle
          ! Guo .. not write out the data below the lowest model level:
          if (iv%info(synop)%zk(1,n) == missing_r) cycle
@@ -203,13 +203,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Metar:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(metar) > 0) then
+   if (iv%info(metar)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
             ' writing filtered obs for metar ',iv%info(metar)%nlocal
       end if
 
-      do n = 1, iv % nlocal(metar)
+      do n = 1, iv%info(metar)%nlocal
          if (.not. iv%info(metar)%proc_domain(1,n)) cycle
          ! Do not write out the data below the lowest model level:
          if (iv%info(metar)%zk(1,n) == missing_r) cycle
@@ -303,13 +303,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Ships:
    !-------------------------------------------------------------------------- 
 
-   if (iv % nlocal(ships) > 0) then
+   if (iv%info(ships)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ships ',iv%nlocal(ships)
+            ' writing filtered obs for ships ',iv%info(ships)%nlocal
       end if
 
-      do n = 1, iv % nlocal(ships)
+      do n = 1, iv%info(ships)%nlocal
          if (.not. iv%info(ships)%proc_domain(1,n)) cycle
          if (iv%info(ships)%zk(1,n) == missing_r) cycle
                
@@ -400,13 +400,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Buoy :
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(buoy)  > 0) then
+   if (iv%info(buoy)%nlocal  > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for buoy  ',iv%nlocal(buoy) 
+            ' writing filtered obs for buoy  ',iv%info(buoy)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(buoy)
+      do n = 1, iv%info(buoy)%nlocal
          if (.not. iv%info(buoy)%proc_domain(1,n)) cycle
          if (iv%info(buoy)%zk(1,n) == missing_r) cycle
                 
@@ -499,13 +499,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Geo. AMVs Obs:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(geoamv) > 0) then
+   if (iv%info(geoamv)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
             ' writing filtered obs for geoamv ',iv%info(geoamv)%nlocal
       end if
 
-      do n = 1, iv % nlocal(geoamv)               
+      do n = 1, iv%info(geoamv)%nlocal               
          if (.not. iv%info(geoamv)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(geoamv)%platform(n),    &
@@ -553,13 +553,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Polar AMVs Obs:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(polaramv) > 0) then
+   if (iv%info(polaramv)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
             ' writing filtered obs for polaramv ',iv%info(polaramv)%nlocal
       end if
 
-      do n = 1, iv % nlocal(polaramv)               
+      do n = 1, iv%info(polaramv)%nlocal               
          if (.not. iv%info(polaramv)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(polaramv)%platform(n),    &
@@ -608,14 +608,14 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Sound 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(stdout,fmt='(A,I5)') &
             ' writing filtered obs for sound  ',iv%info(sound)%nlocal 
       end if
       mnz = 0
 
-      do n = 1, iv % nlocal(sound)               
+      do n = 1, iv%info(sound)%nlocal               
          if (.not. iv%info(sound)%proc_domain(1,n)) cycle
          if (iv%info(sound)%platform(n) /= iv%info(sound)%platform(n) .or. &
              iv%info(sound)%lat(1,n)    /= iv%info(sound)%lat(1,n)      .or. &
@@ -816,13 +816,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Airep: 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(airep) > 0) then
+   if (iv%info(airep)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for airep  ',iv%nlocal(airep) 
+            ' writing filtered obs for airep  ',iv%info(airep)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(airep)               
+      do n = 1, iv%info(airep)%nlocal               
          if (.not. iv%info(airep)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
@@ -879,13 +879,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Pilot:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(pilot) > 0) then
+   if (iv%info(pilot)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-           ' writing filtered obs for pilot  ',iv%nlocal(pilot) 
+           ' writing filtered obs for pilot  ',iv%info(pilot)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(pilot)               
+      do n = 1, iv%info(pilot)%nlocal               
          if (.not. iv%info(pilot)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
@@ -936,13 +936,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Note: The satem ref_p is put in the SLP position in OBSPROC data stream.
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(satem) > 0) then
+   if (iv%info(satem)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for satem  ',iv%nlocal(satem) 
+            ' writing filtered obs for satem  ',iv%info(satem)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(satem)           
+      do n = 1, iv%info(satem)%nlocal           
          if (.not. iv%satem(n)%loc%proc_domain) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
@@ -979,13 +979,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Qscat: 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(qscat) > 0) then
+   if (iv%info(qscat)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for qscat  ',iv%nlocal(qscat) 
+            ' writing filtered obs for qscat  ',iv%info(qscat)%nlocal 
       end if
  
-      do n = 1, iv % nlocal(qscat)               
+      do n = 1, iv%info(qscat)%nlocal               
          if (.not. iv%info(qscat)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
@@ -1032,13 +1032,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Profiler: 
    !--------------------------------------------------------------------------
    
-   if (iv % nlocal(profiler) > 0) then
+   if (iv%info(profiler)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
             ' writing filtered obs for profiler  ',iv%info(profiler)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(profiler)            
+      do n = 1, iv%info(profiler)%nlocal            
          if (.not. iv%info(profiler)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost)    &
             iv%info(profiler)%platform(n),    &
@@ -1085,13 +1085,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
 
    ! [10] Write SSMT1:          
-   if (iv % nlocal(ssmt1) > 0) then
+   if (iv%info(ssmt1)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ssmt1 ', iv % nlocal(ssmt1) 
+            ' writing filtered obs for ssmt1 ', iv%info(ssmt1)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(ssmt1)             
+      do n = 1, iv%info(ssmt1)%nlocal             
          if (.not. iv%info(ssmt1)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(ssmt1)%platform(n),    &
@@ -1121,13 +1121,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write SSMT2:    
    !--------------------------------------------------------------------------      
 
-   if (iv % nlocal(ssmt2) > 0) then
+   if (iv%info(ssmt2)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ssmt2 ', iv % nlocal(ssmt2) 
+            ' writing filtered obs for ssmt2 ', iv%info(ssmt2)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(ssmt2)              
+      do n = 1, iv%info(ssmt2)%nlocal              
          if (.not. iv%info(ssmt2)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(ssmt2)%platform(n),    &
@@ -1157,13 +1157,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !  Write Gpspw:          
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for gpspw ', iv % nlocal(gpspw) 
+            ' writing filtered obs for gpspw ', iv%info(gpspw)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(gpspw)
+      do n = 1, iv%info(gpspw)%nlocal
          if (.not. iv%info(gpspw)%proc_domain(1,n)) cycle
          ! hardwired the # of levels = 0 for GPSPW (YRG 03/02/2006)
          iv%info(gpspw)%levels(n) = 0
@@ -1181,13 +1181,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    end if
 
    ! Write Gps Refractivity:
-   if (iv % nlocal(gpsref) > 0) then
+   if (iv%info(gpsref)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for gpsref ', iv % nlocal(gpsref)
+            ' writing filtered obs for gpsref ', iv%info(gpsref)%nlocal
       end if
 
-      do n = 1, iv % nlocal(gpsref)
+      do n = 1, iv%info(gpsref)%nlocal
          if (.not. iv%info(gpsref)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(gpsref) %platform(n),    &
@@ -1254,13 +1254,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write AIRS  retrievals:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(airsr) > 0) then
+   if (iv%info(airsr)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for AIRS retrievals ',iv%nlocal(airsr) 
+            ' writing filtered obs for AIRS retrievals ',iv%info(airsr)%nlocal 
       end if
 
-      do n = 1, iv % nlocal(airsr)               
+      do n = 1, iv%info(airsr)%nlocal               
          if (.not. iv%info(airsr)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(airsr)%platform(n),    &
@@ -1309,7 +1309,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
       end do     
    end if
 
-   if (iv % nlocal(ssmi_tb) > 0) then
+   if (iv%info(ssmi_tb)%nlocal > 0) then
       call da_warning(__FILE__,__LINE__, &     
         (/"Currently SSMI brightness temperature info is not written for filtered obs"/))
    end if

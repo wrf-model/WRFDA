@@ -35,7 +35,7 @@ subroutine da_oi_stats_bogus (stats_unit, iv)
    stats%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(bogus)
+   do n=1, iv%info(bogus)%nlocal
       if (iv%info(bogus)%proc_domain(1,n)) then
          do k=1, iv%info(bogus)%levels(n)
             call da_stats_calculate(iv%info(bogus)%obs_global_index(n), &

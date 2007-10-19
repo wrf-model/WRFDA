@@ -26,7 +26,7 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    jo % sonde_sfc_q = 0.0
 
    if (test_dm_exact) then
-      if (iv%ntotal(sound) == 0) return
+      if (iv%info(sound)%ntotal == 0) return
    else
       if (iv%info(sound)%nlocal < 1) return
    end if

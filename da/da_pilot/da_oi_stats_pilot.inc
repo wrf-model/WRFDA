@@ -25,7 +25,7 @@ subroutine da_oi_stats_pilot (stats_unit, iv)
    stats%average = residual_pilot1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(pilot)
+   do n=1, iv%info(pilot)%nlocal
       if (iv%info(pilot)%proc_domain(1,n)) then
          do k=1, iv%info(pilot)%levels(n)
             call da_stats_calculate(iv%info(pilot)%obs_global_index(n), &

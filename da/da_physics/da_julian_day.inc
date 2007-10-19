@@ -47,20 +47,3 @@ subroutine da_julian_day(NY,NM,ND,JD,METHOD)
 end subroutine da_julian_day
 
 
-      ep % v3(its:ite,jts:jte,k,n)
-         ! rh:
-         vp % v4(its:ite,jts:jte,k) = vp % v4(its:ite,jts:jte,k) + &
-                                      vp % alpha(its:ite,jts:jte,n) * &
-                                      ep % v4(its:ite,jts:jte,k,n)
-        ! ps_u
-        vp % v5(its:ite,jts:jte,k) = vp % v5(its:ite,jts:jte,k) + &
-                                     vp % alpha(its:ite,jts:jte,n) * &
-                                     ep % v5(its:ite,jts:jte,k,n)
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_add_flow_dependence_vp")
-
-end subroutine da_add_flow_dependence_vp
-
-

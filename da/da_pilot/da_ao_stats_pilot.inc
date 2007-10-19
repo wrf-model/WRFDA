@@ -1,66 +1,57 @@
-subroutine da_llxy_wrf_new(proj, info)
+subroutine da_ao_stats_pilot (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Converts input lat/lon values to the cartesian (x,y) value
-   ! for the given projection. 
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
 
-   type(proj_info), intent(in)    :: proj
-   type(infa_type), intent(inout) :: info
+   integer,        intent(in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent(inout) :: iv            ! iv
+   type  (y_type), intent(in)    :: re            ! A - O
 
-   if (trace_use) call da_trace_entry("da_llxy_wrf_new")
+   type (stats_pilot_type) :: stats
+   integer                 :: nu, nv
+   integer                 :: n, k
+   
+   if (trace_use_dull) call da_trace_entry("da_ao_stats_pilot")
 
-   if (.NOT.proj%init) then
-      call da_error(__FILE__,__LINE__, &
-        (/"You have not called map_set for this projection!"/))
-   end if
+   nu = 0
+   nv = 0
 
-   select case(proj%code)
- 
-      case(PROJ_LATLON)
-         call da_llxy_latlon_new(proj,info)
+   stats%maximum%u = maxmin_type (missing_r, 0, 0)
+   stats%maximum%v = maxmin_type (missing_r, 0, 0)
+   stats%minimum%u = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%v = maxmin_type(-missing_r, 0, 0)
 
-      case(PROJ_MERC)
-         call da_llxy_merc_new(proj,info)
-         info%x(:,:) = info%x(:,:) + proj%knowni - 1.0
-         info%y(:,:) = info%y(:,:) + proj%knownj - 1.0
+   stats%average = residual_pilot1_type(0.0, 0.0)
+   stats%rms_err = stats%average
 
-      case(PROJ_PS)
-         call da_llxy_ps_new(proj,info)
-      
-      case(PROJ_LC)
-         call da_llxy_lc_new(proj,info)
-         info%x(:,:) = info%x(:,:) + proj%knowni - 1.0
-         info%y(:,:) = info%y(:,:) + proj%knownj - 1.0
+   do n=1, iv%info(pilot)%nlocal
+      if (iv%info(pilot)%proc_domain(1,n)) then
+         do k=1, iv%info(pilot)%levels(n)
+            call da_stats_calculate (n, k, iv%pilot(n)%u(k)%qc, & 
+               re%pilot(n)%u(k), nu, & 
+               stats%minimum%u, stats%maximum%u, &
+               stats%average%u, stats%rms_err%u)
+            call da_stats_calculate (n, k, iv%pilot(n)%v(k)%qc, & 
+               re%pilot(n)%v(k), nv, & 
+               stats%minimum%v, stats%maximum%v, &
+               stats%average%v, stats%rms_err%v)
+         end do
+      end if    ! end if (iv%info(pilot)%proc_domain(1,n))
+   end do
 
-      case default
-         write(unit=message(1),fmt='(A,I2)') &
-            'Unrecognized map projection code: ', proj%code
-         call da_error(__FILE__,__LINE__,message(1:1))
-   end select
+   ! do inter-processor communication to gather statistics.
+   call da_proc_sum_int (nu)
+   call da_proc_sum_int (nv)
+   iv%nstats(pilot) = nu + nv
 
-   if (trace_use) call da_trace_exit("da_llxy_wrf_new")
-
-end subroutine da_llxy_wrf_new
-
-
- &
-                       metar%average%t/real(nt), metar%average%p/real(np), &
-                       metar%average%q/real(nq), &
-      '    RMSE     : ', sqrt(metar%rms_err%u/real(nu)), &
-                       sqrt(metar%rms_err%v/real(nv)), &
-                       sqrt(metar%rms_err%t/real(nt)), &
-                       sqrt(metar%rms_err%p/real(np)), &
-                       sqrt(metar%rms_err%q/real(nq))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_metar")
-
-end subroutine da_print_stats_metar
-
-
-ne(stats%average%v, stats%rms_err%v, &
+   call da_proc_stats_combine(stats%average%u, stats%rms_err%u, &
+      stats%minimum%u%value, stats%maximum%u%value, &
+      stats%minimum%u%n, stats%maximum%u%n, &
+      stats%minimum%u%l, stats%maximum%u%l)
+   call da_proc_stats_combine(stats%average%v, stats%rms_err%v, &
       stats%minimum%v%value, stats%maximum%v%value, &
       stats%minimum%v%n, stats%maximum%v%n, &
       stats%minimum%v%l, stats%maximum%v%l)

@@ -23,7 +23,7 @@ subroutine da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % t % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(airsr)
+   do n=1, iv%info(airsr)%nlocal
       do k=1, iv%info(airsr)%levels(n)
         np_available = np_available + 4
         re%airsr(n)%t(k) = da_residual(n, k, y%airsr(n)%t(k), iv%airsr(n)%t(k), n_obs_bad % t)
@@ -38,16 +38,5 @@ subroutine da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    if (trace_use_dull) call da_trace_exit("da_residual_airsr")
 
 end subroutine da_residual_airsr
-
-
-   ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
-            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
-      end do
-   end do
-   
-   if (trace_use_dull) call da_trace_exit("da_check_max_iv_profiler")
-
-end subroutine da_check_max_iv_profiler
 
 

@@ -28,8 +28,7 @@ subroutine da_transform_xtoy_satem (grid, iv, y)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_satem")
 
-   do n=iv%plocal(iv%time-1,satem) + 1, &
-      iv%plocal(iv%time,satem)
+   do n=iv%info(satem)%n1,iv%info(satem)%n2
 
       num_levs = iv % satem(n) % info % levels
 

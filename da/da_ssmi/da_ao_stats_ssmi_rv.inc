@@ -1,4 +1,4 @@
-subroutine da_med_initialdata_output (grid , config_flags, out_filename)
+subroutine da_ao_stats_ssmi_rv (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,60 +6,48 @@ subroutine da_med_initialdata_output (grid , config_flags, out_filename)
 
    implicit none
 
-   type(domain), intent(in)                   :: grid
-   type (grid_config_rec_type) , intent(inout) :: config_flags       
-   character(*),  intent (in),  optional       :: out_filename
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent (inout) :: iv            ! iv
+   type  (y_type), intent (in)    :: re            ! A - O
 
-   integer                :: fid
-   character (len=80)     :: file_name
+   integer                          :: ntpw, nspeed, n
+   type (stats_ssmi_rv_type) :: stats
 
-   integer :: julyr, julday
-   real    :: gmt
+   if (trace_use) call da_trace_entry("da_ao_stats_ssmi_rv")
 
-   if (trace_use) call da_trace_entry("da_med_initialdata_output")
+   ntpw = 0
+   nspeed = 0
 
-   if (present(out_filename)) then
-      file_name = trim(out_filename)
-   else
-      file_name = 'wrfvar_output'
+   stats%maximum%tpw   = maxmin_type (missing_r, 0, 0)
+   stats%maximum%speed = maxmin_type (missing_r, 0, 0)
+   stats%minimum%tpw   = maxmin_type(-missing_r, 0, 0)
+   stats%minimum%speed = maxmin_type(-missing_r, 0, 0)
+   stats%average = residual_ssmi_rv_type(0.0, 0.0)
+   stats%rms_err = stats%average
+
+   if (iv%info(ssmi_rv)%nlocal > 0) then
+      do n=1, iv%info(ssmi_rv)%nlocal
+         if (iv%info(ssmi_rv)%proc_domain(1,n)) then
+            call da_stats_calculate (n, 0, iv%ssmi_rv(n)%tpw%qc, &
+               re%ssmi_rv(n)%tpw, ntpw,  &
+               stats%minimum%tpw,  stats%maximum%tpw,&
+               stats%average%tpw,  stats%rms_err%tpw)
+
+            call da_stats_calculate (n, 0, iv%ssmi_rv(n)%speed%qc, &
+               re%ssmi_rv(n)%speed,    nspeed,  &
+               stats%minimum%speed,  stats%maximum%speed,&
+               stats%average%speed,  stats%rms_err%speed)
+         end if
+      end do   
    end if
 
-   call da_trace ("da_med_initialdata_ouput",Message="Writing wrfvar output")
-   call open_w_dataset (fid, trim(file_name), grid , config_flags , &
-                         output_model_input , "DATASET=INPUT", ierr)
-
-   if (ierr /= 0) then
-      write(unit=message(1),fmt=*) 'Error opening ', &
-         trim(file_name),' for writing ierr=',ierr
-      call da_error(__FILE__,__LINE__,message(1:1))
-   end if
-
-   start_date=current_date
-
-   call geth_julgmt(julyr, julday, gmt)
-   config_flags%gmt = gmt
-   config_flags%julyr = julyr
-   config_flags%julday = julday
-
-   call output_model_input (fid, grid , config_flags , ierr)
-
-   call close_dataset (fid , config_flags, "DATASET=INPUT")
-
-   if (trace_use) call da_trace_exit("da_med_initialdata_output")
-
-end subroutine da_med_initialdata_output
-
-
- &
-                         sqrt(sound%rms_err%t/real(nt)), &
-                         sqrt(sound%rms_err%q/real(nq))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_sound")
-
-end subroutine da_print_stats_sound
-
-
-ts%minimum%tpw%value, stats%maximum%tpw%value, &
+   ! Do inter-processor communication to gather statistics.
+   call da_proc_sum_int (ntpw)
+   call da_proc_sum_int (nspeed)
+   iv%nstats(ssmi_rv) = ntpw + nspeed
+   
+   call da_proc_stats_combine(stats%average%tpw, stats%rms_err%tpw, &
+      stats%minimum%tpw%value, stats%maximum%tpw%value, &
       stats%minimum%tpw%n, stats%maximum%tpw%n, &
       stats%minimum%tpw%l, stats%maximum%tpw%l)
 

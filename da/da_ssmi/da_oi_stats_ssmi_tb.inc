@@ -41,7 +41,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, iv)
    stats%average = residual_ssmi_tb_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(ssmi_tb)
+   do n=1, iv%info(ssmi_tb)%nlocal
       if (iv%info(ssmi_tb)%proc_domain(1,n)) then
          call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb19v%qc, & 

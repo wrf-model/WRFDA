@@ -21,7 +21,7 @@ subroutine da_jo_and_grady_ships(iv, re, jo, jo_grad_y)
    jo % ships_p = 0.0
    jo % ships_q = 0.0
 
-   do n=1, iv%nlocal(ships)
+   do n=1, iv%info(ships)%nlocal
       jo_grad_y%ships(n)%u = -re%ships(n)%u / &
          (iv%ships(n)%u%error * iv%ships(n)%u%error)
       jo_grad_y%ships(n)%v = -re%ships(n)%v / &

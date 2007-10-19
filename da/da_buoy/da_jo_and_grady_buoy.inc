@@ -21,7 +21,7 @@ subroutine da_jo_and_grady_buoy(iv, re, jo, jo_grad_y)
    jo % buoy_p = 0.0
    jo % buoy_q = 0.0
 
-   do n=1, iv%nlocal(buoy)
+   do n=1, iv%info(buoy)%nlocal
       jo_grad_y%buoy(n)%u = -re%buoy(n)%u / (iv%buoy(n)%u%error * iv%buoy(n)%u%error)
       jo_grad_y%buoy(n)%v = -re%buoy(n)%v / (iv%buoy(n)%v%error * iv%buoy(n)%v%error)
       jo_grad_y%buoy(n)%t = -re%buoy(n)%t / (iv%buoy(n)%t%error * iv%buoy(n)%t%error)

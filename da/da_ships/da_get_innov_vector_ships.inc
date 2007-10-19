@@ -124,9 +124,9 @@ subroutine da_get_innov_vector_ships( it, grid, ob, iv)
       call da_interp_lin_3d_newest (grid%xb%p, iv%info(ships), model_p)
 
    else if (sfc_assi_options == 2) then
-      ! Surface data assimilation approca 2
+      ! Surface data assmiilation approca 2
 
-      ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and 
+      ! 1.2.1 Surface assmiilation approach 2(10-m u, v, 2-m t, q, and 
       ! sfc_p)
 
       call da_interp_lin_2d_newest (grid%xb%u10,  iv%info(ships), 1, model_u)

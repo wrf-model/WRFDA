@@ -1,4 +1,4 @@
-subroutine da_alloc_and_copy_be_arrays (vg , v, jts,jte, kts,kte)
+subroutine da_transform_vtovv(grid, cv_size, be, cv, vv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,37 +6,31 @@ subroutine da_alloc_and_copy_be_arrays (vg , v, jts,jte, kts,kte)
 
    implicit none
 
-   type (be_subtype), intent(inout) :: vg       ! Global backgrd error struct.
-   type (be_subtype), intent(inout) :: v        ! Local backgrd error struct.
-   integer, intent(in)              :: jts,jte  ! Tile dimension.
-   integer, intent(in)              :: kts,kte  ! Tile dimension.
+   type(domain),  intent(inout) :: grid
+   integer,       intent(in)    :: cv_size ! Size of cv array.
+   type(be_type), intent(in)    :: be   ! Background error structure.
+   real,          intent(in)    :: cv(1:cv_size)   ! control variables.
+   type(vp_type), intent(inout) :: vv   ! Grid point/EOF equivalent.
 
-   ! Allocate local-grid structure.
-   v % mz = vg % mz
-   if (v % mz > 0) then
-      allocate  (v % val(jts:jte,1:v % mz))
-      allocate  (v % evec(jts:jte,kts:kte,1:v % mz))
-      allocate  (v % rf_alpha(1:v % mz))
-   end if
+   integer :: mz   ! Vertical truncation.
 
-   ! Make local copies from global arrays.
-   if (v % mz > 0) then
-       v % val(jts:jte,1:v % mz) = vg % val(jts:jte,1:v % mz)
-       v % evec(jts:jte,kts:kte,1:v % mz) = vg % evec(jts:jte,kts:kte,1:v % mz)
-       v % rf_alpha(1:v % mz) = vg % rf_alpha(1:v % mz)
-   end if
+   if (trace_use) call da_trace_entry("da_transform_vtovv")
 
-   ! Deallocate global arrays.
-   if (v % mz > 0) then 
-      deallocate  (vg % val )
-      deallocate  (vg % evec)
-      deallocate  (vg % rf_alpha)
-   end if
+   !-------------------------------------------------------------------------
+   ! [1.0] Fill vv arrays from 1-dimensional cv array.
+   !-------------------------------------------------------------------------
 
-end subroutine da_alloc_and_copy_be_arrays 
+   call da_cv_to_vv(cv_size, cv, (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%ne /), vv)
 
+   !-------------------------------------------------------------------------
+   ! [2.0] Perform VToVV Transform:
+   !-------------------------------------------------------------------------
 
-     call da_transform_through_rf(grid,mz, be % v1 % rf_alpha, be % v1 % val, vv % v1)
+   ! [2.1] Transform 1st control variable:
+
+   mz = be % v1 % mz
+   if (mz > 0) then
+      call da_transform_through_rf(grid,mz, be % v1 % rf_alpha, be % v1 % val, vv % v1)
    end if
 
    ! [2.2] Transform 2nd control variable:

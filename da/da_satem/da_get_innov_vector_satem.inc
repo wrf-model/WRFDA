@@ -28,7 +28,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
    ithickness = 0 ; ithicknessf = 0
 
-   do n=iv%plocal(iv%time-1,satem) + 1, iv%plocal(iv%time,satem)
+   do n=iv%info(satem)%n1,iv%info(satem)%n2
       num_levs = iv % satem(n) % info % levels
 
       if (num_levs < 1) cycle

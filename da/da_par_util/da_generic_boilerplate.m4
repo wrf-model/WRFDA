@@ -31,7 +31,7 @@ SUBROUTINE da_y_type_ex_$1( iv, re, slice )
    ! Local declarations
    INTEGER :: n
 
-   CALL da_y_facade_create( slice, iv%nlocal($1), iv%ntotal($1) )
+   CALL da_y_facade_create( slice, iv%info($1)%nlocal, iv%info($1)%ntotal )
    DO n=1, slice%num_obs
 stop
 !     CALL da_res_generic_set_info( slice%obs(n),                     &
@@ -101,11 +101,11 @@ SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
    INTEGER :: n
 
    ! allocate and initialize needed bits of iv_glob (ugly)
-   iv_glob%nlocal($1) = slice_glob%num_obs
-   iv_glob%ntotal($1) = slice_glob%num_obs_glo
+   iv_glob%info($1)%nlocal  = slice_glob%num_obs
+   iv_glob%info($1)%ntotal = slice_glob%num_obs_glo
    ! deallocation is done in free_global_$1()
-   ALLOCATE( iv_glob%$1(iv_glob%nlocal($1)) )
-   DO n=1, iv_glob%nlocal($1)
+   ALLOCATE( iv_glob%$1(iv_glob%info($1)%nlocal) )
+   DO n=1, iv_glob%info($1)%nlocal
 stop
 !     iv_glob%$1(n)%loc%proc_domain = slice_glob%obs(n)%proc_domain
 !     iv_glob%$1(n)%loc%obs_global_index = &

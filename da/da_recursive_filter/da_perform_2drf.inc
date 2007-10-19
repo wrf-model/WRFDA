@@ -40,12 +40,3 @@ subroutine da_perform_2drf(ni, nj, num_passes, rf_scale, field)
 end subroutine da_perform_2drf
 
 
-%xa%v(i,j,kts)+var*grid%xa%speed(i,j)*grid%xb%v(i,j,kts)
-      end do
-   end do
-
-   if (trace_use) call da_trace_exit("da_transform_xtoseasfcwind_adj")
-
-end subroutine da_transform_xtoseasfcwind_adj
-
-

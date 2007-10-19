@@ -1,30 +1,32 @@
-subroutine da_read_obs_bufrssmis (obstype,iv,infile)
+subroutine da_calculate_grady_satem(iv, re, jo_grad_y)
 
-   !---------------------------------------------------------------------------
-   !  Purpose: read in NCEP bufr SSM/IS data to innovation structure
-   !
-   !   METHOD: use F90 sequential data structure to avoid reading file twice  
-   !            1. read file radiance data in sequential data structure
-   !            2. do gross QC check
-   !            3. assign sequential data structure to innovation structure
-   !               and deallocate sequential data structure
-   !---------------------------------------------------------------------------
+   !----------------------------------------------------------------------
+   ! Purpose: Applies obs inverse on re-vector
+   !----------------------------------------------------------------------
 
    implicit none
 
-   character(5) ,     intent (in)    :: obstype    ! ssmis
-   character(20),     intent (in)    :: infile     ! ssmis.bufr
-   type (iv_type),    intent (inout) :: iv
+   type (iv_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-   if (trace_use) call da_trace_entry("da_read_obs_bufrssmis")
+   integer  :: n, k
 
-   write(*,*) ' To be implemented for SSMIS'
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_satem")
 
-   if (trace_use) call da_trace_exit("da_read_obs_bufrssmis")
+   do n=1, iv%info(satem)%nlocal
+      do k=1, iv%satem(n)%info%levels
+         if (iv%satem(n)%thickness(k)%qc < obs_qc_pointer) then
+            re%satem(n)%thickness(k) = 0.0
+         end if
 
-end subroutine da_read_obs_bufrssmis
+         jo_grad_y%satem(n)%thickness(k) = -re%satem(n)%thickness(k) / &
+            (iv%satem(n)%thickness(k)%error * iv%satem(n)%thickness(k)%error)
+         end do
+   end do
 
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_satem")
 
-ubroutine da_calculate_grady_satem
+end subroutine da_calculate_grady_satem
 
 

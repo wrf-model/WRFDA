@@ -22,7 +22,7 @@ subroutine da_get_innov_vector_ssmi_rv (it, grid, ob, iv)
    if (trace_use) call da_trace_entry("da_get_innov_vector_ssmi_rv")
 
    itpw = 0 ; itpwf = 0 ; ispeed = 0 ; ispeedf = 0 
-   do n=1, iv % nlocal(ssmi_rv)
+   do n=1, iv%info(ssmi_rv)%nlocal
 
       ! compute innovation vector
       ! =========================

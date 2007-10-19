@@ -1,4 +1,4 @@
-subroutine da_message(strs)
+subroutine da_ao_stats_ssmi_tb  (stats_unit, iv, re)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,42 +6,32 @@ subroutine da_message(strs)
 
    implicit none
 
-   character(len=*), intent(in) :: strs(:)
-   integer :: i
+   integer,        intent (in)    :: stats_unit    ! Output unit for stats.
+   type (iv_type), intent (inout) :: iv            ! iv
+   type  (y_type), intent (in)    :: re            ! A - O
 
-   do i=1,size(strs) 
-      write(unit=stdout,fmt='(a)') trim(strs(i))
-   end do
-   write(unit=stdout,fmt=*) " "
+   integer                          :: ntb19v,ntb19h,ntb22v,ntb37v,ntb37h, &
+                                       ntb85v,ntb85h
+   integer                          :: n
+   type (stats_ssmi_tb_type)        :: stats
 
-end subroutine da_message
+   if (trace_use) call da_trace_entry("da_ao_stats_ssmi_tb")
 
+   ntb19v = 0
+   ntb19h = 0
+   ntb22v = 0
+   ntb37v = 0
+   ntb37h = 0
+   ntb85v = 0
+   ntb85h = 0
 
-ype (maxmin_type), intent(in)    :: maximum
-   real,               intent(in)    :: average
-   real,               intent(in)    :: rms_err
-
-   if (trace_use_dull) call da_trace_entry("da_print_stats_ssmt1")
-   
-   write(unit=stats_unit, fmt='(a/)') '   var              T(K)     n    k'
-
-   write(unit=stats_unit, fmt='(a,i16,4i22)') '  Number: ', nt
-
-   if (nt < 1) nt = 1
-   
-   write(unit=stats_unit, fmt='((a,f12.4,2i5))') &
-      ' Minimum(n,k): ', minimum,    &
-      ' Maximum(n,k): ', maximum
-   write(unit=stats_unit, fmt='((a,f12.4,10x))') &
-      ' Average     : ', average/real(nt),    &
-      '    RMSE     : ', sqrt(rms_err/real(nt))
-
-   if (trace_use_dull) call da_trace_exit("da_print_stats_ssmt1")
-
-end subroutine da_print_stats_ssmt1
-
-
-type (missing_r, 0, 0)
+   stats%maximum%tb19v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb19h = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb22v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb37v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb37h = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb85v = maxmin_type (missing_r, 0, 0)
+   stats%maximum%tb85h = maxmin_type (missing_r, 0, 0)
    stats%minimum%tb19v = maxmin_type(-missing_r, 0, 0)
    stats%minimum%tb19h = maxmin_type(-missing_r, 0, 0)
    stats%minimum%tb22v = maxmin_type(-missing_r, 0, 0)
@@ -52,8 +42,8 @@ type (missing_r, 0, 0)
    stats%average = residual_ssmi_tb_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   if (iv%nlocal(ssmi_tb) .gt. 0) then
-      do n=1, iv%nlocal(ssmi_tb) 
+   if (iv%info(ssmi_tb)%nlocal .gt. 0) then
+      do n=1, iv%info(ssmi_tb)%nlocal 
          if (iv%info(ssmi_tb)%proc_domain(1,n)) then
             call da_stats_calculate (n, 0, iv%ssmi_tb(n)%tb19v%qc, &
                re%ssmi_tb(n)%tb19v, ntb19v,  &

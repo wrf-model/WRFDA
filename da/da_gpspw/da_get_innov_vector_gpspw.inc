@@ -44,9 +44,9 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
       use_gpspwobs = .true.
 
       ! Allocate:
-      iv % nlocal(gpspw)   = num_pseudo
-      iv % plocal(1,gpspw) = num_pseudo
-      iv % nlocal(pseudo)  = 0
+      iv%info(gpspw)%nlocal   = num_pseudo
+      iv%info(gpspw)%plocal(1) = num_pseudo
+      iv%info(pseudo)%nlocal  = 0
 
       allocate(iv % gpspw(1:num_pseudo))
       allocate(ob % gpspw(1:num_pseudo))
@@ -99,7 +99,7 @@ subroutine da_get_innov_vector_gpspw (it, grid, ob, iv)
       write(unit=stdout,fmt='(a,f8.2)')    'iv%gpspw: elv=',iv%info(gpspw)%elv(1)
    end if 
 
-   if (iv % nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
 
       ittpw   = 0
       ittpwf  = 0

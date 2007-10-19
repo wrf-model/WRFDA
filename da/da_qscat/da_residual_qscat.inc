@@ -23,7 +23,7 @@ subroutine da_residual_qscat(iv, y, re, np_missing, np_bad_data,np_obs_used, np_
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(qscat)
+   do n=1, iv%info(qscat)%nlocal
       np_available = np_available + 2
       re%qscat(n)%u = da_residual(n, 0, y%qscat(n)%u, iv%qscat(n)%u, n_obs_bad % u)
       re%qscat(n)%v = da_residual(n, 0, y%qscat(n)%v, iv%qscat(n)%v, n_obs_bad % v)

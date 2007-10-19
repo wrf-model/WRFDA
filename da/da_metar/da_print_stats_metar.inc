@@ -49,20 +49,3 @@ subroutine da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
 end subroutine da_print_stats_metar
 
 
-ne(stats%average%v, stats%rms_err%v, &
-      stats%minimum%v%value, stats%maximum%v%value, &
-      stats%minimum%v%n, stats%maximum%v%n, &
-      stats%minimum%v%l, stats%maximum%v%l)
-
-   if (rootproc) then
-      if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for pilot'
-         call da_print_stats_pilot(stats_unit, nu, nv, stats)
-      end if
-   end if
-   
-   if (trace_use_dull) call da_trace_exit("da_ao_stats_pilot")
-
-end subroutine da_ao_stats_pilot
-
-

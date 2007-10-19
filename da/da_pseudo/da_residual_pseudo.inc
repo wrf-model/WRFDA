@@ -26,7 +26,7 @@ subroutine da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(pseudo)
+   do n=1, iv%info(pseudo)%nlocal
       if (iv%info(pseudo)%proc_domain(1,n)) then
          np_available = np_available + 5
          re%pseudo(n)%u = da_residual(n, 0, y%pseudo(n)%u, iv%pseudo(n)%u, n_obs_bad % u)
@@ -50,15 +50,5 @@ subroutine da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    if (trace_use_dull) call da_trace_exit("da_residual_pseudo")
 
 end subroutine da_residual_pseudo
-
-
-rint)
-      ! Mixing ratio, same ratio as relative humidity
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
-   end do
-
-   if (trace_use_dull) call da_trace_exit("da_check_max_iv_synop")
-
-end subroutine da_check_max_iv_synop
 
 

@@ -1,32 +1,18 @@
-subroutine da_qfrmrh ( p, t, rh, q )
+subroutine da_calculate_grady(iv, re, jo_grad_y)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! Purpose: Does part of the obs gradient operation   
+   !-------------------------------------------------------------------------
 
    implicit none
 
-   real, intent(in)  :: p, t, rh
-   real, intent(out) :: q
+   type (iv_type), intent(in)    :: iv          ! Innovation vector (O-B).
+   type (y_type),  intent(inout) :: re          ! Residual vector (O-A).
+   type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
-   real   :: a, b, e, qs
+   if (trace_use) call da_trace_entry("da_calculate_grady")
 
-   if (trace_use) call da_trace_entry("da_qfrmrh")
-
-   a=17.26
-   b=35.86
-   if (t <= 263.0) a=21.87
-   if (t <= 263.0) b= 7.66
-   e  = 6.11*exp(a*(t-t_triple)/(t-b))
-   qs = 0.622*e/(p-0.378*e)
-   q  = qs*rh/100.0
-
-   if (trace_use) call da_trace_exit("da_qfrmrh")
-
-end subroutine da_qfrmrh
-
-
------------------------
+   !-------------------------------------------------------------------------
    ! [1.0] Compute components of Grad_y(Jo):
    !-------------------------------------------------------------------------
 

@@ -1,74 +1,94 @@
-subroutine da_allocate_observations (iv)
+subroutine da_transform_vtovv_global (cv_size, xbx, be, cv, vv)
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Allocate components of observation structure.
-   !---------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! Purpose: Control variable transform for global WRF-Var 
+   !--------------------------------------------------------------------------
 
    implicit none
 
-   type (iv_type), intent(inout) :: iv     ! Observation structure.
+   integer,        intent(in)    :: cv_size       ! Size of cv array.
+   type(xbx_type), intent(in)    :: xbx           ! For header & non-grid arrays.
+   type(be_type),  intent(in)    :: be            ! background errors.
+   real,           intent(in)    :: cv(1:cv_size) ! control variables.
+   type(vp_type),  intent(inout) :: vv            ! grdipt/eof cv (local).
 
-   integer :: i
+   integer :: k, m ! Loop counters.
+   integer :: cv_s ! Counter.
+   integer :: cv_e ! Counter.
 
-   if (trace_use) call da_trace_entry("da_allocate_observations")
+   if (trace_use) call da_trace_entry("da_transform_vtovv_global")
 
-   if (iv%info(sound)%nlocal     > 0) allocate(iv%sound    (1:iv%info(sound)%nlocal))
-write (0,*) "iv%info(sonde_sfc)%nlocal",iv%info(sonde_sfc)%nlocal
-   if (iv%info(sonde_sfc)%nlocal > 0) allocate(iv%sonde_sfc(1:iv%info(sonde_sfc)%nlocal))
-   if (iv%nlocal(synop)     > 0) allocate(iv%synop    (1:iv%nlocal(synop)))
-   if (iv%nlocal(airep)     > 0) allocate(iv%airep    (1:iv%nlocal(airep)))
-   if (iv%info(geoamv)%nlocal    > 0) allocate(iv%geoamv   (1:iv%info(geoamv)%nlocal))
-   if (iv%info(polaramv)%nlocal  > 0) allocate(iv%polaramv (1:iv%info(polaramv)%nlocal))
-   if (iv%info(satem)%nlocal     > 0) allocate(iv%satem    (1:iv%info(satem)%nlocal))
-   if (iv%info(metar)%nlocal     > 0) allocate(iv%metar    (1:iv%info(metar)%nlocal))
-   if (iv%nlocal(ships)     > 0) allocate(iv%ships    (1:iv%nlocal(ships)))
-   if (iv%nlocal(pilot)     > 0) allocate(iv%pilot    (1:iv%nlocal(pilot)))
-   if (iv%info(gpspw)%nlocal     > 0) allocate(iv%gpspw    (1:iv%info(gpspw)%nlocal))
-   if (iv%info(gpsref)%nlocal    > 0) allocate(iv%gpsref   (1:iv%info(gpsref)%nlocal))
-   if (iv%nlocal(ssmi_tb)   > 0) allocate(iv%ssmi_tb  (1:iv%nlocal(ssmi_tb)))
-   if (iv%nlocal(ssmi_rv)   > 0) allocate(iv%ssmi_rv  (1:iv%nlocal(ssmi_rv)))
-   if (iv%nlocal(ssmt1)     > 0) allocate(iv%ssmt1    (1:iv%nlocal(ssmt1)))
-   if (iv%nlocal(ssmt2)     > 0) allocate(iv%ssmt2    (1:iv%nlocal(ssmt2)))
-   if (iv%nlocal(qscat)     > 0) allocate(iv%qscat    (1:iv%nlocal(qscat)))
-   if (iv%info(profiler)%nlocal  > 0) allocate(iv%profiler (1:iv%info(profiler)%nlocal))
-   if (iv%nlocal(buoy)      > 0) allocate(iv%buoy     (1:iv%nlocal(buoy)))
-   if (iv%info(radar)%nlocal     > 0) allocate(iv%radar    (1:iv%info(radar)%nlocal))
-   if (iv%nlocal(bogus)     > 0) allocate(iv%bogus    (1:iv%nlocal(bogus)))
-   if (iv%nlocal(airsr)     > 0) allocate(iv%airsr    (1:iv%nlocal(airsr)))
-
-   do i=1,num_ob_indexes
-      allocate (iv%info(i)%name(iv%nlocal(i)))     
-      allocate (iv%info(i)%platform(iv%nlocal(i))) 
-      allocate (iv%info(i)%id(iv%nlocal(i)))       
-      allocate (iv%info(i)%date_char(iv%nlocal(i)))
-      allocate (iv%info(i)%levels(iv%nlocal(i)))   
-      allocate (iv%info(i)%lat(iv%info(i)%max_lev,iv%nlocal(i)))    
-      allocate (iv%info(i)%lon(iv%info(i)%max_lev,iv%nlocal(i)))    
-      allocate (iv%info(i)%elv(iv%nlocal(i)))      
-      allocate (iv%info(i)%pstar(iv%nlocal(i)))    
-
-      allocate (iv%info(i)%slp(iv%nlocal(i)))   
-      allocate (iv%info(i)%pw(iv%nlocal(i)))    
-
-      allocate (iv%info(i)%x  (kms:kme,iv%nlocal(i)))   
-      allocate (iv%info(i)%y  (kms:kme,iv%nlocal(i)))   
-      allocate (iv%info(i)%i  (kms:kme,iv%nlocal(i)))   
-      allocate (iv%info(i)%j  (kms:kme,iv%nlocal(i)))      
-      allocate (iv%info(i)%dx (kms:kme,iv%nlocal(i)))  
-      allocate (iv%info(i)%dxm(kms:kme,iv%nlocal(i))) 
-      allocate (iv%info(i)%dy (kms:kme,iv%nlocal(i)))  
-      allocate (iv%info(i)%dym(kms:kme,iv%nlocal(i))) 
-      allocate (iv%info(i)%k  (iv%info(i)%max_lev,iv%nlocal(i)))
-      allocate (iv%info(i)%dz (iv%info(i)%max_lev,iv%nlocal(i)))  
-      allocate (iv%info(i)%dzm(iv%info(i)%max_lev,iv%nlocal(i))) 
-      allocate (iv%info(i)%zk (iv%info(i)%max_lev,iv%nlocal(i))) 
-      iv%info(i)%zk(:,:) = missing_r
-      allocate (iv%info(i)%proc_domain(iv%info(i)%max_lev,iv%nlocal(i))) 
-      allocate (iv%info(i)%obs_global_index(iv%nlocal(i))) 
+   !-------------------------------------------------------------------------
+   ! [1] Spectral to grid transform for standard control variables:
+   !-------------------------------------------------------------------------
+  
+   cv_s = 1        
+   do k = 1, be%v1%mz
+      cv_e = cv_s + 2 * be % cv % size1c - 1 
+      call da_vtovv_spectral(be % v1 % max_wave, be % cv % size1c, &
+         xbx % lenr, xbx % lenwrk, xbx % lensav, &
+         xbx % inc, xbx % alp_size, xbx % alp, &
+         xbx % wsave, be%v1%power(0:be % v1 % max_wave,k), &
+         cv(cv_s:cv_e), vv%v1(its:ite,jts:jte,k))
+      cv_s = cv_e + 1
    end do
 
-   if (trace_use) call da_trace_exit("da_allocate_observations")
+   do k = 1, be%v2%mz
+      cv_e = cv_s + 2 * be % cv % size2c - 1
+      call da_vtovv_spectral(be % v2 % max_wave, be % cv % size2c, &
+         xbx % lenr, xbx % lenwrk, xbx % lensav, &
+         xbx % inc, xbx % alp_size, xbx % alp, &
+         xbx % wsave, be%v2%power(0:be % v2 % max_wave,k), &
+         cv(cv_s:cv_e), vv%v2(its:ite,jts:jte,k))
+      cv_s = cv_e + 1
+   end do
 
-end subroutine da_allocate_observations
+   do k = 1, be%v3%mz
+      cv_e = cv_s + 2 * be % cv % size3c - 1
+      call da_vtovv_spectral(be % v3 % max_wave, be % cv % size3c, &
+         xbx % lenr, xbx % lenwrk, xbx % lensav, &
+         xbx % inc, xbx % alp_size, xbx % alp, &
+         xbx % wsave, be%v3%power(0:be % v3 % max_wave,k), &
+         cv(cv_s:cv_e), vv%v3(its:ite,jts:jte,k))
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v4%mz
+      cv_e = cv_s + 2 * be % cv % size4c - 1
+      call da_vtovv_spectral(be % v4 % max_wave, be % cv % size4c, &
+         xbx % lenr, xbx % lenwrk, xbx % lensav, &
+         xbx % inc, xbx % alp_size, xbx % alp, &
+         xbx % wsave, be%v4%power(0:be % v4 % max_wave,k), &
+         cv(cv_s:cv_e), vv%v4(its:ite,jts:jte,k))
+      cv_s = cv_e + 1
+   end do
+
+   do k = 1, be%v5%mz
+     cv_e = cv_s + 2 * be % cv % size5c - 1
+     call da_vtovv_spectral(be % v5 % max_wave, be % cv % size5c, &
+        xbx % lenr, xbx % lenwrk, xbx % lensav, &
+        xbx % inc, xbx % alp_size, xbx % alp, &
+        xbx % wsave, be%v5%power(0:be % v5 % max_wave,k), &
+        cv(cv_s:cv_e), vv%v5(its:ite,jts:jte,kts:kte))
+     cv_s = cv_e + 1
+   end do
+
+   !-------------------------------------------------------------------------
+   ! [2] Spectral to grid transform for flow-dependent control variables:
+   !-------------------------------------------------------------------------
+  
+   do m = 1, be % ne
+      cv_e = cv_s + 2 * be % cv % size_alphac - 1
+      call da_vtovv_spectral(be % alpha % max_wave, be % cv % size_alphac, &
+         xbx % lenr, xbx % lenwrk, xbx % lensav, &
+         xbx % inc, xbx % alp_size, xbx % alp, &
+         xbx % wsave, be % alpha % power(0:be%alpha%max_wave,1), &
+         cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m))
+      cv_s = cv_e + 1
+   end do
+
+   if (trace_use) call da_trace_exit("da_transform_vtovv_global")
+
+end subroutine da_transform_vtovv_global
 
 

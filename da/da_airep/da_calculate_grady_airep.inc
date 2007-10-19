@@ -15,7 +15,7 @@ subroutine da_calculate_grady_airep(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_airep")
 
-   do n=1, iv%nlocal(airep)
+   do n=1, iv%info(airep)%nlocal
       do k=1, iv%info(airep)%levels(n)
          if (iv%airep(n)%u(k)%qc < obs_qc_pointer) re%airep(n)%u(k) = 0.0
          if (iv%airep(n)%v(k)%qc < obs_qc_pointer) re%airep(n)%v(k) = 0.0

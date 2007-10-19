@@ -21,7 +21,7 @@ subroutine da_jo_and_grady_pseudo(iv, re, jo, jo_grad_y)
    jo % pseudo_p = 0.0
    jo % pseudo_q = 0.0
 
-   do n=1, iv%nlocal(pseudo)
+   do n=1, iv%info(pseudo)%nlocal
       jo_grad_y%pseudo(n)%u = -re%pseudo(n)%u / (iv%pseudo(n)%u%error * iv%pseudo(n)%u%error)
       jo_grad_y%pseudo(n)%v = -re%pseudo(n)%v / (iv%pseudo(n)%v%error * iv%pseudo(n)%v%error)
       jo_grad_y%pseudo(n)%t = -re%pseudo(n)%t / (iv%pseudo(n)%t%error * iv%pseudo(n)%t%error)

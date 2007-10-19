@@ -58,8 +58,8 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
 
       ! Allocate:
       iv%info(gpsref)%nlocal = num_pseudo
-      iv%plocal(1,gpsref) = num_pseudo
-      iv%nlocal(pseudo) = 0
+      iv%info(gpsref)%plocal(1) = num_pseudo
+      iv%info(pseudo)%nlocal = 0
 
       allocate(iv % gpsref(1:num_pseudo))
       allocate(iv%gpsref(num_pseudo)%ref(1:1))

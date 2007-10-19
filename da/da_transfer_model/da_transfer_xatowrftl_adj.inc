@@ -1,56 +1,73 @@
-subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp)
+subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Add flow-dependent increments in model space (xa).
-   !-----------------------------------------------------------------------
-                                      
+   !---------------------------------------------------------------------------
+   ! Purpose: Convert WRFTL variables to analysis increments
+   !           (inverse of the incremental part of xatowrf)
+   !---------------------------------------------------------------------------
+
    implicit none
    
-   integer, intent(in)                  :: ne  ! Ensemble size.
-   type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
-   type (x_type), intent(in)            :: xa  ! Analysis increments.
-   type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
-   
-   integer                              :: n, k! Loop counters.
+   type(domain), intent(inout)               :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
-   vp % alpha(:,:,:) = 0.0
+   character*4, intent(in) :: filnam
 
-   do n = ne, 1, -1
-      ! ps:
-      vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                      ep % v5(its:ite,jts:jte,1,n) * & ! v5 = ps
-                                      xa % psfc(its:ite,jts:jte)
+   ! Local variables
 
-      do k = kte, kts, -1
+   integer :: i, j, k
+   real    :: sdmd, s1md
+   real    :: rho_cgrid
 
-         ! q:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v4(its:ite,jts:jte,k,n) * & ! v4 = q
-                                         xa % q(its:ite,jts:jte,k)
+   real, dimension(ims:ime,jms:jme,kms:kme) :: a_press
+   real, dimension(ims:ime,jms:jme,kms:kme) :: utmp
+   real, dimension(ims:ime,jms:jme,kms:kme) :: vtmp
 
-         ! t:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v3(its:ite,jts:jte,k,n) * & ! v3 = t
-                                         xa % t(its:ite,jts:jte,k)
 
-         ! v:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v2(its:ite,jts:jte,k,n) * & ! v2 = v
-                                         xa % v(its:ite,jts:jte,k)
+   integer ndynopt
 
-         ! u:
-         vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
-                                         ep % v1(its:ite,jts:jte,k,n) * & ! v1 = u
-                                         xa % u(its:ite,jts:jte,k)
+   if (trace_use) call da_trace_entry("da_transfer_xatowrftl_adj")
+
+   !---------------------------------------------------------------------------
+   ! [7.0] Adjoint of outPUT (inPUT)
+   !---------------------------------------------------------------------------
+
+   ndynopt      = grid%dyn_opt
+   grid%dyn_opt = DYN_EM_AD
+   call nl_set_dyn_opt (1 , DYN_EM_AD)
+
+   call da_med_initialdata_input(grid , config_flags, filnam)
+
+   grid%dyn_opt = ndynopt
+   call nl_set_dyn_opt (1 , DYN_EM)
+
+   !---------------------------------------------------------------------------
+   ! [6.0] Adjoint of save OTHERinCREMENT
+   !---------------------------------------------------------------------------
+
+   do k=kts,kte+1
+      do j=jts,jte
+         do i=its,ite
+            grid%xa%w(i,j,k)=grid%xa%w(i,j,k)+grid%a_w_2(i,j,k)
+         end do
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_add_flow_dependence_xa_adj")
+   grid%a_w_2 = 0.0
 
-end subroutine da_add_flow_dependence_xa_adj
+#ifdef VAR4D_MICROPHYSICS
+   ! New code needed once we introduce the microphysics to 4dvar in 2008
+   if (size(grid%moist,dim=4) >= 4) then
+      do k=kts,kte
+         do j=jts,jte
+            do i=its,ite
+               grid%xa%qcw(i,j,k)=grid%a_moist(i,j,k,p_qcw)
+               grid%xa%qrn(i,j,k)=grid%a_moist(i,j,k,p_qrn)
+            end do
+         end do
+      end do
+   end if
 
-
->= 6) then
+   if (size(grid%moist,dim=4) >= 6) then
       do k=kts,kte
          do j=jts,jte
             do i=its,ite

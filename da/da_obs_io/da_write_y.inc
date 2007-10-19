@@ -44,15 +44,15 @@ subroutine da_write_y (iv, y)
 
    ! [1] Transfer surface obs:
 
-   if (iv % nlocal(synop) > 0) then
+   if (iv%info(synop)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(synop)
+      do n = 1, iv%info(synop)%nlocal
          if (iv%info(synop)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'synop', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(synop)
+         do n = 1, iv%info(synop)%nlocal
             if (iv%info(synop)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -70,15 +70,15 @@ subroutine da_write_y (iv, y)
 
    ! [2] Transfer metar obs:
 
-   if (iv % nlocal(metar) > 0) then
+   if (iv%info(metar)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(metar)
+      do n = 1, iv%info(metar)%nlocal
          if(iv%info(metar)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'metar', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(metar)
+         do n = 1, iv%info(metar)%nlocal
             if (iv%info(metar)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -96,15 +96,15 @@ subroutine da_write_y (iv, y)
 
    ! [3] Transfer ships obs:
 
-   if (iv % nlocal(ships) > 0) then
+   if (iv%info(ships)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(ships)
+      do n = 1, iv%info(ships)%nlocal
         if (iv%info(ships)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ships', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(ships)
+         do n = 1, iv%info(ships)%nlocal
             if (iv%info(ships)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -122,15 +122,15 @@ subroutine da_write_y (iv, y)
 
    ! [4.1] Transfer Geo. AMVs Obs:
 
-   if (iv % nlocal(geoamv) > 0) then 
+   if (iv%info(geoamv)%nlocal > 0) then 
       num_obs = 0
-      do n = 1, iv % nlocal(geoamv)
+      do n = 1, iv%info(geoamv)%nlocal
          if (iv%info(geoamv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'geoamv', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(geoamv)
+         do n = 1, iv%info(geoamv)%nlocal
             if (iv%info(geoamv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(geoamv)%levels(n)
@@ -149,15 +149,15 @@ subroutine da_write_y (iv, y)
 
    ! [4.2] Transfer Polar AMVs Obs:
 
-   if (iv % nlocal(polaramv) > 0) then
+   if (iv%info(polaramv)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(polaramv)
+      do n = 1, iv%info(polaramv)%nlocal
          if (iv%info(polaramv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'polaramv', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(polaramv)
+         do n = 1, iv%info(polaramv)%nlocal
             if (iv%info(polaramv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)') iv%info(polaramv)%levels(n)
@@ -176,15 +176,15 @@ subroutine da_write_y (iv, y)
 
    ! [5] Transfer gpspw obs:
 
-   if (iv % nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(gpspw)
+      do n = 1, iv%info(gpspw)%nlocal
          if (iv%info(gpspw)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'gpspw', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(gpspw)
+         do n = 1, iv%info(gpspw)%nlocal
             if (iv%info(gpspw)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -198,15 +198,15 @@ subroutine da_write_y (iv, y)
 
    ! [6] Transfer sonde obs:
 
-   if (iv % nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(sound)
+      do n = 1, iv%info(sound)%nlocal
          if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sound', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(sound)
+         do n = 1, iv%info(sound)%nlocal
             if (iv%info(sound)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(sound)%levels(n)
@@ -223,13 +223,13 @@ subroutine da_write_y (iv, y)
       end if
 
       num_obs = 0
-      do n = 1, iv % nlocal(sound)
+      do n = 1, iv%info(sound)%nlocal
          if (iv%info(sound)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sonde_sfc', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(sound)
+         do n = 1, iv%info(sound)%nlocal
             if (iv%info(sound)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -247,15 +247,15 @@ subroutine da_write_y (iv, y)
 
    ! [7] Transfer airep obs:
 
-   if (iv % nlocal(airep) > 0) then
+   if (iv%info(airep)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(airep)
+      do n = 1, iv%info(airep)%nlocal
          if (iv%info(airep)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airep', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(airep)
+         do n = 1, iv%info(airep)%nlocal
             if (iv%info(airep)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)') iv%info(airep)%levels(n)
@@ -273,15 +273,15 @@ subroutine da_write_y (iv, y)
 
    ! [8] Transfer pilot obs:
 
-   if (iv % nlocal(pilot) > 0) then
+   if (iv%info(pilot)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(pilot)
+      do n = 1, iv%info(pilot)%nlocal
          if (iv%info(pilot)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'pilot', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(pilot)
+         do n = 1, iv%info(pilot)%nlocal
             if (iv%info(pilot)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(pilot)%levels(n)
@@ -298,15 +298,15 @@ subroutine da_write_y (iv, y)
 
    ! [9] Transfer SSM/I obs:SSMI:
 
-   if (iv % nlocal(ssmi_rv) > 0) then
+   if (iv%info(ssmi_rv)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(ssmi_rv)
+      do n = 1, iv%info(ssmi_rv)%nlocal
          if (iv%info(ssmi_rv)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmir', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(ssmi_rv)
+         do n = 1, iv%info(ssmi_rv)%nlocal
             if (iv%info(ssmi_rv)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -321,15 +321,15 @@ subroutine da_write_y (iv, y)
       end if
    end if
 
-   if (iv % nlocal(ssmi_tb) > 0) then
+   if (iv%info(ssmi_tb)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(ssmi_tb)            
+      do n = 1, iv%info(ssmi_tb)%nlocal            
          if (iv%info(ssmi_tb)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmit', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(ssmi_tb)
+         do n = 1, iv%info(ssmi_tb)%nlocal
             if (iv%info(ssmi_tb)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -355,15 +355,15 @@ subroutine da_write_y (iv, y)
 
    ! [10] Transfer satem obs:
 
-   if (iv % nlocal(satem) > 0) then
+   if (iv%info(satem)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(satem)            
+      do n = 1, iv%info(satem)%nlocal            
          if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'satem', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(satem)
+         do n = 1, iv%info(satem)%nlocal
             if (iv%satem(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % satem(n) % info % levels
@@ -380,15 +380,15 @@ subroutine da_write_y (iv, y)
    
    ! [11] Transfer ssmt1 obs:
 
-   if (iv % nlocal(ssmt1) > 0) then
+   if (iv%info(ssmt1)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(ssmt1)            
+      do n = 1, iv%info(ssmt1)%nlocal            
          if (iv%info(ssmt1)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt1', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(ssmt1)
+         do n = 1, iv%info(ssmt1)%nlocal
             if (iv%info(ssmt1)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(ssmt1)%levels(n)
@@ -405,15 +405,15 @@ subroutine da_write_y (iv, y)
 
    ! [12] Transfer ssmt2 obs:
 
-   if (iv % nlocal(ssmt2) > 0) then
+   if (iv%info(ssmt2)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(ssmt2)            
+      do n = 1, iv%info(ssmt2)%nlocal            
          if (iv%info(ssmt2)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt2', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(ssmt2)
+         do n = 1, iv%info(ssmt2)%nlocal
             if (iv%info(ssmt2)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(ssmt2)%levels(n)
@@ -430,15 +430,15 @@ subroutine da_write_y (iv, y)
 
    ! [13] Transfer scatterometer obs:
 
-   if (iv % nlocal(qscat) > 0) then
+   if (iv%info(qscat)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(qscat)            
+      do n = 1, iv%info(qscat)%nlocal            
          if (iv%info(qscat)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'qscat', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(qscat)
+         do n = 1, iv%info(qscat)%nlocal
             if (iv%info(qscat)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -453,15 +453,15 @@ subroutine da_write_y (iv, y)
    
    ! [14] Transfer profiler obs:
 
-   if (iv % nlocal(profiler) > 0) then
+   if (iv%info(profiler)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(profiler)            
+      do n = 1, iv%info(profiler)%nlocal            
          if (iv%info(profiler)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'profiler', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(profiler)
+         do n = 1, iv%info(profiler)%nlocal
             if (iv%info(profiler)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(profiler)%levels(n)
@@ -480,15 +480,15 @@ subroutine da_write_y (iv, y)
 
    ! [15] Transfer buoy  obs:
 
-   if (iv % nlocal(buoy) > 0) then
+   if (iv%info(buoy)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(buoy)            
+      do n = 1, iv%info(buoy)%nlocal            
          if (iv%info(buoy)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'buoy', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(buoy)
+         do n = 1, iv%info(buoy)%nlocal
             if (iv%info(buoy)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -506,15 +506,15 @@ subroutine da_write_y (iv, y)
 
    ! [16] Transfer TC bogus obs:
 
-   if (iv % nlocal(bogus) > 0) then
+   if (iv%info(bogus)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(bogus)            
+      do n = 1, iv%info(bogus)%nlocal            
          if (iv%info(bogus)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'bogus', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(bogus)
+         do n = 1, iv%info(bogus)%nlocal
             if (iv%info(bogus)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -535,15 +535,15 @@ subroutine da_write_y (iv, y)
 
    ! [17] Transfer AIRS retrievals:
 
-   if (iv % nlocal(airsr) > 0) then
+   if (iv%info(airsr)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(airsr)
+      do n = 1, iv%info(airsr)%nlocal
          if (iv%info(airsr)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airsr', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(airsr)
+         do n = 1, iv%info(airsr)%nlocal
             if (iv%info(airsr)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(airsr)%levels(n)
@@ -591,15 +591,15 @@ subroutine da_write_y (iv, y)
 
    ! Transfer gpsref obs:
 
-   if (iv % nlocal(gpsref) > 0) then
+   if (iv%info(gpsref)%nlocal > 0) then
       num_obs = 0
-      do n = 1, iv % nlocal(gpsref)
+      do n = 1, iv%info(gpsref)%nlocal
          if (iv%info(gpsref)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'gpsref', num_obs
          num_obs = 0
-         do n = 1, iv % nlocal(gpsref)
+         do n = 1, iv%info(gpsref)%nlocal
             if (iv%info(gpsref)%proc_domain(1,n)) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv%info(gpsref)%levels(n)

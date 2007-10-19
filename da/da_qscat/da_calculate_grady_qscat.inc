@@ -15,7 +15,7 @@ subroutine da_calculate_grady_qscat(iv, re, jo_grad_y)
    
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_qscat")
 
-   do n=1, iv%nlocal(qscat)
+   do n=1, iv%info(qscat)%nlocal
       if (iv%qscat(n)%u%qc < obs_qc_pointer) re%qscat(n)%u = 0.0
       if (iv%qscat(n)%v%qc < obs_qc_pointer) re%qscat(n)%v = 0.0
       jo_grad_y%qscat(n)%u = -re%qscat(n)%u / (iv%qscat(n)%u%error * iv%qscat(n)%u%error)

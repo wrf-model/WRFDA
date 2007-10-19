@@ -14,8 +14,8 @@ subroutine da_calculate_grady_ssmt2(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_ssmt2")
 
-   if (iv%nlocal(ssmt2) > 0) then  
-      do n=1, iv%nlocal(ssmt2)
+   if (iv%info(ssmt2)%nlocal > 0) then  
+      do n=1, iv%info(ssmt2)%nlocal
          do k=1, iv%info(ssmt2)%levels(n)
             if (iv%ssmt2(n)%rh(k)%qc < obs_qc_pointer) re%ssmt2(n)%rh(k) = 0.0
             jo_grad_y%ssmt2(n)%rh(k) = -re%ssmt2(n)%rh(k) / &

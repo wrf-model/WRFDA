@@ -16,7 +16,7 @@ subroutine da_jo_synop_uvtq(iv, re, jo_grad_y, jo)
 
    if (trace_use_dull) call da_trace_entry("da_jo_synop_uvtq")
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       if (iv%info(synop)%proc_domain(1,n)) then
          jo % synop_u = jo % synop_u - re%synop(n)%u * jo_grad_y%synop(n)%u
          jo % synop_v = jo % synop_v - re%synop(n)%v * jo_grad_y%synop(n)%v

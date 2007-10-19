@@ -493,8 +493,6 @@ module da_define_structures
       real :: ptop
    end type iv_type
 
-   ! [3.3] Where are these used:?
-
    type number_type
       integer                    :: bad
       integer                    :: miss
@@ -567,10 +565,6 @@ module da_define_structures
       real, pointer :: v(:)                     ! v-wind.
       real, pointer :: t(:)                     ! temperature.
       real, pointer :: q(:)                     ! specific humidity.
-      real, pointer :: new_u(:)                     ! u-wind.
-      real, pointer :: new_v(:)                     ! v-wind.
-      real, pointer :: new_t(:)                     ! temperature.
-      real, pointer :: new_q(:)                     ! specific humidity.
    end type residual_sound_type
 
    type residual_airsr_type

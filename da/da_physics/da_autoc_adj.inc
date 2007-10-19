@@ -1,67 +1,36 @@
-subroutine da_obs_proc_station(obs)
+subroutine da_autoc_adj(dt,scr2,prc,scr29,prc9,kts,kte,kms,kme)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Processing obs data read in at a station: 
-   !
-   ! (1) Surface correction
-   ! (2) Vertical checks
-   ! (3) Missing data check
+   ! Purpose: Auto-conversion
    !-----------------------------------------------------------------------
 
    implicit none
-                             
-   type (multi_level_type), intent(inout) :: obs
 
-   real    :: po, to, rho, es, qs, qvo
-   integer :: i
+   integer, intent(in)    :: kts, kte, kms, kme
+   real,    intent(in)    :: dt(kms:kme)
+   real,    intent(in)    :: scr2(kms:kme)
+   real,    intent(in)    :: prc(kms:kme)
+   real,    intent(in)    :: prc9(kms:kme)
+   real,    intent(inout) :: scr29(kms:kme)
 
-   if (trace_use_dull) call da_trace_entry("da_obs_proc_station")
+   integer :: k
+   real    :: qcth, alpha
 
-   do i = 1, obs % info % levels
-      !-----------------------------------------------------------------------
-      ! Gross check for t, p & q
-      !-----------------------------------------------------------------------
+   if (trace_use) call da_trace_entry("da_autoc_adj")
 
-      if (obs%each(i)%t %inv <  75.0 .or. obs%each(i)%t %inv > 350.0  ) then
-         obs%each(i)%t %inv = missing_r
-         obs%each(i)%t %qc  = missing
-      end if
-      if (obs%each(i)%p %inv <=  0.0 .or. obs%each(i)%p %inv > 110000.0) then
-         obs%each(i)%p %inv = missing_r
-         obs%each(i)%p %qc  = missing
-      end if
-      if (obs%each(i)%rh%inv < 0.0)  then
-         obs%each(i)%rh%inv = missing_r
-         obs%each(i)%rh%qc  = missing
-      end if
+   qcth = 0.5e-3
+   alpha = 0.001
 
-      po   = obs % each(i) % p  % inv
-      to   = obs % each(i) % t  % inv
-      rho  = obs % each(i) % rh  % inv
+   do k = kts, kte
+      if ( dt(k) <= 0.0 ) cycle
 
-      if (ob_format == ob_format_ascii) then ! Calculate q if possible:
-         if (abs(po -  missing_r) > 1.0 .and. abs(to -  missing_r) > 1.0 .and. &
-             abs(rho-  missing_r) > 1.0) then
-
-            call da_tp_to_qs(to, po, es, qs)
-
-            if (rho > 100.0) then
-               qvo = qs
-            else
-               qvo  = rho * qs / 100.0
-            end if
-         else
-            qvo       = missing_r
-         end if
-
-         obs % each(i) % q  % inv = qvo
-         obs % each(i) % q  % qc = obs % each(i) % rh % qc
-         obs % each(i) % q  % error = obs % each(i) % rh % error
+      if ( scr2(k) >= qcth ) then
+         scr29(k) = scr29(k) + alpha * prc9(k)
       end if
    end do
 
-   if (trace_use_dull) call da_trace_exit("da_obs_proc_station")
+   if (trace_use) call da_trace_exit("da_autoc_adj")
 
-end subroutine da_obs_proc_station
+end subroutine da_autoc_adj
 
 

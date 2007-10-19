@@ -82,7 +82,7 @@ subroutine da_obs_sfc_correction(info, sfc_obs, n, xb)
          end if
       end if
       sfc_obs % p % inv = psfc
-      ! YRG: to allow assimlate the Psfc from mslp:
+      ! YRG: to allow assmilate the Psfc from mslp:
       sfc_obs % p % qc  = 0
    end if
 

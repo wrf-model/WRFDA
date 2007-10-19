@@ -41,8 +41,3 @@ subroutine da_set_ps(proj)
 end subroutine da_set_ps
 
 
-i_rv")
-
-end subroutine da_check_xtoy_adjoint_ssmi_rv
-
-

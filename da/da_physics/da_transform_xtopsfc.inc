@@ -17,7 +17,7 @@ subroutine da_transform_xtopsfc(grid, synop, y_synop)
    if (trace_use) call da_trace_entry("da_transform_xtopsfc")
 stop
 
-   ! 2.0 Surface assimilation approach 2 (2-m t and q, 10-m u and v)
+   ! 2.0 Surface assmiilation approach 2 (2-m t and q, 10-m u and v)
 
 !   call da_interp_lin_2d(grid%xa%u10, synop%loc, y_synop%u)
 !   call da_interp_lin_2d(grid%xa%v10, synop%loc, y_synop%v)

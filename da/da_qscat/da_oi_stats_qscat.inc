@@ -25,7 +25,7 @@ subroutine da_oi_stats_qscat (stats_unit, iv)
    stats%average = residual_qscat1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(qscat)
+   do n=1, iv%info(qscat)%nlocal
       if (iv%info(qscat)%proc_domain(1,n)) then
          call da_stats_calculate(n, 0, iv%qscat(n)%u%qc, iv%qscat(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, stats%average%u, stats%rms_err%u)
