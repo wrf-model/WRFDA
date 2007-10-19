@@ -71,6 +71,7 @@ subroutine da_read_obs_ascii (iv, filename)
          "Error",iost," opening gts obs file "//trim(filename)
       call da_warning(__FILE__,__LINE__,message(1:1))
       call da_free_unit(iunit)
+      if (trace_use) call da_trace_exit("da_read_obs_ascii")
       return
    end if
 
@@ -82,6 +83,7 @@ subroutine da_read_obs_ascii (iv, filename)
       if (iost /= 0) then
          call da_warning(__FILE__,__LINE__, &
             (/"Problem reading gts obs header, skipping file"/))
+         if (trace_use) call da_trace_exit("da_read_obs_ascii")
          return
       end if
 
@@ -99,6 +101,7 @@ subroutine da_read_obs_ascii (iv, filename)
    if (iost /= 0) then
       call da_warning(__FILE__,__LINE__, &
          (/"Problem reading gts obs file, skipping"/))
+         if (trace_use) call da_trace_exit("da_read_obs_ascii")
       return
    end if
 

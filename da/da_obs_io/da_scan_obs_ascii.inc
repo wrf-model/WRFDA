@@ -38,6 +38,7 @@ subroutine da_scan_obs_ascii (iv, filename)
          "Error",iost," opening gts obs file "//trim(filename)
       call da_warning(__FILE__,__LINE__,message(1:1))
       call da_free_unit(iunit)
+      if (trace_use) call da_trace_exit("da_scan_obs_ascii")
       return
    end if
 
@@ -49,6 +50,7 @@ subroutine da_scan_obs_ascii (iv, filename)
          write(unit=message(1),fmt='(A,I3,A,I3)') &
             "Error",iost,"reading gts obs header on unit",iunit
          call da_warning(__FILE__,__LINE__,message(1:1))
+      if (trace_use) call da_trace_exit("da_scan_obs_ascii")
          return
       end if
       if (info_string(1:6) == 'EACH  ') exit
@@ -65,6 +67,7 @@ subroutine da_scan_obs_ascii (iv, filename)
       write(unit=message(1),fmt='(A,I3,A,I3)') &
          "Error",iost,"reading gts obs formats on unit",iunit
          call da_warning(__FILE__,__LINE__,message(1:1))
+      if (trace_use) call da_trace_exit("da_scan_obs_ascii")
       return
    end if
 
