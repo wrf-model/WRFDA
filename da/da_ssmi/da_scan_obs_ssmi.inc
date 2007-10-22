@@ -168,6 +168,11 @@ subroutine da_scan_obs_ssmi (iv, filename)
 
    end do reports
 
+   iv%info(ssmt1)%max_lev   = 1
+   iv%info(ssmt2)%max_lev   = 1
+   iv%info(ssmi_tb)%max_lev = 1
+   iv%info(ssmi_rv)%max_lev = 1
+
    close(unit=iunit)
    call da_free_unit(iunit)
 

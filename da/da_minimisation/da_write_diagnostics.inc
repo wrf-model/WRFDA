@@ -35,6 +35,7 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    if (iv%info(gpspw)%ntotal    > 0) call da_oi_stats_gpspw    (stats_unit, iv)
    if (iv%info(gpsref)%ntotal   > 0) call da_oi_stats_gpsref   (stats_unit, iv)
    if (iv%info(ssmi_tb)%ntotal  > 0) call da_oi_stats_ssmi_tb  (stats_unit, iv)
+write (0,*) __FILE__,__LINE__,"iv%info(ssmi_rv)%ntotal",iv%info(ssmi_rv)%ntotal
    if (iv%info(ssmi_rv)%ntotal  > 0) call da_oi_stats_ssmi_rv  (stats_unit, iv)
    if (iv%info(satem)%ntotal    > 0) call da_oi_stats_satem    (stats_unit, iv)
    if (iv%info(ssmt1)%ntotal    > 0) call da_oi_stats_ssmt1    (stats_unit, iv)

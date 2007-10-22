@@ -39,6 +39,12 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
    allocate (model_qrnb(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
    allocate (model_ps(iv%info(radar)%n1:iv%info(radar)%n2))
 
+   ! Needed
+   model_u = 0.0
+   model_v = 0.0
+   model_w = 0.0
+   model_qrn = 0.0
+
    ! W_HALF is vertical velocity at half-sigma levels.
 
    do n=iv%info(radar)%n1,iv%info(radar)%n2

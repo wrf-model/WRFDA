@@ -12,9 +12,16 @@ subroutine da_setup_obs_interp_wts (iv)
 
    if (trace_use) call da_trace_entry("da_setup_obs_interp_wts")
 
+write (0,*) __FILE__,__LINE__,"its,ite,jts,jte",its,ite,jts,jte
+write (0,*) __FILE__,__LINE__,"iv%info(ssmi_rv)%proc_domain(1,:)",iv%info(ssmi_rv)%proc_domain(1,:)
+write (0,*) __FILE__,__LINE__,"iv%info(ssmi_rv)%i(1,:)",iv%info(ssmi_rv)%i(1,:)
+write (0,*) __FILE__,__LINE__,"iv%info(ssmi_rv)%j(1,:)",iv%info(ssmi_rv)%j(1,:)
    do i=1,num_ob_indexes
-      call da_store_obs_grid_info_new (iv%info(i))
+      if (iv%info(i)%nlocal > 0) then
+         call da_store_obs_grid_info_new (iv%info(i))
+      end if
    end do
+write (0,*) __FILE__,__LINE__,"iv%info(ssmi_rv)%proc_domain(1,:)",iv%info(ssmi_rv)%proc_domain(1,:)
 
    do n=1, iv%info(satem)%nlocal
       call da_store_obs_grid_info (iv%satem(n)%loc)

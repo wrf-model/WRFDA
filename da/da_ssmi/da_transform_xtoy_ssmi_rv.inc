@@ -17,6 +17,8 @@ subroutine da_transform_xtoy_ssmi_rv(grid, iv, y)
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_ssmi_rv")
 
+write (0,*) __FILE__,__LINE__,iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
+
    ! SSMI observation operator y = H(x):
 
    allocate (tpw(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))

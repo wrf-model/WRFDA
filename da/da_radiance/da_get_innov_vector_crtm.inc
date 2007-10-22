@@ -332,22 +332,22 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id 
             Surface(1)%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)
          end if
-write (0,*) "n",n
-write (0,*) "sum(Atmosphere(1)%Temperature)",sum(Atmosphere(1)%Temperature)
-write (0,*) "sum(Atmosphere(1)%Absorber(:,1))",sum(Atmosphere(1)%Absorber(:,1))
+!write (0,*) "n",n
+!write (0,*) "sum(Atmosphere(1)%Temperature)",sum(Atmosphere(1)%Temperature)
+!write (0,*) "sum(Atmosphere(1)%Absorber(:,1))",sum(Atmosphere(1)%Absorber(:,1))
 !write (0,*) "sum(Atmosphere(1)%Cloud(1)%Water_Content)",sum(Atmosphere(1)%Cloud(1)%Water_Content)
 !write (0,*) "sum(Atmosphere(1)%Cloud(2)%Water_Content)",sum(Atmosphere(1)%Cloud(2)%Water_Content)
 !write (0,*) "sum(Atmosphere(1)%Cloud(3)%Water_Content)",sum(Atmosphere(1)%Cloud(3)%Water_Content)
 !write (0,*) "sum(Atmosphere(1)%Cloud(4)%Water_Content)",sum(Atmosphere(1)%Cloud(4)%Water_Content)
 !write (0,*) "sum(Atmosphere(1)%Cloud(5)%Water_Content)",sum(Atmosphere(1)%Cloud(5)%Water_Content)
-write (0,*) "sum(Atmosphere(1)%Level_Pressure)",sum(Atmosphere(1)%Level_Pressure)
-write (0,*) "sum(Atmosphere(1)%Pressure)",sum(Atmosphere(1)%Pressure)
-write (0,*) "Surface(1)%Land_Temperature)",Surface(1)%Land_Temperature
-write (0,*) "Surface(1)%Soil_Temperature)",Surface(1)%Soil_Temperature
-write (0,*) "Surface(1)%Snow_Temperature)",Surface(1)%Snow_Temperature
-write (0,*) "Surface(1)%Ice_Temperature)",Surface(1)%Ice_Temperature
-write (0,*) "Surface(1)%Wind_Speed)",Surface(1)%Wind_Speed
-write (0,*) "Surface(1)%Vegetation_Fraction)",Surface(1)%Vegetation_Fraction
+!write (0,*) "sum(Atmosphere(1)%Level_Pressure)",sum(Atmosphere(1)%Level_Pressure)
+!write (0,*) "sum(Atmosphere(1)%Pressure)",sum(Atmosphere(1)%Pressure)
+!write (0,*) "Surface(1)%Land_Temperature)",Surface(1)%Land_Temperature
+!write (0,*) "Surface(1)%Soil_Temperature)",Surface(1)%Soil_Temperature
+!write (0,*) "Surface(1)%Snow_Temperature)",Surface(1)%Snow_Temperature
+!write (0,*) "Surface(1)%Ice_Temperature)",Surface(1)%Ice_Temperature
+!write (0,*) "Surface(1)%Wind_Speed)",Surface(1)%Wind_Speed
+!write (0,*) "Surface(1)%Vegetation_Fraction)",Surface(1)%Vegetation_Fraction
 
          ! [1.3] Call RTM foreward model
          call da_crtm_direct(1, nchanl, 1, Atmosphere,   &
