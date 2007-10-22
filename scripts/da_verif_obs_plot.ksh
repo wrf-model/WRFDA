@@ -90,7 +90,7 @@ cat >> namelist.plot_diag << EOF
    file_path_string = '${FILE_PATH_STRING}' /
 EOF
 
-ln -sf ${WRFVAR_DIR}/build/da_verif_obs.exe .
+ln -sf $BUILD_DIR/da_verif_obs.exe .
 
 nfile=$(ls *omb.diag 2>/dev/null | wc -l)
 if [[ $nfile -eq 0 ]]; then

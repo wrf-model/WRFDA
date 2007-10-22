@@ -108,7 +108,7 @@ EOF
 #------------
 # Making full namelist file
 #--------------------------------------------------
-ln -sf ${WRFVAR_DIR}/build/da_verif_anal.exe .
+ln -sf $BUILD_DIR/da_verif_anal.exe .
 #
 ./da_verif_anal.exe  
  RC=$?

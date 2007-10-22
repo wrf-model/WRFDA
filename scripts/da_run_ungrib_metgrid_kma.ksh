@@ -88,7 +88,7 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
 
 #  Move to next forecast hour:
 
-   export DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+   export DATE=`$BUILD_DIR/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
    export FCST_HOUR=`expr $FCST_HOUR + $LBC_FREQ`
 
 done

@@ -116,7 +116,7 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
 
 	# Need to run ungrib for every 3 hour separately, so re-organize the namelist.
 
-	export DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+	export DATE=`$BUILD_DIR/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
 
 	${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 	cp namelist.wps namelist.wps.$FG_TYPE

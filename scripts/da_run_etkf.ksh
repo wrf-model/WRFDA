@@ -47,7 +47,7 @@ date
 mkdir -p $WORK_DIR
 cd $WORK_DIR
 
-export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$FCST_RANGE)
+export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$FCST_RANGE)
 export YYYY=$(echo $DATE | cut -c1-4)
 export MM=$(echo $DATE | cut -c5-6)
 export DD=$(echo $DATE | cut -c7-8)
@@ -119,7 +119,7 @@ cat > gen_be_ensmean_nl.nl << EOF
     cv = ${CV} /
 EOF
 
-ln -fs $WRFVAR_DIR/build/gen_be_ensmean.exe .
+ln -fs $BUILD_DIR/gen_be_ensmean.exe .
 ./gen_be_ensmean.exe > gen_be_ensmean.out 2>&1
 
 cp gen_be_ensmean.out $RUN_DIR_SAVE
@@ -160,7 +160,7 @@ cat > gen_be_etkf_nl.nl << EOF
     rhoinput = ${RHOINPUT} /
 EOF
 
-ln -fs $WRFVAR_DIR/build/gen_be_etkf.exe .
+ln -fs $BUILD_DIR/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
 cp gen_be_etkf.out $RUN_DIR_SAVE

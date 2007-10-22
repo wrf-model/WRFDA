@@ -175,15 +175,18 @@ wrfvar : setup da_wrfvar.exe da_advance_time.exe da_update_bc.exe
 wrfvar_esmf : setup da_wrfvar_esmf.exe da_advance_time.exe da_update_bc.exe
 
 da_wrfvar.exe : $(WRFVAR_LIBS) da_wrfvar_main.o
-	$(LD) -o da_wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+	$(LD) -o $@ $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_wrfvar_esmf.exe : $(WRFVAR_LIBS) da_wrfvar_esmf.o da_wrfvar_esmf_super.o
-	$(LD) -o da_wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
+	$(LD) -o $@ $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o
+	(cd ../da; $(LN) ../build/$@.exe .)
 
 da_advance_time.exe : da_advance_time.o
 	$(RM) $@
 	$(SFC) $(LDFLAGS) -o $@ da_advance_time.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
@@ -206,41 +209,52 @@ da_utils : setup \
 
 da_verif_obs.exe : da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
 	$(SFC) -o $@ da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_verif_anal.exe : da_verif_anal.o da_verif_anal_control.o da_netcdf_interface.o $(NETCDF_LIBS)
 	$(SFC) $(LDFLAGS) -o $@ da_verif_anal.o da_netcdf_interface.o \
            da_verif_anal_control.o $(NETCDF_LIB) $(LOCAL_LIB)
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_tune_obs_hollingsworth1.exe: da_tune_obs_hollingsworth1.o
 	$(SFC) -o $@ da_tune_obs_hollingsworth1.o da_control.o \
 	   module_driver_constants.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.o
 	$(SFC) -o $@ da_tune_obs_hollingsworth2.o da_control.o \
 	    module_driver_constants.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_tune_obs_desroziers.exe: da_tune_obs_desroziers.o
 	$(SFC) -o $@ da_tune_obs_desroziers.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_update_bc.exe : da_update_bc.o libwrfio_nf.a
 	$(SFC) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
 	$(FFC) -o  da_bias_airmass.exe da_bias_airmass.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_bias_sele.exe : da_bias_sele.o rad_bias.o
 	$(FFC) -o da_bias_sele.exe da_bias_sele.o rad_bias.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_bias_scan.exe : da_bias_scan.o rad_bias.o
 	$(FFC) -o da_bias_scan.exe da_bias_scan.o rad_bias.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_bias_verif.exe : da_bias_verif.o rad_bias.o
 	$(FFC) -o da_bias_verif.exe da_bias_verif.o rad_bias.o
+	(cd ../da; $(LN) ../build/$@ .)
 
 da_rad_diags.exe : da_rad_diags.o $(NETCDF_LIBS)
 	$(FFC) -o da_rad_diags.exe da_rad_diags.o -L. $(NETCDF_LIB) 
+	(cd ../da; $(LN) ../build/$@ .)
 
 
 # Special cases, either needing special include files or too big to 

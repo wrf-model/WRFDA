@@ -132,7 +132,7 @@ if $LINK_DATA; then
       fi
       cd $DIAG_RUN_DIR/$DATE
       ln -sf $VAR_RUN_DIR1/$DATE/$VAR_RUN_DIR2/$FILE_PREFIX* .
-      DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD)
+      DATE=$($BUILD_DIR/da_advance_time.exe $DATE $CYCLE_PERIOD)
    done
 fi
 
@@ -143,7 +143,7 @@ cd $DIAG_RUN_DIR
 #---------------------------------------------------------------------
 #
 if $PROC_DATA; then
-   ln -sf $WRFVAR_DIR/build/da_rad_diags.exe ./da_rad_diags.exe
+   ln -sf $BUILD_DIR/da_rad_diags.exe ./da_rad_diags.exe
 
 #
 # create namelist
