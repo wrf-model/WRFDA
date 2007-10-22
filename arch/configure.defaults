@@ -161,35 +161,6 @@ arch :
 		$(LN) $(RSL_STUBS)/* .
 		@ touch arch
 	
-###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI compilers, SM         (OpenMP) EXPERIMENTAL
-#
-FC              = pgf90
-FFC             = $(FC)
-SFC             = $(FC)
-CC              = gcc
-CC_TOOLS        = $(CC)
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -D_OPENMP
-
-FCOPTIM         =
-FCDEBUG         =
-FCTYPE          = -r$(RWORDSIZE)
-FCFREE          = -Mfree
-FCFIXED         = -Mfixed
-FCENDIAN        = -byteswapio
-EXTRA_FCFLAGS   = -Ktrap=fp -mp
-EXTRA_LDFLAGS   = -mp
-
-LOCAL_LIB       = -L/usr/local/lib
-
-arch : 
-		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, GNU compilers, serial     (Single-threaded)
