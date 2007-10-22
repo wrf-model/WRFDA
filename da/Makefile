@@ -1132,16 +1132,17 @@ da_wrfvar_top.o : esmf_time da_wrfvar_top.f90 \
                       da_tracing.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_top.f90 > da_wrfvar_top.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) \
-                           -I../external/esmf_time_f90 da_wrfvar_top.f
+                           $(ESMF_INC) da_wrfvar_top.f
 
-da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
-                             da_esmf_init.inc \
-                             da_esmf_run.inc \
-                             da_esmf_finalize.inc \
-                             da_wrfvar_interface.inc \
-                             da_wrfvar_io.o
-			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_esmf_super.f90 > da_wrfvar_esmf_super.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_esmf_super.f
+# Never worked
+#da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
+#                             da_esmf_init.inc \
+#                             da_esmf_run.inc \
+#                             da_esmf_finalize.inc \
+#                             da_wrfvar_interface.inc \
+#                             da_wrfvar_io.o
+#			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_esmf_super.f90 > da_wrfvar_esmf_super.f
+#			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_esmf_super.f
 
 da_tracing.o:           da_tracing.f90           \
                         da_trace_init.inc      \
