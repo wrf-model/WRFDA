@@ -55,8 +55,8 @@ OBJS_FOR_ALL =		da_memory.o             \
 			gsi_thinning.o		\
                         da_wrfvar_top.o         \
                         da_wrfvar_io.o          \
-                        da_verif_init.o         \
                         da_verif_control.o      \
+                        da_verif_init.o         \
                         da_reporting.o          \
                         da_airsr.o              \
                         da_transfer_model.o     \
