@@ -6,7 +6,7 @@ RM      =       rm -f
 
 MODULES = module_init_utilities.o
  
-LIBTARGET    =  dyn_em
+LIBTARGET    =  dyn_share
 TARGETDIR    =  ./
 $(LIBTARGET) :  $(MODULES)
 		$(AR) ../main/libwrflib.a $(MODULES)

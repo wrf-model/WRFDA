@@ -73,6 +73,8 @@ all_wrfvar :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_share
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_em
 	( cd da; make -r all_wrfvar )
 
 be : 
@@ -359,10 +361,6 @@ dyn_share :
 em_core :
 	@ echo '--------------------------------------'
 	( cd dyn_em ; $(MAKE) )
-
-wrfvar_code :
-	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" all_wrfvar )
 
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :

@@ -52,15 +52,50 @@ OBJS_FOR_ALL =		da_memory.o             \
 			da_crtm.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
+			gsi_thinning.o		\
                         da_wrfvar_top.o         \
                         da_wrfvar_io.o          \
+                        da_verif_init.o         \
+                        da_verif_control.o      \
                         da_reporting.o          \
-                        da_airsr.o
+                        da_airsr.o              \
+                        da_transfer_model.o     \
+                        da_obs_io.o             \
+                        da_rttov.o              \
+                        da_tools_serial.o       \
+                        da_gen_be.o             \
+                        da_etkf.o               \
+                        da_be_spectral.o        \
+                        da_netcdf_interface.o   \
+                        da_verif_anal_control.o \
+                        da_verif_obs_control.o  \
+                        da_verif_obs_init.o     \
+                        module_ssmi.o           \
+                        module_ffts.o           \
+                        f_qv_from_rh.o          \
+                        rad_bias.o              \
+                        regress_one.o           \
+                        tqli.o                  \
+                        tred2.o                 \
+                        pythag.o
 
 TARGETDIR    =  ../..
 
-all_wrfvar :	links $(OBJS_FOR_ALL)
-		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
+all_wrfvar : da_wrfvar.exe \
+             da_advance_time.exe \
+             da_bias_airmass.exe \
+             da_bias_verif.exe \
+             da_bias_sele.exe \
+             da_bias_scan.exe \
+             da_verif_obs.exe \
+             da_verif_anal.exe \
+             da_tune_obs_desroziers.exe \
+             da_tune_obs_hollingsworth1.exe \
+             da_tune_obs_hollingsworth2.exe \
+             da_rad_diags.exe 
+
+wrfvar_lib : links $(OBJS_FOR_ALL)
+	$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
 
 links :
 	@ $(LN) */*.inc .
@@ -79,7 +114,7 @@ clean:
 superclean : clean
 	@ $(RM) mpif.h
 	@ $(RM) *.inc
-	@ $(RM) *.f90 *.c *.m4
+	@ $(RM) *.f90 *.c *.m4 *.exe
 
 da_generic_boilerplate.inc:	da_generic_boilerplate.m4
 			$(RM) da_generic_boilerplate.inc
@@ -164,6 +199,11 @@ da_transfer_model.o:	da_transfer_model.f90
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_transfer_model.f90 > da_transfer_model.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_transfer_model.f
+
+da_netcdf_interface.o:	da_netcdf_interface.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc -I$(NETCDF)/include da_netcdf_interface.f90 > da_netcdf_interface.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_netcdf_interface.f
 
 da_setup_structures.o:	da_setup_structures.f90 \
 			da_obs_io.o \
@@ -1072,7 +1112,7 @@ da_etkf.o:	        da_etkf.f90 \
                         da_matmultiover.inc \
 			da_solve_etkf.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_etkf.f90 > da_etkf.f
-			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_etkf.f
+			$(FC) -c $(FCFLAGS) -I$(NETCDF)/include -I../frame  $(PROMOTION) da_etkf.f
 
 da_gen_be.o:	        da_gen_be.f90 \
 			da_control.o			\
@@ -1095,8 +1135,8 @@ da_gen_be.o:	        da_gen_be.f90 \
 			da_readwrite_be_stage3.inc    \
 			da_readwrite_be_stage4.inc    \
 			da_stage0_initialize.inc 
-			$(CPP) $(CPPFLAGS) -I../inc da_gen_be.f90 > da_gen_be.f
-			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_gen_be.f
+			$(CPP) $(CPPFLAGS) -I../inc -I$(NETCDF)/include da_gen_be.f90 > da_gen_be.f
+			$(FC) -c $(FCFLAGS) -I$(NETCDF)/include -I../frame  $(PROMOTION) da_gen_be.f
 
 da_spectral.o:		da_spectral.f90             \
 			da_control.o		    \
@@ -1132,7 +1172,7 @@ da_wrfvar_top.o : esmf_time da_wrfvar_top.f90 \
                       da_tracing.o
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_top.f90 > da_wrfvar_top.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) \
-                           $(ESMF_INC) da_wrfvar_top.f
+                           $(ESMF_IO_INC) da_wrfvar_top.f
 
 # Never worked
 #da_wrfvar_esmf_super.o : da_wrfvar_esmf_super.f90 \
@@ -1166,7 +1206,7 @@ da_reporting.o:         da_control.o \
 			$(CPP) $(CPPFLAGS) -I../inc da_reporting.f90 > da_reporting.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_reporting.f
 
-be_spectral.o:		da_be_spectral.f90          \
+da_be_spectral.o:	da_be_spectral.f90          \
 			da_control.o	            \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
@@ -1254,45 +1294,61 @@ gsi_constants.o:	gsi_constants.f90 \
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_constants.f90 > gsi_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_constants.f
 
-da_wrfvar.exe:	        da_wrfvar.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_main.f90 > da_wrfvar_main.f
-			$(FC) -o da_wrfvar.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_main.f
+da_wrfvar.exe:	        wrfvar_lib da_wrfvar_main.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_main.f90 > da_wrfvar_main.f
+	$(FC) -o da_wrfvar.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(ESMF_IO_INC) \
+            -L$(LAPACK) -llapack -L$(BLAS) -lblas $(PROMOTION) $(LIB) -L../main -lwrflib da_wrfvar_main.f
 
-da_advance_time.exe:   da_advance_time.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_advance_time.f90 > da_advance_time.f
-			$(FC) -o da_advance_time.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_advance_time.f
+da_advance_time.exe:    wrfvar_lib da_advance_time.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_advance_time.f90 > da_advance_time.f
+	$(SFC) -o da_advance_time.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_advance_time.f
 
-da_bias_airmass.exe:	da_bias_airmass.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_bias_airmass.f90 > da_bias_airmass.f
-			$(FC) -o da_bias_airmass.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_airmass.f
+da_bias_airmass.exe:	wrfvar_lib da_bias_airmass.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_bias_airmass.f90 > da_bias_airmass.f
+	$(SFC) -o da_bias_airmass.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_airmass.f
 
-da_bias_verif.exe:	da_bias_verif.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_bias_verif.f90 > da_bias_verif.f
-			$(FC) -o da_bias_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_verif.f
+da_bias_verif.exe:	wrfvar_lib da_bias_verif.f90 wrfvar_lib
+	$(CPP) $(CPPFLAGS) -I../inc da_bias_verif.f90 > da_bias_verif.f
+	$(SFC) -o da_bias_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_verif.f
 
-da_bias_sele.exe:	da_bias_sele.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_bias_sele.f90 > da_bias_sele.f
-			$(FC) -o da_bias_sele.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_sele.f
+da_bias_sele.exe:	wrfvar_lib da_bias_sele.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_bias_sele.f90 > da_bias_sele.f
+	$(SFC) -o da_bias_sele.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_sele.f
 
-da_verif.exe:	        da_verif.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_verif.f90 > da_verif.f
-			$(FC) -o da_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_verif.f
+da_bias_scan.exe:	wrfvar_lib da_bias_scan.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_bias_scan.f90 > da_bias_scan.f
+	$(SFC) -o da_bias_scan.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_scan.f
 
-da_tune_obs_desroziers.exe: da_tune_obs_desroziers.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_desroziers.f90 > da_tune_obs_desroziers.f
-			$(FC) -o da_tune_obs_desroziers.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_desroziers.f
+da_verif_obs.exe:        wrfvar_lib da_verif_obs.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_verif_obs.f90 > da_verif_obs.f
+	$(SFC) -o da_verif_obs.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_verif_obs.f
 
-da_tune_obs_hollingsworth1.exe: da_tune_obs_hollingsworth1.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth1.f90 > da_tune_obs_hollingsworth1.f
-			$(FC) -o da_tune_obs_hollingsworth1.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_hollingsworth1.f
+da_verif_anal.exe:       wrfvar_lib da_verif_anal.f90
+	$(CPP) $(CPPFLAGS) -I../inc  -I$(NETCDF)/include  da_verif_anal.f90 > da_verif_anal.f
+	$(SFC) -o da_verif_anal.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib $(LIB) da_verif_anal.f
 
-da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth2.f90 > da_tune_obs_hollingsworth2.f
-			$(FC) -o da_tune_obs_hollingsworth2.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_hollingsworth2.f
+da_tune_obs_desroziers.exe: wrfvar_lib da_tune_obs_desroziers.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_desroziers.f90 > da_tune_obs_desroziers.f
+	$(SFC) -o da_tune_obs_desroziers.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_tune_obs_desroziers.f
 
-da_rad_diags.exe: da_rad_diags.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_rad_diags.f90 > da_rad_diags.f
-			$(FC) -o da_rad_diags.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_rad_diags.f
+da_tune_obs_hollingsworth1.exe: wrfvar_lib da_tune_obs_hollingsworth1.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth1.f90 > da_tune_obs_hollingsworth1.f
+	$(SFC) -o da_tune_obs_hollingsworth1.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_tune_obs_hollingsworth1.f
+
+da_tune_obs_hollingsworth2.exe: wrfvar_lib da_tune_obs_hollingsworth2.f90
+	$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth2.f90 > da_tune_obs_hollingsworth2.f
+	$(SFC) -o da_tune_obs_hollingsworth2.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_tune_obs_hollingsworth2.f
+
+da_rad_diags.exe: wrfvar_lib da_rad_diags.f90
+	$(CPP) $(CPPFLAGS) -I../inc -I$(NETCDF)/include da_rad_diags.f90 > da_rad_diags.f
+	$(SFC) -o da_rad_diags.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_rad_diags.f $(LIB)
+
+da_rad_diags.exe: wrfvar_lib da_rad_diags.f90
+	$(CPP) $(CPPFLAGS) -I../inc -I$(NETCDF)/include da_rad_diags.f90 > da_rad_diags.f
+	$(SFC) -o da_rad_diags.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_rad_diags.f $(LIB)
+
+gen_be_ensmean.exe : gen_be_ensmean.o $(GEN_BE_OBJS) $(GEN_BE_LIBS)
+	$(SFC) -o gen_be_ensmean.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_ensmean.o $(GEN_BE_LIB)
 
 ##############################################################################
 
