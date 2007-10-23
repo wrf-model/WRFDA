@@ -2,7 +2,6 @@
 #
 # Configuration script for WRFVAR code
 
-$sw_devtop = `pwd` ;
 $sw_registry = "" ;
 $sw_em_core = "" ;
 $sw_da_core = "" ;
@@ -240,7 +239,6 @@ open CONFIGURE_PREAMBLE, "< ./arch/preamble"
 $latchon = 0 ;
 while ( <CONFIGURE_PREAMBLE> ) {
 
-  $_ =~ s/CONFIGURE_DEVTOP/$sw_devtop/g ;
   $_ =~ s/CONFIGURE_PERL_PATH/$sw_perl_path/g ;
   $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
   $_ =~ s/CONFIGURE_COREFLAGS/$sw_coreflags/g ;

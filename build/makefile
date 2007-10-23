@@ -70,7 +70,7 @@ WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
 GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
         $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
-depend : links arch registry module_state_description.F md_calls.inc \
+depend : links local registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	makedepf90 -free $(FPPFLAGS) *.F *.f90 *.F90 2>/dev/null > depend.txt
 	touch depend
@@ -121,7 +121,7 @@ superclean : clean
           *.bsh *.csh Utl* macros_utl module_dm_warning \
           scl_plotting_routines \
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
-          da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
+          da_macros_utl links local README* TEST_RESULTS g2lib grib1_util \
           landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \
           depend depend.txt ../main/*exe ../inc/namelist_script.inc \
           wrf-phdf5attr.F90btg KPP Makefile INSTALL.htm

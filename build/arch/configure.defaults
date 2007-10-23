@@ -37,8 +37,8 @@ MPI_LIB         = -lrsl_lite
 
 # Architecture
 
-arch : rsl_lite.a
-	@ touch arch
+local : rsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compilers, serial     (Single-threaded)
@@ -65,9 +65,9 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compilers, debug      (RSL_LITE, MPI)
@@ -97,8 +97,8 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compilers, optimised  (RSL_LITE, MPI)
@@ -128,8 +128,8 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compilers, SM         (OpenMP) EXPERIMENTAL
@@ -157,9 +157,9 @@ EXTRA_LDFLAGS   = -mp
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 	
 
 ###########################################################
@@ -187,9 +187,9 @@ FCTYPE          = -r$(RWORDSIZE)
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, GNU compilers, debug      (RSL_LITE, MPI)
@@ -223,8 +223,8 @@ CCOPTIM         =
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, GNU compilers, optimised  (RSL_LITE, MPI)
@@ -256,8 +256,8 @@ CCOPTIM         = -O2
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, Intel compilers, serial   (Single-threaded) untested
@@ -284,9 +284,9 @@ FCTYPE          = -r$(RWORDSIZE)
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, Intel compilers, debug    (RSL_LITE, MPI) untested
@@ -315,8 +315,8 @@ FCTYPE          = -r$(RWORDSIZE)
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, Intel compilers, optimised(RSL_LITE, MPI) untested
@@ -345,8 +345,8 @@ FCTYPE          = -r$(RWORDSIZE)
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch	
+local : librsl_lite.a
+	@ touch local	
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, gfortran, serial          (Single-threaded) EXPERIMENTAL
@@ -373,9 +373,9 @@ FCTYPE          = -fdefault-real-$(RWORDSIZE)
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compilers, serial             (Single-threaded)
@@ -402,9 +402,9 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch :
+local :
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compilers, debug              (RSL_LITE, MPI)
@@ -435,8 +435,8 @@ EXTRA_LDFLAGS   = -V
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compilers, optimised          (RSL_LITE, MPI)
@@ -465,8 +465,8 @@ FCENDIAN        = -byteswapio
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Pathscale compilers, serial       (Single-threaded) untested
@@ -492,9 +492,9 @@ EXTRA_FCFLAGS   = -fno-second-underscore
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Pathscale compilers, debug        (RSL_LITE, MPI) untested
@@ -523,8 +523,8 @@ EXTRA_FCFLAGS   = -fno-second-underscore
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Pathscale compilers, optimised    (RSL_LITE, MPI) untested
@@ -553,8 +553,8 @@ EXTRA_FCFLAGS   = -fno-second-underscore
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Intel compilers, serial           (Single-threaded) untested
@@ -580,9 +580,9 @@ FCENDIAN        = -convert big_endian
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch :
+local :
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Intel compilers, debug            (RSL_LITE, MPI) untested
@@ -612,8 +612,8 @@ FCENDIAN        = -convert big_endian
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, Intel compilers, optimised        (RSL_LITE, MPI) untested
@@ -642,8 +642,8 @@ FCENDIAN        = -convert big_endian
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 
@@ -674,9 +674,9 @@ EXTRA_CCFLAGS   = -w -64 -mips4 -DUNDERSCORE -DIRIX
 
 LOCAL_LIB       = 
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for SGI O2K DM IRIX64, optimised                       (RSL_LITE, SGI-MPI) untested
@@ -709,8 +709,8 @@ EXTRA_CCFLAGS   = -w -64 -mips4 -DIRIX
 LOCAL_LIB       = 
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, Intel compilers, optimised (RSL_LITE, SGI-MPI) untested
@@ -754,8 +754,8 @@ EXTRA_CCFLAGS   = -w -O3 -ip -tpp2 -c -ftz -no-gcc
 LOCAL_LIB       = 
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for NEC, serial                                        (single-threaded) untested
@@ -786,9 +786,9 @@ EXTRA_FCFLAGS   = -C hopt \
 		  -Wf"-init stack=zero heap=zero -pvctl loopcnt=100000000 noassume -O nooverlap" \
                   -pi -ew -eb -float0 -Wf"-L fmtlist"
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for AIX, IBM compilers, serial                         (single-threaded)
@@ -819,9 +819,9 @@ EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for AIX, IBM compilers, debug                          (RSL_LITE, IBM-MPI)
@@ -858,8 +858,8 @@ EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for AIX, IBM compilers, optimised                      (RSL_LITE, IBM-MPI)
@@ -894,8 +894,8 @@ EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for AIX, IBM compilers, SM                             (OpenMP) EXPERIMENTAL
@@ -926,9 +926,9 @@ EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000 -qsmp=noauto:noopt
 
 LOCAL_LIB       = -lmass -lmassv
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for cray_x1 UNICOS/mp CRAY X1, serial                  (Single-threaded) 
@@ -962,9 +962,9 @@ EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
 # Cray linker very fussy about availablity of modules, so give it a very wide scope
 LOCAL_LIB       = 
 
-arch : 
+local : 
 	$(LN) $(RSL_STUBS)/* .
-	@ touch arch
+	@ touch local
 
 ###########################################################
 #ARCH Settings for cray_x1 UNICOS/mp CRAY X1, debug                   (RSL_LITE, Cray MPI)
@@ -1005,8 +1005,8 @@ EXTRA_LDFLAGS   = -V
 LOCAL_LIB       = 
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for cray_x1 UNICOS/mp CRAY X1, optimised               (RSL_LITE, Cray MPI)
@@ -1043,8 +1043,8 @@ EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
 LOCAL_LIB       = 
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, GNU compilers, serial                      (single-threaded)
@@ -1075,9 +1075,9 @@ EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, GNU compilers, debug                       (RSL_LITE, MPI)
@@ -1113,8 +1113,8 @@ EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -I/usr/include/sys
 LOCAL_LIB       = -lSystemStubs
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, GNU compilers, optimised                   (RSL_LITE, MPI)
@@ -1149,8 +1149,8 @@ CCOPTIM         = -O2
 LOCAL_LIB       = -lSystemStubs
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, PGI compilers, serial                      (Single-threaded)
@@ -1181,9 +1181,9 @@ EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -L/usr/local/lib
 
-arch : 
+local : 
 		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
+		@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, PGI compilers, debug                       (RSL_LITE, MPI)
@@ -1217,8 +1217,8 @@ EXTRA_CCFLAGS   = -DDM_PARALLEL $(WORDSIZE_DEF) -DMACOS -I/usr/include/sys
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH Settings for Darwin, PGI compilers, optimised                   (RSL_LITE, MPI)
@@ -1252,8 +1252,8 @@ EXTRA_CCFLAGS   = -DMACOS -I/usr/include/sys
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
 
-arch : librsl_lite.a
-	@ touch arch
+local : librsl_lite.a
+	@ touch local
 
 ###########################################################
 #ARCH  NULL

@@ -29,7 +29,6 @@ MAX_PROC    = 1024
 
 # Substituted by Config.pl
 
-DEVTOP        = CONFIGURE_DEVTOP
 PERL          = CONFIGURE_PERL_PATH
 REGISTRY      = CONFIGURE_REGISTRY
 NETCDF_PATH   = CONFIGURE_NETCDF_PATH
@@ -102,7 +101,7 @@ DEFAULT_FPPFLAGS = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
 DEFAULT_CCFLAGS = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF CONFIGURE_WRFIO_PNF CONFIGURE_WRFIO_PHDF5 \
                  CONFIGURE_WRFIO_GRIB1 CONFIGURE_WRFIO_GRIB2 wrfio_int
-INCS        = -I. -I./inc -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) \
+INCS        = -I. -I./inc -I../inc -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) \
    -I$(FFTPACK_INC) -I$(HDF4_INC) -I$(PNETCDF_INC) -I$(PHDF5_INC) -I$(CRTM_INC) \
    -I$(RTTOV_INC)
 DEFAULT_LDFLAGS = CONFIGURE_LDFLAGS
@@ -119,27 +118,26 @@ SOLVER=CONFIGURE_SOLVER
 
 # Short cuts to directories
 
-ARCH      = $(DEVTOP)/arch
-BUILD     = $(DEVTOP)/build
-CHEM      = $(DEVTOP)/chem
-CONVERTOR = $(DEVTOP)/convertor
-DA        = $(DEVTOP)/da
-DYN_SHARE = $(DEVTOP)/dyn_share
-DYN_NMM   = $(DEVTOP)/dyn_nmm
-DYN_EM    = $(DEVTOP)/dyn_em
-DYN_EXP   = $(DEVTOP)/dyn_exp
-DYNAMICS  = $(DEVTOP)/dyn_$(SOLVER)
-EXTERNAL  = $(DEVTOP)/external
-FRAME     = $(DEVTOP)/frame
-GEN_BE    = $(DEVTOP)/gen_be
-INC       = $(DEVTOP)/inc
-MAIN      = $(DEVTOP)/main
-PHYS      = $(DEVTOP)/phys
-RUN       = $(DEVTOP)/run
-SCRIPTS   = $(DEVTOP)/scripts
-SHARE     = $(DEVTOP)/share
-TEST      = $(DEVTOP)/test
-TOOLS     = $(DEVTOP)/tools
+ARCH      = arch
+CHEM      = ../chem
+CONVERTOR = ../convertor
+DA        = ../da
+DYN_SHARE = ../dyn_share
+DYN_NMM   = ../dyn_nmm
+DYN_EM    = ../dyn_em
+DYN_EXP   = ../dyn_exp
+DYNAMICS  = ../dyn_$(SOLVER)
+EXTERNAL  = ../external
+FRAME     = ../frame
+GEN_BE    = ../gen_be
+INC       = ../inc
+MAIN      = ../main
+PHYS      = ../phys
+RUN       = ../run
+SCRIPTS   = ../scripts
+SHARE     = ../share
+TEST      = ../test
+TOOLS     = ../tools
 
 IO_GRIB1      = $(EXTERNAL)/io_grib1
 IO_GRIB2      = $(EXTERNAL)/io_grib2
