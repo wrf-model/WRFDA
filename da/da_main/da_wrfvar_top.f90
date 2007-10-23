@@ -23,19 +23,12 @@ module da_wrfvar_top
    use module_tiles, only : set_tiles
 
 #ifdef DM_PARALLEL
-#ifdef RSL_LITE
    use module_dm, only : local_communicator, local_communicator_x, &
       local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy,wrf_dm_initialize
    use module_comm_dm, only : halo_radar_xa_w_sub,halo_ssmi_xa_sub, &
       halo_sfc_xa_sub, halo_xa_sub, halo_psichi_uv_adj_sub, halo_bal_eqn_adj_sub, &
       halo_psichi_uv_sub, halo_init_sub, halo_psichi_uv_adj_sub, halo_2d_work_sub
-#else
-   use module_dm, only : invalid_message_value, glen,setup_xpose_rsl, &
-      add_msg_24pt_real,reset_msgs_24pt,stencil_24pt,setup_halo_rsl, &
-      reset_msgs_xpose, add_msg_xpose_real, define_xpose, add_msg_24pt_integer, &
-      wrf_dm_initialize
-#endif
 #endif
 
    ! too many namelist options to list

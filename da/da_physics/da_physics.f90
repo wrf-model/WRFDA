@@ -5,7 +5,7 @@ module da_physics
    !---------------------------------------------------------------------------
 
    use module_domain, only : domain, x_type
-#ifdef RSL_LITE
+#ifdef DM_PARALLEL
    use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, &
       ntasks_y, data_order_xyz
    use module_comm_dm, only : halo_bal_eqn_adj_sub

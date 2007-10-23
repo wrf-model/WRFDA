@@ -9,16 +9,9 @@ module da_par_util
    use module_domain, only : domain, xpose_type
 
 #ifdef DM_PARALLEL
-#ifdef RSL_LITE
    use module_dm, only : local_communicator_x, &
       local_communicator_y, ntasks_x, ntasks_y, data_order_xyz
    use da_par_util1, only : true_mpi_real, true_mpi_complex
-#else
-   use module_dm, only : io2d_ij_internal, io3d_ijk_internal, &
-      invalid_message_value, setup_xpose_rsl, define_xpose,reset_msgs_xpose, &
-      add_msg_xpose_real
-   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real
-#endif
    use mpi, only : mpi_2double_precision, mpi_status_size, &
       mpi_integer, mpi_maxloc, mpi_status_size, &
       mpi_minloc, mpi_sum
