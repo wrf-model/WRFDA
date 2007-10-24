@@ -385,7 +385,7 @@ nmm_core :
 
 toolsdir :
 	@ echo '--------------------------------------'
-	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" )
+	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" CFLAGS="$(COREDEFS)" )
 
 # Use this target to build stand-alone tests of esmf_time_f90.  
 # Only touches external/esmf_time_f90/.  
