@@ -114,8 +114,8 @@ until ( $validresponse ) {
   printf "Please select from among the following supported platforms.\n\n" ;
 
   $opt = 1 ;
-  open CONFIGURE_DEFAULTS, "< ./arch_old/configure.defaults" 
-      or die "Cannot open ./arch_old/configure.defaults for reading" ;
+  open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults" 
+      or die "Cannot open ./arch/configure.defaults for reading" ;
   while ( <CONFIGURE_DEFAULTS> )
   {
     if ( substr( $_, 0, 5 ) eq "#ARCH" && ( index( $_, $sw_os ) >= 0 ) && ( index( $_, $sw_mach ) >= 0 ) )
@@ -147,8 +147,8 @@ printf "------------------------------------------------------------------------
 
 $optchoice = $response ;
 
-open CONFIGURE_DEFAULTS, "< ./arch_old/configure.defaults" 
-      or die "Cannot open ./arch_old/configure.defaults for reading" ;
+open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults" 
+      or die "Cannot open ./arch/configure.defaults for reading" ;
 $latchon = 0 ;
 while ( <CONFIGURE_DEFAULTS> )
 {
@@ -254,11 +254,11 @@ close CONFIGURE_DEFAULTS ;
 #printf "Settings are written to the file configure.wrf here in the top-level\n" ;
 #printf "directory.  If you wish to change settings, please edit that file.\n" ;
 #printf "If you wish to change the default options, edit the file:\n\n" ;
-#printf "     arch_old/configure.defaults\n" ;
+#printf "     arch/configure.defaults\n" ;
 #printf "\n" ;
 
 open CONFIGURE_WRF, "> configure.wrf" or die "cannot append configure.wrf" ;
-open ARCH_PREAMBLE, "< arch_old/preamble" or die "cannot open arch_old/preamble" ;
+open ARCH_PREAMBLE, "< arch/preamble" or die "cannot open arch/preamble" ;
 my @preamble;
 # apply substitutions to the preamble...
 while ( <ARCH_PREAMBLE> )
@@ -289,7 +289,7 @@ print CONFIGURE_WRF @preamble  ;
 close ARCH_PREAMBLE ;
 printf CONFIGURE_WRF "# Settings for %s", $optstr[$optchoice] ;
 print CONFIGURE_WRF @machopts  ;
-open ARCH_POSTAMBLE, "< arch_old/postamble" or die "cannot open arch_old/postamble" ;
+open ARCH_POSTAMBLE, "< arch/postamble" or die "cannot open arch/postamble" ;
 while ( <ARCH_POSTAMBLE> ) { print CONFIGURE_WRF } ;
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;

@@ -73,6 +73,8 @@ all_wrfvar :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_share
+	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_em
 	( cd da; make -r all_wrfvar )
 
 be : 
@@ -360,10 +362,6 @@ em_core :
 	@ echo '--------------------------------------'
 	( cd dyn_em ; $(MAKE) )
 
-wrfvar_code :
-	@ echo '--------------------------------------'
-	( cd da; $(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES_2)" all_wrfvar )
-
 # rule used by configure to test if this will compile with MPI 2 calls MPI_Comm_f2c and _c2f
 mpi2_test :
 	@ cd tools ; /bin/rm -f mpi2_test ; $(CC) -c mpi2_test.c ; cd ..
@@ -387,7 +385,7 @@ nmm_core :
 
 toolsdir :
 	@ echo '--------------------------------------'
-	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" )
+	( cd tools ; $(MAKE) CC="$(CC_TOOLS)" CFLAGS="$(COREDEFS)" )
 
 # Use this target to build stand-alone tests of esmf_time_f90.  
 # Only touches external/esmf_time_f90/.  

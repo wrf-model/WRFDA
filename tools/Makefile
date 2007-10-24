@@ -1,7 +1,6 @@
 .SUFFIXES: .c .o
 
-CC = cc
-CFLAGS = #-ansi
+CC_TOOLS = cc
 LDFLAGS =
 DEBUG = -g 
 OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
@@ -10,10 +9,10 @@ OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
       gen_model_data_ord.o gen_interp.o gen_comms.o gen_scalar_derefs.o
 
 registry : $(OBJ)
-	$(CC) -o registry $(DEBUG) $(LDFLAGS) $(OBJ)
+	$(CC_TOOLS) -o registry $(DEBUG) $(LDFLAGS) $(OBJ)
 
 .c.o :
-	$(CC) $(CFLAGS) -c $(DEBUG) $<
+	$(CC_TOOLS) $(CFLAGS) -c $(DEBUG) $<
 
 clean:
 	/bin/rm -f $(OBJ) gen_comms.c

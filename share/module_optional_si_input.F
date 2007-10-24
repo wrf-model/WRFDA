@@ -1,4 +1,5 @@
 MODULE module_optional_si_input
+#ifndef DA_CORE
 
    INTEGER :: flag_metgrid  , flag_tavgsfc  , flag_psfc     , flag_soilhgt
 
@@ -1002,5 +1003,5 @@ USE module_io_domain
    END FUNCTION char2int2
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+#endif
 END MODULE module_optional_si_input
