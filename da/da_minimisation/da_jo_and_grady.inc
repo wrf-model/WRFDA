@@ -13,7 +13,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    type (y_type),  intent(out)  :: jo_grad_y   ! Grad_y(Jo)
 
 
-   real    :: jo_sound, jo_synop, jo_geoamv, jo_polaramv, &
+   real    :: jo_sound, jo_sonde_sfc,jo_synop, jo_geoamv, jo_polaramv, &
               jo_airep, jo_pilot, jo_satem, &
               jo_metar, jo_ships, jo_gpspw, &
               jo_ssmi_tb, jo_ssmi_rv, jo_ssmt1, jo_ssmt2, &
@@ -42,12 +42,12 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       end if
 
       call da_jo_and_grady_sonde_sfc(iv, re, jo, jo_grad_y)
-      jo_sound = jo_sound + jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
+      jo_sonde_sfc = jo_sound + jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
          jo%sonde_sfc_q + jo%sonde_sfc_p
 
       if (print_detail_grad) then
          write(unit=stdout, fmt='(a, e24.12)') &
-            '   jo_sound	     ', jo_sound, &
+            '   jo_sonde_sfc    ', jo_sonde_sfc,     &
             '   jo%sonde_sfc_u  ', jo%sonde_sfc_u, &
             '   jo%sonde_sfc_v  ', jo%sonde_sfc_v, &
             '   jo%sonde_sfc_t  ', jo%sonde_sfc_t, &
@@ -263,7 +263,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    ! [2.0] Jo = 1/2 * (yo-y)**2/ob_err_variance:
    !-------------------------------------------------------------------------
 
-   jo%total = jo_sound + jo_geoamv + jo_polaramv + jo_synop + jo_satem + &
+   jo%total = jo_sound + jo_sonde_sfc+jo_geoamv + jo_polaramv + jo_synop + jo_satem + &
       jo_pilot + jo_airep + jo_metar + jo_ships + &
       jo_gpspw + jo_ssmi_tb + jo_ssmi_rv + jo_ssmt1 + jo_ssmt2 + &
       jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
@@ -277,6 +277,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
       write(unit=stdout, fmt='(a, e24.12)') &
          '   jo_sound	     ', jo_sound, &
+         '   jo_sode_sfc     ', jo_sonde_sfc, &
          '   jo_geoamv       ', jo_geoamv, &
          '   jo_polaramv     ', jo_polaramv, &
          '   jo_synop	     ', jo_synop, &
