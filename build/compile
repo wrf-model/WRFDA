@@ -110,12 +110,11 @@ else
   echo "."
   echo " "
 
-  cd build
   # seperate setup stage for make programs that don't update include
   # files before using them. gnu make good. Aix make bad
   make links
   make depend
-  time make -j$COMPILE_PROCS $arglist A2DCASE="$A2DCASE"
+  time make -j$COMPILE_PROCS -r $arglist A2DCASE="$A2DCASE"
 
 endif
 
@@ -126,7 +125,7 @@ hlp:
 echo ' '
 echo 'Usage:'
 echo ' '
-echo '   compile wrf           compile wrf in build dir (NOTE: no real.exe, ndown.exe, or ideal.exe generated)'
+echo '   compile wrf           compile wrf dir (NOTE: no real.exe, ndown.exe, or ideal.exe generated)'
 echo ' '
 echo '   or choose a test case (see README_test_cases for details) :'
 foreach d ( `/bin/ls test` )

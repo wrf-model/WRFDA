@@ -492,9 +492,7 @@ fi
 
 export CONFIG=configure.wrfvar
 
-ln -fs $PWD/$CONFIG build
-
-touch -t01010101 build/depend.txt
+touch -t01010101 depend.txt
 
 # new feb 2005.  test whether MPI-2
 #if test -e $CONFIG ; then
