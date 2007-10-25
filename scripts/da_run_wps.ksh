@@ -55,7 +55,7 @@ if $DUMMY; then
       for DOMAIN in $DOMAINS; do
          echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
       done
-      LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
+      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
    done
 else
    if $RUN_GEOGRID; then
@@ -83,7 +83,7 @@ else
    FILES=''
    while [[ $LOCAL_DATE -le $END_DATE ]]; do
       FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-      LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
+      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
    done
    $WPS_DIR/link_grib.csh $FILES
 

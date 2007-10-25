@@ -30,7 +30,7 @@ if $NL_VAR4D ; then
             export MONTH=$(echo $DATE | cut -c5-6)
             export DAY=$(echo $DATE | cut -c7-8)
             export HOUR=$(echo $DATE | cut -c9-10)
-            export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+            export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
             export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
             export DA_ANALYSIS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
          else
@@ -78,7 +78,7 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d01
 else
 
-   ln -fs $WRFVAR_DIR/build/da_update_bc.exe .
+   ln -fs $BUILD_DIR/da_update_bc.exe .
    ./da_update_bc.exe
 
    RC=$?

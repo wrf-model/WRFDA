@@ -20,7 +20,6 @@ begin
    fcst_range = "T+12"
    expt = "etkf"
    file_type = "wrfout_d01_"
-   ; file_type = "wrf_3dvar_input_d01_"
    ; file_type = "wrfinput_d01"
    dir  = "/rap/datc/data/jme/" + expt + "/fc/" + date + "/"
    filename  = file_type + year + "-" + month + "-" + day + "_" + hour + ":00:00"

@@ -1,13 +1,13 @@
 #!/bin/ksh
 # da_update_html.ksh
 
-# Assuming starting from wrfvar/scripts directory
+# Assuming starting from ./scripts directory
 cd ..
 svn update
+cd build
 ./clean -a
 . ./setup.ksh gnu
 echo 3 | ./configure # optimised code
-cd build
 make -r setup
 ln -fs inc/* .
 # This file causes da_generate_html.pl to stall

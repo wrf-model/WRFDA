@@ -97,7 +97,7 @@ while [[ $DATE -le $END_DATE ]]; do
       exit 5       
    fi
 
-   export DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD)
+   export DATE=$($BUILD_DIR/da_advance_time.exe $DATE $CYCLE_PERIOD)
 done
 
 # append ***** to file end
@@ -107,7 +107,7 @@ echo "*****" >> ${FILE_Y}
 echo "*****" >> ${FILE_JO}
 echo "*****" >> ${FILE_RSLOUT}
 
-$WRFVAR_DIR/build/da_tune_obs_desroziers.exe > errfac.dat   
+$BUILD_DIR/da_tune_obs_desroziers.exe > errfac.dat   
 
 rm -rf fort.45 fort.46 fort.47 fort.48 fort.49
 

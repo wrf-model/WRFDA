@@ -1,7 +1,5 @@
 #!/bin/csh -f
 
-cd build
-
 cat > configure.wrfvar <<EOF
 RM=rm -rf
 EOF
@@ -11,8 +9,8 @@ if ( ! -f depend.txt ) then
 endif
 
 if ( "$1" == '-a' ) then
-  make superclean >/dev/null
+   make -r superclean >/dev/null
 else
-  make clean > /dev/null
+   make -r clean1 >/dev/null
 endif
 

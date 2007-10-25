@@ -81,7 +81,7 @@ export DATE=$INITIAL_DATE
 RC=0
 
 while [[ $DATE -le $FINAL_DATE ]] ; do 
-   export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+   export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
 
    if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
@@ -404,7 +404,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       fi
    fi
 
-   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
+   export NEXT_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
    let CYCLE_NUMBER=$CYCLE_NUMBER+1
 done

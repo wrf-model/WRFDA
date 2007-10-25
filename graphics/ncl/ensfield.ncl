@@ -20,7 +20,6 @@ begin
    hour = "12"
    expt = "test"
    file_type = "wrfout_d01_"
-   ; file_type = "wrf_3dvar_input_d01_"
    ; file_type = "wrfinput_d01"
 
    dir1 = "/rap/datc/data/jme/" + expt + "/fc/" + date1+ "/"
