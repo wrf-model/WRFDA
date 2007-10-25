@@ -107,13 +107,14 @@ libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
-clean : 
+# Must not call target clean, as there is a script of that name here
+clean1 : 
 	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
-          inc/dm_comm_cpp_flags
+          inc/dm_comm_cpp_flags testall.csh
 
-superclean : clean
+superclean : clean1
 	@ ( cd ../external; make superclean )
 	@ rm -rf *.exe *.f90 *.F90 *.F *.inc inc/*.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
