@@ -70,7 +70,7 @@ WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
 GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
         $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
-depend : links arch registry module_state_description.F md_calls.inc \
+depend : links local registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	makedepf90 -free $(FPPFLAGS) *.F *.f90 *.F90 2>/dev/null > depend.txt
 	touch depend
@@ -107,21 +107,22 @@ libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
-clean : 
+# Must not call target clean, as there is a script of that name here
+clean1 : 
 	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
-          inc/dm_comm_cpp_flags
+          inc/dm_comm_cpp_flags testall.csh
 
-superclean : clean
+superclean : clean1
 	@ ( cd ../external; make superclean )
 	@ rm -rf *.exe *.f90 *.F90 *.F *.inc inc/*.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
-          convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
-          *.bsh *.csh Utl* macros_utl module_dm_warning \
+          convert_tool kma_wave2grid wave2grid_kma version_decl \
+          Utl* macros_utl module_dm_warning \
           scl_plotting_routines \
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
-          da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
+          da_macros_utl links local README* TEST_RESULTS g2lib grib1_util \
           landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \
           depend depend.txt ../main/*exe ../inc/namelist_script.inc \
           wrf-phdf5attr.F90btg KPP Makefile INSTALL.htm

@@ -74,7 +74,7 @@ ELSE
 
 ! core specific initializations -- add new cores here
 #if (EM_CORE == 1)
-#  if ( DA_CORE != 1)
+#  if (DA_CORE != 1)
  CALL init_modules_em
 #  endif
 #endif

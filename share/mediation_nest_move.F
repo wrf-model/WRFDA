@@ -1,4 +1,4 @@
-
+#if (DA_CORE != 1)
 SUBROUTINE med_nest_move ( parent, nest )
   ! Driver layer
    USE module_domain
@@ -906,3 +906,4 @@ LOGICAL FUNCTION should_not_move ( id )
   should_not_move = retval
 END FUNCTION
 
+#endif
