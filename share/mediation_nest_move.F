@@ -1,4 +1,4 @@
-#ifndef DA_CORE
+#if (DA_CORE != 1)
 SUBROUTINE med_nest_move ( parent, nest )
   ! Driver layer
    USE module_domain

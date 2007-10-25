@@ -1,5 +1,5 @@
 MODULE module_optional_si_input
-#ifndef DA_CORE
+#if (DA_CORE != 1)
 
    INTEGER :: flag_metgrid  , flag_tavgsfc  , flag_psfc     , flag_soilhgt
 
