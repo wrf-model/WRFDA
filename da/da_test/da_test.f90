@@ -7,22 +7,19 @@ module da_test
    use module_configure, only : grid_config_rec_type,nl_set_dyn_opt
    use module_dm, only : wrf_dm_sum_real
 
-#ifdef RSL_LITE
+#ifdef DM_PARALLEL
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
    use module_comm_dm, only : halo_psichi_uv_adj_sub, halo_xa_sub, &
       halo_sfc_xa_sub, halo_ssmi_xa_sub
    use da_control, only : ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
+   use mpi, only : mpi_sum
 #endif
 
    use module_domain, only : vp_type, xb_type, x_type, ep_type, &
       domain
    use module_state_description, only : dyn_em,dyn_em_tl,dyn_em_ad,p_a_qv
-
-#ifdef DM_PARALLEL
-   use mpi, only : mpi_sum
-#endif
 
    use da_control, only : trace_use,ims,ime,jms,jme,kms,kme, &
       ierr, trace_use_dull, comm,global,stdout,rootproc, &

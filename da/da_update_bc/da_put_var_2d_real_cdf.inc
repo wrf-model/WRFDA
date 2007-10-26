@@ -9,7 +9,7 @@ subroutine da_put_var_2d_real_cdf(file, var, data, i1, i2, time, debug)
 #include "netcdf.inc"
 
    integer,            intent(in)  ::  i1, i2, time
-   character (len=80), intent(in) :: file
+   character (len=*),  intent(in) :: file
    logical,            intent(in) :: debug
    character (len=*),  intent(in) :: var
    real,               intent(in) :: data(i1,i2)

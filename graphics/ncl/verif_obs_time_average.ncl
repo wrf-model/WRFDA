@@ -1,22 +1,7 @@
 ;===========================================================================================;
-;  time_average.ncl
-;ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-; Copyright (C) 2006
-; University Corporation for Atmospheric Research
-; All Rights Reserved
-;ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-; Author: Ananda Kumar Das (Visiting Scientist)
-;         National Center for Atmospheric Research 
-;         Boulder, CO 80301  Date: 11/27/06
-; Purpose : Plots time averaged bar of verification scores
-; Updates:
-;
-;         06/08/2007  Hui Shao NCAR/RAL/DATC 
-;         (1) corrected data format
-;         (2) added AVG file type
-;
-;         08/31/2007      Syed RH Rizvi ,  MMM/NCAR
-;         Added parallel option for reading OMA along with OMB
+;  verif_anal_time_average.ncl
+; Author: Syed RH Rizvi  MMM/NCAR                 
+; Date  : 10/12/2007
 ;=========================================================;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
@@ -195,6 +180,9 @@ do iv = 1, nv
    end if
  end do
 end do
+
+   x@_FillValue = Fill_ValueI
+   y_bar@_FillValue = Fill_ValueF
 
 ;----------------------------------------------------------
  res                       = True                   ; plot mods desired

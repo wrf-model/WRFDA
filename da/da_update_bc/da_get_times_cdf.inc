@@ -10,7 +10,7 @@ subroutine da_get_times_cdf(file, times, n_times, max_times, debug)
 
    integer,            intent(in)  ::  max_times  
    integer,            intent(out) ::  n_times
-   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: file
    character (len=80), intent(out) :: times(max_times)
    logical,            intent(in)  :: debug
 

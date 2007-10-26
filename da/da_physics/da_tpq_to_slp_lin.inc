@@ -49,6 +49,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
       return
    end if
 
+
    pl9  = psfc9 
    pl  = psfc - pconst                                        
    klo = 0

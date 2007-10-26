@@ -6,7 +6,7 @@ module da_vtox_transforms
    !---------------------------------------------------------------------------
   
    use module_dm, only : wrf_dm_sum_real,wrf_dm_sum_reals
-#ifdef RSL_LITE
+#ifdef DM_PARALLEL
    use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, & 
       ntasks_y, data_order_xy, data_order_xyz
    use module_comm_dm, only : halo_psichi_uv_adj_sub,halo_ssmi_xa_sub,halo_sfc_xa_sub, &

@@ -8,7 +8,7 @@ subroutine da_get_dims_cdf(file, var, dims, ndims, debug)
 
 #include "netcdf.inc"
 
-   character (len=80), intent(in)  :: file
+   character (len=*),  intent(in)  :: file
    character (len=*),  intent(in)  :: var
    logical,            intent(in)  :: debug
    integer,            intent(out) :: dims(4)

@@ -11,7 +11,7 @@ module da_transfer_model
    use module_state_description, only : dyn_em_ad, dyn_em, p_qv,dyn_em_tl, &
       p_qr, p_qi,p_qs,p_qg,p_qc,num_moist, p_a_qv, p_g_qv
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals
-#ifdef RSL_LITE
+#ifdef DM_PARALLEL
    use module_dm, only : local_communicator, &
       ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
