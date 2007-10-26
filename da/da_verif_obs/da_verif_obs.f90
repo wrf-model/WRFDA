@@ -17,7 +17,7 @@ program da_verif_obs
    use da_verif_obs_control, only : surface_type, upr_type, gpspw_type, &
       gpsref_type, record1, record2, record3, &
       record4, record5, stats_value, exp_dirs, out_dirs, nstd,nstdh, &
-      num_miss, rmiss, diag_unit_out, nml_unit, alpha, &
+      rmiss, diag_unit_out, nml_unit, alpha, &
       diag_unit_in, info_unit, exp_num, end_date, file_path_string, &
       if_plot_bias, if_plot_airsret, if_plot_airep,if_plot_abias, &
       if_plot_buoy, if_plot_gpspw, if_plot_gpsref, if_plot_pilot, &

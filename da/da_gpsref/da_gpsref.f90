@@ -1,6 +1,6 @@
 module da_gpsref
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    use module_dm, only : wrf_dm_sum_real
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &

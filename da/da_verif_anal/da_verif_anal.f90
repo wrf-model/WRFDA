@@ -11,7 +11,7 @@ program da_verif_anal !---------------------------------------------------------
        max_3d_variables, max_2d_variables,num_vert_levels,verification_file_string,&
        missing,namelist_unit,time_series_unit,time_average_unit,&
        ncl_info_unit, grads_ctl_unit, out_dat_unit, profile_time_series,&
-       profile_time_average, filename, stime, etime, year, month, day, hour,&
+       profile_time_average, filename, stime, etime, &
        hstart, hend, hdate, date, pdate, desc3d, desc2d, var_to_get, var_to_plot,&
        length_var, length_plot, output_input_grid, use_lowest_heights, vert_args, &
        nx, ny, nz, number_of_levels, io_status,  debug1, debug2, verify_its_own_analysis, &
@@ -34,11 +34,12 @@ program da_verif_anal !---------------------------------------------------------
    integer                              :: time(6), ptime(6)
    integer                              :: nx1, ny1, nz1
    integer                              :: nx2, ny2, nz2
-   integer                              :: i,j,k,l,m,n,ifound
+   integer                              :: i,k,ifound
    integer                              :: ivar, iexp, iscore
    integer, allocatable,dimension(:)    :: count_recs
    integer                              :: irec, dat_unit
-   character (len=10)                   :: sdate, new_date
+   character (len=10)                   :: sdate
+!   character (len=10)                   :: new_date
    character (len=20)                   :: file_string, domain_string, out_hr
    logical, allocatable,dimension(:)    :: first_score
 
@@ -675,7 +676,7 @@ program da_verif_anal !---------------------------------------------------------
 
       integer                :: ccyy, mm, dd, hh
       integer, dimension(12) :: mmday
-      character(len=10) :: ccyymmddhh
+!      character(len=10) :: ccyymmddhh
 
 !-----------------------------------------------------
       mmday = (/31,28,31,30,31,30,31,31,30,31,30,31/)
@@ -757,9 +758,9 @@ program da_verif_anal !---------------------------------------------------------
 !      format:  "YYYY-MM-DD hh:mm:ss"
 
 ! INPUT:
-      integer time(6) ! all time specs in it
+      integer, intent(in) :: time(6) ! all time specs in it
 ! OUTPUT:
-      character*(*) hdate ! 'YYYY-MM-DD hh:mm:ss'
+      character*(*), intent(out) :: hdate ! 'YYYY-MM-DD hh:mm:ss'
 
 ! LOCAL:
       integer iyr     ! year (e.g., 1997, 2001)
@@ -769,7 +770,7 @@ program da_verif_anal !---------------------------------------------------------
       integer imi     ! minute (00-59)
       integer isc     ! second (00-59)
 !
-      integer i  ! Loop counter.
+!      integer i  ! Loop counter.
       integer hlen ! Length of hdate string
 
       hlen = len(hdate)
@@ -821,12 +822,12 @@ program da_verif_anal !---------------------------------------------------------
   character (len=*), intent(in)                          :: file_for_time
   character (len=19), intent(in)                           :: times
   integer, intent(in)                                      :: file_time_index
-  integer, intent(in)                                      :: number_of_3dvar, number_of_2dvar
-  character (len=20),           dimension(number_of_3dvar) :: variables3d
-  character (len=20),           dimension(number_of_2dvar) :: variables2d
-  character (len=50),           dimension(number_of_3dvar) :: desc3d
-  character (len=50),           dimension(number_of_2dvar) :: desc2d
-  character (len=50)                                       :: descdumm
+  integer, intent(inout)                                      :: number_of_3dvar, number_of_2dvar
+  character (len=20), intent(inout),          dimension(number_of_3dvar) :: variables3d
+  character (len=20),  intent(inout),          dimension(number_of_2dvar) :: variables2d
+  character (len=50),  intent(inout),          dimension(number_of_3dvar) :: desc3d
+  character (len=50),  intent(inout),          dimension(number_of_2dvar) :: desc2d
+  character (len=50)                                      :: descdumm
 
   logical, intent(in)                                      :: output_input_grid, use_lowest_heights  
   integer, intent(in)                                      :: num_grads_levels
@@ -838,14 +839,14 @@ program da_verif_anal !---------------------------------------------------------
 
 
   real, allocatable, dimension(:,:,:)                      :: z, ph, phb     
-  real, allocatable, dimension(:,:,:)                      :: p, pb     
-  real, allocatable, dimension(:,:,:)                      :: data_out, data_out_z
+!  real, allocatable, dimension(:,:,:)                      :: p, pb     
+!  real, allocatable, dimension(:,:,:)                      :: data_out, data_out_z
   character (len=30)                                       :: var_to_get, var_to_plot
   integer                                                  :: length_var, length_plot
   integer                                                  :: ivar
   integer                                                  :: num_vert
   integer, dimension(2)                                    :: loc_of_min_z
-  real                                                     :: missing
+  real , intent(in)                                                    :: missing
 
 
   integer                                                  :: count_var
@@ -855,26 +856,26 @@ program da_verif_anal !---------------------------------------------------------
   integer                                                  :: nx, ny, nz
   integer                                                  :: nlgen        
   integer                                                  :: ndims, dims(4)
-  integer                                                  :: i, j, k
-  integer                                                  :: ii, jj, kk
+  integer                                                  :: i, k
   integer                                                  :: ilon
 
 
   character (len=180)                                       :: nclfile,ctlfile, datfile
   character (len=35)                                       :: tdef
   integer                                                  :: timestamp, datestamp
-  integer                                                  :: file_recl
+!  integer                                                  :: file_recl
 
 
   real, allocatable, dimension(:,:)                        :: xlat, xlon
   real                                                     :: xlat_a(4), xlon_a(4)
-  real                                                     :: xlat_n_max, xlat_s_max
-  real                                                     :: xlon_w, xlon_e
+!  real                                                     :: xlat_n_max, xlat_s_max
+!  real                                                     :: xlon_w
+!  real                                                     :: xlon_e
   real                                                     :: abslatmin, abslatmax
   real                                                     :: abslonmin, abslonmax
   real                                                     :: truelat1, truelat2, temp
   real                                                     :: cen_lat, cen_lon
-  real                                                     :: centeri, centerj
+!  real                                                     :: centeri, centerj
   integer                                                  :: ipoints, jpoints
   integer                                                  :: ncref, nrref      
   real                                                     :: dx, dy 
@@ -1313,6 +1314,7 @@ program da_verif_anal !---------------------------------------------------------
 
   end subroutine create_grads_ctl
 !==================================================================================
+#if 0
   subroutine write_out_data( grads_file, irec, data_in, nx, ny, number_of_levels, &
                                first, grads_dat_unit )
 
@@ -1330,7 +1332,6 @@ program da_verif_anal !---------------------------------------------------------
 
   integer                                                  :: file_recl, rec_length
   integer                                                  :: ii, jj, kk
-  integer                                                  :: i, j, k
 
   character (len=512)                                      :: datfile
 
@@ -1366,6 +1367,7 @@ program da_verif_anal !---------------------------------------------------------
     enddo
 
   end subroutine write_out_data
+#endif
 
 !----------------------------------------------------------------------------------
   subroutine write_profile(date, profile, counter, nlevel, nscore, out_unit)
@@ -1385,11 +1387,12 @@ program da_verif_anal !---------------------------------------------------------
   implicit none
 
   character (len=19), intent(in) :: time
-  character (len=35)             :: tdef
+  character (len=35), intent(inout)             :: tdef
   integer, intent(out)           :: timestamp, datestamp
   logical, intent(in)            :: debug
 
-  integer :: hours, minutes, seconds, year, month, day,it,hour1,hourint
+   integer, intent(in) :: it
+  integer :: hours, minutes, seconds, year, month, day,hour1,hourint
   integer :: mins1,minsint
 
   save hourint 
@@ -1476,17 +1479,18 @@ program da_verif_anal !---------------------------------------------------------
                           nx, ny, nz, data_out, debug)
   implicit none
 
-  character (len=512)                       ::   file
-  integer                                   ::   file_time_index
-  character (len=30)                        ::   var
-  integer                                   ::   length_var
-  integer                                   ::   nx, ny, nz           
+  character (len=512), intent(in)                       ::   file
+  integer, intent(in)                                   ::   file_time_index
+  character (len=30), intent(in)                        ::   var
+  integer, intent(in)                                   ::   length_var
+  integer , intent(in)                                  ::   nx, ny, nz           
   real, intent(out), dimension(:,:,:)       ::   data_out
-  logical                                   ::   debug
+  logical, intent(in)                                   ::   debug
   real,    allocatable, dimension(:,:,:)    ::   data_tmp, data_tmp2
   real,    allocatable, dimension(:,:,:)    ::   u, v
   real,    allocatable, dimension(:,:)      ::   xlat, xlon
-  real,    allocatable, dimension(:,:,:)    ::   z, ph, phb  
+!  real,    allocatable, dimension(:,:,:)    ::   z 
+  real,    allocatable, dimension(:,:,:)    ::   ph, phb  
   real,    allocatable, dimension(:,:,:)    ::   p, pb  
   real,    allocatable, dimension(:,:,:)    ::   t, qv 
   integer                                   ::   map_proj
@@ -1509,7 +1513,7 @@ program da_verif_anal !---------------------------------------------------------
    REAL    , PARAMETER :: p1000mb      = 100000.
    REAL    , PARAMETER :: cpovcv       = cp/(cp-r_d)
    REAL    , PARAMETER :: cvovcp       = 1./cpovcv
-   REAL   :: pp
+!   REAL   :: pp
 
   if(debug) then
     write(6,*) ' calculations for variable ',var
@@ -1784,13 +1788,13 @@ program da_verif_anal !---------------------------------------------------------
                           nx, ny, nz, data_out, debug)
   implicit none
 
-  character (len=512)                       ::   file
-  integer                                   ::   file_time_index
-  character (len=30)                        ::   var
-  integer                                   ::   length_var
-  integer                                   ::   nx, ny, nz           
+  character (len=512), intent(in)                       ::   file
+  integer, intent(in)                                   ::   file_time_index
+  character (len=30), intent(in)                        ::   var
+  integer, intent(in)                                   ::   length_var
+  integer, intent(in)                                   ::   nx, ny, nz           
   real, intent(out), dimension(:,:,:)       ::   data_out
-  logical                                   ::   debug
+  logical, intent(in)                                   ::   debug
   integer, allocatable, dimension(:,:,:)    ::   data_int
   real,    allocatable, dimension(:,:,:)    ::   u10, v10
   real,    allocatable, dimension(:,:)      ::   xlat, xlon
@@ -1979,7 +1983,7 @@ program da_verif_anal !---------------------------------------------------------
   real, dimension(nx_out, ny_out, nz_out), intent(out) :: data_out
   real, dimension(nz_out), intent(in)                  :: z_out
   logical, intent(in)                                  :: debug
-  character (len=1)                                    :: vertical_type
+  character (len=1)                , intent(in)                     :: vertical_type
 
   real, dimension(nz_in)                               :: data_in_z, zz_in
   real, dimension(nz_out)                              :: data_out_z
@@ -2026,7 +2030,7 @@ program da_verif_anal !---------------------------------------------------------
   integer                          :: n_in, n_out
   logical                          :: interp
   real                             :: w1, w2
-  character (len=1)                :: vertical_type
+  character (len=1) ,intent(in)               :: vertical_type
 
 
   if ( vertical_type == 'p' ) then
@@ -2100,14 +2104,15 @@ program da_verif_anal !---------------------------------------------------------
 !     &                            t_sea_level, t_surf, level )
       IMPLICIT NONE
 !     Estimate sea level pressure.
-      INTEGER nx , ny , nz
-      REAL    z(nx,ny,nz)
-      REAL    t(nx,ny,nz) , p(nx,ny,nz) , q(nx,ny,nz)
+      INTEGER, intent(in) :: nx , ny , nz
+      REAL, intent(in) ::    z(nx,ny,nz)
+      REAL, intent(in)  ::  p(nx,ny,nz) , q(nx,ny,nz)
+      REAL, intent(inout)  ::  t(nx,ny,nz)
 !     The output is the 2d sea level pressure.
-      REAL    sea_level_pressure(nx,ny)
+      REAL, intent(out)   :: sea_level_pressure(nx,ny)
       INTEGER level(nx,ny)
       REAL t_surf(nx,ny) , t_sea_level(nx,ny)
-      LOGICAL debug
+      LOGICAL, intent(in) :: debug
 
 !     Some required physical constants:
 
@@ -2267,11 +2272,14 @@ program da_verif_anal !---------------------------------------------------------
 
   integer, intent(in)            ::  d1, d2, d3
 
-  real, dimension(d1,d2,d3)      :: data_out
-  integer                        :: map_proj,i,j,k
-  real                           :: cen_lon, truelat1, truelat2, cone
-  real, dimension(d1,d2,d3)      :: u,v 
-  real, dimension(d1,d2)         :: xlat, xlon, diff, alpha
+  real, dimension(d1,d2,d3), intent(out)      :: data_out
+  integer, intent(in)                        :: map_proj
+  integer                        ::i,j,k
+  real, intent(in)                           :: cen_lon, truelat1, truelat2
+  real                          :: cone
+  real, dimension(d1,d2,d3), intent(in)      :: u,v 
+  real, dimension(d1,d2), intent(in)         :: xlat, xlon
+  real, dimension(d1,d2)         :: diff, alpha
 
   character (len=10), intent(in) :: var
 
@@ -2336,8 +2344,8 @@ program da_verif_anal !---------------------------------------------------------
   subroutine handle_err(rmarker,nf_status)
 
 #include "netcdf.inc"
-      integer nf_status
-      character*(*)        :: rmarker
+      integer, intent(in) :: nf_status
+      character*(*), intent(in)        :: rmarker
       if (nf_status .ne. nf_noerr) then
          write(*,*)  'NetCDF error : ',rmarker
          write(*,*)  '  ',nf_strerror(nf_status)
@@ -2355,13 +2363,13 @@ program da_verif_anal !---------------------------------------------------------
       
 #include "netcdf.inc"
 
-      character (len=512)                             ::  infile
-      integer                                         ::  number_of_3dvar ,number_of_2dvar
-      character (len=20), dimension(number_of_3dvar)  ::  variables3d
-      character (len=20), dimension(number_of_2dvar)  ::  variables2d
-      character (len=50), dimension(number_of_3dvar)  ::  desc3d 
-      character (len=50), dimension(number_of_2dvar)  ::  desc2d
-      logical                                         ::  debug
+      character (len=512), intent(in)                             ::  infile
+      integer, intent(inout)                                         ::  number_of_3dvar ,number_of_2dvar
+      character (len=20), dimension(number_of_3dvar), intent(inout)  ::  variables3d
+      character (len=20), dimension(number_of_2dvar), intent(inout)  ::  variables2d
+      character (len=50), dimension(number_of_3dvar), intent(inout)  ::  desc3d 
+      character (len=50), dimension(number_of_2dvar), intent(inout)  ::  desc2d
+      logical, intent(in)                                         ::  debug
       integer                                         ::  nf_status, ncid, rcode, id_var, trcode
       integer                                         ::  missing3d, missing2d
       integer                                         ::  newi

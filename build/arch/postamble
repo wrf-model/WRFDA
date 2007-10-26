@@ -21,6 +21,7 @@ wrf_bdyout.o wrf_bdyin.o \
    wrf_restartout.o \
    wrf_restartin.o \
    wrf_inputin.o \
+   wrf_inputout.o \
    wrf_histin.o \
    wrf_histout.o \
    module_si_io.o \

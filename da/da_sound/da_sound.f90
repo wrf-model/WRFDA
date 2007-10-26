@@ -10,7 +10,7 @@ module da_sound
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, sound_type, number_type, bad_data_type, &
       residual_sound_type,synop_type
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
       da_interp_lin_3d_adj,da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj, &
       da_interp_lin_2d, da_interp_lin_2d_adj

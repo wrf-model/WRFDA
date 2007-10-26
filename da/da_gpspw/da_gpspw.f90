@@ -1,7 +1,7 @@
 module da_gpspw
 
    use module_dm, only : wrf_dm_sum_real
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print,kts,kte, &

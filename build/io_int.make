@@ -16,7 +16,7 @@ io_int.o : io_int.F90 module_internal_header_util.o
 
 diffwrf_int.o : diffwrf_int.F
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) diffwrf_int.F > diffwrf_int.f
-	$(SFC) -c $(FCFLAGS) diffwrf_int.f
+	$(SFC) -c $(FCFLAGS_SIMPLE)  diffwrf_int.f
 
 diffwrf_int.exe : diffwrf_int.o io_int.o module_internal_header_util.o module_wrf_error.o \
    module_machine.o module_driver_constants.o pack_utils.o $(NETCDF_LIBS)

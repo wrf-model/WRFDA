@@ -1,6 +1,6 @@
 module da_ships
 
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, sfc_assi_options, check_max_iv_print, &
