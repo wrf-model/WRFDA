@@ -42,7 +42,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       end if
 
       call da_jo_and_grady_sonde_sfc(iv, re, jo, jo_grad_y)
-      jo_sonde_sfc = jo_sound + jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
+      jo_sonde_sfc = jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
          jo%sonde_sfc_q + jo%sonde_sfc_p
 
       if (print_detail_grad) then
@@ -55,7 +55,8 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
             '   jo%sonde_sfc_q  ', jo%sonde_sfc_q
       end if
    else
-      jo_sound = 0.0
+      jo_sound     = 0.0
+      jo_sonde_sfc = 0.0
    end if
 
    if (iv%info(synop)%nlocal > 0) then
@@ -277,29 +278,29 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
       write(unit=stdout, fmt='(a, e24.12)') &
          '   jo_sound	     ', jo_sound, &
-         '   jo_sode_sfc     ', jo_sonde_sfc, &
+         '   jo_sonde_sfc    ', jo_sonde_sfc, &
          '   jo_geoamv       ', jo_geoamv, &
          '   jo_polaramv     ', jo_polaramv, &
-         '   jo_synop	     ', jo_synop, &
-         '   jo_satem	     ', jo_satem, &
-         '   jo_pilot	     ', jo_pilot, &
-         '   jo_airep	     ', jo_airep, &
-         '   jo_metar	     ', jo_metar, &
-         '   jo_ships	     ', jo_ships, &
-         '   jo_gpspw	     ', jo_gpspw, &
+         '   jo_synop        ', jo_synop, &
+         '   jo_satem        ', jo_satem, &
+         '   jo_pilot        ', jo_pilot, &
+         '   jo_airep        ', jo_airep, &
+         '   jo_metar        ', jo_metar, &
+         '   jo_ships        ', jo_ships, &
+         '   jo_gpspw        ', jo_gpspw, &
          '   jo_ssmi_tb	     ', jo_ssmi_tb, &
          '   jo_ssmi_rv	     ', jo_ssmi_rv, &
-         '   jo_ssmt1	     ', jo_ssmt1, &
-         '   jo_ssmt2	     ', jo_ssmt2, &
+         '   jo_ssmt1        ', jo_ssmt1, &
+         '   jo_ssmt2        ', jo_ssmt2, &
          '   jo_pseudo       ', jo_pseudo, &
-         '   jo_qscat	     ', jo_qscat, &
-         '   jo_profil       ', jo_profiler, &
-         '   jo_buoy	     ', jo_buoy, &
-         '   jo_radar	     ', jo_radar, &
+         '   jo_qscat        ', jo_qscat, &
+         '   jo_profiler     ', jo_profiler, &
+         '   jo_buoy         ', jo_buoy, &
+         '   jo_radar        ', jo_radar, &
          '   jo_gpsref       ', jo_gpsref, &
-         '   jo_bogus	     ', jo_bogus,  &
+         '   jo_bogus        ', jo_bogus,  &
          '   jo_radiance     ', jo_radiance, &
-         '   jo_airsr	     ', jo_airsr	  
+         '   jo_airsr        ', jo_airsr	  
 
    end if
 
