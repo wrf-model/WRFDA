@@ -167,7 +167,11 @@ while ( <CONFIGURE_DEFAULTS> )
     if ( $sw_netcdf_path ) 
       { $_ =~ s/CONFIGURE_WRFIO_NF/wrfio_nf/g ;
 	$_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
-	$_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L../external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib -lnetcdf: ;
+        if ( $sw_os == Interix ) {
+	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:../external/io_netcdf/libwrfio_nf.a -L$sw_netcdf_path/lib -lnetcdf: ;
+        } else {
+	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L../external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib -lnetcdf: ;
+        }
 	 }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_NF//g ;
@@ -178,7 +182,11 @@ while ( <CONFIGURE_DEFAULTS> )
     if ( $sw_pnetcdf_path ) 
       { $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
 	$_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF: ;
-	$_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:-L../external/io_pnetcdf -lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+        if ( $sw_os == Interix ) {
+	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:../external/io_pnetcdf/libwrfio_pnf.a -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+        } else {
+	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:-L../external/io_pnetcdf -lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+        }
 	 }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_PNF//g ;
@@ -220,8 +228,13 @@ while ( <CONFIGURE_DEFAULTS> )
       }
     else
       {
-      $_ =~ s:ESMFIOLIB:-L../external/esmf_time_f90 -lesmf_time:g ;
-      $_ =~ s:ESMFIOEXTLIB:-L../../external/esmf_time_f90 -lesmf_time:g ;
+        if ( $sw_os == Interix ) {
+           $_ =~ s:ESMFIOLIB:../external/esmf_time_f90/libesmf_time.a:g ;
+           $_ =~ s:ESMFIOEXTLIB:-L../../external/esmf_time_f90/libesmf_time.a:g ;
+        } else {
+           $_ =~ s:ESMFIOLIB:-L../external/esmf_time_f90 -lesmf_time:g ;
+           $_ =~ s:ESMFIOEXTLIB:-L../../external/esmf_time_f90 -lesmf_time:g ;
+        }
       }
 
     @machopts = ( @machopts, $_ ) ;
@@ -293,26 +306,6 @@ open ARCH_POSTAMBLE, "< arch/postamble" or die "cannot open arch/postamble" ;
 while ( <ARCH_POSTAMBLE> ) { print CONFIGURE_WRF } ;
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;
-
-# Die if attempting to configure with both RSL_LITE and a separately-installed ESMF library
-if ( $sw_esmflib_path && $sw_esmfinc_path )
-  {
-  my $RSL_LITE_plus_ESMF = "";
-  open CONFIGURE_WRF, "< configure.wrf" or die "cannot open configure.wrf for reading" ;
-  while ( <CONFIGURE_WRF> )
-    {
-    if ( $_ =~ /DRSL_LITE/ )
-      {
-      $RSL_LITE_plus_ESMF = "TRUE";
-      }
-    }
-  close CONFIGURE_WRF ;
-  if ( $RSL_LITE_plus_ESMF )
-    {
-    unlink("configure.wrf") ;
-    die "\nCONFIGURATION FAILED:  cannot use a separately-installed ESMF library with RSL_LITE.  Please reconfigure to use RSL instead.\n\n" ;
-    }
-  }
 
 printf "Configuration successful. To build the model type compile . \n" ;
 printf "------------------------------------------------------------------------\n" ;
