@@ -23,7 +23,7 @@ vort.o : vort.F90 $(IO_NETCDF_CODE)
 
 diffwrf_netcdf.o : diffwrf_netcdf.F
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) $(IO_NETCDF_CPPFLAGS) diffwrf_netcdf.F > diffwrf_netcdf.f
-	$(SFC) -c $(FCFLAGS) diffwrf_netcdf.f
+	$(SFC) -c $(FCFLAGS_SIMPLE) diffwrf_netcdf.f
 
 field_routines.o: field_routines.F90 wrf_io.o
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) field_routines.F90 > field_routines.f

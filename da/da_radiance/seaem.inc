@@ -215,7 +215,7 @@ subroutine seaem(freqghz,zasat,zlsat,ts5,u10,v10,ehorz,evert)
 !          to calculate a correction to the fresnel reflection coefficients
 !          allowing for the presence of large scale roughness      
 
-!          jc: six coefficients (constant, u, u^2, sec, sec^2, u*sec)	
+!          jc: six coefficients (constant, u, u^2, sec, sec^2, u*sec)   
            zcv1=emc(24)+emc(25)*freqghz+emc(26)*freqghz2
            zcv2=(emc(27)+emc(28)*freqghz+emc(29)*freqghz2)*sec
            zcv3=(emc(30)+emc(31)*freqghz+emc(32)*freqghz2)*sec2

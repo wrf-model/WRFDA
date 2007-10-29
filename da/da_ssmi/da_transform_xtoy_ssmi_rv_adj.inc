@@ -21,8 +21,6 @@ subroutine da_transform_xtoy_ssmi_rv_adj(grid, iv, jo_grad_y, jo_grad_x)
    allocate (tpw(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
    allocate (speed(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
 
-write (0,*) __FILE__,__LINE__,iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2,iv%info(ssmi_rv)%ntotal
-
    do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
       tpw(n)   = jo_grad_y%ssmi_rv(n)%tpw
       speed(n) = jo_grad_y%ssmi_rv(n)%speed

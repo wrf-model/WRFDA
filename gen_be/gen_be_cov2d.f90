@@ -8,8 +8,8 @@ program gen_be_cov2d
 
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
-   character*10        :: variable1					 ! Variable name
-   character*10        :: variable2					 ! Variable name
+   character*10        :: variable1                                      ! Variable name
+   character*10        :: variable2                                      ! Variable name
    character(len=filename_len)        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
@@ -31,7 +31,7 @@ program gen_be_cov2d
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
    real, allocatable   :: field1(:,:)                ! Field 1.
-   real, allocatable   :: field2(:,:)	             ! Field 2.
+   real, allocatable   :: field2(:,:)                ! Field 2.
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
    integer, allocatable:: bin_pts2d(:)               ! Number of points in bin (2D fields).

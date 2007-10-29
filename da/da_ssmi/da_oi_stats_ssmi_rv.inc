@@ -25,9 +25,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%info(ssmi_rv)%nlocal
-write (0,*) "n,iv%info(ssmi_rv)%proc_domain(1,n)",n,iv%info(ssmi_rv)%proc_domain(1,n)
       if (iv%info(ssmi_rv)%proc_domain(1,n)) then
-write (0,*) "iv%info(ssmi_rv)%obs_global_index(n)",iv%info(ssmi_rv)%obs_global_index(n)
          call da_stats_calculate(iv%info(ssmi_rv)%obs_global_index(n), &
            0, iv%ssmi_rv(n)%tpw%qc, &
            iv%ssmi_rv(n)%tpw%inv, ntpw, &
@@ -44,13 +42,10 @@ write (0,*) "iv%info(ssmi_rv)%obs_global_index(n)",iv%info(ssmi_rv)%obs_global_i
            stats%rms_err%speed)
       end if
    end do
-write (0,*) __FILE__,__LINE__,"ntpw",ntpw
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int(ntpw)
    call da_proc_sum_int(nspeed)
-
-write (0,*) __FILE__,__LINE__,"ntpw",ntpw
 
    call da_proc_stats_combine(stats%average%tpw, stats%rms_err%tpw, &
        stats%minimum%tpw%value, stats%maximum%tpw%value, &

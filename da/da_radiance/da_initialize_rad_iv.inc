@@ -28,6 +28,7 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
    iv%instid(i)%info%dxm(:,n)   = p%loc%dxm
    iv%instid(i)%info%dym(:,n)   = p%loc%dym
    iv%instid(i)%info%dzm(:,n)   = 0.0
+   iv%instid(i)%info%proc_domain(:,n) = .false.
    ! z done in da_get_innov_vector_rad
    iv%instid(i)%t(:,n)          = 0.0
    iv%instid(i)%mr(:,n)         = 0.0

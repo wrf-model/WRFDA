@@ -6,7 +6,7 @@ module da_rttov
    !---------------------------------------------------------------------------
 
    use da_define_structures, only : iv_type, y_type, x_type
-   use module_domain, only : xb_type, domain
+   use module_domain, only : domain
    use da_reporting, only : da_error
 
 #ifdef RTTOV

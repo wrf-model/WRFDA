@@ -130,7 +130,7 @@ subroutine da_vtovv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, in
                       ccv(index_start:index_end), n, true_mpi_complex, mpi_sum, &
                       comm, ierr)
 #else
-   ccv(:) = ccv_local(:)		      
+   ccv(:) = ccv_local(:)                      
 #endif
 
    !----------------------------------------------------------------------

@@ -27,8 +27,8 @@ subroutine da_oi_stats_geoamv(stats_unit, iv)
    stats%rms_err = stats%average
 
    do n=1, iv%info(geoamv)%nlocal
-      do k=1, iv%info(geoamv)%levels(n)
-         if (iv%info(geoamv)%proc_domain(k,n)) then
+      if (iv%info(geoamv)%proc_domain(1,n)) then
+         do k=1, iv%info(geoamv)%levels(n)
             call da_stats_calculate(iv%info(geoamv)%obs_global_index(n), &
                0, iv%geoamv(n)%u(k)%qc, &
                iv%geoamv(n)%u(k)%inv, nu, &
@@ -39,8 +39,8 @@ subroutine da_oi_stats_geoamv(stats_unit, iv)
                iv%geoamv(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
-         end if
-      end do
+         end do
+      end if
    end do
 
    ! Do inter-processor communication to gather statistics.

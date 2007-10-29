@@ -21,8 +21,6 @@ subroutine da_get_innov_vector_ssmi_rv (it, grid, ob, iv)
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_ssmi_rv")
 
-write (0,*) __FILE__,__LINE__,iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
-
    itpw = 0 ; itpwf = 0 ; ispeed = 0 ; ispeedf = 0 
    do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
 

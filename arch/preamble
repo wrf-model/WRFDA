@@ -75,6 +75,8 @@ ESMF_TARGET         = ESMFTARGET
 
 ##############################################################################
 
+LIBWRFLIB = libwrflib.a
+
 
 #### Architecture specific settings ####
 

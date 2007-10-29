@@ -24,8 +24,8 @@ subroutine da_crtm_init(iv,ob)
 ! CRTM local ---------------------------------------------------
 !
   integer :: Error_Status
-  character( 256 ) :: SpcCoeff_File
-  character( 256 ) :: TauCoeff_File
+!  character( 256 ) :: SpcCoeff_File
+!  character( 256 ) :: TauCoeff_File
   character( 256 ) :: AerosolCoeff_File
   character( 256 ) :: CloudCoeff_File
   character( 256 ) :: EmisCoeff_File 

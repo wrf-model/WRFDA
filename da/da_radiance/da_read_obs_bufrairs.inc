@@ -23,7 +23,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 #ifdef BUFR
 
 ! Number of channels for sensors in BUFR
-  integer(i_kind),parameter :: N_AIRSCHAN = 281	 !- 281 subset ch out of 2378 ch for AIRS
+  integer(i_kind),parameter :: N_AIRSCHAN = 281  !- 281 subset ch out of 2378 ch for AIRS
   integer(i_kind),parameter :: N_AMSUCHAN =  15  
   integer(i_kind),parameter :: N_HSBCHAN  =   4
   integer(i_kind),parameter :: N_MAXCHAN  = 350
@@ -377,7 +377,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
      iflag = .false.
   
      do l=1,nchan
-        airdata(l+nreal) = airschan(l)%tmbrst	         ! brightness temerature
+        airdata(l+nreal) = airschan(l)%tmbrst            ! brightness temerature
         if( airdata(l+nreal) > 0.0_r_kind .and. airdata(l+nreal) < 500.0_r_kind )then
            iflag = .true.
         else

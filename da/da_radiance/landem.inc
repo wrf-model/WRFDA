@@ -27,10 +27,10 @@ subroutine landem(theta,freq,mv,veg_frac,veg_tp,soil_tp, &
 ! input argument list:
 !
 !       theta       -  local zenith angle (0 - 60.0)
-!       freq        -  frequency in ghz	( 0 - 90.0) 
+!       freq        -  frequency in ghz ( 0 - 90.0) 
 !       mv          -  volumetric moisture content in soil (0.0 - 1.0) (gdas)
 !       veg_frac    -  vegetation fraction (0 - 1.0)                   (gdas)
-!       veg_tp      -  vegetation type		     (gdas, not used)
+!       veg_tp      -  vegetation type               (gdas, not used)
 !                       1: broadleave evergreen trees
 !                       2: broadleave deciduous trees
 !                       3: broad & needle mixed forest
@@ -43,7 +43,7 @@ subroutine landem(theta,freq,mv,veg_frac,veg_tp,soil_tp, &
 !                       10: dwarf trees & shrubs with bare soil
 !                       11: bare soil'
 !                       12: cultivations (use paramater 7)
-!                       13: glacial		
+!                       13: glacial             
 !
 !       soil_tp     -  soil type                 (gdas, not used)
 !                       1: loamy sand (coarse)
@@ -56,7 +56,7 @@ subroutine landem(theta,freq,mv,veg_frac,veg_tp,soil_tp, &
 !                       8: loam (organic)
 !                       9: ice (use loamy sand property)
 !
-!       t_soil      -  soil temperature (k)	            (gdas)
+!       t_soil      -  soil temperature (k)                 (gdas)
 !       t_skin      -  scattering layer temperature (k)     (gdas)
 !       snow_depth  -  scatter medium depth (mm)            (gdas)
 !
@@ -707,7 +707,7 @@ subroutine two_stream_solution(b,mu,gv,gh,ssalb_h,ssalb_v,tau_h,tau_v,r12_h, &
 !
 ! input argument list:
 !
-!      b            -  scattering layer temperature (k)			 (gdas)
+!      b            -  scattering layer temperature (k)                  (gdas)
 !      mu           -  cos(theta)
 !      gv           -  asymmetry factor for v pol
 !      gh           -  asymmetry factor for h pol

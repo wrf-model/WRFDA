@@ -1,5 +1,13 @@
-#include <stdio.h>
+#ifndef MS_SUA_
+# include <stdio.h>
+#endif
 #include <fcntl.h>
+#ifndef O_CREAT
+# define O_CREAT _O_CREAT
+#endif
+#ifndef O_WRONLY
+# define O_WRONLY _O_WRONLY
+#endif
 
 #define STANDARD_ERROR 2
 
@@ -18,6 +26,7 @@ RSL_LITE_ERROR_DUP1 ( int *me )
     char filename[256] ;
     char hostname[256] ;
 
+#ifndef MS_SUA
     gethostname( hostname, 256 ) ;
 
 /* redirect standard out*/
@@ -51,8 +60,39 @@ RSL_LITE_ERROR_DUP1 ( int *me )
         close(newfd) ;
         return ;
     }
+#if (DA_CORE != 1)
+    /* Do not want this in wrfvar output streams */
     fprintf( stdout, "taskid: %d hostname: %s\n",*me,hostname) ;
     fprintf( stderr, "taskid: %d hostname: %s\n",*me,hostname) ;
+#endif
+#else
+    printf("host %d", *me ) ;
+    system("hostname") ;
+    sprintf( hostname, "host %d", *me ) ;
+/* redirect standard out*/
+    sprintf(filename,"rsl.out.%04d",*me) ;
+    if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
+    {
+        return ;
+    }
+    if( dup2( newfd, STANDARD_OUTPUT ) < 0 )
+    {
+        close(newfd) ;
+        return ;
+    }
+/* redirect standard error */
+    sprintf(filename,"rsl.error.%04d",*me) ;
+    if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
+    {
+        return ;
+    }
+    if( dup2( newfd, STANDARD_ERROR ) < 0 )
+    {
+        close(newfd) ;
+        return ;
+    }
+
+#endif
 
 }
 
@@ -203,8 +243,10 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = IMAX(ips-shw) ; ie = IMIN(ipe+shw) ;
         nbytes = buffer_size_for_proc( yp, da_buf ) ;
 	if ( yp_curs + RANGE( jpe-shw+1, jpe, kps, kpe, ips-shw, ipe+shw, 1, typesize ) > nbytes ) {
+#ifndef MS_SUA
 	  fprintf(stderr,"memory overwrite in rsl_lite_pack, Y pack up, %d > %d\n",
 	      yp_curs + RANGE( jpe-shw+1, jpe, kps, kpe, ips-shw, ipe+shw, 1, typesize ), nbytes ) ;
+#endif
 	  MPI_Abort(MPI_COMM_WORLD, 99) ;
         }
         if ( typesize == 8 ) {
@@ -218,7 +260,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           yp_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
         }
       } else {
         js = jpe+1         ; je = jpe+shw ;
@@ -235,7 +279,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           yp_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
 	}
       }
     }
@@ -247,8 +293,10 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = IMAX(ips-shw) ; ie = IMIN(ipe+shw) ;
         nbytes = buffer_size_for_proc( ym, da_buf ) ;
 	if ( ym_curs + RANGE( jps, jps+shw-1, kps, kpe, ips-shw, ipe+shw, 1, typesize ) > nbytes ) {
+#ifndef  MS_SUA
 	  fprintf(stderr,"memory overwrite in rsl_lite_pack, Y pack dn, %d > %d\n",
 	      ym_curs + RANGE( jps, jps+shw-1, kps, kpe, ips-shw, ipe+shw, 1, typesize ), nbytes ) ;
+#endif
 	  MPI_Abort(MPI_COMM_WORLD, 99) ;
         }
         if ( typesize == 8 ) {
@@ -262,7 +310,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           ym_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
 	}
       } else {
         js = jps-shw       ; je = jps-1 ;
@@ -279,7 +329,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           ym_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
         }
       }
     }
@@ -295,8 +347,10 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = ipe-shw+1     ; ie = ipe ;
         nbytes = buffer_size_for_proc( xp, da_buf ) ;
         if ( xp_curs + RANGE( jps-shw, jpe+shw, kps, kpe, ipe-shw+1, ipe, 1, typesize ) > nbytes ) {
+#ifndef MS_SUA
 	  fprintf(stderr,"memory overwrite in rsl_lite_pack, X pack right, %d > %d\n",
 	      xp_curs + RANGE( jps-shw, jpe+shw, kps, kpe, ipe-shw+1, ipe, 1, typesize ), nbytes ) ;
+#endif
 	  MPI_Abort(MPI_COMM_WORLD, 99) ;
         }
         if ( typesize == 8 ) {
@@ -310,7 +364,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           xp_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
 	}
       } else {
         js = JMAX(jps-shw) ; je = JMIN(jpe+shw) ;
@@ -327,7 +383,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           xp_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
         }
       }
     }
@@ -339,8 +397,10 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = ips           ; ie = ips+shw-1 ;
         nbytes = buffer_size_for_proc( xm, da_buf ) ;
         if ( xm_curs + RANGE( jps-shw, jpe+shw, kps, kpe, ips, ips+shw-1, 1, typesize ) > nbytes ) {
+#ifndef MS_SUA
 	  fprintf(stderr,"memory overwrite in rsl_lite_pack, X left , %d > %d\n",
 	      xm_curs + RANGE( jps-shw, jpe+shw, kps, kpe, ips, ips+shw-1, 1, typesize ), nbytes ) ;
+#endif
 	  MPI_Abort(MPI_COMM_WORLD, 99) ;
         }
         if ( typesize == 8 ) {
@@ -354,7 +414,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           xm_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
         }
       } else {
         js = JMAX(jps-shw) ; je = JMIN(jpe+shw) ;
@@ -371,7 +433,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
           xm_curs += wcount*typesize ;
 	}
 	else {
+#ifndef MS_SUA
           fprintf(stderr,"internal error: %s %d\n",__FILE__,__LINE__) ;
+#endif
         }
       }
     }
@@ -453,6 +517,7 @@ RSL_LITE_EXCH_X ( int * Fcomm0, int *me0, int * np0 , int * np_x0 , int * np_y0 
 #endif
 }
 
+#ifndef MS_SUA
 #include <sys/time.h>
 RSL_INTERNAL_MILLICLOCK ()
 {
@@ -480,3 +545,4 @@ RSL_INTERNAL_MICROCLOCK ()
     msecs = 1000000 * isec + usec ;
     return(msecs) ;
 }
+#endif

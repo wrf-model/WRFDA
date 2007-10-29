@@ -34,7 +34,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
       if (print_detail_grad) then
          write(unit=stdout, fmt='(a, e24.12)') &
-            '   jo_sound	     ', jo_sound, &
+            '   jo_sound             ', jo_sound, &
             '   jo%sound_u      ', jo%sound_u, &
             '   jo%sound_v      ', jo%sound_v, &
             '   jo%sound_t      ', jo%sound_t, &
@@ -65,7 +65,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
       if (print_detail_grad) then
          write(unit=stdout, fmt='(a, e24.12)') &
-            '   jo_synop	     ', jo_synop, &
+            '   jo_synop             ', jo_synop, &
             '   jo%synop_u      ', jo%synop_u, &
             '   jo%synop_v      ', jo%synop_v, &
             '   jo%synop_t      ', jo%synop_t, &
@@ -277,7 +277,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
          '   jo%total      ', jot
 
       write(unit=stdout, fmt='(a, e24.12)') &
-         '   jo_sound	     ', jo_sound, &
+         '   jo_sound        ', jo_sound, &
          '   jo_sonde_sfc    ', jo_sonde_sfc, &
          '   jo_geoamv       ', jo_geoamv, &
          '   jo_polaramv     ', jo_polaramv, &
@@ -288,8 +288,8 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
          '   jo_metar        ', jo_metar, &
          '   jo_ships        ', jo_ships, &
          '   jo_gpspw        ', jo_gpspw, &
-         '   jo_ssmi_tb	     ', jo_ssmi_tb, &
-         '   jo_ssmi_rv	     ', jo_ssmi_rv, &
+         '   jo_ssmi_tb      ', jo_ssmi_tb, &
+         '   jo_ssmi_rv      ', jo_ssmi_rv, &
          '   jo_ssmt1        ', jo_ssmt1, &
          '   jo_ssmt2        ', jo_ssmt2, &
          '   jo_pseudo       ', jo_pseudo, &
@@ -300,7 +300,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
          '   jo_gpsref       ', jo_gpsref, &
          '   jo_bogus        ', jo_bogus,  &
          '   jo_radiance     ', jo_radiance, &
-         '   jo_airsr        ', jo_airsr	  
+         '   jo_airsr        ', jo_airsr
 
    end if
 

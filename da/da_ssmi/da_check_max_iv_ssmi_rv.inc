@@ -15,8 +15,6 @@ subroutine da_check_max_iv_ssmi_rv(iv, it, itpw, itpwf, ispeed, ispeedf)
 
    if (trace_use) call da_trace_entry("da_check_max_iv_ssmi_rv")
 
-write (0,*) __FILE__,__LINE__,iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
-
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
@@ -38,7 +36,6 @@ write (0,*) __FILE__,__LINE__,iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
    failed = .false.
 
    do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
-write (0,*) __FILE__,__LINE__,"n,iv%ssmi_rv(n)%tpw",n,iv%ssmi_rv(n)%tpw
       call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%tpw, &
          max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
       call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%speed, &

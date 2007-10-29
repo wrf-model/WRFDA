@@ -16,4 +16,4 @@ else
 pythag=absb*sqrt(1.0+(absa/absb)**2)
 end if
 end if
-END FUNCTION pythag			
+END FUNCTION pythag                     

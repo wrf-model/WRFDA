@@ -98,11 +98,11 @@ program gen_be_ensrf
    real, allocatable     :: h(:), h_devn(:)
    real, allocatable     :: x_devn(:)
 
-   real, allocatable	 :: uc(:,:)		      ! u-wind (C grid).
-   real, allocatable	 :: vc(:,:)		      ! v-wind (C grid).
-   real, allocatable	 :: field(:,:)  	      ! Input field.
-   real, allocatable	 :: dummy(:,:)  	      ! Dummy.
-   real, allocatable	 :: corr(:,:)		      ! Correlation.
+   real, allocatable     :: uc(:,:)                   ! u-wind (C grid).
+   real, allocatable     :: vc(:,:)                   ! v-wind (C grid).
+   real, allocatable     :: field(:,:)                ! Input field.
+   real, allocatable     :: dummy(:,:)                ! Dummy.
+   real, allocatable     :: corr(:,:)                 ! Correlation.
    real, allocatable     :: xf_mean(:)                ! Prior mean.
    real, allocatable     :: xa_mean(:)                ! Posterior mean.
  
