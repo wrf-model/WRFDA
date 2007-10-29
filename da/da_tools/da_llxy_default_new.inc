@@ -59,41 +59,41 @@ subroutine da_llxy_default_new (xlati,xloni,x,y)
          if (dxlon < -180) dxlon = dxlon + 360.0
 
          if (map_projection == 3) then
-	    xc = 0.0
-	    yc = YCNTR
+            xc = 0.0
+            yc = YCNTR
 
-	    cell = cos(xlat/conv)/(1.0+sin(xlat/conv))
-	    yy = -c2*alog(cell)
-	    xx = c2*dxlon/conv
+            cell = cos(xlat/conv)/(1.0+sin(xlat/conv))
+            yy = -c2*alog(cell)
+            xx = c2*dxlon/conv
          else
-	    psi0 = (pole - phic)/conv
-	    xc = 0.0
+            psi0 = (pole - phic)/conv
+            xc = 0.0
 
-	    ! calculate x,y coords. relative to pole
+            ! calculate x,y coords. relative to pole
 
-	    flp = cone_factor*dxlon/conv
+            flp = cone_factor*dxlon/conv
 
-	    psx = (pole - xlat)/conv
+            psx = (pole - xlat)/conv
 
-	    if (map_projection == 2) then
+            if (map_projection == 2) then
                ! Polar stereographics:
                bb = 2.0*(cos(psi1/2.0)**2)
                yc = -earth_radius*bb*tan(psi0/2.0)
                 r = -earth_radius*bb*tan(psx/2.0)
-	    else
+            else
                ! Lambert conformal:
                bb = -earth_radius/cone_factor*sin(psi1)
                yc = bb*(tan(psi0/2.0)/tan(psi1/2.0))**cone_factor
                 r = bb*(tan(psx /2.0)/tan(psi1/2.0))**cone_factor
-	    end if
+            end if
 
-	    if (phic < 0.0) then
+            if (phic < 0.0) then
                xx = r*sin(flp)
                yy = r*cos(flp)
-	    else
+            else
                xx = -r*sin(flp)
                yy =  r*cos(flp)
-	    end if
+            end if
 
          end if
 

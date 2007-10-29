@@ -9,7 +9,7 @@ subroutine da_oi_stats_buoy (stats_unit, iv)
    integer,        intent (in) :: stats_unit    ! Output unit for stats.
    type (iv_type), intent (in) :: iv            ! OI
 
-   type (stats_buoy_type) :: stats	
+   type (stats_buoy_type) :: stats      
    integer                :: nu, nv, nt, np, nq
    integer                :: n
 

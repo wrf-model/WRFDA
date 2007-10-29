@@ -134,7 +134,7 @@ contains
        glatm = thinning_grid(n)%glat(j) + dgv*deg2rad
 
        factor = abs(cos(abs(glatm)))
-       mlonj  = nint(thinning_grid(n)%mlonx*factor)	
+       mlonj  = nint(thinning_grid(n)%mlonx*factor)     
        thinning_grid(n)%mlon(j) = max(2,mlonj)
        delon = dlon_grid/thinning_grid(n)%mlon(j)
 
