@@ -402,11 +402,9 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                                ids, ide, jds, jde, kds, kde,    &
                                ims, ime, jms, jme, kms, kme,    &
                                ips, ipe, jps, jpe, kps, kpe    )
-
-#if (EM_CORE == 1 && DA_CORE == 0) 
+  
 ! initialize some other constants (and 1d arrays in z)
      CALL init_domain_constants ( parent, nest )
-#endif
 
 ! get the nest config flags
      CALL model_to_grid_config_rec ( nest%id , model_config_rec , nest_config_flags )
@@ -437,13 +435,11 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 ! read input from dataset
           CALL med_initialdata_input_ptr( nest , nest_config_flags )
        ELSE IF ( nest_config_flags%input_from_hires ) THEN
-#if (DA_CORE == 0)
 ! read in high res topography
           CALL  input_terrain_rsmas ( nest,                               &
                                       ids , ide , jds , jde , 1   , 1   , &
                                       ims , ime , jms , jme , 1   , 1   , &
                                       ips , ipe , jps , jpe , 1   , 1   )
-#endif
        ENDIF
 
 #if (DA_CORE == 0)

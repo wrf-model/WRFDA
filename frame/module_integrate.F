@@ -286,9 +286,7 @@ RECURSIVE SUBROUTINE integrate ( grid )
                                               parent     = grid ,     &
                                               kid        = kid        )
             CALL Setup_Timekeeping (new_nest)
-#if (DA_CORE == 0)
             CALL med_nest_initial ( grid , new_nest , config_flags )
-#endif
          END DO
          IF ( a_nest_was_opened ) THEN
             CALL set_overlaps ( grid )   ! find overlapping and set pointers
