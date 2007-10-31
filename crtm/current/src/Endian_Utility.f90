@@ -556,11 +556,11 @@ END MODULE Endian_Utility
 !                          -- MODIFICATION HISTORY --
 !-------------------------------------------------------------------------------
 !
-! $Id: Endian_Utility.f90,v 2.3 2004/12/01 19:35:15 paulv Exp $
+! $Id: Endian_Utility.f90 886 2007-08-23 22:51:40Z paul.vandelst@noaa.gov $
 !
 ! $Date: 2004/12/01 19:35:15 $
 !
-! $Revision: 2.3 $
+! $Revision: 886 $
 !
 ! $State: Exp $
 !

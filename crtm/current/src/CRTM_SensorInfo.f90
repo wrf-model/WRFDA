@@ -86,8 +86,10 @@ MODULE CRTM_SensorInfo
   INTEGER, PUBLIC, PARAMETER :: WMO_MHS     = 203
 
   INTEGER, PUBLIC, PARAMETER :: WMO_VAS     = 630
+
+!*** error
   INTEGER, PUBLIC, PARAMETER :: WMO_SOUNDER = 626
-  INTEGER, PUBLIC, PARAMETER :: WMO_IMAGER  = 615
+!  INTEGER, PUBLIC, PARAMETER :: WMO_SOUNDER = 615
 
   INTEGER, PUBLIC, PARAMETER :: WMO_SSMI    = 905
   INTEGER, PUBLIC, PARAMETER :: WMO_SSMT1   = 906
@@ -291,20 +293,19 @@ END MODULE CRTM_SensorInfo
 !                          -- MODIFICATION HISTORY --
 !-------------------------------------------------------------------------------
 !
-! $Id: CRTM_SensorInfo.f90,v 1.2 2005/10/24 16:55:05 paulv Exp $
+! $Id: CRTM_SensorInfo.f90 568 2007-05-15 20:23:48Z paul.vandelst@noaa.gov $
 !
-! $Date: 2005/10/24 16:55:05 $
+! $Date: 2005/08/19 20:54:10 $
 !
-! $Revision: 1.2 $
+! $Revision: 568 $
 !
 ! $Name:  $
 !
 ! $State: Exp $
 !
 ! $Log: CRTM_SensorInfo.f90,v $
-! Revision 1.2  2005/10/24 16:55:05  paulv
-! - Corrected multiple definition of WMO_SOUNDER.
-! - Corrected syntax error in derfinition of NCEP_SENSOR_ID array.
+! Revision 1.1  2005/08/19 20:54:10  yhan
+! -- Initial checkin
 !
 ! Revision 1.1  2005/06/27 13:20:26  paulv
 ! Initial checkin.

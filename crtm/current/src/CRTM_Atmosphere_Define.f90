@@ -171,12 +171,16 @@
 !           --------------------------------------------------
 !                   None           NO_AEROSOL   
 !                   Dust           DUST_AEROSOL   
-!                  Sea salt        SEASALT_AEROSOL  
+!               Sea salt SSAM(*)   SEASALT_SSAM_AEROSOL 
+!               Sea salt SSCM(+)   SEASALT_SSCM_AEROSOL 
 !             Dry organic carbon   DRY_ORGANIC_CARBON_AEROSOL
 !             Wet organic carbon   WET_ORGANIC_CARBON_AEROSOL
 !              Dry black carbon    DRY_BLACK_CARBON_AEROSOL
 !              Wet black carbon    WET_BLACK_CARBON_AEROSOL
 !                  Sulfate         SULFATE_AEROSOL  
+!
+!            (*) SSAM == sea salt accumulation mode, Reff ~ 0.5 - 5.0 um
+!            (+) SSCM == sea salt coarse mode,       Reff ~ 5.0 - 30 um
 !
 !         2) The number of valid aerosol types is specified by the 
 !              N_VALID_AEROSOL_TYPES
@@ -202,42 +206,46 @@ MODULE CRTM_Atmosphere_Define
   ! Environment setup
   ! -----------------
   ! Module use
-  USE Type_Kinds,          ONLY: fp=>fp_kind
-  USE Message_Handler,     ONLY: SUCCESS, FAILURE, Display_Message
-  USE CRTM_Parameters,     ONLY: ZERO, NO, YES, SET
-  USE CRTM_Cloud_Define,   ONLY: N_VALID_CLOUD_TYPES, &
-                                 NO_CLOUD, &
-                                 WATER_CLOUD, &
-                                 ICE_CLOUD, &
-                                 RAIN_CLOUD, &
-                                 SNOW_CLOUD, &
-                                 GRAUPEL_CLOUD, &
-                                 HAIL_CLOUD, &
-                                 CLOUD_TYPE_NAME, &
-                                 CRTM_Cloud_type, &
-                                 CRTM_Associated_Cloud, &
-                                 CRTM_Destroy_Cloud, &
-                                 CRTM_Allocate_Cloud, &
-                                 CRTM_Assign_Cloud, &
-                                 CRTM_WeightedSum_Cloud, &
-                                 CRTM_Zero_Cloud
-  USE CRTM_Aerosol_Define, ONLY: N_VALID_AEROSOL_TYPES, &
-                                 NO_AEROSOL, &
-                                 DUST_AEROSOL, &
-                                 SEASALT_AEROSOL, &
-                                 DRY_ORGANIC_CARBON_AEROSOL, &
-                                 WET_ORGANIC_CARBON_AEROSOL, &
-                                 DRY_BLACK_CARBON_AEROSOL, &
-                                 WET_BLACK_CARBON_AEROSOL, &
-                                 SULFATE_AEROSOL  , &
-                                 AEROSOL_TYPE_NAME, &
-                                 CRTM_Aerosol_type, &
-                                 CRTM_Associated_Aerosol, &
-                                 CRTM_Destroy_Aerosol, &
-                                 CRTM_Allocate_Aerosol, &
-                                 CRTM_Assign_Aerosol, &
-                                 CRTM_WeightedSum_Aerosol, &
-                                 CRTM_Zero_Aerosol
+  USE Type_Kinds           , ONLY: fp
+  USE Message_Handler      , ONLY: SUCCESS, FAILURE, Display_Message
+  USE Compare_Float_Numbers, ONLY: Compare_Float
+  USE CRTM_Parameters      , ONLY: ZERO, NO, YES, SET
+  USE CRTM_Cloud_Define    , ONLY: N_VALID_CLOUD_TYPES, &
+                                   NO_CLOUD, &
+                                   WATER_CLOUD, &
+                                   ICE_CLOUD, &
+                                   RAIN_CLOUD, &
+                                   SNOW_CLOUD, &
+                                   GRAUPEL_CLOUD, &
+                                   HAIL_CLOUD, &
+                                   CLOUD_TYPE_NAME, &
+                                   CRTM_Cloud_type, &
+                                   CRTM_Associated_Cloud, &
+                                   CRTM_Destroy_Cloud, &
+                                   CRTM_Allocate_Cloud, &
+                                   CRTM_Assign_Cloud, &
+                                   CRTM_Equal_Cloud, &
+                                   CRTM_WeightedSum_Cloud, &
+                                   CRTM_Zero_Cloud
+  USE CRTM_Aerosol_Define  , ONLY: N_VALID_AEROSOL_TYPES, &
+                                   NO_AEROSOL, &
+                                   DUST_AEROSOL, &
+                                   SEASALT_SSAM_AEROSOL, &
+                                   SEASALT_SSCM_AEROSOL, &
+                                   DRY_ORGANIC_CARBON_AEROSOL, &
+                                   WET_ORGANIC_CARBON_AEROSOL, &
+                                   DRY_BLACK_CARBON_AEROSOL, &
+                                   WET_BLACK_CARBON_AEROSOL, &
+                                   SULFATE_AEROSOL  , &
+                                   AEROSOL_TYPE_NAME, &
+                                   CRTM_Aerosol_type, &
+                                   CRTM_Associated_Aerosol, &
+                                   CRTM_Destroy_Aerosol, &
+                                   CRTM_Allocate_Aerosol, &
+                                   CRTM_Assign_Aerosol, &
+                                   CRTM_Equal_Aerosol, &
+                                   CRTM_WeightedSum_Aerosol, &
+                                   CRTM_Zero_Aerosol
   ! Disable implicit typing
   IMPLICIT NONE
 
@@ -266,11 +274,13 @@ MODULE CRTM_Atmosphere_Define
   PUBLIC :: CRTM_Destroy_Cloud
   PUBLIC :: CRTM_Allocate_Cloud
   PUBLIC :: CRTM_Assign_Cloud
+  PUBLIC :: CRTM_Equal_Cloud
   ! CRTM_Aerosol parameters
   PUBLIC :: N_VALID_AEROSOL_TYPES
   PUBLIC :: NO_AEROSOL
   PUBLIC :: DUST_AEROSOL
-  PUBLIC :: SEASALT_AEROSOL
+  PUBLIC :: SEASALT_SSAM_AEROSOL
+  PUBLIC :: SEASALT_SSCM_AEROSOL
   PUBLIC :: DRY_ORGANIC_CARBON_AEROSOL
   PUBLIC :: WET_ORGANIC_CARBON_AEROSOL
   PUBLIC :: DRY_BLACK_CARBON_AEROSOL
@@ -286,6 +296,7 @@ MODULE CRTM_Atmosphere_Define
   PUBLIC :: CRTM_Destroy_Aerosol
   PUBLIC :: CRTM_Allocate_Aerosol
   PUBLIC :: CRTM_Assign_Aerosol
+  PUBLIC :: CRTM_Equal_Aerosol
   ! CRTM_Atmosphere parameters
   PUBLIC :: N_VALID_ABSORBER_IDS
   PUBLIC :: INVALID_ABSORBER_ID
@@ -352,17 +363,19 @@ MODULE CRTM_Atmosphere_Define
   PUBLIC :: CRTM_Destroy_Atmosphere
   PUBLIC :: CRTM_Allocate_Atmosphere
   PUBLIC :: CRTM_Assign_Atmosphere
+  PUBLIC :: CRTM_Equal_Atmosphere
   PUBLIC :: CRTM_WeightedSum_Atmosphere
   PUBLIC :: CRTM_Zero_Atmosphere
+  ! Utility routines in this module
+  PUBLIC :: CRTM_Get_AbsorberIdx
 
   ! -------------------
   ! Procedure overloads
   ! -------------------
   INTERFACE CRTM_Destroy_Atmosphere
     MODULE PROCEDURE Destroy_Scalar
-    MODULE PROCEDURE Destroy_Scalar_Multi
     MODULE PROCEDURE Destroy_Rank1
-    MODULE PROCEDURE Destroy_Rank1_Multi
+    MODULE PROCEDURE Destroy_Rank2
   END INTERFACE CRTM_Destroy_Atmosphere
 
   INTERFACE CRTM_Allocate_Atmosphere
@@ -379,16 +392,25 @@ MODULE CRTM_Atmosphere_Define
   INTERFACE CRTM_Assign_Atmosphere
     MODULE PROCEDURE Assign_Scalar
     MODULE PROCEDURE Assign_Rank1
+    MODULE PROCEDURE Assign_Rank2
   END INTERFACE CRTM_Assign_Atmosphere
+
+  INTERFACE CRTM_Equal_Atmosphere
+    MODULE PROCEDURE Equal_Scalar
+    MODULE PROCEDURE Equal_Rank1
+    MODULE PROCEDURE Equal_Rank2
+  END INTERFACE CRTM_Equal_Atmosphere
 
   INTERFACE CRTM_WeightedSum_Atmosphere
     MODULE PROCEDURE WeightedSum_Scalar
     MODULE PROCEDURE WeightedSum_Rank1
+    MODULE PROCEDURE WeightedSum_Rank2
   END INTERFACE CRTM_WeightedSum_Atmosphere
 
   INTERFACE CRTM_Zero_Atmosphere
     MODULE PROCEDURE Zero_Scalar
     MODULE PROCEDURE Zero_Rank1
+    MODULE PROCEDURE Zero_Rank2
   END INTERFACE CRTM_Zero_Atmosphere
 
 
@@ -499,11 +521,7 @@ MODULE CRTM_Atmosphere_Define
 
   ! RCS Id for the module
   CHARACTER(*), PARAMETER :: MODULE_RCS_ID = &
-  '$Id: CRTM_Atmosphere_Define.f90,v 1.21 2006/05/25 19:33:27 wd20pd Exp $'
-
-  ! The maximum number of aerosol size distribution modes
-  ! Currently this will remain a fixed quantity.
-  INTEGER, PARAMETER :: MAX_N_AEROSOL_MODES = 4
+  '$Id: CRTM_Atmosphere_Define.f90 886 2007-08-23 22:51:40Z paul.vandelst@noaa.gov $'
 
 
   ! ------------------------------------
@@ -519,20 +537,16 @@ MODULE CRTM_Atmosphere_Define
     INTEGER :: n_Clouds     = 0  ! NcUse dimension
     INTEGER :: Max_Aerosols = 0  ! Na dimension
     INTEGER :: n_Aerosols   = 0  ! NaUse dimension
-    ! Flag to determine if level temperatures have been supplied.
-    ! Default is to assume that they HAVE been supplied.
-    INTEGER :: Level_Temperature_Input = YES
     ! Climatology model associated with the profile
     INTEGER :: Climatology = INVALID_MODEL
     ! Absorber ID and units
     INTEGER, DIMENSION(:), POINTER :: Absorber_ID    => NULL() ! J
     INTEGER, DIMENSION(:), POINTER :: Absorber_Units => NULL() ! J
     ! Profile LEVEL and LAYER quantities
-    REAL(fp), DIMENSION(:),   POINTER :: Level_Pressure    => NULL()  ! 0:K
-    REAL(fp), DIMENSION(:),   POINTER :: Level_Temperature => NULL()  ! 0:K
-    REAL(fp), DIMENSION(:),   POINTER :: Pressure          => NULL()  ! K
-    REAL(fp), DIMENSION(:),   POINTER :: Temperature       => NULL()  ! K
-    REAL(fp), DIMENSION(:,:), POINTER :: Absorber          => NULL()  ! K x J
+    REAL(fp), DIMENSION(:),   POINTER :: Level_Pressure => NULL()  ! 0:K
+    REAL(fp), DIMENSION(:),   POINTER :: Pressure       => NULL()  ! K
+    REAL(fp), DIMENSION(:),   POINTER :: Temperature    => NULL()  ! K
+    REAL(fp), DIMENSION(:,:), POINTER :: Absorber       => NULL()  ! K x J
     ! Clouds associated with each profile
     TYPE(CRTM_Cloud_type),   DIMENSION(:), POINTER :: Cloud   => NULL()  ! Nc
     ! Aerosols associated with each profile
@@ -541,8 +555,6 @@ MODULE CRTM_Atmosphere_Define
 
 
 CONTAINS
-
-
 
 
 !##################################################################################
@@ -581,18 +593,6 @@ CONTAINS
 
   SUBROUTINE CRTM_Clear_Atmosphere( Atmosphere )
     TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere
-    ! Dimensions
-    Atmosphere%Max_Layers   = 0
-    Atmosphere%n_Layers     = 0
-    Atmosphere%n_Absorbers  = 0
-    Atmosphere%Max_Clouds   = 0
-    Atmosphere%n_Clouds     = 0
-    Atmosphere%Max_Aerosols = 0
-    Atmosphere%n_Aerosols   = 0
-    ! Flag to determine if level temperatures have been supplied.
-    ! Default is to assume that they HAVE been supplied.
-    Atmosphere%Level_Temperature_Input = YES
-    ! Climatology model associated with the profile
     Atmosphere%Climatology = INVALID_MODEL
   END SUBROUTINE CRTM_Clear_Atmosphere
 
@@ -612,7 +612,7 @@ CONTAINS
 !       CRTM_Associated_Atmosphere
 !
 ! PURPOSE:
-!       Function to test the association status of the pointer members of a
+!       Function to test the association status of the components of a
 !       CRTM_Atmosphere structure.
 !
 ! CALLING SEQUENCE:
@@ -631,12 +631,12 @@ CONTAINS
 !
 ! OPTIONAL INPUT ARGUMENTS:
 !       ANY_Test:            Set this argument to test if ANY of the
-!                            Atmosphere structure pointer members are associated.
-!                            The default is to test if ALL the pointer members
+!                            Atmosphere structure components are associated.
+!                            The default is to test if ALL the components
 !                            are associated.
-!                            If ANY_Test = 0, test if ALL the pointer members
+!                            If ANY_Test = 0, test if ALL the components
 !                                             are associated.  (DEFAULT)
-!                               ANY_Test = 1, test if ANY of the pointer members
+!                               ANY_Test = 1, test if ANY of the components
 !                                             are associated.
 !                            UNITS:      N/A
 !                            TYPE:       INTEGER
@@ -671,8 +671,8 @@ CONTAINS
 !
 ! FUNCTION RESULT:
 !       Association_Status:  The return value is a logical value indicating the
-!                            association status of the Atmosphere pointer members.
-!                            .TRUE.  - if ALL the Atmosphere pointer members are
+!                            association status of the Atmosphere components.
+!                            .TRUE.  - if ALL the Atmosphere components are
 !                                      associated, or if the ANY_Test argument
 !                                      is set and ANY of the Atmosphere pointer
 !                                      members are associated.
@@ -684,10 +684,10 @@ CONTAINS
 !
 !--------------------------------------------------------------------------------
 
-  FUNCTION CRTM_Associated_Atmosphere( Atmosphere,    & ! Input
-                                       ANY_Test,      & ! Optional input
-                                       Skip_Cloud,    & ! Optional input
-                                       Skip_Aerosol ) & ! Optional input
+  FUNCTION CRTM_Associated_Atmosphere( Atmosphere  , & ! Input
+                                       ANY_Test    , & ! Optional input
+                                       Skip_Cloud  , & ! Optional input
+                                       Skip_Aerosol) & ! Optional input
                                      RESULT( Association_Status )
     ! Arguments
     TYPE(CRTM_Atmosphere_type), INTENT(IN) :: Atmosphere
@@ -701,11 +701,9 @@ CONTAINS
     LOGICAL :: Include_Cloud
     LOGICAL :: Include_Aerosol
 
-
-    ! ------
     ! Set up
     ! ------
-    ! Default is to test ALL the pointer members
+    ! Default is to test ALL the components
     ! for a true association status....
     ALL_Test = .TRUE.
     ! ...unless the ANY_Test argument is set.
@@ -733,45 +731,41 @@ CONTAINS
     Association_Status = .FALSE.
 
 
-    ! ----------------------------------------
     ! Test the members that MUST be associated
     ! ----------------------------------------
     IF ( ALL_Test ) THEN
       IF ( ASSOCIATED( Atmosphere%Absorber_ID       ) .AND. &
            ASSOCIATED( Atmosphere%Absorber_Units    ) .AND. &
            ASSOCIATED( Atmosphere%Level_Pressure    ) .AND. &
-           ASSOCIATED( Atmosphere%Level_Temperature ) .AND. &
            ASSOCIATED( Atmosphere%Pressure          ) .AND. &
            ASSOCIATED( Atmosphere%Temperature       ) .AND. &
-           ASSOCIATED( Atmosphere%Absorber          )       ) THEN
+           ASSOCIATED( Atmosphere%Absorber          ) ) THEN
         Association_Status = .TRUE.
       END IF
     ELSE
       IF ( ASSOCIATED( Atmosphere%Absorber_ID       ) .OR. &
            ASSOCIATED( Atmosphere%Absorber_Units    ) .OR. &
            ASSOCIATED( Atmosphere%Level_Pressure    ) .OR. &
-           ASSOCIATED( Atmosphere%Level_Temperature ) .OR. &
            ASSOCIATED( Atmosphere%Pressure          ) .OR. &
            ASSOCIATED( Atmosphere%Temperature       ) .OR. &
-           ASSOCIATED( Atmosphere%Absorber          )      ) THEN
+           ASSOCIATED( Atmosphere%Absorber          ) ) THEN
         Association_Status = .TRUE.
       END IF
     END IF
 
 
-    ! ---------------------------------------
     ! Test the members that MAY be associated
     ! ---------------------------------------
     ! Clouds
     IF ( Include_Cloud ) THEN
       IF ( ALL_Test ) THEN
         IF ( Association_Status             .AND. &
-             ASSOCIATED( Atmosphere%Cloud )       ) THEN
+             ASSOCIATED( Atmosphere%Cloud ) ) THEN
           Association_Status = .TRUE.
         END IF
       ELSE
         IF ( Association_Status             .OR. &
-             ASSOCIATED( Atmosphere%Cloud )      ) THEN
+             ASSOCIATED( Atmosphere%Cloud ) ) THEN
           Association_Status = .TRUE.
         END IF
       END IF
@@ -781,12 +775,12 @@ CONTAINS
     IF ( Include_Aerosol ) THEN
       IF ( ALL_Test ) THEN
         IF ( Association_Status               .AND. &
-             ASSOCIATED( Atmosphere%Aerosol )       ) THEN
+             ASSOCIATED( Atmosphere%Aerosol ) ) THEN
           Association_Status = .TRUE.
         END IF
       ELSE
         IF ( Association_Status               .OR. &
-             ASSOCIATED( Atmosphere%Aerosol )      ) THEN
+             ASSOCIATED( Atmosphere%Aerosol ) ) THEN
           Association_Status = .TRUE.
         END IF
       END IF
@@ -804,9 +798,19 @@ CONTAINS
 !       Function to re-initialize CRTM_Atmosphere data structures.
 !
 ! CALLING SEQUENCE:
-!       Error_Status = CRTM_Destroy_Atmosphere( Atmosphere1, [ Atmosphere2, ..., Atmosphere10, ] &  ! Output
-!                                               RCS_Id = RCS_Id,                                 &  ! Revision control
-!                                               Message_Log = Message_Log                        )  ! Error messaging
+!       Error_Status = CRTM_Destroy_Atmosphere( Atmosphere             , &  ! Output
+!                                               RCS_Id     =RCS_Id     , &  ! Revision control
+!                                               Message_Log=Message_Log  )  ! Error messaging
+!
+! OUTPUT ARGUMENTS:
+!       Atmosphere:   Re-initialized Atmosphere structure. In the context of
+!                     the CRTM, rank-1 corresponds to an vector of profiles,
+!                     and rank-2 corresponds to an array of channels x profiles.
+!                     The latter is used in the K-matrix model.
+!                     UNITS:      N/A
+!                     TYPE:       CRTM_Atmosphere_type
+!                     DIMENSION:  Scalar, Rank-1, or Rank-2 array
+!                     ATTRIBUTES: INTENT(IN OUT)
 !
 ! OPTIONAL INPUT ARGUMENTS:
 !       Message_Log:  Character string specifying a filename in which any
@@ -817,19 +821,6 @@ CONTAINS
 !                     TYPE:       CHARACTER(*)
 !                     DIMENSION:  Scalar
 !                     ATTRIBUTES: INTENT(IN), OPTIONAL
-!
-! OUTPUT ARGUMENTS:
-!       Atmosphere1, [ Atmosphere2, ..., Atmosphere10 ]:
-!                     Re-initialized Atmosphere structure(s). At least one
-!                     structure or structure array must be specified, and
-!                     no more than 10 structures or structure arrays must
-!                     be specified.
-!                     UNITS:      N/A
-!                     TYPE:       CRTM_Atmosphere_type
-!                     DIMENSION:  Scalar
-!                                   OR
-!                                 Rank-1 array
-!                     ATTRIBUTES: INTENT(IN OUT)
 !
 ! OPTIONAL OUTPUT ARGUMENTS:
 !       RCS_Id:       Character string containing the Revision Control
@@ -860,14 +851,14 @@ CONTAINS
 !
 !--------------------------------------------------------------------------------
 
-  FUNCTION Destroy_Scalar( Atmosphere,   &  ! Output
-                           No_Clear,     &  ! Optional input
-                           RCS_Id,       &  ! Revision control
-                           Message_Log ) &  ! Error messaging
+  FUNCTION Destroy_Scalar( Atmosphere , &  ! Output
+                           No_Clear   , &  ! Optional input
+                           RCS_Id     , &  ! Revision control
+                           Message_Log) &  ! Error messaging
                          RESULT( Error_Status )
     ! Arguments
     TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere
-    INTEGER,            OPTIONAL, INTENT(IN)     :: No_Clear
+    INTEGER     ,     OPTIONAL, INTENT(IN)     :: No_Clear
     CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
     CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
@@ -875,16 +866,23 @@ CONTAINS
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Destroy_Atmosphere(Scalar)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     LOGICAL :: Clear
     INTEGER :: Allocate_Status
 
-
-    ! ------
     ! Set up
     ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Re-initialise the dimensions
+    Atmosphere%Max_Layers   = 0
+    Atmosphere%n_Layers     = 0
+    Atmosphere%n_Absorbers  = 0
+    Atmosphere%Max_Clouds   = 0
+    Atmosphere%n_Clouds     = 0
+    Atmosphere%Max_Aerosols = 0
+    Atmosphere%n_Aerosols   = 0
 
     ! Default is to clear scalar members...
     Clear = .TRUE.
@@ -892,174 +890,75 @@ CONTAINS
     IF ( PRESENT( No_Clear ) ) THEN
       IF ( No_Clear == SET ) Clear = .FALSE.
     END IF
-
-
-    ! -----------------------------
-    ! Initialise the scalar members
-    ! -----------------------------
     IF ( Clear ) CALL CRTM_Clear_Atmosphere( Atmosphere )
 
-
-    ! -----------------------------------------------------
-    ! If ALL pointer members are NOT associated, do nothing
-    ! -----------------------------------------------------
+    ! If ALL components are NOT associated, do nothing
     IF ( .NOT. CRTM_Associated_Atmosphere( Atmosphere ) ) RETURN
 
 
-    ! ------------------------------------
-    ! Deallocate the array pointer members
-    ! ------------------------------------
-    ! Deallocate the Atmosphere Absorber_ID member
-    IF ( ASSOCIATED( Atmosphere%Absorber_ID ) ) THEN
-      DEALLOCATE( Atmosphere%Absorber_ID, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Absorber_ID ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Absorber_Units member
-    IF ( ASSOCIATED( Atmosphere%Absorber_Units ) ) THEN
-      DEALLOCATE( Atmosphere%Absorber_Units, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Absorber_Units ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Level_Pressure member
-    IF ( ASSOCIATED( Atmosphere%Level_Pressure ) ) THEN
-      DEALLOCATE( Atmosphere%Level_Pressure, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Level_Pressure ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Level_Temperature member
-    IF ( ASSOCIATED( Atmosphere%Level_Temperature ) ) THEN
-      DEALLOCATE( Atmosphere%Level_Temperature, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Level_Temperature ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Pressure member
-    IF ( ASSOCIATED( Atmosphere%Pressure ) ) THEN
-      DEALLOCATE( Atmosphere%Pressure, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Pressure ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Temperature member
-    IF ( ASSOCIATED( Atmosphere%Temperature ) ) THEN
-      DEALLOCATE( Atmosphere%Temperature, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Temperature ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the Atmosphere Absorber member
-    IF ( ASSOCIATED( Atmosphere%Absorber ) ) THEN
-      DEALLOCATE( Atmosphere%Absorber, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere Absorber ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
+    ! Deallocate the array components
+    ! -------------------------------
+    DEALLOCATE( Atmosphere%Absorber_ID   , &
+                Atmosphere%Absorber_Units, &
+                Atmosphere%Level_Pressure, &
+                Atmosphere%Pressure      , &
+                Atmosphere%Temperature   , &
+                Atmosphere%Absorber      , &
+                STAT = Allocate_Status )
+    IF ( Allocate_Status /= 0 ) THEN
+      Error_Status = FAILURE
+      WRITE(Message,'("Error deallocating Atmosphere components. STAT = ",i0)') &
+                    Allocate_Status
+      CALL Display_Message( ROUTINE_NAME,    &
+                            TRIM(Message), &
+                            Error_Status,    &
+                            Message_Log=Message_Log )
     END IF
 
 
-    ! ---------------------------------------------------
-    ! Deallocate the Cloud structure array pointer member
-    ! ---------------------------------------------------
+    ! Deallocate the Cloud structure array component
+    ! ----------------------------------------------
     IF ( ASSOCIATED( Atmosphere%Cloud ) ) THEN
 
       ! Destroy the cloud structure(s)
       Error_Status = CRTM_Destroy_Cloud( Atmosphere%Cloud, &
                                          No_Clear = No_Clear, &
-                                         Message_Log = Message_Log )
+                                         Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
-                              'Error destroying CRTM_Atmosphere Cloud structure(s).', &
+                              'Error destroying Atmosphere Cloud structure(s).', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
 
       ! Deallocate the array
       DEALLOCATE( Atmosphere%Cloud, STAT = Allocate_Status )
       IF ( Allocate_Status /= 0 ) THEN
         Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_Atmosphere cloud ", &
-                          &"member. STAT = ", i5 )' ) &
+        WRITE( Message, '( "Error deallocating Atmosphere cloud ", &
+                          &"component. STAT = ", i0 )' ) &
                         Allocate_Status
         CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END IF
 
 
-    ! -----------------------------------------------------
-    ! Deallocate the Aerosol structure array pointer member
-    ! -----------------------------------------------------
+    ! Deallocate the Aerosol structure array component
+    ! ------------------------------------------------
     IF ( ASSOCIATED( Atmosphere%Aerosol ) ) THEN
-
+    
       ! Destroy the aerosol structure(s)
       Error_Status = CRTM_Destroy_Aerosol( Atmosphere%Aerosol, &
                                            No_Clear = No_Clear, &
-                                           Message_Log = Message_Log )
+                                           Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
                               'Error destroying CRTM_Atmosphere Aerosol structure(s).', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
 
       ! Deallocate the array
@@ -1067,417 +966,121 @@ CONTAINS
       IF ( Allocate_Status /= 0 ) THEN
         Error_Status = FAILURE
         WRITE( Message, '( "Error deallocating CRTM_Atmosphere cloud ", &
-                          &"member. STAT = ", i5 )' ) &
+                          &"member. STAT = ", i0 )' ) &
                         Allocate_Status
         CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END IF
 
 
-    ! -------------------------------------
     ! Decrement and test allocation counter
     ! -------------------------------------
     Atmosphere%n_Allocates = Atmosphere%n_Allocates - 1
     IF ( Atmosphere%n_Allocates /= 0 ) THEN
       Error_Status = FAILURE
-      WRITE( Message, '( "Allocation counter /= 0, Value = ", i5 )' ) &
+      WRITE( Message, '( "Allocation counter /= 0, Value = ", i0 )' ) &
                       Atmosphere%n_Allocates
       CALL Display_Message( ROUTINE_NAME,    &
-                            TRIM( Message ), &
+                            TRIM(Message), &
                             Error_Status,    &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
     END IF
 
   END FUNCTION Destroy_Scalar
 
 
-  FUNCTION Destroy_Scalar_Multi( Atmosphere1,  &  ! Output
-                                 Atmosphere2,  &  ! Output
-                                 Atmosphere3,  &  ! Optional Output
-                                 Atmosphere4,  &  ! Optional Output
-                                 Atmosphere5,  &  ! Optional Output
-                                 Atmosphere6,  &  ! Optional Output
-                                 Atmosphere7,  &  ! Optional Output
-                                 Atmosphere8,  &  ! Optional Output
-                                 Atmosphere9,  &  ! Optional Output
-                                 Atmosphere10, &  ! Optional Output
-                                 No_Clear,     &  ! Optional input
-                                 RCS_Id,       &  ! Revision control
-                                 Message_Log ) &  ! Error messaging
-                               RESULT( Error_Status )
-    ! Arguments
-    TYPE(CRTM_Atmosphere_type),           INTENT(IN OUT) :: Atmosphere1
-    TYPE(CRTM_Atmosphere_type),           INTENT(IN OUT) :: Atmosphere2
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere3
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere4
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere5
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere6
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere7
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere8
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere9
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, INTENT(IN OUT) :: Atmosphere10
-    INTEGER,                    OPTIONAL, INTENT(IN)     :: No_Clear
-    CHARACTER(*),               OPTIONAL, INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL, INTENT(IN)     :: Message_Log
-    ! Function result
-    INTEGER :: Error_Status
-    ! Local parameters
-    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Destroy_Atmosphere(Scalar,Multi)'
-    ! Local variables
-    INTEGER :: Destroy_Status
-
-    ! Set up
-    Error_Status = SUCCESS
-    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
-
-
-    ! The mandatory arguments
-    Destroy_Status = Destroy_Scalar( Atmosphere1, &
-                                     No_Clear = No_Clear, &
-                                     Message_Log = Message_Log )
-    IF ( Destroy_Status /= SUCCESS ) THEN
-      Error_Status = Destroy_Status
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Error destroying first Atmosphere structure.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-    END IF
-
-    Destroy_Status = Destroy_Scalar( Atmosphere2, &
-                                     No_Clear = No_Clear, &
-                                     Message_Log = Message_Log )
-    IF ( Destroy_Status /= SUCCESS ) THEN
-      Error_Status = Destroy_Status
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Error destroying second Atmosphere structure.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-    END IF
-
-
-    ! The optional arguments
-    IF ( PRESENT( Atmosphere3 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere3, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying third Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere4 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere4, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying fourth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere5 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere5, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying fifth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere6 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere6, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying sixth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere7 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere7, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying seventh Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere8 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere8, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying eighth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere9 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere9, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying ninth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere10 ) ) THEN
-      Destroy_Status = Destroy_Scalar( Atmosphere10, &
-                                       No_Clear = No_Clear, &
-                                       Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying tenth Atmosphere structure.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-  END FUNCTION Destroy_Scalar_Multi
-
-
-  FUNCTION Destroy_Rank1( Atmosphere,   &  ! Output
-                          No_Clear,     &  ! Optional input
-                          RCS_Id,       &  ! Revision control
-                          Message_Log ) &  ! Error messaging
+  FUNCTION Destroy_Rank1( Atmosphere , &  ! Output
+                          No_Clear   , &  ! Optional input
+                          RCS_Id     , &  ! Revision control
+                          Message_Log) &  ! Error messaging
                         RESULT( Error_Status )
     ! Arguments
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    INTEGER,                    OPTIONAL,     INTENT(IN)     :: No_Clear
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    INTEGER     ,     OPTIONAL, INTENT(IN)     :: No_Clear
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Destroy_Atmosphere(Rank-1)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
     ! Reinitialise array
+    ! ------------------
     DO n = 1, SIZE( Atmosphere )
       Scalar_Status = Destroy_Scalar( Atmosphere(n), &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
+                                      No_Clear   =No_Clear, &
+                                      Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error destroying element #", i5, &
-                          &" of CRTM_Atmosphere structure array." )' ) n
+        WRITE( Message, '( "Error destroying element (",i0,")", &
+                          &" of Atmosphere structure array." )' ) n
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Destroy_Rank1
 
-  FUNCTION Destroy_Rank1_Multi( Atmosphere1,  &  ! Output
-                                Atmosphere2,  &  ! Output
-                                Atmosphere3,  &  ! Optional Output
-                                Atmosphere4,  &  ! Optional Output
-                                Atmosphere5,  &  ! Optional Output
-                                Atmosphere6,  &  ! Optional Output
-                                Atmosphere7,  &  ! Optional Output
-                                Atmosphere8,  &  ! Optional Output
-                                Atmosphere9,  &  ! Optional Output
-                                Atmosphere10, &  ! Optional Output
-                                No_Clear,     &  ! Optional input
-                                RCS_Id,       &  ! Revision control
-                                Message_Log ) &  ! Error messaging
-                              RESULT( Error_Status )
+
+  FUNCTION Destroy_Rank2( Atmosphere , &  ! Output
+                          No_Clear   , &  ! Optional input
+                          RCS_Id     , &  ! Revision control
+                          Message_Log) &  ! Error messaging
+                        RESULT( Error_Status )
     ! Arguments
-    TYPE(CRTM_Atmosphere_type),           DIMENSION(:), INTENT(IN OUT) :: Atmosphere1
-    TYPE(CRTM_Atmosphere_type),           DIMENSION(:), INTENT(IN OUT) :: Atmosphere2
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere3
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere4
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere5
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere6
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere7
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere8
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere9
-    TYPE(CRTM_Atmosphere_type), OPTIONAL, DIMENSION(:), INTENT(IN OUT) :: Atmosphere10
-    INTEGER,                    OPTIONAL,               INTENT(IN)     :: No_Clear
-    CHARACTER(*),               OPTIONAL,               INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,               INTENT(IN)     :: Message_Log
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:,:)
+    INTEGER     ,     OPTIONAL, INTENT(IN)     :: No_Clear
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
-    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Destroy_Atmosphere(Rank-1,Multi)'
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Destroy_Atmosphere(Rank-2)'
     ! Local variables
-    INTEGER :: Destroy_Status
+    CHARACTER(256) :: Message
+    INTEGER :: Scalar_Status
+    INTEGER :: l, m
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
+    ! Reinitialise array
+    ! ------------------
+    DO m = 1, SIZE(Atmosphere,2)
+      DO l = 1, SIZE(Atmosphere,1)
+        Scalar_Status = Destroy_Scalar( Atmosphere(l,m), &
+                                        No_Clear = No_Clear, &
+                                        Message_Log=Message_Log )
+        IF ( Scalar_Status /= SUCCESS ) THEN
+          Error_Status = Scalar_Status
+          WRITE( Message, '( "Error destroying element (",i0,",",i0,")", &
+                            &" of Atmosphere structure array." )' ) l, m
+          CALL Display_Message( ROUTINE_NAME, &
+                                TRIM(Message), &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+        END IF
+      END DO
+    END DO
 
-    ! The mandatory arguments
-    Destroy_Status = Destroy_Rank1( Atmosphere1, &
-                                    No_Clear = No_Clear, &
-                                    Message_Log = Message_Log )
-    IF ( Destroy_Status /= SUCCESS ) THEN
-      Error_Status = Destroy_Status
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Error destroying first Atmosphere structure array.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-    END IF
-
-    Destroy_Status = Destroy_Rank1( Atmosphere2, &
-                                    No_Clear = No_Clear, &
-                                    Message_Log = Message_Log )
-    IF ( Destroy_Status /= SUCCESS ) THEN
-      Error_Status = Destroy_Status
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Error destroying second Atmosphere structure array.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-    END IF
-
-
-    ! The optional arguments
-    IF ( PRESENT( Atmosphere3 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere3, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying third Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere4 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere4, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying fourth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere5 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere5, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying fifth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere6 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere6, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying sixth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere7 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere7, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying seventh Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere8 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere8, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying eighth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere9 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere9, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying ninth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    IF ( PRESENT( Atmosphere10 ) ) THEN
-      Destroy_Status = Destroy_Rank1( Atmosphere10, &
-                                      No_Clear = No_Clear, &
-                                      Message_Log = Message_Log )
-      IF ( Destroy_Status /= SUCCESS ) THEN
-        Error_Status = Destroy_Status
-        CALL Display_Message( ROUTINE_NAME, &
-                              'Error destroying tenth Atmosphere structure array.', &
-                              Error_Status, &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-  END FUNCTION Destroy_Rank1_Multi
-
+  END FUNCTION Destroy_Rank2
+  
 
 !--------------------------------------------------------------------------------
 !
@@ -1488,13 +1091,13 @@ CONTAINS
 !       Function to allocate CRTM_Atmosphere data structures.
 !
 ! CALLING SEQUENCE:
-!       Error_Status = CRTM_Allocate_Atmosphere( n_Layers,                 &  ! Input
-!                                                n_Absorbers,              &  ! Input
-!                                                n_Clouds,                 &  ! Input
-!                                                n_Aerosols,               &  ! Input
-!                                                Atmosphere,               &  ! Output
-!                                                RCS_Id      = RCS_Id,     &  ! Revision control
-!                                                Message_Log = Message_Log )  ! Error messaging
+!       Error_Status = CRTM_Allocate_Atmosphere( n_Layers               , &  ! Input
+!                                                n_Absorbers            , &  ! Input
+!                                                n_Clouds               , &  ! Input
+!                                                n_Aerosols             , &  ! Input
+!                                                Atmosphere             , &  ! Output
+!                                                RCS_Id     =RCS_Id     , &  ! Revision control
+!                                                Message_Log=Message_Log  )  ! Error messaging
 !
 ! INPUT ARGUMENTS:
 !       n_Layers:     Number of layers dimension.
@@ -1540,7 +1143,7 @@ CONTAINS
 !                     ATTRIBUTES: INTENT(IN), OPTIONAL
 !
 ! OUTPUT ARGUMENTS:
-!       Atmosphere:   Atmosphere structure with allocated pointer members. The
+!       Atmosphere:   Atmosphere structure with allocated components. The
 !                     following table shows the allowable dimension combinations
 !                     for the calling routine, where M == number of profiles:
 !
@@ -1599,19 +1202,19 @@ CONTAINS
 !
 !--------------------------------------------------------------------------------
 
-  FUNCTION Allocate_Scalar( n_Layers,     &  ! Input
-                            n_Absorbers,  &  ! Input
-                            n_Clouds,     &  ! Input
-                            n_Aerosols,   &  ! Input
-                            Atmosphere,   &  ! Output
-                            RCS_Id,       &  ! Revision control
-                            Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Scalar( n_Layers   , &  ! Input
+                            n_Absorbers, &  ! Input
+                            n_Clouds   , &  ! Input
+                            n_Aerosols , &  ! Input
+                            Atmosphere , &  ! Output
+                            RCS_Id     , &  ! Revision control
+                            Message_Log) &  ! Error messaging
                           RESULT( Error_Status )
     ! Arguments
-    INTEGER,                    INTENT(IN)     :: n_Layers    
-    INTEGER,                    INTENT(IN)     :: n_Absorbers 
-    INTEGER,                    INTENT(IN)     :: n_Clouds    
-    INTEGER,                    INTENT(IN)     :: n_Aerosols    
+    INTEGER                   , INTENT(IN)     :: n_Layers    
+    INTEGER                   , INTENT(IN)     :: n_Absorbers 
+    INTEGER                   , INTENT(IN)     :: n_Clouds    
+    INTEGER                   , INTENT(IN)     :: n_Aerosols    
     TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere
     CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
     CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
@@ -1620,159 +1223,140 @@ CONTAINS
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Scalar)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Allocate_Status
+    INTEGER :: i
 
-
-    ! ------
     ! Set up
     ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
-
-    ! Number of layers
-    IF ( n_Layers < 1 ) THEN
+    
+    ! Check dimensions
+    IF ( n_Layers    < 1 .OR. &
+         n_Absorbers < 1 ) THEN
       Error_Status = FAILURE
       CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Layers must be > 0.', &
+                            'Input n_Layers and n_Absorbers must be > 0.', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
-
-    ! Number of absorbers
-    IF ( n_Absorbers < 1 ) THEN
+    IF ( n_Clouds   < 0 .OR. &
+         n_Aerosols < 0 ) THEN
       Error_Status = FAILURE
       CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Absorbers must be > 0.', &
+                            'Input n_Clouds and n_Aerosols must be > or = 0.', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
-
-    ! Number of clouds. Can be == 0.
-    IF ( n_Clouds < 0 ) THEN
-      Error_Status = FAILURE
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Clouds must be > or = 0.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-      RETURN
-    END IF
-
-    ! Number of aerosols. Can be == 0.
-    IF ( n_Aerosols < 0 ) THEN
-      Error_Status = FAILURE
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Aerosols must be > or = 0.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-      RETURN
-    END IF
-
+    
     ! Check if ANY pointers are already associated
     ! If they are, deallocate them but leave scalars.
     IF ( CRTM_Associated_Atmosphere( Atmosphere, ANY_Test = SET ) ) THEN
       Error_Status = CRTM_Destroy_Atmosphere( Atmosphere, &
                                               No_Clear = SET, &
-                                              Message_Log = Message_Log )
+                                              Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
-                              'Error deallocating CRTM_Atmosphere pointer members.', &
+                              'Error deallocating Atmosphere components.', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
         RETURN
       END IF
     END IF
 
 
-    ! -------------------------
-    ! The intrinsic type arrays
-    ! -------------------------
+    ! Allocate the intrinsic type arrays
+    ! ----------------------------------
     ALLOCATE( Atmosphere%Absorber_ID( n_Absorbers ), &
               Atmosphere%Absorber_Units( n_Absorbers ), &
               Atmosphere%Level_Pressure( 0:n_Layers ), &
-              Atmosphere%Level_Temperature( 0:n_Layers ), &
               Atmosphere%Pressure( n_Layers ), &
               Atmosphere%Temperature( n_Layers ), &
               Atmosphere%Absorber( n_Layers, n_Absorbers ), &
               STAT = Allocate_Status )
     IF ( Allocate_Status /= 0 ) THEN
       Error_Status = FAILURE
-      WRITE( Message, '( "Error allocating CRTM_Atmosphere data arrays. STAT = ", i5 )' ) &
+      WRITE( Message, '( "Error allocating Atmosphere data arrays. STAT = ", i0 )' ) &
                       Allocate_Status
-      CALL Display_Message( ROUTINE_NAME,    &
-                            TRIM( Message ), &
-                            Error_Status,    &
-                            Message_Log = Message_Log )
+      CALL Display_Message( ROUTINE_NAME, &
+                            TRIM(Message), &
+                            Error_Status, &
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
 
-    ! -------------------------
-    ! The cloud structure array
-    ! -------------------------
+    ! Allocate the cloud structure array
+    ! ----------------------------------
     IF ( n_Clouds > 0 ) THEN
+    
       ! Allocate the structure array
       ALLOCATE( Atmosphere%Cloud( n_Clouds ), &
                 STAT = Allocate_Status )
       IF ( Allocate_Status /= 0 ) THEN
         Error_Status = FAILURE
-        WRITE( Message, '( "Error allocating CRTM_Atmosphere Cloud structure array. STAT = ", i5 )' ) &
+        WRITE( Message, '( "Error allocating Atmosphere Cloud structure array. STAT = ", i0 )' ) &
                         Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
         RETURN
       END IF
+      
       ! Allocate the individual structures
-      Error_Status = CRTM_Allocate_Cloud( n_Layers,         &
-                                          Atmosphere%Cloud, &
-                                          Message_Log = Message_Log )
-      IF ( Error_Status /= SUCCESS ) THEN
-        CALL Display_Message( ROUTINE_NAME,    &
-                              'Error allocating CRTM_Cloud structure(s).', &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-        RETURN
-      END IF
+      DO i = 1, n_Clouds
+        Error_Status = CRTM_Allocate_Cloud( n_Layers,&
+                                            Atmosphere%Cloud(i), &
+                                            Message_Log=Message_Log )
+        IF ( Error_Status /= SUCCESS ) THEN
+          CALL Display_Message( ROUTINE_NAME, &
+                                'Error allocating Cloud structure(s).', &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+          RETURN
+        END IF
+      END DO
     END IF
 
 
-    ! ---------------------------
-    ! The aerosol structure array
-    ! ---------------------------
+    ! Allocate the aerosol structure array
+    ! ------------------------------------
     IF ( n_Aerosols > 0 ) THEN
+    
       ! Allocate the structure array
       ALLOCATE( Atmosphere%Aerosol( n_Aerosols ), &
                 STAT = Allocate_Status )
       IF ( Allocate_Status /= 0 ) THEN
         Error_Status = FAILURE
-        WRITE( Message, '( "Error allocating CRTM_Atmosphere Aerosol structure array. STAT = ", i5 )' ) &
+        WRITE( Message, '( "Error allocating Atmosphere Aerosol structure array. STAT = ", i0 )' ) &
                         Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
         RETURN
       END IF
+      
       ! Allocate the individual structures
-      Error_Status = CRTM_Allocate_Aerosol( n_Layers, &
-                                            MAX_N_AEROSOL_MODES, &
-                                            Atmosphere%Aerosol, &
-                                            Message_Log = Message_Log )
-      IF ( Error_Status /= SUCCESS ) THEN
-        CALL Display_Message( ROUTINE_NAME,    &
-                              'Error allocating CRTM_Aerosol structure(s).', &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-        RETURN
-      END IF
+      DO i = 1, n_Aerosols
+        Error_Status = CRTM_Allocate_Aerosol( n_Layers, &
+                                              Atmosphere%Aerosol(i), &
+                                              Message_Log=Message_Log )
+        IF ( Error_Status /= SUCCESS ) THEN
+          CALL Display_Message( ROUTINE_NAME, &
+                                'Error allocating Aerosol structure(s).', &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+          RETURN
+        END IF
+      END DO
     END IF
 
 
-    ! ------------------------------------------
     ! Assign the dimensions and initalise arrays
     ! ------------------------------------------
     Atmosphere%Max_Layers   = n_Layers
@@ -1782,109 +1366,113 @@ CONTAINS
     Atmosphere%n_Clouds     = n_Clouds
     Atmosphere%Max_Aerosols = n_Aerosols
     Atmosphere%n_Aerosols   = n_Aerosols
+    
     Atmosphere%Absorber_ID    = INVALID_ABSORBER_ID
     Atmosphere%Absorber_Units = INVALID_ABSORBER_UNITS
-    Atmosphere%Level_Pressure    = ZERO
-    Atmosphere%Level_Temperature = ZERO
-    Atmosphere%Pressure          = ZERO
-    Atmosphere%Temperature       = ZERO
-    Atmosphere%Absorber          = ZERO
+    
+    Atmosphere%Level_Pressure = ZERO
+    Atmosphere%Pressure       = ZERO
+    Atmosphere%Temperature    = ZERO
+    Atmosphere%Absorber       = ZERO
 
 
-    ! -------------------------------------
     ! Increment and test allocation counter
     ! -------------------------------------
     Atmosphere%n_Allocates = Atmosphere%n_Allocates + 1
     IF ( Atmosphere%n_Allocates /= 1 ) THEN
       Error_Status = FAILURE
-      WRITE( Message, '( "Allocation counter /= 1, Value = ", i5 )' ) &
+      WRITE( Message, '( "Allocation counter /= 1, Value = ", i0 )' ) &
                       Atmosphere%n_Allocates
       CALL Display_Message( ROUTINE_NAME,    &
-                            TRIM( Message ), &
+                            TRIM(Message), &
                             Error_Status,    &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
     END IF
 
   END FUNCTION Allocate_Scalar
 
 
-  FUNCTION Allocate_Rank00001( n_Layers,     &  ! Input, scalar
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input, scalar
-                               n_Aerosols,   &  ! Input, scalar
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank00001( n_Layers   , &  ! Input, scalar
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input, scalar
+                               n_Aerosols , &  ! Input, scalar
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                                  INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                                  INTENT(IN)     :: n_Clouds
-    INTEGER,                                  INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers
+    INTEGER                   , INTENT(IN)     :: n_Absorbers
+    INTEGER                   , INTENT(IN)     :: n_Clouds
+    INTEGER                   , INTENT(IN)     :: n_Aerosols
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-00001)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, SIZE( Atmosphere )
-      Scalar_Status = Allocate_Scalar( n_Layers,      & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds,      & ! Input
-                                       n_Aerosols,    & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers     , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds     , & ! Input
+                                       n_Aerosols   , & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank00001
 
 
-  FUNCTION Allocate_Rank00011( n_Layers,     &  ! Input, scalar
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input, scalar
-                               n_Aerosols,   &  ! Input,  M
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank00011( n_Layers   , &  ! Input, scalar
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input, scalar
+                               n_Aerosols , &  ! Input,  M
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                                  INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                                  INTENT(IN)     :: n_Clouds
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers
+    INTEGER                   , INTENT(IN)     :: n_Absorbers
+    INTEGER                   , INTENT(IN)     :: n_Clouds
+    INTEGER                   , INTENT(IN)     :: n_Aerosols(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-00011)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------                
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -1896,58 +1484,61 @@ CONTAINS
                             'Input n_Aerosols and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers,      & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds,      & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers     , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds     , & ! Input
                                        n_Aerosols(i), & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank00011
 
 
-  FUNCTION Allocate_Rank00101( n_Layers,     &  ! Input, scalar
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input,  M
-                               n_Aerosols,   &  ! Input, scalar
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank00101( n_Layers   , &  ! Input, scalar
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input,  M
+                               n_Aerosols , &  ! Input, scalar
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                                  INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Clouds
-    INTEGER,                                  INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers
+    INTEGER                   , INTENT(IN)     :: n_Absorbers
+    INTEGER                   , INTENT(IN)     :: n_Clouds(:)
+    INTEGER                   , INTENT(IN)     :: n_Aerosols
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-00101)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------                
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -1959,58 +1550,61 @@ CONTAINS
                             'Input n_Clouds and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers,      & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds(i),   & ! Input
-                                       n_Aerosols,    & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers     , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds(i)  , & ! Input
+                                       n_Aerosols   , & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank00101
 
 
-  FUNCTION Allocate_Rank00111( n_Layers,     &  ! Input, scalar
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input,  M
-                               n_Aerosols,   &  ! Input,  M
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank00111( n_Layers   , &  ! Input, scalar
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input,  M
+                               n_Aerosols , &  ! Input,  M
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                                  INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Clouds
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers
+    INTEGER                   , INTENT(IN)     :: n_Absorbers
+    INTEGER                   , INTENT(IN)     :: n_Clouds(:)
+    INTEGER                   , INTENT(IN)     :: n_Aerosols(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-00111)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2023,58 +1617,60 @@ CONTAINS
                             'Input n_Clouds, n_Aerosols and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers,      & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds(i),   & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers     , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds(i)  , & ! Input
                                        n_Aerosols(i), & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank00111
 
 
-  FUNCTION Allocate_Rank10001( n_Layers,     &  ! Input,  M
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input, scalar
-                               n_Aerosols,   &  ! Input, scalar
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank10001( n_Layers   , &  ! Input,  M
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input, scalar
+                               n_Aerosols , &  ! Input, scalar
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                                  INTENT(IN)     :: n_Clouds
-    INTEGER,                                  INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers(:)
+    INTEGER                   , INTENT(IN)     :: n_Absorbers
+    INTEGER                   , INTENT(IN)     :: n_Clouds
+    INTEGER                   , INTENT(IN)     :: n_Aerosols
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-10001)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2086,58 +1682,61 @@ CONTAINS
                             'Input n_Layers and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers(i),   & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds,      & ! Input
-                                       n_Aerosols,    & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers(i)  , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds     , & ! Input
+                                       n_Aerosols   , & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank10001
 
 
-  FUNCTION Allocate_Rank10011( n_Layers,     &  ! Input,  M
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input, scalar
-                               n_Aerosols,   &  ! Input,  M
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank10011( n_Layers   , &  ! Input,  M
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input, scalar
+                               n_Aerosols , &  ! Input,  M
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                                  INTENT(IN)     :: n_Clouds
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers(:)
+    INTEGER                   , INTENT(IN)     :: n_Absorbers   
+    INTEGER                   , INTENT(IN)     :: n_Clouds      
+    INTEGER                   , INTENT(IN)     :: n_Aerosols(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-10011)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2150,58 +1749,61 @@ CONTAINS
                             'Input n_Layers, n_Aerosols and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers(i),   & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds,      & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers(i)  , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds     , & ! Input
                                        n_Aerosols(i), & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank10011
 
 
-  FUNCTION Allocate_Rank10101( n_Layers,     &  ! Input,  M
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input,  M
-                               n_Aerosols,   &  ! Input, scalar
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank10101( n_Layers   , &  ! Input,  M
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input,  M
+                               n_Aerosols , &  ! Input, scalar
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Clouds
-    INTEGER,                                  INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers(:)
+    INTEGER                   , INTENT(IN)     :: n_Absorbers   
+    INTEGER                   , INTENT(IN)     :: n_Clouds(:)
+    INTEGER                   , INTENT(IN)     :: n_Aerosols    
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-10101)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2214,58 +1816,61 @@ CONTAINS
                             'Input n_Layers, n_Clouds and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers(i),   & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds(i),   & ! Input
-                                       n_Aerosols,    & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers(i)  , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds(i)  , & ! Input
+                                       n_Aerosols   , & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Allocate_Rank10101
 
 
-  FUNCTION Allocate_Rank10111( n_Layers,     &  ! Input,  M
-                               n_Absorbers,  &  ! Input, scalar
-                               n_Clouds,     &  ! Input,  M
-                               n_Aerosols,   &  ! Input,  M
-                               Atmosphere,   &  ! Output, M
-                               RCS_Id,       &  ! Revision control
-                               Message_Log ) &  ! Error messaging
+  FUNCTION Allocate_Rank10111( n_Layers   , &  ! Input,  M
+                               n_Absorbers, &  ! Input, scalar
+                               n_Clouds   , &  ! Input,  M
+                               n_Aerosols , &  ! Input,  M
+                               Atmosphere , &  ! Output, M
+                               RCS_Id     , &  ! Revision control
+                               Message_Log) &  ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Layers
-    INTEGER,                                  INTENT(IN)     :: n_Absorbers
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Clouds
-    INTEGER,                    DIMENSION(:), INTENT(IN)     :: n_Aerosols
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    INTEGER                   , INTENT(IN)     :: n_Layers(:)
+    INTEGER                   , INTENT(IN)     :: n_Absorbers   
+    INTEGER                   , INTENT(IN)     :: n_Clouds(:)
+    INTEGER                   , INTENT(IN)     :: n_Aerosols(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_Atmosphere(Rank-10111)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2279,26 +1884,28 @@ CONTAINS
                             'Input n_Layers, n_Clouds, n_Aerosols and Atmosphere arrays'//&
                             ' do not conform', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the allocation
+    ! ----------------------
     DO i = 1, n
-      Scalar_Status = Allocate_Scalar( n_Layers(i),   & ! Input
-                                       n_Absorbers,   & ! Input
-                                       n_Clouds(i),   & ! Input
+      Scalar_Status = Allocate_Scalar( n_Layers(i)  , & ! Input
+                                       n_Absorbers  , & ! Input
+                                       n_Clouds(i)  , & ! Input
                                        n_Aerosols(i), & ! Input
                                        Atmosphere(i), & ! Output
-                                       Message_Log = Message_Log )
+                                       Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error allocating element #", i5, &
+        WRITE( Message, '( "Error allocating element #", i0, &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
@@ -2314,17 +1921,28 @@ CONTAINS
 !       Function to copy valid CRTM_Atmosphere structures.
 !
 ! CALLING SEQUENCE:
-!       Error_Status = CRTM_Assign_Atmosphere( Atmosphere_in,            &  ! Input
-!                                              Atmosphere_out,           &  ! Output
-!                                              RCS_Id = RCS_Id,          &  ! Revision control
-!                                              Message_Log = Message_Log )  ! Error messaging
+!       Error_Status = CRTM_Assign_Atmosphere( Atmosphere_in          , &  ! Input
+!                                              Atmosphere_out         , &  ! Output
+!                                              RCS_Id     =RCS_Id     , &  ! Revision control
+!                                              Message_Log=Message_Log  )  ! Error messaging
 !
 ! INPUT ARGUMENTS:
-!       Atmosphere_in:   Atmosphere structure which is to be copied.
+!       Atmosphere_in:   Atmosphere structure which is to be copied. In the
+!                        context of the CRTM, rank-1 corresponds to an vector
+!                        of profiles, and rank-2 corresponds to an array of
+!                        channels x profiles. The latter is used in the K-matrix
+!                        model.
 !                        UNITS:      N/A
 !                        TYPE:       CRTM_Atmosphere_type
-!                        DIMENSION:  Scalar OR Rank-1
+!                        DIMENSION:  Scalar, Rank-1, or Rank-2 array
 !                        ATTRIBUTES: INTENT(IN)
+!
+! OUTPUT ARGUMENTS:
+!       Atmosphere_out:  Copy of the input structure, Atmosphere_in.
+!                        UNITS:      N/A
+!                        TYPE:       CRTM_Atmosphere_type
+!                        DIMENSION:  Same as Atmosphere_in
+!                        ATTRIBUTES: INTENT(IN OUT)
 !
 ! OPTIONAL INPUT ARGUMENTS:
 !       Message_Log:     Character string specifying a filename in which any
@@ -2335,14 +1953,6 @@ CONTAINS
 !                        TYPE:       CHARACTER(*)
 !                        DIMENSION:  Scalar
 !                        ATTRIBUTES: INTENT(IN), OPTIONAL
-!
-! OUTPUT ARGUMENTS:
-!       Atmosphere_out:  Copy of the input structure, Atmosphere_in.
-!                        UNITS:      N/A
-!                        TYPE:       CRTM_Atmosphere_type
-!                        DIMENSION:  Same as Atmosphere_in
-!                        ATTRIBUTES: INTENT(IN OUT)
-!
 !
 ! OPTIONAL OUTPUT ARGUMENTS:
 !       RCS_Id:          Character string containing the Revision Control
@@ -2368,10 +1978,10 @@ CONTAINS
 !
 !--------------------------------------------------------------------------------
 
-  FUNCTION Assign_Scalar( Atmosphere_in,  &  ! Input
+  FUNCTION Assign_Scalar( Atmosphere_in , &  ! Input
                           Atmosphere_out, &  ! Output
-                          RCS_Id,         &  ! Revision control
-                          Message_Log )   &  ! Error messaging
+                          RCS_Id        , &  ! Revision control
+                          Message_Log   ) &  ! Error messaging
                         RESULT( Error_Status )
     ! Arguments
     TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: Atmosphere_in
@@ -2383,31 +1993,29 @@ CONTAINS
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Assign_Atmosphere(Scalar)'
 
-    ! ------
     ! Set up
     ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
-
+    
     ! ALL *input* pointers must be associated
-    ! BUT the Cloud and/or Aerosol pointer members
+    ! BUT the Cloud and/or Aerosol components
     ! may not be.
     IF ( .NOT. CRTM_Associated_Atmosphere( Atmosphere_In, &
                                            Skip_Cloud   = SET, &
                                            Skip_Aerosol = SET  ) ) THEN
       Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_Out, &
-                                              Message_Log = Message_Log )
+                                              Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
-                              'Error deallocating output CRTM_Atmosphere pointer members.', &
+                              'Error deallocating output CRTM_Atmosphere components.', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
       RETURN
     END IF
 
 
-    ! ----------------------
     ! Allocate the structure
     ! ----------------------
     Error_Status = CRTM_Allocate_Atmosphere( Atmosphere_in%Max_Layers, &
@@ -2415,70 +2023,59 @@ CONTAINS
                                              Atmosphere_in%Max_Clouds, &
                                              Atmosphere_in%Max_Aerosols, &
                                              Atmosphere_out, &
-                                             Message_Log = Message_Log )
+                                             Message_Log=Message_Log )
     IF ( Error_Status /= SUCCESS ) THEN
       CALL Display_Message( ROUTINE_NAME, &
                             'Error allocating output CRTM_Atmosphere arrays.', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
 
-    ! ----------------------------------------
-    ! Assign the used-dimension scalar members
-    ! ----------------------------------------
+    ! Assign intrinsic data types
+    ! ---------------------------
     Atmosphere_out%n_Layers   = Atmosphere_in%n_Layers
     Atmosphere_out%n_Clouds   = Atmosphere_in%n_Clouds
     Atmosphere_out%n_Aerosols = Atmosphere_in%n_Aerosols
 
+    Atmosphere_out%Climatology = Atmosphere_in%Climatology
 
-    ! -----------------------------------
-    ! Assign non-dimension scalar members
-    ! -----------------------------------
-    Atmosphere_out%Level_Temperature_Input = Atmosphere_in%Level_Temperature_Input
-    Atmosphere_out%Climatology             = Atmosphere_in%Climatology
-
-
-    ! -----------------
-    ! Assign array data
-    ! -----------------
-    Atmosphere_out%Absorber_ID       = Atmosphere_in%Absorber_ID
-    Atmosphere_out%Absorber_Units    = Atmosphere_in%Absorber_Units
-    Atmosphere_out%Level_Pressure    = Atmosphere_in%Level_Pressure
-    Atmosphere_out%Level_Temperature = Atmosphere_in%Level_Temperature
-    Atmosphere_out%Pressure          = Atmosphere_in%Pressure
-    Atmosphere_out%Temperature       = Atmosphere_in%Temperature
-    Atmosphere_out%Absorber          = Atmosphere_in%Absorber
+    Atmosphere_out%Absorber_ID    = Atmosphere_in%Absorber_ID
+    Atmosphere_out%Absorber_Units = Atmosphere_in%Absorber_Units
+    Atmosphere_out%Level_Pressure = Atmosphere_in%Level_Pressure
+    Atmosphere_out%Pressure       = Atmosphere_in%Pressure
+    Atmosphere_out%Temperature    = Atmosphere_in%Temperature
+    Atmosphere_out%Absorber       = Atmosphere_in%Absorber
 
 
-    ! ---------------------
-    ! Assign structure data
-    ! ---------------------
-    ! Copy Cloud structure
+    ! Assign Cloud structure
+    ! ----------------------
     IF ( Atmosphere_in%Max_Clouds > 0 ) THEN
       Error_Status = CRTM_Assign_Cloud( Atmosphere_in%Cloud, &
                                         Atmosphere_out%Cloud, &
-                                        Message_Log = Message_Log)
+                                        Message_Log=Message_Log)
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME, &
                               'Error copying Cloud structure.', &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
         RETURN
       END IF
     END IF
 
-    ! Copy Aerosol structure
+
+    ! Assign Aerosol structure
+    ! ------------------------
     IF ( Atmosphere_in%Max_Aerosols > 0 ) THEN
       Error_Status = CRTM_Assign_Aerosol( Atmosphere_in%Aerosol, &
                                           Atmosphere_out%Aerosol, &
-                                          Message_Log = Message_Log)
+                                          Message_Log=Message_Log)
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME, &
                               'Error copying Aerosol structure.', &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
         RETURN
       END IF
     END IF
@@ -2486,26 +2083,27 @@ CONTAINS
   END FUNCTION Assign_Scalar
 
 
-  FUNCTION Assign_Rank1( Atmosphere_in,  &  ! Input
+  FUNCTION Assign_Rank1( Atmosphere_in , &  ! Input
                          Atmosphere_out, &  ! Output
-                         RCS_Id,         &  ! Revision control
-                         Message_Log )   &  ! Error messaging
+                         RCS_Id        , &  ! Revision control
+                         Message_Log   ) &  ! Error messaging
                        RESULT( Error_Status )
     ! Arguments
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN)     :: Atmosphere_in
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere_out
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: Atmosphere_in(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere_out(:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Assign_Atmosphere(Rank-1)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
     INTEGER :: i, n
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -2517,29 +2115,570 @@ CONTAINS
                             'Input Atmosphere_in and Atmosphere_out arrays'//&
                             ' have different dimensions', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the assignment
+    ! ----------------------
     DO i = 1, n
       Scalar_Status = Assign_Scalar( Atmosphere_in(i), &
                                      Atmosphere_out(i), &
-                                     Message_Log = Message_Log )
+                                     Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error copying element #", i5, &
+        WRITE( Message, '( "Error copying element (",i0,")", &
                           &" of CRTM_Atmosphere structure array." )' ) i
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
 
   END FUNCTION Assign_Rank1
 
 
+  FUNCTION Assign_Rank2( Atmosphere_in , &  ! Input
+                         Atmosphere_out, &  ! Output
+                         RCS_Id        , &  ! Revision control
+                         Message_Log   ) &  ! Error messaging
+                       RESULT( Error_Status )
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: Atmosphere_in(:,:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere_out(:,:)
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
+    ! Function result
+    INTEGER :: Error_Status
+    ! Local parameters
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Assign_Atmosphere(Rank-2)'
+    ! Local variables
+    CHARACTER(256) :: Message
+    INTEGER :: Scalar_Status
+    INTEGER :: i, j, l, m
+
+    ! Set up
+    ! ------
+    Error_Status = SUCCESS
+    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Array arguments must conform
+    l = SIZE(Atmosphere_in,1)
+    m = SIZE(Atmosphere_in,2)
+    IF ( SIZE(Atmosphere_out,1) /= l .OR. &
+         SIZE(Atmosphere_out,2) /= m      ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Input Atmosphere_in and Atmosphere_out arrays'//&
+                            ' have different dimensions', &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Perform the assignment
+    ! ----------------------
+    DO j = 1, m
+      DO i = 1, l
+        Scalar_Status = Assign_Scalar( Atmosphere_in(i,j), &
+                                       Atmosphere_out(i,j), &
+                                       Message_Log=Message_Log )
+        IF ( Scalar_Status /= SUCCESS ) THEN
+          Error_Status = Scalar_Status
+          WRITE( Message, '( "Error copying element (",i0,",",i0,")",&
+                            &" of CRTM_Atmosphere structure array." )' ) i,j
+          CALL Display_Message( ROUTINE_NAME, &
+                                TRIM(Message), &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+        END IF
+      END DO
+    END DO
+
+  END FUNCTION Assign_Rank2
+
+
+!--------------------------------------------------------------------------------
+!
+! NAME:
+!       CRTM_Equal_Atmosphere
+!
+! PURPOSE:
+!       Function to test if two Atmosphere structures are equal.
+!
+! CALLING SEQUENCE:
+!       Error_Status = CRTM_Equal_Atmosphere( Atmosphere_LHS                       , &  ! Input
+!                                             Atmosphere_RHS                       , &  ! Input
+!                                             ULP_Scale         =ULP_Scale         , &  ! Optional input
+!                                             Percent_Difference=Percent_Difference, &  ! Optional input
+!                                             Check_All         =Check_All         , &  ! Optional input
+!                                             RCS_Id            =RCS_Id            , &  ! Optional output
+!                                             Message_Log       =Message_Log         )  ! Error messaging
+!
+!
+! INPUT ARGUMENTS:
+!       Atmosphere_LHS:     Atmosphere structure to be compared; equivalent to the
+!                           left-hand side of a lexical comparison, e.g.
+!                             IF ( Atmosphere_LHS == Atmosphere_RHS ).
+!                           In the context of the CRTM, rank-1 corresponds to an
+!                           vector of profiles, and rank-2 corresponds to an array
+!                           of channels x profiles. The latter is used in the
+!                           K-matrix model.
+!                           UNITS:      N/A
+!                           TYPE:       CRTM_Atmosphere_type
+!                           DIMENSION:  Scalar, Rank-1, or Rank-2 array
+!                           ATTRIBUTES: INTENT(IN)
+!
+!       Atmosphere_RHS:     Atmosphere structure to be compared to; equivalent to
+!                           right-hand side of a lexical comparison, e.g.
+!                             IF ( Atmosphere_LHS == Atmosphere_RHS ).
+!                           UNITS:      N/A
+!                           TYPE:       CRTM_Atmosphere_type
+!                           DIMENSION:  Same as Atmosphere_LHS
+!                           ATTRIBUTES: INTENT(IN)
+!
+! OPTIONAL INPUT ARGUMENTS:
+!       ULP_Scale:          Unit of data precision used to scale the floating
+!                           point comparison. ULP stands for "Unit in the Last Place,"
+!                           the smallest possible increment or decrement that can be
+!                           made using a machine's floating point arithmetic.
+!                           Value must be positive - if a negative value is supplied,
+!                           the absolute value is used. If not specified, the default
+!                           value is 1.
+!                           UNITS:      N/A
+!                           TYPE:       INTEGER
+!                           DIMENSION:  Scalar
+!                           ATTRIBUTES: INTENT(IN), OPTIONAL
+!
+!       Percent_Differnece: Percentage difference value to use in comparing
+!                           the numbers rather than testing within some numerical
+!                           limit. The ULP_Scale argument is ignored if this argument is
+!                           specified.
+!                           UNITS:      N/A
+!                           TYPE:       REAL(fp)
+!                           DIMENSION:  Scalar
+!                           ATTRIBUTES: OPTIONAL, INTENT(IN)
+!
+!       Check_All:          Set this argument to check ALL the floating point
+!                           channel data of the Atmosphere structures. The default
+!                           action is return with a FAILURE status as soon as
+!                           any difference is found. This optional argument can
+!                           be used to get a listing of ALL the differences
+!                           between data in Atmosphere structures.
+!                           If == 0, Return with FAILURE status as soon as
+!                                    ANY difference is found  *DEFAULT*
+!                              == 1, Set FAILURE status if ANY difference is
+!                                    found, but continue to check ALL data.
+!                           UNITS:      N/A
+!                           TYPE:       INTEGER
+!                           DIMENSION:  Scalar
+!                           ATTRIBUTES: INTENT(IN), OPTIONAL
+!
+!       Message_Log:        Character string specifying a filename in which any
+!                           messages will be logged. If not specified, or if an
+!                           error occurs opening the log file, the default action
+!                           is to output messages to standard output.
+!                           UNITS:      None
+!                           TYPE:       CHARACTER(*)
+!                           DIMENSION:  Scalar
+!                           ATTRIBUTES: INTENT(IN), OPTIONAL
+!
+! OPTIONAL OUTPUT ARGUMENTS:
+!       RCS_Id:             Character string containing the Revision Control
+!                           System Id field for the module.
+!                           UNITS:      None
+!                           TYPE:       CHARACTER(*)
+!                           DIMENSION:  Scalar
+!                           ATTRIBUTES: INTENT(OUT), OPTIONAL
+!
+! FUNCTION RESULT:
+!       Error_Status:       The return value is an integer defining the error status.
+!                           The error codes are defined in the Message_Handler module.
+!                           If == SUCCESS the structures were equal
+!                              == FAILURE - an error occurred, or
+!                                         - the structures were different.
+!                           UNITS:      N/A
+!                           TYPE:       INTEGER
+!                           DIMENSION:  Scalar
+!
+!--------------------------------------------------------------------------------
+
+  FUNCTION Equal_Scalar( Atmosphere_LHS    , &  ! Input
+                         Atmosphere_RHS    , &  ! Input
+                         ULP_Scale         , &  ! Optional input
+                         Percent_Difference, &  ! Optional input
+                         Check_All         , &  ! Optional input
+                         RCS_Id            , &  ! Revision control
+                         Message_Log       ) &  ! Error messaging
+                       RESULT( Error_Status )
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_LHS
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_RHS
+    INTEGER,          OPTIONAL, INTENT(IN)  :: ULP_Scale
+    REAL(fp),         OPTIONAL, INTENT(IN)  :: Percent_Difference
+    INTEGER,          OPTIONAL, INTENT(IN)  :: Check_All
+    CHARACTER(*),     OPTIONAL, INTENT(OUT) :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)  :: Message_Log
+    ! Function result
+    INTEGER :: Error_Status
+    ! Local parameters
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Equal_Atmosphere(scalar)'
+    ! Local variables
+    CHARACTER(256) :: Message
+    LOGICAL :: Check_Once
+    INTEGER :: j, k
+    INTEGER :: Cloud_Status, Aerosol_Status
+
+    ! Set up
+    ! ------
+    Error_Status = SUCCESS
+    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Default action is to return on ANY difference...
+    Check_Once = .TRUE.
+    ! ...unless the Check_All argument is set
+    IF ( PRESENT( Check_All ) ) THEN
+      IF ( Check_All == SET ) Check_Once = .FALSE.
+    END IF
+
+    ! Check the structure association status
+    IF ( .NOT. CRTM_Associated_Atmosphere( Atmosphere_LHS ) ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Some or all INPUT Atmosphere_LHS pointer '//&
+                            'members are NOT associated.', &
+                            Error_Status,    &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+    IF ( .NOT. CRTM_Associated_Atmosphere( Atmosphere_RHS ) ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME,    &
+                            'Some or all INPUT Atmosphere_RHS pointer '//&
+                            'members are NOT associated.', &
+                            Error_Status,    &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Check dimensions
+    ! ----------------
+    IF ( Atmosphere_LHS%n_Layers    /= Atmosphere_RHS%n_Layers    .AND. &
+         Atmosphere_LHS%n_Absorbers /= Atmosphere_RHS%n_Absorbers .AND. &
+         Atmosphere_LHS%n_Clouds    /= Atmosphere_RHS%n_Clouds    .AND. &
+         Atmosphere_LHS%n_Aerosols  /= Atmosphere_RHS%n_Aerosols        ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Structure dimensions are different', &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Compare the values
+    ! ------------------
+    IF ( Atmosphere_LHS%Climatology /= Atmosphere_RHS%Climatology ) THEN
+      Error_Status = FAILURE
+      WRITE( Message,'("Climatology values are different:",2(1x,i0))') &
+                     Atmosphere_LHS%Climatology, Atmosphere_RHS%Climatology
+      CALL Display_Message( ROUTINE_NAME, &
+                            TRIM(Message), &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      IF ( Check_Once ) RETURN
+    END IF
+    DO j = 1, Atmosphere_LHS%n_Absorbers
+      IF ( Atmosphere_LHS%Absorber_ID(j) /= Atmosphere_RHS%Absorber_ID(j) ) THEN
+        Error_Status = FAILURE
+        WRITE( Message,'("Absorber_Id(",i0,") values are different:",2(1x,i0))') &
+                       j, Atmosphere_LHS%Absorber_ID(j), Atmosphere_RHS%Absorber_ID(j)
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+    DO j = 1, Atmosphere_LHS%n_Absorbers
+      IF ( Atmosphere_LHS%Absorber_Units(j) /= Atmosphere_RHS%Absorber_Units(j) ) THEN
+        Error_Status = FAILURE
+        WRITE( Message,'("Absorber_Units(",i0,") values are different:",2(1x,i0))') &
+                       j, Atmosphere_LHS%Absorber_Units(j), Atmosphere_RHS%Absorber_Units(j)
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+    DO k = 0, Atmosphere_LHS%n_Layers
+      IF ( .NOT. Compare_Float( Atmosphere_LHS%Level_Pressure(k), &
+                                Atmosphere_RHS%Level_Pressure(k), &
+                                ULP    =ULP_Scale, &
+                                Percent=Percent_Difference ) ) THEN
+        Error_Status = FAILURE
+        WRITE( Message,'("Level_Pressure values are different at level ",i0,&
+                        &":",3(1x,es13.6))') &
+                       k, Atmosphere_LHS%Level_Pressure(k), &
+                          Atmosphere_RHS%Level_Pressure(k), &
+                          Atmosphere_LHS%Level_Pressure(k)-Atmosphere_RHS%Level_Pressure(k)
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+    DO k = 1, Atmosphere_LHS%n_Layers
+      IF ( .NOT. Compare_Float( Atmosphere_LHS%Pressure(k), &
+                                Atmosphere_RHS%Pressure(k), &
+                                ULP    =ULP_Scale, &
+                                Percent=Percent_Difference ) ) THEN
+        Error_Status = FAILURE
+        WRITE( Message,'("Pressure values are different at level ",i0,&
+                        &":",3(1x,es13.6))') &
+                       k, Atmosphere_LHS%Pressure(k), &
+                          Atmosphere_RHS%Pressure(k), &
+                          Atmosphere_LHS%Pressure(k)-Atmosphere_RHS%Pressure(k)
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+    
+    DO k = 1, Atmosphere_LHS%n_Layers
+      IF ( .NOT. Compare_Float( Atmosphere_LHS%Temperature(k), &
+                                Atmosphere_RHS%Temperature(k), &
+                                ULP    =ULP_Scale, &
+                                Percent=Percent_Difference ) ) THEN
+        Error_Status = FAILURE
+        WRITE( Message,'("Temperature values are different at level ",i0,&
+                        &":",3(1x,es13.6))') &
+                       k, Atmosphere_LHS%Temperature(k), &
+                          Atmosphere_RHS%Temperature(k), &
+                          Atmosphere_LHS%Temperature(k)-Atmosphere_RHS%Temperature(k)
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+    DO j = 1, Atmosphere_LHS%n_Absorbers
+      DO k = 1, Atmosphere_LHS%n_Layers
+        IF ( .NOT. Compare_Float( Atmosphere_LHS%Absorber(k,j), &
+                                  Atmosphere_RHS%Absorber(k,j), &
+                                  ULP    =ULP_Scale, &
+                                  Percent=Percent_Difference ) ) THEN
+          Error_Status = FAILURE
+          WRITE( Message,'("Absorber values are different at level ",i0,&
+                          &" for absorber ",i0,":",3(1x,es13.6))') &
+                         k, j, Atmosphere_LHS%Absorber(k,j), &
+                               Atmosphere_RHS%Absorber(k,j), &
+                               Atmosphere_LHS%Absorber(k,j)-Atmosphere_RHS%Absorber(k,j)
+          CALL Display_Message( ROUTINE_NAME, &
+                                TRIM(Message), &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+          IF ( Check_Once ) RETURN
+        END IF
+      END DO
+    END DO
+    
+    IF ( Atmosphere_LHS%n_Clouds > 0 ) THEN
+      Cloud_Status = CRTM_Equal_Cloud( Atmosphere_LHS%Cloud, &
+                                       Atmosphere_RHS%Cloud, &
+                                       ULP_Scale  =ULP_Scale, &
+                                       Check_All  =Check_All, &
+                                       Message_Log=Message_Log )
+      IF ( Cloud_Status /= SUCCESS ) THEN
+        Error_Status = FAILURE
+        CALL Display_Message( ROUTINE_NAME, &
+                              'Cloud structures are different', &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END IF
+    
+    IF ( Atmosphere_LHS%n_Aerosols > 0 ) THEN
+      Aerosol_Status = CRTM_Equal_Aerosol( Atmosphere_LHS%Aerosol, &
+                                           Atmosphere_RHS%Aerosol, &
+                                           ULP_Scale  =ULP_Scale, &
+                                           Check_All  =Check_All, &
+                                           Message_Log=Message_Log )
+      IF ( Aerosol_Status /= SUCCESS ) THEN
+        Error_Status = FAILURE
+        CALL Display_Message( ROUTINE_NAME, &
+                              'Aerosol structures are different', &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END IF
+  END FUNCTION Equal_Scalar
+
+
+  FUNCTION Equal_Rank1( Atmosphere_LHS    , &  ! Input
+                        Atmosphere_RHS    , &  ! Output
+                        ULP_Scale         , &  ! Optional input
+                        Percent_Difference, &  ! Optional input
+                        Check_All         , &  ! Optional input
+                        RCS_Id            , &  ! Revision control
+                        Message_Log       ) &  ! Error messaging
+                      RESULT( Error_Status )
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_LHS(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_RHS(:)
+    INTEGER,          OPTIONAL, INTENT(IN)  :: ULP_Scale
+    REAL(fp),         OPTIONAL, INTENT(IN)  :: Percent_Difference
+    INTEGER,          OPTIONAL, INTENT(IN)  :: Check_All
+    CHARACTER(*),     OPTIONAL, INTENT(OUT) :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)  :: Message_Log
+    ! Function result
+    INTEGER :: Error_Status
+    ! Local parameters
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Equal_Atmosphere(Rank-1)'
+    ! Local variables
+    CHARACTER(256) :: Message
+    LOGICAL :: Check_Once
+    INTEGER :: Scalar_Status
+    INTEGER :: m, nProfiles
+
+    ! Set up
+    ! ------
+    Error_Status = SUCCESS
+    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Default action is to return on ANY difference...
+    Check_Once = .TRUE.
+    ! ...unless the Check_All argument is set
+    IF ( PRESENT( Check_All ) ) THEN
+      IF ( Check_All == SET ) Check_Once = .FALSE.
+    END IF
+
+    ! Arguments must conform
+    nProfiles = SIZE( Atmosphere_LHS )
+    IF ( SIZE( Atmosphere_RHS ) /= nProfiles ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Input Atmosphere_LHS and Atmosphere_RHS arrays'//&
+                            ' have different dimensions', &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Test for equality
+    ! -----------------
+    DO m = 1, nProfiles
+      Scalar_Status = Equal_Scalar( Atmosphere_LHS(m), &
+                                    Atmosphere_RHS(m), &
+                                    ULP_Scale         =ULP_Scale, &
+                                    Percent_Difference=Percent_Difference, &
+                                    Check_All         =Check_All, &
+                                    Message_Log       =Message_Log )
+      IF ( Scalar_Status /= SUCCESS ) THEN
+        Error_Status = Scalar_Status
+        WRITE( Message, '( "Error comparing element (",i0,")", &
+                          &" of rank-1 CRTM_Atmosphere structure array." )' ) m
+        CALL Display_Message( ROUTINE_NAME, &
+                              TRIM(Message), &
+                              Error_Status, &
+                              Message_Log=Message_Log )
+        IF ( Check_Once ) RETURN
+      END IF
+    END DO
+  END FUNCTION Equal_Rank1
+
+
+  FUNCTION Equal_Rank2( Atmosphere_LHS    , &  ! Input
+                        Atmosphere_RHS    , &  ! Output
+                        ULP_Scale         , &  ! Optional input
+                        Percent_Difference, &  ! Optional input
+                        Check_All         , &  ! Optional input
+                        RCS_Id            , &  ! Revision control
+                        Message_Log       ) &  ! Error messaging
+                      RESULT( Error_Status )
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_LHS(:,:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)  :: Atmosphere_RHS(:,:)
+    INTEGER,          OPTIONAL, INTENT(IN)  :: ULP_Scale
+    REAL(fp),         OPTIONAL, INTENT(IN)  :: Percent_Difference
+    INTEGER,          OPTIONAL, INTENT(IN)  :: Check_All
+    CHARACTER(*),     OPTIONAL, INTENT(OUT) :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)  :: Message_Log
+    ! Function result
+    INTEGER :: Error_Status
+    ! Local parameters
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Equal_Atmosphere(Rank-2)'
+    ! Local variables
+    CHARACTER(256) :: Message
+    LOGICAL :: Check_Once
+    INTEGER :: Scalar_Status
+    INTEGER :: l, nChannels
+    INTEGER :: m, nProfiles
+
+    ! Set up
+    ! ------
+    Error_Status = SUCCESS
+    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Default action is to return on ANY difference...
+    Check_Once = .TRUE.
+    ! ...unless the Check_All argument is set
+    IF ( PRESENT( Check_All ) ) THEN
+      IF ( Check_All == SET ) Check_Once = .FALSE.
+    END IF
+
+    ! Arguments must conform
+    nChannels = SIZE(Atmosphere_LHS,1)
+    nProfiles = SIZE(Atmosphere_LHS,2)
+    IF ( SIZE(Atmosphere_RHS,1) /= nChannels .OR. &
+         SIZE(Atmosphere_RHS,2) /= nProfiles      ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Input Atmosphere_LHS and Atmosphere_RHS arrays'//&
+                            ' have different dimensions', &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Test for equality
+    ! -----------------
+    DO m = 1, nProfiles
+      DO l = 1, nChannels
+        Scalar_Status = Equal_Scalar( Atmosphere_LHS(l,m), &
+                                      Atmosphere_RHS(l,m), &
+                                      ULP_Scale         =ULP_Scale, &
+                                      Percent_Difference=Percent_Difference, &
+                                      Check_All         =Check_All, &
+                                      Message_Log       =Message_Log )
+        IF ( Scalar_Status /= SUCCESS ) THEN
+          Error_Status = Scalar_Status
+          WRITE( Message, '( "Error comparing element (",i0,",",i0,")", &
+                            &" of rank-2 CRTM_Atmosphere structure array." )' ) l,m
+          CALL Display_Message( ROUTINE_NAME, &
+                                TRIM(Message), &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+          IF ( Check_Once ) RETURN
+        END IF
+      END DO
+    END DO
+  END FUNCTION Equal_Rank2
+  
+  
 !--------------------------------------------------------------------------------
 !
 ! NAME:
@@ -2553,18 +2692,22 @@ CONTAINS
 !       are the weighting factors. Note that w2 is optional.
 !
 ! CALLING SEQUENCE:
-!       Error_Status = CRTM_WeightedSum_Atmosphere( A,                        &  ! In/Output
-!                                                   B,                        &  ! Input
-!                                                   w1,                       &  ! Input
-!                                                   w2 = w2,                  &  ! Optional input
-!                                                   RCS_Id = RCS_Id,          &  ! Revision control
-!                                                   Message_Log = Message_Log )  ! Error messaging
+!       Error_Status = CRTM_WeightedSum_Atmosphere( A                      , &  ! In/Output
+!                                                   B                      , &  ! Input
+!                                                   w1                     , &  ! Input
+!                                                   w2         =w2         , &  ! Optional input
+!                                                   RCS_Id     =RCS_Id     , &  ! Revision control
+!                                                   Message_Log=Message_Log  )  ! Error messaging
 !
 ! INPUT ARGUMENTS:
 !       A:               Atmosphere structure that is to be added to.
+!                        In the context of the CRTM, rank-1 corresponds to an
+!                        vector of profiles, and rank-2 corresponds to an array
+!                        of channels x profiles. The latter is used in the
+!                        K-matrix model.
 !                        UNITS:      N/A
 !                        TYPE:       CRTM_Atmosphere_type
-!                        DIMENSION:  Scalar OR Rank-1
+!                        DIMENSION:  Scalar, Rank-1, or Rank-2 array
 !                        ATTRIBUTES: INTENT(IN OUT)
 !
 !       B:               Atmosphere structure that is to be weighted and
@@ -2629,18 +2772,18 @@ CONTAINS
 !
 !--------------------------------------------------------------------------------
 
-  FUNCTION WeightedSum_Scalar( A,              &  ! Input/Output
-                               B,              &  ! Input
-                               w1,             &  ! Input
-                               w2,             &  ! optional input
-                               RCS_Id,         &  ! Revision control
-                               Message_Log )   &  ! Error messaging
+  FUNCTION WeightedSum_Scalar( A          , & ! Input/Output
+                               B          , & ! Input
+                               w1         , & ! Input
+                               w2         , & ! optional input
+                               RCS_Id     , & ! Revision control
+                               Message_Log) & ! Error messaging
                              RESULT( Error_Status )
     ! Arguments
     TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: A
     TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: B
-    REAL(fp),                   INTENT(IN)     :: w1
-    REAL(fp),         OPTIONAL, INTENT(IN)     :: w2
+    REAL(fp)    ,               INTENT(IN)     :: w1
+    REAL(fp)    ,     OPTIONAL, INTENT(IN)     :: w2
     CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
     CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
@@ -2649,15 +2792,13 @@ CONTAINS
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_WeightedSum_Atmosphere(Scalar)'
     ! Local variables
     REAL(fp) :: w2_Local
-    INTEGER :: j
+    INTEGER :: j, k
 
-
-    ! ------
     ! Set up
     ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
-
+    
     ! Array arguments must conform
     IF ( A%n_Layers    /= B%n_Layers    .OR. &
          A%n_Absorbers /= B%n_Absorbers .OR. &
@@ -2667,7 +2808,7 @@ CONTAINS
       CALL Display_Message( ROUTINE_NAME,    &
                             'A and B structure dimensions are different.', &
                             Error_Status,    &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
          
@@ -2676,52 +2817,46 @@ CONTAINS
     IF ( PRESENT( w2 ) ) w2_Local = w2
 
 
-    ! --------------------
-    ! The array components
-    ! --------------------
-    A%Temperature(:A%n_Layers) = A%Temperature(:A%n_Layers) + &
-                                 (w1*B%Temperature(:A%n_Layers)) + &
-                                 w2_Local
+    ! Weight the array components
+    ! ---------------------------
+    k = A%n_Layers
+    A%Temperature(:k) = A%Temperature(:k) + (w1*B%Temperature(:k)) + w2_Local
     DO j = 1, A%n_Absorbers
-      A%Absorber(:A%n_Layers,j) = A%Absorber(:A%n_Layers,j) + &
-                                  (w1*B%Absorber(:A%n_Layers,j)) + &
-                                  w2_Local
+      A%Absorber(:k,j) = A%Absorber(:k,j) + (w1*B%Absorber(:k,j)) + w2_Local
     END DO
 
 
-    ! -------------------
-    ! The Cloud structure
-    ! -------------------
-    IF ( ASSOCIATED( A%Cloud ) ) THEN
+    ! Weight the Cloud structure
+    ! --------------------------
+    IF ( A%n_Clouds > 0 ) THEN
       Error_Status = CRTM_WeightedSum_Cloud( A%Cloud, &
                                              B%Cloud, &
                                              w1, &
                                              w2 = w2, &
-                                             Message_Log = Message_Log )
+                                             Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
                               'Weighted sum of Cloud structure components failed.', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
         RETURN
       END IF
     END IF
 
 
-    ! ---------------------
-    ! The Aerosol structure
-    ! ---------------------
-    IF ( ASSOCIATED( A%Aerosol ) ) THEN
+    ! Weight the Aerosol structure
+    ! ----------------------------
+    IF ( A%n_Aerosols > 0 ) THEN
       Error_Status = CRTM_WeightedSum_Aerosol( A%Aerosol, &
                                                B%Aerosol, &
                                                w1, &
                                                w2 = w2, &
-                                               Message_Log = Message_Log )
+                                               Message_Log=Message_Log )
       IF ( Error_Status /= SUCCESS ) THEN
         CALL Display_Message( ROUTINE_NAME,    &
                               'Weighted sum of Aerosol structure components failed.', &
                               Error_Status,    &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
         RETURN
       END IF
     END IF
@@ -2729,63 +2864,131 @@ CONTAINS
   END FUNCTION WeightedSum_Scalar
 
 
-  FUNCTION WeightedSum_Rank1( A,              &  ! Input/Output
-                              B,              &  ! Input
-                              w1,             &  ! Input
-                              w2,             &  ! optional input
-                              RCS_Id,         &  ! Revision control
-                              Message_Log )   &  ! Error messaging
+  FUNCTION WeightedSum_Rank1( A          , &  ! Input/Output
+                              B          , &  ! Input
+                              w1         , &  ! Input
+                              w2         , &  ! optional input
+                              RCS_Id     , &  ! Revision control
+                              Message_Log) &  ! Error messaging
                             RESULT( Error_Status )
     ! Arguments
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: A
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN)     :: B
-    REAL(fp),                                 INTENT(IN)     :: w1
-    REAL(fp),                   OPTIONAL,     INTENT(IN)     :: w2
-    CHARACTER(*),               OPTIONAL,     INTENT(OUT)    :: RCS_Id
-    CHARACTER(*),               OPTIONAL,     INTENT(IN)     :: Message_Log
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: A(:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: B(:)
+    REAL(fp)    ,               INTENT(IN)     :: w1
+    REAL(fp)    ,     OPTIONAL, INTENT(IN)     :: w2
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
     ! Function result
     INTEGER :: Error_Status
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_WeightSum_Atmosphere(Rank-1)'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Scalar_Status
-    INTEGER :: i, n
+    INTEGER :: m, nProfiles
 
     ! Set up
+    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
     ! Array arguments must conform
-    n = SIZE( A )
-    IF ( SIZE( B )  /= n  ) THEN
+    nProfiles = SIZE(A)
+    IF ( SIZE(B) /= nProfiles  ) THEN
       Error_Status = FAILURE
       CALL Display_Message( ROUTINE_NAME, &
                             'Input structure arguments have different dimensions', &
                             Error_Status, &
-                            Message_Log = Message_Log )
+                            Message_Log=Message_Log )
       RETURN
     END IF
 
+
     ! Perform the summation
-    DO i = 1, n
-      Scalar_Status = WeightedSum_Scalar( A(i), &
-                                          B(i), &
+    ! ---------------------
+    DO m = 1, nProfiles
+      Scalar_Status = WeightedSum_Scalar( A(m), &
+                                          B(m), &
                                           w1, &
-                                          w2 = w2, &
-                                          Message_Log = Message_Log )
+                                          w2         =w2, &
+                                          Message_Log=Message_Log )
       IF ( Scalar_Status /= SUCCESS ) THEN
         Error_Status = Scalar_Status
-        WRITE( Message, '( "Error computing weighted sum for element #", i5, &
-                          &" of CRTM_Atmosphere structure arrays." )' ) i
+        WRITE( Message, '( "Error computing weighted sum for element (",i0,")", &
+                          &" of CRTM_Atmosphere structure arrays." )' ) m
         CALL Display_Message( ROUTINE_NAME, &
-                              TRIM( Message ), &
+                              TRIM(Message), &
                               Error_Status, &
-                              Message_Log = Message_Log )
+                              Message_Log=Message_Log )
       END IF
     END DO
-
   END FUNCTION WeightedSum_Rank1
+
+
+  FUNCTION WeightedSum_Rank2( A          , &  ! Input/Output
+                              B          , &  ! Input
+                              w1         , &  ! Input
+                              w2         , &  ! optional input
+                              RCS_Id     , &  ! Revision control
+                              Message_Log) &  ! Error messaging
+                            RESULT( Error_Status )
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: A(:,:)
+    TYPE(CRTM_Atmosphere_type), INTENT(IN)     :: B(:,:)
+    REAL(fp)    ,               INTENT(IN)     :: w1
+    REAL(fp)    ,     OPTIONAL, INTENT(IN)     :: w2
+    CHARACTER(*),     OPTIONAL, INTENT(OUT)    :: RCS_Id
+    CHARACTER(*),     OPTIONAL, INTENT(IN)     :: Message_Log
+    ! Function result
+    INTEGER :: Error_Status
+    ! Local parameters
+    CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_WeightSum_Atmosphere(Rank-2)'
+    ! Local variables
+    CHARACTER(256) :: Message
+    INTEGER :: Scalar_Status
+    INTEGER :: l, nChannels
+    INTEGER :: m, nProfiles
+
+    ! Set up
+    ! ------
+    Error_Status = SUCCESS
+    IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
+
+    ! Arguments must conform
+    nChannels = SIZE(A,1)
+    nProfiles = SIZE(A,2)
+    IF ( SIZE(B,1) /= nChannels .OR. &
+         SIZE(B,2) /= nProfiles      ) THEN
+      Error_Status = FAILURE
+      CALL Display_Message( ROUTINE_NAME, &
+                            'Input structure arguments have different dimensions', &
+                            Error_Status, &
+                            Message_Log=Message_Log )
+      RETURN
+    END IF
+
+
+    ! Perform the summation
+    ! ---------------------
+    DO m = 1, nProfiles
+      DO l = 1, nChannels
+        Scalar_Status = WeightedSum_Scalar( A(l,m), &
+                                            B(l,m), &
+                                            w1, &
+                                            w2         =w2, &
+                                            Message_Log=Message_Log )
+        IF ( Scalar_Status /= SUCCESS ) THEN
+          Error_Status = Scalar_Status
+          WRITE( Message, '( "Error computing weighted sum for element (",i0,",",i0,")", &
+                            &" of CRTM_Atmosphere structure arrays." )' ) l,m
+          CALL Display_Message( ROUTINE_NAME, &
+                                TRIM(Message), &
+                                Error_Status, &
+                                Message_Log=Message_Log )
+        END IF
+      END DO
+    END DO
+  END FUNCTION WeightedSum_Rank2
 
 
 !--------------------------------------------------------------------------------
@@ -2802,17 +3005,19 @@ CONTAINS
 !
 ! OUTPUT ARGUMENTS:
 !       Atmosphere:   Zeroed out Atmosphere structure.
+!                     In the context of the CRTM, rank-1 corresponds to an
+!                     vector of profiles, and rank-2 corresponds to an array
+!                     of channels x profiles. The latter is used in the
+!                     K-matrix model.
 !                     UNITS:      N/A
 !                     TYPE:       CRTM_Atmosphere_type
-!                     DIMENSION:  Scalar
-!                                   OR
-!                                 Rank1 array
+!                     DIMENSION:  Scalar, Rank-1, or Rank-2 array
 !                     ATTRIBUTES: INTENT(IN OUT)
 !
 ! COMMENTS:
 !       - No checking of the input structure is performed, so there are no
-!         tests for pointer member association status. This means the Atmosphere
-!         structure must have allocated pointer members upon entry to this
+!         tests for component association status. This means the Atmosphere
+!         structure must have allocated components upon entry to this
 !         routine.
 !
 !       - The Absorber_ID and Absorber_Units components are *NOT* zeroed out
@@ -2834,29 +3039,91 @@ CONTAINS
     IF ( Atmosphere%Max_Clouds   > 0 ) CALL CRTM_Zero_Cloud(   Atmosphere%Cloud   )
     IF ( Atmosphere%Max_Aerosols > 0 ) CALL CRTM_Zero_Aerosol( Atmosphere%Aerosol )
 
-    ! Reset the multi-dimensional scalar components
-!    Atmosphere%n_Layers   = Atmosphere%Max_Layers
-!    Atmosphere%n_Clouds   = Atmosphere%Max_Clouds
-!    Atmosphere%n_Aerosols = Atmosphere%Max_Aerosols
-
     ! Reset the array components
     Atmosphere%Level_Pressure    = ZERO
-    Atmosphere%Level_Temperature = ZERO
     Atmosphere%Pressure          = ZERO
     Atmosphere%Temperature       = ZERO
     Atmosphere%Absorber          = ZERO
-
   END SUBROUTINE Zero_Scalar
 
 
   SUBROUTINE Zero_Rank1( Atmosphere )  ! Output
-    TYPE(CRTM_Atmosphere_type), DIMENSION(:), INTENT(IN OUT) :: Atmosphere
-    INTEGER :: n
-
-    DO n = 1, SIZE( Atmosphere )
-      CALL Zero_Scalar( Atmosphere(n) )
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:)
+    INTEGER :: m
+    DO m = 1, SIZE( Atmosphere )
+      CALL Zero_Scalar( Atmosphere(m) )
     END DO
-
   END SUBROUTINE Zero_Rank1
+
+
+  SUBROUTINE Zero_Rank2( Atmosphere )  ! Output
+    TYPE(CRTM_Atmosphere_type), INTENT(IN OUT) :: Atmosphere(:,:)
+    INTEGER :: l, m
+    DO m = 1, SIZE(Atmosphere,2)
+      DO l = 1, SIZE(Atmosphere,1)
+        CALL Zero_Scalar( Atmosphere(l,m) )
+      END DO
+    END DO
+  END SUBROUTINE Zero_Rank2
+
+
+
+!--------------------------------------------------------------------------------
+!
+! NAME:
+!       CRTM_Get_AbsorberIdx
+! 
+! PURPOSE:
+!       Function to determine the index of the requested absorber in the
+!       CRTM_Atmosphere structure absorber component.
+!
+! CALLING SEQUENCE:
+!       Idx = CRTM_Get_AbsorberIdx(Atmosphere, AbsorberId)
+!
+! INPUT ARGUMENTS:
+!       Atmosphere:   CRTM Atmosphere structure.
+!                     UNITS:      N/A
+!                     TYPE:       CRTM_Atmosphere_type
+!                     DIMENSION:  Scalar
+!                     ATTRIBUTES: INTENT(IN)
+!
+!       AbsorberId:   Integer value used to identify absorbing molecular
+!                     species. The accepted absorber Ids are defined in
+!                     this module.
+!                     UNITS:      N/A
+!                     TYPE:       INTEGER
+!                     DIMENSION:  Scalar
+!                     ATTRIBUTES: INTENT(IN)
+!
+! FUNCTION RESULT:
+!       Idx:          Index of the requested absorber in the 
+!                     Atmosphere%Absorber array component.
+!                     If the requested absorber cannot be found, 
+!                     a value of -1 is returned.
+!                     UNITS:      N/A
+!                     TYPE:       INTEGER
+!                     DIMENSION:  Scalar
+!
+!--------------------------------------------------------------------------------
+
+  FUNCTION CRTM_Get_AbsorberIdx(Atm, AbsorberId) RESULT(AbsorberIdx)
+    ! Arguments
+    TYPE(CRTM_Atmosphere_type), INTENT(IN) :: Atm
+    INTEGER                   , INTENT(IN) :: AbsorberId
+    ! Function result
+    INTEGER :: AbsorberIdx
+    ! Local variables
+    INTEGER :: j, Idx(1)
+    
+    ! Initialise result to "not found"
+    AbsorberIdx = -1
+    ! Return if absorber not present
+    IF ( COUNT(Atm%Absorber_ID == AbsorberId) /= 1 ) RETURN
+    ! Find the location
+    Idx = PACK( (/(j,j=1,Atm%n_Absorbers)/), &
+                Atm%Absorber_ID==AbsorberId  )
+    AbsorberIdx=Idx(1)
+    
+  END FUNCTION CRTM_Get_AbsorberIdx
 
 END MODULE CRTM_Atmosphere_Define

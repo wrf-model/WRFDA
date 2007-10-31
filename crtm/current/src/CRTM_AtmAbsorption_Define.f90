@@ -16,7 +16,7 @@ MODULE CRTM_AtmAbsorption_Define
   ! Environment setup
   ! -----------------
   ! Module use
-  USE Type_Kinds,      ONLY: fp=>fp_kind
+  USE Type_Kinds,      ONLY: fp
   USE Message_Handler, ONLY: SUCCESS, FAILURE, Display_Message
   USE CRTM_Parameters, ONLY: ZERO, SET
   ! Disable implicit typing
@@ -42,7 +42,7 @@ MODULE CRTM_AtmAbsorption_Define
   ! -----------------
   ! RCS Id for the module
   CHARACTER(*), PARAMETER :: MODULE_RCS_ID = &
-  '$Id: CRTM_AtmAbsorption_Define.f90,v 1.11 2006/05/25 19:20:30 wd20pd Exp $'
+  '$Id: CRTM_AtmAbsorption_Define.f90 645 2007-05-29 20:19:17Z paul.vandelst@noaa.gov $'
 
 
   ! ----------------------------------
@@ -51,15 +51,9 @@ MODULE CRTM_AtmAbsorption_Define
   TYPE :: CRTM_AtmAbsorption_type
     INTEGER :: n_Allocates = 0
     ! Dimensions
-    INTEGER :: n_Layers     = 0  ! K dimension
-    INTEGER :: n_Predictors = 0  ! I dimension
-    INTEGER :: n_Absorbers  = 0  ! J dimension
-    ! Algorithm specific members
-    REAL(fp)                          :: Secant_Sensor_Zenith = ZERO
-    REAL(fp), DIMENSION(:,:), POINTER :: IntAbsorber => NULL()   ! 0:K x J
-    REAL(fp), DIMENSION(:,:), POINTER :: Predictor   => NULL()   ! I x K
-    ! Mandatory members
-    REAL(fp), DIMENSION(:),   POINTER :: Optical_Depth => NULL() ! K
+    INTEGER :: n_Layers = 0  ! K dimension
+    ! Structure members
+    REAL(fp), DIMENSION(:), POINTER :: Optical_Depth => NULL() ! K
   END TYPE CRTM_AtmAbsorption_type
 
 
@@ -103,9 +97,6 @@ CONTAINS
   SUBROUTINE CRTM_Clear_AtmAbsorption( AtmAbsorption )
     TYPE(CRTM_AtmAbsorption_type), INTENT(IN OUT) :: AtmAbsorption
     AtmAbsorption%n_Layers     = 0
-    AtmAbsorption%n_Predictors = 0
-    AtmAbsorption%n_Absorbers  = 0
-    AtmAbsorption%Secant_Sensor_Zenith = ZERO
   END SUBROUTINE CRTM_Clear_AtmAbsorption
 
 
@@ -184,10 +175,6 @@ CONTAINS
     ! Local variables
     LOGICAL :: ALL_Test
 
-
-    ! ------
-    ! Set up
-    ! ------
     ! Default is to test ALL the pointer members
     ! for a true association status....
     ALL_Test = .TRUE.
@@ -197,23 +184,25 @@ CONTAINS
     END IF
 
 
-    ! ---------------------------------------------
     ! Test the structure pointer member association
-    ! ---------------------------------------------
+!    Association_Status = .FALSE.
+!    IF ( ALL_Test ) THEN
+!      IF ( ASSOCIATED( AtmAbsorption%Optical_Depth ) .AND. &
+!           ASSOCIATED( AtmAbsorption%othercomp1    ) .AND. &
+!           ASSOCIATED( AtmAbsorption%othercomp2    )       ) THEN
+!        Association_Status = .TRUE.
+!      END IF
+!    ELSE
+!      IF ( ASSOCIATED( AtmAbsorption%Optical_Depth ) .OR. &
+!           ASSOCIATED( AtmAbsorption%othercomp1    ) .OR. &
+!           ASSOCIATED( AtmAbsorption%othercomp2    )      ) THEN
+!        Association_Status = .TRUE.
+!      END IF
+!    END IF
+
+    ! Code for current single component test
     Association_Status = .FALSE.
-    IF ( ALL_Test ) THEN
-      IF ( ASSOCIATED( AtmAbsorption%IntAbsorber   ) .AND. &
-           ASSOCIATED( AtmAbsorption%Predictor     ) .AND. &
-           ASSOCIATED( AtmAbsorption%Optical_Depth )       ) THEN
-        Association_Status = .TRUE.
-      END IF
-    ELSE
-      IF ( ASSOCIATED( AtmAbsorption%IntAbsorber   ) .OR. &
-           ASSOCIATED( AtmAbsorption%Predictor     ) .OR. &
-           ASSOCIATED( AtmAbsorption%Optical_Depth )      ) THEN
-        Association_Status = .TRUE.
-      END IF
-    END IF
+    IF ( ASSOCIATED( AtmAbsorption%Optical_Depth ) ) Association_Status = .TRUE.
 
   END FUNCTION CRTM_Associated_AtmAbsorption
 
@@ -297,10 +286,7 @@ CONTAINS
     LOGICAL :: Clear
     INTEGER :: Allocate_Status
 
-
-    ! ------
     ! Set up
-    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -311,71 +297,26 @@ CONTAINS
       IF ( No_Clear == SET ) Clear = .FALSE.
     END IF
 
-
-    ! -----------------------------
     ! Initialise the scalar members
-    ! -----------------------------
     IF ( Clear ) CALL CRTM_Clear_AtmAbsorption( AtmAbsorption )
 
-
-    ! -----------------------------------------------------
     ! If ALL pointer members are NOT associated, do nothing
-    ! -----------------------------------------------------
     IF ( .NOT. CRTM_Associated_AtmAbsorption( AtmAbsorption ) ) RETURN
 
-
-    ! ------------------------------
     ! Deallocate the pointer members
-    ! ------------------------------
-    ! Deallocate the CRTM_AtmAbsorption IntAbsorber member
-    IF ( ASSOCIATED( AtmAbsorption%IntAbsorber ) ) THEN
-      DEALLOCATE( AtmAbsorption%IntAbsorber, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_AtmAbsorption IntAbsorber ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
+    DEALLOCATE( AtmAbsorption%Optical_Depth, &
+                STAT = Allocate_Status )
+    IF ( Allocate_Status /= 0 ) THEN
+      Error_Status = FAILURE
+      WRITE( Message, '( "Error deallocating CRTM_AtmAbsorption structure. STAT = ", i5 )' ) &
+                      Allocate_Status
+      CALL Display_Message( ROUTINE_NAME,  &
+                            TRIM(Message), &
+                            Error_Status,  &
+                            Message_Log=Message_Log )
     END IF
 
-    ! Deallocate the CRTM_AtmAbsorption X member
-    IF ( ASSOCIATED( AtmAbsorption%Predictor ) ) THEN
-      DEALLOCATE( AtmAbsorption%Predictor, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_AtmAbsorption X ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-    ! Deallocate the CRTM_AtmAbsorption Optical_Depth profile
-    IF ( ASSOCIATED( AtmAbsorption%Optical_Depth ) ) THEN
-      DEALLOCATE( AtmAbsorption%Optical_Depth, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-        Error_Status = FAILURE
-        WRITE( Message, '( "Error deallocating CRTM_AtmAbsorption Optical_Depth ", &
-                          &"member. STAT = ", i5 )' ) &
-                        Allocate_Status
-        CALL Display_Message( ROUTINE_NAME,    &
-                              TRIM( Message ), &
-                              Error_Status,    &
-                              Message_Log = Message_Log )
-      END IF
-    END IF
-
-
-    ! -------------------------------------
     ! Decrement and test allocation counter
-    ! -------------------------------------
     AtmAbsorption%n_Allocates = AtmAbsorption%n_Allocates - 1
     IF ( AtmAbsorption%n_Allocates /= 0 ) THEN
       Error_Status = FAILURE
@@ -401,28 +342,12 @@ CONTAINS
 !
 ! CALLING SEQUENCE:
 !       Error_Status = CRTM_Allocate_AtmAbsorption( n_Layers,                 &  ! Input
-!                                                   n_Predictors,             &  ! Input
-!                                                   n_Absorbers,              &  ! Input
 !                                                   AtmAbsorption,            &  ! Output
 !                                                   RCS_Id = RCS_Id,          &  ! Revision control
 !                                                   Message_Log = Message_Log )  ! Error messaging
 !
 ! INPUT ARGUMENTS:
 !         n_Layers:          Number of atmospheric layers.
-!                            Must be > 0
-!                            UNITS:      N/A
-!                            TYPE:       INTEGER
-!                            DIMENSION:  Scalar
-!                            ATTRIBUTES: INTENT(IN)
-!
-!         n_Predictors:      Number of absorption predictors.
-!                            Must be > 0
-!                            UNITS:      N/A
-!                            TYPE:       INTEGER
-!                            DIMENSION:  Scalar
-!                            ATTRIBUTES: INTENT(IN)
-!
-!         n_Absorbers:       Number of atmospheric absorbers.
 !                            Must be > 0
 !                            UNITS:      N/A
 !                            TYPE:       INTEGER
@@ -477,16 +402,12 @@ CONTAINS
 !--------------------------------------------------------------------------------
 
   FUNCTION CRTM_Allocate_AtmAbsorption( n_Layers,         &  ! Input
-                                        n_Predictors,     &  ! Input
-                                        n_Absorbers,      &  ! Input
                                         AtmAbsorption,    &  ! Output
                                         RCS_Id,           &  ! Revision control
                                         Message_Log )     &  ! Error messaging
                                       RESULT( Error_Status )
     ! Arguments
     INTEGER,                       INTENT(IN)     :: n_Layers
-    INTEGER,                       INTENT(IN)     :: n_Predictors
-    INTEGER,                       INTENT(IN)     :: n_Absorbers
     TYPE(CRTM_AtmAbsorption_type), INTENT(IN OUT) :: AtmAbsorption
     CHARACTER(*),        OPTIONAL, INTENT(OUT)    :: RCS_Id
     CHARACTER(*),        OPTIONAL, INTENT(IN)     :: Message_Log
@@ -495,13 +416,10 @@ CONTAINS
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Allocate_AtmAbsorption'
     ! Local variables
-    CHARACTER( 256 ) :: Message
+    CHARACTER(256) :: Message
     INTEGER :: Allocate_Status
 
-
-    ! ------
     ! Set up
-    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -510,24 +428,6 @@ CONTAINS
       Error_Status = FAILURE
       CALL Display_Message( ROUTINE_NAME, &
                             'Input n_Layers must be > 0.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-      RETURN
-    END IF
-
-    IF ( n_Predictors < 1 ) THEN
-      Error_Status = FAILURE
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Predictors must be > 0.', &
-                            Error_Status, &
-                            Message_Log = Message_Log )
-      RETURN
-    END IF
-
-    IF ( n_Absorbers < 1 ) THEN
-      Error_Status = FAILURE
-      CALL Display_Message( ROUTINE_NAME, &
-                            'Input n_Absorbers must be > 0.', &
                             Error_Status, &
                             Message_Log = Message_Log )
       RETURN
@@ -548,13 +448,8 @@ CONTAINS
       END IF
     END IF
 
-
-    ! ----------------------
     ! Perform the allocation
-    ! ----------------------
-    ALLOCATE( AtmAbsorption%IntAbsorber( 0:n_Layers, n_Absorbers ), &
-              AtmAbsorption%Predictor( n_Predictors, n_Layers ), &
-              AtmAbsorption%Optical_Depth( n_Layers ), &
+    ALLOCATE( AtmAbsorption%Optical_Depth( n_Layers ), &
               STAT = Allocate_Status )
     IF ( Allocate_Status /= 0 ) THEN
       Error_Status = FAILURE
@@ -567,21 +462,11 @@ CONTAINS
       RETURN
     END IF
 
-
-    ! ------------------------------------------
     ! Assign the dimensions and initalise arrays
-    ! ------------------------------------------
-    AtmAbsorption%n_Layers     = n_Layers
-    AtmAbsorption%n_Predictors = n_Predictors
-    AtmAbsorption%n_Absorbers  = n_Absorbers
-    AtmAbsorption%IntAbsorber   = ZERO
-    AtmAbsorption%Predictor     = ZERO
+    AtmAbsorption%n_Layers      = n_Layers
     AtmAbsorption%Optical_Depth = ZERO
 
-
-    ! -------------------------------------
     ! Increment and test allocation counter
-    ! -------------------------------------
     AtmAbsorption%n_Allocates = AtmAbsorption%n_Allocates + 1
     IF ( AtmAbsorption%n_Allocates /= 1 ) THEN
       Error_Status = FAILURE
@@ -605,10 +490,10 @@ CONTAINS
 !       Function to copy valid CRTM_AtmAbsorption structures.
 !
 ! CALLING SEQUENCE:
-!       Error_Status = CRTM_Assign_AtmAbsorption( AtmAbsorption_in,         &  ! Input
-!                                                 AtmAbsorption_out,        &  ! Output
-!                                                 RCS_Id      = RCS_Id,     &  ! Revision control
-!                                                 Message_Log = Message_Log )  ! Error messaging
+!       Error_Status = CRTM_Assign_AtmAbsorption( AtmAbsorption_in,       &  ! Input
+!                                                 AtmAbsorption_out,      &  ! Output
+!                                                 RCS_Id     =RCS_Id,     &  ! Revision control
+!                                                 Message_Log=Message_Log )  ! Error messaging
 !
 ! INPUT ARGUMENTS:
 !       AtmAbsorption_in:  CRTM_AtmAbsorption structure which is to be copied.
@@ -674,10 +559,7 @@ CONTAINS
     ! Local parameters
     CHARACTER(*), PARAMETER :: ROUTINE_NAME = 'CRTM_Assign_AtmAbsorption'
 
-
-    ! ------
     ! Set up
-    ! ------
     Error_Status = SUCCESS
     IF ( PRESENT( RCS_Id ) ) RCS_Id = MODULE_RCS_ID
 
@@ -697,13 +579,8 @@ CONTAINS
       RETURN
     END IF
 
-
-    ! ----------------------
     ! Allocate the structure
-    ! ----------------------
     Error_Status = CRTM_Allocate_AtmAbsorption( AtmAbsorption_in%n_Layers, &
-                                                AtmAbsorption_in%n_Predictors, &
-                                                AtmAbsorption_in%n_Absorbers, &
                                                 AtmAbsorption_out, &
                                                 Message_Log = Message_Log )
     IF ( Error_Status /= SUCCESS ) THEN
@@ -714,18 +591,7 @@ CONTAINS
       RETURN
     END IF
 
-
-    ! -----------------------------------
-    ! Assign non-dimension scalar members
-    ! -----------------------------------
-    AtmAbsorption_out%Secant_Sensor_Zenith = AtmAbsorption_in%Secant_Sensor_Zenith
-
-
-    ! -----------------
     ! Assign array data
-    ! -----------------
-    AtmAbsorption_out%IntAbsorber   = AtmAbsorption_in%IntAbsorber
-    AtmAbsorption_out%Predictor     = AtmAbsorption_in%Predictor
     AtmAbsorption_out%Optical_Depth = AtmAbsorption_in%Optical_Depth
 
   END FUNCTION CRTM_Assign_AtmAbsorption

@@ -1,566 +1,637 @@
 !
 ! CRTM_Interpolation
 !
-! Module containing routines for data interpolation in the CRTM
+! Module containing the interpolation routines used in the CRTM
 !
 !
 ! CREATION HISTORY:
-!       Written by:     Yong Han, 27-July-2005
-!                       Yong.Han@noaa.gov
+!       Written by:     Paul van Delst, CIMSS/SSEC 01-Feb-2007
+!                       paul.vandelst@ssec.wisc.edu
 !
-
 MODULE CRTM_Interpolation
 
   ! -----------------
   ! Environment setup
   ! -----------------
-  ! Module use
-  USE Type_Kinds,      ONLY: fp=>fp_kind
-  USE CRTM_Parameters, ONLY: ZERO, ONE, TOLERANCE
-  ! Disable all implicit typing
+  ! Module usage
+  USE Type_Kinds, ONLY: fp
+  ! Disable implicit typing
   IMPLICIT NONE
 
 
   ! ------------
   ! Visibilities
   ! ------------
-  ! Everything private by default
   PRIVATE
-  ! Routines in this module
-  PUBLIC  :: Interpolate_Profile
-  PUBLIC  :: Interpolate_Profile_TL
-  PUBLIC  :: Interpolate_Profile_AD
-  PUBLIC  :: Compute_Interp_Index
- 
+  ! Parameters
+  PUBLIC :: ORDER
+  PUBLIC :: NPTS
+  ! Procedures
+  PUBLIC :: interp_1D
+  PUBLIC :: interp_2D
+  PUBLIC :: interp_3D
+  PUBLIC :: interp_1D_TL
+  PUBLIC :: interp_2D_TL
+  PUBLIC :: interp_3D_TL
+  PUBLIC :: interp_1D_AD
+  PUBLIC :: interp_2D_AD
+  PUBLIC :: interp_3D_AD
+  PUBLIC :: find_index
+  PUBLIC :: lpoly
+  PUBLIC :: dlpoly
 
-  ! ---------------------
-  ! Procedure overloading
-  ! ---------------------
-  INTERFACE Interpolate_Profile
-    MODULE PROCEDURE Interpolate_Profile_F1
-    MODULE PROCEDURE Interpolate_Profile_F2
-  END INTERFACE Interpolate_Profile
 
-  INTERFACE Interpolate_Profile_TL
-    MODULE PROCEDURE Interpolate_Profile_F1_TL
-    MODULE PROCEDURE Interpolate_Profile_F2_TL
-  END INTERFACE Interpolate_Profile_TL
+  ! -------------------
+  ! Procedure overloads
+  ! -------------------
+  INTERFACE interp_2D_TL
+    MODULE PROCEDURE interp_2D_2D_TL
+    MODULE PROCEDURE interp_2D_1D_TL
+  END INTERFACE interp_2D_TL
+  
+  INTERFACE interp_3D_TL
+    MODULE PROCEDURE interp_3D_3D_TL
+    MODULE PROCEDURE interp_3D_2D_TL
+    MODULE PROCEDURE interp_3D_1D_TL
+  END INTERFACE interp_3D_TL
+  
+  INTERFACE interp_2D_AD
+    MODULE PROCEDURE interp_2D_2D_AD
+    MODULE PROCEDURE interp_2D_1D_AD
+  END INTERFACE interp_2D_AD
+    
+  INTERFACE interp_3D_AD
+    MODULE PROCEDURE interp_3D_3D_AD
+    MODULE PROCEDURE interp_3D_2D_AD
+    MODULE PROCEDURE interp_3D_1D_AD
+  END INTERFACE interp_3D_AD
 
-  INTERFACE Interpolate_Profile_AD
-    MODULE PROCEDURE Interpolate_Profile_F1_AD
-    MODULE PROCEDURE Interpolate_Profile_F2_AD
-  END INTERFACE Interpolate_Profile_AD
+  INTERFACE find_index
+    MODULE PROCEDURE find_regular_index
+    MODULE PROCEDURE find_random_index
+  END INTERFACE find_index
+
+
+  ! -----------------  
+  ! Module parameters
+  ! -----------------  
+  CHARACTER(*), PARAMETER :: MODULE_RCS_ID=&
+  '$Id: $'
+  REAL(fp), PARAMETER :: ZERO = 0.0_fp
+  REAL(fp), PARAMETER :: ONE  = 1.0_fp
+!  INTEGER,  PARAMETER :: ORDER = 3
+  INTEGER,  PARAMETER :: ORDER = 1
+  INTEGER,  PARAMETER :: NPTS  = ORDER+1
 
 
 CONTAINS
 
 
-!---------------------------------------------------------------------------------------------  
-! NAME: Interpolate_Profile                                                                      
-!                                                                                                 
-! PURPOSE:
-!    Given x and u that are ascending arrays, it interpolates y with the abscissa x
-!    on the abscissa u using the following algorithm:
-!       y_int(i) = y(1)  if u(i) < x(1)
-!       y_int(i) = y(nx) if u(i) > x(nx)
-!       y_int(i) = y(ix1) + (y(ix2)-y(ix1))*(u(i) - x(ix1))/(x(ix2)-x(ix1))
-!                        if x(ix1) <= u(i) <= x(ix2)
-!
-!    IThe index array interp_index contains the following content 
-!
-!      interp_index(i, 1) = 1 and interp_index(i, 2) = 1, if u(i) < x(1)
-!      interp_index(i, 1) = nx and interp_index(i, 2) = nx, if u(i) > x(nx), 
-!                                                          where nx = SIZE(x)
-!      x(interp_index(i, 1)) <= u(i) <= x(interp_index(i, 2)) if x(1) <= u(i) <= x(nx)
-!
-! CALLING SEQUENCE:
-!            CALL Interpolate_Profile(y, x, u, y_int) 
-!      or    CALL Interpolate_Profile(interp_index, y, x, u, y_int)
-!
-! INPUT ARGUMENTS:
-!       y:            The data array to be interpolated.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       x:            The abscissa values for y and they must be monotonically 
-!                     ascending.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       u:            The abscissa values for the results
-!                     and they must be monotonically ascending
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!    interp_index:    The index array of dimension (nu x 2), where nu = SIZE(u) 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-2
-!                     ATTRIBUTES: INTENT(IN)                         
-!
-! OUTPUT ARGUMENTS:
-!       y_int:        The array contains the results 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-1
-!                     ATTRIBUTES: INTENT(OUT)                         
-!
-! RESTRICTIONS:
-!     To be efficient, this routine does not check that x and u are both
-!     monotonically ascending and the index bounds.
-!
-! CREATION HISTORY:
-!       Written by:     Yong Han, 07-May-2004
-!-----------------------------------------------------------------------------------
-
-  !----------------------------------------------------------------------------
-  !  Interpolation routine with interperlation index array already calculated.
-  !----------------------------------------------------------------------------
-  SUBROUTINE Interpolate_Profile_F1(interp_index, y, x, u, y_int)
+  ! ------------------------------------
+  ! Forward model interpolation routines
+  ! ------------------------------------
+  ! 1-D routine
+  SUBROUTINE interp_1D(y, xlp, &  ! Input
+                       y_int   )  ! Output
     ! Arguments
-    INTEGER,  DIMENSION(:,:), INTENT(IN)  :: interp_index
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: y
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: u
-    REAL(fp), DIMENSION(:),   INTENT(OUT) :: y_int
+    REAL(fp), INTENT(IN)  :: y(:), xlp(:)
+    REAL(fp), INTENT(OUT) :: y_int
     ! Local variables
-    INTEGER :: i, k1, k2
-
-    DO i = 1, SIZE(u)
-      k1 = interp_index(i, 1)
-      k2 = interp_index(i, 2)
-      IF( k1 == k2)THEN
-        y_int(i) = y(k1)
-      ELSE
-        CALL Interp_linear(y(k1), x(k1), y(k2), x(k2), u(i), y_int(i))
-      END IF
+    INTEGER  :: i
+    ! Perform interpolation
+    y_int = ZERO
+    DO i = 1,NPTS
+      y_int = y_int + xlp(i)*y(i)
     END DO
-
-  END SUBROUTINE Interpolate_Profile_F1
-
-
-  !----------------------------------------------------------------------------
-  !  Interpolation routine with the interperlation index array not supplied
-  !----------------------------------------------------------------------------
-
-  SUBROUTINE Interpolate_Profile_F2(y, x, u, y_int)
-    ! Arguments
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: y
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: u
-    REAL(fp), DIMENSION(:),   INTENT(OUT) :: y_int
-    ! Local variables
-    INTEGER :: interp_index(SIZE(u), 2)
-
-    ! Compute the index array for indexing the two interpolation points
-    CALL Compute_Interp_Index(x, u, interp_index)
-
-    ! Perform the interpolation
-    CALL Interpolate_Profile_F1(interp_index, y, x, u, y_int)
-
-  END SUBROUTINE Interpolate_Profile_F2
-
-
-!---------------------------------------------------------------------------------------------  
-! NAME: Interpolate_Profile_TL
-!                                                                                                 
-! PURPOSE:
-!     The Tangent_Linear routine of Interpolate_Profile
-! CALLING SEQUENCE:
-!            CALL Interpolate_Profile_TL(y, x, u, y_TL, y_int_TL) 
-!      or    CALL Interpolate_Profile_TL(interp_index, y, x, u, y_TL, y_int_TL)
-!
-! INPUT ARGUMENTS:
-!       y:            The data array to be interpolated.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       x:            The abscissa values for y and they must be monotonically 
-!                     ascending.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       u:            The abscissa values for the results
-!                     and they must be monotonically ascending
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       y_TL:         The Tangent-linear data array of y
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!    interp_index:    The index array of dimension (nu x 2), where nu = SIZE(u) 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-2
-!                     ATTRIBUTES: INTENT(IN)                         
-!
-! OUTPUT ARGUMENTS:
-!       y_int_TL:     The Tangent-linear array of y_int 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-1
-!                     ATTRIBUTES: INTENT(OUT)                         
-!
-! RESTRICTIONS:
-!     To be efficient, this routine does not check that x and u are both
-!     monotonically ascending and the index bounds.
-!
-! CREATION HISTORY:
-!       Written by:     Yong Han, 07-May-2004
-!-----------------------------------------------------------------------------------
-    
-  SUBROUTINE Interpolate_Profile_F1_TL(interp_index, y, x, u, y_TL, y_int_TL)
-    ! Arguments
-    INTEGER,  DIMENSION(:,:), INTENT(IN)  :: interp_index
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: y
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: u
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: y_TL
-    REAL(fp), DIMENSION(:),   INTENT(OUT) :: y_int_TL
-    ! Local variables
-    INTEGER :: i, k1, k2
-
-    DO i = 1, SIZE(u)
-      k1 = interp_index(i, 1)
-      k2 = interp_index(i, 2)
-      IF( k1 == k2)THEN
-        y_int_TL(i) = y_TL(k1)
-      ELSE
-        CALL Interp_linear_TL(y(k1), x(k1), y(k2), x(k2), u(i), y_TL(k1), y_TL(k2), y_int_TL(i))
-      END IF
-    END DO
-
-  END SUBROUTINE Interpolate_Profile_F1_TL
-
-  SUBROUTINE Interpolate_Profile_F2_TL(y, x, u, y_TL, y_int_TL)
-    ! Arguments
-    REAL(fp), DIMENSION(:), INTENT(IN)  :: y
-    REAL(fp), DIMENSION(:), INTENT(IN)  :: x
-    REAL(fp), DIMENSION(:), INTENT(IN)  :: u
-    REAL(fp), DIMENSION(:), INTENT(IN)  :: y_TL
-    REAL(fp), DIMENSION(:), INTENT(OUT) :: y_int_TL
-    ! Local variables
-    INTEGER :: interp_index(SIZE(u), 2)
-
-    ! Compute the index array for indexing the two interpolation points
-    CALL Compute_Interp_Index(x, u, interp_index)
-
-    ! Perform the TL interpolation
-    CALL Interpolate_Profile_F1_TL(interp_index, y, x, u, y_TL, y_int_TL)
-
-  END SUBROUTINE Interpolate_Profile_F2_TL
-
-
-!---------------------------------------------------------------------------------------------  
-! NAME: Interpolate_Profile_AD
-!                                                                                                 
-! PURPOSE:
-!     The Adjoint routine of Interpolate_Profile
-!
-! CALLING SEQUENCE:
-!            CALL Interpolate_Profile_AD(y, x, u, y_int_AD, y_AD) 
-!      or    CALL Interpolate_Profile_AD(interp_index, y, x, u, y_int_AD, y_AD)
-!
-! INPUT ARGUMENTS:
-!       y:            The data array to be interpolated.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       x:            The abscissa values for y and they must be monotonically 
-!                     ascending.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       u:            The abscissa values for the results
-!                     and they must be monotonically ascending
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       y_int_AD:     The Adjoint array of y_int 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-1
-!                     ATTRIBUTES: INTENT(IN)                         
-!
-!    interp_index:    The index array of dimension (nu x 2), where nu = SIZE(u) 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-2
-!                     ATTRIBUTES: INTENT(IN)                         
-!
-! IN/OUTPUT ARGUMENTS:
-!       y_AD:         The Adjoint data array of y
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-! RESTRICTIONS:
-!     To be efficient, this routine does not check that x and u are both
-!     monotonically ascending and the index bounds.
-!
-! CREATION HISTORY:
-!       Written by:     Yong Han, 07-May-2004
-!-----------------------------------------------------------------------------------
-    
-  SUBROUTINE Interpolate_Profile_F1_AD(interp_index, y, x, u, y_int_AD, y_AD)
-    ! Arguments
-    INTEGER,  DIMENSION(:,:), INTENT(IN)      :: interp_index
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: y
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: u
-    REAL(fp), DIMENSION(:),   INTENT(IN OUT)  :: y_int_AD
-    REAL(fp), DIMENSION(:),   INTENT(IN OUT)  :: y_AD
-    ! Local variables
-    INTEGER :: i, k1, k2
-
-    DO i = SIZE(u), 1, -1
-      k1 = interp_index(i, 1)
-      k2 = interp_index(i, 2)
-      IF( k1 == k2)THEN
-        y_AD(k1) = y_AD(k1) + y_int_AD(i)
-        y_int_AD(i) = ZERO
-      ELSE
-        CALL Interp_linear_AD(y(k1), x(k1), y(k2), x(k2), u(i), y_int_AD(i), y_AD(k1), y_AD(k2))
-      END IF
-    END DO
-
-  END SUBROUTINE Interpolate_Profile_F1_AD
-
-
-  SUBROUTINE Interpolate_Profile_F2_AD(y, x, u, y_int_AD, y_AD)
-    ! Arguments
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: y
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)      :: u
-    REAL(fp), DIMENSION(:),   INTENT(IN OUT)  :: y_int_AD
-    REAL(fp), DIMENSION(:),   INTENT(IN OUT)  :: y_AD
-    ! Local variables
-    INTEGER :: interp_index(SIZE(u), 2)
-
-    ! Compute the index array for indexing the two interpolation points
-    CALL Compute_Interp_Index(x, u, interp_index)
-
-    ! Perform the AD interpolation
-    CALL Interpolate_Profile_F1_AD(interp_index, y, x, u, y_int_AD, y_AD)
-
-  END SUBROUTINE Interpolate_Profile_F2_AD
-
-
-!---------------------------------------------------------------------------------------------  
-! NAME: Compute_Interp_Index                                                                      
-!                                                                                                 
-! PURPOSE:
-!    Given x and u that are ascending arrays, it computes an index array, interp_index,
-!    such that
-!    
-!      interp_index(i, 1) = 1 and interp_index(i, 2) = 1, if u(i) < x(1)
-!      interp_index(i, 1) = nx and interp_index(i, 2) = nx, if u(i) > x(nx), 
-!                                                          where nx = SIZE(x)
-!      x(interp_index(i, 1)) <= u(i) <= x(interp_index(i, 2)) if x(1) <= u(i) <= x(nx)
-!           
-! CALLING SEQUENCE:
-!            CALL Compute_Interp_Index(x, u, interp_index)
-!
-! INPUT ARGUMENTS:
-!       x:            The abscissa values for the data to be interpolated and
-!                     they must be monotonically ascending.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-!       u:            The abscissa values on which the data are interpolated
-!                     they must be monotonically ascending
-!                     the elements of array x.
-!                     UNITS:      N/A                            
-!                     TYPE:       fp         
-!                     DIMENSION:  rank-1                        
-!                     ATTRIBUTES: INTENT(IN)                   
-!
-! OUTPUT ARGUMENTS:
-!       interp_index: The index array of dimension (nu x 2), where nu = SIZE(u) 
-!                     UNITS:      N/A                                  
-!                     TYPE:       Integer         
-!                     DIMENSION:  rank-2
-!                     ATTRIBUTES: INTENT(OUT)                         
-!
-! RESTRICTIONS:
-!     To be efficient, this routine does not check that x and u are both
-!     monotonically ascending and the index bounds.
-!
-! CREATION HISTORY:
-!       Written by:     Yong Han, 07-May-2004
-!-----------------------------------------------------------------------------------
-
-  SUBROUTINE Compute_Interp_Index(x, u, interp_index)
-    ! Arguments
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: x
-    REAL(fp), DIMENSION(:),   INTENT(IN)  :: u
-    INTEGER,  DIMENSION(:,:), INTENT(OUT) :: interp_index
-    ! Local variables
-    INTEGER :: nx, nu, ix, iu, j, k1, k2
-
-    nx = SIZE(x)
-    nu = SIZE(u)
-
-    ! Set the indexes to 1 for the elements in u that are smaller than x(1)
-    k1 = nu + 1
-    LessThan_Loop: DO iu = 1, nu
-      IF(u(iu) < x(1))THEN
-        interp_index(iu, 1) = 1
-        interp_index(iu, 2) = 1
-      ELSE
-        k1 = iu
-        EXIT LessThan_Loop
-      END IF
-    END DO LessThan_Loop
-
-    ! Set the indexes to nx for the elements in u that are larger than x(nx)
-    k2 = 0
-    GreaterThan_Loop: DO iu = nu, k1, -1
-      IF(u(iu) > x(nx))THEN
-        interp_index(iu, 1) = nx
-        interp_index(iu, 2) = nx
-      ELSE
-        k2 = iu
-        EXIT GreaterThan_Loop
-      END IF
-    END DO GreaterThan_Loop
-
-    ! Set the indexes for the elements in u that are in the range
-    ! between x1(1) and x(nx)
-    j = 1
-    Outer_Loop: DO iu = k1, k2
-      Inner_Loop: DO ix = j, nx-1
-        IF(u(iu) >= x(ix) .AND. u(iu) <= x(ix+1))THEN
-          interp_index(iu, 1) = ix
-          interp_index(iu, 2) = ix+1
-          j = ix
-          EXIT Inner_Loop
-        ENDIF
-      END DO Inner_Loop
-    END DO Outer_Loop
+  END SUBROUTINE interp_1D
   
-  END SUBROUTINE Compute_Interp_Index
-
-
-  !---------------------------------------------
-  ! Function for two points linear interpolation
-  !---------------------------------------------
-  SUBROUTINE Interp_linear(y1, x1, y2, x2, x, y)
-    REAL(fp), INTENT(IN)  :: y1, x1, y2, x2, x
-    REAL(fp), INTENT(OUT) :: y
-    y = y1 + (y2-y1)*(x - x1)/(x2 - x1)
-  END SUBROUTINE Interp_linear
-
-
-  SUBROUTINE Interp_linear_TL(y1, x1, y2, x2, x, y1_TL, y2_TL, y_TL)
-    REAL(fp), INTENT(IN)  :: y1, x1, y2, x2, x, y1_TL, y2_TL
-    REAL(fp), INTENT(OUT) :: y_TL
-    y_TL = y1_TL + (y2_TL-y1_TL)*(x - x1)/(x2 - x1)
-  END SUBROUTINE Interp_linear_TL
-
-
-  SUBROUTINE Interp_linear_AD(y1, x1, y2, x2, x, y_AD, y1_AD, y2_AD)
-    REAL(fp), INTENT(IN)     :: y1, x1, y2, x2, x
-    REAL(fp), INTENT(IN OUT) :: y_AD
-    REAL(fp), INTENT(IN OUT) :: y1_AD, y2_AD
+  ! 2-D routine
+  SUBROUTINE interp_2D(z, xlp, ylp, &  ! Input
+                       z_int        )  ! Output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:), xlp(:), ylp(:)
+    REAL(fp), INTENT(OUT) :: z_int
     ! Local variables
-    REAL(fp) :: fac
-    fac = (x - x1)/(x2 - x1)  
-    y1_AD = y1_AD + y_AD      
-    y1_AD = y1_AD - fac*y_AD  
-    y2_AD = y2_AD + fac*y_AD  
-    y_AD = ZERO
-  END SUBROUTINE Interp_linear_AD
+    INTEGER  :: i
+    REAL(fp) :: a(NPTS)
+    ! Interpolate z in x dimension for all y
+    DO i = 1,NPTS
+      CALL interp_1D(z(:,i),xlp,a(i))
+    END DO
+    ! Interpolate z in y dimension
+    CALL interp_1D(a,ylp,z_int)
+  END SUBROUTINE interp_2D
 
-
-  !----------------------------------------------
-  ! Function for two points log_log interpolation
-  !----------------------------------------------
-  SUBROUTINE Interp_loglog(y1, x1, y2, x2, x, y)
-    REAL(fp), INTENT(IN)  :: y1, x1, y2, x2, x
-    REAL(fp), INTENT(OUT) :: y
+  ! 3-D routine
+  SUBROUTINE interp_3D(z, wlp, xlp, ylp, &  ! Input
+                       z_int             )  ! Output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:,:), wlp(:), xlp(:), ylp(:)
+    REAL(fp), INTENT(OUT) :: z_int
     ! Local variables
-    REAL(fp) :: xx
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS), b(NPTS)
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i))
+      END DO
+      CALL interp_1D(a,xlp,b(j))
+    END DO
+    ! Interpolate b in y dimension
+    CALL interp_1D(b,ylp,z_int)
+  END SUBROUTINE interp_3D
 
-    IF ( x1 <= TOLERANCE .OR. x2 <= TOLERANCE .OR. x <= TOLERANCE .OR. &
-         y1 <= TOLERANCE .OR. y2 <= TOLERANCE                          ) THEN
-      ! Linear interpolation
-      CALL Interp_linear(y1, x1, y2, x2, x, y)
-    ELSE 
-      ! Log interpolation
-      xx = LOG(x/x1) / LOG(x2/x1)
-      y = y1 * (y2/y1)**xx
-    END IF
 
-  END SUBROUTINE Interp_loglog
-
-
-  SUBROUTINE Interp_loglog_TL(y1, x1, y2, x2, x, y1_TL, y2_TL, y_TL)
-    REAL(fp), INTENT(IN)  :: y1, x1, y2, x2, x, y1_TL, y2_TL
-    REAL(fp), INTENT(OUT) :: y_TL
+  ! -------------------------------------------
+  ! Tangent-linear model interpolation routines
+  ! -------------------------------------------
+  ! 1-D routine
+  SUBROUTINE interp_1D_TL( y, xdlp , &  ! Input
+                           x_int_TL, &  ! TL  Input
+                           y_int_TL  )  ! TL  Output
+    ! Arguments
+    REAL(fp), INTENT(IN) :: y(:), xdlp(:)
+    REAL(fp), INTENT(IN) :: x_int_TL
+    REAL(fp), INTENT(OUT):: y_int_TL
     ! Local variables
-    REAL(fp) :: xx, r, rxx
-
-    IF( x1 <= TOLERANCE .OR. x2 <= TOLERANCE .OR. x <= TOLERANCE .OR. &
-        y1 <= TOLERANCE .OR. y2 <= TOLERANCE                          ) THEN
-      ! Linear interpolation
-      CALL Interp_linear_TL(y1, x1, y2, x2, x, y1_TL, y2_TL, y_TL)
-    ELSE 
-      ! Log interpolation
-      xx  = Log(x/x1) / Log(x2/x1)
-      r   = (y2/y1)
-      rxx = r**xx
-      y_TL = (ONE - xx)*rxx*y1_TL + xx*(rxx/r)*y2_TL
-    END IF
-
-  END SUBROUTINE Interp_loglog_TL
-
-
-  SUBROUTINE Interp_loglog_AD(y1, x1, y2, x2, x, y_AD, y1_AD, y2_AD)
-    REAL(fp), INTENT(IN)     :: y1, x1, y2, x2, x  ! Input
-    REAL(fp), INTENT(IN OUT) :: y_AD               ! Input
-    REAL(fp), INTENT(IN OUT) :: y1_AD, y2_AD       ! Output
+    INTEGER  :: i
+    ! Perform TL interpolation
+    y_int_TL = ZERO
+    DO i = 1,NPTS
+      y_int_TL = y_int_TL + x_int_TL*xdlp(i)*y(i)
+    END DO
+  END SUBROUTINE interp_1D_TL
+  
+  ! 2-D, z(x,y), with 2 dimensions perturbed
+  SUBROUTINE interp_2D_2D_TL( z                 , &  ! Input
+                              xlp , ylp         , &  ! Input
+                              xdlp, ydlp        , &  ! Input
+                              x_int_TL, y_int_TL, &  ! TL  Input
+                              z_int_TL            )  ! TL  Output
+    REAL(fp), INTENT(IN)  :: z(:,:)
+    REAL(fp), INTENT(IN)  :: xlp(:) , ylp(:)
+    REAL(fp), INTENT(IN)  :: xdlp(:), ydlp(:)
+    REAL(fp), INTENT(IN)  :: x_int_TL, y_int_TL
+    REAL(fp), INTENT(OUT) :: z_int_TL
     ! Local variables
-    REAL(fp) :: xx, r, rxx
+    INTEGER  :: i
+    REAL(fp) :: a(NPTS)
+    REAL(fp) :: a_TL(NPTS)
+    REAL(fp) :: a_int_TL, a_TL_int
+    ! Interpolate z in x dimension for all y
+    DO i = 1,NPTS
+      CALL interp_1D(z(:,i),xlp,a(i))
+      CALL interp_1D_TL(z(:,i),xdlp,x_int_TL,a_TL(i))
+    END DO
+    ! Interpolate z in y dimension
+    CALL interp_1D_TL(a,ydlp,y_int_TL,a_int_TL)
+    CALL interp_1D(a_TL,ylp,a_TL_int)
+    z_int_TL = a_int_TL + a_TL_int
+  END SUBROUTINE interp_2D_2D_TL
+  
+  ! 2-D, z(x,y), with 1 dimension (y) perturbed
+  SUBROUTINE interp_2D_1D_TL( z         , & ! Input
+                              xlp       , & ! Input
+                              ydlp      , & ! Input
+                              y_int_TL  , & ! TL input
+                              z_int_TL    ) ! TL output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:)
+    REAL(fp), INTENT(IN)  :: xlp(:)
+    REAL(fp), INTENT(IN)  :: ydlp(:)                         
+    REAL(fp), INTENT(IN)  :: y_int_TL
+    REAL(fp), INTENT(OUT) :: z_int_TL
+    ! Local variables
+    INTEGER :: i
+    REAL(fp) :: a(NPTS)
+    ! Interpolate z in x dimension for all y
+    DO i = 1,NPTS
+      CALL interp_1D(z(:,i),xlp,a(i))
+    END DO
+    ! Interpolate z in y dimension
+    CALL interp_1D_TL(a,ydlp,y_int_TL,z_int_TL)
+  END SUBROUTINE interp_2D_1D_TL
 
-    IF( x1 <= TOLERANCE .OR. x2 <= TOLERANCE .OR. x <= TOLERANCE .OR. &
-        y1 <= TOLERANCE .OR. y2 <= TOLERANCE                          ) THEN
-      ! Linear interpolation
-      CALL Interp_linear_AD(y1, x1, y2, x2, x, y_AD, y1_AD, y2_AD)
-    ELSE 
-      ! Log interpolation
-      xx  = Log(x/x1) / Log(x2/x1)
-      r   = (y2/y1)
-      rxx = r**xx
-      y1_AD = y1_AD + (ONE - xx)*rxx*y_AD
-      y2_AD = y2_AD + xx*(rxx/r)*y_AD
-      y_AD = ZERO
-    END IF
+  ! 3-D, z(w,x,y), with 3 dimensions perturbed
+  SUBROUTINE interp_3D_3D_TL( z                           , &  ! Input
+                              wlp     , xlp     , ylp     , &  ! Input
+                              wdlp    , xdlp    , ydlp    , &  ! Input
+                              w_int_TL, x_int_TL, y_int_TL, &  ! TL Input
+                              z_int_TL                      )  ! TL Output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:,:)
+    REAL(fp), INTENT(IN)  :: wlp(:)  , xlp(:)  , ylp(:) 
+    REAL(fp), INTENT(IN)  :: wdlp(:) , xdlp(:) , ydlp(:)  
+    REAL(fp), INTENT(IN)  :: w_int_TL, x_int_TL, y_int_TL
+    REAL(fp), INTENT(OUT) :: z_int_TL
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS)   , b(NPTS)
+    REAL(fp) :: a_TL(NPTS), b_TL(NPTS)
+    REAL(fp) :: a_int_TL, a_TL_int
+    REAL(fp) :: b_int_TL, b_TL_int
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i))
+        CALL interp_1D_TL(z(:,i,j),wdlp,w_int_TL,a_TL(i))
+      END DO
+      CALL interp_1D(a,xlp,b(j))
+      CALL interp_1D_TL(a,xdlp,x_int_TL,a_int_TL)
+      CALL interp_1D(a_TL,xlp,a_TL_int)
+      b_TL(j) = a_int_TL + a_TL_int
+    END DO
+    ! Interpolate b in y dimension
+    CALL interp_1D_TL(b,ydlp,y_int_TL,b_int_TL)
+    CALL interp_1D(b_TL,ylp,b_TL_int)
+    z_int_TL = b_int_TL + b_TL_int
+  END SUBROUTINE interp_3D_3D_TL
+  
+  ! 3-D, z(w,x,y), with 2 dimensions (x,y) perturbed
+  SUBROUTINE interp_3D_2D_TL( z                      , &  ! Input 
+                              wlp, xlp     , ylp     , &  ! Input
+                                   xdlp    , ydlp    , &  ! Input
+                                   x_int_TL, y_int_TL, &  ! TL Input
+                              z_int_TL                 )  ! TL Output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:,:)
+    REAL(fp), INTENT(IN)  :: wlp(:), xlp(:), ylp(:)
+    REAL(fp), INTENT(IN)  :: xdlp(:), ydlp(:)
+    REAL(fp), INTENT(IN)  :: x_int_TL, y_int_TL
+    REAL(fp), INTENT(OUT) :: z_int_TL
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS), b(NPTS) 
+    REAL(fp) :: b_TL(NPTS) 
+    REAL(fp) :: a_int_TL
+    REAL(fp) :: b_int_TL, b_TL_int
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i))
+      END DO
+      CALL interp_1D(a,xlp,b(j))
+      CALL interp_1D_TL(a,xdlp,x_int_TL,a_int_TL)
+      b_TL(j) = a_int_TL
+    END DO
+    ! Interpolate b in y dimension
+    CALL interp_1D_TL(b,ydlp,y_int_TL,b_int_TL)
+    CALL interp_1D(b_TL,ylp,b_TL_int)
+    z_int_TL = b_int_TL + b_TL_int
+  END SUBROUTINE interp_3D_2D_TL
+  
+  ! 3-D, z(w,x,y), with 1 dimensions (y) perturbed
+  SUBROUTINE interp_3D_1D_TL( z       , &  ! Input
+                              wlp, xlp, &  ! Input
+                              ydlp    , &  ! Input
+                              y_int_TL, &  ! TL Input
+                              z_int_TL  )  ! TL Output
+    ! Arguments
+    REAL(fp), INTENT(IN)  :: z(:,:,:)
+    REAL(fp), INTENT(IN)  :: wlp(:), xlp(:)
+    REAL(fp), INTENT(IN)  :: ydlp(:)
+    REAL(fp), INTENT(IN)  :: y_int_TL
+    REAL(fp), INTENT(OUT) :: z_int_TL
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS)   , b(NPTS)
+    REAL(fp) :: b_int_TL
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i))
+      END DO 
+      CALL interp_1D(a,xlp,b(j))
+    END DO
+    ! Interpolate b in y dimension
+    CALL interp_1D_TL(b,ydlp,y_int_TL,z_int_TL)
+  END SUBROUTINE interp_3D_1D_TL                        
 
-  END SUBROUTINE Interp_loglog_AD
+
+  ! ------------------------------------
+  ! Adjoint model interpolation routines
+  ! ------------------------------------
+  ! 1-D routine
+  SUBROUTINE interp_1D_AD( y, xdlp , &  ! Input
+                           y_int_AD, &  ! AD  Input
+                           x_int_AD  )  ! AD  Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: y(:), xdlp(:)
+    REAL(fp), INTENT(IN OUT) :: y_int_AD
+    REAL(fp), INTENT(IN OUT) :: x_int_AD
+    ! Local variables
+    INTEGER  :: i
+    ! Perform interpolation
+    DO i = 1,NPTS
+      x_int_AD = x_int_AD + y_int_AD*xdlp(i)*y(i)
+    END DO
+      y_int_AD = ZERO
+  END SUBROUTINE interp_1D_AD
+
+  ! 1-D routine for adjoint of FWD
+  ! interpolation of TL quantities
+  SUBROUTINE interp_1D_FWD_AD(lp,       &  ! Input
+                              y_int_AD, &  ! Input
+                              y_AD      )  ! Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: lp(:)
+    REAL(fp), INTENT(IN OUT) :: y_int_AD
+    REAL(fp), INTENT(IN OUT) :: y_AD(:)
+    ! Local variables
+    INTEGER  :: i
+    ! Compute the adjoint interpolate
+    DO i = 1,NPTS
+      y_AD(i) = y_AD(i) + lp(i)*y_int_AD
+    END DO
+    y_int_AD = ZERO
+  END SUBROUTINE interp_1D_FWD_AD
+  
+  ! 2-D, z(x,y), with 2 dimensions perturbed
+  SUBROUTINE interp_2D_2D_AD( z                 , &  ! Input
+                              xlp , ylp         , &  ! Input
+                              xdlp, ydlp        , &  ! Input
+                              z_int_AD          , &  ! AD Input
+                              x_int_AD, y_int_AD  )  ! AD Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: z(:,:)
+    REAL(fp), INTENT(IN)     :: xlp(:) , ylp(:)
+    REAL(fp), INTENT(IN)     :: xdlp(:), ydlp(:)
+    REAL(fp), INTENT(IN OUT) :: z_int_AD
+    REAL(fp), INTENT(IN OUT) :: x_int_AD, y_int_AD
+    ! Local variables
+    INTEGER  :: i
+    REAL(fp) :: a(NPTS)
+    REAL(fp) :: a_AD(NPTS)
+    REAL(fp) :: a_AD_int
+    ! Forward calculations
+    ! Interpolate z in x dimension for all y
+    DO i = 1,NPTS
+      CALL interp_1D(z(:,i),xlp,a(i))
+    END DO
+    ! Adjoint calculations
+    ! Initialize local AD variables
+    a_AD     = ZERO
+    a_AD_int = ONE
+    ! Adjoint of z interpolation in y dimension
+    ! The first part provides y_int_AD (dz/dy)
+    CALL interp_1D_AD(a,ydlp,z_int_AD,y_int_AD)
+    CALL interp_1D_FWD_AD(ylp,a_AD_int,a_AD)
+    ! Adjoint of z interpolation in x dimension for all y
+    ! This provides x_int_AD (dz/dx)
+    DO i = 1,NPTS
+      CALL interp_1D_AD(z(:,i),xdlp,a_AD(i),x_int_AD)
+    END DO
+  END SUBROUTINE interp_2D_2D_AD
+  
+  ! 2-D, z(x,y), with 1 dimension (y) perturbed
+  SUBROUTINE interp_2D_1D_AD( z       , &  ! Input
+                              xlp     , &  ! Input
+                              ydlp    , &  ! Input
+                              z_int_AD, &  ! AD Input
+                              y_int_AD  )  ! AD Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: z(:,:)
+    REAL(fp), INTENT(IN)     :: xlp(:)   
+    REAL(fp), INTENT(IN)     :: ydlp(:)
+    REAL(fp), INTENT(IN OUT) :: z_int_AD
+    REAL(fp), INTENT(IN OUT) :: y_int_AD
+    ! Local variables
+    INTEGER  :: i
+    REAL(fp) :: a(NPTS)
+    REAL(fp) :: a_AD(NPTS)
+    REAL(fp) :: a_AD_int
+    ! Forward calculations
+    ! Interpolate z in x dimension for all y
+    DO i = 1,NPTS
+      CALL interp_1D(z(:,i),xlp,a(i))
+    END DO
+    ! Adjoint calculations
+    ! Adjoint of z interpolation in y dimension
+    ! The first part provides y_int_AD (dz/dy)
+    CALL interp_1D_AD(a,ydlp,z_int_AD,y_int_AD)
+  END SUBROUTINE interp_2D_1D_AD
+                               
+  ! 3-D, z(w,x,y), with 3 dimensions perturbed
+  SUBROUTINE interp_3D_3D_AD( z                           , &  ! Input
+                              wlp , xlp , ylp             , &  ! Input
+                              wdlp, xdlp, ydlp            , &  ! Input
+                              z_int_AD                    , &  ! AD Input
+                              w_int_AD, x_int_AD, y_int_AD  )  ! AD Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: z(:,:,:)
+    REAL(fp), INTENT(IN)     :: wlp(:), xlp(:), ylp(:)
+    REAL(fp), INTENT(IN)     :: wdlp(:), xdlp(:), ydlp(:)
+    REAL(fp), INTENT(IN OUT) :: w_int_AD, x_int_AD, y_int_AD, z_int_AD
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS,NPTS), b(NPTS)
+    REAL(fp) :: a_AD(NPTS)  , b_AD(NPTS)
+    REAL(fp) :: a_AD_int
+    REAL(fp) :: b_AD_int
+    ! Forward calculations
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i,j))
+      END DO
+      CALL interp_1D(a(:,j),xlp,b(j))
+    END DO
+    ! Adjoint calculations
+    ! Initialize local AD variables
+    b_AD = ZERO
+    a_AD = ZERO
+    ! Adjoint of b interpolation in y direction
+    ! The first part provides y_int_AD (dz/dy)
+    b_AD_int = z_int_AD
+    CALL interp_1D_AD(b,ydlp,z_int_AD,y_int_AD)
+    CALL interp_1D_FWD_AD(ylp,b_AD_int,b_AD)
+    ! Adjoint of a interpolation in x dimension for all y
+    ! The first part provides x_int_AD (dz/dx)
+    DO j = 1,NPTS
+      a_AD_int = b_AD(j)
+      CALL interp_1D_AD(a(:,j),xdlp,b_AD(j),x_int_AD)
+      CALL interp_1D_FWD_AD(xlp,a_AD_int,a_AD) 
+      ! Adjoint of z interpolation in w dimension for all x and y
+      ! This provides w_int_AD (dz/dw)
+      DO i = 1,NPTS
+        CALL interp_1D_AD(z(:,i,j),wdlp,a_AD(i),w_int_AD)
+      END DO
+    END DO
+  END SUBROUTINE interp_3D_3D_AD
+
+  ! 3-D, z(w,x,y), with 2 dimensions (x,y) perturbed
+  SUBROUTINE interp_3D_2D_AD( z                 , & ! Input
+                              wlp, xlp , ylp    , & ! Input
+                                   xdlp, ydlp   , & ! Input
+                              z_int_AD          , & ! AD Input
+                              x_int_AD, y_int_AD  ) ! AD Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: z(:,:,:)
+    REAL(fp), INTENT(IN)     :: wlp(:), xlp(:), ylp(:)
+    REAL(fp), INTENT(IN)     :: xdlp(:), ydlp(:)
+    REAL(fp), INTENT(IN OUT) :: z_int_AD
+    REAL(fp), INTENT(IN OUT) :: x_int_AD, y_int_AD
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS,NPTS), b(NPTS)
+    REAL(fp) :: b_AD(NPTS)
+    REAL(fp) :: b_AD_int
+    ! Forward calculations
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i,j))
+      END DO
+      CALL interp_1D(a(:,j),xlp,b(j))
+    END DO
+    ! Adjoint calculations
+    ! Initialize local AD variables
+    b_AD = ZERO
+    ! Adjoint of b interpolation in y direction
+    ! The first part provides y_int_AD (dz/dy)
+    b_AD_int = z_int_AD
+    CALL interp_1D_AD(b,ydlp,z_int_AD,y_int_AD)
+    CALL interp_1D_FWD_AD(ylp,b_AD_int,b_AD)
+    ! Adjoint of a interpolation in x dimension for all y
+    ! The first part provides x_int_AD (dz/dx)
+    DO j = 1,NPTS
+      CALL interp_1D_AD(a(:,j),xdlp,b_AD(j),x_int_AD)
+    END DO
+  END SUBROUTINE interp_3D_2D_AD
+  
+  ! 3-D, z(w,x,y), with 1 dimensions (y) perturbed
+  SUBROUTINE interp_3D_1D_AD( z       , & ! Input
+                              wlp, xlp, & ! Input  
+                              ydlp    , & ! Input
+                              z_int_AD, & ! AD Input
+                              y_int_AD  ) ! AD Output
+    ! Arguments
+    REAL(fp), INTENT(IN)     :: z(:,:,:)
+    REAL(fp), INTENT(IN)     :: wlp(:), xlp(:)
+    REAL(fp), INTENT(IN)     :: ydlp(:)
+    REAL(fp), INTENT(IN OUT) :: z_int_AD
+    REAL(fp), INTENT(IN OUT) :: y_int_AD
+    ! Local variables
+    INTEGER  :: i, j
+    REAL(fp) :: a(NPTS,NPTS), b(NPTS) 
+    ! Forward calculations
+    ! Interpolate a in x dimension for all y
+    DO j = 1,NPTS
+      ! Interpolate z in w dimension for all x and y
+      DO i = 1,NPTS
+        CALL interp_1D(z(:,i,j),wlp,a(i,j))
+      END DO
+      CALL interp_1D(a(:,j),xlp,b(j))
+    END DO
+    ! Adjoint calculation
+    CALL interp_1D_AD(b,ydlp,z_int_AD,y_int_AD)
+  END SUBROUTINE interp_3D_1D_AD
+       
+       
+  ! --------------------
+  ! Indexing subroutines
+  ! --------------------
+  ! Find lower index for regular spacing
+  SUBROUTINE find_regular_index(x, dx, x_int, i1, i2)
+    REAL(fp), INTENT(IN)  :: x(:)
+    REAL(fp), INTENT(IN)  :: dx, x_int
+    INTEGER , INTENT(OUT) :: i1, i2
+    INTEGER :: n
+    n = SIZE(x)
+    i1 = FLOOR((x_int-x(1))/dx)+1-(ORDER/2)
+    i1 = MIN(MAX(i1,1),n-ORDER)
+    i2 = i1 + ORDER
+  END SUBROUTINE find_regular_index
+  
+  ! Find lower index for random spacing.
+  ! Assumption is that x(1) <= xInt <= x(n)
+  ! (despite the MIN/MAX test)
+  SUBROUTINE find_random_index(x, x_int, i1, i2)
+    REAL(fp), INTENT(IN)  :: x(:)
+    REAL(fp), INTENT(IN)  :: x_int
+    INTEGER , INTENT(OUT) :: i1, i2
+    INTEGER :: k, n
+    n = SIZE(x)
+    DO k=1,n
+      IF (x_int <= x(k) ) EXIT
+    END DO
+    i1 = MIN(MAX(1,k-1-(ORDER/2)),n-ORDER)
+    i2 = i1 + ORDER
+  END SUBROUTINE find_random_index
+  
+  ! --------------------
+  ! Polynomial functions
+  ! --------------------
+  ! Function to compute the Lagrangian polynomials
+!  FUNCTION lpoly(x, x_int) RESULT(lp)
+!    REAL(fp), INTENT(IN)  :: x(:)
+!    REAL(fp), INTENT(IN)  :: x_int
+!    REAL(fp) :: lp(SIZE(x))
+!    REAL(fp) :: xi
+!
+!    lp(1) =  (x_int-x(2))*(x_int-x(3))*(x_int-x(4))  / &
+!            ((x(1) -x(2))*(x(1) -x(3))*(x(1) -x(4)))
+!
+!    lp(2) =  (x_int-x(1))*(x_int-x(3))*(x_int-x(4))  / &
+!            ((x(2) -x(1))*(x(2) -x(3))*(x(2) -x(4)))
+!    
+!    lp(3) =  (x_int-x(1))*(x_int-x(2))*(x_int-x(4))  / &
+!            ((x(3) -x(1))*(x(3) -x(2))*(x(3) -x(4)))
+!    
+!    lp(4) =  (x_int-x(1))*(x_int-x(2))*(x_int-x(3))  / &
+!            ((x(4) -x(1))*(x(4) -x(2))*(x(4) -x(3)))
+!  END FUNCTION lpoly
+  FUNCTION lpoly(x, x_int) RESULT(lp)
+    REAL(fp), INTENT(IN)  :: x(:)
+    REAL(fp), INTENT(IN)  :: x_int
+    REAL(fp) :: lp(SIZE(x))
+    lp(1) = (x_int-x(2)) / (x(1)-x(2))
+    lp(2) = (x_int-x(1)) / (x(2)-x(1))
+  END FUNCTION lpoly
+
+  
+  ! Function to compute the derivatives
+  ! of the Lagrangian polynomials
+!  FUNCTION dlpoly(x, x_int) RESULT(dlp)
+!    REAL(fp), INTENT(IN) :: x(:)
+!    REAL(fp), INTENT(IN) :: x_int
+!    REAL(fp) :: dlp(SIZE(x))
+!            
+!    ! Compute derivative of Lagrangian polynomials
+!    dlp(1) = ((x_int-x(2))*(x_int-x(3)) + &
+!              (x_int-x(2))*(x_int-x(4)) + &
+!              (x_int-x(3))*(x_int-x(4))) / &
+!             ((x(1)-x(2))*(x(1)-x(3))*(x(1)-x(4)))
+!
+!    dlp(2) = ((x_int-x(1))*(x_int-x(3)) + &
+!              (x_int-x(1))*(x_int-x(4)) + &
+!              (x_int-x(3))*(x_int-x(4))) / &
+!             ((x(2)-x(1))*(x(2)-x(3))*(x(2)-x(4)))
+!
+!    dlp(3) = ((x_int-x(1))*(x_int-x(2)) + &
+!              (x_int-x(2))*(x_int-x(4)) + &
+!              (x_int-x(1))*(x_int-x(4))) / &
+!             ((x(3)-x(1))*(x(3)-x(2))*(x(3)-x(4)))
+!    
+!    dlp(4) = ((x_int-x(2))*(x_int-x(3)) + &
+!              (x_int-x(1))*(x_int-x(2)) + &
+!              (x_int-x(1))*(x_int-x(3))) / &
+!             ((x(4)-x(1))*(x(4)-x(2))*(x(4)-x(3)))
+!  END FUNCTION dlpoly
+  FUNCTION dlpoly(x, x_int) RESULT(dlp)
+    REAL(fp), INTENT(IN) :: x(:)
+    REAL(fp), INTENT(IN) :: x_int
+    REAL(fp) :: dlp(SIZE(x))
+    dlp(1) = ONE / (x(1)-x(2))
+    dlp(2) = ONE / (x(2)-x(1))
+  END FUNCTION dlpoly
 
 END MODULE CRTM_Interpolation
+

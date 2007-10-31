@@ -313,22 +313,21 @@ CONTAINS
     !# scattering. Otherwise, they're set to zero                               #
     !#--------------------------------------------------------------------------#
 
+    AtmOptics%Phase_Coefficient     = ZERO
+    AtmOptics%Asymmetry_Factor      = ZERO
+    AtmOptics%Delta_Truncation      = ZERO
+    AtmOptics%Single_Scatter_Albedo = ZERO
+
 
 
     !#--------------------------------------------------------------------------#
     !#                         -- NO SCATTERING CASE --                         #
     !#--------------------------------------------------------------------------#
 
-    AtmOptics%Single_Scatter_Albedo = ZERO
     IF( AtmOptics%n_Legendre_Terms == 0 ) THEN
       AtmOptics%Optical_Depth = AtmAbsorption%Optical_Depth
       RETURN
     END IF
-
-    AtmOptics%Phase_Coefficient     = ZERO
-    AtmOptics%Asymmetry_Factor      = ZERO
-    AtmOptics%Delta_Truncation      = ZERO
-!    AtmOptics%Single_Scatter_Albedo = ZERO
 
 
 
@@ -738,7 +737,12 @@ CONTAINS
     !# scattering. Otherwise, they're set to zero                               #
     !#--------------------------------------------------------------------------#
 
+    AtmOptics_TL%Phase_Coefficient     = ZERO
+    AtmOptics_TL%Asymmetry_Factor      = ZERO
+    AtmOptics_TL%Delta_Truncation      = ZERO
     AtmOptics_TL%Single_Scatter_Albedo = ZERO
+
+
 
     !#--------------------------------------------------------------------------#
     !#                          -- NO SCATTERING CASE --                        #
@@ -749,9 +753,6 @@ CONTAINS
       RETURN
     END IF
 
-    AtmOptics_TL%Phase_Coefficient     = ZERO
-    AtmOptics_TL%Asymmetry_Factor      = ZERO
-    AtmOptics_TL%Delta_Truncation      = ZERO
 
 
     !#--------------------------------------------------------------------------#

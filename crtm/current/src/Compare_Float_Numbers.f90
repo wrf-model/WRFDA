@@ -1,90 +1,30 @@
-!------------------------------------------------------------------------------
-!M+
-! NAME:
-!       Compare_Float_Numbers
 !
-! PURPOSE:
-!       Module containing routines to perform equality and relational
-!       comparisons on floating point numbers.
+! Compare_Float_Numbers
 !
-! CATEGORY:
-!       Utility
+! Module containing routines to perform equality and relational
+! comparisons on floating point numbers.
 !
-! LANGUAGE:
-!       Fortran-95
-!
-! CALLING SEQUENCE:
-!       USE Compare_Numbers
-!
-! MODULES:
-!       Type_Kinds:         Module containing definitions for kinds
-!                           of variable types.
-!
-! CONTAINS:
-!       .EqualTo.           Relational operator to test the equality of
-!                           floating point numbers.
-!
-!       .GreaterThan.       Relational operator to test if one operand
-!                           is greater than another.
-!
-!       .LessThan.          Relational operator to test if one operand
-!                           is less than another.
-!
-!       Compare_Float:      Function to compare floating point scalars
-!                           and arrays with adjustible precision tolerance.
-!
-! INCLUDE FILES:
-!       None.
-!
-! EXTERNALS:
-!       None.
-!
-! COMMON BLOCKS:
-!       None.
 !
 ! CREATION HISTORY:
 !       Written by:     Paul van Delst, CIMSS/SSEC 01-Apr-2003
 !                       paul.vandelst@ssec.wisc.edu
 !
-!  Copyright (C) 2003 Paul van Delst
-!
-!  This program is free software; you can redistribute it and/or
-!  modify it under the terms of the GNU General Public License
-!  as published by the Free Software Foundation; either version 2
-!  of the License, or (at your option) any later version.
-!
-!  This program is distributed in the hope that it will be useful,
-!  but WITHOUT ANY WARRANTY; without even the implied warranty of
-!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!  GNU General Public License for more details.
-!
-!  You should have received a copy of the GNU General Public License
-!  along with this program; if not, write to the Free Software
-!  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-!M-
-!------------------------------------------------------------------------------
 
 MODULE Compare_Float_Numbers
 
 
-  ! ------------
+  ! -----------------
+  ! Environment setup
+  ! -----------------
   ! Module usage
-  ! ------------
-
-  USE Type_Kinds
-
-
-  ! ---------------------------
+  USE Type_Kinds, ONLY: Single, Double
   ! Disable all implicit typing
-  ! ---------------------------
-
   IMPLICIT NONE
 
 
   ! ------------
   ! Visibilities
   ! ------------
-
   PRIVATE
   PUBLIC :: Compare_Float
   PUBLIC :: OPERATOR (.EqualTo.)
@@ -97,8 +37,10 @@ MODULE Compare_Float_Numbers
   ! ---------------------
 
   INTERFACE Compare_Float
-    MODULE PROCEDURE Compare_Float_Single
-    MODULE PROCEDURE Compare_Float_Double
+    MODULE PROCEDURE Compare_Real_Single
+    MODULE PROCEDURE Compare_Real_Double
+    MODULE PROCEDURE Compare_Complex_Single
+    MODULE PROCEDURE Compare_Complex_Double
   END INTERFACE Compare_Float
 
   INTERFACE OPERATOR (.EqualTo.)
@@ -120,28 +62,26 @@ MODULE Compare_Float_Numbers
   ! -----------------
   ! Module parameters
   ! -----------------
-
-  ! -- Module RCS Id string
-  CHARACTER( * ), PRIVATE, PARAMETER :: MODULE_RCS_ID = &
-    '$Id: Compare_Float_Numbers.f90,v 2.3 2004/10/06 19:00:23 paulv Exp $'
-
+  ! Module RCS Id string
+  CHARACTER(*), PARAMETER :: MODULE_RCS_ID = &
+    '$Id: Compare_Float_Numbers.f90 886 2007-08-23 22:51:40Z paul.vandelst@noaa.gov $'
+  ! Numeric literals
+  REAL(Single), PARAMETER :: SP_ZERO = 0.0_Single
+  REAL(Double), PARAMETER :: DP_ZERO = 0.0_Double
+  REAL(Single), PARAMETER :: SP_ONE = 1.0_Single
+  REAL(Double), PARAMETER :: DP_ONE = 1.0_Double
+  REAL(Single), PARAMETER :: SP_HUNDRED = 100.0_Single
+  REAL(Double), PARAMETER :: DP_HUNDRED = 100.0_Double
 
 CONTAINS
 
 
 !----------------------------------------------------------------------------------
-!S+
 ! NAME:
 !       .EqualTo.
 !
 ! PURPOSE:
-!       Relational operator to test the equality of floating point numbers.
-!
-! CATEGORY:
-!       Utility
-!
-! LANGUAGE:
-!       Fortran-95
+!       Relational operator to test the equality of REAL operands.
 !
 ! CALLING SEQUENCE:
 !       IF ( x .EqualTo. y ) THEN
@@ -151,9 +91,9 @@ CONTAINS
 ! OPERANDS:
 !       x, y:        Two congruent floating point data objects to compare.
 !                    UNITS:      N/A
-!                    TYPE:       REAL( Single )   [ == default real]
+!                    TYPE:       REAL(Single)   [ == default real]
 !                                  OR
-!                                REAL( Double )
+!                                REAL(Double)
 !                    DIMENSION:  Scalar, or any allowed rank array.
 !
 ! OPERATOR RESULT:
@@ -170,45 +110,27 @@ CONTAINS
 !
 !       If the result is .TRUE., the numbers are considered equal.
 !
-! CREATION HISTORY:
-!       Written by:     Paul van Delst, CIMSS/SSEC 30-Aug-2003
-!                       paul.vandelst@ssec.wisc.edu
-!S-
 !----------------------------------------------------------------------------------
 
   ELEMENTAL FUNCTION Is_Equal_To_Single( x, y ) RESULT( Equal_To )
-    REAL( Single ), INTENT( IN )  :: x, y
+    REAL(Single), INTENT(IN)  :: x, y
     LOGICAL :: Equal_To
-
-    Equal_To = ABS( x - y ) < SPACING( MAX(ABS(x),ABS(y)) )
-
+    Equal_To = ABS(x-y) < SPACING( MAX(ABS(x),ABS(y)) )
   END FUNCTION Is_Equal_To_Single
 
   ELEMENTAL FUNCTION Is_Equal_To_Double( x, y ) RESULT( Equal_To )
-    REAL( Double ), INTENT( IN )  :: x, y
+    REAL(Double), INTENT(IN)  :: x, y
     LOGICAL :: Equal_To
-
-    Equal_To = ABS( x - y ) < SPACING( MAX(ABS(x),ABS(y)) )
-
+    Equal_To = ABS(x-y) < SPACING( MAX(ABS(x),ABS(y)) )
   END FUNCTION Is_Equal_To_Double
 
 
-
-
-
 !----------------------------------------------------------------------------------
-!S+
 ! NAME:
 !       .GreaterThan.
 !
 ! PURPOSE:
-!       Relational operator to test if one operand is greater than another.
-!
-! CATEGORY:
-!       Utility
-!
-! LANGUAGE:
-!       Fortran-95
+!       Relational operator to test if one REAL operand is greater than another.
 !
 ! CALLING SEQUENCE:
 !       IF ( x .GreaterThan. y ) THEN
@@ -218,9 +140,9 @@ CONTAINS
 ! OPERANDS:
 !       x, y:        Two congruent floating point data objects to compare.
 !                    UNITS:      N/A
-!                    TYPE:       REAL( Single )   [ == default real]
+!                    TYPE:       REAL(Single)   [ == default real]
 !                                  OR
-!                                REAL( Double )
+!                                REAL(Double)
 !                    DIMENSION:  Scalar, or any allowed rank array.
 !
 ! OPERATOR RESULT:
@@ -239,17 +161,12 @@ CONTAINS
 !
 !       If the result is .TRUE., x is considered greater than y.
 !
-! CREATION HISTORY:
-!       Written by:     Paul van Delst, CIMSS/SSEC 30-Aug-2003
-!                       paul.vandelst@ssec.wisc.edu
-!S-
 !----------------------------------------------------------------------------------
 
   ELEMENTAL FUNCTION Is_Greater_Than_Single( x, y ) RESULT ( Greater_Than )
-    REAL( Single ), INTENT( IN ) :: x, y
+    REAL(Single), INTENT(IN) :: x, y
     LOGICAL :: Greater_Than
-
-    IF ( (x - y) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
+    IF ( (x-y) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
       Greater_Than = .TRUE.
     ELSE
       Greater_Than = .FALSE.
@@ -258,10 +175,9 @@ CONTAINS
 
 
   ELEMENTAL FUNCTION Is_Greater_Than_Double( x, y ) RESULT ( Greater_Than )
-    REAL( Double ), INTENT( IN ) :: x, y
+    REAL(Double), INTENT(IN) :: x, y
     LOGICAL :: Greater_Than
-
-    IF ( (x - y) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
+    IF ( (x-y) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
       Greater_Than = .TRUE.
     ELSE
       Greater_Than = .FALSE.
@@ -269,22 +185,12 @@ CONTAINS
   END FUNCTION Is_Greater_Than_Double
 
 
-
-
-
 !----------------------------------------------------------------------------------
-!S+
 ! NAME:
 !       .LessThan.
 !
 ! PURPOSE:
-!       Relational operator to test if one operand is less than another.
-!
-! CATEGORY:
-!       Utility
-!
-! LANGUAGE:
-!       Fortran-95
+!       Relational operator to test if one REAL operand is less than another.
 !
 ! CALLING SEQUENCE:
 !       IF ( x .LessThan. y ) THEN
@@ -294,9 +200,9 @@ CONTAINS
 ! OPERANDS:
 !       x, y:        Two congruent floating point data objects to compare.
 !                    UNITS:      N/A
-!                    TYPE:       REAL( Single )   [ == default real]
+!                    TYPE:       REAL(Single)   [ == default real]
 !                                  OR
-!                                REAL( Double )
+!                                REAL(Double)
 !                    DIMENSION:  Scalar, or any allowed rank array.
 !
 ! OPERATOR RESULT:
@@ -315,17 +221,12 @@ CONTAINS
 !
 !       If the result is .TRUE., x is considered less than y.
 !
-! CREATION HISTORY:
-!       Written by:     Paul van Delst, CIMSS/SSEC 30-Aug-2003
-!                       paul.vandelst@ssec.wisc.edu
-!S-
 !----------------------------------------------------------------------------------
 
   ELEMENTAL FUNCTION Is_Less_Than_Single( x, y ) RESULT ( Less_Than )
-    REAL( Single ), INTENT( IN ) :: x, y
+    REAL(Single), INTENT(IN) :: x, y
     LOGICAL :: Less_Than
-
-    IF ( (y - x) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
+    IF ( (y-x) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
       Less_Than = .TRUE.
     ELSE
       Less_Than = .FALSE.
@@ -334,10 +235,9 @@ CONTAINS
 
 
   ELEMENTAL FUNCTION Is_Less_Than_Double( x, y ) RESULT ( Less_Than )
-    REAL( Double ), INTENT( IN ) :: x, y
+    REAL(Double), INTENT(IN) :: x, y
     LOGICAL :: Less_Than
-
-    IF ( (y - x) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
+    IF ( (y-x) >= SPACING( MAX( ABS(x), ABS(y) ) ) ) THEN
       Less_Than = .TRUE.
     ELSE
       Less_Than = .FALSE.
@@ -345,11 +245,7 @@ CONTAINS
   END FUNCTION Is_Less_Than_Double
 
 
-
-
-
 !----------------------------------------------------------------------------------
-!S+
 ! NAME:
 !       Compare_Float
 !
@@ -357,24 +253,23 @@ CONTAINS
 !       Function to compare floating point scalars and arrays with adjustible
 !       precision tolerance.
 !
-! CATEGORY:
-!       Utility
-!
-! LANGUAGE:
-!       Fortran-95
-!
 ! CALLING SEQUENCE:
-!       Result = Compare_Float( x, y,     &  ! Input
-!                               ULP = ULP )  ! Optional input
+!       Result = Compare_Float( x, y,            &  ! Input
+!                               ULP    =ULP    , &  ! Optional input
+!                               Percent=Percent  )  ! Optional input
 !
 ! INPUT ARGUMENTS:
 !       x, y:        Two congruent floating point data objects to compare.
 !                    UNITS:      N/A
-!                    TYPE:       REAL( Single )   [ == default real]
+!                    TYPE:       REAL(Single)   [ == default real]
 !                                  OR
-!                                REAL( Double )
+!                                REAL(Double)
+!                                  OR
+!                                COMPLEX(Single)
+!                                  OR
+!                                COMPLEX(Double)
 !                    DIMENSION:  Scalar, or any allowed rank array.
-!                    ATTRIBUTES: INTENT( IN )
+!                    ATTRIBUTES: INTENT(IN)
 !
 ! OPTIONAL INPUT ARGUMENTS:
 !       ULP:         Unit of data precision. The acronym stands for "unit in
@@ -385,16 +280,22 @@ CONTAINS
 !                    floating-point number. Value must be positive - if a negative
 !                    value is supplied, the absolute value is used.
 !                    If not specified, the default value is 1.
+!                    This argument is ignored if the Percent optioanl argument is specifed.
 !                    UNITS:      N/A
 !                    TYPE:       INTEGER
 !                    DIMENSION:  Scalar
-!                    ATTRIBUTES: OPTIONAL, INTENT( IN )
-!                  
-! OUTPUT ARGUMENTS:
-!       None.
+!                    ATTRIBUTES: OPTIONAL, INTENT(IN)
 !
-! OPTIONAL OUTPUT ARGUMENTS:
-!       None.
+!       Percent:     Specify a percentage difference value to use in comparing
+!                    the numbers rather than testing within some numerical
+!                    limit. The ULP argument is ignored if this argument is
+!                    specified.
+!                    UNITS:      N/A
+!                    TYPE:       REAL(Single)  for REAL(Single) or COMPLEX(Single) x,y
+!                                  OR
+!                                REAL(Double)  for REAL(Double) or COMPLEX(Double) x,y
+!                    DIMENSION:  Scalar
+!                    ATTRIBUTES: OPTIONAL, INTENT(IN)
 !
 ! FUNCTION RESULT:
 !       Result:      The return value is a logical value indicating whether
@@ -406,16 +307,9 @@ CONTAINS
 !                    TYPE:       LOGICAL
 !                    DIMENSION:  Scalar
 !
-! CALLS:
-!       None.
-!
-! SIDE EFFECTS:
-!       None.
-!
-! RESTRICTIONS:
-!       None.
-!
 ! PROCEDURE:
+!       ULP Test
+!       --------
 !       The test performed is
 !
 !         ABS( x - y ) < ( ULP * SPACING( MAX(ABS(x),ABS(y)) ) )
@@ -436,80 +330,138 @@ CONTAINS
 !       James Van Buskirk and James Giles suggested this method for floating
 !       point comparisons in the comp.lang.fortran newsgroup.
 !
-! CREATION HISTORY:
-!       Written by:     Paul van Delst, CIMSS/SSEC 01-Apr-2003
-!                       paul.vandelst@ssec.wisc.edu
-!S-
+!
+!       Percent Test
+!       ------------
+!       The test performed is
+!
+!         100.0 * ABS((x-y)/x) < Percent
+!
+!       If the result is .TRUE., the numbers are considered equal.
+!
+!
+!       For complex numbers, the same test is applied to both the real and
+!       imaginary parts and each result is ANDed.
+!
 !----------------------------------------------------------------------------------
 
-  ELEMENTAL FUNCTION Compare_Float_Single( x, y, ulp ) RESULT( Compare )
-    REAL( Single ),           INTENT( IN )  :: x
-    REAL( Single ),           INTENT( IN )  :: y
-    INTEGER,        OPTIONAL, INTENT( IN )  :: ulp
+  ELEMENTAL FUNCTION Compare_Real_Single( x, y, ULP, Percent ) RESULT( Compare )
+    ! Arguments
+    REAL(Single),           INTENT(IN) :: x
+    REAL(Single),           INTENT(IN) :: y
+    INTEGER     , OPTIONAL, INTENT(IN) :: ULP
+    REAL(Single), OPTIONAL, INTENT(IN) :: Percent
+    ! Function result
     LOGICAL :: Compare
-
-    REAL( Single ) :: Rel
-
-    Rel = 1.0_Single
-    IF ( PRESENT( ulp ) ) THEN
-      Rel = REAL( ABS(ulp), Single )
+    ! Local variables
+    LOGICAL      :: ULP_Test
+    REAL(Single) :: Rel
+    
+    ! Set up
+    ! ------
+    ULP_Test = .TRUE.
+    IF ( PRESENT(ULP) ) THEN
+      Rel = REAL(ABS(ULP), Single)
+    ELSE
+      Rel = SP_ONE
     END IF
+    IF ( PRESENT(Percent) ) THEN
+      ULP_Test = .FALSE.
+      ! Test for zero x (elementals can't be recursive)
+      IF ( ABS(x) < ( SPACING( MAX(ABS(x),SP_ZERO) ) ) ) ULP_Test = .TRUE.
+    END IF
+    
+    ! Compare the numbers
+    ! -------------------
+    IF ( ULP_Test ) THEN
+      Compare = ABS(x-y) < ( Rel * SPACING( MAX(ABS(x),ABS(y)) ) )
+    ELSE
+      Compare = SP_HUNDRED*ABS((x-y)/x) < Percent
+    END IF
+  END FUNCTION Compare_Real_Single
 
-    Compare = ABS( x - y ) < ( Rel * SPACING( MAX(ABS(x),ABS(y)) ) )
 
-  END FUNCTION Compare_Float_Single
-
-
-  ELEMENTAL FUNCTION Compare_Float_Double( x, y, ulp ) RESULT( Compare )
-    REAL( Double ),           INTENT( IN )  :: x
-    REAL( Double ),           INTENT( IN )  :: y
-    INTEGER,        OPTIONAL, INTENT( IN )  :: ulp
+  ELEMENTAL FUNCTION Compare_Real_Double( x, y, ULP, Percent ) RESULT( Compare )
+    ! Arguments
+    REAL(Double),           INTENT(IN) :: x
+    REAL(Double),           INTENT(IN) :: y
+    INTEGER     , OPTIONAL, INTENT(IN) :: ULP
+    REAL(Double), OPTIONAL, INTENT(IN) :: Percent
+    ! Function result
     LOGICAL :: Compare
-
-    REAL( Double ) :: Rel
-
-    Rel = 1.0_Double
-    IF ( PRESENT( ulp ) ) THEN
-      Rel = REAL( ABS(ulp), Double )
+    ! Local variables
+    LOGICAL      :: ULP_Test
+    REAL(Double) :: Rel
+    
+    ! Set up
+    ! ------
+    ULP_Test = .TRUE.
+    IF ( PRESENT(ULP) ) THEN
+      Rel = REAL(ABS(ULP), Double)
+    ELSE
+      Rel = DP_ONE
     END IF
+    IF ( PRESENT(Percent) ) THEN
+      ULP_Test = .FALSE.
+      ! Test for zero x (elementals can't be recursive)
+      IF ( ABS(x) < ( SPACING( MAX(ABS(x),DP_ZERO) ) ) ) ULP_Test = .TRUE.
+    END IF
+    
+    ! Compare the numbers
+    ! -------------------
+    IF ( ULP_Test ) THEN
+      Compare = ABS(x-y) < ( Rel * SPACING( MAX(ABS(x),ABS(y)) ) )
+    ELSE
+      Compare = DP_HUNDRED*ABS((x-y)/x) < Percent
+    END IF
+  END FUNCTION Compare_Real_Double
 
-    Compare = ABS( x - y ) < ( Rel * SPACING( MAX(ABS(x),ABS(y)) ) )
 
-  END FUNCTION Compare_Float_Double
+  ELEMENTAL FUNCTION Compare_Complex_Single( x, y, ULP, Percent ) RESULT( Compare )
+    ! Arguments
+    COMPLEX(Single),           INTENT(IN) :: x
+    COMPLEX(Single),           INTENT(IN) :: y
+    INTEGER        , OPTIONAL, INTENT(IN) :: ULP
+    REAL(Single)   , OPTIONAL, INTENT(IN) :: Percent
+    ! Function result
+    LOGICAL :: Compare
+    ! Local variables
+    REAL(Single) :: xr, xi
+    REAL(Single) :: yr, yi
+    
+    ! Separate real and complex parts
+    ! -------------------------------
+    xr=REAL(x,Single); xi=AIMAG(x)
+    yr=REAL(y,Single); yi=AIMAG(y)
+    
+    ! Compare each part separately
+    ! ----------------------------
+    Compare = Compare_Real_Single(xr,yr,ULP=ULP,Percent=Percent) .AND. &
+              Compare_Real_Single(xi,yi,ULP=ULP,Percent=Percent)
+  END FUNCTION Compare_Complex_Single
+
+
+  ELEMENTAL FUNCTION Compare_Complex_Double( x, y, ULP, Percent ) RESULT( Compare )
+    ! Arguments
+    COMPLEX(Double),           INTENT(IN) :: x
+    COMPLEX(Double),           INTENT(IN) :: y
+    INTEGER        , OPTIONAL, INTENT(IN) :: ULP
+    REAL(Double)   , OPTIONAL, INTENT(IN) :: Percent
+    ! Function result
+    LOGICAL :: Compare
+    ! Local variables
+    REAL(Double) :: xr, xi
+    REAL(Double) :: yr, yi
+    
+    ! Separate real and complex parts
+    ! -------------------------------
+    xr=REAL(x,Double); xi=AIMAG(x)
+    yr=REAL(y,Double); yi=AIMAG(y)
+    
+    ! Compare each part separately
+    ! ----------------------------
+    Compare = Compare_Real_Double(xr,yr,ULP=ULP,Percent=Percent) .AND. &
+              Compare_Real_Double(xi,yi,ULP=ULP,Percent=Percent)
+  END FUNCTION Compare_Complex_Double
 
 END MODULE Compare_Float_Numbers
-
-
-!-------------------------------------------------------------------------------
-!                          -- MODIFICATION HISTORY --
-!-------------------------------------------------------------------------------
-!
-! $Id: Compare_Float_Numbers.f90,v 2.3 2004/10/06 19:00:23 paulv Exp $
-!
-! $Date: 2004/10/06 19:00:23 $
-!
-! $Revision: 2.3 $
-!
-! $Name:  $
-!
-! $State: Exp $
-!
-! $Log: Compare_Float_Numbers.f90,v $
-! Revision 2.3  2004/10/06 19:00:23  paulv
-! - Cosmetic change only.
-!
-! Revision 2.2  2004/08/31 19:59:30  paulv
-! - Added .EqualTo., .GreaterThan., and .LessThan. relational operators for
-!   Single and Double floating point data objects.
-!
-! Revision 2.1  2004/08/16 16:25:41  paulv
-! - Updated header documentation.
-!
-! Revision 2.0  2004/08/13 20:25:48  paulv
-! - New version using elemental functions for Compare_Float.
-!
-! Revision 1.1  2003/04/02 14:35:30  paulv
-! Initial checkin.
-!
-!
-!
