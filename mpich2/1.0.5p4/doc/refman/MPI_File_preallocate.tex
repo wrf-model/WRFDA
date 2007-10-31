@@ -1,0 +1,19 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}preallocate}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}preallocate}
+--- Preallocates storage space for a file 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_File_preallocate(MPI_File mpi_fh, MPI_Offset size)
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\startarg{size }{size to preallocate (nonnegative integer)
+}
+\par
+\location{prealloc.c}
+\endmanpage

@@ -1,0 +1,10 @@
+Makefile.in
+Makefile
+c2f2cf
+testlist
+*.o
+*ebug*
+*elease*
+*.vfproj
+*.gcda
+*.gcno

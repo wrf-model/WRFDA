@@ -1,0 +1,133 @@
+\startmanpage
+\mantitle{mpicxx}{tex}{9/23/2005}
+\manname{mpicxx}
+--- Compiles and links MPI programs written in C++ 
+\subhead{Description}
+This command can be used to compile and link MPI programs written in
+C++.  It provides the options and any special libraries that are
+needed to compile and link MPI programs.
+\par
+It is important to use this command, particularly when linking programs,
+as it provides the necessary libraries.
+\par
+\subhead{Command line arguments}
+\startarg{-show      }{Show the commands that would be used without
+runnning them
+}
+\startarg{-help      }{Give short help
+}
+\startarg{-cxx$=$name   }{Use compiler {\tt name} instead of the default choice.  Use
+this only if the compiler is compatible with the MPICH
+library (see below)
+}
+\startarg{-config$=$name }{Load a configuration file for a particular compiler.
+This allows a single {\tt mpicxx} command to be used with 
+multiple compilers.
+}
+\startarg{-compile{\tt \char`\_}info }{Show the steps for compiling a program.  This option
+can be used to see what options and include paths are
+used by mpicxx.
+}
+\startarg{-link{\tt \char`\_}info }{Show the steps for linking a program.  This optoin 
+can be used to see what options and libraries are used by
+mpicxx.
+}
+\startarg{-profile$=$name }{Use the MPI profiling given by name.  See below for
+details
+}
+\startarg{-mpe$=$name  }{Use an MPE profiling library.  The behavior is similar
+to using {\tt -profile$=$mpe{\tt \char`\_}name.conf}.
+}
+\startarg{-echo      }{Show exactly what this program is doing.
+This option should normally not be used.
+}
+\startarg{others     }{are passed to the compiler or linker.  For example, {\tt -c
+}causes files to be compiled, {\tt -g} selects compilation with
+debugging on most systems, and {\tt -o name} causes linking 
+with the output executable given the name {\tt name}.
+}
+\par
+\subhead{Environment Variables}
+The environment variables {\tt MPICH{\tt \char`\_}CXX} may be used
+to select different C++ compiler and linker.  Note that since
+MPICH is built with a particular C and Fortran compiler, changing the
+compilers used can cause problems.  Use this only if you could intermix
+code compiled with the different compilers.
+\par
+The environment variable {\tt MPICC{\tt \char`\_}PROFILE} specifies a profile library
+and has the same effect as if {\tt -profile$=$\$MPICC{\tt \char`\_}PROFILE} were used as
+an argument to {\tt mpicc}.  See the discussion of {\tt -profile} below for more
+details.
+\par
+\subhead{Compatible Compilers}
+The MPI library may be used with any compiler that uses the same
+lengths for basic data objects (such as {\tt long double}) and that
+uses compatible run-time libraries.  On many systems, the various
+compilers are compatible and may be used interchangably.  There are
+exceptions; if you use the {\tt MPICH{\tt \char`\_}CXX} environment variable or the
+{\tt -cxx$=$name} command-line argument to override the choice of compiler
+and encounter problems, try reconfiguring MPICH2 with the new compiler,
+and installing MPICH2 in a separate location.  See the installation manual
+for more details.
+\par
+\subhead{Examples}
+To compile a single file {\tt foo.c}, use
+\begin{verbatim}
+   mpicxx -c foo.cxx
+\end{verbatim}
+
+\par
+To link the output and make an executable, use
+\begin{verbatim}
+   mpicxx -o foo foo.o
+\end{verbatim}
+
+Combining compilation and linking in a single command
+\begin{verbatim}
+   mpicxx -o foo foo.cxx
+\end{verbatim}
+
+is a convenient way to build simple programs.
+\par
+\subhead{Selecting a Profiling Library}
+The {\tt -profile$=$name} argument allows you to specify an MPI profiling
+library to be used.  {\tt name} can have two forms:
+\par
+\nextline
+A library in the same directory as the MPI library
+\nextline
+The name of a profile configuration file
+\nextline
+\par
+If {\tt name} is a library, then this library is included before the MPI
+library.  This allows the simple use of libraries that make use of the
+MPI profiling interface and that are installed in the same directory as
+the MPI library.
+\par
+If {\tt name.conf} is the name of a file in the sysconfdir directory, then this
+is read and may define the following variables:
+\startarg{PROFILE{\tt \char`\_}PRELIB }{Libraries (and paths) to include before the MPI library
+}
+\startarg{PROFILE{\tt \char`\_}POSTLIB }{Libraries to include after the MPI library
+}
+\startarg{PROFILE{\tt \char`\_}INCPATHS }{C preprocessor arguments for any include files
+For example, to add {\tt /usr/local/myprof/include} to the include path and
+the library {\tt libmyprof.a} in {\tt /usr/local/myprof/lib} to the link step, 
+you could create the file {\tt myprof.conf} with the lines
+}
+\par
+\begin{verbatim}
+    PROFILE_PRELIB="-L/usr/local/myprof/lib -lmyprof"
+    PROFILE_INCPATHS="-I/usr/local/myprof/include"
+\end{verbatim}
+
+and place it in the sysconfdir directory (this directory is set at
+configure time when MPICH is built).  Then using the command-line
+argument {\tt -profile$=$myprof} will cause these
+definitions to be added to the relevant compile commands.
+\par
+\subhead{See Also}
+ mpif77, mpicc, mpif90, mpiexec
+\nextline
+\location{mpicxx.txt}
+\endmanpage

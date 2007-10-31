@@ -1,0 +1,19 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}f2c}{tex}{6/8/2005}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}f2c}
+--- Translates a Fortran file handle to a C file handle 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+MPI_File MPI_File_f2c(MPI_Fint fh)
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{Fortran file handle (integer)
+}
+\par
+\subhead{Return Value}
+C file handle (handle)
+\location{file{\tt \char`\_}f2c.c}
+\endmanpage

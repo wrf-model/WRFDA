@@ -1,0 +1,93 @@
+# This Makefile.in created by simplemake.  Do not edit
+
+# @configure_input@
+
+# --------------------------------------------------------------------------
+all: all-redirect
+
+SHELL           = @SHELL@
+AR              = @AR@
+RANLIB          = @RANLIB@
+master_top_srcdir  = @master_top_srcdir@
+top_builddir    = @master_top_builddir@
+abs_builddir    = @abs_builddir@
+srcdir          = @srcdir@
+abs_srcdir      = @abs_srcdir@
+DEFS            = @DEFS@ -I. -I${srcdir}
+CPPFLAGS        = @CPPFLAGS@
+MAKE            = @MAKE@
+MPILIBNAME      = @MPILIBNAME@
+CC              = @CC@
+CFLAGS          = @CFLAGS@
+C_COMPILE       = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+LIBTOOL         = @LIBTOOL@
+CC_SHL          = @CC_SHL@
+C_COMPILE_SHL   = $(CC_SHL) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+
+VPATH = .:@srcdir@
+INCLUDES = -I. -I../include -I${master_top_srcdir}/src/ch3/channels/nemesis/nemesis/include -I${master_top_srcdir}/src/include \
+           -I${top_builddir}/src/include
+
+.SUFFIXES:
+.SUFFIXES: .o .lo .c 
+.c.o:
+	$(C_COMPILE) -c $<
+.c.lo:
+	$(C_COMPILE_SHL) -c $< -o _s$*.o
+	@mv -f _s$*.o $*.lo
+.c:
+	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
+apply: 
+	$(ACTION) $(ACTION_INPUT)
+clean: 
+	-@rm -f *.o ${srcdir}/*.o 
+	-@rm -f .libstamp0 .libstamp1 
+	-@rm -f *.lo ${srcdir}/*.lo
+distclean:  clean distclean-xxx remove-makefile
+distclean-xxx:
+	-@rm -f Makefile
+	-@rm -rf autom4te*.cache
+	-@rm -rf $(DEPS_DIR)
+	-@rm -f TAGS
+remove-makefile:
+	rm -f Makefile
+remove-genmakefiles:
+	rm -f  Makefile
+all-redirect: .libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a
+	@if [ "@ENABLE_SHLIB@" != "none" ] ; then \
+	    ${MAKE} .libstamp1 ; \
+	fi
+
+.libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a: mpid_nem_alloc.o \
+	mpid_nem_init.o mpid_nem_queue.o mpid_nem_barrier.o mpid_nem_mpich2.o \
+	mpid_nem_ckpt.o mpid_nem_mpich2_rma.o mpid_nem_finalize.o \
+	mpid_nem_network_poll.o mpid_nem_network.o mpid_nem_debug.o 
+	${AR} cr ../../../../../../../lib/lib${MPILIBNAME}.a $?
+	${RANLIB} ../../../../../../../lib/lib${MPILIBNAME}.a
+	date > .libstamp0
+.libstamp1 ../../../../../../../lib/lib${MPILIBNAME}.la: mpid_nem_alloc.lo \
+	mpid_nem_init.lo mpid_nem_queue.lo mpid_nem_barrier.lo \
+	mpid_nem_mpich2.lo mpid_nem_ckpt.lo mpid_nem_mpich2_rma.lo \
+	mpid_nem_finalize.lo mpid_nem_network_poll.lo mpid_nem_network.lo \
+	mpid_nem_debug.lo 
+	${AR} cr ../../../../../../../lib/lib${MPILIBNAME}.la $?
+	date > .libstamp1
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+SOURCES         =  mpid_nem_alloc.c mpid_nem_init.c mpid_nem_queue.c \
+	mpid_nem_barrier.c mpid_nem_mpich2.c mpid_nem_ckpt.c \
+	mpid_nem_mpich2_rma.c mpid_nem_finalize.c mpid_nem_network_poll.c \
+	mpid_nem_network.c mpid_nem_debug.c 
+ETAGS           = @ETAGS@ @ETAGSADD@
+HEADERFILES     = $(HEADERS)
+SOURCEFILES     = $(SOURCES)
+tags: TAGS
+TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
+	here=`cd ../../../../../../.. && pwd` ; cd ${srcdir} && $(ETAGS) -o $$here/TAGS --append ${HEADERFILES} ${SOURCEFILES}
+# --------------------------------------------------------------------------
+
+
+
+FORCE_TARGET:
+

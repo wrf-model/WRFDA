@@ -1,0 +1,362 @@
+AC_PREREQ(2.59)
+AC_INIT(configure.in)
+
+dnl
+dnl Set the directory that contains support scripts such as install-sh and
+dnl config.guess
+dnl
+AC_CONFIG_AUX_DIR(../../../../../confdb)
+
+dnl
+dnl Definitions will be placed in this file rather than in the DEFS variable
+dnl
+AC_CONFIG_HEADER(include/mpidi_ch3i_ssm_conf.h)
+AH_TOP([/* -*- Mode: C; c-basic-offset:4 ; -*- */
+/*  
+ *  (C) 2001 by Argonne National Laboratory.
+ *      See COPYRIGHT in top-level directory.
+ */
+#ifndef MPIDI_CH3I_SSM_CONF_H_INCLUDED
+#define MPIDI_CH3I_SSM_CONF_H_INCLUDED
+])
+AH_BOTTOM([#endif])
+
+echo "RUNNING CONFIGURE FOR THE SOCK-SHARED_MEMORY CHANNEL"
+
+save_libs=$LIBS
+LIBS=
+
+dnl
+dnl First check that we have a clean build if we are doing a VPATH build
+PAC_VPATH_CHECK()
+
+PAC_LOAD_BASE_CACHE
+
+PAC_PROG_MAKE
+
+dnl AC_DEFINE(USE_PROCESS_LOCKS,,[Define to use process locks])
+AC_DEFINE(USE_BUSY_LOCKS,,[Define to use busy locks])
+AC_ARG_ENABLE(mqshm,
+[--enable-mqshm - Disable this to use SysV message queues],,
+enable_mqshm=yes)
+if test $enable_mqshm = yes ; then
+    AC_DEFINE(USE_MQSHM,,[Define to use shared memory message queues])   
+fi
+
+AC_CHECK_HEADERS(assert.h)
+
+dnl AC_CHECK_HEADERS(sys/types.h sys/socket.h net/if.h netinet/in.h sys/ioctl.h sys/sockio.h errno.h)
+
+#
+# Note: if we plan to use the sys/ipc.h header, we need to assert that
+# we're using sysv or xopen varities of unix
+# To check for this, we compile sys/ipc.h (if present) and check for
+# a warning about _SVID_SOURCE or _XOPEN_SOURCE.  If either is found,
+# we set _XOPEN_SOURCE now, before we do much additional testing
+AC_MSG_CHECKING([whether we need to define _XOPEN_SOURCE for sys/ipc.h])
+pac_cv_ipc_h_needs_xopen_source=no
+rm -f conftest*
+echo "#include <sys/ipc.h>" > conftest.c
+if $CC -c $CFLAGS $CPPFLAGS conftest.c 2>conftest.er1 1>/dev/null ; then
+    if test -s conftest.er1 && \
+        grep _XOPEN_SOURCE conftest.er1 >/dev/null 2>&1 ; then
+        if $CC -c $CFLAGS $CPPFLAGS -D_XOPEN_SOURCE=500 conftest.c \
+	             2>conftest.er1 1>/dev/null ; then
+            pac_cv_ipc_h_needs_xopen_source=yes
+        fi
+    fi
+fi
+AC_MSG_RESULT($pac_cv_ipc_h_needs_xopen_source)
+if test "$pac_cv_ipc_h_needs_xopen_source" = yes ; then
+    AC_DEFINE(_XOPEN_SOURCE,500,[Define to access sys/ipc.h cleanly])
+fi
+rm -f conftest*
+
+
+AC_SEARCH_LIBS(socket, socket)
+AC_CHECK_LIB(thread, mutex_init)
+AC_CHECK_HEADERS(pthread.h fcntl.h string.h strings.h sys/time.h sys/sem.h sys/ipc.h sys/msg.h sys/shm.h unistd.h sys/param.h sys/ioctl.h netinet/in.h netinet/tcp.h netdb.h sys/uio.h sys/select.h sys/types.h stdlib.h sys/socket.h sys/filio.h netinet/in.h values.h sys/uio.h sched.h arpa/inet.h sys/sockio.h net/if.h)
+AC_CHECK_HEADERS(sys/stat.h sys/ptrace.h sys/wait.h errno.h ctype.h process.h sys/mman.h uuid/uuid.h mqueue.h sys/sysctl.h)
+AC_CHECK_FUNCS(msgget yield mutex_init shmget shmat shmdt shmctl usleep sleep getcwd gethostname gettimeofday putenv select socket sched_yield)
+AC_CHECK_FUNCS(sysconf sysctl pthread_mutexattr_setpshared pthread_mutexattr_init)
+dnl AC_CHECK_FUNCS( mmap )
+# This autoconf code checks that mmap works, at least in 
+# a simple case (private, fixed mapping of an already mapped memory)
+# It is a slightly better test than just checking that the function exists,
+# but is isn't fully adequate (we need something more complete)
+AC_FUNC_MMAP
+
+AC_SEARCH_LIBS( uuid_generate, uuid )
+AC_SEARCH_LIBS( mq_open, rt, AC_DEFINE(HAVE_MQ_OPEN,,[Define if mq_open is available]) )
+
+save_libs2=$LIBS
+AC_SEARCH_LIBS( shm_open, rt, have_shm_open=yes, have_shm_open=no)
+AC_SEARCH_LIBS( shm_unlink, rt, have_shm_unlink=yes, have_shm_unlink=no)
+if test $have_shm_open = "yes" -a $have_shm_unlink = "yes" ; then
+    AC_MSG_CHECKING(that shm_open has been implemented)
+    AC_TRY_RUN([
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+
+int main(int argc, char ** argv)
+{
+   int fd;
+
+   fd = shm_open("/mpich2conf", O_RDWR | O_CREAT, 0666);
+   if (fd == -1)
+   {
+       if (errno == ENOSYS)
+       {
+           return 1;
+       }
+   }
+   else
+   {
+       shm_unlink("/mpich2conf");
+       close(fd);
+   }
+   return 0;
+}],shm_open_impl=yes,shm_open_impl=no,shm_open_impl=${CROSS_HAVE_SHM_OPEN:-no})
+    AC_MSG_RESULT($shm_open_impl)
+    if test $shm_open_impl = "yes" ; then
+        AC_DEFINE(HAVE_SHM_OPEN,,[Define if shm_open is available])
+        AC_DEFINE(HAVE_SHM_UNLINK,,[Define if shm_unlink is available])
+    else
+        LIBS=$save_libs2
+    fi
+else
+    LIBS=$save_libs2
+fi
+AC_CACHE_CHECK([whether SHM_R and SHM_W are defined],pac_cv_has_shm_rw,[
+AC_TRY_COMPILE([
+#include <sys/shm.h>
+],[ int flags = SHM_R | SHM_W; ],pac_cv_has_shm_rw=yes,pac_cv_has_shm_rw=no)])
+if test "$pac_cv_has_shm_rw" = yes ; then
+    AC_DEFINE(HAVE_SHM_RW,1,[Define if SHM_R and SHM_W are available])
+fi
+
+# Add a test that shmget works (under cygwin, it causes the 
+# program to immediately abort with "Bad system call".
+AC_CACHE_CHECK([whether shmget works],pac_cv_func_shmget_works,[
+AC_TRY_RUN([#include <sys/shm.h>
+int main(int argc, char *argv[])
+{
+   key_t key = rand();
+   int id = shmget(key,128,IPC_CREAT);
+   if (id) shmctl(id,IPC_RMID,0);
+   return (id > 0) ? 0 : 1;
+}
+],pac_cv_func_shmget_works=yes,pac_cv_func_shmget_works=no)])
+if test "$pac_cv_func_shmget_works" = "yes" ; then
+    AC_DEFINE(HAVE_WORKING_SHMGET,1,[Define if shmget works])
+fi
+
+
+dnl gcc checking
+
+cpu_gcc_x86_cycle=no
+AC_TRY_COMPILE(,[
+    long long var, *var_ptr=&var;
+    __asm__ __volatile__  ( "cpuid ; rdtsc ; mov %%edx,%1 ; mov %%eax,%0" 
+                            : "=m" (*((char *) (var_ptr))), 
+                              "=m" (*(((char *) (var_ptr))+4)) 
+                            :: "eax", "ebx", "ecx", "edx" ); 
+],cpu_gcc_x86_cycle=yes,cpu_gcc_x86_cycle=no)
+if test "$cpu_gcc_x86_cycle" = "yes" ; then
+  AC_DEFINE_UNQUOTED(MPICH_CPU_TICK_TYPE, USE_GCC_X86_CYCLE_ASM, [Define if using gcc on an Intel CPU with the rdtsc instruction])
+dnl else
+dnl If a cycle counter is not available the code reverts to fixed spin waits.  So no error is needed.
+dnl  AC_MSG_ERROR([gcc x86 cycle counter is not available on this system])
+fi
+
+AC_MSG_CHECKING([for x86 mfence instruction using __asm__])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" );
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_mfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_mfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_mfence=no)
+if test "$lac_cv_have_gcc_asm_and_x86_mfence" = "yes" ; then
+    AC_DEFINE(HAVE_GCC_ASM_AND_X86_MFENCE, 1, [Define if using gcc on a x86 system with the mfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 sfence instruction using __asm__])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf8" ::: "memory" );
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_sfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_sfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_sfence=no)
+if test "$lac_cv_have_gcc_asm_and_x86_sfence" = "yes" ; then
+    AC_DEFINE(HAVE_GCC_ASM_AND_X86_SFENCE, 1, [Define if using gcc on a x86 system with the sfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 lfence instruction using __asm__])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xe8" ::: "memory" );
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_lfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_lfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_lfence=no)
+if test "$lac_cv_have_gcc_asm_and_x86_lfence" = "yes" ; then
+    AC_DEFINE(HAVE_GCC_ASM_AND_X86_LFENCE, 1, [Define if using gcc on a x86 system with the lfence instruction])
+fi
+
+dnl icc checking
+
+AC_MSG_CHECKING([for x86 mfence instruction using __asm])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xf0 ;
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_mfence=yes,
+AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_mfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_mfence=no)
+if test "$lac_cv_have___asm_and_x86_mfence" = "yes" ; then
+    AC_DEFINE(HAVE___ASM_AND_X86_MFENCE, 1, [Define if using __asm on a x86 system with the mfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 sfence instruction using __asm])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm sfence ;
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_sfence=yes,
+AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_sfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_sfence=no)
+if test "$lac_cv_have___asm_and_x86_sfence" = "yes" ; then
+    AC_DEFINE(HAVE___ASM_AND_X86_SFENCE, 1, [Define if using __asm on a x86 system with the sfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 lfence instruction using __asm])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xe8 ;
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_lfence=yes,
+AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_lfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_lfence=no)
+if test "$lac_cv_have___asm_and_x86_lfence" = "yes" ; then
+    AC_DEFINE(HAVE___ASM_AND_X86_LFENCE, 1, [Define if using __asm on a x86 system with the lfence instruction])
+fi
+
+dnl pgcc checking - compiler needs -Masmkeyword flag. How do I set this in the try_run?
+
+AC_MSG_CHECKING([for x86 mfence instruction using asm()])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xf0");
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_mfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_mfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_mfence=no)
+if test "$lac_cv_have_asm_and_x86_mfence" = "yes" ; then
+    AC_DEFINE(HAVE_ASM_AND_X86_MFENCE, 1, [Define if using asm() on a x86 system with the mfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 sfence instruction using asm()])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    asm("sfence");
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_sfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_sfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_sfence=no)
+if test "$lac_cv_have_asm_and_x86_sfence" = "yes" ; then
+    AC_DEFINE(HAVE_ASM_AND_X86_SFENCE, 1, [Define if using asm() on a x86 system with the sfence instruction])
+fi
+
+AC_MSG_CHECKING([for x86 lfence instruction using asm()])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xe8");
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_lfence=yes,
+AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_lfence=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_lfence=no)
+if test "$lac_cv_have_asm_and_x86_lfence" = "yes" ; then
+    AC_DEFINE(HAVE_ASM_AND_X86_LFENCE, 1, [Define if using asm() on a x86 system with the lfence instruction])
+fi
+
+AC_MSG_CHECKING([for _InterlockedExchange intrinsic])
+AC_TRY_RUN([
+int main(int argc, char *argv[])
+{
+    unsigned long lock, *lock_ptr;
+    lock_ptr = &lock;
+    _InterlockedExchange(lock_ptr, 1);
+    exit(0);
+}
+],
+AC_MSG_RESULT(yes); lac_cv_have__InterlockedExchange=yes,
+AC_MSG_RESULT(no); lac_cv_have__InterlockedExchange=no,
+AC_MSG_RESULT(not checking when cross compiling), lac_cv_have__InterlockedExchange=no)
+if test "$lac_cv_have__InterlockedExchange" = "yes" ; then
+    AC_DEFINE(HAVE__INTERLOCKEDEXCHANGE, 1, [Define if _InterlockedExchange intrinsic is available])
+fi
+
+SSM_LIBS=$LIBS
+LIBS=$save_libs
+
+# We need the util/sock/ch3usock.h header file
+CPPFLAGS="${CPPFLAGS} -I${master_top_srcdir}/src/mpid/ch3/util/sock"
+
+AC_SUBST(device_name)
+AC_SUBST(channel_name)
+AC_SUBST(SSM_LIBS)
+AC_SUBST(AR)
+AC_SUBST(RANLIB)
+AC_SUBST(MPILIBNAME)
+AC_SUBST(CC)
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+PAC_CC_SUBDIR_SHLIBS
+AC_SUBST(master_top_srcdir)
+AC_SUBST(master_top_builddir)
+dnl
+dnl Dependency handling
+AC_SUBST(MAKE_DEPEND_C)
+
+dnl
+dnl Etags
+AC_SUBST(ETAGS)
+AC_SUBST(ETAGSADD)
+export ETAGS
+export ETAGSADD
+
+PAC_UPDATE_BASE_CACHE
+
+AC_OUTPUT(Makefile src/Makefile localdefs)

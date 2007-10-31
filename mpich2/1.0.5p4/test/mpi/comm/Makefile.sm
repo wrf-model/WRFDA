@@ -1,0 +1,18 @@
+INCLUDES = -I../include -I${top_srcdir}/include
+LDADD = ../util/mtest.o
+DEPADD = @MPILIBLOC@ ../util/mtest.o
+smvar_do_sharedlibs = 0
+
+dup_SOURCES      = dup.c
+dupic_SOURCES    = dupic.c
+ic1_SOURCES      = ic1.c
+commname_SOURCES = commname.c
+ctxalloc_SOURCES = ctxalloc.c
+icgroup_SOURCES  = icgroup.c
+cmfree_SOURCES   = cmfree.c
+icm_SOURCES      = icm.c
+cmsplit_SOURCES  = cmsplit.c
+
+../util/mtest.o:
+	(cd ../util && $(MAKE) mtest.o )
+
