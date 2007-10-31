@@ -1,0 +1,28 @@
+INTERFACE
+Subroutine rttov_integratesource (&
+ & nwp_levels,&
+ & nchannels,&
+ & nprofiles,&
+ & lprofiles,&
+ & angles,&
+ & scatt_aux,&
+ & dp,&
+ & dm,&
+ & j_do,&
+ & j_up) 
+ Use rttov_types, Only :&
+ & profile_scatt_aux ,&
+ & geometry_Type 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nchannels)
+ Type (profile_scatt_aux), Intent (in) :: scatt_aux
+ Type (geometry_Type), Intent (in) :: angles (nprofiles)
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dp
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dm
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_do
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_up
+End subroutine rttov_integratesource
+END INTERFACE

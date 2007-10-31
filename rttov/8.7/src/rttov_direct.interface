@@ -1,0 +1,62 @@
+Interface
+!
+Subroutine rttov_direct( &
+     errorstatus,      & ! out
+     nfrequencies,     & ! in
+     nchannels,        & ! in
+     nbtout,           & ! in
+     nprofiles,        & ! in
+     channels,         & ! in
+     polarisations,    & ! in
+     lprofiles,        & ! in
+     profiles,         & ! in
+     coef,             & ! in
+     addcloud,         & ! in
+     calcemis,         & ! in
+     emissivity,       & ! inout
+     transmission,     & ! inout
+     radiancedata )      ! inout
+
+  Use rttov_const, Only :   &
+       errorstatus_success ,&
+       errorstatus_warning ,&
+       errorstatus_fatal   ,&
+       max_optical_depth   ,&
+       sensor_id_mw        ,&
+       sensor_id_ir
+
+  Use rttov_types, Only : &
+       rttov_coef     ,&
+       profile_Type   ,&
+       geometry_Type  ,&
+       predictors_Type,&
+       profile_aux    ,&
+       transmission_type ,&
+       radiance_Type  ,&
+       radiance_aux
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+
+  Integer(Kind=jpim),      Intent(in)    :: nchannels  ! Number of output radiances
+                                                       !  (= channels used * profiles)
+  Integer(Kind=jpim),      Intent(in)    :: nfrequencies
+  Integer(Kind=jpim),      Intent(in)    :: nbtout
+  Integer(Kind=jpim),      Intent(in)    :: nprofiles
+  Integer(Kind=jpim),      Intent(in)    :: channels(nfrequencies)
+  Integer(Kind=jpim),      Intent(in)    :: polarisations(nchannels,3)
+  Integer(Kind=jpim),      Intent(in)    :: lprofiles(nfrequencies)
+  Logical,                 Intent(in)    :: addcloud  ! switch for cloud computations
+  Type(profile_Type),      Intent(in)    :: profiles(nprofiles) ! Atmospheric profiles
+  Type(rttov_coef),        Intent(in)    :: coef                ! RT Coefficients
+  Logical,                 Intent(in)    :: calcemis(nchannels)! switch for emmissivity calc.
+  Real(Kind=jprb),         Intent(inout) :: emissivity(nchannels) ! surface emmissivity
+  Type(transmission_type), Intent(inout) :: transmission ! transmittances and layer optical depths
+  Type(radiance_Type),     Intent(inout) :: radiancedata   ! radiances (mw/cm-1/ster/sq.m) and degK
+  Integer(Kind=jpim),      Intent(out)   :: errorstatus(nprofiles) ! return flag
+
+
+
+End Subroutine rttov_direct
+End Interface

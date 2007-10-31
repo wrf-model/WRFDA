@@ -1,0 +1,336 @@
+
+#
+# Makefile for RTTOV-8.7 library
+#
+# Usage:  make -f Makefile_lib lib_basic FC=F90 FFLAGS=' -Am -O3 -M .'
+#
+# P. Brunel 26 October 2001
+#
+# split subroutines in 3 kinds (basic, cld, scat)
+# P. Brunel 12 March 2004
+
+LIBRARY=librttov8.7.a
+
+#Includes or modules are in the current directory
+INC=.
+
+LIST_MOD_F= \
+parkind1.F90 \
+rttov_const.F90 \
+rttov_types.F90 \
+rttov_global.F90 \
+mod_cparam.F90  \
+mod_tstrad.F90 \
+mod_rttov_scatt_test.F90
+
+LIST_MOD=$(LIST_MOD_F:.F90=.o) 
+
+LIST_SUB_F=   \
+rttov_cmpuc.F90	\
+rttov_deletecomment.F90	\
+rttov_dealloc_coef.F90	\
+rttov_errorreport.F90	\
+rttov_errorhandling.F90	\
+rttov_q2v.F90           \
+rttov_v2q.F90           \
+rttov_coeffname.F90	\
+rttov_findnextsection.F90	\
+rttov_intext_prof.F90   \
+rttov_opencoeff.F90	\
+rttov_readcoeffs.F90	\
+rttov_readcoeffs_ascii.F90	\
+rttov_readcoeffs_binary.F90	\
+rttov_setpressure.F90		\
+rttov_setup.F90			\
+rttov_setupchan.F90		\
+rttov_setupindex.F90		\
+rttov_scatt_setupindex.F90	\
+rttov_skipcommentline.F90	\
+rttov_writecoef.F90	\
+rttov_initcoeffs.F90 \
+rttov_distribcoeffs.F90 \
+rttvi.F90               \
+rttov.F90		\
+\
+rttov_direct.F90	\
+rttov_calcbt.F90	\
+rttov_calcpolarisation.F90 \
+rttov_calcemis_ir.F90	\
+rttov_calcemis_mw.F90	\
+rttov_calcrad.F90	\
+rttov_checkinput.F90	\
+rttov_integrate.F90	\
+rttov_profaux.F90	\
+rttov_setgeometry.F90	\
+rttov_setpredictors.F90	\
+rttov_transmit.F90	\
+\
+rttov_tl.F90		\
+rttov_calcbt_tl.F90	\
+rttov_calcpolarisation_tl.F90	\
+rttov_calcemis_mw_tl.F90	\
+rttov_calcrad_tl.F90	\
+rttov_integrate_tl.F90	\
+rttov_profaux_tl.F90	\
+rttov_setpredictors_tl.F90 \
+rttov_transmit_tl.F90	\
+tstrad_tl.F90           \
+\
+rttov_ad.F90		\
+rttov_calcbt_ad.F90	\
+rttov_calcpolarisation_ad.F90	\
+rttov_calcrad_ad.F90	\
+rttov_integrate_ad.F90  \
+rttov_profaux_ad.F90	\
+rttov_setpredictors_ad.F90 \
+rttov_calcemis_mw_ad.F90	\
+rttov_transmit_ad.F90   \
+tstrad_ad.F90		\
+\
+rttov_k.F90		\
+rttov_calcrad_k.F90	\
+rttov_profout_k.F90	\
+rttov_cld_profout_k.F90	\
+rttov_profaux_k.F90     \
+rttov_integrate_k.F90  \
+rttov_calcemis_mw_k.F90	\
+rttov_setpredictors_k.F90 \
+rttov_transmit_k.F90   \
+tstrad_k.F90		\
+\
+rttov_setpredictors_8.F90 \
+rttov_setpredictors_8_tl.F90 \
+rttov_setpredictors_8_ad.F90 \
+rttov_setpredictors_8_k.F90 \
+\
+rttov_intex.F90		\
+rttov_intex_tl.F90  	\
+rttov_intex_ad.F90  	
+
+LIST_SUB_CLD_F=   \
+rttov_cld.F90		\
+rttov_aitosu.F90	\
+rttov_emiscld.F90	\
+rttov_intex.F90		\
+rttovcld.F90		\
+\
+rttov_cld_tl.F90	\
+rttov_aitosu_tl.F90	\
+rttov_emiscld_tl.F90	\
+\
+rttov_cld_ad.F90	\
+rttov_aitosu_ad.F90	\
+rttov_emiscld_ad.F90    \
+\
+rttov_cld_k.F90
+
+LIST_SUB_SCAT_F=   \
+rttov_boundaryconditions.F90 \
+rttov_eddington.F90 \
+rttov_iniedd.F90 \
+rttov_iniscatt.F90 \
+rttov_integratesource.F90 \
+rttov_interpcubic.F90 \
+rttov_polcoe.F90 \
+rttov_mieproc.F90 \
+rttov_readscattcoeffs.F90 \
+rttov_scatt.F90 \
+rttov_scatt_test.F90 \
+lapack.f \
+\
+rttov_boundaryconditions_tl.F90 \
+rttov_eddington_tl.F90 \
+rttov_iniedd_tl.F90 \
+rttov_iniscatt_tl.F90 \
+rttov_integratesource_tl.F90 \
+rttov_interpcubic_tl.F90 \
+rttov_mieproc_tl.F90 \
+rttov_scatt_tl.F90 \
+\
+rttov_boundaryconditions_ad.F90 \
+rttov_eddington_ad.F90 \
+rttov_iniedd_ad.F90 \
+rttov_iniscatt_ad.F90 \
+rttov_integratesource_ad.F90 \
+rttov_interpcubic_ad.F90 \
+rttov_mieproc_ad.F90 \
+rttov_scatt_ad.F90 \
+\
+rttov_boundaryconditions_k.F90 \
+rttov_eddington_k.F90 \
+rttov_iniedd_k.F90 \
+rttov_iniscatt_k.F90 \
+rttov_integratesource_k.F90 \
+rttov_mieproc_k.F90 \
+rttov_scatt_k.F90  
+
+
+LIST_SUB=$(LIST_SUB_F:.F90=.o)
+LIST_SUB_CLD=$(LIST_SUB_CLD_F:.F90=.o) 
+LIST_SUB_SCAT=$(LIST_SUB_SCAT_F:.F90=.o) $(LIST_SUB_SCAT_F:.f=.o)
+
+.SUFFIXES: .F90 .f
+
+.F90.o : 
+	$(FC) -c $(FFLAGS) $*.F90 -o $*.o
+	ar rv $(LIBRARY) $*.o
+.f.o : 
+	$(FC77) -c $*.f -o $*.o
+	ar rv $(LIBRARY) $*.o
+
+#.F90.mod : 
+#	$(FC) -c $(FFLAGS) $*.F90 -o $*.o
+#	ar rv $(LIBRARY) $*.o
+
+## ----- Start of NEC Section -----
+##NEC compiler
+## These over-ride above settings.
+## Note the addition of FFLAGS to the F77 section
+#
+#.F90.o :
+#	$(FC) -c $(FFLAGS) $*.F90 -o $*.o
+#	sxar rv $(LIBRARY) $*.o
+#.f.o :
+#	$(FC77) -c $(FFLAGS) $*.f -o $*.o
+#	sxar rv $(LIBRARY) $*.o
+#
+## ------ End of NEC Section ------
+
+# default target
+all: $(LIST_MOD) $(LIST_SUB) $(LIST_SUB_CLD) $(LIST_SUB_SCAT) 
+	@echo "library $(LIBRARY) is build"
+
+lib_basic: $(LIST_MOD) $(LIST_SUB) 
+	@echo "library $(LIBRARY) basic routines is build"
+
+lib_cld: $(LIST_MOD) $(LIST_SUB) $(LIST_SUB_CLD) 
+	@echo "library $(LIBRARY) with cloud routines is build"
+
+lib_scat: $(LIST_MOD) $(LIST_SUB) $(LIST_SUB_SCAT) 
+	@echo "library $(LIBRARY) with scattering routines is build"
+
+# Clean library subroutines and modules
+clean:
+	\rm -f $(LIBRARY) *.o  *.mod *.MOD
+
+
+
+# Dependencies with modules and interfaces
+
+mod_cparam.o: mod_cparam.F90 rttov_types.o parkind1.o
+mod_tstrad.o: mod_tstrad.F90 parkind1.o
+parkind1.o: parkind1.F90
+rttov_const.o: rttov_const.F90 parkind1.o
+rttov_global.o: rttov_global.F90 rttov_const.o parkind1.o
+rttov_types.o: rttov_types.F90 rttov_const.o parkind1.o
+
+rttov.o: rttov.F90 rttov_const.o rttov_types.o mod_cparam.o parkind1.o rttov_errorreport.o rttov_direct.o
+rttov_ad.o: rttov_ad.F90 rttov_const.o rttov_types.o parkind1.o rttov_checkinput.o rttov_errorreport.o rttov_profaux.o rttov_setgeometry.o rttov_setpredictors.o rttov_setpredictors_8.o rttov_transmit.o rttov_calcemis_ir.o rttov_calcemis_mw.o rttov_integrate.o rttov_integrate_ad.o rttov_calcemis_mw_ad.o rttov_transmit_ad.o rttov_setpredictors_ad.o rttov_setpredictors_8_ad.o rttov_profaux_ad.o
+rttov_aitosu.o: rttov_aitosu.F90 rttov_types.o parkind1.o
+rttov_aitosu_ad.o: rttov_aitosu_ad.F90 rttov_types.o parkind1.o
+rttov_aitosu_tl.o: rttov_aitosu_tl.F90 rttov_types.o parkind1.o
+rttov_boundaryconditions.o: rttov_boundaryconditions.F90 rttov_types.o parkind1.o
+rttov_boundaryconditions_ad.o: rttov_boundaryconditions_ad.F90 rttov_types.o parkind1.o
+rttov_boundaryconditions_tl.o: rttov_boundaryconditions_tl.F90 rttov_types.o parkind1.o
+rttov_calcbt.o: rttov_calcbt.F90 rttov_types.o parkind1.o
+rttov_calcbt_ad.o: rttov_calcbt_ad.F90 rttov_types.o parkind1.o
+rttov_calcbt_tl.o: rttov_calcbt_tl.F90 rttov_types.o parkind1.o
+rttov_calcemis_ir.o: rttov_calcemis_ir.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcemis_mw.o: rttov_calcemis_mw.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o
+rttov_calcemis_mw_ad.o: rttov_calcemis_mw_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcemis_mw_k.o: rttov_calcemis_mw_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcemis_mw_tl.o: rttov_calcemis_mw_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcpolarisation.o: rttov_calcpolarisation.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcpolarisation_ad.o: rttov_calcpolarisation_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcpolarisation_tl.o: rttov_calcpolarisation_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcrad.o: rttov_calcrad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_calcrad_ad.o: rttov_calcrad_ad.F90 rttov_types.o parkind1.o
+rttov_calcrad_k.o: rttov_calcrad_k.F90 rttov_types.o parkind1.o
+rttov_calcrad_tl.o: rttov_calcrad_tl.F90 rttov_types.o parkind1.o
+rttov_checkinput.o: rttov_checkinput.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o
+rttov_cld.o: rttov_cld.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_direct.o rttov_intex.o rttov_emiscld.o rttov_aitosu.o rttov_calcbt.o rttov_setgeometry.o rttov_calcpolarisation.o
+rttov_cld_ad.o: rttov_cld_ad.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_direct.o rttov_intex.o rttov_emiscld.o rttov_aitosu.o rttov_calcbt.o rttov_setgeometry.o rttov_calcpolarisation.o rttov_calcpolarisation_ad.o rttov_calcbt_ad.o rttov_aitosu_ad.o rttov_emiscld_ad.o rttov_intex_ad.o rttov_ad.o
+rttov_cld_k.o: rttov_cld_k.F90 rttov_const.o rttov_types.o parkind1.o rttov_cld_ad.o rttov_errorreport.o
+rttov_cld_tl.o: rttov_cld_tl.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_tl.o rttov_intex_tl.o rttov_emiscld_tl.o rttov_aitosu_tl.o rttov_calcbt.o rttov_calcbt_tl.o rttov_setgeometry.o rttov_calcpolarisation.o rttov_calcpolarisation_tl.o
+rttov_cmpuc.o: rttov_cmpuc.F90 parkind1.o
+rttov_coeffname.o: rttov_coeffname.F90 rttov_const.o parkind1.o rttov_errorreport.o
+rttov_dealloc_coef.o: rttov_dealloc_coef.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o
+rttov_deletecomment.o: rttov_deletecomment.F90 parkind1.o
+rttov_direct.o: rttov_direct.F90 rttov_const.o rttov_types.o parkind1.o rttov_checkinput.o rttov_errorreport.o rttov_profaux.o rttov_setgeometry.o rttov_setpredictors.o rttov_setpredictors_8.o rttov_transmit.o rttov_calcemis_ir.o rttov_calcemis_mw.o rttov_integrate.o
+rttov_distribcoeffs.o: rttov_distribcoeffs.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_eddington.o: rttov_eddington.F90 rttov_types.o rttov_const.o parkind1.o rttov_boundaryconditions.o rttov_integratesource.o
+rttov_eddington_ad.o: rttov_eddington_ad.F90 rttov_types.o rttov_const.o parkind1.o rttov_boundaryconditions.o rttov_integratesource.o rttov_integratesource_ad.o rttov_boundaryconditions_ad.o
+rttov_eddington_tl.o: rttov_eddington_tl.F90 rttov_types.o rttov_const.o parkind1.o rttov_boundaryconditions_tl.o rttov_integratesource_tl.o
+rttov_emiscld.o: rttov_emiscld.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_emiscld_ad.o: rttov_emiscld_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_emiscld_tl.o: rttov_emiscld_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_errorhandling.o: rttov_errorhandling.F90 rttov_const.o rttov_global.o parkind1.o
+rttov_errorreport.o: rttov_errorreport.F90 rttov_const.o rttov_global.o parkind1.o rttov_errorhandling.o
+rttov_findnextsection.o: rttov_findnextsection.F90 rttov_const.o parkind1.o
+rttov_iniedd.o: rttov_iniedd.F90 rttov_types.o parkind1.o
+rttov_iniedd_ad.o: rttov_iniedd_ad.F90 rttov_types.o parkind1.o
+rttov_iniedd_tl.o: rttov_iniedd_tl.F90 rttov_types.o parkind1.o
+rttov_iniscatt.o: rttov_iniscatt.F90 rttov_types.o rttov_const.o parkind1.o rttov_errorreport.o rttov_setgeometry.o rttov_intex.o rttov_mieproc.o rttov_iniedd.o rttov_calcemis_mw.o
+rttov_iniscatt_ad.o: rttov_iniscatt_ad.F90 rttov_types.o rttov_const.o parkind1.o rttov_errorreport.o rttov_setgeometry.o rttov_intex.o rttov_mieproc.o rttov_iniedd.o rttov_calcemis_mw.o rttov_calcemis_mw_ad.o rttov_iniedd_ad.o rttov_mieproc_ad.o rttov_intex_ad.o
+rttov_iniscatt_tl.o: rttov_iniscatt_tl.F90 rttov_types.o rttov_const.o parkind1.o rttov_errorreport.o rttov_setgeometry.o rttov_intex_tl.o rttov_mieproc_tl.o rttov_iniedd_tl.o rttov_calcemis_mw.o rttov_calcemis_mw_tl.o
+rttov_initcoeffs.o: rttov_initcoeffs.F90 rttov_const.o rttov_types.o parkind1.o rttov_distribcoeffs.o rttov_errorreport.o rttov_q2v.o
+rttov_integrate.o: rttov_integrate.F90 rttov_const.o rttov_types.o parkind1.o rttov_calcrad.o rttov_calcbt.o rttov_calcpolarisation.o
+rttov_integrate_ad.o: rttov_integrate_ad.F90 rttov_const.o rttov_types.o parkind1.o rttov_calcpolarisation_ad.o rttov_calcbt_ad.o rttov_calcrad_ad.o
+rttov_integrate_k.o: rttov_integrate_k.F90 rttov_const.o rttov_types.o parkind1.o rttov_calcpolarisation_ad.o rttov_calcbt_ad.o rttov_calcrad_k.o
+rttov_integrate_tl.o: rttov_integrate_tl.F90 rttov_const.o rttov_types.o parkind1.o rttov_calcrad_tl.o rttov_calcbt_tl.o rttov_calcpolarisation_tl.o
+rttov_integratesource.o: rttov_integratesource.F90 rttov_types.o parkind1.o
+rttov_integratesource_ad.o: rttov_integratesource_ad.F90 rttov_types.o parkind1.o
+rttov_integratesource_tl.o: rttov_integratesource_tl.F90 rttov_types.o parkind1.o
+rttov_interpcubic.o: rttov_interpcubic.F90 rttov_types.o parkind1.o rttov_polcoe.o
+rttov_interpcubic_ad.o: rttov_interpcubic_ad.F90 rttov_types.o parkind1.o rttov_polcoe.o
+rttov_interpcubic_tl.o: rttov_interpcubic_tl.F90 rttov_types.o parkind1.o rttov_polcoe.o
+rttov_intex.o: rttov_intex.F90 parkind1.o
+rttov_intex_ad.o: rttov_intex_ad.F90 parkind1.o
+rttov_intex_tl.o: rttov_intex_tl.F90 parkind1.o
+rttov_intext_prof.o: rttov_intext_prof.F90 rttov_types.o parkind1.o
+rttov_k.o: rttov_k.F90 rttov_const.o rttov_types.o parkind1.o rttov_checkinput.o rttov_errorreport.o rttov_profaux.o rttov_setgeometry.o rttov_setpredictors.o rttov_setpredictors_8.o rttov_transmit.o rttov_calcemis_ir.o rttov_calcemis_mw.o rttov_integrate.o rttov_integrate_k.o rttov_calcemis_mw_k.o rttov_transmit_k.o rttov_setpredictors_k.o rttov_setpredictors_8_k.o rttov_profaux_k.o rttov_profout_k.o
+rttov_mieproc.o: rttov_mieproc.F90 parkind1.o rttov_types.o
+rttov_mieproc_ad.o: rttov_mieproc_ad.F90 parkind1.o rttov_types.o
+rttov_mieproc_tl.o: rttov_mieproc_tl.F90 rttov_types.o parkind1.o
+rttov_opencoeff.o: rttov_opencoeff.F90 rttov_const.o parkind1.o rttov_errorreport.o
+rttov_polcoe.o: rttov_polcoe.F90 parkind1.o
+rttov_profaux.o: rttov_profaux.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_profaux_ad.o: rttov_profaux_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_profaux_k.o: rttov_profaux_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_profaux_tl.o: rttov_profaux_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_profout_k.o: rttov_profout_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_q2v.o: rttov_q2v.F90 rttov_const.o parkind1.o
+rttov_readcoeffs.o: rttov_readcoeffs.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_coeffname.o rttov_opencoeff.o rttov_readcoeffs_binary.o rttov_readcoeffs_ascii.o
+rttov_readcoeffs_ascii.o: rttov_readcoeffs_ascii.F90 rttov_const.o rttov_types.o parkind1.o rttov_findnextsection.o rttov_skipcommentline.o rttov_errorreport.o rttov_deletecomment.o rttov_cmpuc.o rttov_opencoeff.o
+rttov_readcoeffs_binary.o: rttov_readcoeffs_binary.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o
+rttov_readscattcoeffs.o: rttov_readscattcoeffs.F90 rttov_types.o rttov_const.o parkind1.o rttov_errorreport.o rttov_opencoeff.o rttov_findnextsection.o rttov_skipcommentline.o
+rttov_scatt.o: rttov_scatt.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_direct.o rttov_iniscatt.o rttov_eddington.o rttov_setgeometry.o rttov_calcpolarisation.o
+rttov_scatt_ad.o: rttov_scatt_ad.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_direct.o rttov_iniscatt.o rttov_eddington.o rttov_setgeometry.o rttov_calcpolarisation_ad.o rttov_eddington_ad.o rttov_iniscatt_ad.o rttov_ad.o
+rttov_scatt_k.o: rttov_scatt_k.F90 rttov_const.o rttov_types.o parkind1.o rttov_scatt_ad.o rttov_errorreport.o
+rttov_scatt_tl.o: rttov_scatt_tl.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o rttov_tl.o rttov_iniscatt_tl.o rttov_eddington_tl.o rttov_setgeometry.o rttov_calcpolarisation.o rttov_calcpolarisation_tl.o
+rttov_setgeometry.o: rttov_setgeometry.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors.o: rttov_setpredictors.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_8.o: rttov_setpredictors_8.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_8_ad.o: rttov_setpredictors_8_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_8_k.o: rttov_setpredictors_8_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_8_tl.o: rttov_setpredictors_8_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_ad.o: rttov_setpredictors_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_k.o: rttov_setpredictors_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpredictors_tl.o: rttov_setpredictors_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_setpressure.o: rttov_setpressure.F90 rttov_const.o rttov_types.o
+rttov_setup.o: rttov_setup.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorhandling.o rttov_errorreport.o rttov_readcoeffs.o rttov_initcoeffs.o
+rttov_setupchan.o: rttov_setupchan.F90 rttov_types.o rttov_const.o parkind1.o
+rttov_setupindex.o: rttov_setupindex.F90 rttov_types.o rttov_const.o parkind1.o
+rttov_skipcommentline.o: rttov_skipcommentline.F90 parkind1.o
+rttov_tl.o: rttov_tl.F90 rttov_const.o rttov_types.o parkind1.o rttov_checkinput.o rttov_errorreport.o rttov_profaux.o rttov_setgeometry.o rttov_setpredictors.o rttov_setpredictors_8.o rttov_transmit.o rttov_calcemis_ir.o rttov_calcemis_mw.o rttov_integrate.o rttov_profaux_tl.o rttov_setpredictors_tl.o rttov_setpredictors_8_tl.o rttov_transmit_tl.o rttov_calcemis_mw_tl.o rttov_integrate_tl.o
+rttov_transmit.o: rttov_transmit.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_transmit_ad.o: rttov_transmit_ad.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_transmit_k.o: rttov_transmit_k.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_transmit_tl.o: rttov_transmit_tl.F90 rttov_const.o rttov_types.o parkind1.o
+rttov_v2q.o: rttov_v2q.F90 rttov_const.o parkind1.o
+rttov_writecoef.o: rttov_writecoef.F90 rttov_const.o rttov_types.o parkind1.o rttov_errorreport.o
+rttovcld.o: rttovcld.F90 rttov_const.o rttov_types.o mod_cparam.o parkind1.o rttov_errorreport.o rttov_setupindex.o rttov_cld.o
+rttvi.o: rttvi.F90 mod_cparam.o rttov_const.o parkind1.o rttov_readcoeffs.o rttov_initcoeffs.o
+tstrad_ad.o: tstrad_ad.F90 rttov_const.o rttov_types.o mod_tstrad.o parkind1.o rttov_errorreport.o rttov_ad.o rttov_tl.o
+tstrad_k.o: tstrad_k.F90 rttov_const.o rttov_types.o mod_tstrad.o parkind1.o rttov_errorreport.o rttov_k.o
+tstrad_tl.o: tstrad_tl.F90 rttov_const.o rttov_types.o mod_tstrad.o parkind1.o rttov_errorreport.o rttov_tl.o rttov_direct.o

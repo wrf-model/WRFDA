@@ -1,0 +1,34 @@
+INTERFACE
+Subroutine rttov_boundaryconditions_ad (&
+ & nwp_levels,&
+ & nchannels,&
+ & nprofiles,&
+ & lprofiles,&
+ & scatt_aux,&
+ & scatt_aux_ad,&
+ & profiles ,&
+ & profiles_ad ,&
+ & ftop,&
+ & ftop_ad,&
+ & dp,&
+ & dp_ad,&
+ & dm,&
+ & dm_ad) 
+ Use rttov_types, Only :&
+ & profile_Type ,&
+ & profile_scatt_aux 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nchannels)
+ Type (profile_scatt_aux), Intent (in) :: scatt_aux
+ Type (profile_scatt_aux), Intent (inout) :: scatt_aux_ad
+ Type (profile_Type), Intent (in) :: profiles (nprofiles)
+ Type (profile_Type), Intent (inout) :: profiles_ad (nprofiles)
+ Real (Kind=jprb), Intent (in), dimension (nchannels) :: ftop
+ Real (Kind=jprb), Intent (inout), dimension (nchannels) :: ftop_ad
+ Real (Kind=jprb), Intent (out), dimension (nchannels,nwp_levels) :: dp , dm
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: dp_ad, dm_ad
+End subroutine rttov_boundaryconditions_ad
+END INTERFACE

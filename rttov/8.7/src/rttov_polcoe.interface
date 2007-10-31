@@ -1,0 +1,10 @@
+Interface
+   Subroutine rttov_polcoe (x, y, n, cof)
+      Use parkind1, Only: jpim, jprb
+      Implicit None
+      Integer (Kind=jpim) :: n
+      Real (Kind=jprb), Dimension (n) :: y
+      Real (Kind=jprb), Dimension (n) :: x
+      Real (Kind=jprb), Dimension (n) :: cof
+   End Subroutine rttov_polcoe
+End Interface

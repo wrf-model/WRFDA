@@ -1,0 +1,92 @@
+Interface
+!+ Fast radiative transfer model.
+!  Cloud package
+!
+SUBROUTINE RTTOVCLD &
+     (knpf, klenpf, klevm,     &
+      ppres, pangl, pangs, ksurf, ksat, knchpf, knpzpf, knout,&
+      kchan, kpol, kprof, pav, psav, pssv, pcvm, pap, paph,   &
+      pemis, ifail, prad, ptb, pradcld, ptbcld, tau, tausfc,  &
+      pradovm, pcldemis, pait, pais)
+!
+!    This software was developed within the context of
+!    the EUMETSAT Satellite Application Facility on
+!    Numerical Weather Prediction (NWP SAF), under the
+!    Cooperation Agreement dated 25 November 1998, between
+!    EUMETSAT and the Met Office, UK, by one or more partners
+!    within the NWP SAF. The partners in the NWP SAF are
+!    the Met Office, ECMWF, KNMI and MeteoFrance.
+!
+!    Copyright 2002, EUMETSAT, All Rights Reserved.
+!
+! Description:
+! to compute multi-channel radiances and brightness
+! temperatures for many profiles in cloudy sky.
+! Compatible with RTTOV8 library but only able to
+! run with coefficients created on RTTOV7 43 pressure levels
+!
+! Method
+! see Saunders et al QJ 1999  for the clear-sky part
+! see comments for cloudy sky part
+!
+! Current Code Owner: SAF NWP
+!
+! History:
+! Version   Date        Comment
+! -------   ----        -------
+!           03/2001     Initial version (F. Chevallier)
+!           19/7/2001   Version for testing RTTOV-7 (R. Saunders)
+!           01/12/2002   Keep compatibility with RTTOV8 (P Brunel)
+!           04/02/2004  Added polairmetry (R Saunders)
+
+! Code Description:
+!   Language:          Fortran 90.
+!   Software Standards: "European Standards for Writing and
+!     Documenting Exchangeable Fortran 90 Code".
+!
+! Declarations:
+! Modules used:
+!
+  Use rttov_const, only :   &
+       errorstatus_warning ,&
+       errorstatus_fatal
+
+  Use rttov_types, only : &
+    rttov_coef           ,&
+    geometry_Type        ,&
+    profile_type         ,&
+    profile_cloud_type   ,&
+    radiance_cloud_type
+
+  USE MOD_CPARAM, ONLY : &
+  njpnsat  ,&   ! Total max sats to be used
+  njplev   ,&   ! No. of pressure levels
+  njpnav   ,&   ! No. of profile variables
+  njpnsav  ,&   ! No. of surface air variables
+  njpnssv  ,&   ! No. of skin variables
+  q_mixratio_to_ppmv  ,&
+  o3_mixratio_to_ppmv ,&
+  coef
+
+  Use parkind1, Only : jpim     ,jprb
+  IMPLICIT NONE
+
+  Integer(Kind=jpim) , INTENT(in) :: knpf           ! Number of profiles
+  Integer(Kind=jpim) , INTENT(in) :: klenpf         ! Length of input  profile vectors
+  Integer(Kind=jpim) , INTENT(in) :: ksat           ! Satellite index (see rttvi)
+  Integer(Kind=jpim) , INTENT(in) :: knchpf         ! Number of output radiances
+                                         !    (= channels used * profiles)
+  Integer(Kind=jpim) , INTENT(in) :: klevm          ! Number of model (native) levels
+
+  Integer(Kind=jpim) , INTENT(in) :: kchan(knchpf)  ! Channel indices
+  Integer(Kind=jpim) , INTENT(in) :: kprof(knchpf)  ! Profiles indices
+  Integer(Kind=jpim) , INTENT(in) :: ksurf(knpf)    ! Surface type index
+  Real(Kind=jprb)    , INTENT(in) :: ppres(njplev)  ! Pressure levels (hpa) of
+                                         !   atmospheric profile vectors
+
+  INTEGER(Kind=jpim) , INTENT(in) :: knpzpf         ! Number of output radiances
+  INTEGER(Kind=jpim) , INTENT(in) :: knout         ! Number of output radiances
+  INTEGER(Kind=jpim) , INTENT(in) :: kpol(knchpf, 3)! Polarisation indices
+
+END SUBROUTINE RTTOVCLD
+End Interface

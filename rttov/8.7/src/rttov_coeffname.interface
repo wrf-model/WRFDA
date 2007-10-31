@@ -1,0 +1,25 @@
+Interface
+!
+Subroutine rttov_coeffname (errorstatus, instrument, coeffname, lbinary)
+  Use rttov_const, Only :   &
+       errorstatus_success ,&
+       errorstatus_fatal   ,&
+       nplatforms          ,&
+       ninst               ,&
+       inst_name           ,&
+       platform_name
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+
+  Integer(Kind=jpim), Intent (in) :: instrument(3)  ! (platform, sat_id, inst) numbers
+  Logical, Optional, Intent (in) :: lbinary        ! if binary file wanted
+
+  Integer(Kind=jpim), Intent (out)       :: errorstatus! return code
+  Character (*), Intent (out) :: coeffname  ! filename of the coefficient file
+
+
+
+End Subroutine rttov_coeffname
+End Interface

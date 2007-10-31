@@ -1,0 +1,53 @@
+INTERFACE
+Subroutine rttov_scatt(&
+ & errorstatus,&
+ & nwp_levels,&
+ & nrt_levels,&
+ & nfrequencies,&
+ & nchannels,&
+ & nbtout,&
+ & nprofiles,&
+ & polarisations,&
+ & channels,&
+ & frequencies,&
+ & lprofiles,&
+ & lsprofiles,&
+ & profiles,&
+ & cld_profiles,&
+ & coef_rttov,&
+ & coef_scatt,&
+ & calcemiss,&
+ & emissivity_in,&
+ & cld_radiance ) 
+ Use rttov_types, Only :&
+ & rttov_coef ,&
+ & rttov_scatt_coef ,&
+ & geometry_Type ,&
+ & profile_Type ,&
+ & profile_cloud_Type ,&
+ & profile_scatt_aux ,&
+ & transmission_Type ,&
+ & radiance_Type ,&
+ & radiance_cloud_Type 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nrt_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nfrequencies
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent (in) :: nbtout
+ Integer (Kind=jpim), Intent (in) :: channels (nfrequencies)
+ Integer (Kind=jpim), Intent (in) :: frequencies (nchannels)
+ Integer (Kind=jpim), Intent (in) :: polarisations (nchannels,3)
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nfrequencies)
+ Integer (Kind=jpim), Intent (in) :: lsprofiles (nchannels)
+ Integer (Kind=jpim), Intent (out) :: errorstatus (nprofiles)
+ Logical, Intent (in) :: calcemiss (nchannels)
+ Real (Kind=jprb), Intent (in) :: emissivity_in (nchannels)
+ Type (profile_Type), Intent (inout) :: profiles (nprofiles)
+ Type (rttov_coef), Intent (in) :: coef_rttov
+ Type (rttov_scatt_coef), Intent (in) :: coef_scatt
+ Type (profile_cloud_Type), Intent (in) :: cld_profiles (nprofiles)
+ Type (radiance_cloud_Type), Intent (inout) :: cld_radiance
+End Subroutine rttov_scatt
+END INTERFACE

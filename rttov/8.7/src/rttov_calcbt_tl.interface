@@ -1,0 +1,30 @@
+Interface
+Subroutine rttov_calcbt_tl( &
+         nfrequencies,  & ! in
+         nchannels,     & ! in
+         channels,      & ! in
+         polarisations, & ! in
+         coeffs,        & ! in
+         rad,           & ! in
+         rad_tl         ) ! inout
+
+   Use rttov_types, only : &
+       rttov_coef     ,&
+       radiance_type
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+  Integer(Kind=jpim), Intent(in) :: nfrequencies
+  Integer(Kind=jpim), Intent(in) :: nchannels
+  Integer(Kind=jpim), Intent(in) :: channels(nfrequencies)
+  Integer(Kind=jpim), Intent(in) :: polarisations(nchannels,3)
+  Type(rttov_coef),    Intent(in)    :: coeffs
+  Type(radiance_Type), Intent(in)    :: rad  ! rad%total rad%clear
+  Type(radiance_Type), Intent(inout) :: rad_tl
+      ! input  rad_tl%total  and rad_tl%clear
+      ! output rad_tl%bt     and rad_tl%bt_clear
+
+
+
+End Subroutine rttov_calcbt_tl
+End Interface

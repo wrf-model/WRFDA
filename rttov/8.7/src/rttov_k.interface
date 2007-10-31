@@ -1,0 +1,73 @@
+Interface
+!
+Subroutine rttov_k( &
+     errorstatus,   & ! out
+     nfrequencies,  & ! in
+     nchannels,     & ! in
+     nbtout,        & ! in
+     nprofiles,     & ! in
+     channels,      & ! in
+     polarisations, & ! in
+     lprofiles,     & ! in
+     profiles,      & ! in
+     coef,          & ! in
+     addcloud,      & ! in
+     switchrad,     & ! in
+     calcemis,      & ! in
+     emissivity,    & ! inout  direct model
+     profiles_k,    & ! inout  K mat on profile variables
+     emissivity_k,  & ! inout  K mat on surface emissivity
+     transmission,  & ! inout  K model
+     transmission_k,& ! inout  K input
+     radiancedata,  & ! inout  direct model   (input due to pointers alloc)
+     radiance_k     ) ! inout OPTIONAL K radiances
+  Use rttov_const, Only :   &
+       errorstatus_success ,&
+       errorstatus_warning ,&
+       errorstatus_fatal   ,&
+       max_optical_depth   ,&
+       sensor_id_mw        ,&
+       sensor_id_ir
+
+  Use rttov_types, Only : &
+       rttov_coef     ,&
+       profile_Type   ,&
+       geometry_Type  ,&
+       predictors_Type,&
+       profile_aux    ,&
+       transmission_Type  ,&
+       radiance_Type  ,&
+       radiance_aux
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+     !subroutine arguments:
+  Integer(Kind=jpim),      Intent(in)    :: nfrequencies
+  Integer(Kind=jpim),      Intent(in)    :: nchannels
+  Integer(Kind=jpim),      Intent(in)    :: nbtout
+  Integer(Kind=jpim),      Intent(in)    :: nprofiles
+  Integer(Kind=jpim),      Intent(in)    :: channels(nfrequencies)
+  Integer(Kind=jpim),      Intent(in)    :: polarisations(nchannels,3)
+  Integer(Kind=jpim),      Intent(in)    :: lprofiles(nfrequencies)
+  Logical,                 Intent(in)    :: addcloud
+  Logical,                 Intent(in)    :: switchrad  ! true if input is BT
+  Type(profile_Type),      Intent(in)    :: profiles(nprofiles)
+  Type(rttov_coef),        Intent(in)    :: coef
+  Logical,                 Intent(in)    :: calcemis(nchannels)
+  Integer(Kind=jpim),      Intent(out)   :: errorstatus(nprofiles)
+  Real(Kind=jprb),         Intent(inout) :: emissivity(nchannels)
+  Type(transmission_Type), Intent(inout) :: transmission! in because of meme allocation
+  Type(radiance_Type),     Intent(inout) :: radiancedata! in because of meme allocation
+
+
+  Type(profile_Type),      Intent(inout) :: profiles_k(nchannels)
+  Real(Kind=jprb),         Intent(inout) :: emissivity_k(nchannels)
+  Type(transmission_Type), Intent(inout) :: transmission_k ! in because of meme allocation
+  Type(radiance_Type),     Intent(inout), optional :: radiance_k
+
+
+
+
+End Subroutine rttov_k
+End Interface

@@ -1,0 +1,47 @@
+Interface
+Subroutine rttov_calcrad_ad( &
+     nfrequencies,   & ! in
+     nchannels,      & ! in
+     nprofiles,      & ! in
+     channels,       & ! in
+     polarisations,  & ! in
+     lprofiles,      & ! in
+     profiles,       & ! in
+     profiles_ad,    & ! inout
+     coeffs,         & ! in
+     rad_skin,       & ! in
+     rad_surfair,    & ! in
+     rad_layer,      & ! in
+     rad_skin_ad,    & ! in
+     rad_surfair_ad, & ! in
+     rad_layer_ad    ) ! in
+
+  Use rttov_types, only : &
+    rttov_coef     ,&
+    profile_type
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+  Integer(Kind=jpim),  Intent(in)    :: nprofiles
+  Type(profile_Type),  Intent(in) ,Target   :: profiles(nprofiles)
+  Type(profile_Type),  Intent(inout) ,Target   :: profiles_ad(nprofiles)
+  Type(rttov_coef),    Intent(in)    :: coeffs
+
+  Integer(Kind=jpim),  Intent(in)    :: nfrequencies  ! Number of processed radiances
+  Integer(Kind=jpim),  Intent(in)    :: nchannels
+  Integer(Kind=jpim),  Intent(in)    :: channels(nfrequencies)
+  Integer(Kind=jpim),  Intent(in)    :: polarisations(nchannels,3)  ! Array of channel indices.
+  Integer(Kind=jpim),  Intent(in)    :: lprofiles(nfrequencies)
+  Real(Kind=jprb),    Intent(in) :: rad_skin(nchannels)
+  Real(Kind=jprb),    Intent(in) :: rad_surfair(nchannels)
+  Real(Kind=jprb),    Intent(in) :: rad_layer( coeffs%nlevels , nchannels )
+
+  Real(Kind=jprb),    Intent(in) :: rad_skin_ad(nchannels)
+  Real(Kind=jprb),    Intent(in) :: rad_surfair_ad(nchannels)
+  Real(Kind=jprb),    Intent(in) :: rad_layer_ad( coeffs%nlevels , nchannels )
+
+
+
+End Subroutine rttov_calcrad_ad
+End Interface

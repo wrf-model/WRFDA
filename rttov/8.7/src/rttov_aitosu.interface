@@ -1,0 +1,34 @@
+Interface
+!
+Subroutine rttov_aitosu (  &
+     & nfrequencies,   &   ! in
+     & nchannels,      &   ! in
+     & nprofiles,      &   ! in
+     & nlevels,        &   ! in
+     & polarisations,  &   ! in
+     & lprofiles,      &   ! in
+     & overlap_scheme, &   ! in
+     & profiles,       &   ! in  (cloud cover)
+     & radiance)           ! inout  (cldemis input and
+                           ! cs_wtao, cs_wsurf, wtao, wsurf in output)
+  Use rttov_types, Only :    &
+       profile_cloud_Type   ,&
+       radiance_cloud_Type
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+  Integer(Kind=jpim),        Intent(in)    :: nchannels
+  Integer(Kind=jpim),        Intent(in)    :: nfrequencies
+  Integer(Kind=jpim),        Intent(in)    :: nprofiles
+  Integer(Kind=jpim),        Intent(in)    :: nlevels
+  Integer(Kind=jpim),        Intent(in)    :: polarisations(nchannels,3)
+  Integer(Kind=jpim),        Intent(in)    :: lprofiles(nfrequencies)
+  Integer(Kind=jpim),        Intent(in)    :: overlap_scheme
+  Type(profile_cloud_Type),  Intent(in)    :: profiles(nprofiles)
+  Type(radiance_cloud_Type), Intent(inout) :: radiance
+
+
+
+End Subroutine rttov_aitosu
+End Interface

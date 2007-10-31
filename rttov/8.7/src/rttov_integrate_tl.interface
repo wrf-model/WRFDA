@@ -1,0 +1,73 @@
+Interface
+Subroutine rttov_integrate_tl( &
+     addcloud,     & ! in
+     addcosmic,    & ! in
+     nfrequencies, & ! in
+     nchannels,    & ! in
+     nbtout,       & ! in
+     nprofiles,    & ! in
+     geometry,     & ! in
+     channels,     & ! in
+     polarisations,& ! in
+     lprofiles,    & ! in
+     emissivity,   & ! in
+     emissivity_tl,   & ! in
+     reflectivity,    & ! in
+     reflectivity_tl, & ! in
+     transmission,    & ! in
+     transmission_tl, & ! in
+     profiles,        & ! in
+     profiles_tl,     & ! in
+     aux_prof,        & ! in
+     aux_prof_tl,     & ! in
+     coef,            & ! in
+     rad ,            & ! in
+     auxrad ,         & ! in
+     rad_tl           ) ! inout
+
+  Use rttov_types, Only : &
+       rttov_coef     ,&
+       profile_Type   ,&
+       profile_aux    ,&
+       transmission_Type  ,&
+       radiance_Type  ,&
+       radiance_aux  ,&
+       geometry_Type
+
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+
+  Logical,             Intent(in)    :: addcloud
+  Logical,             Intent(in)    :: addcosmic
+  Integer(Kind=jpim),  Intent(in)    :: nchannels
+  Integer(Kind=jpim),  Intent(in)    :: nfrequencies
+  Integer(Kind=jpim),  Intent(in)    :: nbtout
+  Integer(Kind=jpim),  Intent(in)    :: nprofiles
+  Integer(Kind=jpim),  Intent(in)    :: channels(nfrequencies)
+  Integer(Kind=jpim),  Intent(in)    :: polarisations(nchannels,3)
+  Integer(Kind=jpim),  Intent(in)    :: lprofiles(nfrequencies)
+  Real(Kind=jprb),     Intent(in)    :: emissivity(nchannels)
+  Real(Kind=jprb),     Intent(in)    :: reflectivity(nchannels)
+  Type(geometry_Type), Intent(in) ,Target   :: geometry(nprofiles)
+  Type(rttov_coef),    Intent(in)    :: coef
+  Type(profile_Type),  Intent(in) ,Target   :: profiles(nprofiles)
+  Type(profile_aux) ,  Intent(in) ,Target   :: aux_prof(nprofiles)
+  Type(transmission_Type), Intent(in):: transmission
+  Type(radiance_Type), Intent(in)    :: rad
+  Type(radiance_aux),  Intent(in)    :: auxrad
+
+  Real(Kind=jprb),     Intent(in)    :: emissivity_tl(nchannels)
+  Real(Kind=jprb),     Intent(in)    :: reflectivity_tl(nchannels)
+  Type(profile_Type),  Intent(in) ,Target   :: profiles_tl(nprofiles)
+  Type(profile_aux) ,  Intent(in) ,Target   :: aux_prof_tl(nprofiles)
+  Type(transmission_Type), Intent(in):: transmission_tl
+  Type(radiance_Type), Intent(inout)   :: rad_tl ! in because of mem allocation
+
+
+
+
+
+End Subroutine rttov_integrate_tl
+End Interface

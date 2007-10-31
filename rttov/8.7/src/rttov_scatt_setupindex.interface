@@ -1,0 +1,25 @@
+INTERFACE
+    subroutine rttov_scatt_setupindex (nprofiles, n_chan, coef, nchannels, &
+				     & lsprofiles,lsprofiles2, frequencies, nbtout)
+
+    use parkind1     , only: jpim, jprb
+    
+    use rttov_const, only : npolar_return, npolar_compute, &
+                          & inst_id_ssmi
+    use rttov_types, only : rttov_coef   
+        
+    implicit none
+    
+    integer (kind=jpim), intent ( in) :: nprofiles
+    integer (kind=jpim), intent ( in) :: nchannels
+    integer (kind=jpim), intent ( in) :: nbtout
+    integer (kind=jpim), intent ( in) :: n_chan (nprofiles)
+    
+    type   (rttov_coef), intent ( in) :: coef   
+    
+    integer (kind=jpim), intent (out), dimension (nchannels)    :: lsprofiles   
+    integer (kind=jpim), intent (out), dimension (nbtout)       :: lsprofiles2  
+    integer (kind=jpim), intent (out), dimension (nchannels)    :: frequencies
+
+    end subroutine rttov_scatt_setupindex
+END INTERFACE
