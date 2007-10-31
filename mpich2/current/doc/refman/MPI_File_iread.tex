@@ -1,0 +1,31 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}iread}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}iread}
+--- Nonblocking read using individual file pointer 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+#ifdef HAVE_MPI_GREQUEST
+#include "mpiu_greq.h"
+
+#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
+typedef struct iread_args
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\startarg{count }{number of elements in buffer (nonnegative integer)
+}
+\startarg{datatype }{datatype of each buffer element (handle)
+}
+\par
+\subhead{Output Parameters}
+\startarg{buf }{initial address of buffer (choice)
+}
+\startarg{request }{request object (handle)
+}
+\par
+\location{iread.c}
+\endmanpage

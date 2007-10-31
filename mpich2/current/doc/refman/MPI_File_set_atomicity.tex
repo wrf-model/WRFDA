@@ -1,0 +1,19 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}set{\tt \char`\_}atomicity}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}set{\tt \char`\_}atomicity}
+--- Sets the atomicity mode 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_File_set_atomicity(MPI_File mpi_fh, int flag)
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\startarg{flag }{true to set atomic mode, false to set nonatomic mode (logical)
+}
+\par
+\location{set{\tt \char`\_}atom.c}
+\endmanpage

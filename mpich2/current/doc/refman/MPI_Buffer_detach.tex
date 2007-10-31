@@ -1,0 +1,94 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}Buffer{\tt \char`\_}detach}{tex}{5/8/2006}
+\manname{MPI{\tt \char`\_}Buffer{\tt \char`\_}detach}
+--- Removes an existing buffer (for use in MPI{\tt \char`\_}Bsend etc) 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_Buffer_detach(void *buffer, int *size)
+
+\end{verbatim}
+\endvb
+
+\subhead{Output Parameters}
+\startarg{buffer }{initial buffer address (choice) 
+}
+\startarg{size }{buffer size, in bytes (integer) 
+}
+\par
+\subhead{Notes}
+The reason that {\tt MPI{\tt \char`\_}Buffer{\tt \char`\_}detach} returns the address and size of the
+buffer being detached is to allow nested libraries to replace and restore
+the buffer.  For example, consider
+\par
+\begin{verbatim}
+    int size, mysize, idummy;
+    void *ptr, *myptr, *dummy;     
+    MPI_Buffer_detach( &ptr, &size );
+    MPI_Buffer_attach( myptr, mysize );
+    ...
+    ... library code ...
+    ...
+    MPI_Buffer_detach( &dummy, &idummy );
+    MPI_Buffer_attach( ptr, size );
+\end{verbatim}
+
+\par
+This is much like the action of the Unix signal routine and has the same
+strengths (it is simple) and weaknesses (it only works for nested usages).
+\par
+Note that for this approach to work, MPI{\tt \char`\_}Buffer{\tt \char`\_}detach must return MPI{\tt \char`\_}SUCCESS
+even when there is no buffer to detach.  In that case, it returns a size of
+zero.  The MPI 1.1 standard for {\tt MPI{\tt \char`\_}BUFFER{\tt \char`\_}DETACH} contains the text
+\par
+\begin{verbatim}
+   The statements made in this section describe the behavior of MPI for
+   buffered-mode sends. When no buffer is currently associated, MPI behaves 
+   as if a zero-sized buffer is associated with the process.
+\end{verbatim}
+
+\par
+This could be read as applying only to the various Bsend routines.  This
+implementation takes the position that this applies to {\tt MPI{\tt \char`\_}BUFFER{\tt \char`\_}DETACH
+}as well.
+\par
+\subhead{Thread and Interrupt Safety}
+\par
+The user is responsible for ensuring that multiple threads do not try to
+update the same MPI object from different threads.  This routine should
+not be used from within a signal handler.
+\par
+The MPI standard defined a thread-safe interface but this does not
+mean that all routines may be called without any thread locks.  For
+example, two threads must not attempt to change the contents of the
+same {\tt MPI{\tt \char`\_}Info} object concurrently.  The user is responsible in this
+case for using some mechanism, such as thread locks, to ensure that
+only one thread at a time makes use of this routine.
+Because the buffer for buffered sends (e.g., {\tt MPI{\tt \char`\_}Bsend}) is shared by all
+threads in a process, the user is responsible for ensuring that only
+one thread at a time calls this routine or {\tt MPI{\tt \char`\_}Buffer{\tt \char`\_}attach}.
+\par
+\subhead{Notes for Fortran}
+All MPI routines in Fortran (except for {\tt MPI{\tt \char`\_}WTIME} and {\tt MPI{\tt \char`\_}WTICK}) have
+an additional argument {\tt ierr} at the end of the argument list.  {\tt ierr
+}is an integer and has the same meaning as the return value of the routine
+in C.  In Fortran, MPI routines are subroutines, and are invoked with the
+{\tt call} statement.
+\par
+All MPI objects (e.g., {\tt MPI{\tt \char`\_}Datatype}, {\tt MPI{\tt \char`\_}Comm}) are of type {\tt INTEGER
+}in Fortran.
+\par
+The Fortran binding for this routine is different.  Because Fortran
+does not have pointers, it is impossible to provide a way to use the
+output of this routine to exchange buffers.  In this case, only the
+size field is set.
+\par
+\subhead{Notes for C}
+Even though the {\tt bufferptr} argument is declared as {\tt void *}, it is
+really the address of a void pointer.  See the rationale in the
+standard for more details.
+\par
+\subhead{See Also}
+ MPI{\tt \char`\_}Buffer{\tt \char`\_}attach
+\nextline
+\location{buffree.c}
+\endmanpage
