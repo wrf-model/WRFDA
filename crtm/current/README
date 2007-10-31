@@ -1,0 +1,7 @@
+On Thursday 4/13/7
+ftp ftp.orbit.nesdis.noaa.gov
+cd cd pub/smcd/spb/qliu/liuzhiquan
+get crtm_src.tar.gz
+
+~
+
