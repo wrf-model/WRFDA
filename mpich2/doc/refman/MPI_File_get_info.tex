@@ -1,0 +1,21 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}get{\tt \char`\_}info}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}get{\tt \char`\_}info}
+--- Returns the hints for a file that are actually being used by MPI 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_File_get_info(MPI_File mpi_fh, MPI_Info *info_used)
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\par
+\subhead{Output Parameters}
+\startarg{info{\tt \char`\_}used }{info object (handle)
+}
+\par
+\location{get{\tt \char`\_}info.c}
+\endmanpage

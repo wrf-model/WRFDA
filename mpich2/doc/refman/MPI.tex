@@ -1,0 +1,85 @@
+\startmanpage
+\mantitle{MPI}{tex}{1/27/2005}
+\manname{MPI}
+--- Introduction to the Message-Passing Interface 
+\subhead{Description}
+\par
+MPI stands for Message Passing Interface.
+MPI is a specification (like C or Fortran) and there are a number of
+implementations.  The rest of this man page describes the use of the MPICH
+implementation of MPI.
+\par
+\subhead{Getting started}
+\par
+Add MPI to your path
+\begin{verbatim}
+        % set path = ( $path /usr/local/mpi/bin )
+\end{verbatim}
+
+for the {\tt csh} and {\tt tcsh} shells, or
+\begin{verbatim}
+        % export path=$path:/usr/local/mpi/bin
+\end{verbatim}
+
+for {\tt sh}, {\tt ksh}, and {\tt bash} shells.
+\par
+Compute pi to a given resolution on 8 processes
+\begin{verbatim}
+        % mpiexec -n 8 /usr/local/mpi/examples/cpi
+\end{verbatim}
+
+\par
+You can compile and link your own MPI programs with the commands {\tt mpicc},
+{\tt mpif77}, {\tt mpicxx}, and {\tt mpif90}:
+\begin{verbatim}
+        % mpicc -o cpi cpi.c
+        % mpif77 -o fpi fpi.f
+        % mpicxx -o cxxpi cxxpi.cxx
+        % mpif790 -o pi3f90 pi3f90.f90
+\end{verbatim}
+
+using the source code from {\em /usr/local/mpi/examples}.
+\par
+\subhead{Documentation}
+\par
+PDF documentation can be found in directory
+{\tt /usr/local/mpi/doc/}.  These include an installation manual ({\tt install.pdf})
+and a user's manual ({\tt usermanual.pdf}).
+\par
+Man pages exist for every MPI subroutine and function.  The man pages are
+also available on the Web at {\tt http://www.mcs.anl.gov/mpi/www}.
+Additional on-line information is available at {\tt http://www.mcs.anl.gov/mpi},
+including a hypertext version of the standard, information on other libraries
+that use MPI, and pointers to other MPI resources.
+\par
+\subhead{Version}
+\par
+MPICH2 version 1.0
+\par
+\subhead{License}
+\par
+Copyright 2002 University of Chicago.
+See the file {\tt COPYRIGHT} for details.  The source code is freely available
+by anonymous ftp from {\tt ftp.mcs.anl.gov} in {\tt pub/mpi/mpich2-beta.tar.gz} .
+\par
+\subhead{Files}
+\par
+\begin{verbatim}
+/usr/local/mpi/                 MPI software directory
+/usr/local/mpi/COPYRIGHT        Copyright notice
+/usr/local/mpi/README           various notes and instructions
+/usr/local/mpi/bin/             binaries, including mpiexec and mpicc
+/usr/local/mpi/examples         elementary MPI programs
+/usr/local/mpi/doc/             documentation
+/usr/local/mpi/include/         include files
+/usr/local/mpi/lib/             library files
+\end{verbatim}
+
+\par
+\subhead{Contact}
+\par
+MPI-specific suggestions and bug reports should
+be sent to {\tt mpich2-maint@mcs.anl.gov}.
+\par
+\location{manpage.txt}
+\endmanpage

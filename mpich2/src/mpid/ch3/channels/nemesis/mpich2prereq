@@ -1,0 +1,5 @@
+#! /bin/sh
+#
+# The nemesis channel does not implement SPAWN (yet)
+echo "Executing mpich2prereq in $devicedir/channels/nemesis"
+MPID_NO_SPAWN=yes

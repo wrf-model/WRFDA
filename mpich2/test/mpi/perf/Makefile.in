@@ -1,0 +1,84 @@
+# This Makefile.in created by simplemake.  Do not edit
+
+# @configure_input@
+
+# --------------------------------------------------------------------------
+all: all-redirect
+
+SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
+abs_builddir    = @abs_builddir@
+srcdir          = @srcdir@
+abs_srcdir      = @abs_srcdir@
+DEFS            = @DEFS@ -I. -I${srcdir}
+CPPFLAGS        = @CPPFLAGS@
+LIBS            = @LIBS@
+MAKE            = @MAKE@
+CC              = @CC@
+CFLAGS          = @CFLAGS@
+C_COMPILE       = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+C_LINK         = $(CC)
+LDFLAGS     =  @LDFLAGS@ 
+
+VPATH = .:@srcdir@
+INCLUDES = -I../include -I${srcdir}/../include
+
+.SUFFIXES:
+.SUFFIXES: .o .c 
+.c.o:
+	$(C_COMPILE) -c $<
+.c:
+	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
+apply: 
+	$(ACTION) $(ACTION_INPUT)
+clean: 
+	-@rm -f *.o ${srcdir}/*.o dtpack sendrecvl twovec transp-datatype
+	-@rm -f dtpack.exe sendrecvl.exe twovec.exe transp-datatype.exe
+	-@rm -f core core.[0-9]*
+	-@rm -f *.lo ${srcdir}/*.lo
+	-@rm -f *.irlog*
+distclean:  clean distclean-xxx remove-makefile
+distclean-xxx:
+	-@rm -f Makefile
+	-@rm -rf autom4te*.cache
+	-@rm -rf $(DEPS_DIR)
+	-@rm -f TAGS
+remove-makefile:
+	rm -f Makefile
+remove-genmakefiles:
+	rm -f  Makefile
+all-redirect: transp-datatype sendrecvl twovec dtpack
+
+dtpack: dtpack.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o dtpack dtpack.o  ${LIBS}
+sendrecvl: sendrecvl.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o sendrecvl sendrecvl.o  ${LIBS}
+twovec: twovec.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o twovec twovec.o  ${LIBS}
+transp-datatype: transp-datatype.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o transp-datatype transp-datatype.o  \
+	${LIBS} 
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+SOURCES         =  transp-datatype.c sendrecvl.c twovec.c dtpack.c
+ETAGS           = @ETAGS@ @ETAGSADD@
+HEADERFILES     = $(HEADERS)
+SOURCEFILES     = $(SOURCES)
+tags: TAGS
+TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
+	here=`cd ../../.. && pwd` ; cd ${srcdir} && $(ETAGS) -o $$here/TAGS --append ${HEADERFILES} ${SOURCEFILES}
+# --------------------------------------------------------------------------
+
+
+# A special testing target to simplify running just the performance tests
+testing:
+	../runtests -srcdir=$(srcdir) -tests=testlist \
+		   -mpiexec=$(bindir)/mpiexec \
+		   -xmlfile=summary.xml
+
+
+FORCE_TARGET:
+

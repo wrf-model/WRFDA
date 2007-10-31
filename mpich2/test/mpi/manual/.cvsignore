@@ -1,0 +1,15 @@
+*.vcproj
+*.o
+*.bb
+*.bbg
+*.da
+*.gcov
+Makefile.in
+Makefile
+singjoin
+testconnect
+manyconnect
+test-port
+.deps
+*ebug
+*elease

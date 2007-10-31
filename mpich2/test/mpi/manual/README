@@ -1,0 +1,15 @@
+This directory contains programs and tests that need to be run by
+a human being rather than a script.  Instructions on running each test
+are in the test file at the top.
+
+singjoin - A test of Comm_join, including a test of comm_join by singleton
+           processes
+
+testconnect - A test of Comm_connect and Comm_accept, with many processes.
+              Use the script manyconnect to run them, as in
+
+make testconnect
+./manyconnect
+
+
+
