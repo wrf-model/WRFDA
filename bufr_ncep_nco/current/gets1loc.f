@@ -7,47 +7,67 @@ C   PRGMMR: ATOR             ORG: NP12       DATE: 2005-11-29
 C
 C ABSTRACT: THIS SUBROUTINE RETURNS THE LOCATION (I.E. STARTING BYTE
 C   AND BIT WIDTH) OF A SPECIFIED VALUE WITHIN SECTION 1 OF A BUFR
-C   MESSAGE ENCODED ACCORDING TO A SPECIFIED BUFR EDITION.  THE VALUE
-C   FOR WHICH THE LOCATION IS TO BE DETERMINED IS SPECIFIED VIA THE
-C   MNEMONIC S1MNEM, AS EXPLAINED IN FURTHER DETAIL BELOW.
+C   MESSAGE ENCODED ACCORDING TO A SPECIFIED BUFR EDITION.  IT WILL
+C   WORK ON ANY MESSAGE ENCODED USING BUFR EDITION 2, 3 OR 4.  THE
+C   VALUE FOR WHICH THE LOCATION IS TO BE DETERMINED IS SPECIFIED VIA
+C   THE MNEMONIC S1MNEM, AS EXPLAINED IN FURTHER DETAIL BELOW.
 C
 C PROGRAM HISTORY LOG:
 C 2005-11-29  J. ATOR    -- ORIGINAL AUTHOR
+C 2006-04-14  D. KEYSER  -- ADDED OPTIONS FOR 'YCEN' AND 'CENT'
 C
 C USAGE:    GETS1LOC ( S1MNEM, IBEN, ISBYT, IWID, IRET )
 C   INPUT ARGUMENT LIST:
-C     S1MNEM   - CHARACTER*(*): MNEMONIC SPECIFYING VALUE WHOSE LOCATION
-C                WITHIN SECTION 1 IS TO BE DETERMINED:
+C     S1MNEM   - CHARACTER*(*): MNEMONIC SPECIFYING VALUE WHOSE
+C                LOCATION WITHIN SECTION 1 IS TO BE DETERMINED:
 C                  'LEN1'  = LENGTH (IN BYTES) OF SECTION 1
 C                  'BMT'   = BUFR MASTER TABLE 
 C                  'OGCE'  = ORIGINATING CENTER
 C                  'GSES'  = ORIGINATING SUBCENTER
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 3 OR 4 MESSAGES!)
+C                              (NOTE: THIS VALUE IS PRESENT ONLY IN
+C                                     BUFR EDITION 3 OR 4 MESSAGES!)
 C                  'USN'   = UPDATE SEQUENCE NUMBER 
 C                  'ISC2'  = FLAG INDICATING ABSENCE/PRESENCE OF
 C                            (OPTIONAL) SECTION 2 IN BUFR MESSAGE:
+C                              0 = SECTION 2 ABSENT
+C                              1 = SECTION 2 PRESENT
 C                  'MTYP'  = DATA CATEGORY 
-C                  'MSBT'  = DATA SUBCATEGORY (LOCAL)
 C                  'MSBTI' = DATA SUBCATEGORY (INTERNATIONAL)
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE IS PRESENT ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'MSBT'  = DATA SUBCATEGORY (LOCAL)
 C                  'MTV'   = VERSION NUMBER OF MASTER TABLE
 C                  'MTVL'  = VERSION NUMBER OF LOCAL TABLES
-C                  'YEAR'  = YEAR
+C                  'YCEN'  = YEAR OF CENTURY (1-100)
+C                              (NOTE: THIS VALUE IS PRESENT ONLY IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES!)
+C                  'CENT'  = CENTURY (I.E., 20 FOR YEARS 1901-2000,
+C                                           21 FOR YEARS 2001-2100)
+C                              (NOTE: THIS VALUE *MAY* BE PRESENT IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES,
+C                                     BUT IT IS NEVER PRESENT IN ANY
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'YEAR'  = YEAR (4-DIGIT)
+C                              (NOTE: THIS VALUE IS PRESENT ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
 C                  'MNTH'  = MONTH
 C                  'DAYS'  = DAY
 C                  'HOUR'  = HOUR
 C                  'MINU'  = MINUTE
 C                  'SECO'  = SECOND
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE IS PRESENT ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
 C     IBEN     - INTEGER: BUFR EDITION NUMBER
 C
 C
 C   OUTPUT ARGUMENT LIST:
-C     ISBYT    - INTEGER: NUMBER OF STARTING BYTE WITHIN SECTION 1 WHICH
-C                CONTAINS VALUE CORRESPONDING TO S1MNEM
+C     ISBYT    - INTEGER: NUMBER OF STARTING BYTE WITHIN SECTION 1
+C                WHICH CONTAINS VALUE CORRESPONDING TO S1MNEM
+C                   (NOTE: ISBYT IS ALWAYS RETURNED AS 18 WHENEVER
+C                          S1MNEM = 'CENT' AND IBEN = 2 OR 3; IN SUCH
+C                          CASES IT IS THEN UP TO THE CALLING ROUTINE
+C                          TO DETERMINE WHETHER THIS LOCATION ACTUALLY
+C                          CONTAINS A VALID CENTURY VALUE!)
 C     IWID     - INTEGER: WIDTH (IN BITS) OF VALUE CORRESPONDING
 C                TO S1MNEM
 C     IRET     - INTEGER: RETURN CODE
@@ -84,6 +104,10 @@ C-----------------------------------------------------------------------
 	    IF(IBEN.EQ.3) THEN
 		ISBYT = 6 
 	    ELSE
+
+C               Note that this location is actually the same for both
+C               Edition 2 *and* Edition 4 of BUFR!
+
 		ISBYT = 5
 		IWID = 16
 	    ENDIF
@@ -144,7 +168,19 @@ C-----------------------------------------------------------------------
 		ISBYT = 16
 		IWID = 16
 	    ELSE
+		IRET = -1
+	    ENDIF
+	ELSE IF(S1MNEM.EQ.'YCEN') THEN
+	    IF(IBEN.LT.4) THEN
 		ISBYT = 13
+	    ELSE
+		IRET = -1
+	    ENDIF
+	ELSE IF(S1MNEM.EQ.'CENT') THEN
+	    IF(IBEN.LT.4) THEN
+		ISBYT = 18
+	    ELSE
+		IRET = -1
 	    ENDIF
 	ELSE IF(S1MNEM.EQ.'MNTH') THEN
 	    IF(IBEN.EQ.4) THEN

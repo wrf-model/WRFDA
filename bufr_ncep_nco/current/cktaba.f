@@ -43,6 +43,9 @@ C                           IRET RETURNED AS 11 (BEFORE WAS UNDEFINED)
 C 2004-08-09  J. ATOR    -- MAXIMUM MESSAGE LENGTH INCREASED FROM
 C                           20,000 TO 50,000 BYTES
 C 2005-11-29  J. ATOR    -- USE IUPBS01, IGETDATE AND GETLENS
+C 2006-04-14  J. ATOR    -- ALLOW "FRtttsss" AND "FNtttsss" AS POSSIBLE
+C                           TABLE A MNEMONICS, WHERE ttt IS THE BUFR
+C                           TYPE AND sss IS THE BUFR SUBTYPE
 C
 C USAGE:    CALL CKTABA (LUN, SUBSET, JDATE, IRET)
 C   INPUT ARGUMENT LIST:
@@ -89,8 +92,12 @@ C$$$
 
       CHARACTER*128 BORT_STR
       CHARACTER*8   SUBSET
+      CHARACTER*2   CPFX(3)
       CHARACTER*1   TAB
       LOGICAL       TRYBT, DIGIT
+
+      DATA CPFX   / 'NC', 'FR', 'FN' /
+      DATA NCPFX  / 3 /
 
 C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
@@ -156,8 +163,8 @@ c  .... get SUBSET from ISUB
 5     CALL NUMTAB(LUN,ISUB,SUBSET,TAB,ITAB)
 c  .... is SUBSET from Tbl A?
       CALL NEMTBAX(LUN,SUBSET,MTY1,MSB1,INOD)
-c  .... yes it is
       IF(INOD.GT.0) THEN
+c  .... yes it is
          MBYT(LUN) = (IAD4+4)
          MSGUNP(LUN) = 0
          GOTO 10
@@ -170,31 +177,36 @@ c  .... get SUBSET from KSUB
       CALL NUMTAB(LUN,KSUB,SUBSET,TAB,ITAB)
 c  .... is SUBSET from Tbl A?
       CALL NEMTBAX(LUN,SUBSET,MTY1,MSB1,INOD)
-c  .... yes it is
       IF(INOD.GT.0) THEN
+c  .... yes it is
          MBYT(LUN) = 8*(IAD4+4)
          MSGUNP(LUN) = 1
          GOTO 10
       ENDIF
 
 C  OKAY, STILL NO "SUBSET", LETS MAKE IT "NCtttsss" (where ttt=MTYP
-C  and sss=MSBT) AND SEE IF IT DEFINES TABLE A
+C  and sss=MSBT) AND SEE IF IT DEFINES TABLE A.  IF NOT, THEN ALSO
+C  TRY "FRtttsss" AND "FNtttsss".
 C  ----------------------------------------------------------------
 
-      WRITE(SUBSET,'("NC",2I3.3)') MTYP,MSBT
-c  .... is SUBSET from Tbl A?
-      CALL NEMTBAX(LUN,SUBSET,MTY1,MSB1,INOD)
-c  .... yes it is, and KSUB byte count descr.
-      IF(INOD.GT.0 .AND. KSUB.EQ.IBCT) THEN
-         MBYT(LUN) = (IAD4+4)
-         MSGUNP(LUN) = 0
-         GOTO 10
-      ELSEIF(INOD.GT.0) THEN
-c  .... yes it is
-         MBYT(LUN) = 8*(IAD4+4)
-         MSGUNP(LUN) = 1
-         GOTO 10
-      ENDIF
+      II=1
+      DO WHILE(II.LE.NCPFX)
+         WRITE(SUBSET,'(A2,2I3.3)') CPFX(II),MTYP,MSBT
+c  ....    is SUBSET from Tbl A?
+         CALL NEMTBAX(LUN,SUBSET,MTY1,MSB1,INOD)
+         IF(INOD.GT.0) THEN
+c  ....     yes it is
+            IF(KSUB.EQ.IBCT) THEN
+               MBYT(LUN) = (IAD4+4)
+               MSGUNP(LUN) = 0
+            ELSE
+               MBYT(LUN) = 8*(IAD4+4)
+               MSGUNP(LUN) = 1
+            ENDIF
+            GOTO 10
+         ENDIF
+         II=II+1
+      ENDDO
 
 C  NOW WE HAVE A GENERATED "SUBSET", BUT IT STILL DOES NOT DEFINE
 C  TABLE A - MAKE ONE LAST DESPERATE ATTEMPT - SEE IF AN EXTERNAL
@@ -208,15 +220,15 @@ C  ------------------------------------------------------------------
          IF(IPRT.GE.1) THEN
       PRINT*
       PRINT*,'+++++++++++++++++BUFR ARCHIVE LIBRARY++++++++++++++++++++'
-            PRINT*, 'NUFRLIB: CKTABA - LAST RESORT, CHECK FOR EXTERNAL',
+            PRINT*, 'BUFRLIB: CKTABA - LAST RESORT, CHECK FOR EXTERNAL',
      .       ' BUFR TABLE VIA CALL TO IN-LINE OPENBT'
       PRINT*,'+++++++++++++++++BUFR ARCHIVE LIBRARY++++++++++++++++++++'
       PRINT*
          ENDIF
          CALL OPENBT(LUNDX,MTYP)
-c  .... Good news, there is unit no. (LUNDX) connected to a table file
          IF(LUNDX.GT.0) THEN
-c  .... Store the table internally
+c  .... Good news, there is a unit (LUNDX) connected to a table file,
+c  .... so store the table internally
             CALL RDUSDX(LUNDX,LUN)
             GOTO 5
          ENDIF

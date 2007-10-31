@@ -33,6 +33,14 @@ C 2003-11-04  D. KEYSER  -- UNIFIED/PORTABLE FOR WRF; ADDED HISTORY
 C                           DOCUMENTATION; OUTPUTS MORE COMPLETE
 C                           DIAGNOSTIC INFO WHEN ROUTINE TERMINATES
 C                           ABNORMALLY; CHANGED CALL FROM BORT TO BORT2
+C 2006-04-14  D. KEYSER  -- ABORTS IF A USER-DEFINED MESSAGE TYPE "011"
+C                           IS READ (EITHER DIRECTLY FROM A TABLE A
+C                           MNEMONIC OR FROM THE "Y" VALUE OF A TABLE A
+C                           FXY SEQUENCE DESCRIPTOR), MESSAGE TYPE
+C                           "011" IS RESERVED FOR DICTIONARY MESSAGES
+C                           (PREVIOUSLY WOULD STORE DATA WITH MESSAGE
+C                           TYPE "011" BUT SUCH MESSAGES WOULD BE
+C                           SKIPPED OVER WHEN READ)
 C
 C USAGE:    CALL RDUSDX (LUNDX, LUN)
 C   INPUT ARGUMENT LIST:
@@ -174,18 +182,20 @@ c  .... Description
             NTBA(LUN) = N
 
             IF(DIGIT(NEMO(3:8))) THEN
-c  .... Message type & subtype obtained directly from Table A menmonic
+c  .... Message type & subtype obtained directly from Table A mnemonic
                READ(NEMO,'(2X,2I3)') MTYP,MSBT
+               IF(NEMO(3:5).EQ.'011')  GOTO 907
                IDNA(N,LUN,1) = MTYP
                IDNA(N,LUN,2) = MSBT
             ELSE
 c  .... Message type obtained from Y value of Table A seq. descriptor
-c       Message subtype hardwired to ZERO
+               IF(NUMB(4:6).EQ.'011')  GOTO 907
                READ(NUMB(4:6),'(I3)') IDNA(N,LUN,1)
+c  ........ Message subtype hardwired to ZERO
                IDNA(N,LUN,2) = 0
             ENDIF
-c  .... Replace "A" with "3" so Table D descriptor  will be found in
-c       card as well (below)
+c  .... Replace "A" with "3" so Table D descriptor will be found in
+c  .... card as well (below)
             NUMB(1:1) = '3'
 
          ENDIF
@@ -196,7 +206,7 @@ C  ------------------------
          IF(NUMB(1:1).EQ.'0') THEN
 
             N = NTBB(LUN)+1
-            IF(N.GT.NTBB(0)) GOTO 907
+            IF(N.GT.NTBB(0)) GOTO 908
             CALL NENUBD(NEMO,NUMB,LUN)
 c  .... Integer representation of FXY descriptor
             IDNB(N,LUN) = IFXY(NUMB)
@@ -217,7 +227,7 @@ C  ------------------------
          IF(NUMB(1:1).EQ.'3') THEN
 
             N = NTBD(LUN)+1
-            IF(N.GT.NTBD(0)) GOTO 908
+            IF(N.GT.NTBD(0)) GOTO 909
             CALL NENUBD(NEMO,NUMB,LUN)
 c  .... Integer representation of FXY descriptor
             IDND(N,LUN) = IFXY(NUMB)
@@ -257,7 +267,7 @@ C  --------------------------------
 C  CAN'T FIGURE OUT WHAT KIND OF CARD IT IS
 C  ----------------------------------------
 
-      GOTO 909
+      GOTO 910
 
 C  NORMAL ENDING
 C  -------------
@@ -301,14 +311,18 @@ C  -----
      . 'DICTIONARY EXCEEDS THE LIMIT (",I4,")")') NTBA(0)
       CALL BORT2(BORT_STR1,BORT_STR2)
 907   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
+      WRITE(BORT_STR2,'(18X,"USER-DEFINED MESSAGE TYPE ""011"" IS '//
+     . 'RESERVED FOR DICTIONARY MESSAGES")')
+      CALL BORT2(BORT_STR1,BORT_STR2)
+908   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
       WRITE(BORT_STR2,'(18X,"THE NUMBER OF TABLE B ENTRIES IN USER '//
      . 'DICTIONARY EXCEEDS THE LIMIT (",I4,")")') NTBB(0)
       CALL BORT2(BORT_STR1,BORT_STR2)
-908   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
+909   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
       WRITE(BORT_STR2,'(18X,"THE NUMBER OF TABLE D ENTRIES IN USER '//
      . 'DICTIONARY EXCEEDS THE LIMIT (",I4,")")') NTBD(0)
       CALL BORT2(BORT_STR1,BORT_STR2)
-909   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
+910   WRITE(BORT_STR1,'("BUFRLIB: RDUSDX - CARD READ IN IS: ",A)') CARD
       WRITE(BORT_STR2,'(18X,"THIS CARD HAS A BAD FORMAT - IT IS NOT '//
      . 'RECOGNIZED BY THIS SUBROUTINE")')
       CALL BORT2(BORT_STR1,BORT_STR2)

@@ -28,6 +28,7 @@ C   SECTION 0 OR SECTION 1 VALUE FOR THE CORRESPONDING LOCATION!).
 C
 C PROGRAM HISTORY LOG:
 C 2005-11-29  J. ATOR    -- ORIGINAL AUTHOR
+C 2006-04-14  D. KEYSER  -- UPDATED DOCBLOCK
 C
 C USAGE:    CALL PKVS01(S01MNEM,IVAL)
 C   INPUT ARGUMENT LIST:
@@ -38,24 +39,39 @@ C                  'BEN'   = BUFR EDITION NUMBER
 C                  'BMT'   = BUFR MASTER TABLE 
 C                  'OGCE'  = ORIGINATING CENTER
 C                  'GSES'  = ORIGINATING SUBCENTER
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 3 OR 4 MESSAGES!)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 3 OR 4 MESSAGES!)
 C                  'USN'   = UPDATE SEQUENCE NUMBER 
+C                  'MTYP'  = DATA CATEGORY
 C                  'MSBTI' = DATA SUBCATEGORY (INTERNATIONAL)
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'MSBT'  = DATA SUBCATEGORY (LOCAL)
 C                  'MTV'   = VERSION NUMBER OF MASTER TABLE
 C                  'MTVL'  = VERSION NUMBER OF LOCAL TABLES
+C                  'YCEN'  = YEAR OF CENTURY (1-100)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES!)
+C                  'CENT'  = CENTURY (I.E., 20 FOR YEARS 1901-2000,
+C                                           21 FOR YEARS 2001-2100)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES!)
+C                  'YEAR'  = YEAR (4-DIGIT)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'MNTH'  = MONTH
+C                  'DAYS'  = DAY
+C                  'HOUR'  = HOUR
 C                  'MINU'  = MINUTE
 C                  'SECO'  = SECOND
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE WILL BE STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
 C                  'INIT'  = THIS IS A SPECIAL FLAG TO FORCE THE
 C                            INITIALIZATION OF NS01V = 0 WITHIN
 C                            COMMON /S01CM/; IN THIS CASE IVAL IS
 C                            IGNORED
 C                              (NOTE: AN APPLICATION PROGRAM SHOULD
-C                              NEVER ITSELF NEED TO DO THIS!)
+C                                     NEVER ITSELF NEED TO DO THIS!)
 C     IVAL     - INTEGER: NEW VALUE FOR LOCATION POINTED TO BY S01MNEM
 C
 C REMARKS:

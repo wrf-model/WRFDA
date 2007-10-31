@@ -16,6 +16,8 @@ C   S1MNEM, AS EXPLAINED IN FURTHER DETAIL BELOW.
 C
 C PROGRAM HISTORY LOG:
 C 2005-11-29  J. ATOR    -- ORIGINAL AUTHOR
+C 2006-04-14  D. KEYSER  -- ADDED OPTIONS FOR 'MTYP', 'MSBT', 'YEAR',
+C                           'MNTH', 'DAYS', 'HOUR', 'YCEN' AND 'CENT'
 C
 C USAGE:    PKBS1 (IVAL, MBAY, S1MNEM)
 C   INPUT ARGUMENT LIST:
@@ -24,21 +26,36 @@ C     MBAY     - INTEGER: *-WORD PACKED BINARY ARRAY CONTAINING
 C                BUFR MESSAGE PRIOR TO STORING IVAL
 C     S1MNEM   - CHARACTER*(*): MNEMONIC SPECIFYING LOCATION WHERE IVAL
 C                IS TO BE STORED WITHIN SECTION 1 OF BUFR MESSAGE:
-C                  'BMT'   = BUFR MASTER TABLE 
+C                  'BMT'   = BUFR MASTER TABLE
 C                  'OGCE'  = ORIGINATING CENTER
 C                  'GSES'  = ORIGINATING SUBCENTER
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 3 OR 4 MESSAGES!)
-C                  'USN'   = UPDATE SEQUENCE NUMBER 
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 3 OR 4 MESSAGES!)
+C                  'USN'   = UPDATE SEQUENCE NUMBER
+C                  'MTYP'  = DATA CATEGORY
 C                  'MSBTI' = DATA SUBCATEGORY (INTERNATIONAL)
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'MSBT'  = DATA SUBCATEGORY (LOCAL)
 C                  'MTV'   = VERSION NUMBER OF MASTER TABLE
 C                  'MTVL'  = VERSION NUMBER OF LOCAL TABLES
+C                  'YCEN'  = YEAR OF CENTURY (1-100)
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES!)
+C                  'CENT'  = CENTURY (I.E., 20 FOR YEARS 1901-2000,
+C                                           21 FOR YEARS 2001-2100)
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 2 AND 3 MESSAGES!)
+C                  'YEAR'  = YEAR (4-DIGIT)
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
+C                  'MNTH'  = MONTH
+C                  'DAYS'  = DAY
+C                  'HOUR'  = HOUR
 C                  'MINU'  = MINUTE
 C                  'SECO'  = SECOND
-C                              (NOTE: THIS VALUE EXISTS ONLY IN
-C                              BUFR EDITION 4 MESSAGES!)
+C                              (NOTE: THIS VALUE IS STORED ONLY IN
+C                                     BUFR EDITION 4 MESSAGES!)
 C
 C   OUTPUT ARGUMENT LIST:
 C     MBAY     - INTEGER: *-WORD PACKED BINARY ARRAY CONTAINING BUFR
@@ -73,11 +90,15 @@ C	Determine where to store the value.
 
 	CALL GETS1LOC(S1MNEM,IBEN,ISBYT,IWID,IRET)
 	IF ( (IRET.EQ.0) .AND.
-     .	     ( (S1MNEM.EQ.'BMT') .OR. (S1MNEM.EQ.'OGCE') .OR.
-     .	       (S1MNEM.EQ.'USN') .OR. (S1MNEM.EQ.'GSES') .OR.
-     .	       (S1MNEM.EQ.'MTV') .OR. (S1MNEM.EQ.'MTVL') .OR.
-     .	       (S1MNEM.EQ.'MINU') .OR. (S1MNEM.EQ.'SECO') .OR.
-     .	       (S1MNEM.EQ.'MSBTI') ) ) THEN
+     .	     ( (S1MNEM.EQ.'USN') .OR. (S1MNEM.EQ.'BMT')   .OR.
+     .	       (S1MNEM.EQ.'OGCE') .OR. (S1MNEM.EQ.'GSES')  .OR.
+     .	       (S1MNEM.EQ.'MTYP') .OR. (S1MNEM.EQ.'MSBTI') .OR.
+     .	       (S1MNEM.EQ.'MSBT') .OR. (S1MNEM.EQ.'MTV')   .OR.
+     .	       (S1MNEM.EQ.'MTVL') .OR. (S1MNEM.EQ.'YCEN')  .OR.
+     .	       (S1MNEM.EQ.'CENT') .OR. (S1MNEM.EQ.'YEAR')  .OR.
+     .	       (S1MNEM.EQ.'MNTH') .OR. (S1MNEM.EQ.'DAYS')  .OR.
+     .	       (S1MNEM.EQ.'HOUR') .OR. (S1MNEM.EQ.'MINU')  .OR.
+     .	       (S1MNEM.EQ.'SECO') ) ) THEN
 
 C	    Store the value.
 

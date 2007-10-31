@@ -55,9 +55,9 @@ C                           B, C, or D arrays
 C
 C REMARKS:
 C    THIS ROUTINE CALLS:        IFXY
-C    THIS ROUTINE IS CALLED BY: CHEKSTAB CMSGINI ELEMDX MSGINI
-C                               SEQSDX   TABSUB  UFBQCD UFDUMP
-C                               UPFTBV
+C    THIS ROUTINE IS CALLED BY: CHEKSTAB CMSGINI  ELEMDX   MSGINI
+C                               SEQSDX   TABSUB   UFBDMP   UFBQCD
+C                               UFDUMP   UPFTBV
 C                               Also called by application programs
 C                               (see ABSTRACT).
 C

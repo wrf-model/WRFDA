@@ -27,9 +27,8 @@ C     NIB      - INTEGER: NUMBER OF BIT NUMBERS RETURNED IN IBIT
 C
 C REMARKS:
 C    THIS ROUTINE CALLS:        BORT     NEMTAB   STATUS   VALX
-C    THIS ROUTINE IS CALLED BY: None
-C                               Normally called only by application
-C                               programs.
+C    THIS ROUTINE IS CALLED BY: UFBDMP   UFDUMP
+C                               Also called by application programs.
 C
 C ATTRIBUTES:
 C   LANGUAGE: FORTRAN 77
