@@ -102,7 +102,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    !-------------------------------------------------------
    do inst = 1, iv%num_inst                 ! loop for sensor
       ! if ( iv%instid(inst)%num_rad < 1 ) cycle
-      if (iv%plocal_rad(iv%time,inst) <= iv%plocal_rad(iv%time-1,inst) ) cycle
+      if (iv%instid(inst)%info%n2 <= iv%instid(inst)%info%n1) cycle
       num_levs  = kte-kts+1 
       ! CRTM channel information structure
       ! Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -138,8 +138,8 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
       end if
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
 
-      n1 = iv%plocal_rad(iv%time-1,inst)+1
-      n2 = iv%plocal_rad(iv%time,inst)
+      n1 = iv%instid(inst)%info%n1
+      n2 = iv%instid(inst)%info%n2
 
       allocate (model_u10(n1:n2))
       allocate (model_v10(n1:n2))

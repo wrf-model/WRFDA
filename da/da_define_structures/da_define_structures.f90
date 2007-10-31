@@ -435,8 +435,6 @@ module da_define_structures
    end type instid_type
 
    type iv_type
-      integer :: plocal_rad(0:max_fgat_time,maxsensor)
-
       integer :: nstats(num_ob_indexes)
 
       integer :: time

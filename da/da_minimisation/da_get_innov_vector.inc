@@ -53,7 +53,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (iv%info(gpspw)%nlocal          > 0) call da_get_innov_vector_gpspw    (it, grid, ob, iv)
       if (iv%info(gpsref)%nlocal         > 0) call da_get_innov_vector_gpsref   (it, grid, ob, iv)
       if (iv%info(ssmi_tb)%nlocal        > 0) call da_get_innov_vector_ssmi_tb  (it, grid, ob, iv) 
-      if (iv%info(ssmi_rv)%nlocal > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
+      if (iv%info(ssmi_rv)%nlocal        > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
       if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
       if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt2    (it, grid, ob, iv)
       if (iv%info(satem)%nlocal          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
@@ -63,6 +63,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (iv%info(buoy)%nlocal           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
 
       if (iv%num_inst > 0) then
+         iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
+         iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
          if (rtm_option == rtm_option_rttov) then
             call da_get_innov_vector_rttov( it, grid, ob, iv )
          elseif (rtm_option == rtm_option_crtm) then

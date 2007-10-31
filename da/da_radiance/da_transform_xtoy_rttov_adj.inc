@@ -411,7 +411,8 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_ps(n) = con_vars_ad(n)% ps
          end do
-         call da_interp_lin_2d_adj_newer (jo_grad_x% psfc, iv%instid(i)%info, 1, 1, num_rad, temp_ps)
+stop
+!         call da_interp_lin_2d_adj_newer (jo_grad_x% psfc, iv%instid(i)%info, 1, 1, num_rad, temp_ps)
          deallocate(temp_ps)
       end if
 

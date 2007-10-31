@@ -13,7 +13,7 @@ subroutine da_biascorr ( i, ob, iv)
    type (iv_type), intent(inout) :: iv      ! O-B structure.
 
    ! Local variables
-   integer   :: k,iband,iscan, n1,n2,n,j,npred,nlevels
+   integer   :: k,iband,iscan, n,j,npred,nlevels
    real      :: q(43),pred(4),airbias
 
    if (trace_use) call da_trace_entry("da_biascorr")
@@ -21,10 +21,7 @@ subroutine da_biascorr ( i, ob, iv)
    npred=4
    nlevels=iv%instid(i)%nlevels-1
 
-   n1 = iv%plocal_rad(iv%time-1,i)+1
-   n2 = iv%plocal_rad(iv%time,i)
-
-   do n=n1,n2
+   do n=iv%instid(i)%info%n1,iv%instid(i)%info%n2
       ! get airmass predictors
       !-------------------------
         if (rtm_option==rtm_option_rttov) then

@@ -19,7 +19,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),      &
                 nrej_mixsurface,nrej_windowchanl, nrej_si,    &
-                nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
+                nrej_clw,nrej_topo, num_proc_domain,  &
                 nrej_limb
 
    character(len=30)  :: filename
@@ -36,12 +36,10 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    nrej_clw        = 0
    nrej_topo       = 0
    nrej_limb       = 0
-   num_rad         = iv%plocal_rad(iv%time,i) - iv%plocal_rad(iv%time-1,i)
 
    num_proc_domain = 0
 
-   if (num_rad > 0) then
-      do n= iv%plocal_rad(iv%time-1,i)+1, iv%plocal_rad(iv%time,i)
+      do n= iv%instid(i)%info%n1,iv%instid(i)%info%n2
 
          if (iv%instid(i)%info%proc_domain(1,n)) &
                num_proc_domain = num_proc_domain + 1
@@ -157,7 +155,6 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
             end if
          end do ! chan
       end do ! end loop pixel
-   end if
 
    ! Do inter-processor communication to gather statistics.
 

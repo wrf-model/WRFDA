@@ -235,7 +235,6 @@ subroutine da_read_obs_ssmi (iv, filename)
             iv%info(ssmi_rv)%dy(:,nlocal(ssmi_rv))          = loc%dy
             iv%info(ssmi_rv)%dym(:,nlocal(ssmi_rv))         = loc%dym
             iv%info(ssmi_rv)%proc_domain(:,nlocal(ssmi_rv)) = loc%proc_domain
-write (0,*) __FILE__,__LINE__,"nlocal(ssmi_rv),loc%proc_domain",nlocal(ssmi_rv),loc%proc_domain
 
             iv%info(ssmi_rv)%obs_global_index(nlocal(ssmi_rv)) = ntotal(ssmi_rv)
 
