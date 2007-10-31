@@ -1,0 +1,25 @@
+INTERFACE
+Subroutine rttov_iniedd_tl (&
+ & nwp_levels,&
+ & nchannels ,&
+ & nprofiles ,&
+ & lprofiles ,&
+ & angles ,&
+ & coef_scatt,&
+ & scatt_aux,&
+ & scatt_aux_tl) 
+ Use rttov_types, Only :&
+ & geometry_Type ,&
+ & rttov_scatt_coef ,&
+ & profile_scatt_aux 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nchannels)
+ Type (geometry_Type), Intent (in) :: angles (nprofiles)
+ Type (rttov_scatt_coef), Intent (in) :: coef_scatt
+ Type (profile_scatt_aux), Intent (inout) :: scatt_aux
+ Type (profile_scatt_aux), Intent (inout) :: scatt_aux_tl
+End subroutine rttov_iniedd_tl
+END INTERFACE

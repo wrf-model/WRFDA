@@ -1,0 +1,25 @@
+Interface
+!
+Subroutine rttov_distribcoeffs  (&
+      & kmyproc,       &! id proc
+      & kioproc,       &! io proc
+      & coef           )! inout
+Use rttov_const, Only :  gas_id_mixed
+
+  ! Imported Type Definitions:
+  Use rttov_types, Only : &
+       & rttov_coef
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+  ! subroutine arguments
+  ! scalar arguments with intent(in):
+  Integer(Kind=jpim), Intent(in) :: kmyproc  ! logical processor id
+  Integer(Kind=jpim), Intent(in) :: kioproc  ! processor  dedicated for io
+
+  ! scalar arguments with intent(inout):
+  Type( rttov_coef ), Intent (inout) :: coef   ! coefficients
+
+End Subroutine rttov_distribcoeffs
+End Interface

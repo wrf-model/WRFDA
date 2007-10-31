@@ -1,0 +1,31 @@
+Interface
+Subroutine rttov_profaux_ad( &
+     prof,     & ! in
+     prof_ad,  & ! inout
+     coef,     & ! in
+     aux,      & ! in
+     aux_ad)     ! inout
+
+  Use rttov_const, Only : &
+       sensor_id_mw, &    ! sensor id number for MW
+       mwcldtop , &       ! Upper level for lwp calcs
+       dcoeff             ! debye coefficients
+
+  Use rttov_types, Only : &
+       rttov_coef     ,&
+       profile_Type   ,&
+       profile_aux
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+  Type(profile_Type),  Intent(in)   :: prof
+  Type(profile_Type),  Intent(inout):: prof_ad
+  Type(rttov_coef)  ,  Intent(in)   :: coef
+  Type(profile_aux) ,  Intent(in)   :: aux
+  Type(profile_aux) ,  Intent(inOUT):: aux_ad
+
+
+
+End Subroutine rttov_profaux_ad
+End Interface

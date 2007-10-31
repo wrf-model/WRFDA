@@ -1,0 +1,146 @@
+Interface
+!+ Fast radiative transfer model.
+!
+SUBROUTINE RTTOV &
+     (knpf, klenpf, ppres, pangl, pangs, ksurf, ksat, knchpf,            &
+     kchan, kprof, pav, psav, pssv, pcv, pemis, ifail, prad, ptb, radov, &
+     rado, tau, tausfc, lcloud)
+!
+!    This software was developed within the context of
+!    the EUMETSAT Satellite Application Facility on
+!    Numerical Weather Prediction (NWP SAF), under the
+!    Cooperation Agreement dated 25 November 1998, between
+!    EUMETSAT and the Met Office, UK, by one or more partners
+!    within the NWP SAF. The partners in the NWP SAF are
+!    the Met Office, ECMWF, KNMI and MeteoFrance.
+!
+!    Copyright 2002, EUMETSAT, All Rights Reserved.
+!
+! Description:
+! to compute multi-channel level to space transmittances,
+! top of atmosphere radiances and brightness
+! temperatures for many profiles and Ir/Mw sensors.
+! Compatible with RTTOV8 library but only able to
+! run with coefficients created on RTTOV7 43 pressure levels
+!
+! Method
+! see Matricardi et al QJ 2002
+! see Saunders et al QJ 1999
+! see: ECMWF Technical Memoranda 176/282/345 (Available from ECMWF)
+!
+! Current Code Owner: SAF NWP
+!
+! History:
+! Version   Date        Comment
+! -------   ----        -------
+!          13/8/92.  For version 2.
+!                    ksat added to argument list; ssu included;
+!                    internal changes to move big arrays from commons to
+!                    arguments and to introduce taskcommons
+!           8/7/97   added ozone and extended water vapour in control vector
+!        01/05/2000     F90 code
+!        21/08/2000  Interface to rtint changed to include pref (surface reflectivity).
+!                    (Stephen English)
+!        31/01/2001  More cloud computations. stored in radov (F. Chevallier)
+!        6/2/2001    pgrody and knav etc arrays removed from call (R Saunders)
+!        18/01/2002  Thread safe (D.Salmond)
+!        01/12/2002  Keep compatibility with RTTOV8 (P Brunel)
+!
+! Code Description:
+!   Language:          Fortran 90.
+!   Software Standards: "European Standards for Writing and
+!     Documenting Exchangeable Fortran 90 Code".
+!     31/01/2001  More cloud computations. stored in radov (F. Chevallier)
+! Declarations:
+! Modules used:
+!
+
+  Use rttov_types, only : &
+    rttov_coef     ,&
+    profile_type   ,&
+    transmission_type  ,&
+    radiance_type
+
+  USE MOD_CPARAM, ONLY : &
+  ! Imported Scalar Variables with intent (in):
+  njpnsat  ,&   ! Total max sats to be used
+  njplev   ,&   ! No. of pressure levels
+  njpnav   ,&   ! No. of profile variables
+  njpnsav  ,&   ! No. of surface air variables
+  njpnssv  ,&   ! No. of skin variables
+  njpncv        ! No. of cloud variables
+  !
+  Use parkind1, Only : jpim     ,jprb
+  IMPLICIT NONE
+
+  ! Subroutine arguments
+  ! Scalar arguments with intent(in):
+  Integer(Kind=jpim) , INTENT(in) :: knpf           ! Number of profiles
+  Integer(Kind=jpim) , INTENT(in) :: klenpf         ! Length of input  profile vectors
+  Integer(Kind=jpim) , INTENT(in) :: ksat           ! Satellite index (see rttvi)
+  Integer(Kind=jpim) , INTENT(in) :: knchpf         ! Number of output frequencies
+                                                    !    (= channels used * profiles)
+  LOGICAL, INTENT(in) :: lcloud          ! switch for cloud computations
+
+  ! Array  arguments with intent(in):
+  Integer(Kind=jpim) , INTENT(in) :: kchan(knchpf)    ! Channel indices
+  Integer(Kind=jpim) , INTENT(in) :: kprof(knchpf)    ! Profiles indices
+  Integer(Kind=jpim) , INTENT(in) :: ksurf(knpf)      ! Surface type index
+  Real(Kind=jprb) , INTENT(in)    :: ppres(njplev)    ! Pressure levels (hpa) of
+                                         !   atmospheric profile vectors
+
+
+  Real(Kind=jprb) , INTENT(in)    :: pangl(knpf)    ! Satellite local zenith angle (deg)
+  Real(Kind=jprb) , INTENT(in)    :: pangs(knpf)    ! Solar zenith angle at surface (deg)
+  Real(Kind=jprb) , INTENT(in)    :: pav(njplev,njpnav,knpf)! Atmosp. profile variables
+  Real(Kind=jprb) , INTENT(in)    :: psav(njpnsav,knpf)    ! Surface air variables
+  Real(Kind=jprb) , INTENT(in)    :: pssv(njpnssv,knpf)    ! Surface skin variables
+  Real(Kind=jprb) , INTENT(in)    :: pcv(njpncv,knpf)      ! Cloud variables
+
+  ! Array  arguments with intent(inout):
+  Real(Kind=jprb) , INTENT(inout) :: pemis(knchpf)         !  surface emissivities
+
+  ! Scalar arguments with intent(out):
+
+  ! Array  arguments with intent(out):
+  Integer(Kind=jpim) , INTENT(out) :: ifail(knpf,njpnsat)  !  return flag
+              !     0 = input profile OK
+              ! 11-19 = outside profile limits
+              !    11 =  temp profile
+              !    12 =  specific humidity profile
+              !    13 =  ozone profile
+              !    14 =  surface temp profile
+              !    15 =  surface specific humidity profile
+              !    16 =  surface wind
+              ! 20-29 = unphysical profile
+              !    20 =  input pressure levels wrong
+              !    21 =  temp profile
+              !    22 =  specific humidity profile
+              !    23 =  ozone profile
+              !    24 =  surface temp profile
+              !    25 =  surface specific humidity profile
+              !    26 =  surface wind
+              !    27 =  surface pressure
+
+  Real(Kind=jprb) , INTENT(out)    :: prad(knchpf)         ! radiances (mw/cm-1/ster/sq.m)
+  Real(Kind=jprb) , INTENT(out)    :: ptb(knchpf)          ! brightness temperatures (K)
+  Real(Kind=jprb) , INTENT(out)    :: rado(knchpf)         ! overcast radiance at given
+                                                !   cloud top in mw/m2/sr/cm-1
+  Real(Kind=jprb) , INTENT(out)    :: radov(knchpf,2*njplev+2)
+    ! RT quantities for possible cloud computations outside RTTOV,
+    !   in mw/m2/sr/cm-1 :
+    ! radov (:,1:njplev)          : overcast radiance at given cloud top
+    ! radov (:,njplev+1,2*njplev) : contribution to radiance of
+    !                               downward cloud emission at given cloud top
+    ! radov (:,2*njplev+1)        : clear-sky radiance without reflection term
+    ! radov (:,2*njplev+2)        : reflected clear-sky downwelling radiance
+
+  Real(Kind=jprb) , INTENT(out)    :: tau(knchpf,njplev)  ! transmittance from each
+                                                !   standard pressure level
+  Real(Kind=jprb) , INTENT(out)    :: tausfc(knchpf)      ! transmittance from surface
+
+
+
+
+END SUBROUTINE RTTOV
+End Interface

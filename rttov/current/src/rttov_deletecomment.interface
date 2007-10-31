@@ -1,0 +1,11 @@
+Interface
+!
+Subroutine rttov_DeleteComment (String)
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+  Character (len=*) , Intent (inout) :: string    ! ..to check
+
+
+
+End Subroutine rttov_DeleteComment
+End Interface

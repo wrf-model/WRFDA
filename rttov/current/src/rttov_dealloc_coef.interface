@@ -1,0 +1,24 @@
+Interface
+!
+Subroutine rttov_dealloc_coef (errorstatus, coef)
+  Use rttov_const, Only :     &
+       & sensor_id_mw        ,&
+       & errorstatus_info    ,&
+       & errorstatus_success ,&
+       & errorstatus_fatal   ,&
+       & errorstatus_warning
+
+  Use rttov_types, Only : &
+       rttov_coef
+
+  Use parkind1, Only : jpim     ,jprb
+  Implicit None
+
+
+  Integer(Kind=jpim), Intent (out)   :: errorstatus    ! return code
+  Type( rttov_coef ), Intent (inout) :: coef           ! coefficients
+
+
+
+End Subroutine rttov_dealloc_coef
+End Interface

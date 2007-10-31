@@ -1,0 +1,38 @@
+INTERFACE
+Subroutine rttov_integratesource_tl (&
+ & nwp_levels,&
+ & nchannels,&
+ & nprofiles,&
+ & lprofiles,&
+ & angles,&
+ & scatt_aux,&
+ & scatt_aux_tl,&
+ & dp,&
+ & dp_tl,&
+ & dm,&
+ & dm_tl,&
+ & j_do,&
+ & j_do_tl,&
+ & j_up,&
+ & j_up_tl) 
+ Use rttov_types, Only :&
+ & profile_scatt_aux ,&
+ & geometry_Type 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nchannels)
+ Type (profile_scatt_aux), Intent(in) :: scatt_aux
+ Type (profile_scatt_aux), Intent(in) :: scatt_aux_tl
+ Type (geometry_Type), Intent(in) :: angles (nprofiles)
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dp
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dm
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_do
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_up
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dp_tl
+ Real (Kind=jprb), Intent (in) , dimension (nchannels,nwp_levels) :: dm_tl
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_do_tl
+ Real (Kind=jprb), Intent (inout), dimension (nchannels,nwp_levels) :: j_up_tl
+End subroutine rttov_integratesource_tl
+END INTERFACE

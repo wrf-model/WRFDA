@@ -1,0 +1,59 @@
+INTERFACE
+Subroutine rttov_iniscatt_tl (&
+ & errorstatus,&
+ & nwp_levels,&
+ & nrt_levels,&
+ & nfrequencies,&
+ & nchannels,&
+ & nprofiles,&
+ & polarisations,&
+ & channels,&
+ & frequencies,&
+ & lprofiles,&
+ & lsprofiles,&
+ & profiles,&
+ & profiles_tl,&
+ & cld_profiles,&
+ & cld_profiles_tl,&
+ & coef_rttov,&
+ & coef_scatt,&
+ & transmission,&
+ & transmission_tl,&
+ & calcemiss,&
+ & angles,&
+ & scatt_aux,&
+ & scatt_aux_tl) 
+ Use rttov_types, Only :&
+ & rttov_coef ,&
+ & rttov_scatt_coef ,&
+ & transmission_type ,&
+ & geometry_Type ,&
+ & profile_scatt_aux ,&
+ & profile_Type ,&
+ & profile_cloud_Type 
+ Use parkind1, Only : jpim ,jprb
+ Integer (Kind=jpim), Intent (in) :: nwp_levels
+ Integer (Kind=jpim), Intent (in) :: nrt_levels
+ Integer (Kind=jpim), Intent (in) :: nprofiles
+ Integer (Kind=jpim), Intent (in) :: nfrequencies
+ Integer (Kind=jpim), Intent (in) :: nchannels
+ Integer (Kind=jpim), Intent(out) :: errorstatus(nprofiles)
+ Integer (Kind=jpim), Intent (in) :: frequencies (nchannels)
+ Integer (Kind=jpim), Intent (in) :: channels (nfrequencies)
+ Integer (Kind=jpim), Intent (in) :: polarisations (nchannels,3)
+ Integer (Kind=jpim), Intent (in) :: lprofiles (nfrequencies)
+ Integer (Kind=jpim), Intent (in) :: lsprofiles (nchannels)
+ Logical , Intent (in) :: calcemiss (nchannels)
+ Type (profile_Type), Intent (in) :: profiles (nprofiles)
+ Type (profile_Type), Intent (in) :: profiles_tl (nprofiles)
+ Type (rttov_coef), Intent (in) :: coef_rttov
+ Type (rttov_scatt_coef), Intent (in) :: coef_scatt
+ Type (profile_cloud_Type), Intent (in) :: cld_profiles (nprofiles)
+ Type (profile_cloud_Type), Intent (in) :: cld_profiles_tl (nprofiles)
+ Type (transmission_Type), Intent (in) :: transmission
+ Type (transmission_Type), Intent (in) :: transmission_tl
+ Type (geometry_Type), Intent (out) :: angles (nprofiles)
+ Type (profile_scatt_aux), Intent (inout) :: scatt_aux
+ Type (profile_scatt_aux), Intent (inout) :: scatt_aux_tl
+End Subroutine rttov_iniscatt_tl
+END INTERFACE
