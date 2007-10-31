@@ -1,5 +1,0 @@
-# SUBDIRS_channel_name contains the list of all possible channel
-# implementations
-SUBDIRS_channel_name = ib shm sock ssm gasnet sshm nemesis sctp
-SUBDIRS = @channel_name@ .
-

@@ -1,3 +1,0 @@
-INCLUDES = -I../../../../include -I${master_top_srcdir}/src/include
-lib${MPILIBNAME}_a_SOURCES = ch3u_init_sock.c ch3u_connect_sock.c \
-                             ch3u_getinterfaces.c

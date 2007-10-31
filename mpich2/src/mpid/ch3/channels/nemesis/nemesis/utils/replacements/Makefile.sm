@@ -1,1 +1,0 @@
-lib${MPILIBNAME}_a_SOURCES = mkstemp.c

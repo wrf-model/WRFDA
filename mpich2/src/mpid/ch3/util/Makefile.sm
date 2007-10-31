@@ -1,6 +1,0 @@
-SUBDIRS = @ch3subsystems@
-SUBDIRS_ch3subsystems = shm sock shmbase
-
-distclean-local:
-
-maintainer-clean-local:
