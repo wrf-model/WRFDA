@@ -99,25 +99,13 @@ subroutine da_uvprho_to_w_lin(grid)
 
    call da_uv_to_divergence(grid%xb, grid%xa%u, grid%xa%v, DIV)
 
-   do K=kts,kte  
-      do J=jts,jte
-         do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xb%p(I,J,K)*DIV(I,J,K)
-         end do
-      end do
-   end do
+   WZ(its:ite,jts:jte,kts:kte)=WZ(its:ite,jts:jte,kts:kte)-GAMMA*grid%xb%p(its:ite,jts:jte,kts:kte)*DIV(its:ite,jts:jte,kts:kte)
 
    ! Term 2.2: Divergence term from basic wind
 
    call da_uv_to_divergence(grid%xb, grid%xb%u, grid%xb%v, DIV)
 
-   do K=kts,kte
-      do J=jts,jte
-         do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xa%p(I,J,K)*DIV(I,J,K)
-         end do
-      end do
-   end do
+   WZ(its:ite,jts:jte,kts:kte)=WZ(its:ite,jts:jte,kts:kte)-GAMMA*grid%xa%p(its:ite,jts:jte,kts:kte)*DIV(its:ite,jts:jte,kts:kte)
 
    ! Computation to check for edge of domain:
    is = its-1; ie = ite+1; js = jts-1; je = jte+1
@@ -126,14 +114,8 @@ subroutine da_uvprho_to_w_lin(grid)
 
    ! Term 3.1: Vertical integration of the perturbed mass divergence
 
-   do K=kts,kte
-      do J=js,je
-         do I=is,ie
-            URHO(I,J,K)=grid%xb%rho(I,J,K)*grid%xa%u(I,J,K)
-            VRHO(I,J,K)=grid%xb%rho(I,J,K)*grid%xa%v(I,J,K)
-         end do
-      end do
-   end do
+   URHO(is:ie,js:je,kts:kte)=grid%xb%rho(is:ie,js:je,kts:kte)*grid%xa%u(is:ie,js:je,kts:kte)
+   VRHO(is:ie,js:je,kts:kte)=grid%xb%rho(is:ie,js:je,kts:kte)*grid%xa%v(is:ie,js:je,kts:kte)
 
    call da_uv_to_divergence(grid%xb, URHO, VRHO, DIV)
 
@@ -150,14 +132,8 @@ subroutine da_uvprho_to_w_lin(grid)
 
    ! Term 3.2: Vertical integration of the basic mass divergence
 
-   do K=kts,kte
-      do J=js,je
-         do I=is,ie
-            URHO(I,J,K)=grid%xa%rho(I,J,K)*grid%xb%u(I,J,K)
-            VRHO(I,J,K)=grid%xa%rho(I,J,K)*grid%xb%v(I,J,K)
-         end do
-      end do
-   end do
+   URHO(is:ie,js:je,kts:kte)=grid%xa%rho(is:ie,js:je,kts:kte)*grid%xb%u(is:ie,js:je,kts:kte)
+   VRHO(is:ie,js:je,kts:kte)=grid%xa%rho(is:ie,js:je,kts:kte)*grid%xb%v(is:ie,js:je,kts:kte)
 
    call da_uv_to_divergence(grid%xb, URHO, VRHO, DIV)
 
@@ -183,15 +159,9 @@ subroutine da_uvprho_to_w_lin(grid)
       end do
    end do
 
-   ! Divided by constant
+   ! Divide by constant
 
-   do K=kts,kte
-      do J=jts,jte
-         do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*grid%xb%p(I,J,K))
-         end do
-      end do
-   end do
+   WZ(its:ite,jts:jte,kts:kte)=WZ(its:ite,jts:jte,kts:kte)/(GAMMA*grid%xb%p(its:ite,jts:jte,kts:kte))
 
    ! integration to calculate the vertical velocity 
 

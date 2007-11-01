@@ -47,13 +47,7 @@ subroutine da_uvprho_to_w_adj(grid)
 
    ! Divide by constant
 
-   do K=kts,kte
-      do J=jts,jte
-         do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*grid%xb%p(I,J,K))
-         end do
-      end do
-   end do
+   WZ(its:ite,jts:jte,kts:kte)=WZ(its:ite,jts:jte,kts:kte)/(GAMMA*grid%xb%p(its:ite,jts:jte,kts:kte))
 
    ! Term 4: Derivative of basic vertical velocity with respect to z.
 
@@ -96,14 +90,8 @@ subroutine da_uvprho_to_w_adj(grid)
       je = jte
    end if
 
-   do K=kts,kte
-      do J=js,je
-         do I=is,ie
-            grid%xa%rho(I,J,K)=grid%xa%rho(I,J,K)+VRHO(I,J,K)*grid%xb%v(I,J,K)
-            grid%xa%rho(I,J,K)=grid%xa%rho(I,J,K)+URHO(I,J,K)*grid%xb%u(I,J,K)
-         end do
-      end do
-   end do
+   grid%xa%rho(is:ie,js:je,kts:kte)=grid%xa%rho(is:ie,js:je,kts:kte)+VRHO(is:ie,js:je,kts:kte)*grid%xb%v(is:ie,js:je,kts:kte)
+   grid%xa%rho(is:ie,js:je,kts:kte)=grid%xa%rho(is:ie,js:je,kts:kte)+URHO(is:ie,js:je,kts:kte)*grid%xb%u(is:ie,js:je,kts:kte)
 
    URHO(:,:,:)=0.0
    VRHO(:,:,:)=0.0
@@ -125,14 +113,8 @@ subroutine da_uvprho_to_w_adj(grid)
 
    call da_uv_to_divergence_adj(grid, URHO,VRHO, DIV)
 
-   do K=kts,kte
-      do J=js,je
-         do I=is,ie
-            grid%xa%v(I,J,K)=grid%xa%v(I,J,K)+VRHO(I,J,K)*grid%xb%rho(I,J,K)
-            grid%xa%u(I,J,K)=grid%xa%u(I,J,K)+URHO(I,J,K)*grid%xb%rho(I,J,K)
-         end do
-      end do
-   end do
+   grid%xa%v(is:ie,js:je,kts:kte)=grid%xa%v(is:ie,js:je,kts:kte)+VRHO(is:ie,js:je,kts:kte)*grid%xb%rho(is:ie,js:je,kts:kte)
+   grid%xa%u(is:ie,js:je,kts:kte)=grid%xa%u(is:ie,js:je,kts:kte)+URHO(is:ie,js:je,kts:kte)*grid%xb%rho(is:ie,js:je,kts:kte)
 
    URHO(:,:,:)=0.0
    VRHO(:,:,:)=0.0
@@ -141,23 +123,11 @@ subroutine da_uvprho_to_w_adj(grid)
 
    call da_uv_to_divergence(grid%xb, grid%xb%u,grid%xb%v, DIV)
 
-   do K=kts,kte
-      do J=jts,jte
-         do I=its,ite
-           grid%xa%p(I,J,K)=grid%xa%p(I,J,K)-WZ(I,J,K)*GAMMA*DIV(I,J,K)
-         end do
-      end do
-   end do
-
+   grid%xa%p(its:ite,jts:jte,kts:kte)=grid%xa%p(its:ite,jts:jte,kts:kte)-WZ(its:ite,jts:jte,kts:kte)*GAMMA*DIV(its:ite,jts:jte,kts:kte)
+   
    ! Term 2.1: Divergence term from perturbed wind
 
-   do K=kts,kte   
-      do J=jts,jte
-         do I=its,ite
-            DIV(I,J,K)=-WZ(I,J,K)*GAMMA*grid%xb%p(I,J,K)  ! DIV redefined
-         end do
-      end do
-   end do
+   DIV(its:ite,jts:jte,kts:kte)=-WZ(its:ite,jts:jte,kts:kte)*GAMMA*grid%xb%p(its:ite,jts:jte,kts:kte)  ! DIV redefined
 
    call da_uv_to_divergence_adj(grid, grid%xa%u,grid%xa%v, DIV)
 
