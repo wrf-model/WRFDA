@@ -94,8 +94,8 @@ subroutine da_write_iv_for_multi_inc(file_index, iv)
             (/"Cannot open conventional observation omb file"//filename/))
       end if
 
-      write(ounit,'(a20,i8)')'ships', iv%ob_numb(iv%current_ob_time)%metar - &
-                                       iv%ob_numb(iv%current_ob_time-1)%metar
+      write(ounit,'(a20,i8)')'ships', iv%ob_numb(iv%current_ob_time)%ships - &
+                                       iv%ob_numb(iv%current_ob_time-1)%ships
       do n = iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
              iv%ob_numb(iv%current_ob_time)%ships
          write(ounit,'(i8,a5,2E22.13)')&
