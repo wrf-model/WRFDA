@@ -42,7 +42,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       end if
 
       call da_jo_and_grady_sonde_sfc(iv, re, jo, jo_grad_y)
-      jo_sonde_sfc = jo_sound + jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
+      jo_sonde_sfc = jo%sonde_sfc_u + jo%sonde_sfc_v + jo%sonde_sfc_t + &
          jo%sonde_sfc_q + jo%sonde_sfc_p
 
       if (print_detail_grad) then
