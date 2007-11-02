@@ -21,7 +21,8 @@ END MODULE module_wrf_error
 SUBROUTINE wrf_message( str )
   IMPLICIT NONE
   CHARACTER*(*) str
-#if defined( DM_PARALLEL ) && ! defined( STUBMPI) 
+#if defined( DM_PARALLEL ) && ! defined( STUBMPI) && (DA_CORE != 1)
+  ! wrfvar does not want information messages going to stderr stream
   write(0,*) TRIM(str)
 #endif
   print*, TRIM(str)
