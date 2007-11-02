@@ -24,7 +24,7 @@ subroutine da_moist_phys_lin(grid)
    real    :: QVSS(kms:kme)
    real    :: EES9(kms:kme)
    real    :: QVSS9(kms:kme)
-   real    :: DT(kms:kme)
+   real    :: DT(its:ite,jts:jte,kms:kme)
    real    :: QVT(kms:kme)
    real    :: QCT(kms:kme)
    real    :: QRT(kms:kme)
@@ -64,65 +64,54 @@ subroutine da_moist_phys_lin(grid)
    real    :: SCR429(kms:kme)
    real    :: SCR719(kms:kme)
    real    :: DUM1129(kms:kme)
-   real    :: DUM1139(kms:kme)
-   real    :: DUM2119(kms:kme)
    real    :: DUM4119(kms:kme)
    real    :: TMP(kms:kme)
 
+   integer, parameter :: qcth = 0.5e-3
+   integer, parameter :: qrth = 1.0e-6
+   integer, parameter :: alpha = 0.001
+   integer, parameter :: beta  = 0.0486
+   integer, parameter :: gamma = 0.002
+
    integer :: i, j, k
+
+   real    :: tmp1, tmp2
+   real    :: qrth1
 
    if (trace_use) call da_trace_entry("da_moist_phys_lin")
 
-   do k=kts,kte
-      do j=jts,jte
-         do i=its,ite
-            T_OLD(i,j,k) = grid%xa % t (i,j,k)
-            Q_OLD(i,j,k) = grid%xa % q (i,j,k)
-            QCW_OLD(i,j,k) = grid%xa % qcw (i,j,k)
-            QRN_OLD(i,j,k) = grid%xa % qrn (i,j,k)
-         end do
-      end do
-   end do
+   qrth1 = (QRTH*1.0e3)**0.875
+
+   T_OLD  (its:ite,jts:jte,kts:kte) = grid%xa%t  (its:ite,jts:jte,kts:kte)
+   Q_OLD  (its:ite,jts:jte,kts:kte) = grid%xa%q  (its:ite,jts:jte,kts:kte)
+   QCW_OLD(its:ite,jts:jte,kts:kte) = grid%xa%qcw(its:ite,jts:jte,kts:kte)
+   QRN_OLD(its:ite,jts:jte,kts:kte) = grid%xa%qrn(its:ite,jts:jte,kts:kte)
+
+   !  Preparation
+
+   grid%xa%q(its:ite,jts:jte,kts:kte) =grid%xa%qt(its:ite,jts:jte,kts:kte) - grid%xa%qcw(its:ite,jts:jte,kts:kte) - grid%xa %qrn(its:ite,jts:jte,kts:kte)
+   DT(its:ite,jts:jte,kts:kte) = grid%xb%delt(its:ite,jts:jte,kts:kte)
 
    do j=jts,jte
       do i=its,ite
-
-      !  Preparation
-
-         do K=kts,kte
-            grid%xa % q(i,j,k) =grid%xa % qt(i,j,k) - grid%xa % qcw(i,j,k) - grid%xa %qrn(i,j,k)
-         end do
-
-         do K=kts,kte
-            DT(k) = grid%xb%delt(i,j,k)
-         end do
-
          do K=kts,kte
 
-            if (DT(k) <= 0.0) cycle
+            if (dt(i,j,k) <= 0.0) cycle
 
             if ( grid%xb%t(I,J,K) > TO )then
                EES(K)=SVP1*EXP(SVP2*(grid%xb%t(I,J,K)-SVPT0)/(grid%xb%t(I,J,K)-SVP3))
-               EES9(K)=EES(K)*SVP2*(SVPT0-SVP3)/((grid%xb%t(I,J,K)-SVP3)*  &
-                       (grid%xb%t(I,J,K)-SVP3))*grid%xa%t(I,J,K)
+               EES9(K)=EES(K)*SVP2*(SVPT0-SVP3)/((grid%xb%t(I,J,K)-SVP3) * (grid%xb%t(I,J,K)-SVP3))*grid%xa%t(I,J,K)
             else
                EES(K)=.611*EXP(22.514-6.15E3/grid%xb%t(I,J,K))
                EES9(K)=EES(K)*6.15E3/(grid%xb%t(I,J,K)*grid%xb%t(I,J,K))*grid%xa%t(I,J,K)
             end if
 
             TMP(K)=622.0/((grid%xb%p(I,J,K)-EES(K))**2)
-            QVSS9(K)=TMP(K)*grid%xb%p(I,J,K)*EES9(K)  &
-                  -TMP(K)*EES(K)*grid%xa%p(I,J,K)
+            QVSS9(K)=TMP(K)*grid%xb%p(I,J,K)*EES9(K) - TMP(K)*EES(K)*grid%xa%p(I,J,K)
             QVSS(K)=622.0*EES(K)/(grid%xb%p(I,J,K)-EES(K))
-
 
             SCR49(K)=grid%xa%q(I,J,K)/QVSS(K)-grid%xb%q(I,J,K)/QVSS(K)**2*QVSS9(K)
             SCR4(K)=grid%xb%q(I,J,K)/QVSS(K)
-         end do
-
-         do K=kts,kte
-
-            if (DT(k) <= 0.0) cycle
 
             if (grid%xb%qcw(I,J,K) > 0.0) then
                SCR29(K)=grid%xa%qcw(I,J,K)
@@ -147,26 +136,46 @@ subroutine da_moist_phys_lin(grid)
 
             DUM319(K)=-XLV1*grid%xa%t(I,J,K) 
             DUM31(K)=3.1484E6-XLV1*grid%xb%t(I,J,K)
+ 
+            ! Auto conversion
+
+            if (scr2(k) >= qcth) then
+               prc9(k) = alpha * scr29(k)
+               prc(k) = alpha * (scr2(k) - qcth)
+            else
+               prc9(k) = 0.0
+               prc(k) = 0.0
+            end if
+
+            ! Accretion
+
+            if (SCR2(k) > 0.0 .and. SCR3(k) > QRTH ) then
+               PRA9(K) = gamma * 0.875 * SCR2(k) * (SCR3(K)*1.0e3)**(-0.125) * 1.0e3 * SCR39(K)  &
+                            + gamma * SCR29(k) * (SCR3(K)*1.0e3)**0.875
+               PRA(k) = gamma * SCR2(k) * (SCR3(k)*1.0e3)**0.875
+            else if (SCR2(k) > 0.0 .and. SCR3(k) <= QRTH ) then
+               PRA9(K) = gamma * SCR29(k) * qrth1
+               PRA(k) = gamma * SCR2(k) * qrth1
+            else
+               PRA9(K) = 0.0
+               PRA(k) = 0.0
+            end if
 
          end do
 
-         call da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
-
-         call da_accre_lin(DT,SCR2,SCR3,PRA,SCR29,SCR39,PRA9,kts,kte,kms,kme)
-
-         call da_evapo_lin(DT,SCR3,SCR5,grid%xb%q(I,J,:),PRE,SCR6,  &
+         call da_evapo_lin(DT(i,j,:),SCR3,SCR5,grid%xb%q(I,J,:),PRE,SCR6,  &
                            SCR39,SCR59,grid%xa%q(I,J,:),PRE9,SCR69, &
                            kts,kte,kms,kme)
 
          do K=kts, kte
 
-            if (DT(k) <= 0.0) cycle
+            if (dt(i,j,k) <= 0.0) cycle
 
             !  Readjust
 
-            DUM1129(K)=(PRC9(k)+PRA9(k))*DT(k)
-            DUM112(K)=(PRC(k)+PRA(k))*DT(k)
+            DUM112(K)=(PRC(k)+PRA(k))*dt(i,j,k)
             if (DUM112(K) > SCR2(k)) then
+               DUM1129(K)=(PRC9(k)+PRA9(k))*dt(i,j,k)
                PRC9(K)=SCR29(K)*PRC(K)/DUM112(K)  &
                       +PRC9(K)*SCR2(K)/DUM112(K)  &
                       -SCR2(K)*PRC(K)/(DUM112(K)*DUM112(K))*DUM1129(K)
@@ -196,29 +205,27 @@ subroutine da_moist_phys_lin(grid)
                    +DUM411(K)*QVT(K)/(PRD(K)*PRD(K))*PRD9(K)
             TTT(K)=-DUM411(K)*QVT(K)/PRD(K)
 
-            DUM1139(K)=grid%xa%q(I,J,K)+DT(K)*QVT9(K)
-            DUM113(K)=grid%xb%q(I,J,K)+DT(K)*QVT(K)
+            DUM113(K)=grid%xb%q(I,J,K)+dt(i,j,k)*QVT(K)
             if (DUM113(K) > 1.0e-12 ) then
-               SCR429(K)=DUM1139(K)
+               SCR429(K)=grid%xa%q(I,J,K)+dt(i,j,k)*QVT9(K)
                SCR42(K)=DUM113(K)
             else
                SCR429(K)=0.0
                SCR42(K)=1.0e-12
             end if
-            DUM2119(K)=grid%xa%qcw(I,J,K)+QCT9(K)*DT(k)
-            DUM211(K)=grid%xb%qcw(I,J,K)+QCT(K)*DT(k)
+            DUM211(K)=grid%xb%qcw(I,J,K)+QCT(K)*dt(i,j,k)
             if (DUM211(K) > 0.0) then
-               SCR319(K)=DUM2119(K)
+               SCR319(K)=grid%xa%qcw(I,J,K)+QCT9(K)*dt(i,j,k)
                SCR31(K)=DUM211(K)
             else
                SCR319(K)=0.0
                SCR31(K)=0.0
             end if
-            SCR719(K)=grid%xa%t(I,J,K)+TTT9(K)*DT(k)
-            SCR71(K)=grid%xb%t(I,J,K)+TTT(K)*DT(k)
+            SCR719(K)=grid%xa%t(I,J,K)+TTT9(K)*dt(i,j,k)
+            SCR71(K)=grid%xb%t(I,J,K)+TTT(K)*dt(i,j,k)
          end do
 
-         call da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,         &
+         call da_condens_lin(DT(i,j,:),SCR31,SCR42,SCR71,DUM31,PRD,         &
                              QVT,QCT,QRT,TTT,                        &
                              grid%xb%p(I,J,:),grid%xb%t(I,J,:),grid%xb%q(I,J,:),    &
                              grid%xb%qcw(I,J,:),grid%xb%qrn(I,J,:),            &
@@ -229,32 +236,20 @@ subroutine da_moist_phys_lin(grid)
       end do
    end do
 
-   do k=kds,kde
-      do j=jts,jte
-         do i=its,ite
-            T_NEW(i,j,k) = grid%xa % t (i,j,k) - T_OLD(i,j,k)
-            Q_NEW(i,j,k) = grid%xa % q (i,j,k) - Q_OLD(i,j,k)
-            QCW_NEW(i,j,k) = grid%xa % qcw (i,j,k) - QCW_OLD(i,j,k)
-            QRN_NEW(i,j,k) = grid%xa % qrn (i,j,k) - QRN_OLD(i,j,k)
-         end do
-      end do
-   end do
+   T_NEW  (its:ite,jts:jte,kds:kde) = grid%xa%t   (its:ite,jts:jte,kds:kde) - T_OLD  (its:ite,jts:jte,kds:kde)
+   Q_NEW  (its:ite,jts:jte,kds:kde) = grid%xa%q   (its:ite,jts:jte,kds:kde) - Q_OLD  (its:ite,jts:jte,kds:kde)
+   QCW_NEW(its:ite,jts:jte,kds:kde) = grid%xa%qcw (its:ite,jts:jte,kds:kde) - QCW_OLD(its:ite,jts:jte,kds:kde)
+   QRN_NEW(its:ite,jts:jte,kds:kde) = grid%xa%qrn (its:ite,jts:jte,kds:kde) - QRN_OLD(its:ite,jts:jte,kds:kde)
 
    call da_filter(grid, t_new)
    call da_filter(grid, q_new)
    call da_filter(grid, qcw_new)
    call da_filter(grid, qrn_new)
 
-   do k=kds,kde
-      do j=jts,jte
-         do i=its,ite
-            grid%xa % t (i,j,k) = T_NEW(i,j,k) + T_OLD(i,j,k)
-            grid%xa % q (i,j,k) = Q_NEW(i,j,k) + Q_OLD(i,j,k)
-            grid%xa % qcw (i,j,k) = QCW_NEW(i,j,k) + QCW_OLD(i,j,k)
-            grid%xa % qrn (i,j,k) = QRN_NEW(i,j,k) + QRN_OLD(i,j,k)
-         end do
-      end do
-   end do
+   grid%xa%t   (its:ite,jts:jte,kds:kde) = T_NEW  (its:ite,jts:jte,kds:kde) + T_OLD  (its:ite,jts:jte,kds:kde)
+   grid%xa%q   (its:ite,jts:jte,kds:kde) = Q_NEW  (its:ite,jts:jte,kds:kde) + Q_OLD  (its:ite,jts:jte,kds:kde)
+   grid%xa%qcw (its:ite,jts:jte,kds:kde) = QCW_NEW(its:ite,jts:jte,kds:kde) + QCW_OLD(its:ite,jts:jte,kds:kde)
+   grid%xa%qrn (its:ite,jts:jte,kds:kde) = QRN_NEW(its:ite,jts:jte,kds:kde) + QRN_OLD(its:ite,jts:jte,kds:kde)
 
    if (trace_use) call da_trace_exit("da_moist_phys_lin")
 
