@@ -35,7 +35,6 @@ subroutine da_check_rh(xb, xa, xp)
 ! To get the xa%rh for the moisture adjustments (YRG, 04/02/2007):
 
       if ( cv_options_hum == 1  ) then
-         write(6,'(/a,i2,a)')'cv_options_hum=',cv_options_hum,' to get xa%rh..'
          call DA_TPQ_To_RH_Lin( xb, xp, xa )
       endif
 
