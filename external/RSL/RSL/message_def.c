@@ -346,10 +346,12 @@ RSL_BUILD_MESSAGE ( mh_p, t_p, base, ndim_p, decomp, glen, llen )
     fld->gdex[dim] = RSL_INVALID ;	/* this gets filled in dynamically */
     if ( decomp[dim] == RSL_NOTDECOMPOSED && glen[dim] != llen[dim] )
     {
+/* Do not want these messages for afwa_2.2 branch
        sprintf(errmess,
 "rsl_build_message: mesg %d: dim %d is RSL_NOTDECOMPOSED so glen(%d)=%d must eq llen(%d)=%d",
        mh, dim+1, dim+1, glen[dim], dim+1, llen[dim] ) ;
        RSL_TEST_WRN( 1, errmess ) ;
+*/
     }
     fld->glen[dim] = glen[dim] ;
     fld->llen[dim] = llen[dim] ;

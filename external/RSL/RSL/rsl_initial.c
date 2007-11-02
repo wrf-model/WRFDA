@@ -180,8 +180,10 @@ rsl_initialize_internal()
 
 #ifndef T3D
   gethostname(name,255) ;
+/* We don't want this for afwa_2.2 branch to clutter output
   fprintf(stderr,"%s -- rsl_nproc_all %d, rsl_myproc %d\n",name,
                   rsl_nproc_all, rsl_myproc ) ;
+*/
 #endif
 
   RSL_F_SET_PADAREA ( &rsl_padarea ) ;
