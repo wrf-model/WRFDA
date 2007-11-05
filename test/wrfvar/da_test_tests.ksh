@@ -4,7 +4,7 @@
 
 . ./setup.ksh
 
-export EXPT=${EXPT:-vartest}
+export EXPT=${EXPT:-expt}
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export NL_NTMAX=${NL_NTMAX:-2}
 

@@ -1,6 +1,6 @@
 #!/bin/ksh
-
 # da_compare_data.ksh
+# Purpose: Compare top level data directories
 
 DIR1=$1
 DIR2=$2
@@ -15,10 +15,8 @@ if [[ ! -d $DIR2 ]]; then
    exit 1
 fi
 
-cd $DIR1
-DIR1=$PWD # expand partial directories
-
-for REG in *; do
+for DIR in $DIR1/*; do
+   REG=$(basename $DIR)
    if [[ -d $DIR1/$REG && -d $DIR2/$REG ]]; then
       da_compare_region.ksh $DIR1/$REG $DIR2/$REG
    fi

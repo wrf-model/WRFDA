@@ -1,6 +1,8 @@
 #!/bin/ksh
-
+# da_compare_gen_be.ksh
 # Purpose: Compare files between gen_be runs
+
+. da_test_defaults.ksh
 
 if [[ $# != 2 ]]; then
    echo "Arguments dir1 dir2"
@@ -19,8 +21,6 @@ if [[ ! -d $DIR2 ]]; then
    echo "Directory $DIR2 does not exist"
    exit 1
 fi
-
-export FULL=${FULL:-false}
 
 # Text files
 

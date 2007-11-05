@@ -1,5 +1,7 @@
 #!/bin/ksh
 
+. da_test_defaults.ksh
+
 . ./setup.ksh
 . $CASE/setup.ksh
 
@@ -7,7 +9,7 @@ export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export EXPT=${ID}_gen_be
 export RUN=run
 
-export REL_DIR=${REL_DIR:-$HOME/code/$ID}
+export REL_DIR=${REL_DIR:-$HOME/code/$RELEASE/$ID}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 export REG_DIR=$PWD

@@ -1,14 +1,22 @@
 #!/bin/ksh
 
-. ./setup.ksh
+# da_test_verification.ksh
 
-export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
-export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/$ID/wrfvar}
+. da_test_defaults.ksh
+
+. ./setup.ksh
 
 export REG_DIR=$PWD
 
+export EXP1=${1:-~/data/afwa_2.2/$REGION/${ID}_quick_${NUM_PROCS}}
+export EXP2=${2:-~/data/trunk/$REGION/${ID}_quick_${NUM_PROCS}}
+
+NAME1=$(basename $EXP1)
+NAME2=$(basename $EXP2)
+
 export NUM_EXPT=2
-export EXP_NAMES="${MACHINE}_${COMPILER}_stable_quick_${NUM_PROCS) ${MACHINE}_${COMPILER}_opt_quick_${NUM_PROCS)"
+export EXP_DIRS="$EXP1 $EXP2"
+export EXP_NAMES="$NAME1 $NAME2"
 export EXP_LEGENDS='(/"stable","opt"/)'
 
 export INTERVAL=12

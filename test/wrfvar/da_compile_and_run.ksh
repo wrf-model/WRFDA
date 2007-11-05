@@ -11,12 +11,15 @@ export CLEAN=${CLEAN:-true}
 # Assuming option 2 is pgi mpi is a hack
 
 export TYPE=${TYPE:-opt}
+export RELEASE=${RELEASE:-trunk}
+export REL_DIR=${REL_DIR:-$HOME/code/$RELEASE}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
 export TARGET=${TARGET:-all}
 
 echo "TYPE      $TYPE"
+echo "RELEASE   $RELEASE"
 echo "COMPILE   $COMPILE"
 echo "FULL      $FULL"
 echo "EXECUTE   $EXECUTE"
@@ -34,7 +37,7 @@ let COUNT=1
 
 for COMPILER in $COMPILERS; do
    export ID=${MACHINE}_${COMPILER}_${TYPE}
-   export WRFVAR_DIR=$HOME/code/$ID/wrfvar
+   export WRFVAR_DIR=$REL_DIR/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
       echo "Compiling $WRFVAR_DIR $TARGET with option $OPTION"
