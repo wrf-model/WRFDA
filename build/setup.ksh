@@ -6,7 +6,7 @@ if ! test -d $EXT_DIR; then
    echo "No directory EXT_DIR=$EXT_DIR"
 fi
 
-COMPILER=${1:-gnu}
+export COMPILER=${1:-gnu}
 
 if test $COMPILER = g95; then export COMPILER=gnu; fi
 if test $COMPILER = xlf; then export COMPILER=ibm; fi
