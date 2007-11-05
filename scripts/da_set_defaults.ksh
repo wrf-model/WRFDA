@@ -28,6 +28,7 @@ export RUN_UPDATE_BC=${RUN_UPDATE_BC:-false}
 export RUN_WRF=${RUN_WRF:-false}
 
 #Experiment details:
+export RELEASE=${RELEASE:-afwa_2.2}
 export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}                            # Domain name.
@@ -143,7 +144,7 @@ export VTABLE_TYPE=${VTABLE_TYPE:-GFS}
 export METGRID_TABLE_TYPE=${METGRID_TABLE_TYPE:-ARW}
 export CONSTANTS1=${CONSTANTS1:-*}
 export CONSTANTS2=${CONSTANTS2:-*}
-export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
+export NL_DEBUG_LEVEL=${NL_DEBUG_LEVEL:-0}
 
 #WRF real (not already covered above):
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
@@ -172,11 +173,11 @@ export NL_KM_OPT=${NL_KM_OPT:-1}               #
 export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}               #
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
-export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
+export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
 
 #WRF (not already covered above):
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
-export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
+export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
 export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.

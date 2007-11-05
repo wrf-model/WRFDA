@@ -24,7 +24,7 @@ if test $SUBMIT = "LoadLeveller"; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_name         = ${REGION}_${EXPT}
+# @ job_name         = ${RELEASE}_${REGION}_${EXPT}_${RUN}
 # @ total_tasks      = $NUM_PROCS
 # @ node             = $NODES
 # @ output           = job.output
@@ -51,13 +51,14 @@ elif test $SUBMIT = "LSF"; then
 #
 # LSF batch script
 #
-#BSUB -J ${REGION}_${EXPT}_${RUN}          
+#BSUB -J ${RELEASE}_${REGION}_${EXPT}_${RUN}          
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
 #BSUB -e job.error   
 #BSUB -W $WALLCLOCK       
 #BSUB -P $PROJECT        
+#BSUB -R "span[ptile=$LL_PTILE]"
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
@@ -81,7 +82,7 @@ elif test $SUBMIT = "PBS"; then
    if test $TEMP -gt 4; then
       TEMP=4
    fi
-   typeset -L15 JOBNAME=${REGION}_${EXPT}_${RUN}
+   typeset -L15 JOBNAME=${RELEASE}_${REGION}_${EXPT}_${RUN}
    cat > job.ksh <<EOF
 #!/bin/ksh
 #

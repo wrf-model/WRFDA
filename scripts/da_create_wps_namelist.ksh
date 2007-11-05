@@ -34,7 +34,7 @@ cat >namelist.wps <<EOF
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
  opt_output_from_geogrid_path = '$RC_DIR',
- debug_level = $DEBUG_LEVEL
+ debug_level = $NL_DEBUG_LEVEL
 /
 
 &geogrid
