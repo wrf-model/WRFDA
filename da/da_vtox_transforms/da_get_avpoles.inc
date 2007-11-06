@@ -20,7 +20,7 @@ subroutine da_get_avpoles(u,v,       &
    real                   :: tmp_u(kts:kte)
    real                   :: tmpv(kts:kte)
    real                   :: tmp_v(kts:kte)
-   integer                :: k, n
+   integer                :: k
 
    if (trace_use) call da_trace_entry("da_get_avpoles")
 
@@ -30,8 +30,6 @@ subroutine da_get_avpoles(u,v,       &
 
    tmp_u(:) =0.0
    tmp_v(:) =0.0
-
-   n = kte-kts+1
 
    if (jts == jds) then 
       do k = kts,kte

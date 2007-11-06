@@ -13,7 +13,6 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    integer           :: map_util_project
    real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
   
-   real              :: conv
    real              :: buf(2)
 
    character(len=24) :: xb_date, an_date
@@ -49,8 +48,6 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    !------------------------------------------------------------------------
    ! [1.0] Read original WRF format first guess:
    !------------------------------------------------------------------------
-
-   conv = 180.0 / pi
    
    !------------------------------------------------------------------------
    ! [2.0] Copy header info:

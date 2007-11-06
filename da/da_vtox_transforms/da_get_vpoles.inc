@@ -15,13 +15,11 @@ subroutine da_get_vpoles(u,v,        &
    real, intent(inout)    :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(inout)    :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
  
-   real                   :: conv,tmpvar                                         
+   real                   :: tmpvar                                         
    real                   :: tmpu,tmp_u,tmpv,tmp_v
    integer                :: k
 
    if (trace_use) call da_trace_entry("da_get_vpoles")
-
-   conv = pi/180.0
 
    ! cos_xls etc in da_control, calculated in da_setup_firstguess
 
