@@ -26,7 +26,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    real, dimension(kms:kme) :: DDT
 
-   real   :: old, qvf1, cvpm, cpovcv, ppb, ttb, albn, aln, height
+   real   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln, height
    real, allocatable :: arrayglobal(:,:)
 
    !---------------------------------------------------------------------------
@@ -375,8 +375,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          if (grid%xb%tgrn(i,j) < 100.0) &    
             grid%xb%tgrn(i,j) = grid%xb%t(i,j,kts)+ &
             0.0065*(grid%xb%h(i,j,kts)-grid%xb%hf(i,j,kts))
-         old = grid%xb%t(i,j,kts) + 0.0065*(grid%xb%h(i,j,kts+1) - &
-            grid%xb%hf(i,j,kts))
       end do
    end do
 

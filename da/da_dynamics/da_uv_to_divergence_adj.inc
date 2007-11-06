@@ -30,12 +30,6 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
 
-   if (.not. global) then
-      um(ims:ime,jms:jme) = 0.0
-      vm(ims:ime,jms:jme) = 0.0
-      inv_2ds = 0.5 / grid%xb%ds
-   end if
-
    one_third = 1.0 / 3.0
 
    if (test_wrfvar) then
@@ -52,12 +46,11 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
    ! [2.0] Calculate divergence:
    !---------------------------------------------------------------------------
 
-   if (global) then
-      call da_set_boundary_3d(div)
-   end if
-
-   do k =kds, kde
-      if (.not. global) then
+   if (.not. global) then
+      inv_2ds = 0.5 / grid%xb%ds
+      do k =kds, kde
+         um(ims:ime,jms:jme) = 0.0
+         vm(ims:ime,jms:jme) = 0.0
          ! [2.2] Impose zero divergence gradient condition at boundaries:
 
          ! [2.2.4] Right boundaries:
@@ -123,24 +116,22 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
 
          do j = js, je
             do i = is, ie
-              coeff = grid%xb%map_factor(i,j) * grid%xb%map_factor(i,j) * inv_2ds
-              um(i+1,j)=um(i+1,j)+div(i,j,k)*coeff
-              um(i-1,j)=um(i-1,j)-div(i,j,k)*coeff
-              vm(i,j+1)=vm(i,j+1)+div(i,j,k)*coeff
-              vm(i,j-1)=vm(i,j-1)-div(i,j,k)*coeff
-           end do
+               coeff = grid%xb%map_factor(i,j) * grid%xb%map_factor(i,j) * inv_2ds
+               um(i+1,j)=um(i+1,j)+div(i,j,k)*coeff
+               um(i-1,j)=um(i-1,j)-div(i,j,k)*coeff
+               vm(i,j+1)=vm(i,j+1)+div(i,j,k)*coeff
+               vm(i,j-1)=vm(i,j-1)-div(i,j,k)*coeff
+            end do
          end do
 
-         u(is-1:ie+1,js-1:je+1,k) = u(is-1:ie+1,js-1:je+1,k) &
-            +um(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
-         v(is-1:ie+1,js-1:je+1,k) = v(is-1:ie+1,js-1:je+1,k) &
-            +vm(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
+         u(is-1:ie+1,js-1:je+1,k) = u(is-1:ie+1,js-1:je+1,k) +um(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
+         v(is-1:ie+1,js-1:je+1,k) = v(is-1:ie+1,js-1:je+1,k) +vm(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
+      end do
 
-         um(:,:)=0.0
-         vm(:,:)=0.0
+   else ! global
+      call da_set_boundary_3d(div)
 
-      else
-
+      do k =kds, kde
          !-------------------------------------------------------------------------
          ! [2.1] Compute fd divergence at interior points:
          !-------------------------------------------------------------------------
@@ -153,8 +144,8 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
                v(i,j-1,k) = v(i,j-1,k) - grid%xb%coefy(i,j) * div(i,j,k) 
             end do
          end do
-      end if
-   end do
+      end do
+   end if
 
    div = 0.0
 

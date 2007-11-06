@@ -37,7 +37,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
       call da_get_aspoles(grid%xa%q, &
          ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
       call da_get_aspoles(grid%xa%psfc, &
-         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
+         ids,ide,jds,jde,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1)
    end if     
 
    ! Compute w increments using Richardson's eqn.

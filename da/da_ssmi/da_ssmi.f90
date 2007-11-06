@@ -111,7 +111,8 @@ contains
 #include "da_transform_xtoy_ssmt1_adj.inc"
 #include "da_transform_xtoy_ssmt2.inc"
 #include "da_transform_xtoy_ssmt2_adj.inc"
-#include "da_calculate_grady_ssmi.inc"
+#include "da_calculate_grady_ssmi_tb.inc"
+#include "da_calculate_grady_ssmi_rv.inc"
 #include "da_calculate_grady_ssmt1.inc"
 #include "da_calculate_grady_ssmt2.inc"
 

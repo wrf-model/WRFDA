@@ -29,7 +29,11 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    real    :: xr,yr,zr
 
+   real    :: alog10
+
    if (trace_use) call da_trace_entry("da_transform_xtoy_radar_adj")
+
+   alog10= alog(10.0)
 
    allocate (model_p(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
    allocate (model_u(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
@@ -47,26 +51,25 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    ! W_HALF is vertical velocity at half-sigma levels.
 
+   model_ps(iv%info(radar)%n1:iv%info(radar)%n2) = iv%radar(iv%info(radar)%n1:iv%info(radar)%n2)%model_ps 
+
    do n=iv%info(radar)%n1,iv%info(radar)%n2
-      model_ps(n) = iv%radar(n)%model_ps  
 
       ! [1.7] Calculate rv and rf at OBS location
 
       xr = grid%xb%ds * (iv%info(radar)%x(1,n) - iv%radar(n)%stn_loc%x)
       yr = grid%xb%ds * (iv%info(radar)%y(1,n) - iv%radar(n)%stn_loc%y)
 
-      do k = 1, iv%info(radar)%levels(n)
+      model_qrnb(1:iv%info(radar)%levels(n),n) = iv%radar(n)%model_qrn(:)
+      model_p   (1:iv%info(radar)%levels(n),n) = iv%radar(n)%model_p(:)
 
-         model_qrnb(k,n) = iv%radar(n)%model_qrn(k)
-         model_p(k,n)    = iv%radar(n)%model_p(k)
-
+      do k = 1,iv%info(radar)%levels(n)
          if (iv % radar(n) % height_qc(k) /= below_model_surface .and.  &
               iv % radar(n) % height_qc(k) /= above_model_lid) then
 
             if (use_radar_rf) then
                if (iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                 call da_reflectivity_adj(jo_grad_y%radar(n)%rf(k), &
-                    model_qrn(k,n), model_qrnb(k,n))
+                  model_qrn(k,n) = model_qrn(k,n) + leh2/(model_qrnb(k,n)*alog10) * jo_grad_y%radar(n)%rf(k)
                end if
             end if
 
@@ -80,11 +83,9 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
                end if
             end if
          end if
-
-         jo_grad_y%radar(n)%rv(k) = 0.0
-         jo_grad_y%radar(n)%rf(k) = 0.0
-
       end do
+      jo_grad_y%radar(n)%rv(:) = 0.0
+      jo_grad_y%radar(n)%rf(:) = 0.0
    end do ! n
 
    ! [1.6] Interpolate horizontally from crs points:

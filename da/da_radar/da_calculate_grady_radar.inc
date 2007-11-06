@@ -12,7 +12,7 @@ subroutine da_calculate_grady_radar(iv, re, jo_grad_y)
 
    integer  :: n, k
 
-   if (trace_use) call da_trace_entry("da_calculate_grady_radar")
+   if (trace_use_dull) call da_trace_entry("da_calculate_grady_radar")
 
    do n=1, iv%info(radar)%nlocal
       do k=1, iv%info(radar)%levels(n)
@@ -35,7 +35,7 @@ subroutine da_calculate_grady_radar(iv, re, jo_grad_y)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_calculate_grady_radar")
+   if (trace_use_dull) call da_trace_exit("da_calculate_grady_radar")
 
 end subroutine da_calculate_grady_radar
 

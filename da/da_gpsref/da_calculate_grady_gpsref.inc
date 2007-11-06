@@ -20,8 +20,7 @@ subroutine da_calculate_grady_gpsref(iv, re, jo_grad_y)
          if (iv%gpsref(n)%ref(k)%qc < obs_qc_pointer) then
             re%gpsref(n)%ref(k) = 0.0
          end if
-         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
-             (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
+         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
       end do
    end do
 

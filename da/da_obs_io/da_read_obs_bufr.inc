@@ -803,7 +803,8 @@ subroutine da_read_obs_bufr (iv, filename)
    call da_free_unit(iunit)
 
    if (trace_use) call da_trace_exit("da_read_obs_bufr")
-
+#else
+   call da_error(__FILE__,__LINE__,(/"must compile with BUFR library"/))
 #endif
 
 end subroutine da_read_obs_bufr

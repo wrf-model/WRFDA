@@ -24,7 +24,11 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
    real, allocatable :: model_ps(:)
    real    :: xr,yr,zr
 
+   real    :: alog_10
+
    if (trace_use) call da_trace_entry("da_transform_xtoy_radar")
+
+   alog_10 = alog(10.0)
 
    allocate (model_p(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
    allocate (model_u(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
@@ -72,9 +76,7 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
 
             if (use_radar_rf) then
                if (iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                  call da_reflectivity_lin(y%radar(n)%rf(k), &
-                     model_qrn(k,n), &
-                     model_qrnb(k,n))
+                  y%radar(n)%rf(k) = leh2 * model_qrn(n,k) /(model_qrnb(n,k)*alog_10) 
                end if
             end if
          end if

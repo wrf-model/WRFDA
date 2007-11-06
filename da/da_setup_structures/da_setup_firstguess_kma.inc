@@ -11,7 +11,7 @@ subroutine da_setup_firstguess_kma(xbx, grid)
    type (domain), intent(inout)        :: grid
 
    integer           :: i, j
-   integer           :: is, ie, js, je, ks, ke
+   integer           :: is, ie, js, je
    integer           :: max_wavenumber
 
    if (trace_use) call da_trace_entry("da_setup_firstguess_kma")
@@ -20,8 +20,6 @@ subroutine da_setup_firstguess_kma(xbx, grid)
    ie = grid%xp % ite
    js = grid%xp % jts
    je = grid%xp % jte
-   ks = grid%xp % kts
-   ke = grid%xp % kte
 
    !------------------------------------------------------------------------
    ! [2.0] Copy header info:

@@ -15,14 +15,10 @@ subroutine da_radial_velocity(rv,p,u,v,w,qrn,ps,x,y,z)
    if (trace_use) call da_trace_entry("da_radial_velocity")
 
    r=sqrt(x*x+y*y+z*z)
+   alpha=(ps/p)**0.4
 
-   if (qrn <= 0.0) then
-      vt=0.0
-   else 
-      alpha=(ps/p)**0.4
-      vt=5.4*alpha*qrn**0.125
-   end if
-
+   if (qrn <= 0.0) vt=0.0
+   if (qrn >  0.0) vt=5.4*alpha*qrn**0.125
    rv=u*x+v*y+(w-vt)*z
    rv=rv/r
 

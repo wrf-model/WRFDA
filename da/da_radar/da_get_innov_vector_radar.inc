@@ -150,8 +150,7 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
                         model_u(k,n), model_v(k,n), model_w(k,n),          &
                         model_qrn(k,n), model_ps(n), xr, yr, zr)
 
-                     iv % radar(n) % rv(k) % inv = ob % radar(n) % rv(k) - &
-                                              model_rv(k,n)
+                     iv % radar(n) % rv(k) % inv = ob % radar(n) % rv(k) - model_rv(k,n)
                   end if
                end if
             end if
@@ -160,11 +159,8 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
                if (abs(iv % radar(n) % rf(k) % qc - missing_data) > 1) then
                   if (abs(ob % radar(n) % rf(k) - missing_r) > 1.0 .AND. &
                      iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                     call da_reflectivity( model_rf(k,n), model_rho(k,n), &
-                        model_qrn(k,n))
-
-                     iv % radar(n) % rf(k) % inv = ob % radar(n) % rf(k) - &
-                                              model_rf(k,n)
+                     model_rf(n,k) = leh1 + leh2 * alog10(model_rho(n,k) * model_qrn(n,k) * 1.0e+3)
+                     iv % radar(n) % rf(k) % inv = ob % radar(n) % rf(k) - model_rf(k,n)
                   end if
                end if
             end if

@@ -49,19 +49,20 @@ subroutine da_uv_to_divergence(xb, u, v, div)
    ! [2.0] Calculate divergence:
    !---------------------------------------------------------------------------
 
-   do k = kts, kte
-      ! [2.1] Compute fd divergence at interior points:
+   if (global) then
+      do k = kts, kte
+         ! [2.1] Compute fd divergence at interior points:
 
-      if (global) then
          do j = js, je
             do i = is, ie
                div(i,j,k) = xb%coefx(i,j) * (u(i+1,j,k) - u(i-1,j,k)) + &
                             xb%coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k))
             end do
          end do
-
-         ! if (global) cycle
-      else
+      end do
+      call da_set_boundary_3d(div)
+   else
+      do k = kts, kte
 
          um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
          vm(is-1:ie+1,js-1:je+1) = v(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
@@ -112,11 +113,7 @@ subroutine da_uv_to_divergence(xb, u, v, div)
                div(i,j,k) = one_third * (4.0 * div(i,j-1,k) - div(i,j-2,k))
             end do
          end if
-      end if
-   end do
-
-   if (global) then
-      call da_set_boundary_3d(div)
+      end do
    end if
 
    if (trace_use) call da_trace_exit("da_uv_to_divergence")

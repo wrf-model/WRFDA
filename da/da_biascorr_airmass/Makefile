@@ -19,4 +19,4 @@ all:
 	@ ${FC} -o da_bias_verif.exe rad_bias.f90 da_bias_verif.f90
 clean:
 	@ rm *.mod *.exe
-	
+        

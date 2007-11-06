@@ -458,6 +458,8 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    ! end do
 
    call da_trace_exit("da_read_obs_bufrtovs")
+#else
+   call da_error(__FILE__,__LINE__,(/"Needs to be compiled with a BUFR library"/)) 
 #endif
 
 end subroutine da_read_obs_bufrtovs

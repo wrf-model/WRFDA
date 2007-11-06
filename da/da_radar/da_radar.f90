@@ -10,10 +10,10 @@ module da_radar
       max_error_bt, max_error_buv, radar,fails_error_max, &
       use_radar_rv, use_radar_rf,below_model_surface,mkz,above_model_lid,&
       fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
-      far_below_model_surface,kms,kme,kts,kte, trace_use_frequent
+      far_below_model_surface,kms,kme,kts,kte, trace_use_frequent, trace_use_dull
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      field_type, infa_type
+      radar_type, infa_type, field_type
    use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
@@ -38,6 +38,9 @@ module da_radar
       type (residual_radar1_type)     :: average, rms_err
    end type stats_radar_type
 
+   real, parameter :: leh1=43.1
+   real, parameter :: leh2=17.5
+
 contains
 
 #include "da_ao_stats_radar.inc"
@@ -52,9 +55,9 @@ contains
 #include "da_radial_velocity.inc"
 #include "da_radial_velocity_lin.inc"
 #include "da_radial_velocity_adj.inc"
-#include "da_reflectivity.inc"
-#include "da_reflectivity_lin.inc"
-#include "da_reflectivity_adj.inc"
+#include "da_radial_velocity_new.inc"
+#include "da_radial_velocity_lin_new.inc"
+#include "da_radial_velocity_adj_new.inc"
 #include "da_calculate_grady_radar.inc"
 #include "da_max_error_qc_radar.inc"
 
