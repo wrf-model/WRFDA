@@ -12,7 +12,7 @@
  end_year                            = 2000, 2000, 2000,
  end_month                           = 01,   01,   01,
  end_day                             = 25,   25,   25,
- end_hour                            = 00,   00,   00,
+ end_hour                            = 12,   12,   12,
  end_minute                          = 00,   00,   00,
  end_second                          = 00,   00,   00,
  interval_seconds                    = 21600

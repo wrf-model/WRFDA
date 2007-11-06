@@ -54,7 +54,6 @@ module wrf_data
 
   character (256)                         :: msg
   logical                                 :: WrfIOnotInitialized = .true.
-  logical                                 :: R4OnOutput          = .true.
 
   type :: wrf_data_handle
     character (255)                       :: FileName
@@ -88,6 +87,7 @@ module wrf_data
 ! or when open-for-write or open-for-read are committed.  It is set 
 ! to .FALSE. when the first field is read or written.  
     logical                               :: first_operation
+    logical                               :: R4OnOutput
   end type wrf_data_handle
   type(wrf_data_handle),target            :: WrfDataHandles(WrfDataHandleMax)
 end module wrf_data
@@ -197,6 +197,7 @@ subroutine allocHandle(DataHandle,DH,Comm,Status)
   DH%Comm      = Comm
   DH%Write     =.false.
   DH%first_operation  = .TRUE.
+  DH%R4OnOutput = .false.
   Status = WRF_NO_ERR
 end subroutine allocHandle
 
@@ -850,8 +851,8 @@ subroutine TransposeToR4(IO,MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
   integer           ,intent(in)    :: di
   integer           ,intent(in)    :: x1,x2,y1,y2,z1,z2
   integer           ,intent(in)    :: i1,i2,j1,j2,k1,k2
-  real (kind=8)     ,intent(inout) :: Field(di,l1:l2,m1:m2,n1:n2)
-  real (kind=4)     ,intent(inout) :: XField(di,(i2-i1+1)*(j2-j1+1)*(k2-k1+1))
+  real*8            ,intent(inout) :: Field(di,l1:l2,m1:m2,n1:n2)
+  real*4            ,intent(inout) :: XField(di,(i2-i1+1)*(j2-j1+1)*(k2-k1+1))
   character*3                      :: MemOrd
   character*3                      :: MemO
   integer           ,parameter     :: MaxUpperCase=IACHAR('Z')
@@ -1284,6 +1285,11 @@ SUBROUTINE ext_ncd_open_for_write_begin(FileName,Comm,IOComm,SysDepInfo,DataHand
     return
   endif
   DH%DimLengths(1) = DateStrLen
+
+  if (index(SysDepInfo,'REAL_OUTPUT_SIZE=4') /= 0) then
+     DH%R4OnOutput = .true.
+  end if
+
   return
 end subroutine ext_ncd_open_for_write_begin
 
@@ -2316,12 +2322,6 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldTypeIn,  &
   character (80)                               :: NullName
   logical                                      :: NotFound
 
-  if ( R4OnOutput .and. FieldTypeIn == WRF_DOUBLE ) then
-     FieldType = WRF_REAL
-  else
-     FieldType = FieldTypeIn
-  end if
-
   MemoryOrder = trim(adjustl(MemoryOrdIn))
   NullName=char(0)
   call GetDim(MemoryOrder,NDim,Status)
@@ -2344,6 +2344,12 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldTypeIn,  &
     return
   endif
   NCID = DH%NCID
+
+  if ( DH%R4OnOutput .and. FieldTypeIn == WRF_DOUBLE ) then
+     FieldType = WRF_REAL
+  else
+     FieldType = FieldTypeIn
+  end if
 
   write(msg,*)'ext_ncd_write_field: called for ',TRIM(Var)
 
@@ -2527,7 +2533,7 @@ subroutine ext_ncd_write_field(DataHandle,DateStr,Var,Field,FieldTypeIn,  &
       call wrf_debug ( FATAL , TRIM(msg))
       return
     endif
-    if (R4OnOutput .and. FieldTypeIn == WRF_DOUBLE) then
+    if (DH%R4OnOutput .and. FieldTypeIn == WRF_DOUBLE) then
        call TransposeToR4('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
                                                 ,XField,x1,x2,y1,y2,z1,z2 &
                                                    ,i1,i2,j1,j2,k1,k2 )

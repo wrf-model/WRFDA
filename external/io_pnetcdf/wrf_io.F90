@@ -148,6 +148,7 @@ subroutine allocHandle(DataHandle,DH,Comm,Status)
   DH%Comm      = Comm
   DH%Write     =.false.
   DH%first_operation  = .TRUE.
+  DH%R4OnOutput = .false.
   Status = WRF_NO_ERR
 end subroutine allocHandle
 
@@ -1180,6 +1181,11 @@ SUBROUTINE ext_pnc_open_for_write_begin(FileName,Comm,IOComm,SysDepInfo,DataHand
     return
   endif
   DH%DimLengths(1) = DateStrLen
+
+  if (index(SysDepInfo,'REAL_OUTPUT_SIZE=4') /= 0) then
+     DH%R4OnOutput = .true.
+  end if
+
   return
 end subroutine ext_pnc_open_for_write_begin
 
@@ -2165,8 +2171,8 @@ subroutine ext_pnc_get_dom_td_char(DataHandle,Element,DateStr,Data,Status)
 end subroutine ext_pnc_get_dom_td_char
 
 
-subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
-  IOComm, DomainDesc, MemoryOrdIn, Stagger,  DimNames,                      &
+subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldTypeIn,    &
+  Comm, IOComm, DomainDesc, MemoryOrdIn, Stagger,  DimNames,                &
   DomainStart,DomainEnd,MemoryStart,MemoryEnd,PatchStart,PatchEnd,Status)
   use wrf_data
   use ext_pnc_support_routines
@@ -2177,7 +2183,7 @@ subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   character*(*)                 ,intent(in)    :: DateStr
   character*(*)                 ,intent(in)    :: Var
   integer                       ,intent(inout) :: Field(*)
-  integer                       ,intent(in)    :: FieldType
+  integer                       ,intent(in)    :: FieldTypeIn
   integer                       ,intent(inout) :: Comm
   integer                       ,intent(inout) :: IOComm
   integer                       ,intent(in)    :: DomainDesc
@@ -2188,6 +2194,7 @@ subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   integer       ,dimension(*)   ,intent(in)    :: MemoryStart, MemoryEnd
   integer       ,dimension(*)   ,intent(in)    :: PatchStart,  PatchEnd
   integer                       ,intent(out)   :: Status
+  integer                                      :: FieldType
   character (3)                                :: MemoryOrder
   type(wrf_data_handle)         ,pointer       :: DH
   integer                                      :: NCID
@@ -2212,6 +2219,12 @@ subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
   integer                                      :: di
   character (80)                               :: NullName
   logical                                      :: NotFound
+
+  if ( DH%R4OnOutput .and. FieldTypeIn == WRF_DOUBLE ) then
+     FieldType = WRF_REAL
+  else
+     FieldType = FieldTypeIn
+  end if
 
   MemoryOrder = trim(adjustl(MemoryOrdIn))
   NullName=char(0)
@@ -2425,9 +2438,15 @@ subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
       call wrf_debug ( FATAL , TRIM(msg))
       return
     endif
-    call Transpose('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
-                                         ,XField,x1,x2,y1,y2,z1,z2 &
-                                                ,i1,i2,j1,j2,k1,k2 )
+    if (DH%R4OnOutput .and. FieldTypeIn == WRF_DOUBLE) then
+       call TransposeToR4('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
+                                                ,XField,x1,x2,y1,y2,z1,z2 &
+                                                   ,i1,i2,j1,j2,k1,k2 )
+    else
+       call Transpose('write',MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
+                                            ,XField,x1,x2,y1,y2,z1,z2 &
+                                                   ,i1,i2,j1,j2,k1,k2 )
+    end if
     StoredStart(1:NDim) = PatchStart(1:NDim)
     call ExtOrder(MemoryOrder,StoredStart,Status)
     call FieldIO('write',DataHandle,DateStr,StoredStart,Length,MemoryOrder, &

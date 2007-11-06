@@ -22,7 +22,7 @@ fi
 
 # Text files
 
-export TEXT_FILES="cost_fn grad_fn"
+export TEXT_FILES="cost_fn grad_fn rsl/rsl.error.0000.html namelist.input"
 #namelist.output
 #statistics
 #working/unpert_obs

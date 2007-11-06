@@ -931,7 +931,7 @@ local :
 		@ touch local
 
 ###########################################################
-#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, serial                  (Single-threaded) 
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, serial                  (Single-threaded) 
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -967,7 +967,7 @@ local :
 	@ touch local
 
 ###########################################################
-#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, debug                   (RSL_LITE, Cray MPI)
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug                   (RSL_LITE, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1009,7 +1009,7 @@ local : librsl_lite.a
 	@ touch local
 
 ###########################################################
-#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, optimised               (RSL_LITE, Cray MPI)
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, optimised               (RSL_LITE, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000

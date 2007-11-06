@@ -121,7 +121,6 @@ state    real   qi_gc          igj      dyn_em      1        Z     i1  "QI"    "
 state    real   qg_gc          igj      dyn_em      1        Z     i1  "QG"    "graupel mixing ratio"   "kg kg-1"
 state    real   qni_gc         igj      dyn_em      1        Z     i1  "QNI"   "ice no concentration"   "m-3"
 endif
-#state    real   qni_gc         igj      dyn_em      1        Z     i1  "QNI"   "ice no concentration"   "m-3"
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                               
