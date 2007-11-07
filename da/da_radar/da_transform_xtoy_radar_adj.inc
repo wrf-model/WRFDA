@@ -69,7 +69,9 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
             if (use_radar_rf) then
                if (iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
+
                   model_qrn(k,n) = model_qrn(k,n) + leh2/(model_qrnb(k,n)*alog10) * jo_grad_y%radar(n)%rf(k)
+
                end if
             end if
 
@@ -80,6 +82,7 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
                   call da_radial_velocity_adj(jo_grad_y%radar(n)%rv(k), &
                      model_p(k,n), model_u(k,n), model_v(k,n), model_w(k,n),  &
                      model_qrn(k,n), model_ps(n), xr, yr, zr, model_qrnb(k,n))
+
                end if
             end if
          end if

@@ -108,6 +108,7 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
       dxm = iv%info(radar)%dxm(1,n)
       dym = iv%info(radar)%dym(1,n)
 
+
       model_ps(n) = dxm *(dym * grid%xb % psac(i,  j) + dy * grid%xb%psac(i+1,  j)) + &
                  dx  *(dym * grid%xb % psac(i,j+1) + dy * grid%xb%psac(i+1,j+1)) + &
                  grid%xb % ptop
@@ -159,7 +160,7 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
                if (abs(iv % radar(n) % rf(k) % qc - missing_data) > 1) then
                   if (abs(ob % radar(n) % rf(k) - missing_r) > 1.0 .AND. &
                      iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                     model_rf(n,k) = leh1 + leh2 * alog10(model_rho(n,k) * model_qrn(n,k) * 1.0e+3)
+                     model_rf(k,n) = leh1 + leh2 * alog10(model_rho(k,n) * model_qrn(k,n) * 1.0e+3)
                      iv % radar(n) % rf(k) % inv = ob % radar(n) % rf(k) - model_rf(k,n)
                   end if
                end if

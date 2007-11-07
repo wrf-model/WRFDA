@@ -76,7 +76,7 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
 
             if (use_radar_rf) then
                if (iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                  y%radar(n)%rf(k) = leh2 * model_qrn(n,k) /(model_qrnb(n,k)*alog_10) 
+                  y%radar(n)%rf(k) = leh2 * model_qrn(k,n) /(model_qrnb(k,n)*alog_10) 
                end if
             end if
          end if
