@@ -31,10 +31,10 @@ subroutine da_transform_xtoy_sound_adj(iv, jo_grad_y, jo_grad_x)
       q(1:size(jo_grad_y%sound(n)%q),n) = jo_grad_y%sound(n)%q(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(sound), u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(sound), v)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(sound), t)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(sound), q)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(sound), u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(sound), v)
+   call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(sound), t)
+   call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(sound), q)
 
    deallocate (u)
    deallocate (v)

@@ -64,8 +64,8 @@ subroutine da_get_innov_vector_qscat (it, grid, ob, iv)
       end do
    end if
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(qscat), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(qscat), model_v)
+   call da_interp_lin_3d (grid%xb%u, iv%info(qscat), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(qscat), model_v)
 
    do n=iv%info(qscat)%n1,iv%info(qscat)%n2
 

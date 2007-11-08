@@ -21,8 +21,8 @@ module da_ssmi
       maxmin_type,residual_ssmi_rv_type, &
       residual_ssmi_tb_type, model_loc_type, info_type, field_type, &
       count_obs_number_type
-   use da_interpolation, only : da_to_zk,da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest, &
-      da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
+   use da_interpolation, only : da_to_zk,da_interp_lin_2d, da_interp_lin_2d_adj, &
+      da_interp_lin_3d,da_interp_lin_3d_adj
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_reporting, only : da_warning, message, da_error

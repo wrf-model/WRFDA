@@ -19,8 +19,8 @@ subroutine da_transform_xtoy_geoamv (grid, iv, y)
    allocate (u(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
    allocate (v(iv%info(geoamv)%max_lev,iv%info(geoamv)%n1:iv%info(geoamv)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(geoamv), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(geoamv), v)
+   call da_interp_lin_3d (grid%xa%u, iv%info(geoamv), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(geoamv), v)
 
    do n=iv%info(geoamv)%n1,iv%info(geoamv)%n2
       y%geoamv(n)%u(:) = u(1:size(y%geoamv(n)%u),n)

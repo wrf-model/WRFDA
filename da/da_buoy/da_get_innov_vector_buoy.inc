@@ -118,11 +118,11 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
       end if
 
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_newest (grid%xb%u, iv%info(buoy),model_u)
-      call da_interp_lin_3d_newest (grid%xb%v, iv%info(buoy),model_v)
-      call da_interp_lin_3d_newest (grid%xb%t, iv%info(buoy),model_t)
-      call da_interp_lin_3d_newest (grid%xb%q, iv%info(buoy),model_q)
-      call da_interp_lin_3d_newest (grid%xb%p, iv%info(buoy),model_p)
+      call da_interp_lin_3d (grid%xb%u, iv%info(buoy),model_u)
+      call da_interp_lin_3d (grid%xb%v, iv%info(buoy),model_v)
+      call da_interp_lin_3d (grid%xb%t, iv%info(buoy),model_t)
+      call da_interp_lin_3d (grid%xb%q, iv%info(buoy),model_q)
+      call da_interp_lin_3d (grid%xb%p, iv%info(buoy),model_p)
    else if (sfc_assi_options == 2) then
 
       ! Surface data assmiilation approach 2
@@ -131,17 +131,17 @@ subroutine da_get_innov_vector_buoy( it, grid, ob, iv)
       ! 1.2.1 Surface assmiilation approach 2(10-m u, v, 2-m t, q, 
       ! and sfc_p)
 
-      call da_interp_lin_2d_newest (grid%xb%u10,  iv%info(buoy), 1,model_u)
-      call da_interp_lin_2d_newest (grid%xb%v10,  iv%info(buoy), 1,model_v)
-      call da_interp_lin_2d_newest (grid%xb%t2,   iv%info(buoy), 1,model_t)
-      call da_interp_lin_2d_newest (grid%xb%q2,   iv%info(buoy), 1,model_q)
-      call da_interp_lin_2d_newest (grid%xb%psfc, iv%info(buoy), 1,model_p)
+      call da_interp_lin_2d (grid%xb%u10,  iv%info(buoy), 1,model_u)
+      call da_interp_lin_2d (grid%xb%v10,  iv%info(buoy), 1,model_v)
+      call da_interp_lin_2d (grid%xb%t2,   iv%info(buoy), 1,model_t)
+      call da_interp_lin_2d (grid%xb%q2,   iv%info(buoy), 1,model_q)
+      call da_interp_lin_2d (grid%xb%psfc, iv%info(buoy), 1,model_p)
 
       do n=iv%info(buoy)%n1,iv%info(buoy)%n2
          if (iv%buoy(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
-            call da_interp_lin_2d_newer (grid%xb%terr, iv%info(buoy), 1, n, n, model_hsm(:,n))
+            call da_interp_lin_2d_partial (grid%xb%terr, iv%info(buoy), 1, n, n, model_hsm(:,n))
 
             ho = iv%buoy(n)%h
             to = -888888.0

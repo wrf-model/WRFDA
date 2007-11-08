@@ -46,10 +46,10 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    ! [1.1] Adjoint feedback from Y to X for u and v:
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(bogus), temp_u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(bogus), temp_v)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(bogus), temp_t)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(bogus), temp_q)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(bogus), temp_u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(bogus), temp_v)
+   call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(bogus), temp_t)
+   call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(bogus), temp_q)
    deallocate (temp_u)
    deallocate (temp_v)
    deallocate (temp_t)

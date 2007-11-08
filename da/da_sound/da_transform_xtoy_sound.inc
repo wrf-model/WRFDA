@@ -24,10 +24,10 @@ subroutine da_transform_xtoy_sound (grid, iv, y)
    allocate (t(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
    allocate (q(iv%info(sound)%max_lev,iv%info(sound)%n1:iv%info(sound)%n2))
   
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(sound), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(sound), v)
-   call da_interp_lin_3d_newest (grid%xa%t, iv%info(sound), t)
-   call da_interp_lin_3d_newest (grid%xa%q, iv%info(sound), q)
+   call da_interp_lin_3d (grid%xa%u, iv%info(sound), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(sound), v)
+   call da_interp_lin_3d (grid%xa%t, iv%info(sound), t)
+   call da_interp_lin_3d (grid%xa%q, iv%info(sound), q)
 
    do n=iv%info(sound)%n1,iv%info(sound)%n2
       y%sound(n)%u(:) = u(1:size(y%sound(n)%u),n)

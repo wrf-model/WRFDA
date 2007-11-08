@@ -22,7 +22,7 @@ module da_physics
    use da_par_util, only : da_transpose_z2y, da_transpose_y2x, &
       da_transpose_x2z, da_transpose_z2x, da_transpose_x2y, da_transpose_y2z
    use da_tracing, only : da_trace_entry, da_trace_exit
-   use da_interpolation, only : da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest
+   use da_interpolation, only : da_interp_lin_2d, da_interp_lin_2d_adj
    use da_dynamics, only : da_w_adjustment_adj, da_uv_to_divergence_adj, &
       da_w_adjustment_lin, da_uv_to_divergence
    use da_reporting, only : da_error, message

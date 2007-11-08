@@ -133,16 +133,16 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       psfc(:)          = 0.0
 
       do k=kts,kte ! from bottom to top
-         call da_interp_lin_2d_newer (grid%xa%t(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+         call da_interp_lin_2d_partial (grid%xa%t(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
             temperature(kte-k+1,:))
-         call da_interp_lin_2d_newer (grid%xa%q(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+         call da_interp_lin_2d_partial (grid%xa%q(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
             absorber(kte-k+1,:))
          do n=1,num_rad
             if (iv%instid(inst)%pm(kte-k+1,n) < 75.0) absorber(kte-k+1,n) = 0.0
          end do
       end do
 
-      call da_interp_lin_2d_newer (grid%xa%psfc, iv%instid(inst)%info, 1, 1, num_rad,psfc(:))
+      call da_interp_lin_2d_partial (grid%xa%psfc, iv%instid(inst)%info, 1, 1, num_rad,psfc(:))
 
       do n= 1, num_rad           ! loop for pixel
             

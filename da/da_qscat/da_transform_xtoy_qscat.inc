@@ -20,8 +20,8 @@ subroutine da_transform_xtoy_qscat(grid, iv, y)
    allocate (u(1,iv%info(qscat)%n1:iv%info(qscat)%n2))
    allocate (v(1,iv%info(qscat)%n1:iv%info(qscat)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(qscat), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(qscat), v)
+   call da_interp_lin_3d (grid%xa%u, iv%info(qscat), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(qscat), v)
 
    do n=iv%info(qscat)%n1,iv%info(qscat)%n2
       y%qscat(n)%u = u(1,n)

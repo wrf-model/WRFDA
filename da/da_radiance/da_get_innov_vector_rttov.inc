@@ -116,8 +116,8 @@ real,allocatable :: temp(:)
       call da_convert_zk (iv%instid(inst)%info)
 
       ! [1.2] Interpolate horizontally to ob:
-      call da_interp_lin_3d_newest (grid%xb%t, iv%instid(inst)%info, iv%instid(inst)%t (:,n1:n2))
-      call da_interp_lin_3d_newest (grid%xb%q, iv%instid(inst)%info, iv%instid(inst)%mr(:,n1:n2))
+      call da_interp_lin_3d (grid%xb%t, iv%instid(inst)%info, iv%instid(inst)%t (:,n1:n2))
+      call da_interp_lin_3d (grid%xb%q, iv%instid(inst)%info, iv%instid(inst)%mr(:,n1:n2))
 
       do n= n1,n2
          do k=1, nlevels
@@ -148,31 +148,31 @@ real,allocatable :: temp(:)
             seap, icep, lndp, snop )
       end do
 
-      call da_interp_lin_2d_newest (grid%xb % u10,  iv%instid(inst)%info, 1,iv%instid(inst)%u10(n1:n2))
-      call da_interp_lin_2d_newest (grid%xb % v10,  iv%instid(inst)%info, 1,iv%instid(inst)%v10(n1:n2))
-      call da_interp_lin_2d_newest (grid%xb % t2,   iv%instid(inst)%info, 1,iv%instid(inst)%t2m(n1:n2))
-      call da_interp_lin_2d_newest (grid%xb % q2,   iv%instid(inst)%info, 1,iv%instid(inst)%q2m(n1:n2))
-      call da_interp_lin_2d_newest (grid%xb % psfc, iv%instid(inst)%info, 1,iv%instid(inst)%ps(n1:n2))
+      call da_interp_lin_2d (grid%xb % u10,  iv%instid(inst)%info, 1,iv%instid(inst)%u10(n1:n2))
+      call da_interp_lin_2d (grid%xb % v10,  iv%instid(inst)%info, 1,iv%instid(inst)%v10(n1:n2))
+      call da_interp_lin_2d (grid%xb % t2,   iv%instid(inst)%info, 1,iv%instid(inst)%t2m(n1:n2))
+      call da_interp_lin_2d (grid%xb % q2,   iv%instid(inst)%info, 1,iv%instid(inst)%q2m(n1:n2))
+      call da_interp_lin_2d (grid%xb % psfc, iv%instid(inst)%info, 1,iv%instid(inst)%ps(n1:n2))
 
       do n=n1,n2
          if (iv%instid(inst)%isflg(n) == 0) then   ! over sea using SST
-            call da_interp_lin_2d_newer (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
+            call da_interp_lin_2d_partial (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
          else
-            call da_interp_lin_2d_newer (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
+            call da_interp_lin_2d_partial (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
 
          end if
 
       end do
 
-      call da_interp_lin_2d_newer (grid%xb%terr,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%elevation(n1:n2))
+      call da_interp_lin_2d_partial (grid%xb%terr,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%elevation(n1:n2))
 
       ! variables for emissivity calculations
       !---------------------------------------- 
 
-      call da_interp_lin_2d_newer (grid%xb%smois,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%smois(n1:n2))
-      call da_interp_lin_2d_newer (grid%xb%tslb,   iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%tslb(n1:n2))
-      call da_interp_lin_2d_newer (grid%xb%snowh,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%snowh(n1:n2))
-      call da_interp_lin_2d_newer (grid%xb%vegfra, iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%vegfra(n1:n2))
+      call da_interp_lin_2d_partial (grid%xb%smois,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%smois(n1:n2))
+      call da_interp_lin_2d_partial (grid%xb%tslb,   iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%tslb(n1:n2))
+      call da_interp_lin_2d_partial (grid%xb%snowh,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%snowh(n1:n2))
+      call da_interp_lin_2d_partial (grid%xb%vegfra, iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%vegfra(n1:n2))
 
       ! iv%instid(inst)%snowh(n1:n2) = iv%instid(inst)%snowh(n1:n2)*100.0   ! convert from m to mm
       iv%instid(inst)%vegfra(n1:n2) = 0.01*iv%instid(inst)%vegfra(n1:n2)  ! convert range to 0~1
@@ -180,13 +180,13 @@ real,allocatable :: temp(:)
       ! variables for calculation of cloud affected radiance
       !-------------------------------------------------------
       do k=kts,kte
-         call da_interp_lin_2d_newer (grid%xb%t(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%tm(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%q(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qm(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%qrn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qrn(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%qcw(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qcw(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%qci(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qci(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%qsn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qsn(k,n1:n2))
-         call da_interp_lin_2d_newer (grid%xb%qgr(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qgr(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%t(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%tm(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%q(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qm(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%qrn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qrn(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%qcw(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qcw(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%qci(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qci(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%qsn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qsn(k,n1:n2))
+         call da_interp_lin_2d_partial (grid%xb%qgr(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qgr(k,n1:n2))
 
          iv%instid(inst)%pm(k,n1:n2)  = v_p(k,n1:n2)
       end do

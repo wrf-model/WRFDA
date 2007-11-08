@@ -64,8 +64,8 @@ subroutine da_get_innov_vector_profiler( it, grid, ob, iv)
    call da_convert_zk (iv%info(profiler))
 
    ! [1.4] Interpolate horizontally:
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(profiler), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(profiler), model_v)
+   call da_interp_lin_3d (grid%xb%u, iv%info(profiler), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(profiler), model_v)
 
 
    do n=iv%info(profiler)%n1,iv%info(profiler)%n2

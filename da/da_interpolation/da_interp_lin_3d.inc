@@ -1,4 +1,4 @@
-subroutine da_interp_lin_3d_newest(fm3d, info, fo3d)
+subroutine da_interp_lin_3d(fm3d, info, fo3d)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -13,7 +13,7 @@ subroutine da_interp_lin_3d_newest(fm3d, info, fo3d)
    integer :: n, k
    real    :: fmz(kms:kme)
 
-   if (trace_use) call da_trace_entry("da_interp_lin_3d_newest")
+   if (trace_use) call da_trace_entry("da_interp_lin_3d")
 
    fo3d(:,:) = 0.0
 
@@ -35,8 +35,8 @@ subroutine da_interp_lin_3d_newest(fm3d, info, fo3d)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_interp_lin_3d_newest")
+   if (trace_use) call da_trace_exit("da_interp_lin_3d")
 
-end subroutine da_interp_lin_3d_newest
+end subroutine da_interp_lin_3d
 
 

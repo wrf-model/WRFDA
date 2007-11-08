@@ -15,7 +15,7 @@ module da_gpsref
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type
-   use da_interpolation, only : da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest, &
+   use da_interpolation, only : da_interp_lin_3d,da_interp_lin_3d_adj, &
       da_to_zk
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int

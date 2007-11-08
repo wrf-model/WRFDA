@@ -27,12 +27,12 @@ subroutine da_transform_xtoy_metar (grid, iv, y)
       allocate (model_q(1,iv%info(metar)%n1:iv%info(metar)%n2))
       allocate (model_p(iv%info(metar)%n1:iv%info(metar)%n2))
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_newest (grid%xa%u, iv%info(metar),model_u)
-      call da_interp_lin_3d_newest (grid%xa%v, iv%info(metar),model_v)
-      call da_interp_lin_3d_newest (grid%xa%t, iv%info(metar),model_t)
-      call da_interp_lin_3d_newest (grid%xa%q, iv%info(metar),model_q)
+      call da_interp_lin_3d (grid%xa%u, iv%info(metar),model_u)
+      call da_interp_lin_3d (grid%xa%v, iv%info(metar),model_v)
+      call da_interp_lin_3d (grid%xa%t, iv%info(metar),model_t)
+      call da_interp_lin_3d (grid%xa%q, iv%info(metar),model_q)
 
-      call da_interp_lin_2d_newest (grid%xa%psfc, iv%info(metar), 1, model_p)
+      call da_interp_lin_2d (grid%xa%psfc, iv%info(metar), 1, model_p)
 
       do n=iv%info(metar)%n1,iv%info(metar)%n2
          y%metar(n)%u = model_u(1,n)

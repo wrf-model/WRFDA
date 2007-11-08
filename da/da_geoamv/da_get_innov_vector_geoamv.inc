@@ -94,8 +94,8 @@ subroutine da_get_innov_vector_geoamv( it, grid, ob, iv)
       end do
    end if
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(geoamv), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(geoamv), model_v)
+   call da_interp_lin_3d (grid%xb%u, iv%info(geoamv), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(geoamv), model_v)
 
    do n = iv%info(geoamv)%n1, iv%info(geoamv)%n2
       do k = 1, iv%info(geoamv)%levels(n)

@@ -26,7 +26,7 @@ module da_crtm
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
       time_window_min,num_fgat_time,rtminit_platform, &
       rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte
-   use da_interpolation, only : da_interp_lin_2d_newer,da_interp_lin_2d_adj_newer
+   use da_interpolation, only : da_interp_lin_2d_partial,da_interp_lin_2d_adj_partial
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
       da_get_time_slots,da_biasprep,da_read_biascoef
    use da_radiance1, only : da_qc_crtm

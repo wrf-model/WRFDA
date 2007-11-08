@@ -35,12 +35,12 @@ subroutine da_transform_xtoy_synop_adj(grid, iv, jo_grad_y, jo_grad_x)
          model_q(1,n)  = jo_grad_y%synop(n)%q
          model_psfc(n) = jo_grad_y%synop(n)%p
       end do
-      call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(synop),model_u)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(synop),model_v)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(synop),model_t)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(synop),model_q)
+      call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(synop),model_u)
+      call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(synop),model_v)
+      call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(synop),model_t)
+      call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(synop),model_q)
 
-      call da_interp_lin_2d_adj_newest (jo_grad_x%psfc, iv%info(synop), 1, model_psfc)
+      call da_interp_lin_2d_adj (jo_grad_x%psfc, iv%info(synop), 1, model_psfc)
       deallocate (model_u)
       deallocate (model_v)
       deallocate (model_t)

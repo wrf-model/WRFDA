@@ -27,8 +27,8 @@ subroutine da_transform_xtoy_airsr_adj(iv, jo_grad_y, jo_grad_x)
 
    ! [1.1] Adjoint feedback from Y to X for u and v:
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(airsr), t)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(airsr), q)
+   call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(airsr), t)
+   call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(airsr), q)
 
    deallocate (t)
    deallocate (q)

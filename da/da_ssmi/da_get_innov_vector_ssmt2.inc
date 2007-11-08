@@ -76,7 +76,7 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
 
    call da_convert_zk (iv%info(ssmt2))
 
-   call da_interp_lin_3d_newest (grid%xb%rh, iv%info(ssmt2), model_rh)
+   call da_interp_lin_3d (grid%xb%rh, iv%info(ssmt2), model_rh)
 
    do n=iv%info(ssmt2)%n1, iv%info(ssmt2)%n2
       do k = 1, iv%info(ssmt2)%levels(n)

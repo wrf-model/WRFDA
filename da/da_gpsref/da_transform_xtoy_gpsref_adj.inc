@@ -22,7 +22,7 @@ subroutine da_transform_xtoy_gpsref_adj(iv, jo_grad_y, jo_grad_x)
       model_ref(1:iv%info(gpsref)%levels(n),n) = jo_grad_y%gpsref(n)%ref(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%ref, iv%info(gpsref), model_ref)
+   call da_interp_lin_3d_adj (jo_grad_x%ref, iv%info(gpsref), model_ref)
 
    deallocate(model_ref)
 

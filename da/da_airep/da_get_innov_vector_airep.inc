@@ -97,9 +97,9 @@ subroutine da_get_innov_vector_airep( it, grid, ob, iv)
       end do
    end if
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(airep), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(airep), model_v)
-   call da_interp_lin_3d_newest (grid%xb%t, iv%info(airep), model_t)
+   call da_interp_lin_3d (grid%xb%u, iv%info(airep), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(airep), model_v)
+   call da_interp_lin_3d (grid%xb%t, iv%info(airep), model_t)
 
    do n=iv%info(airep)%n1, iv%info(airep)%n2
 

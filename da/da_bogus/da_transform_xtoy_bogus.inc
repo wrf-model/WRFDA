@@ -81,10 +81,10 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
    t(:,:)=0.0
    q(:,:)=0.0
   
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(bogus), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(bogus), v)
-   call da_interp_lin_3d_newest (grid%xa%t, iv%info(bogus), t)
-   call da_interp_lin_3d_newest (grid%xa%q, iv%info(bogus), q)
+   call da_interp_lin_3d (grid%xa%u, iv%info(bogus), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(bogus), v)
+   call da_interp_lin_3d (grid%xa%t, iv%info(bogus), t)
+   call da_interp_lin_3d (grid%xa%q, iv%info(bogus), q)
 
    do n=iv%info(bogus)%n1,iv%info(bogus)%n2
       y%bogus(n)%u(:) = u(1:size(y%bogus(n)%u),n)

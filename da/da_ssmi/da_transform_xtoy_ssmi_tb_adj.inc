@@ -41,13 +41,13 @@ subroutine da_transform_xtoy_ssmi_tb_adj(grid, iv, jo_grad_y, jo_grad_x)
       tb85h(n) = jo_grad_y%ssmi_tb(n)%tb85h
    end do
 
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb19v, iv%info(ssmi_tb), 1, tb19v)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb19h, iv%info(ssmi_tb), 1, tb19h)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb22v, iv%info(ssmi_tb), 1, tb22v)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb37v, iv%info(ssmi_tb), 1, tb37v)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb37h, iv%info(ssmi_tb), 1, tb37h)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb85v, iv%info(ssmi_tb), 1, tb85v)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%tb85h, iv%info(ssmi_tb), 1, tb85h)
+   call da_interp_lin_2d_adj(jo_grad_x%tb19v, iv%info(ssmi_tb), 1, tb19v)
+   call da_interp_lin_2d_adj(jo_grad_x%tb19h, iv%info(ssmi_tb), 1, tb19h)
+   call da_interp_lin_2d_adj(jo_grad_x%tb22v, iv%info(ssmi_tb), 1, tb22v)
+   call da_interp_lin_2d_adj(jo_grad_x%tb37v, iv%info(ssmi_tb), 1, tb37v)
+   call da_interp_lin_2d_adj(jo_grad_x%tb37h, iv%info(ssmi_tb), 1, tb37h)
+   call da_interp_lin_2d_adj(jo_grad_x%tb85v, iv%info(ssmi_tb), 1, tb85v)
+   call da_interp_lin_2d_adj(jo_grad_x%tb85h, iv%info(ssmi_tb), 1, tb85h)
   
    deallocate(tb19v)
    deallocate(tb19h)

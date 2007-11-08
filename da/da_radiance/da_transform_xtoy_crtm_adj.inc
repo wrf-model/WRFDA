@@ -308,9 +308,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
          end do       !  end loop for pixels
 
-         call da_interp_lin_2d_adj_newer(jo_grad_x%t(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, t)
-         call da_interp_lin_2d_adj_newer(jo_grad_x%q(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, q_ad)
-         call da_interp_lin_2d_adj_newer(jo_grad_x%psfc, iv%instid(inst)%info, 1,1, p)
+         call da_interp_lin_2d_adj_partial(jo_grad_x%t(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, t)
+         call da_interp_lin_2d_adj_partial(jo_grad_x%q(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, q_ad)
+         call da_interp_lin_2d_adj_partial(jo_grad_x%psfc, iv%instid(inst)%info, 1,1, p)
 
          deallocate (q_ad)
          deallocate (t)

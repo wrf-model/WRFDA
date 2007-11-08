@@ -35,10 +35,10 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
 
    ! 2.1 Terrain height at the observed site (xj, yi):
 
-   call da_interp_lin_2d_newest(grid%xb%terr, iv%info(obs_index), 1, hsm)
-   call da_interp_lin_2d_newest(grid%xb%t2,   iv%info(obs_index), 1, tsm)
-   call da_interp_lin_2d_newest(grid%xb%q2,   iv%info(obs_index), 1, qsm)
-   call da_interp_lin_2d_newest(grid%xb%psfc, iv%info(obs_index), 1, psm)
+   call da_interp_lin_2d(grid%xb%terr, iv%info(obs_index), 1, hsm)
+   call da_interp_lin_2d(grid%xb%t2,   iv%info(obs_index), 1, tsm)
+   call da_interp_lin_2d(grid%xb%q2,   iv%info(obs_index), 1, qsm)
+   call da_interp_lin_2d(grid%xb%psfc, iv%info(obs_index), 1, psm)
 
    do n=iv%info(obs_index)%n1,iv%info(obs_index)%n2
       if (synop(n)%p%qc >= 0) then
@@ -78,11 +78,11 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
    end do
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%t2,   iv%info(obs_index), 1, j_synop_y(n)%t)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%q2,   iv%info(obs_index), 1, j_synop_y(n)%q)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%u10,  iv%info(obs_index), 1, j_synop_y(n)%u)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%v10,  iv%info(obs_index), 1, j_synop_y(n)%v)
-   call da_interp_lin_2d_adj_newest(jo_grad_x%psfc, iv%info(obs_index), 1, psm_prime)
+   call da_interp_lin_2d_adj(jo_grad_x%t2,   iv%info(obs_index), 1, j_synop_y(n)%t)
+   call da_interp_lin_2d_adj(jo_grad_x%q2,   iv%info(obs_index), 1, j_synop_y(n)%q)
+   call da_interp_lin_2d_adj(jo_grad_x%u10,  iv%info(obs_index), 1, j_synop_y(n)%u)
+   call da_interp_lin_2d_adj(jo_grad_x%v10,  iv%info(obs_index), 1, j_synop_y(n)%v)
+   call da_interp_lin_2d_adj(jo_grad_x%psfc, iv%info(obs_index), 1, psm_prime)
 
    deallocate (hsm)
    deallocate (tsm)

@@ -21,8 +21,8 @@ subroutine da_transform_xtoy_pilot (grid, iv, y)
    allocate (model_u(iv%info(pilot)%max_lev,iv%info(pilot)%n1:iv%info(pilot)%n2))
    allocate (model_v(iv%info(pilot)%max_lev,iv%info(pilot)%n1:iv%info(pilot)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(pilot), model_u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(pilot), model_v)
+   call da_interp_lin_3d (grid%xa%u, iv%info(pilot), model_u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(pilot), model_v)
 
    do n=iv%info(pilot)%n1,iv%info(pilot)%n2
       y%pilot(n)%u(:) = model_u(1:iv%info(pilot)%levels(n),n)

@@ -10,8 +10,8 @@ module da_airsr
       max_error_bt, max_error_buv, anal_type_verify, kms,kme,kts,kte
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type
-   use da_interpolation, only : da_interp_lin_3d_newest, da_to_zk, &
-      da_interp_lin_3d_adj_newest
+   use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
+      da_interp_lin_3d_adj
    use da_par_util1, only : da_proc_sum_int
    use da_par_util, only : da_proc_stats_combine
    use da_statistics, only : da_stats_calculate

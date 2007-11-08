@@ -397,21 +397,21 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_t(:,n) = con_vars_ad(n)% t(:)
          end do
-         call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%instid(i)%info, temp_t)
+         call da_interp_lin_3d_adj (jo_grad_x%t, iv%instid(i)%info, temp_t)
          deallocate(temp_t)
 
          allocate(temp_q(nlevels,num_rad))
          do n=1,num_rad
             temp_q(:,n) = con_vars_ad(n)% q(:)
          end do
-         call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%instid(i)%info, temp_q)
+         call da_interp_lin_3d_adj (jo_grad_x%q, iv%instid(i)%info, temp_q)
          deallocate(temp_q)
 
          allocate(temp_ps(num_rad))
          do n=1,num_rad
             temp_ps(n) = con_vars_ad(n)% ps
          end do
-         call da_interp_lin_2d_adj_newest (jo_grad_x% psfc, iv%instid(i)%info, 1, temp_ps)
+         call da_interp_lin_2d_adj (jo_grad_x% psfc, iv%instid(i)%info, 1, temp_ps)
          deallocate(temp_ps)
       end if
 

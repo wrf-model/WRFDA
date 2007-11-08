@@ -27,12 +27,12 @@ subroutine da_transform_xtoy_sonde_sfc (grid, iv, y)
       allocate (model_q(1,iv%info(sound)%n1:iv%info(sound)%n2))
       allocate (model_psfc(iv%info(sound)%n1:iv%info(sound)%n2))
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_newest (grid%xa%u, iv%info(sonde_sfc), model_u)
-      call da_interp_lin_3d_newest (grid%xa%v, iv%info(sonde_sfc), model_v)
-      call da_interp_lin_3d_newest (grid%xa%t, iv%info(sonde_sfc), model_t)
-      call da_interp_lin_3d_newest (grid%xa%q, iv%info(sonde_sfc), model_q)
+      call da_interp_lin_3d (grid%xa%u, iv%info(sonde_sfc), model_u)
+      call da_interp_lin_3d (grid%xa%v, iv%info(sonde_sfc), model_v)
+      call da_interp_lin_3d (grid%xa%t, iv%info(sonde_sfc), model_t)
+      call da_interp_lin_3d (grid%xa%q, iv%info(sonde_sfc), model_q)
 
-      call da_interp_lin_2d_newest (grid%xa%psfc, iv%info(sonde_sfc), 1, model_psfc)
+      call da_interp_lin_2d (grid%xa%psfc, iv%info(sonde_sfc), 1, model_psfc)
 
       do n=iv%info(sound)%n1,iv%info(sound)%n2
          y%sonde_sfc(n)%u = model_u(1,n)

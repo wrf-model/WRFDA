@@ -10,8 +10,8 @@ module da_sound
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type
    use module_domain, only : domain
-   use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest, &
-      da_interp_lin_3d_adj_newest, da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest, da_interp_lin_2d_newer
+   use da_interpolation, only : da_to_zk, da_interp_lin_3d, &
+      da_interp_lin_3d_adj, da_interp_lin_2d, da_interp_lin_2d_adj, da_interp_lin_2d_partial
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc_new, da_residual, da_obs_sfc_correction, da_convert_zk
    use da_par_util, only : da_proc_stats_combine, &

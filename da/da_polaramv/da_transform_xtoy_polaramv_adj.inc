@@ -24,8 +24,8 @@ subroutine da_transform_xtoy_polaramv_adj (iv, jo_grad_y, jo_grad_x)
       v(1:size(jo_grad_y%polaramv(n)%v),n) = jo_grad_y%polaramv(n)%v(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(polaramv), u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(polaramv), v)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(polaramv), u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(polaramv), v)
 
    deallocate (u)
    deallocate (v)

@@ -20,8 +20,8 @@ subroutine da_transform_xtoy_airsr (grid, iv, y)
    allocate (t(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
    allocate (q(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
   
-   call da_interp_lin_3d_newest (grid%xa%t, iv%info(airsr), t)
-   call da_interp_lin_3d_newest (grid%xa%q, iv%info(airsr), q)
+   call da_interp_lin_3d (grid%xa%t, iv%info(airsr), t)
+   call da_interp_lin_3d (grid%xa%q, iv%info(airsr), q)
 
    do n=iv%info(airsr)%n1,iv%info(airsr)%n2
       y%airsr(n)%t(:) = t(1:size(y%airsr(n)%t),n)

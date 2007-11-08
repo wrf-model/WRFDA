@@ -87,12 +87,12 @@ subroutine da_get_innov_vector_radar (it, grid, ob, iv)
 
    ! [2.0] Interpolate horizontally to ob points:
 
-   call da_interp_lin_3d_newest (grid%xb % p,   iv%info(radar), model_p)
-   call da_interp_lin_3d_newest (grid%xb % u,   iv%info(radar), model_u)
-   call da_interp_lin_3d_newest (grid%xb % v,   iv%info(radar), model_v)
-   call da_interp_lin_3d_newest (grid%xb % wh,  iv%info(radar), model_w)
-   call da_interp_lin_3d_newest (grid%xb % rho, iv%info(radar), model_rho)
-   call da_interp_lin_3d_newest (grid%xb % qrn, iv%info(radar), model_qrn)
+   call da_interp_lin_3d (grid%xb % p,   iv%info(radar), model_p)
+   call da_interp_lin_3d (grid%xb % u,   iv%info(radar), model_u)
+   call da_interp_lin_3d (grid%xb % v,   iv%info(radar), model_v)
+   call da_interp_lin_3d (grid%xb % wh,  iv%info(radar), model_w)
+   call da_interp_lin_3d (grid%xb % rho, iv%info(radar), model_rho)
+   call da_interp_lin_3d (grid%xb % qrn, iv%info(radar), model_qrn)
 
    ! Test 5.0E-5 as critical value. It can not be smaller.
 

@@ -30,18 +30,18 @@ subroutine da_transform_xtopsfc(grid, iv, obs_index, synop, y_synop)
 
    ! 2.0 Surface assmiilation approach 2 (2-m t and q, 10-m u and v)
 
-   call da_interp_lin_2d_newest(grid%xa%u10,  iv%info(obs_index), 1, y_synop(n)%u)
-   call da_interp_lin_2d_newest(grid%xa%v10,  iv%info(obs_index), 1, y_synop(n)%v)
-   call da_interp_lin_2d_newest(grid%xa%psfc, iv%info(obs_index), 1, psm_prime)
-   call da_interp_lin_2d_newest(grid%xa%t2,   iv%info(obs_index), 1, y_synop(n)%t)
-   call da_interp_lin_2d_newest(grid%xa%q2,   iv%info(obs_index), 1, y_synop(n)%q)
+   call da_interp_lin_2d(grid%xa%u10,  iv%info(obs_index), 1, y_synop(n)%u)
+   call da_interp_lin_2d(grid%xa%v10,  iv%info(obs_index), 1, y_synop(n)%v)
+   call da_interp_lin_2d(grid%xa%psfc, iv%info(obs_index), 1, psm_prime)
+   call da_interp_lin_2d(grid%xa%t2,   iv%info(obs_index), 1, y_synop(n)%t)
+   call da_interp_lin_2d(grid%xa%q2,   iv%info(obs_index), 1, y_synop(n)%q)
 
    ! 3.2 model background surface p, t, q, h at observed site:
 
-   call da_interp_lin_2d_newest(grid%xb%terr, iv%info(obs_index), 1, hsm)
-   call da_interp_lin_2d_newest(grid%xb%t2,   iv%info(obs_index), 1, tsm)
-   call da_interp_lin_2d_newest(grid%xb%q2,   iv%info(obs_index), 1, qsm)
-   call da_interp_lin_2d_newest(grid%xb%psfc, iv%info(obs_index), 1, psm)
+   call da_interp_lin_2d(grid%xb%terr, iv%info(obs_index), 1, hsm)
+   call da_interp_lin_2d(grid%xb%t2,   iv%info(obs_index), 1, tsm)
+   call da_interp_lin_2d(grid%xb%q2,   iv%info(obs_index), 1, qsm)
+   call da_interp_lin_2d(grid%xb%psfc, iv%info(obs_index), 1, psm)
 
    do n=iv%info(obs_index)%n1,iv%info(obs_index)%n2
       if (synop(n)%p%qc < 0) then

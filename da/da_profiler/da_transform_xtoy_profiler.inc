@@ -21,8 +21,8 @@ subroutine da_transform_xtoy_profiler (grid, iv, y)
    allocate (model_u(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
    allocate (model_v(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(profiler), model_u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(profiler), model_v)
+   call da_interp_lin_3d (grid%xa%u, iv%info(profiler), model_u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(profiler), model_v)
 
    do n=iv%info(profiler)%n1,iv%info(profiler)%n2
       y%profiler(n)%u(:) = model_u(1:iv%info(profiler)%levels(n),n)

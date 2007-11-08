@@ -77,8 +77,8 @@ subroutine da_get_innov_vector_airsr( it, grid, ob, iv)
    call da_convert_zk (iv%info(airsr))
 
    ! [1.2] Interpolate horizontally to ob:
-   call da_interp_lin_3d_newest (grid%xb%t, iv%info(airsr), model_t)
-   call da_interp_lin_3d_newest (grid%xb%q, iv%info(airsr), model_q)
+   call da_interp_lin_3d (grid%xb%t, iv%info(airsr), model_t)
+   call da_interp_lin_3d (grid%xb%q, iv%info(airsr), model_q)
 
    do n=iv%info(airsr)%n1,iv%info(airsr)%n2
       !------------------------------------------------------------------------

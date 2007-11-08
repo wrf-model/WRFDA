@@ -1,4 +1,4 @@
-subroutine da_interp_lin_2d_adj_newer(fm2d, info, k1,k2, fo2d)
+subroutine da_interp_lin_2d_adj_partial(fm2d, info, k1,k2, fo2d)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -13,7 +13,7 @@ subroutine da_interp_lin_2d_adj_newer(fm2d, info, k1,k2, fo2d)
 
    integer :: n,k
 
-   if (trace_use) call da_trace_entry("da_interp_lin_2d_adj_newer")
+   if (trace_use) call da_trace_entry("da_interp_lin_2d_adj_partial")
 
    do n=info%n1,info%n2
       do k=k1,k2
@@ -24,8 +24,8 @@ subroutine da_interp_lin_2d_adj_newer(fm2d, info, k1,k2, fo2d)
       end do
    end do
 
-   if (trace_use) call da_trace_exit("da_interp_lin_2d_adj_newer")
+   if (trace_use) call da_trace_exit("da_interp_lin_2d_adj_partial")
 
-end subroutine da_interp_lin_2d_adj_newer
+end subroutine da_interp_lin_2d_adj_partial
 
 

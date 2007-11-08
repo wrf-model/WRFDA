@@ -34,11 +34,11 @@ subroutine da_transform_xtoy_pseudo_adj(iv, jo_grad_y, jo_grad_x)
       t(1,n) = jo_grad_y%pseudo(n)%t
    end do
 
-   call da_interp_lin_3d_adj_newest(jo_grad_x%u, iv%info(pseudo), u)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%v, iv%info(pseudo), v)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%q, iv%info(pseudo), q)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%p, iv%info(pseudo), p)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%t, iv%info(pseudo), t)
+   call da_interp_lin_3d_adj(jo_grad_x%u, iv%info(pseudo), u)
+   call da_interp_lin_3d_adj(jo_grad_x%v, iv%info(pseudo), v)
+   call da_interp_lin_3d_adj(jo_grad_x%q, iv%info(pseudo), q)
+   call da_interp_lin_3d_adj(jo_grad_x%p, iv%info(pseudo), p)
+   call da_interp_lin_3d_adj(jo_grad_x%t, iv%info(pseudo), t)
 
    deallocate (u)
    deallocate (v)

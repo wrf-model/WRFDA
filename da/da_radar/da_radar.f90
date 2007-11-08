@@ -14,7 +14,7 @@ module da_radar
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       radar_type, infa_type, field_type
-   use da_interpolation, only : da_to_zk, da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest
+   use da_interpolation, only : da_to_zk, da_interp_lin_3d,da_interp_lin_3d_adj
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate

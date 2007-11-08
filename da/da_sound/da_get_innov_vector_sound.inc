@@ -103,10 +103,10 @@ subroutine da_get_innov_vector_sound (it, grid, ob, iv)
 
    ! [1.2] Interpolate horizontally to ob:
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(sound), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(sound), model_v)
-   call da_interp_lin_3d_newest (grid%xb%t, iv%info(sound), model_t)
-   call da_interp_lin_3d_newest (grid%xb%q, iv%info(sound), model_q)
+   call da_interp_lin_3d (grid%xb%u, iv%info(sound), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(sound), model_v)
+   call da_interp_lin_3d (grid%xb%t, iv%info(sound), model_t)
+   call da_interp_lin_3d (grid%xb%q, iv%info(sound), model_q)
 
    do n=iv%info(sound)%n1, iv%info(sound)%n2
       !----------------------------------------------------------------------

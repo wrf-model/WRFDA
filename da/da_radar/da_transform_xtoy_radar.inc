@@ -48,10 +48,10 @@ subroutine da_transform_xtoy_radar (grid, iv, y)
    end do
 
    ! [1.4] Interpolate horizontally from dot points:
-   call da_interp_lin_3d_newest (grid%xa%u,   iv%info(radar), model_u)
-   call da_interp_lin_3d_newest (grid%xa%v,   iv%info(radar), model_v)
-   call da_interp_lin_3d_newest (grid%xa%qrn, iv%info(radar), model_qrn)
-   call da_interp_lin_3d_newest (grid%xa%wh,  iv%info(radar), model_w)
+   call da_interp_lin_3d (grid%xa%u,   iv%info(radar), model_u)
+   call da_interp_lin_3d (grid%xa%v,   iv%info(radar), model_v)
+   call da_interp_lin_3d (grid%xa%qrn, iv%info(radar), model_qrn)
+   call da_interp_lin_3d (grid%xa%wh,  iv%info(radar), model_w)
 
    do n=iv%info(radar)%n1,iv%info(radar)%n2
 

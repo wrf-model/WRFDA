@@ -22,9 +22,9 @@ subroutine da_transform_xtoy_airep (grid, iv, y)
    allocate (v(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
    allocate (t(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
   
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(airep), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(airep), v)
-   call da_interp_lin_3d_newest (grid%xa%t, iv%info(airep), t)
+   call da_interp_lin_3d (grid%xa%u, iv%info(airep), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(airep), v)
+   call da_interp_lin_3d (grid%xa%t, iv%info(airep), t)
 
    do n=iv%info(airep)%n1,iv%info(airep)%n2
       y%airep(n)%u(:) = u(1:size(y%airep(n)%u),n)

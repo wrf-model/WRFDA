@@ -18,7 +18,7 @@ subroutine da_transform_xtoy_gpsref (grid, iv, y)
 
    allocate (model_ref(iv%info(gpsref)%max_lev,iv%info(gpsref)%n1:iv%info(gpsref)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%ref, iv%info(gpsref), model_ref)
+   call da_interp_lin_3d (grid%xa%ref, iv%info(gpsref), model_ref)
 
    do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
       y%gpsref(n)%ref(:) = model_ref(1:iv%info(gpsref)%levels(n),n)

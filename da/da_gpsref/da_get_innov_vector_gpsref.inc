@@ -144,7 +144,7 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
 
    call da_convert_zk (iv%info(gpsref))
 
-   call da_interp_lin_3d_newest (grid%xb%ref, iv%info(gpsref), model_ref)
+   call da_interp_lin_3d (grid%xb%ref, iv%info(gpsref), model_ref)
 
    do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then

@@ -1,4 +1,4 @@
-subroutine da_interp_lin_2d_newest(fm2d, info, k, fo2d)
+subroutine da_interp_lin_2d(fm2d, info, k, fo2d)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -13,15 +13,15 @@ subroutine da_interp_lin_2d_newest(fm2d, info, k, fo2d)
    
    integer :: n
 
-   if (trace_use_frequent) call da_trace_entry("da_interp_lin_2d_newest")
+   if (trace_use_frequent) call da_trace_entry("da_interp_lin_2d")
 
    do n=info%n1,info%n2
       fo2d(n) = info%dym(k,n)*(info%dxm(k,n)*fm2d(info%i(k,n),info%j(k,n))   + info%dx(k,n)*fm2d(info%i(k,n)+1,info%j(k,n))) &
               + info%dy(k,n) *(info%dxm(k,n)*fm2d(info%i(k,n),info%j(k,n)+1) + info%dx(k,n)*fm2d(info%i(k,n)+1,info%j(k,n)+1))
    end do
 
-   if (trace_use_frequent) call da_trace_exit("da_interp_lin_2d_newest")
+   if (trace_use_frequent) call da_trace_exit("da_interp_lin_2d")
 
-end subroutine da_interp_lin_2d_newest
+end subroutine da_interp_lin_2d
 
 

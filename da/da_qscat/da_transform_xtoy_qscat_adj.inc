@@ -25,8 +25,8 @@ subroutine da_transform_xtoy_qscat_adj(iv, jo_grad_y, jo_grad_x)
       v(1,n) = jo_grad_y%qscat(n)%v
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(qscat), u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(qscat), v)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(qscat), u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(qscat), v)
 
    deallocate (u)
    deallocate (v)

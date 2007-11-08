@@ -18,7 +18,7 @@ subroutine da_transform_xtoy_ssmt1 (grid, iv, y)
 
    allocate (t(iv%info(ssmt1)%max_lev,iv%info(ssmt1)%n1:iv%info(ssmt1)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa % t, iv%info(ssmt1), t)
+   call da_interp_lin_3d (grid%xa % t, iv%info(ssmt1), t)
 
    do n=iv%info(ssmt1)%n1,iv%info(ssmt1)%n2
       y%ssmt1(n)%t(:) = t(1:iv%info(ssmt1)%levels(n),n)

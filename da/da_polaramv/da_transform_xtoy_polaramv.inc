@@ -19,8 +19,8 @@ subroutine da_transform_xtoy_polaramv (grid, iv, y)
    allocate (u(iv%info(polaramv)%max_lev,iv%info(polaramv)%n1:iv%info(polaramv)%n2))
    allocate (v(iv%info(polaramv)%max_lev,iv%info(polaramv)%n1:iv%info(polaramv)%n2))
 
-   call da_interp_lin_3d_newest (grid%xa%u, iv%info(polaramv), u)
-   call da_interp_lin_3d_newest (grid%xa%v, iv%info(polaramv), v)
+   call da_interp_lin_3d (grid%xa%u, iv%info(polaramv), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(polaramv), v)
 
    do n=iv%info(polaramv)%n1,iv%info(polaramv)%n2
       y%polaramv(n)%u(:) = u(1:size(y%polaramv(n)%u),n)

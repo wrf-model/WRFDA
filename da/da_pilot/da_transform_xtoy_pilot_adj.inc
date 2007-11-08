@@ -26,8 +26,8 @@ subroutine da_transform_xtoy_pilot_adj(iv, jo_grad_y, jo_grad_x)
       model_v(1:iv%info(pilot)%levels(n),n) = jo_grad_y%pilot(n)%v(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(pilot), model_u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(pilot), model_v)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(pilot), model_u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(pilot), model_v)
 
    deallocate(model_u)
    deallocate(model_v)

@@ -28,9 +28,9 @@ subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
       t(1:size(jo_grad_y%airep(n)%t),n) = jo_grad_y%airep(n)%t(:)
    end do
 
-   call da_interp_lin_3d_adj_newest(jo_grad_x%u, iv%info(airep), u)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%v, iv%info(airep), v)
-   call da_interp_lin_3d_adj_newest(jo_grad_x%t, iv%info(airep), t)
+   call da_interp_lin_3d_adj(jo_grad_x%u, iv%info(airep), u)
+   call da_interp_lin_3d_adj(jo_grad_x%v, iv%info(airep), v)
+   call da_interp_lin_3d_adj(jo_grad_x%t, iv%info(airep), t)
 
    deallocate (u)
    deallocate (v)

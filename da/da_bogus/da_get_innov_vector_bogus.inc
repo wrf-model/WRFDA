@@ -80,10 +80,10 @@ subroutine da_get_innov_vector_bogus( it, grid, ob, iv)
 
    ! [1.4] Interpolate horizontally:
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(bogus), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(bogus), model_v)
-   call da_interp_lin_3d_newest (grid%xb%t, iv%info(bogus), model_t)
-   call da_interp_lin_3d_newest (grid%xb%q, iv%info(bogus), model_q)
+   call da_interp_lin_3d (grid%xb%u, iv%info(bogus), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(bogus), model_v)
+   call da_interp_lin_3d (grid%xb%t, iv%info(bogus), model_t)
+   call da_interp_lin_3d (grid%xb%q, iv%info(bogus), model_q)
 
    do n=iv%info(bogus)%n1,iv%info(bogus)%n2
       num_levs = iv%info(bogus)%levels(n)

@@ -76,7 +76,7 @@ subroutine da_get_innov_vector_ssmt1( it, grid, ob, iv)
 
    ! [1.2] Interpolate horizontally to ob:
 
-   call da_interp_lin_3d_newest (grid%xb%t, iv%info(ssmt1), model_t)
+   call da_interp_lin_3d (grid%xb%t, iv%info(ssmt1), model_t)
 
    do n=iv%info(ssmt1)%n1,iv%info(ssmt1)%n2
 

@@ -12,8 +12,8 @@ module da_ships
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type
    use da_interpolation, only : da_to_zk, &
-      da_interp_lin_3d_newest,da_interp_lin_3d_adj_newest, da_interp_lin_2d_newer, &
-      da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest
+      da_interp_lin_3d,da_interp_lin_3d_adj, da_interp_lin_2d_partial, &
+      da_interp_lin_2d, da_interp_lin_2d_adj
    use da_par_util, only :da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_physics, only : da_sfc_pre, da_transform_xtopsfc, &

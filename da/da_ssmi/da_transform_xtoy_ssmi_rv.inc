@@ -22,8 +22,8 @@ subroutine da_transform_xtoy_ssmi_rv(grid, iv, y)
    allocate (tpw(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
    allocate (speed(iv%info(ssmi_rv)%n1:iv%info(ssmi_rv)%n2))
 
-   call da_interp_lin_2d_newest (grid%xa%tpw,   iv%info(ssmi_rv), 1, tpw)
-   call da_interp_lin_2d_newest (grid%xa%speed, iv%info(ssmi_rv), 1, speed)   
+   call da_interp_lin_2d (grid%xa%tpw,   iv%info(ssmi_rv), 1, tpw)
+   call da_interp_lin_2d (grid%xa%speed, iv%info(ssmi_rv), 1, speed)   
    
    do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
       y%ssmi_rv(n)%tpw   = tpw(n)

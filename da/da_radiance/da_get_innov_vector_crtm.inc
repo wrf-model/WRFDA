@@ -184,8 +184,8 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 
          ! [1.2] Interpolate horizontally to ob:
          do k=kts,kte ! from bottom to top
-            call da_interp_lin_2d_newer (grid%xb%t(:,:,k), iv%instid(inst)%info,k,n,n,t)
-            call da_interp_lin_2d_newer (grid%xb%q(:,:,k), iv%instid(inst)%info,k,n,n,a) 
+            call da_interp_lin_2d_partial (grid%xb%t(:,:,k), iv%instid(inst)%info,k,n,n,t)
+            call da_interp_lin_2d_partial (grid%xb%q(:,:,k), iv%instid(inst)%info,k,n,n,a) 
             Atmosphere(1)%Temperature(kte-k+1) = t(1)
             Atmosphere(1)%Absorber(kte-k+1,1)  = a(1)
             Atmosphere(1)%Absorber(kte-k+1,1) = 1000.0*Atmosphere(1)%Absorber(kte-k+1,1) ! in g/kg
@@ -193,29 +193,29 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere(1)%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d_newer (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, model_qcw(kte-k+1:kte-k+1))
+            call da_interp_lin_2d_partial (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, model_qcw(kte-k+1:kte-k+1))
             
             if (crtm_cloud) then
                Atmosphere(1)%Cloud(1)%Effective_Radius(kte-k+1)=10.0
                Atmosphere(1)%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1)
 
                Atmosphere(1)%Cloud(2)%Effective_Radius(kte-k+1)=200.0
-               call da_interp_lin_2d_newer (grid%xb%qci(:,:,k), iv%instid(inst)%info,k,n,n, &
+               call da_interp_lin_2d_partial (grid%xb%qci(:,:,k), iv%instid(inst)%info,k,n,n, &
                   Atmosphere(1)%Cloud(2)%Water_Content(kte-k+1:kte-k+1) )
 
                Atmosphere(1)%Cloud(3)%Effective_Radius(kte-k+1)=200.0
 
-               call da_interp_lin_2d_newer (grid%xb%qrn(:,:,k), iv%instid(inst)%info,k,n,n, &
+               call da_interp_lin_2d_partial (grid%xb%qrn(:,:,k), iv%instid(inst)%info,k,n,n, &
                   Atmosphere(1)%Cloud(3)%Water_Content(kte-k+1:kte-k+1) )
 
                Atmosphere(1)%Cloud(4)%Effective_Radius(kte-k+1)=200.0
 
-               call da_interp_lin_2d_newer (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k,n,n, &
+               call da_interp_lin_2d_partial (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k,n,n, &
                   Atmosphere(1)%Cloud(4)%Water_Content(kte-k+1:kte-k+1) )
 
                Atmosphere(1)%Cloud(5)%Effective_Radius(kte-k+1)=200.0
 
-               call da_interp_lin_2d_newer (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k,n,n, &
+               call da_interp_lin_2d_partial (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k,n,n, &
                   Atmosphere(1)%Cloud(5)%Water_Content(kte-k+1:kte-k+1) )
 
                Atmosphere(1)%Cloud(6)%Effective_Radius(kte-k+1)=200.0
@@ -233,9 +233,9 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             Surface(1)%Water_Coverage, Surface(1)%Ice_Coverage, &
             Surface(1)%Land_Coverage, Surface(1)%Snow_Coverage )
 
-         call da_interp_lin_2d_newer (grid%xb%u10,  iv%instid(inst)%info, 1, n, n, model_u10(n:n))
-         call da_interp_lin_2d_newer (grid%xb%v10,  iv%instid(inst)%info, 1, n, n, model_v10(n:n))
-         call da_interp_lin_2d_newer (grid%xb%psfc, iv%instid(inst)%info, 1, n, n, model_psfc(n:n))
+         call da_interp_lin_2d_partial (grid%xb%u10,  iv%instid(inst)%info, 1, n, n, model_u10(n:n))
+         call da_interp_lin_2d_partial (grid%xb%v10,  iv%instid(inst)%info, 1, n, n, model_v10(n:n))
+         call da_interp_lin_2d_partial (grid%xb%psfc, iv%instid(inst)%info, 1, n, n, model_psfc(n:n))
 
          model_psfc(n) = 0.01*model_psfc(n)           ! convert to hPa
          model_ptop = 0.01*grid%xb%ptop
@@ -259,19 +259,19 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
          end if
 
          if ( model_isflg == 0 ) then   ! over sea using SST
-            call da_interp_lin_2d_newer (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, model_ts(n:n))
+            call da_interp_lin_2d_partial (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, model_ts(n:n))
          else
-            call da_interp_lin_2d_newer (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, model_ts(n:n))
+            call da_interp_lin_2d_partial (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, model_ts(n:n))
          end if
 
-         call da_interp_lin_2d_newer (grid%xb % terr, iv%instid(inst)%info, 1, n, n, model_elv(n:n))
+         call da_interp_lin_2d_partial (grid%xb % terr, iv%instid(inst)%info, 1, n, n, model_elv(n:n))
 
          ! variables for emissivity calculations
          !---------------------------------------- 
-         call da_interp_lin_2d_newer (grid%xb % smois,  iv%instid(inst)%info, 1, n, n, model_smois(n:n) )
-         call da_interp_lin_2d_newer (grid%xb % tslb,   iv%instid(inst)%info, 1, n, n, model_tslb(n:n) )
-         call da_interp_lin_2d_newer (grid%xb % snowh,  iv%instid(inst)%info, 1, n, n, model_snowh(n:n) )
-         call da_interp_lin_2d_newer (grid%xb % vegfra, iv%instid(inst)%info, 1, n, n, model_vegfra(n:n) )
+         call da_interp_lin_2d_partial (grid%xb % smois,  iv%instid(inst)%info, 1, n, n, model_smois(n:n) )
+         call da_interp_lin_2d_partial (grid%xb % tslb,   iv%instid(inst)%info, 1, n, n, model_tslb(n:n) )
+         call da_interp_lin_2d_partial (grid%xb % snowh,  iv%instid(inst)%info, 1, n, n, model_snowh(n:n) )
+         call da_interp_lin_2d_partial (grid%xb % vegfra, iv%instid(inst)%info, 1, n, n, model_vegfra(n:n) )
 
          ! model_snowh(n) = model_snowh(n)*100.0   ! convert from m to mm
          model_vegfra(n) = 0.01*model_vegfra(n)  ! convert range to 0~1

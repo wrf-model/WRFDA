@@ -22,7 +22,7 @@ subroutine da_transform_xtoy_ssmt2_adj(iv, jo_grad_y, jo_grad_x)
       rh(1:iv%info(ssmt2)%levels(n),n) = jo_grad_y%ssmt2(n)%rh(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%rh, iv%info(ssmt2), rh)
+   call da_interp_lin_3d_adj (jo_grad_x%rh, iv%info(ssmt2), rh)
 
    deallocate (rh)
 

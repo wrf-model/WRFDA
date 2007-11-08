@@ -24,8 +24,8 @@ subroutine da_transform_xtoy_geoamv_adj (iv, jo_grad_y, jo_grad_x)
       v(1:size(jo_grad_y%geoamv(n)%v),n) = jo_grad_y%geoamv(n)%v(:)
    end do
 
-   call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(geoamv), u)
-   call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(geoamv), v)
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(geoamv), u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(geoamv), v)
 
    deallocate (u)
    deallocate (v)

@@ -67,8 +67,8 @@ subroutine da_get_innov_vector_pilot( it, grid, ob, iv)
    call da_convert_zk (iv%info(pilot))
 
    ! [1.4] Interpolate horizontally:
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(pilot), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(pilot), model_v)
+   call da_interp_lin_3d (grid%xb%u, iv%info(pilot), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(pilot), model_v)
 
    do n=iv%info(pilot)%n1,iv%info(pilot)%n2
       !------------------------------------------------------------------------

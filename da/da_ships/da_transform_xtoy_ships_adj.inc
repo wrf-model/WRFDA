@@ -35,12 +35,12 @@ subroutine da_transform_xtoy_ships_adj(grid, iv, jo_grad_y, jo_grad_x)
          model_q(1,n)  = jo_grad_y%ships(n)%q
          model_psfc(n) = jo_grad_y%ships(n)%p
       end do
-      call da_interp_lin_3d_adj_newest (jo_grad_x%u, iv%info(ships), model_u)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%v, iv%info(ships), model_v)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%t, iv%info(ships), model_t)
-      call da_interp_lin_3d_adj_newest (jo_grad_x%q, iv%info(ships), model_q)
+      call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(ships), model_u)
+      call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(ships), model_v)
+      call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(ships), model_t)
+      call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(ships), model_q)
 
-      call da_interp_lin_2d_adj_newest (jo_grad_x%psfc, iv%info(ships), 1, model_psfc)
+      call da_interp_lin_2d_adj (jo_grad_x%psfc, iv%info(ships), 1, model_psfc)
       deallocate (model_u)
       deallocate (model_v)
       deallocate (model_t)

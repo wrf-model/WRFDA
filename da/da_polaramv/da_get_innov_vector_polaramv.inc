@@ -86,8 +86,8 @@ subroutine da_get_innov_vector_polaramv( it, grid, ob, iv)
 
    ! [1.2] Interpolate horizontally to ob:
 
-   call da_interp_lin_3d_newest (grid%xb%u, iv%info(polaramv), model_u)
-   call da_interp_lin_3d_newest (grid%xb%v, iv%info(polaramv), model_v)
+   call da_interp_lin_3d (grid%xb%u, iv%info(polaramv), model_u)
+   call da_interp_lin_3d (grid%xb%v, iv%info(polaramv), model_v)
 
    do n=iv%info(polaramv)%n1,iv%info(polaramv)%n2
       do k = 1, iv%info(polaramv)%levels(n)

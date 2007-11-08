@@ -27,12 +27,12 @@ subroutine da_transform_xtoy_buoy (grid, iv, y)
       allocate (model_q(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
       allocate (model_psfc(iv%info(buoy)%n1:iv%info(buoy)%n2))
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_newest (grid%xa%u, iv%info(buoy), model_u)
-      call da_interp_lin_3d_newest (grid%xa%v, iv%info(buoy), model_v)
-      call da_interp_lin_3d_newest (grid%xa%t, iv%info(buoy), model_t)
-      call da_interp_lin_3d_newest (grid%xa%q, iv%info(buoy), model_q)
+      call da_interp_lin_3d (grid%xa%u, iv%info(buoy), model_u)
+      call da_interp_lin_3d (grid%xa%v, iv%info(buoy), model_v)
+      call da_interp_lin_3d (grid%xa%t, iv%info(buoy), model_t)
+      call da_interp_lin_3d (grid%xa%q, iv%info(buoy), model_q)
 
-      call da_interp_lin_2d_newest (grid%xa%psfc, iv%info(buoy), 1, model_psfc)
+      call da_interp_lin_2d (grid%xa%psfc, iv%info(buoy), 1, model_psfc)
 
       do n=iv%info(buoy)%n1,iv%info(buoy)%n2
          y%buoy(n)%u = model_u(1,n)
