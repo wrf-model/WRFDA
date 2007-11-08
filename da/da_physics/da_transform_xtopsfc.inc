@@ -19,6 +19,10 @@ subroutine da_transform_xtopsfc(grid, iv, obs_index, synop, y_synop)
    real, allocatable :: qsm(:,:)
    real, allocatable :: psm(:,:)
    real, allocatable :: psm_prime(:,:)
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
 
    if (trace_use) call da_trace_entry("da_transform_xtopsfc")
 
@@ -27,14 +31,24 @@ subroutine da_transform_xtopsfc(grid, iv, obs_index, synop, y_synop)
    allocate (qsm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
    allocate (psm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
    allocate (psm_prime(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (u(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (v(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (t(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (q(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
 
    ! 2.0 Surface assmiilation approach 2 (2-m t and q, 10-m u and v)
 
-   call da_interp_lin_2d(grid%xa%u10,  iv%info(obs_index), 1, y_synop(n)%u)
-   call da_interp_lin_2d(grid%xa%v10,  iv%info(obs_index), 1, y_synop(n)%v)
+   call da_interp_lin_2d(grid%xa%u10,  iv%info(obs_index), 1, u)
+   call da_interp_lin_2d(grid%xa%v10,  iv%info(obs_index), 1, v)
    call da_interp_lin_2d(grid%xa%psfc, iv%info(obs_index), 1, psm_prime)
-   call da_interp_lin_2d(grid%xa%t2,   iv%info(obs_index), 1, y_synop(n)%t)
-   call da_interp_lin_2d(grid%xa%q2,   iv%info(obs_index), 1, y_synop(n)%q)
+   call da_interp_lin_2d(grid%xa%t2,   iv%info(obs_index), 1, t)
+   call da_interp_lin_2d(grid%xa%q2,   iv%info(obs_index), 1, q)
+   do n=iv%info(obs_index)%n1,iv%info(obs_index)%n2
+      y_synop(n)%u=u(1,n)
+      y_synop(n)%v=v(1,n)
+      y_synop(n)%t=t(1,n)
+      y_synop(n)%q=q(1,n)
+   end do
 
    ! 3.2 model background surface p, t, q, h at observed site:
 
@@ -93,6 +107,10 @@ subroutine da_transform_xtopsfc(grid, iv, obs_index, synop, y_synop)
    deallocate (qsm)
    deallocate (psm)
    deallocate (psm_prime)
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use) call da_trace_exit("da_transform_xtopsfc")
 

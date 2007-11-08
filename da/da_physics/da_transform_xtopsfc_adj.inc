@@ -22,6 +22,10 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
    real, allocatable :: qsm(:,:)
    real, allocatable :: psm(:,:)
    real, allocatable :: psm_prime(:,:)
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
 
    if (trace_use) call da_trace_entry("da_transform_xtopsfc_adj")
 
@@ -30,6 +34,10 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
    allocate (qsm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
    allocate (psm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
    allocate (psm_prime(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (u(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (v(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (t(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (q(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
 
    psm_prime = 0.0
 
@@ -75,13 +83,17 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
                psm(1,n), tsm(1,n), qsm(1,n), hsm(1,n), synop(n)%h)
          end if
       end if
+      j_synop_y(n)%t=t(1,n)
+      j_synop_y(n)%q=q(1,n)
+      j_synop_y(n)%u=u(1,n)
+      j_synop_y(n)%v=v(1,n)
    end do
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
-   call da_interp_lin_2d_adj(jo_grad_x%t2,   iv%info(obs_index), 1, j_synop_y(n)%t)
-   call da_interp_lin_2d_adj(jo_grad_x%q2,   iv%info(obs_index), 1, j_synop_y(n)%q)
-   call da_interp_lin_2d_adj(jo_grad_x%u10,  iv%info(obs_index), 1, j_synop_y(n)%u)
-   call da_interp_lin_2d_adj(jo_grad_x%v10,  iv%info(obs_index), 1, j_synop_y(n)%v)
+   call da_interp_lin_2d_adj(jo_grad_x%t2,   iv%info(obs_index), 1, t)
+   call da_interp_lin_2d_adj(jo_grad_x%q2,   iv%info(obs_index), 1, q)
+   call da_interp_lin_2d_adj(jo_grad_x%u10,  iv%info(obs_index), 1, u)
+   call da_interp_lin_2d_adj(jo_grad_x%v10,  iv%info(obs_index), 1, v)
    call da_interp_lin_2d_adj(jo_grad_x%psfc, iv%info(obs_index), 1, psm_prime)
 
    deallocate (hsm)
@@ -89,6 +101,10 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
    deallocate (qsm)
    deallocate (psm)
    deallocate (psm_prime)
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use) call da_trace_exit("da_transform_xtopsfc_adj")
 
