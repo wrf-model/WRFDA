@@ -6,8 +6,8 @@
 
 if [[ $# != 1 ]]; then
    echo "Arguments test"
-   echo "One of : wrfvar wrfvar_tests wrfvar_verbose ideal"
-   echo "wrf wrf_real wrf_ideal quick"
+   echo "One of : wrfvar wrfvar_tests wrfvar_verbose wrfvar_rttov"
+   echo "ideal wrf wrf_real wrf_ideal quick"
    echo "em_real_1 em_real_2 em_real_3 em_real_4 em_real_5"
    exit 1
 fi
@@ -47,6 +47,13 @@ if [[ $TEST == wrfvar ]]; then
    export RUN_WRFVAR=true
    export RC_DIR=$PWD/$CASE/rc
    export OB_DIR=$PWD/$CASE/ob
+elif [[ $TEST == wrfvar_rttov ]]; then
+   export INITIAL_DATE=$DATE
+   export FINAL_DATE=$DATE
+   export RUN_WRFVAR=true
+   export RC_DIR=$PWD/$CASE/rc
+   export OB_DIR=$PWD/$CASE/ob
+   export RTM_OPTION=1 # RTTOV
 elif [[ $TEST == wrfvar_tests ]]; then
    export INITIAL_DATE=$DATE
    export FINAL_DATE=$DATE
