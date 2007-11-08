@@ -47,9 +47,7 @@ subroutine da_transform_xtoy_metar_adj(grid, iv, jo_grad_y, jo_grad_x)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%info(metar)%n1, iv%info(metar)%n2
-         call da_transform_xtopsfc_adj(grid,iv%metar(n), jo_grad_y%metar(n),jo_grad_x)
-      end do
+      call da_transform_xtopsfc_adj(grid,iv,metar,iv%metar(:), jo_grad_y%metar(:),jo_grad_x)
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_metar_adj")

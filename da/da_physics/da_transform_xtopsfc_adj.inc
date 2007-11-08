@@ -1,4 +1,4 @@
-subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x) 
+subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_grad_x) 
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,69 +7,88 @@ subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x)
    implicit none
 
    type (domain),              intent(in)    :: grid
-
-   type (synop_type),          intent(in)    :: synop
-   type (residual_synop_type), intent(inout) :: j_synop_y   ! grad_y(jo)
+   type (iv_type),             intent(in)    :: iv
+   integer,                    intent(in)    :: obs_index
+   type (synop_type),          intent(in)    :: synop(:)
+   type (residual_synop_type), intent(inout) :: j_synop_y(:)   ! grad_y(jo)
    type (x_type),              intent(inout) :: jo_grad_x   ! grad_x(jo)
    
 
-   real :: hsm, to, qo
-   real :: tsm, qsm, psm
-   real :: psm_prime
+   integer :: n
+
+   real :: to, qo
+   real, allocatable :: hsm(:,:)
+   real, allocatable :: tsm(:,:)
+   real, allocatable :: qsm(:,:)
+   real, allocatable :: psm(:,:)
+   real, allocatable :: psm_prime(:,:)
 
    if (trace_use) call da_trace_entry("da_transform_xtopsfc_adj")
-stop
+
+   allocate (hsm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (tsm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (qsm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (psm(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
+   allocate (psm_prime(1,iv%info(obs_index)%n1:iv%info(obs_index)%n2))
 
    psm_prime = 0.0
 
-   if (synop%p%qc >= 0) then
-      !------------------------------------------------------------------------
-      ! 2.0 Calculate gradient with respect the pressure at the observed height: 
-      !------------------------------------------------------------------------
+   ! 2.1 Terrain height at the observed site (xj, yi):
 
-      ! 2.1 Terrain height at the observed site (xj, yi):
+   call da_interp_lin_2d_newest(grid%xb%terr, iv%info(obs_index), 1, hsm)
+   call da_interp_lin_2d_newest(grid%xb%t2,   iv%info(obs_index), 1, tsm)
+   call da_interp_lin_2d_newest(grid%xb%q2,   iv%info(obs_index), 1, qsm)
+   call da_interp_lin_2d_newest(grid%xb%psfc, iv%info(obs_index), 1, psm)
 
-!      call da_interp_lin_2d(grid%xb%terr, synop%loc, hsm)
-!      call da_interp_lin_2d(grid%xb%t2,   synop%loc, tsm)
-!      call da_interp_lin_2d(grid%xb%q2,   synop%loc, qsm)
-!      call da_interp_lin_2d(grid%xb%psfc, synop%loc, psm)
+   do n=iv%info(obs_index)%n1,iv%info(obs_index)%n2
+      if (synop(n)%p%qc >= 0) then
+         !------------------------------------------------------------------------
+         ! 2.0 Calculate gradient with respect the pressure at the observed height: 
+         !------------------------------------------------------------------------
 
-      to = -888888.0
-      qo = -888888.0
+         to = -888888.0
+         qo = -888888.0
 
-      ! 2.3 Zero out the adjoint variables:
+         ! 2.3 Zero out the adjoint variables:
 
-      !----------------------------------------------------------------
-      ! 3.0 Surface pressure gradient at the observed height
-      !----------------------------------------------------------------
+         !----------------------------------------------------------------
+         ! 3.0 Surface pressure gradient at the observed height
+         !----------------------------------------------------------------
 
-      ! 4.0 Get the surface pressure gradient at the model surface height (hsm)
-      ! 4.1 Both observed to and qo available:
-      if (synop%t%qc >= 0 .and. synop%q%qc >= 0) then
-         to = tsm + synop%t%inv
-         qo = qsm + synop%q%inv
-         call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
-            psm, tsm, qsm, hsm, synop%h, to, qo)
+         ! 4.0 Get the surface pressure gradient at the model surface height (hsm)
+         ! 4.1 Both observed to and qo available:
+         if (synop(n)%t%qc >= 0 .and. synop(n)%q%qc >= 0) then
+            to = tsm(1,n) + synop(n)%t%inv
+            qo = qsm(1,n) + synop(n)%q%inv
+            call da_sfc_pre_adj (j_synop_y(n)%p, psm_prime(1,n), j_synop_y(n)%t, j_synop_y(n)%q, &
+               psm(1,n), tsm(1,n), qsm(1,n), hsm(1,n), synop(n)%h, to, qo)
 
-         ! 4.2 only observed to available:
-      else if (synop%t%qc >= 0 .and. synop%q%qc < 0) then
-         to = tsm + synop%t%inv
-         call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
-            psm, tsm, qsm, hsm, synop%h, to)
+            ! 4.2 only observed to available:
+         else if (synop(n)%t%qc >= 0 .and. synop(n)%q%qc < 0) then
+            to = tsm(1,n) + synop(n)%t%inv
+            call da_sfc_pre_adj (j_synop_y(n)%p, psm_prime(1,n), j_synop_y(n)%t, j_synop_y(n)%q, &
+               psm(1,n), tsm(1,n), qsm(1,n), hsm(1,n), synop(n)%h, to)
 
-         ! 4.3 Both observed to and qo missing:
-      else
-         call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
-            psm, tsm, qsm, hsm, synop%h)
+            ! 4.3 Both observed to and qo missing:
+         else
+            call da_sfc_pre_adj (j_synop_y(n)%p, psm_prime(1,n), j_synop_y(n)%t, j_synop_y(n)%q, &
+               psm(1,n), tsm(1,n), qsm(1,n), hsm(1,n), synop(n)%h)
+         end if
       end if
-   end if
+   end do
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
-!   call da_interp_lin_2d_adj(jo_grad_x%t2,   synop%loc, j_synop_y%t)
-!   call da_interp_lin_2d_adj(jo_grad_x%q2,   synop%loc, j_synop_y%q)
-!   call da_interp_lin_2d_adj(jo_grad_x%u10,  synop%loc, j_synop_y%u)
-!   call da_interp_lin_2d_adj(jo_grad_x%v10,  synop%loc, j_synop_y%v)
-!   call da_interp_lin_2d_adj(jo_grad_x%psfc, synop%loc, psm_prime)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%t2,   iv%info(obs_index), 1, j_synop_y(n)%t)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%q2,   iv%info(obs_index), 1, j_synop_y(n)%q)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%u10,  iv%info(obs_index), 1, j_synop_y(n)%u)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%v10,  iv%info(obs_index), 1, j_synop_y(n)%v)
+   call da_interp_lin_2d_adj_newest(jo_grad_x%psfc, iv%info(obs_index), 1, psm_prime)
+
+   deallocate (hsm)
+   deallocate (tsm)
+   deallocate (qsm)
+   deallocate (psm)
+   deallocate (psm_prime)
 
    if (trace_use) call da_trace_exit("da_transform_xtopsfc_adj")
 

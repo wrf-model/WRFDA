@@ -47,9 +47,7 @@ subroutine da_transform_xtoy_sonde_sfc (grid, iv, y)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%info(sound)%n1,iv%info(sound)%n2
-         call da_transform_xtopsfc(grid, iv%sonde_sfc(n), y%sonde_sfc(n))
-      end do
+      call da_transform_xtopsfc(grid, iv, sonde_sfc, iv%sonde_sfc(:), y%sonde_sfc(:))
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_sonde_sfc")

@@ -47,9 +47,7 @@ subroutine da_transform_xtoy_synop (grid, iv, y)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%info(synop)%n1,iv%info(synop)%n2
-         call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
-      end do
+      call da_transform_xtopsfc(grid, iv, synop, iv%synop(:), y%synop(:))
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_synop")

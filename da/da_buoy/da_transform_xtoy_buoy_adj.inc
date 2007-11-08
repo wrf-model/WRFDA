@@ -47,9 +47,7 @@ subroutine da_transform_xtoy_buoy_adj(grid, iv, jo_grad_y, jo_grad_x)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%info(buoy)%n1,iv%info(buoy)%n2
-         call da_transform_xtopsfc_adj(grid,iv%buoy(n), jo_grad_y%buoy(n), jo_grad_x)
-      end do
+      call da_transform_xtopsfc_adj(grid,iv, buoy, iv%buoy(:), jo_grad_y%buoy(:), jo_grad_x)
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_buoy_adj")

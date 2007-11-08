@@ -282,41 +282,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
                   q_ad(k,n) = Atmosphere_AD(1)%Absorber(kte-k+1,1)
                end if
                t(k,n)=Atmosphere_AD(1)%Temperature(kte-k+1)
-write (0,*) n,k,"q_ad,t",q_ad(k,n),t(k,n)
             end do
-
-!            do k=kts,kte ! from bottom to top
-!               q_ad(n) = Atmosphere_AD(1)%Absorber(kte-k+1,1)
-!               if (atmosphere(1)%pressure(kte-k+1) < 75.0) q_ad(n) = 0.0
-!               t(1)=Atmosphere_AD(1)%Temperature(kte-k+1)
-!               call da_interp_lin_2d_adj_newer (jo_grad_x%t(:,:,k), iv%instid(inst)%info, k,n,n, t)
-!               call da_interp_lin_2d_adj_newer (jo_grad_x%q(:,:,k), iv%instid(inst)%info, k,n,n, q_ad(n:n) )
-!            end do
-
-!            i   = info%i(1,n)
-!            j   = info%j(1,n)
-!            dx  = info%dx(1,n)
-!            dy  = info%dy(1,n)
-!            dxm = info%dxm(1,n)
-!            dym = info%dym(1,n)
-
-!            do k=kts,kte ! from bottom to top
-!               if (atmosphere(1)%pressure(kte-k+1) < 75.0) then
-!                  q_ad = 0.0
-!               else
-!                  q_ad = Atmosphere_AD(1)%Absorber(kte-k+1,1)
-!               end if
-!               t=Atmosphere_AD(1)%Temperature(kte-k+1)
-!               jo_grad_x%t(i  ,j,k)   = dym * dxm * t + jo_grad_x%t(i  ,j,k)
-!               jo_grad_x%t(i+1,j,k)   = dym * dx  * t + jo_grad_x%t(i+1,j,k)
-!               jo_grad_x%t(i  ,j+1,k) = dy  * dxm * t + jo_grad_x%t(i  ,j+1,k)
-!               jo_grad_x%t(i+1,j+1,k) = dy  * dx  * t + jo_grad_x%t(i+1,j+1,k)
-
-!               jo_grad_x%q(i  ,j,k)   = dym * dxm * q_ad + jo_grad_x%q(i  ,j,k)
-!               jo_grad_x%q(i+1,j,k)   = dym * dx  * q_ad + jo_grad_x%q(i+1,j,k)
-!               jo_grad_x%q(i  ,j+1,k) = dy  * dxm * q_ad + jo_grad_x%q(i  ,j+1,k)
-!               jo_grad_x%q(i+1,j+1,k) = dy  * dx  * q_ad + jo_grad_x%q(i+1,j+1,k)
-!            end do
 
             p(n) = Atmosphere_AD(1)%Level_Pressure(atmosphere(1)%n_layers)
 
@@ -342,13 +308,9 @@ write (0,*) n,k,"q_ad,t",q_ad(k,n),t(k,n)
 
          end do       !  end loop for pixels
 
-write (0,*) "before sum(jo_grad_x%t),sum(jo_grad_x%q),sum(jo_grad_x%psfc)",sum(jo_grad_x%t),sum(jo_grad_x%q),sum(jo_grad_x%psfc)
-
          call da_interp_lin_2d_adj_newer(jo_grad_x%t(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, t)
          call da_interp_lin_2d_adj_newer(jo_grad_x%q(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, q_ad)
          call da_interp_lin_2d_adj_newer(jo_grad_x%psfc, iv%instid(inst)%info, 1,1, p)
-
-write (0,*) "after sum(jo_grad_x%t),sum(jo_grad_x%q),sum(jo_grad_x%psfc)",sum(jo_grad_x%t),sum(jo_grad_x%q),sum(jo_grad_x%psfc)
 
          deallocate (q_ad)
          deallocate (t)

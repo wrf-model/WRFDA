@@ -11,7 +11,7 @@ module da_physics
    use module_comm_dm, only : halo_bal_eqn_adj_sub
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
-   use da_define_structures, only : synop_type, residual_synop_type, model_loc_type
+   use da_define_structures, only : synop_type, residual_synop_type, model_loc_type, iv_type
    use da_control, only : gas_constant, gravity,kts,kte, svp3,svpt0, &
       gas_constant_v, svp1, to, xls, svp2,its,ite,jts,jte,kts,kte, &
       ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, test_wrfvar, &
@@ -22,7 +22,7 @@ module da_physics
    use da_par_util, only : da_transpose_z2y, da_transpose_y2x, &
       da_transpose_x2z, da_transpose_z2x, da_transpose_x2y, da_transpose_y2z
    use da_tracing, only : da_trace_entry, da_trace_exit
-   use da_interpolation, only : da_interp_lin_2d, da_interp_lin_2d_adj
+   use da_interpolation, only : da_interp_lin_2d_newest, da_interp_lin_2d_adj_newest
    use da_dynamics, only : da_w_adjustment_adj, da_uv_to_divergence_adj, &
       da_w_adjustment_lin, da_uv_to_divergence
    use da_reporting, only : da_error, message

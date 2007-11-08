@@ -47,9 +47,7 @@ subroutine da_transform_xtoy_ships_adj(grid, iv, jo_grad_y, jo_grad_x)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%info(ships)%n1,iv%info(ships)%n2
-         call da_transform_xtopsfc_adj(grid,iv%ships(n), jo_grad_y%ships(n),jo_grad_x)
-      end do
+      call da_transform_xtopsfc_adj(grid,iv,ships,iv%ships(:), jo_grad_y%ships(:),jo_grad_x)
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_ships_adj")

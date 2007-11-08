@@ -75,10 +75,10 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
          model_mr(:,:)=0.0
          model_psfc(:)=0.0
 
-         call da_interp_lin_3d_newer (grid%xa%t, iv%instid(i)%info, 1, num_rad, model_t)
-         call da_interp_lin_3d_newer (grid%xa%q, iv%instid(i)%info, 1, num_rad, model_q)
+         call da_interp_lin_3d_newest (grid%xa%t, iv%instid(i)%info, model_t)
+         call da_interp_lin_3d_newest (grid%xa%q, iv%instid(i)%info, model_q)
 
-         call da_interp_lin_2d_newer (grid%xa%psfc, iv%instid(i)%info, 1, 1, num_rad, model_psfc)
+         call da_interp_lin_2d_newest (grid%xa%psfc, iv%instid(i)%info, 1, model_psfc)
 
          model_psfc(:) = 0.01*model_psfc(:)  ! convert to hPa 
          con_vars(:) % nlevels = nlevels 

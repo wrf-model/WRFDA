@@ -47,10 +47,8 @@ subroutine da_transform_xtoy_ships (grid, iv, y)
       deallocate (model_q)
       deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-       ! [2.0] Surface assmiilation approach 2
-       do n=iv%info(ships)%n1,iv%info(ships)%n2
-          call da_transform_xtopsfc(grid,iv%ships(n),y%ships(n))
-      end do
+      ! [2.0] Surface assmiilation approach 2
+      call da_transform_xtopsfc(grid,iv,ships,iv%ships(:),y%ships(:))
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_ships")
