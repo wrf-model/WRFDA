@@ -55,9 +55,6 @@ contains
 #include "da_radial_velocity.inc"
 #include "da_radial_velocity_lin.inc"
 #include "da_radial_velocity_adj.inc"
-#include "da_radial_velocity_new.inc"
-#include "da_radial_velocity_lin_new.inc"
-#include "da_radial_velocity_adj_new.inc"
 #include "da_calculate_grady_radar.inc"
 #include "da_max_error_qc_radar.inc"
 

@@ -217,7 +217,7 @@ subroutine da_random_omb_all(iv, ob)
 
    if (iv%info(satem)%nlocal > 0) then
       do n = 1, iv%info(satem)%nlocal
-         do k = 1, iv % satem(n) % info % levels
+         do k = 1, iv%info(satem)%levels(n)
             call da_random_omb(iv % satem(n) % thickness(k) % error, &
                               ob % satem(n) % thickness(k), &
                               iv % satem(n) % thickness(k) % qc, &

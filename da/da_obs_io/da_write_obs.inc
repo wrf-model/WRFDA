@@ -327,21 +327,21 @@ subroutine da_write_obs(ob, iv, re)
 
    num_obs = 0
    do n = 1, iv%info(satem)%nlocal
-      if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
+      if (iv%info(satem)%proc_domain(1,n)) num_obs = num_obs + 1
    end do
    if (num_obs > 0) then
       write(ounit,'(a20,i8)')'satem', num_obs    
       num_obs = 0
       do n = 1, iv%info(satem)%nlocal
-         if (iv%satem(n)%loc%proc_domain) then
+         if (iv%info(satem)%proc_domain(1,n)) then
             num_obs = num_obs + 1
-            write(ounit,'(i8)')iv % satem(n) % info % levels
-            do k = 1, iv % satem(n) % info % levels
+            write(ounit,'(i8)')iv%info(satem)%levels(n)
+            do k = 1, iv%info(satem)%levels(n)
                write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
-                  num_obs   , k, iv % satem(n) % info % id, &  ! Station
-                  iv % satem(n) % info % lat, &       ! Latitude
-                  iv % satem(n) % info % lon, &       ! Longitude
-                  iv % satem(n) % p(k), &             ! Obs Pressure
+                  num_obs   , k, iv%info(satem)%id(n), &  ! Station
+                  iv%info(satem)%lat(1,n), &       ! Latitude
+                  iv%info(satem)%lon(1,n), &       ! Longitude
+                  iv%satem(n) % p(k), &             ! Obs Pressure
                   ob%satem(n)%thickness(k), &
                   iv%satem(n)%thickness(k), &
                   re%satem(n)%thickness(k)            ! O,O-B,O-A

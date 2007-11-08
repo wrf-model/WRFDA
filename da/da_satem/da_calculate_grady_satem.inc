@@ -15,7 +15,7 @@ subroutine da_calculate_grady_satem(iv, re, jo_grad_y)
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_satem")
 
    do n=1, iv%info(satem)%nlocal
-      do k=1, iv%satem(n)%info%levels
+      do k=1, iv%info(satem)%levels(n)
          if (iv%satem(n)%thickness(k)%qc < obs_qc_pointer) then
             re%satem(n)%thickness(k) = 0.0
          end if

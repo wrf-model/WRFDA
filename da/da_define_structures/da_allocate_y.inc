@@ -175,7 +175,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(satem) > 0) then
       allocate (y % satem(1:y % nlocal(satem)))
       do n = 1, y % nlocal(satem)
-         nlevels = iv % satem(n) % info % levels
+         nlevels = iv%info(satem)%levels(n)
          allocate (y % satem(n) % thickness(1:nlevels))
          y % satem(n) % thickness(1:nlevels) = 0.0
       end do

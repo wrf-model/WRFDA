@@ -1,4 +1,4 @@
-subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
+subroutine da_tv_profile(grid, info, n, pre_ma, tv_ma)
 
    !--------------------------------------------------------------------------
    ! Purpose: Calculates virtual temperature (tv_ma) on each level
@@ -9,7 +9,8 @@ subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
    implicit none
 
    type (domain),         intent(in)  :: grid
-   type (model_loc_type), intent(in)  :: loc
+   type (infa_type),      intent(in)  :: info
+   integer,               intent(in)  :: n
    real,                  intent(out) :: pre_ma(kts-1:kte+1)
    real,                  intent(out) :: tv_ma(kts-1:kte+1)
                           
@@ -22,13 +23,16 @@ subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
 
    if (trace_use_dull) call da_trace_entry("da_tv_profile")
 
+tv_ma = 0.0
 
-   i   = loc%i
-   j   = loc%j
-   dx  = loc%dx
-   dy  = loc%dy
-   dxm = loc%dxm
-   dym = loc%dym
+   i   = info%i(1,n)
+   j   = info%j(1,n)
+   dx  = info%dx(1,n)
+   dy  = info%dy(1,n)
+   dxm = info%dxm(1,n)
+   dym = info%dym(1,n)
+
+write (0,*) "i,j,dx,dy,dxm,dym",j,dx,dy,dxm,dym
 
    ! Virtual temperature
 
@@ -36,8 +40,10 @@ subroutine da_tv_profile(grid, loc, pre_ma, tv_ma)
       do jj=j,j+1
          tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xb%t(ii,jj,kts:kte) * &
             (1.0 + 0.61*grid%xb%q(ii,jj,kts:kte))
+write (0,*) ii,jj,"tv_m",tv_m(ii-i+1,jj-j+1,kts:kte)
       end do
    end do
+write (0,*) "tv_m",tv_m
 
    ! Horizontal interpolation to the obs. pt.
 

@@ -347,14 +347,14 @@ subroutine da_write_obs_etkf(ob, iv, re)
    if (iv%info(satem)%nlocal > 0) then
       num_obs = 0
       do n = 1, iv%info(satem)%nlocal
-        if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
+        if (iv%info(satem)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          num_obs = 0
          do n = 1, iv%info(satem)%nlocal
-            if (iv%satem(n)%loc%proc_domain) then
+            if (iv%info(satem)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               do k = 1, iv % satem(n) % info % levels
+               do k = 1, iv%info(satem)%levels(n)
                   if ( iv%satem(n)%thickness(k)%qc >= 0 ) then
                      write(ounit,'(3f17.7)') ob%satem(n)%thickness(k), iv%satem(n)%thickness(k)%inv, &
                                              iv%satem(n)%thickness(k)%error

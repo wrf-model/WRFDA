@@ -263,7 +263,7 @@ subroutine da_final_write_y(iv)
    num_obs = 0
    if (iv%info(satem)%nlocal > 0) then
       do n = 1, iv%info(satem)%nlocal
-         if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(satem)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
    end if
    call da_proc_sum_int(num_obs)

@@ -23,7 +23,7 @@ subroutine da_residual_satem(iv, y, re,np_missing, np_bad_data,np_obs_used, np_a
    n_obs_bad % thickness % num = number_type(0, 0, 0)
 
    do n=1, iv%info(satem)%nlocal
-       do k=1, iv%satem(n)%info%levels
+       do k=1, iv%info(satem)%levels(n)
           np_available = np_available + 1
           re%satem(n)%thickness(k) = &
              da_residual(n, k, y%satem(n)%thickness(k), iv%satem(n)%thickness(k), n_obs_bad % thickness)

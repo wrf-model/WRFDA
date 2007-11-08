@@ -18,10 +18,6 @@ subroutine da_setup_obs_interp_wts (iv)
       end if
    end do
 
-   do n=1, iv%info(satem)%nlocal
-      call da_store_obs_grid_info (iv%satem(n)%loc)
-   end do
-
    do i = 1, iv % num_inst
       if (iv % instid(i) % num_rad < 1) cycle
       call da_store_obs_grid_info_new (iv%instid(i)%info)

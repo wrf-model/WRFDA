@@ -29,7 +29,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
    ithickness = 0 ; ithicknessf = 0
 
    do n=iv%info(satem)%n1,iv%info(satem)%n2
-      num_levs = iv % satem(n) % info % levels
+      num_levs = iv%info(satem)%levels(n)
 
       if (num_levs < 1) cycle
 
@@ -37,18 +37,18 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
       ! [1.0] Get cross pt. horizontal interpolation weights:
 
-      i   = iv%satem(n)%loc%i
-      dy  = iv%satem(n)%loc%dy
-      dym = iv%satem(n)%loc%dym
-      j   = iv%satem(n)%loc%j
-      dx  = iv%satem(n)%loc%dx
-      dxm = iv%satem(n)%loc%dxm
+      i   = iv%info(satem)%i(1,n)
+      dy  = iv%info(satem)%dy(1,n)
+      dym = iv%info(satem)%dym(1,n)
+      j   = iv%info(satem)%j(1,n)
+      dx  = iv%info(satem)%dx(1,n)
+      dxm = iv%info(satem)%dxm(1,n)
 
       !------------------------------------------------------------------------
 
       ! [2.0] Calculate vertical profile of virtual temperature at obs pt.
 
-      call da_tv_profile(grid,iv%satem(n)%loc,pre_ma,tv_ma)
+      call da_tv_profile(grid,iv%info(satem),n,pre_ma,tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
@@ -77,24 +77,35 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
          layer2 = layer1
          tv2 = tv1
       end do
+write (0,*) __FILE__,n,"sum(model_thickness(:))",sum(model_thickness(:))
+   end do
 
-      !------------------------------------------------------------------------
-      ! [5.0] Perform optional maximum error check:
-      !------------------------------------------------------------------------
+   !------------------------------------------------------------------------
+   ! [5.0] Perform optional maximum error check:
+   !------------------------------------------------------------------------
 
-      if (check_max_iv) then
-         call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf)
-      end if
+   if (check_max_iv) then
+      call da_check_max_iv_satem(iv, it, ithickness,ithicknessf)
+   end if
 
-      !------------------------------------------------------------------------
-      ! [6.0] Perform land/ocean check
-      !------------------------------------------------------------------------
+   !------------------------------------------------------------------------
+   ! [6.0] Perform land/ocean check
+   !------------------------------------------------------------------------
 
+   do n=iv%info(satem)%n1,iv%info(satem)%n2
+
+      i   = iv%info(satem)%i(1,n)
+      dy  = iv%info(satem)%dy(1,n)
+      dym = iv%info(satem)%dym(1,n)
+      j   = iv%info(satem)%j(1,n)
+      dx  = iv%info(satem)%dx(1,n)
+      dxm = iv%info(satem)%dxm(1,n)
       if (grid%xb%landmask(i,j ) /= 0.0 .or. grid%xb%landmask(i+1,j ) /= 0. .or.  &
           grid%xb%landmask(i,j+1) /= 0.0 .or. grid%xb%landmask(i+1,j+1) /= 0.0) then
          iv % satem(n) % thickness(1) % inv = 0.0
          ithicknessf = ithicknessf + 1
       end if
+write (0,*) __FILE__,n,"ithicknessf",ithicknessf
    end do
 
    if (rootproc .and. check_max_iv_print) then

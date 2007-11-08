@@ -30,21 +30,22 @@ subroutine da_transform_xtoy_satem (grid, iv, y)
 
    do n=iv%info(satem)%n1,iv%info(satem)%n2
 
-      num_levs = iv % satem(n) % info % levels
+      num_levs = iv%info(satem)%levels(n)
 
       ! [1.0] Get horizontal interpolation weights:
 
-      i = iv%satem(n)%loc%i
-      dy = iv%satem(n)%loc%dy
-      dym = iv%satem(n)%loc%dym
-      j = iv%satem(n)%loc%j
-      dx = iv%satem(n)%loc%dx
-      dxm = iv%satem(n)%loc%dxm
+      i   = iv%info(satem)%i(1,n)
+      dy  = iv%info(satem)%dy(1,n)
+      dym = iv%info(satem)%dym(1,n)
+      j   = iv%info(satem)%j(1,n)
+      dx  = iv%info(satem)%dx(1,n)
+      dxm = iv%info(satem)%dxm(1,n)
 
       ! [2.0] Virtual temperature at obs pt.
 
       call da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,                &
          pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
+write (0,*) n,"sum(TGL_pre_ma),sum(TGL_tv_ma)",sum(TGL_pre_ma),sum(TGL_tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
@@ -59,9 +60,13 @@ subroutine da_transform_xtoy_satem (grid, iv, y)
             call da_find_layer_tl(layer1,tv1,iv%satem(n)%p(k),            &
                pre_ma,tv_ma,kts,kte,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
 
+write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))", &
+sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))
             call da_thickness_tl(pre_ma,tv_ma,kts,kte,tv1,tv2,layer1,layer2,&
                iv%satem(n)%p(k),pres2,TGL_pre_ma,TGL_tv_ma,           &
                TGL_tv1,TGL_tv2,y%satem(n)%thickness(k))
+write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))", &
+sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))
 
             pres2 = iv%satem(n)%p(k)
             layer2 = layer1

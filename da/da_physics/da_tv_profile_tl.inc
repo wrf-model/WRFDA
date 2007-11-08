@@ -21,11 +21,18 @@ subroutine da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,pre_ma,tv_ma,TGL_pre_ma,TGL_t
 
    if (trace_use_dull) call da_trace_entry("da_tv_profile_tl")
 
+   TGL_pre_ma(:) = 0
+   TGL_tv_ma(:)  = 0
+   pre_ma(:)     = 0
+   tv_ma(:)      = 0
+
    do ii=i,i+1
       do jj=j,j+1
          TGL_tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xa%t(ii,jj,kts:kte)*(1.0+0.61*grid%xb%q(ii,jj,kts:kte)) +  &
                                       0.61*grid%xb%t(ii,jj,kts:kte)*grid%xa%q(ii,jj,kts:kte)
          tv_m(ii-i+1,jj-j+1,kts:kte)     = grid%xb%t(ii,jj,kts:kte)*(1.0+0.61*grid%xb%q(ii,jj,kts:kte))
+write (0,*) "TGL_tv_m(ii-i+1,jj-j+1,kts:kte)",TGL_tv_m(ii-i+1,jj-j+1,kts:kte)
+!write (0,*) "tv_m(ii-i+1,jj-j+1,kts:kte)",tv_m(ii-i+1,jj-j+1,kts:kte)
       end do
    end do
  
@@ -37,6 +44,10 @@ subroutine da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,pre_ma,tv_ma,TGL_pre_ma,TGL_t
                    dy * ( dxm * grid%xb%p(i,j+1,kts:kte) + dx * grid%xb%p(i+1,j+1,kts:kte) )
    tv_ma (kts:kte) = dym* ( dxm * tv_m (1,1,kts:kte) + dx * tv_m (2,1,kts:kte) ) + &
                    dy * ( dxm * tv_m (1,2,kts:kte) + dx * tv_m (2,2,kts:kte) )
+!write (0,*) "TGL_pre_ma(kts:kte)",TGL_pre_ma(kts:kte)
+!write (0,*) "TGL_tv_ma (kts:kte)",TGL_tv_ma (kts:kte)
+!write (0,*) "pre_ma(kts:kte)",pre_ma(kts:kte)
+!write (0,*) "tv_ma (kts:kte)",tv_ma (kts:kte)
 
    if (trace_use_dull) call da_trace_exit("da_tv_profile_tl")
  

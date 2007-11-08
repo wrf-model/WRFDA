@@ -17,7 +17,7 @@ module da_satem
       da_find_layer_adj, da_tv_profile_adj, da_find_layer_tl, &
       da_thickness_tl, da_tv_profile_tl
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual
+   use da_tools, only : da_max_error_qc_new, da_residual
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_satem_type" is ONLY used locally in da_satem:

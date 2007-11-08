@@ -258,9 +258,6 @@ module da_define_structures
    end type bogus_type
 
    type satem_type
-      type (info_type)        :: info
-      type (model_loc_type)   :: loc
-
       real                            :: ref_p        ! Reference pressure
       real                  , pointer :: p        (:) ! Multi-level pressure
 

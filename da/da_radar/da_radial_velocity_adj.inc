@@ -18,15 +18,15 @@ subroutine da_radial_velocity_adj(rv,p,u,v,w,qrn,ps,x,y,z,qrn9)
    if (trace_use) call da_trace_entry("da_radial_velocity_adj")
 
    r     = sqrt(x*x+y*y+z*z)
+   alpha = (ps/p)**0.4
 
    rv = rv/r
    u  = u + rv*x
    v  = v + rv*y
    w  = w + rv*z
+   vt = -rv*z
 
    if (qrn9 >  0.0) then
-      alpha = (ps/p)**0.4
-      vt = -rv*z
       qrn = qrn + vt*0.675*alpha*qrn9**(-0.875)
    end if
 

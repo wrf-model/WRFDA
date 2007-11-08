@@ -352,7 +352,7 @@ subroutine da_fill_obs_structures(iv, ob)
 
    if (iv%info(satem)%nlocal > 0) then
       do n = 1, iv%info(satem)%nlocal
-         do k = 1, iv % satem(n) % info % levels
+         do k = 1, iv%info(satem)%levels(n)
             ob % satem(n) % thickness(k) = iv % satem(n) % thickness(k) % inv
          end do
       end do

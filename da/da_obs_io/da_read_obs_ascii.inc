@@ -482,10 +482,6 @@ subroutine da_read_obs_ascii (iv, filename)
             nlocal(satem) = nlocal(satem) + 1
             if (nlocal(satem) > iv%info(satem)%nlocal) cycle reports
 
-            iv%satem(nlocal(satem))%info                 = platform%info
-            iv%satem(nlocal(satem))%loc                  = platform%loc
-            iv%satem(nlocal(satem))%loc%obs_global_index = ntotal(satem)
-
             ! The satem ref_p is put in the SLP position in OBSPROC data stream.
 
             iv%satem(nlocal(satem))%ref_p= platform%loc%slp%inv

@@ -69,7 +69,7 @@ module da_radiance
    use da_reporting, only : da_message, da_warning, message, da_error
    use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, &
+   use da_tools, only : da_residual, da_obs_sfc_correction, &
       da_llxy, da_llxy_new, da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort

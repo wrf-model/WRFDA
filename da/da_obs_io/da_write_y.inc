@@ -358,16 +358,16 @@ subroutine da_write_y (iv, y)
    if (iv%info(satem)%nlocal > 0) then
       num_obs = 0
       do n = 1, iv%info(satem)%nlocal            
-         if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%info(satem)%proc_domain(1,n)) num_obs = num_obs + 1
       end do
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'satem', num_obs
          num_obs = 0
          do n = 1, iv%info(satem)%nlocal
-            if (iv%satem(n)%loc%proc_domain) then
+            if (iv%info(satem)%proc_domain(1,n)) then
                num_obs = num_obs + 1
-               write(ounit,'(i8)')iv % satem(n) % info % levels
-               do k = 1, iv % satem(n) % info % levels
+               write(ounit,'(i8)')iv%info(satem)%levels(n)
+               do k = 1, iv%info(satem)%levels(n)
                   call da_check_missing(iv%satem(n)%thickness(k)%qc, &
                      y % satem(n) % thickness(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &

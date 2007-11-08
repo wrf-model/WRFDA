@@ -37,8 +37,7 @@ module da_setup_structures
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, trace_use_dull, kts,kte
-   use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
-      da_store_obs_grid_info_new
+   use da_obs, only : da_fill_obs_structures, da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
       da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
    use da_par_util, only : da_patch_to_global

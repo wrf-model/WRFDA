@@ -943,20 +943,20 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
       end if
 
       do n = 1, iv%info(satem)%nlocal           
-         if (.not. iv%satem(n)%loc%proc_domain) cycle
+         if (.not. iv%info(satem)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%satem(n)%info%platform,    &
-            iv%satem(n)%info%date_char,   &
-            iv%satem(n)%info%name,        &
-            iv%satem(n)%info%levels,      &
-            iv%satem(n)%info%lat,         &
-            iv%satem(n)%info%lon,         &
-            iv%satem(n)%info%elv,         &
-            iv%satem(n)%info%id
-         write(ounit, fmt = fmt_srfc) iv%satem(n)%loc%slp, iv%satem(n)%loc%pw
+            iv%info(satem)%platform(n),    &
+            iv%info(satem)%date_char(n),   &
+            iv%info(satem)%name(n),        &
+            iv%info(satem)%levels(n),      &
+            iv%info(satem)%lat(1,n),         &
+            iv%info(satem)%lon(1,n),         &
+            iv%info(satem)%elv(n),         &
+            iv%info(satem)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(satem)%slp(n),iv%info(satem)%pw(n)
 
-         do k = 1, iv%satem(n)%info%levels 
+         do k = 1, iv%info(satem)%levels(n) 
             thick_qc = iv%satem(n)%thickness(k)%qc
             thick = iv%satem(n)%org_thickness(k)%inv   
             thick_error = iv%satem(n)%org_thickness(k)%error

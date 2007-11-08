@@ -217,7 +217,7 @@ subroutine da_use_obs_errfac(iv)
       call da_read_errfac('satem', iv % satem_ef_thickness, d1, d2, d3, d4)
 
       do n = 1, iv%info(satem)%nlocal
-         do k = 1, iv % satem(n) % info % levels
+         do k = 1, iv%info(satem)%levels(n)
             iv % satem(n) % thickness(k) % error = iv % satem(n) % thickness(k) % error*&
                                                    iv % satem_ef_thickness
          end do
