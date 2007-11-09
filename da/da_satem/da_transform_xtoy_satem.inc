@@ -45,7 +45,6 @@ subroutine da_transform_xtoy_satem (grid, iv, y)
 
       call da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,                &
          pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
-write (0,*) n,"sum(TGL_pre_ma),sum(TGL_tv_ma)",sum(TGL_pre_ma),sum(TGL_tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
