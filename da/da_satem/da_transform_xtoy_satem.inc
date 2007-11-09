@@ -59,14 +59,9 @@ write (0,*) n,"sum(TGL_pre_ma),sum(TGL_tv_ma)",sum(TGL_pre_ma),sum(TGL_tv_ma)
          if (ABS(iv % satem(n) %p (k) - missing_r) > 1.0) then
             call da_find_layer_tl(layer1,tv1,iv%satem(n)%p(k),            &
                pre_ma,tv_ma,kts,kte,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
-
-write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))", &
-sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))
             call da_thickness_tl(pre_ma,tv_ma,kts,kte,tv1,tv2,layer1,layer2,&
                iv%satem(n)%p(k),pres2,TGL_pre_ma,TGL_tv_ma,           &
                TGL_tv1,TGL_tv2,y%satem(n)%thickness(k))
-write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))", &
-sum(iv%satem(n)%p(:)),sum(y%satem(n)%thickness(:))
 
             pres2 = iv%satem(n)%p(k)
             layer2 = layer1

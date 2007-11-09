@@ -36,9 +36,9 @@ subroutine da_check_max_iv_polaramv(iv,it,itu,ituf,itv,itvf)
 
    do n = iv%info(polaramv)%n1,iv%info(polaramv)%n2
       do k = 1, iv%info(polaramv)%levels(n)
-         call da_max_error_qc_new (it, iv%info(polaramv), n, iv%polaramv(n)%u(k), max_error_uv, itu, ituf, &
+         call da_max_error_qc (it, iv%info(polaramv), n, iv%polaramv(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(polaramv), n, iv%polaramv(n)%v(k), max_error_uv, itv, itvf, &
+         call da_max_error_qc (it, iv%info(polaramv), n, iv%polaramv(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
       end do
    end do

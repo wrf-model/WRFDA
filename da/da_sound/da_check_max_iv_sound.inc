@@ -39,13 +39,13 @@ subroutine da_check_max_iv_sound(iv, it, itu,ituf,itv,itvf,itt,ittf,itqv,itqvf)
 
    do n = iv%info(sound)%n1,iv%info(sound)%n2
       do k = 1, iv%info(sound)%levels(n)
-         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%u(k), max_error_uv, itu, ituf, &
+         call da_max_error_qc (it, iv%info(sound), n, iv%sound(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%v(k), max_error_uv, itv, itvf, &
+         call da_max_error_qc (it, iv%info(sound), n, iv%sound(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%t(k), max_error_t,  itt, ittf, &
+         call da_max_error_qc (it, iv%info(sound), n, iv%sound(n)%t(k), max_error_t,  itt, ittf, &
             check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)                           
-         call da_max_error_qc_new (it, iv%info(sound), n, iv%sound(n)%q(k), max_error_q,  itqv, itqvf, &
+         call da_max_error_qc (it, iv%info(sound), n, iv%sound(n)%q(k), max_error_q,  itqv, itqvf, &
             check_max_iv_unit, 'QV   ', failed, check_max_iv_print)                           
       end do
    end do

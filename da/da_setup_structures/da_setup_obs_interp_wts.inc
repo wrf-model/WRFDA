@@ -8,19 +8,19 @@ subroutine da_setup_obs_interp_wts (iv)
 
    type (iv_type), intent(inout)  :: iv         ! Innovation vector (O-B).
 
-   integer                        :: i, n          ! Loop counter.
+   integer                        :: i         ! Loop counter.
 
    if (trace_use) call da_trace_entry("da_setup_obs_interp_wts")
 
    do i=1,num_ob_indexes
       if (iv%info(i)%nlocal > 0) then
-         call da_store_obs_grid_info_new (iv%info(i))
+         call da_store_obs_grid_info (iv%info(i))
       end if
    end do
 
    do i = 1, iv % num_inst
       if (iv % instid(i) % num_rad < 1) cycle
-      call da_store_obs_grid_info_new (iv%instid(i)%info)
+      call da_store_obs_grid_info (iv%instid(i)%info)
    end do
 
    if (trace_use) call da_trace_exit("da_setup_obs_interp_wts")

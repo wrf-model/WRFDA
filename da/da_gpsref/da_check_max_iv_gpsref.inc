@@ -36,7 +36,7 @@ subroutine da_check_max_iv_gpsref(iv,it, pref, fref)
 
    do n = iv%info(gpsref)%n1,iv%info(gpsref)%n2
       do k = 1, iv%info(gpsref)%levels(n)
-         call da_max_error_qc_new(it, iv%info(gpsref), n, iv%gpsref(n)%ref(k), &
+         call da_max_error_qc(it, iv%info(gpsref), n, iv%gpsref(n)%ref(k), &
             max_error_ref, pref, fref, check_max_iv_unit, &
             'GPSRef    ', failed, check_max_iv_print)
       end do

@@ -33,7 +33,7 @@ subroutine da_check_max_iv_gpspw(iv, it, ittpw,ittpwf)
    ! TPW:
 
    do n=iv%info(gpspw)%n1,iv%info(gpspw)%n2
-      call da_max_error_qc_new(it, iv%info(gpspw), n, iv%gpspw(n)%tpw, max_error_pw, ittpw, &
+      call da_max_error_qc(it, iv%info(gpspw), n, iv%gpspw(n)%tpw, max_error_pw, ittpw, &
         ittpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
    end do
 

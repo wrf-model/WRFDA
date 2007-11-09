@@ -39,12 +39,12 @@ subroutine da_check_max_iv_synop(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,i
    failed = .false.
 
    do n=iv%info(synop)%n1,iv%info(synop)%n2
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
       ! Mixing ratio, same ratio as relative humidity
-      call da_max_error_qc_new (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
    end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_synop")

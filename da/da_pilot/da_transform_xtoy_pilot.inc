@@ -11,7 +11,6 @@ subroutine da_transform_xtoy_pilot (grid, iv, y)
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
 
    real, allocatable :: model_u(:,:)
    real, allocatable :: model_v(:,:)

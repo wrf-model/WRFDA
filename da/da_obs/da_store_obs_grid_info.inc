@@ -1,4 +1,4 @@
-subroutine da_store_obs_grid_info_new (info)
+subroutine da_store_obs_grid_info (info)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,7 +8,7 @@ subroutine da_store_obs_grid_info_new (info)
 
    type(infa_type), intent(inout) :: info
 
-   if (trace_use) call da_trace_entry("da_store_obs_grid_info_new")
+   if (trace_use) call da_trace_entry("da_store_obs_grid_info")
 
    info%proc_domain(:,:) = .false.
    
@@ -16,8 +16,8 @@ subroutine da_store_obs_grid_info_new (info)
       info%proc_domain(:,:) = .true.
    end where
 
-   if (trace_use) call da_trace_exit("da_store_obs_grid_info_new")
+   if (trace_use) call da_trace_exit("da_store_obs_grid_info")
 
-end subroutine da_store_obs_grid_info_new
+end subroutine da_store_obs_grid_info
 
 

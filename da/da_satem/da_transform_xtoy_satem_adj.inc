@@ -37,7 +37,6 @@ subroutine da_transform_xtoy_satem_adj(grid, iv, jo_grad_y, jo_grad_x)
       ! [2.0] Virtual temperature at obs pt.
 
       call da_tv_profile(grid,iv%info(satem),n,pre_ma,tv_ma)
-write (0,*) n,"after sum(pre_ma),sum(tv_ma)",sum(pre_ma),sum(tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
@@ -50,14 +49,10 @@ write (0,*) n,"after sum(pre_ma),sum(tv_ma)",sum(pre_ma),sum(tv_ma)
          if (ABS(iv % satem(n) %p (k) - missing_r) > 1.0) then
             call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
                kts,kte)
-write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(jo_grad_y%satem(n)%thickness(:))", &
-sum(iv%satem(n)%p(:)),sum(jo_grad_y%satem(n)%thickness(:))
 
             call da_thickness_adj(pre_ma,tv_ma,kts,kte,tv1,tv2,layer1, &
                layer2, iv%satem(n)%p(k),pres2,ADJ_pre_ma,ADJ_tv_ma, &
                ADJ_tv1,ADJ_tv2,jo_grad_y%satem(n)%thickness(k))
-write (0,*) __FILE__,n,"sum(iv%satem(n)%p(:)),sum(jo_grad_y%satem(n)%thickness(:))", &
-sum(iv%satem(n)%p(:)),sum(jo_grad_y%satem(n)%thickness(:))
 
             call da_find_layer_adj(layer1,tv1,iv%satem(n)%p(k),         &
                pre_ma,tv_ma,kts,kte,ADJ_tv1,ADJ_pre_ma,ADJ_tv_ma)
@@ -74,10 +69,8 @@ sum(iv%satem(n)%p(:)),sum(jo_grad_y%satem(n)%thickness(:))
          pre_ma,tv_ma,kts,kte,ADJ_tv2,ADJ_pre_ma,ADJ_tv_ma)
 
       ! [6.0] Adjoint of horizontal interpolation
-write (0,*) __FILE__,n,"sum(grid%xa%t)",sum(grid%xa%t)
       call da_tv_profile_adj(grid,jo_grad_x,iv%info(satem),n,         &
          pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
-write (0,*) n,__FILE__,"sum(pre_ma),sum(tv_ma),sum(ADJ_pre_ma),sum(ADJ_tv_ma)",sum(pre_ma),sum(tv_ma),sum(ADJ_pre_ma),sum(ADJ_tv_ma)
    end do
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_satem_adj")

@@ -1,4 +1,4 @@
-subroutine da_max_error_qc_new (it, info, n, field, max_error, ix, ixf, iunit, var, failed, print)
+subroutine da_max_error_qc (it, info, n, field, max_error, ix, ixf, iunit, var, failed, print)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -20,7 +20,7 @@ subroutine da_max_error_qc_new (it, info, n, field, max_error, ix, ixf, iunit, v
    real                               :: err, err_max
    integer                            :: qc_flag
 
-   if (trace_use_frequent) call da_trace_entry("da_max_error_qc_new")
+   if (trace_use_frequent) call da_trace_entry("da_max_error_qc")
 
    failed = .false.
 
@@ -54,8 +54,8 @@ subroutine da_max_error_qc_new (it, info, n, field, max_error, ix, ixf, iunit, v
       field % inv = 0.0
    end if
 
-   if (trace_use_frequent) call da_trace_exit("da_max_error_qc_new")
+   if (trace_use_frequent) call da_trace_exit("da_max_error_qc")
 
-end subroutine da_max_error_qc_new
+end subroutine da_max_error_qc
 
 

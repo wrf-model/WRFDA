@@ -13,7 +13,7 @@ module da_sound
    use da_interpolation, only : da_to_zk, da_interp_lin_3d, &
       da_interp_lin_3d_adj, da_interp_lin_2d, da_interp_lin_2d_adj, da_interp_lin_2d_partial
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc_new, da_residual, da_obs_sfc_correction, da_convert_zk
+   use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, da_convert_zk
    use da_par_util, only : da_proc_stats_combine, &
       da_deallocate_global_sound, da_to_global_sound, da_to_global_sonde_sfc, &
       da_deallocate_global_sonde_sfc

@@ -11,7 +11,6 @@ subroutine da_transform_xtoy_pilot_adj(iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
 
    real, allocatable :: model_u(:,:)
    real, allocatable :: model_v(:,:)

@@ -19,7 +19,7 @@ module da_gpspw
    use da_par_util1, only : da_proc_sum_int
    use da_reporting, only : da_error
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc_new, da_residual
+   use da_tools, only : da_max_error_qc, da_residual
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_gpspw_type" is ONLY used locally in da_gpspw:

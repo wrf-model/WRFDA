@@ -20,7 +20,7 @@ module da_gpsref
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc_new, da_residual, da_convert_zk
+   use da_tools, only : da_max_error_qc, da_residual, da_convert_zk
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_gpsref_type" is ONLY used locally in da_gpsref:

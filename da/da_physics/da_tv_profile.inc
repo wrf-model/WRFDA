@@ -23,8 +23,6 @@ subroutine da_tv_profile(grid, info, n, pre_ma, tv_ma)
 
    if (trace_use_dull) call da_trace_entry("da_tv_profile")
 
-tv_ma = 0.0
-
    i   = info%i(1,n)
    j   = info%j(1,n)
    dx  = info%dx(1,n)
@@ -32,18 +30,14 @@ tv_ma = 0.0
    dxm = info%dxm(1,n)
    dym = info%dym(1,n)
 
-write (0,*) "i,j,dx,dy,dxm,dym",j,dx,dy,dxm,dym
-
    ! Virtual temperature
 
    do ii=i,i+1
       do jj=j,j+1
          tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xb%t(ii,jj,kts:kte) * &
             (1.0 + 0.61*grid%xb%q(ii,jj,kts:kte))
-write (0,*) ii,jj,"tv_m",tv_m(ii-i+1,jj-j+1,kts:kte)
       end do
    end do
-write (0,*) "tv_m",tv_m
 
    ! Horizontal interpolation to the obs. pt.
 

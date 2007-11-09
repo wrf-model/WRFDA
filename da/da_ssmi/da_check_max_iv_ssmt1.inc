@@ -37,7 +37,7 @@ subroutine da_check_max_iv_ssmt1(iv, it, itt,ittf)
    do n=iv%info(ssmt1)%n1,iv%info(ssmt1)%n2
       do k = 1, iv%info(ssmt1)%levels(n)
          ! Temperature
-         call da_max_error_qc_new (it, iv%info(ssmt1), n, iv%ssmt1(n)%t(k),&
+         call da_max_error_qc (it, iv%info(ssmt1), n, iv%ssmt1(n)%t(k),&
             max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
       end do
    end do

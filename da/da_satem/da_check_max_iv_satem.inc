@@ -36,7 +36,7 @@ subroutine da_check_max_iv_satem(iv, it, ith,ithf)
    do n = iv%info(satem)%n1,iv%info(satem)%n2
       do k = 1, iv%info(satem)%levels(n)
          ! Thickness
-         call da_max_error_qc_new(it, iv%info(satem), n, iv%satem(n)%thickness(k), &
+         call da_max_error_qc(it, iv%info(satem), n, iv%satem(n)%thickness(k), &
             max_error_thickness, ith, ithf, check_max_iv_unit, &
             'Thickness    ', failed, check_max_iv_print)
       end do

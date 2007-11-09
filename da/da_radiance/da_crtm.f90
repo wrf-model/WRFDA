@@ -5,7 +5,7 @@ module da_crtm
    !---------------------------------------------------------------------------
 
    use module_domain, only : x_type, domain
-   use da_define_structures, only : y_type, iv_type, infa_type
+   use da_define_structures, only : y_type, iv_type
 
 #ifdef CRTM
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &

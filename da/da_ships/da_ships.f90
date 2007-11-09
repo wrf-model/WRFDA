@@ -19,7 +19,7 @@ module da_ships
    use da_physics, only : da_sfc_pre, da_transform_xtopsfc, &
       da_transform_xtopsfc_adj
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc_new, da_residual, da_obs_sfc_correction, da_convert_zk
+   use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, da_convert_zk
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_ships_type" is ONLY used locally in da_ships:

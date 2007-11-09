@@ -77,7 +77,6 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
          layer2 = layer1
          tv2 = tv1
       end do
-write (0,*) __FILE__,n,"sum(model_thickness(:))",sum(model_thickness(:))
    end do
 
    !------------------------------------------------------------------------
@@ -93,19 +92,13 @@ write (0,*) __FILE__,n,"sum(model_thickness(:))",sum(model_thickness(:))
    !------------------------------------------------------------------------
 
    do n=iv%info(satem)%n1,iv%info(satem)%n2
-
       i   = iv%info(satem)%i(1,n)
-      dy  = iv%info(satem)%dy(1,n)
-      dym = iv%info(satem)%dym(1,n)
       j   = iv%info(satem)%j(1,n)
-      dx  = iv%info(satem)%dx(1,n)
-      dxm = iv%info(satem)%dxm(1,n)
       if (grid%xb%landmask(i,j ) /= 0.0 .or. grid%xb%landmask(i+1,j ) /= 0. .or.  &
           grid%xb%landmask(i,j+1) /= 0.0 .or. grid%xb%landmask(i+1,j+1) /= 0.0) then
          iv % satem(n) % thickness(1) % inv = 0.0
          ithicknessf = ithicknessf + 1
       end if
-write (0,*) __FILE__,n,"ithicknessf",ithicknessf
    end do
 
    if (rootproc .and. check_max_iv_print) then

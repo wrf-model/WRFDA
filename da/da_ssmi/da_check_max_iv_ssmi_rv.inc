@@ -36,9 +36,9 @@ subroutine da_check_max_iv_ssmi_rv(iv, it, itpw, itpwf, ispeed, ispeedf)
    failed = .false.
 
    do n=iv%info(ssmi_rv)%n1,iv%info(ssmi_rv)%n2
-      call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%tpw, &
+      call da_max_error_qc (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%tpw, &
          max_error_pw, itpw, itpwf, check_max_iv_unit, 'TPW  ', failed, check_max_iv_print)
-      call da_max_error_qc_new (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%speed, &
+      call da_max_error_qc (it, iv%info(ssmi_rv), n, iv%ssmi_rv(n)%speed, &
          max_error_uv, ispeed, ispeedf, check_max_iv_unit, 'SPEED', failed, check_max_iv_print)
    end do
 

@@ -39,14 +39,14 @@ subroutine da_check_max_iv_airsr(iv, it,itt,ittf,itqv,itqvf)
       do k = 1, iv%info(airsr)%levels(n)
          ! Temperature
          if (iv%airsr(n)%t(k)%qc >= obs_qc_pointer) then
-            call da_max_error_qc_new (it, iv%info(airsr), n, iv%airsr(n)%t(k),&
+            call da_max_error_qc (it, iv%info(airsr), n, iv%airsr(n)%t(k),&
                max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
                             failed, check_max_iv_print)
 
          end if
          ! Mixing ratio, same ratio as relative humidity
          if (iv%airsr(n)%q(k)%qc >= obs_qc_pointer) then
-            call da_max_error_qc_new  (it, iv%info(airsr), n, iv%airsr(n)%q(k), &
+            call da_max_error_qc  (it, iv%info(airsr), n, iv%airsr(n)%q(k), &
                max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
                             failed, check_max_iv_print)
          end if

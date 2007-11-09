@@ -36,9 +36,9 @@ subroutine da_check_max_iv_profiler(iv, it, itu,ituf,itv,itvf)
 
    do n = iv%info(profiler)%n1,iv%info(profiler)%n2
       do k = 1, iv%info(profiler)%levels(n)
-         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%u(k), max_error_uv, itu, ituf, &
+         call da_max_error_qc (it, iv%info(profiler), n, iv%profiler(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
+         call da_max_error_qc (it, iv%info(profiler), n, iv%profiler(n)%v(k), max_error_uv, itv, itvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
       end do
    end do

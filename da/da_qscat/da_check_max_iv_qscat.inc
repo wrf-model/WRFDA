@@ -36,9 +36,9 @@ subroutine da_check_max_iv_qscat(iv, it, itu, itvv, ituf, itvvf)
    failed = .false.
 
    do n=iv%info(qscat)%n1,iv%info(qscat)%n2
-      call da_max_error_qc_new(it, iv%info(qscat), n, iv%qscat(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, &
+      call da_max_error_qc(it, iv%info(qscat), n, iv%qscat(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, &
          'U    ', failed, check_max_iv_print)
-      call da_max_error_qc_new (it, iv%info(qscat), n, iv%qscat(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
+      call da_max_error_qc (it, iv%info(qscat), n, iv%qscat(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
          'V    ', failed, check_max_iv_print)                           
    end do
 

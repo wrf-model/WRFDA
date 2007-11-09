@@ -23,9 +23,6 @@ subroutine da_tv_profile_adj(grid,jo_grad_x,info, n,pre_ma,tv_ma,ADJ_pre_ma, ADJ
 
    if (trace_use_dull) call da_trace_entry("da_tv_profile_adj")
 
-   ADJ_pre_ma(:)  = 0.0
-   ADJ_tv_ma(:) = 0.0
-
    i   = info%i(1,n)
    j   = info%j(1,n)
    dx  = info%dx(1,n)

@@ -36,9 +36,9 @@ subroutine da_check_max_iv_geoamv(iv, it, itu,ituf,itvv,itvvf)
 
    do n=iv%info(geoamv)%n1,iv%info(geoamv)%n2
       do k = 1, iv%info(geoamv)%levels(n)
-         call da_max_error_qc_new(it, iv%info(geoamv), n, iv%geoamv(n)%u(k), max_error_uv, itu, ituf, &
+         call da_max_error_qc(it, iv%info(geoamv), n, iv%geoamv(n)%u(k), max_error_uv, itu, ituf, &
             check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-         call da_max_error_qc_new (it, iv%info(geoamv), n, iv%geoamv(n)%v(k), max_error_uv, itvv, itvvf, &
+         call da_max_error_qc (it, iv%info(geoamv), n, iv%geoamv(n)%v(k), max_error_uv, itvv, itvvf, &
             check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
       end do
    end do
