@@ -22,15 +22,12 @@ if [[ ! -f $FILE2 ]]; then
    exit 1
 fi
 
-# Do not use WRFVAR_DIR diffwrf_netcdf.exe, as it makes a pigs
-# ear of the comparison, perhaps because of the 8 bit compilation
-
 if $FULL; then
-   $WRF_DIR/build/diffwrf_netcdf.exe $FILE1 $FILE2
+   diffwrf_netcdf $FILE1 $FILE2
 fi
 
-TMPFILE=da_compare_netcdf.temp
-$WRF_DIR/build/diffwrf_netcdf.exe $FILE1 $FILE2 | tail +5 > $TMPFILE
+TMPFILE=/tmp/${USER}.da_compare_netcdf.temp
+diffwrf_netcdf $FILE1 $FILE2 | tail +5 > $TMPFILE
 
 MIN_DIGITS=0
 
