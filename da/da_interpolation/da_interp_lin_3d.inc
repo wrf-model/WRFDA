@@ -27,7 +27,6 @@ subroutine da_interp_lin_3d(fm3d, info, fo3d)
             + info%dy (k,n) * (info%dxm(k,n)*fm3d(info%i(k,n), info%j(k,n)+1, k) &
             + info%dx (k,n) * fm3d(info%i(k,n)+1, info%j(k,n)+1, k))
       end do
-
       do k = 1, info%levels(n)
          if (info%k(k,n) > 0) then
             fo3d(k,n) = info%dzm(k,n)*fmz(info%k(k,n)) + info%dz(k,n)*fmz(info%k(k,n)+1)

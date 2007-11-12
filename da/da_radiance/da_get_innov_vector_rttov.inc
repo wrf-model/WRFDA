@@ -41,6 +41,9 @@ subroutine da_get_innov_vector_rttov (it, grid, ob, iv)
 ! FIX?
 real,allocatable :: temp(:)
 
+   real, allocatable :: tgrn(:)
+   real, allocatable :: tsk(:)
+
    type(con_vars_type),  allocatable :: con_vars(:)
    type(aux_vars_type),  allocatable :: aux_vars(:)
 
@@ -64,9 +67,9 @@ real,allocatable :: temp(:)
       ssmi  = trim( inst_name(rtminit_sensor(inst))) == 'ssmi'
       sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
 
-      if (iv%info(inst)%n2 <= iv%info(inst)%n1) cycle
-      n1 = iv%info(inst)%n1
-      n2 = iv%info(inst)%n2
+      if (iv%instid(inst)%info%n2 <= iv%instid(inst)%info%n1) cycle
+      n1 = iv%instid(inst)%info%n1
+      n2 = iv%instid(inst)%info%n2
 
       n1n2=n2-n1+1
 
@@ -141,7 +144,7 @@ real,allocatable :: temp(:)
          call da_detsurtyp( grid%xb%snow, grid%xb%xice, grid%xb%landmask,  &
             grid%xb%ivgtyp, grid%xb%isltyp, &
             ims, ime, jms, jme, &
-            iv%instid(inst)%info%i(1,n), iv%instid(inst)%info%j(k,n), &
+            iv%instid(inst)%info%i(1,n), iv%instid(inst)%info%j(1,n), &
             iv%instid(inst)%info%dx(1,n), iv%instid(inst)%info%dy(1,n), &
             iv%instid(inst)%info%dxm(1,n), iv%instid(inst)%info%dym(1,n), &
             iv%instid(inst)%isflg(n),iv%instid(inst)%vegtyp(n), iv%instid(inst)%soiltyp(n), &
@@ -152,27 +155,32 @@ real,allocatable :: temp(:)
       call da_interp_lin_2d (grid%xb % v10,  iv%instid(inst)%info, 1,iv%instid(inst)%v10(n1:n2))
       call da_interp_lin_2d (grid%xb % t2,   iv%instid(inst)%info, 1,iv%instid(inst)%t2m(n1:n2))
       call da_interp_lin_2d (grid%xb % q2,   iv%instid(inst)%info, 1,iv%instid(inst)%q2m(n1:n2))
-      call da_interp_lin_2d (grid%xb % psfc, iv%instid(inst)%info, 1,iv%instid(inst)%ps(n1:n2))
+      call da_interp_lin_2d (grid%xb % psfc, iv%instid(inst)%info, 1,iv%instid(inst)%ps (n1:n2))
+
+      allocate (tgrn(n1:n2))
+      allocate (tsk(n1:n2))
+      call da_interp_lin_2d (grid%xb % tgrn, iv%instid(inst)%info, 1, tgrn)
+      call da_interp_lin_2d (grid%xb % tsk, iv%instid(inst)%info, 1, tsk)
 
       do n=n1,n2
          if (iv%instid(inst)%isflg(n) == 0) then   ! over sea using SST
-            call da_interp_lin_2d_partial (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
+            iv%instid(inst)%ts(n) = tgrn(n)
          else
-            call da_interp_lin_2d_partial (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, iv%instid(inst)%ts(n:n))
-
+            iv%instid(inst)%ts(n) = tsk(n)
          end if
-
       end do
+      deallocate (tgrn)
+      deallocate (tsk)
 
-      call da_interp_lin_2d_partial (grid%xb%terr,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%elevation(n1:n2))
+      call da_interp_lin_2d (grid%xb%terr,  iv%instid(inst)%info, 1, iv%instid(inst)%elevation(n1:n2))
 
       ! variables for emissivity calculations
       !---------------------------------------- 
 
-      call da_interp_lin_2d_partial (grid%xb%smois,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%smois(n1:n2))
-      call da_interp_lin_2d_partial (grid%xb%tslb,   iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%tslb(n1:n2))
-      call da_interp_lin_2d_partial (grid%xb%snowh,  iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%snowh(n1:n2))
-      call da_interp_lin_2d_partial (grid%xb%vegfra, iv%instid(inst)%info, 1, n1, n2, iv%instid(inst)%vegfra(n1:n2))
+      call da_interp_lin_2d (grid%xb%smois,  iv%instid(inst)%info, 1, iv%instid(inst)%smois(n1:n2))
+      call da_interp_lin_2d (grid%xb%tslb,   iv%instid(inst)%info, 1, iv%instid(inst)%tslb(n1:n2))
+      call da_interp_lin_2d (grid%xb%snowh,  iv%instid(inst)%info, 1, iv%instid(inst)%snowh(n1:n2))
+      call da_interp_lin_2d (grid%xb%vegfra, iv%instid(inst)%info, 1, iv%instid(inst)%vegfra(n1:n2))
 
       ! iv%instid(inst)%snowh(n1:n2) = iv%instid(inst)%snowh(n1:n2)*100.0   ! convert from m to mm
       iv%instid(inst)%vegfra(n1:n2) = 0.01*iv%instid(inst)%vegfra(n1:n2)  ! convert range to 0~1
@@ -180,16 +188,16 @@ real,allocatable :: temp(:)
       ! variables for calculation of cloud affected radiance
       !-------------------------------------------------------
       do k=kts,kte
-         call da_interp_lin_2d_partial (grid%xb%t(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%tm(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%q(:,:,:k),   iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qm(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%qrn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qrn(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%qcw(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qcw(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%qci(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qci(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%qsn(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qsn(k,n1:n2))
-         call da_interp_lin_2d_partial (grid%xb%qgr(:,:,:k), iv%instid(inst)%info, k, n1, n2, iv%instid(inst)%qgr(k,n1:n2))
-
-         iv%instid(inst)%pm(k,n1:n2)  = v_p(k,n1:n2)
+         call da_interp_lin_2d (grid%xb%t  (:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%tm(k,:))
+         call da_interp_lin_2d (grid%xb%q  (:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qm(k,:))
+         call da_interp_lin_2d (grid%xb%qrn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qrn(k,:))
+         call da_interp_lin_2d (grid%xb%qcw(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qcw(k,:))
+         call da_interp_lin_2d (grid%xb%qci(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qci(k,:))
+         call da_interp_lin_2d (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qsn(k,:))
+         call da_interp_lin_2d (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qgr(k,:))
       end do
+
+      iv%instid(inst)%pm(:,n1:n2)  = v_p(:,n1:n2)
 
       ! convert to hPa
       iv%instid(inst)%ps(n1:n2) = 0.01 * iv%instid(inst)%ps(n1:n2)
@@ -328,19 +336,15 @@ end do
       ! [2.0] calculate components of innovation vector:
       !----------------------------------------------------------------
 
-      where (iv%instid(inst)%tb_inv(1:nchan,n1:n2) > missing_r)
-         iv%instid(inst)%tb_inv(1:nchan,n1:n2) = &
-            ob%instid(inst)%tb(1:nchan,n1:n2) - iv%instid(inst)%tb_xb(1:nchan,n1:n2)
-      elsewhere
-         iv%instid(inst)%tb_inv(1:nchan,n1:n2)   = missing_r
-      endwhere
-      !do n=n1,n2
-      !   do k=1,nchan
-      !      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
-      !         write (0,*) "n,k,tb,grid%xb,inv",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n),iv%instid(inst)%tb_inv(k,n)
-      !      end if
-      !   end do
-      !end do
+      do n=n1,n2
+         do k=1,nchan
+            if (iv%instid(inst)%tb_inv(k,n) > missing_r) then
+               iv%instid(inst)%tb_inv(k,n) = ob%instid(inst)%tb(k,n) - iv%instid(inst)%tb_xb(k,n)
+            else
+               iv%instid(inst)%tb_inv(k,n)   = missing_r
+            end if
+         end do
+      end do
 
       deallocate (v_p)
       deallocate (clw)
