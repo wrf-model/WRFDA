@@ -31,38 +31,12 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, grid, mzs)
    ! testing.  This will always be .false. for a serial run or 
    ! one-processor DM_PARALLEL run.
 
-   if (test_dm_exact) then
+   dtemp1(1) = da_dot(cv_size, x, y)
 
-      ! Collect local cv arrays x and y to globally-sized serially-ordered 
-      ! arrays xg and yg.  Note that xg and yg will only exist on the 
-      ! monitor task.  
-
-      if (rootproc) then
-         allocate(xg(1:cv_size_domain))
-         allocate(yg(1:cv_size_domain))
-      end if
-
-      call da_cv_to_global(cv_size, cv_size_domain, x, grid, mzs, xg)
-      call da_cv_to_global(cv_size, cv_size_domain, y, grid, mzs, yg)
-
-      if (rootproc) then
-         dtemp1(1) = da_dot(cv_size_domain, xg, yg)
-         deallocate(xg, yg)
-      end if
-
-      ! Broadcast result from monitor to other tasks.  
-      call wrf_dm_bcast_real(dtemp1, 1)
-
-   else
-
-      dtemp1(1) = da_dot(cv_size, x, y)
-
-      if (.not. global) then
-         dtemp1x = dtemp1(1)
-         ! summation across processors:
-         dtemp1(1) = wrf_dm_sum_real(dtemp1x)
-      end if
-
+   if (.not. global) then
+      dtemp1x = dtemp1(1)
+      ! summation across processors:
+      dtemp1(1) = wrf_dm_sum_real(dtemp1x)
    end if
 
    da_dot_cv = dtemp1(1)

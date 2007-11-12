@@ -6,7 +6,7 @@ module da_synop
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, sfc_assi_options, &
-      max_stheight_diff,test_dm_exact, anal_type_verify, &
+      max_stheight_diff, anal_type_verify, &
       kts,kte,kms,kme,sfc_assi_options_1,sfc_assi_options_2 , &
       trace_use_dull, synop
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
@@ -15,8 +15,7 @@ module da_synop
       da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj, &
       da_interp_lin_2d, da_interp_lin_2d_adj
    use da_par_util1, only : da_proc_sum_int
-   use da_par_util, only : da_proc_stats_combine, &
-      da_deallocate_global_synop, da_to_global_synop
+   use da_par_util, only : da_proc_stats_combine
    use da_physics, only : da_sfc_pre, da_transform_xtopsfc, &
       da_transform_xtopsfc_adj
    use da_statistics, only : da_stats_calculate

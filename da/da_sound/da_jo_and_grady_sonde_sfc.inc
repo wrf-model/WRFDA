@@ -25,11 +25,7 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    jo % sonde_sfc_p = 0.0
    jo % sonde_sfc_q = 0.0
 
-   if (test_dm_exact) then
-      if (iv%ntotal(sound) == 0) return
-   else
-      if (iv%nlocal(sound) < 1) return
-   end if
+   if (iv%nlocal(sound) < 1) return
 
    do n=1, iv%nlocal(sound)
       jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / (iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
@@ -39,20 +35,8 @@ subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
       jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / (iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
    end do
 
-   ! Bitwise-exact reduction preserves operation order of serial code for
-   ! testing, at the cost of much-increased run-time.  Turn it off when not
-   ! testing.  This will always be .false. for a serial run.
-   if (test_dm_exact) then
-      ! collect all obs in serial order and allocate global objects
-      call da_to_global_sonde_sfc( iv, re, jo_grad_y, iv_glob, re_glob, jo_grad_y_glob)
-      ! perform remaining computations
-      call da_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
-      ! free global objects
-      call da_deallocate_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob)
-   else
-      ! perform remaining computations
-      call da_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo)
-   end if
+   ! perform remaining computations
+   call da_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo)
 
    jo % sonde_sfc_u = 0.5 * jo % sonde_sfc_u
    jo % sonde_sfc_v = 0.5 * jo % sonde_sfc_v

@@ -4,7 +4,7 @@ module da_sound
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, sfc_assi_options, &
-      max_stheight_diff,test_dm_exact, trace_use, anal_type_verify, &
+      max_stheight_diff, trace_use, anal_type_verify, &
       kms,kme,kts,kte,sfc_assi_options_1,sfc_assi_options_2, &
       trace_use_dull, sound
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
@@ -17,9 +17,7 @@ module da_sound
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction
    use da_tools_serial, only : da_get_unit, da_free_unit
-   use da_par_util, only : da_proc_stats_combine, &
-      da_deallocate_global_sound, da_to_global_sound, da_to_global_sonde_sfc, &
-      da_deallocate_global_sonde_sfc
+   use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_physics, only : da_sfc_pre, da_transform_xtopsfc, &
       da_transform_xtopsfc_adj

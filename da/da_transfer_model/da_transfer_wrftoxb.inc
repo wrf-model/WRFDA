@@ -598,46 +598,18 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    size2d = (ide-ids+1)*(jde-jds+1)
 
    tmpvar = 1.0/real(size2d)
-
-   ! Bitwitse-exact reduction preserves operation order of serial code for
-   ! testing, at the cost of much-increased run-time.  Turn it off when not
-   ! testing.  Thits will always be .false. for a serial or 1-process MPI run.
-   if (test_dm_exact) then
-      allocate(arrayglobal(ids:ide, jds:jde))
-      call da_patch_to_global(grid,grid%xb%psac, arrayglobal)
-      loc_psac_mean = tmpvar*sum(arrayglobal(ids:ide,jds:jde))
-      deallocate(arrayglobal)
-   else
-      loc_psac_mean = tmpvar*sum(grid%xb % psac(its:ite,jts:jte))
-   end if
+   
+   loc_psac_mean = tmpvar*sum(grid%xb % psac(its:ite,jts:jte))
 
    tmpvar = 1.0/real(ide-ids+1)
-
-   if (test_dm_exact) then
-      allocate(arrayglobal(ids:ide, jds:jde))
-      call da_patch_to_global(grid,grid%xb%lat, arrayglobal)
-      do j=jds,jde
-         loc_latc_mean(j) = tmpvar*sum(arrayglobal(ids:ide, j))
-      end do
-      deallocate(arrayglobal)
-   else
-      do j=jts,jte
-         loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(its:ite, j))
-      end do
-   end if
-
-   if (test_dm_exact) then
-      ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_psac_mean, 1)
-      xbx % psac_mean = loc_psac_mean
-      ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_latc_mean, (jde-jds+1))
-      xbx % latc_mean = loc_latc_mean
-   else
-      xbx % psac_mean = wrf_dm_sum_real(loc_psac_mean)
-      call wrf_dm_sum_reals(loc_latc_mean, xbx % latc_mean)
-   end if
-
+      
+   do j=jts,jte
+      loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(its:ite, j))
+   end do
+   
+   xbx % psac_mean = wrf_dm_sum_real(loc_psac_mean)
+   call wrf_dm_sum_reals(loc_latc_mean, xbx % latc_mean)
+   
    if (print_detail_xb) then
       ! write(unit=stdout, fmt=*) 'loc_psac_mean  =', loc_psac_mean
       write(unit=stdout, fmt=*) 'xbx % psac_mean=', xbx % psac_mean

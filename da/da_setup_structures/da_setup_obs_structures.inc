@@ -39,52 +39,6 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    else
       use_rad = .false.
    end if
-
-   ! test_dm_exact can be set to .true. to force DM_PARALLEL runs 
-   ! to produce results that are bitwise-identical regardless of the number of 
-   ! MPI tasks used.  This is useful for validating that multi-processor runs 
-   ! are not a source of bugs.  Runtime will be much longer.  This option is 
-   ! automatically overridden to .false. for serial or 1-MPI-task runs.  
-
-   if (test_dm_exact) then
-      if (num_procs == 1) then
-         test_dm_exact = .false.
-         write(unit=stdout,fmt='(A)') &
-            ' test_dm_exact overridden to .false. for serial or 1-MPI-task run'
-      end if
-      ! only implmenented for Sound and Synop, so switch other types off
-      use_shipsobs         = .false.
-      use_metarobs         = .false.
-      use_bogusobs         = .false.
-      use_pilotobs         = .false.
-      use_airepobs         = .false.
-      use_geoamvobs        = .false.
-      use_polaramvobs      = .false.
-      use_buoyobs          = .false.
-      use_profilerobs      = .false.
-      use_satemobs         = .false.
-      use_gpspwobs         = .false.
-      use_gpsrefobs        = .false.
-      use_ssmiretrievalobs = .false.
-      use_ssmitbobs        = .false.
-      use_ssmt1obs         = .false.
-      use_ssmt2obs         = .false.
-      use_qscatobs         = .false.
-      use_hirs2obs         = .false.
-      use_hirs3obs         = .false.
-      use_hirs4obs         = .false.
-      use_mhsobs           = .false.
-      use_msuobs           = .false.
-      use_amsuaobs         = .false.
-      use_amsubobs         = .false.
-      use_airsobs          = .false.
-      use_eos_amsuaobs     = .false.
-      use_eos_radobs       = .false.
-      use_hsbobs           = .false.
-      use_obsgts           = .false.
-      use_rad              = .false.
-      use_airsretobs       = .false.
-   end if
     
    if (num_pseudo > 0) then
       call da_message((/"Single OBS Test:: Turn off all the OBS switches ***"/))

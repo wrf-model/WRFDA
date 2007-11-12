@@ -26,11 +26,7 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
    jo % synop_p = 0.0
    jo % synop_q = 0.0
 
-   if (test_dm_exact) then
-      if (iv%ntotal(synop) == 0) return
-   else
-      if (iv%nlocal(synop) < 1) return
-   end if
+   if (iv%nlocal(synop) < 1) return
 
    do n=1, iv%nlocal(synop)
       jo_grad_y%synop(n)%u = -re%synop(n)%u / (iv%synop(n)%u%error * iv%synop(n)%u%error)
@@ -40,20 +36,8 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
       jo_grad_y%synop(n)%q = -re%synop(n)%q / (iv%synop(n)%q%error * iv%synop(n)%q%error)
    end do
 
-   ! Bitwise-exact reduction preserves operation order of serial code for
-   ! testing, at the cost of much-increased run-time.  Turn it off when not
-   ! testing.  This will always be .false. for a serial run.
-   if (test_dm_exact) then
-      ! collect all obs in serial order and allocate global objects
-      call da_to_global_synop(iv, re, jo_grad_y, iv_glob, re_glob, jo_grad_y_glob)
-      ! perform remaining computations
-      call da_jo_synop_uvtq(iv_glob, re_glob, jo_grad_y_glob, jo)
-      ! free global objects
-      call da_deallocate_global_synop(iv_glob, re_glob, jo_grad_y_glob)
-   else
-      ! perform remaining computations
-      call da_jo_synop_uvtq(iv, re, jo_grad_y, jo)
-   end if
+   ! perform remaining computations
+   call da_jo_synop_uvtq(iv, re, jo_grad_y, jo)
 
    jo % synop_u = 0.5 * jo % synop_u
    jo % synop_v = 0.5 * jo % synop_v

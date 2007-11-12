@@ -188,10 +188,6 @@ da_advance_time.exe : da_advance_time.o
 	$(SFC) $(LDFLAGS) -o $@ da_advance_time.o
 	(cd ../da; $(LN) ../build/$@ .)
 
-inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
-	@ $(RM) inc/da_generic_boilerplate.inc
-	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
-
 da_utils : setup \
            da_tune_obs_hollingsworth1.exe \
            da_tune_obs_hollingsworth2.exe \

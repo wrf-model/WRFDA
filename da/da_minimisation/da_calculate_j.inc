@@ -71,12 +71,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    call da_jo_and_grady(iv, re, jo_partial, j % jo, jo_grad_y)
 
-   if (test_dm_exact) then
-      ! jo_partial has been already summed at lower level
-      j % jo % total = jo_partial
-   else
-      j % jo % total = wrf_dm_sum_real(jo_partial)
-   end if
+   j % jo % total = wrf_dm_sum_real(jo_partial)
 
    ! [1.4] calculate jc-dfi:
 

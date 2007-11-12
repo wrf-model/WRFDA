@@ -464,26 +464,11 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 
    tmpvar = 1.0/real(ide-ids+1)
    loc_latc_mean(:) = 0.0
-
-   ! Bitwise-exact reduction preserves operation order of serial code for
-   ! testing, at the cost of much-increased run-time.  Turn it off when not     
-   ! testing.  This will always be .false. for a serial or 1-process MPI run.  
-   if (test_dm_exact) then
-      allocate(arrayglobal(ids:ide, jds:jde))
-      call da_patch_to_global(grid, grid%xb%lat, arrayglobal)
-      do j=jds,jde
-         loc_latc_mean(j) = tmpvar*sum(arrayglobal(ids:ide, j))
-      end do
-      deallocate(arrayglobal)
-      ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_latc_mean, (jde-jds+1))
-      xbx % latc_mean = loc_latc_mean
-   else
-      do j=js,je
-         loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(is:ie, j))
-      end do
-      call wrf_dm_sum_reals (loc_latc_mean, xbx % latc_mean)
-   end if
+   
+   do j=js,je
+      loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(is:ie, j))
+   end do
+   call wrf_dm_sum_reals (loc_latc_mean, xbx % latc_mean)
 
    ! WHY?
    !  do j=js,je

@@ -28,7 +28,7 @@ module da_transfer_model
       print_detail_map,stdout,truelat1_3dv, fg_format_wrf, fg_format, base_pres, &
       truelat2_3dv, periodic_x,write_increments,max_ext_its, gravity, &
       kappa, print_detail_xa,rd_over_rv,t0, print_detail_xa, check_rh, &
-      print_detail_xb,test_dm_exact,base_lapse,base_temp,vertical_ip,ptop, &
+      print_detail_xb,base_lapse,base_temp,vertical_ip,ptop, &
       use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs,ids,ide, &
       jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
       vertical_ip_sqrt_delta_p, vertical_ip_delta_p,check_rh_simple, check_rh_tpw

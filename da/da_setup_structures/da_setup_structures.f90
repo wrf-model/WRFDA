@@ -16,7 +16,7 @@ module da_setup_structures
       max_fgat_time, num_fgat_time, dt_cloud_model, &
       use_ssmiretrievalobs,use_radarobs,use_ssmitbobs,use_qscatobs, num_procs, &
       num_pseudo, missing, ob_format, ob_format_bufr,ob_format_ascii, &
-      use_airepobs, test_dm_exact, use_amsuaobs, use_amsubobs, &
+      use_airepobs, use_amsuaobs, use_amsubobs, &
       use_airsobs, use_bogusobs, sfc_assi_options, use_eos_amsuaobs, &
       use_filtered_rad, use_eos_radobs, use_gpsrefobs, use_hirs2obs, &
       use_hsbobs,use_hirs3obs, use_gpspwobs, use_metarobs, use_msuobs, &

@@ -38,8 +38,6 @@ module da_par_util
 
    implicit none
 
-#include "da_generic_typedefs.inc"
-
    interface da_patch_to_global
       module procedure da_patch_to_global_2d
       module procedure da_patch_to_global_3d
@@ -66,12 +64,9 @@ module da_par_util
 #include "da_cv_to_global.inc"
 #include "da_patch_to_global_2d.inc"
 #include "da_patch_to_global_3d.inc"
-#include "da_generic_methods.inc"
 #include "da_deallocate_global_sonde_sfc.inc"
 #include "da_deallocate_global_sound.inc"
 #include "da_deallocate_global_synop.inc"
-#include "da_generic_boilerplate.inc"
-#include "da_y_facade_to_global.inc"
 #include "da_system.inc"
 
 #ifdef DM_PARALLEL

@@ -70,8 +70,7 @@ WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
 GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
         $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
-depend : links local registry module_state_description.F md_calls.inc \
-                      inc/da_generic_boilerplate.inc
+depend : links local registry module_state_description.F md_calls.inc
 	makedepf90 -free $(FPPFLAGS) *.F *.f90 *.F90 2>/dev/null > depend.txt
 	touch depend
 	

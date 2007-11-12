@@ -24,11 +24,7 @@ subroutine da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
    jo % sound_t = 0.0
    jo % sound_q = 0.0
 
-   if (test_dm_exact) then
-      if (iv%ntotal(sound) == 0) return
-   else
-      if (iv%nlocal(sound) < 1) return
-   end if
+   if (iv%nlocal(sound) < 1) return
 
    do n=1, iv%nlocal(sound)
        do k=1, iv%sound(n)%info%levels
@@ -38,21 +34,9 @@ subroutine da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
           jo_grad_y%sound(n)%q(k) = -re%sound(n)%q(k) / (iv%sound(n)%q(k)%error * iv%sound(n)%q(k)%error)
       end do
    end do
-
-   ! Bitwise-exact reduction preserves operation order of serial code for 
-   ! testing, at the cost of much-increased run-time.  Turn it off when not 
-   ! testing.  This will always be .false. for a serial or 1-MPI-process run.  
-   if (test_dm_exact) then
-      ! collect all obs in serial order and allocate global objects
-      call da_to_global_sound(iv, re, jo_grad_y, iv_glob, re_glob, jo_grad_y_glob)
-      ! perform remaining computations
-      call da_jo_sound_uvtq(iv_glob, re_glob, jo_grad_y_glob, jo)
-      ! free global objects
-      call da_deallocate_global_sound(iv_glob, re_glob, jo_grad_y_glob)
-   else
-      ! perform remaining computations
-      call da_jo_sound_uvtq(iv, re, jo_grad_y, jo)
-   end if
+   
+   ! perform remaining computations
+   call da_jo_sound_uvtq(iv, re, jo_grad_y, jo)
 
    jo % sound_u = 0.5 * jo % sound_u
    jo % sound_v = 0.5 * jo % sound_v

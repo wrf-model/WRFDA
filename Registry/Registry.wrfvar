@@ -642,7 +642,6 @@ rconfig   logical   test_wrfvar             namelist,wrfvar10  1  .false.  - "te
 rconfig   logical   test_transforms         namelist,wrfvar10  1  .false.  - "test_transforms"         ""  ""  
 rconfig   logical   test_statistics         namelist,wrfvar10  1  .false.  - "test_statistics"         ""  ""  
 rconfig   logical   interpolate_stats       namelist,wrfvar10  1  .true.   - "interpolate_stats"       ""  ""  
-rconfig   logical   test_dm_exact           namelist,wrfvar10  1  .false.  - "test_dm_exact"           ""  ""  
 
 rconfig   integer   cv_options_hum          namelist,wrfvar11  1  1        - "cv_options_hum"          ""  ""  
 rconfig   integer   check_rh                namelist,wrfvar11  1  2        - "check_rh"                ""  ""  
