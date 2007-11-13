@@ -54,7 +54,7 @@ SUBROUTINE calc_dpsdt ( itimestep, dt, psfc, psfcm, cn, &
   call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_REAL, MPI_SUM, &
                        comm, IERROR )
 #else
-  call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_DOUBLE, MPI_SUM, &
+  call MPI_ALLREDUCE( avg_abs_dpsdt, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
 #endif
 

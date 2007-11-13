@@ -69,7 +69,7 @@
       END SUBROUTINE f_unpack_int
      
       SUBROUTINE f_unpack_lint ( inbuf, outbuf, js, je, ks, ke, is, ie,    &
-     &                           jms, jme, kms, kme, ims, ime, curs, cs ) 
+     &                          jms, jme, kms, kme, ims, ime, curs, cs ) 
         IMPLICIT NONE
         INTEGER jms, jme, kms, kme, ims, ime
         INTEGER*8 outbuf(ims:ime,kms:kme,jms:jme), inbuf(*)
