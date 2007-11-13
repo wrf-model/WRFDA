@@ -251,23 +251,23 @@ gen_get_nl_config ( char * dirname )
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ;
 	    } else if ( !strcmp( p->nentries, "max_moves" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%num_moves ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ; 
-            } else if ( !strcmp( p->nentries, "max_eta" )) {
+	    } else if ( !strcmp( p->nentries, "max_eta" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%e_vert(1) ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eta_level number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ; 
+	    } else if ( !strcmp( p->nentries, "max_outer_iterations" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. max_outer_iterations ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eps number: ',id_id\n",gs,p->name) ;
+	    } else if ( !strcmp( p->nentries, "max_instruments" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. max_instruments ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range instruments number: ',id_id\n",gs,p->name) ;
 	    } else {
-/* JRB I can't see we can't have generic multi-elements
-	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
-*/
+	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, max_eta, max_outer_iterations, or max_instruments \n") ;
 	    }
+            fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+            fprintf(fp,"  ENDIF\n" ) ;
           }
           fprintf(fp,"  %s = model_config_rec%%%s(id_id)\n",p->name,p->name) ;
         }
@@ -291,23 +291,23 @@ gen_get_nl_config ( char * dirname )
             if        ( !strcmp( p->nentries, "max_domains" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%max_dom ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range domain number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ;
 	    } else if ( !strcmp( p->nentries, "max_moves" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%num_moves ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ;
-	    }  else if ( !strcmp( p->nentries, "max_eta" )) {
+	    } else if ( !strcmp( p->nentries, "max_eta" )) {
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%e_vert(1) ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eta_level number: ',id_id\n",gs,p->name) ;
-              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ;
+	    } else if ( !strcmp( p->nentries, "max_outer_iterations" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. max_outer_iterations ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eps number: ',id_id\n",gs,p->name) ;
+	    } else if ( !strcmp( p->nentries, "max_instruments" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. max_instruments ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range instruments number: ',id_id\n",gs,p->name) ;
 	    } else {
-/* JRB I cannot see why we cannot have multi-element ones
-
-	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, or max_eta \n") ;
-*/	    }
+	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, max_eta, max_outer_iterations, or max_instruments \n") ;
+	    }
+            fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+            fprintf(fp,"  ENDIF\n" ) ;
           }
           fprintf(fp,"  model_config_rec%%%s(id_id) = %s\n",p->name,p->name) ;
         }
