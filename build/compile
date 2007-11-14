@@ -90,7 +90,7 @@ else
     setenv REGISTRY Registry.NMM
     # integrity check for a kludge where a hard coded value in the 
     # registry must match the same value in arch/preamble
-    set registryvalue=`grep 'dimspec.* q ' Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
+    set registryvalue=`grep 'dimspec.* q ' ../Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
     set configurevalue=`grep 'DNMM_MAX_DIM=.*' configure.wrfvar | sed -e 's/..*-DNMM_MAX_DIM=//' -e 's/ ..*$//'`
     if ( $registryvalue != $configurevalue ) then
       echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"

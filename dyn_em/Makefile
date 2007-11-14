@@ -13,6 +13,7 @@ MODULES =                 		\
         module_em.o         		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
+        module_init_utilities.o         \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings
@@ -97,7 +98,7 @@ module_initialize_b_wave.o : \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 module_initialize_grav2d_x.o: \
 		../frame/module_domain.o \
@@ -108,7 +109,7 @@ module_initialize_grav2d_x.o: \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 module_initialize_hill2d_x.o: \
 		../frame/module_domain.o \
@@ -119,7 +120,7 @@ module_initialize_hill2d_x.o: \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 module_initialize_quarter_ss.o : \
 		../frame/module_domain.o \
@@ -130,7 +131,7 @@ module_initialize_quarter_ss.o : \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 module_initialize_real.o :  ../frame/module_domain.o \
 		../frame/module_configure.o  \
@@ -152,7 +153,7 @@ module_initialize_squall2d_x.o : \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 module_initialize_squall2d_y.o : \
 		../frame/module_domain.o \
@@ -163,7 +164,7 @@ module_initialize_squall2d_y.o : \
 		../share/module_io_domain.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
-		../dyn_share/module_init_utilities.o
+		module_init_utilities.o
 
 nest_init_utils.o: \
 		../frame/module_domain.o \

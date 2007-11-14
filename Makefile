@@ -55,7 +55,6 @@ framework_only : configcheck
 
 wrf : framework_only
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
-	$(MAKE) dyn_share
 	if [ $(WRF_CHEM) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" chemics ; fi
 	if [ $(WRF_EM_CORE) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" em_core ; fi
 	if [ $(WRF_NMM_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" nmm_core ; fi
@@ -72,7 +71,6 @@ all_wrfvar :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_share
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_em
 	( cd da; make -r all_wrfvar )
 
@@ -349,10 +347,6 @@ chemics :
 physics :
 	@ echo '--------------------------------------'
 	( cd phys ; $(MAKE) )
-
-dyn_share :
-	@ echo '--------------------------------------'
-	( cd dyn_share ; $(MAKE) )
 
 em_core :
 	@ echo '--------------------------------------'

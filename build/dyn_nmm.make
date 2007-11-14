@@ -16,7 +16,6 @@ DYN_nmm_OBJS = \
 	module_TIMERS.o \
 	module_ZEROX.o \
 	module_si_io_nmm.o \
-	read_nmm.o \
 	init_modules_nmm.o \
 	start_domain_nmm.o \
 	solve_nmm.o \

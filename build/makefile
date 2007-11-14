@@ -12,7 +12,6 @@ setup : depend
 links : 
 	@ cp makefile makefile.old
 	@ $(LN) $(CHEM)/* .
-	@ $(LN) $(DYN_SHARE)/* .
 	@ $(LN) $(DYNAMICS)/* .
 	@ $(LN) $(GEN_BE)/* .
 	@ $(LN) $(INC)/* .
@@ -47,7 +46,7 @@ links :
 	@ touch links
 
 
-WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
+WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
   module_wrf_top.o $(FRAME_SPECIAL_OBJS) $(SHARE_$(SOLVER)_OBJS) \
   $(DYN_$(SOLVER)_OBJS) $(PHYS_$(SOLVER)_OBJS)

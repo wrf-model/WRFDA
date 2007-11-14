@@ -520,7 +520,7 @@ if test $NMM_CORE = 1; then
 #  fi
   # integrity check for a kludge where a hard coded value in the 
   # registry must match the same value in arch/preamble
-  registryvalue=`grep 'dimspec.* q ' Registry/Registry.NMM | sed -e 's/..*constant=//' -e 's/ ..*$//'`
+  registryvalue=`grep 'dimspec.* q ' ../Registry/Registry.NMM | sed -e 's/..*constant=//' -e 's/ ..*$//'`
   if test $registryvalue -ne $NMM_MAX_DIM; then
     echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"
     echo "equal the hard coded value of NMM_MAX_DIM in configure ($NMM_MAX_DIM)"

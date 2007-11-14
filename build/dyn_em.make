@@ -1,7 +1,5 @@
 # dyn_em
 
-DYN_OBJS = module_init_utilities.o
-
 DYN_em_OBJS = \
 	module_advect_em.o \
 	module_diffusion_em.o \
@@ -15,4 +13,5 @@ DYN_em_OBJS = \
 	solve_em.o \
 	start_em.o \
 	shift_domain_em.o \
-	interp_domain_em.o
+	interp_domain_em.o \
+        module_init_utilities.o
