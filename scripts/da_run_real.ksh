@@ -48,11 +48,6 @@ let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
 
-if [[ ! -f $WRF_DIR/inc/namelist_script.inc ]]; then
-   # No namelist_script logic introduced during build, so add manually
-   ln -fs $WRFVAR_DIR/inc/namelist_script_wrf_2234.inc $WRF_DIR/inc/namelist_script.inc
-fi
-
 if [[ $WRF_NAMELIST'.' != '.' ]]; then
    ln -fs $WRF_NAMELIST namelist.input
 elif [[ -f $WRF_DIR/inc/namelist_script.inc ]]; then

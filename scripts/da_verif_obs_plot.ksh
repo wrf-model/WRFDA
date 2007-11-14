@@ -7,8 +7,10 @@
 #
 #============================================================;
 
-export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/trunk/wrfvar}
-export REG_DIR=${REG_DIR:-$HOME/data/trunk/con200}
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export NUM_EXPT=${NUM_EXPT:-2}
 export EXP_DIRS=${EXP_DIRS:-${REG_DIR}/NO_NOISE ${REG_DIR}/NOISE}
 export EXP_NAMES=${EXP_NAMES:-"NO_NOISE" "NOISE"}
@@ -18,7 +20,7 @@ export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010100}
 
 export RUN_DIR=${RUN_DIR:-$PWD/verification}
-export WORK_DIR=${WORK_DIR:-$RUN_DIR}
+export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}
 
 export INTERVAL=${INTERVAL:-12}
 export Verify_Date_Range=${Verify_Date_Range:-"01 - 28 October 2006 (${INTERVAL} hour Cycle)"}
@@ -26,9 +28,9 @@ export Verify_Date_Range=${Verify_Date_Range:-"01 - 28 October 2006 (${INTERVAL}
 export NUM_OBS_TYPE=${NUM_OBS_TYPES:-4}
 export OBS_TYPES=${OBS_TYPES:-synop sound airep geoamv}
 
-export DESIRED_LEVELS=${DESIRED_LEVELS:-(/"850","500", "200"/)}
-export DESIRED_SCORES=${DESIRED_SCORES:-(/"RMSE","BIAS", "ABIAS"/)}
-export EXP_LINES_COLORS=${EXP_LINES_COLORS:-(/"blue","green", "orange"/)}
+export DESIRED_LEVELS=${DESIRED_LEVELS:-'(/"850","500", "200"/)'}
+export DESIRED_SCORES=${DESIRED_SCORES:-'(/"RMSE","BIAS", "ABIAS"/)'}
+export EXP_LINES_COLORS=${EXP_LINES_COLORS:-'(/"blue","green", "orange"/)'}
 
 export PLOT_WKS=${PLOT_WKS:-x11}
 export CLEAN=${CLEAN:-false}
@@ -42,6 +44,9 @@ export FILE_PATH_STRING=${FILE_PATH_STRING:-'wrfvar/working/gts_omb_oma'}
 #=========================================================
 DIAG_VAR1="omb"
 DIAG_VAR2="oma"
+
+echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>"
+echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><PRE>"
 
 rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
 
@@ -350,28 +355,26 @@ chmod +x run4
 ./run4 > run4.log 2>&1
 fi
 #----------------
-
-echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>" > index.html
-echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>" >> index.html
+cd $RUN_DIR
+mv $WORK_DIR/*.pdf $WORK_DIR/*.log .
+echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>"
 for FILE in *.pdf *.log; do
    if [[ -f $FILE ]]; then
-      echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
+      echo '<LI><A HREF="'$FILE'">'$FILE'</a>'
    fi
 done
 
-echo "</UL>Output logs<UL>" >> index.html
+echo "</UL>Output logs<UL>"
 for FILE in *.log; do
    if [[ -f $FILE ]]; then
-      echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
+      echo '<LI><A HREF="'$FILE'">'$FILE'</a>'
    fi
 done
 
-echo "</UL></BODY></HTML>" >> index.html
+echo "</UL></BODY></HTML>"
 
 if $CLEAN; then
-   rm -rf $EXP_NAMES run1 run2 run3 run4 run5 run6 tmp_sfc 
-   rm -rf  tmp_upr tmp_gupr tmp_gpsref namelist.plot_diag 
-   rm -rf  fnames_sfc fnames_upr fnames_gupr da_verif.out
+   rm -rf $WORK_DIR
 fi
 
 

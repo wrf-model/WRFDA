@@ -11,7 +11,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;=============================================================;
 begin
    ;=============================================================;
-   run_dir=getenv("RUN_DIR")+"/"
+   run_dir=getenv("PWD")+"/"
    plot_dir = run_dir
    read_headers = asciiread(run_dir+"header_main",-1,"string")
    ;----------------------------------------------------------

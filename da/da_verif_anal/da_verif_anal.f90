@@ -272,7 +272,7 @@ program da_verif_anal !---------------------------------------------------------
 !----------------------------------------------------------------------------
            call build_hdate(hdate, time)
 
-           if ( hdate >= hend ) exit time_loop_3d
+           if ( hdate > hend ) exit time_loop_3d
 
            call build_hdate(date, time )
            ptime = time
@@ -450,7 +450,7 @@ program da_verif_anal !---------------------------------------------------------
 !----------------------------------------------------------------------------
            call build_hdate(hdate, time )
 
-           if ( hdate >= hend ) exit time_loop_2d
+           if ( hdate > hend ) exit time_loop_2d
 
            call build_hdate(date, time )
            ptime = time

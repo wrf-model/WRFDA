@@ -1,5 +1,4 @@
 #!/bin/ksh
-# -auex   
 #=======================================================================================
 #  Purpose : Main script for processing and display of results for
 #            verification against analysis
@@ -7,32 +6,37 @@
 #  Author  :  Syed RH Rizvi,  NCAR/MMM    10/12/2007
 #--------------------------------------------------------------------------------------
 #=======================================================================================
-export WRFVAR_DIR=${WRFVAR_DIR:-/ptmp/rizvi/trunk}
-export REG_DIR=${REG_DIR:-/ptmp/rizvi/data/t46}          
+
+echo "<PRE>"
+
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export DATA_DIR=${DATA_DIR:-${REG_DIR}}    
 export NUM_EXPT=${NUM_EXPT:-2}
 export CONTROL_EXP_DIR=${CONTROL_EXP_DIR:-${REG_DIR}/noda}                 
 export EXP_DIRS=${EXP_DIRS:-${REG_DIR}/noda ${REG_DIR}/cycling_rad}
 export EXP_NAMES=${EXP_NAMES:-"NODA" "CY RAD"}
-export VERIFICATION_FILE_STRING=${VERIFICATION_FILE_STRING:-'wrfvar'}
-export EXP_LEGENDS=${EXP_LEGENDS:-(/"noda","cy rad"/)}
+export VERIFICATION_FILE_STRING=${VERIFICATION_FILE_STRING:-'wrfout'}
+export EXP_LEGENDS=${EXP_LEGENDS:-'(/"noda","cy rad"/)'}
 
 export INTERVAL=${INTERVAL:-12}
 export VERIFY_HOUR=${VERIFY_HOUR:-12}
 export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010100}
 
-export RUN_DIR=${RUN_DIR:-/ptmp/rizvi/verification}
+export RUN_DIR=${RUN_DIR:-$PWD}
 export VERIFY_ITS_OWN_ANALYSIS=${VERIFY_ITS_OWN_ANALYSIS:-true}
-export Verify_Date_Range=${Verify_Date_Range:-"01 - 28 October 2006 (${INTERVAL} hour Cycle)"}
+export Verify_Date_Range=${Verify_Date_Range:-"$START_DATE - $END_DATE (${INTERVAL} hour Cycle)"}
 
 export DOMAIN=${DOMAIN:-1}
 export PLOT_WKS=${PLOT_WKS:-pdf}
 
 #=======================================================================================
-export DESIRED_LEVELS=${DESIRED_LEVELS:-(/"850","500", "200"/)}
-export DESIRED_SCORES=${DESIRED_SCORES:-(/"RMSE","BIAS", "ABIAS"/)}
-export EXP_LINES_COLORS=${EXP_LINES_COLORS:-(/"blue","green", "orange"/)}
+export DESIRED_LEVELS=${DESIRED_LEVELS:-850 500 200}
+export DESIRED_SCORES=${DESIRED_SCORES:-'(/"RMSE","BIAS", "ABIAS"/)'}
+export EXP_LINES_COLORS=${EXP_LINES_COLORS:-'(/"blue","green", "orange"/)'}
 
 export NUM3D=${NUM3D:-4}
 export VAR3D=${VAR3D:-'"U", "V", "TK", "QVAPOR"'}
@@ -40,13 +44,12 @@ export NUM2D=${NUM2D:-1}
 export VAR2D=${VAR2D:-' "SLP"'}
 #--------------------------------------------------------------------------------------
 #=========================================================
-# BELOW THIS LINE NO CHABGES ARE REQUIRRED                 
+# BELOW THIS LINE NO CHABGES ARE REQUIRED                 
 #=========================================================
-mkdir -p ${RUN_DIR}
-export RUN_DIR=${RUN_DIR}/Verif_hr${VERIFY_HOUR}
-mkdir -p ${RUN_DIR}
-cd ${RUN_DIR}
-rm -rf ${RUN_DIR}/*
+export WORK_DIR=${RUN_DIR}/working
+mkdir -p ${WORK_DIR}
+cd ${WORK_DIR}
+rm -rf ${WORK_DIR}/*
 export VERT_TYPE=${VERT_TYPE:-'p'}
 export BAR_LABEL_ANGLE=${BAR_LABEL_ANGLE:-45}
 #=========================================================
@@ -57,9 +60,9 @@ for EXP_DIR in $EXP_DIRS; do
    exp_dirs="$exp_dirs '$EXP_DIR/fc/',"
 done
 for EXP_NAME in $EXP_NAMES; do
-   out_dirs="$out_dirs '$EXP_NAME',"
+   out_dirs="$out_dirs '$iexp',"
    pdat_dirs[$iexp]="$EXP_NAME/"
-   mkdir -p $EXP_NAME
+   mkdir -p $iexp
    iexp=$((iexp + 1))
 done
 #--------------------------------------------------
@@ -118,13 +121,12 @@ ln -sf $BUILD_DIR/da_verif_anal.exe .
  fi
 
 #=========================================================
-# Now ploting starts
+# Now plotting starts
 #=========================================================
-cd ${RUN_DIR}
 iexp=0
 pdat_dirs=''
 for EXP_NAME in $EXP_NAMES; do
-pdat_dirs[$iexp]="${RUN_DIR}/${EXP_NAME}/"
+pdat_dirs[$iexp]="${WORK_DIR}/$iexp/"
 iexp=$((iexp + 1))
 done
 #--------------------------------------------------
@@ -144,16 +146,17 @@ iexp=$((iexp + 1))
 done
 #-----------------
 #declare -a ob_fnames
-rm -f tmp_upr 
+rm -f $WORK_DIR/tmp_upr 
 num_upr=`ls ${pdat_dirs[0]}/*${DIAG_VAR} |wc -l`
 
+OLDPWD=$PWD
 cd ${pdat_dirs[0]}
 for vn in U V TK QVAPOR; do
-  ls ${vn}*${DIAG_VAR} >> ../tmp_upr
+  ls ${vn}*${DIAG_VAR} >> $WORK_DIR/tmp_upr
 done
- 
-cd ${RUN_DIR}
 
+cd $OLDPWD
+ 
 #----------------
 if [ "$num_upr" -lt 4 ]; then
    echo "All upper-air files are not generated"
@@ -162,11 +165,11 @@ else
    echo "All upper-air files generated successfully.."
    echo "fnames_upr" >> header_main    
 
-   anyfile=`head -1 "tmp_upr"`
+   anyfile=`head -1 "$WORK_DIR/tmp_upr"`
    ncol=`head -1 ${pdat_dirs[0]}/$anyfile |wc -w`
    nrow=`cat ${pdat_dirs[0]}/$anyfile |wc -l`
-   echo $nrow > fnames_upr     
-   echo $ncol >> fnames_upr     
+   echo $nrow > $WORK_DIR/fnames_upr     
+   echo $ncol >> $WORK_DIR/fnames_upr     
    while read ob_fname
    do
      if [[ "$ob_fname" = "TK_time_series_${VERIFY_HOUR}" ]]; then
@@ -180,12 +183,12 @@ else
      else
         echo "Unknown upper-air variable:-Don't know what to do??"
      fi
-     echo "${ob_fname}" >> fnames_upr
-     echo "${ob_unit}" >> fnames_upr
-   done < tmp_upr
+     echo "${ob_fname}" >> $WORK_DIR/fnames_upr
+     echo "${ob_unit}" >> $WORK_DIR/fnames_upr
+   done < $WORK_DIR/tmp_upr
 fi
 #ob_fnames = ( `cat "$tmp_file"` )
-#rm -f tmp_upr tmp_sfc
+#rm -f $WORK_DIR/tmp_upr tmp_sfc
 #-----------------------------------------------------------------------------------------------------------------------
 # Run NCL scripts now 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -207,6 +210,8 @@ done
 echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/verif_anal_vert_profile.ncl" > run3
 chmod +x run3
 ./run3
+
+mv $WORK_DIR/*.pdf $RUN_DIR
 #-----------------------------------------------------------------------------------------------------------------------
 echo "successfully completed..."
 #-----------------------------------------------------------------------------------------------------------------------

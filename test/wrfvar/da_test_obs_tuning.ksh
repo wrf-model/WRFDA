@@ -1,13 +1,11 @@
 #!/bin/ksh
 
+. ./setup.ksh
+. ${CASE}/setup.ksh
+
 . da_test_defaults.ksh
 
-. ./setup.ksh
-
 export REG_DIR=$PWD
-
-export START_DATE=$INITIAL_DATE
-export END_DATE=$FINAL_DATE
 
 TUNING_DIR=$PWD/${MACHINE}_tuning
 rm -rf $TUNING_DIR; mkdir -p $TUNING_DIR; cd $TUNING_DIR
@@ -22,10 +20,10 @@ export Y_DIR=$REG_DIR/${UNPERT_ID}_wrfvar_${NUM_PROCS}
 export YP_DIR=$REG_DIR/${PERT_ID}_wrfvar_verbose_${NUM_PROCS}
 
 export RUN_DIR=$TUNING_DIR/desroziers
-
-$WRFVAR_DIR/scripts/da_tune_obs_desroziers.ksh
+mkdir -p $RUN_DIR
+$WRFVAR_DIR/scripts/da_tune_obs_desroziers.ksh > $RUN_DIR/index.html 2>&1
 
 export EXP_DIR=$Y_DIR
 export RUN_DIR=$TUNING_DIR/hollingsworth
-
-$WRFVAR_DIR/scripts/da_tune_obs_hollingsworth.ksh
+mkdir -p $RUN_DIR
+$WRFVAR_DIR/scripts/da_tune_obs_hollingsworth.ksh > $RUN_DIR/index.html 2>&1
