@@ -58,7 +58,9 @@ export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2
 export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d${DOMAIN}}
+if ! $CYCLING ; then
+   export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d${DOMAIN}}
+fi
 
 if $NL_VAR4D; then
    export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}
@@ -69,7 +71,7 @@ if $CYCLING; then
       if $NL_VAR4D; then
          export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       fi
-      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+      export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}}
    fi
 fi
 

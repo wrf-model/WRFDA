@@ -21,6 +21,7 @@
 #-----------------------------------------------------------------------
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
+#set -x
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
@@ -46,7 +47,7 @@ export MM=$(echo $DATE | cut -c5-6)
 export DD=$(echo $DATE | cut -c7-8)
 export HH=$(echo $DATE | cut -c9-10)
 export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
-export DA_FILE=${FC_DIR}/${PREV_DATE}/${FILE_TYPE}_${FILE_DATE} #JEFS test uses wrfout
+export DA_FILE=${FC_DIR}/${PREV_DATE}/${FILE_TYPE}_d${DOMAIN}_${FILE_DATE} #JEFS test uses wrfout
 
 #-----------------------------------------------------------------------
 # [3] Create observation files for ETKF:
@@ -156,7 +157,7 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
-   mv etkf_output.${CMEM} ${FC_DIR}/$DATE/${FILE_TYPE}_${FILE_DATE}.${CMEM}
+   mv etkf_output.${CMEM} ${FC_DIR}/$DATE/${FILE_TYPE}_d${DOMAIN}_${FILE_DATE}.${CMEM}
    let MEM=$MEM+1
 done
 
