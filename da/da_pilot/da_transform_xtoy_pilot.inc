@@ -11,17 +11,26 @@ subroutine da_transform_xtoy_pilot (grid, iv, y)
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_pilot")
 
-   do n=iv%plocal(iv%time-1,pilot) + 1, iv%plocal(iv%time,pilot)
-      k = iv % pilot(n) % info % levels
-      if (k < 1) cycle
-      ! [1.4] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % u, iv%pilot(n)%loc, y%pilot(n)%u, k, iv%pilot(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % v, iv%pilot(n)%loc, y%pilot(n)%v, k, iv%pilot(n)%zk, k)
+   allocate (model_u(iv%info(pilot)%max_lev,iv%info(pilot)%n1:iv%info(pilot)%n2))
+   allocate (model_v(iv%info(pilot)%max_lev,iv%info(pilot)%n1:iv%info(pilot)%n2))
+
+   call da_interp_lin_3d (grid%xa%u, iv%info(pilot), model_u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(pilot), model_v)
+
+   do n=iv%info(pilot)%n1,iv%info(pilot)%n2
+      y%pilot(n)%u(:) = model_u(1:iv%info(pilot)%levels(n),n)
+      y%pilot(n)%v(:) = model_v(1:iv%info(pilot)%levels(n),n)
    end do
+
+   deallocate (model_u)
+   deallocate (model_v)
+
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_pilot")
 
 end subroutine da_transform_xtoy_pilot 

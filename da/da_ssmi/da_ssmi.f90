@@ -20,15 +20,14 @@ module da_ssmi
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_rv_type, &
       residual_ssmi_tb_type, model_loc_type, info_type, field_type, &
-      count_obs_number_type, ssmi_rv_type, ssmi_tb_type, ssmt1_type, &
-      ssmt2_type
-   use da_interpolation, only : da_interp_lin_2d, da_interp_lin_2d_adj, &
-      da_interp_lin_3d,da_interp_lin_3d_adj,da_to_zk
+      count_obs_number_type
+   use da_interpolation, only : da_to_zk,da_interp_lin_2d, da_interp_lin_2d_adj, &
+      da_interp_lin_3d,da_interp_lin_3d_adj
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_reporting, only : da_warning, message, da_error
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual, da_llxy
+   use da_tools, only : da_max_error_qc, da_residual, da_llxy, da_convert_zk
    use da_tools_serial, only : da_get_unit, da_free_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
 
@@ -112,7 +111,8 @@ contains
 #include "da_transform_xtoy_ssmt1_adj.inc"
 #include "da_transform_xtoy_ssmt2.inc"
 #include "da_transform_xtoy_ssmt2_adj.inc"
-#include "da_calculate_grady_ssmi.inc"
+#include "da_calculate_grady_ssmi_tb.inc"
+#include "da_calculate_grady_ssmi_rv.inc"
 #include "da_calculate_grady_ssmt1.inc"
 #include "da_calculate_grady_ssmt2.inc"
 

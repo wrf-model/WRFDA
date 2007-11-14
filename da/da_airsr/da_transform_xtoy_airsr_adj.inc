@@ -11,17 +11,27 @@ subroutine da_transform_xtoy_airsr_adj(iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)           
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airsr_adj")
 
-   do n=iv%plocal(iv%time-1,airsr) + 1, iv%plocal(iv%time,airsr)
-      k = iv % airsr(n) % info % levels
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_adj(jo_grad_x%t, iv%airsr(n)%loc, jo_grad_y%airsr(n)%t, k, iv%airsr(n)%zk, k)
-      call da_interp_lin_3d_adj(jo_grad_x%q, iv%airsr(n)%loc, jo_grad_y%airsr(n)%q, k, iv%airsr(n)%zk, k)
+   allocate (t(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
+   allocate (q(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
+
+   do n=iv%info(airsr)%n1,iv%info(airsr)%n2
+      t(1:size(jo_grad_y%airsr(n)%t),n)  = jo_grad_y%airsr(n)%t
+      q(1:size(jo_grad_y%airsr(n)%q),n)  = jo_grad_y%airsr(n)%q
    end do
+
+   ! [1.1] Adjoint feedback from Y to X for u and v:
+
+   call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(airsr), t)
+   call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(airsr), q)
+
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airsr_adj")
 

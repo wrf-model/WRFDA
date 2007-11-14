@@ -27,8 +27,8 @@ subroutine da_ao_stats_gpspw (stats_unit, iv, re)
    stats%average = residual_gpspw1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(gpspw)
-      if (iv%gpspw(n)%loc%proc_domain) then
+   do n=1, iv%info(gpspw)%nlocal
+      if (iv%info(gpspw)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%gpspw(n)%tpw%qc, &
             re%gpspw(n)%tpw, ntpw,   &
             stats%minimum%tpw,  stats%maximum%tpw, &
@@ -67,7 +67,7 @@ subroutine da_ao_stats_gpspw (stats_unit, iv, re)
                  ' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b_0 
             end if  
          end if
-      end if    ! end if (iv%gpspw(n)%loc%proc_domain)
+      end if    ! end if (iv%info(gpspw)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

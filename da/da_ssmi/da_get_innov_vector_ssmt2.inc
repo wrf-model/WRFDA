@@ -16,9 +16,7 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
    integer :: num_levs ! Number of obs levels.
    real    :: dx, dxm  ! Interpolation weights.
    real    :: dy, dym  ! Interpolation weights.
-   real    :: model_rh(1:max_ob_levels) ! Model value rh at ob location.
-
-   real    :: zk       ! Interpolation vertical coordinator.
+   real, allocatable :: model_rh(:,:) ! Model value rh at ob location.
 
    real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
    real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
@@ -26,23 +24,25 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
    integer :: irh, irhf
    
    if (trace_use_dull) call da_trace_entry("da_get_innov_vector_ssmt2")
-   
+
+   allocate (model_rh(1:iv%info(ssmt2)%max_lev,iv%info(ssmt2)%n1:iv%info(ssmt2)%n2))
+   model_rh(:,:) = 0.0
+
    irh = 0 ; irhf = 0
-   do n=1, iv % nlocal(ssmt2)
-      num_levs = iv % ssmt2(n) % info % levels
+
+   do n=iv%info(ssmt2)%n1,iv%info(ssmt2)%n2
+      num_levs = iv%info(ssmt2)%levels(n)
 
       if (num_levs < 1) cycle
 
-      model_rh(:) = 0.0
-
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%ssmt2(n)%loc%i
-      j = iv%ssmt2(n)%loc%j
-      dx = iv%ssmt2(n)%loc%dx
-      dy = iv%ssmt2(n)%loc%dy
-      dxm = iv%ssmt2(n)%loc%dxm
-      dym = iv%ssmt2(n)%loc%dym
+      i   = iv%info(ssmt2)%i(1,n)
+      j   = iv%info(ssmt2)%j(1,n)
+      dx  = iv%info(ssmt2)%dx(1,n)
+      dy  = iv%info(ssmt2)%dy(1,n)
+      dxm = iv%info(ssmt2)%dxm(1,n)
+      dym = iv%info(ssmt2)%dym(1,n)
 
       do k=kts,kte
          v_h(k) = dym*(dxm*grid%xb%h(i,j  ,k) + dx*grid%xb%h(i+1,j  ,k)) &
@@ -52,19 +52,16 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
       end do
 
       num_levs=0
-      do k=1, iv % ssmt2(n) % info % levels
-
-         zk=missing_r
-
+      do k=1, iv%info(ssmt2)%levels(n)
          if (iv % ssmt2(n) % h(k) > 0.0) then
-            call da_to_zk(iv % ssmt2(n) % h(k), v_h, v_interp_h, zk)
+            call da_to_zk(iv % ssmt2(n) % h(k), v_h, v_interp_h, iv%info(ssmt2)%zk(k,n))
          else if (iv % ssmt2(n) % p(k) > 1.0) then
-            call da_to_zk(iv % ssmt2(n) % p(k), v_p, v_interp_p, zk)
+            call da_to_zk(iv % ssmt2(n) % p(k), v_p, v_interp_p, iv%info(ssmt2)%zk(k,n))
          end if
 
-         if (zk > 0.0) then
+         if (iv%info(ssmt2)%zk(k,n) > 0.0) then
             num_levs=num_levs+1
-            iv%ssmt2(n)%zk(num_levs)=zk
+            iv%info(ssmt2)%zk(num_levs,n)=iv%info(ssmt2)%zk(k,n)
 
             ob % ssmt2(n) % rh(num_levs) = ob % ssmt2(n) % rh(k)
 
@@ -74,18 +71,15 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
          end if
       end do
 
-      iv % ssmt2(n) % info % levels = num_levs
+      iv%info(ssmt2)%levels(n) = num_levs
+   end do
 
-      ! [1.2] Interpolate horizontally to ob:
+   call da_convert_zk (iv%info(ssmt2))
 
-      call da_interp_lin_3d( grid%xb % rh, iv%ssmt2(n)%loc, &
-         model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
+   call da_interp_lin_3d (grid%xb%rh, iv%info(ssmt2), model_rh)
 
-      !--------------------------------------------------------------------
-      ! [2.0] Initialise components of innovation vector:
-      !--------------------------------------------------------------------
-
-      do k = 1, iv % ssmt2(n) % info % levels
+   do n=iv%info(ssmt2)%n1, iv%info(ssmt2)%n2
+      do k = 1, iv%info(ssmt2)%levels(n)
          iv % ssmt2(n) % rh(k) % inv = 0.0
 
          !-----------------------------------------------------------------
@@ -94,22 +88,22 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
 
          if (ob % ssmt2(n) % rh(k) > missing_r .AND. &
              iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer) then
-            iv % ssmt2(n) % rh(k) % inv = ob % ssmt2(n) % rh(k) - model_rh(k)
+            iv % ssmt2(n) % rh(k) % inv = ob % ssmt2(n) % rh(k) - model_rh(k,n)
          end if
 
          ! write(122,'(2i4,i8,5f15.5)')n, k, iv%ssmt2(n)%height_qc(k), &
          ! iv%ssmt2(n)%info%lat, iv%ssmt2(n)%info%lon, &
          ! iv%ssmt2(n)%h(k), &
-         ! ob % ssmt2(n) % rh(k), model_rh(k)
+         ! ob % ssmt2(n) % rh(k), model_rh(k,n)
 
       end do
-
-      !------------------------------------------------------------------------
-      ! [5.0] Perform optional maximum error check:
-      !------------------------------------------------------------------------
-
-      if (check_max_iv) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf)
    end do
+
+   !------------------------------------------------------------------------
+   ! [5.0] Perform optional maximum error check:
+   !------------------------------------------------------------------------
+
+   if (check_max_iv) call da_check_max_iv_ssmt2(iv, it, irh,irhf)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(A,i5,A)')    &
@@ -117,6 +111,8 @@ subroutine da_get_innov_vector_ssmt2 (it, grid, ob, iv)
       write(unit = check_max_iv_unit, fmt = '(/,2(2(A,I6),/))') &
          'Number of failed RH(T2) observations:    ',irhf, ' on ',irh
    end if
+
+   deallocate (model_rh)
    
    if (trace_use_dull) call da_trace_exit("da_get_innov_vector_ssmt2")
 

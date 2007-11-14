@@ -24,11 +24,11 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
    do i = 1, iv%num_inst
       if (iv%instid(i)%num_rad < 1) cycle
 
-      ! count number of obs within the loc%proc_domain
+      ! count number of obs within the proc_domain
       !---------------------------------------------
       ndomain = 0
       do n =1,iv%instid(i)%num_rad
-         if (iv%instid(i)%proc_domain(n)) then
+         if (iv%instid(i)%info%proc_domain(1,n)) then
             ndomain = ndomain + 1
          end if
       end do
@@ -54,15 +54,15 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                        & soiltyp vegtyp vegfra elev clwp'
       ndomain = 0
       do n=1,iv%instid(i)%num_rad
-         if (iv%instid(i)%proc_domain(n)) then
+         if (iv%instid(i)%info%proc_domain(1,n)) then
             ndomain=ndomain+1
             write(unit=oma_rad_unit,fmt='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
-                                   iv%instid(i)%info(n)%date_char, &
+                                   iv%instid(i)%info%date_char(n), &
                                    iv%instid(i)%scanpos(n),   &
                                    iv%instid(i)%landsea_mask(n), &
-                                   iv%instid(i)%info(n)%elv,  &
-                                   iv%instid(i)%info(n)%lat,  &
-                                   iv%instid(i)%info(n)%lon, &
+                                   iv%instid(i)%info%elv(n),  &
+                                   iv%instid(i)%info%lat(1,n),  &
+                                   iv%instid(i)%info%lon(1,n), &
                                    iv%instid(i)%satzen(n),    &
                                    iv%instid(i)%satazi(n)
              if (iv%instid(i)%isflg(n)==0) then

@@ -14,7 +14,7 @@ subroutine da_calculate_grady_synop(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_synop")
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       if (iv%synop(n)%u%qc < obs_qc_pointer) re%synop(n)%u = 0.0
       if (iv%synop(n)%v%qc < obs_qc_pointer) re%synop(n)%v = 0.0
       if (iv%synop(n)%t%qc < obs_qc_pointer) re%synop(n)%t = 0.0

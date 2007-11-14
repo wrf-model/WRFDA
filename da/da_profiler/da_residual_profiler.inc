@@ -23,8 +23,8 @@ subroutine da_residual_profiler(iv, y, re, np_missing, np_bad_data, np_obs_used,
    n_obs_bad % u % num = number_type(0, 0, 0)
    n_obs_bad % v % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(profiler)
-      do k=1, iv%profiler(n)%info%levels
+   do n=1, iv%info(profiler)%nlocal
+      do k=1, iv%info(profiler)%levels(n)
          np_available = np_available + 2
          re%profiler(n)%u(k) = da_residual(n, k, y%profiler(n)%u(k), iv%profiler(n)%u(k), n_obs_bad % u)
          re%profiler(n)%v(k) = da_residual(n, k, y%profiler(n)%v(k), iv%profiler(n)%v(k), n_obs_bad % v)

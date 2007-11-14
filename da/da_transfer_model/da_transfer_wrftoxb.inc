@@ -348,7 +348,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
             if (grid%xb%q(i,j,k) < 1.0e-6) &
                grid%xb%q(i,j,k) = 1.0e-6
    
-            ! Background qrn needed for radar radial velocity assimilation:
+            ! Background qrn needed for radar radial velocity assmiilation:
 
             if (size(grid%moist,dim=4) >= 4) then
                grid%xb%qcw(i,j,k) = grid%moist(i,j,k,p_qc)

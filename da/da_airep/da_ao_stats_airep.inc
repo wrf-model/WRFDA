@@ -29,9 +29,9 @@ subroutine da_ao_stats_airep (stats_unit, iv, re)
    stats%average = residual_airep1_type(0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(airep)
-      if (iv%airep(n)%loc%proc_domain) then
-         do k=1, iv%airep(n)%info%levels
+   do n=1, iv%info(airep)%nlocal
+      do k=1, iv%info(airep)%levels(n)
+         if (iv%info(airep)%proc_domain(k,n)) then
             call da_stats_calculate (n, k, iv%airep(n)%u(k)%qc,  & 
                re%airep(n)%u(k), nu, &
                stats%minimum%u, stats%maximum%u, &
@@ -44,8 +44,8 @@ subroutine da_ao_stats_airep (stats_unit, iv, re)
                re%airep(n)%t(k), nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-        end do
-      end if    ! end if (iv%airep(n)%loc%proc_domain)
+        end if
+      end do
    end do
 
    ! Do inter-processor communication to gather statistics.

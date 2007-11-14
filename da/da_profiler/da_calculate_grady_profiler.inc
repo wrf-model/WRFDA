@@ -14,8 +14,8 @@ subroutine da_calculate_grady_profiler(iv, re, jo_grad_y)
    
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_profiler")
 
-   do n=1, iv%nlocal(profiler)
-      do k=1, iv%profiler(n)%info%levels
+   do n=1, iv%info(profiler)%nlocal
+      do k=1, iv%info(profiler)%levels(n)
          if (iv%profiler(n)%u(k)%qc < obs_qc_pointer) then
             re%profiler(n)%u(k) = 0.0
          end if

@@ -35,8 +35,8 @@ subroutine da_ao_stats_sonde_sfc (stats_unit, iv, re)
    stats%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(sound)
-      if (iv%sonde_sfc(n)%loc%proc_domain) then
+   do n=1, iv%info(sound)%nlocal
+      if (iv%info(sonde_sfc)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%sonde_sfc(n)%u%qc,  & 
             re%sonde_sfc(n)%u, nu, & 
             stats%minimum%u, stats%maximum%u, &

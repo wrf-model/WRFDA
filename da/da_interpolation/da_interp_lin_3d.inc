@@ -1,45 +1,40 @@
-subroutine da_interp_lin_3d(fm3d, loc, fo3d, ml, zk, nl)
+subroutine da_interp_lin_3d(fm3d, info, fo3d)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD 
+   ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
 
-   real,                  intent(in)    :: fm3d(ims:ime,jms:jme,kms:kme)
-   type (model_loc_type), intent(in)    :: loc
-   integer,               intent(in)    :: ml, nl                        
-   real,                  intent(inout) :: fo3d(ml)
-   real,                  intent(in)    :: zk(nl)
+   real,            intent(in)    :: fm3d(ims:ime,jms:jme,kms:kme) ! Input variable 
+   type(infa_type), intent(in)    :: info       
+   real,            intent(inout) :: fo3d(1:info%max_lev,info%n1:info%n2)           ! Output variable 
 
-   integer :: i,j,k, kk
-   real    :: dx, dxm, dy, dym,dz, dzm
+   integer :: n, k
    real    :: fmz(kms:kme)
 
-   if (trace_use_dull) call da_trace_entry("da_interp_lin_3d")
+   if (trace_use) call da_trace_entry("da_interp_lin_3d")
 
-   i   = loc%i
-   j   = loc%j
-   dx  = loc%dx
-   dy  = loc%dy
-   dxm = loc%dxm
-   dym = loc%dym
+   fo3d(:,:) = 0.0
 
-   fmz(:) = 0.0
+   do n=info%n1,info%n2
+      fmz(:)=0.0
 
-   fmz(kts:kte) = dym*(dxm*fm3d(i,j,kts:kte) + dx *fm3d(i+1,j,kts:kte)) &
-      + dy *(dxm*fm3d(i,j+1,kts:kte) + dx *fm3d(i+1,j+1,kts:kte))
-
-   fo3d(:) = 0.0
-
-   do kk = 1, nl
-      if (zk(kk) > 0.0 .or. anal_type_verify ) then
-         call da_togrid(zk(kk), kts, kte, k, dz, dzm)
-         fo3d(kk) = dzm*fmz(k) + dz*fmz(k+1)
-      end if
+      do k = kts,kte
+         fmz(k) = &
+              info%dym(k,n) * (info%dxm(k,n)*fm3d(info%i(k,n), info%j(k,n), k) &
+            + info%dx (k,n) * fm3d(info%i(k,n)+1,info%j(k,n), k)) &
+            + info%dy (k,n) * (info%dxm(k,n)*fm3d(info%i(k,n), info%j(k,n)+1, k) &
+            + info%dx (k,n) * fm3d(info%i(k,n)+1, info%j(k,n)+1, k))
+      end do
+      do k = 1, info%levels(n)
+         if (info%k(k,n) > 0) then
+            fo3d(k,n) = info%dzm(k,n)*fmz(info%k(k,n)) + info%dz(k,n)*fmz(info%k(k,n)+1)
+         end if
+      end do
    end do
 
-   if (trace_use_dull) call da_trace_exit("da_interp_lin_3d")
+   if (trace_use) call da_trace_exit("da_interp_lin_3d")
 
 end subroutine da_interp_lin_3d
 

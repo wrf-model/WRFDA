@@ -30,7 +30,7 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
             jo_grad_y%instid(i)%tb(k,n) = -re%instid(i)%tb(k,n) / &
                (iv%instid(i)%tb_error(k,n) * iv%instid(i)%tb_error(k,n))
          end do
-         if (iv%instid(i)%proc_domain(n)) then
+         if (iv%instid(i)%info%proc_domain(1,n)) then
             do k=1, iv%instid(i)%nchan
                if (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer) then
                   jo % rad(i) % jo_ichan(k) = jo % rad(i) % jo_ichan(k) - &

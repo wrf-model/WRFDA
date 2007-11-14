@@ -23,7 +23,7 @@ subroutine da_residual_ssmi_rv(iv, y, re, np_missing, np_bad_data, np_obs_used, 
    n_obs_bad % Speed % num = number_type(0, 0, 0)
    n_obs_bad % q % num     = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(ssmi_rv)
+   do n=1, iv%info(ssmi_rv)%nlocal
       np_available = np_available + 2
 
       re%ssmi_rv(n)%Speed = da_residual(n, 0, y%ssmi_rv(n)%Speed, &

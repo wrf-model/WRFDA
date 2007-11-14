@@ -19,7 +19,7 @@ subroutine da_scan_obs_ascii (iv, filename)
    type (multi_level_type) :: platform
    logical                 :: outside, outside_all
    real                    :: height_error
-   integer                 :: ndup, n
+   integer                 :: ndup, n, obs_index
 
    if (trace_use) call da_trace_entry("da_scan_obs_ascii")
 
@@ -176,126 +176,131 @@ subroutine da_scan_obs_ascii (iv, filename)
 
       if (test_wrfvar) ndup = 1
 
+      obs_index = fm_index(fm)
+      
       do n = 1, ndup
          select case(fm)
 
          case (12) ; 
-            if (.not.use_synopobs .or. iv%ntotal(synop) == max_synop_input) cycle reports
-            if (n==1) iv%ntotal(synop) = iv%ntotal(synop) + 1
+            if (.not.use_synopobs .or. iv%info(synop)%ntotal == max_synop_input) cycle reports
+            if (n==1) iv%info(synop)%ntotal = iv%info(synop)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(synop) = iv%nlocal(synop) + 1
+            iv%info(synop)%nlocal = iv%info(synop)%nlocal + 1
 
          case (13, 17) ;    
-            if (.not.use_shipsobs .or. iv%ntotal(ships) == max_ships_input) cycle reports
-            if (n==1) iv%ntotal(ships) = iv%ntotal(ships) + 1
+            if (.not.use_shipsobs .or. iv%info(ships)%ntotal == max_ships_input) cycle reports
+            if (n==1) iv%info(ships)%ntotal = iv%info(ships)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(ships) = iv%nlocal(ships) + 1
+            iv%info(ships)%nlocal = iv%info(ships)%nlocal + 1
 
          case (15:16) ;     
-            if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
-            if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
+            if (.not.use_metarobs .or. iv%info(metar)%ntotal == max_metar_input) cycle reports
+            if (n==1) iv%info(metar)%ntotal = iv%info(metar)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
 
          case (32:34) ;
-            if (.not.use_pilotobs .or. iv%ntotal(pilot) == max_pilot_input) cycle reports
-            if (n==1) iv%ntotal(pilot) = iv%ntotal(pilot) + 1
+            if (.not.use_pilotobs .or. iv%info(pilot)%ntotal == max_pilot_input) cycle reports
+            if (n==1) iv%info(pilot)%ntotal = iv%info(pilot)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(pilot) = iv%nlocal(pilot) + 1
+            iv%info(pilot)%nlocal = iv%info(pilot)%nlocal + 1
 
          case (35:38) ;
-            if (.not.use_soundobs .or. iv%ntotal(sound) == max_sound_input) cycle reports
-            if (n==1) iv%ntotal(sound) = iv%ntotal(sound) + 1
+            if (.not.use_soundobs .or. iv%info(sound)%ntotal == max_sound_input) cycle reports
+            if (n==1) iv%info(sound)%ntotal     = iv%info(sound)%ntotal + 1
+            if (n==1) iv%info(sonde_sfc)%ntotal = iv%info(sonde_sfc)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(sound) = iv%nlocal(sound) + 1
+            iv%info(sound)%nlocal     = iv%info(sound)%nlocal + 1
+            iv%info(sonde_sfc)%nlocal = iv%info(sonde_sfc)%nlocal + 1
 
          case (86) ;
-            if (.not.use_satemobs .or. iv%ntotal(satem) == max_satem_input) cycle reports
+            if (.not.use_satemobs .or. iv%info(satem)%ntotal == max_satem_input) cycle reports
             ! Reject cloudy satem obs.
             if (platform%loc%pw%inv > 10.0) then
                cycle reports
             end if
-            if (n==1) iv%ntotal(satem) = iv%ntotal(satem) + 1
+            if (n==1) iv%info(satem)%ntotal = iv%info(satem)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(satem) = iv%nlocal(satem) + 1
+            iv%info(satem)%nlocal = iv%info(satem)%nlocal + 1
 
          case (88)    ;
             ! Geostationary or Polar orbitting Satellite AMVs:
             if (index(platform%info%name, 'MODIS') > 0 .or. &
                 index(platform%info%name, 'modis') > 0)  then
-               if (.not.use_polaramvobs .or. iv%ntotal(polaramv) == max_polaramv_input) cycle reports
-               if (n==1) iv%ntotal(polaramv) = iv%ntotal(polaramv) + 1
+               if (.not.use_polaramvobs .or. iv%info(polaramv)%ntotal == max_polaramv_input) cycle reports
+               if (n==1) iv%info(polaramv)%ntotal = iv%info(polaramv)%ntotal + 1
                if (outside) cycle reports
-               iv%nlocal(polaramv) = iv%nlocal(polaramv) + 1
+               iv%info(polaramv)%nlocal = iv%info(polaramv)%nlocal + 1
+	       obs_index = polaramv ! geoamv is the fm_index value for 88
             else
-               if (.not.use_geoamvobs .or. iv%ntotal(geoamv) == max_geoamv_input) cycle reports
-               if (n==1) iv%ntotal(geoamv) = iv%ntotal(geoamv) + 1
+               if (.not.use_geoamvobs .or. iv%info(geoamv)%ntotal == max_geoamv_input) cycle reports
+               if (n==1) iv%info(geoamv)%ntotal = iv%info(geoamv)%ntotal + 1
                if (outside) cycle reports
-               iv%nlocal(geoamv) = iv%nlocal(geoamv) + 1
+               iv%info(geoamv)%nlocal = iv%info(geoamv)%nlocal + 1
             end if
 
          case (42,96:97) ;
-            if (.not.use_airepobs .or. iv%ntotal(airep) == max_airep_input) cycle reports
-            if (n==1) iv%ntotal(airep) = iv%ntotal(airep) + 1
+            if (.not.use_airepobs .or. iv%info(airep)%ntotal == max_airep_input) cycle reports
+            if (n==1) iv%info(airep)%ntotal = iv%info(airep)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(airep) = iv%nlocal(airep) + 1
+            iv%info(airep)%nlocal = iv%info(airep)%nlocal + 1
 
          case (111) ;       
-            if (.not.use_gpspwobs .or. iv%ntotal(gpspw) == max_gpspw_input) cycle reports
-            if (n==1) iv%ntotal(gpspw) = iv%ntotal(gpspw) + 1
+            if (.not.use_gpspwobs .or. iv%info(gpspw)%ntotal == max_gpspw_input) cycle reports
+            if (n==1) iv%info(gpspw)%ntotal = iv%info(gpspw)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(gpspw) = iv%nlocal(gpspw) + 1
+            iv%info(gpspw)%nlocal = iv%info(gpspw)%nlocal + 1
 
          case (116) ;
-            if (.not.use_gpsrefobs .or. iv%ntotal(gpsref) == max_gpsref_input) cycle reports
-            if (n==1) iv%ntotal(gpsref) = iv%ntotal(gpsref) + 1
+            if (.not.use_gpsrefobs .or. iv%info(gpsref)%ntotal == max_gpsref_input) cycle reports
+            if (n==1) iv%info(gpsref)%ntotal = iv%info(gpsref)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(gpsref) = iv%nlocal(gpsref) + 1
+            iv%info(gpsref)%nlocal = iv%info(gpsref)%nlocal + 1
 
           case (121) ;
             ! SSM/T1 temperatures
-            if (.not.use_ssmt1obs .or. iv%ntotal(ssmt1) == max_ssmt1_input) cycle reports
-            if (n==1) iv%ntotal(ssmt1) = iv%ntotal(ssmt1) + 1
+            if (.not.use_ssmt1obs .or. iv%info(ssmt1)%ntotal == max_ssmt1_input) cycle reports
+            if (n==1) iv%info(ssmt1)%ntotal = iv%info(ssmt1)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(ssmt1) = iv%nlocal(ssmt1) + 1
+            iv%info(ssmt2)%nlocal = iv%info(ssmt2)%nlocal + 1
 
          case (122) ;
             ! SSM/T2 relative humidities:
-            if (.not.use_ssmt2obs .or. iv%ntotal(ssmt2) == max_ssmt2_input) cycle reports
-            if (n==1) iv%ntotal(ssmt2) = iv%ntotal(ssmt2) + 1
+            if (.not.use_ssmt2obs .or. iv%info(ssmt2)%ntotal == max_ssmt2_input) cycle reports
+            if (n==1) iv%info(ssmt2)%ntotal = iv%info(ssmt2)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(ssmt2) = iv%nlocal(ssmt2) + 1
+            iv%info(ssmt2)%nlocal = iv%info(ssmt2)%nlocal + 1
 
          case (281)    ;
             ! Scatterometer:
-            if (.not.use_qscatobs .or. iv%ntotal(qscat) == max_qscat_input) cycle reports
-            if (n==1) iv%ntotal(qscat) = iv%ntotal(qscat) + 1
+            if (.not.use_qscatobs .or. iv%info(qscat)%ntotal == max_qscat_input) cycle reports
+            if (n==1) iv%info(qscat)%ntotal = iv%info(qscat)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(qscat) = iv%nlocal(qscat) + 1
+            iv%info(qscat)%nlocal = iv%info(qscat)%nlocal + 1
 
          case (132) ;
-            if (.not.use_profilerobs .or. iv%ntotal(profiler) == max_profiler_input) cycle reports
-            if (n==1) iv%ntotal(profiler) = iv%ntotal(profiler) + 1
+            if (.not.use_profilerobs .or. iv%info(profiler)%ntotal == max_profiler_input) cycle reports
+            if (n==1) iv%info(profiler)%ntotal = iv%info(profiler)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(profiler) = iv%nlocal(profiler) + 1
+            iv%info(profiler)%nlocal = iv%info(profiler)%nlocal + 1
 
          case (135) ;
-            if (.not.use_bogusobs .or. iv%ntotal(bogus) == max_bogus_input) cycle reports
-            if (n==1) iv%ntotal(bogus) = iv%ntotal(bogus) + 1
+            if (.not.use_bogusobs .or. iv%info(bogus)%ntotal == max_bogus_input) cycle reports
+            if (n==1) iv%info(bogus)%ntotal = iv%info(bogus)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(bogus) = iv%nlocal(bogus) + 1
+            iv%info(bogus)%nlocal = iv%info(bogus)%nlocal + 1
 
          case (18,19) ;             ! buoy
-            if (.not.use_buoyobs .or. iv%ntotal(buoy) == max_buoy_input) cycle reports
-            if (n==1) iv%ntotal(buoy) = iv%ntotal(buoy) + 1
+            if (.not.use_buoyobs .or. iv%info(buoy)%ntotal == max_buoy_input) cycle reports
+            if (n==1) iv%info(buoy)%ntotal = iv%info(buoy)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(buoy) = iv%nlocal(buoy) + 1
+            iv%info(buoy)%nlocal = iv%info(buoy)%nlocal + 1
 
          case (133) ;               ! AIRS retrievals
-            if (.not.use_airsretobs .or. iv%ntotal(airsr) == max_airsr_input) cycle reports
-            if (n==1) iv%ntotal(airsr) = iv%ntotal(airsr) + 1
+            if (.not.use_airsretobs .or. iv%info(airsr)%ntotal == max_airsr_input) cycle reports
+            if (n==1) iv%info(airsr)%ntotal = iv%info(airsr)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(airsr) = iv%nlocal(airsr) + 1
+            iv%info(airsr)%nlocal = iv%info(airsr)%nlocal + 1
 
          case default;
             write(unit=message(1), fmt='(a)') 'unsaved obs found:'
@@ -305,15 +310,15 @@ subroutine da_scan_obs_ascii (iv, filename)
                  'platform%info%levels=', platform%info%levels
             call da_warning(__FILE__,__LINE__,message(1:3))
          end select
+         iv%info(obs_index)%max_lev = max(iv%info(obs_index)%max_lev, platform%info%levels)
       end do        !  loop over duplicate
    end do reports
+
+   iv%info(sonde_sfc)%max_lev=1
 
    close(iunit)
 
    call da_free_unit(iunit)
- 
-   iv%plocal(iv%time,:) = iv%nlocal(:)
-   iv%ptotal(iv%time,:) = iv%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_obs_ascii")
 

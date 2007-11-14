@@ -23,33 +23,50 @@ subroutine da_transform_xtoy_bogus_adj(grid, iv, jo_grad_y, jo_grad_x)
    real    :: qq(kms:kme)
    real    :: model_p_c(kms:kme)
    real    :: pp(kms:kme)
-   real    :: psfc_loc,terr_loc,ppsfc                     
+   real    :: psfc_loc,terr_loc,ppsfc   
+
+   real, allocatable :: temp_u(:,:)
+   real, allocatable :: temp_v(:,:)
+   real, allocatable :: temp_t(:,:)
+   real, allocatable :: temp_q(:,:)           
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_bogus_adj")
 
-   do n= iv%plocal(iv%time-1,bogus)+1, iv%plocal(iv%time,bogus)
-      num_levs = iv % bogus(n) % info % levels
+   allocate (temp_u(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (temp_v(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (temp_t(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (temp_q(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+
+   do n=iv%info(bogus)%n1,iv%info(bogus)%n2
+      temp_u(1:size(jo_grad_y%bogus(n)%u),n)  = jo_grad_y%bogus(n)%u
+      temp_v(1:size(jo_grad_y%bogus(n)%u),n)  = jo_grad_y%bogus(n)%v
+      temp_t(1:size(jo_grad_y%bogus(n)%u),n)  = jo_grad_y%bogus(n)%t
+      temp_q(1:size(jo_grad_y%bogus(n)%u),n)  = jo_grad_y%bogus(n)%q
+   end do
+
+   ! [1.1] Adjoint feedback from Y to X for u and v:
+
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(bogus), temp_u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(bogus), temp_v)
+   call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(bogus), temp_t)
+   call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(bogus), temp_q)
+   deallocate (temp_u)
+   deallocate (temp_v)
+   deallocate (temp_t)
+   deallocate (temp_q)
+
+   do n= iv%info(bogus)%n1, iv%info(bogus)%n2
+      num_levs = iv%info(bogus)%levels(n)
       if (num_levs < 1) cycle
 
       ! [1.1] Get cross pt. horizontal interpolation weights:
 
-      i   = iv%bogus(n)%loc%i
-      dy  = iv%bogus(n)%loc%dy
-      dym = iv%bogus(n)%loc%dym
-      j   = iv%bogus(n)%loc%j
-      dx  = iv%bogus(n)%loc%dx
-      dxm = iv%bogus(n)%loc%dxm
-
-      ! [1.1] Adjoint feedback from Y to X for u and v:
-
-      call da_interp_lin_3d_adj(jo_grad_x % u, iv%bogus(n)%loc, jo_grad_y%bogus(n)%u, &
-         num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % v, iv%bogus(n)%loc, jo_grad_y%bogus(n)%v, &
-         num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % t, iv%bogus(n)%loc, jo_grad_y%bogus(n)%t, &
-         num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % q, iv%bogus(n)%loc, jo_grad_y%bogus(n)%q, &
-         num_levs, iv%bogus(n)%zk, num_levs)
+      i   = iv%info(bogus)%i(1,n)
+      dy  = iv%info(bogus)%dy(1,n)
+      dym = iv%info(bogus)%dym(1,n)
+      j   = iv%info(bogus)%j(1,n)
+      dx  = iv%info(bogus)%dx(1,n)
+      dxm = iv%info(bogus)%dxm(1,n)
 
       ! [1.2] Compute the feedback from SLP to t and q:
 

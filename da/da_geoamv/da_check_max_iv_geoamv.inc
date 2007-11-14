@@ -1,5 +1,4 @@
-subroutine da_check_max_iv_geoamv(it, geoamv, &
-                           itu,ituf,itvv,itvvf)
+subroutine da_check_max_iv_geoamv(iv, it, itu,ituf,itvv,itvvf)
 
    !-------------------------------------------------------------------------
    ! Purpose: Innovation vector check for Geo. AMVs               
@@ -7,11 +6,14 @@ subroutine da_check_max_iv_geoamv(it, geoamv, &
 
    implicit none
 
-   integer,           intent (in)         :: it      ! Outer iteration
-   type (geoamv_type), intent(inout)      :: geoamv
-   integer, intent(inout) :: itu,ituf,itvv,itvvf
-   integer                                :: k
-   logical                                :: failed
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf
+
+   integer :: k,n
+   logical :: failed
+
+   if (trace_use_dull) call da_trace_entry("da_check_max_iv_geoamv")
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -32,16 +34,16 @@ subroutine da_check_max_iv_geoamv(it, geoamv, &
 
    failed = .false.
 
-   do k = 1, geoamv % info % levels
-      ! U-wind
-      call da_max_error_qc(it, geoamv % info, geoamv % u(k), &
-              max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
-                            failed, check_max_iv_print)
-      ! V-wind
-      call da_max_error_qc (it, geoamv % info, geoamv % v(k),&
-              max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-                             failed, check_max_iv_print)                           
+   do n=iv%info(geoamv)%n1,iv%info(geoamv)%n2
+      do k = 1, iv%info(geoamv)%levels(n)
+         call da_max_error_qc(it, iv%info(geoamv), n, iv%geoamv(n)%u(k), max_error_uv, itu, ituf, &
+            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+         call da_max_error_qc (it, iv%info(geoamv), n, iv%geoamv(n)%v(k), max_error_uv, itvv, itvvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      end do
    end do
+
+   if (trace_use_dull) call da_trace_exit("da_check_max_iv_geoamv")
 
 end subroutine da_check_max_iv_geoamv      
 

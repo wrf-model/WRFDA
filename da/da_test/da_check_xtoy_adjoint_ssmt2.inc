@@ -14,14 +14,14 @@ subroutine da_check_xtoy_adjoint_ssmt2(iv, y, adjtest_lhs, pertile_lhs)
 
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_ssmt2")
 
-   do n=1, iv%nlocal(ssmt2)
-      if (iv%ssmt2(n)%loc%proc_domain) then
-         do k=1, iv%ssmt2(n)%info%levels
+   do n=1, iv%info(ssmt2)%nlocal
+      if (iv%info(ssmt2)%proc_domain(1,n)) then
+         do k=1, iv%info(ssmt2)%levels(n)
             adjtest_lhs = adjtest_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
          end do
       end if
 
-      do k=1, iv%ssmt2(n)%info%levels
+      do k=1, iv%info(ssmt2)%levels(n)
          pertile_lhs = pertile_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
 
          y%ssmt2(n)%rh(k) = y%ssmt2(n)%rh(k) / typical_rh_rms ** 2

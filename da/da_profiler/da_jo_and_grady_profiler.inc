@@ -18,16 +18,16 @@ subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
    jo % profiler_u = 0.0
    jo % profiler_v = 0.0
 
-   do n=1, iv%nlocal(profiler)
-      do k=1, iv%profiler(n)%info%levels
+   do n=1, iv%info(profiler)%nlocal
+      do k=1, iv%info(profiler)%levels(n)
          jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
             (iv%profiler(n)%u(k)%error * iv%profiler(n)%u(k)%error)
          jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
             (iv%profiler(n)%v(k)%error * iv%profiler(n)%v(k)%error)
       end do
 
-      if (iv%profiler(n)%loc%proc_domain) then
-         do k=1, iv%profiler(n)%info%levels
+      if (iv%info(profiler)%proc_domain(1,n)) then
+         do k=1, iv%info(profiler)%levels(n)
             jo % profiler_u = jo % profiler_u - &
                re%profiler(n)%u(k) * jo_grad_y%profiler(n)%u(k)
             jo % profiler_v = jo % profiler_v - &

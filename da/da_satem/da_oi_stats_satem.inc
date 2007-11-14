@@ -23,10 +23,10 @@ subroutine da_oi_stats_satem (stats_unit, iv)
    stats%average = residual_satem1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(satem)
-      if (iv%satem(n)%loc%proc_domain) then
-         do k=1, iv%satem(n)%info%levels
-            call da_stats_calculate(iv%satem(n)%loc%obs_global_index, &
+   do n=1, iv%info(satem)%nlocal
+      if (iv%info(satem)%proc_domain(1,n)) then
+         do k=1, iv%info(satem)%levels(n)
+            call da_stats_calculate(iv%info(satem)%obs_global_index(n), &
                k, iv%satem(n)%thickness(k)%qc, &
                iv%satem(n)%thickness(k)%inv, nthickness, &
                stats%minimum%thickness, stats%maximum%thickness, &

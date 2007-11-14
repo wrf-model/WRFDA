@@ -27,12 +27,12 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
    jo % synop_q = 0.0
 
    if (test_dm_exact) then
-      if (iv%ntotal(synop) == 0) return
+      if (iv%info(synop)%ntotal == 0) return
    else
-      if (iv%nlocal(synop) < 1) return
+      if (iv%info(synop)%nlocal < 1) return
    end if
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       jo_grad_y%synop(n)%u = -re%synop(n)%u / (iv%synop(n)%u%error * iv%synop(n)%u%error)
       jo_grad_y%synop(n)%v = -re%synop(n)%v / (iv%synop(n)%v%error * iv%synop(n)%v%error)
       jo_grad_y%synop(n)%t = -re%synop(n)%t / (iv%synop(n)%t%error * iv%synop(n)%t%error)

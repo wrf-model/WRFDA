@@ -26,7 +26,7 @@ subroutine da_residual_ships(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(ships)
+   do n=1, iv%info(ships)%nlocal
       np_available = np_available + 5
 
       re%ships(n)%u = da_residual(n, 0, y%ships(n)%u, iv%ships(n)%u, n_obs_bad % u)

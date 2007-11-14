@@ -434,34 +434,9 @@ module da_control
 
    integer :: trace_start_points=0   ! Number of routines to initiate trace
 
-   integer, parameter :: num_ob_indexes = 23
-
-   integer, parameter :: sound_index    = 1
-   integer, parameter :: synop_index    = 2
-   integer, parameter :: pilot_index    = 3
-   integer, parameter :: satem_index    = 4
-   integer, parameter :: geoamv_index   = 5
-   integer, parameter :: polaramv_index = 6
-   integer, parameter :: airep_index    = 7
-   integer, parameter :: gpspw_index    = 8
-   integer, parameter :: gpsref_index   = 9
-   integer, parameter :: metar_index    = 10
-   integer, parameter :: ships_index    = 11
-   integer, parameter :: ssmi_rv_index  = 12
-   integer, parameter :: ssmi_tb_index  = 13
-   integer, parameter :: ssmt1_index    = 14
-   integer, parameter :: ssmt2_index    = 15
-   integer, parameter :: qscat_index    = 16
-   integer, parameter :: profiler_index = 17
-   integer, parameter :: buoy_index     = 18
-   integer, parameter :: bogus_index    = 19
-   integer, parameter :: pseudo_index   = 20
-   integer, parameter :: radar_index    = 21
-   integer, parameter :: radiance_index = 22
-   integer, parameter :: airsr_index    = 23
+   integer, parameter :: num_ob_indexes = 24
 
    integer, parameter :: sound     = 1
-   integer, parameter :: sonde_sfc = 1 ! identical to sound
    integer, parameter :: synop     = 2
    integer, parameter :: pilot     = 3
    integer, parameter :: satem     = 4
@@ -484,6 +459,7 @@ module da_control
    integer, parameter :: radar     = 21
    integer, parameter :: radiance  = 22
    integer, parameter :: airsr     = 23
+   integer, parameter :: sonde_sfc = 24
 
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
       "sound         ", &
@@ -508,7 +484,8 @@ module da_control
       "pseudo        ", &
       "radar         ", &
       "radiance      ", &
-      "airs retrieval"  &
+      "airs retrieval", &
+      "sonde_sfc     "  &
    /)
 
    integer, parameter :: max_no_fm = 290
@@ -539,21 +516,21 @@ module da_control
 
    integer, parameter :: fm_index(max_no_fm) = (/ &
       0,0,0,0,0,0,0,0,0,0,                                & ! 1-10
-      0,Synop_index,Ships_index,0,Metar_index,            & ! 11-15
-      Metar_index,Ships_index,buoy_index,buoy_index,0,    & ! 16-20
+      0,Synop,Ships,0,Metar,            & ! 11-15
+      Metar,Ships,buoy,buoy,0,    & ! 16-20
       0,0,0,0,0,0,0,0,0,0,                                & ! 21-30
-      0,pilot_index,pilot_index,pilot_index,sound_index,  & ! 31-35
-      sound_index,sound_index,sound_index,0,0,            & ! 36-40
-      0,airep_index,0,0,0,0,0,0,0,0,                      & ! 41-50
+      0,pilot,pilot,pilot,sound,  & ! 31-35
+      sound,sound,sound,0,0,            & ! 36-40
+      0,airep,0,0,0,0,0,0,0,0,                      & ! 41-50
       0,0,0,0,0,0,0,0,0,0,                                & ! 51-60
       0,0,0,0,0,0,0,0,0,0,                                & ! 61-70
       0,0,0,0,0,0,0,0,0,0,                                & ! 71-80
-      0,0,0,0,0,satem_index,0,geoamv_index,0,0,           & ! 81-90
-      0,0,0,0,0,airep_index,airep_index,0,0,0,            & ! 91-100
+      0,0,0,0,0,satem,0,geoamv,0,0,           & ! 81-90
+      0,0,0,0,0,airep,airep,0,0,0,            & ! 91-100
       0,0,0,0,0,0,0,0,0,0,                                & ! 101-110
-      gpspw_index,0,0,gpspw_index,0,gpsref_index,0,0,0,0, & ! 111-120
-      ssmt1_index,ssmt2_index,0,0,0,0,0,0,0,0,            & ! 121-130
-      0,profiler_index,airsr_index,0,bogus_index,0,0,0,0,0, & ! 131-140
+      gpspw,0,0,gpspw,0,gpsref,0,0,0,0, & ! 111-120
+      ssmt1,ssmt2,0,0,0,0,0,0,0,0,            & ! 121-130
+      0,profiler,airsr,0,bogus,0,0,0,0,0, & ! 131-140
       0,0,0,0,0,0,0,0,0,0,                                & ! 141-150
       0,0,0,0,0,0,0,0,0,0,                                & ! 151-160
       0,0,0,0,0,0,0,0,0,0,                                & ! 161-170
@@ -568,7 +545,7 @@ module da_control
       0,0,0,0,0,0,0,0,0,0,                                & ! 251-260
       0,0,0,0,0,0,0,0,0,0,                                & ! 261-270
       0,0,0,0,0,0,0,0,0,0,                                & ! 271-280
-      qscat_index,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
+      qscat,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
 
    character(len=120)  :: fmt_info ='(a12,1x,a19,1x,a40,1x,i6,3(f12.3,11x),6x,a5)'
    character(len=120)  :: fmt_srfc = '(7(:,f12.3,i4,f7.2))'

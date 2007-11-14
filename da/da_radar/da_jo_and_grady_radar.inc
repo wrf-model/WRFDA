@@ -18,8 +18,8 @@ subroutine da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
    jo % radar_rv = 0.0
    jo % radar_rf = 0.0
    
-   do n=1, iv%nlocal(radar)
-      do k=1, iv%radar(n)%info%levels
+   do n=1, iv%info(radar)%nlocal
+      do k=1, iv%info(radar)%levels(n)
          if (use_radar_rv) then
             jo_grad_y%radar(n)%rv(k) = -re%radar(n)%rv(k) / &
                (iv%radar(n)%rv(k)%error * iv%radar(n)%rv(k)%error)
@@ -31,8 +31,8 @@ subroutine da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
          end if
       end do
 
-      if (iv%radar(n)%loc%proc_domain) then
-         do k=1, iv%radar(n)%info%levels
+      if (iv%info(radar)%proc_domain(1,n)) then
+         do k=1, iv%info(radar)%levels(n)
             if (use_radar_rv) then
                jo % radar_rv = jo % radar_rv - re%radar(n)%rv(k) * jo_grad_y%radar(n)%rv(k)
             end if

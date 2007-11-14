@@ -11,18 +11,26 @@ subroutine da_transform_xtoy_profiler (grid, iv, y)
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+
+   real, allocatable :: model_u(:,:)  ! Model value u at ob location.
+   real, allocatable :: model_v(:,:)  ! Model value v at ob location.
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_profiler")
-   
-   do n=iv%plocal(iv%time-1,profiler) + 1, iv%plocal(iv%time,profiler)
-      k = iv % profiler(n) % info % levels
-      if (k < 1) cycle
-      ! [1.4] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % u, iv%profiler(n)%loc, y%profiler(n)%u, k, iv%profiler(n)%zk, k)
-      call da_interp_lin_3d(grid%xa % v, iv%profiler(n)%loc, y%profiler(n)%v, k, iv%profiler(n)%zk, k)
+
+   allocate (model_u(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
+   allocate (model_v(iv%info(profiler)%max_lev,iv%info(profiler)%n1:iv%info(profiler)%n2))
+
+   call da_interp_lin_3d (grid%xa%u, iv%info(profiler), model_u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(profiler), model_v)
+
+   do n=iv%info(profiler)%n1,iv%info(profiler)%n2
+      y%profiler(n)%u(:) = model_u(1:iv%info(profiler)%levels(n),n)
+      y%profiler(n)%v(:) = model_v(1:iv%info(profiler)%levels(n),n)
    end do
 
+   deallocate (model_u)
+   deallocate (model_v)
+   
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_profiler")
 
 end subroutine da_transform_xtoy_profiler 

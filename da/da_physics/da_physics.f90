@@ -11,13 +11,13 @@ module da_physics
    use module_comm_dm, only : halo_bal_eqn_adj_sub
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
-   use da_define_structures, only : synop_type, residual_synop_type, model_loc_type
+   use da_define_structures, only : synop_type, residual_synop_type, infa_type, iv_type
    use da_control, only : gas_constant, gravity,kts,kte, svp3,svpt0, &
       gas_constant_v, svp1, to, xls, svp2,its,ite,jts,jte,kts,kte, &
       ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, test_wrfvar, &
       trace_use, missing_r, maximum_rh, minimum_rh,cv_options_hum,coeff,l_over_rv, &
       es_gammakelvin, es_gammabeta, rd_over_rv1,t_kelvin, es_alpha, es_gamma, &
-      es_beta, rd_over_rv, trace_use_frequent,gamma, stdout, &
+      es_beta, rd_over_rv, trace_use_frequent,gamma, &
       cv_options_hum_specific_humidity, trace_use_dull 
    use da_par_util, only : da_transpose_z2y, da_transpose_y2x, &
       da_transpose_x2z, da_transpose_z2x, da_transpose_x2y, da_transpose_y2z

@@ -14,7 +14,7 @@ subroutine da_calculate_grady_ships(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_ships")
 
-   do n=1, iv%nlocal(ships)
+   do n=1, iv%info(ships)%nlocal
       if (iv%ships(n)%u%qc < obs_qc_pointer) re%ships(n)%u = 0.0
       if (iv%ships(n)%v%qc < obs_qc_pointer) re%ships(n)%v = 0.0
       if (iv%ships(n)%t%qc < obs_qc_pointer) re%ships(n)%t = 0.0

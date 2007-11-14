@@ -1,16 +1,17 @@
-subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
-             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_sonde_sfc(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (synop_type), intent(inout) :: sonde_sfc
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
    logical :: failed
+   integer :: n
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_sonde_sfc")
 
@@ -37,23 +38,14 @@ subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
 
    failed = .false.
 
-   ! U-wind
-   call da_max_error_qc(it, sonde_sfc % info, sonde_sfc % u, &
-           max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-   ! V-wind
-   call da_max_error_qc (it, sonde_sfc % info, sonde_sfc % v,&
-           max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
-   ! Pressure
-   call da_max_error_qc (it, sonde_sfc % info, sonde_sfc % p,&
-           max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
-
-   ! Temperature
-   call da_max_error_qc (it, sonde_sfc % info, sonde_sfc % t,&
-           max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
-
-   ! Mixing ratio, same ratio as relative humidity
-   call da_max_error_qc (it, sonde_sfc % info, sonde_sfc % q, &
-           max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   do n=iv%info(sound)%n1,iv%info(sound)%n2
+      call da_max_error_qc (it, iv%info(sonde_sfc), n, iv%sonde_sfc(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(sonde_sfc), n, iv%sonde_sfc(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc (it, iv%info(sonde_sfc), n, iv%sonde_sfc(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc (it, iv%info(sonde_sfc), n, iv%sonde_sfc(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      ! Mixing ratio, same ratio as relative humidity
+      call da_max_error_qc (it, iv%info(sonde_sfc), n, iv%sonde_sfc(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_sonde_sfc")
 

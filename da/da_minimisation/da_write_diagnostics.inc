@@ -1,7 +1,7 @@
 subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Output data assimilation diagnostics
+   ! Purpose: Output data assmiilation diagnostics
    !---------------------------------------------------------------------------
 
    implicit none
@@ -21,30 +21,30 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    ! [1.0] Calculate innovation vector (O-B) statistics:
    !---------------------------------------------------------------------------
 
-   if (iv%ntotal(sound) > 0) then
+   if (iv%info(sound)%ntotal > 0) then
       call da_oi_stats_sound     (stats_unit, iv)
       call da_oi_stats_sonde_sfc (stats_unit, iv)
    end if
-   if (iv%ntotal(synop)    > 0) call da_oi_stats_synop    (stats_unit, iv)
-   if (iv%ntotal(geoamv)   > 0) call da_oi_stats_geoamv   (stats_unit, iv)
-   if (iv%ntotal(polaramv) > 0) call da_oi_stats_polaramv (stats_unit, iv)
-   if (iv%ntotal(airep)    > 0) call da_oi_stats_airep    (stats_unit, iv)
-   if (iv%ntotal(pilot)    > 0) call da_oi_stats_pilot    (stats_unit, iv)
-   if (iv%ntotal(metar)    > 0) call da_oi_stats_metar    (stats_unit, iv)
-   if (iv%ntotal(ships)    > 0) call da_oi_stats_ships    (stats_unit, iv)
-   if (iv%ntotal(gpspw)    > 0) call da_oi_stats_gpspw    (stats_unit, iv)
-   if (iv%ntotal(gpsref)   > 0) call da_oi_stats_gpsref   (stats_unit, iv)
-   if (iv%ntotal(ssmi_tb)  > 0) call da_oi_stats_ssmi_tb  (stats_unit, iv)
-   if (iv%ntotal(ssmi_rv)  > 0) call da_oi_stats_ssmi_rv  (stats_unit, iv)
-   if (iv%ntotal(satem)    > 0) call da_oi_stats_satem    (stats_unit, iv)
-   if (iv%ntotal(ssmt1)    > 0) call da_oi_stats_ssmt1    (stats_unit, iv)
-   if (iv%ntotal(ssmt2)    > 0) call da_oi_stats_ssmt2    (stats_unit, iv)
-   if (iv%ntotal(qscat)    > 0) call da_oi_stats_qscat    (stats_unit, iv)
-   if (iv%ntotal(profiler) > 0) call da_oi_stats_profiler (stats_unit, iv)
-   if (iv%ntotal(buoy)     > 0) call da_oi_stats_buoy     (stats_unit, iv)
-   if (iv%ntotal(radar)    > 0) call da_oi_stats_radar    (stats_unit, iv)
-   if (iv%ntotal(bogus)    > 0) call da_oi_stats_bogus    (stats_unit, iv)
-   if (iv%ntotal(airsr)    > 0) call da_oi_stats_airsr    (stats_unit, iv)
+   if (iv%info(synop)%ntotal    > 0) call da_oi_stats_synop    (stats_unit, iv)
+   if (iv%info(geoamv)%ntotal   > 0) call da_oi_stats_geoamv   (stats_unit, iv)
+   if (iv%info(polaramv)%ntotal > 0) call da_oi_stats_polaramv (stats_unit, iv)
+   if (iv%info(airep)%ntotal    > 0) call da_oi_stats_airep    (stats_unit, iv)
+   if (iv%info(pilot)%ntotal    > 0) call da_oi_stats_pilot    (stats_unit, iv)
+   if (iv%info(metar)%ntotal    > 0) call da_oi_stats_metar    (stats_unit, iv)
+   if (iv%info(ships)%ntotal    > 0) call da_oi_stats_ships    (stats_unit, iv)
+   if (iv%info(gpspw)%ntotal    > 0) call da_oi_stats_gpspw    (stats_unit, iv)
+   if (iv%info(gpsref)%ntotal   > 0) call da_oi_stats_gpsref   (stats_unit, iv)
+   if (iv%info(ssmi_tb)%ntotal  > 0) call da_oi_stats_ssmi_tb  (stats_unit, iv)
+   if (iv%info(ssmi_rv)%ntotal  > 0) call da_oi_stats_ssmi_rv  (stats_unit, iv)
+   if (iv%info(satem)%ntotal    > 0) call da_oi_stats_satem    (stats_unit, iv)
+   if (iv%info(ssmt1)%ntotal    > 0) call da_oi_stats_ssmt1    (stats_unit, iv)
+   if (iv%info(ssmt2)%ntotal    > 0) call da_oi_stats_ssmt2    (stats_unit, iv)
+   if (iv%info(qscat)%ntotal    > 0) call da_oi_stats_qscat    (stats_unit, iv)
+   if (iv%info(profiler)%ntotal > 0) call da_oi_stats_profiler (stats_unit, iv)
+   if (iv%info(buoy)%ntotal     > 0) call da_oi_stats_buoy     (stats_unit, iv)
+   if (iv%info(radar)%ntotal    > 0) call da_oi_stats_radar    (stats_unit, iv)
+   if (iv%info(bogus)%ntotal    > 0) call da_oi_stats_bogus    (stats_unit, iv)
+   if (iv%info(airsr)%ntotal    > 0) call da_oi_stats_airsr    (stats_unit, iv)
 
    if (iv%num_inst > 0) call da_oi_stats_rad (stats_unit, iv)
 
@@ -54,30 +54,30 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    ! [2.0] Calculate residual vector (O-A) statistics:
    !---------------------------------------------------------------------------
 
-   if (iv%ntotal(sound) > 0) then
+   if (iv%info(sound)%ntotal > 0) then
       call da_ao_stats_sound (stats_unit, iv, re)
       call da_ao_stats_sonde_sfc (stats_unit, iv, re)
    end if
-   if (iv%ntotal(synop)    > 0) call da_ao_stats_synop    (stats_unit, iv, re)
-   if (iv%ntotal(geoamv)   > 0) call da_ao_stats_geoamv   (stats_unit, iv, re)
-   if (iv%ntotal(polaramv) > 0) call da_ao_stats_polaramv (stats_unit, iv, re)
-   if (iv%ntotal(airep)    > 0) call da_ao_stats_airep    (stats_unit, iv, re)
-   if (iv%ntotal(pilot)    > 0) call da_ao_stats_pilot    (stats_unit, iv, re)
-   if (iv%ntotal(metar)    > 0) call da_ao_stats_metar    (stats_unit, iv, re)
-   if (iv%ntotal(ships)    > 0) call da_ao_stats_ships    (stats_unit, iv, re)
-   if (iv%ntotal(gpspw)    > 0) call da_ao_stats_gpspw    (stats_unit, iv, re)
-   if (iv%ntotal(gpsref)   > 0) call da_ao_stats_gpsref   (stats_unit, iv, re)
-   if (iv%ntotal(ssmi_tb)  > 0) call da_ao_stats_ssmi_tb  (stats_unit, iv, re)
-   if (iv%ntotal(ssmi_rv)  > 0) call da_ao_stats_ssmi_rv  (stats_unit, iv, re)
-   if (iv%ntotal(satem)    > 0) call da_ao_stats_satem    (stats_unit, iv, re)
-   if (iv%ntotal(ssmt1)    > 0) call da_ao_stats_ssmt1    (stats_unit, iv, re)
-   if (iv%ntotal(ssmt2)    > 0) call da_ao_stats_ssmt2    (stats_unit, iv, re)
-   if (iv%ntotal(qscat)    > 0) call da_ao_stats_qscat    (stats_unit, iv, re)
-   if (iv%ntotal(profiler) > 0) call da_ao_stats_profiler (stats_unit, iv, re)
-   if (iv%ntotal(buoy)     > 0) call da_ao_stats_buoy     (stats_unit, iv, re)
-   if (iv%ntotal(radar)    > 0) call da_ao_stats_radar    (stats_unit, iv, re)
-   if (iv%ntotal(bogus)    > 0) call da_ao_stats_bogus    (stats_unit, iv, re)
-   if (iv%ntotal(airsr)    > 0) call da_ao_stats_airsr    (stats_unit, iv, re)
+   if (iv%info(synop)%ntotal    > 0) call da_ao_stats_synop    (stats_unit, iv, re)
+   if (iv%info(geoamv)%ntotal   > 0) call da_ao_stats_geoamv   (stats_unit, iv, re)
+   if (iv%info(polaramv)%ntotal > 0) call da_ao_stats_polaramv (stats_unit, iv, re)
+   if (iv%info(airep)%ntotal    > 0) call da_ao_stats_airep    (stats_unit, iv, re)
+   if (iv%info(pilot)%ntotal    > 0) call da_ao_stats_pilot    (stats_unit, iv, re)
+   if (iv%info(metar)%ntotal    > 0) call da_ao_stats_metar    (stats_unit, iv, re)
+   if (iv%info(ships)%ntotal    > 0) call da_ao_stats_ships    (stats_unit, iv, re)
+   if (iv%info(gpspw)%ntotal    > 0) call da_ao_stats_gpspw    (stats_unit, iv, re)
+   if (iv%info(gpsref)%ntotal   > 0) call da_ao_stats_gpsref   (stats_unit, iv, re)
+   if (iv%info(ssmi_tb)%ntotal  > 0) call da_ao_stats_ssmi_tb  (stats_unit, iv, re)
+   if (iv%info(ssmi_rv)%ntotal  > 0) call da_ao_stats_ssmi_rv  (stats_unit, iv, re)
+   if (iv%info(satem)%ntotal    > 0) call da_ao_stats_satem    (stats_unit, iv, re)
+   if (iv%info(ssmt1)%ntotal    > 0) call da_ao_stats_ssmt1    (stats_unit, iv, re)
+   if (iv%info(ssmt2)%ntotal    > 0) call da_ao_stats_ssmt2    (stats_unit, iv, re)
+   if (iv%info(qscat)%ntotal    > 0) call da_ao_stats_qscat    (stats_unit, iv, re)
+   if (iv%info(profiler)%ntotal > 0) call da_ao_stats_profiler (stats_unit, iv, re)
+   if (iv%info(buoy)%ntotal     > 0) call da_ao_stats_buoy     (stats_unit, iv, re)
+   if (iv%info(radar)%ntotal    > 0) call da_ao_stats_radar    (stats_unit, iv, re)
+   if (iv%info(bogus)%ntotal    > 0) call da_ao_stats_bogus    (stats_unit, iv, re)
+   if (iv%info(airsr)%ntotal    > 0) call da_ao_stats_airsr    (stats_unit, iv, re)
 
    if (iv%num_inst > 0) call da_ao_stats_rad (stats_unit, iv, re)
 

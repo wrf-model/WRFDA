@@ -1,4 +1,4 @@
-subroutine da_llxy_wrf_new(proj, lat, lon, x, y)
+subroutine da_llxy_wrf_new(proj, info)
 
    !-----------------------------------------------------------------------
    ! Purpose: Converts input lat/lon values to the cartesian (x,y) value
@@ -7,11 +7,8 @@ subroutine da_llxy_wrf_new(proj, lat, lon, x, y)
 
    implicit none
 
-   type(proj_info), intent(in)          :: proj
-   real, intent(in)                     :: lat(:,:)
-   real, intent(in)                     :: lon(:,:)
-   real, intent(out)                    :: x(:,:)
-   real, intent(out)                    :: y(:,:)
+   type(proj_info), intent(in)    :: proj
+   type(infa_type), intent(inout) :: info
 
    if (trace_use) call da_trace_entry("da_llxy_wrf_new")
 
@@ -23,20 +20,20 @@ subroutine da_llxy_wrf_new(proj, lat, lon, x, y)
    select case(proj%code)
  
       case(PROJ_LATLON)
-         call da_llxy_latlon_new(lat,lon,proj,x,y)
+         call da_llxy_latlon_new(proj,info)
 
       case(PROJ_MERC)
-         call da_llxy_merc_new(lat,lon,proj,x,y)
-         x(:,:) = x(:,:) + proj%knowni - 1.0
-         y(:,:) = y(:,:) + proj%knownj - 1.0
+         call da_llxy_merc_new(proj,info)
+         info%x(:,:) = info%x(:,:) + proj%knowni - 1.0
+         info%y(:,:) = info%y(:,:) + proj%knownj - 1.0
 
       case(PROJ_PS)
-         call da_llxy_ps_new(lat,lon,proj,x,y)
+         call da_llxy_ps_new(proj,info)
       
       case(PROJ_LC)
-         call da_llxy_lc_new(lat,lon,proj,x,y)
-         x(:,:) = x(:,:) + proj%knowni - 1.0
-         y(:,:) = y(:,:) + proj%knownj - 1.0
+         call da_llxy_lc_new(proj,info)
+         info%x(:,:) = info%x(:,:) + proj%knowni - 1.0
+         info%y(:,:) = info%y(:,:) + proj%knownj - 1.0
 
       case default
          write(unit=message(1),fmt='(A,I2)') &

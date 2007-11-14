@@ -139,7 +139,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
               use_ssmitbobs .or. use_ssmiretrievalobs) then
             if (global) then
                call da_error(__FILE__,__LINE__, &
-                  (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
+                  (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
             end if
             call da_transform_xtoseasfcwind_lin(grid)
          end if

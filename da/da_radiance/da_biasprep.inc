@@ -16,7 +16,7 @@ subroutine da_biasprep(inst,ob,iv)
    real               :: pred(6), q(43)
    type (bias_type)   :: radbias
 
-   num_rad = iv%plocal_rad(iv%time,inst) - iv%plocal_rad(iv%time-1,inst)
+   num_rad = iv%instid(inst)%info%n2-iv%instid(inst)%info%n1+1
 
    if (num_rad < 1) return
 
@@ -43,8 +43,8 @@ subroutine da_biasprep(inst,ob,iv)
    allocate(radbias%cloud_flag(nchan))
    allocate(radbias%pred(npred))
 
-   do n= iv%plocal_rad(iv%time-1,inst)+1, iv%plocal_rad(iv%time,inst)
-      if (iv%instid(inst)%proc_domain(n)) then 
+   do n=iv%instid(inst)%info%n1,iv%instid(inst)%info%n2
+      if (iv%instid(inst)%info%proc_domain(1,n)) then 
 
         if (rtm_option==rtm_option_rttov) then
          q(1:43) = iv%instid(inst)%mr(1:43,n)/q2ppmv
@@ -63,16 +63,16 @@ subroutine da_biasprep(inst,ob,iv)
          radbias%satellite_id = iv%instid(inst)%satellite_id
          radbias%sensor_id    = iv%instid(inst)%sensor_id
 
-         read(iv%instid(inst)%info(n)%date_char,'(i4,5(a1,i2))') &
+         read(iv%instid(inst)%info%date_char(n),'(i4,5(a1,i2))') &
                                    radbias%year,s1, radbias%month,s1, radbias%day, &
                                    s1,radbias%hour, s1,radbias%min, s1,radbias%sec
 
          radbias%scanline     = iv%instid(inst)%scanline(n)    ! not available
          radbias%scanpos      = iv%instid(inst)%scanpos(n)
          radbias%landmask     = iv%instid(inst)%landsea_mask(n)
-         radbias%elevation    = iv%instid(inst)%info(n)%elv
-         radbias%lat          = iv%instid(inst)%info(n)%lat
-         radbias%lon          = iv%instid(inst)%info(n)%lon
+         radbias%elevation    = iv%instid(inst)%info%elv(n)
+         radbias%lat          = iv%instid(inst)%info%lat(1,n)
+         radbias%lon          = iv%instid(inst)%info%lon(1,n)
          radbias%surf_flag    = iv%instid(inst)%isflg(n)
          radbias%ps           = iv%instid(inst)%ps(n)
          radbias%t2m          = iv%instid(inst)%t2m(n)

@@ -10,18 +10,25 @@ subroutine da_transform_xtoy_polaramv_adj (iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer :: n, k     ! Loop counter.
+   integer           :: n     ! Loop counter.
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_polaramv_adj")
 
-   do n=iv%plocal(iv%time-1,polaramv) + 1, iv%plocal(iv%time,polaramv)
-      k = iv % polaramv(n) % info % levels
-      if (k < 1) cycle
-      call da_interp_lin_3d_adj(jo_grad_x % u, iv%polaramv(n)%loc, &
-         jo_grad_y%polaramv(n)%u, k, iv%polaramv(n)%zk, k)
-      call da_interp_lin_3d_adj(jo_grad_x % v, iv%polaramv(n)%loc, &
-         jo_grad_y%polaramv(n)%v, k, iv%polaramv(n)%zk, k)
+   allocate (u(iv%info(polaramv)%max_lev,iv%info(polaramv)%n1:iv%info(polaramv)%n2))
+   allocate (v(iv%info(polaramv)%max_lev,iv%info(polaramv)%n1:iv%info(polaramv)%n2))
+
+   do n=iv%info(polaramv)%n1,iv%info(polaramv)%n2
+      u(1:size(jo_grad_y%polaramv(n)%u),n) = jo_grad_y%polaramv(n)%u(:)
+      v(1:size(jo_grad_y%polaramv(n)%v),n) = jo_grad_y%polaramv(n)%v(:)
    end do
+
+   call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(polaramv), u)
+   call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(polaramv), v)
+
+   deallocate (u)
+   deallocate (v)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_polaramv_adj")
 

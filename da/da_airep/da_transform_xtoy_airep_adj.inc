@@ -10,19 +10,31 @@ subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+   integer :: n
+
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airep_adj")
 
-   do n=iv%plocal(iv%time-1,airep) + 1, iv%plocal(iv%time,airep)
-      k = iv % airep(n) % info % levels
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_adj(jo_grad_x%u, iv%airep(n)%loc, jo_grad_y%airep(n)%u, k, iv%airep(n)%zk, k)
-      call da_interp_lin_3d_adj(jo_grad_x%v, iv%airep(n)%loc, jo_grad_y%airep(n)%v, k, iv%airep(n)%zk, k)
-      call da_interp_lin_3d_adj(jo_grad_x%t, iv%airep(n)%loc, jo_grad_y%airep(n)%t, k, iv%airep(n)%zk, k)
+   allocate (u(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+   allocate (v(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+   allocate (t(iv%info(airep)%max_lev,iv%info(airep)%n1:iv%info(airep)%n2))
+
+   do n=iv%info(airep)%n1,iv%info(airep)%n2
+      u(1:size(jo_grad_y%airep(n)%u),n) = jo_grad_y%airep(n)%u(:)
+      v(1:size(jo_grad_y%airep(n)%v),n) = jo_grad_y%airep(n)%v(:)
+      t(1:size(jo_grad_y%airep(n)%t),n) = jo_grad_y%airep(n)%t(:)
    end do
+
+   call da_interp_lin_3d_adj(jo_grad_x%u, iv%info(airep), u)
+   call da_interp_lin_3d_adj(jo_grad_x%v, iv%info(airep), v)
+   call da_interp_lin_3d_adj(jo_grad_x%t, iv%info(airep), t)
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airep_adj")
 

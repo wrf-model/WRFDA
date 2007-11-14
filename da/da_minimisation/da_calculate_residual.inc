@@ -23,75 +23,75 @@ subroutine da_calculate_residual(iv, y, re)
    ! [1.0] (O-A) = (O-B) - H x~:
    !-------------------------------------------------------------------------
 
-   if (iv%nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       call da_residual_sound(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
       call da_residual_sonde_sfc(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
    end if
 
-   if (iv%nlocal(synop) > 0) &
+   if (iv%info(synop)%nlocal > 0) &
       call da_residual_synop(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(geoamv) > 0) &
+   if (iv%info(geoamv)%nlocal > 0) &
       call da_residual_geoamv(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(polaramv) > 0) &
+   if (iv%info(polaramv)%nlocal > 0) &
       call da_residual_polaramv(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(airep) > 0) &
+   if (iv%info(airep)%nlocal > 0) &
       call da_residual_airep(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(metar) > 0) &
+   if (iv%info(metar)%nlocal > 0) &
       call da_residual_metar(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(ships) > 0) &
+   if (iv%info(ships)%nlocal > 0) &
       call da_residual_ships(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(gpspw) > 0) &
+   if (iv%info(gpspw)%nlocal > 0) &
       call da_residual_gpspw(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(gpsref) > 0) &
+   if (iv%info(gpsref)%nlocal > 0) &
       call da_residual_gpsref(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(ssmi_tb) > 0) &
+   if (iv%info(ssmi_tb)%nlocal > 0) &
       call da_residual_ssmi_tb(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(ssmi_rv) > 0) &
+   if (iv%info(ssmi_rv)%nlocal > 0) &
       call da_residual_ssmi_rv(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if ( iv%nlocal(ssmt1) > 0) &
+   if ( iv%info(ssmt2)%nlocal > 0) &
       call da_residual_ssmt1(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(ssmt2) > 0) &
+   if (iv%info(ssmt2)%nlocal > 0) &
       call da_residual_ssmt2(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(pilot) > 0) &
+   if (iv%info(pilot)%nlocal > 0) &
       call da_residual_pilot(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(bogus) > 0) &
+   if (iv%info(bogus)%nlocal > 0) &
       call da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(satem) > 0) &
+   if (iv%info(satem)%nlocal > 0) &
       call da_residual_satem(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    if (num_pseudo > 0) &
       call da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(qscat) > 0) &
+   if (iv%info(qscat)%nlocal > 0) &
       call da_residual_qscat(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(radar) > 0) &
+   if (iv%info(radar)%nlocal > 0) &
       call da_residual_radar(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(profiler) > 0) &
+   if (iv%info(profiler)%nlocal > 0) &
       call da_residual_profiler(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(buoy) > 0) &
+   if (iv%info(buoy)%nlocal > 0) &
       call da_residual_buoy(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    if (iv%num_inst > 0) &
       call da_residual_rad(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-   if (iv%nlocal(airsr) > 0) &
+   if (iv%info(airsr)%nlocal > 0) &
       call da_residual_airsr(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    if (trace_use) call da_trace_exit("da_calculate_residual")

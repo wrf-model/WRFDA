@@ -26,15 +26,15 @@ subroutine da_oi_stats_profiler (stats_unit, iv)
    stats%average = residual_profiler1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(profiler)
-      if (iv%profiler(n)%loc%proc_domain) then
-         do k=1, iv%profiler(n)%info%levels
-            call da_stats_calculate(iv%profiler(n)%loc%obs_global_index, &
+   do n=1, iv%info(profiler)%nlocal
+      if (iv%info(profiler)%proc_domain(1,n)) then
+         do k=1, iv%info(profiler)%levels(n)
+            call da_stats_calculate(iv%info(profiler)%obs_global_index(n), &
                k, iv%profiler(n)%u(k)%qc,  &
                iv%profiler(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(iv%profiler(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(profiler)%obs_global_index(n), &
                k, iv%profiler(n)%v(k)%qc, &
                iv%profiler(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &

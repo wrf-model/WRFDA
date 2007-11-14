@@ -26,21 +26,21 @@ subroutine da_oi_stats_airsr (stats_unit, iv)
    stats%average = residual_airsr1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(airsr)
-      if (iv%airsr(n)%loc%proc_domain) then
-         do k=1, iv%airsr(n)%info%levels
-            call da_stats_calculate(iv%airsr(n)%loc%obs_global_index, &
+   do n=1, iv%info(airsr)%nlocal
+      if (iv%info(airsr)%proc_domain(1,n)) then
+         do k=1, iv%info(airsr)%levels(n)
+            call da_stats_calculate(iv%info(airsr)%obs_global_index(n), &
                k, iv%airsr(n)%t(k)%qc, &
                iv%airsr(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(iv%airsr(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(airsr)%obs_global_index(n), &
                k, iv%airsr(n)%q(k)%qc, &
                iv%airsr(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, &
                stats%average%q, stats%rms_err%q)
          end do
-      end if    ! end if (iv%airsr(n)%loc%proc_domain)
+      end if    ! end if (iv%info(airsr)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

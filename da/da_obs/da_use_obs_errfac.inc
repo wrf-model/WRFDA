@@ -19,12 +19,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.1] Transfer surface obs:
 
-   if (iv % nlocal(synop) > 0) then
+   if (iv%info(synop)%nlocal > 0) then
       call da_read_errfac('synop', iv % synop_ef_u, &
                            iv % synop_ef_v, iv % synop_ef_t, &
                            iv % synop_ef_p, iv % synop_ef_q)                           
 
-      do n = 1, iv % nlocal(synop)
+      do n = 1, iv%info(synop)%nlocal
          iv % synop(n) % u % error = iv % synop(n) % u % error * iv % synop_ef_u
          iv % synop(n) % v % error = iv % synop(n) % v % error * iv % synop_ef_v
          iv % synop(n) % t % error = iv % synop(n) % t % error * iv % synop_ef_t
@@ -35,13 +35,13 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.2] Transfer metar obs:
 
-   if (iv % nlocal(metar) > 0) then
+   if (iv%info(metar)%nlocal > 0) then
 
       call da_read_errfac('metar', iv % metar_ef_u, &
                            iv % metar_ef_v, iv % metar_ef_t, &
                            iv % metar_ef_p, iv % metar_ef_q)
                            
-      do n = 1, iv % nlocal(metar)
+      do n = 1, iv%info(metar)%nlocal
          iv % metar(n) % u % error = iv % metar(n) % u % error * iv % metar_ef_u
          iv % metar(n) % v % error = iv % metar(n) % v % error * iv % metar_ef_v
          iv % metar(n) % t % error = iv % metar(n) % t % error * iv % metar_ef_t
@@ -52,13 +52,13 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.2] Transfer ships obs:
 
-   if (iv % nlocal(ships) > 0) then
+   if (iv%info(ships)%nlocal > 0) then
       
       call da_read_errfac('ships', iv % ships_ef_u, &
                            iv % ships_ef_v, iv % ships_ef_t, &
                            iv % ships_ef_p, iv % ships_ef_q)
                            
-      do n = 1, iv % nlocal(ships)
+      do n = 1, iv%info(ships)%nlocal
          iv % ships(n) % u % error = iv % ships(n) % u % error * iv % ships_ef_u
          iv % ships(n) % v % error = iv % ships(n) % v % error * iv % ships_ef_v
          iv % ships(n) % t % error = iv % ships(n) % t % error * iv % ships_ef_t
@@ -69,12 +69,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.4.1] Transfer Geo. AMVs Obs:
    
-   if (iv % nlocal(geoamv) > 0) then
+   if (iv%info(geoamv)%nlocal > 0) then
    
       call da_read_errfac('geoamv', iv % geoamv_ef_u, iv % geoamv_ef_v, d1, d2, d3)
 
-      do n = 1, iv % nlocal(geoamv)
-        do k = 1, iv % geoamv(n) % info % levels
+      do n = 1, iv%info(geoamv)%nlocal
+        do k = 1, iv%info(geoamv)%levels(n)
          iv % geoamv(n) % u(k) % error = iv % geoamv(n) % u(k) % error * iv % geoamv_ef_u
          iv % geoamv(n) % v(k) % error = iv % geoamv(n) % v(k) % error * iv % geoamv_ef_v
         end do
@@ -83,12 +83,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.4.2] Transfer Polar AMVs Obs:
 
-   if (iv % nlocal(polaramv) > 0) then 
+   if (iv%info(polaramv)%nlocal > 0) then 
 
       call da_read_errfac('polaramv', iv % polaramv_ef_u, iv % polaramv_ef_v, d1, d2, d3)
 
-      do n = 1, iv % nlocal(polaramv)
-        do k = 1, iv % polaramv(n) % info % levels
+      do n = 1, iv%info(polaramv)%nlocal
+        do k = 1, iv%info(polaramv)%levels(n)
          iv % polaramv(n) % u(k) % error = iv % polaramv(n) % u(k) % error * iv % polaramv_ef_u
          iv % polaramv(n) % v(k) % error = iv % polaramv(n) % v(k) % error * iv % polaramv_ef_v
         end do
@@ -98,11 +98,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.5] Transfer gpspw obs:
 
-   if (iv % nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
 
       call da_read_errfac('gpspw', iv % gpspw_ef_tpw, d1, d2, d3, d4)
 
-      do n = 1, iv % nlocal(gpspw)
+      do n = 1, iv%info(gpspw)%nlocal
          iv % gpspw(n) % tpw % error = iv % gpspw(n) % tpw % error * &
                                        iv % gpspw_ef_tpw
 
@@ -111,13 +111,13 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.6] Transfer sonde obs:
 
-   if (iv % nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
 
       call da_read_errfac('sound', iv % sound_ef_u, iv % sound_ef_v, &
                            iv % sound_ef_t, iv % sound_ef_q, d1)
 
-      do n = 1, iv % nlocal(sound)
-         do k = 1, iv % sound(n) % info % levels
+      do n = 1, iv%info(sound)%nlocal
+         do k = 1, iv%info(sound)%levels(n)
             iv % sound(n) % u(k) % error = iv % sound(n) % u(k) % error * &
                                            iv % sound_ef_u
             iv % sound(n) % v(k) % error = iv % sound(n) % v(k) % error * &
@@ -138,13 +138,13 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.7] Transfer airep obs:
 
-   if (iv % nlocal(airep) > 0) then
+   if (iv%info(airep)%nlocal > 0) then
    
       call da_read_errfac('airep', iv % airep_ef_u, iv % airep_ef_v, &
                            iv % airep_ef_t, d1, d2)
 
-      do n = 1, iv % nlocal(airep)
-         do k = 1, iv % airep(n) % info % levels
+      do n = 1, iv%info(airep)%nlocal
+         do k = 1, iv%info(airep)%levels(n)
             iv % airep(n) % u(k) % error = iv % airep(n) % u(k) % error * &
                                            iv % airep_ef_u
             iv % airep(n) % v(k) % error = iv % airep(n) % v(k) % error * &
@@ -157,12 +157,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.8] Transfer pilot obs:
 
-   if (iv % nlocal(pilot) > 0) then
+   if (iv%info(pilot)%nlocal > 0) then
 
       call da_read_errfac('pilot', iv % pilot_ef_u, iv % pilot_ef_v, d1, d2, d3)
 
-      do n = 1, iv % nlocal(pilot)
-         do k = 1, iv % pilot(n) % info % levels
+      do n = 1, iv%info(pilot)%nlocal
+         do k = 1, iv%info(pilot)%levels(n)
             iv % pilot(n) % u(k) % error = iv % pilot(n) % u(k) % error * &
                                            iv % pilot_ef_u
             iv % pilot(n) % v(k) % error = iv % pilot(n) % v(k) % error * &
@@ -174,11 +174,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.9] Transfer SSM/I obs:SSMI:
 
-   if (iv % nlocal(ssmi_rv) > 0) then
+   if (iv%info(ssmi_rv)%nlocal > 0) then
 
       call da_read_errfac('ssmir', iv % ssmir_ef_speed, iv % ssmir_ef_tpw, d1, d2, d3)
 
-      do n = 1, iv % nlocal(ssmi_rv)
+      do n = 1, iv%info(ssmi_rv)%nlocal
          iv%ssmi_rv(n)%tpw%error = iv%ssmi_rv(n)%tpw%error * &
                                           iv % ssmir_ef_tpw
          iv%ssmi_rv(n)%speed%error = iv%ssmi_rv(n)%speed%error * &
@@ -186,7 +186,7 @@ subroutine da_use_obs_errfac(iv)
       end do
    end if
 
-   if (iv % nlocal(ssmi_tb) > 0) then
+   if (iv%info(ssmi_tb)%nlocal > 0) then
 
       ! iv % ssmit_ef_tb19h = 1.0 ! Tuning not yet coded.
       ! iv % ssmit_ef_tb19v = 1.0 ! Tuning not yet coded.
@@ -196,7 +196,7 @@ subroutine da_use_obs_errfac(iv)
       ! iv % ssmit_ef_tb85h = 1.0 ! Tuning not yet coded.
       ! iv % ssmit_ef_tb85v = 1.0 ! Tuning not yet coded.
 
-      ! do n = 1, iv % nlocal(ssmi_tb)
+      ! do n = 1, iv%info(ssmi_tb)%nlocal
       !    iv%ssmi_tb(n)%tb19h%error = iv%ssmi_tb(n)%tb19h%error
       !    iv%ssmi_tb(n)%tb19v%error = iv%ssmi_tb(n)%tb19v%error
       !    iv%ssmi_tb(n)%tb22v%error = iv%ssmi_tb(n)%tb22v%error
@@ -213,11 +213,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.10] Transfer satem obs:
 
-   if (iv % nlocal(satem) > 0) then
+   if (iv%info(satem)%nlocal > 0) then
       call da_read_errfac('satem', iv % satem_ef_thickness, d1, d2, d3, d4)
 
-      do n = 1, iv % nlocal(satem)
-         do k = 1, iv % satem(n) % info % levels
+      do n = 1, iv%info(satem)%nlocal
+         do k = 1, iv%info(satem)%levels(n)
             iv % satem(n) % thickness(k) % error = iv % satem(n) % thickness(k) % error*&
                                                    iv % satem_ef_thickness
          end do
@@ -226,11 +226,11 @@ subroutine da_use_obs_errfac(iv)
    
    ! [2.11] Transfer ssmt1 obs:
 
-   if (iv % nlocal(ssmt1) > 0) then
+   if (iv%info(ssmt1)%nlocal > 0) then
       call da_read_errfac('ssmt1', iv % ssmt1_ef_t, d1, d2, d3, d4)
       
-      do n = 1, iv % nlocal(ssmt1)
-         do k = 1, iv % ssmt1(n) % info % levels   
+      do n = 1, iv%info(ssmt1)%nlocal
+         do k = 1, iv%info(ssmt1)%levels(n)   
             iv % ssmt1(n) % t(k) % error = iv % ssmt1(n) % t(k) % error * &
                                         iv % ssmt1_ef_t
          end do
@@ -239,11 +239,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.12] Transfer ssmt2 obs:
 
-   if (iv % nlocal(ssmt2) > 0) then
+   if (iv%info(ssmt2)%nlocal > 0) then
       call da_read_errfac('ssmt2', iv % ssmt2_ef_rh, d1, d2, d3, d4)
 
-      do n = 1, iv % nlocal(ssmt2)
-         do k = 1, iv % ssmt2(n) % info % levels      
+      do n = 1, iv%info(ssmt2)%nlocal
+         do k = 1, iv%info(ssmt2)%levels(n)      
             iv % ssmt2(n) % rh(k) % error = iv % ssmt2(n) % rh(k) % error * &
                                          iv % ssmt2_ef_rh
          end do
@@ -252,11 +252,11 @@ subroutine da_use_obs_errfac(iv)
    
    ! [2.13] Transfer scatterometer obs:
 
-   if (iv % nlocal(qscat) > 0) then
+   if (iv%info(qscat)%nlocal > 0) then
       call da_read_errfac('qscat', iv % qscat_ef_u, &
                            iv % qscat_ef_v, d1, d2, d3)
                            
-      do n = 1, iv % nlocal(qscat)
+      do n = 1, iv%info(qscat)%nlocal
          iv % qscat(n) % u % error = iv % qscat(n) % u % error * iv % qscat_ef_u
          iv % qscat(n) % v % error = iv % qscat(n) % v % error * iv % qscat_ef_v
       end do
@@ -264,11 +264,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.14] Transfer profiler obs:
 
-   if (iv % nlocal(profiler) > 0) then
+   if (iv%info(profiler)%nlocal > 0) then
       call da_read_errfac('profi', iv % profiler_ef_u, iv % profiler_ef_v, d1, d2, d3)
 
-      do n = 1, iv % nlocal(profiler)
-         do k = 1, iv % profiler(n) % info % levels
+      do n = 1, iv%info(profiler)%nlocal
+         do k = 1, iv%info(profiler)%levels(n)
             iv % profiler(n) % u(k) % error = iv % profiler(n) % u(k) % error * &
                                            iv % profiler_ef_u
             iv % profiler(n) % v(k) % error = iv % profiler(n) % v(k) % error * &
@@ -280,12 +280,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.15] Transfer buoy obs:
 
-   if (iv % nlocal(buoy) > 0) then  
+   if (iv%info(buoy)%nlocal > 0) then  
       call da_read_errfac('buoy ', iv % buoy_ef_u, &
                            iv % buoy_ef_v, iv % buoy_ef_t, &
                            iv % buoy_ef_p, iv % buoy_ef_q)
                            
-      do n = 1, iv % nlocal(buoy)
+      do n = 1, iv%info(buoy)%nlocal
          iv % buoy(n) % u % error = iv % buoy(n) % u % error * iv % buoy_ef_u
          iv % buoy(n) % v % error = iv % buoy(n) % v % error * iv % buoy_ef_v
          iv % buoy(n) % t % error = iv % buoy(n) % t % error * iv % buoy_ef_t
@@ -296,12 +296,12 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.16] Transfer TC bogus obs:
 
-   if (iv % nlocal(bogus) > 0) then
+   if (iv%info(bogus)%nlocal > 0) then
       call da_read_errfac('bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
                            iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp)
 
-      do n = 1, iv % nlocal(bogus)
-         do k = 1, iv % bogus(n) % info % levels
+      do n = 1, iv%info(bogus)%nlocal
+         do k = 1, iv%info(bogus)%levels(n)
             iv % bogus(n) % u(k) % error = iv % bogus(n) % u(k) % error * &
                                            iv % bogus_ef_u
             iv % bogus(n) % v(k) % error = iv % bogus(n) % v(k) % error * &
@@ -319,11 +319,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! Transfer AIRS retrievals:
 
-   if (iv % nlocal(airsr) > 0) then
+   if (iv%info(airsr)%nlocal > 0) then
       call da_read_errfac('airsr', iv % airsr_ef_t, iv % airsr_ef_q, d1, d3, d3)
 
-      do n = 1, iv % nlocal(airsr)
-         do k = 1, iv % airsr(n) % info % levels
+      do n = 1, iv%info(airsr)%nlocal
+         do k = 1, iv%info(airsr)%levels(n)
             iv % airsr(n) % t(k) % error = iv % airsr(n) % t(k) % error * &
                                            iv % airsr_ef_t
             iv % airsr(n) % q(k) % error = iv % airsr(n) % q(k) % error * &

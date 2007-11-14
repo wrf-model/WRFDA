@@ -10,7 +10,7 @@ module da_satem
       max_error_bt, max_error_buv, satem,max_error_thickness
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      satem_type, maxmin_type
+      maxmin_type
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_physics, only : da_tv_profile, da_thickness, da_find_layer, da_thickness_adj, &

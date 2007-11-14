@@ -139,15 +139,19 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%total_rad_pixel   = 0
    iv%total_rad_channel = 0
 
-   iv%nlocal(:) = 0
-   iv%ntotal(:) = 0
-   iv%plocal(:,:) = 0
-   iv%ptotal(:,:) = 0
+   iv%info(:)%nlocal = 0
+   iv%info(:)%ntotal = 0
+   do i=1,num_ob_indexes
+      iv%info(i)%plocal(:) = 0
+      iv%info(i)%ptotal(:) = 0
+   end do
    iv%num_inst  = 0 
 
    ob%nlocal(:) = 0
    ob%ntotal(:) = 0
    ob%num_inst  = 0
+
+   iv%info(:)%max_lev = 0
 
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
@@ -174,8 +178,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       write(unit=stdout, fmt='(3x,a,i2)') 'ob time ', i
       do j=1,num_ob_indexes
          write(unit=stdout, fmt='(6x,a,i6,a,i6,a)') &
-            obs_names(j), iv%ptotal(i,j) - iv%ptotal(i-1,j), ' global,', &
-            iv%plocal(i,j) - iv%plocal(i-1,j), ' local'
+            obs_names(j), iv%info(j)%ptotal(i) - iv%info(j)%ptotal(i-1), ' global,', &
+            iv%info(j)%plocal(i) - iv%info(j)%plocal(i-1), ' local'
       end do
    end do
    write(unit=stdout, fmt='(a)') ' '

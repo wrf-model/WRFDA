@@ -13,26 +13,42 @@ subroutine da_transform_xtoy_sonde_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    integer :: n        ! Loop counter.
 
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_t(:,:)
+   real, allocatable :: model_q(:,:)
+   real, allocatable :: model_psfc(:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_sonde_sfc_adj")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d_adj(jo_grad_x%u, iv%sonde_sfc(n)%loc, &
-            jo_grad_y%sonde_sfc(n)%u, iv%sonde_sfc(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%v, iv%sonde_sfc(n)%loc, &
-            jo_grad_y%sonde_sfc(n)%v, iv%sonde_sfc(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%t, iv%sonde_sfc(n)%loc, &
-            jo_grad_y%sonde_sfc(n)%t, iv%sonde_sfc(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%q, iv%sonde_sfc(n)%loc, &
-            jo_grad_y%sonde_sfc(n)%q, iv%sonde_sfc(n)%zk)
 
-         call da_interp_lin_2d_adj(jo_grad_x % psfc, iv%sonde_sfc(n)%loc, jo_grad_y%sonde_sfc(n)%p)
+      allocate (model_u(1,iv%info(sound)%n1:iv%info(sound)%n2))
+      allocate (model_v(1,iv%info(sound)%n1:iv%info(sound)%n2))
+      allocate (model_t(1,iv%info(sound)%n1:iv%info(sound)%n2))
+      allocate (model_q(1,iv%info(sound)%n1:iv%info(sound)%n2))
+      allocate (model_psfc(iv%info(sound)%n1:iv%info(sound)%n2))
+      ! [1.2] Interpolate horizontally:
+      do n=iv%info(sound)%n1,iv%info(sound)%n2
+         model_u(1,n)  = jo_grad_y%sonde_sfc(n)%u
+         model_v(1,n)  = jo_grad_y%sonde_sfc(n)%v
+         model_t(1,n)  = jo_grad_y%sonde_sfc(n)%t
+         model_q(1,n)  = jo_grad_y%sonde_sfc(n)%q
+         model_psfc(n) = jo_grad_y%sonde_sfc(n)%p
       end do
+      call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(sonde_sfc), model_u)
+      call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(sonde_sfc), model_v)
+      call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(sonde_sfc), model_t)
+      call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(sonde_sfc), model_q)
+
+      call da_interp_lin_2d_adj (jo_grad_x%psfc, iv%info(sonde_sfc), 1, model_psfc)
+      deallocate (model_u)
+      deallocate (model_v)
+      deallocate (model_t)
+      deallocate (model_q)
+      deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%plocal(iv%time-1,sound) + 1, iv%plocal(iv%time,sound)
-         call da_transform_xtopsfc_adj(grid,iv%sonde_sfc(n), jo_grad_y%sonde_sfc(n),jo_grad_x)
-      end do
+      call da_transform_xtopsfc_adj(grid,iv,sonde_sfc,iv%sonde_sfc(:), jo_grad_y%sonde_sfc(:),jo_grad_x)
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_sonde_sfc_adj")

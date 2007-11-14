@@ -1,4 +1,4 @@
-subroutine da_obs_sfc_correction(sfc_obs, xb)
+subroutine da_obs_sfc_correction(info, sfc_obs, n, xb)
 
    !--------------------------------------------------------------------
    ! Purpose: correct the surface measurements (wind, 
@@ -16,7 +16,9 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    implicit none
 
+   type(infa_type),  intent(in)    :: info
    type(synop_type), intent(inout) :: sfc_obs
+   integer,          intent(in)    :: n
    type(xb_type),    intent(in)    :: xb
 
    real    :: roughness, psfc, mslp, dx, dxm, dy, dym, ho, po, to, qo
@@ -34,16 +36,16 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    ! 1. Check if it needs to do the surface correction at the first level
  
-   ! 1.1 Surface repots located at far below the lowest model level
+   ! 1.1 Surface reports located at far below the lowest model level
  
    ! 2. Model profile at OBS site for surface correction
 
-   i   = sfc_obs%loc%i
-   j   = sfc_obs%loc%j
-   dx  = sfc_obs%loc%dx
-   dy  = sfc_obs%loc%dy
-   dxm = sfc_obs%loc%dxm
-   dym = sfc_obs%loc%dym
+   i   = info%i(1,n)
+   j   = info%j(1,n)
+   dx  = info%dx(1,n)
+   dy  = info%dy(1,n)
+   dxm = info%dxm(1,n)
+   dym = info%dym(1,n)
 
    ! Model roughness at the obs site
 
@@ -69,7 +71,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    ! 3.1 Compute the surface OBS pressure from mean sea level pressure
 
-   mslp = sfc_obs % loc % slp % inv
+   mslp = info%slp(n)%inv
    if (abs(mslp - missing_r) > 1.0) then
       psfc = missing_r
       if (abs(ho - missing_r) > 1.0) then
@@ -80,7 +82,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
          end if
       end if
       sfc_obs % p % inv = psfc
-      ! YRG: to allow assimlate the Psfc from mslp:
+      ! YRG: to allow assmilate the Psfc from mslp:
       sfc_obs % p % qc  = 0
    end if
 

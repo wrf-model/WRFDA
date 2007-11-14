@@ -6,11 +6,11 @@ subroutine da_setup_obs_structures_bufr(ob, iv)
 
    implicit none
    
-   type (y_type),     intent(out) :: ob          ! Observation structure.
-   type (iv_type),    intent(out) :: iv          ! O-B structure.
+   type (y_type),  intent(out)   :: ob          ! Observation structure.
+   type (iv_type), intent(inout) :: iv          ! O-B structure.
 
-   character(len=120)           :: filename
-   integer                      :: n   
+   character(len=filename_len) :: filename
+   integer                     :: n,i   
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures_bufr")
 
@@ -28,11 +28,17 @@ subroutine da_setup_obs_structures_bufr(ob, iv)
 
          ! scan prepbufr observation file
          call da_scan_obs_bufr (iv, filename)
+        iv%info(:)%plocal(n) = iv%info(:)%nlocal
+        iv%info(:)%ptotal(n) = iv%info(:)%ntotal
       end do
    else
       iv%time = 1
       filename="ob.bufr"
       call da_scan_obs_bufr(iv, filename)
+      do i=1,num_ob_indexes
+         iv%info(i)%plocal(iv%time) = iv%info(i)%nlocal
+         iv%info(i)%ptotal(iv%time) = iv%info(i)%ntotal
+      end do
 
       ! scan main body of radar observation file
       ! if (use_radarobs) &

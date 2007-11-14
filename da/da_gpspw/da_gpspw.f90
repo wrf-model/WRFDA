@@ -5,7 +5,7 @@ module da_gpspw
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print,kts,kte, &
-      missing, max_error_uv, max_error_t, rootproc, &
+      missing, max_error_uv, max_error_t, rootproc, gpspw, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, gpspw,max_error_thickness, &
@@ -14,7 +14,7 @@ module da_gpspw
       pseudo_z,pseudo_val,max_error_ref, trace_use_dull, pseudo, its,ite,jts,jte
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      gpspw_type, maxmin_type
+      maxmin_type
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
    use da_reporting, only : da_error

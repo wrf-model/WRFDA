@@ -31,23 +31,24 @@ subroutine da_oi_stats_sound (stats_unit, iv)
    stats%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(sound)
-      if (iv%sound(n)%loc%proc_domain) then
-         do k=1, iv%sound(n)%info%levels
-            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+   do n=1, iv%info(sound)%nlocal
+      do k=1, iv%info(sound)%levels(n)
+!         if (iv%info(sound)%proc_domain(k,n)) then
+         if (iv%info(sound)%proc_domain(1,n)) then
+            call da_stats_calculate(iv%info(sound)%obs_global_index(n), &
                k, iv%sound(n)%u(k)%qc, iv%sound(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(sound)%obs_global_index(n), &
                k, iv%sound(n)%v(k)%qc, iv%sound(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(sound)%obs_global_index(n), &
                k, iv%sound(n)%t(k)%qc, iv%sound(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(iv%sound(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(sound)%obs_global_index(n), &
                k, iv%sound(n)%q(k)%qc, iv%sound(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, stats%average%q, stats%rms_err%q)
-         end do
-      end if
+         end if
+      end do
    end do
 
    ! Do inter-processor communication to gather statistics.

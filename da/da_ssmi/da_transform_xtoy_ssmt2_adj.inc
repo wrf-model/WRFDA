@@ -11,17 +11,20 @@ subroutine da_transform_xtoy_ssmt2_adj(iv, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer  :: n  ! Loop counter.
-   integer  :: k  ! Index dimension.
+
+   real, allocatable :: rh(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_ssmt2_adj") 
 
-   do n=1, iv % nlocal(ssmt2)
-      k = iv % ssmt2(n) % info % levels
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d_adj(jo_grad_x%rh, iv%ssmt2(n)%loc, &
-         jo_grad_y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
-   end do 
+   allocate (rh(1:iv%info(ssmt2)%max_lev,iv%info(ssmt2)%n1:iv%info(ssmt2)%n2))
+
+   do n=iv%info(ssmt2)%n1,iv%info(ssmt2)%n2
+      rh(1:iv%info(ssmt2)%levels(n),n) = jo_grad_y%ssmt2(n)%rh(:)
+   end do
+
+   call da_interp_lin_3d_adj (jo_grad_x%rh, iv%info(ssmt2), rh)
+
+   deallocate (rh)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_ssmt2_adj") 
 

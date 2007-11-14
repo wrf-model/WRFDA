@@ -31,15 +31,15 @@ subroutine da_ao_stats_satem (stats_unit, iv, re)
    stats%average = residual_satem1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(satem)
-      if (iv%satem(n)%loc%proc_domain) then
-         do k=1, iv%satem(n)%info%levels
+   do n=1, iv%info(satem)%nlocal
+      if (iv%info(satem)%proc_domain(1,n)) then
+         do k=1, iv%info(satem)%levels(n)
             call da_stats_calculate (n, k, iv%satem(n)%thickness(k)%qc, & 
                re%satem(n)%thickness(k), nthickness, &
                stats%minimum%thickness, stats%maximum%thickness, &
                stats%average%thickness, stats%rms_err%thickness)
          end do
-      end if    ! end if (iv%satem(n)%loc%proc_domain)
+      end if
    end do
 
    ! Do inter-processor communication to gather statistics.

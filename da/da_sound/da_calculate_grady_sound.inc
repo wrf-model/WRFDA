@@ -14,8 +14,8 @@ subroutine da_calculate_grady_sound(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_sound")
 
-   do n=1, iv%nlocal(sound)
-      do k=1, iv%sound(n)%info%levels
+   do n=1, iv%info(sound)%nlocal
+      do k=1, iv%info(sound)%levels(n)
          if (iv%sound(n)%u(k)%qc < obs_qc_pointer) re%sound(n)%u(k) = 0.0
          if (iv%sound(n)%v(k)%qc < obs_qc_pointer) re%sound(n)%v(k) = 0.0
          if (iv%sound(n)%t(k)%qc < obs_qc_pointer) re%sound(n)%t(k) = 0.0

@@ -15,13 +15,12 @@ subroutine da_calculate_grady_gpsref(iv, re, jo_grad_y)
 
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_gpsref")
    
-   do n=1, iv%nlocal(gpsref)
-      do k=1, iv%gpsref(n)%info%levels
+   do n=1, iv%info(gpsref)%nlocal
+      do k=1, iv%info(gpsref)%levels(n)
          if (iv%gpsref(n)%ref(k)%qc < obs_qc_pointer) then
             re%gpsref(n)%ref(k) = 0.0
          end if
-         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / &
-             (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
+         jo_grad_y%gpsref(n)%ref(k) = -re%gpsref(n)%ref(k) / (iv%gpsref(n)%ref(k)%error * iv%gpsref(n)%ref(k)%error)
       end do
    end do
 

@@ -120,19 +120,19 @@ subroutine da_scan_obs_ssmi (iv, filename)
 
       select case(fm)
       case (125) ;
-         if (.not. use_ssmiretrievalobs .or. iv%ntotal(ssmi_rv) == max_ssmi_rv_input) cycle reports
+         if (.not. use_ssmiretrievalobs .or. iv%info(ssmi_rv)%ntotal == max_ssmi_rv_input) cycle reports
 
          ! Check if at least one field is present
          if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
             cycle reports
          end if
-         iv % ntotal(ssmi_rv) = iv % ntotal(ssmi_rv) + 1
+         iv%info(ssmi_rv)%ntotal = iv%info(ssmi_rv)%ntotal + 1
          if (outside) cycle reports
 
-         iv % nlocal(ssmi_rv) = iv % nlocal(ssmi_rv) + 1
+         iv%info(ssmi_rv)%nlocal = iv%info(ssmi_rv)%nlocal + 1
 
       case (126) ;
-         if (.not. use_ssmitbobs .or. iv%ntotal(ssmi_tb) == max_ssmi_tb_input) cycle reports
+         if (.not. use_ssmitbobs .or. iv%info(ssmi_tb)%ntotal == max_ssmi_tb_input) cycle reports
 
          ! Check if at least one field is present
 
@@ -158,15 +158,20 @@ subroutine da_scan_obs_ssmi (iv, filename)
             end if
          end if
 
-         iv % ntotal(ssmi_tb) = iv % ntotal(ssmi_tb) + 1
+         iv%info(ssmi_tb)%ntotal = iv%info(ssmi_tb)%ntotal + 1
          if (outside) cycle reports
-         iv % nlocal(ssmi_tb) = iv % nlocal(ssmi_tb) + 1
+         iv%info(ssmi_tb)%nlocal = iv%info(ssmi_tb)%nlocal + 1
 
       case default;
          ! Do nothing.
       end select
 
    end do reports
+
+   iv%info(ssmt1)%max_lev   = 1
+   iv%info(ssmt2)%max_lev   = 1
+   iv%info(ssmi_tb)%max_lev = 1
+   iv%info(ssmi_rv)%max_lev = 1
 
    close(unit=iunit)
    call da_free_unit(iunit)
@@ -175,9 +180,6 @@ subroutine da_scan_obs_ssmi (iv, filename)
       write(unit=stdout, fmt='(/,5x,a,i6/)') 'Rejected rain contaminated ssmi_tb =', irain
       write(unit=stdout, fmt='(A)') ' '
    end if
-
-   iv%plocal(iv%time,:) = iv%nlocal(:)
-   iv%ptotal(iv%time,:) = iv%ntotal(:)
 
    if (trace_use) call da_trace_exit("da_scan_obs_ssmi")
 

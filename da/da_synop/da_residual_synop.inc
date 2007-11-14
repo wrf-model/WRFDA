@@ -26,7 +26,7 @@ subroutine da_residual_synop(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(synop)
+   do n=1, iv%info(synop)%nlocal
       np_available = np_available + 5
 
       re%synop(n)%u = da_residual(n, 0, y%synop(n)%u, iv%synop(n)%u, n_obs_bad % u)

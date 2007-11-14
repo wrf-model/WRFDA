@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_satem(it, satem,ith,ithf)
+subroutine da_check_max_iv_satem(iv, it, ith,ithf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
 
    implicit none
 
-   integer,           intent(in)    :: it       ! External iteration.
-   type (satem_type), intent(inout) :: satem
-   integer,           intent(inout) :: ith,ithf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it       ! External iteration.
+   integer,       intent(inout) :: ith,ithf
 
-   integer  :: k
+   integer  :: k,n
    logical  :: failed
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_satem")
@@ -33,12 +33,13 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
    !---------------------------------------------------------------------------
 
    failed = .false.
-
-   do k = 1, satem % info % levels
-      ! Thickness
-      call da_max_error_qc(it, satem % info, satem % thickness(k), &
-         max_error_thickness, ith, ithf, check_max_iv_unit, &
-         'Thickness    ', failed, check_max_iv_print)
+   do n = iv%info(satem)%n1,iv%info(satem)%n2
+      do k = 1, iv%info(satem)%levels(n)
+         ! Thickness
+         call da_max_error_qc(it, iv%info(satem), n, iv%satem(n)%thickness(k), &
+            max_error_thickness, ith, ithf, check_max_iv_unit, &
+            'Thickness    ', failed, check_max_iv_print)
+      end do
    end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_satem")

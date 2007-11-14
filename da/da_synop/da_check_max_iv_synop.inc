@@ -1,15 +1,17 @@
-subroutine da_check_max_iv_synop(it, synop, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+subroutine da_check_max_iv_synop(iv, it, itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    !-------------------------------------------------------------------------
    ! Purpose: TBD
    !-------------------------------------------------------------------------
 
    implicit none
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (synop_type), intent(inout) :: synop
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
    logical :: failed
+   integer :: n
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_synop")
 
@@ -27,7 +29,7 @@ subroutine da_check_max_iv_synop(it, synop, itu,ituf,itvv,itvvf,itp,itpf,itt,itt
          'Error max test ratio for Synop_V   = ',max_error_uv, &
          'Error max test ratio for Synop_P   = ',max_error_p,  &
          'Error max test ratio for Synop_T   = ',max_error_t,  &
-          'Error max test ratio for Synop_QV  = ',max_error_q
+         'Error max test ratio for Synop_QV  = ',max_error_q
    end if
 
    !---------------------------------------------------------------------------
@@ -36,21 +38,14 @@ subroutine da_check_max_iv_synop(it, synop, itu,ituf,itvv,itvvf,itp,itpf,itt,itt
 
    failed = .false.
 
-   ! U-wind
-   call da_max_error_qc(it, synop % info, synop % u, max_error_uv, itu, ituf, check_max_iv_unit, &
-      'U    ', failed, check_max_iv_print)
-   ! V-wind
-   call da_max_error_qc (it, synop % info, synop % v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
-      'V    ', failed, check_max_iv_print)                           
-   ! Pressure
-   call da_max_error_qc (it, synop % info, synop % p, max_error_p, itp, itpf, check_max_iv_unit, &
-      'Press', failed, check_max_iv_print)         
-   ! Temperature
-   call da_max_error_qc (it, synop % info, synop % t, max_error_t, itt, ittf, check_max_iv_unit, &
-      'TEMP ', failed, check_max_iv_print)
-   ! Mixing ratio, same ratio as relative humidity
-   call da_max_error_qc (it, synop % info, synop % q, max_error_q, itqv, itqvf, check_max_iv_unit, &
-      'QV   ', failed, check_max_iv_print)
+   do n=iv%info(synop)%n1,iv%info(synop)%n2
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', failed, check_max_iv_print)                           
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%p, max_error_p, itp, itpf, check_max_iv_unit, 'Press', failed, check_max_iv_print)         
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%t, max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', failed, check_max_iv_print)
+      ! Mixing ratio, same ratio as relative humidity
+      call da_max_error_qc (it, iv%info(synop), n, iv%synop(n)%q, max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', failed, check_max_iv_print)
+   end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_synop")
 

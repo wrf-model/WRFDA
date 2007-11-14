@@ -12,11 +12,11 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
    ! Wang et al. 2005 MWR
    ! 1) nanals, ensemble size
    ! 2) ndim, dimension of the perturbation vector that needs to be updated
-   ! 3) nobs, number of observations assimilated
+   ! 3) nobs, number of observations assmiilated
    ! 4) ens, array of perturbations before (Xf') and after (Xa') ETKF update
    ! 5) ens_ob, array of HXf
    ! 6) oberrvar, observation error variance, listed in the same sequence as HXf
-   ! 7) obs, observations assimilated
+   ! 7) obs, observations assmiilated
    ! 8) naccumt1, number of previous cycles immediately before the current cycle,
    ! which is needed for calculating adaptive inflation factor. naccumt1 < 0 for
    ! pre-specified inflation

@@ -118,15 +118,15 @@ subroutine da_fill_obs_structures(iv, ob)
    end if
 
    if (outside) then
-      iv%nlocal(pseudo) = 0
-      ob%nlocal(pseudo) = 0
-      iv%ntotal(pseudo) = 0
-      iv%plocal(iv%time,pseudo) = 0
+      iv%info(pseudo)%nlocal          = 0
+      ob%nlocal(pseudo)               = 0
+      iv%info(pseudo)%ntotal          = 0
+      iv%info(pseudo)%plocal(iv%time) = 0
    else
-      iv % nlocal(pseudo)         = num_pseudo
-      ob % nlocal(pseudo)         = num_pseudo
-      iv % ntotal(pseudo)         = num_pseudo
-      iv % plocal(iv%time,pseudo) = num_pseudo
+      iv%info(pseudo)%nlocal          = num_pseudo
+      ob%nlocal(pseudo)               = num_pseudo
+      iv%info(pseudo)%ntotal          = num_pseudo
+      iv%info(pseudo)%plocal(iv%time) = num_pseudo
    end if
 
    !---------------------------------------------------------------------------
@@ -140,8 +140,8 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.1] Transfer surface obs:
 
-   if (iv % nlocal(synop) > 0) then
-      do n = 1, iv % nlocal(synop)
+   if (iv%info(synop)%nlocal > 0) then
+      do n = 1, iv%info(synop)%nlocal
          ob % synop(n) % u = iv % synop(n) % u % inv
          ob % synop(n) % v = iv % synop(n) % v % inv
          ob % synop(n) % t = iv % synop(n) % t % inv
@@ -171,8 +171,8 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.2] Transfer metar obs:
 
-   if (iv % nlocal(metar) > 0) then
-      do n = 1, iv % nlocal(metar)
+   if (iv%info(metar)%nlocal > 0) then
+      do n = 1, iv%info(metar)%nlocal
          ob % metar(n) % u = iv % metar(n) % u % inv
          ob % metar(n) % v = iv % metar(n) % v % inv
          ob % metar(n) % t = iv % metar(n) % t % inv
@@ -195,8 +195,8 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.2] Transfer ships obs:
 
-   if (iv % nlocal(ships) > 0) then   
-      do n = 1, iv % nlocal(ships)
+   if (iv%info(ships)%nlocal > 0) then   
+      do n = 1, iv%info(ships)%nlocal
          ob % ships(n) % u = iv % ships(n) % u % inv
          ob % ships(n) % v = iv % ships(n) % v % inv
          ob % ships(n) % t = iv % ships(n) % t % inv
@@ -220,9 +220,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.4.1] Transfer Geo. AMVs Obs:
 
-   if (iv % nlocal(geoamv) > 0) then
-      do n = 1, iv % nlocal(geoamv)
-         do k = 1, iv % geoamv(n) % info % levels
+   if (iv%info(geoamv)%nlocal > 0) then
+      do n = 1, iv%info(geoamv)%nlocal
+         do k = 1, iv%info(geoamv)%levels(n)
             ob % geoamv(n) % u(k) = iv % geoamv(n) % u(k) % inv
             ob % geoamv(n) % v(k) = iv % geoamv(n) % v(k) % inv
          end do
@@ -231,9 +231,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.4.2] Transfer  Polar AMVs Obs:
 
-   if (iv % nlocal(polaramv) > 0) then
-      do n = 1, iv % nlocal(polaramv)
-         do k = 1, iv % polaramv(n) % info % levels
+   if (iv%info(polaramv)%nlocal > 0) then
+      do n = 1, iv%info(polaramv)%nlocal
+         do k = 1,iv%info(polaramv)%levels(n)
             ob % polaramv(n) % u(k) = iv % polaramv(n) % u(k) % inv
             ob % polaramv(n) % v(k) = iv % polaramv(n) % v(k) % inv
          end do
@@ -242,8 +242,8 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.5] Transfer gpspw obs:
 
-   if (iv % nlocal(gpspw) > 0) then
-      do n = 1, iv % nlocal(gpspw)
+   if (iv%info(gpspw)%nlocal > 0) then
+      do n = 1, iv%info(gpspw)%nlocal
          ob % gpspw(n) % tpw = iv % gpspw(n) % tpw % inv
       end do
 
@@ -251,9 +251,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.6] Transfer GPS REF obs:
 
-   if (iv % nlocal(gpsref) > 0) then
-      do n = 1, iv % nlocal(gpsref)
-         do k = 1, iv % gpsref(n) % info % levels
+   if (iv%info(gpsref)%nlocal > 0) then
+      do n = 1, iv%info(gpsref)%nlocal
+         do k = 1, iv%info(gpsref)%levels(n)
             ob % gpsref(n) % ref(k) = iv % gpsref(n) % ref(k) % inv
             ob % gpsref(n) %   p(k) = iv % gpsref(n) %   p(k) % inv
             ob % gpsref(n) %   t(k) = iv % gpsref(n) %   t(k) % inv
@@ -264,9 +264,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.7] Transfer sonde obs:
 
-   if (iv % nlocal(sound) > 0) then
-      do n = 1, iv % nlocal(sound)
-         do k = 1, iv % sound(n) % info % levels
+   if (iv%info(sound)%nlocal > 0) then
+      do n = 1, iv%info(sound)%nlocal
+         do k = 1, iv%info(sound)%levels(n)
             ob % sound(n) % u(k) = iv % sound(n) % u(k) % inv
             ob % sound(n) % v(k) = iv % sound(n) % v(k) % inv
             ob % sound(n) % t(k) = iv % sound(n) % t(k) % inv
@@ -306,9 +306,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.8] Transfer airep obs:
 
-   if (iv % nlocal(airep) > 0) then
-      do n = 1, iv % nlocal(airep)
-         do k = 1, iv % airep(n) % info % levels
+   if (iv%info(airep)%nlocal > 0) then
+      do n = 1, iv%info(airep)%nlocal
+         do k = 1, iv%info(airep)%levels(n)
             ob % airep(n) % u(k) = iv % airep(n) % u(k) % inv
             ob % airep(n) % v(k) = iv % airep(n) % v(k) % inv
             ob % airep(n) % t(k) = iv % airep(n) % t(k) % inv
@@ -318,9 +318,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.9] Transfer pilot obs:
 
-   if (iv % nlocal(pilot) > 0) then
-      do n = 1, iv % nlocal(pilot)
-         do k = 1, iv % pilot(n) % info % levels
+   if (iv%info(pilot)%nlocal > 0) then
+      do n = 1, iv%info(pilot)%nlocal
+         do k = 1, iv%info(pilot)%levels(n)
             ob % pilot(n) % u(k) = iv % pilot(n) % u(k) % inv
             ob % pilot(n) % v(k) = iv % pilot(n) % v(k) % inv
          end do
@@ -329,15 +329,15 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.10] Transfer SSM/I obs:SSMI:
 
-   if (iv % nlocal(ssmi_rv) > 0) then
-      do n = 1, iv % nlocal(ssmi_rv)
+   if (iv%info(ssmi_rv)%nlocal > 0) then
+      do n = 1, iv%info(ssmi_rv)%nlocal
          ob % ssmi_rv(n) % speed = iv % ssmi_rv(n) % speed % inv
          ob % ssmi_rv(n) % tpw   = iv % ssmi_rv(n) % tpw % inv
       end do
    end if
 
-   if (iv % nlocal(ssmi_tb) > 0) then
-      do n = 1, iv % nlocal(ssmi_tb)
+   if (iv%info(ssmi_tb)%nlocal > 0) then
+      do n = 1, iv%info(ssmi_tb)%nlocal
          ob % ssmi_tb(n) % tb19v = iv % ssmi_tb(n) % tb19v % inv
          ob % ssmi_tb(n) % tb19h = iv % ssmi_tb(n) % tb19h % inv
          ob % ssmi_tb(n) % tb22v = iv % ssmi_tb(n) % tb22v % inv
@@ -350,9 +350,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.11] Transfer satem obs:
 
-   if (iv % nlocal(satem) > 0) then
-      do n = 1, iv % nlocal(satem)
-         do k = 1, iv % satem(n) % info % levels
+   if (iv%info(satem)%nlocal > 0) then
+      do n = 1, iv%info(satem)%nlocal
+         do k = 1, iv%info(satem)%levels(n)
             ob % satem(n) % thickness(k) = iv % satem(n) % thickness(k) % inv
          end do
       end do
@@ -360,9 +360,9 @@ subroutine da_fill_obs_structures(iv, ob)
    
    ! [2.12] Transfer ssmt1 obs:
 
-   if (iv % nlocal(ssmt1) > 0) then
-      do n = 1, iv % nlocal(ssmt1)
-         do k = 1, iv % ssmt1(n) % info % levels
+   if (iv%info(ssmt1)%nlocal > 0) then
+      do n = 1, iv%info(ssmt1)%nlocal
+         do k = 1, iv%info(ssmt1)%levels(n)
             ob % ssmt1(n) % t(k) = iv % ssmt1(n) % t(k) % inv
          end do
       end do
@@ -371,9 +371,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.13] Transfer ssmt2 obs:
 
-   if (iv % nlocal(ssmt2) > 0) then
-      do n = 1, iv % nlocal(ssmt2)
-         do k = 1, iv % ssmt2(n) % info % levels
+   if (iv%info(ssmt2)%nlocal > 0) then
+      do n = 1, iv%info(ssmt2)%nlocal
+         do k = 1, iv%info(ssmt2)%levels(n)
             ob % ssmt2(n) % rh(k) = iv % ssmt2(n) % rh(k) % inv
          end do
       end do
@@ -381,12 +381,12 @@ subroutine da_fill_obs_structures(iv, ob)
    
    ! [2.14] Setup pseudo observations:
 
-   if (iv%nlocal(pseudo) > 0) call da_setup_pseudo_obs(iv, ob)
+   if (iv%info(pseudo)%nlocal > 0) call da_setup_pseudo_obs(iv, ob)
 
    ! [2.15] Transfer scatterometer obs:
 
-   if (iv % nlocal(qscat) > 0) then
-      do n = 1, iv % nlocal(qscat)
+   if (iv%info(qscat)%nlocal > 0) then
+      do n = 1, iv%info(qscat)%nlocal
          ob % qscat(n) % u = iv % qscat(n) % u % inv
          ob % qscat(n) % v = iv % qscat(n) % v % inv
       end do     
@@ -394,9 +394,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.16] Transfer profiler obs:
 
-   if (iv % nlocal(profiler) > 0) then
-      do n = 1, iv % nlocal(profiler)
-         do k = 1, iv % profiler(n) % info % levels
+   if (iv%info(profiler)%nlocal > 0) then
+      do n = 1, iv%info(profiler)%nlocal
+         do k = 1, iv%info(profiler)%levels(n)
             ob % profiler(n) % u(k) = iv % profiler(n) % u(k) % inv
             ob % profiler(n) % v(k) = iv % profiler(n) % v(k) % inv
          end do
@@ -405,11 +405,11 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.17] Transfer buoy obs:
 
-   if (iv % nlocal(buoy) > 0) then
-      do n = 1, iv % nlocal(buoy)
+   if (iv%info(buoy)%nlocal > 0) then
+      do n = 1, iv%info(buoy)%nlocal
          ob % buoy(n) % p = iv % buoy(n) % p % inv
       end do
-      do n = 1, iv % nlocal(buoy)
+      do n = 1, iv%info(buoy)%nlocal
          ob % buoy(n) % u = iv % buoy(n) % u % inv
          ob % buoy(n) % v = iv % buoy(n) % v % inv
          ob % buoy(n) % t = iv % buoy(n) % t % inv
@@ -431,9 +431,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.18] Transfer radar obs:
 
-   if (iv % nlocal(radar) > 0) then
-      do n = 1, iv % nlocal(radar)
-         do k = 1, iv % radar(n) % info % levels
+   if (iv%info(radar)%nlocal > 0) then
+      do n = 1, iv%info(radar)%nlocal
+         do k = 1, iv%info(radar)%levels(n)
             ! Copy observation variables:
             ob % radar(n) % rv(k) = iv % radar(n) % rv(k) % inv
            ob % radar(n) % rf(k) = iv % radar(n) % rf(k) % inv
@@ -443,9 +443,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! [2.19] Transfer TC bogus:
 
-   if (iv % nlocal(bogus) > 0) then
-      do n = 1, iv % nlocal(bogus)
-         do k = 1, iv % bogus(n) % info % levels
+   if (iv%info(bogus)%nlocal > 0) then
+      do n = 1, iv%info(bogus)%nlocal
+         do k = 1, iv%info(bogus)%levels(n)
 
             ! Copy observation variables:
 
@@ -473,9 +473,9 @@ subroutine da_fill_obs_structures(iv, ob)
 
    ! Transfer AIRS  retrievals:
 
-   if (iv % nlocal(airsr) > 0) then
-      do n = 1, iv % nlocal(airsr)
-         do k = 1, iv % airsr(n) % info % levels
+   if (iv%info(airsr)%nlocal > 0) then
+      do n = 1, iv%info(airsr)%nlocal
+         do k = 1, iv%info(airsr)%levels(n)
 
             ! Copy observation variables:
 

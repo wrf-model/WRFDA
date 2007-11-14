@@ -18,8 +18,8 @@ subroutine da_allocate_y (iv, y)
 
    if (trace_use) call da_trace_entry("da_allocate_y")
 
-   y % nlocal(:) = iv % nlocal(:)
-   y % ntotal(:) = iv % ntotal(:) 
+   y % nlocal(:) = iv%info(:)%nlocal
+   y % ntotal(:) = iv%info(:)%ntotal
 
    y % num_inst     = iv % num_inst
 
@@ -57,7 +57,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(geoamv) > 0) then
       allocate (y % geoamv(1:y % nlocal(geoamv)))
       do n = 1, y % nlocal(geoamv)
-         nlevels = iv % geoamv(n) % info % levels
+         nlevels = iv%info(geoamv)%levels(n)
          allocate (y % geoamv(n)%u(1:nlevels))
          allocate (y % geoamv(n)%v(1:nlevels))
          y % geoamv(n) % u(1:nlevels) = 0.0
@@ -68,7 +68,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(polaramv) > 0) then
       allocate (y % polaramv(1:y % nlocal(polaramv)))
       do n = 1, y % nlocal(polaramv)
-         nlevels = iv % polaramv(n) % info % levels
+         nlevels = iv%info(polaramv)%levels(n)
          allocate (y % polaramv(n)%u(1:nlevels))
          allocate (y % polaramv(n)%v(1:nlevels))
          y % polaramv(n) % u(1:nlevels) = 0.0
@@ -84,7 +84,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(gpsref) > 0) then
       allocate (y % gpsref(1:y % nlocal(gpsref)))
       do n = 1, y % nlocal(gpsref)
-         nlevels = iv % gpsref(n) % info % levels
+         nlevels = iv%info(gpsref)%levels(n)
          allocate (y % gpsref(n)%ref(1:nlevels))
          allocate (y % gpsref(n)%  p(1:nlevels))
          allocate (y % gpsref(n)%  t(1:nlevels))
@@ -100,7 +100,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(sound) > 0) then
       allocate (y % sound(1:y % nlocal(sound)))
       do n = 1, y % nlocal(sound)
-         nlevels = max(1,iv % sound(n) % info % levels)
+         nlevels = max(1,iv%info(sound)%levels(n))
          allocate (y % sound(n)%u(1:nlevels))
          allocate (y % sound(n)%v(1:nlevels))
          allocate (y % sound(n)%t(1:nlevels))
@@ -111,19 +111,19 @@ subroutine da_allocate_y (iv, y)
          y % sound(n) % q(1:nlevels) = 0.0
       end do
 
-      allocate (y % sonde_sfc(1:y % nlocal(sound)))
+      allocate (y % sonde_sfc(1:y % nlocal(sonde_sfc)))
 
-      y % sonde_sfc(1:y % nlocal(sound)) % u = 0.0
-      y % sonde_sfc(1:y % nlocal(sound)) % v = 0.0
-      y % sonde_sfc(1:y % nlocal(sound)) % t = 0.0
-      y % sonde_sfc(1:y % nlocal(sound)) % p = 0.0
-      y % sonde_sfc(1:y % nlocal(sound)) % q = 0.0
+      y % sonde_sfc(1:y % nlocal(sonde_sfc)) % u = 0.0
+      y % sonde_sfc(1:y % nlocal(sonde_sfc)) % v = 0.0
+      y % sonde_sfc(1:y % nlocal(sonde_sfc)) % t = 0.0
+      y % sonde_sfc(1:y % nlocal(sonde_sfc)) % p = 0.0
+      y % sonde_sfc(1:y % nlocal(sonde_sfc)) % q = 0.0
    end if
 
    if (y % nlocal(pilot) > 0) then
       allocate (y % pilot(1:y % nlocal(pilot)))
       do n = 1, y % nlocal(pilot)
-         nlevels = iv % pilot(n) % info % levels
+         nlevels = iv%info(pilot)%levels(n)
          allocate (y % pilot(n)%u(1:nlevels))
          allocate (y % pilot(n)%v(1:nlevels))
          y % pilot(n) % u(1:nlevels) = 0.0
@@ -134,7 +134,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(radar) > 0) then
       allocate (y % radar(1:y % nlocal(radar)))
       do n = 1, y % nlocal(radar)
-         nlevels = iv % radar(n) % info % levels
+         nlevels = iv%info(radar)%levels(n)
          allocate (y % radar(n)%rv(1:nlevels))
          allocate (y % radar(n)%rf(1:nlevels))
          y % radar(n) % rv(1:nlevels) = 0.0
@@ -145,7 +145,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(airep) > 0) then
       allocate (y % airep(1:y % nlocal(airep)))
       do n = 1, y % nlocal(airep)
-         nlevels = iv % airep(n) % info % levels
+         nlevels = iv%info(airep)%levels(n)
          allocate (y % airep(n)%u(1:nlevels))
          allocate (y % airep(n)%v(1:nlevels))
          allocate (y % airep(n)%t(1:nlevels))
@@ -158,7 +158,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(bogus) > 0) then
       allocate (y % bogus(1:y % nlocal(bogus)))
       do n = 1, y % nlocal(bogus)
-         nlevels = iv % bogus(n) % info % levels
+         nlevels = iv%info(bogus)%levels(n)
          allocate (y % bogus(n)%u(1:nlevels))
          allocate (y % bogus(n)%v(1:nlevels))
          allocate (y % bogus(n)%t(1:nlevels))
@@ -175,7 +175,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(satem) > 0) then
       allocate (y % satem(1:y % nlocal(satem)))
       do n = 1, y % nlocal(satem)
-         nlevels = iv % satem(n) % info % levels
+         nlevels = iv%info(satem)%levels(n)
          allocate (y % satem(n) % thickness(1:nlevels))
          y % satem(n) % thickness(1:nlevels) = 0.0
       end do
@@ -201,7 +201,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(ssmt1) > 0) then
       allocate (y % ssmt1(1:y % nlocal(ssmt1)))
       do n = 1, y % nlocal(ssmt1)
-         nlevels = iv % ssmt1(n) % info % levels
+         nlevels = iv%info(ssmt1)%levels(n)
          allocate (y % ssmt1(n) % t(1:nlevels))
          y % ssmt1(n) % t(1:nlevels) = 0.0
       end do
@@ -210,7 +210,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(ssmt2) > 0) then
       allocate (y % ssmt2(1:y % nlocal(ssmt2)))
       do n = 1, y % nlocal(ssmt2)
-         nlevels = iv % ssmt2(n) % info % levels
+         nlevels=iv%info(ssmt2)%levels(n)
          allocate (y % ssmt2(n) % rh(1:nlevels))
          y % ssmt2(n) % rh(1:nlevels) = 0.0
       end do
@@ -234,12 +234,11 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(profiler) > 0) then
       allocate (y % profiler(1:y % nlocal(profiler)))
       do n = 1, y % nlocal(profiler)
-         nlevels = iv % profiler(n) % info % levels
+         nlevels = iv%info(profiler)%levels(n)
          allocate (y % profiler(n)%u(1:nlevels))
          allocate (y % profiler(n)%v(1:nlevels))
          y % profiler(n) % u(1:nlevels) = 0.0
          y % profiler(n) % v(1:nlevels) = 0.0
-
       end do
    end if
 
@@ -273,7 +272,7 @@ subroutine da_allocate_y (iv, y)
    if (y % nlocal(airsr) > 0) then
       allocate (y % airsr(1:y % nlocal(airsr)))
       do n = 1, y % nlocal(airsr)
-         nlevels = iv % airsr(n) % info % levels
+         nlevels = iv%info(airsr)%levels(n)
          allocate (y % airsr(n)%t(1:nlevels))
          allocate (y % airsr(n)%q(1:nlevels))
          y % airsr(n) % t(1:nlevels) = 0.0

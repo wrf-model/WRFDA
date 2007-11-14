@@ -13,22 +13,41 @@ subroutine da_transform_xtoy_synop_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    integer :: n        ! Loop counter.
 
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_t(:,:)
+   real, allocatable :: model_q(:,:)
+   real, allocatable :: model_psfc(:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_synop_adj")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%plocal(iv%time-1,synop) + 1, iv%plocal(iv%time,synop)
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d_adj(jo_grad_x%u, iv%synop(n)%loc, jo_grad_y%synop(n)%u, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%v, iv%synop(n)%loc, jo_grad_y%synop(n)%v, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%t, iv%synop(n)%loc, jo_grad_y%synop(n)%t, iv%synop(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x%q, iv%synop(n)%loc, jo_grad_y%synop(n)%q, iv%synop(n)%zk)
+      allocate (model_u(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_v(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_t(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_q(1,iv%info(synop)%n1:iv%info(synop)%n2))
+      allocate (model_psfc(iv%info(synop)%n1:iv%info(synop)%n2))
+      ! [1.2] Interpolate horizontally:
+      do n=iv%info(synop)%n1,iv%info(synop)%n2
+         model_u(1,n)  = jo_grad_y%synop(n)%u
+         model_v(1,n)  = jo_grad_y%synop(n)%v
+         model_t(1,n)  = jo_grad_y%synop(n)%t
+         model_q(1,n)  = jo_grad_y%synop(n)%q
+         model_psfc(n) = jo_grad_y%synop(n)%p
+      end do
+      call da_interp_lin_3d_adj (jo_grad_x%u, iv%info(synop),model_u)
+      call da_interp_lin_3d_adj (jo_grad_x%v, iv%info(synop),model_v)
+      call da_interp_lin_3d_adj (jo_grad_x%t, iv%info(synop),model_t)
+      call da_interp_lin_3d_adj (jo_grad_x%q, iv%info(synop),model_q)
 
-         call da_interp_lin_2d_adj(jo_grad_x % psfc, iv%synop(n)%loc, jo_grad_y%synop(n)%p)
-      end do
+      call da_interp_lin_2d_adj (jo_grad_x%psfc, iv%info(synop), 1, model_psfc)
+      deallocate (model_u)
+      deallocate (model_v)
+      deallocate (model_t)
+      deallocate (model_q)
+      deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      do n=iv%plocal(iv%time-1,synop) + 1, iv%plocal(iv%time,synop)
-         call da_transform_xtopsfc_adj(grid,iv%synop(n), jo_grad_y%synop(n),jo_grad_x)
-      end do
+      call da_transform_xtopsfc_adj(grid,iv, synop, iv%synop(:), jo_grad_y%synop(:),jo_grad_x)
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_synop_adj")

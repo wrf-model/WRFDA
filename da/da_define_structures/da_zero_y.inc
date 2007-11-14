@@ -58,7 +58,7 @@ subroutine da_zero_y( iv, y )
 
    if ( y % nlocal(geoamv) > 0 ) then
       do n = 1, y % nlocal(geoamv)
-       nlevels = iv % geoamv(n) % info % levels
+       nlevels = iv%info(geoamv)%levels(n)
        y % geoamv(n) % u(1:nlevels) = 0.0
        y % geoamv(n) % v(1:nlevels) = 0.0
       end do
@@ -68,7 +68,7 @@ subroutine da_zero_y( iv, y )
 
    if ( y % nlocal(polaramv) > 0 ) then
       do n = 1, y % nlocal(polaramv)
-       nlevels = iv % polaramv(n) % info % levels
+       nlevels = iv%info(polaramv)%levels(n)
        y % polaramv(n) % u(1:nlevels) = 0.0
        y % polaramv(n) % v(1:nlevels) = 0.0
       end do
@@ -96,7 +96,7 @@ subroutine da_zero_y( iv, y )
 
    if ( y % nlocal(sound) > 0 ) then
       do n = 1, y % nlocal(sound)
-         nlevels = iv % sound(n) % info % levels
+         nlevels = iv%info(sound)%levels(n)
 
          y % sound(n) % u(1:nlevels) = 0.0
          y % sound(n) % v(1:nlevels) = 0.0
@@ -140,7 +140,7 @@ subroutine da_zero_y( iv, y )
 
    if ( y % nlocal(airep) > 0 ) then
       do n = 1, y % nlocal(airep)
-         nlevels = iv % airep(n) % info % levels
+         nlevels = iv%info(airep)%levels(n)
 
          y % airep(n) % u(1:nlevels) = 0.0
          y % airep(n) % v(1:nlevels) = 0.0

@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
+subroutine da_check_max_iv_qscat(iv, it, itu, itvv, ituf, itvvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,12 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 
    implicit none
 
-   integer,           intent (in)         :: it
-   integer,           intent (inout)      :: itu, itvv, ituf, itvvf
-   type (qscat_type), intent(inout)       :: qscat
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it
+   integer,       intent(inout) :: itu, itvv, ituf, itvvf
 
    logical :: failed
+   integer :: n
    
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_qscat")
 
@@ -34,13 +35,12 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 
    failed = .false.
 
-   ! U-wind
-   call da_max_error_qc(it, qscat % info, qscat % u, max_error_uv, itu, ituf, check_max_iv_unit, &
-      'U    ', failed, check_max_iv_print)
-
-   ! V-wind
-   call da_max_error_qc (it, qscat % info, qscat % v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
-      'V    ', failed, check_max_iv_print)                           
+   do n=iv%info(qscat)%n1,iv%info(qscat)%n2
+      call da_max_error_qc(it, iv%info(qscat), n, iv%qscat(n)%u, max_error_uv, itu, ituf, check_max_iv_unit, &
+         'U    ', failed, check_max_iv_print)
+      call da_max_error_qc (it, iv%info(qscat), n, iv%qscat(n)%v, max_error_uv, itvv, itvvf, check_max_iv_unit, &
+         'V    ', failed, check_max_iv_print)                           
+   end do
 
    !---------------------------------------------------------------------------
    ! [3.0] Output test failed results:

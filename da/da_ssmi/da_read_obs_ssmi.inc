@@ -36,8 +36,8 @@ subroutine da_read_obs_ssmi (iv, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_ssmi")
 
-   nlocal(:) = iv%plocal(iv%time-1,:)
-   ntotal(:) = iv%ptotal(iv%time-1,:)
+   nlocal(:) = iv%info(:)%plocal(iv%time-1)
+   ntotal(:) = iv%info(:)%ptotal(iv%time-1)
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -214,12 +214,29 @@ subroutine da_read_obs_ssmi (iv, filename)
       
             !  Initialize other non read fields
 
-            iv % ssmi_rv (nlocal(ssmi_rv)) % loc = loc
+            iv%info(ssmi_rv)%name(nlocal(ssmi_rv))      = info%name
+            iv%info(ssmi_rv)%platform(nlocal(ssmi_rv))  = info%platform
+            iv%info(ssmi_rv)%id(nlocal(ssmi_rv))        = info%id
+            iv%info(ssmi_rv)%date_char(nlocal(ssmi_rv)) = info%date_char
+            iv%info(ssmi_rv)%levels(nlocal(ssmi_rv))    = 1
+            iv%info(ssmi_rv)%lat(:,nlocal(ssmi_rv))     = info%lat
+            iv%info(ssmi_rv)%lon(:,nlocal(ssmi_rv))     = info%lon
+            iv%info(ssmi_rv)%elv(nlocal(ssmi_rv))       = info%elv
+            iv%info(ssmi_rv)%pstar(nlocal(ssmi_rv))     = info%pstar
 
-            !  Initialize with read fields
+            iv%info(ssmi_rv)%slp(nlocal(ssmi_rv))           = loc%slp
+            iv%info(ssmi_rv)%pw(nlocal(ssmi_rv))            = loc%pw
+            iv%info(ssmi_rv)%x(:,nlocal(ssmi_rv))           = loc%x
+            iv%info(ssmi_rv)%y(:,nlocal(ssmi_rv))           = loc%y 
+            iv%info(ssmi_rv)%i(:,nlocal(ssmi_rv))           = loc%i 
+            iv%info(ssmi_rv)%j(:,nlocal(ssmi_rv))           = loc%j 
+            iv%info(ssmi_rv)%dx(:,nlocal(ssmi_rv))          = loc%dx
+            iv%info(ssmi_rv)%dxm(:,nlocal(ssmi_rv))         = loc%dxm
+            iv%info(ssmi_rv)%dy(:,nlocal(ssmi_rv))          = loc%dy
+            iv%info(ssmi_rv)%dym(:,nlocal(ssmi_rv))         = loc%dym
+            iv%info(ssmi_rv)%proc_domain(:,nlocal(ssmi_rv)) = loc%proc_domain
 
-            iv%ssmi_rv(nlocal(ssmi_rv))%info                 = info
-            iv%ssmi_rv(nlocal(ssmi_rv))%loc%obs_global_index = ntotal(ssmi_rv)
+            iv%info(ssmi_rv)%obs_global_index(nlocal(ssmi_rv)) = ntotal(ssmi_rv)
 
             iv % ssmi_rv (nlocal(ssmi_rv)) % speed = speed
             iv % ssmi_rv (nlocal(ssmi_rv)) % tpw   = tpw
@@ -279,12 +296,29 @@ subroutine da_read_obs_ssmi (iv, filename)
 
             !  Initialize other non read fields
 
-            iv % ssmi_tb (nlocal(ssmi_tb)) % loc = loc
+            iv%info(ssmi_tb)%name(nlocal(ssmi_tb))      = info%name
+            iv%info(ssmi_tb)%platform(nlocal(ssmi_tb))  = info%platform
+            iv%info(ssmi_tb)%id(nlocal(ssmi_tb))        = info%id
+            iv%info(ssmi_tb)%date_char(nlocal(ssmi_tb)) = info%date_char
+            iv%info(ssmi_tb)%levels(nlocal(ssmi_tb))    = 1
+            iv%info(ssmi_tb)%lat(:,nlocal(ssmi_tb))     = info%lat
+            iv%info(ssmi_tb)%lon(:,nlocal(ssmi_tb))     = info%lon
+            iv%info(ssmi_tb)%elv(nlocal(ssmi_tb))       = info%elv
+            iv%info(ssmi_tb)%pstar(nlocal(ssmi_tb))     = info%pstar
 
-            !  Initialize with read fields
+            iv%info(ssmi_tb)%slp(nlocal(ssmi_tb))           = loc%slp
+            iv%info(ssmi_tb)%pw(nlocal(ssmi_tb))            = loc%pw
+            iv%info(ssmi_tb)%x(:,nlocal(ssmi_tb))           = loc%x
+            iv%info(ssmi_tb)%y(:,nlocal(ssmi_tb))           = loc%y 
+            iv%info(ssmi_tb)%i(:,nlocal(ssmi_tb))           = loc%i 
+            iv%info(ssmi_tb)%j(:,nlocal(ssmi_tb))           = loc%j 
+            iv%info(ssmi_tb)%dx(:,nlocal(ssmi_tb))          = loc%dx
+            iv%info(ssmi_tb)%dxm(:,nlocal(ssmi_tb))         = loc%dxm
+            iv%info(ssmi_tb)%dy(:,nlocal(ssmi_tb))          = loc%dy
+            iv%info(ssmi_tb)%dym(:,nlocal(ssmi_tb))         = loc%dym
+            iv%info(ssmi_tb)%proc_domain(:,nlocal(ssmi_tb)) = loc%proc_domain
 
-            iv%ssmi_tb(nlocal(ssmi_tb))%info                 = info
-            iv%ssmi_tb(nlocal(ssmi_tb))%loc%obs_global_index = ntotal(ssmi_tb)
+            iv%info(ssmi_tb)%obs_global_index(nlocal(ssmi_tb)) = ntotal(ssmi_tb)
 
             iv % ssmi_tb (nlocal(ssmi_tb)) % tb19v = tb19v
             iv % ssmi_tb (nlocal(ssmi_tb)) % tb19h = tb19h

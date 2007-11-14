@@ -23,21 +23,26 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
    real    :: model_p_c9(kts:kte)
    real    :: psfc_loc,terr_loc,psfc_loc9
 
+   real, allocatable :: u(:,:)
+   real, allocatable :: v(:,:)
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_bogus")      
 
-   do n = iv%plocal(iv%time-1,bogus)+1, iv%plocal(iv%time,bogus)
-      num_levs = iv % bogus(n) % info % levels
+   do n = iv%info(bogus)%n1,iv%info(bogus)%n2
+      num_levs = iv%info(bogus)%levels(n)
 
       if (num_levs < 1) cycle
 
       ! [1.1] Get cross pt. horizontal interpolation weights:
 
-      i   = iv%bogus(n)%loc%i
-      dy  = iv%bogus(n)%loc%dy
-      dym = iv%bogus(n)%loc%dym
-      j   = iv%bogus(n)%loc%j
-      dx  = iv%bogus(n)%loc%dx
-      dxm = iv%bogus(n)%loc%dxm
+      i   = iv%info(bogus)%i(1,n)
+      dy  = iv%info(bogus)%dy(1,n)
+      dym = iv%info(bogus)%dym(1,n)
+      j   = iv%info(bogus)%j(1,n)
+      dx  = iv%info(bogus)%dx(1,n)
+      dxm = iv%info(bogus)%dxm(1,n)
 
       ! [1.2] Interpolate horizontally from cross points:
 
@@ -65,17 +70,33 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
 
       call da_tpq_to_slp_lin (model_t, model_q, model_p_c, terr_loc, psfc_loc,   &
          model_t9, model_q9, model_p_c9, psfc_loc9, y%bogus(n)%slp) 
-
-      ! [1.4] Interpolate horizontally from dot points:
-      call da_interp_lin_3d(grid%xa % u, iv%bogus(n)%loc, &
-         y%bogus(n)%u, num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d(grid%xa % v, iv%bogus(n)%loc, &
-         y%bogus(n)%v, num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d(grid%xa % t, iv%bogus(n)%loc, &
-         y%bogus(n)%t, num_levs, iv%bogus(n)%zk, num_levs)
-      call da_interp_lin_3d(grid%xa % q, iv%bogus(n)%loc, &
-         y%bogus(n)%q, num_levs, iv%bogus(n)%zk, num_levs) 
    end do
+
+   allocate (u(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (v(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (t(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   allocate (q(iv%info(bogus)%max_lev,iv%info(bogus)%n1:iv%info(bogus)%n2))
+   u(:,:)=0.0
+   v(:,:)=0.0
+   t(:,:)=0.0
+   q(:,:)=0.0
+  
+   call da_interp_lin_3d (grid%xa%u, iv%info(bogus), u)
+   call da_interp_lin_3d (grid%xa%v, iv%info(bogus), v)
+   call da_interp_lin_3d (grid%xa%t, iv%info(bogus), t)
+   call da_interp_lin_3d (grid%xa%q, iv%info(bogus), q)
+
+   do n=iv%info(bogus)%n1,iv%info(bogus)%n2
+      y%bogus(n)%u(:) = u(1:size(y%bogus(n)%u),n)
+      y%bogus(n)%v(:) = v(1:size(y%bogus(n)%v),n)
+      y%bogus(n)%t(:) = t(1:size(y%bogus(n)%t),n)
+      y%bogus(n)%q(:) = q(1:size(y%bogus(n)%q),n)
+   end do
+
+   deallocate (u)
+   deallocate (v)
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_bogus") 
 

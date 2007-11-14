@@ -14,16 +14,16 @@ subroutine da_check_xtoy_adjoint_profiler(iv, y, adjtest_lhs, pertile_lhs)
    
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_profiler")
 
-   do n=1, iv%nlocal(profiler)
-      if (iv%profiler(n)%loc%proc_domain) then
-         do k=1, iv%profiler(n)%info%levels
+   do n=1, iv%info(profiler)%nlocal
+      if (iv%info(profiler)%proc_domain(1,n)) then
+         do k=1, iv%info(profiler)%levels(n)
             adjtest_lhs = adjtest_lhs &
               + (y%profiler(n)%u(k)/typical_u_rms)**2 + (y%profiler(n)%v(k)/typical_v_rms)**2
 
          end do
       end if
 
-      do k=1, iv%profiler(n)%info%levels
+      do k=1, iv%info(profiler)%levels(n)
          pertile_lhs = pertile_lhs &
             + (y%profiler(n)%u(k)/typical_u_rms)**2 + (y%profiler(n)%v(k)/typical_v_rms)**2
 

@@ -14,7 +14,7 @@ subroutine da_calculate_grady_pseudo(iv, re, jo_grad_y)
    
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_pseudo")
 
-   do n=1, iv%nlocal(pseudo)
+   do n=1, iv%info(pseudo)%nlocal
       if (iv%pseudo(n)%u%qc < obs_qc_pointer) re%pseudo(n)%u = 0.0
       if (iv%pseudo(n)%v%qc < obs_qc_pointer) re%pseudo(n)%v = 0.0
       if (iv%pseudo(n)%t%qc < obs_qc_pointer) re%pseudo(n)%t = 0.0

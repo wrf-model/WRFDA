@@ -22,7 +22,7 @@ subroutine da_residual_gpspw(iv, y, re, np_missing, np_bad_data, np_obs_used, np
 
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(gpspw)
+   do n=1, iv%info(gpspw)%nlocal
       np_available = np_available + 1
       re%gpspw(n)%tpw = da_residual(n, 0, y%gpspw(n)%tpw, iv%gpspw(n)%tpw, n_obs_bad % q)
    end do

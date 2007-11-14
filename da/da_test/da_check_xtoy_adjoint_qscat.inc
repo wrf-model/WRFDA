@@ -14,8 +14,8 @@ subroutine da_check_xtoy_adjoint_qscat(iv, y, adjtest_lhs, pertile_lhs)
    
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_qscat")
 
-   do n=1, iv%nlocal(qscat)
-      if (iv%qscat(n)%loc%proc_domain) then
+   do n=1, iv%info(qscat)%nlocal
+      if (iv%info(qscat)%proc_domain(1,n)) then
          adjtest_lhs = adjtest_lhs + (y%qscat(n)%u/typical_u_rms)**2 + (y%qscat(n)%v/typical_v_rms)**2
       end if
 

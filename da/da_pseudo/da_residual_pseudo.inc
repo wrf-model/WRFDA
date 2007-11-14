@@ -26,8 +26,8 @@ subroutine da_residual_pseudo(iv, y, re, np_missing, np_bad_data, np_obs_used, n
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(pseudo)
-      if (iv%pseudo(n)%loc%proc_domain) then
+   do n=1, iv%info(pseudo)%nlocal
+      if (iv%info(pseudo)%proc_domain(1,n)) then
          np_available = np_available + 5
          re%pseudo(n)%u = da_residual(n, 0, y%pseudo(n)%u, iv%pseudo(n)%u, n_obs_bad % u)
          re%pseudo(n)%v = da_residual(n, 0, y%pseudo(n)%v, iv%pseudo(n)%v, n_obs_bad % v)

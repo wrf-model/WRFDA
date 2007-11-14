@@ -22,8 +22,8 @@ subroutine da_residual_gpsref(iv, y, re, np_missing, np_bad_data, np_obs_used, n
 
    n_obs_bad % gpsref % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(gpsref)
-      do k=1, iv%gpsref(n)%info%levels
+   do n=1, iv%info(gpsref)%nlocal
+      do k=1, iv%info(gpsref)%levels(n)
          np_available = np_available + 1
          re%gpsref(n)%ref(k) = &
             da_residual(n, k, y%gpsref(n)%ref(k), iv%gpsref(n)%ref(k), n_obs_bad%gpsref)

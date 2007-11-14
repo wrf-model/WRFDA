@@ -1,4 +1,4 @@
-subroutine da_to_zk_new(obs_v, mdl_v, v_interp_optn, zk,num,nlevels)
+subroutine da_to_zk_new(obs_v, mdl_v, v_interp_optn, num,nlevels,zk)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,12 +6,12 @@ subroutine da_to_zk_new(obs_v, mdl_v, v_interp_optn, zk,num,nlevels)
 
    implicit none
 
-   integer,          intent(in)  :: v_interp_optn
    real,             intent(in)  :: obs_v(nlevels)
    real,             intent(in)  :: mdl_v(kms:kme,num)
-   real,             intent(out) :: zk(nlevels,num)
+   integer,          intent(in)  :: v_interp_optn
    integer,          intent(in)  :: num
    integer,          intent(in)  :: nlevels
+   real,             intent(out) :: zk(nlevels,num)
 
    integer                :: k,n,kk
    real    :: r_ktsplus, r_kteminus

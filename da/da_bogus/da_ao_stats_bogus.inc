@@ -36,14 +36,14 @@ subroutine da_ao_stats_bogus (stats_unit, iv, re)
    stats%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(bogus)
-      if (iv%bogus(n)%loc%proc_domain) then
+   do n=1, iv%info(bogus)%nlocal
+      if (iv%info(bogus)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%bogus(n)%slp%qc,  &
             re%bogus(n)%slp, nslp,     &
             stats%minimum%slp, stats%maximum%slp,  &
             stats%average%slp, stats%rms_err%slp)
 
-         do k=1, iv%bogus(n)%info%levels
+         do k=1, iv%info(bogus)%levels(n)
             call da_stats_calculate (n, k, iv%bogus(n)%u(k)%qc, & 
                re%bogus(n)%u(k), nu, &
                stats%minimum%u, stats%maximum%u, &

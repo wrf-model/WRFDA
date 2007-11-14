@@ -14,14 +14,14 @@ subroutine da_calculate_grady_bogus(iv, re, jo_grad_y)
    
    if (trace_use_dull) call da_trace_entry("da_calculate_grady_bogus")
 
-   do n=1, iv%nlocal(bogus)
+   do n=1, iv%info(bogus)%nlocal
       if (iv%bogus(n)%slp%qc < obs_qc_pointer) then
          re%bogus(n)%slp = 0.0
       end if
 
       jo_grad_y%bogus(n)%slp = -re%bogus(n)%slp / (iv%bogus(n)%slp%error * iv%bogus(n)%slp%error)
 
-      do k=1, iv%bogus(n)%info%levels
+      do k=1, iv%info(bogus)%levels(n)
          if (iv%bogus(n)%u(k)%qc < obs_qc_pointer) re%bogus(n)%u(k) = 0.0
          if (iv%bogus(n)%v(k)%qc < obs_qc_pointer) re%bogus(n)%v(k) = 0.0
          if (iv%bogus(n)%t(k)%qc < obs_qc_pointer) re%bogus(n)%t(k) = 0.0

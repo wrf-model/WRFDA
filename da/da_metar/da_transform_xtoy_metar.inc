@@ -10,26 +10,45 @@ subroutine da_transform_xtoy_metar (grid, iv, y)
    type (iv_type), intent(in)    :: iv       ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
-   integer                      :: n        ! Loop counter.
+   integer                      :: n   ! Loop counter.
+
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_t(:,:)
+   real, allocatable :: model_q(:,:)
+   real, allocatable :: model_p(:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_metar")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%plocal(iv%time-1,metar) + 1, iv%plocal(iv%time,metar)
+      allocate (model_u(1,iv%info(metar)%n1:iv%info(metar)%n2))
+      allocate (model_v(1,iv%info(metar)%n1:iv%info(metar)%n2))
+      allocate (model_t(1,iv%info(metar)%n1:iv%info(metar)%n2))
+      allocate (model_q(1,iv%info(metar)%n1:iv%info(metar)%n2))
+      allocate (model_p(iv%info(metar)%n1:iv%info(metar)%n2))
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d (grid%xa%u, iv%info(metar),model_u)
+      call da_interp_lin_3d (grid%xa%v, iv%info(metar),model_v)
+      call da_interp_lin_3d (grid%xa%t, iv%info(metar),model_t)
+      call da_interp_lin_3d (grid%xa%q, iv%info(metar),model_q)
 
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d(grid%xa % u, iv%metar(n)%loc, y%metar(n)%u, iv%metar(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % v, iv%metar(n)%loc, y%metar(n)%v, iv%metar(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % t, iv%metar(n)%loc, y%metar(n)%t, iv%metar(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % q, iv%metar(n)%loc, y%metar(n)%q, iv%metar(n)%zk)
+      call da_interp_lin_2d (grid%xa%psfc, iv%info(metar), 1, model_p)
 
-         call da_interp_lin_2d(grid%xa % psfc, iv%metar(n)%loc, y%metar(n)%p)
+      do n=iv%info(metar)%n1,iv%info(metar)%n2
+         y%metar(n)%u = model_u(1,n)
+         y%metar(n)%v = model_v(1,n)
+         y%metar(n)%t = model_t(1,n)
+         y%metar(n)%q = model_q(1,n)
+         y%metar(n)%p = model_p(n)
       end do
+      deallocate (model_u)
+      deallocate (model_v)
+      deallocate (model_t)
+      deallocate (model_q)
+      deallocate (model_p)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      ! [2.0] Surface assimilation approach 2
-      do n=iv%plocal(iv%time-1,metar) + 1, iv%plocal(iv%time,metar)
-         call da_transform_xtopsfc(grid,iv%metar(n),y%metar(n))
-      end do
+      ! [2.0] Surface assmiilation approach 2
+      call da_transform_xtopsfc(grid,iv,metar,iv%metar(:),y%metar(:))
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_metar")

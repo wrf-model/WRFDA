@@ -35,35 +35,35 @@ subroutine da_oi_stats_sonde_sfc (stats_unit, iv)
    stats%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(sound)
-      if (iv%sonde_sfc(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%sonde_sfc(n)%loc%obs_global_index, &
+   do n=1, iv%info(sound)%nlocal
+      if (iv%info(sonde_sfc)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(sonde_sfc)%obs_global_index(n), &
             0, iv%sonde_sfc(n)%u%qc, &
             iv%sonde_sfc(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(iv%sonde_sfc(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(sonde_sfc)%obs_global_index(n), &
             0, iv%sonde_sfc(n)%v%qc, &
             iv%sonde_sfc(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(iv%sonde_sfc(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(sonde_sfc)%obs_global_index(n), &
             0, iv%sonde_sfc(n)%t%qc, &
             iv%sonde_sfc(n)%t%inv, nt, &
             stats%minimum%t, stats%maximum%t, &
             stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(iv%sonde_sfc(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(sonde_sfc)%obs_global_index(n), &
             0, iv%sonde_sfc(n)%p%qc, &
             iv%sonde_sfc(n)%p%inv, np, &
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
 
-         call da_stats_calculate(iv%sonde_sfc(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(sonde_sfc)%obs_global_index(n), &
             0, iv%sonde_sfc(n)%q%qc, &
             iv%sonde_sfc(n)%q%inv, nq, &
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%sonde_sfc(n)%loc%proc_domain)
+      end if    ! end if (iv%info(sonde_sfc)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

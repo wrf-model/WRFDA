@@ -35,34 +35,34 @@ subroutine da_oi_stats_buoy (stats_unit, iv)
    stats%average = residual_buoy1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(buoy)
-      if (iv%buoy(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+   do n=1, iv%info(buoy)%nlocal
+      if (iv%info(buoy)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
             0, iv%buoy(n)%u%qc, &
             iv%buoy(n)%u%inv, nu, &
             stats%minimum%u, stats%maximum%u, &
             stats%average%u, stats%rms_err%u)
-         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
             0, iv%buoy(n)%v%qc, &
             iv%buoy(n)%v%inv, nv, &
             stats%minimum%v, stats%maximum%v, &
             stats%average%v, stats%rms_err%v)
-         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
              0, iv%buoy(n)%t%qc, &
              iv%buoy(n)%t%inv, nt, &
              stats%minimum%t, stats%maximum%t, &
              stats%average%t, stats%rms_err%t)
-         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
             0, iv%buoy(n)%p%qc, &
             iv%buoy(n)%p%inv, np, &
             stats%minimum%p, stats%maximum%p, &
             stats%average%p, stats%rms_err%p)
-         call da_stats_calculate(iv%buoy(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(buoy)%obs_global_index(n), &
              0, iv%buoy(n)%q%qc, &
              iv%buoy(n)%q%inv, nq, &
              stats%minimum%q, stats%maximum%q, &
              stats%average%q, stats%rms_err%q)
-      end if    ! end if (iv%buoy(n)%loc%proc_domain)
+      end if    ! end if (iv%info(buoy)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

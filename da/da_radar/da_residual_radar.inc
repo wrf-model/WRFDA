@@ -23,8 +23,8 @@ subroutine da_residual_radar(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % rv % num = number_type(0, 0, 0)
    n_obs_bad % rf % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(radar)
-      do k=1, iv%radar(n)%info%levels
+   do n=1, iv%info(radar)%nlocal
+      do k=1, iv%info(radar)%levels(n)
          if (use_radar_rv) then
             np_available = np_available + 1
             re%radar(n)%rv(k) = da_residual(n, k, y%radar(n)%rv(k), iv%radar(n)%rv(k), n_obs_bad % rv)

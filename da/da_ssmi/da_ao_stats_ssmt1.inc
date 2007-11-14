@@ -25,14 +25,14 @@ subroutine da_ao_stats_ssmt1 (stats_unit, iv, re)
    average = 0.0
    rms_err = 0.0
 
-   if (iv%nlocal(ssmt1) > 0) then
-      do n=1, iv%nlocal(ssmt1)
-         if (iv%ssmt1(n)%loc%proc_domain) then
-            do k=1, iv%ssmt1(n)%info%levels
+   if (iv%info(ssmt1)%nlocal > 0) then
+      do n=1, iv%info(ssmt1)%nlocal
+         if (iv%info(ssmt1)%proc_domain(1,n)) then
+            do k=1, iv%info(ssmt1)%levels(n)
                call da_stats_calculate (n, k, iv%ssmt1(n)%t(k)%qc, re%ssmt1(n)%t(k), nt, &
                   minimum, maximum, average, rms_err)
             end do
-         end if    ! end if (iv%ssmt1(n)%loc%proc_domain)
+         end if    ! end if (iv%info(ssmt1)%proc_domain(1,n))
       end do
    end if
 

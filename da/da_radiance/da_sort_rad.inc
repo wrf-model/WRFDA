@@ -8,42 +8,58 @@ subroutine da_sort_rad (iv)
 
    type (iv_type), intent (inout) :: iv
 
-   integer                   :: i,j, n,t, error
-   type(info_type), pointer  :: info(:)
-   integer, allocatable      :: ifgat(:),landsea_mask(:)
-   integer, allocatable      :: loc_i(:), loc_j(:),loc_k(:,:)
-   real, allocatable         :: loc_dx(:),loc_dy(:),loc_dz(:,:)
-   real, allocatable         :: loc_dxm(:),loc_dym(:),loc_dzm(:,:)
-   real, allocatable         :: scanpos(:), satzen(:), satazi(:), solzen(:)
-   real, allocatable         :: tb_inv(:,:)
+   integer                           :: i,j, n,t, error
+   integer, allocatable              :: ifgat(:),landsea_mask(:)
+   integer, allocatable              :: loc_i(:,:), loc_j(:,:),loc_k(:,:)
+   real, allocatable                 :: loc_dx(:,:),loc_dy(:,:),loc_dz(:,:)
+   real, allocatable                 :: loc_dxm(:,:),loc_dym(:,:),loc_dzm(:,:)
+   character (len = 40), allocatable :: name(:)       
+   character (len = 12), allocatable :: platform(:)   
+   character (len =  5), allocatable :: id(:)          
+   character (len = 19), allocatable :: date_char(:)   
+   integer, allocatable              :: levels(:)      
+   real, allocatable                 :: lat(:,:)         
+   real, allocatable                 :: lon(:,:)         
+   real, allocatable                 :: elv(:)        
+   real, allocatable                 :: pstar(:)      
+   real, allocatable                 :: scanpos(:), satzen(:), satazi(:), solzen(:)
+   real, allocatable                 :: tb_inv(:,:)
 
    if (trace_use) call da_trace_entry("da_sort_rad")
 
    if (num_fgat_time == 1) then
       do i=1,rtminit_nsensor
-         iv%plocal_rad(:,i) = 0
-         iv%plocal_rad(num_fgat_time,i) = iv%instid(i)%num_rad
+         iv%instid(i)%info%plocal(:) = 0
+         iv%instid(i)%info%plocal(num_fgat_time) = iv%instid(i)%num_rad
       end do
       if (trace_use) call da_trace_exit("da_sort_rad")
       return
    end if
 
    do i=1,rtminit_nsensor
-      iv%plocal_rad(:,i) = 0
+      iv%instid(i)%info%plocal(:) = 0
       if (iv%instid(i)%num_rad < 1) cycle
 
-      allocate (info        (iv%instid(i)%num_rad))
       allocate (ifgat       (iv%instid(i)%num_rad)) 
       allocate (landsea_mask(iv%instid(i)%num_rad))
-      allocate (loc_i       (iv%instid(i)%num_rad))
-      allocate (loc_j       (iv%instid(i)%num_rad))
+      allocate (loc_i       (max_ob_levels, iv%instid(i)%num_rad))
+      allocate (loc_j       (max_ob_levels, iv%instid(i)%num_rad))
       allocate (loc_k       (iv%instid(i)%nchan,iv%instid(i)%num_rad))
-      allocate (loc_dx      (iv%instid(i)%num_rad))
-      allocate (loc_dy      (iv%instid(i)%num_rad))
+      allocate (loc_dx      (max_ob_levels, iv%instid(i)%num_rad))
+      allocate (loc_dy      (max_ob_levels, iv%instid(i)%num_rad))
       allocate (loc_dz      (iv%instid(i)%nchan,iv%instid(i)%num_rad))
-      allocate (loc_dxm     (iv%instid(i)%num_rad))
-      allocate (loc_dym     (iv%instid(i)%num_rad))
+      allocate (loc_dxm     (max_ob_levels, iv%instid(i)%num_rad))
+      allocate (loc_dym     (max_ob_levels, iv%instid(i)%num_rad))
       allocate (loc_dzm     (iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      allocate (name        (iv%instid(i)%num_rad))
+      allocate (platform    (iv%instid(i)%num_rad))
+      allocate (id          (iv%instid(i)%num_rad))
+      allocate (date_char   (iv%instid(i)%num_rad))
+      allocate (levels      (iv%instid(i)%num_rad))
+      allocate (lat         (iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      allocate (lon         (iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      allocate (elv         (iv%instid(i)%num_rad))
+      allocate (pstar       (iv%instid(i)%num_rad))
       allocate (scanpos     (iv%instid(i)%num_rad))
       allocate (satzen      (iv%instid(i)%num_rad))
       allocate (satazi      (iv%instid(i)%num_rad))
@@ -56,16 +72,26 @@ subroutine da_sort_rad (iv)
             if (iv%instid(i)%ifgat(n) /= t) cycle
             j = j + 1
             ifgat(j)        = iv%instid(i)%ifgat(n)
-            info(j)         = iv%instid(i)%info(n)
-            loc_i(j)        = iv%instid(i)%loc_i(n)
-            loc_j(j)        = iv%instid(i)%loc_j(n)
-            loc_k(:,j)      = iv%instid(i)%loc_k(:,n)
-            loc_dx(j)       = iv%instid(i)%loc_dx(n)
-            loc_dy(j)       = iv%instid(i)%loc_dy(n)
-            loc_dz(:,j)     = iv%instid(i)%loc_dz(:,n)
-            loc_dxm(j)      = iv%instid(i)%loc_dxm(n)
-            loc_dym(j)      = iv%instid(i)%loc_dym(n)
-            loc_dzm(:,j)    = iv%instid(i)%loc_dzm(:,n)
+            name(j)         = iv%instid(i)%info%name(n)
+            platform(j)     = iv%instid(i)%info%platform(n)
+            id(j)           = iv%instid(i)%info%id(n)
+            date_char(j)    = iv%instid(i)%info%date_char(n)
+            levels(j)       = iv%instid(i)%info%levels(n)
+            elv(j)          = iv%instid(i)%info%elv(n)
+            pstar(j)        = iv%instid(i)%info%pstar(n)
+
+            lat    (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%lat(:,n)
+            lon    (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%lon(:,n)
+            loc_i  (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%i(:,n)
+            loc_j  (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%j(:,n)
+            loc_k  (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%k(:,n)
+            loc_dx (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dx(:,n)
+            loc_dy (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dy(:,n)
+            loc_dxm(1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dxm(:,n)
+            loc_dym(1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dym(:,n)
+            loc_dz (1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dz(:,n)
+            loc_dzm(1:iv%instid(i)%info%levels(n),j) = iv%instid(i)%info%dzm(:,n)
+
             landsea_mask(j) = iv%instid(i)%landsea_mask(n)
             scanpos(j)      = iv%instid(i)%scanpos(n)
             satzen(j)       = iv%instid(i)%satzen(n)
@@ -74,37 +100,55 @@ subroutine da_sort_rad (iv)
 
             tb_inv(1:iv%instid(i)%nchan,j) = iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) 
          end do
-         iv%plocal_rad(t,i) = j
+         iv%instid(i)%info%plocal(t) = j
+write (0,*) __FILE__,__LINE__,"i,t,iv%instid(i)%info%plocal(t)",i,t,iv%instid(i)%info%plocal(t)
       end do
 
       write(unit=stdout,fmt='(a,2x,a,2x,10i7)') &
-         ' FGAT: ',iv%instid(i)%rttovid_string, iv%plocal_rad(1:num_fgat_time,i)
+         ' FGAT: ',iv%instid(i)%rttovid_string, iv%info(i)%plocal(1:num_fgat_time)
 
       do n = 1,iv%instid(i)%num_rad
          iv%instid(i)%ifgat(n)        = ifgat(n)
-         iv%instid(i)%info(n)         = info(n)
-         iv%instid(i)%loc_i(j)        = loc_i(n)
-         iv%instid(i)%loc_j(j)        = loc_j(n)
-         iv%instid(i)%loc_k(:,j)      = loc_k(:,n)
-         iv%instid(i)%loc_dx(j)       = loc_dx(n)
-         iv%instid(i)%loc_dy(j)       = loc_dy(n)
-         iv%instid(i)%loc_dz(:,j)     = loc_dz(:,n)
-         iv%instid(i)%loc_dxm(j)      = loc_dxm(n)
-         iv%instid(i)%loc_dym(j)      = loc_dym(n)
-         iv%instid(i)%loc_dzm(:,j)    = loc_dzm(:,n)
+
+         iv%instid(i)%info%name(n)	    = name(n)
+         iv%instid(i)%info%platform(n)  = platform(n)
+         iv%instid(i)%info%id(n) 	    = id(n)
+         iv%instid(i)%info%date_char(n) = date_char(n)
+         iv%instid(i)%info%levels(n)    = levels(n)
+         iv%instid(i)%info%lat(:,n)     = lat(:,n)
+         iv%instid(i)%info%lon(:,n)     = lon(:,n)
+         iv%instid(i)%info%elv(n)	    = elv(n)
+         iv%instid(i)%info%pstar(n)     = pstar(n)
+
+         iv%instid(i)%info%i(:,j)    = loc_i(:,n)
+         iv%instid(i)%info%j(:,j)    = loc_j(:,n)
+         iv%instid(i)%info%k(:,j)    = loc_k(:,n)
+         iv%instid(i)%info%dx(:,j)   = loc_dx(:,n)
+         iv%instid(i)%info%dy(:,j)   = loc_dy(:,n)
+         iv%instid(i)%info%dz(:,j)   = loc_dz(:,n)
+         iv%instid(i)%info%dxm(:,j)  = loc_dxm(:,n)
+         iv%instid(i)%info%dym(:,j)  = loc_dym(:,n)
+         iv%instid(i)%info%dzm(:,j)  = loc_dzm(:,n)
          iv%instid(i)%landsea_mask(n) = landsea_mask(n)
          iv%instid(i)%scanpos(n)      = scanpos(n)
          iv%instid(i)%satzen(n)       = satzen(n)
          iv%instid(i)%satazi(n)       = satazi(n)
          iv%instid(i)%solzen(n)       = solzen(n)
 
-         iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) = &
-                        tb_inv(1:iv%instid(i)%nchan,n)
+         iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) = tb_inv(1:iv%instid(i)%nchan,n)
       end do
 
-      deallocate (info)
       deallocate (ifgat) 
       deallocate (landsea_mask)
+      deallocate (name)
+      deallocate (platform)
+      deallocate (id)
+      deallocate (date_char)
+      deallocate (levels)
+      deallocate (lat)
+      deallocate (lon)
+      deallocate (elv)
+      deallocate (pstar)
       deallocate (loc_i)
       deallocate (loc_j)
       deallocate (loc_k)

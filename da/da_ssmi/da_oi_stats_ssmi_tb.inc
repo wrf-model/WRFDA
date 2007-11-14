@@ -41,39 +41,39 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, iv)
    stats%average = residual_ssmi_tb_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(ssmi_tb)
-      if (iv%ssmi_tb(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+   do n=1, iv%info(ssmi_tb)%nlocal
+      if (iv%info(ssmi_tb)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb19v%qc, & 
             iv%ssmi_tb(n)%tb19v%inv, ntb19v, &
             stats%minimum%tb19v, stats%maximum%tb19v,&
             stats%average%tb19v, stats%rms_err%tb19v)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb19h%qc, & 
             iv%ssmi_tb(n)%tb19h%inv, ntb19h, &
             stats%minimum%tb19h, stats%maximum%tb19h,&
             stats%average%tb19h, stats%rms_err%tb19h)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb22v%qc, & 
             iv%ssmi_tb(n)%tb22v%inv, ntb22v, &
             stats%minimum%tb22v, stats%maximum%tb22v,&
             stats%average%tb22v, stats%rms_err%tb22v)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb37v%qc, & 
             iv%ssmi_tb(n)%tb37v%inv, ntb37v, &
             stats%minimum%tb37v, stats%maximum%tb37v,&
             stats%average%tb37v, stats%rms_err%tb37v)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb37h%qc, & 
             iv%ssmi_tb(n)%tb37h%inv, ntb37h, &
             stats%minimum%tb37h, stats%maximum%tb37h,&
             stats%average%tb37h, stats%rms_err%tb37h)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb85v%qc, & 
             iv%ssmi_tb(n)%tb85v%inv, ntb85v, &
             stats%minimum%tb85v, stats%maximum%tb85v,&
             stats%average%tb85v, stats%rms_err%tb85v)
-         call da_stats_calculate(iv%ssmi_tb(n)%loc%obs_global_index, &
+         call da_stats_calculate(iv%info(ssmi_tb)%obs_global_index(n), &
             0, iv%ssmi_tb(n)%tb85h%qc, & 
             iv%ssmi_tb(n)%tb85h%inv, ntb85h, &
             stats%minimum%tb85h, stats%maximum%tb85h,&

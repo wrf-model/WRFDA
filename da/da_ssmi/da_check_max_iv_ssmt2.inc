@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
+subroutine da_check_max_iv_ssmt2(iv, it, irh,irhf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
 
    implicit none
 
+   type(iv_type), intent(inout) :: iv
    integer,           intent(in)    :: it     ! outer iteration
    integer,           intent(inout) :: irh, irhf
-   type (ssmt2_type), intent(inout) :: ssmt2
 
-   integer :: k
+   integer :: k,n
    logical :: failed
 
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_ssmt2")
@@ -34,10 +34,12 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
 
    failed = .false.
 
-   do k = 1, ssmt2 % info % levels
-      ! Temperature
-      call da_max_error_qc (it, ssmt2 % info, ssmt2 % rh(k),&
-         max_error_t, irh, irhf, check_max_iv_unit, 'RH  ', failed, check_max_iv_print)
+   do n=iv%info(ssmt2)%n1,iv%info(ssmt2)%n2
+      do k = 1, iv%info(ssmt2)%levels(n)
+         ! Temperature
+         call da_max_error_qc (it, iv%info(ssmt2), n, iv%ssmt2(n)%rh(k),&
+            max_error_t, irh, irhf, check_max_iv_unit, 'RH  ', failed, check_max_iv_print)
+      end do
    end do
 
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_ssmt2")

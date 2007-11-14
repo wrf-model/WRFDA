@@ -13,10 +13,9 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
 
    integer :: n        ! Loop counter.
    integer :: i, j, k  ! Index dimension.
-   integer :: num_levs ! Number of obs levels.
    real    :: dx, dxm  ! Interpolation weights.
    real    :: dy, dym  ! Interpolation weights.
-   real    :: model_ref(1:max_ob_levels) !Model gpsref at ob loc
+   real,allocatable :: model_ref(:,:) !Model gpsref at ob loc
    real    :: v_h(kms:kme)     ! Model value h at ob
                                                ! hor. location.
    integer :: pref, fref
@@ -30,7 +29,7 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
    ! real   , parameter :: pcnt1 = 0.02, pcnt2 = 0.01, pcnt3 = 0.03
    integer, parameter :: qc_below = -31, qc_middle = -32, qc_above = -33
 
-   integer :: nn, n1, ntotal, nqc0, nqc1, nqc2, nqc3
+   integer :: nn, na, ntotal, nqc0, nqc1, nqc2, nqc3
    real    :: percnt
    real    :: height_below(5000)
    character(len=40) :: name_qc(5000)
@@ -42,10 +41,9 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
    if (pseudo_var(1:3) == 'ref' .and. num_pseudo > 0) then
 
       ! Deallocate:
-      if (iv%nlocal(gpsref) > 0) then
-         do n = 1, iv%nlocal(gpsref)
+      if (iv%info(gpsref)%nlocal > 0) then
+         do n = 1, iv%info(gpsref)%nlocal
             deallocate(iv % gpsref(n) %  h)
-            deallocate(iv % gpsref(n) %  zk)
             deallocate(iv % gpsref(n) % ref)
             deallocate(iv % gpsref(n) %   p)
             deallocate(iv % gpsref(n) %   t)
@@ -59,45 +57,44 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
       use_gpsrefobs = .true.
 
       ! Allocate:
-      iv%nlocal(gpsref) = num_pseudo
-      iv%plocal(1,gpsref) = num_pseudo
-      iv%nlocal(pseudo) = 0
+      iv%info(gpsref)%nlocal = num_pseudo
+      iv%info(gpsref)%plocal(1) = num_pseudo
+      iv%info(pseudo)%nlocal = 0
 
       allocate(iv % gpsref(1:num_pseudo))
-      allocate(iv%gpsref(num_pseudo)%zk(1:1))
       allocate(iv%gpsref(num_pseudo)%ref(1:1))
       allocate(ob%gpsref(1:num_pseudo))
       allocate(ob%gpsref(num_pseudo)%ref(1:1))
 
       write(stdout,'(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
 
-      iv%gpsref(1)%info%levels = 1
+      iv%info(gpsref)%levels(1) = 1
 
-      iv % gpsref(1)%loc%x = pseudo_x
-      iv % gpsref(1)%loc%y = pseudo_y
+      iv%info(gpsref)%x(:,1) = pseudo_x
+      iv%info(gpsref)%y(:,1) = pseudo_y
 
-      iv%gpsref(1)%loc%i = int(pseudo_x)
-      iv%gpsref(1)%loc%j = int(pseudo_y)
+      iv%info(gpsref)%i(:,1) = int(pseudo_x)
+      iv%info(gpsref)%j(:,1) = int(pseudo_y)
 
-      iv%gpsref(1)%loc%dx = pseudo_x-real(iv%gpsref(1)%loc%i)
-      iv%gpsref(1)%loc%dy = pseudo_y-real(iv%gpsref(1)%loc%j)
-      iv%gpsref(1)%loc%dxm=1.0-iv%gpsref(1)%loc%dx
-      iv%gpsref(1)%loc%dym=1.0-iv%gpsref(1)%loc%dy
+      iv%info(gpsref)%dx(:,1) = pseudo_x-real(iv%info(gpsref)%i(1,1))
+      iv%info(gpsref)%dy(:,1) = pseudo_y-real(iv%info(gpsref)%j(1,1))
+      iv%info(gpsref)%dxm(:,1)=1.0-iv%info(gpsref)%dx(1,1)
+      iv%info(gpsref)%dym(:,1)=1.0-iv%info(gpsref)%dy(1,1)
 
       iv % gpsref(1) %ref(1) % inv = pseudo_val
       iv % gpsref(1) %ref(1) % error = pseudo_err
       iv % gpsref(1) %ref(1) % qc = 0
 
       ! Set halo:
-      if ((iv%gpsref(1)%loc%i < its-1) .or.(iv%gpsref(1)%loc%i > ite) .or. &
-          (iv%gpsref(1)%loc%j < jts-1) .or.(iv%gpsref(1)%loc%j > jte)) then
-         iv%gpsref(1)%loc%proc_domain = .false.
+      if ((iv%info(gpsref)%i(1,1) < its-1) .or.(iv%info(gpsref)%i(1,1) > ite) .or. &
+          (iv%info(gpsref)%j(1,1) < jts-1) .or.(iv%info(gpsref)%j(1,1) > jte)) then
+         iv%info(gpsref)%proc_domain(:,1) = .false.
       else
-         iv%gpsref(1)%loc%proc_domain = .false. 
+         iv%info(gpsref)%proc_domain(:,1) = .false. 
 
-         if (iv%gpsref(1)%loc%i >= its .and. iv%gpsref(1)%loc%i <= ite .and. & 
-             iv%gpsref(1)%loc%j >= jts .and. iv%gpsref(1)%loc%j <= jte) then 
-            iv%gpsref(1)%loc%proc_domain = .true. 
+         if (iv%info(gpsref)%i(1,1) >= its .and. iv%info(gpsref)%i(1,1) <= ite .and. & 
+             iv%info(gpsref)%j(1,1) >= jts .and. iv%info(gpsref)%j(1,1) <= jte) then 
+            iv%info(gpsref)%proc_domain(:,1) = .true. 
          end if 
       end if
 
@@ -105,79 +102,82 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
       write(stdout,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
    end if
 
-   if (iv%nlocal(gpsref) < 1) return
+   if (iv%info(gpsref)%nlocal < 1) return
 
    ntotal = 0
    pref = 0 ; fref = 0
 
-   do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
-      num_levs = iv%gpsref(n)%info%levels
+   allocate (model_ref(iv%info(gpsref)%max_lev,iv%info(gpsref)%n1:iv%info(gpsref)%n2))
 
-      if (num_levs < 1) cycle
+   model_ref(:,:) = 0.0
 
-      model_ref(:) = 0.0
+   do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
 
       ! Get cross pt. horizontal interpolation weights:
 
-      i = iv%gpsref(n)%loc%i
-      j = iv%gpsref(n)%loc%j
-      dx = iv%gpsref(n)%loc%dx
-      dy = iv%gpsref(n)%loc%dy
-      dxm = iv%gpsref(n)%loc%dxm
-      dym = iv%gpsref(n)%loc%dym
+      i   = iv%info(gpsref)%i(1,n)
+      j   = iv%info(gpsref)%j(1,n)
+      dx  = iv%info(gpsref)%dx(1,n)
+      dy  = iv%info(gpsref)%dy(1,n)
+      dxm = iv%info(gpsref)%dxm(1,n)
+      dym = iv%info(gpsref)%dym(1,n)
 
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
 
-         ! Get the gpsref%zk from gpsref%h:
+         ! Get the zk from gpsref%h:
 
          do k=kts,kte
             v_h(k) = dym*(dxm*grid%xb%h(i,j  ,k) + dx*grid%xb%h(i+1,j  ,k)) &
                    + dy *(dxm*grid%xb%h(i,j+1,k) + dx*grid%xb%h(i+1,j+1,k))
          end do
-         do k=1, num_levs
-            iv%gpsref(n)%zk(k)=missing_r
+         do k=1, iv%info(gpsref)%levels(n)
             if (iv%gpsref(n)%h(k) > 0.0) &
-               call da_to_zk(iv%gpsref(n)%h(k), v_h, v_interp_h, iv%gpsref(n)%zk(k))
-            if (iv%gpsref(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
+               call da_to_zk(iv%gpsref(n)%h(k), v_h, v_interp_h, iv%info(gpsref)%zk(k,n))
+            if (iv%info(gpsref)%zk(k,n) < 0.0 .and. .not. anal_type_verify) then
                iv%gpsref(n)%ref(k)%qc = missing
             end if
          end do
       else
-         iv % gpsref(1)%zk(1) = pseudo_z
+         iv%info(gpsref)%zk(:,n) = pseudo_z
       end if
+   end do
 
-      call da_interp_lin_3d(grid%xb%ref, iv%gpsref(n)%loc, model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
+   call da_convert_zk (iv%info(gpsref))
 
+   call da_interp_lin_3d (grid%xb%ref, iv%info(gpsref), model_ref)
+
+   do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
-         do k = 1, num_levs
+         do k = 1, iv%info(gpsref)%levels(n)
             iv%gpsref(n)%ref(k)%inv = 0.0
 
             if (ob%gpsref(n)%ref(k) > missing_r .AND. &
                  iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
-                 iv%gpsref(n)%ref(k)%inv = ob%gpsref(n)%ref(k) - model_ref(k)
+                 iv%gpsref(n)%ref(k)%inv = ob%gpsref(n)%ref(k) - model_ref(k,n)
             end if
          end do
       else
-         ob % gpsref(1)%ref(1) = model_ref(1) + iv %gpsref(1)%ref(1)%inv 
+         ob % gpsref(1)%ref(1) = model_ref(1,n) + iv %gpsref(1)%ref(1)%inv 
       end if
+   end do
 
-      ! Quality check 1: Gross error(departure from the background) check 
+   ! Quality check 1: Gross error(departure from the background) check 
 
-      if (check_max_iv) &
-         call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref)
+   if (check_max_iv) call da_check_max_iv_gpsref(iv, it, pref, fref)
 
+   do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
       ! Quality check 2: Error percentage check.
 
       if (.not. anal_type_verify) then
          if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
-            do k=1, num_levs
+            do k=1, iv%info(gpsref)%levels(n)
 
                ! incremetal refractivity or the relative error:
                !   abs[(O-B)/{(O+B)/2}]              (Lidia Cucurull 2005)
 
                ntotal = ntotal + 1
                percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / &
-                 (ob%gpsref(n)%ref(k) + model_ref(k)))
+                 (ob%gpsref(n)%ref(k) + model_ref(k,n)))
 
                if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
 
@@ -204,12 +204,12 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
          height_below = 0.0
          name_qc      = '                                       '
 
-         do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
+         do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
              nn = nn + 1
-             num_levs = iv%gpsref(n)%info%levels
-             do k=1, num_levs
+             iv%info(gpsref)%levels(n) = iv%info(gpsref)%levels(n)
+             do k=1, iv%info(gpsref)%levels(n)
                 if (iv%gpsref(n)%ref(k)%qc == qc_below) then
-                   name_qc(nn) = iv%gpsref(n)%info%name
+                   name_qc(nn) = iv%info(gpsref)%name(n)
                    height_below(nn) = max(iv%gpsref(n)%h(k),height_below(nn))
                 end if
              end do
@@ -224,20 +224,18 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
          nqc2   = 0
          nqc3   = 0
 
-         do n=iv%plocal(iv%time-1,gpsref) + 1, iv%plocal(iv%time,gpsref) 
-            num_levs = iv%gpsref(n)%info%levels
-
-            do n1 = 1,nn
-               if (iv%gpsref(n)%info%name == name_qc(n1)) then
-                  do k=1, num_levs
-                     if (iv%gpsref(n)%h(k) < height_below(n1) .and. &
+         do n=iv%info(gpsref)%n1,iv%info(gpsref)%n2
+            do na = 1,nn
+               if (iv%info(gpsref)%name(n) == name_qc(na)) then
+                  do k=1, iv%info(gpsref)%levels(n)
+                     if (iv%gpsref(n)%h(k) < height_below(na) .and. &
                          iv%gpsref(n)%ref(k)%qc >= 0) iv%gpsref(n)%ref(k)%qc = qc_below
                   end do
                   exit
                end if
             end do
 
-            do k=1, num_levs
+            do k=1, iv%info(gpsref)%levels(n)
                ntotal = ntotal + 1
                if (iv%gpsref(n)%ref(k)%qc == fails_error_max) nqc0 = nqc0 + 1
                if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
@@ -256,6 +254,8 @@ subroutine da_get_innov_vector_gpsref( it, grid, ob, iv)
          'Number of failed GPSRef observations:', &
          fref, ' on ',pref
    end if
+
+   deallocate (model_ref)
 
    if (trace_use_dull) call da_trace_exit("da_get_innov_vector_gpsref")
 

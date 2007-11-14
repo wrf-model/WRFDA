@@ -23,15 +23,15 @@ subroutine da_oi_stats_gpspw (stats_unit, iv)
    stats%average = residual_gpspw1_type(0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(gpspw)
-      if (iv%gpspw(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%gpspw(n)%loc%obs_global_index, &
+   do n=1, iv%info(gpspw)%nlocal
+      if (iv%info(gpspw)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(gpspw)%obs_global_index(n), &
             0, iv%gpspw(n)%tpw%qc, &
             iv%gpspw(n)%tpw%inv, ntpw, &
             stats%minimum%tpw  , stats%maximum%tpw, &
             stats%average%tpw  , stats%rms_err%tpw)
 
-      end if    ! end if (iv%gpspw(n)%loc%proc_domain)
+      end if    ! end if (iv%info(gpspw)%proc_domain(1,n))
    end do
 
    ! do inter-processor communication to gather statistics.

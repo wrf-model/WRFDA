@@ -28,13 +28,13 @@ subroutine da_transform_xtoy_gpspw_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_gpspw_adj")
 
-   do n=iv%plocal(iv%time-1,gpspw) + 1, iv%plocal(iv%time,gpspw)
-      i   = iv%gpspw(n)%loc%i
-      dy  = iv%gpspw(n)%loc%dy
-      dym = iv%gpspw(n)%loc%dym
-      j   = iv%gpspw(n)%loc%j
-      dx  = iv%gpspw(n)%loc%dx
-      dxm = iv%gpspw(n)%loc%dxm
+   do n=iv%info(gpspw)%n1,iv%info(gpspw)%n2
+      i   = iv%info(gpspw)%i(1,n)
+      dy  = iv%info(gpspw)%dy(1,n)
+      dym = iv%info(gpspw)%dym(1,n)
+      j   = iv%info(gpspw)%j(1,n)
+      dx  = iv%info(gpspw)%dx(1,n)
+      dxm = iv%info(gpspw)%dxm(1,n)
 
       !  Initialise the varibles
       dpw           = 0.0
@@ -43,7 +43,7 @@ subroutine da_transform_xtoy_gpspw_adj(grid, iv, jo_grad_y, jo_grad_x)
       model_rho(:)  = 0.0
       model_drho(:) = 0.0
 
-      obs_terr   = iv%gpspw(n)%info%elv
+      obs_terr   = iv%info(gpspw)%elv(n)
       model_terr = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + &
          dy *(dxm*grid%xb%terr(i,j+1) + dx*grid%xb%terr(i+1,j+1))
 

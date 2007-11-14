@@ -35,31 +35,31 @@ subroutine da_oi_stats_bogus (stats_unit, iv)
    stats%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(bogus)
-      if (iv%bogus(n)%loc%proc_domain) then
-         do k=1, iv%bogus(n)%info%levels
-            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+   do n=1, iv%info(bogus)%nlocal
+      if (iv%info(bogus)%proc_domain(1,n)) then
+         do k=1, iv%info(bogus)%levels(n)
+            call da_stats_calculate(iv%info(bogus)%obs_global_index(n), &
                k, iv%bogus(n)%u(k)%qc, &
                iv%bogus(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(bogus)%obs_global_index(n), &
                k, iv%bogus(n)%v(k)%qc, &
                iv%bogus(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &
                stats%average%v, stats%rms_err%v)
-            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(bogus)%obs_global_index(n), &
                k, iv%bogus(n)%t(k)%qc, &
                iv%bogus(n)%t(k)%inv, nt, &
                stats%minimum%t, stats%maximum%t, &
                stats%average%t, stats%rms_err%t)
-            call da_stats_calculate(iv%bogus(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(bogus)%obs_global_index(n), &
                k, iv%bogus(n)%q(k)%qc, &
                iv%bogus(n)%q(k)%inv, nq, &
                stats%minimum%q, stats%maximum%q, &
                stats%average%q, stats%rms_err%q)
          end do
-         call da_stats_calculate( iv%bogus(n)%loc%obs_global_index, &
+         call da_stats_calculate( iv%info(bogus)%obs_global_index(n), &
             0, iv%bogus(n)%slp%qc, &
             iv%bogus(n)%slp%inv, nslp,  &
             stats%minimum%slp, stats%maximum%slp, &
@@ -102,7 +102,7 @@ subroutine da_oi_stats_bogus (stats_unit, iv)
       end if
    end if
 
-   if (trace_use) call da_trace_exit("da_oi_stats_bogus")
+   if (trace_use_dull) call da_trace_exit("da_oi_stats_bogus")
 
 end subroutine da_oi_stats_bogus
 

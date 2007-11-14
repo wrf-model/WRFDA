@@ -26,7 +26,7 @@ subroutine da_residual_sonde_sfc(iv, y, re,np_missing, np_bad_data,np_obs_used, 
    n_obs_bad % p % num = number_type(0, 0, 0)
    n_obs_bad % q % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(sound)
+   do n=1, iv%info(sound)%nlocal
       np_available = np_available + 5
 
       re%sonde_sfc(n)%u = da_residual(n, 0, y%sonde_sfc(n)%u, iv%sonde_sfc(n)%u, n_obs_bad % u)

@@ -1,4 +1,4 @@
-subroutine da_store_obs_grid_info (loc)
+subroutine da_store_obs_grid_info (info)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,24 +6,17 @@ subroutine da_store_obs_grid_info (loc)
 
    implicit none
 
-   type (model_loc_type), intent(inout) :: loc    ! Obs location 
+   type(infa_type), intent(inout) :: info
 
-   if (trace_use_dull) call da_trace_entry("da_store_obs_grid_info")
+   if (trace_use) call da_trace_entry("da_store_obs_grid_info")
 
-   loc%proc_domain = .false.
+   info%proc_domain(:,:) = .false.
    
-   ! FIX?
-   if (loc%i >= its .and. loc%i <= ite .and. &
-      loc%j >= jts .and. loc%j <= jte) then
-      loc%proc_domain = .true.
-   end if
+   where(info%i(:,:) >= its .and. info%i(:,:) <= ite .and. info%j(:,:) >= jts .and. info%j(:,:) <= jte)
+      info%proc_domain(:,:) = .true.
+   end where
 
-   ! if (loc%i >= its .and. loc%i < ite .and. &
-   !    loc%j >= jts .and. loc%j < jte) then
-   !    loc%proc_domain = .true.
-   ! end if
-
-   if (trace_use_dull) call da_trace_exit("da_store_obs_grid_info")
+   if (trace_use) call da_trace_exit("da_store_obs_grid_info")
 
 end subroutine da_store_obs_grid_info
 

@@ -36,8 +36,8 @@ subroutine da_ao_stats_metar (stats_unit, iv, re)
    stats%average = residual_metar1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(metar)
-       if (iv%metar(n)%loc%proc_domain) then
+   do n=1, iv%info(metar)%nlocal
+       if (iv%info(metar)%proc_domain(1,n)) then
          call da_stats_calculate (n, 0, iv%metar(n)%u%qc, & 
             re%metar(n)%u, nu, &
             stats%minimum%u, stats%maximum%u, &
@@ -59,7 +59,7 @@ subroutine da_ao_stats_metar (stats_unit, iv, re)
             stats%minimum%q, stats%maximum%q, &
             stats%average%q, stats%rms_err%q)
 
-      end if    ! end if (iv%metar(n)%loc%proc_domain)
+      end if    ! end if (iv%info(metar)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

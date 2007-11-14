@@ -11,17 +11,25 @@ subroutine da_transform_xtoy_airsr (grid, iv, y)
    type (y_type),     intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+
+   real, allocatable :: t(:,:)
+   real, allocatable :: q(:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_airsr")
 
-   do n=iv%plocal(iv%time-1,airsr) + 1, iv%plocal(iv%time,airsr)
-      k = iv % airsr(n) % info % levels
-      if (k < 1) cycle
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa%t, iv%airsr(n)%loc, y%airsr(n)%t, k, iv%airsr(n)%zk, k)
-      call da_interp_lin_3d(grid%xa%q, iv%airsr(n)%loc, y%airsr(n)%q, k, iv%airsr(n)%zk, k)
+   allocate (t(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
+   allocate (q(iv%info(airsr)%max_lev,iv%info(airsr)%n1:iv%info(airsr)%n2))
+  
+   call da_interp_lin_3d (grid%xa%t, iv%info(airsr), t)
+   call da_interp_lin_3d (grid%xa%q, iv%info(airsr), q)
+
+   do n=iv%info(airsr)%n1,iv%info(airsr)%n2
+      y%airsr(n)%t(:) = t(1:size(y%airsr(n)%t),n)
+      y%airsr(n)%q(:) = q(1:size(y%airsr(n)%q),n)
    end do
+
+   deallocate (t)
+   deallocate (q)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_airsr")
 

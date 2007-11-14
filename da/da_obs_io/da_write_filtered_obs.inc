@@ -15,7 +15,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !       observations to "surface_correction (= 2)" even if it is bad
    !       quality obs (qc < fails_error_max), such obs (element) is 
    !       made missing. Otherwise the bad obs (element) will also get 
-   !       assimilated with "max_iv_check = .false."
+   !       assmiilated with "max_iv_check = .false."
    !   (f) AMV's from Geostationary and Polar orbiting satellite are
    !       seperated & used as profile
    !   (g) Currently only MODIS winds from Polar orbiting satellite are used
@@ -45,7 +45,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    integer, intent(in)            :: coarse_ix, coarse_jy
    real, intent(in)               :: start_x, start_y
 
-   integer                      :: i, j, iost, nlevels
+   integer                      :: j, k, iost, nlevels
 
    integer            :: n, zero
    real               :: es, qs, speed, dir, rh, rh_error, uu, vv
@@ -102,53 +102,53 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !  Write Synop:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(synop) > 0) then
+   if (iv%info(synop)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout, fmt='(A,I6)') ' writing filtered obs for synop ', &
-            iv%nlocal(synop)
+            iv%info(synop)%nlocal
       end if
 
-      do i = 1, iv % nlocal(synop)
-         if (.not.iv%synop(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(synop)%nlocal
+         if (.not.iv%info(synop)%proc_domain(1,n)) cycle
          ! Guo .. not write out the data below the lowest model level:
-         if (iv%synop(i)%zk == missing_r) cycle
+         if (iv%info(synop)%zk(1,n) == missing_r) cycle
 
-         nlevels = iv%synop(i)%info%levels
-         if (iv%synop(i)%info%levels > 1) then
+         nlevels = iv%info(synop)%levels(n)
+         if (iv%info(synop)%levels(n) > 1) then
             write(unit=stdout, fmt='(3A,I5,A)') &
-               ' for SYNOP station ',iv%synop(i)%info%name,' got levels ',&
-               iv%synop(i)%info%levels ,' but wrote only one level'
+               ' for SYNOP station ',iv%info(synop)%name(n),' got levels ',&
+               iv%info(synop)%levels(n) ,' but wrote only one level'
             nlevels = 1
          end if
          write(ounit, fmt = fmt_info)                &
-            iv%synop(i)%info%platform,    &
-            iv%synop(i)%info%date_char,   &
-            iv%synop(i)%info%name,        &
+            iv%info(synop)%platform(n),    &
+            iv%info(synop)%date_char(n),   &
+            iv%info(synop)%name(n),        &
             nlevels,                      &
-            iv%synop(i)%info%lat,         &
-            iv%synop(i)%info%lon,         &
-            iv%synop(i)%info%elv,         &
-            iv%synop(i)%info%id
-         slp_inv= iv%synop(i)%loc%slp%inv
-         slp_qc = iv%synop(i)%loc%slp%qc
-         if (iv%synop(i)%p%qc <= fails_error_max) then
+            iv%info(synop)%lat(1,n),         &
+            iv%info(synop)%lon(1,n),         &
+            iv%info(synop)%elv(n),         &
+            iv%info(synop)%id(n)
+         slp_inv= iv%info(synop)%slp(n)%inv
+         slp_qc = iv%info(synop)%slp(n)%qc
+         if (iv%synop(n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
          end if
 
          write(ounit, fmt = fmt_srfc) &
-            slp_inv,slp_qc,iv%synop(i)%loc%slp%error, iv%synop(i)%loc%pw
+            slp_inv,slp_qc,iv%info(synop)%slp(n)%error, iv%info(synop)%pw(n)
 
          ! get speed and direction
-         if (iv%synop(i)%u%qc >= obs_qc_pointer .and. &
-              iv%synop(i)%v%qc >= obs_qc_pointer) then
-            uu = ob%synop(i)%u
-            vv = ob%synop(i)%v
-            call da_ffdduv(speed, dir, uu, vv, iv%synop(i)%info%lon, &
+         if (iv%synop(n)%u%qc >= obs_qc_pointer .and. &
+              iv%synop(n)%v%qc >= obs_qc_pointer) then
+            uu = ob%synop(n)%u
+            vv = ob%synop(n)%v
+            call da_ffdduv(speed, dir, uu, vv, iv%info(synop)%lon(1,n), &
                convert_uv2fd)             
-            speed_qc  = iv%synop(i)%u%qc
+            speed_qc  = iv%synop(n)%u%qc
             dir_qc    = speed_qc
-            speed_err = iv%synop(i)%u%error
+            speed_err = iv%synop(n)%u%error
          else
             speed     = missing_r
             speed_qc    = missing_data
@@ -158,13 +158,13 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          ! get RH from Q & T    
-         if (iv%synop(i)%q%qc >= obs_qc_pointer .and.  &
-              abs(iv%synop(i)%q%error - missing_r) > 1. .and.  &
-              abs(ob%synop(i)%t       - missing_r) > 1. .and.  &
-              abs(ob%synop(i)%p       - missing_r) > 1.   ) then 
-            call da_tp_to_qs(ob%synop(i)%t, ob%synop(i)%p, es, qs)
-            rh = (ob%synop(i)%q/qs) * 100.
-            rh_qc = iv%synop(i)%q%qc
+         if (iv%synop(n)%q%qc >= obs_qc_pointer .and.  &
+              abs(iv%synop(n)%q%error - missing_r) > 1. .and.  &
+              abs(ob%synop(n)%t       - missing_r) > 1. .and.  &
+              abs(ob%synop(n)%p       - missing_r) > 1.   ) then 
+            call da_tp_to_qs(ob%synop(n)%t, ob%synop(n)%p, es, qs)
+            rh = (ob%synop(n)%q/qs) * 100.
+            rh_qc = iv%synop(n)%q%qc
          else
             rh    = missing_r
             rh_qc = missing_data
@@ -172,18 +172,18 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
          if (rh_qc < 0) rh_qc = missing_data
 
-         p    = ob%synop(i)%p
-         p_qc = iv%synop(i)%p%qc
-         p_err = iv%synop(i)%p%error
-         if (iv%synop(i)%p%qc <= fails_error_max) then
+         p    = ob%synop(n)%p
+         p_qc = iv%synop(n)%p%qc
+         p_err = iv%synop(n)%p%error
+         if (iv%synop(n)%p%qc <= fails_error_max) then
             p_qc = missing_data
             p    = missing_r
             p_err  = pr_error           
          end if
 
-         t    =  ob%synop(i)%t
-         t_qc =  iv%synop(i)%t%qc
-         if (iv%synop(i)%t%qc <= fails_error_max) then
+         t    =  ob%synop(n)%t
+         t_qc =  iv%synop(n)%t%qc
+         if (iv%synop(n)%t%qc <= fails_error_max) then
             t_qc = missing_data
             t   = missing_r
          end if
@@ -192,8 +192,8 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             p,  p_qc,  p_err,                                  &
             speed,speed_qc,        speed_err  ,                &
             dir  , dir_qc,         dir_err  ,                  &
-            iv%synop(i)%info%elv, zero, elv_error,             &
-            t, t_qc, iv%synop(i)%t%error,                      &
+            iv%info(synop)%elv(n), zero, elv_error,             &
+            t, t_qc, iv%synop(n)%t%error,                      &
             td, td_qc, td_error,                               &
             rh, rh_qc,  rh_error                
       end do 
@@ -203,54 +203,54 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Metar:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(metar) > 0) then
+   if (iv%info(metar)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for metar ',iv%nlocal(metar)
+            ' writing filtered obs for metar ',iv%info(metar)%nlocal
       end if
 
-      do i = 1, iv % nlocal(metar)
-         if (.not. iv%metar(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(metar)%nlocal
+         if (.not. iv%info(metar)%proc_domain(1,n)) cycle
          ! Do not write out the data below the lowest model level:
-         if (iv%metar(i)%zk == missing_r) cycle
+         if (iv%info(metar)%zk(1,n) == missing_r) cycle
 
-         nlevels = iv%metar(i)%info%levels
-         if (iv%metar(i)%info%levels > 1) then
+         nlevels = iv%info(metar)%levels(k)
+         if (iv%info(metar)%levels(n)> 1) then
             write(stdout,fmt='(3A,I5,A)') &
-               ' for METAR station ',iv%metar(i)%info%name,' got levels ',&
-               iv%metar(i)%info%levels ,' but wrote only one level'
+               ' for METAR station ',iv%info(metar)%name(n),' got levels ',&
+               iv%info(metar)%levels(n),' but wrote only one level'
             nlevels = 1
          end if
 
          write(ounit, fmt = fmt_info)                &
-            iv%metar(i)%info%platform,    &
-            iv%metar(i)%info%date_char,   &
-            iv%metar(i)%info%name,        &
+            iv%info(metar)%platform(n),    &
+            iv%info(metar)%date_char(n),   &
+            iv%info(metar)%name(n),        &
             nlevels,                      &
-            iv%metar(i)%info%lat,         &
-            iv%metar(i)%info%lon,         &
-            iv%metar(i)%info%elv,         &
-            iv%metar(i)%info%id
-            slp_inv= iv%metar(i)%loc%slp%inv
-            slp_qc = iv%metar(i)%loc%slp%qc
-            if(iv%metar(i)%p%qc <= fails_error_max) then
+            iv%info(metar)%lat(1,n),         &
+            iv%info(metar)%lon(1,n),         &
+            iv%info(metar)%elv(n),         &
+            iv%info(metar)%id(n)
+         slp_inv= iv%info(metar)%slp(n)%inv
+         slp_qc = iv%info(metar)%slp(n)%qc
+         if(iv%metar(n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
          end if
 
          write(ounit, fmt = fmt_srfc) &
-            slp_inv,slp_qc,iv%metar(i)%loc%slp%error, iv%metar(i)%loc%pw
+            slp_inv,slp_qc,iv%info(metar)%slp(n)%error, iv%info(metar)%pw(n)
 
          ! get speed and direction
-         if (iv%metar(i)%u%qc >= obs_qc_pointer .and. &
-            iv%metar(i)%v%qc >= obs_qc_pointer) then
-            uu = ob%metar(i)%u
-            vv = ob%metar(i)%v
-            call da_ffdduv(speed, dir, uu, vv, iv%metar(i)%info%lon, &
+         if (iv%metar(n)%u%qc >= obs_qc_pointer .and. &
+            iv%metar(n)%v%qc >= obs_qc_pointer) then
+            uu = ob%metar(n)%u
+            vv = ob%metar(n)%v
+            call da_ffdduv(speed, dir, uu, vv, iv%info(metar)%lon(1,n), &
                convert_uv2fd)             
-            speed_qc  = iv%metar(i)%u%qc
+            speed_qc  = iv%metar(n)%u%qc
             dir_qc    = speed_qc
-            speed_err = iv%metar(i)%u%error
+            speed_err = iv%metar(n)%u%error
          else
             speed     = missing_r
             speed_qc    = missing_data
@@ -260,30 +260,30 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          ! get RH from Q & T    
-         if (iv%metar(i)%q%qc >= obs_qc_pointer .and.  &
-             abs(iv%metar(i)%q%error - missing_r) > 1. .and.  &
-             abs(ob%metar(i)%t       - missing_r) > 1. .and.  &
-             abs(ob%metar(i)%p       - missing_r) > 1.   ) then 
-            call da_tp_to_qs(ob%metar(i)%t, ob%metar(i)%p, es, qs)
-            rh = (ob%metar(i)%q/qs) * 100.
-            rh_qc = iv%metar(i)%q%qc
+         if (iv%metar(n)%q%qc >= obs_qc_pointer .and.  &
+             abs(iv%metar(n)%q%error - missing_r) > 1. .and.  &
+             abs(ob%metar(n)%t       - missing_r) > 1. .and.  &
+             abs(ob%metar(n)%p       - missing_r) > 1.   ) then 
+            call da_tp_to_qs(ob%metar(n)%t, ob%metar(n)%p, es, qs)
+            rh = (ob%metar(n)%q/qs) * 100.
+            rh_qc = iv%metar(n)%q%qc
          else
             rh    = missing_r
             rh_qc = missing_data
          end if
          if (rh_qc < 0) rh_qc = missing_data
 
-         p    = ob%metar(i)%p
-         p_qc = iv%metar(i)%p%qc
-         p_err = iv%metar(i)%p%error
-         if (iv%metar(i)%p%qc <= fails_error_max) then
+         p    = ob%metar(n)%p
+         p_qc = iv%metar(n)%p%qc
+         p_err = iv%metar(n)%p%error
+         if (iv%metar(n)%p%qc <= fails_error_max) then
             p_qc = missing_data
             p    = missing_r
             p_err  = pr_error           
          end if
-         t    =  ob%metar(i)%t
-         t_qc =  iv%metar(i)%t%qc
-         if (iv%metar(i)%t%qc <= fails_error_max) then
+         t    =  ob%metar(n)%t
+         t_qc =  iv%metar(n)%t%qc
+         if (iv%metar(n)%t%qc <= fails_error_max) then
             t_qc = missing_data
             t   = missing_r
          end if
@@ -292,8 +292,8 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             p,  p_qc,  p_err,                                  &
             speed,speed_qc,        speed_err  ,                &
             dir  , dir_qc,         dir_err  ,                  &
-            iv%metar(i)%info%elv, zero, elv_error,             &
-            t, t_qc, iv%metar(i)%t%error,                      &
+            iv%info(metar)%elv(n), zero, elv_error,             &
+            t, t_qc, iv%metar(n)%t%error,                      &
             td, td_qc, td_error,                               &
             rh, rh_qc,  rh_error                
       end do 
@@ -303,52 +303,52 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Ships:
    !-------------------------------------------------------------------------- 
 
-   if (iv % nlocal(ships) > 0) then
+   if (iv%info(ships)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ships ',iv%nlocal(ships)
+            ' writing filtered obs for ships ',iv%info(ships)%nlocal
       end if
 
-      do i = 1, iv % nlocal(ships)
-         if (.not. iv%ships(i)%loc%proc_domain) cycle
-         if (iv%ships(i)%zk == missing_r) cycle
+      do n = 1, iv%info(ships)%nlocal
+         if (.not. iv%info(ships)%proc_domain(1,n)) cycle
+         if (iv%info(ships)%zk(1,n) == missing_r) cycle
                
-         nlevels = iv%ships(i)%info%levels
-         if (iv%ships(i)%info%levels > 1) then
+         nlevels = iv%info(ships)%levels(n)
+         if (iv%info(ships)%levels(n) > 1) then
             write(unit=stdout,fmt='(3A,I5,A)') &
-               ' for SHIP station ',iv%ships(i)%info%name,' got levels ',&
-               iv%ships(i)%info%levels ,' but wrote only one level'
+               ' for SHIP station ',iv%info(ships)%name(n),' got levels ',&
+               iv%info(ships)%levels(n) ,' but wrote only one level'
             nlevels = 1
          end if
          write(ounit, fmt = fmt_info)                &
-            iv%ships(i)%info%platform,    &
-            iv%ships(i)%info%date_char,   &
-            iv%ships(i)%info%name,        &
-            nlevels,                      &
-            iv%ships(i)%info%lat,         &
-            iv%ships(i)%info%lon,         &
-            iv%ships(i)%info%elv,         &
-            iv%ships(i)%info%id
-            slp_inv= iv%ships(i)%loc%slp%inv
-            slp_qc = iv%ships(i)%loc%slp%qc
-         if (iv%ships(i)%p%qc <= fails_error_max) then
+            iv%info(ships)%platform(n),    &
+            iv%info(ships)%date_char(n),   &
+            iv%info(ships)%name(n),        &
+            nlevels,               &
+            iv%info(ships)%lat,         &
+            iv%info(ships)%lon,         &
+            iv%info(ships)%elv(n),         &
+            iv%info(ships)%id(n)
+            slp_inv= iv%info(ships)%slp(n)%inv
+            slp_qc = iv%info(ships)%slp(n)%qc
+         if (iv%ships(n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
          end if
 
          write(ounit, fmt = fmt_srfc) &
-            slp_inv,slp_qc,iv%ships(i)%loc%slp%error, iv%ships(i)%loc%pw
+            slp_inv,slp_qc,iv%info(ships)%slp(n)%error, iv%info(ships)%pw(n)
 
          ! get speed and direction
-         if (iv%ships(i)%u%qc >= obs_qc_pointer .and. &
-             iv%ships(i)%v%qc >= obs_qc_pointer) then
-            uu = ob%ships(i)%u
-            vv = ob%ships(i)%v
-            call da_ffdduv(speed, dir, uu, vv, iv%ships(i)%info%lon, &
+         if (iv%ships(n)%u%qc >= obs_qc_pointer .and. &
+             iv%ships(n)%v%qc >= obs_qc_pointer) then
+            uu = ob%ships(n)%u
+            vv = ob%ships(n)%v
+            call da_ffdduv(speed, dir, uu, vv, iv%info(ships)%lon(1,n), &
                convert_uv2fd)             
-            speed_qc  = iv%ships(i)%u%qc
+            speed_qc  = iv%ships(n)%u%qc
             dir_qc    = speed_qc
-            speed_err = iv%ships(i)%u%error
+            speed_err = iv%ships(n)%u%error
          else
             speed     = missing_r
             speed_qc    = missing_data
@@ -358,29 +358,29 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          ! get RH from Q & T    
-         if (iv%ships(i)%q%qc >= obs_qc_pointer .and.  &
-             abs(iv%ships(i)%q%error - missing_r) > 1. .and.  &
-             abs(ob%ships(i)%t       - missing_r) > 1. .and.  &
-             abs(ob%ships(i)%p       - missing_r) > 1.   ) then 
-            call da_tp_to_qs(ob%ships(i)%t, ob%ships(i)%p, es, qs)
-            rh = (ob%ships(i)%q/qs) * 100.
-            rh_qc = iv%ships(i)%q%qc
+         if (iv%ships(n)%q%qc >= obs_qc_pointer .and.  &
+             abs(iv%ships(n)%q%error - missing_r) > 1. .and.  &
+             abs(ob%ships(n)%t       - missing_r) > 1. .and.  &
+             abs(ob%ships(n)%p       - missing_r) > 1.   ) then 
+            call da_tp_to_qs(ob%ships(n)%t, ob%ships(n)%p, es, qs)
+            rh = (ob%ships(n)%q/qs) * 100.
+            rh_qc = iv%ships(n)%q%qc
          else
             rh    = missing_r
             rh_qc = missing_data
          end if
          if (rh_qc < 0) rh_qc = missing_data
 
-         p     = ob%ships(i)%p
-         p_qc  = iv%ships(i)%p%qc
+         p     = ob%ships(n)%p
+         p_qc  = iv%ships(n)%p%qc
          p_err =  ships_pr_error
-         if (iv%ships(i)%p%qc <= fails_error_max) then
+         if (iv%ships(n)%p%qc <= fails_error_max) then
             p_qc = missing_data
             p    = missing_r
          end if
-         t    =  ob%ships(i)%t
-         t_qc =  iv%ships(i)%t%qc
-         if (iv%ships(i)%t%qc <= fails_error_max) then
+         t    =  ob%ships(n)%t
+         t_qc =  iv%ships(n)%t%qc
+         if (iv%ships(n)%t%qc <= fails_error_max) then
             t_qc = missing_data
             t   = missing_r
          end if
@@ -389,8 +389,8 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             p,  p_qc,  p_err,                                  &
             speed,speed_qc,        speed_err  ,                &
             dir  , dir_qc,         dir_err  ,                  &
-            iv%ships(i)%info%elv, zero, elv_error,             &
-            t, t_qc, iv%ships(i)%t%error,                      &
+            iv%info(ships)%elv(n), zero, elv_error,             &
+            t, t_qc, iv%ships(n)%t%error,                      &
             td, td_qc, td_error,                               &
             rh, rh_qc,  rh_error                
       end do 
@@ -400,53 +400,53 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Buoy :
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(buoy)  > 0) then
+   if (iv%info(buoy)%nlocal  > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for buoy  ',iv%nlocal(buoy) 
+            ' writing filtered obs for buoy  ',iv%info(buoy)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(buoy)
-         if (.not. iv%buoy(i)%loc%proc_domain) cycle
-         if (iv%buoy (i)%zk == missing_r) cycle
+      do n = 1, iv%info(buoy)%nlocal
+         if (.not. iv%info(buoy)%proc_domain(1,n)) cycle
+         if (iv%info(buoy)%zk(1,n) == missing_r) cycle
                 
-         nlevels = iv%buoy (i)%info%levels
-         if (iv%buoy (i)%info%levels > 1) then
+         nlevels = iv%info(buoy)%levels(n)
+         if (iv%info(buoy)%levels(n) > 1) then
             write(unit=stdout, fmt='(3A,I5,A)') &
-               ' for BUOY  station ',iv%buoy (i)%info%name,' got levels ',&
-               iv%buoy (i)%info%levels ,' but wrote only one level'
+               ' for BUOY  station ',iv%info(buoy)%name(n),' got levels ',&
+               iv%info(buoy)%levels(n) ,' but wrote only one level'
             nlevels = 1
          end if
 
          write(ounit, fmt = fmt_info)                &
-            iv%buoy (i)%info%platform,    &
-            iv%buoy (i)%info%date_char,   &
-            iv%buoy (i)%info%name,        &
-            nlevels,                      &
-            iv%buoy (i)%info%lat,         &
-            iv%buoy (i)%info%lon,         &
-            iv%buoy (i)%info%elv,         &
-            iv%buoy (i)%info%id
-         slp_inv= iv%buoy (i)%loc%slp%inv
-         slp_qc = iv%buoy (i)%loc%slp%qc
-         if (iv%buoy (i)%p%qc <= fails_error_max) then
+            iv%info(buoy)%platform(1),    &
+            iv%info(buoy)%date_char(1),   &
+            iv%info(buoy)%name(1),        &
+            nlevels,         &
+            iv%info(buoy)%lat(1,n),         &
+            iv%info(buoy)%lon(1,n),         &
+            iv%info(buoy)%elv(1),         &
+            iv%info(buoy)%id(1)
+         slp_inv= iv%info(buoy)%slp(n)%inv
+         slp_qc = iv%info(buoy)%slp(n)%qc
+         if (iv%buoy (n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
          end if
 
          write(ounit, fmt = fmt_srfc) &
-            slp_inv,slp_qc,iv%buoy (i)%loc%slp%error, iv%buoy (i)%loc%pw
+            slp_inv,slp_qc,iv%info(buoy)%slp(n)%error, iv%info(buoy)%pw(n)
 
          ! get speed and direction
-         if (iv%buoy (i)%u%qc >= obs_qc_pointer .and. &
-              iv%buoy (i)%v%qc >= obs_qc_pointer) then
-            uu = ob%buoy (i)%u
-            vv = ob%buoy (i)%v
-            call da_ffdduv(speed, dir, uu, vv, iv%buoy (i)%info%lon, &
+         if (iv%buoy (n)%u%qc >= obs_qc_pointer .and. &
+              iv%buoy (n)%v%qc >= obs_qc_pointer) then
+            uu = ob%buoy (n)%u
+            vv = ob%buoy (n)%v
+            call da_ffdduv(speed, dir, uu, vv, iv%info(buoy)%lon(1,n), &
                convert_uv2fd)             
-            speed_qc  = iv%buoy (i)%u%qc
+            speed_qc  = iv%buoy (n)%u%qc
             dir_qc    = speed_qc
-            speed_err = iv%buoy (i)%u%error
+            speed_err = iv%buoy (n)%u%error
          else
             speed     = missing_r
             speed_qc    = missing_data
@@ -456,30 +456,30 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          ! get RH from Q & T    
-         if (iv%buoy (i)%q%qc >= obs_qc_pointer .and.  &
-             abs(iv%buoy (i)%q%error - missing_r) > 1. .and.  &
-             abs(ob%buoy (i)%t       - missing_r) > 1. .and.  &
-             abs(ob%buoy (i)%p       - missing_r) > 1.   ) then 
-            call da_tp_to_qs(ob%buoy (i)%t, ob%buoy (i)%p, es, qs)
-            rh = (ob%buoy (i)%q/qs) * 100.
-            rh_qc = iv%buoy (i)%q%qc
+         if (iv%buoy (n)%q%qc >= obs_qc_pointer .and.  &
+             abs(iv%buoy (n)%q%error - missing_r) > 1. .and.  &
+             abs(ob%buoy (n)%t       - missing_r) > 1. .and.  &
+             abs(ob%buoy (n)%p       - missing_r) > 1.   ) then 
+            call da_tp_to_qs(ob%buoy (n)%t, ob%buoy (n)%p, es, qs)
+            rh = (ob%buoy (n)%q/qs) * 100.
+            rh_qc = iv%buoy (n)%q%qc
          else
             rh    = missing_r
            rh_qc = missing_data
          end if
          if (rh_qc < 0) rh_qc = missing_data
 
-         p     = ob%buoy (i)%p
-         p_qc  = iv%buoy (i)%p%qc
-         p_err = iv%buoy (i)%p%error
-         if (iv%buoy (i)%p%qc <= fails_error_max) then
+         p     = ob%buoy (n)%p
+         p_qc  = iv%buoy (n)%p%qc
+         p_err = iv%buoy (n)%p%error
+         if (iv%buoy (n)%p%qc <= fails_error_max) then
             p_qc = missing_data
             p    = missing_r
             p_err  = pr_error           
          end if
-         t    =  ob%buoy (i)%t
-         t_qc =  iv%buoy (i)%t%qc
-         if (iv%buoy (i)%t%qc <= fails_error_max) then
+         t    =  ob%buoy (n)%t
+         t_qc =  iv%buoy (n)%t%qc
+         if (iv%buoy (n)%t%qc <= fails_error_max) then
             t_qc = missing_data
             t   = missing_r
          end if
@@ -488,8 +488,8 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             p,  p_qc,   p_err,                                 &
             speed,speed_qc,        speed_err  ,                &
             dir  , dir_qc,         dir_err  ,                  &
-            iv%buoy (i)%info%elv, zero, elv_error,             &
-            t, t_qc, iv%buoy (i)%t%error,                      &
+            iv%info(buoy)%elv(n), zero, elv_error,             &
+            t, t_qc, iv%buoy (n)%t%error,                      &
             td, td_qc, td_error,                               &
             rh, rh_qc,  rh_error                
       end do 
@@ -499,37 +499,36 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Geo. AMVs Obs:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(geoamv) > 0) then
+   if (iv%info(geoamv)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for geoamv ',iv%nlocal(geoamv)
+            ' writing filtered obs for geoamv ',iv%info(geoamv)%nlocal
       end if
 
-      do i = 1, iv % nlocal(geoamv)               
-         if (.not. iv%geoamv(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(geoamv)%nlocal               
+         if (.not. iv%info(geoamv)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%geoamv(i)%info%platform,    &
-            iv%geoamv(i)%info%date_char,   &
-            iv%geoamv(i)%info%name,        &
-            iv%geoamv(i)%info%levels,      &
-            iv%geoamv(i)%info%lat,         &
-            iv%geoamv(i)%info%lon,         &
-            iv%geoamv(i)%info%elv,         &
-            iv%geoamv(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%geoamv(i)%loc%slp, iv%geoamv(i)%loc%pw
+            iv%info(geoamv)%platform(n),    &
+            iv%info(geoamv)%date_char(n),   &
+            iv%info(geoamv)%name(n),        &
+            iv%info(geoamv)%levels(n),      &
+            iv%info(geoamv)%lat(1,n),         &
+            iv%info(geoamv)%lon(1,n),         &
+            iv%info(geoamv)%elv(n),         &
+            iv%info(geoamv)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(geoamv)%slp(n), iv%info(geoamv)%pw(n)
 
-         do n = 1, iv%geoamv(i)%info%levels
+         do k = 1, iv%info(geoamv)%levels(n)
 
             ! get speed and direction
-            if (iv%geoamv(i)%u(n)%qc >= obs_qc_pointer .and. &
-                iv%geoamv(i)%v(n)%qc >= obs_qc_pointer) then  
-               uu = ob%geoamv(i)%u(n)
-               vv = ob%geoamv(i)%v(n)
-               call da_ffdduv(speed, dir, uu, vv, iv%geoamv(i)%info%lon, &
-                  convert_uv2fd)                        
-               speed_qc  = iv%geoamv(i)%u(n)%qc
+            if (iv%geoamv(n)%u(k)%qc >= obs_qc_pointer .and. &
+                iv%geoamv(n)%v(k)%qc >= obs_qc_pointer) then  
+               uu = ob%geoamv(n)%u(k)
+               vv = ob%geoamv(n)%v(k)
+               call da_ffdduv(speed, dir, uu, vv, iv%info(geoamv)%lon(1,n), convert_uv2fd)                        
+               speed_qc  = iv%geoamv(n)%u(k)%qc
                dir_qc    = speed_qc
-               speed_err = iv%geoamv(i)%u(n)%error
+               speed_err = iv%geoamv(n)%u(k)%error
             else
                speed     = missing_r
                speed_qc  = missing_data
@@ -539,7 +538,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             end if
 
             write(ounit, fmt = trim (fmt_each))         &
-               iv%geoamv(i)%p(n), speed_qc, slp_error,  &
+               iv%geoamv(n)%p(k), speed_qc, slp_error,  &
                speed, speed_qc, speed_err,              &
                dir  , dir_qc,             dir_error,    &
                missing_r, standard_atmosphere, xmiss,   &
@@ -554,38 +553,37 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Polar AMVs Obs:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(polaramv) > 0) then
+   if (iv%info(polaramv)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for polaramv ',iv%nlocal(polaramv)
+            ' writing filtered obs for polaramv ',iv%info(polaramv)%nlocal
       end if
 
-      do i = 1, iv % nlocal(polaramv)               
-      if (.not. iv%polaramv(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(polaramv)%nlocal               
+         if (.not. iv%info(polaramv)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%polaramv(i)%info%platform,    &
-            iv%polaramv(i)%info%date_char,   &
-            iv%polaramv(i)%info%name,        &
-            iv%polaramv(i)%info%levels,      &
-            iv%polaramv(i)%info%lat,         &
-            iv%polaramv(i)%info%lon,         &
-            iv%polaramv(i)%info%elv,         &
-            iv%polaramv(i)%info%id
+            iv%info(polaramv)%platform(n),    &
+            iv%info(polaramv)%date_char(n),   &
+            iv%info(polaramv)%name(n),        &
+            iv%info(polaramv)%levels(n),      &
+            iv%info(polaramv)%lat(1,n),         &
+            iv%info(polaramv)%lon(1,n),         &
+            iv%info(polaramv)%elv(n),         &
+            iv%info(polaramv)%id(n)
 
          write(ounit, fmt = fmt_srfc) &
-            iv%polaramv(i)%loc%slp, iv%polaramv(i)%loc%pw
+            iv%info(polaramv)%slp(n), iv%info(polaramv)%pw(n)
 
-         do n = 1, iv%polaramv(i)%info%levels
+         do k = 1, iv%info(polaramv)%levels(n)
             ! get speed and direction
-            if (iv%polaramv(i)%u(n)%qc >= obs_qc_pointer .and. &
-                iv%polaramv(i)%v(n)%qc >= obs_qc_pointer) then  
-               uu = ob%polaramv(i)%u(n)
-               vv = ob%polaramv(i)%v(n)
-               call da_ffdduv(speed, dir, uu, vv, &
-                  iv%polaramv(i)%info%lon, convert_uv2fd)                        
-               speed_qc  = iv%polaramv(i)%u(n)%qc
+            if (iv%polaramv(n)%u(k)%qc >= obs_qc_pointer .and. &
+                iv%polaramv(n)%v(k)%qc >= obs_qc_pointer) then  
+               uu = ob%polaramv(n)%u(k)
+               vv = ob%polaramv(n)%v(k)
+               call da_ffdduv(speed, dir, uu, vv, iv%info(polaramv)%lon(k,n), convert_uv2fd)                        
+               speed_qc  = iv%polaramv(n)%u(k)%qc
                dir_qc    = speed_qc
-               speed_err = iv%polaramv(i)%u(n)%error
+               speed_err = iv%polaramv(n)%u(k)%error
             else
                speed     = missing_r
                speed_qc  = missing_data
@@ -595,7 +593,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             end if
 
             write (ounit, fmt = trim (fmt_each))           &
-               iv%polaramv(i)%p(n), speed_qc, slp_error,  &
+               iv%polaramv(n)%p(k), speed_qc, slp_error,  &
                speed, speed_qc, speed_err,                &
                dir  , dir_qc,             dir_error,      &
                missing_r, standard_atmosphere, xmiss,     &
@@ -610,51 +608,51 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Sound 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(stdout,fmt='(A,I5)') &
-            ' writing filtered obs for sound  ',iv%nlocal(sound) 
+            ' writing filtered obs for sound  ',iv%info(sound)%nlocal 
       end if
       mnz = 0
 
-      do i = 1, iv % nlocal(sound)               
-         if (.not. iv%sound(i)%loc%proc_domain) cycle
-         if (iv%sonde_sfc(i)%info%platform /= iv%sound(i)%info%platform .or. &
-             iv%sonde_sfc(i)%info%lat      /= iv%sound(i)%info%lat      .or. &
-             iv%sonde_sfc(i)%info%lon      /= iv%sound(i)%info%lon      .or. &
-             iv%sonde_sfc(i)%info%elv      /= iv%sound(i)%info%elv      .or. &
-             iv%sonde_sfc(i)%info%id       /= iv%sound(i)%info%id      ) then
+      do n = 1, iv%info(sound)%nlocal               
+         if (.not. iv%info(sound)%proc_domain(1,n)) cycle
+         if (iv%info(sound)%platform(n) /= iv%info(sound)%platform(n) .or. &
+             iv%info(sound)%lat(1,n)    /= iv%info(sound)%lat(1,n)      .or. &
+             iv%info(sound)%lon(1,n)    /= iv%info(sound)%lon(1,n)      .or. &
+             iv%info(sound)%elv(n)      /= iv%info(sound)%elv(n)      .or. &
+             iv%info(sound)%id(n)       /= iv%info(sound)%id(n)      ) then
             write(unit=stderr,fmt='(A)')' Surface Sound Details:            '
             write(unit=stderr, fmt=fmt_info) &
-               iv%sonde_sfc(i)%info%platform,    &
-               iv%sonde_sfc(i)%info%date_char,   &
-               iv%sonde_sfc(i)%info%name,        &
-               iv%sonde_sfc(i)%info%levels,      &
-               iv%sonde_sfc(i)%info%lat,         &
-               iv%sonde_sfc(i)%info%lon,         &
-               iv%sonde_sfc(i)%info%elv,         &
-               iv%sonde_sfc(i)%info%id
+               iv%info(sound)%platform(n),    &
+               iv%info(sound)%date_char(n),   &
+               iv%info(sound)%name(n),        &
+               iv%info(sound)%levels(n),      &
+               iv%info(sound)%lat(1,n),         &
+               iv%info(sound)%lon(1,n),         &
+               iv%info(sound)%elv(n),         &
+               iv%info(sound)%id(n)
 
             write(unit=stderr,fmt='(A)') ' Upper level  Details: '
             write(unit=stderr, fmt=fmt_info) &
-               iv%sound(i)%info%platform,    &
-               iv%sound(i)%info%date_char,   &
-               iv%sound(i)%info%name,        &
-               iv%sound(i)%info%levels,      &
-               iv%sound(i)%info%lat,         &
-               iv%sound(i)%info%lon,         &
-               iv%sound(i)%info%elv,         &
-               iv%sound(i)%info%id
+               iv%info(sound)%platform(n),    &
+               iv%info(sound)%date_char(n),   &
+               iv%info(sound)%name(n),        &
+               iv%info(sound)%levels(n),      &
+               iv%info(sound)%lat(1,n),         &
+               iv%info(sound)%lon(1,n),         &
+               iv%info(sound)%elv(n),         &
+               iv%info(sound)%id(n)
             call da_error(__FILE__,__LINE__, &
                (/"Mismatch for Sound surface and upper air report"/))
          end if
          nz = 0
-         if (iv%sonde_sfc(i)%zk == missing_r) then
+         if (iv%info(sound)%zk(1,n) == missing_r) then
             nz = nz + 1
          end if
 
-         do n = 1, iv%sound(i)%info%levels
-            if (iv%sound(i)%zk(n) == missing_r) then
+         do k = 1, iv%info(sound)%levels(n)
+            if (iv%info(sound)%zk(k,n) == missing_r) then
                nz = nz + 1
             end if
          end do
@@ -663,48 +661,48 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             mnz = mnz + 1
          end if
 
-         nz = iv%sound(i)%info%levels + 1 - nz
+         nz = iv%info(sound)%levels(n) + 1 - nz
          if (nz < 1) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%sound(i)%info%platform,    &
-            iv%sound(i)%info%date_char,   &
-            iv%sound(i)%info%name,        &
+            iv%info(sound)%platform(k),    &
+            iv%info(sound)%date_char(k),   &
+            iv%info(sound)%name(k),        &
             nz,                           &
-            iv%sound(i)%info%lat,         &
-            iv%sound(i)%info%lon,         &
-            iv%sound(i)%info%elv,         &
-            iv%sound(i)%info%id
-            ! iv%sound(i)%info%levels + 1,  &
-         slp_inv= iv%sound(i)%loc%slp%inv
-         slp_qc = iv%sound(i)%loc%slp%qc
-         if (iv%sonde_sfc(i)%p%qc <= fails_error_max) then
+            iv%info(sound)%lat(1,n),         &
+            iv%info(sound)%lon(1,n),         &
+            iv%info(sound)%elv(k),         &
+            iv%info(sound)%id(k)
+            ! iv%info(sound)%levels(k) + 1,  &
+         slp_inv= iv%info(sound)%slp(k)%inv
+         slp_qc = iv%info(sound)%slp(k)%qc
+         if (iv%sonde_sfc(n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
          end if
 
          write(ounit, fmt = fmt_srfc) &
-            slp_inv,slp_qc,iv%sound(i)%loc%slp%error, iv%sound(i)%loc%pw
+            slp_inv,slp_qc,iv%info(sound)%slp(n)%error, iv%info(sound)%pw(n)
  
          nz = 0
          j  = 0
 
          ! Not below the first model level
-         if (iv%sonde_sfc(i)%zk == missing_r) then
+         if (iv%info(sound)%zk(1,n) == missing_r) then
             nz = nz + 1
          else
             j = j + 1
             ! First write surface level information
  
             ! get speed and direction
-            if (iv%sonde_sfc(i)%u%qc >= obs_qc_pointer .and. &
-                iv%sonde_sfc(i)%v%qc >= obs_qc_pointer) then
-               uu = ob%sonde_sfc(i)%u
-               vv = ob%sonde_sfc(i)%v
-               call da_ffdduv(speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, &
+            if (iv%sonde_sfc(n)%u%qc >= obs_qc_pointer .and. &
+                iv%sonde_sfc(n)%v%qc >= obs_qc_pointer) then
+               uu = ob%sonde_sfc(n)%u
+               vv = ob%sonde_sfc(n)%v
+               call da_ffdduv(speed, dir, uu, vv, iv%info(sound)%lon(1,n), &
                   convert_uv2fd)             
-               speed_qc  = iv%sonde_sfc(i)%u%qc
+               speed_qc  = iv%sonde_sfc(n)%u%qc
                dir_qc    = speed_qc
-               speed_err = iv%sonde_sfc(i)%u%error
+               speed_err = iv%sonde_sfc(n)%u%error
             else
                speed     = missing_r
                speed_qc    = missing_data
@@ -714,32 +712,32 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             end if
 
             ! get RH from Q & T    
-            if (iv%sonde_sfc(i)%q%qc >= obs_qc_pointer .and.  &
-                abs(iv%sonde_sfc(i)%q%error - missing_r) > 1. .and.  &
-                abs(ob%sonde_sfc(i)%t       - missing_r) > 1. .and.  &
-                abs(ob%sonde_sfc(i)%p       - missing_r) > 1.   ) then 
-               call da_tp_to_qs(ob%sonde_sfc(i)%t, ob%sonde_sfc(i)%p, es, qs)
-               rh = (ob%sonde_sfc(i)%q/qs) * 100.
-               rh_qc = iv%sonde_sfc(i)%q%qc
+            if (iv%sonde_sfc(n)%q%qc >= obs_qc_pointer .and.  &
+                abs(iv%sonde_sfc(n)%q%error - missing_r) > 1. .and.  &
+                abs(ob%sonde_sfc(n)%t       - missing_r) > 1. .and.  &
+                abs(ob%sonde_sfc(n)%p       - missing_r) > 1.   ) then 
+               call da_tp_to_qs(ob%sonde_sfc(n)%t, ob%sonde_sfc(n)%p, es, qs)
+               rh = (ob%sonde_sfc(n)%q/qs) * 100.
+               rh_qc = iv%sonde_sfc(n)%q%qc
              else
                 rh    = missing_r
                 rh_qc = missing_data
              end if
             if (rh_qc < 0) rh_qc = missing_data
 
-            p     = ob%sonde_sfc(i)%p
-            p_qc  = iv%sonde_sfc(i)%p%qc
-            p_err = iv%sonde_sfc(i)%p%error
-            if (iv%sonde_sfc(i)%p%qc <= fails_error_max) then
+            p     = ob%sonde_sfc(n)%p
+            p_qc  = iv%sonde_sfc(n)%p%qc
+            p_err = iv%sonde_sfc(n)%p%error
+            if (iv%sonde_sfc(n)%p%qc <= fails_error_max) then
                p_qc  = missing_data
                p     = missing_r
                p_err   = pr_error           
             end if
 
-            t     =  ob%sonde_sfc(i)%t
-            t_qc  =  iv%sonde_sfc(i)%t%qc
-            t_err =  iv%sonde_sfc(i)%t%error
-            if (iv%sonde_sfc(i)%t%qc <= fails_error_max) then
+            t     =  ob%sonde_sfc(n)%t
+            t_qc  =  iv%sonde_sfc(n)%t%qc
+            t_err =  iv%sonde_sfc(n)%t%error
+            if (iv%sonde_sfc(n)%t%qc <= fails_error_max) then
                t_qc  = missing_data
                t     = missing_r
                t_err = xmiss       
@@ -749,29 +747,28 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                p,  p_qc,   p_err,                         &
                speed,speed_qc, speed_err ,                &
                dir  , dir_qc,  dir_err ,                  &
-               iv%sonde_sfc(i)%h, zero, elv_error,        &
+               iv%sonde_sfc(n)%h, zero, elv_error,        &
                t, t_qc, t_err,                            &
                td, td_qc, td_error,                       &
                rh, rh_qc,  rh_error
          end if
                 
-         do n = 1, iv%sound(i)%info%levels
+         do k = 1, iv%info(sound)%levels(n)
 
-            if (iv%sound(i)%zk(n) == missing_r) then
+            if (iv%info(sound)%zk(k,n) == missing_r) then
                 nz = nz + 1
             else
                j  = j + 1
 
                ! get speed and direction
-               if (iv%sound(i)%u(n)%qc >= obs_qc_pointer .and. &
-                   iv%sound(i)%v(n)%qc >= obs_qc_pointer) then  
-                  uu = ob%sound(i)%u(n)
-                  vv = ob%sound(i)%v(n)
-                  call da_ffdduv(speed, dir, uu, vv, iv%sound(i)%info%lon, &
-                     convert_uv2fd)                        
-                  speed_qc  = iv%sound(i)%u(n)%qc
+               if (iv%sound(n)%u(k)%qc >= obs_qc_pointer .and. &
+                   iv%sound(n)%v(k)%qc >= obs_qc_pointer) then  
+                  uu = ob%sound(n)%u(k)
+                  vv = ob%sound(n)%v(k)
+                  call da_ffdduv(speed, dir, uu, vv, iv%info(sound)%lon(1,n), convert_uv2fd)                        
+                  speed_qc  = iv%sound(n)%u(k)%qc
                   dir_qc    = speed_qc
-                  speed_err = iv%sound(i)%u(n)%error
+                  speed_err = iv%sound(n)%u(k)%error
                else
                   speed     = missing_r
                   speed_qc  = missing_data
@@ -781,32 +778,32 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                end if
 
                ! get RH from Q & T    
-               if (iv%sound(i)%q(n)%qc >= obs_qc_pointer .and.  &
-                   abs(iv%sound(i)%q(n)%error - missing_r) > 1. .and.  &
-                   abs(ob%sound(i)%t(n)       - missing_r) > 1. .and.  &
-                   abs(iv%sound(i)%p(n)       - missing_r) > 1.   ) then 
-                  call da_tp_to_qs(ob%sound(i)%t(n), iv%sound(i)%p(n), es, qs)
-                  rh = (ob%sound(i)%q(n)/qs) * 100.
-                  rh_qc = iv%sound(i)%q(n)%qc
+               if (iv%sound(n)%q(k)%qc >= obs_qc_pointer .and.  &
+                   abs(iv%sound(n)%q(k)%error - missing_r) > 1. .and.  &
+                   abs(ob%sound(n)%t(k)       - missing_r) > 1. .and.  &
+                   abs(iv%sound(n)%p(k)       - missing_r) > 1.   ) then 
+                  call da_tp_to_qs(ob%sound(n)%t(k), iv%sound(n)%p(k), es, qs)
+                  rh = (ob%sound(n)%q(k)/qs) * 100.
+                  rh_qc = iv%sound(n)%q(k)%qc
                else
                   rh    = missing_r
                   rh_qc = missing_data
                end if
                if (rh_qc < 0) rh_qc = missing_data
 
-               t    =  ob%sound(i)%t(n)
-               t_qc =  iv%sound(i)%t(n)%qc
-               t_err= iv%sound(i)%t(n)%error
-               if (iv%sound(i)%t(n)%qc <= fails_error_max) then
+               t    =  ob%sound(n)%t(k)
+               t_qc =  iv%sound(n)%t(k)%qc
+               t_err= iv%sound(n)%t(k)%error
+               if (iv%sound(n)%t(k)%qc <= fails_error_max) then
                   t_qc = missing_data
                   t   = missing_r
                end if
 
                write(ounit, fmt = trim (fmt_each))           &
-                  iv%sound(i)%p(n), zero,    pr_error,       &
+                  iv%sound(n)%p(k), zero,    pr_error,       &
                   speed, speed_qc, speed_err ,               &
                   dir  , dir_qc,  dir_err ,                  &
-                  iv%sound(i)%h(n), zero, elv_error,         &
+                  iv%sound(n)%h(k), zero, elv_error,         &
                   t,  t_qc, t_err,                           &
                   td, td_qc, td_error,                       &
                   rh, rh_qc,  rh_error                
@@ -819,38 +816,37 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Airep: 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(airep) > 0) then
+   if (iv%info(airep)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for airep  ',iv%nlocal(airep) 
+            ' writing filtered obs for airep  ',iv%info(airep)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(airep)               
-         if (.not. iv%airep(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(airep)%nlocal               
+         if (.not. iv%info(airep)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%airep(i)%info%platform,    &
-            iv%airep(i)%info%date_char,   &
-            iv%airep(i)%info%name,        &
-            iv%airep(i)%info%levels,      &
-            iv%airep(i)%info%lat,         &
-            iv%airep(i)%info%lon,         &
-            iv%airep(i)%info%elv,         &
-            iv%airep(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%airep(i)%loc%slp, iv%airep(i)%loc%pw
+            iv%info(airep)%platform(n),    &
+            iv%info(airep)%date_char(n),   &
+            iv%info(airep)%name(n),        &
+            iv%info(airep)%levels(n),      &
+            iv%info(airep)%lat(1,n),         &
+            iv%info(airep)%lon(1,n),         &
+            iv%info(airep)%elv(n),         &
+            iv%info(airep)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(airep)%slp(n), iv%info(airep)%pw(n)
 
-         do n = 1, iv%airep(i)%info%levels
+         do k = 1, iv%info(airep)%levels(n)
 
             ! get speed and direction
-            if (iv%airep(i)%u(n)%qc >= obs_qc_pointer .and. &
-                iv%airep(i)%v(n)%qc >= obs_qc_pointer) then  
-               uu = ob%airep(i)%u(n)
-               vv = ob%airep(i)%v(n)
-               call da_ffdduv(speed, dir, uu, vv, iv%airep(i)%info%lon, &
-                  convert_uv2fd)             
-               speed_qc  = iv%airep(i)%u(n)%qc
+            if (iv%airep(n)%u(k)%qc >= obs_qc_pointer .and. &
+                iv%airep(n)%v(k)%qc >= obs_qc_pointer) then  
+               uu = ob%airep(n)%u(k)
+               vv = ob%airep(n)%v(k)
+               call da_ffdduv(speed, dir, uu, vv, iv%info(airep)%lon(k,n), convert_uv2fd)             
+               speed_qc  = iv%airep(n)%u(k)%qc
                dir_qc    = speed_qc
-               speed_err = iv%airep(i)%u(n)%error
+               speed_err = iv%airep(n)%u(k)%error
             else
                speed     = missing_r
                speed_qc    = missing_data
@@ -859,16 +855,16 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                speed_err = xmiss
             end if
 
-            t    =  ob%airep(i)%t(n)
-            t_qc =  iv%airep(i)%t(n)%qc
-            t_err= iv%airep(i)%t(n)%error
-            if (iv%airep(i)%t(n)%qc <= fails_error_max) then
+            t    =  ob%airep(n)%t(k)
+            t_qc =  iv%airep(n)%t(k)%qc
+            t_err= iv%airep(n)%t(k)%error
+            if (iv%airep(n)%t(k)%qc <= fails_error_max) then
                t_qc = missing_data
                t   = missing_r
             end if
 
             write(ounit, fmt = trim (fmt_each))       &
-               iv%airep(i)%p(n),zero , pr_error,      &
+               iv%airep(n)%p(k),zero , pr_error,      &
                speed, speed_qc, speed_err,            &
                dir  , dir_qc, dir_error,              &
                missing_r, standard_atmosphere, xmiss, &
@@ -883,38 +879,38 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Pilot:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(pilot) > 0) then
+   if (iv%info(pilot)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-           ' writing filtered obs for pilot  ',iv%nlocal(pilot) 
+           ' writing filtered obs for pilot  ',iv%info(pilot)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(pilot)               
-         if (.not. iv%pilot(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(pilot)%nlocal               
+         if (.not. iv%info(pilot)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%pilot(i)%info%platform,    &
-            iv%pilot(i)%info%date_char,   &
-            iv%pilot(i)%info%name,        &
-            iv%pilot(i)%info%levels,      &
-            iv%pilot(i)%info%lat,         &
-            iv%pilot(i)%info%lon,         &
-            iv%pilot(i)%info%elv,         &
-            iv%pilot(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%pilot(i)%loc%slp, iv%pilot(i)%loc%pw
+            iv%info(pilot)%platform(n),    &
+            iv%info(pilot)%date_char(n),   &
+            iv%info(pilot)%name(n),        &
+            iv%info(pilot)%levels(n),      &
+            iv%info(pilot)%lat(1,n),         &
+            iv%info(pilot)%lon(1,n),         &
+            iv%info(pilot)%elv(n),         &
+            iv%info(pilot)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(pilot)%slp(n), iv%info(pilot)%pw(n)
 
-         do n = 1, iv%pilot(i)%info%levels
+         do k = 1, iv%info(pilot)%levels(n)
 
             ! get speed and direction
-            if (iv%pilot(i)%u(n)%qc >= obs_qc_pointer .and. &
-                iv%pilot(i)%v(n)%qc >= obs_qc_pointer) then  
-               uu = ob%pilot(i)%u(n)
-               vv = ob%pilot(i)%v(n)
-               call da_ffdduv(speed, dir, uu, vv, iv%pilot(i)%info%lon, &
+            if (iv%pilot(n)%u(k)%qc >= obs_qc_pointer .and. &
+                iv%pilot(n)%v(k)%qc >= obs_qc_pointer) then  
+               uu = ob%pilot(n)%u(k)
+               vv = ob%pilot(n)%v(k)
+               call da_ffdduv(speed, dir, uu, vv, iv%info(pilot)%lon(k,n), &
                   convert_uv2fd)                        
-               speed_qc  = iv%pilot(i)%u(n)%qc
+               speed_qc  = iv%pilot(n)%u(k)%qc
                dir_qc    = speed_qc
-               speed_err = iv%pilot(i)%u(n)%error
+               speed_err = iv%pilot(n)%u(k)%error
             else
                speed     = missing_r
             speed_qc    = missing_data
@@ -924,7 +920,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             end if
 
             write(ounit, fmt = trim (fmt_each))       &
-               iv%pilot(i)%p(n),zero, pr_error,       &
+               iv%pilot(n)%p(k),zero, pr_error,       &
                speed, speed_qc, speed_err,            &
                dir  , dir_qc, dir_error,              &
                missing_r, standard_atmosphere, xmiss, &
@@ -940,35 +936,35 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Note: The satem ref_p is put in the SLP position in OBSPROC data stream.
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(satem) > 0) then
+   if (iv%info(satem)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for satem  ',iv%nlocal(satem) 
+            ' writing filtered obs for satem  ',iv%info(satem)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(satem)           
-         if (.not. iv%satem(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(satem)%nlocal           
+         if (.not. iv%info(satem)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%satem(i)%info%platform,    &
-            iv%satem(i)%info%date_char,   &
-            iv%satem(i)%info%name,        &
-            iv%satem(i)%info%levels,      &
-            iv%satem(i)%info%lat,         &
-            iv%satem(i)%info%lon,         &
-            iv%satem(i)%info%elv,         &
-            iv%satem(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%satem(i)%loc%slp, iv%satem(i)%loc%pw
+            iv%info(satem)%platform(n),    &
+            iv%info(satem)%date_char(n),   &
+            iv%info(satem)%name(n),        &
+            iv%info(satem)%levels(n),      &
+            iv%info(satem)%lat(1,n),         &
+            iv%info(satem)%lon(1,n),         &
+            iv%info(satem)%elv(n),         &
+            iv%info(satem)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(satem)%slp(n),iv%info(satem)%pw(n)
 
-         do n = 1, iv%satem(i)%info%levels 
-            thick_qc = iv%satem(i)%thickness(n)%qc
-            thick = iv%satem(i)%org_thickness(n)%inv   
-            thick_error = iv%satem(i)%org_thickness(n)%error
-            if (iv%satem(i)%thickness(n)%qc < obs_qc_pointer) &
+         do k = 1, iv%info(satem)%levels(n) 
+            thick_qc = iv%satem(n)%thickness(k)%qc
+            thick = iv%satem(n)%org_thickness(k)%inv   
+            thick_error = iv%satem(n)%org_thickness(k)%error
+            if (iv%satem(n)%thickness(k)%qc < obs_qc_pointer) &
                thick_qc = missing_data
 
             write(ounit, fmt = trim (fmt_each))               &
-               iv%satem(i)%p(n),zero, slp_error,                 &
+               iv%satem(n)%p(k),zero, slp_error,                 &
                missing_r, missing_data, xmiss,                   &
                missing_r, missing_data, xmiss,                   &
                missing_r, standard_atmosphere, xmiss,            &
@@ -983,35 +979,35 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Qscat: 
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(qscat) > 0) then
+   if (iv%info(qscat)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for qscat  ',iv%nlocal(qscat) 
+            ' writing filtered obs for qscat  ',iv%info(qscat)%nlocal 
       end if
  
-      do i = 1, iv % nlocal(qscat)               
-         if (.not. iv%qscat(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(qscat)%nlocal               
+         if (.not. iv%info(qscat)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%qscat(i)%info%platform,    &
-            iv%qscat(i)%info%date_char,   &
-            iv%qscat(i)%info%name,        &
-            iv%qscat(i)%info%levels,      &
-            iv%qscat(i)%info%lat,         &
-            iv%qscat(i)%info%lon,         &
-            iv%qscat(i)%info%elv,         &
-            iv%qscat(i)%info%id
+            iv%info(qscat)%platform(k),    &
+            iv%info(qscat)%date_char(k),   &
+            iv%info(qscat)%name(k),        &
+            iv%info(qscat)%levels(k),      &
+            iv%info(qscat)%lat(1,n),         &
+            iv%info(qscat)%lon(1,n),         &
+            iv%info(qscat)%elv(n),         &
+            iv%info(qscat)%id
 
-         write(ounit, fmt = fmt_srfc) iv%qscat(i)%loc%slp, iv%qscat(i)%loc%pw
+         write(ounit, fmt = fmt_srfc) iv%info(qscat)%slp(k), iv%info(qscat)%pw(k)
 
          ! get speed and direction
-         if (iv%qscat(i)%u%qc >= obs_qc_pointer .and. &
-             iv%qscat(i)%v%qc >= obs_qc_pointer) then  
-            uu = ob%qscat(i)%u
-            vv = ob%qscat(i)%v
-            call da_ffdduv(speed, dir, uu, vv, iv%qscat(i)%info%lon, &
+         if (iv%qscat(k)%u%qc >= obs_qc_pointer .and. &
+             iv%qscat(k)%v%qc >= obs_qc_pointer) then  
+            uu = ob%qscat(n)%u
+            vv = ob%qscat(n)%v
+            call da_ffdduv(speed, dir, uu, vv, iv%info(qscat)%lon(1,n), &
                convert_uv2fd)                        
-            speed_error = iv%qscat(i)%u%error
+            speed_error = iv%qscat(n)%u%error
          else
             speed = missing_r
             dir   = missing_r
@@ -1021,10 +1017,10 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          write(ounit, fmt = trim (fmt_each))          &
-            iv%qscat(i)%h,iv%qscat(i)%u%qc,slp_error, &  
-            speed,iv%qscat(i)%u%qc,speed_error,       &
-            dir  ,iv%qscat(i)%u%qc,dir_error,         &
-            iv%qscat(i)%info%elv, zero, elv_error,    &
+            iv%qscat(k)%h,iv%qscat(k)%u%qc,slp_error, &  
+            speed,iv%qscat(k)%u%qc,speed_error,       &
+            dir  ,iv%qscat(k)%u%qc,dir_error,         &
+            iv%info(qscat)%elv(n), zero, elv_error,    &
             missing_r, missing_data, xmiss,           & 
             missing_r, missing_data, xmiss,           & 
             missing_r, missing_data, xmiss
@@ -1036,36 +1032,36 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write Profiler: 
    !--------------------------------------------------------------------------
    
-   if (iv % nlocal(profiler) > 0) then
+   if (iv%info(profiler)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for profiler  ',iv%nlocal(profiler) 
+            ' writing filtered obs for profiler  ',iv%info(profiler)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(profiler)            
-         if (.not. iv%profiler(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(profiler)%nlocal            
+         if (.not. iv%info(profiler)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost)    &
-            iv%profiler(i)%info%platform,    &
-            iv%profiler(i)%info%date_char,   &
-            iv%profiler(i)%info%name,        &
-            iv%profiler(i)%info%levels,      &
-            iv%profiler(i)%info%lat,         &
-            iv%profiler(i)%info%lon,         &
-            iv%profiler(i)%info%elv,         &
-            iv%profiler(i)%info%id
+            iv%info(profiler)%platform(n),    &
+            iv%info(profiler)%date_char(n),   &
+            iv%info(profiler)%name(n),        &
+            iv%info(profiler)%levels(n),      &
+            iv%info(profiler)%lat(1,n),         &
+            iv%info(profiler)%lon(1,n),         &
+            iv%info(profiler)%elv(n),         &
+            iv%info(profiler)%id(n)
          write(ounit, fmt = fmt_srfc) &
-            iv%profiler(i)%loc%slp, iv%profiler(i)%loc%pw
+            iv%info(profiler)%slp(n), iv%info(profiler)%pw(n)
 
-         do n = 1, iv%profiler(i)%info%levels
+         do k = 1, iv%info(profiler)%levels(n)
 
             ! get speed and direction
-            if (iv%profiler(i)%u(n)%qc >= obs_qc_pointer .and. &
-                iv%profiler(i)%v(n)%qc >= obs_qc_pointer) then  
-               uu = ob%profiler(i)%u(n)
-               vv = ob%profiler(i)%v(n)
-               call da_ffdduv(speed, dir, uu, vv, iv%profiler(i)%info%lon, &
+            if (iv%profiler(n)%u(k)%qc >= obs_qc_pointer .and. &
+                iv%profiler(n)%v(k)%qc >= obs_qc_pointer) then  
+               uu = ob%profiler(n)%u(k)
+               vv = ob%profiler(n)%v(k)
+               call da_ffdduv(speed, dir, uu, vv, iv%info(profiler)%lon(k,n), &
                   convert_uv2fd)
-               speed_error = iv%profiler(i)%u(n)%error
+               speed_error = iv%profiler(n)%u(k)%error
             else
                speed = missing_r
                dir   = missing_r
@@ -1075,10 +1071,10 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
            end if
 
            write(ounit, fmt = trim (fmt_each))          &
-              iv%profiler(i)%p(n),zero,pr_error,        &
+              iv%profiler(n)%p(k),zero,pr_error,        &
               speed,speed_qc              ,speed_error, &
               dir  ,dir_qc                ,dir_error,   &
-              iv%profiler(i)%info%elv, zero, elv_error, &
+              iv%info(profiler)%elv(n), zero, elv_error, &
               missing_r, missing_data, xmiss,           & 
               missing_r, missing_data, xmiss,           & 
               missing_r, missing_data, xmiss
@@ -1089,32 +1085,32 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
 
    ! [10] Write SSMT1:          
-   if (iv % nlocal(ssmt1) > 0) then
+   if (iv%info(ssmt1)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ssmt1 ', iv % nlocal(ssmt1) 
+            ' writing filtered obs for ssmt1 ', iv%info(ssmt1)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(ssmt1)             
-         if (.not. iv%ssmt1(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(ssmt1)%nlocal             
+         if (.not. iv%info(ssmt1)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%ssmt1(i)%info%platform,    &
-            iv%ssmt1(i)%info%date_char,   &
-            iv%ssmt1(i)%info%name,        &
-            iv%ssmt1(i)%info%levels,      &
-            iv%ssmt1(i)%info%lat,         &
-            iv%ssmt1(i)%info%lon,         &
-            iv%ssmt1(i)%info%elv,         &
-            iv%ssmt1(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%ssmt1(i)%loc%slp, iv%ssmt1(i)%loc%pw
+            iv%info(ssmt1)%platform(n),    &
+            iv%info(ssmt1)%date_char(n),   &
+            iv%info(ssmt1)%name(n),        &
+            iv%info(ssmt1)%levels(n),      &
+            iv%info(ssmt1)%lat(1,n),         &
+            iv%info(ssmt1)%lon(1,n),         &
+            iv%info(ssmt1)%elv(n),         &
+            iv%info(ssmt1)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(ssmt1)%slp(n), iv%info(ssmt1)%pw(n)
 
-         do n = 1, iv%ssmt1(i)%info%levels
+         do k = 1, iv%info(ssmt1)%levels(n)
             write(ounit, fmt = trim (fmt_each))                            &
-               iv%ssmt1(i)%p(n),zero,  slp_error,                          &
+               iv%ssmt1(n)%p(k),zero,  slp_error,                          &
                missing_r, missing, missing_r,                              &
                missing_r, missing, missing_r,                              &
                height,          height_qc,height_error,                    &
-               ob%ssmt1(i)%t(n),iv%ssmt1(i)%t(n)%qc,iv%ssmt1(i)%t(n)%error,&
+               ob%ssmt1(n)%t(k),iv%ssmt1(n)%t(k)%qc,iv%ssmt1(n)%t(k)%error,&
                td, td_qc, td_error,                                        &   
                missing_r, missing, missing_r                                 
          end do 
@@ -1125,34 +1121,34 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write SSMT2:    
    !--------------------------------------------------------------------------      
 
-   if (iv % nlocal(ssmt2) > 0) then
+   if (iv%info(ssmt2)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ssmt2 ', iv % nlocal(ssmt2) 
+            ' writing filtered obs for ssmt2 ', iv%info(ssmt2)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(ssmt2)              
-         if (.not. iv%ssmt2(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(ssmt2)%nlocal              
+         if (.not. iv%info(ssmt2)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%ssmt2(i)%info%platform,    &
-            iv%ssmt2(i)%info%date_char,   &
-            iv%ssmt2(i)%info%name,        &
-            iv%ssmt2(i)%info%levels,      &
-            iv%ssmt2(i)%info%lat,         &
-            iv%ssmt2(i)%info%lon,         &
-            iv%ssmt2(i)%info%elv,         &
-            iv%ssmt2(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%ssmt2(i)%loc%slp, iv%ssmt2(i)%loc%pw
+            iv%info(ssmt2)%platform(n),    &
+            iv%info(ssmt2)%date_char(n),   &
+            iv%info(ssmt2)%name(n),        &
+            iv%info(ssmt2)%levels(n),      &
+            iv%info(ssmt2)%lat(1,n),         &
+            iv%info(ssmt2)%lon(1,n),         &
+            iv%info(ssmt2)%elv(n),         &
+            iv%info(ssmt2)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(ssmt2)%slp(n), iv%info(ssmt2)%pw(n)
 
-         do n = 1, iv%ssmt2(i)%info%levels
+         do k = 1, iv%info(ssmt2)%levels(n)
             write(ounit, fmt = trim (fmt_each))                  &
-            iv%ssmt2(i)%p(n),zero,  slp_error,                &
+            iv%ssmt2(n)%p(k),zero,  slp_error,                &
             missing_r, missing, missing_r,                    &
             missing_r, missing, missing_r,                    &
             height,          height_qc,height_error,          &
             missing_r, missing, missing_r,                    &
             td, td_qc, td_error,                              &   
-            ob%ssmt2(i)%rh(n),iv%ssmt2(i)%rh(n)%qc,rh_error                 
+            ob%ssmt2(n)%rh(k),iv%ssmt2(n)%rh(k)%qc,rh_error                 
          end do  
       end do 
    end if
@@ -1161,83 +1157,83 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    !  Write Gpspw:          
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(gpspw) > 0) then
+   if (iv%info(gpspw)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for gpspw ', iv % nlocal(gpspw) 
+            ' writing filtered obs for gpspw ', iv%info(gpspw)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(gpspw)
-         if (.not. iv%gpspw(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(gpspw)%nlocal
+         if (.not. iv%info(gpspw)%proc_domain(1,n)) cycle
          ! hardwired the # of levels = 0 for GPSPW (YRG 03/02/2006)
-         iv%gpspw(i)%info%levels = 0
+         iv%info(gpspw)%levels(n) = 0
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%gpspw(i)%info%platform,    &
-            iv%gpspw(i)%info%date_char,   &
-            iv%gpspw(i)%info%name,        &
-            iv%gpspw(i)%info%levels,      &
-            iv%gpspw(i)%info%lat,         &
-            iv%gpspw(i)%info%lon,         &
-            iv%gpspw(i)%info%elv,         &
-            iv%gpspw(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%gpspw(i)%loc%slp, iv%gpspw(i)%loc%pw
+            iv%info(gpspw)%platform(n),    &
+            iv%info(gpspw)%date_char(n),   &
+            iv%info(gpspw)%name(n),        &
+            iv%info(gpspw)%levels(n),      &
+            iv%info(gpspw)%lat(1,n),         &
+            iv%info(gpspw)%lon(1,n),         &
+            iv%info(gpspw)%elv(n),         &
+            iv%info(gpspw)%id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(gpspw)%slp(n), iv%info(gpspw)%pw(n)
       end do 
    end if
 
    ! Write Gps Refractivity:
-   if (iv % nlocal(gpsref) > 0) then
+   if (iv%info(gpsref)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for gpsref ', iv % nlocal(gpsref)
+            ' writing filtered obs for gpsref ', iv%info(gpsref)%nlocal
       end if
 
-      do i = 1, iv % nlocal(gpsref)
-         if (.not. iv%gpsref(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(gpsref)%nlocal
+         if (.not. iv%info(gpsref)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%gpsref(i)%info%platform,    &
-            iv%gpsref(i)%info%date_char,   &
-            iv%gpsref(i)%info%name,        &
-            iv%gpsref(i)%info%levels,      &
-            iv%gpsref(i)%info%lat,         &
-            iv%gpsref(i)%info%lon,         &
-            iv%gpsref(i)%info%elv,         &
-            iv%gpsref(i)%info%id
-         write(ounit, fmt = fmt_srfc) iv%gpsref(i)%loc%slp, iv%gpsref(i)%loc%pw
+            iv%info(gpsref) %platform(n),    &
+            iv%info(gpsref) %date_char(n),   &
+            iv%info(gpsref) %name(n),        &
+            iv%info(gpsref) %levels(n),      &
+            iv%info(gpsref) %lat(1,n),         &
+            iv%info(gpsref) %lon(1,n),         &
+            iv%info(gpsref) %elv(n),         &
+            iv%info(gpsref) %id(n)
+         write(ounit, fmt = fmt_srfc) iv%info(gpsref)%slp(n), iv%info(gpsref)%pw(n)
 
-         do n = 1, iv%gpsref(i)%info%levels
+         do k = 1, iv%info(gpsref)%levels(k)
 
             ! get RH from Q & T    
-            if (iv%gpsref(i)%q(n)%qc >= obs_qc_pointer .and.  &
-                abs(iv%gpsref(i)%q(n)%error - missing_r) > 1. .and.  &
-                abs(ob%gpsref(i)%t(n)       - missing_r) > 1. .and.  &
-                abs(ob%gpsref(i)%p(n)       - missing_r) > 1.   ) then 
-               call da_tp_to_qs(ob%gpsref(i)%t(n), ob%gpsref(i)%p(n), es, qs)
-               rh = (ob%gpsref(i)%q(n)/qs) * 100.
-               rh_qc = iv%gpsref(i)%q(n)%qc
+            if (iv%gpsref(n)%q(k)%qc >= obs_qc_pointer .and.  &
+                abs(iv%gpsref(n)%q(k)%error - missing_r) > 1. .and.  &
+                abs(ob%gpsref(n)%t(k)       - missing_r) > 1. .and.  &
+                abs(ob%gpsref(n)%p(k)       - missing_r) > 1.   ) then 
+               call da_tp_to_qs(ob%gpsref(n)%t(k), ob%gpsref(n)%p(k), es, qs)
+               rh = (ob%gpsref(n)%q(k)/qs) * 100.
+               rh_qc = iv%gpsref(n)%q(k)%qc
             else
                rh    = missing_r
                rh_qc = missing_data
             end if
 
-            p    = ob%gpsref(i)%p(n)
-            p_qc = iv%gpsref(i)%p(n)%qc 
-            if (iv%gpsref(i)%p(n)%qc <= fails_error_max) then
+            p    = ob%gpsref(n)%p(k)
+            p_qc = iv%gpsref(n)%p(k)%qc 
+            if (iv%gpsref(n)%p(k)%qc <= fails_error_max) then
                p    = missing_r     
                p_qc = missing_data  
             end if
 
-            t    = ob%gpsref(i)%t(n)
-            t_qc  = iv%gpsref(i)%t(n)%qc
-            t_err = iv%gpsref(i)%t(n)%error   
-            if (iv%gpsref(i)%t(n)%qc <= fails_error_max) then
+            t    = ob%gpsref(n)%t(k)
+            t_qc  = iv%gpsref(n)%t(k)%qc
+            t_err = iv%gpsref(n)%t(k)%error   
+            if (iv%gpsref(n)%t(k)%qc <= fails_error_max) then
                t    = missing_r     
                t_qc = missing_data  
             end if
 
-            ref = ob%gpsref(i)%ref(n)
-            ref_qc = iv%gpsref(i)%ref(n)%qc
-            ref_err = iv%gpsref(i)%ref(n)%error   
-            if (iv%gpsref(i)%ref(n)%qc <= fails_error_max) then
+            ref = ob%gpsref(n)%ref(k)
+            ref_qc = iv%gpsref(n)%ref(k)%qc
+            ref_err = iv%gpsref(n)%ref(k)%error   
+            if (iv%gpsref(n)%ref(k)%qc <= fails_error_max) then
                ref    = missing_r     
                ref_qc = missing_data  
             end if
@@ -1246,10 +1242,10 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                p,  p_qc, slp_error,                         &
                missing_r, missing_data, xmiss,              &
                missing_r, missing_data, xmiss,              &
-               iv%gpsref(i)%h(n), zero, height_error,       &
+               iv%gpsref(n)%h(k), zero, height_error,       &
                t, t_qc,  t_err,                             &   
                ref, ref_qc,  ref_err,                       &   
-               rh, rh_qc, iv%gpsref(i)%q(n)%error
+               rh, rh_qc, iv%gpsref(n)%q(k)%error
          end do 
       end do 
    end if
@@ -1258,54 +1254,54 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
    ! Write AIRS  retrievals:
    !--------------------------------------------------------------------------
 
-   if (iv % nlocal(airsr) > 0) then
+   if (iv%info(airsr)%nlocal > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for AIRS retrievals ',iv%nlocal(airsr) 
+            ' writing filtered obs for AIRS retrievals ',iv%info(airsr)%nlocal 
       end if
 
-      do i = 1, iv % nlocal(airsr)               
-         if (.not. iv%airsr(i)%loc%proc_domain) cycle
+      do n = 1, iv%info(airsr)%nlocal               
+         if (.not. iv%info(airsr)%proc_domain(1,n)) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%airsr(i)%info%platform,    &
-            iv%airsr(i)%info%date_char,   &
-            iv%airsr(i)%info%name,        &
-            iv%airsr(i)%info%levels,      &
-            iv%airsr(i)%info%lat,         &
-            iv%airsr(i)%info%lon,         &
-            iv%airsr(i)%info%elv,         &
-            iv%airsr(i)%info%id
+            iv%info(airsr)%platform(n),    &
+            iv%info(airsr)%date_char(n),   &
+            iv%info(airsr)%name(n),        &
+            iv%info(airsr)%levels(n),      &
+            iv%info(airsr)%lat(1,n),         &
+            iv%info(airsr)%lon(1,n),         &
+            iv%info(airsr)%elv(n),         &
+            iv%info(airsr)%id(n)
          write(ounit, fmt = fmt_srfc) &
-            iv%airsr(i)%loc%slp, iv%airsr(i)%loc%pw
+            iv%info(airsr)%slp(n), iv%info(airsr)%pw(n)
 
-         do n = 1, iv%airsr(i)%info%levels
+         do k = 1, iv%info(airsr)%levels(n)
             ! get RH from Q & T    
-            if (iv%airsr(i)%q(n)%qc >= obs_qc_pointer .and.  &
-                abs(iv%airsr(i)%q(n)%error - missing_r) > 1. .and.  &
-                abs(ob%airsr(i)%t(n)       - missing_r) > 1. .and.  &
-                abs(iv%airsr(i)%p(n)       - missing_r) > 1.   ) then 
-               call da_tp_to_qs(ob%airsr(i)%t(n), iv%airsr(i)%p(n), es, qs)
-               rh = (ob%airsr(i)%q(n)/qs) * 100.
-               rh_qc = iv%airsr(i)%q(n)%qc
+            if (iv%airsr(n)%q(k)%qc >= obs_qc_pointer .and.  &
+                abs(iv%airsr(n)%q(k)%error - missing_r) > 1. .and.  &
+                abs(ob%airsr(n)%t(k)       - missing_r) > 1. .and.  &
+                abs(iv%airsr(n)%p(k)       - missing_r) > 1.   ) then 
+               call da_tp_to_qs(ob%airsr(n)%t(k), iv%airsr(n)%p(k), es, qs)
+               rh = (ob%airsr(n)%q(k)/qs) * 100.
+               rh_qc = iv%airsr(n)%q(k)%qc
             else
                rh    = missing_r
                rh_qc = missing_data
             end if
             if (rh_qc < 0) rh_qc = missing_data
 
-            t     = ob%airsr(i)%t(n)
-            t_qc  = iv%airsr(i)%t(n)%qc
-            t_err = iv%airsr(i)%t(n)%error
-            if (iv%airsr(i)%t(n)%qc <= fails_error_max) then
+            t     = ob%airsr(n)%t(k)
+            t_qc  = iv%airsr(n)%t(k)%qc
+            t_err = iv%airsr(n)%t(k)%error
+            if (iv%airsr(n)%t(k)%qc <= fails_error_max) then
                t_qc = missing_data
                t    = missing_r
             end if
 
             write(ounit, fmt = trim (fmt_each))      &
-               iv%airsr(i)%p(n), zero,    pr_error,     &
+               iv%airsr(n)%p(k), zero,    pr_error,     &
                missing_r, missing_data, xmiss,          &
                missing_r, missing_data, xmiss,          &
-               iv%airsr(i)%h(n), zero, elv_error,       &
+               iv%airsr(n)%h(k), zero, elv_error,       &
                t,  t_qc, t_err,                         &
                td, td_qc, td_error,                     &
                rh, rh_qc,  rh_error                
@@ -1313,7 +1309,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
       end do     
    end if
 
-   if (iv % nlocal(ssmi_tb) > 0) then
+   if (iv%info(ssmi_tb)%nlocal > 0) then
       call da_warning(__FILE__,__LINE__, &     
         (/"Currently SSMI brightness temperature info is not written for filtered obs"/))
    end if

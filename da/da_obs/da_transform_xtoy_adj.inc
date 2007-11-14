@@ -17,34 +17,34 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    ! [1.0] observation operator y = H(x):
    !--------------------------------------------------------------------------
   
-   if (iv % nlocal(sound) > 0) then
+   if (iv%info(sound)%nlocal > 0) then
       call da_transform_xtoy_sound_adj     (iv, jo_grad_y, jo_grad_x) 
       call da_transform_xtoy_sonde_sfc_adj (grid, iv, jo_grad_y, jo_grad_x) 
    end if
 
-   if (iv % nlocal(synop)          > 0) call da_transform_xtoy_synop_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(geoamv)         > 0) call da_transform_xtoy_geoamv_adj   (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(polaramv)       > 0) call da_transform_xtoy_polaramv_adj (iv, jo_grad_y, jo_grad_x)   
-   if (iv % nlocal(airep)          > 0) call da_transform_xtoy_airep_adj    (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(metar)          > 0) call da_transform_xtoy_metar_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(ships)          > 0) call da_transform_xtoy_ships_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(gpspw)          > 0) call da_transform_xtoy_gpspw_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(gpsref)         > 0) call da_transform_xtoy_gpsref_adj   (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(ssmi_tb)        > 0) call da_transform_xtoy_ssmi_tb_adj  (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(ssmi_rv) > 0) call da_transform_xtoy_ssmi_rv_adj  (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(pilot)          > 0) call da_transform_xtoy_pilot_adj    (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(satem)          > 0) call da_transform_xtoy_satem_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(ssmt1)          > 0) call da_transform_xtoy_ssmt1_adj    (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(ssmt2)          > 0) call da_transform_xtoy_ssmt2_adj    (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(qscat)          > 0) call da_transform_xtoy_qscat_adj    (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(profiler)       > 0) call da_transform_xtoy_profiler_adj (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(buoy)           > 0) call da_transform_xtoy_buoy_adj     (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(gpsref)         > 0) call da_transform_xtoy_gpsref_adj   (iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(radar)          > 0) call da_transform_xtoy_radar_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(bogus)          > 0) call da_transform_xtoy_bogus_adj    (grid, iv, jo_grad_y, jo_grad_x)
-   if (iv % nlocal(airsr)          > 0) call da_transform_xtoy_airsr_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(synop)%nlocal    > 0) call da_transform_xtoy_synop_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(geoamv)%nlocal   > 0) call da_transform_xtoy_geoamv_adj   (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(polaramv)%nlocal > 0) call da_transform_xtoy_polaramv_adj (iv, jo_grad_y, jo_grad_x)   
+   if (iv%info(airep)%nlocal    > 0) call da_transform_xtoy_airep_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(metar)%nlocal    > 0) call da_transform_xtoy_metar_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(ships)%nlocal    > 0) call da_transform_xtoy_ships_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(gpspw)%nlocal    > 0) call da_transform_xtoy_gpspw_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(gpsref)%nlocal   > 0) call da_transform_xtoy_gpsref_adj   (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(ssmi_tb)%nlocal  > 0) call da_transform_xtoy_ssmi_tb_adj  (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(ssmi_rv)%nlocal  > 0) call da_transform_xtoy_ssmi_rv_adj  (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(pilot)%nlocal    > 0) call da_transform_xtoy_pilot_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(satem)%nlocal    > 0) call da_transform_xtoy_satem_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(ssmt1)%nlocal    > 0) call da_transform_xtoy_ssmt1_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(ssmt2)%nlocal    > 0) call da_transform_xtoy_ssmt2_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(qscat)%nlocal    > 0) call da_transform_xtoy_qscat_adj    (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(profiler)%nlocal > 0) call da_transform_xtoy_profiler_adj (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(buoy)%nlocal     > 0) call da_transform_xtoy_buoy_adj     (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(gpsref)%nlocal   > 0) call da_transform_xtoy_gpsref_adj   (iv, jo_grad_y, jo_grad_x)
+   if (iv%info(radar)%nlocal    > 0) call da_transform_xtoy_radar_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(bogus)%nlocal    > 0) call da_transform_xtoy_bogus_adj    (grid, iv, jo_grad_y, jo_grad_x)
+   if (iv%info(airsr)%nlocal    > 0) call da_transform_xtoy_airsr_adj    (iv, jo_grad_y, jo_grad_x)
 
-   if (num_pseudo              > 0) call da_transform_xtoy_pseudo_adj   (iv, jo_grad_y, jo_grad_x)
+   if (num_pseudo            > 0) call da_transform_xtoy_pseudo_adj   (iv, jo_grad_y, jo_grad_x)
 
    if (use_rad) then
       if (rtm_option == rtm_option_rttov) then

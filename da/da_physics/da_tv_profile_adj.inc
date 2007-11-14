@@ -1,4 +1,4 @@
-subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, ADJ_tv_ma)
+subroutine da_tv_profile_adj(grid,jo_grad_x,info, n,pre_ma,tv_ma,ADJ_pre_ma, ADJ_tv_ma)
 
    !-----------------------------------------------------------------------
    ! Purpose: adjoint routine for da_tv_profile
@@ -7,7 +7,8 @@ subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, ADJ_tv_
    implicit none
 
    type (x_type),         intent(inout) :: jo_grad_x ! grad_x(jo)
-   type (model_loc_type), intent(in)    :: loc
+   type (infa_type),      intent(in)    :: info
+   integer,               intent(in)    :: n
    type (domain),         intent(in)    :: grid
    real,                  intent(in)    :: pre_ma(kts-1:kte+1)
    real,                  intent(in)    :: tv_ma(kts-1:kte+1)
@@ -22,12 +23,12 @@ subroutine da_tv_profile_adj(grid,jo_grad_x,loc,pre_ma,tv_ma,ADJ_pre_ma, ADJ_tv_
 
    if (trace_use_dull) call da_trace_entry("da_tv_profile_adj")
 
-   i   = loc%i
-   j   = loc%j
-   dx  = loc%dx
-   dy  = loc%dy
-   dxm = loc%dxm
-   dym = loc%dym
+   i   = info%i(1,n)
+   j   = info%j(1,n)
+   dx  = info%dx(1,n)
+   dy  = info%dy(1,n)
+   dxm = info%dxm(1,n)
+   dym = info%dym(1,n)
 
    ADJ_tv_m(1,1,kts:kte) = dym*dxm * ADJ_tv_ma (kts:kte)
    ADJ_tv_m(2,1,kts:kte) = dym*dx *  ADJ_tv_ma (kts:kte)

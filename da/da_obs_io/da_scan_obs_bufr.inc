@@ -153,101 +153,103 @@ subroutine da_scan_obs_bufr (iv, filename)
          case (11, 12, 13, 22, 23, 31)
             select case(kx)
             case (120, 122, 132, 220, 222, 232) ;         ! Sound
-               if (.not.use_soundobs .or. iv%ntotal(sound) == max_sound_input) cycle reports
-               if (n==1) iv%ntotal(sound) = iv%ntotal(sound) + 1
+               if (.not.use_soundobs .or. iv%info(sound)%ntotal == max_sound_input) cycle reports
+               if (n==1) iv%info(sound)%ntotal     = iv%info(sound)%ntotal + 1
+               if (n==1) iv%info(sonde_sfc)%ntotal = iv%info(sonde_sfc)%ntotal + 1
                if (outside) cycle reports
-               iv%nlocal(sound) = iv%nlocal(sound) + 1
-               platform%loc%obs_global_index  = iv%ntotal(sound)
+               iv%info(sound)%nlocal = iv%info(sound)%nlocal + 1
+               iv%info(sonde_sfc)%nlocal = iv%info(sonde_sfc)%nlocal + 1
+               platform%loc%obs_global_index  = iv%info(sound)%ntotal
 
             case (221) ;                   ! Pilot 
-               if (.not.use_pilotobs .or. iv%ntotal(pilot) == max_pilot_input) cycle reports
-               if (n==1) iv%ntotal(pilot) = iv%ntotal(pilot) + 1
+               if (.not.use_pilotobs .or. iv%info(pilot)%ntotal == max_pilot_input) cycle reports
+               if (n==1) iv%info(pilot)%ntotal = iv%info(pilot)%ntotal + 1
                if (outside) cycle reports
-               iv%nlocal(pilot) = iv%nlocal(pilot) + 1
-               platform%loc%obs_global_index  = iv%ntotal(pilot)
+               iv%info(pilot)%nlocal = iv%info(pilot)%nlocal + 1
+               platform%loc%obs_global_index  = iv%info(pilot)%ntotal
             end select
 
          case (41)
          ! case (130:131, 133, 230:231, 233) ;  ! Airep
-            if (.not.use_airepobs .or. iv%ntotal(airep) == max_airep_input) cycle reports
-            if (n==1) iv%ntotal(airep) = iv%ntotal(airep) + 1
+            if (.not.use_airepobs .or. iv%info(airep)%ntotal == max_airep_input) cycle reports
+            if (n==1) iv%info(airep)%ntotal = iv%info(airep)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(airep) = iv%nlocal(airep) + 1
-            platform%loc%obs_global_index  = iv%ntotal(airep)
+            iv%info(airep)%nlocal = iv%info(airep)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(airep)%ntotal
 
          ! case (180, 182, 280, 282) ;          ! Ships
          case (522, 523) ;      
-            if (.not.use_shipsobs .or. iv%ntotal(ships) == max_ships_input) cycle reports
-            if (n==1) iv%ntotal(ships) = iv%ntotal(ships) + 1
+            if (.not.use_shipsobs .or. iv%info(ships)%ntotal == max_ships_input) cycle reports
+            if (n==1) iv%info(ships)%ntotal = iv%info(ships)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(ships) = iv%nlocal(ships) + 1
-            platform%loc%obs_global_index  = iv%ntotal(ships)
+            iv%info(ships)%nlocal = iv%info(ships)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(ships)%ntotal
 
          case (531, 561, 562) ;                ! Buoy
-            if (.not.use_synopobs .or. iv%ntotal(synop) == max_synop_input) cycle reports
-            if (n==1) iv%ntotal(synop) = iv%ntotal(synop) + 1
+            if (.not.use_synopobs .or. iv%info(synop)%ntotal == max_synop_input) cycle reports
+            if (n==1) iv%info(synop)%ntotal = iv%info(synop)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(synop) = iv%nlocal(synop) + 1
-            platform%loc%obs_global_index  = iv%ntotal(synop)
+            iv%info(synop)%nlocal = iv%info(synop)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(synop)%ntotal
 
          case (511)
          ! case (181, 281) ;            ! Synop
-            if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
-            if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
+            if (.not.use_metarobs .or. iv%info(metar)%ntotal == max_metar_input) cycle reports
+            if (n==1) iv%info(metar)%ntotal = iv%info(metar)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
-            platform%loc%obs_global_index  = iv%ntotal(metar)
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(metar)%ntotal
 
          case (512)
          ! case (187 , 287) ;                   ! Metar
-            if (.not.use_metarobs .or. iv%ntotal(metar) == max_metar_input) cycle reports
-            if (n==1) iv%ntotal(metar) = iv%ntotal(metar) + 1
+            if (.not.use_metarobs .or. iv%info(metar)%ntotal == max_metar_input) cycle reports
+            if (n==1) iv%info(metar)%ntotal = iv%info(metar)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(metar) = iv%nlocal(metar) + 1
-            platform%loc%obs_global_index  = iv%ntotal(metar)
+            iv%info(metar)%nlocal = iv%info(metar)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(metar)%ntotal
 
          case (63)
          ! case (242:246, 252:253, 255);  ! Geo. AMVs
-            if (.not.use_geoamvobs .or. iv%ntotal(geoamv) == max_geoamv_input) cycle reports
-            if (n==1) iv%ntotal(geoamv) = iv%ntotal(geoamv) + 1
+            if (.not.use_geoamvobs .or. iv%info(geoamv)%ntotal == max_geoamv_input) cycle reports
+            if (n==1) iv%info(geoamv)%ntotal = iv%info(geoamv)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(geoamv) = iv%nlocal(geoamv) + 1
-            platform%loc%obs_global_index  = iv%ntotal(geoamv)
+            iv%info(geoamv)%nlocal = iv%info(geoamv)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(geoamv)%ntotal
 
          case (71, 72)        ;         !  Profiler & VADWND - NEXRAD winds
-            if (.not.use_polaramvobs .or. iv%ntotal(polaramv) == max_polaramv_input) cycle reports
-            if (n==1) iv%ntotal(polaramv) = iv%ntotal(polaramv) + 1
+            if (.not.use_polaramvobs .or. iv%info(polaramv)%ntotal == max_polaramv_input) cycle reports
+            if (n==1) iv%info(polaramv)%ntotal = iv%info(polaramv)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(polaramv) = iv%nlocal(polaramv) + 1
-            platform%loc%obs_global_index  = iv%ntotal(polaramv)
+            iv%info(polaramv)%nlocal = iv%info(polaramv)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(polaramv)%ntotal
 
          case (582)    ;                 !  Quikscat
-            if (.not.use_qscatobs .or. iv%ntotal(qscat) == max_qscat_input) cycle reports
-            if (n==1) iv%ntotal(qscat) = iv%ntotal(qscat) + 1
+            if (.not.use_qscatobs .or. iv%info(qscat)%ntotal == max_qscat_input) cycle reports
+            if (n==1) iv%info(qscat)%ntotal = iv%info(qscat)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(qscat) = iv%nlocal(qscat) + 1
-            platform%loc%obs_global_index  = iv%ntotal(qscat)
+            iv%info(qscat)%nlocal = iv%info(qscat)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(qscat)%ntotal
 
          case (583)    ;                 !  GPS IPW      
-            if (.not.use_gpspwobs .or. iv%ntotal(gpspw) == max_gpspw_input) cycle reports
-            if (n==1) iv%ntotal(gpspw) = iv%ntotal(gpspw) + 1
+            if (.not.use_gpspwobs .or. iv%info(gpspw)%ntotal == max_gpspw_input) cycle reports
+            if (n==1) iv%info(gpspw)%ntotal = iv%info(gpspw)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(gpspw) = iv%nlocal(gpspw) + 1
-            platform%loc%obs_global_index  = iv%ntotal(gpspw)
+            iv%info(gpspw)%nlocal = iv%info(gpspw)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(gpspw)%ntotal
 
          case (584)    ;                 !  GPS REF 
-            if (.not.use_gpsrefobs .or. iv%ntotal(gpsref) == max_gpsref_input) cycle reports
-            if (n==1) iv%ntotal(gpsref) = iv%ntotal(gpsref) + 1
+            if (.not.use_gpsrefobs .or. iv%info(gpsref)%ntotal == max_gpsref_input) cycle reports
+            if (n==1) iv%info(gpsref)%ntotal = iv%info(gpsref)%ntotal + 1
             if (outside) cycle reports
-            iv%nlocal(gpsref) = iv%nlocal(gpsref) + 1
-            platform%loc%obs_global_index  = iv%ntotal(gpsref)
+            iv%info(gpsref)%nlocal = iv%info(gpsref)%nlocal + 1
+            platform%loc%obs_global_index  = iv%info(gpsref)%ntotal
 
          case default ;
             select case (kx)
             case (111 , 210)    ;           !  Tropical Cyclone Bogus
                !  Note Tropical cyclone Bougus is given type 135 in Obs-ascii
                if (.not.use_bogusobs) cycle reports
-            iv%nlocal(bogus) = iv%nlocal(bogus) + 1
+            iv%info(bogus)%nlocal = iv%info(bogus)%nlocal + 1
 
             case default 
                miscd = miscd + 1
@@ -263,9 +265,6 @@ subroutine da_scan_obs_bufr (iv, filename)
    write (unit=message(1),fmt=*) 'total bufr records =',nrecs
    write (unit=message(3),fmt=*) 'number unhandled   =',miscd 
    call da_message(message(1:3))
- 
-   iv%plocal(iv%time,:) = iv%nlocal(:)
-   iv%ptotal(iv%time,:) = iv%ntotal(:)
 
    close(iunit)
    call da_free_unit(iunit)

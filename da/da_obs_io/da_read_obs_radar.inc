@@ -25,8 +25,8 @@ subroutine da_read_obs_radar (iv, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs_radar")
 
-   nlocal(:) = iv%plocal(iv%time-1,:)
-   ntotal(:) = iv%ptotal(iv%time-1,:)
+   nlocal(:) = iv%info(:)%plocal(iv%time-1)
+   ntotal(:) = iv%info(:)%ptotal(iv%time-1)
  
    ! 1. open file
 
@@ -207,27 +207,47 @@ subroutine da_read_obs_radar (iv, filename)
                if (n==1) ntotal(radar) = ntotal(radar) + 1
                if (outside) cycle reports
                nlocal(radar) = nlocal(radar) + 1
-               if (nlocal(radar) > iv%nlocal(radar)) cycle reports
-
-               platform % loc%obs_global_index = ntotal(radar)
+               if (nlocal(radar) > iv%info(radar)%nlocal) cycle reports
 
                iv % radar (nlocal(radar)) % stn_loc % lon = platform % stn % lon
                iv % radar (nlocal(radar)) % stn_loc % lat = platform % stn % lat
                iv % radar (nlocal(radar)) % stn_loc % elv = platform % stn % elv
 
-               iv % radar (nlocal(radar)) % info = platform % info
-               iv % radar (nlocal(radar)) % loc  = platform % loc
+               iv%info(radar)%levels(nlocal(radar))    = nlevels
+               iv%info(radar)%name(nlocal(radar))      = platform%info%name
+               iv%info(radar)%platform(nlocal(radar))  = platform%info%platform
+               iv%info(radar)%id(nlocal(radar))        = platform%info%id
+               iv%info(radar)%date_char(nlocal(radar)) = platform%info%date_char
+               iv%info(radar)%lat(:,nlocal(radar))     = platform%info%lat
+               iv%info(radar)%lon(:,nlocal(radar))     = platform%info%lon
+               iv%info(radar)%elv(nlocal(radar))       = platform%info%elv
+               iv%info(radar)%pstar(nlocal(radar))     = platform%info%pstar
 
+               iv%info(radar)%slp(nlocal(radar))           = platform%loc%slp
+               iv%info(radar)%pw(nlocal(radar))            = platform%loc%pw
+               iv%info(radar)%x(:,nlocal(radar))           = platform%loc%x
+               iv%info(radar)%y(:,nlocal(radar))           = platform%loc%y 
+               iv%info(radar)%i(:,nlocal(radar))           = platform%loc%i 
+               iv%info(radar)%j(:,nlocal(radar))           = platform%loc%j 
+               iv%info(radar)%dx(:,nlocal(radar))          = platform%loc%dx
+               iv%info(radar)%dxm(:,nlocal(radar))         = platform%loc%dxm
+               iv%info(radar)%dy(:,nlocal(radar))          = platform%loc%dy
+               iv%info(radar)%dym(:,nlocal(radar))         = platform%loc%dym
+               iv%info(radar)%proc_domain(:,nlocal(radar)) = platform%loc%proc_domain
+
+               iv%info(radar)%obs_global_index(nlocal(radar)) = ntotal(radar)
+
+               allocate (iv % radar (nlocal(radar)) % model_p  (1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % model_rho(1:nlevels))
+               allocate (iv % radar (nlocal(radar)) % model_qrn(1:nlevels))
                allocate (iv % radar (nlocal(radar)) % height   (1:nlevels))
                allocate (iv % radar (nlocal(radar)) % height_qc(1:nlevels))
-               allocate (iv % radar (nlocal(radar)) % zk       (1:nlevels))
                allocate (iv % radar (nlocal(radar)) % rv       (1:nlevels))
                allocate (iv % radar (nlocal(radar)) % rf       (1:nlevels))
 
                do i = 1, nlevels
                   iv % radar (nlocal(radar)) % height(i)    = platform % each(i) % height
                   iv % radar (nlocal(radar)) % height_qc(i) = platform % each(i) % height_qc
-                  iv % radar (nlocal(radar)) % zk(i)        = platform % each(i) % zk
                   iv % radar (nlocal(radar)) % rv(i)        = platform % each(i) % rv
                   iv % radar (nlocal(radar)) % rf(i)        = platform % each(i) % rf
                end do

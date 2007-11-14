@@ -14,8 +14,8 @@ subroutine da_check_xtoy_adjoint_synop(iv, y, adjtest_lhs, pertile_lhs)
 
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_synop")
 
-   do n=1, iv%nlocal(synop)
-      if (iv%synop(n)%zk < 1.0) then
+   do n=1, iv%info(synop)%nlocal
+      if (iv%info(synop)%zk(1,n) < 1.0) then
          y%synop(n)%u = 0.0
          y%synop(n)%v = 0.0
          y%synop(n)%t = 0.0
@@ -30,7 +30,7 @@ subroutine da_check_xtoy_adjoint_synop(iv, y, adjtest_lhs, pertile_lhs)
       y%synop(n)%p = y%synop(n)%p/typical_p_rms
       y%synop(n)%q = y%synop(n)%q/typical_q_rms
 
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          adjtest_lhs = adjtest_lhs + (y%synop(n)%u)**2 + (y%synop(n)%v)**2 + (y%synop(n)%t)**2 &
             + (y%synop(n)%p)**2 + (y%synop(n)%q)**2
       end if

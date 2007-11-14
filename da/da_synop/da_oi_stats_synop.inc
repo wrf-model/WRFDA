@@ -35,29 +35,29 @@ subroutine da_oi_stats_synop (stats_unit, iv)
    stats%average = residual_synop1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(synop)
-      if (iv%synop(n)%loc%proc_domain) then
-        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+   do n=1, iv%info(synop)%nlocal
+      if (iv%info(synop)%proc_domain(1,n)) then
+        call da_stats_calculate(iv%info(synop)%obs_global_index(n), &
            0, iv%synop(n)%u%qc, &
            iv%synop(n)%u%inv, nu, &
            stats%minimum%u, stats%maximum%u, &
            stats%average%u, stats%rms_err%u)
-        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+        call da_stats_calculate(iv%info(synop)%obs_global_index(n), &
            0, iv%synop(n)%v%qc, &
            iv%synop(n)%v%inv, nv, &
            stats%minimum%v, stats%maximum%v, &
            stats%average%v, stats%rms_err%v)
-        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+        call da_stats_calculate(iv%info(synop)%obs_global_index(n), &
            0, iv%synop(n)%t%qc, &
            iv%synop(n)%t%inv, nt, &
            stats%minimum%t, stats%maximum%t, &
            stats%average%t, stats%rms_err%t)
-        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+        call da_stats_calculate(iv%info(synop)%obs_global_index(n), &
            0, iv%synop(n)%p%qc, &
            iv%synop(n)%p%inv, np, &
            stats%minimum%p, stats%maximum%p, &
            stats%average%p, stats%rms_err%p)
-        call da_stats_calculate(iv%synop(n)%loc%obs_global_index, &
+        call da_stats_calculate(iv%info(synop)%obs_global_index(n), &
             0, iv%synop(n)%q%qc, &
             iv%synop(n)%q%inv, nq, &
             stats%minimum%q, stats%maximum%q, &

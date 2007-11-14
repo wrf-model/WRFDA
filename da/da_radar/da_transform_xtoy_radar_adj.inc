@@ -15,53 +15,63 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   integer :: n  ! Loop counter.
    integer :: k  ! Index dimension.
-   integer :: num_levs
 
-   real    :: model_p(max_ob_levels)    ! Model value p at ob location.
-   real    :: model_u(max_ob_levels)    ! Model value u at ob location.
-   real    :: model_v(max_ob_levels)    ! Model value v at ob location.
-   real    :: model_w(max_ob_levels)    ! Model value w at ob location.
-   real    :: model_qrn(max_ob_levels)  ! Model qrn at ob location.
-   real    :: model_qrnb(max_ob_levels) ! Model qrn at ob location.
-   real    :: model_ps
+   integer :: n
+
+   real, allocatable :: model_p(:,:)
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_w(:,:)
+   real, allocatable :: model_qrn(:,:)
+   real, allocatable :: model_qrnb(:,:)
+   real, allocatable :: model_ps(:)
 
    real    :: xr,yr,zr
 
+   real    :: alog10
+
    if (trace_use) call da_trace_entry("da_transform_xtoy_radar_adj")
+
+   alog10= alog(10.0)
+
+   allocate (model_p(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_u(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_v(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_w(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_qrn(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_qrnb(iv%info(radar)%max_lev,iv%info(radar)%n1:iv%info(radar)%n2))
+   allocate (model_ps(iv%info(radar)%n1:iv%info(radar)%n2))
+
+   ! Needed
+   model_u = 0.0
+   model_v = 0.0
+   model_w = 0.0
+   model_qrn = 0.0
 
    ! W_HALF is vertical velocity at half-sigma levels.
 
-   do n=iv%plocal(iv%time-1,radar) + 1, iv%plocal(iv%time,radar)
-      do k = 1, max_ob_levels
-         model_u(k) = 0.0
-         model_v(k) = 0.0
-         model_w(k) = 0.0
-         model_qrn(k) = 0.0
-      end do
+   model_ps(iv%info(radar)%n1:iv%info(radar)%n2) = iv%radar(iv%info(radar)%n1:iv%info(radar)%n2)%model_ps 
 
-      num_levs = iv % radar(n) % info % levels
-
-      model_ps = iv%radar(n)%model_ps
+   do n=iv%info(radar)%n1,iv%info(radar)%n2
 
       ! [1.7] Calculate rv and rf at OBS location
 
-      xr = grid%xb%ds * (iv%radar(n)%loc%x - iv%radar(n)%stn_loc%x)
-      yr = grid%xb%ds * (iv%radar(n)%loc%y - iv%radar(n)%stn_loc%y)
+      xr = grid%xb%ds * (iv%info(radar)%x(1,n) - iv%radar(n)%stn_loc%x)
+      yr = grid%xb%ds * (iv%info(radar)%y(1,n) - iv%radar(n)%stn_loc%y)
 
-      do k = 1, num_levs
+      model_qrnb(1:iv%info(radar)%levels(n),n) = iv%radar(n)%model_qrn(:)
+      model_p   (1:iv%info(radar)%levels(n),n) = iv%radar(n)%model_p(:)
 
-         model_qrnb(k) = iv%radar(n)%model_qrn(k)
-         model_p(k)    = iv%radar(n)%model_p(k)
-
+      do k = 1,iv%info(radar)%levels(n)
          if (iv % radar(n) % height_qc(k) /= below_model_surface .and.  &
               iv % radar(n) % height_qc(k) /= above_model_lid) then
 
             if (use_radar_rf) then
                if (iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
-                 call da_reflectivity_adj(jo_grad_y%radar(n)%rf(k), &
-                    model_qrn(k), model_qrnb(k))
+
+                  model_qrn(k,n) = model_qrn(k,n) + leh2/(model_qrnb(k,n)*alog10) * jo_grad_y%radar(n)%rf(k)
+
                end if
             end if
 
@@ -70,28 +80,31 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
                   zr=iv%radar(n)%height(k) - iv%radar(n)%stn_loc%elv
 
                   call da_radial_velocity_adj(jo_grad_y%radar(n)%rv(k), &
-                     model_p(k), model_u(k), model_v(k), model_w(k),  &
-                     model_qrn(k), model_ps, xr, yr, zr, model_qrnb(k))
+                     model_p(k,n), model_u(k,n), model_v(k,n), model_w(k,n),  &
+                     model_qrn(k,n), model_ps(n), xr, yr, zr, model_qrnb(k,n))
+
                end if
             end if
          end if
-
-         jo_grad_y%radar(n)%rv(k) = 0.0
-         jo_grad_y%radar(n)%rf(k) = 0.0
-
       end do
+      jo_grad_y%radar(n)%rv(:) = 0.0
+      jo_grad_y%radar(n)%rf(:) = 0.0
+   end do ! n
 
-      ! [1.6] Interpolate horizontally from crs points:
+   ! [1.6] Interpolate horizontally from crs points:
 
-      call da_interp_lin_3d_adj(jo_grad_x % wh,iv%radar(n)%loc, &
-         model_w, num_levs, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % qrn, iv%radar(n)%loc, &
-         model_qrn, num_levs, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % v, iv%radar(n)%loc, &
-         model_v, num_levs, iv%radar(n)%zk, num_levs)
-      call da_interp_lin_3d_adj(jo_grad_x % u, iv%radar(n)%loc, &
-         model_u, num_levs, iv%radar(n)%zk, num_levs)
-   end do
+   call da_interp_lin_3d_adj (jo_grad_x % wh,  iv%info(radar), model_w)
+   call da_interp_lin_3d_adj (jo_grad_x % qrn, iv%info(radar), model_qrn)
+   call da_interp_lin_3d_adj (jo_grad_x % v,   iv%info(radar), model_v)
+   call da_interp_lin_3d_adj (jo_grad_x % u,   iv%info(radar), model_u)
+
+   deallocate (model_p)
+   deallocate (model_u)
+   deallocate (model_v)
+   deallocate (model_w)
+   deallocate (model_qrn)
+   deallocate (model_qrnb)
+   deallocate (model_ps)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_radar_adj")
 

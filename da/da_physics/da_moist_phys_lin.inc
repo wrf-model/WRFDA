@@ -75,7 +75,6 @@ subroutine da_moist_phys_lin(grid)
 
    integer :: i, j, k
 
-   real    :: tmp1, tmp2
    real    :: qrth1
 
    if (trace_use) call da_trace_entry("da_moist_phys_lin")

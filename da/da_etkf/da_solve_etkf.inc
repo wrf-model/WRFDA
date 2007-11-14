@@ -15,11 +15,11 @@ subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,&
    !
    !1) nanals, ensemble size
    !2) ndim, dimension of the perturbation vector that needs to be updated
-   !3) nobs, number of observations assimilated
+   !3) nobs, number of observations assmiilated
    !4) ens, array of perturbations before (Xf') and after (Xa') ETKF update
    !5) ens_ob, array of HXf
    !6) oberrvar, observation error variance, listed in the same sequence as HXf
-   !7) obs, observations assimilated
+   !7) obs, observations assmiilated
    !8) naccumt1, number of previous cycles immediately before the current cycle, which is needed for calculating adaptive inflation factor. naccumt1 < 0 for pre-specified inflation
    !9) naccumt2, number of previous cycles immediately before the current cycle, which is needed for calculating the rho factor in the latest version of ETKF. naccumt2 < 0 for using the older version of the ETKF. naccumt2 = 0 for using pre-specified rho factor
    !10) nstartaccum1, the cycle from which the accumulation of previous naccumt1 cycles in 8) starts

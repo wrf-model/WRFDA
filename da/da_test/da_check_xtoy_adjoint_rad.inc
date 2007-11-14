@@ -19,7 +19,7 @@ subroutine da_check_xtoy_adjoint_rad(iv, y, adjtest_lhs, pertile_lhs)
 
       do n= 1, iv%instid(inst)%num_rad       ! loop for pixel
          ! if (iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
-         if (iv%instid(inst)%proc_domain(n)) then
+         if (iv%instid(inst)%info%proc_domain(1,n)) then
             do k = 1, iv%instid(inst)%nchan
                ! if ( iv%instid(inst)%tb_qc(k,n) >= obs_qc_pointer ) &
                adjtest_lhs = adjtest_lhs + &

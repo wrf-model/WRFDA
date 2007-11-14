@@ -16,7 +16,7 @@ subroutine da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
    type (iv_type) :: iv_glob         ! Global Innovation vector (O-B).
    type (y_type)  :: re_glob         ! Global Residual vector (O-A).
    type (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
-
+   
    if (trace_use_dull) call da_trace_entry("da_jo_and_grady_sound")
 
    jo % sound_u = 0.0
@@ -25,13 +25,13 @@ subroutine da_jo_and_grady_sound(iv, re, jo, jo_grad_y)
    jo % sound_q = 0.0
 
    if (test_dm_exact) then
-      if (iv%ntotal(sound) == 0) return
+      if (iv%info(sound)%ntotal == 0) return
    else
-      if (iv%nlocal(sound) < 1) return
+      if (iv%info(sound)%nlocal < 1) return
    end if
 
-   do n=1, iv%nlocal(sound)
-       do k=1, iv%sound(n)%info%levels
+   do n=1, iv%info(sound)%nlocal
+       do k=1, iv%info(sound)%levels(n)
           jo_grad_y%sound(n)%u(k) = -re%sound(n)%u(k) / (iv%sound(n)%u(k)%error * iv%sound(n)%u(k)%error)
           jo_grad_y%sound(n)%v(k) = -re%sound(n)%v(k) / (iv%sound(n)%v(k)%error * iv%sound(n)%v(k)%error)
           jo_grad_y%sound(n)%t(k) = -re%sound(n)%t(k) / (iv%sound(n)%t(k)%error * iv%sound(n)%t(k)%error)

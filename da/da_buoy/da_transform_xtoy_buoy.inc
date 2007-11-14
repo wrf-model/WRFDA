@@ -12,23 +12,43 @@ subroutine da_transform_xtoy_buoy (grid, iv, y)
 
    integer :: n        ! Loop counter.
 
+   real, allocatable :: model_u(:,:)
+   real, allocatable :: model_v(:,:)
+   real, allocatable :: model_t(:,:)
+   real, allocatable :: model_q(:,:)
+   real, allocatable :: model_psfc(:)
+
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_buoy")
 
    if (sfc_assi_options == sfc_assi_options_1) then
-      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
-         ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d(grid%xa % u, iv%buoy(n)%loc, y%buoy(n)%u, iv%buoy(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % v, iv%buoy(n)%loc, y%buoy(n)%v, iv%buoy(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % t, iv%buoy(n)%loc, y%buoy(n)%t, iv%buoy(n)%zk)
-         call da_interp_obs_lin_2d(grid%xa % q, iv%buoy(n)%loc, y%buoy(n)%q, iv%buoy(n)%zk)
+      allocate (model_u(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+      allocate (model_v(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+      allocate (model_t(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+      allocate (model_q(1,iv%info(buoy)%n1:iv%info(buoy)%n2))
+      allocate (model_psfc(iv%info(buoy)%n1:iv%info(buoy)%n2))
+      ! [1.2] Interpolate horizontally:
+      call da_interp_lin_3d (grid%xa%u, iv%info(buoy), model_u)
+      call da_interp_lin_3d (grid%xa%v, iv%info(buoy), model_v)
+      call da_interp_lin_3d (grid%xa%t, iv%info(buoy), model_t)
+      call da_interp_lin_3d (grid%xa%q, iv%info(buoy), model_q)
 
-         call da_interp_lin_2d(grid%xa % psfc, iv%buoy(n)%loc, y%buoy(n)%p)
+      call da_interp_lin_2d (grid%xa%psfc, iv%info(buoy), 1, model_psfc)
+
+      do n=iv%info(buoy)%n1,iv%info(buoy)%n2
+         y%buoy(n)%u = model_u(1,n)
+         y%buoy(n)%v = model_v(1,n)
+         y%buoy(n)%t = model_t(1,n)
+         y%buoy(n)%q = model_q(1,n)
+         y%buoy(n)%p = model_psfc(n)
       end do
+      deallocate (model_u)
+      deallocate (model_v)
+      deallocate (model_t)
+      deallocate (model_q)
+      deallocate (model_psfc)
    else if (sfc_assi_options == sfc_assi_options_2) then
-      ! [2.0] Surface assimilation approach 2
-      do n=iv%plocal(iv%time-1,buoy) + 1, iv%plocal(iv%time,buoy)
-         call da_transform_xtopsfc(grid,iv%buoy(n),y%buoy(n))
-      end do
+      ! [2.0] Surface assmiilation approach 2
+      call da_transform_xtopsfc(grid,iv,buoy,iv%buoy(:),y%buoy(:))
    end if
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_buoy")

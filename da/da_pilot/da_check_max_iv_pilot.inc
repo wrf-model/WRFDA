@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
+subroutine da_check_max_iv_pilot(iv, it, itu,ituf,itv,itvf)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,11 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
 
    implicit none
 
-   integer,           intent(in)    :: it      ! Outer iteration
-   type (pilot_type), intent(inout) :: pilot
-   integer,           intent(inout) :: itu,ituf,itvv,itvvf
+   type(iv_type), intent(inout) :: iv
+   integer,       intent(in)    :: it      ! Outer iteration
+   integer,       intent(inout) :: itu,ituf,itv,itvf
 
-   integer :: k
+   integer :: k,n
    logical :: failed
    
    if (trace_use_dull) call da_trace_entry("da_check_max_iv_pilot")
@@ -34,14 +34,13 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
 
    failed = .false.
 
-   do k = 1, pilot % info % levels
-      ! U-wind
-      call da_max_error_qc(it, pilot % info, pilot % u(k), max_error_uv, itu, ituf, &
-         check_max_iv_unit, 'U    ', failed, check_max_iv_print)
-
-      ! V-wind
-      call da_max_error_qc (it, pilot % info, pilot % v(k), max_error_uv, itvv, itvvf, &
-         check_max_iv_unit, 'V    ', failed, check_max_iv_print)
+   do n = iv%info(pilot)%n1,iv%info(pilot)%n2
+      do k = 1, iv%info(pilot)%levels(n)
+         call da_max_error_qc (it, iv%info(pilot), n, iv%pilot(n)%u(k), max_error_uv, itu, ituf, &
+            check_max_iv_unit, 'U    ', failed, check_max_iv_print)
+         call da_max_error_qc (it, iv%info(pilot), n, iv%pilot(n)%v(k), max_error_uv, itv, itvf, &
+            check_max_iv_unit, 'V    ', failed, check_max_iv_print)                         
+      end do
    end do
    
    if (trace_use_dull) call da_trace_exit("da_check_max_iv_pilot")

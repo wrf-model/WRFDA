@@ -14,17 +14,17 @@ subroutine da_check_xtoy_adjoint_airep(iv, y, adjtest_lhs, pertile_lhs)
    
    if (trace_use_dull) call da_trace_entry("da_check_xtoy_adjoint_airep")
 
-   do n=1, iv%nlocal(airep)
-      if (iv%airep(n)%loc%proc_domain) then
-         do k=1, iv%airep(n)%info%levels
+   do n=1, iv%info(airep)%nlocal
+      do k=1, iv%info(airep)%levels(n)
+         if (iv%info(airep)%proc_domain(k,n)) then
             adjtest_lhs = adjtest_lhs + &
                (y%airep(n)%u(k) / typical_u_rms)**2 + &
                (y%airep(n)%v(k) / typical_v_rms)**2 + &
                (y%airep(n)%t(k) / typical_t_rms)**2 
-         end do
-      end if
+         end if
+      end do
 
-      do k=1, iv%airep(n)%info%levels
+      do k=1, iv%info(airep)%levels(n)
          pertile_lhs = pertile_lhs + &
             (y%airep(n)%u(k) / typical_u_rms)**2 + &
             (y%airep(n)%v(k) / typical_v_rms)**2 + &

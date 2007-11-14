@@ -27,9 +27,9 @@ subroutine da_ao_stats_gpsref (stats_unit, iv, re)
    stats%average = residual_gpsref1_type(0.0,0.0,0.0,0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(gpsref)
-      if (iv%gpsref(n)%loc%proc_domain) then
-         do k=1, iv%gpsref(n)%info%levels
+   do n=1, iv%info(gpsref)%nlocal
+      if (iv%info(gpsref)%proc_domain(1,n)) then
+         do k=1, iv%info(gpsref)%levels(n)
             call da_stats_calculate (n, k, iv%gpsref(n)%ref(k)%qc, & 
                re%gpsref(n)%ref(k), ngpsref, &
                stats%minimum%ref, stats%maximum%ref, &
@@ -71,7 +71,7 @@ subroutine da_ao_stats_gpsref (stats_unit, iv, re)
                   ' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b_0
             end if 
          end if
-      end if    ! end if (iv%gpsref(n)%loc%proc_domain)
+      end if    ! end if (iv%info(gpsref)%proc_domain(1,n))
    end do
 
    ! Do inter-processor communication to gather statistics.

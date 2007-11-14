@@ -35,7 +35,7 @@ module da_minimisation
       var_scaling4,var_scaling5,var_scaling3, jo_unit, &
       print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
       cv_size_domain_je,cv_size_domain_jb, num_pseudo, &
-      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      sound, sonde_sfc, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, radiance, monitor_on
 
@@ -97,7 +97,7 @@ module da_minimisation
       da_oi_stats_sonde_sfc,da_ao_stats_sonde_sfc,da_get_innov_vector_sound, &
       da_get_innov_vector_sonde_sfc,da_jo_and_grady_sound, da_residual_sound, &
       da_jo_and_grady_sound,da_jo_and_grady_sonde_sfc,da_residual_sonde_sfc
-   use da_ssmi, only : da_calculate_grady_ssmi,da_calculate_grady_ssmt1, &
+   use da_ssmi, only : da_calculate_grady_ssmi_tb,da_calculate_grady_ssmi_rv,da_calculate_grady_ssmt1, &
       da_calculate_grady_ssmt2, da_ao_stats_ssmi_tb ,da_ao_stats_ssmt2, &
       da_ao_stats_ssmt2, da_oi_stats_ssmt1, da_oi_stats_ssmt2, &
       da_oi_stats_ssmi_tb,da_oi_stats_ssmi_rv,da_ao_stats_ssmt1,da_get_innov_vector_ssmi_tb, &

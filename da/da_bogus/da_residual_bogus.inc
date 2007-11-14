@@ -26,8 +26,8 @@ subroutine da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np
    n_obs_bad % q % num = number_type(0, 0, 0)
    n_obs_bad % slp % num = number_type(0, 0, 0)
 
-   do n=1, iv%nlocal(bogus)
-      do k=1, iv%bogus(n)%info%levels
+   do n=1, iv%info(bogus)%nlocal
+      do k=1, iv%info(bogus)%levels(n)
          np_available = np_available + 4
          re%bogus(n)%u(k) = da_residual(n, k, y%bogus(n)%u(k), iv%bogus(n)%u(k), n_obs_bad % u)
          re%bogus(n)%v(k) = da_residual(n, k, y%bogus(n)%v(k), iv%bogus(n)%v(k), n_obs_bad % v)

@@ -11,16 +11,20 @@ subroutine da_transform_xtoy_ssmt1 (grid, iv, y)
    type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer :: n  ! Loop counter.
-   integer :: k  ! Index dimension.
+
+   real, allocatable :: t (:,:)
 
    if (trace_use_dull) call da_trace_entry("da_transform_xtoy_ssmt1") 
 
-   do n=1, iv % nlocal(ssmt1)
-      y%ssmt1(n)%t(:) = 0.0
-      k = iv % ssmt1(n) % info % levels
-      ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d(grid%xa % t, iv%ssmt1(n)%loc, y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
+   allocate (t(iv%info(ssmt1)%max_lev,iv%info(ssmt1)%n1:iv%info(ssmt1)%n2))
+
+   call da_interp_lin_3d (grid%xa % t, iv%info(ssmt1), t)
+
+   do n=iv%info(ssmt1)%n1,iv%info(ssmt1)%n2
+      y%ssmt1(n)%t(:) = t(1:iv%info(ssmt1)%levels(n),n)
    end do
+
+   deallocate (t)
 
    if (trace_use_dull) call da_trace_exit("da_transform_xtoy_ssmt1")
 

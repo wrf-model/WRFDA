@@ -24,16 +24,16 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, iv)
    stats%average = residual_ssmi_rv_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(ssmi_rv)
-      if (iv%ssmi_rv(n)%loc%proc_domain) then
-         call da_stats_calculate(iv%ssmi_rv(n)%loc%obs_global_index, &
+   do n=1, iv%info(ssmi_rv)%nlocal
+      if (iv%info(ssmi_rv)%proc_domain(1,n)) then
+         call da_stats_calculate(iv%info(ssmi_rv)%obs_global_index(n), &
            0, iv%ssmi_rv(n)%tpw%qc, &
            iv%ssmi_rv(n)%tpw%inv, ntpw, &
            stats%minimum%tpw, &
            stats%maximum%tpw,  &
            stats%average%tpw, &
            stats%rms_err%tpw)
-        call da_stats_calculate(iv%ssmi_rv(n)%loc%obs_global_index, &
+        call da_stats_calculate(iv%info(ssmi_rv)%obs_global_index(n), &
            0, iv%ssmi_rv(n)%speed%qc, &
            iv%ssmi_rv(n)%speed%inv, nspeed, &
            stats%minimum%speed, &

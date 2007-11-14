@@ -42,7 +42,7 @@ subroutine da_ao_stats_rad ( stats_unit, iv, re )
 
       do k=1, iv%instid(i)%nchan               !! loop for channels
          do n=1, iv%instid(i)%num_rad              !! loop for pixels
-            if (iv%instid(i)%proc_domain(n)) then
+            if (iv%instid(i)%info%proc_domain(1,n)) then
                call da_stats_calculate( n,k,iv%instid(i)%tb_qc(k,n), &
                                  re%instid(i)%tb(k,n), rad(i)%ichan(k)%num, &
                                  rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &

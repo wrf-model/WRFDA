@@ -26,15 +26,15 @@ subroutine da_oi_stats_polaramv(stats_unit, iv)
    stats%average = residual_polaramv1_type(0.0, 0.0)
    stats%rms_err = stats%average
 
-   do n=1, iv%nlocal(polaramv)
-      if (iv%polaramv(n)%loc%proc_domain) then
-         do k=1, iv%polaramv(n)%info%levels
-            call da_stats_calculate(iv%polaramv(n)%loc%obs_global_index, &
+   do n=1, iv%info(polaramv)%nlocal
+      if (iv%info(polaramv)%proc_domain(1,n)) then
+         do k=1, iv%info(polaramv)%levels(n)
+            call da_stats_calculate(iv%info(polaramv)%obs_global_index(n), &
                0, iv%polaramv(n)%u(k)%qc, &
                iv%polaramv(n)%u(k)%inv, nu, &
                stats%minimum%u, stats%maximum%u, &
                stats%average%u, stats%rms_err%u)
-            call da_stats_calculate(iv%polaramv(n)%loc%obs_global_index, &
+            call da_stats_calculate(iv%info(polaramv)%obs_global_index(n), &
                0, iv%polaramv(n)%v(k)%qc, &
                iv%polaramv(n)%v(k)%inv, nv, &
                stats%minimum%v, stats%maximum%v, &

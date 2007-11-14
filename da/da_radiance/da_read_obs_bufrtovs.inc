@@ -389,8 +389,8 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    iv%total_rad_pixel   = iv%total_rad_pixel   + num_tovs_used
    iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
 
-   iv%nlocal(radiance) = iv%nlocal(radiance) + num_tovs_used
-   iv%ntotal(radiance) = iv%ntotal(radiance) + num_tovs_global
+   iv%info(radiance)%nlocal = iv%info(radiance)%nlocal + num_tovs_used
+   iv%info(radiance)%ntotal = iv%info(radiance)%ntotal + num_tovs_global
 
    write(unit=stdout,fmt='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_tovs_thinned'
    write(unit=stdout,fmt='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_tovs_thinned

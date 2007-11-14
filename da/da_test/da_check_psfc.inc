@@ -43,8 +43,8 @@ subroutine da_check_psfc(grid, iv, y)
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
-   do n=1, iv%nlocal(synop)
-      call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
+   do n=1, iv%info(synop)%nlocal
+      call da_transform_xtopsfc(grid, iv, synop, iv%synop(:), y%synop(:))
       pertile_lhs = pertile_lhs &
                   + y%synop(n)%u * y%synop(n)%u &
                   + y%synop(n)%v * y%synop(n)%v &
@@ -52,7 +52,7 @@ subroutine da_check_psfc(grid, iv, y)
                   + y%synop(n)%p * y%synop(n)%p &
                   + y%synop(n)%q * y%synop(n)%q
 
-      if (iv%synop(n)%loc%proc_domain) then
+      if (iv%info(synop)%proc_domain(1,n)) then
          partial_lhs = partial_lhs & 
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
@@ -63,7 +63,7 @@ subroutine da_check_psfc(grid, iv, y)
    end do
 
    !-------------------------------------------------------------------------
-   ! [5.0] Perform adjivnt operation:
+   ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
    grid%xa%psfc(ims:ime, jms:jme) = 0.0
@@ -73,8 +73,8 @@ subroutine da_check_psfc(grid, iv, y)
    grid%xa%t2  (ims:ime, jms:jme) = 0.0
    grid%xa%q2  (ims:ime, jms:jme) = 0.0
    
-   do n=1, iv%nlocal(synop)
-      call da_transform_xtopsfc_adj(grid,iv%synop(n),y%synop(n),grid%xa)
+   do n=1, iv%info(synop)%nlocal
+      call da_transform_xtopsfc_adj(grid,iv,synop,iv%synop(:),y%synop(:),grid%xa)
    end do
 
    pertile_rhs = sum(grid%xa%u10 (ims:ime, jms:jme) * xa2_u10 (ims:ime, jms:jme)) &
@@ -90,7 +90,7 @@ subroutine da_check_psfc(grid, iv, y)
                + sum(grid%xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
    
    !----------------------------------------------------------------------
-   ! [6.0] Calculate RHS of adjivnt test equation:
+   ! [6.0] Calculate RHS of adjoint test equation:
    !----------------------------------------------------------------------
 
    !----------------------------------------------------------------------
