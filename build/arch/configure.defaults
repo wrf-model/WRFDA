@@ -726,33 +726,35 @@ local : librsl_lite.a
 # Draft version to be reviewed by Gerardo Cisneros <gerardo@sgi.com>
 
 M4              = m4 -B12000
-FC              = mpif90
+MPIHOME         = /usr
+FC              = ifort -I$(MPIHOME)/include
 FFC             = $(FC)
-SFC             = $(FC)
-CC              = mpicc
-CC_TOOLS        = cc
+SFC             = ifort
+CC              = icc -I$(MPIHOME)/include
+CC_TOOLS        = icc
 RANLIB          = echo
 LD              = $(FC)
 
 NATIVE_RWORDSIZE	= 8
 
-TRADFLAG        =
-EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM
+TRADFLAG        = -traditional
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         = -O3
+FCLOWOPT        = -O1
 FCDEBUG         = # -g
 FCTYPE          = -r$(RWORDSIZE)
-FCFREE          = -freeform
+FCFREE          = -FR
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
+EXTRA_FCFLAGS   = -w -ip -tpp2 -ftz -convert big_endian -fno-alias \
                      -align all -IPF_fp_relaxed
 
 EXTRA_CCFLAGS   = -w -O3 -ip -tpp2 -c -ftz -no-gcc
 
-LOCAL_LIB       = 
-MPI_LIB         = -lrsl_lite
+LOCAL_LIB       = -L/sw/sdev/cmkl/9.1.021/lib_serial/64 -lmkl_lapack -lmkl
+MPI_LIB         = -lrsl_lite -L$(MPIHOME)/lib -lmpi
 
 local : librsl_lite.a
 	@ touch local
