@@ -209,7 +209,7 @@ subroutine da_write_obs(ob, iv, re)
       write(ounit,'(a20,i8)')'sonde_sfc', num_obs    
       num_obs = 0
       do n = 1, iv%info(sonde_sfc)%nlocal
-         if (iv%info(sonde_sfc)%proc_domain(1,n)) then 
+         if (iv%info(sound)%proc_domain(1,n)) then 
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
             write(ounit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))')&
