@@ -64,6 +64,7 @@ if [[ $NUM_PROCS -gt $MAX_PROCS ]]; then
 fi
 
 export RUN=${RUN:-${ID}_${NUM_PROCS}}
+export JOBNAME=${JOBNAME:-${RELEASE}_${REGION}_${EXPT}_${RUN}}
 
 # Cannot put - options inside default substitution
 if [[ $SUBMIT == "LoadLeveller" ]]; then

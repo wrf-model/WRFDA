@@ -21,7 +21,7 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_name         = ${RELEASE}_${REGION}_${EXPT}_${RUN}
+# @ job_name         = ${JOBNAME}
 # @ total_tasks      = $NUM_PROCS
 # @ node             = $NODES
 # @ output           = job.output
@@ -47,7 +47,7 @@ elif [[ $SUBMIT == "LSF" ]]; then
 #
 # LSF batch script
 #
-#BSUB -J ${RELEASE}_${REGION}_${EXPT}_${RUN} 
+#BSUB -J ${JOBNAME} 
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
@@ -74,15 +74,16 @@ elif [[ $SUBMIT == "PBS" ]]; then
    if [[ $TEMP -gt 4 ]]; then
       TEMP=4
    fi
-   typeset -L15 JOBNAME=${REGION}_${EXPT}_${RUN}
+   typeset -L15 PBS_JOBNAME=${JOBNAME}
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
 # PBS batch script
 #
-#PBS -N JOBNAME
+#PBS -N ${PBS_JOBNAME}
 ##PBS -q $QUEUE
-#PBS -l mppe=$NUM_PROCS
+##PBS -l mppe=$NUM_PROCS
+#PBS -l ncpus=$NUM_PROCS
 #PBS -l walltime=$WALLCLOCK
 #PBS -o job.output
 #PBS -e job.error
