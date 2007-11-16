@@ -713,7 +713,7 @@ local : librsl_lite.a
 	@ touch local
 
 ###########################################################
-#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, Intel compilers, optimised (RSL_LITE, SGI-MPI) untested
+#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, Intel compilers, optimised (RSL_LITE, SGI-MPI)
 #
 # Process pinning should be used -- set the environment
 #  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
@@ -722,8 +722,6 @@ local : librsl_lite.a
 #  other cases, if specific processors are known to be free,
 #  the environment variable MPI_DSM_CPULIST may be used
 #  (details in 'man mpi').
-
-# Draft version to be reviewed by Gerardo Cisneros <gerardo@sgi.com>
 
 M4              = m4 -B12000
 MPIHOME         = /usr

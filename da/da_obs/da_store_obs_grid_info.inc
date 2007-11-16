@@ -8,13 +8,17 @@ subroutine da_store_obs_grid_info (info)
 
    type(infa_type), intent(inout) :: info
 
+   integer :: n
+
    if (trace_use) call da_trace_entry("da_store_obs_grid_info")
 
    info%proc_domain(:,:) = .false.
    
-   where(info%i(:,:) >= its .and. info%i(:,:) <= ite .and. info%j(:,:) >= jts .and. info%j(:,:) <= jte)
-      info%proc_domain(:,:) = .true.
-   end where
+   do n=1,info%nlocal
+      if (info%i(1,n) >= its .and. info%i(1,n) <= ite .and. info%j(1,n) >= jts .and. info%j(1,n) <= jte) then
+         info%proc_domain(:,n) = .true.
+      end if
+   end do
 
    if (trace_use) call da_trace_exit("da_store_obs_grid_info")
 
