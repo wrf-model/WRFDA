@@ -8,7 +8,7 @@ subroutine da_interp_lin_3d_adj(fm3d, info, fo3d)
 
    real,            intent(inout) :: fm3d(ims:ime,jms:jme,kms:kme)
    type(infa_type), intent(in)    :: info
-   real,            intent(in)    :: fo3d(:,:) 
+   real,            intent(in)    :: fo3d(1:info%max_lev,info%n1:info%n2) 
 
    integer :: n,k
    real    :: fmz(kms:kme)
