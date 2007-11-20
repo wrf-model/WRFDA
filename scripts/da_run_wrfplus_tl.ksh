@@ -18,12 +18,13 @@ cd $WORK_DIR/tl
 if [[ $NUM_PROCS -eq 1 ]]; then
    ./wrfplus.exe > wrf_tl.out 2>wrf_tl.error
 else
-   if [[ $arg1 == pre ]]; then
-      cp namelist.input ..
-      ln -fs $WORK_DIR/tl01 $WORK_DIR/wrfinput_d${DOMAIN}
+   if [[ $arg1 == "pre" ]]; then
+      mv -f ../namelist.input ../namelist_wrfvar.input
+      cp -f namelist.input ../.
+      ln -fs $WORK_DIR/tl01 $WORK_DIR/wrfinput_d01
    fi
-   if [[ $arg1 == post ]]; then
-      mv ../namelist.output .
-      ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d${DOMAIN}
+   if [[ $arg1 == "post" ]]; then
+      mv -f ../namelist_wrfvar.input ../namelist.input
+      ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d01
    fi
 fi

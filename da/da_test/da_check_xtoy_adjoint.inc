@@ -67,7 +67,6 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    xa2_qcw(ims:ime, jms:jme, kms:kme) = grid%xa%qcw(ims:ime, jms:jme, kms:kme)
    xa2_qrn(ims:ime, jms:jme, kms:kme) = grid%xa%qrn(ims:ime, jms:jme, kms:kme)
 
-
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
 

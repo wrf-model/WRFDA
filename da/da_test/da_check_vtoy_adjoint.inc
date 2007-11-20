@@ -52,7 +52,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    call da_get_y_lhs_value(iv, y, partial_lhs, pertile_lhs, adj_sum_lhs)
 
    cv = 0.0
-   cg_jcdf = 1
 
    ! WHY?
    ! call da_zero_vp_type(vp)
@@ -60,7 +59,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    ! call da_zero_x(grid%xa)      
 
    call da_transform_vtoy_adj(0,cv_size, be, ep, cv, iv, vp, vv, xbx, y, grid, &
-      config_flags, cg_jcdf)
+      config_flags)
 
    adj_rhs = sum(cv(1:cv_size) * cv_2(1:cv_size))
 

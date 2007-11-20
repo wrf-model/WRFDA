@@ -19,12 +19,12 @@ export G95_UNIT_ENDIAN_98=BIG
 if [[ $NUM_PROCS == 1 ]]; then
    ./wrf.exe > wrf_nl.out 2>wrf_nl.error
 else
-   if [[ $arg1 == pre ]]; then
-      mv ../namelist.output ../namelist_wrfvar.output
-      cp namelist.input ..
+   if [[ $arg1 == "pre" ]]; then
+      mv -f ../namelist.input ../namelist_wrfvar.input
+      cp -f namelist.input ../.
    fi
-   if [[ $arg1 == post ]]; then
-      mv ../namelist.output .
+   if [[ $arg1 == "post" ]]; then
+      mv -f ../namelist_wrfvar.input ../namelist.input
    fi
 fi
 

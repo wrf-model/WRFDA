@@ -27,7 +27,7 @@ module da_minimisation
       da_jo_and_grady_buoy
    use da_control, only : trace_use,var4d_coupling_disk_simul, &
       var4d, rootproc,jcdfi_use,var4d_coupling,ierr,comm,num_fgat_time, &
-      stdout, eps, stats_unit, test_dm_exact, global, &
+      stdout, eps, stats_unit, test_dm_exact, global, var4d_multi_inc, &
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
       rtm_option,rtm_option_rttov, rtm_option_crtm, anal_type_verify, &
@@ -57,7 +57,8 @@ module da_minimisation
       da_oi_stats_gpsref, da_get_innov_vector_gpsref, da_residual_gpsref, &
       da_jo_and_grady_gpsref
    use da_obs_io, only : da_final_write_y, da_write_y, da_final_write_obs, &
-      da_write_obs,da_write_obs_etkf,da_write_noise_to_ob, da_use_obs_errfac
+      da_write_obs,da_write_obs_etkf,da_write_noise_to_ob, da_use_obs_errfac !, &
+!     da_write_iv_for_multi_inc, da_read_iv_for_multi_inc
    use da_metar, only : da_calculate_grady_metar, da_ao_stats_metar, &
       da_oi_stats_metar, da_get_innov_vector_metar, da_residual_metar, &
       da_jo_and_grady_metar
@@ -117,6 +118,8 @@ module da_minimisation
    use da_vtox_transforms, only : da_transform_vtox,da_transform_vtox_adj
    use da_wrf_interfaces, only : wrf_dm_bcast_real, wrf_get_dm_communicator
    use da_wrfvar_io, only : da_med_initialdata_input
+   use module_symbols_util, only : wrfu_finalize
+!  use da_wrfvar_top, only : da_wrfvar_finalize
 
    implicit none
 

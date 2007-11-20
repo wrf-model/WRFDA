@@ -1,5 +1,5 @@
 subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
-   grid, config_flags, cg_jcdf)
+   grid, config_flags)
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -19,7 +19,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    type(y_type),               intent(inout) :: y      ! y = H(x_inc).
    type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
-   integer,                    intent(in)    :: cg_jcdf
+   type (xbx_type)                  :: xbx_tmp
 
    integer :: nobwin,ndynopt
 #ifdef DM_PARALLEL
@@ -31,23 +31,19 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    call da_trace_entry("da_transform_vtoy_adj")
 
    if (var4d) then
-      do nobwin=num_fgat_time,1,-1
-         iv%time = nobwin
-         iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
-         iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
-         call da_zero_x(grid%xa)
-         call da_transform_xtoy_adj(grid, iv, y, grid%xa)
-         write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
-
-         call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
-      end do
-
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt (1 , DYN_EM_TL)
 
-      if (jcdfi_use .AND. iter > 0 .AND. cg_jcdf == 1) then
+      if (jcdfi_use .AND. iter > 0) then
          call da_med_initialdata_input(grid , config_flags, 'tldf')
+         grid%g_u_2 = - grid%g_u_2
+         grid%g_v_2 = - grid%g_v_2
+         grid%g_w_2 = - grid%g_w_2
+         grid%g_t_2 = - grid%g_t_2
+         grid%g_ph_2 = - grid%g_ph_2
+         grid%g_mu_2 = - grid%g_mu_2
+         grid%g_moist = - grid%g_moist
       else
          grid%g_u_2 = 0.0
          grid%g_v_2 = 0.0
@@ -63,13 +59,29 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
 
+      do nobwin=num_fgat_time,1,-1
+         write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
+         call da_med_initialdata_input( grid , config_flags, &
+            filnam)
+         call da_setup_firstguess( xbx_tmp, grid)
+
+         iv%time = nobwin
+         iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
+         iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
+         call da_zero_x(grid%xa)
+         call da_transform_xtoy_adj(grid, iv, y, grid%xa)
+         write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
+
+         call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
+      end do
+
       call da_trace("da_transform_vtoy_adj","Starting da_run_wrfplus_ad.ksh")
 
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
-         call da_system("da_run_wrfplus_ad.ksh pre")
 
          if (rootproc) then
+            call da_system("da_run_wrfplus_ad.ksh pre")
             call da_system("rm -rf wrf_done")
             call da_system("touch wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
@@ -81,11 +93,11 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
                call da_system("sleep 1")
             end do
             call da_free_unit(wrf_done_unit)
+            call da_system("da_run_wrfplus_ad.ksh post")
          end if
          ! Wait until PE 0 agrees that AD finished
          call wrf_get_dm_communicator ( comm )
          call mpi_barrier(comm, ierr)
-         call da_system("da_run_wrfplus_ad.ksh post")
       end if
 #else
       call da_system("da_run_wrfplus_ad.ksh")

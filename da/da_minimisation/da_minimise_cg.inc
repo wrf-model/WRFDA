@@ -41,8 +41,6 @@ subroutine da_minimise_cg(grid, config_flags,            &
 
    type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
 
-   integer                           :: cg_jcdf
-
    if (trace_use) call da_trace_entry("da_minimise_cg")
 
    write(unit=stdout,fmt='(A)') 'Minimize cost function using CG method'
@@ -100,7 +98,6 @@ subroutine da_minimise_cg(grid, config_flags,            &
    do iter=1, ntmax
       if (rrmold == 0.0) go to 1002
       fhat = phat
-      cg_jcdf = 1
 
       call da_transform_vtoy(cv_size, be, grid%ep, fhat, iv, grid%vp, &
          grid%vv, xbx, y,         &
@@ -110,7 +107,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
 
       call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, fhat, iv, &
          grid%vp, grid%vv, xbx, jo_grad_y, &
-         grid, config_flags, cg_jcdf)
+         grid, config_flags)
 
       je_start = be % cv % size_jb + 1
       je_end = be % cv % size_jb + be % cv % size_je

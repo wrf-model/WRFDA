@@ -226,6 +226,53 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          echo wrfvar > FAIL
          break
       fi
+
+      if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+
+         export NL_VAR4D_MULTI_INC=2
+
+         export OB_DIR_TMP=$OB_DIR
+         export RC_DIR_TMP=$RC_DIR
+         export BE_DIR_TMP=$BE_DIR
+         export NL_E_WE_TMP=$NL_E_WE
+         export NL_E_SN_TMP=$NL_E_SN
+         export NL_DX_TMP=$NL_DX
+         export NL_DY_TMP=$NL_DY
+         export NL_TIME_STEP_TMP=$NL_TIME_STEP
+
+         export OB_DIR=$OB_DIR_LOW
+         export RC_DIR=$RC_DIR_LOW
+         export BE_DIR=$BE_DIR_LOW
+         export NL_E_WE=$NL_E_WE_LOW
+         export NL_E_SN=$NL_E_SN_LOW
+         export NL_DX=$NL_DX_LOW
+         export NL_DY=$NL_DY_LOW
+         export NL_TIME_STEP=$NL_TIME_STEP_LOW
+         export DA_BACK_ERRORS=$BE_DIR/be.dat
+         
+         ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index2.html 2>&1
+
+         export OB_DIR=$OB_DIR_TMP
+         export RC_DIR=$RC_DIR_TMP
+         export BE_DIR=$BE_DIR_TMP
+         export NL_E_WE=$NL_E_WE_TMP
+         export NL_E_SN=$NL_E_SN_TMP
+         export NL_DX=$NL_DX_TMP
+         export NL_DY=$NL_DY_TMP
+         export NL_TIME_STEP=$NL_TIME_STEP_TMP
+         export DA_BACK_ERRORS=$BE_DIR/be.dat
+
+         export NL_VAR4D_MULTI_INC=1
+
+      fi
+
+      RC=$?
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR} 4dvar multi-inc stage 2 failed with error $RC$END"
+         echo wrfvar_2 > FAIL
+         break
+      fi
+      export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
          if [[ $CYCLE_NUMBER -gt 0 ]]; then

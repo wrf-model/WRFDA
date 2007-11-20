@@ -26,6 +26,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    filename = ' '
    
+
    do n=1, num_fgat_time
       iv%time = n
       iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
@@ -37,6 +38,9 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_setup_firstguess (xbx, grid)
       end if
 
+      if ( var4d_multi_inc /= 2 ) then
+
+      ! Radiosonde:
       if (iv%info(sound)%nlocal > 0) then
          call da_get_innov_vector_sound     (it, grid, ob, iv)
          call da_get_innov_vector_sonde_sfc (it, grid, ob, iv)
@@ -82,7 +86,35 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
       if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid, ob, iv)
       if (iv%info(airsr)%nlocal > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
+
+   endif
+
+   !----------------------------------------------
+   ! [5]  write out iv in ascii format
+   !-----------------------------------------------
+
+   if ( var4d_multi_inc == 1 ) then
+
+!      call da_write_iv_for_multi_inc(n, iv)
+
+   elseif ( var4d_multi_inc == 2 ) then
+
+!      call da_read_iv_for_multi_inc(n, iv)
+
+   endif
+
    end do
+
+   if ( var4d_multi_inc == 1 ) then
+#ifdef DM_PARALLEL
+       call da_system("touch wrf_stop_now")
+#endif
+!      call da_wrfvar_finalize
+       call wrf_message("*** WRF-Var multi-increment stage 1 completed successfully ***")
+       call wrfu_finalize
+       call wrf_shutdown
+
+   endif
 
    iv%time = 1
    iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1

@@ -19,6 +19,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
    type(y_type),               intent(inout) :: y      ! y = H(x_inc).
    type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
+   type (xbx_type)                    :: xbx_tmp
 
    integer :: nobwin
 #ifdef DM_PARALLEL
@@ -37,9 +38,9 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       if (trace_use) call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
-         call da_system("da_run_wrfplus_tl.ksh pre")
 
          if (rootproc) then
+            call da_system("da_run_wrfplus_tl.ksh pre")
             call da_system("rm -rf wrf_done")
             call da_system("touch wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
@@ -51,11 +52,11 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
                call da_system("sleep 1")
             end do
             call da_free_unit(wrf_done_unit)
+            call da_system("da_run_wrfplus_tl.ksh post")
          end if
          ! Wait until PE 0 agrees that TL finished
          call wrf_get_dm_communicator ( comm )
          call mpi_barrier(comm, ierr)
-         call da_system("da_run_wrfplus_tl.ksh post")
       end if
 #else
       call da_system("da_run_wrfplus_tl.ksh")
@@ -63,6 +64,11 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       if (trace_use) call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
 
       do nobwin=1, num_fgat_time
+         write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
+         call da_med_initialdata_input( grid , config_flags, &
+            filnam)
+         call da_setup_firstguess( xbx_tmp, grid)
+
          iv%time = nobwin
          iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
          iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
@@ -70,6 +76,8 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoy(grid, iv, y)
       end do
+      call da_med_initialdata_input( grid , config_flags, 'fg01')
+      call da_setup_firstguess( xbx_tmp, grid)
    else  ! not var4d
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d

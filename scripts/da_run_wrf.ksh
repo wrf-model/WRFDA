@@ -134,6 +134,10 @@ else
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
    fi
+   mv wrfout* wrfinput* $FC_DIR/$DATE
+# else
+#    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
+# fi
 
    echo $(date +'%D %T') "Ended $RC"
 fi

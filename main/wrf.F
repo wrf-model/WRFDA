@@ -5,7 +5,7 @@ PROGRAM wrf
 
    USE module_wrf_top
 
-#if defined(DM_PARALLEL) && defined(WRFNL) 
+#if defined(DM_PARALLEL) && defined(VAR4D) 
    USE module_timing
 #endif
 
@@ -21,7 +21,7 @@ PROGRAM wrf
 
    IMPLICIT NONE
 
-#if defined(DM_PARALLEL) && defined(WRFNL) 
+#if defined(DM_PARALLEL) && defined(VAR4D) 
 
    LOGICAL, EXTERNAL :: await_next
    INTEGER           :: comm
@@ -40,19 +40,17 @@ PROGRAM wrf
 
    CALL system("echo -n model_start ; date")
 
-   ! Initialize WRF model.  
-   CALL wrf_init(.true.)
-#else
+#endif
+
    ! Initialize WRF model.  
    CALL wrf_init
-#endif
 
    ! WRF model time-stepping.  Calls integrate().  
    CALL wrf_run
 
 
    ! WRF model clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
-#if defined(DM_PARALLEL) && defined(WRFNL) 
+#if defined(DM_PARALLEL) && defined(VAR4D) 
    CALL wrf_finalize(.true.)
 
    IF ( wrf_dm_on_monitor() ) THEN
@@ -74,7 +72,7 @@ PROGRAM wrf
 
 END PROGRAM wrf
 
-#if defined(DM_PARALLEL) && defined(WRFNL) 
+#if defined(DM_PARALLEL) && defined(VAR4D) 
 
 LOGICAL FUNCTION await_next()
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor

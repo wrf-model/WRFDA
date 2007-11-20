@@ -81,6 +81,7 @@ CONTAINS
 
    program_name = "WRF " // TRIM(release_version) // " MODEL"
 
+#ifndef VAR4D
    ! Initialize WRF modules:  
    ! Phase 1 returns after MPI_INIT() (if it is called)
    CALL init_modules(1)
@@ -90,6 +91,7 @@ CONTAINS
    ENDIF
    ! Phase 2 resumes after MPI_INIT() (if it is called)
    CALL init_modules(2)
+#endif
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated

@@ -37,7 +37,10 @@ if $CYCLING; then
       export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
    fi
 fi
-
+if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+   export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d01
+   export DA_BOUNDARIES=${RC_DIR}/$DATE/wrfbdy_d01
+fi
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 
@@ -368,7 +371,11 @@ if $NL_VAR4D; then
 
    # Outputs
    for I in 02 03 04 05 06 07; do
-      ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+      else
+         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+      fi
    done
 
    # tl
@@ -491,6 +498,23 @@ else
 fi
 
 #-------------------------------------------------------------------
+#Prepare the multi-incremnet files:
+#-------------------------------------------------------------------
+
+if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
+
+   mv -f $RUN_DIR/gts_omb.*  .
+
+   mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
+   mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
+   mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
+
+#  ln -fs wrfinput_d01-thin wrfinput_d01
+#  ln -fs wrfinput_d01-thin fg01
+
+fi
+
+#-------------------------------------------------------------------
 #Run WRF-Var:
 #-------------------------------------------------------------------
 mkdir trace
@@ -510,23 +534,36 @@ else
          export MP_PGMMODEL=mpmd
          export MP_CMDFILE=poe.cmdfile
          if [[ $NUM_PROCS -lt 3 ]]; then
-            echo "Need at least 3 processors for 4dvar"
+            echo "Need at least 3 processors for 4dvar in parallel mode"
             exit 1
          fi
          export NUM_PROCS_VAR=${NUM_PROCS_VAR:-2}
          export NUM_PROCS_WRF=${NUM_PROCS_WRF:-2}
          let NUM_PROCS_WRFPLUS=$NUM_PROCS-$NUM_PROCS_VAR-$NUM_PROCS_WRF
+         export NUM_PROCS_WRFPLUS_PART=`expr $NUM_PROCS_WRFPLUS \/ 2`
          echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
          echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
          echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
+         echo "NUM_PROCS_WRFPLUS_PART       $NUM_PROCS_WRFPLUS_PART"
 
          rm -f $MP_CMDFILE
          let I=0
-         while [[ $I -lt $NUM_PROCS_VAR ]]; do
-            echo "da_wrfvar.exe" >> $MP_CMDFILE
+         if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+            while [[ $I -lt 1 ]]; do
+               echo "da_wrfvar.exe" >> $MP_CMDFILE
+               let I=$I+1
+            done
+         else
+            while [[ $I -lt $NUM_PROCS_VAR ]]; do
+               echo "da_wrfvar.exe" >> $MP_CMDFILE
+               let I=$I+1
+            done
+         fi
+         while [[ $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRFPLUS_PART ]]; do
+            echo "./ad/wrfplus.exe" >> $MP_CMDFILE
             let I=$I+1
          done
-         while [[ $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF ]]; do
+         while [[ $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRFPLUS_PART+$NUM_PROCS_WRF ]]; do
             echo "./nl/wrf.exe" >> $MP_CMDFILE
             let I=$I+1
          done
@@ -534,7 +571,7 @@ else
             echo "./ad/wrfplus.exe" >> $MP_CMDFILE
             let I=$I+1
          done
-         mpirun.lsf -cmdfile poe.cmdfile
+         mpirun.lsf -cmdfile  $MP_CMDFILE
          RC=$?
       else
          $RUN_CMD ./da_wrfvar.exe
@@ -544,6 +581,30 @@ else
       # 3DVAR
       $RUN_CMD ./da_wrfvar.exe
       RC=$?
+   fi
+
+# temporarily store the high resolution reults in RUN_DIR
+   if [[ $NL_VAR4D_MULTI_INC == 1 ]]; then
+
+      mv -f gts_omb.*  $RUN_DIR
+
+      cd nl
+      ln -fs $WRFPLUS_DIR/main/nupdown.exe .
+      ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
+      ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
+      sh thin.csh
+      cd ..
+
+      $WRFPLUS_DIR/main/nupdown.exe wrfinput_d01 -thin 3
+
+      mv -f $WORK_DIR/nl/*-thin $RUN_DIR
+      mv -f wrfinput_d01-thin $RUN_DIR
+
+      exit $RC
+   fi
+
+   if [[ -f fort.9 ]]; then
+      cp fort.9 $RUN_DIR/namelist.output
    fi
 
    if [[ -f statistics ]]; then
@@ -566,8 +627,33 @@ else
       cp ob.etkf.000 $RUN_DIR
    fi
 
-   # remove intermediate output files
+# remove intermediate output files
 
+   if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
+
+      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" ${FC_DIR}/${DATE}/wrfinput_d01 $DA_FIRST_GUESS low_res_increment
+
+      ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
+
+        
+      cp -f ${RC_HIGH_DIR}/${DATE}/wrfinput_d01 ${FC_DIR}/${DATE}/analysis_update
+      if $CYCLING; then
+         if ! $FIRST; then
+            cp -f ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${ANALYSIS_DATE} ${FC_DIR}/${DATE}/analysis_update
+         fi
+      fi
+
+      ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
+
+#  rm low_res_increment low_res_increment-down
+      cp -f ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/wrfinput_d01
+
+   fi
+
+   if [[ -d trace ]]; then
+      mkdir -p $RUN_DIR/trace
+      mv trace/* $RUN_DIR/trace
+   fi
    rm -f unpert_obs.*
    rm -f pert_obs.*
    rm -f rand_obs_error.*
@@ -590,10 +676,10 @@ else
    fi
 
    if $NL_VAR4D; then
-      cp $WORK_DIR/namelist_wrfvar.output $RUN_DIR/namelist_wrfvar.output
-      cp $WORK_DIR/nl/namelist.output     $RUN_DIR/namelist_nl.output
-      cp $WORK_DIR/tl/namelist.output     $RUN_DIR/namelist_tl.output
-      cp $WORK_DIR/ad/namelist.output     $RUN_DIR/namelist_ad.output
+      cp $WORK_DIR/namelist.input $RUN_DIR/namelist_wrfvar.output
+      cp $WORK_DIR/nl/namelist.input     $RUN_DIR/namelist_nl.output
+      cp $WORK_DIR/tl/namelist.input     $RUN_DIR/namelist_tl.output
+      cp $WORK_DIR/ad/namelist.input     $RUN_DIR/namelist_ad.output
       echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
       echo '<A HREF="namelist_nl.output">NL namelist.output</a>'
       echo '<A HREF="namelist_tl.output">TL namelist.output</a>'

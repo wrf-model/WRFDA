@@ -38,14 +38,12 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    real, allocatable, dimension(:) :: cv_xhat_jb, cv_xhat_je
    integer          :: ndynopt
 
-   integer          :: cg_jcdf
 
    if (trace_use) call da_trace_entry("da_calculate_j")
 
    allocate(cv_xhat_jb(cv_size_jb))
    allocate(cv_xhat_je(cv_size_je))
 
-   cg_jcdf = 0
 
    je_start = cv_size_jb + 1
    je_end = cv_size_jb + cv_size_je
@@ -82,7 +80,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % jc = 0.0
 
-   if (var4d .AND. jcdfi_use .AND. iter > 0) then
+   if ( var4d .and. iter > 0 ) then
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
@@ -93,11 +91,11 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
 
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_u_2),   grid%g_u_2,   grid%g_u_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_v_2),   grid%g_v_2,   grid%g_v_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_t_2),   grid%g_t_2,   grid%g_t_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_mu_2),  grid%g_mu_2,  grid%g_mu_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_moist), grid%g_moist, grid%g_moist)
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_u_2),   grid%g_u_2,   grid%g_u_2)
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_v_2),   grid%g_v_2,   grid%g_v_2)
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_t_2),   grid%g_t_2,   grid%g_t_2)
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_mu_2),  grid%g_mu_2,  grid%g_mu_2)
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_moist), grid%g_moist, grid%g_moist)
 
    end if
 
@@ -159,7 +157,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, j_grad, iv, &
       grid%vp, grid%vv, xbx, jo_grad_y, &
-      grid, config_flags, cg_jcdf)
+      grid, config_flags)
 
    call da_deallocate_y(jo_grad_y)
 

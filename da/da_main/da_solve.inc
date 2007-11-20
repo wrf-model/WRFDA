@@ -139,9 +139,8 @@ subroutine da_solve ( grid , config_flags)
          call da_trace ("da_solve","Starting da_run_wrf_nl.ksh")
 #ifdef DM_PARALLEL
          if (var4d_coupling == var4d_coupling_disk_simul) then
-            call da_system ("da_run_wrf_nl.ksh pre")
-            ! call da_system("./wrf.exe -rmpool 1")
             if (rootproc) then
+               call da_system ("da_run_wrf_nl.ksh pre")
                call da_system ("rm -rf wrfnl_done")
                call da_system ("touch wrfnl_go_ahead")
                call da_get_unit (wrf_done_unit)
@@ -154,11 +153,11 @@ subroutine da_solve ( grid , config_flags)
                   call da_system ("sleep 1")
                end do
                call da_free_unit (wrf_done_unit)
+               call da_system ("da_run_wrf_nl.ksh post")
+               call da_system ("touch wrfnl_stop_now")
             end if
             ! Wait until PE thinks NL model has finished
             call mpi_barrier (comm, ierr)
-            call da_system ("da_run_wrf_nl.ksh post")
-            call da_system ("touch wrfnl_stop_now")
          end if
 #else
          call da_system ("da_run_wrf_nl.ksh")
