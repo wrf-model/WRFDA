@@ -35,7 +35,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [1] Transfer surface obs:
 
-   if (iv%plocal(iv%time,synop)-iv%plocal(iv%time-1,synop) > 0) then
+   if (iv%info(synop)%plocal(iv%time)-iv%info(synop)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.synop',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -48,15 +48,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find synop marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,synop) + 1, &
-              iv%plocal(iv%time,synop)
+       do n = iv%info(synop)%plocal(iv%time-1) + 1, &
+              iv%info(synop)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find synop obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,synop)-iv%plocal(iv%time-1,synop)) &
+       if (gn /= iv%info(synop)%plocal(iv%time)-iv%info(synop)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -64,7 +64,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [2] Transfer metar obs:
 
-   if (iv%plocal(iv%time,metar)-iv%plocal(iv%time-1,metar) > 0) then
+   if (iv%info(metar)%plocal(iv%time)-iv%info(metar)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.metar',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -77,15 +77,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find metar marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,metar) + 1, &
-              iv%plocal(iv%time,metar)
+       do n = iv%info(metar)%plocal(iv%time-1) + 1, &
+              iv%info(metar)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find metar obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,metar)-iv%plocal(iv%time-1,metar)) &
+       if (gn /= iv%info(metar)%plocal(iv%time)-iv%info(metar)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -93,7 +93,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [3] Transfer ships obs:
 
-   if (iv%plocal(iv%time,ships)-iv%plocal(iv%time-1,ships) > 0) then
+   if (iv%info(ships)%plocal(iv%time)-iv%info(ships)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.ships',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -106,15 +106,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ships marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,ships) + 1, &
-              iv%plocal(iv%time,ships)
+       do n = iv%info(ships)%plocal(iv%time-1) + 1, &
+              iv%info(ships)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ships obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,ships)-iv%plocal(iv%time-1,ships)) &
+       if (gn /= iv%info(ships)%plocal(iv%time)-iv%info(ships)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -122,7 +122,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [4] Transfer sonde_sfc obs:
 
-   if (iv%plocal(iv%time,sound)-iv%plocal(iv%time-1,sound) > 0) then
+   if (iv%info(sound)%plocal(iv%time)-iv%info(sound)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.sonde_sfc',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -135,15 +135,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find sonde_sfc marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,sound) + 1, &
-              iv%plocal(iv%time,sound)
+       do n = iv%info(sound)%plocal(iv%time-1) + 1, &
+              iv%info(sound)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find sonde_sfc obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,sound)-iv%plocal(iv%time-1,sound)) &
+       if (gn /= iv%info(sound)%plocal(iv%time)-iv%info(sound)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -151,7 +151,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [5] Transfer sound obs:
 
-   if (iv%plocal(iv%time,sound)-iv%plocal(iv%time-1,sound) > 0) then
+   if (iv%info(sound)%plocal(iv%time)-iv%info(sound)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.sound',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -164,15 +164,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find sound marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,sound) + 1, &
-              iv%plocal(iv%time,sound)
+       do n = iv%info(sound)%plocal(iv%time-1) + 1, &
+              iv%info(sound)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find sound obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,sound)-iv%plocal(iv%time-1,sound)) &
+       if (gn /= iv%info(sound)%plocal(iv%time)-iv%info(sound)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -180,7 +180,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [6] Transfer buoy obs:
 
-   if (iv%plocal(iv%time,buoy)-iv%plocal(iv%time-1,buoy) > 0) then
+   if (iv%info(buoy)%plocal(iv%time)-iv%info(buoy)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.buoy',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -193,15 +193,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find buoy marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,buoy) + 1, &
-              iv%plocal(iv%time,buoy)
+       do n = iv%info(buoy)%plocal(iv%time-1) + 1, &
+              iv%info(buoy)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find buoy obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,buoy)-iv%plocal(iv%time-1,buoy)) &
+       if (gn /= iv%info(buoy)%plocal(iv%time)-iv%info(buoy)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -209,7 +209,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [7] Transfer Geo AMV obs:
 
-   if (iv%plocal(iv%time,geoamv)-iv%plocal(iv%time-1,geoamv) > 0) then
+   if (iv%info(geoamv)%plocal(iv%time)-iv%info(geoamv)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.geoamv',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -222,15 +222,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find geoamv marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,geoamv) + 1, &
-              iv%plocal(iv%time,geoamv)
+       do n = iv%info(geoamv)%plocal(iv%time-1) + 1, &
+              iv%info(geoamv)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find geoamv obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,geoamv)-iv%plocal(iv%time-1,geoamv)) &
+       if (gn /= iv%info(geoamv)%plocal(iv%time)-iv%info(geoamv)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -238,7 +238,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [8] Transfer gpspw obs:
 
-   if (iv%plocal(iv%time,gpspw)-iv%plocal(iv%time-1,gpspw) > 0) then
+   if (iv%info(gpspw)%plocal(iv%time)-iv%info(gpspw)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.gpspw',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -251,15 +251,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find gpspw marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,gpspw) + 1, &
-              iv%plocal(iv%time,gpspw)
+       do n = iv%info(gpspw)%plocal(iv%time-1) + 1, &
+              iv%info(gpspw)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find gpspw obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,gpspw)-iv%plocal(iv%time-1,gpspw)) &
+       if (gn /= iv%info(gpspw)%plocal(iv%time)-iv%info(gpspw)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -267,7 +267,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [9] Transfer SSM/I obs:
 
-   if (iv%plocal(iv%time,ssmi_rv)-iv%plocal(iv%time-1,ssmi_rv) > 0) then
+   if (iv%info(ssmi_rv)%plocal(iv%time)-iv%info(ssmi_rv)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.ssmir',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -280,15 +280,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmir marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,ssmi_rv) + 1, &
-              iv%plocal(iv%time,ssmi_rv)
+       do n = iv%info(ssmi_rv)%plocal(iv%time-1) + 1, &
+              iv%info(ssmi_rv)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmir obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,ssmi_rv)-iv%plocal(iv%time-1,ssmi_rv)) &
+       if (gn /= iv%info(ssmi_rv)%plocal(iv%time)-iv%info(ssmi_rv)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -296,7 +296,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [10] Transfer airep obs:
 
-   if (iv%plocal(iv%time,airep)-iv%plocal(iv%time-1,airep) > 0) then
+   if (iv%info(airep)%plocal(iv%time)-iv%info(airep)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.airep',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -309,15 +309,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find airep marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,airep) + 1, &
-              iv%plocal(iv%time,airep)
+       do n = iv%info(airep)%plocal(iv%time-1) + 1, &
+              iv%info(airep)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find airep obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,airep)-iv%plocal(iv%time-1,airep)) &
+       if (gn /= iv%info(airep)%plocal(iv%time)-iv%info(airep)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -325,7 +325,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [11] Transfer polaramv obs:
 
-   if (iv%plocal(iv%time,polaramv)-iv%plocal(iv%time-1,polaramv) > 0) then
+   if (iv%info(polaramv)%plocal(iv%time)-iv%info(polaramv)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.polaramv',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -338,15 +338,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find polaramv marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,polaramv) + 1, &
-              iv%plocal(iv%time,polaramv)
+       do n = iv%info(polaramv)%plocal(iv%time-1) + 1, &
+              iv%info(polaramv)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find polaramv obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,polaramv)-iv%plocal(iv%time-1,polaramv)) &
+       if (gn /= iv%info(polaramv)%plocal(iv%time)-iv%info(polaramv)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -354,7 +354,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [12] Transfer pilot obs:
 
-   if (iv%plocal(iv%time,pilot)-iv%plocal(iv%time-1,pilot) > 0) then
+   if (iv%info(pilot)%plocal(iv%time)-iv%info(pilot)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.pilot',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -367,15 +367,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find pilot marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,pilot) + 1, &
-              iv%plocal(iv%time,pilot)
+       do n = iv%info(pilot)%plocal(iv%time-1) + 1, &
+              iv%info(pilot)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find pilot obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,pilot)-iv%plocal(iv%time-1,pilot)) &
+       if (gn /= iv%info(pilot)%plocal(iv%time)-iv%info(pilot)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -383,7 +383,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [13] Transfer ssmi_tb obs:
 
-   if (iv%plocal(iv%time,ssmi_tb)-iv%plocal(iv%time-1,ssmi_tb) > 0) then
+   if (iv%info(ssmi_tb)%plocal(iv%time)-iv%info(ssmi_tb)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.ssmi_tb',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -396,15 +396,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmi_tb marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,ssmi_tb) + 1, &
-              iv%plocal(iv%time,ssmi_tb)
+       do n = iv%info(ssmi_tb)%plocal(iv%time-1) + 1, &
+              iv%info(ssmi_tb)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmi_tb obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,ssmi_tb)-iv%plocal(iv%time-1,ssmi_tb)) &
+       if (gn /= iv%info(ssmi_tb)%plocal(iv%time)-iv%info(ssmi_tb)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -412,7 +412,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [14] Transfer satem obs:
 
-   if (iv%plocal(iv%time,satem)-iv%plocal(iv%time-1,satem) > 0) then
+   if (iv%info(satem)%plocal(iv%time)-iv%info(satem)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.satem',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -425,15 +425,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find satem marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,satem) + 1, &
-              iv%plocal(iv%time,satem)
+       do n = iv%info(satem)%plocal(iv%time-1) + 1, &
+              iv%info(satem)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find satem obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,satem)-iv%plocal(iv%time-1,satem)) &
+       if (gn /= iv%info(satem)%plocal(iv%time)-iv%info(satem)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -441,7 +441,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [15] Transfer ssmt1 obs:
 
-   if (iv%plocal(iv%time,ssmt1)-iv%plocal(iv%time-1,ssmt1) > 0) then
+   if (iv%info(ssmt1)%plocal(iv%time)-iv%info(ssmt1)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.ssmt1',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -454,15 +454,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmt1 marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,ssmt1) + 1, &
-              iv%plocal(iv%time,ssmt1)
+       do n = iv%info(ssmt1)%plocal(iv%time-1) + 1, &
+              iv%info(ssmt1)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmt1 obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,ssmt1)-iv%plocal(iv%time-1,ssmt1)) &
+       if (gn /= iv%info(ssmt1)%plocal(iv%time)-iv%info(ssmt1)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -470,7 +470,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [16] Transfer ssmt2 obs:
 
-   if (iv%plocal(iv%time,ssmt2)-iv%plocal(iv%time-1,ssmt2) > 0) then
+   if (iv%info(ssmt2)%plocal(iv%time)-iv%info(ssmt2)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.ssmt2',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -483,15 +483,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmt2 marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,ssmt2) + 1, &
-              iv%plocal(iv%time,ssmt2)
+       do n = iv%info(ssmt2)%plocal(iv%time-1) + 1, &
+              iv%info(ssmt2)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find ssmt2 obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,ssmt2)-iv%plocal(iv%time-1,ssmt2)) &
+       if (gn /= iv%info(ssmt2)%plocal(iv%time)-iv%info(ssmt2)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -499,7 +499,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [17] Transfer scatterometer obs:
 
-   if (iv%plocal(iv%time,qscat)-iv%plocal(iv%time-1,qscat) > 0) then
+   if (iv%info(qscat)%plocal(iv%time)-iv%info(qscat)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.qscat',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -512,15 +512,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find qscat marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,qscat) + 1, &
-              iv%plocal(iv%time,qscat)
+       do n = iv%info(qscat)%plocal(iv%time-1) + 1, &
+              iv%info(qscat)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find qscat obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,qscat)-iv%plocal(iv%time-1,qscat)) &
+       if (gn /= iv%info(qscat)%plocal(iv%time)-iv%info(qscat)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -528,7 +528,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [18] Transfer profiler obs:
 
-   if (iv%plocal(iv%time,profiler)-iv%plocal(iv%time-1,profiler) > 0) then
+   if (iv%info(profiler)%plocal(iv%time)-iv%info(profiler)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.profiler',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -541,15 +541,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find profiler marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,profiler) + 1, &
-              iv%plocal(iv%time,profiler)
+       do n = iv%info(profiler)%plocal(iv%time-1) + 1, &
+              iv%info(profiler)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find profiler obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,profiler)-iv%plocal(iv%time-1,profiler)) &
+       if (gn /= iv%info(profiler)%plocal(iv%time)-iv%info(profiler)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -557,7 +557,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [19] Transfer TC bogus obs:
 
-   if (iv%plocal(iv%time,bogus)-iv%plocal(iv%time-1,bogus) > 0) then
+   if (iv%info(bogus)%plocal(iv%time)-iv%info(bogus)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.bogus',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -570,15 +570,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find bogus marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,bogus) + 1, &
-              iv%plocal(iv%time,bogus)
+       do n = iv%info(bogus)%plocal(iv%time-1) + 1, &
+              iv%info(bogus)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find bogus obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,bogus)-iv%plocal(iv%time-1,bogus)) &
+       if (gn /= iv%info(bogus)%plocal(iv%time)-iv%info(bogus)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -586,7 +586,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [20] Transfer AIRS retrievals:
 
-   if (iv%plocal(iv%time,airsr)-iv%plocal(iv%time-1,airsr) > 0) then
+   if (iv%info(airsr)%plocal(iv%time)-iv%info(airsr)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.airsr',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -599,15 +599,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find airsr marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,airsr) + 1, &
-              iv%plocal(iv%time,airsr)
+       do n = iv%info(airsr)%plocal(iv%time-1) + 1, &
+              iv%info(airsr)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find airsr obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,airsr)-iv%plocal(iv%time-1,airsr)) &
+       if (gn /= iv%info(airsr)%plocal(iv%time)-iv%info(airsr)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)
@@ -615,7 +615,7 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
 
    ! [21] Transfer gpsref obs:
 
-   if (iv%plocal(iv%time,gpsref)-iv%plocal(iv%time-1,gpsref) > 0) then
+   if (iv%info(gpsref)%plocal(iv%time)-iv%info(gpsref)%plocal(iv%time-1) > 0) then
 
        open(unit=unit_in,file=trim(filename)//'.gpsref',form='formatted',status='old',iostat=ios)
        if (ios /= 0) Then
@@ -628,15 +628,15 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
            call da_error(__FILE__,__LINE__, &
                            (/"Cannot find gpsref marker. "/))
        gn = 0
-       do n = iv%plocal(iv%time-1,gpsref) + 1, &
-              iv%plocal(iv%time,gpsref)
+       do n = iv%info(gpsref)%plocal(iv%time-1) + 1, &
+              iv%info(gpsref)%plocal(iv%time)
           call da_search_obs (ob_type_string, unit_in, num_obs, n, iv, found_flag)
           if (found_flag .eqv. .false.) &
               call da_error(__FILE__,__LINE__, &
                            (/"Cannot find gpsref obs. "/))
           gn = gn + 1
        end do
-       if (gn /= iv%plocal(iv%time,gpsref)-iv%plocal(iv%time-1,gpsref)) &
+       if (gn /= iv%info(gpsref)%plocal(iv%time)-iv%info(gpsref)%plocal(iv%time-1)) &
            call da_error(__FILE__,__LINE__, &
                         (/"Unequal obs. found "/))
        close (unit_in)

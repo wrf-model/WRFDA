@@ -27,9 +27,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%synop(nth)%info%id  == stn_id .and.  &
-           iv%synop(nth)%info%lat == lat    .and.  &
-           iv%synop(nth)%info%lon == lon ) then
+      if ( iv%info(synop)%id(nth)  == stn_id .and.  &
+           iv%info(synop)%lat(1,nth) == lat    .and.  &
+           iv%info(synop)%lon(1,nth) == lon ) then
 
            read(unit_in,'(E22.13,5(E22.13,i8,E22.13))')&
                   iv%synop(nth)%h, &
@@ -52,9 +52,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%metar(nth)%info%id  == stn_id .and.  &
-           iv%metar(nth)%info%lat == lat    .and.  &
-           iv%metar(nth)%info%lon == lon ) then
+      if ( iv%info(metar)%id(nth)  == stn_id .and.  &
+           iv%info(metar)%lat(1,nth) == lat    .and.  &
+           iv%info(metar)%lon(1,nth) == lon ) then
 
            read(unit_in,'(E22.13,5(E22.13,i8,E22.13))')&
                   iv%metar(nth)%h, &
@@ -77,9 +77,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%ships(nth)%info%id  == stn_id .and.  &
-           iv%ships(nth)%info%lat == lat    .and.  &
-           iv%ships(nth)%info%lon == lon ) then
+      if ( iv%info(ships)%id(nth)  == stn_id .and.  &
+           iv%info(ships)%lat(1,nth) == lat    .and.  &
+           iv%info(ships)%lon(1,nth) == lon ) then
 
            read(unit_in,'(E22.13,5(E22.13,i8,E22.13))')&
                   iv%ships(nth)%h, &
@@ -102,9 +102,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%sonde_sfc(nth)%info%id  == stn_id .and.  &
-           iv%sonde_sfc(nth)%info%lat == lat    .and.  &
-           iv%sonde_sfc(nth)%info%lon == lon ) then
+      if ( iv%info(sonde_sfc)%id(nth)  == stn_id .and.  &
+           iv%info(sonde_sfc)%lat(1,nth) == lat    .and.  &
+           iv%info(sonde_sfc)%lon(1,nth) == lon ) then
 
            read(unit_in,'(E22.13,5(E22.13,i8,E22.13))')&
                   iv%sonde_sfc(nth)%h, &
@@ -127,14 +127,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%sound(nth)%info%id  == stn_id .and.  &
-           iv%sound(nth)%info%lat == lat    .and.  &
-           iv%sound(nth)%info%lon == lon ) then
+      if ( iv%info(sound)%id(nth)  == stn_id .and.  &
+           iv%info(sound)%lat(1,nth) == lat    .and.  &
+           iv%info(sound)%lon(1,nth) == lon ) then
 
          do k = 1, levels
-           read(unit_in,'(3E22.13,4(E22.13,i8,E22.13))')&
+           read(unit_in,'(2E22.13,4(E22.13,i8,E22.13))')&
                  iv % sound(nth) % h(k), &
-                 iv % sound(nth) % zk(k), &
                  iv % sound(nth) % p(k), &             ! Obs Pressure
                  iv%sound(nth)%u(k), &! O-B u
                  iv%sound(nth)%v(k), &! O-B v
@@ -157,9 +156,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%buoy(nth)%info%id  == stn_id .and.  &
-           iv%buoy(nth)%info%lat == lat    .and.  &
-           iv%buoy(nth)%info%lon == lon ) then
+      if ( iv%info(buoy)%id(nth)  == stn_id .and.  &
+           iv%info(buoy)%lat(1,nth) == lat    .and.  &
+           iv%info(buoy)%lon(1,nth) == lon ) then
 
            read(unit_in,'(E22.13,5(E22.13,i8,E22.13))')&
                   iv%buoy(nth)%h, &
@@ -182,14 +181,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%geoamv(nth)%info%id  == stn_id .and.  &
-           iv%geoamv(nth)%info%lat == lat    .and.  &
-           iv%geoamv(nth)%info%lon == lon ) then
+      if ( iv%info(geoamv)%id(nth)  == stn_id .and.  &
+           iv%info(geoamv)%lat(1,nth) == lat    .and.  &
+           iv%info(geoamv)%lon(1,nth) == lon ) then
 
          do k = 1, levels
-           read(unit_in,'(2E22.13,2(E22.13,i8,E22.13))')&
+           read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
                       iv % geoamv(nth) % p(k), &                ! Obs Pressure
-                      iv % geoamv(nth) % zk(k), &                ! Obs Pressure
                       iv%geoamv(nth)%u(k), &! O-B u
                       iv%geoamv(nth)%v(k)
          enddo
@@ -209,9 +207,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%gpspw(nth)%info%id  == stn_id .and.  &
-           iv%gpspw(nth)%info%lat == lat    .and.  &
-           iv%gpspw(nth)%info%lon == lon ) then
+      if ( iv%info(gpspw)%id(nth)  == stn_id .and.  &
+           iv%info(gpspw)%lat(1,nth) == lat    .and.  &
+           iv%info(gpspw)%lon(1,nth) == lon ) then
 
          read(unit_in,'(E22.13,i8,E22.13)')&
            iv%gpspw(nth)%tpw
@@ -230,8 +228,8 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
    do n = 1, num_obs
       read(unit_in,'(i8,2E22.13)') n_dummy, lat, lon
       if (  &
-           iv%ssmi_rv(nth)%info%lat == lat    .and.  &
-           iv%ssmi_rv(nth)%info%lon == lon ) then
+           iv%info(ssmi_rv)%lat(1,nth) == lat    .and.  &
+           iv%info(ssmi_rv)%lon(1,nth) == lon ) then
 
          read(unit_in,'2(E22.13,i8,E22.13)')&
            iv%ssmi_rv(nth)%speed, & ! O-B speed
@@ -250,14 +248,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%airep(nth)%info%id  == stn_id .and.  &
-           iv%airep(nth)%info%lat == lat    .and.  &
-           iv%airep(nth)%info%lon == lon ) then
+      if ( iv%info(airep)%id(nth)  == stn_id .and.  &
+           iv%info(airep)%lat(1,nth) == lat    .and.  &
+           iv%info(airep)%lon(1,nth) == lon ) then
 
         do k = 1, levels
-          read(unit_in,'(3E22.13,3(E22.13,i8,E22.13))')&
+          read(unit_in,'(2E22.13,3(E22.13,i8,E22.13))')&
                iv % airep(nth) % h(k), &
-               iv % airep(nth) % zk(k), &
                iv % airep(nth) % p(k), &             ! Obs pressure
                iv%airep(nth)%u(k), &! O-B u
                iv%airep(nth)%v(k), &! O-B v
@@ -279,14 +276,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%polaramv(nth)%info%id  == stn_id .and.  &
-           iv%polaramv(nth)%info%lat == lat    .and.  &
-           iv%polaramv(nth)%info%lon == lon ) then
+      if ( iv%info(polaramv)%id(nth)  == stn_id .and.  &
+           iv%info(polaramv)%lat(1,nth) == lat    .and.  &
+           iv%info(polaramv)%lon(1,nth) == lon ) then
 
         do k = 1, levels
-          read(unit_in,'(2E22.13,2(E22.13,i8,E22.13))')&
+          read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
                iv % polaramv(nth) % p(k), &                ! Obs Pressure
-               iv % polaramv(nth) % zk(k), &                ! Obs Pressure
                iv%polaramv(nth)%u(k), &! O-B u
                iv%polaramv(nth)%v(k)
         enddo
@@ -306,14 +302,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%pilot(nth)%info%id  == stn_id .and.  &
-           iv%pilot(nth)%info%lat == lat    .and.  &
-           iv%pilot(nth)%info%lon == lon ) then
+      if ( iv%info(pilot)%id(nth)  == stn_id .and.  &
+           iv%info(pilot)%lat(1,nth) == lat    .and.  &
+           iv%info(pilot)%lon(1,nth) == lon ) then
 
         do k = 1, levels
-          read(unit_in,'(2E22.13,2(E22.13,i8,E22.13))')&
+          read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
                iv % pilot(nth) % p(k), &                ! Obs Pressure
-               iv % pilot(nth) % zk(k), &                ! Obs Pressure
                iv%pilot(nth)%u(k), &! O-B u
                iv%pilot(nth)%v(k)
         enddo
@@ -334,8 +329,8 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
    do n = 1, num_obs
       read(unit_in,'(i8,2E22.13)') n_dummy, lat, lon
       if (  &
-           iv%ssmi_tb(nth)%info%lat == lat    .and.  &
-           iv%ssmi_tb(nth)%info%lon == lon ) then
+           iv%info(ssmi_tb)%lat(1,nth) == lat    .and.  &
+           iv%info(ssmi_tb)%lon(1,nth) == lon ) then
 
         read(unit_in,'(7(E22.13,i8,E22.13))')&
                iv%ssmi_tb(nth)%tb19h, & ! O-B Tb19h
@@ -359,9 +354,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%satem(nth)%info%id  == stn_id .and.  &
-           iv%satem(nth)%info%lat == lat    .and.  &
-           iv%satem(nth)%info%lon == lon ) then
+      if ( iv%info(satem)%id(nth)  == stn_id .and.  &
+           iv%info(satem)%lat(1,nth) == lat    .and.  &
+           iv%info(satem)%lon(1,nth) == lon ) then
 
         do k = 1, levels
           read(unit_in,'(E22.13,(E22.13,i8,E22.13))')&
@@ -384,9 +379,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%ssmt1(nth)%info%id  == stn_id .and.  &
-           iv%ssmt1(nth)%info%lat == lat    .and.  &
-           iv%ssmt1(nth)%info%lon == lon ) then
+      if ( iv%info(ssmt1)%id(nth)  == stn_id .and.  &
+           iv%info(ssmt1)%lat(1,nth) == lat    .and.  &
+           iv%info(ssmt1)%lon(1,nth) == lon ) then
 
         do k = 1, levels
           read(unit_in,'(E22.13,(E22.13,i8,E22.13))')&
@@ -409,9 +404,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%ssmt2(nth)%info%id  == stn_id .and.  &
-           iv%ssmt2(nth)%info%lat == lat    .and.  &
-           iv%ssmt2(nth)%info%lon == lon ) then
+      if ( iv%info(ssmt2)%id(nth)  == stn_id .and.  &
+           iv%info(ssmt2)%lat(1,nth) == lat    .and.  &
+           iv%info(ssmt2)%lon(1,nth) == lon ) then
 
         do k = 1, levels
           read(unit_in,'(E22.13,(E22.13,i8,E22.13))')&
@@ -434,13 +429,12 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(i8,a5,2E22.13)') n_dummy, stn_id, lat, lon
-      if ( iv%qscat(nth)%info%id  == stn_id .and.  &
-           iv%qscat(nth)%info%lat == lat    .and.  &
-           iv%qscat(nth)%info%lon == lon ) then
+      if ( iv%info(qscat)%id(nth)  == stn_id .and.  &
+           iv%info(qscat)%lat(1,nth) == lat    .and.  &
+           iv%info(qscat)%lon(1,nth) == lon ) then
 
-        read(unit_in,'(2E22.13,2(E22.13,i8,E22.13))')&
+        read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
                    iv % qscat(nth) % h, &                ! Obs height
-                   iv % qscat(nth) % zk, &                ! Obs height
                    iv%qscat(nth)%u, &! O-B u
                    iv%qscat(nth)%v   ! O-B v
         found_flag = .true.
@@ -457,14 +451,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%profiler(nth)%info%id  == stn_id .and.  &
-           iv%profiler(nth)%info%lat == lat    .and.  &
-           iv%profiler(nth)%info%lon == lon ) then
+      if ( iv%info(profiler)%id(nth)  == stn_id .and.  &
+           iv%info(profiler)%lat(1,nth) == lat    .and.  &
+           iv%info(profiler)%lon(1,nth) == lon ) then
 
         do k = 1, levels
-          read(unit_in,'(2E22.13,2(E22.13,i8,E22.13))')&
+          read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
                      iv % profiler(nth) % p(k), &             ! Obs Pressure
-                     iv % profiler(nth) % zk(k), &             ! Obs Pressure
                      iv%profiler(nth)%u(k), &! O-B u
                      iv%profiler(nth)%v(k) ! O-B v
         enddo
@@ -484,16 +477,15 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%bogus(nth)%info%id  == stn_id .and.  &
-           iv%bogus(nth)%info%lat == lat    .and.  &
-           iv%bogus(nth)%info%lon == lon ) then
+      if ( iv%info(bogus)%id(nth)  == stn_id .and.  &
+           iv%info(bogus)%lat(1,nth) == lat    .and.  &
+           iv%info(bogus)%lon(1,nth) == lon ) then
 
         read(unit_in,'(E22.13,i8,E22.13)')&
           iv%bogus(nth)%slp
         do k = 1, levels
-          read(unit_in,'(3E22.13,4(E22.13,i8,E22.13))')&
+          read(unit_in,'(2E22.13,4(E22.13,i8,E22.13))')&
                      iv % bogus(nth) % h(k), &
-                     iv % bogus(nth) % zk(k), &
                      iv % bogus(nth) % p(k), &             ! Obs Pressure
                      iv%bogus(nth)%u(k), &! O-B u
                      iv%bogus(nth)%v(k), &! O-B v
@@ -517,9 +509,9 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%airsr(nth)%info%id  == stn_id .and.  &
-           iv%airsr(nth)%info%lat == lat    .and.  &
-           iv%airsr(nth)%info%lon == lon ) then
+      if ( iv%info(airsr)%id(nth)  == stn_id .and.  &
+           iv%info(airsr)%lat(1,nth) == lat    .and.  &
+           iv%info(airsr)%lon(1,nth) == lon ) then
 
         do k = 1, levels
           read(unit_in,'(E22.13,2(E22.13,i8,E22.13))')&
@@ -543,14 +535,13 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
 
    do n = 1, num_obs
       read(unit_in,'(2i8,a5,2E22.13)') n_dummy, levels, stn_id, lat, lon
-      if ( iv%gpsref(nth)%info%id  == stn_id .and.  &
-           iv%gpsref(nth)%info%lat == lat    .and.  &
-           iv%gpsref(nth)%info%lon == lon ) then
+      if ( iv%info(gpsref)%id(nth)  == stn_id .and.  &
+           iv%info(gpsref)%lat(1,nth) == lat    .and.  &
+           iv%info(gpsref)%lon(1,nth) == lon ) then
 
         do k = 1, levels
-          read(unit_in,'(2E22.13,(E22.13,i8,E22.13))')&
+          read(unit_in,'(E22.13,(E22.13,i8,E22.13))')&
                      iv % gpsref(nth) % h(k), &             ! Obs Height
-                     iv % gpsref(nth) % zk(k), &             ! Obs Height
                      iv%gpsref(nth)%ref(k) ! O-B ref
         enddo
         found_flag = .true.

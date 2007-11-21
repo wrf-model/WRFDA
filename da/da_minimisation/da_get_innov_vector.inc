@@ -95,11 +95,11 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    if ( var4d_multi_inc == 1 ) then
 
-!      call da_write_iv_for_multi_inc(n, iv)
+       call da_write_iv_for_multi_inc(n, iv)
 
    elseif ( var4d_multi_inc == 2 ) then
 
-!      call da_read_iv_for_multi_inc(n, iv)
+       call da_read_iv_for_multi_inc(n, iv)
 
    endif
 
