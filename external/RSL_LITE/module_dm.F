@@ -150,11 +150,14 @@ write(0,*)'reordering mesh'
 ! debug
       CALL mpi_comm_rank( local_communicator_periodic, mytask, ierr )
       CALL mpi_cart_coords( local_communicator_periodic, mytask, 2, coords, ierr )
+#if (DA_CORE != 1)
         write(0,*)'periodic coords ',mytask, coords
-
+#endif
       CALL mpi_comm_rank( local_communicator, mytask, ierr )
       CALL mpi_cart_coords( local_communicator, mytask, 2, coords, ierr )
+#if (DA_CORE != 1)
         write(0,*)'non periodic coords ',mytask, coords
+#endif
       mytask_x = coords(2)   ! col task (x)
       mytask_y = coords(1)   ! row task (y)
       CALL nl_set_nproc_x ( 1, ntasks_x )
