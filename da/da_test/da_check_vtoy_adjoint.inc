@@ -24,8 +24,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    real    :: adj_sum_lhs               ! < y, y >
    real    :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
    real    :: partial_lhs   ! < y, y >
-   real    :: pertile_lhs   ! < y, y >   
-   integer :: cg_jcdf
+   real    :: pertile_lhs   ! < y, y >  
 
    if (trace_use_dull) call da_trace_entry("da_check_vtoy_adjoint")
 

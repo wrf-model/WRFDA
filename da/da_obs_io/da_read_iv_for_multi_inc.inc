@@ -16,11 +16,9 @@ subroutine da_read_iv_for_multi_inc(file_index, iv)
    character(len=filename_len)   :: filename
 
    integer      :: num_obs, ios 
-   integer      :: global_num_obs
    character*20 :: ob_type_string               
    
-   character*5  :: stn_id               
-   integer      :: n, gn, k, kk, l, levels
+   integer      :: n, gn
    logical      :: found_flag
 
    if (trace_use) call da_trace_entry("da_read_iv_for_multi_inc")

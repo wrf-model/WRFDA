@@ -231,7 +231,7 @@ subroutine da_search_obs (ob_type_string, unit_in, num_obs, nth, iv, found_flag)
            iv%info(ssmi_rv)%lat(1,nth) == lat    .and.  &
            iv%info(ssmi_rv)%lon(1,nth) == lon ) then
 
-         read(unit_in,'2(E22.13,i8,E22.13)')&
+         read(unit_in,'(2(E22.13,i8,E22.13))')&
            iv%ssmi_rv(nth)%speed, & ! O-B speed
            iv%ssmi_rv(nth)%tpw ! O-BA tpw
          found_flag = .true.

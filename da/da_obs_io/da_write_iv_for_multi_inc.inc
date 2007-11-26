@@ -9,7 +9,7 @@ subroutine da_write_iv_for_multi_inc(file_index, iv)
    type (iv_type), intent(in)    :: iv      ! O-B structure.
    integer, intent (in)          :: file_index
       
-   integer                       :: n, k, num_obs, ios
+   integer                       :: n, k, ios
    integer                       :: ounit     ! Output unit           
    character(len=filename_len)   :: filename
 
@@ -278,7 +278,7 @@ subroutine da_write_iv_for_multi_inc(file_index, iv)
                  n, &  ! Station
                  iv%info(ssmi_rv)%lat(1,n), &       ! Latitude
                  iv%info(ssmi_rv)%lon(1,n)          ! Longitude
-         write(ounit,'2(E22.13,i8,E22.13)')&
+         write(ounit,'(2(E22.13,i8,E22.13))')&
                  iv%ssmi_rv(n)%speed, & ! O-B speed
                  iv%ssmi_rv(n)%tpw ! O-BA tpw
       end do

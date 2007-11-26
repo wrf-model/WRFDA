@@ -8,7 +8,7 @@ module da_obs
    use da_airsr, only : da_transform_xtoy_airsr, da_transform_xtoy_airsr_adj 
    use da_bogus, only : da_transform_xtoy_bogus, da_transform_xtoy_bogus_adj
    use da_buoy, only : da_transform_xtoy_buoy,da_transform_xtoy_buoy_adj
-   use da_control, only : var4d_multi_inc, use_shipsobs, use_synopobs, use_ssmt2obs, &
+   use da_control, only : use_shipsobs, use_synopobs, use_ssmt2obs, &
       use_soundobs,use_satemobs, use_profilerobs, use_pilotobs, &
       use_qscatobs,use_metarobs, use_polaramvobs, use_geoamvobs, &
       use_bogusobs,use_buoyobs, use_airsretobs, trace_use, num_procs, &
