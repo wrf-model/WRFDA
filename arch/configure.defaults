@@ -966,7 +966,7 @@ INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../exter
                         -I../frame -I../share -I../phys -I../chem -I../inc
 ARCHFLAGS       =       $(COREDEFS) -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         CONFIGURE_NETCDF_FLAG \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+			-DLIMIT_ARGS -DNATIVE_MASSV
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv \
@@ -1259,7 +1259,7 @@ INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../exter
                         -I../frame -I../share -I../phys -I../chem -I../inc
 ARCHFLAGS       =       $(COREDEFS) -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         CONFIGURE_NETCDF_FLAG \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+			-DLIMIT_ARGS -DNATIVE_MASSV
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv -lxlsmp \
@@ -1410,12 +1410,12 @@ ESMF_LIB_FLAGS  =       -lC
 ESMF_IO_LIB     =       ESMFIOLIB
 ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_pnetcdf \
-                        -I../external/io_int  -I../external/esmf_time_f90 \
-                        -I../frame -I../share -I../phys -I../chem -I../inc
+                        -I../external/io_int $(ESMF_IO_INC) \
+                        -I../frame -I../share -I../phys -I../chem -I../inc $(ESMF_MOD_INC)
 ARCHFLAGS       =       $(COREDEFS) -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) \
                         -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG CONFIGURE_PNETCDF_FLAG \
                         -DTRIEDNTRUE -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO \
-			-DLIMIT_ARGS  -DNATIVE_MASSV -DNMM_NEST=$(WRF_NMM_NEST)
+			-DLIMIT_ARGS  -DNATIVE_MASSV -DNMM_NEST=$(WRF_NMM_NEST) $(ESMF_IO_DEFS)
 PERL            =       perl
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH CONFIGURE_PNETCDF_LIB_PATH \
@@ -1424,7 +1424,7 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH CONFIGURE_PNETCDF_LIB_PATH \
                         -L../external/io_grib1 -lio_grib1 \
                         CONFIGURE_GRIB2_LIB \
                         -L../external/io_grib_share -lio_grib_share \
-			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+			../frame/module_internal_header_util.o ../frame/pack_utils.o $(ESMF_IO_LIB)
 LDFLAGS         =	 CONFIGURE_LDFLAGS
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP		=	/lib/cpp
@@ -1438,7 +1438,8 @@ NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 PNETCDFPATH	=	CONFIGURE_PNETCDF_PATH
 CC_TOOLS        =       cc
 
-externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF CONFIGURE_WRFIO_PNF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+externals : wrf_ioapi_includes CONFIGURE_WRFIO_NF CONFIGURE_WRFIO_PNF wrfio_grib_share wrfio_grib1 CONFIGURE_WRFIO_GRIB2 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F $(ESMF_TARGET)
+
 
 gen_comms.c : ../external/RSL_LITE/gen_comms.c
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
@@ -6701,7 +6702,7 @@ convert_nmm.o :
 #
 FC              =       g95
 LD              =       g95
-CC              =       gcc -DFSEEKO64_OK -DMACOS -DF2CSTYLE
+CC              =       gcc -DMACOS -DF2CSTYLE
 SCC		=	$(CC)
 RWORDSIZE       =       $(NATIVE_RWORDSIZE)
 SFC             =       $(FC)
@@ -6711,20 +6712,19 @@ PROMOTION	=	-i4
 CFLAGS          =       
 FCOPTIM		=	-O2 # -fast
 FCDEBUG		=	#-g -O0
-#FCBASEOPTS      =       -Wno=101,139,155,158 -fno-second-underscore -fendian=big -ffree-form $(FCDEBUG) # -Mlfs
-FCBASEOPTS      =       -Wno=101,139,155,158 -fendian=big -ffree-form $(FCDEBUG) # -Mlfs
+FCBASEOPTS      =       -Wno=101,139,155,158 -fendian=big -ffree-line-length-huge -ffree-form $(FCDEBUG) # -Mlfs
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          -DNETCDF -DGRIB1 -DLIMIT_ARGS -DG95 -DMACOS -DF2CSTYLE
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
 ESMF_LIB_FLAGS  =       
-ESMF_IO_LIB     =       -L../external/esmf_time_f90 -lesmf_time
-ESMF_IO_LIB_EXT =       -L../../external/esmf_time_f90 -lesmf_time
+ESMF_IO_LIB     =       ESMFIOLIB
+ESMF_IO_LIB_EXT =       ESMFIOEXTLIB
 INCLUDE_MODULES =       -fmod=../main -I../external/io_netcdf -I../external/io_int -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
 PERL            =       perl
 REGISTRY        =       Registry
-LIB             =       -L../external/io_netcdf -lwrfio_nf -L/automount/static/usr/local/netcdf-3.6.0-p1-g95intel/lib -lnetcdf \
+LIB             =       CONFIGURE_NETCDF_LIB_PATH \
                         -L../external/io_grib1 -lio_grib1 \
                          \
                         -L../external/io_grib_share -lio_grib_share \
@@ -6738,7 +6738,7 @@ CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(ENVCOMPDEFS) $(POUN
 AR              =       ar ru
 M4              =       m4 -B 14000
 RANLIB          =       ranlib
-NETCDFPATH	=	/usr/local/netcdf-3.6.0-p1-g95intel
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 CC_TOOLS        =       $(CC)
 
 #### Override default sed command and script for Fortran source files         ####
@@ -6753,7 +6753,7 @@ module_dm.F :
 
 wrfio_nf : 
 	( cd ../external/io_netcdf ; \
-	  make NETCDFPATH=/usr/local/netcdf-3.6.0-p1-g95intel RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -w" TRADFLAG="-traditional" )
+	  make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) -w" TRADFLAG="-traditional" )
 
 wrfio_grib_share :
 	( cd ../external/io_grib_share ; \
@@ -6765,7 +6765,7 @@ wrfio_grib1 :
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) " RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-Mfixed" archive )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) " RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-ffixed-form" archive )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -6822,8 +6822,8 @@ DMPARALLEL      =       1
 MAX_PROC        =       1024
 FC              =       mpif90 -f90=g95
 LD              =       mpif90 -f90=g95
-CC              =       mpicc -cc=gcc -DFSEEKO64_OK -DMACOS -DF2CSTYLE
-SCC		=	gcc -DFSEEKO64_OK -DMACOS -DF2CSTYLE
+CC              =       mpicc -cc=gcc -DMACOS -DF2CSTYLE
+SCC		=	gcc -DMACOS -DF2CSTYLE
 SFC             =       g95
 RWORDSIZE       =       $(NATIVE_RWORDSIZE)
 # g95 does not like -r4. if you want promotion to -r8 add it to PROMOTION below
@@ -6833,7 +6833,7 @@ CFLAGS          =       -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM		=	-O2 # -fast
 FCDEBUG		=	#-g -O0
-FCBASEOPTS      =       -Wno=101,139,155,158 -fno-second-underscore -fendian=big -ffree-form $(FCDEBUG) # -Mlfs
+FCBASEOPTS      =       -Wno=101,139,155,158 -ffree-line-length-huge -fno-second-underscore -fendian=big -ffree-form $(FCDEBUG) # -Mlfs
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       $(COREDEFS) -DGRIB1 CONFIGURE_GRIB2_FLAG -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
@@ -6846,7 +6846,8 @@ INCLUDE_MODULES =       -fmod=../main -I../external/io_netcdf -I../external/io_i
                         -I../external -I../frame -I../share -I../phys -I../chem -I../inc
 PERL            =       perl
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
+LIB             =       CONFIGURE_NETCDF_LIB_PATH \
+                        -L../external/RSL_LITE -lrsl_lite \
                         -L../external/io_grib1 -lio_grib1 \
                         CONFIGURE_GRIB2_LIB \
                         -L../external/io_grib_share -lio_grib_share \
@@ -6950,13 +6951,11 @@ DMPARALLEL      =       1
 MAX_PROC        =       1024
 FC              =       mpif90 -f90=g95
 LD              =       mpif90 -f90=g95
-CC              =       mpicc -cc=gcc -DFSEEKO64_OK -DMACOS -DF2CSTYLE
-SCC		=	gcc -DFSEEKO64_OK -DMACOS -DF2CSTYLE
+CC              =       mpicc -cc=gcc -DMACOS -DF2CSTYLE
+SCC		=	gcc -DMACOS -DF2CSTYLE
 SFC             =       g95
 RWORDSIZE       =       8
-# g95 does not like -r4. if you want promotion to -r8 add it to PROMOTION below
-#PROMOTION      =       -r$(RWORDSIZE) -i4
-PROMOTION       =       -i4 -r8
+PROMOTION      =       -r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM		=	-O2 # -fast
@@ -7020,7 +7019,7 @@ wrfio_grib1 :
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-Mfixed" archive)
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-ffixed-form" archive)
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -7638,7 +7637,7 @@ wrfio_grib1 :
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-Mfixed" archive )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-ffixed-form" archive )
 
 
 wrfio_int : 
@@ -7754,7 +7753,7 @@ wrfio_grib1 :
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-Mfixed" archive )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-ffixed-form" archive )
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -7880,7 +7879,7 @@ wrfio_grib1 :
 
 wrfio_grib2 :
 	( cd ../external/io_grib2 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-Mfixed" archive)
+          make CC="$(SCC)" CFLAGS="$(CFLAGS) CONFIGURE_GRIB2_INC" RM="$(RM)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) -I. $(FCDEBUG) $(FCBASEOPTS) -w" TRADFLAG="-traditional" FIXED="-ffixed-form" archive)
 
 wrfio_int : 
 	( cd ../external/io_int ; \
@@ -7967,7 +7966,7 @@ ARCHFLAGS       =       $(COREDEFS) \
                         -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         -DNETCDF -DINTIO \
-                        -DNO_NAMELIST_PRINT  \
+                         \
                         -DLIMIT_ARGS -DLANDREAD_STUB -DNMM_NEST=$(WRF_NMM_NEST) -DMEMCPY_FOR_BCOPY
 
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
