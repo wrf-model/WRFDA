@@ -30,6 +30,7 @@ elif [ "$option" = "em_nl" ] ; then
     SOLVER=em
     REGISTRY=Registry.EM_NL
     EM_CORE=1
+    COREFLAGS="$COREFLAGS -DWRFNL"
 elif [ "$option" = "em_chem" ] ; then
     SOLVER=em
     REGISTRY=Registry.EM_CHEM
@@ -485,7 +486,7 @@ if test -n "$PERL" ; then
      -ldflags=$ldflags -pnetcdf=$PNETCDF -zlib=$ZLIB -jpeg=$JPEG \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE -max_domains=$MAX_DOMAINS \
-     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -coreflags=$COREFLAGS \
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -coreflags="$COREFLAGS" \
      -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR \
      -rwordsize=$RWORDSIZE -solver=$SOLVER -promote_float="$PROMOTE_FLOAT"
 fi

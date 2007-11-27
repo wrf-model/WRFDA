@@ -81,7 +81,7 @@ CONTAINS
 
    program_name = "WRF " // TRIM(release_version) // " MODEL"
 
-#ifndef VAR4D
+#ifndef WRFNL
    ! Initialize WRF modules:  
    ! Phase 1 returns after MPI_INIT() (if it is called)
    CALL init_modules(1)
