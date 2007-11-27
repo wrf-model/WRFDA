@@ -81,7 +81,8 @@ CONTAINS
 
    program_name = "WRF " // TRIM(release_version) // " MODEL"
 
-#ifndef WRFNL
+#if defined(DM_PARALLEL) && defined(WRFNL)
+#else
    ! Initialize WRF modules:  
    ! Phase 1 returns after MPI_INIT() (if it is called)
    CALL init_modules(1)
