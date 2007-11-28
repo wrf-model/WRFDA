@@ -38,8 +38,6 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_setup_firstguess (xbx, grid)
       end if
 
-      if ( var4d_multi_inc /= 2 ) then
-
       ! Radiosonde:
       if (iv%info(sound)%nlocal > 0) then
          call da_get_innov_vector_sound     (it, grid, ob, iv)
@@ -87,21 +85,19 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid, ob, iv)
       if (iv%info(airsr)%nlocal > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
 
-   endif
-
    !----------------------------------------------
    ! [5]  write out iv in ascii format
    !-----------------------------------------------
 
-   if ( var4d_multi_inc == 1 ) then
+      if ( var4d_multi_inc == 1 ) then
 
-       call da_write_iv_for_multi_inc(n, iv)
+          call da_write_iv_for_multi_inc(n, iv)
 
-   elseif ( var4d_multi_inc == 2 ) then
+      elseif ( var4d_multi_inc == 2 ) then
 
-       call da_read_iv_for_multi_inc(n, iv)
+          call da_read_iv_for_multi_inc(n, iv)
 
-   endif
+      endif
 
    end do
 
