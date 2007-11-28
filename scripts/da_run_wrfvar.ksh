@@ -372,18 +372,13 @@ if $NL_VAR4D; then
    ln -fs $WORK_DIR/*.TBL nl
    ln -fs $WORK_DIR/RRTM_DATA nl
    ln -fs $WORK_DIR/wrfbdy_d01 nl
-   ln -fs $WORK_DIR/fg01 nl/wrfinput_d01
-   # if [[ -e $WORK_DIR/wrfvar_output ]]; then
-   #    ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d01
-   # else
-      ln -fs $WORK_DIR/fg01 nl/wrfinput_d01
-   # fi
+   ln -fs $WORK_DIR/wrfinput_d01 nl/wrfinput_d01
    ln -fs $WRFNL_DIR/main/wrf.exe nl
 
    # Outputs
    for I in 02 03 04 05 06 07; do
       if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
-         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00-thin fg$I
       else
          ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
       fi
@@ -395,10 +390,18 @@ if $NL_VAR4D; then
 
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
-   export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+   if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
+   else
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+   fi
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
-      export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
+      else
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      fi
    fi
    let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
    export NL_MP_PHYSICS=0
@@ -442,10 +445,18 @@ if $NL_VAR4D; then
    # Inputs
    export NL_DYN_OPT=302
    export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
-   export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+   if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
+   else
+      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+   fi
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
-      export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
+      else
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      fi
    fi
    let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
@@ -461,7 +472,7 @@ if $NL_VAR4D; then
    ln -fs $WORK_DIR/*.TBL ad
    ln -fs $WORK_DIR/RRTM_DATA ad
    ln -fs $WORK_DIR/wrfbdy_d01 ad
-   ln -fs $WORK_DIR/fg01 ad/wrfinput_d01
+   ln -fs $WORK_DIR/wrfinput_d01 ad/wrfinput_d01
    for I in 01 02 03 04 05 06 07; do
       ln -fs $WORK_DIR/af$I ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
    done
@@ -521,7 +532,7 @@ if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
    mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
 
 #  ln -fs wrfinput_d01-thin wrfinput_d01
-#  ln -fs wrfinput_d01-thin fg01
+   ln -fs wrfinput_d01-thin fg01
 
 fi
 
