@@ -3,7 +3,7 @@
 cd ..
 svn update
 ./clean -a
-. ./setup.ksh g95
+. ./setup.ksh pgi
 echo 4 | ./configure wrfvar
 cd build
 make -r setup
