@@ -184,3 +184,8 @@ fi
 if test "$SUBMIT_WAIT_FLAG." != '.'; then
    echo "SUBMIT_WAIT_FLAG $SUBMIT_WAIT_FLAG"
 fi
+
+if [[ $COMPILER == cray ]]; then
+   # Cray use environment variable for their own purposes, so unset
+   unset COMPILER
+fi

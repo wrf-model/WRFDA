@@ -209,7 +209,7 @@ if ( Justplot ) then
         IF ( ndim .eq. 3 ) THEN
         do k = start_index(2), end_index(2)
           if ( levlim .eq. -1 .or. k .eq. levlim ) then
-            write(88,*)end_index(1),end_index(3),' ',trim(name),' ',k,' time ',n
+!            write(88,*)end_index(1),end_index(3),' ',trim(name),' ',k,' time ',n
             do j = 1, end_index(3)
               do i = 1, end_index(1)
                 write(88,*) data(i,k,j,1)
@@ -219,7 +219,7 @@ if ( Justplot ) then
         enddo
         ELSE IF ( ndim .eq. 2 ) THEN
             k = 1
-            write(88,*)end_index(1),end_index(2),' ',trim(name),' ',k,' time ',n
+!            write(88,*)end_index(1),end_index(2),' ',trim(name),' ',k,' time ',n
             do j = 1, end_index(2)
               do i = 1, end_index(1)
                 write(88,*) data(i,j,1,1)

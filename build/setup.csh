@@ -249,3 +249,8 @@ endif
 if ($?SUBMIT_WAIT_FLAG) then
    echo "SUBMIT_WAIT_FLAG $SUBMIT_WAIT_FLAG"
 endif
+
+if ($COMPILER == cray) then
+   # Cray use COMPILER for their own purposes, so reset
+   unsetenv COMPILER
+endif
