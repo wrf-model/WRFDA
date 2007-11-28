@@ -37,6 +37,7 @@
  foreach TYPES ( synop buoy ships metar sondsfc )
  setenv TYPE $TYPES
 #---------------------------------------------------
+setenv VAR (u_omb v_omb t_omb q_omb p_omb ) 
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
   ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35

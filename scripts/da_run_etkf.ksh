@@ -18,56 +18,23 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-#Experiment details:
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export REGION=${REGION:-con200}
-export EXPT=${EXPT:-test}                              # Experiment name.
-export NUM_MEMBERS=${NUM_MEMBERS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
-export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/${DATE}/run_etkf}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 
-#Ensemble mean parameters:
-export NV=${NV:-15}                               # Number of variables to average.
-export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
-                "'QCLOUD'", "'QRAIN'", "'QVAPOR'", "'U10'", "'V10'", "'T2'", "'Q2'"} # Variable names
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
-#WRF-Var parameters:
-export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat}
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
-export WINDOW_START=${WINDOW_START:-0}
-export WINDOW_END=${WINDOW_END:-0}
-export NL_E_WE=${NL_E_WE:-45}
-export NL_E_SN=${NL_E_SN:-45}
-export NL_E_VERT=${NL_E_VERT:-28}
-export NL_DX=${NL_DX:-200000}
-export NL_DY=${NL_DX:-200000}
-#export NL_NTMAX=0
+export ETKF_DIR=$FC_DIR/etkf
+export RUN_DIR=$EXP_DIR/run/${DATE}/run_etkf
+
 export NL_CHECK_RH=0
 export NL_CHECK_MAX_IV=.false.
 export NL_ANALYSIS_TYPE="VERIFY"
 export DA_ANALYSIS=analysis_not_used
-
-#ETKF parameters:
-export NACCUMT1=${NACCUMT1:-1}
-export NACCUMT2=${NACCUMT2:--1}
-export NSTARTACCUM1=${NSTARTACCUM1:-1}
-export NSTARTACCUM2=${NSTARTACCUM2:-1}
-export CYCLE_NUMBER=${CYCLE_NUMBER:-0}
-export TAINFLATINPUT=${TAINFLATINPUT:-1.0}
-export RHOINPUT=${RHOINPUT:-1.0}
 
 #------------------------------------------------------------------------------------------
 

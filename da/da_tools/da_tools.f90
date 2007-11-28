@@ -9,7 +9,7 @@ module da_tools
    use module_domain, only : xb_type, xpose_type
 
 #ifndef crayx1
-   use lapack, only : dsyev
+!   use lapack, only : dsyev
 #endif
 
    use da_control, only : pi, gravity, gas_constant, ims, ime, jms,jme, &

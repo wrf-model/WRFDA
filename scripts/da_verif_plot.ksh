@@ -1,45 +1,79 @@
-#!/bin/ksh
-#set -x
-#=========================================================
-RUN_DIR=/mmmtmp/rizvi/verify
-DIAG_DIR=/mmmtmp/rizvi/input_gts_omb_oma
-START_DATE=2005080200
-END_DATE=2005083112
-INTERVAL=12
-Verify_Date_Range="02 - 31 August 2005 (${INTERVAL} hour Cycle)"
+#!/bin/bash
+#===========================================
+RUN_DIR=/ptmp/rizvi/test_verif_plot
+DIAG_DIR=/ptmp/rizvi/data/t44    
+START_DATE=2006100100
+END_DATE=2006102818
+INTERVAL=06
+Verify_Date_Range="01 - 28 October 2006 (${INTERVAL} hour Cycle)"
 #---------------------------------------------------------------
-NUM_EXPT=4
-EXP_NAMES=( verify_an verify_00 verify_12 verify_24 )
-NUM_OBS_TYPE=3
-OBS_TYPES=( "synop" "sound" "airep" )
-DESIRED_LEVELS='(/"850","500","200","10"/)'
+NUM_EXPT=2
+EXP_NAMES=( no_noise_t44 with_noise_t44 )
+#EXP_NAMES=( verif_cold_start_12 verif_cycling_12 verif_cold_start_24 verif_cycling_24 )
+#---------------------------------------------------------------
+NUM_OBS_TYPE=4
+OBS_TYPES=( "synop" "sound" "airep" "geoamv" )
+#*************************************************************************************
+#DESIRED_LEVELS='(/"1000","850","500","200","20","10"/)'
+DESIRED_LEVELS='(/"850"/)'
 DESIRED_SCORES='(/"RMSE","BIAS"/)'
-EXP_LEGENDS='(/"WRF-Var","FNL (FG)","12 hour","24 hour"/)'
-EXP_LINES_COLORS='(/"blue","green","orange","red"/)'
-PLOT_WKS=pdf
-WRFVAR_DIR=/mmmtmp/rizvi/trunk         
+EXP_LEGENDS='(/"No_noise","with_noise"/)'
+#EXP_LEGENDS='(/"12 hr FCST (cold start)","12 hr FCST (cycling)", \
+#               "24 hr FCST (cold start)","24 hr FCST (cycling)"/)' 
+EXP_LINES_COLORS='(/"blue","green","orange"/)'
+#EXP_LINES_COLORS='(/"blue","green","orange","red"/)'
+#---------------------------------------------------------------
+PLOT_WKS=x11
+WRFVAR_DIR=/ptmp/rizvi/trunk
+#=========================================================
 #=========================================================
 # BELOW THIS DO NOT CHANGE ANYTHING : CHANGE NOT REQUIRED
 #=========================================================
-SRC_DIR=$WRFVAR_DIR/da/da_verif    
+#=========================================================
+SRC_DIR=$WRFVAR_DIR/da/da_verif
 DIAG_VAR="omb"
+FILE_PATH_STRING=wrfvar/working/gts_omb_oma
 cd ${SRC_DIR}
-make clean
-make
+#make clean
+#make
 #=========================================================
 mkdir -p ${RUN_DIR}
 cd ${RUN_DIR}
 rm -rf *
 #=========================================================
 iexp=0
+exp_dirs=''
+out_dirs=''
 while [ "${iexp}" -lt "${NUM_EXPT}" ]
 do
-expt=${EXP_NAMES[iexp]}
-EXP_DIR=$RUN_DIR/$expt
-mkdir -p $EXP_DIR 
-
-cd $EXP_DIR
-ln -fs ${SRC_DIR}/src/get_diag.exe .
+exp_dirs="$exp_dirs '${DIAG_DIR}/${EXP_NAMES[iexp]}/run',"
+out_dirs="$out_dirs '$RUN_DIR/${EXP_NAMES[iexp]}',"
+#-----------------------------------------
+pdat_dirs[$iexp]="$RUN_DIR/${EXP_NAMES[iexp]}/"
+#-----------------------------------------
+mkdir -p $RUN_DIR/${EXP_NAMES[iexp]}
+iexp=$((iexp + 1))
+done
+#-------------
+# Making records 1 to 3 of namelist here
+#-------------
+cat > namelist.recs1to3 << EOF
+&record1
+ exp_num   = ${NUM_EXPT} ,
+ exp_dirs  = ${exp_dirs}
+ out_dirs  = ${out_dirs}
+/
+&record2
+ start_date = '${START_DATE}',
+ end_date   = '${END_DATE}',
+ interval   = ${INTERVAL},
+/
+&record3
+ if_plot_rmse = .TRUE.,
+ if_plot_bias = .TRUE.,
+ if_plot_abias = .TRUE.,
+/
+EOF
 #--------------------------------------------------
 # Making record 4 of namelist
 #---------
@@ -58,32 +92,23 @@ done
 cat >> record4 << EOR4_3
 /
 EOR4_3
-#-------------
-# Making records 1 to 3 of namelist here
-#-------------
-cat > namelist.recs1to3 << EOF
-&record1
- diag_dir  = '${DIAG_DIR}',
- exp_names = '${expt}'
+#--------------------------------------------------
+# Making record 5 of namelist
+#---------
+cat > record5 << EOR5
+&record5
+ file_path_string = '${FILE_PATH_STRING}',
 /
-&record2
- start_date = '${START_DATE}'
- end_date   = '${END_DATE}'
- interval   = ${INTERVAL}
-/
-&record3
- if_plot_rmse = .TRUE.,
- if_plot_bias = .TRUE.,
- if_plot_abias = .TRUE.,
-/
-EOF
+EOR5
 #------------
 # Making full namelist file
 #------------
-cat namelist.recs1to3 record4 > namelist.plot_diag
-rm namelist.recs1to3 record4
+cat namelist.recs1to3 record4 record5 > namelist.plot_diag
+rm namelist.recs1to3 record4 record5
 #--------------------------------------------------
 #----------- Now run get_diag.exe ---------
+ln -sf ${SRC_DIR}/src/get_diag.exe .
+#
 nfile=`ls *${DIAG_VAR}.diag | wc -l`
 if [ $nfile -eq "0" ]; then
  ./get_diag.exe
@@ -99,48 +124,49 @@ else
 #  exit 0
 fi
 #-----------------------------------------
-pdat_dirs[$iexp]="$RUN_DIR/$expt/"
-#-----------------------------------------
-iexp=$((iexp + 1))
-done
-#-----------------------------------------
 #---- Create control file for NCL script
 #-----------------------------------------
-cd $RUN_DIR/${EXP_NAMES[0]}
-echo $RUN_DIR/${EXP_NAMES[0]}
+#cd $RUN_DIR/${EXP_NAMES[0]}
+#echo $RUN_DIR/${EXP_NAMES[0]}
+cd $RUN_DIR
 
-echo "$Verify_Date_Range" > ../header_main
-echo "$DIAG_VAR" >> ../header_main
+echo "$Verify_Date_Range" > header_main
+echo "$DIAG_VAR" >> header_main
 
 #-----------------
 #echo "${pdat_dirs[@]:0}" > ../dirnames
 iexp=0
-echo "${NUM_EXPT}" >> ../header_main
+echo "${NUM_EXPT}" >> header_main
 while [ $iexp -lt $NUM_EXPT ]
 do
-echo ${pdat_dirs[$iexp]} >> ../header_main
+echo ${pdat_dirs[$iexp]} >> header_main
 iexp=$((iexp + 1))
 done
 #-----------------
 #declare -a ob_fnames
-num_sfc=`ls surface*${DIAG_VAR}.diag |wc -l`
-num_upr=`ls upr*${DIAG_VAR}.diag |wc -l`
+rm -f tmp_upr tmp_sfc
+num_sfc=`ls ${pdat_dirs[0]}/surface*${DIAG_VAR}.diag |wc -l`
+num_upr=`ls ${pdat_dirs[0]}/upr*${DIAG_VAR}.diag |wc -l`
 
-ls surface*${DIAG_VAR}.diag |sort -r > ../tmp_sfc
-ls upr*${DIAG_VAR}.diag |sort -r > ../tmp_upr
+cd ${pdat_dirs[0]}
+for vn in u v t q p; do
+  ls sur*${vn}*${DIAG_VAR}.diag >> ../tmp_sfc
+  ls upr*${vn}*${DIAG_VAR}.diag >> ../tmp_upr
+done
+cd $RUN_DIR
  
 if [ "$num_sfc" -lt 5 ]; then
    echo "All surface files are not generated"
    echo "Check your data and selected observation types"
 else
    echo "All surface files generated successfully.."
-   echo "fnames_sfc" >> ../header_main
+   echo "fnames_sfc" >> header_main
 
-   anyfile=`head -1 "../tmp_sfc"`
-   ncol=`head -1 $anyfile |wc -w`
-   nrow=`cat $anyfile |wc -l`
-   echo $nrow > ../fnames_sfc
-   echo $ncol >> ../fnames_sfc
+   anyfile=`head -1 "tmp_sfc"`
+   ncol=`head -1 ${pdat_dirs[0]}/$anyfile |wc -w`
+   nrow=`cat ${pdat_dirs[0]}/$anyfile |wc -l`
+   echo $nrow > fnames_sfc
+   echo $ncol >> fnames_sfc
    while read ob_fname
    do
      if [ "$ob_fname" = "surface_p_omb.diag" ]; then
@@ -156,9 +182,9 @@ else
      else
         echo "Unknown surface variable:-Don't know what to do??"
      fi
-     echo "$ob_fname" >> ../fnames_sfc
-     echo "$ob_unit" >> ../fnames_sfc
-   done < ../tmp_sfc
+     echo "$ob_fname" >> fnames_sfc
+     echo "$ob_unit" >> fnames_sfc
+   done < tmp_sfc
 fi
 #----------------
 if [ "$num_upr" -lt 4 ]; then
@@ -166,13 +192,13 @@ if [ "$num_upr" -lt 4 ]; then
    echo "Check your data and selected observation types"
 else
    echo "All upper-air files generated successfully.."
-   echo "fnames_upr" >> ../header_main    
+   echo "fnames_upr" >> header_main    
 
-   anyfile=`head -1 "../tmp_upr"`
-   ncol=`head -1 $anyfile |wc -w`
-   nrow=`cat $anyfile |wc -l`
-   echo $nrow > ../fnames_upr     
-   echo $ncol >> ../fnames_upr     
+   anyfile=`head -1 "tmp_upr"`
+   ncol=`head -1 ${pdat_dirs[0]}/$anyfile |wc -w`
+   nrow=`cat ${pdat_dirs[0]}/$anyfile |wc -l`
+   echo $nrow > fnames_upr     
+   echo $ncol >> fnames_upr     
    while read ob_fname
    do
      if [ "$ob_fname" = "upr_t_omb.diag" ]; then
@@ -186,24 +212,32 @@ else
      else
         echo "Unknown upper-air variable:-Don't know what to do??"
      fi
-     echo "${ob_fname}" >> ../fnames_upr
-     echo "${ob_unit}" >> ../fnames_upr
-   done < ../tmp_upr
+     echo "${ob_fname}" >> fnames_upr
+     echo "${ob_unit}" >> fnames_upr
+   done < tmp_upr
 fi
 #----------------
 #ob_fnames = ( `cat "$tmp_file"` )
-rm -f ../tmp_upr ../tmp_sfc
+#rm -f tmp_upr tmp_sfc
+BAR_LABEL_ANGLE=45
+#-----------------------------------------------------------------------------------------------------------------------
+# Run NCL scripts now 
+#-----------------------------------------------------------------------------------------------------------------------
+NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${RUN_DIR}\"' 'exp_legends=${EXP_LEGENDS}' 'exp_line_cols=${EXP_LINES_COLORS}' 'select_levs=${DESIRED_LEVELS}' 'select_scores=${DESIRED_SCORES}' 'bar_label_angle=${BAR_LABEL_ANGLE}'"
+echo "ncl ${NCL_COMMAND_LINE} ${SRC_DIR}/scripts/time_series.ncl" > run1
+chmod +x run1
+./run1
+#rm -f run1
+echo "ncl ${NCL_COMMAND_LINE} ${SRC_DIR}/scripts/time_average.ncl" > run2
+chmod +x run2
+./run2
+#rm -f run2
+echo "ncl ${NCL_COMMAND_LINE} ${SRC_DIR}/scripts/vert_profile.ncl" > run3
+chmod +x run3
+./run3
+#rm -f run3
 #----------------
-cd $RUN_DIR
-NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${RUN_DIR}\"' 'exp_legends=${EXP_LEGENDS}' 'exp_line_cols=${EXP_LINES_COLORS}' 'select_levs=${DESIRED_LEVELS}' 'select_scores=${DESIRED_SCORES}'"
-echo "ncl ${NCL_COMMAND_LINE} ${SRC_DIR}/scripts/time_series.ncl" > run
-chmod +x run
-./run
-rm -f run
-echo "ncl ${NCL_COMMAND_LINE} ${SRC_DIR}/scripts/vert_profile.ncl" > run
-chmod +x run
-./run
-rm -f run
-#----------------
+#-----------------------------------------------------------------------------------------------------------------------
 echo "successfully completed..."
+#-----------------------------------------------------------------------------------------------------------------------
 exit 0

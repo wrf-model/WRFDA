@@ -11,27 +11,11 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-#Experiment details:
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}                            # Domain name.
-export EXPT=${EXPT:-test}                              # Experiment name.
-export CLEAN=${CLEAN:-true}
-export CYCLING=${CYCLING:-false}
-
-#Time info:
-export DATE=${DATE:-2003010100}
-
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/update_bc}
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
+
 export WORK_DIR=$RUN_DIR/working
 
 echo "<HTML><HEAD><TITLE>$EXPT update_bc</TITLE></HEAD><BODY>"
@@ -79,9 +63,14 @@ echo "DA_ANALYSIS    $DA_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
-cp $DA_REAL_OUTPUT real_output
-cp $BDYIN wrfbdy_d$DOMAIN
-cp $DA_ANALYSIS wrfvar_output
+# To save some disk space, link is used:
+
+ln -sf $DA_REAL_OUTPUT real_output
+cp     $BDYIN wrfbdy_d$DOMAIN
+ln -sf $DA_ANALYSIS wrfvar_output
+
+# Note that for the old WRF_BC, "wrf_3dvar_output_file" should be used.
+# the new WRFVAR/da_update_bc, "wrfvar_output_file" is used in the "parame.in".
 
 cat > parame.in << EOF
 &control_param
@@ -98,17 +87,27 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
-   ln -fs $WRF_BC_DIR/da_update_bc.exe .
-   ./da_update_bc.exe
+
+   ln -sf  $WRF_BC_DIR/update_wrf_bc.exe .
+   ./update_wrf_bc.exe
 
    RC=$?
    if test $RC != 0; then
       echo "Update_bc failed with error $RC"
       exit 1
+     else
+      cp wrfbdy_d${DOMAIN} $BDYOUT  
+      
+# To save some disk space, the wrfbdy_d${DOMAIN} file is removed from the working directory after a sucessful run.
+
+	if test -e $BDYOUT; then
+  	   rm wrfbdy_d${DOMAIN} 
+#	   rm wrfvar_output  
+	fi   
    fi
 fi
 
-cp wrfbdy_d${DOMAIN} $BDYOUT
+
 
 if $CLEAN; then
    rm -rf ${WORK_DIR}

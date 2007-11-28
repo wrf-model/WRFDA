@@ -7,14 +7,14 @@ export COMPILE=${COMPILE:-true}
 export RUN=${RUN:-true}
 export CLEAN=${CLEAN:-true}
 
-# Need a cleaner mapping between compiler and configure options.
+# Need a cleaner mapping between compiler and configure options
 # Assuming option 2 is pgi mpi is a hack
 
 export TYPE=${TYPE:-simple}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
-export TARGET=${TARGET:-wrfvar}
+export TARGET=${TARGET:-all}
 
 echo "TYPE      $TYPE"
 echo "COMPILE   $COMPILE"
@@ -33,8 +33,8 @@ echo "TARGET    $TARGET"
 let COUNT=1
 
 for COMPILER in $COMPILERS; do
-   export ID=${COMPILER}_${MACHINE}_${TYPE}
-   export WRFVAR_DIR=$HOME/$ID/wrfvar
+   export ID=${MACHINE}_${COMPILER}_${TYPE}
+   export WRFVAR_DIR=$HOME/code/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
       echo "Compiling $WRFVAR_DIR $TARGET with option $OPTION"
@@ -47,7 +47,7 @@ for COMPILER in $COMPILERS; do
       rm -f build/links
       ./compile $TARGET > compile.out 2>&1
       if $CLEAN; then ./clean > /dev/null 2>&1; fi
-      ls -l build/da_wrfvar.exe
+      echo `ls -l build/*.exe | wc -l` executables
       let COUNT=$COUNT+1
    fi
    if $RUN; then

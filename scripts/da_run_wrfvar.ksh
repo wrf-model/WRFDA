@@ -2,11 +2,6 @@
 DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
-fi
 
 #-----------------------------------------------------------------------
 # [1.0] Specify default environment variables:
@@ -39,6 +34,7 @@ export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export FC_DIR=${FC_DIR:-$REG_DIR/fc}
+export BIASCORR_DIR=${BIASCORR_DIR:-$WRFVAR_DIR/run/biascorr}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
@@ -64,12 +60,19 @@ if $CYCLING; then
 fi
 
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 
-export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
+export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export CRTM=${CRTM:-$HOME/crtm}
-export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/../crtm_coefs}
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coeffs}
+
+# Error Tunning namelist parameters
+# Assign Random seeds
+#-----------------------------
+export NL_SEED_ARRAY1=$DATE
+export NL_SEED_ARRAY2=$DATE
+
 
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
@@ -93,15 +96,24 @@ fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
+if test -d $DA_RTTOV_COEFFS; then
+   echo "DA_RTTOV_COEFFS       $DA_RTTOV_COEFFS"
+fi
+if test -d $DA_CRTM_COEFFS; then
+   echo "DA_CRTM_COEFFS        $DA_CRTM_COEFFS"
+fi
+if test -d $BIASCORR_DIR; then
+   echo "BIASCORR_DIR          $BIASCORR_DIR"
+fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
-echo 'RUN_DIR               <A HREF="'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
-echo 'WORK_DIR              <A HREF="'${WORK_DIR##$PWD/}'">'$WORK_DIR'</a>'
+echo 'RUN_DIR               <A HREF="file:'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
+echo 'WORK_DIR              <A HREF="file:'${WORK_DIR##$PWD/}'">'$WORK_DIR'</a>'
 echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
 
-#if test ! -f $DA_ANALYSIS; then
+# if test ! -f $DA_ANALYSIS; then
 
    rm -rf ${WORK_DIR}
    mkdir -p ${WORK_DIR}
@@ -119,9 +131,8 @@ echo "WINDOW_END            $WINDOW_END"
       export D_HOUR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
    done
 
-   export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
    if $NL_GLOBAL; then
-      export NPROC_X=1
+      export NL_NPROC_X=1
    fi
 
    export YEAR=`echo $DATE | cut -c1-4`
@@ -189,12 +200,12 @@ echo "WINDOW_END            $WINDOW_END"
    # [3.0] Prepare for assimilation:
    #-----------------------------------------------------------------------
 
-   if test $DA_RTTOV_COEFFS'.' != '.'; then
+   if test -d $DA_RTTOV_COEFFS; then
       ln -fs $DA_RTTOV_COEFFS/* .
    fi
-
-   if test $DA_CRTM_COEFFS'.' != '.'; then
-      ln -fs $DA_CRTM_COEFFS/* .
+ 
+   if test -d $DA_CRTM_COEFFS; then
+      ln -fs $DA_CRTM_COEFFS crtm_coeffs
    fi
 
    ln -fs $WRFVAR_DIR/run/gribmap.txt .
@@ -202,7 +213,7 @@ echo "WINDOW_END            $WINDOW_END"
    ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
    ln -fs $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
    ln -fs $WRFVAR_DIR/build/da_wrfvar.exe .
-   export PATH=$WRFVAR_DIR/scripts:$PATH
+   export PATH=${SCRIPTS_DIR}:$PATH
 
    ln -fs $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
    ln -fs $DA_FIRST_GUESS	 fg01
@@ -215,6 +226,10 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    done
 
+   if test -d $BIASCORR_DIR; then
+      ln -fs $BIASCORR_DIR biascorr
+   fi
+
    ln -fs $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
@@ -226,17 +241,17 @@ echo "WINDOW_END            $WINDOW_END"
          done
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob01.ssmi
          for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${I}.ssmi
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi- ob07.ssmi
 
-         ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.radar+ ob01.radar
          for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ${I}.radar
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.radar- ob07.radar
       else
          if [[ $DATE = $START_DATE ]]; then
             ln -fs $OB_DIR/$DATE/ob.ascii+ ob01.ascii
@@ -246,7 +261,7 @@ echo "WINDOW_END            $WINDOW_END"
          typeset -i N
          let N=1
          FGAT_DATE=$START_DATE
-#         while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
+         # while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
          until [[ $FGAT_DATE > $END_DATE ]]; do
             if [[ $FGAT_DATE != $DATE ]]; then
                let N=$N+1
@@ -267,9 +282,14 @@ echo "WINDOW_END            $WINDOW_END"
          done
       fi
    else
-      ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      ln -fs $OB_DIR/${DATE}/ssmi.dat  ssmi01.dat
-      ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
+      ln -fs $OB_DIR/${DATE}/ob.ascii ob01.ascii
+      if [[ -s $OB_DIR/${DATE}/ob.ssmi ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.ssmi ob01.ssmi
+      fi
+      if [[ -s $OB_DIR/${DATE}/ob.radar ]]; then
+         ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
+         ln -fs $OB_DIR/${DATE}/ob.radar radar01.dat
+      fi
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
@@ -375,11 +395,11 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
       ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
-#      if test -e $WORK_DIR/wrfvar_output; then
-#         ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
-#      else
+      # if test -e $WORK_DIR/wrfvar_output; then
+      #    ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
+      # else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
-#      fi
+      # fi
       ln -fs $WRF_DIR/main/wrf.exe nl
 
       # Outputs
@@ -430,7 +450,11 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 02 03 04 05 06 07; do
          ln -fs tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
-      ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      if test $NUM_PROCS -gt 1; then
+         ln -fs auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      else
+         ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      fi
 
       # ad
 
@@ -461,10 +485,10 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 01 02 03 04 05 06 07; do
          ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
       done
-# JRB
-#      if $NL_JCDFI_USE; then
-         ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
-#      fi   
+      # JRB
+      # if $NL_JCDFI_USE; then
+         ln -fs $WORK_DIR/auxhist3_d${DOMAIN}_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
+      # fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
       mkdir ad/trace
 
@@ -508,7 +532,7 @@ echo "WINDOW_END            $WINDOW_END"
       RC=0
    else
       if $NL_VAR4D; then
-         if $POE && test $NUM_PROCS -gt 1; then
+         if test $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
             export MP_CMDFILE=poe.cmdfile
@@ -544,8 +568,7 @@ echo "WINDOW_END            $WINDOW_END"
             RC=$?
          fi
       else
-        # 3DVAR
-
+         # 3DVAR
          $RUN_CMD ./da_wrfvar.exe
          RC=$?
       fi
@@ -555,15 +578,23 @@ echo "WINDOW_END            $WINDOW_END"
       fi
 
       if test -f statistics; then
-         cp statistics $RUN_DIR/statistics
+         cp statistics $RUN_DIR
       fi
 
       if test -f cost_fn; then 
-         cp cost_fn $RUN_DIR/cost_fn
+         cp cost_fn $RUN_DIR
       fi
 
       if test -f grad_fn; then
-         cp grad_fn $RUN_DIR/grad_fn
+         cp grad_fn $RUN_DIR
+      fi
+
+      if test -f filtered_obs; then
+         cp filtered_obs $RUN_DIR
+      fi
+
+      if test -f gts_omb_oma; then
+         cp gts_omb_oma $RUN_DIR
       fi
 
       # remove intermediate output files
@@ -572,10 +603,15 @@ echo "WINDOW_END            $WINDOW_END"
       rm -f pert_obs.*
       rm -f rand_obs_error.*
       rm -f gts_omb_oma.*
+      rm -f qcstat_*.*
+      # No routine to merge these files across processors yet
+      # rm -f inv_*.*
+      # rm -f oma_*.*
+      # rm -f filtered_*.*
 
       if test -f wrfvar_output; then
          if test $DA_ANALYSIS != wrfvar_output; then 
-            mv wrfvar_output $DA_ANALYSIS
+            cp wrfvar_output $DA_ANALYSIS
          fi
       fi
 
@@ -586,14 +622,16 @@ echo "WINDOW_END            $WINDOW_END"
 
       rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
-      mv rsl* $RUN_DIR/rsl
       cd $RUN_DIR/rsl
-      for FILE in rsl*; do
-         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-         cat $FILE >> $FILE.html
-         echo "</PRE></BODY></HTML>" >> $FILE.html
-         rm $FILE
+      for FILE in $WORK_DIR/rsl*; do
+         if test -f $FILE; then
+            FILE1=`basename $FILE`
+            echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
+            echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
+            cat $FILE >> $FILE1.html
+            echo "</PRE></BODY></HTML>" >> $FILE1.html
+            rm $FILE
+         fi
       done
       cd $RUN_DIR
 
@@ -609,12 +647,7 @@ echo "WINDOW_END            $WINDOW_END"
 
       cat $RUN_DIR/cost_fn
 
-      if test $RC = 0; then
-        echo `date` "${OK}Succeeded${END}"
-      else
-         echo `date` "${ERR}Failed${END} with error $RC"
-         exit 1
-      fi
+      echo `date +'%D %T'` "Ended $RC"
    fi
 
    # We never look at core files
@@ -628,9 +661,9 @@ echo "WINDOW_END            $WINDOW_END"
    if $CLEAN; then
       rm -rf $WORK_DIR
    fi
-#else
-#   echo "$DA_ANALYSIS already exists, skipping"
-#fi
+# else
+#    echo "$DA_ANALYSIS already exists, skipping"
+# fi
 
 echo '</PRE></BODY></HTML>'
 
