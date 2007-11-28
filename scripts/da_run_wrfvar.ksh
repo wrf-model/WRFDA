@@ -70,7 +70,18 @@ export NL_REAL_DATA_INIT_TYPE=${NL_REAL_DATA_INIT_TYPE:-3}
 
 mkdir -p $RUN_DIR
 
-echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
+if [[ $NL_VAR4D_MULTI_INC != 2 ]] ; then
+   echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
+   if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+      echo "============================================================================="
+      echo "WRF Multi-incremental Var4D Stage I : Calculating High-Resolution Innovations"
+      echo "============================================================================="
+   fi
+else
+   echo "================================================================================================================="
+   echo "WRF Multi-incremental Var4D Stage II : Solve Low-Resolution Minimization Problem With High-Resolution Innovations"
+   echo "================================================================================================================="
+fi
 
 date
 

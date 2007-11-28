@@ -250,7 +250,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          export NL_TIME_STEP=$NL_TIME_STEP_LOW
          export DA_BACK_ERRORS=$BE_DIR/be.dat
          
-         ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index2.html 2>&1
+         ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh >> $RUN_DIR/index.html 2>&1
 
          export OB_DIR=$OB_DIR_TMP
          export RC_DIR=$RC_DIR_TMP

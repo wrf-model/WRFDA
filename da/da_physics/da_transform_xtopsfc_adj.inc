@@ -83,10 +83,10 @@ subroutine da_transform_xtopsfc_adj(grid, iv, obs_index, synop, j_synop_y, jo_gr
                psm(1,n), tsm(1,n), qsm(1,n), hsm(1,n), synop(n)%h)
          end if
       end if
-      j_synop_y(n)%t=t(1,n)
-      j_synop_y(n)%q=q(1,n)
-      j_synop_y(n)%u=u(1,n)
-      j_synop_y(n)%v=v(1,n)
+      t(1,n)=j_synop_y(n)%t
+      q(1,n)=j_synop_y(n)%q
+      u(1,n)=j_synop_y(n)%u
+      v(1,n)=j_synop_y(n)%v
    end do
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
