@@ -119,7 +119,7 @@ module da_minimisation
    use da_wrf_interfaces, only : wrf_dm_bcast_real, wrf_get_dm_communicator
    use da_wrfvar_io, only : da_med_initialdata_input
    use module_symbols_util, only : wrfu_finalize
-!  use da_wrfvar_top, only : da_wrfvar_finalize
+   use da_wrfvar_top, only : da_wrfvar_finalize
 
    implicit none
 
