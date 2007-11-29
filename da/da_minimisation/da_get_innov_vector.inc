@@ -105,7 +105,6 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 #ifdef DM_PARALLEL
        call da_system("touch wrf_stop_now")
 #endif
-       call da_wrfvar_finalize
        call wrf_message("*** WRF-Var multi-increment stage 1 completed successfully ***")
        call wrfu_finalize
        call wrf_shutdown
