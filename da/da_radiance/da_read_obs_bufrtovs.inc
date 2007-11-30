@@ -405,6 +405,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    do i = 1, iv%num_inst
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
+      iv%instid(i)%info%nlocal = nread(i)
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         'Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
