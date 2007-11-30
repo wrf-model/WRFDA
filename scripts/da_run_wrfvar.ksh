@@ -472,7 +472,7 @@ if $NL_VAR4D; then
    ln -fs $WORK_DIR/*.TBL ad
    ln -fs $WORK_DIR/RRTM_DATA ad
    ln -fs $WORK_DIR/wrfbdy_d01 ad
-   ln -fs $WORK_DIR/wrfinput_d01 ad/wrfinput_d01
+   ln -fs $DA_FIRST_GUESS ad/wrfinput_d01
    for I in 01 02 03 04 05 06 07; do
       ln -fs $WORK_DIR/af$I ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
    done
@@ -531,7 +531,7 @@ if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
    mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
    mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
 
-#  ln -fs wrfinput_d01-thin wrfinput_d01
+   ln -fs wrfinput_d01-thin wrfinput_d01
    ln -fs wrfinput_d01-thin fg01
 
 fi
@@ -653,7 +653,7 @@ else
 
    if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
 
-      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" ${FC_DIR}/${DATE}/wrfinput_d01 $DA_FIRST_GUESS low_res_increment
+      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" ${FC_DIR}/${DATE}/wrfinput_d01 fg01 low_res_increment
 
       ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
 

@@ -26,5 +26,8 @@ else
    if [[ $arg1 == "post" ]]; then
       mv -f ../namelist_wrfvar.input ../namelist.input
       ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d01
+      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+         ln -fs $WORK_DIR/wrfinput_d01-thin $WORK_DIR/wrfinput_d01
+      fi
    fi
 fi
