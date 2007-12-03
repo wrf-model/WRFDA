@@ -36,7 +36,8 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    real             :: cv_je(1:cv_size_je)          ! Je control variable.
    real             :: xhat_je(1:cv_size_je)        ! Je control variable.
    real, allocatable, dimension(:) :: cv_xhat_jb, cv_xhat_je
-   integer          :: ndynopt
+   integer          :: ndynopt, is, ie, js, je, ks, ke
+   real             :: dtemp1x
 
 
    if (trace_use) call da_trace_entry("da_calculate_j")
@@ -91,11 +92,24 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
 
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_u_2),   grid%g_u_2,   grid%g_u_2)
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_v_2),   grid%g_v_2,   grid%g_v_2)
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_t_2),   grid%g_t_2,   grid%g_t_2)
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_mu_2),  grid%g_mu_2,  grid%g_mu_2)
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot(size(grid%g_moist), grid%g_moist, grid%g_moist)
+      is = grid%xp%ips
+      ie = grid%xp%ipe
+      if ( ie == grid%xp%ide ) ie = ie + 1
+      js = grid%xp%jps
+      je = grid%xp%jpe
+      if ( je == grid%xp%jde ) je = je + 1
+      ks = grid%xp%kps
+      ke = grid%xp%kpe
+      
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_u_2(is:ie,js:je,ks:ke), grid%g_u_2(is:ie,js:je,ks:ke) )
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_v_2(is:ie,js:je,ks:ke), grid%g_v_2(is:ie,js:je,ks:ke) )
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_t_2(is:ie,js:je,ks:ke), grid%g_t_2(is:ie,js:je,ks:ke) )
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1), grid%g_mu_2(is:ie,js:je), grid%g_mu_2(is:ie,js:je) )
+      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_moist(is:ie,js:je,ks:ke,P_G_QV), grid%g_moist(is:ie,js:je,ks:ke,P_G_QV) )
+
+      dtemp1x = j % jc
+      ! summation across processors:
+      j % jc  = wrf_dm_sum_real(dtemp1x)
 
    end if
 
