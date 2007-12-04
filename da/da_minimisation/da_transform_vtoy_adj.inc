@@ -1,5 +1,5 @@
 subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
-   grid, config_flags)
+   grid, config_flags, jcdf_flag)
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -20,6 +20,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
    type (xbx_type)                  :: xbx_tmp
+   logical                          :: jcdf_flag       ! additional flag to switch off JcDF, used to switch off JcDF in calculation of J.
 
    integer :: nobwin,ndynopt
 #ifdef DM_PARALLEL
@@ -35,7 +36,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt (1 , DYN_EM_TL)
 
-      if (jcdfi_use .AND. iter > 0) then
+      if (jcdfi_use .AND. jcdf_flag ) then
          call da_med_initialdata_input(grid , config_flags, 'tldf')
          grid%g_u_2 = - grid%g_u_2
          grid%g_v_2 = - grid%g_v_2

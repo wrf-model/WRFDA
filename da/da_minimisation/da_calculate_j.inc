@@ -171,7 +171,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, j_grad, iv, &
       grid%vp, grid%vv, xbx, jo_grad_y, &
-      grid, config_flags)
+      grid, config_flags, .false.)
 
    call da_deallocate_y(jo_grad_y)
 

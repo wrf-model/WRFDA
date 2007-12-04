@@ -107,7 +107,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
 
       call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, fhat, iv, &
          grid%vp, grid%vv, xbx, jo_grad_y, &
-         grid, config_flags)
+         grid, config_flags, .true.)
 
       je_start = be % cv % size_jb + 1
       je_end = be % cv % size_jb + be % cv % size_je
