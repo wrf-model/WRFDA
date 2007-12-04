@@ -222,12 +222,14 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                   read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                      kk,l, stn_id, &          ! Station
                      lat, lon, dummy, &       ! Lat/lon, dummy    
-                     spd_obs, spd_inv, spd_qc, spd_err, spd_inc
+                     spd_obs, spd_inv, spd_qc, spd_err, spd_inc, &
+                     tpw_obs, tpw_inv, tpw_qc, tpw_err, tpw_inc
                   if (if_write) &
                      write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                         num, k, stn_id,  &       ! Station
                         lat, lon, dummy, &       ! Lat/lon, dummy    
-                        spd_obs, spd_inv, spd_qc, spd_err, spd_inc
+                        spd_obs, spd_inv, spd_qc, spd_err, spd_inc, &
+                        tpw_obs, tpw_inv, tpw_qc, tpw_err, tpw_inc
                end do
             end do
          end if
