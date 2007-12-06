@@ -15,11 +15,11 @@
 #########################################################################
 
 #Decide which stages to run (run if true):
-export RUN_WPS=true 
-export RUN_REAL=true   
-export RUN_WRFVAR=false
+export RUN_WPS=false
+export RUN_REAL=false  
+export RUN_WRFVAR=true  
 export RUN_UPDATE_BC=false
-export RUN_WRF=true  
+export RUN_WRF=false 
 
 #Experiment details:
 export REGION=t8
@@ -33,12 +33,12 @@ export CYCLING=false
 export CLEAN=true 
 
 #Scheduling:
-export PROJECT_ID=64000510       # DATC GAUs.
-export QUEUE=regular  #  debug #  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
+export PROJECT=64000510       # DATC GAUs.
+export QUEUE=debug    #  debug #  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 #export QUEUE=premium    # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
-export NUM_PROCS=64
+export NUM_PROCS=8 
 export RUN_CMD=mpirun.lsf
-export LSF_MAX_RUNTIME=200 
+export WALLCLOCK=10       
 export LSF_EXCLUSIVE=" "
 export LL_PTILE=16
 export PREV_JOBNAME=${EXPT}_job0
@@ -48,8 +48,8 @@ export SUBMIT_OPTIONS1=" "
 
 #Time info:
 
-export INITIAL_DATE=2007081600
-export FINAL_DATE=2007081612 
+export INITIAL_DATE=2007081500
+export FINAL_DATE=2007081500 
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=48 
 export LONG_FCST_TIME_2=12
@@ -57,13 +57,12 @@ export LONG_FCST_RANGE_2=48
 export LBC_FREQ=3  # For 06/18Z KMA runs
 
 #Directories:
-export MACHINE=bluevista
 export DAT_DIR=/ptmp/rizvi/data
 export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista 
 
-export REL_DIR=/mmm/users/dmbarker/code/trunk
+export REL_DIR=/ptmp/rizvi                   
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
-export WRFVAR_DIR=$REL_DIR/wrfvar_afwa_2.2
+export WRFVAR_DIR=$REL_DIR/trunk           
 #export WPS_DIR=$REL_DIR/wps_r237               # r237 AFWA release.
 #export WPS_DIR=/blhome/demirtas/code/wps_r237   # r237 AFWA release.
 export WPS_DIR=/mmm/users/rizvi/code/wps_r237               # r237 AFWA release.
@@ -71,6 +70,8 @@ export WRF_BC_DIR=/rap/datc/code/WRF_BC                 # Which version?
 export WRF_DIR=$REL_DIR/wrf_dfi_ndown
 export REG_DIR=$DAT_DIR/$REGION
 export EXP_DIR=$REG_DIR/$EXPT
+export RC_DIR=$REG_DIR/rc
+export RUN_DIR=$EXP_DIR
 export OB_DIR=$REG_DIR/ob
 export GRIB_DIR=$DAT_DIR/$FG_TYPE
 
@@ -153,7 +154,7 @@ export NL_USE_QSCATOBS=false      # (AFWA's original)
 
 export SCRIPTS_DIR=$WRFVAR_DIR/scripts
 export SCRIPT=${SCRIPTS_DIR}/da_run_suite.ksh
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 
