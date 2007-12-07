@@ -21,7 +21,6 @@
 #-----------------------------------------------------------------------
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
-#set -x
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
@@ -87,6 +86,10 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
 
    wc -l ${RUN_DIR}/ob.etkf.000 > ${RUN_DIR_SAVE}/ob.etkf.${CMEM}
    cat ${RUN_DIR}/ob.etkf.000 >> ${RUN_DIR_SAVE}/ob.etkf.${CMEM}
+
+# Added by JLS to write out obs count to index.html file
+   obs_count=`wc -l ${RUN_DIR}/ob.etkf.000`
+   echo "\n Obs count for member $MEM is ${obs_count} \n"
 
    let MEM=$MEM+1
 done
@@ -157,7 +160,9 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
-   mv etkf_output.${CMEM} ${FC_DIR}/$DATE/${FILE_TYPE}_d${DOMAIN}_${FILE_DATE}.${CMEM}
+#    mv etkf_output.${CMEM} ${FC_DIR}/$DATE/${FILE_TYPE}_d${DOMAIN}_${FILE_DATE}.${CMEM}
+# JLS: retain the name of the etkf output files for clarity
+     mv etkf_output.${CMEM} ${FC_DIR}/$DATE/etkf_output.${CMEM}
    let MEM=$MEM+1
 done
 
