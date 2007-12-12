@@ -25,7 +25,7 @@ export RUN_WRF=true
 #Experiment details:
 export REGION=kma_10km
 export RUN_UNGRIB_METGRID_KMA=true
-export FG_TYPE=GDAPS
+export FG_TYPE=gdaps
 export EXPT=noda
 #export CYCLE_PERIOD=6
 #export CYCLING=true
