@@ -31,7 +31,6 @@ export DUMMY=false
 #-----------------------------------------------------------------------
 export RUN_RESTORE_DATA_NCEP=false
 export RUN_RESTORE_DATA_RTOBS=false
-export RUN_WRFSI=false
 export RUN_WPS=false
 export RUN_REAL=false
 #-----------------------------------------------------------------------

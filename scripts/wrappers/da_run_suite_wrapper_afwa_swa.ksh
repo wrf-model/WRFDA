@@ -26,7 +26,6 @@
 #Decide which stages to run (run if true):
 #export RUN_RESTORE_DATA_GRIB=true
 #export RUN_RESTORE_DATA_RTOBS=true
-#export RUN_WRFSI=true
 #export RUN_WPS=true
 #export RUN_REAL=true
 #export RUN_OBSPROC=true

@@ -31,9 +31,8 @@
 #export RUN_RESTORE_DATA_GRIB=true    # retrieval NCAR FNL grid analysis
 #export RUN_RESTORE_DATA_RTOBS=true   # retrieval Jim Bresch's GTS archive
   
-  # 1.1 run WPS/SI/REAL/WRF
+  # 1.1 run WPS/REAL/WRF
   #------------------------
-#export RUN_WRFSI=true                # 
 #export RUN_WPS=true
 #export RUN_REAL=true
 export RUN_WRF=true

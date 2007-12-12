@@ -37,7 +37,6 @@ export NL_VAR4D=false
 #Decide which stages to run (run if true):
 export RUN_RESTORE_DATA_NCEP=false
 export RUN_RESTORE_DATA_RTOBS=false
-export RUN_WRFSI=false
 export RUN_WPS=false
 export RUN_REAL=false
 export RUN_OBSPROC=false

@@ -27,8 +27,7 @@
 # Mass Store).
 # 4) Overwrite default directories, filenames, namelist parameters,
 # etc in script da_run_wrf_wrapper.ksh. This is done via environment
-# variables. (TO DO: Automate vertical levels ENV variable - currently hardwired
-# in da_run_wrfsi.ksh).
+# variables. (TO DO: Automate vertical levels ENV variable).
 #
 # NOTE: The idea is that you overwrite defaults in da_run_suite_wrapper.ksh, 
 # NOT da_run_suite.ksh itself. We want to maintain a clean script interface
@@ -123,19 +122,6 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"
-         exit 1
-      fi
-   fi
-  
-   if $RUN_WRFSI; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/wrfsi
-      mkdir -p $RUN_DIR
-
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $RUN_DIR/index.html 2>&1
-      RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi

@@ -99,7 +99,6 @@ export REL_DIR=${REL_DIR:-$HOME/code/$RELEASE}    # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/da}     # WRF-Var executable location.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
-export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
 export WPB_DIR=${WPB_DIR:-$REL_DIR/wpb}           # Perturbed LBC dir.
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}           # WRF directory.
 export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
