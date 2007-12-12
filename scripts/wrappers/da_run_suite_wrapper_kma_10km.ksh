@@ -39,7 +39,7 @@ export PROJECT_ID=25000026
 export QUEUE=premium  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
-export LSF_MAX_RUNTIME=180
+export WALLCLOCK=180
 
 #Time info:
 export INITIAL_DATE=2007070112

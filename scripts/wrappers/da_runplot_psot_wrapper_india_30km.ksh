@@ -13,7 +13,7 @@ runplot_psot=1
 #  Submit options
 export NUM_PROCS=8
 export QUEUE=share
-export LSF_MAX_RUNTIME=10
+export WALLCLOCK=10
 export PROJECT=64000420
 
 #Experiment

@@ -170,7 +170,7 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
 #BSUB -e $EXPT.err
 #BSUB -q $QUEUE
 #BSUB -P $PROJECT
-#BSUB -W $LSF_MAX_RUNTIME
+#BSUB -W $WALLCLOCK
 #BSUB -R "span[ptile=$LSF_PTILE]"
 ############BSUB -w \"done(${PREV_JOBID})\"
 
