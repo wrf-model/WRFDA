@@ -39,8 +39,7 @@ export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 export QUEUE=share  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=1  #64 is for WRF and WRF-VAR # 1 is for WPS, REAL, UPDATE_BC and OBS_PROC
 export RUN_CMD=mpirun.lsf
-export LSF_MAX_RUNTIME=10   
-export LSF_EXCLUSIVE=" "
+export LSF_MAX_RUNTIME=10
 
 #Time info:
 export INITIAL_DATE=2007070300

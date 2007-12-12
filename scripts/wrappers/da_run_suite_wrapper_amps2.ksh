@@ -51,7 +51,6 @@ export QUEUE=premium
 export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=180
-export LSF_EXCLUSIVE=" "
 
 #Time info:
 export INITIAL_DATE=2006101612

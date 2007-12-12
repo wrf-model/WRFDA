@@ -43,7 +43,6 @@ export CLEAN=${CLEAN:-true}
 #export CYCLE_PERIOD=6
 #export FIRST=false
 
-export LSF_EXCLUSIVE=" "
 export NUM_PROCS=1
 export NUM_PROCS=16
 export PROJECT=68000001

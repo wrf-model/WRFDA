@@ -80,7 +80,6 @@ if [[ $SUBMIT == "LoadLeveller" ]]; then
 elif [[ $SUBMIT == "LSF" ]]; then 
    # Use SMT on an 8 processor node
    export LSF_PTILE=${LSF_PTILE:-16}
-   export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
    export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
    export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
    export SUBMIT_WAIT_FLAG="-K"

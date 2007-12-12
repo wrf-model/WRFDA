@@ -54,7 +54,6 @@ export CLEAN=false
 
 # 3 Job detail
 #------------------------
-export LSF_EXCLUSIVE=" "
 export NUM_PROCS=32
 export QUEUE=regular
 export PROJECT=64000420 # 25000026

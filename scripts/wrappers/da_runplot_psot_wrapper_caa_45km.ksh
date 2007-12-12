@@ -16,7 +16,6 @@ export EXPT=psot
 export NUM_PROCS=2
 export QUEUE=share
 export LSF_MAX_RUNTIME=10
-export LSF_EXCLUSIVE=" "
 
 #Directory
 export REL_DIR=/rap/datc/huishao/code/trunk_blueice

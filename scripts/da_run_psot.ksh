@@ -162,7 +162,6 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
 #
 # LSF batch script
 #
-#BSUB $LSF_EXCLUSIVE
 ############BSUB -a mpich_gm
 #BSUB -a poe
 #BSUB -n $NUM_PROCS

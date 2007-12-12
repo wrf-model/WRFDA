@@ -17,7 +17,6 @@
 # in da_run_suite.ksh.
 #########################################################################
 
-export LSF_EXCLUSIVE="-x"
 export NUM_PROCS=16
 export WALLCLOCK=60
 export PROJECT=64000420

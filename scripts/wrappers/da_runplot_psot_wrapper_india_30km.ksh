@@ -14,7 +14,6 @@ runplot_psot=1
 export NUM_PROCS=8
 export QUEUE=share
 export LSF_MAX_RUNTIME=10
-export LSF_EXCLUSIVE=" "
 export PROJECT=64000420
 
 #Experiment

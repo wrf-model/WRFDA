@@ -2,7 +2,6 @@
 
 #########################################################################
 
-export LSF_EXCLUSIVE="-x"
 export NUM_PROCS=8
 export PROJECT=64000420
 export WALLCLOCK=60

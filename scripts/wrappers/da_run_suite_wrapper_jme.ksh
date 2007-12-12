@@ -13,7 +13,6 @@ export PROJECT_ID=25000026        # JNT GAUs (1200/month).
 export QUEUE=share
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=60
-export LSF_EXCLUSIVE=" "
 #export FCST_RANGE=0
 
 #Time info:
