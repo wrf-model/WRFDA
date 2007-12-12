@@ -31,7 +31,6 @@ export EXPT=noda.july
 export CYCLE_PERIOD=6
 #export CYCLING=true
 export FIRST=false
-export UPDATE_CYCLING=true
 
 #Scheduling:
 export PROJECT_ID=48500053       # JNT GAUs (1200/month).
