@@ -75,8 +75,8 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
 !-------------------------------------------------------------------------------
 
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if ( iv%instid(inst)%num_rad < 1 ) cycle
-      num_rad   = iv%instid(inst)%num_rad
+      num_rad = iv%instid(inst)%info%n2 - iv%instid(inst)%info%n1 + 1
+      if ( num_rad < 1 ) cycle
 
   ! CRTM channel information structure
       ! Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -124,27 +124,28 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
 
-      allocate (temperature(Atmosphere(1)%n_layers, num_rad))
-      allocate (absorber(Atmosphere(1)%n_layers, num_rad))
-      allocate (psfc(num_rad))
+      allocate (temperature(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+      allocate (absorber(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+      allocate (psfc(iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
 
       temperature(:,:) = 0.0
       absorber(:,:)    = 0.0
       psfc(:)          = 0.0
 
       do k=kts,kte ! from bottom to top
-         call da_interp_lin_2d_partial (grid%xa%t(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+         call da_interp_lin_2d_partial (grid%xa%t(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
             temperature(kte-k+1,:))
-         call da_interp_lin_2d_partial (grid%xa%q(:,:,k), iv%instid(inst)%info, k,1,num_rad, &
+         call da_interp_lin_2d_partial (grid%xa%q(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
             absorber(kte-k+1,:))
-         do n=1,num_rad
+         do n=iv%instid(inst)%info%n1, iv%instid(inst)%info%n2
             if (iv%instid(inst)%pm(kte-k+1,n) < 75.0) absorber(kte-k+1,n) = 0.0
          end do
       end do
 
-      call da_interp_lin_2d_partial (grid%xa%psfc, iv%instid(inst)%info, 1, 1, num_rad,psfc(:))
+      call da_interp_lin_2d_partial (grid%xa%psfc, iv%instid(inst)%info, 1, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, psfc(:))
 
-      do n= 1, num_rad           ! loop for pixel
+      !do n= 1, num_rad           ! loop for pixel
+      do n = iv%instid(inst)%info%n1, iv%instid(inst)%info%n2 ! loop for pixel
             
       ! [1.1] Get horizontal interpolation weights:
 

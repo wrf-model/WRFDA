@@ -27,10 +27,12 @@ subroutine da_sort_rad (iv)
 
    if (trace_use) call da_trace_entry("da_sort_rad")
 
+   iv%info(radiance)%plocal(:) = 0
    if (num_fgat_time == 1) then
       do i=1,rtminit_nsensor
          iv%instid(i)%info%plocal(:) = 0
          iv%instid(i)%info%plocal(num_fgat_time) = iv%instid(i)%num_rad
+         iv%info(radiance)%plocal(num_fgat_time) = iv%info(radiance)%plocal(num_fgat_time) + iv%instid(i)%num_rad
       end do
       if (trace_use) call da_trace_exit("da_sort_rad")
       return
@@ -101,11 +103,13 @@ subroutine da_sort_rad (iv)
             tb_inv(1:iv%instid(i)%nchan,j) = iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,n) 
          end do
          iv%instid(i)%info%plocal(t) = j
-write (0,*) __FILE__,__LINE__,"i,t,iv%instid(i)%info%plocal(t)",i,t,iv%instid(i)%info%plocal(t)
+         !write (0,*) __FILE__,__LINE__,"i,t,iv%instid(i)%info%plocal(t)",i,t,iv%instid(i)%info%plocal(t)
       end do
 
+      iv%info(radiance)%plocal = iv%info(radiance)%plocal + iv%instid(i)%info%plocal
+
       write(unit=stdout,fmt='(a,2x,a,2x,10i7)') &
-         ' FGAT: ',iv%instid(i)%rttovid_string, iv%info(i)%plocal(1:num_fgat_time)
+         ' FGAT: ',iv%instid(i)%rttovid_string, iv%instid(i)%info%plocal(1:num_fgat_time)
 
       do n = 1,iv%instid(i)%num_rad
          iv%instid(i)%ifgat(n)        = ifgat(n)

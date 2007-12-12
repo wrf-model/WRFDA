@@ -271,11 +271,16 @@ subroutine da_solve ( grid , config_flags)
 
          if (iv%instid(i)%num_rad > 0) then
  
+            deallocate (iv%instid(i)%info%date_char)
+            deallocate (iv%instid(i)%info%name)
+            deallocate (iv%instid(i)%info%platform)
+            deallocate (iv%instid(i)%info%id)
             deallocate (iv%instid(i)%info%levels)     
             deallocate (iv%instid(i)%info%lat)      
             deallocate (iv%instid(i)%info%lon)      
             deallocate (iv%instid(i)%info%elv)   
 
+            deallocate (iv%instid(i)%info%pstar)
             deallocate (iv%instid(i)%info%i)
             deallocate (iv%instid(i)%info%j)
             deallocate (iv%instid(i)%info%k)

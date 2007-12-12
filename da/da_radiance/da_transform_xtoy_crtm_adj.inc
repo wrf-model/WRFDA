@@ -79,11 +79,11 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 !-------------------------------------------------------------------------------
 
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if ( iv%instid(inst)%num_rad < 1 ) cycle
-      num_rad = iv%instid(inst)%num_rad
-      allocate (q_ad(kts:kte,num_rad))
-      allocate (t(kts:kte,num_rad))
-      allocate (p(num_rad))
+      num_rad = iv%instid(inst)%info%n2 - iv%instid(inst)%info%n1 + 1
+      if ( num_rad < 1 ) cycle
+      allocate (q_ad(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+      allocate (t(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+      allocate (p(iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
 
 !      info => iv%instid(inst)%info
 
@@ -133,7 +133,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
 
-      do n=1,num_rad
+      !do n=1,num_rad
+      do n =  iv%instid(inst)%info%n1, iv%instid(inst)%info%n2
 
       ! [1.0] Extract base state Atmosphere variables
             Atmosphere(1)%level_pressure(0) = iv%instid(inst)%pf(0,n)
