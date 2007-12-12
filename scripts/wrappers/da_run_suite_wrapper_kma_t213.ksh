@@ -6,12 +6,11 @@ export LSF_EXCLUSIVE="-x"
 export NUM_PROCS=8
 export PROJECT=64000420
 export WALLCLOCK=60
-export LSF_PTILE=2
 
 
 export ID=${ID:-trunk_xlf_bluesky}
 
-export EXPT=run${LSF_PTILE}_${NUM_PROCS}_kma_2007020100          
+export EXPT=run_${NUM_PROCS}_kma_2007020100          
 
 export REL_DIR=/mmm/users/rizvi/code
 export DAT_DIR=/ptmp/rizvi/data    

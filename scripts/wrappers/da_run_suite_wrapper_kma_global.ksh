@@ -21,7 +21,6 @@ export LSF_EXCLUSIVE="-x"
 export NUM_PROCS=16
 export WALLCLOCK=60
 export PROJECT=64000420
-export LSF_PTILE=2
 export ID=${ID:-trunk_xlf_bluesky}
 export EXPT=run_kma_T213_${NUM_PROCS}   
 

@@ -30,7 +30,7 @@ cat > job.ksh <<EOF
 #BSUB -q $QUEUE 
 #BSUB -P $PROJECT
 #BSUB -W $LSF_MAX_RUNTIME
-#BSUB -R "span[ptile=$LL_PTILE]"
+#BSUB -R "span[ptile=$LSF_PTILE]"
 ############BSUB -w \"done(${PREV_JOBID})\"
 
 export RUN_CMD="mpirun.lsf"

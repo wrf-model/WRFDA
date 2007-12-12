@@ -41,7 +41,6 @@ export NUM_PROCS=1  #64 is for WRF and WRF-VAR # 1 is for WPS, REAL, UPDATE_BC a
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=10   
 export LSF_EXCLUSIVE=" "
-export LL_PTILE=16 
 
 #Time info:
 export INITIAL_DATE=2007070300

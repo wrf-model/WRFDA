@@ -41,7 +41,6 @@ export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=180
 export LSF_EXCLUSIVE=" "
-export LL_PTILE=16
 
 #Time info:
 export INITIAL_DATE=2007070112

@@ -40,7 +40,6 @@ export NUM_PROCS=8
 export RUN_CMD=mpirun.lsf
 export WALLCLOCK=10       
 export LSF_EXCLUSIVE=" "
-export LL_PTILE=16
 export PREV_JOBNAME=${EXPT}_job0
 export JOBNAME=${EXPT}_job1
 export SUBMIT_OPTIONS1="#BSUB -w \"done(${PREV_JOBNAME})\""

@@ -60,7 +60,6 @@ export QUEUE=regular
 export PROJECT=64000420 # 25000026
 #export LSF_MAX_RUNTIME=30
 export WALLCLOCK=360
-#export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME"
 #export RUN_CMD=mpirun.lsf
 #export RUN_CMD="mpirun -np $NUM_PROCS -machinefile /users/hclin/hosts"
