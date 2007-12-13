@@ -44,7 +44,7 @@ export DOUBLE=${DOUBLE:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 # Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
-export FG_TYPE=${FG_TYPE:-gfs}
+export FG_TYPE=${FG_TYPE:-GFS}
 
 # Scheduling:
 export SUBMIT=${SUBMIT:-LSF}
