@@ -17,6 +17,7 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
    iv%instid(i)%info%lat(:,n)   = p%info%lat
    iv%instid(i)%info%lon(:,n)   = p%info%lon
    iv%instid(i)%info%elv(n)     = p%info%elv
+   iv%instid(i)%info%date_char(n) = p%info%date_char
 
    iv%instid(i)%info%max_lev    = iv%instid(i)%nlevels
    iv%instid(i)%info%levels(n)  = iv%instid(i)%nlevels
