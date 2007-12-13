@@ -491,7 +491,6 @@ rconfig   logical   var4d                   namelist,wrfvar1  1  .false.  -  "va
 rconfig   integer   var4d_multi_inc         namelist,wrfvar1  1  0        -  "var4d_multi_inc"         ""  ""
 rconfig   integer   var4d_coupling          namelist,wrfvar1  1  2        -  "var4d_coupling"          ""  ""
 rconfig   logical   global                  namelist,wrfvar1  1  .false.  -  "global"                  ""  ""
-rconfig   logical   oi_use                  namelist,wrfvar1  1  .true.   -  "oi_use"                  ""  ""
 rconfig   logical   print_detail_airep      namelist,wrfvar1  1  .false.  -  "print_detail_airep"      ""  ""
 rconfig   logical   print_detail_radar      namelist,wrfvar1  1  .false.  -  "print_detail_radar"      ""  ""
 rconfig   logical   print_detail_rad        namelist,wrfvar1  1  .false.  -  "print_detail_rad"        ""  ""

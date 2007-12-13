@@ -17,7 +17,7 @@ module da_tools
       set_omb_rand_fac, fails_error_max, missing_r,x_start_sub_domain, global, &
       fg_format_wrf, x_end_sub_domain, y_end_sub_domain, def_sub_domain, &
       y_start_sub_domain, start_lat, delt_lat, delt_lon, start_lon, cp, &
-      missing, surface_correction,print_detail_map, oi_use, use_rad, stderr, &
+      missing, surface_correction,print_detail_map, use_rad, stderr, &
       t_kelvin, trace_use_frequent, jds, jde
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise, &
@@ -95,7 +95,5 @@ contains
 #include "da_get_2d_sum.inc"
 #include "da_get_3d_sum.inc"
 
-#include "da_oi.inc"
-   
 end module da_tools
 

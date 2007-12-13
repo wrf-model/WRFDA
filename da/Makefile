@@ -933,7 +933,6 @@ da_tools.o:		\
 			da_set_boundary_xb.inc \
 			da_get_2d_sum.inc \
 			da_get_3d_sum.inc \
-			da_oi.inc \
 			da_xyll.inc \
 			da_xyll_default.inc \
 			da_xyll_latlon.inc \
