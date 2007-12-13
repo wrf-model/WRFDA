@@ -65,14 +65,16 @@ wrf : framework_only
 	  ( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf_SST_ESMF ) ; \
 	fi
 
-all_wrfvar : 
+all_wrfvar : da be
+
+da :
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" ext
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" dyn_em
-	( cd da; make -r all_wrfvar )
+	( cd da; make -r da )
 
 be : 
 	/bin/rm -f main/libwrflib.a
@@ -80,7 +82,7 @@ be :
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" toolsdir
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" REGISTRY="Registry" framework
 	$(MAKE) MODULE_DIRS="$(DA_WRFVAR_MODULES)" shared
-	( cd da; $(MAKE) all_wrfvar )
+	( cd da; $(MAKE) da )
 	( cd gen_be; $(MAKE) gen_be )
 
 ### 3.a.  rules to build the framework and then the experimental core

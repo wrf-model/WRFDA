@@ -55,8 +55,6 @@ OBJS_FOR_ALL =		da_memory.o             \
 			gsi_thinning.o		\
                         da_wrfvar_top.o         \
                         da_wrfvar_io.o          \
-                        da_verif_control.o      \
-                        da_verif_init.o         \
                         da_reporting.o          \
                         da_airsr.o              \
                         da_transfer_model.o     \
@@ -82,7 +80,7 @@ OBJS_FOR_ALL =		da_memory.o             \
 
 TARGETDIR    =  ../..
 
-all_wrfvar : da_wrfvar.exe \
+da : da_wrfvar.exe \
              da_advance_time.exe \
              da_bias_airmass.exe \
              da_bias_verif.exe \
@@ -104,7 +102,7 @@ links :
 	@ $(LN) */*.c .
 	@ $(LN) */*.m4 .
 
-MODULE_DIRS=-I../frame -I../share
+MODULE_DIRS=-I../frame -I../share -I../external/esmf_time_f90
 
 
 ##########################################################################
@@ -333,8 +331,6 @@ da_obs.o:		da_obs.f90 \
 			da_store_obs_grid_info.inc \
 			da_use_obs_errfac.inc \
 			da_write_obs.inc \
-			da_write_inv_for_multi_inc.inc \
-			da_read_inv_for_multi_inc.inc \
 			da_write_obs_etkf.inc \
 			da_write_filtered_obs.inc \
 			da_write_y.inc
@@ -601,9 +597,6 @@ da_radar.o:		da_radar.f90 \
 			da_transform_xtoy_radar_adj.inc \
 			da_check_max_iv_radar.inc \
 			da_get_innov_vector_radar.inc \
-			da_reflectivity.inc \
-			da_reflectivity_adj.inc \
-			da_reflectivity_lin.inc \
 			da_radial_velocity.inc \
 			da_radial_velocity_lin.inc \
 			da_radial_velocity_adj.inc \
@@ -984,10 +977,10 @@ da_interpolation.o:	\
 			da_tools.o \
 			da_interpolation.f90 \
 			da_to_zk.inc \
-			da_interp_obs_lin_2d.inc \
-			da_interp_obs_lin_2d_adj.inc \
 			da_interp_lin_2d.inc \
 			da_interp_lin_2d_adj.inc \
+			da_interp_lin_2d_partial.inc \
+			da_interp_lin_2d_adj_partial.inc \
 			da_interp_lin_3d.inc \
 			da_interp_lin_3d_adj.inc
 	$(RM) $@
@@ -1108,6 +1101,21 @@ da_test.o:		da_test.f90 \
 	$(RM) $@
 	$(CPP) $(CPPFLAGS) -I../inc da_test.f90 > da_test.f
 	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_test.f
+
+da_verif_anal_control.o: da_verif_anal_control.f90
+	$(RM) $@
+	$(CPP) $(CPPFLAGS) -I../inc da_verif_anal_control.f90 > da_verif_anal_control.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_verif_anal_control.f
+
+da_verif_obs_control.o: da_verif_obs_control.f90
+	$(RM) $@
+	$(CPP) $(CPPFLAGS) -I../inc da_verif_obs_control.f90 > da_verif_obs_control.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_verif_obs_control.f
+
+da_verif_obs_init.o: da_verif_obs_init.f90
+	$(RM) $@
+	$(CPP) $(CPPFLAGS) -I../inc da_verif_obs_init.f90 > da_verif_obs_init.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_verif_obs_init.f
 
 da_etkf.o:	        da_etkf.f90 \
 			da_innerprod.inc \
@@ -1264,6 +1272,41 @@ da_radiance.o:		da_radiance.f90 \
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance.f90 > da_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance.f
+
+gsi_thinning.o:         gsi_thinning.f90
+			$(RM) $@
+			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_thinning.f90 > gsi_thinning.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_thinning.f
+
+f_qv_from_rh.o:         f_qv_from_rh.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc f_qv_from_rh.f90 > f_qv_from_rh.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) f_qv_from_rh.f
+
+rad_bias.o:             rad_bias.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc rad_bias.f90 > rad_bias.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rad_bias.f
+
+regress_one.o:          regress_one.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc regress_one.f90 > regress_one.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) regress_one.f
+
+tqli.o:                 tqli.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc tqli.f90 > tqli.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) tqli.f
+
+tred2.o:                tred2.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc tred2.f90 > tred2.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) tred2.f
+
+pythag.o:               pythag.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc pythag.f90 > pythag.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) pythag.f
 
 da_rttov.o:		da_rttov.f90
 	$(RM) $@
