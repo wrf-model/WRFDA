@@ -87,7 +87,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         = -g -C -Mchkfpstk -Mchkptr -Mchkstk
 FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
@@ -209,7 +209,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         =
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
+FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -flogical=false -fpointer=null -C
 FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wimplicit-none
 FCFREE          = -ffree-form -ffree-line-length-huge
@@ -424,7 +424,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         = -g -C -Mchkfpstk -Mchkptr -Mchkstk
 FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
@@ -1099,7 +1099,7 @@ EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         =
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
+FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -flogical=false -fpointer=null -C
 FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wunused-parameter
 FCTYPE          = -r$(RWORDSIZE)
@@ -1205,7 +1205,7 @@ EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
 DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         = -g -C -Mchkfpstk -Mchkptr -Mchkstk
 FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
