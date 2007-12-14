@@ -60,11 +60,8 @@ RSL_LITE_ERROR_DUP1 ( int *me )
         close(newfd) ;
         return ;
     }
-#if (DA_CORE != 1)
-    /* Do not want this in wrfvar output streams */
     fprintf( stdout, "taskid: %d hostname: %s\n",*me,hostname) ;
     fprintf( stderr, "taskid: %d hostname: %s\n",*me,hostname) ;
-#endif
 #else
     printf("host %d", *me ) ;
     system("hostname") ;

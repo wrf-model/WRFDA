@@ -1,5 +1,6 @@
 # CHEM
 
+
 CHEM_OBJS = \
 	module_chem_utilities.o \
 	module_data_radm2.o \
@@ -17,6 +18,10 @@ CHEM_OBJS = \
 	module_input_chem_bioemiss.o \
 	module_ctrans_grell.o \
 	module_emissions_anthropogenics.o \
+	module_data_mgn2mech.o \
+	module_bioemi_megan2.o \
+	module_data_megan2.o \
+	convert_bioemiss_megan2.o \
 	chemics_init.o \
 	chem_driver.o \
 	photolysis_driver.o \

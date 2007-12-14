@@ -752,6 +752,7 @@ integer myproc
    USE module_ra_sw
    USE module_ra_gsfcsw
    USE module_ra_gfdleta
+   USE module_ra_hs
    USE module_domain
 !---------------------------------------------------------------------
    IMPLICIT NONE
@@ -894,6 +895,11 @@ integer myproc
                               ims, ime, jms, jme, kms, kme, &
                               its, ite, jts, jte, kts, kte  )
              etalw = .true.
+        CASE (HELDSUAREZ)
+             CALL hsinit(RTHRATEN,restart,             &
+                         ids, ide, jds, jde, kds, kde, &
+                         ims, ime, jms, jme, kms, kme, &
+                         its, ite, jts, jte, kts, kte )
         CASE DEFAULT
 
    END SELECT lwrad_select
@@ -1401,8 +1407,6 @@ integer myproc
                       ims, ime, jms, jme, kms, kme,               &
                       its, ite, jts, jte, kts, kte                )
 !------------------------------------------------------------------
-   USE module_mp_ncloud3
-   USE module_mp_ncloud5
    USE module_mp_wsm3
    USE module_mp_wsm5
    USE module_mp_wsm6
@@ -1466,10 +1470,6 @@ integer myproc
                           its, ite, jts, jte, kts, kte            )
      CASE (THOMPSON)
          CALL thompson_init
-     CASE (NCEPCLOUD3)
-          CALL ncloud3init(rhoair0,rhowater,rhosnow,cliq,cv, allowed_to_read )
-     CASE (NCEPCLOUD5)
-          CALL ncloud5init(rhoair0,rhowater,rhosnow,cliq,cv, allowed_to_read )
 
      CASE DEFAULT
 

@@ -261,6 +261,19 @@ em_grav2d_x : wrf
 		/bin/rm -f namelist.input ; ln -s ../test/em_grav2d_x/namelist.input . )
 	( cd run ; /bin/rm -f input_sounding ; ln -s ../test/em_grav2d_x/input_sounding . )
 
+em_heldsuarez : wrf
+	@ echo '--------------------------------------'
+	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em IDEAL_CASE=heldsuarez em_ideal )
+	( cd test/em_heldsuarez ; /bin/rm -f wrf.exe ; ln -s ../../main/wrf.exe . )
+	( cd test/em_heldsuarez ; /bin/rm -f ideal.exe ; ln -s ../../main/ideal.exe . )
+	( cd test/em_heldsuarez ; /bin/rm -f README.namelist ; ln -s ../../run/README.namelist . )
+	( cd test/em_heldsuarez ; /bin/rm -f gribmap.txt ; ln -s ../../run/gribmap.txt . )
+	( cd test/em_heldsuarez ; /bin/rm -f grib2map.tbl ; ln -s ../../run/grib2map.tbl . )
+	( cd run ; /bin/rm -f ideal.exe ; ln -s ../main/ideal.exe . )
+	( cd run ; if test -f namelist.input ; then \
+		/bin/cp -f namelist.input namelist.input.backup ; fi ; \
+		/bin/rm -f namelist.input ; ln -s ../test/em_heldsuarez/namelist.input . )
+
 #### anthropogenic emissions converter
 
 emi_conv : wrf
@@ -293,6 +306,15 @@ bio_conv : wrf
 	( cd run ; if test -f namelist.input ; then \
 		/bin/cp -f namelist.input namelist.input.backup ; fi ; \
 		/bin/rm -f namelist.input ; ln -s ../test/em_real/namelist.input . )
+
+bioemiss_conv_megan2 : wrf
+	@ echo '--------------------------------------'
+	( cd chem ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em IDEAL_CASE=real convert_bioemiss_megan2 )
+	( cd test/em_real ; /bin/rm -f convert_bioemiss_megan2.exe ; ln -s ../../chem/convert_bioemiss_megan2.exe . )
+	( cd test/em_real ; /bin/rm -f README.namelist ; ln -s ../../run/README.namelist . )
+	( cd run ; if test -f namelist.input ; then \
+	        /bin/cp -f namelist.input namelist.input.backup ; fi ; \
+	        /bin/rm -f namelist.input ; ln -s ../test/em_real/namelist.input . )
 
 #### nmm converter
 

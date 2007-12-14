@@ -11,6 +11,7 @@ SUBROUTINE microphysics_driver(                                          &
                       ,specified, channel_switch                         &
                       ,warm_rain                                         &
                       ,t8w                                               &
+                      ,chem_opt, progn                                   &
                       ,cldfra, cldfra_old, exch_h, nsource               &
                       ,qlsink, precr, preci, precs, precg                &
                       ,xland,itimestep                                   &
@@ -33,7 +34,7 @@ SUBROUTINE microphysics_driver(                                          &
 ! Framework
    USE module_state_description, ONLY :                                  &
                      KESSLERSCHEME, LINSCHEME, WSM3SCHEME, WSM5SCHEME    &
-                    ,WSM6SCHEME, ETAMPNEW, NCEPCLOUD3, NCEPCLOUD5, THOMPSON
+                    ,WSM6SCHEME, ETAMPNEW, THOMPSON
 
 
 ! Model Layer
@@ -44,8 +45,6 @@ SUBROUTINE microphysics_driver(                                          &
 
    USE module_mp_kessler
    USE module_mp_lin
-   USE module_mp_ncloud3
-   USE module_mp_ncloud5
    USE module_mp_wsm3
    USE module_mp_wsm5
    USE module_mp_wsm6
@@ -64,8 +63,6 @@ SUBROUTINE microphysics_driver(                                          &
    ! WRF Single-Moment 5-class, Hong, Dudhia and Chen (2004)
    ! WRF Single-Moment 6-class, Lim and Hong (2003 WRF workshop)
    ! Eta Grid-scale Cloud and Precipitation scheme (EGCP01, Ferrier)
-   ! NCEP cloud3, Hong et al. (1998) with some mod, Dudhia (1989)
-   ! NCEP cloud5, Hong et al. (1998) with some mod, Rutledge and Hobbs (1984)
    ! 
 !----------------------------------------------------------------------
    IMPLICIT NONE
@@ -182,6 +179,7 @@ SUBROUTINE microphysics_driver(                                          &
 
    INTEGER,    INTENT(IN   )    :: mp_physics
    LOGICAL,    INTENT(IN   )    :: specified
+   INTEGER, OPTIONAL, INTENT(IN   )    :: chem_opt, progn
 !
    INTEGER,      INTENT(IN   )    ::       ids,ide, jds,jde, kds,kde
    INTEGER,      INTENT(IN   )    ::       ims,ime, jms,jme, kms,kme
@@ -307,9 +305,9 @@ SUBROUTINE microphysics_driver(                                          &
        IF( PRESENT(qlsink) ) qlsink(its:ite,kts:kte,jts:jte) = 0.
 
 !-----------
-#ifndef WRF_CHEM
-       IF( PRESENT( QNDROP_CURR ) ) THEN
-          IF( F_QNDROP .AND. mp_physics==LINSCHEME ) THEN
+       IF( PRESENT(chem_opt) .AND. PRESENT(progn) ) THEN
+       IF( chem_opt==0 .AND. progn==1 .AND. mp_physics==LINSCHEME ) THEN
+          IF( PRESENT( QNDROP_CURR ) ) THEN
              CALL wrf_debug ( 100 , 'microphysics_driver: calling prescribe_aerosol_mixactivate' )
 ! 06-nov-2005 rce - id  & itimestep added to arg list
              call prescribe_aerosol_mixactivate (               &
@@ -318,14 +316,15 @@ SUBROUTINE microphysics_driver(                                          &
                   z, dz8w, p8w, t8w, exch_h,                    &
                   qv_curr, qc_curr, qi_curr, qndrop_curr,       &
                   nsource,                                      &
+                  ids,ide, jds,jde, kds,kde,                    &
                   ims,ime, jms,jme, kms,kme,                    &
                   its,ite, jts,jte, kts,kte,                    &
                   F_QC=f_qc, F_QI=f_qi                          )
-          ELSE IF( F_QNDROP ) THEN
-             call wrf_error_fatal("SETTINGS ERROR: Prognostic cloud droplet number can only be used with the mp_physics=LINSCHEME.")
           END IF
+       ELSE IF( progn==1 .AND. mp_physics/=LINSCHEME ) THEN
+             call wrf_error_fatal("SETTINGS ERROR: Prognostic cloud droplet number can only be used with the mp_physics=LINSCHEME.")
        END IF
-#endif
+       END IF
 
      micro_select: SELECT CASE(mp_physics)
 
@@ -541,64 +540,6 @@ SUBROUTINE microphysics_driver(                                          &
                                                                     )
              ELSE
                 CALL wrf_error_fatal ( 'arguments not present for calling etampnew' )
-             ENDIF
-
-        CASE (NCEPCLOUD3)
-             CALL wrf_debug ( 100 , 'microphysics_driver: calling ncloud3' )
-             IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
-                  PRESENT( QR_CURR ) .AND.                            &
-                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
-                  PRESENT( W       )                            ) THEN
-             CALL ncloud3(                                          &
-                  TH=th                                             &
-                 ,Q=qv_curr                                         &
-                 ,QCI=qc_curr                                       &
-                 ,QRS=qr_curr                                       &
-                 ,W=w, DEN=rho, PII=pi_phy, P=p, DELZ=dz8w          &
-                 ,DELT=dt,G=g,CPD=cp,CPV=cpv                        &
-                 ,RD=r_d,RV=r_v,T0C=SVPT0                           &
-                 ,EP1=ep_1, EP2=ep_2, QMIN=epsilon                  &
-                 ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
-                 ,DEN0=rhoair0, DENR=rhowater                       &
-                 ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
-                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
-                 ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
-                 ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
-                 ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-                                                                    )
-
-             ELSE
-                CALL wrf_error_fatal ( 'arguments not present for calling ncepcloud3' )
-             ENDIF
-
-        CASE (NCEPCLOUD5)
-             CALL wrf_debug ( 100 , 'microphysics_driver: calling ncloud5' )
-             IF ( PRESENT( QV_CURR ) .AND. PRESENT ( QC_CURR ) .AND.  &
-                  PRESENT( QR_CURR ) .AND. PRESENT ( QI_CURR ) .AND.  &
-                  PRESENT( QS_CURR ) .AND. PRESENT ( QG_CURR ) .AND.  &
-                  PRESENT( RAINNC  ) .AND. PRESENT ( RAINNCV ) .AND.  &
-                  PRESENT( W       )                            ) THEN
-             CALL ncloud5(                                          &
-                  TH=th                                             &
-                 ,Q=qv_curr                                         &
-                 ,QC=qc_curr                                        &
-                 ,QR=qr_curr                                        &
-                 ,QI=qi_curr                                        &
-                 ,QS=qs_curr                                        &
-                 ,W=w, DEN=rho, PII=pi_phy, P=p, DELZ=dz8w          &
-                 ,DELT=dt,G=g,CPD=cp,CPV=cpv                        &
-                 ,RD=r_d,RV=r_v,T0C=SVPT0                           &
-                 ,EP1=ep_1, EP2=ep_2, QMIN=epsilon                  &
-                 ,XLS=xls, XLV0=xlv, XLF0=xlf                       &
-                 ,DEN0=rhoair0, DENR=rhowater                       &
-                 ,CLIQ=cliq,CICE=cice,PSAT=psat                     &
-                 ,RAIN=RAINNC,RAINNCV=RAINNCV                       &
-                 ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde &
-                 ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme &
-                 ,ITS=its,ITE=ite, JTS=jts,JTE=jte, KTS=kts,KTE=kte &
-                                                                    )
-             ELSE
-                CALL wrf_error_fatal ( 'arguments not present for calling ncepcloud5' )
              ENDIF
 
 
