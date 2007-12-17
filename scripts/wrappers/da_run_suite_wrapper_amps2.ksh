@@ -42,14 +42,14 @@ export CYCLE_PERIOD=12
 export CLEAN=true
 
 #Scheduling:
-export PROJECT_ID=25000026        # JNT GAUs (1200/month).
-#export PROJECT_ID=48500053       # JNT GAUs (1200/month).
-#export PROJECT_ID=48503001       # DATC GAUs.
+export PROJECT=25000026        # JNT GAUs (1200/month).
+#export PROJECT=48500053       # JNT GAUs (1200/month).
+#export PROJECT=48503001       # DATC GAUs.
 export QUEUE=premium
 #export QUEUE=regular
 #export QUEUE=share
 export NUM_PROCS=64
-export RUN_CMD=mpirun.lsf
+export SUBMIT=LSF
 export WALLCLOCK=180
 
 #Time info:
@@ -62,12 +62,10 @@ export LONG_FCST_RANGE_2=24
 export NL_HISTORY_INTERVAL=720
 
 #Directories:
-export MACHINE=bluevista
 export REL_DIR=/rap/datc/code
 export DAT_DIR=/rap/datc/data
 export FG_TYPE=gfs
 export GRIB_DIR=$DAT_DIR/$FG_TYPE
-export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
 #export WRFVAR_DIR=$REL_DIR/wrfvar_r2522           # r2522.
 export WRFVAR_DIR=/mmm/users/dmbarker/code/trunk/wrfvar_afwa_2.2 # AFWA branch.
@@ -116,8 +114,7 @@ export NL_TIME_STEP_SOUND=4
 export NL_MP_ZERO_OUT=0
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

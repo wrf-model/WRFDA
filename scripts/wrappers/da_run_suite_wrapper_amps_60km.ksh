@@ -58,15 +58,12 @@ export LONG_FCST_RANGE_2=72
 #snowdrift:
 #export REL_DIR=/data1/$USER/code/trunk
 #export DAT_DIR=/data3/$USER/data
-#export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 #export WRF_BC_DIR=/data1/dmbarker/code/WRF_BC
-#bluevista:
 export REL_DIR=/mmm/users/dmbarker/code/trunk
 #export DAT_DIR=/mmm/users/dmbarker/data
 export NCEP_DIR=/mmm/users/dmbarker/data/ncep
 export DAT_DIR=/ptmp/dmbarker/data
 export RC_DIR=/mmm/users/dmbarker/data/amps1/rc
-export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
@@ -111,8 +108,7 @@ export NL_TIME_STEP_SOUND=4
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

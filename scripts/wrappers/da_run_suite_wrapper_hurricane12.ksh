@@ -74,16 +74,13 @@ export LONG_FCST_RANGE_2=6
 export LONG_FCST_RANGE_3=6
 export LONG_FCST_RANGE_4=6
 
-# 5 Directories (bluevista/blueice):
+# 5 Directories:
 #------------------------------------
-export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG  # WPS static data dir
 export USERNAME=liuz
 
   # 5.1 code dir
   #-------------------
 export REL_DIR=/mmm/users/${USERNAME}/code_vista # TOP dir of code
-export WPS_DIR=$REL_DIR/WPS                      # WPS dir
-export WRF_DIR=$REL_DIR/WRFV2                    # WRF dir
 export WRFVAR_DIR=$REL_DIR/trunk                 # WRF-Var dir
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC        # OBSPROC dir
 export WRF_BC_DIR=$WRFVAR_DIR/build              # da_update_bc dir

@@ -63,14 +63,9 @@ export REGION=regional_kma
 #-----------------------------------------------------------------------
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export REL_DIR=/mmm/users/rizvi/code
-export WPS_DIR=${WPS_DIR:-$REL_DIR/WPS}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC_v2.1}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}
-######export WRF_NL_DIR=$REL_DIR/wrfvar_wrf_nl
 #-----------------------------------------------------------------------
 #export WPS_INPUT_DIR=${WPS_INPUT_DIR:-/ptmp/rizvi/ncep}
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
 #-----------------------------------------------------------------------
 # [3] ############     Job details:        ############################
 #-------------------------------------------------------------------------

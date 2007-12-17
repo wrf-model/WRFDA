@@ -61,17 +61,14 @@ export LONG_FCST_RANGE_3=24
 export LONG_FCST_RANGE_4=72
 
 #Directories:
-#bluevista:
 #export REL_DIR=/mmm/users/dmbarker/code/trunk
 export REL_DIR=/rap/datc/demirtas/code
 export DAT_DIR=/ptmp/demirtas/data
 #export DAT_DIR=/rap/datc/data
-export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 #smoke:
 #export REL_DIR=/smoke/dmbarker/code/trunk/Vtable.AGRWRF
 #export DAT_DIR=/smoke/dmbarker/data
-#export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
@@ -120,11 +117,7 @@ export NL_INPUTOUT_END_H=9       # Output input format end.
 #export NL_CHECK_MAX_IV=.false.
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

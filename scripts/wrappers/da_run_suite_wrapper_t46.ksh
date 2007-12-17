@@ -33,11 +33,11 @@ export CYCLE_PERIOD=6
 export FIRST=false
 
 #Scheduling:
-export PROJECT_ID=48500053       # JNT GAUs (1200/month).
-#export PROJECT_ID=48503001      # DATC GAUs.
+export PROJECT=48500053       # JNT GAUs (1200/month).
+#export PROJECT=48503001      # DATC GAUs.
 export QUEUE=share  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=1  #64 is for WRF and WRF-VAR # 1 is for WPS, REAL, UPDATE_BC and OBS_PROC
-export RUN_CMD=mpirun.lsf
+export SUBMIT=LSF
 export WALLCLOCK=10
 
 #Time info:
@@ -55,17 +55,8 @@ export LBC_FREQ=3
 
 #Directories:
 export SCRIPTS_DIR=/rap/datc/demirtas/experiments/afwa/t46/da_scripts
-#export MACHINE=smoke
-#export REL_DIR=/smoke/dmbarker/code/trunk        # smoke
-#export DAT_DIR=/smoke/dmbarker/data              # smoke
-#export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG            # smoke
-export MACHINE=bluevista
-#export REL_DIR=/mmm/users/dmbarker/code/trunk    # bluevista
-#export DAT_DIR=/mmm/users/dmbarker/data          # bluevista
-export REL_DIR=/rap/datc/demirtas/code            # bluevista
-export DAT_DIR=/ptmp/demirtas/data                # bluevista
-
-export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista 
+export REL_DIR=/rap/datc/demirtas/code            # ibm
+export DAT_DIR=/ptmp/demirtas/data                # ibm
 
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version? New trunk version.
 export WRFVAR_DIR=$REL_DIR/wrfvar_r2522           # r2522.       
@@ -159,11 +150,8 @@ export NL_PD_MOIST=.true.  # Check with Dale
 
 #Continuous job 
 #export CONTJOB=n
-#export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 export SCRIPT=${SCRIPTS_DIR}/da_run_suite.ksh
-export MACHINE=bluevista
-#$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-${SCRIPTS_DIR}/da_run_job.${MACHINE}.ksh
+${SCRIPTS_DIR}/da_run_job.ksh
 
 
 exit 0

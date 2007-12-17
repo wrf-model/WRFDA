@@ -66,7 +66,6 @@ export LONG_FCST_RANGE_4=24
 #Directories:
 export REL_DIR=/smoke/dmbarker/code/trunk
 export DAT_DIR=/smoke/dmbarker/data
-export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 export WPS_DIR=$REL_DIR/wps_r237
 export WRF_DIR=$REL_DIR/wrf_r2234
 export WRFVAR_DIR=$REL_DIR/wrfvar_be
@@ -131,12 +130,8 @@ export NL_ANALYSIS_TYPE=randomcv
 #export NACCUMT1=5
 #export NSTARTACCUM1=14
 
-#export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-#export MACHINE=bluevista
-#$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-export RUN_CMD=" "
-$WRFVAR_DIR/scripts/da_run_suite.ksh
+export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

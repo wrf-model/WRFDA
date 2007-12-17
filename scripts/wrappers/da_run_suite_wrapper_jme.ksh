@@ -9,9 +9,9 @@ export CYCLE_NUMBER=1
 #export FIRST=false
 
 #Scheduling:
-export PROJECT_ID=25000026        # JNT GAUs (1200/month).
+export PROJECT=25000026        # JNT GAUs (1200/month).
 export QUEUE=share
-export RUN_CMD=mpirun.lsf
+export SUBMIT=LSF
 export WALLCLOCK=60
 #export FCST_RANGE=0
 
@@ -19,7 +19,6 @@ export WALLCLOCK=60
 export DATE=2006100312
 
 #Directories:
-export MACHINE=bluevista
 export REL_DIR=/mmm/users/dmbarker/code/trunk
 export DAT_DIR=/rap/datc/data
 export WRFVAR_DIR=$REL_DIR/wrfvar
@@ -78,8 +77,7 @@ export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'QVAPOR'"}
 
 # Submit script:
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_etkf.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

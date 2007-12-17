@@ -37,7 +37,7 @@ export PROJECT=64000510       # DATC GAUs.
 export QUEUE=debug    #  debug #  # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 #export QUEUE=premium    # use "share" queue for:WPS, REAL, UPDATE_BC and OBS_PROC 
 export NUM_PROCS=8 
-export RUN_CMD=mpirun.lsf
+export SUBMIT=LSF
 export WALLCLOCK=10       
 export PREV_JOBNAME=${EXPT}_job0
 export JOBNAME=${EXPT}_job1
@@ -56,7 +56,6 @@ export LBC_FREQ=3  # For 06/18Z KMA runs
 
 #Directories:
 export DAT_DIR=/ptmp/rizvi/data
-export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista 
 
 export REL_DIR=/ptmp/rizvi                   
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?

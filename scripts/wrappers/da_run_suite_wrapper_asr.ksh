@@ -52,7 +52,6 @@ export FINAL_DATE=2006100100
 #snowdrift:
 export REL_DIR=/data1/$USER/code/trunk
 export DAT_DIR=/data3/$USER/data
-export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 export WRF_BC_DIR=/data1/dmbarker/code/WRF_BC
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
