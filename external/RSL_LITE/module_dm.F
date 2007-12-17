@@ -150,6 +150,7 @@ write(0,*)'reordering mesh'
 ! debug
       CALL mpi_comm_rank( local_communicator_periodic, mytask, ierr )
       CALL mpi_cart_coords( local_communicator_periodic, mytask, 2, coords, ierr )
+
       CALL mpi_comm_rank( local_communicator, mytask, ierr )
       CALL mpi_cart_coords( local_communicator, mytask, 2, coords, ierr )
       mytask_x = coords(2)   ! col task (x)
@@ -1139,7 +1140,7 @@ write(0,*)'reordering mesh'
 	! should already be stored and use that.
 	CALL mpi_init ( ierr )
         CALL wrf_termio_dup
-        CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
+	CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
    END SUBROUTINE init_module_dm
