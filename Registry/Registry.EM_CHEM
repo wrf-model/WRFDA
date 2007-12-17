@@ -56,14 +56,14 @@ dimspec    h      -     namelist=nobs_err_flds    c          nobs_err_flds
 dimspec    r      -     namelist=nobs_ndg_vars    c          nobs_ndg_vars
 dimspec    g      2     namelist=num_metgrid_levels  z          num_metgrid_levels
 dimspec    m      2     constant=12                  z          months_per_year
-dimspec    o      3     namelist=ne_area             z          emissions dimension
+dimspec    o      3     namelist=ne_area             z          bio_emissions_dimension
 dimspec    +      2     namelist=kemit               z          emissions_zdim
 dimspec    a      -     namelist=cam_abs_dim1     c          cam_abs_dim1
 dimspec    c      -     namelist=cam_abs_dim2     z          cam_abs_dim2
 dimspec    q      2     namelist=levsiz           z          levsiz
 dimspec    d      2     namelist=paerlev          z          paerlev
 dimspec    v      -     constant=1                z          one
-
+dimspec    ?      2     namelist=nmegan           z          megan_species
 
 
 ################################################################################
@@ -345,6 +345,12 @@ state   real    qndrop         ikjftb  scalar      1         -     \
    i01rhusdf=(bdy_interp:dt) "QNDROP"           "Droplet number mixing ratio"        "# kg-1"
 state   real    qt             ikjftb  scalar      1         -     \
    i01rhusdf=(bdy_interp:dt)    "CWM"           "Total condensate mixing ratio"      "kg kg-1"
+state   real    qns            ikjftb  scalar      1         -     \
+   i01rhusdf=(bdy_interp:dt)    "QNSNOW"         "Snow Number concentration"   "# kg(-1)"
+state   real    qnr            ikjftb  scalar      1         -     \
+   i01rhusdf=(bdy_interp:dt)    "QNRAIN"        "Rain Number concentration"   "# kg(-1)"
+state   real    qng            ikjftb  scalar      1         -     \
+   i01rhusdf=(bdy_interp:dt)    "QNGRAUPEL"     "Graupel Number concentration" "# kg(-1)"
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1201,6 +1207,7 @@ package   wsm5scheme    mp_physics==4                -             moist:qv,qc,q
 package   etampnew      mp_physics==5                -             moist:qv,qc,qr,qi,qs,qg;scalar:qt
 package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
 package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
+package   morr_two_moment  mp_physics==10            -             moist:qv,qc,qr,qi,qs,qg;scalar:qni,qns,qnr,qng
 
 package   noprogn       progn==0                     -             -
 package   progndrop     progn==1                     -             scalar:qndrop
