@@ -48,7 +48,8 @@ PHYS_OBJS = \
 	module_fddaobs_driver.o \
 	module_fddaobs_rtfdda.o \
 	module_diagnostics.o \
-        module_mixactivate.o
+        module_mixactivate.o \
+        module_mp_morr_two_moment.o
 
 PHYS_nmm_OBJS = \
 	module_sf_lsm_nmm.o
