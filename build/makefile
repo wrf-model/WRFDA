@@ -17,6 +17,7 @@ links :
 	@ $(LN) $(INC)/* .
 	@ $(LN) $(SHARE)/* .
 	@ $(LN) $(FRAME)/* .
+	@ if test -e module_dm_stubs.F; then rm -rf module_dm_stubs.F; fi
 	@ $(LN) $(MAIN)/* .
 	@ $(LN) $(PHYS)/* .
 	@ $(LN) $(TOOLS)/*.c .
