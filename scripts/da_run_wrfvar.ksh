@@ -321,54 +321,32 @@ if $NL_VAR4D; then
    # nl
 
    # Inputs
+   export NL_AUXHIST2_OUTNAME_SAVE=$NL_AUXHIST2_OUTNAME
    export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
    fi
+   export NL_DYN_OPT_SAVE=$NL_DYN_OPT
    export NL_DYN_OPT=2
+   export NL_INPUT_OUTNAME_SAVE=$NL_INPUT_OUTNAME
    export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
    fi
+   export NL_INPUTOUT_INTERVAL_SAVE=$NL_INPUTOUT_INTERVAL
    export NL_INPUTOUT_INTERVAL=60
+   export NL_AUXHIST2_INTERVAL_SAVE=$NL_INPUTOUT_INTERVAL
    let NL_AUXHIST2_INTERVAL=$NL_TIME_STEP/60
+   export NL_FRAMES_PER_AUXHIST2_SAVE=$NL_FRAMES_PER_AUXHIST2
    export NL_FRAMES_PER_AUXHIST2=1
-   export NL_HISTORY_INTERVAL=9999
-   export NL_RESTART=false
-   export NL_FRAMES_PER_OUTFILE=1000
-   export NL_INPUT_FROM_FILE=true
-   export NL_WRITE_INPUT=true
-   export NL_DEBUG_LEVEL=0
 
-   export NL_SMOOTH_OPTION=0
-   export NL_MP_PHYSICS=3
-   export NL_RA_LW_PHYSICS=1
-   export NL_RA_SW_PHYSICS=1
-   export NL_SF_SFCLAY_PHYSICS=1
-   export NL_BL_PBL_PHYSICS=1
-   export NL_BLDT=0
-   export NL_CU_PHYSICS=1
-   export NL_CUDT=5
-   export NL_ISFFLX=1
-   export NL_ICLOUD=1
-   export NL_MP_ZERO_OUT=2
-   export NL_W_DAMPING=1
-   export NL_DIFF_OPT=1
-   export NL_KM_OPT=4
-   export NL_DAMP_OPT=0
-   export NL_DAMPCOEF=0.0
-   export NL_SMDIV=0.1
-   export NL_EMDIV=0.01
+   export NL_TIME_STEP_SOUND_SAVE=$NL_TIME_STEP_SOUND
    export NL_TIME_STEP_SOUND=4
-   export NL_SPECIFIED=true
-   export NL_NESTED=false
-   export NL_REAL_DATA_INIT_TYPE=1
    . $WRFNL_DIR/inc/namelist_script.inc 
    mv namelist.input nl
-   export NL_DEBUG_LEVEL=0
-   unset NL_AUXHIST2_OUTNAME
-   unset NL_AUXHIST2_INTERVAL
-   unset NL_FRAMES_PER_AUXHIST2
+   export NL_AUXHIST2_OUTNAME=$NL_AUXHIST2_OUTNAME_SAVE
+   export NL_AUXHIST2_INTERVAL=$NL_AUXHIST2_INTERVAL_SAVE
+   export NL_FRAMES_PER_AUXHIST2=$NL_AUXHIST2_INTERVAL_SAVE
    ln -fs $WORK_DIR/*.TBL nl
    ln -fs $WORK_DIR/RRTM_DATA nl
    ln -fs $WORK_DIR/wrfbdy_d01 nl
@@ -390,6 +368,7 @@ if $NL_VAR4D; then
 
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
+   export NL_AUXINPUT2_INNAME_SAVE=$NL_AUXINPUT2_INNAME
    if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
    else
@@ -403,23 +382,37 @@ if $NL_VAR4D; then
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
       fi
    fi
+   export NL_AUXINPUT2_INTERVAL_SAVE=$NL_AUXINPUT2_INTERVAL
    let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
+   export NL_MP_PHYSICS_SAVE=$NL_MP_PHYSICS
    export NL_MP_PHYSICS=0
+   export NL_RA_LW_PHYSICS_SAVE=$NL_RA_LW_PHYSICS
    export NL_RA_LW_PHYSICS=0
+   export NL_RA_SW_PHYSICS_SAVE=$NL_RA_SW_PHYSICS
    export NL_RA_SW_PHYSICS=0
-   export NL_RADT_OLD=$NL_RADT
+   export NL_RADT_SAVE=$NL_RADT
    export NL_RADT=0
+   export NL_SF_SFCLAY_PHYSICS_SAVE=$NL_SF_SFCLAY_PHYSICS
    export NL_SF_SFCLAY_PHYSICS=0
-   export NL_SF_SURFACE_PHYSICS_OLD=$NL_SF_SURFACE_PHYSICS
+   export NL_SF_SURFACE_PHYSICS_SAVE=$NL_SF_SURFACE_PHYSICS
    export NL_SF_SURFACE_PHYSICS=0 # Just for tl/ad
+   export NL_BL_PBL_PHYSICS_SAVE=$NL_BL_PBL_PHYSICS
    export NL_BL_PBL_PHYSICS=0
+   export NL_BLDT_SAVE=$NL_BLDT_SAVE
    export NL_BLDT=0
+   export NL_CU_PHYSICS_SAVE=$NL_CU_PHYSICS
    export NL_CU_PHYSICS=0
+   export NL_CUDT_SAVE=$NL_CUDT
    export NL_CUDT=0
+   export NL_ISFFLX_SAVE=$NL_ISFFLX
    export NL_ISFFLX=0
+   export NL_ICLOUD_SAVE=$NL_ICLOUD
    export NL_ICLOUD=0
+   export NL_W_DAMPING_SAVE=$NL_W_DAMPING
    export NL_W_DAMPING=0
+   export NL_DIFF_OPT_SAVE=$NL_DIFF_OPT
    export NL_DIFF_OPT=0
+   export NL_DAMPCOEF_SAVE=$NL_DAMPCOEF
    export NL_DAMPCOEF=0.01
    . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input tl
@@ -459,12 +452,14 @@ if $NL_VAR4D; then
       fi
    fi
    let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
+   export NL_AUXINPUT3_INNAME_SAVE=$NL_AUXINPUT3_INNAME
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_AUXINPUT3_INNAME='./ad/auxinput3_d<domain>_<date>'
    fi
+   export NL_AUXINPUT3_INTERVAL_SAVE=$NL_AUXINPUT3_INTERVAL
    export NL_AUXINPUT3_INTERVAL=60
-   export NL_HISTORY_INTERVAL=9999
+   export NL_AUXHIST3_INTERVAL_SAVE=$NL_AUXHIST3_INTERVAL
    export NL_AUXHIST3_INTERVAL=60
    export NL_INPUTOUT_INTERVAL=60
    . $WRFPLUS_DIR/inc/namelist_script.inc
@@ -486,20 +481,32 @@ if $NL_VAR4D; then
    # Outputs
    ln -fs ad/ad_d01_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
 
-   export NL_DYN_OPT=2
-   unset NL_MP_PHYSICS
-   unset NL_RA_LW_PHYSICS
-   unset NL_RA_SW_PHYSICS
-   unset NL_SF_SFCLAY_PHYSICS
-   unset NL_BL_PBL_PHYSICS
-   unset NL_BLDT
-   unset NL_CU_PHYSICS
-   unset NL_CUDT
-   unset NL_ISFFLX
-   unset NL_ICLOUD
    # Restore values
-   export NL_SF_SURFACE_PHYSICS=$NL_SF_SURFACE_PHYSICS_OLD
-   export NL_RADT=$NL_RADT_OLD
+   export NL_AUXINPUT2_INTERVAL=$NL_AUXINPUT2_INTERVAL_SAVE
+   export NL_AUXINPUT2_INNAME=$NL_AUXINPUT2_INNAME_SAVE
+   export NL_AUXINPUT3_INTERVAL=$NL_AUXINPUT3_INTERVAL_SAVE
+   export NL_AUXINPUT3_INNAME=$NL_AUXINPUT3_INNAME_SAVE
+   export NL_AUXHIST3_INTERVAL=$NL_AUXHIST3_INTERVAL_SAVE
+   export NL_INPUTOUT_INTERVAL=$NL_INPUTOUT_INTERVAL_SAVE
+   export NL_INPUT_OUTNAME=$NL_INPUT_OUTNAME_SAVE
+   export NL_FRAMES_PER_AUXHIST2=$NL_FRAMES_PER_AUXHIST2_SAVE
+   export NL_DYN_OPT=$NL_DYN_OPT_SAVE
+   export NL_MP_PHYSICS=$NL_MP_PHYSICS_SAVE
+   export NL_RA_LW_PHYSICS=$NL_RA_LW_PHYSICS_SAVE
+   export NL_RA_SW_PHYSICS=$NL_RA_SW_PHYSICS_SAVE
+   export NL_SF_SFCLAY_PHYSICS=$NL_SF_SFCLAY_PHYSICS_SAVE
+   export NL_BL_PBL_PHYSICS=$NL_BL_PBL_PHYSICS_SAVE
+   export NL_BLDT=$NL_BLDT_SAVE
+   export NL_CU_PHYSICS=$NL_CU_PHYSICS_SAVE
+   export NL_CUDT=$NL_CUDT_SAVE
+   export NL_ISFFLX=$NL_ISFFLX_SAVE
+   export NL_ICLOUD=$NL_ICLOUD_SAVE
+   export NL_SF_SURFACE_PHYSICS=$NL_SF_SURFACE_PHYSICS_SAVE
+   export NL_RADT=$NL_RADT_SAVE
+   export NL_TIME_STEP_SOUND=$NL_TIME_STEP_SOUND_SAVE
+   export NL_W_DAMPING=$NL_W_DAMPING_SAVE
+   export NL_DIFF_OPT=$NL_DIFF_OPT_SAVE
+   export NL_DAMPCOEF=$NL_DAMPCOEF_SAVE
 
 fi
 
@@ -698,7 +705,7 @@ else
    fi
 
    if $NL_VAR4D; then
-      cp $WORK_DIR/namelist.input $RUN_DIR/namelist_wrfvar.output
+      cp $WORK_DIR/namelist.output $RUN_DIR/namelist_wrfvar.output
       cp $WORK_DIR/nl/namelist.input     $RUN_DIR/namelist_nl.output
       cp $WORK_DIR/tl/namelist.input     $RUN_DIR/namelist_tl.output
       cp $WORK_DIR/ad/namelist.input     $RUN_DIR/namelist_ad.output
