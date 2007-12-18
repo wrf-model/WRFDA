@@ -1084,7 +1084,7 @@ write(0,*)'reordering mesh'
 
       CALL MPI_Comm_rank ( mpi_comm_here, mytask, ierr ) ;
       CALL mpi_comm_size ( mpi_comm_here, ntasks, ierr ) ;
-#ifdef WRFNL
+#ifdef WRF_NL
       CALL mpi_comm_split( MPI_COMM_WORLD , 3 , 1 , mpi_comm_local, ierr )
 #else
       CALL mpi_comm_split( MPI_COMM_WORLD , 4 , 1 , mpi_comm_local, ierr )
