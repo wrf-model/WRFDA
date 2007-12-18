@@ -89,6 +89,10 @@ subroutine da_wrfvar_init1(no_init1)
 
    if (.NOT. rootproc) check_max_iv_print=.false.
 
+   if (test_transforms .AND. .NOT. test_wrfvar) then
+      call da_error(__FILE__,__LINE__,(/"Must have test_wrfvar true if test_transforms is true"/))
+   end if
+
 end subroutine da_wrfvar_init1
 
 
