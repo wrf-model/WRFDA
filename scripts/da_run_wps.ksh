@@ -78,7 +78,7 @@ else
    fi
 
    # Run ungrib:
-   ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
+   ln -fs $VTABLE_DIR/Vtable.$FG_TYPE Vtable
    LOCAL_DATE=$DATE
    FILES=''
    while [[ $LOCAL_DATE -le $END_DATE ]]; do

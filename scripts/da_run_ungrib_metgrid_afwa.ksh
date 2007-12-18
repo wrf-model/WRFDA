@@ -31,9 +31,7 @@ ln -fs $WPS_DIR/ungrib.exe .
 #-----------------------------------------------------------------------
 
 export FG_TYPE=agrmet
-typeset -u UPPERCASE_FG_TYPE=$FG_TYPE
-export VTABLE_TYPE=$UPPERCASE_FG_TYPE.AFWA
-ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$VTABLE_TYPE Vtable
+ln -fs $VTABLE_DIR/Vtable.$FG_TYPE Vtable
 $WPS_DIR/link_grib.csh $DAT_DIR/$FG_TYPE/$DATE/*
 
 export FCST_RANGE=0
@@ -50,17 +48,15 @@ mv FILE:* AGRMET
 rm Vtable GRIBFILE*
 
 #-----------------------------------------------------------------------
-# [2] Run ungrib for NAVYSST:
+# [2] Run ungrib for NavySST:
 #-----------------------------------------------------------------------
 
-export FG_TYPE=navysst
-typeset -u UPPERCASE_FG_TYPE=$FG_TYPE
-export VTABLE_TYPE=$UPPERCASE_FG_TYPE
-ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$VTABLE_TYPE Vtable
-$WPS_DIR/link_grib.csh $DAT_DIR/$FG_TYPE/$DATE/navyssts
+export FG_TYPE=NavySST
+ln -fs $VTABLE_DIR/Vtable.$FG_TYPE Vtable
+$WPS_DIR/link_grib.csh $DAT_DIR/$FG_TYPE/$DATE/$FG_TYPE
 
 # Temporarily change date to that in SST file:
-export SST_DATE=`$WPS_DIR/util/g1print.exe ${DAT_DIR}/$FG_TYPE/${DATE}/navyssts | grep -ni WTMP | cut -c 34-46`
+export SST_DATE=`$WPS_DIR/util/g1print.exe ${DAT_DIR}/$FG_TYPE/${DATE}/$FG_TYPE | grep -ni WTMP | cut -c 34-46`
 export YEAR=`echo $SST_DATE | cut -c1-4`
 export MONTH=`echo $SST_DATE | cut -c6-7`
 export DAY=`echo $SST_DATE | cut -c9-10`
@@ -86,10 +82,8 @@ rm Vtable GRIBFILE*
 
 export DATE=$DATE_SAVE # Restore true date.
 export FCST_RANGE=0
-export FG_TYPE=gfs
-typeset -u UPPERCASE_FG_TYPE=$FG_TYPE
-export VTABLE_TYPE=$UPPERCASE_FG_TYPE.AFWA
-ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$VTABLE_TYPE Vtable
+export FG_TYPE=GFS
+ln -fs $VTABLE_DIR/Vtable.FG_TYPE Vtable
 
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 cp namelist.wps namelist.wps.$FG_TYPE

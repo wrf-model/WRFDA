@@ -35,11 +35,10 @@ export FCST_RANGE=0
 export FCST_HOUR=00
 
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
-export FG_TYPE=gfs
+export FG_TYPE=GFS
 cp namelist.wps namelist.wps.$FG_TYPE.$FCST_HOUR
 
-export VTABLE=Vtable.GFS.GDAPS
-ln -fs $WPS_DIR/ungrib/Variable_Tables/$VTABLE Vtable
+ln -fs $VTABLE_DIR/$Vtable.$FG_TYPE.GDAPS Vtable
 
 rm -rf tmp > /dev/null 2>&1; mkdir tmp
 ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/t${FCST_HOUR}  tmp/.
@@ -68,11 +67,10 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
    if test $FCST_HOUR -lt 10; then export FCST_HOUR=0$FCST_HOUR; fi
 
    ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
-   export FG_TYPE=gdaps
+   export FG_TYPE=GDAPS
    cp namelist.wps namelist.wps.$FG_TYPE.$FCST_HOUR
 
-   export VTABLE=Vtable.GDAPS
-   ln -fs $WPS_DIR/ungrib/Variable_Tables/$VTABLE Vtable
+   ln -fs $VTABLE_DIR/Vtable.$FG_TYPE Vtable
 
    rm -rf tmp > /dev/null 2>&1; mkdir tmp
    ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/kwrf_lc10_prep_gdps_grib.${DATE_SAVE}  tmp/.

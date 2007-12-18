@@ -44,7 +44,7 @@ export DOUBLE=${DOUBLE:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 # Combination of cold start and cycling runs for AFWA projects: cold start (for 00,12) cycling (for 06,18)
-export FG_TYPE=${FG_TYPE:-gfs}
+export FG_TYPE=${FG_TYPE:-GFS}
 
 # Scheduling:
 export SUBMIT=${SUBMIT:-LSF}
@@ -116,6 +116,7 @@ export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
+export VTABLE_DIR=${VTABLE_DIR:-$WPS_DIR/ungrib/Variable_Tables}
 
 # Time info:
 export DATE=${DATE:-2003010100}                   # Current date.

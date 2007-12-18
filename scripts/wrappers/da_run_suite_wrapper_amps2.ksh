@@ -64,7 +64,7 @@ export NL_HISTORY_INTERVAL=720
 #Directories:
 export REL_DIR=/rap/datc/code
 export DAT_DIR=/rap/datc/data
-export FG_TYPE=gfs
+export FG_TYPE=GFS
 export GRIB_DIR=$DAT_DIR/$FG_TYPE
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
 #export WRFVAR_DIR=$REL_DIR/wrfvar_r2522           # r2522.
