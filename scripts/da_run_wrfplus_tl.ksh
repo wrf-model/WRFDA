@@ -24,6 +24,7 @@ else
       ln -fs $WORK_DIR/tl01 $WORK_DIR/wrfinput_d01
    fi
    if [[ $arg1 == "post" ]]; then
+      mv ../namelist.output .
       mv -f ../namelist_wrfvar.input ../namelist.input
       ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d01
       if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then

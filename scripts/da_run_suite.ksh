@@ -192,6 +192,10 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
                export PHASE=true
                mkdir -p $RUN_DIR
 
+               export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d01
+               export BDYIN=$RC_DIR/$DATE/wrfbdy_d01
+               export BDYOUT=$FC_DIR/$DATE/wrfbdy_d01
+
                $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
                $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
                RC=$?
@@ -422,7 +426,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          mkdir -p $RUN_DIR
 
          export WRF_INPUT_DIR=$RC_DIR/$DATE
-         if [[ $CYCLE_NUMBER -gt 0 ]] && $CYCLING; then
+         if $RUN_UPDATE_BC && $CYCLING; then
             export WRF_INPUT_DIR=$FC_DIR/$DATE
          fi
 

@@ -705,10 +705,10 @@ else
    fi
 
    if $NL_VAR4D; then
-      cp $WORK_DIR/namelist.output $RUN_DIR/namelist_wrfvar.output
-      cp $WORK_DIR/nl/namelist.input     $RUN_DIR/namelist_nl.output
-      cp $WORK_DIR/tl/namelist.input     $RUN_DIR/namelist_tl.output
-      cp $WORK_DIR/ad/namelist.input     $RUN_DIR/namelist_ad.output
+      cp $WORK_DIR/namelist_wrfvar.output $RUN_DIR/namelist_wrfvar.output
+      cp $WORK_DIR/nl/namelist.output     $RUN_DIR/namelist_nl.output
+      cp $WORK_DIR/tl/namelist.output     $RUN_DIR/namelist_tl.output
+      cp $WORK_DIR/ad/namelist.output     $RUN_DIR/namelist_ad.output
       echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
       echo '<A HREF="namelist_nl.output">NL namelist.output</a>'
       echo '<A HREF="namelist_tl.output">TL namelist.output</a>'
