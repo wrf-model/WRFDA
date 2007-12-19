@@ -164,6 +164,7 @@ subroutine da_scan_obs_bufr (iv, filename)
       ndup = 1
       if (global .and. &
          (platform%loc%i < ids .or. platform%loc%i >= ide)) ndup= 2
+      if (test_wrfvar) ndup = 1
 
       ! It is possible that logic for counting obs is incorrect for the
       ! global case with >1 MPI tasks due to obs duplication, halo, etc.
