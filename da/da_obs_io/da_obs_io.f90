@@ -7,13 +7,13 @@ module da_obs_io
       obs_qc_pointer, rootproc, omb_unit,omb_add_noise,use_airepobs, &
       use_airepobs,use_bogusobs,use_gpspwobs,use_gpsrefobs,use_geoamvobs, &
       use_metarobs,use_profilerobs,use_pilotobs,use_buoyobs,use_shipsobs, &
-      use_synopobs,use_soundobs,use_qscatobs,test_wrfvar, report_start, &
+      use_synopobs,use_soundobs,use_qscatobs,test_wrfvar, use_ssmiretrievalobs, report_start, &
       report_end, global, print_detail_obs, stdout, t_kelvin, stderr, &
       max_ob_levels, missing_data, max_bogus_input, myproc,convert_uv2fd, &
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &
       print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
       use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity, &
-      filename_len, t0, max_airep_input, max_bogus_input, &
+      filename_len, t0, max_airep_input, max_bogus_input, max_ssmi_rv_input, &
       max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &
       max_airsr_input, max_polaramv_input, max_radar_input, &
       max_profiler_input, max_sound_input, max_ships_input, &

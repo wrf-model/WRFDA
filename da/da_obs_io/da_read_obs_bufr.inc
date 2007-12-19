@@ -25,9 +25,9 @@ subroutine da_read_obs_bufr (iv, filename)
    real                  :: time,woe,qob,toe,qoe,poe,pob,tob,zob,rob,roe
 
    integer               :: iost, ndup, n, i, j, k, surface_level, report
-   integer               :: iret, idate, kx, nlevels, nrecs,miscd, t29, jx, ix
+   integer               :: iret, idate, kx, old_nlevels,nlevels, nrecs,miscd, t29, jx, ix
    integer               :: cat,zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
-   integer               :: iunit
+   integer               :: iunit, fm , obs_index
 
    integer, parameter    :: qflag=4         ! Flag for retaining data
    equivalence     (hdr(1), c8id)
@@ -172,18 +172,6 @@ subroutine da_read_obs_bufr (iv, filename)
       call ufbint(iunit,obs,9,255,nlevels,obstr)
       call ufbint(iunit,qms,9,255,nlevels,qmstr)
       call ufbint(iunit,oes,9,255,nlevels,oestr)
-      if (c8id(1:5) .eq. 'RJOR ') then
-         ! if (kx .eq. 180) then
-         write(unit=stdout,fmt=*) 'report, ',c8id(1:5),' typ = ',kx, &
-            ' nlevels = ',nlevels
-         do ix = 1,nlevels
-            write(unit=stdout,fmt='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
-            write(unit=stdout,fmt='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
-            write(unit=stdout,fmt=*) 'PMO = ',pmo(1,1)
-         end do
-         !    kx = 180
-         ! end if
-      end if
 
       ! WHY?
       ! no need for balloon drift
@@ -309,6 +297,7 @@ subroutine da_read_obs_bufr (iv, filename)
             platform % each (k) % v % error =woe
 
             ! Convert earth wind to model wind.
+!            if( kx /= 283 .and. kx /= 152) &     ! skip SSMI speed or TPW
             call da_earth_2_model_wind(obs(5,k), obs(6,k), &
                platform % each (k) % u % inv, &
                platform % each (k) % v % inv, &
@@ -414,23 +403,25 @@ subroutine da_read_obs_bufr (iv, filename)
                platform%loc%dy, platform%loc%dym
          end if
       end if
-
       dup_loop: do n = 1, ndup
          select case(t29)
          case (11, 12, 13, 22, 23, 31)
             select case (kx)
             case (120, 122, 132, 220, 222, 232) ;         ! Sound
-               ntotal(sound)     = ntotal(sound) + 1
-               ntotal(sonde_sfc) = ntotal(sonde_sfc) + 1
+               if (.not.use_soundobs) cycle reports
+               if( n==1 ) ntotal(sound)     = ntotal(sound) + 1
+               if( n==1 ) ntotal(sonde_sfc) = ntotal(sonde_sfc) + 1
                if (outside) then
                   cycle reports
                end if
 
-               if (.not.use_soundobs) cycle reports
-
+        
                platform  % info % platform ='FM-35 TEMP'
                nlocal(sound)     = nlocal(sound) + 1
                nlocal(sonde_sfc) = nlocal(sonde_sfc) + 1
+               if (nlocal(sound) > iv%info(sound)%nlocal) cycle reports
+               fm = 35
+               old_nlevels = nlevels
                ! Track serial obs index for reassembly of obs during 
                ! bit-for-bit tests with different numbers of MPI tasks.
 
@@ -480,7 +471,7 @@ subroutine da_read_obs_bufr (iv, filename)
                allocate (iv%sound(nlocal(sound))%q (1:nlevels))
 
                j = 0
-               do i = 1, nlevels
+               do i = 1, old_nlevels
                   if (i == surface_level) cycle
 
                   j=j+1
@@ -494,13 +485,15 @@ subroutine da_read_obs_bufr (iv, filename)
                end do
 
             case (221) ;           ! Pilot 
-               ntotal(pilot) = ntotal(pilot) + 1
+               if (.not.use_pilotobs) cycle reports
+               if( n==1 ) ntotal(pilot) = ntotal(pilot) + 1
                if (outside) then
                   cycle reports
                end if
 
-               if (.not.use_pilotobs) cycle reports
                   nlocal(pilot) = nlocal(pilot) + 1
+                  if (nlocal(pilot) > iv%info(pilot)%nlocal) cycle reports
+                  fm = 32
                   ! Track serial obs index for reassembly of obs during 
                   ! bit-for-bit tests with different numbers of MPI tasks.
 
@@ -517,18 +510,19 @@ subroutine da_read_obs_bufr (iv, filename)
 
          case (41)
             ! case (130:131, 133, 230:231, 233) ; ! Airep
-            ntotal(airep) = ntotal(airep) + 1
+            if (.not.use_airepobs) cycle reports
+            if( n==1 ) ntotal(airep) = ntotal(airep) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_airepobs) cycle reports
 
             platform  % info % platform ='FM-97 AIREP'
             nlocal(airep) = nlocal(airep) + 1
+            if (nlocal(airep) > iv%info(airep)%nlocal) cycle reports
+            fm = 42
             ! Track serial obs index for reassembly of obs during 
             ! bit-for-bit tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ntotal(airep)
 
             allocate (iv % airep (nlocal(airep)) % h (1:nlevels))
             allocate (iv % airep (nlocal(airep)) % p (1:nlevels))
@@ -547,18 +541,19 @@ subroutine da_read_obs_bufr (iv, filename)
             ! case (180, 182, 280, 282) ;         ! Ships and  buoys
 
          case (522, 523);        ! Ships
-            ntotal(ships) = ntotal(ships) + 1
+            if (.not.use_shipsobs) cycle reports
+            if( n==1 ) ntotal(ships) = ntotal(ships) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_shipsobs) cycle reports
 
             platform  % info % platform ='FM-13 SHIP '
             nlocal(ships)  = nlocal(ships)  + 1
+            if (nlocal(ships) > iv%info(ships)%nlocal) cycle reports
+            fm = 13
             ! Track serial obs index for reassembly of obs during 
             ! bit-for-bit tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ntotal(ships)
 
             iv % ships (nlocal(ships)) % h = platform % each(1) % height
             iv % ships (nlocal(ships)) % u = platform % each(1) % u
@@ -570,15 +565,16 @@ subroutine da_read_obs_bufr (iv, filename)
             iv % ships (nlocal(ships)) % q = platform % each(1) % q
 
          case (531, 561, 562) ;          ! Buoy  
-            ntotal(buoy) = ntotal(buoy) + 1
+            if (.not.use_buoyobs) cycle reports
+            if( n==1 ) ntotal(buoy) = ntotal(buoy) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_buoyobs) cycle reports
             platform  % info % platform ='FM-18 BUOY '
             nlocal(buoy)  = nlocal(buoy)  + 1
-            platform%loc%obs_global_index = ntotal(buoy)
+            if (nlocal(buoy) > iv%info(buoy)%nlocal) cycle reports
+            fm = 18
 
             iv%buoy(nlocal(buoy))%h = platform%each(1)%height
             iv%buoy(nlocal(buoy))%u = platform%each(1)%u
@@ -588,19 +584,20 @@ subroutine da_read_obs_bufr (iv, filename)
             iv%buoy(nlocal(buoy))%q = platform%each(1)%q
 
          case (511)
+            if (.not.use_synopobs) cycle reports
             ! case (181, 281) ;                   ! Synop
 
-            ntotal(synop) = ntotal(synop) + 1
+            if( n==1 ) ntotal(synop) = ntotal(synop) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_synopobs) cycle reports
 
             platform  % info % platform ='FM-12 SYNOP'
 
             nlocal(synop)  = nlocal(synop)  + 1
-            platform%loc%obs_global_index = ntotal(synop)
+            if (nlocal(synop) > iv%info(synop)%nlocal) cycle reports
+            fm = 12
 
             iv % synop (nlocal(synop)) % h = platform % each(1) % height
             iv % synop (nlocal(synop)) % u = platform % each(1) % u
@@ -616,17 +613,18 @@ subroutine da_read_obs_bufr (iv, filename)
             end if
 
          case (512)
+            if (.not.use_metarobs) cycle reports
             ! case (187, 287) ;                        ! Metar
-            ntotal(metar) = ntotal(metar) + 1
+            if( n==1 ) ntotal(metar) = ntotal(metar) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_metarobs) cycle reports
 
             platform  % info % platform ='FM-15 METAR'
             nlocal(metar)  = nlocal(metar)  + 1
-            platform%loc%obs_global_index = ntotal(metar)
+            if (nlocal(metar) > iv%info(metar)%nlocal) cycle reports
+            fm = 15
 
             iv % metar (nlocal(metar)) % h = platform % each(1) % height
             iv % metar (nlocal(metar)) % u = platform % each(1) % u
@@ -636,16 +634,17 @@ subroutine da_read_obs_bufr (iv, filename)
             iv % metar (nlocal(metar)) % q = platform % each(1) % q
 
          case (63)
+            if (.not.use_geoamvobs) cycle reports
             ! case (242:246, 252:253, 255) ;         ! Geo. CMVs
-            ntotal(geoamv) = ntotal(geoamv) + 1
+            if( n==1 ) ntotal(geoamv) = ntotal(geoamv) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_geoamvobs) cycle reports
             platform  % info % platform ='FM-88 SATOB'
             nlocal(geoamv) = nlocal(geoamv) + 1  
-            platform%loc%obs_global_index = ntotal(geoamv)
+            if (nlocal(geoamv) > iv%info(geoamv)%nlocal) cycle reports
+            fm = 88
 
             allocate (iv%geoamv(nlocal(geoamv))%p (1:nlevels))
             allocate (iv%geoamv(nlocal(geoamv))%u (1:nlevels))
@@ -659,14 +658,16 @@ subroutine da_read_obs_bufr (iv, filename)
             end do
 
          case (582)
-            ntotal(qscat) = ntotal(qscat) + 1
+            if (.not.use_qscatobs) cycle reports
+            if( n==1 ) ntotal(qscat) = ntotal(qscat) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_qscatobs) cycle reports
             platform  % info % platform ='FM-281 Quiks'
             nlocal(qscat) = nlocal(qscat)  + 1 
+            if (nlocal(qscat) > iv%info(qscat)%nlocal) cycle reports
+            fm = 281
 
             ! WHY?
             ! iv%qscat(nlocal(qscat))%h = platform%each(1)%height
@@ -679,26 +680,30 @@ subroutine da_read_obs_bufr (iv, filename)
             iv%qscat(nlocal(qscat))%v%error = max(platform%each(1)%v%error,1.0)
 
          case (583)       ! GPS PW
-            ntotal(gpspw) = ntotal(gpspw) + 1
+            if (.not.use_gpspwobs) cycle reports
+            if( n==1 ) ntotal(gpspw) = ntotal(gpspw) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_gpspwobs) cycle reports
             platform  % info % platform ='FM-111 GPSPW'
             nlocal(gpspw)  = nlocal(gpspw) + 1
+            if (nlocal(gpspw) > iv%info(gpspw)%nlocal) cycle reports
+            fm = 111
 
             iv%gpspw(nlocal(gpspw))%tpw  = platform%loc%pw
 
          case (584)       ! GPS REF
-            ntotal(gpsref) = ntotal(gpsref) + 1
+            if (.not.use_gpsrefobs) cycle reports
+            if( n==1 ) ntotal(gpsref) = ntotal(gpsref) + 1
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_gpsrefobs) cycle reports
             platform  % info % platform ='FM-116 GPSRF'
             nlocal(gpsref)  = nlocal(gpsref) + 1
+            if (nlocal(gpsref) > iv%info(gpsref)%nlocal) cycle reports
+            fm = 116
 
             allocate (iv%gpsref(nlocal(gpsref))%h (1:nlevels))
             allocate (iv%gpsref(nlocal(gpsref))%ref(1:nlevels))
@@ -718,14 +723,16 @@ subroutine da_read_obs_bufr (iv, filename)
 
          case (71, 72)
             ! case (223, 224 )        ;         !  Profiler & VADWND - NEXRAD winds    
-            ntotal(profiler) = ntotal(profiler)
+            if (.not.use_profilerobs) cycle reports
+            if( n==1 ) ntotal(profiler) = ntotal(profiler)
             if (outside) then
                cycle reports
             end if
 
-            if (.not.use_profilerobs) cycle reports
             platform  % info % platform ='FM-132 PRFLR'
             nlocal(profiler) = nlocal(profiler) + 1
+            if (nlocal(profiler) > iv%info(profiler)%nlocal) cycle reports
+            fm = 132
             ! Track serial obs index for reassembly of obs during bit-for-bit
             ! tests with different numbers of MPI tasks.  
 
@@ -739,11 +746,60 @@ subroutine da_read_obs_bufr (iv, filename)
                iv%profiler(nlocal(profiler))%v(i) = platform%each(i)%v
             end do
 
+         case (571, 65)   ! SSM/I wind speed & TPW
+            if (.not. use_ssmiretrievalobs) cycle reports
+            if( n==1 ) ntotal(ssmi_rv) = ntotal(ssmi_rv) + 1
+            if (outside) then
+               cycle reports
+            end if
+
+            nlocal(ssmi_rv)  = nlocal(ssmi_rv) + 1
+            if (nlocal(ssmi_rv) > iv%info(ssmi_rv)%nlocal) cycle reports
+            platform  % info % platform ='FM-125 SSMI'
+            fm = 125
+            select case (kx)
+             case ( 283)
+!------------------
+!          write(unit=stdout,fmt=*) 'report, ',c8id(1:5),' typ = ',kx, &
+!            ' nlevels = ',nlevels
+!          do ix = 1,nlevels
+!            write(unit=stdout,fmt='(a5,2x,6(f10.4,2x))')c8id(1:5), (hdr(jx),jx=2,7)
+!            write(unit=stdout,fmt='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
+!            write(unit=stdout,fmt='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
+!            write(unit=stdout,fmt=*) 'PMO = ',pmo(1,1)
+!          end do
+!------------------
+            do i = 1, nlevels
+              iv%ssmi_rv(nlocal(ssmi_rv))%speed  = platform%each(i)%u
+              iv%ssmi_rv(nlocal(ssmi_rv))%speed%inv  = sqrt ( &
+                platform%each(i)%u%inv * platform%each(i)%u%inv + & 
+                platform%each(i)%v%inv * platform%each(i)%v%inv  )
+              iv%ssmi_rv(nlocal(ssmi_rv))%tpw    = platform%loc%pw
+            end do
+             case ( 152 )
+!------------------
+!          write(unit=stdout,fmt=*) 'report, ',c8id(1:5),' typ = ',kx, &
+!            ' nlevels = ',nlevels
+!          do ix = 1,nlevels
+!            write(unit=stdout,fmt='(a5,2x,6(f10.4,2x))')c8id(1:5), (hdr(jx),jx=2,7)
+!            write(unit=stdout,fmt='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
+!            write(unit=stdout,fmt='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
+!            write(unit=stdout,fmt=*) 'PMO = ',pmo(1,1)
+!          end do
+!------------------
+            do i = 1, nlevels
+              iv%ssmi_rv(nlocal(ssmi_rv))%speed  = platform%each(i)%u
+              iv%ssmi_rv(nlocal(ssmi_rv))%tpw    = platform%loc%pw
+            end do
+             case default
+               exit dup_loop
+             end select  
+
          case default 
             select case (kx)
             case (111 , 210)    ;         !  Tropical Cyclone Bogus
                ! Note Tropical cyclone Bougus is given type 135 in Obs-ascii
-               ntotal(bogus) = ntotal(bogus) + 1
+               if( n==1 ) ntotal(bogus) = ntotal(bogus) + 1
                if (outside) then
                   cycle reports
                end if
@@ -751,9 +807,9 @@ subroutine da_read_obs_bufr (iv, filename)
                if (.not.use_bogusobs) cycle reports
                platform  % info % platform ='FM-135 TCBOG'
                nlocal(bogus) = nlocal(bogus) + 1
+               fm = 135
                ! Track serial obs index for reassembly of obs during bit-for-bit
                ! tests with different numbers of MPI tasks.  
-               platform%loc%obs_global_index = ntotal(bogus)
 
                if (nlocal(bogus) > max_bogus_input) then
                  write(unit=message(1),fmt='(A,I6,A,I6)') &
@@ -780,11 +836,64 @@ subroutine da_read_obs_bufr (iv, filename)
                iv%bogus(nlocal(bogus))%slp    = platform%loc%slp
 
             case default
-               write(unit=message(1), fmt='(a, i12)') &
-                  'unsaved obs found with type: ',kx
-               call da_warning(__FILE__,__LINE__,message(1:1))
+               exit dup_loop
             end select
          end select
+
+!   rizvi's add start
+         obs_index = fm_index(fm)
+         iv%info(obs_index)%name(nlocal(obs_index))      = platform%info%name
+         iv%info(obs_index)%platform(nlocal(obs_index))  = platform%info%platform
+         iv%info(obs_index)%id(nlocal(obs_index))        = platform%info%id
+         iv%info(obs_index)%date_char(nlocal(obs_index)) = platform%info%date_char
+         ! nlevels adjusted for some obs types so use that
+         iv%info(obs_index)%levels(nlocal(obs_index))    = nlevels
+         iv%info(obs_index)%lat(:,nlocal(obs_index))     = platform%info%lat
+         iv%info(obs_index)%lon(:,nlocal(obs_index))     = platform%info%lon
+         iv%info(obs_index)%elv(nlocal(obs_index))       = platform%info%elv
+         iv%info(obs_index)%pstar(nlocal(obs_index))     = platform%info%pstar
+
+         iv%info(obs_index)%slp(nlocal(obs_index))           = platform%loc%slp
+         iv%info(obs_index)%pw(nlocal(obs_index))            = platform%loc%pw
+         iv%info(obs_index)%x(:,nlocal(obs_index))           = platform%loc%x
+         iv%info(obs_index)%y(:,nlocal(obs_index))           = platform%loc%y
+         iv%info(obs_index)%i(:,nlocal(obs_index))           = platform%loc%i
+         iv%info(obs_index)%j(:,nlocal(obs_index))           = platform%loc%j
+         iv%info(obs_index)%dx(:,nlocal(obs_index))          = platform%loc%dx
+         iv%info(obs_index)%dxm(:,nlocal(obs_index))         = platform%loc%dxm
+         iv%info(obs_index)%dy(:,nlocal(obs_index))          = platform%loc%dy
+         iv%info(obs_index)%dym(:,nlocal(obs_index))         = platform%loc%dym
+         iv%info(obs_index)%proc_domain(:,nlocal(obs_index)) = platform%loc%proc_domain
+
+         iv%info(obs_index)%obs_global_index(nlocal(obs_index)) = ntotal(obs_index)
+         ! special case for sonde_sfc, duplicate sound info
+         if (obs_index == sound) then
+
+            iv%info(sonde_sfc)%name(nlocal(sonde_sfc))      = platform%info%name
+            iv%info(sonde_sfc)%platform(nlocal(sonde_sfc))  = platform%info%platform
+            iv%info(sonde_sfc)%id(nlocal(sonde_sfc))        = platform%info%id
+            iv%info(sonde_sfc)%date_char(nlocal(sonde_sfc)) = platform%info%date_char
+            iv%info(sonde_sfc)%levels(nlocal(sonde_sfc))    = 1
+            iv%info(sonde_sfc)%lat(:,nlocal(sonde_sfc))     = platform%info%lat
+            iv%info(sonde_sfc)%lon(:,nlocal(sonde_sfc))     = platform%info%lon
+            iv%info(sonde_sfc)%elv(nlocal(sonde_sfc))       = platform%info%elv
+            iv%info(sonde_sfc)%pstar(nlocal(sonde_sfc))     = platform%info%pstar
+
+            iv%info(sonde_sfc)%slp(nlocal(sonde_sfc))           = platform%loc%slp
+            iv%info(sonde_sfc)%pw(nlocal(sonde_sfc))            = platform%loc%pw
+            iv%info(sonde_sfc)%x(:,nlocal(sonde_sfc))           = platform%loc%x
+            iv%info(sonde_sfc)%y(:,nlocal(sonde_sfc))           = platform%loc%y
+            iv%info(sonde_sfc)%i(:,nlocal(sonde_sfc))           = platform%loc%i
+            iv%info(sonde_sfc)%j(:,nlocal(sonde_sfc))           = platform%loc%j
+            iv%info(sonde_sfc)%dx(:,nlocal(sonde_sfc))          = platform%loc%dx
+            iv%info(sonde_sfc)%dxm(:,nlocal(sonde_sfc))         = platform%loc%dxm
+            iv%info(sonde_sfc)%dy(:,nlocal(sonde_sfc))          = platform%loc%dy
+            iv%info(sonde_sfc)%dym(:,nlocal(sonde_sfc))         = platform%loc%dym
+            iv%info(sonde_sfc)%proc_domain(:,nlocal(sonde_sfc)) = platform%loc%proc_domain
+
+            iv%info(sonde_sfc)%obs_global_index(nlocal(sonde_sfc)) = ntotal(sonde_sfc)
+         end if
+!rizvi add ends
 
          if (global .and. n < 2) then
            if (test_wrfvar) exit dup_loop
@@ -808,5 +917,3 @@ subroutine da_read_obs_bufr (iv, filename)
 #endif
 
 end subroutine da_read_obs_bufr
-
-
