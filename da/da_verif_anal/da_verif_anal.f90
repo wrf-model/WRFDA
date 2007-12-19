@@ -291,6 +291,7 @@ program da_verif_anal !---------------------------------------------------------
 
            verif_file = trim(verif_dirs(iexp))//'/'//pdate//'/'//trim(filename)
 
+
 !  Get the dimensions of the both files and check
            call get_dimensions(control_file,nx1,ny1,nz1)
            call get_dimensions(verif_file,nx2,ny2,nz2)
@@ -1376,7 +1377,7 @@ program da_verif_anal !---------------------------------------------------------
   real, intent(in), dimension(:,:)    :: profile
   integer, intent(in), dimension(:)   :: counter
   character (len=10), intent(in)      :: date
-  write(out_unit,fmt='(a10,1x,100(i5,1x,3(f14.8,1x)))') date,  &
+  write(out_unit,fmt='(a10,1x,100(i8,1x,3(f14.8,1x)))') date,  &
                               (counter(k), (profile(i,k),i=1,nscore),k=1,nlevel)
 
   end subroutine write_profile
