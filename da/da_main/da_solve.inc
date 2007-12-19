@@ -235,6 +235,9 @@ subroutine da_solve ( grid , config_flags)
       ! [8.0] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
 
+      if (num_fgat_time > 1) then ! Make sure that the firstguess is used in calculation of analysis
+         call da_med_initialdata_input( grid , config_flags, 'fg01')
+      end if
       call da_transfer_xatoanalysis (it, xbx, grid, config_flags)
    end do
 
