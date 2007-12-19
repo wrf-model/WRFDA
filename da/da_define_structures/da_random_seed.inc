@@ -6,14 +6,26 @@ subroutine da_random_seed
 
    implicit none
 
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
+
    integer              :: seed_size
    integer, allocatable :: seed_array(:)
+
+   integer :: myproc,ierr
 
    if (trace_use) call da_trace_entry("da_random_seed")
 
    !----------------------------------------------------------------------------
    !  Check that right seed_size is being used:
    !----------------------------------------------------------------------------
+
+   myproc=0
+#ifdef DM_PARALLEL
+   call wrf_get_dm_communicator (comm)
+   call mpi_comm_rank (comm, myproc, ierr)
+#endif
 
    call random_seed(size=seed_size)              ! Get size of seed array.
    allocate(seed_array(1:seed_size))
@@ -26,9 +38,9 @@ subroutine da_random_seed
       end if
      
       seed_array(1) = seed_array1
-      seed_array(2) = seed_array2
-      write(unit=stdout,fmt='(a,i16)')' Setting seed_array(1) = ', seed_array1
-      write(unit=stdout,fmt='(a,i16)')' Setting seed_array(2) = ', seed_array2
+      seed_array(2) = seed_array2 + myproc*10000000
+      write(unit=stdout,fmt='(a,i16)')' Setting seed_array(1) = ', seed_array(1)
+      write(unit=stdout,fmt='(a,i16)')' Setting seed_array(2) = ', seed_array(2)
       call random_seed(put=seed_array(1:seed_size)) ! Set random seed.
    else                                 ! Random seed set "randomly"
       call random_seed

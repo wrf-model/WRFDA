@@ -194,6 +194,11 @@ subroutine da_solve ( grid , config_flags)
 
       !------------------------------------------------------------------------
 
+      ! reset cv to random noise
+      if (anal_type_randomcv) then
+         call da_set_randomcv (cv_size, xhat)
+      end if
+
       ! [8.5] Update latest analysis solution:
 
       call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)

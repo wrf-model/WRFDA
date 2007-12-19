@@ -55,6 +55,7 @@ module da_wrfvar_top
    use da_transfer_model, only : da_transfer_xatoanalysis,da_setup_firstguess
    use da_vtox_transforms, only : da_transform_vtox
    use da_wrfvar_io, only : da_med_initialdata_input, da_med_initialdata_output
+   use da_tools, only : da_set_randomcv
 
 #ifdef CRTM
    use module_radiance, only : crtm_destroy
