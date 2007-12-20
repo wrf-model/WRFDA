@@ -33,7 +33,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
    if (trace_use) call da_trace_entry("da_check_xtoy_adjoint")
 
-   write (unit=stdout, fmt='(/a)') ' da_check_xtoy_adjoint: Adjoint Test Results:'
+   write (unit=stdout, fmt='(/a/)') 'da_check_xtoy_adjoint: Test Results:'
 
    !----------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -367,18 +367,19 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    !  [7.0] Print output:
    !----------------------------------------------------------------------
    
-   write (unit=stdout, fmt='(A,1pe22.14)') &
-      ' Tile < y, y     > = ', pertile_lhs, &
-      ' Tile < x, x_adj > = ', pertile_rhs
+   write (unit=stdout, fmt='(A,1pe22.14)') ' Single Domain < y, y     > = ', pertile_lhs
+   write (unit=stdout, fmt='(A,1pe22.14)') ' Single Domain < x, x_adj > = ', pertile_rhs
 
    adj_ttl_lhs = wrf_dm_sum_real (partial_lhs)
    adj_ttl_rhs = wrf_dm_sum_real (partial_rhs)
    
    if (rootproc) then
+      write(unit=stdout, fmt='(/)')
       write (unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write (unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    end if
 
+   write (unit=stdout, fmt='(/a/)') 'da_check_xtoy_adjoint: Test Finished:'
    if (trace_use) call da_trace_exit("da_check_xtoy_adjoint")
    
 end subroutine da_check_xtoy_adjoint

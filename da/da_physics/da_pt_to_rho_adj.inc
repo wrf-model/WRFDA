@@ -24,7 +24,7 @@ subroutine da_pt_to_rho_adj(grid)
    ie = ite
    je = jte
 
-   if (test_wrfvar) then
+   if (test_transforms) then
       is = its-1
       js = jts-1
 

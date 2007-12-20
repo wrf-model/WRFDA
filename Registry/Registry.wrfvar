@@ -648,7 +648,6 @@ rconfig   logical   trace_csv               namelist,wrfvar9  1  .true.    - "tr
 rconfig   logical   use_html                namelist,wrfvar9  1  .true.    - "use_html"                ""  ""
 rconfig   logical   warnings_are_fatal      namelist,wrfvar9  1  .false.   - "warnings_are_fatal"      ""  ""
 
-rconfig   logical   test_wrfvar             namelist,wrfvar10  1  .false.  - "test_wrfvar"             ""  ""  
 rconfig   logical   test_transforms         namelist,wrfvar10  1  .false.  - "test_transforms"         ""  ""  
 rconfig   logical   test_statistics         namelist,wrfvar10  1  .false.  - "test_statistics"         ""  ""  
 rconfig   logical   interpolate_stats       namelist,wrfvar10  1  .true.   - "interpolate_stats"       ""  ""  

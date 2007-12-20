@@ -829,7 +829,7 @@ subroutine da_read_obs_ascii (iv, filename)
          end if
 
          if (global .and. n < 2) then
-            if (test_wrfvar) exit dup_loop
+            if (test_transforms) exit dup_loop
             if (platform%loc % i >= ide) then
                platform%loc%i = platform%loc % i - ide
             else if (platform%loc % i < ids) then

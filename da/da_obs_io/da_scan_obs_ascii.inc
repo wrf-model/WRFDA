@@ -174,7 +174,7 @@ subroutine da_scan_obs_ascii (iv, filename)
       ndup = 1
       if (global .and. (platform%loc%i < ids .or. platform%loc%i >= ide)) ndup= 2
 
-      if (test_wrfvar) ndup = 1
+      if (test_transforms) ndup = 1
 
       obs_index = fm_index(fm)
       

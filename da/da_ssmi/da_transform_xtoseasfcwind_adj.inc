@@ -21,7 +21,7 @@ subroutine da_transform_xtoseasfcwind_adj(grid)
    ie = ite
    je = jte
 
-   if (test_wrfvar) then
+   if (test_transforms) then
       is = its-1
       js = jts-1
 

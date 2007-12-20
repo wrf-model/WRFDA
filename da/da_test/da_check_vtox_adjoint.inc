@@ -109,15 +109,16 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
    !-------------------------------------------------------------------------
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
+      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='(a,1pe22.14)') &
+         'Single Domain: < x, x >     = ', adj_par_lhs, &
+         'Single Domain: < v_adj, v > = ', adj_par_rhs
 
    if (global) then
       adj_sum_rhs = adj_par_rhs
    else
       adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    end if
-   write (unit=stdout,fmt='(A,2F15.2)') &
-      'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
-      adj_sum_lhs,adj_sum_rhs
 
    if (rootproc) then
       write(unit=stdout, fmt='(/)')

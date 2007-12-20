@@ -32,7 +32,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
 
    one_third = 1.0 / 3.0
 
-   if (test_wrfvar) then
+   if (test_transforms) then
       is = its; ie = ite; js = jts; je = jte
    else
       is = its - 1; ie = ite + 1; js = jts - 1; je = jte + 1
@@ -102,7 +102,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
          ! This is only for adjoint, as we have to cross the processor boundary
          ! to get the contribution.
 
-         if (.not. test_wrfvar) then
+         if (.not. test_transforms) then
             grid%xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
 #ifdef DM_PARALLEL
 #include "HALO_2D_WORK.inc"

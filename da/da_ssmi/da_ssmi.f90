@@ -12,7 +12,7 @@ module da_ssmi
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, max_error_thickness, mkz, &
       max_error_rh,max_error_tb, max_error_pw, trace_use_dull, &
-      test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
+      test_transforms,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
       global, print_detail_obs, max_ssmi_rv_input, max_ssmi_tb_input, &
       its,ite,jts,jte,kts,kte,kms,kme,ids,ide,jds,jde, &
       ssmi_tb, ssmi_rv, num_ob_indexes, ssmt1, ssmt2

@@ -173,7 +173,7 @@ subroutine da_solve ( grid , config_flags)
 
       call da_get_innov_vector (it, ob, iv, grid , config_flags)
 
-      if (test_transforms .or. test_wrfvar) then
+      if (test_transforms) then
          call da_check (grid, config_flags, cv_size, xbx, be, grid%ep, iv, &
             grid%vv, grid%vp, y)
          if (var4d) then

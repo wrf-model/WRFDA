@@ -70,10 +70,16 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xbx, be, cv, vv)
    ! [5.0] Print output:
    !----------------------------------------------------------------------
 
-   if (.not. global) then
+   if (.not. global ) then
+    if( num_procs == 1) then
       write(unit=stdout, fmt='(a,1pe22.14)') &
          'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
          'Single Domain: < cv_adj, cv > = ', adj_par_rhs
+    else
+      write(unit=stdout, fmt='(/a/,a/)')&
+        'It is Multi Processor Run: ',&
+        'For Single Domain: da_check_cvtovv_adjoint Test: Not Performed'
+    endif
    end if
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
@@ -84,11 +90,8 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xbx, be, cv, vv)
       adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    end if  
 
-   write(unit=stdout,fmt='(A,2F12.2)') &
-      'TEST_COVERAGE_da_check_cvtovv_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
-      adj_sum_lhs,adj_sum_rhs
    if (rootproc) then
-      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='/')
       write(unit=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
            'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs

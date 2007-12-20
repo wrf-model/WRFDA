@@ -5,7 +5,7 @@ module da_dynamics
    !---------------------------------------------------------------------------
 
    use da_control, only : ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
-      gamma, gravity, ids,ide,jds,jde,kds,kde, global, test_wrfvar, &
+      gamma, gravity, ids,ide,jds,jde,kds,kde, global, test_transforms, &
       fg_format, fg_format_kma_global, balance_geo,balance_geocyc, fg_format_wrf, &
       balance_type, balance_cyc, gravity, convert_fd2uv, trace_use
    use module_domain, only : domain,xb_type

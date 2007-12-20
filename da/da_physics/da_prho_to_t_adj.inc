@@ -28,7 +28,7 @@ subroutine da_prho_to_t_adj(grid)
    js = jts
    je = jte
    
-   if (test_wrfvar) then
+   if (test_transforms) then
       is = its-1
       js = jts-1
 

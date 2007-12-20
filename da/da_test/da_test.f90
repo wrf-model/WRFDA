@@ -17,6 +17,7 @@ module da_test
    use mpi, only : mpi_sum
 #endif
 
+   use da_control, only : num_procs                                
    use module_domain, only : vp_type, xb_type, x_type, ep_type, &
       domain
    use module_state_description, only : dyn_em,dyn_em_tl,dyn_em_ad,p_a_qv

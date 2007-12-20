@@ -32,7 +32,6 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    ! [1.0] Initialise:
    !-------------------------------------------------------------------------
 
-   write(unit=stdout, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
    call da_zero_x(grid%xa)
 
@@ -58,22 +57,26 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    adj_par_rhs = sum(vp % v1(its:ite,jts:jte,:) * vp2_v1(its:ite,jts:jte,:))
    adj_par_rhs = sum(vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:)) + &
       adj_par_rhs
+   
+      write(unit=stdout, fmt='(/a/)') &
+          'da_check_da_psichi_to_uv_adjoint: Test Results:'
+      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='(a,1pe22.14)') &
+          'Single Domain: < u_v,     u_v         > = ', adj_par_lhs, &
+          'Single Domain: < psi_chi, psi_chi_adj > = ', adj_par_rhs
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
    adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
-   write(unit=stdout,fmt='(A,2F15.2)') &
-      'TEST_COVERAGE_da_check_vptox_adjoint A:  adj_sum_lhs,adj_sum_rhs = ', &
-      adj_sum_lhs,adj_sum_rhs
 
    if (rootproc) then
-      write(unit=stdout, fmt='(/a/)') &
-          ' da_check_da_psichi_to_uv: Adjoint Test Results:'
 
       write(unit=stdout, fmt='(/)')
       write(unit=stdout, fmt='(a,1pe22.14)') &
           'Whole  Domain: < u_v,     u_v         > = ', adj_sum_lhs, &
           'Whole  Domain: < psi_chi, psi_chi_adj > = ', adj_sum_rhs
    end if
+      write(unit=stdout, fmt='(/a/)') &
+          'da_check_da_psichi_to_uv_adjoint: Test Finished:'
 
    vp%v1(:,:,:) = vp2_v1(:,:,:)
    vp%v2(:,:,:) = vp2_v2(:,:,:)
@@ -192,9 +195,12 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
    adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
-   write (unit=stdout,fmt='(A,2E22.14)') &
-      'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', &
-      adj_sum_lhs,adj_sum_rhs
+
+   write(unit=stdout, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
+      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='(a,1pe22.14)') &
+         'Single Domain: < x, x >       = ', adj_par_lhs, &
+         'Single Domain: < vp_adj, vp > = ', adj_par_rhs
 
    if (rootproc) then
       write(unit=stdout, fmt='(/)')
@@ -210,8 +216,7 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    vp % v5(:,:,:) = vp2_v5(:,:,:)
    if (be % ne > 0) vp % alpha(:,:,:) = vp2_alpha(:,:,:)
 
-   write(unit=stdout, fmt='(/a/)') &
-        'End of da_check_vptox_adjoint.'
+   write(unit=stdout, fmt='(/a/)') 'da_check_vptox_adjoint: Test Finished:'
 
    if (trace_use) call da_trace_exit("da_check_vptox_adjoint")
       
