@@ -106,6 +106,11 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       call da_trace("da_transform_vtoy_adj","Finished da_run_wrfplus_ad.ksh")
 
       call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01')
+
+      if (num_fgat_time > 1) then ! Recover the firstguess fields touched by reading gr01
+         call da_med_initialdata_input( grid , config_flags, 'fg01')
+      end if
+
    else  ! var4d
       iv%time = 1
       iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1

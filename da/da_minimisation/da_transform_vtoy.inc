@@ -73,6 +73,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
          iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
          write(filnam,'(a2,i2.2)') 'tl',nobwin
+         call da_zero_x(grid%xa)
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoy(grid, iv, y)
       end do
