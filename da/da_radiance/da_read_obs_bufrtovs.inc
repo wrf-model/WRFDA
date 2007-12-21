@@ -189,7 +189,6 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    num_tovs_file     = 0    ! number of obs in file
    num_tovs_global   = 0    ! number of obs within whole domain
-   iv%info(radiance)%ptotal = 0 ! number of obs within whole domain in different time slots
    num_tovs_local    = 0    ! number of obs within tile
    num_tovs_thinned  = 0    ! number of obs rejected by thinning
    num_tovs_used     = 0    ! number of obs entered into innovation computation
@@ -399,7 +398,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
       iv%info(radiance)%ptotal(i) = iv%info(radiance)%ptotal(i) + iv%info(radiance)%ptotal(i-1) 
    end do
    if ( iv%info(radiance)%ptotal(num_fgat_time) /= iv%info(radiance)%ntotal ) then
-      write(unit=message(1),fmt='(A,I10,A)') &
+      write(unit=message(1),fmt='(A,I10,A,I10)') &
           "Number of ntotal:",iv%info(radiance)%ntotal," is different from the sum of ptotal:", iv%info(radiance)%ptotal(num_fgat_time)
       call da_warning(__FILE__,__LINE__,message(1:1))
    endif
