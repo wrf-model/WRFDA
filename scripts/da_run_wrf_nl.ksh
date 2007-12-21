@@ -17,6 +17,7 @@ cd $WORK_DIR/nl
 export G95_UNIT_ENDIAN_98=BIG
 
 if [[ $NUM_PROCS == 1 ]]; then
+   mv ../namelist.output ../namelist_wrfvar.output
    ./wrf.exe > wrf_nl.out 2>wrf_nl.error
 else
    if [[ $arg1 == "pre" ]]; then
