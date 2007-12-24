@@ -297,7 +297,7 @@ state    real   DZS             l        misc      -         Z     irh       "DZ
 
 state    real   SMOIS            ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
 state    real   SH2O             ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
-state    real   XICE             ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
+state    real   XICE             ij     misc        1         -     i0124rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
 
 state    real   SFCRUNOFF        ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "SFROFF"           "SURFACE RUNOFF"     "mm"
 state    real   UDRUNOFF         ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "UDROFF"           "UNDERGROUND RUNOFF" "mm"
@@ -473,9 +473,6 @@ state integer  STEPBL          -        misc        1         -      r        "S
                                                
 state   real   xkmv            ijk      misc        1         -     -         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ijk      misc        1         -     -         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
-state   real   xkmhd           ijk      misc        1         -     -         "xkmhd"                 "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
-state   real   a_xkmhd         ijk      misc        1         -     -         "a_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
-state   real   g_xkmhd         ijk      misc        1         -     -         "g_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
 state   real   xkhv            ijk      misc        1         -     -         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ijk      misc        1         -     -         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
 state  logical warm_rain        -       misc        1         -     -         "warm_rain"              "WARM_RAIN_LOGICAL"
@@ -1114,9 +1111,9 @@ halo      HALO_EM_INIT_4 dyn_em 48:h_diabatic,msftx,msfty,msfux,msfuy,msfvx,msfv
 halo      HALO_EM_INIT_5 dyn_em 48:moist,scalar
 halo      HALO_EM_A dyn_em  8:p
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
-halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:xkmv,xkmh,xkmhd,xkhv,xkhh
+halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:xkmv,xkmh,xkhv,xkhh
 halo      HALO_EM_TKE_A dyn_em 4:ph_2,phb
-halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,moist
+halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkhv,xkhh,moist
 halo      HALO_EM_B dyn_em 4:ph_2,p,t_1,mu_1,mu_2
 halo      HALO_EM_C dyn_em    4:u_2,v_2
 halo      HALO_EM_C2 dyn_em    4:ph_2,p,mu_2
