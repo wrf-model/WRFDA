@@ -9,7 +9,7 @@ export CC=gcc
 export CXX=g++
 export LOADER=g95
 
-export FFLAGS="-O2 -fno-second-underscore"
+export FFLAGS="-O2"
 export FCFLAGS=$FFLAGS
 export FCFLAGS_f90=$FCFLAGS
 

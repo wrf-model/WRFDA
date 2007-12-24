@@ -6,5 +6,6 @@ make clean
 rm -f *.a
 make g95
 rm *.o
+mkdir -p ../include
 cp *.mod ../include
 cp libCRTM.a ../libcrtm.a

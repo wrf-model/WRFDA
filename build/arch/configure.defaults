@@ -1069,9 +1069,9 @@ FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -Wno=101,155,158,159
 
-EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
+EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -DF2CSTYLE
 
 LOCAL_LIB       = -lSystemStubs
 
@@ -1106,9 +1106,9 @@ FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,112,136,155,158,159,165
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165
 
-EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -I/usr/include/sys
+EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -I/usr/include/sys -DF2CSTYLE
 
 LOCAL_LIB       = -lSystemStubs
 MPI_LIB         = -lrsl_lite
@@ -1141,9 +1141,9 @@ FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -Wno=101,155,158,159
 
-EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -I/usr/include/sys
+EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS -I/usr/include/sys -DF2CSTYLE
 CCOPTIM         = -O2
 
 LOCAL_LIB       = -lSystemStubs

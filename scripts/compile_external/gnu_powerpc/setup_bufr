@@ -2,7 +2,7 @@
 export AR="ar -ru"
 export FC=g95
 export CC=gcc
-export FCFLAGS="-O3 -r8 -fno-second-underscore"
+export FCFLAGS="-O3 -r8"
 export CCFLAGS="-O3 -DUNDERSCORE"
 rm -f *.o *.a
 $FC -c $FCFLAGS *.f
