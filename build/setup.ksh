@@ -69,8 +69,8 @@ fi
 if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}; then
    export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}; then
-   export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}
+if test -d ${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}; then
+   export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}
 fi
 if test -d ${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}; then
    export BLAS=${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}
