@@ -1,0 +1,94 @@
+# This Makefile.in created by simplemake.  Do not edit
+
+# @configure_input@
+
+# --------------------------------------------------------------------------
+all: all-redirect
+
+SHELL           = @SHELL@
+AR              = @AR@
+RANLIB          = @RANLIB@
+master_top_srcdir  = @master_top_srcdir@
+top_builddir    = @master_top_builddir@
+abs_builddir    = @abs_builddir@
+srcdir          = @srcdir@
+abs_srcdir      = @abs_srcdir@
+DEFS            = @DEFS@ -I. -I${srcdir}
+CPPFLAGS        = @CPPFLAGS@
+MAKE            = @MAKE@
+MPILIBNAME      = @MPILIBNAME@
+CC              = @CC@
+CFLAGS          = @CFLAGS@
+C_COMPILE       = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+LIBTOOL         = @LIBTOOL@
+CC_SHL          = @CC_SHL@
+C_COMPILE_SHL   = $(CC_SHL) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+
+VPATH = .:@srcdir@
+HEADERS = dataloop.h dataloop_parts.h dataloop_create.h ../mpid_dataloop.h  typesize_support.h
+INCLUDES = -I${srcdir}/.. -I${top_builddir}/src/include -I${master_top_srcdir}/src/include
+
+.SUFFIXES:
+.SUFFIXES: .o .lo .c 
+.c.o:
+	$(C_COMPILE) -c $<
+.c.lo:
+	$(C_COMPILE_SHL) -c $< -o _s$*.o
+	@mv -f _s$*.o $*.lo
+.c:
+	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
+apply: 
+	$(ACTION) $(ACTION_INPUT)
+clean: 
+	-@rm -f *.o ${srcdir}/*.o 
+	-@rm -f .libstamp0 .libstamp1 
+	-@rm -f *.lo ${srcdir}/*.lo
+distclean:  clean distclean-xxx remove-makefile
+distclean-xxx:
+	-@rm -f Makefile
+	-@rm -rf autom4te*.cache
+	-@rm -rf $(DEPS_DIR)
+	-@rm -f TAGS
+remove-makefile:
+	rm -f Makefile
+remove-genmakefiles:
+	rm -f  Makefile
+all-redirect: .libstamp0 ../../../../../lib/lib${MPILIBNAME}.a
+	@if [ "@ENABLE_SHLIB@" != "none" ] ; then \
+	    ${MAKE} .libstamp1 ; \
+	fi
+
+.libstamp0 ../../../../../lib/lib${MPILIBNAME}.a: dataloop.o segment.o \
+	segment_ops.o dataloop_create.o dataloop_create_contig.o \
+	dataloop_create_vector.o dataloop_create_blockindexed.o \
+	dataloop_create_indexed.o dataloop_create_struct.o \
+	dataloop_create_pairtype.o subarray_support.o darray_support.o 
+	${AR} cr ../../../../../lib/lib${MPILIBNAME}.a $?
+	${RANLIB} ../../../../../lib/lib${MPILIBNAME}.a
+	date > .libstamp0
+.libstamp1 ../../../../../lib/lib${MPILIBNAME}.la: dataloop.lo segment.lo \
+	segment_ops.lo dataloop_create.lo dataloop_create_contig.lo \
+	dataloop_create_vector.lo dataloop_create_blockindexed.lo \
+	dataloop_create_indexed.lo dataloop_create_struct.lo \
+	dataloop_create_pairtype.lo subarray_support.lo darray_support.lo 
+	${AR} cr ../../../../../lib/lib${MPILIBNAME}.la $?
+	date > .libstamp1
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+SOURCES         =  dataloop.c segment.c segment_ops.c dataloop_create.c \
+	dataloop_create_contig.c dataloop_create_vector.c \
+	dataloop_create_blockindexed.c dataloop_create_indexed.c \
+	dataloop_create_struct.c dataloop_create_pairtype.c \
+	subarray_support.c darray_support.c 
+ETAGS           = @ETAGS@ @ETAGSADD@
+HEADERFILES     = $(HEADERS)
+SOURCEFILES     = $(SOURCES)
+tags: TAGS
+TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
+	here=`cd ../../../../.. && pwd` ; cd ${srcdir} && $(ETAGS) -o $$here/TAGS --append ${HEADERFILES} ${SOURCEFILES}
+# --------------------------------------------------------------------------
+# INCLUDES = -I${srcdir} -I${srcdir}/.. -I../../../include -I${master_top_srcdir}/src/include
+
+FORCE_TARGET:
+

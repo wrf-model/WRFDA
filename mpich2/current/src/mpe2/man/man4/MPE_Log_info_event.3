@@ -1,0 +1,24 @@
+.TH MPE_Log_info_event 3 "8/5/2007" " " "MPE"
+.SH NAME
+MPE_Log_info_event \-  Logs an infomational event in MPI_COMM_WORLD. 
+.SH SYNOPSIS
+.nf
+int MPE_Log_info_event( int event, const char *bytebuf )
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B event   
+- event number.
+.PD 1
+.PD 0
+.TP
+.B bytebuf 
+- byte informational array.  If no byte inforamtional array,
+use MPE_Log_bare_event() instead.
+.PD 1
+
+.SH RETURNS
+alway returns MPE_LOG_OK
+.SH LOCATION
+../src/logging/src/mpe_log.c
