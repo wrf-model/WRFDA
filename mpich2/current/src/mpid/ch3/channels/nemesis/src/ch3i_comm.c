@@ -74,14 +74,14 @@ static int find_local_and_external (MPID_Comm *comm, int *local_size_p, int *loc
         nodes[i] = 0;
     
     external_size = 0;
-    my_node_id = comm->vcr[comm->rank]->ch.node_id;
+    my_node_id = ((MPIDI_CH3I_VC *)comm->vcr[comm->rank]->channel_private)->node_id;
     local_size = 0;
     local_rank = -1;
     external_rank = -1;
     
     for (i = 0; i < comm->remote_size; ++i)
     {
-        node_id = comm->vcr[i]->ch.node_id;
+        node_id = ((MPIDI_CH3I_VC *)comm->vcr[i]->channel_private)->node_id;
 
         /* build list of external processes */
         if (node_id == -1 || nodes[node_id] == 0)
@@ -165,10 +165,7 @@ int MPIDI_CH3I_comm_destroy (MPID_Comm *comm)
     if (comm->ch.external_size)
         MPIU_Free (comm->ch.external_ranks);
     
- fn_exit:
     return mpi_errno;
- fn_fail:
-    goto fn_exit;
 }
 
 #undef FUNCNAME
@@ -197,8 +194,6 @@ static int alloc_barrier_vars (MPID_Comm *comm, MPID_nem_barrier_vars_t **vars)
     
  fn_exit:
     return mpi_errno;
- fn_fail:
-    goto fn_exit;
 }
 
 #undef FUNCNAME
@@ -325,8 +320,6 @@ static int barrier (MPID_Comm *comm_ptr)
         /* do barrier between local and external */
         int external_rank = comm_ptr->ch.external_rank;
         int *external_ranks = comm_ptr->ch.external_ranks;
-        int src, dst, mask;
-        MPI_Comm comm = comm_ptr->handle;
         
         /* wait for local procs to reach barrier */
         if (local_size > 1)
@@ -394,10 +387,7 @@ int MPID_nem_barrier_vars_init (MPID_nem_barrier_vars_t *barrier_region)
             barrier_region[i].sig = 0;
         }
 
- fn_exit:
     return mpi_errno;
- fn_fail:
-    goto fn_exit;
 }
 
 #undef FUNCNAME
@@ -411,8 +401,5 @@ int MPID_nem_coll_barrier_init ()
 /*     mpi_errno = MPIDI_CH3I_comm_create (MPIR_Process.comm_world); */
 /*     if (mpi_errno) MPIU_ERR_POP (mpi_errno); */
     
- fn_exit:
     return mpi_errno;
- fn_fail:
-    goto fn_exit;
 }

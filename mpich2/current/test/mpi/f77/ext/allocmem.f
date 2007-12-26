@@ -4,6 +4,7 @@ C  (C) 2004 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
         program main
+        implicit none
         include 'mpif.h'
 C
 C This program makes use of a common (but not universal; g77 doesn't 

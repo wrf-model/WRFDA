@@ -1,10 +1,11 @@
 <dir>
-<file name="ismain.c" info="1165682546"/>
+<file name="ismain.c" info="1172516294"/>
 <file name="finalized.c" info="1165682546"/>
-<file name="init.c" info="1165682546"/>
-<file name="finalize.c" info="1162927094"/>
-<file name="querythread.c" info="1165682546"/>
-<file name="initthread.c" info="1165682546"/>
+<file name="init.c" info="1186174952"/>
+<file name="finalize.c" info="1170776094"/>
+<file name="initinfo.c" info="1184169998"/>
+<file name="querythread.c" info="1172516294"/>
+<file name="initthread.c" info="1186174952"/>
 <file name="mpi_init.h" info="1028668064"/>
 <file name="abort.c" info="1147102484"/>
 <file name="initialized.c" info="1165682546"/>
@@ -21,6 +22,8 @@ MPID_STATE_MPI_INIT MPI_Init
 </fileinfo>
 <fileinfo name="finalize.c">
 MPID_STATE_MPI_FINALIZE MPI_Finalize
+</fileinfo>
+<fileinfo name="initinfo.c">
 </fileinfo>
 <fileinfo name="querythread.c">
 MPID_STATE_MPI_QUERY_THREAD MPI_Query_thread

@@ -34,16 +34,16 @@ $key = q/fig:histogram_state_all_cumu_excl/;
 $ref_files{$key} = "$dir".q|node26.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_6/;
+$ref_files{$key} = "$dir".q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:convertor_init/;
 $ref_files{$key} = "$dir".q|node10.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_3/;
 $ref_files{$key} = "$dir".q|node6.html|; 
-$noresave{$key} = "$nosave";
-
-$key = q/fig:legend_sort_order/;
-$ref_files{$key} = "$dir".q|node11.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_state_infobox/;
@@ -70,6 +70,10 @@ $key = q/fig:timeline_search_preview_zoomed/;
 $ref_files{$key} = "$dir".q|node31.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_5/;
+$ref_files{$key} = "$dir".q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:convertor_progress/;
 $ref_files{$key} = "$dir".q|node10.html|; 
 $noresave{$key} = "$nosave";
@@ -78,8 +82,16 @@ $key = q/fig:convertor_done/;
 $ref_files{$key} = "$dir".q|node10.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_3/;
+$ref_files{$key} = "$dir".q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:timeline_preview_detail_2/;
 $ref_files{$key} = "$dir".q|node6.html|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_2/;
+$ref_files{$key} = "$dir".q|node34.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_arrow_infobox/;
@@ -102,6 +114,10 @@ $key = q/sub:Zoomable-and-Scrollable/;
 $ref_files{$key} = "$dir".q|node13.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_4/;
+$ref_files{$key} = "$dir".q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:histogram_mpi_overhead/;
 $ref_files{$key} = "$dir".q|node33.html|; 
 $noresave{$key} = "$nosave";
@@ -116,6 +132,10 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_1/;
 $ref_files{$key} = "$dir".q|node6.html|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:legend_sort_orders/;
+$ref_files{$key} = "$dir".q|node11.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:hand_open_cursor/;
@@ -176,6 +196,10 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_infobox_real_primitive/;
 $ref_files{$key} = "$dir".q|node20.html|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:pthread_sendrecv_legend/;
+$ref_files{$key} = "$dir".q|node34.html|; 
 $noresave{$key} = "$nosave";
 
 1;

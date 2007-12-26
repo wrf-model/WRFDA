@@ -31,7 +31,7 @@ PMPILIBNAME     = @PMPILIBNAME@
 
 VPATH = .:@srcdir@
 PACKAGE = mpich2
-VERSION = 1.0.5
+VERSION = 1.0.6
 MPICVSHOME = @MPICVSHOME@
 MODULE_DIRS = confdb src/util/thread src/mpi/romio src/mpe2 src/pm/smpd src/pm/mpd doc/notes 
 MPICXXLIBNAME = @MPICXXLIBNAME@
@@ -59,7 +59,7 @@ distclean-xxx:
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		if [ ! -s $$dir/Makefile ] ; then continue ; fi ;\
 		(cd $$dir && ${MAKE} distclean ; ) ; done
-	-@rm -f Makefile examples/f77/Makefile examples/f90/Makefile examples/cxx/Makefile doc/refman/Makefile doc/installguide/Makefile doc/userguide/Makefile doc/logging/Makefile doc/design/Makefile doc/smpd/Makefile doc/windev/Makefile config.status config.log config.cache *conf.cache config.system
+	-@rm -f Makefile mpich2-doxygen examples/f77/Makefile examples/f90/Makefile examples/cxx/Makefile doc/refman/Makefile doc/installguide/Makefile doc/userguide/Makefile doc/logging/Makefile doc/design/Makefile doc/smpd/Makefile doc/windev/Makefile config.status config.log config.cache *conf.cache config.system
 	-@rm -rf autom4te*.cache
 	-@rm -f src/include/mpichconf.h
 	-@rm -f test/Makefile test/util/Makefile test/basic/Makefile test/commands/Makefile test/commands/cmdtests test/mpid/Makefile test/mpid/ch3/Makefile doc/Makefile doc/mansrc/Makefile doc/mansrc/createhtmlindex
@@ -86,6 +86,10 @@ all-redirect: all-preamble
 	        echo "make lib/libf${MPILIBNAME}.@SHLIB_EXT@" ;\
 	        ${MAKE} lib/libf${MPILIBNAME}.@SHLIB_EXT@ ; \
 	    fi ; \
+	    if [ -s lib/lib${MPICXXLIBNAME}.la ] ; then \
+	        echo "make lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@" ;\
+	        ${MAKE} lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@ ; \
+	    fi ; \
 	fi
 	${MAKE} all-postamble
 
@@ -94,14 +98,17 @@ CFLAGS          = @CFLAGS@
 C_COMPILE       = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
 # Build the shared library from the shared object files
 lib/lib${MPILIBNAME}.@SHLIB_EXT@: lib/lib${MPILIBNAME}.la
-	(cd lib && $(CREATESHLIB) --mode=link -o lib${MPILIBNAME}.la  -rpath $(libdir) )
+	(cd lib && $(CREATESHLIB) --mode=link -version-info "@ABIVERSION@" -o lib${MPILIBNAME}.la  -rpath $(libdir) )
 	if [ -n "@NO_WEAK_SYM@" -a \
 		"${MPILIBNAME}" != "${PMPILIBNAME}" ] ; then \
-	(cd lib && $(CREATESHLIB) --mode=link -o lib${PMPILIBNAME}.la  -rpath $(libdir) );\
+	(cd lib && $(CREATESHLIB) --mode=link -version-info "@ABIVERSION@" -o lib${PMPILIBNAME}.la  -rpath $(libdir) );\
 	fi
 # Build the shared library from the shared object files
 lib/libf${MPILIBNAME}.@SHLIB_EXT@: lib/libf${MPILIBNAME}.la
-	(cd lib && $(CREATESHLIB) --mode=link -o libf${MPILIBNAME}.la  -rpath $(libdir) -L. -l$(MPILIBNAME))
+	(cd lib && $(CREATESHLIB) --mode=link -version-info "@ABIVERSION@" -o libf${MPILIBNAME}.la  -rpath $(libdir) -L. -l$(MPILIBNAME))
+# Build the shared library from the shared object files
+lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@: lib/lib${MPICXXLIBNAME}.la
+	(cd lib && $(CREATESHLIB) --mode=link -version-info "@ABIVERSION@" -o lib${MPICXXLIBNAME}.la  -rpath $(libdir) )
 
 # --------------------------------------------------------------------------
 .libstamp0: 
@@ -176,12 +183,14 @@ install:  install-preamble FORCE_TARGET
 	if [ -s lib/lib${MPILIBNAME}.@SHLIB_EXT@ ] ; then $(CREATESHLIB) --mode=install lib/lib${MPILIBNAME}.@SHLIB_EXT@ ${DESTDIR}${libdir}/lib${MPILIBNAME}.@SHLIB_EXT@ ; fi
 	if [ -s lib/lib${PMPILIBNAME}.@SHLIB_EXT@ ] ; then $(CREATESHLIB) --mode=install lib/lib${PMPILIBNAME}.@SHLIB_EXT@ ${DESTDIR}${libdir}/lib${PMPILIBNAME}.@SHLIB_EXT@ ; fi
 	if [ -s lib/libf${MPILIBNAME}.@SHLIB_EXT@ ] ; then $(CREATESHLIB) --mode=install lib/libf${MPILIBNAME}.@SHLIB_EXT@ ${DESTDIR}${libdir}/libf${MPILIBNAME}.@SHLIB_EXT@ ; fi
+	if [ -s lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@ ] ; then $(CREATESHLIB) --mode=install lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@ ${DESTDIR}${libdir}/lib${MPICXXLIBNAME}.@SHLIB_EXT@ ; fi
 	if [ -s $(srcdir)/doc/userguide/user.pdf ] ; then $(INSTALL_DATA) $(srcdir)/doc/userguide/user.pdf ${DESTDIR}${docdir}/user.pdf ; fi
 	if [ -s $(srcdir)/doc/installguide/install.pdf ] ; then $(INSTALL_DATA) $(srcdir)/doc/installguide/install.pdf ${DESTDIR}${docdir}/install.pdf ; fi
 	if [ -s $(srcdir)/doc/smpd/smpd_pmi.pdf ] ; then $(INSTALL_DATA) $(srcdir)/doc/smpd/smpd_pmi.pdf ${DESTDIR}${docdir}/smpd_pmi.pdf ; fi
 	if [ -s $(srcdir)/doc/logging/logging.pdf ] ; then $(INSTALL_DATA) $(srcdir)/doc/logging/logging.pdf ${DESTDIR}${docdir}/logging.pdf ; fi
 	(cd src/util/thread && $(MAKE) INSTALL_STRIP_FLAG=$(INSTALL_STRIP_FLAG) install)
 	(cd src/env && $(MAKE) INSTALL_STRIP_FLAG=$(INSTALL_STRIP_FLAG) install)
+	(cd src/pkgconfig && $(MAKE) INSTALL_STRIP_FLAG=$(INSTALL_STRIP_FLAG) install)
 	for dir in @bindings_dirs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ;\
 		(cd $$dir && $(MAKE) INSTALL_STRIP_FLAG=$(INSTALL_STRIP_FLAG) install) ;\
@@ -206,15 +215,16 @@ uninstall:
 	-rm -f ${DESTDIR}${libdir}/lib${MPILIBNAME}.@SHLIB_EXT@
 	-rm -f ${DESTDIR}${libdir}/lib${PMPILIBNAME}.@SHLIB_EXT@
 	-rm -f ${DESTDIR}${libdir}/libf${MPILIBNAME}.@SHLIB_EXT@
+	-rm -f ${DESTDIR}${libdir}/lib${MPICXXLIBNAME}.@SHLIB_EXT@
 	-rm -f ${DESTDIR}${docdir}/user.pdf
 	-rm -f ${DESTDIR}${docdir}/install.pdf
 	-rm -f ${DESTDIR}${docdir}/smpd_pmi.pdf
 	-rm -f ${DESTDIR}${docdir}/logging.pdf
-	for dir in src/util/thread src/env @bindings_dirs@ @other_install_dirs@ - ; do \
+	for dir in src/util/thread src/env src/pkgconfig @bindings_dirs@ @other_install_dirs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} uninstall ; ) ; done
 installcheck: 
-	for dir in src/util/thread src/env @bindings_dirs@ @other_install_dirs@ - ; do \
+	for dir in src/util/thread src/env src/pkgconfig @bindings_dirs@ @other_install_dirs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} installcheck ; ) ; done
 	${MAKE} installcheck-postamble
@@ -276,13 +286,18 @@ cleanobjsandlibs:
 # cleanlibs makes sure that we clean all of the library files
 cleanlibs:
 	rm -f lib/lib${MPILIBNAME}.a lib/lib${PMPILIBNAME}.a
-	rm -f lib/lib${MPILIBNAME}cxx.a 
-	rm -f lib/libf${MPILIBNAME}.a 
-	rm -f lib/lib${MPILIBNAME}.@SHLIB_EXT@* lib/lib${PMPILIBNAME}.@SHLIB_EXT@*
-	rm -f lib/lib${MPILIBNAME}cxx.@SHLIB_EXT@* 
+	rm -f lib/lib${MPICXXLIBNAME}.a 
+	rm -f lib/libf${MPILIBNAME}.a lib/lib${MPILIBNAME}f90.a
+	rm -f lib/lib${MPILIBNAME}.@SHLIB_EXT@* 
+	rm -f lib/lib${PMPILIBNAME}.@SHLIB_EXT@*
+	rm -f lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@* 
 	rm -f lib/libf${MPILIBNAME}.@SHLIB_EXT@* 
+	rm -f lib/lib${MPILIBNAME}.*.@SHLIB_EXT@* 
+	rm -f lib/lib${PMPILIBNAME}.*.@SHLIB_EXT@*
+	rm -f lib/lib${MPICXXLIBNAME}.*.@SHLIB_EXT@* 
+	rm -f lib/libf${MPILIBNAME}.*.@SHLIB_EXT@* 
 	rm -f lib/lib${MPILIBNAME}.la* lib/lib${PMPILIBNAME}.la*
-	rm -f lib/lib${MPILIBNAME}cxx.la* 
+	rm -f lib/lib${MPICXXLIBNAME}.la* 
 	rm -f lib/libf${MPILIBNAME}.la* 
 
 all-preamble:
@@ -365,10 +380,12 @@ dist-with-version:
 	( cd tmpdir/${PACKAGE}-${version}/src/pm && rm -rf forker rmpd ompd )
 	( cd tmpdir/$(PACKAGE)-$(version)/src/pm/mpd && rm -f Zeroconf.py)
 	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels && rm -rf ib rdma gasnet sshm)
-	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && rm -rf newtcp_module/* sctp_module/* ib_module/*)
+	( cd tmpdir/$(PACKAGE)-$(version)/src/pmi && rm -rf simple2)
+	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && rm -rf newtcp_module/* sctp_module/* ib_module/* psm_module/*)
 	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && \
 	echo "# Stub Makefile" > newtcp_module/Makefile.sm && \
 	echo "# Stub Makefile" > ib_module/Makefile.sm && \
+	echo "# Stub Makefile" > psm_module/Makefile.sm && \
 	echo "# Stub Makefile" > sctp_module/Makefile.sm )
 	( cd tmpdir/${PACKAGE}-${version} && rm -f ToDo* )
 	( cd tmpdir/${PACKAGE}-${version} && rm -rf archive )
@@ -405,6 +422,7 @@ dist-with-version:
 	    cp tmpdir2/doc/logging/logging.pdf tmpdir/${PACKAGE}-${version}/doc/logging/logging.pdf ; \
 	    cp tmpdir2/doc/windev/windev.pdf tmpdir/${PACKAGE}-${version}/doc/windev/windev.pdf ; \
 	    rm -rf tmpdir2 ; \
+	    ( cd tmpdir/${PACKAGE}-${version}/src/mpe2/maint && ${MAKE} -f Makefile4man ) ; \
 	fi
 	( cd tmpdir/${PACKAGE}-${version} && maint/updatefiles -distrib )
 	( cd tmpdir/${PACKAGE}-${version} && find . -name 'CVS' -print | \

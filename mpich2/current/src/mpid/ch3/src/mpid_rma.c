@@ -30,7 +30,7 @@ int MPID_Win_create(void *base, MPI_Aint size, int disp_unit, MPID_Info *info,
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -76,7 +76,7 @@ int MPID_Win_free(MPID_Win **win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -118,7 +118,7 @@ int MPID_Put(void *origin_addr, int origin_count, MPI_Datatype
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -163,7 +163,7 @@ int MPID_Get(void *origin_addr, int origin_count, MPI_Datatype
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -209,7 +209,7 @@ int MPID_Accumulate(void *origin_addr, int origin_count, MPI_Datatype
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -251,7 +251,7 @@ int MPID_Win_fence(int assert, MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -291,7 +291,7 @@ int MPID_Win_post(MPID_Group *group_ptr, int assert, MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -331,7 +331,7 @@ int MPID_Win_start(MPID_Group *group_ptr, int assert, MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -371,7 +371,7 @@ int MPID_Win_complete(MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -411,7 +411,7 @@ int MPID_Win_wait(MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -451,7 +451,7 @@ int MPID_Win_lock(int lock_type, int dest, int assert, MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -491,7 +491,7 @@ int MPID_Win_unlock(int dest, MPID_Win *win_ptr)
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -531,7 +531,7 @@ void *MPID_Alloc_mem( size_t size, MPID_Info *info_ptr )
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 
@@ -564,7 +564,7 @@ int MPID_Free_mem( void *ptr )
     /* Check to see if we need to setup channel-specific functions
        for handling the RMA operations */
     if (setupRMAFunctions) {
-	MPIDI_CH3_RMAFnsInit( &RMAFns );
+	MPIU_CALL(MPIDI_CH3,RMAFnsInit( &RMAFns ));
 	setupRMAFunctions = 0;
     }
 

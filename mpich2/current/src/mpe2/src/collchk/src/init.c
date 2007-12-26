@@ -43,10 +43,13 @@ int     COLLCHK_ERR_FILE_NOT_OPEN = 0;
 int MPI_Init(int * c, char *** v)
 {
     int ret;
+    int rank;
 
-    fprintf( stdout, "Starting MPI Collective and Datatype Checking!\n" );
     /* make the call */
     ret = PMPI_Init(c, v);
+    PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    if ( rank == 0 )
+        fprintf( stdout, "Starting MPI Collective and Datatype Checking!\n" );
 
     /* the main error class for all the errors */
     MPI_Add_error_class(&COLLCHK_ERRORS);

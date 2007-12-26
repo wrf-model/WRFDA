@@ -76,6 +76,39 @@ int smpd_parse_map_string(const char *str, smpd_map_drive_node_t **list)
     return SMPD_SUCCESS;
 }
 
+#ifdef HAVE_WINDOWS_H
+#undef FCNAME
+#define FCNAME "smpd_mapall"
+#define SMPD_MAP_NETWORKDRVSTRING_MAX   1024
+int smpd_mapall(smpd_map_drive_node_t **list){
+    char *smpd_map_string;
+    int success = 1;
+
+    smpd_enter_fn(FCNAME);
+    smpd_map_string = (char *)MPIU_Malloc(SMPD_MAP_NETWORKDRVSTRING_MAX);
+    if(!smpd_map_string){
+   		printf("Error: unable to allocate mem for mapping network drive\n");
+		smpd_exit_fn(FCNAME);
+		return SMPD_FAIL;
+    }
+    if(smpd_get_network_drives(smpd_map_string, SMPD_MAP_NETWORKDRVSTRING_MAX) == SMPD_SUCCESS){
+        if(smpd_parse_map_string(smpd_map_string, list) != SMPD_SUCCESS){
+   	    	printf("Error: unable to map network drive\n");
+            success = 0;
+        }
+    }else{
+   		printf("Error: unable to get network drives\n");
+        success = 0;
+    }
+    MPIU_Free(smpd_map_string);
+    smpd_exit_fn(FCNAME);
+    if(success)
+        return SMPD_SUCCESS;
+    else
+        return SMPD_FAIL;
+}
+#endif
+
 #undef FCNAME
 #define FCNAME "smpd_fix_up_host_tree"
 void smpd_fix_up_host_tree(smpd_host_node_t *node)

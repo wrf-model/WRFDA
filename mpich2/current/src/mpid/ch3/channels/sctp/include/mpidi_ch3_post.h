@@ -16,7 +16,7 @@
 #define MPIDI_CH3_EAGER_MAX_MSG_SIZE (64 * 1024)
 #endif
 
-
+#if 0
 /*
  * Channel level request management macros
  */
@@ -64,6 +64,7 @@ extern volatile unsigned int MPIDI_CH3I_progress_completion_count;
     }
 #endif
 
+#endif  /* if 0 */
 
 /*
  * CH3 Progress routines (implemented as macros for performanace)

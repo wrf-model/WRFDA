@@ -90,7 +90,9 @@ case "$enable_sharedlibs" in
     #C_LINK_SHL='${CC} -shared -Wl,-h,<finallibname>'
     # May need -fPIC 
     CC_SHL='${CC} -fpic'
-    C_LINKPATH_SHL="-Wl,-rpath -Wl,"
+    #C_LINKPATH_SHL="-Wl,-rpath -Wl,"
+    # More recent versions allow multiple args, separated by commas
+    C_LINKPATH_SHL="-Wl,-rpath,"
     SHLIB_EXT=so
     # We need to test that this isn't osx.  The following is a 
     # simple hack
@@ -177,7 +179,9 @@ dnl Other, such as solaris-cc
     linuxppc-xlc)
     # This is only the beginning of xlc support, thanks to andy@vpac.org
     CC_SHL='${CC} -qmkshrobj'
-    C_LINKPATH_SHL="-Wl,-rpath -Wl,"
+    # More recent versions allow multiple args, separated by commas
+    C_LINKPATH_SHL="-Wl,-rpath,"
+    #C_LINKPATH_SHL="-Wl,-rpath -Wl,"
     C_LINK_SHL='${CC} -shared -qmkshrobj'
     SHLIB_EXT=so
     # Note that the full line should be more like
@@ -265,6 +269,7 @@ AC_DEFUN(PAC_CC_SUBDIR_SHLIBS,[
         AC_SUBST(C_LINK_SHL)
         AC_SUBST(LIBTOOL)
         AC_SUBST(ENABLE_SHLIB)
+        AC_SUBST(SHLIB_EXT)
 	if test "$ENABLE_SHLIB" = "libtool" ; then
 	    if test -z "$LIBTOOL" ; then
 		AC_MSG_WARN([libtool selected for shared library support but LIBTOOL is not defined])

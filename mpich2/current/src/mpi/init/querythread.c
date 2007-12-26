@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: querythread.c,v 1.16 2006/12/09 16:42:26 gropp Exp $
+/*  $Id: querythread.c,v 1.17 2007/02/26 18:58:14 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -83,7 +83,7 @@ int MPI_Query_thread( int *provided )
 #   endif /* HAVE_ERROR_CHECKING */
     
     /* ... body of routine ...  */
-    *provided = MPIR_Process.thread_provided;
+    *provided = MPIR_ThreadInfo.thread_provided;
     /* ... end of body of routine ... */
 
 #ifdef HAVE_ERROR_CHECKING

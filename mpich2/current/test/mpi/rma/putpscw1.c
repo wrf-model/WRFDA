@@ -92,10 +92,10 @@ int main( int argc, char *argv[] )
 		       MPI routines */
 		    ;
 		}
+		MPI_Win_free( &win );
 		MTestFreeDatatype( &sendtype );
 		MTestFreeDatatype( &recvtype );
 		MPI_Group_free( &wingroup );
-		MPI_Win_free( &win );
 	    }
 	}
 	MTestFreeComm( &comm );

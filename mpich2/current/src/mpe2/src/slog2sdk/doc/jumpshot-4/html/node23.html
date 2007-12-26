@@ -1,9 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
-patched version by:  Kenshi Muto, Debian Project.
-* modified by:  Shige TAKENO
-LaTeX2HTML 2002-2-1 (1.70),
+<!--Converted with LaTeX2HTML 2002-2-1 (1.70)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -17,7 +14,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="distribution" CONTENT="global">
 
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="usersguide.css">
@@ -30,26 +27,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html446"
+<A NAME="tex2html460"
   HREF="node24.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html442"
+<A NAME="tex2html456"
   HREF="node12.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html436"
+<A NAME="tex2html450"
   HREF="node22.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html444"
+<A NAME="tex2html458"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html447"
+<B> Next:</B> <A NAME="tex2html461"
   HREF="node24.html">3.4.3 Y-Axis Label Panel</A>
-<B> Up:</B> <A NAME="tex2html443"
+<B> Up:</B> <A NAME="tex2html457"
   HREF="node12.html">3.4 Timeline Zoomable Window</A>
-<B> Previous:</B> <A NAME="tex2html437"
+<B> Previous:</B> <A NAME="tex2html451"
   HREF="node22.html">3.4.1.4.3 Time Info Box</A>
- &nbsp; <B>  <A NAME="tex2html445"
+ &nbsp; <B>  <A NAME="tex2html459"
   HREF="node2.html">Contents</A></B> 
 <BR>
 <BR>
@@ -61,14 +58,14 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P>
 The buttons in the toolbar of the Timeline window provide various
-basic services to the Timeline window. Table <A HREF="#table:timeline_toolbar">3.12</A>
+basic services to the Timeline window. Table <A HREF="#table:timeline_toolbar">3.14</A>
 contains the list of functionalities of the buttons found in the toolbar.
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="709"></A>
+<DIV ALIGN="CENTER"><A NAME="813"></A>
 <TABLE>
-<CAPTION><STRONG>Table 3.12:</STRONG>
+<CAPTION><STRONG>Table 3.14:</STRONG>
  Toolbar functionalities.</CAPTION>
 <TR><TD><TABLE CELLPADDING=3 BORDER="1">
 <TR><TD ALIGN="CENTER">Icon</TD>
@@ -80,7 +77,7 @@ Function
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Up24.png"
  ALT="Image Up24"></TD>
 <TD ALIGN="CENTER">Up</TD>
@@ -91,7 +88,7 @@ Scroll upward by half a screen
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Down24.png"
  ALT="Image Down24"></TD>
 <TD ALIGN="CENTER">Down</TD>
@@ -102,7 +99,7 @@ Scroll downward by half of a screen
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Edit24.png"
  ALT="Image Edit24"></TD>
 <TD ALIGN="CENTER">LabelMark</TD>
@@ -113,7 +110,7 @@ Mark the timeline(s)
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Paste24.png"
  ALT="Image Paste24"></TD>
 <TD ALIGN="CENTER">LabelMove</TD>
@@ -124,7 +121,7 @@ Move the marked timeline(s)
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Delete24.png"
  ALT="Image Delete24"></TD>
 <TD ALIGN="CENTER">LabelDelete</TD>
@@ -135,29 +132,32 @@ Delete the marked timeline(s)
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./TreeExpand24.png"
  ALT="Image TreeExpand24"></TD>
 <TD ALIGN="CENTER">LabelExpand</TD>
 <TD ALIGN="CENTER">Alt-E</TD>
 <TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=252>
 <DIV ALIGN="CENTER">
-Expand the y-axis tree label by 1 level
+Expand the y-axis tree label by 1 level. Useful in Process-Thread
+or Communicator-Thread view to expand each process timeline into multiple
+thread timelines in multi-threaded slog2 file.
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./TreeCollapse24.png"
  ALT="Image TreeCollapse24"></TD>
 <TD ALIGN="CENTER">LabelCollapse</TD>
 <TD ALIGN="CENTER">Alt-C</TD>
 <TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=252>
 <DIV ALIGN="CENTER">
-Collapse the y-axis tree label by 1 level
+Collapse the y-axis tree label by 1 level. Useful in collapsing multiple
+thread timelines into single process timeline.
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Backward24.png"
  ALT="Image Backward24"></TD>
 <TD ALIGN="CENTER">Backward</TD>
@@ -168,7 +168,7 @@ Scroll Backward by half a screen
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Forward24.png"
  ALT="Image Forward24"></TD>
 <TD ALIGN="CENTER">Forward</TD>
@@ -179,7 +179,7 @@ Scroll Forward by half a screen
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./WinUndo.png"
  ALT="Image WinUndo"></TD>
 <TD ALIGN="CENTER">ZoomUndo</TD>
@@ -190,7 +190,7 @@ Undo the previous zoom operation
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./ZoomOut24.png"
  ALT="Image ZoomOut24"></TD>
 <TD ALIGN="CENTER">ZoomOut</TD>
@@ -201,7 +201,7 @@ Zoom Out by 1 level in time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Home24.png"
  ALT="Image Home24"></TD>
 <TD ALIGN="CENTER">ZoomHome</TD>
@@ -212,7 +212,7 @@ Reset zoom to the initial resolution in time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./ZoomIn24.png"
  ALT="Image ZoomIn24"></TD>
 <TD ALIGN="CENTER">ZoomIn</TD>
@@ -223,7 +223,7 @@ Zoom In by 1 level in time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./WinRedo.png"
  ALT="Image WinRedo"></TD>
 <TD ALIGN="CENTER">ZoomRedo</TD>
@@ -234,7 +234,7 @@ Redo the previous zoom operation
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./FindBack24.png"
  ALT="Image FindBack24"></TD>
 <TD ALIGN="CENTER">SearchBackward</TD>
@@ -245,7 +245,7 @@ Search backward in time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Find24.png"
  ALT="Image Find24"></TD>
 <TD ALIGN="CENTER">SeachInitialize</TD>
@@ -256,7 +256,7 @@ Search initialization from last popup InfoBox's time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./FindFore24.png"
  ALT="Image FindFore24"></TD>
 <TD ALIGN="CENTER">SearchForward</TD>
@@ -267,7 +267,7 @@ Search forward in time
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Refresh24.png"
  ALT="Image Refresh24"></TD>
 <TD ALIGN="CENTER">CanvasReDraw</TD>
@@ -279,7 +279,7 @@ or y-axis label panel.
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Print24.png"
  ALT="Image Print24"></TD>
 <TD ALIGN="CENTER">Print</TD>
@@ -290,7 +290,7 @@ Print the Timeline window
 </DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="24" HEIGHT="24" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./Stop24.png"
  ALT="Image Stop24"></TD>
 <TD ALIGN="CENTER">Exit</TD>
@@ -311,26 +311,26 @@ Exit the Timeline window
 <P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html446"
+<A NAME="tex2html460"
   HREF="node24.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html442"
+<A NAME="tex2html456"
   HREF="node12.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html436"
+<A NAME="tex2html450"
   HREF="node22.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html444"
+<A NAME="tex2html458"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html447"
+<B> Next:</B> <A NAME="tex2html461"
   HREF="node24.html">3.4.3 Y-Axis Label Panel</A>
-<B> Up:</B> <A NAME="tex2html443"
+<B> Up:</B> <A NAME="tex2html457"
   HREF="node12.html">3.4 Timeline Zoomable Window</A>
-<B> Previous:</B> <A NAME="tex2html437"
+<B> Previous:</B> <A NAME="tex2html451"
   HREF="node22.html">3.4.1.4.3 Time Info Box</A>
- &nbsp; <B>  <A NAME="tex2html445"
+ &nbsp; <B>  <A NAME="tex2html459"
   HREF="node2.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

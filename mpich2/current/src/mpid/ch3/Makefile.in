@@ -31,7 +31,7 @@ distclean-xxx:
 	for dir in channels src util ; do \
 		if [ ! -s $$dir/Makefile ] ; then continue ; fi ;\
 		(cd $$dir && ${MAKE} distclean ; ) ; done
-	-@rm -f Makefile src/Makefile util/Makefile util/sock/Makefile util/shm/Makefile util/shmbase/Makefile channels/Makefile localdefs config.status config.log config.cache *conf.cache config.system
+	-@rm -f Makefile src/Makefile util/Makefile util/shm/Makefile util/shmbase/Makefile channels/Makefile localdefs config.status config.log config.cache *conf.cache config.system
 	-@rm -rf autom4te*.cache
 	-@rm -f include/mpidi_ch3_conf.h
 	-@rm -rf $(DEPS_DIR)

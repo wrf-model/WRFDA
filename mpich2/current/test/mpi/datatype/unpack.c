@@ -57,6 +57,7 @@ int main(int argc, char **argv)
     MPI_Type_commit(&tmp_dtype);
     MPI_Type_indexed(COUNT, blk_arr, dsp_arr,
                      tmp_dtype, &mem_dtype);
+    MPI_Type_free( &tmp_dtype );
     MPI_Type_commit(&mem_dtype);
 
     MPI_Type_size(mem_dtype, &mem_dtype_sz);

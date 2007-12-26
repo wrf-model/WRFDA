@@ -6,6 +6,8 @@ testing:
 	./runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=@MPIEXEC@ \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 #
 # The following are used to provide a target that is used to create a 

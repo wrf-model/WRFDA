@@ -110,15 +110,22 @@ if test -z "$PYTHON" ; then  ## user did not give us a python; find one
             continue
         fi
         
-        if test "$enable_totalview" = "yes" ; then
-            AC_MSG_CHECKING([that $pypgm has development tools for totalview])
-            if test -f /usr/lib/$pypgm/config/Makefile ; then
-                AC_MSG_RESULT(yes)
-            else
-                AC_MSG_RESULT(no)
-                continue
-            fi
-        fi
+dnl        if test "$enable_totalview" = "yes" ; then
+dnl             AC_MSG_CHECKING([that $pypgm has development tools for totalview])
+dnl             has_python_sdk=no
+dnl             for python_homedir in /usr/lib64 /usr/lib32 /usr/lib ; do
+dnl                 if test -f $python_homedir/$pypgm/config/Makefile ; then
+dnl                     has_python_sdk=yes
+dnl                     break
+dnl                 fi
+dnl             done
+dnl             if test "$has_python_sdk" = "yes" ; then
+dnl                 AC_MSG_RESULT(yes)
+dnl             else
+dnl                 AC_MSG_RESULT(no)
+dnl                 continue
+dnl             fi
+dnl        fi
 
         PYTHON="$pypgm"
         break
@@ -165,6 +172,11 @@ AC_CHECK_HEADERS(fcntl.h strings.h sys/time.h unistd.h stdlib.h sys/param.h)
 dnl Checks for library functions.
 # Checking library functions
 AC_CHECK_FUNCS(putenv socket)
+
+AC_CHECK_FUNCS(snprintf)
+if test "$ac_cv_func_snprintf" = "yes" ; then
+     PAC_FUNC_NEEDS_DECL([#include <stdio.h>],snprintf)
+fi
 
 dnl Output:
 # Starting output

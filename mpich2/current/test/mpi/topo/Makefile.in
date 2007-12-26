@@ -34,8 +34,8 @@ INCLUDES = -I../include -I${srcdir}/../include
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean: 
-	-@rm -f *.o ${srcdir}/*.o graphcr topodup cartsuball cartmap1 graphmap1 dims2 cartshift1 topotest dims1
-	-@rm -f graphcr.exe topodup.exe cartsuball.exe cartmap1.exe graphmap1.exe dims2.exe cartshift1.exe topotest.exe dims1.exe
+	-@rm -f *.o ${srcdir}/*.o graphcr topodup cartsuball cartmap1 graphmap1 dims2 cartshift1 cartcreates topotest dims1
+	-@rm -f graphcr.exe topodup.exe cartsuball.exe cartmap1.exe graphmap1.exe dims2.exe cartshift1.exe cartcreates.exe topotest.exe dims1.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -49,8 +49,8 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: cartmap1 cartshift1 cartsuball dims1 dims2 graphmap1 topotest\
-	 topodup graphcr
+all-redirect: cartmap1 cartshift1 cartsuball cartcreates dims1 dims2 graphmap1\
+	 topotest topodup graphcr
 
 graphcr: graphcr.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o graphcr graphcr.o  ${LIBS}
@@ -66,6 +66,8 @@ dims2: dims2.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o dims2 dims2.o  ${LIBS}
 cartshift1: cartshift1.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o cartshift1 cartshift1.o  ${LIBS}
+cartcreates: cartcreates.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o cartcreates cartcreates.o  ${LIBS}
 topotest: topotest.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o topotest topotest.o  ${LIBS}
 dims1: dims1.o   @MPILIBLOC@ ../util/mtest.o
@@ -73,8 +75,8 @@ dims1: dims1.o   @MPILIBLOC@ ../util/mtest.o
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  cartmap1.c cartshift1.c cartsuball.c dims1.c dims2.c \
-	graphmap1.c topotest.c topodup.c graphcr.c 
+SOURCES         =  cartmap1.c cartshift1.c cartsuball.c cartcreates.c dims1.c \
+	dims2.c graphmap1.c topotest.c topodup.c graphcr.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

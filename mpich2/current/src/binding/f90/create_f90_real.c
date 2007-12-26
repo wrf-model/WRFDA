@@ -5,7 +5,13 @@
  */
 
 #include "mpiimpl.h"
-#include "mpif90conf.h"
+#ifdef HAVE_F90_TYPE_ROUTINES
+#include "mpif90model.h"
+#else
+/* Assume only 4 and 8 byte IEEE reals available */
+#define MPIR_F90_REAL_MODEL 6, 37
+#define MPIR_F90_DOUBLE_MODEL 15, 307
+#endif
 
 /* -- Begin Profiling Symbol Block for routine MPI_Type_create_f90_real */
 #if defined(HAVE_PRAGMA_WEAK)
@@ -22,8 +28,12 @@
    using weak symbols to implement the MPI routines. */
 #ifndef MPICH_MPI_FROM_PMPI
 #define MPI_Type_create_f90_real PMPI_Type_create_f90_real
-
 #endif
+
+typedef struct realModel { 
+    int digits, exponent; 
+    MPI_Datatype dtype; 
+} realModel;
 
 #undef FUNCNAME
 #define FUNCNAME MPI_Type_create_f90_real
@@ -53,9 +63,11 @@ returns an error of class 'MPI_ERR_ARG'.
 int MPI_Type_create_f90_real( int precision, int range, MPI_Datatype *newtype )
 {
     static const char FCNAME[] = "MPI_Type_create_f90_real";
+    int i;
     int mpi_errno = MPI_SUCCESS;
-    static int f90_real_model[4] = { MPIR_F90_REAL_MODEL,
-                                     MPIR_F90_DOUBLE_MODEL };
+    static realModel f90_real_model[2] = { 
+	{ MPIR_F90_REAL_MODEL, MPI_REAL},
+	{ MPIR_F90_DOUBLE_MODEL, MPI_DOUBLE_PRECISION } };
     MPID_MPI_STATE_DECL(MPID_STATE_MPI_TYPE_CREATE_F90_REAL);
 
     MPID_MPI_FUNC_ENTER(MPID_STATE_MPI_TYPE_CREATE_F90_REAL);
@@ -73,7 +85,16 @@ int MPI_Type_create_f90_real( int precision, int range, MPI_Datatype *newtype )
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
+    *newtype = MPI_DATATYPE_NULL;
+    for (i=0; i<2; i++) {
+	if (f90_real_model[i].digits >= precision &&
+	    f90_real_model[i].exponent >= range) {
+	    *newtype = f90_real_model[i].dtype;
+	    break;
+	}
+    }
 
+    /* FIXME: Check on action if no match found */
     /* ... end of body of routine ... */
 
     MPID_MPI_FUNC_EXIT(MPID_STATE_MPI_TYPE_CREATE_F90_REAL);

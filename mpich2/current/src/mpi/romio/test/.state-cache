@@ -8,13 +8,15 @@
 <file name="psimple.c" info="1122073712"/>
 <file name="noncontig_coll2.c" info="1156193473"/>
 <file name="simple.c" info="1122073712"/>
-<file name="file_info.c" info="1149182165"/>
+<file name="file_info.c" info="1184210149"/>
 <file name="atomicity.c" info="1122073710"/>
 <file name="status.c" info="1122073712"/>
 <file name="perf.c" info="1122073711"/>
+<file name="aggregation1.c" info="1185406821"/>
+<file name="aggregation2.c" info="1186086552"/>
 <file name="noncontig_coll.c" info="1122073711"/>
 <file name="coll_test.c" info="1122073710"/>
-<file name="async.c" info="1122073710"/>
+<file name="async.c" info="1184261890"/>
 <file name="noncontig.c" info="1122073711"/>
 <file name="excl.c" info="1122073710"/>
 <file name="creat_excl.c" info="1060038755"/>
@@ -45,6 +47,10 @@
 <fileinfo name="status.c">
 </fileinfo>
 <fileinfo name="perf.c">
+</fileinfo>
+<fileinfo name="aggregation1.c">
+</fileinfo>
+<fileinfo name="aggregation2.c">
 </fileinfo>
 <fileinfo name="noncontig_coll.c">
 </fileinfo>

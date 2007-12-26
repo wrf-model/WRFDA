@@ -33,6 +33,13 @@ int MPIDI_CH3_iStartMsg (MPIDI_VC_t *vc, void *hdr, MPIDI_msg_sz_t hdr_sz, MPID_
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_ISTARTMSG);
 
+    if (((MPIDI_CH3I_VC *)vc->channel_private)->iStartContigMsg)
+    {
+        mpi_errno = ((MPIDI_CH3I_VC *)vc->channel_private)->iStartContigMsg(vc, hdr, hdr_sz, NULL, 0, sreq_ptr);
+        goto fn_exit;
+    }
+
+    /*MPIU_Assert(((MPIDI_CH3I_VC *)vc->channel_private)->is_local);*/
     MPIU_Assert(hdr_sz <= sizeof(MPIDI_CH3_Pkt_t));
 
     /* This channel uses a fixed length header, the size of which is
@@ -43,7 +50,7 @@ int MPIDI_CH3_iStartMsg (MPIDI_VC_t *vc, void *hdr, MPIDI_msg_sz_t hdr_sz, MPID_
     if (MPIDI_CH3I_SendQ_empty (CH3_NORMAL_QUEUE))
        /* MT */
     {
-	MPIU_DBG_MSG_D (CH3_CHANNEL, VERBOSE, "iStartMsg %d", hdr_sz);
+	MPIU_DBG_MSG_D (CH3_CHANNEL, VERBOSE, "iStartMsg %d", (int) hdr_sz);
 	mpi_errno = MPID_nem_mpich2_send_header (hdr, hdr_sz, vc, &again);
         if (mpi_errno) MPIU_ERR_POP (mpi_errno);
 	if (again)
@@ -78,11 +85,12 @@ int MPIDI_CH3_iStartMsg (MPIDI_VC_t *vc, void *hdr, MPIDI_msg_sz_t hdr_sz, MPID_
 	MPIU_Object_set_ref (sreq, 2);
 	sreq->kind = MPID_REQUEST_SEND;
 
-	sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) hdr;
-	sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->ch.pkt;
+	sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) hdr;
+	sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->dev.pending_pkt;
 	sreq->dev.iov[0].MPID_IOV_LEN = hdr_sz;
 	sreq->dev.iov_count = 1;
-	sreq->ch.iov_offset = 0;
+	sreq->dev.iov_offset = 0;
+        sreq->ch.noncontig = FALSE;
 	sreq->ch.vc = vc;
 	sreq->dev.OnDataAvail = 0;
 	MPIDI_CH3I_SendQ_enqueue (sreq, CH3_NORMAL_QUEUE);

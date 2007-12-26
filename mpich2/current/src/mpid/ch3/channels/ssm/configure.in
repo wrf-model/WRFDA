@@ -32,7 +32,21 @@ PAC_VPATH_CHECK()
 
 PAC_LOAD_BASE_CACHE
 
+AC_PROG_INSTALL
+PAC_PROG_CHECK_INSTALL_WORKS
+#
+# On Mac OS/X, install breaks libraries unless used with the -p switch
+PAC_PROG_INSTALL_BREAKS_LIBS
+# We also need mkdir -p.
+PAC_PROG_MKDIR_P
 PAC_PROG_MAKE
+AC_CHECK_PROGS(AR,ar)
+if test -z "$AR" ; then
+    AC_MSG_ERROR([The program ar is required for building MPICH2.  Make sure that your path includes ar])
+fi
+# Note that we set RANLIB to true if we don't find it (some systems neither
+# need it nor provide it)
+AC_CHECK_PROGS(RANLIB,ranlib,true)
 
 dnl AC_DEFINE(USE_PROCESS_LOCKS,,[Define to use process locks])
 AC_DEFINE(USE_BUSY_LOCKS,,[Define to use busy locks])
@@ -79,6 +93,7 @@ AC_CHECK_HEADERS(pthread.h fcntl.h string.h strings.h sys/time.h sys/sem.h sys/i
 AC_CHECK_HEADERS(sys/stat.h sys/ptrace.h sys/wait.h errno.h ctype.h process.h sys/mman.h uuid/uuid.h mqueue.h sys/sysctl.h)
 AC_CHECK_FUNCS(msgget yield mutex_init shmget shmat shmdt shmctl usleep sleep getcwd gethostname gettimeofday putenv select socket sched_yield)
 AC_CHECK_FUNCS(sysconf sysctl pthread_mutexattr_setpshared pthread_mutexattr_init)
+
 dnl AC_CHECK_FUNCS( mmap )
 # This autoconf code checks that mmap works, at least in 
 # a simple case (private, fixed mapping of an already mapped memory)
@@ -157,176 +172,49 @@ fi
 
 dnl gcc checking
 
-cpu_gcc_x86_cycle=no
-AC_TRY_COMPILE(,[
-    long long var, *var_ptr=&var;
-    __asm__ __volatile__  ( "cpuid ; rdtsc ; mov %%edx,%1 ; mov %%eax,%0" 
-                            : "=m" (*((char *) (var_ptr))), 
-                              "=m" (*(((char *) (var_ptr))+4)) 
-                            :: "eax", "ebx", "ecx", "edx" ); 
-],cpu_gcc_x86_cycle=yes,cpu_gcc_x86_cycle=no)
-if test "$cpu_gcc_x86_cycle" = "yes" ; then
+    AC_CACHE_CHECK([that linux86 cycle counter is available],
+        pac_cv_linux86_cycle,[
+            AC_TRY_COMPILE(,[
+                long long var, *var_ptr=&var;
+		__asm__ __volatile__("rdtscp; shl \$32, %%rdx; or %%rdx, %%rax" : "=a" (*var_ptr) : : "ecx", "rdx");
+            ],pac_cv_linux86_cycle=rdtscp,
+                AC_TRY_COMPILE(,[
+	            long long var, *var_ptr=&var;
+		    __asm__ __volatile__("push %%ebx ; cpuid ; rdtsc ; pop %%ebx" : "=A" (*var_ptr) : : "ecx");
+                ],pac_cv_linux86_cycle=cpuid_rdtsc,
+                    AC_TRY_COMPILE(,[[
+	                long long var, *var_ptr=&var;
+	                __asm__ __volatile__("rdtsc" : "=A" (*var_ptr));
+                    ]],pac_cv_linux86_cycle=rdtsc,
+		    pac_cv_linux86_cycle=no)
+                )
+            )
+    ])
+
+case "$pac_cv_linux86_cycle" in
+    "rdtscp")
+        AC_DEFINE(GCC_X86_CYCLE_RDTSCP,1,[Define which x86 cycle counter to use])
+	;;
+    "cpuid_rdtsc")
+        AC_DEFINE(GCC_X86_CYCLE_CPUID_RDTSC,1,[Define which x86 cycle counter to use])
+	;;
+    "rdtsc")
+        AC_DEFINE(GCC_X86_CYCLE_RDTSC,1,[Define which x86 cycle counter to use])
+	;;
+    *)
+        cpu_gcc_x86_cycle=no
+	;;
+esac
+
+if test "$cpu_gcc_x86_cycle" != "no" ; then
   AC_DEFINE_UNQUOTED(MPICH_CPU_TICK_TYPE, USE_GCC_X86_CYCLE_ASM, [Define if using gcc on an Intel CPU with the rdtsc instruction])
 dnl else
 dnl If a cycle counter is not available the code reverts to fixed spin waits.  So no error is needed.
 dnl  AC_MSG_ERROR([gcc x86 cycle counter is not available on this system])
 fi
 
-AC_MSG_CHECKING([for x86 mfence instruction using __asm__])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" );
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_mfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_mfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_mfence=no)
-if test "$lac_cv_have_gcc_asm_and_x86_mfence" = "yes" ; then
-    AC_DEFINE(HAVE_GCC_ASM_AND_X86_MFENCE, 1, [Define if using gcc on a x86 system with the mfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 sfence instruction using __asm__])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf8" ::: "memory" );
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_sfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_sfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_sfence=no)
-if test "$lac_cv_have_gcc_asm_and_x86_sfence" = "yes" ; then
-    AC_DEFINE(HAVE_GCC_ASM_AND_X86_SFENCE, 1, [Define if using gcc on a x86 system with the sfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 lfence instruction using __asm__])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xe8" ::: "memory" );
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_gcc_asm_and_x86_lfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_gcc_asm_and_x86_lfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_gcc_asm_and_x86_lfence=no)
-if test "$lac_cv_have_gcc_asm_and_x86_lfence" = "yes" ; then
-    AC_DEFINE(HAVE_GCC_ASM_AND_X86_LFENCE, 1, [Define if using gcc on a x86 system with the lfence instruction])
-fi
-
-dnl icc checking
-
-AC_MSG_CHECKING([for x86 mfence instruction using __asm])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xf0 ;
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_mfence=yes,
-AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_mfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_mfence=no)
-if test "$lac_cv_have___asm_and_x86_mfence" = "yes" ; then
-    AC_DEFINE(HAVE___ASM_AND_X86_MFENCE, 1, [Define if using __asm on a x86 system with the mfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 sfence instruction using __asm])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm sfence ;
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_sfence=yes,
-AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_sfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_sfence=no)
-if test "$lac_cv_have___asm_and_x86_sfence" = "yes" ; then
-    AC_DEFINE(HAVE___ASM_AND_X86_SFENCE, 1, [Define if using __asm on a x86 system with the sfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 lfence instruction using __asm])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xe8 ;
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have___asm_and_x86_lfence=yes,
-AC_MSG_RESULT(no); lac_cv_have___asm_and_x86_lfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have___asm_and_x86_lfence=no)
-if test "$lac_cv_have___asm_and_x86_lfence" = "yes" ; then
-    AC_DEFINE(HAVE___ASM_AND_X86_LFENCE, 1, [Define if using __asm on a x86 system with the lfence instruction])
-fi
-
-dnl pgcc checking - compiler needs -Masmkeyword flag. How do I set this in the try_run?
-
-AC_MSG_CHECKING([for x86 mfence instruction using asm()])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xf0");
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_mfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_mfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_mfence=no)
-if test "$lac_cv_have_asm_and_x86_mfence" = "yes" ; then
-    AC_DEFINE(HAVE_ASM_AND_X86_MFENCE, 1, [Define if using asm() on a x86 system with the mfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 sfence instruction using asm()])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    asm("sfence");
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_sfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_sfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_sfence=no)
-if test "$lac_cv_have_asm_and_x86_sfence" = "yes" ; then
-    AC_DEFINE(HAVE_ASM_AND_X86_SFENCE, 1, [Define if using asm() on a x86 system with the sfence instruction])
-fi
-
-AC_MSG_CHECKING([for x86 lfence instruction using asm()])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xe8");
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have_asm_and_x86_lfence=yes,
-AC_MSG_RESULT(no); lac_cv_have_asm_and_x86_lfence=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have_asm_and_x86_lfence=no)
-if test "$lac_cv_have_asm_and_x86_lfence" = "yes" ; then
-    AC_DEFINE(HAVE_ASM_AND_X86_LFENCE, 1, [Define if using asm() on a x86 system with the lfence instruction])
-fi
-
-AC_MSG_CHECKING([for _InterlockedExchange intrinsic])
-AC_TRY_RUN([
-int main(int argc, char *argv[])
-{
-    unsigned long lock, *lock_ptr;
-    lock_ptr = &lock;
-    _InterlockedExchange(lock_ptr, 1);
-    exit(0);
-}
-],
-AC_MSG_RESULT(yes); lac_cv_have__InterlockedExchange=yes,
-AC_MSG_RESULT(no); lac_cv_have__InterlockedExchange=no,
-AC_MSG_RESULT(not checking when cross compiling), lac_cv_have__InterlockedExchange=no)
-if test "$lac_cv_have__InterlockedExchange" = "yes" ; then
-    AC_DEFINE(HAVE__INTERLOCKEDEXCHANGE, 1, [Define if _InterlockedExchange intrinsic is available])
-fi
+# Check for memory atomic instructions
+PAC_C_MEMATOMIC
 
 SSM_LIBS=$LIBS
 LIBS=$save_libs
@@ -344,6 +232,21 @@ AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 PAC_CC_SUBDIR_SHLIBS
+# We need the script that is used to create shared libraries if either
+# we are creating shared libraries for MPICH2 or we are creating the
+# dynamically loadable library for the debugger interface
+if test -z "$CREATESHLIB" ; then
+   if test ! -d ../../../../util ; then 
+       mkdir ../../../../util
+   fi
+   CREATESHLIB=`cd ../../../../util && pwd`
+   CREATESHLIB="$CREATESHLIB/createshlib"
+fi
+AC_SUBST(CREATESHLIB)
+if test -z "$BUILD_DLLS" ; then
+    BUILD_DLLS=no
+fi
+AC_SUBST(BUILD_DLLS)
 AC_SUBST(master_top_srcdir)
 AC_SUBST(master_top_builddir)
 dnl
@@ -358,5 +261,17 @@ export ETAGS
 export ETAGSADD
 
 PAC_UPDATE_BASE_CACHE
+
+# Add the MPICH2 include flags to CPPFLAGS.  See the discussion above about
+# which include flags should start in MPICH2_INCLUDE_FLAGS and which in 
+# CPPFLAGS
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
+
+dnl Add a step to create the dependencies directory if it is not present
+AC_OUTPUT_COMMANDS([if grep 'dependencies:' Makefile >/dev/null 2>&1 ; then
+    if test ! -s src/.deps/alldeps ; then 
+    echo "Updating dependency directories .deps" 
+    find src -type d -print | sed -e 's%\(.*\)%(cd \1 \&\& grep MAKE_DEPEND_C Makefile >/dev/null 2>\&1 \&\& ( test -d .deps || mkdir .deps) \&\& touch .deps/alldeps)%g' | sh
+fi; fi])
 
 AC_OUTPUT(Makefile src/Makefile localdefs)

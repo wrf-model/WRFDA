@@ -69,7 +69,6 @@ int main( int argc, char *argv[] )
 			    }
 			}
 		    }
-		    MTestFreeDatatype( &sendtype );
 		}
 		else if (rank == dest) {
 		    for (nmsg=1; nmsg<maxmsg; nmsg++) {
@@ -98,8 +97,10 @@ int main( int argc, char *argv[] )
 		    }
 		}
 		MTestFreeDatatype( &recvtype );
+		MTestFreeDatatype( &sendtype );
 	    }
 	}
+	MTestFreeComm( &comm );
     }
 
     MTest_Finalize( errs );

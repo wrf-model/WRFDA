@@ -26,6 +26,7 @@ SRC       = Const.java CategoryIcon.java CategoryLabel.java \
             Triangular3DIcon.java GenericHeaderRenderer.java \
             TableHeaderHandler.java TableColumnHandler.java \
             OperationBooleanMenu.java OperationStringMenu.java \
+            OperationNumberMenu.java \
             LegendTable.java LegendPanel.java LegendFrame.java
 
 OBJ       = $(SRC:.java=.class)

@@ -80,7 +80,7 @@ MPI_Aint MPID_Datatype_size_external32(MPI_Datatype type)
     else {
 	MPID_Dataloop *dlp = NULL;
 
-	MPID_Datatype_get_hetero_loopptr_macro(type, dlp);
+	MPID_Datatype_get_loopptr_macro(type, dlp, MPID_DATALOOP_HETEROGENEOUS);
 
 	return MPID_Dataloop_stream_size(dlp,
 					 MPIDI_Datatype_get_basic_size_external32);

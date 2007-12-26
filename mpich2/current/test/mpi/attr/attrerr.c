@@ -95,7 +95,8 @@ int test_communicators( void )
 	printf( "Error with first put\n" );
     }
 
-    err = MPI_Attr_put( dup_comm_world, key_1, (void *) (MPI_Aint) (2*world_rank) );
+    err = MPI_Attr_put( dup_comm_world, key_1, 
+			(void *) (MPI_Aint) (2*world_rank) );
     if (err == MPI_SUCCESS) {
 	errs++;
 	printf( "delete function return code was MPI_SUCCESS in put\n" );

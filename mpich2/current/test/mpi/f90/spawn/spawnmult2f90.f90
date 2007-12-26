@@ -10,7 +10,7 @@
 !
        program main
        use mpi
-       integer (kind=MPI_ADDRESS_KIND) asize
+       integer (kind=MPI_ADDRESS_KIND) aint
 
        integer errs, err
        integer rank, size, rsize, wsize, i
@@ -22,6 +22,7 @@
        character*(30) cmds(2)
        integer appnum
        logical flag
+       integer ierr
        errs = 0
 
        call MTest_Init( ierr )
@@ -95,11 +96,11 @@
          endif
 !
 !       Check for correct APPNUM
-         call mpi_comm_get_attr( MPI_COMM_WORLD, MPI_APPNUM, asize,         &
+         call mpi_comm_get_attr( MPI_COMM_WORLD, MPI_APPNUM, aint,         &
       &        flag, ierr )
 !        My appnum should be my rank in comm world
          if (flag) then
-            appnum = asize
+            appnum = aint
             if (appnum .ne. rank) then
                 errs = errs + 1
                 print *, "appnum is ", appnum, " but should be ", rank

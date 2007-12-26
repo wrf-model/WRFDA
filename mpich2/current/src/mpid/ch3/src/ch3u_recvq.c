@@ -171,7 +171,8 @@ MPID_Request * MPIDI_CH3U_Recvq_FDU(MPI_Request sreq_id,
     matching_prev_rreq = NULL;
     matching_cur_rreq = NULL;
     prev_rreq = NULL;
-    
+
+    /* FIXME: Why doesn't this exit after it finds the first match? */
     cur_rreq = recvq_unexpected_head;
     while(cur_rreq != NULL) {
 	if (cur_rreq->dev.sender_req_id == sreq_id && 

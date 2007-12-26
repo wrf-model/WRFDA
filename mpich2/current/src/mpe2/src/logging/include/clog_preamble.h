@@ -23,10 +23,10 @@ typedef struct {
     unsigned int  num_buffered_blocks;
     unsigned int  max_comm_world_size;
     unsigned int  max_thread_count;
-    unsigned int  known_eventID_start;
-    unsigned int  user_eventID_start;
-    unsigned int  known_solo_eventID_start;
-    unsigned int  user_solo_eventID_start;
+             int  known_eventID_start;
+             int  user_eventID_start;
+             int  known_solo_eventID_start;
+             int  user_solo_eventID_start;
     unsigned int  known_stateID_count;
     unsigned int  user_stateID_count;
     unsigned int  known_solo_eventID_count;

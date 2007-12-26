@@ -25,35 +25,41 @@
 #define FUNCNAME MPIDI_CH3U_Finalize_sshm
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-int MPIDI_CH3U_Finalize_sshm()
+int MPIDI_CH3U_Finalize_sshm(void)
 {
     int mpi_errno = MPI_SUCCESS;
 
     MPIDI_PG_t * pg;
     MPIDI_PG_t * pg_next;
+    MPIDI_CH3I_PG *pgch;
     int inuse;
 
+#if 0
     /* Free resources allocated in CH3_Init() */
     while (MPIDI_CH3I_Process.shm_reading_list)
     {
-	MPIDI_CH3I_SHM_Release_mem(&MPIDI_CH3I_Process.shm_reading_list->ch.shm_read_queue_info);
-	MPIDI_CH3I_Process.shm_reading_list = MPIDI_CH3I_Process.shm_reading_list->ch.shm_next_reader;
+	pgch = (MPIDI_CH3I_PG *)MPIDI_CH3I_Process.shm_reading_list->channel_private;
+	MPIDI_CH3I_SHM_Release_mem(&pgch->shm_read_queue_info);
+	MPIDI_CH3I_Process.shm_reading_list = pgch->shm_next_reader;
     }
     while (MPIDI_CH3I_Process.shm_writing_list)
     {
-	MPIDI_CH3I_SHM_Release_mem(&MPIDI_CH3I_Process.shm_writing_list->ch.shm_write_queue_info);
-	MPIDI_CH3I_Process.shm_writing_list = MPIDI_CH3I_Process.shm_writing_list->ch.shm_next_writer;
+	pgch = (MPIDI_CH3I_PG *)MPIDI_CH3I_Process.shm_writing_list->channel_private;
+	MPIDI_CH3I_SHM_Release_mem(&pgch->shm_write_queue_info);
+	MPIDI_CH3I_Process.shm_writing_list = pgch->shm_next_writer;
     }
+#endif
 
-    /* brad : used to unlink this within Init but now done in finalize in case someone spawned needs
-     *        to attach to this bootstrapQ.
+    /* brad : used to unlink this within Init but now done in finalize in case 
+     * someone spawned needs to attach to this bootstrapQ.
      */
-    mpi_errno = MPIDI_CH3I_BootstrapQ_unlink(MPIDI_Process.my_pg->ch.bootstrapQ);
+    pgch = (MPIDI_CH3I_PG *)MPIDI_Process.my_pg->channel_private;
+    mpi_errno = MPIDI_CH3I_BootstrapQ_unlink(pgch->bootstrapQ);
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_SET(mpi_errno,MPI_ERR_OTHER, "**boot_unlink");
     }
     
-    mpi_errno = MPIDI_CH3I_BootstrapQ_destroy(MPIDI_Process.my_pg->ch.bootstrapQ);
+    mpi_errno = MPIDI_CH3I_BootstrapQ_destroy(pgch->bootstrapQ);
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_SET(mpi_errno,MPI_ERR_OTHER, "**finalize_boot");
     }

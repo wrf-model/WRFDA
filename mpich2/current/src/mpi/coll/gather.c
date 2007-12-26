@@ -56,15 +56,23 @@ int MPIR_Gather (
     static const char FCNAME[] = "MPIR_Gather";
     int        comm_size, rank;
     int        mpi_errno = MPI_SUCCESS;
-    int curr_cnt=0, relative_rank, nbytes, recv_size, is_homogeneous;
-    int mask, sendtype_size, recvtype_size, src, dst, position;
-#ifdef MPID_HAS_HETERO
-    int tmp_buf_size;
-#endif
+    int curr_cnt=0, relative_rank, nbytes, is_homogeneous;
+    int mask, sendtype_size, recvtype_size, src, dst, relative_src;
+    int recvblks;
+    int tmp_buf_size, missing;
     void *tmp_buf=NULL;
     MPI_Status status;
     MPI_Aint   extent=0;            /* Datatype extent */
     MPI_Comm comm;
+    int blocks[2];
+    int displs[2];
+    MPI_Aint struct_displs[2];
+    MPI_Datatype types[2], tmp_type;
+    int copy_offset = 0, copy_blks = 0;
+
+#ifdef MPID_HAS_HETERO
+    int position, recv_size;
+#endif
     
     comm = comm_ptr->handle;
     comm_size = comm_ptr->local_size;
@@ -82,14 +90,14 @@ int MPIR_Gather (
 
     /* check if multiple threads are calling this collective function */
     MPIDU_ERR_CHECK_MULTIPLE_THREADS_ENTER( comm_ptr );
-    
-/* Use binomial tree algorithm. */
+
+    /* Use binomial tree algorithm. */
     
     relative_rank = (rank >= root) ? rank - root : rank - root + comm_size;
-    
+
     if (rank == root) 
         MPID_Datatype_get_extent_macro(recvtype, extent);
-    
+
     if (is_homogeneous)
     {
 
@@ -106,81 +114,53 @@ int MPIR_Gather (
             nbytes = sendtype_size * sendcnt;
         }
 
-        if (rank == root)
-	{
-            if (root != 0)
-	    {
-                /* allocate temporary buffer to receive data because it
-                   will not be in the right order. We will need to
-                   reorder it into the recv_buf. */
-                tmp_buf = MPIU_Malloc(nbytes*comm_size);
-		/* --BEGIN ERROR HANDLING-- */
-                if (!tmp_buf)
-		{
-                    mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**nomem", 0 );
-                    return mpi_errno;
-                }
-		/* --END ERROR HANDLING-- */
+	/* Find the number of missing nodes in my sub-tree compared to
+	 * a balanced tree */
+	for (mask = 1; mask < comm_size; mask <<= 1);
+	--mask;
+	while (relative_rank & mask) mask >>= 1;
+	missing = (relative_rank | mask) - comm_size + 1;
+	if (missing < 0) missing = 0;
+	tmp_buf_size = (mask - missing);
 
-                if (sendbuf != MPI_IN_PLACE)
-		{
-                    /* copy root's sendbuf into tmpbuf just so that it is
-                       easier to unpack everything later into the recv_buf */
-                    mpi_errno = MPIR_Localcopy(sendbuf, sendcnt, sendtype,
-                                               tmp_buf, nbytes, MPI_BYTE);
-		    /* --BEGIN ERROR HANDLING-- */
-                    if (mpi_errno)
-		    {
-			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			return mpi_errno;
-		    }
-		    /* --END ERROR HANDLING-- */
-                }
-                curr_cnt = nbytes;
-            }
-            else
-	    {
-                /* root is 0. no tmp_buf needed at root. */
-                /* copy root's sendbuf into recvbuf */
-                if (sendbuf != MPI_IN_PLACE)
-		{
-                    mpi_errno = MPIR_Localcopy(sendbuf, sendcnt, sendtype,
-                                               recvbuf, recvcnt, recvtype);
-		    /* --BEGIN ERROR HANDLING-- */
-                    if (mpi_errno)
-		    {
-			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			return mpi_errno;
-		    }
-		    /* --END ERROR HANDLING-- */
-                }
-                curr_cnt = recvcnt;
-            }          
-        }
-        else if (!(relative_rank % 2))
-	{
-            /* allocate temporary buffer for nodes other than leaf
-               nodes. max size needed is (nbytes*comm_size)/2. */
-            tmp_buf = MPIU_Malloc((nbytes*comm_size)/2);
+	/* If the message is smaller than the threshold, we will copy
+	 * our message in there too */
+	if (nbytes < MPIR_GATHER_VSMALL_MSG) tmp_buf_size++;
+
+	tmp_buf_size *= nbytes;
+
+	/* For zero-ranked root, we don't need any temporary buffer */
+	if ((rank == root) && (!root || (nbytes >= MPIR_GATHER_VSMALL_MSG)))
+	    tmp_buf_size = 0;
+
+	if (tmp_buf_size) {
+	    tmp_buf = MPIU_Malloc(tmp_buf_size);
 	    /* --BEGIN ERROR HANDLING-- */
-            if (!tmp_buf)
+	    if (!tmp_buf)
 	    {
-                mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**nomem", 0 );
-                return mpi_errno;
-            }
-	    /* --END ERROR HANDLING-- */
-            /* copy from sendbuf into tmp_buf */
-            mpi_errno = MPIR_Localcopy(sendbuf, sendcnt, sendtype,
-                                       tmp_buf, nbytes, MPI_BYTE);
-	    /* --BEGIN ERROR HANDLING-- */
-            if (mpi_errno)
-	    {
-		mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
+		mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**nomem", 0 );
 		return mpi_errno;
 	    }
 	    /* --END ERROR HANDLING-- */
-            curr_cnt = nbytes;
+	}
+
+        if (rank == root)
+	{
+	    if (sendbuf != MPI_IN_PLACE)
+	    {
+		mpi_errno = MPIR_Localcopy(sendbuf, sendcnt, sendtype,
+					   ((char *) recvbuf + extent*recvcnt*rank), recvcnt, recvtype);
+		if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+	    }
         }
+	else if (tmp_buf_size && (nbytes < MPIR_GATHER_VSMALL_MSG))
+	{
+            /* copy from sendbuf into tmp_buf */
+            mpi_errno = MPIR_Localcopy(sendbuf, sendcnt, sendtype,
+                                       tmp_buf, nbytes, MPI_BYTE);
+	    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+        }
+	curr_cnt = nbytes;
         
         mask = 0x1;
         while (mask < comm_size)
@@ -191,104 +171,127 @@ int MPIR_Gather (
                 if (src < comm_size)
 		{
                     src = (src + root) % comm_size;
-                    if ((rank == root) && (root == 0))
+
+		    if (rank == root)
 		    {
-                        /* root is 0. Receive directly into recvbuf */
-                        mpi_errno = MPIC_Recv(((char *)recvbuf + 
-                                               src*recvcnt*extent), 
-                                              recvcnt*mask, recvtype, src,
-                                              MPIR_GATHER_TAG, comm, 
-                                              &status);
-			/* --BEGIN ERROR HANDLING-- */
-                        if (mpi_errno)
-			{
-			    mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			    return mpi_errno;
+			recvblks = mask;
+			if ((2 * recvblks) > comm_size)
+			    recvblks = comm_size - recvblks;
+
+			if ((rank + mask + recvblks == comm_size) ||
+			    (((rank + mask) % comm_size) <
+			     ((rank + mask + recvblks) % comm_size))) {
+			    /* If the data contiguously fits into the
+			     * receive buffer, place it directly. This
+			     * should cover the case where the root is
+			     * rank 0. */
+			    mpi_errno = MPIC_Recv(((char *)recvbuf +
+						   (((rank + mask) % comm_size)*recvcnt*extent)),
+						  recvblks * recvcnt, recvtype, src,
+						  MPIR_GATHER_TAG, comm,
+						  &status);
 			}
-			/* --END ERROR HANDLING-- */
-                    }
-                    else
+			else if (nbytes < MPIR_GATHER_VSMALL_MSG) {
+			    mpi_errno = MPIC_Recv(tmp_buf, recvblks * nbytes, MPI_BYTE,
+						  src, MPIR_GATHER_TAG, comm, &status);
+			    copy_offset = rank + mask;
+			    copy_blks = recvblks;
+			}
+			else {
+			    blocks[0] = recvcnt * (comm_size - root - mask);
+			    displs[0] = recvcnt * (root + mask);
+			    blocks[1] = (recvcnt * recvblks) - blocks[0];
+			    displs[1] = 0;
+			    
+			    NMPI_Type_indexed(2, blocks, displs, recvtype, &tmp_type);
+			    NMPI_Type_commit(&tmp_type);
+			    
+			    mpi_errno = MPIC_Recv(recvbuf, 1, tmp_type, src,
+						  MPIR_GATHER_TAG, comm, &status);
+
+			    NMPI_Type_free(&tmp_type);
+			}
+		    }
+                    else /* Intermediate nodes store in temporary buffer */
 		    {
-                        /* intermediate nodes or nonzero root. store in
-                           tmp_buf */
-                        mpi_errno = MPIC_Recv(((char *)tmp_buf + curr_cnt), 
-                                              mask*nbytes, MPI_BYTE, src,
-                                              MPIR_GATHER_TAG, comm, 
-                                              &status);
-			/* --BEGIN ERROR HANDLING-- */
-                        if (mpi_errno)
-			{
-			    mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			    return mpi_errno;
-			}
-			/* --END ERROR HANDLING-- */
-                        /* the recv size is larger than what may be sent in
-                           some cases. query amount of data actually received */
-                        NMPI_Get_count(&status, MPI_BYTE, &recv_size);
-                        curr_cnt += recv_size;
+			int offset;
+
+			/* Estimate the amount of data that is going to come in */
+			recvblks = mask;
+			relative_src = ((src - root) < 0) ? (src - root + comm_size) : (src - root);
+			if (relative_src + mask > comm_size)
+			    recvblks -= (relative_src + mask - comm_size);
+
+			if (nbytes < MPIR_GATHER_VSMALL_MSG)
+			    offset = mask * nbytes;
+			else offset = 0;
+			mpi_errno = MPIC_Recv(((char *)tmp_buf + offset),
+					      recvblks * nbytes, MPI_BYTE, src,
+					      MPIR_GATHER_TAG, comm,
+					      &status);
+			curr_cnt += (recvblks * nbytes);
                     }
+		    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
                 }
             }
             else
 	    {
                 dst = relative_rank ^ mask;
                 dst = (dst + root) % comm_size;
-                if (relative_rank % 2)
+
+		if (!tmp_buf_size)
 		{
                     /* leaf nodes send directly from sendbuf */
                     mpi_errno = MPIC_Send(sendbuf, sendcnt, sendtype, dst,
-                                          MPIR_GATHER_TAG, comm); 
-		    /* --BEGIN ERROR HANDLING-- */
-                    if (mpi_errno)
-		    {
-			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			return mpi_errno;
-		    }
-		    /* --END ERROR HANDLING-- */
+                                          MPIR_GATHER_TAG, comm);
                 }
-                else
-		{
-                    mpi_errno = MPIC_Send(tmp_buf, curr_cnt, MPI_BYTE, dst,
-                                          MPIR_GATHER_TAG, comm); 
-		    /* --BEGIN ERROR HANDLING-- */
-                    if (mpi_errno)
-		    {
-			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", 0);
-			return mpi_errno;
-		    }
-		    /* --END ERROR HANDLING-- */
-                }
+                else if (nbytes < MPIR_GATHER_VSMALL_MSG) {
+		    mpi_errno = MPIC_Send(tmp_buf, curr_cnt, MPI_BYTE, dst,
+					  MPIR_GATHER_TAG, comm);
+		}
+		else {
+		    int offset;
+
+		    if (nbytes < MPIR_GATHER_VSMALL_MSG)
+			offset = nbytes;
+		    else offset = 0;
+
+		    blocks[0] = sendcnt;
+		    struct_displs[0] = (MPI_Aint) sendbuf;
+		    types[0] = sendtype;
+		    blocks[1] = curr_cnt - nbytes;
+		    struct_displs[1] = (MPI_Aint) ((char*) tmp_buf + offset);
+		    types[1] = MPI_BYTE;
+
+		    NMPI_Type_create_struct(2, blocks, struct_displs, types, &tmp_type);
+		    NMPI_Type_commit(&tmp_type);
+
+		    mpi_errno = MPIC_Send(MPI_BOTTOM, 1, tmp_type, dst,
+					  MPIR_GATHER_TAG, comm);
+
+		    NMPI_Type_free(&tmp_type);
+		}
+		if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+
                 break;
             }
             mask <<= 1;
         }
-        
-        if ((rank == root) && (root != 0))
+
+        if ((rank == root) && root && (nbytes < MPIR_GATHER_VSMALL_MSG) && copy_blks)
 	{
             /* reorder and copy from tmp_buf into recvbuf */
-            position = 0;
-
-            if (sendbuf != MPI_IN_PLACE)
-	    {
-                MPIR_Localcopy(tmp_buf, nbytes*(comm_size-rank), MPI_BYTE, 
-                               ((char *) recvbuf + extent*recvcnt*rank),
-                               recvcnt*(comm_size-rank), recvtype);
-            }
-            else
-	    {
-                MPIR_Localcopy((char *) tmp_buf + nbytes,
-                               nbytes*(comm_size-rank-1), MPI_BYTE,  
-                               ((char *) recvbuf + extent*recvcnt*(rank+1)),
-                               recvcnt*(comm_size-rank-1), recvtype);
-            }
-            MPIR_Localcopy((char *) tmp_buf + nbytes*(comm_size-rank),
-                           nbytes*rank, MPI_BYTE, recvbuf, 
-                           recvcnt*rank, recvtype); 
-
-            MPIU_Free(tmp_buf);
+	    MPIR_Localcopy(tmp_buf,
+			   nbytes * (comm_size - copy_offset), MPI_BYTE,  
+			   ((char *) recvbuf + extent * recvcnt * copy_offset),
+			   recvcnt * (comm_size - copy_offset), recvtype);
+	    MPIR_Localcopy((char *) tmp_buf + nbytes * (comm_size - copy_offset),
+			   nbytes * (copy_blks - comm_size + copy_offset), MPI_BYTE,  
+			   recvbuf,
+			   recvcnt * (copy_blks - comm_size + copy_offset), recvtype);
         }
-        else if (relative_rank && !(relative_rank % 2))
-            MPIU_Free(tmp_buf);
+
+	if (tmp_buf) MPIU_Free(tmp_buf);
     }
     
 #ifdef MPID_HAS_HETERO
@@ -337,7 +340,7 @@ int MPIR_Gather (
 		{
                     src = (src + root) % comm_size;
                     mpi_errno = MPIC_Recv(((char *)tmp_buf + curr_cnt), 
-                                          mask*nbytes, MPI_BYTE, src,
+                                          tmp_buf_size-curr_cnt, MPI_BYTE, src,
                                           MPIR_GATHER_TAG, comm, 
                                           &status);
 		    /* --BEGIN ERROR HANDLING-- */
@@ -398,6 +401,7 @@ int MPIR_Gather (
     }
 #endif /* MPID_HAS_HETERO */
 
+ fn_fail:
     /* check if multiple threads are calling this collective function */
     MPIDU_ERR_CHECK_MULTIPLE_THREADS_EXIT( comm_ptr );
     

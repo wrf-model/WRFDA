@@ -124,7 +124,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\mpid\common\sock,..\..\mpid\common\sock\iocp,..\..\include,..\..\include\win32"
+				AdditionalIncludeDirectories="..\..\mpid\common\sock;..\..\mpid\common\sock\iocp;..\..\include;..\..\include\win32;..\..\mpid\ch3\include;..\..\mpid\common\datatype;..\..\mpid\ch3\channels\sock\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;HAVE_WINDOWS_H;USE_WINCONF_H"
 				StringPooling="true"
 				RuntimeLibrary="0"

@@ -71,6 +71,13 @@
 #define MPIU_QUOTE(A) MPIU_QUOTE2(A)
 #define MPIU_QUOTE2(A) #A
 
+/* FIXME: The code base should not define two of these */
+/* This is used to quote a name in a definition (see FUNCNAME/FCNAME below) */
+#ifndef MPIDI_QUOTE
+#define MPIDI_QUOTE(A) MPIDI_QUOTE2(A)
+#define MPIDI_QUOTE2(A) #A
+#endif
+
 
 /* 
    Include the implementation definitions (e.g., error reporting, thread
@@ -180,22 +187,6 @@ void MPIU_dump_dbg_memlog(FILE * fp);
 
 /* Routines for memory management */
 #include "mpimem.h"
-
-#if 0
-/* ------------------------------------------------------------------------- */
-/* mpimsg.h */
-/* ------------------------------------------------------------------------- */
-/* Message printing */
-int MPIU_Usage_printf( const char *str, ... ) ATTRIBUTE((format(printf,1,2)));
-int MPIU_Msg_printf( const char *str, ... ) ATTRIBUTE((format(printf,1,2)));
-int MPIU_Error_printf( const char *str, ... ) ATTRIBUTE((format(printf,1,2)));
-int MPIU_Internal_error_printf( const char *str, ... ) ATTRIBUTE((format(printf,1,2)));
-int MPIU_Internal_sys_error_printf( const char *, int, const char *str, ... ) ATTRIBUTE((format(printf,3,4)));
-#endif
-
-/* ------------------------------------------------------------------------- */
-/* end of mpimsg.h */
-/* ------------------------------------------------------------------------- */
 
 /*
  * Use MPIU_SYSCALL to wrap system calls; this provides a convenient point
@@ -565,6 +556,7 @@ int MPIU_Handle_free( void *((*)[]), int );
 #define MPID_Info_get_ptr(a,ptr)       MPID_Get_ptr(Info,a,ptr)
 #define MPID_Win_get_ptr(a,ptr)        MPID_Get_ptr(Win,a,ptr)
 #define MPID_Request_get_ptr(a,ptr)    MPID_Get_ptr(Request,a,ptr)
+#define MPID_Grequest_class_get_ptr(a,ptr) MPID_Get_ptr(Grequest_class,a,ptr)
 /* Keyvals have a special format. This is roughly MPID_Get_ptrb, but
    the handle index is in a smaller bit field.  In addition, 
    there is no storage for the builtin keyvals.  
@@ -658,12 +650,15 @@ int MPIU_Param_bcast( void );
 int MPIU_Param_register( const char [], const char [], const char [] );
 int MPIU_Param_get_int( const char [], int, int * );
 int MPIU_Param_get_string( const char [], const char *, char ** );
+int MPIU_Param_get_range( const char name[], int *lowPtr, int *highPtr );
 void MPIU_Param_finalize( void );
 
-int MPIU_GetEnvRange( const char *, int *, int * );
-int MPIU_GetEnvInt( const char *, int * );
+/* Prototypes for the functions to provide uniform access to the environment */
+int MPIU_GetEnvInt( const char *envName, int *val );
+int MPIU_GetEnvRange( const char *envName, int *lowPtr, int *highPtr );
 int MPIU_GetEnvBool( const char *envName, int *val );
 
+/* See mpishared.h as well */
 /* ------------------------------------------------------------------------- */
 /* end of mpiparam.h*/
 /* ------------------------------------------------------------------------- */
@@ -743,8 +738,11 @@ int MPIU_GetEnvBool( const char *envName, int *val );
   S*/
 typedef struct MPID_Info {
     int                handle;
-    volatile int       ref_count;  /* FIXME: ref_count isn't needed by Info objects, but MPIU_Info_free does not work correctly
-				      unless MPID_Info and MPIU_Handle_common have the next pointer in the same location */
+    volatile int       ref_count;  /* FIXME: ref_count isn't needed by Info 
+				      objects, but MPIU_Info_free does not 
+				      work correctly unless MPID_Info and 
+				      MPIU_Handle_common have the next 
+				      pointer in the same location */
     struct MPID_Info   *next;
     char               *key;
     char               *value;
@@ -763,6 +761,11 @@ extern MPID_Info MPID_Info_direct[];
   The MPI-1 Standard declared only the C version of this, implicitly 
   assuming that 'int' and 'MPI_Fint' were the same. 
 
+  Since Fortran does not have a C-style variable number of arguments 
+  interface, the Fortran interface simply accepts two arguments.  Some
+  calling conventions for Fortran (particularly under Windows) require
+  this.
+
   Module:
   ErrHand-DS
   
@@ -772,11 +775,10 @@ extern MPID_Info MPID_Info_direct[];
   to this structure?  Does the C++ handler need to be different (not part
   of the union)?
 
-  What is the interface for the Fortran version of the error handler?  
   E*/
 typedef union MPID_Errhandler_fn {
    void (*C_Comm_Handler_function) ( MPI_Comm *, int *, ... );
-   void (*F77_Handler_function) ( MPI_Fint *, MPI_Fint *, ... );
+   void (*F77_Handler_function) ( MPI_Fint *, MPI_Fint * );
    void (*C_Win_Handler_function) ( MPI_Win *, int *, ... );
    void (*C_File_Handler_function) ( MPI_File *, int *, ... );
 } MPID_Errhandler_fn;
@@ -1192,23 +1194,23 @@ typedef struct MPID_Comm {
     MPID_VCRT     local_vcrt;    /* local virtual connecton reference table */
     MPID_VCR *    local_vcr;     /* alias to the array of local virtual
 				    connections in local vcrt */
-    MPID_Attribute *attributes;    /* List of attributes */
+    MPID_Attribute *attributes;  /* List of attributes */
     int           local_size;    /* Value of MPI_Comm_size for local group */
     MPID_Group   *local_group,   /* Groups in communicator. */
                  *remote_group;  /* The local and remote groups are the
                                     same for intra communicators */
     MPID_Comm_kind_t comm_kind;  /* MPID_INTRACOMM or MPID_INTERCOMM */
     char          name[MPI_MAX_OBJECT_NAME];  /* Required for MPI-2 */
-    MPID_Errhandler *errhandler;  /* Pointer to the error handler structure */
+    MPID_Errhandler *errhandler; /* Pointer to the error handler structure */
     struct MPID_Comm    *local_comm; /* Defined only for intercomms, holds
 				        an intracomm for the local group */
-    int           is_low_group;   /* For intercomms only, this boolean is
-				     set for all members of one of the 
-				     two groups of processes and clear for 
-				     the other.  It enables certain
-				     intercommunicator collective operations
-				     that wish to use half-duplex operations
-				     to implement a full-duplex operation */
+    int           is_low_group;  /* For intercomms only, this boolean is
+				    set for all members of one of the 
+				    two groups of processes and clear for 
+				    the other.  It enables certain
+				    intercommunicator collective operations
+				    that wish to use half-duplex operations
+				    to implement a full-duplex operation */
     struct MPID_Comm     *comm_next;/* Provides a chain through all active 
 				       communicators */
     struct MPID_Collops  *coll_fns; /* Pointer to a table of functions 
@@ -1246,10 +1248,16 @@ int MPIR_Comm_release(MPID_Comm *, int );
        MPIU_DBG_MSG_FMT(REFCOUNT,TYPICAL,(MPIU_DBG_FDEST,\
          "Decr comm %p ref count to %d",_comm,_comm->ref_count));}
 
-/* Preallocated comm objects */
-#define MPID_COMM_N_BUILTIN 2
+/* Preallocated comm objects.  There are 3: comm_world, comm_self, and 
+   a private (non-user accessible) dup of comm world that is provided 
+   if needed in MPI_Finalize.  Having a separate version of comm_world
+   avoids possible interference with User code */
+#define MPID_COMM_N_BUILTIN 3
 extern MPID_Comm MPID_Comm_builtin[MPID_COMM_N_BUILTIN];
 extern MPID_Comm MPID_Comm_direct[];
+/* This is the handle for the internal MPI_COMM_WORLD .  The "2" at the end
+   of the handle is 3-1 (e.g., the index in the builtin array) */
+#define MPIR_ICOMM_WORLD  ((MPI_Comm)0x44000002)
 
 /*
  * The order of the context offsets is important.  The collective routines
@@ -1341,7 +1349,10 @@ typedef struct MPID_Request {
     MPI_Grequest_cancel_function *cancel_fn;
     MPI_Grequest_free_function   *free_fn;
     MPI_Grequest_query_function  *query_fn;
-    void *grequest_extra_state;
+    MPIX_Grequest_poll_function   *poll_fn;
+    MPIX_Grequest_wait_function   *wait_fn;
+    void             *grequest_extra_state;
+    MPIX_Grequest_class	        greq_class;
     MPID_Lang_t                  greq_lang;         /* language that defined
 						       the generalize req */
     
@@ -1833,9 +1844,11 @@ extern MPICH_PerThread_t MPIR_Thread;
    This structure is allocated in src/mpi/init/initthread.c */
 extern MPICH_PerThread_t MPIR_ThreadSingle;
 
+/* We need to provide a function that will cleanup the storage attached
+   to the key.  */
 #define MPIU_THREADPRIV_INITKEY  \
     {if (MPIR_Process.isThreaded) {\
-    MPID_Thread_tls_create(NULL,&MPIR_Process.thread_storage,NULL);}}
+	    MPID_Thread_tls_create(MPIR_CleanupThreadStorage,&MPIR_Process.thread_storage,NULL);}}
 #define MPIU_THREADPRIV_INIT {if (MPIR_Process.isThreaded) {\
 	MPICH_PerThread_t *(pt_) = (MPICH_PerThread_t *) MPIU_Calloc(1, sizeof(MPICH_PerThread_t));	\
 	MPID_Thread_tls_set(&MPIR_Process.thread_storage, (void *) (pt_)); \
@@ -1854,7 +1867,7 @@ extern MPICH_PerThread_t MPIR_ThreadSingle;
    in an invocation of a routine.  */
 
 #define MPIU_THREADPRIV_INITKEY  \
-    MPID_Thread_tls_create(NULL,&MPIR_Process.thread_storage,NULL)
+    MPID_Thread_tls_create(MPIR_CleanupThreadStorage,&MPIR_Process.thread_storage,NULL)
 #define MPIU_THREADPRIV_INIT {\
 	MPICH_PerThread_t *(pt_) = (MPICH_PerThread_t *) MPIU_Calloc(1, sizeof(MPICH_PerThread_t));	\
 	MPID_Thread_tls_set(&MPIR_Process.thread_storage, (void *) (pt_)); \
@@ -1882,25 +1895,15 @@ struct MPID_Datatype;
 
 typedef struct MPICH_PerProcess_t {
     MPIR_MPI_State_t  initialized;      /* Is MPI initalized? */
-    int               thread_provided;  /* Provided level of thread support */
-    /* This is a special case for is_thread_main, which must be
-       implemented even if MPICH2 itself is single threaded.  */
-#if (MPICH_THREAD_LEVEL >= MPI_THREAD_SERIALIZED)    
-    MPID_Thread_tls_t thread_storage;   /* Id for perthread data */
-    MPID_Thread_id_t  master_thread;    /* Thread that started MPI */
-#endif
-#ifdef HAVE_RUNTIME_THREADCHECK
-    int isThreaded;                      /* Set to true if user requested
-					    THREAD_MULTIPLE */
-#endif
     int               do_error_checks;  /* runtime error check control */
-    MPID_Comm         *comm_world;      /* Easy access to comm_world for
+    struct MPID_Comm  *comm_world;      /* Easy access to comm_world for
                                            error handler */
-    MPID_Comm         *comm_self;       /* Easy access to comm_self */
-    MPID_Comm         *comm_parent;     /* Easy access to comm_parent */
+    struct MPID_Comm  *comm_self;       /* Easy access to comm_self */
+    struct MPID_Comm  *comm_parent;     /* Easy access to comm_parent */
+    struct MPID_Comm  *icomm_world;     /* An internal version of comm_world
+					   that is separate from user's 
+					   versions */
     PreDefined_attrs  attrs;            /* Predefined attribute values */
-    /* Communicator context ids.  Special data is needed for thread-safety */
-    int context_id_mask[32];
 
     /* The topology routines dimsCreate is independent of any communicator.
        If this pointer is null, the default routine is used */
@@ -1931,10 +1934,7 @@ typedef struct MPICH_PerProcess_t {
        C++ interface and exported to C).  The first argument is used
        to specify the kind (comm,file,win) */
     void  (*cxx_call_errfn) ( int, int *, int *, void (*)(void) );
-#endif
-# if (USE_THREAD_IMPL == MPICH_THREAD_IMPL_GLOBAL_MUTEX)
-    MPID_Thread_mutex_t global_mutex;
-# endif
+#endif /* HAVE_CXX_BINDING */
 } MPICH_PerProcess_t;
 extern MPICH_PerProcess_t MPIR_Process;
 
@@ -1952,7 +1952,7 @@ extern MPICH_PerProcess_t MPIR_Process;
 
   A typical use is 
 .vb
-  #if MPICH_IS_THREADED
+  #ifdef MPICH_IS_THREADED
      lock((r)->lock_ptr);
      (r)->ref_count++;
      unlock((r)->lock_ptr);
@@ -1985,13 +1985,17 @@ extern MPICH_PerProcess_t MPIR_Process;
  *    Checks that the "NMPI" functions and the Nest_incr/decr calls
  *    are properly nested at runtime.  
  * 3. Debug logging (selected with --enable-g=log)
- *    Invokes MPIU_DBG_MSG at the entry and exit for each routine            */
+ *    Invokes MPIU_DBG_MSG at the entry and exit for each routine            
+ * 4. Additional memory validation of the memory arena (--enable-g=memarena)
+ */
 /* ------------------------------------------------------------------------- */
 /* if fine-grain nest testing is enabled then define the function enter/exit
    macros to track the nesting level; otherwise, allow the timing module the
    opportunity to define the macros */
 #if defined(MPICH_DEBUG_FINE_GRAIN_NESTING)
 #   include "mpidu_func_nesting.h"
+#elif defined(MPICH_DEBUG_MEMARENA)
+#   include "mpifuncmem.h"
 #elif defined(USE_DBG_LOGGING)
 #   include "mpifunclog.h"
 #elif !defined(NEEDS_FUNC_ENTER_EXIT_DEFS)
@@ -2049,6 +2053,11 @@ extern MPICH_PerProcess_t MPIR_Process;
 /* Definitions for error handling and reporting */
 #include "mpierror.h"
 #include "mpierrs.h"
+
+/* FIXME: This routine is only used within mpi/src/err/errutil.c and 
+   smpd.  We may not want to export it.  */
+void MPIR_Err_print_stack(FILE *, int);
+
 
 /* ------------------------------------------------------------------------- */
 /* FIXME: Merge these with the object refcount update routines (perhaps as
@@ -2197,7 +2206,10 @@ void MPIR_Nest_decr_export(void);
                           __FILE__,__LINE__,\
                           MPIU_THREADPRIV_FIELD(nestinfo)[MPIU_THREADPRIV_FIELD(nest_count)].file,\
                           MPIU_THREADPRIV_FIELD(nestinfo)[MPIU_THREADPRIV_FIELD(nest_count)].line);\
-}}
+     }else if (MPIU_THREADPRIV_FIELD(nest_count) < 0){\
+	 MPIU_Msg_printf("Decremented nest count in file %s:%d is negative\n",\
+			 __FILE__,__LINE__);}\
+}
 #else
 #define MPIR_Nest_init()
 #define MPIR_Nest_incr() {MPIU_THREADPRIV_FIELD(nest_count)++;}
@@ -2231,6 +2243,11 @@ int MPIR_Request_get_error(MPID_Request *);
 int MPIR_Grequest_cancel(MPID_Request * request_ptr, int complete);
 int MPIR_Grequest_query(MPID_Request * request_ptr);
 int MPIR_Grequest_free(MPID_Request * request_ptr);
+
+/* this routine was added to support our extension relaxing the progress rules
+ * for generalized requests */
+int MPIR_Grequest_progress_poke(int count, MPID_Request **request_ptrs, 
+		MPI_Status array_of_statuses[] );
 
 /* ------------------------------------------------------------------------- */
 /* Prototypes for language-specific routines, such as routines to set
@@ -2387,6 +2404,19 @@ int MPID_Init( int *argc_p, char ***argv_p, int requested,
 	       int requested, int *provided,
 	       MPID_Comm **parent_comm, int *has_args, int *has_env ); */
 
+/*@ 
+  MPID_InitCompleted - Notify the device that the MPI_Init or MPI_Initthread
+  call has completed setting up MPI
+
+ Notes:
+ This call allows the device to complete any setup that it wishes to perform
+ and for which it needs to access any of the structures (such as 'MPIR_Process')
+ that are initialized after 'MPID_Init' is called.  If the device does not need
+ any extra operations, then it may provide either an empty function or even
+ define this as a macro with the value 'MPI_SUCCESS'.
+  @*/
+int MPID_InitCompleted( void );
+
 /*@
   MPID_Finalize - Perform the device-specific termination of an MPI job
 
@@ -2487,7 +2517,10 @@ int MPID_Finalize(void);
   @*/
 
 /* FIXME: the 4th argument isn't part of the original design and isn't documented */
+
 int MPID_Abort( MPID_Comm *comm, int mpi_errno, int exit_code, const char *error_msg );
+/* We want to also declare MPID_Abort in mpiutil.h if mpiimpl.h is not used */
+#define HAS_MPID_ABORT_DECL
 
 int MPID_Open_port(MPID_Info *, char *);
 int MPID_Close_port(const char *);
@@ -3104,6 +3137,18 @@ void MPID_Request_set_completed(MPID_Request *);
 @*/
 void MPID_Request_release(MPID_Request *);
 
+typedef struct MPID_Grequest_class {
+     int                handle;      /* value of MPIX_Grequest_class for 
+					this structure */
+     volatile int       ref_count;
+     MPI_Grequest_query_function *query_fn;
+     MPI_Grequest_free_function *free_fn;
+     MPI_Grequest_cancel_function *cancel_fn;
+     MPIX_Grequest_poll_function *poll_fn;
+     MPIX_Grequest_wait_function *wait_fn;
+} MPID_Grequest_class;
+
+
 /*TTopoOverview.tex
  *
  * The MPI collective and topology routines can benefit from information 
@@ -3291,6 +3336,30 @@ int MPID_VCR_Dup(MPID_VCR orig_vcr, MPID_VCR * new_vcr);
   @*/
 int MPID_VCR_Get_lpid(MPID_VCR vcr, int * lpid_ptr);
 
+/* ------------------------------------------------------------------------- */
+/* Define a macro to allow us to select between statically selected functions
+ * and dynamically loaded ones.  If USE_DYNAMIC_LIBRARIES is defined,
+ * the macro MPIU_CALL(context,funccall) expands into
+ *    MPIU_CALL##context.funccall.
+ * For example,
+ *    err = MPIU_CALL(MPIDI_CH3,iSend(...))
+ * will expand into
+ *    err = MPIU_CALL_MPIDI_CH3.iSend(...)
+ * If USE_DYNAMIC_LIBS is not selected, then it expands into
+ *    err = MPIDI_CH3_iSend(...)
+ * 
+ * In the case where dynamic libraries are used, a variable named 
+ * MPIU_CALL_context must be defined that contains the function pointers;
+ * initializing the function pointers must be done before the first use.
+ * Typically, this variable will be the single instance of a structure that
+ * contains the function pointers.
+ */
+/* ------------------------------------------------------------------------- */
+#ifdef USE_DYNAMIC_LIBRARIES
+#define MPIU_CALL(context,funccall) MPIU_CALL_##context.funccall
+#else
+#define MPIU_CALL(context,funccall) context##_##funccall
+#endif
 
 /* Include definitions from the device which require items defined by this 
    file (mpiimpl.h). */
@@ -3315,6 +3384,7 @@ int MPID_VCR_Get_lpid(MPID_VCR vcr, int * lpid_ptr);
 #define MPIR_ALLGATHER_LONG_MSG       524288
 #define MPIR_REDUCE_SHORT_MSG         2048
 #define MPIR_ALLREDUCE_SHORT_MSG      2048
+#define MPIR_GATHER_VSMALL_MSG        1024
 #define MPIR_SCATTER_SHORT_MSG        2048  /* for intercommunicator scatter */
 #define MPIR_GATHER_SHORT_MSG         2048  /* for intercommunicator scatter */
 

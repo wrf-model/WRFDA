@@ -68,7 +68,8 @@ int main(int argc, char **argv)
 
 #		    if defined(VERBOSE)
 		    {
-			printf("sending message: p=%d s=%d c=%d\n", status.MPI_SOURCE, msg_size, msg_cnt);
+			printf("sending message: p=%d s=%d c=%d\n", 
+			       status.MPI_SOURCE, msg_size, msg_cnt);
 		    }
 #		    endif
 		    

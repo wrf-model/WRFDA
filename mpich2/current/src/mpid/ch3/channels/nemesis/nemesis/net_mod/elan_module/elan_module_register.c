@@ -5,7 +5,7 @@
  */
 
 #include "elan_module_impl.h"
-#include "elan.h"
+#include <elan/elan.h>
 
 int
 MPID_nem_elan_module_register_mem (void *p, int len)

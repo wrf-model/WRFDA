@@ -25,6 +25,7 @@ F77_LINK       = $(FC)
 LDFLAGS     =  @LDFLAGS@ 
 
 VPATH = .:@srcdir@
+c2f2c_CFLAGSADD = -I../../include
 
 .SUFFIXES:
 .SUFFIXES: .o .c .f 
@@ -46,7 +47,7 @@ clean:
 	-@rm -f *.irlog*
 distclean:  clean distclean-xxx remove-makefile
 distclean-xxx:
-	-@rm -f Makefile testlist
+	-@rm -f add1size.h Makefile testlist
 	-@rm -rf autom4te*.cache
 	-@rm -rf $(DEPS_DIR)
 	-@rm -f TAGS
@@ -57,7 +58,8 @@ remove-genmakefiles:
 all-redirect: c2f2cf c2fmult
 
 allocmemf: allocmemf.o   @MPILIBLOC@ ../util/mtestf.o
-	$(F77_LINK) $(FFLAGS) $(LDFLAGS) -o allocmemf allocmemf.o  ${LIBS}
+	$(F77_LINK) $(FFLAGS) $(LDFLAGS) -o allocmemf allocmemf.o  \
+	../util/mtestf.o ${LIBS} 
 c2fmult: c2fmult.o   @MPILIBLOC@ ../util/mtestf.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o c2fmult c2fmult.o  ${LIBS}
 c2f2cf: c2f2c.o c2f2cf.o   @MPILIBLOC@ ../util/mtestf.o

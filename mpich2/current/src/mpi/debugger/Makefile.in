@@ -94,17 +94,8 @@ libtvmpich2.la: dll_mpich2.lo
 	${AR} cr libtvmpich2.la $?
 
 # --------------------------------------------------------------------------
-.libstamp2: _dbginit.o 
-	${AR} cr ../../../lib/lib${PMPILIBNAME}.a $?
-	${RANLIB} ../../../lib/lib${PMPILIBNAME}.a
-	date > .libstamp2
-.libstamp3: _dbginit.lo 
-	${AR} cr ../../../lib/lib${PMPILIBNAME}.la $?
-	date > .libstamp3
-_dbginit.o: dbginit.c
-	$(C_COMPILE) -c @PROFILE_DEF_MPI@ $(srcdir)/dbginit.c -o _dbginit.o
-_dbginit.lo: dbginit.c
-	$(C_COMPILE_SHL) -c @PROFILE_DEF_MPI@ $(srcdir)/dbginit.c -o _dbginit.lo
+.libstamp2: 
+.libstamp3: 
 # --------------------------------------------------------------------------
 qdemo: qdemo.o   
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o qdemo qdemo.o  ${LIBS}

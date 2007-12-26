@@ -53,7 +53,7 @@ The replacement for this routine is 'MPI_Type_get_extent'.
 int MPI_Type_extent(MPI_Datatype datatype, MPI_Aint *extent)
 {
     int mpi_errno = MPI_SUCCESS;
-    int type_extent;
+    MPI_Aint type_extent;
     MPID_Datatype *datatype_ptr = NULL;
     MPID_MPI_STATE_DECL(MPID_STATE_MPI_TYPE_EXTENT);
 

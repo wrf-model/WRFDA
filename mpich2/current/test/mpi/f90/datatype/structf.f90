@@ -15,7 +15,8 @@
 !
       program bustit
       use mpi
-
+      implicit none
+      
       integer comm
       integer newtype
       integer me
@@ -32,6 +33,7 @@
       integer i, size
       double precision x
       integer src, dest
+      integer ierr
 
       errs = 0
 !     Enroll in MPI

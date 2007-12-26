@@ -26,6 +26,14 @@ public class LegendComparators
                                     = new CaseSensitiveOrder();
     public  static final Comparator CASE_INSENSITIVE_ORDER
                                     = new CaseInsensitiveOrder();
+    public  static final Comparator LONG_NAME_ORDER
+                                    = new LongNameOrder();
+    public  static final Comparator COUNT_ORDER
+                                    = new CountOrder();
+    public  static final Comparator INCL_RATIO_ORDER
+                                    = new InclusiveRatioOrder();
+    public  static final Comparator EXCL_RATIO_ORDER
+                                    = new ExclusiveRatioOrder();
 
     public static class IndexOrder implements Comparator
     {
@@ -105,6 +113,52 @@ public class LegendComparators
                     return diff;
             }
             return type1.getName().compareToIgnoreCase( type2.getName() );
+        }
+    }
+
+    public static class LongNameOrder implements Comparator
+    {
+        public int compare( Object o1, Object o2 )
+        {
+            Category type1      = (Category) o1;
+            Category type2      = (Category) o2;
+            return type1.getName().length() - type2.getName().length();
+        }
+    }
+
+    public static class CountOrder implements Comparator
+    {
+        public int compare( Object o1, Object o2 )
+        {
+            Category type1 = (Category) o1;
+            Category type2 = (Category) o2;
+            long ldiff =   type1.getSummary().getDrawableCount()
+                         - type2.getSummary().getDrawableCount();
+            return ( ldiff < 0 ? -1 : ( ldiff == 0 ? 0 : 1 ) );
+        }
+    }
+
+    public static class InclusiveRatioOrder implements Comparator
+    {
+        public int compare( Object o1, Object o2 )
+        {
+            Category type1 = (Category) o1;
+            Category type2 = (Category) o2;
+            float fdiff =   type1.getSummary().getRatio(true)
+                          - type2.getSummary().getRatio(true);
+            return ( fdiff < 0.0f ? -1 : ( fdiff == 0.0f ? 0 : 1 ) );
+        }
+    }
+
+    public static class ExclusiveRatioOrder implements Comparator
+    {
+        public int compare( Object o1, Object o2 )
+        {
+            Category type1 = (Category) o1;
+            Category type2 = (Category) o2;
+            float fdiff =   type1.getSummary().getRatio(false)
+                          - type2.getSummary().getRatio(false);
+            return ( fdiff < 0.0f ? -1 : ( fdiff == 0.0f ? 0 : 1 ) );
         }
     }
 }

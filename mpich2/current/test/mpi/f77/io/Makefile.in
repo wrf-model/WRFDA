@@ -6,6 +6,9 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
@@ -145,6 +148,11 @@ writeordf.f writeordbef.f writeshf.f writeatallbef.f \
 iwritef.f iwriteshf.f : ioharness.tlt ioharness.defn ../../maint/testmerge
 	../../maint/testmerge -defn=$(top_srcdir)/maint/common.defn \
 		$(srcdir)/ioharness.defn $(srcdir)/ioharness.tlt
+
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
 
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)

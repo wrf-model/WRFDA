@@ -15,8 +15,6 @@ int MPIDI_CH3_Finalize()
 {
     int mpi_errno = MPI_SUCCESS;
 
-    MPIDI_DBG_PRINTF((50, FCNAME, "entering"));
-
     /* Shutdown the progress engine */
     mpi_errno = MPIDI_CH3I_Progress_finalize();
     if (mpi_errno != MPI_SUCCESS)
@@ -35,6 +33,5 @@ int MPIDI_CH3_Finalize()
 	MPIU_ERR_SET(mpi_errno, MPI_ERR_OTHER, "**finalize_release_mem");
     }
 
-    MPIDI_DBG_PRINTF((50, FCNAME, "exiting"));
     return mpi_errno;
 }

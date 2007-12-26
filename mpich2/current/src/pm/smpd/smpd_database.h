@@ -16,8 +16,8 @@
 extern "C" {
 #endif
 
-int smpd_dbs_init();
-int smpd_dbs_finalize();
+int smpd_dbs_init(void);
+int smpd_dbs_finalize(void);
 int smpd_dbs_create(char *name);
 int smpd_dbs_create_name_in(char *name);
 int smpd_dbs_destroy(const char *name);

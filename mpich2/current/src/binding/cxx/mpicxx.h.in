@@ -2602,8 +2602,8 @@ extern const int ORDER_C;
 extern const int ORDER_FORTRAN;
 // Include these only if MPI-IO is available
 #ifdef MPI_MODE_RDONLY
-extern const int DISPLACEMENT_CURRENT;
 extern const int MAX_DATAREP_STRING;
+extern const MPI_Offset DISPLACEMENT_CURRENT;
 extern const int MODE_APPEND;
 extern const int MODE_CREATE;
 extern const int MODE_DELETE_ON_CLOSE;

@@ -100,6 +100,8 @@ int double_int_test(void)
 			     count);
     }
 
+    MPI_Type_free( &stype );
+
     return errs;
 }
 

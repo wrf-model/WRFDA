@@ -1,5 +1,5 @@
 INCLUDES = -I../../../../../include -I${master_top_srcdir}/src/include
-lib${MPILIBNAME}_a_SOURCES = \
+shmsources = \
  ch3_finalize.c \
  ch3_init.c \
  ch3_isend.c \
@@ -11,4 +11,10 @@ lib${MPILIBNAME}_a_SOURCES = \
  ch3_open_port.c \
  ch3_istartrndvmsg.c \
  ch3_istartrndvtransfer.c
+
+lib${MPILIBNAME}_a_SOURCES = ${shmsources}
+
+EXTRA_LIBS = libmpich2-ch3-shm.a
+libmpich2-ch3-shm_a_SOURCES = ${shmsources}
+
 

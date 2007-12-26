@@ -40,7 +40,7 @@
        integer max_nints, max_dtypes, max_asizev
        parameter (max_nints = 10, max_dtypes = 10, max_asizev=10)
        integer intv(max_nints), dtypesv(max_dtypes)
-       integer (kind=MPI_ADDRESS_KIND) asize, asizev(max_asizev)
+       integer (kind=MPI_ADDRESS_KIND) aint, aintv(max_asizev)
 
 !
        call mpi_type_get_envelope( dtype, nints, nadds, ntype, &
@@ -49,7 +49,7 @@
        if (combiner .ne. MPI_COMBINER_NAMED) then
           call mpi_type_get_contents( dtype,  &
       &         max_nints, max_asizev, max_dtypes, &
-      &         intv, asizev, dtypesv, ierr )
+      &         intv, aintv, dtypesv, ierr )
 !
 !              dtypesv of constructed types must be free'd now
 !

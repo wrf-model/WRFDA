@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include "mpitest.h"
 
+#ifndef MAX_INT
+#define MAX_INT 0x7fffffff
+#endif
+
 static char MTEST_Descrip[] = "Test MPI_Accumulate with fence";
 
 /* same as accfence2.c, but uses alloc_mem */
@@ -39,9 +43,18 @@ int main( int argc, char *argv[] )
 	
 	for (count = 32768; count < 65000; count = count * 2) {
 	    datatype = MPI_INT;
-/*	    winbuf = (int *)malloc( count * sizeof(int) );
-	    sbuf   = (int *)malloc( count * sizeof(int) );
-*/
+
+	    /* We compare with an integer value that can be as large as
+	       size * (count * count + (1/2)*(size-1))
+	       For large machines (size large), this can exceed the 
+	       maximum integer for some large values of count.  We check
+	       that in advance and break this loop if the above value 
+	       would exceed MAX_INT.  Specifically,
+
+	       size*count*count + (1/2)*size*(size-1) > MAX_INT
+	       count*count > (MAX_INT/size - (1/2)*(size-1))
+	    */
+	    if (count * count > (MAX_INT/size - (size-1)/2)) break;
 
 	    MPI_Alloc_mem( count * sizeof(int), MPI_INFO_NULL, &winbuf );
 	    MPI_Alloc_mem( count * sizeof(int), MPI_INFO_NULL, &sbuf );
@@ -69,10 +82,6 @@ int main( int argc, char *argv[] )
 	    }
 
 	    MPI_Win_free( &win );
-
-/*	    free( winbuf );
-	    free( sbuf );
-*/
 
             MPI_Free_mem(winbuf);
             MPI_Free_mem(sbuf);

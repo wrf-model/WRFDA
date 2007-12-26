@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: file_nameserv.c,v 1.16 2005/08/10 21:21:35 gropp Exp $
+/*  $Id: file_nameserv.c,v 1.17 2007/07/22 21:36:23 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -13,9 +13,12 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include "mpiimpl.h"
 #include "namepub.h"
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <errno.h>
 
 /* For writing the name/service pair */
 /* style: allow:fprintf:1 sig:0 */   

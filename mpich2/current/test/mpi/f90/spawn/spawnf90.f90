@@ -12,6 +12,7 @@
         integer errcodes(2)
         integer parentcomm, intercomm
         integer status(MPI_STATUS_SIZE)
+        integer ierr
 
         errs = 0
         np   = 2

@@ -5,7 +5,7 @@
  */
 
 #include "elan_module_impl.h"
-#include "elan.h"
+#include <elan/elan.h>
 #include "elan_module.h"
 #include "my_papi_defs.h"
 
@@ -30,7 +30,7 @@ MPID_nem_elan_module_send (MPIDI_VC_t *vc, MPID_nem_cell_ptr_t cell, int datalen
 	
 	elan_event_ptr =
 	  elan_queueTx(rxq_ptr_array[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
-	//elan_queueTx(vc->ch.rxq_ptr_array[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
+	//elan_queueTx(VC_FIELD(vc, rxq_ptr_array)[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
 
 	if (elan_poll(elan_event_ptr,MPID_NEM_ELAN_LOOPS_SEND) == TRUE)
 	  {
@@ -59,9 +59,9 @@ MPID_nem_elan_module_send (MPIDI_VC_t *vc, MPID_nem_cell_ptr_t cell, int datalen
 
 		  elan_event_cell->elan_event = 
 		    elan_queueTx(rxq_ptr_array[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
-		  //elan_queueTx(vc->ch.rxq_ptr_array[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
+		  //elan_queueTx(VC_FIELD(vc, rxq_ptr_array)[dest],MPID_nem_elan_vpids[dest],(char *)pkt,(size_t)(MPID_NEM_PACKET_LEN(pkt)),MPID_NEM_ELAN_RAIL_NUM);
 	       }
-	     elan_wait(elan_event_cell->elan_event,ELAN_WAIT_EVENT);
+	     elan_wait(elan_event_cell->elan_event,elan_base->waitType);
 	     MPID_nem_queue_enqueue (MPID_nem_process_free_queue,elan_event_cell->cell_ptr);	     	     
 	  }		
 	MPID_NEM_ELAN_SET_CELL( elan_event_cell , NULL , cell, 1);

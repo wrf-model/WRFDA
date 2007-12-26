@@ -77,7 +77,7 @@ int MPI_Waitall(int count, MPI_Request array_of_requests[],
     MPI_Status * status_ptr;
     MPID_Progress_state progress_state;
     int i;
-    int n_completed;
+    int n_completed, n_native=0;
     int active_flag;
     int rc;
     int mpi_errno = MPI_SUCCESS;
@@ -160,8 +160,13 @@ int MPI_Waitall(int count, MPI_Request array_of_requests[],
     }
     
     MPID_Progress_start(&progress_state);
+
     for(;;)
     {
+	mpi_errno = MPIR_Grequest_progress_poke(count, 
+			request_ptrs, array_of_statuses);
+	if (mpi_errno != MPI_SUCCESS) goto fn_fail;
+
 	for (i = 0; i < count; i++)
 	{
 	    if (request_ptrs[i] != NULL && *request_ptrs[i]->cc_ptr == 0)
@@ -212,13 +217,24 @@ int MPI_Waitall(int count, MPI_Request array_of_requests[],
 	    break;
 	}
 
-	mpi_errno = MPID_Progress_wait(&progress_state);
-	if (mpi_errno != MPI_SUCCESS)
-	{
-	    /* --BEGIN ERROR HANDLING-- */
-	    MPID_Progress_end(&progress_state);
-	    goto fn_fail;
-	    /* --END ERROR HANDLING-- */
+	for (i=0; i<count; i++) {
+	    if (request_ptrs[i] != NULL && 
+			    request_ptrs[i]->kind != MPID_UREQUEST) 
+	    {
+		n_native=1;
+		break;
+	    }
+	}
+		    
+	if (n_native > 0) {
+	    mpi_errno = MPID_Progress_wait(&progress_state);
+	    if (mpi_errno != MPI_SUCCESS)
+	    {
+	        /* --BEGIN ERROR HANDLING-- */
+	        MPID_Progress_end(&progress_state);
+	        goto fn_fail;
+	        /* --END ERROR HANDLING-- */
+	    }
 	}
     }
     MPID_Progress_end(&progress_state);

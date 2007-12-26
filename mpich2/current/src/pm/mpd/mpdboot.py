@@ -46,7 +46,7 @@ usage:  mpdboot --totalnum=<n_to_start> [--file=<hostsfile>]  [--help] \
 from time import ctime
 __author__ = "Ralph Butler and Rusty Lusk"
 __date__ = ctime()
-__version__ = "$Revision: 1.46 $"
+__version__ = "$Revision: 1.49 $"
 __credits__ = ""
 
 import re
@@ -223,17 +223,28 @@ def mpdboot():
             if k == 'ifhn':
                 ifhn = v
         hostsAndInfo.append( {'host' : host, 'ncpus' : ncpus, 'ifhn' : ifhn} )
+    cachedIPs = {}
     if oneMPDPerHost  and  totalnumToStart > 1:
-        oldHosts = hostsAndInfo[:]
+        oldHostsAndInfo = hostsAndInfo[:]
         hostsAndInfo = []
-        for x in oldHosts:
-           keep = 1
-           for y in hostsAndInfo:
-               if mpd_same_ips(x['host'],y['host']):
-                   keep = 0
-                   break
-           if keep:
-               hostsAndInfo.append(x)
+        for hostAndInfo in oldHostsAndInfo:
+            oldhost = hostAndInfo['host']
+            try:
+                ips = gethostbyname_ex(oldhost)[2]    # may fail if invalid host
+            except:
+                print 'unable to obtain IP for host:', oldhost
+                continue
+            uips = {}    # unique ips
+            for ip in ips:
+                uips[ip] = 1
+            keep = 1
+            for ip in uips.keys():
+                if cachedIPs.has_key(ip):
+                    keep = 0
+                    break
+            if keep:
+                hostsAndInfo.append(hostAndInfo)
+                cachedIPs.update(uips)
     if len(hostsAndInfo) < totalnumToStart:    # one is local
         print 'totalnum=%d  numhosts=%d' % (totalnumToStart,len(hostsAndInfo))
         print 'there are not enough hosts on which to start all processes'
@@ -371,7 +382,7 @@ def handle_mpd_output(fd,fd2idx,hostsAndInfo):
             tempSock.send_dict_msg(msgToSend)
             msg = tempSock.recv_dict_msg()    # RMB: WITH TIMEOUT ??
             if not msg  or  not msg.has_key('cmd')  or  msg['cmd'] != 'challenge':
-                mpd_print(1,'failed to ping mpd on %s; recvd output=%s' % \
+                mpd_print(1,'failed to handshake with mpd on %s; recvd output=%s' % \
                           (host,msg) )
                 tempOut = tempSock.recv(1000)
                 print tempOut

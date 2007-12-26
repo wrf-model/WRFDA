@@ -5,7 +5,7 @@
  */
 
 #include "elan_module_impl.h"
-#include "elan.h"
+#include <elan/elan.h>
 #include "elan_module.h"
 #include "my_papi_defs.h"
 
@@ -109,7 +109,7 @@ MPID_nem_elan_module_recv( void )
 	MPID_nem_cell_ptr_t  cell = NULL;
 	
 	MPID_nem_queue_dequeue (MPID_nem_module_elan_free_queue, &cell);
-	elan_queueRxWait(mpid_nem_elan_recv_queue_ptr,(char *)(MPID_NEM_CELL_TO_PACKET (cell)),ELAN_WAIT_EVENT);	     	     
+	elan_queueRxWait(mpid_nem_elan_recv_queue_ptr,(char *)(MPID_NEM_CELL_TO_PACKET (cell)),elan_base->waitType);	     	     
 	MPID_nem_queue_enqueue (MPID_nem_process_recv_queue, cell);	     	     
      }	
    fn_exit:

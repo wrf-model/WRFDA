@@ -6,22 +6,16 @@
 
 int CollChk_get_fh(MPI_File fh, MPI_Comm *comm)
 {
-    int crr_fh=0, found=0;
+    int cur_idx = 0;
 
     /* find the fh */
-    while( (crr_fh < CollChk_fh_cnt) && !found ) {
-        if(fh == CollChk_fh_list[crr_fh].fh) {
-            found = 1;
-        } 
-        else {
-            crr_fh++;
-        }
-    }
+    while( cur_idx < CollChk_fh_cnt && CollChk_fh_list[cur_idx].fh != fh )
+        cur_idx++;
 
     /* return the comm if found */
-    if(found) {
+    if ( cur_idx < CollChk_fh_cnt && CollChk_fh_list[cur_idx].fh == fh ) {
         /* the comm was found */
-        *comm = CollChk_fh_list[crr_fh].comm;
+        *comm = CollChk_fh_list[cur_idx].comm;
         return 1;
     }
     else {

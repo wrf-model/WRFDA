@@ -26,14 +26,16 @@
 #include <io.h>
 #endif
 
+#if !defined( CLOG_NOMPI )
+#include "mpi.h"
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
 #include "clog_const.h"
 #include "clog_mem.h"
 #include "clog_merger.h"
 #include "clog_util.h"
-
-#if !defined( CLOG_NOMPI )
-#include "mpi.h"
-#endif
 
 #define CLOG_RANK_NULL   -1
 
@@ -152,13 +154,8 @@ void CLOG_Merger_init(       CLOG_Merger_t    *merger,
                        const char             *merged_file_prefix )
 {
     /* Set up the binary tree MPI ranks ID locally for merging */
-#if !defined( CLOG_NOMPI )
     PMPI_Comm_size( MPI_COMM_WORLD, &(merger->world_size) );
     PMPI_Comm_rank( MPI_COMM_WORLD, &(merger->local_world_rank) );
-#else
-    merger->world_size       = 1;
-    merger->local_world_rank = 0;
-#endif
     CLOG_Merger_set_neighbor_ranks( merger );
 
     merger->is_big_endian  = preamble->is_big_endian;
@@ -189,13 +186,10 @@ void CLOG_Merger_init(       CLOG_Merger_t    *merger,
 /* Finalize the CLOG_Merger_t */
 void CLOG_Merger_finalize( CLOG_Merger_t *merger, CLOG_Buffer_t *buffer )
 {
-#if !defined( CLOG_NOMPI )
     CLOG_BOOL_T  do_byte_swap;
     int          ierr;
-#endif
 
     if ( merger->out_fd != -1 ) {
-#if !defined( CLOG_NOMPI )
         /* Update CLOG_Preamble_t with commtable_fptr */
         buffer->preamble->commtable_fptr
         = (CLOG_int64_t) lseek( merger->out_fd, 0, SEEK_CUR );
@@ -213,7 +207,6 @@ void CLOG_Merger_finalize( CLOG_Merger_t *merger, CLOG_Buffer_t *buffer )
         lseek( merger->out_fd, 0, SEEK_SET );
         CLOG_Preamble_write( buffer->preamble, CLOG_BOOL_TRUE, CLOG_BOOL_TRUE,
                              merger->out_fd );
-#endif
         close( merger->out_fd );
     }
 }
@@ -276,11 +269,9 @@ void CLOG_Merger_save_rec( CLOG_Merger_t *merger, const CLOG_Rec_Header_t *hdr )
         sorted_hdr->rectype    = CLOG_REC_ENDBLOCK;
 
         if ( merger->parent_world_rank != CLOG_RANK_NULL ) {
-#if !defined( CLOG_NOMPI )
             PMPI_Send( sorted_blk->head, merger->block_size, 
                        CLOG_DATAUNIT_MPI_TYPE, merger->parent_world_rank,
                        CLOG_MERGE_LOGBUFTYPE, MPI_COMM_WORLD );
-#endif
         }
         else { /* if parent_world_rank does not exist, must be the root */
             CLOG_Merger_flush( merger );
@@ -303,14 +294,12 @@ void CLOG_Merger_save_rec( CLOG_Merger_t *merger, const CLOG_Rec_Header_t *hdr )
 void CLOG_Merger_refill_sideblock( CLOG_BlockData_t  *blockdata,
                                    int block_world_rank, int block_size )
 {
-#if !defined( CLOG_NOMPI )
     MPI_Status         status;
 
     PMPI_Recv( blockdata->head, block_size, CLOG_DATAUNIT_MPI_TYPE,
                block_world_rank, CLOG_MERGE_LOGBUFTYPE, MPI_COMM_WORLD,
                &status );
     CLOG_BlockData_reset( blockdata );
-#endif
 }
 
 /* Used internally by CLOG_Merger_sort() */
@@ -324,12 +313,8 @@ void CLOG_Merger_refill_localblock( CLOG_BlockData_t *blockdata,
 
     if ( buffer->num_used_blocks > 0 ) {
         blockdata->head = buffer->curr_block->data->head;
-#if !defined( CLOG_NOMPI )
         CLOG_BlockData_patch_all( blockdata, timediff_handle,
                                   buffer->commset->table );
-#else
-        CLOG_BlockData_patch_time( blockdata, timediff_handle );
-#endif
         CLOG_BlockData_reset( blockdata );
         buffer->curr_block = buffer->curr_block->next;
         buffer->num_used_blocks--;
@@ -405,9 +390,7 @@ void CLOG_Merger_sort( CLOG_Merger_t *merger, CLOG_Buffer_t *buffer )
 
     /* May want to move this to CLOG_Merger_init() or CLOG_Converge_init() */
     /* Merge/Synchronize all the CLOG_CommSet_t at all the processes */
-#if !defined( CLOG_NOMPI )
     CLOG_CommSet_merge( buffer->commset );
-#endif
     /*
         reinitialization of CLOG_Buffer_t so that
         buffer->curr_block == buffer->head->block
@@ -502,11 +485,9 @@ void CLOG_Merger_last_flush( CLOG_Merger_t *merger )
     sorted_hdr->rectype    = CLOG_REC_ENDLOG;
 
     if ( merger->parent_world_rank != CLOG_RANK_NULL ) {
-#if !defined( CLOG_NOMPI )
         PMPI_Send( sorted_blk->head, merger->block_size,
                    CLOG_DATAUNIT_MPI_TYPE, merger->parent_world_rank,
                    CLOG_MERGE_LOGBUFTYPE, MPI_COMM_WORLD );
-#endif
     }
     else { /* if parent_world_rank does not exist, must be the root */
         CLOG_Merger_flush( merger );

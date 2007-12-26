@@ -85,7 +85,7 @@ for (@ARGV) {
 	# Create the coverage in default web pages for the device
 	# named as an argument (e.g., maint/getcoverage -webpages=ch3:sock)
 	my $device = $1;
-	my $weblocbase = "/Users/gropp/tmp/mpich2-p2/tmpdir/mpich2-1.0.5/www/coverage";
+	my $weblocbase = "/sandbox/thakur/1.0.6p1/mpich2/tmpdir/mpich2-1.0.6p1/www/coverage";
 	my $webloc     = $weblocbase . "/$device";
 	$annoteSrcDir = $webloc;
 	$annoteFiles  = 1;

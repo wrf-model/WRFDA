@@ -14,5 +14,10 @@ typeattrf_SOURCES    = typeattrf.f
 typeattr2f_SOURCES   = typeattr2f.f
 typeattr3f_SOURCES   = typeattr3f.f
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)

@@ -258,7 +258,12 @@ def mpd_sockpair():
     sock1.close()
     return (sock2,sock3)
 
-def mpd_which(execName,user_path=os.environ['PATH']):
+def mpd_which(execName,user_path=None):
+    if not user_path:
+        if os.environ.has_key('PATH'):
+            user_path = os.environ['PATH']
+        else:
+            return ''
     for d in user_path.split(os.pathsep):
         fpn = os.path.join(d,execName)
         if os.path.isdir(fpn):  # follows symlinks; dirs can have execute permission
@@ -318,6 +323,7 @@ def mpd_read_nbytes(fd,nbytes):
     rv = 0
     while 1:
         try:
+            mpd_signum = 0
             rv = os.read(fd,nbytes)
             break
         except os.error, errinfo:
@@ -378,6 +384,7 @@ class MPDSock(object):
         # do the right thing in that case).
         while 1:
             try:
+                mpd_signum = 0
                 self.sock.connect(*args)
                 break
             except socket.error, errinfo:
@@ -491,29 +498,37 @@ class MPDSock(object):
         if readyToRecv:
             mpd_print(mpd_dbg_level,"readyToRecv");
             try:
-                while (1):
-                    try:
-                        pickledLen = self.sock.recv(8)
-                        # FIXME: Shouldn't this block until there is a
-                        # message unless it raises an exception.
-                        # Is no message an EOF, and in that case, 
-                        # do we really want to immediately delete
-                        # the corresponding entry?
-                        #if not pickledLen:
-			#    mpd_print(1,"continuing because recv failed")
-                        #    continue
-                        break
-                    except socket.error,errinfo:
-                        if errinfo[0] == EINTR:
-                            mpd_print(mpd_dbg_level,"Saw EINTR")
-                            pass
-			elif errinfo[0] == ECONNRESET:
-                            mpd_print(mpd_dbg_level,"Saw ECONNRESET, ignore (return null msg)")
-			    return msg;
-                        else:
-                            mpd_print_tb(1,"recv_dict_msg: sock.recv(8): errinfo=:%s:" % (errinfo))
-                            raise socket.error,errinfo
-                # end of while(1)
+                pickledLen = ''
+                tempRecvd = ''
+                lenLeft = 8
+                while lenLeft:
+                    while (1):
+                        try:
+                            tempRecvd = self.sock.recv(lenLeft)
+                            # FIXME: Shouldn't this block until there is a
+                            # message unless it raises an exception.
+                            # Is no message an EOF, and in that case, 
+                            # do we really want to immediately delete
+                            # the corresponding entry?
+                            #if not pickledLen:
+                            #    mpd_print(1,"continuing because recv failed")
+                            #    continue
+                            break
+                        except socket.error,errinfo:
+                            if errinfo[0] == EINTR:
+                                mpd_print(mpd_dbg_level,"Saw EINTR")
+                                pass
+                            elif errinfo[0] == ECONNRESET:
+                                mpd_print(mpd_dbg_level,"Saw ECONNRESET, ignore (return null msg)")
+                                return msg;
+                            else:
+                                mpd_print_tb(1,"recv_dict_msg: sock.recv(8): errinfo=:%s:" % (errinfo))
+                                raise socket.error,errinfo
+                    # end of while(1)
+                    if not tempRecvd:
+                         break
+                    pickledLen += tempRecvd
+                    lenLeft -= len(tempRecvd)
                 if not pickledLen:
                     mpd_print(mpd_dbg_level,"no pickeled len")
                 if pickledLen:
@@ -620,12 +635,14 @@ class MPDSock(object):
                     self.sendall( "%08d%s" % (len(pickledMsg),pickledMsg) )
                     break
                 except socket.error, errmsg:
-		    if errmsg[0] == EPIPE:
+		    if errmsg[0] == EPIPE  \
+                    or errmsg[0] == ECONNRESET \
+                    or errmsg[0] == EINTR:
 			# silent failure on pipe failure, as we usually
                         # just want to discard messages in this case 
                         # (We need to plan error handling more thoroughly)
-                        pass
-                    if errmsg[0] != EINTR:
+                        break  ## RMB: chgd from pass
+                    else:
                         raise socket.error, errmsg
             # end of While
         except Exception, errmsg:
@@ -722,6 +739,8 @@ class MPDStreamHandler(object):
                 break
             except select.error, errinfo:
                 if errinfo[0] == EINTR:
+                    if mpd_signum == signal.SIGCHLD:
+                        break
                     if mpd_signum == signal.SIGINT  or  mpd_signum == signal.SIGALRM:
                         break
                     else:
@@ -1403,6 +1422,8 @@ class MPDTest(object):
                 runner.stdin.write(expIn)
             runner.stdin.close()
             for line in runner.stdout:
+                outLines.append(line[:-1])    # strip newlines
+            for line in runner.stderr:
                 outLines.append(line[:-1])    # strip newlines
             rv['pid'] = runner.pid
             rv['EC'] = runner.wait()

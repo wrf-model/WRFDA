@@ -17,12 +17,6 @@
 #include <unistd.h>
 #endif
 
-#include "clog_const.h"
-#include "clog_mem.h"
-#include "clog_uuid.h"
-#include "clog_commset.h"
-#include "clog_util.h"
-
 #if !defined( CLOG_NOMPI )
 
 #if !defined( HAVE_PMPI_COMM_CREATE_KEYVAL )
@@ -41,7 +35,19 @@
 #define PMPI_Comm_get_attr PMPI_Attr_get
 #endif
 
-#endif
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
+
+#include "clog_const.h"
+#include "clog_util.h"
+#include "clog_mem.h"
+#include "clog_uuid.h"
+#include "clog_commset.h"
+
+
+
 
 CLOG_CommSet_t* CLOG_CommSet_create( void )
 {
@@ -50,21 +56,34 @@ CLOG_CommSet_t* CLOG_CommSet_create( void )
 
     commset = (CLOG_CommSet_t *) MALLOC( sizeof(CLOG_CommSet_t) );
     if ( commset == NULL ) {
-        fprintf( stderr, __FILE__":CLOG_CommSet_create() - MALLOC() fails.\n" );
+        fprintf( stderr, __FILE__":CLOG_CommSet_create() - \n"
+                         "\tMALLOC() fails for CLOG_CommSet_t!\n" );
         fflush( stderr );
         return NULL;
     }
 
     /* LID_key Initialized to 'unallocated' */
-#if !defined( CLOG_NOMPI )
     commset->LID_key   = MPI_KEYVAL_INVALID;
-#else
-    commset->LID_key   = 0;
-#endif
     commset->max       = CLOG_COMM_TABLE_INCRE;
     commset->count     = 0;
     table_size         = commset->max * sizeof(CLOG_CommIDs_t);
     commset->table     = (CLOG_CommIDs_t *) MALLOC( table_size );
+    if ( commset->table == NULL ) {
+        FREE( commset );
+        fprintf( stderr, __FILE__":CLOG_CommSet_create() - \n"
+                         "\tMALLOC() fails for CLOG_CommSet_t.table[]!\n" );
+        fflush( stderr );
+        return NULL;
+    }
+    /*
+       memset() to set all alignment space in commset->table.
+       This is done to keep valgrind happy on 64bit machine.
+    */
+    memset( commset->table, 0, table_size );
+
+    /* Initialize */
+    commset->IDs4world = &(commset->table[0]);
+    commset->IDs4self  = &(commset->table[1]);
 
     return commset;
 }
@@ -77,9 +96,8 @@ void CLOG_CommSet_free( CLOG_CommSet_t **comm_handle )
     if ( commset != NULL ) {
         if ( commset->table != NULL )
             FREE( commset->table );
-#if !defined( CLOG_NOMPI )
-        PMPI_Comm_free_keyval( &(commset->LID_key) );
-#endif
+        if ( commset->LID_key != MPI_KEYVAL_INVALID )
+            PMPI_Comm_free_keyval( &(commset->LID_key) );
         FREE( commset );
     }
     *comm_handle = NULL;
@@ -88,17 +106,22 @@ void CLOG_CommSet_free( CLOG_CommSet_t **comm_handle )
 
 
 static
-CLOG_CommIDs_t* CLOG_CommSet_get_new_IDs( CLOG_CommSet_t *commset )
+CLOG_CommIDs_t* CLOG_CommSet_get_new_IDs( CLOG_CommSet_t *commset, int num_IDs )
 {
     CLOG_CommIDs_t  *new_table;
     CLOG_CommIDs_t  *new_entry;
     int              new_size;
+    int              old_size, old_max;
+    int              idx;
 
     /* Enlarge the CLOG_CommSet_t.table if necessary */
-    if ( commset->count >= commset->max ) {
-        commset->max += CLOG_COMM_TABLE_INCRE;
-        new_size      = commset->max * sizeof(CLOG_CommIDs_t);
-        new_table     = (CLOG_CommIDs_t *) REALLOC( commset->table, new_size );
+    if ( commset->count + num_IDs > commset->max ) {
+        old_max    = commset->max;
+        do {
+            commset->max += CLOG_COMM_TABLE_INCRE;
+        } while ( commset->count + num_IDs > commset->max );
+        new_size   = commset->max * sizeof(CLOG_CommIDs_t);
+        new_table  = (CLOG_CommIDs_t *) REALLOC( commset->table, new_size );
         if ( new_table == NULL ) {
             fprintf( stderr, __FILE__":CLOG_CommSet_get_next_IDs() - \n"
                              "\t""REALLOC(%p,%d) fails!\n",
@@ -106,26 +129,40 @@ CLOG_CommIDs_t* CLOG_CommSet_get_new_IDs( CLOG_CommSet_t *commset )
             fflush( stderr );
             CLOG_Util_abort( 1 );
         }
-        commset->table = new_table;
+        /* memset() newly allocated data to keep valgrind happy on 64bit box */
+        old_size   = old_max * sizeof(CLOG_CommIDs_t);
+        memset( &(new_table[old_max]), 0, new_size - old_size );
+
+        commset->table     = new_table;
+        /* Update commset->IDs4xxxx after successfully REALLOC() */
+        commset->IDs4world = &(commset->table[0]);
+        commset->IDs4self  = &(commset->table[1]);
     }
 
-    /* return the next available table entry in CLOG_CommSet_t */
     new_entry  = &( commset->table[commset->count] );
+    for ( idx = 0; idx < num_IDs; idx++ ) {
+        /* Set the local Comm ID temporarily equal to the table entry's index */
+        new_entry->local_ID   = commset->count + idx;
 
-    /* Set the local Comm ID temporarily equal to the table entry's index */
-    new_entry->local_ID   = commset->count;
+        /* set the new entry with the process rank in MPI_COMM_WORLD */
+        new_entry->world_rank = commset->world_rank;
 
-    /* set the new entry with the process rank in MPI_COMM_WORLD */
-    new_entry->world_rank = commset->world_rank;
+        /*
+           Since most commIDs requested is intracomms, no related commIDs:
+           i.e. set the related CLOG_CommIDs_t* as NULL
+        */
+        new_entry->next      = NULL;
+        
+        new_entry++;  /* increment to next CLOG_CommIDs_t in the table[] */
+    }
 
-    /* Set the related CLOG_CommIDs_t* as NULL(Most commIDs refer intracomms. */
-    new_entry->next      = NULL;
-
+    /* return the leading available table entry in CLOG_CommSet_t */
+    new_entry  = &( commset->table[commset->count] );
     /*
        Increment the count to next available slot in the table.
        Also, the count indicates the current used slot in the table.
     */
-    commset->count++;
+    commset->count += num_IDs;
 
     return new_entry;
 }
@@ -151,18 +188,14 @@ CLOG_CommIDs_t* CLOG_CommSet_add_new_GID(       CLOG_CommSet_t *commset,
     CLOG_CommIDs_t  *commIDs;
 
     /* Update the next available table entry in CLOG_CommSet_t */
-    commIDs              = CLOG_CommSet_get_new_IDs( commset );
+    commIDs              = CLOG_CommSet_get_new_IDs( commset, 1 );
     commIDs->kind        = CLOG_COMM_KIND_UNKNOWN;
 
     /* Set the global Comm ID */
     CLOG_Uuid_copy( commgid, commIDs->global_ID );
 
     /* Set the Comm field's */
-#if !defined( CLOG_NOMPI )
     commIDs->comm        = MPI_COMM_NULL;
-#else
-    commIDs->comm        = 0;
-#endif
     commIDs->comm_rank   = -1;
 
     return commIDs;
@@ -231,7 +264,6 @@ CLOG_BOOL_T CLOG_CommSet_sync_IDs(       CLOG_CommSet_t *parent_commset,
 
 
 
-#if !defined( CLOG_NOMPI )
 /*
    CLOG_CommSet_init() should only be called if MPI is involved.
 */
@@ -251,6 +283,9 @@ void CLOG_CommSet_init( CLOG_CommSet_t *commset )
 
     CLOG_CommSet_add_intracomm( commset, MPI_COMM_WORLD );
     CLOG_CommSet_add_intracomm( commset, MPI_COMM_SELF );
+
+    commset->IDs4world = &(commset->table[0]);
+    commset->IDs4self  = &(commset->table[1]);
 }
 
 /*
@@ -263,7 +298,7 @@ const CLOG_CommIDs_t *CLOG_CommSet_add_intracomm( CLOG_CommSet_t *commset,
     CLOG_CommIDs_t  *intracommIDs;
 
     /* Update the next available table entry in CLOG_CommSet_t */
-    intracommIDs         = CLOG_CommSet_get_new_IDs( commset );
+    intracommIDs         = CLOG_CommSet_get_new_IDs( commset, 1 );
     intracommIDs->kind   = CLOG_COMM_KIND_INTRA;
 
     /* Set the input MPI_Comm's LID_key attribute with new local CommID's LID */
@@ -295,10 +330,11 @@ const CLOG_CommIDs_t *CLOG_CommSet_add_intracomm( CLOG_CommSet_t *commset,
 const CLOG_CommIDs_t*
 CLOG_CommSet_add_intercomm(       CLOG_CommSet_t *commset,
                                   MPI_Comm        intercomm,
-                            const CLOG_CommIDs_t *orig_intracommIDs )
+                            const CLOG_CommIDs_t *intracommIDs )
 {
     CLOG_CommIDs_t  *intercommIDs;
     CLOG_CommIDs_t  *local_intracommIDs, *remote_intracommIDs;
+    CLOG_CommIDs_t  *orig_intracommIDs, intracommIDs_val;
     MPI_Status       status;
     MPI_Request      request;
     int              is_intercomm;
@@ -308,8 +344,16 @@ CLOG_CommSet_add_intercomm(       CLOG_CommSet_t *commset,
     if ( !is_intercomm )
         return CLOG_CommSet_add_intracomm( commset, intercomm );
 
+    /*
+       Since CLOG_CommSet_get_new_IDs() may call realloc()
+       which may invalidate any CLOG_CommIDs_t pointer,
+       copy the content of input intracommIDs pointer to a local buffer.
+    */
+    orig_intracommIDs = &intracommIDs_val;
+    memcpy( orig_intracommIDs, intracommIDs, sizeof(CLOG_CommIDs_t) );
+
     /* Set the next available table entry in CLOG_CommSet_t with intercomm */
-    intercommIDs         = CLOG_CommSet_get_new_IDs( commset );
+    intercommIDs         = CLOG_CommSet_get_new_IDs( commset, 3 );
     intercommIDs->kind   = CLOG_COMM_KIND_INTER;
 
     /* Set the input MPI_Comm's LID_key attribute with new local CommID */
@@ -339,7 +383,7 @@ CLOG_CommSet_add_intercomm(       CLOG_CommSet_t *commset,
 #endif
 
     /* Set the next available table entry with the LOCAL intracomm's info */
-    local_intracommIDs            = CLOG_CommSet_get_new_IDs( commset );
+    local_intracommIDs            = intercommIDs + 1;
     local_intracommIDs->kind      = CLOG_COMM_KIND_LOCAL;
     local_intracommIDs->local_ID  = orig_intracommIDs->local_ID;
     CLOG_Uuid_copy( orig_intracommIDs->global_ID,
@@ -349,8 +393,8 @@ CLOG_CommSet_add_intercomm(       CLOG_CommSet_t *commset,
     /* NOTE: LOCAL intracommIDs->comm_rank == intercommIDs->comm_rank */
 
     /* Set the next available table entry with the REMOTE intracomm's info */
-    remote_intracommIDs             = CLOG_CommSet_get_new_IDs( commset );
-    remote_intracommIDs->kind       = CLOG_COMM_KIND_REMOTE;
+    remote_intracommIDs           = intercommIDs + 2;
+    remote_intracommIDs->kind     = CLOG_COMM_KIND_REMOTE;
     /*
        Broadcast local_intracommIDs's GID to everyone in remote_intracomm, i.e.
        Send local_intracommIDs' GID from the root of local intracomms to the
@@ -513,6 +557,11 @@ void CLOG_CommSet_merge( CLOG_CommSet_t *commset )
         fflush( stderr );
         CLOG_Util_abort( 1 );
     }
+    /*
+       memset() to set all alignment space in commset->table.
+       This is done to keep valgrind happy on 64bit machine.
+       memset( recv_table, 0, recv_table_size );
+    */
 
     if ( comm_world_rank == 0 )
         memcpy( recv_table, commset->table, recv_table_size );
@@ -533,7 +582,6 @@ void CLOG_CommSet_merge( CLOG_CommSet_t *commset )
 
     PMPI_Barrier( MPI_COMM_WORLD );
 }
-#endif
 
 static void CLOG_CommRec_swap_bytes( char *commrec )
 {

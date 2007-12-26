@@ -34,6 +34,7 @@ MPEDBG               = @MPEDBG@
 SHELL            = @SHELL@
 RM               = @RM@
 MV               = @MV@
+CP               = @CPRP@
 
 @VPATH@
 
@@ -132,11 +133,16 @@ ${libbuild_dir}/lib$(PROF_LIBNAME)_nompi.a: $(MPE_N_XOBJECTS)
 	 $(RANLIB) $@
 
 dbxtest@EXEEXT@: dbxtest.p@OBJEXT@ ${libbuild_dir}/lib$(PROF_LIBNAME).a
-	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ dbxtest.p@OBJEXT@ \
+	$(CP) -f dbxtest.p@OBJEXT@ mpe2tmp.@OBJEXT@
+	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ mpe2tmp.@OBJEXT@ \
 	               -L${libbuild_dir} -l$(PROF_LIBNAME) $(MPI_LIBS) 
+	@-$(RM) -f mpe2tmp.@OBJEXT@
+
 dbxtest2@EXEEXT@: dbxtest2.p@OBJEXT@ 
-	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ dbxtest2.p@OBJEXT@ \
+	$(CP) -f dbxtest2.p@OBJEXT@ mpe2tmp.@OBJEXT@
+	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ mpe2tmp.@OBJEXT@ \
 	               $(LIB_PATH) 
+	@-$(RM) -f mpe2tmp.@OBJEXT@
 
 #
 # Remove the old libraries before rebuilding (in case they came from another

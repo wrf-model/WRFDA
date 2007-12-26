@@ -9,7 +9,12 @@
        integer errs, ierr, code(2), newerrclass, eclass
        character*(MPI_MAX_ERROR_STRING) errstring
        integer comm, rlen
-       external myerrhanfunc
+!      external myerrhanfunc
+       INTERFACE 
+       SUBROUTINE myerrhanfunc(vv0,vv1)
+       INTEGER vv0,vv1
+       END SUBROUTINE
+       END INTERFACE
        integer myerrhan, qerr
        integer callcount, codesSeen(3)
        common /myerrhan/ callcount, codesSeen

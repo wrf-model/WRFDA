@@ -24,7 +24,7 @@ apply:
 	(cd util && $(MAKE) apply )
 	(cd pt2pt && $(MAKE) apply )
 	(cd comm && $(MAKE) apply )
-clean: 
+clean:  clean-local
 	-@rm -f *.o ${srcdir}/*.o 
 	-@rm -f *.lo ${srcdir}/*.lo
 	(cd util && $(MAKE) clean )
@@ -68,6 +68,8 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=$(bindir)/mpiexec \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

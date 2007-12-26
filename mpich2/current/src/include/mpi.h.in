@@ -165,7 +165,7 @@ typedef int MPI_Op;
 
 /* These are only guesses; make sure you change them in mpif.h as well */
 #define MPI_MAX_PROCESSOR_NAME @MPI_MAX_PROCESSOR_NAME@
-#define MPI_MAX_ERROR_STRING   512
+#define MPI_MAX_ERROR_STRING  1024 
 #define MPI_MAX_NAME_STRING     63
 #define MPI_MAX_PORT_NAME      256
 #define MPI_MAX_OBJECT_NAME    128
@@ -246,6 +246,12 @@ typedef int (MPI_Delete_function) ( MPI_Comm, int, void *, void * );
 #define MPICH_NAME     2
 #define MPICH2         1
 #define MPICH_HAS_C2F  1
+    /* MPICH2_VERSION is the version string */
+    /* MPICH2_NUMVERSION is the numeric version that can be used in 
+       numeric comparisons, such as MPICH2_NUMVERSION < 10005
+       This is 1.xx.xx */
+#define MPICH2_VERSION "@VERSION@"
+#define MPICH2_NUMVERSION @NUMVERSION@
 
 /* for the datatype decoders */
 enum MPI_COMBINER_ENUM {
@@ -1104,5 +1110,48 @@ int PMPI_Win_set_errhandler(MPI_Win, MPI_Errhandler);
 @INCLUDE_MPICXX_H@
 #endif 
 #endif
+
+/* BEGIN: non-standard but public extensions to MPI */
+
+/* Generalized requests extensions as proposed in "Extending the MPI-2
+ * Generalized Request Interface" */
+typedef int (MPIX_Grequest_poll_function)(void *, MPI_Status *);
+typedef int (MPIX_Grequest_wait_function)(int, void **, double, MPI_Status *);
+
+typedef int MPIX_Grequest_class;
+int MPIX_Grequest_class_create(MPI_Grequest_query_function *, 
+                       MPI_Grequest_free_function *, 
+                       MPI_Grequest_cancel_function *, 
+		       MPIX_Grequest_poll_function *,
+		       MPIX_Grequest_wait_function *, 
+		       MPIX_Grequest_class *);
+
+int MPIX_Grequest_class_allocate(MPIX_Grequest_class,
+		       void *,
+		       MPI_Request *);
+
+int MPIX_Grequest_start(MPI_Grequest_query_function *, 
+                       MPI_Grequest_free_function *, 
+                       MPI_Grequest_cancel_function *, 
+		       MPIX_Grequest_poll_function *,
+		       MPIX_Grequest_wait_function *, void *, MPI_Request *);
+#if !defined(MPI_BUILD_PROFILING)
+int PMPIX_Grequest_class_create(MPI_Grequest_query_function *, 
+                       MPI_Grequest_free_function *, 
+                       MPI_Grequest_cancel_function *, 
+		       MPIX_Grequest_poll_function *,
+		       MPIX_Grequest_wait_function *, 
+		       MPIX_Grequest_class *);
+
+int PMPIX_Grequest_class_allocate(MPIX_Grequest_class,
+		       void *,
+		       MPI_Request *);
+int PMPIX_Grequest_start(MPI_Grequest_query_function *, 
+                       MPI_Grequest_free_function *, 
+                       MPI_Grequest_cancel_function *, 
+		       MPIX_Grequest_poll_function *,
+		       MPIX_Grequest_wait_function *, void *, MPI_Request *);
+#endif
+/* END: non-standard but public extensions to MPI */
 
 #endif

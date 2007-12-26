@@ -4,6 +4,7 @@ C (C) 2003 by Argonne National Laboratory.
 C     See COPYRIGHT in top-level directory.
 C
       program main
+      implicit none
       include 'mpif.h'
       integer errs
       character*(MPI_MAX_PORT_NAME) port_name
@@ -12,6 +13,7 @@ C
       integer merr, mclass
       character*(MPI_MAX_ERROR_STRING) errmsg
       integer msglen, rank
+      integer ierr
 
       errs = 0
       call MTest_Init( ierr )

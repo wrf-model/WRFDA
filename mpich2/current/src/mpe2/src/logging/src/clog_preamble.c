@@ -23,15 +23,17 @@
 #include <io.h>
 #endif
 
+#if !defined( CLOG_NOMPI )
+#include "mpi.h"
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
 #include "clog.h"
 #include "clog_const.h"
 #include "clog_mem.h"
 #include "clog_util.h"
 #include "clog_preamble.h"
-
-#if !defined( CLOG_NOMPI )
-#include "mpi.h"
-#endif
 
 #ifdef NEEDS_SNPRINTF_DECL
 extern int snprintf( char *, size_t, const char *, ... );
@@ -88,18 +90,12 @@ void CLOG_Preamble_env_init( CLOG_Preamble_t *preamble )
     char *env_block_size;
     char *env_buffered_blocks;
     int   my_rank, num_procs;
-#if !defined( CLOG_NOMPI )
     int   ierr;
-#endif
 
 
-#if !defined( CLOG_NOMPI )
     PMPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
     PMPI_Comm_size( MPI_COMM_WORLD, &num_procs );
-#else
-    my_rank   = 0;
-    num_procs = 1;
-#endif
+
     preamble->max_comm_world_size  = num_procs;
     /* There is alway at least 1 thread, i.e. main thread */
     preamble->max_thread_count     = 1;
@@ -141,7 +137,6 @@ void CLOG_Preamble_env_init( CLOG_Preamble_t *preamble )
             preamble->num_buffered_blocks = CLOG_DEFAULT_BUFFERED_BLOCKS;
     }
 
-#if !defined( CLOG_NOMPI )
     /*
        MPI_Bcast() from _root_ on preamble's block_size
        and num_buffered_blocks to all.
@@ -152,7 +147,8 @@ void CLOG_Preamble_env_init( CLOG_Preamble_t *preamble )
         fprintf( stderr, __FILE__":CLOG_Preamble_env_init() - \n"
                          "\t""MPI_Bcast(preamble->block_size) fails.\n" );
         fflush( stderr );
-        PMPI_Abort( MPI_COMM_WORLD, 1 );
+        /* PMPI_Abort( MPI_COMM_WORLD, 1 ); */
+        CLOG_Util_abort( 1 );
     }
 
     ierr = PMPI_Bcast( &(preamble->num_buffered_blocks), 1, MPI_INT,
@@ -161,9 +157,9 @@ void CLOG_Preamble_env_init( CLOG_Preamble_t *preamble )
         fprintf( stderr, __FILE__":CLOG_Preamble_env_init() - \n"
                          "\t""MPI_Bcast(num_buffered_blocks) fails.\n" );
         fflush( stderr );
-        PMPI_Abort( MPI_COMM_WORLD, 1 );
+        /* PMPI_Abort( MPI_COMM_WORLD, 1 ); */
+        CLOG_Util_abort( 1 );
     }
-#endif
 
     /*
        user_stateID_count and user_solo_eventID_count are set with
@@ -515,7 +511,7 @@ void CLOG_Preamble_read( CLOG_Preamble_t *preamble, int fd )
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
                                     buf_ptr, "CLOG_KNOWN_EVENTID_START Value" );
-    preamble->known_eventID_start = (unsigned int) atoi( value_str );
+    preamble->known_eventID_start = atoi( value_str );
 
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
@@ -523,7 +519,7 @@ void CLOG_Preamble_read( CLOG_Preamble_t *preamble, int fd )
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
                                     buf_ptr, "CLOG_USER_EVENTID_START Value" );
-    preamble->user_eventID_start = (unsigned int) atoi( value_str );
+    preamble->user_eventID_start = atoi( value_str );
 
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
@@ -533,7 +529,7 @@ void CLOG_Preamble_read( CLOG_Preamble_t *preamble, int fd )
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
                                     buf_ptr,
                                     "CLOG_KNOWN_SOLO_EVENTID_START Value" );
-    preamble->known_solo_eventID_start = (unsigned int) atoi( value_str );
+    preamble->known_solo_eventID_start = atoi( value_str );
 
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
@@ -543,7 +539,7 @@ void CLOG_Preamble_read( CLOG_Preamble_t *preamble, int fd )
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),
                                     buf_ptr,
                                     "CLOG_USER_SOLO_EVENTID_START Value" );
-    preamble->user_solo_eventID_start = (unsigned int) atoi( value_str );
+    preamble->user_solo_eventID_start = atoi( value_str );
 
     buf_ptr = CLOG_Util_strbuf_get( value_str,
                                     &(value_str[ CLOG_PREAMBLE_STRLEN-1 ]),

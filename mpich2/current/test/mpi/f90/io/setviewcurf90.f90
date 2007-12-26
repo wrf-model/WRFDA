@@ -32,7 +32,7 @@
          if (rank .eq. 0) then
             print *,  &
       &"This program must be run with no more than 1024 processes"
-            call MPI_Abort( MPI_COMM_WORLD, 1 )
+            call MPI_Abort( MPI_COMM_WORLD, 1, ierr )
          endif
       endif
 

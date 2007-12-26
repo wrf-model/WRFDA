@@ -26,16 +26,18 @@
 #include <io.h>
 #endif
 
+#if !defined( CLOG_NOMPI )
+#include "mpi.h"
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
 #include "clog_const.h"
 #include "clog_mem.h"
 #include "clog_preamble.h"
 #include "clog_buffer.h"
 #include "clog_util.h"
 #include "clog_record.h"
-
-#if !defined( CLOG_NOMPI )
-#include "mpi.h"
-#endif
 
 static int clog_buffer_minblocksize;
 
@@ -65,7 +67,6 @@ CLOG_Buffer_t* CLOG_Buffer_create( void )
     buffer->num_blocks       = 0;
     buffer->num_used_blocks  = 0;
 
-#if !defined( CLOG_NOMPI )
     buffer->commset          = CLOG_CommSet_create();
     if ( buffer->commset == NULL ) {
         fprintf( stderr, __FILE__":CLOG_Buffer_create() - \n"
@@ -73,9 +74,6 @@ CLOG_Buffer_t* CLOG_Buffer_create( void )
         fflush( stderr );
         return NULL;
     }
-#else
-    buffer->commset          = NULL;
-#endif
 
     buffer->local_fd         = CLOG_NULL_FILE;
     strcpy( buffer->local_filename, "" );
@@ -93,9 +91,7 @@ void CLOG_Buffer_free( CLOG_Buffer_t **buffer_handle )
     CLOG_Block_t  *block;
 
     buffer = *buffer_handle;
-#if !defined( CLOG_NOMPI )
     CLOG_CommSet_free( &(buffer->commset) );
-#endif
 
     block = buffer->head_block;
     while ( block != NULL ) {
@@ -117,9 +113,7 @@ void CLOG_Buffer_env_init( CLOG_Buffer_t *buffer )
 {
     char          *env_delete_localfile;
     char          *env_log_overhead;
-#if !defined( CLOG_NOMPI )
     int            ierr;
-#endif
 
     env_delete_localfile = (char *) getenv( "MPE_DELETE_LOCALFILE" );
     if ( env_delete_localfile != NULL ) {
@@ -139,7 +133,6 @@ void CLOG_Buffer_env_init( CLOG_Buffer_t *buffer )
             buffer->log_overhead = CLOG_BOOL_FALSE;
     }
 
-#if !defined( CLOG_NOMPI )
     /*  Let everyone in MPI_COMM_WORLD know what root has */
     ierr = PMPI_Bcast( &(buffer->delete_localfile), 1, MPI_INT,
                        0, MPI_COMM_WORLD );
@@ -147,7 +140,8 @@ void CLOG_Buffer_env_init( CLOG_Buffer_t *buffer )
         fprintf( stderr, __FILE__":CLOG_Buffer_env_init() - \n"
                          "\t""PMPI_Bcast(buffer->delete_localfile) fails!\n" );
         fflush( stderr );
-        PMPI_Abort( MPI_COMM_WORLD, 1 );
+        /* PMPI_Abort( MPI_COMM_WORLD, 1 ); */
+        CLOG_Util_abort( 1 );
     }
 
     ierr = PMPI_Bcast( &(buffer->log_overhead), 1, MPI_INT,
@@ -156,9 +150,9 @@ void CLOG_Buffer_env_init( CLOG_Buffer_t *buffer )
         fprintf( stderr, __FILE__":CLOG_Buffer_env_init() - \n"
                          "\t""PMPI_Bcast(buffer->log_overhead) fails!\n" );
         fflush( stderr );
-        PMPI_Abort( MPI_COMM_WORLD, 1 );
+        /* PMPI_Abort( MPI_COMM_WORLD, 1 ); */
+        CLOG_Util_abort( 1 );
     }
-#endif
 }
 
 /*
@@ -192,14 +186,9 @@ void CLOG_Buffer_init4write( CLOG_Buffer_t *buffer,
     buffer->curr_block       = buffer->head_block;
     buffer->num_used_blocks  = 1;
 
-#if !defined( CLOG_NOMPI )
     PMPI_Comm_size( MPI_COMM_WORLD, &(buffer->world_size) );
     PMPI_Comm_rank( MPI_COMM_WORLD, &(buffer->world_rank) );
     CLOG_CommSet_init( buffer->commset );
-#else
-    buffer->world_size  = 1;
-    buffer->world_rank  = 0;
-#endif
 
     if ( local_tmpfile_name != NULL )
         strcpy( buffer->local_filename, local_tmpfile_name );
@@ -324,13 +313,10 @@ void CLOG_Buffer_advance_block( CLOG_Buffer_t *buffer )
 
 void CLOG_Buffer_localIO_flush( CLOG_Buffer_t *buffer )
 {
-#if !defined( CLOG_NOMPI )
     int  ierr;
-#endif
 
     if ( buffer->local_fd != CLOG_NULL_FILE ) {
         CLOG_Buffer_localIO_write( buffer );
-#if !defined( CLOG_NOMPI )
         /* Update CLOG_Preamble_t with commtable_fptr */
         buffer->preamble->commtable_fptr
         = (CLOG_int64_t) lseek( buffer->local_fd, 0, SEEK_CUR );
@@ -351,7 +337,6 @@ void CLOG_Buffer_localIO_flush( CLOG_Buffer_t *buffer )
         lseek( buffer->local_fd, 0, SEEK_SET );
         CLOG_Preamble_write( buffer->preamble, CLOG_BOOL_NULL, CLOG_BOOL_NULL,
                              buffer->local_fd );
-#endif
     }
 }
 
@@ -633,13 +618,8 @@ void CLOG_Buffer_save_header_0chk( CLOG_Buffer_t *buffer,
     blkdata          = buffer->curr_block->data;
     hdr              = (CLOG_Rec_Header_t *) blkdata->ptr;
     hdr->time        = CLOG_Timer_get();
-#if !defined( CLOG_NOMPI )
     hdr->icomm       = commIDs->local_ID;
     hdr->rank        = commIDs->comm_rank;
-#else
-    hdr->icomm       = 0;
-    hdr->rank        = 0;
-#endif
     hdr->thread      = thd;
     hdr->rectype     = rectype;
     blkdata->ptr     = hdr->rest;  /* advance to next available space */
@@ -661,13 +641,8 @@ void CLOG_Buffer_save_header( CLOG_Buffer_t *buffer,
     }
     hdr              = (CLOG_Rec_Header_t *) blkdata->ptr;
     hdr->time        = CLOG_Timer_get();
-#if !defined( CLOG_NOMPI )
     hdr->icomm       = commIDs->local_ID;
     hdr->rank        = commIDs->comm_rank;
-#else
-    hdr->icomm       = 0;
-    hdr->rank        = 0;
-#endif
     hdr->thread      = thd;
     hdr->rectype     = rectype;
     blkdata->ptr     = hdr->rest;  /* advance to next available space */

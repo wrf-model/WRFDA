@@ -31,8 +31,8 @@ INCLUDES = -I../../include -I${srcdir}/../../include
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean: 
-	-@rm -f *.o ${srcdir}/*.o truncmsg2 proberank
-	-@rm -f truncmsg2.exe proberank.exe
+	-@rm -f *.o ${srcdir}/*.o truncmsg2 proberank truncmsg1
+	-@rm -f truncmsg2.exe proberank.exe truncmsg1.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -46,16 +46,18 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: proberank truncmsg2
+all-redirect: proberank truncmsg1 truncmsg2
 
 truncmsg2: truncmsg2.o   @MPILIBLOC@
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o truncmsg2 truncmsg2.o  ${LIBS}
 proberank: proberank.o   @MPILIBLOC@
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o proberank proberank.o  ${LIBS}
+truncmsg1: truncmsg1.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o truncmsg1 truncmsg1.o  ${LIBS}
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  proberank.c truncmsg2.c
+SOURCES         =  proberank.c truncmsg1.c truncmsg2.c
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

@@ -17,13 +17,15 @@
  */
 
 /*@
-  MPIDI_CH3_Request_destroy - Release resources in use by an existing request object.
+  MPIDI_CH3_Request_destroy - Release resources in use by an existing request 
+  object.
 
   Input Parameters:
 . req - pointer to the request object
 
   IMPLEMENTORS:
-  MPIDI_CH3_Request_destroy() must call MPIDI_CH3U_Request_destroy() before request object is freed.
+  MPIDI_CH3_Request_destroy() must call MPIDI_CH3U_Request_destroy() before 
+  request object is freed.
 @*/
 void MPIDI_CH3_Request_destroy(MPID_Request * req);
 
@@ -38,7 +40,8 @@ void MPIDI_CH3_Request_destroy(MPID_Request * req);
   An MPI error code.
   
   NOTE:
-  This routine need only be called if the code might call MPIDI_CH3_Progress_wait().  It is normally used as follows example:
+  This routine need only be called if the code might call 
+  MPIDI_CH3_Progress_wait().  It is normally used as follows example:
 .vb
       if (*req->cc_ptr != 0)
       {
@@ -131,12 +134,17 @@ int MPIDI_CH3_Progress_poke(void);
 
 int MPIDI_CH3_Open_port(char *port_name);
 
-int MPIDI_CH3_Comm_spawn_multiple(int count, char ** commands, char *** argvs, int * maxprocs, MPID_Info ** info_ptrs, int root,
-                                  MPID_Comm * comm_ptr, MPID_Comm ** intercomm, int * errcodes);
+int MPIDI_CH3_Comm_spawn_multiple(int count, char ** commands, char *** argvs,
+				  int * maxprocs, MPID_Info ** info_ptrs, 
+				  int root,
+                                  MPID_Comm * comm_ptr, MPID_Comm ** intercomm,
+				  int * errcodes);
 
-int MPIDI_CH3_Comm_accept(char * port_name, int root, MPID_Comm * comm_ptr, MPID_Comm ** newcomm); 
+int MPIDI_CH3_Comm_accept(char * port_name, int root, MPID_Comm * comm_ptr, 
+			  MPID_Comm ** newcomm); 
 
-int MPIDI_CH3_Comm_connect(char * port_name, int root, MPID_Comm * comm_ptr, MPID_Comm ** newcomm);
+int MPIDI_CH3_Comm_connect(char * port_name, int root, MPID_Comm * comm_ptr, 
+			   MPID_Comm ** newcomm);
 
 
 /*@

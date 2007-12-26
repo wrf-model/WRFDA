@@ -8,6 +8,7 @@ C       Place the include first so that we can automatically create a
 C       Fortran 90 version that uses the mpi module instead.  If
 C       the module is in a different place, the compiler can complain
 C       about out-of-order statements
+        implicit none
         include 'mpif.h'
         integer ierr
         logical flag
@@ -25,6 +26,7 @@ C       about out-of-order statements
         end
 C
         subroutine MTest_Finalize( errs )
+        implicit none
         include 'mpif.h'
         integer errs
         integer rank, toterrs, ierr
@@ -32,7 +34,7 @@ C
         call MPI_Comm_rank( MPI_COMM_WORLD, rank, ierr )
 
         call MPI_Allreduce( errs, toterrs, 1, MPI_INTEGER, MPI_SUM, 
-     *        MPI_COMM_WORLD, ierrs ) 
+     *        MPI_COMM_WORLD, ierr ) 
         
         if (rank .eq. 0) then
            if (toterrs .gt. 0) then 
@@ -45,7 +47,9 @@ C
 C
 C A simple get intracomm for now
         logical function MTestGetIntracomm( comm, min_size, qsmaller )
+        implicit none
         include 'mpif.h'
+        integer ierr
         integer comm, min_size, size, rank
         logical qsmaller
         integer myindex
@@ -72,6 +76,7 @@ C A simple get intracomm for now
         end
 C
         subroutine MTestFreeComm( comm )
+        implicit none
         include 'mpif.h'
         integer comm, ierr
         if (comm .ne. MPI_COMM_WORLD .and.
@@ -82,6 +87,7 @@ C
         end
 C
         subroutine MTestPrintError( errcode )
+        implicit none
         include 'mpif.h'
         integer errcode
         integer errclass, slen, ierr
@@ -93,6 +99,7 @@ C
         end
 C
         subroutine MTestPrintErrorMsg( msg, errcode )
+        implicit none
         include 'mpif.h'
         character*(*) msg
         integer errcode

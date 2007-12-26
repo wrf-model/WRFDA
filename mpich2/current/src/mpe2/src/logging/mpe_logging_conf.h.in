@@ -12,8 +12,14 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the `gethostname' function. */
+#undef HAVE_GETHOSTNAME
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define if libpthread.a(so) is defined */
+#undef HAVE_LIBPTHREAD
 
 /* Define to 1 if you have the `lrand48' function. */
 #undef HAVE_LRAND48
@@ -38,6 +44,9 @@
 
 /* Define if PMPI_Comm_set_attr() available */
 #undef HAVE_PMPI_COMM_SET_ATTR
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
 
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
@@ -75,6 +84,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define if gethostname needs a declaration */
+#undef NEEDS_GETHOSTNAME_DECL
+
 /* Define if lrand48 needs a declaration */
 #undef NEEDS_LRAND48_DECL
 
@@ -108,6 +120,9 @@
 /* The size of a `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
+/* define if sizeof(int) = sizeof(void*) */
+#undef SIZEOF_INT_IS_AINT
+
 /* The size of a `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
@@ -116,6 +131,9 @@
 
 /* The size of a `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
+
+/* The size of a `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

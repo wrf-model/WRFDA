@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: handlemem.c,v 1.28 2006/11/07 21:42:38 gropp Exp $
+/*  $Id: handlemem.c,v 1.29 2007/03/08 22:12:32 buntinas Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -313,7 +313,7 @@ void *MPIU_Handle_obj_alloc(MPIU_Object_alloc_t *objmem)
 
     MPIU_DBG_MSG_FMT(HANDLE,TYPICAL,(MPIU_DBG_FDEST,
 				     "Allocating handle %x (0x%08x)\n",
-				     (unsigned) ptr, ptr->handle));
+				     (unsigned) (MPI_Aint)ptr, ptr->handle));
 
 #ifdef USE_MEMORY_TRACING
     /* We set the object to an invalid pattern.  This is similar to 

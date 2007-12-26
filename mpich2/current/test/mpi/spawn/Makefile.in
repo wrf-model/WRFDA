@@ -33,7 +33,7 @@ INCLUDES = -I../include -I${srcdir}/../include
 	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-clean: 
+clean:  clean-local
 	-@rm -f *.o ${srcdir}/*.o spawnintra selfconacc disconnect2 disconnect3 disconnect_reconnect2 multiple_ports2 join disconnect_reconnect disconnect_reconnect3 namepub spawnargv spawnmult2 spawn1 disconnect spawnminfo1 spaconacc2 concurrent_spawns spawn2 spawninfo1 multiple_ports spaconacc spaiccreate
 	-@rm -f spawnintra.exe selfconacc.exe disconnect2.exe disconnect3.exe disconnect_reconnect2.exe multiple_ports2.exe join.exe disconnect_reconnect.exe disconnect_reconnect3.exe namepub.exe spawnargv.exe spawnmult2.exe spawn1.exe disconnect.exe spawnminfo1.exe spaconacc2.exe concurrent_spawns.exe spawn2.exe spawninfo1.exe multiple_ports.exe spaconacc.exe spaiccreate.exe
 	-@rm -f core core.[0-9]*
@@ -130,6 +130,8 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 			-mpiexec=$(bindir)/mpiexec \
 		   	-xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

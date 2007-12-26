@@ -34,8 +34,8 @@ INCLUDES = -I../include -I${srcdir}/../include
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean: 
-	-@rm -f *.o ${srcdir}/*.o dtpack sendrecvl twovec transp-datatype
-	-@rm -f dtpack.exe sendrecvl.exe twovec.exe transp-datatype.exe
+	-@rm -f *.o ${srcdir}/*.o non_zero_root dtpack sendrecvl twovec transp-datatype
+	-@rm -f non_zero_root.exe dtpack.exe sendrecvl.exe twovec.exe transp-datatype.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -49,8 +49,11 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: transp-datatype sendrecvl twovec dtpack
+all-redirect: transp-datatype non_zero_root sendrecvl twovec dtpack
 
+non_zero_root: non_zero_root.o   @MPILIBLOC@
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o non_zero_root non_zero_root.o  \
+	${LIBS} 
 dtpack: dtpack.o   @MPILIBLOC@
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o dtpack dtpack.o  ${LIBS}
 sendrecvl: sendrecvl.o   @MPILIBLOC@
@@ -63,7 +66,8 @@ transp-datatype: transp-datatype.o   @MPILIBLOC@
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  transp-datatype.c sendrecvl.c twovec.c dtpack.c
+SOURCES         =  transp-datatype.c non_zero_root.c sendrecvl.c twovec.c \
+	dtpack.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

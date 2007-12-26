@@ -115,7 +115,7 @@ int MPIDU_Sock_wait(struct MPIDU_Sock_set * sock_set, int millisecond_timeout,
 		 multithreaded code (and we don't then need the 
 		 MPIU_THREAD_CHECK_BEGIN/END macros) */
 #ifdef HAVE_RUNTIME_THREADCHECK
-		if (!MPIR_Process.isThreaded) {
+		if (!MPIR_ThreadInfo.isThreaded) {
 		    MPIDI_FUNC_ENTER(MPID_STATE_POLL);
 		    n_fds = poll(sock_set->pollfds, sock_set->poll_array_elems, 
 				 millisecond_timeout);
@@ -143,7 +143,7 @@ int MPIDU_Sock_wait(struct MPIDU_Sock_set * sock_set, int millisecond_timeout,
 		       progress while this thread waits for something to 
 		       do */
 		    MPIU_DBG_MSG(THREAD,TYPICAL,"Exit global critical section");
-		    MPID_Thread_mutex_unlock(&MPIR_Process.global_mutex);
+		    MPID_Thread_mutex_unlock(&MPIR_ThreadInfo.global_mutex);
 			    
 		    MPIDI_FUNC_ENTER(MPID_STATE_POLL);
 		    n_fds = poll(sock_set->pollfds_active, 
@@ -153,7 +153,7 @@ int MPIDU_Sock_wait(struct MPIDU_Sock_set * sock_set, int millisecond_timeout,
 		    /* Reaquire the lock before processing any of the 
 		       information returned from poll */
 		    MPIU_DBG_MSG(THREAD,TYPICAL,"Enter global critical section");
-		    MPID_Thread_mutex_lock(&MPIR_Process.global_mutex);
+		    MPID_Thread_mutex_lock(&MPIR_ThreadInfo.global_mutex);
 
 		    /*
 		     * Update pollfds array if changes were posted while we 
@@ -167,7 +167,7 @@ int MPIDU_Sock_wait(struct MPIDU_Sock_set * sock_set, int millisecond_timeout,
 		    sock_set->pollfds_active = NULL;
 		    sock_set->wakeup_posted = FALSE;
 		}
-		} /* else !MPIR_Process.isThreaded */
+		} /* else !MPIR_ThreadInfo.isThreaded */
 	    } 
 #	    endif /* MPICH_IS_THREADED */
 

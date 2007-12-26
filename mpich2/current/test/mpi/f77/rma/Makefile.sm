@@ -32,5 +32,10 @@ winattrf_LDADD        = ../util/mtestf.o
 winattr2f_SOURCES     = winattr2f.f
 winattr2f_LDADD       = ../util/mtestf.o
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)

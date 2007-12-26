@@ -33,9 +33,9 @@ INCLUDES = -I../include -I${srcdir}/../include
 	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-clean: 
-	-@rm -f *.o ${srcdir}/*.o inactivereq bsend3 bsendfrag errinstatta rcancel bsend4 bsendpending waitany-null errinstatws cancelrecv isendself rqstatus sendrecv3 sendself probenull bsendalign greq1 eagerdt bsend5 bottom bsend2 probe-unexp pscancel errinstatts bsend1 scancel icsend errinstatwa sendrecv1 waittestnull scancel2 pingping isendselfprobe sendrecv2
-	-@rm -f inactivereq.exe bsend3.exe bsendfrag.exe errinstatta.exe rcancel.exe bsend4.exe bsendpending.exe waitany-null.exe errinstatws.exe cancelrecv.exe isendself.exe rqstatus.exe sendrecv3.exe sendself.exe probenull.exe bsendalign.exe greq1.exe eagerdt.exe bsend5.exe bottom.exe bsend2.exe probe-unexp.exe pscancel.exe errinstatts.exe bsend1.exe scancel.exe icsend.exe errinstatwa.exe sendrecv1.exe waittestnull.exe scancel2.exe pingping.exe isendselfprobe.exe sendrecv2.exe
+clean:  clean-local
+	-@rm -f *.o ${srcdir}/*.o inactivereq bsend3 bsendfrag errinstatta rcancel rqfreeb bsend4 bsendpending waitany-null errinstatws cancelrecv isendself rqstatus sendrecv3 sendself probenull bsendalign greq1 eagerdt bsend5 bottom bsend2 probe-unexp pscancel errinstatts bsend1 scancel icsend errinstatwa sendflood sendrecv1 waittestnull scancel2 pingping isendselfprobe sendrecv2 sendall
+	-@rm -f inactivereq.exe bsend3.exe bsendfrag.exe errinstatta.exe rcancel.exe rqfreeb.exe bsend4.exe bsendpending.exe waitany-null.exe errinstatws.exe cancelrecv.exe isendself.exe rqstatus.exe sendrecv3.exe sendself.exe probenull.exe bsendalign.exe greq1.exe eagerdt.exe bsend5.exe bottom.exe bsend2.exe probe-unexp.exe pscancel.exe errinstatts.exe bsend1.exe scancel.exe icsend.exe errinstatwa.exe sendflood.exe sendrecv1.exe waittestnull.exe scancel2.exe pingping.exe isendselfprobe.exe sendrecv2.exe sendall.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -51,9 +51,10 @@ remove-genmakefiles:
 	rm -f  Makefile
 all-redirect: bottom bsend1 bsend2 bsend3 bsend4 bsend5 bsendalign cancelrecv\
 	 isendself sendself eagerdt isendselfprobe bsendfrag bsendpending\
-	 errinstatts errinstatta errinstatws errinstatwa icsend rqstatus greq1\
-	 scancel scancel2 rcancel pscancel sendrecv1 sendrecv2 sendrecv3\
-	 waitany-null pingping probe-unexp probenull inactivereq waittestnull
+	 errinstatts errinstatta errinstatws errinstatwa icsend rqstatus\
+	 rqfreeb greq1 scancel scancel2 rcancel pscancel sendflood sendrecv1\
+	 sendrecv2 sendrecv3 waitany-null pingping probe-unexp probenull\
+	 inactivereq waittestnull sendall
 
 inactivereq: inactivereq.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o inactivereq inactivereq.o  ${LIBS}
@@ -65,6 +66,8 @@ errinstatta: errinstatta.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o errinstatta errinstatta.o  ${LIBS}
 rcancel: rcancel.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o rcancel rcancel.o  ${LIBS}
+rqfreeb: rqfreeb.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o rqfreeb rqfreeb.o  ${LIBS}
 bsend4: bsend4.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o bsend4 bsend4.o  ${LIBS}
 bsendpending: bsendpending.o   @MPILIBLOC@ ../util/mtest.o
@@ -113,6 +116,8 @@ icsend: icsend.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o icsend icsend.o  ${LIBS}
 errinstatwa: errinstatwa.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o errinstatwa errinstatwa.o  ${LIBS}
+sendflood: sendflood.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o sendflood sendflood.o  ${LIBS}
 sendrecv1: sendrecv1.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o sendrecv1 sendrecv1.o  ${LIBS}
 waittestnull: waittestnull.o   @MPILIBLOC@ ../util/mtest.o
@@ -127,16 +132,19 @@ isendselfprobe: isendselfprobe.o   @MPILIBLOC@ ../util/mtest.o
 	${LIBS} 
 sendrecv2: sendrecv2.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o sendrecv2 sendrecv2.o  ${LIBS}
+sendall: sendall.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o sendall sendall.o  ${LIBS}
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 SOURCES         =  bottom.c bsend1.c bsend2.c bsend3.c bsend4.c bsend5.c \
 	bsendalign.c cancelrecv.c isendself.c sendself.c eagerdt.c \
 	isendselfprobe.c bsendfrag.c bsendpending.c errinstatts.c \
-	errinstatta.c errinstatws.c errinstatwa.c icsend.c rqstatus.c greq1.c \
-	scancel.c scancel2.c rcancel.c pscancel.c sendrecv1.c sendrecv2.c \
-	sendrecv3.c waitany-null.c pingping.c probe-unexp.c probenull.c \
-	inactivereq.c waittestnull.c 
+	errinstatta.c errinstatws.c errinstatwa.c icsend.c rqstatus.c \
+	rqfreeb.c greq1.c scancel.c scancel2.c rcancel.c pscancel.c \
+	sendflood.c sendrecv1.c sendrecv2.c sendrecv3.c waitany-null.c \
+	pingping.c probe-unexp.c probenull.c inactivereq.c waittestnull.c \
+	sendall.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
@@ -156,6 +164,8 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=$(bindir)/mpiexec \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

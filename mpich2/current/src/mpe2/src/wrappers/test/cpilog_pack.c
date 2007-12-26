@@ -2,10 +2,14 @@
    (C) 2001 by Argonne National Laboratory.
        See COPYRIGHT in top-level directory.
 */
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
 #include "mpi.h"
 #include "mpe.h"
-#include <math.h>
-#include <stdio.h>
+
+#define ITER_COUNT  5
 
 double f( double );
 double f( double a )
@@ -27,7 +31,8 @@ int main( int argc, char *argv[] )
     MPE_LOG_BYTES  bytebuf;
     int            bytebuf_pos;
 
-    MPI_Init( &argc,&argv );
+
+    MPI_Init( &argc, &argv );
         
         MPI_Pcontrol( 0 );
 
@@ -59,7 +64,7 @@ int main( int argc, char *argv[] )
     if ( myid == 0 ) {
         MPE_Describe_state( event1a, event1b, "Broadcast", "red" );
         MPE_Describe_info_state( event2a, event2b, "Sync", "orange",
-                                 "comment = %s" );
+                                 "source = %s()'s line %d." );
         MPE_Describe_info_state( event3a, event3b, "Compute", "blue",
                                  "mypi = %E computed at iteration %d." );
         MPE_Describe_info_state( event4a, event4b, "Reduce", "green",
@@ -77,15 +82,19 @@ int main( int argc, char *argv[] )
     MPE_Start_log();
     */
 
-    for ( jj = 0; jj < 5; jj++ ) {
+    for ( jj = 0; jj < ITER_COUNT; jj++ ) {
         MPE_Log_event( event1a, 0, NULL );
         MPI_Bcast( &n, 1, MPI_INT, 0, MPI_COMM_WORLD );
         MPE_Log_event( event1b, 0, NULL );
     
         MPE_Log_event( event2a, 0, NULL );
         MPI_Barrier( MPI_COMM_WORLD );
+            int line_num;
             bytebuf_pos = 0;
-            MPE_Log_pack( bytebuf, &bytebuf_pos, 's', 11, "cpilog sync" );
+            MPE_Log_pack( bytebuf, &bytebuf_pos, 's',
+                          sizeof(__func__)-1, __func__ );
+            line_num = __LINE__;
+            MPE_Log_pack( bytebuf, &bytebuf_pos, 'd', 1, &line_num );
         MPE_Log_event( event2b, 0, bytebuf );
 
         MPE_Log_event( event3a, 0, NULL );
@@ -122,6 +131,7 @@ int main( int argc, char *argv[] )
                 pi, fabs(pi - PI25DT) );
         printf( "wall clock time = %f\n", endwtime-startwtime );
     }
+
     MPI_Finalize();
     return( 0 );
 }

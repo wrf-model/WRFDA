@@ -1003,6 +1003,7 @@ AC_ARG_ENABLE(strict,
 [--enable-strict  - Turn on strict compilation testing when using gcc])
 saveCFLAGS="$CFLAGS"
 if test "$enable_strict_done" != "yes" ; then
+    if test -z "$GCC_OPTFLAG" ; then GCC_OPTFLAG="-O2" ; fi
     if test -z "CC" ; then
         AC_CHECK_PROGS(CC,gcc)
     fi
@@ -1010,7 +1011,7 @@ if test "$enable_strict_done" != "yes" ; then
 	yes)
         enable_strict_done="yes"
         if test "$CC" = "gcc" ; then 
-            COPTIONS="${COPTIONS} -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes -DGCC_WALL -std=c89"
+            COPTIONS="${COPTIONS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -DGCC_WALL -std=c89"
         fi
 	;;
 	all)
@@ -1019,14 +1020,14 @@ if test "$enable_strict_done" != "yes" ; then
 	    # Note that -Wall does not include all of the warnings that
 	    # the gcc documentation claims that it does; in particular,
 	    # the -Wunused-parameter option is *not* part of -Wall
-            COPTIONS="${COPTIONS} -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes -DGCC_WALL -Wunused -Wshadow -Wmissing-declarations -Wno-long-long -Wunused-parameter -Wunused-value -std=c89"
+            COPTIONS="${COPTIONS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -DGCC_WALL -Wunused -Wshadow -Wmissing-declarations -Wno-long-long -Wunused-parameter -Wunused-value -std=c89"
         fi
 	;;
 
 	posix)
 	enable_strict_done="yes"
         if test "$CC" = "gcc" ; then
-            COPTIONS="${COPTIONS} -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -D_POSIX_C_SOURCE=199506L -std=c89"
+            COPTIONS="${COPTIONS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -D_POSIX_C_SOURCE=199506L -std=c89"
     	fi
  	;;	
 	
@@ -1066,6 +1067,7 @@ AC_DEFUN(PAC_CC_STRICT,[
 export enable_strict_done
 if test "$enable_strict_done" != "yes" ; then
     # We must know the compiler type
+    if test -z "$GCC_OPTFLAG" ; then GCC_OPTFLAG="-O2" ; fi
     if test -z "CC" ; then
         AC_CHECK_PROGS(CC,gcc)
     fi
@@ -1073,7 +1075,7 @@ if test "$enable_strict_done" != "yes" ; then
 	yes)
         enable_strict_done="yes"
         if test "$ac_cv_prog_gcc" = "yes" ; then 
-            CFLAGS="${CFLAGS} -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL"
+            CFLAGS="${CFLAGS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL"
 	    AC_MSG_RESULT([Adding strict check arguments to CFLAGS])
 	    AC_MSG_CHECKING([whether we can add -std=c89])
             # See if we can add -std=c89
@@ -1093,7 +1095,7 @@ if test "$enable_strict_done" != "yes" ; then
 	all)
         enable_strict_done="yes"
         if test "$ac_cv_prog_gcc" = "yes" ; then 
-            CFLAGS="${CFLAGS} -Wall -O -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -Wunused -Wshadow -Wmissing-declarations -Wunused-parameter -Wunused-value -Wno-long-long"
+            CFLAGS="${CFLAGS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -Wunused -Wshadow -Wmissing-declarations -Wunused-parameter -Wunused-value -Wno-long-long"
 	    AC_MSG_CHECKING([whether we can add -std=c89])
             # See if we can add -std=c89
             savCFLAGS=$CFLAGS
@@ -1113,7 +1115,7 @@ if test "$enable_strict_done" != "yes" ; then
 	posix)
 	enable_strict_done="yes"
         if test "$ac_cv_prog_gcc" = "yes" ; then 
-            CFLAGS="${CFLAGS} -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -D_POSIX_C_SOURCE=199506L"
+            CFLAGS="${CFLAGS} -Wall $GCC_OPTFLAG -Wstrict-prototypes -Wmissing-prototypes -Wundef -Wpointer-arith -Wbad-function-cast -ansi -DGCC_WALL -D_POSIX_C_SOURCE=199506L"
 	    AC_MSG_RESULT([Adding strict check arguments (POSIX flavor) to CFLAGS])
 	    AC_MSG_CHECKING([whether we can add -std=c89])
             # See if we can add -std=c89
@@ -1559,7 +1561,12 @@ int main( int argc, char *argv[] )
     /* assume max integer alignment isn't 8 if we don't have
      * an eight-byte value :)
      */
+#ifdef HAVE_LONG_LONG_INT
+    if (sizeof(int) < 8 && sizeof(long) < 8 && sizeof(long long int) < 8)
+	is_eight = 0;
+#else
     if (sizeof(int) < 8 && sizeof(long) < 8) is_eight = 0;
+#endif
 
     size = sizeof(char) + sizeof(int);
     extent = sizeof(char_int);

@@ -4,6 +4,7 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
       program main
+      implicit none
       include 'mpif.h'
       include 'iooffset.h'
       integer errs, ierr, size, rank
@@ -30,7 +31,7 @@ C    using a combination of collective and ordered writes
          if (rank .eq. 0) then
             print *, 
      $"This program must be run with no more than 1024 processes"
-            call MPI_Abort( MPI_COMM_WORLD, 1 )
+            call MPI_Abort( MPI_COMM_WORLD, 1, ierr )
          endif
       endif
 

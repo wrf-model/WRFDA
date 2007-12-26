@@ -26,11 +26,13 @@ errinstatws_SOURCES  = errinstatws.c
 errinstatwa_SOURCES  = errinstatwa.c
 icsend_SOURCES       = icsend.c
 rqstatus_SOURCES     = rqstatus.c
+rqfreeb_SOURCES      = rqfreeb.c
 greq1_SOURCES        = greq1.c
 scancel_SOURCES      = scancel.c
 scancel2_SOURCES     = scancel2.c
 rcancel_SOURCES      = rcancel.c
 pscancel_SOURCES     = pscancel.c
+sendflood_SOURCES    = sendflood.c
 sendrecv1_SOURCES    = sendrecv1.c
 sendrecv2_SOURCES    = sendrecv2.c
 sendrecv3_SOURCES    = sendrecv3.c
@@ -40,6 +42,7 @@ probe-unexp_SOURCES  = probe-unexp.c
 probenull_SOURCES    = probenull.c
 inactivereq_SOURCES  = inactivereq.c
 waittestnull_SOURCES = waittestnull.c
+sendall_SOURCES      = sendall.c
 
 ../util/mtest.o:
 	(cd ../util && $(MAKE) mtest.o)
@@ -49,3 +52,5 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=$(bindir)/mpiexec \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml

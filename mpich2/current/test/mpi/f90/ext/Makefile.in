@@ -25,6 +25,7 @@ F90_LINK       = $(F90)
 LDFLAGS     =  @LDFLAGS@ 
 
 VPATH = .:@srcdir@
+c2f2c_CFLAGSADD = -I../../include
 
 .SUFFIXES:
 .SUFFIXES: .o .c .f90 
@@ -63,7 +64,7 @@ c2f90mult: c2f90mult.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o c2f90mult c2f90mult.o  ${LIBS}
 allocmemf90: allocmemf90.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o allocmemf90 allocmemf90.o  \
-	${LIBS} 
+	../util/mtestf90.o ${LIBS} 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------

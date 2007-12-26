@@ -130,3 +130,5 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=$(bindir)/mpiexec \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml

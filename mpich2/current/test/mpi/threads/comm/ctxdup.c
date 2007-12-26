@@ -95,6 +95,8 @@ int main( int argc, char *argv[] )
     MPI_Recv( buffer, 0, MPI_INT, rank, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
 
     MPI_Comm_free( &comm4 );
+    MPI_Comm_free( &comm1 );
+    MPI_Comm_free( &comm2 );
 
     MTest_Finalize(0);
     MPI_Finalize();

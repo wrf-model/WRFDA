@@ -11,9 +11,14 @@
        integer comm, rlen, intsize
        integer buf(10)
        integer win
-       external myerrhanfunc
+!      external myerrhanfunc
+       INTERFACE 
+       SUBROUTINE myerrhanfunc(vv0,vv1)
+       INTEGER vv0,vv1
+       END SUBROUTINE
+       END INTERFACE
        integer myerrhan, qerr
-       integer (kind=MPI_ADDRESS_KIND) aint
+       integer (kind=MPI_ADDRESS_KIND) asize
 
        integer callcount, codesSeen(3)
        common /myerrhan/ callcount, codesSeen
@@ -38,8 +43,8 @@
 !
        call mpi_comm_dup( MPI_COMM_WORLD, comm, ierr )
        call mpi_type_size( MPI_INTEGER, intsize, ierr )
-       aint  = 10 * intsize
-       call mpi_win_create( buf, aint, intsize, MPI_INFO_NULL, &
+       asize  = 10 * intsize
+       call mpi_win_create( buf, asize, intsize, MPI_INFO_NULL, &
       &                      comm, win, ierr )
 !
        call mpi_win_set_errhandler( win, myerrhan, ierr )
@@ -80,6 +85,7 @@
        endif
 
        call mpi_win_free( win, ierr )
+       call mpi_comm_free( comm, ierr )
 !
 ! Check error strings while here here...
        call mpi_error_string( newerrclass, errstring, rlen, ierr )

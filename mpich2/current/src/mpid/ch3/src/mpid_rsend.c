@@ -52,6 +52,7 @@ int MPID_Rsend(const void * buf, int count, MPI_Datatype datatype, int rank, int
     }
 
     MPIDI_Datatype_get_info(count, datatype, dt_contig, data_sz, dt_ptr, dt_true_lb);
+    MPIDI_Comm_get_vc(comm, rank, &vc);
 
     if (data_sz == 0)
     {
@@ -67,11 +68,10 @@ int MPID_Rsend(const void * buf, int count, MPI_Datatype datatype, int rank, int
 	ready_pkt->sender_req_id = MPI_REQUEST_NULL;
 	ready_pkt->data_sz = data_sz;
 
-	MPIDI_Comm_get_vc(comm, rank, &vc);
 	MPIDI_VC_FAI_send_seqnum(vc, seqnum);
 	MPIDI_Pkt_set_seqnum(ready_pkt, seqnum);
 	
-	mpi_errno = MPIDI_CH3_iStartMsg(vc, ready_pkt, sizeof(*ready_pkt), &sreq);
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iStartMsg(vc, ready_pkt, sizeof(*ready_pkt), &sreq));
 	/* --BEGIN ERROR HANDLING-- */
 	if (mpi_errno != MPI_SUCCESS)
 	{
@@ -103,10 +103,10 @@ int MPID_Rsend(const void * buf, int count, MPI_Datatype datatype, int rank, int
 	MPIDI_Request_create_sreq(sreq, mpi_errno, goto fn_exit);
 	MPIDI_Request_set_type(sreq, MPIDI_REQUEST_TYPE_SEND);
 	mpi_errno = MPIDI_CH3_EagerNoncontigSend( &sreq, 
-						  MPIDI_CH3_PKT_READY_SEND,
-						  buf, count, datatype,
-						  data_sz, rank, tag, 
-						  comm, context_offset );
+                                                  MPIDI_CH3_PKT_READY_SEND,
+                                                  buf, count, datatype,
+                                                  data_sz, rank, tag, 
+                                                  comm, context_offset );
     }
 
   fn_exit:

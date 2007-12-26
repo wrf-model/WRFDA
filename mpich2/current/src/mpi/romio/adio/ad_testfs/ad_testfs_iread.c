@@ -22,15 +22,9 @@ void ADIOI_TESTFS_IreadContig(ADIO_File fd, void *buf, int count,
 
     *error_code = MPI_SUCCESS;
 
-    *request = ADIOI_Malloc_request();
-    (*request)->optype = ADIOI_WRITE;
-    (*request)->fd = fd;
-    (*request)->queued = 0;
-    (*request)->datatype = datatype;
-
-    MPI_Type_size(datatype, &typesize);
     MPI_Comm_size(fd->comm, &nprocs);
     MPI_Comm_rank(fd->comm, &myrank);
+    MPI_Type_size(datatype, &typesize);
     FPRINTF(stdout, "[%d/%d] ADIOI_TESTFS_IreadContig called on %s\n", 
 	    myrank, nprocs, fd->filename);
     FPRINTF(stdout, "[%d/%d]    calling ADIOI_TESTFS_ReadContig\n", 
@@ -43,10 +37,9 @@ void ADIOI_TESTFS_IreadContig(ADIO_File fd, void *buf, int count,
 #ifdef HAVE_STATUS_SET_BYTES
     if (*error_code == MPI_SUCCESS) {
 	MPI_Get_elements(&status, MPI_BYTE, &len);
-	(*request)->nbytes = len;
+	/* what do to with len? */
     }
 #endif
-    fd->async_count++;
 }
 
 void ADIOI_TESTFS_IreadStrided(ADIO_File fd, void *buf, int count,
@@ -59,14 +52,6 @@ void ADIOI_TESTFS_IreadStrided(ADIO_File fd, void *buf, int count,
 #ifdef HAVE_STATUS_SET_BYTES
     int typesize;
 #endif
-
-    *error_code = MPI_SUCCESS;
-
-    *request = ADIOI_Malloc_request();
-    (*request)->optype = ADIOI_WRITE;
-    (*request)->fd = fd;
-    (*request)->queued = 0;
-    (*request)->datatype = datatype;
 
     MPI_Comm_size(fd->comm, &nprocs);
     MPI_Comm_rank(fd->comm, &myrank);
@@ -81,9 +66,8 @@ void ADIOI_TESTFS_IreadStrided(ADIO_File fd, void *buf, int count,
 #ifdef HAVE_STATUS_SET_BYTES
     if (*error_code == MPI_SUCCESS) {
 	MPI_Type_size(datatype, &typesize);
-	(*request)->nbytes = count * typesize;
+	/* what to do with count * typesize */
     }
 #endif
-    fd->async_count++;
 }
 

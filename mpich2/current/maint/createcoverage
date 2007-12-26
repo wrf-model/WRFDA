@@ -6,7 +6,7 @@
 # The default approach is to prepare the coverage for this MPICH2 
 # distribution and to place the coverage web pages into a 
 # (mpich2src)/www/coverage
-srcdir=/Users/gropp/tmp/mpich2-p2/tmpdir/mpich2-1.0.5
+srcdir=/sandbox/thakur/1.0.6p1/mpich2/tmpdir/mpich2-1.0.6p1
 tsuites=$srcdir/tests/mpi
 weblocbase=$srcdir/www/coverage
 weblocprefix=""
@@ -271,8 +271,8 @@ if [ $build_mpich = yes ] ; then
     make clean >&6 2>&6
     # Make sure that we clean away any old results
     find . -name '*.bb' -o -name '*.bbg' -o -name '*.da' -print | \
-	xargs  rm -f
-    find . -name '*.gcov' -print | xargs  rm -f
+	xargs -r rm -f
+    find . -name '*.gcov' -print | xargs -r rm -f
     rm -f lib/*
     make >&6 2>&6
     rc=$?
@@ -434,7 +434,7 @@ if [ "$update_web" = yes ] ; then
     if [ -d "$annotedir/src" ] ; then
 	(cd $annotedir/src && \
 	    find . -name '*.c.htm' -ctime +2 -print | \
-	    xargs  rm -f )
+	    xargs -r rm -f )
     fi
     $srcdir/maint/getcoverage -annote=$annotedir \
     -annoteweb=$annotewebprefix \

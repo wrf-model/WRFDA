@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: simple_pmiutil.c,v 1.22 2006/12/09 17:03:11 gropp Exp $
+/*  $Id: simple_pmiutil.c,v 1.23 2007/02/15 19:43:43 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -207,6 +207,7 @@ int PMIU_writeline( int fd, char *buf )
 int PMIU_parse_keyvals( char *st )
 {
     char *p, *keystart, *valstart;
+    int  offset;
 
     if ( !st )
 	return( -1 );
@@ -246,7 +247,11 @@ int PMIU_parse_keyvals( char *st )
 	/* store value */
         MPIU_Strncpy( PMIU_keyval_tab[PMIU_keyval_tab_idx].value, valstart, 
 		      MAXVALLEN );
-	PMIU_keyval_tab[PMIU_keyval_tab_idx].value[p - valstart] = '\0'; 
+	offset = p - valstart;
+	/* When compiled with -fPIC, the pgcc compiler generates incorrect
+	   code if "p - valstart" is used instead of using the 
+	   intermediate offset */
+	PMIU_keyval_tab[PMIU_keyval_tab_idx].value[offset] = '\0';  
 	PMIU_keyval_tab_idx++;
 	if ( *p == ' ' )
 	    continue;

@@ -20,6 +20,9 @@
 /* Define if Fortran names are uppercase */
 #undef F77_NAME_UPPER
 
+/* Define if long long allowed */
+#undef HAVE_LONG_LONG
+
 /* Define if MPI_Wtime available */
 #undef HAVE_MPI_WTIME
 
@@ -37,3 +40,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* Define calling convention */
+#undef STDCALL

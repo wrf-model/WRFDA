@@ -7,17 +7,22 @@
 #ifndef MPID_NEM_POST_H
 #define MPID_NEM_POST_H
 
+struct MPIDI_PG;
 
-int MPID_nem_init (int rank, MPIDI_PG_t *pg_p);
-int _MPID_nem_init (int rank, MPIDI_PG_t *pg_p, int ckpt_restart);
-int MPID_nem_finalize (void);
-int MPID_nem_ckpt_shutdown (void);
+/* FIXME: Do not export these definitions all the way into mpiimpl.h (which
+   will happen if this is included in mpidpost.h or mpidpre.h) */
+int MPID_nem_init(int rank, struct MPIDI_PG *pg_p);
+int _MPID_nem_init(int rank, struct MPIDI_PG *pg_p, int ckpt_restart);
+int MPID_nem_finalize(void);
+int MPID_nem_ckpt_shutdown(void);
 int MPID_nem_barrier_init(MPID_nem_barrier_t *barrier_region);
-int MPID_nem_barrier(int, int);
-int MPID_nem_vc_init (MPIDI_VC_t *vc, const char *business_card);
-int MPID_nem_get_business_card (int myRank, char *value, int length);
-int MPID_nem_connect_to_root (const char *port_name, MPIDI_VC_t *new_vc);
-
+int MPID_nem_barrier(int num_processes, int rank);
+int MPID_nem_vc_init(struct MPIDI_VC *vc, const char *business_card);
+int MPID_nem_vc_destroy(struct MPIDI_VC *vc);
+int MPID_nem_get_business_card(int myRank, char *value, int length);
+int MPID_nem_connect_to_root(const char *port_name, struct MPIDI_VC *new_vc);
+int MPID_nem_lmt_shm_progress(void);
+int MPID_nem_vc_terminate(struct MPIDI_VC *vc);
 
 #ifdef ENABLED_CHECKPOINTING
 int MPID_nem_ckpt_init (int ckpt_restart);
@@ -83,30 +88,21 @@ int MPID_nem_mpich2_getv (struct iovec **s_iov, int *s_niov, struct iovec **d_io
 } while (0)
 
 
-
-#if 0
-/* large message transfer functions */
-int MPID_nem_mpich2_lmt_send_pre (struct iovec *iov, int n_iov, MPIDI_VC_t *dest_vc, struct iovec *cookie);
-int MPID_nem_mpich2_lmt_recv_pre (struct iovec *iov, int n_iov, MPIDI_VC_t *src_vc, struct iovec *cookie);
-int MPID_nem_mpich2_lmt_start_send (MPIDI_VC_t *dest_vc, struct iovec s_cookie, struct iovec r_cookie, int *completion_ctr);
-int MPID_nem_mpich2_lmt_start_recv (MPIDI_VC_t *src_vc, struct iovec s_cookie, struct iovec r_cookie, int *completion_ctr);
-int MPID_nem_mpich2_lmt_send_post (MPIDI_VC_t *dest_vc, struct iovec cookie);
-int MPID_nem_mpich2_lmt_recv_post (MPIDI_VC_t *src_vc, struct iovec cookie);
-#endif
-
-
 #if !defined (MPID_NEM_INLINE) || !MPID_NEM_INLINE
-int MPID_nem_mpich2_send_ckpt_marker (unsigned short wave, MPIDI_VC_t *vc, int *again);
-int MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again);
-int MPID_nem_mpich2_sendv (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *again);
-int MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *again);
-int MPID_nem_mpich2_test_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox);
-int MPID_nem_mpich2_test_recv_wait (MPID_nem_cell_ptr_t *cell, int *in_fbox, int timeout);
-int MPID_nem_recv_seqno_matches (MPID_nem_queue_ptr_t qhead) ;
-int MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox);
-int MPID_nem_mpich2_release_cell (MPID_nem_cell_ptr_t cell, MPIDI_VC_t *vc);
-int MPID_nem_mpich2_enqueue_fastbox (int local_rank);
-int MPID_nem_mpich2_dequeue_fastbox (int local_rank);
+int MPID_nem_mpich2_send_ckpt_marker(unsigned short wave, struct MPIDI_VC *vc, int *again);
+int MPID_nem_mpich2_send_header(void* buf, int size, struct MPIDI_VC *vc, int *again);
+int MPID_nem_mpich2_sendv(struct iovec **iov, int *n_iov, struct MPIDI_VC *vc, int *again);
+int MPID_nem_mpich2_sendv_header(struct iovec **iov, int *n_iov, struct MPIDI_VC *vc, int *again);
+void MPID_nem_mpich2_send_seg(MPID_Segment segment, MPIDI_msg_sz_t *segment_first, MPIDI_msg_sz_t segment_sz, struct MPIDI_VC *vc, int *again);
+void MPID_nem_mpich2_send_seg_header(MPID_Segment segment, MPIDI_msg_sz_t *segment_first, MPIDI_msg_sz_t segment_size,
+                                     void *header, MPIDI_msg_sz_t header_sz, struct MPIDI_VC *vc, int *again);
+int MPID_nem_mpich2_test_recv(MPID_nem_cell_ptr_t *cell, int *in_fbox);
+int MPID_nem_mpich2_test_recv_wait(MPID_nem_cell_ptr_t *cell, int *in_fbox, int timeout);
+int MPID_nem_recv_seqno_matches(MPID_nem_queue_ptr_t qhead) ;
+int MPID_nem_mpich2_blocking_recv(MPID_nem_cell_ptr_t *cell, int *in_fbox);
+int MPID_nem_mpich2_release_cell(MPID_nem_cell_ptr_t cell, struct MPIDI_VC *vc);
+int MPID_nem_mpich2_enqueue_fastbox(int local_rank);
+int MPID_nem_mpich2_dequeue_fastbox(int local_rank);
 #endif /* MPID_NEM_INLINE */
 
 

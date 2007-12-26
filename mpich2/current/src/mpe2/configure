@@ -272,12 +272,13 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_subdirs_all="$ac_subdirs_all src/misc"
+ac_subdirs_all="$ac_subdirs_all src/callstack"
 ac_subdirs_all="$ac_subdirs_all src/logging"
 ac_subdirs_all="$ac_subdirs_all src/wrappers"
 ac_subdirs_all="$ac_subdirs_all src/graphics"
 ac_subdirs_all="$ac_subdirs_all src/collchk"
 ac_subdirs_all="$ac_subdirs_all src/slog2sdk"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS top_srcdir_abs VPATH MAKE MKDIR CPRP RM MV includebuild_dir libbuild_dir binbuild_dir sbinbuild_dir etcbuild_dir MPI_CC MPI_F77 MPI_INC MPI_LIBS MPERUN htmldir docdir CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT F77 FFLAGS ac_ct_F77 FLIBS F77_NAME_MANGLE F77_LIBDIR_LEADER F77_INCDIR CPP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB RANLIB_AFTER_INSTALL MPI_IMPL MPE_LIBNAME MPE_BUILD_FORTRAN2C CLINKER MPE_CFLAGS FLINKER MPE_FFLAGS subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS top_srcdir_abs VPATH MAKE MKDIR CPRP RM MV includebuild_dir libbuild_dir binbuild_dir sbinbuild_dir etcbuild_dir MPI_CC MPI_F77 MPI_INC MPI_LIBS MPERUN htmldir docdir CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT F77 FFLAGS ac_ct_F77 FLIBS F77_NAME_MANGLE F77_OTHER_LIBS F77_LIBDIR_LEADER F77_INCDIR CPP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB RANLIB_AFTER_INSTALL MPI_IMPL MPE_LIBNAME MPE_BUILD_FORTRAN2C CLINKER MPE_CFLAGS MPE_CLINKER FLINKER MPE_FFLAGS MPE_FLINKER subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -862,6 +863,9 @@ Optional Features:
                                      MPE_Errors_xxx(), MPE_Seq_xxx(),
                                      MPE_xxxTags() and MPE_GetHostName()....
                                      The default enable=yes.
+--enable-callstack                 - Build MPE callstack routines, i.e.
+                                     MPE_CallStack_xxx()...
+                                     The default enable=yes.
 --enable-logging                   - Build MPE logging routines for
                                      CLOG-2, e.g.  MPE_Log_xxx()...
                                      The default enable=yes.
@@ -919,6 +923,10 @@ Optional Packages:
                                      e.g. -L/pkgs/MPI/lib -lpmpich -lmpich.
 --with-htmldir=dir                 - Specify the HTML directory.
 --with-docdir=dir                  - Specify the documentation directory.
+--with-cross-spec=file             - Specify the values of variables that
+                                     configure cannot determine in a
+                                     cross-compilation environment through
+                                     a file
 
 Some influential environment variables:
   MPI_CC      C compiler to compile MPI program and to create parallel
@@ -935,7 +943,7 @@ Some influential environment variables:
               -L/pkgs/MPI/lib -lpmpich -lmpich.
   MPERUN      MPI application launch command. This variable is necessary only
               if user wants to run "make check", "make installcheck-all" or
-              "$sbindir/mpecheckinstall -run" and the default MPERUN value,
+              "$sbindir/mpecheckinstall -run" when the default MPERUN value,
               "$bindir/mpiexec -n 4", is not correct.
   CC          C compiler command
   CFLAGS      C compiler flags
@@ -1038,7 +1046,7 @@ esac
     else
       echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2
     fi
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 
@@ -1484,10 +1492,12 @@ else
 fi;
 
 VERSION=""
-CC=${CC:-cc}
-F77=${F77:-f77}
-CFLAGS=${CFLAGS}
-FFLAGS=${FFLAGS}
+if test "$FROM_MPICH2" != "yes" ; then
+    CC=${CC:-cc}
+    F77=${F77:-f77}
+    CFLAGS=${CFLAGS}
+    FFLAGS=${FFLAGS}
+fi
 MPE_LIBNAME=""
 
 MAKE=${MAKE:-make}
@@ -1861,6 +1871,40 @@ else
     docdir='${prefix}/doc'
 fi
 
+
+
+# Check whether --with-cross-spec or --without-cross-spec was given.
+if test "${with_cross_spec+set}" = set; then
+  withval="$with_cross_spec"
+
+else
+  with_cross_spec=no
+fi;
+pac_cross_compiling=no
+if test "$with_cross_spec" != "no" ; then
+    if test -s "$with_cross_spec" ; then
+        echo "$as_me:$LINENO: result: Reading the cross-compilation file $with_cross_spec" >&5
+echo "${ECHO_T}Reading the cross-compilation file $with_cross_spec" >&6
+        . $with_cross_spec
+        # Autoconf 2.52 no longer sets cross_compiling except with the
+        # awkward "targethost" options.
+        pac_cross_compiling=yes
+        cross_compiling=yes
+        ac_cv_prog_cc_cross=yes
+        ac_cv_prog_f77_cross=yes
+        ac_cv_prog_f90_cross=yes
+        ac_cv_prog_cxx_cross=yes
+        export cross_compiling
+        # Export all the variables in cross_spec/cross_spec.txt
+        # i.e. CROSS_xxx, MPI_xxx and friends...
+        cross_spec_vars=`grep -v '^#' $with_cross_spec | sed -e 's/=.*//g'`
+        for var in $cross_spec_vars ; do
+            eval value=\$"$var"
+            echo "Exporting $var=$value ..."
+            export $var
+        done
+    fi
+fi
 
 
 ac_ext=c
@@ -2431,8 +2475,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2490,8 +2533,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2607,8 +2649,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2662,8 +2703,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2708,8 +2748,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2753,8 +2792,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2878,8 +2916,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2948,8 +2985,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3018,8 +3054,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3088,8 +3123,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3234,7 +3268,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:3237:" \
+echo "$as_me:3271:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -3280,8 +3314,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_f77_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_f77_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3330,8 +3363,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_f77_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_f77_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3437,7 +3469,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -3462,8 +3496,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3569,8 +3602,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_f77_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_f77_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3667,7 +3699,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -3692,8 +3726,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3774,6 +3807,8 @@ fi
 fi
 
 if test -n "$F77" -a "$MPE_BUILD_FORTRAN2C" = "yes" ; then
+    FLIBS_save="$FLIBS"
+    FLIBS=""
     ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
 ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -3797,8 +3832,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_f77_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_f77_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3825,7 +3859,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:3828: \"$ac_link\") >&5
+(eval echo $as_me:3862: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -3903,7 +3937,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:3906: \"$ac_link\") >&5
+(eval echo $as_me:3940: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -3985,7 +4019,7 @@ fi
 
           ;;
           # Ignore these flags.
-        -lang* | -lcrt[01].o | -lcrtbegin.o | -lc | -lgcc | -libmil | -LANG:=*)
+        -lang* | -lcrt*.o | -lc | -lgcc | -libmil | -LANG:=*)
           ;;
         -lkernel32)
           test x"$CYGWIN" != xyes && ac_cv_f77_libs="$ac_cv_f77_libs $ac_arg"
@@ -4075,6 +4109,71 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+    # The autoconf macro for finding FLIBS sometimes makes mistakes
+    # (particularly with the Fujitsu frt compiler).  This next step
+    # first sees if the FLIBS is valid with the Fortran compiler
+
+    pac_cv_f77_flibs_valid=unknown
+    echo "$as_me:$LINENO: checking whether $F77 accepts the FLIBS found by autoconf" >&5
+echo $ECHO_N "checking whether $F77 accepts the FLIBS found by autoconf... $ECHO_C" >&6
+
+
+    ac_ext=f
+ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
+ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_f77_compiler_gnu
+
+cat > conftest.$ac_ext <<EOF
+       program main
+       end
+EOF
+    if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+      pac_cv_f77_flibs_valid=yes
+    else
+      echo "configure: failed program was:" >&5
+      cat conftest.$ac_ext >&5
+      pac_cv_f77_flibs_valid=no
+    fi
+echo "$as_me:$LINENO: result: $pac_cv_f77_flibs_valid" >&5
+echo "${ECHO_T}$pac_cv_f77_flibs_valid" >&6
+if test $pac_cv_f77_flibs_valid = no ; then
+    # See which ones *are* valid
+    echo "$as_me:$LINENO: checking for valid entries in FLIBS" >&5
+echo $ECHO_N "checking for valid entries in FLIBS... $ECHO_C" >&6
+    goodFLIBS=""
+    saveFLIBS=$FLIBS
+    FLIBS=""
+    for arg in $saveFLIBS ; do
+      FLIBS="$goodFLIBS $arg"
+      if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext}; then
+          goodFLIBS=$FLIBS
+      else
+        echo "configure: failed program was:" >&5
+        cat conftest.$ac_ext >&5
+      fi
+      done
+    FLIBS=$goodFLIBS
+    echo "$as_me:$LINENO: result: $FLIBS" >&5
+echo "${ECHO_T}$FLIBS" >&6
+fi
+#
+rm -f conftest*
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    # Now see if FLIBS works with the C compiler
     echo "$as_me:$LINENO: checking whether C can link with $FLIBS" >&5
 echo $ECHO_N "checking whether C can link with $FLIBS... $ECHO_C" >&6
 # Try to link a C program with all of these libraries
@@ -4104,8 +4203,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4130,8 +4228,8 @@ LIBS="$save_LIBS"
 echo "$as_me:$LINENO: result: $runs" >&5
 echo "${ECHO_T}$runs" >&6
 if test "$runs" = "no" ; then
-    echo "$as_me:$LINENO: checking which libraries can be used" >&5
-echo $ECHO_N "checking which libraries can be used... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking for which libraries can be used" >&5
+echo $ECHO_N "checking for which libraries can be used... $ECHO_C" >&6
     pac_ldirs=""
     pac_libs=""
     pac_other=""
@@ -4170,8 +4268,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4201,6 +4298,130 @@ echo "${ECHO_T}$keep_libs" >&6
 fi
 
 
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+long long a;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LONG_LONG 1
+_ACEOF
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: checking for linker for Fortran main programs" >&5
+echo $ECHO_N "checking for linker for Fortran main programs... $ECHO_C" >&6
+cat > conftest.c <<EOF
+#include "confdefs.h"
+#ifdef HAVE_LONG_LONG
+int f(int a, long long b) { int c; c = a * ( b / 3 ) / (b-1); return c ; }
+#else
+int f(int a, long b) { int c; c = a * b / (b-1); return c ; }
+#endif
+EOF
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+    mv conftest.o conftest1.o
+else
+    { { echo "$as_me:$LINENO: error: Could not compile C test program" >&5
+echo "$as_me: error: Could not compile C test program" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+ac_ext=f
+ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
+ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_f77_compiler_gnu
+
+cat > conftest.f <<EOF
+        program main
+        double precision d
+        print *, "hi"
+        end
+EOF
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+    # We include $FFLAGS on the link line because this is
+    # the way in which most of the configure tests run.  In particular,
+    # many users are used to using FFLAGS (and CFLAGS) to select
+    # different instruction sets, such as 64-bit with -xarch=v9 for
+    # Solaris.
+    if ${F77} ${FFLAGS} -o conftest conftest.o conftest1.o $LDFLAGS 2>&5 ; then
+	echo "$as_me:$LINENO: result: Use Fortran to link programs" >&5
+echo "${ECHO_T}Use Fortran to link programs" >&6
+    elif ${CC} ${CFLAGS} -o conftest conftest.o conftest1.o $LDFLAGS $FLIBS 2>&5 ; then
+	echo "$as_me:$LINENO: result: Use C with FLIBS to link programs" >&5
+echo "${ECHO_T}Use C with FLIBS to link programs" >&6
+	F77LINKER="$CC"
+        F77_LDFLAGS="$F77_LDFLAGS $FLIBS"
+    else
+	echo "$as_me:$LINENO: result: Unable to determine how to link Fortran programs with C" >&5
+echo "${ECHO_T}Unable to determine how to link Fortran programs with C" >&6
+    fi
+else
+    { { echo "$as_me:$LINENO: error: Could not compile Fortran test program" >&5
+echo "$as_me: error: Could not compile Fortran test program" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    # For name mangle, we need the library flags
+
 echo "$as_me:$LINENO: checking for Fortran 77 name mangling" >&5
 echo $ECHO_N "checking for Fortran 77 name mangling... $ECHO_C" >&6
 if test "${pac_cv_prog_f77_name_mangle+set}" = set; then
@@ -4218,7 +4439,7 @@ else
    # external name format (rs6000 xlf, for example).
    rm -f conftest*
    cat > conftest.f <<EOF
-       subroutine MY_name( a )
+       subroutine MY_name( i )
        return
        end
 EOF
@@ -4271,8 +4492,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4317,8 +4537,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4331,6 +4550,52 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   pac_cv_prog_f77_name_mangle="lower underscore"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+   fi
+   if test  "X$pac_cv_prog_f77_name_mangle" = "X" ; then
+     cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+void __stdcall MY_NAME(int);
+int
+main ()
+{
+MY_NAME(0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_prog_f77_name_mangle="upper stdcall"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -4364,8 +4629,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4411,8 +4675,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4458,8 +4721,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4505,8 +4767,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4542,6 +4803,7 @@ echo "${ECHO_T}$pac_cv_prog_f77_name_mangle" >&6
 # Make the actual definition
 pac_namecheck=`echo X$pac_cv_prog_f77_name_mangle | sed 's/ /-/g'`
 
+pac_cv_test_stdcall=""
 case $pac_namecheck in
     X) { echo "$as_me:$LINENO: WARNING: Cannot determine Fortran naming scheme" >&5
 echo "$as_me: WARNING: Cannot determine Fortran naming scheme" >&2;} ;;
@@ -4587,9 +4849,111 @@ _ACEOF
 
 	F77_NAME_MANGLE="F77_NAME_MIXED_USCORE"
 	;;
+    Xupper-stdcall)
+cat >>confdefs.h <<\_ACEOF
+#define F77_NAME_UPPER 1
+_ACEOF
+
+        F77_NAME_MANGLE="F77_NAME_UPPER_STDCALL"
+        pac_cv_test_stdcall="__stdcall"
+        ;;
     *) { echo "$as_me:$LINENO: WARNING: Unknown Fortran naming scheme" >&5
 echo "$as_me: WARNING: Unknown Fortran naming scheme" >&2;} ;;
 esac
+
+# Get the standard call definition
+# FIXME: This should use F77_STDCALL, not STDCALL (non-conforming name)
+if test "X$pac_cv_test_stdcall" = "X" ; then
+    F77_STDCALL=""
+else
+    F77_STDCALL="__stdcall"
+fi
+#
+
+cat >>confdefs.h <<_ACEOF
+#define STDCALL $F77_STDCALL
+_ACEOF
+
+
+
+    # Check whether additional libraries are needed when linking with C
+
+    # To simply the code in the cache_check macro, chose the routine name
+    # first, in case we need it
+    confname=conf1_
+    case "$pac_cv_prog_f77_name_mangle" in
+    "lower underscore")       confname=conf1_ ;;
+    "upper stdcall")          confname=CONF1  ;;
+    upper)                    confname=CONF1  ;;
+    "lower doubleunderscore") confname=conf1_ ;;
+    lower)                    confname=conf1  ;;
+    "mixed underscore")       confname=conf1_ ;;
+    mixed)                    confname=conf1  ;;
+    esac
+
+    echo "$as_me:$LINENO: checking what libraries are needed to link Fortran programs with C routines that use stdio" >&5
+echo $ECHO_N "checking what libraries are needed to link Fortran programs with C routines that use stdio... $ECHO_C" >&6
+if test "${pac_cv_prog_f77_and_c_stdio_libs+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+    pac_cv_prog_f77_and_c_stdio_libs=unknown
+    rm -f conftest*
+    cat >conftest.f <<EOF
+        program main
+        call conf1(0)
+        end
+EOF
+    cat >conftestc.c <<EOF
+#include <stdio.h>
+int $confname( int a )
+{ printf( "The answer is %d\n", a ); fflush(stdout); return 0; }
+EOF
+    tmpcmd='${CC-cc} -c $CFLAGS conftestc.c 1>&5'
+    if { (eval echo "$as_me:$LINENO: \"$tmpcmd\"") >&5
+  (eval $tmpcmd) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftestc.o ; then
+        :
+    else
+        echo "configure: failed program was:" >&5
+        cat conftestc.c >&5
+    fi
+
+    tmpcmd='${F77-f77} $FFLAGS -o conftest conftest.f conftestc.o 1>&5'
+    if { (eval echo "$as_me:$LINENO: \"$tmpcmd\"") >&5
+  (eval $tmpcmd) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -x conftest ; then
+         pac_cv_prog_f77_and_c_stdio_libs=none
+    else
+         # Try again with -lSystemStubs
+         tmpcmd='${F77-f77} $FFLAGS -o conftest conftest.f conftestc.o -lSystemStubs 1>&5'
+         if { (eval echo "$as_me:$LINENO: \"$tmpcmd\"") >&5
+  (eval $tmpcmd) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -x conftest ; then
+             pac_cv_prog_f77_and_c_stdio_libs="-lSystemStubs"
+	 else
+	     echo "configure: failed program was:" >&5
+	     cat conftestc.c >&5
+	     echo "configure: with Fortran 77 program:" >&5
+	     cat conftest.f >&5
+         fi
+    fi
+
+    rm -f conftest*
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_f77_and_c_stdio_libs" >&5
+echo "${ECHO_T}$pac_cv_prog_f77_and_c_stdio_libs" >&6
+if test "$pac_cv_prog_f77_and_c_stdio_libs" != none -a \
+        "$pac_cv_prog_f77_and_c_stdio_libs" != unknown ; then
+    F77_OTHER_LIBS="$F77_OTHER_LIBS $pac_cv_prog_f77_and_c_stdio_libs"
+fi
 
 
 
@@ -4619,7 +4983,11 @@ EOF
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } && test -s conftest1.o ; then
         if test ! -d conftest ; then mkdir conftest2 ; fi
-	        { ac_try='${AR-"ar"} cr conftest2/libconftest.a conftest1.o'
+	# We have had some problems with "AR" set to "ar cr"; this is
+	# a user-error; AR should be set to just the program (plus
+	# any flags that affect the object file format, such as -X64
+	# required for 64-bit objects in some versions of AIX).
+        { ac_try='${AR-"ar"} cr conftest2/libconftest.a conftest1.o'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5215,8 +5583,21 @@ if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
     MPE_FFLAGS="$FFLAGS"
 fi
 
+if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
+    mpe_compilers=bin/mpecc
+    if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
+        mpe_compilers="$mpe_compilers bin/mpefc"
+    fi
+    MPE_CLINKER="$binbuild_dir/mpecc -"
+    MPE_FLINKER="$binbuild_dir/mpefc -"
+else     MPE_CLINKER="$MPI_CC -mpe="
+    MPE_FLINKER="$MPI_F77 -mpe="
+fi
+
 if test -z "$CLINKER" ; then CLINKER="$CC" ; fi
 if test -z "$FLINKER" ; then FLINKER="$F77" ; fi
+
+
 
 
 
@@ -5241,11 +5622,13 @@ export MPE_BUILD_FORTRAN2C
 export CC
 export CLINKER
 export MPI_CC
+export MPE_CLINKER
 export MPE_CFLAGS
 export F77
 export FLINKER
-export MPE_FFLAGS
 export MPI_F77
+export MPE_FLINKER
+export MPE_FFLAGS
 export MPI_INC
 export MPI_LIBS
 export LDFLAGS
@@ -5257,6 +5640,7 @@ export mpe_enable_softerror
 
 
 misc_dirname="src/misc"
+callstack_dirname="src/callstack"
 logging_dirname="src/logging"
 wrappers_dirname="src/wrappers"
 graphics_dirname="src/graphics"
@@ -5266,7 +5650,7 @@ slog2_dirname="src/slog2sdk"
 echo "$as_me:$LINENO: checking for leftover Makefiles in subpackages " >&5
 echo $ECHO_N "checking for leftover Makefiles in subpackages ... $ECHO_C" >&6
 leftover_pkgs=""
-for pkg in misc logging wrappers graphics collchk slog2 ; do
+for pkg in misc callstack logging wrappers graphics collchk slog2 ; do
     dirname=${pkg}_dirname
     eval dirvalue=\$"$dirname"
     if test -s $rootbuild_dir/$dirvalue/Makefile ; then
@@ -5292,6 +5676,14 @@ if test "${enable_misc+set}" = set; then
 
 else
   enable_misc=yes
+fi;
+
+# Check whether --enable-callstack or --disable-callstack was given.
+if test "${enable_callstack+set}" = set; then
+  enableval="$enable_callstack"
+
+else
+  enable_callstack=yes
 fi;
 
 # Check whether --enable-logging or --disable-logging was given.
@@ -5338,6 +5730,13 @@ if test "${enable_collchk+set}" = set; then
 else
   enable_collchk=yes
 fi;
+if test "$enable_collchk" = "yes" ; then
+    if test "$enable_callstack" != "yes" ; then
+        enable_callstack=yes
+        { echo "$as_me:$LINENO: WARNING: Enabling CallStack which is required by CollChk. " >&5
+echo "$as_me: WARNING: Enabling CallStack which is required by CollChk. " >&2;};
+    fi
+fi
 
 selected_pkgs=""
 
@@ -5346,6 +5745,13 @@ if test "$enable_misc" = "yes" -a -s $srcdir/src/misc/configure ; then
 
 
 subdirs="$subdirs src/misc"
+
+fi
+if test "$enable_callstack" = "yes" -a -s $srcdir/src/callstack/configure ; then
+    selected_pkgs="$selected_pkgs callstack"
+
+
+subdirs="$subdirs src/callstack"
 
 fi
 if test "$enable_logging" = "yes" -a -s $srcdir/src/logging/configure ; then
@@ -5408,13 +5814,6 @@ subdirs="$subdirs src/slog2sdk"
     fi
 fi
 
-
-if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
-    mpe_compilers=bin/mpecc
-    if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
-        mpe_compilers="$mpe_compilers bin/mpefc"
-    fi
-fi
 
           ac_config_commands="$ac_config_commands default-1"
 
@@ -6029,6 +6428,7 @@ s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@FLIBS@,$FLIBS,;t t
 s,@F77_NAME_MANGLE@,$F77_NAME_MANGLE,;t t
+s,@F77_OTHER_LIBS@,$F77_OTHER_LIBS,;t t
 s,@F77_LIBDIR_LEADER@,$F77_LIBDIR_LEADER,;t t
 s,@F77_INCDIR@,$F77_INCDIR,;t t
 s,@CPP@,$CPP,;t t
@@ -6044,8 +6444,10 @@ s,@MPE_LIBNAME@,$MPE_LIBNAME,;t t
 s,@MPE_BUILD_FORTRAN2C@,$MPE_BUILD_FORTRAN2C,;t t
 s,@CLINKER@,$CLINKER,;t t
 s,@MPE_CFLAGS@,$MPE_CFLAGS,;t t
+s,@MPE_CLINKER@,$MPE_CLINKER,;t t
 s,@FLINKER@,$FLINKER,;t t
 s,@MPE_FFLAGS@,$MPE_FFLAGS,;t t
+s,@MPE_FLINKER@,$MPE_FLINKER,;t t
 s,@subdirs@,$subdirs,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
@@ -6215,11 +6617,6 @@ esac
   *) ac_INSTALL=$ac_top_builddir$INSTALL ;;
   esac
 
-  if test x"$ac_file" != x-; then
-    { echo "$as_me:$LINENO: creating $ac_file" >&5
-echo "$as_me: creating $ac_file" >&6;}
-    rm -f "$ac_file"
-  fi
   # Let's still pretend it is `configure' which instantiates (i.e., don't
   # use $as_me), people would be surprised to read:
   #    /* config.h.  Generated by config.status.  */
@@ -6258,6 +6655,12 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
 	 fi;;
       esac
     done` || { (exit 1); exit 1; }
+
+  if test x"$ac_file" != x-; then
+    { echo "$as_me:$LINENO: creating $ac_file" >&5
+echo "$as_me: creating $ac_file" >&6;}
+    rm -f "$ac_file"
+  fi
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF
   sed "$ac_vpsub
@@ -6625,28 +7028,28 @@ esac
 echo "$as_me: executing $ac_dest commands" >&6;}
   case $ac_dest in
     default-1 )
-if test ! -x ./sbin/mpeinstall -a -s ./sbin/mpeinstall; then
+if test ! -x ./sbin/mpeinstall -a -s ./sbin/mpeinstall ; then
     chmod u+x ./sbin/mpeinstall
 fi
-if test ! -x ./sbin/mpecheckinstall -a -s ./sbin/mpecheckinstall; then
+if test ! -x ./sbin/mpecheckinstall -a -s ./sbin/mpecheckinstall ; then
     chmod u+x ./sbin/mpecheckinstall
 fi
-if test ! -x ./sbin/mpecheckbuild -a -s ./sbin/mpecheckbuild; then
+if test ! -x ./sbin/mpecheckbuild -a -s ./sbin/mpecheckbuild ; then
     chmod u+x ./sbin/mpecheckbuild
 fi
-if test ! -x ./sbin/mpetestlink -a -s ./sbin/mpetestlink; then
+if test ! -x ./sbin/mpetestlink -a -s ./sbin/mpetestlink ; then
     chmod u+x ./sbin/mpetestlink
 fi
-if test ! -x ./sbin/mpetestexec -a -s ./sbin/mpetestexec; then
+if test ! -x ./sbin/mpetestexec -a -s ./sbin/mpetestexec ; then
     chmod u+x ./sbin/mpetestexec
 fi
-if test ! -x ./sbin/mpetestexeclog -a -s ./sbin/mpetestexeclog; then
+if test ! -x ./sbin/mpetestexeclog -a -s ./sbin/mpetestexeclog ; then
     chmod u+x ./sbin/mpetestexeclog
 fi
-if test ! -x ./bin/mpecc -a -s ./bin/mpecc; then
+if test ! -x ./bin/mpecc -a -s ./bin/mpecc ; then
     chmod a+x ./bin/mpecc
 fi
-if test ! -x ./bin/mpefc -a -s ./bin/mpefc; then
+if test ! -x ./bin/mpefc -a -s ./bin/mpefc ; then
     chmod a+x ./bin/mpefc
 fi
   ;;
@@ -6856,7 +7259,7 @@ echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
    { (exit 1); exit 1; }; }
     fi
 
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 

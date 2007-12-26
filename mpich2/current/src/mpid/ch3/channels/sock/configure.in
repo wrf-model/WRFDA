@@ -29,7 +29,21 @@ PAC_VPATH_CHECK()
 
 PAC_LOAD_BASE_CACHE
 
+AC_PROG_INSTALL
+PAC_PROG_CHECK_INSTALL_WORKS
+#
+# On Mac OS/X, install breaks libraries unless used with the -p switch
+PAC_PROG_INSTALL_BREAKS_LIBS
+# We also need mkdir -p.
+PAC_PROG_MKDIR_P
 PAC_PROG_MAKE
+AC_CHECK_PROGS(AR,ar)
+if test -z "$AR" ; then
+    AC_MSG_ERROR([The program ar is required for building MPICH2.  Make sure that your path includes ar])
+fi
+# Note that we set RANLIB to true if we don't find it (some systems neither
+# need it nor provide it)
+AC_CHECK_PROGS(RANLIB,ranlib,true)
 
 dnl AC_CHECK_HEADER(net/if.h) fails on Solaris; extra header files needed
 AC_TRY_COMPILE([
@@ -90,6 +104,21 @@ if test -z "$master_top_builddir" ; then
     fi
 fi
 AC_SUBST(master_top_builddir)
+# We need the script that is used to create shared libraries if either
+# we are creating shared libraries for MPICH2 or we are creating the
+# dynamically loadable library for the debugger interface
+if test -z "$CREATESHLIB" ; then
+   if test ! -d ../../../../util ; then 
+       mkdir ../../../../util
+   fi
+   CREATESHLIB=`cd ../../../../util && pwd`
+   CREATESHLIB="$CREATESHLIB/createshlib"
+fi
+AC_SUBST(CREATESHLIB)
+if test -z "$BUILD_DLLS" ; then
+    BUILD_DLLS=no
+fi
+AC_SUBST(BUILD_DLLS)
 dnl
 dnl Dependency handling
 AC_SUBST(MAKE_DEPEND_C)
@@ -101,5 +130,21 @@ export ETAGS
 export ETAGSADD
 
 PAC_UPDATE_BASE_CACHE
+
+# Add the MPICH2 include flags to CPPFLAGS.  See the discussion above about
+# which include flags should start in MPICH2_INCLUDE_FLAGS and which in 
+# CPPFLAGS
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
+
+# define the ABI version of the channel ABI that we are using.
+ABIVERSION=1:1
+AC_SUBST(ABIVERSION)
+
+dnl Add a step to create the dependencies directory if it is not present
+AC_OUTPUT_COMMANDS([if grep 'dependencies:' Makefile >/dev/null 2>&1 ; then
+    if test ! -s src/.deps/alldeps ; then 
+    echo "Updating dependency directories .deps" 
+    find src -type d -print | sed -e 's%\(.*\)%(cd \1 \&\& grep MAKE_DEPEND_C Makefile >/dev/null 2>\&1 \&\& ( test -d .deps || mkdir .deps) \&\& touch .deps/alldeps)%g' | sh
+fi; fi])
 
 AC_OUTPUT(Makefile src/Makefile localdefs)

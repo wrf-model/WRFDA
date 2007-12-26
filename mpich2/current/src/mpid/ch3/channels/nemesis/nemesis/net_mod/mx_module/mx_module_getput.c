@@ -37,7 +37,7 @@ MPID_nem_gm_module_get (void *target_p, void *source_p, int len, MPIDI_VC_t *sou
 {
     int ret;
     
-    MPIU_Assert (source_vc->ch.node_id >= 0 && source_vc->ch.node_id < MPID_nem_mem_region.num_procs);
+    MPIU_Assert (VC_FIELD(source_vc, node_id) >= 0 && VC_FIELD(source_vc, node_id) < MPID_nem_mem_region.num_procs);
     MPIU_Assert (len >= 0);
     
     if (len == 0)
@@ -49,7 +49,7 @@ MPID_nem_gm_module_get (void *target_p, void *source_p, int len, MPIDI_VC_t *sou
     {
 	gm_status_t status;
 	
-	status = gm_directcopy_get (MPID_nem_module_gm_port, source_p, target_p, len, 0, source_vc->ch.port_id);
+	status = gm_directcopy_get (MPID_nem_module_gm_port, source_p, target_p, len, 0, VC_FIELD(source_vc, port_id));
 	if (status != GM_SUCCESS)
 	{
 	    gm_perror ("directcopy", status);
@@ -61,7 +61,7 @@ MPID_nem_gm_module_get (void *target_p, void *source_p, int len, MPIDI_VC_t *sou
 #endif
     if (MPID_nem_module_gm_num_send_tokens)
     {
-	MPID_nem_gm_module_do_get (target_p, source_p, len, source_vc->ch.node_id, source_vc->ch.port_id, completion_ctr);
+	MPID_nem_gm_module_do_get (target_p, source_p, len, VC_FIELD(source_vc, node_id), VC_FIELD(source_vc, port_id), completion_ctr);
     }
     else
     {
@@ -72,8 +72,8 @@ MPID_nem_gm_module_get (void *target_p, void *source_p, int len, MPIDI_VC_t *sou
 	e->u.rdma.target_p = target_p;
 	e->u.rdma.source_p = source_p;
 	e->u.rdma.len = len;
-	e->node_id = source_vc->ch.node_id;
-	e->port_id = source_vc->ch.port_id;
+	e->node_id = VC_FIELD(source_vc, node_id);
+	e->port_id = VC_FIELD(source_vc, port_id);
 	e->u.rdma.completion_ctr = completion_ctr;
 	MPID_nem_gm_module_queue_enqueue (send, e);
     }
@@ -97,7 +97,7 @@ MPID_nem_gm_module_put (void *target_p, void *source_p, int len, MPIDI_VC_t *tar
 {
     int ret;
     
-    MPIU_Assert (target_vc->ch.node_id >= 0 && target_vc->ch.node_id < MPID_nem_mem_region.num_procs);
+    MPIU_Assert (VC_FIELD(target_vc, node_id) >= 0 && VC_FIELD(target_vc, node_id) < MPID_nem_mem_region.num_procs);
     MPIU_Assert (len >= 0);
     
     if (len == 0)
@@ -108,7 +108,7 @@ MPID_nem_gm_module_put (void *target_p, void *source_p, int len, MPIDI_VC_t *tar
     
     if (MPID_nem_module_gm_num_send_tokens)
     {
-	MPID_nem_gm_module_do_put (target_p, source_p, len, target_vc->ch.node_id, target_vc->ch.port_id, completion_ctr);
+	MPID_nem_gm_module_do_put (target_p, source_p, len, VC_FIELD(target_vc, node_id), VC_FIELD(target_vc, port_id), completion_ctr);
     }
     else
     {
@@ -119,8 +119,8 @@ MPID_nem_gm_module_put (void *target_p, void *source_p, int len, MPIDI_VC_t *tar
 	e->u.rdma.target_p = target_p;
 	e->u.rdma.source_p = source_p;
 	e->u.rdma.len = len;
-	e->node_id = target_vc->ch.node_id;
-	e->port_id = target_vc->ch.port_id;
+	e->node_id = VC_FIELD(target_vc, node_id);
+	e->port_id = VC_FIELD(target_vc, port_id);
 	e->u.rdma.completion_ctr = completion_ctr;
 	MPID_nem_gm_module_queue_enqueue (send, e);
     }

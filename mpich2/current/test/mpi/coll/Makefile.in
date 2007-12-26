@@ -33,7 +33,7 @@ INCLUDES = -I../include -I${srcdir}/../include
 	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-clean: 
+clean:  clean-local
 	-@rm -f *.o ${srcdir}/*.o icreduce red3 bcasttest icbarrier coll4 allgatherv2 alltoallv allredmany icallgather scatter3 opsum icallreduce scatterv alltoallw2 coll13 opmax alltoall1 longuser coll9 icalltoallw icgatherv exscan2 alltoallw1 icgather reduce allgather3 alltoallv0 coll10 opband icalltoall scattern scatter2 oplxor opprod opbxor gather2 icscatterv icalltoallv coll12 allred coll7 coll11 opbor exscan allgather2 opland scantst oplor coll5 red4 opminloc bcast2 coll3 icbcast allred2 allgatherv3 bcast3 coll6 coll2 icscatter opmin gather opmaxloc allred3 coll8 redscat icallgatherv allred4
 	-@rm -f icreduce.exe red3.exe bcasttest.exe icbarrier.exe coll4.exe allgatherv2.exe alltoallv.exe allredmany.exe icallgather.exe scatter3.exe opsum.exe icallreduce.exe scatterv.exe alltoallw2.exe coll13.exe opmax.exe alltoall1.exe longuser.exe coll9.exe icalltoallw.exe icgatherv.exe exscan2.exe alltoallw1.exe icgather.exe reduce.exe allgather3.exe alltoallv0.exe coll10.exe opband.exe icalltoall.exe scattern.exe scatter2.exe oplxor.exe opprod.exe opbxor.exe gather2.exe icscatterv.exe icalltoallv.exe coll12.exe allred.exe coll7.exe coll11.exe opbor.exe exscan.exe allgather2.exe opland.exe scantst.exe oplor.exe coll5.exe red4.exe opminloc.exe bcast2.exe coll3.exe icbcast.exe allred2.exe allgatherv3.exe bcast3.exe coll6.exe coll2.exe icscatter.exe opmin.exe gather.exe opmaxloc.exe allred3.exe coll8.exe redscat.exe icallgatherv.exe allred4.exe
 	-@rm -f core core.[0-9]*
@@ -274,6 +274,8 @@ testing:
 	../runtests -srcdir=$(srcdir) -tests=testlist \
 		   -mpiexec=$(bindir)/mpiexec \
 		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

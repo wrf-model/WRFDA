@@ -8,7 +8,7 @@
 #ifndef MPID_DATALOOP_H
 #define MPID_DATALOOP_H
 
-#include "mpi.h"
+#include <mpi.h>
 
 /* Note: this is where you define the prefix that will be prepended on
  * all externally visible generic dataloop and segment functions.
@@ -29,16 +29,12 @@
 
 /* The following accessor functions must also be defined:
  *
- * DLOOP_Handle_extent()    *
- * DLOOP_Handle_size()      *
+ * DLOOP_Handle_extent()
+ * DLOOP_Handle_size()
  * DLOOP_Handle_loopptr()
- * DLOOP_Handle_loopdepth() *
+ * DLOOP_Handle_loopdepth()
  * DLOOP_Handle_hasloop()
- * DLOOP_Handle_true_lb()
- * DLOOP_Handle_mpi1_lb()
- * DLOOP_Handle_mpi1_ub()
  *
- * Q: Do we really need ALL of these? *'d ones we need for sure.
  */
 
 /* USE THE NOTATION THAT BILL USED IN MPIIMPL.H AND MAKE THESE MACROS */
@@ -46,14 +42,23 @@
 /* NOTE: put get size into mpiimpl.h; the others go here until such time
  * as we see that we need them elsewhere.
  */
-#define DLOOP_Handle_get_loopdepth_macro(handle_,depth_,hetero_) \
-    MPID_Datatype_get_loopdepth_macro(handle_,depth_,hetero_)
+#define DLOOP_Handle_get_loopdepth_macro(handle_,depth_,flag_) \
+    MPID_Datatype_get_loopdepth_macro(handle_,depth_,flag_)
 
-#define DLOOP_Handle_get_loopsize_macro(handle_,size_,hetero_) \
-    MPID_Datatype_get_loopsize_macro(handle_,size_,hetero_)
+#define DLOOP_Handle_get_loopsize_macro(handle_,size_,flag_) \
+    MPID_Datatype_get_loopsize_macro(handle_,size_,flag_)
 
-#define DLOOP_Handle_get_loopptr_macro(handle_,lptr_,hetero_) \
-    MPID_Datatype_get_loopptr_macro(handle_,lptr_,hetero_)
+#define DLOOP_Handle_set_loopptr_macro(handle_,lptr_,flag_) \
+    MPID_Datatype_set_loopptr_macro(handle_,lptr_,flag_)
+
+#define DLOOP_Handle_set_loopdepth_macro(handle_,depth_,flag_) \
+    MPID_Datatype_set_loopdepth_macro(handle_,depth_,flag_)
+
+#define DLOOP_Handle_set_loopsize_macro(handle_,size_,flag_) \
+    MPID_Datatype_set_loopsize_macro(handle_,size_,flag_)
+
+#define DLOOP_Handle_get_loopptr_macro(handle_,lptr_,flag_) \
+    MPID_Datatype_get_loopptr_macro(handle_,lptr_,flag_)
 
 #define DLOOP_Handle_get_size_macro(handle_,size_) \
     MPID_Datatype_get_size_macro(handle_,size_)
@@ -77,58 +82,19 @@
 /* assert function */
 #define DLOOP_Assert MPIU_Assert
 
-/* Include gen_dataloop.h at the end to get the rest of the prototypes
+/* Include dataloop_parts.h at the end to get the rest of the prototypes
  * and defines, in terms of the prefixes and types above.
  */
-#include <gen_dataloop.h>
+#include "dataloop/dataloop_parts.h"
+#include "dataloop/dataloop_create.h"
 
-/* NOTE: WE MAY WANT TO UNDEF EVERYTHING HERE FOR NON-INTERNAL COMPILATIONS */
+/* These values are defined by DLOOP code.
+ *
+ * Note: DLOOP_DATALOOP_ALL_BYTES not currently used in MPICH2.
+ */
+#define MPID_DATALOOP_HETEROGENEOUS DLOOP_DATALOOP_HETEROGENEOUS
+#define MPID_DATALOOP_HOMOGENEOUS   DLOOP_DATALOOP_HOMOGENEOUS
 
-/* dataloop construction functions */
-int MPID_Dataloop_create_contiguous(int count,
-				    MPI_Datatype oldtype,
-				    MPID_Dataloop **dlp_p,
-				    int *dlsz_p,
-				    int *dldepth_p,
-				    int flags);
-int MPID_Dataloop_create_vector(int count,
-				int blocklength,
-				MPI_Aint stride,
-				int strideinbytes,
-				MPI_Datatype oldtype,
-				MPID_Dataloop **dlp_p,
-				int *dlsz_p,
-				int *dldepth_p,
-				int flags);
-int MPID_Dataloop_create_blockindexed(int count,
-				      int blklen,
-				      void *disp_array,
-				      int dispinbytes,
-				      MPI_Datatype oldtype,
-				      MPID_Dataloop **dlp_p,
-				      int *dlsz_p,
-				      int *dldepth_p,
-				      int flags);
-int MPID_Dataloop_create_indexed(int count,
-				 int *blocklength_array,
-				 void *displacement_array,
-				 int dispinbytes,
-				 MPI_Datatype oldtype,
-				 MPID_Dataloop **dlp_p,
-				 int *dlsz_p,
-				 int *dldepth_p,
-				 int flags);
-int MPID_Dataloop_create_struct(int count,
-				int *blklen_array,
-				MPI_Aint *disp_array,
-				MPI_Datatype *oldtype_array,
-				MPID_Dataloop **dlp_p,
-				int *dlsz_p,
-				int *dldepth_p,
-				int flags);
-
-/* flags for MPID_Dataloop_create_xxx calls */
-#define MPID_DATALOOP_HOMOGENEOUS 1
-#define MPID_DATALOOP_ALL_BYTES   2
+#include <mpiimpl.h>
 
 #endif

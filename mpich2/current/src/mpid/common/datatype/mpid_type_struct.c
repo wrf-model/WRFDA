@@ -147,7 +147,7 @@ int MPID_Type_struct(int count,
 		     MPI_Datatype *oldtype_array,
 		     MPI_Datatype *newtype)
 {
-    int err, mpi_errno = MPI_SUCCESS;
+    int mpi_errno = MPI_SUCCESS;
     int i, old_are_contig = 1, definitely_not_contig = 0;
     int found_sticky_lb = 0, found_sticky_ub = 0, found_true_lb = 0,
 	found_true_ub = 0, found_el_type = 0;
@@ -157,6 +157,8 @@ int MPID_Type_struct(int count,
 	sticky_ub_disp = 0;
 
     MPID_Datatype *new_dtp;
+
+    if (count == 0) return MPID_Type_zerolen(newtype);
 
 #ifdef MPID_STRUCT_DEBUG
     MPIDI_Datatype_printf(oldtype_array[0], 1, displacement_array[0],
@@ -190,76 +192,20 @@ int MPID_Type_struct(int count,
     new_dtp->name[0]      = 0;
     new_dtp->contents     = NULL;
 
-    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop       = NULL;
+    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop_depth = -1;
+    new_dtp->hetero_dloop       = NULL;
+    new_dtp->hetero_dloop_size  = -1;
+    new_dtp->hetero_dloop_depth = -1;
 
     /* check for junk struct with all zero blocks */
     for (i=0; i < count; i++) if (blocklength_array[i] != 0) break;
 
-    if (count == 0 || i == count)
+    if (i == count)
     {
-	/* we are interpreting the standard here based on the fact that
-	 * with a zero count there is nothing in the typemap.
-	 *
-	 * we do the same thing for a type with all zero blocks.
-	 *
-	 * we handle this case explicitly to get it out of the way.
-	 */
-	new_dtp->has_sticky_ub = 0;
-	new_dtp->has_sticky_lb = 0;
-
-	new_dtp->alignsize    = 0;
-	new_dtp->element_size = 0;
-	new_dtp->eltype       = 0;
-
-	new_dtp->size    = 0;
-	new_dtp->lb      = 0;
-	new_dtp->ub      = 0;
-	new_dtp->true_lb = 0;
-	new_dtp->true_ub = 0;
-	new_dtp->extent  = 0;
-
-	new_dtp->n_elements = 0;
-	new_dtp->is_contig  = 1;
-
-	err = MPID_Dataloop_create_struct(0,
-					  NULL,
-					  NULL,
-					  NULL,
-					  &(new_dtp->dataloop),
-					  &(new_dtp->dataloop_size),
-					  &(new_dtp->dataloop_depth),
-					  0);
-
-#if defined(MPID_HAS_HETERO) || 1
-	if (!err) {
-	    /* heterogeneous dataloop representation */
-	    err = MPID_Dataloop_create_struct(0,
-					      NULL,
-					      NULL,
-					      NULL,
-					      &(new_dtp->hetero_dloop),
-					      &(new_dtp->hetero_dloop_size),
-					      &(new_dtp->hetero_dloop_depth),
-					      0);
-	}
-#endif /* MPID_HAS_HETERO */
-	/* --BEGIN ERROR HANDLING-- */
-	if (err) {
-	    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					     MPIR_ERR_RECOVERABLE,
-					     "MPID_Dataloop_create_struct",
-					     __LINE__,
-					     MPI_ERR_OTHER,
-					     "**nomem",
-					     0);
-	    return mpi_errno;
-	}
-	/* --END ERROR HANDLING-- */
-  
-	*newtype = new_dtp->handle;
-	return mpi_errno;
+	MPIU_Handle_obj_free(&MPID_Datatype_mem, new_dtp);
+	return MPID_Type_zerolen(newtype);
     }
 
     new_dtp->n_contig_blocks = 0;
@@ -279,7 +225,6 @@ int MPID_Type_struct(int count,
 
 	if (is_builtin)
 	{
-	    /* Q: DO LB or UBs count in element counts? */
 	    tmp_el_sz   = MPID_Datatype_get_basic_size(oldtype_array[i]);
 	    tmp_el_type = oldtype_array[i];
 
@@ -455,41 +400,6 @@ int MPID_Type_struct(int count,
     {
 	new_dtp->is_contig = 0;
     }
-
-    /* fill in dataloop(s) */
-    err = MPID_Dataloop_create_struct(count,
-				      blocklength_array,
-				      displacement_array,
-				      oldtype_array,
-				      &(new_dtp->dataloop),
-				      &(new_dtp->dataloop_size),
-				      &(new_dtp->dataloop_depth),
-				      MPID_DATALOOP_HOMOGENEOUS);
-#if defined(MPID_HAS_HETERO) || 1
-    if (!err) {
-	/* heterogeneous dataloop representation */
-	err = MPID_Dataloop_create_struct(count,
-					  blocklength_array,
-					  displacement_array,
-					  oldtype_array,
-					  &(new_dtp->hetero_dloop),
-					  &(new_dtp->hetero_dloop_size),
-					  &(new_dtp->hetero_dloop_depth),
-					  0);
-    }
-#endif /* MPID_HAS_HETERO */
-    /* --BEGIN ERROR HANDLING-- */
-    if (err) {
-	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					 MPIR_ERR_RECOVERABLE,
-					 "MPID_Dataloop_create_struct",
-					 __LINE__,
-					 MPI_ERR_OTHER,
-					 "**nomem",
-					 0);
-	return mpi_errno;
-    }
-    /* --END ERROR HANDLING-- */
 
     *newtype = new_dtp->handle;
     return mpi_errno;

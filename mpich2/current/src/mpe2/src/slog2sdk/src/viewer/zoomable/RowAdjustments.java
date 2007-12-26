@@ -262,6 +262,7 @@ public class RowAdjustments
             }
             // else if ( resize_mode.equals( ROW_HEIGHT_RESIZE ) ) {
             // }
+            fitall_btn.doClick();
         }
 
 /*

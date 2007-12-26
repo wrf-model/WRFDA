@@ -6,6 +6,9 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
@@ -79,6 +82,11 @@ TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 # This Makefile.sm generated automatically by f77tof90
 # from test/mpi/f77/spawn/Makefile.sm.  DO NOT EDIT
 
+
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
 
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)

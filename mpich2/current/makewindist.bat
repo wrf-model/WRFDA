@@ -1,6 +1,6 @@
 IF "%1" == "" GOTO HELP
 IF "%1" == "--help" GOTO HELP
-IF "%CVS_HOST%" == "" set CVS_HOST=harley.mcs.anl.gov
+IF "%CVS_HOST%" == "" set CVS_HOST=shakey.mcs.anl.gov
 GOTO AFTERHELP
 :HELP
 REM
@@ -74,6 +74,7 @@ echo maint/updatefiles >> sshcmds.txt
 echo tar cvf dotin.tar `find . -name "*.h.in"` >> sshcmds.txt
 echo gzip dotin.tar >> sshcmds.txt
 echo exit >> sshcmds.txt
+dos2unix sshcmds.txt
 ssh -l %USERNAME% %CVS_HOST% < sshcmds.txt
 scp %USERNAME%@%CVS_HOST%:/sandbox/%USERNAME%/dotintmp/mpich2/dotin.tar.gz .
 ssh -l %USERNAME% %CVS_HOST% rm -rf /sandbox/%USERNAME%/dotintmp
@@ -83,7 +84,7 @@ del dotin.tar.gz
 cscript winconfigure.wsf --cleancode --enable-timer-type=queryperformancecounter
 GOTO BUILD_RELEASE
 :AFTERCONFIGURE
-IF "%1" == "--with-curdir" GOTO BUILD
+IF "%1" == "--with-curdir" GOTO BUILD_RELEASE
 REM
 REM Unknown option: %1
 REM
@@ -119,34 +120,34 @@ if %errorlevel% NEQ 0 goto BUILDERROR
 devenv.com examples\examples.sln /project cpi /build Debug
 if %errorlevel% NEQ 0 goto BUILDERROR
 :BUILD_RELEASE
-devenv.com mpich2.sln /build ch3sockRelease
+devenv.com mpich2.sln /build ch3sockRelease > make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /project mpich2s /build ch3sockRelease
+devenv.com mpich2.sln /project mpich2s /build ch3sockRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3sockPRelease
+devenv.com mpich2.sln /build ch3sockPRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /project mpich2s /build ch3sockPRelease
+devenv.com mpich2.sln /project mpich2s /build ch3sockPRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build Release
+devenv.com mpich2.sln /build Release >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build fortRelease
+devenv.com mpich2.sln /build fortRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build gfortRelease
+devenv.com mpich2.sln /build gfortRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build sfortRelease
+devenv.com mpich2.sln /build sfortRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3shmRelease
+devenv.com mpich2.sln /build ch3shmRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3shmPRelease
-REM if %errorlevel% NEQ 0 goto BUILDERROR
+devenv.com mpich2.sln /build ch3shmPRelease >> make.log
+if %errorlevel% NEQ 0 goto BUILDERROR
 REM devenv.com mpich2.sln /build ch3sshmRelease
 REM if %errorlevel% NEQ 0 goto BUILDERROR
 REM devenv.com mpich2.sln /build ch3sshmPRelease
-if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3ssmRelease
-if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3ssmPRelease
 REM if %errorlevel% NEQ 0 goto BUILDERROR
+devenv.com mpich2.sln /build ch3ssmRelease >> make.log
+if %errorlevel% NEQ 0 goto BUILDERROR
+devenv.com mpich2.sln /build ch3ssmPRelease >> make.log
+if %errorlevel% NEQ 0 goto BUILDERROR
 REM devenv.com mpich2.sln /build ch3ibIbalRelease
 REM if %errorlevel% NEQ 0 goto BUILDERROR
 REM devenv.com mpich2.sln /build ch3ibIbalPRelease
@@ -155,15 +156,15 @@ REM devenv.com mpich2.sln /build ch3essmRelease
 REM if %errorlevel% NEQ 0 goto BUILDERROR
 REM devenv.com mpich2.sln /build ch3essmPRelease
 REM if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3sockmtRelease
+devenv.com mpich2.sln /build ch3sockmtRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build ch3sockmtPRelease
+devenv.com mpich2.sln /build ch3sockmtPRelease >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /project cxx /build Debug
+devenv.com mpich2.sln /project cxx /build Debug >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com src\util\logging\rlog\rlogtools.sln /build Release
+devenv.com src\util\logging\rlog\rlogtools.sln /build Release >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
-devenv.com mpich2.sln /build fmpe
+devenv.com mpich2.sln /build fmpe >> make.log
 if %errorlevel% NEQ 0 goto BUILDERROR
 cd maint
 call makegcclibs.bat

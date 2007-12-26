@@ -1,5 +1,6 @@
 Makefile.in
 Makefile
+add1size.h
 c2f2cf
 testlist
 *.o

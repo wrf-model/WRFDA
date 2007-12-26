@@ -29,7 +29,7 @@ C_COMPILE_SHL   = $(CC_SHL) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
 
 VPATH = .:@srcdir@
 mpi_sources = abort.c init.c initialized.c initthread.c \
- ismain.c finalize.c finalized.c querythread.c
+ ismain.c finalize.c finalized.c querythread.c 
 HEADERS = mpi_init.h
 INCLUDES = -I../../include -I${top_srcdir}/src/include -I${top_srcdir}/src/mpi/datatype -I${master_top_srcdir}/src/mpi/spawn
 
@@ -70,12 +70,13 @@ all-redirect: .libstamp0 ../../../lib/lib${MPILIBNAME}.a
 	fi
 
 .libstamp0 ../../../lib/lib${MPILIBNAME}.a: abort.o init.o initialized.o \
-	initthread.o ismain.o finalize.o finalized.o querythread.o 
+	initthread.o ismain.o finalize.o finalized.o querythread.o initinfo.o 
 	${AR} cr ../../../lib/lib${MPILIBNAME}.a $?
 	${RANLIB} ../../../lib/lib${MPILIBNAME}.a
 	date > .libstamp0
 .libstamp1 ../../../lib/lib${MPILIBNAME}.la: abort.lo init.lo initialized.lo \
-	initthread.lo ismain.lo finalize.lo finalized.lo querythread.lo 
+	initthread.lo ismain.lo finalize.lo finalized.lo querythread.lo \
+	initinfo.lo 
 	${AR} cr ../../../lib/lib${MPILIBNAME}.la $?
 	date > .libstamp1
 
@@ -126,7 +127,7 @@ _querythread.lo: querythread.c
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 SOURCES         =  abort.c init.c initialized.c initthread.c ismain.c \
-	finalize.c finalized.c querythread.c 
+	finalize.c finalized.c querythread.c initinfo.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
@@ -134,6 +135,7 @@ tags: TAGS
 TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 	here=`cd ../../.. && pwd` ; cd ${srcdir} && $(ETAGS) -o $$here/TAGS --append ${HEADERFILES} ${SOURCEFILES}
 # --------------------------------------------------------------------------
+# Note that initinfo is only in the MPI library, not the profile library
 #
 
 FORCE_TARGET:

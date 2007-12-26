@@ -11,6 +11,12 @@
 #include "mpidimpl.h"
 #include "mpidu_process_locks.h"
 
+/* Redefine MPIU_CALL since the shm channel should be self-contained.
+   This only affects the building of a dynamically loadable library for 
+   the sock channel, and then only when debugging is enabled */
+#undef MPIU_CALL
+#define MPIU_CALL(context,funccall) context##_##funccall
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -56,8 +62,7 @@
 
 #ifdef HAVE_GCC_AND_PENTIUM_ASM
 #ifdef HAVE_GCC_ASM_AND_X86_SFENCE
-/*#define MPID_WRITE_BARRIER() __asm__ __volatile__  ( "sfence" ::: "memory" )*/
-#define MPID_WRITE_BARRIER()
+#define MPID_WRITE_BARRIER() __asm__ __volatile__  ( "sfence" ::: "memory" )
 #else
 #define MPID_WRITE_BARRIER()
 #endif
@@ -67,16 +72,14 @@
 #define MPID_READ_BARRIER()
 #endif
 #ifdef HAVE_GCC_ASM_AND_X86_MFENCE
-/*#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" )*/
-#define MPID_READ_WRITE_BARRIER()
+#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" )
 #else
 #define MPID_READ_WRITE_BARRIER()
 #endif
 
 #elif defined(HAVE___ASM_AND_PENTIUM_ASM)
 #ifdef HAVE___ASM_AND_X86_SFENCE
-/*#define MPID_WRITE_BARRIER() __asm sfence */
-#define MPID_WRITE_BARRIER()
+#define MPID_WRITE_BARRIER() __asm sfence
 #else
 #define MPID_WRITE_BARRIER()
 #endif
@@ -86,13 +89,34 @@
 #define MPID_READ_BARRIER()
 #endif
 #ifdef HAVE___ASM_AND_X86_MFENCE
-/*#define MPID_READ_WRITE_BARRIER() __asm __emit 0x0f __asm __emit 0xae __asm __emit 0xf0*/
-#define MPID_READ_WRITE_BARRIER()
+#define MPID_READ_WRITE_BARRIER() __asm __emit 0x0f __asm __emit 0xae __asm __emit 0xf0
 #else
 #define MPID_READ_WRITE_BARRIER()
 #endif
 
+#elif defined(HAVE_GCC_ASM_SPARC_MEMBAR)
+#define MPID_WRITE_BARRIER() __asm__ __volatile__ ( "membar #StoreLoad | #StoreStore" : : : "memory" );
+#define MPID_READ_BARRIER() __asm__ __volatile__ ( "membar #LoadLoad | #LoadStore" : : : "memory" );
+#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__ ( "membar #StoreLoad | #StoreStore | #LoadLoad | #LoadStore" : : : "memory" );
+
+#elif defined(HAVE_GCC_ASM_SPARC_STBAR)
+#define MPID_WRITE_BARRIER() __asm__ __volatile__ ( "stbar" : : : "memory" );
+#define MPID_READ_BARRIER()  __asm__ __volatile__ ( "stbar" : : : "memory" );
+#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__ ( "stbar" : : : "memory" );
+
+#elif defined(HAVE_SOLARIS_ASM_SPARC_MEMBAR)
+#define MPID_WRITE_BARRIER() __asm ( "membar #StoreLoad | #StoreStore");
+#define MPID_READ_BARRIER()  __asm ( "membar #LoadLoad | #LoadStore");
+#define MPID_READ_WRITE_BARRIER() __asm ( "membar #StoreLoad | #StoreStore | #LoadLoad | #LoadStore");
+
+#elif defined(HAVE_SOLARIS_ASM_SPARC_STBAR)
+#define MPID_WRITE_BARRIER() __asm ( "stbar" );
+#define MPID_READ_BARRIER() __asm ( "stbar" );
+#define MPID_READ_WRITE_BARRIER() __asm ( "stbar" );
+
 #else
+/* FIXME: We need to ensure read/write barriers for correctness, if the 
+   processor might possibly reorder */
 #define MPID_WRITE_BARRIER()
 #define MPID_READ_BARRIER()
 #define MPID_READ_WRITE_BARRIER()
@@ -118,16 +142,69 @@
 #define MPIDI_CH3I_PKT_FILLED           MPIDI_CH3I_PKT_USED
 
 
-/* This structure uses the avail field to signal that the data is available for reading.
+/* This structure requires the iovec structure macros to be defined */
+typedef struct MPIDI_CH3I_SHM_Buffer_t
+{
+    int use_iov;
+    unsigned int num_bytes;
+    void *buffer;
+    unsigned int bufflen;
+#ifdef USE_SHM_IOV_COPY
+    MPID_IOV iov[MPID_IOV_LIMIT];
+#else
+    MPID_IOV *iov;
+#endif
+    int iovlen;
+    int index;
+    int total;
+} MPIDI_CH3I_SHM_Buffer_t;
+
+typedef struct MPIDI_CH3I_SHM_Unex_read_s
+{
+    struct MPIDI_CH3I_SHM_Packet_t *pkt_ptr;
+    unsigned char *buf;
+    unsigned int length;
+    int src;
+    struct MPIDI_CH3I_SHM_Unex_read_s *next;
+} MPIDI_CH3I_SHM_Unex_read_t;
+
+typedef struct MPIDI_CH3I_VC
+{
+    struct MPIDI_CH3I_SHM_Queue_t * shm, * read_shmq, * write_shmq;
+    struct MPID_Request * sendq_head;
+    struct MPID_Request * sendq_tail;
+    struct MPID_Request * send_active;
+    struct MPID_Request * recv_active;
+    struct MPID_Request * req;
+    int shm_reading_pkt;
+    int shm_state;
+    MPIDI_CH3I_SHM_Buffer_t read;
+#ifdef USE_SHM_UNEX
+    MPIDI_CH3I_SHM_Unex_read_t *unex_list;
+    struct MPIDI_VC *unex_finished_next;
+#endif
+#ifdef HAVE_SHARED_PROCESS_READ
+#ifdef HAVE_WINDOWS_H
+    HANDLE hSharedProcessHandle;
+#else
+    int nSharedProcessID;
+    int nSharedProcessFileDescriptor;
+#endif
+#endif
+} MPIDI_CH3I_VC;
+
+/* This structure uses the avail field to signal that the data is available 
+   for reading.
    The code fills the data and then sets the avail field.
-   This assumes that declaring avail to be volatile causes the compiler to insert a
+   This assumes that declaring avail to be volatile causes the compiler to 
+   insert a
    write barrier when the avail location is written to.
    */
 typedef struct MPIDI_CH3I_SHM_Packet_t
 {
     volatile int avail;
     /*char pad_avail[60];*/ /* keep the avail flag on a separate cache line */
-    int num_bytes;
+    volatile int num_bytes;
     int offset;
     /* insert stuff here to align data? */
     int pad;/*char pad_data[56];*/ /* cache align the data */
@@ -152,51 +229,93 @@ MPIDI_CH3I_Process_t;
 
 extern MPIDI_CH3I_Process_t MPIDI_CH3I_Process;
 
-#define MPIDI_CH3I_SendQ_enqueue(vc, req)				\
+#ifdef HAVE_SHARED_PROCESS_READ
+typedef struct MPIDI_CH3I_Shared_process
+{
+    int nRank;
+#ifdef HAVE_WINDOWS_H
+    DWORD nPid;
+#else
+    int nPid;
+#endif
+    BOOL bFinished;
+} MPIDI_CH3I_Shared_process_t;
+#endif
+
+typedef struct MPIDI_Process_group_s
+{
+    volatile int ref_count;
+    int nShmEagerLimit;
+#ifdef HAVE_SHARED_PROCESS_READ
+    int nShmRndvLimit;
+    MPIDI_CH3I_Shared_process_t *pSHP;
+#ifdef HAVE_WINDOWS_H
+    HANDLE *pSharedProcessHandles;
+#else
+    int *pSharedProcessIDs;
+    int *pSharedProcessFileDescriptors;
+#endif
+#endif
+    void *addr;
+#ifdef USE_POSIX_SHM
+    char key[MPIDI_MAX_SHM_NAME_LENGTH];
+    int id;
+#elif defined (USE_SYSV_SHM)
+    int key;
+    int id;
+#elif defined (USE_WINDOWS_SHM)
+    char key[MPIDI_MAX_SHM_NAME_LENGTH];
+    HANDLE id;
+#else
+#error *** No shared memory mapping variables specified ***
+#endif
+    int nShmWaitSpinCount;
+    int nShmWaitYieldCount;
+} MPIDI_CH3I_PG;
+/* MPIDI_CH3I_Process_group_t; */
+
+/* #define MPIDI_CH3_PG_DECL MPIDI_CH3I_Process_group_t ch; */
+
+
+#define MPIDI_CH3I_SendQ_enqueue(vcch, req)				\
 {									\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue vc=0x%08x req=0x%08x",	\
-	              (unsigned long) vc, req->handle));		\
     req->dev.next = NULL;						\
-    if (vc->ch.sendq_tail != NULL)					\
+    if (vcch->sendq_tail != NULL)					\
     {									\
-	vc->ch.sendq_tail->dev.next = req;				\
+	vcch->sendq_tail->dev.next = req;				\
     }									\
     else								\
     {									\
-	vc->ch.sendq_head = req;					\
+	vcch->sendq_head = req;					\
     }									\
-    vc->ch.sendq_tail = req;						\
+    vcch->sendq_tail = req;						\
 }
 
-#define MPIDI_CH3I_SendQ_enqueue_head(vc, req)				     \
+#define MPIDI_CH3I_SendQ_enqueue_head(vcch, req)			     \
 {									     \
     /* MT - not thread safe! */						     \
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue_head vc=0x%08x req=0x%08x", \
-	              (unsigned long) vc, req->handle));		     \
-    req->dev.next = vc->ch.sendq_head;					     \
-    if (vc->ch.sendq_tail == NULL)					     \
+    req->dev.next = vcch->sendq_head;					     \
+    if (vcch->sendq_tail == NULL)					     \
     {									     \
-	vc->ch.sendq_tail = req;					     \
+	vcch->sendq_tail = req;					     \
     }									     \
-    vc->ch.sendq_head = req;						     \
+    vcch->sendq_head = req;						     \
 }
 
-#define MPIDI_CH3I_SendQ_dequeue(vc)					\
+#define MPIDI_CH3I_SendQ_dequeue(vcch)					\
 {									\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_dequeue vc=0x%08x req=0x%08x",	\
-	              (unsigned long) vc, vc->ch.sendq_head));		\
-    vc->ch.sendq_head = vc->ch.sendq_head->dev.next;			\
-    if (vc->ch.sendq_head == NULL)					\
+    vcch->sendq_head = vcch->sendq_head->dev.next;			\
+    if (vcch->sendq_head == NULL)					\
     {									\
-	vc->ch.sendq_tail = NULL;					\
+	vcch->sendq_tail = NULL;					\
     }									\
 }
 
-#define MPIDI_CH3I_SendQ_head(vc) (vc->ch.sendq_head)
+#define MPIDI_CH3I_SendQ_head(vcch) (vcch->sendq_head)
 
-#define MPIDI_CH3I_SendQ_empty(vc) (vc->ch.sendq_head == NULL)
+#define MPIDI_CH3I_SendQ_empty(vcch) (vcch->sendq_head == NULL)
 
 typedef enum shm_wait_e
 {

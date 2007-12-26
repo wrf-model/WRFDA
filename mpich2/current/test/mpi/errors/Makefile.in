@@ -18,18 +18,18 @@ VPATH = .:@srcdir@
 .SUFFIXES: .c .o
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-	for dir in coll comm group pt2pt rma spawn io @otherlangs@ - ; do \
+	for dir in coll comm group pt2pt rma spawn topo io @otherlangs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} apply ; ) ; done
 clean: 
 	-@rm -f *.o ${srcdir}/*.o 
 	-@rm -f *.lo ${srcdir}/*.lo
-	for dir in coll comm group pt2pt rma spawn io @otherlangs@ - ; do \
+	for dir in coll comm group pt2pt rma spawn topo io @otherlangs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} clean ; ) ; done
 distclean:  clean distclean-xxx remove-makefile
 distclean-xxx:
-	for dir in coll comm group pt2pt rma spawn io @otherlangs@ - ; do \
+	for dir in coll comm group pt2pt rma spawn topo io @otherlangs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		if [ ! -s $$dir/Makefile ] ; then continue ; fi ;\
 		(cd $$dir && ${MAKE} distclean ; ) ; done
@@ -52,6 +52,7 @@ all-redirect:
 	@(cd pt2pt && ${MAKE} all )
 	@(cd rma && ${MAKE} all )
 	@(cd spawn && ${MAKE} all )
+	@(cd topo && ${MAKE} all )
 	@(cd io && ${MAKE} all )
 	@for dir in @otherlangs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
@@ -65,7 +66,7 @@ HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
 tags: TAGS
 TAGS: Makefile
-	for dir in coll comm group pt2pt rma spawn io @otherlangs@ - ; do \
+	for dir in coll comm group pt2pt rma spawn topo io @otherlangs@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} TAGS ; ) ; done
 # --------------------------------------------------------------------------

@@ -7,3 +7,4 @@ distclean-local:
 maintainer-clean-local:
 	-rm -f include/mpidi_ch3i_ssm_conf.h.in
 
+optinstall_DLLLIB = libmpich2-ch3-ssm.@SHLIB_EXT@

@@ -203,10 +203,18 @@ LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
 #
 # Handle the case of a profile switch
 if [ -n "$profConf" ] ; then
+    profConffile=
     if [ -s "$libdir/lib$profConf.a" -o -s "$libdir/lib$profConf.so" ] ; then
 	mpilibs="-l$profConf $mpilibs"
     elif [ -s "$sysconfdir/$profConf.conf" ] ; then
-	. $sysconfdir/$profConf.conf
+	profConffile="$sysconfdir/$profConf.conf"
+    elif [ -s "$profConf.conf" ] ; then
+        profConffile="$profConf.conf"
+    else
+        echo "Profiling configuration file $profConf.conf not found in $sysconfdir"
+    fi
+    if [ -n "$profConffile" -a -s "$profConffile" ] ; then
+	. $profConffile
 	if [ -n "$PROFILE_INCPATHS" ] ; then
 	    CXXFLAGS="$PROFILE_INCPATHS $CXXFLAGS"
         fi
@@ -216,8 +224,6 @@ if [ -n "$profConf" ] ; then
         if [ -n "$PROFILE_POSTLIB" ] ; then
 	    mpilibs="$mpilibs $PROFILE_POSTLIB"
         fi
-    else
-        echo "Profiling configuration file $profConf.conf not found in $sysconfdir"
     fi
 fi
 # A temporary statement to invoke the compiler

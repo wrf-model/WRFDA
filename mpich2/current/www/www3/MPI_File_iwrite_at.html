@@ -11,9 +11,11 @@ Nonblocking write using explict offset
 <PRE>
 #ifdef HAVE_MPI_GREQUEST
 #include "mpiu_greq.h"
+#endif
 
-#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
-typedef struct iwrite_at_args
+int MPI_File_iwrite_at(MPI_File mpi_fh, MPI_Offset offset, void *buf,
+                       int count, MPI_Datatype datatype, 
+                       MPIO_Request *request)
 </PRE>
 <H2>Input Parameters</H2>
 <DL><DT><B>fh </B> <DD> file handle (handle)

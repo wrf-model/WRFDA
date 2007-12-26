@@ -35,6 +35,13 @@ export sock_name
 AC_SUBST(sock_name)
 
 PAC_PROG_MAKE
+AC_CHECK_PROGS(AR,ar)
+if test -z "$AR" ; then
+    AC_MSG_ERROR([The program ar is required for building MPICH2.  Make sure that your path includes ar])
+fi
+# Note that we set RANLIB to true if we don't find it (some systems neither
+# need it nor provide it)
+AC_CHECK_PROGS(RANLIB,ranlib,true)
 
 AC_SUBST(AR)
 AC_SUBST(RANLIB)
@@ -43,6 +50,9 @@ AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 PAC_CC_SUBDIR_SHLIBS
+if test -z "$ENABLE_SHLIB" -o "$ENABLE_SHLIB" = "no" ; then
+    ENABLE_SHLIB=none
+fi
 AC_SUBST(master_top_srcdir)
 # Master_top_builddir is imported from the top; use it for the "top"
 # (used for things like libtool)
@@ -66,7 +76,15 @@ export ETAGSADD
 
 PAC_SUBDIR_CACHE
 
+export RANLIB
+export AR
+# FIXME: autoconf doesn't like variable names in the config_subdirs call.
 AC_CONFIG_SUBDIRS(${sock_name})
+
+# Add the MPICH2 include flags to CPPFLAGS.  See the discussion above about
+# which include flags should start in MPICH2_INCLUDE_FLAGS and which in 
+# CPPFLAGS
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
 
 AC_OUTPUT(Makefile localdefs)
 

@@ -1,13 +1,14 @@
-.TH MPI_File_iread 3 "1/30/2007" " " "MPI"
+.TH MPI_File_iread 3 "10/30/2007" " " "MPI"
 .SH NAME
 MPI_File_iread \-  Nonblocking read using individual file pointer 
 .SH SYNOPSIS
 .nf
 #ifdef HAVE_MPI_GREQUEST
 #include "mpiu_greq.h"
+#endif
 
-#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
-typedef struct iread_args
+int MPI_File_iread(MPI_File mpi_fh, void *buf, int count, 
+                  MPI_Datatype datatype, MPI_Request *request)
 .fi
 .SH INPUT PARAMETERS
 .PD 0

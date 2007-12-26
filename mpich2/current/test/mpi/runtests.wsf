@@ -52,7 +52,7 @@ end if
 
 set ftmp = f.CreateTextFile(outfile_name)
 ftmp.WriteLine("<?xml version='1.0' ?>")
-ftmp.WriteLine("<?xml-stylesheet href=""../TestResults.xsl"" type=""text/xsl"" ?>")
+ftmp.WriteLine("<?xml-stylesheet href=""TestResults.xsl"" type=""text/xsl"" ?>")
 ftmp.WriteLine("<MPITESTRESULTS>")
 ftmp.WriteLine("<DATE>" & Date)
 ftmp.WriteLine("</DATE>")

@@ -21,11 +21,11 @@
 	MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3_ISEND); \
 	return mpi_errno; \
     } \
-    sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) pkt; \
-    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->ch.pkt + nb); \
+    sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) pkt; \
+    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->dev.pending_pkt + nb); \
     sreq->dev.iov[0].MPID_IOV_LEN = pkt_sz - nb; \
     sreq->dev.iov_count = 1; \
-    sreq->ch.iov_offset = 0; \
+    sreq->dev.iov_offset = 0; \
     MPIDI_FUNC_EXIT(MPID_STATE_UPDATE_REQUEST); \
 }
 #else
@@ -33,11 +33,11 @@
 { \
     MPIDI_STATE_DECL(MPID_STATE_UPDATE_REQUEST); \
     MPIDI_FUNC_ENTER(MPID_STATE_UPDATE_REQUEST); \
-    sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) pkt; \
-    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->ch.pkt + nb); \
+    sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) pkt; \
+    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->dev.pending_pkt + nb); \
     sreq->dev.iov[0].MPID_IOV_LEN = pkt_sz - nb; \
     sreq->dev.iov_count = 1; \
-    sreq->ch.iov_offset = 0; \
+    sreq->dev.iov_offset = 0; \
     MPIDI_FUNC_EXIT(MPID_STATE_UPDATE_REQUEST); \
 }
 #endif
@@ -46,9 +46,11 @@
 #define FUNCNAME MPIDI_CH3_iSend
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_sz_t pkt_sz)
+int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt,
+		    MPIDI_msg_sz_t pkt_sz)
 {
     int mpi_errno = MPI_SUCCESS;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_ISEND);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_ISEND);
@@ -66,7 +68,7 @@ int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_
     pkt_sz = sizeof(MPIDI_CH3_Pkt_t);
     MPIDI_DBG_Print_packet((MPIDI_CH3_Pkt_t*)pkt);
     
-    if (MPIDI_CH3I_SendQ_empty(vc)) /* MT */
+    if (MPIDI_CH3I_SendQ_empty(vcch)) /* MT */
     {
 	int nb;
 	
@@ -88,7 +90,7 @@ int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_
 		reqFn = sreq->dev.OnDataAvail;
 		if (!reqFn) {
 		    MPIDI_CH3U_Request_complete(sreq);
-		    vc->ch.send_active = MPIDI_CH3I_SendQ_head(vc);
+		    vcch->send_active = MPIDI_CH3I_SendQ_head(vcch);
 		}
 		else {
 		    int complete;
@@ -96,13 +98,13 @@ int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_
 		    if (mpi_errno) MPIU_ERR_POP(mpi_errno);
 		    if (!complete)
 		    {
-			sreq->ch.iov_offset = 0;
-			MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
-			vc->ch.send_active = sreq;
+			sreq->dev.iov_offset = 0;
+			MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
+			vcch->send_active = sreq;
 		    }
 		    else
 		    {
-			vc->ch.send_active = MPIDI_CH3I_SendQ_head(vc);
+			vcch->send_active = MPIDI_CH3I_SendQ_head(vcch);
 		    }
 		}
 	    }
@@ -110,13 +112,13 @@ int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_
 	    {
 		MPIDI_DBG_PRINTF((55, FCNAME, "partial write, enqueuing at head"));
 		update_request(sreq, pkt, pkt_sz, nb);
-		MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
-		vc->ch.send_active = sreq;
+		MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
+		vcch->send_active = sreq;
 	    }
 	}
 	else
 	{
-	    /*vc->ch.state = MPIDI_CH3I_VC_STATE_FAILED;*/
+	    /*vcch->state = MPIDI_CH3I_VC_STATE_FAILED;*/
 	    /* TODO: Create an appropriate error message based on the return value (rc) */
 	    sreq->status.MPI_ERROR = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shmwrite", 0);
 	    /* MT -CH3U_Request_complete() performs write barrier */
@@ -127,7 +129,7 @@ int MPIDI_CH3_iSend(MPIDI_VC_t * vc, MPID_Request * sreq, void * pkt, MPIDI_msg_
     {
 	MPIDI_DBG_PRINTF((55, FCNAME, "send queue not empty, enqueuing"));
 	update_request(sreq, pkt, pkt_sz, 0);
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
     }
 
  fn_fail:

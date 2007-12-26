@@ -6,30 +6,97 @@
 
 #include "gm_module_impl.h"
 
-
-inline int
-MPID_nem_gm_module_recv()
+/* receive buffer */
+typedef struct recv_buffer
 {
-    gm_recv_event_t *e;
-    MPID_nem_cell_ptr_t c;
+    struct recv_buffer *next;
+    packet_t pkt;
+} recv_buffer_t;
 
+static recv_buffer_t *recv_buffers;
+
+#define RECVBUF_TO_PKT(rbp) (&(rbp)->pkt)
+#define PKT_TO_RECVBUF(pktp) ((recv_buffer_t *)((MPI_Aint)(pktp) - (MPI_Aint)(&((recv_buffer_t *)0)->pkt)))
+
+#define RECVBUF_S_EMPTY() GENERIC_S_EMPTY(recvbuf_stack)
+#define RECVBUF_S_PUSH(ep) GENERIC_S_PUSH(&recvbuf_stack, ep, next)
+#define RECVBUF_S_POP(ep) GENERIC_S_POP(&recvbuf_stack, ep, next)
+static struct {recv_buffer_t *top;} recvbuf_stack;
+
+
+static int num_recv_tokens;
+static int recv_tokens_hiwatermark;
+#define HIWATERMARK_RATIO 0.75
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_gm_module_recv_init
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPID_nem_gm_module_recv_init()
+{
+    int mpi_errno = MPI_SUCCESS;
+    int i;
+    gm_status_t status;
+    MPIU_CHKPMEM_DECL (1);
+
+    num_recv_tokens = gm_num_receive_tokens(MPID_nem_module_gm_port);
+
+    recvbuf_stack.top = NULL;
+    
+    MPIU_CHKPMEM_MALLOC(recv_buffers, recv_buffer_t *, sizeof(recv_buffer_t) * num_recv_tokens, mpi_errno, "recvbuf");
+    status = gm_register_memory(MPID_nem_module_gm_port, (void *)recv_buffers,
+                                sizeof(recv_buffer_t) * num_recv_tokens);
+    MPIU_ERR_CHKANDJUMP1(status != GM_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**gm_regmem", "**gm_regmem %d", status);
+
+    recv_tokens_hiwatermark = num_recv_tokens * HIWATERMARK_RATIO;
+    
+    for (i = 0; i < num_recv_tokens; ++i)
+    {
+	gm_provide_receive_buffer_with_tag(MPID_nem_module_gm_port, (void *)RECVBUF_TO_PKT(&recv_buffers[i]), PACKET_SIZE,
+                                           GM_LOW_PRIORITY, i);
+    }
+    num_recv_tokens = 0;
+    
+    MPIU_CHKPMEM_COMMIT();
+ fn_exit:
+    return mpi_errno;
+ fn_fail:
+    MPIU_CHKPMEM_REAP();
+    goto fn_exit;
+}
+
+
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_gm_module_recv
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+inline int MPID_nem_gm_module_recv()
+{
+    int mpi_errno = MPI_SUCCESS;
+    gm_recv_event_t *e;
+    MPIDI_VC_t *vc;
+    
     /*    printf_d ("MPID_nem_gm_module_recv()\n"); */
     
-    DO_PAPI (PAPI_reset (PAPI_EventSet));
-    while (MPID_nem_module_gm_num_recv_tokens && !MPID_nem_queue_empty (MPID_nem_module_gm_free_queue))
+    while (!RECVBUF_S_EMPTY())
     {
-	MPID_nem_queue_dequeue (MPID_nem_module_gm_free_queue, &c);
-	gm_provide_receive_buffer_with_tag (MPID_nem_module_gm_port, (void *)MPID_NEM_CELL_TO_PACKET (c), PACKET_SIZE, GM_LOW_PRIORITY, 0);
-	--MPID_nem_module_gm_num_recv_tokens;
-	DO_PAPI (if (!(MPID_nem_module_gm_num_recv_tokens && !MPID_nem_queue_empty (MPID_nem_module_gm_free_queue)))
-		 PAPI_accum_var (PAPI_EventSet, PAPI_vvalues10));
-   }
-    
+        recv_buffer_t *recvbuf;
+
+        RECVBUF_S_POP(&recvbuf);
+        
+	gm_provide_receive_buffer_with_tag(MPID_nem_module_gm_port, (void *)RECVBUF_TO_PKT(recvbuf), PACKET_SIZE, GM_LOW_PRIORITY, -1);
+	--num_recv_tokens;
+        MPIU_Assert(num_recv_tokens >= 0);
+    }
+
     DO_PAPI (PAPI_reset (PAPI_EventSet));
     e = gm_receive (MPID_nem_module_gm_port);
     while (gm_ntoh_u8 (e->recv.type) != GM_NO_RECV_EVENT)
     {
-	MPID_nem_pkt_header_t *header;
+        packet_t *pkt;
+        int msg_len;
+        
 	switch (gm_ntoh_u8 (e->recv.type))
 	{
 	case GM_FAST_HIGH_PEER_RECV_EVENT:
@@ -44,45 +111,58 @@ MPID_nem_gm_module_recv()
 	case GM_FAST_RECV_EVENT:
 	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
 	    DO_PAPI (PAPI_reset (PAPI_EventSet));
-	    /*gm_memorize_message (gm_ntohp (e->recv.message), gm_ntohp (e->recv.buffer), gm_ntoh_u32 (e->recv.length)); */
-	    /*my_memcpy (gm_ntohp (e->recv.buffer), gm_ntohp (e->recv.message), gm_ntoh_u32 (e->recv.length)); */
-	    MPID_NEM_MEMCPY (gm_ntohp (e->recv.buffer), gm_ntohp (e->recv.message), gm_ntoh_u32 (e->recv.length));
+
+            pkt = (packet_t *)gm_ntohp(e->recv.message);
+            msg_len = gm_ntoh_u32(e->recv.length) - PKT_HEADER_LEN;
+            MPIDI_PG_Get_vc (MPIDI_Process.my_pg, pkt->source_id, &vc);
+
+            mpi_errno = MPID_nem_handle_pkt(vc, (char *)pkt->buf, msg_len);
+            if (mpi_errno) MPIU_ERR_POP(mpi_errno);
+            
+            RECVBUF_S_PUSH(PKT_TO_RECVBUF((packet_t *)gm_ntohp(e->recv.buffer)));
+            ++num_recv_tokens;
+
 	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues7));
+            break;
 	case GM_PEER_RECV_EVENT:
 	case GM_RECV_EVENT:
-	    DO_PAPI (if (gm_ntoh_u8 (e->recv.type) == GM_RECV_EVENT || gm_ntoh_u8 (e->recv.type) == GM_PEER_RECV_EVENT)
-		     PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
-	    header = (MPID_nem_pkt_header_t *)gm_ntohp (e->recv.buffer);
-	    c = MPID_NEM_PACKET_TO_CELL (header);	    
-
-	    printf_d ("  Received packet\n");
-	    printf_d ("    dest %d\n", header->dest);
-	    printf_d ("    datalen %d\n", header->datalen);
-	    printf_d ("    seqno %d\n", header->seqno);
-
-	    DO_PAPI (PAPI_reset (PAPI_EventSet));	    
-	    MPID_nem_queue_enqueue (MPID_nem_process_recv_queue, c);
-	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues9));
-
-/* 	    if (!MPID_nem_queue_empty (MPID_nem_module_gm_free_queue)) */
-/* 	    { */
-/* 		MPID_nem_queue_dequeue (MPID_nem_module_gm_free_queue, &c); */
-/* 		gm_provide_receive_buffer_with_tag (MPID_nem_module_gm_port, MPID_NEM_CELL_TO_PACKET (c), PACKET_SIZE, GM_LOW_PRIORITY, 0); */
-/* 	    } */
-/* 	    else */
-/* 	    { */
-		++MPID_nem_module_gm_num_recv_tokens; 
-/* 	    } */
+            pkt = (packet_t *)gm_ntohp(e->recv.buffer);
+            msg_len = gm_ntoh_u32(e->recv.length) - PKT_HEADER_LEN;
+            MPIDI_PG_Get_vc (MPIDI_Process.my_pg, pkt->source_id, &vc);
+            
+            mpi_errno = MPID_nem_handle_pkt(vc, (char *)pkt->buf, msg_len);
+            if (mpi_errno) MPIU_ERR_POP(mpi_errno);
+            
+            RECVBUF_S_PUSH(PKT_TO_RECVBUF(pkt));
+            ++num_recv_tokens;
 	    break;
 	default:
 	    gm_unknown (MPID_nem_module_gm_port, e);
 	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues6));
 	}
+
+        if (num_recv_tokens > recv_tokens_hiwatermark)
+        {
+            while (!RECVBUF_S_EMPTY())
+            {
+                recv_buffer_t *recvbuf;
+        
+                RECVBUF_S_POP(&recvbuf);
+                gm_provide_receive_buffer_with_tag(MPID_nem_module_gm_port, (void *)RECVBUF_TO_PKT(recvbuf), PACKET_SIZE,
+                                                   GM_LOW_PRIORITY, -1);
+                --num_recv_tokens;
+                MPIU_Assert(num_recv_tokens >= 0);
+            }
+        }
 	
 	DO_PAPI (PAPI_reset (PAPI_EventSet));
 	e = gm_receive (MPID_nem_module_gm_port);
     }
-    return MPI_SUCCESS;
+
+ fn_exit:
+    return mpi_errno;
+ fn_fail:
+    goto fn_exit;
 }
 
 static inline int

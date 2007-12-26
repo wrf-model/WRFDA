@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: trmem.c,v 1.31 2006/11/02 19:48:50 gropp Exp $
+/*  $Id: trmem.c,v 1.32 2007/02/22 21:56:13 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -152,6 +152,7 @@ static long    TRMaxMemAllow = 0;
 
 /* 8 bytes = 16 hex chars + 0x (2 chars) + the null is 19 */
 #define MAX_ADDRESS_CHARS 19
+
 static void addrToHex( void *addr, char string[MAX_ADDRESS_CHARS] );
 
 /*+C
@@ -420,7 +421,7 @@ int MPIU_trvalid( const char str[] )
 	    if (!errs) MPIU_Error_printf( "%s\n", str );
 	    errs++;
 	    addrToHex( head, hexstring );
-	    MPIU_Error_printf( "[%d] Block at address %s is corrupted\n", 
+	    MPIU_Error_printf( "[%d] Block at address %s is corrupted (invalid cookie in head)\n", 
 			 world_rank, hexstring );
 	    /* Must stop because if head is invalid, then the data in the
 	       head is probably also invalid, and using could lead to 

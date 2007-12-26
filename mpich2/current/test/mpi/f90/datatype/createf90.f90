@@ -7,7 +7,9 @@
         integer ierr
         integer errs
         integer nints, nadds, ndtypes, combiner
+        integer rank
         integer nparms(2), dummy(1)
+        integer (kind=MPI_ADDRESS_KIND) adummy(1)
         integer ntype1, nsize, ntype2
 !
 !       Test the Type_create_f90_xxx routines
@@ -17,7 +19,7 @@
 
 ! integers with upto 9 are 4 bytes integers; r of 4 are 2 byte,
 ! and r of 2 is 1 byte
-        call mpi_type_create_integer( 9, ntype1, ierr )
+        call mpi_type_create_f90_integer( 9, ntype1, ierr )
 !
 !       Check with get contents and envelope...
         call mpi_type_get_envelope( ntype1, nints, nadds, ndtypes, &
@@ -40,19 +42,29 @@
         endif
         if (nints .eq. 1) then
            call mpi_type_get_contents( ntype1, 1, 0, 0, &
-                                       nparms, dummy, dummy, ierr )
+                                       nparms, adummy, dummy, ierr )
            if (nparms(1) .ne. 9) then
               errs = errs + 1
               print *, "parameter was ", nparms(1), " should be 9"
            endif
         endif
            
-        call mpi_type_create_integer( 8, ntype2, ierr )
+        call mpi_type_create_f90_integer( 8, ntype2, ierr )
         if (ntype1 .eq. ntype2) then
            errs = errs + 1
            print *, "Types with r = 8 and r = 9 are the same, ", &
                 "should be distinct"
         endif
 
+        call mpi_comm_rank( MPI_COMM_WORLD, rank, ierr )
+        if (rank .eq. 0) then
+           if (errs .eq. 0) then
+              print *, " No Errors"
+           else
+              print *, " Found ", errs, " Errors"
+           endif
+        endif
+
         call mpi_finalize( ierr )
+        
         end

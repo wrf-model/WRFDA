@@ -15,6 +15,9 @@ static char MTEST_Descrip[] = "Test MPI_MINLOC operations on datatypes dupported
  * This test looks at the handling of char and types that  are not required 
  * integers (e.g., long long).  MPICH2 allows
  * these as well.  A strict MPI test should not include this test.
+ *
+ * The rule on min loc is that if there is a tie in the value, the minimum
+ * rank is used (see 4.9.3 in the MPI-1 standard)
  */
 int main( int argc, char *argv[] )
 {
@@ -116,15 +119,15 @@ int main( int argc, char *argv[] )
 	coutbuf[2].loc = -1;
 	MPI_Reduce( cinbuf, coutbuf, 3, MPI_LONG_INT, MPI_MINLOC, 0, comm );
 	if (rank == 0) {
-	    if (coutbuf[0].val != 1 && coutbuf[0].loc != -1) {
+	    if (coutbuf[0].val != 1 || coutbuf[0].loc != 0) {
 		errs++;
 		fprintf( stderr, "long-int MINLOC(1) test failed\n" );
 	    }
-	    if (coutbuf[1].val != 0 && coutbuf[1].loc != -1) {
+	    if (coutbuf[1].val != 0 || coutbuf[1].loc != 0) {
 		errs++;
 		fprintf( stderr, "long-int MINLOC(0) test failed\n" );
 	    }
-	    if (coutbuf[2].val != 0 && coutbuf[2].loc != 0) {
+	    if (coutbuf[2].val != 0 || coutbuf[2].loc != 0) {
 		errs++;
 		fprintf( stderr, "long-int MINLOC(>) test failed\n" );
 	    }
@@ -150,15 +153,15 @@ int main( int argc, char *argv[] )
 	coutbuf[2].loc = -1;
 	MPI_Reduce( cinbuf, coutbuf, 3, MPI_SHORT_INT, MPI_MINLOC, 0, comm );
 	if (rank == 0) {
-	    if (coutbuf[0].val != 1 && coutbuf[0].loc != -1) {
+	    if (coutbuf[0].val != 1 || coutbuf[0].loc != 0) {
 		errs++;
 		fprintf( stderr, "short-int MINLOC(1) test failed\n" );
 	    }
-	    if (coutbuf[1].val != 0 && coutbuf[1].loc != -1) {
+	    if (coutbuf[1].val != 0 || coutbuf[1].loc != 0) {
 		errs++;
 		fprintf( stderr, "short-int MINLOC(0) test failed\n" );
 	    }
-	    if (coutbuf[2].val != 0 && coutbuf[2].loc != 0) {
+	    if (coutbuf[2].val != 0 || coutbuf[2].loc != 0) {
 		errs++;
 		fprintf( stderr, "short-int MINLOC(>) test failed\n" );
 	    }
@@ -184,15 +187,15 @@ int main( int argc, char *argv[] )
 	coutbuf[2].loc = -1;
 	MPI_Reduce( cinbuf, coutbuf, 3, MPI_DOUBLE_INT, MPI_MINLOC, 0, comm );
 	if (rank == 0) {
-	    if (coutbuf[0].val != 1 && coutbuf[0].loc != -1) {
+	    if (coutbuf[0].val != 1 || coutbuf[0].loc != 0) {
 		errs++;
 		fprintf( stderr, "double-int MINLOC(1) test failed\n" );
 	    }
-	    if (coutbuf[1].val != 0 && coutbuf[1].loc != -1) {
+	    if (coutbuf[1].val != 0 || coutbuf[1].loc != 0) {
 		errs++;
 		fprintf( stderr, "double-int MINLOC(0) test failed\n" );
 	    }
-	    if (coutbuf[2].val != 0 && coutbuf[2].loc != 0) {
+	    if (coutbuf[2].val != 0 || coutbuf[2].loc != 0) {
 		errs++;
 		fprintf( stderr, "double-int MINLOC(>) test failed\n" );
 	    }
@@ -221,15 +224,15 @@ int main( int argc, char *argv[] )
 	    MPI_Reduce( cinbuf, coutbuf, 3, MPI_LONG_DOUBLE_INT, MPI_MINLOC, 
 			0, comm );
 	    if (rank == 0) {
-		if (coutbuf[0].val != 1 && coutbuf[0].loc != -1) {
+		if (coutbuf[0].val != 1 || coutbuf[0].loc != 0) {
 		    errs++;
 		    fprintf( stderr, "long double-int MINLOC(1) test failed\n" );
 		}
-		if (coutbuf[1].val != 0 && coutbuf[1].loc != -1) {
+		if (coutbuf[1].val != 0 || coutbuf[1].loc != 0) {
 		    errs++;
 		    fprintf( stderr, "long double-int MINLOC(0) test failed\n" );
 		}
-		if (coutbuf[2].val != 0 && coutbuf[2].loc != 0) {
+		if (coutbuf[2].val != 0 || coutbuf[2].loc != 0) {
 		    errs++;
 		    fprintf( stderr, "long double-int MINLOC(>) test failed\n" );
 		}

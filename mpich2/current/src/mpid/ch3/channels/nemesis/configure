@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="configure.in"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAKE VPATH SET_CFLAGS SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP device_name channel_name nemesis_network mmx_copy_s PAPI_INCLUDE AS AR RANLIB MPILIBNAME CC_SHL C_LINK_SHL LIBTOOL ENABLE_SHLIB master_top_srcdir master_top_builddir MAKE_DEPEND_C LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAKE VPATH SET_CFLAGS SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP device_name channel_name nemesis_network mmx_copy_s PAPI_INCLUDE AS AR RANLIB MPILIBNAME CC_SHL C_LINK_SHL LIBTOOL ENABLE_SHLIB SHLIB_EXT master_top_srcdir master_top_builddir MAKE_DEPEND_C LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -829,10 +829,13 @@ Optional Packages:
 --with-sctp=path - specify path where sctp include directory and lib directory can be found
 --with-sctp-include=path - specify path to sctp include directory
 --with-sctp-lib=path - specify path to sctp lib directory
+--with-psm=path - specify path where psm include directory and lib directory can be found
+--with-psm-include=path - specify path to psm include directory
+--with-psm-lib=path - specify path to psm lib directory
 --with-papi=path - specify path where papi include and lib directories can be found
 --with-ckpt-dir=path - (checkpointing) specify path to ckpt directory
 --with-cli-dir=path - (checkpointing) specify path to cli directory
---with-shared-memory=auto|sysv|mmap - create shared memory using sysv or mmap (dafault is auto)
+--with-shared-memory=auto|sysv|mmap - create shared memory using sysv or mmap (default is auto)
 
 Some influential environment variables:
   CC          C compiler command
@@ -934,7 +937,7 @@ esac
     else
       echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2
     fi
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 
@@ -2298,8 +2301,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2357,8 +2359,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2474,8 +2475,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2529,8 +2529,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2575,8 +2574,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2620,8 +2618,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2690,8 +2687,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2761,8 +2757,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3095,7 +3090,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 3098 "configure"
+#line 3093 "configure"
 #include "confdefs.h"
 #include <$ac_header>
 int conftest() {return 0;}
@@ -3173,8 +3168,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3226,7 +3220,7 @@ fi
 if test "${with_gm+set}" = set; then
   withval="$with_gm"
   if test "${with_gm}" != "yes" -a "${with_gm}" != "no" ; then
-    LDFLAGS="$LDFLAGS -L${with_gm}/lib -L${with_gm}/lib64"
+    LDFLAGS="$LDFLAGS -L${with_gm}/lib64 -L${with_gm}/lib"
     CPPFLAGS="$CPPFLAGS -I${with_gm}/include"
 fi
 fi;
@@ -3295,7 +3289,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 3298 "configure"
+#line 3292 "configure"
 #include "confdefs.h"
 #include <gm.h>
 int conftest() {return 0;}
@@ -3374,8 +3368,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3422,7 +3415,7 @@ fi;
 if test "${with_ib+set}" = set; then
   withval="$with_ib"
   if test "${with_ib}" != "yes" -a "${with_ib}" != "no" ; then
-    LDFLAGS="$LDFLAGS -L${with_ib}/lib -L${with_ib}/lib64"
+    LDFLAGS="$LDFLAGS -L${with_ib}/lib64 -L${with_ib}/lib"
     CPPFLAGS="$CPPFLAGS -I${with_ib}/include -I${with_ib}/include/infiniband"
 fi
 fi;
@@ -3491,7 +3484,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 3494 "configure"
+#line 3487 "configure"
 #include "confdefs.h"
 #include <verbs.h>
 int conftest() {return 0;}
@@ -3570,8 +3563,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3618,7 +3610,7 @@ fi;
 if test "${with_mx+set}" = set; then
   withval="$with_mx"
   if test "${with_mx}" != "yes" -a "${with_mx}" != "no" ; then
-    LDFLAGS="$LDFLAGS -L${with_mx}/lib"
+    LDFLAGS="$LDFLAGS -L${with_mx}/lib64 -L${with_mx}/lib"
     CPPFLAGS="$CPPFLAGS -I${with_mx}/include"
 fi
 fi;
@@ -3687,7 +3679,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 3690 "configure"
+#line 3682 "configure"
 #include "confdefs.h"
 #include <myriexpress.h>
 int conftest() {return 0;}
@@ -3767,8 +3759,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3816,7 +3807,7 @@ fi;
 if test "${with_elan+set}" = set; then
   withval="$with_elan"
   if test "${with_elan}" != "yes" -a "${with_elan}" != "no" ; then
-    LDFLAGS="$LDFLAGS -L${with_elan}/lib"
+    LDFLAGS="$LDFLAGS -L${with_elan}/lib64 -L${with_elan}/lib"
     CPPFLAGS="$CPPFLAGS -I${with_elan}/include"
 fi
 fi;
@@ -3849,9 +3840,9 @@ if test "${nemesis_network}" == "elan" ; then
 echo "=== You're about to use the experimental Nemesis/Elan network module."
 echo "=== This module has not been thoroughly tested and some performance issues remain."
 
-    ac_safe=`echo "elan.h" | sed 'y%./+-%__p_%'`
-echo "$as_me:$LINENO: checking for elan.h" >&5
-echo $ECHO_N "checking for elan.h... $ECHO_C" >&6
+    ac_safe=`echo "elan/elan.h" | sed 'y%./+-%__p_%'`
+echo "$as_me:$LINENO: checking for elan/elan.h" >&5
+echo $ECHO_N "checking for elan/elan.h... $ECHO_C" >&6
 if eval "test \"\${ac_cv_header_$ac_safe+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -3864,7 +3855,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <elan.h>
+#include <elan/elan.h>
 _ACEOF
 if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
   (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
@@ -3896,9 +3887,9 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 3899 "configure"
+#line 3890 "configure"
 #include "confdefs.h"
-#include <elan.h>
+#include <elan/elan.h>
 int conftest() {return 0;}
 EOF
     ac_compile_for_cpp='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.c 1>&5'
@@ -3975,8 +3966,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4023,7 +4013,7 @@ fi;
 if test "${with_sctp+set}" = set; then
   withval="$with_sctp"
   if test "${with_sctp}" != "yes" -a "${with_sctp}" != "no" ; then
-    LDFLAGS="$LDFLAGS -L${with_sctp}/lib"
+    LDFLAGS="$LDFLAGS -L${with_sctp}/lib64 -L${with_sctp}/lib"
     CPPFLAGS="$CPPFLAGS -I${with_sctp}/include"
 fi
 fi;
@@ -4092,7 +4082,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 4095 "configure"
+#line 4085 "configure"
 #include "confdefs.h"
 #include <netinet/sctp.h>
 int conftest() {return 0;}
@@ -4171,8 +4161,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4208,6 +4197,201 @@ else
 
         { { echo "$as_me:$LINENO: error: 'sctp library not found.  Did you specify --with-sctp= or --with-sctp-lib=?'" >&5
 echo "$as_me: error: 'sctp library not found.  Did you specify --with-sctp= or --with-sctp-lib=?'" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+fi;
+
+
+# Check whether --with-psm or --without-psm was given.
+if test "${with_psm+set}" = set; then
+  withval="$with_psm"
+  if test "${with_psm}" != "yes" -a "${with_psm}" != "no" ; then
+    LDFLAGS="$LDFLAGS -L${with_psm}/lib64 -L${with_psm}/lib"
+    CPPFLAGS="$CPPFLAGS -I${with_psm}/include"
+fi
+fi;
+
+# Check whether --with-psm-include or --without-psm-include was given.
+if test "${with_psm_include+set}" = set; then
+  withval="$with_psm_include"
+  if test "${with_psm_include}" != "yes" -a "${with_psm_include}" != "no" ; then
+    CPPFLAGS="$CPPFLAGS -I${with_psm_include}"
+fi
+fi;
+
+# Check whether --with-psm-lib or --without-psm-lib was given.
+if test "${with_psm_lib+set}" = set; then
+  withval="$with_psm_lib"
+  if test "${with_psm_lib}" != "yes" -a "${with_psm_lib}" != "no" ; then
+    LDFLAGS="$LDFLAGS -L${with_psm_lib}"
+fi
+fi;
+
+if test "${nemesis_network}" == "psm" ; then
+    ac_safe=`echo "psm.h" | sed 'y%./+-%__p_%'`
+echo "$as_me:$LINENO: checking for psm.h" >&5
+echo $ECHO_N "checking for psm.h... $ECHO_C" >&6
+if eval "test \"\${ac_cv_header_$ac_safe+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+pac_found_header=no
+if test "$CPP" != "/lib/cpp" ; then
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <psm.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  pac_found_header=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+rm -f conftest.err conftest.$ac_ext
+fi
+# If cpp failed, see if the compiler accepts the header.
+if test "$pac_found_header" != "yes" ; then
+    cat >conftest.c<<EOF
+#line 4280 "configure"
+#include "confdefs.h"
+#include <psm.h>
+int conftest() {return 0;}
+EOF
+    ac_compile_for_cpp='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.c 1>&5'
+    if { (eval echo "$as_me:$LINENO: \"$ac_compile_for_cpp\"") >&5
+  (eval $ac_compile_for_cpp) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+	pac_found_header=yes
+    else
+        echo "configure: failed program was:" >&5
+        cat conftest.c >&5
+    fi
+    rm -f conftest*
+fi
+# Finally, set the ac variable.
+if test "$pac_found_header" = "yes" ; then
+    eval "ac_cv_header_$ac_safe=yes"
+else
+    eval "ac_cv_header_$ac_safe=no"
+fi
+
+fi
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+  :
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+        { { echo "$as_me:$LINENO: error: 'psm.h not found.  Did you specify --with-psm= or --with-psm-include=?'" >&5
+echo "$as_me: error: 'psm.h not found.  Did you specify --with-psm= or --with-psm-include=?'" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+
+
+echo "$as_me:$LINENO: checking for psm_init in -lpsm_infinipath" >&5
+echo $ECHO_N "checking for psm_init in -lpsm_infinipath... $ECHO_C" >&6
+if test "${ac_cv_lib_psm_infinipath_psm_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpsm_infinipath  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char psm_init ();
+int
+main ()
+{
+psm_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_psm_infinipath_psm_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_psm_infinipath_psm_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_psm_infinipath_psm_init" >&5
+echo "${ECHO_T}$ac_cv_lib_psm_infinipath_psm_init" >&6
+if test $ac_cv_lib_psm_infinipath_psm_init = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPSM_INFINIPATH 1
+_ACEOF
+
+  LIBS="-lpsm_infinipath $LIBS"
+
+else
+
+        { { echo "$as_me:$LINENO: error: 'psm_infinipath library not found.  Did you specify --with-psm= or --with-psm-lib=?'" >&5
+echo "$as_me: error: 'psm_infinipath library not found.  Did you specify --with-psm= or --with-psm-lib=?'" >&2;}
    { (exit 1); exit 1; }; }
 
 fi
@@ -4256,6 +4440,12 @@ _ACEOF
 
 cat >>confdefs.h <<\_ACEOF
 #define MPID_NEM_NET_MODULE MPID_NEM_IB_MODULE
+_ACEOF
+ ;;
+     psm )
+
+cat >>confdefs.h <<\_ACEOF
+#define MPID_NEM_NET_MODULE MPID_NEM_PSM_MODULE
 _ACEOF
  ;;
      * )
@@ -4351,7 +4541,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 4354 "configure"
+#line 4544 "configure"
 #include "confdefs.h"
 #include <papi.h>
 int conftest() {return 0;}
@@ -4523,7 +4713,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 4526 "configure"
+#line 4716 "configure"
 #include "confdefs.h"
 #include <cli.h>
 int conftest() {return 0;}
@@ -4600,8 +4790,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4687,7 +4876,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 4690 "configure"
+#line 4879 "configure"
 #include "confdefs.h"
 #include <ckpt.h>
 int conftest() {return 0;}
@@ -4764,8 +4953,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4880,8 +5068,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4982,8 +5169,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5084,8 +5270,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5200,8 +5385,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5319,8 +5503,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5443,8 +5626,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5510,6 +5692,917 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
+# We may need this only for tcp and related netmodules
+# Check for h_addr or h_addr_list
+echo "$as_me:$LINENO: checking whether struct hostent contains h_addr_list" >&5
+echo $ECHO_N "checking whether struct hostent contains h_addr_list... $ECHO_C" >&6
+if test "${pac_cv_have_haddr_list+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <netdb.h>
+int
+main ()
+{
+struct hostent hp;hp.h_addr_list[0]=0;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_haddr_list=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+pac_cv_have_haddr_list=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_haddr_list" >&5
+echo "${ECHO_T}$pac_cv_have_haddr_list" >&6
+if test "$pac_cv_have_haddr_list" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_H_ADDR_LIST 1
+_ACEOF
+
+fi
+
+# Check for memory atomic instructions
+
+echo "$as_me:$LINENO: checking for x86 mfence instruction using __asm__" >&5
+echo $ECHO_N "checking for x86 mfence instruction using __asm__... $ECHO_C" >&6
+if test "${pac_cv_have_gcc_asm_and_x86_mfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" );
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_gcc_asm_and_x86_mfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_gcc_asm_and_x86_mfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_gcc_asm_and_x86_mfence" >&5
+echo "${ECHO_T}$pac_cv_have_gcc_asm_and_x86_mfence" >&6
+
+if test "$pac_cv_have_gcc_asm_and_x86_mfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ASM_AND_X86_MFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 sfence instruction using __asm__" >&5
+echo $ECHO_N "checking for x86 sfence instruction using __asm__... $ECHO_C" >&6
+if test "${pac_cv_have_gcc_asm_and_x86_sfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf8" ::: "memory" );
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_gcc_asm_and_x86_sfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_gcc_asm_and_x86_sfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_gcc_asm_and_x86_sfence" >&5
+echo "${ECHO_T}$pac_cv_have_gcc_asm_and_x86_sfence" >&6
+
+if test "$pac_cv_have_gcc_asm_and_x86_sfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ASM_AND_X86_SFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 lfence instruction using __asm__" >&5
+echo $ECHO_N "checking for x86 lfence instruction using __asm__... $ECHO_C" >&6
+if test "${pac_cv_have_gcc_asm_and_x86_lfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xe8" ::: "memory" );
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_gcc_asm_and_x86_lfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_gcc_asm_and_x86_lfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_gcc_asm_and_x86_lfence" >&5
+echo "${ECHO_T}$pac_cv_have_gcc_asm_and_x86_lfence" >&6
+
+if test "$pac_cv_have_gcc_asm_and_x86_lfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ASM_AND_X86_LFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 mfence instruction using __asm" >&5
+echo $ECHO_N "checking for x86 mfence instruction using __asm... $ECHO_C" >&6
+if test "${pac_cv_have___asm_and_x86_mfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xf0 ;
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have___asm_and_x86_mfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have___asm_and_x86_mfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have___asm_and_x86_mfence" >&5
+echo "${ECHO_T}$pac_cv_have___asm_and_x86_mfence" >&6
+
+if test "$pac_cv_have___asm_and_x86_mfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE___ASM_AND_X86_MFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 sfence instruction using __asm" >&5
+echo $ECHO_N "checking for x86 sfence instruction using __asm... $ECHO_C" >&6
+if test "${pac_cv_have___asm_and_x86_sfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm sfence ;
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have___asm_and_x86_sfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have___asm_and_x86_sfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have___asm_and_x86_sfence" >&5
+echo "${ECHO_T}$pac_cv_have___asm_and_x86_sfence" >&6
+
+if test "$pac_cv_have___asm_and_x86_sfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE___ASM_AND_X86_SFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 lfence instruction using __asm" >&5
+echo $ECHO_N "checking for x86 lfence instruction using __asm... $ECHO_C" >&6
+if test "${pac_cv_have___asm_and_x86_lfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    __asm _emit 0x0f __asm _emit 0xae __asm _emit 0xe8 ;
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have___asm_and_x86_lfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have___asm_and_x86_lfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have___asm_and_x86_lfence" >&5
+echo "${ECHO_T}$pac_cv_have___asm_and_x86_lfence" >&6
+
+if test "$lac_cv_have___asm_and_x86_lfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE___ASM_AND_X86_LFENCE 1
+_ACEOF
+
+fi
+
+
+echo "$as_me:$LINENO: checking for x86 mfence instruction using asm()" >&5
+echo $ECHO_N "checking for x86 mfence instruction using asm()... $ECHO_C" >&6
+if test "${pac_cv_have_asm_and_x86_mfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xf0");
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_asm_and_x86_mfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_asm_and_x86_mfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_asm_and_x86_mfence" >&5
+echo "${ECHO_T}$pac_cv_have_asm_and_x86_mfence" >&6
+
+if test "$pac_cv_have_asm_and_x86_mfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_ASM_AND_X86_MFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 sfence instruction using asm()" >&5
+echo $ECHO_N "checking for x86 sfence instruction using asm()... $ECHO_C" >&6
+if test "${pac_cv_have_asm_and_x86_sfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    asm("sfence");
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_asm_and_x86_sfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_asm_and_x86_sfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_asm_and_x86_sfence" >&5
+echo "${ECHO_T}$pac_cv_have_asm_and_x86_sfence" >&6
+
+if test "$pac_cv_have_asm_and_x86_sfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_ASM_AND_X86_SFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for x86 lfence instruction using asm()" >&5
+echo $ECHO_N "checking for x86 lfence instruction using asm()... $ECHO_C" >&6
+if test "${pac_cv_have_asm_and_x86_lfence+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    asm("_emit 0x0f __asm _emit 0xae __asm _emit 0xe8");
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have_asm_and_x86_lfence=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have_asm_and_x86_lfence=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have_asm_and_x86_lfence" >&5
+echo "${ECHO_T}$pac_cv_have_asm_and_x86_lfence" >&6
+
+if test "$pac_cv_have_asm_and_x86_lfence" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_ASM_AND_X86_LFENCE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for _InterlockedExchange intrinsic" >&5
+echo $ECHO_N "checking for _InterlockedExchange intrinsic... $ECHO_C" >&6
+if test "${pac_cv_have__InterlockedExchange+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv)
+{
+    unsigned long lock, *lock_ptr;
+    lock_ptr = &lock;
+    _InterlockedExchange(lock_ptr, 1);
+    exit(0);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_have__InterlockedExchange=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_have__InterlockedExchange=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_have__InterlockedExchange" >&5
+echo "${ECHO_T}$pac_cv_have__InterlockedExchange" >&6
+
+if test "$pac_cv_have__InterlockedExchange" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE__INTERLOCKEDEXCHANGE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for SPARC membar instruction with gcc" >&5
+echo $ECHO_N "checking for SPARC membar instruction with gcc... $ECHO_C" >&6
+if test "${pac_cv_gcc_sparc_membar+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv){
+    __asm__ __volatile__ ( "membar #StoreLoad | #StoreStore" : : : "memory" );
+    exit(0);
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_gcc_sparc_membar=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_gcc_sparc_membar=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_gcc_sparc_membar" >&5
+echo "${ECHO_T}$pac_cv_gcc_sparc_membar" >&6
+if test "$pac_cv_gcc_sparc_membar" = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ASM_SPARC_MEMBAR 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for SPARC membar instruction with Solaris C" >&5
+echo $ECHO_N "checking for SPARC membar instruction with Solaris C... $ECHO_C" >&6
+if test "${pac_cv_solaris_sparc_membar+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv){
+    __asm ( "membar #StoreLoad | #StoreStore");
+    exit(0);
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_solaris_sparc_membar=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_solaris_sparc_membar=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_solaris_sparc_membar" >&5
+echo "${ECHO_T}$pac_cv_solaris_sparc_membar" >&6
+if test "$pac_cv_solaris_sparc_membar" = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SOLARIS_ASM_SPARC_MEMBAR 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for SPARC stbar instruction with gcc" >&5
+echo $ECHO_N "checking for SPARC stbar instruction with gcc... $ECHO_C" >&6
+if test "${pac_cv_gcc_sparc_stbar+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv){
+    __asm__ __volatile__ ( "stbar" : : : "memory" );
+    exit(0);
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_gcc_sparc_stbar=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_gcc_sparc_stbar=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_gcc_sparc_stbar" >&5
+echo "${ECHO_T}$pac_cv_gcc_sparc_stbar" >&6
+if test "$pac_cv_gcc_sparc_stbar" = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GCC_ASM_SPARC_STBAR 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking for SPARC stbar instruction with Solaris C" >&5
+echo $ECHO_N "checking for SPARC stbar instruction with Solaris C... $ECHO_C" >&6
+if test "${pac_cv_solaris_sparc_stbar+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int main(int argc, char **argv){
+    __asm ( "stbar" );
+    exit(0);
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_cv_solaris_sparc_stbar=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+pac_cv_solaris_sparc_stbar=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+fi
+echo "$as_me:$LINENO: result: $pac_cv_solaris_sparc_stbar" >&5
+echo "${ECHO_T}$pac_cv_solaris_sparc_stbar" >&6
+if test "$pac_cv_solaris_sparc_stbar" = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SOLARIS_ASM_SPARC_STBAR 1
+_ACEOF
+
+fi
+
 
 
 
@@ -5518,6 +6611,7 @@ _ACEOF
 
 
 AS=as
+
 
 
 
@@ -5541,7 +6635,12 @@ echo "$as_me: WARNING: libtool selected for shared library support but LIBTOOL i
 
 
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile nemesis/Makefile nemesis/src/Makefile nemesis/utils/Makefile nemesis/utils/replacements/Makefile nemesis/utils/monitor/Makefile nemesis/net_mod/Makefile nemesis/net_mod/elan_module/Makefile nemesis/net_mod/gm_module/Makefile nemesis/net_mod/mx_module/Makefile nemesis/net_mod/tcp_module/Makefile nemesis/net_mod/newtcp_module/Makefile nemesis/net_mod/sctp_module/Makefile nemesis/net_mod/ib_module/Makefile nemesis/net_mod/none_module/Makefile localdefs"
+# Add the MPICH2 include flags to CPPFLAGS.  See the discussion above about
+# which include flags should start in MPICH2_INCLUDE_FLAGS and which in
+# CPPFLAGS
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
+
+                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile nemesis/Makefile nemesis/src/Makefile nemesis/utils/Makefile nemesis/utils/replacements/Makefile nemesis/utils/monitor/Makefile nemesis/net_mod/Makefile nemesis/net_mod/elan_module/Makefile nemesis/net_mod/gm_module/Makefile nemesis/net_mod/mx_module/Makefile nemesis/net_mod/tcp_module/Makefile nemesis/net_mod/newtcp_module/Makefile nemesis/net_mod/sctp_module/Makefile nemesis/net_mod/ib_module/Makefile nemesis/net_mod/psm_module/Makefile nemesis/net_mod/none_module/Makefile localdefs"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -6081,6 +7180,7 @@ do
   "nemesis/net_mod/newtcp_module/Makefile" ) CONFIG_FILES="$CONFIG_FILES nemesis/net_mod/newtcp_module/Makefile" ;;
   "nemesis/net_mod/sctp_module/Makefile" ) CONFIG_FILES="$CONFIG_FILES nemesis/net_mod/sctp_module/Makefile" ;;
   "nemesis/net_mod/ib_module/Makefile" ) CONFIG_FILES="$CONFIG_FILES nemesis/net_mod/ib_module/Makefile" ;;
+  "nemesis/net_mod/psm_module/Makefile" ) CONFIG_FILES="$CONFIG_FILES nemesis/net_mod/psm_module/Makefile" ;;
   "nemesis/net_mod/none_module/Makefile" ) CONFIG_FILES="$CONFIG_FILES nemesis/net_mod/none_module/Makefile" ;;
   "localdefs" ) CONFIG_FILES="$CONFIG_FILES localdefs" ;;
   "include/mpidi_ch3i_nemesis_conf.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/mpidi_ch3i_nemesis_conf.h" ;;
@@ -6193,6 +7293,7 @@ s,@CC_SHL@,$CC_SHL,;t t
 s,@C_LINK_SHL@,$C_LINK_SHL,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@ENABLE_SHLIB@,$ENABLE_SHLIB,;t t
+s,@SHLIB_EXT@,$SHLIB_EXT,;t t
 s,@master_top_srcdir@,$master_top_srcdir,;t t
 s,@master_top_builddir@,$master_top_builddir,;t t
 s,@MAKE_DEPEND_C@,$MAKE_DEPEND_C,;t t
@@ -6360,11 +7461,6 @@ esac
 
 
 
-  if test x"$ac_file" != x-; then
-    { echo "$as_me:$LINENO: creating $ac_file" >&5
-echo "$as_me: creating $ac_file" >&6;}
-    rm -f "$ac_file"
-  fi
   # Let's still pretend it is `configure' which instantiates (i.e., don't
   # use $as_me), people would be surprised to read:
   #    /* config.h.  Generated by config.status.  */
@@ -6403,6 +7499,12 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
 	 fi;;
       esac
     done` || { (exit 1); exit 1; }
+
+  if test x"$ac_file" != x-; then
+    { echo "$as_me:$LINENO: creating $ac_file" >&5
+echo "$as_me: creating $ac_file" >&6;}
+    rm -f "$ac_file"
+  fi
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF
   sed "$ac_vpsub

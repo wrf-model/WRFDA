@@ -9,6 +9,15 @@
 #define MPIDI_CH3I_SSM_CONF_H_INCLUDED
 
 
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_CPUID_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_RDTSCP
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
@@ -41,6 +50,12 @@
 
 /* Define if using gcc on a x86 system with the sfence instruction */
 #undef HAVE_GCC_ASM_AND_X86_SFENCE
+
+/* Define if gcc asm membar supported */
+#undef HAVE_GCC_ASM_SPARC_MEMBAR
+
+/* Define if gcc asm stbar supported */
+#undef HAVE_GCC_ASM_SPARC_STBAR
 
 /* Define to 1 if you have the `getcwd' function. */
 #undef HAVE_GETCWD
@@ -140,6 +155,12 @@
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
+
+/* Define if solaris asm membar supported */
+#undef HAVE_SOLARIS_ASM_SPARC_MEMBAR
+
+/* Define if solaris asm stbar supported */
+#undef HAVE_SOLARIS_ASM_SPARC_STBAR
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

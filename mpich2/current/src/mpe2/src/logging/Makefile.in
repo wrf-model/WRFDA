@@ -22,7 +22,7 @@ MPE_BUILD_FORTRAN2C  = @MPE_BUILD_FORTRAN2C@
 # MPI_IMPL             = @MPI_IMPL@
 # MPE header files that are needed by endusers
 MPE_HEADERS          = clog_inttypes.h clog_const.h clog_uuid.h clog_commset.h \
-                       mpe_log.h mpe_logf.h
+                       mpe_log_thread.h mpe_log.h mpe_logf.h
 
 all: build_include build_lib_bin build_etc
 
@@ -37,9 +37,9 @@ build_include:
 	              $(CP) -f $(top_srcdir)/include/$$file \
 	                       $(includebuild_dir) ; \
 	          else \
-	               if [ -f include/$$file ] ; then \
-	                   $(CP) -f include/$$file $(includebuild_dir) ; \
-	               fi ; \
+	              if [ -f include/$$file ] ; then \
+	                  $(CP) -f include/$$file $(includebuild_dir) ; \
+	              fi ; \
 	          fi ; \
 	      done ; \
 	  fi

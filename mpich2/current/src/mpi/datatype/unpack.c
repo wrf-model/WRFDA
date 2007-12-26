@@ -55,12 +55,8 @@ Output Parameter:
 
 .seealso: MPI_Pack, MPI_Pack_size
 @*/
-int MPI_Unpack(void *inbuf,
-	       int insize,
-	       int *position,
-	       void *outbuf,
-	       int outcount,
-	       MPI_Datatype datatype,
+int MPI_Unpack(void *inbuf, int insize, int *position,
+	       void *outbuf, int outcount, MPI_Datatype datatype,
 	       MPI_Comm comm)
 {
     static const char FCNAME[] = "MPI_Unpack";

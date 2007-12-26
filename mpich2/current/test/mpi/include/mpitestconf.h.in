@@ -32,6 +32,9 @@
 /* Define if Fortran is supported */
 #undef HAVE_FORTRAN_BINDING
 
+/* Define if struct hostent contains h_addr_list */
+#undef HAVE_H_ADDR_LIST
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

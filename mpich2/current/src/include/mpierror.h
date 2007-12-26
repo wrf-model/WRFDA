@@ -19,7 +19,10 @@ struct MPID_Win;
 int MPIR_Err_return_comm( struct MPID_Comm *, const char [], int );
 int MPIR_Err_return_win( struct MPID_Win *, const char [], int );
 /*int MPIR_Err_return_file( struct MPID_File *, const char [], int );*/
+#ifdef MPI__FILE_DEFINED
+/* Only define if we have MPI_File */
 int MPIR_Err_return_file( MPI_File, const char [], int ); /* Romio version */
+#endif
 /* FIXME:
  * The following description is out of date and should not be used
  */
@@ -151,8 +154,6 @@ void MPIR_Err_preOrPostInit( void );
   @*/
 typedef int (* MPIR_Err_get_class_string_func_t)(int error, char *str, int length);
 void MPIR_Err_get_string( int, char *, int, MPIR_Err_get_class_string_func_t );
-
-void MPIR_Err_print_stack(FILE *, int);
 
 int MPIR_Err_set_msg( int code, const char *msg_string );
 

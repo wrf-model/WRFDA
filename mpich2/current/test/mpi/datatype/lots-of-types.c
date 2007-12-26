@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     int err, errs = 0;
 
     /* Initialize MPI */
-    MPI_Init(&argc, &argv);
+    MTest_Init(&argc, &argv);
     parse_args(argc, argv);
 
     /* To improve reporting of problems about operations, we
@@ -36,12 +36,8 @@ int main(int argc, char *argv[])
     errs += err;
 
     /* print message and exit */
-    if (errs) {
-	fprintf(stderr, "Found %d errors\n", errs);
-    }
-    else {
-	printf(" No Errors\n");
-    }
+    MTest_Finalize( errs );
+
     MPI_Finalize();
     return 0;
 }
@@ -64,7 +60,7 @@ int lots_of_types_test(void)
     MPI_Status status;
 
     /* note: first element of struct has zero blklen and should be dropped */
-    MPI_Aint disps[1024];
+    int disps[1024];
     int blks[1024];
 
 

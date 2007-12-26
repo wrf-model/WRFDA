@@ -4,7 +4,12 @@
  *      See COPYRIGHT in top-level directory.
  */
 
+#include <stdio.h>
 #include "mpdroot.h"
+
+#ifdef NEEDS_SNPRINTF_DECL
+int snprintf(char *str, size_t size, const char *format, ...);
+#endif
 
 int main(int argc, char *argv[])
 {

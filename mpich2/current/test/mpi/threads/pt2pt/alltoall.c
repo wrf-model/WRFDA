@@ -4,8 +4,10 @@
  *      See COPYRIGHT in top-level directory.
  */
 #include <mpi.h>
-#include <pthread.h>
-#include <unistd.h>
+#include "mpitest.h"
+#ifdef HAVE_UNISTD_H
+    #include <unistd.h>
+#endif
 #include <stdio.h>
 
 #ifdef DO_DEBUG
@@ -17,6 +19,52 @@
 const int REQ_TAG = 111;
 const int ANS_TAG = 222;
 
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#define THREAD_RETURN_TYPE DWORD
+/* HANDLE to listener thread */
+HANDLE hThread;
+int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p))
+{
+    hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)fn, NULL, 0, NULL);
+    if (hThread == NULL){
+        DEBUG(printf("Error CreateThread() \n"));
+	    return GetLastError();
+    }
+    return 0;
+}
+
+int join_thread( void ){
+    int err = 0;
+    if(WaitForSingleObject(hThread, INFINITE) == WAIT_FAILED){
+        DEBUG(printf("Error WaitForSingleObject() \n"));
+        err = GetLastError();
+    }
+    CloseHandle(hThread);
+    return err;
+}
+
+#else
+#include <pthread.h>
+#define THREAD_RETURN_TYPE void *
+pthread_t thread;
+int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p));
+
+int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p))
+{
+    int err;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    err = pthread_create(&thread, &attr, fn, NULL);
+    pthread_attr_destroy(&attr);
+    return err;
+}
+int join_thread( void )
+{
+    return pthread_join(thread, 0);
+}
+#endif
 
 /* MPI environment description */
 int rank, size, provided;
@@ -60,8 +108,10 @@ void* listener(void*extra) {
 
 
 int main(int argc, char* argv[]) {
+    /*
     pthread_t thr;
     pthread_attr_t attr;
+    */
     int buf = 0;
     long int i;
     
@@ -78,12 +128,9 @@ int main(int argc, char* argv[]) {
 #ifdef USE_BARRIER
     MPI_Barrier( MPI_COMM_WORLD );
 #endif
-    
+
     /* create listener thread */
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    pthread_create(&thr, &attr, listener, 0);
-    pthread_attr_destroy(&attr);
+    start_send_thread(listener);
 
     /* no more requests to send
        inform other in the group that we have finished */
@@ -93,7 +140,7 @@ int main(int argc, char* argv[]) {
     }
 
     /* and wait for others to do the same */
-    pthread_join(thr, 0);
+    join_thread();
 
     MPI_Finalize();
 

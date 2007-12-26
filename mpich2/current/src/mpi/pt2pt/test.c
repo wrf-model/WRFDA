@@ -120,6 +120,13 @@ int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status)
      conditional on the request not being completed. */
     mpi_errno = MPID_Progress_test();
     if (mpi_errno != MPI_SUCCESS) goto fn_fail;
+
+    if (request_ptr->kind == MPID_UREQUEST && request_ptr->poll_fn != NULL) 
+    {
+	mpi_errno = (request_ptr->poll_fn)(request_ptr->grequest_extra_state, 
+			status);
+	if (mpi_errno != MPI_SUCCESS) goto fn_fail;
+    }
     
     if (*request_ptr->cc_ptr == 0)
     {

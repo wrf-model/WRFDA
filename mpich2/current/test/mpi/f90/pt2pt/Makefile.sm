@@ -8,5 +8,9 @@ smvar_do_sharedlibs = 0
 statusesf90_SOURCES = statusesf90.f90
 greqf90_SOURCES     = greqf90.f90
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)

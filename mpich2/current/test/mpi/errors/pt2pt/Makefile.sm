@@ -7,6 +7,7 @@ smvar_do_sharedlibs = 0
 EXTRA_PROGRAMS       = 
 
 proberank_SOURCES    = proberank.c
+truncmsg1_SOURCES    = truncmsg1.c
 truncmsg2_SOURCES    = truncmsg2.c
 
 ../../util/mtest.o:

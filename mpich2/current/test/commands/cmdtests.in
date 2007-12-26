@@ -25,11 +25,24 @@ $xmlOutputContinue = 0;
 # error and XML output containing the messages is desired.
 $testoutput = "";
 
+# The MPD process manager has trouble with stdin.  While this should be
+# fixed, for the moment, we provide a way to turn off those tests
+$testStdin = 0;
+if (defined($ENV{"MPIEXEC_HAS_STDIN"})) { $testStdin = 1; }
+
 # Set a default for the timeout 
 # (The stdintest has hung sometimes; a correctly functioning mpiexec
 # will abort when this timelimit is exceeded)
 if (!defined($ENV{"MPIEXEC_TIMEOUT"})) {
     $ENV{"MPIEXEC_TIMEOUT"} = 20;
+}
+
+#
+# Get a way to kill processes
+my $killall = '@KILLALL@';
+my $myusername = "";
+if (defined($ENV{'LOGNAME'})) {
+    $myusername = $ENV{'LOGNAME'};
 }
 
 # -------------------------------------------------------------------------
@@ -363,128 +376,148 @@ if (-x "stdiotest") {
 }
 # -------------------------------------------------------------------------
 # mpiexec stdin handling
-&Announce( "$mpiexec ./stdintest <in.txt 2>err.txt 1>out.txt" );
-if (! -x "stdintest" ) {
-    system "make stdintest";
-    if (! -x "stdintest") {
-	&ReportError( "Unable to build stdintest program\n" );
-	$errors ++;
+if ($testStdin) {
+    &Announce( "$mpiexec ./stdintest <in.txt 2>err.txt 1>out.txt" );
+    if (! -x "stdintest" ) {
+	system "make stdintest";
+	if (! -x "stdintest") {
+	    &ReportError( "Unable to build stdintest program\n" );
+	    $errors ++;
+	}
     }
-}
-if (-x "stdintest") {
-    unlink "in.txt";
-    unlink "err.txt";
-    unlink "out.txt";
-    # Create the input file
-    open TFD, ">in.txt" || die "Cannot create test input file";
-    for (my $i = 0; $i < 1024; $i++) {
-	print TFD "This is line $i\n";
-    }
-    close TFD;
-
-    $rc = system "$mpiexec ./stdintest <in.txt 2>err.txt 1>out.txt";
-    if ($rc != 0) {
-	&ReportError( "Program stdintest failed with return $rc" );
-	$errors ++;
-    }
-    # Compare the expected output
-    if (-s "out.txt") {
-	&CheckEchoedOutput;
-    }
-    else {
-	&ReportError( "Program stdintest did not create stdout file\n" );
-	$errors ++;
-    }
-    if (-s "err.txt") {
-	&ReportError( "Program stdintest created a non-empty stderr file\n" );
-	$errors ++;
-	system "cat err.txt";
-    }
-    unlink "err.txt";
-    unlink "out.txt";
-
-    # Try with a parallel job
-    &Announce( "$mpiexec -n 3 ./stdintest <in.txt 2>err.txt 1>out.txt" );
-    $rc = system "$mpiexec -n 3 ./stdintest <in.txt 2>err.txt 1>out.txt";
-    if ($rc != 0) {
-	&ReportError( "Program stdintest (3 processes) failed with return $rc" );
-	$errors ++;
-    }
-    # Compare the expected output
-    if (-s "out.txt") {
-	&CheckEchoedOutput;
-    }
-    else {
-	&ReportError( "Program stdintest did not create stdout file\n" );
-	$errors ++;
-    }
-    if (-s "err.txt") {
-	&ReportError( "Program stdintest created a non-empty stderr file\n" );
-	$errors ++;
-	system "cat err.txt";
-    }
-    unlink "err.txt";
-    unlink "out.txt";
-
-    unlink "in.txt";
-}
-#
-# Test for allowing stdin to have unread data
-&Announce( "$mpiexec ./stdintest2 <in.txt 2>err.txt 1>out.txt" );
-if (! -x "stdintest2" ) {
-    system "make stdintest2";
-    if (! -x "stdintest2") {
-	&ReportError( "Unable to build stdintest2 program\n" );
-	$errors ++;
-    }
-}
-if (-x "stdintest2") {
-    unlink "in.txt";
-    unlink "err.txt";
-    unlink "out.txt";
-    # Create the input file
-    open TFD, ">in.txt" || die "Cannot create test input file";
-    for (my $i = 0; $i < 1024; $i++) {
-	print TFD "This is line $i\n";
-    }
-    close TFD;
-    $rc = system "$mpiexec ./stdintest2 <in.txt 2>err.txt 1>out.txt";
-    if ($rc != 0) {
-	&ReportError( "Program stdintest2 failed with return $rc" );
-	$errors ++;
-    }
-    # Compare the expected output
-    if (-s "out.txt") {
-	# Check for No Errors ONLY
-	open TFD, "<out.txt" || die "Cannot create test input file";
-	$found_no_errors = 0;
-	my $found_other = 0;
-	while (<TFD>) {
-	    if (/No Errors/) {
-		$found_no_errors = 1;
-	    }
-	    else {
-		if (!$found_other) {
-		    &ReportError( "Found unexpected text %_" );
-		}
-		$found_other = 1;
-		$errors ++;
-	    }
+    if (-x "stdintest") {
+	unlink "in.txt";
+	unlink "err.txt";
+	unlink "out.txt";
+	# Create the input file
+	open TFD, ">in.txt" || die "Cannot create test input file";
+	for (my $i = 0; $i < 1024; $i++) {
+	    print TFD "This is line $i\n";
 	}
 	close TFD;
-	if (! $found_no_errors) {
-	    &ReportError( "Did not find No Errors" );
-	    $errors++;
+	
+	$rc = system "$mpiexec ./stdintest <in.txt 2>err.txt 1>out.txt";
+	if ($rc != 0) {
+	    &ReportError( "Program stdintest failed with return $rc" );
+	    $errors ++;
+	}
+	# Because some mpiexec programs fail to properly handle these stdio
+	# tests, we add a step to kill the test program if mpiexec failed
+	# to remove it.
+	if ($killall ne "true" && $myusername ne "") {
+	    system "$killall -u $myusername stdintest";
+	}
+	# Compare the expected output
+	if (-s "out.txt") {
+	    &CheckEchoedOutput;
+	}
+	else {
+	    &ReportError( "Program stdintest did not create stdout file\n" );
+	    $errors ++;
+	}
+	if (-s "err.txt") {
+	    &ReportError( "Program stdintest created a non-empty stderr file\n" );
+	    $errors ++;
+	    system "cat err.txt";
+	}
+	unlink "err.txt";
+	unlink "out.txt";
+	
+	# Try with a parallel job
+	&Announce( "$mpiexec -n 3 ./stdintest <in.txt 2>err.txt 1>out.txt" );
+	$rc = system "$mpiexec -n 3 ./stdintest <in.txt 2>err.txt 1>out.txt";
+	if ($rc != 0) {
+	    &ReportError( "Program stdintest (3 processes) failed with return $rc" );
+	    $errors ++;
+	}
+	# Because some mpiexec programs fail to properly handle these stdio
+	# tests, we add a step to kill the test program if mpiexec failed
+	# to remove it.
+	if ($killall ne "true" && $myusername ne "") {
+	    system "$killall -u $myusername stdintest";
+	}
+	# Compare the expected output
+	if (-s "out.txt") {
+	    &CheckEchoedOutput;
+	}
+	else {
+	    &ReportError( "Program stdintest did not create stdout file\n" );
+	    $errors ++;
+	}
+	if (-s "err.txt") {
+	    &ReportError( "Program stdintest created a non-empty stderr file\n" );
+	    $errors ++;
+	    system "cat err.txt";
+	}
+	unlink "err.txt";
+	unlink "out.txt";
+
+	unlink "in.txt";
+    }
+    #
+    # Test for allowing stdin to have unread data
+    &Announce( "$mpiexec ./stdintest2 <in.txt 2>err.txt 1>out.txt" );
+    if (! -x "stdintest2" ) {
+	system "make stdintest2";
+	if (! -x "stdintest2") {
+	    &ReportError( "Unable to build stdintest2 program\n" );
+	    $errors ++;
 	}
     }
-    if (-s "err.txt") {
-	&ReportError( "Program stdintest2 created a non-empty stderr file\n" );
-	$errors ++;
-	system "cat err.txt";
+    if (-x "stdintest2") {
+	unlink "in.txt";
+	unlink "err.txt";
+	unlink "out.txt";
+	# Create the input file
+	open TFD, ">in.txt" || die "Cannot create test input file";
+	for (my $i = 0; $i < 1024; $i++) {
+	    print TFD "This is line $i\n";
+	}
+	close TFD;
+	$rc = system "$mpiexec ./stdintest2 <in.txt 2>err.txt 1>out.txt";
+	if ($rc != 0) {
+	    &ReportError( "Program stdintest2 failed with return $rc" );
+	    $errors ++;
+	}
+	# Because some mpiexec programs fail to properly handle these stdio
+	# tests, we add a step to kill the test program if mpiexec failed
+	# to remove it.
+	if ($killall ne "true" && $myusername ne "") {
+	    system "$killall -u $myusername stdintest2";
+	}
+	# Compare the expected output
+	if (-s "out.txt") {
+	    # Check for No Errors ONLY
+	    open TFD, "<out.txt" || die "Cannot create test input file";
+	    $found_no_errors = 0;
+	    my $found_other = 0;
+	    while (<TFD>) {
+		if (/No Errors/) {
+		    $found_no_errors = 1;
+		}
+		else {
+		    if (!$found_other) {
+			&ReportError( "Found unexpected text %_" );
+		    }
+		    $found_other = 1;
+		    $errors ++;
+		}
+	    }
+	    close TFD;
+	    if (! $found_no_errors) {
+		&ReportError( "Did not find No Errors" );
+		$errors++;
+	    }
+	}
+	if (-s "err.txt") {
+	    &ReportError( "Program stdintest2 created a non-empty stderr file\n" );
+	    $errors ++;
+	    system "cat err.txt";
+	}
+	unlink "err.txt";
+	unlink "out.txt";
+	unlink "in.txt";
     }
-    unlink "err.txt";
-    unlink "out.txt";
-    unlink "in.txt";
 }
 # -------------------------------------------------------------------------
 # Compliation script testing, particularly for special command-line arguments

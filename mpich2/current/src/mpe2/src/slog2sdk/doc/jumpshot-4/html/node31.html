@@ -1,9 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
-patched version by:  Kenshi Muto, Debian Project.
-* modified by:  Shige TAKENO
-LaTeX2HTML 2002-2-1 (1.70),
+<!--Converted with LaTeX2HTML 2002-2-1 (1.70)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -17,7 +14,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="distribution" CONTENT="global">
 
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="usersguide.css">
@@ -30,26 +27,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html541"
+<A NAME="tex2html557"
   HREF="node32.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html537"
+<A NAME="tex2html553"
   HREF="node30.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html531"
+<A NAME="tex2html547"
   HREF="node30.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html539"
+<A NAME="tex2html555"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html542"
+<B> Next:</B> <A NAME="tex2html558"
   HREF="node32.html">4.2 Tuning of the</A>
-<B> Up:</B> <A NAME="tex2html538"
+<B> Up:</B> <A NAME="tex2html554"
   HREF="node30.html">4. Special Features</A>
-<B> Previous:</B> <A NAME="tex2html532"
+<B> Previous:</B> <A NAME="tex2html548"
   HREF="node30.html">4. Special Features</A>
- &nbsp; <B>  <A NAME="tex2html540"
+ &nbsp; <B>  <A NAME="tex2html556"
   HREF="node2.html">Contents</A></B> 
 <BR>
 <BR>
@@ -60,13 +57,15 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 </H1>
 
 <P>
-The level-of-detail support provided in SLOG-2 and Jumpshot-4 tends
-to help locate states that either are longer in time or occur very
-frequently. States that are short and occur rarely in a big logfile
-are difficult to locate without a special tool. In Jumpshot-4, a search
-and scan facility is provided to facilitate this goal. There are three
-search criteria: search time, searchable timeline IDs, and searchable
-categories. 
+The level-of-detail support provided in SLOG-2 and Jumpshot-4's timeline
+window tends to help locate states that either are longer in time
+or occur very frequently. States that are short and occur rarely in
+a big logfile are difficult to locate without a special tool. User
+can easily spot the rarest states from looking at column <I>count</I>
+in the Legend window as in Figure <A HREF="node11.html#fig:legend_popup">3.6</A>. In Jumpshot-4,
+a search and scan facility is provided to facilitate this goal. There
+are three search criteria: search time, searchable timeline IDs, and
+searchable categories. 
 
 <P>
 
@@ -89,7 +88,7 @@ is set at the starttime of the logfile.
 operate on; only states on the marked timelines will be returned by
 the search facility. These marked timelines can be selected by clicking
 on their timeline IDs on y-axis label panel with rules described in
-Table <A HREF="#table:selection_rules">3.10</A>. When nothing is selected, all
+Table <A HREF="#table:selection_rules">3.12</A>. When nothing is selected, all
 timelines are searchable.
 </LI>
 <LI><I>Searchable categories</I> are categories that have their searchable
@@ -99,7 +98,7 @@ facility. By default, all categories in the Legend window are searchable.
 </LI>
 </OL>
 
-<DIV ALIGN="CENTER"><A NAME="fig:timeline_search_preview"></A><A NAME="731"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:timeline_search_preview"></A><A NAME="835"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 4.1:</STRONG>
 Search of state <I>eos</I> in
@@ -107,7 +106,7 @@ preview stage. The returned state is a preview state containing state
 <I>eos</I> as shown in the Search Box and Drawable Info Box.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER"><IMG
-  WIDTH="676" HEIGHT="778" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./timeline_search_preview.png"
  ALT="Image timeline_search_preview">
 </DIV>
@@ -119,10 +118,10 @@ preview stage. The returned state is a preview state containing state
 <P>
 After any needed search criteria have been set, the search operation
 can be carried out by pressing either the SearchForeward or SearchBackward
-buttons shown in Table <A HREF="#table:timeline_toolbar">3.12</A>. As shown in
+buttons shown in Table <A HREF="#table:timeline_toolbar">3.14</A>. As shown in
 Figure <A HREF="#fig:timeline_search_preview">4.1</A>, the search facility returns
-a searched state that is marked by a transparent <A NAME="tex2html72"
-  HREF="#foot617"><SUP>4.1</SUP></A>box with a 3D raised border and whose starttime is marked by a yellow
+a searched state that is marked by a transparent <A NAME="tex2html73"
+  HREF="#foot649"><SUP>4.1</SUP></A>box with a 3D raised border and whose starttime is marked by a yellow
 search cursor and an upper and a lower 3D arrowhead. The upper 3D
 arrow's color matches that of the returned state. In the figure, the
 returned state is a preview state, so the upper 3D arrow is gray,
@@ -140,7 +139,7 @@ Box.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:timeline_search_preview_zoomed"></A><A NAME="732"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:timeline_search_preview_zoomed"></A><A NAME="836"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 4.2:</STRONG>
 Dragged zoom performed
@@ -148,7 +147,7 @@ around the 3D raised bordered box in Figure <A HREF="#fig:timeline_search_previe
 shows the real state <I>eos.</I></CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER"><IMG
-  WIDTH="678" HEIGHT="778" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./timeline_search_preview_zoomed.png"
  ALT="Image timeline_search_preview_zoomed">
 </DIV>
@@ -175,34 +174,34 @@ process will be automated in a later version of Jumpshot-4.
 <P>
 <BR><HR><H4>Footnotes</H4>
 <DL>
-<DT><A NAME="foot617">...</A><A
- HREF="node31.html#tex2html72"><SUP>4.1</SUP></A></DT>
+<DT><A NAME="foot649">...</A><A
+ HREF="node31.html#tex2html73"><SUP>4.1</SUP></A></DT>
 <DD>The transparency of the 3D raised box can be made opaque by selecting
 the SEARCHED_OBJECT_ON_TOP true.
 
 </DD>
 </DL><HR>
 <!--Navigation Panel-->
-<A NAME="tex2html541"
+<A NAME="tex2html557"
   HREF="node32.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html537"
+<A NAME="tex2html553"
   HREF="node30.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html531"
+<A NAME="tex2html547"
   HREF="node30.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html539"
+<A NAME="tex2html555"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html542"
+<B> Next:</B> <A NAME="tex2html558"
   HREF="node32.html">4.2 Tuning of the</A>
-<B> Up:</B> <A NAME="tex2html538"
+<B> Up:</B> <A NAME="tex2html554"
   HREF="node30.html">4. Special Features</A>
-<B> Previous:</B> <A NAME="tex2html532"
+<B> Previous:</B> <A NAME="tex2html548"
   HREF="node30.html">4. Special Features</A>
- &nbsp; <B>  <A NAME="tex2html540"
+ &nbsp; <B>  <A NAME="tex2html556"
   HREF="node2.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

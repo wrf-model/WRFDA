@@ -91,9 +91,9 @@ int main( int argc, char *argv[] )
 		else {
 		    MPI_Win_fence( 0, win );
 		}
+		MPI_Win_free( &win );
 		MTestFreeDatatype( &sendtype );
 		MTestFreeDatatype( &recvtype );
-		MPI_Win_free( &win );
 	    }
 	}
         MTestFreeComm(&comm);

@@ -14,6 +14,12 @@
 #include "ch3i_progress.h"
 #include "ch3usock.h"
 
+/* Redefine MPIU_CALL since the ssm channel should be self-contained.
+   This only affects the building of a dynamically loadable library for 
+   the sock channel, and then only when debugging is enabled */
+#undef MPIU_CALL
+#define MPIU_CALL(context,funccall) context##_##funccall
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -78,8 +84,7 @@
 
 #ifdef HAVE_GCC_AND_PENTIUM_ASM
 #ifdef HAVE_GCC_ASM_AND_X86_SFENCE
-/*#define MPID_WRITE_BARRIER() __asm__ __volatile__  ( "sfence" ::: "memory" )*/
-#define MPID_WRITE_BARRIER()
+#define MPID_WRITE_BARRIER() __asm__ __volatile__  ( "sfence" ::: "memory" )
 #else
 #define MPID_WRITE_BARRIER()
 #endif
@@ -89,8 +94,7 @@
 #define MPID_READ_BARRIER()
 #endif
 #ifdef HAVE_GCC_ASM_AND_X86_MFENCE
-/*#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" )*/
-#define MPID_READ_WRITE_BARRIER()
+#define MPID_READ_WRITE_BARRIER() __asm__ __volatile__  ( ".byte 0x0f, 0xae, 0xf0" ::: "memory" )
 #else
 #define MPID_READ_WRITE_BARRIER()
 #endif
@@ -138,7 +142,7 @@ typedef struct MPIDI_CH3I_SHM_Packet_t
 {
     volatile int avail;
     /*char pad_avail[60];*/ /* keep the avail flag on a separate cache line */
-    int num_bytes;
+    volatile int num_bytes;
     int offset;
     /* insert stuff here to align data? */
     int pad;/*char pad_data[56];*/ /* cache align the data */
@@ -164,6 +168,102 @@ MPIDI_CH3I_Process_t;
 
 extern MPIDI_CH3I_Process_t MPIDI_CH3I_Process;
 
+/* for MAXHOSTNAMELEN under Linux ans OSX */
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 256
+#endif
+
+typedef struct MPIDI_CH3I_BootstrapQ_struct * MPIDI_CH3I_BootstrapQ;
+
+typedef struct MPIDI_Process_group_s
+{
+    int nShmEagerLimit;
+#ifdef HAVE_SHARED_PROCESS_READ
+    int nShmRndvLimit;
+#endif
+    int nShmWaitSpinCount;
+    int nShmWaitYieldCount;
+    MPIDI_CH3I_BootstrapQ bootstrapQ;
+    char shm_hostname[MAXHOSTNAMELEN];
+#ifdef MPIDI_CH3_USES_SHM_NAME
+    char * shm_name;
+#endif
+    /*struct MPIDI_Process_group_s *next;*/
+} MPIDI_CH3I_PG;
+/* MPIDI_CH3I_Process_group_t; */
+
+/* #define MPIDI_CH3_PG_DECL MPIDI_CH3I_Process_group_t ch; */
+
+/* This structure requires the iovec structure macros to be defined */
+typedef struct MPIDI_CH3I_SHM_Buffer_t
+{
+    int use_iov;
+    unsigned int num_bytes;
+    void *buffer;
+    unsigned int bufflen;
+#ifdef USE_SHM_IOV_COPY
+    MPID_IOV iov[MPID_IOV_LIMIT];
+#else
+    MPID_IOV *iov;
+#endif
+    int iovlen;
+    int index;
+    int total;
+} MPIDI_CH3I_SHM_Buffer_t;
+
+typedef struct MPIDI_CH3I_Shmem_block_request_result
+{
+    int error;
+    void *addr;
+    unsigned int size;
+#ifdef USE_POSIX_SHM
+    char key[MPIDI_MAX_SHM_NAME_LENGTH];
+    int id;
+#elif defined (USE_SYSV_SHM)
+    int key;
+    int id;
+#elif defined (USE_WINDOWS_SHM)
+    char key[MPIDI_MAX_SHM_NAME_LENGTH];
+    HANDLE id;
+#else
+#error *** No shared memory mapping variables specified ***
+#endif
+    char name[MPIDI_MAX_SHM_NAME_LENGTH];
+} MPIDI_CH3I_Shmem_block_request_result;
+
+typedef struct MPIDI_CH3I_VC
+{
+    struct MPIDI_CH3I_SHM_Queue_t * shm, * read_shmq, * write_shmq;
+    struct MPID_Request * sendq_head;
+    struct MPID_Request * sendq_tail;
+    struct MPID_Request * send_active;
+    struct MPID_Request * recv_active;
+    struct MPID_Request * req;
+    MPIDI_CH3I_VC_state_t state;
+    int shm_read_connected;
+    struct MPIDU_Sock *sock;
+    struct MPIDI_CH3I_Connection * conn;
+    int port_name_tag;
+    BOOL bShm;
+    MPIDI_CH3I_Shmem_block_request_result shm_write_queue_info, shm_read_queue_info;
+    int shm_reading_pkt;
+    int shm_state;
+    MPIDI_CH3I_SHM_Buffer_t read;
+#ifdef HAVE_SHARED_PROCESS_READ
+#ifdef HAVE_WINDOWS_H
+    HANDLE hSharedProcessHandle;
+#else
+    int nSharedProcessID;
+    int nSharedProcessFileDescriptor;
+#endif
+#endif
+    struct MPIDI_VC *shm_next_reader, *shm_next_writer;
+} MPIDI_CH3I_VC;
+
 /* The following define a few different modes of progress, often varying 
    what the process does while waiting for messages to arrive, and how often
    it checks each source of messages (since shared memory is so much faster
@@ -184,13 +284,16 @@ extern MPIDI_CH3I_Process_t MPIDI_CH3I_Process;
 #define MPIDI_DEC_WRITE_ACTIVE()
 #endif
 
+/* FIXME: We need to move these queue routines out of the 
+   header files to allow dynamic loading/selection of channels,
+   and to provide better modularity of the ch3 code */
 /*#define USE_VALIDATING_QUEUE_MACROS*/
 #ifdef USE_VALIDATING_QUEUE_MACROS
 
-#define MPIDI_CH3I_SendQ_enqueue(vc, req)				\
+#define MPIDI_CH3I_SendQ_enqueue(vcch, req)				\
 {									\
     MPID_Request *iter;							\
-    iter = vc->ch.sendq_head;						\
+    iter = vcch->sendq_head;						\
     while (iter) {							\
 	if (iter == req) {						\
 	    /*abort();*/ break; /*printf("Error: enqueueing request twice.\n");fflush(stdout);*/\
@@ -199,26 +302,25 @@ extern MPIDI_CH3I_Process_t MPIDI_CH3I_Process;
     }									\
     if (!iter) {							\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue vc=%p req=0x%08x", vc, req->handle));\
     req->dev.next = NULL;						\
-    if (vc->ch.sendq_tail != NULL)					\
+    if (vcch->sendq_tail != NULL)					\
     {									\
-	vc->ch.sendq_tail->dev.next = req;				\
+	vcch->sendq_tail->dev.next = req;				\
     }									\
     else								\
     {									\
 	/* increment number of active writes when posting to an empty queue */\
 	MPIDI_INC_WRITE_ACTIVE();					\
-	vc->ch.sendq_head = req;					\
+	vcch->sendq_head = req;					\
     }									\
-    vc->ch.sendq_tail = req;						\
+    vcch->sendq_tail = req;						\
     }									\
 }
 
-#define MPIDI_CH3I_SendQ_enqueue_head(vc, req)				\
+#define MPIDI_CH3I_SendQ_enqueue_head(vcch, req)				\
 {									\
     MPID_Request *iter;							\
-    iter = vc->ch.sendq_head;						\
+    iter = vcch->sendq_head;						\
     while (iter) {							\
 	if (iter == req) {						\
 	    /*abort();*/ break; /*printf("Error: head enqueueing request twice.\n");fflush(stdout);*/\
@@ -227,79 +329,75 @@ extern MPIDI_CH3I_Process_t MPIDI_CH3I_Process;
     }									\
     /* MT - not thread safe! */						\
     if (!iter) {							\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue_head vc=%p req=0x%08x", vc, req->handle));\
-    req->dev.next = vc->ch.sendq_head; /*sendq_tail;*/			\
-    if (vc->ch.sendq_tail == NULL)					\
+    req->dev.next = vcch->sendq_head; /*sendq_tail;*/			\
+    if (vcch->sendq_tail == NULL)					\
     {									\
 	/* increment number of active writes when posting to an empty queue */\
 	MPIDI_INC_WRITE_ACTIVE();					\
-	vc->ch.sendq_tail = req;					\
+	vcch->sendq_tail = req;					\
     }									\
-    vc->ch.sendq_head = req;						\
+    vcch->sendq_head = req;						\
     }									\
 }
 
 #else
 
-#define MPIDI_CH3I_SendQ_enqueue(vc, req)				\
+#define MPIDI_CH3I_SendQ_enqueue(vcch, req)				\
 {									\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue vc=%p req=0x%08x", vc, req->handle));	\
     req->dev.next = NULL;						\
-    if (vc->ch.sendq_tail != NULL)					\
+    if (vcch->sendq_tail != NULL)					\
     {									\
-	vc->ch.sendq_tail->dev.next = req;				\
+	vcch->sendq_tail->dev.next = req;				\
     }									\
     else								\
     {									\
 	/* increment number of active writes when posting to an empty queue */\
 	MPIDI_INC_WRITE_ACTIVE();					\
-	vc->ch.sendq_head = req;					\
+	vcch->sendq_head = req;					\
     }									\
-    vc->ch.sendq_tail = req;						\
+    vcch->sendq_tail = req;						\
 }
 
-#define MPIDI_CH3I_SendQ_enqueue_head(vc, req)				\
+#define MPIDI_CH3I_SendQ_enqueue_head(vcch, req)				\
 {									\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue_head vc=%p req=0x%08x", vc, req->handle));\
-    req->dev.next = vc->ch.sendq_head;					\
-    if (vc->ch.sendq_tail == NULL)					\
+    req->dev.next = vcch->sendq_head;					\
+    if (vcch->sendq_tail == NULL)					\
     {									\
 	/* increment number of active writes when posting to an empty queue */\
 	MPIDI_INC_WRITE_ACTIVE();					\
-	vc->ch.sendq_tail = req;					\
+	vcch->sendq_tail = req;					\
     }									\
-    vc->ch.sendq_head = req;						\
+    vcch->sendq_head = req;						\
 }
 
 #endif
 
-#define MPIDI_CH3I_SendQ_dequeue(vc)					\
+#define MPIDI_CH3I_SendQ_dequeue(vcch)					\
 {									\
     /* MT - not thread safe! */						\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_dequeue vc=%p req=0x%08x", vc, vc->ch.sendq_head->handle));\
-    vc->ch.sendq_head = vc->ch.sendq_head->dev.next;			\
-    if (vc->ch.sendq_head == NULL)					\
+    vcch->sendq_head = vcch->sendq_head->dev.next;			\
+    if (vcch->sendq_head == NULL)					\
     {									\
 	/* decrement number of active writes when a queue becomes empty */\
 	MPIDI_DEC_WRITE_ACTIVE();					\
-	vc->ch.sendq_tail = NULL;					\
+	vcch->sendq_tail = NULL;					\
     }									\
 }
 
-#define MPIDI_CH3I_SendQ_head(vc) (vc->ch.sendq_head)
+#define MPIDI_CH3I_SendQ_head(vcch) (vcch->sendq_head)
 
-#define MPIDI_CH3I_SendQ_empty(vc) (vc->ch.sendq_head == NULL)
+#define MPIDI_CH3I_SendQ_empty(vcch) (vcch->sendq_head == NULL)
 
 #define MPIDU_MAX_SHM_BLOCK_SIZE ((unsigned int)2*1024*1024*1024)
 
 typedef struct MPIDI_CH3I_Shmem_queue_info
 {
-    int /*pg_id, */pg_rank, pid;
+    int  pg_rank, pid;
+    /* FIXME: Why 100? */
     char pg_id[100];
     int type;
-    /*int is_intercomm;*/
     MPIDI_CH3I_Shmem_block_request_result info;
 } MPIDI_CH3I_Shmem_queue_info;
 

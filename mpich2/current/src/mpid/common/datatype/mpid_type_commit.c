@@ -5,7 +5,6 @@
  *      See COPYRIGHT in top-level directory.
  */
 
-#include <mpiimpl.h>
 #include <mpid_dataloop.h>
 #include <stdlib.h>
 
@@ -23,9 +22,11 @@
 int MPID_Type_commit(MPI_Datatype *datatype_p)
 {
     int           mpi_errno=MPI_SUCCESS;
-    MPI_Aint      first, last;
     MPID_Datatype *datatype_ptr;
+#if 0
     MPID_Segment  *segp;
+    MPI_Aint      first, last;
+#endif
 
     MPIU_Assert(HANDLE_GET_KIND(*datatype_p) != HANDLE_KIND_BUILTIN);
 
@@ -34,6 +35,20 @@ int MPID_Type_commit(MPI_Datatype *datatype_p)
     if (datatype_ptr->is_committed == 0) {
 	datatype_ptr->is_committed = 1;
 
+	MPID_Dataloop_create(*datatype_p,
+			     &datatype_ptr->dataloop,
+			     &datatype_ptr->dataloop_size,
+			     &datatype_ptr->dataloop_depth,
+			     MPID_DATALOOP_HOMOGENEOUS);
+
+	/* create heterogeneous dataloop */
+	MPID_Dataloop_create(*datatype_p,
+			     &datatype_ptr->hetero_dloop,
+			     &datatype_ptr->hetero_dloop_size,
+			     &datatype_ptr->hetero_dloop_depth,
+			     MPID_DATALOOP_HETEROGENEOUS);
+
+#if 0
 	/* determine number of contiguous blocks in the type */
 	segp = MPID_Segment_alloc();
         /* --BEGIN ERROR HANDLING-- */
@@ -49,6 +64,7 @@ int MPID_Type_commit(MPI_Datatype *datatype_p)
             return mpi_errno;
         }
         /* --END ERROR HANDLING-- */
+
 	MPID_Segment_init(0, 1, *datatype_p, segp, 0); /* first 0 is bufptr,
 							* 1 is count
 							* last 0 is homogeneous
@@ -58,18 +74,11 @@ int MPID_Type_commit(MPI_Datatype *datatype_p)
 	last  = SEGMENT_IGNORE_LAST;
 
 	MPID_Segment_free(segp);
+#endif
 
 	MPIU_DBG_PRINTF(("# contig blocks = %d\n",
 			 (int) datatype_ptr->n_contig_blocks));
 
-#ifdef USE_MEMORY_TRACING
-	if ( ((unsigned int)datatype_ptr->hetero_dloop & 0xFFFFFFFF ) == 0xefefefef) {
-	    mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_FATAL,
-					      __FILE__, __LINE__, 
-					      MPI_ERR_OTHER, "**fail",
-					      "**fail %s", "hetero_dloop not set" );
-	}
-#endif
 #if 0
 	MPIDI_Dataloop_dot_printf(datatype_ptr->dataloop, 0, 1);
 #endif

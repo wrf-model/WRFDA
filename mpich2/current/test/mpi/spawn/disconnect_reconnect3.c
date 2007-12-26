@@ -181,6 +181,7 @@ int main(int argc, char *argv[])
 	/*MPI_Ssend( &errs, 1, MPI_INT, 0, 1, intercomm );*/
     }
 
+    MPI_Comm_free( &comm );
     /* Note that the MTest_Finalize get errs only over COMM_WORLD */
     /* Note also that both the parent and child will generate "No Errors"
        if both call MTest_Finalize */

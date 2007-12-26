@@ -16,5 +16,10 @@ typeattrf90_SOURCES    = typeattrf90.f90
 typeattr2f90_SOURCES   = typeattr2f90.f90
 typeattr3f90_SOURCES   = typeattr3f90.f90
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)

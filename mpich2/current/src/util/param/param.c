@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: param.c,v 1.14 2006/05/02 13:16:00 gropp Exp $
+/*  $Id: param.c,v 1.16 2007/04/13 14:09:50 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -30,10 +30,11 @@
 
 typedef struct {
     char *name;
-    enum { MPIU_STRING, MPIU_INT } kind;
+    enum { MPIU_STRING, MPIU_INT, MPIU_INT_RANGE } kind;
     union {
 	char *string_value;
 	int  int_value;
+	int  intrange_value[2];
     } val;
 } Param_entry;
 
@@ -116,7 +117,6 @@ int MPIU_Param_init( int *argc_p, char *argv_p[], const char def_file[] )
 	    
 		if (!*value) {
 		    /* Error - key without value */
-
 		    continue;
 		}
 
@@ -164,6 +164,20 @@ int MPIU_Param_bcast( void )
     return 0;
 }
 
+/* The purpose of this routine is really to mark, at the point of 
+   use, the parmaeters that are used by the program.  We may want to 
+   use a different interface that passes these values directly to 
+   to code that uses them, or we may want to use an interface that
+   allows the efficient setting of these values at the point of use.  Thus,
+   this routine is really a place-holder for future development. 
+   
+   Input Parameters:
++  name - Name of the parameter, without any prefix (e.g., memdump), as
+          it might be used in an argument list (e.c., as -mpich-memdump=yes)
+.  envname - Name of the parameter, without any prefix, as it might
+          be used as an environment variable name
+-  description - Description of the use of the parameter, in English.          
+*/
 int MPIU_Param_register( const char name[], const char envname[], 
                          const char description[] )
 {
@@ -229,6 +243,52 @@ int MPIU_Param_get_string( const char name[], const char *default_val,
 	*value = (char *)default_val;
 	return 1;
     }
+}
+
+int MPIU_Param_get_range( const char name[], int *lowPtr, int *highPtr )
+{
+    Param_entry *entry; 
+    int rc = 0;
+
+    entry = find_entry( name );
+    if (entry) {
+	if (entry->kind == MPIU_STRING) {
+	    /* Can we convert this to an integer range? */
+	    /* FIXME: This is the code from EnvGetRange */
+	    
+	    const char *p;
+	    int   high = 0, low = 0;
+	    /* Look for n:m format */
+	    p = entry->val.string_value;
+	    while (*p && isspace(*p)) p++;
+	    while (*p && isdigit(*p)) low = 10 * low + (*p++ - '0');
+	    if (*p == ':') {
+		p++;
+		while (*p && isdigit(*p)) high = 10 * high + (*p++ - '0');
+	    }
+	    if (*p) {
+		MPIU_Error_printf( "Invalid character %c in %s\n", 
+				   *p, entry->val.string_value );
+		return -1;
+	    }
+	    entry->val.intrange_value[0] = low;
+	    entry->val.intrange_value[1] = high;
+	    entry->kind = MPIU_INT_RANGE;
+	}
+	if (entry->kind == MPIU_INT_RANGE) {
+	    *lowPtr  = entry->val.intrange_value[0];
+	    *highPtr = entry->val.intrange_value[1];
+	    rc = 0;
+	}
+	else {
+	    rc = 2;
+	}
+    }
+    else  {
+	/* Leave values unchanged */
+	rc = 1;
+    }
+    return rc;
 }
 
 void MPIU_Param_finalize( void )
@@ -337,6 +397,7 @@ int MPIU_GetEnvBool( const char *envName, int *val )
 	    return 1;
 	}
 	/* Else an invalid value */
+	/* FIXME: We need to provide a way to signal this error */
 	return -1;
     }
     return 0;

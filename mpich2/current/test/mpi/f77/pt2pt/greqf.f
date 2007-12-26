@@ -7,7 +7,7 @@ C
       implicit none
       include 'mpif.h'
       integer status(MPI_STATUS_SIZE), ierr
-      include '../attr/attraints.h'
+      include 'attr1aints.h'
 C
 C    set a default status
       status(MPI_SOURCE) = MPI_UNDEFINED
@@ -21,7 +21,7 @@ C
       implicit none
       include 'mpif.h'
       integer value, ierr
-      include '../attr/attraints.h'
+      include 'attr1aints.h'
 C
       extrastate = extrastate - 1
 C   The value returned by the free function is the error code
@@ -34,7 +34,7 @@ C
       include 'mpif.h'
       integer ierr
       logical complete
-      include '../attr/attraints.h'
+      include 'attr1aints.h'
 
       ierr = MPI_SUCCESS
       end
@@ -58,7 +58,7 @@ C
        integer status(MPI_STATUS_SIZE)
        integer request
        external query_fn, free_fn, cancel_fn
-       include '../attr/attraints.h'
+       include 'attr1aints.h'
 
        errs = 0
        

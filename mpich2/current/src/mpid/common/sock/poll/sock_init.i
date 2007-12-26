@@ -13,30 +13,10 @@
 #define FCNAME MPIU_QUOTE(FUNCNAME)
 int MPIDU_Sock_init(void)
 {
-    char * env;
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_SOCK_INIT);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_SOCK_INIT);
 
-    if (MPIDU_Socki_initialized == 0)
-    { 
-	/* FIXME: where is this documented?  Also, this should use
-	   the general parameter interface (environment variables
-	   might not be available) */
-	env = getenv("MPICH_SOCKET_BUFFER_SIZE");
-	if (env)
-	{
-	    int tmp;
-	    
-	    /* FIXME: atoi doesn't detect errors (e.g., non-digits) */
-	    tmp = atoi(env);
-	    if (tmp > 0)
-	    {
-		MPIDU_Socki_socket_bufsz = tmp;
-	    }
-	}
-    }
-    
     MPIDU_Socki_initialized++;
 
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_SOCK_INIT);

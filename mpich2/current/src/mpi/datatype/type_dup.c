@@ -104,6 +104,9 @@ int MPI_Type_dup(MPI_Datatype datatype, MPI_Datatype *newtype)
 				           NULL,
 				           &datatype);
 
+    mpi_errno = MPID_Type_commit(newtype);
+    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+
     /* Copy attributes, executing the attribute copy functions */
     /* This accesses the attribute dup function through the perprocess
        structure to prevent type_dup from forcing the linking of the

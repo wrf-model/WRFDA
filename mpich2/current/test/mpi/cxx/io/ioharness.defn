@@ -40,7 +40,7 @@ fh.Close();
 <checkStatus>
 if (status.Get_count( MPI::INT ) != n) {
     cout << "Wrong value from status; expected " << n << " but got " <<
-       status.Get_count( MPI::INT );
+       status.Get_count( MPI::INT ) << "\n";
 }
 </checkStatus>
 <deletefile>

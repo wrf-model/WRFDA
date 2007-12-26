@@ -17,7 +17,7 @@ int MPI_File_set_size(MPI_File fh, MPI_Offset size)
 
     if(g2g) {
         /* get the comm */
-        if (CollChk_get_fh(fh, &comm)) {
+        if (!CollChk_get_fh(fh, &comm)) {
             return CollChk_err_han("File has not been Opened", 
                                    COLLCHK_ERR_FILE_NOT_OPEN,
                                    call, MPI_COMM_WORLD);

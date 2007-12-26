@@ -77,7 +77,7 @@ int MPIDI_CH3U_Handle_connection(MPIDI_VC_t * vc, MPIDI_VC_Event_t event)
 
 		    /* MT: this is not thread safe */
 		    MPIDI_Outstanding_close_ops -= 1;
-		    MPIU_DBG_MSG_D(CH3_DISCONNECT,VERBOSE,
+		    MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,
              "outstanding close operations = %d", MPIDI_Outstanding_close_ops);
 	    
 		    if (MPIDI_Outstanding_close_ops == 0)
@@ -141,7 +141,7 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3U_VC_SENDCLOSE);
 
     /* FIXME: Remove this IFDEF */
-#ifdef MPIDI_CH3_USES_SSHM
+#if defined(MPIDI_CH3_USES_SSHM) && 0
     MPIU_Assert( vc->state == MPIDI_VC_STATE_ACTIVE || 
 		 vc->state == MPIDI_VC_STATE_REMOTE_CLOSE 
 		 /* sshm queues are uni-directional.  A VC that is connected 
@@ -152,7 +152,7 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
 		 * we need to initiate the close protocol on the read side 
 		 * even if the write state is MPIDI_VC_STATE_INACTIVE. */
 		 || ((vc->state == MPIDI_VC_STATE_INACTIVE) && 
-		     vc->ch.shm_read_connected) );
+		     ((MPIDI_CH3I_VC *)(vc->channel_private))->shm_read_connected) );
 #else
     MPIU_Assert( vc->state == MPIDI_VC_STATE_ACTIVE || 
 		 vc->state == MPIDI_VC_STATE_REMOTE_CLOSE );
@@ -163,7 +163,7 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
     
     /* MT: this is not thread safe */
     MPIDI_Outstanding_close_ops += 1;
-    MPIU_DBG_MSG_FMT(CH3_DISCONNECT,VERBOSE,(MPIU_DBG_FDEST,
+    MPIU_DBG_MSG_FMT(CH3_DISCONNECT,TYPICAL,(MPIU_DBG_FDEST,
 		  "sending close(%s) on vc (pg=%p) %p to rank %d, ops = %d", 
 		  close_pkt->ack ? "TRUE" : "FALSE", vc->pg, vc, 
 		  rank, MPIDI_Outstanding_close_ops));
@@ -184,7 +184,8 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
 	vc->state = MPIDI_VC_STATE_CLOSE_ACKED;
     }
 		
-    mpi_errno = MPIDI_CH3_iStartMsg(vc, close_pkt, sizeof(*close_pkt), &sreq);
+    mpi_errno = MPIU_CALL(MPIDI_CH3,iStartMsg(vc, close_pkt, 
+					      sizeof(*close_pkt), &sreq));
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_SET(mpi_errno,MPI_ERR_OTHER,
 		     "**ch3|send_close_ack");
@@ -192,6 +193,7 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
     
     if (sreq != NULL) {
 	MPID_Request_release(sreq);
+	/* printf( "Panic on send close ack\n" ); fflush(stdout); */
     }
 
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3U_VC_SENDCLOSE);
@@ -201,7 +203,7 @@ int MPIDI_CH3U_VC_SendClose( MPIDI_VC_t *vc, int rank )
 /* Here is the matching code that processes a close packet when it is 
    received */
 int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt, 
-				MPID_Request **rreqp )
+				MPIDI_msg_sz_t *buflen, MPID_Request **rreqp )
 {
     MPIDI_CH3_Pkt_close_t * close_pkt = &pkt->close;
     int mpi_errno = MPI_SUCCESS;
@@ -215,10 +217,10 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
 	MPIDI_Pkt_init(resp_pkt, MPIDI_CH3_PKT_CLOSE);
 	resp_pkt->ack = TRUE;
 	
-	MPIU_DBG_MSG_D(CH3_OTHER,VERBOSE,"sending close(TRUE) to %d",
+	MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,"sending close(TRUE) to %d",
 		       vc->pg_rank);
-	mpi_errno = MPIDI_CH3_iStartMsg(vc, resp_pkt, sizeof(*resp_pkt), 
-					&resp_sreq);
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iStartMsg(vc, resp_pkt, 
+					  sizeof(*resp_pkt), &resp_sreq));
 	if (mpi_errno != MPI_SUCCESS) {
 	    MPIU_ERR_SETANDJUMP(mpi_errno,MPI_ERR_OTHER,
 				"**ch3|send_close_ack");
@@ -227,6 +229,7 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
 	if (resp_sreq != NULL)
 	{
 	    MPID_Request_release(resp_sreq);
+	    /*printf( "Panic on send close\n" ); fflush(stdout);*/
 	}
     }
     
@@ -234,7 +237,7 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
     {
 	if (vc->state == MPIDI_VC_STATE_LOCAL_CLOSE)
 	{
-	    MPIU_DBG_MSG_D(CH3_DISCONNECT,VERBOSE,
+	    MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,
 		   "received close(FALSE) from %d, moving to CLOSE_ACKED.",
 		   vc->pg_rank);
 	    MPIU_DBG_VCSTATECHANGE(vc,VC_STATE_CLOSE_ACKED);
@@ -249,21 +252,23 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
 	       closing the connection.  We will act as if this is
 	       duplicate information can be ignored (rather than triggering
 	       the Assert in the next case) */
-	    MPIU_DBG_MSG(CH3_DISCONNECT,VERBOSE,
+	    MPIU_DBG_MSG(CH3_DISCONNECT,TYPICAL,
 			 "Saw CLOSE_ACKED while already in that state");
 	    vc->state = MPIDI_VC_STATE_REMOTE_CLOSE;
 	    /* We need this terminate to decrement the outstanding closes */
-	    mpi_errno = MPIDI_CH3_Connection_terminate(vc);
+	    /* For example, with sockets, Connection_terminate will close
+	       the socket */
+	    mpi_errno = MPIU_CALL(MPIDI_CH3,Connection_terminate(vc));
 	}
 #endif
 	else /* (vc->state == MPIDI_VC_STATE_ACTIVE) */
 	{
 	    /* FIXME: Debugging */
 	    if (vc->state != MPIDI_VC_STATE_ACTIVE) {
-		printf( "Unexpected state %d in vc %x\n", vc->state, (int)vc);
+		printf( "Unexpected state %d in vc %p\n", vc->state, vc );
 		fflush(stdout);
 	    }
-	    MPIU_DBG_MSG_D(CH3_DISCONNECT,VERBOSE,
+	    MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,
                      "received close(FALSE) from %d, moving to REMOTE_CLOSE.",
 				   vc->pg_rank);
 	    MPIU_Assert(vc->state == MPIDI_VC_STATE_ACTIVE);
@@ -273,7 +278,7 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
     }
     else
     {
-	MPIU_DBG_MSG_D(CH3_DISCONNECT,VERBOSE,
+	MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,
                        "received close(TRUE) from %d, moving to CLOSE_ACKED.", 
 			       vc->pg_rank);
 	MPIU_Assert (vc->state == MPIDI_VC_STATE_LOCAL_CLOSE || 
@@ -281,9 +286,12 @@ int MPIDI_CH3_PktHandler_Close( MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *pkt,
 	MPIU_DBG_VCSTATECHANGE(vc,VC_STATE_CLOSE_ACKED);
 	
 	vc->state = MPIDI_VC_STATE_CLOSE_ACKED;
-	mpi_errno = MPIDI_CH3_Connection_terminate(vc);
+	/* For example, with sockets, Connection_terminate will close
+	   the socket */
+	mpi_errno = MPIU_CALL(MPIDI_CH3,Connection_terminate(vc));
     }
     
+    *buflen = sizeof(MPIDI_CH3_Pkt_t);
     *rreqp = NULL;
 
  fn_fail:
@@ -321,7 +329,7 @@ int MPIDI_CH3U_VC_WaitForClose( void )
 
     MPID_Progress_start(&progress_state);
     while(MPIDI_Outstanding_close_ops > 0) {
-	MPIU_DBG_MSG_D(CH3_DISCONNECT,VERBOSE,
+	MPIU_DBG_MSG_D(CH3_DISCONNECT,TYPICAL,
 		       "Waiting for %d close operations",
 		       MPIDI_Outstanding_close_ops);
 	mpi_errno = MPID_Progress_wait(&progress_state);

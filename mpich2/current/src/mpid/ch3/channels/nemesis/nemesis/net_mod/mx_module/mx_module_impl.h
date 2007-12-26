@@ -23,6 +23,18 @@ extern int                    MPID_nem_module_mx_recv_outstanding_request_num;
 extern int                    MPID_nem_module_mx_pendings_recvs;
 extern int                   *MPID_nem_module_mx_pendings_recvs_array;
 
+/* The vc provides a generic buffer in which network modules can store
+   private fields This removes all dependencies from the VC struction
+   on the network module, facilitating dynamic module loading. */
+typedef struct 
+{
+    unsigned int       remote_endpoint_id; /* uint32_t equivalent */
+    unsigned long long remote_nic_id;      /* uint64_t equivalent */
+} MPID_nem_mx_module_vc_area;
+
+/* accessor macro to private fields in VC */
+#define VC_FIELD(vc, field) (((MPID_nem_mx_module_vc_area *)((MPIDI_CH3I_VC *)(vc)->channel_private)->netmod_area.padding)->field)
+
 typedef struct MPID_nem_mx_cell
 {   
    struct MPID_nem_mx_cell *next;

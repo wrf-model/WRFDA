@@ -59,14 +59,15 @@ all-redirect: .libstamp0 ../../../../../../lib/lib${MPILIBNAME}.a
 
 .libstamp0 ../../../../../../lib/lib${MPILIBNAME}.a: ch3_finalize.o \
 	ch3_init.o ch3_isend.o ch3_isendv.o ch3_istartmsg.o ch3_istartmsgv.o \
-	ch3_progress.o ch3i_errno.o ch3_comm_spawn.o ch3_abort.o ch3i_comm.o 
+	ch3_progress.o ch3i_errno.o ch3_comm_spawn.o ch3_abort.o ch3i_comm.o \
+	ch3i_eagernoncontig.o 
 	${AR} cr ../../../../../../lib/lib${MPILIBNAME}.a $?
 	${RANLIB} ../../../../../../lib/lib${MPILIBNAME}.a
 	date > .libstamp0
 .libstamp1 ../../../../../../lib/lib${MPILIBNAME}.la: ch3_finalize.lo \
 	ch3_init.lo ch3_isend.lo ch3_isendv.lo ch3_istartmsg.lo \
 	ch3_istartmsgv.lo ch3_progress.lo ch3i_errno.lo ch3_comm_spawn.lo \
-	ch3_abort.lo ch3i_comm.lo 
+	ch3_abort.lo ch3i_comm.lo ch3i_eagernoncontig.lo 
 	${AR} cr ../../../../../../lib/lib${MPILIBNAME}.la $?
 	date > .libstamp1
 # --------------------------------------------------------------------------
@@ -74,7 +75,7 @@ all-redirect: .libstamp0 ../../../../../../lib/lib${MPILIBNAME}.a
 # --------------------------------------------------------------------------
 SOURCES         =  ch3_finalize.c ch3_init.c ch3_isend.c ch3_isendv.c \
 	ch3_istartmsg.c ch3_istartmsgv.c ch3_progress.c ch3i_errno.c \
-	ch3_comm_spawn.c ch3_abort.c ch3i_comm.c 
+	ch3_comm_spawn.c ch3_abort.c ch3i_comm.c ch3i_eagernoncontig.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

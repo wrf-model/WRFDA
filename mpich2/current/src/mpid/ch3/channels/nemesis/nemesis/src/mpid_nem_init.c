@@ -55,10 +55,23 @@ _MPID_nem_init (int pg_rank, MPIDI_PG_t *pg_p, int ckpt_restart)
     char  *publish_bc_orig = NULL;
     char  *bc_val          = NULL;
     int    val_max_remaining;
-    int    num_nodes;
-    int   *node_ids;    
+    int    num_nodes = 0;
+    int   *node_ids = 0;    
     MPIU_CHKPMEM_DECL(4);
+
+    /* Make sure the nemesis packet is no larger than the generic
+       packet.  This is needed because we no longer include channel
+       packet types in the CH3 packet types to allow dynamic channel
+       loading. */
+    MPIU_Assert(sizeof(MPIDI_CH3_nem_pkt_t) <= sizeof(MPIDI_CH3_PktGeneric_t));
+
+    /* Make sure the cell structure looks like it should */
+    MPIU_Assert(MPID_NEM_CELL_PAYLOAD_LEN + MPID_NEM_CELL_HEAD_LEN == sizeof(MPID_nem_cell_t));
+    MPIU_Assert(sizeof(MPID_nem_cell_t) == sizeof(MPID_nem_abs_cell_t));
+    /* Make sure payload is aligned on a double */
+    MPIU_Assert(MPID_NEM_ALIGNED(&((MPID_nem_cell_t*)0)->pkt.mpich2.payload[0], sizeof(double)));
     
+                
     /* Initialize the business card */
     mpi_errno = MPIDI_CH3I_BCInit( &bc_val, &val_max_remaining );
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
@@ -333,6 +346,8 @@ _MPID_nem_init (int pg_rank, MPIDI_PG_t *pg_p, int ckpt_restart)
     mpi_errno = MPIDI_PG_SetConnInfo (pg_rank, (const char *)publish_bc_orig);
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
 
+    MPIU_Free(publish_bc_orig);
+
     mpi_errno = MPID_nem_barrier (num_local, local_rank);   
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
     mpi_errno = MPID_nem_mpich2_init (ckpt_restart);
@@ -446,7 +461,6 @@ get_local_procs (int global_rank, int num_global, int *num_local_p, int **local_
     int *procs;
     int i, j;
     char key[MPID_NEM_MAX_KEY_VAL_LEN];
-    char val[MPID_NEM_MAX_KEY_VAL_LEN];
     char *kvs_name;
     char **node_names;
     char *node_name_buf;
@@ -460,41 +474,53 @@ get_local_procs (int global_rank, int num_global, int *num_local_p, int **local_
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
 
     /* Put my hostname id */
-    memset (key, 0, MPID_NEM_MAX_KEY_VAL_LEN);
-    MPIU_Snprintf (key, MPID_NEM_MAX_KEY_VAL_LEN, "hostname[%d]", global_rank);
+    if (num_global > 1)
+    {
+        memset (key, 0, MPID_NEM_MAX_KEY_VAL_LEN);
+        MPIU_Snprintf (key, MPID_NEM_MAX_KEY_VAL_LEN, "hostname[%d]", global_rank);
+        
+        pmi_errno = PMI_KVS_Put (kvs_name, key, MPID_nem_hostname);
+        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_put", "**pmi_kvs_put %d", pmi_errno);
+        
+        pmi_errno = PMI_KVS_Commit (kvs_name);
+        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_commit", "**pmi_kvs_commit %d", pmi_errno);
+        
+        pmi_errno = PMI_Barrier();
+        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_barrier", "**pmi_barrier %d", pmi_errno);
+    }
 
-    pmi_errno = PMI_KVS_Put (kvs_name, key, MPID_nem_hostname);
-    MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_put", "**pmi_kvs_put %d", pmi_errno);
-
-    pmi_errno = PMI_KVS_Commit (kvs_name);
-    MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_commit", "**pmi_kvs_commit %d", pmi_errno);
-
-    pmi_errno = PMI_Barrier();
-    MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_barrier", "**pmi_barrier %d", pmi_errno);
-
-    /* Gather hostnames */
+    /* allocate structures */
     MPIU_CHKPMEM_MALLOC (procs, int *, num_global * sizeof (int), mpi_errno, "local process index array");
     MPIU_CHKPMEM_MALLOC (node_ids, int *, num_global * sizeof (int), mpi_errno, "node_ids");
     MPIU_CHKLMEM_MALLOC (node_names, char **, num_global * sizeof (char*), mpi_errno, "node_names");
     MPIU_CHKLMEM_MALLOC (node_name_buf, char *, num_global * MPID_NEM_MAX_KEY_VAL_LEN * sizeof(char), mpi_errno, "node_name_buf");
 
-    num_nodes = 0;
+    /* Gather hostnames */
     for (i = 0; i < num_global; ++i)
     {
         node_names[i] = &node_name_buf[i * MPID_NEM_MAX_KEY_VAL_LEN];
         node_names[i][0] = '\0';
     }
     
+    num_nodes = 0;    
     num_local = 0;
 
     for (i = 0; i < num_global; ++i)
     {
-	memset (key, 0, MPID_NEM_MAX_KEY_VAL_LEN);
-	MPIU_Snprintf (key, MPID_NEM_MAX_KEY_VAL_LEN, "hostname[%d]", i);
+        if (i == global_rank)
+        {
+            /* This is us, no need to perform a get */
+            MPIU_Snprintf(node_names[num_nodes], MPID_NEM_MAX_KEY_VAL_LEN, "%s", MPID_nem_hostname);
+        }
+        else
+        {
+            memset (key, 0, MPID_NEM_MAX_KEY_VAL_LEN);
+            MPIU_Snprintf (key, MPID_NEM_MAX_KEY_VAL_LEN, "hostname[%d]", i);
 
-	pmi_errno = PMI_KVS_Get (kvs_name, key, node_names[num_nodes], MPID_NEM_MAX_KEY_VAL_LEN);
-        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_get", "**pmi_kvs_get %d", pmi_errno);
-	
+            pmi_errno = PMI_KVS_Get (kvs_name, key, node_names[num_nodes], MPID_NEM_MAX_KEY_VAL_LEN);
+            MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_kvs_get", "**pmi_kvs_get %d", pmi_errno);
+	}
+        
 	if (!strncmp (MPID_nem_hostname, node_names[num_nodes], MPID_NEM_MAX_KEY_VAL_LEN)
 #if defined (ENABLED_ODD_EVEN_CLIQUES)
             /* Used for debugging on a single machine: Odd procs on a
@@ -569,10 +595,15 @@ int
 MPID_nem_vc_init (MPIDI_VC_t *vc, const char *business_card)
 {
     int mpi_errno = MPI_SUCCESS;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
+    MPIU_CHKPMEM_DECL(1);
     MPIDI_STATE_DECL (MPID_STATE_MPID_NEM_VC_INIT);
 
     MPIDI_FUNC_ENTER (MPID_STATE_MPID_NEM_VC_INIT);
-    vc->ch.send_seqno = 0;
+    vc_ch->send_seqno = 0;
+
+    vc_ch->pending_pkt_len = 0;
+    MPIU_CHKPMEM_MALLOC (vc_ch->pending_pkt, MPIDI_CH3_PktGeneric_t *, sizeof (MPIDI_CH3_PktGeneric_t), mpi_errno, "pending_pkt");
 
     /* We do different things for vcs in the COMM_WORLD pg vs other pgs
        COMM_WORLD vcs may use shared memory, and already have queues allocated
@@ -580,46 +611,115 @@ MPID_nem_vc_init (MPIDI_VC_t *vc, const char *business_card)
     if (vc->lpid < MPID_nem_mem_region.num_procs) 
     {
 	/* This vc is in COMM_WORLD */
-	vc->ch.is_local = MPID_NEM_IS_LOCAL (vc->lpid);
-	vc->ch.free_queue = MPID_nem_mem_region.FreeQ[vc->lpid]; /* networks and local procs have free queues */    
-        vc->ch.node_id = MPID_nem_mem_region.node_ids[vc->lpid];
+	vc_ch->is_local = MPID_NEM_IS_LOCAL (vc->lpid);
+	vc_ch->free_queue = MPID_nem_mem_region.FreeQ[vc->lpid]; /* networks and local procs have free queues */    
+        vc_ch->node_id = MPID_nem_mem_region.node_ids[vc->lpid];
     }
     else
     {
 	/* this vc is the result of a connect */
-	vc->ch.is_local = 0;
-	vc->ch.free_queue = net_free_queue;
-        vc->ch.node_id = -1; /* we're not using shared memory, so assume we're on our own node */
+	vc_ch->is_local = 0;
+	vc_ch->free_queue = net_free_queue;
+        vc_ch->node_id = -1; /* we're not using shared memory, so assume we're on our own node */
     }
     
-    if (vc->ch.is_local)
+    if (vc_ch->is_local)
     {
-	vc->ch.fbox_out = &MPID_nem_mem_region.mailboxes.out[MPID_nem_mem_region.local_ranks[vc->lpid]]->mpich2;
-	vc->ch.fbox_in = &MPID_nem_mem_region.mailboxes.in[MPID_nem_mem_region.local_ranks[vc->lpid]]->mpich2;
-	vc->ch.recv_queue = MPID_nem_mem_region.RecvQ[vc->lpid];
+	vc_ch->fbox_out = &MPID_nem_mem_region.mailboxes.out[MPID_nem_mem_region.local_ranks[vc->lpid]]->mpich2;
+	vc_ch->fbox_in = &MPID_nem_mem_region.mailboxes.in[MPID_nem_mem_region.local_ranks[vc->lpid]]->mpich2;
+	vc_ch->recv_queue = MPID_nem_mem_region.RecvQ[vc->lpid];
+
+        /* override nocontig send function */
+        vc->sendEagerNoncontig_fn = MPIDI_CH3I_SendEagerNoncontig;
+
+        /* local processes use the default method */
+        vc_ch->iStartContigMsg = NULL;
+        vc_ch->iSendContig     = NULL;
+        
+        vc_ch->lmt_initiate_lmt  = MPID_nem_lmt_shm_initiate_lmt;
+        vc_ch->lmt_start_recv    = MPID_nem_lmt_shm_start_recv;
+        vc_ch->lmt_start_send    = MPID_nem_lmt_shm_start_send;
+        vc_ch->lmt_handle_cookie = MPID_nem_lmt_shm_handle_cookie;
+        vc_ch->lmt_done_send     = MPID_nem_lmt_shm_done_send;
+        vc_ch->lmt_done_recv     = MPID_nem_lmt_shm_done_recv;
+
+        vc_ch->lmt_copy_buf        = NULL;
+        vc_ch->lmt_copy_buf_handle = NULL;
+        vc_ch->lmt_queue.head      = NULL;
+        vc_ch->lmt_queue.tail      = NULL;        
+        vc_ch->lmt_active_lmt      = NULL;
+        vc_ch->lmt_enqueued        = FALSE;
     }
     else
     {
-	vc->ch.fbox_out = NULL;
-	vc->ch.fbox_in = NULL;
-	vc->ch.recv_queue = NULL;
+	vc_ch->fbox_out   = NULL;
+	vc_ch->fbox_in    = NULL;
+	vc_ch->recv_queue = NULL;
 
-	mpi_errno = MPID_nem_net_module_vc_init (vc, business_card);
+        vc_ch->lmt_initiate_lmt  = NULL;
+        vc_ch->lmt_start_recv    = NULL;
+        vc_ch->lmt_start_send    = NULL;
+        vc_ch->lmt_handle_cookie = NULL;
+        vc_ch->lmt_done_send     = NULL;
+        vc_ch->lmt_done_recv     = NULL;
+
+        /* FIXME: DARIUS set these to default for now */
+        vc_ch->iStartContigMsg = NULL;
+        vc_ch->iSendContig     = NULL;
+        
+        mpi_errno = MPID_nem_net_module_vc_init (vc, business_card);
 	if (mpi_errno) MPIU_ERR_POP(mpi_errno);
+
+/* FIXME: DARIUS -- enable this assert once these functions are implemented */
+/*         /\* iStartContigMsg iSendContig and sendEagerNoncontig_fn must */
+/*            be set for nonlocal processes.  Default functions only */
+/*            support shared-memory communication. *\/ */
+/*         MPIU_Assert(vc_ch->iStartContigMsg && vc_ch->iSendContig && vc->sendEagerNoncontig_fn); */
+
     }
-    
+
+    /* override rendezvous functions */
+    vc->rndvSend_fn           = MPID_nem_lmt_RndvSend;
+    vc->rndvRecv_fn           = MPID_nem_lmt_RndvRecv;
+
     /* FIXME: ch3 assumes there is a field called sendq_head in the ch
        portion of the vc.  This is unused in nemesis and should be set
        to NULL */
-    vc->ch.sendq_head = NULL;
+    vc_ch->sendq_head = NULL;
     
- fn_exit:
+     MPIU_CHKPMEM_COMMIT();
+fn_exit:
     MPIDI_FUNC_EXIT (MPID_STATE_MPID_NEM_VC_INIT);
+    return mpi_errno;
+ fn_fail:
+    MPIU_CHKPMEM_REAP();
+    goto fn_exit;
+}
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_vc_destroy
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int
+MPID_nem_vc_destroy(MPIDI_VC_t *vc)
+{
+    int mpi_errno = MPI_SUCCESS;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
+    MPIDI_STATE_DECL (MPID_STATE_MPID_NEM_VC_DESTROY);
+
+    MPIDI_FUNC_ENTER (MPID_STATE_MPID_NEM_VC_DESTROY);
+
+    MPIU_Free(vc_ch->pending_pkt);
+
+    mpi_errno = MPID_nem_net_module_vc_destroy(vc);
+    if (mpi_errno) MPIU_ERR_POP(mpi_errno);
+
+    fn_exit:
+    MPIDI_FUNC_EXIT (MPID_STATE_MPID_NEM_VC_DESTROY);
     return mpi_errno;
  fn_fail:
     goto fn_exit;
 }
-
 
 int
 MPID_nem_get_business_card (int my_rank, char *value, int length)

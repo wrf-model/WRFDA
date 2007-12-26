@@ -19,9 +19,12 @@
 #endif
 
 #include "mpe_log.h"
+
 #if !defined( CLOG_NOMPI )
 #include "mpi.h"                /* Needed for PMPI routines */
-#endif
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
 
 #include "clog.h"
 #include "clog_const.h"
@@ -37,14 +40,12 @@
 #include "mpiprof.h"
 #endif
 
-extern CLOG_Uuid_t    CLOG_UUID_NULL;
+extern               CLOG_Uuid_t     CLOG_UUID_NULL;
 
 /* Global variables for MPE logging */
                     CLOG_Stream_t  *CLOG_Stream            = NULL;
                     CLOG_Buffer_t  *CLOG_Buffer            = NULL;
 MPEU_DLL_SPEC       CLOG_CommSet_t *CLOG_CommSet           = NULL;
-              const CLOG_CommIDs_t *CLOG_CommIDs4Self            ;
-MPEU_DLL_SPEC const CLOG_CommIDs_t *CLOG_CommIDs4World           ;
                     int             MPE_Log_hasBeenInit    = 0;
                     int             MPE_Log_hasBeenClosed  = 0;
 
@@ -67,35 +68,51 @@ MPEU_DLL_SPEC const CLOG_CommIDs_t *CLOG_CommIDs4World           ;
 @*/
 int MPE_Init_log( void )
 {
+#if !defined( CLOG_NOMPI )
+    int           flag;
+    PMPI_Initialized(&flag);
+    if (!flag) {
+        fprintf( stderr, __FILE__":MPE_Init_log() - **** WARNING ****!\n"
+                 "\tMPI_Init() has not been called before MPE_Init_log()!\n"
+                 "\tMPE logging will call MPI_Init() to get things going.\n"
+                 "\tHowever, you are see this message because you're likely\n"
+                 "\tmaking an error somewhere, e.g. link with wrong MPE\n"
+                 "\tlibrary or make incorrect sequence of MPE logging calls."
+                 "\tCheck MPE documentation or README for detailed info.\n" );
+        PMPI_Init( NULL, NULL );
+    }
+#else
+    /* Initialize Serial MPI implementation */
+    PMPI_Init( NULL, NULL );
+#endif
+
     if (!MPE_Log_hasBeenInit || MPE_Log_hasBeenClosed) {
         CLOG_Stream     = CLOG_Open();
         CLOG_Local_init( CLOG_Stream, NULL );
         CLOG_Buffer     = CLOG_Stream->buffer;
         CLOG_CommSet    = CLOG_Buffer->commset;
-#if !defined( CLOG_NOMPI )
-        CLOG_CommIDs4World  = CLOG_CommSet_get_IDs( CLOG_CommSet,
-                                                    MPI_COMM_WORLD );
-        MPE_Log_commIDs_intracomm( CLOG_CommIDs4World, 0,
+        MPE_Log_commIDs_intracomm( CLOG_CommSet->IDs4world, 0,
                                    CLOG_COMM_WORLD_CREATE,
-                                   CLOG_CommIDs4World );
-        CLOG_CommIDs4Self   = CLOG_CommSet_get_IDs( CLOG_CommSet,
-                                                    MPI_COMM_SELF );
-        MPE_Log_commIDs_intracomm( CLOG_CommIDs4World, 0,
+                                   CLOG_CommSet->IDs4world );
+        MPE_Log_commIDs_intracomm( CLOG_CommSet->IDs4world, 0,
                                    CLOG_COMM_SELF_CREATE,
-                                   CLOG_CommIDs4Self );
+                                   CLOG_CommSet->IDs4self );
+#if !defined( CLOG_NOMPI )
+        /*
+           Leave these on so the clog2 file can be distinguished
+           if real MPI(i.e. non serial-MPI) is used or not.
+        */
         if ( CLOG_Buffer->world_rank == 0 ) {
-            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommIDs4World, 0,
+            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommSet->IDs4world, 0,
                                        CLOG_EVT_CONST,
                                        MPI_PROC_NULL, "MPI_PROC_NULL" );
-            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommIDs4World, 0,
+            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommSet->IDs4world, 0,
                                        CLOG_EVT_CONST,
                                        MPI_ANY_SOURCE, "MPI_ANY_SOURCE" );
-            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommIDs4World, 0,
+            CLOG_Buffer_save_constdef( CLOG_Buffer, CLOG_CommSet->IDs4world, 0,
                                        CLOG_EVT_CONST,
                                        MPI_ANY_TAG, "MPI_ANY_TAG" );
         }
-#else
-        CLOG_CommIDs4World  = NULL;
 #endif
         MPE_Log_hasBeenInit = 1;        /* set MPE_Log as being initialized */
         MPE_Log_hasBeenClosed = 0;
@@ -148,13 +165,11 @@ int MPE_Log_commIDs_intracomm( const CLOG_CommIDs_t *commIDs, int local_thread,
                                int comm_etype,
                                const CLOG_CommIDs_t *intracommIDs )
 {
-#if !defined( CLOG_NOMPI )
     CLOG_Buffer_save_commevt( CLOG_Buffer, commIDs, local_thread, comm_etype,
                               intracommIDs->global_ID,
                               intracommIDs->local_ID,
                               intracommIDs->comm_rank,
                               intracommIDs->world_rank );
-#endif
     return MPE_LOG_OK;
 }
 
@@ -162,11 +177,9 @@ int MPE_Log_commIDs_intracomm( const CLOG_CommIDs_t *commIDs, int local_thread,
 int MPE_Log_commIDs_nullcomm( const CLOG_CommIDs_t *commIDs, int local_thread,
                               int comm_etype )
 {
-#if !defined( CLOG_NOMPI )
     CLOG_Buffer_save_commevt( CLOG_Buffer, commIDs, local_thread, comm_etype,
                               CLOG_UUID_NULL, CLOG_COMM_LID_NULL,
                               CLOG_COMM_RANK_NULL, CLOG_COMM_WRANK_NULL );
-#endif
     return MPE_LOG_OK;
 }
 
@@ -174,7 +187,6 @@ int MPE_Log_commIDs_intercomm( const CLOG_CommIDs_t *commIDs, int local_thread,
                                int comm_etype,
                                const CLOG_CommIDs_t *intercommIDs )
 {
-#if !defined( CLOG_NOMPI )
     CLOG_CommIDs_t *local_intracommIDs;
     CLOG_CommIDs_t *remote_intracommIDs;
 
@@ -201,7 +213,6 @@ int MPE_Log_commIDs_intercomm( const CLOG_CommIDs_t *commIDs, int local_thread,
                               remote_intracommIDs->local_ID,
                               remote_intracommIDs->comm_rank,
                               remote_intracommIDs->world_rank );
-#endif
     return MPE_LOG_OK;
 }
 
@@ -614,9 +625,7 @@ int MPE_Log_get_known_stateID( void )
 int MPE_Log_commIDs_send( const CLOG_CommIDs_t *commIDs, int local_thread,
                           int other_party, int tag, int size )
 {
-#if !defined( CLOG_NOMPI )
     if (other_party != MPI_PROC_NULL)
-#endif
         CLOG_Buffer_save_msgevt( CLOG_Buffer, commIDs, local_thread,
                                  CLOG_EVT_SENDMSG, tag, other_party, size );
     return MPE_LOG_OK;
@@ -655,16 +664,14 @@ int MPE_Log_comm_send( MPI_Comm comm, int local_thread,
 @*/
 int MPE_Log_send( int other_party, int tag, int size )
 {
-    return MPE_Log_commIDs_send( CLOG_CommIDs4World, 0,
+    return MPE_Log_commIDs_send( CLOG_CommSet->IDs4world, 0,
                                  other_party, tag, size );
 }
 
 int MPE_Log_commIDs_receive( const CLOG_CommIDs_t *commIDs, int local_thread,
                              int other_party, int tag, int size )
 {
-#if !defined( CLOG_NOMPI )
     if (other_party != MPI_PROC_NULL)
-#endif
         CLOG_Buffer_save_msgevt( CLOG_Buffer, commIDs, local_thread,
                                  CLOG_EVT_RECVMSG, tag, other_party, size );
     return MPE_LOG_OK;
@@ -701,7 +708,7 @@ int MPE_Log_comm_receive( MPI_Comm comm, int local_thread,
 @*/
 int MPE_Log_receive( int other_party, int tag, int size )
 {
-    return MPE_Log_commIDs_receive( CLOG_CommIDs4World, 0,
+    return MPE_Log_commIDs_receive( CLOG_CommSet->IDs4world, 0,
                                     other_party, tag, size );
 }
 
@@ -853,7 +860,7 @@ int MPE_Log_comm_event( MPI_Comm comm, int local_thread,
 @*/
 int MPE_Log_event( int event, int data, const char *bytebuf )
 {
-    return MPE_Log_commIDs_event( CLOG_CommIDs4World, 0, event, bytebuf );
+    return MPE_Log_commIDs_event( CLOG_CommSet->IDs4world, 0, event, bytebuf );
 }
 
 /*@
@@ -867,7 +874,7 @@ int MPE_Log_event( int event, int data, const char *bytebuf )
 @*/
 int MPE_Log_bare_event( int event )
 {
-    CLOG_Buffer_save_bareevt( CLOG_Buffer, CLOG_CommIDs4World, 0,
+    CLOG_Buffer_save_bareevt( CLOG_Buffer, CLOG_CommSet->IDs4world, 0,
                               event );
     return MPE_LOG_OK;
 }
@@ -885,7 +892,7 @@ int MPE_Log_bare_event( int event )
 @*/
 int MPE_Log_info_event( int event, const char *bytebuf )
 {
-    CLOG_Buffer_save_cargoevt( CLOG_Buffer, CLOG_CommIDs4World, 0,
+    CLOG_Buffer_save_cargoevt( CLOG_Buffer, CLOG_CommSet->IDs4world, 0,
                                event, bytebuf );
     return MPE_LOG_OK;
 }
@@ -916,12 +923,8 @@ int MPE_Log_sync_clocks( void )
 void MPE_Log_thread_sync( int local_thread_count )
 {
      int max_thread_count;
-#if !defined( CLOG_NOMPI )
      PMPI_Allreduce( &local_thread_count, &max_thread_count, 1, MPI_INT,
                      MPI_MAX, MPI_COMM_WORLD );
-#else
-     max_thread_count = local_thread_count;
-#endif
      CLOG_Stream->buffer->preamble->max_thread_count = max_thread_count;
 }
 
@@ -955,6 +958,7 @@ int MPE_Finish_log( const char *filename )
         */
         MPE_Stop_log();
 
+        /* Even every process reads MPE_LOGFILE_PREFIX, only rank=0 needs it */
         env_logfile_prefix = (char *) getenv( "MPE_LOGFILE_PREFIX" );
         if ( env_logfile_prefix != NULL )
             CLOG_Converge_init( CLOG_Stream, env_logfile_prefix );
@@ -979,6 +983,11 @@ int MPE_Finish_log( const char *filename )
 
         MPE_Log_hasBeenClosed = 1;
     }
+
+#if defined( CLOG_NOMPI )
+    /* Finalize the serial-MPI implementation */
+    PMPI_Finalize();
+#endif
     return MPE_LOG_OK;
 }
 

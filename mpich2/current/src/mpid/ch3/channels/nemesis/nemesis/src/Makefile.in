@@ -61,7 +61,8 @@ all-redirect: .libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a
 .libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a: mpid_nem_alloc.o \
 	mpid_nem_init.o mpid_nem_queue.o mpid_nem_barrier.o mpid_nem_mpich2.o \
 	mpid_nem_ckpt.o mpid_nem_mpich2_rma.o mpid_nem_finalize.o \
-	mpid_nem_network_poll.o mpid_nem_network.o mpid_nem_debug.o 
+	mpid_nem_network_poll.o mpid_nem_network.o mpid_nem_debug.o \
+	mpid_nem_lmt.o mpid_nem_lmt_shm.o 
 	${AR} cr ../../../../../../../lib/lib${MPILIBNAME}.a $?
 	${RANLIB} ../../../../../../../lib/lib${MPILIBNAME}.a
 	date > .libstamp0
@@ -69,7 +70,7 @@ all-redirect: .libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a
 	mpid_nem_init.lo mpid_nem_queue.lo mpid_nem_barrier.lo \
 	mpid_nem_mpich2.lo mpid_nem_ckpt.lo mpid_nem_mpich2_rma.lo \
 	mpid_nem_finalize.lo mpid_nem_network_poll.lo mpid_nem_network.lo \
-	mpid_nem_debug.lo 
+	mpid_nem_debug.lo mpid_nem_lmt.lo mpid_nem_lmt_shm.lo 
 	${AR} cr ../../../../../../../lib/lib${MPILIBNAME}.la $?
 	date > .libstamp1
 # --------------------------------------------------------------------------
@@ -78,7 +79,7 @@ all-redirect: .libstamp0 ../../../../../../../lib/lib${MPILIBNAME}.a
 SOURCES         =  mpid_nem_alloc.c mpid_nem_init.c mpid_nem_queue.c \
 	mpid_nem_barrier.c mpid_nem_mpich2.c mpid_nem_ckpt.c \
 	mpid_nem_mpich2_rma.c mpid_nem_finalize.c mpid_nem_network_poll.c \
-	mpid_nem_network.c mpid_nem_debug.c 
+	mpid_nem_network.c mpid_nem_debug.c mpid_nem_lmt.c mpid_nem_lmt_shm.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

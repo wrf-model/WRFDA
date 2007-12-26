@@ -96,6 +96,7 @@ was not started with MPI_GREQUEST_START
 **commperm:Cannot free permanent communicator
 **commperm %s:Cannot free permanent communicator %s
 **group:Invalid group
+**groupperm:Cannot free permanent group
 **groupnotincomm:Specified group is not within the communicator
 **groupnotincomm %d:Rank %d of the specified group is not a member of this communicator
 **commnotintra:An intracommunicator is required but an intercommunicator \
@@ -151,6 +152,16 @@ MPI_TYPECLASS_INTEGER, or MPI_TYPECLASS_COMPLEX
 **f90typetoomany:Too many requests for unnamed, predefined f90 types
 **f90typetoomany %s %d:Too many requests for unnamed, predefined f90 %s \
  types; no more than %d allowed.
+**f90typeintnone: No integer type with the requested range is available
+**f90typeintnone %d: No integer type with %d digits of range is avaiable
+**f90typerealnone: No real type with the requested range and/or precision \
+ is available
+**f90typerealnone %d %d: No real type with both %d digits of precision \
+ and an exponent range of %d is available
+**f90typecomplexnone: No complex type with the requested range and/or \
+ precision is available
+**f90typecomplexnone %d %d: No complex type with both %d digits of precision \
+ and an exponent range of %d is available
 #
 **noConnInfoToString:No ConnInfoToString routine defined for this process group
 #
@@ -161,6 +172,14 @@ MPI_TYPECLASS_INTEGER, or MPI_TYPECLASS_COMPLEX
  (only did first %d)
 **typeinitminmaxloc: Could not determine pointer for predefined minloc or \
  maxloc type.  Initialization of those names failed.
+
+**unableToLoadDLL: Unable to load a dynamically loadable library
+**unableToLoadDLL %s %s: Unable to load the dynamically loadable library %s \
+ for reason %s
+**unableToLoadDLLsym: Unable to find or load a symbol from a dynamically \
+ loadable library
+**unableToLoadDLLsym %s %s: Unable to find or load the symbol %s from a \
+ dynamically loaded library for reason %s
 
 # -- FIXME: Some (but not all) of the messages below this line have been used
 #---- The messages below this line haven't been used yet.
@@ -854,8 +873,40 @@ with MPI_Alloc_mem.
 **pthread_cancel %s:pthread_cancel failed (%s)
 **badportrange:MPICH_PORT_RANGE - invalid range specified
 **argstr_missingifname:Missing ifname or invalid host/port description in business card
-
 **pmi_kvs_get_parent %d:unable to get the PARENT_ROOT_PORT_NAME from the keyval space (pmi_error %d)
+**rtspkt:failure occurred while attempting to send RTS packet
+**ctspkt:failure occurred while attempting to send CTS packet
+**cookiepkt:failure occurred while attempting to send COOKIE packet
+**donepkt:failure occurred while attempting to send DONE packet
+**psm_module_connect:psm_module_connect failed
+**psm_module_connect %d: psm_module_connect failed (%d)
+**decode_buffer:decode_buffer failed
+**decode_buffer %d:decode_buffer failed (%d)
+**encode_buffer:decode_buffer failed
+**encode_buffer %d:decode_buffer failed (%d)
+**psm_close_endpoint:psm_close_endpiont failed
+**psm_close_endpoint %s:psm_close_endpiont failed (%s)
+**psm_ep_connect:psm_ep_connect failed
+**psm_ep_connect %s:psm_ep_connect failed (%s)
+**psm_ep_open:psm_ep_open failed
+**psm_ep_open %s:psm_ep_open failed (%s)
+**psm_finalize:psm_finalize failed
+**psm_finalize %s:psm_finalize failed (%s)
+**psm_init:psm_init failed
+**psm_init %s:psm_init failed (%s)
+**psm_irecv:psm_irecv failed
+**psm_irecv %s:psm_irecv failed (%s)
+**psm_isend:psm_isend failed
+**psm_isend %s:psm_isend failed (%s)
+**psm_mq_finalize:psm_mq_finalize failed
+**psm_mq_finalize %s:psm_mq_finalize failed (%s)
+**psm_mq_init:psm_mq_init failed
+**psm_mq_init %s:psm_mq_init failed (%s)
+**psm_test:psm_test failed
+**psm_test %s:psm_test failed (%s)
+**psm_wait:psm_wait failed
+**psm_wait %s:psm_wait failed (%s)
+
 
 #
 # mpi functions
@@ -1197,6 +1248,8 @@ with MPI_Alloc_mem.
 **mpi_grequest_complete %R:MPI_Grequest_complete(%R) failed
 **mpi_grequest_start:MPI_Grequest_start failed
 **mpi_grequest_start %p %p %p %p %p:MPI_Grequest_start(query_fn=%p, free_fn=%p, cancel_fn=%p, extra_state=%p, request=%p) failed
+**mpix_grequest_class_create: MPIX_Grequest_class_create failed
+**mpix_grequest_class_create %p %p %p %p %p:MPIX_Grequest_class_create(query_fn=%p, free_fn=%p, cancel_fn=%p, %poll_fn=%p, wait_fn=%p) failed
 **mpi_init_thread:MPI_Init_thread failed
 **mpi_init_thread %p %p %d %p:MPI_Init_thread(argc_p=%p, argv_p=%p, required=%d, provided=%p)
 **mpi_is_thread_main:MPI_Is_thread_main failed

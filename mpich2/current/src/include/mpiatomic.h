@@ -35,16 +35,12 @@
    __asm__ __volatile__ ( "xor %%eax,%%eax; lock; decl %0 ; setnz %%al"	\
                         : "=m" (*count_ptr) , "=a" (nzflag) :: "memory", "cc" )
 
-/* FIXME: %ebx cannot be used when shared libraries are built (the
-   register is reserved for the PIC code in gcc) */
-#define MPID_Atomic_fetch_and_incr(count_ptr_, count_old_)	\
-    __asm__ __volatile__ ("0: movl %0, %%eax;"			\
-			  "movl %%eax, %%ebx;"			\
-			  "incl %%ebx;"				\
-			  "lock; cmpxchgl %%ebx, %0;"		\
-			  "jnz 0b;"				\
-			  "movl %%eax, %1"			\
-			  : "+m" (*count_ptr_), "=q" (count_old_) :: "memory", "cc", "eax", "ebx")
+#define MPID_Atomic_fetch_and_incr(count_ptr_, count_old_) do {         \
+        (count_old_) = 1;                                               \
+        __asm__ __volatile__ ("lock ; xaddl %0,%1"                      \
+                              : "=r" (count_old_), "=m" (*count_ptr_)   \
+                              :  "0" (count_old_),  "m" (*count_ptr_)); \
+    } while (0)
 
 /* The Intel Pentium Pro has a bug that can result in out-of-order stores.  
    The rest of the Intel x86 processors perform writes

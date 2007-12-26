@@ -32,7 +32,7 @@ MPIU_Object_alloc_t MPID_Request_mem = {
 #define FUNCNAME MPID_Request_create
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-MPID_Request * MPID_Request_create()
+MPID_Request * MPID_Request_create(void)
 {
     MPID_Request * req;
     MPIDI_STATE_DECL(MPID_STATE_MPID_REQUEST_CREATE);
@@ -73,6 +73,7 @@ MPID_Request * MPID_Request_create()
 	req->status.cancelled	   = FALSE;
 	req->comm		   = NULL;
 	req->dev.datatype_ptr	   = NULL;
+	req->dev.segment_ptr	   = NULL;
 	/* Masks and flags for channel device state in an MPID_Request */
 	req->dev.state		   = 0;
 	req->dev.cancel_pending	   = FALSE;
@@ -84,8 +85,11 @@ MPID_Request * MPID_Request_create()
 	req->dev.lock_queue_entry  = NULL;
 	req->dev.dtype_info	   = NULL;
 	req->dev.dataloop	   = NULL;
+	req->dev.iov_offset        = 0;
+#if 0
 	req->dev.rdma_iov_count	   = 0;
 	req->dev.rdma_iov_offset   = 0;
+#endif
 #ifdef MPIDI_CH3_REQUEST_INIT
 	MPIDI_CH3_REQUEST_INIT(req);
 #endif
@@ -148,6 +152,10 @@ void MPIDI_CH3_Request_destroy(MPID_Request * req)
 	MPID_Datatype_release(req->dev.datatype_ptr);
     }
 
+    if (req->dev.segment_ptr != NULL) {
+	MPID_Segment_free(req->dev.segment_ptr);
+    }
+
     if (MPIDI_Request_get_srbuf_flag(req)) {
 	MPIDI_CH3U_SRBuf_free(req);
     }
@@ -191,7 +199,7 @@ int MPIDI_CH3U_Request_load_send_iov(MPID_Request * const sreq,
     MPIU_Assert(sreq->dev.segment_first < last);
     MPIU_Assert(last > 0);
     MPIU_Assert(*iov_n > 0 && *iov_n <= MPID_IOV_LIMIT);
-    MPID_Segment_pack_vector(&sreq->dev.segment, sreq->dev.segment_first, 
+    MPID_Segment_pack_vector(sreq->dev.segment_ptr, sreq->dev.segment_first, 
 			     &last, iov, iov_n);
     MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,(MPIU_DBG_FDEST,
     "post-pv: first=" MPIDI_MSG_SZ_FMT ", last=" MPIDI_MSG_SZ_FMT ", iov_n=%d",
@@ -234,7 +242,8 @@ int MPIDI_CH3U_Request_load_send_iov(MPID_Request * const sreq,
 
 	iov_data_copied = 0;
 	for (i = 0; i < *iov_n; i++) {
-	    memcpy((char*) sreq->dev.tmpbuf + iov_data_copied, iov[i].MPID_IOV_BUF, iov[i].MPID_IOV_LEN);
+	    memcpy((char*) sreq->dev.tmpbuf + iov_data_copied, 
+		   iov[i].MPID_IOV_BUF, iov[i].MPID_IOV_LEN);
 	    iov_data_copied += iov[i].MPID_IOV_LEN;
 	}
 	sreq->dev.segment_first = last;
@@ -245,8 +254,8 @@ int MPIDI_CH3U_Request_load_send_iov(MPID_Request * const sreq,
 	MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,(MPIU_DBG_FDEST,
                "pre-pack: first=" MPIDI_MSG_SZ_FMT ", last=" MPIDI_MSG_SZ_FMT,
 			  sreq->dev.segment_first, last));
-	MPID_Segment_pack(&sreq->dev.segment, sreq->dev.segment_first, &last, 
-			  (char*) sreq->dev.tmpbuf + iov_data_copied);
+	MPID_Segment_pack(sreq->dev.segment_ptr, sreq->dev.segment_first, 
+			  &last, (char*) sreq->dev.tmpbuf + iov_data_copied);
 	MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,(MPIU_DBG_FDEST,
               "post-pack: first=" MPIDI_MSG_SZ_FMT ", last=" MPIDI_MSG_SZ_FMT,
 			   sreq->dev.segment_first, last));
@@ -344,7 +353,8 @@ int MPIDI_CH3U_Request_load_recv_iov(MPID_Request * const rreq)
 			  rreq->dev.segment_first, last, rreq->dev.iov_count));
 	MPIU_Assert(rreq->dev.segment_first < last);
 	MPIU_Assert(last > 0);
-	MPID_Segment_unpack_vector(&rreq->dev.segment, rreq->dev.segment_first,
+	MPID_Segment_unpack_vector(rreq->dev.segment_ptr, 
+				   rreq->dev.segment_first,
 				   &last, rreq->dev.iov, &rreq->dev.iov_count);
 	MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,(MPIU_DBG_FDEST,
    "post-upv: first=" MPIDI_MSG_SZ_FMT ", last=" MPIDI_MSG_SZ_FMT ", iov_n=%d",
@@ -485,7 +495,7 @@ int MPIDI_CH3U_Request_unpack_srbuf(MPID_Request * rreq)
 	tmpbuf_last = (int)rreq->dev.segment_size;
     }
     last = tmpbuf_last;
-    MPID_Segment_unpack(&rreq->dev.segment, rreq->dev.segment_first, 
+    MPID_Segment_unpack(rreq->dev.segment_ptr, rreq->dev.segment_first, 
 			&last, rreq->dev.tmpbuf);
     if (last == 0 || last == rreq->dev.segment_first)
     {

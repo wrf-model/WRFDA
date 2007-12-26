@@ -23,71 +23,71 @@ C
        pbufsize = 1000 * intsize
 
        call mpi_pack_external_size( 'external32', 10, MPI_INTEGER, 
-     &                              asize, ierr ) 
-       if (asize .ne. 10 * 4) then
+     &                              aint, ierr ) 
+       if (aint .ne. 10 * 4) then
           errs = errs + 1
           print *, 'Expected 40 for size of 10 external32 integers',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        call mpi_pack_external_size( 'external32', 10, MPI_LOGICAL, 
-     &                              asize, ierr ) 
-       if (asize .ne. 10 * 4) then
+     &                              aint, ierr ) 
+       if (aint .ne. 10 * 4) then
           errs = errs + 1
           print *, 'Expected 40 for size of 10 external32 logicals',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        call mpi_pack_external_size( 'external32', 10, MPI_CHARACTER, 
-     &                              asize, ierr ) 
-       if (asize .ne. 10 * 1) then
+     &                              aint, ierr ) 
+       if (aint .ne. 10 * 1) then
           errs = errs + 1
           print *, 'Expected 10 for size of 10 external32 characters',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        
        call mpi_pack_external_size( 'external32', 3, MPI_INTEGER2,
-     &                              asize, ierr )
-       if (asize .ne. 3 * 2) then
+     &                              aint, ierr )
+       if (aint .ne. 3 * 2) then
           errs = errs + 1
           print *, 'Expected 6 for size of 3 external32 INTEGER*2',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        call mpi_pack_external_size( 'external32', 3, MPI_INTEGER4,
-     &                              asize, ierr )
-       if (asize .ne. 3 * 4) then
+     &                              aint, ierr )
+       if (aint .ne. 3 * 4) then
           errs = errs + 1
           print *, 'Expected 12 for size of 3 external32 INTEGER*4',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        call mpi_pack_external_size( 'external32', 3, MPI_REAL4,
-     &                              asize, ierr )
-       if (asize .ne. 3 * 4) then
+     &                              aint, ierr )
+       if (aint .ne. 3 * 4) then
           errs = errs + 1
           print *, 'Expected 12 for size of 3 external32 REAL*4',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        call mpi_pack_external_size( 'external32', 3, MPI_REAL8,
-     &                              asize, ierr )
-       if (asize .ne. 3 * 8) then
+     &                              aint, ierr )
+       if (aint .ne. 3 * 8) then
           errs = errs + 1
           print *, 'Expected 24 for size of 3 external32 REAL*8',
-     &       ', got ', asize
+     &       ', got ', aint
        endif
        if (MPI_INTEGER1 .ne. MPI_DATATYPE_NULL) then
           call mpi_pack_external_size( 'external32', 3, MPI_INTEGER1,
-     &                              asize, ierr )
-          if (asize .ne. 3 * 1) then
+     &                              aint, ierr )
+          if (aint .ne. 3 * 1) then
              errs = errs + 1
              print *, 'Expected 3 for size of 3 external32 INTEGER*1',
-     &            ', got ', asize
+     &            ', got ', aint
           endif
        endif
        if (MPI_INTEGER8 .ne. MPI_DATATYPE_NULL) then
           call mpi_pack_external_size( 'external32', 3, MPI_INTEGER8,
-     &                              asize, ierr )
-          if (asize .ne. 3 * 8) then
+     &                              aint, ierr )
+          if (aint .ne. 3 * 8) then
              errs = errs + 1
              print *, 'Expected 24 for size of 3 external32 INTEGER*8',
-     &            ', got ', asize
+     &            ', got ', aint
           endif
        endif
 
@@ -109,30 +109,30 @@ C
           inbuf2(i) = 5000-i
        enddo
 C
-       asizev(1) = pbufsize
-       asizev(2) = 0
+       aintv(1) = pbufsize
+       aintv(2) = 0
        call mpi_pack_external( 'external32', inbuf, insize, MPI_INTEGER,
-     &               packbuf, asizev(1), asizev(2), ierr )
+     &               packbuf, aintv(1), aintv(2), ierr )
        call mpi_pack_external( 'external32', rbuf, rsize, 
-     &               MPI_DOUBLE_PRECISION, packbuf, asizev(1), 
-     &               asizev(2), ierr )
+     &               MPI_DOUBLE_PRECISION, packbuf, aintv(1), 
+     &               aintv(2), ierr )
        call mpi_pack_external( 'external32', cbuf, csize, 
-     &               MPI_CHARACTER, packbuf, asizev(1), 
-     &               asizev(2), ierr )
+     &               MPI_CHARACTER, packbuf, aintv(1), 
+     &               aintv(2), ierr )
        call mpi_pack_external( 'external32', inbuf2, insize2, 
      &               MPI_INTEGER,
-     &               packbuf, asizev(1), asizev(2), ierr )
+     &               packbuf, aintv(1), aintv(2), ierr )
 C
 C We could try sending this with MPI_BYTE...
-       asizev(2) = 0
-       call mpi_unpack_external( 'external32', packbuf, asizev(1),
-     &  asizev(2), ioutbuf, insize, MPI_INTEGER, ierr )
-       call mpi_unpack_external( 'external32', packbuf, asizev(1),
-     &  asizev(2), routbuf, rsize, MPI_DOUBLE_PRECISION, ierr )
-       call mpi_unpack_external( 'external32', packbuf, asizev(1),
-     &  asizev(2), coutbuf, csize, MPI_CHARACTER, ierr )
-       call mpi_unpack_external( 'external32', packbuf, asizev(1),
-     &  asizev(2), ioutbuf2, insize2, MPI_INTEGER, ierr )
+       aintv(2) = 0
+       call mpi_unpack_external( 'external32', packbuf, aintv(1),
+     &  aintv(2), ioutbuf, insize, MPI_INTEGER, ierr )
+       call mpi_unpack_external( 'external32', packbuf, aintv(1),
+     &  aintv(2), routbuf, rsize, MPI_DOUBLE_PRECISION, ierr )
+       call mpi_unpack_external( 'external32', packbuf, aintv(1),
+     &  aintv(2), coutbuf, csize, MPI_CHARACTER, ierr )
+       call mpi_unpack_external( 'external32', packbuf, aintv(1),
+     &  aintv(2), ioutbuf2, insize2, MPI_INTEGER, ierr )
 C
 C Now, test the values
 C

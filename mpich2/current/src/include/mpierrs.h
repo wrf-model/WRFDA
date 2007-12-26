@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: mpierrs.h,v 1.37 2006/11/05 16:29:06 gropp Exp $
+/*  $Id: mpierrs.h,v 1.38 2007/01/03 16:43:26 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -379,8 +379,16 @@
 
 /* If you add any macros to this list, make sure that you update
  maint/extracterrmsgs to handle the additional macros (see the hash 
- KnownErrRoutines in that script) */
+ KnownErrRoutines in that script) 
+ ERR_SETSIMPLE is like ERR_SET except that it just sets the error, it 
+ doesn't add it to an existing error.  This is appropriate in cases
+ where there can be no pre-existing error, and MPI_SUCCESS is needed for the
+ first argument to MPIR_Err_create_code .
+*/
 #ifdef HAVE_ERROR_CHECKING
+#define MPIU_ERR_SETSIMPLE(err_,class_,msg_)	\
+    err_ = MPIR_Err_create_code( MPI_SUCCESS,MPIR_ERR_RECOVERABLE,FCNAME,\
+           __LINE__, class_, msg_, 0 )
 #define MPIU_ERR_SET(err_,class_,msg_) \
     err_ = MPIR_Err_create_code( err_,MPIR_ERR_RECOVERABLE,FCNAME,\
            __LINE__, class_, msg_, 0 )
@@ -424,7 +432,9 @@
     {(err_) = MPIR_Err_combine_codes((newerr_), (err_));}
 #else
 /* Simply set the class, being careful not to override a previously
-   set class */
+   set class. */
+#define MPIU_ERR_SETSIMPLE(err_,class_,msg_)	\
+    {err_ = class_;}
 #define MPIU_ERR_SET(err_,class_,msg_) \
      {if (!err_){err_=class_;}}
 #define MPIU_ERR_SET1(err_,class_,gmsg_,smsg_,arg1_) \

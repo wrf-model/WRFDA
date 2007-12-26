@@ -370,7 +370,7 @@ int MPIE_ConnectToPort( char *hostname, int portnum )
     }
     
     memset( (void *)&sa, 0, sizeof(sa) );
-    /* POSIX might define h_addr_list only and node define h_addr */
+    /* POSIX might define h_addr_list only and not define h_addr */
 #ifdef HAVE_H_ADDR_LIST
     memcpy( (void *)&sa.sin_addr, (void *)hp->h_addr_list[0], hp->h_length);
 #else

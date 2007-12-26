@@ -79,37 +79,39 @@ public class LegendTable extends JTable
         JPopupMenu         pop_menu;
         MouseAdapter       handler;
         Color              bg_color;
-        Class              class_type;
         int                column_count;
 
         column_count  = table_model.getColumnCount();
         for ( int icol = 0; icol < column_count; icol++ ) {
             column     = column_model.getColumn( icol );
             renderer   = column.getHeaderRenderer();
-            class_type = table_model.getColumnClass( icol );
-            if ( class_type == Boolean.class ) {
+            if ( icol != LegendTableModel.ICON_COLUMN ) {
                 renderer = new GenericHeaderRenderer( this, icol );
                 ((GenericHeaderRenderer) renderer).initPressablePullDownTab();
                 column.setHeaderRenderer( renderer );
 
-                pop_menu = new OperationBooleanMenu( this, icol );
+                switch ( icol ) {
+                    case LegendTableModel.NAME_COLUMN :
+                        pop_menu = new OperationStringMenu( this, icol );
+                        break;
+                    case LegendTableModel.VISIBILITY_COLUMN :
+                    case LegendTableModel.SEARCHABILITY_COLUMN :
+                        pop_menu = new OperationBooleanMenu( this, icol );
+                        break;
+                    case LegendTableModel.COUNT_COLUMN :
+                    case LegendTableModel.INCL_RATIO_COLUMN :
+                    case LegendTableModel.EXCL_RATIO_COLUMN :
+                        pop_menu = new OperationNumberMenu( this, icol );
+                        break;
+                    default:
+                        pop_menu = null;
+                }
                 handler  = new TableHeaderHandler( this, icol, pop_menu );
                 table_header.addMouseListener( handler );
                 handler  = new TableColumnHandler( this, icol, pop_menu );
                 this.addMouseListener( handler );
             }
-            if ( class_type == String.class ) {
-                renderer = new GenericHeaderRenderer( this, icol );
-                ((GenericHeaderRenderer) renderer).initPressablePullDownTab();
-                column.setHeaderRenderer( renderer );
-
-                pop_menu = new OperationStringMenu( this, icol );
-                handler  = new TableHeaderHandler( this, icol, pop_menu );
-                table_header.addMouseListener( handler );
-                handler  = new TableColumnHandler( this, icol, pop_menu );
-                this.addMouseListener( handler );
-            }
-            else if ( renderer == null ) {
+            if ( renderer == null ) {
                 renderer = new GenericHeaderRenderer( this, icol );
                 column.setHeaderRenderer( renderer );
             }
@@ -158,7 +160,7 @@ public class LegendTable extends JTable
                 renderer = super.getDefaultRenderer(
                                  table_model.getColumnClass( icol ) );
             component   = renderer.getTableCellRendererComponent( this,
-                                   table_model.getColumnTypicalValue( icol ),
+                                   table_model.getColumnMaxValue( icol ),
                                    false, false, 0, icol );
             cell_size   = component.getPreferredSize();
             // cell_insets = ( (JComponent) component ).getInsets();
@@ -175,13 +177,17 @@ public class LegendTable extends JTable
             System.out.println( "\t header_width = " + header_width
                               + ", cell_width = " + cell_width );
             */
+            //  Limit vport_width increment so only first few columns before
+            //  COUNT_COLUMN visible when the Legend Window first shows up.
             if ( cell_width > header_width ) {
                 column.setPreferredWidth( cell_width );
-                vport_width  += cell_width;
+                if ( icol < LegendTableModel.COUNT_COLUMN )
+                    vport_width  += cell_width;
             }
             else {
                 column.setPreferredWidth( header_width );
-                vport_width  += header_width;
+                if ( icol < LegendTableModel.COUNT_COLUMN )
+                    vport_width  += header_width;
             }
             cell_height   = cell_size.height
                           + cell_insets.top + cell_insets.bottom;

@@ -9,6 +9,7 @@ Makefile
 singjoin
 testconnect
 manyconnect
+dimsbalanced
 test-port
 .deps
 *ebug

@@ -22,10 +22,30 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
     int mpi_errno = MPI_SUCCESS;
     int again = 0;
     int j;
-    
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;    
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_ISENDV);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_ISENDV);
+
+    if (vc_ch->iSendContig)
+    {
+        MPIU_Assert(n_iov > 0);
+        switch (n_iov)
+        {
+        case 1:
+            mpi_errno = vc_ch->iSendContig(vc, sreq, iov[0].MPID_IOV_BUF, iov[0].MPID_IOV_LEN, NULL, 0);
+            break;
+        case 2:
+            mpi_errno = vc_ch->iSendContig(vc, sreq, iov[0].MPID_IOV_BUF, iov[0].MPID_IOV_LEN, iov[1].MPID_IOV_BUF, iov[1].MPID_IOV_LEN);
+            break;
+        default:
+            mpi_errno = MPID_nem_send_iov(vc, &sreq, iov, n_iov);
+            break;
+        }
+        goto fn_exit;
+    }
+
+    /*MPIU_Assert(vc_ch->is_local); */
     MPIU_Assert(n_iov <= MPID_IOV_LIMIT);
     MPIU_Assert(iov[0].MPID_IOV_LEN <= sizeof(MPIDI_CH3_Pkt_t));
 
@@ -54,8 +74,9 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
 	    if (remaining_iov == iov)
 	    {
 		/* header was not sent */
-		sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) iov[0].MPID_IOV_BUF;
-		sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->ch.pkt;
+		sreq->dev.pending_pkt = 
+		    *(MPIDI_CH3_PktGeneric_t *) iov[0].MPID_IOV_BUF;
+		sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->dev.pending_pkt;
 		sreq->dev.iov[0].MPID_IOV_LEN = iov[0].MPID_IOV_LEN;
 	    }
 	    else
@@ -67,8 +88,9 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
 	    {
 		sreq->dev.iov[j] = remaining_iov[j];
 	    }
-	    sreq->ch.iov_offset = 0;
+	    sreq->dev.iov_offset = 0;
 	    sreq->dev.iov_count = remaining_n_iov;
+            sreq->ch.noncontig = FALSE;
 	    sreq->ch.vc = vc;
 	    MPIDI_CH3I_SendQ_enqueue (sreq, CH3_NORMAL_QUEUE);
 	    MPIU_Assert (MPIDI_CH3I_active_send[CH3_NORMAL_QUEUE] == NULL);
@@ -94,7 +116,8 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
 
                 if (!complete)
                 {
-                    sreq->ch.iov_offset = 0;
+                    sreq->dev.iov_offset = 0;
+                    sreq->ch.noncontig = FALSE;
                     sreq->ch.vc = vc;
                     MPIDI_CH3I_SendQ_enqueue (sreq, CH3_NORMAL_QUEUE);
                     MPIU_Assert (MPIDI_CH3I_active_send[CH3_NORMAL_QUEUE] == NULL);
@@ -113,8 +136,8 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
 	
 	MPIDI_DBG_PRINTF((55, FCNAME, "enqueuing"));
 	
-	sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) iov[0].MPID_IOV_BUF;
-	sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->ch.pkt;
+	sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) iov[0].MPID_IOV_BUF;
+	sreq->dev.iov[0].MPID_IOV_BUF = (char *) &sreq->dev.pending_pkt;
 	sreq->dev.iov[0].MPID_IOV_LEN = iov[0].MPID_IOV_LEN;
 
 	for (i = 1; i < n_iov; i++)
@@ -123,7 +146,8 @@ int MPIDI_CH3_iSendv (MPIDI_VC_t *vc, MPID_Request *sreq, MPID_IOV *iov, int n_i
 	}
 
 	sreq->dev.iov_count = n_iov;
-	sreq->ch.iov_offset = 0;
+	sreq->dev.iov_offset = 0;
+        sreq->ch.noncontig = FALSE;
 	sreq->ch.vc = vc;
 	MPIDI_CH3I_SendQ_enqueue (sreq, CH3_NORMAL_QUEUE);
     }

@@ -32,8 +32,8 @@ INCLUDES = -I../../include -I${top_srcdir}/include
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean: 
-	-@rm -f *.o ${srcdir}/*.o cfree
-	-@rm -f cfree.exe
+	-@rm -f *.o ${srcdir}/*.o userdup cfree
+	-@rm -f userdup.exe cfree.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -47,14 +47,16 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: cfree
+all-redirect: cfree userdup
 
+userdup: userdup.o   @MPILIBLOC@ ../../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o userdup userdup.o  ${LIBS}
 cfree: cfree.o   @MPILIBLOC@ ../../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o cfree cfree.o  ${LIBS}
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  cfree.c
+SOURCES         =  cfree.c userdup.c
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

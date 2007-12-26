@@ -112,9 +112,9 @@ int main( int argc, char *argv[] )
 	    }
 	}
 	MPI_Barrier( comm );
-	do {
+	while (!tflag) {
 	    MPI_Testall( 2, r, &tflag, s );
-	} while (!tflag);
+	}
 	MPI_Test_cancelled( &s[0], &flag );
 	if (!flag) {
 	    errs++;

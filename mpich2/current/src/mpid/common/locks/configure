@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="configure.in"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP AR RANLIB MPILIBNAME CC_SHL C_LINK_SHL LIBTOOL ENABLE_SHLIB master_top_srcdir MAKE_DEPEND_C LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAKE VPATH SET_CFLAGS SET_MAKE AR RANLIB CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP MPILIBNAME CC_SHL C_LINK_SHL LIBTOOL ENABLE_SHLIB SHLIB_EXT master_top_srcdir ETAGS ETAGSADD MAKE_DEPEND_C LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -900,7 +900,7 @@ esac
     else
       echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2
     fi
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 
@@ -1435,6 +1435,355 @@ echo "$as_me: error: You cannot do a VPATH build if the source directory has bee
     fi
 fi
 rm -f conftest*
+
+
+
+true
+if test "X$MAKE" = "X" ; then
+   for ac_prog in make gnumake nmake pmake smake
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_MAKE+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$MAKE"; then
+  ac_cv_prog_MAKE="$MAKE" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_MAKE="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+MAKE=$ac_cv_prog_MAKE
+if test -n "$MAKE"; then
+  echo "$as_me:$LINENO: result: $MAKE" >&5
+echo "${ECHO_T}$MAKE" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$MAKE" && break
+done
+
+fi
+
+
+echo "$as_me:$LINENO: checking whether clock skew breaks make" >&5
+echo $ECHO_N "checking whether clock skew breaks make... $ECHO_C" >&6
+if test "${pac_cv_prog_make_found_clock_skew+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+rm -f conftest*
+cat > conftest <<EOF
+ALL:
+	@-echo "success"
+EOF
+$MAKE -f conftest > conftest.out 2>&1
+if grep -i skew conftest >/dev/null 2>&1 ; then
+    pac_cv_prog_make_found_clock_skew=yes
+else
+    pac_cv_prog_make_found_clock_skew=no
+fi
+rm -f conftest*
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_make_found_clock_skew" >&5
+echo "${ECHO_T}$pac_cv_prog_make_found_clock_skew" >&6
+if test "$pac_cv_prog_make_found_clock_skew" = "yes" ; then
+    { echo "$as_me:$LINENO: WARNING: Clock skew found by make.  The configure and build may fail.
+Consider building in a local instead of NFS filesystem." >&5
+echo "$as_me: WARNING: Clock skew found by make.  The configure and build may fail.
+Consider building in a local instead of NFS filesystem." >&2;}
+fi
+
+
+echo "$as_me:$LINENO: checking whether make supports include" >&5
+echo $ECHO_N "checking whether make supports include... $ECHO_C" >&6
+if test "${pac_cv_prog_make_include+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+rm -f conftest
+cat > conftest <<.
+ALL:
+	@echo "success"
+.
+cat > conftest1 <<.
+include conftest
+.
+pac_str=`$MAKE -f conftest1 2>&1`
+rm -f conftest conftest1
+if test "$pac_str" != "success" ; then
+    pac_cv_prog_make_include="no"
+else
+    pac_cv_prog_make_include="yes"
+fi
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_make_include" >&5
+echo "${ECHO_T}$pac_cv_prog_make_include" >&6
+if test "$pac_cv_prog_make_include" = "no" ; then
+    :
+else
+    :
+fi
+
+
+echo "$as_me:$LINENO: checking whether make allows comments in actions" >&5
+echo $ECHO_N "checking whether make allows comments in actions... $ECHO_C" >&6
+if test "${pac_cv_prog_make_allows_comments+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+rm -f conftest
+cat > conftest <<.
+SHELL=/bin/sh
+ALL:
+	@# This is a valid comment!
+	@echo "success"
+.
+pac_str=`$MAKE -f conftest 2>&1`
+rm -f conftest
+if test "$pac_str" != "success" ; then
+    pac_cv_prog_make_allows_comments="no"
+else
+    pac_cv_prog_make_allows_comments="yes"
+fi
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_make_allows_comments" >&5
+echo "${ECHO_T}$pac_cv_prog_make_allows_comments" >&6
+if test "$pac_cv_prog_make_allows_comments" = "no" ; then
+    { echo "$as_me:$LINENO: WARNING: Your make does not allow comments in target code.
+Using this make may cause problems when building programs.
+You should consider using gnumake instead." >&5
+echo "$as_me: WARNING: Your make does not allow comments in target code.
+Using this make may cause problems when building programs.
+You should consider using gnumake instead." >&2;}
+
+fi
+
+
+
+echo "$as_me:$LINENO: checking for virtual path format" >&5
+echo $ECHO_N "checking for virtual path format... $ECHO_C" >&6
+if test "${pac_cv_prog_make_vpath+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+rm -rf conftest*
+mkdir conftestdir
+cat >conftestdir/a.c <<EOF
+A sample file
+EOF
+cat > conftest <<EOF
+all: a.o
+VPATH=.:conftestdir
+.c.o:
+	@echo \$<
+EOF
+ac_out=`$MAKE -f conftest 2>&1 | grep 'conftestdir/a.c'`
+if test -n "$ac_out" ; then
+    pac_cv_prog_make_vpath="VPATH"
+else
+    rm -f conftest
+    cat > conftest <<EOF
+all: a.o
+.PATH: . conftestdir
+.c.o:
+	@echo \$<
+EOF
+    ac_out=`$MAKE -f conftest 2>&1 | grep 'conftestdir/a.c'`
+    if test -n "$ac_out" ; then
+        pac_cv_prog_make_vpath=".PATH"
+    else
+	pac_cv_prog_make_vpath="neither VPATH nor .PATH works"
+    fi
+fi
+rm -rf conftest*
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_make_vpath" >&5
+echo "${ECHO_T}$pac_cv_prog_make_vpath" >&6
+if test "$pac_cv_prog_make_vpath" = "VPATH" ; then
+    VPATH='VPATH=.:${srcdir}'
+elif test "$pac_cv_prog_make_vpath" = ".PATH" ; then
+    VPATH='.PATH: . ${srcdir}'
+fi
+
+
+
+echo "$as_me:$LINENO: checking whether make sets CFLAGS" >&5
+echo $ECHO_N "checking whether make sets CFLAGS... $ECHO_C" >&6
+if test "${pac_cv_prog_make_set_cflags+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+rm -f conftest
+cat > conftest <<EOF
+SHELL=/bin/sh
+ALL:
+	@echo X\${CFLAGS}X
+EOF
+pac_str=`$MAKE -f conftest 2>&1`
+rm -f conftest
+if test "$pac_str" = "XX" ; then
+    pac_cv_prog_make_set_cflags="no"
+else
+    pac_cv_prog_make_set_cflags="yes"
+fi
+
+fi
+echo "$as_me:$LINENO: result: $pac_cv_prog_make_set_cflags" >&5
+echo "${ECHO_T}$pac_cv_prog_make_set_cflags" >&6
+if test "$pac_cv_prog_make_set_cflags" = "no" ; then
+    :
+else
+    SET_CFLAGS='CFLAGS='
+fi
+
+if test "$pac_cv_prog_make_echos_dir" = "no" ; then
+    echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \$(MAKE)" >&5
+echo $ECHO_N "checking whether ${MAKE-make} sets \$(MAKE)... $ECHO_C" >&6
+set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y,:./+-,___p_,'`
+if eval "test \"\${ac_cv_prog_make_${ac_make}_set+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.make <<\_ACEOF
+all:
+	@echo 'ac_maketemp="$(MAKE)"'
+_ACEOF
+# GNU make sometimes prints "make[1]: Entering...", which would confuse us.
+eval `${MAKE-make} -f conftest.make 2>/dev/null | grep temp=`
+if test -n "$ac_maketemp"; then
+  eval ac_cv_prog_make_${ac_make}_set=yes
+else
+  eval ac_cv_prog_make_${ac_make}_set=no
+fi
+rm -f conftest.make
+fi
+if eval "test \"`echo '$ac_cv_prog_make_'${ac_make}_set`\" = yes"; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+  SET_MAKE=
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+  SET_MAKE="MAKE=${MAKE-make}"
+fi
+
+else
+    SET_MAKE="MAKE=${MAKE-make}"
+fi
+
+for ac_prog in ar
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_AR+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$AR"; then
+  ac_cv_prog_AR="$AR" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_AR="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+AR=$ac_cv_prog_AR
+if test -n "$AR"; then
+  echo "$as_me:$LINENO: result: $AR" >&5
+echo "${ECHO_T}$AR" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$AR" && break
+done
+
+if test -z "$AR" ; then
+    { { echo "$as_me:$LINENO: error: The program ar is required for building MPICH2.  Make sure that your path includes ar" >&5
+echo "$as_me: error: The program ar is required for building MPICH2.  Make sure that your path includes ar" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+# Note that we set RANLIB to true if we don't find it (some systems neither
+# need it nor provide it)
+for ac_prog in ranlib
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_RANLIB+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$RANLIB"; then
+  ac_cv_prog_RANLIB="$RANLIB" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_RANLIB="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+RANLIB=$ac_cv_prog_RANLIB
+if test -n "$RANLIB"; then
+  echo "$as_me:$LINENO: result: $RANLIB" >&5
+echo "${ECHO_T}$RANLIB" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$RANLIB" && break
+done
+test -n "$RANLIB" || RANLIB="true"
 
 
 ac_ext=c
@@ -2005,8 +2354,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2064,8 +2412,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2181,8 +2528,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2236,8 +2582,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2282,8 +2627,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2327,8 +2671,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2441,8 +2784,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2544,8 +2886,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2647,8 +2988,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2966,7 +3306,7 @@ fi
 # If cpp failed, see if the compiler accepts the header.
 if test "$pac_found_header" != "yes" ; then
     cat >conftest.c<<EOF
-#line 2969 "configure"
+#line 3309 "configure"
 #include "confdefs.h"
 #include <$ac_header>
 int conftest() {return 0;}
@@ -3016,10 +3356,12 @@ _ACEOF
     # always reach all of the necessary files (I saw failures in ch3_progress.c
     # where the inline file was not in the Makefile) and (a) adds the inline
     # where it should not be, such as in mpicc.
-    { { echo "$as_me:$LINENO: error: Use of inline process locks is not supported.  Please volunteer to fix this code" >&5
-echo "$as_me: error: Use of inline process locks is not supported.  Please volunteer to fix this code" >&2;}
-   { (exit 1); exit 1; }; }
+    CFLAGS="$CFLAGS $LOCKCFLAGS"
 fi
+
+# Add the MPICH2 include flags to CPPFLAGS.
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
+
 
 
 
@@ -3040,6 +3382,10 @@ echo "$as_me: WARNING: libtool selected for shared library support but LIBTOOL i
 	fi
 
 
+
+
+export ETAGS
+export ETAGSADD
 
 
           ac_config_files="$ac_config_files Makefile"
@@ -3653,6 +3999,12 @@ s,@ECHO_C@,$ECHO_C,;t t
 s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
+s,@MAKE@,$MAKE,;t t
+s,@VPATH@,$VPATH,;t t
+s,@SET_CFLAGS@,$SET_CFLAGS,;t t
+s,@SET_MAKE@,$SET_MAKE,;t t
+s,@AR@,$AR,;t t
+s,@RANLIB@,$RANLIB,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
@@ -3661,14 +4013,15 @@ s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
-s,@AR@,$AR,;t t
-s,@RANLIB@,$RANLIB,;t t
 s,@MPILIBNAME@,$MPILIBNAME,;t t
 s,@CC_SHL@,$CC_SHL,;t t
 s,@C_LINK_SHL@,$C_LINK_SHL,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@ENABLE_SHLIB@,$ENABLE_SHLIB,;t t
+s,@SHLIB_EXT@,$SHLIB_EXT,;t t
 s,@master_top_srcdir@,$master_top_srcdir,;t t
+s,@ETAGS@,$ETAGS,;t t
+s,@ETAGSADD@,$ETAGSADD,;t t
 s,@MAKE_DEPEND_C@,$MAKE_DEPEND_C,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
@@ -3834,11 +4187,6 @@ esac
 
 
 
-  if test x"$ac_file" != x-; then
-    { echo "$as_me:$LINENO: creating $ac_file" >&5
-echo "$as_me: creating $ac_file" >&6;}
-    rm -f "$ac_file"
-  fi
   # Let's still pretend it is `configure' which instantiates (i.e., don't
   # use $as_me), people would be surprised to read:
   #    /* config.h.  Generated by config.status.  */
@@ -3877,6 +4225,12 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
 	 fi;;
       esac
     done` || { (exit 1); exit 1; }
+
+  if test x"$ac_file" != x-; then
+    { echo "$as_me:$LINENO: creating $ac_file" >&5
+echo "$as_me: creating $ac_file" >&6;}
+    rm -f "$ac_file"
+  fi
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF
   sed "$ac_vpsub

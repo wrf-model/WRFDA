@@ -263,6 +263,14 @@ echo '**** Testing noncontig_coll2.c ****'
 $mpirun -np 4 ./noncontig_coll2 -fname $FILENAME
 # CheckOutput noncontig_coll2
 CleanExe noncontig_coll2
+echo '**** Testing aggregation1 ****'
+$mpirun -np 4 ./aggregation1 -h -fname $FILENAME
+# CheckOutput aggregation1
+CleanExe aggregation1
+echo '**** Testing aggregation2 ****'
+$mpirun -np 4 ./aggregation2 $FILENAME
+# CheckOutput aggregation2
+CleanExe aggregation2
 #
 OutTime
 if [ $subset_only -eq 0 ] ; then 

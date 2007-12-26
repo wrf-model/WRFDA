@@ -6,10 +6,16 @@
 #ifndef MPIDU_PROCESS_LOCKS_H
 #define MPIDU_PROCESS_LOCKS_H
 
-#include "mpiimpl.h"
+#include "mpishared.h"
 #include "mpid_locksconf.h"
 
-#include <stdio.h>
+/* This is used to quote a name in a definition (see FUNCNAME/FCNAME below) */
+#ifndef MPIDI_QUOTE
+#define MPIDI_QUOTE(A) MPIDI_QUOTE2(A)
+#define MPIDI_QUOTE2(A) #A
+#endif
+
+/*#include <stdio.h>*/
 
 /* FIXME: First use the configure ifdefs to decide on an approach for 
    locks.  Then put all lock code in one place, or at least guarded by
@@ -19,6 +25,67 @@
    missing a volatile, needed when using the _InterlockedExchange inline 
    function
 */
+
+/* Determine the lock type to use */
+#if defined(HAVE_SPARC_INLINE_PROCESS_LOCKS)
+#define USE_SPARC_ASM_LOCKS
+#elif defined(HAVE_NT_LOCKS)
+#define USE_NT_LOCKS
+#elif defined(HAVE_MUTEX_INIT)
+#define USE_SUN_MUTEX
+#elif defined(HAVE_PTHREAD_H)
+#define USE_PTHREAD_LOCKS
+#else
+#error Locking functions not defined
+#endif
+
+/* Temp name shift for backward compatibility.  The new name doesn't have
+   exactly the same meaning, but the old one was misnamed */
+#ifdef USE_BUSY_LOCKS
+#define USE_INLINE_LOCKS
+#endif
+
+/* 
+ * Define MPIDU_Yield() 
+ * This is always defined as a macro for now
+ */
+#ifdef HAVE_YIELD
+#define MPIDU_Yield() yield()
+#elif defined(HAVE_WIN32_SLEEP)
+#define MPIDU_Yield() Sleep(0)
+#elif defined (HAVE_SCHED_YIELD)
+#ifdef HAVE_SCHED_H
+#include <sched.h>
+#endif
+#define MPIDU_Yield() sched_yield()
+#elif defined (HAVE_SELECT)
+#define MPIDU_Yield() { struct timeval t; t.tv_sec = 0; t.tv_usec = 0; select(0,0,0,0,&t); }
+#elif defined (HAVE_USLEEP)
+#define MPIDU_Yield() usleep(0)
+#elif defined (HAVE_SLEEP)
+#define MPIDU_Yield() sleep(0)
+#else
+#error *** No yield function specified ***
+#endif
+
+/* There are several cases.
+ * First, inline or routine.  If inline, define them here.
+ */
+
+
+#if defined(USE_INLINE_LOCKS) 
+/* These are definitions that are intended to inline simple code that
+   manages a lock between processes.  It may exploit assembly language
+   on systems that provide asm() extensions to the C compiler */
+
+#if defined(USE_BUSY_LOCKS)
+typedef volatile long MPIDU_Process_lock_t;
+/* FIXME: This uses an invalid prefix */
+extern int g_nLockSpinCount;
+
+/* We need an atomic "test and set if clear" operation.  The following
+   definitions are used to create that.  The operation itself
+   is MPID_ATOMIC_SET_IF_ZERO */
 
 #ifdef HAVE_GCC_AND_PENTIUM_ASM
 #define HAVE_COMPARE_AND_SWAP
@@ -70,165 +137,60 @@ static inline unsigned long _InterlockedExchange(volatile long *ptr, unsigned lo
 #define _InterlockedExchange(ptr,x) _InterlockedExchange(ptr,x)
 #endif
 
-extern int g_nLockSpinCount;
-
-/* Define MPIDU_Yield() */
-#ifdef HAVE_YIELD
-#define MPIDU_Yield() yield()
-#elif defined(HAVE_WIN32_SLEEP)
-#define MPIDU_Yield() Sleep(0)
-#elif defined (HAVE_SCHED_YIELD)
-#ifdef HAVE_SCHED_H
-#include <sched.h>
-#endif
-#define MPIDU_Yield() sched_yield()
-#elif defined (HAVE_SELECT)
-#define MPIDU_Yield() { struct timeval t; t.tv_sec = 0; t.tv_usec = 0; select(0,0,0,0,&t); }
-#elif defined (HAVE_USLEEP)
-#define MPIDU_Yield() usleep(0)
-#elif defined (HAVE_SLEEP)
-#define MPIDU_Yield() sleep(0)
+/* Given the possible atomic operations, define the set if zero operation.
+   This operation returns true if the value was zero.  */
+#ifdef HAVE_INTERLOCKEDEXCHANGE
+#define MPID_ATOMIC_SET_IF_ZERO(_lock) \
+    (InterlockedExchange((LPLONG)_lock, 1) == 0)
+#elif defined(HAVE__INTERLOCKEDEXCHANGE)
+	/* The Intel compiler complains if the lock is cast to
+	 * volatile void * (the type of lock is probably
+	 * volatile long *).  The void * works for the Intel 
+	 * compiler. */
+#define MPID_ATOMIC_SET_IF_ZERO(_lock) \
+    (_InterlockedExchange((void *)lock, 1) == 0)
+#elif defined(HAVE_COMPARE_AND_SWAP)
+#define MPID_ATOMIC_SET_IF_ZERO(_lock) (compare_and_swap(_lock, 0, 1) == 1)
 #else
-#error *** No yield function specified ***
+#error Cannot define atomic set flag if zero operation; needed for busy locks
 #endif
 
-#if defined(HAVE_SPARC_INLINE_PROCESS_LOCKS)
-typedef int MPIDU_Process_lock_t;
-#error 'process locks are not supported for Solaris.  Developers should see req 2033'
-
-#else
-
-#ifdef HAVE_MUTEX_INIT
-/*   Only known system is Solaris */
-#include <sys/systeminfo.h>
-#include <sys/processor.h>
-#include <sys/procset.h>
-#include <synch.h>
-#include <string.h>
-
-typedef mutex_t                 MPIDU_Process_lock_t;
-#define MPIDU_Process_lock_init(lock)   mutex_init(lock,USYNC_PROCESS,(void *)NULL)
-#define MPIDU_Process_lock(lock)        mutex_lock(lock)
-#define MPIDU_Process_unlock(lock)      mutex_unlock(lock)
-#define MPIDU_Process_lock_free(lock)   mutex_destroy(lock)
-
-#undef FUNCNAME
-#define FUNCNAME MPIDU_Process_lock_busy_wait
-#undef FCNAME
-#define FCNAME MPIDI_QUOTE(FUNCNAME)
-static inline void MPIDU_Process_lock_busy_wait( MPIDU_Process_lock_t *lock )
-{
-    int i;
-    MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
-    MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
-    mutex_lock(lock);
-    mutex_unlock(lock);
-    MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
-}
-
-#else
-
-#ifdef USE_BUSY_LOCKS
-#ifdef HAVE_MUTEX_INIT
-typedef mutex_t MPIDU_Process_lock_t;
-#else
-typedef volatile long MPIDU_Process_lock_t;
-#endif
-#else
-#ifdef HAVE_NT_LOCKS
-typedef HANDLE MPIDU_Process_lock_t;
-#elif defined(HAVE_PTHREAD_H)
-#include <pthread.h>
-typedef pthread_mutex_t MPIDU_Process_lock_t;  
-#else
-#error *** No locking mechanism for shared memory.specified ***
-#endif
-#endif
-
-#include <errno.h>
-#ifdef HAVE_WINDOWS_H
-#include <winsock2.h>
-#include <windows.h>
-#endif
-
-#ifdef USE_BUSY_LOCKS
-
-/* FIXME: only the lock/unlock/wait routines should be considered for 
-   static inline functions */
 #undef FUNCNAME
 #define FUNCNAME MPIDU_Process_lock_init
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 static inline void MPIDU_Process_lock_init( MPIDU_Process_lock_t *lock )
 {
-#ifdef HAVE_MUTEX_INIT
-    int err;
-#endif
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_LOCK_INIT);
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_LOCK_INIT);
-#ifdef HAVE_MUTEX_INIT
-    memset(lock, 0, sizeof(MPIDU_Process_lock_t));
-    err = mutex_init(lock, USYNC_PROCESS, 0);
-    if (err)
-	MPIU_Error_printf("mutex_init error: %d\n", err);
-#else
     *(lock) = 0;
-#endif
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK_INIT);
 }
 
+/* 
+ * This routine requires an atomic "test and set if clear" operation
+ */
 #undef FUNCNAME
 #define FUNCNAME MPIDU_Process_lock
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 static inline void MPIDU_Process_lock( MPIDU_Process_lock_t *lock )
 {
-#ifdef HAVE_MUTEX_INIT
-    int err;
-    err = mutex_lock(lock);
-    if (err)
-	MPIU_Error_printf("mutex_lock error: %d\n", err);
-#else
     int i;
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_LOCK);
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_LOCK);
-    for (;;)
-    {
-        for (i=0; i<g_nLockSpinCount; i++)
-        {
-            if (*lock == 0)
-            {
-#ifdef HAVE_INTERLOCKEDEXCHANGE
-                if (InterlockedExchange((LPLONG)lock, 1) == 0)
-                {
+    for (;;) {
+        for (i=0; i<g_nLockSpinCount; i++) {
+            if (*lock == 0) {
+		if (MPID_ATOMIC_SET_IF_ZERO(lock)) {
                     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK);
                     return;
                 }
-#elif defined(HAVE__INTERLOCKEDEXCHANGE)
-		/* The Intel compiler complains if the lock is cast to
-		 * volatile void * (the type of lock is probably
-		 * volatile long *).  The void * works for the Intel 
-		 * compiler. */
-                if (_InterlockedExchange((void *)lock, 1) == 0)
-                {
-                    MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK);
-                    return;
-                }
-#elif defined(HAVE_COMPARE_AND_SWAP)
-                if (compare_and_swap(lock, 0, 1) == 1)
-                {
-                    MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK);
-                    return;
-                }
-#else
-#error *** No atomic memory operation specified to implement busy locks ***
-#endif
             }
         }
         MPIDU_Yield();
     }
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK);
-#endif
 }
 
 #undef FUNCNAME
@@ -237,18 +199,9 @@ static inline void MPIDU_Process_lock( MPIDU_Process_lock_t *lock )
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 static inline void MPIDU_Process_unlock( MPIDU_Process_lock_t *lock )
 {
-#ifdef HAVE_MUTEX_INIT
-    int err;
-#endif
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_UNLOCK);
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_UNLOCK);
-#ifdef HAVE_MUTEX_INIT
-    err = mutex_lock(lock);
-    if (err)
-	MPIU_Error_printf("mutex_unlock error: %d\n", err);
-#else
     *(lock) = 0;
-#endif
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_UNLOCK);
 }
 
@@ -259,19 +212,8 @@ static inline void MPIDU_Process_unlock( MPIDU_Process_lock_t *lock )
 static inline void MPIDU_Process_lock_busy_wait( MPIDU_Process_lock_t *lock )
 {
     int i;
-#ifdef HAVE_MUTEX_INIT
-    int err;
-#endif
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
-#ifdef HAVE_MUTEX_INIT
-    err = mutex_lock(lock);
-    if (err)
-	MPIU_Error_printf("mutex_lock error: %d\n", err);
-    err = mutex_unlock(lock);
-    if (err)
-	MPIU_Error_printf("mutex_unlock error: %d\n", err);
-#else
     for (;;)
     {
         for (i=0; i<g_nLockSpinCount; i++)
@@ -282,7 +224,6 @@ static inline void MPIDU_Process_lock_busy_wait( MPIDU_Process_lock_t *lock )
             }
         MPIDU_Yield();
     }
-#endif
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK_BUSY_WAIT);
 }
 
@@ -292,31 +233,51 @@ static inline void MPIDU_Process_lock_busy_wait( MPIDU_Process_lock_t *lock )
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 static inline void MPIDU_Process_lock_free( MPIDU_Process_lock_t *lock )
 {
-#ifdef HAVE_MUTEX_INIT
-    int err;
-#endif
     MPIDI_STATE_DECL(MPID_STATE_MPIDU_PROCESS_LOCK_FREE);
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDU_PROCESS_LOCK_FREE);
-#ifdef HAVE_MUTEX_INIT
-    err = mutex_destroy(lock);
-    if (err)
-	MPIU_Error_printf("mutex_destroy error: %d\n", err);
-#endif
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_PROCESS_LOCK_FREE);
 }
 
+/* End of USE_BUSY_LOCKS */
+#elif defined(USE_SUN_MUTEX)
+#include <synch.h>
+/* This may allow the use of Sun Mutex as an inline */
+typedef mutex_t                 MPIDU_Process_lock_t;
+#define MPIDU_Process_lock_init(lock)   mutex_init(lock,USYNC_PROCESS,(void *)0)
+#define MPIDU_Process_lock(lock)        mutex_lock(lock)
+#define MPIDU_Process_unlock(lock)      mutex_unlock(lock)
+#define MPIDU_Process_lock_free(lock)   mutex_destroy(lock)
+/* End of case USE_SUN_MUTEX */
+#endif /* USE_BUSY_LOCKS */
+/* End of USE_INLINE_LOCKS */
 #else
+/* In the case where we use the routines in mpidu_process_locks.c , 
+   we only need to define the type for the lock */
+#if defined(USE_SPARC_ASM_LOCKS)
+typedef int MPIDU_Process_lock_t;
+#elif defined(USE_NT_LOCKS)
+#include <winsock2.h>
+#include <windows.h>
+typedef HANDLE MPIDU_Process_lock_t;
+#elif defined(USE_SUN_MUTEX)
+#include <synch.h>
+typedef mutex_t MPIDU_Process_lock_t;
+#elif defined(USE_PTHREAD_LOCKS)
+#include <pthread.h>
+typedef pthread_mutex_t MPIDU_Process_lock_t;  
 
+#endif /* Case on lock type */
 void MPIDU_Process_lock_init( MPIDU_Process_lock_t *lock );
 void MPIDU_Process_lock( MPIDU_Process_lock_t *lock );
 void MPIDU_Process_unlock( MPIDU_Process_lock_t *lock );
 void MPIDU_Process_lock_free( MPIDU_Process_lock_t *lock );
 void MPIDU_Process_lock_busy_wait( MPIDU_Process_lock_t *lock );
 
-#endif /* #ifdef USE_BUSY_LOCKS */
-#endif /* #ifdef HAVE_MUTEX_INIT */
-#endif /* defined(HAVE_SPARC_INLINE_PROCESS_LOCKS) */
+#endif /* (of else defined) USE_INLINE_LOCKS */
 
+/* If no one uses this, then remove it.  We probably do not want a "lock"
+   as an argument in any case (use a common lock or no lock at all) */
+#if 0
 
 #undef FUNCNAME
 #define FUNCNAME MPIDU_Compare_swap
@@ -368,5 +329,6 @@ static inline int MPIDU_Compare_swap( void **dest, void *new_val, void *compare_
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_COMPARE_SWAP);
     return 0;
 }
+#endif /* 0 for compareSwap */
 
-#endif
+#endif /* MPIDU_PROCESS_LOCKS_H */

@@ -7,3 +7,5 @@ distclean-local:
 maintainer-clean-local:
 	-rm -f include/mpidi_ch3i_sock_conf.h.in
 
+optinstall_DLLLIB = libmpich2-ch3-sock.@SHLIB_EXT@
+

@@ -11,33 +11,47 @@
 
 static char MTEST_Descrip[] = "Send to self in a threaded program";
 
-
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #define THREAD_RETURN_TYPE DWORD
+/* HANDLE to listener thread */
+HANDLE hThread;
 int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p))
 {
-    HANDLE hThread;
     hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)fn, NULL, 0, NULL);
     if (hThread == NULL)
     {
 	return GetLastError();
     }
-    CloseHandle(hThread);
     return 0;
 }
+
+int join_thread( void ){
+    int err = 0;
+    if(WaitForSingleObject(hThread, INFINITE) == WAIT_FAILED){
+        DEBUG(printf("Error WaitForSingleObject() \n"));
+        err = GetLastError();
+    }
+    CloseHandle(hThread);
+    return err;
+}
+
 #else
 #include <pthread.h>
 #define THREAD_RETURN_TYPE void *
+pthread_t thread;
 int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p));
 
 int start_send_thread(THREAD_RETURN_TYPE (*fn)(void *p))
 {
     int err;
-    pthread_t thread;
-    /*pthread_attr_t attr;*/
+
     err = pthread_create(&thread, NULL/*&attr*/, fn, NULL);
     return err;
+}
+int join_thread( void )
+{
+    return pthread_join(thread, 0);
 }
 #endif
 
@@ -82,6 +96,8 @@ int main( int argc, char *argv[] )
     MPI_Probe(MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
     MPI_Recv(buffer, sizeof(buffer), MPI_CHAR, rank, 0, MPI_COMM_WORLD, &status);
+
+    join_thread();
 
     MTest_Finalize(0);
     MPI_Finalize();

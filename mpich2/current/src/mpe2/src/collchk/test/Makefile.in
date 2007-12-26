@@ -7,6 +7,8 @@ MPI_CC               = @MPI_CC@
 MPI_F77              = @MPI_F77@
 MPI_CLINKER          = $(MPI_CC)
 MPI_FLINKER          = $(MPI_F77)
+MPE_CLINKER          = @MPE_CLINKER@
+MPE_FLINKER          = @MPE_FLINKER@
 
 DEBUG_LIBS           = @DEBUG_LIBS@
 MPI_INC              = @MPI_INC@
@@ -65,7 +67,8 @@ OPT_F_EXECS   = wrong_reals@EXEEXT@ wrong_reals_nochk@EXEEXT@
 	$(MPI_F77) $(FC_FLAGS) -c $<
 
 .@OBJEXT@@EXEEXT@:
-	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $< $(COLLCHK_LIBS)
+	$(MPE_CLINKER)mpicheck $(CC_LDFLAGS) -o $@ $<
+#	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $< $(COLLCHK_LIBS)
 
 time_bcast_nochk@EXEEXT@: time_bcast.@OBJEXT@
 	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(MPI_LIBS)
@@ -79,11 +82,17 @@ time_alltoallv_nochk@EXEEXT@: time_alltoallv.@OBJEXT@
 time_alltoallv0_nochk@EXEEXT@: time_alltoallv0.@OBJEXT@
 	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(MPI_LIBS)
 
+wrong_int_byte@EXEEXT@: wrong_int_byte.@OBJEXT@
+	$(MPE_CLINKER)mpicheck $(CC_LDFLAGS) -o $@ $?
+#	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(COLLCHK_LIBS)
+
 wrong_reals@EXEEXT@: wrong_reals.@OBJEXT@
-	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(COLLCHK_FLIBS)
+	$(MPE_FLINKER)mpicheck $(FC_LDFLAGS) -o $@ $?
+#	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(COLLCHK_FLIBS)
 
 wrong_reals_nochk@EXEEXT@: wrong_reals.@OBJEXT@
-	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(MPI_LIBS)
+	$(MPE_FLINKER)mpicheck $(FC_LDFLAGS) -o $@ $?
+#	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(MPI_LIBS)
 
 default: $(C_OBJS) $(C_EXECS) $(OPT_C_EXECS)
 

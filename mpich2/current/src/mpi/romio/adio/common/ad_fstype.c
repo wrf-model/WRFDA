@@ -90,9 +90,17 @@
 # endif
 #endif
 
+/* ADIO_FileSysType_parentdir is only used if one of these is defined.
+   By including this test, we avoid warnings about unused static functions
+   from the compiler */
+#if defined(ROMIO_HAVE_STRUCT_STATVFS_WITH_F_BASETYPE) || \
+    defined(HAVE_STRUCT_STATFS) || \
+    defined(ROMIO_HAVE_STRUCT_STAT_WITH_ST_FSTYPE) 
 #ifndef ROMIO_NTFS
+#define ROMIO_NEEDS_ADIOPARENTDIR
 static void ADIO_FileSysType_parentdir(char *filename, char **dirnamep);
 #endif
+#endif 
 static void ADIO_FileSysType_prefix(char *filename, int *fstype, 
 				    int *error_code);
 static void ADIO_FileSysType_fncall(char *filename, int *fstype, 
@@ -111,7 +119,8 @@ Output Parameters:
  Note that the caller should free the memory located at the pointer returned
  after the string is no longer needed.
 */
-#ifndef ROMIO_NTFS
+#ifdef ROMIO_NEEDS_ADIOPARENTDIR
+
 #ifndef PATH_MAX
 #define PATH_MAX 65535
 #endif
@@ -128,7 +137,7 @@ Output Parameters:
      /* no way to check if it is a link, so say false */
 #    define S_ISLNK(mode) 0   
 #    endif
-#endif
+#endif /* !(S_ISLNK) */
 
 /* ADIO_FileSysType_parentdir
  *
@@ -494,18 +503,33 @@ tables in a reasonable way. -- Rob, 06/06/2001
 void ADIO_ResolveFileType(MPI_Comm comm, char *filename, int *fstype, 
 			  ADIOI_Fns **ops, int *error_code)
 {
-    int myerrcode, file_system, min_code;
+    int myerrcode, file_system, min_code, max_code;
     char *tmp;
     static char myname[] = "ADIO_RESOLVEFILETYPE";
 
     file_system = -1;
     tmp = strchr(filename, ':');
     if (!tmp) {
+	*error_code = MPI_SUCCESS;
 	/* no prefix; use system-dependent function call to determine type */
 	ADIO_FileSysType_fncall(filename, &file_system, &myerrcode);
 	if (myerrcode != MPI_SUCCESS) {
 	    *error_code = myerrcode;
-	    return;
+	}
+
+	/* the check for file system type will hang if any process got
+	 * an error in ADIO_FileSysType_fncall.  Processes encountering
+	 * an error will return early, before the collective file system
+	 * type check below.  This case could happen if a full path
+	 * exists on one node but not on others, and no prefix like ufs:
+	 * was provided.  see discussion at
+	 * http://www.mcs.anl.gov/web-mail-archive/lists/mpich-discuss/2007/08/msg00042.html 
+	 */
+
+	MPI_Allreduce(error_code, &max_code, 1, MPI_INT, MPI_MAX, comm);
+	if (max_code != MPI_SUCCESS)  {
+		*error_code = max_code;
+		return;
 	}
 
 	/* ensure that everyone came up with the same file system type */

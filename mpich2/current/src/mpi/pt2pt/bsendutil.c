@@ -317,7 +317,10 @@ int MPIR_Bsend_isend( void *buf, int count, MPI_Datatype dtype,
 	    }
 	    break;
 	}
-	if (p || pass == 2) break;
+	/* If we found a buffer or we're in the seccond pass, then break.
+	    Note that the test on phere is redundant, as the code breaks 
+	    out of the loop in the test above if a block p is found. */
+	if (p || pass == 1) break;
 	MPIU_DBG_MSG(BSEND,TYPICAL,"Could not find storage, checking active");
 	/* Try to complete some pending bsends */
 	MPIR_Bsend_check_active( );
@@ -364,7 +367,7 @@ static void MPIR_Bsend_free_segment( BsendData_t *p )
 	     "At the begining of free_segment with size %d:", p->total_size );
     MPIU_DBG_STMT(BSEND,TYPICAL,MPIR_Bsend_dump());
 
-    /* Remove the segment from the free list */
+    /* Remove the segment from the active list */
     if (prev) {
 	MPIU_DBG_MSG(BSEND,TYPICAL,"free segment is within active list");
 	prev->next = p->next;
@@ -414,7 +417,7 @@ static void MPIR_Bsend_free_segment( BsendData_t *p )
     if (avail_prev) {
 	if ((char *)avail_prev + avail_prev->total_size == (char *)p) {
 	    avail_prev->total_size += p->total_size;
-	    avail_prev->size       = p->total_size - BSENDDATA_HEADER_TRUE_SIZE;
+	    avail_prev->size       = avail_prev->total_size - BSENDDATA_HEADER_TRUE_SIZE;
 	    avail_prev->next = p->next;
 	    if (p->next) p->next->prev = avail_prev;
 	}

@@ -9,27 +9,13 @@
 
 /* STATES:NO WARNINGS */
 
-#if 0
-#ifndef HAVE_WINDOWS_H
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#ifdef HAVE_SYS_PTRACE_H
-#include <sys/ptrace.h>
-#endif
-#include <sys/wait.h>
-#include <errno.h>
-#define OFF_T off_t
-#define OFF_T_CAST(a) ((off_t)(a))
-#endif
-#endif
-
 /*#undef USE_IOV_LEN_2_SHORTCUT*/
 #define USE_IOV_LEN_2_SHORTCUT
 
 #define SHM_READING_BIT     0x0008
+
+#define MPIDI_CH3_PKT_RELOAD_SEND 1
+#define MPIDI_CH3_PKT_RELOAD_RECV 0
 
 #ifndef min
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -80,12 +66,15 @@ int MPIDI_CH3I_SHM_write(MPIDI_VC_t * vc, void *buf, int len, int *num_bytes_ptr
     int length;
     int index;
     MPIDI_CH3I_SHM_Queue_t * writeq;
+    MPIDI_CH3I_VC *vcch;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3I_SHM_WRITE);
     MPIDI_STATE_DECL(MPID_STATE_MEMCPY);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3I_SHM_WRITE);
 
-    writeq = vc->ch.write_shmq;
+    vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+
+    writeq = vcch->write_shmq;
     index = writeq->tail_index;
     if (writeq->packet[index].avail == MPIDI_CH3I_PKT_FILLED)
     {
@@ -144,12 +133,13 @@ int MPIDI_CH3I_SHM_writev(MPIDI_VC_t *vc, MPID_IOV *iov, int n,
     unsigned char *cur_pos, *dest_pos;
     int index;
     MPIDI_CH3I_SHM_Queue_t * writeq;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3I_SHM_WRITEV);
     MPIDI_STATE_DECL(MPID_STATE_MEMCPY);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3I_SHM_WRITEV);
 
-    writeq = vc->ch.write_shmq;
+    writeq = vcch->write_shmq;
     index = writeq->tail_index;
     if (writeq->packet[index].avail == MPIDI_CH3I_PKT_FILLED)
     {
@@ -291,6 +281,8 @@ int MPIDI_CH3I_SHM_writev(MPIDI_VC_t *vc, MPID_IOV *iov, int n,
     return MPI_SUCCESS;
 }
 
+/* No one defines USE_RDMA_WRITEV; this is old, unused code */
+#ifdef USE_RDMA_WRITEV
 #undef FUNCNAME
 #define FUNCNAME MPIDI_CH3I_SHM_rdma_writev
 #undef FCNAME
@@ -359,7 +351,7 @@ int MPIDI_CH3I_SHM_rdma_writev(MPIDI_VC_t *vc, MPID_Request *sreq)
 	rbuf = recv_iov[0].MPID_IOV_BUF;
 	rbuf_len = recv_iov[0].MPID_IOV_LEN;
 	riov_offset = 0;
-	for (i=sreq->ch.iov_offset; i<send_count; i++)
+	for (i=sreq->dev.iov_offset; i<send_count; i++)
 	{
 	    sbuf = send_iov[i].MPID_IOV_BUF;
 	    sbuf_len = send_iov[i].MPID_IOV_LEN;
@@ -470,9 +462,9 @@ int MPIDI_CH3I_SHM_rdma_writev(MPIDI_VC_t *vc, MPID_Request *sreq)
 		    }
 		} while (0);
 		num_written = len;
-#endif
+#endif /* HAVE_PROC_RDMA_WRITE */
 
-#endif
+#endif /* HAVE_WINDOWS_H */
 		/*printf("wrote %d bytes to remote process\n", num_written);
 		  fflush(stdout);*/
 		if (num_written < (SIZE_T)rbuf_len)
@@ -510,7 +502,7 @@ int MPIDI_CH3I_SHM_rdma_writev(MPIDI_VC_t *vc, MPID_Request *sreq)
 				(MPID_IOV_BUF_CAST)sbuf;
 			    sreq->dev.iov[i].MPID_IOV_LEN = sbuf_len;
 			}
-			sreq->ch.iov_offset = i;
+			sreq->dev.iov_offset = i;
 
 			/* send the reload packet to the receiver */
 			MPIDI_Pkt_init(reload_pkt, MPIDI_CH3_PKT_RELOAD);
@@ -598,9 +590,11 @@ int MPIDI_CH3I_SHM_rdma_writev(MPIDI_VC_t *vc, MPID_Request *sreq)
     mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**notimpl", 0);
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_RDMA_WRITEV);
     return mpi_errno;
-#endif
+#endif /* MPIDI_CH3_CHANNEL_RNDV */
 }
+#endif /* USE_RDMA_WRITEV */
 
+#ifdef USE_RDMA_READV
 #undef FUNCNAME
 #define FUNCNAME MPIDI_CH3I_SHM_rdma_readv
 #undef FCNAME
@@ -669,7 +663,7 @@ int MPIDI_CH3I_SHM_rdma_readv(MPIDI_VC_t *vc, MPID_Request *rreq)
 	*/
 	sbuf = send_iov[siov_offset].MPID_IOV_BUF;
 	sbuf_len = send_iov[siov_offset].MPID_IOV_LEN;
-	for (i=rreq->ch.iov_offset; i<recv_count; i++)
+	for (i=rreq->dev.iov_offset; i<recv_count; i++)
 	{
 	    rbuf = recv_iov[i].MPID_IOV_BUF;
 	    rbuf_len = recv_iov[i].MPID_IOV_LEN;
@@ -717,7 +711,7 @@ int MPIDI_CH3I_SHM_rdma_readv(MPIDI_VC_t *vc, MPID_Request *rreq)
 		    }
 		    ptrace(PTRACE_PEEKDATA, vc->ch.nSharedProcessID, sbuf + len - num_read, 0);
 		}
-#endif
+#endif /* HAVE_WINDOWS_H */
 		/*printf("read %d bytes from the remote process\n", num_read);fflush(stdout);*/
 		if (num_read < (SIZE_T)sbuf_len)
 		{
@@ -756,7 +750,7 @@ int MPIDI_CH3I_SHM_rdma_readv(MPIDI_VC_t *vc, MPID_Request *rreq)
 			    rreq->dev.iov[i].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)rbuf;
 			    rreq->dev.iov[i].MPID_IOV_LEN = rbuf_len;
 			}
-			rreq->ch.iov_offset = i;
+			rreq->dev.iov_offset = i;
 
 			/* send the reload packet to the sender */
 			/*printf("sending reload packet to the sender.\n");fflush(stdout);*/
@@ -842,8 +836,9 @@ int MPIDI_CH3I_SHM_rdma_readv(MPIDI_VC_t *vc, MPID_Request *rreq)
     mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**notimpl", 0);
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_RDMA_READV);
     return mpi_errno;
-#endif
+#endif /* MPIDI_CH3_CHANNEL_RNDV */
 }
+#endif /* USE_RDMA_READV */
 
 #undef FUNCNAME
 #define FUNCNAME MPIDI_CH3I_SHM_read_progress
@@ -859,10 +854,13 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
     int num_bytes;
     unsigned int offset;
     MPIDI_VC_t *recv_vc_ptr;
+    MPIDI_CH3I_VC *recv_vcch;
     MPIDI_CH3I_SHM_Packet_t *pkt_ptr;
     MPIDI_CH3I_SHM_Queue_t *shm_ptr;
     register int index, working;
+#ifndef MPIDI_CH3_SHM_SCALABLE_READQUEUES
     int i;
+#endif
 #ifdef MPIDI_CH3_CHANNEL_RNDV
     MPID_Request *sreq, *rreq;
     int complete;
@@ -877,9 +875,10 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 	working = FALSE;
 #ifdef MPIDI_CH3_SHM_SCALABLE_READQUEUES
 	for (recv_vc_ptr=vc; recv_vc_ptr; 
-	     recv_vc_ptr = recv_vc_ptr->ch.shm_next_reader )
+	     recv_vc_ptr = recv_vcch->shm_next_reader )
 	{
-	    shm_ptr = recv_vc_ptr->ch.read_shmq;
+	    recv_vcch = (MPIDI_CH3I_VC *)recv_vc_ptr->channel_private;
+	    shm_ptr = recv_vcch->read_shmq;
 	    if (shm_ptr == NULL)
 		continue;
 #else
@@ -888,9 +887,11 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 	    /* skip over the vc to myself */
 	    if (vc->pg_rank == i)
 		continue;
+	    recv_vcch = (MPIDI_CH3I_VC *)vc->channel_private;
 
-	    shm_ptr = &vc->ch.shm[i];
+	    shm_ptr = &recv_vcch->shm[i];
 	    MPIDI_PG_Get_vc(vc->pg, i, &recv_vc_ptr);
+	    recv_vcch = (MPIDI_CH3I_VC *)recv_vc_ptr->channel_private;
 #endif
 	    index = shm_ptr->head_index;
 	    pkt_ptr = &shm_ptr->packet[index];
@@ -908,7 +909,7 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 	    mem_ptr = (void*)(pkt_ptr->data + pkt_ptr->offset);
 	    num_bytes = pkt_ptr->num_bytes;
 
-	    if (recv_vc_ptr->ch.shm_reading_pkt)
+	    if (recv_vcch->shm_reading_pkt)
 	    {
 		MPIU_DBG_PRINTF(("shm_read_progress: reading %d byte header from shm packet %d offset %d size %d\n", sizeof(MPIDI_CH3_Pkt_t), index, pkt_ptr->offset, num_bytes));
 #ifdef MPIDI_CH3_CHANNEL_RNDV
@@ -934,8 +935,8 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			rreq->dev.iov[1].MPID_IOV_LEN = sizeof(MPIDI_CH3_Pkt_t);
 			rreq->dev.iov_count = 2;
 			rreq->ch.req = NULL;
-			rreq->ch.iov_offset = 0;
-			recv_vc_ptr->ch.recv_active = rreq;
+			rreq->dev.iov_offset = 0;
+			recv_vcch->recv_active = rreq;
 		    }
 		    else if (((MPIDI_CH3_Pkt_t*)mem_ptr)->type == MPIDI_CH3_PKT_CTS_IOV)
 		    {
@@ -956,8 +957,8 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			rreq->dev.iov[0].MPID_IOV_LEN = sreq->dev.rdma_iov_count * sizeof(MPID_IOV);
 			rreq->dev.iov_count = 1;
 			rreq->ch.req = sreq;
-			rreq->ch.iov_offset = 0;
-			recv_vc_ptr->ch.recv_active = rreq;
+			rreq->dev.iov_offset = 0;
+			recv_vcch->recv_active = rreq;
 			/*MPIDI_CH3I_SHM_post_read(recv_vc_ptr, &sreq->ch.rdma_iov, sreq->ch.rdma_iov_count * sizeof(MPID_IOV), NULL);*/
 		    }
 		    else if (((MPIDI_CH3_Pkt_t*)mem_ptr)->type == MPIDI_CH3_PKT_IOV)
@@ -980,8 +981,8 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			    rreq->dev.iov[0].MPID_IOV_LEN = sreq->dev.rdma_iov_count * sizeof(MPID_IOV);
 			    rreq->dev.iov_count = 1;
 			    rreq->ch.req = sreq;
-			    rreq->ch.iov_offset = 0;
-			    recv_vc_ptr->ch.recv_active = rreq;
+			    rreq->dev.iov_offset = 0;
+			    recv_vcch->recv_active = rreq;
 			}
 			else if ( ((MPIDI_CH3_Pkt_rdma_iov_t*)mem_ptr)->send_recv == MPIDI_CH3_PKT_RELOAD_RECV )
 			{
@@ -1001,8 +1002,8 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			    sreq->dev.iov[0].MPID_IOV_LEN = rreq->dev.rdma_iov_count * sizeof(MPID_IOV);
 			    sreq->dev.iov_count = 1;
 			    sreq->ch.req = rreq;
-			    sreq->ch.iov_offset = 0;
-			    recv_vc_ptr->ch.recv_active = sreq;
+			    sreq->dev.iov_offset = 0;
+			    recv_vcch->recv_active = sreq;
 			}
 			else
 			{
@@ -1128,8 +1129,8 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			    return mpi_errno;
 			}
 
-			recv_vc_ptr->ch.recv_active = NULL;
-			recv_vc_ptr->ch.shm_reading_pkt = TRUE;
+			recv_vcch->recv_active = NULL;
+			recv_vcch->shm_reading_pkt = TRUE;
 			if (num_bytes > sizeof(MPIDI_CH3_Pkt_t))
 			{
 			    pkt_ptr->offset += sizeof(MPIDI_CH3_Pkt_t);
@@ -1163,13 +1164,14 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 		{
 #if 1
 		    {
-			MPIDI_CH3_Pkt_t *pkt = (MPIDI_CH3_Pkt_t*)mem_ptr;
+                        MPIDI_msg_sz_t buflen = sizeof (MPIDI_CH3_Pkt_t);
+                        MPIDI_CH3_Pkt_t *pkt = (MPIDI_CH3_Pkt_t*)mem_ptr;
 			mpi_errno = MPIDI_pktArray[pkt->type]( 
-			    recv_vc_ptr, pkt, &recv_vc_ptr->ch.recv_active);
-
+			    recv_vc_ptr, pkt, &buflen, &recv_vcch->recv_active);
+                        MPIU_Assert(mpi_errno || buflen == sizeof (MPIDI_CH3_Pkt_t));
 		    }
 #else		    
-		    mpi_errno = MPIDI_CH3U_Handle_recv_pkt(recv_vc_ptr, (MPIDI_CH3_Pkt_t*)mem_ptr, &recv_vc_ptr->ch.recv_active);
+		    mpi_errno = MPIDI_CH3U_Handle_recv_pkt(recv_vc_ptr, (MPIDI_CH3_Pkt_t*)mem_ptr, &recv_vcch->recv_active);
 #endif
 		    if (mpi_errno != MPI_SUCCESS)
 		    {
@@ -1179,13 +1181,13 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 		    }
 		}
 
-		if (recv_vc_ptr->ch.recv_active == NULL)
+		if (recv_vcch->recv_active == NULL)
 		{
-		    recv_vc_ptr->ch.shm_reading_pkt = TRUE;
+		    recv_vcch->shm_reading_pkt = TRUE;
 		}
 		else
 		{
-		    mpi_errno = MPIDI_CH3I_SHM_post_readv(recv_vc_ptr, recv_vc_ptr->ch.recv_active->dev.iov, recv_vc_ptr->ch.recv_active->dev.iov_count, NULL);
+		    mpi_errno = MPIDI_CH3I_SHM_post_readv(recv_vc_ptr, recv_vcch->recv_active->dev.iov, recv_vcch->recv_active->dev.iov_count, NULL);
 		}
 
 		if (num_bytes > sizeof(MPIDI_CH3_Pkt_t))
@@ -1204,56 +1206,55 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 		    MPIDI_DBG_PRINTF((60, FCNAME, "read_shmq head = %d", shm_ptr->head_index));
 		    continue;
 		}
-		if (recv_vc_ptr->ch.recv_active == NULL)
+		if (recv_vcch->recv_active == NULL)
 		    continue;
 	    }
 
 	    MPIDI_DBG_PRINTF((60, FCNAME, "read %d bytes\n", num_bytes));
-	    /*MPIDI_DBG_PRINTF((60, FCNAME, "shm_read_progress(recv finished %d bytes)\n", num_bytes));*/
-	    if (!(recv_vc_ptr->ch.shm_state & SHM_READING_BIT))
+	    if (!(recv_vcch->shm_state & SHM_READING_BIT))
 	    {
 		continue;
 	    }
-	    MPIDI_DBG_PRINTF((60, FCNAME, "read update, total = %d + %d = %d\n", recv_vc_ptr->ch.read.total, num_bytes, recv_vc_ptr->ch.read.total + num_bytes));
-	    if (recv_vc_ptr->ch.read.use_iov)
+	    MPIDI_DBG_PRINTF((60, FCNAME, "read update, total = %d + %d = %d\n", recv_vcch->read.total, num_bytes, recv_vcch->ch.read.total + num_bytes));
+	    if (recv_vcch->read.use_iov)
 	    {
 		iter_ptr = mem_ptr;
-		while (num_bytes && recv_vc_ptr->ch.read.iovlen > 0)
+		while (num_bytes && recv_vcch->read.iovlen > 0)
 		{
-		    if ((int)recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN <= num_bytes)
+		    if ((int)recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN <= num_bytes)
 		    {
 			/* copy the received data */
 			MPIDI_FUNC_ENTER(MPID_STATE_MEMCPY);
-			memcpy(recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_BUF, iter_ptr,
-			    recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN);
+			memcpy(recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_BUF, iter_ptr,
+			    recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN);
 			MPIDI_FUNC_EXIT(MPID_STATE_MEMCPY);
 			MPIU_DBG_PRINTF(("a:shm_read_progress: %d bytes read from packet %d offset %d\n",
-			    recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN, index,
+			    recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN, index,
 			    pkt_ptr->offset + (int)((char*)iter_ptr - (char*)mem_ptr)));
-			iter_ptr += recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN;
+			iter_ptr += recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN;
 			/* update the iov */
-			num_bytes -= recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN;
-			recv_vc_ptr->ch.read.index++;
-			recv_vc_ptr->ch.read.iovlen--;
+			num_bytes -= recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN;
+			recv_vcch->read.index++;
+			recv_vcch->read.iovlen--;
 		    }
 		    else
 		    {
 			/* copy the received data */
 			MPIDI_FUNC_ENTER(MPID_STATE_MEMCPY);
-			memcpy(recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_BUF, iter_ptr, num_bytes);
+			memcpy(recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_BUF, iter_ptr, num_bytes);
 			MPIDI_FUNC_EXIT(MPID_STATE_MEMCPY);
 			MPIU_DBG_PRINTF(("b:shm_read_progress: %d bytes read from packet %d offset %d\n", num_bytes, index,
 			    pkt_ptr->offset + (int)((char*)iter_ptr - (char*)mem_ptr)));
 			iter_ptr += num_bytes;
 			/* update the iov */
-			recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_LEN -= num_bytes;
-			recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)(
-			    (char*)(recv_vc_ptr->ch.read.iov[recv_vc_ptr->ch.read.index].MPID_IOV_BUF) + num_bytes);
+			recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_LEN -= num_bytes;
+			recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)(
+			    (char*)(recv_vcch->read.iov[recv_vcch->read.index].MPID_IOV_BUF) + num_bytes);
 			num_bytes = 0;
 		    }
 		}
 		offset = (unsigned int)((unsigned char*)iter_ptr - (unsigned char*)mem_ptr);
-		recv_vc_ptr->ch.read.total += offset;
+		recv_vcch->read.total += offset;
 		if (num_bytes == 0)
 		{
 		    /* put the shmem buffer back in the queue */
@@ -1278,25 +1279,25 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 		    pkt_ptr->offset += (pkt_ptr->num_bytes - num_bytes);
 		    pkt_ptr->num_bytes = num_bytes;
 		}
-		if (recv_vc_ptr->ch.read.iovlen == 0)
+		if (recv_vcch->read.iovlen == 0)
 		{
-		    if (recv_vc_ptr->ch.recv_active->kind < MPID_LAST_REQUEST_KIND)
+		    if (recv_vcch->recv_active->kind < MPID_LAST_REQUEST_KIND)
 		    {
-			recv_vc_ptr->ch.shm_state &= ~SHM_READING_BIT;
-			*num_bytes_ptr = recv_vc_ptr->ch.read.total;
+			recv_vcch->shm_state &= ~SHM_READING_BIT;
+			*num_bytes_ptr = recv_vcch->read.total;
 			*vc_pptr = recv_vc_ptr;
 			*shm_out = SHM_WAIT_READ;
 			MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_READ_PROGRESS);
 			return MPI_SUCCESS;
 		    }
 #ifdef MPIDI_CH3_CHANNEL_RNDV
-		    else if (recv_vc_ptr->ch.recv_active->kind == MPIDI_CH3I_RTS_IOV_READ_REQUEST)
+		    else if (recv_vcch->recv_active->kind == MPIDI_CH3I_RTS_IOV_READ_REQUEST)
 		    {
 			int found;
 			/*printf("received rts iov_read.\n");fflush(stdout);*/
 
 			mpi_errno = MPIDI_CH3U_Handle_recv_rndv_pkt(recv_vc_ptr,
-								    &recv_vc_ptr->ch.recv_active->ch.pkt,
+								    &recv_vcch->recv_active->ch.pkt,
 								    &rreq, &found);
 			/* --BEGIN ERROR HANDLING-- */
 			if (mpi_errno != MPI_SUCCESS)
@@ -1307,12 +1308,12 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			}
 			/* --END ERROR HANDLING-- */
 
-			for (i=0; i<recv_vc_ptr->ch.recv_active->dev.rdma_iov_count; i++)
+			for (i=0; i<recv_vcch->recv_active->dev.rdma_iov_count; i++)
 			{
-			    rreq->dev.rdma_iov[i].MPID_IOV_BUF = recv_vc_ptr->ch.recv_active->dev.rdma_iov[i].MPID_IOV_BUF;
-			    rreq->dev.rdma_iov[i].MPID_IOV_LEN = recv_vc_ptr->ch.recv_active->dev.rdma_iov[i].MPID_IOV_LEN;
+			    rreq->dev.rdma_iov[i].MPID_IOV_BUF = recv_vcch->recv_active->dev.rdma_iov[i].MPID_IOV_BUF;
+			    rreq->dev.rdma_iov[i].MPID_IOV_LEN = recv_vcch->recv_active->dev.rdma_iov[i].MPID_IOV_LEN;
 			}
-			rreq->dev.rdma_iov_count = recv_vc_ptr->ch.recv_active->dev.rdma_iov_count;
+			rreq->dev.rdma_iov_count = recv_vcch->recv_active->dev.rdma_iov_count;
 
 			if (found)
 			{
@@ -1349,19 +1350,19 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			    /* --END ERROR HANDLING-- */
 			}
 
-			rreq = recv_vc_ptr->ch.recv_active;
+			rreq = recv_vcch->recv_active;
 			/* free the request used to receive the rts packet 
 			   and iov data */
 			MPIU_Object_set_ref(rreq, 0);
 			MPIDI_CH3_Request_destroy(rreq);
 
-			recv_vc_ptr->ch.recv_active = NULL;
-			recv_vc_ptr->ch.shm_reading_pkt = TRUE;
+			recv_vcch->recv_active = NULL;
+			recv_vcch->shm_reading_pkt = TRUE;
 		    }
-		    else if (recv_vc_ptr->ch.recv_active->kind == MPIDI_CH3I_IOV_READ_REQUEST)
+		    else if (recv_vcch->recv_active->kind == MPIDI_CH3I_IOV_READ_REQUEST)
 		    {
 			/*printf("received iov_read.\n");fflush(stdout);*/
-			rreq = recv_vc_ptr->ch.recv_active;
+			rreq = recv_vcch->recv_active;
 
 			mpi_errno = MPIDI_CH3_iStartRndvTransfer(recv_vc_ptr, rreq->ch.req);
 			/* --BEGIN ERROR HANDLING-- */
@@ -1373,17 +1374,17 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			}
 			/* --END ERROR HANDLING-- */
 
-			recv_vc_ptr->ch.recv_active = NULL;
-			recv_vc_ptr->ch.shm_reading_pkt = TRUE;
+			recv_vcch->recv_active = NULL;
+			recv_vcch->shm_reading_pkt = TRUE;
 
 			/* free the request used to receive the iov data */
 			MPIU_Object_set_ref(rreq, 0);
 			MPIDI_CH3_Request_destroy(rreq);
 		    }
-		    else if (recv_vc_ptr->ch.recv_active->kind == MPIDI_CH3I_IOV_WRITE_REQUEST)
+		    else if (recv_vcch->recv_active->kind == MPIDI_CH3I_IOV_WRITE_REQUEST)
 		    {
 			/*printf("received iov_write.\n");fflush(stdout);*/
-			mpi_errno = MPIDI_CH3I_SHM_rdma_writev(recv_vc_ptr, recv_vc_ptr->ch.recv_active->ch.req);
+			mpi_errno = MPIDI_CH3I_SHM_rdma_writev(recv_vc_ptr, recv_vcch->recv_active->ch.req);
 			/* --BEGIN ERROR HANDLING-- */
 			if (mpi_errno != MPI_SUCCESS)
 			{
@@ -1394,9 +1395,9 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 			/* --END ERROR HANDLING-- */
 
 			/* return from the wait */
-			MPID_Request_release(recv_vc_ptr->ch.recv_active);
-			recv_vc_ptr->ch.recv_active = NULL;
-			recv_vc_ptr->ch.shm_reading_pkt = TRUE;
+			MPID_Request_release(recv_vcch->recv_active);
+			recv_vcch->recv_active = NULL;
+			recv_vcch->shm_reading_pkt = TRUE;
 			*num_bytes_ptr = 0;
 			*vc_pptr = recv_vc_ptr;
 			*shm_out = SHM_WAIT_WAKEUP;
@@ -1406,7 +1407,7 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 #endif /* MPIDI_CH3_CHANNEL_RNDV */
 		    else
 		    {
-			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", "**fail %s %d", "invalid request type", recv_vc_ptr->ch.recv_active->kind);
+			mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**fail", "**fail %s %d", "invalid request type", recv_vcch->recv_active->kind);
 			MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_READ_PROGRESS);
 			return mpi_errno;
 		    }
@@ -1414,29 +1415,29 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 	    }
 	    else
 	    {
-		if ((unsigned int)num_bytes > recv_vc_ptr->ch.read.bufflen)
+		if ((unsigned int)num_bytes > recv_vcch->read.bufflen)
 		{
 		    /* copy the received data */
-		    MPIDI_DBG_PRINTF((60, FCNAME, "reading %d bytes from read_shmq %08p packet[%d]", recv_vc_ptr->ch.read.bufflen, shm_ptr, index));
+		    MPIDI_DBG_PRINTF((60, FCNAME, "reading %d bytes from read_shmq %08p packet[%d]", recv_vcch->read.bufflen, shm_ptr, index));
 		    MPIDI_FUNC_ENTER(MPID_STATE_MEMCPY);
-		    memcpy(recv_vc_ptr->ch.read.buffer, mem_ptr, recv_vc_ptr->ch.read.bufflen);
+		    memcpy(recv_vcch->read.buffer, mem_ptr, recv_vcch->read.bufflen);
 		    MPIDI_FUNC_EXIT(MPID_STATE_MEMCPY);
-		    recv_vc_ptr->ch.read.total = recv_vc_ptr->ch.read.bufflen;
-		    pkt_ptr->offset += recv_vc_ptr->ch.read.bufflen;
-		    pkt_ptr->num_bytes = num_bytes - recv_vc_ptr->ch.read.bufflen;
-		    recv_vc_ptr->ch.read.bufflen = 0;
+		    recv_vcch->read.total = recv_vcch->read.bufflen;
+		    pkt_ptr->offset += recv_vcch->read.bufflen;
+		    pkt_ptr->num_bytes = num_bytes - recv_vcch->read.bufflen;
+		    recv_vcch->read.bufflen = 0;
 		}
 		else
 		{
 		    /* copy the received data */
 		    MPIDI_DBG_PRINTF((60, FCNAME, "reading %d bytes from read_shmq %08p packet[%d]", num_bytes, shm_ptr, index));
 		    MPIDI_FUNC_ENTER(MPID_STATE_MEMCPY);
-		    memcpy(recv_vc_ptr->ch.read.buffer, mem_ptr, num_bytes);
+		    memcpy(recv_vcch->read.buffer, mem_ptr, num_bytes);
 		    MPIDI_FUNC_EXIT(MPID_STATE_MEMCPY);
-		    recv_vc_ptr->ch.read.total += num_bytes;
+		    recv_vcch->read.total += num_bytes;
 		    /* advance the user pointer */
-		    recv_vc_ptr->ch.read.buffer = (char*)(recv_vc_ptr->ch.read.buffer) + num_bytes;
-		    recv_vc_ptr->ch.read.bufflen -= num_bytes;
+		    recv_vcch->read.buffer = (char*)(recv_vcch->read.buffer) + num_bytes;
+		    recv_vcch->read.bufflen -= num_bytes;
 		    /* put the shmem buffer back in the queue */
 		    pkt_ptr->offset = 0;
 		    MPID_READ_WRITE_BARRIER(); /* the writing of the flag cannot occur before the reading of the last piece of data */
@@ -1453,11 +1454,11 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 		    shm_ptr->head_index = (index + 1) % MPIDI_CH3I_NUM_PACKETS;
 		    MPIDI_DBG_PRINTF((60, FCNAME, "read_shmq head = %d", shm_ptr->head_index));
 		}
-		if (recv_vc_ptr->ch.read.bufflen == 0)
+		if (recv_vcch->read.bufflen == 0)
 		{
-		    MPIU_Assert(recv_vc_ptr->ch.recv_active->kind < MPID_LAST_REQUEST_KIND);
-		    recv_vc_ptr->ch.shm_state &= ~SHM_READING_BIT;
-		    *num_bytes_ptr = recv_vc_ptr->ch.read.total;
+		    MPIU_Assert(recv_vcch->recv_active->kind < MPID_LAST_REQUEST_KIND);
+		    recv_vcch->shm_state &= ~SHM_READING_BIT;
+		    *num_bytes_ptr = recv_vcch->read.total;
 		    *vc_pptr = recv_vc_ptr;
 		    *shm_out = SHM_WAIT_READ;
 		    MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_READ_PROGRESS);
@@ -1488,16 +1489,17 @@ int MPIDI_CH3I_SHM_read_progress(MPIDI_VC_t *vc, int millisecond_timeout,
 int MPIDI_CH3I_SHM_post_read(MPIDI_VC_t *vc, void *buf, int len, 
 			     int (*rfn)(int, void*))
 {
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3I_SHM_POST_READ);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3I_SHM_POST_READ);
     MPIDI_DBG_PRINTF((60, FCNAME, "posting a read of %d bytes", len));
-    vc->ch.read.total = 0;
-    vc->ch.read.buffer = buf;
-    vc->ch.read.bufflen = len;
-    vc->ch.read.use_iov = FALSE;
-    vc->ch.shm_state |= SHM_READING_BIT;
-    vc->ch.shm_reading_pkt = FALSE;
+    vcch->read.total = 0;
+    vcch->read.buffer = buf;
+    vcch->read.bufflen = len;
+    vcch->read.use_iov = FALSE;
+    vcch->shm_state |= SHM_READING_BIT;
+    vcch->shm_reading_pkt = FALSE;
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_POST_READ);
     return MPI_SUCCESS;
 }
@@ -1509,6 +1511,7 @@ int MPIDI_CH3I_SHM_post_read(MPIDI_VC_t *vc, void *buf, int len,
 int MPIDI_CH3I_SHM_post_readv(MPIDI_VC_t *vc, MPID_IOV *iov, int n, 
 			      int (*rfn)(int, void*))
 {
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3I_SHM_POST_READV);
 #ifdef USE_SHM_IOV_COPY
     MPIDI_STATE_DECL(MPID_STATE_MEMCPY);
@@ -1538,21 +1541,52 @@ int MPIDI_CH3I_SHM_post_readv(MPIDI_VC_t *vc, MPID_IOV *iov, int n,
 	}
     }
 #endif
-    vc->ch.read.total = 0;
+    vcch->read.total = 0;
 #ifdef USE_SHM_IOV_COPY
     /* This isn't necessary if we require the iov to be valid for the 
        duration of the operation */
     MPIDI_FUNC_ENTER(MPID_STATE_MEMCPY);
-    memcpy(vc->ch.read.iov, iov, sizeof(MPID_IOV) * n);
+    memcpy(vcch->read.iov, iov, sizeof(MPID_IOV) * n);
     MPIDI_FUNC_EXIT(MPID_STATE_MEMCPY);
 #else
-    vc->ch.read.iov = iov;
+    vcch->read.iov = iov;
 #endif
-    vc->ch.read.iovlen = n;
-    vc->ch.read.index = 0;
-    vc->ch.read.use_iov = TRUE;
-    vc->ch.shm_state |= SHM_READING_BIT;
-    vc->ch.shm_reading_pkt = FALSE;
+    vcch->read.iovlen = n;
+    vcch->read.index = 0;
+    vcch->read.use_iov = TRUE;
+    vcch->shm_state |= SHM_READING_BIT;
+    vcch->shm_reading_pkt = FALSE;
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_POST_READV);
     return MPI_SUCCESS;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Routines to create/open shared memory                                      */
+/* -------------------------------------------------------------------------- */
+/* Create a name that may be used for a shared-memory region.
+   "str" must have at least maxlen characters, and it is recommended 
+   that maxlen be at least MPIDI_MAX_SHM_NAME_LENGTH
+   Note that the name may include a random number; this is to 
+   help create unique names which is needed in some users (e.g., 
+   a separate shared memory region for each pair of processes)
+ */
+void MPIDI_Generate_shm_string(char *str, int maxlen)
+{
+#ifdef USE_WINDOWS_SHM
+    UUID guid;
+    UuidCreate(&guid);
+    MPIU_Snprintf(str, maxlen,
+	"%08lX-%04X-%04x-%02X%02X-%02X%02X%02X%02X%02X%02X",
+	guid.Data1, guid.Data2, guid.Data3,
+	guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+	guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+    MPIU_DBG_PRINTF(("GUID = %s\n", str));
+#elif defined (USE_POSIX_SHM)
+    MPIU_Snprintf(str, maxlen, "/mpich_shm_%d_%d", rand(), getpid());
+#elif defined (USE_SYSV_SHM)
+    MPIU_Snprintf(str, maxlen, "%d", getpid());
+#else
+#error No shared memory subsystem defined
+#endif
 }

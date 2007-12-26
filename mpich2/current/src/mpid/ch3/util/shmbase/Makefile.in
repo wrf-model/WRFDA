@@ -40,12 +40,14 @@ apply:
 	$(ACTION) $(ACTION_INPUT)
 clean: 
 	-@rm -f *.o ${srcdir}/*.o 
-	-@rm -f .libstamp0 .libstamp1 
+	-@rm -f .libstamp0 .libstamp1 .libstamp2 .libstamp3 
 	-@rm -f *.lo ${srcdir}/*.lo
 distclean:  clean distclean-xxx remove-makefile
 distclean-xxx:
-	-@rm -f Makefile
+	-@rm -f libmpich-shmutil.a
+	-@rm -f Makefile Makefile config.status config.log config.cache *conf.cache config.system
 	-@rm -rf autom4te*.cache
+	-@rm -f mpidi_ch3shmbase_conf.h
 	-@rm -rf $(DEPS_DIR)
 	-@rm -f TAGS
 remove-makefile:
@@ -55,19 +57,25 @@ remove-genmakefiles:
 all-redirect: .libstamp0 ../../../../../lib/lib${MPILIBNAME}.a
 	@if [ "@ENABLE_SHLIB@" != "none" ] ; then \
 	    ${MAKE} .libstamp1 ; \
+	    ${MAKE} libmpich-shmutil.la ; \
 	fi
 
 .libstamp0 ../../../../../lib/lib${MPILIBNAME}.a: ch3_shm.o 
 	${AR} cr ../../../../../lib/lib${MPILIBNAME}.a $?
 	${RANLIB} ../../../../../lib/lib${MPILIBNAME}.a
 	date > .libstamp0
+libmpich-shmutil.a: ch3_shm.o 
+	${AR} cr libmpich-shmutil.a $?
+	${RANLIB} libmpich-shmutil.a
 .libstamp1 ../../../../../lib/lib${MPILIBNAME}.la: ch3_shm.lo 
 	${AR} cr ../../../../../lib/lib${MPILIBNAME}.la $?
 	date > .libstamp1
+libmpich-shmutil.la: ch3_shm.lo 
+	${AR} cr libmpich-shmutil.la $?
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  ch3_shm.c
+SOURCES         =  ch3_shm.c ch3_shm.c
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
@@ -75,6 +83,8 @@ tags: TAGS
 TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 	here=`cd ../../../../.. && pwd` ; cd ${srcdir} && $(ETAGS) -o $$here/TAGS --append ${HEADERFILES} ${SOURCEFILES}
 # --------------------------------------------------------------------------
+
+# Create a local library as an option
 
 FORCE_TARGET:
 

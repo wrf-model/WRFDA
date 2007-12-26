@@ -73,7 +73,6 @@ int MPIDI_PG_Init(int *argc_p, char ***argv_p,
 int MPIDI_PG_Finalize(void)
 {
     int mpi_errno = MPI_SUCCESS;
-    int inuse;
     MPIDI_PG_t *pg, *pgNext;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_PG_FINALIZE);
 
@@ -84,7 +83,7 @@ int MPIDI_PG_Finalize(void)
 	MPIU_PG_Printall( stdout );
     }
 
-    /* FIXME - straighten out the use of PG_Finalize - no use after 
+    /* FIXME - straighten out the use of PMI_Finalize - no use after 
        PG_Finalize */
     if (pg_world->connData) {
 	int rc;
@@ -97,16 +96,30 @@ int MPIDI_PG_Finalize(void)
     }
 
     /* Free the storage associated with the process groups */
-    MPIDI_PG_release_ref(MPIDI_Process.my_pg, &inuse);
     pg = MPIDI_PG_list;
     while (pg) {
 	pgNext = pg->next;
 	
-	if (pg->ref_count == 0) {
+	/* In finalize, we free all process group information, even if
+	   the ref count is not zero.  This can happen if the user
+	   fails to use MPI_Comm_disconnect on communicators that
+	   were created with the dynamic process routines.*/
+	if (pg->ref_count == 0 || 1) {
+	    if (pg == MPIDI_Process.my_pg)
+		MPIDI_Process.my_pg = NULL;
 	    MPIDI_PG_Destroy(pg);
 	}
 	pg     = pgNext;
     }
+
+    /* If COMM_WORLD is still around (it normally should be), 
+       try to free it here.  The reason that we need to free it at this 
+       point is that comm_world (and comm_self) still exist, and 
+       hence the usual process to free the related VC structures will
+       not be invoked. */
+    if (MPIDI_Process.my_pg) {
+	MPIDI_PG_Destroy(MPIDI_Process.my_pg);
+    } 
     MPIDI_Process.my_pg = NULL;
 
     /* ifdefing out this check because the list will not be NULL in 
@@ -120,6 +133,7 @@ int MPIDI_PG_Finalize(void)
 
     if (MPIDI_PG_list != NULL)
     { 
+	
 	/* --BEGIN ERROR HANDLING-- */
 	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_INTERN,
         "**dev|pg_finalize|list_not_empty", NULL); 
@@ -172,6 +186,14 @@ int MPIDI_PG_Create(int vct_sz, void * pg_id, MPIDI_PG_t ** pg_ptr)
     MPIU_Object_set_ref(pg, 0);
     pg->size = vct_sz;
     pg->id   = pg_id;
+    /* Initialize the connection information to null.  Use
+       the appropriate MPIDI_PG_InitConnXXX routine to set up these 
+       fields */
+    pg->connData           = 0;
+    pg->getConnInfo        = 0;
+    pg->connInfoToString   = 0;
+    pg->connInfoFromString = 0;
+    pg->freeConnInfo       = 0;
     
     for (p = 0; p < vct_sz; p++)
     {
@@ -182,22 +204,16 @@ int MPIDI_PG_Create(int vct_sz, void * pg_id, MPIDI_PG_t ** pg_ptr)
     /* We may first need to initialize the channel before calling the channel 
        VC init functions.  This routine may be a no-op; look in the 
        ch3_init.c file in each channel */
-    MPIDI_CH3_PG_Init( pg );
+    MPIU_CALL(MPIDI_CH3,PG_Init( pg ));
 
+    /* These are now done in MPIDI_VC_Init */
+#if 0
     for (p = 0; p < vct_sz; p++)
     {
 	/* Initialize the channel fields in the VC object */
 	MPIDI_CH3_VC_Init( &pg->vct[p] );
     }
-    
-    /* Initialize the connection information to null.  Use
-       the appropriate MPIDI_PG_InitConnXXX routine to set up these 
-       fields */
-    pg->connData           = 0;
-    pg->getConnInfo        = 0;
-    pg->connInfoToString   = 0;
-    pg->connInfoFromString = 0;
-    pg->freeConnInfo       = 0;
+#endif
 
     /* The first process group is always the world group */
     if (!pg_world) { pg_world = pg; }
@@ -234,7 +250,6 @@ int MPIDI_PG_Create(int vct_sz, void * pg_id, MPIDI_PG_t ** pg_ptr)
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 int MPIDI_PG_Destroy(MPIDI_PG_t * pg)
 {
-    /*int i;*/
     MPIDI_PG_t * pg_prev;
     MPIDI_PG_t * pg_cur;
     int mpi_errno = MPI_SUCCESS;
@@ -258,14 +273,8 @@ int MPIDI_PG_Destroy(MPIDI_PG_t * pg)
             else
                 pg_prev->next = pg->next;
 
-	    /*
-	    for (i=0; i<pg->size; i++)
-	    {
-		printf("[%s%d]freeing vc%d - %p (%s)\n", MPIU_DBG_parent_str, 
-		MPIR_Process.comm_world->rank, i, &pg->vct[i], pg->id);
-		fflush(stdout);
-	    }
-	    */
+	    /* FIXME: This is a temp debugging print (and should use
+	       one of the standard debug macros instead */
 	    if (verbose) {
 		fprintf( stdout, "Destroying process group %s\n", 
 			 (char *)pg->id ); fflush(stdout);
@@ -273,8 +282,14 @@ int MPIDI_PG_Destroy(MPIDI_PG_t * pg)
 	    MPIDI_PG_Destroy_fn(pg);
 	    MPIU_Free(pg->vct);
 	    if (pg->connData) {
-		MPIU_Free(pg->connData);
+		if (pg->freeConnInfo) {
+		    (*pg->freeConnInfo)( pg );
+		}
+		else {
+		    MPIU_Free(pg->connData);
+		}
 	    }
+	    mpi_errno = MPIU_CALL(MPIDI_CH3,PG_Destroy(pg));
 	    MPIU_Free(pg);
 
 	    goto fn_exit;
@@ -676,7 +691,9 @@ static int connFromStringKVS( const char *buf, MPIDI_PG_t *pg )
 }
 static int connFreeKVS( MPIDI_PG_t *pg )
 {
-    /* In this implementation, there is no local data */
+    if (pg->connData) {
+	MPIU_Free( pg->connData );
+    }
     return MPI_SUCCESS;
 }
 
@@ -1018,10 +1035,8 @@ int MPIDI_PG_Close_VCs( void )
 
 	    if (vc->state == MPIDI_VC_STATE_ACTIVE || 
 		vc->state == MPIDI_VC_STATE_REMOTE_CLOSE
-#ifdef MPIDI_CH3_USES_SSHM
+#if defined(MPIDI_CH3_USES_SSHM) && 0
 		/* FIXME: Remove this IFDEF */
-		/* FIXME: There should be no vc->ch.xxx refs in this code 
-		   (those are channel-only fields) */
 		/* sshm queues are uni-directional.  A VC that is connected 
 		 * in the read direction is marked MPIDI_VC_STATE_INACTIVE
 		 * so that a connection will be formed on the first write.  
@@ -1029,7 +1044,8 @@ int MPIDI_PG_Close_VCs( void )
 		 * writing 
 		 * we need to initiate the close protocol on the read side 
 		 * even if the write state is MPIDI_VC_STATE_INACTIVE. */
-		|| ((vc->state == MPIDI_VC_STATE_INACTIVE) && vc->ch.shm_read_connected)
+		|| ((vc->state == MPIDI_VC_STATE_INACTIVE) && 
+		    ((MPIDI_CH3I_VC *)(vc->channel_private))->shm_read_connected)
 #endif
 		)
 	    {

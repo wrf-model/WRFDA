@@ -62,9 +62,7 @@ int MPIR_Scatter (
     int        rank, comm_size, is_homogeneous, sendtype_size;
     int curr_cnt, relative_rank, nbytes, send_subtree_cnt;
     int mask, recvtype_size=0, src, dst, position;
-#ifdef MPID_HAS_HETERO
-    int tmp_buf_size;
-#endif
+    int tmp_buf_size = 0;
     void *tmp_buf=NULL;
     int        mpi_errno = MPI_SUCCESS;
     MPI_Comm comm;
@@ -112,7 +110,8 @@ int MPIR_Scatter (
         /* all even nodes other than root need a temporary buffer to
            receive data of max size (nbytes*comm_size)/2 */
         if (relative_rank && !(relative_rank % 2)) {
-            tmp_buf = MPIU_Malloc((nbytes*comm_size)/2);
+	    tmp_buf_size = (nbytes*comm_size)/2;
+            tmp_buf = MPIU_Malloc(tmp_buf_size);
 	    /* --BEGIN ERROR HANDLING-- */
             if (!tmp_buf) {
                 mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**nomem", 0 );
@@ -127,7 +126,8 @@ int MPIR_Scatter (
            order. */
         if (rank == root) {
             if (root != 0) {
-                tmp_buf = MPIU_Malloc(nbytes*comm_size);
+		tmp_buf_size = nbytes*comm_size;
+                tmp_buf = MPIU_Malloc(tmp_buf_size);
 		/* --BEGIN ERROR HANDLING-- */
                 if (!tmp_buf) { 
                     mpi_errno = MPIR_Err_create_code( MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**nomem", 0 );
@@ -195,10 +195,8 @@ int MPIR_Scatter (
 		    /* --END ERROR HANDLING-- */
                 }
                 else {
-                    mpi_errno = MPIC_Recv(tmp_buf, mask * recvcnt *
-                                          recvtype_size, MPI_BYTE, src,
-                                          MPIR_SCATTER_TAG, comm, 
-                                          &status);
+                    mpi_errno = MPIC_Recv(tmp_buf, tmp_buf_size, MPI_BYTE, src,
+                                          MPIR_SCATTER_TAG, comm, &status);
 		    /* --BEGIN ERROR HANDLING-- */
                     if (mpi_errno)
 		    {
@@ -372,7 +370,7 @@ int MPIR_Scatter (
                 src = rank - mask; 
                 if (src < 0) src += comm_size;
                 
-                mpi_errno = MPIC_Recv(tmp_buf, mask*nbytes, MPI_BYTE, src,
+                mpi_errno = MPIC_Recv(tmp_buf, tmp_buf_size, MPI_BYTE, src,
                                      MPIR_SCATTER_TAG, comm, &status);
 		/* --BEGIN ERROR HANDLING-- */
                 if (mpi_errno)

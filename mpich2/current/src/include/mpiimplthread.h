@@ -32,38 +32,72 @@
 #define MPICH_THREAD_IMPL_GLOBAL_MUTEX 2
 
 
+typedef struct MPICH_ThreadInfo_t {
+    int               thread_provided;  /* Provided level of thread support */
+    /* This is a special case for is_thread_main, which must be
+       implemented even if MPICH2 itself is single threaded.  */
+#if (MPICH_THREAD_LEVEL >= MPI_THREAD_SERIALIZED)    
+    MPID_Thread_tls_t thread_storage;   /* Id for perthread data */
+    MPID_Thread_id_t  master_thread;    /* Thread that started MPI */
+#endif
+#ifdef HAVE_RUNTIME_THREADCHECK
+    int isThreaded;                      /* Set to true if user requested
+					    THREAD_MULTIPLE */
+#endif
+# if (USE_THREAD_IMPL == MPICH_THREAD_IMPL_GLOBAL_MUTEX)
+    MPID_Thread_mutex_t global_mutex;
+# endif
+} MPICH_ThreadInfo_t;
+extern MPICH_ThreadInfo_t MPIR_ThreadInfo;
+
 /*
  * Get a pointer to the thread's private data
+ * Also define a macro to release any storage that may be allocated
+ * by Malloc to ensure that memory leak tools don't report this when
+ * there is no real leak.
  */
 #ifndef MPICH_IS_THREADED
 #define MPIR_GetPerThread(pt_)			\
 {						\
     *(pt_) = &MPIR_Thread;			\
 }
+#define MPIR_ReleasePerThread
 #else
 /* Define a macro to acquire or create the thread private storage */
 #define MPIR_GetOrInitThreadPriv( pt_ ) \
 {									\
-    MPID_Thread_tls_get(&MPIR_Process.thread_storage, (pt_));		\
+    MPID_Thread_tls_get(&MPIR_ThreadInfo.thread_storage, (pt_));		\
     if (*(pt_) == NULL)							\
     {									\
 	*(pt_) = (MPICH_PerThread_t *) MPIU_Calloc(1, sizeof(MPICH_PerThread_t));	\
-	MPID_Thread_tls_set(&MPIR_Process.thread_storage, (void *) *(pt_));\
+	MPID_Thread_tls_set(&MPIR_ThreadInfo.thread_storage, (void *) *(pt_));\
     }									\
     MPIU_DBG_MSG_FMT(THREAD,VERBOSE,(MPIU_DBG_FDEST,\
-     "perthread storage (key = %x) is %p", (unsigned int)MPIR_Process.thread_storage,*pt_));\
+     "perthread storage (key = %x) is %p", (unsigned int)MPIR_ThreadInfo.thread_storage,*pt_));\
 }
 /* We want to avoid the overhead of the thread call if we're in the
    runtime state and threads are not in use.  In that case, MPIR_Thread 
    is still a pointer but it was already allocated in InitThread */
 #ifdef HAVE_RUNTIME_THREADCHECK
 #define MPIR_GetPerThread(pt_) {\
- if (MPIR_Process.isThreaded) { MPIR_GetOrInitThreadPriv( pt_ ); } \
+ if (MPIR_ThreadInfo.isThreaded) { MPIR_GetOrInitThreadPriv( pt_ ); } \
  else { *(pt_) = &MPIR_ThreadSingle; } \
  }
+/* Note that we set the value on the thread_storage key to zero.  This
+   is because we have set an exit handler on this thread key when it
+   was created; that handler will try to delete the storage associated
+   with that value. */
+#define MPIR_ReleasePerThread { \
+	if (MPIR_ThreadInfo.isThreaded) { \
+         MPICH_PerThread_t *pt_; \
+         MPIR_GetOrInitThreadPriv( &pt_ ); MPIU_Free( pt_ ); \
+         MPID_Thread_tls_set(&MPIR_ThreadInfo.thread_storage,(void *)0);} }
 #else
 #define MPIR_GetPerThread(pt_) MPIR_GetOrInitThreadPriv( pt_ )
+#define MPIR_ReleasePerThread { \
+MPICH_PerThread_t *pt_; MPIR_GetOrInitThreadPriv( &pt_ ); MPIU_Free( pt_ ); }
 #endif /* HAVE_RUNTIME_THREADCHECK */
+
 #endif /* MPICH_IS_THREADED */
 
 
@@ -77,18 +111,22 @@
 #define MPID_CS_ENTER()
 #define MPID_CS_EXIT()
 #elif (USE_THREAD_IMPL == MPICH_THREAD_IMPL_GLOBAL_MUTEX)
+/* Function prototype (needed when no weak symbols available) */
+void MPIR_CleanupThreadStorage( void *a );
+
 /* FIXME: The "thread storage" needs to be moved out of this */
 #define MPID_CS_INITIALIZE()						\
 {									\
-    MPID_Thread_mutex_create(&MPIR_Process.global_mutex, NULL);		\
-    MPID_Thread_tls_create(NULL, &MPIR_Process.thread_storage, NULL);   \
+    MPID_Thread_mutex_create(&MPIR_ThreadInfo.global_mutex, NULL);		\
+    MPID_Thread_tls_create(MPIR_CleanupThreadStorage, &MPIR_ThreadInfo.thread_storage, NULL);   \
     MPIU_DBG_MSG(THREAD,TYPICAL,"Created global mutex and private storage");\
 }
 #define MPID_CS_FINALIZE()						\
 {									\
     MPIU_DBG_MSG(THREAD,TYPICAL,"Freeing global mutex and private storage");\
-    MPID_Thread_tls_destroy(&MPIR_Process.thread_storage, NULL);	\
-    MPID_Thread_mutex_destroy(&MPIR_Process.global_mutex, NULL);	\
+    MPIR_ReleasePerThread;						\
+    MPID_Thread_tls_destroy(&MPIR_ThreadInfo.thread_storage, NULL);	\
+    MPID_Thread_mutex_destroy(&MPIR_ThreadInfo.global_mutex, NULL);	\
 }
 /* FIXME: Figure out what we want to do for the nest count on 
    these routines, so as to avoid extra function calls */
@@ -99,7 +137,7 @@
     if (MPIR_Nest_value() == 0)					\
     { 								\
         MPIU_DBG_MSG(THREAD,TYPICAL,"Enter global critical section");\
-	MPID_Thread_mutex_lock(&MPIR_Process.global_mutex);	\
+	MPID_Thread_mutex_lock(&MPIR_ThreadInfo.global_mutex);	\
     }								\
 }
 #define MPID_CS_EXIT()						\
@@ -109,7 +147,7 @@
     if (MPIR_Nest_value() == 0)					\
     { 								\
         MPIU_DBG_MSG(THREAD,TYPICAL,"Exit global critical section");\
-	MPID_Thread_mutex_unlock(&MPIR_Process.global_mutex);	\
+	MPID_Thread_mutex_unlock(&MPIR_ThreadInfo.global_mutex);	\
     }								\
 }
 #else
@@ -150,7 +188,7 @@
 #ifdef MPICH_IS_THREADED
 
 #ifdef HAVE_RUNTIME_THREADCHECK
-#define MPIU_THREAD_CHECK_BEGIN if (MPIR_Process.isThreaded) {
+#define MPIU_THREAD_CHECK_BEGIN if (MPIR_ThreadInfo.isThreaded) {
 #define MPIU_THREAD_CHECK_END   }  
 #else
 #define MPIU_THREAD_CHECK_BEGIN

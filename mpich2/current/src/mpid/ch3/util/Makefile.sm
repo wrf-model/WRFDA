@@ -1,5 +1,5 @@
 SUBDIRS = @ch3subsystems@
-SUBDIRS_ch3subsystems = shm sock shmbase
+SUBDIRS_ch3subsystems = shm sock shmbase shmproc
 
 distclean-local:
 

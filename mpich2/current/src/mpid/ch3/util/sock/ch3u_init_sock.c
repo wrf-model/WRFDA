@@ -4,8 +4,12 @@
  *      See COPYRIGHT in top-level directory.
  */
 
+#include "ch3usockconf.h"
 #include "mpidi_ch3_impl.h"
+
 #include "pmi.h"
+
+#include "mpidu_sock.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -61,13 +65,15 @@ int MPIDI_CH3U_Init_sock(int has_parent, MPIDI_PG_t *pg_p, int pg_rank,
        so this should be MPIDI_CH3_VC_Init( &pg_p->vct[p] );
        followed by MPIDI_VC_InitSock( ditto );  
        In fact, there should be a single VC_Init call here */
+    /* FIXME: Why isn't this MPIDI_VC_Init( vc, NULL, 0 )? */
     for (p = 0; p < pg_size; p++)
     {
-	pg_p->vct[p].ch.sendq_head = NULL;
-	pg_p->vct[p].ch.sendq_tail = NULL;
-	pg_p->vct[p].ch.state = MPIDI_CH3I_VC_STATE_UNCONNECTED;
-	pg_p->vct[p].ch.sock = MPIDU_SOCK_INVALID_SOCK;
-	pg_p->vct[p].ch.conn = NULL;
+	MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)pg_p->vct[p].channel_private;
+	vcch->sendq_head = NULL;
+	vcch->sendq_tail = NULL;
+	vcch->state      = MPIDI_CH3I_VC_STATE_UNCONNECTED;
+	vcch->sock       = MPIDU_SOCK_INVALID_SOCK;
+	vcch->conn       = NULL;
     }    
 
     mpi_errno = MPIDI_CH3U_Get_business_card_sock(pg_rank, 
@@ -96,8 +102,9 @@ int MPIDI_CH3U_Init_sock(int has_parent, MPIDI_PG_t *pg_p, int pg_rank,
 /* This routine initializes Sock-specific elements of the VC */
 int MPIDI_VC_InitSock( MPIDI_VC_t *vc ) 
 {
-    vc->ch.sock               = MPIDU_SOCK_INVALID_SOCK;
-    vc->ch.conn               = NULL;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+    vcch->sock               = MPIDU_SOCK_INVALID_SOCK;
+    vcch->conn               = NULL;
     return 0;
 }
 

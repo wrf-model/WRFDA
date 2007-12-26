@@ -812,7 +812,7 @@ void smpd_stdin_thread(SOCKET hWrite);
 #endif
 #ifdef USE_PTHREAD_STDIN_REDIRECTION
 void *smpd_pthread_stdin_thread(void *p);
-int smpd_cancel_stdin_thread();
+int smpd_cancel_stdin_thread(void);
 #endif
 int smpd_handle_command(smpd_context_t *context);
 int smpd_create_command_from_stdin(char *str, smpd_command_t **cmd_pptr);
@@ -831,17 +831,17 @@ SMPD_BOOL smpd_search_path(const char *path, const char *exe, int maxlen, char *
 #ifdef HAVE_WINDOWS_H
 int smpd_process_from_registry(smpd_process_t *process);
 int smpd_process_to_registry(smpd_process_t *process, char *actual_exe);
-int smpd_clear_process_registry();
-int smpd_validate_process_registry();
+int smpd_clear_process_registry(void);
+int smpd_validate_process_registry(void);
 SMPD_BOOL smpd_read_password_from_registry(int index, char *szAccount, char *szPassword);
 SMPD_BOOL smpd_save_password_to_registry(int index, const char *szAccount, const char *szPassword, SMPD_BOOL persistent);
 SMPD_BOOL smpd_delete_current_password_registry_entry(int index);
 int smpd_cache_password(const char *account, const char *password);
 SMPD_BOOL smpd_get_cached_password(char *account, char *password);
-int smpd_delete_cached_password();
+int smpd_delete_cached_password(void);
 #endif
-int smpd_do_console();
-int smpd_restart();
+int smpd_do_console(void);
+int smpd_restart(void);
 SMPD_BOOL smpd_snprintf_update(char **str_pptr, int *len_ptr, char *str_format, ...);
 const char * smpd_get_state_string(smpd_state_t state);
 const char * smpd_get_cmd_state_string(smpd_command_state_t state);
@@ -868,7 +868,7 @@ int smpd_abort_job(char *name, int rank, char *fmt, ...);
 int smpd_suspend_process(smpd_process_t *process);
 int smpd_kill_process(smpd_process_t *process, int exit_code);
 int smpd_handle_suspend_result(smpd_command_t *cmd, char *result_str);
-int smpd_watch_processes();
+int smpd_watch_processes(void);
 int smpd_get_hostname(char *host, int length);
 int PMIX_Start_root_smpd(int nproc, char *host, int len, int *port);
 int PMIX_Stop_root_smpd(void);
@@ -880,13 +880,13 @@ int smpd_create_sspi_client_context(smpd_sspi_client_context_t **new_context);
 int smpd_free_sspi_client_context(smpd_sspi_client_context_t **context);
 int smpd_sspi_context_init(smpd_sspi_client_context_t **sspi_context_pptr, const char *host, int port, smpd_sspi_type_t type);
 int smpd_sspi_context_iter(int sspi_id, void **sspi_buffer_pptr, int *length_ptr);
-SMPD_BOOL smpd_setup_scp();
-SMPD_BOOL smpd_remove_scp();
+SMPD_BOOL smpd_setup_scp(void);
+SMPD_BOOL smpd_remove_scp(void);
 int smpd_register_spn(const char *dc, const char *dn, const char *dh);
 int smpd_lookup_spn(char *target, int length, const char * host, int port);
 SMPD_BOOL smpd_map_user_drives(char *pszMap, char *pszAccount, char *pszPassword, char *pszError, int maxerrlength);
 SMPD_BOOL smpd_unmap_user_drives(char *pszMap);
-void smpd_finalize_drive_maps();
+void smpd_finalize_drive_maps(void);
 int smpd_append_env_option(char *str, int maxlen, const char *env_name, const char *env_val);
 #ifdef HAVE_WINDOWS_H
 int smpd_add_job_key(const char *key, const char *username, const char *domain, const char *full_domain);

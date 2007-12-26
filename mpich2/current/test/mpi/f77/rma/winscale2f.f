@@ -16,7 +16,7 @@ C
       integer nneighbors, nbrs(2), i, j
       logical mtestGetIntraComm
       logical flag
-C Include addsize defines aint as an address-sized integer
+C Include addsize defines asize as an address-sized integer
       include 'addsize.h'
       
       errs = 0
@@ -24,9 +24,9 @@ C Include addsize defines aint as an address-sized integer
 
       call mpi_type_size( MPI_INTEGER, intsize, ierr )
       do while( mtestGetIntraComm( comm, 2, .false. ) ) 
-         aint = nrows * (ncols + 2) * intsize
-         call mpi_win_create( buf, aint, intsize * nrows, MPI_INFO_NULL,
-     &                        comm, win, ierr )
+         asize = nrows * (ncols + 2) * intsize
+         call mpi_win_create( buf, asize, intsize * nrows, 
+     &                        MPI_INFO_NULL, comm, win, ierr )
          
 C Create the group for the neighbors
          call mpi_comm_size( comm, size, ierr )
@@ -60,12 +60,14 @@ C Initialize the buffer
                buf(i,j) = rank * (ncols * nrows) + i + (j-1) * nrows
             enddo
          enddo
-         call mpi_win_start( group2, 0, win, ierr )
          call mpi_win_post( group2, 0, win, ierr )
+         call mpi_win_start( group2, 0, win, ierr )
 C         
-         call mpi_put( buf(1,1), nrows, MPI_INTEGER, left, ncols+1, 
+         asize = ncols+1
+         call mpi_put( buf(1,1), nrows, MPI_INTEGER, left, asize,
      &                 nrows, MPI_INTEGER, win, ierr )
-         call mpi_put( buf(1,ncols), nrows, MPI_INTEGER, right, 0, 
+         asize = 0
+         call mpi_put( buf(1,ncols), nrows, MPI_INTEGER, right, asize, 
      &                 nrows, MPI_INTEGER, win, ierr )
 C         
          call mpi_win_complete( win, ierr )

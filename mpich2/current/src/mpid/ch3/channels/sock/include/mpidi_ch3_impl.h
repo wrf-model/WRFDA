@@ -12,51 +12,70 @@
 #include "mpidimpl.h"
 #include "ch3usock.h"
 
+/* Redefine MPIU_CALL since the sock channel should be self-contained.
+   This only affects the building of a dynamically loadable library for 
+   the sock channel, and then only when debugging is enabled */
+#undef MPIU_CALL
+#define MPIU_CALL(context,funccall) context##_##funccall
+
+/* Define the channel-private data structures; these are overlaid on the
+   channel_private scratchpads */
+typedef struct MPIDI_CH3I_VC
+{
+    struct MPID_Request * sendq_head;
+    struct MPID_Request * sendq_tail;
+    MPIDI_CH3I_VC_state_t state;
+    struct MPIDU_Sock *sock;
+    struct MPIDI_CH3I_Connection * conn;
+}
+MPIDI_CH3I_VC;
+
 /* This is all socket connection definitions */
 
     /* MT - not thread safe! */
-#define MPIDI_CH3I_SendQ_enqueue(vc, req)				\
+
+#define MPIDI_CH3I_SendQ_enqueue(vcch, req)				\
 {									\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue vc=%p req=0x%08x", vc, req->handle));  \
+    MPIU_DBG_MSG(CH3_MSG,TYPICAL,"Enqueuing this request");\
     req->dev.next = NULL;						\
-    if (vc->ch.sendq_tail != NULL)					\
+    if (vcch->sendq_tail != NULL)					\
     {									\
-	vc->ch.sendq_tail->dev.next = req;				\
+	vcch->sendq_tail->dev.next = req;				\
     }									\
     else								\
     {									\
-	vc->ch.sendq_head = req;					\
+	vcch->sendq_head = req;					\
     }									\
-    vc->ch.sendq_tail = req;						\
+    vcch->sendq_tail = req;						\
 }
 
     /* MT - not thread safe! */
-#define MPIDI_CH3I_SendQ_enqueue_head(vc, req)				\
+#define MPIDI_CH3I_SendQ_enqueue_head(vcch, req)			\
 {									\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_enqueue_head vc=%p req=0x%08x", vc, req->handle));\
-    req->dev.next = vc->ch.sendq_head;					\
-    if (vc->ch.sendq_tail == NULL)					\
+    MPIU_DBG_MSG(CH3_MSG,TYPICAL,"Enqueuing this request at head");\
+    req->dev.next = vcch->sendq_head;					\
+    if (vcch->sendq_tail == NULL)					\
     {									\
-	vc->ch.sendq_tail = req;					\
+	vcch->sendq_tail = req;					\
     }									\
-    vc->ch.sendq_head = req;						\
+    vcch->sendq_head = req;						\
 }
 
     /* MT - not thread safe! */
-#define MPIDI_CH3I_SendQ_dequeue(vc)					\
+#define MPIDI_CH3I_SendQ_dequeue(vcch)					\
 {									\
-    MPIDI_DBG_PRINTF((50, FCNAME, "SendQ_dequeue vc=%p req=0x%08x", vc, vc->ch.sendq_head->handle));\
-    vc->ch.sendq_head = vc->ch.sendq_head->dev.next;			\
-    if (vc->ch.sendq_head == NULL)					\
+    MPIU_DBG_MSG(CH3_MSG,TYPICAL,"Dequeuing this request");\
+    vcch->sendq_head = vcch->sendq_head->dev.next;			\
+    if (vcch->sendq_head == NULL)					\
     {									\
-	vc->ch.sendq_tail = NULL;					\
+	vcch->sendq_tail = NULL;					\
     }									\
 }
 
 
-#define MPIDI_CH3I_SendQ_head(vc) (vc->ch.sendq_head)
+#define MPIDI_CH3I_SendQ_head(vcch) (vcch->sendq_head)
 
-#define MPIDI_CH3I_SendQ_empty(vc) (vc->ch.sendq_head == NULL)
+#define MPIDI_CH3I_SendQ_empty(vcch) (vcch->sendq_head == NULL)
 
 /* End of connection-related macros */
 

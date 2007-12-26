@@ -40,6 +40,9 @@ int MPIR_Graph_create( const MPID_Comm *comm_ptr, int nnodes,
     MPIR_Topology *graph_ptr = NULL;
     MPIU_CHKPMEM_DECL(3);
 
+    /* Set this to null in case there is an error */
+    *comm_graph = MPI_COMM_NULL;
+
     /* Create a new communicator */
     if (reorder) {
 	int nrank;

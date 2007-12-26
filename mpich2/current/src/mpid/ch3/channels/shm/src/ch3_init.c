@@ -12,25 +12,9 @@
 
 MPIDI_CH3I_Process_t MPIDI_CH3I_Process = {NULL};
 
-static void generate_shm_string(char *str)
-{
-#ifdef USE_WINDOWS_SHM
-    UUID guid;
-    UuidCreate(&guid);
-    MPIU_Snprintf(str, MPIDI_MAX_SHM_NAME_LENGTH, 
-	"%08lX-%04X-%04x-%02X%02X-%02X%02X%02X%02X%02X%02X",
-	guid.Data1, guid.Data2, guid.Data3,
-	guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
-	guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
-    MPIU_DBG_PRINTF(("GUID = %s\n", str));
-#elif defined (USE_POSIX_SHM)
-    MPIU_Snprintf(str, MPIDI_MAX_SHM_NAME_LENGTH, "/mpich_shm_%d", getpid());
-#elif defined (USE_SYSV_SHM)
-    MPIU_Snprintf(str, MPIDI_MAX_SHM_NAME_LENGTH, "%d", getpid());
-#else
-#error No shared memory subsystem defined
-#endif
-}
+/* Define the ABI version of this channel.  Change this if the channel
+   interface (not just the implementation of that interface) changes */
+char MPIDI_CH3_ABIVersion[] = "1.1";
 
 #undef FUNCNAME
 #define FUNCNAME MPIDI_CH3_Init
@@ -39,7 +23,6 @@ static void generate_shm_string(char *str)
 int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 {
     int mpi_errno = MPI_SUCCESS;
-    int pmi_errno = PMI_SUCCESS;
     MPIDI_VC_t * vc;
     int pg_size;
     int p;
@@ -52,7 +35,14 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
     int i, j, k;
     int shm_block;
     char local_host[100];
+    MPIDI_CH3I_PG *pgch = (MPIDI_CH3I_PG*)pg->channel_private;
 
+#if 1
+    if (sizeof(MPIDI_CH3I_PG) > MPIDI_CH3_PG_SIZE * sizeof(int32_t) ) {
+	fprintf( stderr, "channel pg data larger than size in MPIDI_PG_t\n" );
+	return MPI_ERR_INTERN;
+    }
+#endif
     /*
      * Extract process group related information from PMI and initialize
      * structures that track the process group connections, MPI_COMM_WORLD, and
@@ -64,31 +54,31 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
     MPIDI_PG_GetConnKVSname( &kvsname );
 
     /* set the global variable defaults */
-    pg->ch.nShmEagerLimit = MPIDI_SHM_EAGER_LIMIT;
+    pgch->nShmEagerLimit = MPIDI_SHM_EAGER_LIMIT;
 #ifdef HAVE_SHARED_PROCESS_READ
-    pg->ch.nShmRndvLimit = MPIDI_SHM_RNDV_LIMIT;
+    pgch->nShmRndvLimit = MPIDI_SHM_RNDV_LIMIT;
 #ifdef HAVE_WINDOWS_H
-    pg->ch.pSharedProcessHandles = NULL;
+    pgch->pSharedProcessHandles = NULL;
 #else
-    pg->ch.pSharedProcessIDs = NULL;
-    pg->ch.pSharedProcessFileDescriptors = NULL;
+    pgch->pSharedProcessIDs = NULL;
+    pgch->pSharedProcessFileDescriptors = NULL;
 #endif
 #endif
-    pg->ch.addr = NULL;
+    pgch->addr = NULL;
 #ifdef USE_POSIX_SHM
-    pg->ch.key[0] = '\0';
-    pg->ch.id = -1;
+    pgch->key[0] = '\0';
+    pgch->id = -1;
 #elif defined (USE_SYSV_SHM)
-    pg->ch.key = -1;
-    pg->ch.id = -1;
+    pgch->key = -1;
+    pgch->id = -1;
 #elif defined (USE_WINDOWS_SHM)
-    pg->ch.key[0] = '\0';
-    pg->ch.id = NULL;
+    pgch->key[0] = '\0';
+    pgch->id = NULL;
 #else
 #error No shared memory subsystem defined
 #endif
-    pg->ch.nShmWaitSpinCount = MPIDI_CH3I_SPIN_COUNT_DEFAULT;
-    pg->ch.nShmWaitYieldCount = MPIDI_CH3I_YIELD_COUNT_DEFAULT;
+    pgch->nShmWaitSpinCount = MPIDI_CH3I_SPIN_COUNT_DEFAULT;
+    pgch->nShmWaitYieldCount = MPIDI_CH3I_YIELD_COUNT_DEFAULT;
 
     /* Initialize the VC table associated with this process
        group (and thus COMM_WORLD) */
@@ -96,18 +86,21 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 
     for (p = 0; p < pg_size; p++)
     {
+	MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)pg->vct[p].channel_private;
 	/* FIXME: the vc's must be set to active for the close protocol to 
 	   work in the shm channel */
 	pg->vct[p].state = MPIDI_VC_STATE_ACTIVE;
+	/* FIXME: Should the malloc be within the init? */
 	MPIDI_CH3_VC_Init( &pg->vct[p] );
-	pg->vct[p].ch.req = (MPID_Request*)MPIU_Malloc(sizeof(MPID_Request));
+	/* FIXME: Need to free this request when the vc is removed */
+	vcch->req = (MPID_Request*)MPIU_Malloc(sizeof(MPID_Request));
 	/* FIXME: Should these also be set in the VC_Init, or 
 	   is VC_Init moot (never called because this channel does not
 	   support dynamic processes?) */
-	pg->vct[p].ch.shm_reading_pkt = TRUE;
+	vcch->shm_reading_pkt = TRUE;
 #ifdef USE_SHM_UNEX
-	pg->vct[p].ch.unex_finished_next = NULL;
-	pg->vct[p].ch.unex_list = NULL;
+	vcch->unex_finished_next = NULL;
+	vcch->unex_list = NULL;
 #endif
     }
     
@@ -163,7 +156,7 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 	if (pg_rank == 0)
 	{
 	    /* Put the shared memory key */
-	    generate_shm_string(shmemkey);
+	    MPIDI_Generate_shm_string(shmemkey,sizeof(shmemkey));
 	    if (MPIU_Strncpy(key, "SHMEMKEY", key_max_sz))
 	    {
 		mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**strncpy", 0);
@@ -255,13 +248,13 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 
 	MPIU_DBG_PRINTF(("KEY = %s\n", shmemkey));
 #if defined(USE_POSIX_SHM) || defined(USE_WINDOWS_SHM)
-	if (MPIU_Strncpy(pg->ch.key, shmemkey, MPIDI_MAX_SHM_NAME_LENGTH))
+	if (MPIU_Strncpy(pgch->key, shmemkey, MPIDI_MAX_SHM_NAME_LENGTH))
 	{
 	    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**strncpy", 0);
 	    return mpi_errno;
 	}
 #elif defined (USE_SYSV_SHM)
-	pg->ch.key = atoi(shmemkey);
+	pgch->key = atoi(shmemkey);
 #else
 #error No shared memory subsystem defined
 #endif
@@ -286,44 +279,46 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
     /* initialize each shared memory queue */
     for (i=0; i<pg_size; i++)
     {
+	MPIDI_CH3I_VC *vcch;
 	/* MPIDI_PG_Get_vcr(pg, i, &vc); */
 	/* FIXME: Move this code to the general init pg for shared
 	   memory */
 	vc = &pg->vct[i];
+	vcch = (MPIDI_CH3I_VC *)vc->channel_private;
 #ifdef HAVE_SHARED_PROCESS_READ
 #ifdef HAVE_WINDOWS_H
-	if (pg->ch.pSharedProcessHandles)
-	    vc->ch.hSharedProcessHandle = pg->ch.pSharedProcessHandles[i];
+	if (pgch->pSharedProcessHandles)
+	    vcch->hSharedProcessHandle = pgch->pSharedProcessHandles[i];
 #else
-	if (pg->ch.pSharedProcessIDs)
+	if (pgch->pSharedProcessIDs)
 	{
-	    vc->ch.nSharedProcessID = pg->ch.pSharedProcessIDs[i];
-	    vc->ch.nSharedProcessFileDescriptor = pg->ch.pSharedProcessFileDescriptors[i];
+	    vcch->nSharedProcessID = pgch->pSharedProcessIDs[i];
+	    vcch->nSharedProcessFileDescriptor = pgch->pSharedProcessFileDescriptors[i];
 	}
 #endif
 #endif
 	if (i == pg_rank)
 	{
-	    vc->ch.shm = (MPIDI_CH3I_SHM_Queue_t*)((char*)pg->ch.addr + (shm_block * i));
+	    vcch->shm = (MPIDI_CH3I_SHM_Queue_t*)((char*)pgch->addr + (shm_block * i));
 	    for (j=0; j<pg_size; j++)
 	    {
-		vc->ch.shm[j].head_index = 0;
-		vc->ch.shm[j].tail_index = 0;
+		vcch->shm[j].head_index = 0;
+		vcch->shm[j].tail_index = 0;
 		for (k=0; k<MPIDI_CH3I_NUM_PACKETS; k++)
 		{
-		    vc->ch.shm[j].packet[k].offset = 0;
-		    vc->ch.shm[j].packet[k].avail = MPIDI_CH3I_PKT_AVAILABLE;
+		    vcch->shm[j].packet[k].offset = 0;
+		    vcch->shm[j].packet[k].avail = MPIDI_CH3I_PKT_AVAILABLE;
 		}
 	    }
 	}
 	else
 	{
-	    /*vc->ch.shm += pg_rank;*/
-	    vc->ch.shm = NULL;
-	    vc->ch.write_shmq = (MPIDI_CH3I_SHM_Queue_t*)((char*)pg->ch.addr + (shm_block * i)) + pg_rank;
-	    vc->ch.read_shmq = (MPIDI_CH3I_SHM_Queue_t*)((char*)pg->ch.addr + (shm_block * pg_rank)) + i;
+	    /*vcch->shm += pg_rank;*/
+	    vcch->shm = NULL;
+	    vcch->write_shmq = (MPIDI_CH3I_SHM_Queue_t*)((char*)pgch->addr + (shm_block * i)) + pg_rank;
+	    vcch->read_shmq = (MPIDI_CH3I_SHM_Queue_t*)((char*)pgch->addr + (shm_block * pg_rank)) + i;
 	    /* post a read of the first packet header */
-	    vc->ch.shm_reading_pkt = TRUE;
+	    vcch->shm_reading_pkt = TRUE;
 	}
     }
 
@@ -333,9 +328,9 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
         SYSTEM_INFO info;
         GetSystemInfo(&info);
         if (info.dwNumberOfProcessors == 1)
-            pg->ch.nShmWaitSpinCount = 1;
+            pgch->nShmWaitSpinCount = 1;
         else if (info.dwNumberOfProcessors < (DWORD) pg_size)
-            pg->ch.nShmWaitSpinCount = ( MPIDI_CH3I_SPIN_COUNT_DEFAULT * info.dwNumberOfProcessors ) / pg_size;
+            pgch->nShmWaitSpinCount = ( MPIDI_CH3I_SPIN_COUNT_DEFAULT * info.dwNumberOfProcessors ) / pg_size;
     }
 #else
     /* figure out how many processors are available and set the spin count accordingly */
@@ -344,14 +339,14 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 	int num_cpus;
 	num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
 	if (num_cpus == 1)
-	    pg->ch.nShmWaitSpinCount = 1;
+	    pgch->nShmWaitSpinCount = 1;
 	else if (num_cpus > 0 && num_cpus < pg_size)
-            pg->ch.nShmWaitSpinCount = 1;
-	    /* pg->ch.nShmWaitSpinCount = ( MPIDI_CH3I_SPIN_COUNT_DEFAULT * num_cpus ) / pg_size; */
+            pgch->nShmWaitSpinCount = 1;
+	    /* pgch->nShmWaitSpinCount = ( MPIDI_CH3I_SPIN_COUNT_DEFAULT * num_cpus ) / pg_size; */
     }
 #else
     /* if the number of cpus cannot be determined, set the spin count to 1 */
-    pg->ch.nShmWaitSpinCount = 1;
+    pgch->nShmWaitSpinCount = 1;
 #endif
 #endif
 
@@ -368,27 +363,26 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t * pg, int pg_rank )
 	return mpi_errno;
     }
 #ifdef USE_POSIX_SHM
-    if (shm_unlink(pg->ch.key))
+    if (shm_unlink(pgch->key))
     {
 	/* Everyone is unlinking the same object so failure is ok? */
 	/*
-	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shm_unlink", "**shm_unlink %s %d", pg->ch.key, errno);
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shm_unlink", "**shm_unlink %s %d", pgch->key, errno);
 	return mpi_errno;
 	*/
     }
 #elif defined (USE_SYSV_SHM)
-    if (shmctl(pg->ch.id, IPC_RMID, NULL))
+    if (shmctl(pgch->id, IPC_RMID, NULL))
     {
 	/* Everyone is removing the same object so failure is ok? */
 	if (errno != EINVAL)
 	{
-	    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shmctl", "**shmctl %d %d", pg->ch.id, errno);
+	    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shmctl", "**shmctl %d %d", pgch->id, errno);
 	    return mpi_errno;
 	}
     }
 #endif
 
-fn_exit:
     if (val != NULL)
     { 
 	MPIU_Free(val);
@@ -405,18 +399,29 @@ fn_exit:
    in MPIDI_CH3_Init and in routines that create and initialize connections */
 int MPIDI_CH3_VC_Init( MPIDI_VC_t *vc )
 {
-    vc->ch.sendq_head         = NULL;
-    vc->ch.sendq_tail         = NULL;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+    vcch->sendq_head         = NULL;
+    vcch->sendq_tail         = NULL;
 
     /* Which of these do we need? */
-    vc->ch.recv_active        = NULL;
-    vc->ch.send_active        = NULL;
-    vc->ch.req                = NULL;
-    vc->ch.read_shmq          = NULL;
-    vc->ch.write_shmq         = NULL;
-    vc->ch.shm                = NULL;
-    vc->ch.shm_state          = 0;
+    vcch->recv_active        = NULL;
+    vcch->send_active        = NULL;
+    vcch->req                = NULL;
+    vcch->read_shmq          = NULL;
+    vcch->write_shmq         = NULL;
+    vcch->shm                = NULL;
+    vcch->shm_state          = 0;
     return 0;
+}
+
+/* Free the request structure that may have been added to this vc */
+int MPIDI_CH3_VC_Destroy( struct MPIDI_VC *vc )
+{
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+    if (vcch->req) {
+	MPIU_Free( vcch->req );
+    }
+    return MPI_SUCCESS;
 }
 
 /* This function simply tells the CH3 device to use the defaults for the 
@@ -433,5 +438,19 @@ int MPIDI_CH3_PG_Init( MPIDI_PG_t *pg )
     /* FIXME: This should call a routine from the ch3/util/shm directory
        to initialize the use of shared memory for processes WITHIN this 
        process group */
+    return MPI_SUCCESS;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a process group */
+int MPIDI_CH3_PG_Destroy( struct MPIDI_PG *pg )
+{
+    return MPI_SUCCESS;
+}
+
+/* A dummy function so that all channels provide the same set of functions, 
+   enabling dll channels */
+int MPIDI_CH3_InitCompleted( void )
+{
     return MPI_SUCCESS;
 }

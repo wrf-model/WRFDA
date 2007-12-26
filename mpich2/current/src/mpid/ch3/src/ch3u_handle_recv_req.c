@@ -161,10 +161,12 @@ int MPIDI_CH3_ReqHandler_PutRespDerivedDTComplete( MPIDI_VC_t *vc,
        request is freed. free dtype_info here. */
     MPIU_Free(rreq->dev.dtype_info);
     
+    rreq->dev.segment_ptr = MPID_Segment_alloc( );
+    /* if (!rreq->dev.segment_ptr) { MPIU_ERR_POP(); } */
     MPID_Segment_init(rreq->dev.user_buf,
 		      rreq->dev.user_count,
 		      rreq->dev.datatype,
-		      &rreq->dev.segment, 0);
+		      rreq->dev.segment_ptr, 0);
     rreq->dev.segment_first = 0;
     rreq->dev.segment_size = rreq->dev.recv_data_sz;
     
@@ -237,10 +239,12 @@ int MPIDI_CH3_ReqHandler_AccumRespDerivedDTComplete( MPIDI_VC_t *vc,
        request is freed. free dtype_info here. */
     MPIU_Free(rreq->dev.dtype_info);
     
+    rreq->dev.segment_ptr = MPID_Segment_alloc( );
+    /* if (!rreq->dev.segment_ptr) { MPIU_ERR_POP(); } */
     MPID_Segment_init(rreq->dev.user_buf,
 		      rreq->dev.user_count,
 		      rreq->dev.datatype,
-		      &rreq->dev.segment, 0);
+		      rreq->dev.segment_ptr, 0);
     rreq->dev.segment_first = 0;
     rreq->dev.segment_size = rreq->dev.recv_data_sz;
     
@@ -303,10 +307,12 @@ int MPIDI_CH3_ReqHandler_GetRespDerivedDTComplete( MPIDI_VC_t *vc,
     iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) get_resp_pkt;
     iov[0].MPID_IOV_LEN = sizeof(*get_resp_pkt);
     
+    sreq->dev.segment_ptr = MPID_Segment_alloc( );
+    /* if (!sreq->dev.segment_ptr) { MPIU_ERR_POP(); } */
     MPID_Segment_init(sreq->dev.user_buf,
 		      sreq->dev.user_count,
 		      sreq->dev.datatype,
-		      &sreq->dev.segment, 0);
+		      sreq->dev.segment_ptr, 0);
     sreq->dev.segment_first = 0;
     sreq->dev.segment_size = new_dtp->size * sreq->dev.user_count;
     
@@ -317,7 +323,7 @@ int MPIDI_CH3_ReqHandler_GetRespDerivedDTComplete( MPIDI_VC_t *vc,
     {
 	iov_n += 1;
 		
-	mpi_errno = MPIDI_CH3_iSendv(vc, sreq, iov, iov_n);
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iSendv(vc, sreq, iov, iov_n));
 	/* --BEGIN ERROR HANDLING-- */
 	if (mpi_errno != MPI_SUCCESS)
 	{
@@ -930,8 +936,8 @@ int MPIDI_CH3I_Send_pt_rma_done_pkt(MPIDI_VC_t *vc, MPI_Win source_win_handle)
     MPIDI_Pkt_init(pt_rma_done_pkt, MPIDI_CH3_PKT_PT_RMA_DONE);
     pt_rma_done_pkt->source_win_handle = source_win_handle;
 
-    mpi_errno = MPIDI_CH3_iStartMsg(vc, pt_rma_done_pkt,
-                                    sizeof(*pt_rma_done_pkt), &req);
+    mpi_errno = MPIU_CALL(MPIDI_CH3,iStartMsg(vc, pt_rma_done_pkt,
+					      sizeof(*pt_rma_done_pkt), &req));
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_SETFATALANDJUMP(mpi_errno,MPI_ERR_OTHER,"**ch3|rmamsg");
     }
@@ -1034,7 +1040,7 @@ static int do_simple_get(MPID_Win *win_ptr, MPIDI_Win_lock_queue *lock_queue)
     MPID_Datatype_get_size_macro(lock_queue->pt_single_op->datatype, type_size);
     iov[1].MPID_IOV_LEN = lock_queue->pt_single_op->count * type_size;
     
-    mpi_errno = MPIDI_CH3_iSendv(lock_queue->vc, req, iov, 2);
+    mpi_errno = MPIU_CALL(MPIDI_CH3,iSendv(lock_queue->vc, req, iov, 2));
     /* --BEGIN ERROR HANDLING-- */
     if (mpi_errno != MPI_SUCCESS)
     {

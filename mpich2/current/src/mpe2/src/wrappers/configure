@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS top_srcdir_abs VPATH MAKE MKDIR CPRP RM MV includebuild_dir libbuild_dir binbuild_dir sbinbuild_dir etcbuild_dir CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT AR RANLIB ac_ct_RANLIB CPP DEBUG_LIBS EGREP ALLOCA build build_cpu build_vendor build_os host host_cpu host_vendor host_os MPI_IMPL MPE_BUILD_FORTRAN2C CLINKER MPI_CC F77 FLINKER FFLAGS MPI_F77 FINC_PATH_LEADER FLIB_PATH_LEADER MPI_INC MPI_LIBS LOG_LIBNAME TRACE_LIBNAME F2CMPI_LIBNAME PROF_LIBS LOG_LIBS TRACE_LIBS F2CMPI_LIBS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS top_srcdir_abs VPATH MAKE MKDIR CPRP RM MV includebuild_dir libbuild_dir binbuild_dir sbinbuild_dir etcbuild_dir CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT AR RANLIB ac_ct_RANLIB CPP DEBUG_LIBS EGREP ALLOCA build build_cpu build_vendor build_os host host_cpu host_vendor host_os MPI_IMPL MPE_BUILD_FORTRAN2C CLINKER MPI_CC MPE_CLINKER F77 FLINKER FFLAGS MPI_F77 MPE_FLINKER FINC_PATH_LEADER FLIB_PATH_LEADER MPI_INC MPI_LIBS LOG_LIBNAME TRACE_LIBNAME F2CMPI_LIBNAME PROF_LIBS LOG_LIBS TRACE_LIBS F2CMPI_LIBS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -862,8 +862,8 @@ Optional Features:
                                      Turn off logging before making PMPI call.
                                      Turn on logging after PMPI call.  For
                                      non-MPICH2 (standalone build), the default
-                                     is enable=yes.  For MPICH2 build, the
-                                     default is enable=no.
+                                     is enable=yes for non-MPICH2 build.  For
+                                     MPICH2 build, the default is enable=no.
 --enable-debugcheck                - Turn on/off the debugging & diagnostic
                                      checking code in MPE code.
                                      The default is enable=no.
@@ -987,7 +987,7 @@ esac
     else
       echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2
     fi
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 
@@ -1321,7 +1321,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
           ac_config_headers="$ac_config_headers mpe_wrappers_conf.h"
 
-echo "Configuring MPE wrapper Library For MPI with $ac_configure_args"
+echo "Configuring MPE Wrapper Libraries For MPI with $ac_configure_args"
 if test "X$srcdir" != "X." -a -s $srcdir/src/log_mpi_core.c ; then
     top_srcdir_abs=$srcdir
 else
@@ -1402,10 +1402,12 @@ CC=${CC:-cc}
 CLINKER=${CLINKER:-$CC}
 CFLAGS=${MPE_CFLAGS}
 MPI_CC=${MPI_CC:-${CC}}
+MPE_CLINKER=${MPE_CLINKER}
 F77=${F77:-f77}
 FLINKER=${FLINKER:-$F77}
 FFLAGS=${MPE_FFLAGS}
 MPI_F77=${MPI_F77:-${F77}}
+MPE_FLINKER=${MPE_FLINKER}
 FINC_PATH_LEADER=${FINC_PATH_LEADER:-"-I"}
 FLIB_PATH_LEADER=${FLIB_PATH_LEADER:-"-L"}
 MPI_INC=${MPI_INC}
@@ -2240,8 +2242,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2299,8 +2300,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2416,8 +2416,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2471,8 +2470,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2517,8 +2515,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -2562,8 +2559,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3002,8 +2998,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3084,8 +3079,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3292,8 +3286,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3363,8 +3356,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3433,8 +3425,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3579,8 +3570,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3728,8 +3718,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3810,8 +3799,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -3952,8 +3940,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4086,7 +4073,7 @@ return 0;
 }
 int main() { func( 1, 2 ); return 0;}
 EOF
-if { (eval echo configure:4089: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:4076: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
   rm -rf conftest*
@@ -4129,8 +4116,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4288,8 +4274,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4338,8 +4323,6 @@ if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
     if test "$enable_f2cmpilib" = "yes" ; then
         F2CMPI_LIBS="-l$F2CMPI_LIBNAME"
     fi
-#   when --enable-f77 and --disable-f2cmpilib are selected,
-#   value supplied in --with-f2cmpilibs will be used.
 else
     F2CMPI_LIBS=""
 fi
@@ -4360,6 +4343,240 @@ _ACEOF
 else
     echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
+fi
+
+if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
+    if test "$enable_checkMPI" = "yes" ; then
+        echo "$as_me:$LINENO: checking for the C version of MPI_Init_thread " >&5
+echo $ECHO_N "checking for the C version of MPI_Init_thread ... $ECHO_C" >&6
+
+    pac_MPI_CC="$MPI_CC"
+    pac_MPI_CFLAGS="$CFLAGS $MPI_INC"
+    pac_MPI_LIBS="$MPI_LIBS"
+
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    pac_saved_CC="$CC"
+    pac_saved_CFLAGS="$CFLAGS"
+    pac_saved_LIBS="$LIBS"
+    CC="$pac_MPI_CC"
+    CFLAGS="$pac_MPI_CFLAGS"
+    LIBS="$pac_MPI_LIBS"
+    cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* <stdlib.h> is included to get NULL defined */
+#if defined( STDC_HEADERS ) || defined( HAVE_STDLIB_H )
+#include <stdlib.h>
+#else
+#if !defined( NULL )
+#define NULL 0
+#endif
+#endif
+
+
+#include "mpi.h"
+
+
+int
+main ()
+{
+
+    int argc; char **argv;
+     int itmp; int thread_level  ;
+    MPI_Init(&argc, &argv);
+
+    itmp=MPI_Init_thread( NULL, NULL, MPI_THREAD_MULTIPLE, &thread_level )
+                               ;
+    MPI_Finalize();
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_mpi_working=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+pac_mpi_working=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+    CC="$pac_saved_CC"
+    CFLAGS="$pac_saved_CFLAGS"
+    LIBS="$pac_saved_LIBS"
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    if test "$pac_mpi_working" = "yes" ; then
+        mpe_link_ok=yes
+    else
+        mpe_link_ok=no
+    fi
+
+        if test "$mpe_link_ok" = "yes" ; then
+            echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+            echo "$as_me:$LINENO: checking for the C version of PMPI_Init_thread " >&5
+echo $ECHO_N "checking for the C version of PMPI_Init_thread ... $ECHO_C" >&6
+
+    pac_MPI_CC="$MPI_CC"
+    pac_MPI_CFLAGS="$CFLAGS $MPI_INC"
+    pac_MPI_LIBS="$MPI_LIBS"
+
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    pac_saved_CC="$CC"
+    pac_saved_CFLAGS="$CFLAGS"
+    pac_saved_LIBS="$LIBS"
+    CC="$pac_MPI_CC"
+    CFLAGS="$pac_MPI_CFLAGS"
+    LIBS="$pac_MPI_LIBS"
+    cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* <stdlib.h> is included to get NULL defined */
+#if defined( STDC_HEADERS ) || defined( HAVE_STDLIB_H )
+#include <stdlib.h>
+#else
+#if !defined( NULL )
+#define NULL 0
+#endif
+#endif
+
+
+#include "mpi.h"
+
+
+int
+main ()
+{
+
+    int argc; char **argv;
+     int itmp; int thread_level ;
+    MPI_Init(&argc, &argv);
+
+    itmp=PMPI_Init_thread( NULL, NULL, MPI_THREAD_MULTIPLE, &thread_level )
+                                   ;
+    MPI_Finalize();
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  pac_mpi_working=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+pac_mpi_working=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+    CC="$pac_saved_CC"
+    CFLAGS="$pac_saved_CFLAGS"
+    LIBS="$pac_saved_LIBS"
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    if test "$pac_mpi_working" = "yes" ; then
+        mpe_link_ok=yes
+    else
+        mpe_link_ok=no
+    fi
+
+            if test "$mpe_link_ok" = "yes" ; then
+                echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI_INIT_THREAD 1
+_ACEOF
+
+            else
+                echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+            fi
+        else
+            echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+        fi
+    fi
+else
+    if test "$MPI_IMPL" = "MPICH2" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI_INIT_THREAD 1
+_ACEOF
+
+    fi
 fi
 
 
@@ -4401,7 +4618,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4410,8 +4629,10 @@ main ()
     int argc; char **argv;
      int itmp; MPI_File fh  ;
     MPI_Init(&argc, &argv);
-     itmp=MPI_File_open( MPI_COMM_WORLD, "mpiiotest",
- MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &fh )  ;
+
+    itmp=MPI_File_open( MPI_COMM_WORLD, "mpiiotest",
+                        MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &fh )
+                               ;
     MPI_Finalize();
 
   ;
@@ -4427,8 +4648,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4503,7 +4723,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4512,7 +4734,10 @@ main ()
     int argc; char **argv;
      int itmp; MPI_File fh  ;
     MPI_Init(&argc, &argv);
-     itmp=PMPI_File_open( MPI_COMM_WORLD, "mpiiotest", MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &fh )  ;
+
+    itmp=PMPI_File_open( MPI_COMM_WORLD, "mpiiotest",
+                         MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &fh )
+                                   ;
     MPI_Finalize();
 
   ;
@@ -4528,8 +4753,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4609,7 +4833,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4634,8 +4860,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4740,7 +4965,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4767,8 +4994,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4843,7 +5069,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4870,8 +5098,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -4952,7 +5179,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -4981,8 +5210,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5057,7 +5285,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5086,8 +5316,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5176,7 +5405,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5204,8 +5435,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5280,7 +5510,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5308,8 +5540,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5429,7 +5660,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5457,8 +5690,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5533,7 +5765,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5561,8 +5795,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5643,7 +5876,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5672,8 +5907,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5748,7 +5982,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5777,8 +6013,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -5886,7 +6121,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -5914,8 +6151,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6004,7 +6240,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -6032,8 +6270,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6090,6 +6327,27 @@ if test "${F2CMPI_LIBS}" = "-l${F2CMPI_LIBNAME}" \
 
 #   FIXME: MPICH2 include MPI_Fint, Need to fetch the value somehow.
 
+#   Obtain MPICH2's MPI_STATUS_SIZE from environmental variable
+    echo "$as_me:$LINENO: checking for the value of MPI_STATUS_SIZE " >&5
+echo $ECHO_N "checking for the value of MPI_STATUS_SIZE ... $ECHO_C" >&6
+    if test -n "$SIZEOF_MPI_STATUS" ; then
+        # FIXME: Get true value of MPI_Fint instead of 4
+        CROSS_MPI_STATUS_SIZE=`expr $SIZEOF_MPI_STATUS / 4`
+        MPI_STATUS_SIZE=$CROSS_MPI_STATUS_SIZE
+        echo "$as_me:$LINENO: result: $MPI_STATUS_SIZE" >&5
+echo "${ECHO_T}$MPI_STATUS_SIZE" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define MPI_STATUS_SIZE $MPI_STATUS_SIZE
+_ACEOF
+
+    else
+        echo "$as_me:$LINENO: result: \"undefined -- disabling fortran features.\"" >&5
+echo "${ECHO_T}\"undefined -- disabling fortran features.\"" >&6
+        MPE_BUILD_FORTRAN2C=no
+        F2CMPI_LIBS=""
+    fi
+
 #   MPICH2 after 1.0.2 release has MPI_F_STATUS_IGNORE, MPI_F_STATUSES_IGNORE
 
 cat >>confdefs.h <<\_ACEOF
@@ -6108,34 +6366,6 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_MPI_COMM_F2C 1
 _ACEOF
 
-
-#   Obtain MPICH2's MPI_STATUS_SIZE from environmental variable
-    echo "$as_me:$LINENO: checking for the value of MPI_STATUS_SIZE " >&5
-echo $ECHO_N "checking for the value of MPI_STATUS_SIZE ... $ECHO_C" >&6
-    if test -n "$SIZEOF_MPI_STATUS" ; then
-        # FIXME: Get true value of MPI_Fint instead of 4
-        CROSS_MPI_STATUS_SIZE=`expr $SIZEOF_MPI_STATUS / 4`
-        MPI_STATUS_SIZE=$CROSS_MPI_STATUS_SIZE
-        echo "$as_me:$LINENO: result: $MPI_STATUS_SIZE" >&5
-echo "${ECHO_T}$MPI_STATUS_SIZE" >&6
-
-cat >>confdefs.h <<_ACEOF
-#define MPI_STATUS_SIZE $MPI_STATUS_SIZE
-_ACEOF
-
-    else
-
-if test "$enable_softerror" = "yes" ; then
-    { echo "$as_me:$LINENO: WARNING:  Undefined MPI_STATUS_SIZE in MPICH-2! Exiting...  " >&5
-echo "$as_me: WARNING:  Undefined MPI_STATUS_SIZE in MPICH-2! Exiting...  " >&2;}
-    exit 0
-else
-    { { echo "$as_me:$LINENO: error:  Undefined MPI_STATUS_SIZE in MPICH-2! Exiting...  " >&5
-echo "$as_me: error:  Undefined MPI_STATUS_SIZE in MPICH-2! Exiting...  " >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-    fi
 
 #   MPICH2 has MPI_Status_f2c()/c2f()
 
@@ -6235,7 +6465,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -6260,8 +6492,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6348,7 +6579,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -6376,8 +6609,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6459,7 +6691,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -6487,8 +6721,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6570,16 +6803,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Comm comm; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Comm comm; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Comm_c2f(comm) ;
@@ -6600,8 +6833,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6822,7 +7054,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
@@ -6854,8 +7088,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -6938,16 +7171,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Datatype type; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Datatype type; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Type_c2f(type) ;
@@ -6968,8 +7201,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -7052,16 +7284,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Group group; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Group group; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Group_c2f(group) ;
@@ -7082,8 +7314,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -7166,16 +7397,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Request request; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Request request; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Request_c2f(request) ;
@@ -7196,8 +7427,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -7280,16 +7510,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Op op; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Op op; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Op_c2f(op) ;
@@ -7310,8 +7540,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -7394,16 +7623,16 @@ cat >>conftest.$ac_ext <<_ACEOF
 #endif
 #endif
 
+
 #include "mpi.h"
+
 
 int
 main ()
 {
 
     int argc; char **argv;
-
-                          MPI_Errhandler errhandler; ${MPI_FINT_TYPE} aa;
-                           ;
+     MPI_Errhandler errhandler; ${MPI_FINT_TYPE} aa;  ;
     MPI_Init(&argc, &argv);
 
                           aa=MPI_Errhandler_c2f(errhandler) ;
@@ -7424,8 +7653,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -7700,6 +7928,8 @@ fi
     fi
 
 fi
+
+
 
 
 
@@ -8325,10 +8555,12 @@ s,@MPI_IMPL@,$MPI_IMPL,;t t
 s,@MPE_BUILD_FORTRAN2C@,$MPE_BUILD_FORTRAN2C,;t t
 s,@CLINKER@,$CLINKER,;t t
 s,@MPI_CC@,$MPI_CC,;t t
+s,@MPE_CLINKER@,$MPE_CLINKER,;t t
 s,@F77@,$F77,;t t
 s,@FLINKER@,$FLINKER,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@MPI_F77@,$MPI_F77,;t t
+s,@MPE_FLINKER@,$MPE_FLINKER,;t t
 s,@FINC_PATH_LEADER@,$FINC_PATH_LEADER,;t t
 s,@FLIB_PATH_LEADER@,$FLIB_PATH_LEADER,;t t
 s,@MPI_INC@,$MPI_INC,;t t
@@ -8504,11 +8736,6 @@ esac
 
 
 
-  if test x"$ac_file" != x-; then
-    { echo "$as_me:$LINENO: creating $ac_file" >&5
-echo "$as_me: creating $ac_file" >&6;}
-    rm -f "$ac_file"
-  fi
   # Let's still pretend it is `configure' which instantiates (i.e., don't
   # use $as_me), people would be surprised to read:
   #    /* config.h.  Generated by config.status.  */
@@ -8547,6 +8774,12 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
 	 fi;;
       esac
     done` || { (exit 1); exit 1; }
+
+  if test x"$ac_file" != x-; then
+    { echo "$as_me:$LINENO: creating $ac_file" >&5
+echo "$as_me: creating $ac_file" >&6;}
+    rm -f "$ac_file"
+  fi
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF
   sed "$ac_vpsub

@@ -1,6 +1,10 @@
 #! @PERL@
+# -*- Mode: perl; -*-
 #
 # Kill all processes running a specified command
+#
+# Many systems also have the "killall" command; this should be used instead
+# if it is available.
 #
 # This script relies on the ps command; where possible, it uses the
 # /proc/<pid>/cmdline interface to more reliably access the commandline

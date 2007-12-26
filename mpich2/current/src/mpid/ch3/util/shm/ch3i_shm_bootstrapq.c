@@ -401,3 +401,161 @@ int MPIDI_CH3I_mqshm_receive(const int id, const int tag, void *buffer, const in
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_MQSHM_RECEIVE);
     return MPI_SUCCESS;
 }
+
+/* FIXME: What is this routine for?  Why does this routine duplicate so much 
+   of the code in the MPIDI_CH3I_SHM_Get_mem function (but not exactly; 
+   e.g., is there a reason that this routine and the Get_mem version use
+   slightly different arguments to the shm_open routine and take different
+   action on failure? */
+
+/* Is this routine used only in this file?  Should it be static */
+
+#undef FUNCNAME
+#define FUNCNAME MPIDI_CH3I_SHM_Get_mem_named
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+/*@
+   MPIDI_CH3I_SHM_Get_mem_named - allocate and get the address and size of a shared 
+   memory block
+
+   Parameters:
++  int size - size
+-  MPIDI_CH3I_Shmem_block_request_result* pOutput - output
+@*/
+int MPIDI_CH3I_SHM_Get_mem_named(int size, 
+				 MPIDI_CH3I_Shmem_block_request_result *pOutput)
+{
+    int mpi_errno = MPI_SUCCESS;
+#if defined (USE_POSIX_SHM)
+#elif defined (USE_SYSV_SHM)
+    int i;
+    FILE *fout;
+    int shmflag;
+#endif
+    MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3I_SHM_GET_MEM_NAMED);
+
+    MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3I_SHM_GET_MEM_NAMED);
+
+    if (size == 0 || size > MPIDU_MAX_SHM_BLOCK_SIZE )
+    {
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**arg", 0);
+	MPIU_ERR_POP(mpi_errno);
+    }
+
+    /* Create the shared memory object */
+#ifdef USE_POSIX_SHM
+    /*printf("[%d] creating a named shm object: '%s'\n", MPIR_Process.comm_world->rank, pOutput->name);*/
+    /* Mac OSX has a ridiculously short limit on the name (30 characters,
+       based on experiments, as the value of SHM_NAME_MAX is not easily
+       available. (it was nowhere defined on my Mac) */
+    pOutput->id = shm_open(pOutput->name, O_RDWR | O_CREAT, 0600);
+#ifdef ENAMETOOLONG
+    /* Try again if there is a name too long error */
+    if (pOutput->id == -1 && errno == ENAMETOOLONG && 
+	strlen(pOutput->name) > 30) {
+	pOutput->name[30] = 0;
+	pOutput->id = shm_open(pOutput->name, O_RDWR | O_CREAT, 0600);
+    }
+#endif    
+    if (pOutput->id == -1)
+    {
+	pOutput->error = errno;
+	perror("shm_open msg" );
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shm_open", "**shm_open %s %d", pOutput->name, pOutput->error);
+	MPIU_ERR_POP(mpi_errno);
+    }
+    /* Broken Mac OSX implementation only allows ftruncate on the 
+       creation of the shared memory */
+    if (ftruncate(pOutput->id, size) == -1)
+    {
+	pOutput->error = errno;
+	perror( "ftrunctate" );
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**ftruncate", "**ftruncate %s %d %d", pOutput->name, size, pOutput->error);
+	MPIU_ERR_POP(mpi_errno);
+    }
+#elif defined (USE_SYSV_SHM)
+    /* Insert code here to convert the name into a key */
+    fout = fopen(pOutput->name, "a+");
+    pOutput->key = ftok(pOutput->name, 12345);
+    fclose(fout);
+    if (pOutput->key == -1)
+    {
+	pOutput->error = errno;
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**ftok", "**ftok %s %d %d", pOutput->name, 12345, pOutput->error);
+	MPIU_ERR_POP(mpi_errno);
+    }
+    shmflag = IPC_CREAT;
+#ifdef HAVE_SHM_RW
+	shmflag |= SHM_R | SHM_W;
+#endif	
+    pOutput->id = shmget(pOutput->key, size, shmflag );
+    if (pOutput->id == -1)
+    {
+	pOutput->error = errno;
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shmget", "**shmget %d", pOutput->error);
+	MPIU_ERR_POP(mpi_errno);
+    }
+#elif defined (USE_WINDOWS_SHM)
+    pOutput->id = CreateFileMapping(
+	INVALID_HANDLE_VALUE,
+	NULL,
+	PAGE_READWRITE,
+	0, 
+	size,
+	pOutput->name);
+    if (pOutput->id == NULL) 
+    {
+	pOutput->error = GetLastError();
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**CreateFileMapping", "**CreateFileMapping %d", pOutput->error); /*"Error in CreateFileMapping, %d", pOutput->error);*/
+	MPIU_ERR_POP(mpi_errno);
+    }
+#else
+#error No shared memory subsystem defined
+#endif
+
+    /*printf("[%d] mmapping the shared memory object\n", MPIR_Process.comm_world->rank);fflush(stdout);*/
+    pOutput->addr = NULL;
+#ifdef USE_POSIX_SHM
+    pOutput->addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED /* | MAP_NORESERVE*/, pOutput->id, 0);
+    if (pOutput->addr == MAP_FAILED)
+    {
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**mmap", "**mmap %d", errno);
+	pOutput->addr = NULL;
+	MPIU_ERR_POP(mpi_errno);
+    }
+    
+#elif defined (USE_SYSV_SHM)
+    pOutput->addr = shmat(pOutput->id, NULL, SHM_RND);
+    if (pOutput->addr == (void*)-1)
+    {
+	pOutput->error = errno;
+	pOutput->addr = NULL;
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**shmat", "**shmat %d", pOutput->error); /*"Error from shmat %d", pOutput->error);*/
+	MPIU_ERR_POP(mpi_errno);
+    }
+#elif defined(USE_WINDOWS_SHM)
+    pOutput->addr = MapViewOfFileEx(
+	pOutput->id,
+	FILE_MAP_WRITE,
+	0, 0,
+	size,
+	NULL
+	);
+    if (pOutput->addr == NULL)
+    {
+	pOutput->error = GetLastError();
+	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER, "**MapViewOfFileEx", "**MapViewOfFileEx %d", pOutput->error);
+	MPIU_ERR_POP(mpi_errno);
+    }
+#else
+#error No shared memory subsystem defined
+#endif
+
+    pOutput->size = size;
+    pOutput->error = MPI_SUCCESS;
+ fn_fail:
+    MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3I_SHM_GET_MEM_NAMED);
+    return mpi_errno;
+}
+
+

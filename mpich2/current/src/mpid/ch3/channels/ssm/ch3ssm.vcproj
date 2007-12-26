@@ -1012,10 +1012,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\ch3i_get_business_card.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\ch3u_buffer.c"
 				>
 			</File>
@@ -1200,7 +1196,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\util\shm\shmproc.c"
+				RelativePath="..\..\util\shmproc\shmproc.c"
 				>
 			</File>
 		</Filter>

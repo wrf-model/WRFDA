@@ -947,6 +947,7 @@ int MTestGetIntracommGeneral( MPI_Comm *comm, int min_size, int allowSmaller )
     /* The while loop allows us to skip communicators that are too small.
        MPI_COMM_NULL is always considered large enough */
     while (!done) {
+	isBasic = 0;
 	intraCommName = "";
 	switch (intraCommIdx) {
 	case 0:

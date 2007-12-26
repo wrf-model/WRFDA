@@ -6,5 +6,9 @@ smvar_do_sharedlibs = 0
 statusesf_SOURCES = statusesf.f
 greqf_SOURCES     = greqf.f
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)

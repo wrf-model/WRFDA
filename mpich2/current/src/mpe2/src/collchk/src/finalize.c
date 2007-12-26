@@ -7,6 +7,10 @@
 
 int MPI_Finalize( void )
 {
-    fprintf( stdout, "Done with MPI Collective and Datatype Checking!\n" );
+    int  rank;
+
+    PMPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    if ( rank == 0 )
+        fprintf( stdout, "Done with MPI Collective and Datatype Checking!\n" );
     return PMPI_Finalize();
 }

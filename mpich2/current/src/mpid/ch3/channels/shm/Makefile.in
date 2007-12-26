@@ -6,9 +6,19 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+LIBTOOL         = @LIBTOOL@
+CREATESHLIB     = @CREATESHLIB@
+C_LINK_SHL      = @C_LINK_SHL@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+MKDIR_P         = @MKDIR_P@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+libdir          = @libdir@
 MAKE            = @MAKE@
 MPILIBNAME      = @MPILIBNAME@
 
@@ -42,8 +52,30 @@ remove-genmakefiles:
 all-redirect:
 	@(cd ../../../common/locks && ${MAKE} all )
 	@(cd src && ${MAKE} all )
+	@if [ "@BUILD_DLLS@" = "yes" ] ; then \
+	    if [ -s libmpich2-ch3-shm.la ] ; then \
+	        echo "make libmpich2-ch3-shm.@SHLIB_EXT@" ;\
+	        ${MAKE} libmpich2-ch3-shm.@SHLIB_EXT@ ; \
+	    fi ; \
+	fi
 
+CC              = @CC@
+CFLAGS          = @CFLAGS@
+C_COMPILE       = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS)
+# Build the shared library from the shared object files
+./libmpich2-ch3-shm.@SHLIB_EXT@: ./libmpich2-ch3-shm.la
+	(cd . && $(CREATESHLIB) --mode=link -version-info "@ABIVERSION@" -o libmpich2-ch3-shm.la  -rpath $(libdir) )
 # --------------------------------------------------------------------------
+# Install target
+install:  FORCE_TARGET 
+	if [ ! -d ${DESTDIR}${libdir} ] ; then $(MKDIR_P) ${DESTDIR}${libdir} ; fi
+	if [ -s libmpich2-ch3-shm.@SHLIB_EXT@ ] ; then $(CREATESHLIB) --mode=install libmpich2-ch3-shm.@SHLIB_EXT@ ${DESTDIR}${libdir}/libmpich2-ch3-shm.@SHLIB_EXT@ ; fi
+
+install-strip:
+	$(MAKE) INSTALL_STRIP_FLAG=-s install
+uninstall: 
+	-rm -f ${DESTDIR}${libdir}/libmpich2-ch3-shm.@SHLIB_EXT@
+installcheck: 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 HEADERFILES     = $(HEADERS)

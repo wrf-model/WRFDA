@@ -305,6 +305,7 @@ PAC_C_RESTRICT
 # General headers
 AC_CHECK_HEADERS(unistd.h stdarg.h string.h stdlib.h memory.h)
 
+
 # Define functionality that we support
 
 # Now, select the proper compilers for the tests
@@ -370,6 +371,18 @@ if test "$FROM_MPICH2" = yes ; then
         F90=$mpibindir/mpif90
     fi
 fi
+
+# Check for h_addr or h_addr_list.  This is needed for the singjoin test
+# in manual/singjoin.c
+AC_CACHE_CHECK([whether struct hostent contains h_addr_list],
+pac_cv_have_haddr_list,[
+AC_TRY_COMPILE([
+#include <netdb.h>],[struct hostent hp;hp.h_addr_list[0]=0;],
+pac_cv_have_haddr_list=yes,pac_cv_have_haddr_list=no)])
+if test "$pac_cv_have_haddr_list" = "yes" ; then
+    AC_DEFINE(HAVE_H_ADDR_LIST,1,[Define if struct hostent contains h_addr_list])
+fi
+
 # Simple tests for which other languages we can handle.  
 # Use these only when configuring separate from an MPICH2 build
 f77dir="#"
@@ -875,6 +888,8 @@ AC_OUTPUT(maint/testmerge \
 	  f77/Makefile \
 	  f77/attr/Makefile \
 	  f77/attr/attraints.h \
+	  f77/pt2pt/attr1aints.h \
+	  f77/ext/add1size.h \
 	  f77/datatype/Makefile \
 	  f77/datatype/typeaints.h \
 	  f77/util/Makefile \
@@ -897,6 +912,7 @@ AC_OUTPUT(maint/testmerge \
 	  f90/Makefile \
 	  f90/attr/Makefile \
 	  f90/datatype/Makefile \
+	  f90/f90types/Makefile \
 	  f90/util/Makefile \
 	  f90/coll/Makefile \
 	  f90/comm/Makefile \
@@ -914,6 +930,7 @@ AC_OUTPUT(maint/testmerge \
 	  cxx/Makefile \
 	  cxx/util/Makefile \
 	  cxx/attr/Makefile \
+	  cxx/pt2pt/Makefile \
 	  cxx/comm/Makefile \
 	  cxx/coll/Makefile \
           cxx/info/Makefile \
@@ -933,6 +950,7 @@ AC_OUTPUT(maint/testmerge \
 	  errors/pt2pt/Makefile \
 	  errors/rma/Makefile \
 	  errors/spawn/Makefile \
+	  errors/topo/Makefile \
 	  errors/io/Makefile \
 	  errors/cxx/Makefile \
 	  errors/cxx/errhan/Makefile \

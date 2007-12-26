@@ -1783,8 +1783,13 @@ extern Datatype TWOINTEGER;
     print $OUTFD "#ifdef MPI_MODE_RDONLY\n";
 
     # Other file constants
-    foreach $int (DISPLACEMENT_CURRENT, MAX_DATAREP_STRING) {
+    foreach $int (MAX_DATAREP_STRING) {
         print $OUTFD "${extern}const int $int";
+	if ($giveValue) { print $OUTFD " = MPI_$int;\n"; }
+	else            { print $OUTFD ";\n"; }
+    }
+    foreach $int (DISPLACEMENT_CURRENT) {
+        print $OUTFD "${extern}const MPI_Offset $int";
 	if ($giveValue) { print $OUTFD " = MPI_$int;\n"; }
 	else            { print $OUTFD ";\n"; }
     }

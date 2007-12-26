@@ -7,6 +7,10 @@
 #include "mpidi_ch3_impl.h"
 MPIDI_CH3I_Process_t MPIDI_CH3I_Process = {NULL};
 
+/* Define the ABI version of this channel.  Change this if the channel
+   interface (not just the implementation of that interface) changes */
+char MPIDI_CH3_ABIVersion[] = "1.1";
+
 /* FIXME: These VC debug print routines belong in mpid_vc.c, with 
    channel-specific code in an appropriate file.  Much of that 
    channel-specific code might belong in ch3/util/sock or ch3/util/shm */
@@ -88,6 +92,10 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t *pg_p, int pg_rank )
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPID_CH3_INIT);
 
+    if (sizeof(MPIDI_CH3I_VC) > 4*MPIDI_CH3_VC_SIZE) {
+	printf( "Panic! storage too small (need %d)!\n",
+		(int) sizeof(MPIDI_CH3I_VC) );fflush(stdout);
+    }
     mpi_errno = MPIDI_CH3I_Progress_init();
     if (mpi_errno != MPI_SUCCESS) MPIU_ERR_POP(mpi_errno);
 
@@ -127,7 +135,8 @@ int MPIDI_CH3_Init(int has_parent, MPIDI_PG_t *pg_p, int pg_rank )
        now part of the channel-specific hook for channel-specific VC info? */
     for (p = 0; p < pg_size; p++)
     {
-	pg_p->vct[p].ch.bShm = FALSE;
+	MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)pg_p->vct[p].channel_private;
+	vcch->bShm = FALSE;
     }
 
 fn_exit:
@@ -147,6 +156,31 @@ int MPIDI_CH3_PortFnsInit( MPIDI_PortFns *a )
 { 
     return 0;
 }
+#undef FUNCNAME
+#define FUNCNAME MPIDI_CH3_Get_business_card
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPIDI_CH3_Get_business_card(int myRank, char *value, int length)
+{
+    int mpi_errno;
+    MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_GET_BUSINESS_CARD);
+
+    MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_GET_BUSINESS_CARD);
+
+    mpi_errno = MPIDI_CH3U_Get_business_card_sock(myRank, &value, &length);
+    if (mpi_errno != MPI_SUCCESS) {
+	MPIU_ERR_SETANDJUMP(mpi_errno,MPI_ERR_OTHER,"**buscard");
+    }
+
+    mpi_errno = MPIDI_CH3U_Get_business_card_sshm(&value, &length);
+    if (mpi_errno != MPI_SUCCESS) {
+	MPIU_ERR_SETANDJUMP(mpi_errno,MPI_ERR_OTHER,"**buscard");
+    }
+
+ fn_fail:
+    MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3_GET_BUSINESS_CARD);
+    return mpi_errno;
+}
 
 /* This function simply tells the CH3 device to use the defaults for the 
    MPI-2 RMA functions */
@@ -157,14 +191,33 @@ int MPIDI_CH3_RMAFnsInit( MPIDI_RMAFns *a )
 
 /* Perform the channel-specific vc initialization */
 int MPIDI_CH3_VC_Init( MPIDI_VC_t *vc ) {
-    vc->ch.sendq_head         = NULL;
-    vc->ch.sendq_tail         = NULL;
-    vc->ch.state              = MPIDI_CH3I_VC_STATE_UNCONNECTED;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+    vcch->sendq_head         = NULL;
+    vcch->sendq_tail         = NULL;
+    vcch->state              = MPIDI_CH3I_VC_STATE_UNCONNECTED;
     MPIDI_VC_InitSock( vc );
     MPIDI_VC_InitShm( vc );
     /* This variable is used when sock and sshm are combined */
-    vc->ch.bShm               = FALSE;
+    vcch->bShm               = FALSE;
     return 0;
+}
+
+/* Hook routine for any channel-specific actions when a vc is freed. */
+int MPIDI_CH3_VC_Destroy( struct MPIDI_VC *vc )
+{
+    return MPI_SUCCESS;
+}
+
+const char * MPIDI_CH3_VC_GetStateString( struct MPIDI_VC *vc )
+{
+#ifdef USE_DBG_LOGGING
+    return MPIDI_CH3_VC_SshmGetStateString( vc );
+    /* If the states could be different, we'd need to figure out which
+       routine to call */
+    /*    return MPIDI_CH3_VC_SockGetStateString( vc );*/
+#else
+    return "unknown";
+#endif
 }
 
 /* Select the routine that uses sockets to connect two communicators
@@ -182,5 +235,19 @@ int MPIDI_CH3_PG_Init( MPIDI_PG_t *pg )
     /* FIXME: This should call a routine from the ch3/util/shm directory
        to initialize the use of shared memory for processes WITHIN this 
        process group */
+    return MPI_SUCCESS;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a process group */
+int MPIDI_CH3_PG_Destroy( struct MPIDI_PG *pg )
+{
+    return MPI_SUCCESS;
+}
+
+/* A dummy function so that all channels provide the same set of functions, 
+   enabling dll channels */
+int MPIDI_CH3_InitCompleted( void )
+{
     return MPI_SUCCESS;
 }

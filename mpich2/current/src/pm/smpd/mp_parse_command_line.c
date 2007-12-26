@@ -103,6 +103,10 @@ void mp_print_extra_options(void)
     printf("-map drive:\\\\host\\share\n");
     printf("  map a drive on all the nodes\n");
     printf("  this mapping will be removed when the processes exit\n");
+    printf("-mapall\n");
+    printf("  map all of the current network drives\n");
+    printf("  this mapping will be removed when the processes exit\n");
+    printf("  (Available currently only on windows)\n");
     printf("-dir drive:\\my\\working\\directory\n");
     printf("-wdir /my/working/directory\n");
     printf("  launch processes in the specified directory\n");
@@ -1003,6 +1007,16 @@ configfile_loop:
 		}
 		num_args_to_strip = 2;
 	    }
+        else if (strcmp(&(*argvp)[1][1], "mapall") == 0){
+#ifdef HAVE_WINDOWS_H
+            if(smpd_mapall(&drive_map_list) != SMPD_SUCCESS){
+		    printf("Error: unable to map all network drives");
+		    smpd_exit_fn(FCNAME);
+		    return SMPD_FAIL;
+            }
+#endif
+        num_args_to_strip = 1;
+        }
 	    else if (strcmp(&(*argvp)[1][1], "gmap") == 0)
 	    {
 		if (argc < 3)

@@ -1,9 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
-<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
-patched version by:  Kenshi Muto, Debian Project.
-* modified by:  Shige TAKENO
-LaTeX2HTML 2002-2-1 (1.70),
+<!--Converted with LaTeX2HTML 2002-2-1 (1.70)
 original version by:  Nikos Drakos, CBLU, University of Leeds
 * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 * with significant contributions from:
@@ -17,7 +14,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <META NAME="distribution" CONTENT="global">
 
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
 <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
 
 <LINK REL="STYLESHEET" HREF="usersguide.css">
@@ -30,26 +27,26 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <BODY >
 <!--Navigation Panel-->
-<A NAME="tex2html279"
+<A NAME="tex2html293"
   HREF="node12.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html275"
+<A NAME="tex2html289"
   HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html269"
+<A NAME="tex2html283"
   HREF="node10.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html277"
+<A NAME="tex2html291"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html280"
+<B> Next:</B> <A NAME="tex2html294"
   HREF="node12.html">3.4 Timeline Zoomable Window</A>
-<B> Up:</B> <A NAME="tex2html276"
+<B> Up:</B> <A NAME="tex2html290"
   HREF="node8.html">3. Graphical User Interface</A>
-<B> Previous:</B> <A NAME="tex2html270"
+<B> Previous:</B> <A NAME="tex2html284"
   HREF="node10.html">3.2 Logfile Convertor Window</A>
- &nbsp; <B>  <A NAME="tex2html278"
+ &nbsp; <B>  <A NAME="tex2html292"
   HREF="node2.html">Contents</A></B> 
 <BR>
 <BR>
@@ -68,16 +65,22 @@ and the Histogram windows.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:legend_popup"></A><A NAME="684"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:legend_popup"></A><A NAME="785"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.6:</STRONG>
 Typical Legend window when a slog2 file
-is first loaded into Jumpshot-4.</CAPTION>
+is first loaded into Jumpshot-4. The Legend window can be expanded
+to reveal the hidden statistics, <I>count</I>, <I>inclusion ratio</I>
+and <I>exclusion ratio</I> of each category of drawables, stored in
+the 5th, 6th and 7th columns of the window.</CAPTION>
 <TR><TD>
-<DIV ALIGN="CENTER"><IMG
-  WIDTH="265" HEIGHT="883" ALIGN="BOTTOM" BORDER="0"
+<DIV ALIGN="CENTER">[Legend Window's initial view]<IMG
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_popup.png"
- ALT="Image legend_popup">
+ ALT="Image legend_popup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Fully extended Legend window that shows statistics sumary]<IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_popup_full.png"
+ ALT="Image legend_popup_full">
 </DIV>
 <P>
 <DIV ALIGN="CENTER"></DIV></TD></TR>
@@ -85,30 +88,32 @@ is first loaded into Jumpshot-4.</CAPTION>
 </DIV>
 
 <P>
-The Legend window contains mainly a four-column legend table. The
-four columns are labeled <I>Topo, Name, V,</I> and <I>S,</I> as in
-Table <A HREF="#table:legend_column_ops">3.6</A>.
-
-<P>
+The Legend window contains mainly a seven-column legend table. The
+seven columns are labeled <I>Topo, Name, V, S, count, incl and
+excl</I> as in Table <A HREF="#table:legend_column_ops">3.6</A>.
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="686"></A>
+<DIV ALIGN="CENTER"><A NAME="787"></A>
 <TABLE>
 <CAPTION><STRONG>Table 3.6:</STRONG>
  Operations on the Legend window's
 columns.</CAPTION>
-<TR><TD><TABLE CELLPADDING=3 BORDER="1">
-<TR><TD ALIGN="CENTER" COLSPAN=1>Icon</TD>
+<TR><TD>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER">Icon</TD>
 <TD ALIGN="CENTER">Description</TD>
 <TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
 <DIV ALIGN="CENTER">
 Left Mouse Click on Column Cell
 </DIV></TD>
-<TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=144>Right Mouse Click on Column Cell or Left Mouse Click on Column Title</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Right Mouse Click on Column Cell or Left Mouse Click on Column Title
+</DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="40" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_topo.png"
  ALT="Image legend_topo"></TD>
 <TD ALIGN="CENTER">Topology</TD>
@@ -116,10 +121,13 @@ Left Mouse Click on Column Cell
 <DIV ALIGN="CENTER">
 Pick new Color (Figure <A HREF="#fig:legend_color_chooser">3.7</A>)
 </DIV></TD>
-<TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=144>None</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+None
+</DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="57" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_name.png"
  ALT="Image legend_name"></TD>
 <TD ALIGN="CENTER">Name</TD>
@@ -127,10 +135,13 @@ Pick new Color (Figure <A HREF="#fig:legend_color_chooser">3.7</A>)
 <DIV ALIGN="CENTER">
 Edit Name
 </DIV></TD>
-<TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=144>Sort Order Menu (Figure <A HREF="#fig:legend_sort_order">3.8</A>)</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+String Sort Order Menu (Figure <A HREF="#fig:legend_sort_orders">3.8</A>(a))
+</DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="26" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_v.png"
  ALT="Image legend_v"></TD>
 <TD ALIGN="CENTER">Visibility</TD>
@@ -138,10 +149,13 @@ Edit Name
 <DIV ALIGN="CENTER">
 Check or Uncheck
 </DIV></TD>
-<TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=144>Checkbox Operations Menu (Figure <A HREF="#fig:legend_checkbox_ops">3.9</A>)</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Checkbox Operations Menu (Figure <A HREF="#fig:legend_checkbox_ops">3.9</A>)
+</DIV></TD>
 </TR>
 <TR><TD ALIGN="CENTER"><IMG
-  WIDTH="25" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_s.png"
  ALT="Image legend_s"></TD>
 <TD ALIGN="CENTER">Searchability</TD>
@@ -149,12 +163,57 @@ Check or Uncheck
 <DIV ALIGN="CENTER">
 Check or Uncheck
 </DIV></TD>
-<TD ALIGN="LEFT" VALIGN="MIDDLE" WIDTH=144>Checkbox Operations Menu (Figure <A HREF="#fig:legend_checkbox_ops">3.9</A>)</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Checkbox Operations Menu (Figure <A HREF="#fig:legend_checkbox_ops">3.9</A>)
+</DIV></TD>
+</TR>
+<TR><TD ALIGN="CENTER"><IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_count.png"
+ ALT="Image legend_count"></TD>
+<TD ALIGN="CENTER">Count</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Non-editable
+</DIV></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Number Sort Order Menu(Figure<A HREF="#fig:legend_sort_orders">3.8</A>(b))
+</DIV></TD>
+</TR>
+<TR><TD ALIGN="CENTER"><IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_incl.png"
+ ALT="Image legend_incl"></TD>
+<TD ALIGN="CENTER">Inclusion Ratio</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Non-editable
+</DIV></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Number Sort Order Menu(Figure<A HREF="#fig:legend_sort_orders">3.8</A>(b))
+</DIV></TD>
+</TR>
+<TR><TD ALIGN="CENTER"><IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_excl.png"
+ ALT="Image legend_excl"></TD>
+<TD ALIGN="CENTER">Exclusion Ratio</TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Non-editable
+</DIV></TD>
+<TD ALIGN="LEFT" VALIGN="TOP" WIDTH=144>
+<DIV ALIGN="CENTER">
+Number Sort Order Menu(Figure<A HREF="#fig:legend_sort_orders">3.8</A>(b))
+</DIV></TD>
 </TR>
 </TABLE>
-
+</DIV>
 <P>
-</TD></TR>
+<DIV ALIGN="CENTER"></DIV></TD></TR>
 </TABLE>
 </DIV><P></P>
 <BR>
@@ -167,14 +226,14 @@ and (2) right mouse clicking in any column cell.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:legend_color_chooser"></A><A NAME="687"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:legend_color_chooser"></A><A NAME="788"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.7:</STRONG>
 Color Chooser Dialog for column
 Category Topology</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER"><IMG
-  WIDTH="441" HEIGHT="403" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_color_chooser.png"
  ALT="Image legend_color_chooser">
 </DIV>
@@ -193,18 +252,19 @@ timeline canvas automatically; an explicit screen redraw is needed.
 
 <P>
 
-<P>
-
-<DIV ALIGN="CENTER"><A NAME="fig:legend_sort_order"></A><A NAME="688"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:legend_sort_orders"></A><A NAME="791"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.8:</STRONG>
 Sort Order operation menu for the
-column Category Name in the Legend window.</CAPTION>
+column <I>Name, count, incl</I> and <I>excl</I> in the Legend window.</CAPTION>
 <TR><TD>
-<DIV ALIGN="CENTER"><IMG
-  WIDTH="328" HEIGHT="530" ALIGN="BOTTOM" BORDER="0"
- SRC="./legend_sort_menu.png"
- ALT="Image legend_sort_menu">
+<DIV ALIGN="CENTER">[Sort Order menu for Name]<IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_sort_string_menu.png"
+ ALT="Image legend_sort_string_menu">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Sort Order menu for count, inclusion and exclusion ratios]<IMG
+  ALIGN="BOTTOM" BORDER="0"
+ SRC="./legend_sort_number_menu.png"
+ ALT="Image legend_sort_number_menu">
 </DIV>
 <P>
 <DIV ALIGN="CENTER"></DIV></TD></TR>
@@ -212,19 +272,24 @@ column Category Name in the Legend window.</CAPTION>
 </DIV>
 
 <P>
-Figure <A HREF="#fig:legend_sort_order">3.8</A> shows the popup dialog box either
-when the title icon of column Name is pressed or when the right mouse
-button is clicked somewhere in the column. Altogether, there are six
-different sort orders as shown in the figure and they are summarized
-in Table <A HREF="#table:legend_sort_orders">3.8</A>.
+Figure <A HREF="#fig:legend_sort_orders">3.8</A>(a) shows the popup dialog box
+either when the title icon of column <I>Name</I> is pressed or when
+the right mouse button is clicked somewhere in the column. Altogether,
+there are six different alphabetical sort orders as shown in the figure
+and they are summarized in Table <A HREF="#table:legend_sort_string_orders">3.8</A>.
+Fig <A HREF="#fig:legend_sort_orders">3.8</A>(b) shows the popup dialog box for
+the column <I>count</I>, i<I>ncl</I> or <I>excl</I> is pressed or
+when the right mouse button is clicked somewhere in the column. The
+popup dialog box contains a menu which will be described later in
+Table <A HREF="#table:legend_sort_number_orders">3.10</A>.
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="689"></A>
+<DIV ALIGN="CENTER"><A NAME="792"></A>
 <TABLE>
 <CAPTION><STRONG>Table 3.8:</STRONG>
-Description of the Sort Order operation
-menu in the Legend window.</CAPTION>
+Description of the alphabetical
+Sort Order operation menu for column <I>Name</I> in the Legend window.</CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER"><TABLE CELLPADDING=3 BORDER="1">
 <TR><TD ALIGN="CENTER">Ordering</TD>
@@ -267,18 +332,49 @@ alphabetical orderings have two hidden sort orders. One is called
 all the real drawable categories of the same topology. The other is
 <I>Topo Order,</I> which refers to topological ordering (i.e., arrow
 is ahead of state). The Preview and Topo sort orders can be turned
-on or off through the Preference window in Table <A HREF="#table:preference_legend">3.22</A>.
+on or off through the Preference window in Table <A HREF="#table:preference_legend">3.24</A>.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="793"></A>
+<TABLE>
+<CAPTION><STRONG>Table 3.10:</STRONG>
+Description of the numerical
+Sort Order operation menu for columns <I>count</I>, i<I>ncl</I> and
+<I>excl</I> in the Legend window</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER">Ordering</TD>
+<TD ALIGN="CENTER">Description</TD>
+</TR>
+<TR><TD ALIGN="CENTER">9 ... 1</TD>
+<TD ALIGN="CENTER">Decreasing numerical ordering</TD>
+</TR>
+<TR><TD ALIGN="CENTER">1 ... 9</TD>
+<TD ALIGN="CENTER">Increasing numerical ordering</TD>
+</TR>
+</TABLE>
+</DIV>
+<P>
+<DIV ALIGN="CENTER"></DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Table <A HREF="#table:legend_sort_number_orders">3.10</A> shows the only two orderings
+allowed for all numerical entries in the Legend window.
 
 <P>
 
-<DIV ALIGN="CENTER"><A NAME="fig:legend_checkbox_ops"></A><A NAME="690"></A>
+<DIV ALIGN="CENTER"><A NAME="fig:legend_checkbox_ops"></A><A NAME="794"></A>
 <TABLE>
 <CAPTION ALIGN="BOTTOM"><STRONG>Figure 3.9:</STRONG>
 Checkbox Operation menu for column
 Category Visibility and Searchability </CAPTION>
 <TR><TD>
 <DIV ALIGN="CENTER"><IMG
-  WIDTH="264" HEIGHT="518" ALIGN="BOTTOM" BORDER="0"
+  ALIGN="BOTTOM" BORDER="0"
  SRC="./legend_checkbox_menu.png"
  ALT="Image legend_checkbox_menu">
 </DIV>
@@ -289,10 +385,10 @@ Category Visibility and Searchability </CAPTION>
 
 <P>
 Figure <A HREF="#fig:legend_checkbox_ops">3.9</A> shows a popup dialog box when
-the title icon of column V (Visibility) or S (Searchability) is pressed
-or when the right mouse button is clicked somewhere in either column.
-The rule of selection in the legend table follows the standard practice
-of other graphical user interfaces as in Table <A HREF="#table:selection_rules">3.10</A>.
+the title icon of column <I>V (Visibility)</I> or <I>S (Searchability)</I>
+is pressed or when the right mouse button is clicked somewhere in
+either column. The rule of selection in the legend table follows the
+standard practice of other graphical user interfaces as in Table <A HREF="#table:selection_rules">3.12</A>.
 Together with these standard selection rules, the operations provided
 in the checkbox operation menu allow easy enabling and disabling of
 visibility as well as searchability checkboxes. With the help of continuous
@@ -300,21 +396,20 @@ selection of the category rows in the legend table and the various
 sort orderings, users can easily make a huge number of categories
 disappear in the Timeline or Histogram window. For instance, in CLOG
 converted SLOG-2 file where upper-case names always refer to MPI names,
-the case-sensitive alphabetical ordering allows all MPI names to be
-put before all user-defined categories. With continuous mouse selection,
-the user can easily toggle the visibility of user-defined states in
-the Timeline or Histogram window. Also, every element in the column
-Name can be edited. This feature allows the user to correct undesirable
-category names set during logfile creation and even facilitates sorting
-of the names for selection purposes.
-
-<P>
+in CLOG2 converted SLOG-2 file where all MPI states will be prefixed
+with MPI_, the case-sensitive alphabetical ordering allows all MPI
+names to be put before all user-defined categories. With continuous
+mouse selection, the user can easily toggle the visibility of user-defined
+states in the Timeline or Histogram window. Also, every element in
+the column Name can be edited. This feature allows the user to correct
+undesirable category names set during logfile creation and even facilitates
+sorting of the names for selection purposes.
 
 <P>
 <BR><P></P>
-<DIV ALIGN="CENTER"><A NAME="692"></A>
+<DIV ALIGN="CENTER"><A NAME="796"></A>
 <TABLE>
-<CAPTION><STRONG>Table 3.10:</STRONG>
+<CAPTION><STRONG>Table 3.12:</STRONG>
  Standard selection rules.</CAPTION>
 <TR><TD><TABLE CELLPADDING=3 BORDER="1">
 <TR><TD ALIGN="CENTER">Left Mouse Operation</TD>
@@ -366,28 +461,30 @@ appearance of drawables will not be automatically updated in the Timeline
 canvas until the CanvasReDraw button in the Timeline window is pressed.
 
 <P>
+
+<P>
 <HR>
 <!--Navigation Panel-->
-<A NAME="tex2html279"
+<A NAME="tex2html293"
   HREF="node12.html">
 <IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
-<A NAME="tex2html275"
+<A NAME="tex2html289"
   HREF="node8.html">
 <IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
-<A NAME="tex2html269"
+<A NAME="tex2html283"
   HREF="node10.html">
 <IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
-<A NAME="tex2html277"
+<A NAME="tex2html291"
   HREF="node2.html">
 <IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
 <BR>
-<B> Next:</B> <A NAME="tex2html280"
+<B> Next:</B> <A NAME="tex2html294"
   HREF="node12.html">3.4 Timeline Zoomable Window</A>
-<B> Up:</B> <A NAME="tex2html276"
+<B> Up:</B> <A NAME="tex2html290"
   HREF="node8.html">3. Graphical User Interface</A>
-<B> Previous:</B> <A NAME="tex2html270"
+<B> Previous:</B> <A NAME="tex2html284"
   HREF="node10.html">3.2 Logfile Convertor Window</A>
- &nbsp; <B>  <A NAME="tex2html278"
+ &nbsp; <B>  <A NAME="tex2html292"
   HREF="node2.html">Contents</A></B> 
 <!--End of Navigation Panel-->
 

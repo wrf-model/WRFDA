@@ -16,6 +16,9 @@ dlltool --dllname mpich2mpi.dll --def mpich2mpi.def --output-lib ..\lib\libmpi.a
 REM dlltool --dllname mpich2mpid.dll --def mpich2mpid.def --output-lib ..\lib\libmpid.a
 dlltool --dllname fmpich2g.dll --def fmpich2gcc.def --output-lib ..\lib\libfmpich2g.a
 REM dlltool --dllname fmpich2gd.dll --def fmpich2gccd.def --output-lib ..\lib\libfmpich2gd.a
+REM Building MPI CXX Interface lib
+g++ -I ../src/include -I ../src/include/win32 -c ../src/binding/cxx/initcxx.cxx -o initcxx.o
+ar rvs ../lib/libmpicxx.a initcxx.o 
 del mpich2gcc.def
 REM del mpich2gccd.def
 del mpich2mpi.def

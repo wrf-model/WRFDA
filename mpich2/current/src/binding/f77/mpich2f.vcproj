@@ -251,8 +251,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="copying fmpich2.dll to the system32 directory"
-				CommandLine="copy ..\..\..\lib\fmpich2.dll %SystemRoot%\system32\fmpich2.dll"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration

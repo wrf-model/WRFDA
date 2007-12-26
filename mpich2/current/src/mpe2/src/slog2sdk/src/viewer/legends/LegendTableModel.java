@@ -35,28 +35,35 @@ public class LegendTableModel extends AbstractTableModel
     public  static final int        NAME_COLUMN            = 1;
     public  static final int        VISIBILITY_COLUMN      = 2;
     public  static final int        SEARCHABILITY_COLUMN   = 3;
+    public  static final int        COUNT_COLUMN           = 4;
+    public  static final int        INCL_RATIO_COLUMN      = 5;
+    public  static final int        EXCL_RATIO_COLUMN      = 6;
 
     private static final String[]   COLUMN_TITLES
-                                    = { "Topo", "Name", "V", "S" };
+                                    = { "Topo", "Name", "V", "S",
+                                        "count", "incl", "excl" };
     private static final String[]   COLUMN_TOOLTIPS
                                     = { "Topology/Color", "Category Name",
-                                        "Visibility", "Searchability" };
+                                        "Visibility", "Searchability",
+                                        "category Count in the whole logfile",
+                                        "Inclusive Ratio", "Exclusive Ratio" };
     private static final Class[]    COLUMN_CLASSES
                                     = { CategoryIcon.class, String.class,
-                                        Boolean.class, Boolean.class };
+                                        Boolean.class, Boolean.class,
+                                        Long.class, Float.class, Float.class };
     private static final Color[]    COLUMN_TITLE_FORE_COLORS
                                     = { Color.magenta, Color.pink,
-                                        Color.green, Color.yellow };
+                                        Color.green, Color.yellow,
+                                        Color.white, Color.white, Color.white };
     private static final Color[]    COLUMN_TITLE_BACK_COLORS
                                     = { Color.black, Color.gray,
                                         Color.darkGray.darker(),
-                                        Color.blue.darker() };
+                                        Color.blue.darker(),
+                                        Color.gray, Color.gray, Color.gray };
     private static final boolean[]  COLUMN_TITLE_RAISED_ICONS
-                                    = { false, false, true, false };
-    private static final Object[]   COLUMN_SAMPLES
-                                    = { CategoryIcon.BLANK_ICON,
-                                        "ABCDEFGHIJKLMNOP",
-                                        Boolean.TRUE, Boolean.TRUE };
+                                    = { false, false, true, false,
+                                        false, false, false };
+
 
     private List   objdef_list    = null;
     private List   icon_list      = null;
@@ -124,6 +131,8 @@ public class LegendTableModel extends AbstractTableModel
         return COLUMN_TITLES.length;
     }
 
+    // Overload the AbstractTableModel.getColumnClass()
+    // which always returns Object.class
     public Class getColumnClass( int icolumn )
     {
         return COLUMN_CLASSES[ icolumn ];
@@ -154,9 +163,38 @@ public class LegendTableModel extends AbstractTableModel
         return COLUMN_TOOLTIPS[ icolumn ];
     }
 
-    public Object getColumnTypicalValue( int icolumn )
+    public Object getColumnMaxValue( int icolumn )
     {
-        return COLUMN_SAMPLES[ icolumn ];
+        Category objdef;
+        switch ( icolumn ) {
+            case ICON_COLUMN :
+                return CategoryIcon.BLANK_ICON;
+            case NAME_COLUMN :
+                objdef = (Category) Collections.max( objdef_list, 
+                                    LegendComparators.LONG_NAME_ORDER );
+                // UpperCase takes up more space.
+                return objdef.getName().toUpperCase() + ".";
+            case VISIBILITY_COLUMN :
+                return Boolean.TRUE;
+            case SEARCHABILITY_COLUMN :
+                return Boolean.TRUE;
+            case COUNT_COLUMN :
+                objdef = (Category) Collections.max( objdef_list,
+                                    LegendComparators.COUNT_ORDER  );
+                return new Long( objdef.getSummary().getDrawableCount() * 10 );
+            case INCL_RATIO_COLUMN :
+                objdef = (Category) Collections.max( objdef_list,
+                                    LegendComparators.INCL_RATIO_ORDER  );
+                return new Float( objdef.getSummary().getRatio(true) * 10 );
+            case EXCL_RATIO_COLUMN :
+                objdef = (Category) Collections.max( objdef_list,
+                                    LegendComparators.EXCL_RATIO_ORDER  );
+                return new Float( objdef.getSummary().getRatio(false) * 10 );
+            default:
+                System.err.println( "LegendTableModel.getColumnMaxValue("
+                                  + icolumn + ") fails!" );
+                return null;
+        }
     }
 
     public Object getValueAt( int irow, int icolumn )
@@ -180,6 +218,15 @@ public class LegendTableModel extends AbstractTableModel
                     return Boolean.TRUE;
                 else
                     return Boolean.FALSE;
+            case COUNT_COLUMN :
+                objdef = (Category) objdef_list.get( irow );
+                return new Long( objdef.getSummary().getDrawableCount() );
+            case INCL_RATIO_COLUMN :
+                objdef = (Category) objdef_list.get( irow );
+                return new Float( objdef.getSummary().getRatio(true) );
+            case EXCL_RATIO_COLUMN :
+                objdef = (Category) objdef_list.get( irow );
+                return new Float( objdef.getSummary().getRatio(false) );
             default:
                 System.err.println( "LegendTableModel.getValueAt("
                                   + irow + "," + icolumn + ") fails!" );
@@ -189,7 +236,14 @@ public class LegendTableModel extends AbstractTableModel
 
     public boolean isCellEditable( int irow, int icolumn )
     {
-        return true;
+        switch ( icolumn ) {
+            case COUNT_COLUMN :
+            case INCL_RATIO_COLUMN :
+            case EXCL_RATIO_COLUMN :
+                return false;
+            default:
+                return true;
+        }
     }
 
     public void setValueAt( Object value, int irow, int icolumn )
@@ -218,6 +272,12 @@ public class LegendTableModel extends AbstractTableModel
             case SEARCHABILITY_COLUMN :
                 objdef.setSearchable( ( (Boolean) value ).booleanValue() );
                 fireTableCellUpdated( irow, icolumn );
+                break;
+            case COUNT_COLUMN :
+            case INCL_RATIO_COLUMN :
+            case EXCL_RATIO_COLUMN :
+                // Don't change the CategorySummary property of the Category.
+                // consistent with isCellEditable();
                 break;
             default:
                 System.err.print( "LegendTableModel.setValueAt("

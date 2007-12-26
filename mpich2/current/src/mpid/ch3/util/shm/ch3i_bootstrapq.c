@@ -5,6 +5,12 @@
  */
 #include "mpidi_ch3_impl.h"
 
+#ifdef USE_SINGLE_MSG_QUEUE
+#include <sys/ipc.h>
+#include <sys/types.h>
+#include <sys/msg.h>
+#endif
+
 #ifdef HAVE_WINDOWS_H
 #include <winsock2.h>
 #include <windows.h>
@@ -761,6 +767,7 @@ int MPIDI_CH3I_BootstrapQ_attach(char *name_full, MPIDI_CH3I_BootstrapQ * queue_
     }
 #endif
 
+    /* FIXME: This memory is not freed */
     iter = (MPIDI_CH3I_BootstrapQ_struct*)MPIU_Malloc(sizeof(MPIDI_CH3I_BootstrapQ_struct));
     if (iter == NULL)
     {

@@ -308,19 +308,32 @@ BOOL Is_DomainController()
 
   COMMENTS:
 */
+
+/* FIXME: Remove hardcoded values -- eg: Length of error Mesg, 256*/
+
+#define SMPD_MAX_FILENAME_DECORATION (2 * sizeof(TCHAR))
+#define SMPD_MAX_FILENAME_QUOTED (SMPD_MAX_FILENAME + SMPD_MAX_FILENAME_DECORATION)
 void smpd_install_service(SMPD_BOOL interact, SMPD_BOOL bSetupRestart, SMPD_BOOL bSetupScp)
 {
     SC_HANDLE   schService;
     SC_HANDLE   schSCManager;
     TCHAR szErr[256];
-    TCHAR szPath[1024];
+    TCHAR szPathQuoted[SMPD_MAX_FILENAME_QUOTED];
+    LPTSTR pszPathQuoted;
     
-    if ( GetModuleFileName( NULL, szPath, 1024 ) == 0 )
+    pszPathQuoted = szPathQuoted;
+    /* The smpd module file name has to be quoted before passing to CreateService() --- refer MSDN doc for 
+     * CreateService() 
+     */
+    _stprintf(pszPathQuoted, TEXT("\""));
+    if ( GetModuleFileName( NULL, pszPathQuoted+1, SMPD_MAX_FILENAME ) == 0 )
     {
         _tprintf(TEXT("Unable to install %s.\n%s\n"), TEXT(SMPD_SERVICE_DISPLAY_NAME), smpd_get_last_error_text(szErr, 256));
 	fflush(stdout);
         return;
     }
+    
+    _stprintf(pszPathQuoted + _tcslen(pszPathQuoted), TEXT("\""));
 
     schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
     if ( schSCManager )
@@ -337,7 +350,7 @@ void smpd_install_service(SMPD_BOOL interact, SMPD_BOOL bSetupRestart, SMPD_BOOL
 	    SERVICE_AUTO_START,
             /*SERVICE_ERROR_NORMAL,*/       /* error control type */
 	    SERVICE_ERROR_IGNORE,
-            szPath,                     /* service's binary */
+            szPathQuoted,                /* service's binary */
             NULL,                       /* no load ordering group */
             NULL,                       /* no tag identifier */
             TEXT(""),                   /* dependencies */

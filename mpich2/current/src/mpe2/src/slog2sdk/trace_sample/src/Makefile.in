@@ -20,7 +20,7 @@ TRACE_INCDIR     = $(TRACE_HOME)/src/logformat/trace
 TRACE_SRCDIR     = $(TRACE_HOME)/src/logformat/trace
 
 # Use VPATH so logformat/trace/*.c(h) do NOT need to be here.
-@VPATH@:$(TRACE_SRCDIR)
+@VPATH@@VPATH_EXTRA@
 
 # Define the TRACE-API shared library name and utility program names here
 LIB_TRACE        = @LIBSO_PREFIX@TraceInput.la
@@ -89,10 +89,10 @@ INSTALL_LIBSO: $(LOBJ)
 	$(LIBTOOL) --finish $(LIBDIR)
 
 $(binbuild_dir)/$(PGM_PRINT): $(OBJ4T)
-	$(CC) -o $@ $(OBJ4T) $(MEMLIBS)
+	$(CC) @COPTS@ -o $@ $(OBJ4T) $(MEMLIBS)
 
 $(binbuild_dir)/$(PGM_CHECK): $(OBJ4E)
-	$(CC) -o $@ $(OBJ4E) $(MEMLIBS)
+	$(CC) @COPTS@ -o $@ $(OBJ4E) $(MEMLIBS)
 
 clean:
 	@-$(RM) *.@OBJEXT@ *.lo *.la

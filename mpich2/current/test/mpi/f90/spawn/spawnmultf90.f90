@@ -9,6 +9,7 @@
 ! command-line options.
 !
        program main
+!     declared on the old sparc compilers
        use mpi
        integer errs, err
        integer rank, size, rsize, wsize, i
@@ -21,6 +22,7 @@
        character*(30) cmds(2)
        character*(80) argv(64)
        integer argc
+       integer ierr
 !
 !       Arguments are stored by rows, not columns in the vector.
 !       We write the data in a way that looks like the transpose,

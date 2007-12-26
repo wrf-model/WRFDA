@@ -33,7 +33,7 @@
         call MPI_Comm_rank( MPI_COMM_WORLD, rank, ierr )
 
         call MPI_Allreduce( errs, toterrs, 1, MPI_INTEGER, MPI_SUM,  &
-      &        MPI_COMM_WORLD, ierrs ) 
+      &        MPI_COMM_WORLD, ierr ) 
         
         if (rank .eq. 0) then
            if (toterrs .gt. 0) then 
@@ -47,6 +47,7 @@
 ! A simple get intracomm for now
         logical function MTestGetIntracomm( comm, min_size, qsmaller )
         use mpi
+        integer ierr
         integer comm, min_size, size, rank
         logical qsmaller
         integer myindex

@@ -57,9 +57,9 @@
 #else
 #define MPID_Thread_mutex_lock(mutex_)		\
 {						\
-    int err__;					\
-    MPE_Thread_mutex_lock((mutex_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);	\
+    int err_;					\
+    MPE_Thread_mutex_lock((mutex_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);    \
 }
 #endif
 
@@ -71,9 +71,9 @@
 #else
 #define MPID_Thread_mutex_unlock(mutex_)	\
 {						\
-    int err__;					\
-    MPE_Thread_mutex_unlock((mutex_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);	\
+    int err_;					\
+    MPE_Thread_mutex_unlock((mutex_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);	\
 }
 #endif
 
@@ -85,9 +85,9 @@
 #else
 #define MPID_Thread_mutex_trylock(mutex_, flag_)		\
 {								\
-    int err__;							\
-    MPE_Thread_mutex_trylock((mutex_), (flag_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);			\
+    int err_;							\
+    MPE_Thread_mutex_trylock((mutex_), (flag_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);			\
 }
 #endif
 
@@ -114,9 +114,9 @@
 #else
 #define MPID_Thread_cond_wait(cond_, mutex_)		\
 {							\
-    int err__;						\
-    MPE_Thread_cond_wait((cond_), (mutex_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);		\
+    int err_;						\
+    MPE_Thread_cond_wait((cond_), (mutex_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);		\
 }
 #endif
 
@@ -128,9 +128,9 @@
 #else
 #define MPID_Thread_cond_broadcast(cond_)	\
 {						\
-    int err__;					\
-    MPE_Thread_cond_broadcast((cond_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);	\
+    int err_;					\
+    MPE_Thread_cond_broadcast((cond_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);	\
 }
 #endif
 
@@ -142,9 +142,9 @@
 #else
 #define MPID_Thread_cond_signal(cond_)		\
 {						\
-    int err__;					\
-    MPE_Thread_cond_signal((cond_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);	\
+    int err_;					\
+    MPE_Thread_cond_signal((cond_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);	\
 }
 #endif
 
@@ -171,9 +171,9 @@
 #else
 #define MPID_Thread_tls_set(tls_, value_)		\
 {							\
-    int err__;						\
-    MPE_Thread_tls_set((tls_), (value_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);		\
+    int err_;						\
+    MPE_Thread_tls_set((tls_), (value_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);		\
 }
 #endif
 
@@ -185,10 +185,10 @@
 #else
 #define MPID_Thread_tls_get(tls_, value_)		\
 {							\
-    int err__;						\
+    int err_;						\
 							\
-    MPE_Thread_tls_get((tls_), (value_), &err__);	\
-    MPIU_Assert(err__ == MPE_THREAD_SUCCESS);		\
+    MPE_Thread_tls_get((tls_), (value_), &err_);	\
+    MPIU_Assert(err_ == MPE_THREAD_SUCCESS);		\
 }
 #endif
 

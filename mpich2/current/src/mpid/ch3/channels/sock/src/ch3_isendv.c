@@ -25,8 +25,8 @@ static void update_request(MPID_Request * sreq, MPID_IOV * iov, int iov_count,
     if (iov_offset == 0)
     {
 	MPIU_Assert(iov[0].MPID_IOV_LEN == sizeof(MPIDI_CH3_Pkt_t));
-	sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) iov[0].MPID_IOV_BUF;
-	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->ch.pkt;
+	sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) iov[0].MPID_IOV_BUF;
+	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->dev.pending_pkt;
     }
     sreq->dev.iov[iov_offset].MPID_IOV_BUF = 
 	(MPID_IOV_BUF_CAST)((char *) sreq->dev.iov[iov_offset].MPID_IOV_BUF + nb );
@@ -44,6 +44,7 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 		     MPID_IOV * iov, int n_iov)
 {
     int mpi_errno = MPI_SUCCESS;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     int (*reqFn)(MPIDI_VC_t *, MPID_Request *, int *);
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_ISENDV);
 
@@ -58,11 +59,11 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
     MPIU_DBG_STMT(CH3_CHANNEL,VERBOSE,
 	 MPIDI_DBG_Print_packet((MPIDI_CH3_Pkt_t *)iov[0].MPID_IOV_BUF));
 
-    if (vc->ch.state == MPIDI_CH3I_VC_STATE_CONNECTED) /* MT */
+    if (vcch->state == MPIDI_CH3I_VC_STATE_CONNECTED) /* MT */
     {
 	/* Connection already formed.  If send queue is empty attempt to send 
 	   data, queuing any unsent data. */
-	if (MPIDI_CH3I_SendQ_empty(vc)) /* MT */
+	if (MPIDI_CH3I_SendQ_empty(vcch)) /* MT */
 	{
 	    MPIU_Size_t nb;
 	    int rc;
@@ -70,7 +71,7 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 	    MPIU_DBG_MSG(CH3_CHANNEL,VERBOSE,
 			 "send queue empty, attempting to write");
 	    
-	    MPIU_DBG_PKT(vc->ch.conn,(MPIDI_CH3_Pkt_t*)iov[0].MPID_IOV_BUF,
+	    MPIU_DBG_PKT(vcch->conn,(MPIDI_CH3_Pkt_t*)iov[0].MPID_IOV_BUF,
 			 "isendv");
 	    /* MT - need some signalling to lock down our right to use the 
 	       channel, thus insuring that the progress engine does
@@ -80,7 +81,7 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 	       Eventually it should be changed to agressively write
                as much as possible.  Ideally, the code would be shared between 
 	       the send routines and the progress engine. */
-	    rc = MPIDU_Sock_writev(vc->ch.sock, iov, n_iov, &nb);
+	    rc = MPIDU_Sock_writev(vcch->sock, iov, n_iov, &nb);
 	    if (rc == MPI_SUCCESS)
 	    {
 		int offset = 0;
@@ -100,11 +101,11 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 			MPIU_DBG_MSG(CH3_CHANNEL,VERBOSE,
 			     "partial write, request enqueued at head");
 			update_request(sreq, iov, n_iov, offset, nb);
-			MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
+			MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
 			MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,
     (MPIU_DBG_FDEST,"posting writev, vc=0x%p, sreq=0x%08x", vc, sreq->handle));
-			vc->ch.conn->send_active = sreq;
-			mpi_errno = MPIDU_Sock_post_writev(vc->ch.conn->sock, 
+			vcch->conn->send_active = sreq;
+			mpi_errno = MPIDU_Sock_post_writev(vcch->conn->sock, 
 					   sreq->dev.iov + offset,
 					   sreq->dev.iov_count - offset, NULL);
 			/* --BEGIN ERROR HANDLING-- */
@@ -112,7 +113,7 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 			{
 			    mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER,
 							     "**ch3|sock|postwrite", "ch3|sock|postwrite %p %p %p",
-							     sreq, vc->ch.conn, vc);
+							     sreq, vcch->conn, vc);
 			}
 			/* --END ERROR HANDLING-- */
 
@@ -134,19 +135,19 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 			mpi_errno = reqFn( vc, sreq, &complete );
 			if (mpi_errno) MPIU_ERR_POP(mpi_errno);
 			if (!complete) {
-			    MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
+			    MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
 			    MPIU_DBG_MSG_FMT(CH3_CHANNEL,VERBOSE,
     (MPIU_DBG_FDEST,"posting writev, vc=0x%p, sreq=0x%08x", vc, sreq->handle));
-			    vc->ch.conn->send_active = sreq;
+			    vcch->conn->send_active = sreq;
 			    mpi_errno = MPIDU_Sock_post_writev(
-				vc->ch.conn->sock, sreq->dev.iov, 
+				vcch->conn->sock, sreq->dev.iov, 
 				sreq->dev.iov_count, NULL);
 			    /* --BEGIN ERROR HANDLING-- */
 			    if (mpi_errno != MPI_SUCCESS)
 			    {
 				mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER,
 								 "**ch3|sock|postwrite", "ch3|sock|postwrite %p %p %p",
-								 sreq, vc->ch.conn, vc);
+								 sreq, vcch->conn, vc);
 			    }
 			    /* --END ERROR HANDLING-- */
 			}
@@ -169,7 +170,7 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 		MPIU_DBG_VCCHSTATECHANGE(vc,VC_STATE_FAILED);
 		/* FIXME: Shouldn't the vc->state also change? */
 
-		vc->ch.state = MPIDI_CH3I_VC_STATE_FAILED;
+		vcch->state = MPIDI_CH3I_VC_STATE_FAILED;
 		/* TODO: Create an appropriate error message based on the 
 		   return value (rc) */
 		sreq->status.MPI_ERROR = MPI_ERR_INTERN;
@@ -182,26 +183,33 @@ int MPIDI_CH3_iSendv(MPIDI_VC_t * vc, MPID_Request * sreq,
 	{
 	    MPIU_DBG_MSG(CH3_CHANNEL,VERBOSE,"send queue not empty, enqueuing");
 	    update_request(sreq, iov, n_iov, 0, 0);
-	    MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	    MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
 	}
     }
-    else if (vc->ch.state == MPIDI_CH3I_VC_STATE_UNCONNECTED)
+    else if (vcch->state == MPIDI_CH3I_VC_STATE_CONNECTING)
+    {
+	/* queuing the data so it can be sent later. */
+	MPIU_DBG_VCUSE(vc,"connecting.  Enqueuing request");
+	update_request(sreq, iov, n_iov, 0, 0);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
+    }
+    else if (vcch->state == MPIDI_CH3I_VC_STATE_UNCONNECTED)
     {
 	/* Form a new connection, queuing the data so it can be sent later. */
 	MPIU_DBG_VCUSE(vc,"unconnected.  Enqueuing request");
 	update_request(sreq, iov, n_iov, 0, 0);
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
 	mpi_errno = MPIDI_CH3I_VC_post_connect(vc);
 	if (mpi_errno) {
 	    MPIU_ERR_POP(mpi_errno);
 	}
     }
-    else if (vc->ch.state != MPIDI_CH3I_VC_STATE_FAILED)
+    else if (vcch->state != MPIDI_CH3I_VC_STATE_FAILED)
     {
 	/* Unable to send data at the moment, so queue it for later */
 	MPIU_DBG_VCUSE(vc,"still connecting.  enqueuing request");
 	update_request(sreq, iov, n_iov, 0, 0);
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
     }
     /* --BEGIN ERROR HANDLING-- */
     else

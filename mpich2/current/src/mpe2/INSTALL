@@ -1,7 +1,7 @@
                       MPE (Multi-Processing Environment)
                       ----------------------------------
 
-                          Version 2.4.3. November, 2006
+                          Version 2.4.5. August, 2007
 
                     Mathematics and Computer Science Division
                            Argonne National Laboratory
@@ -23,7 +23,7 @@ II. a)  Configuration Model
 MPE is designed to be used as an extension to an existing MPI implementation,
 so its configuration model assumes a general MPI development environment.  
 Here are the some of the variables that MPE configure reads, some are read 
-as environmental variables and some are read from the command line arguments 
+as environment variables and some are read from the command line arguments 
 to configure.
 
 CC          : C compiler used to create serial executable,
@@ -60,33 +60,14 @@ MPERUN      : MPI application launch command. This variable is necessary only
               "$sbindir/mpecheckinstall -run".
 
 Among above listed variables, CC, MPI_CC, F77 and MPI_F77 are usually set
-by the corresponding environmental variables.  The rest can be set through 
+by the corresponding environment variables.  The rest can be set through 
 command line arguments to configure.  In some MPI implementations, like 
 HP-UX's, MPI_CC and MPI_F77 are reserved for use by the MPI implementation,
 use the configure options to set MPI_CC and MPI_F77 instead.
 
-For those who requires cross-compilation support, another 5 to 8 
-more environmental variables are needed depends on if one needs to use the
-MPE's internal Fortran to C MPI profiling wrapper library.  If your MPI
-implementation does NOT provide any Fortran to C MPI profiling wrapper
-library, then you need to specify at least following 5 environmental
-variables regarding the properties of running environment in the executable
-platform.
+For those who require Cross-Compilation support, please refer to the
+INSTALL.cross file.
 
-CROSS_SIZEOF_CHAR      : sizeof(char), e.g. 1
-CROSS_SIZEOF_SHORT     : sizeof(short), e.g. 2
-CROSS_SIZEOF_INT       : sizeof(int), e.g. 4
-CROSS_SIZEOF_LONG_LONG : sizeof(long long), e.g. 8
-CROSS_BIGENDIAN        : true if it is a big endian machine, false otherwise.
-
-The following 3 environmental variables specify properties of MPI
-implementation if F2CMPI_LIBS is defined, i.e MPE's internal Fortran
-to C MPI profiling library is used.
-
-CROSS_MPI_STATUS_SIZE  : value of MPI_STATUS_SIZE defined in mpif.h, 
-                         i.e. sizeof(MPI_STATUS_SIZE)/sizeof(MPI_Fint), e.g. 4
-CROSS_FORTRAN2C_TRUE   : value of fortran's .TRUE. in C program, e.g. 1
-CROSS_FORTRAN2C_FALSE  : value of fortran's .FALSE. in C program, e.g. 0
 
 II. b)  Build Options and Features
 ----------------------------------
@@ -138,7 +119,7 @@ Generic flags:
 
 MPI implementation Options:
 Besides the following command line options, the serial C and Fortran compilers
-can be specified through typical environmental variables CC and F77.
+can be specified through typical environment variables CC and F77.
 
 --with-mpicc=MPI_CC             Specify MPI C compiler to generate parallel
                                 executable, e.g. mpcc for AIX.  This can be
@@ -293,14 +274,16 @@ For IBM MPI, e.g. quad.mcs.anl.gov, do
     make installcheck PREFIX=${MPE_INSTALL_DIR}
 
 
-For SUN MPI, do
+For SUN MPI CLuster Tools 7 and older versions, do
 
     setenv MPI_CC mpcc
     setenv MPI_F77 mpf90
-    ${MPE_SRC_DIR}/configure --with-mpilibs=-lmpi
+    ${MPE_SRC_DIR}/configure --with-mpilibs="-L${MPI_LIB_DIR} -lmpi"
     make
     make install PREFIX=${MPE_INSTALL_DIR}
     make installcheck PREFIX=${MPE_INSTALL_DIR}
+
+    without -L${MPI_LIB_DIR} in --with-mpilibs, mpe2 configure may fail.
 
 
 For HP-UX's MPI implementation,
@@ -426,84 +409,6 @@ version of MPICH.  Not using --with-f2cmpilibs would cause MPE to use
 its own Fortran to C MPI profiling wrapper library. 
 
 
-For cross-compilation with an existing version of MPICH(or LAM). e.g. ASCI-Red.
-
-*** If the Fortran to C MPI profiling wrapper library exists (it is called
-    libfmpich.a in MPICH and liblamf77mpi.a in LAM), do 
-
-    setenv CC cicc
-    setenv F77 cif77
-    setenv CROSS_SIZEOF_CHAR 1
-    setenv CROSS_SIZEOF_SHORT 2
-    setenv CROSS_SIZEOF_INT 4
-    setenv CROSS_SIZEOF_LONG_LONG 8
-    setenv CROSS_BIGENDIAN false 
-    ${MPE_SRC_DIR}/configure --with-mpicc=${MPICH_INSTALL_DIR}/bin/mpicc \
-                             --with-mpif77=${MPICH_INSTALL_DIR}/bin/mpif77 \
-                             --with-f2cmpilibs=-lfmpich \
-                             --disable-graphics
-    make
-    make install PREFIX=${MPE_INSTALL_DIR}
-
-Here assume mpicc/mpif77 scripts exist.  If not, mpicc should include lines:
-
-#! /bin/sh
-cicc -I${MPICH_INSTALL_DIR}/include -L${MPICH_INSTALL_DIR}/lib $@ <-lmpi>
-
-
-mpif77 can be composed by including the following line
-
-#! /bin/sh
-cicc -I${MPICH_INSTALL_DIR}/include -L${MPICH_INSTALL_DIR}/lib $@ <-lmpi>
-
-
-<-lmpi> refers to various MPI libraries included in your MPI implementation.
-
-
-*** If the Fortran to C MPI profiling wrapper library does NOT exist,
-    then the MPE's own Fortran to C MPI profiling wrapper library needs
-    to be built.  3 additional environmental variables are needed.  They
-    are CROSS_MPI_STATUS_SIZE, CROSS_FORTRAN2C_TRUE & CROSS_FORTRAN2C_FALSE
-
-    setenv CC cicc
-    setenv F77 cif77
-    setenv CROSS_SIZEOF_CHAR 1
-    setenv CROSS_SIZEOF_SHORT 2
-    setenv CROSS_SIZEOF_INT 4
-    setenv CROSS_SIZEOF_LONG_LONG 8
-    setenv CROSS_BIGENDIAN false 
-    setenv CROSS_MPI_STATUS_SIZE 4 
-    setenv CROSS_FORTRAN2C_TRUE  1 
-    setenv CROSS_FORTRAN2C_FALSE 0
-    ${MPE_SRC_DIR}/configure --with-mpicc=${MPICH_INSTALL_DIR}/bin/mpicc \
-                             --with-mpif77=${MPICH_INSTALL_DIR}/bin/mpif77 \
-                             --disable-graphics
-    make
-    make install PREFIX=${MPE_INSTALL_DIR}
-
-
-For Cray X1E MPI implementation: cross-compilation at a linux front-end
-(e.g. phoenix at Oak Ridge)
-
-    ${MPE_SRC_DIR}/configure                                              \
-    MPI_F77="ftn -s real64 -dp"                                           \
-    F77="ftn -s real64 -dp"                                               \
-    MPI_CC=cc                                                             \
-    CC=$HOME/phoenix/bin/gcc-robin                                        \
-    --host=craynv-cray-unicosmp3.0.X                                      \
-    --build=i686-pc-linux-gnu                                             \
-    CROSS_SIZEOF_CHAR=1                                                   \
-    CROSS_SIZEOF_SHORT=2                                                  \
-    CROSS_SIZEOF_INT=4                                                    \
-    CROSS_SIZEOF_LONG_LONG=8                                              \
-    CROSS_BIGENDIAN=true                                                  \
-    CROSS_MPI_STATUS_SIZE=24                                              \
-    CROSS_FORTRAN2C_TRUE=1                                                \
-    CROSS_FORTRAN2C_FALSE=0                                               \
-    --disable-misc --disable-graphics --disable-collchk                   \
-    --disable-sample --disable-rlog
-
-
 For BlueGene/Light's MPI implementation: If the compilers are set up correctly
 
     ${MPE_SRC_DIR}/configure                                               \
@@ -598,7 +503,7 @@ almost all of MPE's Makefiles to mimic the usage of CFLAGS, FFLAGS and LDFLAGS.
    MPE_FOPTS  is the FFLAGS equivalent,
    MPE_LDOPTS is the LDFLAGS equivalent.
 These variables are not set in configures and Makefiles.  So it allows
-end-user to quickly set one of this variables in Makefile through environmental
+end-user to quickly set one of this variables in Makefile through environment
 variable without rerun configure.  For instance, if user forgets to set
 CFLAGS=-g in configuring MPE, one can do "make MPE_COPTS=-g" instead and 
 this can be done selectively in any subpackages.

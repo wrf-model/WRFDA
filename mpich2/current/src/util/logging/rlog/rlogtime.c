@@ -10,14 +10,19 @@
  * belong.  This file will then contain only the utility functions
  */
 
-#include "mpiimpl.h"
+#include "mpi.h"
+
+#include "mpichconf.h"
+#include "mpimem.h" /* for MPIU_Snprintf */
+#include "rlog.h"
 #include <math.h>
+#include <stdlib.h>
 
 /* global variables */
 
 /* FIXME: This name needs to be changed to ensure no conflicts with 
    user-defined globals */
-RLOG_Struct *g_pRLOG = NULL;
+RLOG_Struct *g_pRLOG = 0;
 
 /* utility funcions */
 #ifndef RGB

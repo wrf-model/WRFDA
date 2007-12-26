@@ -66,7 +66,8 @@ int main(int argc, char *argv[])
         for (i=0; i<NROWS; i++) 
             for (j=0; j<NCOLS; j++)
                 A[i][j] = -1;
-        MPI_Win_create(&A[0][0], NROWS*NCOLS*sizeof(int), sizeof(int), MPI_INFO_NULL, 
+        MPI_Win_create(&A[0][0], NROWS*NCOLS*sizeof(int), sizeof(int), 
+		       MPI_INFO_NULL, 
                        MPI_COMM_WORLD, &win); 
         MPI_Win_fence(0, win); 
 

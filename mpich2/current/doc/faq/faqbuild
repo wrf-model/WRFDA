@@ -547,8 +547,13 @@ sub CreateHTMLBody {
 	    print HTMLFD "<h2><a name=\"$file\">$heading</a></h2>$nl";
 	}
 	print HTMLFD "<div id=\"answer$i\">$nl";
+	my $inVerbatim = 0;
 	foreach my $line (split(/\n/,$fileToText{$file})) {
-	    if ($line =~ /</) { print "Saw less than: $line\n" ; }
+	    if ($line =~ /\\begin\{verbatim\}/) { $inVerbatim = 1; }
+	    elsif ($line =~ /\\end\{verbatim\}/) { $inVerbatim = 0; }
+	    if ($line =~ /</ && ! $inVerbatim) { 
+		print "Saw less than: $line\n" ; 
+	    }
 	    $line = &tophtmlify2( $line );
 	    print HTMLFD &htmlify2($line) . $nl;
 	}

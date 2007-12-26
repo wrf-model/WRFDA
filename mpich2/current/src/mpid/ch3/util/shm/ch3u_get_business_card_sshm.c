@@ -30,7 +30,8 @@ int MPIDI_CH3U_Get_business_card_sshm(char **bc_val_p, int *val_max_sz_p)
 {
     char queue_name[100];
     int mpi_errno;
-    MPIDI_PG_t * pg = MPIDI_Process.my_pg;
+    MPIDI_CH3I_PG *pgch = 
+	(MPIDI_CH3I_PG *)MPIDI_Process.my_pg->channel_private;
 #ifdef HAVE_SHARED_PROCESS_READ
     char pid_str[20];
 #ifdef HAVE_WINDOWS_H
@@ -44,7 +45,7 @@ int MPIDI_CH3U_Get_business_card_sshm(char **bc_val_p, int *val_max_sz_p)
 /*     printf("before first MPIU_Str_add_string_arg\n"); */
     mpi_errno = MPIU_Str_add_string_arg(bc_val_p, val_max_sz_p, 
 					MPIDI_CH3I_SHM_HOST_KEY, 
-					pg->ch.shm_hostname);
+					pgch->shm_hostname);
     /* --BEGIN ERROR HANDLING-- */
     if (mpi_errno != MPIU_STR_SUCCESS)
     {
@@ -61,7 +62,7 @@ int MPIDI_CH3U_Get_business_card_sshm(char **bc_val_p, int *val_max_sz_p)
 /*     printf("before MPIDI_CH3I_BootstrapQ_tostring\n"); */
     /* brad: must ensure that KVS was already appropriately updated (i.e. bootstrapQ was set) */
     queue_name[0] = '\0';
-    mpi_errno = MPIDI_CH3I_BootstrapQ_tostring(pg->ch.bootstrapQ, queue_name, 
+    mpi_errno = MPIDI_CH3I_BootstrapQ_tostring(pgch->bootstrapQ, queue_name, 
 					       sizeof(queue_name));
     /* --BEGIN ERROR HANDLING-- */
     if (mpi_errno != 0) {

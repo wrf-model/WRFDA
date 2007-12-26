@@ -184,6 +184,7 @@ int main( int argc, char *argv[], char *envp[] )
     if (!pUniv.fromSingleton) {
 	MPIE_ForkProcesses( &pUniv.worlds[0], envp, mypreamble, &s,
 			    mypostfork, 0, mypostamble, 0 );
+	MPIE_InitForDebugger( &pUniv.worlds[0] );
     }
     else {
 	int newfd;

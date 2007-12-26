@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: ismain.c,v 1.20 2006/12/09 16:42:26 gropp Exp $
+/*  $Id: ismain.c,v 1.21 2007/02/26 18:58:14 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -74,7 +74,7 @@ int MPI_Is_thread_main( int *flag )
 	MPID_Thread_id_t my_thread_id;
 
 	MPID_Thread_self(&my_thread_id);
-	MPID_Thread_same(&MPIR_Process.master_thread, &my_thread_id, flag);
+	MPID_Thread_same(&MPIR_ThreadInfo.master_thread, &my_thread_id, flag);
     }
 #   endif
     /* ... end of body of routine ... */

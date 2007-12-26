@@ -15,9 +15,7 @@
 #ifndef _MPID_NEM_INLINE_H
 #define _MPID_NEM_INLINE_H
 
-#ifndef ENABLE_NO_SCHED_YIELD
 #define MPID_NEM_POLLS_BEFORE_YIELD 1000
-#endif
 
 #include "my_papi_defs.h"
 
@@ -33,6 +31,12 @@ MPID_NEM_INLINE_DECL int MPID_nem_mpich2_test_recv (MPID_nem_cell_ptr_t *cell, i
 MPID_NEM_INLINE_DECL int MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox);
 MPID_NEM_INLINE_DECL int MPID_nem_mpich2_test_recv_wait (MPID_nem_cell_ptr_t *cell, int *in_fbox, int timeout);
 MPID_NEM_INLINE_DECL int MPID_nem_mpich2_release_cell (MPID_nem_cell_ptr_t cell, MPIDI_VC_t *vc);
+MPID_NEM_INLINE_DECL void MPID_nem_mpich2_send_seg_header (MPID_Segment *segment, MPIDI_msg_sz_t *segment_first,
+                                                           MPIDI_msg_sz_t segment_size, void *header, MPIDI_msg_sz_t header_sz,
+                                                           MPIDI_VC_t *vc, int *again);
+MPID_NEM_INLINE_DECL void MPID_nem_mpich2_send_seg (MPID_Segment *segment, MPIDI_msg_sz_t *segment_first, MPIDI_msg_sz_t segment_size,
+                                                    MPIDI_VC_t *vc, int *again);
+
 
 /* MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc)
    same as above, but sends MPICH2 32 byte header */
@@ -46,6 +50,7 @@ MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again)
     int mpi_errno = MPI_SUCCESS;
     MPID_nem_cell_ptr_t el;
     int my_rank;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
 
 #ifdef ENABLED_CHECKPOINTING
     if (MPID_nem_ckpt_sending_markers)
@@ -62,9 +67,9 @@ MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again)
     my_rank = MPID_nem_mem_region.rank;
 
 #ifdef USE_FASTBOX
-    if (vc->ch.is_local)
+    if (vc_ch->is_local)
     {
-	MPID_nem_fbox_mpich2_t *pbox = vc->ch.fbox_out;
+	MPID_nem_fbox_mpich2_t *pbox = vc_ch->fbox_out;
 	int count = 10;
 	u_int32_t *payload_32 = (u_int32_t *)pbox->cell.pkt.mpich2.payload;
 	u_int32_t *buf_32 = (u_int32_t *)buf;
@@ -78,7 +83,7 @@ MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again)
 	{
 	    pbox->cell.pkt.mpich2.source  = MPID_nem_mem_region.local_rank;
 	    pbox->cell.pkt.mpich2.datalen = size;
-	    pbox->cell.pkt.mpich2.seqno   = vc->ch.send_seqno++;
+	    pbox->cell.pkt.mpich2.seqno   = vc_ch->send_seqno++;
 
 #ifdef ENABLED_CHECKPOINTING
 	    pbox->cell.pkt.mpich2.datalen = size;
@@ -141,7 +146,7 @@ MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again)
     el->pkt.mpich2.source  = my_rank;
     el->pkt.mpich2.dest    = vc->lpid;
     el->pkt.mpich2.datalen = size;
-    el->pkt.mpich2.seqno   = vc->ch.send_seqno++;
+    el->pkt.mpich2.seqno   = vc_ch->send_seqno++;
 #ifdef ENABLED_CHECKPOINTING
     el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
 #endif
@@ -170,10 +175,10 @@ MPID_nem_mpich2_send_header (void* buf, int size, MPIDI_VC_t *vc, int *again)
     MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (el));
 
     DO_PAPI (PAPI_reset (PAPI_EventSet));
-    if (vc->ch.is_local)
+    if (vc_ch->is_local)
     {
-	MPID_nem_queue_enqueue (vc->ch.recv_queue, el);
-	/*MPID_nem_rel_dump_queue( vc->ch.recv_queue ); */
+	MPID_nem_queue_enqueue (vc_ch->recv_queue, el);
+	/*MPID_nem_rel_dump_queue( vc_ch->recv_queue ); */
     }
     else
     {
@@ -226,10 +231,11 @@ MPID_nem_mpich2_sendv (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *agai
     int mpi_errno = MPI_SUCCESS;
     MPID_nem_cell_ptr_t el;
     char *cell_buf;
-    int payload_len;    
+    MPIDI_msg_sz_t payload_len;    
     int my_rank;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
 
-    MPIU_Assert (n_iov > 0 && (*iov)->iov_len > 0);
+    MPIU_Assert (*n_iov > 0 && (*iov)->iov_len > 0);
     
 #ifdef ENABLED_CHECKPOINTING
     if (MPID_nem_ckpt_sending_markers)
@@ -290,7 +296,7 @@ MPID_nem_mpich2_sendv (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *agai
     el->pkt.mpich2.source  = my_rank;
     el->pkt.mpich2.dest    = vc->lpid;
     el->pkt.mpich2.datalen = MPID_NEM_MPICH2_DATA_LEN - payload_len;
-    el->pkt.mpich2.seqno   = vc->ch.send_seqno++;
+    el->pkt.mpich2.seqno   = vc_ch->send_seqno++;
 #ifdef ENABLED_CHECKPOINTING
     el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
 #endif
@@ -299,10 +305,10 @@ MPID_nem_mpich2_sendv (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *agai
     MPIU_DBG_MSG (CH3_CHANNEL, VERBOSE, "--> Sent queue");
     MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (el));
 
-    if(vc->ch.is_local)
+    if(vc_ch->is_local)
     {
-	MPID_nem_queue_enqueue (vc->ch.recv_queue, el);
-	/*MPID_nem_rel_dump_queue( vc->ch.recv_queue ); */
+	MPID_nem_queue_enqueue (vc_ch->recv_queue, el);
+	/*MPID_nem_rel_dump_queue( vc_ch->recv_queue ); */
     }
     else
     {
@@ -332,7 +338,7 @@ MPID_nem_mpich2_sendv (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, int *agai
 /* MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, int dest)
    same as above but first iov element is an MPICH2 32 byte header */
 #undef FUNCNAME
-#define FUNCNAME MPID_nem_mpich2_send_header
+#define FUNCNAME MPID_nem_mpich2_sendv_header
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 MPID_NEM_INLINE_DECL int
@@ -341,8 +347,9 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
     int mpi_errno = MPI_SUCCESS;
     MPID_nem_cell_ptr_t el;
     char *cell_buf;
-    int payload_len;    
+    MPIDI_msg_sz_t payload_len;    
     int my_rank;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
 
 #ifdef ENABLED_CHECKPOINTING
     if (MPID_nem_ckpt_sending_markers)
@@ -358,9 +365,9 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
     my_rank = MPID_nem_mem_region.rank;
 
 #ifdef USE_FASTBOX
-    if (vc->ch.is_local && (*n_iov == 2 && (*iov)[1].iov_len + sizeof(MPIDI_CH3_Pkt_t) <= MPID_NEM_FBOX_DATALEN))
+    if (vc_ch->is_local && (*n_iov == 2 && (*iov)[1].iov_len + sizeof(MPIDI_CH3_Pkt_t) <= MPID_NEM_FBOX_DATALEN))
     {
-	MPID_nem_fbox_mpich2_t *pbox = vc->ch.fbox_out;
+	MPID_nem_fbox_mpich2_t *pbox = vc_ch->fbox_out;
 	int count = 10;
 	u_int32_t *payload_32 = (u_int32_t *)(pbox->cell.pkt.mpich2.payload ) ;
 	u_int32_t *buf_32 = (u_int32_t *)(*iov)->iov_base;
@@ -375,7 +382,7 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
 	{
 	    pbox->cell.pkt.mpich2.source  = MPID_nem_mem_region.local_rank;
 	    pbox->cell.pkt.mpich2.datalen = (*iov)[1].iov_len + sizeof(MPIDI_CH3_Pkt_t);
-	    pbox->cell.pkt.mpich2.seqno   = vc->ch.send_seqno++;
+	    pbox->cell.pkt.mpich2.seqno   = vc_ch->send_seqno++;
 #ifdef ENABLED_CHECKPOINTING
 	    pbox->cell.pkt.mpich2.datalen = (*iov)[1].iov_len + sizeof(MPIDI_CH3_Pkt_t);
 	    pbox->cell.pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
@@ -473,7 +480,7 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
     el->pkt.mpich2.source  = my_rank;
     el->pkt.mpich2.dest    = vc->lpid;
     el->pkt.mpich2.datalen = MPID_NEM_MPICH2_DATA_LEN - payload_len;
-    el->pkt.mpich2.seqno   = vc->ch.send_seqno++;
+    el->pkt.mpich2.seqno   = vc_ch->send_seqno++;
 #ifdef ENABLED_CHECKPOINTING
     el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
 #endif
@@ -482,10 +489,10 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
     MPIU_DBG_MSG (CH3_CHANNEL, VERBOSE, "--> Sent queue");
     MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (el));
 
-    if (vc->ch.is_local)
+    if (vc_ch->is_local)
     {    
-	MPID_nem_queue_enqueue (vc->ch.recv_queue, el);	
-	/*MPID_nem_rel_dump_queue( vc->ch.recv_queue ); */
+	MPID_nem_queue_enqueue (vc_ch->recv_queue, el);	
+	/*MPID_nem_rel_dump_queue( vc_ch->recv_queue ); */
     }
     else
     {
@@ -511,6 +518,255 @@ MPID_nem_mpich2_sendv_header (struct iovec **iov, int *n_iov, MPIDI_VC_t *vc, in
     return mpi_errno;
  fn_fail:
     goto fn_exit;
+}
+
+/* send the header and data described by the segment in one cell.  If
+   there is no cell available, *again is set to 1.  If all of the data
+   cannot be sent, *segment_first is set to the index of the first
+   unsent byte.
+   Pre condition:  This must be the first packet of a message (i.e.,
+                       *segment first == 0)
+                   The destination process is local
+   Post conditions:  the header has been sent iff *again == 0
+                     if there is data to send (segment_size > 0) then
+                         (the header has been sent iff any data has
+                         been sent (i.e., *segment_first > 0) )
+                     i.e.: we will never send only the header
+*/
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_mpich2_send_seg_header
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+MPID_NEM_INLINE_DECL void
+MPID_nem_mpich2_send_seg_header (MPID_Segment *segment, MPIDI_msg_sz_t *segment_first, MPIDI_msg_sz_t segment_size,
+                                 void *header, MPIDI_msg_sz_t header_sz, MPIDI_VC_t *vc, int *again)
+{
+    MPID_nem_cell_ptr_t el;
+    MPIDI_msg_sz_t datalen;    
+    int my_rank;
+    MPIDI_msg_sz_t last;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
+
+    MPIU_Assert(vc_ch->is_local); /* netmods will have their own implementation */
+    MPIU_Assert(header_sz <= sizeof(MPIDI_CH3_Pkt_t));
+    MPIU_Assert(*segment_first == 0); /* this routine is only called for new messages */
+    
+#ifdef ENABLED_CHECKPOINTING
+    if (MPID_nem_ckpt_sending_markers)
+    {
+	MPID_nem_ckpt_send_markers();
+        goto return_again;
+    }
+#endif
+    
+    DO_PAPI (PAPI_reset (PAPI_EventSet));
+
+    my_rank = MPID_nem_mem_region.rank;
+
+#ifdef USE_FASTBOX
+    if (sizeof(MPIDI_CH3_Pkt_t) + segment_size <= MPID_NEM_FBOX_DATALEN)
+    {
+	MPID_nem_fbox_mpich2_t *pbox = vc_ch->fbox_out;
+	int count = 10;
+
+#ifdef BLOCKING_FBOX
+	DO_PAPI3 (PAPI_reset (PAPI_EventSet));
+	MPID_nem_waitforlock ((MPID_nem_fbox_common_ptr_t)pbox, 0, count);
+#else /*BLOCKING_FBOX */
+	if (MPID_nem_islocked ((MPID_nem_fbox_common_ptr_t)pbox, 0, count))
+	    goto usequeue_l;
+#endif /*BLOCKING_FBOX */
+	{
+	    pbox->cell.pkt.mpich2.source  = MPID_nem_mem_region.local_rank;
+	    pbox->cell.pkt.mpich2.datalen = sizeof(MPIDI_CH3_Pkt_t) + segment_size;
+	    pbox->cell.pkt.mpich2.seqno   = vc_ch->send_seqno++;
+#ifdef ENABLED_CHECKPOINTING
+	    pbox->cell.pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
+#endif
+            MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, pbox->cell.pkt.mpich2.type = MPID_NEM_PKT_MPICH2_HEAD);
+
+            /* copy header */
+            MPID_NEM_MEMCPY((char *)pbox->cell.pkt.mpich2.payload, header, header_sz);
+
+            /* copy data */
+            last = segment_size;
+            MPID_Segment_pack(segment, *segment_first, &last, (char *)pbox->cell.pkt.mpich2.payload + sizeof(MPIDI_CH3_Pkt_t));
+            MPIU_Assert(last == segment_size);
+            
+	    MPID_NEM_WRITE_BARRIER();
+	    pbox->flag.value = 1;
+
+            *segment_first = last;
+
+	    MPIU_DBG_MSG(CH3_CHANNEL, VERBOSE, "--> Sent fbox ");
+	    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (&pbox->cell));
+
+            goto return_success;
+	}
+    }
+ usequeue_l:
+    
+#endif /*USE_FASTBOX */
+	
+#ifdef PREFETCH_CELL
+    el = MPID_nem_prefetched_cell;
+    
+    if (!el)
+    {
+	if (MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+	{
+	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+            goto return_again;
+	}
+	
+	MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &el);
+    }
+#else /*PREFETCH_CELL    */
+    if (MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+    {
+	DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+        goto return_again;
+    }
+
+    MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &el);
+#endif /*PREFETCH_CELL */
+
+    /* copy header */
+    MPID_NEM_MEMCPY(el->pkt.mpich2.payload, header, header_sz);
+    
+    /* copy data */
+    if (segment_size - *segment_first <= MPID_NEM_MPICH2_DATA_LEN - sizeof(MPIDI_CH3_Pkt_t))
+        last = segment_size;
+    else
+        last = *segment_first + MPID_NEM_MPICH2_DATA_LEN - sizeof(MPIDI_CH3_Pkt_t);
+    
+    MPID_Segment_pack(segment, *segment_first, &last, (char *)el->pkt.mpich2.payload + sizeof(MPIDI_CH3_Pkt_t));
+    datalen = sizeof(MPIDI_CH3_Pkt_t) + last - *segment_first;
+    *segment_first = last;
+    
+    el->pkt.mpich2.source  = my_rank;
+    el->pkt.mpich2.dest    = vc->lpid;
+    el->pkt.mpich2.datalen = datalen;
+    el->pkt.mpich2.seqno   = vc_ch->send_seqno++;
+#ifdef ENABLED_CHECKPOINTING
+    el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
+#endif
+    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2_HEAD);
+
+    MPIU_DBG_MSG (CH3_CHANNEL, VERBOSE, "--> Sent queue");
+    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (el));
+
+    MPID_nem_queue_enqueue (vc_ch->recv_queue, el);	
+
+#ifdef PREFETCH_CELL
+    if (!MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+	MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &MPID_nem_prefetched_cell);
+    else
+	MPID_nem_prefetched_cell = 0;
+#endif /*PREFETCH_CELL */
+    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+
+ return_success:
+    *again = 0;
+    goto fn_exit;
+ return_again:
+    *again = 1;
+    goto fn_exit;
+ fn_exit:
+    return;
+}
+
+/* similar to MPID_nem_mpich2_send_seg_header, except there is no
+   header to send.  This need not be the first packet of a message. */
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_mpich2_send_seg
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+MPID_NEM_INLINE_DECL void
+MPID_nem_mpich2_send_seg (MPID_Segment *segment, MPIDI_msg_sz_t *segment_first, MPIDI_msg_sz_t segment_size, MPIDI_VC_t *vc, int *again)
+{
+    MPID_nem_cell_ptr_t el;
+    MPIDI_msg_sz_t datalen;    
+    int my_rank;
+    MPIDI_msg_sz_t last;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
+
+    MPIU_Assert(vc_ch->is_local); /* netmods will have their own implementation */
+    
+#ifdef ENABLED_CHECKPOINTING
+    if (MPID_nem_ckpt_sending_markers)
+    {
+	MPID_nem_ckpt_send_markers();
+        goto return_again;
+    }
+#endif
+    
+    DO_PAPI (PAPI_reset (PAPI_EventSet));
+
+    my_rank = MPID_nem_mem_region.rank;
+	
+#ifdef PREFETCH_CELL
+    el = MPID_nem_prefetched_cell;
+    
+    if (!el)
+    {
+	if (MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+	{
+	    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+            goto return_again;
+	}
+	
+	MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &el);
+    }
+#else /*PREFETCH_CELL    */
+    if (MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+    {
+	DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+        goto return_again;
+    }
+
+    MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &el);
+#endif /*PREFETCH_CELL */
+
+    /* copy data */
+    if (segment_size - *segment_first <= MPID_NEM_MPICH2_DATA_LEN)
+        last = segment_size;
+    else
+        last = *segment_first + MPID_NEM_MPICH2_DATA_LEN;
+    
+    MPID_Segment_pack(segment, *segment_first, &last, (char *)el->pkt.mpich2.payload);
+    datalen = last - *segment_first;
+    *segment_first = last;
+    
+    el->pkt.mpich2.source  = my_rank;
+    el->pkt.mpich2.dest    = vc->lpid;
+    el->pkt.mpich2.datalen = datalen;
+    el->pkt.mpich2.seqno   = vc_ch->send_seqno++;
+#ifdef ENABLED_CHECKPOINTING
+    el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2;
+#endif
+    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, el->pkt.mpich2.type = MPID_NEM_PKT_MPICH2_HEAD);
+
+    MPIU_DBG_MSG (CH3_CHANNEL, VERBOSE, "--> Sent queue");
+    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (el));
+
+    MPID_nem_queue_enqueue (vc_ch->recv_queue, el);	
+
+#ifdef PREFETCH_CELL
+    if (!MPID_nem_queue_empty (MPID_nem_mem_region.my_freeQ))
+	MPID_nem_queue_dequeue (MPID_nem_mem_region.my_freeQ, &MPID_nem_prefetched_cell);
+    else
+	MPID_nem_prefetched_cell = 0;
+#endif /*PREFETCH_CELL */
+    DO_PAPI (PAPI_accum_var (PAPI_EventSet, PAPI_vvalues5));
+
+    *again = 0;
+    goto fn_exit;
+ return_again:
+    *again = 1;
+    goto fn_exit;
+ fn_exit:
+    return;
 }
 
 /*
@@ -658,7 +914,7 @@ MPID_nem_mpich2_test_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox)
     poll_fboxes (cell, goto fbox_l);
 #endif/* USE_FASTBOX     */
 
-    if (MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE)
+    if ((MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE) && (MPID_nem_mem_region.ext_procs > 0))
     {
 	mpi_errno = MPID_nem_network_poll (MPID_NEM_POLL_IN);
         if (mpi_errno) MPIU_ERR_POP (mpi_errno);
@@ -725,7 +981,7 @@ MPID_nem_mpich2_test_recv_wait (MPID_nem_cell_ptr_t *cell, int *in_fbox, int tim
     poll_fboxes (cell, goto fbox_l);
 #endif/* USE_FASTBOX     */
 
-    if (MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE)
+    if ((MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE) && (MPID_nem_mem_region.ext_procs > 0))
     {
 	mpi_errno = MPID_nem_network_poll (MPID_NEM_POLL_IN);
         if (mpi_errno) MPIU_ERR_POP (mpi_errno);
@@ -765,22 +1021,34 @@ MPID_nem_mpich2_test_recv_wait (MPID_nem_cell_ptr_t *cell, int *in_fbox, int tim
 /*
   int MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox);
 
-  blocking receive
-  waits until there is something to receive, then sets cell to the received cell. in_fbox is true iff the cell was found in a fbox
-  the cell must be released back to the subsystem with MPID_nem_mpich2_release_cell() once the packet has been copied out
+  blocking receive waits until there is something to receive, or then
+  sets cell to the received cell. in_fbox is true iff the cell was
+  found in a fbox the cell must be released back to the subsystem with
+  MPID_nem_mpich2_release_cell() once the packet has been copied out
 */
 #undef FUNCNAME
 #define FUNCNAME MPID_nem_mpich2_blocking_recv
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 MPID_NEM_INLINE_DECL int
-MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox)
+MPID_nem_mpich2_blocking_recv(MPID_nem_cell_ptr_t *cell, int *in_fbox)
 {
     int mpi_errno = MPI_SUCCESS;
+    unsigned completions = MPIDI_CH3I_progress_completion_count;
 #ifndef ENABLE_NO_SCHED_YIELD
     int pollcount = 0;
 #endif
     DO_PAPI (PAPI_reset (PAPI_EventSet));
+
+#ifdef MPICH_IS_THREADED
+    /* We should never enter this function in a multithreaded app */
+#ifdef HAVE_RUNTIME_THREADCHECK
+    MPIU_Assert(!MPIR_ThreadInfo.isThreaded);
+#else
+    MPIU_Assert(0);
+#endif
+#endif
+
 
 #ifdef ENABLED_CHECKPOINTING
     MPID_nem_ckpt_maybe_take_checkpoint();
@@ -800,8 +1068,8 @@ MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox)
 #ifdef USE_FASTBOX
     poll_fboxes (cell, goto fbox_l);
 #endif /*USE_FASTBOX */
-   
-    if (MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE)
+
+    if ((MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE) && (MPID_nem_mem_region.ext_procs > 0))
     {
 	mpi_errno = MPID_nem_network_poll (MPID_NEM_POLL_IN);
         if (mpi_errno) MPIU_ERR_POP (mpi_errno);
@@ -816,10 +1084,17 @@ MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox)
 	poll_fboxes (cell, goto fbox_l);
 #endif /*USE_FASTBOX */
 
-	if (MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE)
-	{
+	if ((MPID_NEM_NET_MODULE != MPID_NEM_NO_MODULE) && (MPID_nem_mem_region.ext_procs > 0))
+	{            
 	    mpi_errno = MPID_nem_network_poll (MPID_NEM_POLL_IN);
             if (mpi_errno) MPIU_ERR_POP (mpi_errno);
+
+            if (completions != MPIDI_CH3I_progress_completion_count)
+            {
+                *cell = 0;
+                *in_fbox = 0;
+                goto exit_l;
+            }
 	}
 #ifndef ENABLE_NO_SCHED_YIELD
 	if (pollcount >= MPID_NEM_POLLS_BEFORE_YIELD)
@@ -839,19 +1114,27 @@ MPID_nem_mpich2_blocking_recv (MPID_nem_cell_ptr_t *cell, int *in_fbox)
  exit_l:    
 
 #ifdef ENABLED_CHECKPOINTING
-    if ((*cell)->pkt.header.type == MPID_NEM_PKT_CKPT)
+    if (*cell)
     {
-	MPID_nem_ckpt_got_marker (cell, in_fbox);
-	goto top_l;
+        if ((*cell)->pkt.header.type == MPID_NEM_PKT_CKPT)
+        {
+            MPID_nem_ckpt_got_marker (cell, in_fbox);
+            goto top_l;
+        }
+        else if (MPID_nem_ckpt_logging_messages)
+            MPID_nem_ckpt_log_message (*cell);
     }
-    else if (MPID_nem_ckpt_logging_messages)
-	MPID_nem_ckpt_log_message (*cell);
 #endif
 
     DO_PAPI (PAPI_accum_var (PAPI_EventSet,PAPI_vvalues8));
     
-    MPIU_DBG_MSG_S (CH3_CHANNEL, VERBOSE, "<-- Recv %s", (*in_fbox) ? "fbox " : "queue");
-    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell (*cell));
+    MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, {
+            if (*cell)
+            {
+                MPIU_DBG_MSG_S (CH3_CHANNEL, VERBOSE, "<-- Recv %s", (*in_fbox) ? "fbox " : "queue");
+                MPIU_DBG_STMT (CH3_CHANNEL, VERBOSE, MPID_nem_dbg_dump_cell(*cell));
+            }
+        });
 
  fn_fail:
     return mpi_errno;
@@ -874,6 +1157,7 @@ MPID_NEM_INLINE_DECL int
 MPID_nem_mpich2_release_cell (MPID_nem_cell_ptr_t cell, MPIDI_VC_t *vc)
 {
     int mpi_errno = MPI_SUCCESS;
+    MPIDI_CH3I_VC *vc_ch = (MPIDI_CH3I_VC *)vc->channel_private;
     DO_PAPI (PAPI_reset (PAPI_EventSet));
 #ifdef ENABLED_CHECKPOINTING
     if (cell->pkt.header.type == MPID_NEM_PKT_CKPT_REPLAY)
@@ -884,7 +1168,7 @@ MPID_nem_mpich2_release_cell (MPID_nem_cell_ptr_t cell, MPIDI_VC_t *vc)
 	return mpi_errno;
     }
 #endif
-    MPID_nem_queue_enqueue (vc->ch.free_queue, cell);
+    MPID_nem_queue_enqueue (vc_ch->free_queue, cell);
     DO_PAPI (PAPI_accum_var (PAPI_EventSet,PAPI_vvalues9));
     return mpi_errno;
 }

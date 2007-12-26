@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: mpitypedefs.h,v 1.8 2005/07/09 19:05:51 ashton Exp $
+/*  $Id: mpitypedefs.h,v 1.9 2007/03/12 20:40:39 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -57,7 +57,8 @@ typedef MPIU_INT64_T int64_t;
 #endif
 #endif
 
-/* Use this macro for each parameter to a function that is not referenced in the body of the function */
+/* Use this macro for each parameter to a function that is not referenced in
+   the body of the function */
 #ifdef HAVE_WINDOWS_H
 #define MPIU_UNREFERENCED_ARG(a) a
 #else
@@ -73,7 +74,8 @@ typedef MPIU_SIZE_T MPIU_Size_t;
 
 /* Use the MPIU_PtrToXXX macros to convert pointers to and from integer types */
 
-/* The Microsoft compiler will not allow casting of different sized types without
+/* The Microsoft compiler will not allow casting of different sized types 
+ * without
  * printing a compiler warning.  Using these macros allows compiler specific
  * type casting and avoids the warning output.  These macros should only be used
  * in code that can handle loss of bits.

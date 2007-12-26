@@ -5,7 +5,7 @@
  */
 
 #include "elan_module_impl.h"
-#include "elan.h"
+#include <elan/elan.h>
 
 
 #undef FUNCNAME
@@ -24,7 +24,12 @@ MPID_nem_elan_module_finalize()
 	     MPID_nem_elan_module_poll(MPID_NEM_POLL_OUT);
 	  }
 
-	elan_disable_network(elan_base->state);
+#ifdef LIBELAN_HAVE_FINI
+        if ( elan_base->capabilities & LIBELAN_HAVE_FINI )
+	    elan_fini(elan_base->state, elan_base->allGroup, LIBELAN_FINI_GROUP);
+#endif
+	 
+        elan_disable_network(elan_base->state);
 	MPIU_Free(rxq_ptr_array);
 	MPIU_Free(MPID_nem_module_elan_cells);
      }

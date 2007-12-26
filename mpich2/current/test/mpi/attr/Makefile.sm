@@ -8,6 +8,7 @@ attric_SOURCES = attric.c
 attrerr_SOURCES = attrerr.c
 attrerrcomm_SOURCES = attrerrcomm.c
 attrerrtype_SOURCES = attrerrtype.c
+attr2type_SOURCES = attr2type.c
 attrorder_SOURCES = attrorder.c
 attrordercomm_SOURCES = attrordercomm.c
 attrordertype_SOURCES = attrordertype.c

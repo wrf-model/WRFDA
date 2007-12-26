@@ -172,15 +172,19 @@ case $ac_mpi_type in
             AC_PATH_PROG(MPICC,mpicc)
             TESTCC=${CC-cc}
             CC="$MPICC"
+	    ac_cv_prog_CC=$CC
             AC_PATH_PROG(MPIF77,mpif77)
             TESTF77=${F77-f77}
             F77="$MPIF77"
+            ac_cv_prog_F77=$F77
             AC_PATH_PROG(MPIF90,mpif90)
             TESTF90=${F90-f90}
             F90="$MPIF90"
+            ac_cv_prog_F90=$F90
             AC_PATH_PROG(MPICXX,mpiCC)
             TESTCXX=${CXX-CC}
             CXX="$MPICXX"
+            ac_cv_prog_CXX=$CXX
 	    # We may want to restrict this to the path containing mpirun
 	    AC_PATH_PROG(MPIEXEC,mpiexec)
 	    AC_PATH_PROG(MPIRUN,mpirun)
@@ -229,15 +233,19 @@ case $ac_mpi_type in
         AC_PATH_PROG(MPICC,mpicc)
         TESTCC=${CC-cc}
         CC="$MPICC"
+        ac_cv_prog_CC=$CC
         AC_PATH_PROG(MPIF77,mpif77)
         TESTF77=${F77-f77}
         F77="$MPIF77"
+        ac_cv_prog_F77=$F77
         AC_PATH_PROG(MPIF90,mpif90)
         TESTF90=${F90-f90}
         F90="$MPIF90"
+        ac_cv_prog_F90=$F90
         AC_PATH_PROG(MPICXX,mpiCC)
         TESTCXX=${CXX-CC}
         CXX="$MPICXX"
+        ac_cv_prog_CXX=$CXX
 	PATH="$save_PATH"
   	MPILIBNAME="lammpi"
 	MPIBOOT="lamboot"
@@ -252,6 +260,8 @@ case $ac_mpi_type in
 	    AC_MSG_ERROR([Could not find IBM MPI compilation scripts.  Either mpcc or mpxlf is missing])
 	fi
 	TESTCC=${CC-xlC}; TESTF77=${F77-xlf}; CC=mpcc; F77=mpxlf
+        ac_cv_prog_CC=$CC
+        ac_cv_prog_F77=$F77
 	# There is no mpxlf90, but the options langlvl and free can
 	# select the F90 version of xlf
 	TESTF90=${F90-xlf90}; F90="mpxlf -qlanglvl=90ext -qfree=f90"
@@ -315,6 +325,8 @@ case $ac_mpi_type in
         fi
         CC=$MPICC
         F77=$MPIF77
+        ac_cv_prog_CC=$CC
+        ac_cv_prog_F77=$F77
 	;;
 
 	*)

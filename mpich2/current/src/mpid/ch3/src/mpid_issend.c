@@ -63,13 +63,13 @@ int MPID_Issend(const void * buf, int count, MPI_Datatype datatype, int rank, in
 	goto fn_exit;
     }
     
-    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_sync_send_t) <= MPIDI_CH3_EAGER_MAX_MSG_SIZE)
+    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_sync_send_t) <= vc->eager_max_msg_sz)
     {
 	mpi_errno = MPIDI_CH3_EagerSyncNoncontigSend( &sreq, buf, count,
-						      datatype, data_sz, 
-						      dt_contig, dt_true_lb,
-						      rank, tag, comm, 
-						      context_offset );
+                                                      datatype, data_sz, 
+                                                      dt_contig, dt_true_lb,
+                                                      rank, tag, comm, 
+                                                      context_offset );
 	/* If we're not complete, then add a reference to the datatype */
 	if (sreq && sreq->dev.OnDataAvail) {
 	    sreq->dev.datatype_ptr = dt_ptr;
@@ -80,9 +80,9 @@ int MPID_Issend(const void * buf, int count, MPI_Datatype datatype, int rank, in
     {
 	/* Note that the sreq was created above */
 	MPIDI_Request_set_msg_type(sreq, MPIDI_REQUEST_RNDV_MSG);
-	mpi_errno = MPIDI_CH3_RndvSend( &sreq, buf, count, datatype, dt_contig,
-					data_sz, dt_true_lb, rank, tag, comm, 
-					context_offset );
+	mpi_errno = vc->rndvSend_fn( &sreq, buf, count, datatype, dt_contig,
+                                     data_sz, dt_true_lb, rank, tag, comm, 
+                                     context_offset );
 	
 	/* FIXME: fill temporary IOV or pack temporary buffer after send to 
 	   hide some latency.  This requires synchronization

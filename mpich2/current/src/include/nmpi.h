@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: nmpi.h,v 1.36 2006/07/05 23:29:22 toonen Exp $
+/*  $Id: nmpi.h,v 1.38 2007/07/11 16:06:38 robl Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -72,6 +72,7 @@
 #define NMPI_Type_get_true_extent MPI_Type_get_true_extent
 #define NMPI_Group_translate_ranks MPI_Group_translate_ranks
 #define NMPI_Type_create_indexed_block MPI_Type_create_indexed_block
+#define NMPI_Type_create_struct MPI_Type_create_struct
 #define NMPI_Wtime MPI_Wtime 
 #define NMPI_Info_get_nkeys MPI_Info_get_nkeys
 #define NMPI_Info_get_nthkey MPI_Info_get_nthkey
@@ -94,6 +95,9 @@
 #define NMPI_Ibsend MPI_Ibsend
 #define NMPI_Buffer_detach MPI_Buffer_detach
 #define NMPI_Gather MPI_Gather
+#define NMPIX_Grequest_class_create MPIX_Grequest_class_create
+#define NMPIX_Grequest_class_allocate MPIX_Grequest_class_allocate
+#define NMPIX_Grequest_start MPIX_Grequest_start
 #else
 #define NMPI_Abort PMPI_Abort
 #define NMPI_Bcast PMPI_Bcast
@@ -143,6 +147,7 @@
 #define NMPI_Type_get_true_extent PMPI_Type_get_true_extent
 #define NMPI_Group_translate_ranks PMPI_Group_translate_ranks
 #define NMPI_Type_create_indexed_block PMPI_Type_create_indexed_block
+#define NMPI_Type_create_struct PMPI_Type_create_struct
 #define NMPI_Wtime PMPI_Wtime
 #define NMPI_Info_get_nkeys PMPI_Info_get_nkeys
 #define NMPI_Info_get_nthkey PMPI_Info_get_nthkey
@@ -166,5 +171,8 @@
 #define NMPI_Ibsend PMPI_Ibsend
 #define NMPI_Buffer_detach PMPI_Buffer_detach
 #define NMPI_Gather PMPI_Gather
+#define NMPIX_Grequest_class_create PMPIX_Grequest_class_create
+#define NMPIX_Grequest_class_allocate PMPIX_Grequest_class_allocate
+#define NMPIX_Grequest_start PMPIX_Grequest_start
 #endif
 #endif /* MPICH_NMPI_H_INCLUDED */

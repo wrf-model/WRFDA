@@ -83,10 +83,10 @@ int MPIDI_CH3_Comm_connect(char *port_name, int root, MPID_Comm
 }
 
 #undef FUNCNAME
-#define FUNCNAME MPIDI_CH3I_Get_business_card
+#define FUNCNAME MPIDI_CH3_Get_business_card
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-int MPIDI_CH3I_Get_business_card (int myRank, char *value, int length)
+int MPIDI_CH3_Get_business_card (int myRank, char *value, int length)
 {
     int mpi_errno = MPI_SUCCESS;
     int ret;

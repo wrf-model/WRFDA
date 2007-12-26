@@ -5,6 +5,15 @@
  *      See COPYRIGHT in top-level directory.
  */
 
+/* For "historical" reasons windows.h includes winsock.h 
+ * internally and WIN32_MEAN_AND_LEAN is to be defined
+ * if we plan to include winsock2.h later on -- in the 
+ * include hierarchy -- to prevent type redefinition 
+ * errors...
+ */
+
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 
 typedef HANDLE MPE_Thread_mutex_t;

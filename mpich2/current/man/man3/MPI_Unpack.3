@@ -1,14 +1,10 @@
-.TH MPI_Unpack 3 "1/30/2007" " " "MPI"
+.TH MPI_Unpack 3 "10/30/2007" " " "MPI"
 .SH NAME
 MPI_Unpack \-  Unpack a buffer according to a datatype into contiguous memory 
 .SH SYNOPSIS
 .nf
-int MPI_Unpack(void *inbuf,
-               int insize,
-               int *position,
-               void *outbuf,
-               int outcount,
-               MPI_Datatype datatype,
+int MPI_Unpack(void *inbuf, int insize, int *position,
+               void *outbuf, int outcount, MPI_Datatype datatype,
                MPI_Comm comm)
 .fi
 .SH INPUT PARAMETERS

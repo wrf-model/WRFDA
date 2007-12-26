@@ -19,6 +19,7 @@ libtvmpich2_so_SOURCES = dll_mpich2.c
 
 INCLUDES = -I../../include -I${top_srcdir}/src/include
 profilelib_${MPILIBNAME} = ${PMPILIBNAME}
+profilelib_${MPILIBNAME}_SOURCES = ${mpi_sources}
 #
 # We need to make sure that dbginit is compiled with -g, so
 # we use an explicit target.  Note that there are no PMPI functions in

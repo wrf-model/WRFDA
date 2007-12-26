@@ -119,6 +119,38 @@ call mpi_file_set_view( fh, offset, MPI_INTEGER, filetype, "native", MPI_INFO_NU
 call mpi_type_free( filetype, ierr )
 </setcontigview>
 
+# Some tests require that the individual processes proceed in order.
+# The following definitions initialize the src and dest, and arrange
+# to pass a token using MPI_Ssend
+# Prereqs: r and s contain rank and size, and src,dest are declared.
+# The ring is executed b times, with index variable k
+<initRing>
+src  = mod( r + s - 1, s )
+dest = mod( r + 1, s )
+if (s .eq. 1) then
+    src = MPI_PROC_NULL
+    dest = MPI_PROC_NULL
+endif
+if (r .eq. s-1) then
+    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, 1, comm, ierr )
+endif
+</initRing>
+<waitRing>
+call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, k, comm, MPI_STATUS_IGNORE, ierr )
+</waitRing>
+<nextRing>
+if (r .eq. s-1) then
+    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k+1, comm, ierr )
+else
+    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k, comm, ierr )
+endif
+</nextRing>
+<endRing>
+if (r .eq. 0) then
+    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, b+1, comm, MPI_STATUS_IGNORE, ierr )
+endif
+</endRing>
+#
 # ----------------------------------------------------------------------------
 # This test uses the individual file pointers.
 # To reach the correct locations, we seek to the position
@@ -365,60 +397,32 @@ integer src, dest
 integer req
 </writefiledecl>
 <writefile>
-src  = mod( r + s - 1, s )
-dest = mod( r + 1, s )
-if (src .eq. dest) then
-    src = MPI_PROC_NULL
-    dest = MPI_PROC_NULL
-endif
-if (r .eq. s - 1) then
-    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, 1, comm, ierr )
-endif
+<initRing/>
 do k=1, b
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, k, comm, MPI_STATUS_IGNORE, ierr )
+    <waitRing/>
     <setContigBuffer/>
     call mpi_file_iwrite_shared( fh, buf, n, MPI_INTEGER, req, ierr )
     <checkErr/>
     call mpi_wait( req, status, ierr )
-    if (r .eq. s-1) then
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k+1, comm, ierr )
-    else
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k, comm, ierr )
-    endif
+    <nextRing/>
 enddo
-if (r .eq. 0) then
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, b+1, comm, MPI_STATUS_IGNORE, ierr )
-endif
+<endRing/>
 </writefile>
 # No extra declarations are needed for the read step
 <readfiledecl>
 </readfiledecl>
 <readfile>
-src  = mod( r + s - 1, s )
-dest = mod( r + 1, s )
-if (src .eq. dest) then
-    src = MPI_PROC_NULL
-    dest = MPI_PROC_NULL
-endif
-if (r .eq. s - 1) then
-    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, 1, comm, ierr )
-endif
+<initRing/>
 do k=1, b
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, k, comm, MPI_STATUS_IGNORE, ierr )
+    <waitRing/>
     <clearContigBuffer/>
     call mpi_file_iread_shared( fh, buf, n, MPI_INTEGER, req, ierr )
     <checkErr/>
     call mpi_wait( req, status, ierr )
     <checkContigBuffer/>
-    if (r .eq. s-1) then
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k+1, comm, ierr )
-    else
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k, comm, ierr )
-    endif
+    <nextRing/>
 enddo
-if (r .eq. 0) then
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, b+1, comm, MPI_STATUS_IGNORE, ierr )
-endif
+<endRing/>
 </readfile>
 </TESTDEFN>
 
@@ -554,57 +558,29 @@ integer buf(MAX_BUFFER), ans
 integer src, dest
 </writefiledecl>
 <writefile>
-src  = mod( r + s - 1, s )
-dest = mod( r + 1, s )
-if (src .eq. dest) then
-    src = MPI_PROC_NULL
-    dest = MPI_PROC_NULL
-endif
-if (r .eq. s - 1) then
-    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, 1, comm, ierr )
-endif
+<initRing/>
 do k=1, b
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, k, comm, MPI_STATUS_IGNORE, ierr )
+    <waitRing/>
     <setContigBuffer/>
     call mpi_file_write_shared( fh, buf, n, MPI_INTEGER, status, ierr )
     <checkErr/>
-    if (r .eq. s-1) then
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k+1, comm, ierr )
-    else
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k, comm, ierr )
-    endif
+    <nextRing/>
 enddo
-if (r .eq. 0) then
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, b+1, comm, MPI_STATUS_IGNORE, ierr )
-endif
+<endRing/>
 </writefile>
 # No extra declarations are needed for the read step
 <readfiledecl>
 </readfiledecl>
 <readfile>
-src  = mod( r + s - 1, s )
-dest = mod( r + 1, s )
-if (src .eq. dest) then
-    src = MPI_PROC_NULL
-    dest = MPI_PROC_NULL
-endif
-if (r .eq. s - 1) then
-    call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, 1, comm, ierr )
-endif
+<initRing/>
 do k=1, b
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, k, comm, MPI_STATUS_IGNORE, ierr )
+    <waitRing/>
     <clearContigBuffer/>
     call mpi_file_read_shared( fh, buf, n, MPI_INTEGER, status, ierr )
     <checkErr/>
     <checkContigBuffer/>
-    if (r .eq. s-1) then
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k+1, comm, ierr )
-    else
-        call mpi_ssend( MPI_BOTTOM, 0, MPI_INTEGER, dest, k, comm, ierr )
-    endif
+    <nextRing/>
 enddo
-if (r .eq. 0) then
-    call mpi_recv( MPI_BOTTOM, 0, MPI_INTEGER, src, b+1, comm, MPI_STATUS_IGNORE, ierr )
-endif
+<endRing/>
 </readfile>
 </TESTDEFN>

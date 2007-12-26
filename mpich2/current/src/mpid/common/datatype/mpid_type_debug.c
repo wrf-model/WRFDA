@@ -58,6 +58,11 @@ void MPIDI_Dataloop_dot_printf(MPID_Dataloop *loop_p,
 {
     int i;
 
+    if (loop_p == NULL) {
+	MPIU_DBG_OUT_FMT(DATATYPE,(MPIU_DBG_FDEST,"<null dataloop>\n"));
+	return;
+    }
+
     if (header) {
 	MPIU_DBG_OUT_FMT(DATATYPE,(MPIU_DBG_FDEST,
 				   "digraph %p {   {", loop_p));
@@ -430,6 +435,16 @@ void MPIDU_Datatype_debug(MPI_Datatype type,
 
     is_builtin = (HANDLE_GET_KIND(type) == HANDLE_KIND_BUILTIN);
 
+    /* can get a NULL type a number of different ways, including not having
+     * fortran support included.
+     */
+    if (type == MPI_DATATYPE_NULL) {
+	MPIU_DBG_OUT_FMT(DATATYPE,
+			 (MPIU_DBG_FDEST,
+			  "# MPIU_Datatype_debug: MPI_Datatype = MPI_DATATYPE_NULL"));
+	return;
+    }
+
     MPIU_DBG_OUT_FMT(DATATYPE,(MPIU_DBG_FDEST,
 	       "# MPIU_Datatype_debug: MPI_Datatype = 0x%0x (%s)", type,
 	       (is_builtin) ? MPIDU_Datatype_builtin_to_string(type) :
@@ -438,6 +453,7 @@ void MPIDU_Datatype_debug(MPI_Datatype type,
     if (is_builtin) return;
 
     MPID_Datatype_get_ptr(type, dtp);
+    MPIU_Assert(dtp != NULL);
 
     MPIU_DBG_OUT_FMT(DATATYPE,(MPIU_DBG_FDEST,
       "# Size = %d, Extent = %d, LB = %d%s, UB = %d%s, Extent = %d, Element Size = %d (%s), %s",
@@ -500,6 +516,11 @@ void MPIDI_Datatype_contents_printf(MPI_Datatype type,
 
     MPID_Datatype_get_ptr(type, dtp);
     cp = dtp->contents;
+
+    if (cp == NULL) {
+	MPIU_DBG_OUT_FMT(DATATYPE,(MPIU_DBG_FDEST,"# <NULL>\n"));
+	return;
+    }
 
     types = (MPI_Datatype *) (((char *) cp) +
 			      sizeof(MPID_Datatype_contents));

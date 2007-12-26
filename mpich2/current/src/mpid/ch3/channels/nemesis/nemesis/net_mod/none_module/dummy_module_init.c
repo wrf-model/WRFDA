@@ -15,27 +15,33 @@ MPID_nem_dummy_module_init (MPID_nem_queue_ptr_t proc_recv_queue,
 		   MPIDI_PG_t *pg_p, int pg_rank,
 		   char **bc_val_p, int *val_max_sz_p)
 {
-    return 0;
+    return MPI_SUCCESS;
 }
 
 int
 MPID_nem_dummy_module_get_business_card (int my_rank, char **bc_val_p, int *val_max_sz_p)
 {
     MPIU_Assertp (0);
-    return 0;
+    return MPI_SUCCESS;
 }
 
 int
 MPID_nem_dummy_module_connect_to_root (const char *business_card, MPIDI_VC_t *new_vc)
 {
     MPIU_Assertp (0);
-    return 0;
+    return MPI_SUCCESS;
 }
 
 int
 MPID_nem_dummy_module_vc_init (MPIDI_VC_t *vc, const char *business_card)
 {
-    return 0;
+    return MPI_SUCCESS;
+}
+
+int
+MPID_nem_dummy_module_vc_destroy(MPIDI_VC_t *vc)
+{
+    return MPI_SUCCESS;
 }
 
 int MPID_nem_dummy_module_vc_terminate (MPIDI_VC_t *vc)

@@ -21,7 +21,9 @@ int MPID_nem_finalize()
     
     mpi_errno = MPID_nem_net_module_finalize();
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
-    mpi_errno = MPID_nem_detach_shared_memory (MPID_nem_mem_region.memory.base_addr, MPID_nem_mem_region.memory.max_size);    
+    
+    /* free the shared memory segment */
+    mpi_errno = MPID_nem_seg_destroy();
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
 
 #ifdef PAPI_MONITOR
@@ -44,3 +46,21 @@ MPID_nem_ckpt_shutdown()
   munmap (MPID_nem_mem_region.memory.base_addr, MPID_nem_mem_region.memory.max_size);    
   return 0;
 }
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_finalize
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPID_nem_vc_terminate(MPIDI_VC_t *vc)
+{
+    int mpi_errno = MPI_SUCCESS;
+    MPIDI_STATE_DECL(MPID_STATE_MPID_NEM_VC_TERMINATE);
+    
+    MPIDI_FUNC_ENTER(MPID_STATE_MPID_NEM_VC_TERMINATE);
+
+    MPIU_Free(((MPIDI_CH3I_VC *)vc->channel_private)->lmt_copy_buf_handle);
+
+    MPIDI_FUNC_EXIT(MPID_STATE_MPID_NEM_VC_TERMINATE);
+    return mpi_errno;
+}
+

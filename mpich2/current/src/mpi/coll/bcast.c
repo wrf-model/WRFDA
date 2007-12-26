@@ -370,7 +370,7 @@ int MPIR_Bcast (
                   mpi_errno = MPIC_Sendrecv(((char *)tmp_buf + send_offset),
                                             curr_size, MPI_BYTE, dst, MPIR_BCAST_TAG, 
                                             ((char *)tmp_buf + recv_offset),
-                                            scatter_size*mask, MPI_BYTE, dst,
+                                            nbytes-recv_offset, MPI_BYTE, dst,
                                             MPIR_BCAST_TAG, comm, &status);
                   if (mpi_errno != MPI_SUCCESS) {
 		      MPIU_ERR_POP(mpi_errno);
@@ -456,7 +456,7 @@ int MPIR_Bcast (
                           /* printf("Rank %d waiting to recv from rank %d\n",
                              relative_rank, dst); */
                           mpi_errno = MPIC_Recv(((char *)tmp_buf + offset),
-                                                scatter_size*nprocs_completed, 
+                                                nbytes - offset, 
                                                 MPI_BYTE, dst, MPIR_BCAST_TAG,
                                                 comm, &status); 
                           /* nprocs_completed is also equal to the no. of processes

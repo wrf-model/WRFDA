@@ -14,3 +14,8 @@ else
 fi
 
 PROFILE_POSTLIB=
+
+# Append LDFLAGS if necessary
+if [ -f "$MPE_ETCDIR/mpe_callstack_ldflags.conf" ] ; then
+    . $MPE_ETCDIR/mpe_callstack_ldflags.conf
+fi

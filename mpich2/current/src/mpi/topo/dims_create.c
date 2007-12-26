@@ -142,14 +142,28 @@ PMPI_LOCAL int MPIR_Factor( int n, Factors factors[], int *ndivisors )
    sizes
 
  */
+/* FIXME: This routine does not work well with non-powers of two (and
+   probably with collections of different factors.  For example, 
+   factoring squares like 6*6 or 7*7 in to 2 dimensions doesn't yield the
+   expected results (18,2) and (49,1) in current tests */
+
+/* 
+   To give more reasonable values of the chosen factors (in the chosen array)
+   from the factors, we first distribute the factors among the dimensions
+   equally.
+
+   Note that since this is only used in the case where factors are the
+   factors of nnnodes, we don't need to use the value of nnodes.
+ */
 PMPI_LOCAL int MPIR_ChooseFactors( int nfactors, Factors factors[], 
 				   int nnodes, int needed, int chosen[] )
 {
+    int i, j;
+
+#if 0
     int nodes_needed = nnodes;
     int target_size = nodes_needed / needed;
     int factor;
-    int i, j;
-
     /* First, distribute the factors into the chosen array */
     j = 0;
     for (i=0; i<needed; i++) {
@@ -177,6 +191,43 @@ PMPI_LOCAL int MPIR_ChooseFactors( int nfactors, Factors factors[],
     }
     /* finish up */
     for (; i<needed; i++) chosen[i] = 1;
+#else
+    /* Initialize the chosen factors to all 1 */
+    for (i=0; i<needed; i++) {
+	chosen[i] = 1;
+    }
+    /* For each of the available factors, there are factors[].cnt 
+       copies of each of the unique factors.  These are assigned in
+       modified round robin fashion to each of the "chosen" entries.  
+       The modification is to combine with the smallest current term
+       Note that the factors are in decreasing order. */
+
+    i = 0;  /* We don't reset the count so that the factors are 
+	       distributed among the dimensions */
+    for (j=0; j<nfactors; j++) {
+	int cnt = factors[j].cnt;
+	int val = factors[j].val;
+	/* For each of the factors that we add, try to keep the 
+	   entries balanced. */
+	while (cnt--) {
+	    /* Find the smallest current entry */
+	    int ii, cMin, iMin;
+	    iMin = 0;
+	    cMin = chosen[0];
+	    for (ii=1; ii<needed; ii++) {
+		if (chosen[ii] < cMin) {
+		    cMin = chosen[ii];
+		    iMin = ii;
+		}
+	    }
+	    if (chosen[i] > iMin) i = iMin;
+
+	    chosen[i] *= val;
+	    i++;
+	    if (i >= needed) i = 0;
+	}
+    }
+#endif
 
     /* Second, sort the chosen array in non-increasing order.  Use
        a simple bubble sort because the number of elements is always small */

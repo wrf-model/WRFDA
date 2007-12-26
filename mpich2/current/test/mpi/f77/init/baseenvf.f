@@ -4,6 +4,7 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
        program main
+       implicit none
        include 'mpif.h'
        integer ierr, provided, errs, rank, size
        integer iv, isubv, qprovided

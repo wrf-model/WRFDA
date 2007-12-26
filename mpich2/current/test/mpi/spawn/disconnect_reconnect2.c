@@ -181,6 +181,8 @@ int main(int argc, char *argv[])
 	IF_VERBOSE(("barrier.\n"));
 	error = MPI_Barrier(comm_parent);
 	check_error(error, "MPI_Barrier");
+
+	MPI_Comm_free( &comm_parent );
     }
     else if ((argc == 2) && (strcmp(argv[1], "connector") == 0))
     {
@@ -231,6 +233,8 @@ int main(int argc, char *argv[])
 	IF_VERBOSE(("barrier.\n"));
 	error = MPI_Barrier(comm_parent);
 	check_error(error, "MPI_Barrier");
+
+	MPI_Comm_free( &comm_parent );
     }
     else
     {

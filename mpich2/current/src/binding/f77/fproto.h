@@ -143,11 +143,11 @@ extern FORT_DLL_SPEC void FORT_CALL mpi_lookup_name_ ( char *v1 FORT_MIXED_LEN(d
 extern FORT_DLL_SPEC void FORT_CALL mpi_open_port_ ( MPI_Fint *v1, char *v2 FORT_MIXED_LEN(d2), MPI_Fint *ierr FORT_END_LEN(d2) ) FUNC_ATTRIBUTES(mpi_open_port_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_publish_name_ ( char *v1 FORT_MIXED_LEN(d1), MPI_Fint *v2, char *v3 FORT_MIXED_LEN(d3), MPI_Fint *ierr FORT_END_LEN(d1) FORT_END_LEN(d3) ) FUNC_ATTRIBUTES(mpi_publish_name_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_unpublish_name_ ( char *v1 FORT_MIXED_LEN(d1), MPI_Fint *v2, char *v3 FORT_MIXED_LEN(d3), MPI_Fint *ierr FORT_END_LEN(d1) FORT_END_LEN(d3) ) FUNC_ATTRIBUTES(mpi_unpublish_name_);
-extern FORT_DLL_SPEC void FORT_CALL mpi_accumulate_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Fint *v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *v9, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_accumulate_);
-extern FORT_DLL_SPEC void FORT_CALL mpi_get_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Fint *v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_get_);
-extern FORT_DLL_SPEC void FORT_CALL mpi_put_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Fint *v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_put_);
+extern FORT_DLL_SPEC void FORT_CALL mpi_accumulate_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Aint * v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *v9, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_accumulate_);
+extern FORT_DLL_SPEC void FORT_CALL mpi_get_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Aint * v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_get_);
+extern FORT_DLL_SPEC void FORT_CALL mpi_put_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Aint * v5, MPI_Fint *v6, MPI_Fint *v7, MPI_Fint *v8, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_put_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_complete_ ( MPI_Fint *v1, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_complete_);
-extern FORT_DLL_SPEC void FORT_CALL mpi_win_create_ ( void*v1, MPI_Fint *v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Fint *v5, MPI_Fint *v6, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_create_);
+extern FORT_DLL_SPEC void FORT_CALL mpi_win_create_ ( void*v1, MPI_Aint * v2, MPI_Fint *v3, MPI_Fint *v4, MPI_Fint *v5, MPI_Fint *v6, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_create_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_fence_ ( MPI_Fint *v1, MPI_Fint *v2, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_fence_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_free_ ( MPI_Fint *v1, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_free_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_get_group_ ( MPI_Fint *v1, MPI_Fint *v2, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_get_group_);
@@ -196,7 +196,7 @@ extern FORT_DLL_SPEC void FORT_CALL mpi_win_get_attr_ ( MPI_Fint *v1, MPI_Fint *
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_get_name_ ( MPI_Fint *v1, char *v2 FORT_MIXED_LEN(d2), MPI_Fint *v3, MPI_Fint *ierr FORT_END_LEN(d2) ) FUNC_ATTRIBUTES(mpi_win_get_name_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_set_attr_ ( MPI_Fint *v1, MPI_Fint *v2, void*v3, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_win_set_attr_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_win_set_name_ ( MPI_Fint *v1, char *v2 FORT_MIXED_LEN(d2), MPI_Fint *ierr FORT_END_LEN(d2) ) FUNC_ATTRIBUTES(mpi_win_set_name_);
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_ ( MPI_Fint *v1, MPI_Fint *v2, void*v3, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_alloc_mem_);
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_ ( MPI_Aint * v1, MPI_Fint *v2, void*v3, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_alloc_mem_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_comm_create_errhandler_ ( MPI_Comm_errhandler_fn*v1, MPI_Fint *v2, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_comm_create_errhandler_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_comm_get_errhandler_ ( MPI_Fint *v1, MPI_Fint *v2, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_comm_get_errhandler_);
 extern FORT_DLL_SPEC void FORT_CALL mpi_comm_set_errhandler_ ( MPI_Fint *v1, MPI_Fint *v2, MPI_Fint *ierr ) FUNC_ATTRIBUTES(mpi_comm_set_errhandler_);

@@ -26,8 +26,8 @@
     MPIU_Object_set_ref(sreq, 2); \
     sreq->kind = MPID_REQUEST_SEND; \
     MPIU_Assert(pkt_sz == sizeof(MPIDI_CH3_Pkt_t)); \
-    sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) pkt; \
-    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->ch.pkt + nb); \
+    sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) pkt; \
+    sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) &sreq->dev.pending_pkt + nb); \
     sreq->dev.iov[0].MPID_IOV_LEN = pkt_sz - nb; \
     sreq->dev.iov_count = 1; \
     sreq->dev.OnDataAvail = 0;\
@@ -50,12 +50,11 @@ int MPIDI_CH3_iStartMsg(MPIDI_VC_t * vc, void * pkt, MPIDI_msg_sz_t pkt_sz, MPID
 {
     int mpi_errno = MPI_SUCCESS;
     MPID_Request * sreq = NULL;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_ISTARTMSG);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_ISTARTMSG);
 
-    MPIU_DBG_PRINTF(("ch3_istartmsg\n"));
-    MPIDI_DBG_PRINTF((50, FCNAME, "entering"));
 #ifdef MPICH_DBG_OUTPUT
     if (pkt_sz > sizeof(MPIDI_CH3_Pkt_t))
     {
@@ -71,7 +70,7 @@ int MPIDI_CH3_iStartMsg(MPIDI_VC_t * vc, void * pkt, MPIDI_msg_sz_t pkt_sz, MPID
     
     /* If send queue is empty attempt to send
        data, queuing any unsent data. */
-    if (MPIDI_CH3I_SendQ_empty(vc)) /* MT */
+    if (MPIDI_CH3I_SendQ_empty(vcch)) /* MT */
     {
 	int nb;
 	
@@ -91,8 +90,8 @@ int MPIDI_CH3_iStartMsg(MPIDI_VC_t * vc, void * pkt, MPIDI_msg_sz_t pkt_sz, MPID
 	    {
 		MPIDI_DBG_PRINTF((55, FCNAME, "send delayed, request enqueued"));
 		create_request(sreq, pkt, pkt_sz, nb);
-		MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
-		vc->ch.send_active = sreq;
+		MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
+		vcch->send_active = sreq;
 	    }
 	}
 	else
@@ -114,12 +113,11 @@ int MPIDI_CH3_iStartMsg(MPIDI_VC_t * vc, void * pkt, MPIDI_msg_sz_t pkt_sz, MPID
     {
 	MPIDI_DBG_PRINTF((55, FCNAME, "send in progress, request enqueued"));
 	create_request(sreq, pkt, pkt_sz, 0);
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
     }
 
     *sreq_ptr = sreq;
 
-    MPIDI_DBG_PRINTF((50, FCNAME, "exiting"));
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDI_CH3_ISTARTMSG);
     return mpi_errno;
 }

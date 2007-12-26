@@ -886,7 +886,7 @@ static int fPMI_Handle_getbyidx( PMIProcess *pentry )
  * set up)
  * After the fork, the child will call
  *      PMISetupInClient( 1, &pmiinfo )
- * This addes the PMI_PORT and PMI_ID values to the enviroment
+ * This adds the PMI_PORT and PMI_ID values to the enviroment
  * The parent also calls
  *      PMISetupFinishInServer( 1, &pmiinfo, pState )
  * ? What should this do, since there is no connection yet?
@@ -1298,7 +1298,8 @@ int PMI_InitSingletonConnection( int fd, PMIProcess *pmiprocess )
     
     MPIU_Snprintf( buf, PMIU_MAXLINE,
 		   "cmd=singinit_info versionok=%s stdio=no kvsname=%s\n",
-		   (rc == 0) ? "yes" : "no",  pmiprocess->group->kvs );
+		   (rc == 0) ? "yes" : "no",  
+		   (char *)(pmiprocess->group->kvs->kvsname) );
     PMIWriteLine( fd, buf );
 
     return 0;

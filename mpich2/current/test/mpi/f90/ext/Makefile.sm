@@ -9,8 +9,10 @@ smvar_do_sharedlibs = 0
 EXTRA_PROGRAMS = allocmemf90
 
 allocmemf90_SOURCES = allocmemf90.f90
+allocmemf90_LDADD = ../util/mtestf90.o
 c2f2cf90_SOURCES = c2f2cf90.f90 c2f902c.c
 c2f2cf90_LDADD = ../util/mtestf90.o 
+c2f2c_CFLAGSADD = -I../../include
 
 c2f90mult_SOURCES = c2f90mult.c
 

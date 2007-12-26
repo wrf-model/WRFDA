@@ -587,6 +587,7 @@ sub ProcessFile
 	%KnownErrRoutines = ( 'MPIR_Err_create_code'      => '5:3:1:1', 
 			      'MPIO_Err_create_code'      => '5:3:1:0', 
 			      'MPIU_ERR_SET'              => '2:-1:0:1',
+			      'MPIU_ERR_SETSIMPLE'        => '2:-1:0:1',
 			      'MPIU_ERR_SET1'             => '2:-1:1:1',
 			      'MPIU_ERR_SET2'             => '2:-1:2:1',
 			      'MPIU_ERR_SETANDSTMT'       => '3:-1:0:1',

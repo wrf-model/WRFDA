@@ -8,20 +8,6 @@
 #include "adio.h"
 
 ADIOI_Flatlist_node *ADIOI_Flatlist = NULL;
-ADIOI_Async_node *ADIOI_Async_list_head = NULL, *ADIOI_Async_list_tail = NULL;
-    /* list of outstanding asynchronous requests */
-ADIOI_Async_node *ADIOI_Async_avail_head = NULL,
-    *ADIOI_Async_avail_tail = NULL;
-    /* list of available (already malloced) nodes for above async list */
-ADIOI_Malloc_async *ADIOI_Malloc_async_head = NULL,
-    *ADIOI_Malloc_async_tail = NULL;
-  /* list of malloced areas for async_list, which must be freed in ADIO_End */
-
-ADIOI_Req_node *ADIOI_Req_avail_head = NULL, *ADIOI_Req_avail_tail = NULL;
-    /* list of available (already malloced) request objects */
-ADIOI_Malloc_req *ADIOI_Malloc_req_head = NULL, *ADIOI_Malloc_req_tail = NULL;
-    /* list of malloced areas for requests, which must be freed in ADIO_End */
-
 ADIOI_Datarep *ADIOI_Datarep_head = NULL;
     /* list of datareps registered by the user */
 
@@ -68,6 +54,47 @@ void ADIO_Init(int *argc, char ***argv, int *error_code)
     if (c && (!strcmp(c, "true") || !strcmp(c, "TRUE"))) 
 	ADIOI_Direct_write = 1;
     else ADIOI_Direct_write = 0;
+#endif
+
+#ifdef ADIOI_MPE_LOGGING
+    {
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_open_a, &ADIOI_MPE_open_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_read_a, &ADIOI_MPE_read_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_write_a, &ADIOI_MPE_write_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_lseek_a, &ADIOI_MPE_lseek_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_close_a, &ADIOI_MPE_close_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_writelock_a,
+                                    &ADIOI_MPE_writelock_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_readlock_a,
+                                    &ADIOI_MPE_readlock_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_unlock_a, &ADIOI_MPE_unlock_b );
+        MPE_Log_get_state_eventIDs( &ADIOI_MPE_postwrite_a,
+                                    &ADIOI_MPE_postwrite_b );
+
+        int  comm_world_rank;
+        PMPI_Comm_rank( MPI_COMM_WORLD, &comm_world_rank );
+
+        if ( comm_world_rank == 0 ) {
+            MPE_Describe_state( ADIOI_MPE_open_a, ADIOI_MPE_open_b,
+                                "open", "orange" );
+            MPE_Describe_state( ADIOI_MPE_read_a, ADIOI_MPE_read_b,
+                                "read", "green" );
+            MPE_Describe_state( ADIOI_MPE_write_a, ADIOI_MPE_write_b,
+                                "write", "blue" );
+            MPE_Describe_state( ADIOI_MPE_lseek_a, ADIOI_MPE_lseek_b,
+                                "lseek", "red" );
+            MPE_Describe_state( ADIOI_MPE_close_a, ADIOI_MPE_close_b,
+                                "close", "grey" );
+            MPE_Describe_state( ADIOI_MPE_writelock_a, ADIOI_MPE_writelock_b,
+                                "writelock", "plum" );
+            MPE_Describe_state( ADIOI_MPE_readlock_a, ADIOI_MPE_readlock_b,
+                                "readlock", "magenta" );
+            MPE_Describe_state( ADIOI_MPE_unlock_a, ADIOI_MPE_unlock_b,
+                                "unlock", "purple" );
+            MPE_Describe_state( ADIOI_MPE_postwrite_a, ADIOI_MPE_postwrite_b,
+                                "postwrite", "ivory" );
+        }
+    }
 #endif
 
     *error_code = MPI_SUCCESS;

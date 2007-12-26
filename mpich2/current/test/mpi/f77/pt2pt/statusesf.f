@@ -4,6 +4,7 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
       program main
+      implicit none
 C     Test support for MPI_STATUS_IGNORE and MPI_STATUSES_IGNORE
       include 'mpif.h'
       integer nreqs

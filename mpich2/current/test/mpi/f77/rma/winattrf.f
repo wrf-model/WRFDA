@@ -134,6 +134,7 @@ C as defined.  To test them, we simply call them here
          print *, " MPI_WIN_NULL_COPY_FN did not return MPI_SUCCESS"
       endif
 C
+      call mpi_comm_free( comm, ierr )
       call mtest_finalize( errs )
       call mpi_finalize( ierr )
       end

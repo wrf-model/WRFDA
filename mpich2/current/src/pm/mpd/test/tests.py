@@ -29,7 +29,7 @@ for i in range(0,1000):     testsToRun[i] = 1    # run tests for mpd
 # for i in range(3000,4000):  testsToRun[i] = 1    # run console pgm tests
 # for i in range(8000,9000):  testsToRun[i] = 1    # run misc tests
 # for i in range(9000,10000): testsToRun[i] = 1    # run root tests
-# testsToRun[2009] = 1                             # run this one test
+# testsToRun[3003] = 1                               # run this one test
 
 
 if 1 in testsToRun[0:1000]:
@@ -145,7 +145,7 @@ if testsToRun[5]:
         ## redo the above test with a local ifhn that should cause failure
         lines = commands.getoutput("mpdboot%s -f %s -n %d --ifhn=127.0.0.1" % (PYEXT,HFILE,NMPDS) )
         if len(lines) > 0:
-            if lines.find('failed to ping') < 0:
+            if lines.find('failed to handshake') < 0:
                 print "probable error in ifhn test using 127.0.0.1; printing lines of output next:"
                 print lines
                 sys.exit(-1)
@@ -372,7 +372,7 @@ if testsToRun[1011]:
         temph.close()
         os.system("mpdboot%s -f %s -n %d" % (PYEXT,HFILE,NMPDS) )
         expout = '/tmp:/bin\n/tmp:/bin\n'
-        mpdtest.run(cmd="mpiexec%s -path /tmp:/bin -n 2 sh -c '/bin/echo $PATH'" % (PYEXT),
+        mpdtest.run(cmd="mpiexec%s -path /tmp:/bin -n 2 /usr/bin/printenv | grep PATH" % (PYEXT),
                     expOut=expout,chkOut=1)
         os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
         os.unlink(HFILE)
@@ -750,15 +750,16 @@ if testsToRun[3003]:
         os.system("cd %s/src/pm/mpd ; cc -o infloop infloop.c" % (MPI_srcdir) )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system("mpdboot%s -n %d" % (PYEXT,NMPDS) )
-    os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
+    if not os.access("./infloop",os.R_OK):  
+       os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
     os.system("mpiexec%s -s all -a ralph -n 2 ./infloop -p &" % (PYEXT))  # -p => don't print
     import time    ## give the mpiexec
     time.sleep(2)  ##     time to get going
     expout = ['ralph']
-    rv = mpdtest.run(cmd="mpdlistjobs%s #1" % (PYEXT), grepOut=1, expOut=expout )
+    rv = mpdtest.run(cmd="mpdlistjobs%s" % (PYEXT), grepOut=1, expOut=expout )
     rv = mpdtest.run(cmd="mpdkilljob%s -a ralph" % (PYEXT), chkOut=0 )
     expout = ''
-    rv = mpdtest.run(cmd="mpdlistjobs%s #2" % (PYEXT), chkOut=1, expOut=expout )
+    rv = mpdtest.run(cmd="mpdlistjobs%s" % (PYEXT), chkOut=1, expOut=expout )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system("killall -q infloop")  ## just to be safe
     os.system('rm -f infloop')
@@ -771,15 +772,16 @@ if testsToRun[3004]:
         os.system("cd %s/src/pm/mpd ; cc -o infloop infloop.c" % (MPI_srcdir) )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system("mpdboot%s -n %d" % (PYEXT,NMPDS) )
-    os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
+    if not os.access("./infloop",os.R_OK):  
+        os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
     os.system("mpiexec%s -s all -a ralph -n 2 ./infloop -p &" % (PYEXT))  # -p => don't print
     import time    ## give the mpiexec
     time.sleep(2)  ##     time to get going
     expout = ['ralph']
-    rv = mpdtest.run(cmd="mpdlistjobs%s #1" % (PYEXT), grepOut=1, expOut=expout )
+    rv = mpdtest.run(cmd="mpdlistjobs%s" % (PYEXT), grepOut=1, expOut=expout )
     rv = mpdtest.run(cmd="mpdsigjob%s INT -a ralph -g" % (PYEXT), chkOut=0 )
     expout = ''
-    rv = mpdtest.run(cmd="mpdlistjobs%s #2" % (PYEXT), chkOut=1, expOut=expout )
+    rv = mpdtest.run(cmd="mpdlistjobs%s" % (PYEXT), chkOut=1, expOut=expout )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system('rm -f infloop')
     
@@ -795,14 +797,15 @@ if testsToRun[8000]:
         os.system("cd %s/src/pm/mpd ; cc -o infloop infloop.c" % (MPI_srcdir) )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system("mpdboot%s -n %d" % (PYEXT,NMPDS) )
-    os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
+    if not os.access("./infloop",os.R_OK):  
+        os.system('cp %s/src/pm/mpd/infloop .' % (MPI_srcdir))
     import popen2
     runner = popen2.Popen4("mpiexec%s -n 2 ./infloop -p" % (PYEXT))  # -p => don't print
     import time    ## give the mpiexec
     time.sleep(2)  ##     time to get going
     os.system("kill -INT %d" % (runner.pid) )  # simulate user ^C
     expout = ''
-    rv = mpdtest.run(cmd="mpdlistjobs%s #2" % (PYEXT), chkOut=1, expOut=expout )
+    rv = mpdtest.run(cmd="mpdlistjobs%s" % (PYEXT), chkOut=1, expOut=expout )
     os.system("mpdallexit%s 1> /dev/null 2> /dev/null" % (PYEXT) )
     os.system("killall -q infloop")  ## just to be safe
     os.system('rm -f infloop')
@@ -868,9 +871,8 @@ if 1 in testsToRun[9000:10000]:
         print "    ** you do not have sudo capability; terminating\n"
         sys.exit(-1)
 
-os.unsetenv('MPD_CON_EXT')   # get rid of this for root tests
-
 if testsToRun[9000]:
+    os.environ['MPD_CON_EXT'] = ""    # get rid of this for root testing
     print "TEST installing mpd as root"
     if not os.access("%s/src/pm/mpd/mpdroot" % (MPI_srcdir),os.X_OK):
         os.system("cd %s/src/pm/mpd ; ./configure ; make")

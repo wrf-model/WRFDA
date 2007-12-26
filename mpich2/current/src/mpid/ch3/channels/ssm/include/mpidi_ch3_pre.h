@@ -9,7 +9,7 @@
 
 /* mpidu_sock.h includes its own header file, so it may come before the 
    channel conf file */
-#include "mpidu_sock.h"
+/*#include "mpidu_sock.h" */
 #include "mpidi_ch3i_ssm_conf.h"
 #include "mpidi_ch3_conf.h"
 
@@ -49,6 +49,8 @@
 
 #define MPIDI_MAX_SHM_NAME_LENGTH 100
 
+#if 0
+
 /* for MAXHOSTNAMELEN under Linux ans OSX */
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -78,6 +80,7 @@ typedef struct MPIDI_Process_group_s
 MPIDI_CH3I_Process_group_t;
 
 #define MPIDI_CH3_PG_DECL MPIDI_CH3I_Process_group_t ch;
+#endif /* 0 */
 
 #define MPIDI_CH3_PKT_ENUM			\
 MPIDI_CH3I_PKT_SC_OPEN_REQ,			\
@@ -89,6 +92,7 @@ MPIDI_CH3_PKT_CTS_IOV,                          \
 MPIDI_CH3_PKT_RELOAD,                           \
 MPIDI_CH3_PKT_IOV
 
+#if 0
 #define MPIDI_CH3_PKT_DEFS						\
 typedef struct								\
 {									\
@@ -162,6 +166,8 @@ MPIDI_CH3_Pkt_rdma_cts_iov_t cts_iov;		    \
 MPIDI_CH3_Pkt_rdma_reload_t reload;		    \
 MPIDI_CH3_Pkt_rdma_iov_t iov;
 
+#endif 
+
 #define MPIDI_CH3_PKT_RELOAD_SEND 1
 #define MPIDI_CH3_PKT_RELOAD_RECV 0
 
@@ -174,6 +180,7 @@ typedef enum MPIDI_CH3I_VC_state
 }
 MPIDI_CH3I_VC_state_t;
 
+#if 0
 /* This structure requires the iovec structure macros to be defined */
 typedef struct MPIDI_CH3I_SHM_Buffer_t
 {
@@ -221,7 +228,7 @@ typedef struct MPIDI_CH3I_VC
     struct MPID_Request * req;
     MPIDI_CH3I_VC_state_t state;
     int shm_read_connected;
-    MPIDU_Sock_t sock;
+    struct MPIDU_Sock *sock;
     struct MPIDI_CH3I_Connection * conn;
     int port_name_tag;
     BOOL bShm;
@@ -240,14 +247,18 @@ typedef struct MPIDI_CH3I_VC
     struct MPIDI_VC *shm_next_reader, *shm_next_writer;
 } MPIDI_CH3I_VC;
 
-#define MPIDI_CH3_VC_DECL MPIDI_CH3I_VC ch;
+#endif
 
+#if 0
+#define MPIDI_CH3_VC_DECL MPIDI_CH3I_VC ch;
+#endif
 
 #define MPIDI_CH3_REQUEST_KIND_DECL \
 MPIDI_CH3I_IOV_WRITE_REQUEST, \
 MPIDI_CH3I_IOV_READ_REQUEST, \
 MPIDI_CH3I_RTS_IOV_READ_REQUEST
 
+#if 0
 /*
  * MPIDI_CH3_REQUEST_DECL (additions to MPID_Request)
  */
@@ -257,10 +268,7 @@ struct MPIDI_CH3I_Request						\
     /* iov_offset points to the current head element in the IOV */	\
     int iov_offset;							\
 									\
-    /*  pkt is used to temporarily store a packet header associated with this request */	\
-    MPIDI_CH3_Pkt_t pkt;						\
-                                                                        \
-    struct MPID_Request *req;						\
+    struct MPID_Request *req;					\
 } ch;
 
 /* Use MPIDI_CH3_REQUEST_INIT to initialize the channel-specific fields
@@ -268,6 +276,8 @@ struct MPIDI_CH3I_Request						\
 #define MPIDI_CH3_REQUEST_INIT(req_) \
     (req_)->ch.iov_offset=0;\
     (req_)->ch.req=NULL
+
+#endif /* 0 */
 
 typedef struct MPIDI_CH3I_Progress_state
 {

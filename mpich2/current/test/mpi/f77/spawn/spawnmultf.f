@@ -8,6 +8,9 @@ C This tests spawn_mult by using the same executable but different
 C command-line options.
 C
        program main
+C     This implicit none is removed here because the iargc was not
+C     declared on the old sparc compilers
+C       implicit none
        include 'mpif.h'
        integer errs, err
        integer rank, size, rsize, wsize, i
@@ -20,6 +23,7 @@ C
        character*(30) cmds(2)
        character*(80) argv(64)
        integer argc
+       integer ierr
 C
 C       Arguments are stored by rows, not columns in the vector.
 C       We write the data in a way that looks like the transpose,

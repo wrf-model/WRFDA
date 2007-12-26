@@ -5,8 +5,8 @@
 /* 
  * Initialize the lock object
  */
-void MPIDU_Process_lock_init(int * lock);
-.inline MPIDU_Process_lock_init, 4
+void MPIDUi_Process_lock_init(int * lock);
+.inline MPIDUi_Process_lock_init, 4
     clrb [%o0]
 .end
 
@@ -14,8 +14,8 @@ void MPIDU_Process_lock_init(int * lock);
 /*
  * Destroy the lock object
  */
-void MPIDU_Process_lock_free(int * lock);
-.inline MPIDU_Process_lock_free, 4
+void MPIDUi_Process_lock_free(int * lock);
+.inline MPIDUi_Process_lock_free, 4
     set 0xaa, %o1
     stub %o1, [%o0]
 .end
@@ -24,8 +24,8 @@ void MPIDU_Process_lock_free(int * lock);
 /*
  * Acquire the lock object
  */
-void MPIDU_Process_lock(int * lock);
-.inline MPIDU_Process_lock, 4
+void MPIDUi_Process_lock(int * lock);
+.inline MPIDUi_Process_lock, 4
  1:
     /* first try to acquire the lock */
     ldstub [%o0], %o1
@@ -51,8 +51,8 @@ void MPIDU_Process_lock(int * lock);
 /*
  * Release the lock object
  */
-void MPIDU_Process_unlock(int * lock);
-.inline MPIDU_Process_unlock, 4
+void MPIDUi_Process_unlock(int * lock);
+.inline MPIDUi_Process_unlock, 4
     /* release the lock, but only after insuring that all previous stores
        have completed */
     stbar
@@ -64,8 +64,8 @@ void MPIDU_Process_unlock(int * lock);
  * Wait for the process holding the lock to release it; this allows the lock
  * to be used as a synchronization object
  */
-void MPIDU_Process_busy_wait(int * lock);
-.inline MPIDU_Process_busy_wait, 4
+void MPIDUi_Process_busy_wait(int * lock);
+.inline MPIDUi_Process_busy_wait, 4
  1:
     ldub [%o0], %o1
     tst %o1

@@ -111,6 +111,21 @@ int MPI_Wait(MPI_Request *request, MPI_Status *status)
 	MPID_Progress_start(&progress_state);
 	while((*(request_ptr)->cc_ptr) != 0)
 	{
+	    mpi_errno = MPIR_Grequest_progress_poke(1, &request_ptr, status);
+	    if (request_ptr->kind == MPID_UREQUEST && 
+			    request_ptr->wait_fn != NULL) 
+	    {
+		if (mpi_errno != MPI_SUCCESS)
+		{
+		    /* --BEGIN ERROR HANDLING-- */ 
+		    MPID_Progress_end(&progress_state);
+		    goto fn_fail;
+		    /* --END ERROR HANDLING-- */
+		}
+		continue; /* treating UREQUEST like normal request means we'll
+			     poll indefinitely. skip over progress_wait */ 
+	    }
+
 	    mpi_errno = MPID_Progress_wait(&progress_state);
 	    if (mpi_errno != MPI_SUCCESS)
 	    {
@@ -123,7 +138,8 @@ int MPI_Wait(MPI_Request *request, MPI_Status *status)
 	MPID_Progress_end(&progress_state);
     }
 
-    mpi_errno = MPIR_Request_complete(request, request_ptr, status, &active_flag);
+    mpi_errno = MPIR_Request_complete(request, request_ptr, status, 
+				      &active_flag);
     if (mpi_errno != MPI_SUCCESS) goto fn_fail;
 
     /* ... end of body of routine ... */

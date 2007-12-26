@@ -8,6 +8,7 @@ C options.  The attribute MPI_APPNUM is used to determine which
 C executable is running.
 C
        program main
+       implicit none
        include 'mpif.h'
        include 'type1aint.h'
        integer errs, err
@@ -20,6 +21,7 @@ C
        character*(30) cmds(2)
        integer appnum
        logical flag
+       integer ierr
        errs = 0
 
        call MTest_Init( ierr )
@@ -93,11 +95,11 @@ C       (the error count will still be reported to the parent)
          endif
 C
 C       Check for correct APPNUM
-         call mpi_comm_get_attr( MPI_COMM_WORLD, MPI_APPNUM, asize,         &
+         call mpi_comm_get_attr( MPI_COMM_WORLD, MPI_APPNUM, aint,         &
      &        flag, ierr )
 C        My appnum should be my rank in comm world
          if (flag) then
-            appnum = asize
+            appnum = aint
             if (appnum .ne. rank) then
                 errs = errs + 1
                 print *, "appnum is ", appnum, " but should be ", rank

@@ -78,8 +78,8 @@ int main( int argc, char *argv[] )
 	}
 
 	// The actual exchange
-	win.Start( group2, 0 );
 	win.Post( group2, 0 );
+	win.Start( group2, 0 );
 
 	win.Put( &buf[0+nrows], nrows, MPI::INT, left, ncols+1, 
 		 nrows, MPI::INT );

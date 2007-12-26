@@ -41,6 +41,11 @@ iwritef90.f90 iwriteshf90.f90 : ioharness.tlt ioharness.defn ../../maint/testmer
 	../../maint/testmerge -defn=$(top_srcdir)/maint/common.defn \
 		$(srcdir)/ioharness.defn $(srcdir)/ioharness.tlt
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)
 

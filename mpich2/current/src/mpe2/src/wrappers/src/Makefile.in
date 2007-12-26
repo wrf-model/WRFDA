@@ -110,20 +110,20 @@ default:
 # responsible if make works as Sun documents it).  To fix this, we
 # add all the objects to the library, not just the "recent" ones.
 ${libbuild_dir}/lib$(LOG_LIBNAME).a: log_mpi_core.@OBJEXT@
-	$(AR) $(ARFLAGS) $@ $?
+	$(AR) $(ARFLAGS) $@ log_mpi_core.@OBJEXT@
 	$(RANLIB) $@
 
 ${libbuild_dir}/lib$(TRACE_LIBNAME).a: trace_mpi_core.@OBJEXT@
-	$(AR) $(ARFLAGS) $@ $?
+	$(AR) $(ARFLAGS) $@ trace_mpi_core.@OBJEXT@
 	$(RANLIB) $@
 
 ${libbuild_dir}/lib$(F2CMPI_LIBNAME).a: mpe_proff.@OBJEXT@
-	$(AR) $(ARFLAGS) $@ $?
+	$(AR) $(ARFLAGS) $@ mpe_proff.@OBJEXT@
 	$(RANLIB) $@
 
 ${libbuild_dir}/mpe_prof.@OBJEXT@: mpe_prof.@OBJEXT@
 	@-if [ "${libbuild_dir}" != "." ] ; then \
-	      $(CP) $? ${libbuild_dir} ; \
+	      $(CP) mpe_prof.@OBJEXT@ ${libbuild_dir} ; \
 	  fi
 
 #

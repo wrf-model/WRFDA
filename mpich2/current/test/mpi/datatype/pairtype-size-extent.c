@@ -106,11 +106,11 @@ int main(int argc, char *argv[])
 
 	MPI_Type_get_extent(stype, &dummy_lb, &stype_extent);
 	MPI_Type_get_extent(pairtypes[i].ptype, &dummy_lb, &ptype_extent);
-	if (stype_extent != ptype_extent) {
+	if (stype_extent != ptype_extent || stype_extent != handbuilt_extent) {
 	    errs++;
 
 	    if (verbose) fprintf(stderr,
-				 "extent of %s (%d) does not match extent of hand-built MPI struct (%d)\n   NOTE: equivalent C struct has size of %d\n",
+				 "extent of %s (%d) does not match extent of either hand-built MPI struct (%d) or equivalent C struct (%d)\n",
 				 pairtypes[i].name, (int) ptype_extent,
 				 (int) stype_extent,
 				 handbuilt_extent);

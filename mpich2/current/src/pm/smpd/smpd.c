@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "smpd.h"
 #include "mpi.h"
+#include "smpd_implthread.h"
 #ifdef HAVE_WINDOWS_H
 #include "smpd_service.h"
 #endif
@@ -48,6 +49,7 @@ int main(int argc, char* argv[])
 
     /* initialization */
     result = PMPI_Init(&argc, &argv);
+    SMPD_CS_ENTER();
     if (result != MPI_SUCCESS)
     {
 	smpd_err_printf("MPI_Init failed,\n error: %d\n", result);
@@ -165,6 +167,7 @@ int main(int argc, char* argv[])
 
     smpd_finalize_printf();
 
+    SMPD_CS_EXIT();
     smpd_exit(result);
     smpd_exit_fn(FCNAME);
     return result;

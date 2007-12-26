@@ -38,6 +38,8 @@ int MPID_nem_ib_module_connect_to_root (const char *business_card,
 int MPID_nem_ib_module_vc_init (MPIDI_VC_t *vc, 
         const char *business_card);
 
+int MPID_nem_ib_module_vc_destroy(MPIDI_VC_t *vc);
+
 int MPID_nem_ib_module_vc_terminate (MPIDI_VC_t *vc);
 
 #endif  /* IB_MODULE_H */

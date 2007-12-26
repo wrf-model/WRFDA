@@ -160,6 +160,10 @@ int MPIDU_Sock_accept(struct MPIDU_Sock * listener,
      */
     /* FIXME: Who sets the socket buffer size?  Why isn't the test
        made at that time? */
+#if 1
+    mpi_errno = MPIDU_Sock_SetSockBufferSize( fd, 1 );
+    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+#else
     if (MPIDU_Socki_socket_bufsz > 0)
     {
 	int bufsz;
@@ -202,12 +206,14 @@ int MPIDU_Sock_accept(struct MPIDU_Sock * listener,
 	}
 	/* --END ERROR HANDLING-- */
     }
-    
+#endif    
     /*
      * Allocate and initialize sock and poll structures.
      *
-     * NOTE: pollfd->fd is initialized to -1.  It is only set to the true fd value when an operation is posted on the sock.  This
-     * (hopefully) eliminates a little overhead in the OS and avoids repetitive POLLHUP events when the connection is closed by
+     * NOTE: pollfd->fd is initialized to -1.  It is only set to the true fd 
+     * value when an operation is posted on the sock.  This
+     * (hopefully) eliminates a little overhead in the OS and avoids 
+     * repetitive POLLHUP events when the connection is closed by
      * the remote process.
      */
     mpi_errno = MPIDU_Socki_sock_alloc(sock_set, &sock);
@@ -683,8 +689,10 @@ int MPIDU_Sock_wakeup(struct MPIDU_Sock_set * sock_set)
     }
     MPIU_THREAD_CHECK_END
 #   endif
-    
-  fn_exit:
+
+#ifdef MPICH_IS_THREADED
+    fn_exit:
+#endif
     MPIDI_FUNC_EXIT(MPID_STATE_MPIDU_SOCK_WAKEUP);
     return mpi_errno;
 }

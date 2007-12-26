@@ -89,6 +89,15 @@
 /* Define if debugger support is included */
 #undef HAVE_DEBUGGER_SUPPORT
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the `dlopen' function. */
+#undef HAVE_DLOPEN
+
+/* Define to 1 if you have the `dlsym' function. */
+#undef HAVE_DLSYM
+
 /* Controls how alignment of doubles is performed, separate from other FP
    values */
 #undef HAVE_DOUBLE_ALIGNMENT_EXCEPTION
@@ -105,6 +114,9 @@
 
 /* Define to enable error checking */
 #undef HAVE_ERROR_CHECKING
+
+/* Define if F90 type routines available */
+#undef HAVE_F90_TYPE_ROUTINES
 
 /* Define if Fortran integer are the same size as C ints */
 #undef HAVE_FINT_IS_INT
@@ -208,6 +220,12 @@
 
 /* Supports weak pragma */
 #undef HAVE_PRAGMA_WEAK
+
+/* Define to 1 if you have the `pthread_cleanup_push' function. */
+#undef HAVE_PTHREAD_CLEANUP_PUSH
+
+/* Define if pthread_cleanup_push is available, even as a macro */
+#undef HAVE_PTHREAD_CLEANUP_PUSH_MACRO
 
 /* Define to 1 if you have the <pthread.h> header file. */
 #undef HAVE_PTHREAD_H
@@ -315,15 +333,33 @@
 /* Define if we have __va_copy */
 #undef HAVE___VA_COPY
 
+/* Define which x86 cycle counter to use */
+#undef LINUX86_CYCLE_CPUID_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef LINUX86_CYCLE_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef LINUX86_CYCLE_RDTSCP
+
+/* Name of installation directory intended for MPICH2 */
+#undef MPICH2_LIBDIR
+
 /* Define to perform a fine-grain nesting level check on exit */
 #undef MPICH_DEBUG_FINE_GRAIN_NESTING
 
 /* Define to enable handle checking */
 #undef MPICH_DEBUG_HANDLES
 
+/* Define if each function exit should confirm memory arena correctness */
+#undef MPICH_DEBUG_MEMARENA
+
 /* Define to enable preinitialization of memory used by structures and unions
    */
 #undef MPICH_DEBUG_MEMINIT
+
+/* Define to enable mutex debugging */
+#undef MPICH_DEBUG_MUTEX
 
 /* Define to check nesting level on exit */
 #undef MPICH_DEBUG_NESTING
@@ -474,6 +510,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Define if alloca should be used if available */
+#undef USE_ALLOCA
+
 /* Define if assembly language atomic update macros should be used (if
    available) */
 #undef USE_ATOMIC_UPDATES
@@ -483,6 +522,9 @@
 
 /* Define to enable logging macros */
 #undef USE_DBG_LOGGING
+
+/* Define if dynamic libraries are available and should be used */
+#undef USE_DYNAMIC_LIBRARIES
 
 /* Define if file should be used for name publisher */
 #undef USE_FILE_FOR_NAMEPUB

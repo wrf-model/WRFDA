@@ -84,8 +84,8 @@ int MPID_Send(const void * buf, int count, MPI_Datatype datatype, int rank,
 	MPIDI_VC_FAI_send_seqnum(vc, seqnum);
 	MPIDI_Pkt_set_seqnum(eager_pkt, seqnum);
 	
-	mpi_errno = MPIDI_CH3_iStartMsg(vc, eager_pkt, sizeof(*eager_pkt), 
-					&sreq);
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iStartMsg(vc, eager_pkt, 
+						  sizeof(*eager_pkt), &sreq));
 	/* --BEGIN ERROR HANDLING-- */
 	if (mpi_errno != MPI_SUCCESS)
 	{
@@ -121,7 +121,7 @@ int MPID_Send(const void * buf, int count, MPI_Datatype datatype, int rank,
     else
 #endif
     if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_send_t) <=	
-	MPIDI_CH3_EAGER_MAX_MSG_SIZE) {
+	vc->eager_max_msg_sz) {
 	if (dt_contig) {
  	    mpi_errno = MPIDI_CH3_EagerContigSend( &sreq, 
 						   MPIDI_CH3_PKT_EAGER_SEND,
@@ -133,18 +133,18 @@ int MPID_Send(const void * buf, int count, MPI_Datatype datatype, int rank,
 	    MPIDI_Request_create_sreq(sreq, mpi_errno, goto fn_exit);
 	    MPIDI_Request_set_type(sreq, MPIDI_REQUEST_TYPE_SEND);
 	    mpi_errno = MPIDI_CH3_EagerNoncontigSend( &sreq, 
-						      MPIDI_CH3_PKT_EAGER_SEND,
-						      buf, count, datatype,
-						      data_sz, rank, tag, 
-						      comm, context_offset );
+                                                      MPIDI_CH3_PKT_EAGER_SEND,
+                                                      buf, count, datatype,
+                                                      data_sz, rank, tag, 
+                                                      comm, context_offset );
 	}
     }
     else {
 	MPIDI_Request_create_sreq(sreq, mpi_errno, goto fn_exit);
 	MPIDI_Request_set_type(sreq, MPIDI_REQUEST_TYPE_SEND);
-	mpi_errno = MPIDI_CH3_RndvSend( &sreq, buf, count, datatype, dt_contig,
-					data_sz, dt_true_lb, rank, tag, comm, 
-					context_offset );
+	mpi_errno = vc->rndvSend_fn( &sreq, buf, count, datatype, dt_contig,
+                                     data_sz, dt_true_lb, rank, tag, comm, 
+                                     context_offset );
 	/* Note that we don't increase the ref count on the datatype
 	   because this is a blocking call, and the calling routine 
 	   must wait until sreq completes */

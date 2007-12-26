@@ -28,11 +28,13 @@ int MPID_Type_contiguous(int count,
 			 MPI_Datatype oldtype,
 			 MPI_Datatype *newtype)
 {
-    int err, mpi_errno = MPI_SUCCESS;
+    int mpi_errno = MPI_SUCCESS;
     int is_builtin;
     int el_sz;
     MPI_Datatype el_type;
     MPID_Datatype *new_dtp;
+
+    if (count == 0) return MPID_Type_zerolen(newtype);
 
     /* allocate new datatype object and handle */
     new_dtp = (MPID_Datatype *) MPIU_Handle_obj_alloc(&MPID_Datatype_mem);
@@ -56,68 +58,16 @@ int MPID_Type_contiguous(int count,
     new_dtp->name[0]      = 0;
     new_dtp->contents     = NULL;
 
-    new_dtp->dataloop_size       = -1;
     new_dtp->dataloop       = NULL;
+    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop_depth = -1;
+    new_dtp->hetero_dloop       = NULL;
+    new_dtp->hetero_dloop_size  = -1;
+    new_dtp->hetero_dloop_depth = -1;
     
     is_builtin = (HANDLE_GET_KIND(oldtype) == HANDLE_KIND_BUILTIN);
 
-    if (count == 0)
-    {
-	/* we are interpreting the standard here based on the fact that
-	 * with a zero count there is nothing in the typemap.
-	 *
-	 * we handle this case explicitly to get it out of the way.
-	 */
-	new_dtp->size          = 0;
-	new_dtp->has_sticky_ub = 0;
-	new_dtp->has_sticky_lb = 0;
-	new_dtp->lb            = 0;
-	new_dtp->ub            = 0;
-	new_dtp->true_lb       = 0;
-	new_dtp->true_ub       = 0;
-	new_dtp->extent        = 0;
-
-	new_dtp->alignsize     = 0;
-	new_dtp->element_size  = 0;
-	new_dtp->eltype        = 0;
-	new_dtp->n_elements    = 0;
-	new_dtp->is_contig     = 1;
-
-	err = MPID_Dataloop_create_contiguous(0,
-					      MPI_INT, /* dummy type */
-					      &(new_dtp->dataloop),
-					      &(new_dtp->dataloop_size),
-					      &(new_dtp->dataloop_depth),
-					      0);
-#if defined(MPID_HAS_HETERO) || 1
-	if (!err) {
-	    /* heterogeneous dataloop representation */
-	    err = MPID_Dataloop_create_contiguous(0,
-						  MPI_INT, /* dummy type */
-						  &(new_dtp->hetero_dloop),
-						  &(new_dtp->hetero_dloop_size),
-						  &(new_dtp->hetero_dloop_depth),
-						  0);
-	}
-#endif /* MPID_HAS_HETERO */
-	/* --BEGIN ERROR HANDLING-- */
-	if (err) {
-	    mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					     MPIR_ERR_RECOVERABLE,
-					     "MPID_Dataloop_create_contiguous",
-					     __LINE__,
-					     MPI_ERR_OTHER,
-					     "**nomem",
-					     0);
-	    return mpi_errno;
-	}
-	/* --END ERROR HANDLING-- */
-
-	*newtype = new_dtp->handle;
-	return mpi_errno;
-    }
-    else if (is_builtin)
+    if (is_builtin)
     {
 	el_sz   = MPID_Datatype_get_basic_size(oldtype);
 	el_type = oldtype;
@@ -172,37 +122,6 @@ int MPID_Type_contiguous(int count,
 
 	new_dtp->is_contig    = old_dtp->is_contig;
     }
-
-    /* fill in dataloop(s) */
-    err = MPID_Dataloop_create_contiguous(count,
-					  oldtype,
-					  &(new_dtp->dataloop),
-					  &(new_dtp->dataloop_size),
-					  &(new_dtp->dataloop_depth),
-					  0);
-#if defined(MPID_HAS_HETERO) || 1
-    if (!err) {
-	/* heterogeneous dataloop representation */
-	err = MPID_Dataloop_create_contiguous(count,
-					      oldtype,
-					      &(new_dtp->hetero_dloop),
-					      &(new_dtp->hetero_dloop_size),
-					      &(new_dtp->hetero_dloop_depth),
-					      0);
-    }
-#endif /* MPID_HAS_HETERO */
-    /* --BEGIN ERROR HANDLING-- */
-    if (err) {
-	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					 MPIR_ERR_RECOVERABLE,
-					 "MPID_Dataloop_create_contiguous",
-					 __LINE__,
-					 MPI_ERR_OTHER,
-					 "**nomem",
-					 0);
-	return mpi_errno;
-    }
-    /* --END ERROR HANDLING-- */
 
     *newtype = new_dtp->handle;
 

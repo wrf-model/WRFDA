@@ -12,5 +12,10 @@ spawnmultf_SOURCES = spawnmultf.f
 spawnmult2f_SOURCES = spawnmult2f.f
 connaccf_SOURCES = connaccf.f
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)

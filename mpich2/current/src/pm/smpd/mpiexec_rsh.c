@@ -15,6 +15,49 @@
 static char root_host[100];
 static int root_port;
 
+#undef FCNAME
+#define FCNAME "FmtEnvVarsForSSH"
+/* This function formats the environment strings of the form,
+ *    foo1=bar1 foo2=bar2 foo3=bar3
+ *    TO
+ *     "foo1=bar1" "foo2=bar2" "foo3=bar3"
+ *    and returns the length of the formatted string
+ *    Note: The formatted string contains a space in the front
+ */
+static int FmtEnvVarsForSSH(char *bEnv, char *fmtEnv, int fmtEnvLen)
+{
+    char name[SMPD_MAX_ENV_LENGTH], equals[3], value[SMPD_MAX_ENV_LENGTH];
+    int curLen = -1;
+
+    smpd_enter_fn(FCNAME);
+    if(fmtEnv && bEnv){
+     for (;;)
+     {
+	 name[0] = '\0';
+	 equals[0] = '\0';
+	 value[0] = '\0';
+	 if(fmtEnvLen <= 0)
+	     break;
+	 if (MPIU_Str_get_string(&bEnv, name, SMPD_MAX_ENV_LENGTH) != MPIU_STR_SUCCESS)
+	     break;
+	 if (name[0] == '\0')
+	     break;
+	 if (MPIU_Str_get_string(&bEnv, equals, 3) != MPIU_STR_SUCCESS)
+	     break;
+	 if (equals[0] == '\0')
+	     break;
+	 if (MPIU_Str_get_string(&bEnv, value, SMPD_MAX_ENV_LENGTH) != MPIU_STR_SUCCESS)
+	     break;
+	 MPIU_Snprintf(fmtEnv, fmtEnvLen, " \"%s=%s\"", name, value);
+	 curLen = strlen(fmtEnv);
+	 fmtEnv += curLen;
+	 fmtEnvLen = SMPD_MAX_ENV_LENGTH - curLen;
+     }
+    }
+    smpd_exit_fn(FCNAME);
+    return curLen;
+}
+
 static int setup_stdin_redirection(smpd_process_t *process, MPIDU_Sock_set_t set)
 {
     int result;
@@ -415,8 +458,21 @@ int mpiexec_rsh()
 	else
 	{
 	    /* ssh and dynamic rPMI initialization */
-	    MPIU_Snprintf(process->exe, SMPD_MAX_EXE_LENGTH, "%s %s env \"PMI_RANK=%d\" \"PMI_SIZE=%d\" \"PMI_KVS=%s\" \"PMI_ROOT_HOST=%s\" \"PMI_ROOT_PORT=%d\" \"PMI_ROOT_LOCAL=0\" \"PMI_APPNUM=%d\" \"%s\"",
-		ssh_cmd, launch_node_ptr->hostname, launch_node_ptr->iproc, launch_node_ptr->nproc, smpd_process.kvs_name, root_host, root_port, launch_node_ptr->appnum, exe);
+            char fmtEnv[SMPD_MAX_ENV_LENGTH];
+	    int fmtEnvLen = SMPD_MAX_ENV_LENGTH;
+	    char *pExe = process->exe;
+	    int curLen = 0;
+	    MPIU_Snprintf(pExe, SMPD_MAX_EXE_LENGTH, "%s %s env", ssh_cmd, launch_node_ptr->hostname);
+	    curLen = strlen(process->exe);
+	    pExe += curLen;
+            if(FmtEnvVarsForSSH(launch_node_ptr->env, fmtEnv, fmtEnvLen)){
+                /* Add user specified env vars */
+                MPIU_Snprintf(pExe, SMPD_MAX_EXE_LENGTH - curLen, "%s", fmtEnv);
+		curLen = strlen(process->exe);
+		pExe += curLen;
+	    }
+	    MPIU_Snprintf(pExe, SMPD_MAX_EXE_LENGTH - curLen, " \"PMI_RANK=%d\" \"PMI_SIZE=%d\" \"PMI_KVS=%s\" \"PMI_ROOT_HOST=%s\" \"PMI_ROOT_PORT=%d\" \"PMI_ROOT_LOCAL=0\" \"PMI_APPNUM=%d\" \"%s\"",
+		launch_node_ptr->iproc, launch_node_ptr->nproc, smpd_process.kvs_name, root_host, root_port, launch_node_ptr->appnum, exe);
 	}
 
 	MPIU_Strncpy(process->kvs_name, smpd_process.kvs_name, SMPD_MAX_DBS_NAME_LEN);

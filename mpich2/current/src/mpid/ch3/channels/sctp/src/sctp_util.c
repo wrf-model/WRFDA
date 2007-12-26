@@ -211,6 +211,7 @@ static MPID_Request* create_request(MPID_IOV * iov, int iov_count, int iov_offse
     if (sreq == NULL)
 	return NULL;
     /* --END ERROR HANDLING-- */
+
     MPIU_Object_set_ref(sreq, 2);
     sreq->kind = MPID_REQUEST_SEND;
     
@@ -221,10 +222,11 @@ static MPID_Request* create_request(MPID_IOV * iov, int iov_count, int iov_offse
     if (iov_offset == 0)
     {
 	MPIU_Assert(iov[0].MPID_IOV_LEN == sizeof(MPIDI_CH3_Pkt_t));
-	sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) iov[0].MPID_IOV_BUF;
-	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->ch.pkt;
+	sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) iov[0].MPID_IOV_BUF;
+	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->dev.pending_pkt;
     }
-    sreq->dev.iov[iov_offset].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) sreq->dev.iov[iov_offset].MPID_IOV_BUF + nb);
+    sreq->dev.iov[iov_offset].MPID_IOV_BUF = 
+	(MPID_IOV_BUF_CAST)((char *) sreq->dev.iov[iov_offset].MPID_IOV_BUF + nb);
     sreq->dev.iov[iov_offset].MPID_IOV_LEN -= nb;
     sreq->dev.iov_count = iov_count;
     sreq->dev.OnDataAvail = 0;
@@ -436,6 +438,7 @@ int Req_Stream_from_pkt_and_req(MPIDI_CH3_Pkt_t * pkt, MPID_Request * sreq)
     switch(pkt->type)
     {
         /* account for each MPIDI_CH3_Pkt_type */
+    case MPIDI_CH3_PKT_EAGERSHORT_SEND:
 
         /* these types are internally identical */
         case MPIDI_CH3_PKT_EAGER_SEND :
@@ -444,21 +447,12 @@ int Req_Stream_from_pkt_and_req(MPIDI_CH3_Pkt_t * pkt, MPID_Request * sreq)
         case MPIDI_CH3_PKT_CANCEL_SEND_REQ:
         case MPIDI_CH3_PKT_RNDV_REQ_TO_SEND :
         {
-	  MPIU_Assert(pkt->eager_send.match.context_id <= 2048 ||
-                      pkt->eager_send.match.context_id == 4095 || /* used in ch3u_port.c */
-                      pkt->eager_send.match.context_id == 4096); /* used in ch3u_port.c */
-	  MPIU_Assert(pkt->eager_send.match.context_id >= 0);
 	  stream = Req_Stream_from_match(pkt->eager_send.match);
         }
         break;
         
         case MPIDI_CH3_PKT_RNDV_SEND :
-        {
-	  MPIU_Assert(sreq);
-	  MPIU_Assert(sreq->dev.match.context_id <= 2048 ||
-                      pkt->eager_send.match.context_id == 4095 || /* used in ch3u_port.c */
-                      pkt->eager_send.match.context_id == 4096); /* used in ch3u_port.c */
-	  MPIU_Assert(sreq->dev.match.context_id >= 0);
+        { 
 	  stream = Req_Stream_from_match(sreq->dev.match);
         }
         break;

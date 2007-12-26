@@ -13,6 +13,7 @@
       integer merr, mclass
       character*(MPI_MAX_ERROR_STRING) errmsg
       integer msglen, rank
+      integer ierr
 
       errs = 0
       call MTest_Init( ierr )

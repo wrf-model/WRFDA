@@ -4,11 +4,13 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
       program main
+      implicit none
       include 'mpif.h'
       integer errs, ierr
       integer win, rlen, ln
       character*(MPI_MAX_OBJECT_NAME) cname
       integer buf(10)
+      integer intsize
 C Include addsize defines asize as an address-sized integer
       include 'addsize.h'
       logical found

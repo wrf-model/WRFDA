@@ -4,9 +4,7 @@
  *      See COPYRIGHT in top-level directory.
  */
 
-#include "mpidimpl.h"
-#include "mpid_nem_queue.h"
-#include "my_papi_defs.h"
+#include "mpid_nem_impl.h"
 
 
 #define USE_MPICH2

@@ -1,11 +1,10 @@
 <dir>
-<file name="ch3i_bootstrapq.c" info="1148054413"/>
-<file name="ch3u_connect_sshm.c" info="1151006135"/>
-<file name="ch3u_get_business_card_sshm.c" info="1139008327"/>
-<file name="ch3u_init_sshm.c" info="1162680608"/>
-<file name="shmproc.c" info="1165878181"/>
-<file name="ch3u_finalize_sshm.c" info="1161400802"/>
-<file name="ch3i_shm_bootstrapq.c" info="1155913270"/>
+<file name="ch3i_bootstrapq.c" info="1186501249"/>
+<file name="ch3u_connect_sshm.c" info="1173732045"/>
+<file name="ch3u_get_business_card_sshm.c" info="1186129347"/>
+<file name="ch3u_init_sshm.c" info="1186129347"/>
+<file name="ch3u_finalize_sshm.c" info="1173732045"/>
+<file name="ch3i_shm_bootstrapq.c" info="1171410396"/>
 </dir>
 <data>
 <fileinfo name="ch3i_bootstrapq.c">
@@ -29,8 +28,6 @@ MPID_STATE_MPIDI_CH3I_CONNECT_TO_ROOT_SSHM MPIDI_CH3I_Connect_to_root_sshm
 </fileinfo>
 <fileinfo name="ch3u_init_sshm.c">
 </fileinfo>
-<fileinfo name="shmproc.c">
-</fileinfo>
 <fileinfo name="ch3u_finalize_sshm.c">
 </fileinfo>
 <fileinfo name="ch3i_shm_bootstrapq.c">
@@ -39,5 +36,6 @@ MPID_STATE_MPIDI_CH3I_MQSHM_CLOSE MPIDI_CH3I_mqshm_close
 MPID_STATE_MPIDI_CH3I_MQSHM_UNLINK MPIDI_CH3I_mqshm_unlink
 MPID_STATE_MPIDI_CH3I_MQSHM_SEND MPIDI_CH3I_mqshm_send
 MPID_STATE_MPIDI_CH3I_MQSHM_RECEIVE MPIDI_CH3I_mqshm_receive
+MPID_STATE_MPIDI_CH3I_SHM_GET_MEM_NAMED MPIDI_CH3I_SHM_Get_mem_named
 </fileinfo>
 </data>

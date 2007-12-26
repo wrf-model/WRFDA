@@ -43,7 +43,9 @@ void MPID_Datatype_free(MPID_Datatype *ptr)
     if (ptr->contents) {
         MPID_Datatype_free_contents(ptr);
     }
-    MPID_Dataloop_free(&(ptr->dataloop));
+    if (ptr->dataloop) {
+	MPID_Dataloop_free(&(ptr->dataloop));
+    }
 #if defined(MPID_HAS_HETERO) || 1
     if (ptr->hetero_dloop) {
 	MPID_Dataloop_free(&(ptr->hetero_dloop));

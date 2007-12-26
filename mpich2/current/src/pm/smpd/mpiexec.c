@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "mpiexec.h"
 #include "smpd.h"
+#include "smpd_implthread.h"
 
 #ifdef HAVE_WINDOWS_H
 void timeout_thread(void *p)
@@ -151,6 +152,7 @@ int main(int argc, char* argv[])
 
     /* initialize */
     result = PMPI_Init(&argc, &argv);
+    SMPD_CS_ENTER();
     if (result != MPI_SUCCESS)
     {
 	smpd_err_printf("MPI_Init failed,\nerror: %d\n", result);
@@ -464,6 +466,7 @@ quit_job:
     smpd_cancel_stdin_thread();
 #endif
     smpd_exit_fn("main");
+    SMPD_CS_EXIT();
     return smpd_exit(smpd_process.mpiexec_exit_code);
 }
 

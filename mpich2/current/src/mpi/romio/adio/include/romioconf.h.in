@@ -72,6 +72,9 @@
 /* Define if pread64 available */
 #undef HAVE_PREAD64
 
+/* Define if PVFS_sys_create does not have layout parameter */
+#undef HAVE_PVFS2_CREATE_WITHOUT_LAYOUT
+
 /* Define to 1 if you have the <pvfs2.h> header file. */
 #undef HAVE_PVFS2_H
 

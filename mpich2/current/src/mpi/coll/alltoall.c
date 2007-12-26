@@ -269,7 +269,7 @@ int MPIR_Alltoall(
         mpi_errno = MPIR_Localcopy(sendbuf, curr_cnt, sendtype,
                                    ((char *)tmp_buf + rank*sendbuf_extent),
                                    curr_cnt, sendtype);
-	if (mpi_errno) {MPIU_ERR_POP(mpi_errno);
+	if (mpi_errno) { MPIU_ERR_POP(mpi_errno);}
         
         mask = 0x1;
         i = 0;
@@ -289,7 +289,7 @@ int MPIR_Alltoall(
                                           dst, MPIR_ALLTOALL_TAG, 
                                           ((char *)tmp_buf +
                                            dst_tree_root*sendbuf_extent),
-                                          sendcount*comm_size*mask,
+					  sendbuf_extent*(comm_size-dst_tree_root),
                                           sendtype, dst, MPIR_ALLTOALL_TAG, 
                                           comm, &status);
 		if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
@@ -350,7 +350,7 @@ int MPIR_Alltoall(
                              (rank >= tree_root + nprocs_completed)) {
                         mpi_errno = MPIC_Recv(((char *)tmp_buf +
                                                dst_tree_root*sendbuf_extent),
-                                              sendcount*comm_size*mask, 
+					      sendbuf_extent*(comm_size-dst_tree_root),
                                               sendtype,   
                                               dst, MPIR_ALLTOALL_TAG,
                                               comm, &status); 

@@ -31,13 +31,17 @@ PMPI_LOCAL int MPID_LPID_GetAllInComm( MPID_Comm *comm_ptr, int local_size,
 /* 128 allows us to handle up to 4k processes */
 #ifdef HAVE_ERROR_CHECKING
 #define MAX_LPID32_ARRAY 128
+#undef FUNCNAME
+#define FUNCNAME MPIR_CheckDisjointLpids
 PMPI_LOCAL int MPIR_CheckDisjointLpids( int lpids1[], int n1, 
 					 int lpids2[], int n2 )
 {
     static const char FCNAME[] = "MPIR_CheckDisjointLpids";
     int i, maxi, idx, bit, maxlpid = -1;
     int mpi_errno = MPI_SUCCESS;
-    int32_t lpidmask[MAX_LPID32_ARRAY];
+    int32_t lpidmaskPrealloc[MAX_LPID32_ARRAY];
+    int32_t *lpidmask;
+    MPIU_CHKLMEM_DECL(1);
 
     /* Find the max lpid */
     for (i=0; i<n1; i++) {
@@ -46,18 +50,18 @@ PMPI_LOCAL int MPIR_CheckDisjointLpids( int lpids1[], int n1,
     for (i=0; i<n2; i++) {
 	if (lpids2[i] > maxlpid) maxlpid = lpids2[i];
     }
-    /* --BEGIN ERROR HANDLING-- */
-    if (maxlpid >= MAX_LPID32_ARRAY * 32) {
-	/* FIXME: internationalize */
-	MPIU_ERR_SET1(mpi_errno,MPI_ERR_OTHER, "**intern",
-		      "**intern %s", 
-		      "Too many processes in intercomm_create" );
-	return mpi_errno;
-    }
-    /* --END ERROR HANDLING-- */
-    
+
     /* Compute the max index and zero the pids array */
     maxi = (maxlpid + 31) / 32;
+
+    if (maxi >= MAX_LPID32_ARRAY) {
+	MPIU_CHKLMEM_MALLOC(lpidmask,int32_t*,maxi*sizeof(int32_t),
+			    mpi_errno,"lpidmask");
+    }
+    else {
+	lpidmask = lpidmaskPrealloc;
+    }
+    
     for (i=0; i<maxi; i++) lpidmask[i] = 0;
 
     /* Set the bits for the first array */
@@ -71,18 +75,20 @@ PMPI_LOCAL int MPIR_CheckDisjointLpids( int lpids1[], int n1,
     for (i=0; i<n2; i++) {
 	idx = lpids2[i] / 32;
 	bit = lpids2[i] % 32;
-	/* --BEGIN ERROR HANDLING-- */
 	if (lpidmask[idx] & (1 << bit)) {
 	    MPIU_ERR_SET1(mpi_errno,MPI_ERR_COMM, 
 			  "**dupprocesses", "**dupprocesses %d", lpids2[i] );
-	    return mpi_errno;
+	    goto fn_fail;
 	}
-	/* --END ERROR HANDLING-- */
 	/* Add a check on duplicates *within* group 2 */
 	lpidmask[idx] = lpidmask[idx] | (1 << bit);
     }
+
+    /* Also fall through for normal return */
+ fn_fail:
+    MPIU_CHKLMEM_FREEALL();
+    return mpi_errno;
     
-    return 0;
 }
 #endif /* HAVE_ERROR_CHECKING */
 
@@ -323,15 +329,15 @@ int MPI_Intercomm_create(MPI_Comm local_comm, int local_leader,
 		   communicators.  However, an easy test is for 
 		   the same ranks in an intracommunicator; we only
 		   need the lpid comparison for intercommunicators */
-		/* FIXME: This comparison needs to use lpids because the
-		 local_leader is in comm_ptr and remote_leader is in 
-		peer_comm */
-#if 0
-		if (0 && peer_comm_ptr->comm_kind == MPID_INTRACOMM &&
-		    local_leader == remote_leader) {
+		/* Here is the test.  We restrict this test to the
+		   process that is the local leader (comm_ptr->rank == 
+		   local_leader because we can then use peer_comm_ptr->rank
+		   to get the rank in peer_comm of the local leader. */
+		if (peer_comm_ptr->comm_kind == MPID_INTRACOMM &&
+		    comm_ptr->rank == local_leader && 
+		    peer_comm_ptr->rank == remote_leader) {
 		    MPIU_ERR_SET(mpi_errno,MPI_ERR_RANK,"**ranksdistinct");
 		}
-#endif
 		if (mpi_errno) goto fn_fail;
 	    }
 	    MPID_END_ERROR_CHECKS;
@@ -527,7 +533,6 @@ int MPI_Intercomm_create(MPI_Comm local_comm, int local_leader,
     mpi_errno = MPIR_Comm_create( &newcomm_ptr );
     if (mpi_errno) goto fn_fail;
 
-    /* FIXME: Here's where we separate the send and receive context id */
     newcomm_ptr->context_id	= final_context_id;
     newcomm_ptr->recvcontext_id	= recvcontext_id;
     newcomm_ptr->remote_size	= remote_size;
@@ -572,8 +577,10 @@ int MPI_Intercomm_create(MPI_Comm local_comm, int local_leader,
 #   ifdef HAVE_ERROR_CHECKING
     {
 	mpi_errno = MPIR_Err_create_code(
-	    mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, "**mpi_intercomm_create",
-	    "**mpi_intercomm_create %C %d %C %d %d %p", local_comm, local_leader, peer_comm, remote_leader, tag, newintercomm);
+	    mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER, 
+	    "**mpi_intercomm_create",
+	    "**mpi_intercomm_create %C %d %C %d %d %p", local_comm, 
+	    local_leader, peer_comm, remote_leader, tag, newintercomm);
     }
 #   endif
     mpi_errno = MPIR_Err_return_comm( comm_ptr, FCNAME, mpi_errno );

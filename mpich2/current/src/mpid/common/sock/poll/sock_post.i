@@ -119,66 +119,19 @@ int MPIDU_Sock_post_connect_ifaddr( struct MPIDU_Sock_set * sock_set,
     /*
      * Set and verify the socket buffer size
      */
-    if (MPIDU_Socki_socket_bufsz > 0)
-    {
-	int bufsz;
-	socklen_t bufsz_len;
-
-	bufsz = MPIDU_Socki_socket_bufsz;
-	bufsz_len = sizeof(bufsz);
-	rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, bufsz_len);
-	if (rc == -1) {
-	    MPIU_ERR_SETANDJUMP3(mpi_errno,MPIDU_SOCK_ERR_FAIL, 
-				 "**sock|poll|setsndbufsz",
-				 "**sock|poll|setsndbufsz %d %d %s", 
-				 bufsz, errno, MPIU_Strerror(errno));
-	}
-	bufsz = MPIDU_Socki_socket_bufsz;
-	bufsz_len = sizeof(bufsz);
-	rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, bufsz_len);
-	if (rc == -1) {
-	    MPIU_ERR_SETANDJUMP3(mpi_errno,MPIDU_SOCK_ERR_FAIL, 
-				 "**sock|poll|setrcvbufsz",
-				 "**sock|poll|setrcvbufsz %d %d %s", 
-				 bufsz, errno, MPIU_Strerror(errno));
-	}
-	bufsz_len = sizeof(bufsz);
-	/* FIXME: This should not be an error or even a warning if
-	 we don't get the requested socket size */
-	/* FIXME: There are other places that the code checks
-	   for the socket buffer size.  These tests (and the messaging,
-	   which is itself problematic), should be in one place. */
-	rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, &bufsz_len);
-	/* --BEGIN ERROR HANDLING-- */
-	if (rc == 0)
-	{
-	    if (bufsz < MPIDU_Socki_socket_bufsz * 0.9 || 
-		bufsz < MPIDU_Socki_socket_bufsz * 1.0)
-	    {
-		MPIU_Msg_printf("WARNING: send socket buffer size differs from requested size (requested=%d, actual=%d)\n",
-				MPIDU_Socki_socket_bufsz, bufsz);
-	    }
-	}
-	/* --END ERROR HANDLING-- */
-
-    	bufsz_len = sizeof(bufsz);
-	rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, &bufsz_len);
-	/* --BEGIN ERROR HANDLING-- */
-	if (rc == 0)
-	{
-	    if (bufsz < MPIDU_Socki_socket_bufsz * 0.9 || 
-		bufsz < MPIDU_Socki_socket_bufsz * 1.0)
-	    {
-		MPIU_Msg_printf("WARNING: receive socket buffer size differs from requested size (requested=%d, actual=%d)\n",
-				MPIDU_Socki_socket_bufsz, bufsz);
-	    }
-	}
-	/* --END ERROR HANDLING-- */
-    }
+    mpi_errno = MPIDU_Sock_SetSockBufferSize( fd, 1 );
+    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
     
     /*
      * Attempt to establish the connection
      */
+    MPIU_DBG_STMT(CH3_CONNECT,TYPICAL,{
+	char addrString[64];
+	MPIDU_Sock_AddrToStr( ifaddr, addrString, sizeof(addrString) );
+	MPIU_DBG_MSG_FMT(CH3_CONNECT,TYPICAL,(MPIU_DBG_FDEST,
+			      "Connecting to %s:%d\n", addrString, port )); 
+	})
+
     do
     {
         rc = connect(fd, (struct sockaddr *) &addr, sizeof(addr));
@@ -422,64 +375,8 @@ int MPIDU_Sock_listen(struct MPIDU_Sock_set * sock_set, void * user_ptr,
     /*
      * Set and verify the socket buffer size
      */
-    if (MPIDU_Socki_socket_bufsz > 0)
-    {
-	int bufsz;
-	socklen_t bufsz_len;
-
-	bufsz = MPIDU_Socki_socket_bufsz;
-	bufsz_len = sizeof(bufsz);
-	rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, bufsz_len);
-	/* --END ERROR HANDLING-- */
-	if (rc == -1)
-	{
-	    mpi_errno = MPIR_Err_create_code(
-		MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPIDU_SOCK_ERR_FAIL, "**sock|poll|setsndbufsz",
-		"**sock|poll|setsndbufsz %d %d %s", bufsz, errno, MPIU_Strerror(errno));
-	    goto fn_fail;
-	    
-	}
-	/* --END ERROR HANDLING-- */
-	
-	bufsz = MPIDU_Socki_socket_bufsz;
-	bufsz_len = sizeof(bufsz);
-	rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, bufsz_len);
-	/* --BEGIN ERROR HANDLING-- */
-	if (rc == -1)
-	{
-	    mpi_errno = MPIR_Err_create_code(
-		MPI_SUCCESS, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPIDU_SOCK_ERR_FAIL, "**sock|poll|setrcvbufsz",
-		"**sock|poll|setrcvbufsz %d %d %s", bufsz, errno, MPIU_Strerror(errno));
-	    goto fn_fail;    
-	}
-	/* --END ERROR HANDLING-- */
-	
-	bufsz_len = sizeof(bufsz);
-	rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, &bufsz_len);
-	/* --BEGIN ERROR HANDLING-- */
-	if (rc == 0)
-	{
-	    if (bufsz < MPIDU_Socki_socket_bufsz * 0.9 || bufsz < MPIDU_Socki_socket_bufsz * 1.0)
-	    {
-		MPIU_Msg_printf("WARNING: send socket buffer size differs from requested size (requested=%d, actual=%d)\n",
-				MPIDU_Socki_socket_bufsz, bufsz);
-	    }
-	}
-	/* --END ERROR HANDLING-- */
-
-    	bufsz_len = sizeof(bufsz);
-	rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, &bufsz_len);
-	/* --BEGIN ERROR HANDLING-- */
-	if (rc == 0)
-	{
-	    if (bufsz < MPIDU_Socki_socket_bufsz * 0.9 || bufsz < MPIDU_Socki_socket_bufsz * 1.0)
-	    {
-		MPIU_Msg_printf("WARNING: receive socket buffer size differs from requested size (requested=%d, actual=%d)\n",
-				MPIDU_Socki_socket_bufsz, bufsz);
-	    }
-	}
-	/* --END ERROR HANDLING-- */
-    }
+    mpi_errno = MPIDU_Sock_SetSockBufferSize( fd, 1 );
+    if (mpi_errno) { MPIU_ERR_POP( mpi_errno ); }
     
     /*
      * Start listening for incoming connections...
@@ -495,8 +392,8 @@ int MPIDU_Sock_listen(struct MPIDU_Sock_set * sock_set, void * user_ptr,
     /* --END ERROR HANDLING-- */
 
     /*
-     * Get listener port.  Techincally we don't need to do this if a port was specified by the calling routine; but it adds an
-     * extra error check.
+     * Get listener port.  Techincally we don't need to do this if a port was 
+     * specified by the calling routine; but it adds an extra error check.
      */
     addr_len = sizeof(addr);
     rc = getsockname(fd, (struct sockaddr *) &addr, &addr_len);

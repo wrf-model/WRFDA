@@ -269,6 +269,87 @@ static SMPD_BOOL ParseDriveShareAccountPassword(char *str, char *pszDrive, char 
     return SMPD_TRUE;
 }
 
+#ifdef HAVE_WINDOWS_H
+/* There can be atmost 26 logical drives -- currently limiting to 10*/
+#define SMPD_LOGICALDRVNUM_MAX      10
+/* Each drive letter occupies 3 TCHARs -- "A:\" */
+#define SMPD_LOGICALDRVLEN_MAX      3
+/* Each drive string is of the form "%s0x0" - 1 delim */
+#define SMPD_LOGICALDRVDELIM_MAX    1
+#define SMPD_LOGICALDRVSTR_NODELIM_MAX      \
+    (SMPD_LOGICALDRVNUM_MAX * (SMPD_LOGICALDRVLEN_MAX * sizeof(TCHAR)))
+#define SMPD_LOGICALDRVSTR_MAX      \
+    (SMPD_LOGICALDRVSTR_NODELIM_MAX + SMPD_LOGICALDRVDELIM_MAX * SMPD_LOGICALDRVNUM_MAX * sizeof(TCHAR))
+/* Each map string is of the form "%s%s;" - 1 delims */
+#define SMPD_MAPLISTDELIM_MAX       1
+/* Network drv name \\compname\share -- is currently limited to 50 TCHARS */
+#define SMPD_MAPNETWORKDRVSTR_MAX   100
+/* Map list item = "%s%s;" - A:\\compname\share; */
+#define SMPD_MAPLISTITEM_MAX    \
+    (SMPD_LOGICALDRVLEN_MAX * sizeof(TCHAR) + SMPD_MAPLISTDELIM_MAX + SMPD_MAPNETWORKDRVSTR_MAX)
+    
+#define SMPD_MAPLISTSTR_MAX (SMPD_MAPLISTITEM_MAX * SMPD_LOGICALDRVNUM_MAX)
+
+#undef FCNAME
+#define FCNAME "smpd_get_network_drives"
+int smpd_get_network_drives(char *pMapList, int mapListLen){
+    DWORD retVal, mapNetworkDrvLen;
+    UINT drvType;
+    LPTSTR pDrv, pNetDrv;
+    /* TODO : Allocate these large arrays in heap */
+    TCHAR logicalDrvs[SMPD_LOGICALDRVSTR_MAX], mapNetworkDrv[SMPD_MAPNETWORKDRVSTR_MAX];
+    smpd_enter_fn(FCNAME);
+    if(mapListLen > SMPD_MAPLISTSTR_MAX){
+   		printf("Error: Not enough mem for mapping network drive\n");
+		smpd_exit_fn(FCNAME);
+        return SMPD_FAIL;
+    }
+    if(retVal = GetLogicalDriveStrings(SMPD_LOGICALDRVSTR_NODELIM_MAX, logicalDrvs)){
+        /* logicalDrvs = "A:\[0x0]C:\[0x0]X:\[0x0][0x0]" */
+        pDrv = logicalDrvs;
+        while(*pDrv){
+            drvType = GetDriveType(pDrv);
+            pNetDrv = pDrv;
+            /* Increment pDrv before any changes to the contents */
+            pDrv += (_tcslen(pDrv) + 1);
+            switch(drvType){
+            /* Network mapped drive */
+            case DRIVE_REMOTE:
+                /* Convert "A:\[0x0]" to "A:[0x0][0x0]" */  
+                pNetDrv[_tcslen(pNetDrv) - 1] = '\0';
+                mapNetworkDrvLen=SMPD_MAPNETWORKDRVSTR_MAX;
+                if((retVal  = WNetGetConnection(pNetDrv, mapNetworkDrv, &mapNetworkDrvLen)) 
+                            == NO_ERROR){
+                    if(mapNetworkDrvLen <= SMPD_MAPNETWORKDRVSTR_MAX){
+                        MPIU_Snprintf(pMapList, SMPD_MAPLISTITEM_MAX,
+                        "%s%s;",pNetDrv, mapNetworkDrv);
+                        pMapList += _tcslen(pMapList);
+                    }else{
+                   	printf("Error:  Not enough space for %s = WNetGetConnection(%s, ...) failed\n",
+                                        mapNetworkDrv, pNetDrv);
+	    	            smpd_exit_fn(FCNAME);
+                        return SMPD_FAIL;
+                    }
+                }else{
+               	    printf("Error: WNetGetConnection(%s, ...) failed\n", pNetDrv);
+		            smpd_exit_fn(FCNAME);
+                    return SMPD_FAIL;
+                }
+                break;
+            default:  
+                break;
+            }
+        }
+    }else{
+   		printf("Error: Could not access mapped drives\n");
+		smpd_exit_fn(FCNAME);
+        return SMPD_FAIL;
+    }
+    smpd_exit_fn(FCNAME);
+    return SMPD_SUCCESS;
+}
+#endif
+
 #undef FCNAME
 #define FCNAME "smpd_map_user_drives"
 SMPD_BOOL smpd_map_user_drives(char *pszMap, char *pszAccount, char *pszPassword, char *pszError, int maxerrlength)

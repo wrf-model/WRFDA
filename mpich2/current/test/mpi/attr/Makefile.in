@@ -34,8 +34,8 @@ INCLUDES = -I../include -I${srcdir}/../include
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean:  clean-local
-	-@rm -f *.o ${srcdir}/*.o baseattrcomm attric attrerr baseattr2 fkeyvaltype attrordertype attrt attrerrtype attrerrcomm fkeyvalcomm attrorder fkeyval attrordercomm
-	-@rm -f baseattrcomm.exe attric.exe attrerr.exe baseattr2.exe fkeyvaltype.exe attrordertype.exe attrt.exe attrerrtype.exe attrerrcomm.exe fkeyvalcomm.exe attrorder.exe fkeyval.exe attrordercomm.exe
+	-@rm -f *.o ${srcdir}/*.o baseattrcomm attric attrerr baseattr2 fkeyvaltype attrordertype attr2type attrt attrerrtype attrerrcomm fkeyvalcomm attrorder fkeyval attrordercomm
+	-@rm -f baseattrcomm.exe attric.exe attrerr.exe baseattr2.exe fkeyvaltype.exe attrordertype.exe attr2type.exe attrt.exe attrerrtype.exe attrerrcomm.exe fkeyvalcomm.exe attrorder.exe fkeyval.exe attrordercomm.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -49,7 +49,7 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: attrt attric attrerr attrerrcomm attrerrtype attrorder\
+all-redirect: attrt attric attrerr attrerrcomm attrerrtype attr2type attrorder\
 	 attrordercomm attrordertype baseattr2 baseattrcomm fkeyval\
 	 fkeyvalcomm fkeyvaltype
 
@@ -67,6 +67,8 @@ fkeyvaltype: fkeyvaltype.o   @MPILIBLOC@ ../util/mtest.o
 attrordertype: attrordertype.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o attrordertype attrordertype.o  \
 	${LIBS} 
+attr2type: attr2type.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o attr2type attr2type.o  ${LIBS}
 attrt: attrt.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o attrt attrt.o  ${LIBS}
 attrerrtype: attrerrtype.o   @MPILIBLOC@ ../util/mtest.o
@@ -86,7 +88,7 @@ attrordercomm: attrordercomm.o   @MPILIBLOC@ ../util/mtest.o
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 SOURCES         =  attrt.c attric.c attrerr.c attrerrcomm.c attrerrtype.c \
-	attrorder.c attrordercomm.c attrordertype.c baseattr2.c \
+	attr2type.c attrorder.c attrordercomm.c attrordertype.c baseattr2.c \
 	baseattrcomm.c fkeyval.c fkeyvalcomm.c fkeyvaltype.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)

@@ -51,6 +51,11 @@ iwritef.f iwriteshf.f : ioharness.tlt ioharness.defn ../../maint/testmerge
 	../../maint/testmerge -defn=$(top_srcdir)/maint/common.defn \
 		$(srcdir)/ioharness.defn $(srcdir)/ioharness.tlt
 
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
+
 ../util/mtestf.o: 
 	(cd ../util && $(MAKE) mtestf.o)
 

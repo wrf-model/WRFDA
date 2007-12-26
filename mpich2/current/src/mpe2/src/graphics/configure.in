@@ -40,10 +40,12 @@ CC=${CC:-cc}
 CLINKER=${CLINKER:-$CC}
 CFLAGS=${MPE_CFLAGS}
 MPI_CC=${MPI_CC:-${CC}}
+MPE_CLINKER=${MPE_CLINKER}
 F77=${F77:-f77}
 FLINKER=${FLINKER:-$F77}
 FFLAGS=${MPE_FFLAGS}
 MPI_F77=${MPI_F77:-${F77}}
+MPE_FLINKER=${MPE_FLINKER}
 FINC_PATH_LEADER=${FINC_PATH_LEADER:-"-I"}
 FLIB_PATH_LEADER=${FLIB_PATH_LEADER:-"-L"}
 MPI_INC=${MPI_INC}
@@ -171,15 +173,9 @@ fi
 AC_HEADER_STDC
 AC_C_CONST
 
-AC_MSG_CHECKING(for long pointers)
-AC_TRY_RUN(int main()
-{
-    if (sizeof(void *) > 4)
-        return -1;
-    return 0;
-}, sizeof_void_greater=no, sizeof_void_greater=yes,
-sizeof_void_greater=$CROSS_SIZEOF_VOID_GREATER)
-if test "$sizeof_void_greater" = "yes" ; then
+AC_CHECK_SIZEOF( void *, $CROSS_SIZEOF_VOID_P )
+AC_MSG_CHECKING(for long pointer)
+if test "$ac_cv_sizeof_void_p" -gt 4 ; then
     AC_DEFINE( POINTER_64_BITS, 1, [Define if pointers are 64 bits] )
     AC_MSG_RESULT([yes])
 else
@@ -197,7 +193,7 @@ if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
 #   Determine MPI_Fint
     if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
         AC_MSG_CHECKING( [for MPI_Fint] )
-        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS,
+        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, ,
                               [ MPI_Fint aa=1 ], ,
                               [ mpe_link_ok=yes ], [ mpe_link_ok=no ] )
         AC_MSG_RESULT($mpe_link_ok)
@@ -216,7 +212,7 @@ if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
 #   Determmine if MPI_Comm_f2c() and MPI_Comm_c2f() are there
     if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
         AC_MSG_CHECKING( [for MPI_Comm_c2f() and MPI_Comm_f2c()] )
-        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, [
+        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, , [
                               MPI_Comm comm; ${MPI_FINT_TYPE} aa;
                               ], [
                               aa=MPI_Comm_c2f(comm) ;
@@ -240,10 +236,12 @@ AC_SUBST(CC)
 AC_SUBST(CLINKER)
 AC_SUBST(CFLAGS)
 AC_SUBST(MPI_CC)
+AC_SUBST(MPE_CLINKER)
 AC_SUBST(F77)
 AC_SUBST(FLINKER)
 AC_SUBST(FFLAGS)
 AC_SUBST(MPI_F77)
+AC_SUBST(MPE_FLINKER)
 AC_SUBST(FINC_PATH_LEADER)
 AC_SUBST(FLIB_PATH_LEADER)
 AC_SUBST(MPI_INC)

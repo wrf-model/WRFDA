@@ -52,13 +52,13 @@ static jmethodID  mid4NewCmplx     = NULL;
 static void *Jlong2Cptr(jlong a_jlong);
 static void *Jlong2Cptr(jlong a_jlong)
 {
-#if SIZEOF_INT == SIZEOF_VOIDP
+#if SIZEOF_INT == SIZEOF_VOID_P
     unsigned int tmp = (unsigned int) a_jlong;
-#elif SIZEOF_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG == SIZEOF_VOID_P
     unsigned long tmp = (unsigned long) a_jlong;
-#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG_LONG == SIZEOF_VOID_P
     unsigned long long tmp = (unsigned long long) a_jlong;
-#elif SIZEOF___INT64 == SIZEOF_VOIDP
+#elif SIZEOF___INT64 == SIZEOF_VOID_P
     unsigned int64 tmp = (unsigned int64) a_jlong;
 #else
     jlong tmp = a_jlong;
@@ -69,13 +69,13 @@ static void *Jlong2Cptr(jlong a_jlong)
 static jlong Cptr2Jlong(void *a_ptr);
 static jlong Cptr2Jlong(void *a_ptr)
 {
-#if SIZEOF_INT == SIZEOF_VOIDP
+#if SIZEOF_INT == SIZEOF_VOID_P
     unsigned int tmp = (unsigned int) a_ptr;
-#elif SIZEOF_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG == SIZEOF_VOID_P
     unsigned long tmp = (unsigned long) a_ptr;
-#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG_LONG == SIZEOF_VOID_P
     unsigned long long tmp = (unsigned long long) a_ptr;
-#elif SIZEOF___INT64 == SIZEOF_VOIDP
+#elif SIZEOF___INT64 == SIZEOF_VOID_P
     unsigned int64 tmp = (unsigned int64) a_ptr;
 #else
     void *tmp = a_ptr;
@@ -83,16 +83,16 @@ static jlong Cptr2Jlong(void *a_ptr)
     return (jlong) tmp;
 }
 */
-#if SIZEOF_INT == SIZEOF_VOIDP
+#if SIZEOF_INT == SIZEOF_VOID_P
 #define Jlong2Cptr   (void*)(unsigned int)
 #define Cptr2Jlong   (jlong)(unsigned int)
-#elif SIZEOF_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG == SIZEOF_VOID_P
 #define Jlong2Cptr   (void*)(unsigned long)
 #define Cptr2Jlong   (jlong)(unsigned long)
-#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#elif SIZEOF_LONG_LONG == SIZEOF_VOID_P
 #define Jlong2Cptr   (void*)(unsigned long long)
 #define Cptr2Jlong   (jlong)(unsigned long long)
-#elif SIZEOF___INT64 == SIZEOF_VOIDP
+#elif SIZEOF___INT64 == SIZEOF_VOID_P
 #define Jlong2Cptr   (void*)(unsigned int64)
 #define Cptr2Jlong   (jlong)(unsigned int64)
 #else

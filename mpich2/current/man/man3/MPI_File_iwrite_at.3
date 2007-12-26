@@ -1,13 +1,15 @@
-.TH MPI_File_iwrite_at 3 "1/30/2007" " " "MPI"
+.TH MPI_File_iwrite_at 3 "10/30/2007" " " "MPI"
 .SH NAME
 MPI_File_iwrite_at \-  Nonblocking write using explict offset 
 .SH SYNOPSIS
 .nf
 #ifdef HAVE_MPI_GREQUEST
 #include "mpiu_greq.h"
+#endif
 
-#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
-typedef struct iwrite_at_args
+int MPI_File_iwrite_at(MPI_File mpi_fh, MPI_Offset offset, void *buf,
+                       int count, MPI_Datatype datatype, 
+                       MPIO_Request *request)
 .fi
 .SH INPUT PARAMETERS
 .PD 0

@@ -7,6 +7,7 @@
 ! This is a special test that requires an getarg/iargc routine 
 !
         program main
+!     declared on the old sparc compilers
         use mpi
         integer errs, err
         integer rank, size, rsize, i
@@ -19,6 +20,7 @@
         integer argc
         data inargv /"a", "b=c", "d e", "-pf", " Ss", " " /
         data outargv /"a", "b=c", "d e", "-pf", " Ss", " " /
+        integer ierr
 
         errs = 0
         np   = 2

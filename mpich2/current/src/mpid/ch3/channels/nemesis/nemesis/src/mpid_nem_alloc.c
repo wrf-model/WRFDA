@@ -26,6 +26,31 @@ int MPID_nem_seg_create(MPID_nem_seg_ptr_t memory, int size, int num_local, int 
     char val[MPID_NEM_MAX_KEY_VAL_LEN];
     char *kvs_name;
     char *handle = 0;
+    MPIU_CHKPMEM_DECL (1);
+    
+    /* if there is only one process on this processor, don't use shared memory */
+    if (num_local == 1)
+    {
+        char *addr;
+        
+        MPIU_CHKPMEM_MALLOC (addr, char *, size + MPID_NEM_CACHE_LINE_LEN, mpi_errno, "segment");
+        
+        memory->base_addr = addr;
+        memory->max_size     = size;
+        memory->current_addr = (char *)(((MPI_Aint)addr + (MPI_Aint)MPID_NEM_CACHE_LINE_LEN-1) & (~((MPI_Aint)MPID_NEM_CACHE_LINE_LEN-1)));
+        memory->max_addr     = (char *)(memory->current_addr) + memory->max_size;
+        memory->size_left    = memory->max_size;
+        memory->symmetrical  = 0 ;   
+
+        /* we still need to calls to barrier */
+	pmi_errno = PMI_Barrier();
+        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_barrier", "**pmi_barrier %d", pmi_errno);
+	pmi_errno = PMI_Barrier();
+        MPIU_ERR_CHKANDJUMP1 (pmi_errno != PMI_SUCCESS, mpi_errno, MPI_ERR_OTHER, "**pmi_barrier", "**pmi_barrier %d", pmi_errno);
+
+        MPIU_CHKPMEM_COMMIT();
+        goto fn_exit;
+    }
  
     mpi_errno = MPIDI_PG_GetConnKVSname (&kvs_name);
     if (mpi_errno) MPIU_ERR_POP (mpi_errno);
@@ -87,10 +112,32 @@ int MPID_nem_seg_create(MPID_nem_seg_ptr_t memory, int size, int num_local, int 
     /* --BEGIN ERROR HANDLING-- */
     if (handle)
         MPID_nem_remove_shared_memory (handle);
+    MPIU_CHKPMEM_REAP();
     goto fn_exit;
     /* --END ERROR HANDLING-- */
 }
 
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_seg_destroy
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPID_nem_seg_destroy()
+{
+    int mpi_errno = MPI_SUCCESS;
+
+    if (MPID_nem_mem_region.num_local == 1)
+        MPIU_Free(MPID_nem_mem_region.memory.base_addr);
+    else
+    {
+        mpi_errno = MPID_nem_detach_shared_memory (MPID_nem_mem_region.memory.base_addr, MPID_nem_mem_region.memory.max_size);
+        if (mpi_errno) MPIU_ERR_POP (mpi_errno);
+    }
+    
+ fn_exit:
+    return mpi_errno;
+ fn_fail:
+    goto fn_exit;
+}
 
 
 
@@ -328,7 +375,6 @@ MPID_nem_allocate_shared_memory (char **buf_p, const int length, char *handle[])
 {
     int mpi_errno = MPI_SUCCESS;
     int fd;
-    struct stat buf;
     int ret;
     const char dev_fname[] = "/dev/shm/nemesis_shar_tmpXXXXXX";
     const char tmp_fname[] = "/tmp/nemesis_shar_tmpXXXXXX";

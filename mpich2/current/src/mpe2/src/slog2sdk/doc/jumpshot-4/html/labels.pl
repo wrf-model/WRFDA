@@ -34,16 +34,16 @@ $key = q/fig:histogram_state_all_cumu_excl/;
 $external_labels{$key} = "$URL/" . q|node26.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_6/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:convertor_init/;
 $external_labels{$key} = "$URL/" . q|node10.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_3/;
 $external_labels{$key} = "$URL/" . q|node6.html|; 
-$noresave{$key} = "$nosave";
-
-$key = q/fig:legend_sort_order/;
-$external_labels{$key} = "$URL/" . q|node11.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_state_infobox/;
@@ -70,6 +70,10 @@ $key = q/fig:timeline_search_preview_zoomed/;
 $external_labels{$key} = "$URL/" . q|node31.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_5/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:convertor_progress/;
 $external_labels{$key} = "$URL/" . q|node10.html|; 
 $noresave{$key} = "$nosave";
@@ -78,8 +82,16 @@ $key = q/fig:convertor_done/;
 $external_labels{$key} = "$URL/" . q|node10.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_3/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:timeline_preview_detail_2/;
 $external_labels{$key} = "$URL/" . q|node6.html|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_2/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_arrow_infobox/;
@@ -102,6 +114,10 @@ $key = q/sub:Zoomable-and-Scrollable/;
 $external_labels{$key} = "$URL/" . q|node13.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_4/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:histogram_mpi_overhead/;
 $external_labels{$key} = "$URL/" . q|node33.html|; 
 $noresave{$key} = "$nosave";
@@ -116,6 +132,10 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_1/;
 $external_labels{$key} = "$URL/" . q|node6.html|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:legend_sort_orders/;
+$external_labels{$key} = "$URL/" . q|node11.html|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:hand_open_cursor/;
@@ -178,6 +198,10 @@ $key = q/fig:timeline_infobox_real_primitive/;
 $external_labels{$key} = "$URL/" . q|node20.html|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:pthread_sendrecv_legend/;
+$external_labels{$key} = "$URL/" . q|node34.html|; 
+$noresave{$key} = "$nosave";
+
 1;
 
 
@@ -189,12 +213,16 @@ $key = q/fig:timeline_nesting_detail/;
 $external_latex_labels{$key} = q|2.6|; 
 $noresave{$key} = "$nosave";
 
+$key = q/table:legend_sort_number_orders/;
+$external_latex_labels{$key} = q|3.10|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:preference_pview_state/;
 $external_latex_labels{$key} = q|3.28|; 
 $noresave{$key} = "$nosave";
 
 $key = q/table:preference_zoomable_all/;
-$external_latex_labels{$key} = q|3.16|; 
+$external_latex_labels{$key} = q|3.18|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_popup_finer/;
@@ -222,11 +250,19 @@ $external_latex_labels{$key} = q|3.23|;
 $noresave{$key} = "$nosave";
 
 $key = q/table:preference_zoomable_reinit/;
-$external_latex_labels{$key} = q|3.14|; 
+$external_latex_labels{$key} = q|3.16|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_6/;
+$external_latex_labels{$key} = q|4.11|; 
 $noresave{$key} = "$nosave";
 
 $key = q/table:convertor_buttons/;
 $external_latex_labels{$key} = q|3.4|; 
+$noresave{$key} = "$nosave";
+
+$key = q/tab:runtime_pthread_sendrecv/;
+$external_latex_labels{$key} = q|4.2|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:convertor_init/;
@@ -235,10 +271,6 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_3/;
 $external_latex_labels{$key} = q|2.4|; 
-$noresave{$key} = "$nosave";
-
-$key = q/fig:legend_sort_order/;
-$external_latex_labels{$key} = q|3.8|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_state_infobox/;
@@ -261,16 +293,16 @@ $key = q/fig:timeline_preview_detail_0/;
 $external_latex_labels{$key} = q|2.1|; 
 $noresave{$key} = "$nosave";
 
-$key = q/table:legend_sort_orders/;
-$external_latex_labels{$key} = q|3.8|; 
-$noresave{$key} = "$nosave";
-
 $key = q/fig:timeline_mpi_overhead/;
 $external_latex_labels{$key} = q|4.4|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_search_preview_zoomed/;
 $external_latex_labels{$key} = q|4.2|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_5/;
+$external_latex_labels{$key} = q|4.10|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:convertor_progress/;
@@ -281,8 +313,16 @@ $key = q/fig:convertor_done/;
 $external_latex_labels{$key} = q|3.5|; 
 $noresave{$key} = "$nosave";
 
+$key = q/fig:openmpi_4_3/;
+$external_latex_labels{$key} = q|4.8|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:timeline_preview_detail_2/;
 $external_latex_labels{$key} = q|2.3|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_2/;
+$external_latex_labels{$key} = q|4.7|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_arrow_infobox/;
@@ -293,12 +333,16 @@ $key = q/fig:timeline_popup/;
 $external_latex_labels{$key} = q|3.10|; 
 $noresave{$key} = "$nosave";
 
+$key = q/table:legend_sort_string_orders/;
+$external_latex_labels{$key} = q|3.8|; 
+$noresave{$key} = "$nosave";
+
 $key = q/fig:histogram_arrow/;
 $external_latex_labels{$key} = q|3.26|; 
 $noresave{$key} = "$nosave";
 
 $key = q/table:preference_zoomable_timeline/;
-$external_latex_labels{$key} = q|3.18|; 
+$external_latex_labels{$key} = q|3.20|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:mouse_zoom_mode/;
@@ -309,12 +353,16 @@ $key = q/sub:Zoomable-and-Scrollable/;
 $external_latex_labels{$key} = q|3.4.1|; 
 $noresave{$key} = "$nosave";
 
-$key = q/table:timeline_toolbar/;
-$external_latex_labels{$key} = q|3.12|; 
-$noresave{$key} = "$nosave";
-
 $key = q/table:main_toolbar/;
 $external_latex_labels{$key} = q|3.2|; 
+$noresave{$key} = "$nosave";
+
+$key = q/table:timeline_toolbar/;
+$external_latex_labels{$key} = q|3.14|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:openmpi_4_4/;
+$external_latex_labels{$key} = q|4.9|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:histogram_mpi_overhead/;
@@ -326,7 +374,7 @@ $external_latex_labels{$key} = q|3.19|;
 $noresave{$key} = "$nosave";
 
 $key = q/table:preference_legend/;
-$external_latex_labels{$key} = q|3.22|; 
+$external_latex_labels{$key} = q|3.24|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_search_preview/;
@@ -335,6 +383,10 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_preview_detail_1/;
 $external_latex_labels{$key} = q|2.2|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:legend_sort_orders/;
+$external_latex_labels{$key} = q|3.8|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:hand_open_cursor/;
@@ -346,7 +398,7 @@ $external_latex_labels{$key} = q|3.12|;
 $noresave{$key} = "$nosave";
 
 $key = q/table:preference_zoomable_histogram/;
-$external_latex_labels{$key} = q|3.20|; 
+$external_latex_labels{$key} = q|3.22|; 
 $noresave{$key} = "$nosave";
 
 $key = q/fig:main/;
@@ -362,7 +414,7 @@ $external_latex_labels{$key} = q|3.21|;
 $noresave{$key} = "$nosave";
 
 $key = q/table:selection_rules/;
-$external_latex_labels{$key} = q|3.10|; 
+$external_latex_labels{$key} = q|3.12|; 
 $noresave{$key} = "$nosave";
 
 $key = q/table:legend_column_ops/;
@@ -407,6 +459,10 @@ $noresave{$key} = "$nosave";
 
 $key = q/fig:timeline_infobox_real_primitive/;
 $external_latex_labels{$key} = q|3.18|; 
+$noresave{$key} = "$nosave";
+
+$key = q/fig:pthread_sendrecv_legend/;
+$external_latex_labels{$key} = q|4.6|; 
 $noresave{$key} = "$nosave";
 
 1;

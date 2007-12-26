@@ -44,7 +44,7 @@ int main( int argc, char *argv[] )
         time_init   = MPI_Wtime();
 
         for ( idx = 0; idx < num_itr; idx++ ) {
-          MPI_Allreduce( buf, buf, count, MPI_DOUBLE, MPI_SUM, comm );
+          MPI_Allreduce( MPI_IN_PLACE, buf, count, MPI_DOUBLE, MPI_SUM, comm );
         }
 
         /* MPI_Barrier( comm ); */

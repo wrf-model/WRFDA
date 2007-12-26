@@ -14,6 +14,12 @@
 #include <stdlib.h>
 #endif
 
+#if !defined( CLOG_NOMPI )
+#include "mpi.h"
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
 #include "clog.h"
 #include "clog_mem.h"
 #include "clog_util.h"

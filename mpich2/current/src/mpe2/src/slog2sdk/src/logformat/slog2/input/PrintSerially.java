@@ -197,7 +197,7 @@ public class PrintSerially
                          printDrawables   = false;
                          idx++;
                     }
-                    else if (  argv[ idx ].equals( "-c" )
+                    else if (  argv[ idx ].equals( "-y" )
                             || argv[ idx ].equals( "-ycoordmap" ) ) {
                          printCategoryMap = false;
                          printTreeDir     = false;

@@ -5,6 +5,7 @@
  */
 
 #include "mpidi_ch3_impl.h"
+#include "ch3i_progress.h"
 
 #undef FUNCNAME
 #define FUNCNAME MPIDI_CH3_Finalize
@@ -14,6 +15,12 @@ int MPIDI_CH3_Finalize()
 {
     int mpi_errno = MPI_SUCCESS;
     
+    mpi_errno = MPIDI_CH3I_Progress_finalize();
+
+    /* Free memory allocated in ch3_progress */
+    mpi_errno = MPIDI_CH3U_Finalize_ssm_memory();
+
+    /* Free other (common) shared-memory */
     mpi_errno = MPIDI_CH3U_Finalize_sshm();
 
     return mpi_errno;

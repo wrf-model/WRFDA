@@ -6,6 +6,9 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
@@ -109,6 +112,11 @@ writeordf90.f90 writeordbef90.f90 writeshf90.f90 writeatallbef90.f90 \
 iwritef90.f90 iwriteshf90.f90 : ioharness.tlt ioharness.defn ../../maint/testmerge
 	../../maint/testmerge -defn=$(top_srcdir)/maint/common.defn \
 		$(srcdir)/ioharness.defn $(srcdir)/ioharness.tlt
+
+testing:
+	../../runtests -srcdir=$(srcdir) -tests=testlist \
+			-mpiexec=$(bindir)/mpiexec \
+		   	-xmlfile=summary.xml
 
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)

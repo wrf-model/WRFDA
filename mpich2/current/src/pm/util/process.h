@@ -182,4 +182,8 @@ void MPIE_IgnoreSigPipe( void );
 /* Currently, parse soft spec is in cmnargs */
 int MPIE_ParseSoftspec( const char *, ProcessSoftSpec * );
 
+/* This routine may be called to make information available for a debugger */
+int MPIE_InitForDebugger( ProcessWorld * );
+int MPIE_FreeFromDebugger( void );
+
 #endif

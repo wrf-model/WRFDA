@@ -10,8 +10,9 @@
       integer win, rlen, ln
       character*(MPI_MAX_OBJECT_NAME) cname
       integer buf(10)
+      integer intsize
 ! Include addsize defines asize as an address-sized integer
-      integer (kind=MPI_ADDRESS_KIND) aint
+      integer (kind=MPI_ADDRESS_KIND) asize
 
       logical found
 !

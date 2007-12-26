@@ -76,7 +76,7 @@ int MPID_Irsend(const void * buf, int count, MPI_Datatype datatype, int rank, in
 	MPIDI_Pkt_set_seqnum(ready_pkt, seqnum);
 	MPIDI_Request_set_seqnum(sreq, seqnum);
 	
-	mpi_errno = MPIDI_CH3_iSend(vc, sreq, ready_pkt, sizeof(*ready_pkt));
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iSend(vc, sreq, ready_pkt, sizeof(*ready_pkt)));
 	/* --BEGIN ERROR HANDLING-- */
 	if (mpi_errno != MPI_SUCCESS)
 	{
@@ -100,10 +100,10 @@ int MPID_Irsend(const void * buf, int count, MPI_Datatype datatype, int rank, in
     }
     else {
 	mpi_errno = MPIDI_CH3_EagerNoncontigSend( &sreq, 
-						  MPIDI_CH3_PKT_READY_SEND,
-						  buf, count, datatype,
-						  data_sz, rank, tag, 
-						  comm, context_offset );
+                                                  MPIDI_CH3_PKT_READY_SEND,
+                                                  buf, count, datatype,
+                                                  data_sz, rank, tag, 
+                                                  comm, context_offset );
 	/* If we're not complete, then add a reference to the datatype */
 	if (sreq && sreq->dev.OnDataAvail) {
 	    sreq->dev.datatype_ptr = dt_ptr;

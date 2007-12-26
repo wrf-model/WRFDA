@@ -11,5 +11,12 @@ testconnect - A test of Comm_connect and Comm_accept, with many processes.
 make testconnect
 ./manyconnect
 
+dimsbalanced - A test of MPI_Dims_create; this checks that Dims_create 
+               produces well-balanced results.  Since there are no 
+               requirements on the "balance" of the output of Dims_create,
+               this is a test of the quality of implementation of the
+               default MPI_Dims_create when there is no underlying 
+               network topology.
+
 
 

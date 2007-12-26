@@ -45,8 +45,18 @@
 #if !defined( CLOG_NOMPI )
 #include "mpi.h"
 #else
-#define MPI_Comm                  int
+/*
+    To avoid mpi_null.h from being exposed to the user's include_dir,
+    the definition of MPI_Comm has to match that in mpi_null.h.
+    The "#if !defined( _MPI_NULL_MPI_COMM )" is to avoid duplicated
+    definition of MPI_Comm when both mpi_null.h and this .h are used
+    in the same .c file.
+*/
+#if !defined( _MPI_NULL_MPI_COMM )
+#define _MPI_NULL_MPI_COMM
+typedef int  MPI_Comm;
 #endif
+#endif /* Endof if !defined( CLOG_NOMPI ) */
 
 #include "clog_commset.h"
 

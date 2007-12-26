@@ -159,13 +159,12 @@ int main( int argc, char *argv[] )
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-
     err = MPI_Comm_disconnect(&intercomm);
     if (err != MPI_SUCCESS) {
         errs++;
 	printf( "Error in MPI_Comm_disconnect\n" );
     }
-
+    
     MTest_Finalize(errs);
     MPI_Finalize();
 

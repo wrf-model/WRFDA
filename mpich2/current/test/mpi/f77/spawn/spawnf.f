@@ -4,6 +4,7 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
         program main
+        implicit none
         include 'mpif.h'
         integer errs, err
         integer rank, size, rsize, i
@@ -11,6 +12,7 @@ C
         integer errcodes(2)
         integer parentcomm, intercomm
         integer status(MPI_STATUS_SIZE)
+        integer ierr
 
         errs = 0
         np   = 2

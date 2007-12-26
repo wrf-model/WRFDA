@@ -49,7 +49,7 @@ C
        if (combiner .ne. MPI_COMBINER_NAMED) then
           call mpi_type_get_contents( dtype, 
      &         max_nints, max_asizev, max_dtypes,
-     &         intv, asizev, dtypesv, ierr )
+     &         intv, aintv, dtypesv, ierr )
 C
 C              dtypesv of constructed types must be free'd now
 C

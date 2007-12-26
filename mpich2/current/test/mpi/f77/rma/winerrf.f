@@ -12,6 +12,11 @@ C
        integer buf(10)
        integer win
        external myerrhanfunc
+CF90   INTERFACE 
+CF90   SUBROUTINE myerrhanfunc(vv0,vv1)
+CF90   INTEGER vv0,vv1
+CF90   END SUBROUTINE
+CF90   END INTERFACE
        integer myerrhan, qerr
        include 'addsize.h'
        integer callcount, codesSeen(3)
@@ -37,8 +42,8 @@ C more separation from comm_world
 C
        call mpi_comm_dup( MPI_COMM_WORLD, comm, ierr )
        call mpi_type_size( MPI_INTEGER, intsize, ierr )
-       aint  = 10 * intsize
-       call mpi_win_create( buf, aint, intsize, MPI_INFO_NULL,
+       asize  = 10 * intsize
+       call mpi_win_create( buf, asize, intsize, MPI_INFO_NULL,
      &                      comm, win, ierr )
 C
        call mpi_win_set_errhandler( win, myerrhan, ierr )
@@ -79,6 +84,7 @@ C We can free our error handler now
        endif
 
        call mpi_win_free( win, ierr )
+       call mpi_comm_free( comm, ierr )
 C
 C Check error strings while here here...
        call mpi_error_string( newerrclass, errstring, rlen, ierr )

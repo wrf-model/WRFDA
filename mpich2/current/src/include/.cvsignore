@@ -8,6 +8,7 @@ mpid_dataloop.h
 gen_dataloop.h
 mpichconf.h
 mpichconf.h.in
+mpich2info.h
 rlogconf.h
 *Debug*
 *Release*

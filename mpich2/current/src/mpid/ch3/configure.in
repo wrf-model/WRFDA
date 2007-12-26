@@ -78,6 +78,7 @@ if test -s $srcdir/channels/$channel_name/setup_$channel_name ; then
     if test "$needs_sock" = yes ; then
         AC_DEFINE(HAVE_UTIL_SOCK,1,[Define if the channel needs util/sock])
 	CPPFLAGS="${CPPFLAGS} -I${master_top_srcdir}/src/mpid/ch3/util/sock"
+        AC_CONFIG_SUBDIRS(util/sock)
     fi				   	
     if test "$needs_shm" = yes ; then
         AC_DEFINE(HAVE_UTIL_SHM,1,[Define if the channel needs util/shm])
@@ -150,8 +151,30 @@ pac_cv_have_struct_ifconf_with_svid=no)])
         AC_DEFINE(USE_SVIDSOURCE_FOR_IFCONF,1,[Define if _SVID_SOURCE needs to be defined for struct ifconf])
     fi
 fi
+
+if test "$pac_cv_have_struct_ifconf" = "no" -a \
+        "$pac_cv_have_struct_ifconf_with_svid" = "no" ; then
+    # Try again with undef _POSIX_C_SOURCE
+    AC_CACHE_CHECK([whether we can use struct ifconf without _POSIX_C_SOURCE],
+pac_cv_have_struct_ifconf_without_posix,[
+AC_TRY_COMPILE([
+#undef _POSIX_C_SOURCE
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#include <net/if.h>
+],[struct ifconf conftest;],
+pac_cv_have_struct_ifconf_without_posix=yes,
+pac_cv_have_struct_ifconf_without_posix=no)])
+    if test "$pac_cv_have_struct_ifconf_without_posix" = yes ; then
+        AC_DEFINE(USE_NOPOSIX_FOR_IFCONF,1,[Define if _POSIX_C_SOURCE needs to be undefined for struct ifconf])
+    fi
+fi
+
 if test "$pac_cv_have_struct_ifconf" = "yes" -o \
-        "$pac_cv_have_struct_ifconf_with_svid" = "yes" ; then
+        "$pac_cv_have_struct_ifconf_with_svid" = "yes" -o \
+        "$pac_cv_have_struct_ifconf_without_posix" ; then
     AC_DEFINE(HAVE_STRUCT_IFCONF,1,[Define if struct ifconf can be used])
 fi
 #
@@ -201,8 +224,21 @@ PAC_SUBDIR_CACHE
 
 PAC_UPDATE_BASE_CACHE
 
+# Ensure that all subdir configures get the shared library items
+export CC_SHL
+export C_LINK_SHL
+export C_LINKPATH_SHL
+export SHLIB_EXT
+export ENABLE_SHLIB
+export LIBTOOL
+
 AC_CONFIG_SUBDIRS(channels/${channel_name})
 
-AC_OUTPUT(Makefile src/Makefile util/Makefile util/sock/Makefile util/shm/Makefile util/shmbase/Makefile channels/Makefile localdefs $MPID_THREAD_OUTPUT_FILES)
+# Add the MPICH2 include flags to CPPFLAGS.  See the discussion above about
+# which include flags should start in MPICH2_INCLUDE_FLAGS and which in 
+# CPPFLAGS
+CPPFLAGS="$CPPFLAGS $MPICH2_INCLUDE_FLAGS"
+
+AC_OUTPUT(Makefile src/Makefile util/Makefile util/shm/Makefile util/shmbase/Makefile channels/Makefile localdefs $MPID_THREAD_OUTPUT_FILES)
 
 PAC_SUBDIR_CACHE_CLEANUP

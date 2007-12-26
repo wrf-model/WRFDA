@@ -6,7 +6,13 @@
  */
 
 #include "mpidu_sock.h"
-#include "mpiimpl.h"
+/*#include "mpiimpl.h"*/
+#ifdef HAVE_STRING_H
+/* Include for memcpy and memset */
+#include <string.h>
+#endif
+
+#include "mpishared.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -22,6 +28,7 @@
 #endif
 #include <netdb.h>
 #include <errno.h>
+
 
 /* FIXME: What do these mean?  Why is 32 a good size (e.g., is it because
    32*32 = 1024 if these are bits in a 4-byte int?  In that case, should
@@ -185,15 +192,22 @@ struct MPIDU_Sock
     int elem;
 };
 
-
+/* FIXME: Why aren't these static */
 int MPIDU_Socki_initialized = 0;
-int MPIDU_Socki_socket_bufsz = 0;
 
 static struct MPIDU_Socki_eventq_elem * MPIDU_Socki_eventq_pool = NULL;
 
 /* MT: needs to be atomically incremented */
 static int MPIDU_Socki_set_next_id = 0;
 
+/* Prototypes for functions used only within the socket code. */
+
+/* Set the buffer size on the socket fd from the environment variable
+   or other option; if "firm" is true, fail if the buffer size is not
+   successfully set */
+int MPIDU_Sock_SetSockBufferSize( int fd, int firm );
+/* Get a string version of the address in ifaddr*/
+int MPIDU_Sock_AddrToStr( MPIDU_Sock_ifaddr_t *ifaddr, char *str, int maxlen );
 
 /* FIXME: Why are these files included in this way?  Why not make them either
    separate files or simply part of (one admittedly large) source file? */

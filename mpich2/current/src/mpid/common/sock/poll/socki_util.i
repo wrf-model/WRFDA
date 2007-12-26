@@ -46,17 +46,18 @@ static struct MPIDU_Socki_eventq_table *MPIDU_Socki_eventq_table_head=NULL;
 #define MPIDU_Socki_pollinfo_get_pollfd(pollinfo_) (&(pollinfo_)->sock_set->pollfds[(pollinfo_)->elem])
 
 
-/* Enqueue a new event.  If the enqueue fails, generate an error and jump to the fail_label_ */
+/* Enqueue a new event.  If the enqueue fails, generate an error and jump to 
+   the fail_label_ */
 #define MPIDU_SOCKI_EVENT_ENQUEUE(pollinfo_, op_, nb_, user_ptr_, event_mpi_errno_, mpi_errno_, fail_label_)	\
-{														\
+{									\
     mpi_errno_ = MPIDU_Socki_event_enqueue((pollinfo_), (op_), (nb_), (user_ptr_), (event_mpi_errno_));		\
-    if (mpi_errno_ != MPI_SUCCESS)										\
-    {														\
+    if (mpi_errno_ != MPI_SUCCESS)					\
+    {									\
 	mpi_errno_ = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPIDU_SOCK_ERR_FAIL,	\
 					  "**sock|poll|eqfail", "**sock|poll|eqfail %d %d %d",			\
 					  pollinfo->sock_set->id, pollinfo->sock_id, (op_));			\
-	goto fail_label_;											\
-    }														\
+	goto fail_label_;						\
+    }									\
 }
 
 /* FIXME: These need to separate the operations from the thread-related
@@ -803,7 +804,7 @@ static void MPIDU_Socki_sock_free(struct MPIDU_Sock * sock)
     pollinfo->sock    = NULL;
     pollinfo->sock_id = -1;
     pollinfo->type    = MPIDU_SOCKI_TYPE_FIRST;
-    pollinfo->state   = MPIDU_SOCKI_TYPE_FIRST;
+    pollinfo->state   = MPIDU_SOCKI_STATE_FIRST;
 #   ifdef MPICH_IS_THREADED
     {
 	pollinfo->pollfd_events = 0;
@@ -947,7 +948,7 @@ static inline int MPIDU_Socki_event_dequeue(struct MPIDU_Sock_set * sock_set, in
 #undef FUNCNAME
 #define FUNCNAME MPIDU_Socki_free_eventq_mem
 #undef FCNAME
-#define FCNAME MPIDI_QUOTE(FUNCNAME)
+#define FCNAME "MPIDU_Socki_free_eventq_mem"
 static void MPIDU_Socki_free_eventq_mem(void)
 {
     struct MPIDU_Socki_eventq_table *eventq_table, *eventq_table_next;
@@ -966,3 +967,93 @@ static void MPIDU_Socki_free_eventq_mem(void)
     MPIDI_FUNC_EXIT(MPID_STATE_SOCKI_FREE_EVENTQ_MEM);
 }
 
+/* Provide a standard mechanism for setting the socket buffer size.
+   The value is -1 if the default size hasn't been set, 0 if no size 
+   should be set, and > 0 if that size should be used */
+static int sockBufSize = -1;
+
+/* Set the socket buffer sizes on fd to the standard values (this is controlled
+   by the parameter MPICH_SOCK_BUFSIZE).  If "firm" is true, require that the
+   sockets actually accept that buffer size.  */
+int MPIDU_Sock_SetSockBufferSize( int fd, int firm )
+{
+    int mpi_errno = MPI_SUCCESS;
+    int rc;
+
+    /* Get the socket buffer size if we haven't yet acquired it */
+    if (sockBufSize < 0) {
+	/* FIXME: Is this the name that we want to use (this was chosen
+	   to match the original, undocumented name) */
+	rc = MPIU_GetEnvInt( "MPICH_SOCKET_BUFFER_SIZE", &sockBufSize );
+	if (rc <= 0) {
+	    sockBufSize = 0;
+	}
+	MPIU_DBG_MSG_D(CH3_CONNECT,TYPICAL,"Sock buf size = %d\n",sockBufSize);
+    }
+
+    if (sockBufSize > 0) {
+	int bufsz;
+	socklen_t bufsz_len;
+
+	bufsz     = sockBufSize;
+	bufsz_len = sizeof(bufsz);
+	rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, bufsz_len);
+	if (rc == -1) {
+	    MPIU_ERR_SETANDJUMP3(mpi_errno,MPIDU_SOCK_ERR_FAIL, 
+				 "**sock|poll|setsndbufsz",
+				 "**sock|poll|setsndbufsz %d %d %s", 
+				 bufsz, errno, MPIU_Strerror(errno));
+	}
+	bufsz     = sockBufSize;
+	bufsz_len = sizeof(bufsz);
+	rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, bufsz_len);
+	if (rc == -1) {
+	    MPIU_ERR_SETANDJUMP3(mpi_errno,MPIDU_SOCK_ERR_FAIL, 
+				 "**sock|poll|setrcvbufsz",
+				 "**sock|poll|setrcvbufsz %d %d %s", 
+				 bufsz, errno, MPIU_Strerror(errno));
+	}
+	bufsz_len = sizeof(bufsz);
+
+	if (firm) {
+	    rc = getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsz, &bufsz_len);
+	    /* --BEGIN ERROR HANDLING-- */
+	    if (rc == 0) {
+		if (bufsz < sockBufSize * 0.9) {
+		MPIU_Msg_printf("WARNING: send socket buffer size differs from requested size (requested=%d, actual=%d)\n",
+				sockBufSize, bufsz);
+		}
+	    }
+	    /* --END ERROR HANDLING-- */
+	    
+	    bufsz_len = sizeof(bufsz);
+	    rc = getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsz, &bufsz_len);
+	    /* --BEGIN ERROR HANDLING-- */
+	    if (rc == 0) {
+		if (bufsz < sockBufSize * 0.9) {
+		    MPIU_Msg_printf("WARNING: receive socket buffer size differs from requested size (requested=%d, actual=%d)\n",
+				    sockBufSize, bufsz);
+		}
+	    }
+	    /* --END ERROR HANDLING-- */
+	}
+    }
+ fn_fail:
+    return mpi_errno;
+}
+
+/* This routine provides a string version of the address. */
+int MPIDU_Sock_AddrToStr( MPIDU_Sock_ifaddr_t *ifaddr, char *str, int maxlen )
+{ 
+    int i;
+    unsigned char *p = ifaddr->ifaddr;
+    for (i=0; i<ifaddr->len && maxlen > 4; i++) { 
+	snprintf( str, maxlen, "%.3d.", *p++ );
+	str += 4;
+	maxlen -= 4;
+    }
+    /* Change the last period to a null; but be careful in case len was zero */
+    if (i > 0) *--str = 0;
+    else       *str = 0;
+    return 0;
+}

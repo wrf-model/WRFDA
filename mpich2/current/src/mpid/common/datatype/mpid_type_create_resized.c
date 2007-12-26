@@ -19,7 +19,6 @@ int MPID_Type_create_resized(MPI_Datatype oldtype,
 			     MPI_Datatype *newtype_p)
 {
     MPID_Datatype *new_dtp;
-    struct MPID_Dataloop *dlp;
 
     new_dtp = (MPID_Datatype *) MPIU_Handle_obj_alloc(&MPID_Datatype_mem);
     /* --BEGIN ERROR HANDLING-- */
@@ -35,6 +34,13 @@ int MPID_Type_create_resized(MPI_Datatype oldtype,
     new_dtp->name[0]      = 0;
     new_dtp->contents     = 0;
 
+    new_dtp->dataloop       = NULL;
+    new_dtp->dataloop_size  = -1;
+    new_dtp->dataloop_depth = -1;
+    new_dtp->hetero_dloop       = NULL;
+    new_dtp->hetero_dloop_size  = -1;
+    new_dtp->hetero_dloop_depth = -1;
+
     /* if oldtype is a basic, we build a contiguous dataloop of count = 1 */
     if (HANDLE_GET_KIND(oldtype) == HANDLE_KIND_BUILTIN)
     {
@@ -49,46 +55,11 @@ int MPID_Type_create_resized(MPI_Datatype oldtype,
 	new_dtp->true_ub        = oldsize;
 	new_dtp->ub             = lb + extent;
 	new_dtp->extent         = extent;
-	new_dtp->alignsize      = oldsize; /* ??? */
+	new_dtp->alignsize      = oldsize; /* FIXME ??? */
 	new_dtp->n_elements     = 1;
 	new_dtp->element_size   = oldsize;
 	new_dtp->is_contig      = (extent == oldsize) ? 1 : 0;
         new_dtp->eltype         = oldtype;
-
-	MPID_Dataloop_alloc(DLOOP_KIND_CONTIG, 1, &dlp,
-			    &(new_dtp->dataloop_size));
-	/* --BEGIN ERROR HANDLING-- */
-	if (dlp == NULL) return MPIDI_Type_create_resized_memory_error();
-	/* --END ERROR HANDLING-- */
-
-	new_dtp->dataloop = dlp;
-
-	/* fill in dataloop */
-	dlp->kind                  = DLOOP_KIND_CONTIG | DLOOP_FINAL_MASK;
-	dlp->loop_params.c_t.count = 1;
-	dlp->el_size               = oldsize;
-	dlp->el_extent             = extent;
-	dlp->el_type               = oldtype;
-
-#if defined(MPID_HAS_HETERO) || 1
-	/* Create a new dataloop, reusing the dlp variable */
-	MPID_Dataloop_alloc(DLOOP_KIND_CONTIG, 1, &dlp,
-			    &(new_dtp->hetero_dloop_size));
-	/* --BEGIN ERROR HANDLING-- */
-	if (dlp == NULL) return MPIDI_Type_create_resized_memory_error();
-	/* --END ERROR HANDLING-- */
-
-	new_dtp->hetero_dloop = dlp;
-
-	/* fill in dataloop */
-	dlp->kind                  = DLOOP_KIND_CONTIG | DLOOP_FINAL_MASK;
-	dlp->loop_params.c_t.count = 1;
-	dlp->el_size               = oldsize;
-	dlp->el_extent             = extent;
-	dlp->el_type               = oldtype;
-	
-	new_dtp->hetero_dloop_depth = 1;
-#endif
     }
     else
     {
@@ -111,26 +82,8 @@ int MPID_Type_create_resized(MPI_Datatype oldtype,
 	new_dtp->element_size   = old_dtp->element_size;
         new_dtp->eltype         = old_dtp->eltype;
 
-	/* TODO: COULD BE MORE AGGRESSIVE ON IS_CONTIG */
 	new_dtp->is_contig      =
 	    (extent == old_dtp->size) ? old_dtp->is_contig : 0;
-
-	MPID_Dataloop_dup(old_dtp->dataloop, old_dtp->dataloop_size, &dlp);
-	/* --BEGIN ERROR HANDLING-- */
-	if (dlp == NULL) return MPIDI_Type_create_resized_memory_error();
-	/* --END ERROR HANDLING-- */
-
-	new_dtp->dataloop      = dlp;
-	new_dtp->dataloop_size = old_dtp->dataloop_size;
-
-#if defined(MPID_HAS_HETERO) || 1
-	MPID_Dataloop_dup(old_dtp->dataloop, old_dtp->dataloop_size, 
-			  &new_dtp->hetero_dloop);
-	
-	new_dtp->hetero_dloop_depth = old_dtp->hetero_dloop_depth;
-	new_dtp->hetero_dloop_size  = old_dtp->hetero_dloop_size;
-	
-#endif
     }
 
     *newtype_p = new_dtp->handle;

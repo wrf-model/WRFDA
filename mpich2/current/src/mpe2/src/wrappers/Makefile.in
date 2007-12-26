@@ -35,6 +35,10 @@ build_include:
 	          if [ -f $(top_srcdir)/include/$$file ] ; then \
 	              $(CP) -f $(top_srcdir)/include/$$file \
 	                       $(includebuild_dir) ; \
+	          else \
+	              if [ -f include/$$file ] ; then \
+	                  $(CP) -f include/$$file $(includebuild_dir) ; \
+	              fi ; \
 	          fi ; \
 	      done ; \
 	  fi

@@ -75,7 +75,7 @@ int main( int argc, char *argv[] )
 	dims[1] = nnodes/2;
 	dims[2] = 1;
 	dims[3] = 2;
-	MPI_Dims_create( nnodes, 2, dims );
+	MPI_Dims_create( nnodes, 4, dims );
 	if (prodof(4, dims) != nnodes) {
 	    errs++;
 	    printf( "Dims_create returned the wrong decomposition (all given).  " );

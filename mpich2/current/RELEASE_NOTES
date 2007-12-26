@@ -8,7 +8,12 @@
 -------------------------------------------------------------------------------
                               Known Deficiencies
 -------------------------------------------------------------------------------
+- The MPD process manager can only handle relatively small amounts of data on 
+  stdin and may also have problems if there is data on stdin that is not
+  consumed by the program.  
 
+- Only the ch3:sock and ch3:nemesis channels support thread safety.
+ 
 - The sock, sctp, and ssm channels are the only channels that implement dynamic 
   process support (i.e., MPI_COMM_SPAWN, MPI_COMM_CONNECT, MPI_COMM_ACCEPT, 
   etc.) under Unix.  All other channels will experience failures for tests 
@@ -18,7 +23,14 @@
 - The ssm channel uses special interprocess locks (often assembly) that may 
   not work with some compilers or machine architectures. It works on
   Linux with gcc, Intel, and Pathscale compilers on various Intel
-  architectures. It also works in Windows and Solaris environments.
+  architectures. It also works in Windows environments.
+
+- The MPI-IO implementation does not support filetypes that use the
+  MPI-2 functions MPI_Type_create_indexed_block or
+  MPI_Type_create_resized. You will need to use MPI_Type_indexed
+  instead of MPI_Type_create_indexed_block and, instead of
+  MPI_Type_create_resized, use MPI_Type_struct to explicity set MPI_LB
+  and MPI_UB. 
 
 - Support for the "external32" data representation is incomplete.  This affects
   the MPI_PACK_EXTERNAL and MPI_UNPACK_EXTERNAL routines, as well the external
@@ -31,15 +43,17 @@
   options.  This device does support the use of different executables (e.g.,
   multiple-program-multiple-data, or MPMD, programming).
 
-- The support for MPI_THREAD_SERIALIZED and MPI_THREAD_MULTIPLE is preliminary,
-  and only available with the sock channel.  We encourage people to
-  experiment and provide feedback.  
-
 - MPI_IRECV operations that are not explicitly completed before MPI_FINALIZE is
   called may fail to complete before MPI_FINALIZE returns, and thus never
   complete.  Furthermore, any matching send operations may erroneously fail.
   By explicitly completed, we mean that the request associated with the
   operation is completed by one of the MPI_TEST or MPI_WAIT routines.
+
+- The dllchan in the ch3 device is experimental and is very fragile.  For
+  example, you may encounter problems when configuring with --enable-g and 
+  --enable-g=log .  This is an "alpha test" of the dllchan; try it if you'd 
+  like, and let us know what does and does not work, but know that fixes will
+  probably wait for the next release.
 
 - C++ Binding:
   
@@ -98,9 +112,6 @@
   to allow starting two processes as singletons and then have them connect
   using MPI_Comm_connect/MPI_Comm_accept, it was necessary to change the part
   of the PMI wire prototcol that implemented the singleton init actions.
-  The "gforker" process manager is the only process manager that supports
-  singleton init in the 1.0.5 release.  We plan to extend support to the
-  mpd process manager in a subsequent release.
 
 - There are significant changes to the ch3 code base.  We expect further
   changes in the next release, particularly to reduce latency and 

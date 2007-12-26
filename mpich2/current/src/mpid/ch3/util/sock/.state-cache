@@ -1,9 +1,9 @@
 <dir>
-<file name="ch3u_init_sock.c" info="1159727793"/>
-<file name="ch3u_connect_sock.c" info="1162854247"/>
-<file name="findinterfaces.c" info="1151000964"/>
-<file name="ch3usock.h" info="1161893817"/>
-<file name="ch3u_getinterfaces.c" info="1165683760"/>
+<file name="ch3u_init_sock.c" info="1173732046"/>
+<file name="ch3u_connect_sock.c" info="1189709019"/>
+<file name="findinterfaces.c" info="1171762957"/>
+<file name="ch3usock.h" info="1185310233"/>
+<file name="ch3u_getinterfaces.c" info="1176559286"/>
 </dir>
 <data>
 <fileinfo name="ch3u_init_sock.c">
@@ -20,6 +20,7 @@ MPID_STATE_MPIDI_CH3_SOCKCONN_HANDLE_CONN_EVENT MPIDI_CH3_Sockconn_handle_conn_e
 MPID_STATE_MPIDI_CH3_SOCKCONN_HANDLE_CONNOPEN_EVENT MPIDI_CH3_Sockconn_handle_connopen_event
 MPID_STATE_MPIDI_CH3_SOCKCONN_HANDLE_CONNWRITE MPIDI_CH3_Sockconn_handle_connwrite
 MPID_STATE_MPIDI_CH3I_VC_POST_SOCKCONNECT MPIDI_CH3I_VC_post_sockconnect
+MPID_STATE_MPIDI_CH3I_SOCK_CONNECT MPIDI_CH3I_Sock_connect
 MPID_STATE_CONNECTION_POST_RECV_PKT connection_post_recv_pkt
 MPID_STATE_CONNECTION_POST_SEND_PKT connection_post_send_pkt
 MPID_STATE_CONNECTION_POST_SEND_PKT_AND_PGID connection_post_send_pkt_and_pgid

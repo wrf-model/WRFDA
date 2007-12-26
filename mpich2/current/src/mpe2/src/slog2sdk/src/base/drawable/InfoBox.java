@@ -153,7 +153,7 @@ public class InfoBox extends TimeBoundingBox
 
 
 
-    public void addErrMsg( String new_msg )
+    private void addErrMsg( String new_msg )
     {
         if ( err_msg == null )
             err_msg = new StringBuffer( new_msg );
@@ -191,11 +191,15 @@ public class InfoBox extends TimeBoundingBox
 
         this.setInfoValueTypes();
 
-        if ( infobuffer == null )
-            if ( infovals != null && infovals.length > 0 )
-                this.addErrMsg( "Null infobuffer byte[] without InfoValue[]." );
-            else  // if ( infovals == null || infovals.length == 0 )
-                return;
+        if ( infobuffer == null ) {
+            if ( infovals != null && infovals.length > 0 ) {
+                // Null infobuffer byte[] but Non-Null infovals[]
+                this.addErrMsg(
+                "Missing user byte[] but Non-empty format chars!" );
+            }
+            // Since infobuffer byte[] is null, can't set infovals[], exit.
+            return;
+        }
 
         if ( infovals != null ) {
             bary_ins = new ByteArrayInputStream( this.infobuffer );
@@ -210,9 +214,11 @@ public class InfoBox extends TimeBoundingBox
                 System.exit( 1 );
             }
         }
-        else
-            this.addErrMsg( "Can't decode infobuffer byte[] "
-                          + "because of missing InfoValue[]." );
+        else {
+            // Can't decode infobuffer byte[] with NULL infovals[]
+            this.addErrMsg(
+            "Can't decode user byte[] with Missing format chars!" );
+        }
     }
 
     private void decodeInfoBuffer()
@@ -333,6 +339,7 @@ public class InfoBox extends TimeBoundingBox
     }
 */
 
+    // toInfoBoxString() is for popup Drawable Info Box in Jumpshot
     public String toInfoBoxString()
     {
         StringBuffer  rep;
@@ -368,6 +375,7 @@ public class InfoBox extends TimeBoundingBox
                     rep.append( infovals[ idx ] + " " );
             }
         }
+        // Needs newline for error message for popup dialog box
         if ( err_msg != null )
             rep.append( "\n" + err_msg );
         return rep.toString();
@@ -413,8 +421,9 @@ public class InfoBox extends TimeBoundingBox
                     rep.append( infovals[ idx ] + " " );
             }
         }
+        // For normal stdout or stderr, preprend/append **** for highlight
         if ( err_msg != null )
-            rep.append( "!" + err_msg + "!" );
+            rep.append( " **** " + err_msg + " **** " );
 
         rep.append( "]" );
         return rep.toString();

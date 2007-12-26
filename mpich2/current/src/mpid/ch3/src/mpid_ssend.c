@@ -23,6 +23,7 @@ int MPID_Ssend(const void * buf, int count, MPI_Datatype datatype, int rank, int
     MPI_Aint dt_true_lb;
     MPID_Datatype * dt_ptr;
     MPID_Request * sreq = NULL;
+    MPIDI_VC_t * vc;
 #if defined(MPID_USE_SEQUENCE_NUMBERS)
     MPID_Seqnum_t seqnum;
 #endif    
@@ -64,6 +65,7 @@ int MPID_Ssend(const void * buf, int count, MPI_Datatype datatype, int rank, int
     }
 
     MPIDI_Datatype_get_info(count, datatype, dt_contig, data_sz, dt_ptr, dt_true_lb);
+    MPIDI_Comm_get_vc(comm, rank, &vc);
 
     MPIDI_Request_create_sreq(sreq, mpi_errno, goto fn_exit);
     MPIDI_Request_set_type(sreq, MPIDI_REQUEST_TYPE_SSEND);
@@ -75,20 +77,20 @@ int MPID_Ssend(const void * buf, int count, MPI_Datatype datatype, int rank, int
 	goto fn_exit;
     }
     
-    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_sync_send_t) <= MPIDI_CH3_EAGER_MAX_MSG_SIZE)
+    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_sync_send_t) <= vc->eager_max_msg_sz)
     {
 	mpi_errno = MPIDI_CH3_EagerSyncNoncontigSend( &sreq, buf, count,
-						      datatype, data_sz, 
-						      dt_contig, dt_true_lb,
-						      rank, tag, comm, 
-						      context_offset );
+                                                      datatype, data_sz, 
+                                                      dt_contig, dt_true_lb,
+                                                      rank, tag, comm, 
+                                                      context_offset );
     }
     else
     {
 	/* Note that the sreq was created above */
-	mpi_errno = MPIDI_CH3_RndvSend( &sreq, buf, count, datatype, dt_contig,
-					data_sz, dt_true_lb, rank, tag, comm, 
-					context_offset );
+	mpi_errno = vc->rndvSend_fn( &sreq, buf, count, datatype, dt_contig,
+                                     data_sz, dt_true_lb, rank, tag, comm, 
+                                     context_offset );
 	/* Note that we don't increase the ref cound on the datatype
 	   because this is a blocking call, and the calling routine 
 	   must wait until sreq completes */

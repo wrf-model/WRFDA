@@ -39,6 +39,9 @@
 /* Define if MPI_Group_f2c and c2f available */
 #undef HAVE_MPI_GROUP_F2C
 
+/* Define if MPI_Init_thread available */
+#undef HAVE_MPI_INIT_THREAD
+
 /* Define if MPI-IO available */
 #undef HAVE_MPI_IO
 

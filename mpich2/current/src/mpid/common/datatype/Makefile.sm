@@ -7,6 +7,7 @@ lib${MPILIBNAME}_a_SOURCES = \
 	mpir_type_get_contig_blocks.c \
 	mpir_type_flatten.c \
 	mpid_type_commit.c \
+	mpid_type_zerolen.c \
 	mpid_type_vector.c \
 	mpid_type_contiguous.c \
 	mpid_type_create_resized.c \
@@ -18,14 +19,9 @@ lib${MPILIBNAME}_a_SOURCES = \
 	mpid_datatype_contents.c \
 	mpid_type_get_contents.c \
 	mpid_type_create_pairtype.c \
-	gen_segment.c \
-	gen_dataloop.c \
-	gen_type_contiguous.c \
-	gen_type_vector.c \
-	gen_type_blockindexed.c \
-	gen_type_indexed.c \
-	gen_type_struct.c
+	mpid_contents_support.c \
 
-HEADERS = gen_dataloop.h mpid_dataloop.h mpid_datatype.h \
+HEADERS = dataloop/dataloop_parts.h dataloop/dataloop_create.h mpid_dataloop.h mpid_datatype.h \
 	mpid_ext32_segment.h segment_states.h
-INCLUDES = -I${srcdir} -I../../../include -I${master_top_srcdir}/src/include
+INCLUDES = -I${srcdir} -I${top_builddir}/src/include -I${master_top_srcdir}/src/include
+SUBDIRS = dataloop .

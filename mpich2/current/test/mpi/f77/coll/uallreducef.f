@@ -7,6 +7,7 @@ C
 C Test user-defined operations.  This tests a simple commutative operation
 C
       subroutine uop( cin, cout, count, datatype )
+      implicit none
       integer cin(*), cout(*)
       integer count, datatype
       integer i
@@ -17,6 +18,7 @@ C
       end
 
       program main
+      implicit none
       include 'mpif.h'
       external uop
       integer ierr, errs

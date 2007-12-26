@@ -27,7 +27,7 @@ typedef MPI_Fint MPE_Fint;
 /* Assume Fortran ints are 32 bits */
 #define MPE_XGraph_c2f(xgraph)    (MPE_Fint)(xgraph->fort_index)
 extern MPE_XGraph MPE_fort_head;
-MPE_XGraph MPE_XGraph_f2c( MPE_Fint xgraph ) 
+static MPE_XGraph MPE_XGraph_f2c( MPE_Fint xgraph ) 
 {
     MPE_XGraph p = MPE_fort_head;
     while (p && p->fort_index != xgraph ) p = p->next;

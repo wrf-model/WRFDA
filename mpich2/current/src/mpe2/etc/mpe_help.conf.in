@@ -38,7 +38,7 @@ ${mpe_hpfx}mpicheck   : Check MPI Program with the Collective & Datatype
 ${mpe_hpst}             Checking library.  This links against -lmpe_collchk.
 
 ${mpe_hpfx}graphics   : Use MPE graphics routines with X11 library.
-${mpe_hpst}             This links against -lmpe <X11 libraries>.
+${mpe_hpst}             This links against -lmpe -l<X11 libraries>.
 
 ${mpe_hpfx}log        : MPE user-defined states logging.
 ${mpe_hpst}             This links against -lmpe.

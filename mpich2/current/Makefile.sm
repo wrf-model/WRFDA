@@ -49,13 +49,18 @@ cleanobjsandlibs:
 # cleanlibs makes sure that we clean all of the library files
 cleanlibs:
 	rm -f lib/lib${MPILIBNAME}.a lib/lib${PMPILIBNAME}.a
-	rm -f lib/lib${MPILIBNAME}cxx.a 
-	rm -f lib/libf${MPILIBNAME}.a 
-	rm -f lib/lib${MPILIBNAME}.@SHLIB_EXT@* lib/lib${PMPILIBNAME}.@SHLIB_EXT@*
-	rm -f lib/lib${MPILIBNAME}cxx.@SHLIB_EXT@* 
+	rm -f lib/lib${MPICXXLIBNAME}.a 
+	rm -f lib/libf${MPILIBNAME}.a lib/lib${MPILIBNAME}f90.a
+	rm -f lib/lib${MPILIBNAME}.@SHLIB_EXT@* 
+	rm -f lib/lib${PMPILIBNAME}.@SHLIB_EXT@*
+	rm -f lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@* 
 	rm -f lib/libf${MPILIBNAME}.@SHLIB_EXT@* 
+	rm -f lib/lib${MPILIBNAME}.*.@SHLIB_EXT@* 
+	rm -f lib/lib${PMPILIBNAME}.*.@SHLIB_EXT@*
+	rm -f lib/lib${MPICXXLIBNAME}.*.@SHLIB_EXT@* 
+	rm -f lib/libf${MPILIBNAME}.*.@SHLIB_EXT@* 
 	rm -f lib/lib${MPILIBNAME}.la* lib/lib${PMPILIBNAME}.la*
-	rm -f lib/lib${MPILIBNAME}cxx.la* 
+	rm -f lib/lib${MPICXXLIBNAME}.la* 
 	rm -f lib/libf${MPILIBNAME}.la* 
 
 all-preamble:
@@ -89,7 +94,7 @@ PACKAGE = mpich2
 # Version is now set in the Configure file so that we can easily include the
 # version on the configure output and to match the common practice of
 # current autoconfs
-VERSION = 1.0.5
+VERSION = 1.0.6
 MPICVSHOME = @MPICVSHOME@
 #
 # Build a distribution tarfile
@@ -141,10 +146,12 @@ dist-with-version:
 	( cd tmpdir/${PACKAGE}-${version}/src/pm && rm -rf forker rmpd ompd )
 	( cd tmpdir/$(PACKAGE)-$(version)/src/pm/mpd && rm -f Zeroconf.py)
 	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels && rm -rf ib rdma gasnet sshm)
-	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && rm -rf newtcp_module/* sctp_module/* ib_module/*)
+	( cd tmpdir/$(PACKAGE)-$(version)/src/pmi && rm -rf simple2)
+	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && rm -rf newtcp_module/* sctp_module/* ib_module/* psm_module/*)
 	( cd tmpdir/$(PACKAGE)-$(version)/src/mpid/ch3/channels/nemesis/nemesis/net_mod && \
 	echo "# Stub Makefile" > newtcp_module/Makefile.sm && \
 	echo "# Stub Makefile" > ib_module/Makefile.sm && \
+	echo "# Stub Makefile" > psm_module/Makefile.sm && \
 	echo "# Stub Makefile" > sctp_module/Makefile.sm )
 	( cd tmpdir/${PACKAGE}-${version} && rm -f ToDo* )
 	( cd tmpdir/${PACKAGE}-${version} && rm -rf archive )
@@ -181,6 +188,7 @@ dist-with-version:
 	    cp tmpdir2/doc/logging/logging.pdf tmpdir/${PACKAGE}-${version}/doc/logging/logging.pdf ; \
 	    cp tmpdir2/doc/windev/windev.pdf tmpdir/${PACKAGE}-${version}/doc/windev/windev.pdf ; \
 	    rm -rf tmpdir2 ; \
+	    ( cd tmpdir/${PACKAGE}-${version}/src/mpe2/maint && ${MAKE} -f Makefile4man ) ; \
 	fi
 	( cd tmpdir/${PACKAGE}-${version} && maint/updatefiles -distrib )
 	( cd tmpdir/${PACKAGE}-${version} && find . -name 'CVS' -print | \
@@ -259,10 +267,12 @@ optinstall_SHLIB = lib/lib${PMPILIBNAME}.@SHLIB_EXT@
 optinstall_INCLUDE = src/mpi/romio/include/mpiof.h src/mpi/romio/include/mpio.h
 optinstall_LIB = lib/libf${MPILIBNAME}.a
 optinstall_SHLIB = lib/libf${MPILIBNAME}.@SHLIB_EXT@
+optinstall_SHLIB = lib/lib${MPICXXLIBNAME}.@SHLIB_EXT@
 
 # Some of the subsidiary packages may need to be installed.  This target will
 # invoke their install targets as part of the installation process
-INSTALL_SUBDIRS = src/util/thread src/env @bindings_dirs@ @other_install_dirs@
+INSTALL_SUBDIRS = src/util/thread src/env \
+                  src/pkgconfig @bindings_dirs@ @other_install_dirs@
 
 # Install preamble checks for possible problems
 install-preamble:

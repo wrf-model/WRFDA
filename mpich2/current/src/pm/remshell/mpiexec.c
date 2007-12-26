@@ -80,7 +80,7 @@
 #include "labelout.h"
 #include "rm.h"
 #include "simple_pmiutil.h"
-
+#include "env.h"             /* MPIE_Putenv */
 /* mpimem.h contains prototypes for MPIU_Strncpy etc. */
 #include "mpimem.h"
 

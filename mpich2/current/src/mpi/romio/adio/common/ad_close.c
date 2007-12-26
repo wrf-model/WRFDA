@@ -12,10 +12,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef PROFILE
-#include "mpe.h"
-#endif
-
 void ADIO_Close(ADIO_File fd, int *error_code)
 {
     int i, j, k, combiner, myrank, err, is_contig;

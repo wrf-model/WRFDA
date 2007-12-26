@@ -13,8 +13,8 @@
       integer wgroup, info, req, win
       integer result
       integer c2fwin
-! The integer aint must be of ADDRESS_KIND size
-      integer (kind=MPI_ADDRESS_KIND) aint
+! The integer asize must be of ADDRESS_KIND size
+      integer (kind=MPI_ADDRESS_KIND) asize
 
       errs = 0
 
@@ -23,8 +23,8 @@
 !
 ! Test passing a Fortran MPI object to C
       call mpi_comm_rank( MPI_COMM_WORLD, wrank, ierr )
-      aint = 0
-      call mpi_win_create( 0, aint, 1, MPI_INFO_NULL,  &
+      asize = 0
+      call mpi_win_create( 0, asize, 1, MPI_INFO_NULL,  &
       &     MPI_COMM_WORLD, win, ierr )
       errs = errs + c2fwin( win )
       call mpi_win_free( win, ierr )

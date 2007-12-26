@@ -7,8 +7,6 @@
 #if !defined(MPICH_MPIDI_CH3_PRE_H_INCLUDED)
 #define MPICH_MPIDI_CH3_PRE_H_INCLUDED
 
-#include "mpidu_sock.h"
-
 /* These macros unlock shared code */
 #define MPIDI_CH3_USES_SOCK
 #define MPIDI_CH3_USES_ACCEPTQ
@@ -30,6 +28,7 @@ MPIDI_CH3I_PKT_SC_CONN_ACCEPT,		        \
 MPIDI_CH3I_PKT_SC_OPEN_RESP,			\
 MPIDI_CH3I_PKT_SC_CLOSE
 
+#if 0
 /* FIXME - We need a little security here to avoid having a random port scan 
    crash the process.  Perhaps a "secret" value for each process could be 
    published in the key-val space and subsequently sent in the open pkt. */
@@ -68,6 +67,7 @@ MPIDI_CH3I_Pkt_sc_conn_accept_t sc_conn_accept;	\
 MPIDI_CH3I_Pkt_sc_open_resp_t sc_open_resp;	\
 MPIDI_CH3I_Pkt_sc_close_t sc_close;
 
+#endif
 
 /* This channel has no special channel data for the process group structure */
 
@@ -81,27 +81,10 @@ typedef enum MPIDI_CH3I_VC_state
 }
 MPIDI_CH3I_VC_state_t;
 
-typedef struct MPIDI_CH3I_VC
-{
-    struct MPID_Request * sendq_head;
-    struct MPID_Request * sendq_tail;
-    MPIDI_CH3I_VC_state_t state;
-    MPIDU_Sock_t sock;
-    struct MPIDI_CH3I_Connection * conn;
-}
-MPIDI_CH3I_VC;
-
-#define MPIDI_CH3_VC_DECL MPIDI_CH3I_VC ch;
-
 /*
  * MPIDI_CH3_REQUEST_DECL (additions to MPID_Request)
+ * The socket channel makes no additions
  */
-/*  pkt is used to temporarily store a packet header associated with this request */	
-#define MPIDI_CH3_REQUEST_DECL	\
-struct MPIDI_CH3I_Request	\
-{				\
-    MPIDI_CH3_Pkt_t pkt;	\
-} ch;
 
 /*
  * MPID_Progress_state - device/channel dependent state to be passed between 

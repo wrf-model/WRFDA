@@ -18,7 +18,7 @@ int MPI_File_read_at_all_end(MPI_File fh, void *buff, MPI_Status *st)
 
     if(g2g) {
         /* get the communicator */
-        if (CollChk_get_fh(fh, &comm)) {
+        if (!CollChk_get_fh(fh, &comm)) {
             return CollChk_err_han("File has not been opened",
                                    COLLCHK_ERR_FILE_NOT_OPEN,
                                    call, MPI_COMM_WORLD);

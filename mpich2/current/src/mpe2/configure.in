@@ -43,11 +43,16 @@ AC_ARG_ENABLE( softerror,
                                      are used.  The default is enable=no.],
 , enable_softerror=${mpe_enable_softerror:-no} )
 
+dnl Don't preset F77 when MPE is configured with MPICH2 
+dnl otherwise AC_PROG_F77 or other PAC F77 tests could be messed up below.
+dnl This is especially true when no fortran compiler in PATH.
 VERSION=""
-CC=${CC:-cc}
-F77=${F77:-f77}
-CFLAGS=${CFLAGS}
-FFLAGS=${FFLAGS}
+if test "$FROM_MPICH2" != "yes" ; then
+    CC=${CC:-cc}
+    F77=${F77:-f77}
+    CFLAGS=${CFLAGS}
+    FFLAGS=${FFLAGS}
+fi
 MPE_LIBNAME=""
 
 dnl Read FROM_MPICHx variables from the environment
@@ -278,7 +283,7 @@ AC_ARG_VAR( MPI_CC, [C compiler to compile MPI program and to create parallel ex
 AC_ARG_VAR( MPI_F77, [F77 compiler to compile MPI program and to create parallel executable, e.g. mpxlf for IBM MPI, or mpif77 from MPICHx or LAM-MPI.] )
 AC_ARG_VAR( MPI_INC, [MPI compiler's include flags prefixed with -I.  It specifies where mpi.h and mpif.h are located, e.g. -I/pkgs/MPI/include.] )
 AC_ARG_VAR( MPI_LIBS, [MPI compiler's library flags prefixed with -L for the library path and prefixed with -l for the name of the MPI libraries. It specifies the location of the MPI libraries. e.g. -L/pkgs/MPI/lib -lpmpich -lmpich.] )
-AC_ARG_VAR( MPERUN, [MPI application launch command.  This variable is necessary only if user wants to run "make check", "make installcheck-all" or "$sbindir/mpecheckinstall -run" and the default MPERUN value, "$bindir/mpiexec -n 4", is not correct.] )
+AC_ARG_VAR( MPERUN, [MPI application launch command.  This variable is necessary only if user wants to run "make check", "make installcheck-all" or "$sbindir/mpecheckinstall -run" when the default MPERUN value, "$bindir/mpiexec -n 4", is not correct.] )
 
 # Prepend/Append '"' before/after MPERUN.
 if test "x$MPERUN" != "x" ; then
@@ -288,13 +293,13 @@ fi
 dnl
 dnl Set non-standard autoconf/GNU install directory variables, htmldir & docdir
 dnl
-AC_ARG_WITH(htmldir,
+AC_ARG_WITH( htmldir,
 [--with-htmldir=dir                 - Specify the HTML directory.],,
-with_htmldir='${prefix}/www')
+with_htmldir='${prefix}/www' )
 
-AC_ARG_WITH(docdir,
+AC_ARG_WITH( docdir,
 [--with-docdir=dir                  - Specify the documentation directory.],,
-with_docdir='${prefix}/doc')
+with_docdir='${prefix}/doc' )
 
 #
 # Set the defaults for directories that are not included in configure's
@@ -312,6 +317,39 @@ else
     docdir='${prefix}/doc'
 fi
 AC_SUBST(docdir)
+
+dnl
+AC_ARG_WITH( cross-spec,
+[--with-cross-spec=file             - Specify the values of variables that
+                                     configure cannot determine in a
+                                     cross-compilation environment through
+                                     a file], ,
+with_cross_spec=no )
+dnl
+pac_cross_compiling=no
+if test "$with_cross_spec" != "no" ; then
+    if test -s "$with_cross_spec" ; then
+        AC_MSG_RESULT([Reading the cross-compilation file $with_cross_spec])
+        . $with_cross_spec
+        # Autoconf 2.52 no longer sets cross_compiling except with the
+        # awkward "targethost" options.
+        pac_cross_compiling=yes
+        cross_compiling=yes
+        ac_cv_prog_cc_cross=yes
+        ac_cv_prog_f77_cross=yes
+        ac_cv_prog_f90_cross=yes
+        ac_cv_prog_cxx_cross=yes
+        export cross_compiling
+        # Export all the variables in cross_spec/cross_spec.txt
+        # i.e. CROSS_xxx, MPI_xxx and friends...
+        cross_spec_vars=`grep -v '^#' $with_cross_spec | sed -e 's/=.*//g'`
+        for var in $cross_spec_vars ; do
+            eval value=\$"$var"
+            echo "Exporting $var=$value ..."
+            export $var
+        done
+    fi
+fi
 
 
 AC_PROG_CC
@@ -361,7 +399,7 @@ dnl
 if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
     if test "$enable_checkMPI" = "yes" ; then
         AC_MSG_CHECKING( [for the linkage of the supplied MPI C definitions] )
-        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, , ,
+        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, , , ,
                               [ mpe_link_ok=yes ], [ mpe_link_ok=no ] )
         if test "$mpe_link_ok" = "yes" ; then
             AC_MSG_RESULT(yes)
@@ -399,7 +437,7 @@ if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
     dnl
     if test "$enable_checkMPI" = "yes" -a "$enable_checkMPIwtime" = "yes" ; then
         AC_MSG_CHECKING( [for the C version of MPI_Wtime()] )
-        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS,
+        PAC_MPI_LINK_CC_FUNC( $MPI_CC, [$CFLAGS $MPI_INC], $MPI_LIBS, ,
                               [ double d ],
                               [ d=MPI_Wtime() ],
                               [ mpe_link_ok=yes ], [ mpe_link_ok=no ] )
@@ -420,9 +458,23 @@ if test -z "$CC" -o -z "$MPI_CC"; then
 fi
  
 if test -n "$F77" -a "$MPE_BUILD_FORTRAN2C" = "yes" ; then 
+    FLIBS_save="$FLIBS"
+    FLIBS=""
     AC_F77_LIBRARY_LDFLAGS
+    # The autoconf macro for finding FLIBS sometimes makes mistakes
+    # (particularly with the Fujitsu frt compiler).  This next step
+    # first sees if the FLIBS is valid with the Fortran compiler
+    PAC_PROG_F77_FLIBS_VALID
+    # Now see if FLIBS works with the C compiler
     PAC_PROG_F77_CHECK_FLIBS
+
+    PAC_PROG_F77_LINKER_WITH_C
+    # For name mangle, we need the library flags
     PAC_PROG_F77_NAME_MANGLE
+    # Check whether additional libraries are needed when linking with C
+    PAC_PROG_F77_AND_C_STDIO_LIBS
+    AC_SUBST(F77_OTHER_LIBS)
+
     PAC_PROG_F77_LIBRARY_DIR_FLAG
     if test -z "$FLIB_PATH_LEADER" ; then
         FLIB_PATH_LEADER=$F77_LIBDIR_LEADER
@@ -457,6 +509,21 @@ if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
     MPE_FFLAGS="$FFLAGS"
 fi
 
+dnl Determine if this is "UserSupplied" MPI implmentation.
+dnl If so, build mpecc and mpefc.
+dnl    MPE_CLINKER/MPE_FLINKER need to sync with sbin/mpeinstall
+if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
+    mpe_compilers=bin/mpecc
+    if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
+        mpe_compilers="$mpe_compilers bin/mpefc"
+    fi
+    MPE_CLINKER="$binbuild_dir/mpecc -"
+    MPE_FLINKER="$binbuild_dir/mpefc -"
+else dnl This is MPICH2.
+    MPE_CLINKER="$MPI_CC -mpe="
+    MPE_FLINKER="$MPI_F77 -mpe="
+fi
+
 dnl The following does not work as expected because
 dnl AC_CONFIG_SUBDIRS sets the "precious" variables like CFLAGS from the
 dnl settings recorded at the top of the configure. That means CFLAGS cannot
@@ -477,10 +544,12 @@ AC_SUBST(CC)
 AC_SUBST(CLINKER)
 AC_SUBST(MPE_CFLAGS)
 AC_SUBST(MPI_CC)
+AC_SUBST(MPE_CLINKER)
 AC_SUBST(F77)
 AC_SUBST(FLINKER)
 AC_SUBST(MPE_FFLAGS)
 AC_SUBST(MPI_F77)
+AC_SUBST(MPE_FLINKER)
 AC_SUBST(MPI_INC)
 AC_SUBST(MPI_LIBS)
 AC_SUBST(LDFLAGS)
@@ -496,11 +565,13 @@ export MPE_BUILD_FORTRAN2C
 export CC
 export CLINKER
 export MPI_CC
+export MPE_CLINKER
 export MPE_CFLAGS
 export F77
 export FLINKER
-export MPE_FFLAGS
 export MPI_F77
+export MPE_FLINKER
+export MPE_FFLAGS
 export MPI_INC
 export MPI_LIBS
 export LDFLAGS
@@ -512,6 +583,7 @@ export mpe_enable_softerror
 
 
 misc_dirname="src/misc"
+callstack_dirname="src/callstack"
 logging_dirname="src/logging"
 wrappers_dirname="src/wrappers"
 graphics_dirname="src/graphics"
@@ -521,7 +593,7 @@ slog2_dirname="src/slog2sdk"
 dnl Cleanup the subpackages' Makefiles if they exist
 AC_MSG_CHECKING( [for leftover Makefiles in subpackages] )
 leftover_pkgs=""
-for pkg in misc logging wrappers graphics collchk slog2 ; do
+for pkg in misc callstack logging wrappers graphics collchk slog2 ; do
     dirname=${pkg}_dirname
     eval dirvalue=\$"$dirname"
     if test -s $rootbuild_dir/$dirvalue/Makefile ; then
@@ -539,7 +611,7 @@ else
     AC_MSG_RESULT( [$leftover_pkgs cleaned] )
 fi
 
-dnl trial_pkgs="misc logging wrappers graphics collchk"
+dnl trial_pkgs="misc callstack logging wrappers graphics collchk"
 
 dnl
 AC_ARG_ENABLE( misc,
@@ -548,6 +620,13 @@ AC_ARG_ENABLE( misc,
                                      MPE_xxxTags() and MPE_GetHostName()....
                                      The default enable=yes.],
 , enable_misc=yes )
+
+dnl
+AC_ARG_ENABLE( callstack,
+[--enable-callstack                 - Build MPE callstack routines, i.e.
+                                     MPE_CallStack_xxx()...
+                                     The default enable=yes.],
+, enable_callstack=yes )
 
 dnl
 AC_ARG_ENABLE( logging,
@@ -594,12 +673,23 @@ AC_ARG_ENABLE( collchk,
 [--enable-collchk                   - Build MPI Collective and Datatype 
                                      checking library, libmpe_collchk.a],
 , enable_collchk=yes )
+dnl  src/collchk requires at least src/callstack
+if test "$enable_collchk" = "yes" ; then
+    if test "$enable_callstack" != "yes" ; then
+        enable_callstack=yes
+        AC_MSG_WARN( [Enabling CallStack which is required by CollChk.] ); 
+    fi
+fi
 
 selected_pkgs=""
 
 if test "$enable_misc" = "yes" -a -s $srcdir/src/misc/configure ; then
     selected_pkgs="$selected_pkgs misc"
     AC_CONFIG_SUBDIRS(src/misc)
+fi
+if test "$enable_callstack" = "yes" -a -s $srcdir/src/callstack/configure ; then
+    selected_pkgs="$selected_pkgs callstack"
+    AC_CONFIG_SUBDIRS(src/callstack)
 fi
 if test "$enable_logging" = "yes" -a -s $srcdir/src/logging/configure ; then
     selected_pkgs="$selected_pkgs logging"
@@ -651,39 +741,52 @@ if test -s $srcdir/$slog2_dirname/configure ; then
     fi
 fi
 
-
-dnl Determine if this is "UserSupplied" MPI implmentation.
-dnl If so, build mpecc and mpefc.
-if test "$MPI_IMPL" != "MPICH" -a "$MPI_IMPL" != "MPICH2" ; then
-    mpe_compilers=bin/mpecc
-    if test "$MPE_BUILD_FORTRAN2C" = "yes" ; then
-        mpe_compilers="$mpe_compilers bin/mpefc"
-    fi
-fi
+dnl The following statement is no longer true as of 6/24/2007,
+dnl a thread-specific MPE logging on/off switch has been added
+dnl to mpe_log_thread[.h/.c] and MPI logging wrappper library
+dnl has been updated accordingly.
+dnl
+dnl AC_ARG_ENABLE( threadlogging,
+dnl [--enable-threadlogging             - Turn on/off the coarse-grained thread
+dnl                                      support in MPE logging.  The default
+dnl                                      is enable=no.], ,
+dnl enable_threadlogging=no )
+dnl
+dnl When thread-logging is enabled in multi-thread environment,
+dnl safePMPI guard can't be used, i.e. global variables is_mpelog_on
+dnl can't be used in coarse-grained thread support,
+dnl becasue these varaibles need to be thread-specific.  Otherwise
+dnl turn off logging on 1 thread would mean turning it off for all
+dnl threads.
+dnl
+dnl if test "$enable_threadlogging" = "yes" ; then
+dnl     enable_safePMPI=no
+dnl     export enable_safePMPI
+dnl fi
 
 AC_OUTPUT_COMMANDS( [
-if test ! -x ./sbin/mpeinstall -a -s ./sbin/mpeinstall; then
+if test ! -x ./sbin/mpeinstall -a -s ./sbin/mpeinstall ; then
     chmod u+x ./sbin/mpeinstall
 fi
-if test ! -x ./sbin/mpecheckinstall -a -s ./sbin/mpecheckinstall; then
+if test ! -x ./sbin/mpecheckinstall -a -s ./sbin/mpecheckinstall ; then
     chmod u+x ./sbin/mpecheckinstall
 fi
-if test ! -x ./sbin/mpecheckbuild -a -s ./sbin/mpecheckbuild; then
+if test ! -x ./sbin/mpecheckbuild -a -s ./sbin/mpecheckbuild ; then
     chmod u+x ./sbin/mpecheckbuild
 fi
-if test ! -x ./sbin/mpetestlink -a -s ./sbin/mpetestlink; then
+if test ! -x ./sbin/mpetestlink -a -s ./sbin/mpetestlink ; then
     chmod u+x ./sbin/mpetestlink
 fi
-if test ! -x ./sbin/mpetestexec -a -s ./sbin/mpetestexec; then
+if test ! -x ./sbin/mpetestexec -a -s ./sbin/mpetestexec ; then
     chmod u+x ./sbin/mpetestexec
 fi
-if test ! -x ./sbin/mpetestexeclog -a -s ./sbin/mpetestexeclog; then
+if test ! -x ./sbin/mpetestexeclog -a -s ./sbin/mpetestexeclog ; then
     chmod u+x ./sbin/mpetestexeclog
 fi
-if test ! -x ./bin/mpecc -a -s ./bin/mpecc; then
+if test ! -x ./bin/mpecc -a -s ./bin/mpecc ; then
     chmod a+x ./bin/mpecc
 fi
-if test ! -x ./bin/mpefc -a -s ./bin/mpefc; then
+if test ! -x ./bin/mpefc -a -s ./bin/mpefc ; then
     chmod a+x ./bin/mpefc
 fi
 ] )

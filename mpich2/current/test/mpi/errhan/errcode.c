@@ -703,15 +703,6 @@ int main(int argc, char **argv)
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_comm_test_inter %C %p" );
     }
     /* src/mpi/comm/intercomm_create.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**intern", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**intern" );
-    {
-    /* src/mpi/comm/intercomm_create.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**intern", "**intern %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**intern %s" );
-    }
-    /* src/mpi/comm/intercomm_create.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dupprocesses", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**dupprocesses" );
     {
@@ -1668,6 +1659,9 @@ int main(int argc, char **argv)
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_group_excl %G %d %p %p" );
     }
     /* src/mpi/group/group_free.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**groupperm", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**groupperm" );
+    /* src/mpi/group/group_free.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_group_free", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_group_free" );
     {
@@ -2054,6 +2048,19 @@ int main(int argc, char **argv)
     char s5[] = "pointer5";
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_grequest_start", "**mpi_grequest_start %p %p %p %p %p", s1, s2, s3, s4, s5 );
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_grequest_start %p %p %p %p %p" );
+    }
+    /* src/mpi/pt2pt/greq_start.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpix_grequest_class_create", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**mpix_grequest_class_create" );
+    {
+    /* src/mpi/pt2pt/greq_start.c */
+    char s1[] = "pointer1";
+    char s2[] = "pointer2";
+    char s3[] = "pointer3";
+    char s4[] = "pointer4";
+    char s5[] = "pointer5";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpix_grequest_class_create", "**mpix_grequest_class_create %p %p %p %p %p", s1, s2, s3, s4, s5 );
+    ChkMsg( err, MPI_ERR_OTHER, "**mpix_grequest_class_create %p %p %p %p %p" );
     }
     /* src/mpi/pt2pt/ibsend.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_ibsend", 0);
@@ -2719,365 +2726,6 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_win_wait", "**mpi_win_wait %W", i1 );
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_win_wait %W" );
     }
-    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_close.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**io", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**io" );
-    {
-    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_close.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**io", "**io %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**io %s" );
-    }
-    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_fcntl.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**flag", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**flag" );
-    {
-    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_fcntl.c */
-    int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**flag", "**flag %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**flag %d" );
-    }
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamelong", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**filenamelong" );
-    {
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    char s1[] = "string1";
-    int i2 = 2;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamelong", "**filenamelong %s %d", s1, i2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**filenamelong %s %d" );
-    }
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenoexist", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**filenoexist" );
-    {
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenoexist", "**filenoexist %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**filenoexist %s" );
-    }
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamedir", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**filenamedir" );
-    {
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamedir", "**filenamedir %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**filenamedir %s" );
-    }
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileaccess", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**fileaccess" );
-    {
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileaccess", "**fileaccess %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**fileaccess %s" );
-    }
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioneedrd", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ioneedrd" );
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioRMWrdwr", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ioRMWrdwr" );
-    /* src/mpi/romio/adio/ad_nfs/ad_nfs_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "ADIOI_NFS_WriteStrided: ROMIO tries to optimize this access by doing a read-modify-write, but is unable to read the file. Please give the file read permission and open it with MPI_MODE_RDWR.", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "ADIOI_NFS_WriteStrided: ROMIO tries to optimize this access by doing a read-modify-write, but is unable to read the file. Please give the file read permission and open it with MPI_MODE_RDWR." );
-    /* src/mpi/romio/adio/ad_pvfs/ad_pvfs_fcntl.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "PVFS does not support atomic mode", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "PVFS does not support atomic mode" );
-    /* src/mpi/romio/adio/ad_pvfs/ad_pvfs_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Atomic mode set in PVFS I/O function", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Atomic mode set in PVFS I/O function" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_common.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_finalize", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_finalize" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_common.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_util_init_defaults", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_util_init_defaults" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_delete.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_util_resolve", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_util_resolve" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_delete.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_remove", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_remove" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_fcntl.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_getattr", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_getattr" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_flush.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_flush", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_flush" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error allocating memory", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error allocating memory" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Unknown error", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Unknown error" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in pvfs_request_contig (memory)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in pvfs_request_contig (memory)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in pvfs_request_contig (file)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in pvfs_request_contig (file)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_read", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_read" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (memory)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (memory)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (file)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (file)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (memory)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (memory)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_resize.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_truncate", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_truncate" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (file)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (file)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_write", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_write" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Atomic noncontiguous writes are not supported by PVFS2", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Atomic noncontiguous writes are not supported by PVFS2" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed(file)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed(file)" );
-    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed" );
-    /* src/mpi/romio/adio/common/ad_end.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error: outstanding nonblocking I/O operations", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Error: outstanding nonblocking I/O operations" );
-    /* src/mpi/romio/adio/common/ad_fstype.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filename", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**filename" );
-    {
-    /* src/mpi/romio/adio/common/ad_fstype.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filename", "**filename %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**filename %s" );
-    }
-    /* src/mpi/romio/adio/common/ad_fstype.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iofstypeunsupported", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iofstypeunsupported" );
-    /* src/mpi/romio/adio/common/ad_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioagnomatch", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ioagnomatch" );
-    /* src/mpi/romio/adio/common/ad_open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**oremote_fail", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**oremote_fail" );
-    /* src/mpi/romio/adio/common/ad_prealloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iopreallocrdwr", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iopreallocrdwr" );
-    /* src/mpi/romio/adio/common/ad_write_coll.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Filetype specifies overlapping write regions (which is illegal according to the MPI-2 specification)", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Filetype specifies overlapping write regions (which is illegal according to the MPI-2 specification)" );
-    /* src/mpi/romio/adio/common/ad_write_str.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowswc", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iowswc" );
-    /* src/mpi/romio/adio/common/ad_write_str.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowsrc", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iowsrc" );
-    /* src/mpi/romio/adio/common/async_list.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Unknown request optype", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Unknown request optype" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadfh", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobadfh" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadcount", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobadcount" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dtypenull", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**dtypenull" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowronly", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iowronly" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iordonly", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iordonly" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioamodeseq", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ioamodeseq" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioetype", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ioetype" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosharedunsupported", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iosharedunsupported" );
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "System call I/O error", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "System call I/O error" );
-    {
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    char s1[] = "string1";
-    char s2[] = "string2";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "System call I/O error", "Syscall error from %s: %s", s1, s2 );
-    ChkMsg( err, MPI_ERR_OTHER, "Syscall error from %s: %s" );
-    }
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Value for info key not same across processes", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Value for info key not same across processes" );
-    {
-    /* src/mpi/romio/adio/include/adioi_error.h */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Value for info key not same across processes", "Value for info key %s not same across processes", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "Value for info key %s not same across processes" );
-    }
-    /* src/mpi/romio/mpi-io/delete.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**initialized", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**initialized" );
-    /* src/mpi/romio/mpi-io/get_bytoff.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadoffset", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobadoffset" );
-    /* src/mpi/romio/mpi-io/get_view.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iodatarepnomem", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iodatarepnomem" );
-    /* src/mpi/romio/mpi-io/ioreq_f2c.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**request", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**request" );
-    {
-    /* src/mpi/romio/mpi-io/iread.c */
-    int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fail", "**fail %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**fail %d" );
-    }
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**comm", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**comm" );
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**commnotintra", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**commnotintra" );
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamodeone", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**fileamodeone" );
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamoderead", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**fileamoderead" );
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamodeseq", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**fileamodeseq" );
-    /* src/mpi/romio/mpi-io/open.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosequnsupported", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iosequnsupported" );
-    /* src/mpi/romio/mpi-io/prealloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadsize", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobadsize" );
-    /* src/mpi/romio/mpi-io/read_allb.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosplitcoll", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iosplitcoll" );
-    /* src/mpi/romio/mpi-io/read_alle.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosplitcollnone", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iosplitcollnone" );
-    /* src/mpi/romio/mpi-io/register_datarep.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepname", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**datarepname" );
-    /* src/mpi/romio/mpi-io/register_datarep.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepused", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**datarepused" );
-    {
-    /* src/mpi/romio/mpi-io/register_datarep.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepused", "**datarepused %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**datarepused %s" );
-    }
-    /* src/mpi/romio/mpi-io/register_datarep.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepextent", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**datarepextent" );
-    /* src/mpi/romio/mpi-io/seek.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ionegoffset", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ionegoffset" );
-    /* src/mpi/romio/mpi-io/seek.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadwhence", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobadwhence" );
-    /* src/mpi/romio/mpi-io/seek_sh.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosharedfailed", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iosharedfailed" );
-    /* src/mpi/romio/mpi-io/set_errh.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileopunsupported", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**fileopunsupported" );
-    /* src/mpi/romio/mpi-io/set_view.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobaddisp", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iobaddisp" );
-    /* src/mpi/romio/mpi-io/set_view.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iofiletype", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iofiletype" );
-    /* src/mpi/romio/mpi-io/set_view.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iodispifseq", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**iodispifseq" );
-    /* src/mpi/romio/mpi-io/set_view.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unsupporteddatarep", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**unsupporteddatarep" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid size argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid size argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid rank argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid rank argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid ndoms argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid ndoms argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_gsizes argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_gsizes argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_distribs argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_distribs argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_dargs argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_dargs argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_psizes argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_psizes argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid gsize argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid gsize argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid darg argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid darg argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid psize argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid psize argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid distrib argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid distrib argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "For MPI_DISTRIBUTE_NONE, the number of processes in that dimension of the grid must be 1", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "For MPI_DISTRIBUTE_NONE, the number of processes in that dimension of the grid must be 1" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid type argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid type argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array size", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array size" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid order argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid order argument" );
-    /* src/mpi/romio/mpi2-other/array/darray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Internal error", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Internal error" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid ndims argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid ndims argument" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_sizes argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_sizes argument" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_subsizes argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_subsizes argument" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_starts argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_starts argument" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid subsize argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid subsize argument" );
-    /* src/mpi/romio/mpi2-other/array/subarray.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid start argument", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "Invalid start argument" );
     /* src/mpi/spawn/close_port.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_close_port", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_close_port" );
@@ -3561,6 +3209,359 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_topo_test", "**mpi_topo_test %C %p", i1, s2 );
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_topo_test %C %p" );
     }
+    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_close.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**io", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**io" );
+    {
+    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_close.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**io", "**io %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**io %s" );
+    }
+    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_fcntl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**flag", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**flag" );
+    {
+    /* src/mpi/romio/adio/ad_gridftp/ad_gridftp_fcntl.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**flag", "**flag %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**flag %d" );
+    }
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamelong", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**filenamelong" );
+    {
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    char s1[] = "string1";
+    int i2 = 2;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamelong", "**filenamelong %s %d", s1, i2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**filenamelong %s %d" );
+    }
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenoexist", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**filenoexist" );
+    {
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenoexist", "**filenoexist %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**filenoexist %s" );
+    }
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamedir", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**filenamedir" );
+    {
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filenamedir", "**filenamedir %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**filenamedir %s" );
+    }
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileaccess", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**fileaccess" );
+    {
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileaccess", "**fileaccess %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**fileaccess %s" );
+    }
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioneedrd", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ioneedrd" );
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioRMWrdwr", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ioRMWrdwr" );
+    /* src/mpi/romio/adio/ad_nfs/ad_nfs_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "ADIOI_NFS_WriteStrided: ROMIO tries to optimize this access by doing a read-modify-write, but is unable to read the file. Please give the file read permission and open it with MPI_MODE_RDWR.", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "ADIOI_NFS_WriteStrided: ROMIO tries to optimize this access by doing a read-modify-write, but is unable to read the file. Please give the file read permission and open it with MPI_MODE_RDWR." );
+    /* src/mpi/romio/adio/ad_pvfs/ad_pvfs_fcntl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "PVFS does not support atomic mode", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "PVFS does not support atomic mode" );
+    /* src/mpi/romio/adio/ad_pvfs/ad_pvfs_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Atomic mode set in PVFS I/O function", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Atomic mode set in PVFS I/O function" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_aio.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in pvfs_request_contig (memory)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in pvfs_request_contig (memory)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_aio.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in pvfs_request_contig (file)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in pvfs_request_contig (file)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_aio.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_isys_io", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_isys_io" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_common.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_finalize", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_finalize" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_common.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_util_init_defaults", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_util_init_defaults" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_delete.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_util_resolve", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_util_resolve" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_delete.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_remove", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_remove" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_fcntl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_getattr", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_getattr" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_flush.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_flush", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_flush" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error allocating memory", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error allocating memory" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Unknown error", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Unknown error" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_read", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_read" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (memory)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (memory)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (file)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (file)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_read.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (memory)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed (memory)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_resize.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_truncate", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_truncate" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (file)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_contiguous (file)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_sys_write", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_sys_write" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Atomic noncontiguous writes are not supported by PVFS2", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Atomic noncontiguous writes are not supported by PVFS2" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed(file)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed(file)" );
+    /* src/mpi/romio/adio/ad_pvfs2/ad_pvfs2_write.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Error in PVFS_Request_hindexed" );
+    /* src/mpi/romio/adio/common/ad_fstype.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filename", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**filename" );
+    {
+    /* src/mpi/romio/adio/common/ad_fstype.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**filename", "**filename %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**filename %s" );
+    }
+    /* src/mpi/romio/adio/common/ad_fstype.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iofstypeunsupported", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iofstypeunsupported" );
+    /* src/mpi/romio/adio/common/ad_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioagnomatch", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ioagnomatch" );
+    /* src/mpi/romio/adio/common/ad_open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**oremote_fail", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**oremote_fail" );
+    /* src/mpi/romio/adio/common/ad_prealloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iopreallocrdwr", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iopreallocrdwr" );
+    /* src/mpi/romio/adio/common/ad_write_coll.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Filetype specifies overlapping write regions (which is illegal according to the MPI-2 specification)", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Filetype specifies overlapping write regions (which is illegal according to the MPI-2 specification)" );
+    /* src/mpi/romio/adio/common/ad_write_str.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowswc", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iowswc" );
+    /* src/mpi/romio/adio/common/ad_write_str.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowsrc", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iowsrc" );
+    /* src/mpi/romio/adio/common/async_list.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Unknown request optype", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Unknown request optype" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadfh", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobadfh" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadcount", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobadcount" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dtypenull", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**dtypenull" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iowronly", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iowronly" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iordonly", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iordonly" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioamodeseq", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ioamodeseq" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ioetype", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ioetype" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosharedunsupported", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iosharedunsupported" );
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "System call I/O error", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "System call I/O error" );
+    {
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "System call I/O error", "Syscall error from %s: %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "Syscall error from %s: %s" );
+    }
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Value for info key not same across processes", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Value for info key not same across processes" );
+    {
+    /* src/mpi/romio/adio/include/adioi_error.h */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Value for info key not same across processes", "Value for info key %s not same across processes", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "Value for info key %s not same across processes" );
+    }
+    /* src/mpi/romio/mpi-io/delete.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**initialized", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**initialized" );
+    /* src/mpi/romio/mpi-io/get_bytoff.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadoffset", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobadoffset" );
+    /* src/mpi/romio/mpi-io/get_view.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iodatarepnomem", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iodatarepnomem" );
+    /* src/mpi/romio/mpi-io/ioreq_f2c.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**request", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**request" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**comm", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**comm" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**commnotintra", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**commnotintra" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamodeone", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**fileamodeone" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamoderead", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**fileamoderead" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileamodeseq", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**fileamodeseq" );
+    /* src/mpi/romio/mpi-io/open.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosequnsupported", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iosequnsupported" );
+    /* src/mpi/romio/mpi-io/prealloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadsize", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobadsize" );
+    /* src/mpi/romio/mpi-io/read_allb.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosplitcoll", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iosplitcoll" );
+    /* src/mpi/romio/mpi-io/read_alle.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosplitcollnone", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iosplitcollnone" );
+    /* src/mpi/romio/mpi-io/register_datarep.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepname", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**datarepname" );
+    /* src/mpi/romio/mpi-io/register_datarep.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepused", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**datarepused" );
+    {
+    /* src/mpi/romio/mpi-io/register_datarep.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepused", "**datarepused %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**datarepused %s" );
+    }
+    /* src/mpi/romio/mpi-io/register_datarep.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**datarepextent", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**datarepextent" );
+    /* src/mpi/romio/mpi-io/seek.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ionegoffset", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ionegoffset" );
+    /* src/mpi/romio/mpi-io/seek.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobadwhence", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobadwhence" );
+    /* src/mpi/romio/mpi-io/seek_sh.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iosharedfailed", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iosharedfailed" );
+    /* src/mpi/romio/mpi-io/set_errh.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fileopunsupported", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**fileopunsupported" );
+    /* src/mpi/romio/mpi-io/set_view.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iobaddisp", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iobaddisp" );
+    /* src/mpi/romio/mpi-io/set_view.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iofiletype", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iofiletype" );
+    /* src/mpi/romio/mpi-io/set_view.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**iodispifseq", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**iodispifseq" );
+    /* src/mpi/romio/mpi-io/set_view.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unsupporteddatarep", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**unsupporteddatarep" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid size argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid size argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid rank argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid rank argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid ndoms argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid ndoms argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_gsizes argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_gsizes argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_distribs argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_distribs argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_dargs argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_dargs argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_psizes argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_psizes argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid gsize argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid gsize argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid darg argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid darg argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid psize argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid psize argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid distrib argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid distrib argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "For MPI_DISTRIBUTE_NONE, the number of processes in that dimension of the grid must be 1", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "For MPI_DISTRIBUTE_NONE, the number of processes in that dimension of the grid must be 1" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid type argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid type argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array size", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array size" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid order argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid order argument" );
+    /* src/mpi/romio/mpi2-other/array/darray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Internal error", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Internal error" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid ndims argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid ndims argument" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_sizes argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_sizes argument" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_subsizes argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_subsizes argument" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid array_of_starts argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid array_of_starts argument" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid subsize argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid subsize argument" );
+    /* src/mpi/romio/mpi2-other/array/subarray.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "Invalid start argument", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "Invalid start argument" );
     /* src/nameserv/file/file_nameserv.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**namepubfile", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**namepubfile" );
@@ -3740,25 +3741,47 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mpi_info_set", "**mpi_info_set %I %s %s", i1, s2, s3 );
     ChkMsg( err, MPI_ERR_OTHER, "**mpi_info_set %I %s %s" );
     }
+    /* src/util/osserv/dl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unableToLoadDLL", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**unableToLoadDLL" );
+    {
+    /* src/util/osserv/dl.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unableToLoadDLL", "**unableToLoadDLL %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**unableToLoadDLL %s %s" );
+    }
+    /* src/util/osserv/dl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unableToLoadDLLsym", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**unableToLoadDLLsym" );
+    {
+    /* src/util/osserv/dl.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**unableToLoadDLLsym", "**unableToLoadDLLsym %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**unableToLoadDLLsym %s %s" );
+    }
     /* src/binding/f77/addressf.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**inttoosmall", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**inttoosmall" );
-    /* src/binding/f77/statusc2f.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**notcstatignore", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**notcstatignore" );
     /* src/binding/f77/statusf2c.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**notfstatignore", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**notfstatignore" );
-    /* src/binding/f90/create_f90_util.c */
+    /* src/binding/f77/statusc2f.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**notcstatignore", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**notcstatignore" );
+    /* src/binding/f90/create_f90_int.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**f90typeintnone", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**f90typeintnone" );
+    {
+    /* src/binding/f90/create_f90_int.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**f90typeintnone", "**f90typeintnone %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**f90typeintnone %d" );
+    }
+    /* src/binding/f90/create_f90_int.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**f90typetoomany", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**f90typetoomany" );
-    {
-    /* src/binding/f90/create_f90_util.c */
-    char s1[] = "string1";
-    int i2 = 2;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**f90typetoomany", "**f90typetoomany %s %d", s1, i2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**f90typetoomany %s %d" );
-    }
     /* src/include/mpierrs.h */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**finalized", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**finalized" );
@@ -3911,33 +3934,202 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**nomem2", "**nomem2 %d %s", i1, s2 );
     ChkMsg( err, MPI_ERR_OTHER, "**nomem2 %d %s" );
     }
+    /* src/mpid/ch3/channels/dllchan/src/ch3impl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**nodllversion", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**nodllversion" );
+    /* src/mpid/ch3/channels/dllchan/src/ch3impl.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dllversionmismatch", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**dllversionmismatch" );
     {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
-    int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_kvs_put", "**pmi_kvs_put %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_kvs_put %d" );
+    /* src/mpid/ch3/channels/dllchan/src/ch3impl.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dllversionmismatch", "**dllversionmismatch %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**dllversionmismatch %s %s" );
     }
+    /* src/mpid/ch3/channels/nemesis/src/ch3_comm_spawn.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**intern", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**intern" );
+    /* src/mpid/ch3/channels/nemesis/src/ch3_init.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**init_progress", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**init_progress" );
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**truncate" );
     {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
     int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_kvs_commit", "**pmi_kvs_commit %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_kvs_commit %d" );
+    int i2 = 2;
+    int i3 = 3;
+    int i4 = 4;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", "**truncate %d %d %d %d", i1, i2, i3, i4 );
+    ChkMsg( err, MPI_ERR_OTHER, "**truncate %d %d %d %d" );
     }
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|syncack", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ch3|syncack" );
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|loadsendiov", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ch3|loadsendiov" );
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|senddata", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ch3|senddata" );
+    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|cancelresp", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ch3|cancelresp" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_barrier", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**pmi_barrier" );
     {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
     int i1 = 1;
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_barrier", "**pmi_barrier %d", i1 );
     ChkMsg( err, MPI_ERR_OTHER, "**pmi_barrier %d" );
     }
     {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_kvs_put", "**pmi_kvs_put %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_kvs_put %d" );
+    }
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_kvs_commit", "**pmi_kvs_commit %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_kvs_commit %d" );
+    }
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
     int i1 = 1;
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_kvs_get", "**pmi_kvs_get %d", i1 );
     ChkMsg( err, MPI_ERR_OTHER, "**pmi_kvs_get %d" );
     }
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**intern", "**intern %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**intern %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**alloc_shar_mem", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**alloc_shar_mem" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**alloc_shar_mem", "**alloc_shar_mem %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**alloc_shar_mem %s %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**attach_shar_mem", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**attach_shar_mem" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**attach_shar_mem", "**attach_shar_mem %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**attach_shar_mem %s %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**remove_shar_mem", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**remove_shar_mem" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**remove_shar_mem", "**remove_shar_mem %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**remove_shar_mem %s %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**detach_shar_mem", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**detach_shar_mem" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
+    char s1[] = "string1";
+    char s2[] = "string2";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**detach_shar_mem", "**detach_shar_mem %s %s", s1, s2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**detach_shar_mem %s %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**open", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**open" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
+    char s1[] = "string1";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**open", "**open %s", s1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**open %s" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**setenv", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**setenv" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock_gethost", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**sock_gethost" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    char s1[] = "string1";
+    int i2 = 2;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock_gethost", "**sock_gethost %s %d", s1, i2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**sock_gethost %s %d" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_size", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_size" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_size", "**pmi_get_clique_size %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_size %d" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_ranks", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_ranks" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_ranks", "**pmi_get_clique_ranks %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_ranks %d" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**not_in_local_ranks", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**not_in_local_ranks" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_lmt.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|pktarraytoosmall", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ch3|pktarraytoosmall" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_lmt.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**nomemreq", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**nomemreq" );
+    {
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_lmt.c */
+    int i1 = 1;
+    int i2 = 2;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", "**truncate %d %d", i1, i2 );
+    ChkMsg( err, MPI_ERR_OTHER, "**truncate %d %d" );
+    }
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winput_oob", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**winput_oob" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winget_oob", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**winget_oob" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winserialize", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**winserialize" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**windeserialize", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**windeserialize" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/include/mpid_nem_impl.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**rtspkt", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**rtspkt" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/include/mpid_nem_impl.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ctspkt", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ctspkt" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/include/mpid_nem_impl.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**cookiepkt", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**cookiepkt" );
+    /* src/mpid/ch3/channels/nemesis/nemesis/include/mpid_nem_impl.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**donepkt", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**donepkt" );
     /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/elan_module/elan_module_init.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**business_card", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**business_card" );
@@ -3980,11 +4172,11 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/gm_module/gm_module_init.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**gm_no_port", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**gm_no_port" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/gm_module/gm_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/gm_module/gm_module_poll.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**gm_regmem", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**gm_regmem" );
     {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/gm_module/gm_module_init.c */
+    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/gm_module/gm_module_poll.c */
     int i1 = 1;
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**gm_regmem", "**gm_regmem %d", i1 );
     ChkMsg( err, MPI_ERR_OTHER, "**gm_regmem %d" );
@@ -4215,16 +4407,6 @@ int main(int argc, char **argv)
     ChkMsg( err, MPI_ERR_OTHER, "**gethostbyname %s %d" );
     }
     /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/tcp_module/tcp_module_lmt.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**truncate" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/tcp_module/tcp_module_lmt.c */
-    int i1 = 1;
-    int i2 = 2;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", "**truncate %d %d", i1, i2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**truncate %d %d" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/tcp_module/tcp_module_lmt.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock_writev", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**sock_writev" );
     /* src/mpid/ch3/channels/nemesis/nemesis/net_mod/tcp_module/tcp_module_poll.c */
@@ -4254,125 +4436,6 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**read", "**read %s", s1 );
     ChkMsg( err, MPI_ERR_OTHER, "**read %s" );
     }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**alloc_shar_mem", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**alloc_shar_mem" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    char s1[] = "string1";
-    char s2[] = "string2";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**alloc_shar_mem", "**alloc_shar_mem %s %s", s1, s2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**alloc_shar_mem %s %s" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**attach_shar_mem", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**attach_shar_mem" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    char s1[] = "string1";
-    char s2[] = "string2";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**attach_shar_mem", "**attach_shar_mem %s %s", s1, s2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**attach_shar_mem %s %s" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**remove_shar_mem", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**remove_shar_mem" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    char s1[] = "string1";
-    char s2[] = "string2";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**remove_shar_mem", "**remove_shar_mem %s %s", s1, s2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**remove_shar_mem %s %s" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**detach_shar_mem", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**detach_shar_mem" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_alloc.c */
-    char s1[] = "string1";
-    char s2[] = "string2";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**detach_shar_mem", "**detach_shar_mem %s %s", s1, s2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**detach_shar_mem %s %s" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**open", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**open" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
-    char s1[] = "string1";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**open", "**open %s", s1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**open %s" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_ckpt.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**setenv", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**setenv" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock_gethost", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**sock_gethost" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    char s1[] = "string1";
-    int i2 = 2;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock_gethost", "**sock_gethost %s %d", s1, i2 );
-    ChkMsg( err, MPI_ERR_OTHER, "**sock_gethost %s %d" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_size", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_size" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_size", "**pmi_get_clique_size %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_size %d" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_ranks", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_ranks" );
-    {
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    int i1 = 1;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**pmi_get_clique_ranks", "**pmi_get_clique_ranks %d", i1 );
-    ChkMsg( err, MPI_ERR_OTHER, "**pmi_get_clique_ranks %d" );
-    }
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_init.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**not_in_local_ranks", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**not_in_local_ranks" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winput_oob", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**winput_oob" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winget_oob", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**winget_oob" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**winserialize", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**winserialize" );
-    /* src/mpid/ch3/channels/nemesis/nemesis/src/mpid_nem_mpich2_rma.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**windeserialize", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**windeserialize" );
-    /* src/mpid/ch3/channels/nemesis/src/ch3_init.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**init_progress", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**init_progress" );
-    {
-    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
-    int i1 = 1;
-    int i2 = 2;
-    int i3 = 3;
-    int i4 = 4;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**truncate", "**truncate %d %d %d %d", i1, i2, i3, i4 );
-    ChkMsg( err, MPI_ERR_OTHER, "**truncate %d %d %d %d" );
-    }
-    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|syncack", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ch3|syncack" );
-    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|loadsendiov", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ch3|loadsendiov" );
-    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|senddata", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ch3|senddata" );
-    /* src/mpid/ch3/channels/nemesis/src/ch3_progress.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|cancelresp", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ch3|cancelresp" );
     /* src/mpid/ch3/channels/sctp/src/ch3_init.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**argstr_port_name_tag", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**argstr_port_name_tag" );
@@ -4438,6 +4501,12 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/channels/shm/src/ch3_finalize.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**finalize_release_mem", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**finalize_release_mem" );
+    {
+    /* src/mpid/ch3/channels/shm/src/ch3_init.c */
+    int i1 = 1;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**fail", "**fail %d", i1 );
+    ChkMsg( err, MPI_ERR_OTHER, "**fail %d" );
+    }
     /* src/mpid/ch3/channels/shm/src/ch3_init.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**strncpy", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**strncpy" );
@@ -4676,9 +4745,6 @@ int main(int argc, char **argv)
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**progress_init", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**progress_init" );
     /* src/mpid/ch3/channels/ssm/src/ch3_progress_connect.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**MPIU_Strdup", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**MPIU_Strdup" );
-    /* src/mpid/ch3/channels/ssm/src/ch3_progress_connect.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**argstr_shmq", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**argstr_shmq" );
     /* src/mpid/ch3/channels/ssm/src/ch3_progress_connect.c */
@@ -4786,17 +4852,6 @@ int main(int argc, char **argv)
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**MapViewOfFileEx", "**MapViewOfFileEx %d", i1 );
     ChkMsg( err, MPI_ERR_OTHER, "**MapViewOfFileEx %d" );
     }
-    /* src/mpid/ch3/channels/ssm/src/ch3_shm_memory.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ftok", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ftok" );
-    {
-    /* src/mpid/ch3/channels/ssm/src/ch3_shm_memory.c */
-    char s1[] = "string1";
-    int i2 = 2;
-    int i3 = 3;
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ftok", "**ftok %s %d %d", s1, i2, i3 );
-    ChkMsg( err, MPI_ERR_OTHER, "**ftok %s %d %d" );
-    }
     /* src/mpid/ch3/src/ch3u_buffer.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dtypemismatch", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**dtypemismatch" );
@@ -4812,9 +4867,6 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/src/ch3u_eager.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|eagermsg", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|eagermsg" );
-    /* src/mpid/ch3/src/ch3u_eager.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**nomemreq", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**nomemreq" );
     /* src/mpid/ch3/src/ch3u_eager.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|postrecv", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|postrecv" );
@@ -4856,9 +4908,6 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/src/ch3u_handle_recv_pkt.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|rmamsg", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|rmamsg" );
-    /* src/mpid/ch3/src/ch3u_handle_recv_pkt.c */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|pktarraytoosmall", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**ch3|pktarraytoosmall" );
     /* src/mpid/ch3/src/ch3u_handle_recv_req.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**opnotpredefined", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**opnotpredefined" );
@@ -5222,6 +5271,17 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/util/shm/ch3i_shm_bootstrapq.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**mqshm_unlink", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**mqshm_unlink" );
+    /* src/mpid/ch3/util/shm/ch3i_shm_bootstrapq.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ftok", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**ftok" );
+    {
+    /* src/mpid/ch3/util/shm/ch3i_shm_bootstrapq.c */
+    char s1[] = "string1";
+    int i2 = 2;
+    int i3 = 3;
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ftok", "**ftok %s %d %d", s1, i2, i3 );
+    ChkMsg( err, MPI_ERR_OTHER, "**ftok %s %d %d" );
+    }
     /* src/mpid/ch3/util/shm/ch3u_finalize_sshm.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**finalize_boot", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**finalize_boot" );
@@ -5294,6 +5354,9 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/util/sock/ch3u_connect_sock.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|sock|connfailed", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|sock|connfailed" );
+    /* src/mpid/ch3/util/sock/findinterfaces.c */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**MPIU_Strdup", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**MPIU_Strdup" );
     /* src/mpid/ch3/util/unordered/unordered.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|pktordered", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|pktordered" );
@@ -5303,9 +5366,6 @@ int main(int argc, char **argv)
     /* src/mpid/ch3/util/unordered/unordered.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**ch3|ooocancelreq", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**ch3|ooocancelreq" );
-    /* src/mpid/common/datatype/mpid_datatype.h */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dtypecommit", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**dtypecommit" );
     /* src/mpid/common/sock/iocp/sock.c */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**socket", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**socket" );
@@ -5482,28 +5542,6 @@ int main(int argc, char **argv)
     char s2[] = "string2";
      err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|socket", "**sock|poll|socket %d %s", i1, s2 );
     ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|socket %d %s" );
-    }
-    /* src/mpid/common/sock/poll/sock_post.i */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setsndbufsz", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setsndbufsz" );
-    {
-    /* src/mpid/common/sock/poll/sock_post.i */
-    int i1 = 1;
-    int i2 = 2;
-    char s3[] = "string3";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setsndbufsz", "**sock|poll|setsndbufsz %d %d %s", i1, i2, s3 );
-    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setsndbufsz %d %d %s" );
-    }
-    /* src/mpid/common/sock/poll/sock_post.i */
-    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz", 0);
-    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz" );
-    {
-    /* src/mpid/common/sock/poll/sock_post.i */
-    int i1 = 1;
-    int i2 = 2;
-    char s3[] = "string3";
-     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz", "**sock|poll|setrcvbufsz %d %d %s", i1, i2, s3 );
-    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz %d %d %s" );
     }
     /* src/mpid/common/sock/poll/sock_post.i */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|connrefused", 0);
@@ -5794,6 +5832,31 @@ int main(int argc, char **argv)
     /* src/mpid/common/sock/poll/socki_util.i */
     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|eqmalloc", 0);
     ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|eqmalloc" );
+    /* src/mpid/common/sock/poll/socki_util.i */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setsndbufsz", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setsndbufsz" );
+    {
+    /* src/mpid/common/sock/poll/socki_util.i */
+    int i1 = 1;
+    int i2 = 2;
+    char s3[] = "string3";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setsndbufsz", "**sock|poll|setsndbufsz %d %d %s", i1, i2, s3 );
+    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setsndbufsz %d %d %s" );
+    }
+    /* src/mpid/common/sock/poll/socki_util.i */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz" );
+    {
+    /* src/mpid/common/sock/poll/socki_util.i */
+    int i1 = 1;
+    int i2 = 2;
+    char s3[] = "string3";
+     err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz", "**sock|poll|setrcvbufsz %d %d %s", i1, i2, s3 );
+    ChkMsg( err, MPI_ERR_OTHER, "**sock|poll|setrcvbufsz %d %d %s" );
+    }
+    /* src/mpid/common/datatype/mpid_datatype.h */
+    err = MPIR_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, "errcode::main", __LINE__, MPI_ERR_OTHER, "**dtypecommit", 0);
+    ChkMsg( err, MPI_ERR_OTHER, "**dtypecommit" );
     MPI_Finalize();
     return 0;
 }

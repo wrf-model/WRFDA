@@ -79,6 +79,7 @@ int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm)
     static const char FCNAME[] = "MPI_Comm_dup";
     int mpi_errno = MPI_SUCCESS;
     MPID_Comm *comm_ptr = NULL, *newcomm_ptr;
+    MPID_Attribute *new_attributes = 0;
     MPID_MPI_STATE_DECL(MPID_STATE_MPI_COMM_DUP);
 
     MPIR_ERRTEST_INITIALIZED_ORDIE();
@@ -117,6 +118,28 @@ int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm)
 #   endif /* HAVE_ERROR_CHECKING */
 
     /* ... body of routine ...  */
+
+    /* Copy attributes, executing the attribute copy functions */
+    /* This accesses the attribute dup function through the perprocess
+       structure to prevent comm_dup from forcing the linking of the
+       attribute functions.  The actual function is (by default)
+       MPIR_Attr_dup_list 
+    */
+    if (MPIR_Process.attr_dup) {
+	mpi_errno = MPIR_Process.attr_dup( comm_ptr->handle, 
+					   comm_ptr->attributes, 
+					   &new_attributes );
+	if (mpi_errno) {
+	    /* Note: The error code returned here should reflect the error code
+	       determined by the user routine called during the
+	       attribute duplication step.  Adding additional text to the 
+	       message associated with the code is allowable; changing the
+	       code is not */
+	    *newcomm = MPI_COMM_NULL;
+	    goto fn_fail;
+	}
+    }
+
     
     /* Generate a new context value and a new communicator structure */ 
     /* We must use the local size, because this is compared to the 
@@ -126,35 +149,7 @@ int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm)
 				&newcomm_ptr );
     if (mpi_errno) goto fn_fail;
 
-    /* Copy attributes, executing the attribute copy functions */
-    /* This accesses the attribute dup function through the perprocess
-       structure to prevent comm_dup from forcing the linking of the
-       attribute functions.  The actual function is (by default)
-       MPIR_Attr_dup_list 
-    */
-    if (MPIR_Process.attr_dup) {
-	newcomm_ptr->attributes = 0;
-	mpi_errno = MPIR_Process.attr_dup( comm_ptr->handle, 
-					   comm_ptr->attributes, 
-					   &newcomm_ptr->attributes );
-	if (mpi_errno)
-	{
-	    /* FIXME: The error code returned here should reflect the error code
-	       determined by the user routine called during the
-	       attribute duplication step.  Adding additional text to the 
-	       message associated with the code is allowable; changing the
-	       code is not */
-#if 0
-	    mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_RECOVERABLE, FCNAME, __LINE__, MPI_ERR_OTHER,
-		"**mpi_comm_dup", "**mpi_comm_dup %C %p", comm, newcomm);
-#endif
-	    *newcomm = MPI_COMM_NULL;
-	    /* FIXME : free newcomm (better yet, consider running 
-	     attribute dup functions before generating the new communicator) */
-	    goto fn_fail;
-	}
-    }
-
+    newcomm_ptr->attributes = new_attributes;
     *newcomm = newcomm_ptr->handle;
     
     /* ... end of body of routine ... */

@@ -12,6 +12,11 @@ C
        integer buf(10)
        integer file
        external myerrhanfunc
+CF90   INTERFACE 
+CF90   SUBROUTINE myerrhanfunc(vv0,vv1)
+CF90   INTEGER vv0,vv1
+CF90   END SUBROUTINE
+CF90   END INTERFACE
        integer myerrhan, qerr
        integer callcount, codesSeen(3)
        common /myerrhan/ callcount, codesSeen
@@ -100,6 +105,7 @@ C We can free our error handler now
        endif
 
        call mpi_file_close( file, ierr )
+       call mpi_comm_free( comm, ierr )
        call mpi_file_delete( "testfile.txt", MPI_INFO_NULL, ierr )
 C
 C Check error strings while here here...

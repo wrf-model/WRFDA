@@ -1,5 +1,7 @@
 echo "RUNNING SETUP FOR THE PROCESS LOCKS MODULE"
 
+#
+# Test for SPARC Compiler inline features.
 cat >lconftest.il << EOF
 void lock_acquire(int * lock);
 .inline lock_acquire, 4
@@ -32,7 +34,7 @@ if (eval $lac_compile) 2>lconftest.err ; then
     echo "SPARC V9 inline spin locks supported...yes"
     echo "SPARC V9 inline spin locks supported...yes" >>config.log
     if test -z "$HAVE_SPARC_INLINE_PROCESS_LOCKS" ; then
-        CFLAGS="$CFLAGS ${master_top_srcdir}/src/mpid/common/locks/mpidu_process_locks_sparc_v9.il"
+        LOCKCFLAGS="$LOCKCFLAGS ${master_top_srcdir}/src/mpid/common/locks/mpidu_process_locks_sparc_v9.il"
         HAVE_SPARC_INLINE_PROCESS_LOCKS=yes
         export HAVE_SPARC_INLINE_PROCESS_LOCKS
     fi
@@ -80,7 +82,7 @@ if (eval $lac_compile) 2>lconftest.err ; then
     # inline to be added to mpicc et al, which is definately *not* what
     # you want to do)
     if test -z "$HAVE_SPARC_INLINE_PROCESS_LOCKS" ; then
-        CFLAGS="$CFLAGS ${master_top_srcdir}/src/mpid/common/locks/mpidu_process_locks_sparc_v8.il"
+        LOCKCFLAGS="$LOCKCFLAGS ${master_top_srcdir}/src/mpid/common/locks/mpidu_process_locks_sparc_v8.il"
         HAVE_SPARC_INLINE_PROCESS_LOCKS=yes
         export HAVE_SPARC_INLINE_PROCESS_LOCKS
     fi
@@ -92,3 +94,4 @@ else
     cat lconftest.err >>config.log
 fi
 rm -f lconftest*
+export LOCKCFLAGS

@@ -108,7 +108,7 @@ int MPID_Datatype_set_contents(MPID_Datatype *new_dtp,
 
 void MPID_Datatype_free_contents(MPID_Datatype *dtp)
 {
-    int i, cnt, struct_sz = sizeof(MPID_Datatype_contents);
+    int i, struct_sz = sizeof(MPID_Datatype_contents);
     int align_sz = 8, epsilon;
     MPID_Datatype *old_dtp;
     MPI_Datatype *array_of_types;
@@ -123,11 +123,7 @@ void MPID_Datatype_free_contents(MPID_Datatype *dtp)
     for (i=0; i < dtp->contents->nr_types; i++) {
 	if (HANDLE_GET_KIND(array_of_types[i]) != HANDLE_KIND_BUILTIN) {
 	    MPID_Datatype_get_ptr(array_of_types[i], old_dtp);
-	    MPIU_Object_release_ref(old_dtp, &cnt);
-	    if (cnt == 0) {
-		/* last reference to this type */
-		MPID_Datatype_free(old_dtp);
-	    }
+	    MPID_Datatype_release(old_dtp);
 	}
     }
 

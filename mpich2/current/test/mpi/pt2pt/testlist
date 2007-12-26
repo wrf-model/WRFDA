@@ -1,7 +1,9 @@
 sendrecv1 4
 sendrecv2 2
 sendrecv3 2
+sendflood 8 timeLimit=600
 sendself 1
+sendall 4
 eagerdt 2
 pingping 2
 bottom 2
@@ -20,6 +22,7 @@ errinstatws 2
 errinstatwa 2
 icsend 4
 rqstatus 2
+rqfreeb 4
 greq1 1
 probe-unexp 4
 probenull 1

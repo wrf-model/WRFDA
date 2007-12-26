@@ -6,6 +6,9 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
@@ -30,7 +33,7 @@ INCLUDES = -I../include -I${srcdir}/../include
 	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-clean: 
+clean:  clean-local
 	-@rm -f *.o ${srcdir}/*.o exitst3 timeout exitst2 version finalized exitst1 initstat
 	-@rm -f exitst3.exe timeout.exe exitst2.exe version.exe finalized.exe exitst1.exe initstat.exe
 	-@rm -f core core.[0-9]*
@@ -48,19 +51,19 @@ remove-genmakefiles:
 	rm -f  Makefile
 all-redirect: exitst1 exitst2 exitst3 initstat version timeout finalized
 
-exitst3: exitst3.o   @MPILIBLOC@
+exitst3: exitst3.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o exitst3 exitst3.o  ${LIBS}
-timeout: timeout.o   @MPILIBLOC@
+timeout: timeout.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o timeout timeout.o  ${LIBS}
-exitst2: exitst2.o   @MPILIBLOC@
+exitst2: exitst2.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o exitst2 exitst2.o  ${LIBS}
-version: version.o   @MPILIBLOC@
+version: version.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o version version.o  ${LIBS}
-finalized: finalized.o   @MPILIBLOC@
+finalized: finalized.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o finalized finalized.o  ${LIBS}
-exitst1: exitst1.o   @MPILIBLOC@
+exitst1: exitst1.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o exitst1 exitst1.o  ${LIBS}
-initstat: initstat.o   @MPILIBLOC@
+initstat: initstat.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o initstat initstat.o  ${LIBS}
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
@@ -80,6 +83,14 @@ TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 
 ../util/mtest.o:
 	(cd ../util && $(MAKE) mtest.o)
+
+# A special testing target to simplify running just the init tests
+testing:
+	../runtests -srcdir=$(srcdir) -tests=testlist \
+		   -mpiexec=$(bindir)/mpiexec \
+		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

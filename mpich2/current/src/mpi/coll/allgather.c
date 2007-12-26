@@ -170,7 +170,8 @@ int MPIR_Allgather (
                                               curr_cnt, recvtype, dst,
                                               MPIR_ALLGATHER_TAG,  
                                               ((char *)recvbuf + recv_offset),
-                                              recvcount*mask, recvtype, dst,
+					      (comm_size-dst_tree_root)*recvcount,
+                                              recvtype, dst,
                                               MPIR_ALLGATHER_TAG, comm, &status);
 		    if (mpi_errno) { 
 			MPIU_ERR_POP(mpi_errno);
@@ -244,7 +245,7 @@ int MPIR_Allgather (
                                  (dst < tree_root + nprocs_completed) &&
                                  (rank >= tree_root + nprocs_completed)) {
                             mpi_errno = MPIC_Recv(((char *)recvbuf + offset),  
-                                                  recvcount*nprocs_completed, 
+						  (comm_size - (my_tree_root + mask))*recvcount,
                                                   recvtype, dst,
                                                   MPIR_ALLGATHER_TAG,
                                                   comm, &status); 
@@ -333,7 +334,8 @@ int MPIR_Allgather (
                                               curr_cnt, MPI_BYTE, dst,
                                               MPIR_ALLGATHER_TAG,  
                                               ((char *)tmp_buf + recv_offset),
-                                              nbytes*mask, MPI_BYTE, dst,
+					      tmp_buf_size - recv_offset,
+                                              MPI_BYTE, dst,
                                               MPIR_ALLGATHER_TAG, comm, &status);
 		    if (mpi_errno) { 
 			MPIU_ERR_POP(mpi_errno);
@@ -400,7 +402,7 @@ int MPIR_Allgather (
                                  (dst < tree_root + nprocs_completed) &&
                                  (rank >= tree_root + nprocs_completed)) {
                             mpi_errno = MPIC_Recv(((char *)tmp_buf + offset),
-                                                  nbytes*nprocs_completed,
+                                                  tmp_buf_size - offset,
                                                   MPI_BYTE, dst,
                                                   MPIR_ALLGATHER_TAG,
                                                   comm, &status); 

@@ -7,10 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "mpitest.h"
 
 static char MTEST_Descrip[] = "Test contig asynchronous I/O";
-#define SIZE (65536)
+#define DEFAULT_SIZE (65536)
 
 /* Uses asynchronous I/O. Each process writes to separate files and
    reads them back. The file name is taken as a command-line argument,
@@ -19,11 +20,16 @@ static char MTEST_Descrip[] = "Test contig asynchronous I/O";
 int main(int argc, char **argv)
 {
     int *buf, i, rank, nints, len;
-    char *filename, *tmp;
+    char *filename=0, *tmp;
     int errs=0;
+    int SIZE = DEFAULT_SIZE;
     MPI_File fh;
     MPI_Status status;
+#ifdef MPIO_USES_MPI_REQUEST
+    MPI_Request request;
+#else
     MPIO_Request request;
+#endif
 
     MTest_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -32,35 +38,53 @@ int main(int argc, char **argv)
    broadcasts it to other processes */
     if (!rank) {
 	i = 1;
-	while ((i < argc) && strcmp("-fname", *argv)) {
-	    i++;
-	    argv++;
+	argv++;
+	/* Skip unrecognized arguments */
+	while (i < argc) {
+	    if (strcmp( *argv, "-fname" ) == 0) {
+		argv++;
+		i++;
+		len = (int)strlen(*argv);
+		filename = (char *) malloc(len+10);
+		strcpy(filename, *argv);
+	    }
+	    else if (strcmp( *argv, "-size" ) == 0) {
+		argv++;
+		i++;
+		SIZE = strtol( *argv, 0, 10 );
+		if (errno) {
+		    fprintf( stderr, "-size requires a numeric argument\n" );
+		    MPI_Abort( MPI_COMM_WORLD, 1 );
+		}
+		else if (SIZE <= 0) {
+		    fprintf( stderr, "-size requires a positive value\n" );
+		}
+	    }
+	    else {
+		i++;
+		argv++;
+	    }
 	}
-	if (i >= argc) {
+
+	if (!filename) {
 	    /* Use a default filename of testfile */
 	    len      = 8;
 	    filename = (char *)malloc(len + 10);
 	    strcpy( filename, "testfile" );
-	    /* 
-	    fprintf(stderr, "\n*#  Usage: async -fname filename\n\n");
-	    MPI_Abort(MPI_COMM_WORLD, 1);
-	    */
-	}
-	else {
-	    argv++;
-	    len = (int)strlen(*argv);
-	    filename = (char *) malloc(len+10);
-	    strcpy(filename, *argv);
 	}
 	MPI_Bcast(&len, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(filename, len+10, MPI_CHAR, 0, MPI_COMM_WORLD);
+	MPI_Bcast( &SIZE, 1, MPI_INT, 0, MPI_COMM_WORLD );
     }
     else {
 	MPI_Bcast(&len, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	filename = (char *) malloc(len+10);
 	MPI_Bcast(filename, len+10, MPI_CHAR, 0, MPI_COMM_WORLD);
+	MPI_Bcast( &SIZE, 1, MPI_INT, 0, MPI_COMM_WORLD );
     }
 
+
+    /*     printf( "Starting (size=%d, file=%s)...\n", SIZE, filename ); fflush(stdout); */
 
     buf = (int *) malloc(SIZE);
     nints = SIZE/sizeof(int);
@@ -70,6 +94,7 @@ int main(int argc, char **argv)
     tmp = (char *) malloc(len+10);
     strcpy(tmp, filename);
     sprintf(filename, "%s.%d", tmp, rank);
+    free(tmp);
 
     MPI_File_open(MPI_COMM_SELF, filename, MPI_MODE_CREATE | MPI_MODE_RDWR, 
                   MPI_INFO_NULL, &fh);
@@ -100,13 +125,17 @@ int main(int argc, char **argv)
     for (i=0; i<nints; i++) {
 	if (buf[i] != (rank*100000 + i)) {
 	    errs++;
-	    fprintf(stderr, "Process %d: error, read %d, should be %d\n", rank, buf[i], rank*100000+i);
+	    if (errs < 25) {
+		fprintf(stderr, "Process %d: error, read %d, should be %d\n", rank, buf[i], rank*100000+i);
+	    }
+	    else if (errs == 25) {
+		fprintf(stderr, "Reached maximum number of errors to report\n" );
+	    }
 	}
     }
 
     free(buf);
     free(filename);
-    free(tmp);
 
     MTest_Finalize(errs);
     MPI_Finalize();

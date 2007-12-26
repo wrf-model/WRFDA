@@ -15,8 +15,8 @@
       integer comm, ans
       integer i, j
       logical mtestGetIntraComm
-! Include addsize defines aint as an address-sized integer
-      integer (kind=MPI_ADDRESS_KIND) aint
+! Include addsize defines asize as an address-sized integer
+      integer (kind=MPI_ADDRESS_KIND) asize
 
       
       errs = 0
@@ -24,8 +24,8 @@
 
       call mpi_type_size( MPI_INTEGER, intsize, ierr )
       do while( mtestGetIntraComm( comm, 2, .false. ) ) 
-         aint  = nrows * (ncols + 2) * intsize
-         call mpi_win_create( buf, aint, intsize * nrows,  &
+         asize  = nrows * (ncols + 2) * intsize
+         call mpi_win_create( buf, asize, intsize * nrows,  &
       &                        MPI_INFO_NULL, comm, win, ierr )
          
          call mpi_comm_size( comm, size, ierr )
@@ -51,11 +51,13 @@
          enddo
          call mpi_win_fence( MPI_MODE_NOPRECEDE, win, ierr )
 !         
+         asize = ncols + 1
          call mpi_accumulate( buf(1,1), nrows, MPI_INTEGER,  &
-      &                 left, ncols+1,  &
+      &                 left, asize,  &
       &                 nrows, MPI_INTEGER, MPI_SUM, win, ierr )
-         call mpi_accumulate( buf(1,ncols), nrows, MPI_INTEGER, right,0,  &
-      &                 nrows, MPI_INTEGER, MPI_SUM, win, ierr )
+         asize = 0
+         call mpi_accumulate( buf(1,ncols), nrows, MPI_INTEGER, right, &
+      &                 asize, nrows, MPI_INTEGER, MPI_SUM, win, ierr )
 !         
          call mpi_win_fence( MPI_MODE_NOSTORE + MPI_MODE_NOPUT +  &
       &                       MPI_MODE_NOSUCCEED, win, ierr )

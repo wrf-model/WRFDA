@@ -9,7 +9,10 @@
 short description 
 <H2>Synopsis</H2>
 <PRE>
-int MPI_Comm_spawn_multiple(int count, char *array_of_commands[], char* *array_of_argv[], int array_of_maxprocs[], MPI_Info array_of_info[], int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]) 
+int MPI_Comm_spawn_multiple(int count, char *array_of_commands[], 
+                          char* *array_of_argv[], int array_of_maxprocs[], 
+                          MPI_Info array_of_info[], int root, MPI_Comm comm, 
+                          MPI_Comm *intercomm, int array_of_errcodes[]) 
 </PRE>
 <H2>Input Parameters</H2>
 <DL>
@@ -75,6 +78,8 @@ communicator in a call (not even allowed in <TT>MPI_Comm_rank</TT>).
 identified by a specific error class (e.g., <TT>MPI_ERR_RANK</TT>).
 </DL>
 <DL><DT><B>MPI_ERR_INFO </B> <DD> Invalid Info 
+</DL>
+<DL><DT><B>MPI_ERR_SPAWN </B> <DD> 
 </DL>
 <P><B>Location:</B>comm_spawn_multiple.c<P>
 </BODY></HTML>

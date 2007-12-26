@@ -20,6 +20,12 @@
 #include <sys/types.h>
 #endif
 
+#if !defined( CLOG_NOMPI )
+#include "mpi.h"
+#else
+#include "mpi_null.h"
+#endif /* Endof if !defined( CLOG_NOMPI ) */
+
 /*
    Definitions for CLOG's Universal Unique ID implementation
 */
@@ -27,15 +33,15 @@
 #include "clog_uuid.h"
 #include "clog_util.h"
 
-#if !defined( CLOG_NOMPI )
-#include "mpi.h"
+
 #if defined( NEEDS_SRAND48_DECL )
 void srand48(long seedval);
 #endif
 #if defined( NEEDS_LRAND48_DECL )
-#endif
 long lrand48(void);
 #endif
+
+
 
 static char CLOG_UUID_NULL_NAME[ CLOG_UUID_NAME_SIZE ]  = {0};
 /* const  char CLOG_UUID_NULL[ CLOG_UUID_SIZE ]            = {0}; */
@@ -43,7 +49,6 @@ const  CLOG_Uuid_t CLOG_UUID_NULL                       = {0};
 
 void CLOG_Uuid_init( void )
 {
-#if !defined( CLOG_NOMPI )
 #ifdef HAVE_WINDOWS_H
     srand(getpid());
 #else
@@ -52,7 +57,6 @@ void CLOG_Uuid_init( void )
     proc_pid = getpid();
     srand48( (long) proc_pid );
 #endif
-#endif
 }
 
 void CLOG_Uuid_finalize( void )
@@ -60,7 +64,6 @@ void CLOG_Uuid_finalize( void )
 
 void CLOG_Uuid_generate( CLOG_Uuid_t uuid )
 {
-#if !defined( CLOG_NOMPI )
     CLOG_int32_t  random_number;
     double        time;
     int           namelen;
@@ -91,9 +94,6 @@ void CLOG_Uuid_generate( CLOG_Uuid_t uuid )
     }
     else /* if ( namelen >= CLOG_UUID_NAME_SIZE ) */
         memcpy( ptr, processor_name, CLOG_UUID_NAME_SIZE );
-#else
-    memcpy( uuid, CLOG_UUID_NULL_NAME, CLOG_UUID_NAME_SIZE );
-#endif
 }
 
 /*

@@ -3,7 +3,7 @@ if test -z "${channel_args}" ; then
     nemesis_network="tcp"
 else
     case "${channel_args}" in
-	elan | gm | mx | tcp | newtcp | sctp | ib | none )
+	elan | gm | mx | tcp | newtcp | sctp | ib | psm | none )
 	    nemesis_network=${channel_args}
 	    ;;
 	* )
@@ -14,16 +14,16 @@ else
 fi
 
 #eval _conf_array=($ac_configure_args) 
-eval _conf_array=\($ac_configure_args\) 
+#eval _conf_array=\($ac_configure_args\) 
 
-for arg in "${_conf_array[@]}" ; do
-  case "$arg" in  
-    --with-papi=* ) 
-      papi_dir=`echo "$arg" | sed 's/--with-papi=//'` 
-      ;;
-    --enable-fast* )
-      enable_fast="yes"
-      ;;
+#for arg in "${_conf_array[@]}" ; do
+#  case "$arg" in  
+#    --with-papi=* ) 
+#      papi_dir=`echo "$arg" | sed 's/--with-papi=//'` 
+#      ;;
+#    --enable-fast* )
+#      enable_fast="yes"
+#      ;;
 #     --with-perfctr=* ) 
 #       perfctr_dir=`echo "$arg" | sed 's/--with-perfctr=//'` 
 #       ;;
@@ -36,7 +36,7 @@ for arg in "${_conf_array[@]}" ; do
 #     --with-gm-lib=* ) 
 #       gm_lib_dir=`echo "$arg" | sed 's/--with-gm-lib=//'` 
 #       ;;
-  esac 
-done 
+#  esac 
+#done 
 
 # export papi_dir perfctr_dir gm_dir gm_include_dir gm_lib_dir

@@ -58,12 +58,17 @@ int main( int argc, char *argv[] )
 	errval = MPI_Waitall( 2, r, s );
 	if (errval != MPI_ERR_IN_STATUS) {
 	    errs++;
-	    printf( "Did not get ERR_IN_STATUS in Testall\n" );
+	    printf( "Did not get ERR_IN_STATUS in Waitall\n" );
 	}
 	else {
 	    /* Check for success */
+	    /* We allow ERR_PENDING (neither completed nor in error) in case
+	       the MPI implementation exits the Waitall when an error 
+	       is detected. Thanks to Jim Hoekstra of Iowa State University
+	       and Kim McMahon for finding this bug in the test. */
 	    for (i=0; i<2; i++) {
-		if (s[i].MPI_TAG < 10 && s[i].MPI_ERROR != MPI_SUCCESS) {
+		if (s[i].MPI_TAG < 10 && (s[i].MPI_ERROR != MPI_SUCCESS &&
+			                  s[i].MPI_ERROR != MPI_ERR_PENDING)) {
 		    char msg[MPI_MAX_ERROR_STRING];
 		    int msglen = MPI_MAX_ERROR_STRING;
 		    errs++;

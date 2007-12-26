@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: mpichtimer.h.in,v 1.2 2006/01/03 22:03:52 gropp Exp $
+/*  $Id: mpichtimer.h.in,v 1.4.6.2 2007/09/26 17:24:57 buntinas Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -71,10 +71,7 @@ typedef @MPID_TIMER_TYPE@ MPID_Time_t;
   For example, the for Intel x86 and gcc, 
 .vb
 #define MPID_Wtime(timeval) \
-    __asm__ __volatile__  ( "cpuid ; rdtsc ; mov %%edx,%1 ; mov %%eax,%0" \
-                            : "=m" (*((char *) (var_ptr))), \
-                              "=m" (*(((char *) (var_ptr))+4)) \
-                            :: "eax", "ebx", "ecx", "edx" ); \
+     __asm__ __volatile__("rdtsc" : "=A" (*timeval))
 .ve
 
   For some purposes, it is important
@@ -225,17 +222,28 @@ void MPID_Wtime_init(void);
 #define MPIDM_Wtime_todouble MPID_Wtime_todouble
 
 #elif MPICH_TIMER_KIND == USE_LINUX86_CYCLE
-/* This is a new version of the cycle counter, based on the read time stamp
-   (rdtsc) instruction */
-/* There may be a better way to read the two 32 bit values into a single
-   long long, but this should work */
-#define MPID_Wtime(var_ptr) \
-{ \
-    __asm__ __volatile__  ( "cpuid ; rdtsc ; mov %%edx,%1 ; mov %%eax,%0" \
-                            : "=m" (*((char *) (var_ptr))), \
-                              "=m" (*(((char *) (var_ptr))+4)) \
-                            :: "eax", "ebx", "ecx", "edx" ); \
-}
+/* The rdtsc instruction is not a "serializing" instruction, so the
+   processor is free to reorder it.  In order to get more accurate
+   timing numbers with rdtsc, we need to put a serializing
+   instruction, like cpuid, before rdtsc.  X86_64 architectures have
+   the rdtscp instruction which is synchronizing, we use this when we
+   can. */
+#ifdef LINUX86_CYCLE_RDTSCP
+#define MPID_Wtime(var_ptr)                                                                     \
+    __asm__ __volatile__("rdtscp; shl $32, %%rdx; or %%rdx, %%rax" : "=a" (*var_ptr) : : "ecx", "rdx")
+#elif defined(LINUX86_CYCLE_CPUID_RDTSC)
+/* Here we have to save the ebx register for when the compiler is
+   generating position independent code (e.g., when it's generating
+   shared libraries) */
+#define MPID_Wtime(var_ptr)                                                                     \
+     __asm__ __volatile__("push %%ebx ; cpuid ; rdtsc ; pop %%ebx" : "=A" (*var_ptr) : : "ecx")
+#elif defined(LINUX86_CYCLE_RDTSC)
+/* The configure test using cpuid must have failed, try just rdtsc by itself */
+#define MPID_Wtime(var_ptr) __asm__ __volatile__("rdtsc" : "=A" (*var_ptr))
+#else
+#error Dont know which Linux timer to use
+#endif
+
 extern double MPID_Seconds_per_tick;
 #define MPIDM_Wtime_todouble(t, d) *d = (double)*t * MPID_Seconds_per_tick
 

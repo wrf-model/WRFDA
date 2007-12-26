@@ -7,6 +7,8 @@ MPI_CC               = @MPI_CC@
 MPI_F77              = @MPI_F77@
 MPI_CLINKER          = $(MPI_CC)
 MPI_FLINKER          = $(MPI_F77)
+MPE_CLINKER          = @MPE_CLINKER@
+MPE_FLINKER          = @MPE_FLINKER@
 #
 DEBUG_LIBS           = @DEBUG_LIBS@
 MPI_INC              = @MPI_INC@
@@ -53,13 +55,16 @@ default: $(EXECS)
 	 fi
 
 cpi_anim@EXEEXT@: cpi.@OBJEXT@
-	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(ANIM_LIBS) $(DEBUG_LIBS) -lm 
+	$(MPE_CLINKER)mpianim $(CC_LDFLAGS) -o $@ $? $(DEBUG_LIBS) -lm 
+#	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(ANIM_LIBS) $(DEBUG_LIBS) -lm 
 
 cxgraphics@EXEEXT@: cxgraphics.@OBJEXT@
-	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(C_XGRAPH_LIBS) $(DEBUG_LIBS) -lm
+	$(MPE_CLINKER)graphics $(CC_LDFLAGS) -o $@ $? $(DEBUG_LIBS) -lm
+#	$(MPI_CLINKER) $(CC_LDFLAGS) -o $@ $? $(C_XGRAPH_LIBS) $(DEBUG_LIBS) -lm
 
 fxgraphics@EXEEXT@: fxgraphics.@OBJEXT@
-	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(F_XGRAPH_LIBS) $(DEBUG_LIBS) -lm
+	$(MPE_FLINKER)graphics $(FC_LDFLAGS) -o $@ $? $(DEBUG_LIBS) -lm
+#	$(MPI_FLINKER) $(FC_LDFLAGS) -o $@ $? $(F_XGRAPH_LIBS) $(DEBUG_LIBS) -lm
 
 linktest: linktest_C
 

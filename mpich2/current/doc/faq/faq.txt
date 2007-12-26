@@ -237,6 +237,16 @@ of ifort.
 
 If you do not need Fortran 90, you can configure with \texttt{--disable-f90}.
 
+%% Heading: Q: The build fails when I use parallel make
+%% Filename: parmake
+%% End
+Parallel make (often invoked with \texttt{make -j4}) will cause several 
+job steps in the build process to update the same library file
+(\texttt{libmpich.a}) concurrently.  Unfortunately, neither the
+\texttt{ar} nor the \texttt{ranlib} programs correctly handle
+this case, and the result is a corrupted library.  For now, the
+solution is to not use a parallel make when building MPICH2.
+
 % ----------------------------------------------------------------------------
 %% Section: Windows version of MPICH2
 %% Heading: I am having trouble installing and using the Windows version of MPICH2
@@ -299,7 +309,7 @@ before including \texttt{mpi.h}.
 %% Filename: envvars
 %% End
 A: The specific method depends on the process manager and version of 
-\texttt{mpiexec} that you are using. 
+\texttt{mpiexec} that you are using.  See the appropriate specific section.
 
 %% Heading: Q:  How do I pass environment variables to the processes of \
 my parallel program when using the mpd process manager?
@@ -424,6 +434,16 @@ can be used.  The \texttt{xlf} compiler supports
 \end{verbatim}
 where the argument is the Fortran logical unit number (here
 \texttt{6}, which is often the unit number associated with \texttt{PRINT}).
+With the G95 Fortran 95 compiler, set the environment variable 
+\texttt{G95\_UNBUFFERED\_6} to cause output to unit 6 to be unbuffered.
+
+%% Heading: Q: Fortran programs using stdio fail when using g95
+%% Filename: g95-stdio
+%% End
+A: By default, g95 does not flush output to stdout.  This also appears
+to cause problems for standard input.  If you are using the Fortran logical
+units 5 and 6 (or the \texttt{*} unit) for standard input and output, set the 
+environment variable \texttt{G95\_UNBUFFERED\_6} to \texttt{yes}.
 
 %% Heading: Q: How do I run MPI programs in the background when using the default MPD process manager? 
 %% Filename: background

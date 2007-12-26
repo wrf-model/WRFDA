@@ -34,7 +34,7 @@
 **ch3|unknownpkt %d:received unknown packet type (type=%d)
 **ch3|unknownpkt:received unknown packet type
 **ch3|get_parent_port:spawn process group was unable to obtain parent port name from the channel
-**ch3|get_parent_port_err_bcast:an error occurred while broadcasting the error code from MPIDI_CH3_Get_parent_port()
+**ch3|get_parent_port_err_bcast:an error occurred while broadcasting the error code from MPIDI_CH3_GetParentPort()
 **ch3|conn_parent:spawned process group was unable to connect back to the parent
 **ch3|conn_parent %s:spawned process group was unable to connect back to the parent on port <%s>
 **ch3|unhandled_connection_state:encountered an unexpected connection state

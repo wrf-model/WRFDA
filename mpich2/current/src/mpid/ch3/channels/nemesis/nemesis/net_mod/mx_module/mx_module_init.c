@@ -294,9 +294,12 @@ MPID_nem_mx_module_vc_init (MPIDI_VC_t *vc, const char *business_card)
    int mpi_errno = MPI_SUCCESS;
    int ret;
    
+   /* first make sure that our private fields in the vc fit into the area provided  */
+   MPIU_Assert(sizeof(MPID_nem_mx_module_vc_area) <= MPID_NEM_VC_NETMOD_AREA_LEN);
+
    if( MPID_nem_mem_region.ext_procs > 0)
      {
-	mpi_errno = MPID_nem_mx_module_get_from_bc (business_card, &vc->ch.remote_endpoint_id, &vc->ch.remote_nic_id);
+	mpi_errno = MPID_nem_mx_module_get_from_bc (business_card, &VC_FIELD(vc, remote_endpoint_id), &VC_FIELD(vc, remote_nic_id));
 	/* --BEGIN ERROR HANDLING-- */   
 	if (mpi_errno) 
 	  {	
@@ -305,8 +308,8 @@ MPID_nem_mx_module_vc_init (MPIDI_VC_t *vc, const char *business_card)
 	/* --END ERROR HANDLING-- */
 	
 	ret = mx_connect(MPID_nem_module_mx_local_endpoint,
-			 vc->ch.remote_nic_id,
-			 vc->ch.remote_endpoint_id,
+			 VC_FIELD(vc, remote_nic_id),
+			 VC_FIELD(vc, remote_endpoint_id),
 			 MPID_nem_module_mx_filter,
 			 MPID_nem_module_mx_timeout,
 			 &MPID_nem_module_mx_endpoints_addr[vc->pg_rank]);
@@ -316,6 +319,22 @@ MPID_nem_mx_module_vc_init (MPIDI_VC_t *vc, const char *business_card)
    fn_exit:
        return mpi_errno;
    fn_fail:
+       goto fn_exit;
+}
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_mx_module_vc_destroy
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPID_nem_mx_module_vc_destroy(MPIDI_VC_t *vc)
+{
+    int mpi_errno = MPI_SUCCESS;   
+
+    /* free any resources associated with this VC here */
+
+ fn_exit:   
+       return mpi_errno;
+ fn_fail:
        goto fn_exit;
 }
 

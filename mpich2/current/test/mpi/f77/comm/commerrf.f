@@ -10,6 +10,11 @@ C
        character*(MPI_MAX_ERROR_STRING) errstring
        integer comm, rlen
        external myerrhanfunc
+CF90   INTERFACE 
+CF90   SUBROUTINE myerrhanfunc(vv0,vv1)
+CF90   INTEGER vv0,vv1
+CF90   END SUBROUTINE
+CF90   END INTERFACE
        integer myerrhan, qerr
        integer callcount, codesSeen(3)
        common /myerrhan/ callcount, codesSeen

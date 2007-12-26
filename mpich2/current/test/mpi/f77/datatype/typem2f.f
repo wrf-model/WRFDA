@@ -26,54 +26,54 @@ C
 C
       call mpi_type_size( MPI_INTEGER, intsize, ierr )
 C
-      asizev(1) = 0
-      asizev(2) = 3 * intsize
-      call mpi_type_create_resized( MPI_INTEGER, asizev(1), asizev(2), 
+      aintv(1) = 0
+      aintv(2) = 3 * intsize
+      call mpi_type_create_resized( MPI_INTEGER, aintv(1), aintv(2), 
      &                              type1, ierr )
       call mpi_type_commit( type1, ierr )
-      asizev(1) = -1
-      asizev(2) = -1
-      call mpi_type_get_extent( type1, asizev(1), asizev(2), ierr )
-      if (asizev(1) .ne. 0) then
+      aintv(1) = -1
+      aintv(2) = -1
+      call mpi_type_get_extent( type1, aintv(1), aintv(2), ierr )
+      if (aintv(1) .ne. 0) then
          errs = errs + 1
          print *, 'Did not get expected lb'
       endif
-      if (asizev(2) .ne. 3*intsize) then
+      if (aintv(2) .ne. 3*intsize) then
          errs = errs + 1
          print *, 'Did not get expected extent'
       endif
-      asizev(1) = -1
-      asizev(2) = -1
-      call mpi_type_get_true_extent( type1, asizev(1), asizev(2), ierr )
-      if (asizev(1) .ne. 0) then
+      aintv(1) = -1
+      aintv(2) = -1
+      call mpi_type_get_true_extent( type1, aintv(1), aintv(2), ierr )
+      if (aintv(1) .ne. 0) then
          errs = errs + 1
          print *, 'Did not get expected true lb'
       endif
-      if (asizev(2) .ne. intsize) then
+      if (aintv(2) .ne. intsize) then
          errs = errs + 1
-         print *, 'Did not get expected true extent (', asizev(2), ') ',
+         print *, 'Did not get expected true extent (', aintv(2), ') ',
      &     ' expected ', intsize
       endif
 C
       do i=1,10
          blocklens(i) = 1
-         asizev(i)    = (i-1) * 3 * intsize
+         aintv(i)    = (i-1) * 3 * intsize
       enddo
-      call mpi_type_create_hindexed( 10, blocklens, asizev, 
+      call mpi_type_create_hindexed( 10, blocklens, aintv, 
      &                               MPI_INTEGER, type2, ierr )
       call mpi_type_commit( type2, ierr )
 C
-      asize = 3 * intsize
-      call mpi_type_create_hvector( 10, 1, asize, MPI_INTEGER, type3, 
+      aint = 3 * intsize
+      call mpi_type_create_hvector( 10, 1, aint, MPI_INTEGER, type3, 
      &                              ierr )
       call mpi_type_commit( type3, ierr )
 C
       do i=1,10
          blocklens(i) = 1
          dtypes(i)    = MPI_INTEGER
-         asizev(i)    = (i-1) * 3 * intsize
+         aintv(i)    = (i-1) * 3 * intsize
       enddo
-      call mpi_type_create_struct( 10, blocklens, asizev, dtypes,
+      call mpi_type_create_struct( 10, blocklens, aintv, dtypes,
      &                             type4, ierr )
       call mpi_type_commit( type4, ierr )
 

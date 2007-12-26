@@ -60,7 +60,17 @@ extern struct MPID_Request *MPIDI_CH3I_active_send[CH3_NUM_QUEUES];
 
 int MPIDI_CH3I_Progress_init(void);
 int MPIDI_CH3I_Progress_finalize(void);
-int MPIDI_CH3I_Progress_poke(void);
+
+int MPIDI_CH3I_SendEagerNoncontig( MPIDI_VC_t *vc, MPID_Request *sreq, void *header, MPIDI_msg_sz_t hdr_sz );
+
+int MPID_nem_lmt_shm_initiate_lmt(MPIDI_VC_t *vc, MPIDI_CH3_Pkt_t *rts_pkt, MPID_Request *req);
+int MPID_nem_lmt_shm_start_recv(MPIDI_VC_t *vc, MPID_Request *req, MPID_IOV s_cookie);
+int MPID_nem_lmt_shm_start_send(MPIDI_VC_t *vc, MPID_Request *req, MPID_IOV r_cookie);
+int MPID_nem_lmt_shm_handle_cookie(MPIDI_VC_t *vc, MPID_Request *req, MPID_IOV cookie);
+int MPID_nem_lmt_shm_done_send(MPIDI_VC_t *vc, MPID_Request *req);
+int MPID_nem_lmt_shm_done_recv(MPIDI_VC_t *vc, MPID_Request *req);
+
+int MPID_nem_handle_pkt(MPIDI_VC_t *vc, char *buf, MPIDI_msg_sz_t buflen);
 
 /* #define BYPASS_PROGRESS */
 
@@ -71,6 +81,75 @@ int MPIDI_CH3I_Progress_poke(void);
 /* int MPIDI_CH3I_sock_errno_to_mpi_errno(char * fcname, int sock_errno); */
 /* int MPIDI_CH3I_Get_business_card(char *value, int length); */
 
+struct MPIDI_VC;
+struct MPID_Request;
+struct MPID_nem_copy_buf;
+union MPIDI_CH3_Pkt;
+struct MPID_nem_lmt_shm_wait_element;
+struct MPIDI_CH3_PktGeneric;
+
+typedef struct MPIDI_CH3I_VC
+{
+    int pg_rank;
+    struct MPID_Request *recv_active;
+
+    int is_local;
+    unsigned short send_seqno;
+    MPID_nem_fbox_mpich2_t *fbox_out;
+    MPID_nem_fbox_mpich2_t *fbox_in;
+    MPID_nem_queue_ptr_t recv_queue;
+    MPID_nem_queue_ptr_t free_queue;
+
+    int node_id;
+
+    /* temp buffer to store partially received header */
+    MPIDI_msg_sz_t pending_pkt_len;
+    struct MPIDI_CH3_PktGeneric *pending_pkt;
+
+    /* can be used by netmods to put this vc on a send queue or list */
+    struct MPIDI_VC *next;
+    struct MPIDI_VC *prev;
+
+    enum {MPID_NEM_VC_STATE_CONNECTED, MPID_NEM_VC_STATE_DISCONNECTED} state;
+
+    /* contig function pointers.  Netmods should set these. */
+    /* iStartContigMsg -- sends a message consisting of a header (hdr) and contiguous data (data), possibly of 0 size.  If the
+       message cannot be sent immediately, the function should create a request and return a pointer in sreq_ptr.  The network
+       module should complete the request once the message has been completely sent. */
+    int (* iStartContigMsg)(struct MPIDI_VC *vc, void *hdr, MPIDI_msg_sz_t hdr_sz, void *data, MPIDI_msg_sz_t data_sz,
+                            struct MPID_Request **sreq_ptr);
+    /* iSentContig -- sends a message consisting of a header (hdr) and contiguous data (data), possibly of 0 size.  The
+       network module should complete the request once the message has been completely sent. */
+    int (* iSendContig)(struct MPIDI_VC *vc, struct MPID_Request *sreq, void *hdr, MPIDI_msg_sz_t hdr_sz,
+                        void *data, MPIDI_msg_sz_t data_sz);
+
+    /* LMT function pointers */
+    int (* lmt_initiate_lmt)(struct MPIDI_VC *vc, union MPIDI_CH3_Pkt *rts_pkt, struct MPID_Request *req);
+    int (* lmt_start_recv)(struct MPIDI_VC *vc, struct MPID_Request *req, MPID_IOV s_cookie);
+    int (* lmt_start_send)(struct MPIDI_VC *vc, struct MPID_Request *sreq, MPID_IOV r_cookie);
+    int (* lmt_handle_cookie)(struct MPIDI_VC *vc, struct MPID_Request *req, MPID_IOV cookie);
+    int (* lmt_done_send)(struct MPIDI_VC *vc, struct MPID_Request *req);
+    int (* lmt_done_recv)(struct MPIDI_VC *vc, struct MPID_Request *req);
+
+    /* LMT shared memory copy-buffer ptr */
+    volatile struct MPID_nem_copy_buf *lmt_copy_buf;
+    char *lmt_copy_buf_handle;
+    int lmt_buf_num;
+    struct {struct MPID_nem_lmt_shm_wait_element *head, *tail;} lmt_queue;
+    struct MPID_nem_lmt_shm_wait_element *lmt_active_lmt;
+    int lmt_enqueued; /* FIXME: used for debugging */
+
+    struct 
+    {
+        char padding[MPID_NEM_VC_NETMOD_AREA_LEN];
+    } netmod_area;
+    
+
+    /* FIXME: ch3 assumes there is a field called sendq_head in the ch
+       portion of the vc.  This is unused in nemesis and should be set
+       to NULL */
+    void *sendq_head;
+} MPIDI_CH3I_VC;
 
 
 #endif /* !defined(MPICH_MPIDI_CH3_IMPL_H_INCLUDED) */

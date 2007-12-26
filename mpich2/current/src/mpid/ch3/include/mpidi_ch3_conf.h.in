@@ -133,6 +133,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Define if _POSIX_C_SOURCE needs to be undefined for struct ifconf */
+#undef USE_NOPOSIX_FOR_IFCONF
+
 /* Define if _SVID_SOURCE needs to be defined for struct ifconf */
 #undef USE_SVIDSOURCE_FOR_IFCONF
 

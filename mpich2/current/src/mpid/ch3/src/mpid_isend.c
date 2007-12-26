@@ -91,7 +91,8 @@ int MPID_Isend(const void * buf, int count, MPI_Datatype datatype, int rank,
 	MPIDI_Pkt_set_seqnum(eager_pkt, seqnum);
 	MPIDI_Request_set_seqnum(sreq, seqnum);
 	
-	mpi_errno = MPIDI_CH3_iSend(vc, sreq, eager_pkt, sizeof(*eager_pkt));
+	mpi_errno = MPIU_CALL(MPIDI_CH3,iSend(vc, sreq, eager_pkt, 
+					      sizeof(*eager_pkt)));
 	/* --BEGIN ERROR HANDLING-- */
 	if (mpi_errno != MPI_SUCCESS)
 	{
@@ -110,7 +111,7 @@ int MPID_Isend(const void * buf, int count, MPI_Datatype datatype, int rank,
     /* FIXME: flow control: limit number of outstanding eager messsages 
        containing data and need to be buffered by the receiver */
 
-    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_send_t) <=	MPIDI_CH3_EAGER_MAX_MSG_SIZE)
+    if (data_sz + sizeof(MPIDI_CH3_Pkt_eager_send_t) <=	vc->eager_max_msg_sz)
     {
 	if (dt_contig)
 	{
@@ -123,10 +124,10 @@ int MPID_Isend(const void * buf, int count, MPI_Datatype datatype, int rank,
 	else
 	{
 	    mpi_errno = MPIDI_CH3_EagerNoncontigSend( &sreq, 
-						      MPIDI_CH3_PKT_EAGER_SEND,
-						      buf, count, datatype,
-						      data_sz, rank, tag, 
-						      comm, context_offset );
+                                                      MPIDI_CH3_PKT_EAGER_SEND,
+                                                      buf, count, datatype,
+                                                      data_sz, rank, tag, 
+                                                      comm, context_offset );
 	    /* If we're not complete, then add a reference to the datatype */
 	    if (sreq && sreq->dev.OnDataAvail) {
 		sreq->dev.datatype_ptr = dt_ptr;
@@ -138,9 +139,9 @@ int MPID_Isend(const void * buf, int count, MPI_Datatype datatype, int rank,
     {
 	/* Note that the sreq was created above */
 	MPIDI_Request_set_msg_type( sreq, MPIDI_REQUEST_RNDV_MSG );
-	mpi_errno = MPIDI_CH3_RndvSend( &sreq, buf, count, datatype, dt_contig,
-					data_sz, dt_true_lb, rank, tag, comm, 
-					context_offset );
+	mpi_errno = vc->rndvSend_fn( &sreq, buf, count, datatype, dt_contig,
+                                     data_sz, dt_true_lb, rank, tag, comm, 
+                                     context_offset );
 	/* FIXME: fill temporary IOV or pack temporary buffer after send to 
 	   hide some latency.  This requires synchronization
            because the CTS packet could arrive and be processed before the 

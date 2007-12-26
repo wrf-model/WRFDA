@@ -247,7 +247,8 @@ int MPIDI_Put(void *origin_addr, int origin_count, MPI_Datatype
 	    prev_ptr = curr_ptr;
 	    curr_ptr = curr_ptr->next;
 	}
-	
+
+	/* FIXME: Where does this memory get freed? */
 	MPIU_CHKPMEM_MALLOC(new_ptr, MPIDI_RMA_ops *, sizeof(MPIDI_RMA_ops), 
 			    mpi_errno, "RMA operation entry");
 	if (prev_ptr != NULL)

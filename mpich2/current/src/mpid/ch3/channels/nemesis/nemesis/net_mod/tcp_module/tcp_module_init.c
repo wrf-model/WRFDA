@@ -216,7 +216,12 @@ static int init_tcp (MPIDI_PG_t *pg_p)
             MPIU_ERR_CHKANDJUMP1 (hp == NULL, mpi_errno, MPI_ERR_OTHER, "**gethostbyname", "**gethostbyname %d", h_errno);
 	    master.sin_family      = AF_INET;
 	    master.sin_port        = htons(port_num);
+	    /* POSIX might define h_addr_list only and node define h_addr */
+#ifdef HAVE_H_ADDR_LIST
+	    MPID_NEM_MEMCPY(&(master.sin_addr.s_addr), hp->h_addr_list[0], hp->h_length);
+#else
 	    MPID_NEM_MEMCPY(&(master.sin_addr.s_addr), hp->h_addr, hp->h_length);
+#endif
 	    
 	    ret = connect(nodes[grank].desc,(struct sockaddr *)&master, sizeof(master));
             MPIU_ERR_CHKANDJUMP4 (ret == -1, mpi_errno, MPI_ERR_OTHER, "**sock_connect", "**sock_connect %s %d %s %d", s, port_num, strerror (errno), errno);
@@ -286,9 +291,13 @@ static int init_tcp (MPIDI_PG_t *pg_p)
                               sizeof(int));  	  
             MPIU_ERR_CHKANDJUMP1 (ret == -1, mpi_errno, MPI_ERR_OTHER, "**setsockopt", "**setsockopt %s", strerror (errno));
 	    getsockopt(nodes[grank].desc,SOL_SOCKET,SO_SNDBUF,&option2,&size);
-	    
+	
+	    /* TCP_MAXSEG is may not be defined if we are enforcing
+	       strict POSIX_C_SOURCE (on OSX, for example) */
+#ifdef TCP_MAXSEG
 	    setsockopt( nodes[grank].desc, IPPROTO_TCP,TCP_MAXSEG,&option,sizeof(int));
 	    getsockopt(nodes[grank].desc,IPPROTO_TCP,TCP_MAXSEG,&option2,&size);
+#endif
 	}
     }
     (MPID_nem_tcp_internal_vars.max_fd)++;
@@ -418,6 +427,15 @@ MPID_nem_tcp_module_connect_to_root (const char *business_card, MPIDI_VC_t *new_
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
 int
 MPID_nem_tcp_module_vc_init (MPIDI_VC_t *vc, const char *business_card)
+{
+    return MPI_SUCCESS;
+}
+
+#undef FUNCNAME
+#define FUNCNAME MPID_nem_tcp_module_vc_destroy
+#undef FCNAME
+#define FCNAME MPIDI_QUOTE(FUNCNAME)
+int MPID_nem_tcp_module_vc_destroy(MPIDI_VC_t *vc)
 {
     return MPI_SUCCESS;
 }

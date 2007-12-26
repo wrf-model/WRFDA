@@ -21,16 +21,16 @@ VPATH = .:@srcdir@
 .SUFFIXES: .c .o
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-	for dir in util attr init info comm coll datatype io rma spawn ; do \
+	for dir in util attr pt2pt init info comm coll datatype io rma spawn ; do \
 		(cd $$dir && ${MAKE} apply ; ) ; done
 clean: 
 	-@rm -f *.o ${srcdir}/*.o 
 	-@rm -f *.lo ${srcdir}/*.lo
-	for dir in util attr init info comm coll datatype io rma spawn ; do \
+	for dir in util attr pt2pt init info comm coll datatype io rma spawn ; do \
 		(cd $$dir && ${MAKE} clean ; ) ; done
 distclean:  clean distclean-xxx remove-makefile
 distclean-xxx:
-	for dir in util attr init info comm coll datatype io rma spawn ; do \
+	for dir in util attr pt2pt init info comm coll datatype io rma spawn ; do \
 		if [ ! -s $$dir/Makefile ] ; then continue ; fi ;\
 		(cd $$dir && ${MAKE} distclean ; ) ; done
 	-@rm -f Makefile testlist
@@ -44,6 +44,7 @@ remove-genmakefiles:
 all-redirect:
 	@(cd util && ${MAKE} all )
 	@(cd attr && ${MAKE} all )
+	@(cd pt2pt && ${MAKE} all )
 	@(cd init && ${MAKE} all )
 	@(cd info && ${MAKE} all )
 	@(cd comm && ${MAKE} all )
@@ -60,7 +61,7 @@ HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
 tags: TAGS
 TAGS: Makefile
-	for dir in util attr init info comm coll datatype io rma spawn ; do \
+	for dir in util attr pt2pt init info comm coll datatype io rma spawn ; do \
 		(cd $$dir && ${MAKE} TAGS ; ) ; done
 # --------------------------------------------------------------------------
 

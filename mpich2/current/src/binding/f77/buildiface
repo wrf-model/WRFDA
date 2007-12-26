@@ -195,6 +195,11 @@ foreach $_ (@ARGV) {
 	     'type_create_resized-3' => 'MPI_Aint *',  # Value in C call
 	     'unpack_external-3' => 'MPI_Aint *',      # Value in C call
 	     'unpack_external-4' => 'MPI_Aint *',
+	     'win_create-2' => 'MPI_Aint *',
+	     'accumulate-5' => 'MPI_Aint *',
+	     'put-5' => 'MPI_Aint *',
+	     'get-5' => 'MPI_Aint *',
+	     'alloc_mem-1' => 'MPI_Aint *',
 	    );
 
 %argsneedcast = ( 'MPI_Request *' => '(MPI_Request *)(ARG)',
@@ -492,6 +497,11 @@ foreach $_ (@ARGV) {
 		  'Unpack_external-3' => 'in:aintToVal',
     'Unpublish_name' => '1:3', 'Unpublish_name-1' => 'in:addnull',
 		  'Unpublish_name-3' => 'in:addnull',
+    'Win_create' => '2', 'Win_create-2' => 'in:aintToVal', 
+    'Accumulate' => '5', 'Accumulate-5' => 'in:aintToVal',
+    'Put' => '5', 'Put-5' => 'in:aintToVal', 
+    'Get' => '5', 'Get-5' => 'in:aintToVal',
+    'Alloc_mem' => '1', 'Alloc_mem-1' => 'in:aintToVal', 
     'Win_get_name' => '2', 'Win_get_name-2' => 'out:blankpad',
     'Win_set_name' => '2', 'Win_set_name-2' => 'in:addnull',		  
     'Wait' => '2', 'Wait-2' => 'in:status',

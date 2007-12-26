@@ -64,6 +64,7 @@ int ADIOI_Set_lock(FDTYPE fd, int cmd, int type, ADIO_Offset offset, int whence,
 
     if (!ret_val)
     {
+    char errMsg[ADIOI_NTFS_ERR_MSG_MAX];
 	/*
 	FPRINTF(stderr, "File locking failed in ADIOI_Set_lock.\n");
 	MPI_Abort(MPI_COMM_WORLD, 1);
@@ -80,8 +81,9 @@ int ADIOI_Set_lock(FDTYPE fd, int cmd, int type, ADIO_Offset offset, int whence,
 	    }
 	    ret_val = GetLastError();
 	}
+    ADIOI_NTFS_Strerror(ret_val, errMsg, ADIOI_NTFS_ERR_MSG_MAX);
 	error_code = MPIO_Err_create_code(MPI_SUCCESS, MPIR_ERR_RECOVERABLE, myname, __LINE__,
-	    MPI_ERR_IO, "**io", "**io %s", ADIOI_NTFS_Strerror(ret_val));
+	    MPI_ERR_IO, "**io", "**io %s", errMsg);
     }
     CloseHandle(Overlapped.hEvent);
 

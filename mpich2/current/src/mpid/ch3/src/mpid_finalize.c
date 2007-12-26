@@ -73,19 +73,41 @@ int MPID_Finalize(void)
       * 
       */
     
-/* commenting out the close protocol and simply using MPI_Barrier until 
-   MPI_Comm_disconnect correctly disconnects all VCs */
+    /* commenting out the close protocol and simply using MPI_Barrier until 
+       MPI_Comm_disconnect correctly disconnects all VCs */
 
+    /* FIXME:
+     * Using MPI_Barrier on MPI_COMM_WORLD here is dangerous.  It is fine,
+     * of course, for correct programs, but incorrect programs, for examples, 
+     * ones that call MPI_Barrier(MPI_COMM_WORLD) in some but not all processes
+     * will show unexpected symptoms (e.g., the otherwise Unmatched MPI_Barrier
+     * calls will match this barrier, and then MPI_Finalize will hang.  To
+     * fix this, we need a separate Barrier operation, either an independent
+     * Barrier or an independent communicator that is not used by any
+     * other (user) routine.
+     */
+#ifdef MPID_NEEDS_ICOMM_WORLD
     MPIU_THREADPRIV_GET;
     MPIR_Nest_incr();
-    mpi_errno = NMPI_Barrier(MPI_COMM_WORLD);
+    mpi_errno = NMPI_Barrier(MPIR_ICOMM_WORLD); 
     MPIR_Nest_decr();
     if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+#endif
 
     mpi_errno = MPID_VCRT_Release(MPIR_Process.comm_self->vcrt,0);
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_POP(mpi_errno);
     }
+
+#ifdef MPID_NEEDS_ICOMM_WORLD
+    MPID_Dev_comm_destroy_hook(MPIR_Process.icomm_world);
+
+    mpi_errno = MPID_VCRT_Release(MPIR_Process.icomm_world->vcrt,0);
+    if (mpi_errno != MPI_SUCCESS) {
+	MPIU_ERR_POP(mpi_errno);
+    }
+    MPID_Dev_comm_destroy_hook(MPIR_Process.icomm_world);
+#endif
 
     MPID_Dev_comm_destroy_hook(MPIR_Process.comm_world);
 
@@ -107,19 +129,32 @@ int MPID_Finalize(void)
     if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
 #endif
 
-    /* FIXME: Progress finalize should be in CH3_Finalize */
-    mpi_errno = MPIDI_CH3I_Progress_finalize();
-    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
-
+    /* Note that the CH3I_Progress_finalize call has been removed; the
+       CH3_Finalize routine should call it */
     mpi_errno = MPIDI_CH3_Finalize();
     if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
 
     /* Tell the process group code that we're done with the process groups.
        This will notify PMI (with PMI_Finalize) if necessary.  It
-       also frees al PG structures, including the PG for COMM_WORLD, whose 
+       also frees all PG structures, including the PG for COMM_WORLD, whose 
        pointer is also saved in MPIDI_Process.my_pg */
     mpi_errno = MPIDI_PG_Finalize();
     if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+
+#ifndef MPIDI_CH3_HAS_NO_DYNAMIC_PROCESS
+    MPIDI_CH3_FreeParentPort();
+#endif
+
+    /* Release any SRbuf pool storage */
+    if (MPIDI_CH3U_SRBuf_pool) {
+	MPIDI_CH3U_SRBuf_element_t *p, *pNext;
+	p = MPIDI_CH3U_SRBuf_pool;
+	while (p) {
+	    pNext = p->next;
+	    MPIU_Free(p);
+	    p = pNext;
+	}
+    }
 
  fn_exit:
     MPIDI_FUNC_EXIT(MPID_STATE_MPID_FINALIZE);

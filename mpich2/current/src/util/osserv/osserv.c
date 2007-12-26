@@ -4,6 +4,8 @@
  *      See COPYRIGHT in top-level directory.
  */
 
+#include "mpiimpl.h"
+
 #if defined(USE_WINDOWS_OS)
 
 /* If windows, set the default width to the window size */

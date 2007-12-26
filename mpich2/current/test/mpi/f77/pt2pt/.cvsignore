@@ -1,5 +1,6 @@
 Makefile.in
 Makefile
+attr1aints.h
 *.o
 *ebug*
 *elease*

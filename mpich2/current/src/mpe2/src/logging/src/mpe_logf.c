@@ -36,6 +36,7 @@ extern void free();
 
 #ifdef F77_NAME_UPPER
 #define mpe_init_log_ MPE_INIT_LOG
+#define mpe_initialized_logging_ MPE_INITIALIZED_LOGGING
 #define mpe_start_log_ MPE_START_LOG
 #define mpe_stop_log_ MPE_STOP_LOG
 #define mpe_log_get_event_number_ MPE_LOG_GET_EVENT_NUMBER
@@ -55,6 +56,7 @@ extern void free();
 #define mpe_finish_log_ MPE_FINISH_LOG
 #elif defined(F77_NAME_LOWER_2USCORE)
 #define mpe_init_log_ mpe_init_log__
+#define mpe_initialized_logging_ mpe_initialized_logging__
 #define mpe_start_log_ mpe_start_log__
 #define mpe_stop_log_ mpe_stop_log__
 #define mpe_log_get_event_number_ mpe_log_get_event_number__
@@ -74,6 +76,7 @@ extern void free();
 #define mpe_finish_log_ mpe_finish_log__
 #elif defined(F77_NAME_LOWER)
 #define mpe_init_log_ mpe_init_log
+#define mpe_initialized_logging_ mpe_initialized_logging
 #define mpe_start_log_ mpe_start_log
 #define mpe_stop_log_ mpe_stop_log
 #define mpe_log_get_event_number_ mpe_log_get_event_number
@@ -126,6 +129,12 @@ int mpe_init_log_( void );
 int  mpe_init_log_( void )
 {
     return MPE_Init_log();
+}
+
+int mpe_initialized_logging_( void );
+int  mpe_initialized_logging_( void )
+{
+    return MPE_Initialized_logging();
 }
 
 int mpe_start_log_( void );

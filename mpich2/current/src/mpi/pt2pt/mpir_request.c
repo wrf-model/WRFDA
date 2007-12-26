@@ -492,3 +492,63 @@ int MPIR_Grequest_free(MPID_Request * request_ptr)
 
     return mpi_errno;
 }
+
+/* MPIR_Grequest_progress_poke:  Drives progess on generalized requests.
+ * Invokes poll_fn for each request in request_ptrs.  Waits for completion of
+ * multiple requests if possible (all outstanding generalized requests are of
+ * same greq class) */
+
+int MPIR_Grequest_progress_poke(int count, 
+		MPID_Request **request_ptrs, 
+		MPI_Status array_of_statuses[] )
+{
+    MPIX_Grequest_wait_function *wait_fn = NULL;
+    void ** state_ptrs;
+    int i, j, n_classes, n_native, n_greq;
+    int mpi_error = MPI_SUCCESS;
+
+    state_ptrs = MPIU_Malloc(sizeof(void*)*count);
+
+    if (state_ptrs == NULL)
+	    goto fn_exit;
+
+    /* This somewhat messy for-loop computes how many requests are native
+     * requests and how many are generalized requests, and how many generalized
+     * request classes those grequests are members of */
+    for (i=0, j=0, n_classes=1, n_native=0, n_greq=0; i< count; i++)
+    {
+	if (request_ptrs[i] == NULL || *request_ptrs[i]->cc_ptr == 0) continue;
+	if (request_ptrs[i]->kind == MPID_UREQUEST)
+	{
+	    n_greq += 1;
+	    wait_fn = request_ptrs[i]->wait_fn;
+	    state_ptrs[j] = request_ptrs[i]->grequest_extra_state;
+	    j++;
+	    if (i+1 < count) {
+	        if (request_ptrs[i+1] == NULL ||
+			(request_ptrs[i]->greq_class != 
+				request_ptrs[i+1]->greq_class) )
+	            n_classes += 1;
+	    }
+	} else {
+	    n_native += 1;
+	}
+    }
+
+    if (j > 0 && n_classes == 1 && wait_fn != NULL) {
+        mpi_error = (wait_fn)(j, state_ptrs, 0, NULL);
+    } else {
+	for (i = 0; i< count; i++ )
+	{
+	    if (request_ptrs[i] != NULL && 
+			request_ptrs[i]->kind == MPID_UREQUEST && 
+			*request_ptrs[i]->cc_ptr != 0) {
+		mpi_error = (request_ptrs[i]->poll_fn)(request_ptrs[i]->grequest_extra_state, &(array_of_statuses[i]));
+	    }
+	}
+    }
+fn_exit:
+    if (state_ptrs != NULL) MPIU_Free(state_ptrs);
+    return mpi_error;
+}
+

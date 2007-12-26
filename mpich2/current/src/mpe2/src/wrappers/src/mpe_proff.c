@@ -181,6 +181,7 @@ int MPER_Err_setmsg();
 
 #ifdef F77_NAME_UPPER
 #define mpi_init_ MPI_INIT
+#define mpi_init_thread_ MPI_INIT_THREAD
 #define mpi_pcontrol_ MPI_PCONTROL
 #define mpi_comm_create_ MPI_COMM_CREATE
 #define mpi_comm_dup_ MPI_COMM_DUP
@@ -261,6 +262,7 @@ int MPER_Err_setmsg();
 #define mpi_finalize_ MPI_FINALIZE
 #elif defined(F77_NAME_LOWER_2USCORE)
 #define mpi_init_ mpi_init__
+#define mpi_init_thread_ mpi_init_thread__
 #define mpi_pcontrol_ mpi_pcontrol__
 #define mpi_comm_create_ mpi_comm_create__
 #define mpi_comm_dup_ mpi_comm_dup__
@@ -341,6 +343,7 @@ int MPER_Err_setmsg();
 #define mpi_finalize_ mpi_finalize__
 #elif defined(F77_NAME_LOWER)
 #define mpi_init_ mpi_init
+#define mpi_init_thread_ mpi_init_thread
 #define mpi_pcontrol_ mpi_pcontrol
 #define mpi_comm_create_ mpi_comm_create
 #define mpi_comm_dup_ mpi_comm_dup
@@ -455,8 +458,8 @@ va_dcl
 
 /****************************************************************************/
 
-void mpi_init_ ( int * );
-void mpi_init_( int *ierr )
+void mpi_init_( MPI_Fint * );
+void mpi_init_( MPI_Fint *ierr )
 {
     int Argc;
     int i, argsize = 1024;
@@ -500,6 +503,15 @@ void mpi_init_( int *ierr )
     }
     FREE( ArgvSave );
 }
+
+
+#if defined( HAVE_MPI_INIT_THREAD )
+void mpi_init_thread_( MPI_Fint *required, MPI_Fint *provided, MPI_Fint *ierr );
+void mpi_init_thread_( MPI_Fint *required, MPI_Fint *provided, MPI_Fint *ierr )
+{
+    *ierr = MPI_Init_thread( NULL, NULL, *required, provided );
+}
+#endif
 
 
 

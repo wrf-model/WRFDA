@@ -100,6 +100,7 @@ int main( int argc, char **argv )
     }
     
     fh.Close();
+    comm.Free();
     MPI::File::Delete( "testfile.txt", MPI::INFO_NULL );
 
     // Check error strings while we're here...

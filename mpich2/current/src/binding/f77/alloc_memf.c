@@ -12,11 +12,11 @@
 /* Begin MPI profiling block */
 #if defined(USE_WEAK_SYMBOLS) && !defined(USE_ONLY_MPI_NAMES) 
 #if defined(HAVE_MULTIPLE_PRAGMA_WEAK) && defined(F77_NAME_LOWER_2USCORE)
-extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL pmpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL pmpi_alloc_mem_( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak MPI_ALLOC_MEM = pmpi_alloc_mem__
 #pragma weak mpi_alloc_mem__ = pmpi_alloc_mem__
@@ -28,19 +28,19 @@ extern FORT_DLL_SPEC void FORT_CALL pmpi_alloc_mem_( MPI_Fint *, MPI_Fint *, voi
 #elif defined(HAVE_PRAGMA_WEAK)
 
 #if defined(F77_NAME_UPPER)
-extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak MPI_ALLOC_MEM = PMPI_ALLOC_MEM
 #elif defined(F77_NAME_LOWER_2USCORE)
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak mpi_alloc_mem__ = pmpi_alloc_mem__
 #elif !defined(F77_NAME_LOWER_USCORE)
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak mpi_alloc_mem = pmpi_alloc_mem
 #else
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak mpi_alloc_mem_ = pmpi_alloc_mem_
 #endif
@@ -74,10 +74,10 @@ extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void
 /* These definitions are used only for generating the Fortran wrappers */
 #if defined(USE_WEAK_SYBMOLS) && defined(HAVE_MULTIPLE_PRAGMA_WEAK) && \
     defined(USE_ONLY_MPI_NAMES)
-extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
-extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL MPI_ALLOC_MEM( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem__( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
+extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Aint *, MPI_Fint *, void*, MPI_Fint * );
 
 #pragma weak MPI_ALLOC_MEM = mpi_alloc_mem__
 #pragma weak mpi_alloc_mem_ = mpi_alloc_mem__
@@ -119,6 +119,6 @@ extern FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_( MPI_Fint *, MPI_Fint *, void
 
 /* Prototypes for the Fortran interfaces */
 #include "fproto.h"
-FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_ ( MPI_Fint *v1, MPI_Fint *v2, void*v3, MPI_Fint *ierr ){
+FORT_DLL_SPEC void FORT_CALL mpi_alloc_mem_ ( MPI_Aint * v1, MPI_Fint *v2, void*v3, MPI_Fint *ierr ){
     *ierr = MPI_Alloc_mem( *v1, (MPI_Info)(*v2), v3 );
 }

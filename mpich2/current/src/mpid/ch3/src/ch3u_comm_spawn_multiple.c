@@ -203,6 +203,13 @@ int MPIDI_Comm_spawn_multiple(int count, char **commands,
 	MPIU_ERR_POP(mpi_errno);
     }
 
+    if (errcodes) { /* If the application used MPI_ERRCODES_IGNORE */
+	mpi_errno = NMPI_Bcast(errcodes, count, MPI_INT, root, comm_ptr->handle);
+	if (mpi_errno != MPI_SUCCESS) {
+	    MPIU_ERR_POP(mpi_errno);
+	}
+    }
+
  fn_exit:
     if (info_keyval_vectors) {
 	free_pmi_keyvals(info_keyval_vectors, count, info_keyval_sizes);
@@ -229,8 +236,6 @@ int MPIDI_Comm_spawn_multiple(int count, char **commands,
    pointer as part of the channel init setup, particularly since this
    function appears to access channel-specific storage (MPIDI_CH3_Process) */
 
-/* FIXME: We need a finalize handler to perform MPIU_Free(parent_port_name)
-   if it is allocated */
 
 /* This function is used only with mpid_init to set up the parent communicator
    if there is one.  The routine should be in this file because the parent 
@@ -240,10 +245,10 @@ static char *parent_port_name = 0;    /* Name of parent port if this
 					 of comm world) or null */
 
 #undef FUNCNAME
-#define FUNCNAME MPIDI_CH3_Get_parent_port
+#define FUNCNAME MPIDI_CH3_GetParentPort
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-int MPIDI_CH3_Get_parent_port(char ** parent_port)
+int MPIDI_CH3_GetParentPort(char ** parent_port)
 {
     int mpi_errno = MPI_SUCCESS;
     char val[MPIDI_MAX_KVS_VALUE_LEN];
@@ -271,5 +276,11 @@ int MPIDI_CH3_Get_parent_port(char ** parent_port)
  fn_fail:
     goto fn_exit;
 }
-
+void MPIDI_CH3_FreeParentPort(void)
+{
+    if (parent_port_name) {
+	MPIU_Free( parent_port_name );
+	parent_port_name = 0;
+    }
+}
 #endif

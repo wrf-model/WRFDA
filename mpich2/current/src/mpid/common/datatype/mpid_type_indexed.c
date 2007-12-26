@@ -17,8 +17,6 @@ int MPIDI_Type_indexed_count_contig(int count,
 				    int dispinbytes,
 				    MPI_Aint old_extent);
 
-static int MPIDI_Type_indexed_zero_size(MPID_Datatype *new_dtp);
-
 /*@
   MPID_Type_indexed - create an indexed datatype
  
@@ -45,7 +43,7 @@ int MPID_Type_indexed(int count,
 		      MPI_Datatype oldtype,
 		      MPI_Datatype *newtype)
 {
-    int err, mpi_errno = MPI_SUCCESS;
+    int mpi_errno = MPI_SUCCESS;
     int is_builtin, old_is_contig;
     int i, contig_count;
     int el_sz, el_ct, old_ct, old_sz;
@@ -54,6 +52,8 @@ int MPID_Type_indexed(int count,
     MPI_Datatype el_type;
 
     MPID_Datatype *new_dtp;
+
+    if (count == 0) return MPID_Type_zerolen(newtype);
 
     /* allocate new datatype object and handle */
     new_dtp = (MPID_Datatype *) MPIU_Handle_obj_alloc(&MPID_Datatype_mem);
@@ -80,21 +80,16 @@ int MPID_Type_indexed(int count,
     new_dtp->name[0]      = 0;
     new_dtp->contents     = NULL;
 
-    new_dtp->dataloop_size       = -1;
     new_dtp->dataloop       = NULL;
+    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop_depth = -1;
+    new_dtp->hetero_dloop       = NULL;
+    new_dtp->hetero_dloop_size  = -1;
+    new_dtp->hetero_dloop_depth = -1;
 
     is_builtin = (HANDLE_GET_KIND(oldtype) == HANDLE_KIND_BUILTIN);
 
-    if (count == 0)
-    {
-	mpi_errno = MPIDI_Type_indexed_zero_size(new_dtp);
-	if (mpi_errno == MPI_SUCCESS) {
-	    *newtype = new_dtp->handle;
-	}
-	return mpi_errno;
-    }
-    else if (is_builtin)
+    if (is_builtin)
     {
 	/* builtins are handled differently than user-defined types because
 	 * they have no associated dataloop or datatype structure.
@@ -146,18 +141,13 @@ int MPID_Type_indexed(int count,
 	new_dtp->n_contig_blocks = old_dtp->n_contig_blocks * count;
     }
 
-
     /* find the first nonzero blocklength element */
     i = 0;
     while (i < count && blocklength_array[i] == 0) i++;
 
     if (i == count) {
-	/* no nonzero blocks; treat the same as the count == 0 case */
-	mpi_errno = MPIDI_Type_indexed_zero_size(new_dtp);
-	if (mpi_errno == MPI_SUCCESS) {
-	    *newtype = new_dtp->handle;
-	}
-	return mpi_errno;
+	MPIU_Handle_obj_free(&MPID_Datatype_mem, new_dtp);
+	return MPID_Type_zerolen(newtype);
     }
 
     /* priming for loop */
@@ -229,48 +219,9 @@ int MPID_Type_indexed(int count,
 	new_dtp->is_contig = 0;
     }
 
-    /* fill in dataloop(s) */
-    err = MPID_Dataloop_create_indexed(count,
-				       blocklength_array,
-				       displacement_array,
-				       dispinbytes,
-				       oldtype,
-				       &(new_dtp->dataloop),
-				       &(new_dtp->dataloop_size),
-				       &(new_dtp->dataloop_depth),
-				       0);
-#if defined(MPID_HAS_HETERO) || 1
-    if (!err) {
-	/* heterogeneous dataloop representation */
-	err = MPID_Dataloop_create_indexed(count,
-					   blocklength_array,
-					   displacement_array,
-					   dispinbytes,
-					   oldtype,
-					   &(new_dtp->hetero_dloop),
-					   &(new_dtp->hetero_dloop_size),
-					   &(new_dtp->hetero_dloop_depth),
-					   0);
-    }
-#endif /* MPID_HAS_HETERO */
-    /* --BEGIN ERROR HANDLING-- */
-    if (err) {
-	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					 MPIR_ERR_RECOVERABLE,
-					 "MPID_Dataloop_create_blockindexed",
-					 __LINE__,
-					 MPI_ERR_OTHER,
-					 "**nomem",
-					 0);
-	return mpi_errno;
-    }
-    /* --END ERROR HANDLING-- */
-
     *newtype = new_dtp->handle;
     return mpi_errno;
 }
-
-
 
 /* MPIDI_Type_indexed_count_contig()
  *
@@ -339,62 +290,3 @@ int MPIDI_Type_indexed_count_contig(int count,
     return contig_count;
 }
 
-
-static int MPIDI_Type_indexed_zero_size(MPID_Datatype *new_dtp)
-{
-    int err, mpi_errno = MPI_SUCCESS;
-    new_dtp->has_sticky_ub = 0;
-    new_dtp->has_sticky_lb = 0;
-    
-    new_dtp->alignsize    = 0;
-    new_dtp->element_size = 0;
-    new_dtp->eltype       = 0;
-    
-    new_dtp->size    = 0;
-    new_dtp->lb      = 0;
-    new_dtp->ub      = 0;
-    new_dtp->true_lb = 0;
-    new_dtp->true_ub = 0;
-    new_dtp->extent  = 0;
-    
-    new_dtp->n_elements = 0;
-    new_dtp->is_contig  = 1;
-    
-    err = MPID_Dataloop_create_indexed(0,
-				       NULL,
-				       NULL,
-				       0,
-				       MPI_INT, /* dummy type */
-				       &(new_dtp->dataloop),
-				       &(new_dtp->dataloop_size),
-				       &(new_dtp->dataloop_depth),
-				       0);
-#if defined(MPID_HAS_HETERO) || 1
-    if (!err) {
-	/* heterogeneous dataloop representation */
-	err = MPID_Dataloop_create_indexed(0,
-					   NULL,
-					   NULL,
-					   0,
-					   MPI_INT,
-					   &(new_dtp->hetero_dloop),
-					   &(new_dtp->hetero_dloop_size),
-					   &(new_dtp->hetero_dloop_depth),
-					   0);
-    }
-#endif /* MPID_HAS_HETERO */
-    /* --BEGIN ERROR HANDLING-- */
-    if (err) {
-	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
-					 MPIR_ERR_RECOVERABLE,
-					 "MPID_Dataloop_create_blockindexed",
-					 __LINE__,
-					 MPI_ERR_OTHER,
-					 "**nomem",
-					 0);
-	return mpi_errno;
-    }
-    /* --END ERROR HANDLING-- */
-
-    return mpi_errno;
-}

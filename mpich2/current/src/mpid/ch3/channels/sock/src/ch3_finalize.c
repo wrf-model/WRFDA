@@ -15,7 +15,14 @@
 int MPIDI_CH3_Finalize( void )
 {
     int mpi_errno = MPI_SUCCESS;
+    MPIDI_STATE_DECL(MPID_STATE_MPID_CH3_FINALIZE);
 
-    MPIU_DBG_MSG(CH3_CHANNEL,VERBOSE,"Entering/exiting MPIDI_CH3_Finalize");
+    MPIDI_FUNC_ENTER(MPID_STATE_MPID_CH3_FINALIZE);
+
+    mpi_errno = MPIDI_CH3I_Progress_finalize();
+    if (mpi_errno) { MPIU_ERR_POP(mpi_errno); }
+
+ fn_fail:
+    MPIDI_FUNC_EXIT(MPID_STATE_MPID_CH3_FINALIZE);
     return mpi_errno;
 }

@@ -333,11 +333,28 @@ int MPIU_DBG_MaxLevel      = MPIU_DBG_TYPICAL;
 static int mpiu_dbg_initialized = 0;  /* 0, 1 (preinit), or 2 (init) */
 static FILE *MPIU_DBG_fp = 0;
 static char *filePattern = "-stdout-"; /* "log%d.log"; */
+/* 
+   We keep information on the state of the file.  
+   The issue is that sometimes we want to generate DBG output before we
+   know the rank (and world) of the process.
+
+   Thus, we have two values: whether the file has been opened, and if so,
+   if it was opened before or after the rank was available; and how the
+   file should be handled if I/O is performed before the rank is available.
+
+   Another option that could be considered is to store values that would
+   otherwise be written before the rank is available for opening the file.
+   Currently, this is not used to avoid allocating the necessary space.
+ */
+typedef enum { MPIU_DBG_CLOSED, MPIU_DBG_PRERANK, MPIU_DBG_OPEN } FileState_t;
+static FileState_t filestate = MPIU_DBG_CLOSED;
+typedef enum { MPIU_DBG_REOPEN, MPIU_DBG_IGNORE_PRERANK, MPIU_DBG_OPENONCE }
+    FileOpenMode_t;
+static FileOpenMode_t filemode = MPIU_DBG_REOPEN;
 static char *defaultFilePattern = "dbg@W%w-@%d@T-%t@.log";
 static int worldNum  = 0;
 static int worldRank = -1;
 static int whichRank = -1;             /* all ranks */
-static int threadID  = 0;
 static double timeOrigin = 0.0;
 
 static int MPIU_DBG_Usage( const char *, const char * );
@@ -354,10 +371,11 @@ int MPIU_DBG_Outevent( const char *file, int line, int class, int kind,
     void *p;
     MPID_Time_t t;
     double  curtime;
+    int threadID  = 0;
 
     if (!mpiu_dbg_initialized) return 0;
 
-#if MPICH_IS_THREADED
+#ifdef MPICH_IS_THREADED
     {
 	MPE_Thread_id_t tid;
 	MPE_Thread_self(&tid);
@@ -443,6 +461,7 @@ static const MPIU_DBG_ClassName MPIU_Classnames[] = {
     { MPIU_DBG_CH3_DISCONNECT,"CH3_DISCONNECT","ch3_disconnect" },
     { MPIU_DBG_CH3_PROGRESS,  "CH3_PROGRESS",  "ch3_progress" },
     { MPIU_DBG_CH3_CHANNEL,   "CH3_CHANNEL",   "ch3_channel" },
+    { MPIU_DBG_CH3_MSG,       "CH3_MSG",       "ch3_msg" },
     { MPIU_DBG_CH3_OTHER,     "CH3_OTHER",     "ch3_other" },
     { MPIU_DBG_CH3,           "CH3",           "ch3" },
     { MPIU_DBG_NEM_SOCK_FUNC, "NEM_SOCK_FUNC", "nem_sock_func"},
@@ -515,7 +534,14 @@ static int MPIU_DBG_ProcessArgs( int *argc_p, char ***argv_p )
 		    char *p = s + 9;
 		    if (*p == '=') {
 			p++;
-			filePattern = MPIU_Strdup( p );
+			/* A special case for a filepattern of "-default",
+			   use the predefined default pattern */
+			if (strcmp( p, "-default" ) == 0) {
+			    filePattern = defaultFilePattern;
+			}
+			else {
+			    filePattern = MPIU_Strdup( p );
+			}
 		    }
 		}
 		else if (strncmp( s, "-rank", 5 ) == 0) {
@@ -617,7 +643,9 @@ int MPIU_DBG_Init( int *argc_p, char ***argv_p, int has_args, int has_env,
 		   int wrank )
 {
     /* if the DBG_MSG system was already initialized, say by the device, then
-       return immediately */
+       return immediately.  Note that the device is then responsible
+       for handling the file mode (e.g., reopen when the rank become 
+       available) */
     if (mpiu_dbg_initialized == 2) return 0;
 
     /* Check to see if any debugging was selected.  The order of these
@@ -639,6 +667,14 @@ int MPIU_DBG_Init( int *argc_p, char ***argv_p, int has_args, int has_env,
     if (whichRank >= 0 && whichRank != wrank) {
 	/* Turn off logging on this process */
 	MPIU_DBG_ActiveClasses = 0;
+    }
+
+    /* If the file has already been opened and we need to reopen it,
+       do that now.  We only need to close the file, since 
+       OutEvent will reopen it as necessary */
+    if (filemode == MPIU_DBG_REOPEN && filestate == MPIU_DBG_PRERANK) {
+	fclose( MPIU_DBG_fp );
+	MPIU_DBG_fp = 0;
     }
 
     mpiu_dbg_initialized = 2;
@@ -686,7 +722,8 @@ static int MPIU_DBG_OpenFile( void )
 	withinMthread = 0;        /* True if within an @T...@ */
     /* FIXME: Need to know how many MPI_COMM_WORLDs are known */
     int nWorld = 1;
-#if MPICH_IS_THREADED
+#ifdef MPICH_IS_THREADED
+    int threadID = 0;
     int nThread = 2;
 #else
     int nThread = 1;
@@ -702,9 +739,11 @@ static int MPIU_DBG_OpenFile( void )
 	
     if (!filePattern || *filePattern == 0 ||
 	strcmp(filePattern, "-stdout-" ) == 0) {
+	filestate   = MPIU_DBG_OPEN;
 	MPIU_DBG_fp = stdout;
     }
     else if (strcmp( filePattern, "-stderr-" ) == 0) {
+	filestate   = MPIU_DBG_OPEN;
 	MPIU_DBG_fp = stderr;
     }
     else {
@@ -767,7 +806,7 @@ static int MPIU_DBG_OpenFile( void )
 		    pDest += strlen(rankAsChar);
 		}
 		else if (*p == 't') {
-#if MPICH_IS_THREADED
+#ifdef MPICH_IS_THREADED
 		    char threadIDAsChar[20];
 		    MPE_Thread_id_t tid;
 		    MPE_Thread_self(&tid);
@@ -800,6 +839,8 @@ static int MPIU_DBG_OpenFile( void )
 	    }
 	}
 	*pDest = 0;
+	if (worldRank == -1) filestate = MPIU_DBG_PRERANK;
+	else                 filestate = MPIU_DBG_OPEN;
 	MPIU_DBG_fp = fopen( filename, "w" );
 	if (!MPIU_DBG_fp) {
 	    MPIU_Error_printf( "Could not open log file %s\n", filename );

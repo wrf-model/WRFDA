@@ -1,4 +1,4 @@
-.TH MPI_File_iread_shared 3 "1/30/2007" " " "MPI"
+.TH MPI_File_iread_shared 3 "10/30/2007" " " "MPI"
 .SH NAME
 MPI_File_iread_shared \-  Nonblocking read using shared file pointer 
 .SH SYNOPSIS
@@ -6,8 +6,9 @@ MPI_File_iread_shared \-  Nonblocking read using shared file pointer
 #ifdef HAVE_MPI_GREQUEST
 #include "mpiu_greq.h"
 
-#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
-typedef struct iread_shared_args
+
+int MPI_File_iread_shared(MPI_File mpi_fh, void *buf, int count, 
+                        MPI_Datatype datatype, MPI_Request *request)
 .fi
 .SH INPUT PARAMETERS
 .PD 0

@@ -113,9 +113,19 @@
  */
 #if defined(MPID_HAS_HETERO) || 1
 #define MPID_GET_FIELD(hetero_,value_,fieldname_) \
-  if (!(hetero_))						\
+  if (hetero_ == MPID_DATALOOP_HOMOGENEOUS)			\
       value_ = ((MPID_Datatype *)ptr)->dataloop##fieldname_;	\
   else value_ = ((MPID_Datatype *) ptr)->hetero_dloop##fieldname_;
+#else
+#define MPID_GET_FIELD(hetero_,value_,fieldname_) \
+      value_ = ((MPID_Datatype *)ptr)->dataloop##fieldname_
+#endif
+
+#if defined(MPID_HAS_HETERO) || 1
+#define MPID_SET_FIELD(hetero_,value_,fieldname_) \
+  if (hetero_ == MPID_DATALOOP_HOMOGENEOUS)			\
+      ((MPID_Datatype *)ptr)->dataloop##fieldname_ = value_;	\
+  else ((MPID_Datatype *) ptr)->hetero_dloop##fieldname_ = value_;
 #else
 #define MPID_GET_FIELD(hetero_,value_,fieldname_) \
       value_ = ((MPID_Datatype *)ptr)->dataloop##fieldname_
@@ -183,29 +193,68 @@
             break;							\
     }									\
 }
-
-#if defined(MPID_HAS_HETERO) || 1
-#define MPID_Datatype_get_hetero_loopptr_macro(a,lptr_)                \
-{                                                                    \
-    void *ptr;                                                          \
-    switch (HANDLE_GET_KIND(a)) {                                       \
-        case HANDLE_KIND_DIRECT:                                        \
-            ptr = MPID_Datatype_direct+HANDLE_INDEX(a);                 \
-            lptr_ = ((MPID_Datatype *) ptr)->hetero_dloop;             \
-            break;                                                      \
-        case HANDLE_KIND_INDIRECT:                                      \
-            ptr = ((MPID_Datatype *)                                    \
-		   MPIU_Handle_get_ptr_indirect(a,&MPID_Datatype_mem)); \
-            lptr_ = ((MPID_Datatype *) ptr)->hetero_dloop;             \
-            break;                                                      \
-        case HANDLE_KIND_INVALID:                                       \
-        case HANDLE_KIND_BUILTIN:                                       \
-        default:                                                        \
-            lptr_ = 0;                                                 \
-            break;                                                      \
+#define MPID_Datatype_set_loopdepth_macro(a,depth_,hetero_)		\
+{									\
+    void *ptr;								\
+    switch (HANDLE_GET_KIND(a)) {					\
+        case HANDLE_KIND_DIRECT:					\
+            ptr = MPID_Datatype_direct+HANDLE_INDEX(a);			\
+            MPID_SET_FIELD(hetero_,depth_,_depth);                      \
+            break;							\
+        case HANDLE_KIND_INDIRECT:					\
+            ptr = ((MPID_Datatype *)					\
+		   MPIU_Handle_get_ptr_indirect(a,&MPID_Datatype_mem));	\
+            MPID_SET_FIELD(hetero_,depth_,_depth);                      \
+            break;							\
+        case HANDLE_KIND_INVALID:					\
+        case HANDLE_KIND_BUILTIN:					\
+        default:							\
+            depth_ = 0;						\
+            break;							\
     }                                                                   \
 }
-#endif /* MPID_HAS_HETERO */
+
+#define MPID_Datatype_set_loopsize_macro(a,depth_,hetero_)		\
+{									\
+    void *ptr;								\
+    switch (HANDLE_GET_KIND(a)) {					\
+        case HANDLE_KIND_DIRECT:					\
+            ptr = MPID_Datatype_direct+HANDLE_INDEX(a);			\
+            MPID_SET_FIELD(hetero_,depth_,_size);                       \
+            break;							\
+        case HANDLE_KIND_INDIRECT:					\
+            ptr = ((MPID_Datatype *)					\
+		   MPIU_Handle_get_ptr_indirect(a,&MPID_Datatype_mem));	\
+            MPID_SET_FIELD(hetero_,depth_,_size);                       \
+            break;							\
+        case HANDLE_KIND_INVALID:					\
+        case HANDLE_KIND_BUILTIN:					\
+        default:							\
+            depth_ = 0;						\
+            break;							\
+    }                                                                   \
+}
+
+#define MPID_Datatype_set_loopptr_macro(a,lptr_,hetero_)		\
+{									\
+    void *ptr;								\
+    switch (HANDLE_GET_KIND(a)) {					\
+        case HANDLE_KIND_DIRECT:					\
+            ptr = MPID_Datatype_direct+HANDLE_INDEX(a);			\
+            MPID_SET_FIELD(hetero_,lptr_,);                             \
+            break;							\
+        case HANDLE_KIND_INDIRECT:					\
+            ptr = ((MPID_Datatype *)					\
+		   MPIU_Handle_get_ptr_indirect(a,&MPID_Datatype_mem));	\
+            MPID_SET_FIELD(hetero_,lptr_,);                             \
+            break;							\
+        case HANDLE_KIND_INVALID:					\
+        case HANDLE_KIND_BUILTIN:					\
+        default:							\
+            lptr_ = 0;							\
+            break;							\
+    }									\
+}
         
 #define MPID_Datatype_get_extent_macro(a,extent_)			    \
 {									    \
@@ -526,6 +575,8 @@ int MPID_Type_contiguous(int count,
 			 MPI_Datatype oldtype,
 			 MPI_Datatype *newtype);
 
+int MPID_Type_zerolen(MPI_Datatype *newtype);
+
 int MPID_Type_create_resized(MPI_Datatype oldtype,
 			     MPI_Aint lb,
 			     MPI_Aint extent,
@@ -585,17 +636,7 @@ void MPID_Dataloop_dup(DLOOP_Dataloop *old_loop,
 		       DLOOP_Dataloop **new_loop_p);
 void MPID_Dataloop_free(struct MPID_Dataloop **dataloop);
 
-/* Segment functions */
-void MPID_Segment_pack(struct DLOOP_Segment *segp,
-		       DLOOP_Offset first,
-		       DLOOP_Offset *lastp,
-		       void *pack_buffer);
-
-void MPID_Segment_unpack(struct DLOOP_Segment *segp,
-			 DLOOP_Offset first,
-			 DLOOP_Offset *lastp,
-			 const void * unpack_buffer);
-
+/* Segment functions specific to MPICH2 */
 void MPID_Segment_pack_vector(struct DLOOP_Segment *segp,
 			      DLOOP_Offset first,
 			      DLOOP_Offset *lastp,
@@ -607,11 +648,6 @@ void MPID_Segment_unpack_vector(struct DLOOP_Segment *segp,
 				DLOOP_Offset *lastp,
 				DLOOP_VECTOR *vector,
 				int *lengthp);
-
-void MPID_Segment_count_contig_blocks(struct DLOOP_Segment *segp,
-				      DLOOP_Offset first,
-				      DLOOP_Offset *lastp,
-				      int *countp);
 
 void MPID_Segment_flatten(struct DLOOP_Segment *segp,
 			  DLOOP_Offset first,
@@ -668,5 +704,16 @@ MPI_Aint MPIDI_Datatype_get_basic_size_external32(MPI_Datatype el_type);
 char *MPIDU_Datatype_builtin_to_string(MPI_Datatype type);
 char *MPIDU_Datatype_combiner_to_string(int combiner);
 void MPIDU_Datatype_debug(MPI_Datatype type, int array_ct);
+
+/* contents accessor functions */
+void MPID_Type_access_contents(MPI_Datatype type,
+			       int **ints_p,
+			       MPI_Aint **aints_p,
+			       MPI_Datatype **types_p);
+void MPID_Type_release_contents(MPI_Datatype type,
+				int **ints_p,
+				MPI_Aint **aints_p,
+				MPI_Datatype **types_p);
+
 /* end of file */
 #endif

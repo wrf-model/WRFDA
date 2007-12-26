@@ -61,17 +61,17 @@ all-redirect: libmpiexec.a
 	fi
 
 libmpiexec.a: cmnargs.o process.o ioloop.o pmiserv.o labelout.o env.o \
-	newsession.o rm.o pmiport.o 
+	newsession.o rm.o pmiport.o dbgiface.o 
 	${AR} cr libmpiexec.a $?
 	${RANLIB} libmpiexec.a
 libmpiexec.la: cmnargs.lo process.lo ioloop.lo pmiserv.lo labelout.lo env.lo \
-	newsession.lo rm.lo pmiport.lo 
+	newsession.lo rm.lo pmiport.lo dbgiface.lo 
 	${AR} cr libmpiexec.la $?
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 SOURCES         =  cmnargs.c process.c ioloop.c pmiserv.c labelout.c env.c \
-	newsession.c rm.c 
+	newsession.c rm.c dbgiface.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

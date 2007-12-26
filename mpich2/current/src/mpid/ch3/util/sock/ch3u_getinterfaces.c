@@ -4,10 +4,17 @@
  *      See COPYRIGHT in top-level directory.
  */
 
-/* We need to include the conf file first so that we can se
+/* We need to include the conf file first so that we can use
    the _SVID_SOURCE if needed before any file includes features.h 
    on GNU systems */
 #include "mpidi_ch3_conf.h"
+
+
+#ifdef USE_NOPOSIX_FOR_IFCONF
+/* This is a very special case.  Allow the use of some extensions for 
+   just the rest of this file so that we can get the ifconf structure */
+#undef _POSIX_C_SOURCE
+#endif
 
 #ifdef USE_SVIDSOURCE_FOR_IFCONF
 /* This is a very special case.  Allow the use of some extensions for just
@@ -24,9 +31,10 @@
 #endif
 
 /* We set dbg_ifname to 1 to help debug the choice of interface name 
-   used when determining which interface to advertise to other processes 
+   used when determining which interface to advertise to other processes.
+   The value is -1 if it has not yet been set.
  */
-static int dbg_ifname = 0;
+static int dbg_ifname = -1;
 
 static int MPIDI_CH3U_GetIPInterface( MPIDU_Sock_ifaddr_t *, int * );
 
@@ -57,6 +65,12 @@ int MPIDU_CH3U_GetSockInterfaceAddr( int myRank, char *ifname, int maxIfname,
     char *ifname_string;
     int mpi_errno = MPI_SUCCESS;
     int ifaddrFound = 0;
+
+    if (dbg_ifname < 0) {
+	int rc;
+	rc = MPIU_GetEnvBool( "MPICH_DBG_IFNAME", &dbg_ifname );
+	if (rc != 1) dbg_ifname = 0;
+    }
 
     /* Set "not found" for ifaddr */
     ifaddr->len = 0;
@@ -105,6 +119,7 @@ int MPIDU_CH3U_GetSockInterfaceAddr( int myRank, char *ifname, int maxIfname,
     /* If we don't have an IP address, try to get it from the name */
     if (!ifaddrFound) {
 	struct hostent *info;
+	/* printf( "Name to check is %s\n", ifname_string ); fflush(stdout); */
 	info = gethostbyname( ifname_string );
 	if (info && info->h_addr_list) {
 	    /* Use the primary address */
@@ -116,8 +131,24 @@ int MPIDU_CH3U_GetSockInterfaceAddr( int myRank, char *ifname, int maxIfname,
 		ifaddr->len = 0;
 		ifaddr->type = -1;
 	    }
-	    else
+	    else {
 		memcpy( ifaddr->ifaddr, info->h_addr_list[0], ifaddr->len );
+#if 0
+		printf( "ifaddr len = %d\n", ifaddr->len );
+		{int i;
+		    unsigned char *p = info->h_addr_list[0];
+		    for (i=0; i<ifaddr->len; i++) { 
+			printf( "%.2x", *p++ );
+		    }
+		    printf( "\n" ); fflush(stdout);
+		    p = info->h_addr_list[0];
+		    for (i=0; i<ifaddr->len; i++) { 
+			printf( "%.3d", *p++ );
+		    }
+		    printf( "\n" ); fflush(stdout);
+		}
+#endif
+	    }
 	}
     }
 
@@ -167,6 +198,12 @@ static int MPIDI_CH3U_GetIPInterface( MPIDU_Sock_ifaddr_t *ifaddr, int *found )
 #ifdef WORDS_BIGENDIAN
     unsigned int MSBlocalhost = 0x7f000001;
 #endif
+
+    if (dbg_ifname < 0) {
+	int rc;
+	rc = MPIU_GetEnvBool( "MPICH_DBG_IFNAME", &dbg_ifname );
+	if (rc != 1) dbg_ifname = 0;
+    }
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
@@ -239,7 +276,7 @@ static int MPIDI_CH3U_GetIPInterface( MPIDU_Sock_ifaddr_t *ifaddr, int *found )
 	ifreq = (struct ifreq *) ptr;
 
 	if (dbg_ifname) {
-	    fprintf( stdout, "%10s\t", ifreq->ifr_name );
+	    fprintf( stdout, "%10s\t", ifreq->ifr_name ); fflush(stdout);
 	}
 	
 	if (ifreq->ifr_addr.sa_family == AF_INET) {

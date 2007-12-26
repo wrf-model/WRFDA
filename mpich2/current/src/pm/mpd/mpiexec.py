@@ -49,7 +49,7 @@ Examples:
 from time import ctime
 __author__ = "Ralph Butler and Rusty Lusk"
 __date__ = ctime()
-__version__ = "$Revision: 1.88 $"
+__version__ = "$Revision: 1.90 $"
 __credits__ = ""
 
 import signal
@@ -548,7 +548,10 @@ def collect_args(args,localArgSets):
     currumask = os.umask(0) ; os.umask(currumask)  # grab it and set it back
     parmdb[('cmdline','-gn')]          = 1
     parmdb[('cmdline','-ghost')]       = '_any_'
-    parmdb[('cmdline','-gpath')]       = os.environ['PATH']
+    if os.environ.has_key('PATH'):
+        parmdb[('cmdline','-gpath')]   = os.environ['PATH']
+    else:
+        parmdb[('cmdline','-gpath')]   =  ''
     parmdb[('cmdline','-gwdir')]       = os.path.abspath(os.getcwd())
     parmdb[('cmdline','-gumask')]      = str(currumask)
     parmdb[('cmdline','-gsoft')]       = 0

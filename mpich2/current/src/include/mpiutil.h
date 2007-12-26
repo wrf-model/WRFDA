@@ -1,11 +1,17 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: mpiutil.h,v 1.7 2006/12/11 21:40:53 jayesh Exp $
+/*  $Id: mpiutil.h,v 1.8 2007/06/02 19:46:50 gropp Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
  */
 #if !defined(MPIUTIL_H_INCLUDED)
 #define MPIUTIL_H_INCLUDED
+
+#ifndef HAS_MPID_ABORT_DECL
+/* FIXME: 4th arg is undocumented and bogus */
+struct MPID_Comm;
+int MPID_Abort( struct MPID_Comm *comm, int mpi_errno, int exit_code, const char *error_msg );
+#endif
 
 /*
  * MPIU_Sterror()

@@ -36,7 +36,7 @@ distclean-xxx:
 		(cd $$dir && ${MAKE} distclean ; ) ; done
 	-@rm -f Makefile
 	-@rm -rf autom4te*.cache
-	-@for dir in  ib shm sock ssm gasnet sshm nemesis sctp ; do \
+	-@for dir in  ib shm sock ssm gasnet sshm nemesis sctp dllchan ; do \
 	    if [ -s $$dir/Makefile ] ; then \
 	      (cd $$dir && ${MAKE} distclean ;) ; fi ; \
 	done

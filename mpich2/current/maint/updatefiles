@@ -30,6 +30,7 @@ fi
 # depend choices are dynamic, static, no
 do_depend=dynamic
 do_geterrmsgs=yes
+do_getparms=no
 do_bindings=yes
 do_f77=yes
 do_f77tof90=yes
@@ -44,7 +45,7 @@ MAKE=${MAKE-make}
 
 # List of steps that we will consider
 # (We do not include depend because the values for depend are not just yes/no)
-AllSteps="geterrmsgs bindings f77 f77tof90 build_configure genstates makefiles smpdversion"
+AllSteps="geterrmsgs bindings f77 f77tof90 build_configure genstates makefiles smpdversion getparms"
 stepsCleared=no
 
 # Options for some steps
@@ -181,9 +182,9 @@ fi
 # Check that you have a working autoconf.  Autoconf 2.57 is not compatible with
 # previous versions of autoconf (!!), even 2.52 (!!!).  
 acVersion=ok
-if test -d .tmp ; then rm -rf .tmp ; fi
-if test -s .tmp ; then rm -f .tmp ; fi
-if test ! -d .tmp ; then
+if [ -d .tmp ] ; then rm -rf .tmp ; fi
+if [ -s .tmp ] ; then rm -f .tmp ; fi
+if [ ! -d .tmp ] ; then
     mkdir .tmp 2>&1 >/dev/null
 fi
 # As of autoconf 2.59, the command line arguments changed (again)
@@ -228,51 +229,42 @@ rm -rf .tmp
 #
 # Create the bindings if necessary 
 if [ $do_bindings = "yes" ] ; then
+    build_f77=no
+    build_f90=no
+    build_cxx=no
     if [ $do_f77 = "yes" ] ; then
         if [ ! -s src/binding/f77/abortf.c ] ; then 
 	    build_f77=yes
-        elif find src/binding/f77 -name 'buildiface' -newer 'src/binding/f77/abortf.c' ; then
+        elif find src/binding/f77 -name 'buildiface' -newer 'src/binding/f77/abortf.c' >/dev/null 2>&1 ; then
 	    build_f77=yes
-        else
-	    build_f77=no
         fi
-    else
-        build_f77=no
+        if [ ! -s src/binding/f90/mpi_base.f90 ] ; then
+ 	    build_f90=yes
+        elif find src/binding/f90 -name 'buildiface' -newer 'src/binding/f90/mpi_base.f90' >/dev/null 2>&1 ; then
+	    build_f90=yes
+        fi
+ 
     fi
 
     if [ $build_f77 = "yes" ] ; then
 	echo "Building Fortran 77 interface"
 	( cd src/binding/f77 && chmod a+x ./buildiface && ./buildiface )
     fi
+    if [ $build_f90 = "yes" ] ; then
+	echo "Building Fortran 90 interface"
+	( cd src/binding/f90 && chmod a+x ./buildiface && ./buildiface )
+	( cd src/binding/f90 && ../f77/buildiface -infile=cf90t.h -deffile=cf90tdefs)
+    fi
 
     if [ ! -s src/binding/cxx/mpicxx.h ] ; then 
 	build_cxx=yes
-    elif find src/binding/cxx -name 'buildiface' -newer 'src/binding/cxx/mpicxx.h' ; then
+    elif find src/binding/cxx -name 'buildiface' -newer 'src/binding/cxx/mpicxx.h' >/dev/null 2>&1 ; then
 	build_cxx=yes
-    else
-	build_cxx=no
     fi
     if [ $build_cxx = "yes" ] ; then
 	echo "Building C++ interface"
-    #    File code still needs work
-    #    if [ ! -d src/mpi/romio ] ; then
-#	    otherarg="-noromio"
-    #    fi
 	( cd src/binding/cxx && chmod a+x ./buildiface &&
 	  ./buildiface -nosep $otherarg )
-    fi
-
-    if [ ! -s src/binding/f90/mpi.f90 ] ; then
-	build_f90=yes
-    elif find src/binding/f90 -name 'buildiface' -newer 'src/binding/f90/mpi.f90' ; then
-	build_f90=yes
-    else
-	build_f90=no
-    fi
-    if [ $build_f90 = "yes" -a -s src/binding/f90/buildiface ] ; then
-	echo "Building F90 interface"
-	( cd src/binding/f90 && chmod a+x ./buildiface && \
-	    ./buildiface $otherarg)
     fi
 fi
 #
@@ -353,7 +345,7 @@ run_configure=no
 # autom4te*.cache file; since this cache is not accurate, we delete it.
 if [ ! -x maint/configure ] ; then
     (cd maint && $autoconf && rm -rf autom4te*.cache )
-elif find maint -name 'configure.in' -newer 'maint/configure' ; then
+elif find maint -name 'configure.in' -newer 'maint/configure' >/dev/null 2>&1 ; then
     # The above relies on the Unix find command
     (cd maint && $autoconf && rm -rf autom4te*.cache)
 fi
@@ -363,14 +355,14 @@ fi
 #
 # The following relies on the Unix find command
 if [ -s maint/simplemake ] ; then
-    if find maint -name 'simplemake.in' -newer 'maint/simplemake' ; then
+    if find maint -name 'simplemake.in' -newer 'maint/simplemake' >/dev/null 2>&1 ; then
         run_configure=yes
     fi
 else
     run_configure=yes
 fi
 if [ -s maint/genstates ] ; then 
-    if find maint -name 'genstates.in' -newer 'maint/genstates' ; then
+    if find maint -name 'genstates.in' -newer 'maint/genstates' >/dev/null 2>&1 ; then
         run_configure=yes
     fi
 else
@@ -401,6 +393,9 @@ if [ -x maint/extractstates -a $do_genstates = "yes" ] ; then
     echo "Creating the enumeration of logging states into src/include/mpiallstates.h"
     maint/extractstates
 fi
+if [ -x maint/extractparms -a $do_getparms = "yes" ] ; then
+    maint/extractparms -outfile=parms.htm
+fi
 # Create and/or update the f90 tests
 if [ -x maint/f77tof90 -a $do_f77tof90 = "yes" ] ; then
     echo "Create or update the Fortran 90 tests derived from the Fortran 77 tests"
@@ -415,10 +410,10 @@ if [ -x maint/f77tof90 -a $do_f77tof90 = "yes" ] ; then
 fi
 
 if [ $made_simplemake != "no" -a $do_makefiles = yes ] ; then
-    # Check that only the first line was changed:
+    # Check that only the first three lines were changed:
     rm -f .t1 .t2
-    sed -e 1d maint/simplemake.in > .t1
-    sed -e 1d maint/simplemake > .t2
+    sed -e 1,3d maint/simplemake.in > .t1
+    sed -e 1,3d maint/simplemake > .t2
     if diff .t1 .t2 >/dev/null 2>&1 ; then
         :
     else
@@ -502,12 +497,19 @@ if [ $do_build_configure = yes ] ; then
 	    if [ -d $confdbSrcDir ] ; then
                 cp -rp $confdbSrcDir confdb
                 # Remove the CVS directories
-		if test -d confdb/CVS ; then
+		if [ -d confdb/CVS ] ; then
                     (cd confdb && find . -name CVS -print | xargs rm -rf)
                 fi
             else
-                echo "Directory `pwd`/confdb is missing and is required for rebuilding configure"
-  	        exit 1
+		# Try to use scp
+                scp -rp shakey.mcs.anl.gov:$confdbSrcDir confdb
+		if [ -d confdb/CVS ] ; then
+		    (cd confdb && find . -name CVS -print | xargs rm -rf)
+                fi
+		if [ ! -d confdb ] ; then    
+                    echo "Directory `pwd`/confdb is missing and is required for rebuilding configure"
+  	            exit 1
+                fi
             fi
         elif [ -d confdb -a -d "$confdbSrcDir" -a ! -d confdb/CVS ] ; then
             # This is a copy; get an up-to-date copy.  We only do 
@@ -515,7 +517,7 @@ if [ $do_build_configure = yes ] ; then
 	    # part of the distributed version and not local.
             cp -rp $confdbSrcDir confdb
             # Remove the CVS directories
-	    if test -d confdb/CVS ; then
+	    if [ -d confdb/CVS ] ; then
                 (cd confdb && find . -name CVS -print | xargs rm -rf)
             fi
         fi

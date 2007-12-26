@@ -4,9 +4,11 @@ C  (C) 2003 by Argonne National Laboratory.
 C      See COPYRIGHT in top-level directory.
 C
       program main
+      implicit none
       include 'mpif.h'
       integer errs, ierr
       integer comm(4), i, rlen, ln
+      integer ncomm
       character*(MPI_MAX_OBJECT_NAME) inname(4), cname
       logical MTestGetIntracomm
 

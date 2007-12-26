@@ -222,7 +222,7 @@ static int MPIDI_CH3I_Connect_to_root_sctp(const char * port_name,
      */
     port = MPIDI_CH3I_listener_port;
     MPIDI_CH3I_listener_port = real_port;
-    mpi_errno = MPIDI_CH3I_Get_business_card(-1, bizcard, MPI_MAX_PORT_NAME);
+    mpi_errno = MPIDI_CH3_Get_business_card(-1, bizcard, MPI_MAX_PORT_NAME);
     /* --BEGIN ERROR HANDLING-- */
     if (mpi_errno != MPI_SUCCESS) {
         /* FIXME define error code */
@@ -381,7 +381,28 @@ int MPIDI_CH3_PG_Init( MPIDI_PG_t *pg )
 #define FUNCNAME MPIDI_CH3_VC_GetStateString
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-const char * MPIDI_CH3_VC_GetStateString( int state )
+const char * MPIDI_CH3_VC_GetStateString(struct MPIDI_VC* state )
 {
     return NULL;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a process group */
+int MPIDI_CH3_PG_Destroy( struct MPIDI_PG *pg )
+{
+    return MPI_SUCCESS;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a virtual connection */
+int MPIDI_CH3_VC_Destroy( struct MPIDI_VC *vc )
+{
+    return MPI_SUCCESS;
+}
+
+/* A dummy function so that all channels provide the same set of functions, 
+   enabling dll channels */
+int MPIDI_CH3_InitCompleted( void )
+{
+    return MPI_SUCCESS;
 }

@@ -30,8 +30,8 @@ F90HEADERS = typeaints.h
 apply: 
 	$(ACTION) $(ACTION_INPUT)
 clean: 
-	-@rm -f *.o ${srcdir}/*.o gaddressf90 typesubf90 structf typenamef90 typem2f90 packef90 indtype typesnamef90 typecntsf90
-	-@rm -f gaddressf90.exe typesubf90.exe structf.exe typenamef90.exe typem2f90.exe packef90.exe indtype.exe typesnamef90.exe typecntsf90.exe
+	-@rm -f *.o ${srcdir}/*.o gaddressf90 typesubf90 structf typenamef90 createf90 typem2f90 sizeof packef90 indtype typesnamef90 typecntsf90
+	-@rm -f gaddressf90.exe typesubf90.exe structf.exe typenamef90.exe createf90.exe typem2f90.exe sizeof.exe packef90.exe indtype.exe typesnamef90.exe typecntsf90.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -46,7 +46,7 @@ remove-makefile:
 remove-genmakefiles:
 	rm -f  Makefile
 all-redirect: typenamef90 typesnamef90 typecntsf90 typesubf90 typem2f90\
-	 gaddressf90 packef90 structf indtype
+	 gaddressf90 packef90 structf indtype createf90 sizeof
 
 gaddressf90: gaddressf90.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o gaddressf90 gaddressf90.o  \
@@ -59,8 +59,12 @@ structf: structf.o   @MPILIBLOC@ ../util/mtestf90.o
 typenamef90: typenamef90.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o typenamef90 typenamef90.o  \
 	${LIBS} 
+createf90: createf90.o   @MPILIBLOC@ ../util/mtestf90.o
+	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o createf90 createf90.o  ${LIBS}
 typem2f90: typem2f90.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o typem2f90 typem2f90.o  ${LIBS}
+sizeof: sizeof.o   @MPILIBLOC@ ../util/mtestf90.o
+	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o sizeof sizeof.o  ${LIBS}
 packef90: packef90.o   @MPILIBLOC@ ../util/mtestf90.o
 	$(F90_LINK) $(F90FLAGS) $(LDFLAGS) -o packef90 packef90.o  ${LIBS}
 indtype: indtype.o   @MPILIBLOC@ ../util/mtestf90.o
@@ -76,7 +80,7 @@ typecntsf90: typecntsf90.o   @MPILIBLOC@ ../util/mtestf90.o
 # --------------------------------------------------------------------------
 SOURCES         =  typenamef90.f90 typesnamef90.f90 typecntsf90.f90 \
 	typesubf90.f90 typem2f90.f90 gaddressf90.f90 packef90.f90 structf.f90 \
-	indtype.f90 
+	indtype.f90 createf90.f90 sizeof.f90 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
@@ -91,8 +95,6 @@ TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 
 ../util/mtestf90.o: 
 	(cd ../util && $(MAKE) mtestf90.o)
-#createf90_SOURCES = createf90.f90
-#createf90types_SOURCES = createf90types.c
 
 FORCE_TARGET:
 

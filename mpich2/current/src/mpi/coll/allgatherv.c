@@ -61,7 +61,8 @@
 */
 
 /* begin:nested */
-/* not declared static because a machine-specific function may call this one in some cases */
+/* not declared static because a machine-specific function may call this one 
+   in some cases */
 int MPIR_Allgatherv ( 
     void *sendbuf, 
     int sendcount,   
@@ -77,7 +78,8 @@ int MPIR_Allgatherv (
     int        comm_size, rank, j, i, jnext, left, right;
     int        mpi_errno = MPI_SUCCESS;
     MPI_Status status;
-    MPI_Aint recvbuf_extent, recvtype_extent, recvtype_true_extent, recvtype_true_lb;
+    MPI_Aint recvbuf_extent, recvtype_extent, recvtype_true_extent, 
+	recvtype_true_lb;
     int curr_cnt, send_cnt, dst, total_count, recvtype_size, pof2, src, rem; 
     int recv_cnt, comm_size_is_pof2;
     void *tmp_buf;
@@ -855,7 +857,7 @@ Input Parameters:
 . sendcount - number of elements in send buffer (integer) 
 . sendtype - data type of send buffer elements (handle) 
 . recvcounts - integer array (of length group size) 
-containing the number of elements that are received from each process 
+containing the number of elements that are to be received from each process 
 . displs - integer array (of length group size). Entry 
  'i'  specifies the displacement (relative to recvbuf ) at
 which to place the incoming data from process  'i'  

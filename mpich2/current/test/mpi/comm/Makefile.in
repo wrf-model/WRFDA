@@ -6,6 +6,9 @@
 all: all-redirect
 
 SHELL           = @SHELL@
+bindir          = @bindir@
+exec_prefix     = @exec_prefix@
+prefix          = @prefix@
 abs_builddir    = @abs_builddir@
 srcdir          = @srcdir@
 abs_srcdir      = @abs_srcdir@
@@ -31,9 +34,9 @@ INCLUDES = -I../include -I${top_srcdir}/include
 	$(C_COMPILE) -o $* $< $(LDFLAGS) $(LIBS)
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-clean: 
-	-@rm -f *.o ${srcdir}/*.o icm commname cmfree ic1 dupic dup ctxalloc cmsplit icgroup
-	-@rm -f icm.exe commname.exe cmfree.exe ic1.exe dupic.exe dup.exe ctxalloc.exe cmsplit.exe icgroup.exe
+clean:  clean-local
+	-@rm -f *.o ${srcdir}/*.o ctxsplit icsplit icm commname cmfree ic1 dupic probe-intercomm dup ctxalloc iccreate cmsplit icgroup
+	-@rm -f ctxsplit.exe icsplit.exe icm.exe commname.exe cmfree.exe ic1.exe dupic.exe probe-intercomm.exe dup.exe ctxalloc.exe iccreate.exe cmsplit.exe icgroup.exe
 	-@rm -f core core.[0-9]*
 	-@rm -f *.lo ${srcdir}/*.lo
 	-@rm -f *.irlog*
@@ -47,8 +50,13 @@ remove-makefile:
 	rm -f Makefile
 remove-genmakefiles:
 	rm -f  Makefile
-all-redirect: dup dupic ic1 commname ctxalloc icgroup cmfree icm cmsplit
+all-redirect: dup dupic ic1 commname ctxalloc ctxsplit icgroup icsplit\
+	 iccreate cmfree icm cmsplit probe-intercomm
 
+ctxsplit: ctxsplit.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o ctxsplit ctxsplit.o  ${LIBS}
+icsplit: icsplit.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o icsplit icsplit.o  ${LIBS}
 icm: icm.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o icm icm.o  ${LIBS}
 commname: commname.o   @MPILIBLOC@ ../util/mtest.o
@@ -59,10 +67,15 @@ ic1: ic1.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o ic1 ic1.o  ${LIBS}
 dupic: dupic.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o dupic dupic.o  ${LIBS}
+probe-intercomm: probe-intercomm.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o probe-intercomm probe-intercomm.o  \
+	${LIBS} 
 dup: dup.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o dup dup.o  ${LIBS}
 ctxalloc: ctxalloc.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o ctxalloc ctxalloc.o  ${LIBS}
+iccreate: iccreate.o   @MPILIBLOC@ ../util/mtest.o
+	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o iccreate iccreate.o  ${LIBS}
 cmsplit: cmsplit.o   @MPILIBLOC@ ../util/mtest.o
 	$(C_LINK) $(CFLAGS) $(LDFLAGS) -o cmsplit cmsplit.o  ${LIBS}
 icgroup: icgroup.o   @MPILIBLOC@ ../util/mtest.o
@@ -70,8 +83,9 @@ icgroup: icgroup.o   @MPILIBLOC@ ../util/mtest.o
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  dup.c dupic.c ic1.c commname.c ctxalloc.c icgroup.c \
-	cmfree.c icm.c cmsplit.c 
+SOURCES         =  dup.c dupic.c ic1.c commname.c ctxalloc.c ctxsplit.c \
+	icgroup.c icsplit.c iccreate.c cmfree.c icm.c cmsplit.c \
+	probe-intercomm.c 
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
@@ -84,6 +98,13 @@ TAGS: Makefile${HEADERFILES} ${SOURCEFILES}
 ../util/mtest.o:
 	(cd ../util && $(MAKE) mtest.o )
 
+# A special testing target to simplify running just the comm tests
+testing:
+	../runtests -srcdir=$(srcdir) -tests=testlist \
+		   -mpiexec=$(bindir)/mpiexec \
+		   -xmlfile=summary.xml
+clean-local:
+	-rm -f summary.xml
 
 FORCE_TARGET:
 

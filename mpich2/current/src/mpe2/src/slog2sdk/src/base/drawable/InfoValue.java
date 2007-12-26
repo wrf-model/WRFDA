@@ -174,7 +174,9 @@ public class InfoValue implements MixedDataIO
             return Integer.toHexString( ( (Integer) value ).intValue() );
         else if ( type.equals( InfoType.BYTE8 ) )
             return Long.toHexString( ( (Long) value ).longValue() );
-        else
+        else if ( value != null )
             return value.toString();
+        else
+            return null;
     }
 }

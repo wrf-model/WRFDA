@@ -21,18 +21,18 @@ VPATH = .:@srcdir@
 .SUFFIXES: .c .o
 apply: 
 	$(ACTION) $(ACTION_INPUT)
-	for dir in mpid mpi util nameserv binding env @mpe_dir@ pmi pm - ; do \
+	for dir in mpid mpi util nameserv binding env pkgconfig @mpe_dir@ pmi pm - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} apply ; ) ; done
 clean: 
 	-@rm -f *.o ${srcdir}/*.o 
 	-@rm -f *.lo ${srcdir}/*.lo
-	for dir in mpid mpi util nameserv binding env @mpe_dir@ pmi pm - ; do \
+	for dir in mpid mpi util nameserv binding env pkgconfig @mpe_dir@ pmi pm - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} clean ; ) ; done
 distclean:  clean distclean-local distclean-xxx remove-makefile
 distclean-xxx:
-	for dir in mpid mpi util nameserv binding env @mpe_dir@ pmi pm - ; do \
+	for dir in mpid mpi util nameserv binding env pkgconfig @mpe_dir@ pmi pm - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		if [ ! -s $$dir/Makefile ] ; then continue ; fi ;\
 		(cd $$dir && ${MAKE} distclean ; ) ; done
@@ -52,6 +52,7 @@ all-redirect:
 	@(cd nameserv && ${MAKE} all )
 	@(cd binding && ${MAKE} all )
 	@(cd env && ${MAKE} all )
+	@(cd pkgconfig && ${MAKE} all )
 	@for dir in @mpe_dir@ - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		if ( cd $$dir && ${MAKE} all ) ; then : ; else exit 1; fi \
@@ -66,7 +67,7 @@ HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)
 tags: TAGS
 TAGS: Makefile
-	for dir in mpid mpi util nameserv binding env @mpe_dir@ pmi pm include - ; do \
+	for dir in mpid mpi util nameserv binding env pkgconfig @mpe_dir@ pmi pm include - ; do \
 		if [ "$$dir" = "-" ] ; then break ; fi ; \
 		(cd $$dir && ${MAKE} TAGS ; ) ; done
 # --------------------------------------------------------------------------

@@ -14,16 +14,20 @@
       integer disp
       integer win
       integer commsize
+! Include addsize defines asize as an address-sized integer
+      integer (kind=MPI_ADDRESS_KIND) asize
+
+
       errs = 0
       
-      call mpi_init( ierr )
+      call mtest_init( ierr )
       call mpi_comm_size( MPI_COMM_WORLD, commsize, ierr )
 
 ! Create a window; then extract the values 
-      n    = 1024
+      asize    = 1024
       disp = 4
-      call MPI_Win_create( base, n, disp, MPI_INFO_NULL, MPI_COMM_WORLD,  &
-      &  win, ierr )
+      call MPI_Win_create( base, asize, disp, MPI_INFO_NULL,  &
+      &  MPI_COMM_WORLD, win, ierr )
 !
 ! In order to check the base, we need an address-of function.
 ! We use MPI_Get_address, even though that isn't strictly correct
@@ -52,10 +56,10 @@
          errs = errs + 1
          print *, "Could not get WIN_SIZE"
       else
-        if (valout .ne. n) then
+        if (valout .ne. asize) then
             errs = errs + 1
             print *, "Got incorrect value for WIN_SIZE (", valout,  &
-      &        ", should be ", n, ")"
+      &        ", should be ", asize, ")"
          endif
       endif
 
@@ -71,15 +75,9 @@
          endif
       endif
 
-      ! Check for errors
-      if (errs .eq. 0) then
-         print *, " No Errors"
-      else
-         print *, " Found ", errs, " errors"
-      endif
-
       call MPI_Win_free( win, ierr )
 
+      call mtest_finalize( errs )
       call MPI_Finalize( ierr )
 
       end

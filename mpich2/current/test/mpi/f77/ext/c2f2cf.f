@@ -23,7 +23,7 @@ C
 C Test passing a Fortran MPI object to C
       call mpi_comm_rank( MPI_COMM_WORLD, wrank, ierr )
       errs = errs + c2fcomm( MPI_COMM_WORLD )
-      call  mpi_comm_group( MPI_COMM_WORLD, wgroup, ierr )
+      call mpi_comm_group( MPI_COMM_WORLD, wgroup, ierr )
       errs = errs + c2fgroup( wgroup )
       call mpi_group_free( wgroup, ierr )
 
@@ -47,7 +47,6 @@ C Test passing a Fortran MPI object to C
 
 C
 C Test using a C routine to provide the Fortran handle
-      call mpi_comm_group( MPI_COMM_WORLD, wgroup, ierr )
       call mpi_comm_size( MPI_COMM_WORLD, wsize, ierr )
       call mpi_comm_rank( MPI_COMM_WORLD, wrank, ierr )
 
@@ -66,6 +65,7 @@ C Test using a C routine to provide the Fortran handle
          errs = errs + 1
          print *, "Group(fortran) has wrong size or rank"
       endif
+      call mpi_group_free( group, ierr )
 
       call f2ctype( type )
       if (type .ne. MPI_INTEGER) then

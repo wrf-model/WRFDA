@@ -351,10 +351,10 @@ void MPIDI_CH3I_Progress_wakeup(void)
 #endif
 
 #undef FUNCNAME
-#define FUNCNAME MPIDI_CH3I_Get_business_card
+#define FUNCNAME MPIDI_CH3_Get_business_card
 #undef FCNAME
 #define FCNAME MPIDI_QUOTE(FUNCNAME)
-int MPIDI_CH3I_Get_business_card(int myRank, char *value, int length)
+int MPIDI_CH3_Get_business_card(int myRank, char *value, int length)
 {
     return MPIDI_CH3U_Get_business_card_sctp(&value, &length);
 }
@@ -445,6 +445,7 @@ int MPIDI_CH3I_Progress_handle_sctp_event(MPIDU_Sctp_event_t * event)
                 /* we have seen this association before */
                 MPIDI_VC_t * vc;
                 MPIDI_CH3_Pkt_t * pkt =  event->user_ptr;
+                MPIDI_msg_sz_t buflen = sizeof (MPIDI_CH3_Pkt_t);
 
                 if(MPIDI_CH3I_dynamic_tmp_fd == event->fd)
                 {
@@ -510,7 +511,7 @@ int MPIDI_CH3I_Progress_handle_sctp_event(MPIDU_Sctp_event_t * event)
                         goto fn_exit;
                     }
 		    
-		    mpi_errno = MPIDI_CH3U_Handle_recv_pkt(vc, pkt, &rreq);
+		    mpi_errno = MPIDI_CH3U_Handle_recv_pkt(vc, pkt, &buflen, &rreq);
 		    
 		    if (mpi_errno != MPI_SUCCESS) {
 			MPIU_ERR_POP(mpi_errno);
@@ -795,7 +796,7 @@ int MPIDI_CH3I_Progress_handle_sctp_event(MPIDU_Sctp_event_t * event)
              */
             suggested_port = MPIDI_CH3I_listener_port;
             MPIDI_CH3I_listener_port = real_port;
-            mpi_errno = MPIDI_CH3I_Get_business_card(-1, bizcard, MPI_MAX_PORT_NAME);
+            mpi_errno = MPIDI_CH3_Get_business_card(-1, bizcard, MPI_MAX_PORT_NAME);
             /* --BEGIN ERROR HANDLING-- */
             if (mpi_errno != MPI_SUCCESS) {
                 /* FIXME define error code */

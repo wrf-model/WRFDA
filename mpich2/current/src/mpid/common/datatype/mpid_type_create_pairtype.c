@@ -10,6 +10,20 @@
 #include <stdlib.h>
 #include <limits.h>
 
+/* PAIRTYPE_SIZE_EXTENT - calculates size, extent, etc. for pairtype by
+ * defining the appropriate C type.
+ */
+#define PAIRTYPE_SIZE_EXTENT(mt1_,ut1_,mt2_,ut2_)			\
+    {									\
+	struct { ut1_ a; ut2_ b; } foo;					\
+	type_size   = sizeof(foo.a) + sizeof(foo.b);			\
+	type_extent = (MPI_Aint) sizeof(foo);				\
+	el_size = (sizeof(foo.a) == sizeof(foo.b)) ? (int) sizeof(foo.a) : -1; \
+	true_ub = ((char *) &foo.b - (char *) &foo.a) + (MPI_Aint) sizeof(foo.b); \
+	alignsize = MPIR_MAX(MPID_Datatype_get_basic_size(mt1_),	\
+                             MPID_Datatype_get_basic_size(mt2_));	\
+    }
+
 /*@
   MPID_Type_create_pairtype - create necessary data structures for certain
   pair types (all but MPI_2INT etc., which never have the size != extent
@@ -50,12 +64,8 @@ int MPID_Type_create_pairtype(MPI_Datatype type,
 			      MPID_Datatype *new_dtp)
 {
     int err, mpi_errno = MPI_SUCCESS;
-    int type_size, el_size;
+    int type_size, el_size, alignsize;
     MPI_Aint type_extent, true_ub;
-
-    int blocks[2] = {1, 1};
-    MPI_Aint disps[2];
-    MPI_Datatype types[2];
 
     /* handle is filled in by MPIU_Handle_obj_alloc() */
     MPIU_Object_set_ref(new_dtp, 1);
@@ -66,86 +76,28 @@ int MPID_Type_create_pairtype(MPI_Datatype type,
     new_dtp->name[0]      = 0;
     new_dtp->contents     = NULL;
 
-    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop       = NULL;
+    new_dtp->dataloop_size  = -1;
     new_dtp->dataloop_depth = -1;
+    new_dtp->hetero_dloop       = NULL;
+    new_dtp->hetero_dloop_size  = -1;
+    new_dtp->hetero_dloop_depth = -1;
 
-    /* TODO: perhaps clean this up with a macro? */
     switch(type) {
 	case MPI_FLOAT_INT:
-	    {
-		struct { float a; int b; } foo;
-
-		disps[0]    = 0;
-		disps[1]    = (MPI_Aint) ((char *) &foo.b - (char *) &foo.a);
-		types[0]    = MPI_FLOAT;
-		types[1]    = MPI_INT;
-		type_size   = sizeof(foo.a) + sizeof(foo.b);
-		type_extent = (MPI_Aint) sizeof(foo);
-		el_size     = (sizeof(foo.a) == sizeof(foo.b)) ?
-		    (int) sizeof(foo.a) : -1;
-		true_ub     = disps[1] + (MPI_Aint) sizeof(foo.b);
-	    }
+	    PAIRTYPE_SIZE_EXTENT(MPI_FLOAT, float, MPI_INT, int);
 	    break;
 	case MPI_DOUBLE_INT:
-	    {
-		struct { double a; int b; } foo;
-
-		disps[0]    = 0;
-		disps[1]    = (MPI_Aint) ((char *) &foo.b - (char *) &foo.a);
-		types[0]    = MPI_DOUBLE;
-		types[1]    = MPI_INT;
-		type_size   = sizeof(foo.a) + sizeof(foo.b);
-		type_extent = (MPI_Aint) sizeof(foo);
-		el_size     = (sizeof(foo.a) == sizeof(foo.b)) ?
-		    (int) sizeof(foo.a) : -1;
-		true_ub     = disps[1] + (MPI_Aint) sizeof(foo.b);
-	    }
+	    PAIRTYPE_SIZE_EXTENT(MPI_DOUBLE, double, MPI_INT, int);
 	    break;
 	case MPI_LONG_INT:
-	    {
-		struct { long a; int b; } foo;
-
-		disps[0]    = 0;
-		disps[1]    = (MPI_Aint) ((char *) &foo.b - (char *) &foo.a);
-		types[0]    = MPI_LONG;
-		types[1]    = MPI_INT;
-		type_size   = sizeof(foo.a) + sizeof(foo.b);
-		type_extent = (MPI_Aint) sizeof(foo);
-		el_size     = (sizeof(foo.a) == sizeof(foo.b)) ?
-		    (int) sizeof(foo.a) : -1;
-		true_ub     = disps[1] + (MPI_Aint) sizeof(foo.b);
-	    }
+	    PAIRTYPE_SIZE_EXTENT(MPI_LONG, long, MPI_INT, int);
 	    break;
 	case MPI_SHORT_INT:
-	    {
-		struct { short a; int b; } foo;
-
-		disps[0]    = 0;
-		disps[1]    = (MPI_Aint) ((char *) &foo.b - (char *) &foo.a);
-		types[0]    = MPI_SHORT;
-		types[1]    = MPI_INT;
-		type_size   = sizeof(foo.a) + sizeof(foo.b);
-		type_extent = (MPI_Aint) sizeof(foo);
-		el_size     = (sizeof(foo.a) == sizeof(foo.b)) ?
-		    (int) sizeof(foo.a) : -1;
-		true_ub     = disps[1] + (MPI_Aint) sizeof(foo.b);
-	    }
+	    PAIRTYPE_SIZE_EXTENT(MPI_SHORT, short, MPI_INT, int);
 	    break;
 	case MPI_LONG_DOUBLE_INT:
-	    {
-		struct { long double a; int b; } foo;
-
-		disps[0]    = 0;
-		disps[1]    = (MPI_Aint) ((char *) &foo.b - (char *) &foo.a);
-		types[0]    = MPI_LONG_DOUBLE;
-		types[1]    = MPI_INT;
-		type_size   = sizeof(foo.a) + sizeof(foo.b);
-		type_extent = (MPI_Aint) sizeof(foo);
-		el_size     = (sizeof(foo.a) == sizeof(foo.b)) ?
-		    (int) sizeof(foo.a) : -1;
-		true_ub     = disps[1] + (MPI_Aint) sizeof(foo.b);
-	    }
+	    PAIRTYPE_SIZE_EXTENT(MPI_LONG_DOUBLE, long double, MPI_INT, int);
 	    break;
 	default:
 	    /* --BEGIN ERROR HANDLING-- */
@@ -173,10 +125,9 @@ int MPID_Type_create_pairtype(MPI_Datatype type,
     new_dtp->size            = type_size;
     new_dtp->ub              = type_extent; /* possible padding */
     new_dtp->extent          = type_extent;
-
-    new_dtp->alignsize       = MPIR_MAX(MPID_Datatype_get_basic_size(types[0]),
-					MPID_Datatype_get_basic_size(types[1]));
-    /* place maximum on alignment based on padding rules */
+    new_dtp->alignsize       = alignsize;
+ 
+   /* place maximum on alignment based on padding rules */
     /* There are some really wierd rules for structure alignment; 
        these capture the ones of which we are aware. */
     switch(type) {
@@ -213,37 +164,34 @@ int MPID_Type_create_pairtype(MPI_Datatype type,
 	    break;
     }
 				   
-
     new_dtp->is_contig       = (type_size == type_extent) ? 1 : 0;
     new_dtp->n_contig_blocks = (type_size == type_extent) ? 1 : 2;
 
-    /* fill in dataloop(s) */
-    err = MPID_Dataloop_create_struct(2,
-				      blocks,
-				      disps,
-				      types,
-				      &(new_dtp->dataloop),
-				      &(new_dtp->dataloop_size),
-				      &(new_dtp->dataloop_depth),
-				      MPID_DATALOOP_HOMOGENEOUS);
-#if defined(MPID_HAS_HETERO) || 1
+    /* fill in dataloops -- only case where we precreate dataloops
+     *
+     * this is necessary because these types aren't committed by the
+     * user, which is the other place where we create dataloops. so
+     * if the user uses one of these w/out building some more complex
+     * type and then committing it, then the dataloop will be missing.
+     */
+    err = MPID_Dataloop_create_pairtype(type,
+					&(new_dtp->dataloop),
+					&(new_dtp->dataloop_size),
+					&(new_dtp->dataloop_depth),
+					MPID_DATALOOP_HOMOGENEOUS);
     if (!err) {
-	/* heterogeneous dataloop representation */
-	err = MPID_Dataloop_create_struct(2,
-					  blocks,
-					  disps,
-					  types,
-					  &(new_dtp->hetero_dloop),
-					  &(new_dtp->hetero_dloop_size),
-					  &(new_dtp->hetero_dloop_depth),
-					  0);
+	err = MPID_Dataloop_create_pairtype(type,
+					    &(new_dtp->hetero_dloop),
+					    &(new_dtp->hetero_dloop_size),
+					    &(new_dtp->hetero_dloop_depth),
+					    MPID_DATALOOP_HETEROGENEOUS);
     }
-#endif /* MPID_HAS_HETERO */
+
     /* --BEGIN ERROR HANDLING-- */
     if (err) {
 	mpi_errno = MPIR_Err_create_code(MPI_SUCCESS,
 					 MPIR_ERR_RECOVERABLE,
-					 "MPID_Dataloop_create_struct",
+					 "MPID_Dataloop_create_pairtype",
 					 __LINE__,
 					 MPI_ERR_OTHER,
 					 "**nomem",

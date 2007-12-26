@@ -11,7 +11,12 @@
        integer comm, rlen
        integer buf(10)
        integer file
-       external myerrhanfunc
+!      external myerrhanfunc
+       INTERFACE 
+       SUBROUTINE myerrhanfunc(vv0,vv1)
+       INTEGER vv0,vv1
+       END SUBROUTINE
+       END INTERFACE
        integer myerrhan, qerr
        integer callcount, codesSeen(3)
        common /myerrhan/ callcount, codesSeen
@@ -100,6 +105,7 @@
        endif
 
        call mpi_file_close( file, ierr )
+       call mpi_comm_free( comm, ierr )
        call mpi_file_delete( "testfile.txt", MPI_INFO_NULL, ierr )
 !
 ! Check error strings while here here...

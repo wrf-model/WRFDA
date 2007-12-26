@@ -1,5 +1,5 @@
 /* -*- Mode: C; c-basic-offset:4 ; -*- */
-/*  $Id: initthread.c,v 1.94 2006/12/09 16:42:26 gropp Exp $
+/*  $Id: initthread.c,v 1.105 2007/08/03 21:02:32 buntinas Exp $
  *
  *  (C) 2001 by Argonne National Laboratory.
  *      See COPYRIGHT in top-level directory.
@@ -31,7 +31,9 @@
 /* Any internal routines can go here.  Make them static if possible */
 
 /* Global variables can be initialized here */
-MPICH_PerProcess_t MPIR_Process = { MPICH_PRE_INIT }; /* all others are irelevant */
+MPICH_PerProcess_t MPIR_Process = { MPICH_PRE_INIT }; 
+     /* all other fields in MPIR_Process are irrelevant */
+MPICH_ThreadInfo_t MPIR_ThreadInfo = { 0 };
 
 /* These are initialized as null (avoids making these into common symbols).
    If the Fortran binding is supported, these can be initialized to 
@@ -39,6 +41,10 @@ MPICH_PerProcess_t MPIR_Process = { MPICH_PRE_INIT }; /* all others are irelevan
    MPI_Init and MPI_Finalize) */
 MPIU_DLL_SPEC MPI_Fint *MPI_F_STATUS_IGNORE = 0;
 MPIU_DLL_SPEC MPI_Fint *MPI_F_STATUSES_IGNORE = 0;
+
+/* This will help force the load of initinfo.o, which contains data about
+   how MPICH2 was configured. */
+extern const char MPIR_Version_device[];
 
 #ifdef HAVE_WINDOWS_H
 /* User-defined abort hook function.  Exiting here will prevent the system from
@@ -92,6 +98,18 @@ MPICH_PerThread_t  MPIR_Thread = { 0 };
 MPICH_PerThread_t  MPIR_ThreadSingle = { 0 };
 #endif
 
+#if defined(MPICH_IS_THREADED)
+/* This routine is called when a thread exits; it is passed the value 
+   associated with the key.  In our case, this is simply storage allocated
+   with MPIU_Calloc */
+void MPIR_CleanupThreadStorage( void *a )
+{
+    if (a != 0) {
+	MPIU_Free( a );
+    }
+}
+#endif /* MPICH_IS_THREADED */
+
 
 int MPIR_Init_thread(int * argc, char ***argv, int required,
 		     int * provided)
@@ -126,10 +144,16 @@ int MPIR_Init_thread(int * argc, char ***argv, int required,
     /* We need this inorder to implement IS_THREAD_MAIN */
 #   if (MPICH_THREAD_LEVEL >= MPI_THREAD_SERIALIZED)
     {
-	MPID_Thread_self(&MPIR_Process.master_thread);
+	MPID_Thread_self(&MPIR_ThreadInfo.master_thread);
     }
 #   endif
-    
+
+#if 0
+    /* This should never happen */
+    if (MPIR_Version_device == 0) {
+	
+    }
+#endif     
 #ifdef HAVE_ERROR_CHECKING
     /* Eventually this will support commandline and environment options
      for controlling error checks.  It will use the routine 
@@ -207,6 +231,28 @@ int MPIR_Init_thread(int * argc, char ***argv, int required,
     MPIR_Process.comm_self->coll_fns	    = NULL; /* XXX */
     MPIR_Process.comm_self->topo_fns	    = NULL; /* XXX */
 
+#ifdef MPID_NEEDS_ICOMM_WORLD
+    MPIR_Process.icomm_world		    = MPID_Comm_builtin + 2;
+    MPIR_Process.icomm_world->handle	    = MPIR_ICOMM_WORLD;
+    MPIU_Object_set_ref( MPIR_Process.icomm_world, 1 );
+    MPIR_Process.icomm_world->context_id    = 8; /* XXX */
+    MPIR_Process.icomm_world->recvcontext_id= 8;
+    MPIR_Process.icomm_world->attributes    = NULL;
+    MPIR_Process.icomm_world->local_group   = NULL;
+    MPIR_Process.icomm_world->remote_group  = NULL;
+    MPIR_Process.icomm_world->comm_kind	    = MPID_INTRACOMM;
+    /* This initialization of the comm name could be done only when 
+       comm_get_name is called */
+    MPIU_Strncpy(MPIR_Process.icomm_world->name, "MPI_ICOMM_WORLD",
+		 MPI_MAX_OBJECT_NAME);
+    MPIR_Process.icomm_world->errhandler    = NULL; /* XXX */
+    MPIR_Process.icomm_world->coll_fns	    = NULL; /* XXX */
+    MPIR_Process.icomm_world->topo_fns	    = NULL; /* XXX */
+
+    /* Note that these communicators are not ready for use - MPID_Init 
+       will setup self and world, and icomm_world if it desires it. */
+#endif
+
     MPIR_Process.comm_parent = NULL;
 
     /* Setup the initial communicator list in case we have 
@@ -237,14 +283,16 @@ int MPIR_Init_thread(int * argc, char ***argv, int required,
        decisions on the value of isThreaded, set a provisional
        value here. We could let the MPID_Init routine override this */
 #ifdef HAVE_RUNTIME_THREADCHECK
-    MPIR_Process.isThreaded = required == MPI_THREAD_MULTIPLE;
+    MPIR_ThreadInfo.isThreaded = required == MPI_THREAD_MULTIPLE;
 #endif
     mpi_errno = MPID_Init(argc, argv, required, &thread_provided, 
 			  &has_args, &has_env);
     /* --BEGIN ERROR HANDLING-- */
     if (mpi_errno != MPI_SUCCESS)
     {
-	mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, "MPIR_Init_thread", __LINE__, MPI_ERR_OTHER, "**init", 0);
+	mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, 
+			   "MPIR_Init_thread", __LINE__, MPI_ERR_OTHER, 
+			   "**init", 0);
 	/* FIXME: the default behavior for all MPI routines is to abort.  
 	   This isn't always convenient, because there's no other way to 
 	   get this routine to simply return.  But we should provide some
@@ -255,19 +303,12 @@ int MPIR_Init_thread(int * argc, char ***argv, int required,
     /* --END ERROR HANDLING-- */
 
     /* Capture the level of thread support provided */
-    MPIR_Process.thread_provided = thread_provided;
+    MPIR_ThreadInfo.thread_provided = thread_provided;
     if (provided) *provided = thread_provided;
     /* FIXME: Rationalize this with the above */
 #ifdef HAVE_RUNTIME_THREADCHECK
-    MPIR_Process.isThreaded = required == MPI_THREAD_MULTIPLE;
+    MPIR_ThreadInfo.isThreaded = required == MPI_THREAD_MULTIPLE;
     if (provided) *provided = required;
-#if 0
-    /* Preallocated MPIR_Thread if we're single-threaded */
-    if (provided < MPI_THREAD_MULTIPLE) {
-	MPIR_Thread = (MPICH_PerThread_t *) 
-	    MPIU_Calloc(1, sizeof(MPICH_PerThread_t));
-    }
-#endif
 #endif
 
     /* FIXME: Define these in the interface.  Does Timer init belong here? */
@@ -303,7 +344,12 @@ int MPIR_Init_thread(int * argc, char ***argv, int required,
 
 #ifdef HAVE_DEBUGGER_SUPPORT
     MPIR_WaitForDebugger();
-#endif    
+#endif
+    
+    /* Let the device know that the rest of the init process is completed */
+    if (mpi_errno == MPI_SUCCESS) 
+	mpi_errno = MPID_InitCompleted();
+
     return mpi_errno;
 }
 #endif
@@ -356,12 +402,26 @@ int MPI_Init_thread( int *argc, char ***argv, int required, int *provided )
     MPID_MPI_INIT_STATE_DECL(MPID_STATE_MPI_INIT_THREAD);
 
     MPID_CS_INITIALIZE();
-    MPIU_THREAD_SINGLE_CS_ENTER("init");
+    /* FIXME: Can we get away without locking every time.  Now, we
+       need a MPID_CS_ENTER/EXIT around MPI_Init and MPI_Init_thread.
+       Progress may be called within MPI_Init, e.g., by a spawned
+       child process.  Within progress, the lock is released and
+       reacquired when blocking.  If the lock isn't acquired before
+       then, the release in progress is incorrect.  Furthermore, if we
+       don't release the lock after progress, we'll deadlock the next
+       time this process tries to acquire the lock.
+       MPID_CS_ENTER/EXIT functions are used here instead of
+       MPIU_THREAD_SINGLE_CS_ENTER/EXIT because
+       MPIR_ThreadInfo.isThreaded hasn't been initialized yet.
+    */
+    MPID_CS_ENTER();
 
+#if 0
     /* Create the thread-private region if necessary and go ahead 
        and initialize it */
     MPIU_THREADPRIV_INITKEY;
     MPIU_THREADPRIV_INIT;
+#endif
 
     MPID_MPI_INIT_FUNC_ENTER(MPID_STATE_MPI_INIT_THREAD);
     
@@ -387,7 +447,7 @@ int MPI_Init_thread( int *argc, char ***argv, int required, int *provided )
     /* ... end of body of routine ... */
     
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT_THREAD);
-    MPIU_THREAD_SINGLE_CS_EXIT("init");
+    MPID_CS_EXIT();
     return mpi_errno;
     
   fn_fail:
@@ -402,7 +462,7 @@ int MPI_Init_thread( int *argc, char ***argv, int required, int *provided )
 #   endif
     mpi_errno = MPIR_Err_return_comm( 0, FCNAME, mpi_errno );
     MPID_MPI_INIT_FUNC_EXIT(MPID_STATE_MPI_INIT_THREAD);
-    MPIU_THREAD_SINGLE_CS_EXIT("init");
+    MPID_CS_EXIT();
     MPID_CS_FINALIZE();
     return mpi_errno;
     /* --END ERROR HANDLING-- */

@@ -1,4 +1,4 @@
-;LIBRARY mpe
+;LIBRARY mpe:wq
 
 EXPORTS
     MPE_Init_log
@@ -41,4 +41,4 @@ EXPORTS
     CLOG_CommSet_add_intracomm
     CLOG_CommSet_add_intercomm
     CLOG_CommSet
-    CLOG_CommIDs4World
+;    CLOG_CommIDs4World

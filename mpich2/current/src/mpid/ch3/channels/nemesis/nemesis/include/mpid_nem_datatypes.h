@@ -50,9 +50,86 @@
 #else
 #define MPID_NEM_CELL_LEN           (64*1024)
 #endif 
-#define MPID_NEM_CELL_PAYLOAD_LEN   (MPID_NEM_CELL_LEN - sizeof(void *))
 
-#define MPID_NEM_CALC_CELL_LEN(cellp) (sizeof(void *) + MPID_NEM_MPICH2_HEAD_LEN + MPID_NEM_CELL_DLEN (cell))
+/*
+   The layout of the cell looks like this:
+
+   --CELL------------------
+   | next                 |
+   | padding              |
+   | --MPICH2 PKT-------- |
+   | | packet headers   | |
+   | | packet payload   | |
+   | |   .              | |
+   | |   .              | |
+   | |   .              | |
+   | |                  | |
+   | -------------------- |
+   ------------------------
+
+   There's also a ckpt packet in addition to the mpich2 pkt, but we
+   can ignore this for this discussion.
+
+   For optimization, we want the cell to start at a cacheline boundary
+   and the cell length to be a multiple of cacheline size.  This will
+   avoid false sharing.  We also want payload to start at an 8-byte
+   boundary to to optimize memcpys and dataloop operations on the
+   payload.  To ensure payload is 8-byte aligned, we add padding after
+   the next pointer so the packet starts at the 8-byte boundary.
+
+   Forgive the misnomers of the macros.
+
+   MPID_NEM_CELL_LEN size of the whole cell (currently 64K)
+   
+   MPID_NEM_CELL_HEAD_LEN is the size of the next pointer plus the
+       padding.
+   
+   MPID_NEM_CELL_PAYLOAD_LEN is the maximum length of the packet.
+       This is MPID_NEM_CELL_LEN minus the size of the next pointer
+       and any padding.
+
+   MPID_NEM_MPICH2_HEAD_LEN is the length of the mpich2 packet header
+       fields.
+
+   MPID_NEM_MPICH2_DATA_LEN is the maximum length of the mpich2 packet
+       payload and is basically what's left after the next pointer,
+       padding and packet header.  This is MPID_NEM_CELL_PAYLOAD_LEN -
+       MPID_NEM_MPICH2_HEAD_LEN.
+
+   MPID_NEM_CALC_CELL_LEN is the amount of data plus headers in the
+       cell.  I.e., how much of a cell would need to be sent over a
+       network.
+
+   FIXME: Simplify this maddness!  Maybe something like this:
+
+       typedef struct mpich2_pkt {
+           header_field1;
+           header_field2;
+           payload[1];
+       } mpich2_pkt_t;
+   
+       typedef struct cell {
+           *next;
+           padding;
+           pkt;
+       } cell_t;
+
+       typedef union cell_container {
+           cell_t cell;
+           char padding[MPID_NEM_CELL_LEN];
+       } cell_container_t;
+
+       #define MPID_NEM_MPICH2_DATA_LEN (sizeof(cell_container_t) - sizeof(cell_t) + 1)
+
+   The packet payload can overflow the array in the packet struct up
+   to MPID_NEM_MPICH2_DATA_LEN bytes.
+   
+*/
+
+#define MPID_NEM_CELL_HEAD_LEN sizeof(double)
+#define MPID_NEM_CELL_PAYLOAD_LEN (MPID_NEM_CELL_LEN - MPID_NEM_CELL_HEAD_LEN)
+
+#define MPID_NEM_CALC_CELL_LEN(cellp) (MPID_NEM_CELL_HEAD_LEN + MPID_NEM_MPICH2_HEAD_LEN + MPID_NEM_CELL_DLEN (cell))
 
 #define MPID_NEM_ALIGNED(addr, bytes) ((((unsigned long)addr) & (((unsigned long)bytes)-1)) == 0)
 
@@ -129,6 +206,7 @@ MPID_nem_cell_rel_ptr_t;
 typedef struct MPID_nem_cell
 {
     MPID_nem_cell_rel_ptr_t next;
+    char padding[MPID_NEM_CELL_HEAD_LEN - sizeof(MPID_nem_cell_rel_ptr_t)];
     MPID_nem_pkt_t pkt;
 } MPID_nem_cell_t;
 typedef volatile MPID_nem_cell_t *MPID_nem_cell_ptr_t;
@@ -136,6 +214,7 @@ typedef volatile MPID_nem_cell_t *MPID_nem_cell_ptr_t;
 typedef struct MPID_nem_abs_cell
 {
     struct MPID_nem_abs_cell *next;
+    char padding[MPID_NEM_CELL_HEAD_LEN - sizeof(struct MPID_nem_abs_cell*)];
     volatile MPID_nem_pkt_t pkt;
 } MPID_nem_abs_cell_t;
 typedef MPID_nem_abs_cell_t *MPID_nem_abs_cell_ptr_t;

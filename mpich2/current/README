@@ -1,4 +1,4 @@
-			 MPICH2 Release 1.0.5
+			 MPICH2 Release 1.0.6
 
 MPICH2 is an all-new implementation of MPI from the group at Argonne
 National Laboratory.  It shares many goals with the original MPICH but
@@ -34,12 +34,12 @@ later, in the section "Alternative configurations".
 
 1.  You will need the following prerequisites.
 
-    - This tar file mpich2-1.0.5.tar.gz
+    - This tar file mpich2-1.0.6.tar.gz
 
     - A C compiler (gcc is sufficient)
 
-    - A Fortran compiler if Fortran applications are to be used (g77 is
-      sufficient) 
+    - A Fortran compiler if Fortran applications are to be used
+      (g77 or gfortran is sufficient) 
 
     - A C++ compiler for the C++ MPI bindings (g++ is sufficient)
 
@@ -59,16 +59,20 @@ later, in the section "Alternative configurations".
     deficiencies if possible.  (If you don't have Fortran, you will
     still be able to use MPICH2, just not with Fortran applications.)
 
+    Also, you need to know what shell you are using since different shell
+    has different command syntax. Command "echo $SHELL" prints out the
+    current shell used by your terminal program.
+
 2.  Unpack the tar file and go to the top level directory:
 
       tar xfz mpich2.tar.gz
-      cd mpich2-1.0.5
+      cd mpich2-1.0.6
 
     If your tar doesn't accept the z option, use
 
       gunzip mpich2.tar.gz
       tar xf mpich2.tar
-      cd mpich2-1.0.5
+      cd mpich2-1.0.6
 
 3.  Choose an installation directory (the default is /usr/local/bin):
 
@@ -80,26 +84,45 @@ later, in the section "Alternative configurations".
 
 4.  Configure MPICH2, specifying the installation directory:
 
-      ./configure -prefix=/home/you/mpich2-install |& tee configure.log
+    for csh and tcsh:
 
-    (On sh and its derivatives, use "2>&1 | tee configure.log" instead
-    of "|& tee configure.log").  Other configure options are described
-    below.  You might also prefer to do a VPATH build (see below).
-    Check the configure.log file to make sure everything went will.
-    Problems should be self-explanatory, but if not, sent
-    configure.log to mpich2-maint@mcs.anl.gov.
+      ./configure --prefix=/home/you/mpich2-install |& tee c.txt
+
+    for bash and sh:
+
+      ./configure --prefix=/home/you/mpich2-install 2>&1 | tee c.txt
+
+    Bourne-like shells, sh and bash, accept "2>&1 |".  Csh-like shell,
+    csh and tcsh, accept "|&".  File c.txt is used to store all messages
+    generated configure command and is useful for diagnosis if something
+    goes wrong.  Other configure options are described below.  You might
+    also prefer to do a VPATH build (see below).  Check the c.txt file
+    to make sure everything went will.  Problems should be self-explanatory,
+    but if not, sent c.txt to mpich2-maint@mcs.anl.gov.
 
 5.  Build MPICH2:
 
-      make |& tee make.log
+    for csh and tcsh:
+
+      make |& tee m.txt
+
+    for bash and sh:
+
+      make 2>&1 | tee m.txt
 
     This step should succeed if there were no problems with the
-    preceding step.  Check make.log.  If there were problems, send
-    make.log to mpich2-maint@mcs.anl.gov.
+    preceding step.  Check file m.txt.  If there were problems, send
+    m.txt to mpich2-maint@mcs.anl.gov.
 
 6.  Install the MPICH2 commands:
 
-      make install |& tee install.log
+    for csh and tcsh:
+
+      make install |& tee mi.txt
+
+    for bash and sh:
+
+      make install 2>&1 | tee mi.txt
 
     This step collects all required executables and scripts in the bin
     subdirectory of the directory specified by the prefix argument to
@@ -113,7 +136,7 @@ later, in the section "Alternative configurations".
 
     for bash and sh:
   
-      export PATH=/home/you/mpich2-install/bin:$PATH
+      PATH=/home/you/mpich2-install/bin:$PATH ; export PATH
 
     Check that everything is in order at this point by doing 
 
@@ -131,7 +154,7 @@ later, in the section "Alternative configurations".
     MPD, which is a ring of daemons on the machines where you will run
     your MPI programs.  In the next few steps, you will get his ring up
     and tested.  More details on interacting with MPD can be found in
-    the README file in mpich2-1.0.5/src/pm/mpd, such as how to list
+    the README file in mpich2-1.0.6/src/pm/mpd, such as how to list
     running jobs, kill, suspend, or otherwise signal them, and how to
     debug programs with "mpiexec -gdb".
 
@@ -214,11 +237,13 @@ later, in the section "Alternative configurations".
 
     to see which machines are in the ring so far.  More details on
     mpdboot and other options for starting the mpd's are in
-    mpich2-1.0.5/src/pm/mpd/README.
+    mpich2-1.0.6/src/pm/mpd/README.
 
+ !! ***************************
     If you are still having problems getting the mpd ring established,
-    see the Installation Guide for instructions on how to diagnose
-    problems with your system configuration that may be preventing it.
+    you can use the mpdcheck utility as described in the Installation Guide 
+    to diagnose problems with your system configuration.
+ !! ***************************
 
 12. Test the ring you have just created:
 
@@ -254,7 +279,7 @@ later, in the section "Alternative configurations".
 14. Now we will run an MPI job, using the mpiexec command as specified
     in the MPI-2 standard.  There are some examples in the install
     directory, which you have already put in your path, as well as in
-    the directory mpich2-1.0.5/examples.  One of them is the classic
+    the directory mpich2-1.0.6/examples.  One of them is the classic
     cpi example, which computes the value of pi by numerical
     integration in parallel.
 
@@ -316,7 +341,25 @@ alternatives with
    ./configure --help
 
 in the mpich2 directory.  The alternatives described below are
-configured by adding arguments to the configure step
+configured by adding arguments to the configure step.
+
+
+Compiler Optimization Levels
+============================
+
+By default, from version 1.0.6 onwards the MPICH2 library is built
+with the -O2 optimization level if it is available. The mpicc and
+other scripts that are used to compile applications do not include any
+optimization flag by default. If you want to build the MPICH2 library
+with a specific optimization level, set the environment variable
+CFLAGS to that level before running configure. If you do not want this
+CFLAGS value to be included in the mpicc script, set the environment
+variable MPI_CFLAGS to MPI_CFLAGS_EMPTY. For example, to build a
+"production" MPICH2 in a GNU environment, you may want to do:
+     setenv CFLAGS -O3
+     setenv MPI_CFLAGS MPI_CFLAGS_EMPTY
+before running configure. This will cause the MPICH2 library to be
+built with -O3, but -O3 will not be included in the mpicc script.
 
 
 Alternative Process Managers
@@ -325,7 +368,7 @@ Alternative Process Managers
 mpd
 ---
 MPD is the default process manager.  Its setup and use have been
-described above.  The file mpich2-1.0.5/src/pm/mpd/README has more 
+described above.  The file mpich2-1.0.6/src/pm/mpd/README has more 
 information about interactive commands for managing the ring of MPDs.
 
 smpd
@@ -333,7 +376,7 @@ smpd
 SMPD is a process management system for both Microsoft Windows and UNIX.
 SMPD is capable of starting a job where some processes are running on
 Windows and others are running on a variant of UNIX.  For more
-information, please see mpich2-1.0.5/src/pm/smpd/README. 
+information, please see mpich2-1.0.6/src/pm/smpd/README. 
 
 gforker
 -------
@@ -372,9 +415,39 @@ or
 
 on the configure command line.
 
+A new channel supports the dynamic loading of other channels.  To use this
+channel, configure with
+
+  --with-device=ch3:dllchan:sock,shm,ssm 
+
+(This provides the sock, shm, and ssm channels as options, with sock being 
+the default.)  In addition, you must specify the shared library type; under
+Linux and when using gcc (or compilers that mimic gcc for shared-library 
+construction) add
+
+   --enable-sharedlibs=gcc
+
+On Mac OSX, use
+
+   --enable-sharedlibs=gcc-osx
+
+This is an experimental channel in the 1.0.6 release.  To select a channel
+other than the default channel, set the environment variable MPICH_CH3CHANNEL
+to the channel name (i.e., sock, shm, or ssm).  If the process manager is
+gforker, you can also use a commandline option to mpiexec; specify
+-channel=name, as in
+
+    mpiexec -n 4 -channel=shm a.out
+
+There are known problems with this channel, particularly during the make step.
+You may find that some symbols are not found when loading the libraries.  
+If you want to try this experimental channel, please let us know what does
+and does not work.  The next release will have a more robust, 
+ready-for-production, version of this channel.
+
 
 The sshm (scalable shared memory) channel is not supported for
-1.0.5. The code has been retained to provide an example of some MPI-2
+1.0.6. The code has been retained to provide an example of some MPI-2
 RMA optimizations (the immediate method as opposed to the deferred
 method used in other channels for implementing the synchronization in
 MPI-2 one-sided communication). 
@@ -386,10 +459,11 @@ State Univ.   http://nowlab.cse.ohio-state.edu/projects/mpi-iba/
 
 The Nemesis channel is a new low-latency channel that uses shared
 memory for intra-node communication and various networks for
-inter-node communication.  It currently supports TCP, GM and MX networks.
-Other networks will be supported in the future.  The Nemesis channel
-may be selected using the --with-device=ch3:nemesis configure option.
-The default network is TCP.
+inter-node communication.  It currently supports TCP, GM, MX and
+Qsnet/Elan networks.  Other networks will be supported in the future.
+The Nemesis channel may be selected using the
+--with-device=ch3:nemesis configure option.  The default network is
+TCP.
 
   To use the GM network, use the --with-device=ch3:nemesis:gm
   configure option.  If the GM include files and libraries are not in
@@ -412,6 +486,17 @@ The default network is TCP.
   (Note : This module is still in *experimental* state. It has not 
   been thoroughly tested and performance issues remain.)
 
+  Note that if the GM, MX or Elan libraries are shared libraries, they
+  need to be in the shared library search path.  This can be done by
+  adding the path to /etc/ld.so.conf, or by setting the
+  LD_LIBRARY_PATH variable in your .bashrc (or .tcshrc) file.  It's
+  also possible to set the shared library search path in the binary.
+  If you're using gcc, you can do this by adding 
+    LD_LIBRARY_PATH=/path/to/lib 
+  and
+    MPI_LDFLAGS="-Wl,-rpath -Wl,/path/to/lib"
+  as arguments to configure.
+
   Using the --enable-fast configure option significantly improves
   intra-node performance.
 
@@ -425,9 +510,9 @@ The default network is TCP.
   segments so using this for Nemesis may limit the number of processes
   that can be started on a single node.
 
-Nemesis is still a work in progress.  Thread-safety, dynamic processes
-and connect/accept are not yet implemented.  Performance in some areas
-is still suboptimal.
+Nemesis is still a work in progress. Dynamic processes and
+connect/accept are not yet implemented.  Performance in some areas is
+still suboptimal.
 
 
 The SCTP channel is a new channel using the Stream Control
@@ -455,10 +540,14 @@ include/ are in the same directory.
 SCTP stack specific instructions:
 
   For FreeBSD 7 and onward, SCTP comes with CURRENT and is enabled with
-  the "option SCTP" in the kernel configuration file.  For FreeBSD
-  6.x, kernel patches and instructions can be downloaded at
-  http://www.sctp.org/download.html .  These kernels place the lib and
-  include in /usr, so nothing needs to be specified for --with-sctp
+  the "option SCTP" in the kernel configuration file.  The sctp_xxx()
+  calls are contained within libc so to compile ch3:sctp, make a soft-link
+  named libsctp.a to the target libc.a, then pass the path of the 
+  libsctp.a soft-link to --with-sctp-lib.
+  
+  For FreeBSD 6.x, kernel patches and instructions can be downloaded at
+  http://www.sctp.org/download.html .  These kernels place libsctp and
+  headers in /usr, so nothing needs to be specified for --with-sctp
   since /usr is often in the default search path.
 
   For Mac OS X, the SCTP Network Kernel Extension (NKE) can be
@@ -470,9 +559,9 @@ SCTP stack specific instructions:
   a module.  This module can be loaded as root using "modprobe sctp".
   After this is loaded,  you can verify it is loaded using "lsmod".
   Once loaded, the SCTP socket lib and include files must be downloaded
-  and installed from http://lksctp.sourceforge.net/ .  The location must
-  then be passed into --with-sctp.  This bundle is called lksctp-tools
-  and is available for download off their website.
+  and installed from http://lksctp.sourceforge.net/ .  The prefix 
+  location must then be passed into --with-sctp.  This bundle is called 
+  lksctp-tools and is available for download off their website.
 
   For Solaris, SCTP comes with the default Solaris 10 kernel; the lib
   and include in /usr, so nothing needs to be specified for --with-sctp
@@ -480,10 +569,10 @@ SCTP stack specific instructions:
   under Solaris, CFLAGS must have -DMPICH_SCTP_CONCATENATES_IOVS set
   when running MPICH2's configure script.
 
-This is the initial release of the SCTP channel, so feedback is
-welcomed.  All MPI features except multithreading are supported.  Some
-performance optimizations could surely exist for this channel and will
-be investigated for future releases.
+MPICH2 v1.0.5 was the initial release of the SCTP channel, so feedback is
+definitely still welcomed.  All MPI features except multithreading are 
+supported.  Some performance optimizations could surely exist for this 
+channel and will be investigated for future releases.
 
 
 VPATH Builds
@@ -547,8 +636,8 @@ MPI Features:
                  filesystems ROMIO should support.  See README.romio.
 
   --enable-threads - Build MPICH2 with support for multi-threaded
-                 applications.  This is supported only for the sock
-                 channel and is the default for that channel.
+                 applications. Only the sock and nemesis channels support
+                 MPI_THREAD_MULTIPLE. 
 
   --with-thread-package - When used with --enable-threads, this option
                  specifies the thread package to use.  This option
@@ -613,6 +702,23 @@ Compilation options for development:
                  More information on the logging options, capabilities
                  and usage can be found in doc/logging/logging.pdf.
 
+  --enable-timer-type=name -  Select the timer to use for MPI_Wtime
+                 and internal timestamps.  name may be one of:
+                     gethrtime        - Solaris timer (Solaris systems
+                                        only) 
+                     clock_gettime    - Posix timer (where available)
+                     gettimeofday     - Most Unix systems
+                     linux86_cycle    - Linux x86; returns cycle
+                                        counts, not time in seconds 
+                     linuxalpha_cycle - Like linux86_cycle, but for
+                                        Linux Alpha 
+                     gcc_ia64_cycle   - IPF ar.itc timer
+                 Note that the cycle timers are intended to be used by
+                 MPICH2 developers for internal low-level timing.
+                 Normal users should not use these as they are not
+                 guaranteed to be accurate in certain situations.
+
+
 
 Status of MPI-2 Features in MPICH2
 ==================================
@@ -640,5 +746,5 @@ can become an MPI process, is supported under the mpd process manager.
 Some routines, such as the intercommunicator extensions to the
 collective routines, have not been extensively tested.
 
-Only the sock channel supports MPI_THREAD_SERIALIZED and MPI_THREAD_MULTIPLE.
+Only the sock and nemesis channels support MPI_THREAD_MULTIPLE. 
 

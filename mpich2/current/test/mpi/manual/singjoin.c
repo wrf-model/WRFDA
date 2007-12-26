@@ -21,6 +21,9 @@
  * where "54321" is some available port number.
  */
 
+/* Include mpitestconf to determine if we can use h_addr or need h_addr_list */
+#include "mpitestconf.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -99,7 +102,14 @@ int client_routine(int portnum)
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(portnum);
-	bcopy(server_ent->h_addr, (char *)&server_addr.sin_addr.s_addr, server_ent->h_length);
+	/* POSIX might define h_addr_list only and not define h_addr */
+#ifdef HAVE_H_ADDR_LIST
+	bcopy(server_ent->h_addr_list[0],
+	      (char *)&server_addr.sin_addr.s_addr, server_ent->h_length);
+#else
+	bcopy(server_ent->h_addr, 
+	      (char *)&server_addr.sin_addr.s_addr, server_ent->h_length);
+#endif
 
 	if (connect(sockfd, (struct sockaddr* )&server_addr, sizeof(server_addr)) < 0) {
 		perror("client connect");
@@ -154,7 +164,11 @@ int main (int argc, char ** argv)
 
 
 	MPI_Init(&argc, &argv);
-
+	MPI_Comm_size( MPI_COMM_WORLD, &size );
+	if (size != 1) {
+	    fprintf( stderr, "This test requires that only one process be in each comm_world\n" );
+	    MPI_Abort( MPI_COMM_WORLD, 1 );
+	}
 	parse_args(argc, argv);
 
 	if (is_server)  {

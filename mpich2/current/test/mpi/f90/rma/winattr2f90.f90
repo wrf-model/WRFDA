@@ -74,7 +74,7 @@
       valin = 2001
       call mpi_win_set_attr( win, keyval, valin, ierr )
       call mpi_win_free( win, ierr )
-
+      call mpi_comm_free( comm, ierr )
       ierr = -1
       call mpi_win_free_keyval( keyval, ierr )
       if (ierr .ne. MPI_SUCCESS) then

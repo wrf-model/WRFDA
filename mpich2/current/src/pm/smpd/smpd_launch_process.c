@@ -1802,7 +1802,7 @@ int smpd_launch_process(smpd_process_t *process, int priorityClass, int priority
     {
 	actual_exe = process->exe;
     }
-
+    
     /* create argv from the command */
     i = 0;
     total = 0;

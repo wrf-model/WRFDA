@@ -30,15 +30,15 @@
     /*for (i = 0; i < count; i++) { sreq->dev.iov[i] = iov[i]; }*/ \
     if (offset == 0) \
     { \
-	/* memcpy(&sreq->ch.pkt, iov[0].MPID_IOV_BUF, iov[0].MPID_IOV_LEN); */ \
+	/* memcpy(&sreq->dev.pending_pkt, iov[0].MPID_IOV_BUF, iov[0].MPID_IOV_LEN); */ \
 	/*MPIU_Assert(iov[0].MPID_IOV_LEN == sizeof(MPIDI_CH3_Pkt_t));*/ \
-	sreq->ch.pkt = *(MPIDI_CH3_Pkt_t *) iov[0].MPID_IOV_BUF; \
-	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->ch.pkt; \
+	sreq->dev.pending_pkt = *(MPIDI_CH3_PktGeneric_t *) iov[0].MPID_IOV_BUF; \
+	sreq->dev.iov[0].MPID_IOV_BUF = (MPID_IOV_BUF_CAST) &sreq->dev.pending_pkt; \
     } \
     sreq->dev.iov[offset].MPID_IOV_BUF = (MPID_IOV_BUF_CAST)((char *) sreq->dev.iov[offset].MPID_IOV_BUF + nb); \
     sreq->dev.iov[offset].MPID_IOV_LEN -= nb; \
     sreq->dev.iov_count = count; \
-    sreq->ch.iov_offset = offset; \
+    sreq->dev.iov_offset = offset; \
     sreq->dev.OnDataAvail = 0;\
     MPIDI_FUNC_EXIT(MPID_STATE_CREATE_REQUEST); \
     /*return sreq;*/ \
@@ -75,6 +75,7 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 {
     int mpi_errno = MPI_SUCCESS;
     MPID_Request * sreq = NULL;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
     MPIDI_STATE_DECL(MPID_STATE_MPIDI_CH3_ISTARTMSGV);
 
     MPIDI_FUNC_ENTER(MPID_STATE_MPIDI_CH3_ISTARTMSGV);
@@ -97,10 +98,10 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
     iov[0].MPID_IOV_LEN = sizeof(MPIDI_CH3_Pkt_t);
     MPIDI_DBG_Print_packet((MPIDI_CH3_Pkt_t*)iov[0].MPID_IOV_BUF);
 
-    if (vc->ch.state == MPIDI_CH3I_VC_STATE_CONNECTED) /* MT */
+    if (vcch->state == MPIDI_CH3I_VC_STATE_CONNECTED) /* MT */
     {
 	/* Connection already formed.  If send queue is empty attempt to send data, queuing any unsent data. */
-	if (MPIDI_CH3I_SendQ_empty(vc)) /* MT */
+	if (MPIDI_CH3I_SendQ_empty(vcch)) /* MT */
 	{
 	    int nb;
 	    MPIDU_Sock_size_t snb;
@@ -108,13 +109,13 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 	    /* MT - need some signalling to lock down our right to use the 
 	       channel, thus insuring that the progress engine does
                also try to write */
-	    if (vc->ch.bShm)
+	    if (vcch->bShm)
 	    {
 		mpi_errno = MPIDI_CH3I_SHM_writev(vc, iov, n_iov, &nb);
 	    }
 	    else
 	    {
-		mpi_errno = MPIDU_Sock_writev(vc->ch.sock, iov, n_iov, &snb);
+		mpi_errno = MPIDU_Sock_writev(vcch->sock, iov, n_iov, &snb);
 		nb = snb;
 	    }
 	    if (mpi_errno == MPI_SUCCESS)
@@ -141,23 +142,23 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 			    return mpi_errno;
 			}
 			*/
-			MPIDI_CH3I_SendQ_enqueue_head(vc, sreq);
-			if (vc->ch.bShm)
+			MPIDI_CH3I_SendQ_enqueue_head(vcch, sreq);
+			if (vcch->bShm)
 			{
-			    vc->ch.send_active = sreq;
+			    vcch->send_active = sreq;
 			}
 			else
 			{
 			    /*MPIDI_CH3I_SSM_VC_post_write(vc, sreq);*/
 			    MPIDI_DBG_PRINTF((55, FCNAME, "posting writev, vc=0x%p, sreq=0x%08x", vc, sreq->handle));
-			    vc->ch.conn->send_active = sreq;
-			    mpi_errno = MPIDU_Sock_post_writev(vc->ch.conn->sock, sreq->dev.iov + offset,
+			    vcch->conn->send_active = sreq;
+			    mpi_errno = MPIDU_Sock_post_writev(vcch->conn->sock, sreq->dev.iov + offset,
 				sreq->dev.iov_count - offset, NULL);
 			    if (mpi_errno != MPI_SUCCESS)
 			    {
 				mpi_errno = MPIR_Err_create_code(mpi_errno, MPIR_ERR_FATAL, FCNAME, __LINE__, MPI_ERR_OTHER,
 				    "**ch3|sock|postwrite", "ch3|sock|postwrite %p %p %p",
-				    sreq, vc->ch.conn, vc);
+				    sreq, vcch->conn, vc);
 			    }
 			}
 			break;
@@ -196,10 +197,18 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 		return mpi_errno;
 	    }
 	    */
-	    MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	    MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
 	}
     }
-    else if (vc->ch.state == MPIDI_CH3I_VC_STATE_UNCONNECTED)
+    else if (vcch->state == MPIDI_CH3I_VC_STATE_CONNECTING)
+    {
+	MPIDI_DBG_PRINTF((55, FCNAME, "connecting.  enqueuing request"));
+	
+	/* queue the data so it can be sent after the connection is formed */
+	create_request(sreq, iov, n_iov, 0, 0);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
+    }
+    else if (vcch->state == MPIDI_CH3I_VC_STATE_UNCONNECTED)
     {
 	MPIDI_DBG_PRINTF((55, FCNAME, "unconnected.  posting connect and enqueuing request"));
 	
@@ -216,7 +225,7 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 	    return mpi_errno;
 	}
 	*/
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
 
 	mpi_errno = MPIDI_CH3I_VC_post_connect(vc);
 	if (mpi_errno != MPI_SUCCESS)
@@ -225,7 +234,7 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 	    goto fn_exit;
 	}
     }
-    else if (vc->ch.state != MPIDI_CH3I_VC_STATE_FAILED)
+    else if (vcch->state != MPIDI_CH3I_VC_STATE_FAILED)
     {
 	/* Unable to send data at the moment, so queue it for later */
 	MPIDI_DBG_PRINTF((55, FCNAME, "forming connection, request enqueued"));
@@ -238,7 +247,7 @@ int MPIDI_CH3_iStartMsgv(MPIDI_VC_t * vc, MPID_IOV * iov, int n_iov, MPID_Reques
 	    return mpi_errno;
 	}
 	*/
-	MPIDI_CH3I_SendQ_enqueue(vc, sreq);
+	MPIDI_CH3I_SendQ_enqueue(vcch, sreq);
     }
     else
     {

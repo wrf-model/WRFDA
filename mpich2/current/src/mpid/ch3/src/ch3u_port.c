@@ -128,7 +128,7 @@ static int MPIDI_Create_inter_root_communicator_connect(const char *port_name,
        temporary intercommunicator between the two roots so that
        we can use MPI functions to communicate data between them. */
 
-    mpi_errno = MPIDI_CH3_Connect_to_root(port_name, &connect_vc);
+    mpi_errno = MPIU_CALL(MPIDI_CH3,Connect_to_root(port_name, &connect_vc));
     if (mpi_errno != MPI_SUCCESS) {
 	MPIU_ERR_POP(mpi_errno);
     }

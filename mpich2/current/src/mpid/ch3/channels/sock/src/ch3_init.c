@@ -6,6 +6,10 @@
 
 #include "mpidi_ch3_impl.h"
 
+/* Define the ABI version of this channel.  Change this if the channel
+   interface (not just the implementation of that interface) changes */
+char MPIDI_CH3_ABIVersion[] = "1.1";
+
 /*
  *  MPIDI_CH3_Init  - makes socket specific initializations.  Most of this 
  *                    functionality is in the MPIDI_CH3U_Init_sock upcall 
@@ -77,12 +81,22 @@ int MPIDI_CH3_RMAFnsInit( MPIDI_RMAFns *a )
 
 /* Perform the channel-specific vc initialization */
 int MPIDI_CH3_VC_Init( MPIDI_VC_t *vc ) {
-    vc->ch.sendq_head         = NULL;
-    vc->ch.sendq_tail         = NULL;
-    vc->ch.state              = MPIDI_CH3I_VC_STATE_UNCONNECTED;
+    MPIDI_CH3I_VC *vcch = (MPIDI_CH3I_VC *)vc->channel_private;
+    vcch->sendq_head         = NULL;
+    vcch->sendq_tail         = NULL;
+    vcch->state              = MPIDI_CH3I_VC_STATE_UNCONNECTED;
     MPIDI_VC_InitSock( vc );
     MPIU_DBG_MSG_P(CH3_CONNECT,TYPICAL,"vc=%p: Setting state (ch) to VC_STATE_UNCONNECTED (Initialization)", vc );
     return 0;
+}
+
+const char * MPIDI_CH3_VC_GetStateString( struct MPIDI_VC *vc )
+{
+#ifdef USE_DBG_LOGGING
+    return MPIDI_CH3_VC_SockGetStateString( vc );
+#else
+    return "unknown";
+#endif
 }
 
 /* Select the routine that uses sockets to connect two communicators
@@ -96,6 +110,27 @@ int MPIDI_CH3_Connect_to_root(const char * port_name,
 /* This routine is a hook for initializing information for a process
    group before the MPIDI_CH3_VC_Init routine is called */
 int MPIDI_CH3_PG_Init( MPIDI_PG_t *pg )
+{
+    return MPI_SUCCESS;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a process group */
+int MPIDI_CH3_PG_Destroy( struct MPIDI_PG *pg )
+{
+    return MPI_SUCCESS;
+}
+
+/* This routine is a hook for any operations that need to be performed before
+   freeing a virtual connection */
+int MPIDI_CH3_VC_Destroy( struct MPIDI_VC *vc )
+{
+    return MPI_SUCCESS;
+}
+
+/* A dummy function so that all channels provide the same set of functions, 
+   enabling dll channels */
+int MPIDI_CH3_InitCompleted( void )
 {
     return MPI_SUCCESS;
 }

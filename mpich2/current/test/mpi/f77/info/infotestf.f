@@ -5,6 +5,7 @@ C      See COPYRIGHT in top-level directory.
 C
 C Simple info test 
        program main
+       implicit none
        include 'mpif.h'
        integer i1, i2
        integer i, errs, ierr

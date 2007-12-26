@@ -4,3 +4,5 @@ atomic
 Debug*
 Release*
 .deps
+lib*.so
+dluse

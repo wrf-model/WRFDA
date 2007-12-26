@@ -9,7 +9,11 @@
  * 
  * Each active fd has a handler associated with it.
  */
-
+/* FIXME: Occassionally, data from stdout has been lost when the job is
+   exiting.  I don't know whether data is being lost because the writer 
+   is discarding it or the reader (mpiexec) is failing to finish reading from 
+   all of the sockets before exiting.
+ */
 #include "pmutilconf.h"
 #include <stdio.h>
 #include <stdlib.h>

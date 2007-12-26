@@ -240,7 +240,7 @@ MachineTable *MPIE_ReadMachines( const char *arch, int nNeeded,
 	    len = strlen(path);
 	
 	/* Copy path into the file name */
-	MPIU_Strncpy( dirname, path, len );
+	MPIU_Strncpy( dirname, path, len+1 );
 
 	dirname[len] = 0;
 

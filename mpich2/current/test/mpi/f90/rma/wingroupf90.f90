@@ -10,7 +10,7 @@
       integer buf(10)
       integer comm, group1, group2, result, win, intsize
       logical mtestGetIntraComm
-      integer (kind=MPI_ADDRESS_KIND) aint
+      integer (kind=MPI_ADDRESS_KIND) asize
 
 
       errs = 0
@@ -18,8 +18,8 @@
 
       call mpi_type_size( MPI_INTEGER, intsize, ierr )
       do while( mtestGetIntraComm( comm, 2, .false. ) ) 
-         aint = 10
-         call mpi_win_create( buf, aint, intsize,  &
+         asize = 10
+         call mpi_win_create( buf, asize, intsize,  &
       &                        MPI_INFO_NULL, comm, win, ierr )
          
          call mpi_comm_group( comm, group1, ierr )

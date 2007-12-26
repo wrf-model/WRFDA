@@ -131,7 +131,7 @@ MPID_nem_gm_module_lmt_start_recv (MPIDI_VC_t *src_vc, struct iovec s_cookie, st
     r_offset = 0;
     s_offset = 0;
     
-    ret = MPID_nem_gm_module_lmt_do_get (src_vc->ch.gm_node_id, src_vc->ch.gm_port_id, &r_iov, &r_n_iov, &r_offset, &s_iov, &s_n_iov, &s_offset,
+    ret = MPID_nem_gm_module_lmt_do_get (VC_FIELD(src_vc, gm_node_id), VC_FIELD(src_vc, gm_port_id), &r_iov, &r_n_iov, &r_offset, &s_iov, &s_n_iov, &s_offset,
 				completion_ctr);
     if (ret == LMT_AGAIN)
     {
@@ -141,8 +141,8 @@ MPID_nem_gm_module_lmt_start_recv (MPIDI_VC_t *src_vc, struct iovec s_cookie, st
 	    printf ("error: malloc failed\n");
 	    return -1;
 	}
-	e->node_id = src_vc->ch.gm_node_id;
-	e->port_id = src_vc->ch.gm_port_id;
+	e->node_id = VC_FIELD(src_vc, gm_node_id);
+	e->port_id = VC_FIELD(src_vc, gm_port_id);
 	e->r_iov = r_iov;
 	e->r_n_iov = r_n_iov;
 	e->r_offset = r_offset;

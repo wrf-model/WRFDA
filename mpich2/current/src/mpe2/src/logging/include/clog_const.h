@@ -17,6 +17,7 @@
 #define  CLOG_BOOL_TRUE        1
 
 #define  CLOG_PATH_STRLEN    256
+#define  CLOG_ERR_STRLEN     256
 
 #define  CLOG_PROCID_NULL     -1
 #define  CLOG_NULL_FILE       -5

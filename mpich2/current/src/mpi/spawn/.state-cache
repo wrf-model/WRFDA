@@ -2,11 +2,11 @@
 <file name="unpublish_name.c" info="1147102488"/>
 <file name="close_port.c" info="1147102487"/>
 <file name="comm_accept.c" info="1147102487"/>
-<file name="comm_spawn.c" info="1147102487"/>
+<file name="comm_spawn.c" info="1174488780"/>
 <file name="comm_get_parent.c" info="1165682546"/>
 <file name="lookup_name.c" info="1147102487"/>
+<file name="comm_spawn_multiple.c" info="1188416485"/>
 <file name="comm_disconnect.c" info="1161035408"/>
-<file name="comm_spawn_multiple.c" info="1147102487"/>
 <file name="open_port.c" info="1147102487"/>
 <file name="comm_connect.c" info="1147102487"/>
 <file name="namepub.h" info="1051536351"/>
@@ -32,11 +32,11 @@ MPID_STATE_MPI_COMM_GET_PARENT MPI_Comm_get_parent
 <fileinfo name="lookup_name.c">
 MPID_STATE_MPI_LOOKUP_NAME MPI_Lookup_name
 </fileinfo>
-<fileinfo name="comm_disconnect.c">
-MPID_STATE_MPI_COMM_DISCONNECT MPI_Comm_disconnect
-</fileinfo>
 <fileinfo name="comm_spawn_multiple.c">
 MPID_STATE_MPI_COMM_SPAWN_MULTIPLE MPI_Comm_spawn_multiple
+</fileinfo>
+<fileinfo name="comm_disconnect.c">
+MPID_STATE_MPI_COMM_DISCONNECT MPI_Comm_disconnect
 </fileinfo>
 <fileinfo name="open_port.c">
 MPID_STATE_MPI_OPEN_PORT MPI_Open_port

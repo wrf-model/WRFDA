@@ -1047,7 +1047,7 @@ if AC_TRY_EVAL(ac_compile) ; then
     else
 	AC_MSG_WARN([Unable to build a simple F90 module])
         echo "configure: failed program was:" >&AC_FD_CC
-        cat conftest.$ac_f90ext >&AC_FD_CC
+        cat conftest.$ac_ext >&AC_FD_CC
     fi
 else
     echo "configure: failed program was:" >&AC_FD_CC
@@ -1171,6 +1171,14 @@ if AC_TRY_EVAL(compile_f77) ; then
         pac_cv_f90_and_f77="yes"
     else 
         pac_cv_f90_and_f77="no"
+	echo "Failed to link a F77 and F90 program" >&AC_FD_CC
+	echo "F77 Program:" >&AD_FD_CC
+	cat conftest2.f >&AD_FD_CC
+	echo "F90 Program:" >&AC_FD_CC
+	cat conftest.$ac_ext_f90 >&AC_FD_CC
+	echo "Output from the link step is"
+	# We re-run this for the output
+	eval $link_f90 2>&1
     fi
     # Some versions of the Intel compiler produce these two files
     rm -f work.pc work.pcl
@@ -1182,6 +1190,7 @@ if test "$pac_cv_f90_and_f77" = yes ; then
     ifelse($1,,:,[$1])
 else
     ifelse($2,,:,[$2])
+    AC_MSG_WARN([The test program that was used and the output may be found in config.log])
 fi
 ])
 dnl Internal routine for testing F90
@@ -1292,10 +1301,10 @@ AC_DEFUN([PAC_PROG_F90_AND_C_STDIO_LIBS],[
     confname=conf1_
     case "$pac_cv_prog_f77_name_mangle" in
     "lower underscore")       confname=conf1_ ;;
-    lower)                    confname=conf1  ;;
     "upper stdcall")          confname=CONF1  ;;
     upper)                    confname=CONF1  ;;
-    "lower doubleunderscore") confname=conf1  ;;
+    "lower doubleunderscore") confname=conf1_  ;;
+    lower)                    confname=conf1  ;;
     "mixed underscore")       confname=conf1_ ;;
     mixed)                    confname=conf1  ;;
     esac
@@ -1327,9 +1336,14 @@ EOF
          pac_cv_prog_f90_and_c_stdio_libs=none
     else
          # Try again with -lSystemStubs
-         tmpcmd='${F90-f90} $FFLAGS -o conftest conftest.$f90_ext conftestc.o -lSystemStubs 1>&AC_FD_CC'
+         tmpcmd='${F90-f90} $F90FLAGS -o conftest conftest.$f90_ext conftestc.o -lSystemStubs 1>&AC_FD_CC'
          if AC_TRY_EVAL(tmpcmd) && test -x conftest ; then
              pac_cv_prog_f90_and_c_stdio_libs="-lSystemStubs"
+	 else 
+	     echo "configure: failed program was:" >&AC_FD_CC
+	     cat conftestc.c >&AC_FD_CC 
+	     echo "configure: with Fortran 90 program:" >&AC_FD_CC
+	     cat conftest.$f90_ext >&AC_FD_CC
          fi
     fi
 

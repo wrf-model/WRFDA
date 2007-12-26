@@ -60,17 +60,17 @@ all-redirect: .libstamp0 ../../../lib/lib${MPILIBNAME}.a
 	    ${MAKE} .libstamp1 ; \
 	fi
 
-.libstamp0 ../../../lib/lib${MPILIBNAME}.a: osserv.o 
+.libstamp0 ../../../lib/lib${MPILIBNAME}.a: osserv.o dl.o 
 	${AR} cr ../../../lib/lib${MPILIBNAME}.a $?
 	${RANLIB} ../../../lib/lib${MPILIBNAME}.a
 	date > .libstamp0
-.libstamp1 ../../../lib/lib${MPILIBNAME}.la: osserv.lo 
+.libstamp1 ../../../lib/lib${MPILIBNAME}.la: osserv.lo dl.lo 
 	${AR} cr ../../../lib/lib${MPILIBNAME}.la $?
 	date > .libstamp1
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-SOURCES         =  osserv.c
+SOURCES         =  osserv.c dl.c
 ETAGS           = @ETAGS@ @ETAGSADD@
 HEADERFILES     = $(HEADERS)
 SOURCEFILES     = $(SOURCES)

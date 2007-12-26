@@ -17,8 +17,8 @@ C
 
       call mpi_type_size( MPI_INTEGER, intsize, ierr )
       do while( mtestGetIntraComm( comm, 2, .false. ) ) 
-         aint = 10
-         call mpi_win_create( buf, aint, intsize, 
+         asize = 10
+         call mpi_win_create( buf, asize, intsize, 
      &                        MPI_INFO_NULL, comm, win, ierr )
          
          call mpi_comm_group( comm, group1, ierr )

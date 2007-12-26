@@ -1,4 +1,49 @@
 ===============================================================================
+			       Changes in 1.0.6
+===============================================================================
+
+- Updates to the ch3:nemesis channel including preliminary support for
+thread safety.
+
+- Preliminary support for dynamic loading of ch3 channels (sock, ssm,
+shm). See the README file for details.
+
+- Singleton init now works with the MPD process manager.
+
+- Fixes in MPD related to MPI-2 connect-accept.
+
+- Improved support for MPI-2 generalized requests that allows true
+nonblocking I/O in ROMIO.
+
+- MPE changes:
+  * Enabled thread-safe MPI logging through global mutex.
+  * Enhanced Jumpshot to be more thread friendly
+    + added simple statistics in the Legend windows.
+  * Added backtrace support to MPE on Solaris and glibc based systems,
+    e.g. Linux.  This improves the output error message from the 
+    Collective/Datatype checking library.
+  * Fixed the CLOG2 format so it can be used in serial (non-MPI) logging.
+
+- Performance improvements for derived datatypes (including packing
+and communication) through in-built loop-unrolling and buffer
+alignment.
+
+- Performance improvements for MPI_Gather when non-power-of-two
+processes are used, and when a non-zero ranked root is performing the
+gather.
+
+- MPI_Comm_create works for intercommunicators.
+
+- Enabled -O2 and equivalent compiler optimizations for supported
+compilers by default (including GNU, Intel, Portland, Sun, Absoft,
+IBM).
+
+- Many other bug fixes, memory leak fixes and code cleanup. A full
+list of changes is available at
+www.mcs.anl.gov/mpi/mpich2/mpich2_1_0_6changes.htm.
+
+
+===============================================================================
 			       Changes in 1.0.5
 ===============================================================================
 

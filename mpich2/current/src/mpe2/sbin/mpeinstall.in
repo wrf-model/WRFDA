@@ -299,6 +299,8 @@ fi
 #
 # Fixup files with various xxxxbuild_dir to xxxxdir, install directory.
 #
+#   The MPE_CLINKER/MPE_FLINKER need to sync with mpe2/configure.in
+#
 FixInstallFile() {
 if [ -d $DESTDIR$2 ] ; then
     dest=$DESTDIR$2/`basename $1`
@@ -318,6 +320,8 @@ else
             sed \
             -e "s%^MPI_CC\([ ]*\)=\([ ]*\).*\$%MPI_CC\1=\2$bindir/mpicc%g" \
             -e "s%^MPI_F77\([ ]*\)=\([ ]*\).*\$%MPI_F77\1=\2$bindir/mpif77%g" \
+            -e "s%^MPE_CLINKER\([ ]*\)=\([ ]*\).*\$%MPE_CLINKER\1=\2$bindir/mpicc -mpe=%g" \
+            -e "s%^MPE_FLINKER\([ ]*\)=\([ ]*\).*\$%MPE_FLINKER\1=\2$bindir/mpif77 -mpe=%g" \
             -e "s%^MPE_INCDIR\([ ]*\)=\([ ]*\).*\$%MPE_INCDIR\1=\2$includedir%g" \
             -e "s%^MPE_LIBDIR\([ ]*\)=\([ ]*\).*\$%MPE_LIBDIR\1=\2$libdir%g" \
             -e "s%^MPE_BINDIR\([ ]*\)=\([ ]*\).*\$%MPE_BINDIR\1=\2$bindir%g" \
@@ -326,6 +330,8 @@ else
             $1 > $dest
         else
             sed \
+            -e "s%^MPE_CLINKER\([ ]*\)=\([ ]*\).*\$%MPE_CLINKER\1=\2$bindir/mpecc -%g" \
+            -e "s%^MPE_FLINKER\([ ]*\)=\([ ]*\).*\$%MPE_FLINKER\1=\2$bindir/mpefc -%g" \
             -e "s%^MPE_INCDIR\([ ]*\)=\([ ]*\).*\$%MPE_INCDIR\1=\2$includedir%g" \
             -e "s%^MPE_LIBDIR\([ ]*\)=\([ ]*\).*\$%MPE_LIBDIR\1=\2$libdir%g" \
             -e "s%^MPE_BINDIR\([ ]*\)=\([ ]*\).*\$%MPE_BINDIR\1=\2$bindir%g" \
@@ -411,7 +417,7 @@ if [ "$prefix_override" = 1 ] ; then
     datadir=$prefix/share
     sysconfdir=$prefix/etc
     mandir=$prefix/man
-    htmldir=$prefix/html
+    htmldir=$prefix/www
     docdir=$prefix/doc
     if [ $appendUninstall = 0 ] ; then
         UNINSTALLFILE=$DESTDIR${sbindir}/${UNINSTALL_base}
