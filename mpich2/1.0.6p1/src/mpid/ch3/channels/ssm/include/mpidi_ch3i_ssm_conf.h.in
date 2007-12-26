@@ -1,0 +1,297 @@
+/* include/mpidi_ch3i_ssm_conf.h.in.  Generated from configure.in by autoheader.  */
+
+/* -*- Mode: C; c-basic-offset:4 ; -*- */
+/*  
+ *  (C) 2001 by Argonne National Laboratory.
+ *      See COPYRIGHT in top-level directory.
+ */
+#ifndef MPIDI_CH3I_SSM_CONF_H_INCLUDED
+#define MPIDI_CH3I_SSM_CONF_H_INCLUDED
+
+
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_CPUID_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_RDTSC
+
+/* Define which x86 cycle counter to use */
+#undef GCC_X86_CYCLE_RDTSCP
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#undef HAVE_ARPA_INET_H
+
+/* Define if using asm() on a x86 system with the lfence instruction */
+#undef HAVE_ASM_AND_X86_LFENCE
+
+/* Define if using asm() on a x86 system with the mfence instruction */
+#undef HAVE_ASM_AND_X86_MFENCE
+
+/* Define if using asm() on a x86 system with the sfence instruction */
+#undef HAVE_ASM_AND_X86_SFENCE
+
+/* Define to 1 if you have the <assert.h> header file. */
+#undef HAVE_ASSERT_H
+
+/* Define to 1 if you have the <ctype.h> header file. */
+#undef HAVE_CTYPE_H
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define if using gcc on a x86 system with the lfence instruction */
+#undef HAVE_GCC_ASM_AND_X86_LFENCE
+
+/* Define if using gcc on a x86 system with the mfence instruction */
+#undef HAVE_GCC_ASM_AND_X86_MFENCE
+
+/* Define if using gcc on a x86 system with the sfence instruction */
+#undef HAVE_GCC_ASM_AND_X86_SFENCE
+
+/* Define if gcc asm membar supported */
+#undef HAVE_GCC_ASM_SPARC_MEMBAR
+
+/* Define if gcc asm stbar supported */
+#undef HAVE_GCC_ASM_SPARC_STBAR
+
+/* Define to 1 if you have the `getcwd' function. */
+#undef HAVE_GETCWD
+
+/* Define to 1 if you have the `gethostname' function. */
+#undef HAVE_GETHOSTNAME
+
+/* Define to 1 if you have the `getpagesize' function. */
+#undef HAVE_GETPAGESIZE
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `thread' library (-lthread). */
+#undef HAVE_LIBTHREAD
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have a working `mmap' system call. */
+#undef HAVE_MMAP
+
+/* Define to 1 if you have the <mqueue.h> header file. */
+#undef HAVE_MQUEUE_H
+
+/* Define if mq_open is available */
+#undef HAVE_MQ_OPEN
+
+/* Define to 1 if you have the `msgget' function. */
+#undef HAVE_MSGGET
+
+/* Define to 1 if you have the `mutex_init' function. */
+#undef HAVE_MUTEX_INIT
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#undef HAVE_NETINET_TCP_H
+
+/* Define to 1 if you have the <net/if.h> header file. */
+#undef HAVE_NET_IF_H
+
+/* Define to 1 if you have the <process.h> header file. */
+#undef HAVE_PROCESS_H
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
+/* Define to 1 if you have the `pthread_mutexattr_init' function. */
+#undef HAVE_PTHREAD_MUTEXATTR_INIT
+
+/* Define to 1 if you have the `pthread_mutexattr_setpshared' function. */
+#undef HAVE_PTHREAD_MUTEXATTR_SETPSHARED
+
+/* Define to 1 if you have the `putenv' function. */
+#undef HAVE_PUTENV
+
+/* Define to 1 if you have the <sched.h> header file. */
+#undef HAVE_SCHED_H
+
+/* Define to 1 if you have the `sched_yield' function. */
+#undef HAVE_SCHED_YIELD
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define to 1 if you have the `shmat' function. */
+#undef HAVE_SHMAT
+
+/* Define to 1 if you have the `shmctl' function. */
+#undef HAVE_SHMCTL
+
+/* Define to 1 if you have the `shmdt' function. */
+#undef HAVE_SHMDT
+
+/* Define to 1 if you have the `shmget' function. */
+#undef HAVE_SHMGET
+
+/* Define if shm_open is available */
+#undef HAVE_SHM_OPEN
+
+/* Define if SHM_R and SHM_W are available */
+#undef HAVE_SHM_RW
+
+/* Define if shm_unlink is available */
+#undef HAVE_SHM_UNLINK
+
+/* Define to 1 if you have the `sleep' function. */
+#undef HAVE_SLEEP
+
+/* Define to 1 if you have the `socket' function. */
+#undef HAVE_SOCKET
+
+/* Define if solaris asm membar supported */
+#undef HAVE_SOLARIS_ASM_SPARC_MEMBAR
+
+/* Define if solaris asm stbar supported */
+#undef HAVE_SOLARIS_ASM_SPARC_STBAR
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `sysconf' function. */
+#undef HAVE_SYSCONF
+
+/* Define to 1 if you have the `sysctl' function. */
+#undef HAVE_SYSCTL
+
+/* Define to 1 if you have the <sys/filio.h> header file. */
+#undef HAVE_SYS_FILIO_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/ipc.h> header file. */
+#undef HAVE_SYS_IPC_H
+
+/* Define to 1 if you have the <sys/mman.h> header file. */
+#undef HAVE_SYS_MMAN_H
+
+/* Define to 1 if you have the <sys/msg.h> header file. */
+#undef HAVE_SYS_MSG_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/ptrace.h> header file. */
+#undef HAVE_SYS_PTRACE_H
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/sem.h> header file. */
+#undef HAVE_SYS_SEM_H
+
+/* Define to 1 if you have the <sys/shm.h> header file. */
+#undef HAVE_SYS_SHM_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/sockio.h> header file. */
+#undef HAVE_SYS_SOCKIO_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/sysctl.h> header file. */
+#undef HAVE_SYS_SYSCTL_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/uio.h> header file. */
+#undef HAVE_SYS_UIO_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `usleep' function. */
+#undef HAVE_USLEEP
+
+/* Define to 1 if you have the <uuid/uuid.h> header file. */
+#undef HAVE_UUID_UUID_H
+
+/* Define to 1 if you have the <values.h> header file. */
+#undef HAVE_VALUES_H
+
+/* Define if shmget works */
+#undef HAVE_WORKING_SHMGET
+
+/* Define to 1 if you have the `yield' function. */
+#undef HAVE_YIELD
+
+/* Define if _InterlockedExchange intrinsic is available */
+#undef HAVE__INTERLOCKEDEXCHANGE
+
+/* Define if using __asm on a x86 system with the lfence instruction */
+#undef HAVE___ASM_AND_X86_LFENCE
+
+/* Define if using __asm on a x86 system with the mfence instruction */
+#undef HAVE___ASM_AND_X86_MFENCE
+
+/* Define if using __asm on a x86 system with the sfence instruction */
+#undef HAVE___ASM_AND_X86_SFENCE
+
+/* Define if using gcc on an Intel CPU with the rdtsc instruction */
+#undef MPICH_CPU_TICK_TYPE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to use busy locks */
+#undef USE_BUSY_LOCKS
+
+/* Define to use shared memory message queues */
+#undef USE_MQSHM
+
+/* Define to access sys/ipc.h cleanly */
+#undef _XOPEN_SOURCE
+
+#endif

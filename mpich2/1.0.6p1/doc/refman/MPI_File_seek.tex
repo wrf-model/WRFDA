@@ -1,0 +1,21 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}seek}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}seek}
+--- Updates the individual file pointer 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_File_seek(MPI_File mpi_fh, MPI_Offset offset, int whence)
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\startarg{offset }{file offset (integer)
+}
+\startarg{whence }{update mode (state)
+}
+\par
+\location{seek.c}
+\endmanpage

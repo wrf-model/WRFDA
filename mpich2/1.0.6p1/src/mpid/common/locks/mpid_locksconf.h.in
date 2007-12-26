@@ -1,0 +1,63 @@
+/* mpid_locksconf.h.in.  Generated from configure.in by autoheader.  */
+
+/* -*- Mode: C; c-basic-offset:4 ; -*- */
+/*  
+ *  (C) 2001 by Argonne National Laboratory.
+ *      See COPYRIGHT in top-level directory.
+ */
+#ifndef MPID_LOCKSCONF_H_INCLUDED
+#define MPID_LOCKSCONF_H_INCLUDED
+
+
+/* Define to 1 if you have the `compare_and_swap' function. */
+#undef HAVE_COMPARE_AND_SWAP
+
+/* Define to 1 if you have the `mutex_init' function. */
+#undef HAVE_MUTEX_INIT
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
+/* Define to 1 if you have the `pthread_mutexattr_init' function. */
+#undef HAVE_PTHREAD_MUTEXATTR_INIT
+
+/* Define to 1 if you have the `pthread_mutexattr_setpshared' function. */
+#undef HAVE_PTHREAD_MUTEXATTR_SETPSHARED
+
+/* Define to 1 if you have the <sched.h> header file. */
+#undef HAVE_SCHED_H
+
+/* Define to 1 if you have the `sched_yield' function. */
+#undef HAVE_SCHED_YIELD
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define to 1 if you have the `sleep' function. */
+#undef HAVE_SLEEP
+
+/* Use inline spin locks on SPARC architectures */
+#undef HAVE_SPARC_INLINE_PROCESS_LOCKS
+
+/* Define to 1 if you have the `usleep' function. */
+#undef HAVE_USLEEP
+
+/* Define to 1 if you have the `yield' function. */
+#undef HAVE_YIELD
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+#endif

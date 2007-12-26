@@ -1,0 +1,28 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}Wtime}{tex}{5/8/2006}
+\manname{MPI{\tt \char`\_}Wtime}
+--- Returns an elapsed time on the calling processor 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+double MPI_Wtime( void )
+
+\end{verbatim}
+\endvb
+
+\subhead{Return value}
+Time in seconds since an arbitrary time in the past.
+\par
+\subhead{Notes}
+This is intended to be a high-resolution, elapsed (or wall) clock.
+See {\tt MPI{\tt \char`\_}WTICK} to determine the resolution of {\tt MPI{\tt \char`\_}WTIME}.
+If the attribute {\tt MPI{\tt \char`\_}WTIME{\tt \char`\_}IS{\tt \char`\_}GLOBAL} is defined and true, then the
+value is synchronized across all processes in {\tt MPI{\tt \char`\_}COMM{\tt \char`\_}WORLD}.
+\par
+\subhead{Notes for Fortran}
+This is a function, declared as {\tt DOUBLE PRECISION MPI{\tt \char`\_}WTIME()} in Fortran.
+\par
+\subhead{See Also}
+also: MPI{\tt \char`\_}Wtick, MPI{\tt \char`\_}Comm{\tt \char`\_}get{\tt \char`\_}attr, MPI{\tt \char`\_}Attr{\tt \char`\_}get
+\nextline
+\location{wtime.c}
+\endmanpage

@@ -1,0 +1,93 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}Recv}{tex}{5/8/2006}
+\manname{MPI{\tt \char`\_}Recv}
+--- Blocking receive for a message 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
+             MPI_Comm comm, MPI_Status *status)
+
+\end{verbatim}
+\endvb
+
+\subhead{Output Parameters}
+\startarg{buf }{initial address of receive buffer (choice) 
+}
+\startarg{status }{status object (Status) 
+}
+\par
+\subhead{Input Parameters}
+\startarg{count }{maximum number of elements in receive buffer (integer) 
+}
+\startarg{datatype }{datatype of each receive buffer element (handle) 
+}
+\startarg{source }{rank of source (integer) 
+}
+\startarg{tag }{message tag (integer) 
+}
+\startarg{comm }{communicator (handle) 
+}
+\par
+\subhead{Notes}
+The {\tt count} argument indicates the maximum length of a message; the actual
+length of the message can be determined with {\tt MPI{\tt \char`\_}Get{\tt \char`\_}count}.
+\par
+\subhead{Thread and Interrupt Safety}
+\par
+This routine is thread-safe.  This means that this routine may be
+safely used by multiple threads without the need for any user-provided
+thread locks.  However, the routine is not interrupt safe.  Typically,
+this is due to the use of memory allocation routines such as {\tt malloc
+}or other non-MPICH runtime routines that are themselves not interrupt-safe.
+\par
+\subhead{Notes for Fortran}
+All MPI routines in Fortran (except for {\tt MPI{\tt \char`\_}WTIME} and {\tt MPI{\tt \char`\_}WTICK}) have
+an additional argument {\tt ierr} at the end of the argument list.  {\tt ierr
+}is an integer and has the same meaning as the return value of the routine
+in C.  In Fortran, MPI routines are subroutines, and are invoked with the
+{\tt call} statement.
+\par
+All MPI objects (e.g., {\tt MPI{\tt \char`\_}Datatype}, {\tt MPI{\tt \char`\_}Comm}) are of type {\tt INTEGER
+}in Fortran.
+\par
+The {\tt status} argument must be declared as an array of size {\tt MPI{\tt \char`\_}STATUS{\tt \char`\_}SIZE},
+as in {\tt integer status(MPI{\tt \char`\_}STATUS{\tt \char`\_}SIZE)}.
+\par
+\subhead{Errors}
+\par
+All MPI routines (except {\tt MPI{\tt \char`\_}Wtime} and {\tt MPI{\tt \char`\_}Wtick}) return an error value;
+C routines as the value of the function and Fortran routines in the last
+argument.  Before the value is returned, the current MPI error handler is
+called.  By default, this error handler aborts the MPI job.  The error handler
+may be changed with {\tt MPI{\tt \char`\_}Comm{\tt \char`\_}set{\tt \char`\_}errhandler} (for communicators),
+{\tt MPI{\tt \char`\_}File{\tt \char`\_}set{\tt \char`\_}errhandler} (for files), and {\tt MPI{\tt \char`\_}Win{\tt \char`\_}set{\tt \char`\_}errhandler} (for
+RMA windows).  The MPI-1 routine {\tt MPI{\tt \char`\_}Errhandler{\tt \char`\_}set} may be used but
+its use is deprecated.  The predefined error handler
+{\tt MPI{\tt \char`\_}ERRORS{\tt \char`\_}RETURN} may be used to cause error values to be returned.
+Note that MPI does {\em not} guarentee that an MPI program can continue past
+an error; however, MPI implementations will attempt to continue whenever
+possible.
+\par
+\startarg{MPI{\tt \char`\_}SUCCESS }{No error; MPI routine completed successfully.
+}
+\startarg{MPI{\tt \char`\_}ERR{\tt \char`\_}COMM }{Invalid communicator.  A common error is to use a null
+communicator in a call (not even allowed in {\tt MPI{\tt \char`\_}Comm{\tt \char`\_}rank}).
+}
+\startarg{MPI{\tt \char`\_}ERR{\tt \char`\_}TYPE }{Invalid datatype argument.  May be an uncommitted 
+MPI{\tt \char`\_}Datatype (see {\tt MPI{\tt \char`\_}Type{\tt \char`\_}commit}).
+}
+\startarg{MPI{\tt \char`\_}ERR{\tt \char`\_}COUNT }{Invalid count argument.  Count arguments must be 
+non-negative; a count of zero is often valid.
+}
+\startarg{MPI{\tt \char`\_}ERR{\tt \char`\_}TAG }{Invalid tag argument.  Tags must be non-negative; tags
+in a receive ({\tt MPI{\tt \char`\_}Recv}, {\tt MPI{\tt \char`\_}Irecv}, {\tt MPI{\tt \char`\_}Sendrecv}, etc.) may
+also be {\tt MPI{\tt \char`\_}ANY{\tt \char`\_}TAG}.  The largest tag value is available through the 
+the attribute {\tt MPI{\tt \char`\_}TAG{\tt \char`\_}UB}.
+}
+\startarg{MPI{\tt \char`\_}ERR{\tt \char`\_}RANK }{Invalid source or destination rank.  Ranks must be between
+zero and the size of the communicator minus one; ranks in a receive
+({\tt MPI{\tt \char`\_}Recv}, {\tt MPI{\tt \char`\_}Irecv}, {\tt MPI{\tt \char`\_}Sendrecv}, etc.) may also be {\tt MPI{\tt \char`\_}ANY{\tt \char`\_}SOURCE}.
+}
+\par
+\location{recv.c}
+\endmanpage
