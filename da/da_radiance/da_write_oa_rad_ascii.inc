@@ -65,7 +65,8 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%info%lon(1,n), &
                                    iv%instid(i)%satzen(n),    &
                                    iv%instid(i)%satazi(n)
-             if (iv%instid(i)%isflg(n)==0) then
+            select case (iv%instid(i)%isflg(n))
+            case (0) ;
                 write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -82,7 +83,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==1) then
+            case (1) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -99,7 +100,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==2) then
+            case (2) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -116,7 +117,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==3) then
+            case (3) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -133,7 +134,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==4) then
+            case (4) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -150,7 +151,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==5) then
+            case (5) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -167,7 +168,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==6) then
+            case (6) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -184,7 +185,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            else if (iv%instid(i)%isflg(n)==7) then
+            case (7) ;
                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', n, &
                                    iv%instid(i)%t2m(n), &
                                    iv%instid(i)%mr2m(n),   &
@@ -201,7 +202,7 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-            end if
+            end select
 
             write(unit=oma_rad_unit,fmt='(a)') 'OBS  : '
             write(unit=oma_rad_unit,fmt='(10f11.2)') ob%instid(i)%tb(:,n)
