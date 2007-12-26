@@ -253,7 +253,7 @@ da_bias_verif.exe : da_bias_verif.o rad_bias.o
 	(cd ../da; $(LN) ../build/$@ .)
 
 da_rad_diags.exe : da_rad_diags.o $(NETCDF_LIBS)
-	$(FFC) -o da_rad_diags.exe da_rad_diags.o -L. $(NETCDF_LIB) 
+	$(FFC) -o da_rad_diags.exe da_rad_diags.o -L. $(NETCDF_LIB) $(LOCAL_LIB)
 	(cd ../da; $(LN) ../build/$@ .)
 
 

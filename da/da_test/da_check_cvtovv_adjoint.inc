@@ -91,7 +91,7 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xbx, be, cv, vv)
    end if  
 
    if (rootproc) then
-      write(unit=stdout, fmt='/')
+      write(unit=stdout, fmt='(/)')
       write(unit=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
            'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs
