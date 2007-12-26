@@ -1,0 +1,23 @@
+# This Makefile.sm generated automatically by f77tof90
+# from test/mpi/f77/ext/Makefile.sm.  DO NOT EDIT
+# We don't use a general LDADD for mtestf90.o because c2fmult is a C-only
+# program
+DEPADD = @MPILIBLOC@ ../util/mtestf90.o
+smvar_do_sharedlibs = 0
+
+# allocmemf is an "extra" program because it requires a Fortran extension
+EXTRA_PROGRAMS = allocmemf90
+
+allocmemf90_SOURCES = allocmemf90.f90
+allocmemf90_LDADD = ../util/mtestf90.o
+c2f2cf90_SOURCES = c2f2cf90.f90 c2f902c.c
+c2f2cf90_LDADD = ../util/mtestf90.o 
+c2f2c_CFLAGSADD = -I../../include
+
+c2f90mult_SOURCES = c2f90mult.c
+
+../util/mtestf90.o: 
+	(cd ../util && $(MAKE) mtestf90.o)
+c2f902c.c: $(srcdir)/../../f90/ext/c2f902c.c
+	cp $(srcdir)/../../f90/ext/c2f902c.c c2f902c.c
+

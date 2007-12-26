@@ -1,0 +1,12 @@
+LDADD = ../util/mtestf.o 
+DEPADD = @MPILIBLOC@ ../util/mtestf.o
+smvar_do_sharedlibs = 0
+
+uallreducef_SOURCES  = uallreducef.f
+exscanf_SOURCES     = exscanf.f
+alltoallwf_SOURCES  = alltoallwf.f
+inplacef_SOURCES  = inplacef.f
+allredint8f_SOURCES  = allredint8f.f
+
+../util/mtestf.o: 
+	(cd ../util && $(MAKE) mtestf.o)

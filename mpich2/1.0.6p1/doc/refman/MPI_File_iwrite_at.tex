@@ -1,0 +1,33 @@
+\startmanpage
+\mantitle{MPI{\tt \char`\_}File{\tt \char`\_}iwrite{\tt \char`\_}at}{tex}{6/1/2006}
+\manname{MPI{\tt \char`\_}File{\tt \char`\_}iwrite{\tt \char`\_}at}
+--- Nonblocking write using explict offset 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+#ifdef HAVE_MPI_GREQUEST
+#include "mpiu_greq.h"
+
+#if defined(HAVE_WINDOWS_H) && defined(USE_WIN_THREADED_IO)
+typedef struct iwrite_at_args
+
+\end{verbatim}
+\endvb
+
+\subhead{Input Parameters}
+\startarg{fh }{file handle (handle)
+}
+\startarg{offset }{file offset (nonnegative integer)
+}
+\startarg{buf }{initial address of buffer (choice)
+}
+\startarg{count }{number of elements in buffer (nonnegative integer)
+}
+\startarg{datatype }{datatype of each buffer element (handle)
+}
+\par
+\subhead{Output Parameters}
+\startarg{request }{request object (handle)
+}
+\par
+\location{iwrite{\tt \char`\_}at.c}
+\endmanpage

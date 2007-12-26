@@ -1,0 +1,106 @@
+\startmanpage
+\mantitle{mpiexec}{tex}{9/21/2006}
+\manname{mpiexec}
+--- Run an MPI program 
+\subhead{Synopsis}
+\startvb\begin{verbatim}
+
+\end{verbatim}
+\endvb
+\begin{verbatim}
+    mpiexec args executable pgmargs [ : args executable pgmargs ... ]
+\end{verbatim}
+
+where {\tt args} are command line arguments for {\tt mpiexec} (see below),
+{\tt executable} is the name of an executable MPI program, and {\tt pgmargs
+}are command line arguments for the executable.  Multiple executables
+can be specified by using the colon notation (for MPMD - Multiple Program
+Multiple Data applications).
+\par
+\subhead{Standard Parameters}
+\par
+\par
+\startarg{-n num }{number of processes
+}
+\startarg{-host hostname }{name of a host (machine, system) on which to run
+}
+\startarg{-arch architecture{\tt \char`\_}name }{name of the computer architecture required
+for this executable
+}
+\startarg{-wdir working{\tt \char`\_}directory }{The working directory to use when running the 
+executable (set before the executable starts)
+}
+\startarg{-path pathlist }{use this to find the executable
+}
+\startarg{-soft list }{comma separated triplets specifying valid numbers of processes
+}
+\startarg{-file name }{implementation-defined specification file
+}
+\startarg{-configfile name }{file containing specifications of host/program, 
+one per line, with {\tt \char`\#} as a comment indicator, e.g., the usual
+mpiexec input, but with ":" replaced with a newline.  That is,
+the configfile contains lines with {\tt -soft}, {\tt -n} etc.
+}
+\par
+\par
+\subhead{Environment Variables}
+The following environment variables affect the behavior of {\tt mpiexec}:
+\startarg{MPIEXEC{\tt \char`\_}UNIVERSE{\tt \char`\_}SIZE }{Sets the maximum number of processes to allow.
+}
+\startarg{MPIEXEC{\tt \char`\_}TIMEOUT }{Maximum running time in seconds.  {\tt mpiexec} will
+terminate MPI programs that take longer than the value specified by
+{\tt MPIEXEC{\tt \char`\_}TIMEOUT}.  This version of {\tt mpiexec} (forker process manager)
+sets a default timelimit of 3 minutes (180 seconds) since the forker
+process manager is intended for debugging applications.
+}
+\startarg{MPIEXEC{\tt \char`\_}PREFIX{\tt \char`\_}DEFAULT }{If this environment variable is set, output
+to standard output is prefixed by the rank in {\tt MPI{\tt \char`\_}COMM{\tt \char`\_}WORLD} of the 
+process and output to standard error is prefixed by the rank and the 
+text {\tt (err)}; both are followed by an angle bracket ({\tt $>$}).  If
+this variable is not set, there is no prefix.
+}
+\startarg{MPIEXEC{\tt \char`\_}PREFIX{\tt \char`\_}STDOUT }{Set the prefix for output from standard output.
+This is a string containing text and (optionally) the expression {\tt \%d};
+if {\tt \%d} is seen, it is replaced by the rank in {\tt MPI{\tt \char`\_}COMM{\tt \char`\_}WORLD} of the 
+process.  If there is more than one {\tt MPI{\tt \char`\_}COMM{\tt \char`\_}WORLD}; for example, 
+if {\tt MPI{\tt \char`\_}Comm{\tt \char`\_}spawn} is used, the expression {\tt \%w} is replaced with a
+numeric {\em world number}, assigned by {\tt mpiexec}.  The expression {\tt \%\%} 
+produces a single percent character.
+}
+\startarg{MPIEXEC{\tt \char`\_}PREFIX{\tt \char`\_}STDERR }{Like {\tt MPIEXEC{\tt \char`\_}PREFIX{\tt \char`\_}STDOUT}, but for output from
+standard error.
+}
+\startarg{MPIEXEC{\tt \char`\_}STDIN{\tt \char`\_}DEST }{Sets the destination process for input from standard in,
+by rank in the corresponding {\tt MPI{\tt \char`\_}COMM{\tt \char`\_}WORLD}.
+}
+\startarg{MPIEXEC{\tt \char`\_}STDOUTBUF }{Sets the buffering mode for standard output.  Valid
+values are {\tt NONE} (no buffering), {\tt LINE} (buffering by lines), and
+{\tt BLOCK} (buffering by blocks of characters; the size of the block is
+implementation defined).  The default is {\tt NONE}.
+}
+\startarg{MPIEXEC{\tt \char`\_}STDERRBUF }{Like {\tt MPIEXEC{\tt \char`\_}STDOUTBUF}, but for standard error.
+}
+\par
+Note that the {\tt MPIEXEC{\tt \char`\_}PREFIX{\tt \char`\_}xxx} and {\tt MPIEXEC{\tt \char`\_}STDIN{\tt \char`\_}DEST} variables
+are not fully implemented.
+\par
+\subhead{Startup Environment}
+All of the users environment variables are provided to each of the
+created processes.  This is not required by the MPI standard, but
+is often very convenient.
+\par
+\subhead{Return Status}
+{\tt mpiexec} returns the maximum of the exit status values of all of the
+processes created by {\tt mpiexec}.
+\par
+\subhead{Notes}
+A few additional enviroment variables are defined for the use of
+developers and in debugging.  These are
+\par
+\startarg{MPIEXEC{\tt \char`\_}DEBUG }{If set, {\tt mpiexec} will write additional information
+about the steps that it is taking.
+}
+\par
+\par
+\location{mpiexec.txt}
+\endmanpage

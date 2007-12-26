@@ -1,0 +1,10 @@
+# This Makefile.sm generated automatically by f77tof90
+# from test/mpi/f77/init/Makefile.sm.  DO NOT EDIT
+LDADD = ../util/mtestf90.o 
+DEPADD = @MPILIBLOC@ ../util/mtestf90.o
+smvar_do_sharedlibs = 0
+
+baseenvf90_SOURCES = baseenvf90.f90
+
+../util/mtestf90.o: 
+	(cd ../util && $(MAKE) mtestf90.o)

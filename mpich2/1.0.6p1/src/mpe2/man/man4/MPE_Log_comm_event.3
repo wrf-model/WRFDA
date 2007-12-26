@@ -1,0 +1,37 @@
+.TH MPE_Log_comm_event 3 "8/5/2007" " " "MPE"
+.SH NAME
+MPE_Log_comm_event \-  Log an event in a specified MPI_Comm. 
+.SH SYNOPSIS
+.nf
+int MPE_Log_comm_event( MPI_Comm comm, int local_thread,
+                        int event, const char *bytebuf )
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm          
+- MPI_Comm where this process is part of.
+.PD 1
+.PD 0
+.TP
+.B local_thread  
+- local thread ID where the receive event takes place.
+.PD 1
+.PD 0
+.TP
+.B event         
+- event number.
+.PD 1
+.PD 0
+.TP
+.B bytebuf       
+- optional byte informational array.  In C, bytebuf should be
+set to NULL when no extra byte informational data.  In
+Fortran, an zero-length string "", or a single blank string
+" ", is equivalent to NULL in C.
+.PD 1
+
+.SH RETURNS
+alway returns MPE_LOG_OK
+.SH LOCATION
+../src/logging/src/mpe_log.c
