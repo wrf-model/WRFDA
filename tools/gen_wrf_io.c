@@ -435,6 +435,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , char * fourdname, no
 
       if ( ! ( io_mask & BOUNDARY ) )
       {
+        set_mem_order( p->members, memord , NAMELEN) ;
 fprintf(fp,"DO itrace = PARAM_FIRST_SCALAR , num_%s\n",p->name ) ;
 fprintf(fp,"  IF (BTEST(%s_stream_table(grid%%id, itrace ) , switch )) THEN\n",p->name) ;
 #if DA_CORE==1
@@ -451,11 +452,19 @@ fprintf(fp,"          TRIM(%s_dname_table( grid%%id, itrace )), & !data name\n",
         if ( ok_to_collect_distribute ) {
 fprintf(fp,"                       globbuf_%s               , &  ! Field \n",p->members->type->name ) ;
         } else {
-#if DA_CORE==1
+           if        ( !strcmp(memord,"XYZ") ) {
 fprintf(fp,"          grid%%%s%s(ims,jms,kms,itrace)  , &  ! Field\n",p->name,tl) ;
-#else
+           } else if ( !strcmp(memord,"YXZ") ) {
+fprintf(fp,"          grid%%%s%s(jms,ims,kms,itrace)  , &  ! Field\n",p->name,tl) ;
+           } else if ( !strcmp(memord,"XZY") ) {
 fprintf(fp,"          grid%%%s%s(ims,kms,jms,itrace)  , &  ! Field\n",p->name,tl) ;
-#endif
+           } else if ( !strcmp(memord,"YZX") ) {
+fprintf(fp,"          grid%%%s%s(jms,kms,ims,itrace)  , &  ! Field\n",p->name,tl) ;
+           } else if ( !strcmp(memord,"ZXY") ) {
+fprintf(fp,"          grid%%%s%s(kms,ims,jms,itrace)  , &  ! Field\n",p->name,tl) ;
+           } else if ( !strcmp(memord,"ZYX") ) {
+fprintf(fp,"          grid%%%s%s(kms,jms,ims,itrace)  , &  ! Field\n",p->name,tl) ;
+           }
         }
         if (!strncmp(p->members->type->name,"real",4)) {
           fprintf(fp,"                       WRF_FLOAT             , &  ! FieldType \n") ;
@@ -469,12 +478,8 @@ fprintf(fp,"          grid%%bdy_mask       , &  ! bdy_mask\n") ;
         if ( sw_io == GEN_OUTPUT ) {
 fprintf(fp,"          dryrun             , &  ! flag\n") ;
         }
-        set_mem_order( p->members, memord , NAMELEN) ;
-#if DA_CORE==1
+fprintf(stderr,"name %s memord %s\n",p->name,memord) ;
 fprintf(fp,"          '%s'               , &  ! MemoryOrder\n",memord) ;
-#else
-fprintf(fp,"          'XZY'               , &  ! MemoryOrder\n") ;
-#endif
         strcpy(stagstr, "") ;
         if ( p->members->stag_x ) strcat(stagstr, "X") ;
         if ( p->members->stag_y ) strcat(stagstr, "Y") ;
@@ -515,11 +520,7 @@ fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimna
 fprintf(fp,"          %s_desc_table( grid%%id, itrace  ), & ! Desc\n",p->name) ;
 fprintf(fp,"          %s_units_table( grid%%id, itrace  ), & ! Units\n",p->name) ;
         }
-#if DA_CORE==1
 fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder %s' , & ! Debug message\n", fname, p->name, memord ) ;
-#else
-fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder XZY' , & ! Debug message\n", fname, p->name ) ;
-#endif
         /* global dimensions */
         for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
         fprintf(fp," & \n") ;
@@ -681,11 +682,7 @@ fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimna
 fprintf(fp,"          %s_desc_table( grid%%id, itrace  ), & ! Desc\n",p->name) ;
 fprintf(fp,"          %s_units_table( grid%%id, itrace  ), & ! Units\n",p->name) ;
             }
-#if DA_CORE==1
-fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder %s' , & ! Debug message\n", fname, p->name, memord ) ;
-#else
-fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder XZY' , & ! Debug message\n", fname, p->name ) ;
-#endif
+fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder %s' , & ! Debug message\n", fname, p->name,memord ) ;
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ds1,de1,ds2,de2,ds3,de3 ) ;
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ms1,me1,ms2,me2,ms3,me3 ) ;
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ps1,pe1,ps2,pe2,ps3,pe3 ) ;
