@@ -77,6 +77,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    integer :: num_tovs_thinned, num_tovs_used
    integer :: lnbufr
    integer :: n
+   integer(i_kind), allocatable :: ptotal(:)
 
    call da_trace_entry("da_read_obs_bufrtovs")
 
@@ -84,7 +85,9 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    nchan = 20
    allocate(nread(1:rtminit_nsensor))
+   allocate(ptotal(0:num_fgat_time))
    nread(1:rtminit_nsensor) = 0
+   ptotal(0:num_fgat_time) = 0
 
    ! Set various variables depending on type of data to be read
 
@@ -282,7 +285,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
          if (inst == 0) cycle
 
          num_tovs_global = num_tovs_global + 1
-         iv%info(radiance)%ptotal(ifgat) = iv%info(radiance)%ptotal(ifgat) + 1
+         ptotal(ifgat) = ptotal(ifgat) + 1
 
          if (num_tovs_global < tovs_start) then
             cycle
@@ -301,7 +304,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
             call da_warning(__FILE__,__LINE__,message(1:1))
             num_tovs_selected = num_tovs_selected-1
             num_tovs_global   = num_tovs_global-1
-            iv%info(radiance)%ptotal(ifgat) = iv%info(radiance)%ptotal(ifgat) - 1
+            ptotal(ifgat) = ptotal(ifgat) - 1
             exit obs
          end if
 
@@ -395,7 +398,8 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    iv%info(radiance)%ntotal = iv%info(radiance)%ntotal + num_tovs_global
 
    do i = 1, num_fgat_time
-      iv%info(radiance)%ptotal(i) = iv%info(radiance)%ptotal(i) + iv%info(radiance)%ptotal(i-1) 
+      ptotal(i) = ptotal(i) + ptotal(i-1) 
+      iv%info(radiance)%ptotal(i) = iv%info(radiance)%ptotal(i) + ptotal(i) 
    end do
    if ( iv%info(radiance)%ptotal(num_fgat_time) /= iv%info(radiance)%ntotal ) then
       write(unit=message(1),fmt='(A,I10,A,I10)') &
@@ -460,6 +464,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    deallocate ( p )
 
    deallocate (nread)
+   deallocate (ptotal)
 
    ! check if sequential structure has been freed
    !
