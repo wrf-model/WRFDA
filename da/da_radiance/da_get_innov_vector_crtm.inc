@@ -130,6 +130,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
       end if
 
+write (0,*) __FILE__,__LINE__,"nchanl",nchanl
       Error_Status = CRTM_Allocate_Surface( nchanl,     &  ! Input
                                    Surface)  ! Output
       if (Error_Status /= 0) then
@@ -232,22 +233,29 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             model_isflg,model_ivgtyp, model_isltyp, &
             Surface(1)%Water_Coverage, Surface(1)%Ice_Coverage, &
             Surface(1)%Land_Coverage, Surface(1)%Snow_Coverage )
+write (0,*) __FILE__,__LINE__
 
          call da_interp_lin_2d_partial (grid%xb%u10,  iv%instid(inst)%info, 1, n, n, model_u10(n:n))
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb%v10,  iv%instid(inst)%info, 1, n, n, model_v10(n:n))
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb%psfc, iv%instid(inst)%info, 1, n, n, model_psfc(n:n))
+write (0,*) __FILE__,__LINE__
 
          model_psfc(n) = 0.01*model_psfc(n)           ! convert to hPa
          model_ptop = 0.01*grid%xb%ptop
 
+write (0,*) __FILE__,__LINE__
          ! get CRTM levels (0.005hPa at top) /model full level
          Atmosphere(1)%Level_Pressure(0)=model_ptop   ! to sigma level 51-->sigmaf=0
          Atmosphere(1)%Level_Pressure(Atmosphere(1)%n_Layers)=model_psfc(n) ! to sigma level 1->sigmaf=1
 
+write (0,*) __FILE__,__LINE__
          do k=kts+1,kte
             Atmosphere(1)%Level_Pressure(kte-k+1)= grid%xb%sigmaf(k)*(model_psfc(n)-model_ptop)+model_ptop
          end do
  
+write (0,*) __FILE__,__LINE__
          ! convert cloud content unit from kg/kg to kg/m^2        
          if (crtm_cloud) then
             do k=kts,kte
@@ -258,23 +266,35 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             end do
          end if
 
+write (0,*) __FILE__,__LINE__
          if ( model_isflg == 0 ) then   ! over sea using SST
+write (0,*) __FILE__,__LINE__
             call da_interp_lin_2d_partial (grid%xb % tgrn, iv%instid(inst)%info, 1, n, n, model_ts(n:n))
+write (0,*) __FILE__,__LINE__
          else
+write (0,*) __FILE__,__LINE__
             call da_interp_lin_2d_partial (grid%xb % tsk,  iv%instid(inst)%info, 1, n, n, model_ts(n:n))
+write (0,*) __FILE__,__LINE__
          end if
 
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb % terr, iv%instid(inst)%info, 1, n, n, model_elv(n:n))
 
+write (0,*) __FILE__,__LINE__
          ! variables for emissivity calculations
          !---------------------------------------- 
          call da_interp_lin_2d_partial (grid%xb % smois,  iv%instid(inst)%info, 1, n, n, model_smois(n:n) )
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb % tslb,   iv%instid(inst)%info, 1, n, n, model_tslb(n:n) )
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb % snowh,  iv%instid(inst)%info, 1, n, n, model_snowh(n:n) )
+write (0,*) __FILE__,__LINE__
          call da_interp_lin_2d_partial (grid%xb % vegfra, iv%instid(inst)%info, 1, n, n, model_vegfra(n:n) )
+write (0,*) __FILE__,__LINE__
 
          ! model_snowh(n) = model_snowh(n)*100.0   ! convert from m to mm
          model_vegfra(n) = 0.01*model_vegfra(n)  ! convert range to 0~1
+write (0,*) __FILE__,__LINE__
 
          ! ADD for computing cloud liquid water path (mm) from guess
          clwp = 0.0
@@ -285,6 +305,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             clwp  = clwp + clw(k)
          end do
 
+write (0,*) __FILE__,__LINE__
          ! CRTM GeometryInfo Structure
          GeometryInfo(1)%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
          GeometryInfo(1)%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
@@ -294,6 +315,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
          ! GeometryInfo(1)%Sensor_Scan_Angle=
          ! GeometryInfo(1)%Source_Zenith_Angle=
 
+write (0,*) __FILE__,__LINE__
          ! CRTM Surface parameter data
 
          if (Surface(1)%Land_Coverage > 0.0) then
@@ -304,6 +326,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             Surface(1)%Vegetation_Fraction=model_vegfra(n)
             Surface(1)%Soil_Temperature=model_tslb(n)
          end if
+write (0,*) __FILE__,__LINE__
          if (Surface(1)%Water_Coverage > 0.0) then
             ! Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
             Surface(1)%Water_Temperature=model_ts(n)     ! K
@@ -311,6 +334,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! surface(1)%Wind_Direction=0.0            ! NOT used
             Surface(1)%Salinity=33.0                   ! ppmv
          end if
+write (0,*) __FILE__,__LINE__
 
          if (Surface(1)%Snow_Coverage > 0.0) then
             Surface(1)%Snow_Type=NEW_SNOW             ! User guide appendix 3
@@ -319,6 +343,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! Surface(1)%Snow_Density=0.2               ! g/cm**3
             ! Surface(1)%Snow_Grain_Size=2.0            ! mm
          end if
+write (0,*) __FILE__,__LINE__
          if (Surface(1)%Ice_Coverage > 0.0) then
             ! Surface(1)%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
             Surface(1)%Ice_Temperature=model_ts(n)       ! K
@@ -327,11 +352,22 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! Surface(1)%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO
 
          end if
+write (0,*) __FILE__,__LINE__,"nchanl",nchanl
          if (nchanl > 0) then
+write (0,*) __FILE__,__LINE__
             Surface(1)%SensorData%n_channels = nchanl
+write (0,*) __FILE__,__LINE__,"wmo_sensor_id",wmo_sensor_id
             Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id 
+write (0,*) __FILE__,__LINE__,"inst,n,ob%instid(inst)%tb(1:nchanl,n)",inst,n,ob%instid(inst)%tb(1:nchanl,n)
+write (0,*) __FILE__,__LINE__,"associated(Surface(1)%SensorData%Tb)",associated(Surface(1)%SensorData%Tb)
+write (0,*) __FILE__,__LINE__,"size(Surface(1)%SensorData%Tb)",size(Surface(1)%SensorData%Tb)
+write (0,*) __FILE__,__LINE__,"lbound(Surface(1)%SensorData%Tb)",lbound(Surface(1)%SensorData%Tb)
+write (0,*) __FILE__,__LINE__,"ubound(Surface(1)%SensorData%Tb)",ubound(Surface(1)%SensorData%Tb)
+write (0,*) __FILE__,__LINE__,"ubound(ob%instid(inst)%tb(1:nchanl,n))",ubound(ob%instid(inst)%tb(1:nchanl,n))
             Surface(1)%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)
+write (0,*) __FILE__,__LINE__
          end if
+write (0,*) __FILE__,__LINE__
 !write (0,*) "n",n
 !write (0,*) "sum(Atmosphere(1)%Temperature)",sum(Atmosphere(1)%Temperature)
 !write (0,*) "sum(Atmosphere(1)%Absorber(:,1))",sum(Atmosphere(1)%Absorber(:,1))
@@ -349,6 +385,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 !write (0,*) "Surface(1)%Wind_Speed)",Surface(1)%Wind_Speed
 !write (0,*) "Surface(1)%Vegetation_Fraction)",Surface(1)%Vegetation_Fraction
 
+write (0,*) __FILE__,__LINE__
          ! [1.3] Call RTM foreward model
          call da_crtm_direct(1, nchanl, 1, Atmosphere,   &
             Surface,      &
@@ -356,6 +393,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ChannelInfo(inst:inst),  &
             RTSolution)
 
+write (0,*) __FILE__,__LINE__
          !Error_Status = CRTM_Forward (Atmosphere,   &
          !   Surface,      &
          !   GeometryInfo, &
@@ -376,10 +414,12 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
          !        (/"Error in calling CRTM_Forward"/))
          !endif
 
+write (0,*) __FILE__,__LINE__
          !----------------------------------------------------------------
          ! [2.0] calculate components of innovation vector:
          !----------------------------------------------------------------
          do k = 1, nchanl
+write (0,*) __FILE__,__LINE__
             if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
                iv%instid(inst)%tb_xb(k,n)  = RTSolution(k,1)%Brightness_Temperature
                iv%instid(inst)%tb_inv(k,n) = &
@@ -391,6 +431,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             iv%instid(inst)%emiss(k,n) = RTSolution(k,1)%surface_emissivity
          end do
 
+write (0,*) __FILE__,__LINE__
          !----------------------------------------------------------------
          ! [3.0] store base state to innovation structure
          !----------------------------------------------------------------
