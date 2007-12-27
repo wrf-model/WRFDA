@@ -570,13 +570,18 @@ else
          export NUM_PROCS_WRF=`expr $NUM_PROCS \/ 4`
          export NUM_PROCS_WRFPLUS=`expr $NUM_PROCS \/ 2`
          export NUM_4DVAR_NODES=`expr $NUM_PROCS \/ $LL_PTILE`
+         if [[ $NUM_4DVAR_NODES -lt 1 ]] ; then
+            export NUM_4DVAR_NODES=1
+         fi
          export NUM_PROCS_VAR_PER_NODE=`expr $NUM_PROCS_VAR \/ $NUM_4DVAR_NODES`
          export NUM_PROCS_WRF_PER_NODE=`expr $NUM_PROCS_WRF \/ $NUM_4DVAR_NODES`
          export NUM_PROCS_WRFPLUS_PER_NODE=`expr $NUM_PROCS_WRFPLUS \/ $NUM_4DVAR_NODES`
-         if [[ $NUM_PROCS_VAR_PER_NODE+$NUM_PROCS_WRF_PER_NODE+$NUM_PROCS_WRFPLUS_PER_NODE -ne $LL_PTILE ]] ; then
+         if [[ $NUM_4DVAR_NODES -gt 1 ]] ; then
+            if [[ $NUM_PROCS_VAR_PER_NODE+$NUM_PROCS_WRF_PER_NODE+$NUM_PROCS_WRFPLUS_PER_NODE -ne $LL_PTILE ]] ; then
                echo $NUM_PROCS_VAR_PER_NODE+$NUM_PROCS_WRF_PER_NODE+$NUM_PROCS_WRFPLUS_PER_NODE
                echo "Wrong processors distribution", $NUM_PROCS_VAR_PER_NODE, $NUM_PROCS_WRF_PER_NODE, $NUM_PROCS_WRFPLUS_PER_NODE, $LL_PTILE
                exit 1
+            fi
          fi
          echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
          echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
