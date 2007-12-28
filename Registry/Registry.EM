@@ -1485,30 +1485,30 @@ i1       real  a_p8w             ikj      misc        1       Z
 i1       real  a_t8w             ikj      misc        1       Z                                          
 i1       real  a_rho_phy         ikj      misc        1       -                                          
 state   real   a_xkmhd           ikj      misc        1       -     -
-state    real   a_u_b            ikjb      dyn_em      -        X     b
-state    real   a_u_bt           ikjb      dyn_em      -        X     b
-state    real   a_v_b            ikjb      dyn_em      -        Y     b
-state    real   a_v_bt           ikjb      dyn_em      -        Y     b
-state    real   a_w_b            ikjb      dyn_em      -        Z     b
-state    real   a_w_bt           ikjb      dyn_em      -        Z     b
-state    real   a_ph_b           ikjb      dyn_em      -        Z     b
-state    real   a_ph_bt          ikjb      dyn_em      -        Z     b
-state    real   a_t_b            ikjb      dyn_em      -        -     b
-state    real   a_t_bt           ikjb      dyn_em      -        -     b
-state    real   a_mu_b           ijb       dyn_em      -        -     b
-state    real   a_mu_bt          ijb       dyn_em      -        -     b
-state    real   a_rqv_b          ikjb      dyn_em      -        -     b
-state    real   a_rqv_bt         ikjb      dyn_em      -        -     b
-state    real   a_rqc_b          ikjb      misc        -        -     b
-state    real   a_rqc_bt         ikjb      misc        -        -     b
-state    real   a_rqr_b          ikjb      misc        -        -     b
-state    real   a_rqr_bt         ikjb      misc        -        -     b
-state    real   a_rqi_b          ikjb      misc        -        -     b
-state    real   a_rqi_bt         ikjb      misc        -        -     b
-state    real   a_rqs_b          ikjb      misc        -        -     b
-state    real   a_rqs_bt         ikjb      misc        -        -     b
-state    real   a_rqg_b          ikjb      misc        -        -     b
-state    real   a_rqg_bt         ikjb      misc        -        -     b
+state    real   a_u_b            ikjb      dyn_em      -        X     b  "A_U_B"
+state    real   a_u_bt           ikjb      dyn_em      -        X     b  "A_U_BT"
+state    real   a_v_b            ikjb      dyn_em      -        Y     b  "A_V_B"
+state    real   a_v_bt           ikjb      dyn_em      -        Y     b  "A_V_BT"
+state    real   a_w_b            ikjb      dyn_em      -        Z     b  "A_W_B"
+state    real   a_w_bt           ikjb      dyn_em      -        Z     b  "A_W_BT"
+state    real   a_ph_b           ikjb      dyn_em      -        Z     b  "A_PH_B"
+state    real   a_ph_bt          ikjb      dyn_em      -        Z     b  "A_PH_BT"
+state    real   a_t_b            ikjb      dyn_em      -        -     b  "A_T_B"
+state    real   a_t_bt           ikjb      dyn_em      -        -     b  "A_T_BT"
+state    real   a_mu_b           ijb       dyn_em      -        -     b  "A_MU_B"
+state    real   a_mu_bt          ijb       dyn_em      -        -     b  "A_MU_BT"
+state    real   a_rqv_b          ikjb      dyn_em      -        -     b  "A_RQV_B"
+state    real   a_rqv_bt         ikjb      dyn_em      -        -     b  "A_RQV_BT"
+state    real   a_rqc_b          ikjb      misc        -        -     b  "A_RQC_B"
+state    real   a_rqc_bt         ikjb      misc        -        -     b  "A_RQC_BT"
+state    real   a_rqr_b          ikjb      misc        -        -     b  "A_RQR_B"
+state    real   a_rqr_bt         ikjb      misc        -        -     b  "A_RQR_BT"
+state    real   a_rqi_b          ikjb      misc        -        -     b  "A_RQI_B"
+state    real   a_rqi_bt         ikjb      misc        -        -     b  "A_RQI_BT"
+state    real   a_rqs_b          ikjb      misc        -        -     b  "A_RQS_B"
+state    real   a_rqs_bt         ikjb      misc        -        -     b  "A_RQS_BT"
+state    real   a_rqg_b          ikjb      misc        -        -     b  "A_RQG_B"
+state    real   a_rqg_bt         ikjb      misc        -        -     b  "A_RQG_BT"
 state    real   a_fcx            w         misc     -       -      irh02      
 state    real   a_gcx            w         misc     -       -      irh02      
 state    real   a_dtbc            -        misc     -       -      irh02      
@@ -1685,30 +1685,30 @@ i1       real  g_p8w             ikj      misc        1       Z
 i1       real  g_t8w             ikj      misc        1       Z                                          
 i1       real  g_rho_phy         ikj      misc        1       -                                          
 state   real   g_xkmhd           ikj      misc        1       -     -
-state    real   g_u_b            ikjb      dyn_em      -        X     b
-state    real   g_u_bt           ikjb      dyn_em      -        X     b
-state    real   g_v_b            ikjb      dyn_em      -        Y     b
-state    real   g_v_bt           ikjb      dyn_em      -        Y     b
-state    real   g_w_b            ikjb      dyn_em      -        Z     b
-state    real   g_w_bt           ikjb      dyn_em      -        Z     b
-state    real   g_ph_b           ikjb      dyn_em      -        Z     b
-state    real   g_ph_bt          ikjb      dyn_em      -        Z     b
-state    real   g_t_b            ikjb      dyn_em      -        -     b
-state    real   g_t_bt           ikjb      dyn_em      -        -     b
-state    real   g_mu_b           ijb       dyn_em      -        -     b
-state    real   g_mu_bt          ijb       dyn_em      -        -     b
-state    real   g_rqv_b          ikjb      dyn_em      -        -     b
-state    real   g_rqv_bt         ikjb      dyn_em      -        -     b
-state    real   g_rqc_b          ikjb      misc        -        -     b
-state    real   g_rqc_bt         ikjb      misc        -        -     b
-state    real   g_rqr_b          ikjb      misc        -        -     b
-state    real   g_rqr_bt         ikjb      misc        -        -     b
-state    real   g_rqi_b          ikjb      misc        -        -     b
-state    real   g_rqi_bt         ikjb      misc        -        -     b
-state    real   g_rqs_b          ikjb      misc        -        -     b
-state    real   g_rqs_bt         ikjb      misc        -        -     b
-state    real   g_rqg_b          ikjb      misc        -        -     b
-state    real   g_rqg_bt         ikjb      misc        -        -     b
+state    real   g_u_b            ikjb      dyn_em      -        X     b  "G_U_B"
+state    real   g_u_bt           ikjb      dyn_em      -        X     b  "G_U_BT"
+state    real   g_v_b            ikjb      dyn_em      -        Y     b  "G_V_B"
+state    real   g_v_bt           ikjb      dyn_em      -        Y     b  "G_V_BT"
+state    real   g_w_b            ikjb      dyn_em      -        Z     b  "G_W_B"
+state    real   g_w_bt           ikjb      dyn_em      -        Z     b  "G_W_BT"
+state    real   g_ph_b           ikjb      dyn_em      -        Z     b  "G_PH_B"
+state    real   g_ph_bt          ikjb      dyn_em      -        Z     b  "G_PH_BT"
+state    real   g_t_b            ikjb      dyn_em      -        -     b  "G_T_B"
+state    real   g_t_bt           ikjb      dyn_em      -        -     b  "G_T_BT"
+state    real   g_mu_b           ijb       dyn_em      -        -     b  "G_MU_B"
+state    real   g_mu_bt          ijb       dyn_em      -        -     b  "G_MU_BT"
+state    real   g_rqv_b          ikjb      dyn_em      -        -     b  "G_RQV_B"
+state    real   g_rqv_bt         ikjb      dyn_em      -        -     b  "G_RQV_BT"
+state    real   g_rqc_b          ikjb      misc        -        -     b  "G_RQC_B"
+state    real   g_rqc_bt         ikjb      misc        -        -     b  "G_RQC_BT"
+state    real   g_rqr_b          ikjb      misc        -        -     b  "G_RQR_B"
+state    real   g_rqr_bt         ikjb      misc        -        -     b  "G_RQR_BT"
+state    real   g_rqi_b          ikjb      misc        -        -     b  "G_RQI_B"
+state    real   g_rqi_bt         ikjb      misc        -        -     b  "G_RQI_BT"
+state    real   g_rqs_b          ikjb      misc        -        -     b  "G_RQS_B"
+state    real   g_rqs_bt         ikjb      misc        -        -     b  "G_RQS_BT"
+state    real   g_rqg_b          ikjb      misc        -        -     b  "G_RQG_B"
+state    real   g_rqg_bt         ikjb      misc        -        -     b  "G_RQG_BT"
 state    real   g_fcx            w         misc     -       -      irh02      
 state    real   g_gcx            w         misc     -       -      irh02      
 state    real   g_dtbc            -        misc     -       -      irh02      
