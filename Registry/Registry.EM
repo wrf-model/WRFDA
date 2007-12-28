@@ -381,7 +381,7 @@ state   real   toposlpx            ij    misc          1     -     i1      "TOPO
 state   real   toposlpy            ij    misc          1     -     i1      "TOPOSLPY"      "ELEVATION Y SLOPE"  ""
 state   real   shdmax              ij    misc          1     -     i01r    "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
 state   real   shdmin              ij    misc          1     -     i01r    "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
-state   real   snoalb              ij    misc          1     -     i01r    "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" "
+state   real   snoalb              ij    misc          1     -     i01r    "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" ""
 state   real   slopecat            ij    misc          1     -     i1      "SLOPECAT"      "SLOPE CATEGORY"  ""
 state   real   toposoil            ij    misc          1     -     i1      "SOILHGT"       "ELEVATION OF LSM DATA"  "m"
 state   real   landusef            iuj   misc          1     Z     i1      "LANDUSEF"      "LANDUSE FRACTION BY CATEGORY"  ""
@@ -428,7 +428,7 @@ state  integer  IFNDSOILW        -      misc        1         -     i         "F
 
 # RUC LSM
 state    real   SMFR3D           ilj    misc        1         Z      r        "SMFR3D"               "SOIL ICE" ""
-state    real   KEEPFR3DFLAG     ilj    misc        1         Z      r        "KEEPFR3DFLAG          "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
+state    real   KEEPFR3DFLAG     ilj    misc        1         Z      r        "KEEPFR3DFLAG"         "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
 
 # MRF PBL variables***25Aug 2002*****
 i1      real   PSIM           ij     misc        1         -     -         "PSIM"                "SIMILARITY FUNCTION FOR MOMENTUM"     ""
@@ -438,7 +438,7 @@ i1      real   GZ1OZ0         ij     misc        1         -     -         "GZ1O
 i1      real   BR             ij     misc        1         -     -         "BR"                  "Bulk Richardson"                       ""
 
 # MYJ PBL variables
-state    real   tke_myj        ikj     misc        1         -      r        "tke_myj"               "TKE FROM MELLOR-YAMADA-JANJIC      "m2 s-2"
+state    real   tke_myj        ikj     misc        1         -      r        "tke_myj"               "TKE FROM MELLOR-YAMADA-JANJIC"     "m2 s-2"
 state    real   EXCH_H          ikj     misc        1         -     r          "EXCH_H"               "EXCHANGE COEFFICIENTS "
 state    real  CT              ij      misc        1         -      r        "CT"                    "COUNTERGRADIENT TERM"    "K"
 state   real   THZ0             ij     misc        1         -      r        "THZ0"                  "POTENTIAL TEMPERATURE AT ZNT"                 "K"
@@ -636,7 +636,7 @@ state    real  QFX              ij      misc        1         -      rh       "Q
 state    real  LH               ij      misc        1         -      rh       "LH"                    "LATENT HEAT FLUX AT THE SURFACE"              "W m-2"
 state    real  FLHC             ij      misc        1         -      r        "FLHC"                  "SURFACE EXCHANGE COEFFICIENT FOR HEAT"       ""
 state    real  FLQC             ij      misc        1         -      r        "FLQC"                  "SURFACE EXCHANGE COEFFICIENT FOR MOISTURE"   ""
-state    real  QSG              ij      misc        1         -      r        "QSG"                   "SURFACE SATURATION WATER VAPOR MIXING RATIO   "kg kg-1"
+state    real  QSG              ij      misc        1         -      r        "QSG"                   "SURFACE SATURATION WATER VAPOR MIXING RATIO"  "kg kg-1"
 state    real  QVG              ij      misc        1         -      r        "QVG"                   "WATER VAPOR MIXING RATIO AT THE SURFACE"      "kg kg-1"
 state    real  QCG              ij      misc        1         -      r        "QCG"                   "CLOUD WATER MIXING RATIO AT THE SURFACE"      "kg kg-1"
 state    real  SOILT1           ij      misc        1         -      r        "SOILT1"                "TEMPERATURE INSIDE SNOW "    "K"
@@ -1086,7 +1086,7 @@ rconfig   logical TEST_calculate_km_kh    namelist,domains          1      .fals
 rconfig   logical TEST_rk_tendency        namelist,domains          1      .false. -     "TEST_rk_tendency"            ""      ""
 rconfig   logical TEST_surface_drag       namelist,domains          1      .false. -     "TEST_surface_drag"           ""      ""
 rconfig   logical TEST_lscond             namelist,domains          1      .false. -     "TEST_lscond"                 ""      ""
-rconfig   logical TEST_moist_physics_prep_em  namelist,domains      1      .false. -     "TEST_moist_physics_prep_em
+rconfig   logical TEST_moist_physics_prep_em  namelist,domains      1      .false. -     "TEST_moist_physics_prep_em"  ""      ""
 rconfig   logical TEST_advect_scalar      namelist,domains          1      .false. -     "TEST_advect_scalar"          ""      ""
 rconfig   logical TEST_relax_bdy_dry      namelist,domains          1      .false. -     "TEST_relax_bdy_dry"          ""      ""
 rconfig   logical TEST_rk_addtend_dry     namelist,domains          1      .false. -     "TEST_rk_addtend_dry"         ""      ""
