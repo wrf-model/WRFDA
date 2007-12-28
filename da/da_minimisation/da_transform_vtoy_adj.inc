@@ -19,8 +19,9 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    type(y_type),               intent(inout) :: y      ! y = H(x_inc).
    type(domain),               intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type (xbx_type)                  :: xbx_tmp
-   logical                          :: jcdf_flag       ! additional flag to switch off JcDF, used to switch off JcDF in calculation of J.
+   logical,                    intent(in)    :: jcdf_flag       ! additional flag to switch off JcDF, used to switch off JcDF in calculation of J.
+
+   type (xbx_type)                           :: xbx_tmp
 
    integer :: nobwin,ndynopt
 #ifdef DM_PARALLEL

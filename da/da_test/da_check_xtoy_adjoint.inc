@@ -10,7 +10,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    
    type (domain),              intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type (iv_type),             intent(in)    :: iv    ! ob. increment vector.
+   type (iv_type),             intent(inout) :: iv    ! ob. increment vector.
    type (y_type),              intent(inout) :: y     ! y = h (grid%xa)
 
    real                           :: adj_ttl_lhs   ! < y, y >
