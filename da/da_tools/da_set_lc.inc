@@ -36,7 +36,7 @@ subroutine da_set_lc(proj)
 
    ! Find pole point
    arg = proj%cone*(deltalon1*rad_per_deg)
-   proj%polei = 1.0 + proj%hemi * proj%rsw * Sin(arg)
+   proj%polei = 1.0 - proj%hemi * proj%rsw * Sin(arg)
    proj%polej = 1.0 + proj%rsw * COS(arg)  
    if (print_detail_map) then
       write(unit=stdout,fmt='(A,2F10.3)') 'Computed pole i/j = ', proj%polei, proj%polej
