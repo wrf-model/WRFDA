@@ -583,6 +583,11 @@ else
                exit 1
             fi
          fi
+         if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+            export NUM_PROCS_VAR=1
+            export NUM_PROCS_WRF=`expr $NUM_PROCS - 1`
+            export NUM_PROCS_WRFPLUS=0
+         fi
          echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
          echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
          echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
@@ -591,11 +596,12 @@ else
 
          if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
             let I=0
-            while [[ $I -lt 1 ]]; do
+            while [[ $I -lt $NUM_PROCS_VAR ]]; do
                echo "da_wrfvar.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while [[ $I -lt $NUM_PROCS-1 ]]; do
+            let I=0
+            while [[ $I -lt $NUM_PROCS_WRF ]]; do
                echo "./nl/wrf.exe" >> $MP_CMDFILE
                let I=$I+1
             done
