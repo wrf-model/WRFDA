@@ -218,6 +218,8 @@ state   integer lbc_fid        -        -          -         -     -         "lb
 state   logical tiled          -        -          -         -     -         "tiled"                 ""         ""      
 # indicates if patches have been computed                                               
 state   logical patched        -        -          -         -     -         "patched"               ""         ""      
+# indicates whether to recompute mu                                                             
+state   logical press_adj      -        -          -         -     -         "press_adj"         "T/F flag adjust mu"         ""    
 
 # Mask for moving nest interpolations
 state    integer imask_nostag         ij      misc     1     -

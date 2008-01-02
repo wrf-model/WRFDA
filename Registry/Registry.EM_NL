@@ -182,8 +182,6 @@ state    real   tp             ikj     dyn_em      2         -
 i1       real   t_2save        ikj     dyn_em      1         -   
 state    real   t_save         ikj     dyn_em      1         -               "t_save"
 #
-state    real   h_div          ikj     dyn_em      1         -       -       "h_div"
-#                                               
 
 
 # Mass
@@ -302,6 +300,8 @@ state   logical tiled          -        -          -         -     -         "ti
 state   logical patched        -        -          -         -     -         "patched"               ""         ""      
 # indicates whether to read input from file or generate                                         
 #state   logical input_from_file        -        -          -         -     -         "input_from_file"         ""         ""    
+# indicates whether to recompute mu                                                             
+state   logical press_adj      -        -          -         -     -         "press_adj"         "T/F flag adjust mu"         ""    
 
 # Mask for moving nest interpolations
 state    integer imask_nostag         ij      misc     1     -
@@ -833,7 +833,6 @@ state   real  defor13          ikj      misc        1         z     r         "d
 state   real  defor23          ikj      misc        1         z     r         "defor23"               "DEFORMATION 23"              "s-1"      
 state   real   xkmv            ikj      misc        1         -     r         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ikj      misc        1         -     r         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
-state   real   xkmhd           ikj      misc        1         -     r         "xkmhd"                 "HORIZONTAL EDDY DIFFUSIVITY" "m2 s-1"      
 state   real   xkhv            ikj      misc        1         -     r         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ikj      misc        1         -     r         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
 state   real    div            ikj      misc        1         -     r         "div"                   "DIVERGENCE"                                                      "s-1"
@@ -1101,7 +1100,6 @@ rconfig   real    diff_6th_factor         namelist,dynamics     max_domains    0
 rconfig   integer diff_6th_opt            namelist,dynamics     max_domains    0      irh   "diff_6th_opt" "switch for 6th-order numerical diffusion"
 rconfig   real    smdiv                   namelist,dynamics	max_domains    0.1     h    "smdiv"         ""      ""
 rconfig   real    emdiv                   namelist,dynamics	max_domains    0.01    h    "emdiv"         ""      ""
-rconfig   real    hmdiv                   namelist,dynamics	max_domains    0.00    h    "hmdiv"         ""      ""
 rconfig   real    epssm                   namelist,dynamics	max_domains    .1      h    "epssm"         ""      ""
 rconfig   logical non_hydrostatic         namelist,dynamics	max_domains  .true.   irh  "non_hydrostatic"    ""   ""
 rconfig   integer time_step_sound         namelist,dynamics	max_domains    0       h     "time_step_sound"               ""      ""
@@ -1172,6 +1170,7 @@ rconfig   integer isice                   derived                  max_domains  
 rconfig   integer isurban                 derived                  max_domains    0       -        "isurban"              "land use index for 'urban and built-up"     "index category"
 rconfig   integer isoilwater              derived                  max_domains    0       -        "isoilwater"           "land use index of water for soil"        "index category"
 rconfig   integer map_proj                derived                  max_domains    0       -        "map_proj"             "domain map projection"      "0=none (Cylindrical), 1=Lambert, 2=polar, 3=Mercator"
+rconfig   integer use_wps_input           derived                       1         0       -        "use_wps_input"        "0/1 flag, using wps input"      "0=no, 1=yes"
 
 #
 # Single dummy declaration to define a nodyn dyn option
@@ -1231,6 +1230,10 @@ package   kfscheme       cu_physics==99              -             -
 
 package   psufddagd      grid_fdda==1                -             fdda3d:u_ndg_old,v_ndg_old,t_ndg_old,q_ndg_old,ph_ndg_old,u_ndg_new,v_ndg_new,t_ndg_new,q_ndg_new,ph_ndg_new;fdda2d:mu_ndg_old,mu_ndg_new;state:rundgdten,rvndgdten,rthndgdten,rqvndgdten,rmundgdten
 
+package   restofwrf      use_wps_input==0            -             -
+package   realonly       use_wps_input==1            -             state:u_gc,v_gc,t_gc,rh_gc,ght_gc,p_gc,xlat_gc,xlong_gc,ht_gc,tsk_gc,tavgsfc,tmn_gc,pslv_gc,greenfrac,albedo12m,pd_gc,psfc_gc,intq_gc,pdhs,qv_gc,qr_gc qc_gc qs_gc,qi_gc,qg_gc,qni_gc
+
+
 # only need to specify these once; not for every io_form* variable
 package   io_intio    io_form_restart==1                     -             -
 package   io_netcdf   io_form_restart==2                     -             -
@@ -1264,14 +1267,14 @@ halo      HALO_EM_A dyn_em  8:ru,rv,rw,ww,php,alt,al,p,muu,muv,mut
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
 halo      HALO_EM_PHYS_PBL dyn_em        4:rublten,rvblten
 halo      HALO_EM_FDDA dyn_em            4:rundgdten,rvndgdten
-halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
+halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkhv,xkhh,tke_1,tke_2
 halo      HALO_EM_TKE_ADVECT_3 dyn_em 24:tke_2
 halo      HALO_EM_TKE_ADVECT_5 dyn_em 48:tke_2
 halo      HALO_EM_TKE_A dyn_em 4:ph_2,phb
 halo      HALO_EM_TKE_B dyn_em 4:z,rdz,rdzw,zx,zy
 halo      HALO_EM_TKE_C dyn_em 8:u_2,v_2,z,zx,zy,rdz,rdzw
 halo      HALO_EM_TKE_D dyn_em 8:defor11,defor22,defor33,defor12,defor13,defor23,div
-halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,moist
+halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkhv,xkhh,BN2,moist
 halo      HALO_EM_TKE_DO2 dyn_em 24:zx,zy
 halo      HALO_EM_TKE_3 dyn_em   24:tke_1,tke_2
 halo      HALO_EM_TKE_5 dyn_em   48:tke_1,tke_2
@@ -1343,7 +1346,7 @@ period    PERIOD_BDY_EM_TKE_OLD dyn_em 3:tke_1
 period    PERIOD_EM_HYDRO_UV dyn_em 1:u_2,v_2
 period    PERIOD_BDY_EM_A dyn_em 2:ru,rv,rw,ww,php,alt,p,muu,muv,mut,ph_2,al
 period    PERIOD_BDY_EM_A1  dyn_em 3:rdzw,rdz,z,zx,zy
-period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2
+period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2,rdzw,rdz
 period    PERIOD_BDY_EM_FDDA_BC dyn_em 2:rundgdten,rvndgdten
 period    PERIOD_BDY_EM_B dyn_em 2:ru_tend,rv_tend,ph_2,al,p,t_1,t_save,u_save,v_save,mu_1,mu_2,mudf,php,alt,pb,h_div
 period    PERIOD_BDY_EM_B3 dyn_em 2:ph_2,al,p,mu_2,muts,mudf,h_div
