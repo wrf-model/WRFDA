@@ -15,11 +15,16 @@ subroutine da_biascorr ( i, ob, iv)
    ! Local variables
    integer   :: k,iband,iscan, n,j,npred,nlevels
    real      :: q(43),pred(4),airbias
+   real,allocatable      :: temp(:), hum(:), pm(:), pf(:)
 
    if (trace_use) call da_trace_entry("da_biascorr")
 
    npred=4
    nlevels=iv%instid(i)%nlevels-1
+   allocate(temp(nlevels))
+   allocate(hum(nlevels))
+   allocate(pm(nlevels))
+   allocate(pf(0:nlevels))
 
    do n=iv%instid(i)%info%n1,iv%instid(i)%info%n2
       ! get airmass predictors
@@ -30,9 +35,13 @@ subroutine da_biascorr ( i, ob, iv)
             q(1:43), iv%instid(i)%ts(n))
         else if (rtm_option==rtm_option_crtm) then
 #ifdef CRTM
-         call da_predictor_crtm(pred(1:npred), npred, nlevels,iv%instid(i)%tm(1:nlevels,n), &
-            iv%instid(i)%qm(1:nlevels,n), iv%instid(i)%ts(n), &
-            iv%instid(i)%pm(1:nlevels,n),iv%instid(i)%pf(0:nlevels,n))
+! FIX? problems with IBM AIX COMPILER
+         temp(1:nlevels) = iv%instid(i)%tm(1:nlevels,n)
+         hum(1:nlevels) = iv%instid(i)%qm(1:nlevels,n)
+         pm(1:nlevels) = iv%instid(i)%pm(1:nlevels,n)
+         pf(0:nlevels) = iv%instid(i)%pf(0:nlevels,n)
+         call da_predictor_crtm(pred(1:npred), npred, nlevels,temp, &
+            hum, iv%instid(i)%ts(n), pm, pf)
 #endif
         end if
         iscan = iv%instid(i)%scanpos(n)
@@ -58,6 +67,10 @@ subroutine da_biascorr ( i, ob, iv)
         !end if
       end do
    end do
+        deallocate(temp)
+        deallocate(hum)
+        deallocate(pm)
+        deallocate(pf)
 
    if (trace_use) call da_trace_exit("da_biascorr")
 
