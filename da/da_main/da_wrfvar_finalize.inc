@@ -36,6 +36,7 @@ subroutine da_wrfvar_finalize
 
    deallocate (grid)
 
+#if defined(RTTOV) || defined(CRTM)
    if (allocated(num_tovs_before)) deallocate (num_tovs_before)
    if (allocated(num_tovs_after))  deallocate (num_tovs_after)
    if (allocated(tovs_copy_count)) deallocate (tovs_copy_count)
@@ -44,6 +45,7 @@ subroutine da_wrfvar_finalize
    if (allocated(tovs_send_start)) deallocate (tovs_send_start)
    if (allocated(tovs_send_count)) deallocate (tovs_send_count)
    if (allocated(tovs_recv_start)) deallocate (tovs_recv_start)
+#endif
 
    if (rootproc) then
       close (cost_unit)

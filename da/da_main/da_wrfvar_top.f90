@@ -13,7 +13,9 @@ module da_wrfvar_top
    use module_symbols_util, only : wrfu_finalize, wrfu_initialize, &
       wrfu_cal_gregorian
 
+#if defined(RTTOV) || defined(CRTM)
    use module_radiance, only : satinfo, time_slots
+#endif
 #ifdef RTTOV
    use module_radiance, only : coefs, sensor_descriptor
 #endif
@@ -39,13 +41,15 @@ module da_wrfvar_top
       da_deallocate_y
    use da_minimisation, only : da_get_innov_vector,da_minimise_cg, &
       da_write_diagnostics
-   use da_radiance1, only : da_write_oa_rad_ascii
    use da_obs_io, only : da_write_filtered_obs
    use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
    use da_physics, only : da_uvprho_to_w_lin
+#if defined (CRTM) || defined (RTTOV)
+   use da_radiance1, only : da_write_oa_rad_ascii
    use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
       tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
       tovs_send_start
+#endif
    use da_reporting, only : message, da_warning, da_error, da_message
    use da_setup_structures, only : da_setup_obs_structures, &
       da_setup_background_errors,da_setup_flow_predictors

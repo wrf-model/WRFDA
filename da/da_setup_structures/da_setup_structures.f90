@@ -41,7 +41,9 @@ module da_setup_structures
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
       da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
    use da_par_util, only : da_patch_to_global
+#if defined(RTTOV) || defined(CRTM)
    use da_radiance, only : da_setup_bufrtovs_structures
+#endif
    use da_reporting, only : da_error,message, da_warning, da_message
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_spectral, only : da_initialize_h,da_calc_power_spectrum

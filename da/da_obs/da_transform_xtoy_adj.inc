@@ -46,6 +46,7 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    if (num_pseudo            > 0) call da_transform_xtoy_pseudo_adj   (iv, jo_grad_y, jo_grad_x)
 
+#if defined(CRTM) || defined(RTTOV)
    if (use_rad) then
       iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
       iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
@@ -65,6 +66,7 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
          call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))
       end if
    end if
+#endif
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_adj")
 

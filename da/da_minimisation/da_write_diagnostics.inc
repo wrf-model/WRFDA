@@ -46,7 +46,9 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    if (iv%info(bogus)%ntotal    > 0) call da_oi_stats_bogus    (stats_unit, iv)
    if (iv%info(airsr)%ntotal    > 0) call da_oi_stats_airsr    (stats_unit, iv)
 
+#if defined(RTTOV) || defined(CRTM)
    if (iv%num_inst > 0) call da_oi_stats_rad (stats_unit, iv)
+#endif
 
    if (num_pseudo > 0) call da_oi_stats_pseudo (stats_unit, iv)
 
@@ -79,7 +81,9 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    if (iv%info(bogus)%ntotal    > 0) call da_ao_stats_bogus    (stats_unit, iv, re)
    if (iv%info(airsr)%ntotal    > 0) call da_ao_stats_airsr    (stats_unit, iv, re)
 
+#if defined(CRTM) || defined(RTTOV)
    if (iv%num_inst > 0) call da_ao_stats_rad (stats_unit, iv, re)
+#endif
 
    if (num_pseudo > 0) call da_ao_stats_pseudo (stats_unit, iv, re)
 

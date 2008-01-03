@@ -223,6 +223,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_buoy = 0.0
    end if
 
+#if defined(CRTM) || defined(RTTOV)
    if (iv%num_inst > 0) then
       call da_jo_and_grady_rad (iv, re, jo, jo_grad_y)
 
@@ -245,6 +246,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    else
       jo_radiance = 0.0
    end if
+#endif
 
    if (iv%info(airsr)%nlocal > 0) then
       call da_jo_and_grady_airsr(iv, re, jo, jo_grad_y)

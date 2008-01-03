@@ -230,11 +230,13 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 
+#if defined(CRTM) || defined(RTTOV)
       if (write_oa_rad_ascii) then
          write(unit=stdout,fmt='(A)')  'Writing radiance OMB and OMA ascii file'
          write(unit=stdout,fmt=*)  " "
          call da_write_oa_rad_ascii (ob,iv,re)
       end if
+#endif
 
       !------------------------------------------------------------------------
       ! [8.0] Output WRFVAR analysis and analysis increments:
@@ -254,6 +256,7 @@ subroutine da_solve ( grid , config_flags)
    deallocate (cvt)
    deallocate (xhat)
 
+#if defined(RTTOV) || defined(CRTM)
    if (use_rad) then
       do i =1, iv%num_inst
          deallocate (j % jo % rad(i) % jo_ichan)
@@ -357,7 +360,7 @@ subroutine da_solve ( grid , config_flags)
 #endif
       end do
       deallocate (iv%instid)
-      deallocate (j % jo % rad)
+      deallocate (j % jo % rad)     
       deallocate (satinfo)
       deallocate (time_slots)
 #ifdef RTTOV
@@ -366,6 +369,7 @@ subroutine da_solve ( grid , config_flags)
       end if
 #endif
    end if
+#endif
 
    call da_deallocate_observations (iv)
    call da_deallocate_y (re)

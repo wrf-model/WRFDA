@@ -164,12 +164,14 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       end if
    end if
 
+#if defined(CRTM) || defined(RTTOV)
    ! Radiance files can only be in BUFR
 
    if (use_rad) then
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
       call da_setup_bufrtovs_structures(grid, ob, iv)
    end if
+#endif
 
    ! Summarize observations 
 

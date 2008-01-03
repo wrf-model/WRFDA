@@ -79,14 +79,18 @@ module da_minimisation
    use da_qscat, only : da_calculate_grady_qscat, da_ao_stats_qscat, &
       da_oi_stats_qscat, da_get_innov_vector_qscat, da_residual_qscat, &
       da_jo_and_grady_qscat
+#if defined(RTTOV) || defined(CRTM)
    use da_radiance, only : da_calculate_grady_rad, da_write_filtered_rad
    use da_radiance1, only : da_ao_stats_rad,da_oi_stats_rad, &
       da_write_iv_rad_ascii,da_residual_rad,da_jo_and_grady_rad
+#endif
    use da_radar, only :  da_calculate_grady_radar, da_ao_stats_radar, &
       da_oi_stats_radar, da_get_innov_vector_radar, da_residual_radar, &
       da_jo_and_grady_radar
    use da_reporting, only : da_message, da_warning
+#if defined(RTTOV)
    use da_rttov, only : da_get_innov_vector_rttov
+#endif
    use da_satem, only : da_calculate_grady_satem, da_ao_stats_satem, &
       da_oi_stats_satem, da_get_innov_vector_satem, da_residual_satem, &
       da_jo_and_grady_satem

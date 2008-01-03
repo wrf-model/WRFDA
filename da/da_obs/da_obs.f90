@@ -40,7 +40,9 @@ module da_obs
    use da_qscat,     only : da_transform_xtoy_qscat,da_transform_xtoy_qscat_adj
    use da_radar,     only : da_transform_xtoy_radar,da_transform_xtoy_radar_adj
    use da_reporting, only : da_error, message, da_warning
+#ifdef RTTOV
    use da_rttov,     only : da_transform_xtoy_rttov,da_transform_xtoy_rttov_adj
+#endif
    use da_satem,     only : da_transform_xtoy_satem, da_transform_xtoy_satem_adj
    use da_ships,     only : da_transform_xtoy_ships, da_transform_xtoy_ships_adj
    use da_sound,     only : da_transform_xtoy_sound, da_transform_xtoy_sonde_sfc, &
