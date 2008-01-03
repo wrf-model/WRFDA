@@ -119,6 +119,7 @@ state    real   a_ph           ijkb     misc        2         Z     \
 state    real   g_ph           ijkb     misc        2         Z     \
        irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ijk     dyn_em      1         Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
+state    real   phb_fine       ikj     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
 
 # Potential Temperature
 state    real   t              ijkb     dyn_em      2         -     \
@@ -136,6 +137,7 @@ state    real   a_mu            ijb     misc        2         -     \
 state    real   g_mu            ijb     misc        2         -     \
      irh03usdf=(bdy_interp:dt)   "g_mu"  "perturbation dry air mass in column" "Pa"
 state    real   mub             ij     dyn_em      1         -     irhdus       "mub" "base state dry air mass in column" "Pa"
+state    real   mub_fine        ij     dyn_em      1         -      -           "mub_fine" "nest temp, holds interpolated coarse grid mub" "Pa"
 state    real   mu0             ij     dyn_em      1         -     i01rdu       "mu0" "initial dry mass in column" "Pa"
 
 #diagnostic for looking at nest position in output. A mungy version of terrain height.
@@ -496,6 +498,7 @@ state  logical moved            -       misc        1         -     -
 # wrfvar namelists all documented at http://wiki.ucar.edu/display/mmm/Namelists
 
 rconfig   logical   write_increments        namelist,wrfvar1  1  .false.  -  "write_increments"        ""  ""
+rconfig   integer   wrfvar_mem_model        namelist,wrfvar1  1  0        -  "wrfvar_mem_model"        ""  "0=WRFVAR, 1=WRF"
 rconfig   logical   var4d                   namelist,wrfvar1  1  .false.  -  "var4d"                   ""  ""
 rconfig   integer   var4d_multi_inc         namelist,wrfvar1  1  0        -  "var4d_multi_inc"         ""  ""
 rconfig   integer   var4d_coupling          namelist,wrfvar1  1  2        -  "var4d_coupling"          ""  ""
@@ -1080,6 +1083,8 @@ package   bmjscheme      cu_physics==2               -             -
 package   gdscheme       cu_physics==3               -             -
 package   sasscheme      cu_physics==4               -             -
 package   kfscheme       cu_physics==99              -             -
+
+package   varscheme      wrfvar_mem_model==1         -             state:mub_fine,phb_fine
 
 #package   psufddagd      grid_fdda==1                -             fdda3d:u_ndg_old,v_ndg_old,t_ndg_old,q_ndg_old,ph_ndg_old,u_ndg_new,v_ndg_new,t_ndg_new,q_ndg_new,ph_ndg_new;fdda2d:mu_ndg_old,mu_ndg_new
 

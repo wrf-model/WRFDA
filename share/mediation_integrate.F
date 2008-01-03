@@ -411,7 +411,6 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 
      IF ( nest_config_flags%input_from_file .OR. nest_config_flags%input_from_hires ) THEN
 
-#if (DA_CORE == 0)
        WRITE(message,FMT='(A,I2,A)') '*** Initializing nest domain #',nest%id,&
                                       ' from an input file. ***'
        CALL wrf_debug ( 0 , message )
@@ -429,7 +428,6 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                              ids , ide , jds , jde , kds , kde , &
                              ims , ime , jms , jme , kms , kme , &
                              ips , ipe , jps , jpe , kps , kpe )
-#endif
 
        IF ( nest_config_flags%input_from_file ) THEN
 ! read input from dataset
@@ -442,7 +440,6 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                                       ips , ipe , jps , jpe , 1   , 1   )
        ENDIF
 
-#if (DA_CORE == 0)
 ! blend parent and nest fields: terrain, mub, and phb.  THe mub and phb are used in start_domain.
        CALL  blend_terrain ( nest%ht_fine , nest%ht , &
                              ids , ide , jds , jde , 1   , 1   , &
@@ -456,7 +453,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                              ids , ide , jds , jde , kds , kde , &
                              ims , ime , jms , jme , kms , kme , &
                              ips , ipe , jps , jpe , kps , kpe )
-#endif
+
      ELSE
        WRITE(message,FMT='(A,I2,A,I2,A)') '*** Initializing nest domain #',nest%id,&
                                      ' by horizontally interpolating parent domain #' ,parent%id, &
