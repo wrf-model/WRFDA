@@ -67,10 +67,11 @@ subroutine da_biascorr ( i, ob, iv)
         !end if
       end do
    end do
-        deallocate(temp)
-        deallocate(hum)
-        deallocate(pm)
-        deallocate(pf)
+
+   deallocate(temp)
+   deallocate(hum)
+   deallocate(pm)
+   deallocate(pf)
 
    if (trace_use) call da_trace_exit("da_biascorr")
 
