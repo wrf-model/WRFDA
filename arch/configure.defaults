@@ -849,7 +849,6 @@ FCOPTIM         =       -O2 -qarch=auto
 #FCOPTIM         =       -O3 -qhot
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -w #-qflttrap=zerodivide:invalid:enable -qsigtrap
-FCFIXED         =       -qfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 FCSUFFIX        =       -qsuffix=f=f90
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
@@ -995,7 +994,6 @@ FCOPTIM         =       -O2 -qarch=auto
 #FCOPTIM         =       -O3 -qhot
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -w -DSTUBMPI #-qflttrap=zerodivide:invalid:enable -qsigtrap
-FCFIXED         =       -qfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 FCSUFFIX        =       -qsuffix=f=f90
 # machine-specific flags needed to link in ESMF library (C++ run-time-library, etc.)
