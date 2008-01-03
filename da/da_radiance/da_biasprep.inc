@@ -15,6 +15,7 @@ subroutine da_biasprep(inst,ob,iv)
    character(len=1)   :: s1
    real               :: pred(6), q(43)
    type (bias_type)   :: radbias
+   real,allocatable      :: temp(:), hum(:), pm(:), pf(:)
 
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
@@ -36,6 +37,10 @@ subroutine da_biasprep(inst,ob,iv)
    npred = 4
    nchan = iv%instid(inst)%nchan 
    nlevels = iv%instid(inst)%nlevels-1
+   allocate(temp(nlevels))
+   allocate(hum(nlevels))
+   allocate(pm(nlevels))
+   allocate(pf(0:nlevels))
 
    allocate(radbias%tb(nchan))
    allocate(radbias%omb(nchan))
@@ -54,9 +59,13 @@ subroutine da_biasprep(inst,ob,iv)
             q(1:43), iv%instid(inst)%ts(n))
         else if (rtm_option==rtm_option_crtm) then
 #ifdef CRTM
-         call da_predictor_crtm(pred(1:npred), npred, nlevels,iv%instid(inst)%tm(1:nlevels,n), &
-            iv%instid(inst)%qm(1:nlevels,n), iv%instid(inst)%ts(n), &
-            iv%instid(inst)%pm(1:nlevels,n),iv%instid(inst)%pf(0:nlevels,n))
+! FIX? problems with IBM AIX COMPILER
+         temp(1:nlevels) = iv%instid(inst)%tm(1:nlevels,n)
+         hum(1:nlevels) = iv%instid(inst)%qm(1:nlevels,n)
+         pm(1:nlevels) = iv%instid(inst)%pm(1:nlevels,n)
+         pf(0:nlevels) = iv%instid(inst)%pf(0:nlevels,n)
+         call da_predictor_crtm(pred(1:npred), npred, nlevels,temp, &
+            hum, iv%instid(inst)%ts(n), pm, pf)
 #endif
         end if
 
@@ -110,6 +119,11 @@ subroutine da_biasprep(inst,ob,iv)
   
    close(unit=biasprep_unit)
    call da_free_unit(biasprep_unit)
+
+   deallocate(temp)
+   deallocate(hum)
+   deallocate(pm)
+   deallocate(pf)
 
    deallocate(radbias%tb)
    deallocate(radbias%omb)
