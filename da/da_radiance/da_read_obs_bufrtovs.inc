@@ -418,16 +418,16 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    !----------------------------------------------------------------  
    
    do i = 1, iv%num_inst
+      if (rtm_option == rtm_option_crtm) then
+         iv%instid(i)%nlevels = kme-kms+1
+         iv%instid(i)%nchannels=nchan
+      end if
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
       iv%instid(i)%info%nlocal = nread(i)
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         'Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
-      if (rtm_option == rtm_option_crtm) then
-         iv%instid(i)%nlevels = kme-kms+1
-         iv%instid(i)%nchannels=nchan
-      end if
 
 #ifdef RTTOV
       if (rtm_option == rtm_option_rttov) then
