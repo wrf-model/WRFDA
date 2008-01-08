@@ -184,31 +184,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
    export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 
-   if $NL_VAR4D; then
-      if $CYCLING; then
-         if [[ $CYCLE_NUMBER -gt 0 ]]; then
-            if $RUN_UPDATE_BC; then
-               export RUN_DIR=$SUITE_DIR/$DATE/update_bc_4dvar
-               export PHASE=true
-               mkdir -p $RUN_DIR
-
-               export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d01
-               export BDYIN=$RC_DIR/$DATE/wrfbdy_d01
-               export BDYOUT=$FC_DIR/$DATE/wrfbdy_d01
-
-               $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
-               $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
-               RC=$?
-               if [[ $? != 0 ]]; then
-        	  echo $(date) "${ERR}update_bc failed with error $RC$END"
-                  echo update_bc > FAIL
-                  break
-               fi
-            fi 
-         fi
-      fi
-   fi
-
    if $RUN_WRFVAR; then
       export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
       mkdir -p $RUN_DIR
@@ -229,45 +204,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          echo $(date) "${ERR}wrfvar failed with error $RC$END"
          echo wrfvar > FAIL
          break
-      fi
-
-      if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
-
-         export NL_VAR4D_MULTI_INC=2
-
-         export OB_DIR_TMP=$OB_DIR
-         export RC_DIR_TMP=$RC_DIR
-         export BE_DIR_TMP=$BE_DIR
-         export NL_E_WE_TMP=$NL_E_WE
-         export NL_E_SN_TMP=$NL_E_SN
-         export NL_DX_TMP=$NL_DX
-         export NL_DY_TMP=$NL_DY
-         export NL_TIME_STEP_TMP=$NL_TIME_STEP
-
-         export OB_DIR=$OB_DIR_LOW
-         export RC_DIR=$RC_DIR_LOW
-         export BE_DIR=$BE_DIR_LOW
-         export NL_E_WE=$NL_E_WE_LOW
-         export NL_E_SN=$NL_E_SN_LOW
-         export NL_DX=$NL_DX_LOW
-         export NL_DY=$NL_DY_LOW
-         export NL_TIME_STEP=$NL_TIME_STEP_LOW
-         export DA_BACK_ERRORS=$BE_DIR/be.dat
-         
-         ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh >> $RUN_DIR/index.html 2>&1
-
-         export OB_DIR=$OB_DIR_TMP
-         export RC_DIR=$RC_DIR_TMP
-         export BE_DIR=$BE_DIR_TMP
-         export NL_E_WE=$NL_E_WE_TMP
-         export NL_E_SN=$NL_E_SN_TMP
-         export NL_DX=$NL_DX_TMP
-         export NL_DY=$NL_DY_TMP
-         export NL_TIME_STEP=$NL_TIME_STEP_TMP
-         export DA_BACK_ERRORS=$BE_DIR/be.dat
-
-         export NL_VAR4D_MULTI_INC=1
-
       fi
 
       RC=$?

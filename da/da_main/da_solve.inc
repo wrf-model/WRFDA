@@ -135,40 +135,6 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.1] Calculate nonlinear model trajectory 
 
-      if (var4d .and. var4d_multi_inc /= 2 ) then
-         call da_trace ("da_solve","Starting da_run_wrf_nl.ksh")
-#ifdef DM_PARALLEL
-         if (var4d_coupling == var4d_coupling_disk_simul) then
-            if (rootproc) then
-               call da_system ("da_run_wrf_nl.ksh pre")
-               call da_system ("rm -rf wrfnl_done")
-               call da_system ("touch wrfnl_go_ahead")
-               call da_get_unit (wrf_done_unit)
-               do while ( .true. )
-                  open(wrf_done_unit,file="wrfnl_done",status="old",err=303)
-                  close(wrf_done_unit)
-                  exit
-303                  continue
-                  call da_system ("sync")
-                  call da_system ("sleep 1")
-               end do
-               call da_free_unit (wrf_done_unit)
-               call da_system ("da_run_wrf_nl.ksh post")
-               call da_system ("touch wrfnl_stop_now")
-            end if
-            ! Wait until PE thinks NL model has finished
-            call mpi_barrier (comm, ierr)
-         end if
-#else
-         call da_system ("da_run_wrf_nl.ksh")
-#endif
-         call da_trace ("da_solve","Finished da_run_wrf_nl.ksh")
-      elseif (var4d .and. var4d_multi_inc == 2 ) then
-#ifdef DM_PARALLEL
-         call da_system ("touch wrfnl_stop_now")
-#endif
-      end if
-
       ! [8.2] Calculate innovation vector (O-B):
 
       call da_get_innov_vector (it, ob, iv, grid , config_flags)
@@ -176,9 +142,6 @@ subroutine da_solve ( grid , config_flags)
       if (test_transforms) then
          call da_check (grid, config_flags, cv_size, xbx, be, grid%ep, iv, &
             grid%vv, grid%vp, y)
-         if (var4d) then
-            call da_system ("touch wrf_stop_now")
-         end if
          ! No point continuing, as data corrupted
          call wrf_shutdown
          stop
@@ -248,10 +211,6 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
    ! [9.0] Tidy up:
    !---------------------------------------------------------------------------
-
-   if (var4d) then
-      call da_system ("touch wrf_stop_now")
-   end if
 
    deallocate (cvt)
    deallocate (xhat)

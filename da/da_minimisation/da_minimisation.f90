@@ -57,8 +57,7 @@ module da_minimisation
       da_oi_stats_gpsref, da_get_innov_vector_gpsref, da_residual_gpsref, &
       da_jo_and_grady_gpsref
    use da_obs_io, only : da_final_write_y, da_write_y, da_final_write_obs, &
-      da_write_obs,da_write_obs_etkf,da_write_noise_to_ob, da_use_obs_errfac, &
-      da_write_iv_for_multi_inc, da_read_iv_for_multi_inc
+      da_write_obs,da_write_obs_etkf,da_write_noise_to_ob, da_use_obs_errfac
    use da_metar, only : da_calculate_grady_metar, da_ao_stats_metar, &
       da_oi_stats_metar, da_get_innov_vector_metar, da_residual_metar, &
       da_jo_and_grady_metar

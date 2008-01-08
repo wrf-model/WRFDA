@@ -52,8 +52,6 @@ contains
 #include "da_read_errfac.inc"
 #include "da_use_obs_errfac.inc"
 #include "da_write_obs.inc"
-#include "da_write_iv_for_multi_inc.inc"
-#include "da_read_iv_for_multi_inc.inc"
 #include "da_search_obs.inc"
 #include "da_write_obs_etkf.inc"
 #include "da_write_filtered_obs.inc"

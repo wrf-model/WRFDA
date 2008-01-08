@@ -81,38 +81,6 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % jc = 0.0
 
-   if ( var4d .and. iter > 0 ) then
-
-      ndynopt      = grid%dyn_opt
-      grid%dyn_opt = DYN_EM_TL
-      call nl_set_dyn_opt (1 , DYN_EM_TL)
-
-      call da_med_initialdata_input(grid , config_flags, 'tldf')
-
-      grid%dyn_opt = ndynopt
-      call nl_set_dyn_opt (1 , DYN_EM)
-
-      is = grid%xp%ips
-      ie = grid%xp%ipe
-      if ( ie == grid%xp%ide ) ie = ie + 1
-      js = grid%xp%jps
-      je = grid%xp%jpe
-      if ( je == grid%xp%jde ) je = je + 1
-      ks = grid%xp%kps
-      ke = grid%xp%kpe
-      
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_u_2(is:ie,js:je,ks:ke), grid%g_u_2(is:ie,js:je,ks:ke) )
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_v_2(is:ie,js:je,ks:ke), grid%g_v_2(is:ie,js:je,ks:ke) )
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_t_2(is:ie,js:je,ks:ke), grid%g_t_2(is:ie,js:je,ks:ke) )
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1), grid%g_mu_2(is:ie,js:je), grid%g_mu_2(is:ie,js:je) )
-      j % jc = j % jc + 0.5*grid%jcdfi_gama*da_dot( (ie-is+1)*(je-js+1)*(ke-ks+1), grid%g_moist(is:ie,js:je,ks:ke,P_G_QV), grid%g_moist(is:ie,js:je,ks:ke,P_G_QV) )
-
-      dtemp1x = j % jc
-      ! summation across processors:
-      j % jc  = wrf_dm_sum_real(dtemp1x)
-
-   end if
-
    !-------------------------------------------------------------------------
    ! [2.0] calculate jb:
    !-------------------------------------------------------------------------

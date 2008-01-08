@@ -16,10 +16,6 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
-if $NL_VAR4D; then
-   export NL_RUN_HOURS=$FCST_RANGE
-fi
-
 # allow for ensemble members identified by CMEM
 if [[ ! -z $CMEM ]]; then
    export WRF_INPUT_DIR=${WRF_INPUT_DIR:-$RC_DIR/$DATE}.$CMEM
@@ -108,9 +104,6 @@ if $DUMMY; then
       LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
    done
 else
-   if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then
-      touch wrfnl_go_ahead
-   fi
    $RUN_CMD ./wrf.exe
    grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
    RC=$?
