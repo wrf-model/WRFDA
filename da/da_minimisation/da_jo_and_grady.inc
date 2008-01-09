@@ -223,31 +223,6 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
       jo_buoy = 0.0
    end if
 
-#if defined(CRTM) || defined(RTTOV)
-   if (iv%num_inst > 0) then
-      call da_jo_and_grady_rad (iv, re, jo, jo_grad_y)
-
-      jo_radiance = 0.0 
-      if (use_rad) then
-         do i=1,iv%num_inst
-            do k=1,iv%instid(i)%nchan
-               jo_radiance = jo_radiance + jo%rad(i)%jo_ichan(k)
-            end do
-         end do
-      end if
-      if (print_detail_grad) then
-         write(unit=stdout, fmt='(a, e24.12)') &
-            '   jo_radiance     ', jo_radiance
-         do i = 1, iv%num_inst
-            write(unit=stdout, fmt='(a, e24.12)') &
-               trim('   jo_'//iv%instid(i)%rttovid_string), sum(jo%rad(i)%jo_ichan(:))
-         end do
-      end if
-   else
-      jo_radiance = 0.0
-   end if
-#endif
-
    if (iv%info(airsr)%nlocal > 0) then
       call da_jo_and_grady_airsr(iv, re, jo, jo_grad_y)
       jo_airsr = jo%airsr_t + jo%airsr_q

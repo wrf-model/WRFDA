@@ -13,13 +13,6 @@ module da_wrfvar_top
    use module_symbols_util, only : wrfu_finalize, wrfu_initialize, &
       wrfu_cal_gregorian
 
-#if defined(RTTOV) || defined(CRTM)
-   use module_radiance, only : satinfo, time_slots
-#endif
-#ifdef RTTOV
-   use module_radiance, only : coefs, sensor_descriptor
-#endif
-
    use module_state_description, only : num_moist, num_a_moist, num_g_moist, &
       num_scalar, num_a_scalar, num_g_scalar
    use module_tiles, only : set_tiles
@@ -44,12 +37,6 @@ module da_wrfvar_top
    use da_obs_io, only : da_write_filtered_obs
    use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
    use da_physics, only : da_uvprho_to_w_lin
-#if defined (CRTM) || defined (RTTOV)
-   use da_radiance1, only : da_write_oa_rad_ascii
-   use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
-      tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
-      tovs_send_start
-#endif
    use da_reporting, only : message, da_warning, da_error, da_message
    use da_setup_structures, only : da_setup_obs_structures, &
       da_setup_background_errors,da_setup_flow_predictors
@@ -60,12 +47,6 @@ module da_wrfvar_top
    use da_vtox_transforms, only : da_transform_vtox
    use da_wrfvar_io, only : da_med_initialdata_input, da_med_initialdata_output
    use da_tools, only : da_set_randomcv
-
-#ifdef CRTM
-   use module_radiance, only : crtm_destroy
-   use da_crtm, only : channelinfo, sensor_descriptor
-   use da_control, only : rtm_option, use_rad
-#endif
 
    use da_wrf_interfaces
 

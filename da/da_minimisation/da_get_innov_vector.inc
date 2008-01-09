@@ -64,26 +64,6 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (iv%info(profiler)%nlocal       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
       if (iv%info(buoy)%nlocal           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
 
-#if defined(CRTM) || defined(RTTOV)
-      if (iv%num_inst > 0) then
-         iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
-         iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
-         if (rtm_option == rtm_option_rttov) then
-            call da_get_innov_vector_rttov( it, grid, ob, iv )
-         elseif (rtm_option == rtm_option_crtm) then
-#ifdef CRTM
-           !if (use_crtm_kmatrix_fast) then
-           !   call da_get_innov_vector_crtmk( it, grid, ob, iv )
-           !else
-            call da_get_innov_vector_crtm (it, grid, ob, iv )
-           !end if
-#endif
-         else
-            call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
-         end if
-      end if
-#endif
-
       if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid, ob, iv)
       if (iv%info(airsr)%nlocal > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
 
@@ -119,26 +99,9 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    !#endif
    end if
 
-#if defined(CRTM) || defined(RTTOV)
-   !----------------------------------------------
-   ! [5]  write out radiance iv in ascii format
-   !-----------------------------------------------
-   if (write_iv_rad_ascii) then
-      write(unit=stdout,fmt='(A)')  'Writing radiance iv ascii'
-      call da_write_iv_rad_ascii(ob,iv)
-   end if
-#endif
-
    !----------------------------------------------------------
    ! [6]  write out filtered radiance obs in binary format
    !----------------------------------------------------------
-
-#if defined(CRTM) || defined(RTTOV)
-   if (write_filtered_rad) then
-      write(unit=stdout,fmt='(A)') 'Writing filtered radiance'
-      call da_write_filtered_rad(ob,iv)
-   end if
-#endif
 
    if (num_fgat_time > 1) then
       call da_med_initialdata_input( grid , config_flags, 'fg01')

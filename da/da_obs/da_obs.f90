@@ -22,12 +22,6 @@ module da_obs
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, num_ob_indexes, its,ite,jds,jts,jte,ids
-   ! use_crtm_kmatrix,use_crtm_kmatrix_fast
-#ifdef CRTM
-   use da_crtm, only : da_transform_xtoy_crtm, da_transform_xtoy_crtm_adj
-      !da_transform_xtoy_crtmk,da_transform_xtoy_crtmk_adj
-      !da_transform_xtoy_crtmk_f, da_transform_xtoy_crtmk_f_adj
-#endif
    use da_geoamv,    only : da_transform_xtoy_geoamv, da_transform_xtoy_geoamv_adj
    use da_gpspw,     only : da_transform_xtoy_gpspw,da_transform_xtoy_gpspw_adj
    use da_gpsref,    only : da_transform_xtoy_gpsref,da_transform_xtoy_gpsref_adj
@@ -40,9 +34,6 @@ module da_obs
    use da_qscat,     only : da_transform_xtoy_qscat,da_transform_xtoy_qscat_adj
    use da_radar,     only : da_transform_xtoy_radar,da_transform_xtoy_radar_adj
    use da_reporting, only : da_error, message, da_warning
-#ifdef RTTOV
-   use da_rttov,     only : da_transform_xtoy_rttov,da_transform_xtoy_rttov_adj
-#endif
    use da_satem,     only : da_transform_xtoy_satem, da_transform_xtoy_satem_adj
    use da_ships,     only : da_transform_xtoy_ships, da_transform_xtoy_ships_adj
    use da_sound,     only : da_transform_xtoy_sound, da_transform_xtoy_sonde_sfc, &

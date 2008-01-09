@@ -45,28 +45,6 @@ subroutine da_transform_xtoy(grid, iv, y)
 
    if (num_pseudo              > 0) call da_transform_xtoy_pseudo   (grid, iv, y)
 
-#if defined(CRTM) || defined(RTTOV)
-   if (use_rad) then
-      iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
-      iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
-      if (rtm_option == rtm_option_rttov) then
-         call da_transform_xtoy_rttov (grid, iv, y)
-      elseif (rtm_option == rtm_option_crtm) then
-#ifdef CRTM
-         !if (use_crtm_kmatrix) then
-         !   call da_transform_xtoy_crtmk (grid, iv, y)
-         !else if (use_crtm_kmatrix_fast) then
-         !   call da_transform_xtoy_crtmk_f (grid, iv, y)
-         !else
-            call da_transform_xtoy_crtm (grid, iv, y)
-         !end if
-#endif
-       else
-          call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))
-       end if
-   end if
-#endif
-
    if (trace_use) call da_trace_exit("da_transform_xtoy")
 
 end subroutine da_transform_xtoy
