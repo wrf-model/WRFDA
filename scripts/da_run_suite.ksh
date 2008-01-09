@@ -231,9 +231,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          break
       fi
 
-      if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+      if [[ $NL_MULTI_INC == 1 ]] ; then
 
-         export NL_VAR4D_MULTI_INC=2
+         export NL_MULTI_INC=2
 
          export OB_DIR_TMP=$OB_DIR
          export RC_DIR_TMP=$RC_DIR
@@ -266,7 +266,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          export NL_TIME_STEP=$NL_TIME_STEP_TMP
          export DA_BACK_ERRORS=$BE_DIR/be.dat
 
-         export NL_VAR4D_MULTI_INC=1
+         export NL_MULTI_INC=1
 
       fi
 

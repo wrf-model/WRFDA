@@ -91,11 +91,11 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    ! [5]  write out iv in ascii format
    !-----------------------------------------------
 
-      if ( var4d_multi_inc == 1 ) then
+      if ( multi_inc == 1 ) then
 
           call da_write_iv_for_multi_inc(n, iv)
 
-      elseif ( var4d_multi_inc == 2 ) then
+      elseif ( multi_inc == 2 ) then
 
           call da_read_iv_for_multi_inc(n, iv)
 
@@ -103,7 +103,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    end do
 
-   if ( var4d_multi_inc == 1 ) then
+   if ( multi_inc == 1 ) then
 #ifdef DM_PARALLEL
        call da_system("touch wrf_stop_now")
 #endif

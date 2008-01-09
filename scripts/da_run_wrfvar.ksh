@@ -37,7 +37,7 @@ if $CYCLING; then
       export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
    fi
 fi
-if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+if [[ $NL_MULTI_INC == 2 ]]; then
    export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d01
    export DA_BOUNDARIES=${RC_DIR}/$DATE/wrfbdy_d01
 fi
@@ -70,16 +70,16 @@ export NL_REAL_DATA_INIT_TYPE=${NL_REAL_DATA_INIT_TYPE:-3}
 
 mkdir -p $RUN_DIR
 
-if [[ $NL_VAR4D_MULTI_INC != 2 ]] ; then
+if [[ $NL_MULTI_INC != 2 ]] ; then
    echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><PRE>"
-   if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+   if [[ $NL_MULTI_INC == 1 ]] ; then
       echo "============================================================================="
-      echo "WRF Multi-incremental Var4D Stage I : Calculating High-Resolution Innovations"
+      echo "WRF Multi-incremental Stage I : Calculating High-Resolution Innovations"
       echo "============================================================================="
    fi
 else
    echo "================================================================================================================="
-   echo "WRF Multi-incremental Var4D Stage II : Solve Low-Resolution Minimization Problem With High-Resolution Innovations"
+   echo "WRF Multi-incremental Stage II : Solve Low-Resolution Minimization Problem With High-Resolution Innovations"
    echo "================================================================================================================="
 fi
 
@@ -355,7 +355,7 @@ if $NL_VAR4D; then
 
    # Outputs
    for I in 02 03 04 05 06 07; do
-      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+      if [[ $NL_MULTI_INC == 2 ]]; then
          ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00-thin fg$I
       else
          ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
@@ -369,14 +369,14 @@ if $NL_VAR4D; then
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
    export NL_AUXINPUT2_INNAME_SAVE=$NL_AUXINPUT2_INNAME
-   if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+   if [[ $NL_MULTI_INC == 2 ]]; then
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
    else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
    fi
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
-      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+      if [[ $NL_MULTI_INC == 2 ]]; then
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
       else
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
@@ -438,14 +438,14 @@ if $NL_VAR4D; then
    # Inputs
    export NL_DYN_OPT=302
    export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
-   if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+   if [[ $NL_MULTI_INC == 2 ]]; then
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
    else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
    fi
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
-      if [[ $NL_VAR4D_MULTI_INC == 2 ]]; then
+      if [[ $NL_MULTI_INC == 2 ]]; then
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
       else
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
@@ -530,14 +530,16 @@ fi
 #Prepare the multi-incremnet files:
 #-------------------------------------------------------------------
 
-if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
+if [[ $NL_MULTI_INC == 2 ]] ; then
 
    mv -f $RUN_DIR/gts_omb.*  .
 
-   mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
-   mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
-   mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
+   if $NL_VAR4D; then
+      mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
+      mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
+   fi
 
+   mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
    ln -fs wrfinput_d01-thin wrfinput_d01
    ln -fs wrfinput_d01-thin fg01
 
@@ -583,7 +585,7 @@ else
                exit 1
             fi
          fi
-         if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+         if [[ $NL_MULTI_INC == 1 ]] ; then
             export NUM_PROCS_VAR=1
             export NUM_PROCS_WRF=`expr $NUM_PROCS - 1`
             export NUM_PROCS_WRFPLUS=0
@@ -594,7 +596,7 @@ else
 
          rm -f $MP_CMDFILE
 
-         if [[ $NL_VAR4D_MULTI_INC == 1 ]] ; then
+         if [[ $NL_MULTI_INC == 1 ]] ; then
             let I=0
             while [[ $I -lt $NUM_PROCS_VAR ]]; do
                echo "da_wrfvar.exe" >> $MP_CMDFILE
@@ -640,20 +642,22 @@ else
    fi
 
 # temporarily store the high resolution reults in RUN_DIR
-   if [[ $NL_VAR4D_MULTI_INC == 1 ]]; then
+   if [ $NL_MULTI_INC == 1 ]; then
 
       mv -f gts_omb.*  $RUN_DIR
 
-      cd nl
-      ln -fs $WRFPLUS_DIR/main/nupdown.exe .
-      ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
-      ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
-      sh thin.csh
-      cd ..
+      if $NL_VAR4D; then
+        cd nl
+        ln -fs $WRFPLUS_DIR/main/nupdown.exe .
+        ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
+        ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
+        sh thin.csh
+        cd ..
+        mv -f $WORK_DIR/nl/*-thin $RUN_DIR
+      fi
 
       $WRFPLUS_DIR/main/nupdown.exe wrfinput_d01 -thin 3
 
-      mv -f $WORK_DIR/nl/*-thin $RUN_DIR
       mv -f wrfinput_d01-thin $RUN_DIR
 
       exit $RC
@@ -685,9 +689,9 @@ else
 
 # remove intermediate output files
 
-   if [[ $NL_VAR4D_MULTI_INC == 2 ]] ; then
+   if [[ $NL_MULTI_INC == 2 ]] ; then
 
-      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" ${FC_DIR}/${DATE}/wrfinput_d01 fg01 low_res_increment
+      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" wrfvar_output fg01 low_res_increment
 
       ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
 
@@ -701,8 +705,8 @@ else
 
       ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
 
-#  rm low_res_increment low_res_increment-down
-      cp -f ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/wrfinput_d01
+#     rm low_res_increment low_res_increment-down
+      cp -f ${FC_DIR}/${DATE}/analysis_update $DA_ANALYSIS
 
    fi
 
@@ -720,15 +724,12 @@ else
    # rm -f oma_*.*
    # rm -f filtered_*.*
 
-   if [[ -f wrfvar_output ]]; then
-      if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
-         cp wrfvar_output $DA_ANALYSIS
+   if [[ $NL_MULTI_INC == 0 ]] ; then
+      if [[ -f wrfvar_output ]]; then
+         if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
+            cp wrfvar_output $DA_ANALYSIS
+         fi
       fi
-   fi
-
-   if [[ -d trace ]]; then
-      mkdir -p $RUN_DIR/trace
-      mv trace/* $RUN_DIR/trace
    fi
 
    if $NL_VAR4D; then

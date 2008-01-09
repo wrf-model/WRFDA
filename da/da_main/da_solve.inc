@@ -135,7 +135,7 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.1] Calculate nonlinear model trajectory 
 
-      if (var4d .and. var4d_multi_inc /= 2 ) then
+      if (var4d .and. multi_inc /= 2 ) then
          call da_trace ("da_solve","Starting da_run_wrf_nl.ksh")
 #ifdef DM_PARALLEL
          if (var4d_coupling == var4d_coupling_disk_simul) then
@@ -163,7 +163,7 @@ subroutine da_solve ( grid , config_flags)
          call da_system ("da_run_wrf_nl.ksh")
 #endif
          call da_trace ("da_solve","Finished da_run_wrf_nl.ksh")
-      elseif (var4d .and. var4d_multi_inc == 2 ) then
+      elseif (var4d .and. multi_inc == 2 ) then
 #ifdef DM_PARALLEL
          call da_system ("touch wrfnl_stop_now")
 #endif
