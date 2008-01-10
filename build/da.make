@@ -45,15 +45,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_control.o \
    gamma1.o \
    da_spectral.o \
-   da_radiance.o \
-   da_radiance1.o \
-   da_rttov.o \
-   da_crtm.o \
-   module_radiance.o \
    da_tracing.o \
-   gsi_kinds.o \
-   gsi_constants.o \
-   gsi_thinning.o \
    da_wrfvar_io.o \
    da_airsr.o \
    da_wrfvar_top.o \
@@ -199,13 +191,7 @@ da_utils : setup \
            da_update_bc.exe \
            da_advance_time.exe \
            da_verif_obs.exe \
-           da_verif_anal.exe \
-           da_bias_airmass.exe \
-           da_bias_sele.exe \
-           da_bias_scan.exe \
-           da_bias_scan.exe \
-           da_bias_verif.exe \
-           da_rad_diags.exe
+           da_verif_anal.exe
 
 da_verif_obs.exe : da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
 	$(SFC) -o $@ da_verif_obs.o da_verif_obs_control.o da_verif_obs_init.o
@@ -235,27 +221,6 @@ da_update_bc.exe : da_update_bc.o libwrfio_nf.a
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
 	(cd ../da; $(LN) ../build/$@ .)
-
-da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
-	$(FFC) -o  da_bias_airmass.exe da_bias_airmass.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o
-	(cd ../da; $(LN) ../build/$@ .)
-
-da_bias_sele.exe : da_bias_sele.o rad_bias.o
-	$(FFC) -o da_bias_sele.exe da_bias_sele.o rad_bias.o
-	(cd ../da; $(LN) ../build/$@ .)
-
-da_bias_scan.exe : da_bias_scan.o rad_bias.o
-	$(FFC) -o da_bias_scan.exe da_bias_scan.o rad_bias.o
-	(cd ../da; $(LN) ../build/$@ .)
-
-da_bias_verif.exe : da_bias_verif.o rad_bias.o
-	$(FFC) -o da_bias_verif.exe da_bias_verif.o rad_bias.o
-	(cd ../da; $(LN) ../build/$@ .)
-
-da_rad_diags.exe : da_rad_diags.o $(NETCDF_LIBS)
-	$(FFC) -o da_rad_diags.exe da_rad_diags.o -L. $(NETCDF_LIB) $(LOCAL_LIB)
-	(cd ../da; $(LN) ../build/$@ .)
-
 
 # Special cases, either needing special include files or too big to 
 # optimise/debug
