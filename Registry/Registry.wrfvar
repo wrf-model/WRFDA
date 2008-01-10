@@ -119,7 +119,7 @@ state    real   a_ph           ijkb     misc        2         Z     \
 state    real   g_ph           ijkb     misc        2         Z     \
        irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ijk     dyn_em      1         Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
-state    real   phb_fine       ikj     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
+state    real   phb_fine       ijk     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
 
 # Potential Temperature
 state    real   t              ijkb     dyn_em      2         -     \
@@ -128,6 +128,7 @@ state    real   a_t            ijkb     misc        2         -     \
        i01rh03usdf=(bdy_interp:dt)   "a_t"      "perturbation potential temperature (theta-t0)" "K"
 state    real   g_t            ijkb     misc        2         -     \
        i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   t_init         ijk     dyn_em      1         -      ir       "t_init" "initial potential temperature" "K"
 
 # Mass
 state    real   mu              ijb     dyn_em      2         -     \
@@ -263,7 +264,7 @@ state   real    -              ijkft   a_scalar    1         -     -    -
 state   real    -              ijkft   g_scalar    1         -     -    -                                       
 state   real    qni            ijkftb  scalar      1         -     \
    i01rhusdf=(bdy_interp:dt)    "QNICE"         "Ice Number concentration" "# kg(-1)"
-state   real    qt             ikjftb  scalar      1         -     \
+state   real    qt             ijkftb  scalar      1         -     \
    i01rhusdf=(bdy_interp:dt)    "CWM"           "Total condensate mixing ratio"      "kg kg-1"
  
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -319,6 +320,13 @@ state    real   CANWAT           ij     misc        1         -     i012rhd=(int
 state    real   SST              ij     misc        1         -     i0124rhd=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
 state  integer  IFNDSNOWH        -      misc        1         -     i         "FNDSNOWH" "SNOWH_LOGICAL"
 state  integer  IFNDSOILW        -      misc        1         -     i         "FNDSOILW" "SOILW_LOGICAL"
+
+# MYJ PBL variables
+state   real   TSHLTR           ij     misc        1         -     ir        "TSHLTR"                "SHELTER THETA FROM MYJ"                       "K"
+state   real   QSHLTR           ij     misc        1         -     ir        "QSHLTR"                "SHELTER SPECIFIC HUMIDITY FROM MYJ"           "kg kg-1"
+state   real   PSHLTR           ij     misc        1         -     ir        "PSHLTR"                "SHELTER PRESSURE FROM MYJ"           "Pa"
+state   real   TH10             ij     misc        1         -     ir        "TH10"                  "10-M THETA FROM MYJ"                          "K"
+state   real   Q10              ij     misc        1         -     ir        "Q10"                   "10-M SPECIFIC HUMIDITY FROM MYJ"              "kg kg-1"
 
 # gfdl (eta) radiation State Variables
 state    real    HTOP            ij     misc        1         -      r        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
@@ -500,7 +508,7 @@ state  logical moved            -       misc        1         -     -
 rconfig   logical   write_increments        namelist,wrfvar1  1  .false.  -  "write_increments"        ""  ""
 rconfig   integer   wrfvar_mem_model        namelist,wrfvar1  1  0        -  "wrfvar_mem_model"        ""  "0=WRFVAR, 1=WRF"
 rconfig   logical   var4d                   namelist,wrfvar1  1  .false.  -  "var4d"                   ""  ""
-rconfig   integer   var4d_multi_inc         namelist,wrfvar1  1  0        -  "var4d_multi_inc"         ""  ""
+rconfig   integer   multi_inc               namelist,wrfvar1  1  0        -  "multi_incremental flag"  ""  ""
 rconfig   integer   var4d_coupling          namelist,wrfvar1  1  2        -  "var4d_coupling"          ""  ""
 rconfig   logical   global                  namelist,wrfvar1  1  .false.  -  "global"                  ""  ""
 rconfig   logical   print_detail_airep      namelist,wrfvar1  1  .false.  -  "print_detail_airep"      ""  ""

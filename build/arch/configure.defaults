@@ -955,7 +955,7 @@ FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 EXTRA_FCFLAGS  = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC) -p$(CRTM_INC) -p$(PNETCDF_INC) -p$(HDF_INC) \
+                     -p$(PNETCDF_INC) -p$(HDF_INC) \
                      -p$(PHDF5_INC)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
@@ -995,7 +995,7 @@ FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC)  -p$(CRTM_INC) -p$(PNETCDF_INC) \
+                     -p$(PNETCDF_INC) \
                      -p$(HDF_INC) -p$(PHDF5_INC)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
@@ -1035,7 +1035,7 @@ FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                    -p$(RTTOV_INC) -p$(CRTM_INC) -p$(PNETCDF_INC) \
+                    -p$(PNETCDF_INC) \
                     -p$(HDF_INC) -p$(PHDF5_INC)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1

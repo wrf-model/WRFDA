@@ -46,20 +46,12 @@ OBJS_FOR_ALL =		da_memory.o             \
 			da_define_structures.o	\
 			da_control.o		\
 			da_spectral.o           \
-			da_radiance.o		\
-			da_radiance.o		\
-			da_radiance1.o		\
-			da_crtm.o		\
-			gsi_kinds.o		\
-			gsi_constants.o		\
-			gsi_thinning.o		\
                         da_wrfvar_top.o         \
                         da_wrfvar_io.o          \
                         da_reporting.o          \
                         da_airsr.o              \
                         da_transfer_model.o     \
                         da_obs_io.o             \
-                        da_rttov.o              \
                         da_tools_serial.o       \
                         da_gen_be.o             \
                         da_etkf.o               \
@@ -71,7 +63,6 @@ OBJS_FOR_ALL =		da_memory.o             \
                         module_ssmi.o           \
                         module_ffts.o           \
                         f_qv_from_rh.o          \
-                        rad_bias.o              \
                         regress_one.o           \
                         tqli.o                  \
                         tred2.o                 \
@@ -82,10 +73,6 @@ TARGETDIR    =  ../..
 
 da : da_wrfvar.exe \
              da_advance_time.exe \
-             da_bias_airmass.exe \
-             da_bias_verif.exe \
-             da_bias_sele.exe \
-             da_bias_scan.exe \
              da_verif_obs.exe \
              da_verif_anal.exe \
              da_tune_obs_desroziers.exe \
@@ -949,14 +936,6 @@ da_tools_serial.o:	da_tools_serial.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_tools_serial.f90 > da_tools_serial.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools_serial.f
 
-module_radiance.o:	module_radiance.f90 \
-                        gsi_kinds.o \
-                        gsi_constants.o
-	$(RM) $@
-	$(CPP) $(CPPFLAGS) -I../inc module_radiance.f90 > module_radiance.f
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -I$(RTTOV)/src \
-           -I$(CRTM)/src module_radiance.f
-
 da_recursive_filter.o:	\
 			da_control.o \
 			da_recursive_filter.f90 \
@@ -1235,58 +1214,10 @@ da_be_spectral.o:	da_be_spectral.f90          \
 			$(CPP) $(CPPFLAGS) -I../inc da_be_spectral.f90 > da_be_spectral.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_be_spectral.f
 
-da_radiance.o:		da_radiance.f90 \
-                        module_radiance.o          \
-                        da_radiance1.o          \
-                        da_rttov.o          \
-                        da_crtm.o          \
-                        gsi_thinning.o          \
-                        da_rttov.o          \
-			da_define_structures.o  \
-			da_interpolation.o \
-			da_statistics.o \
-			da_tools.o		\
-			da_par_util.o		\
-			gsi_kinds.o		\
-			gsi_constants.o	\
-			da_calculate_grady_rad.inc \
-			da_jo_and_grady_rad.inc \
-			da_residual_rad.inc \
-			da_biasprep.inc \
-			da_qc_rad.inc \
-			da_qc_amsua.inc \
-			da_qc_amsub.inc \
-			da_read_obs_bufrtovs.inc \
-			da_read_obs_bufrairs.inc \
-			da_read_obs_bufrssmis.inc \
-			da_read_kma1dvar.inc \
-			da_setup_bufrtovs_structures.inc \
-			da_print_stats_rad.inc \
-			da_detsurtyp.inc \
-			gsi_emiss.inc \
-			emiss_ssmi.inc \
-			iceem_amsu.inc \
-			landem.inc \
-			snwem_amsu.inc \
-			seaem.inc
-			$(RM) $@
-			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance.f90 > da_radiance.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance.f
-
-gsi_thinning.o:         gsi_thinning.f90
-			$(RM) $@
-			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_thinning.f90 > gsi_thinning.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_thinning.f
-
 f_qv_from_rh.o:         f_qv_from_rh.f90
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc f_qv_from_rh.f90 > f_qv_from_rh.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) f_qv_from_rh.f
-
-rad_bias.o:             rad_bias.f90
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) -I../inc rad_bias.f90 > rad_bias.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rad_bias.f
 
 regress_one.o:          regress_one.f90
 			$(RM) $@
@@ -1308,21 +1239,6 @@ pythag.o:               pythag.f90
 			$(CPP) $(CPPFLAGS) -I../inc pythag.f90 > pythag.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) pythag.f
 
-da_rttov.o:		da_rttov.f90
-	$(RM) $@
-	$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_rttov.f90 > da_rttov.f
-	$(FC) -c -I$(RTTOV)/src $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_rttov.f
-
-da_radiance1.o:		da_radiance1.f90
-	$(RM) $@
-	$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance1.f90 > da_radiance1.f
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance1.f
-
-da_crtm.o:		da_crtm.f90
-	$(RM) $@
-	$(CPP) $(CPPFLAGS) -I../inc da_crtm.f90 > da_crtm.f
-	$(FC) -c -I$(CRTM) $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_crtm.f
-
 da_wrf_interfaces.o:	da_wrf_interfaces.f90
 	$(RM) $@
 	$(CPP) $(CPPFLAGS) -I../inc da_wrf_interfaces.f90 > da_wrf_interfaces.f
@@ -1331,14 +1247,6 @@ da_wrf_interfaces.o:	da_wrf_interfaces.f90
 parkind1.o:		parkind1.f90
 	$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc parkind1.f90 > parkind1.f
 	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) parkind1.f
-
-gsi_kinds.o:		gsi_kinds.f90
-	$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_kinds.f90 > gsi_kinds.f
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_kinds.f
-
-gsi_constants.o:	gsi_constants.f90 gsi_kinds.o
-	$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_constants.f90 > gsi_constants.f
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_constants.f
 
 da_wrfvar.exe:	        wrfvar_lib da_wrfvar_main.f90
 	$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_main.f90 > da_wrfvar_main.f
@@ -1349,22 +1257,6 @@ da_wrfvar.exe:	        wrfvar_lib da_wrfvar_main.f90
 da_advance_time.exe:    wrfvar_lib da_advance_time.f90
 	$(CPP) $(CPPFLAGS) -I../inc da_advance_time.f90 > da_advance_time.f
 	$(SFC) -o da_advance_time.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_advance_time.f
-
-da_bias_airmass.exe:	wrfvar_lib da_bias_airmass.f90
-	$(CPP) $(CPPFLAGS) -I../inc da_bias_airmass.f90 > da_bias_airmass.f
-	$(SFC) -o da_bias_airmass.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_airmass.f
-
-da_bias_verif.exe:	wrfvar_lib da_bias_verif.f90 wrfvar_lib
-	$(CPP) $(CPPFLAGS) -I../inc da_bias_verif.f90 > da_bias_verif.f
-	$(SFC) -o da_bias_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_verif.f
-
-da_bias_sele.exe:	wrfvar_lib da_bias_sele.f90
-	$(CPP) $(CPPFLAGS) -I../inc da_bias_sele.f90 > da_bias_sele.f
-	$(SFC) -o da_bias_sele.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_sele.f
-
-da_bias_scan.exe:	wrfvar_lib da_bias_scan.f90
-	$(CPP) $(CPPFLAGS) -I../inc da_bias_scan.f90 > da_bias_scan.f
-	$(SFC) -o da_bias_scan.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -L../main -lwrflib da_bias_scan.f
 
 da_verif_obs.exe:        wrfvar_lib da_verif_obs.f90
 	$(CPP) $(CPPFLAGS) -I../inc da_verif_obs.f90 > da_verif_obs.f
