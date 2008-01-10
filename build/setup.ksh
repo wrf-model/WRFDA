@@ -60,12 +60,6 @@ fi
 if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}; then
   export NETCDF=${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}; then
-   export RTTOV=${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/crtm/CRTM_08_27_07/${COMPILER}_${PROCESSOR}; then
-   export CRTM=${EXT_DIR}/crtm/CRTM_08_27_07/${COMPILER}_${PROCESSOR}
-fi
 if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}; then
    export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
 fi
@@ -135,8 +129,6 @@ export MANPATH=$MPIHOME/man:$MANPATH
 echo "PROCESSOR       " $PROCESSOR
 echo "COMPILER        " $COMPILER
 echo "MPIHOME         " $MPIHOME
-echo "RTTOV           " $RTTOV
-echo "CRTM            " $CRTM
 echo "NETCDF          " $NETCDF
 echo "BLAS            " $BLAS
 echo "LAPACK          " $LAPACK

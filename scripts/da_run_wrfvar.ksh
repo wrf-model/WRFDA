@@ -33,11 +33,6 @@ fi
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 
-export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
-export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
-export CRTM=${CRTM:-$HOME/crtm}
-export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coeffs}
-
 # Error tuning namelist parameters
 # Assign random seeds
 
@@ -66,12 +61,6 @@ date
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
-if [[ -d $DA_RTTOV_COEFFS ]]; then
-   echo "DA_RTTOV_COEFFS       $DA_RTTOV_COEFFS"
-fi
-if [[ -d $DA_CRTM_COEFFS ]]; then
-   echo "DA_CRTM_COEFFS        $DA_CRTM_COEFFS"
-fi
 if [[ -d $BIASCORR_DIR ]]; then
    echo "BIASCORR_DIR          $BIASCORR_DIR"
 fi
@@ -158,14 +147,6 @@ fi
 #-----------------------------------------------------------------------
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
-
-if [[ -d $DA_RTTOV_COEFFS ]]; then
-   ln -fs $DA_RTTOV_COEFFS/* .
-fi
-
-if [[ -d $DA_CRTM_COEFFS ]]; then
-   ln -fs $DA_CRTM_COEFFS crtm_coeffs
-fi
 
 ln -fs $WRFVAR_DIR/run/gribmap.txt .
 ln -fs $WRFVAR_DIR/run/*.TBL .
