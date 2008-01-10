@@ -102,7 +102,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    !-------------------------------------------------------
    do inst = 1, iv%num_inst                 ! loop for sensor
       ! if ( iv%instid(inst)%num_rad < 1 ) cycle
-      if (iv%instid(inst)%info%n2 <= iv%instid(inst)%info%n1) cycle
+      if (iv%instid(inst)%info%n2 < iv%instid(inst)%info%n1) cycle
       num_levs  = kte-kts+1 
       ! CRTM channel information structure
       ! Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
