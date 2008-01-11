@@ -495,7 +495,6 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 
    if (biascorr) then
       do inst = 1, iv%num_inst
-         if (iv%instid(inst)%info%n2 < iv%instid(inst)%info%n1) cycle
          write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
             trim(iv%instid(inst)%rttovid_string)
          call da_biascorr(inst,ob,iv)
@@ -507,10 +506,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    ! [5.0] Perform QC check
    !------------------------------------------------------------------------
    if (qc_rad) then
-      do inst = 1, iv%num_inst
-         if (iv%instid(inst)%info%n2 < iv%instid(inst)%info%n1) cycle
-         call da_qc_crtm(ob, iv)
-      end do
+      call da_qc_crtm(ob, iv)
    end if
    !------------------------------------------
    ! 6.0 prepare bias statistics files
