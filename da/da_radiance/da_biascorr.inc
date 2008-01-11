@@ -47,6 +47,9 @@ subroutine da_biascorr ( i, ob, iv)
         iscan = iv%instid(i)%scanpos(n)
         iband = floor(iv%instid(i)%info%lat(1,n)/10.0001) + 10
       do k=1,iv%instid(i)%nchan
+       ! only do bias correction for used channels
+       if (satinfo(i)%iuse(k) == 1) then
+
        ! scan bias correction
        !-----------------------
         if (global) then
@@ -65,6 +68,7 @@ subroutine da_biascorr ( i, ob, iv)
         !  write(*,'(6f15.5)') satinfo(i)%scanbias(k,iscan), satinfo(i)%bcoef(k,1:npred),satinfo(i)%bcoef0(k)
         !  write(*,'(5f15.5)') airbias,pred(1:npred)
         !end if
+       end if
       end do
    end do
 

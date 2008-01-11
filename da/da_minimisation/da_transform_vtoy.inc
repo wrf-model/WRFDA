@@ -67,7 +67,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
          call da_med_initialdata_input( grid , config_flags, &
             filnam)
-         call da_setup_firstguess( xbx_tmp, grid)
+         call da_setup_firstguess( xbx_tmp, grid, config_flags)
 
          iv%time = nobwin
          iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
@@ -78,7 +78,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          call da_transform_xtoy(grid, iv, y)
       end do
       call da_med_initialdata_input( grid , config_flags, 'fg01')
-      call da_setup_firstguess( xbx_tmp, grid)
+      call da_setup_firstguess( xbx_tmp, grid, config_flags)
    else  ! not var4d
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d

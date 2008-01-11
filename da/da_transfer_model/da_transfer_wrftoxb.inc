@@ -1,4 +1,4 @@
-subroutine da_transfer_wrftoxb(xbx, grid)
+subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transfers fields from WRF to first guess structure.
@@ -9,6 +9,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    type (xbx_type), intent(inout)     :: xbx        ! Header & non-gridded vars.
 
    type(domain), intent(inout)        :: grid
+   type(grid_config_rec_type), intent(in) :: config_flags
 
    integer :: i, j, k
 
@@ -365,6 +366,16 @@ subroutine da_transfer_wrftoxb(xbx, grid)
             if (size(grid%moist,dim=4) >= 7) then
                grid%xb%qgr(i,j,k) = grid%moist(i,j,k,p_qg)
             end if
+
+            if ( config_flags%mp_physics == 3 ) then   ! WSM3-class scheme
+               if ( grid%xb%t(i,j,k) <= t_kelvin ) then
+                  grid%xb%qci(i,j,k) = grid%xb%qcw(i,j,k)
+                  grid%xb%qcw(i,j,k) = 0.0
+                  grid%xb%qsn(i,j,k) = grid%xb%qrn(i,j,k)
+                  grid%xb%qrn(i,j,k) = 0.0
+               end if
+            end if
+
          end do
       end do
 

@@ -82,7 +82,7 @@ subroutine da_solve ( grid , config_flags)
    ! [3.0] Set up first guess field (grid%xb):
    !---------------------------------------------------------------------------
 
-   call da_setup_firstguess(xbx, grid)
+   call da_setup_firstguess(xbx, grid, config_flags)
 
    !---------------------------------------------------------------------------
    ! [4.0] Set up observations (ob):
@@ -299,6 +299,7 @@ subroutine da_solve ( grid , config_flags)
             deallocate (iv%instid(i)%info%dxm)
             deallocate (iv%instid(i)%info%dym)
             deallocate (iv%instid(i)%info%dzm)
+            deallocate (iv%instid(i)%info%proc_domain)
 
             deallocate (iv%instid(i)%t)
             deallocate (iv%instid(i)%mr)
@@ -306,9 +307,18 @@ subroutine da_solve ( grid , config_flags)
             deallocate (iv%instid(i)%qm)
             deallocate (iv%instid(i)%qrn)
             deallocate (iv%instid(i)%qcw)
-            deallocate (iv%instid(i)%qci)
-            deallocate (iv%instid(i)%qsn)
-            deallocate (iv%instid(i)%qgr)
+            if ( crtm_cloud) then
+               deallocate (iv%instid(i)%qci)
+               deallocate (iv%instid(i)%qsn)
+               deallocate (iv%instid(i)%qgr)
+               deallocate (iv%instid(i)%qhl)
+               deallocate (iv%instid(i)%rcw)
+               deallocate (iv%instid(i)%rci)
+               deallocate (iv%instid(i)%rrn)
+               deallocate (iv%instid(i)%rsn)
+               deallocate (iv%instid(i)%rgr)
+               deallocate (iv%instid(i)%rhl)
+            end if
             deallocate (iv%instid(i)%pm)
             deallocate (iv%instid(i)%pf)
             deallocate (iv%instid(i)%u10)
@@ -338,6 +348,7 @@ subroutine da_solve ( grid , config_flags)
             deallocate (iv%instid(i)%scanline)
             deallocate (iv%instid(i)%ifgat)
             deallocate (iv%instid(i)%cloud_flag)
+            deallocate (iv%instid(i)%rain_flag)
             deallocate (iv%instid(i)%satzen)
             deallocate (iv%instid(i)%satazi)
             deallocate (iv%instid(i)%solzen)
@@ -348,9 +359,27 @@ subroutine da_solve ( grid , config_flags)
                deallocate(iv%instid(i)%land_coverage)
                deallocate(iv%instid(i)%ice_coverage)
                deallocate(iv%instid(i)%snow_coverage)
-               ! deallocate(iv%instid(i)%ps_jacobian)
-               ! deallocate(iv%instid(i)%t_jacobian)
-               ! deallocate(iv%instid(i)%q_jacobian)
+               if (use_crtm_kmatrix) then
+                  deallocate(iv%instid(i)%ts_jacobian)
+                  deallocate(iv%instid(i)%t_jacobian)
+                  deallocate(iv%instid(i)%q_jacobian)
+                  deallocate(iv%instid(i)%windspeed_jacobian)
+                  deallocate(iv%instid(i)%emiss_jacobian)
+                  if ( crtm_cloud ) then
+                     deallocate(iv%instid(i)%water_jacobian)
+                     deallocate(iv%instid(i)%ice_jacobian)
+                     deallocate(iv%instid(i)%rain_jacobian)
+                     deallocate(iv%instid(i)%snow_jacobian)
+                     deallocate(iv%instid(i)%graupel_jacobian)
+                     deallocate(iv%instid(i)%hail_jacobian)
+                     deallocate(iv%instid(i)%water_r_jacobian)
+                     deallocate(iv%instid(i)%ice_r_jacobian)
+                     deallocate(iv%instid(i)%rain_r_jacobian)
+                     deallocate(iv%instid(i)%snow_r_jacobian)
+                     deallocate(iv%instid(i)%graupel_r_jacobian)
+                     deallocate(iv%instid(i)%hail_r_jacobian)
+                 end if
+              end if
             end if
          end if
 #ifdef RTTOV

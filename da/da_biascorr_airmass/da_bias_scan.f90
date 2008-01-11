@@ -1,7 +1,7 @@
   program da_bias_scan
 
   use rad_bias, only : long, bias, jpchan, jpscan, da_read_biasprep, print_bias, &
-     qc_amsua, qc_amsub, jband, boff, bdiv
+     qc_amsua, qc_amsub, qc_ssmis, jband, boff, bdiv
 
 ! PURPOSE.
 ! -------
@@ -127,6 +127,10 @@ loop1:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then  ! mhs
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 10) then  ! ssmis
+           call qc_ssmis(tovs)
       end if
 
     do j=1,tovs%nchan 
@@ -211,6 +215,10 @@ loop2:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then ! mhs
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 10) then ! ssmis
+           call qc_ssmis(tovs)
       end if
 
 !---------------------------------------------------------------------------------

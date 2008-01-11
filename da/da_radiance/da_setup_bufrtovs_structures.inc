@@ -80,7 +80,7 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
    ! [2.0] Read NCEP bufr tovs data in radiance innovations vector
    !-------------------------------------------------------------------
 
-   if (.not. use_filtered_rad) then
+   if ( (.not. use_filtered_rad) .and. (.not. use_pseudo_rad) .and. (.not. use_simulated_rad) ) then
 
       if (use_hirs2obs) then
          write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs2.bufr'
@@ -159,10 +159,21 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
          call da_read_obs_bufrssmis ('ssmis',iv, filename)
       end if
 
-   else
+   end if
 
+   if ( use_filtered_rad ) then
+      write(unit=stdout,fmt='(a)') 'Reading filtered radiance'
       call da_read_filtered_rad (iv)
+   end if
 
+   if ( use_simulated_rad ) then
+      write(unit=stdout,fmt='(a)') 'Reading simulated radiance'
+!hcl      call da_read_simulated_rad (iv)
+   end if
+
+   if ( use_pseudo_rad ) then
+      write(unit=stdout,fmt='(a)') 'Reading pseudo radiance from namelist'
+      call da_read_pseudo_rad (iv)
    end if
 
    if (use_kma1dvar) then
@@ -183,12 +194,6 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
 
    ! sorting obs into FGAT time bins
    call da_sort_rad(iv)
-
-   ! allocate cloud_flag in iv structure
-   !   do i = 1,  iv % num_inst
-   !      if (iv % instid(i) % num_rad < 1) cycle
-   !         iv%instid(i)%cloud_flag(:,:) = 1  ! no cloud
-   !   end do
 
    !-----------------------------------------------------------------------------
    ! [3.0] create (smaller) ob structure:

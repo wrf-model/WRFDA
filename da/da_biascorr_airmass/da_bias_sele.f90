@@ -56,11 +56,11 @@ readloop:&
     elseif (ierr == 1) then  ! end
          exit
     else                     ! error
-         stop 'read error in cycle_sele'
+         stop 'read error in da_bias_sele'
     endif
 
     ntotal = ntotal + 1
-    IF (ntotal < 2  ) THEN
+    IF ( mod(ntotal,500) == 0 ) THEN
       CALL PRINT_BIAS(tovs)
     ENDIF
 

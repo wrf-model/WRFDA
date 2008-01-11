@@ -38,17 +38,20 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
    iv%instid(i)%qm(:,n)         = 0.0
    iv%instid(i)%qrn(:,n)        = 0.0
    iv%instid(i)%qcw(:,n)        = 0.0
-   iv%instid(i)%qci(:,n)        = 0.0
-   iv%instid(i)%qsn(:,n)        = 0.0
-   iv%instid(i)%qgr(:,n)        = 0.0
-   iv%instid(i)%qhl(:,n)        = 0.0
-   iv%instid(i)%rcw(:,n)        = 0.0
-   iv%instid(i)%rci(:,n)        = 0.0
-   iv%instid(i)%rrn(:,n)        = 0.0
-   iv%instid(i)%rsn(:,n)        = 0.0
-   iv%instid(i)%rgr(:,n)        = 0.0
-   iv%instid(i)%rhl(:,n)        = 0.0
+   if ( crtm_cloud ) then
+      iv%instid(i)%qci(:,n)        = 0.0
+      iv%instid(i)%qsn(:,n)        = 0.0
+      iv%instid(i)%qgr(:,n)        = 0.0
+      iv%instid(i)%qhl(:,n)        = 0.0
+      iv%instid(i)%rcw(:,n)        = 0.0
+      iv%instid(i)%rci(:,n)        = 0.0
+      iv%instid(i)%rrn(:,n)        = 0.0
+      iv%instid(i)%rsn(:,n)        = 0.0
+      iv%instid(i)%rgr(:,n)        = 0.0
+      iv%instid(i)%rhl(:,n)        = 0.0
+   end if
    iv%instid(i)%pm(:,n)         = 0.0
+   iv%instid(i)%pf(:,n)         = 0.0
    iv%instid(i)%u10(n)          = 0.0
    iv%instid(i)%v10(n)          = 0.0
    iv%instid(i)%t2m(n)          = 0.0
@@ -77,6 +80,7 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
    iv%instid(i)%scanline(n)     = 0
    iv%instid(i)%ifgat(n)        = p%ifgat
    iv%instid(i)%cloud_flag(:,n) = 1        ! no cloud
+   iv%instid(i)%rain_flag(n)    = 0        ! no rain;  1:rain
    iv%instid(i)%satzen(n)       = p%satzen
    iv%instid(i)%satazi(n)       = p%satazi
    iv%instid(i)%solzen(n)       = p%solzen
@@ -89,23 +93,25 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
       iv%instid(i)%ice_coverage(n)=0.0
       iv%instid(i)%snow_coverage(n)=0.0
       if (use_crtm_kmatrix) then
-      !  iv%instid(i)%ts_jacobian(:,n)=0.0
-      !  iv%instid(i)%windspeed_jacobian(:,n)=0.0
-      !  iv%instid(i)%emiss_jacobian(:,n)=0.0
-      !  iv%instid(i)%t_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%q_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%water_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%ice_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%rain_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%snow_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%graupel_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%hail_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%water_r_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%ice_r_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%rain_r_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%snow_r_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%graupel_r_jacobian(:,:,n)=0.0
-      !  iv%instid(i)%hail_r_jacobian(:,:,n)=0.0
+         iv%instid(i)%ts_jacobian(:,n)=0.0
+         iv%instid(i)%windspeed_jacobian(:,n)=0.0
+         iv%instid(i)%emiss_jacobian(:,n)=0.0
+         iv%instid(i)%t_jacobian(:,:,n)=0.0
+         iv%instid(i)%q_jacobian(:,:,n)=0.0
+         if ( crtm_cloud ) then
+            iv%instid(i)%water_jacobian(:,:,n)=0.0
+            iv%instid(i)%ice_jacobian(:,:,n)=0.0
+            iv%instid(i)%rain_jacobian(:,:,n)=0.0
+            iv%instid(i)%snow_jacobian(:,:,n)=0.0
+            iv%instid(i)%graupel_jacobian(:,:,n)=0.0
+            iv%instid(i)%hail_jacobian(:,:,n)=0.0
+            iv%instid(i)%water_r_jacobian(:,:,n)=0.0
+            iv%instid(i)%ice_r_jacobian(:,:,n)=0.0
+            iv%instid(i)%rain_r_jacobian(:,:,n)=0.0
+            iv%instid(i)%snow_r_jacobian(:,:,n)=0.0
+            iv%instid(i)%graupel_r_jacobian(:,:,n)=0.0
+            iv%instid(i)%hail_r_jacobian(:,:,n)=0.0
+         end if
       end if
    end if
 

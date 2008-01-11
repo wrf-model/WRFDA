@@ -141,6 +141,7 @@ module da_control
    integer, parameter :: nchan_hirs2 = 19
    integer, parameter :: nchan_hirs3 = 19
    integer, parameter :: nchan_hirs4 = 19
+   integer, parameter :: nchan_ssmis = 24
 
    ! WRFVAR Minimisation:
 

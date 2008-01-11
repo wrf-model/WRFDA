@@ -133,7 +133,7 @@ subroutine da_crtm_init(iv,ob)
       nscan(n)   = 90
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'ssmis' ) then
       nchanl(n)  = 24
-      nscan(n)   = 180
+      nscan(n)   = 60
    else
       call da_error(__FILE__,__LINE__, &
         (/"Unrecorgnized instrument"/))
@@ -242,8 +242,7 @@ subroutine da_crtm_init(iv,ob)
 !  4.0 read bias correction coefs files
 !-------------------------------------------------------
 
- if (read_biascoef) then
-   loop_sensor2: do n = 1, nsensor
+ loop_sensor2: do n = 1, nsensor
 
    allocate ( satinfo(n) % scanbias  (nchanl(n),nscan(n)) )
    allocate ( satinfo(n) % scanbias_b(nchanl(n),nscan(n),18) )
@@ -259,9 +258,8 @@ subroutine da_crtm_init(iv,ob)
 
    if ( index(iv%instid(n)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
-   if ( index(iv%instid(n)%rttovid_string,'ssmis') > 0) cycle   ! not implemented
-   ! if ( index(iv%instid(n)%rttovid_string,'mhs') > 0)   cycle   ! not implemented
 
+  if (read_biascoef) then
   !  new bias coefs files
   !----------------------------------
     call da_read_biascoef(iv%instid(n)%rttovid_string, &
@@ -272,8 +270,8 @@ subroutine da_crtm_init(iv,ob)
                       satinfo(n)%bcoef0, &
                       satinfo(n)%error_std)
  
+  end if
  end do loop_sensor2
- end if
 
 !-------------------------------------------------------
 !  5.0 read error factor file

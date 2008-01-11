@@ -10,8 +10,8 @@
   INTEGER, PARAMETER :: JPNX=8
   INTEGER, PARAMETER :: JPXEIG=10
 
-  INTEGER, PARAMETER :: JPNY=20
-  INTEGER, PARAMETER :: JPCHAN=20
+  INTEGER, PARAMETER :: JPNY=24
+  INTEGER, PARAMETER :: JPCHAN=24
   INTEGER, PARAMETER :: JPSCAN=90
 
   INTEGER, PARAMETER :: JBAND=18
@@ -272,6 +272,42 @@
 
     END SUBROUTINE QC_AMSUB
 
+    SUBROUTINE QC_ssmis(tovs)
+
+    TYPE(bias), intent(inout) :: tovs
+    integer :: j, jv
+
+    tovs%qc_flag(:) = 1
+!--------------------------------------------------------
+! 2.1 extrem values
+!--------------------------------------------------------
+    DO j=1, tovs%nchan    ! Reject silly values
+        jv = j
+        IF ((tovs%tb(jv) > VMAX) .OR. (tovs%tb(jv) < VMIN) ) then
+          tovs%qc_flag(jv) = -1
+        ENDIF
+    ENDDO
+
+!------------------------------------
+! 2.2 departure extrem values test
+!------------------------------------
+    DO j=1, tovs%nchan
+        jv = j
+        IF (ABS(tovs%omb(jv)) > VDMAX) THEN
+           tovs%qc_flag(jv) = -1
+        ENDIF
+    ENDDO
+
+!------------------------------------
+! 2.3 window channel
+!------------------------------------
+        IF (tovs%surf_flag > 0) THEN   ! not over sea
+           tovs%qc_flag(1:2) = -1
+           tovs%qc_flag(8) = -1
+        ENDIF
+
+    END SUBROUTINE QC_ssmis
+
     subroutine da_read_biasprep(radbias,biasprep_unit,ierr)
       TYPE(bias), INTENT(INOUT)  :: radbias
       integer, intent(in)        :: biasprep_unit
@@ -365,48 +401,16 @@
     end do 
 
     if (global) then
-        if (nscan == 30) then ! amsua
-         write (iunit,'(a,/8X,30I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else if (nscan == 90) then ! amsub
-         write (iunit,'(a,/8X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else if (nscan == 56) then ! hirs
-         write (iunit,'(a,/8X,56I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
-        end if
+      write (iunit,'(a,/8X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
       do j=1, nchan
       do i=1, nband
-        if (nscan == 30) then ! amsua
-         write(iunit,'(i5,i3,30F7.2)') j,i, scanbias_b(j,1:nscan,i)
-        else if (nscan == 90) then ! amsub
          write(iunit,'(i5,i3,90F7.2)') j,i, scanbias_b(j,1:nscan,i)
-        else if (nscan == 56) then ! hirs
-         write(iunit,'(i5,i3,56F7.2)') j,i, scanbias_b(j,1:nscan,i)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
-        end if
       end do
       end do
     else
-        if (nscan == 30) then ! amsua
-         write (iunit,'(a,/5X,30I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else if (nscan == 90) then ! amsub
-         write (iunit,'(a,/5X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else if (nscan == 56) then ! hirs
-         write (iunit,'(a,/5X,56I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
-        end if
+      write (iunit,'(a,/5X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
       do j=1, nchan
-        if (nscan == 30) then ! amsua
-         write(iunit,'(i5,30F7.2)') j, scanbias(j,1:nscan)
-        else if (nscan == 90) then ! amsub
          write(iunit,'(i5,90F7.2)') j, scanbias(j,1:nscan)
-        else if (nscan == 56) then ! hirs
-         write(iunit,'(i5,56F7.2)') j, scanbias(j,1:nscan)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type' 
-        end if
       end do
     end if
 
@@ -447,28 +451,12 @@
     if (global) then
       do j=1, nchan
       do i=1, nband
-        if (nscan == 30) then ! amsua
-         read(iunit,'(i5,i3,30F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
-        else if (nscan == 90) then ! amsub
          read(iunit,'(i5,i3,90F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
-        else if (nscan == 56) then ! hirs
-         read(iunit,'(i5,i3,56F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
-        end if
       end do
       end do
     else
       do j=1, nchan
-        if (nscan == 30) then ! amsua
-         read(iunit,'(i5,30F7.2)') jj, scanbias(j,1:nscan)
-        else if (nscan == 90) then ! amsub
          read(iunit,'(i5,90F7.2)') jj, scanbias(j,1:nscan)
-        else if (nscan == 56) then ! hirs
-         read(iunit,'(i5,56F7.2)') jj, scanbias(j,1:nscan)
-        else
-         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
-        end if
       end do
     end if
 

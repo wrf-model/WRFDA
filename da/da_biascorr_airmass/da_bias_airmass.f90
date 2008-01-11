@@ -168,6 +168,10 @@ loop1:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then ! mhs
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 10) then ! ssmis
+           call qc_ssmis(tovs)
       end if
 
 !-------------------------
@@ -294,6 +298,10 @@ loop2:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then  ! mhs
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 10) then  ! ssmis
+           call qc_ssmis(tovs)
       end if
 
 ! 3.3 limb scan check

@@ -2,7 +2,7 @@
 
   use rad_bias, only : bias, long, jpchan, jpscan,jband, jpnx, &
      da_read_biasprep, read_biascoef, get_scorr, qc_amsua, qc_amsub, mask, &
-     write_biascoef, jpny
+     write_biascoef, jpny, qc_ssmis
 
 ! PURPOSE.
 ! --------
@@ -123,6 +123,10 @@ loop2:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 15) then  ! mhs
+           call qc_amsub(tovs)
+      elseif(tovs%sensor_id == 10) then  ! ssmis
+           call qc_ssmis(tovs)
       end if
 
 ! 3.3 limb scan check
@@ -174,21 +178,9 @@ loop2:&
       end if
     end do
 
-    if (nchan == 15) then
-      write (11,'(15i15)') tovs%qc_flag(1:nchan)
-      write (11,'(15f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
-      write (11,'(15f15.3)') vec_dep(1:nchan)   ! omb with bias correction
-    else if(nchan==5) then
-      write (11,'(5i15)') tovs%qc_flag(1:nchan)
-      write (11,'(5f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
-      write (11,'(5f15.3)') vec_dep(1:nchan)   ! omb with bias correction
-    else if(nchan==19) then
-      write (11,'(19i15)') tovs%qc_flag(1:nchan)
-      write (11,'(19f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
-      write (11,'(19f15.3)') vec_dep(1:nchan)   ! omb with bias correction
-    else
-      write (*,*) 'Unknow sensor'
-    end if
+    write (11,'(30i15)') tovs%qc_flag(1:nchan)
+    write (11,'(30f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
+    write (11,'(30f15.3)') vec_dep(1:nchan)   ! omb with bias correction
 
   end do loop2
 

@@ -35,7 +35,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
          call da_med_initialdata_input (grid , config_flags, filename)
-         call da_setup_firstguess (xbx, grid)
+         call da_setup_firstguess (xbx, grid, config_flags)
       end if
 
       ! Radiosonde:
@@ -75,8 +75,11 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
            !if (use_crtm_kmatrix_fast) then
            !   call da_get_innov_vector_crtmk( it, grid, ob, iv )
            !else
-            call da_get_innov_vector_crtm (it, grid, ob, iv )
-           !end if
+           if (use_crtm_kmatrix) then
+              call da_get_innov_vector_crtmk( it, grid, ob, iv )
+           else
+              call da_get_innov_vector_crtm (it, grid, ob, iv )
+           end if
 #endif
          else
             call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
@@ -166,7 +169,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    if (num_fgat_time > 1) then
       call da_med_initialdata_input( grid , config_flags, 'fg01')
-      call da_setup_firstguess(xbx, grid)
+      call da_setup_firstguess(xbx, grid, config_flags)
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector")

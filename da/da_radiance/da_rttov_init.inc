@@ -314,7 +314,6 @@ subroutine da_rttov_init(iv,ob)
       ! 6.0 read bias correction coefs files
       !-------------------------------------------------------
 
-      if ( read_biascoef ) then
 
          allocate ( satinfo(i) % scanbias  (nchan(i),nscan(i)) )
          allocate ( satinfo(i) % scanbias_b(nchan(i),nscan(i),18) )
@@ -330,7 +329,9 @@ subroutine da_rttov_init(iv,ob)
 
          if ( index(iv%instid(i)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented 
          if ( index(iv%instid(i)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
-         if ( index(iv%instid(i)%rttovid_string,'ssmis') > 0) cycle   ! not implemented 
+         ! if ( index(iv%instid(i)%rttovid_string,'ssmis') > 0) cycle   ! not implemented 
+
+  if ( read_biascoef ) then
 
   !  new bias coefs files
   !----------------------------------

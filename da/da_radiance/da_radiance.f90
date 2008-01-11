@@ -44,7 +44,10 @@ module da_radiance
       bufr_minute, bufr_second,bufr_solzen, bufr_station_height, &
       bufr_landsea_mask,tovs_end, max_tovs_input, bufr_satzen, nchan_mhs, &
       nchan_msu, nchan_amsua,nchan_hirs2, nchan_hirs3, nchan_hirs4, bufr_lon, &
-      bufr_satellite_id, bufr_ifov,nchan_amsub, tovs_start, bufr_lat
+      bufr_satellite_id, bufr_ifov,nchan_amsub, tovs_start, bufr_lat, &
+      use_pseudo_rad, pseudo_rad_platid,pseudo_rad_satid, pseudo_rad_senid, &
+      pseudo_rad_ichan, pseudo_rad_tb, pseudo_rad_lat,pseudo_rad_lon, &
+      pseudo_rad_err, use_simulated_rad, use_crtm_kmatrix
 #ifdef CRTM
    use da_crtm, only : da_crtm_init
 #endif
@@ -65,7 +68,7 @@ module da_radiance
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, datalink_type,da_qc_amsub, &
       da_qc_amsua,da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
-      da_get_julian_time,da_qc_rad
+      da_get_julian_time,da_qc_rad, da_cld_eff_radius
    use da_reporting, only : da_message, da_warning, message, da_error
    use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate
@@ -85,6 +88,7 @@ contains
 
 #include "da_calculate_grady_rad.inc"
 #include "da_read_filtered_rad.inc"
+!hcl #include "da_read_simulated_rad.inc"
 #include "da_write_filtered_rad.inc"
 #include "da_read_obs_bufrtovs.inc"
 #include "da_read_obs_bufrairs.inc"
@@ -94,6 +98,7 @@ contains
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
+#include "da_read_pseudo_rad.inc"
 
 end module da_radiance
 

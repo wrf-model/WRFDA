@@ -34,7 +34,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    if (use_hirs2obs .OR. use_hirs3obs .OR. use_msuobs .OR. use_amsuaobs .OR. &
       use_amsubobs .OR. use_airsobs .OR. use_eos_amsuaobs .OR. &
       use_eos_radobs .OR. use_hsbobs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
-      use_ssmisobs .or. use_hirs4obs .or. use_mhsobs) then
+      use_ssmisobs .or. use_hirs4obs .or. use_mhsobs .or. use_pseudo_rad .or. &
+      use_simulated_rad ) then
       use_rad = .true.
    else
       use_rad = .false.
@@ -86,7 +87,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_airsretobs       = .false.
    end if
     
-   if (num_pseudo > 0) then
+   if (use_pseudo_rad .or. num_pseudo > 0) then
       call da_message((/"Single OBS Test:: Turn off all the OBS switches ***"/))
       use_synopobs         = .false.
       use_shipsobs         = .false.
@@ -121,6 +122,16 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_obsgts           = .true.
       use_rad              = .false.
       use_airsretobs       = .false.
+   end if
+
+   if ( use_pseudo_rad ) then
+      use_rad = .true.
+      thinning         = .false.
+      qc_rad           = .false.
+      rtminit_nsensor  = 1
+      rtminit_platform = pseudo_rad_platid
+      rtminit_satid    = pseudo_rad_satid
+      rtminit_sensor   = pseudo_rad_senid
    end if
 
    if (sfc_assi_options < 1 .OR. sfc_assi_options > 2) then

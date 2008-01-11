@@ -16,8 +16,9 @@ module da_radiance1
       stdout,myproc,qc_good,num_fgat_time,qc_bad, &
       use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
       print_detail_rad, rtm_option, trace_use_dull, &
-      rtm_option_rttov,rtm_option_crtm, radiance, &
-      global, gas_constant, gravity, monitor_on,kts,kte
+      rtm_option_rttov,rtm_option_crtm, radiance, only_sea_rad, &
+      global, gas_constant, gravity, monitor_on,kts,kte, &
+      use_pseudo_rad, pi, t_triple, crtm_cloud, write_jacobian
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       iv_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
    use da_par_util, only : da_proc_stats_combine
@@ -45,8 +46,7 @@ module da_radiance1
       type (info_type)        :: info
       type (model_loc_type)   :: loc
 
-      integer   ::  ssmis_subinst
-      integer   ::  ifgat, landsea_mask
+      integer   ::  ifgat, landsea_mask, rain_flag
       integer   ::  scanline, scanpos
       real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
       ! channels' bright temperature
@@ -218,6 +218,7 @@ contains
 #include "da_write_iv_rad_ascii.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_detsurtyp.inc"
+#include "da_cld_eff_radius.inc"
 #include "da_ao_stats_rad.inc"
 #include "da_oi_stats_rad.inc"
 #include "da_print_stats_rad.inc"

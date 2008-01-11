@@ -33,7 +33,7 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
             call da_med_initialdata_output(grid , config_flags)
          end if
 
-         call da_transfer_wrftoxb(xbx, grid)
+         call da_transfer_wrftoxb(xbx, grid, config_flags)
       end if
    else if (fg_format == fg_format_kma_global) then
       call da_transfer_xatokma(grid)

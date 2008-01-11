@@ -221,34 +221,78 @@ subroutine da_write_oa_rad_ascii ( ob, iv, re )
 
             if (write_profile) then
                nlevelss  = iv%instid(i)%nlevels
-               write(unit=oma_rad_unit,fmt=*) &
-                  'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
-               do k=kts,kte
-                  if (k <= nlevelss) then
-                     write(unit=oma_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
-                        k, &                             ! RTTOV levels
-                        coefs(i) % ref_prfl_p(k) , &
-                        iv%instid(i)%t(k,n) , &
-                        iv%instid(i)%mr(k,n), &
-                        k,  &                     ! WRF model levels
-                        iv%instid(i)%pm(k,n) , &
-                        iv%instid(i)%tm(k,n) , &
-                        iv%instid(i)%qm(k,n)*1000 , &    
-                        iv%instid(i)%qcw(k,n)*1000.0, &
-                        iv%instid(i)%qrn(k,n)*1000.0
+               if ( rtm_option == rtm_option_rttov ) then
+                  write(unit=oma_rad_unit,fmt=*) &
+                     'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
+                  do k=kts,kte
+                     if (k <= nlevelss) then
+                        write(unit=oma_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
+                           k, &                             ! RTTOV levels
+                           coefs(i) % ref_prfl_p(k) , &
+                           iv%instid(i)%t(k,n) , &
+                           iv%instid(i)%mr(k,n), &
+                           k,  &                     ! WRF model levels
+                           iv%instid(i)%pm(k,n) , &
+                           iv%instid(i)%tm(k,n) , &
+                           iv%instid(i)%qm(k,n)*1000 , &    
+                           iv%instid(i)%qcw(k,n)*1000.0, &
+                           iv%instid(i)%qrn(k,n)*1000.0
+                     else
+                        write(unit=oma_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
+                           iv%instid(i)%pm(k,n) , &
+                           iv%instid(i)%tm(k,n) , &
+                           iv%instid(i)%qm(k,n)*1000 , &
+                           iv%instid(i)%qcw(k,n)*1000.0, &
+                           iv%instid(i)%qrn(k,n)*1000.0
+                           ! iv%instid(i)%qci(k,n)*1000.0, &
+                           ! iv%instid(i)%qsn(k,n)*1000.0, &
+                           ! iv%instid(i)%qgr(k,n)*10000.0
+                     end if  
+                  end do   ! end loop profile
+               end if  ! end if rtm_option_rttov
 
-                  else
-                     write(unit=oma_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
-                        iv%instid(i)%pm(k,n) , &
-                        iv%instid(i)%tm(k,n) , &
-                        iv%instid(i)%qm(k,n)*1000 , &
-                        iv%instid(i)%qcw(k,n)*1000.0, &
-                        iv%instid(i)%qrn(k,n)*1000.0
-                     ! iv%instid(i)%qci(k,n)*1000.0, &
-                     ! iv%instid(i)%qsn(k,n)*1000.0, &
-                     ! iv%instid(i)%qgr(k,n)*10000.0
-                  end if  
-               end do   ! end loop profile
+               if ( rtm_option == rtm_option_crtm ) then
+                  write(unit=oma_rad_unit,fmt=*) &
+                     'level fullp(mb) halfp(mb) t(k) q(g/kg) water(mm) ice(mm) rain(mm) snow(mm) graupel(mm) hail(mm)'
+                  if (crtm_cloud) then
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=oma_rad_unit,fmt='(i3,2f10.2,f8.2,13f8.3)') &
+                           k,  &
+                           iv%instid(i)%pf(k,n), &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%tm(k,n), &
+                           iv%instid(i)%qm(k,n), &
+                           iv%instid(i)%qcw(k,n), &
+                           iv%instid(i)%qci(k,n), &
+                           iv%instid(i)%qrn(k,n), &
+                           iv%instid(i)%qsn(k,n), &
+                           iv%instid(i)%qgr(k,n), &
+                           iv%instid(i)%qhl(k,n), &
+                           iv%instid(i)%rcw(k,n), &
+                           iv%instid(i)%rci(k,n), &
+                           iv%instid(i)%rrn(k,n), &
+                           iv%instid(i)%rsn(k,n), &
+                           iv%instid(i)%rgr(k,n), &
+                           iv%instid(i)%rhl(k,n)
+                     end do ! end loop profile
+                  else  ! no cloud
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=oma_rad_unit,fmt='(i3,2f10.2,f8.2,7f8.3)') &
+                           k,  &
+                           iv%instid(i)%pf(k,n), &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%tm(k,n), &
+                           iv%instid(i)%qm(k,n), &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0
+                     end do ! end loop profile
+                  end if ! end if crtm_cloud
+               end if  ! end if crtm_option
+
             end if   ! end if write_profile
          end if    ! end if proc_domain
       end do     ! end do pixels

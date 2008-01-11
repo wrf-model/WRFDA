@@ -12,13 +12,12 @@ subroutine da_write_iv_rad_ascii (ob, iv )
 #ifdef RTTOV
 
    integer                        :: n        ! Loop counter.
-   integer                        :: i, k     ! Index dimension.
+   integer                        :: i, k, l  ! Index dimension.
    integer                        :: nlevelss ! Number of obs levels.
 
    integer            :: ios, innov_rad_unit
    character(len=30)  :: filename
    integer            :: ndomain
-   logical            :: ssmis
 
    if (trace_use) call da_trace_entry("da_write_iv_rad_ascii")
 
@@ -52,31 +51,14 @@ subroutine da_write_iv_rad_ascii (ob, iv )
                         ' index-of-channels : '
       write(unit=innov_rad_unit,fmt='(10i5)') iv%instid(i)%ichan
 
-      ssmis= index(iv%instid(i)%rttovid_string,'ssmis') > 0
-      if ( ssmis ) then
-         write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi ssmis_subinst'
-      else
-         write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
-      end if
+      write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi'
       write(unit=innov_rad_unit,fmt=*) ' grid%xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                     & soiltyp vegtyp vegfra elev clwp'
       ndomain = 0
       do n =1,iv%instid(i)%num_rad
          if (iv%instid(i)%info%proc_domain(1,n)) then
             ndomain=ndomain+1
-            if ( ssmis ) then
-               write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2,i3)') 'INFO : ', ndomain, &
-                                iv%instid(i)%info%date_char(n), &
-                                iv%instid(i)%scanpos(n),   &
-                                iv%instid(i)%landsea_mask(n), &
-                                iv%instid(i)%info%elv(n),  &
-                                iv%instid(i)%info%lat(1,n),  &
-                                iv%instid(i)%info%lon(1,n), &
-                                iv%instid(i)%satzen(n),    &
-                                iv%instid(i)%satazi(n),    &
-                                iv%instid(i)%ssmis_subinst(n)
-            else
-               write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
+            write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
                                 iv%instid(i)%info%date_char(n), &
                                 iv%instid(i)%scanpos(n),   &
                                 iv%instid(i)%landsea_mask(n), &
@@ -85,7 +67,6 @@ subroutine da_write_iv_rad_ascii (ob, iv )
                                 iv%instid(i)%info%lon(1,n), &
                                 iv%instid(i)%satzen(n),    &
                                 iv%instid(i)%satazi(n)
-            end if
             select case (iv%instid(i)%isflg(n))
             case (0) ;
                write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', n, &
@@ -233,6 +214,10 @@ subroutine da_write_iv_rad_ascii (ob, iv )
             write(unit=innov_rad_unit,fmt='(10f11.2)')  iv%instid(i)%tb_inv(:,n)
             write(unit=innov_rad_unit,fmt='(a)') 'EMS  : '
             write(unit=innov_rad_unit,fmt='(10f11.2)')  iv%instid(i)%emiss(1:iv%instid(i)%nchan,n)
+            if (rtm_option==rtm_option_crtm .and. write_jacobian) then
+               write(unit=innov_rad_unit,fmt='(a)') 'EMS_JACOBIAN : '
+               write(unit=innov_rad_unit,fmt='(10f10.3)') iv%instid(i)%emiss_jacobian(1:iv%instid(i)%nchan,n)
+            end if
             write(unit=innov_rad_unit,fmt='(a)') 'ERR  : '
             write(unit=innov_rad_unit,fmt='(10f11.2)') iv%instid(i)%tb_error(:,n)
             write(unit=innov_rad_unit,fmt='(a)') 'QC   : '
@@ -240,34 +225,130 @@ subroutine da_write_iv_rad_ascii (ob, iv )
 
             if (write_profile) then
                nlevelss  = iv%instid(i)%nlevels
-               write(unit=innov_rad_unit,fmt=*) &
-                  'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
-               do k=kts,kte
-                  if (k <= nlevelss) then
-                     write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
-                        k, &                             ! RTTOV levels
-                        coefs(i) % ref_prfl_p(k) , &
-                        iv%instid(i)%t(k,n) , &
-                        iv%instid(i)%mr(k,n), &
-                        k,  &                     ! WRF model levels
-                        iv%instid(i)%pm(k,n) , &
-                        iv%instid(i)%tm(k,n) , &
-                        iv%instid(i)%qm(k,n)*1000 , &    
-                        iv%instid(i)%qcw(k,n)*1000.0, &
-                        iv%instid(i)%qrn(k,n)*1000.0
-                  else
-                     write(unit=innov_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
-                        iv%instid(i)%pm(k,n) , &
-                        iv%instid(i)%tm(k,n) , &
-                        iv%instid(i)%qm(k,n)*1000 , &
-                        iv%instid(i)%qcw(k,n)*1000.0, &
-                        iv%instid(i)%qrn(k,n)*1000.0
-                        ! iv%instid(i)%qci(k,n)*1000.0, &
-                        ! iv%instid(i)%qsn(k,n)*1000.0, &
-                        ! iv%instid(i)%qgr(k,n)*1000.0
-                  end if  
-               end do ! end loop profile
+               if ( rtm_option == rtm_option_rttov ) then
+                  write(unit=innov_rad_unit,fmt=*) &
+                     'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
+                  do k=kts,kte
+                     if (k <= nlevelss) then
+                        write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
+                           k, &                             ! RTTOV levels
+                           coefs(i) % ref_prfl_p(k) , &
+                           iv%instid(i)%t(k,n) , &
+                           iv%instid(i)%mr(k,n), &
+                           k,  &                     ! WRF model levels
+                           iv%instid(i)%pm(k,n) , &
+                           iv%instid(i)%tm(k,n) , &
+                           iv%instid(i)%qm(k,n)*1000 , &    
+                           iv%instid(i)%qcw(k,n)*1000.0, &
+                           iv%instid(i)%qrn(k,n)*1000.0
+                     else
+                        write(unit=innov_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
+                           iv%instid(i)%pm(k,n) , &
+                           iv%instid(i)%tm(k,n) , &
+                           iv%instid(i)%qm(k,n)*1000 , &
+                           iv%instid(i)%qcw(k,n)*1000.0, &
+                           iv%instid(i)%qrn(k,n)*1000.0
+                           ! iv%instid(i)%qci(k,n)*1000.0, &
+                           ! iv%instid(i)%qsn(k,n)*1000.0, &
+                           ! iv%instid(i)%qgr(k,n)*1000.0
+                     end if  
+                  end do ! end loop profile
+               end if ! end if rtm_option_rttov
+
+               if ( rtm_option == rtm_option_crtm ) then
+                  write(unit=innov_rad_unit,fmt=*) &
+                     'level fullp(mb) halfp(mb) t(k) q(g/kg) water(mm) ice(mm) rain(mm) snow(mm) graupel(mm) hail(mm)'
+                  if (crtm_cloud) then
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=innov_rad_unit,fmt='(i3,2f10.2,f8.2,13f8.3)') &
+                           k,  &
+                           iv%instid(i)%pf(k,n), &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%tm(k,n), &
+                           iv%instid(i)%qm(k,n), &
+                           iv%instid(i)%qcw(k,n), &
+                           iv%instid(i)%qci(k,n), &
+                           iv%instid(i)%qrn(k,n), &
+                           iv%instid(i)%qsn(k,n), &
+                           iv%instid(i)%qgr(k,n), &
+                           iv%instid(i)%qhl(k,n), &
+                           iv%instid(i)%rcw(k,n), &
+                           iv%instid(i)%rci(k,n), &
+                           iv%instid(i)%rrn(k,n), &
+                           iv%instid(i)%rsn(k,n), &
+                           iv%instid(i)%rgr(k,n), &
+                           iv%instid(i)%rhl(k,n)
+                     end do ! end loop profile
+                  else  ! no cloud
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=innov_rad_unit,fmt='(i3,2f10.2,f8.2,7f8.3)') &
+                           k,  &
+                           iv%instid(i)%pf(k,n), &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%tm(k,n), &
+                           iv%instid(i)%qm(k,n), &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0, &
+                           0.0
+                     end do ! end loop profile
+                  end if  ! end if crtm_cloud
+               end if ! end if rtm_option_crtm
+
             end if  ! end if write_profile
+
+            if ( rtm_option == rtm_option_crtm .and. write_jacobian) then
+               write(unit=innov_rad_unit,fmt=*) &
+                  'channel level halfp(mb) t(k) q(g/kg) water(mm) ice(mm) rain(mm) snow(mm) graupel(mm) hail(mm)'
+               if (crtm_cloud) then
+                  do l=1,iv%instid(i)%nchan
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=innov_rad_unit,fmt='(i5,i3,f10.2,8f8.3,6f8.3)') &
+                           l, k,  &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%t_jacobian(l,k,n), &
+                           iv%instid(i)%q_jacobian(l,k,n), &
+                           iv%instid(i)%water_jacobian(l,k,n), &
+                           iv%instid(i)%ice_jacobian(l,k,n), & 
+                           iv%instid(i)%rain_jacobian(l,k,n), &
+                           iv%instid(i)%snow_jacobian(l,k,n), &
+                           iv%instid(i)%graupel_jacobian(l,k,n), &
+                           iv%instid(i)%hail_jacobian(l,k,n), &
+                           iv%instid(i)%water_r_jacobian(l,k,n), &
+                           iv%instid(i)%ice_r_jacobian(l,k,n), & 
+                           iv%instid(i)%rain_r_jacobian(l,k,n), &
+                           iv%instid(i)%snow_r_jacobian(l,k,n), &
+                           iv%instid(i)%graupel_r_jacobian(l,k,n), &
+                           iv%instid(i)%hail_r_jacobian(l,k,n)
+                    end do ! end loop profile
+                 end do ! end loop channels
+               else  ! no cloud
+                  do l=1,iv%instid(i)%nchan
+                     do k=1,iv%instid(i)%nlevels-1
+                        write(unit=innov_rad_unit,fmt='(i5,i3,f10.2,8f8.3,6f8.3)') &
+                           l, k,  &
+                           iv%instid(i)%pm(k,n), &
+                           iv%instid(i)%t_jacobian(l,k,n), &
+                           iv%instid(i)%q_jacobian(l,k,n), &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0., &
+                           0.
+                     end do ! end loop profile
+                  end do ! end loop channels
+               end if  ! end if crtm_cloud
+            end if !  end if write_jacobian
+
          end if ! end if proc_domain
       end do ! end do pixels
       close(unit=innov_rad_unit)

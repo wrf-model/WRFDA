@@ -149,13 +149,13 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             Atmosphere(1)%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
             Atmosphere(1)%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
             Atmosphere(1)%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
-            Atmosphere(1)%cloud(6)%water_content(k)=0.0
-            Atmosphere(1)%cloud(1)%effective_radius(k)=10.0
-            Atmosphere(1)%cloud(2)%effective_radius(k)=200.0
-            Atmosphere(1)%cloud(3)%effective_radius(k)=200.0
-            Atmosphere(1)%cloud(4)%effective_radius(k)=200.0
-            Atmosphere(1)%cloud(5)%effective_radius(k)=200.0
-            Atmosphere(1)%cloud(6)%effective_radius(k)=200.0
+            Atmosphere(1)%cloud(6)%water_content(k)=iv%instid(inst)%qhl(k,n)
+            Atmosphere(1)%cloud(1)%effective_radius(k)=iv%instid(inst)%rcw(k,n)
+            Atmosphere(1)%cloud(2)%effective_radius(k)=iv%instid(inst)%rci(k,n)
+            Atmosphere(1)%cloud(3)%effective_radius(k)=iv%instid(inst)%rrn(k,n)
+            Atmosphere(1)%cloud(4)%effective_radius(k)=iv%instid(inst)%rsn(k,n)
+            Atmosphere(1)%cloud(5)%effective_radius(k)=iv%instid(inst)%rgr(k,n)
+            Atmosphere(1)%cloud(6)%effective_radius(k)=iv%instid(inst)%rhl(k,n)
            end if
            end do
 

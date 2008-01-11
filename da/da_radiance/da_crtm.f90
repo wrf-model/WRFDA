@@ -11,7 +11,7 @@ module da_crtm
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &
       CRTM_Atmosphere_type, CRTM_Surface_type,CRTM_GeometryInfo_type, &
       CRTM_Adjoint,CRTM_Forward,CRTM_Tangent_Linear, &
-!      CRTM_K_Matrix, &
+      CRTM_K_Matrix, &
       CRTM_Allocate_Atmosphere,H2O_ID,GRAUPEL_CLOUD,ICE_CLOUD,HAIL_CLOUD, &
       INVALID_WMO_SENSOR_ID,NEW_SNOW,rain_cloud,snow_cloud,O3_ID, GRASS_SOIL, &
       WMO_AMSRE, WATER_CLOUD, WMO_AMSUB, WMO_AMSUA,WMO_SSMI, Sensor_Descriptor, &
@@ -28,7 +28,7 @@ module da_crtm
       rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte
    use da_interpolation, only : da_interp_lin_2d_partial,da_interp_lin_2d_adj_partial
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
-      da_get_time_slots,da_biasprep,da_read_biascoef
+      da_get_time_slots,da_biasprep,da_read_biascoef,da_cld_eff_radius
    use da_radiance1, only : da_qc_crtm
 
    use da_reporting, only : da_error,message
@@ -46,10 +46,10 @@ contains
 !#include "da_transform_xtoy_crtmk_adj.inc"
 #include "da_transform_xtoy_crtm.inc"
 #include "da_transform_xtoy_crtm_adj.inc"
-!#include "da_get_innov_vector_crtmk.inc"
+#include "da_get_innov_vector_crtmk.inc"
 #include "da_get_innov_vector_crtm.inc"
 #include "da_crtm_tl.inc"
-!#include "da_crtm_k.inc"
+#include "da_crtm_k.inc"
 #include "da_crtm_direct.inc"
 #include "da_crtm_ad.inc"
 #include "da_crtm_init.inc"

@@ -64,6 +64,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
             iv%instid(i)%tb_qc(1:2,n)    = qc_bad
             if (iv%instid(i)%info%proc_domain(1,n)) &
                nrej_windowchanl = nrej_windowchanl + 1
+            if (only_sea_rad) iv%instid(i)%tb_qc(:,n)    = qc_bad
          end if
 
          ! reject limb obs 
@@ -153,6 +154,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   ngood(k) = ngood(k) + 1
             end if
+
          end do ! chan
       end do ! end loop pixel
 

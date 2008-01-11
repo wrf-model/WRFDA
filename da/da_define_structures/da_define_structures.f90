@@ -368,7 +368,6 @@ module da_define_structures
       integer              :: num_rad, nchan, nlevels
       integer              :: nchannels, nfrequencies,nbtout
       integer              :: num_rad_glo
-      integer, pointer     :: ssmis_subinst(:)
       integer, pointer     :: ichan(:)
       real,    pointer     :: tb_inv(:,:)
       integer, pointer     :: tb_qc(:,:)
@@ -377,6 +376,7 @@ module da_define_structures
       integer, pointer     :: scanpos(:)
       integer, pointer     :: scanline(:)
       integer, pointer     :: cloud_flag(:,:)
+      integer, pointer     :: rain_flag(:)
       real,    pointer     :: satzen(:) 
       real,    pointer     :: satazi(:) 
       real,    pointer     :: solzen(:) 
@@ -420,9 +420,24 @@ module da_define_structures
       real,    pointer     :: vegtyp(:)
       real,    pointer     :: vegfra(:)
       real,    pointer     :: clwp(:)
-      ! real,    pointer     :: ps_jacobian(:,:)
-      ! real,    pointer     :: t_jacobian(:,:,:)
-      ! real,    pointer     :: q_jacobian(:,:,:)
+      real,    pointer     :: ps_jacobian(:,:) ! only RTTOV
+      real,    pointer     :: ts_jacobian(:,:) ! only over water CRTM
+      real,    pointer     :: windspeed_jacobian(:,:) ! only MV and over water CRTM
+      real,    pointer     :: emiss_jacobian(:,:)
+      real,    pointer     :: t_jacobian(:,:,:)
+      real,    pointer     :: q_jacobian(:,:,:)
+      real,    pointer     :: water_jacobian(:,:,:) ! water content jacobian
+      real,    pointer     :: ice_jacobian(:,:,:)
+      real,    pointer     :: rain_jacobian(:,:,:)
+      real,    pointer     :: snow_jacobian(:,:,:)
+      real,    pointer     :: graupel_jacobian(:,:,:)
+      real,    pointer     :: hail_jacobian(:,:,:)
+      real,    pointer     :: water_r_jacobian(:,:,:) ! effective radius jacobian
+      real,    pointer     :: ice_r_jacobian(:,:,:)
+      real,    pointer     :: rain_r_jacobian(:,:,:)
+      real,    pointer     :: snow_r_jacobian(:,:,:)
+      real,    pointer     :: graupel_r_jacobian(:,:,:)
+      real,    pointer     :: hail_r_jacobian(:,:,:)
       real,    pointer     :: water_coverage(:)
       real,    pointer     :: land_coverage(:)
       real,    pointer     :: ice_coverage(:)
