@@ -642,7 +642,7 @@ else
    fi
 
 # temporarily store the high resolution reults in RUN_DIR
-   if [ $NL_MULTI_INC == 1 ]; then
+   if [[ $NL_MULTI_INC == 1 ]]; then
 
       mv -f gts_omb.*  $RUN_DIR
 
