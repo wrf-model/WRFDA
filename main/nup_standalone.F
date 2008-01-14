@@ -50,6 +50,7 @@
 !
 !============================================================================
 
+      use feedback
       INCLUDE 'netcdf.inc'
       parameter (jdim=6)
       integer ncid, status
@@ -309,7 +310,7 @@
 	  status = nf_get_var_int(ncid, i, idata)
           IF (debug) write(6,*) '   SAMPLE VALUE = ',idata(1,1,1,1)
           if (idm .ge. 3) then
-            IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio), 'New version'
+            IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio), 'copy_fcni'
             call copy_fcni(idata2,                                           &  ! CD field
                            1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
                            idata,                                            &  ! ND field
@@ -332,30 +333,86 @@
 	  status = nf_get_var_real(ncid, i, data)
           IF (debug) write(6,*) '   SAMPLE VALUE = ',data(1,1,1,1)
             if (idm .ge. 3) then
-            IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'New version'
-            if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &
+            if ( trim(cval) == 'MAPFAC_UX' .or. trim(cval) == 'MAPFAC_U' .or.  &
+                 trim(cval) == 'MAPFAC_UY' .or.  &
                  trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then
-                 IF (debug) write(6,*) '   Attention'
-!                data2 = data(1:dims_in(1):3,2:dims_in(2):3,:,:)
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'
                  call copy_fcnm(data2,                                            &  ! CD field
                                 1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
                                 data,                                             &  ! ND field
                                 1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
-                                .true., .false.,                                 &  ! staggering of field
+                                .true., .false.,                                  &  ! staggering of field
                                 1, 1,                                             &  ! Position of lower left of nest in CD
                                 int(ratio), int(ratio)               )               ! nest ratios
-            elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &
+            elseif ( trim(cval) == 'MAPFAC_VX' .or. trim(cval) == 'MAPFAC_V' .or.  &
+                 trim(cval) == 'MAPFAC_VY' .or. trim(cval) == 'MF_VX_INV' .or. &
                  trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then
-                 IF (debug) write(6,*) '   Attention'
-!                data2 = data(2:dims_in(1):3,1:dims_in(2):3,:,:)
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'
                  call copy_fcnm(data2,                                            &  ! CD field
                                 1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
                                 data,                                             &  ! ND field
                                 1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
-                                .false., .true.,                                 &  ! staggering of field
+                                .false., .true.,                                  &  ! staggering of field
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+            elseif ( trim(cval) == 'U' ) then
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'
+                 call copy_fcn (data2,                                            &  ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                data,                                             &  ! ND field
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .true., .false.,                                  &  ! staggering of field
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+                 CALL smoother (                                                               &
+                                data2,                                            &         ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .TRUE., .FALSE.,                                                &         ! xstag, ystag
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+            elseif ( trim(cval) == 'V' ) then
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'
+                 call copy_fcn (data2,                                            &  ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                data,                                             &  ! ND field
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .false., .true.,                                  &  ! staggering of field
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+                 CALL smoother (                                                               &
+                                data2,                                            &         ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .FALSE., .TRUE.,                                                &         ! xstag, ystag
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+            elseif ( trim(cval) == 'W' .or. trim(cval) == 'PH' .or. trim(cval) == 'PHB' .or. &
+                     trim(cval) == 'T' .or. trim(cval) == 'T_INIT' .or. trim(cval) == 'MU' .or. &
+                     trim(cval) == 'MUB' .or. trim(cval) == 'MU0' .or. trim(cval) == 'Q2' .or. &
+                     trim(cval) == 'T2' .or. trim(cval) == 'TH2' .or. trim(cval) == 'PSFC' .or. &
+                     trim(cval) == 'U10' .or. trim(cval) == 'V10' .or. trim(cval) == 'TH10' .or. &
+                     trim(cval) == 'Q10' .or. trim(cval) == 'QVAPOR' .or. trim(cval) == 'QCLOUD' .or. &
+                     trim(cval) == 'QRAIN' .or. trim(cval) == 'QICE' .or. trim(cval) == 'QGRAUP' .or. &
+                     trim(cval) == 'HGT' .or. trim(cval) == 'SNOWNC' .or. trim(cval) == 'GRAUPELNCV' &
+                      ) then
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'
+                 call copy_fcn (data2,                                            &  ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                data,                                             &  ! ND field
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .false., .false.,                                  &  ! staggering of field
+                                1, 1,                                             &  ! Position of lower left of nest in CD
+                                int(ratio), int(ratio)               )               ! nest ratios
+                 CALL smoother (                                                               &
+                                data2,                                            &         ! CD field
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &
+                                .FALSE., .FALSE.,                                                &         ! xstag, ystag
                                 1, 1,                                             &  ! Position of lower left of nest in CD
                                 int(ratio), int(ratio)               )               ! nest ratios
             else
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'
                  call copy_fcnm(data2,                                            &  ! CD field
                                 1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &
                                 data,                                             &  ! ND field
@@ -533,146 +590,21 @@
 
 !-----------------------------------------------------------------------------
 
-!
-!=======================================================================================
- SUBROUTINE SPLINE2(I,J,JTBX,NOLD,XOLD,YOLD,Y2,NNEW,XNEW,YNEW,P,Q)
-!
-!   ******************************************************************
-!   *                                                                *
-!   *  THIS IS A ONE-DIMENSIONAL CUBIC SPLINE FITTING ROUTINE        *
-!   *  PROGRAMED FOR A SMALL SCALAR MACHINE.                         *
-!   *                                                                *
-!   *  PROGRAMER Z. JANJIC                                           *
-!   *                                                                *
-!   *  NOLD - NUMBER OF GIVEN VALUES OF THE FUNCTION.  MUST BE GE 3. *
-!   *  XOLD - LOCATIONS OF THE POINTS AT WHICH THE VALUES OF THE     *
-!   *         FUNCTION ARE GIVEN.  MUST BE IN ASCENDING ORDER.       *
-!   *  YOLD - THE GIVEN VALUES OF THE FUNCTION AT THE POINTS XOLD.   *
-!   *  Y2   - THE SECOND DERIVATIVES AT THE POINTS XOLD.  IF NATURAL *
-!   *         SPLINE IS FITTED Y2(1)=0. AND Y2(NOLD)=0. MUST BE      *
-!   *         SPECIFIED.                                             *
-!   *  NNEW - NUMBER OF VALUES OF THE FUNCTION TO BE CALCULATED.     *
-!   *  XNEW - LOCATIONS OF THE POINTS AT WHICH THE VALUES OF THE     *
-!   *         FUNCTION ARE CALCULATED.  XNEW(K) MUST BE GE XOLD(1)   *
-!   *         AND LE XOLD(NOLD).                                     *
-!   *  YNEW - THE VALUES OF THE FUNCTION TO BE CALCULATED.           *
-!   *  P, Q - AUXILIARY VECTORS OF THE LENGTH NOLD-2.                *
-!   *                                                                *
-!   ******************************************************************
-!---------------------------------------------------------------------
-      IMPLICIT NONE
-!---------------------------------------------------------------------
-      INTEGER,INTENT(IN) :: I,J,JTBX,NNEW,NOLD
-      REAL,DIMENSION(JTBX),INTENT(IN) :: XNEW,XOLD,YOLD
-      REAL,DIMENSION(JTBX),INTENT(INOUT) :: P,Q,Y2
-      REAL,DIMENSION(JTBX),INTENT(OUT) :: YNEW
-!
-      INTEGER :: II,JJ,K,K1,K2,KOLD,NOLDM1
-      REAL :: AK,BK,CK,DEN,DX,DXC,DXL,DXR,DYDXL,DYDXR                 &
-             ,RDX,RTDXC,X,XK,XSQ,Y2K,Y2KP1
-!---------------------------------------------------------------------
+MODULE feedback
 
-!     debug
+   implicit none
 
-      II=9999
-      JJ=9999
-      IF(I.eq.II.and.J.eq.JJ)THEN
-        WRITE(0,*)'DEBUG in SPLINE2: I,J',I,J
-        WRITE(0,*)'DEBUG in SPLINE2:HSO= ',xnew(1:nold)
-        DO K=1,NOLD
-         WRITE(0,*)'DEBUG in SPLINE2:L,ZETAI,PINTI= ' &
-                        ,K,YOLD(K),XOLD(K)
-        ENDDO
-      ENDIF
-!
-      NOLDM1=NOLD-1
-!
-      DXL=XOLD(2)-XOLD(1)
-      DXR=XOLD(3)-XOLD(2)
-      DYDXL=(YOLD(2)-YOLD(1))/DXL
-      DYDXR=(YOLD(3)-YOLD(2))/DXR
-      RTDXC=0.5/(DXL+DXR)
-!
-      P(1)= RTDXC*(6.*(DYDXR-DYDXL)-DXL*Y2(1))
-      Q(1)=-RTDXC*DXR
-!
-      IF(NOLD.EQ.3)GO TO 150
-!---------------------------------------------------------------------
-      K=3
-!
-  100 DXL=DXR
-      DYDXL=DYDXR
-      DXR=XOLD(K+1)-XOLD(K)
-      DYDXR=(YOLD(K+1)-YOLD(K))/DXR
-      DXC=DXL+DXR
-      DEN=1./(DXL*Q(K-2)+DXC+DXC)
-!
-      P(K-1)= DEN*(6.*(DYDXR-DYDXL)-DXL*P(K-2))
-      Q(K-1)=-DEN*DXR
-!
-      K=K+1
-      IF(K.LT.NOLD)GO TO 100
-!-----------------------------------------------------------------------
-  150 K=NOLDM1
-!
-  200 Y2(K)=P(K-1)+Q(K-1)*Y2(K+1)
-!
-      K=K-1
-      IF(K.GT.1)GO TO 200
-!-----------------------------------------------------------------------
-      K1=1
-!
-  300 XK=XNEW(K1)
-!
-      DO 400 K2=2,NOLD
-!
-      IF(XOLD(K2).GT.XK)THEN
-        KOLD=K2-1
-        GO TO 450
-      ENDIF
-!
-  400 CONTINUE
-!
-      YNEW(K1)=YOLD(NOLD)
-      GO TO 600
-!
-  450 IF(K1.EQ.1)GO TO 500
-      IF(K.EQ.KOLD)GO TO 550
-!
-  500 K=KOLD
-!
-      Y2K=Y2(K)
-      Y2KP1=Y2(K+1)
-      DX=XOLD(K+1)-XOLD(K)
-      RDX=1./DX
-!
-      AK=.1666667*RDX*(Y2KP1-Y2K)
-      BK=0.5*Y2K
-      CK=RDX*(YOLD(K+1)-YOLD(K))-.1666667*DX*(Y2KP1+Y2K+Y2K)
-!
-  550 X=XK-XOLD(K)
-      XSQ=X*X
-!
-      YNEW(K1)=AK*XSQ*X+BK*XSQ+CK*X+YOLD(K)
+   interface copy_fcn
+     module procedure copy_fcn_real, copy_fcn_double
+   end interface
 
-!  debug
+   interface copy_fcnm
+     module procedure copy_fcnm_real, copy_fcnm_double
+   end interface
 
-      IF(I.eq.II.and.J.eq.JJ)THEN
-        WRITE(0,*) 'DEBUG:: k1,xnew(k1),ynew(k1): ', K1,XNEW(k1),YNEW(k1)
-      ENDIF 
+   contains
 
-!
-  600 K1=K1+1
-      IF(K1.LE.NNEW)GO TO 300
-
-      RETURN
-
-      END SUBROUTINE SPLINE2
-
-!==================================
-! this is the default function used in feedback.
-
-   SUBROUTINE copy_fcn ( cfld,                                 &  ! CD field
+   SUBROUTINE copy_fcn_real ( cfld,                                 &  ! CD field
                            cids, cide, cjds, cjde, ckds, ckde,   &
                            nfld,                                 &  ! ND field
                            nids, nide, njds, njde, nkds, nkde,   &
@@ -946,7 +878,7 @@
 
      RETURN
 
-   END SUBROUTINE copy_fcn
+   END SUBROUTINE copy_fcn_real
 
 !==================================
 ! this is the 1pt function used in feedback.
@@ -1013,7 +945,7 @@
 
    END SUBROUTINE copy_fcnm_double
 
-   SUBROUTINE copy_fcnm (  cfld,                                 &  ! CD field
+   SUBROUTINE copy_fcnm_real (  cfld,                                 &  ! CD field
                            cids, cide, cjds, cjde, ckds, ckde,   &
                            nfld,                                 &  ! ND field
                            nids, nide, njds, njde, nkds, nkde,   &
@@ -1073,8 +1005,69 @@
 
      RETURN
 
-   END SUBROUTINE copy_fcnm
+   END SUBROUTINE copy_fcnm_real
 
+   SUBROUTINE copy_fcnm_double (  cfld,                                 &  ! CD field
+                           cids, cide, cjds, cjde, ckds, ckde,   &
+                           nfld,                                 &  ! ND field
+                           nids, nide, njds, njde, nkds, nkde,   &
+                           xstag, ystag,                         &  ! staggering of field
+                           ipos, jpos,                           &  ! Position of lower left of nest in CD
+                           nri, nrj                             )   ! nest ratios
+     IMPLICIT NONE
+
+
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &
+                            nids, nide, nkds, nkde, njds, njde,   &
+                            ipos, jpos,                           &
+                            nri, nrj
+     LOGICAL, INTENT(IN) :: xstag, ystag
+
+     DOUBLE PRECISION, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde ), INTENT(OUT) :: cfld
+     DOUBLE PRECISION, DIMENSION ( nids:nide, njds:njde, nkds:nkde ), INTENT(IN) :: nfld
+
+     ! Local
+
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa
+     INTEGER :: icmin,icmax,jcmin,jcmax
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints
+
+     istag = 1 ; jstag = 1
+     IF ( xstag ) istag = 0
+     IF ( ystag ) jstag = 0
+
+     IF( MOD(nrj,2) .NE. 0) THEN  ! odd refinement ratio
+
+        DO ck = ckds, ckde
+           nk = ck
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)
+              nj = (cj-jpos)*nrj + jstag + 1
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)
+                 ni = (ci-ipos)*nri + istag + 1
+                 cfld( ci, cj, ck ) =  nfld( ni  , nj , nk  )
+              ENDDO
+           ENDDO
+        ENDDO
+
+     ELSE  ! even refinement ratio, pick nearest neighbor on SW corner
+        DO ck = ckds, ckde
+           nk = ck
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)
+              nj = (cj-jpos)*nrj + 1
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)
+                 ni = (ci-ipos)*nri + 1
+                 ipoints = nri/2 -1
+                 jpoints = nrj/2 -1
+                 cfld( ci, cj, ck ) =  nfld( ni+ipoints , nj+jpoints , nk )
+              END DO
+           END DO
+        END DO
+
+     END IF
+
+     RETURN
+
+   END SUBROUTINE copy_fcnm_real
 !==================================
 ! this is the 1pt function used in feedback for integers
 
@@ -1160,32 +1153,27 @@
    
       REAL, DIMENSION ( cids:cide, ckds:ckde, cjds:cjde ) :: cfld
 
-      !  If there is no feedback, there can be no smoothing.
-
-      CALL nl_get_feedback       ( 1, feedback  )
-      IF ( feedback == 0 ) RETURN
-
       !  These are the 2d smoothers used on the fedback data.  These filters
       !  are run on the coarse grid data (after the nested info has been
       !  fedback).  Only the area of the nest in the coarse grid is filtered.
 
-      CALL nl_get_smooth_option  ( 1, smooth_option  )
+      smooth_option = 0
 
       IF      ( smooth_option == 0 ) THEN
 ! no op
       ELSE IF ( smooth_option == 1 ) THEN
          CALL sm121 ( cfld , &
-                      cids, cide, ckds, ckde, cjds, cjde,   &
+                      cids, cide, cjds, cjde, ckds, ckde,   &
                       xstag, ystag,                         &  ! staggering of field
-                      nids, nide, nkds, nkde, njds, njde,   &
+                      nids, nide, njds, njde, nkds, nkde,   &
                       nri, nrj,                             &  
                       ipos, jpos                            &  ! Position of lower left of nest in 
                       )
       ELSE IF ( smooth_option == 2 ) THEN
          CALL smdsm ( cfld , &
-                      cids, cide, ckds, ckde, cjds, cjde,   &
+                      cids, cide, cjds, cjde, ckds, ckde,   &
                       xstag, ystag,                         &  ! staggering of field
-                      nids, nide, nkds, nkde, njds, njde,   &
+                      nids, nide, njds, njde, nkds, nkde,   &
                       nri, nrj,                             &  
                       ipos, jpos                            &  ! Position of lower left of nest in 
                       )
@@ -1194,9 +1182,9 @@
    END SUBROUTINE smoother 
 
    SUBROUTINE sm121 ( cfld , &
-                      cids, cide, ckds, ckde, cjds, cjde,   &
+                      cids, cide, cjds, cjde, ckds, ckde,   &
                       xstag, ystag,                         &  ! staggering of field
-                      nids, nide, nkds, nkde, njds, njde,   &
+                      nids, nide, njds, njde, nkds, nkde,   &
                       nri, nrj,                             &  
                       ipos, jpos                            &  ! Position of lower left of nest in 
                       )
@@ -1209,7 +1197,7 @@
                              ipos, jpos
       LOGICAL, INTENT(IN) :: xstag, ystag
    
-      REAL, DIMENSION ( cids:cide, ckds:ckde, cjds:cjde ) :: cfld
+      REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde ) :: cfld
       REAL, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew
    
       INTEGER                        :: i , j , k , loop
@@ -1231,7 +1219,7 @@
 
             DO i = MAX(ipos,cids-3) , MIN(ipos+(nide-nids)/nri,cide+3)
                DO j = MAX(jpos,cjds-3) , MIN(jpos+(njde-njds)/nrj,cjde+3)
-                  cfldnew(i,j) = cfld(i,k,j) 
+                  cfldnew(i,j) = cfld(i,j,k) 
                END DO
             END DO
 
@@ -1239,7 +1227,7 @@
    
             DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
             DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
-                  cfldnew(i,j) = 0.25 * ( cfld(i,k,j+1) + 2.*cfld(i,k,j) + cfld(i,k,j-1) )
+                  cfldnew(i,j) = 0.25 * ( cfld(i,j+1,k) + 2.*cfld(i,j,k) + cfld(i,j-1,k) )
                END DO
             END DO
 
@@ -1247,7 +1235,7 @@
        
             DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
             DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
-                  cfld(i,k,j) =  0.25 * ( cfldnew(i+1,j) + 2.*cfldnew(i,j) + cfldnew(i-1,j) )
+                  cfld(i,j,k) =  0.25 * ( cfldnew(i+1,j) + 2.*cfldnew(i,j) + cfldnew(i-1,j) )
                END DO
             END DO
        
@@ -1258,9 +1246,9 @@
    END SUBROUTINE sm121
 
    SUBROUTINE smdsm ( cfld , &
-                      cids, cide, ckds, ckde, cjds, cjde,   &
+                      cids, cide, cjds, cjde, ckds, ckde,   &
                       xstag, ystag,                         &  ! staggering of field
-                      nids, nide, nkds, nkde, njds, njde,   &
+                      nids, nide, njds, njde, nkds, nkde,   &
                       nri, nrj,                             &  
                       ipos, jpos                            &  ! Position of lower left of nest in 
                       )
@@ -1273,7 +1261,7 @@
                              ipos, jpos
       LOGICAL, INTENT(IN) :: xstag, ystag
    
-      REAL, DIMENSION ( cids:cide, ckds:ckde, cjds:cjde ) :: cfld
+      REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde ) :: cfld
       REAL, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew
    
       REAL , DIMENSION ( 2 )         :: xnu
@@ -1299,25 +1287,25 @@
    
             DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
                DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
-                  cfldnew(i,j) = cfld(i,k,j) + xnu(n) * ((cfld(i,k,j+1) + cfld(i,k,j-1)) * 0.5-cfld(i,k,j))
+                  cfldnew(i,j) = cfld(i,j,k) + xnu(n) * ((cfld(i,j+1,k) + cfld(i,j-1,k)) * 0.5-cfld(i,j,k))
                END DO
             END DO
        
             DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
                DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
-                  cfld(i,k,j) = cfldnew(i,j)
+                  cfld(i,j,k) = cfldnew(i,j)
                END DO
             END DO
        
             DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
                DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
-                  cfldnew(i,j) = cfld(i,k,j) + xnu(n) * ((cfld(i+1,k,j) + cfld(i-1,k,j)) * 0.5-cfld(i,k,j))
+                  cfldnew(i,j) = cfld(i,j,k) + xnu(n) * ((cfld(i+1,j,k) + cfld(i-1,j,k)) * 0.5-cfld(i,j,k))
                END DO
             END DO
        
             DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)
                DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)
-                  cfld(i,k,j) = cfldnew(i,j)
+                  cfld(i,j,k) = cfldnew(i,j)
                END DO
             END DO
    
@@ -1326,6 +1314,8 @@
       END DO smoothing_passes
    
    END SUBROUTINE smdsm
+
+END MODULE feedback
 
 !==================================
 
