@@ -28,10 +28,9 @@ $(SOLVER) : $(SOLVER).o
 	$(RANLIB) libwrflib.a
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
 
-$(SOLVER)_wrf : wrf.o nup_standalone.o module_nup_feedback.o
+$(SOLVER)_wrf : wrf.o nup_standalone.exe
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
-	$(SFC) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
@@ -58,6 +57,11 @@ real_nmm : real_nmm.o
 convert_nmm : convert_nmm.o
 	$(RANLIB) libwrflib.a
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(LIB)
+
+nup_standalone.exe : 
+	$(SFC) -I$(NETCDFPATH)/include -c module_nup_feedback.F
+	$(SFC) -I$(NETCDFPATH)/include -c nup_standalone.F
+	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
@@ -146,8 +150,11 @@ da_3dvar.o: \
 	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
-nup_standalone.o: \
-	module_nup_feedback.o
-	$(SFC) -I$(NETCDFPATH)/include -c nup_standalone.F
+#nup_standalone.o: \
+#	module_nup_feedback.o
+#	$(SFC) -I$(NETCDFPATH)/include -c nup_standalone.F
+
+#module_nup_feedback.o : \
+#	$(SFC) -I$(NETCDFPATH)/include -c module_nup_feedback.F
 
 # DO NOT DELETE
