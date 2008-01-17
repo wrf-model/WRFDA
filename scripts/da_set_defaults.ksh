@@ -225,6 +225,7 @@ export PTOP_PA=${PTOP_PA:-5000.0}
 
 # WRF-Var (not covered above):
 export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.
+export NL_MULTI_INC=${NL_MULTI_INC:-0}  # Analysis type.
 export NL_VAR4D=${NL_VAR4D:-false}
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}                   # Background error covariance directory.
