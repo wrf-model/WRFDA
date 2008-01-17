@@ -561,15 +561,6 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
       do n = 1, iv%info(polaramv)%nlocal               
          if (.not. iv%info(polaramv)%proc_domain(1,n)) cycle
-         write(stdout,*) &
-            iv%info(polaramv)%platform(n),    &
-            iv%info(polaramv)%date_char(n),   &
-            iv%info(polaramv)%name(n),        &
-            iv%info(polaramv)%levels(n),      &
-            iv%info(polaramv)%lat(1,n),         &
-            iv%info(polaramv)%lon(1,n),         &
-            iv%info(polaramv)%elv(n),         &
-            iv%info(polaramv)%id(n)
          write(ounit, fmt = fmt_info, iostat = iost) &
             iv%info(polaramv)%platform(n),    &
             iv%info(polaramv)%date_char(n),   &
@@ -581,8 +572,6 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             iv%info(polaramv)%id(n)
 
          write(ounit, fmt = fmt_srfc) &
-            iv%info(polaramv)%slp(n), iv%info(polaramv)%pw(n)
-         write(stdout, *) &
             iv%info(polaramv)%slp(n), iv%info(polaramv)%pw(n)
 
          do k = 1, iv%info(polaramv)%levels(n)
@@ -628,21 +617,21 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
 
       do n = 1, iv%info(sound)%nlocal               
          if (.not. iv%info(sound)%proc_domain(1,n)) cycle
-         if (iv%info(sound)%platform(n) /= iv%info(sound)%platform(n) .or. &
-             iv%info(sound)%lat(1,n)    /= iv%info(sound)%lat(1,n)      .or. &
-             iv%info(sound)%lon(1,n)    /= iv%info(sound)%lon(1,n)      .or. &
-             iv%info(sound)%elv(n)      /= iv%info(sound)%elv(n)      .or. &
-             iv%info(sound)%id(n)       /= iv%info(sound)%id(n)      ) then
+         if (iv%info(sonde_sfc)%platform(n) /= iv%info(sound)%platform(n) .or. &
+             iv%info(sonde_sfc)%lat(1,n)    /= iv%info(sound)%lat(1,n)      .or. &
+             iv%info(sonde_sfc)%lon(1,n)    /= iv%info(sound)%lon(1,n)      .or. &
+             iv%info(sonde_sfc)%elv(n)      /= iv%info(sound)%elv(n)      .or. &
+             iv%info(sonde_sfc)%id(n)       /= iv%info(sound)%id(n)      ) then
             write(unit=stderr,fmt='(A)')' Surface Sound Details:            '
             write(unit=stderr, fmt=fmt_info) &
-               iv%info(sound)%platform(n),    &
-               iv%info(sound)%date_char(n),   &
-               iv%info(sound)%name(n),        &
-               iv%info(sound)%levels(n),      &
-               iv%info(sound)%lat(1,n),         &
-               iv%info(sound)%lon(1,n),         &
-               iv%info(sound)%elv(n),         &
-               iv%info(sound)%id(n)
+               iv%info(sonde_sfc)%platform(n),    &
+               iv%info(sonde_sfc)%date_char(n),   &
+               iv%info(sonde_sfc)%name(n),        &
+               iv%info(sonde_sfc)%levels(n),      &
+               iv%info(sonde_sfc)%lat(1,n),         &
+               iv%info(sonde_sfc)%lon(1,n),         &
+               iv%info(sonde_sfc)%elv(n),         &
+               iv%info(sonde_sfc)%id(n)
 
             write(unit=stderr,fmt='(A)') ' Upper level  Details: '
             write(unit=stderr, fmt=fmt_info) &
@@ -658,7 +647,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
                (/"Mismatch for Sound surface and upper air report"/))
          end if
          nz = 0
-         if (iv%info(sound)%zk(1,n) == missing_r) then
+         if (iv%info(sonde_sfc)%zk(1,n) == missing_r) then
             nz = nz + 1
          end if
 
@@ -675,17 +664,17 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          nz = iv%info(sound)%levels(n) + 1 - nz
          if (nz < 1) cycle
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%info(sound)%platform(k),    &
-            iv%info(sound)%date_char(k),   &
-            iv%info(sound)%name(k),        &
+            iv%info(sound)%platform(n),    &
+            iv%info(sound)%date_char(n),   &
+            iv%info(sound)%name(n),        &
             nz,                           &
             iv%info(sound)%lat(1,n),         &
             iv%info(sound)%lon(1,n),         &
-            iv%info(sound)%elv(k),         &
-            iv%info(sound)%id(k)
-            ! iv%info(sound)%levels(k) + 1,  &
-         slp_inv= iv%info(sound)%slp(k)%inv
-         slp_qc = iv%info(sound)%slp(k)%qc
+            iv%info(sound)%elv(n),         &
+            iv%info(sound)%id(n)
+            ! iv%info(sound)%levels(n) + 1,  &
+         slp_inv= iv%info(sound)%slp(n)%inv
+         slp_qc = iv%info(sound)%slp(n)%qc
          if (iv%sonde_sfc(n)%p%qc <= fails_error_max) then
             slp_inv = missing_r
             slp_qc  = missing_data
@@ -698,7 +687,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          j  = 0
 
          ! Not below the first model level
-         if (iv%info(sound)%zk(1,n) == missing_r) then
+         if (iv%info(sonde_sfc)%zk(1,n) == missing_r) then
             nz = nz + 1
          else
             j = j + 1
