@@ -214,7 +214,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          ! Do not write out the data below the lowest model level:
          if (iv%info(metar)%zk(1,n) == missing_r) cycle
 
-         nlevels = iv%info(metar)%levels(k)
+         nlevels = iv%info(metar)%levels(n)
          if (iv%info(metar)%levels(n)> 1) then
             write(stdout,fmt='(3A,I5,A)') &
                ' for METAR station ',iv%info(metar)%name(n),' got levels ',&
