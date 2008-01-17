@@ -998,11 +998,11 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             iv%info(qscat)%elv(n),         &
             iv%info(qscat)%id
 
-         write(ounit, fmt = fmt_srfc) iv%info(qscat)%slp(k), iv%info(qscat)%pw(k)
+         write(ounit, fmt = fmt_srfc) iv%info(qscat)%slp(n), iv%info(qscat)%pw(n)
 
          ! get speed and direction
-         if (iv%qscat(k)%u%qc >= obs_qc_pointer .and. &
-             iv%qscat(k)%v%qc >= obs_qc_pointer) then  
+         if (iv%qscat(n)%u%qc >= obs_qc_pointer .and. &
+             iv%qscat(n)%v%qc >= obs_qc_pointer) then  
             uu = ob%qscat(n)%u
             vv = ob%qscat(n)%v
             call da_ffdduv(speed, dir, uu, vv, iv%info(qscat)%lon(1,n), &
@@ -1017,9 +1017,9 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          end if
 
          write(ounit, fmt = trim (fmt_each))          &
-            iv%qscat(k)%h,iv%qscat(k)%u%qc,slp_error, &  
-            speed,iv%qscat(k)%u%qc,speed_error,       &
-            dir  ,iv%qscat(k)%u%qc,dir_error,         &
+            iv%qscat(n)%h,iv%qscat(n)%u%qc,slp_error, &  
+            speed,iv%qscat(n)%u%qc,speed_error,       &
+            dir  ,iv%qscat(n)%u%qc,dir_error,         &
             iv%info(qscat)%elv(n), zero, elv_error,    &
             missing_r, missing_data, xmiss,           & 
             missing_r, missing_data, xmiss,           & 
