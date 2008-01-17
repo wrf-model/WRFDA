@@ -989,10 +989,10 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
          if (.not. iv%info(qscat)%proc_domain(1,n)) cycle
 
          write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%info(qscat)%platform(k),    &
-            iv%info(qscat)%date_char(k),   &
-            iv%info(qscat)%name(k),        &
-            iv%info(qscat)%levels(k),      &
+            iv%info(qscat)%platform(n),    &
+            iv%info(qscat)%date_char(n),   &
+            iv%info(qscat)%name(n),        &
+            iv%info(qscat)%levels(n),      &
             iv%info(qscat)%lat(1,n),         &
             iv%info(qscat)%lon(1,n),         &
             iv%info(qscat)%elv(n),         &
@@ -1200,7 +1200,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             iv%info(gpsref) %id(n)
          write(ounit, fmt = fmt_srfc) iv%info(gpsref)%slp(n), iv%info(gpsref)%pw(n)
 
-         do k = 1, iv%info(gpsref)%levels(k)
+         do k = 1, iv%info(gpsref)%levels(n)
 
             ! get RH from Q & T    
             if (iv%gpsref(n)%q(k)%qc >= obs_qc_pointer .and.  &
