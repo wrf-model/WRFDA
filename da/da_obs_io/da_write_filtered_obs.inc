@@ -996,7 +996,7 @@ subroutine da_write_filtered_obs(grid, ob, iv, &
             iv%info(qscat)%lat(1,n),         &
             iv%info(qscat)%lon(1,n),         &
             iv%info(qscat)%elv(n),         &
-            iv%info(qscat)%id
+            iv%info(qscat)%id(n)
 
          write(ounit, fmt = fmt_srfc) iv%info(qscat)%slp(n), iv%info(qscat)%pw(n)
 
