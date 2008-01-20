@@ -83,9 +83,6 @@ endif
 if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}) then
    setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}) then
-   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
-endif
 if (-d ${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}) then
    setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}
 endif
@@ -95,32 +92,8 @@ endif
 if (-d ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}) then
    setenv LAPACK ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}) then
-   setenv FFTPACK ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}) then
-   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}
-endif
 if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}) then
    setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}) then
-   setenv ZLIB ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}) then
-   setenv JPEG ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}) then
-   setenv HDF4 ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}) then
-   setenv HDF5 ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}) then
-   setenv HDFEOS ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}
-endif
-if (-d ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}) then
-   setenv JASPER ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}
 endif
 if (-d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}) then
    setenv PNETCDF ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}
@@ -171,32 +144,8 @@ endif
 if ($?LAPACK) then
    echo "LAPACK          " $LAPACK
 endif
-if ($?FFTPACK) then
-   echo "FFTPACK         " $FFTPACK
-endif
-if ($?BUFR) then
-   echo "BUFR            " $BUFR
-endif
 if ($?MAKEDEPF90) then
    echo "MAKEDEPF90      " $MAKEDEPF90
-endif
-if ($?ZLIB) then
-   echo "ZLIB            " $ZLIB
-endif
-if ($?JPEG) then
-   echo "JPEG            " $JPEG
-endif
-if ($?HDF4) then
-   echo "HDF4            " $HDF4
-endif
-if ($?HDF5) then
-   echo "HDF5            " $HDF5
-endif
-if ($?HDFEOS) then
-   echo "HDFEOS          " $HDFEOS
-endif
-if ($?JASPER) then
-   echo "JASPER          " $JASPER
 endif
 if ($?PNETCDF) then
    echo "PNETCDF         " $PNETCDF

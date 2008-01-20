@@ -60,9 +60,6 @@ fi
 if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}; then
   export NETCDF=${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}; then
-   export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
-fi
 if test -d ${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}; then
    export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.6p1/${COMPILER}_${PROCESSOR}
 fi
@@ -72,32 +69,8 @@ fi
 if test -d ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}; then
    export LAPACK=${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}; then
-   export FFTPACK=${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}; then
-   export BUFR=${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}
-fi
 if test -d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}; then
    export MAKEDEPF90=${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}; then
-   export ZLIB=${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}; then
-   export JPEG=${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}; then
-   export HDF4=${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}; then
-   export HDF5=${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}; then
-   export HDFEOS=${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}
-fi
-if test -d ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}; then
-   export JASPER=${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}
 fi
 if test -d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}; then
    export PNETCDF=${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}
@@ -132,15 +105,7 @@ echo "MPIHOME         " $MPIHOME
 echo "NETCDF          " $NETCDF
 echo "BLAS            " $BLAS
 echo "LAPACK          " $LAPACK
-echo "FFTPACK         " $FFTPACK
-echo "BUFR            " $BUFR
 echo "MAKEDEPF90      " $MAKEDEPF90
-echo "ZLIB            " $ZLIB        
-echo "JPEG            " $JPEG        
-echo "HDF4            " $HDF4        
-echo "HDF5            " $HDF5        
-echo "HDFEOS          " $HDFEOS
-echo "JASPER          " $JASPER      
 echo "PNETCDF         " $PNETCDF     
 echo "SUBMIT          " $SUBMIT
 if test "$SUBMIT_OPTIONS1." != '.'; then
