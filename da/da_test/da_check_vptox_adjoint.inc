@@ -125,7 +125,8 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    adj_par_lhs = sum(grid%xa%rho(its:ite,jts:jte,:)**2)/typical_rho_rms**2 + &
       adj_par_lhs
 
-   if (use_radarobs) then
+!   if (use_radarobs) then
+   if (use_radarobs .or. use_rad) then
       adj_par_lhs = adj_par_lhs &
                 + sum(grid%xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
@@ -137,6 +138,17 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
       adj_par_lhs = sum(grid%xa % rh(its:ite,jts:jte,:)**2) / &
          typical_rh_rms**2 + adj_par_lhs
    end if
+
+!
+   if (Use_Radar_rf .or. crtm_cloud) then
+      adj_par_lhs = sum(grid%xa % qcw(its:ite,jts:jte,kts:kte)**2) / &
+         typical_qcw_rms**2 + adj_par_lhs
+      adj_par_lhs = sum(grid%xa % qrn(its:ite,jts:jte,kts:kte)**2) / &
+         typical_qrn_rms**2 + adj_par_lhs
+      adj_par_lhs = sum(grid%xa % qt (its:ite,jts:jte,kts:kte)**2) / &
+         typical_q_rms**2 + adj_par_lhs
+   end if
+
 
    !-------------------------------------------------------------------------
    ! [4.0] Rescale input to adjoint routine:
@@ -151,7 +163,8 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    grid%xa % p(:,:,:) = grid%xa % p(:,:,:) / typical_p_rms**2
    grid%xa % rho(:,:,:) = grid%xa % rho(:,:,:) / typical_rho_rms**2
 
-   if (use_radarobs) then
+!   if (use_radarobs) then
+   if (use_radarobs .or. use_rad) then
       grid%xa %wh(:,:,:) = grid%xa %wh(:,:,:) / typical_w_rms**2
       grid%xa % w(:,:,:) = 0.0
    else
@@ -161,6 +174,14 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    if (cv_options_hum == cv_options_hum_relative_humidity) then
       grid%xa % rh(:,:,:) = grid%xa % rh(:,:,:) / typical_rh_rms**2
    end if
+
+!
+   if (Use_Radar_rf .or. crtm_cloud) then
+      grid%xa % qcw(:,:,:) = grid%xa % qcw(:,:,:) / typical_qcw_rms**2
+      grid%xa % qrn(:,:,:) = grid%xa % qrn(:,:,:) / typical_qrn_rms**2
+      grid%xa % qt (:,:,:) = grid%xa % qt (:,:,:) / typical_q_rms**2
+   end if
+
    
    !-------------------------------------------------------------------------
    ! [5.0] Perform adjoint operation:

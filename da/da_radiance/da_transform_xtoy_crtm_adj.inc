@@ -9,6 +9,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    !           3. adjoint of interpolation from model grid to obs loc
    !
    !  HISTORY: 11/19/2006 - Creation            Zhiquan Liu
+   !           01/11/2008 - Add crtm_cloud      Xiaoyan Zhang
    !
    !---------------------------------------------------------------------------
 
@@ -20,12 +21,21 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
 #ifdef CRTM
 
+   integer                        :: icld 
    integer                        :: k  ! Index dimension.
    integer                        :: num_rad  ! Number of radiance obs
    integer                        :: inst, nchanl, n
    real, allocatable              :: q_ad(:,:)
    real, allocatable              :: t(:,:)
    real, allocatable              :: p(:)
+
+!! for crtm_cloud
+   real, allocatable              :: qcw(:,:)
+   real, allocatable              :: qci(:,:)
+   real, allocatable              :: qrn(:,:)
+   real, allocatable              :: qsn(:,:)
+   real, allocatable              :: qgr(:,:)
+
 !   type(infa_type), pointer       :: info                
 !   integer                        :: i,j
 !   real                           :: dx,dy,dxm,dym
@@ -84,6 +94,14 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
       allocate (q_ad(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (t(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (p(iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+
+      if (crtm_cloud) then
+         allocate (qcw(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qci(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qrn(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qsn(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qgr(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+      end if
 
 !      info => iv%instid(inst)%info
 
@@ -144,18 +162,18 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             Atmosphere(1)%temperature(k) = iv%instid(inst)%tm(k,n)
             Atmosphere(1)%absorber(k,1) = iv%instid(inst)%qm(k,n)
            if (crtm_cloud) then
-            Atmosphere(1)%cloud(1)%water_content(k)=iv%instid(inst)%qcw(k,n)
-            Atmosphere(1)%cloud(2)%water_content(k)=iv%instid(inst)%qci(k,n)
-            Atmosphere(1)%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
-            Atmosphere(1)%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
-            Atmosphere(1)%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
-            Atmosphere(1)%cloud(6)%water_content(k)=iv%instid(inst)%qhl(k,n)
-            Atmosphere(1)%cloud(1)%effective_radius(k)=iv%instid(inst)%rcw(k,n)
-            Atmosphere(1)%cloud(2)%effective_radius(k)=iv%instid(inst)%rci(k,n)
-            Atmosphere(1)%cloud(3)%effective_radius(k)=iv%instid(inst)%rrn(k,n)
-            Atmosphere(1)%cloud(4)%effective_radius(k)=iv%instid(inst)%rsn(k,n)
-            Atmosphere(1)%cloud(5)%effective_radius(k)=iv%instid(inst)%rgr(k,n)
-            Atmosphere(1)%cloud(6)%effective_radius(k)=iv%instid(inst)%rhl(k,n)
+              Atmosphere(1)%cloud(1)%water_content(k)=iv%instid(inst)%qcw(k,n)
+              Atmosphere(1)%cloud(2)%water_content(k)=iv%instid(inst)%qci(k,n)
+              Atmosphere(1)%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
+              Atmosphere(1)%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
+              Atmosphere(1)%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
+              Atmosphere(1)%cloud(6)%water_content(k)=iv%instid(inst)%qhl(k,n)
+              Atmosphere(1)%cloud(1)%effective_radius(k)=iv%instid(inst)%rcw(k,n)
+              Atmosphere(1)%cloud(2)%effective_radius(k)=iv%instid(inst)%rci(k,n)
+              Atmosphere(1)%cloud(3)%effective_radius(k)=iv%instid(inst)%rrn(k,n)
+              Atmosphere(1)%cloud(4)%effective_radius(k)=iv%instid(inst)%rsn(k,n)
+              Atmosphere(1)%cloud(5)%effective_radius(k)=iv%instid(inst)%rgr(k,n)
+              Atmosphere(1)%cloud(6)%effective_radius(k)=iv%instid(inst)%rhl(k,n)
            end if
            end do
 
@@ -274,9 +292,32 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
                  Atmosphere_AD(1)%Level_Pressure(Atmosphere(1)%n_layers)*0.01 
          Atmosphere_AD(1)%Absorber(:,1) = 1000.0*Atmosphere_AD(1)%Absorber(:,1) ! in g/kg
 
+         if (crtm_cloud) then
+            do k=kts,kte
+            do icld=1,Atmosphere(1)%n_Clouds
+
+                Atmosphere_AD(1)%Cloud(icld)%Water_Content(k)=Atmosphere_AD(1)%Cloud(icld)%Water_Content(k) &
+                 * (Atmosphere(1)%Level_Pressure(k)- Atmosphere(1)%Level_Pressure(k-1))*100./gravity
+
+            enddo
+            enddo
+         end if
+
+
             ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
 
             do k=kts,kte ! from bottom to top
+
+               if (crtm_cloud) then
+
+                  qcw(k,n)=Atmosphere_AD(1)%Cloud(1)%Water_Content(kte-k+1)
+                  qci(k,n)=Atmosphere_AD(1)%Cloud(2)%Water_Content(kte-k+1)
+                  qrn(k,n)=Atmosphere_AD(1)%Cloud(3)%Water_Content(kte-k+1)
+                  qsn(k,n)=Atmosphere_AD(1)%Cloud(4)%Water_Content(kte-k+1)
+                  qgr(k,n)=Atmosphere_AD(1)%Cloud(5)%Water_Content(kte-k+1)
+
+               end if    
+
                if (atmosphere(1)%pressure(kte-k+1) < 75.0) then
                   q_ad(k,n) = 0.0
                else
@@ -309,6 +350,14 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
          end do       !  end loop for pixels
 
+        if (crtm_cloud) then
+           call da_interp_lin_2d_adj_partial(jo_grad_x%qcw(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qcw)
+           call da_interp_lin_2d_adj_partial(jo_grad_x%qci(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qci)
+           call da_interp_lin_2d_adj_partial(jo_grad_x%qrn(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qrn)
+           call da_interp_lin_2d_adj_partial(jo_grad_x%qsn(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qsn)
+           call da_interp_lin_2d_adj_partial(jo_grad_x%qgr(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qgr)
+        endif
+
          call da_interp_lin_2d_adj_partial(jo_grad_x%t(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, t)
          call da_interp_lin_2d_adj_partial(jo_grad_x%q(:,:,kts:kte),    iv%instid(inst)%info, kts,kte, q_ad)
          call da_interp_lin_2d_adj_partial(jo_grad_x%psfc, iv%instid(inst)%info, 1,1, p)
@@ -316,6 +365,14 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
          deallocate (q_ad)
          deallocate (t)
          deallocate (p)
+
+         if (crtm_cloud) then
+            deallocate (qcw)
+            deallocate (qci)
+            deallocate (qrn)
+            deallocate (qsn)
+            deallocate (qgr)
+         end if
 
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures

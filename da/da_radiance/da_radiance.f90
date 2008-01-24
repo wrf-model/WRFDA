@@ -47,7 +47,9 @@ module da_radiance
       bufr_satellite_id, bufr_ifov,nchan_amsub, tovs_start, bufr_lat, &
       use_pseudo_rad, pseudo_rad_platid,pseudo_rad_satid, pseudo_rad_senid, &
       pseudo_rad_ichan, pseudo_rad_tb, pseudo_rad_lat,pseudo_rad_lon, &
-      pseudo_rad_err, use_simulated_rad, use_crtm_kmatrix
+      pseudo_rad_err, use_simulated_rad, use_crtm_kmatrix , &
+      use_rad,crtm_cloud, DT_cloud_model
+ 
 #ifdef CRTM
    use da_crtm, only : da_crtm_init
 #endif

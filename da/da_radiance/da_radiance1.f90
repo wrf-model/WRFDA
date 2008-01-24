@@ -18,7 +18,7 @@ module da_radiance1
       print_detail_rad, rtm_option, trace_use_dull, &
       rtm_option_rttov,rtm_option_crtm, radiance, only_sea_rad, &
       global, gas_constant, gravity, monitor_on,kts,kte, &
-      use_pseudo_rad, pi, t_triple, crtm_cloud, write_jacobian
+      use_pseudo_rad, pi, t_triple, crtm_cloud, DT_cloud_model,write_jacobian
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       iv_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
    use da_par_util, only : da_proc_stats_combine

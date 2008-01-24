@@ -41,7 +41,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end if     
 
    ! Compute w increments using Richardson's eqn.
-   if (use_radarobs) then
+   if (Use_RadarObs .or. Use_Rad) then
       do k=kts,kte
          do j=jts,jte
             do i=its,ite
@@ -54,7 +54,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
       call da_uvprho_to_w_adj(grid)
  
-      if (use_radarobs .and. use_radar_rf) then
+      if (Use_radarobs .and. use_radar_rf .or. use_rad .and. crtm_cloud) then
          ! Partition of hydrometeor increments via warm rain process
          call da_moist_phys_adj(grid)
       end if

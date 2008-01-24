@@ -22,10 +22,12 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
 #ifdef CRTM
    integer                        :: k  ! Index dimension.
 
-   integer            :: inst, num_rad, nchanl, n
+   integer            :: inst, num_rad, nchanl, n, icld
    real, allocatable :: temperature(:,:)
    real, allocatable :: absorber(:,:)
    real, allocatable :: psfc(:)
+!! for crtm_cloud
+   real, allocatable :: qcw(:,:),qci(:,:),qrn(:,:),qsn(:,:),qgr(:,:)
 
    ! CRTM local variables and types
    integer :: wmo_sensor_id, Error_Status, Allocate_Status
@@ -132,6 +134,21 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       absorber(:,:)    = 0.0
       psfc(:)          = 0.0
 
+      if (crtm_cloud) then
+
+         allocate (qcw(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qci(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qrn(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qsn(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         allocate (qgr(Atmosphere(1)%n_layers, iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
+         qcw(:,:) = 0.0
+         qci(:,:) = 0.0
+         qrn(:,:) = 0.0
+         qsn(:,:) = 0.0
+         qgr(:,:) = 0.0
+
+      end if
+
       do k=kts,kte ! from bottom to top
          call da_interp_lin_2d_partial (grid%xa%t(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
             temperature(kte-k+1,:))
@@ -140,6 +157,21 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
          do n=iv%instid(inst)%info%n1, iv%instid(inst)%info%n2
             if (iv%instid(inst)%pm(kte-k+1,n) < 75.0) absorber(kte-k+1,n) = 0.0
          end do
+
+      if (crtm_cloud) then
+
+         call da_interp_lin_2d_partial (grid%xa%qcw(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
+            qcw(kte-k+1,:))
+         call da_interp_lin_2d_partial (grid%xa%qci(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
+            qci(kte-k+1,:))
+         call da_interp_lin_2d_partial (grid%xa%qrn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
+            qrn(kte-k+1,:))
+         call da_interp_lin_2d_partial (grid%xa%qsn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
+            qsn(kte-k+1,:))
+         call da_interp_lin_2d_partial (grid%xa%qgr(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, &
+            qgr(kte-k+1,:))
+      end if
+
       end do
 
       call da_interp_lin_2d_partial (grid%xa%psfc, iv%instid(inst)%info, 1, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, psfc(:))
@@ -157,18 +189,18 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
             Atmosphere(1)%temperature(k) = iv%instid(inst)%tm(k,n)
             Atmosphere(1)%absorber(k,1) = iv%instid(inst)%qm(k,n)
            if (crtm_cloud) then
-            Atmosphere(1)%cloud(1)%water_content(k)=iv%instid(inst)%qcw(k,n)
-            Atmosphere(1)%cloud(2)%water_content(k)=iv%instid(inst)%qci(k,n)
-            Atmosphere(1)%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
-            Atmosphere(1)%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
-            Atmosphere(1)%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
-            Atmosphere(1)%cloud(6)%water_content(k)=iv%instid(inst)%qhl(k,n)
-            Atmosphere(1)%cloud(1)%effective_radius(k)=iv%instid(inst)%rcw(k,n)
-            Atmosphere(1)%cloud(2)%effective_radius(k)=iv%instid(inst)%rci(k,n)
-            Atmosphere(1)%cloud(3)%effective_radius(k)=iv%instid(inst)%rrn(k,n)
-            Atmosphere(1)%cloud(4)%effective_radius(k)=iv%instid(inst)%rsn(k,n)
-            Atmosphere(1)%cloud(5)%effective_radius(k)=iv%instid(inst)%rgr(k,n)
-            Atmosphere(1)%cloud(6)%effective_radius(k)=iv%instid(inst)%rhl(k,n)
+              Atmosphere(1)%cloud(1)%water_content(k)=iv%instid(inst)%qcw(k,n)
+              Atmosphere(1)%cloud(2)%water_content(k)=iv%instid(inst)%qci(k,n)
+              Atmosphere(1)%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
+              Atmosphere(1)%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
+              Atmosphere(1)%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
+              Atmosphere(1)%cloud(6)%water_content(k)=iv%instid(inst)%qhl(k,n)
+              Atmosphere(1)%cloud(1)%effective_radius(k)=iv%instid(inst)%rcw(k,n)
+              Atmosphere(1)%cloud(2)%effective_radius(k)=iv%instid(inst)%rci(k,n)
+              Atmosphere(1)%cloud(3)%effective_radius(k)=iv%instid(inst)%rrn(k,n)
+              Atmosphere(1)%cloud(4)%effective_radius(k)=iv%instid(inst)%rsn(k,n)
+              Atmosphere(1)%cloud(5)%effective_radius(k)=iv%instid(inst)%rgr(k,n)
+              Atmosphere(1)%cloud(6)%effective_radius(k)=iv%instid(inst)%rhl(k,n)
            end if
            end do
 
@@ -246,6 +278,23 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
               Atmosphere_TL(1)%Level_Pressure(Atmosphere(1)%n_Layers)= &
                          0.01*Atmosphere_TL(1)%Level_Pressure(Atmosphere(1)%n_Layers)
               Atmosphere_TL(1)%Absorber(:,1) = 1000.0*Atmosphere_TL(1)%Absorber(:,1) ! in g/kg
+     if (crtm_cloud) then
+        Atmosphere_TL(1)%Cloud(1)%Water_Content(kts:kte)             = qcw(kts:kte,n)
+        Atmosphere_TL(1)%Cloud(2)%Water_Content(kts:kte)             = qci(kts:kte,n)
+        Atmosphere_TL(1)%Cloud(3)%Water_Content(kts:kte)             = qrn(kts:kte,n)
+        Atmosphere_TL(1)%Cloud(4)%Water_Content(kts:kte)             = qsn(kts:kte,n)
+        Atmosphere_TL(1)%Cloud(5)%Water_Content(kts:kte)             = qgr(kts:kte,n)
+        Atmosphere_TL(1)%Cloud(6)%Water_Content(kts:kte)             = 0.
+! convert cloud content unit from kg/kg to kg/m^2
+         do k=kts,kte
+         do icld=1,Atmosphere(1)%n_Clouds
+
+            Atmosphere_TL(1)%Cloud(icld)%Water_Content(k)=  Atmosphere_TL(1)%Cloud(icld)%Water_Content(k)* &
+                 (Atmosphere(1)%Level_Pressure(k)- Atmosphere(1)%Level_Pressure(k-1))*100./gravity
+ 
+         enddo
+         enddo
+      end if
 
       ! [1.5] CRTM GeometryInfo Structure
         GeometryInfo(1)%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
@@ -304,6 +353,15 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       deallocate (temperature)
       deallocate (absorber)
       deallocate (psfc)     
+
+      if (crtm_cloud) then
+         deallocate (qcw)
+         deallocate (qci)
+         deallocate (qrn)
+         deallocate (qsn)
+         deallocate (qgr)
+      end if
+
                                                                                                                     
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures

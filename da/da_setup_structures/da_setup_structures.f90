@@ -20,7 +20,7 @@ module da_setup_structures
       use_airsobs, use_bogusobs, sfc_assi_options, use_eos_amsuaobs, &
       use_filtered_rad, use_eos_radobs, use_gpsrefobs, use_hirs2obs, &
       use_hsbobs,use_hirs3obs, use_gpspwobs, use_metarobs, use_msuobs, &
-      use_kma1dvar,use_pilotobs, use_polaramvobs, use_rad, use_soundobs, &
+      use_kma1dvar,use_pilotobs, use_polaramvobs, use_rad, crtm_cloud, use_soundobs, &
       use_ssmt1obs,use_ssmt2obs, use_shipsobs, use_satemobs, use_synopobs, &
       use_radar_rv,use_profilerobs, use_obsgts, use_geoamvobs, use_buoyobs, &
       alphacv_method,its,ite,jts,jte,cv_size_domain_jb, &

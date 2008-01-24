@@ -21,7 +21,7 @@ module da_vtox_transforms
       vertical_ip,alphacv_method,use_radarobs,use_radar_rf,use_ssmitbobs, &
       use_ssmiretrievalobs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
       use_gpsrefobs,sfc_assi_options, test_transforms, vert_corr, fg_format, &
-      fg_format_kma_global, fg_format_wrf, ids,ide, stdout, vert_corr_2, &
+      fg_format_kma_global, fg_format_wrf, ids, ide, stdout, use_rad, crtm_cloud, vert_corr_2, &
       alphacv_method_vp, alphacv_method_xa, vertical_ip_0, trace_use_dull
    use da_define_structures, only : be_type, xbx_type,da_zero_vp_type,da_zero_x
    use da_dynamics, only : da_psichi_to_uv,da_psichi_to_uv_adj

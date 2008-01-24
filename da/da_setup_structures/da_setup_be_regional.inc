@@ -72,7 +72,7 @@ subroutine da_setup_be_regional(xb, be)
    be % v4 % name = 'q/qsg'
    be % v5 % name = 'psfc'            ! surface pressure
 !clq
-   if(use_radarobs .and. use_radar_rf) then
+   if(use_radarobs .and. use_radar_rf .or. use_rad .and. crtm_cloud) then  
    be % v4 % name = 'qt   '
    end if
 !clq end

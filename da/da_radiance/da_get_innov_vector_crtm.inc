@@ -41,6 +41,8 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    real    :: v_p(kms:kme)  ! Model value p at ob hor. location.
    real    :: model_qcw(kms:kme)
    real    :: model_rho(kms:kme)
+   real    :: model_qrn(kms:kme)
+   real    :: model_qci(kms:kme)
    real, allocatable :: model_snow(:)  ! snow water equivalent, different from model_snowh,
                                        ! used in calculating reff_water
 
@@ -61,6 +63,9 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    type (CRTM_GeometryInfo_type) :: GeometryInfo(1)
 
    real :: t(1), a(1)
+
+!! for crtm cloud
+   real :: qcw(1),qrn(1), qci(1),qsn(1),qgr(1)
 
    ! WHY? use argument it
    if (it==0) then; write(unit=stdout,fmt='(A)') "WHY? have argument it to"//__FILE__; end if
@@ -210,27 +215,25 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere(1)%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d_partial (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, model_qcw(kte-k+1:kte-k+1))
+            call da_interp_lin_2d_partial (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, qcw)
+              model_qcw(kte-k+1)=qcw(1)
             
             if (crtm_cloud) then
-               Atmosphere(1)%Cloud(1)%Water_Content(kte-k+1) = model_qcw(kte-k+1)
 
-               call da_interp_lin_2d_partial (grid%xb%qci(:,:,k), iv%instid(inst)%info,k,n,n, &
-                  Atmosphere(1)%Cloud(2)%Water_Content(kte-k+1:kte-k+1) )
+               call da_interp_lin_2d_partial (grid%xb%qci(:,:,k), iv%instid(inst)%info,k,n,n,qci)
 
+               call da_interp_lin_2d_partial (grid%xb%qrn(:,:,k), iv%instid(inst)%info,k,n,n,qrn)
+ 
+               call da_interp_lin_2d_partial (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k,n,n,qsn)
+ 
+               call da_interp_lin_2d_partial (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k,n,n,qgr)
 
-               call da_interp_lin_2d_partial (grid%xb%qrn(:,:,k), iv%instid(inst)%info,k,n,n, &
-                  Atmosphere(1)%Cloud(3)%Water_Content(kte-k+1:kte-k+1) )
-
-
-               call da_interp_lin_2d_partial (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k,n,n, &
-                  Atmosphere(1)%Cloud(4)%Water_Content(kte-k+1:kte-k+1) )
-
-
-               call da_interp_lin_2d_partial (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k,n,n, &
-                  Atmosphere(1)%Cloud(5)%Water_Content(kte-k+1:kte-k+1) )
-
-               Atmosphere(1)%Cloud(6)%Water_Content(kte-k+1) = 0.0
+               Atmosphere(1)%Cloud(1)%Water_Content(kte-k+1)=model_qcw(kte-k+1)
+               Atmosphere(1)%Cloud(2)%Water_Content(kte-k+1)=qci(1)
+               Atmosphere(1)%Cloud(3)%Water_Content(kte-k+1)=qrn(1)
+               Atmosphere(1)%Cloud(4)%Water_Content(kte-k+1)=qsn(1)
+               Atmosphere(1)%Cloud(5)%Water_Content(kte-k+1)=qgr(1)
+               Atmosphere(1)%Cloud(6)%Water_Content(kte-k+1)=0.0
 
                call da_interp_lin_2d_partial (grid%xb%rho(:,:,k), iv%instid(inst)%info, k,n,n, &
                   model_rho(k:k) )

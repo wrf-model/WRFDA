@@ -16,6 +16,8 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
 
    ! thinning variables
    integer  :: istart,iend,jstart,jend
+   ! crtm_cloud
+   integer  :: n1,n2,k,ks,ke,inst
    
    if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
 
@@ -207,6 +209,38 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
          ob % instid(i) % tb(:,:) = iv % instid(i) % tb_inv(:,:)
       end do
    end if
+
+! Calculate DT for Cloudy Radiance DA
+
+   if (use_rad .and. crtm_cloud) then
+    ks = grid%xp % kts
+    ke = grid%xp % kte
+
+      if (.not. DT_cloud_model) then
+         do j = grid%xp%jts, grid%xp%jte
+            do i = grid%xp%its, grid%xp%ite
+               do k = ks,ke
+                   grid%xb%delt(i,j,k) = 0.0
+               end do
+            end do
+          end do
+
+
+    do inst= 1, iv % num_inst
+        do n=1,iv%instid(inst)%num_rad
+        do i=int(iv%instid(inst)%info%i(1,n)),int(iv%instid(inst)%info%i(1,n))+1
+           do j =int(iv%instid(inst)%info%j(1,n)), int(iv%instid(inst)%info%j(1,n))+1
+               do k = ks,ke
+                grid%xb%delt(i,j,k) = 1800.0
+               end do
+           end do
+        end do
+       end do
+    end do
+
+    endif
+   endif
+
 
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
