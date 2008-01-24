@@ -250,6 +250,10 @@ subroutine da_moist_phys_lin(grid)
    grid%xa%qcw (its:ite,jts:jte,kds:kde) = QCW_NEW(its:ite,jts:jte,kds:kde) + QCW_OLD(its:ite,jts:jte,kds:kde)
    grid%xa%qrn (its:ite,jts:jte,kds:kde) = QRN_NEW(its:ite,jts:jte,kds:kde) + QRN_OLD(its:ite,jts:jte,kds:kde)
 
+#ifdef DM_PARALLEL
+#include "HALO_XA.inc"
+#endif
+
    if (trace_use) call da_trace_exit("da_moist_phys_lin")
 
 end subroutine da_moist_phys_lin
