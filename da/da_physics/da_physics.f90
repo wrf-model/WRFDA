@@ -8,7 +8,7 @@ module da_physics
 #ifdef DM_PARALLEL
    use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, &
       ntasks_y, data_order_xyz
-   use module_comm_dm, only : halo_bal_eqn_adj_sub, halo_xa_sub
+   use module_comm_dm, only : halo_bal_eqn_adj_sub, halo_xa_cloud_sub
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
    use da_define_structures, only : synop_type, residual_synop_type, infa_type, iv_type
