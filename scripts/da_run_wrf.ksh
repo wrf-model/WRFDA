@@ -16,9 +16,7 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
-if $NL_VAR4D; then
-   export NL_RUN_HOURS=$FCST_RANGE
-fi
+export NL_RUN_HOURS=$FCST_RANGE
 
 # allow for ensemble members identified by CMEM
 if [[ ! -z $CMEM ]]; then
