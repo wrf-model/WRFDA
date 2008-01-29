@@ -68,8 +68,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
              + sum(grid%xa % qt (its:ite, jts:jte, kts:kte)**2)/typical_q_rms**2
    end if
 
-!   if (use_radarobs) then
-   if (use_radarobs .or. use_rad) then
+   if (use_radarobs) then
       adj_par_lhs = adj_par_lhs &
          + sum(grid%xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
@@ -95,7 +94,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
    end if
 
 !
-   if (Use_Radar_rf .or.  crtm_cloud ) then
+   if (use_radar_rf .or.  crtm_cloud ) then
       grid%xa % qcw(:,:,:) = grid%xa % qcw(:,:,:) / typical_qcw_rms**2
       grid%xa % qrn(:,:,:) = grid%xa % qrn(:,:,:) / typical_qrn_rms**2
       grid%xa % qt (:,:,:) = grid%xa % qt (:,:,:) / typical_q_rms**2
@@ -104,8 +103,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
 
 
 
-!   if (use_radarobs) then
-   if (use_radarobs .or. use_rad ) then
+   if (use_radarobs) then
       grid%xa %wh(:,:,:) = grid%xa %wh(:,:,:) / typical_w_rms**2
       grid%xa % w(:,:,:) = 0.0
    else
