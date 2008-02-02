@@ -80,6 +80,8 @@ subroutine da_read_pseudo_rad (iv)
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  
    
+   i = 1
+
    if ( iv%instid(inst)%num_rad > 0 ) then
       if (rtm_option == rtm_option_crtm) then
          iv%instid(inst)%nlevels = kme-kms+1
