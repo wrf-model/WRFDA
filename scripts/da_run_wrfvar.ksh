@@ -243,7 +243,8 @@ if [[ -d $OBS_TUNING_DIR ]]; then
    ln -fs $OBS_TUNING_DIR/* .
 fi
 
-ln -fs $WRFVAR_DIR/run/radiance_info .
+export RADIANCE_INFO_DIR=${RADIANCE_INFO_DIR:-$WRFVAR_DIR/run/radiance_info}
+ln -fs $RADIANCE_INFO_DIR .
 
 if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
    if $NL_VAR4D; then
