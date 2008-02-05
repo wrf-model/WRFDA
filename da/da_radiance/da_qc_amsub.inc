@@ -47,6 +47,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
          ! 0.0  initialise QC flags by assuming good obs
          !---------------------------------------------
          iv%instid(i)%tb_qc(:,n) = qc_good
+         if (crtm_cloud) go to 2508
 
          ! a.  reject all channels over mixture surface type
          !------------------------------------------------------
@@ -120,16 +121,20 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
            if (satinfo(i)%iuse(k) .eq. -1) &
                 iv%instid(i)%tb_qc(k,n) = qc_bad
          end do
+ 
+2508      continue
 
          !  f. check innovation
          !-----------------------------------------------------------
          do k = 1, nchan
           ! absolute departure check
+          if (.not. crtm_cloud) then
             if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1
             end if
+          end if 
 
           ! relative departure check
             if (use_error_factor_rad) then
@@ -139,6 +144,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
                  iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
             end if
 
+          if (.not. crtm_cloud) then
             if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%info%proc_domain(1,n)) &
@@ -154,6 +160,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   ngood(k) = ngood(k) + 1
             end if
+          end if
 
          end do ! chan
       end do ! end loop pixel
