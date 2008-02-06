@@ -39,7 +39,10 @@ module da_setup_structures
       bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte, &
       use_simulated_rad, use_pseudo_rad, pseudo_rad_platid, pseudo_rad_satid, &
       pseudo_rad_senid, rtminit_nsensor, rtminit_platform, rtminit_satid, &
-      rtminit_sensor, thinning, qc_rad
+      rtminit_sensor, thinning, qc_rad,& 
+      num_pseudo,pseudo_x, pseudo_y, pseudo_z, pseudo_var,pseudo_val, pseudo_err,&
+      fg_format, fg_format_kma_global
+
    use da_obs, only : da_fill_obs_structures, da_store_obs_grid_info
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
       da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
