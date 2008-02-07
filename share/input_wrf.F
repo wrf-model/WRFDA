@@ -47,7 +47,7 @@
     LOGICAL dryrun
     INTEGER idt
     INTEGER itmp
-    INTEGER dyn_opt_tmp, dyn_opt, filestate, ierr3
+    INTEGER dyn_opt, filestate, ierr3
     INTEGER :: ide_compare , jde_compare , kde_compare
     REAL , DIMENSION(16) :: lats16 , lons16
     CHARACTER (len=19) simulation_start_date
@@ -180,7 +180,6 @@
     ! do the check later (see check_if_dryrun below)
 
     CALL nl_get_dyn_opt( 1, dyn_opt )
-    CALL wrf_get_dom_ti_integer ( fid, 'DYN_OPT', dyn_opt_tmp, 1, icnt, ierr )
 
     !  We do not want the CEN_LAT LON values from the boundary file.  For 1-way nests
     !  with ndown, this ends up being the data from the previous coarse domain.
@@ -462,11 +461,6 @@
 
 #endif
 
-
-    IF ( dyn_opt_tmp .NE. dyn_opt .AND. switch .EQ. model_input_only ) THEN
-      WRITE(wrf_err_message,*)'input_wrf: dyn_opt in file ',dyn_opt_tmp,' NE namelist ',dyn_opt
-      CALL wrf_error_fatal( wrf_err_message )
-    ENDIF
 
     ENDIF check_if_dryrun 
 
