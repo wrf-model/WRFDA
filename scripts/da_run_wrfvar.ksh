@@ -104,6 +104,9 @@ fi
 if [[ -d $OBS_TUNING_DIR ]] ; then
    echo "OBS_TUNING_DIR        $OBS_TUNING_DIR"
 fi
+if [[ -f $DA_VARBC_IN ]]; then
+   echo "DA_VARBC_IN          $DA_VARBC_IN"
+fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RC_DIR                <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR                <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
@@ -241,6 +244,10 @@ fi
 
 if [[ -d $OBS_TUNING_DIR ]]; then
    ln -fs $OBS_TUNING_DIR/* .
+fi
+
+if [[ -f $DA_VARBC_IN ]]; then
+   ln -fs $DA_VARBC_IN "VARBC.in"
 fi
 
 export RADIANCE_INFO_DIR=${RADIANCE_INFO_DIR:-$WRFVAR_DIR/run/radiance_info}

@@ -58,37 +58,14 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (iv%info(ssmi_rv)%nlocal        > 0) call da_get_innov_vector_ssmi_rv  (it, grid, ob, iv)
       if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt1    (it, grid, ob, iv)
       if (iv%info(ssmt2)%nlocal          > 0) call da_get_innov_vector_ssmt2    (it, grid, ob, iv)
-      if (iv%info(satem)%nlocal          > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
+      if (iv%info(satem)%nlocal          > 0) call da_get_innov_vector_satem    (grid, it, ob, iv)
       if (iv%info(radar)%nlocal          > 0) call da_get_innov_vector_radar    (it, grid, ob, iv)
       if (iv%info(qscat)%nlocal          > 0) call da_get_innov_vector_qscat    (it, grid, ob, iv)
       if (iv%info(profiler)%nlocal       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
       if (iv%info(buoy)%nlocal           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
-
-#if defined(CRTM) || defined(RTTOV)
-      if (iv%num_inst > 0) then
-         iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
-         iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
-         if (rtm_option == rtm_option_rttov) then
-            call da_get_innov_vector_rttov( it, grid, ob, iv )
-         elseif (rtm_option == rtm_option_crtm) then
-#ifdef CRTM
-           !if (use_crtm_kmatrix_fast) then
-           !   call da_get_innov_vector_crtmk( it, grid, ob, iv )
-           !else
-           if (use_crtm_kmatrix) then
-              call da_get_innov_vector_crtmk( it, grid, ob, iv )
-           else
-              call da_get_innov_vector_crtm (it, grid, ob, iv )
-           end if
-#endif
-         else
-            call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
-         end if
-      end if
-#endif
-
-      if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid, ob, iv)
-      if (iv%info(airsr)%nlocal > 0) call da_get_innov_vector_airsr  (it, grid, ob, iv)
+      if (iv%info(radiance)%ntotal       > 0) call da_get_innov_vector_radiance (it, grid, ob, iv)
+      if (num_pseudo                     > 0) call da_get_innov_vector_pseudo   (grid, ob, iv)
+      if (iv%info(airsr)%nlocal          > 0) call da_get_innov_vector_airsr    (it, grid, ob, iv)
 
    !----------------------------------------------
    ! [5]  write out iv in ascii format

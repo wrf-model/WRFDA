@@ -28,8 +28,7 @@ module da_crtm
       rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte
    use da_interpolation, only : da_interp_lin_2d_partial,da_interp_lin_2d_adj_partial
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
-      da_get_time_slots,da_biasprep,da_read_biascoef,da_cld_eff_radius
-   use da_radiance1, only : da_qc_crtm
+      da_get_time_slots,da_biasprep,da_cld_eff_radius
 
    use da_reporting, only : da_error,message
    use da_tools_serial, only : da_free_unit, da_get_unit

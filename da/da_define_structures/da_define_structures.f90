@@ -357,6 +357,28 @@ module da_define_structures
       type (field_type)       :: v              ! v-wind.
    end type qscat_type
 
+   type varbc_info_type
+      integer              :: platform_id, satellite_id, sensor_id
+      integer              :: npredmax
+      integer              :: nchanl
+      integer, pointer     :: nbgerr(:) 
+      real,    pointer     :: pred(:,:)
+      real,    pointer     :: pred_mean(:)
+      real,    pointer     :: pred_std(:)
+   end type varbc_info_type
+   
+   type varbc_type
+      integer              :: nobs
+      integer              :: npred 
+      integer              :: ichanl
+      integer, pointer     :: pred_use(:)
+      integer, pointer     :: ipred(:)
+      integer, pointer     :: index(:)
+      real,    pointer     :: param(:)
+      real,    pointer     :: bgerr(:) 
+      real,    pointer     :: vtox(:,:)
+   end type varbc_type
+   
    type instid_type
       ! Instrument triplet, follow the convension of RTTOV
       integer              :: platform_id, satellite_id, sensor_id
@@ -443,6 +465,8 @@ module da_define_structures
       real,    pointer     :: ice_coverage(:)
       real,    pointer     :: snow_coverage(:)
 
+      type (varbc_info_type)      :: varbc_info
+      type (varbc_type),pointer   :: varbc(:)
       type (infa_type) :: info
    end type instid_type
 
@@ -739,6 +763,7 @@ module da_define_structures
       real             :: jb
       real             :: jc
       real             :: je
+      real             :: jp
       type (jo_type)   :: jo
    end type j_type
 
@@ -746,6 +771,7 @@ module da_define_structures
       integer :: size        ! Total size of control variable.
       integer :: size_jb     ! Size of CV array for Jb term.
       integer :: size_je     ! Size of CV array for Je term.
+      integer :: size_jp     ! Size of CV array for Jp term.
       integer :: size1c      ! Complex size of CV array of 1st variable error.
       integer :: size2c      ! Complex size of CV array of 2nd variable error.
       integer :: size3c      ! Complex size of CV array of 3rd variable error.

@@ -1,4 +1,4 @@
-subroutine da_setup_bufrtovs_structures( grid, ob, iv )
+subroutine da_setup_radiance_structures( grid, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of tovs raidance observation structure.
@@ -17,24 +17,16 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
    ! thinning variables
    integer  :: istart,iend,jstart,jend
    ! crtm_cloud
-   integer  :: n1,n2,k,ks,ke,inst
+   integer  :: n1,n2,k,its,ite,jts,jte,kts,kte,inst
    
-   if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
+   if (trace_use) call da_trace_entry("da_setup_radiance_structures")
 
    !-------------------------------------------------------------------
    ! [1.0] Initialize RTTOV coefs and innovations vector for radiance
    !-------------------------------------------------------------------
 
-    if (rtm_option == rtm_option_rttov) then
-       call da_rttov_init(iv,ob)
-    end if
-
-    if (rtm_option == rtm_option_crtm) then
-#ifdef CRTM
-       call da_crtm_init(iv,ob)
-#endif
-    end if
-
+    call da_radiance_init(iv, ob)
+    
     do n = 1, rtminit_nsensor
        iv%instid(n)%rad_monitoring = rad_monitoring(n)
     enddo
@@ -212,37 +204,27 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
 
 ! Calculate DT for Cloudy Radiance DA
 
-   if (use_rad .and. crtm_cloud) then
-    ks = grid%xp % kts
-    ke = grid%xp % kte
+   if (use_rad .and. crtm_cloud .and. .not. DT_cloud_model) then
+      its = grid%xp % its
+      ite = grid%xp % ite
+      jts = grid%xp % jts
+      jte = grid%xp % jte
+      kts = grid%xp % kts
+      kte = grid%xp % kte
 
-      if (.not. DT_cloud_model) then
-         do j = grid%xp%jts, grid%xp%jte
-            do i = grid%xp%its, grid%xp%ite
-               do k = ks,ke
-                   grid%xb%delt(i,j,k) = 0.0
-               end do
-            end do
-          end do
+      grid%xb%delt(its:ite,jts:jte,kts:kte) = 0.0
 
-
-    do inst= 1, iv % num_inst
-        do n=1,iv%instid(inst)%num_rad
-        do i=int(iv%instid(inst)%info%i(1,n)),int(iv%instid(inst)%info%i(1,n))+1
-           do j =int(iv%instid(inst)%info%j(1,n)), int(iv%instid(inst)%info%j(1,n))+1
-               do k = ks,ke
-                grid%xb%delt(i,j,k) = 1800.0
-               end do
-           end do
-        end do
-       end do
-    end do
-
-    endif
+      do inst= 1, iv % num_inst
+         do n=1,iv%instid(inst)%num_rad
+	     i = int(iv%instid(inst)%info%i(1,n))
+	     j = int(iv%instid(inst)%info%j(1,n))
+   	     grid%xb%delt(i:i+1, j:j+1, kts:kte) = 1800.0
+         end do
+      end do
    endif
 
 
-   if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
+   if (trace_use) call da_trace_exit("da_setup_radiance_structures")
 
-end subroutine da_setup_bufrtovs_structures
+end subroutine da_setup_radiance_structures
 

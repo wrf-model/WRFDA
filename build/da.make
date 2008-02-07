@@ -49,6 +49,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_radiance1.o \
    da_rttov.o \
    da_crtm.o \
+   da_varbc.o \
    module_radiance.o \
    da_tracing.o \
    gsi_kinds.o \

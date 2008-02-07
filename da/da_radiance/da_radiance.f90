@@ -13,8 +13,8 @@ module da_radiance
       init_constants_derived, gsi_emiss
 #ifdef RTTOV
    use module_radiance, only : coefs,coefs_scatt,profile_type,radiance_type, &
-      rttov_coef,sensor_descriptor,platform_name,inst_name,transmission_type, &
-      errorstatus_success,gas_id_watervapour
+      rttov_coef,sensor_descriptor,rttov_platform_name,rttov_inst_name, &
+      transmission_type,errorstatus_success,gas_id_watervapour
 #endif
 #ifdef CRTM
    use module_radiance, only : crtm_channelinfo_type, crtm_platform_name, &
@@ -48,14 +48,15 @@ module da_radiance
       use_pseudo_rad, pseudo_rad_platid,pseudo_rad_satid, pseudo_rad_senid, &
       pseudo_rad_ichan, pseudo_rad_tb, pseudo_rad_lat,pseudo_rad_lon, &
       pseudo_rad_err, use_simulated_rad, use_crtm_kmatrix , &
-      use_rad,crtm_cloud, DT_cloud_model
+      use_rad,crtm_cloud, DT_cloud_model, global, use_varbc, freeze_varbc
  
 #ifdef CRTM
-   use da_crtm, only : da_crtm_init
+   use da_crtm, only : da_crtm_init, da_get_innov_vector_crtm, &
+      da_get_innov_vector_crtmk
 #endif
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
-      airsr_type,info_type, model_loc_type
+      airsr_type,info_type, model_loc_type, varbc_info_type, varbc_type
    use da_interpolation, only : da_to_zk, da_to_zk_new
    use da_tools_serial, only : da_get_unit, da_free_unit
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
@@ -70,14 +71,17 @@ module da_radiance
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, datalink_type,da_qc_amsub, &
       da_qc_amsua,da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
-      da_get_julian_time,da_qc_rad, da_cld_eff_radius
+      da_get_julian_time,da_qc_rad, da_cld_eff_radius, da_read_biascoef
    use da_reporting, only : da_message, da_warning, message, da_error
-   use da_rttov, only : da_rttov_init
+#ifdef RTTOV
+   use da_rttov, only : da_rttov_init, da_get_innov_vector_rttov
+#endif
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_residual, da_obs_sfc_correction, &
       da_llxy, da_llxy_new, da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
+   use da_varbc, only : da_varbc_direct,da_varbc_coldstart,da_varbc_precond
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
    use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max, &
                             dlat_grid,dlon_grid,thinning_grid, &
@@ -99,7 +103,9 @@ contains
 #include "da_initialize_rad_iv.inc"
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
-#include "da_setup_bufrtovs_structures.inc"
+#include "da_setup_radiance_structures.inc"
+#include "da_radiance_init.inc"
+#include "da_get_innov_vector_radiance.inc"
 #include "da_read_pseudo_rad.inc"
 
 end module da_radiance

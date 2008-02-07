@@ -180,7 +180,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
 
    if (use_rad) then
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
-      call da_setup_bufrtovs_structures(grid, ob, iv)
+      call da_setup_radiance_structures(grid, ob, iv)
    end if
 #endif
 

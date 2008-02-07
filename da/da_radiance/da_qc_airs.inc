@@ -14,33 +14,21 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
    ! local variables
    integer   :: n,k,isflg,ios,fgat_rad_unit
-   ! integer :: scanpos
+   integer :: scanpos
    ! logical   :: lmix
    ! real    :: satzen
-!!
-!! TV change: added new diagnostic local varaibles
+
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),nrej_limb,     &
                 nrej_landsurface,nrej_windowchshort,nrej_windowchlong,    &
                 nrej_clw,nrej_sst,nrej_topo, num_proc_domain
-   ! integer :: nrej_si
-!
-!   integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
-!                nrej_omb_std(nchan),      &
-!                nrej_mixsurface,nrej_windowchanl, nrej_si,    &
-!                nrej_clw,nrej_topo, num_proc_domain,  &
-!                nrej_limb
-! 
+
    real      :: SST_model, SST_airs, diffSST
-
-!! TV end change
-
 
    character(len=30)  :: filename
 
    if (trace_use_dull) call da_trace_entry("da_qc_airs")
 
-!! TV change: new diagnosic locals
    ngood(:)        = 0
    nrej(:)         = 0
    nrej_omb_abs(:) = 0
@@ -49,14 +37,10 @@ subroutine da_qc_airs (i, nchan, ob, iv)
    nrej_windowchshort= 0
    nrej_windowchlong= 0
    nrej_sst= 0
-!   nrej_si         = 0
    nrej_clw        = 0
    nrej_topo       = 0
 
 !   nrej_mixsurface = 0
-!   nrej_windowchanl= 0
-
-!! TV end change
 
    nrej_limb       = 0
    num_proc_domain = 0
@@ -70,15 +54,36 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !---------------------------------------------
          iv%instid(i)%tb_qc(:,n) = qc_good
 
-!! TV change: include sea locations only
-            !  a.  reject all channels over land and mixture 
-            !------------------------------------------------------
-            isflg = iv%instid(i)%isflg(n) 
-            if (isflg > 0) then
-               iv%instid(i)%tb_qc(:,n)  =  -1
+         !  a.  reject channels over land/sea-ice/snow and mixture 
+         !------------------------------------------------------------
+         isflg = iv%instid(i)%isflg(n) 
+         if (isflg > 0) then
+            if (use_crtm_kmatrix) then
+               ! Check surface emissivity Jacobian 
+               !-----------------------------------
+               do k = 1, nchan
+                  if ( abs(iv%instid(i)%emiss_jacobian(k,n)) > 0.1 ) &
+                  iv%instid(i)%tb_qc(k,n)  =  qc_bad
+	       end do  	      
+            else
+               ! reject all channels 
+               !--------------------
+               iv%instid(i)%tb_qc(:,n)  =  qc_bad
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_landsurface = nrej_landsurface + 1
-            end if
+            endif
+         end if
+
+         ! a (bis) Check T and Q Jacobians for sensitivity to model top  
+         !-----------------------------------------------------------
+         if (use_crtm_kmatrix) then
+            do k = 1, nchan
+              if ( abs(iv%instid(i)%t_jacobian(k,1,n)) > 0.05 * SUM(abs(iv%instid(i)%t_jacobian(k,1:41,n))) ) &
+                 iv%instid(i)%tb_qc(k,n)  =  qc_bad
+              if ( abs(iv%instid(i)%q_jacobian(k,1,n)) > 0.05 * SUM(abs(iv%instid(i)%q_jacobian(k,1:41,n))) ) &
+                 iv%instid(i)%tb_qc(k,n)  =  qc_bad
+     	    end do
+	 end if     
 
 !         !  a.  reject all channels over mixture surface type
 !         !------------------------------------------------------
@@ -90,35 +95,21 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 !               nrej_mixsurface = nrej_mixsurface + 1
 !         end if
 
-!         !  b.  reject all channels over land/sea-ice/snow
-!         !------------------------------------------------------
-!         if (isflg > 0) then 
-!            iv%instid(i)%tb_qc(:,n)  = qc_bad
-!            if (iv%instid(i)%info%proc_domain(1,n)) &
-!               nrej_windowchanl = nrej_windowchanl + 1
-!         end if
-
-!! TV end change: include sea locations only
-
-
-         !    reject limb obs 
+         !  b.  reject limb obs 
          !------------------------------------------------------
-         !scanpos = iv%instid(i)%scanpos(n)
-         !if (scanpos <= 3 .or. scanpos >= 88) then
-         !   iv%instid(i)%tb_qc(:,n)  =  qc_bad
-         !   if (iv%instid(i)%info%proc_domain(1,n)) &
-         !         nrej_limb = nrej_limb + 1
-         !end if
+         scanpos = iv%instid(i)%scanpos(n)
+         if (scanpos <= 3 .or. scanpos >= 88) then
+            iv%instid(i)%tb_qc(:,n)  =  qc_bad
+            if (iv%instid(i)%info%proc_domain(1,n)) &
+                  nrej_limb = nrej_limb + 1
+         end if
 
-
-!! TV change: QC for clouds
-
-            !  c. Check for model clouds!!!!!!
+            !  c. Check for model clouds
             !-----------------------------------------------------------
 
             if (iv%instid(i)%clwp(n) > 0.05) then
                iv%instid(i)%tb_qc(:,n) = qc_bad
-               iv%instid(i)%cloud_flag(:,n) = -1
+               iv%instid(i)%cloud_flag(:,n) = qc_bad
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_clw = nrej_clw + 1
             end if
@@ -157,8 +148,6 @@ subroutine da_qc_airs (i, nchan, ob, iv)
                if (iv%instid(i)%info%proc_domain(1,n)) &
                   nrej_sst = nrej_sst + 1
             end if
-
-!! TV change
 
          !  e. check surface height/pressure
          !-----------------------------------------------------------
@@ -208,7 +197,15 @@ subroutine da_qc_airs (i, nchan, ob, iv)
                   nrej_omb_std(k) = nrej_omb_std(k) + 1
             end if
 
-           ! 3. Final QC decision
+           ! 3. Cloud detection scheme (MMR)
+           !---------------------------------------------
+!            if (rtm_option == rtm_option_rttov) then
+!#ifdef RTTOV
+!	    call cloud_detect_mmr
+!#endif	    
+!            end if
+
+           ! 4. Final QC decision
            !---------------------------------------------
             if (iv%instid(i)%tb_qc(k,n) == qc_bad) then  ! bad obs
                iv%instid(i)%tb_error(k,n) = 500.0
@@ -222,17 +219,14 @@ subroutine da_qc_airs (i, nchan, ob, iv)
       end do ! end loop pixel
  
    ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (num_proc_domain)
-   !! TV change
-   call da_proc_sum_int ( nrej_landsurface )
-   call da_proc_sum_int ( nrej_windowchlong)
-   call da_proc_sum_int ( nrej_windowchshort)
-   call da_proc_sum_int ( nrej_sst)
-   ! call da_proc_sum_int ( nrej_si   )
-   !! TV end change
-   call da_proc_sum_int ( nrej_clw  )
-   call da_proc_sum_int ( nrej_topo )
-   call da_proc_sum_int (nrej_limb)
+   call da_proc_sum_int  (num_proc_domain)
+   call da_proc_sum_int  (nrej_landsurface )
+   call da_proc_sum_int  (nrej_windowchlong)
+   call da_proc_sum_int  (nrej_windowchshort)
+   call da_proc_sum_int  (nrej_sst)
+   call da_proc_sum_int  (nrej_clw  )
+   call da_proc_sum_int  (nrej_topo )
+   call da_proc_sum_int  (nrej_limb)
    call da_proc_sum_ints (nrej_omb_abs(:))
    call da_proc_sum_ints (nrej_omb_std(:))
    call da_proc_sum_ints (nrej(:))
@@ -254,15 +248,11 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
       write(fgat_rad_unit, fmt='(/a/)') ' Quality Control Statistics for '//iv%instid(i)%rttovid_string
       write(fgat_rad_unit,'(a20,i7)') ' num_proc_domain  = ', num_proc_domain
-      !!TV change
       write(fgat_rad_unit,'(a20,i7)') ' nrej_landsurface  = ', nrej_landsurface
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchlong = ', nrej_windowchlong
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchshort = ', nrej_windowchshort
       write(fgat_rad_unit,'(a20,i7)') ' nrej_sst = ', nrej_sst
       !      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
-      !      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
-      !      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
-      !!TV end change
       write(fgat_rad_unit,'(a20,i7)') ' nrej_clw         = ', nrej_clw
       write(fgat_rad_unit,'(a20,i7)') ' nrej_topo        = ', nrej_topo
       write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb

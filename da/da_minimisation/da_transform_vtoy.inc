@@ -83,6 +83,11 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d
 
+   !--------------------------------------------------------------
+   ! TL of Variational Bias Correction
+   !--------------------------------------------------------------
+   if (use_varbc) call da_varbc_tl(cv_size, cv, iv, y)
+
    if (trace_use) call da_trace_exit("da_transform_vtoy")
 
 end subroutine da_transform_vtoy

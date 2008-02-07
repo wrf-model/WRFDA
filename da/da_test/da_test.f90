@@ -38,7 +38,7 @@ module da_test
       cv_options_hum_relative_humidity, ids, ide, jds, jde, kds, kde, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, use_radarobs, use_ssmiretrievalobs, &
+      bogus, buoy, qscat, pseudo, radiance, use_radarobs, use_ssmiretrievalobs, &
       use_gpsrefobs, use_ssmt1obs, use_ssmitbobs, use_ssmt2obs, use_gpspwobs,&
       Use_Radar_rf, use_rad, crtm_cloud
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &

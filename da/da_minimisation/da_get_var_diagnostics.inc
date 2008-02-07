@@ -178,6 +178,7 @@ subroutine da_get_var_diagnostics( iv, j)
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Jb           = ', j % jb
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Jc           = ', j % jc
       write(unit=stdout,fmt='(a,f15.5)') '   Final value of Je           = ', j % je
+      write(unit=stdout,fmt='(a,f15.5)') '   Final value of Jp           = ', j % jp
       if (num_stats_tot > 0) &
          write(unit=stdout,fmt='(a,f15.5)') '   Final J / total num_obs     = ', j % total / &
                                                           real(num_stats_tot)
@@ -188,6 +189,7 @@ subroutine da_get_var_diagnostics( iv, j)
       write(unit=stdout,fmt='(a,f15.5)') '   Jb factor used(5)           = ', var_scaling5
       write(unit=stdout,fmt='(a,f15.5)') '   Jb factor used              = ', jb_factor
       write(unit=stdout,fmt='(a,f15.5)') '   Je factor used              = ', je_factor
+      write(unit=stdout,fmt='(a,f15.5)') '   VarBC factor used           = ', varbc_factor
       write(unit=stdout,fmt=*) ' '
 
       if (use_rad) then

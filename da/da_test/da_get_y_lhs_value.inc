@@ -32,13 +32,14 @@ subroutine da_get_y_lhs_value (iv, y, partial_lhs, pertile_lhs, adj_ttl_lhs)
    if (iv%info(gpspw)%nlocal          > 0) call da_check_xtoy_adjoint_gpspw    (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(gpsref)%nlocal         > 0) call da_check_xtoy_adjoint_gpsref   (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(ssmi_tb)%nlocal        > 0) call da_check_xtoy_adjoint_ssmi_tb  (iv, y, partial_lhs, pertile_lhs)
-   if (iv%info(ssmi_rv)%nlocal > 0) call da_check_xtoy_adjoint_ssmi_rv  (iv, y, partial_lhs, pertile_lhs) 
+   if (iv%info(ssmi_rv)%nlocal        > 0) call da_check_xtoy_adjoint_ssmi_rv  (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(ssmt2)%nlocal          > 0) call da_check_xtoy_adjoint_ssmt1    (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(ssmt2)%nlocal          > 0) call da_check_xtoy_adjoint_ssmt2    (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(qscat)%nlocal          > 0) call da_check_xtoy_adjoint_qscat    (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(profiler)%nlocal       > 0) call da_check_xtoy_adjoint_profiler (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(buoy)%nlocal           > 0) call da_check_xtoy_adjoint_buoy     (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(bogus)%nlocal          > 0) call da_check_xtoy_adjoint_bogus    (iv, y, partial_lhs, pertile_lhs) 
+   if (iv%info(radiance)%nlocal       > 0) call da_check_xtoy_adjoint_rad      (iv, y, partial_lhs, pertile_lhs) 
 
    ! FIX? consider using dm_sum_real
 #ifdef DM_PARALLEL

@@ -37,11 +37,9 @@ module da_minimisation
       cv_size_domain_je,cv_size_domain_jb, num_pseudo, &
       sound, sonde_sfc, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat,pseudo, radiance, monitor_on, max_ext_its, use_crtm_kmatrix
-
-#ifdef CRTM
-   use da_crtm, only : da_get_innov_vector_crtm, da_get_innov_vector_crtmk
-#endif
+      bogus, buoy, qscat,pseudo, radiance, monitor_on, max_ext_its, use_crtm_kmatrix, &
+      precondition_cg, precondition_factor, cv_size_domain_jp, use_varbc, varbc_factor, &
+      num_procs
    use da_define_structures, only : iv_type, y_type, j_type, be_type, &
       xbx_type, jo_type, da_allocate_y,da_zero_x,da_deallocate_y
    use da_obs, only : da_transform_xtoy_adj,da_transform_xtoy, &
@@ -79,7 +77,8 @@ module da_minimisation
       da_oi_stats_qscat, da_get_innov_vector_qscat, da_residual_qscat, &
       da_jo_and_grady_qscat
 #if defined(RTTOV) || defined(CRTM)
-   use da_radiance, only : da_calculate_grady_rad, da_write_filtered_rad
+   use da_radiance, only : da_calculate_grady_rad, da_write_filtered_rad, &
+      da_get_innov_vector_radiance
    use da_radiance1, only : da_ao_stats_rad,da_oi_stats_rad, &
       da_write_iv_rad_ascii,da_residual_rad,da_jo_and_grady_rad
 #endif
@@ -87,9 +86,6 @@ module da_minimisation
       da_oi_stats_radar, da_get_innov_vector_radar, da_residual_radar, &
       da_jo_and_grady_radar
    use da_reporting, only : da_message, da_warning
-#if defined(RTTOV)
-   use da_rttov, only : da_get_innov_vector_rttov
-#endif
    use da_satem, only : da_calculate_grady_satem, da_ao_stats_satem, &
       da_oi_stats_satem, da_get_innov_vector_satem, da_residual_satem, &
       da_jo_and_grady_satem
@@ -118,6 +114,7 @@ module da_minimisation
    use da_tracing, only : da_trace_entry, da_trace_exit,da_trace
    use da_transfer_model, only : da_transfer_wrftltoxa,da_transfer_xatowrftl, &
       da_transfer_xatowrftl_adj,da_setup_firstguess,da_transfer_wrftltoxa_adj
+   use da_varbc, only : da_varbc_tl,da_varbc_adj
    use da_vtox_transforms, only : da_transform_vtox,da_transform_vtox_adj
    use da_wrf_interfaces, only : wrf_dm_bcast_real, wrf_get_dm_communicator
    use da_wrfvar_io, only : da_med_initialdata_input

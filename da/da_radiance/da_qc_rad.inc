@@ -3,7 +3,7 @@ subroutine da_qc_rad (ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for radiance data.
    !
-   ! METHOD:  seperated QC for each sensor
+   ! METHOD:  separated QC for each sensor
    !---------------------------------------------------------------------------
 
    implicit none
@@ -55,10 +55,8 @@ subroutine da_qc_rad (ob, iv)
       if (hirs) then
          ! 1.0 QC for HIRS
          call da_qc_hirs(i,nchan,ob,iv)
-         !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HIRS'/))
       else if (airs) then
          call da_qc_airs(i,nchan,ob,iv)
-         !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for AIRS'/))
       else if ( hsb ) then
          ! call da_qc_hsb(i,nchan,ob,iv)
          call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HSB'/))

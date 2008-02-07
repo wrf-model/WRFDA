@@ -20,7 +20,7 @@ subroutine da_solve ( grid , config_flags)
    integer                      :: it          ! External loop counter.
    type (j_type)                :: j           ! Cost function.
 
-   integer                      :: cv_size, i
+   integer                      :: cv_size, i, ichan
    real                         :: j_grad_norm_target ! Target j norm.
 
 #ifdef DM_PARALLEL
@@ -103,6 +103,15 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    call da_setup_background_errors (grid%xb, be)
+   cv_size = be % cv % size
+
+   !---------------------------------------------------------------------------
+   ! [5.1] Set up observation bias correction (Varbc):
+   !---------------------------------------------------------------------------
+
+   be % cv % size_jp = 0.0
+   if ( (use_varbc).or.(freeze_varbc) ) call da_varbc_init(iv, be)
+
    cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
@@ -238,8 +247,12 @@ subroutine da_solve ( grid , config_flags)
       end if
 #endif
 
+      ! [8.9] Update VarBC parameters and write output file
+      
+      if ( (use_varbc).or.(freeze_varbc) ) call da_varbc_update(cv_size, xhat, iv)
+
       !------------------------------------------------------------------------
-      ! [8.0] Output WRFVAR analysis and analysis increments:
+      ! [8.10] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
 
       call da_transfer_xatoanalysis (it, xbx, grid, config_flags)
@@ -353,6 +366,23 @@ subroutine da_solve ( grid , config_flags)
             deallocate (iv%instid(i)%satazi)
             deallocate (iv%instid(i)%solzen)
             deallocate (iv%instid(i)%solazi)
+
+	    if ( (use_varbc).or.(freeze_varbc) ) then
+               deallocate (iv%instid(i)%varbc_info%pred)
+               deallocate (iv%instid(i)%varbc_info%pred_mean)
+               deallocate (iv%instid(i)%varbc_info%pred_std)
+               deallocate (iv%instid(i)%varbc_info%nbgerr)
+	       do ichan = 1, iv%instid(i)%nchannels
+	         if (iv%instid(i)%varbc(ichan)%npred <= 0) cycle	 
+		 deallocate (iv%instid(i)%varbc(ichan)%pred_use)
+		 deallocate (iv%instid(i)%varbc(ichan)%ipred)
+		 deallocate (iv%instid(i)%varbc(ichan)%index)
+		 deallocate (iv%instid(i)%varbc(ichan)%param)
+    	         deallocate (iv%instid(i)%varbc(ichan)%bgerr)
+		 deallocate (iv%instid(i)%varbc(ichan)%vtox)
+	       end do
+   	       deallocate (iv%instid(i)%varbc)
+	    end if
 
             if (rtm_option == rtm_option_crtm) then
                deallocate(iv%instid(i)%water_coverage)

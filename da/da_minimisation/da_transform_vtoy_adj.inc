@@ -123,6 +123,11 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
    cv = 0.0
    call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
+   !--------------------------------------------------------------
+   ! ADJ of Variational Bias Correction
+   !--------------------------------------------------------------
+   if (use_varbc) call da_varbc_adj(cv_size, cv, iv, y)
+
    call da_trace_exit("da_transform_vtoy_adj")
 
 end subroutine da_transform_vtoy_adj

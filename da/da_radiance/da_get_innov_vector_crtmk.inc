@@ -16,8 +16,6 @@ subroutine da_get_innov_vector_crtmk ( it, grid, ob, iv )
    type (y_type),     intent(inout) :: ob       ! Observation structure.
    type (iv_type),    intent(inout) :: iv       ! O-B structure.
 
-#ifdef CRTM
-
    integer :: n, icld  ! Loop counter.
    integer :: i, j, k  ! Index dimension.
    integer :: l        ! Index dimension.
@@ -551,38 +549,6 @@ subroutine da_get_innov_vector_crtmk ( it, grid, ob, iv )
 
    end do        ! end loop for sensor
 
-   !------------------------------------------
-   ! 4.0 perfoming bias correction files
-   !------------------------------------------
-
-   if (biascorr) then
-      do inst = 1, iv%num_inst
-         write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
-            trim(iv%instid(inst)%rttovid_string)
-         call da_biascorr(inst,ob,iv)
-      end do
-      write(unit=stdout,fmt='(A)') " "
-   end if
-
-   !------------------------------------------------------------------------
-   ! [5.0] Perform QC check
-   !------------------------------------------------------------------------
-   if (qc_rad) then
-      call da_qc_crtm(ob, iv)
-   end if
-   !------------------------------------------
-   ! 6.0 prepare bias statistics files
-   !------------------------------------------
-
-   if (biasprep) then
-      do inst = 1, iv%num_inst
-         write(unit=stdout,fmt='(a,a)') 'Preparing bias statistics files for ', &
-            trim(iv%instid(inst)%rttovid_string)
-         call da_biasprep(inst,ob,iv)
-      end do
-      write(unit=stdout,fmt='(A)') " "
-   end if
-
    Error_Status = CRTM_Destroy_Atmosphere (Atmosphere)
    if (Error_Status /= 0) then
        call da_error(__FILE__,__LINE__, &
@@ -590,10 +556,6 @@ subroutine da_get_innov_vector_crtmk ( it, grid, ob, iv )
    end if   
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_crtmk")
-#else
-   call da_error(__FILE__,__LINE__, &
-      (/"Must compile with $CRTM option for radiances"/))
-#endif
  
 end subroutine da_get_innov_vector_crtmk
 

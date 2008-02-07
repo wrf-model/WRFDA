@@ -61,10 +61,10 @@ real,allocatable :: temp(:)
       nlevels  = iv%instid(inst)%nlevels
       nchan    = iv%instid(inst)%nchan
 
-      amsua = trim( inst_name(rtminit_sensor(inst))) == 'amsua'
-      amsub = trim( inst_name(rtminit_sensor(inst))) == 'amsub'
-      ! mhs = trim( inst_name(rtminit_sensor(inst))) == 'mhs'
-      ssmi  = trim( inst_name(rtminit_sensor(inst))) == 'ssmi'
+      amsua = trim( rttov_inst_name(rtminit_sensor(inst))) == 'amsua'
+      amsub = trim( rttov_inst_name(rtminit_sensor(inst))) == 'amsub'
+      ! mhs = trim( rttov_inst_name(rtminit_sensor(inst))) == 'mhs'
+      ssmi  = trim( rttov_inst_name(rtminit_sensor(inst))) == 'ssmi'
       sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
 
       if (iv%instid(inst)%info%n2 < iv%instid(inst)%info%n1) cycle
@@ -365,37 +365,9 @@ end do
       deallocate (pemsh)
       deallocate (pems5)
 
-      !------------------------------------------------------------------------
-      ! [3.0] Perform bias correction
-      !------------------------------------------------------------------------
-
-      if (biascorr) then
-         write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
-            trim(iv%instid(inst)%rttovid_string)
-         call da_biascorr(inst,ob,iv)
-      end if
-
       call da_convert_zk (iv%instid(inst)%info)
    end do        ! end loop for sensor
    
-   !------------------------------------------------------------------------
-   ! [4.0] Perform QC check
-   !------------------------------------------------------------------------
-
-   if (qc_rad) then
-      call da_qc_rad(ob, iv)
-   end if
-
-   !------------------------------------------
-   ! 5.0 prepare bias statistics files
-   !------------------------------------------
-
-   if (biasprep) then
-      do inst = 1, iv%num_inst
-         call da_biasprep(inst,ob,iv)
-      end do
-   end if
-
    if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
 #else
     call da_error(__FILE__,__LINE__, &

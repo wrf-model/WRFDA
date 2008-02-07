@@ -220,6 +220,14 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          fi
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d01
+      
+      if test -f $DA_VARBC_IN; then
+         if $CYCLING; then
+            if  [[ -s ${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out ]]; then
+	       export DA_VARBC_IN=${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out
+	    fi
+	 fi
+      fi
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1

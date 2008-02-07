@@ -116,8 +116,9 @@ module da_control
    integer,parameter :: monitor_on  = 1
    integer,parameter :: monitor_off = 0
 
-   integer,parameter :: qc_good = 1
-   integer,parameter :: qc_bad  = -1
+   integer,parameter :: qc_good       =  1
+   integer,parameter :: qc_bad        = -1
+   integer,parameter :: qc_varbc_bad  = -1
 
    integer, parameter :: bufr_satellite_id   = 1
    integer, parameter :: bufr_ifov           = 2
@@ -319,6 +320,7 @@ module da_control
 
    integer       :: cv_size_domain_jb    ! Total jb cv size.
    integer       :: cv_size_domain_je    ! Total je cv size.
+   integer       :: cv_size_domain_jp    ! Total jp cv size.
    integer       :: cv_size_domain       ! Total cv size.    
 
 

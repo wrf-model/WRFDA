@@ -348,7 +348,11 @@ subroutine da_setup_be_regional(xb, be)
       call da_get_vertical_truncation(max_vert_var3, be3_eval_glo(:), be % v3)
       call da_get_vertical_truncation(max_vert_var4, be4_eval_glo(:), be % v4)
 
-      be % v5 % mz = 1
+      if (max_vert_var5 == 0.0) then
+         be % v5 % mz = 0
+      else
+         be % v5 % mz = 1
+      end if
 
       write (unit=stdout,fmt=*) ' '
 
