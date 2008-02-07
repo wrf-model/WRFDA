@@ -36,7 +36,13 @@ module da_setup_structures
       vert_evalue_local, obs_names, num_ob_indexes, &
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
-      bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte
+      bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte, &
+      use_simulated_rad, use_pseudo_rad, pseudo_rad_platid, pseudo_rad_satid, &
+      pseudo_rad_senid, rtminit_nsensor, rtminit_platform, rtminit_satid, &
+      rtminit_sensor, thinning, qc_rad,& 
+      num_pseudo,pseudo_x, pseudo_y, pseudo_z, pseudo_var,pseudo_val, pseudo_err,&
+      fg_format, fg_format_kma_global
+
    use da_obs, only : da_fill_obs_structures, da_store_obs_grid_info
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
       da_scan_obs_radar,da_scan_obs_ascii,da_read_obs_ascii
