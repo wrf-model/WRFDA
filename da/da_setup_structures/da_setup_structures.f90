@@ -37,9 +37,6 @@ module da_setup_structures
       sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte, &
-      use_simulated_rad, use_pseudo_rad, pseudo_rad_platid, pseudo_rad_satid, &
-      pseudo_rad_senid, rtminit_nsensor, rtminit_platform, rtminit_satid, &
-      rtminit_sensor, thinning, qc_rad,& 
       num_pseudo,pseudo_x, pseudo_y, pseudo_z, pseudo_var,pseudo_val, pseudo_err,&
       fg_format, fg_format_kma_global
 
