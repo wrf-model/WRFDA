@@ -61,10 +61,10 @@
                trim(adjustl(iv%instid(inst)%rttovid_string)),k
 
          lcs(ipred(1:npred)) = (lcs(ipred(1:npred)) .or. &
-	                       (iv%instid(inst)%varbc(k)%pred_use == 0))
+	                       (iv%instid(inst)%varbc(k)%pred_use(ipred(1:npred)) == 0))
 			       	
-	 where (iv%instid(inst)%varbc(k)%pred_use(:) == 0) &
-	        iv%instid(inst)%varbc(k)%param(:) = 0.0
+	 where (iv%instid(inst)%varbc(k)%pred_use(ipred(1:npred)) == 0) &
+	        iv%instid(inst)%varbc(k)%param(1:npred) = 0.0
 
          if (iv%instid(inst)%varbc(k)%pred_use(1) == 0) then
 	    Allocate ( hist(nbins),  hist_tot(nbins))
