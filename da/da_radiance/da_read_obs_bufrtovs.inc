@@ -91,7 +91,8 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    ! Set various variables depending on type of data to be read
 
-   platform_id  = 1                 !! for NOAA series
+   ! platform_id  = 1                 !! for NOAA series
+   ! platform_id  = 10                !! for METOP series
 
    hirs2=     obstype == 'hirs2'
    hirs3=     obstype == 'hirs3'
@@ -231,7 +232,13 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
          !------------------------------------------------------
          !  3.1     Extract satellite id and scan position. 
    
-         satellite_id = nint(bfr1bhdr(bufr_satellite_id))-191
+         if ( nint(bfr1bhdr(bufr_satellite_id)) >= 206 .and. nint(bfr1bhdr(bufr_satellite_id)) <= 209 ) then
+            platform_id = 1
+            satellite_id = nint(bfr1bhdr(bufr_satellite_id))-191
+         else if ( nint(bfr1bhdr(bufr_satellite_id)) >= 3 .and. nint(bfr1bhdr(bufr_satellite_id)) <= 5 ) then
+            platform_id = 10
+            satellite_id = nint(bfr1bhdr(bufr_satellite_id))-2
+         end if
          ifov = nint(bfr1bhdr(bufr_ifov))    
 
          !  QC2:  limb pixel rejected (not implemented)
