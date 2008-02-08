@@ -57,7 +57,7 @@ program decode_airs
 
    integer :: delta_time
    integer :: istatus
-   integer :: nvalid, nvalid_temp, nvalid_h2o
+   integer :: nvalid, nvalid_temp, nvalid_h2o, npolarday_temp, npolarday_h2o
    integer :: fn
    integer :: cmp_min, cmp_max
    integer :: mm, ss
@@ -65,6 +65,7 @@ program decode_airs
    integer :: i, j                ! indices 1..3 for 3x3 of IR FOVs per retrieval
    real :: temp                   ! temperature or -9999 if not good enough
    real :: h2o                    ! H2O MMR or -9999 if not good enough
+   logical :: polarday            ! true if |lat|>50 and DayNightFlag is not Night
 
    nargs = iargc()
 
@@ -76,6 +77,7 @@ program decode_airs
      write(6,*) ' '
      stop
    end if
+
 
    min_time = '00000000000000'
    max_time = '99999999999999'
@@ -99,6 +101,7 @@ program decode_airs
    ref_time = '1993010100 '
 
    open(10, file='soundings.little_r', form='formatted', status='replace')
+   open(20, file='soundings_polarday.little_r', form='formatted', status='replace')
 
    do fn = 1, nargs
       call getarg (fn, file_name)
@@ -109,12 +112,16 @@ program decode_airs
       if (granule_out_of_timewin(ret%Time, min_time, max_time)) cycle      
    
       nvalid_temp = 0
-      nvalid_h2o = 0
+      nvalid_h2o  = 0
+      npolarday_temp = 0
+      npolarday_h2o  = 0
 
       write(6,'(a,a)') 'DayNightFlag for this granule: ', trim(ret%DayNightFlag)
 
       do track = 1, AIRS_RET_GEOTRACK
       do xtrack = 1, AIRS_RET_GEOXTRACK
+
+         polarday = .false.
          nvalid = 0
       
          delta_time = nint(ret%Time(xtrack,track))/3600
@@ -193,6 +200,9 @@ program decode_airs
                      nvalid = AIRS_RET_STDPRESSURELAY - ret%nGoodStd(xtrack,track) + 1
                   end if
                end if
+               if ( (abs(ret%Latitude(xtrack,track)) > 50.0) .and. (trim(ret%DayNightFlag) /= 'Night') ) then
+                  polarday = .true.
+               end if
             end if  ! end of V5 quality selection
             !
             ! If there are valid obs to be reported, write them out to little_r format
@@ -247,12 +257,21 @@ program decode_airs
                x8 = -888888.
                ix8 = -88 
          
-               write(10, fmt=rpt_format) latitude, longitude, id, name, platform, &
-                  source, elevation, n_valid, n_err, n_warning, iseq, n_dups,     &
-                  is_sound, is_bogus, is_discard, isut, julian, date_char,        &
-                  slp, islp, refp, irefp, grndt, igrndt, sst, isst, psfc, ipsfc,  &
-                  x1, ix1, x2, ix2, x3, ix3, x4, ix4, x5, ix5, x6, ix6, x7, ix7,  &
-                  x8, ix8
+               if ( .not. polarday ) then
+                  write(10, fmt=rpt_format) latitude, longitude, id, name, platform, &
+                     source, elevation, n_valid, n_err, n_warning, iseq, n_dups,     &
+                     is_sound, is_bogus, is_discard, isut, julian, date_char,        &
+                     slp, islp, refp, irefp, grndt, igrndt, sst, isst, psfc, ipsfc,  &
+                     x1, ix1, x2, ix2, x3, ix3, x4, ix4, x5, ix5, x6, ix6, x7, ix7,  &
+                     x8, ix8
+               else
+                  write(20, fmt=rpt_format) latitude, longitude, id, name, platform, &
+                     source, elevation, n_valid, n_err, n_warning, iseq, n_dups,     &
+                     is_sound, is_bogus, is_discard, isut, julian, date_char,        &
+                     slp, islp, refp, irefp, grndt, igrndt, sst, isst, psfc, ipsfc,  &
+                     x1, ix1, x2, ix2, x3, ix3, x4, ix4, x5, ix5, x6, ix6, x7, ix7,  &
+                     x8, ix8
+               end if
          
                do layer=AIRS_RET_STDPRESSURELAY,1,-1
 
@@ -321,19 +340,21 @@ program decode_airs
                      end if
                      if (h2o == -9999.) h2o = -888888.
 
-                     ! check for polar day
-
-                     if ( abs(ret%Latitude(xtrack,track)) > 50.0 ) then
-                        if ( trim(ret%DayNightFlag) /= 'Night' ) then
-                           temp = -888888.0
-                           h2o = -888888.0
-                        end if
-                     end if
-
                   end if    ! end if V5 check
 
                   if ( temp > 0.0 ) nvalid_temp = nvalid_temp + 1
                   if ( h2o  > 0.0 ) nvalid_h2o  = nvalid_h2o  + 1
+
+                  if ( polarday ) then
+                     if ( temp > 0.0 ) then
+                        nvalid_temp    = nvalid_temp - 1
+                        npolarday_temp = npolarday_temp + 1
+                     end if
+                     if ( h2o  > 0.0 ) then
+                        nvalid_h2o     = nvalid_h2o  - 1
+                        npolarday_h2o  = npolarday_h2o  + 1
+                     end if
+                  end if
 
                   if (temp /= -888888.) then
              
@@ -362,8 +383,13 @@ program decode_airs
                      irh = 0
                      thk = -888888.
                      ithk = 0
-                     write(10, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
-                           spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+                     if ( .not. polarday ) then
+                        write(10, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
+                              spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+                     else
+                        write(20, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
+                              spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+                     end if
                   end if
                end do
             
@@ -388,13 +414,22 @@ program decode_airs
                thk = -888888.
                ithk = 0
       
-               write(10, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
-                     spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+               if ( .not. polarday ) then
+                  write(10, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
+                        spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+               else
+                  write(20, fmt=meas_format) p, ip, z, iz, t, it, dewpt, idewpt, &
+                        spd, ispd, dir, idir, u, iu, v, iv, rh, irh, thk, ithk
+               end if
       
                num_valid = nvalid
                num_err = 0
                num_warn = 0
-               write(10, fmt=end_format) num_valid, num_err, num_warn
+               if ( .not. polarday ) then
+                  write(10, fmt=end_format) num_valid, num_err, num_warn
+               else
+                  write(20, fmt=end_format) num_valid, num_err, num_warn
+               end if
          
             end if  ! end if nvalid > 0
          
@@ -416,10 +451,12 @@ program decode_airs
       end do
 
       write(6,*) 'nvalid_temp, nvalid_h2o ', nvalid_temp, nvalid_h2o
+      write(6,*) 'npolarday_temp, npolarday_h2o ', npolarday_temp, npolarday_h2o
 
    end do ! Loop over filenames
 
    close(10)
+   close(20)
 
    stop
     
