@@ -11,7 +11,7 @@
 
    implicit none
 
-   type (iv_type), intent (in)      :: iv             ! Innovation
+   type (iv_type), intent (inout)   :: iv             ! Innovation
 
    type (stats_rad_type), pointer   :: rad
    integer                          :: inst, n, i, j, k, ii, jj, n1, n2
