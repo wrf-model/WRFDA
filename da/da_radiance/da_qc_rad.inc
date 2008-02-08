@@ -13,7 +13,7 @@ subroutine da_qc_rad (ob, iv)
 
 #ifdef RTTOV
    integer :: i, nchan,p,j
-   logical   :: amsua, amsub, hirs, msu,airs,hsb
+   logical   :: amsua, amsub, hirs, msu,airs, hsb, ssmis, mhs
 
    integer, allocatable :: index(:)
    integer :: num_tovs_avg
@@ -51,6 +51,8 @@ subroutine da_qc_rad (ob, iv)
       msu   = trim(inst_name(rtminit_sensor(i))) == 'msu'
       airs  = trim(inst_name(rtminit_sensor(i))) == 'airs'
       hsb   = trim(inst_name(rtminit_sensor(i))) == 'hsb'
+      ssmis = trim(rttov_inst_name(rtminit_sensor(i))) == 'ssmis'
+      mhs   = trim(rttov_inst_name(rtminit_sensor(i))) == 'mhs'
 
       if (hirs) then
          ! 1.0 QC for HIRS
@@ -67,6 +69,10 @@ subroutine da_qc_rad (ob, iv)
       else if (msu) then
          ! call da_qc_msu(i,nchan, ob,iv)
          call da_warning(__FILE__,__LINE__,(/'QC Not implemented for MSU'/))
+      else if (ssmis) then
+         call da_qc_ssmis(i,nchan,ob,iv)
+      else if (mhs) then
+         call da_qc_mhs(i,nchan,ob,iv)
       else
          write(unit=message(1),fmt='(A,A)') &
             "Unrecognized instrument",trim(inst_name(rtminit_sensor(i)))
