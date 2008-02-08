@@ -91,7 +91,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    echo "=========="
 
    # Decide on length of forecast to run
-   export FCST_RANGE=$CYCLE_PERIOD
+   export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
    if [[ $HOUR -eq $LONG_FCST_TIME_1 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
    if [[ $HOUR -eq $LONG_FCST_TIME_2 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
    if [[ $HOUR -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
@@ -221,12 +221,14 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d01
       
-      if test -f $DA_VARBC_IN; then
-         if $CYCLING; then
-            if  [[ -s ${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out ]]; then
-	       export DA_VARBC_IN=${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out
+      if [[ ${DA_VARBC_IN:+1} = 1 ]]; then
+         if [[ -f $DA_VARBC_IN ]]; then
+            if $CYCLING; then
+               if  [[ -s ${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out ]]; then
+	          export DA_VARBC_IN=${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out
+	       fi
 	    fi
-	 fi
+         fi
       fi
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
