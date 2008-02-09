@@ -6,7 +6,7 @@ subroutine da_setup_radiance_structures( grid, ob, iv )
 
    implicit none
 
-   type (domain) ,  intent (in)    :: grid       ! model data
+   type (domain) , intent(inout)   :: grid       ! model data
    type ( y_type), intent(inout)   :: ob         ! Observation structure.
    type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
