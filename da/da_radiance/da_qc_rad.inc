@@ -25,22 +25,22 @@ subroutine da_qc_rad (ob, iv)
 
    if (trace_use) call da_trace_entry("da_qc_rad")
 
-   allocate (num_tovs_before(iv%num_inst,num_procs))
-   allocate (num_tovs_after(iv%num_inst,num_procs))
+   if ( .not. allocated(num_tovs_before) )  allocate (num_tovs_before(iv%num_inst,num_procs))
+   if ( .not. allocated(num_tovs_after) )   allocate (num_tovs_after(iv%num_inst,num_procs))
 
    ! Cannot be more total send,receives than combination of processors
-   allocate (tovs_copy_count(iv%num_inst))
-   allocate (tovs_send_pe(iv%num_inst,num_procs*num_procs))
-   allocate (tovs_recv_pe(iv%num_inst,num_procs*num_procs))
-   allocate (tovs_send_start(iv%num_inst,num_procs*num_procs))
-   allocate (tovs_send_count(iv%num_inst,num_procs*num_procs))
-   allocate (tovs_recv_start(iv%num_inst,num_procs*num_procs))
+   if ( .not. allocated(tovs_copy_count) )  allocate (tovs_copy_count(iv%num_inst))
+   if ( .not. allocated(tovs_send_pe) )     allocate (tovs_send_pe(iv%num_inst,num_procs*num_procs))
+   if ( .not. allocated(tovs_recv_pe) )     allocate (tovs_recv_pe(iv%num_inst,num_procs*num_procs))
+   if ( .not. allocated(tovs_send_start) )  allocate (tovs_send_start(iv%num_inst,num_procs*num_procs))
+   if ( .not. allocated(tovs_send_count) )  allocate (tovs_send_count(iv%num_inst,num_procs*num_procs))
+   if ( .not. allocated(tovs_recv_start) )  allocate (tovs_recv_start(iv%num_inst,num_procs*num_procs))
 
    call da_trace("da_qc_rad", message="allocated tovs redistibution arrays")
 
-   allocate (index(num_procs))
-   allocate (excess_count(num_procs))
-   allocate (spare_count(num_procs))
+   if ( .not. allocated(index) )            allocate (index(num_procs))
+   if ( .not. allocated(excess_count) )     allocate (excess_count(num_procs))
+   if ( .not. allocated(spare_count) )      allocate (spare_count(num_procs))
 
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
