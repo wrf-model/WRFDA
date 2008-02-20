@@ -60,7 +60,7 @@ echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
 cp -f $DA_REAL_OUTPUT real_output 
 cp -f $BDYIN wrfbdy_d01
-cp -f $DA_ANALYSIS wrfvar_output
+ln -sf $DA_ANALYSIS wrfvar_output
 
 cat > parame.in << EOF
 &control_param
