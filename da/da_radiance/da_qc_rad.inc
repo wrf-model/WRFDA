@@ -11,7 +11,6 @@ subroutine da_qc_rad (ob, iv)
    type (y_type),  intent(in)      :: ob         ! Observation structure.
    type (iv_type), intent(inout)   :: iv         ! O-B structure.
 
-#ifdef RTTOV
    integer :: i, nchan,p,j
    logical   :: amsua, amsub, hirs, msu,airs, hsb, ssmis, mhs
 
@@ -45,12 +44,12 @@ subroutine da_qc_rad (ob, iv)
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
 
-      amsua = trim(inst_name(rtminit_sensor(i))) == 'amsua'
-      amsub = trim(inst_name(rtminit_sensor(i))) == 'amsub'
-      hirs  = trim(inst_name(rtminit_sensor(i))) == 'hirs'
-      msu   = trim(inst_name(rtminit_sensor(i))) == 'msu'
-      airs  = trim(inst_name(rtminit_sensor(i))) == 'airs'
-      hsb   = trim(inst_name(rtminit_sensor(i))) == 'hsb'
+      amsua = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsua'
+      amsub = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsub'
+      hirs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'hirs'
+      msu   = trim(rttov_inst_name(rtminit_sensor(i))) == 'msu'
+      airs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'airs'
+      hsb   = trim(rttov_inst_name(rtminit_sensor(i))) == 'hsb'
       ssmis = trim(rttov_inst_name(rtminit_sensor(i))) == 'ssmis'
       mhs   = trim(rttov_inst_name(rtminit_sensor(i))) == 'mhs'
 
@@ -75,7 +74,7 @@ subroutine da_qc_rad (ob, iv)
          call da_qc_mhs(i,nchan,ob,iv)
       else
          write(unit=message(1),fmt='(A,A)') &
-            "Unrecognized instrument",trim(inst_name(rtminit_sensor(i)))
+            "Unrecognized instrument",trim(rttov_inst_name(rtminit_sensor(i)))
          call da_error(__FILE__,__LINE__,message(1:1))
       end if
 
@@ -155,7 +154,6 @@ subroutine da_qc_rad (ob, iv)
    deallocate (spare_count)
 
    if (trace_use) call da_trace_exit("da_qc_rad")
-#endif
 
 end subroutine da_qc_rad
 

@@ -44,7 +44,8 @@
 	    
          write(unit=stdout,fmt='(A,I6,3A,I5)') &
 	    'VARBC:',iv%instid(inst)%varbc(k)%nobs,' active observations for ', &
-            trim(adjustl(iv%instid(inst)%rttovid_string)),' channel',k
+            trim(adjustl(iv%instid(inst)%rttovid_string)),' channel',           &
+	    iv%instid(inst)%ichan(k)
 	    
          if (iv%instid(inst)%varbc(k)%nobs == 0) cycle
 	 

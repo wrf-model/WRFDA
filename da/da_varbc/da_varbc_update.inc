@@ -85,9 +85,10 @@
 	           iv%instid(inst)%varbc(ichan)%pred_use = 1
 	 else
 	    if (count(iv%instid(inst)%varbc(ichan)%pred_use == 0) > 0) &
-	       write(unit=stdout,fmt='(A,A,I4)') &	   
+	       write(unit=stdout,fmt='(A,A,I5)') &	   
 	          'VARBC: Not enough data to keep statistics for ', &
-	          trim(iv%instid(inst)%rttovid_string),ichan
+	          trim(iv%instid(inst)%rttovid_string),             &
+		  iv%instid(inst)%ichan(ichan)
 	 end if
  	 if (use_varbc) then
            !---------------------------------------------------------------

@@ -5,11 +5,9 @@ module da_radiance1
    !---------------------------------------------------------------------------
 
    use module_radiance, only : satinfo,q2ppmv
-#ifdef RTTOV
-   use module_radiance, only : coefs,inst_name
-#endif
-#ifdef CRTM
    use module_radiance, only : rttov_inst_name
+#ifdef RTTOV
+   use module_radiance, only : coefs
 #endif
 
    use da_control, only : trace_use,missing_r, rootproc, &

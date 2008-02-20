@@ -374,7 +374,7 @@ subroutine da_get_var_diagnostics( iv, j)
          do k = 1, iv%instid(i)%nchan
             if (j % jo % rad(i) % num_ichan(k) > 0) then
                write(unit=jo_unit,fmt='(a30,a16,i5,i10,8f15.5)')'    radiance,  Jo(actual)  = ', &
-                  iv%instid(i)%rttovid_string, k , &
+                  iv%instid(i)%rttovid_string, iv%instid(i)%ichan(k) , &
                   j % jo % rad(i) % num_ichan(k), &
                   j % jo % rad(i) % jo_ichan(k)
             end if

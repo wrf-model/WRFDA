@@ -63,7 +63,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
       if (iv%info(qscat)%nlocal          > 0) call da_get_innov_vector_qscat    (it, grid, ob, iv)
       if (iv%info(profiler)%nlocal       > 0) call da_get_innov_vector_profiler (it, grid, ob, iv)
       if (iv%info(buoy)%nlocal           > 0) call da_get_innov_vector_buoy     (it, grid, ob, iv)
-      if (iv%info(radiance)%ntotal       > 0) call da_get_innov_vector_radiance (it, grid, ob, iv)
+      if (use_rad                           ) call da_get_innov_vector_radiance (it, grid, ob, iv)
       if (num_pseudo                     > 0) call da_get_innov_vector_pseudo   (grid, ob, iv)
       if (iv%info(airsr)%nlocal          > 0) call da_get_innov_vector_airsr    (it, grid, ob, iv)
 

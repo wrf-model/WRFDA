@@ -78,9 +78,9 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !-----------------------------------------------------------
          if (use_crtm_kmatrix) then
             do k = 1, nchan
-              if ( abs(iv%instid(i)%t_jacobian(k,1,n)) > 0.05 * SUM(abs(iv%instid(i)%t_jacobian(k,1:41,n))) ) &
+              if ( abs(iv%instid(i)%t_jacobian(k,1,n)) > 0.1 * SUM(abs(iv%instid(i)%t_jacobian(k,1:41,n))) ) &
                  iv%instid(i)%tb_qc(k,n)  =  qc_bad
-              if ( abs(iv%instid(i)%q_jacobian(k,1,n)) > 0.05 * SUM(abs(iv%instid(i)%q_jacobian(k,1:41,n))) ) &
+              if ( abs(iv%instid(i)%q_jacobian(k,1,n)) > 0.1 * SUM(abs(iv%instid(i)%q_jacobian(k,1:41,n))) ) &
                  iv%instid(i)%tb_qc(k,n)  =  qc_bad
      	    end do
 	 end if     

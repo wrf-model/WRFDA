@@ -29,9 +29,9 @@
    real                             :: modetmp(1), mode
    integer, allocatable             :: hist(:), hist_tot(:)
    
-   logical, allocatable             :: lcs(:)
    real, allocatable                :: mean(:), rms(:), mean_tot(:), rms_tot(:)
    integer, allocatable             :: ipred(:)
+   logical                          :: global_cs
    
    if ( iv%num_inst < 1 ) RETURN
 
@@ -44,9 +44,11 @@
       num_rad  = iv%instid(inst)%num_rad
       n1       = iv%instid(inst)%info%n1
       n2       = iv%instid(inst)%info%n2
-       
-      allocate( lcs(npredmax), ipred(npredmax) )
-      lcs(:) = .false.
+ 
+      num_rad_tot = wrf_dm_sum_integer(num_rad)
+      if (num_rad_tot<=0) cycle
+      
+      allocate( ipred(npredmax) )
     
     !---------------------------------------------------------------------------
     ! [1]: Calculate mode of histogram of (uncorrected) innovations 
@@ -57,11 +59,8 @@
 	 if (npred <= 0) cycle                                         !! VarBC channels only
 	 if (ALL(iv%instid(inst)%varbc(k)%pred_use /= 0)) cycle        !! Coldstart channels only
 	 
-         write(unit=stdout,fmt='(A,A,I4)') 'VARBC: Cold-starting ', &
-               trim(adjustl(iv%instid(inst)%rttovid_string)),k
-
-         lcs(ipred(1:npred)) = (lcs(ipred(1:npred)) .or. &
-	                       (iv%instid(inst)%varbc(k)%pred_use(ipred(1:npred)) == 0))
+         write(unit=stdout,fmt='(A,A,I5)') 'VARBC: Cold-starting ', &
+               trim(adjustl(iv%instid(inst)%rttovid_string)),iv%instid(inst)%ichan(k)
 			       	
 	 where (iv%instid(inst)%varbc(k)%pred_use(ipred(1:npred)) == 0) &
 	        iv%instid(inst)%varbc(k)%param(1:npred) = 0.0
@@ -110,7 +109,13 @@
     !---------------------------------------------------------------------------
     !  [3]: Calculate statistics for cold-started predictors 
     !---------------------------------------------------------------------------
-      if (ANY(lcs)) then      !! coldstart instruments only
+      global_cs = .true.
+      do k = 1, iv%instid(inst)%nchan 
+	 if (iv%instid(inst)%varbc(k)%npred <= 0) cycle                   !! VarBC channels only      
+	 global_cs = ( global_cs.and.(ALL(iv%instid(inst)%varbc(k)%pred_use <= 0)) )        
+      end do	 
+    
+      if (global_cs) then                                                 !! Instrument coldstart only
       
          write(unit=stdout,fmt='(A,A)') 'VARBC: Computing predictor statistics for ', &
  	         trim(adjustl(iv%instid(inst)%rttovid_string))
@@ -125,26 +130,20 @@
   
         ! Do inter-processor communication to gather statistics
         ! ------------------------------------------------------
-         num_rad_tot = wrf_dm_sum_integer(num_rad)
 	 call wrf_dm_sum_reals(mean, mean_tot)
-	 call wrf_dm_sum_reals(rms,  rms_tot)
-	 
-         if (num_rad_tot >0) then
-	    mean_tot = mean_tot / num_rad_tot
-            rms_tot  = rms_tot  / num_rad_tot
-         end if
+  	 call wrf_dm_sum_reals(rms,  rms_tot)	 
+	 mean_tot = mean_tot / num_rad_tot
+         rms_tot  = rms_tot  / num_rad_tot
 	 
         ! Store statistics
         !------------------
-	 where (lcs)
-	    iv%instid(inst)%varbc_info%pred_mean = mean_tot
-	    iv%instid(inst)%varbc_info%pred_std  = sqrt(rms_tot - mean_tot**2)
-	 end where   
+	 iv%instid(inst)%varbc_info%pred_mean = mean_tot
+         iv%instid(inst)%varbc_info%pred_std  = sqrt(rms_tot - mean_tot**2)
       
          deallocate(mean, rms, mean_tot, rms_tot)
 
       end if
-      deallocate(lcs, ipred)  	           	     	
+      deallocate(ipred)  	           	     	
 
     !---------------------------------------------------------------------------
     !  [4]: Normalize predictors

@@ -104,7 +104,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 
 
 ! Other work variables
-  integer(i_kind)  :: nreal, nobs, ityp,ityp2
+  integer(i_kind)  :: nreal, nobs(0:num_fgat_time), ityp,ityp2
   integer(i_kind)  :: itx, k, itt, iobsout
   integer(i_kind),dimension(19)::icount
   real(r_kind)     :: rlat, rlon, dx, dy, dx1, dy1, sstx, dlon, dlat
@@ -127,6 +127,12 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   real(r_kind)     :: R180     = 180.0_r_kind
   real(r_kind)     :: R360     = 360.0_r_kind
 
+! Thinning variables
+  integer(i_kind) itt,itx,iobs,iout
+  real(r_kind) crit,dist
+  real(r_kind) dlon_earth,dlat_earth
+  logical luse
+
   logical           :: airs, eos_amsua, hsb, airstab
   type(info_type)            :: info
   type(model_loc_type)       :: loc
@@ -139,7 +145,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   platform_id  = 9   ! eos series
   satellite_id = 2   ! eos-2
   nreal  = maxinfo
-  nobs   = 0
+  nobs(:)  = 0
   airs=      obstype == 'airs     '
   eos_amsua= obstype == 'eos_amsua'
   hsb=       obstype == 'hsb      '
@@ -191,7 +197,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
       if (print_detail_rad) then
          write(unit=message(1),fmt=*) &
             'Reading BUFR Table A file: ',trim(table_file)
-         call da_warning(__FILE__,__LINE__,message(1:1))
+         call da_message(message(1:1))
       end if
       call da_get_unit(airs_table_unit)
       open(unit=airs_table_unit,file=table_file,iostat = iost)
@@ -346,6 +352,22 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 
        info%elv = 0.0  !aquaspot%selv
 
+!  4.1 Make Thinning
+!  Map obs to thinning grid
+!-------------------------------------------------------------------
+       if (thinning) then
+          dlat_earth = info%lat
+          dlon_earth = info%lon
+          if (dlon_earth<zero) dlon_earth = dlon_earth+r360
+          if (dlon_earth>=r360) dlon_earth = dlon_earth-r360
+          dlat_earth = dlat_earth*deg2rad
+          dlon_earth = dlon_earth*deg2rad           
+          crit = 1.0 ! 0.01_r_kind+terrain + timedif !+ 10.0_r_kind*float(iskip)
+          iobs = 0   ! argument is inout
+          call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,luse)
+          if (.not. luse) cycle loop_obspoints
+       end if
+
 !  4.2  Check observational info
 !-------------------------------------------------------
      if( airsspot%fovn <    0.0_r_kind .or. airsspot%fovn > 100.0_r_kind .or. &
@@ -393,7 +415,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
         cycle loop_obspoints
      end if
 
-     nobs=nobs + 1
+     nobs(ifgat) = nobs(ifgat) + 1
 
 !  4.0   assign information to sequential radiance structure
 !--------------------------------------------------------------------------
@@ -426,11 +448,20 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchan
 
+   iv%info(radiance)%nlocal = iv%info(radiance)%nlocal + size
+   iv%info(radiance)%ntotal = iv%info(radiance)%ntotal + size
+   iv%instid(inst)%info%nlocal = size
+   
+   do ifgat = 1, num_fgat_time
+      nobs(ifgat) = nobs(ifgat) + nobs(ifgat-1) 
+      iv%info(radiance)%ptotal(ifgat) = iv%info(radiance)%ptotal(ifgat) + nobs(ifgat) 
+   end do
+   
 !  5.0 allocate innovation radiance structure
 !----------------------------------------------------------------
 !  do i = 1, iv%num_inst
-   if ( nobs > 0 ) then
-      iv%instid(inst)%num_rad = nobs
+   if ( size > 0 ) then
+      iv%instid(inst)%num_rad = size
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         'Allocating space for radiance innov structure', &
          inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
