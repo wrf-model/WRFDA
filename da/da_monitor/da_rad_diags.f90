@@ -45,7 +45,7 @@ program da_rad_diags
    logical                                :: isfile, prf_found, jac_found
    integer, parameter                     :: datelen1 = 10
    integer, parameter                     :: datelen2 = 19
-   real, parameter                        :: missing_r = -888888.00
+   real*4, parameter                      :: missing_r = -888888.00
    character(len=250)                     :: buf, inst
    character(len=7)                       :: numbuf
    character(len=datelen1)                :: valid_date
@@ -54,19 +54,19 @@ program da_rad_diags
    integer                                :: ntime, nchan, total_npixel
    integer, dimension(:), allocatable     :: ichan, npixel, iunit, scanpos, isflg
    integer, dimension(:), allocatable     :: landsea_mask, soiltyp, vegtyp
-   real,    dimension(:), allocatable     :: lat, lon, elv, elev
-   real,    dimension(:), allocatable     :: satzen, satazi, t2m, mr2m, u10, v10, ps, ts
-   real,    dimension(:), allocatable     :: smois, tslb, snowh, vegfra, clwp
+   real*4,  dimension(:), allocatable     :: lat, lon, elv, elev
+   real*4,  dimension(:), allocatable     :: satzen, satazi, t2m, mr2m, u10, v10, ps, ts
+   real*4,  dimension(:), allocatable     :: smois, tslb, snowh, vegfra, clwp
    integer, dimension(:,:), allocatable   :: tb_qc
-   real,    dimension(:,:), allocatable   :: tb_obs, tb_bak, tb_inv, tb_oma, tb_err, ems, ems_jac
-   real,    dimension(:,:), allocatable   :: prf_pfull, prf_phalf, prf_t, prf_q, prf_water
-   real,    dimension(:,:), allocatable   :: prf_ice, prf_rain, prf_snow, prf_grau, prf_hail
-   real,    dimension(:,:), allocatable   :: prf_water_reff, prf_ice_reff, prf_rain_reff
-   real,    dimension(:,:), allocatable   :: prf_snow_reff, prf_grau_reff, prf_hail_reff
-   real,    dimension(:,:,:), allocatable :: prf_t_jac, prf_q_jac, prf_water_jac, prf_ice_jac
-   real,    dimension(:,:,:), allocatable :: prf_rain_jac, prf_snow_jac, prf_grau_jac, prf_hail_jac
-   real,    dimension(:,:,:), allocatable :: prf_water_reff_jac, prf_ice_reff_jac, prf_rain_reff_jac
-   real,    dimension(:,:,:), allocatable :: prf_snow_reff_jac, prf_grau_reff_jac, prf_hail_reff_jac
+   real*4,  dimension(:,:), allocatable   :: tb_obs, tb_bak, tb_inv, tb_oma, tb_err, ems, ems_jac
+   real*4,  dimension(:,:), allocatable   :: prf_pfull, prf_phalf, prf_t, prf_q, prf_water
+   real*4,  dimension(:,:), allocatable   :: prf_ice, prf_rain, prf_snow, prf_grau, prf_hail
+   real*4,  dimension(:,:), allocatable   :: prf_water_reff, prf_ice_reff, prf_rain_reff
+   real*4,  dimension(:,:), allocatable   :: prf_snow_reff, prf_grau_reff, prf_hail_reff
+   real*4,  dimension(:,:,:), allocatable :: prf_t_jac, prf_q_jac, prf_water_jac, prf_ice_jac
+   real*4,  dimension(:,:,:), allocatable :: prf_rain_jac, prf_snow_jac, prf_grau_jac, prf_hail_jac
+   real*4,  dimension(:,:,:), allocatable :: prf_water_reff_jac, prf_ice_reff_jac, prf_rain_reff_jac
+   real*4,  dimension(:,:,:), allocatable :: prf_snow_reff_jac, prf_grau_reff_jac, prf_hail_reff_jac
    character(len=200), dimension(:), allocatable      :: inpname
    character(len=datelen1), dimension(:), allocatable :: datestr1          ! date string
    character(len=datelen2), dimension(:), allocatable :: datestr2          ! date string
