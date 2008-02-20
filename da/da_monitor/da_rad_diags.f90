@@ -5,7 +5,7 @@ program da_rad_diags
 ! program to read multiple-time of radiance innovation files and write out in
 ! netcdf format for ncl time-series plotting
 !
-! input files: (1)  namelist.rw_rad_diags
+! input files: (1)  namelist.da_rad_diags
 !                   &record1
 !                    nproc = 16   (the proc numbers used when inv files were written out)
 !                    instid = 'dmsp-16-ssmis'   (inst names, can be more than one instid)
@@ -22,6 +22,7 @@ program da_rad_diags
 !
 ! namelist variables
 !
+   namelist /record1/ nproc, instid, file_prefix, start_date, end_date, cycle_period
            ! nproc: number of processsors used when writing out inv files
            ! instid, eg dmsp-16-ssmis
            ! file_prefix, inv or oma
@@ -34,11 +35,10 @@ program da_rad_diags
    character(len=20), dimension(maxnum)   :: instid
    character(len=3)                       :: file_prefix
    character(len=10)                      :: start_date, end_date
-   namelist /record1/ nproc, instid, file_prefix, start_date, end_date, cycle_period
 !
 ! netcdf variables
 !
-   character(len=80)                      :: ncname
+   character(len=200)                     :: ncname
    integer                                :: ncid, dimid, varid
    integer, dimension(3)                  :: ishape, istart, icount
 !
@@ -67,7 +67,7 @@ program da_rad_diags
    real,    dimension(:,:,:), allocatable :: prf_rain_jac, prf_snow_jac, prf_grau_jac, prf_hail_jac
    real,    dimension(:,:,:), allocatable :: prf_water_reff_jac, prf_ice_reff_jac, prf_rain_reff_jac
    real,    dimension(:,:,:), allocatable :: prf_snow_reff_jac, prf_grau_reff_jac, prf_hail_reff_jac
-   character(len=80), dimension(:), allocatable      :: inpname
+   character(len=200), dimension(:), allocatable      :: inpname
    character(len=datelen1), dimension(:), allocatable :: datestr1          ! date string
    character(len=datelen2), dimension(:), allocatable :: datestr2          ! date string
 !
@@ -263,9 +263,9 @@ ntime_loop: do itime = 1, ntime
             tb_oma = missing_r
             tb_err = missing_r
             ncname = 'diags_'//trim(instid(iinst))//"_"//datestr1(itime)//'.nc'
-            ios = NF_CREATE(ncname, NF_CLOBBER, ncid)  ! NF_CLOBBER specifies the default behavior of
-                                                       ! overwritting any existing dataset with the 
-                                                       ! same file name
+            ios = NF_CREATE(trim(ncname), NF_CLOBBER, ncid)  ! NF_CLOBBER specifies the default behavior of
+                                                             ! overwritting any existing dataset with the 
+                                                             ! same file name
             if ( ios /= 0 ) then
                write(0,*) 'Error creating netcdf file: ', ncname
                stop
