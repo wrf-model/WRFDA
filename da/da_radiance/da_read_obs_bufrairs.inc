@@ -105,7 +105,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 
 ! Other work variables
   integer(i_kind)  :: nreal, nobs(0:num_fgat_time), ityp,ityp2
-  integer(i_kind)  :: itx, k, itt, iobsout
+  integer(i_kind)  :: k, iobsout
   integer(i_kind),dimension(19)::icount
   real(r_kind)     :: rlat, rlon, dx, dy, dx1, dy1, sstx, dlon, dlat
   real(r_kind)     :: sza, timedif, pred, crit1

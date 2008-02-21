@@ -192,9 +192,9 @@ real,allocatable :: temp(:)
          call da_interp_lin_2d (grid%xb%q  (:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qm(k,:))
          call da_interp_lin_2d (grid%xb%qrn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qrn(k,:))
          call da_interp_lin_2d (grid%xb%qcw(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qcw(k,:))
-         call da_interp_lin_2d (grid%xb%qci(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qci(k,:))
-         call da_interp_lin_2d (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qsn(k,:))
-         call da_interp_lin_2d (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qgr(k,:))
+       ! call da_interp_lin_2d (grid%xb%qci(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qci(k,:))
+       ! call da_interp_lin_2d (grid%xb%qsn(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qsn(k,:))
+       ! call da_interp_lin_2d (grid%xb%qgr(:,:,k), iv%instid(inst)%info, k, iv%instid(inst)%qgr(k,:))
       end do
 
       iv%instid(inst)%pm(:,n1:n2)  = v_p(:,n1:n2)
