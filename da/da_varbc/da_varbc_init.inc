@@ -115,7 +115,7 @@
 		     do ipred = 1, npred
 		        iv%instid(n)%varbc(k)%vtox(ipred, ipred)      = 1.0
                      end do
-		     iv%instid(n)%varbc(k)%param(1:npred)             = missing_r
+		     iv%instid(n)%varbc(k)%param(1:npred)             = 0.0
    	             iv%instid(n)%varbc(k)%bgerr(1:npred)             = 0.0
                      iv%instid(n)%varbc(k)%ipred(1:npred)             = &
                            PACK((/ (ipred, ipred=1,npredmax) /), mask = (pred_use >= 0))

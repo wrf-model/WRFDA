@@ -35,18 +35,15 @@
    
    if ( iv%num_inst < 1 ) RETURN
 
-   if (trace_use) call da_trace_entry("da_varbc_coldstart")
-   
+   if (trace_use) call da_trace_entry("da_varbc_coldstart")   
 
    do inst = 1, iv%num_inst                                               !! loop for sensors
 
-      npredmax = iv%instid(inst)%varbc_info%npredmax
-      num_rad  = iv%instid(inst)%num_rad
-      n1       = iv%instid(inst)%info%n1
-      n2       = iv%instid(inst)%info%n2
- 
+      npredmax    = iv%instid(inst)%varbc_info%npredmax
+      num_rad     = iv%instid(inst)%num_rad
+      n1          = iv%instid(inst)%info%n1
+      n2          = iv%instid(inst)%info%n2
       num_rad_tot = wrf_dm_sum_integer(num_rad)
-      if (num_rad_tot<=0) cycle
       
       allocate( ipred(npredmax) )
     
@@ -112,7 +109,7 @@
       global_cs = .true.
       do k = 1, iv%instid(inst)%nchan 
 	 if (iv%instid(inst)%varbc(k)%npred <= 0) cycle                   !! VarBC channels only      
-	 global_cs = ( global_cs.and.(ALL(iv%instid(inst)%varbc(k)%pred_use <= 0)) )        
+	 if (ANY(iv%instid(inst)%varbc(k)%pred_use > 0)) global_cs = .false.      
       end do	 
     
       if (global_cs) then                                                 !! Instrument coldstart only
@@ -132,8 +129,10 @@
         ! ------------------------------------------------------
 	 call wrf_dm_sum_reals(mean, mean_tot)
   	 call wrf_dm_sum_reals(rms,  rms_tot)	 
-	 mean_tot = mean_tot / num_rad_tot
-         rms_tot  = rms_tot  / num_rad_tot
+         if (num_rad_tot > 0) then
+	    mean_tot = mean_tot / num_rad_tot
+            rms_tot  = rms_tot  / num_rad_tot
+	 end if
 	 
         ! Store statistics
         !------------------
