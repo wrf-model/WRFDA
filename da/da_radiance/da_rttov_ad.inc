@@ -268,7 +268,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 #endif
 
    ! rttov87 generates warnings we want to ignore
-   if (any(errorstatus(:) == errorstatus_fatal)) then
+   if (print_detail_rad .and. (any(errorstatus(:) == errorstatus_fatal))) then
        write (message(1),*) 'rttov_direct error code = ', errorstatus(:)
        write (message(2),*) 'nfrequencies            = ', nfrequencies
        write (message(3),*) 'nchannels               = ', nchannels
