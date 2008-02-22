@@ -142,13 +142,17 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
 
          !  3.0     Extract other information
 
-         info%elv  =  bfr1bhdr(bufr_station_height)         ! the value seems wrong
-         landsea_mask = nint(bfr1bhdr(bufr_landsea_mask))   ! actually surface flag
+         info%elv  = 0.0
+         landsea_mask = nint(bfr1bhdr(bufr_landsea_mask))   ! ssmis surface flag
                                                             ! 0:land, 2:near coast, 3:ice,
                                                             ! 4:possible ice, 5:ocean, 6:coast
+         ! RTTOV surftype: 0:land, 1:sea, 2:sea ice
          if ( landsea_mask == 5 ) then
             landsea_mask = 1
-            info%elv     = 0.0
+         else if ( landsea_mask == 2 .or. landsea_mask == 6 ) then
+            landsea_mask = 0
+         else if ( landsea_mask == 3 .or. landsea_mask == 4 ) then
+            landsea_mask = 2
          end if
          rain_flag = nint(bfr1bhdr(15))    ! 0:no rain, 1:rain
 
