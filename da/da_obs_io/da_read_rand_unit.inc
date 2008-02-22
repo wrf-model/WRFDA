@@ -35,8 +35,8 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    if (index(iv_type,OBS_type_in(1:nc)) > 0) if_write = .true.
 
    ! If radiance data treat differently
-   if ( index(iv_type,'noaa') > 0  .or. index(iv_type,'eos') > 0 .or.  &
-        index(iv_type,'dmsp') > 0 ) then
+   if ( (index(iv_type,'noaa') > 0)  .or. (index(iv_type,'eos') > 0) .or.  &
+        (index(iv_type,'dmsp') > 0) .or. (index(iv_type,'metop') > 0) ) then
       do n = 1, num_obs
          if (if_write) num = num + 1
          read(unit_in,'(2i8,f10.3,e15.7)')n1, n2, fld1_rad,fld2_rad
