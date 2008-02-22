@@ -372,7 +372,7 @@ subroutine da_solve ( grid , config_flags)
                deallocate (iv%instid(i)%varbc_info%pred_mean)
                deallocate (iv%instid(i)%varbc_info%pred_std)
                deallocate (iv%instid(i)%varbc_info%nbgerr)
-	       do ichan = 1, iv%instid(i)%nchannels
+	       do ichan = 1, iv%instid(i)%nchan
 	         if (iv%instid(i)%varbc(ichan)%npred <= 0) cycle	 
 		 deallocate (iv%instid(i)%varbc(ichan)%pred_use)
 		 deallocate (iv%instid(i)%varbc(ichan)%ipred)

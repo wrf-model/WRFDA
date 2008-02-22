@@ -157,6 +157,7 @@
        end if
     end do
     close(iunit)
+    call da_free_unit(iunit)
    else
       write(unit=stdout,fmt='(A)') 'VARBC: could not find VARBC.in file --> VARBC switched off'
       use_varbc    = .false.
