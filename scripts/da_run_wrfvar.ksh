@@ -251,7 +251,7 @@ if [[ -f $DA_VARBC_IN ]]; then
 fi
 
 export RADIANCE_INFO_DIR=${RADIANCE_INFO_DIR:-$WRFVAR_DIR/run/radiance_info}
-ln -fs $RADIANCE_INFO_DIR .
+ln -fs $RADIANCE_INFO_DIR radiance_info
 
 if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
    if $NL_VAR4D; then
