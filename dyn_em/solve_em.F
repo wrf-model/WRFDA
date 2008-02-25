@@ -29,6 +29,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_radiation_driver
    USE module_surface_driver
    USE module_cumulus_driver
+   USE module_cu_du , only : DUCU
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp    !Xiaoyan Zhang 11/20/2006 for Large Scale Condensation
@@ -74,6 +75,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    REAL :: dt_rk, dts_rk, dtm, wmax
    LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
+   INTEGER :: kts   !xzhang 6/25/2007
 
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -648,6 +650,48 @@ BENCH_START(cu_driver_tim)
                    , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
                                                                        )
          endif
+
+         IF (cu_physics .eq. 5) then            !IF for CUDU
+            CALL wrf_debug(100,'in du_cps')
+            DO ij = 1, grid%num_tiles
+
+               Print *, 'xxxx  CALL DU_CU scheme from solve_em xxxx, ij= ',ij
+               CALL DUCU(                                            &
+               IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
+               ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
+               ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
+               ,KTS=k_start,KTE=min(k_end, kde-1) &
+               ,DT=dt ,KTAU=itimestep ,DX=dx                    &
+               ,RHO=rho,RAINCV=raincv, NCA=nca                  &
+               ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
+               ,DZ8W=dz8w               &
+               ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
+               ,XLV=XLV                                         &
+               ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
+               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
+               ,STEPCU=stepcu                                   &
+               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
+               ,CUTOP=HTOP,CUBOT=HBOT                           &
+               ,QV=moist_2(ims,kms,jms,P_QV) 		                                     &
+              ! optionals
+               ,RTHCUTEN=rthcuten                               &
+               ,RQVCUTEN=rqvcuten                               &
+                                                                )
+
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  do k = k_start, min(k_end, kde-1)
+                     t_tendf(I,K,J) = t_tendf(I,K,J) + rthcuten(I,K,J) * mut(I,J)
+                     moist_tend(I,K,J,P_QV) = moist_tend(I,K,J,P_QV) + rqvcuten(I,K,J) * mut(I,J)
+                  end do
+                  rainc(I,J) = rainc(I,J) + raincv(I,J)
+               end do
+               end do
+
+            END DO
+         ENDIF 
+
 BENCH_END(cu_driver_tim)
 
 ! calculate_phy_tend

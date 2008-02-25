@@ -435,6 +435,18 @@ SUBROUTINE phy_cu_ten(config_flags,rk_step,n_moist,rt_tendf,    &
                 ids,ide, jds, jde, kds, kde,                     &
                 ims, ime, jms, jme, kms, kme,                    &
                 its, ite, jts, jte, kts, kte                     )
+   CASE (DUCUSCHEME)
+        CALL add_a2a(rt_tendf,RTHCUTEN,config_flags,             &
+                ids,ide, jds, jde, kds, kde,                     &
+                ims, ime, jms, jme, kms, kme,                    &
+                its, ite, jts, jte, kts, kte                     )
+
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &
+        CALL add_a2a(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &
+                config_flags,                                    &
+                ids,ide, jds, jde, kds, kde,                     &
+                ims, ime, jms, jme, kms, kme,                    &
+                its, ite, jts, jte, kts, kte                     )
 
    CASE DEFAULT
 

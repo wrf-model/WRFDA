@@ -356,6 +356,7 @@ if test ! -z "$NL_TEST_CALCULATE_KM_KH"; then echo "test_calculate_km_kh=${NL_TE
 if test ! -z "$NL_TEST_RK_TENDENCY"; then echo "test_rk_tendency=${NL_TEST_RK_TENDENCY}," >> $FILE;fi
 if test ! -z "$NL_TEST_SURFACE_DRAG"; then echo "test_surface_drag=${NL_TEST_SURFACE_DRAG}," >> $FILE;fi
 if test ! -z "$NL_TEST_LSCOND"; then echo "test_lscond=${NL_TEST_LSCOND}," >> $FILE;fi
+if test ! -z "$NL_TEST_CUDU"; then echo "test_cudu=${NL_TEST_CUDU}," >> $FILE;fi
 if test ! -z "$NL_TEST_MOIST_PHYSICS_PREP_EM"; then echo "test_moist_physics_prep_em=${NL_TEST_MOIST_PHYSICS_PREP_EM}," >> $FILE;fi
 if test ! -z "$NL_TEST_ADVECT_SCALAR"; then echo "test_advect_scalar=${NL_TEST_ADVECT_SCALAR}," >> $FILE;fi
 if test ! -z "$NL_TEST_RELAX_BDY_DRY"; then echo "test_relax_bdy_dry=${NL_TEST_RELAX_BDY_DRY}," >> $FILE;fi

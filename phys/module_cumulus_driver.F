@@ -53,6 +53,7 @@ CONTAINS
    USE module_cu_kfeta
    USE module_cu_gd
    USE module_cu_sas
+   USE module_cu_du
 
    !  This driver calls subroutines for the cumulus parameterizations.
    !

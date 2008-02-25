@@ -78,6 +78,7 @@
  TEST_rk_update_scalar      = .false.,
  TEST_calc_p_rho_phi        = .false.,
  TEST_diagnose_w            = .false.,
+ TEST_cudu                  = .true.
  /
 
  &physics
@@ -89,7 +90,7 @@
  sf_surface_physics                  = 0,     2,     2,
  bl_pbl_physics                      = 0,     1,     1,
  bldt                                = 0,     0,     0,
- cu_physics                          = 0,     1,     0,
+ cu_physics                          = 5,     1,     0,
  cudt                                = 0,     5,     5,
  isfflx                              = 0,
  ifsnow                              = 0,

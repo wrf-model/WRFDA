@@ -13097,6 +13097,290 @@ call a_moist_physics_prep_em( K_t_new, P_t_new, K_t_old, P_t_old, t0, rho, P_rho
 END SUBROUTINE t_moist_physics_prep_em
 
 !---------------------------------------------------------------------------------
+   SUBROUTINE t_DUCU(                                          &
+              ids,ide, jds,jde, kds,kde                      &
+             ,ims,ime, jms,jme, kms,kme                      &
+             ,its,ite, jts,jte, kts,kte                      &
+             ,DT,KTAU,DX                                     &
+             ,rho,RAINCV,NCA                                 &
+             ,U,V,TH,T,W,dz8w,Z,Pcps,pi                      &
+             ,W0AVG,XLV                                      &
+             ,CP,RD,RV,G                                      &
+             ,EP2,SVP1,SVP2,SVP3,SVPT0                       &
+             ,STEPCU,CU_ACT_FLAG,warm_rain,CUTOP,CUBOT       &
+             ,QV                                             &
+            ! optionals
+             ,RTHCUTEN,RQVCUTEN                              &
+                                                             )
+
+
+   USE module_cu_du , only : DUCU, DUCU_D, DUCU_B
+!-------------------------------------------------------------
+   IMPLICIT NONE
+!-------------------------------------------------------------
+   INTEGER       ::                            &
+                                  ids,ide, jds,jde, kds,kde, &
+                                  ims,ime, jms,jme, kms,kme, &
+                                  its,ite, jts,jte, kts,kte
+
+   INTEGER   :: STEPCU
+   LOGICAL    :: warm_rain
+
+   REAL          :: XLV
+   REAL          :: CP,RD,RV,G,EP2
+   REAL          :: SVP1,SVP2,SVP3,SVPT0
+
+   INTEGER       :: KTAU
+
+   REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )         :: &
+                                                          U, &
+                                                          V, &
+                                                          W, &
+                                                         TH, &
+                                                          T, &
+                                                         QV, &
+                                                       dz8w, &
+                                                          z, &
+                                                       Pcps, &
+                                                        rho, &
+                                                         pi
+!
+   REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )        :: W0AVG
+  REAL   :: DT, DX
+!
+   REAL, DIMENSION( ims:ime , jms:jme )                  :: RAINCV
+
+   REAL,    DIMENSION( ims:ime , jms:jme )               :: NCA
+
+   REAL, DIMENSION( ims:ime , jms:jme )                ::  CUBOT, &
+                                                      CUTOP
+
+   LOGICAL, DIMENSION( ims:ime , jms:jme )            :: CU_ACT_FLAG
+
+!
+! Optional arguments
+!
+
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme )     :: RTHCUTEN, &
+                                                   RQVCUTEN
+
+!  xzhang: new definition
+!  IN variables
+  REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ) ::  S_TH, S_T, S_QV, S_dz8w, S_z, S_Pcps, S_rho 
+  REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ) ::  P_TH, P_T, P_QV, P_dz8w, P_z, P_Pcps, P_rho 
+  REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ) ::  B_TH, B_T, B_QV, B_dz8w, B_z, B_Pcps, B_rho 
+
+! INOUT variables
+   REAL, DIMENSION( ims:ime , jms:jme )           ::  S_RAINCV,P_RAINCV,B_RAINCV,K_RAINCV
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  S_RTHCUTEN, S_RQVCUTEN
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  P_RTHCUTEN, P_RQVCUTEN
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  B_RTHCUTEN, B_RQVCUTEN
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  K_RTHCUTEN, K_RQVCUTEN
+
+   REAL :: SAVE_L, COEF, ALPHA_TST, FACTOR, VAL_N, VAL_L, VAL_A
+   INTEGER :: NT,h
+
+S_TH =TH
+S_T =T
+S_QV=QV
+S_dz8w =dz8w
+S_z =z
+S_Pcps =Pcps
+S_rho =rho
+
+P_TH =TH
+P_T =T
+P_QV=QV
+P_dz8w =dz8w
+P_z =z
+P_Pcps =Pcps
+P_rho =rho
+
+!S_RAINCV =RAINCV
+!S_RTHCUTEN =RTHCUTEN
+!S_RQVCUTEN =RQVCUTEN
+
+!P_RAINCV =RAINCV
+!P_RTHCUTEN =RTHCUTEN
+!P_RQVCUTEN =RQVCUTEN
+
+!K_RAINCV =RAINCV
+!K_RTHCUTEN =RTHCUTEN
+!K_RQVCUTEN =RQVCUTEN
+
+!  NLM
+
+    CALL  DUCU(                                          &
+              ids,ide, jds,jde, kds,kde                      &
+             ,ims,ime, jms,jme, kms,kme                      &
+             ,its,ite, jts,jte, kts,kte                      &
+             ,DT,KTAU,DX                                     &
+             ,rho,RAINCV,NCA                                 &
+             ,U,V,TH,T,W,dz8w,Z,Pcps,pi                      &
+             ,W0AVG,XLV                                      &
+             ,CP,RD,RV,G                                      &
+             ,EP2,SVP1,SVP2,SVP3,SVPT0                       &
+             ,STEPCU,CU_ACT_FLAG,warm_rain,CUTOP,CUBOT       &
+             ,QV                                             &
+            ! optionals
+             ,RTHCUTEN,RQVCUTEN                              &
+                                                             )
+
+B_RAINCV =RAINCV
+B_RTHCUTEN =RTHCUTEN
+B_RQVCUTEN =RQVCUTEN
+
+!   CALL DUCU_D(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
+! &  , kme, its, ite, jts, jte, kts, kte, dt, ktau, dx, rho, rhod, raincv&
+! &  , raincvd, nca, u, v, th, thd, t, td, w, dz8w, dz8wd, z, zd, pcps, &
+! &  pcpsd, pi, w0avg, xlv, cp, rd, rv, g, ep2, svp1, svp2, svp3, svpt0, &
+! &  stepcu, cu_act_flag, warm_rain, cutop, cubot, qv, qvd, rthcuten, &
+! &  rthcutend, rqvcuten, rqvcutend)
+
+  CALL DUCU_D(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
+&  , kme, its, ite, jts, jte, kts, kte, dt, ktau, dx, rho, P_rho, K_raincv&
+&  , P_raincv, nca, u, v, th, P_th, t, P_t, w, dz8w, P_dz8w, z, P_z, pcps, &
+&  P_pcps, pi, w0avg, xlv, cp, rd, rv, g, ep2, svp1, svp2, svp3, svpt0, &
+&  stepcu, cu_act_flag, warm_rain, cutop, cubot, qv, P_qv, K_rthcuten, &
+&  P_rthcuten, K_rqvcuten, P_rqvcuten)
+
+     SAVE_L=0.
+     SAVE_L= sum(P_RAINCV**2) + sum(P_RTHCUTEN **2)+ sum(P_RQVCUTEN **2)
+
+
+   ALPHA_TST=1.
+   DO NT=1,11
+      ALPHA_TST=0.1*ALPHA_TST
+      FACTOR=1.+ALPHA_TST
+
+	P_TH =FACTOR*S_TH
+	P_T =FACTOR*S_T
+	P_QV=FACTOR*S_QV
+	P_dz8w =FACTOR*S_dz8w
+	P_z =FACTOR*S_z
+	P_Pcps =FACTOR*S_pcps
+	P_rho =FACTOR*S_rho
+
+!	P_RAINCV =FACTOR*S_RAINCV
+!	P_RTHCUTEN =FACTOR*S_RTHCUTEN
+!	P_RQVCUTEN =FACTOR*S_RQVCUTEN
+
+    CALL  DUCU(                                          &
+              ids,ide, jds,jde, kds,kde                      &
+             ,ims,ime, jms,jme, kms,kme                      &
+             ,its,ite, jts,jte, kts,kte                      &
+             ,DT,KTAU,DX                                     &
+             ,P_rho,P_RAINCV,NCA                                 &
+             ,U,V,P_TH,P_T,W,P_dz8w,P_Z,P_Pcps,pi                      &
+             ,W0AVG,XLV                                      &
+             ,CP,RD,RV,G                                      &
+             ,EP2,SVP1,SVP2,SVP3,SVPT0                       &
+             ,STEPCU,CU_ACT_FLAG,warm_rain,CUTOP,CUBOT       &
+             ,P_QV                                             &
+            ! optionals
+             ,P_RTHCUTEN,P_RQVCUTEN                              &
+                                                             )
+
+
+     VAL_N=0.
+     VAL_N= sum((P_RAINCV -B_RAINCV)**2) + sum((P_RTHCUTEN -B_RTHCUTEN)**2) + sum((P_RQVCUTEN -B_RQVCUTEN)**2) 
+
+      VAL_L=SAVE_L*ALPHA_TST**2
+      COEF=VAL_N/VAL_L
+
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+         'g_cudu: ALPHA=',ALPHA_TST,'  COEF=',COEF, &
+         '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+   ENDDO
+
+! ADJ test
+
+  FACTOR = 0.1
+
+TH =S_TH
+T =S_T
+QV=S_QV
+dz8w =S_dz8w
+z =S_z
+Pcps =S_Pcps
+rho =S_rho
+
+!RAINCV =S_RAINCV
+!RTHCUTEN =S_RTHCUTEN
+!RQVCUTEN =S_RQVCUTEN
+
+P_TH =FACTOR*S_TH
+P_T =FACTOR*S_T
+P_QV=FACTOR*S_QV
+P_dz8w =FACTOR*S_dz8w
+P_z =FACTOR*S_z
+P_Pcps =FACTOR*S_Pcps
+P_rho =FACTOR*S_rho
+
+!P_RAINCV =FACTOR*S_RAINCV
+!P_RTHCUTEN =FACTOR*S_RTHCUTEN
+!P_RQVCUTEN =FACTOR*S_RQVCUTEN
+
+B_TH =P_TH
+B_T =P_T
+B_QV=P_QV
+B_dz8w =P_dz8w
+B_z =P_z
+B_Pcps =P_Pcps
+B_rho =P_rho
+
+!B_RAINCV =P_RAINCV
+!B_RTHCUTEN =P_RTHCUTEN
+!B_RQVCUTEN =P_RQVCUTEN
+
+!K_RAINCV =RAINCV
+!K_RTHCUTEN =RTHCUTEN
+!K_RQVCUTEN =RQVCUTEN
+
+  CALL DUCU_D(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
+&  , kme, its, ite, jts, jte, kts, kte, dt, ktau, dx, rho, P_rho, raincv&
+&  , P_raincv, nca, u, v, th, P_th, t, P_t, w, dz8w, P_dz8w, z, P_z, pcps, &
+&  P_pcps, pi, w0avg, xlv, cp, rd, rv, g, ep2, svp1, svp2, svp3, svpt0, &
+&  stepcu, cu_act_flag, warm_rain, cutop, cubot, qv, P_qv, rthcuten, &
+&  P_rthcuten, rqvcuten, P_rqvcuten)
+
+     VAL_L=0.
+     VAL_L= sum(P_RAINCV**2) + sum(P_RTHCUTEN **2)+ sum(P_RQVCUTEN **2)
+
+P_TH =0.0
+P_T =0.0
+P_QV=0.0
+P_dz8w =0.0
+P_z =0.0
+P_Pcps =0.0
+P_rho =0.0
+
+!  call  DUCU_B(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
+!&  , kme, its, ite, jts, jte, kts, kte, dt, ktau, dx, rho, P_rho, K_raincv&
+!&  , P_raincv, nca, u, v, th, P_th, t, P_t, w, dz8w, P_dz8w, z, P_z, pcps, &
+!&  P_pcps, pi, w0avg, xlv, cp, rd, rv, g, ep2, svp1, svp2, svp3, svpt0, &
+!&  stepcu, cu_act_flag, warm_rain, cutop, cubot, qv, P_qv, K_rthcuten, &
+!&  P_rthcuten, K_rqvcuten, P_rqvcuten)
+
+  call  DUCU_B(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
+&  , kme, its, ite, jts, jte, kts, kte, dt, ktau, dx, rho, P_rho, raincv&
+&  , P_raincv, nca, u, v, th, P_th, t, P_t, w, dz8w, P_dz8w, z, P_z, pcps, &
+&  P_pcps, pi, w0avg, xlv, cp, rd, rv, g, ep2, svp1, svp2, svp3, svpt0, &
+&  stepcu, cu_act_flag, warm_rain, cutop, cubot, qv, P_qv, rthcuten, &
+&  P_rthcuten, rqvcuten, P_rqvcuten)
+
+     VAL_A=0.
+     VAL_A= sum(P_TH*B_TH)+ sum(P_T*B_T)+ sum(P_QV*B_QV)+ sum(P_dz8w*B_dz8w)  &
+            + sum(P_z*B_z)+ sum(P_Pcps*B_Pcps)+ sum(P_rho*B_rho) 
+!            + sum(P_RAINCV*B_RAINCV) +sum(P_RTHCUTEN*B_RTHCUTEN) +sum(P_RQVCUTEN*B_RQVCUTEN)
+
+   print*, '                '
+   write(6,*) 'a_CUDU: '
+   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
+   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A
+
+    END SUBROUTINE t_DUCU
+!---------------------------------------------------------------------------------
 !============================================================================================================
 
 END MODULE module_check

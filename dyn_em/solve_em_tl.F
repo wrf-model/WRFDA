@@ -29,6 +29,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    USE module_radiation_driver
    USE module_surface_driver
    USE module_cumulus_driver
+   USE module_cu_du , only : DUCU_D
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp !Xiaoyan Zhang 11/2006
@@ -84,11 +85,15 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
 !--Local variables
 !Xiaoyan Zhang add
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rainnc
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rainncv
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_h_diabatic
-!
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainnc
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainncv
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainc
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_raincv
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rqvcuten
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rthcuten
 
+!!!!!
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_z_at_wm
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_pi_phym
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_xkmhm
@@ -714,6 +719,77 @@ BENCH_START(cu_driver_tim)
                    , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
                                                                        )
          endif
+
+         IF (cu_physics .eq. 5) then            !IF for CUDU
+            CALL wrf_debug(100,'in du_cps')
+            DO ij = 1, grid%num_tiles
+
+               Print *, 'xxxx  CALL TL DU_CU scheme from solve_em_tl xxxx'
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do k = k_start, min(k_end, kde-1)
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  rho(i,k,j) = 1./alt(i,k,j)*(1.+moist_2(i,k,j,P_QV))
+                  u_phy(i,k,j) = 0.5*(u_2(i,k,j)+u_2(i+1,k,j))
+                  v_phy(i,k,j) = 0.5*(v_2(i,k,j)+v_2(i,k,j+1))
+                  rthcuten(i,k,j) = rthcuten(i,k,j)/mut(i,j)
+                  rqvcuten(i,k,j) = rqvcuten(i,k,j)/mut(i,j)
+                  g_rthcuten(i,k,j) = g_rthcuten(i,k,j)/mut(i,j)
+                  g_rqvcuten(i,k,j) = g_rqvcuten(i,k,j)/mut(i,j)
+               end do
+               end do
+               end do
+
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do k = k_start, kde-1
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  dz8w(i,k,j)= z_at_w(i,k+1,j)-z_at_w(i,k,j)
+               end do
+               end do
+               end do
+
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  dz8w(i,kde,j) = 0.
+               end do
+               end do
+          
+               CALL DUCU_D( ids,ide,jds,jde,kds,kde &
+               ,ims,ime,jms,jme,kms,kme &
+               ,grid%i_start(ij),min(grid%i_end(ij), ide-1)      &
+               ,grid%j_start(ij), min(grid%j_end(ij), jde-1)    &
+               ,k_start,min(k_end, kde-1) &
+               ,dt ,itimestep ,dx                    &
+               ,rho,g_rho,raincv,g_raincv                       &
+               ,nca,u_phy ,v_phy                        &
+               ,th_phy,g_th_phy,t_phy,g_t_phy                   &
+               ,w_2                                           &
+               ,dz8w,g_dz8w,z,g_z,p_phy,g_p_phy                 &
+               ,pi_phy,grid%W0AVG,XLV              &
+               ,CP ,R_d ,R_v ,G ,EP_2             &
+               ,SVP1 ,SVP2 ,SVP3 ,SVPT0    &
+               ,stepcu                                   &
+               ,cu_act_flag ,warm_rain    &
+               ,HTOP,HBOT                           &
+               ,moist_2(ims,kms,jms,P_QV),g_moist_2(ims,kms,jms,P_QV) &
+              ! optionals
+               ,rthcuten,g_rthcuten, rqvcuten,g_rqvcuten )
+     
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  do k = k_start, min(k_end, kde-1)
+                     g_t_tendf(I,K,J) = g_t_tendf(I,K,J) + rthcuten(I,K,J) * g_mut(I,J) + g_rthcuten(I,K,J) * mut(I,J)
+                     t_tendf(I,K,J) = t_tendf(I,K,J) + rthcuten(I,K,J) * mut(I,J)
+                     g_moist_tend(I,K,J,P_QV) = g_moist_tend(I,K,J,P_QV) + rqvcuten(I,K,J) * g_mut(I,J) + g_rqvcuten(I,K,J) * mut(I,J)
+                     moist_tend(I,K,J,P_QV) = moist_tend(I,K,J,P_QV) + rqvcuten(I,K,J) * mut(I,J)
+                  end do
+                  g_rainc(I,J) = g_rainc(I,J) + g_raincv(I,J)
+                  rainc(I,J) = rainc(I,J) + raincv(I,J)
+               end do
+               end do
+
+            ENDDO
+         ENDIF
+
 BENCH_END(cu_driver_tim)
 
 ! calculate_phy_tend

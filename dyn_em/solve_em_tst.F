@@ -29,6 +29,7 @@ SUBROUTINE solve_em_tst ( grid , config_flags , &
    USE module_radiation_driver
    USE module_surface_driver
    USE module_cumulus_driver
+   USE module_cu_du , only: DUCU
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp !Xiaoyan Zhang
@@ -429,6 +430,7 @@ BENCH_END(step_prep_tim)
 
 BENCH_START(set_phys_bc_tim)
    if(dyn_opt == DYN_EM) then
+!   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -590,6 +592,7 @@ BENCH_END(phy_prep_tim)
          CALL wrf_debug ( 200 , ' call radiation_driver' )
 BENCH_START(rad_driver_tim)
          if(dyn_opt == DYN_EM) then
+!         if(dyn_opt == DYN_EM_TST) then
          CALL radiation_driver(itimestep,dt,AER_DRY,AER_WATER,       &
                     RTHRATENLW,RTHRATENSW,RTHRATEN,GLW,GSW,          &
                     SWDOWN,                                          &
@@ -619,6 +622,7 @@ BENCH_END(rad_driver_tim)
 
 BENCH_START(surf_driver_tim)
       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
       CALL wrf_debug ( 200 , ' call surface_driver' )
       CALL surface_driver(                                          &
      &           ACSNOM,ACSNOW,AKHS,AKMS,ALBEDO,BR,CANWAT,CAPG        &
@@ -650,6 +654,7 @@ BENCH_END(surf_driver_tim)
 
 BENCH_START(pbl_driver_tim)
       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
       CALL wrf_debug ( 200 , ' call pbl_driver' )
       CALL pbl_driver(itimestep,dt,u_frame,v_frame                    &
      &           ,RUBLTEN,RVBLTEN,RTHBLTEN                            &
@@ -676,8 +681,75 @@ BENCH_END(pbl_driver_tim)
 ! cumulus para.
 
 BENCH_START(cu_driver_tim)
-         if(dyn_opt == DYN_EM) then
+!         if(dyn_opt == DYN_EM) then
+         if(dyn_opt == DYN_EM_TST) then
          CALL wrf_debug ( 200 , ' call cumulus_driver' )
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!            Xiaoyan Zhang Add DU Cumulus  call at 7/13/2007      !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+       DO ij = 1, grid%num_tiles
+
+         CALL wrf_debug ( 200 , ' call dudu' )
+         print *, 'Check the DUCU, TEST_cudu = ', TEST_cudu
+
+         if ( TEST_cudu )      THEN 
+         CALL  t_DUCU(                                            &
+               IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
+               ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
+               ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
+               ,KTS=k_start,KTE=min(k_end, kde-1) &
+               ,DT=dt ,KTAU=itimestep ,DX=dx                    &
+               ,RHO=rho,RAINCV=raincv, NCA=nca                  &
+               ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
+               ,DZ8W=dz8w               &
+               ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
+               ,XLV=XLV                                         &
+               ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
+               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
+               ,STEPCU=stepcu                                   &
+               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
+               ,CUTOP=HTOP,CUBOT=HBOT                           &
+               ,QV=moist_2(ims,kms,jms,P_QV)                                                 &
+              ! optionals
+               ,RTHCUTEN=rthcuten                               &
+               ,RQVCUTEN=rqvcuten                               &
+
+                                                                )
+         endif
+         print *, 'Finishing Check the DUCU, TEST_cudu'
+
+         CALL  DUCU(                                            &
+               IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
+               ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
+               ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
+               ,KTS=k_start,KTE=min(k_end, kde-1) &
+               ,DT=dt ,KTAU=itimestep ,DX=dx                    &
+               ,RHO=rho,RAINCV=raincv, NCA=nca                  &
+               ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
+               ,DZ8W=dz8w               &
+               ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
+               ,XLV=XLV                                         &
+               ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
+               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
+               ,STEPCU=stepcu                                   &
+               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
+               ,CUTOP=HTOP,CUBOT=HBOT                           &
+               ,QV=moist_2(ims,kms,jms,P_QV)                                                 &
+              ! optionals
+               ,RTHCUTEN=rthcuten                               &
+               ,RQVCUTEN=rqvcuten                               &
+
+                                                                )
+
+       ENDDO
+       goto 713
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!            Xiaoyan Zhang Add DU Cumulus  call at 7/13/2007      !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          CALL cumulus_driver(                                          &
                  ! Order dependent args: domain, mem, tile dims
                      ids,ide, jds,jde, kds,kde                         &
@@ -720,6 +792,7 @@ BENCH_START(cu_driver_tim)
                    , QS_CURR=moist_2(ims,kms,jms,P_QS), F_QS=F_QS      &
                    , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
                                                                        )
+713         continue
          endif
 BENCH_END(cu_driver_tim)
 
@@ -727,6 +800,7 @@ BENCH_END(cu_driver_tim)
 
 BENCH_START(cal_phy_tend)
       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -756,6 +830,7 @@ BENCH_END(cal_phy_tend)
 
 BENCH_START(comp_diff_metrics_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -780,6 +855,7 @@ BENCH_END(comp_diff_metrics_tim)
 
 BENCH_START(tke_diff_bc_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        DO ij = 1 , grid%num_tiles
 
           CALL wrf_debug ( 200 , ' call bc for diffusion_metrics ' )
@@ -829,6 +905,7 @@ BENCH_END(tke_diff_bc_tim)
 
 BENCH_START(deform_div_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -922,6 +999,7 @@ BENCH_END(calc_tke_tim)
 
 BENCH_START(phy_bc_tim)
      if(dyn_opt == DYN_EM) then
+!     if(dyn_opt == DYN_EM_TST) then
      !$OMP PARALLEL DO   &
      !$OMP PRIVATE ( ij )
 
@@ -991,6 +1069,7 @@ BENCH_END(phy_bc_tim)
 
 BENCH_START(update_phy_ten_tim)
       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -1017,6 +1096,7 @@ BENCH_END(update_phy_ten_tim)
 
 BENCH_START(tke_rhs_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -1051,6 +1131,7 @@ BENCH_END(tke_rhs_tim)
 
 BENCH_START(vert_diff_tim)
          if(dyn_opt == DYN_EM) then
+!         if(dyn_opt == DYN_EM_TST) then
          !$OMP PARALLEL DO   &
          !$OMP PRIVATE ( ij )
          DO ij = 1 , grid%num_tiles
@@ -1081,6 +1162,7 @@ BENCH_END(vert_diff_tim)
 !
 BENCH_START(hor_diff_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
        DO ij = 1 , grid%num_tiles
@@ -1551,6 +1633,7 @@ BENCH_END(small_step_prep_tim)
 
 BENCH_START(set_phys_bc2_tim)
    if(dyn_opt == DYN_EM) then
+!   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -1962,6 +2045,7 @@ BENCH_START(spec_bdynhyd_tim)
                                      k_start    , k_end             )
              IF( config_flags%specified ) THEN
                if(dyn_opt == DYN_EM) then
+!               if(dyn_opt == DYN_EM_TST) then
                CALL zero_grad_bdy ( w_2,                        &
                                     'w'         , config_flags, &
                                     spec_zone,                  &
@@ -2027,6 +2111,7 @@ BENCH_END(cald_p_rho_tim)
 
 BENCH_START(phys_bc_tim)
       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
 
@@ -2497,6 +2582,7 @@ BENCH_END(update_scal_tim)
 
 BENCH_START(flow_depbdy_tim)
        if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM_TST) then
        IF( config_flags%specified ) THEN
          IF(im .ne. P_QV)THEN
            CALL flow_dep_bdy  (  moist_2(ims,kms,jms,im),                     &
@@ -2522,6 +2608,7 @@ BENCH_END(flow_depbdy_tim)
 
 BENCH_START(tke_adv_tim)
  if(dyn_opt == DYN_EM) then
+! if(dyn_opt == DYN_EM_TST) then
  TKE_advance: IF (km_opt .eq. 2) then
 
 #ifdef DM_PARALLEL
@@ -2824,6 +2911,7 @@ BENCH_END(diag_w_tim)
 
 BENCH_START(bc_end_tim)
    if(dyn_opt == DYN_EM) then
+!   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -3150,6 +3238,7 @@ BENCH_END(moist_phys_end_tim)
 
 
    if(dyn_opt == DYN_EM) then
+!   if(dyn_opt == DYN_EM_TST) then
    IF (leapfrog ) THEN
 
     ! do time filter and switch for the dry variables
@@ -3248,6 +3337,7 @@ BENCH_END(time_filt_tim)
 
 BENCH_START(bc_2d_tim)
    if(dyn_opt == DYN_EM) then
+!   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 

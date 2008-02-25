@@ -1257,6 +1257,8 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33
 !XIAO
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_rainnc
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_rainncv
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_rainc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_raincv
 
 
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_1
@@ -1326,6 +1328,8 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33
 !XIAO
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rainnc
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rainncv
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rainc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_raincv
 
 !---------------------------------------------------------------------------------------
 
@@ -1368,7 +1372,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    S_moist_2 = moist_2 
 !XIAO
    S_rainnc(:,:) = rainnc(:,:)
-!   S_rainncv(:,:)=rainncv(:,:)
+   S_rainncv(:,:)=rainncv(:,:)
+   S_rainc(:,:) = rainc(:,:)
+   S_raincv(:,:)=raincv(:,:)
 !XIAO
 !   S_u_b = u_b 
 !   S_u_bt = u_bt 
@@ -1424,7 +1430,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
     B_mudf(i,j) =mudf(i,j)
 !XIAO
     B_rainnc(i,j)=rainnc(i,j)
-!    B_rainncv(i,j)=rainncv(i,j)
+    B_rainncv(i,j)=rainncv(i,j)
+    B_rainc(i,j)=rainc(i,j)
+    B_raincv(i,j)=raincv(i,j)
    enddo
    enddo
 
@@ -1459,7 +1467,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    moist_2 = S_moist_2 
 !XIAO
    rainnc(:,:)=S_rainnc(:,:)
-!   rainncv(:,:)=S_rainncv(:,:)
+   rainncv(:,:)=S_rainncv(:,:)
+   rainc(:,:)=S_rainc(:,:)
+   raincv(:,:)=S_raincv(:,:)
 
 !   u_b = S_u_b 
 !   u_bt = S_u_bt 
@@ -1495,7 +1505,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    g_moist_2 = moist_2 
 !XIAO
    g_rainnc(:,:)=rainnc(:,:)
-!   g_rainncv(:,:)=rainncv(:,:)
+   g_rainncv(:,:)=rainncv(:,:)
+   g_rainc(:,:)=rainc(:,:)
+   g_raincv(:,:)=raincv(:,:)
 !XIAO
    g_u_b = 0.0 
    g_u_bt = 0.0 
@@ -1549,7 +1561,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
                      + g_mu_2(i,j)  * g_mu_2(i,j)    &
 !XIAO
                      + g_rainnc(i,j) * g_rainnc(i,j)   &
-!                     + g_rainncv(i,j) * g_rainncv(i,j) &
+                     + g_rainncv(i,j) * g_rainncv(i,j) &
+                     + g_rainc(i,j) * g_rainc(i,j)   &
+                     + g_raincv(i,j) * g_raincv(i,j) &
 !XIAO
                      + g_mudf(i,j)  * g_mudf(i,j)    
    enddo
@@ -1588,7 +1602,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    moist_2 = FACTOR*S_moist_2 
 !XIAO
    rainnc = FACTOR*S_rainnc
-!   rainncv = FACTOR*S_rainncv
+   rainncv = FACTOR*S_rainncv
+   rainc = FACTOR*S_rainc
+   raincv = FACTOR*S_raincv
 !XIAO
 !   u_b = FACTOR*S_u_b 
 !   u_bt = FACTOR*S_u_bt 
@@ -1643,7 +1659,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
                    + (mu_2(i,j) -B_mu_2(i,j))*(mu_2(i,j) -B_mu_2(i,j))    &
 !XIAO
                    + (rainnc(i,j) -B_rainnc(i,j))*(rainnc(i,j) -B_rainnc(i,j))  &
-!                   + (rainncv(i,j) -B_rainncv(i,j))*(rainncv(i,j)-B_rainncv(i,j))  &
+                   + (rainncv(i,j) -B_rainncv(i,j))*(rainncv(i,j)-B_rainncv(i,j))  &
+                   + (rainc(i,j) -B_rainc(i,j))*(rainc(i,j) -B_rainc(i,j))  &
+                   + (raincv(i,j) -B_raincv(i,j))*(raincv(i,j)-B_raincv(i,j))  &
 !XIAO
                    + (mudf(i,j) -B_mudf(i,j))*(mudf(i,j) -B_mudf(i,j))  
    enddo
@@ -1690,7 +1708,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    moist_2 = S_moist_2 
 !XIAO
    rainnc = S_rainnc
-!   rainncv = S_rainncv
+   rainncv = S_rainncv
+   rainc = S_rainc
+   raincv = S_raincv
 !XIAO
 
 !   u_b = S_u_b 
@@ -1727,7 +1747,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    g_moist_2 = FACTOR*S_moist_2 
 !XIAO
    g_rainnc = FACTOR*S_rainnc
-!   g_rainncv = FACTOR*S_rainncv
+   g_rainncv = FACTOR*S_rainncv
+   g_rainc = FACTOR*S_rainc
+   g_raincv = FACTOR*S_raincv
 !XIAO
 
 !   g_u_b = FACTOR*S_u_b 
@@ -1797,7 +1819,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    B_moist_2 = g_moist_2 
 !XIAO
    B_rainnc = g_rainnc
-!   B_rainncv = g_rainncv
+   B_rainncv = g_rainncv
+   B_rainc = g_rainc
+   B_raincv = g_raincv
 !XIAO
 
 !   B_u_b = g_u_b 
@@ -1852,7 +1876,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
                      + g_mu_2(i,j)  * g_mu_2(i,j)    &
 !XIAO
                      + g_rainnc(i,j) * g_rainnc(i,j)  &
-!                     + g_rainncv(i,j) * g_rainncv(i,j)  &
+                     + g_rainncv(i,j) * g_rainncv(i,j)  &
+                     + g_rainc(i,j) * g_rainc(i,j)  &
+                     + g_raincv(i,j) * g_raincv(i,j)  &
 !XIAO
                      + g_mudf(i,j)  * g_mudf(i,j)
    enddo
@@ -1889,7 +1915,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    moist_2 = S_moist_2 
 !XIAO
    rainnc = S_rainnc
-!   rainncv = S_rainncv
+   rainncv = S_rainncv
+   rainc = S_rainc
+   raincv = S_raincv
 !XIAO
 
 !   u_b = S_u_b 
@@ -1928,7 +1956,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    a_moist_2 =0.
 !XIAO
    a_rainnc = 0.
-!   a_rainncv = 0.
+   a_rainncv = 0.
+   a_rainc = 0.
+   a_raincv = 0.
 !XIAO
    a_u_b = 0.
    a_u_bt = 0.
@@ -1965,7 +1995,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    a_moist_2 = g_moist_2 
 !XIAO
    a_rainnc = g_rainnc
-!   a_rainncv = g_rainncv
+   a_rainncv = g_rainncv
+   a_rainc = g_rainc
+   a_raincv = g_raincv
 !XIAO
 
    g_z=0.; g_mudf=0.  !XIAO
@@ -2002,7 +2034,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
       VAL_A= VAL_A + a_mu_1(i,j) * B_mu_1(i,j)                 &
 !XIAO
             + a_rainnc(i,j) * B_rainnc(i,j)      &
-!            + a_rainncv(i,j) * B_rainncv(i,j)     &
+            + a_rainncv(i,j) * B_rainncv(i,j)     &
+            + a_rainc(i,j) * B_rainc(i,j)      &
+            + a_raincv(i,j) * B_raincv(i,j)     &
 !XIAO
             + a_mu_2(i,j) * B_mu_2(i,j)        
    enddo
@@ -2086,7 +2120,9 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
    moist_2 = S_moist_2 
 !XIAO
    rainnc = S_rainnc
-!   rainncv = S_rainncv
+   rainncv = S_rainncv
+   rainc = S_rainc
+   raincv = S_raincv
 !XIAO
    u_b = S_u_b 
    u_bt = S_u_bt 

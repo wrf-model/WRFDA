@@ -1086,6 +1086,7 @@ rconfig   logical TEST_calculate_km_kh    namelist,domains          1      .fals
 rconfig   logical TEST_rk_tendency        namelist,domains          1      .false. -     "TEST_rk_tendency"            ""      ""
 rconfig   logical TEST_surface_drag       namelist,domains          1      .false. -     "TEST_surface_drag"           ""      ""
 rconfig   logical TEST_lscond             namelist,domains          1      .false. -     "TEST_lscond"                 ""      ""
+rconfig   logical TEST_cudu               namelist,domains          1      .false. -     "TEST_cudu"                   ""      ""
 rconfig   logical TEST_moist_physics_prep_em  namelist,domains      1      .false. -     "TEST_moist_physics_prep_em"  ""      ""
 rconfig   logical TEST_advect_scalar      namelist,domains          1      .false. -     "TEST_advect_scalar"          ""      ""
 rconfig   logical TEST_relax_bdy_dry      namelist,domains          1      .false. -     "TEST_relax_bdy_dry"          ""      ""
@@ -1283,6 +1284,7 @@ package   kfetascheme    cu_physics==1               -             -
 package   bmjscheme      cu_physics==2               -             -
 package   gdscheme       cu_physics==3               -             -
 package   sasscheme      cu_physics==4               -             -
+package   ducuscheme     cu_physics==5               -             -
 package   kfscheme       cu_physics==99              -             -
                                                 
 # only need to specify these once; not for every io_form* variable

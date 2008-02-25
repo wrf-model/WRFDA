@@ -886,6 +886,7 @@ integer myproc
    USE MODULE_CU_BMJ
    USE module_cu_gd
    USE module_cu_sas
+   USE module_cu_du
 !------------------------------------------------------------------
    IMPLICIT NONE
 !------------------------------------------------------------------
@@ -989,6 +990,15 @@ integer myproc
      CASE (SASSCHEME)
           CALL sasinit(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQICUTEN,       &
                       restart,P_QC,P_QI,PARAM_FIRST_SCALAR,       &
+                      allowed_to_read ,                           &
+                      ids, ide, jds, jde, kds, kde,               &
+                      ims, ime, jms, jme, kms, kme,               &
+                      its, ite, jts, jte, kts, kte                )
+     CASE (DUCUSCHEME)
+          CALL ducuinit(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,      &
+                      RQICUTEN,RQSCUTEN,NCA,W0AVG,P_QI,P_QS,      &
+                      SVP1,SVP2,SVP3,SVPT0,                       &
+                      PARAM_FIRST_SCALAR,restart,                 &
                       allowed_to_read ,                           &
                       ids, ide, jds, jde, kds, kde,               &
                       ims, ime, jms, jme, kms, kme,               &
