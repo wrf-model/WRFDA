@@ -72,6 +72,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
          iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
          call da_zero_x(grid%xa)
          call da_transform_xtoy_adj(grid, iv, y, grid%xa)
+         call da_transform_xtoxa_adj(grid)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
 
          call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
@@ -111,17 +112,18 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       if (num_fgat_time > 1) then ! Recover the firstguess fields touched by reading gr01
          call da_med_initialdata_input( grid , config_flags, 'fg01')
       end if
-
+      cv = 0.0
+      call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    else  ! var4d
       iv%time = 1
       iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
       iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
       call da_zero_x(grid%xa)
       call da_transform_xtoy_adj(grid, iv, y,grid%xa)
+      cv = 0.0
+      call da_transform_xtoxa_adj(grid)
+      call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end if ! var4d
-
-   cv = 0.0
-   call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    !--------------------------------------------------------------
    ! ADJ of Variational Bias Correction

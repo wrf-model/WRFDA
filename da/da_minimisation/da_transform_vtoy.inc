@@ -75,11 +75,13 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_zero_x(grid%xa)
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
+         call da_transform_xtoxa(grid)
          call da_transform_xtoy(grid, iv, y)
       end do
       call da_med_initialdata_input( grid , config_flags, 'fg01')
       call da_setup_firstguess( xbx_tmp, grid, config_flags)
    else  ! not var4d
+      call da_transform_xtoxa(grid)
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d
 
