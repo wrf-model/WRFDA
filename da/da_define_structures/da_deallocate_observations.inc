@@ -32,7 +32,23 @@ subroutine da_deallocate_observations (ob)
 
       deallocate (ob % sonde_sfc)
    end if
+!whl
+   if (ob % num_mtgirs > 0) then
+      do n = 1, ob % num_mtgirs
+         if (ob%mtgirs(n)%info%levels > 0) then
+            deallocate (ob % mtgirs (n) % h)
+            deallocate (ob % mtgirs (n) % p)
+            deallocate (ob % mtgirs (n) % zk)
+            deallocate (ob % mtgirs (n) % u)
+            deallocate (ob % mtgirs (n) % v)
+            deallocate (ob % mtgirs (n) % t)
+            deallocate (ob % mtgirs (n) % q)
+         end if
+      end do
 
+      deallocate (ob % mtgirs)
+
+   end if
    if (ob % num_synop > 0) deallocate (ob % synop)
 
    if (ob % num_airep > 0) then

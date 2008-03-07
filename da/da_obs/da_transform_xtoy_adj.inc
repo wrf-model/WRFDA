@@ -131,7 +131,8 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    !---------------------------------------------------------------------------
 
    call da_transform_xtoy_bogus_adj (grid, iv, jo_grad_y, jo_grad_x)
-
+!whl
+   call da_transform_xtoy_mtgirs_adj (iv, jo_grad_y, jo_grad_x)
    !---------------------------------------------------------------------------
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------

@@ -18,7 +18,7 @@ contains
 #include "da_put_att_cdf.inc"
 #include "da_get_bdyfrq.inc"
 #include "da_get_bdytimestr_cdf.inc"
+#include "da_put_bdytimestr_cdf.inc"
 #include "da_atotime.inc"
 
 end module da_netcdf_interface
-

@@ -331,6 +331,27 @@ subroutine da_random_omb_all(iv, ob)
          end do
       end do
    end if
+!whl
+   ! Transfer mtgirs obs:
+
+   if (iv % num_mtgirs > 0) then
+      do n = 1, iv % num_mtgirs
+         do k = 1, iv % mtgirs(n) % info % levels
+            call da_random_omb(iv % mtgirs(n) % u(k) % error, &
+               ob % mtgirs(n) % u(k), &
+               iv % mtgirs(n) % u(k) % qc, iv % mtgirs(n) % u(k) % inv)
+            call da_random_omb(iv % mtgirs(n) % v(k) % error, &
+               ob % mtgirs(n) % v(k), &
+               iv % mtgirs(n) % v(k) % qc, iv % mtgirs(n) % v(k) % inv)
+            call da_random_omb(iv % mtgirs(n) % t(k) % error, &
+               ob % mtgirs(n) % t(k), &
+               iv % mtgirs(n) % t(k) % qc, iv % mtgirs(n) % t(k) % inv)
+            call da_random_omb(iv % mtgirs(n) % q(k) % error, &
+              ob % mtgirs(n) % q(k), &
+              iv % mtgirs(n) % q(k) % qc, iv % mtgirs(n) % q(k) % inv)
+         end do
+      end do
+   end if
 
 end subroutine da_random_omb_all
 

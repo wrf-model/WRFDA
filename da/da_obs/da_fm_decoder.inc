@@ -1,7 +1,7 @@
 subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
                                       satem, satob, airep, gpspw, gpsref,  &
                                       ssmi_retrieval, ssmi_tb, ssmt1, ssmt2, &
-                                      qscat,profiler, buoy, other)
+                                      qscat,profiler, buoy, mtgirs, other)
 
    !---------------------------------------------------------------------------  
    ! Purpose: Given the WMO code fm, return the observation platform type and 
@@ -29,6 +29,8 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
    !   Profiler 132         'PROFI'
    !   Buoy     18,19       'BUOY '
    !   other      Any other code
+!whl
+   !   MTGIRS   350         'MTGIRS'
    !----------------------------------------------------------------------------
 
     implicit none
@@ -41,6 +43,8 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
                                                       ssmi_retrieval, ssmi_tb,&
                                                       ssmt1, ssmt2, qscat, &
                                                       profiler, buoy, gpsref, &
+!whl
+                                                      mtgirs, &
                                                       other
 
    select case(fm)
@@ -107,6 +111,9 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
 
       case (35) ; platform = 'TEMP'
          if (present (sound)) sound = sound + 1
+!whl
+      case (350) ; platform = 'MTGIRS'
+         if (present (mtgirs)) mtgirs = mtgirs + 1
 
       !  Upper-level pressure, temperature, humidity and wind report 
       !  from a sea station
@@ -359,6 +366,7 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
       case ('OTHER');                                     platform = "OTHER";
       case ('BUOY');                                      platform = "BUOY";
       case ('PROFI');                                     platform = "PROFI";
+      case ('MTGIRS');                                    platform = "MTGIRS";
       case default;                                       platform = "OTHER";
 
    end select

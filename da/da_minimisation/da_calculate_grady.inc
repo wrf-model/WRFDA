@@ -21,6 +21,10 @@ subroutine da_calculate_grady(iv, re, jo_grad_y)
    call da_calculate_grady_sound(iv, re,  jo_grad_y)
    call da_calculate_grady_sonde_sfc(iv, re,  jo_grad_y)
 
+!whl
+   ! Mtgirs
+   call da_calculate_grady_mtgirs(iv, re,  jo_grad_y)
+
    ! Surface
 
    call da_calculate_grady_synop(iv, re,  jo_grad_y)

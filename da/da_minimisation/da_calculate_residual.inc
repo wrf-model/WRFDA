@@ -30,7 +30,10 @@ subroutine da_calculate_residual(iv, y, re)
 
    call da_residual_sonde_sfc(iv, y, re, np_missing, np_bad_data, &
                                          np_obs_used, np_available)
-
+!whl
+   ! for mtgirs
+   call da_residual_mtgirs(iv, y, re, np_missing, np_bad_data, &
+                                     np_obs_used, np_available)
    ! for surface
 
    call da_residual_synop(iv, y, re, np_missing, np_bad_data, &

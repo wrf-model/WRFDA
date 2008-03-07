@@ -336,7 +336,21 @@ module da_define_structures
       type (field_type)     , pointer :: t        (:) ! temperature.
       type (field_type)     , pointer :: q        (:) ! q.
    end type sound_type
+!whlb
+   type mtgirs_type
+      type (info_type)      :: info
+      type (model_loc_type) :: loc
 
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! pressure.
+      real                  , pointer :: zk       (:) ! k-coordinates
+
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+      type (field_type)     , pointer :: t        (:) ! temperature.
+      type (field_type)     , pointer :: q        (:) ! q.
+   end type mtgirs_type
+!whle
    type airsr_type
       type (info_type)      :: info
       type (model_loc_type) :: loc
@@ -504,6 +518,9 @@ module da_define_structures
       integer :: total, &
                  synop, & 
                  sound, &
+!whlb
+                 mtgirs,&
+!whle
                  geoamv,&
                  polaramv,&
                  pilot, &
@@ -542,7 +559,8 @@ module da_define_structures
                  num_qscat, num_profiler, num_buoy, &
                  num_radar, num_gpsref, num_bogus, &
                  num_inst, total_rad_pixel, total_rad_channel
-
+!whl
+      integer :: num_mtgirs
       integer :: num_synop_glo, num_airsr_glo, &
                  num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
                  num_pilot_glo, num_satem_glo, &
@@ -553,7 +571,8 @@ module da_define_structures
                  num_qscat_glo, num_profiler_glo, num_buoy_glo, &
                  num_radar_glo, num_gpsref_glo, num_bogus_glo, &
                  num_inst_glo
-
+!whl             
+      integer :: num_mtgirs_glo 
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
       real    :: metar_ef_u, metar_ef_v, metar_ef_t, metar_ef_p, metar_ef_q
       real    :: ships_ef_u, ships_ef_v, ships_ef_t, ships_ef_p, ships_ef_q
@@ -561,6 +580,8 @@ module da_define_structures
       real    :: polaramv_ef_u, polaramv_ef_v
       real    :: gpspw_ef_tpw
       real    :: sound_ef_u, sound_ef_v, sound_ef_t, sound_ef_q
+!whl
+      real    :: mtgirs_ef_u, mtgirs_ef_v, mtgirs_ef_t, mtgirs_ef_q
       real    :: airep_ef_u, airep_ef_v, airep_ef_t
       real    :: pilot_ef_u, pilot_ef_v
       real    :: ssmir_ef_speed, ssmir_ef_tpw
@@ -575,6 +596,8 @@ module da_define_structures
 
       type (airsr_type)         , pointer :: airsr(:)
       type (sound_type)         , pointer :: sound(:)
+!whl
+      type (mtgirs_type)        , pointer :: mtgirs(:)
       type (synop_type)         , pointer :: sonde_sfc(:)
       type (airep_type)         , pointer :: airep(:)
       type (pilot_type)         , pointer :: pilot(:)
@@ -656,7 +679,9 @@ module da_define_structures
                                          num_profiler, &
                                          num_buoy, &
                                          num_radar, num_bogus, &
-                                         num_other  
+                                         num_other,&
+!whl              
+                                         num_mtgirs  
 
    end type count_obs_type
 
@@ -697,6 +722,13 @@ module da_define_structures
       real, pointer :: t(:)                     ! temperature.
       real, pointer :: q(:)                     ! specific humidity.
    end type residual_sound_type
+!whl
+   type residual_mtgirs_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+      real, pointer :: t(:)                     ! temperature.
+      real, pointer :: q(:)                     ! specific humidity.
+   end type residual_mtgirs_type
 
    type residual_airsr_type
       real, pointer :: t(:)                     ! temperature.
@@ -788,8 +820,9 @@ module da_define_structures
                  num_ssmt1, num_ssmt2, num_pseudo, &
                  num_qscat, num_profiler, num_buoy, &
                  num_radar, num_gpsref, num_bogus, &
-                 num_inst
-
+                 num_inst, &
+!whl          
+                 num_mtgirs
       type (residual_synop_type), pointer :: synop(:)
       type (residual_synop_type), pointer :: metar(:) ! Same as synop type
       type (residual_synop_type), pointer :: ships(:) ! Same as synop type
@@ -814,6 +847,8 @@ module da_define_structures
       type (residual_pilot_type), pointer :: profiler(:) ! Same as pilot type
       type (residual_radar_type), pointer :: radar(:)
       type (residual_instid_type), pointer :: instid(:)
+!whl
+      type (residual_mtgirs_type), pointer :: mtgirs(:)
    end type y_type
 
    !--------------------------------------------------------------------------
@@ -845,6 +880,8 @@ module da_define_structures
       real                :: polaramv_u, polaramv_v
       real                :: gpspw_tpw, satem_thickness, gpsref_ref
       real                :: sound_u, sound_v, sound_t, sound_q
+!whl
+      real                :: mtgirs_u, mtgirs_v, mtgirs_t, mtgirs_q
       real                :: sonde_sfc_u, sonde_sfc_v, sonde_sfc_t, &
                              sonde_sfc_p, sonde_sfc_q
       real                :: airep_u, airep_v, airep_t

@@ -23,6 +23,8 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    iv%total_obs = 0
    iv%num_sound = 0
+!whl
+   iv%num_mtgirs= 0
    iv%num_synop = 0
    iv%num_pilot = 0
    iv%num_geoamv = 0
@@ -48,6 +50,8 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    do n=0, max_fgat_time
       iv%ob_numb(n)%total = 0
       iv%ob_numb(n)%sound = 0
+!whl
+      iv%ob_numb(n)%mtgirs= 0
       iv%ob_numb(n)%synop = 0
       iv%ob_numb(n)%pilot = 0
       iv%ob_numb(n)%geoamv = 0
@@ -85,7 +89,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
          ! scan main body of gts observation file
          call da_scan_obs (iv, xp, filename)
-
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ssmi', n,'.dat'
@@ -102,7 +105,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       iv%current_ob_time = 1
 
       call da_scan_obs(iv, xp,'ob01.ascii')
-
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
@@ -122,6 +124,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    if (iv%num_sound > max_sound_input) &
       iv%num_sound = max_sound_input
+!whl
+   if (iv%num_mtgirs > max_mtgirs_input) &
+      iv%num_mtgirs = max_mtgirs_input
 
    if (iv%num_synop > max_synop_input) &
       iv%num_synop = max_synop_input
@@ -161,8 +166,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       iv%num_bogus = max_bogus_input
    if (iv%num_airsr > max_airsret_input) &
       iv%num_airsr = max_airsret_input
-
-
    !--------------------------------------------------------------------------
    ! Allocate the ob based on inputed number of obs:
    !--------------------------------------------------------------------------
@@ -171,6 +174,8 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    iv%total_obs = 0
    iv%num_sound = 0
+!whl
+   iv%num_mtgirs = 0
    iv%num_synop = 0
    iv%num_pilot = 0
    iv%num_geoamv = 0
@@ -194,6 +199,8 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    iv%num_airsr  = 0
 
    iv%num_sound_glo=0
+!whl
+   iv%num_mtgirs_glo=0
    iv%num_synop_glo=0
    iv%num_pilot_glo=0
    iv%num_geoamv_glo=0
@@ -224,7 +231,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
          ! Read gts observation file
          call da_read_obs (iv, xp, filename)
-
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi', n,'.dat'
@@ -241,7 +247,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       iv%current_ob_time = 1
 
       call da_read_obs(iv, xp, 'ob01.ascii')
-
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
          call da_read_ssmi (iv, xp,'ssmi01.dat')
@@ -290,7 +295,6 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    !--------------------------------------------------------------------------
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
-
    call da_fill_obs_structures(xp, iv, ob)
 
    iv%current_ob_time = 1

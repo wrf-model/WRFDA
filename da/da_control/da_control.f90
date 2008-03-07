@@ -287,7 +287,9 @@ module da_control
                              num_sound_tot, num_airep_tot, num_qscat_tot, &
                              num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
                              num_radar_tot, num_bogus_tot,num_airsr_tot, &
-                             num_radiance_tot
+                             num_radiance_tot,&
+!whl  
+                             num_mtgirs_tot
 
    logical       :: gaussian_lats  
 
@@ -412,8 +414,8 @@ module da_control
 
    integer :: trace_start_points=0   ! Number of routines to initiate trace
 
-   integer, parameter :: num_ob_indexes = 23
-
+!   integer, parameter :: num_ob_indexes = 23
+   integer, parameter :: num_ob_indexes = 24
    integer, parameter :: sound_index          = 1
    integer, parameter :: synop_index          = 2
    integer, parameter :: pilot_index          = 3
@@ -437,7 +439,8 @@ module da_control
    integer, parameter :: radar_index          = 21
    integer, parameter :: radiance_index       = 22
    integer, parameter :: airsr_index          = 23
-
+!whl
+   integer, parameter :: mtgirs_index         = 24
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
       "SOUND         ", &
       "SYNOP         ", &
@@ -461,7 +464,9 @@ module da_control
       "Pseudo        ", &
       "radar         ", &
       "Radiance      ", &
-      "AIRS retrieval"  &
+      "AIRS retrieval", &
+!whl
+      "MTGIRS        "  &
    /)
 
    integer, parameter :: max_no_fm = 290

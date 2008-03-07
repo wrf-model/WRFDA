@@ -83,6 +83,11 @@ cp -f $DA_REAL_OUTPUT real_output
 cp -f $BDYIN wrfbdy_d$DOMAIN
 cp -f $DA_ANALYSIS wrfvar_output
 
+ export YEAR=`echo $DATE | cut -c1-4`
+ export MONTH=`echo $DATE | cut -c5-6`
+ export DAY=`echo $DATE | cut -c7-8`
+ export HOUR=`echo $DATE | cut -c9-10`
+export this_bdy_time=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 cat > parame.in << EOF
 &control_param
  wrfvar_output_file = 'wrfvar_output'
@@ -91,7 +96,8 @@ cat > parame.in << EOF
 
  cycling = .${CYCLING}.
  debug   = .true.
- low_bdy_only = .false. /
+ low_bdy_only = .false.
+ this_bdy_time = '${this_bdy_time}' /
 EOF
 
 if $DUMMY; then

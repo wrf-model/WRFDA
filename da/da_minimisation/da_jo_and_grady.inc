@@ -18,6 +18,8 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
                                    jo_pseudo, jo_qscat, jo_buoy, &
                                    jo_profiler, jo_radar, jo_gpsref, jo_bogus, &
                                    jo_radiance, jo_airsr
+!whl
+  real                          :: jo_mtgirs
    integer                      :: i,k
 
    if (trace_use) call da_trace_entry("da_jo_and_grady")
@@ -70,7 +72,20 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
          '   jo%synop_p      ', jo%synop_p, &
          '   jo%synop_q      ', jo%synop_q
    end if
+!
+!whl
+   call da_jo_and_grady_mtgirs(iv, re, jo, jo_grad_y)
+   jo_mtgirs= jo % mtgirs_u + jo % mtgirs_v + &
+              jo % mtgirs_t + jo % mtgirs_q
 
+   if (print_detail_grad) then
+      write(unit=stdout, fmt='(a, e24.12)') &
+         '   jo_mtgirs        ', jo_mtgirs, &
+         '   jo%mtgirs_u      ', jo%mtgirs_u, &
+         '   jo%mtgirs_v      ', jo%mtgirs_v, &
+         '   jo%mtgirs_t      ', jo%mtgirs_t, &
+         '   jo%mtgirs_q      ', jo%mtgirs_q
+   end if
 
    ! Geostationary Satellite AMVs:
 
@@ -219,8 +234,9 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
                 jo_pilot + jo_airep + jo_metar + jo_ships + &
                 jo_gpspw + jo_ssmi + jo_ssmt1 + jo_ssmt2 + &
                 jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
-                jo_radar + jo_gpsref + jo_bogus + jo_radiance + jo_airsr
-
+                jo_radar + jo_gpsref + jo_bogus + jo_radiance + jo_airsr + &
+!whl 
+                jo_mtgirs
    jot = jo % total
 
    if (print_detail_grad) then
@@ -249,8 +265,9 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
          '   jo_gpsref       ', jo_gpsref, &
          '   jo_bogus	     ', jo_bogus,  &
          '   jo_radiance     ', jo_radiance, &
-         '   jo_airsr	     ', jo_airsr	  
-
+         '   jo_airsr	     ', jo_airsr, &	  
+!whl
+         '   jo_mtgirs        ', jo_mtgirs
    end if
 
    if (trace_use) call da_trace_exit("da_jo_and_grady")

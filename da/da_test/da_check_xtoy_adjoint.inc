@@ -153,7 +153,10 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
          call da_check_xtoy_adjoint_sound(iv, y, partial_lhs, pertile_lhs)
          call da_check_xtoy_adjoint_sonde_sfc(iv, y, partial_lhs, pertile_lhs)
       end if
-
+!whl
+      if (use_mtgirsobs) then
+         call da_check_xtoy_adjoint_mtgirs(iv, y, partial_lhs, pertile_lhs)
+      end if
       if (use_synopobs) &
          call da_check_xtoy_adjoint_synop(iv, y, partial_lhs, pertile_lhs)
 

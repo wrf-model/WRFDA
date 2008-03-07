@@ -23,7 +23,8 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    call da_oi_stats_sound (stats_unit, iv)
    call da_oi_stats_sonde_sfc (stats_unit, iv)
-
+!whl
+   call da_oi_stats_mtgirs (stats_unit, iv)
    ! [1.2] Surface:
 
    call da_oi_stats_synop (stats_unit, iv)
@@ -116,7 +117,8 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    call da_ao_stats_sound (stats_unit, iv, re)
    call da_ao_stats_sonde_sfc (stats_unit, iv, re)
-
+!whl
+   call da_ao_stats_mtgirs (stats_unit, iv, re)
    ! [2.2] Surface:
 
    call da_ao_stats_synop (stats_unit, iv, re)

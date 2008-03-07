@@ -24,6 +24,8 @@ subroutine da_count_filtered_obs(&
                                    num_ships, &
                                    num_buoy, &
                                    num_sound, &
+!whl
+                                   num_mtgirs, &
                                    num_airep, &
                                    num_pilot, &
                                    num_geoamv, &
@@ -48,6 +50,8 @@ subroutine da_count_filtered_obs(&
 
    num_sound = 0
    num_synop = 0
+!whl
+   num_mtgirs = 0
    num_pilot = 0
    num_geoamv = 0
    num_polaramv = 0
@@ -165,6 +169,10 @@ subroutine da_count_filtered_obs(&
          case (35:38) ;
             if (.not.use_soundobs) cycle reports
             num_sound = num_sound + 1
+!whl
+         case (350) ;
+            if (.not.use_mtgirsobs) cycle reports
+            num_mtgirs = num_mtgirs + 1
 
          case (86) ;
 
@@ -262,7 +270,7 @@ subroutine da_count_filtered_obs(&
       num_buoy + num_sound + num_airep + num_pilot + &
       num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
       num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
-      num_satem  + num_bogus +  num_airsr + num_others
+      num_satem  + num_bogus +  num_airsr + num_others + num_mtgirs
 
    write  (unit = filtered_obs_unit, fmt = '(A,I7,A,F8.0,A)')    &
       "TOTAL =",total_obs, ", MISS. =",missing_r,","  
@@ -288,6 +296,8 @@ subroutine da_count_filtered_obs(&
       "SATEM =",num_satem, ", ", &
       "BOGUS =",num_bogus,", ", &
       "AIRSR =",num_airsr,", ", &
+!whl
+      "MTGIRS=",num_mtgirs,", ", &
       "OTHER =",num_others,", "
 
    ! write reference state info

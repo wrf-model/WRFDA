@@ -17,6 +17,10 @@ subroutine da_setup_obs_interp_wts (xp, iv)
       call da_store_obs_grid_info (xp, iv%sound(n)%loc)
       call da_store_obs_grid_info (xp, iv%sonde_sfc(n)%loc)
    end do
+!whl
+   do n=1, iv % num_mtgirs
+      call da_store_obs_grid_info (xp, iv%mtgirs(n)%loc)
+   end do
 
    do n=1, iv % num_synop
       call da_store_obs_grid_info (xp, iv%synop(n)%loc)

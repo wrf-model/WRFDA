@@ -96,6 +96,11 @@ subroutine da_fill_obs_structures(xp, iv, ob)
 
    iv % airsr_ef_t = 1.0
    iv % airsr_ef_q = 1.0
+!whl
+   iv % mtgirs_ef_u = 1.0
+   iv % mtgirs_ef_v = 1.0
+   iv % mtgirs_ef_t = 1.0
+   iv % mtgirs_ef_q = 1.0
 
    !---------------------------------------------------------------------------
    ! [1.0] Allocate innovation vector and observation structures:
@@ -462,6 +467,24 @@ subroutine da_fill_obs_structures(xp, iv, ob)
             iv % airsr(n) % q(k) % error = q_error
             if (iv%airsr(n)% q(k) % error == missing_r) &
                iv%airsr(n)% q(k) % qc = missing_data
+         end do
+      end do
+   end if
+!whl
+   if (iv % num_mtgirs > 0) then
+      do n = 1, iv % num_mtgirs
+         do k = 1, iv % mtgirs(n) % info % levels
+            ob % mtgirs(n) % u(k) = iv % mtgirs(n) % u(k) % inv
+            ob % mtgirs(n) % v(k) = iv % mtgirs(n) % v(k) % inv
+            ob % mtgirs(n) % t(k) = iv % mtgirs(n) % t(k) % inv
+            ob % mtgirs(n) % q(k) = iv % mtgirs(n) % q(k) % inv
+
+            ! Calculate q error from rh error:
+! how to deal?
+!            iv % mtgirs(n) % q(k) % error = q_error
+!         print*,n,k, ob % mtgirs(n) % q(k),iv%mtgirs(n)% q(k) % error
+         if (iv%mtgirs(n)% q(k) % error == missing_r) &
+            iv%mtgirs(n)% q(k) % qc = missing_data
          end do
       end do
    end if

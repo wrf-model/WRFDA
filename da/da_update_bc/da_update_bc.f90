@@ -8,7 +8,7 @@ program da_update_bc
    use da_netcdf_interface, only : da_get_var_3d_real_cdf, &
       da_put_var_3d_real_cdf, da_get_dims_cdf, da_put_var_2d_real_cdf, &
       da_get_var_2d_real_cdf, da_get_var_2d_int_cdf, da_get_bdytimestr_cdf, &
-      da_get_times_cdf, da_get_bdyfrq, stderr, stdout
+      da_put_bdytimestr_cdf,da_get_times_cdf, da_get_bdyfrq, stderr, stdout
 
    use da_module_couple_uv, only : da_couple_uv
 
@@ -49,6 +49,7 @@ program da_update_bc
    character(len=80), allocatable, dimension(:) :: times, &
                                                    thisbdytime, nextbdytime
  
+   character(len=80) this_bdy_time
    integer :: east_end, north_end, io_status
 
    logical :: cycling, debug, low_bdy_only
@@ -62,7 +63,7 @@ program da_update_bc
    namelist /control_param/ wrfvar_output_file, &
                             wrf_bdy_file, &
                             wrf_input, &
-                            cycling, debug, low_bdy_only
+                            cycling, debug, low_bdy_only, this_bdy_time
 
    wrfvar_output_file = 'wrfvar_output'
    wrf_bdy_file       = 'wrfbdy_d01'
@@ -150,9 +151,20 @@ program da_update_bc
 
    call da_get_bdytimestr_cdf(wrf_bdy_file, 'thisbdytime', thisbdytime, dims(2), debug)
    call da_get_bdytimestr_cdf(wrf_bdy_file, 'nextbdytime', nextbdytime, dims(2), debug)
-
+   print*,thisbdytime(1), nextbdytime(1)
+   if( trim(thisbdytime(1)).ne.(trim(this_bdy_time)) )then
+    if(time_level.ge.2)then
+    thisbdytime(1)=this_bdy_time
+    print*,thisbdytime(1)(1:19)
+!    pause
+    call da_put_bdytimestr_cdf(wrf_bdy_file, 'thisbdytime', thisbdytime, dims(2), debug)
+    else
+    print*,'Invalid BDY file ',this_bdy_time,thisbdytime(1) 
+    stop
+    endif
+   endif
    call da_get_bdyfrq(thisbdytime(1), nextbdytime(1), bdyfrq, debug)
-
+   print*,thisbdytime(1), nextbdytime(1),bdyfrq
    if (debug) then
       do n=1, dims(2)
          write(unit=stdout, fmt='(3(a, i2, 2a,2x))') &

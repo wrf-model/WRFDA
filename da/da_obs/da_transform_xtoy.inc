@@ -136,7 +136,8 @@ subroutine da_transform_xtoy(grid, iv, y)
    !---------------------------------------------------------------------------
 
    call da_transform_xtoy_airsr (grid, iv, y) 
-
+!whl
+   call da_transform_xtoy_mtgirs (grid, iv, y)
    !---------------------------------------------------------------------------
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------

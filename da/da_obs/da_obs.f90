@@ -11,6 +11,8 @@ module da_obs
    use da_control, only : use_shipsobs, use_synopobs, use_ssmt2obs, &
       use_soundobs,use_satemobs, use_profilerobs, use_pilotobs, &
       use_qscatobs,use_metarobs, use_polaramvobs, use_geoamvobs, &
+!whl
+      use_mtgirsobs, &
       use_bogusobs,use_buoyobs, use_airsretobs, trace_use, num_procs, &
       missing_r, missing, use_airepobs,use_gpspwobs,use_gpsrefobs, &
       use_ssmt1obs,filtered_obs_unit,fmt_each,fmt_info,fmt_srfc, ide, jde, &
@@ -53,6 +55,9 @@ module da_obs
    use da_tools, only : da_add_noise, da_add_noise_new,da_random_omb, &
       da_random_seed
    use da_tracing, only : da_trace_entry, da_trace_exit 
+!whl 
+   use da_mtgirs, only : da_transform_xtoy_mtgirs, &
+      da_transform_xtoy_mtgirs_adj
 
    implicit none
 

@@ -66,6 +66,8 @@ subroutine da_read_obs (ob, xp, filename)
                                    num_qscat, &
                                    num_profiler, &
                                    num_airsr,num_buoy, num_bogus
+!whl
+   integer                        :: num_mtgirs
 
    integer                        :: ndup, n, report
 
@@ -92,7 +94,9 @@ subroutine da_read_obs (ob, xp, filename)
    num_buoy = ob%num_buoy
    num_bogus= ob%num_bogus
    num_airsr= ob%num_airsr
-
+!whl
+   num_mtgirs= ob%num_mtgirs
+! all num is setted to 0 in *_ascii.inc
    ! open file
    ! =========
 
@@ -182,7 +186,7 @@ subroutine da_read_obs (ob, xp, filename)
          exit reports
       end if
 
-      if (print_detail_obs) then
+!      if (print_detail_obs) then
          write(unit=stdout, fmt=fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
@@ -192,7 +196,7 @@ subroutine da_read_obs (ob, xp, filename)
                platform%info%lon,         &
                platform%info%elv,         &
                platform%info%id
-      end if
+!      end if
 
       if (platform%info%lon == 180.0  ) platform%info%lon =-180.000 
       ! Fix funny wind direction at Poles
@@ -345,7 +349,7 @@ subroutine da_read_obs (ob, xp, filename)
          end if
       end if
 
-      if (fm /= 86) call da_obs_proc_station(platform)
+      if (fm /= 86) call da_obs_proc_station(platform,fm)
 
       nlevels = platform%info%levels
       ! Loop over duplicating obs for global
@@ -564,7 +568,55 @@ subroutine da_read_obs (ob, xp, filename)
             end if
 
             ob%sound(num_sound)%info%levels = nlevels
+!whl
+         case (350) ;
+            if (n==1) ob%num_mtgirs_glo = ob%num_mtgirs_glo + 1
+            if (outside) then
+               cycle reports
+            end if
 
+            if (.not.use_mtgirsobs) cycle reports
+
+            num_mtgirs = num_mtgirs + 1
+            ob%num_mtgirs = num_mtgirs
+            ! Track serial obs index for reassembly of obs during bit-for-bit
+            ! tests with different numbers of MPI tasks.
+            platform%loc%obs_global_index  = ob%num_mtgirs_glo
+!            print*,num_mtgirs,nlevels
+            ob%mtgirs(num_mtgirs)%info = platform%info
+            ob%mtgirs(num_mtgirs)%loc  = platform%loc
+
+            if (nlevels > 0) then
+
+               allocate (ob%mtgirs(num_mtgirs)%h (1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%p (1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%zk(1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%u (1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%v (1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%t (1:nlevels))
+               allocate (ob%mtgirs(num_mtgirs)%q (1:nlevels))
+            ob%mtgirs(num_mtgirs)%info%levels = nlevels
+               do j = 1, ob%mtgirs(num_mtgirs)%info%levels
+                 ob%mtgirs(num_mtgirs)%h(j) = platform%each(j)%height
+                 ob%mtgirs(num_mtgirs)%p(j) = platform%each(j)%p%inv
+                 ob%mtgirs(num_mtgirs)%u(j) = platform%each(j)%u
+                 ob%mtgirs(num_mtgirs)%v(j) = platform%each(j)%v
+                 ob%mtgirs(num_mtgirs)%t(j) = platform%each(j)%t
+                 ob%mtgirs(num_mtgirs)%q(j) = platform%each(j)%q
+!whl change g/kg to kg/kg
+                 if(ob%mtgirs(num_mtgirs)%q(j)%inv.ne.missing_r)then
+                 ob%mtgirs(num_mtgirs)%q(j)%inv = ob%mtgirs(num_mtgirs)%q(j)%inv/1000.0
+                 endif
+                 if(ob%mtgirs(num_mtgirs)%q(j)%error.ne.missing_r)then
+!whl change 10e-2g/kg to kg/kg
+                 ob%mtgirs(num_mtgirs)%q(j)%error = ob%mtgirs(num_mtgirs)%q(j)%error/1000.0/100.0
+                 endif
+!                 print*,j,ob%mtgirs(num_mtgirs)%q(j)
+!                 pause
+ 
+               end do
+            end if
+!           print*,'finish read 350'
          case (86)    ;
 
             if (n==1) ob%num_satem_glo = ob%num_satem_glo + 1
@@ -1051,6 +1103,8 @@ subroutine da_read_obs (ob, xp, filename)
 
       write(unit=stdout, fmt='(5x,a,i6,a)') &
            'Read:  ', num_sound,           ' SOUND          reports,', &
+!whl
+           'Read:  ', num_mtgirs,          ' MTGIRS         reports,', &
            'Read:  ', num_synop,           ' SYNOP          reports,', &
            'Read:  ', num_pilot,           ' PILOT          reports,', &
            'Read:  ', num_satem,           ' SATEM          reports,', &
@@ -1071,7 +1125,7 @@ subroutine da_read_obs (ob, xp, filename)
            'Read:  ', num_bogus,           ' Bogus          reports,', &
            'Read:  ', num_airsr,           ' AIRSRET        reports,', &
            'Read:  ', total_obs,           ' Total reports.', &
-           'There are ', total_obs - num_sound - num_synop &
+           'There are ', total_obs - num_sound - num_synop - num_mtgirs &
                                    - num_pilot - num_satem &
                                    - num_geoamv - num_polaramv - num_airep &
                                    - num_metar - num_ships &
@@ -1085,6 +1139,8 @@ subroutine da_read_obs (ob, xp, filename)
    end if
 
    if ((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
+!whl
+      (ob%ob_numb(ob%current_ob_time)%mtgirs /= ob%num_mtgirs) .or. &
       (ob%ob_numb(ob%current_ob_time)%synop /= ob%num_synop) .or. &
       (ob%ob_numb(ob%current_ob_time)%pilot /= ob%num_pilot) .or. &
       (ob%ob_numb(ob%current_ob_time)%satem /= ob%num_satem) .or. &
@@ -1110,6 +1166,11 @@ subroutine da_read_obs (ob, xp, filename)
          'ob%ob_numb(ob%current_ob_time)%synop=', &
          ob%ob_numb(ob%current_ob_time)%synop, &
          'ob%num_synop=', ob%num_synop, &
+!whl
+         'ob%ob_numb(ob%current_ob_time)%mtgirs=', &
+         ob%ob_numb(ob%current_ob_time)%mtgirs, &
+         'ob%num_mtgirs=', ob%num_mtgirs, &
+
          'ob%ob_numb(ob%current_ob_time)%pilot=', &
          ob%ob_numb(ob%current_ob_time)%pilot, &
          'ob%num_pilot=', ob%num_pilot, &

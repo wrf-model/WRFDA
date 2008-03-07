@@ -29,7 +29,7 @@ module da_test
       use_geoamvobs,use_polaramvobs,use_pilotobs,use_metarobs,use_gpsrefobs, &
       use_gpspwobs,use_qscatobs,use_satemobs,use_shipsobs,use_radarobs, &
       use_profilerobs,use_ssmitbobs,use_synopobs,use_ssmt2obs,use_ssmt1obs, &
-      use_ssmiretrievalobs,use_airepobs,comm,global,stdout,rootproc, &
+      use_ssmiretrievalobs,use_airepobs,use_mtgirsobs,comm,global,stdout,rootproc, &
       its,ite,jts,jte,kts,kte,sfc_assi_options,typical_qrn_rms, &
       typical_u_rms,typical_v_rms,typical_w_rms,typical_t_rms, typical_p_rms, &
       typical_q_rms,typical_qcw_rms,print_detail_testing,typical_rh_rms, &
@@ -105,6 +105,7 @@ contains
 #include "da_check_xtoy_adjoint_sonde_sfc.inc"
 #include "da_check_xtoy_adjoint_synop.inc"
 #include "da_check_xtoy_adjoint_rad.inc"
+#include "da_check_xtoy_adjoint_mtgirs.inc"
 #include "da_transform_xtovp.inc"
 #include "da_check.inc"
 #include "da_check_xtoy_adjoint_pseudo.inc"

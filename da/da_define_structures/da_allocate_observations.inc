@@ -15,7 +15,10 @@ subroutine da_allocate_observations  (ob)
 
       allocate(ob%sonde_sfc(1:ob%num_sound))
    end if
-
+!whl
+   if (ob%num_mtgirs > 0) then
+      allocate(ob%mtgirs(1:ob%num_mtgirs))
+   endif
    if (ob%num_synop > 0) &
       allocate(ob%synop(1:ob%num_synop))
 

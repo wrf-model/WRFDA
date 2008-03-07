@@ -17,6 +17,7 @@ OBJS_FOR_ALL =		da_solve.o		\
 			da_ships.o		\
 			da_synop.o		\
 			da_sound.o		\
+	                da_mtgirs.o             \
 			da_bogus.o		\
 			da_airep.o		\
 			da_pilot.o		\
@@ -142,6 +143,7 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_ships.o \
 			da_synop.o \
 			da_sound.o \
+	                da_mtgirs.o \
 			da_bogus.o \
 			da_airep.o \
 			da_pilot.o \
@@ -268,6 +270,7 @@ da_obs.o:		da_obs.f90 \
 			da_ships.o \
 			da_synop.o \
 			da_sound.o \
+	                da_mtgirs.o \
 			da_bogus.o \
 			da_pseudo.o \
 			da_qscat.o \
@@ -441,6 +444,27 @@ da_synop.o:		da_synop.f90 \
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_synop.f90 > da_synop.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_synop.f
+
+da_mtgirs.o:             da_mtgirs.f90 \
+	                        da_control.o \
+	                        da_par_util.o \
+	                        da_define_structures.o \
+	                        da_interpolation.o \
+	                        da_statistics.o \
+	                        da_tools.o \
+	                        da_ao_stats_mtgirs.inc \
+	                        da_jo_and_grady_mtgirs.inc \
+	                        da_jo_mtgirs_uvtq.inc \
+	                        da_residual_mtgirs.inc \
+	                        da_oi_stats_mtgirs.inc \
+	                        da_print_stats_mtgirs.inc \
+	                        da_transform_xtoy_mtgirs.inc \
+	                        da_transform_xtoy_mtgirs_adj.inc \
+	                        da_check_max_iv_mtgirs.inc \
+	                        da_get_innov_vector_mtgirs.inc \
+	                        $(RM) $@
+	                        $(CPP) $(CPPFLAGS) -I../inc da_mtgirs.f90 > da_mtgirs.f
+	                        $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_mtgirs.f
 
 da_sound.o:		da_sound.f90 \
 			da_control.o \
@@ -980,6 +1004,7 @@ da_test.o:		da_test.f90 \
 			da_pseudo.o \
 			da_profiler.o \
 			da_buoy.o  \
+	                da_mtgirs.o  \
 			da_minimisation.o	\
 			da_setup_structures.o	\
 			da_tools.o \
@@ -1010,6 +1035,7 @@ da_test.o:		da_test.f90 \
 			da_check_xtoy_adjoint_radar.inc \
 			da_check_xtoy_adjoint_profiler.inc \
 			da_check_xtoy_adjoint_buoy.inc  \
+	                da_check_xtoy_adjoint_mtgirs.inc \
 			da_transform_xtovp.inc \
 			da_check.inc \
 			da_check_xtoy_adjoint_pseudo.inc \

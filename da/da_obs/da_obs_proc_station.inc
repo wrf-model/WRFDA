@@ -1,4 +1,4 @@
-subroutine da_obs_proc_station(obs)
+subroutine da_obs_proc_station(obs,ifm)
 
    !-----------------------------------------------------------------------
    ! Purpose: Processing obs data read in at a station: 
@@ -13,7 +13,7 @@ subroutine da_obs_proc_station(obs)
    type (multi_level_type), intent(inout) :: obs
 
    real :: po, to, rho, es, qs, qvo
-   integer :: i
+   integer :: i,ifm
 
 
    do i = 1, obs % info % levels
@@ -33,7 +33,8 @@ subroutine da_obs_proc_station(obs)
          obs%each(i)%rh%inv = missing_r
          obs%each(i)%rh%qc  = missing
       end if
-
+!ifm=350 mtgirs, humidity is q
+      if(ifm.ne.350)then
       po   = obs % each(i) % p  % inv
       to   = obs % each(i) % t  % inv
       rho  = obs % each(i) % rh  % inv
@@ -57,6 +58,12 @@ subroutine da_obs_proc_station(obs)
          obs % each(i) % q  % qc = obs % each(i) % rh % qc
          obs % each(i) % q  % error = obs % each(i) % rh % error
       end if
+   else
+         obs % each(i) % q  % inv = obs % each(i) % rh  % inv 
+         obs % each(i) % q  % qc = obs % each(i) % rh % qc
+         obs % each(i) % q  % error = obs % each(i) % rh % error
+!   print*,obs % each(i) % q  % inv,obs % each(i) % q  % qc,obs % each(i) % q  % error
+   endif
    end do
 
 end subroutine da_obs_proc_station

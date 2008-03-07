@@ -12,6 +12,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_ships.o \
    da_synop.o \
    da_sound.o \
+   da_mtgirs.o \
    da_bogus.o \
    da_airep.o \
    da_pilot.o \

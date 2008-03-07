@@ -444,6 +444,23 @@ subroutine da_write_noise_to_ob (iv)
          end do                           ! end loop for channel
       end do                            ! end loop for sensor
    end if
+!whl
+!write mtgirs
+   num_obs = 0
+   if (iv % num_mtgirs > 0) then
+      do n = 1, iv % num_mtgirs
+         if (iv%mtgirs(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+   end if
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0 .and. rootproc) then
+      write(rand_unit,'(a20,i8)')'mtgirs', num_obs
+      num_obs = 0
+      do k = 0,num_procs-1
+         call da_read_rand_unit(filename(k),iunit,num_obs,'mtgirs',5)
+      end do
+   end if
+
 
    call da_free_unit (iunit)
 !rizvi   call da_free_unit (rand_unit)

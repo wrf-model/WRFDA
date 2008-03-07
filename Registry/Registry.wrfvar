@@ -528,6 +528,8 @@ rconfig   logical   use_synopobs            namelist,wrfvar4  1  .true.   - "use
 rconfig   logical   use_shipsobs            namelist,wrfvar4  1  .true.   - "use_shipsobs"             ""  ""
 rconfig   logical   use_metarobs            namelist,wrfvar4  1  .true.   - "use_metarobs"             ""  ""
 rconfig   logical   use_soundobs            namelist,wrfvar4  1  .true.   - "use_soundobs"             ""  ""
+!whl
+rconfig   logical   use_mtgirsobs           namelist,wrfvar4  1  .true.   - "use_mtgirsobs"            ""  ""
 rconfig   logical   use_pilotobs            namelist,wrfvar4  1  .true.   - "use_pilotobs"             ""  ""
 rconfig   logical   use_airepobs            namelist,wrfvar4  1  .true.   - "use_airepobs"             ""  ""
 rconfig   logical   use_geoamvobs           namelist,wrfvar4  1  .true.   - "use_geoamvobs"            ""  ""
@@ -571,6 +573,8 @@ rconfig   logical   omb_set_rand            namelist,wrfvar5  1  .false.  - "omb
 rconfig   logical   omb_add_noise           namelist,wrfvar5  1  .false.  - "omb_add_noise"            ""  ""
 rconfig   integer   obs_qc_pointer          namelist,wrfvar5  1  0        - "obs_qc_pointer"           ""  ""
 rconfig   integer   max_sound_input         namelist,wrfvar5  1  5000     - "max_sound_input"          ""  ""
+!whl 
+rconfig   integer   max_mtgirs_input        namelist,wrfvar5  1  50000    - "max_mtgirs_input"          ""  ""
 rconfig   integer   max_synop_input         namelist,wrfvar5  1  50000    - "max_synop_input"          ""  ""
 rconfig   integer   max_geoamv_input        namelist,wrfvar5  1  300000   - "max_geoamv_input"         ""  ""
 rconfig   integer   max_polaramv_input      namelist,wrfvar5  1  300000   - "max_polaramv_input"       ""  ""

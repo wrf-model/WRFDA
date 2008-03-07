@@ -40,7 +40,9 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
       call da_get_innov_vector_sound( it, grid%xb, grid%xp, ob, iv)
       call da_get_innov_vector_sonde_sfc( it, grid%xb, grid%xp, ob, iv)
-
+!whl
+      ! Mtgirs
+      call da_get_innov_vector_mtgirs( it, grid%xb, grid%xp, ob, iv)
       ! Surface
 
       call da_get_innov_vector_synop( it, grid%xb, grid%xp, ob, iv)

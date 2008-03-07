@@ -38,7 +38,9 @@ module da_minimisation
       num_ships_tot,num_ssmt2_tot,use_rad,var_scaling2,var_scaling1, &
       num_synop_tot,var_scaling4,var_scaling5,var_scaling3,num_ssmt1_tot, &
       num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
-      cv_size_domain_je,cv_size_domain_jb
+      cv_size_domain_je,cv_size_domain_jb,&
+!whl
+      num_mtgirs_tot 
 #ifdef CRTM
    use da_crtm, only : da_get_innov_vector_crtm
                        !da_get_innov_vector_crtmk
@@ -97,6 +99,12 @@ module da_minimisation
       da_oi_stats_sonde_sfc,da_ao_stats_sonde_sfc,da_get_innov_vector_sound, &
       da_get_innov_vector_sonde_sfc,da_jo_and_grady_sound, da_residual_sound, &
       da_jo_and_grady_sound,da_jo_and_grady_sonde_sfc,da_residual_sonde_sfc
+!whl
+   use da_mtgirs, only : da_calculate_grady_mtgirs, &
+      da_ao_stats_mtgirs, da_oi_stats_mtgirs,da_oi_stats_mtgirs, &
+      da_get_innov_vector_mtgirs, &
+      da_jo_and_grady_mtgirs, da_residual_mtgirs, &
+      da_jo_and_grady_mtgirs
    use da_ssmi, only : da_calculate_grady_ssmi,da_calculate_grady_ssmt1, &
       da_calculate_grady_ssmt2, da_ao_stats_ssmi,da_ao_stats_ssmt2, &
       da_ao_stats_ssmt2, da_oi_stats_ssmt1, da_oi_stats_ssmt2, &

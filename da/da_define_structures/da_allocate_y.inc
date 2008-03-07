@@ -23,6 +23,8 @@ subroutine da_allocate_y (iv, y)
    y % num_ships = iv % num_ships
    y % num_metar = iv % num_metar
    y % num_sound = iv % num_sound
+!whl
+   y % num_mtgirs= iv % num_mtgirs
    y % num_pilot = iv % num_pilot
    y % num_bogus = iv % num_bogus
    y % num_radar = iv % num_radar
@@ -222,6 +224,25 @@ subroutine da_allocate_y (iv, y)
       end do
 
       y % bogus(1:y % num_bogus) % slp = 0.0
+   end if
+!whl
+   ! Initialize mtgirs:
+
+   if (y % num_mtgirs > 0) then
+      allocate (y % mtgirs(1:y % num_mtgirs))
+      do n = 1, y % num_mtgirs
+         nlevels = iv % mtgirs(n) % info % levels
+         allocate (y % mtgirs(n)%u(1:nlevels))
+         allocate (y % mtgirs(n)%v(1:nlevels))
+         allocate (y % mtgirs(n)%t(1:nlevels))
+         allocate (y % mtgirs(n)%q(1:nlevels))
+
+         y % mtgirs(n) % u(1:nlevels) = 0.0
+         y % mtgirs(n) % v(1:nlevels) = 0.0
+         y % mtgirs(n) % t(1:nlevels) = 0.0
+         y % mtgirs(n) % q(1:nlevels) = 0.0
+      end do
+
    end if
 
    ! Initialize satem:

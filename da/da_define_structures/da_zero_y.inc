@@ -41,7 +41,8 @@ subroutine da_zero_y( iv, y )
    y % num_radar    = iv % num_radar   
    y % num_bogus    = iv % num_bogus   
    y % num_airsr    = iv % num_airsr   
-
+!whl
+   y % num_mtgirs   = iv % num_mtgirs
    !---------------------------------------------------------------------------
    ! [2.0] Allocate:
    !---------------------------------------------------------------------------
@@ -64,6 +65,16 @@ subroutine da_zero_y( iv, y )
       y % ships(1:y % num_ships) % t = 0.0
       y % ships(1:y % num_ships) % p = 0.0
       y % ships(1:y % num_ships) % q = 0.0
+   end if
+!whl
+   ! Initialize mtgirs:
+
+   if ( y % num_mtgirs > 0 ) then
+      y % ships(1:y % num_mtgirs) % u = 0.0
+      y % ships(1:y % num_mtgirs) % v = 0.0
+      y % ships(1:y % num_mtgirs) % t = 0.0
+      y % ships(1:y % num_mtgirs) % p = 0.0
+      y % ships(1:y % num_mtgirs) % q = 0.0
    end if
 
    ! Initialize metars:

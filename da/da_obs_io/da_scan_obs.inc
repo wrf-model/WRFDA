@@ -46,7 +46,8 @@ subroutine da_scan_obs (ob, xp, filename)
                                    num_ssmt2, num_airsr, &
                                    num_qscat, &
                                    num_profiler, num_buoy, num_bogus
-
+!whl
+   integer                        :: num_mtgirs 
    integer                        :: ndup, n
 
    ! default value
@@ -69,6 +70,8 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
+!whl
+   ob%ob_numb(ob%current_ob_time)%mtgirs = ob%num_mtgirs
    ! WHY?
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
@@ -112,7 +115,8 @@ subroutine da_scan_obs (ob, xp, filename)
    num_buoy = 0
    num_bogus = 0
    num_airsr = 0
-
+!whl
+   num_mtgirs = 0
    ! read header
 
    head_info: do
@@ -282,6 +286,10 @@ subroutine da_scan_obs (ob, xp, filename)
          case (35:38) ;
             if (.not.use_soundobs) cycle reports
             num_sound = num_sound + 1
+!whl
+         case (350) ;
+            if (.not.use_mtgirsobs) cycle reports
+            num_mtgirs = num_mtgirs + 1
 
          case (86) ;
             if (.not.use_satemobs) cycle reports
@@ -366,6 +374,8 @@ subroutine da_scan_obs (ob, xp, filename)
    !------------------------------------------------------------------------
 
    ob%num_sound = ob%num_sound + num_sound
+!whl
+   ob%num_mtgirs = ob%num_mtgirs + num_mtgirs
    ob%num_synop = ob%num_synop + num_synop
    ob%num_pilot = ob%num_pilot + num_pilot
    ob%num_satem = ob%num_satem + num_satem
@@ -389,6 +399,8 @@ subroutine da_scan_obs (ob, xp, filename)
    ! ob%num_ssmi_retrieval = ob%num_ssmi_retrieval + num_ssmi_retrieval
 
    ob%ob_numb(ob%current_ob_time)%sound = ob%num_sound
+!whl
+   ob%ob_numb(ob%current_ob_time)%mtgirs = ob%num_mtgirs
    ob%ob_numb(ob%current_ob_time)%synop = ob%num_synop
    ob%ob_numb(ob%current_ob_time)%pilot = ob%num_pilot
    ob%ob_numb(ob%current_ob_time)%satem = ob%num_satem
@@ -414,12 +426,14 @@ subroutine da_scan_obs (ob, xp, filename)
 
    ! print out
 
-   if (print_detail_obs) then
+!   if (print_detail_obs) then
       write(unit=stdout, fmt='(a)')  ' '
       write(unit=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
            'Scan:  ', total_obs, ' Total reports.', &
            'Scan:  ', num_sound, ' SOUND reports,', &
+!whl
+           'Scan:  ', num_mtgirs,' MTG reports,  ', &
            'Scan:  ', num_synop, ' SYNOP reports,', &
            'Scan:  ', num_pilot, ' PILOT reports,', &
            'Scan:  ', num_satem, ' SATEM reports,', &
@@ -443,7 +457,7 @@ subroutine da_scan_obs (ob, xp, filename)
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
 
-   end if
+!   end if
 
 end subroutine da_scan_obs
 

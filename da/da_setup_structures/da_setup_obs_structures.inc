@@ -23,6 +23,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_geoamvobs .OR. use_polaramvobs .OR. use_airepobs .OR. &
       use_gpspwobs .OR. use_gpsrefobs .OR. use_ssmiretrievalobs .OR. &
       use_ssmitbobs .OR. use_ssmt1obs .OR. use_ssmt2obs .OR. use_qscatobs .or. &
+!whl
+      use_mtgirsobs .or. &
       use_airsretobs ) then
  
       use_obsgts = .true.
@@ -83,6 +85,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_obsgts           = .false.
       use_rad         = .false.
       use_airsretobs       = .false.
+!whl
+      use_mtgirsobs   = .false.
    end if
     
    if (num_pseudo > 0) then
@@ -91,6 +95,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_shipsobs         = .false.
       use_metarobs         = .false.
       use_soundobs         = .false.
+!whl
+      use_mtgirsobs         = .false.
       use_bogusobs         = .false.
       use_pilotobs         = .false.
       use_airepobs         = .false.
@@ -140,6 +146,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%total_rad_channel = 0
    
    iv%num_sound=0
+!whl
+   iv%num_mtgirs=0
    iv%num_synop=0
    iv%num_geoamv=0
    iv%num_polaramv=0
@@ -164,6 +172,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%num_pseudo=0          
 
    iv%num_sound_glo=0
+!whl
+   iv%num_mtgirs_glo=0
    iv%num_synop_glo=0
    iv%num_geoamv_glo=0
    iv%num_polaramv_glo=0
@@ -188,6 +198,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
 
 
    ob%num_sound=0
+!whl
+   ob%num_mtgirs=0
    ob%num_synop=0
    ob%num_geoamv=0
    ob%num_polaramv=0
