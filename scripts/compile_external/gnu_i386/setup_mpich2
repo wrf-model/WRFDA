@@ -20,4 +20,4 @@ export LDFLAGS=
 make clean
 ./configure --prefix=$PWD
 make
-make install
+make -i install
