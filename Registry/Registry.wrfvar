@@ -168,7 +168,7 @@ state    real    dnw            k       dyn_em      1         -     irh       "d
 state    real    dn             k       dyn_em      1         -     irh       "dn " "d(eta) values between half (mass) levels"   ""
 state    real    znu            k       dyn_em      1         -     irh       "znu"  "eta values on half (mass) levels"  ""
 state    real    znw            k       dyn_em      1         Z     i01rh0    "znw"  "eta values on full (w) levels"  ""
-state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATET T IN IDEALIZED CASES"         "K"      
+state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATE T IN IDEALIZED CASES"         "K"      
 state    real    z              ijk     dyn_em      1         Z     -         " " " " " "
 state    real    a_z            ijk     misc        1         Z     -         " " " " " "
 state    real    g_z            ijk     misc        1         Z     -         " " " " " "
@@ -287,6 +287,9 @@ state   real   landmask            ij    misc          1     -     i012rh0d=(int
 state   real   shdmax              ij    misc          1     -     i012r   "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
 state   real   shdmin              ij    misc          1     -     i012r   "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
 state   real   snoalb              ij    misc          1     -     i012r   "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" ""
+state   real   landusef            iuj   misc          1     Z     i012r   "LANDUSEF"      "LANDUSE FRACTION BY CATEGORY"  ""
+state   real   soilctop            isj   misc          1     Z     i012    "SOILCTOP"      "SOIL CAT FRACTION (TOP)"  ""
+state   real   soilcbot            isj   misc          1     Z     i012    "SOILCBOT"      "SOIL CAT FRACTION (BOTTOM)"  ""
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 # SI - end variables from netCDF format from Standard Initialization

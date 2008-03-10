@@ -179,8 +179,8 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95
 
 FCOPTIM         = 
 FCDEBUG         = 
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r$(RWORDSIZE)
@@ -212,8 +212,8 @@ FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -flogical=false -fpointer=null -C
 FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wimplicit-none
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165 -fno-second-underscore
 FCTYPE          = -r$(RWORDSIZE)
@@ -245,8 +245,8 @@ DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 
 FCOPTIM         = -O2
 FCDEBUG         = 
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r$(RWORDSIZE)
@@ -1066,8 +1066,8 @@ EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95
 FCOPTIM         = 
 FCDEBUG         =
 FCTYPE          = -r$(RWORDSIZE)
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,155,158,159
 
@@ -1103,8 +1103,8 @@ FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -flogical=false -fp
 FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wunused-parameter
 FCTYPE          = -r$(RWORDSIZE)
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165
 
@@ -1138,8 +1138,8 @@ DM_PPFLAGS      = -DDM_PARALLEL -DRSL_LITE -DMPI2_SUPPORT -DLEARN_BCAST
 FCOPTIM         = -O2
 FCDEBUG         =
 FCTYPE          = -r$(RWORDSIZE)
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCFIXED         = -ffixed-form
+FCFREE          = -ffree-form -fendian=big -ffree-line-length-huge
+FCFIXED         = -ffixed-form -fendian=big
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,155,158,159
 

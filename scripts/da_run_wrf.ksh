@@ -107,8 +107,10 @@ if $DUMMY; then
    done
 else
    $RUN_CMD ./wrf.exe
-   grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
-   RC=$?
+   if [[ -f rsl.out.0000 ]]; then
+      grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
+      RC=$?
+   fi
 
    cp namelist.output $RUN_DIR
    echo '<A HREF="namelist.output">Namelist output</a>'
@@ -137,8 +139,8 @@ else
    echo $(date +'%D %T') "Ended $RC"
 fi
 
-mv $WORK_DIR/wrfinput_* $FC_DIR/$DATE
-mv $WORK_DIR/wrfout_* $FC_DIR/$DATE
+#mv $WORK_DIR/wrfinput_* $FC_DIR/$DATE
+#mv $WORK_DIR/wrfout_* $FC_DIR/$DATE
 
 if $CLEAN; then
    rm -rf $WORK_DIR
