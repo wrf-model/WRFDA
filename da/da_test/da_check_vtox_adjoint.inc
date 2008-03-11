@@ -42,6 +42,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
    call da_zero_x (grid%xa)
 
    call da_transform_vtox(grid,cv_size, xbx, be, ep, cv1, vv, vp)
+   call da_transform_xtoxa(grid)
 
    !----------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation: 
@@ -114,6 +115,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xbx, be, ep, cv1, vv, vp)
    ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
+   call da_transform_xtoxa_adj(grid)
    call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv2)
 
    !-------------------------------------------------------------------------

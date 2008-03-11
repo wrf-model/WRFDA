@@ -73,7 +73,8 @@ module da_test
       da_transform_xtotb_adj, da_vertical_transform, da_transform_vptox, &
       da_transform_xtogpsref_adj,da_transform_vptox_adj,da_transform_vtox, &
       da_transform_vtox_adj,da_transform_vtovv,da_transform_vtovv_global, &
-      da_transform_vtovv_global_adj, da_transform_vtovv_adj
+      da_transform_vtovv_global_adj, da_transform_vtovv_adj, da_transform_xtoxa, &
+      da_transform_xtoxa_adj
 
    implicit none
 

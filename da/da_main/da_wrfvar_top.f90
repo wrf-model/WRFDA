@@ -58,7 +58,7 @@ module da_wrfvar_top
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_transfer_model, only : da_transfer_xatoanalysis,da_setup_firstguess
    use da_varbc, only : da_varbc_init,da_varbc_update
-   use da_vtox_transforms, only : da_transform_vtox
+   use da_vtox_transforms, only : da_transform_vtox, da_transform_xtoxa
    use da_wrfvar_io, only : da_med_initialdata_input, da_med_initialdata_output
    use da_tools, only : da_set_randomcv
 

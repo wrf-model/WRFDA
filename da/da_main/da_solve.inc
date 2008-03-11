@@ -211,6 +211,7 @@ subroutine da_solve ( grid , config_flags)
       ! [8.5] Update latest analysis solution:
 
       call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
+      call da_transform_xtoxa (grid)
 
       ! [8.6] Only when use_radarobs = .false. and calc_w_increment =.true.,
       !       the w_increment need to be diagnosed:
