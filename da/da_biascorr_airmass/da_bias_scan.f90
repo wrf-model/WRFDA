@@ -358,29 +358,29 @@ loop2:&
 
 !-------------------
   write (6,370) (js,js=1,KSCAN)
-  370 format (/5X,'NUMBER AT EACH SCAN POSITION'/5X,30I7)
+  370 format (/5X,'NUMBER AT EACH SCAN POSITION'/5X,90I7)
 
   do j=1, tovs%nchan
     jv = j
     write (6,371) jv, nscanch(j,1:KSCAN)
   end do
-  371 format(1X,I4,30I7)
+  371 format(1X,I4,90I7)
 
   write (6,391) (js,js=1,KSCAN)
-  391 format (/1X,'BIASES FOR EACH SCAN ANGLE'/4X,30I7)
+  391 format (/1X,'BIASES FOR EACH SCAN ANGLE'/4X,90I7)
   do j=1, tovs%nchan
     jv = j
     write (6,393) jv, (vmnsc(j,js),js=1,KSCAN)
   end do
-  393 format (1X,I3,30F7.2)
+  393 format (1X,I3,90F7.2)
 
   write (6,394) (js,js=1,KSCAN)
-  394 format (/1X,'STD DEV FOR EACH SCAN ANGLE'/4X,30I7)
+  394 format (/1X,'STD DEV FOR EACH SCAN ANGLE'/4X,90I7)
   do j=1, tovs%nchan
      jv = j
     write (6,396) jv, (vstdsc(j,js),js=1,KSCAN)
   end do
-  396  format (1X,I3,30F7.2)
+  396  format (1X,I3,90F7.2)
 
 !----------------------
   if (global) then
@@ -388,7 +388,7 @@ loop2:&
     do j=1,tovs%nchan
       jv = j
       do iband=1, jband
-         write (6,'(2i3,30f7.2)') jv, iband, vmnrlb(j,1:KSCAN,iband)
+         write (6,'(2i3,90f7.2)') jv, iband, vmnrlb(j,1:KSCAN,iband)
       end do
     end do
 
@@ -541,7 +541,7 @@ loop2:&
     do j=1,tovs%nchan
       jv = j
       do iband=1, jband
-         write (6,'(2i3,30f7.2)') jv, iband, vmnrlbt(j,1:KSCAN,iband)
+         write (6,'(2i3,90f7.2)') jv, iband, vmnrlbt(j,1:KSCAN,iband)
       end do
     end do
 
@@ -550,12 +550,12 @@ loop2:&
  else  ! regional 
 !---------------------
   write (6,397) (js,js=1,KSCAN)
-  397 format (/1X,'RELATIVE BIASES FOR EACH SCAN ANGLE'/4X,30I7)
+  397 format (/1X,'RELATIVE BIASES FOR EACH SCAN ANGLE'/4X,90I7)
   do j=1, tovs%nchan
       jv = j
     write (6,399) jv, vmnrl(j,1:KSCAN)
   end do
-  399 format (1X,I3,30F7.2)
+  399 format (1X,I3,90F7.2)
 
   do j=1, tovs%nchan
      jv = j

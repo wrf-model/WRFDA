@@ -27,7 +27,7 @@
    integer              :: inst, ichan, npred, i, npredmax, id
    integer              :: iunit, iost
    character(len=filename_len) :: filename
-   character(len=30)    :: fparam
+   character(len=120)   :: fparam
    real, allocatable    :: varbc_param_tl(:)
    logical, allocatable :: lvarbc_inst(:)
 
