@@ -62,7 +62,7 @@
 #include "mpi.h"
 #include "rsl_lite.h"
 
-char mess[4096] ;
+char mess1[4096] ;
 
 typedef struct bcast_point_desc {
   int ig ;
@@ -400,9 +400,9 @@ rsl_lite_to_peerpoint_msg ( nbuf_p, buf )
   nbuf = *nbuf_p ;
 
   if ( Sendbufcurs + nbuf >= Sendbufsize ) {
-    sprintf(mess,"RSL_LITE_TO_CHILD_MSG: Sendbufcurs + nbuf (%d) would exceed Sendbufsize (%d)\n",
+    sprintf(mess1,"RSL_LITE_TO_CHILD_MSG: Sendbufcurs + nbuf (%d) would exceed Sendbufsize (%d)\n",
            Sendbufcurs + nbuf , Sendbufsize ) ;
-    RSL_TEST_ERR(1,mess) ;
+    RSL_TEST_ERR(1,mess1) ;
   }
 
   if ( nbuf % sizeof(int) == 0 ) {

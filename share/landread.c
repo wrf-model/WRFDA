@@ -31,7 +31,11 @@ int GET_TERRAIN (        float *adx,
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <math.h>
-#include <malloc.h>
+#ifndef MAC_G95
+# include <malloc.h>
+#else
+# include <malloc/malloc.h>
+#endif
 #include <string.h>
 #include "landread.h"
 #define MAXTOPOFILES  100

@@ -10,7 +10,11 @@
 #ifdef NOUNDERSCORE
 void da_memory(
 #else
+#ifdef F2CSTYLE
+void da_memory__(
+#else
 void da_memory_(
+#endif
 #endif
 
   memory_used)

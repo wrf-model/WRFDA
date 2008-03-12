@@ -23,11 +23,11 @@ integer lineno
    LOGICAL :: dm_debug_flag = .FALSE.
 
    INTERFACE wrf_dm_maxval
-     MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer, wrf_dm_maxval_doubleprecision
+     MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer
    END INTERFACE
 
    INTERFACE wrf_dm_minval                       ! gopal's doing
-     MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer, wrf_dm_minval_doubleprecision
+     MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer
    END INTERFACE
 
 CONTAINS
@@ -679,29 +679,6 @@ write(0,*)'reordering mesh'
       ENDDO
    END SUBROUTINE wrf_dm_maxval_real
 
-   SUBROUTINE wrf_dm_maxval_doubleprecision ( val, idex, jdex )
-      IMPLICIT NONE
-      INCLUDE 'mpif.h'
-      DOUBLE PRECISION val, val_all( ntasks )
-      INTEGER idex, jdex, ierr
-      INTEGER dex(2)
-      INTEGER dex_all (2,ntasks)
-      INTEGER i
-
-      dex(1) = idex ; dex(2) = jdex
-      CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, local_communicator, ierr )
-      CALL mpi_allgather ( val, 1, MPI_DOUBLE_PRECISION, val_all , 1, MPI_DOUBLE_PRECISION, local_communicator, ierr )
-      val = val_all(1)
-      idex = dex_all(1,1) ; jdex = dex_all(2,1)
-      DO i = 2, ntasks
-        IF ( val_all(i) .GT. val ) THEN
-           val = val_all(i)
-           idex = dex_all(1,i)
-           jdex = dex_all(2,i)
-        ENDIF
-      ENDDO
-   END SUBROUTINE wrf_dm_maxval_doubleprecision
-
    SUBROUTINE wrf_dm_maxval_integer ( val, idex, jdex )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -757,37 +734,6 @@ write(0,*)'reordering mesh'
       ENDDO
 #endif
    END SUBROUTINE wrf_dm_minval_real
-
-   SUBROUTINE wrf_dm_minval_doubleprecision ( val, idex, jdex )
-      IMPLICIT NONE
-      DOUBLE PRECISION val, val_all( ntasks )
-      INTEGER idex, jdex, ierr
-      INTEGER dex(2)
-      INTEGER dex_all (2,ntasks)
-! <DESCRIPTION>
-! Collective operation. Each processor calls passing a local value and its index; on return
-! all processors are passed back the maximum of all values passed and its index.
-!
-! </DESCRIPTION>
-      INTEGER i, comm
-#ifndef STUBMPI
-      INCLUDE 'mpif.h'
-
-      CALL wrf_get_dm_communicator ( comm )
-      dex(1) = idex ; dex(2) = jdex
-      CALL mpi_allgather ( dex, 2, MPI_INTEGER, dex_all , 2, MPI_INTEGER, comm, ierr )
-      CALL mpi_allgather ( val, 1, MPI_DOUBLE_PRECISION, val_all , 1, MPI_DOUBLE_PRECISION, comm, ierr )
-      val = val_all(1)
-      idex = dex_all(1,1) ; jdex = dex_all(2,1)
-      DO i = 2, ntasks
-        IF ( val_all(i) .LT. val ) THEN
-           val = val_all(i)
-           idex = dex_all(1,i)
-           jdex = dex_all(2,i)
-        ENDIF
-      ENDDO
-#endif
-   END SUBROUTINE wrf_dm_minval_doubleprecision
 
    SUBROUTINE wrf_dm_minval_integer ( val, idex, jdex )
       IMPLICIT NONE
@@ -2378,7 +2324,6 @@ integer myproc
       character*256 :: timestr
       integer ierr
 
-      LOGICAL, EXTERNAL  :: em_cd_feedback_mask
 #ifdef DEREF_KLUDGE
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33

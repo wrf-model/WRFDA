@@ -59,8 +59,8 @@ convert_nmm : convert_nmm.o
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o libwrflib.a $(LIB)
 
 nup_standalone.exe : 
-	$(SFC) -I$(NETCDFPATH)/include -c module_nup_feedback.F
-	$(SFC) -I$(NETCDFPATH)/include -c nup_standalone.F
+	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) module_nup_feedback.F
+	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F
 	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :
