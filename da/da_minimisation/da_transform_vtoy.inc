@@ -65,6 +65,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 
       do nobwin=1, num_fgat_time
          write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
+         if (nobwin == 1) filnam = 'fg'
          call da_med_initialdata_input( grid , config_flags, &
             filnam)
          call da_setup_firstguess( xbx_tmp, grid, config_flags)
