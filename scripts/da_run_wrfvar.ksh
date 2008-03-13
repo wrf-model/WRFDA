@@ -14,6 +14,7 @@ export WORK_DIR=$RUN_DIR/working
 
 export WINDOW_START=${WINDOW_START:--3}
 export WINDOW_END=${WINDOW_END:-3}
+export FGATOBS_FREQ=${FGATOBS_FREQ:-1}
 
 export YEAR=$(echo $DATE | cut -c1-4)
 export MONTH=$(echo $DATE | cut -c5-6)
@@ -228,7 +229,7 @@ export PATH=$WRFVAR_DIR/scripts:$PATH
 if $NL_VAR4D; then
    ln -fs $DA_BOUNDARIES wrfbdy_d01
 fi
-ln -fs $DA_FIRST_GUESS fg01
+ln -fs $DA_FIRST_GUESS fg
 ln -fs $DA_FIRST_GUESS wrfinput_d01
 ln -fs $DA_BACK_ERRORS be.dat
 
@@ -278,41 +279,33 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
          ln -fs $OB_DIR/${D_DATE[07]}/ob.radar- ob07.radar
       fi
    else
-      if [[ $DATE -eq $START_DATE ]]; then
-         ln -fs $OB_DIR/$DATE/ob.ascii+ ob01.ascii
-      else
-         ln -fs $OB_DIR/$DATE/ob.ascii  ob01.ascii
-      fi
       typeset -i N
-      let N=1
+      let N=0
       FGAT_DATE=$START_DATE
-      # while [[ $FGAT_DATE < $END_DATE || $FGAT_DATE -eq $END_DATE ]] ; do
       until [[ $FGAT_DATE > $END_DATE ]]; do
-         if [[ $FGAT_DATE -ne $DATE ]]; then
-            let N=$N+1
-            if [[ $FGAT_DATE -eq $START_DATE ]]; then
-               ln -fs $OB_DIR/$FGAT_DATE/ob.ascii+ ob0${N}.ascii
-            elif [[ $FGAT_DATE -eq $END_DATE ]]; then
-               ln -fs $OB_DIR/$FGAT_DATE/ob.ascii- ob0${N}.ascii
-            else
-               ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
-            fi
-            FYEAR=$(echo ${FGAT_DATE} | cut -c1-4)
-            FMONTH=$(echo ${FGAT_DATE} | cut -c5-6)
-            FDAY=$(echo ${FGAT_DATE} | cut -c7-8)
-            FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
-            ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d01_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+         let N=$N+1
+         ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
+         if [[ -s $OB_DIR/$FGAT_DATE/ob.ssmi ]]; then
+            ln -fs $OB_DIR/$FGAT_DATE/ob.ssmi ob0${N}.ssmi
          fi
-         FGAT_DATE=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE $OBS_FREQ)
+         if [[ -s $OB_DIR/$FGAT_DATE/ob.radar ]]; then
+            ln -fs $OB_DIR/$FGAT_DATE/ob.radar ob0${N}.radar
+         fi
+         FYEAR=$(echo ${FGAT_DATE} | cut -c1-4)
+         FMONTH=$(echo ${FGAT_DATE} | cut -c5-6)
+         FDAY=$(echo ${FGAT_DATE} | cut -c7-8)
+         FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
+         ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d01_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+         FGAT_DATE=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE $FGATOBS_FREQ)
       done
    fi
 else
-   ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
+   ln -fs $OB_DIR/${DATE}/ob.ascii  ob.ascii
    if [[ -s $OB_DIR/${DATE}/ob.ssmi ]]; then
-      ln -fs $OB_DIR/${DATE}/ob.ssmi ob01.ssmi
+      ln -fs $OB_DIR/${DATE}/ob.ssmi ob.ssmi
    fi
    if [[ -s $OB_DIR/${DATE}/ob.radar ]]; then
-      ln -fs $OB_DIR/${DATE}/ob.radar ob01.radar
+      ln -fs $OB_DIR/${DATE}/ob.radar ob.radar
    fi
 fi
 

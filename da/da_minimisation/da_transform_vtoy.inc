@@ -78,7 +78,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          call da_transform_xtoxa(grid)
          call da_transform_xtoy(grid, iv, y)
       end do
-      call da_med_initialdata_input( grid , config_flags, 'fg01')
+      call da_med_initialdata_input( grid , config_flags, 'fg')
       call da_setup_firstguess( xbx_tmp, grid, config_flags)
    else  ! not var4d
       call da_transform_xtoxa(grid)

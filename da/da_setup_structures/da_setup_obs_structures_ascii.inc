@@ -47,18 +47,18 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
    else
       iv%time = 1
 
-      call da_scan_obs_ascii(iv, 'ob01.ascii')
+      call da_scan_obs_ascii(iv, 'ob.ascii')
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
-         call da_scan_obs_ssmi(iv, 'ob01.ssmi')
+         call da_scan_obs_ssmi(iv, 'ob.ssmi')
       end if
 
       ! scan main body of radar observation file
       if (use_radarobs) then
-         call da_scan_obs_radar(iv, 'ob01.radar')
+         call da_scan_obs_radar(iv, 'ob.radar')
       end if
       do i=1,num_ob_indexes
          iv%info(i)%plocal(iv%time) = iv%info(i)%nlocal
@@ -96,16 +96,16 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
    else
       iv%time = 1
 
-      call da_read_obs_ascii(iv, 'ob01.ascii')
+      call da_read_obs_ascii(iv, 'ob.ascii')
 
       if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
-         call da_read_obs_ssmi (iv, 'ob01.ssmi')
+         call da_read_obs_ssmi (iv, 'ob.ssmi')
       end if
 
       if (use_radarobs) then
          ! read radar observation file
-         call da_read_obs_radar(iv, 'ob01.radar')
+         call da_read_obs_radar(iv, 'ob.radar')
       end if
    end if
 

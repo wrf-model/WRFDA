@@ -47,9 +47,9 @@ export EXP_DIR=/sausage/hclin/exps/$REGION/$EXPT
 export VAR_RUN_DIR1=$EXP_DIR/run
 export VAR_RUN_DIR2=wrfvar/working
 if [[ $VAR_RUN_DIR2 == none ]]; then
-   export FGFILE=$VAR_RUN_DIR1/$START_DATE/fg01
+   export FGFILE=$VAR_RUN_DIR1/$START_DATE/fg
 else
-   export FGFILE=$VAR_RUN_DIR1/$START_DATE/$VAR_RUN_DIR2/fg01   # for retrieving mapping info
+   export FGFILE=$VAR_RUN_DIR1/$START_DATE/$VAR_RUN_DIR2/fg   # for retrieving mapping info
 fi
 #
 export DIAG_RUN_DIR=$EXP_DIR/diag
@@ -94,7 +94,6 @@ export PLOTDIR=$DIAG_RUN_DIR/   # the tailing / is necessary
 
 export MAPINFO_FROM_FILE=true   # true, false
 export SUBDOMAIN=false          # true, false
-#export FGFILE=$VAR_RUN_DIR1/$START_DATE/$VAR_RUN_DIR2/fg01
 
 if ! $MAPINFO_FROM_FILE; then   # MAPINFO_FROM_FILE=false
 #

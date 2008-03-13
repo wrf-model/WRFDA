@@ -25,7 +25,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid, config_flags)
    ! [0.0] check the xb_date for 3DVAR
    !-----------------------------------------------------------------------
 
-   if (.NOT. var4d) then
+   if ( num_fgat_time == 1 ) then
       write(unit=xb_date,fmt='(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
            grid%start_year, grid%start_month, grid%start_day, &
            grid%start_hour, grid%start_minute,grid%start_second
