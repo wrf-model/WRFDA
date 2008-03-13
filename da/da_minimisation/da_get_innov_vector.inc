@@ -34,7 +34,6 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
-         if ( n == 1 ) filename = 'fg'
          call da_med_initialdata_input (grid , config_flags, filename)
          call da_setup_firstguess (xbx, grid, config_flags)
       end if

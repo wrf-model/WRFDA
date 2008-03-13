@@ -228,8 +228,9 @@ export PATH=$WRFVAR_DIR/scripts:$PATH
 
 if $NL_VAR4D; then
    ln -fs $DA_BOUNDARIES wrfbdy_d01
+   ln -fs $DA_FIRST_GUESS fg01
 fi
-ln -fs $DA_FIRST_GUESS fg
+ln -fs $DA_FIRST_GUESS fg 
 ln -fs $DA_FIRST_GUESS wrfinput_d01
 ln -fs $DA_BACK_ERRORS be.dat
 
@@ -543,6 +544,7 @@ if [[ $NL_MULTI_INC == 2 ]] ; then
    mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
    ln -fs wrfinput_d01-thin wrfinput_d01
    ln -fs wrfinput_d01-thin fg01
+   ln -fs wrfinput_d01-thin fg
 
 fi
 
