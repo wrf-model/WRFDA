@@ -561,12 +561,6 @@ else
    if $NL_VAR4D; then
       if [[ $NUM_PROCS -gt 1 ]]; then
          # JRB kludge until we work out what we are doing here
-         if [[ $SUBMIT != "LSF" ]]; then
-            echo "da_run_wrfvar.ksh: Can only handle LSF at present, aborting"
-            exit 1
-         fi
-         export MP_PGMMODEL=mpmd
-         export MP_CMDFILE=poe.cmdfile
          if [[ $NUM_PROCS -lt 3 ]]; then
             echo "Need at least 3 processors for 4dvar in parallel mode"
             exit 1
@@ -574,6 +568,7 @@ else
          export NUM_PROCS_VAR=`expr $NUM_PROCS \/ 4`
          export NUM_PROCS_WRF=`expr $NUM_PROCS \/ 4`
          export NUM_PROCS_WRFPLUS=`expr $NUM_PROCS \/ 2`
+         export LSF_PTILE=${LSF_PTILE:-$NUM_PROCS}
          export NUM_4DVAR_NODES=`expr $NUM_PROCS \/ $LSF_PTILE`
          if [[ $NUM_4DVAR_NODES -lt 1 ]] ; then
             export NUM_4DVAR_NODES=1
@@ -597,43 +592,53 @@ else
          echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
          echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
 
-         rm -f $MP_CMDFILE
+         if [[ $SUBMIT == "LSF" ]]; then
+            export MP_PGMMODEL=mpmd
+            export MP_CMDFILE=poe.cmdfile
+            rm -f $MP_CMDFILE
 
-         if [[ $NL_MULTI_INC == 1 ]] ; then
-            let I=0
-            while [[ $I -lt $NUM_PROCS_VAR ]]; do
-               echo "da_wrfvar.exe" >> $MP_CMDFILE
-               let I=$I+1
-            done
-            let I=0
-            while [[ $I -lt $NUM_PROCS_WRF ]]; do
-               echo "./nl/wrf.exe" >> $MP_CMDFILE
-               let I=$I+1
-            done
-         else
-            let INode=1
-            while [[ $INode -le $NUM_4DVAR_NODES ]]; do
+            if [[ $NL_MULTI_INC == 1 ]] ; then
                let I=0
-               while [[ $I -lt $NUM_PROCS_VAR_PER_NODE ]]; do
+               while [[ $I -lt $NUM_PROCS_VAR ]]; do
                   echo "da_wrfvar.exe" >> $MP_CMDFILE
                   let I=$I+1
                done
                let I=0
-               while [[ $I -lt $NUM_PROCS_WRFPLUS_PER_NODE ]]; do
-                  echo "./ad/wrfplus.exe" >> $MP_CMDFILE
-                  let I=$I+1
-               done
-               let I=0
-               while [[ $I -lt $NUM_PROCS_WRF_PER_NODE ]]; do
+               while [[ $I -lt $NUM_PROCS_WRF ]]; do
                   echo "./nl/wrf.exe" >> $MP_CMDFILE
                   let I=$I+1
                done
-               let INode=$INode+1
-            done
-         fi
+            else
+               let INode=1
+               while [[ $INode -le $NUM_4DVAR_NODES ]]; do
+                  let I=0
+                  while [[ $I -lt $NUM_PROCS_VAR_PER_NODE ]]; do
+                     echo "da_wrfvar.exe" >> $MP_CMDFILE
+                     let I=$I+1
+                  done
+                  let I=0
+                  while [[ $I -lt $NUM_PROCS_WRFPLUS_PER_NODE ]]; do
+                     echo "./ad/wrfplus.exe" >> $MP_CMDFILE
+                     let I=$I+1
+                  done
+                  let I=0
+                  while [[ $I -lt $NUM_PROCS_WRF_PER_NODE ]]; do
+                     echo "./nl/wrf.exe" >> $MP_CMDFILE
+                     let I=$I+1
+                  done
+                  let INode=$INode+1
+               done
+            fi
 
          mpirun.lsf -cmdfile  $MP_CMDFILE
          RC=$?
+
+         fi
+
+         if [[ $SUBMIT == "none" ]]; then
+            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe : -np $NUM_PROCS_WRFPLUS ./ad/wrfplus.exe : -np $NUM_PROCS_WRF ./nl/wrf.exe
+         fi
+
       else
          $RUN_CMD ./da_wrfvar.exe
          RC=$?
