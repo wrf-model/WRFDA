@@ -498,11 +498,11 @@ SUBROUTINE DUCU1D_D(i, j, u0, v0, t0, t0d, qv0, qv0d, p0, p0d, dzq, dzqd&
   REAL, INTENT(OUT) :: pprate, pprated
   REAL, DIMENSION(kts:kte), INTENT(IN) :: dzq, dzqd, p0, p0d, qv0, qv0d&
 &  , rhoe, rhoed, t0, t0d, th0, th0d, u0, v0, w0avg1d, z, zd
-  REAL :: abs1, abs2, alpha, arg1, arg1d, arg2, buoy, cape, cin, cond(&
+  REAL :: abs1, abs2, arg1, arg1d, arg2, buoy, cape, cin, cond(&
 &  kts:kte), condd(kts:kte), condpr, dh, dhd, dq, dqd, dt, dtd, dtm, ep&
-&  , eps, es, esd, evap, evapd, h(kts:kte), hd(kts:kte), hp, hpd, hs(kts&
+&  , es, esd, evap, evapd, h(kts:kte), hd(kts:kte), hp, hpd, hs(kts&
 &  :kte), hsd(kts:kte), mp, mpd, qp, qpd, qs(kts:kte), qsd(kts:kte), qsp&
-&  , qspd, rrk, rrkd, rrkp, rrkpd, tadp, tdp, vfall, x(kts:kte), xd(kts:&
+&  , qspd, rrk, rrkd, rrkp, rrkpd, tadp, tdp, x(kts:kte), xd(kts:&
 &  kte), zb, zg, zi, zt
 !x  UNKNOWNTYPE :: capemin
 !x  UNKNOWNTYPE :: cincap
@@ -920,15 +920,15 @@ SUBROUTINE DUCU1D_B(i, j, u0, v0, t0, t0b, qv0, qv0b, p0, p0b, dzq, dzqb&
 &  u0, v0, w0avg1d, z
   INTEGER :: ad_from, ad_from0, ad_to, branch, ipos, iprint, isat, &
 &  jprint, k, kb, ki, kt
-  REAL :: abs1, abs2, alpha, buoy, cape, cin, cond(kts:kte), condb(kts:&
-&  kte), condpr, dh, dhb, dq, dqb, dt, dtb, dtm, ep, eps, es, esb, evap&
+  REAL :: abs1, abs2, buoy, cape, cin, cond(kts:kte), condb(kts:&
+&  kte), condpr, dh, dhb, dq, dqb, dt, dtb, dtm, ep, es, esb, evap&
 &  , evapb, h(kts:kte), hb(kts:kte), hp, hpb, hs(kts:kte), hsb(kts:kte)&
 &  , mp, mpb, qp, qpb, qs(kts:kte), qsb(kts:kte), qsp, qspb, rrk, rrkb, &
 &  rrkp, rrkpb, tadp, tdp, temp, temp0, temp1, temp10, temp10b, temp10b0&
 &  , temp10b1, temp10b2, temp11, temp11b, temp12, temp12b, temp13, &
 &  temp1b, temp1b0, temp1b1, temp2, temp3, temp3b, temp4, temp5, temp5b&
 &  , temp6, temp6b, temp6b0, temp7, temp7b, temp8, temp8b, temp8b0, &
-&  temp9, temp9b, temp9b0, tempb, vfall, x(kts:kte)
+&  temp9, temp9b, temp9b0, tempb, x(kts:kte)
   REAL :: xb(kts:kte), zb, zg, zi, zt
 
 !new definition
@@ -1265,7 +1265,7 @@ SUBROUTINE DUCU_B(ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms&
   INTEGER :: branch, i, i_end, i_start, icldck, j, j_end, j_start, k, &
 &  ntst, sz
   INTRINSIC MOD, MAX, PRESENT, MIN
-  EXTERNAL PRESENT_B
+! EXTERNAL PRESENT_B
 !-------------------------------------------------------------
 !
 !
