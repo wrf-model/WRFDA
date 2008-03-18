@@ -199,7 +199,7 @@ contains
     logical, intent(out) :: iuse
     integer(i_kind), intent(out) :: itt,itx
     integer(i_kind), intent(in)  :: ithin,n
-    integer(i_kind), intent(inout) :: iobs,iobsout
+    integer(i_kind), intent(inout) :: iobs, iobsout
     real(r_kind),intent(in):: dlat_earth,dlon_earth,crit1
 
     integer(i_kind) :: ix,iy
@@ -251,8 +251,10 @@ contains
     end if
     if(crit < thinning_grid(n)%score_crit(itx) .and. thinning_grid(n)%icount(itx) > 1)then
       iuse=.true.
+      iobs=iobs+1
       thinning_grid(n)%score_crit(itx)= crit
-      iobsout=thinning_grid(n)%ibest_obs(itx)
+      thinning_grid(n)%ibest_obs(itx)=iobs
+      iobsout=iobs
     end if
 
     return

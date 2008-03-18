@@ -33,7 +33,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    character(10) date
    character(8) subset,subfgn
    character(80) hdr1b
-   integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
+   integer(i_kind) ihh,i,j,k,ifov,idd,ireadmg,ireadsb
    integer(i_kind) iret,idate,im,iy,nchan
 
    ! thinning variables
@@ -63,7 +63,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    real , allocatable ::   tb_inv(:)                    !  bright temperatures
    !  end type bright_temperature
 
-   type (datalink_type), pointer    :: head, p, current
+   type (datalink_type), pointer    :: head, p, current, prev
 
    integer                        ::  ifgat
    type(info_type)                ::  info
@@ -74,10 +74,12 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_selected
-   integer :: num_tovs_thinned, num_tovs_used
+   integer :: num_tovs_thinned, num_tovs_used, num_tovs_used_tmp
    integer :: lnbufr
    integer :: n
    integer(i_kind), allocatable :: ptotal(:)
+   real , allocatable :: in(:,:), out(:,:)
+   logical :: found, head_found
 
    call da_trace_entry("da_read_obs_bufrtovs")
 
@@ -197,6 +199,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    num_tovs_thinned  = 0    ! number of obs rejected by thinning
    num_tovs_used     = 0    ! number of obs entered into innovation computation
    num_tovs_selected = 0    ! number of obs limited for debuging
+   iobs = 0                 ! for thinning, argument is inout
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -331,7 +334,6 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
             timedif = 0.0 !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
             terrain = 0.01_r_kind*abs(bfr1bhdr(13))
             crit = 1.0 !0.01_r_kind+terrain + timedif !+ 10.0_r_kind*float(iskip)
-            iobs=0 ! argument is inout
             call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
             if (.not. iuse) then
                num_tovs_thinned=num_tovs_thinned+1
@@ -397,6 +399,92 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
          nullify (p%next)
       end do
    end do obs
+
+   if (thinning .and. num_tovs_global > 0 ) then
+
+      ! Get minimum crit and associated processor index.
+      j = 0
+      do n = 1, iv%num_inst
+         j = j + thinning_grid(n)%itxmax
+      end do
+
+      allocate ( in  (2,j) )
+      allocate ( out (2,j) )
+
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            in(1,j) = thinning_grid(n)%score_crit(i) 
+            in(2,j) = myproc
+         end do
+      end do
+      call mpi_reduce(in, out, j, mpi_2double_precision, mpi_minloc, root, comm, ierr)
+
+      call wrf_dm_bcast_real (out, j*2)
+
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            if ( INT(out(2,j)) /=  myproc ) thinning_grid(n)%ibest_obs(i)  = 0
+         end do
+      end do
+
+      deallocate( in  )
+      deallocate( out )
+
+
+      ! Delete the nodes which being thinning out
+      p => head
+      prev => head
+      head_found = .false.
+      num_tovs_used_tmp = num_tovs_used
+      do j = 1, num_tovs_used_tmp
+         n = p%sensor_index
+         found = .false.
+
+         do i = 1, thinning_grid(n)%itxmax
+            if ( thinning_grid(n)%ibest_obs(i) == j .and. thinning_grid(n)%score_crit(i) < 9.99e6_r_kind ) then
+               found = .true.
+               exit
+            endif
+         end do 
+
+         ! free current data
+         if ( .not. found ) then
+            current => p
+            p => p%next
+            if ( head_found ) then
+               prev%next => p
+            else
+               head => p
+               prev => p
+            endif
+            deallocate ( current % tb_inv )
+            deallocate ( current )
+            num_tovs_thinned = num_tovs_thinned + 1
+            num_tovs_used = num_tovs_used - 1
+            nread(n) = nread(n) - 1
+            continue
+         endif
+
+         if ( found .and. head_found ) then
+            prev => p
+            p => p%next
+            continue
+         endif
+
+         if ( found .and. .not. head_found ) then
+            head_found = .true.
+            head => p
+            prev => p
+            p => p%next
+         endif
+
+      end do
+
+   endif  ! End of thinning
 
    iv%total_rad_pixel   = iv%total_rad_pixel   + num_tovs_used
    iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan

@@ -22,7 +22,8 @@ module da_radiance
 #endif
 
 #ifdef DM_PARALLEL
-   use mpi, only : mpi_integer, mpi_status_size
+   use mpi, only : mpi_integer, mpi_status_size, mpi_min, mpi_max, mpi_minloc, &
+       mpi_2double_precision
 #endif
 
    use da_control, only : max_ob_levels,missing_r, &
@@ -36,7 +37,7 @@ module da_radiance
       use_amsubobs,use_eos_amsuaobs,use_amsuaobs,use_hirs2obs,rtm_option, &
       rtm_option_rttov,rtm_option_crtm,use_airsobs,use_kma1dvar,use_hirs3obs, &
       use_ssmisobs, use_filtered_rad,print_detail_rad,stderr, mw_emis_sea, &
-      rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
+      rtminit_print, rttov_scatt,comm,root,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr,thinning,thinning_mesh, &
       rad_monitoring, monitor_on, kts, kte, kms,kme,&

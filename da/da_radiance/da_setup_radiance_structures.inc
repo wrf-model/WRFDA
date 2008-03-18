@@ -16,6 +16,7 @@ subroutine da_setup_radiance_structures( grid, ob, iv )
 
    ! thinning variables
    integer  :: istart,iend,jstart,jend
+   real     :: rlonlat(4)
    ! crtm_cloud
    integer  :: n1,n2,k,its,ite,jts,jte,kts,kte,inst
    
@@ -60,6 +61,20 @@ subroutine da_setup_radiance_structures( grid, ob, iv )
             endif
          enddo
       enddo
+
+#ifdef DM_PARALLEL
+      call mpi_reduce(rlat_min, rlonlat(1), 1, true_mpi_real, mpi_min, root, comm, ierr)
+      call mpi_reduce(rlon_min, rlonlat(2), 1, true_mpi_real, mpi_min, root, comm, ierr)
+      call mpi_reduce(rlat_max, rlonlat(3), 1, true_mpi_real, mpi_max, root, comm, ierr)
+      call mpi_reduce(rlon_max, rlonlat(4), 1, true_mpi_real, mpi_max, root, comm, ierr)
+
+      CALL mpi_bcast( rlonlat, 4 , true_mpi_real , root , comm, ierr )
+
+      rlat_min = rlonlat(1)
+      rlon_min = rlonlat(2)
+      rlat_max = rlonlat(3)
+      rlon_max = rlonlat(4)
+#endif
 
       dlat_grid = rlat_max - rlat_min
       dlon_grid = rlon_max - rlon_min
