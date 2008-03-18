@@ -402,6 +402,8 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
 
    if (thinning .and. num_tovs_global > 0 ) then
 
+#ifdef DM_PARALLEL
+
       ! Get minimum crit and associated processor index.
       j = 0
       do n = 1, iv%num_inst
@@ -434,6 +436,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
       deallocate( in  )
       deallocate( out )
 
+#endif
 
       ! Delete the nodes which being thinning out
       p => head
