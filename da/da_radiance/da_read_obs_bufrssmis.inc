@@ -35,11 +35,12 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
    logical :: outside, outside_all
 
    integer(i_kind) :: iost, inst, lnbufr, ifgat
-   integer(i_kind) :: ihh, i, n, k, slnm, ifov, idd, ireadmg, ireadsb
+   integer(i_kind) :: ihh, i, j, n, k, slnm, ifov, idd, ireadmg, ireadsb
    integer(i_kind) :: iret, idate, im, iy
    integer(i_kind) :: jc, incangl, bch, landsea_mask, rain_flag
    integer(i_kind) :: platform_id, satellite_id, sensor_id, nchan, num_ssmis_file
    integer(i_kind) :: num_ssmis_local, num_ssmis_global, num_ssmis_used, num_ssmis_thinned
+   integer(i_kind) :: num_ssmis_used_tmp
 
    real(r_double), dimension(2,maxchanl) :: bufrtbb
    real(r_double), dimension(n1bhdr)     :: bfr1bhdr
@@ -49,7 +50,7 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
    real(r_double)    ::  obs_time
    real(r_double), allocatable ::  tb_inv(:)          !  bright temperatures
 
-   type (datalink_type), pointer  :: head, p, current
+   type (datalink_type), pointer  :: head, p, current, prev
    type(info_type)                :: info
    type(model_loc_type)           :: loc
 
@@ -58,12 +59,16 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
    real(r_kind)    :: terrain,timedif,crit,dist
    real(r_kind)    :: dlon_earth,dlat_earth
    logical         :: iuse
+   real, allocatable :: in(:,:), out(:,:)
+   logical           :: found, head_found
 
-   integer(i_kind), allocatable :: ptotal(:)
+   integer(i_kind), allocatable :: ptotal(:), nread(:)
 
    call da_trace_entry("da_read_obs_bufrssmis")
 
+   allocate(nread(1:rtminit_nsensor))
    allocate(ptotal(0:num_fgat_time))
+   nread(1:rtminit_nsensor) = 0
    ptotal(0:num_fgat_time) = 0
 
    platform_id  = 2                 ! for DMSP series
@@ -107,6 +112,7 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
    num_ssmis_global  = 0
    num_ssmis_used    = 0
    num_ssmis_thinned = 0
+   iobs = 0                 ! for thinning, argument is inout
 
    allocate (tb_inv(nchan))
 
@@ -238,7 +244,6 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
             timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
             terrain = 0.01_r_kind*abs(bfr1bhdr(13))
             crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
-            iobs = 0
             call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
             if (.not. iuse) then
                num_ssmis_thinned=num_ssmis_thinned+1
@@ -247,6 +252,7 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
          end if
 
          num_ssmis_used = num_ssmis_used + 1
+         nread(inst) = nread(inst) + 1
 
          if (num_ssmis_used > max_ssmis_input) then
             write(unit=message(1),fmt='(A,I10,A)') &
@@ -305,6 +311,95 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
 
    end do subset_loop
 
+   if (thinning .and. num_ssmis_global > 0 ) then
+
+#ifdef DM_PARALLEL 
+      
+      ! Get minimum crit and associated processor index.
+      j = 0
+      do n = 1, iv%num_inst
+         j = j + thinning_grid(n)%itxmax
+      end do 
+         
+      allocate ( in  (2,j) )
+      allocate ( out (2,j) )
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            in(1,j) = thinning_grid(n)%score_crit(i)
+            in(2,j) = myproc
+         end do 
+      end do
+      call mpi_reduce(in, out, j, mpi_2double_precision, mpi_minloc, root, comm, ierr)
+
+      call wrf_dm_bcast_real (out, j*2)
+
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            if ( INT(out(2,j)) /=  myproc ) thinning_grid(n)%ibest_obs(i)  = 0
+         end do
+      end do
+
+      deallocate( in  )
+      deallocate( out )
+
+#endif
+
+
+      ! Delete the nodes which being thinning out
+      p => head
+      prev => head
+      head_found = .false.
+      num_ssmis_used_tmp = num_ssmis_used
+      do j = 1, num_ssmis_used_tmp
+         n = p%sensor_index
+         found = .false.
+
+         do i = 1, thinning_grid(n)%itxmax
+            if ( thinning_grid(n)%ibest_obs(i) == j .and. thinning_grid(n)%score_crit(i) < 9.99e6_r_kind ) then
+               found = .true.
+               exit
+            end if
+         end do
+
+         ! free current data
+         if ( .not. found ) then
+            current => p
+            p => p%next
+            if ( head_found ) then
+               prev%next => p
+            else
+               head => p
+               prev => p
+            end if
+            deallocate ( current % tb_inv )
+            deallocate ( current )
+            num_ssmis_thinned = num_ssmis_thinned + 1
+            num_ssmis_used = num_ssmis_used - 1
+            nread(n) = nread(n) - 1
+            continue
+         end if
+
+         if ( found .and. head_found ) then
+            prev => p
+            p => p%next
+            continue
+         end if
+
+         if ( found .and. .not. head_found ) then
+            head_found = .true.
+            head => p
+            prev => p
+            p => p%next
+         end if
+
+      end do
+
+   end if  ! End of thinning
+
    iv%total_rad_pixel   = iv%total_rad_pixel + num_ssmis_used
    iv%total_rad_channel = iv%total_rad_channel + num_ssmis_used*nchan
 
@@ -328,39 +423,41 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
 
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  
-   
-   if ( num_ssmis_used > 0 ) then
+   do i = 1, iv%num_inst 
       if (rtm_option == rtm_option_crtm) then
-         iv%instid(inst)%nlevels = kme-kms+1
-         iv%instid(inst)%nchannels = nchan
+         iv%instid(i)%nlevels = kme-kms+1
+         iv%instid(i)%nchannels = nchan
       end if
-      iv%instid(inst)%num_rad  = num_ssmis_used
-      iv%instid(inst)%info%nlocal = num_ssmis_used
+      if (nread(i) < 1) cycle
+      iv%instid(i)%num_rad  = num_ssmis_used
+      iv%instid(i)%info%nlocal = num_ssmis_used
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         'Allocating space for radiance innov structure', &
-         inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
+         i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
 
 #ifdef RTTOV
       if (rtm_option == rtm_option_rttov) then
-         call rttov_setupchan(1, nchan, coefs(inst),             &   ! in
-            iv%instid(inst)%nfrequencies,iv%instid(inst)%nchannels, &
-            iv%instid(inst)%nbtout)                                     ! out
+         call rttov_setupchan(1, nchan, coefs(i),             &   ! in
+            iv%instid(i)%nfrequencies,iv%instid(i)%nchannels, &
+            iv%instid(i)%nbtout)                                     ! out
       end if
 #endif
 
-      call da_allocate_rad_iv (inst, nchan, iv)
+      call da_allocate_rad_iv (i, nchan, iv)
 
-   end if   ! end if num_ssmis_used
+   end do
 
    !  6.0 assign sequential structure to innovation structure
    !-------------------------------------------------------------
+   nread(1:rtminit_nsensor) = 0
    p => head
 
    do n = 1, num_ssmis_used
+      i = p%sensor_index
+      nread(i) = nread(i) + 1
+      call da_initialize_rad_iv (i, nread(i), iv, p)
 
-      call da_initialize_rad_iv (inst, n, iv, p)
-
-      iv%instid(inst)%rain_flag(n) = p%rain_flag
+      iv%instid(i)%rain_flag(n) = p%rain_flag
 
       current => p
       p => p%next
@@ -372,6 +469,7 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
    end do
 
    deallocate ( p )
+   deallocate (nread)
    deallocate (ptotal)
 
    call closbf(lnbufr)
