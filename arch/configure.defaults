@@ -8867,6 +8867,123 @@ convert_nmm.o    :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
+#ARCH    PC Linux i486 i586 i686, G95 compiler  (single-threaded, no nesting, g95 compiler)
+#     
+FC              =       g95
+SFC		=	$(FC)
+LD              =       g95
+CC              =       cc
+SCC		=	$(CC)
+RWORDSIZE       =	8
+PROMOTION	=	-fno-second-underscore -ffree-form -ffree-line-length-huge -r$(RWORDSIZE) -i4 -fendian=big
+CFLAGS          =       -DMACOS
+FCOPTIM         =       -O0  
+FCDEBUG         =       
+FCBASEOPTS      =       -fno-second-underscore -ffree-form -ffree-line-length-huge -fstatic -fendian=big $(FCDEBUG) 
+FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
+INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
+                        -I../frame -I../share -I../phys -I../inc
+EXTRAMODULES    =       
+ARCHFLAGS       =       -DYYY -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
+                        CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DLANDREAD_STUB -DG95 -DMACOS -DF2CSTYLE
+PERL            =       CONFIGURE_PERL_PATH
+REGISTRY        =       Registry
+LIB             =       CONFIGURE_NETCDF_LIB_PATH \
+                        -L../external/io_int -lwrfio_int \
+                        -L../external/io_grib1 -lio_grib1 \
+			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
+
+LDFLAGS         =	 
+ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
+CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
+POUND_DEF	=	-DMAC_OS -DMAC_G95 -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+CPPFLAGS        =       -I$(LIBINCLUDE) -C -P $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF) 
+AR              =       ar ru
+M4              =       m4 -B 10000
+RANLIB          =       ranlib
+NETCDFPATH	=	CONFIGURE_NETCDF_PATH
+CC_TOOLS        =       cc
+
+externals : CONFIGURE_WRFIO_NF wrfio_grib1 wrfio_int module_dm.F esmf_time
+
+module_dm.F :
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+wrfio_nf : 
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) -fno-second-underscore -ffree-form -ffree-line-length-huge -fendian=big " ; \
+	if [ $(RWORDSIZE) -eq 8 ] ; then \
+	  /bin/rm -f foo_io_flags.h; \
+	  sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
+	  /bin/mv foo_io_flags.h wrf_io_flags.h ; fi ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../../inc ; \
+	/bin/cp wrf_io_flags.h wrf_status_codes.h ../io_phdf5 ; \
+	/bin/cp wrf_io_flags.h ../io_quilt )
+
+wrfio_int : 
+	( cd ../external/io_int ; \
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCDEBUG) -fno-second-underscore -ffree-form -ffree-line-length-huge -fendian=big " all )
+
+wrfio_grib1 :
+	( cd ../external/io_grib1 ; \
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) -fno-second-underscore -ffree-form -ffree-line-length-huge -fendian=big " )
+
+esmf_time : 
+	( cd ../external/esmf_time_f90 ; \
+	  make FC="$(FC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" RANLIB="$(RANLIB)" CPP="$(CPP) -I../../inc -I. $(POUND_DEF)" )
+
+solve_interface.o : solve_interface.F
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b > $*.f
+	$(RM) $*.b
+	$(FC) -c -ffree-form -ffree-line-length-huge  -I. $(PROMOTION) $(MODULE_DIRS) $*.f
+
+# compile these without high optimization to speed compile
+module_io_mm5.o : module_io_mm5.F
+module_si_io.o : module_si_io.F
+module_io_wrf.o : module_io_wrf.F
+module_domain.o : module_domain.F
+module_start.o : module_start.F
+module_initialize.o : module_initialize.F
+module_initialize_b_wave.o : module_initialize_b_wave.F
+module_initialize_hill2d_x.o : module_initialize_hill2d_x.F
+module_initialize_quarter_ss.o : module_initialize_quarter_ss.F
+module_initialize_squall2d_x.o : module_initialize_squall2d_x.F
+module_initialize_squall2d_y.o : module_initialize_squall2d_y.F
+module_initialize_real.o : module_initialize_real.F
+module_dm.o : module_dm.F
+start_domain.o : start_domain.F
+mediation_interp_domain.o : mediation_interp_domain.F
+mediation_force_domain.o : mediation_force_domain.F
+mediation_feedback_domain.o : mediation_feedback_domain.F
+convert_nmm.o : convert_nmm.F
+module_configure.o : module_configure.F
+
+module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
+module_start.o module_initialize.o module_initialize_b_wave.o  \
+module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+module_initialize_real.o module_dm.o \
+mediation_interp_domain.o \
+module_configure.o                                             \
+convert_nmm.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+# to prevent having to call our service representative
+mediation_feedback_domain.o \
+mediation_force_domain.o start_domain.o :
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
+
+###########################################################
 #ARCH    PC Linux i486 i586 i686, G95 compiler  (RSL_LITE, no nesting, g95 compiler)
 #
 DMPARALLEL      =       1
