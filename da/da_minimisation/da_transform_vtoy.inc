@@ -72,6 +72,10 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          iv%time = nobwin
          iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
          iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
+         if ( use_rad ) then   
+            iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
+            iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
+         end if
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_zero_x(grid%xa)
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
@@ -81,6 +85,12 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       call da_med_initialdata_input( grid , config_flags, 'fg')
       call da_setup_firstguess( xbx_tmp, grid, config_flags)
    else  ! not var4d
+      iv%info(:)%n1 = 1
+      iv%info(:)%n2 = iv%info(:)%nlocal
+      if ( use_rad ) then
+         iv%instid(:)%info%n1 = 1
+         iv%instid(:)%info%n2 = iv%instid(:)%num_rad
+      end if
       call da_transform_xtoxa(grid)
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d

@@ -47,8 +47,6 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 
 #if defined(CRTM) || defined(RTTOV)
    if (use_rad) then
-      iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
-      iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
       if (rtm_option == rtm_option_rttov) then
          call da_transform_xtoy_rttov_adj (iv, jo_grad_y, jo_grad_x)
       elseif (rtm_option == rtm_option_crtm) then

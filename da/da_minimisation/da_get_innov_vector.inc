@@ -93,10 +93,6 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    endif
 
-   iv%time = 1
-   iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
-   iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
-
    !-----------------------------------------------------------------------
    ! [2] Having calculated the real O-Bs, optionally overwrite with scaled,
    !    random values:

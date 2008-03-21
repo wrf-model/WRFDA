@@ -70,6 +70,10 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
          iv%time = nobwin
          iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
          iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
+         if ( use_rad ) then
+            iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
+            iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
+         end if
          call da_zero_x(grid%xa)
          call da_transform_xtoy_adj(grid, iv, y, grid%xa)
          call da_transform_xtoxa_adj(grid)
@@ -112,10 +116,13 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       if (num_fgat_time > 1) then ! Recover the firstguess fields touched by reading gr01
          call da_med_initialdata_input( grid , config_flags, 'fg')
       end if
-   else  ! var4d
-      iv%time = 1
-      iv%info(:)%n1 = iv%info(:)%plocal(iv%time-1) + 1
-      iv%info(:)%n2 = iv%info(:)%plocal(iv%time)
+   else  ! not var4d
+      iv%info(:)%n1 = 1
+      iv%info(:)%n2 = iv%info(:)%nlocal
+      if ( use_rad ) then
+         iv%instid(:)%info%n1 = 1
+         iv%instid(:)%info%n2 = iv%instid(:)%num_rad
+      end if
       call da_zero_x(grid%xa)
       call da_transform_xtoy_adj(grid, iv, y,grid%xa)
       call da_transform_xtoxa_adj(grid)
