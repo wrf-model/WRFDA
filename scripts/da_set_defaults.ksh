@@ -241,6 +241,8 @@ export NL_CHECK_RH=${NL_CHECK_RH:-2}     # RH bounds check.
 
 # From Update_BC:
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
+export NL_LOW_BDY_ONLY=${NL_LOW_BDY_ONLY:-false}
+export NL_UPDATE_LSM=${NL_UPDATE_LSM:-false}
 
 # Ensemble parameters:
 export NUM_JOBS=${NUM_JOBS:-0}                         # Number of parallel jobs to run.
