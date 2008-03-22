@@ -50,7 +50,8 @@ cat > parame.in << EOF
 
  cycling = .${CYCLING}.
  debug   = .true.
- low_bdy_only = .false. /
+ low_bdy_only = .${NL_LOW_BDY_ONLY}. 
+ update_lsm = .${NL_UPDATE_LSM}. /
 EOF
 
 if $DUMMY; then
