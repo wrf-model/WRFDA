@@ -9,8 +9,6 @@ subroutine da_write_iv_rad_ascii (ob, iv )
    type (y_type),     intent(in)  :: ob       ! Observation structure.
    type (iv_type),    intent(in)  :: iv       ! O-B structure.
 
-#ifdef RTTOV
-
    integer                        :: n        ! Loop counter.
    integer                        :: i, k, l  ! Index dimension.
    integer                        :: nlevelss ! Number of obs levels.
@@ -356,8 +354,6 @@ subroutine da_write_iv_rad_ascii (ob, iv )
    end do ! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_iv_rad_ascii")
-
-#endif
 
 end subroutine da_write_iv_rad_ascii
 
