@@ -78,7 +78,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
    integer :: lnbufr
    integer :: n
    integer(i_kind), allocatable :: ptotal(:)
-   real , allocatable :: in(:,:), out(:,:)
+   real , allocatable :: in(:), out(:)
    logical :: found, head_found
 
    call da_trace_entry("da_read_obs_bufrtovs")
@@ -410,26 +410,25 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
          j = j + thinning_grid(n)%itxmax
       end do
 
-      allocate ( in  (2,j) )
-      allocate ( out (2,j) )
+      allocate ( in  (j) )
+      allocate ( out (j) )
 
       j = 0
       do n = 1, iv%num_inst
          do i = 1, thinning_grid(n)%itxmax
             j = j + 1
-            in(1,j) = thinning_grid(n)%score_crit(i) 
-            in(2,j) = myproc
+            in(j) = thinning_grid(n)%score_crit(i) 
          end do
       end do
-      call mpi_reduce(in, out, j, mpi_2double_precision, mpi_minloc, root, comm, ierr)
+      call mpi_reduce(in, out, j, true_mpi_real, mpi_min, root, comm, ierr)
 
-      call wrf_dm_bcast_real (out, j*2)
+      call wrf_dm_bcast_real (out, j)
 
       j = 0
       do n = 1, iv%num_inst
          do i = 1, thinning_grid(n)%itxmax
             j = j + 1
-            if ( INT(out(2,j)) /=  myproc ) thinning_grid(n)%ibest_obs(i)  = 0
+            if ( ABS(out(j)-thinning_grid(n)%score_crit(i)) > 1.0E-10 ) thinning_grid(n)%ibest_obs(i)  = 0
          end do
       end do
 
