@@ -332,13 +332,13 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
       end do
       call mpi_reduce(in, out, j, true_mpi_real, mpi_min, root, comm, ierr)
 
-      call wrf_dm_bcast_real (out, 2)
+      call wrf_dm_bcast_real (out, j)
 
       j = 0
       do n = 1, iv%num_inst
          do i = 1, thinning_grid(n)%itxmax
             j = j + 1
-            if ( ABS(out(j)-thinning_grid(n)%score_crit(i)) > 1.0E-10 ) thinning_grid(n)%ibest_obs(i)  = 0
+            if ( ABS(out(j)-thinning_grid(n)%score_crit(i)) > 1.0E-10 ) thinning_grid(n)%ibest_obs(i) = 0
          end do
       end do
 
@@ -346,7 +346,6 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
       deallocate( out )
 
 #endif
-
 
       ! Delete the nodes which being thinning out
       p => head
@@ -428,8 +427,8 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
          iv%instid(i)%nchannels = nchan
       end if
       if (nread(i) < 1) cycle
-      iv%instid(i)%num_rad  = num_ssmis_used
-      iv%instid(i)%info%nlocal = num_ssmis_used
+      iv%instid(i)%num_rad  = nread(i)
+      iv%instid(i)%info%nlocal = nread(i)
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         'Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
