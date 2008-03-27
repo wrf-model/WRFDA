@@ -112,7 +112,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   integer(i_kind)  :: klat1, klon1, klatp1, klonp1
   integer(i_kind)  :: ifov,size
   integer(i_kind)  :: inst,platform_id,satellite_id,sensor_id
-  logical          :: iflag,outside,inside_halo
+  logical          :: iflag,outside,outside_all
   integer(i_kind)  :: i, l, n, error, airs_table_unit
   integer          :: iost, lnbufr
   real(r_kind),allocatable,dimension(:,:):: airdata_all
@@ -128,15 +128,17 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   real(r_kind)     :: R360     = 360.0_r_kind
 
 ! Thinning variables
-  integer(i_kind) itt,itx,iobs,iout
+  integer(i_kind) itt,itx,iobs,iout,size_tmp, j
   real(r_kind) crit,dist
   real(r_kind) dlon_earth,dlat_earth
   logical luse
+  real , allocatable :: in(:), out(:)
+  logical :: found, head_found
 
   logical           :: airs, eos_amsua, hsb, airstab
   type(info_type)            :: info
   type(model_loc_type)       :: loc
-  type (datalink_type), pointer   :: head, p, current
+  type (datalink_type), pointer   :: head, p, current, prev
 
    if (trace_use_dull) call da_trace_entry("da_read_obs_bufrairs")
 
@@ -249,6 +251,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   nullify  ( head % next )
   p => head
   size = 0
+  iobs = 0
 
   loop_obspoints: do
 
@@ -302,7 +305,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 
         info%lat  = airsspot%clath
         info%lon  = airsspot%clonh 
-        call da_llxy (info, loc, outside, inside_halo )
+        call da_llxy (info, loc, outside, outside_all )
         if (outside) cycle loop_obspoints
 
 !  4.1  Check obs time
@@ -363,7 +366,6 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
           dlat_earth = dlat_earth*deg2rad
           dlon_earth = dlon_earth*deg2rad           
           crit = 1.0 ! 0.01_r_kind+terrain + timedif !+ 10.0_r_kind*float(iskip)
-          iobs = 0   ! argument is inout
           call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,luse)
           if (.not. luse) cycle loop_obspoints
        end if
@@ -444,6 +446,92 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
    nullify (p%next)
 
   end do loop_obspoints
+
+   if (thinning .and. size > 0 ) then
+
+#ifdef DM_PARALLEL
+         
+      ! Get minimum crit and associated processor index.
+      j = 0
+      do n = 1, iv%num_inst
+         j = j + thinning_grid(n)%itxmax
+      end do
+         
+      allocate ( in  (j) )
+      allocate ( out (j) ) 
+               
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            in(j) = thinning_grid(n)%score_crit(i)
+         end do             
+      end do
+      call mpi_reduce(in, out, j, true_mpi_real, mpi_min, root, comm, ierr)
+
+      call wrf_dm_bcast_real (out, j)
+
+      j = 0
+      do n = 1, iv%num_inst
+         do i = 1, thinning_grid(n)%itxmax
+            j = j + 1
+            if ( ABS(out(j)-thinning_grid(n)%score_crit(i)) > 1.0E-10 ) thinning_grid(n)%ibest_obs(i)  = 0
+         end do
+      end do
+
+      deallocate( in  )
+      deallocate( out )
+
+#endif
+
+      ! Delete the nodes which being thinning out
+      p => head
+      prev => head
+      head_found = .false.
+      size_tmp = size
+      do j = 1, size_tmp
+         n = p%sensor_index
+         found = .false.
+
+         do i = 1, thinning_grid(n)%itxmax
+            if ( thinning_grid(n)%ibest_obs(i) == j .and. thinning_grid(n)%score_crit(i) < 9.99e6_r_kind ) then
+               found = .true.
+               exit
+            endif
+         end do
+
+         ! free current data
+         if ( .not. found ) then
+            current => p
+            p => p%next
+            if ( head_found ) then
+               prev%next => p
+            else
+               head => p
+               prev => p
+            endif
+            deallocate ( current % tb_inv )
+            deallocate ( current )
+            size = size - 1
+            continue
+         endif
+
+         if ( found .and. head_found ) then
+            prev => p
+            p => p%next
+            continue
+         endif
+
+         if ( found .and. .not. head_found ) then
+            head_found = .true.
+            head => p
+            prev => p
+            p => p%next
+         endif
+
+      end do
+
+   endif  ! End of thinning
 
    iv%total_rad_pixel   = iv%total_rad_pixel + size
    iv%total_rad_channel = iv%total_rad_channel + size*nchan
