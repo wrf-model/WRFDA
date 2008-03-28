@@ -109,7 +109,7 @@ MODULE MODULE_NAMELIST
 
    NAMELIST /RECORD9/ prepbufr_output_filename, &
                       prepbufr_table_filename, output_ob_format, &
-                      USE_FOR, num_slots_past, num_slots_ahead &
+                      USE_FOR, num_slots_past, num_slots_ahead, &
                       write_synop, write_ship , write_metar, write_buoy , &
                       write_pilot, write_sound, write_amdar, write_satem, &
                       write_satob, write_airep, write_gpspw, write_gpsztd,&
