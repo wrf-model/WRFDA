@@ -46,9 +46,9 @@ export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
-export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
+export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:- }
 export CRTM=${CRTM:-$HOME/crtm}
-export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coeffs}
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:- }
 
 # Error tuning namelist parameters
 # Assign random seeds
@@ -691,6 +691,22 @@ else
       cp gts_omb_oma $RUN_DIR
    fi
 
+   if [[ -f filtered_obs ]]; then
+      cp filtered_obs $RUN_DIR
+   fi
+
+   if [[ -f jo ]]; then
+      cp jo $RUN_DIR
+   fi
+
+   if [[ -f unpert_obs ]]; then
+      cp unpert_obs $RUN_DIR
+   fi
+
+   if [[ -f check_max_iv ]]; then
+      cp check_max_iv $RUN_DIR
+   fi
+
    if [[ -f ob.etkf.000 ]]; then
       cp ob.etkf.000 $RUN_DIR
    fi
@@ -727,6 +743,7 @@ else
    rm -f rand_obs_error.*
    rm -f gts_omb_oma.*
    rm -f qcstat_*.*
+   rm filtered_obs.*
    # No routine to merge these files across processors yet
    # rm -f inv_*.*
    # rm -f oma_*.*
