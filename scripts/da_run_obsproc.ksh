@@ -100,9 +100,9 @@ cat > namelist.3dvar_obs << EOF
  qc_test_above_lid        = .TRUE.,
  remove_above_lid         = .TRUE.,
  domain_check_h           = .true.,
- Thining_SATOB            = .FALSE.,
- Thining_SSMI             = .FALSE.,
- Thining_QSCAT            = .FALSE.,
+ Thining_SATOB            = ${THINING_SATOB},
+ Thining_SSMI             = ${THINING_SSMI},
+ Thining_QSCAT            = ${THINING_QSCAT},
 /
 
 &record5
