@@ -139,7 +139,7 @@ program da_update_bc
    varsf(11)='TSLB'
    varsf(12)='SMOIS'
    varsf(13)='SNOW'
-   varsf(14)='XICE'
+   varsf(14)='SEAICE'
    varsf(15)='SH2O'
    varsf(16)='CANWAT'
    varsf(17)='RHOSN'
@@ -269,7 +269,7 @@ program da_update_bc
             deallocate(ivgtyp)
             deallocate(tsk_wrfvar)
 
-         case ('TMN', 'SST', 'VEGFRA', 'ALBBCK', 'XICE') ;
+         case ('TMN', 'SST', 'VEGFRA', 'ALBBCK') ;
             if (.not. cycling .and. .not.low_bdy_only) cycle
 
             allocate(full2d(dims(1), dims(2)))
@@ -295,7 +295,7 @@ program da_update_bc
                deallocate(full2d)
             endif
 
-         case ('TSLB', 'SMOIS', 'SH2O') ;
+         case ('TSLB', 'SMOIS', 'SH2O', 'SEAICE') ;
             if(.not. cycling .and. .not.low_bdy_only) cycle
             if (update_lsm) then
                allocate(full3d(dims(1), dims(2), dims(3)))
