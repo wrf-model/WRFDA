@@ -327,6 +327,8 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
             '   jo%airsr_q      ', jo%airsr_q
       end if
    else
+      jo%airsr_t = 0.0
+      jo%airsr_q = 0.0
       jo_airsr = 0.0
    end if
 
