@@ -171,7 +171,7 @@ else
    RC=$?
    echo "Ended %$RC"
 fi
-mv obs_gts.3dvar $OB_DIR/$DATE/ob.ascii
+mv obs_gts_${TIME_ANALYSIS}.3DVAR $OB_DIR/$DATE/ob.ascii
 
 date
 
