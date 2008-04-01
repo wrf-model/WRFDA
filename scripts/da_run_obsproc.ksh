@@ -100,9 +100,9 @@ cat > namelist.3dvar_obs << EOF
  qc_test_above_lid        = .TRUE.,
  remove_above_lid         = .TRUE.,
  domain_check_h           = .true.,
- Thining_SATOB            = ${THINING_SATOB},
- Thining_SSMI             = ${THINING_SSMI},
- Thining_QSCAT            = ${THINING_QSCAT},
+ Thining_SATOB            = .FALSE.,
+ Thining_SSMI             = .FALSE.,
+ Thining_QSCAT            = .FALSE.,
 /
 
 &record5
@@ -152,6 +152,31 @@ cat > namelist.3dvar_obs << EOF
  PREPBUFR_OUTPUT_FILENAME = 'prepbufr_output_filename',
  PREPBUFR_TABLE_FILENAME = 'prepbufr_table_filename',
  OUTPUT_OB_FORMAT = 2
+ use_for          = '${NL_USE_FOR}',
+ num_slots_past   = ${NL_NUM_SLOTS_PAST},
+ num_slots_ahead  = ${NL_NUM_SLOTS_AHEAD},
+ write_synop = .true., 
+ write_ship  = .true.,
+ write_metar = .true.,
+ write_buoy  = .true., 
+ write_pilot = .true.,
+ write_sound = .true.,
+ write_amdar = .true.,
+ write_satem = .true.,
+ write_satob = .true.,
+ write_airep = .true.,
+ write_gpspw = .true.,
+ write_gpsztd= .true.,
+ write_gpsref= .true.,
+ write_gpseph= .true.,
+ write_ssmt1 = .true.,
+ write_ssmt2 = .true.,
+ write_ssmi  = .true.,
+ write_tovs  = .true.,
+ write_qscat = .true.,
+ write_profl = .true.,
+ write_bogus = .true.,
+ write_airs  = .true.,
  /
 
 EOF
@@ -171,7 +196,33 @@ else
    RC=$?
    echo "Ended %$RC"
 fi
-mv obs_gts_${TIME_ANALYSIS}.3DVAR $OB_DIR/$DATE/ob.ascii
+
+if [[ $NL_USE_FOR = 3DVAR ]]; then
+   mv obs_gts_${TIME_ANALYSIS}.${NL_USE_FOR} $OB_DIR/$DATE/ob.ascii
+   echo mv obs_gts_${TIME_ANALYSIS}.${NL_USE_FOR} $OB_DIR/$DATE/ob.ascii
+else 
+   I=0
+   set -A ff `ls obs_gts*.${NL_USE_FOR}`
+   NUM_SLOTS=${#ff[*]}
+   let NUM_SLOTS=$NUM_SLOTS-1
+   echo NUM_SLOTS= 0 to ${NUM_SLOTS}
+   while [[ $I -le $NUM_SLOTS ]]; do
+     fg_time=`echo ${ff[$I]} | cut -c 9-27`
+     fg_time=`$BUILD_DIR/da_advance_time.exe $fg_time 0`
+     mkdir -p $OB_DIR/$fg_time
+     if [[ $I -eq 0 ]]; then
+       mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii+
+       echo $I  mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii+
+     elif [[ $I -eq $NUM_SLOTS ]]; then
+       mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii-
+       echo $I  mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii-
+     else
+       mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii
+       echo $I  mv ${ff[$I]}  $OB_DIR/$fg_time/ob.ascii
+     fi
+     let I=$I+1
+   done   
+fi
 
 date
 

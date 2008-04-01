@@ -222,6 +222,9 @@ export PS0=${PS0:-100000.0}
 export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}
 export PTOP_PA=${PTOP_PA:-5000.0}
+export NL_USE_FOR=${NL_USE_FOR:-3DVAR}
+export NL_NUM_SLOTS_PAST=${NL_NUM_SLOTS_PAST:-3}
+export NL_NUM_SLOTS_AHEAD=${NL_NUM_SLOTS_AHEAD:-3}
 
 # WRF-Var (not covered above):
 export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.
