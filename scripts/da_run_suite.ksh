@@ -81,21 +81,21 @@ export DATE=$INITIAL_DATE
 RC=0
 
 while [[ $DATE -le $FINAL_DATE ]] ; do 
-   export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
-   export HOUR=$(echo $DATE | cut -c9-10)
+   export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -${CYCLE_PERIOD}s -f ccyymmddhhnnss 2>/dev/null)
+   export HHNN=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f hhnn 2>/dev/null)
 
    if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
 
-   echo "=========="
-   echo $DATE
-   echo "=========="
+   echo "==================="
+   echo $($BUILD_DIR/da_advance_time.exe $DATE 00 -w 2>/dev/null)
+   echo "==================="
 
    # Decide on length of forecast to run
-   export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
-   if [[ $HOUR -eq $LONG_FCST_TIME_1 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
-   if [[ $HOUR -eq $LONG_FCST_TIME_2 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
-   if [[ $HOUR -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
-   if [[ $HOUR -eq $LONG_FCST_TIME_4 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
+   export FCST_RANGE=`expr $CYCLE_PERIOD \/ 3600`
+   if [[ $HHNN -eq $LONG_FCST_TIME_1 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
+   if [[ $HHNN -eq $LONG_FCST_TIME_2 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
+   if [[ $HHNN -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
+   if [[ $HHNN -eq $LONG_FCST_TIME_4 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
 
    if $RUN_RESTORE_DATA_GRIB; then
       export RUN_DIR=$SUITE_DIR/$DATE/restore_data_grib
@@ -465,7 +465,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       fi
    fi
 
-   export NEXT_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
+   export NEXT_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${CYCLE_PERIOD}s -f ccyymmddhhnnss 2>/dev/null)
    export DATE=$NEXT_DATE
    let CYCLE_NUMBER=$CYCLE_NUMBER+1
 done

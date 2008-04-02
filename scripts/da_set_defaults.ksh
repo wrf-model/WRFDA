@@ -121,12 +121,14 @@ export VTABLE_DIR=${VTABLE_DIR:-$WPS_DIR/ungrib/Variable_Tables}
 # Time info:
 export DATE=${DATE:-2003010100}                   # Current date.
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}   # Start date of test period
+export INITIAL_DATE=$($BUILD_DIR/da_advance_time.exe $INITIAL_DATE 00 -f ccyymmddhhnnss 2>/dev/null)
 export FINAL_DATE=${FINAL_DATE:-2003012800}       # Final date of test period.
+export FINAL_DATE=$($BUILD_DIR/da_advance_time.exe $FINAL_DATE 00 -f ccyymmddhhnnss 2>/dev/null)
 export NL_NUM_FGAT_TIME=${NL_NUM_FGAT_TIME:-1}
-export LBC_FREQ=${LBC_FREQ:-06}
-let LBC_FREQ_SS=$LBC_FREQ*3600
-let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
-export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
+export LBC_FREQ=${LBC_FREQ:-21600}
+export LBC_FREQ_SS=$LBC_FREQ
+export  NL_INTERVAL_SECONDS=$LBC_FREQ
+export CYCLE_PERIOD=${CYCLE_PERIOD:-43200}                # Assimilation frequency.
 export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
 export CYCLE_NUMBER=${CYCLE_NUMBER:-0}
@@ -137,10 +139,10 @@ export LONG_FCST_TIME_1=${LONG_FCST_TIME_1:-99}
 export LONG_FCST_TIME_2=${LONG_FCST_TIME_2:-99}
 export LONG_FCST_TIME_3=${LONG_FCST_TIME_3:-99}
 export LONG_FCST_TIME_4=${LONG_FCST_TIME_4:-99}
-export LONG_FCST_RANGE_1=${LONG_FCST_RANGE_1:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
-export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
+export LONG_FCST_RANGE_1=${LONG_FCST_RANGE_1:-`expr $CYCLE_PERIOD \/ 3600`}
+export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-`expr $CYCLE_PERIOD \/ 3600`}
+export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-`expr $CYCLE_PERIOD \/ 3600`}
+export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-`expr $CYCLE_PERIOD \/ 3600`}
 
 # Diagnostics:
 export OK='<FONT COLOR="green">'

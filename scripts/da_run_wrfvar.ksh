@@ -12,16 +12,19 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrfvar}
 
 export WORK_DIR=$RUN_DIR/working
 
-export WINDOW_START=${WINDOW_START:--3}
-export WINDOW_END=${WINDOW_END:-3}
+export WINDOW_START=${WINDOW_START:--10800}
+export WINDOW_END=${WINDOW_END:-10800}
 export FGATOBS_FREQ=${FGATOBS_FREQ:-1}
 
-export YEAR=$(echo $DATE | cut -c1-4)
-export MONTH=$(echo $DATE | cut -c5-6)
-export DAY=$(echo $DATE | cut -c7-8)
-export HOUR=$(echo $DATE | cut -c9-10)
-export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
-export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
+export YEAR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ccyy 2>/dev/null)
+export MONTH=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f mm 2>/dev/null)
+export DAY=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f dd 2>/dev/null)
+export HOUR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f hh 2>/dev/null)
+export MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f nn 2>/dev/null)
+export SECOND=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ss 2>/dev/null)
+
+export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -${CYCLE_PERIOD}s -f ccyymmddhhnnss 2>/dev/null)
+export ANALYSIS_DATE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -w 2>/dev/null)
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
 export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d01}
@@ -53,8 +56,8 @@ export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:- }
 # Error tuning namelist parameters
 # Assign random seeds
 
-export NL_SEED_ARRAY1=$DATE
-export NL_SEED_ARRAY2=$DATE
+export NL_SEED_ARRAY1=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ccyymmddhh 2>/dev/null)
+export NL_SEED_ARRAY2=$NL_SEED_ARRAY1
 
 # Change defaults from Registry.wrfvar which is required to be
 # consistent with WRF's Registry.EM
@@ -122,61 +125,79 @@ rm -rf ${WORK_DIR}
 mkdir -p ${WORK_DIR}
 cd $WORK_DIR
 
-START_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $WINDOW_START)
-END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $WINDOW_END)
+START_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${WINDOW_START}s -f ccyymmddhhnnss 2>/dev/null)
+END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${WINDOW_END}s -f ccyymmddhhnnss 2>/dev/null)
 
-for INDEX in 01 02 03 04 05 06 07; do
-   let H=$INDEX-1+$WINDOW_START
-   D_DATE[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE $H)
-   export D_YEAR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c1-4)
-   export D_MONTH[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c5-6)
-   export D_DAY[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c7-8)
-   export D_HOUR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c9-10)
+typeset -i INDEX=1
+while [[ $INDEX -le $NL_NUM_FGAT_TIME ]]; do
+   let SS=$INDEX*$OBS_FREQ+$WINDOW_START-$OBS_FREQ
+   export D_DATE[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f ccyymmddhhnnss 2>/dev/null)
+   export D_YEAR[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f ccyy 2>/dev/null)
+   export D_MONTH[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f mm 2>/dev/null)
+   export D_DAY[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f dd 2>/dev/null)
+   export D_HOUR[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f hh 2>/dev/null)
+   export D_MINUTE[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f nn 2>/dev/null)
+   export D_SECOND[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f ss 2>/dev/null)
+   let INDEX=INDEX+1
 done
 
 if $NL_GLOBAL; then
    export NL_NPROC_X=1
 fi
 
-export YEAR=$(echo $DATE | cut -c1-4)
-export MONTH=$(echo $DATE | cut -c5-6)
-export DAY=$(echo $DATE | cut -c7-8)
-export HOUR=$(echo $DATE | cut -c9-10)
+export YEAR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ccyy 2>/dev/null)
+export MONTH=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f mm 2>/dev/null)
+export DAY=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f dd 2>/dev/null)
+export HOUR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f hh 2>/dev/null)
+export MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f nn 2>/dev/null)
+export SECOND=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ss 2>/dev/null)
 
 export NL_START_YEAR=$YEAR
 export NL_START_MONTH=$MONTH
 export NL_START_DAY=$DAY
 export NL_START_HOUR=$HOUR
+export NL_START_MINUTE=$MINUTE
+export NL_START_SECOND=$SECOND
 
 export NL_END_YEAR=$YEAR
 export NL_END_MONTH=$MONTH
 export NL_END_DAY=$DAY
 export NL_END_HOUR=$HOUR
+export NL_END_MINUTE=$MINUTE
+export NL_END_SECOND=$SECOND
 
-export START_YEAR=$(echo $START_DATE | cut -c1-4)
-export START_MONTH=$(echo $START_DATE | cut -c5-6)
-export START_DAY=$(echo $START_DATE | cut -c7-8)
-export START_HOUR=$(echo $START_DATE | cut -c9-10)
+export START_YEAR=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f ccyy 2>/dev/null)
+export START_MONTH=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f mm 2>/dev/null)
+export START_DAY=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f dd 2>/dev/null)
+export START_HOUR=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f hh 2>/dev/null)
+export START_MINUTE=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f nn 2>/dev/null)
+export START_SECOND=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f ss 2>/dev/null)
 
-export END_YEAR=$(echo $END_DATE | cut -c1-4)
-export END_MONTH=$(echo $END_DATE | cut -c5-6)
-export END_DAY=$(echo $END_DATE | cut -c7-8)
-export END_HOUR=$(echo $END_DATE | cut -c9-10)
+export END_YEAR=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f ccyy 2>/dev/null)
+export END_MONTH=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f mm 2>/dev/null)
+export END_DAY=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f dd 2>/dev/null)
+export END_HOUR=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f hh 2>/dev/null)
+export END_MINUTE=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f nn 2>/dev/null)
+export END_SECOND=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f ss 2>/dev/null)
 
-export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00.0000}
-export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00.0000}
+export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:${START_MINUTE}:${START_SECOND}.0000}
+export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:${END_MINUTE}:${END_SECOND}.0000}
 
 if $NL_VAR4D; then
 
-   export NL_START_YEAR=$(echo $START_DATE | cut -c1-4)
-   export NL_START_MONTH=$(echo $START_DATE | cut -c5-6)
-   export NL_START_DAY=$(echo $START_DATE | cut -c7-8)
-   export NL_START_HOUR=$(echo $START_DATE | cut -c9-10)
+   export NL_START_YEAR=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f ccyy 2>/dev/null)
+   export NL_START_MONTH=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f mm 2>/dev/null)
+   export NL_START_DAY=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f dd 2>/dev/null)
+   export NL_START_HOUR=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f hh 2>/dev/null)
+   export NL_START_MINUTE=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f nn 2>/dev/null)
+   export NL_START_SECOND=$($BUILD_DIR/da_advance_time.exe $START_DATE 00 -f ss 2>/dev/null)
 
-   export NL_END_YEAR=$(echo $END_DATE | cut -c1-4)
-   export NL_END_MONTH=$(echo $END_DATE | cut -c5-6)
-   export NL_END_DAY=$(echo $END_DATE | cut -c7-8)
-   export NL_END_HOUR=$(echo $END_DATE | cut -c9-10)
+   export NL_END_YEAR=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f ccyy 2>/dev/null)
+   export NL_END_MONTH=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f mm 2>/dev/null)
+   export NL_END_DAY=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f dd 2>/dev/null)
+   export NL_END_HOUR=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f hh 2>/dev/null)
+   export NL_END_MINUTE=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f nn 2>/dev/null)
+   export NL_END_SECOND=$($BUILD_DIR/da_advance_time.exe $END_DATE 00 -f ss 2>/dev/null)
 
 fi
 
@@ -259,45 +280,59 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
    if $NL_VAR4D; then
       # More than one observation file of each type
       ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
-      for I in 02 03 04 05 06; do
-         ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
+      typeset -i I=02
+      while [[ $I -lt $NL_NUM_FGAT_TIME ]]; do
+         TAG=$(printf "%2.2d" $I)
+         ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${TAG}.ascii
+         let I=I+1
       done
-      ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
+      TAG=$(printf "%2.2d" $I)
+      ln -fs $OB_DIR/${D_DATE[$NL_NUM_FGAT_TIME]}/ob.ascii- ob${TAG}.ascii
 
       if [[ -s $OB_DIR/${D_DATE[01]}/ob.ssmi+ ]]; then
          ln -fs $OB_DIR/${D_DATE[01]}/ob.ssmi+ ob01.ssmi
-         for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${I}.ssmi
+         typeset -i I=02
+         while [[ $I -lt $NL_NUM_FGAT_TIME ]]; do
+            TAG=$(printf "%2.2d" $I)
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ssmi ob${TAG}.ssmi
+            let I=I+1
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/ob.ssmi- ob07.ssmi
+         TAG=$(printf "%2.2d" $I)
+         ln -fs $OB_DIR/${D_DATE[$NL_NUM_FGAT_TIME]}/ob.ssmi- ob${TAG}.ssmi
       fi
 
       if [[ -s $OB_DIR/${D_DATE[01]}/ob.radar+ ]]; then
          ln -fs $OB_DIR/${D_DATE[01]}/ob.radar+ ob01.radar
-         for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ob${I}.radar
+         typeset -i I=02
+         while [[ $I -lt $NL_NUM_FGAT_TIME ]]; do
+            TAG=$(printf "%2.2d" $I)
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.radar ob${TAG}.radar
+            let I=I+1
          done
-         ln -fs $OB_DIR/${D_DATE[07]}/ob.radar- ob07.radar
+         TAG=$(printf "%2.2d" $I)
+         ln -fs $OB_DIR/${D_DATE[$NL_NUM_FGAT_TIME]}/ob.radar- ob${TAG}.radar
       fi
    else
-      typeset -i N
-      let N=0
+      typeset -i N=0
       FGAT_DATE=$START_DATE
       until [[ $FGAT_DATE > $END_DATE ]]; do
-         let N=$N+1
-         ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
+         let N=N+1
+         TAG=$(printf "%2.2d" $N)
+         ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob${TAG}.ascii
          if [[ -s $OB_DIR/$FGAT_DATE/ob.ssmi ]]; then
-            ln -fs $OB_DIR/$FGAT_DATE/ob.ssmi ob0${N}.ssmi
+            ln -fs $OB_DIR/$FGAT_DATE/ob.ssmi ob${TAG}.ssmi
          fi
          if [[ -s $OB_DIR/$FGAT_DATE/ob.radar ]]; then
-            ln -fs $OB_DIR/$FGAT_DATE/ob.radar ob0${N}.radar
+            ln -fs $OB_DIR/$FGAT_DATE/ob.radar ob${TAG}.radar
          fi
-         FYEAR=$(echo ${FGAT_DATE} | cut -c1-4)
-         FMONTH=$(echo ${FGAT_DATE} | cut -c5-6)
-         FDAY=$(echo ${FGAT_DATE} | cut -c7-8)
-         FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
-         ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d01_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
-         FGAT_DATE=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE $FGATOBS_FREQ)
+         FYEAR=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f ccyy 2>/dev/null)
+         FMONTH=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f mm 2>/dev/null)
+         FDAY=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f dd 2>/dev/null)
+         FHOUR=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f hh 2>/dev/null)
+         FMINUTE=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f nn 2>/dev/null)
+         FSECOND=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE 00 -f ss 2>/dev/null)
+         ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d01_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:${FMINUTE}:${FSECOND} fg${TAG}
+         FGAT_DATE=$($BUILD_DIR/da_advance_time.exe $FGAT_DATE ${FGATOBS_FREQ}s -f ccyymmddhhnnss 2>/dev/null)
       done
    fi
 else
@@ -356,12 +391,15 @@ if $NL_VAR4D; then
    ln -fs $WRFNL_DIR/main/wrf.exe nl
 
    # Outputs
-   for I in 02 03 04 05 06 07; do
+   typeset -i I=2
+   while [[ $I -le $NL_NUM_FGAT_TIME ]]; do
+      TAG=$(printf "%2.2d" $I)
       if [[ $NL_MULTI_INC == 2 ]]; then
-         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00-thin fg$I
+         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:${D_MINUTE[$I]}:${D_SECOND[$I]}-thin fg${TAG}
       else
-         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:${D_MINUTE[$I]}:${D_SECOND[$I]} fg${TAG}
       fi
+      let I=I+1
    done
 
    # tl
@@ -426,13 +464,16 @@ if $NL_VAR4D; then
    mkdir tl/trace
 
    # Outputs
-   for I in 02 03 04 05 06 07; do
-      ln -fs tl/tl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
+   typeset -i I=02
+   while [[ $I -le $NL_NUM_FGAT_TIME ]] ; do
+      TAG=$(printf "%2.2d" $I)
+      ln -fs tl/tl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:${D_MINUTE[$I]}:${D_SECOND[$I]} tl${TAG}
+      let I=I+1
    done
    if [[ $NUM_PROCS -gt 1 ]]; then
-      ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
    else
-      ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
    fi
 
    # ad
@@ -470,18 +511,22 @@ if $NL_VAR4D; then
    ln -fs $WORK_DIR/RRTM_DATA ad
    ln -fs $WORK_DIR/wrfbdy_d01 ad
    ln -fs $DA_FIRST_GUESS ad/wrfinput_d01
-   for I in 01 02 03 04 05 06 07; do
-      ln -fs $WORK_DIR/af$I ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
+   typeset -i I=01
+   while [[ $I -le $NL_NUM_FGAT_TIME ]]; do
+      TAG=$(printf "%2.2d" $I)
+      ln -fs $WORK_DIR/af${TAG} ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:${D_MINUTE[$I]}:${D_SECOND[$I]}
+      let I=I+1
    done
    # JRB
    # if $NL_JCDFI_USE; then
-      ln -fs $WORK_DIR/auxhist3_d01_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
+      I=$NL_NUM_FGAT_TIME
+      ln -fs $WORK_DIR/auxhist3_d01_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:${D_MINUTE[$I]}:${D_SECOND[$I]}_dfi
    # fi   
    ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
    mkdir ad/trace
 
    # Outputs
-   ln -fs ad/ad_d01_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
+   ln -fs ad/ad_d01_${YEAR}-${MONTH}-${DAY}_${HOUR}:${MINUTE}:${SECOND} gr01
 
    # Restore values
    export NL_AUXINPUT2_INTERVAL=$NL_AUXINPUT2_INTERVAL_SAVE

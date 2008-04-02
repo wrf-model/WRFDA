@@ -19,32 +19,30 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 # [2] Calculate environment variables:
 #-----------------------------------------------------------------------
 
-export START_YEAR="$(echo $DATE | cut -c1-4)"
-export START_MONTH="$(echo $DATE | cut -c5-6)"
-export START_DAY="$(echo $DATE | cut -c7-8)"
-export START_HOUR="$(echo $DATE | cut -c9-10)"
-export START_MINUTE=${START_MINUTE:-0}
-export START_SECOND=${START_SECOND:-0}
+export START_YEAR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ccyy 2>/dev/null)
+export START_MONTH=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f mm 2>/dev/null)
+export START_DAY=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f dd 2>/dev/null)
+export START_HOUR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f hh 2>/dev/null)
+export START_MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f nn 2>/dev/null)
+export START_SECOND=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ss 2>/dev/null)
 
-export NL_START_YEAR="11*$(echo $DATE | cut -c1-4)"
-export NL_START_MONTH="11*$(echo $DATE | cut -c5-6)"
-export NL_START_DAY="11*$(echo $DATE | cut -c7-8)"
-export NL_START_HOUR="11*$(echo $DATE | cut -c9-10)"
-export NL_START_MINUTE=${NL_START_MINUTE:-11*0}
-export NL_START_SECOND=${NL_START_SECOND:-11*0}
+export NL_START_YEAR="11*${START_YEAR}"
+export NL_START_MONTH="11*${START_MONTH}"
+export NL_START_DAY="11*${START_DAY}"
+export NL_START_HOUR="11*${START_HOUR}"
+export NL_START_MINUTE="11*${START_MINUTE}"
+export NL_START_SECOND="11*${START_SECOND}"
 
-export END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE 2>/dev/null)
+export END_YEAR=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f ccyy 2>/dev/null)
+export END_MONTH=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f mm 2>/dev/null)
+export END_DAY=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f dd 2>/dev/null)
+export END_HOUR=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f hh 2>/dev/null)
+export END_MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f nn 2>/dev/null)
+export END_SECOND=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f ss 2>/dev/null)
 
-export END_YEAR="$(echo $END_DATE | cut -c1-4)"
-export END_MONTH="$(echo $END_DATE | cut -c5-6)"
-export END_DAY="$(echo $END_DATE | cut -c7-8)"
-export END_HOUR="$(echo $END_DATE | cut -c9-10)"
-export END_MINUTE=${END_MINUTE:-0}
-export END_SECOND=${END_SECOND:-0}
-
-export NL_END_YEAR="11*$(echo $END_DATE | cut -c1-4)"
-export NL_END_MONTH="11*$(echo $END_DATE | cut -c5-6)"
-export NL_END_DAY="11*$(echo $END_DATE | cut -c7-8)"
-export NL_END_HOUR="11*$(echo $END_DATE | cut -c9-10)"
-export NL_END_MINUTE=${NL_END_MINUTE:-11*0}
-export NL_END_SECOND=${NL_END_SECOND:-11*0}
+export NL_END_YEAR="11*${END_YEAR}"
+export NL_END_MONTH="11*${END_MONTH}"
+export NL_END_DAY="11*${END_DAY}"
+export NL_END_HOUR="11*${END_HOUR}"
+export NL_END_MINUTE="11*${END_MINUTE}"
+export NL_END_SECOND="11*${END_SECOND}"
