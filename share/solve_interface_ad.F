@@ -9,6 +9,8 @@ SUBROUTINE solve_interface_ad ( grid )
    USE module_configure
    USE module_wrf_error
 
+   USE da_tracing, only : da_trace_entry, da_trace_exit
+
    IMPLICIT NONE
 
    INTERFACE
@@ -46,11 +48,13 @@ SUBROUTINE solve_interface_ad ( grid )
 
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
+     if(grid%trace_use) call da_trace_entry("solve_em_ad")
      CALL solve_em_ad ( grid , config_flags , &
  
 # include <em_actual_args.inc>
  
                )
+     if(grid%trace_use) call da_trace_exit("solve_em_ad")
 
 # ifdef WRF_CHEM
    IF ( config_flags%chem_opt == RADM2  ) THEN

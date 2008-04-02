@@ -30,7 +30,7 @@ OBJS    = 		\
         start_domain.o                  \
         init_modules.o                  \
         set_timekeeping.o               \
-        Setup_date_string.o          \
+        Setup_date_string.o    		\
         interp_fcn.o sint.o             \
         input_wrf.o                     \
         output_wrf.o                    \

@@ -27,7 +27,6 @@ PROGRAM wrf
    INTEGER :: rc
 
    LOGICAL, EXTERNAL :: await_next
-!   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
    INTEGER comm
 
 write(0,*)'********* ********* *********'
@@ -53,12 +52,17 @@ write(0,*)'********* ********* *********'
      call system("echo -n model_start ; date")
 #endif
 #endif
+     call da_trace_init
+     call da_trace_entry("wrf_init")
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
-   call da_trace_init
-   call da_trace_entry("wrf_init")
+     call da_trace_exit("wrf_init")
+
+     call da_trace_entry("wrf_run")
      CALL wrf_run( gcomp, importState, exportState, clock, rc )
-   call da_trace_exit("wrf_init")
-   call da_trace_report
+     call da_trace_exit("wrf_run")
+
+     call da_trace_report
+
      CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
 #ifdef DM_PARALLEL
 #ifndef STAND_ALONE

@@ -7,8 +7,6 @@ CONTAINS
 
 RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
 
-
-
    USE module_domain
    USE module_driver_constants
    USE module_nesting
@@ -16,6 +14,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_timing
    USE WRF_ESMF_MOD
    USE module_dfi
+
+   USE da_tracing, only : da_trace_entry, da_trace_exit
 
    IMPLICIT NONE
 
@@ -295,13 +295,11 @@ call end_timing('med_auxinput3_in 1 ')
 
 !-----start check non-linear input
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index+1)(1:19)) nl_date_index = nl_date_index + 1
-         write(unit=*, fmt='(2a)') &
-              'xyh AD state at ', currTime_str(1:19)
-         write(unit=*, fmt='(2a)') &
-              'xyh NL state from ', nl_date_string(nl_date_index+1)
-call start_timing
+!        write(unit=*, fmt='(2a)') 'xyh AD state at ', currTime_str(1:19)
+!        write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index+1)
+         call start_timing
          CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
-call end_timing('med_auxinput2_in4ad')
+         call end_timing('med_auxinput2_in4ad')
 !-----end check non-linear input
 
 !--------start check adjoint input
@@ -313,9 +311,13 @@ call end_timing('med_auxinput2_in4ad')
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
 call start_timing
+            if(grid%trace_use) call da_trace_entry("med_auxinput3_in")
             CALL med_auxinput3_in ( grid , config_flags )
+            if(grid%trace_use) call da_trace_exit("med_auxinput3_in")
 call end_timing('med_auxinput3_in 2 ')
+            if(grid%trace_use) call da_trace_entry("add_forcing_to_ad")
             CALL add_forcing_to_ad(grid)
+            if(grid%trace_use) call da_trace_exit("add_forcing_to_ad")
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )
@@ -323,7 +325,9 @@ call end_timing('med_auxinput3_in 2 ')
 
 !--------end check adjoint input
 
+         if(grid%trace_use) call da_trace_entry("med_setup_step")
          CALL med_setup_step ( grid , config_flags )
+         if(grid%trace_use) call da_trace_exit("med_setup_step")
          a_nest_was_opened = .false.
          ! for each nest whose time has come...
 !        CALL med_var_solve_io ( grid , config_flags )
@@ -344,7 +348,9 @@ call end_timing('med_auxinput3_in 2 ')
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
             CALL wrf_debug( 100 , 'module_integrate_ad: calling solve interface ad' )
+            if(grid%trace_use) call da_trace_exit("solve_interface_ad")
             CALL solve_interface_ad ( grid_ptr ) 
+            if(grid%trace_use) call da_trace_exit("solve_interface_ad")
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_ad():  before ESMF_ClockBack,' )
             CALL ESMF_ClockBack( grid_ptr%domain_clock, rc=rc )
@@ -411,10 +417,14 @@ call end_timing('med_auxinput3_in 2 ')
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-call start_timing
+!           call start_timing
+            if(grid%trace_use) call da_trace_entry("med_auxinput3_in")
             CALL med_auxinput3_in ( grid , config_flags )
-call end_timing('med_auxinput3_in 3 ')
+            if(grid%trace_use) call da_trace_exit("med_auxinput3_in")
+!           call end_timing('med_auxinput3_in 3 ')
+            if(grid%trace_use) call da_trace_entry("add_forcing_to_ad")
             CALL add_forcing_to_ad(grid)
+            if(grid%trace_use) call da_trace_exit("add_forcing_to_ad")
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )

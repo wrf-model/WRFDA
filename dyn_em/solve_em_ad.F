@@ -5521,7 +5521,7 @@ BENCH_END(exch111)
 !---------------------------------
 !!!!  Add CUDU Here   !!!!!!!!
 !--------------------------------
-BENCH_START(a_cu_driver_tim)
+!BENCH_START(a_cu_driver_tim)
 
          CALL wrf_debug ( 200 , ' call a_cumulus_driver' )
          IF (cu_physics .eq. 5) then            !IF for CUDU
@@ -5617,7 +5617,7 @@ BENCH_START(a_cu_driver_tim)
                end do
                end do
            ENDIF
-BENCH_END(a_cu_driver_tim)
+!BENCH_END(a_cu_driver_tim)
 !---------------------------------
 !!!! XIAO CUDU End Here   !!!!!!!!
 !---------------------------------

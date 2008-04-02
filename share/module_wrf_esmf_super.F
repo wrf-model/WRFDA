@@ -26,6 +26,8 @@ MODULE module_wrf_esmf_super
    USE module_dm
 #endif
 
+   USE da_tracing, only : da_trace_entry, da_trace_exit
+
    IMPLICIT NONE
 
    REAL    :: time
@@ -297,9 +299,13 @@ write(0,*)'back from init_modules'
    CALL       wrf_debug ( 100 , 'wrf: calling integrate' )
 
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
+      if(head_grid%trace_use) call da_trace_entry("integrate")
       CALL integrate ( head_grid )
+      if(head_grid%trace_use) call da_trace_exit("integrate")
    ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN
+      if(head_grid%trace_use) call da_trace_entry("integrate")
       CALL integrate ( head_grid )
+      if(head_grid%trace_use) call da_trace_exit("integrate")
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TL ) THEN
 
 ! - Look for boundary data after writing out history and restart files
@@ -312,7 +318,11 @@ write(0,*)'back from init_modules'
       CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
+      write(unit=0, fmt='(3a,i6)') 'bgn call integrate_tl, file:', __FILE__, ', line:', __LINE__
+      if(head_grid%trace_use) call da_trace_entry("integrate_tl")
       CALL integrate_tl ( head_grid, nl_date_string, nl_date_index )
+      if(head_grid%trace_use) call da_trace_exit("integrate_tl")
+      write(unit=0, fmt='(3a,i6)') 'end call integrate_tl, file:', __FILE__, ', line:', __LINE__
 
    ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
 
@@ -339,11 +349,14 @@ write(0,*)'back from init_modules'
       CALL ESMF_ClockSetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
+      write(unit=0, fmt='(3a,i6)') 'bgn call integrate_ad, file:', __FILE__, ', line:', __LINE__
+      if(head_grid%trace_use) call da_trace_entry("integrate_ad")
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
-#if 1
+      if(head_grid%trace_use) call da_trace_exit("integrate_ad")
+      write(unit=0, fmt='(3a,i6)') 'end call integrate_ad, file:', __FILE__, ', line:', __LINE__
+
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
-#endif
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
