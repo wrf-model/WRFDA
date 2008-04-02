@@ -1,6 +1,4 @@
 subroutine da_trace_init
-   
-!   use da_tracing
 
    implicit none
 
@@ -11,7 +9,7 @@ subroutine da_trace_init
    integer :: IOStatus             ! I/O return code
    integer :: Loop1
    character (len=200) :: TraceFile
-   character(len=200) :: csvname
+   character (len=200) :: csvname
    character (len=10)  :: temp
 
    IOStatus = 0
@@ -87,8 +85,7 @@ subroutine da_trace_init
    Pointer     = 0
    NoRoutines  = 0
 
-   call system_clock(&
-      COUNT=BaseElapsedTime)
+   call system_clock(COUNT=BaseElapsedTime)
 
    call cpu_time(BaseCPUTime)
 

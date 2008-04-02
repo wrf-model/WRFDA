@@ -6,8 +6,6 @@ subroutine da_trace_real_sort(&
    !-----------------------------------------------------------------------
    ! Purpose: Sort reals for tracing
    !-----------------------------------------------------------------------
-   
-!   use da_tracing
 
    implicit none
 

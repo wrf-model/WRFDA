@@ -1,11 +1,14 @@
 module da_par_util1
 
    use da_control, only : rootproc, ierr, comm, root
-
 #ifdef DM_PARALLEL
-#define rsl_double 1 
-   use mpi, only : mpi_double_complex, mpi_real8, mpi_sum, &
-      mpi_integer
+
+#if ( DWORDSIZE != RWORDSIZE )
+   use mpi, only : mpi_sum, mpi_integer, mpi_complex, mpi_real
+#else
+   use mpi, only : mpi_sum, mpi_integer, mpi_double_complex, mpi_real8
+#endif
+
 #endif
 
    !---------------------------------------------------------------------------
@@ -20,11 +23,9 @@ module da_par_util1
 #if ( DWORDSIZE != RWORDSIZE )
    integer, parameter :: true_mpi_real    = mpi_real
    integer, parameter :: true_mpi_complex = mpi_complex
-   integer, parameter :: true_rsl_real    = rsl_real
 #else
    integer, parameter :: true_mpi_real    = mpi_real8
    integer, parameter :: true_mpi_complex = mpi_double_complex
-   integer, parameter :: true_rsl_real    = rsl_double
 #endif
 #endif
 

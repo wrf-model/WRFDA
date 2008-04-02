@@ -11,10 +11,14 @@ subroutine da_proc_sum_ints (values)
 
    implicit none
 
-   integer,   intent(inout)      :: values(:) ! Values
+   integer, intent(inout) :: values(:) ! Values
 
 #ifdef DM_PARALLEL
    integer, allocatable :: sums(:) ! Sum across processors.
+
+
+   ! Don't trace, as called within trace routines
+   ! if (trace_use_frequent) call da_trace_entry("da_proc_sum_ints")
 
    allocate (sums(size(values)))
    sums(:)=0
@@ -23,6 +27,8 @@ subroutine da_proc_sum_ints (values)
 
    if (rootproc) values(:) = sums(:)
    deallocate(sums)
+
+   ! if (trace_use_frequent) call da_trace_exit("da_proc_sum_ints")
 #endif
 
 end subroutine da_proc_sum_ints

@@ -3,8 +3,6 @@ subroutine da_trace_report
    !--------------------------------------------------------------------
    ! Purpose: Produce a trace report
    !--------------------------------------------------------------------
-   
-!   use da_tracing
 
    implicit none
 

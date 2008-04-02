@@ -7,8 +7,6 @@ subroutine da_trace_exit(&
    !-----------------------------------------------------------------------
    ! Purpose: Trace exit from subroutine
    !-----------------------------------------------------------------------
-   
-!   use da_tracing
 
    implicit none
 

@@ -11,16 +11,21 @@ subroutine da_proc_sum_int (value)
 
    implicit none
 
-   integer,   intent(inout)      :: value     ! Value on processor.
+   integer, intent(inout) :: value     ! Value on processor.
 
 #ifdef DM_PARALLEL
-   integer           :: sum                   ! Sum across processors.
+   integer :: sum                   ! Sum across processors.
+
+   ! Don't trace, as called within trace routines
+   ! if (trace_use_frequent) call da_trace_entry("da_proc_sum_int")
 
    sum=0
    call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, &
       comm, ierr)
 
    if (rootproc) value = sum
+
+   ! if (trace_use_frequent) call da_trace_exit("da_proc_sum_int")
 #endif
 
 end subroutine da_proc_sum_int

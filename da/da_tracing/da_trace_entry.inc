@@ -7,8 +7,6 @@ subroutine da_trace_entry(&
    !-----------------------------------------------------------------------
    ! Purpose: Trace entry point to subroutine
    !-----------------------------------------------------------------------
-   
-!   use da_tracing
 
    implicit none
 

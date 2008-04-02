@@ -3,8 +3,6 @@ subroutine da_trace(&
    Message,  &           ! in, optional
    Messages,  &          ! in, optional
    MaxNoCalls)           ! in, optional
-   
-!   use da_tracing
 
    implicit none
 

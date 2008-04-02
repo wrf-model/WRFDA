@@ -9,7 +9,6 @@ module da_tracing
       trace_csv, myproc, comm, rootproc, trace_max_depth, &
       trace_repeat_head, trace_repeat_body, trace_start_points, trace_all_pes
    use da_par_util1, only : da_proc_sum_ints, da_proc_sum_real, da_proc_sum_int
-   use da_reporting, only : da_error
 
    interface
       ! c code
@@ -66,12 +65,12 @@ module da_tracing
    logical :: trace_write = .false.
 
 
-!end module da_tracing
 contains
 
+#include "da_error.inc"
+#include "da_trace.inc"
 #include "da_trace_init.inc"
 #include "da_trace_entry.inc"
-#include "da_trace.inc"
 #include "da_trace_exit.inc"
 #include "da_trace_int_sort.inc"
 #include "da_trace_real_sort.inc"

@@ -6,8 +6,6 @@ subroutine da_trace_int_sort(&
    !----------------------------------------------------------------------
    ! Purpose: sort integers for tracing
    !----------------------------------------------------------------------
-   
-!   use da_tracing
 
    implicit none
 

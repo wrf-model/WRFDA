@@ -6,22 +6,33 @@ module da_control
 
    use module_driver_constants, only : max_domains, max_moves
 
+!  use module_driver_constants, only : max_domains, max_eta, max_moves, &
+!                                      max_outer_iterations, max_instruments
+
    implicit none
 
 #include "namelist_defines.inc"
 
+   ! switches set from other namelist options
+   logical :: use_obsgts
+   logical :: use_rad
 
    !---------------------------------------------------------------------------
    ! [1.0] Physical parameter constants (all NIST standard values):
    !---------------------------------------------------------------------------
 
    ! Fundamental constants:
-   real, parameter    :: pi = 3.1415926535897932346
-   real, parameter    :: gas_constant = 287.     ! Value used in WRF.
-   real, parameter    :: gas_constant_v = 461.6  ! Value used in WRF.
-   real, parameter    :: cp = 7.*gas_constant/2. ! Value used in WRF.
+   real, parameter    :: pi = 3.1415926           ! Value used in WRF.
+   real, parameter    :: gas_constant = 287.0     ! Value used in WRF.
+   real, parameter    :: gas_constant_v = 461.6   ! Value used in WRF.
+   real, parameter    :: cp = 7.0*gas_constant/2.0 ! Value used in WRF.
    real, parameter    :: t_kelvin = 273.15
-   real, parameter       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
+   real, parameter    :: t_triple = 273.16 ! triple point of water
+   ! The imported code for ssmi and radiance uses 273.0 in a way that suggests 
+   ! it may not be a lazy definition of the melting point of water, so keep the
+   ! value separate for the moment
+   real, parameter    :: t_roughem = 273.0
+   real, parameter    :: t_landem = 273.0
 
    real, parameter    :: kappa = gas_constant / cp
    real, parameter    :: rd_over_rv = gas_constant / gas_constant_v
@@ -31,7 +42,7 @@ module da_control
    real, parameter    :: gamma = 1.4
 
    ! Earth constants:
-   real, parameter    :: gravity = 9.81        ! m/s - value used in MM5.
+   real, parameter    :: gravity = 9.81        ! m/s - value used in WRF.
    ! real, parameter    :: earth_radius = 6378.15
    real, parameter    :: earth_radius = 6370.0          ! Be consistant with WRF
    ! real, parameter    :: earth_omega  = 2.0*pi/86400.0  ! Omega
@@ -46,12 +57,12 @@ module da_control
 
    ! Explicit moist constants:
    real, parameter    :: SVP1=0.6112, SVP2=17.67, SVP3=29.65
-   real, parameter    :: SVPT0=273.15, TO=273.15
-   real, parameter    :: N0R=8.E6, N0S=2.E7, RHOS=0.1
-   real, parameter    :: AVT=841.99667, BVT=0.8, BVT2=2.5+.5*BVT, BVT3=3.+BVT
-   real, parameter    :: PPI=1./(pi*N0R), PPIS=1./(pi*N0S*RHOS)
-   real, parameter    :: XLV1=2370., XLF0=.3337E6, XLV0=3.15E6
-   real, parameter    :: XLS=XLV0-XLV1*273.16+XLF0
+   real, parameter    :: SVPT0=t_kelvin, TO=t_kelvin
+   real, parameter    :: N0R=8.0E6, N0S=2.0E7, RHOS=0.1
+   real, parameter    :: AVT=841.99667, BVT=0.8, BVT2=2.5+0.5*BVT, BVT3=3.0+BVT
+   real, parameter    :: PPI=1.0/(pi*N0R), PPIS=1.0/(pi*N0S*RHOS)
+   real, parameter    :: XLV1=2370.0, XLF0=0.3337E6, XLV0=3.15E6
+   real, parameter    :: XLS=XLV0-XLV1*t_triple+XLF0
 
    ! Planetary boundary physics constants
    real, parameter         :: k_kar = 0.4    ! Von Karman constant
@@ -65,24 +76,51 @@ module da_control
    real, parameter :: da_zero = 0.0
 #endif
 
-complex, parameter :: da_zero_complex = (da_zero,da_zero)
+   complex, parameter :: da_zero_complex = (da_zero,da_zero)
    
    !---------------------------------------------------------------------------
    ! [2.0] WRF-Var parameter constants:
    !---------------------------------------------------------------------------
 
-   ! Missing values and the index number of the quality contro
+   ! Missing values and the index number of the quality control
 
    integer, parameter ::  missing       = -888888
-   real   , parameter ::  missing_r     = -888888.
-   real   , parameter ::  Max_StHeight_Diff = 100.
+   real   , parameter ::  missing_r     = -888888.0
+   real   , parameter ::  Max_StHeight_Diff = 100.0
+
+   integer, parameter :: cv_options_hum_specific_humidity = 1
+   integer, parameter :: cv_options_hum_relative_humidity = 2
+
+   ! No-one explains what these options means anywhere
+   integer, parameter :: vert_corr_1 = 1
+   integer, parameter :: vert_corr_2 = 2
+
+   integer, parameter :: vertical_ip_0            = 0
+   integer, parameter :: vertical_ip_sqrt_delta_p = 1
+   integer, parameter :: vertical_ip_delta_p      = 2
+
+   integer, parameter :: vert_evalue_global = 1
+   integer, parameter :: vert_evalue_local  = 2
+
+   integer, parameter :: alphacv_method_vp = 1
+   integer, parameter :: alphacv_method_xa = 2
+
+   integer, parameter :: sfc_assi_options_1 = 1
+   integer, parameter :: sfc_assi_options_2 = 2
+
+   integer, parameter :: check_rh_simple = 1
+   integer, parameter :: check_rh_tpw    = 2
 
    logical :: anal_type_verify=.false.
    logical :: anal_type_randomcv=.false.
    logical :: anal_type_qcobs=.false.
 
-   integer,parameter :: qc_good = 1
-   integer,parameter :: qc_bad  = -1
+   integer,parameter :: monitor_on  = 1
+   integer,parameter :: monitor_off = 0
+
+   integer,parameter :: qc_good       =  1
+   integer,parameter :: qc_bad        = -1
+   integer,parameter :: qc_varbc_bad  = -1
 
    integer, parameter :: bufr_satellite_id   = 1
    integer, parameter :: bufr_ifov           = 2
@@ -100,9 +138,13 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: bufr_landsea_mask   = 14
 
    integer, parameter :: nchan_amsua = 15
+   integer, parameter :: nchan_amsub = 5
+   integer, parameter :: nchan_mhs = 5
    integer, parameter :: nchan_msu = 4
    integer, parameter :: nchan_hirs2 = 19
    integer, parameter :: nchan_hirs3 = 19
+   integer, parameter :: nchan_hirs4 = 19
+   integer, parameter :: nchan_ssmis = 24
 
    ! WRFVAR Minimisation:
 
@@ -113,7 +155,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real, parameter    :: FTOL = 1.0E-4
    real, parameter    :: GTOL = 0.9
    real, parameter    :: XTOL = 1.0E-17
-   real, parameter    :: STPMin = 1.0E-20
+   real, parameter    :: STPMIN = 1.0E-20
    real, parameter    :: STPMAX = 1.0E+20
 
    ! Background errors:
@@ -170,11 +212,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real, parameter    :: inv_typ_vp5_sumsq = 0.00001 ! 1/sum(?**2)
    real, parameter    :: inv_typ_vpalpha_sumsq = 1.0 ! 1/sum(?**2)
 
-   character(len=*),parameter :: wrfvar_version = "WRFVAR V2.2"
-   character(len=*),parameter :: wrf_version    = "WRF V2.2"
-
    integer, parameter :: fg_format_wrf = 1
-   integer, parameter :: fg_format_kma = 3
+   integer, parameter :: fg_format_kma_global = 3
 
    integer, parameter :: ob_format_bufr = 1
    integer, parameter :: ob_format_ascii = 2
@@ -198,11 +237,13 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer,parameter :: filename_len = 200
 
    integer, parameter :: num_alpha_corr_types = 3
-   integer, parameter :: num_sound_diag = 4 
+
+   integer, parameter :: alpha_corr_type_exp      = 1
+   integer, parameter :: alpha_corr_type_soar     = 2
+   integer, parameter :: alpha_corr_type_gaussian = 3
 
    integer :: alpha_corr_unit1(num_alpha_corr_types)
    integer :: alpha_corr_unit2(num_alpha_corr_types)
-   integer :: sound_diag_unit(num_sound_diag)
 
    integer, parameter :: max_num_of_var = 200 ! Maximum # of stored fields.
 
@@ -210,6 +251,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: unit_end = 500
    logical :: unit_used(unit_start:unit_end) = .false.
 
+   ! grid properties
+
+   character(len=3), parameter :: grid_ordering = "xyz"
+   character(len=3), parameter :: grid_stagger  = "xyz"
 
    !---------------------------------------------------------------------------
    ! [3.0] Variables used in MM5 part of code:
@@ -217,8 +262,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    integer            :: map_projection       ! 1=LamConf/2=PolarSte/3=Mercator
    real               :: ycntr
-   integer            :: coarse_ix            ! COARSE DOMAin DIM in I DIRECTION.
-   integer            :: coarse_jy            ! COARSE DOMAin DIM in Y DIRECTION.
+   integer            :: coarse_ix            ! coarse domain dim in i direction.
+   integer            :: coarse_jy            ! coarse domain dim in y direction.
    real               :: coarse_ds            ! Coarse domain gridlength (km)
    real               :: start_x              ! i posn. of (1,1) in coarse domain.
    real               :: start_y              ! j posn. of (1,1) in coarse domain.
@@ -227,8 +272,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real               :: delt_lat             ! Latitude increments for global grids
    real               :: delt_lon             ! Longitude increments for global grids
 
-   real               :: phic                 ! COARSE DOMAin CENTRAL LAT(DEGREE)
-   real               :: xlonc                ! COARSE DOMAin CENTRAL LON(DEGREE)
+   real               :: phic                 ! coarse domain central lat(degree)
+   real               :: xlonc                ! coarse domain central lon(degree)
    real               :: cone_factor          ! Cone Factor
    real               :: truelat1_3dv         ! True latitude 1 (degrees)
    real               :: truelat2_3dv         ! True latitude 2 (degrees)
@@ -238,11 +283,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real               :: c2                   ! earth_radius * COS(psi1)
 
    real               :: ptop
-   real               :: ps0
-   real               :: ts0 = 300.0          ! Base potential temperture
-                                              ! mm5 code may try to change value
-   real               :: tlp
-   real               :: tis0
+   real, parameter    :: t0 = 300.0
 
    !------------------------------------------------------------------------------
    ! 4.0 vertical interpolation options
@@ -272,23 +313,14 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter     :: max_ob_levels = 1001 ! Maximum levels for single ob
    integer, parameter     :: max_fgat_time = 100  ! Maximum levels for FGAT.
 
-   integer                :: current_ob_time
-
-   integer                :: num_gpspw_tot, num_synop_tot, num_metar_tot, &
-                             num_pilot_tot, num_ssmi_rv_tot, num_ssmi_tb_tot, &
-                             num_ssmi_tot,  num_ssmt1_tot, num_ssmt2_tot, &
-                             num_satem_tot, num_geoamv_tot,num_polaramv_tot, &
-                             num_ships_tot, &
-                             num_sound_tot, num_airep_tot, num_qscat_tot, &
-                             num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                             num_Radar_tot, num_bogus_tot,num_airsr_tot, &
-                             num_radiance_tot
+   integer                :: time
 
    logical       :: gaussian_lats  
 
 
    integer       :: cv_size_domain_jb    ! Total jb cv size.
    integer       :: cv_size_domain_je    ! Total je cv size.
+   integer       :: cv_size_domain_jp    ! Total jp cv size.
    integer       :: cv_size_domain       ! Total cv size.    
 
 
@@ -299,18 +331,13 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! other
 
-   character*80  cheadl1
-   character*80  cheadl2
-   character*160 cheadl3
-
-
    integer, parameter :: jperr = 6
 
    ! NCEP errors (U in m/s, V in m/s, T in K, H in %, P in Pa)
    ! rh has been divided by 2
 
    real, parameter :: err_k(0:jperr+1) = &
-                      (/200000., 100100.,70000.,50000.,30000.,10000.,5000., 1./)
+                      (/200000.0, 100100.0,70000.0,50000.0,30000.0,10000.0,5000.0, 1.0/)
    real, parameter :: err_u(0:jperr+1) = &
                       (/ 1.4, 1.4,   2.4,   2.8,   3.4,   2.5,  2.7,  2.7/)
    real, parameter :: err_v(0:jperr+1) = &
@@ -324,21 +351,21 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Maximum error check factors:  inV > (Obs_error*factor) --> fails_error_max
 
-   real, parameter :: max_error_t              = 5, &
-                      max_error_uv             = 5, &
-                      max_error_pw             = 5, &
-                      max_error_ref            = 5, &
-                      max_error_rh             = 5, &
-                      max_error_q              = 5, &
-                      max_error_p              = 5, &
-                      max_error_tb             = 5, &
-                      max_error_thickness      = 5, &
-                      max_error_rv             = 5, &
-                      max_error_rf             = 5, &
-                      max_error_buv            = 500, &
-                      max_error_bt             = 500, &
-                      max_error_bq             = 500, &
-                      max_error_slp            = 500
+   real, parameter :: max_error_t              = 5.0, &
+                      max_error_uv             = 5.0, &
+                      max_error_pw             = 5.0, &
+                      max_error_ref            = 5.0, &
+                      max_error_rh             = 5.0, &
+                      max_error_q              = 5.0, &
+                      max_error_p              = 5.0, &
+                      max_error_tb             = 5.0, &
+                      max_error_thickness      = 5.0, &
+                      max_error_rv             = 5.0, &
+                      max_error_rf             = 5.0, &
+                      max_error_buv            = 500.0, &
+                      max_error_bt             = 500.0, &
+                      max_error_bq             = 500.0, &
+                      max_error_slp            = 500.0
 
    ! Define various ways for bad data to be flagged.  
 
@@ -391,8 +418,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Observations:
 
-   integer, parameter     :: max_Radar = 10000    ! Maximum Number of Radar obs.
-
    integer                :: num_procs            ! Number of total processors.
    integer                :: myproc               ! My processor ID.
    integer, parameter     :: root = 0             ! Number of root processor
@@ -404,66 +429,66 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: rtm_option_rttov = 1
    integer, parameter :: rtm_option_crtm = 2
 
-   ! RTM_inIT setup parameter
+   ! rtm_init setup parameter
 
    integer, parameter            :: maxsensor = 30
-
-   ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
 
    ! Tracing
 
    integer :: trace_start_points=0   ! Number of routines to initiate trace
 
-   integer, parameter :: num_ob_indexes = 23
+   integer, parameter :: num_ob_indexes = 24
 
-   integer, parameter :: sound_index          = 1
-   integer, parameter :: synop_index          = 2
-   integer, parameter :: pilot_index          = 3
-   integer, parameter :: satem_index          = 4
-   integer, parameter :: geoamv_index         = 5
-   integer, parameter :: polaramv_index       = 6
-   integer, parameter :: airep_index          = 7
-   integer, parameter :: gpspw_index          = 8
-   integer, parameter :: gpsref_index         = 9
-   integer, parameter :: metar_index          = 10
-   integer, parameter :: ships_index          = 11
-   integer, parameter :: ssmi_retrieval_index = 12
-   integer, parameter :: ssmi_tb_index        = 13
-   integer, parameter :: ssmt1_index          = 14
-   integer, parameter :: ssmt2_index          = 15
-   integer, parameter :: qscat_index          = 16
-   integer, parameter :: profiler_index       = 17
-   integer, parameter :: buoy_index           = 18
-   integer, parameter :: bogus_index          = 19
-   integer, parameter :: pseudo_index         = 20
-   integer, parameter :: radar_index          = 21
-   integer, parameter :: radiance_index       = 22
-   integer, parameter :: airsr_index          = 23
+   integer, parameter :: sound     = 1
+   integer, parameter :: synop     = 2
+   integer, parameter :: pilot     = 3
+   integer, parameter :: satem     = 4
+   integer, parameter :: geoamv    = 5
+   integer, parameter :: polaramv  = 6
+   integer, parameter :: airep     = 7
+   integer, parameter :: gpspw     = 8
+   integer, parameter :: gpsref    = 9
+   integer, parameter :: metar     = 10
+   integer, parameter :: ships     = 11
+   integer, parameter :: ssmi_rv   = 12
+   integer, parameter :: ssmi_tb   = 13
+   integer, parameter :: ssmt1     = 14
+   integer, parameter :: ssmt2     = 15
+   integer, parameter :: qscat     = 16
+   integer, parameter :: profiler  = 17
+   integer, parameter :: buoy      = 18
+   integer, parameter :: bogus     = 19
+   integer, parameter :: pseudo    = 20
+   integer, parameter :: radar     = 21
+   integer, parameter :: radiance  = 22
+   integer, parameter :: airsr     = 23
+   integer, parameter :: sonde_sfc = 24
 
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
-      "SOUND         ", &
-      "SYNOP         ", &
-      "PILOT         ", &
-      "SATEM         ", &
-      "Geo AMV       ", &
-      "Polar AMV     ", &
-      "AIREP         ", &
-      "GPSPW         ", &
-      "GPSRF         ", &
-      "METAR         ", &
-      "SHIP          ", &
-      "SSMI_RETRIEVAL", &
-      "SSMI_TB       ", &
-      "SSMT1         ", &
-      "SSMT2         ", &
-      "QSCAT         ", &
-      "Profiler      ", &
-      "Buoy          ", &
-      "Bogus         ", &
-      "Pseudo        ", &
-      "Radar         ", &
-      "Radiance      ", &
-      "AIRS retrieval"  &
+      "sound         ", &
+      "synop         ", &
+      "pilot         ", &
+      "satem         ", &
+      "geo amv       ", &
+      "polar amv     ", &
+      "airep         ", &
+      "gpspw         ", &
+      "gpsrf         ", &
+      "metar         ", &
+      "ship          ", &
+      "ssmi_rv       ", &
+      "ssmi_tb       ", &
+      "ssmt1         ", &
+      "ssmt2         ", &
+      "qscat         ", &
+      "profiler      ", &
+      "buoy          ", &
+      "bogus         ", &
+      "pseudo        ", &
+      "radar         ", &
+      "radiance      ", &
+      "airs retrieval", &
+      "sonde_sfc     "  &
    /)
 
    integer, parameter :: max_no_fm = 290
@@ -487,8 +512,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    logical :: obs_use(num_ob_indexes) = .false.
 
-
-
    ! Special cases
 
    integer, parameter :: fm_satem = 86
@@ -496,21 +519,21 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    integer, parameter :: fm_index(max_no_fm) = (/ &
       0,0,0,0,0,0,0,0,0,0,                                & ! 1-10
-      0,Synop_index,Ships_index,0,Metar_index,            & ! 11-15
-      Metar_index,Ships_index,buoy_index,buoy_index,0,    & ! 16-20
+      0,Synop,Ships,0,Metar,            & ! 11-15
+      Metar,Ships,buoy,buoy,0,    & ! 16-20
       0,0,0,0,0,0,0,0,0,0,                                & ! 21-30
-      0,pilot_index,pilot_index,pilot_index,sound_index,  & ! 31-35
-      sound_index,sound_index,sound_index,0,0,            & ! 36-40
-      0,airep_index,0,0,0,0,0,0,0,0,                      & ! 41-50
+      0,pilot,pilot,pilot,sound,  & ! 31-35
+      sound,sound,sound,0,0,            & ! 36-40
+      0,airep,0,0,0,0,0,0,0,0,                      & ! 41-50
       0,0,0,0,0,0,0,0,0,0,                                & ! 51-60
       0,0,0,0,0,0,0,0,0,0,                                & ! 61-70
       0,0,0,0,0,0,0,0,0,0,                                & ! 71-80
-      0,0,0,0,0,satem_index,0,geoamv_index,0,0,           & ! 81-90
-      0,0,0,0,0,airep_index,airep_index,0,0,0,            & ! 91-100
+      0,0,0,0,0,satem,0,geoamv,0,0,           & ! 81-90
+      0,0,0,0,0,airep,airep,0,0,0,            & ! 91-100
       0,0,0,0,0,0,0,0,0,0,                                & ! 101-110
-      gpspw_index,0,0,gpspw_index,0,gpsref_index,0,0,0,0, & ! 111-120
-      ssmt1_index,ssmt2_index,0,0,0,0,0,0,0,0,            & ! 121-130
-      0,profiler_index,airsr_index,0,bogus_index,0,0,0,0,0, & ! 131-140
+      gpspw,0,0,gpspw,0,gpsref,0,0,0,0, & ! 111-120
+      ssmt1,ssmt2,0,0,ssmi_rv,0,0,0,0,0,            & ! 121-130
+      0,profiler,airsr,0,bogus,0,0,0,0,0, & ! 131-140
       0,0,0,0,0,0,0,0,0,0,                                & ! 141-150
       0,0,0,0,0,0,0,0,0,0,                                & ! 151-160
       0,0,0,0,0,0,0,0,0,0,                                & ! 161-170
@@ -525,7 +548,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
       0,0,0,0,0,0,0,0,0,0,                                & ! 251-260
       0,0,0,0,0,0,0,0,0,0,                                & ! 261-270
       0,0,0,0,0,0,0,0,0,0,                                & ! 271-280
-      qscat_index,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
+      qscat,0,0,0,0,0,0,0,0,0 /)                      ! 281-290
 
    character(len=120)  :: fmt_info ='(a12,1x,a19,1x,a40,1x,i6,3(f12.3,11x),6x,a5)'
    character(len=120)  :: fmt_srfc = '(7(:,f12.3,i4,f7.2))'
@@ -548,13 +571,12 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer :: ims,ime,jms,jme,kms,kme
    integer :: its,ite,jts,jte,kts,kte
    integer :: ips,ipe,jps,jpe,kps,kpe
+   integer :: itsy,itey,jtsy,jtey,ktsy,ktey
+   integer :: itsx,itex,jtsx,jtex,ktsx,ktex
 
-contains
-
-#include "da_advance_cymdh.inc"
-#include "da_array_print.inc"
-#include "da_change_date.inc"
-#include "da_find_fft_factors.inc"
-#include "da_find_fft_trig_funcs.inc"
+   character(len=120) :: documentation_url = "/ptmp/huangwei/tst/run"
+   logical :: warnings_are_fatal = .false.
+   logical :: use_html = .false.
+   integer :: stdout = 6
 
 end module da_control
