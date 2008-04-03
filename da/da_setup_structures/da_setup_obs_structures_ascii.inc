@@ -56,20 +56,20 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
       do n=1, num_fgat_time
          iv%time = n
 
-         write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
+         write(filename(1:10), fmt='(a, i2.2, a)') 'ob', n,'.ascii'
 
          ! scan main body of gts observation file
          call da_scan_obs_ascii (iv, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
-            write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ssmi'
+            write(filename(1:9), fmt='(a, i2.2, a)') 'ob', n,'.ssmi'
             call da_scan_obs_ssmi (iv, filename)
          end if
 
          if (use_radarobs) then
             ! scan radar observation file
-            write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.radar'
+            write(filename(1:10), fmt='(a, i2.2, a)') 'ob', n,'.radar'
             call da_scan_obs_radar(iv, filename)
          end if
          iv%info(:)%plocal(n) = iv%info(:)%nlocal
@@ -107,20 +107,20 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
       do n=1, num_fgat_time
          iv%time = n
 
-         write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
+         write(filename(1:10), fmt='(a, i2.2, a)') 'ob', n,'.ascii'
 
          ! Read gts observation file
          call da_read_obs_ascii (iv, filename)
 
          if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
-            write(filename(1:10), fmt='(a, i2.2)') 'ob', n,'.ssmi'
+            write(filename(1:9), fmt='(a, i2.2, a)') 'ob', n,'.ssmi'
             call da_read_obs_ssmi (iv, filename)
          end if
 
          if (use_radarobs) then
             ! read radar observation file
-            write(filename(1:11), fmt='(a, i2.2)') 'ob', n,'.radar'
+            write(filename(1:10), fmt='(a, i2.2, a)') 'ob', n,'.radar'
             call da_read_obs_radar(iv, filename)
          end if
       end do
