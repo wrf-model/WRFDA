@@ -53,7 +53,6 @@ module module_trace
                                      tracerStartElapsedTime, &
                                      tracerElapsedTime
 
-   logical :: trace_write = .false.
    logical :: NewTraceRoutine = .true.
 
 contains
@@ -64,9 +63,9 @@ contains
 #include "trace_exit.inc"
 #include "trace_info.inc"
 #include "trace_int_sort.inc"
-!include "trace_init.inc"
 #include "trace_real_sort.inc"
 #include "trace_report.inc"
+#include "trace_set.inc"
 #include "trace_start.inc"
 #include "trace_stop.inc"
 #include "trace_time.inc"

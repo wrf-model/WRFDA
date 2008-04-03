@@ -13,6 +13,9 @@ subroutine trace_start(myid, my_html, my_csv, my_url)
    call date_and_time(DATE=traceStartDate,ZONE=traceTimeZone)
    call date_and_time(TIME=traceStartTime)
 
+   write(unit=0, fmt='(4a)') &
+        'Trace started at: ', traceStartDate, ':', traceStartTime
+
    myproc = myid
 
    if(present(my_html)) then

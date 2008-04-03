@@ -21,10 +21,10 @@ subroutine trace_report
    character (len=200) :: csvname
    character (len=10)  :: temp
 
-   call time(current_time)
+   call trace_time(current_time)
 
-   call da_diff_time(traceBaseTime, current_time, TotalElapsedTime)
-   call da_diff_time(traceBaseTime, current_time, TotalCPUTime)
+   call trace_diff_time(traceBaseTime, current_time, TotalElapsedTime)
+   call trace_diff_time(traceBaseTime, current_time, TotalCPUTime)
 
 !==========================================================================
 !--Sort subroutines into time order based on local Elapsed Time.
@@ -39,26 +39,27 @@ subroutine trace_report
 !--Open trace output file. 
 !-----------------------------------------------------------------
 
-   if (trace_write .AND. trace_unit /= 0) then
-      write(unit=temp,fmt='(i10)') myproc
+   if(trace_unit == 0) then
+      trace_unit = 7
+   endif
 
-      if (use_html) then
-         traceFile="trace/"//trim(adjustl(temp))//".html"
-      else   
-         tracefile="trace/"//trim(adjustl(temp))//".txt"
-      end if
+   write(unit=temp,fmt='(i10)') myproc
 
-      open(unit=trace_unit, &      ! i:
-           file=trim(tracefile), & ! i:
-           status="unknown", &     ! i:
-           action="write", &       ! i:
-!          access="append", &      ! i:
-           iostat=IOStatus)        ! O:
+   if (use_html) then
+      traceFile="trace/"//trim(adjustl(temp))//".html"
+   else   
+      tracefile="trace/"//trim(adjustl(temp))//".txt"
+   end if
 
-      if (IOStatus /= 0) then
-         call trace_error(__FILE__,__LINE__, &
-            (/"Cannot open trace file "//traceFile/))
-      endif
+   open(unit=trace_unit, &      ! i:
+        file=trim(tracefile), & ! i:
+        status="unknown", &     ! i:
+        action="write", &       ! i:
+        iostat=IOStatus)        ! O:
+
+   if (IOStatus /= 0) then
+      call trace_error(__FILE__,__LINE__, &
+         (/"Cannot open trace file "//traceFile/))
    endif
 
    if(use_csv) then
@@ -70,21 +71,19 @@ subroutine trace_report
       endif
    endif
 
-   if(trace_write) then
-      if(use_html) then
-         write(unit=trace_unit, fmt='(A)') "<html><head><title>Tracing</title></head>"
-         write(unit=trace_unit, fmt='(A)') "<body><h1>Trace Output</h1>"
-         write(unit=trace_unit, fmt='(A)') "<ul>"
-         write(unit=trace_unit, fmt='(A)') "<li><a href=#tree>Calling Tree</a>"
-         write(unit=trace_unit, fmt='(A)') "<li><a href=#local>Local routine timings</a>"
-         write(unit=trace_unit, fmt='(A)') "<li><a href=#overall>Overall routine timings</a>"
-         write(unit=trace_unit, fmt='(A)') "<li><a href=#memory>Memory usage</a>"
-         write(unit=trace_unit, fmt='(A)') "</ul>"
-         write(unit=trace_unit, fmt='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
-      else
-         write(unit=trace_unit, fmt='(A)') "Trace Output"
-         write(unit=trace_unit, fmt='(A)') ""
-      endif
+   if(use_html) then
+      write(unit=trace_unit, fmt='(A)') "<html><head><title>Tracing</title></head>"
+      write(unit=trace_unit, fmt='(A)') "<body><h1>Trace Output</h1>"
+      write(unit=trace_unit, fmt='(A)') "<ul>"
+      write(unit=trace_unit, fmt='(A)') "<li><a href=#tree>Calling Tree</a>"
+      write(unit=trace_unit, fmt='(A)') "<li><a href=#local>Local routine timings</a>"
+      write(unit=trace_unit, fmt='(A)') "<li><a href=#overall>Overall routine timings</a>"
+      write(unit=trace_unit, fmt='(A)') "<li><a href=#memory>Memory usage</a>"
+      write(unit=trace_unit, fmt='(A)') "</ul>"
+      write(unit=trace_unit, fmt='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
+   else
+      write(unit=trace_unit, fmt='(A)') "Trace Output"
+      write(unit=trace_unit, fmt='(A)') ""
    endif
 
    write(unit=trace_unit, fmt='(A,I4,A)') &
@@ -95,7 +94,7 @@ subroutine trace_report
    write(unit=trace_unit, fmt='(a)') &
         "<a name=local><h2>Local Timing Summary</h2></a>"
 
-   write(unit=trace_unit, fmt='(a, f8.1, a)') &
+   write(unit=trace_unit, fmt='(a, f12.1, a)') &
         "(Tracing itself took ", traceUsedTime, &
         "s CPU Time. This is not included in the times below.)<p>"
 
@@ -137,7 +136,7 @@ subroutine trace_report
            trim(subroutineNames(current_tracer)), & ! Subroutine name
            "</a>"
 
-      write(unit=trace_unit, fmt='(a,i10,10(a,f8.2))') &
+      write(unit=trace_unit, fmt='(a,i10,10(a,f12.2))') &
             "<TD>", tracerBeingCalled(current_tracer), &
             "<TD>", tracerElapsedTime(current_tracer), &
             "<TD>", percentElapsedTime, &
@@ -145,7 +144,7 @@ subroutine trace_report
             "<TD>", percentCPUTime
 
       if(use_csv) then
-         write(unit=trace_csv_unit, fmt='(a,2x,2a,2x,i8,10(a,f8.2))') &
+         write(unit=trace_csv_unit, fmt='(a,2x,a40,a,2x,i8,10(a,f12.2))') &
               'local,', &
               trim(subroutineNames(current_tracer)), &
               ',', tracerBeingCalled(current_tracer), &
@@ -156,7 +155,7 @@ subroutine trace_report
       endif
    enddo
 
-   write(unit=trace_unit, fmt='(a,i4,a,f8.1,a,f8.1,a)') &
+   write(unit=trace_unit, fmt='(a,i6,a,f12.1,a,f12.1,a)') &
       "<TR><TD><B>Total</B></TD><TD>",totalRoutine, "</TD><TD><B>", &
       totalElapsedTime, &
       "</B></TD><TD></TD><TD><B>", &
@@ -182,7 +181,7 @@ subroutine trace_report
    write(unit=trace_unit, &
       fmt='("</pre><hr><a name=overall><h2>Timing Summary</h2></a>")')
 
-   write(unit=trace_unit, fmt='(a, f8.1, a)') &
+   write(unit=trace_unit, fmt='(a, f12.1, a)') &
         "(Tracing itself took ", traceUsedTime, &
         "s CPU Time. This is not included in the times below.)<p>"
 
@@ -224,7 +223,7 @@ subroutine trace_report
            trim(subroutineNames(current_tracer)), & ! Subroutine name
            "</a>"
 
-      write(unit=trace_unit, fmt='(a,i10,10(a,f8.2))') &
+      write(unit=trace_unit, fmt='(a,i10,10(a,f12.2))') &
             "<TD>", tracerBeingCalled(current_tracer), &
             "<TD>", tracerElapsedTime(current_tracer), &
             "<TD>", percentElapsedTime, &
@@ -232,7 +231,7 @@ subroutine trace_report
             "<TD>", percentCPUTime
 
       if(use_csv) then
-         write(unit=trace_csv_unit, fmt='(a,2x,2a,2x,i8,10(a,f8.2))') &
+         write(unit=trace_csv_unit, fmt='(a,2x,a40,a,2x,i8,10(a,f12.2))') &
               'local,', &
               trim(subroutineNames(current_tracer)), &
               ',', tracerBeingCalled(current_tracer), &
@@ -243,7 +242,7 @@ subroutine trace_report
       endif
    enddo
 
-   write(unit=trace_unit, fmt='(a,i4,a,f8.1,a,f8.1,a)') &
+   write(unit=trace_unit, fmt='(a,i6,a,f12.1,a,f12.1,a)') &
       "<TR><TD><B>Total</B></TD><TD>",totalRoutine, "</TD><TD><B>", &
       totalElapsedTime, &
       "</B></TD><TD></TD><TD><B>", &

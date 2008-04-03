@@ -15,7 +15,7 @@ subroutine trace_entry( Name, &       ! in
    integer :: n, previd
    logical :: NewTraceRoutine = .true.
 
-   call time(current_time)
+   call trace_time(current_time)
 
    traceDepth = traceDepth + 1
 
@@ -38,8 +38,11 @@ subroutine trace_entry( Name, &       ! in
       subroutineNames(tracerID) = trim(name)
    endif
 
+   write(unit=0, fmt='(3a,i4,a,f12.2)') &
+        'enter ', trim(name), ' as id:', tracerID, ', at: ', current_time
+
 !--stop previd timer
-   call da_diff_time(tracerStartTime(previd), current_time, diff)
+   call trace_diff_time(tracerStartTime(previd), current_time, diff)
    tracerCPUTime(previd) = tracerCPUTime(previd) + diff
 
 !--Remember its parent ID.

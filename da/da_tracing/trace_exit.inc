@@ -18,16 +18,19 @@ subroutine trace_exit( Name, &             ! in
 
    call trace_time(current_time)
 
+   write(unit=0, fmt='(3a,i4,a,f12.2)') &
+        'exit  ', trim(name), ' as id:', tracerID, ', at: ', current_time
+
    traceDepth=traceDepth-1
 
 !=======================================================================
 !--Check timing and maximum heap memory usage
 !=======================================================================
 
-   call da_diff_time(tracerStartTime(tracerID), current_time, diff)
+   call trace_diff_time(tracerStartTime(tracerID), current_time, diff)
    tracerCPUTime(tracerID) = tracerCPUTime(tracerID)  + diff
 
-   call da_diff_time(tracerStartElapsedTime(tracerID), current_time, diff)
+   call trace_diff_time(tracerStartElapsedTime(tracerID), current_time, diff)
    tracerElapsedTime(tracerID) = tracerElapsedTime(tracerID)  + diff
 
 !--Reset tracerID to its parent.
