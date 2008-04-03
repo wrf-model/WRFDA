@@ -8,18 +8,16 @@
 #endif
 
 #ifdef NOUNDERSCORE
-void da_memory(
+#define MEMORY_INFO memory_info
 #else
 #ifdef F2CSTYLE
-void da_memory__(
+#define MEMORY_INFO memory_info__
 #else
-void da_memory_(
+#define MEMORY_INFO memory_info_
 #endif
 #endif
 
-  memory_used)
-
-  int *memory_used;
+void MEMORY_INFO(int *memory_used)
 {
 
 #if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1) || defined(MACOS)) || defined(IRIX)
@@ -32,3 +30,4 @@ result=mallinfo();
   *memory_used=0;
 #endif
 }
+
