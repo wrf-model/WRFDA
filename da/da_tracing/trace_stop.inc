@@ -1,10 +1,6 @@
-subroutine trace_stop(myid, my_html, my_csv, my_url)
+subroutine trace_stop
 
    implicit none
-
-   integer, intent(in) :: myid
-   logical, optional, intent(in) :: my_html, my_csv
-   character(LEN=*), optional, intent(in) :: my_url
 
    real :: traceBeginTime, diff
 

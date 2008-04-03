@@ -17,8 +17,8 @@ module module_trace
    character(LEN=TraceNameLen) :: documentation_url = "DOCUMENTATION_URL"
 
    character(LEN= 5) :: traceTimeZone
-   character(LEN= 8) :: traceStartDate, traceEndDate
-   character(LEN=10) :: traceStartTime, traceEndTime
+   character(LEN= 8) :: traceStartDate, traceStopDate
+   character(LEN=10) :: traceStartTime, traceStopTime
 
    logical :: use_html = .true., &
               use_csv = .true.
@@ -68,6 +68,7 @@ contains
 #include "trace_real_sort.inc"
 #include "trace_report.inc"
 #include "trace_start.inc"
+#include "trace_stop.inc"
 #include "trace_time.inc"
 
 end module module_trace
