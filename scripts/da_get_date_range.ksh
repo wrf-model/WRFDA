@@ -33,12 +33,12 @@ export NL_START_HOUR="11*${START_HOUR}"
 export NL_START_MINUTE="11*${START_MINUTE}"
 export NL_START_SECOND="11*${START_SECOND}"
 
-export END_YEAR=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f ccyy 2>/dev/null)
-export END_MONTH=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f mm 2>/dev/null)
-export END_DAY=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f dd 2>/dev/null)
-export END_HOUR=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f hh 2>/dev/null)
-export END_MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f nn 2>/dev/null)
-export END_SECOND=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f ss 2>/dev/null)
+export END_YEAR=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f ccyy 2>/dev/null)
+export END_MONTH=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f mm 2>/dev/null)
+export END_DAY=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f dd 2>/dev/null)
+export END_HOUR=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f hh 2>/dev/null)
+export END_MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f nn 2>/dev/null)
+export END_SECOND=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s -f ss 2>/dev/null)
 
 export NL_END_YEAR="11*${END_YEAR}"
 export NL_END_MONTH="11*${END_MONTH}"

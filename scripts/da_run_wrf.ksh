@@ -16,7 +16,9 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
-export NL_RUN_HOURS=$FCST_RANGE
+export NL_RUN_HOURS=$(( FCST_RANGE/3600 ))
+export NL_RUN_MINUTES=$(( (FCST_RANGE%3600)/60 ))
+export NL_RUN_SECONDS=$(( FCST_RANGE-NL_RUN_HOURS*3600-NL_RUN_MINUTES*60 ))
 
 # allow for ensemble members identified by CMEM
 if [[ ! -z $CMEM ]]; then
@@ -77,7 +79,7 @@ for DOMAIN in $DOMAINS; do
 done
 ln -fs $WRF_INPUT_DIR/wrfbdy_d01 .
 
-let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
+let NL_INTERVAL_SECONDS=$LBC_FREQ
 
 if [[ $WRF_NAMELIST'.' != '.' ]]; then
    ln -fs $WRF_NAMELIST namelist.input

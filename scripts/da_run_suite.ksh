@@ -91,7 +91,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    echo "==================="
 
    # Decide on length of forecast to run
-   export FCST_RANGE=`expr $CYCLE_PERIOD \/ 3600`
+   export FCST_RANGE=$(( CYCLE_PERIOD/3600))
    if [[ $HHNN -eq $LONG_FCST_TIME_1 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
    if [[ $HHNN -eq $LONG_FCST_TIME_2 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
    if [[ $HHNN -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi

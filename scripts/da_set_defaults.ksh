@@ -214,8 +214,12 @@ export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrfinput_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
-export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
-export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
+export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$(( CYCLE_PERIOD/3600 ))} # Output input format start.
+export NL_INPUTOUT_BEGIN_M=${NL_INPUTOUT_BEGIN_M:-$(( (CYCLE_PERIOD%3600)/60 ))} # Output input format start.
+export NL_INPUTOUT_BEGIN_S=${NL_INPUTOUT_BEGIN_S:-$(( CYCLE_PERIOD-NL_INPUTOUT_BEGIN_H*3600-NL_INPUTOUT_BEGIN_M*60 ))} # Output input format start.
+export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$(( FCST_RANGE/3600 ))} # Output input format end.
+export NL_INPUTOUT_END_M=${NL_INPUTOUT_END_M:-$(( (FCST_RANGE%3600)/60 ))} # Output input format end.
+export NL_INPUTOUT_END_S=${NL_INPUTOUT_END_S:-$(( FCST_RANGE-NL_INPUTOUT_END_H*3600-NL_INPUTOUT_END_M*60 ))} # Output input format end.
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
