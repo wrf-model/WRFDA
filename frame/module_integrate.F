@@ -7,14 +7,14 @@ CONTAINS
 
 RECURSIVE SUBROUTINE integrate ( grid )
 
-
-
    USE module_domain
    USE module_driver_constants
    USE module_nesting
    USE module_configure
    USE module_timing
    USE module_utility
+
+   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
@@ -262,6 +262,9 @@ RECURSIVE SUBROUTINE integrate ( grid )
 
    END INTERFACE
 
+!  if(grid%trace_use) call trace_entry("integrate")
+   call trace_entry("integrate")
+
    ! This allows us to reference the current grid from anywhere beneath 
    ! this point for debugging purposes.  
    CALL set_current_grid_ptr( grid )
@@ -372,6 +375,9 @@ RECURSIVE SUBROUTINE integrate ( grid )
         ENDIF
       ENDIF
    END IF
+
+!  if(grid%trace_use) call trace_exit("integrate")
+   call trace_exit("integrate")
 
 END SUBROUTINE integrate
 

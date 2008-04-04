@@ -11,6 +11,7 @@ SHARE_OBJS = \
 	module_optional_si_input.o \
 	module_compute_geop.o \
 	module_soil_pre.o \
+	module_trace.o \
 	mediation_integrate.o \
 	mediation_interp_domain.o \
 	mediation_force_domain.o \

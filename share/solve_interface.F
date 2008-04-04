@@ -9,6 +9,8 @@ SUBROUTINE solve_interface ( grid )
    USE module_configure
    USE module_wrf_error
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    INTERFACE
@@ -37,6 +39,9 @@ SUBROUTINE solve_interface ( grid )
    INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
+
+!  if(grid%trace_use) call trace_entry("solve_interface")
+   call trace_entry("solve_interface")
 
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
    CALL set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
@@ -110,6 +115,9 @@ SUBROUTINE solve_interface ( grid )
      CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
      
    END IF
+
+!  if(grid%trace_use) call trace_exit("solve_interface")
+   call trace_exit("solve_interface")
 
 END SUBROUTINE solve_interface
 

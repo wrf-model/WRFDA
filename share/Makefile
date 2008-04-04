@@ -13,6 +13,7 @@ MODULES =                       \
 	module_io_domain.o	\
 	module_model_constants.o \
 	module_MPP.o \
+	module_tracing.o \
 	module_wrf_top.o \
 	module_optional_si_input.o	\
 	module_compute_geop.o           \

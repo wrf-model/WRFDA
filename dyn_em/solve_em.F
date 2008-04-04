@@ -41,6 +41,8 @@ SUBROUTINE solve_em ( grid , config_flags  &
    USE module_chem_utilities
 #endif
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Input data.
@@ -214,6 +216,9 @@ IF (config_flags%polar) dclat = 90./REAL(jde-jds) !(0.5 * 180/ny)
 !</pre>
 !</DESCRIPTION>
 !**********************************************************************
+
+!  if(grid%trace_use) call trace_entry("solve_em")
+   call trace_entry("solve_em")
 
 #ifdef WRF_CHEM
 !
@@ -4042,6 +4047,9 @@ BENCH_END(bc_2d_tim)
 
 ! Finish timers if compiled with -DBENCH.
 #include <bench_solve_em_end.h>
+
+!  if(grid%trace_use) call trace_exit("solve_em")
+   call trace_exit("solve_em")
 
    RETURN
 

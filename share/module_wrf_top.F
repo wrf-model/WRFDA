@@ -22,6 +22,8 @@ MODULE module_wrf_top
    USE module_dm
 #endif
 
+   USE module_trace, only : trace_entry, trace_exit, trace_set, trace_stop
+
    IMPLICIT NONE
 
    REAL    :: time
@@ -107,6 +109,8 @@ CONTAINS
 ! href=set_config_as_buffer.html>set_config_as_buffer</a>).
 !
 !</DESCRIPTION>
+
+   call trace_entry("wrf_init")
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
@@ -234,6 +238,8 @@ CONTAINS
    head_grid%start_subtime = domain_get_start_time ( head_grid )
    head_grid%stop_subtime = domain_get_stop_time ( head_grid )
 
+   call trace_exit("wrf_init")
+
    END SUBROUTINE wrf_init
 
 
@@ -253,12 +259,18 @@ CONTAINS
 ! 
 !</DESCRIPTION>
 
+!  if(head_grid%trace_use) call trace_entry("wrf_run")
+   call trace_entry("wrf_run")
+
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
 
    CALL       wrf_debug ( 100 , 'wrf: calling integrate' )
    CALL integrate ( head_grid )
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
+
+!  if(head_grid%trace_use) call trace_exit("wrf_run")
+   call trace_exit("wrf_run")
 
    END SUBROUTINE wrf_run
 
@@ -287,6 +299,8 @@ CONTAINS
    CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )
 
    CALL       wrf_debug (   0 , 'wrf: SUCCESS COMPLETE WRF' )
+
+   call trace_stop
 
    ! Call wrf_shutdown() (which calls MPI_FINALIZE() 
    ! for DM parallel runs).  
