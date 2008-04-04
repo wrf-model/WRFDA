@@ -129,8 +129,9 @@ START_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${WINDOW_START}s -f ccyymmddhh
 END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${WINDOW_END}s -f ccyymmddhhnnss 2>/dev/null)
 
 typeset -i INDEX=1
+typeset -i SS
 while [[ $INDEX -le $NL_NUM_FGAT_TIME ]]; do
-   let SS=$INDEX*$OBS_FREQ+$WINDOW_START-$OBS_FREQ
+   let SS=INDEX*$OBS_FREQ+$WINDOW_START-$OBS_FREQ
    export D_DATE[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f ccyymmddhhnnss 2>/dev/null)
    export D_YEAR[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f ccyy 2>/dev/null)
    export D_MONTH[$INDEX]=$($BUILD_DIR/da_advance_time.exe $DATE ${SS}s -f mm 2>/dev/null)

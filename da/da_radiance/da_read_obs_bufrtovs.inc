@@ -400,7 +400,7 @@ subroutine da_read_obs_bufrtovs (obstype,iv, infile)
       end do
    end do obs
 
-   if (thinning .and. num_tovs_used > 0 ) then
+   if (thinning .and. num_tovs_global > 0 ) then
 
 #ifdef DM_PARALLEL
 

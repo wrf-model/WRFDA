@@ -447,7 +447,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 
   end do loop_obspoints
 
-   if (thinning .and. size > 0 ) then
+   if (thinning) then
 
 #ifdef DM_PARALLEL
          
@@ -485,51 +485,53 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
 #endif
 
       ! Delete the nodes which being thinning out
-      p => head
-      prev => head
-      head_found = .false.
-      size_tmp = size
-      do j = 1, size_tmp
-         n = p%sensor_index
-         found = .false.
+      if ( size > 0 ) then
+         p => head
+         prev => head
+         head_found = .false.
+         size_tmp = size
+         do j = 1, size_tmp
+            n = p%sensor_index
+            found = .false.
 
-         do i = 1, thinning_grid(n)%itxmax
-            if ( thinning_grid(n)%ibest_obs(i) == j .and. thinning_grid(n)%score_crit(i) < 9.99e6_r_kind ) then
-               found = .true.
-               exit
+            do i = 1, thinning_grid(n)%itxmax
+               if ( thinning_grid(n)%ibest_obs(i) == j .and. thinning_grid(n)%score_crit(i) < 9.99e6_r_kind ) then
+                  found = .true.
+                  exit
+               endif
+            end do
+
+            ! free current data
+            if ( .not. found ) then
+               current => p
+               p => p%next
+               if ( head_found ) then
+                  prev%next => p
+               else
+                  head => p
+                  prev => p
+               endif
+               deallocate ( current % tb_inv )
+               deallocate ( current )
+               size = size - 1
+               continue
             endif
-         end do
 
-         ! free current data
-         if ( .not. found ) then
-            current => p
-            p => p%next
-            if ( head_found ) then
-               prev%next => p
-            else
+            if ( found .and. head_found ) then
+               prev => p
+               p => p%next
+               continue
+            endif
+
+            if ( found .and. .not. head_found ) then
+               head_found = .true.
                head => p
                prev => p
+               p => p%next
             endif
-            deallocate ( current % tb_inv )
-            deallocate ( current )
-            size = size - 1
-            continue
-         endif
 
-         if ( found .and. head_found ) then
-            prev => p
-            p => p%next
-            continue
-         endif
-
-         if ( found .and. .not. head_found ) then
-            head_found = .true.
-            head => p
-            prev => p
-            p => p%next
-         endif
-
-      end do
+         end do
+      endif
 
    endif  ! End of thinning
 

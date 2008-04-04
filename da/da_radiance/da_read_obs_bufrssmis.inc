@@ -311,7 +311,7 @@ subroutine da_read_obs_bufrssmis (obstype,iv,infile)
 
    end do subset_loop
 
-   if (thinning .and. num_ssmis_used > 0 ) then
+   if (thinning .and. num_ssmis_global > 0 ) then
 
 #ifdef DM_PARALLEL 
       
