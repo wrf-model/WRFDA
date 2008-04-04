@@ -6,6 +6,8 @@ MODULE module_advect_em
   USE module_model_constants
   USE module_wrf_error
 
+   USE module_trace, only : trace_entry, trace_exit
+
 CONTAINS
 
 
@@ -64,6 +66,8 @@ SUBROUTINE mass_flux_divergence ( field, field_old, tendency,    &
 
    LOGICAL :: specified
 
+   call trace_entry("mass_flux_divergence")
+
 !--------------- horizontal flux
 
    specified = .false.
@@ -120,6 +124,8 @@ SUBROUTINE mass_flux_divergence ( field, field_old, tendency,    &
       ENDDO
 
    ENDDO
+
+   call trace_exit("mass_flux_divergence")
    
 END SUBROUTINE mass_flux_divergence
 
@@ -212,6 +218,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
 
 
    LOGICAL :: specified
+
+   call trace_entry("advect_u")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -1540,6 +1548,8 @@ SUBROUTINE advect_u   ( u, u_old, tendency,            &
 
    ENDIF vert_order_test
 
+   call trace_exit("advect_u")
+
 END SUBROUTINE advect_u
 
 !-------------------------------------------------------------------------------
@@ -1635,6 +1645,8 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
 
 
    LOGICAL :: specified
+
+   call trace_entry("advect_v")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -3017,6 +3029,8 @@ SUBROUTINE advect_v   ( v, v_old, tendency,            &
 
    ENDIF vert_order_test
 
+   call trace_exit("advect_v")
+
 END SUBROUTINE advect_v
 
 !-------------------------------------------------------------------
@@ -3110,6 +3124,8 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
 
    LOGICAL :: specified
+
+   call trace_entry("advect_scalar")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -4329,6 +4345,8 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ENDIF vert_order_test
 
+   call trace_exit("advect_scalar")
+
 END SUBROUTINE advect_scalar
 
 !---------------------------------------------------------------------------------
@@ -4420,6 +4438,8 @@ SUBROUTINE advect_w    ( w, w_old, tendency,            &
 
 
    LOGICAL :: specified
+
+   call trace_entry("advect_w")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -6009,6 +6029,8 @@ ELSE IF (horz_order == 2 ) THEN
 
    ENDIF vert_order_test
 
+   call trace_exit("advect_w")
+
 END SUBROUTINE advect_w
 
 !----------------------------------------------------------------
@@ -6123,6 +6145,8 @@ SUBROUTINE advect_scalar_pd   ( field, field_old, tendency,    &
     REAL     :: dx,dy,dz
 
     LOGICAL, PARAMETER :: pd_limit = .true.
+
+   call trace_entry("advect_scalar_pd")
 
 ! set order for the advection schemes
 
@@ -7730,6 +7754,8 @@ SUBROUTINE advect_scalar_pd   ( field, field_old, tendency,    &
   ENDDO
   ENDDO
   ENDDO
+
+   call trace_exit("advect_scalar_pd")
 
 END SUBROUTINE advect_scalar_pd
 

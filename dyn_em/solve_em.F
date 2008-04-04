@@ -155,6 +155,9 @@ SUBROUTINE solve_em ( grid , config_flags  &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
+!  if(grid%trace_use) call trace_entry("solve_em")
+   call trace_entry("solve_em")
+
 !  set runge-kutta solver (2nd or 3rd order)
 
    dynamics_option = config_flags%rk_ord
@@ -216,9 +219,6 @@ IF (config_flags%polar) dclat = 90./REAL(jde-jds) !(0.5 * 180/ny)
 !</pre>
 !</DESCRIPTION>
 !**********************************************************************
-
-!  if(grid%trace_use) call trace_entry("solve_em")
-   call trace_entry("solve_em")
 
 #ifdef WRF_CHEM
 !

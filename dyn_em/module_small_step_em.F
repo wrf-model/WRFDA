@@ -10,6 +10,8 @@ MODULE module_small_step_em
    USE module_configure
    USE module_model_constants
 
+   USE module_trace, only : trace_entry, trace_exit
+
 CONTAINS
 
 !----------------------------------------------------------------------
@@ -113,6 +115,8 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 !  timesteps
 !
 !</DESCRIPTION>
+
+   call trace_entry("small_step_prep")
 
     i_start = its
     i_end   = ite
@@ -317,6 +321,8 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
       ENDDO
       ENDDO
 
+   call trace_exit("small_step_prep")
+
 END SUBROUTINE small_step_prep
 
 !-------------------------------------------------------------------------
@@ -390,6 +396,8 @@ SUBROUTINE small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
 !  from the coupled perturbation variables used in the small timesteps.
 !
 !</DESCRIPTION>
+
+   call trace_entry("small_step_finish")
 
   i_start = its
   i_end   = ite
@@ -496,6 +504,8 @@ SUBROUTINE small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
   ENDDO
   ENDDO
 
+   call trace_exit("small_step_finish")
+
 END SUBROUTINE small_step_finish
 
 !-----------------------------------------------------------------------
@@ -569,6 +579,8 @@ SUBROUTINE calc_p_rho( al, p, ph,                    &
 !
 !</DESCRIPTION>
 
+   call trace_entry("calc_p_rho")
+
    i_start = its
    i_end   = ite
    j_start = jts
@@ -636,6 +648,8 @@ SUBROUTINE calc_p_rho( al, p, ph,                    &
        ENDDO
      END IF
 
+   call trace_exit("calc_p_rho")
+
 END SUBROUTINE calc_p_rho
 
 !----------------------------------------------------------------------
@@ -689,6 +703,7 @@ SUBROUTINE calc_coef_w( a,alpha,gamma,              &
 !
 !</DESCRIPTION>
 
+   call trace_entry("calc_coef_w")
                                                  
       i_start = its
       i_end   = ite
@@ -734,6 +749,8 @@ SUBROUTINE calc_coef_w( a,alpha,gamma,              &
         ENDDO
 
       ENDDO outer_j_loop
+
+   call trace_exit("calc_coef_w")
 
 END SUBROUTINE calc_coef_w
 
@@ -833,6 +850,8 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
 !  the small timestep pressure gradient tendency.
 !
 !</DESCRIPTION>
+
+   call trace_entry("advance_uv")
 
 !  now, the real work.
 !  set the loop bounds taking into account boundary conditions.
@@ -1113,6 +1132,7 @@ SUBROUTINE advance_uv ( u, ru_tend, v, rv_tend,        &
      END IF
   END IF
 
+   call trace_exit("advance_uv")
 
 END SUBROUTINE advance_uv
 
@@ -1207,6 +1227,8 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 !  and some quantities needed in other places are squirrelled away.
 !
 !</DESCRIPTION>
+
+   call trace_entry("advance_mu_t")
 
 !  now, the real work.
 !  set the loop bounds taking into account boundary conditions.
@@ -1365,6 +1387,8 @@ SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 
    ENDDO
 
+   call trace_exit("advance_mu_t")
+
 END SUBROUTINE advance_mu_t
           
 
@@ -1465,6 +1489,8 @@ SUBROUTINE advance_w( w, rw_tend, ww, w_save, u, v,  &
 !  advance_w advances the implicit w and geopotential equations.
 !
 !</DESCRIPTION>
+
+   call trace_entry("advance_w")
 
 !  set loop limits.
 !  Currently set for periodic boundary conditions
@@ -1673,6 +1699,8 @@ SUBROUTINE advance_w( w, rw_tend, ww, w_save, u, v,  &
 
   ENDDO j_loop_w
 
+   call trace_exit("advance_w")
+
 END SUBROUTINE advance_w
 
 !---------------------------------------------------------------------
@@ -1726,6 +1754,8 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
 !  are needed for consistent mass-conserving scalar advection.
 !
 !</DESCRIPTION>
+
+   call trace_entry("sumflux")
 
     IF (iteration == 1 )THEN
       DO  j = jts, jte
@@ -1831,6 +1861,7 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
 
   ENDIF
 
+   call trace_exit("sumflux")
 
 END SUBROUTINE sumflux 
 

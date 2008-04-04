@@ -9,6 +9,8 @@ MODULE module_em
    USE module_state_description
    USE module_damping_em
 
+   USE module_trace, only : trace_entry, trace_exit
+
 CONTAINS
 
 !------------------------------------------------------------------------
@@ -118,6 +120,8 @@ SUBROUTINE rk_step_prep  ( config_flags, rk_step,           &
 !
 !</DESCRIPTION>
 
+   call trace_entry("rk_step_prep")
+
    CALL calculate_full( mut, mub, mu,             &
                         ids, ide, jds, jde, 1, 2, &
                         ims, ime, jms, jme, 1, 1, &
@@ -159,6 +163,8 @@ SUBROUTINE rk_step_prep  ( config_flags, rk_step,           &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
                    its, ite, jts, jte, kts, kte )
+
+   call trace_exit("rk_step_prep")
 
 END SUBROUTINE rk_step_prep
 
@@ -319,6 +325,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 !  (5) 3D diffusion on coordinate surfaces.
 !
 !</DESCRIPTION>
+
+   call trace_entry("rk_tendency")
 
    CALL zero_tend ( ru_tend,                      &
                     ids, ide, jds, jde, kds, kde, &
@@ -641,6 +649,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
   END IF forward_step
 
+   call trace_exit("rk_tendency")
+
 END SUBROUTINE rk_tendency
 
 !-------------------------------------------------------------------------------
@@ -722,6 +732,8 @@ SUBROUTINE rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 ! For scalars we need the final tendency to include an inverse msf (msfty)
 ! advection tendency is OK, physics/bc tendency needs to be divided by msf
 
+   call trace_entry("rk_addtend_dry")
+
    DO j = jts,MIN(jte,jde-1)
    DO k = kts,kte-1
    DO i = its,ite
@@ -776,6 +788,8 @@ SUBROUTINE rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
       mu_tend(i,j) =  mu_tend(i,j) +  mu_tendf(i,j)
    ENDDO
    ENDDO
+
+   call trace_exit("rk_addtend_dry")
 
 END SUBROUTINE rk_addtend_dry
 
@@ -871,6 +885,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,          &
 !
 !</DESCRIPTION>
 
+   call trace_entry("rk_scalar_tend")
 
    khdq = khdif/prandtl
    kvdq = kvdif/prandtl
@@ -973,6 +988,8 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,          &
 
  END DO scalar_loop
 
+   call trace_exit("rk_scalar_tend")
+
 END SUBROUTINE rk_scalar_tend
 
 !-------------------------------------------------------------------------------
@@ -1030,6 +1047,7 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
 !
 !</DESCRIPTION>
 
+   call trace_entry("rk_update_scalar")
 
 !
 !  set loop limits.
@@ -1163,6 +1181,8 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
 
     END IF
 
+   call trace_exit("rk_update_scalar")
+
 END SUBROUTINE rk_update_scalar
 
 !-------------------------------------------------------------------------------
@@ -1213,6 +1233,7 @@ SUBROUTINE rk_update_scalar_pd( scs, sce,                      &
 !
 !</DESCRIPTION>
 
+   call trace_entry("rk_update_scalar_pd")
 
 !
 !  set loop limits.
@@ -1279,6 +1300,8 @@ SUBROUTINE rk_update_scalar_pd( scs, sce,                      &
 
       ENDDO
 
+   call trace_exit("rk_update_scalar_pd")
+
 END SUBROUTINE rk_update_scalar_pd
 
 !------------------------------------------------------------
@@ -1330,6 +1353,7 @@ SUBROUTINE init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 !
 !</DESCRIPTION>
 
+   call trace_entry("init_zero_tendency")
 
    CALL zero_tend ( ru_tendf,                        &
                     ids, ide, jds, jde, kds, kde,    &
@@ -1389,6 +1413,8 @@ SUBROUTINE init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte  )
    ENDDO
+
+   call trace_exit("init_zero_tendency")
 
 END SUBROUTINE init_zero_tendency
 
@@ -1507,6 +1533,8 @@ SUBROUTINE calculate_phy_tend (config_flags,mu,muu,muv,pi3d,           &
 !  computed for uncoupled variables.
 !
 !</DESCRIPTION>
+
+   call trace_entry("calculate_phy_tend")
 
       itf=MIN(ite,ide-1)
       jtf=MIN(jte,jde-1)
@@ -1682,6 +1710,8 @@ SUBROUTINE calculate_phy_tend (config_flags,mu,muu,muv,pi3d,           &
 
     ENDIF
 
+   call trace_exit("calculate_phy_tend")
+
 END SUBROUTINE calculate_phy_tend
 
 !-----------------------------------------------------------------------
@@ -1707,6 +1737,8 @@ SUBROUTINE positive_definite_filter ( a,                          &
 !
 !</DESCRIPTION>
 
+   call trace_entry("positive_definite_filter")
+
   DO j=jts,min(jte,jde-1)
   DO k=kts,kte-1
   DO i=its,min(ite,ide-1)
@@ -1715,6 +1747,8 @@ SUBROUTINE positive_definite_filter ( a,                          &
   ENDDO
   ENDDO
   ENDDO
+
+   call trace_exit("positive_definite_filter")
 
   END SUBROUTINE positive_definite_filter
 

@@ -9,6 +9,8 @@
     USE module_model_constants    
     USE module_wrf_error
 
+    USE module_trace, only : trace_entry, trace_exit
+
     CONTAINS
 
 !=======================================================================
@@ -102,6 +104,8 @@
 !=======================================================================
 ! In the following section, calculate 3-d divergence and the first three
 ! (defor11, defor22, defor33) of six deformation terms.
+
+    call trace_entry("cal_deform_and_div")
 
     ktes1   = kte-1
     ktes2   = kte-2
@@ -976,6 +980,8 @@ endif
 ! are now calculated at vorticity points.
 !=======================================================================
 
+    call trace_exit("cal_deform_and_div")
+
     END SUBROUTINE cal_deform_and_div
 
 !=======================================================================
@@ -1057,6 +1063,8 @@ endif
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("calculate_km_kh")
+
     ktf     = MIN( kte, kde-1 )
     i_start = its
     i_end   = MIN( ite, ide-1 )
@@ -1127,6 +1135,8 @@ endif
                        its, ite, jts, jte, kts, kte             )
     END IF
 
+    call trace_exit("calculate_km_kh")
+
     END SUBROUTINE calculate_km_kh
 
 !=======================================================================
@@ -1173,6 +1183,8 @@ SUBROUTINE cal_dampkm( config_flags,xkmh,xkhh,xkmv,xkhv,                       &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("cal_dampkm")
 
    ktf = min(kte,kde-1)
    ktfm1 = ktf-1
@@ -1258,6 +1270,8 @@ SUBROUTINE cal_dampkm( config_flags,xkmh,xkhh,xkmv,xkhv,                       &
    ENDDO
    ENDDO
 
+    call trace_exit("cal_dampkm")
+
 END SUBROUTINE cal_dampkm
 
 !=======================================================================
@@ -1321,6 +1335,8 @@ END SUBROUTINE cal_dampkm
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("calculate_N2")
 
     qc_cr   = 0.00001  ! in Kg/Kg
 
@@ -1491,6 +1507,8 @@ END SUBROUTINE cal_dampkm
     END DO   
 ! end of MARTA/WCS change
 
+    call trace_exit("calculate_N2")
+
     END SUBROUTINE calculate_N2
 
 !=======================================================================
@@ -1527,6 +1545,8 @@ SUBROUTINE isotropic_km( config_flags,                                         &
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("isotropic_km")
+
    ktf = kte
 
    i_start = its
@@ -1549,6 +1569,8 @@ SUBROUTINE isotropic_km( config_flags,                                         &
    ENDDO
    ENDDO
    ENDDO
+
+    call trace_exit("isotropic_km")
 
 END SUBROUTINE isotropic_km
 
@@ -1603,6 +1625,8 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmv,xkhh,xkhv,BN2,                      &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("smag_km")
 
    ktf = min(kte,kde-1)
 
@@ -1702,6 +1726,8 @@ SUBROUTINE smag_km( config_flags,xkmh,xkmv,xkhh,xkhv,BN2,                      &
       ENDDO
    ENDIF
 
+    call trace_exit("smag_km")
+
 END SUBROUTINE smag_km
 
 !=======================================================================
@@ -1750,6 +1776,8 @@ SUBROUTINE smag2d_km( config_flags,xkmh,xkmv,xkhh,xkhv,                        &
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("smag2d_km")
+
    ktf = min(kte,kde-1)
 
    i_start = its
@@ -1795,6 +1823,8 @@ SUBROUTINE smag2d_km( config_flags,xkmh,xkmv,xkhh,xkhv,                        &
       ENDDO
       ENDDO
       ENDDO
+
+    call trace_exit("smag2d_km")
 
 END SUBROUTINE smag2d_km
 
@@ -1865,6 +1895,8 @@ END SUBROUTINE smag2d_km
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("tke_km")
 
     ktf     = MIN( kte, kde-1 )
     i_start = its
@@ -1969,6 +2001,8 @@ END SUBROUTINE smag2d_km
       END DO
     END IF
 
+    call trace_exit("tke_km")
+
     END SUBROUTINE tke_km
 
 !=======================================================================
@@ -2020,6 +2054,8 @@ END SUBROUTINE smag2d_km
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("calc_l_scale")
+
     DO j = j_start, j_end
     DO k = kts, ktf
     DO i = i_start, i_end
@@ -2036,6 +2072,8 @@ END SUBROUTINE smag2d_km
     END DO
     END DO
     END DO
+
+    call trace_exit("calc_l_scale")
 
     END SUBROUTINE calc_l_scale
 
@@ -2140,6 +2178,8 @@ SUBROUTINE horizontal_diffusion_2 ( rt_tendf, ru_tendf, rv_tendf, rw_tendf,    &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("horizontal_diffusion_2")
 
 !-----------------------------------------------------------------------
 ! Call diffusion subroutines.
@@ -2253,6 +2293,8 @@ SUBROUTINE horizontal_diffusion_2 ( rt_tendf, ru_tendf, rv_tendf, rw_tendf,    &
 
     ENDIF
 
+    call trace_exit("horizontal_diffusion_2")
+
     END SUBROUTINE horizontal_diffusion_2
 
 !=======================================================================
@@ -2324,6 +2366,8 @@ SUBROUTINE horizontal_diffusion_u_2( tendency, mu, config_flags,          &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("horizontal_diffusion_u_2")
 
    ktf=MIN(kte,kde-1)
  
@@ -2447,6 +2491,8 @@ SUBROUTINE horizontal_diffusion_u_2( tendency, mu, config_flags,          &
    ENDDO
    ENDDO
 
+    call trace_exit("horizontal_diffusion_u_2")
+
 END SUBROUTINE horizontal_diffusion_u_2
 
 !=======================================================================
@@ -2516,6 +2562,8 @@ SUBROUTINE horizontal_diffusion_v_2( tendency, mu, config_flags,          &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("horizontal_diffusion_v_2")
 
    ktf=MIN(kte,kde-1)
  
@@ -2637,6 +2685,8 @@ SUBROUTINE horizontal_diffusion_v_2( tendency, mu, config_flags,          &
    ENDDO
    ENDDO
 
+    call trace_exit("horizontal_diffusion_v_2")
+
 END SUBROUTINE horizontal_diffusion_v_2
 
 !=======================================================================
@@ -2706,6 +2756,8 @@ SUBROUTINE horizontal_diffusion_w_2( tendency, mu, config_flags,          &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("horizontal_diffusion_w_2")
 
    ktf=MIN(kte,kde-1)
  
@@ -2832,6 +2884,8 @@ SUBROUTINE horizontal_diffusion_w_2( tendency, mu, config_flags,          &
    ENDDO
    ENDDO
 
+    call trace_exit("horizontal_diffusion_w_2")
+
 END SUBROUTINE horizontal_diffusion_w_2
 
 !=======================================================================
@@ -2918,6 +2972,8 @@ SUBROUTINE horizontal_diffusion_s (tendency, mu, config_flags, var,       &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("horizontal_diffusion_s")
 
    ktf=MIN(kte,kde-1)
  
@@ -3191,6 +3247,8 @@ SUBROUTINE horizontal_diffusion_s (tendency, mu, config_flags, var,       &
       ENDDO
    ENDIF
 
+    call trace_exit("horizontal_diffusion_s")
+
 END SUBROUTINE horizontal_diffusion_s
 
 !=======================================================================
@@ -3300,6 +3358,8 @@ SUBROUTINE vertical_diffusion_2   ( ru_tendf, rv_tendf, rw_tendf, rt_tendf,   &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("vertical_diffusion_2")
 
    i_start = its
    i_end   = MIN(ite,ide-1)
@@ -3589,6 +3649,8 @@ SUBROUTINE vertical_diffusion_2   ( ru_tendf, rv_tendf, rw_tendf, rt_tendf,   &
 
    ENDIF
 
+    call trace_exit("vertical_diffusion_2")
+
 END SUBROUTINE vertical_diffusion_2
 
 !=======================================================================
@@ -3640,6 +3702,8 @@ SUBROUTINE vertical_diffusion_u_2( tendency, config_flags, mu,            &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("vertical_diffusion_u_2")
 
    ktf=MIN(kte,kde-1)
   
@@ -3695,6 +3759,8 @@ SUBROUTINE vertical_diffusion_u_2( tendency, config_flags, mu,            &
        ENDDO
 ! ******** MODIF...
 
+    call trace_exit("vertical_diffusion_u_2")
+
 END SUBROUTINE vertical_diffusion_u_2
 
 !=======================================================================
@@ -3745,6 +3811,8 @@ SUBROUTINE vertical_diffusion_v_2( tendency, config_flags, mu,            &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("vertical_diffusion_v_2")
 
    ktf=MIN(kte,kde-1)
   
@@ -3801,6 +3869,8 @@ SUBROUTINE vertical_diffusion_v_2( tendency, config_flags, mu,            &
        ENDDO
 ! ******** MODIF...
 
+    call trace_exit("vertical_diffusion_v_2")
+
 END SUBROUTINE vertical_diffusion_v_2
 
 !=======================================================================
@@ -3849,6 +3919,8 @@ SUBROUTINE vertical_diffusion_w_2(tendency, config_flags, mu,             &
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("vertical_diffusion_w_2")
+
    ktf=MIN(kte,kde-1)
   
    i_start = its
@@ -3894,6 +3966,8 @@ SUBROUTINE vertical_diffusion_w_2(tendency, config_flags, mu,             &
    ENDDO
    ENDDO
    ENDDO
+
+    call trace_exit("vertical_diffusion_w_2")
 
 END SUBROUTINE vertical_diffusion_w_2
 
@@ -3949,6 +4023,8 @@ SUBROUTINE vertical_diffusion_s( tendency, config_flags, var, mu, xkhv,   &
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("vertical_diffusion_s")
 
    ktf=MIN(kte,kde-1)
   
@@ -4021,6 +4097,8 @@ SUBROUTINE vertical_diffusion_s( tendency, config_flags, var, mu, xkhv,   &
       ENDDO
       ENDDO
    ENDIF
+
+    call trace_exit("vertical_diffusion_s")
 
 END SUBROUTINE vertical_diffusion_s
 
@@ -4522,6 +4600,8 @@ SUBROUTINE phy_bc ( config_flags,div,defor11,defor22,defor33,              &
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("phy_bc")
+
    IF(config_flags%bl_pbl_physics .GT. 0) THEN
 
         CALL set_physical_bc3d( RUBLTEN , 't', config_flags,              &
@@ -4616,6 +4696,8 @@ SUBROUTINE phy_bc ( config_flags,div,defor11,defor22,defor33,              &
 
    ENDIF
 
+    call trace_exit("phy_bc")
+
 END SUBROUTINE phy_bc 
 
 !=======================================================================
@@ -4681,6 +4763,8 @@ END SUBROUTINE phy_bc
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("tke_rhs")
+
     CALL tke_shear(    tendency, config_flags,                &
                        defor11, defor22, defor33,             &
                        defor12, defor13, defor23,             &
@@ -4732,6 +4816,8 @@ END SUBROUTINE phy_bc
     END DO
     END DO
     END DO
+
+    call trace_exit("tke_rhs")
 
     END SUBROUTINE tke_rhs
 
@@ -4789,6 +4875,8 @@ END SUBROUTINE phy_bc
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("tke_buoyancy")
 
 !-----------------------------------------------------------------------
 ! Add to the TKE tendency the term that accounts for production of TKE
@@ -4861,6 +4949,8 @@ END SUBROUTINE phy_bc
 ! motions.
 !-----------------------------------------------------------------------
 
+    call trace_exit("tke_buoyancy")
+
     END SUBROUTINE tke_buoyancy
 
 !=======================================================================
@@ -4929,6 +5019,8 @@ END SUBROUTINE phy_bc
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+    call trace_entry("tke_dissip")
 
     ce1 = ( c_k / 0.10 ) * 0.19
     ce2 = max( 0.0 , 0.93 - ce1 )
@@ -5007,6 +5099,8 @@ END SUBROUTINE phy_bc
       END DO
       END DO
     ENDIF
+
+    call trace_exit("tke_dissip")
 
     END SUBROUTINE tke_dissip
 
@@ -5399,6 +5493,8 @@ END SUBROUTINE phy_bc
 ! End declarations.
 !-----------------------------------------------------------------------
 
+    call trace_entry("compute_diff_metrics")
+
     ktf = MIN( kte, kde-1 )
 
 ! Bug fix, WCS, 22 april 2002.
@@ -5606,6 +5702,8 @@ END SUBROUTINE phy_bc
       END DO
       END DO
     END DO
+
+    call trace_exit("compute_diff_metrics")
 
     END SUBROUTINE compute_diff_metrics
 

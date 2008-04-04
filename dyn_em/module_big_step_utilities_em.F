@@ -18,6 +18,8 @@ MODULE module_big_step_utilities_em
    USE module_configure
    USE module_wrf_error
 
+   USE module_trace, only : trace_entry, trace_exit
+
 CONTAINS
 
 !-------------------------------------------------------------------------------
@@ -52,6 +54,8 @@ SUBROUTINE calc_mu_uv ( config_flags,                 &
 !  This routine uses the reference state (mub) and perturbation state (mu)
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_mu_uv")
 
 
       itf=ite
@@ -176,6 +180,8 @@ SUBROUTINE calc_mu_uv ( config_flags,                 &
          ENDDO
       END IF
 
+   call trace_exit("calc_mu_uv")
+
 END SUBROUTINE calc_mu_uv
 
 !-------------------------------------------------------------------------------
@@ -210,6 +216,8 @@ SUBROUTINE calc_mu_uv_1 ( config_flags,                 &
 !  This routine uses the full state (mu)
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_mu_uv_1")
    
       itf=ite
       jtf=MIN(jte,jde-1)
@@ -316,6 +324,8 @@ SUBROUTINE calc_mu_uv_1 ( config_flags,                 &
              muv(i,j) = 0.5*(mu(i,j-1)+mu(i,jm))
          ENDDO
       END IF
+
+   call trace_exit("calc_mu_uv_1")
 
 END SUBROUTINE calc_mu_uv_1
 
@@ -358,6 +368,8 @@ SUBROUTINE couple_momentum ( muu, ru, u, msfu,              &
 !
 !</DESCRIPTION>
 
+   call trace_entry("couple_momentum")
+
    ktf=MIN(kte,kde-1)
    
       itf=ite
@@ -394,6 +406,8 @@ SUBROUTINE couple_momentum ( muu, ru, u, msfu,              &
       ENDDO
       ENDDO
 
+   call trace_exit("couple_momentum")
+
 END SUBROUTINE couple_momentum
 
 !-------------------------------------------------------------------
@@ -424,6 +438,8 @@ SUBROUTINE calc_mu_staggered ( mu, mub, muu, muv,            &
 ! velocity points (u,v).
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_mu_staggered")
    
       itf=ite
       jtf=MIN(jte,jde-1)
@@ -515,6 +531,8 @@ SUBROUTINE calc_mu_staggered ( mu, mub, muu, muv,            &
          ENDDO
       END IF
 
+   call trace_exit("calc_mu_staggered")
+
 END SUBROUTINE calc_mu_staggered
 
 !-------------------------------------------------------------------------------
@@ -553,6 +571,7 @@ SUBROUTINE couple ( mu, mub, rfield, field, name, &
 !
 !</DESCRIPTION>
 
+   call trace_entry("couple")
    
    ktf=MIN(kte,kde-1)
    
@@ -628,6 +647,8 @@ SUBROUTINE couple ( mu, mub, rfield, field, name, &
    
    ENDIF
 
+   call trace_exit("couple")
+
 END SUBROUTINE couple
 
 
@@ -683,6 +704,8 @@ SUBROUTINE calc_ww_cp ( u, v, mup, mub, ww,              &
 !  column mass mu.
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_ww_cp")
 
     jtf=MIN(jte,jde-1)
     ktf=MIN(kte,kde-1)  
@@ -776,6 +799,7 @@ SUBROUTINE calc_ww_cp ( u, v, mup, mub, ww,              &
         ENDDO
      ENDDO
 
+   call trace_exit("calc_ww_cp")
 
 END SUBROUTINE calc_ww_cp
 
@@ -813,6 +837,8 @@ SUBROUTINE calc_cq ( moist, cqu, cqv, cqw, n_moist, &
 !  calc_cq calculates moist coefficients for the momentum equations.
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_cq")
 
       itf=ite
       jtf=MIN(jte,jde-1)
@@ -906,6 +932,8 @@ SUBROUTINE calc_cq ( moist, cqu, cqv, cqw, n_moist, &
 
       END IF
 
+   call trace_exit("calc_cq")
+
 END SUBROUTINE calc_cq
 
 !----------------------------------------------------------------------
@@ -936,6 +964,8 @@ SUBROUTINE calc_alt ( alt, al, alb,                  &
 !
 !</DESCRIPTION>
 
+   call trace_entry("calc_alt")
+
       itf=MIN(ite,ide-1)
       jtf=MIN(jte,jde-1)
       ktf=MIN(kte,kde-1)
@@ -948,6 +978,7 @@ SUBROUTINE calc_alt ( alt, al, alb,                  &
       ENDDO
       ENDDO
 
+   call trace_exit("calc_alt")
 
 END SUBROUTINE calc_alt
 
@@ -1008,6 +1039,8 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
 ! equation.
 !
 !</DESCRIPTION>
+
+   call trace_entry("calc_p_rho_phi")
 
   itf=MIN(ite,ide-1)
   jtf=MIN(jte,jde-1)
@@ -1169,6 +1202,8 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
 
    END IF
 
+   call trace_exit("calc_p_rho_phi")
+
 END SUBROUTINE calc_p_rho_phi
 
 !----------------------------------------------------------------------
@@ -1200,6 +1235,8 @@ SUBROUTINE calc_php ( php, ph, phb,                  &
 !
 !</DESCRIPTION>
 
+   call trace_entry("calc_php")
+
       itf=MIN(ite,ide-1)
       jtf=MIN(jte,jde-1)
       ktf=MIN(kte,kde-1)
@@ -1211,6 +1248,8 @@ SUBROUTINE calc_php ( php, ph, phb,                  &
       ENDDO
       ENDDO
       ENDDO
+
+   call trace_exit("calc_php")
 
 END SUBROUTINE calc_php
 
@@ -1244,6 +1283,8 @@ SUBROUTINE diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    REAL, INTENT(IN   ) :: dt, cf1, cf2, cf3, rdx, rdy
 
    INTEGER :: i, j, k, itf, jtf
+
+   call trace_entry("diagnose_w")
 
    itf=MIN(ite,ide-1)
    jtf=MIN(jte,jde-1)
@@ -1304,6 +1345,8 @@ SUBROUTINE diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
      ENDDO
 
    ENDDO
+
+   call trace_exit("diagnose_w")
 
 END SUBROUTINE diagnose_w
 
@@ -1373,6 +1416,8 @@ SUBROUTINE rhs_ph( ph_tend, u, v, ww,               &
 ! algorithms here.
 !
 !</DESCRIPTION>
+
+   call trace_entry("rhs_ph")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -1912,6 +1957,8 @@ SUBROUTINE rhs_ph( ph_tend, u, v, ww,               &
 
    END IF
 
+   call trace_exit("rhs_ph")
+
   END SUBROUTINE rhs_ph
 
 !-------------------------------------------------------------------------------
@@ -1993,6 +2040,8 @@ SUBROUTINE horizontal_pressure_gradient( ru_tend,rv_tend,                &
 !
 !  mu dp/dy = mu alpha partial dp'/dy + (nu mu partial dmubar/dy) alpha'
 !           + mu partial dphi'/dy + (partial dphi/dy)*(partial dp'/dnu - mu')
+
+   call trace_entry("horizontal_pressure_gradient")
 
 ! start with the north-south (y) pressure gradient
 
@@ -2130,6 +2179,8 @@ SUBROUTINE horizontal_pressure_gradient( ru_tend,rv_tend,                &
 
    ENDDO
 
+   call trace_exit("horizontal_pressure_gradient")
+
 END SUBROUTINE horizontal_pressure_gradient
 
 !-------------------------------------------------------------------------------
@@ -2183,6 +2234,8 @@ SUBROUTINE pg_buoy_w( rw_tend, p, cqw, mu, mub,       &
 !  For moisture-free atmosphere, cq1=1, cq2=0
 !  => (1./msft(i,j)) * g * [rdn(k)*{p(i,k,j)-p(i,k-1,j)}-mu(i,j)]
 
+   call trace_entry("pg_buoy_w")
+
    itf=MIN(ite,ide-1)
    jtf=MIN(jte,jde-1)
 
@@ -2208,8 +2261,9 @@ SUBROUTINE pg_buoy_w( rw_tend, p, cqw, mu, mub,       &
      END DO
      ENDDO           
 
-
    ENDDO
+
+   call trace_exit("pg_buoy_w")
 
 END SUBROUTINE pg_buoy_w
 
@@ -2258,6 +2312,8 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
 !  schemes run at moderately high resolutions (dx ~ O(10) km).
 !
 !</DESCRIPTION>
+
+   call trace_entry("w_damp")
 
    itf=MIN(ite,ide-1)
    jtf=MIN(jte,jde-1)
@@ -2325,6 +2381,8 @@ SUBROUTINE w_damp( rw_tend, ww, w, mut, rdnw, dt,     &
      CALL wrf_debug ( 0 , TRIM(wrf_err_message) )
    ENDIF
 
+   call trace_exit("w_damp")
+
 END SUBROUTINE w_damp
 
 !-------------------------------------------------------------------------------
@@ -2385,6 +2443,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
 !  on model horizontal coordinate surfaces.
 !
 !</DESCRIPTION>
+
+   call trace_entry("horizontal_diffusion")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -2562,6 +2622,8 @@ SUBROUTINE horizontal_diffusion ( name, field, tendency, mu,           &
            
    ENDIF
 
+   call trace_exit("horizontal_diffusion")
+
 END SUBROUTINE horizontal_diffusion
 
 !-----------------------------------------------------------------------------------------
@@ -2626,6 +2688,8 @@ SUBROUTINE horizontal_diffusion_3dmp ( name, field, tendency, mu,           &
 !
 !</DESCRIPTION>
 
+   call trace_entry("horizontal_diffusion_3dmp")
+
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
 
@@ -2669,6 +2733,8 @@ SUBROUTINE horizontal_diffusion_3dmp ( name, field, tendency, mu,           &
       ENDDO
       ENDDO
       ENDDO
+
+   call trace_exit("horizontal_diffusion_3dmp")
 
 END SUBROUTINE horizontal_diffusion_3dmp
 
@@ -2724,6 +2790,8 @@ SUBROUTINE vertical_diffusion ( name, field, tendency,        &
 !  computes vertical diffusion tendency.
 !
 !</DESCRIPTION>
+
+   call trace_entry("vertical_diffusion")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -2795,6 +2863,8 @@ j_loop_s : DO j = j_start, j_end
 
    ENDIF
 
+   call trace_exit("vertical_diffusion")
+
 END SUBROUTINE vertical_diffusion
 
 
@@ -2851,6 +2921,8 @@ SUBROUTINE vertical_diffusion_mp ( field, tendency, config_flags, &
 !
 !</DESCRIPTION>
 
+   call trace_entry("vertical_diffusion_mp")
+
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
 
@@ -2886,6 +2958,8 @@ j_loop_s : DO j = j_start, j_end
      ENDDO
 
  ENDDO j_loop_s
+
+   call trace_exit("vertical_diffusion_mp")
 
 END SUBROUTINE vertical_diffusion_mp
 
@@ -2943,6 +3017,8 @@ SUBROUTINE vertical_diffusion_3dmp ( field, tendency, config_flags, &
 !
 !</DESCRIPTION>
 
+   call trace_entry("vertical_diffusion_3dmp")
+
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
 
@@ -2979,6 +3055,8 @@ j_loop_s : DO j = j_start, j_end
      ENDDO
 
  ENDDO j_loop_s
+
+   call trace_exit("vertical_diffusion_3dmp")
 
 END SUBROUTINE vertical_diffusion_3dmp
 
@@ -3035,6 +3113,8 @@ SUBROUTINE vertical_diffusion_u ( field, tendency,              &
 !
 !</DESCRIPTION>
 
+   call trace_entry("vertical_diffusion_u")
+
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
 
@@ -3081,6 +3161,8 @@ j_loop_u : DO j = j_start, j_end
      ENDDO
 
  ENDDO j_loop_u
+
+   call trace_exit("vertical_diffusion_u")
    
 END SUBROUTINE vertical_diffusion_u
 
@@ -3135,6 +3217,8 @@ SUBROUTINE vertical_diffusion_v ( field, tendency,              &
 !
 !</DESCRIPTION>
 
+   call trace_entry("vertical_diffusion_v")
+
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
 
@@ -3180,6 +3264,8 @@ j_loop_v : DO j = j_start, j_end
      ENDDO
 
  ENDDO j_loop_v
+
+   call trace_exit("vertical_diffusion_v")
    
 END SUBROUTINE vertical_diffusion_v
 
@@ -3216,6 +3302,8 @@ SUBROUTINE calculate_full ( rfield, rfieldb, rfieldp,     &
 !
 !</DESCRIPTION>
 
+   call trace_entry("calculate_full")
+
    itf=MIN(ite,ide-1)
    jtf=MIN(jte,jde-1)
    ktf=MIN(kte,kde-1)
@@ -3227,6 +3315,8 @@ SUBROUTINE calculate_full ( rfield, rfieldb, rfieldp,     &
    ENDDO
    ENDDO
    ENDDO
+
+   call trace_exit("calculate_full")
 
 END SUBROUTINE calculate_full
 
@@ -3286,6 +3376,8 @@ SUBROUTINE coriolis ( ru, rv, rw, ru_tend, rv_tend, rw_tend, &
 !  u, v, and w momentum equations arise from the coriolis force.
 !
 !</DESCRIPTION>
+
+   call trace_entry("coriolis")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -3439,6 +3531,8 @@ SUBROUTINE coriolis ( ru, rv, rw, ru_tend, rv_tend, rw_tend, &
    ENDDO
    ENDDO
 
+   call trace_exit("coriolis")
+
 END SUBROUTINE coriolis
 
 !------------------------------------------------------------------------------
@@ -3518,6 +3612,8 @@ SUBROUTINE perturbation_coriolis ( ru_in, rv_in, rw, ru_tend, rv_tend, rw_tend, 
 !  computing the forcing terms, hence "perturbation" coriolis.
 !
 !</DESCRIPTION>
+
+   call trace_entry("perturbation_coriolis")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -3755,6 +3851,8 @@ SUBROUTINE perturbation_coriolis ( ru_in, rv_in, rw, ru_tend, rv_tend, rw_tend, 
    ENDDO
    ENDDO
 
+   call trace_exit("perturbation_coriolis")
+
 END SUBROUTINE perturbation_coriolis
 
 !------------------------------------------------------------------------------
@@ -3822,6 +3920,8 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
 !  u, v, and w momentum equations arise from the curvature terms.  
 !
 !</DESCRIPTION>
+
+   call trace_entry("curvature")
 
    specified = .false.
    if(config_flags%specified .or. config_flags%nested) specified = .true.
@@ -4053,6 +4153,8 @@ SUBROUTINE curvature ( ru, rv, rw, u, v, w, ru_tend, rv_tend, rw_tend, &
    ENDDO
    ENDDO
 
+   call trace_exit("curvature")
+
 END SUBROUTINE curvature
 
 !------------------------------------------------------------------------------
@@ -4092,6 +4194,8 @@ SUBROUTINE decouple ( rr, rfield, field, name, config_flags, &
 !  decouple decouples a variable from the column dry-air mass.
 !
 !</DESCRIPTION>
+
+   call trace_entry("decouple")
 
    ktf=MIN(kte,kde-1)
    
@@ -4150,6 +4254,8 @@ SUBROUTINE decouple ( rr, rfield, field, name, config_flags, &
    
    ENDIF
 
+   call trace_exit("decouple")
+
 END SUBROUTINE decouple
 
 !-------------------------------------------------------------------------------
@@ -4181,6 +4287,8 @@ SUBROUTINE zero_tend ( tendency,                     &
 !
 !</DESCRIPTION>
 
+   call trace_entry("zero_tend")
+
       DO j = jts, jte
       DO k = kts, kte
       DO i = its, ite
@@ -4188,6 +4296,8 @@ SUBROUTINE zero_tend ( tendency,                     &
       ENDDO
       ENDDO
       ENDDO
+
+   call trace_exit("zero_tend")
 
       END SUBROUTINE zero_tend
 
@@ -4382,6 +4492,8 @@ END SUBROUTINE pole_point_bc
 !  uncoupled tendencies).
 !
 !</DESCRIPTION>
+
+   call trace_entry("phy_prep")
 
 !  set up loop bounds for this grid's boundary conditions
 
@@ -4676,6 +4788,8 @@ END SUBROUTINE pole_point_bc
 
     ENDIF
 
+   call trace_exit("phy_prep")
+
 END SUBROUTINE phy_prep
 
 !------------------------------------------------------------
@@ -4749,6 +4863,8 @@ END SUBROUTINE phy_prep
 !  the microphysics routines.
 !
 !</DESCRIPTION>
+
+   call trace_entry("moist_physics_prep_em")
 
 !  set up loop bounds for this grid's boundary conditions
 
@@ -4844,6 +4960,8 @@ END SUBROUTINE phy_prep
     enddo
     enddo
 
+   call trace_exit("moist_physics_prep_em")
+
    END SUBROUTINE moist_physics_prep_em
 
 !------------------------------------------------------------------------------
@@ -4891,6 +5009,7 @@ END SUBROUTINE phy_prep
 
 !  set up loop bounds for this grid's boundary conditions
 
+   call trace_entry("moist_physics_finish_em")
 
     i_start = its    
     i_end   = min( ite,ide-1 )
@@ -4913,6 +5032,8 @@ END SUBROUTINE phy_prep
      ENDDO
      ENDDO
      ENDDO
+
+   call trace_exit("moist_physics_finish_em")
 
    END SUBROUTINE moist_physics_finish_em
 
@@ -5042,6 +5163,8 @@ END SUBROUTINE set_tend
 
 ! End declarations.
 !-----------------------------------------------------------------------
+
+   call trace_entry("rk_rayleigh_damp")
 
     pii = 2.0 * asin(1.0)
 
@@ -5230,6 +5353,8 @@ END SUBROUTINE set_tend
 ! End adjustment of potential temperature.
 !-----------------------------------------------------------------------
 
+   call trace_exit("rk_rayleigh_damp")
+
     END SUBROUTINE rk_rayleigh_damp
 
 !==============================================================================
@@ -5306,6 +5431,8 @@ END SUBROUTINE set_tend
  
 ! End: Declarations.
 !------------------------------------------------------------------------------
+
+   call trace_entry("sixth_order_diffusion")
 
 !------------------------------------------------------------------------------
 ! Begin: Translate the diffusion factor into a diffusion coefficient.  See
@@ -5507,6 +5634,8 @@ END SUBROUTINE set_tend
 
 ! End: Loop across spatial dimensions.
 !------------------------------------------------------------------------------
+
+   call trace_exit("sixth_order_diffusion")
  
     END SUBROUTINE sixth_order_diffusion
  

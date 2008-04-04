@@ -21,6 +21,8 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple &
 ! Registry generated module
    USE module_state_description
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Subroutine interface block.
@@ -47,6 +49,8 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple &
    REAL                            :: mu_factor
 
    REAL, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33) :: mut_2, muut_2, muvt_2, muwt_2
+
+   call trace_entry("couple_or_uncouple_em")
 
 !  De-reference dimension information stored in the grid data structure.
 
@@ -420,6 +424,7 @@ LOGICAL FUNCTION em_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, j
                            pig .le. ipe_save-spec_zone  +ioff .and.      &
                            pjg .le. jpe_save-spec_zone  +joff           )
 
+   call trace_exit("couple_or_uncouple_em")
 
 END FUNCTION em_cd_feedback_mask
 

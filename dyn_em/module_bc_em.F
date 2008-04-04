@@ -6,6 +6,8 @@ MODULE module_bc_em
    USE module_configure
    USE module_wrf_error
 
+   USE module_trace, only : trace_entry, trace_exit
+
 CONTAINS
 
 !------------------------------------------------------------------------
@@ -47,6 +49,8 @@ CONTAINS
 
       REAL,  DIMENSION( its:ite , jts:jte ) :: mu_old
       LOGICAL    :: periodic_x
+
+      call trace_entry("spec_bdyupdate_ph")
 
       periodic_x = config_flags%periodic_x
 
@@ -148,6 +152,8 @@ CONTAINS
       ENDIF 
     ENDIF
 
+      call trace_exit("spec_bdyupdate_ph")
+
    END SUBROUTINE spec_bdyupdate_ph
 
 !------------------------------------------------------------------------
@@ -233,6 +239,8 @@ CONTAINS
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: rfield
    INTEGER :: i_start, i_end, j_start, j_end, i, j, k
+
+      call trace_entry("relax_bdy_dry")
 
            CALL relax_bdytend ( ru, ru_tendf,             &
                                u_bxs,u_bxe,u_bys,u_bye,u_btxs,u_btxe,u_btys,u_btye, &
@@ -331,6 +339,8 @@ CONTAINS
 
         END IF
 
+      call trace_exit("relax_bdy_dry")
+
    END SUBROUTINE relax_bdy_dry 
 !------------------------------------------------------------------------
    SUBROUTINE relax_bdy_scalar ( scalar_tend,                &
@@ -369,6 +379,8 @@ CONTAINS
    INTEGER :: i,j,k, i_start, i_end, j_start, j_end
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: rscalar
 
+      call trace_entry("relax_bdy_scalar")
+
 ! rscalar will be calculated beyond tile limits because relax_bdytend
 !   requires a 5-point stencil, and this avoids need for inter-tile/patch 
 !   communication here
@@ -395,10 +407,12 @@ CONTAINS
                                ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                                its,ite, jts,jte, kts,kte )
 
+      call trace_exit("relax_bdy_scalar")
 
    END SUBROUTINE relax_bdy_scalar 
 
 !------------------------------------------------------------------------
+
    SUBROUTINE spec_bdy_dry ( config_flags,                        &
                              ru_tend, rv_tend, ph_tend, t_tend,   &
                              rw_tend, mu_tend,                    &
@@ -465,6 +479,9 @@ CONTAINS
 
    REAL,  DIMENSION( ims:ime , 1:1 ,     spec_bdy_width    ), INTENT(IN   ) :: mu_bys,mu_bye, &
                                                                                mu_btys,mu_btye
+
+      call trace_entry("spec_bdy_dry")
+
          CALL spec_bdytend (   ru_tend,                &
                                u_bxs,u_bxe,u_bys,u_bye, u_btxs,u_btxe,u_btys,u_btye,    &
                                'u'     , config_flags, &
@@ -515,6 +532,8 @@ CONTAINS
                                ims,ime, jms,jme, kms,kme,  & ! memory dims
                                ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                                its,ite, jts,jte, kts,kte )
+
+      call trace_exit("spec_bdy_dry")
 
    END SUBROUTINE spec_bdy_dry 
 
@@ -593,6 +612,7 @@ CONTAINS
            t_1, t_2, tp_1, tp_2, pp, pip
 
 
+      call trace_entry("set_phys_bc_dry_1")
 
       CALL set_physical_bc3d( u_1  , 'u', config_flags,               &
                               ids, ide, jds, jde, kds, kde,       &
@@ -665,6 +685,8 @@ CONTAINS
                               ips, ipe, jps, jpe, kps, kpe,       &
                               its, ite, jts, jte, kts, kte )
 
+      call trace_exit("set_phys_bc_dry_1")
+
   END SUBROUTINE set_phys_bc_dry_1
 
 !--------------------------------------------------------------
@@ -698,6 +720,7 @@ CONTAINS
       REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: &
                              mu_1, mu_2
 
+      call trace_entry("set_phys_bc_dry_2")
 
       CALL set_physical_bc3d( u_1, 'U', config_flags,           &
                               ids, ide, jds, jde, kds, kde, &
@@ -769,6 +792,8 @@ CONTAINS
                               ips, ipe, jps, jpe,  &
                               its, ite, jts, jte  )
 
+      call trace_exit("set_phys_bc_dry_2")
+
    END SUBROUTINE set_phys_bc_dry_2
 
 !------------------------------------------------------------------------
@@ -796,6 +821,8 @@ CONTAINS
       REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) :: &
            ru_1,du, rv_1, dv
 
+      call trace_entry("set_phys_bc_smallstep_1")
+
       CALL set_physical_bc3d( ru_1  , 'u', config_flags,              &
                               ids, ide, jds, jde, kds, kde,       &
                               ims, ime, jms, jme, kms, kme,       &
@@ -816,6 +843,8 @@ CONTAINS
                               ims, ime, jms, jme, kms, kme,       &
                               ips, ipe, jps, jpe, kps, kpe,       &
                               its, ite, jts, jte, kts, kde )
+
+      call trace_exit("set_phys_bc_smallstep_1")
 
   END SUBROUTINE set_phys_bc_smallstep_1
 
@@ -846,6 +875,8 @@ CONTAINS
                                 INTENT(INOUT) ::  u, v, rw, w, php, alt, p
       REAL, DIMENSION( ims:ime, jms:jme ),                             &
                                 INTENT(INOUT) ::    muu, muv, mut
+
+      call trace_entry("rk_phys_bc_dry_1")
 
       CALL set_physical_bc3d( u  , 'u', config_flags,             &
                               ids, ide, jds, jde, kds, kde,       &
@@ -902,6 +933,8 @@ CONTAINS
                               ips, ipe, jps, jpe,      &
                               its, ite, jts, jte  )
 
+      call trace_exit("rk_phys_bc_dry_1")
+
   END SUBROUTINE rk_phys_bc_dry_1
 
 !------------------------------------------------------------------------
@@ -932,6 +965,8 @@ CONTAINS
 
       REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: &
                              mu
+
+      call trace_entry("rk_phys_bc_dry_2")
 
       CALL set_physical_bc3d( u   , 'U', config_flags,            &
                               ids, ide, jds, jde, kds, kde,       &
@@ -964,6 +999,8 @@ CONTAINS
                               ims, ime, jms, jme,    &
                               ips, ipe, jps, jpe,    &
                               its, ite, jts, jte    )
+
+      call trace_exit("rk_phys_bc_dry_2")
 
   END SUBROUTINE rk_phys_bc_dry_2
 
@@ -1017,6 +1054,8 @@ CONTAINS
 !  [NB - cf1, cf2 and cf3 do vertical weighting of u or v values
 !   nearest the surface]
 
+      call trace_entry("set_w_surface")
+
      DO j = jts,min(jte,jde-1)
        jm1 = max(j-1,jds)
        jp1 = min(j+1,jde-1)
@@ -1049,6 +1088,8 @@ CONTAINS
      ENDDO
      ENDDO
      ENDDO
+
+      call trace_exit("set_w_surface")
 
   END SUBROUTINE set_w_surface
 
