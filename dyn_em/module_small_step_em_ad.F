@@ -34,12 +34,15 @@ use module_configure
 use module_model_constants
 use module_small_step_em
 
+USE module_trace, only : trace_entry, trace_exit
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
 implicit none
 
 contains
+
 subroutine a_advance_mu_t( ww, a_ww, ww_1, a_ww_1, u, a_u, u_1, a_u_1, v, a_v, v_1, a_v_1, a_mu, a_mut, a_muave, a_muts, muu, &
 &a_muu, muv, a_muv, a_mudf, a_t, t_1, a_t_1, a_t_ave, a_ft, mu_tend, a_mu_tend, rdx, rdy, dts, epssm, dnw, fnm, fnp, rdnw, msfu, &
 &msfv, msft, config_flags, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
@@ -132,6 +135,8 @@ integer j_start
 integer k
 integer k_end
 integer k_start
+
+   call trace_entry("a_advance_mu_t")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -293,6 +298,8 @@ do j = j_start, j_end
   end do
 end do
 
+   call trace_exit("a_advance_mu_t")
+
 end subroutine a_advance_mu_t
 
 
@@ -395,6 +402,8 @@ integer j_start_vp
 integer k
 integer k_end
 integer k_start
+
+   call trace_entry("a_advance_uv")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -648,6 +657,8 @@ do j = j_start, j_end
   end do
 end do
 
+   call trace_exit("a_advance_uv")
+
 end subroutine a_advance_uv
 
 
@@ -770,6 +781,8 @@ real keep1_w(ims:ime,kms:kme,jms:jme)
 real keep2_w(ims:ime,kms:kme,jms:jme)
 real keep3_w(ims:ime,kms:kme,jms:jme)
 !mzz
+
+   call trace_entry("a_advance_w")
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -1159,6 +1172,8 @@ end do
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
 
+   call trace_exit("a_advance_w")
+
 end subroutine a_advance_w
 
 
@@ -1226,6 +1241,8 @@ integer j_end
 integer j_start
 integer k
 integer k1
+
+   call trace_entry("a_calc_coef_w")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1365,6 +1382,8 @@ do j = j_start, j_end
   end do
 end do
 
+   call trace_exit("a_calc_coef_w")
+
 end subroutine a_calc_coef_w
 
 
@@ -1439,6 +1458,8 @@ integer j_start
 integer k
 integer k_end
 integer k_start
+
+   call trace_entry("a_calc_p_rho")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1550,6 +1571,8 @@ else
   end do
 endif
 
+   call trace_exit("a_calc_p_rho")
+
 end subroutine a_calc_p_rho
 
 subroutine a_small_step_finish( u_2, a_u_2, v_2, a_v_2, w_2, a_w_2, t_2, a_t_2, a_ph_2, a_mu_2, mut, a_mut, muts, a_muts, muu, &
@@ -1641,6 +1664,8 @@ integer j_endv
 integer j_start
 integer k
 
+   call trace_entry("a_small_step_finish")
+
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -1721,6 +1746,8 @@ do j = j_start, j_endv
     end do
   end do
 end do
+
+   call trace_exit("a_small_step_finish")
 
 end subroutine a_small_step_finish
 
@@ -1828,6 +1855,8 @@ integer j_start
 integer k
 integer k_end
 integer k_start
+
+   call trace_entry("a_small_step_prep")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2138,6 +2167,8 @@ else
   end do
 endif
 
+   call trace_exit("a_small_step_prep")
+
 end subroutine a_small_step_prep
 
 
@@ -2198,6 +2229,8 @@ real, intent(in) :: v_lin(ims:ime,kms:kme,jms:jme)
 integer i
 integer j
 integer k
+
+   call trace_entry("a_sumflux")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2262,6 +2295,8 @@ if (iteration .eq. 1) then
     end do
   end do
 endif
+
+   call trace_exit("a_sumflux")
 
 end subroutine a_sumflux
 

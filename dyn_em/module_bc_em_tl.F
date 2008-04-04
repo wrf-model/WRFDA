@@ -36,12 +36,15 @@ use module_configure
 use module_wrf_error
 use module_bc_em
 
+USE module_trace, only : trace_entry, trace_exit
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
 implicit none
 
 contains
+
 subroutine g_relax_bdy_dry( config_flags, ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, ph_tendf, g_ph_tendf, t_tendf, g_t_tendf, &
 &rw_tendf, g_rw_tendf, mu_tend, g_mu_tend, ru, g_ru, rv, g_rv, ph, g_ph, t, g_t, w, g_w, mu, g_mu, mut, g_mut, u_b, g_u_b, v_b, &
 &g_v_b, ph_b, g_ph_b, t_b, g_t_b, w_b, g_w_b, mu_b, g_mu_b, u_bt, g_u_bt, v_bt, g_v_bt, ph_bt, g_ph_bt, t_bt, g_t_bt, w_bt, g_w_bt,&
@@ -152,6 +155,8 @@ integer j_start
 integer k
 real rfield(ims:ime,kms:kme,jms:jme)
 
+  call trace_entry("g_relax_bdy_dry")
+
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
@@ -201,6 +206,8 @@ if (config_flags%nested) then
   call g_relax_bdytend( rfield,g_rfield,rw_tendf,g_rw_tendf,w_b,g_w_b,w_bt,g_w_bt,'h',spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,&
 &gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 endif
+
+  call trace_exit("g_relax_bdy_dry")
 
 end subroutine g_relax_bdy_dry
 
@@ -270,6 +277,8 @@ real, intent(in) :: u_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(in) :: v_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(in) :: w_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 
+  call trace_entry("g_spec_bdy_dry")
+
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
@@ -287,6 +296,8 @@ if (config_flags%nested) then
   call g_spec_bdytend( rw_tend,g_rw_tend,w_bt,g_w_bt,'h',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
 &jme,kms,kme,its,ite,jts,jte,kts,kte )
 endif
+
+  call trace_exit("g_spec_bdy_dry")
 
 end subroutine g_spec_bdy_dry
 
@@ -334,11 +345,15 @@ real, intent(in) :: scalar_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(out) :: scalar_tend(ims:ime,kms:kme,jms:jme)
 integer, intent(in) :: spec_zone
 
+  call trace_entry("g_spec_bdy_scalar")
+
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
 call g_spec_bdytend( scalar_tend,g_scalar_tend,scalar_bt,g_scalar_bt,'q',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+  call trace_exit("g_spec_bdy_scalar")
 
 end subroutine g_spec_bdy_scalar
 
@@ -407,6 +422,8 @@ integer k
 integer ktf
 real mu_old(its:ite,jts:jte)
 character variable
+
+  call trace_entry("g_spec_bdyupdate_ph")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -509,6 +526,8 @@ if (ibe-itf .lt. spec_zone) then
     end do
   end do
 endif
+
+  call trace_exit("g_spec_bdyupdate_ph")
 
 end subroutine g_spec_bdyupdate_ph
 
