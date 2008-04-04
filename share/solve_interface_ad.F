@@ -9,7 +9,7 @@ SUBROUTINE solve_interface_ad ( grid )
    USE module_configure
    USE module_wrf_error
 
-   USE da_tracing, only : da_trace_entry, da_trace_exit
+   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
@@ -39,6 +39,8 @@ SUBROUTINE solve_interface_ad ( grid )
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
+   if(grid%trace_use) call trace_entry("solve_interface_ad")
+
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
    CALL set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
 
@@ -48,13 +50,11 @@ SUBROUTINE solve_interface_ad ( grid )
 
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_AD ) THEN
-     if(grid%trace_use) call da_trace_entry("solve_em_ad")
      CALL solve_em_ad ( grid , config_flags , &
  
 # include <em_actual_args.inc>
  
                )
-     if(grid%trace_use) call da_trace_exit("solve_em_ad")
 
 # ifdef WRF_CHEM
    IF ( config_flags%chem_opt == RADM2  ) THEN
@@ -107,6 +107,8 @@ SUBROUTINE solve_interface_ad ( grid )
      CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
      
    END IF
+
+   if(grid%trace_use) call trace_exit("solve_interface_ad")
 
 END SUBROUTINE solve_interface_ad
 

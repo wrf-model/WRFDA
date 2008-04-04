@@ -10,16 +10,12 @@ subroutine trace_exit( Name, &             ! in
    character (len=*), intent(in)           :: Name         ! subroutine name
    character (len=*), optional, intent(in) :: Message      ! text to trace
 
-   integer                         :: IOStatus        ! I-O return code 
-   integer                         :: n
-   integer                         :: Caller
-
-   real                            :: current_time, diff
+   real :: current_time, diff
 
    call trace_time(current_time)
 
-   write(unit=0, fmt='(3a,i4,a,f12.2)') &
-        'exit  ', trim(name), ' as id:', tracerID, ', at: ', current_time
+!  write(unit=0, fmt='(3a,i4,a,f12.2)') &
+!       'exit  ', trim(name), ' as id:', tracerID, ', at: ', current_time
 
    traceDepth=traceDepth-1
 

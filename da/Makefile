@@ -16,7 +16,7 @@ $(LIBTARGET) :  $(MODULES) $(OBJS)
 		$(RANLIB) ../main/libwrflib.a
 
 clean :
-		@ echo 'Use the clean script'
+	$(RM) $(MODULES) $(OBJS) *.mod
 
 module_trace.o : da_tracing/module_trace.f90
 	$(RM) $@

@@ -15,9 +15,6 @@ PROGRAM wrf
 !
 !</DESCRIPTION>
 
-   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
-      da_trace_report
-      
    IMPLICIT NONE
 
    TYPE(ESMF_GridComp) :: gcomp
@@ -28,8 +25,6 @@ PROGRAM wrf
 
    LOGICAL, EXTERNAL :: await_next
    INTEGER comm
-
-write(0,*)'********* ********* *********'
 
    ! This call includes everything that must be done before ESMF_Initialize() 
    ! is called.  
@@ -52,16 +47,9 @@ write(0,*)'********* ********* *********'
      call system("echo -n model_start ; date")
 #endif
 #endif
-     call da_trace_init
-     call da_trace_entry("wrf_init")
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
-     call da_trace_exit("wrf_init")
 
-     call da_trace_entry("wrf_run")
      CALL wrf_run( gcomp, importState, exportState, clock, rc )
-     call da_trace_exit("wrf_run")
-
-     call da_trace_report
 
      CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
 #ifdef DM_PARALLEL

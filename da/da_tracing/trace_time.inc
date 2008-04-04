@@ -29,14 +29,14 @@ subroutine trace_time(seconds)
 !--call date_and_time(TIME=time)
    call date_and_time(VALUES=values)
 !--print '(a,2x,a,2x,a)', date, time, zone
-   write(unit=0, fmt='(a,i4,5(a,i2.2),a,i3.3)') &
-        'Time: ', values(1), '_', values(2), '_', values(3), '_', values(5), &
-        ':', values(6), ':', values(7), ':', values(8)
+!  write(unit=0, fmt='(a,i4,5(a,i2.2),a,i3.3)') &
+!       'Time: ', values(1), '_', values(2), '_', values(3), '_', values(5), &
+!       ':', values(6), ':', values(7), ':', values(8)
 
-   seconds = real(60*(24*values(5) + values(6)) + values(7)) + 0.001*values(8)
+   seconds = real(60*(60*values(5) + values(6)) + values(7)) + 0.001*values(8)
 
-   write(unit=0, fmt='(a,f10.2)') &
-        'Time in seconds:', seconds
+!  write(unit=0, fmt='(a,f10.2)') &
+!       'Time in seconds:', seconds
 
 end subroutine trace_time
 

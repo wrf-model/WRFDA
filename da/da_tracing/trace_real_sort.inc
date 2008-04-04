@@ -7,8 +7,8 @@ subroutine trace_real_sort(key, n, index)
    implicit none
 
    integer, intent(in)  :: n      ! The number of items to be sorted. 
-   real,    intent(in)  :: key(:)
-   integer, intent(out) :: index(:)
+   real,    intent(in)  :: key(1:n)
+   integer, intent(out) :: index(1:n)
 
    integer :: head       ! heaps are tree structures: head and child refer
    integer :: child      ! to related items within the tree 
@@ -20,6 +20,22 @@ subroutine trace_real_sort(key, n, index)
       index(i)=i
    end do
 
+#if 0
+   do head = 1, n-1
+      do i = head+1, n
+         if(key(index(i)) > key(index(head))) then
+            dum=index(i)
+            index(i)=index(head)
+            index(head)=dum
+         endif
+      enddo
+   enddo
+
+!  do head = 1, n
+!     write(unit=0, fmt='(a,i4,a,f12.3)') &
+!          'key(', index(head), ')=', key(index(head))
+!  enddo
+#else
 !--Do heapsort: Create the heap...
    makeheap : do i=n/2,1,-1
       head=i
@@ -67,6 +83,7 @@ subroutine trace_real_sort(key, n, index)
          head=child
       end do sift2  
    end do retire
+#endif
 
 end subroutine trace_real_sort
 

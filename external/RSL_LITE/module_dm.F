@@ -903,6 +903,7 @@ SUBROUTINE wrf_dm_patch_domain ( id  , domdesc , parent_id , parent_domdesc , &
 END SUBROUTINE wrf_dm_patch_domain
 
 SUBROUTINE wrf_termio_dup ( comm )
+  use module_trace, only : trace_start
   IMPLICIT NONE
   INCLUDE 'mpif.h'
   INTEGER mytask, ntasks, ierr, comm
@@ -910,6 +911,7 @@ SUBROUTINE wrf_termio_dup ( comm )
   CALL mpi_comm_rank(comm, mytask, ierr )
   write(0,*)'starting wrf task ',mytask,' of ',ntasks
   CALL rsl_error_dup1( mytask )
+  call trace_start(mytask)
 END SUBROUTINE wrf_termio_dup
 
 SUBROUTINE wrf_get_myproc( myproc )

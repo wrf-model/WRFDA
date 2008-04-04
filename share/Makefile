@@ -199,6 +199,7 @@ module_wrf_esmf_super.o: ../frame/module_machine.o \
 			../frame/module_configure.o \
 			../frame/module_timing.o \
 			../frame/module_wrf_error.o \
+			../da/module_trace.o \
 			$(ESMF_MOD_DEPENDENCE)
 
 wrf_inputout.o                  : ../frame/module_domain.o \

@@ -15,7 +15,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE WRF_ESMF_MOD
    USE module_dfi
 
-   USE da_tracing, only : da_trace_entry, da_trace_exit
+   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
@@ -248,6 +248,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
    END INTERFACE
 
+   if(grid%trace_use) call trace_entry("integrate_ad")
+
    print *, 'ESMF_ClockIsStartTime(grid%domain_clock ,rc=rc)=', &
              ESMF_ClockIsStartTime(grid%domain_clock ,rc=rc)
 
@@ -310,14 +312,11 @@ call end_timing('med_auxinput3_in 1 ')
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-call start_timing
-            if(grid%trace_use) call da_trace_entry("med_auxinput3_in")
+            call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
-            if(grid%trace_use) call da_trace_exit("med_auxinput3_in")
-call end_timing('med_auxinput3_in 2 ')
-            if(grid%trace_use) call da_trace_entry("add_forcing_to_ad")
+            call end_timing('med_auxinput3_in 2 ')
+
             CALL add_forcing_to_ad(grid)
-            if(grid%trace_use) call da_trace_exit("add_forcing_to_ad")
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )
@@ -325,9 +324,7 @@ call end_timing('med_auxinput3_in 2 ')
 
 !--------end check adjoint input
 
-         if(grid%trace_use) call da_trace_entry("med_setup_step")
          CALL med_setup_step ( grid , config_flags )
-         if(grid%trace_use) call da_trace_exit("med_setup_step")
          a_nest_was_opened = .false.
          ! for each nest whose time has come...
 !        CALL med_var_solve_io ( grid , config_flags )
@@ -348,9 +345,7 @@ call end_timing('med_auxinput3_in 2 ')
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
             CALL wrf_debug( 100 , 'module_integrate_ad: calling solve interface ad' )
-            if(grid%trace_use) call da_trace_exit("solve_interface_ad")
             CALL solve_interface_ad ( grid_ptr ) 
-            if(grid%trace_use) call da_trace_exit("solve_interface_ad")
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate_ad():  before ESMF_ClockBack,' )
             CALL ESMF_ClockBack( grid_ptr%domain_clock, rc=rc )
@@ -417,14 +412,10 @@ call end_timing('med_auxinput3_in 2 ')
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-!           call start_timing
-            if(grid%trace_use) call da_trace_entry("med_auxinput3_in")
+            call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
-            if(grid%trace_use) call da_trace_exit("med_auxinput3_in")
-!           call end_timing('med_auxinput3_in 3 ')
-            if(grid%trace_use) call da_trace_entry("add_forcing_to_ad")
+            call end_timing('med_auxinput3_in 3 ')
             CALL add_forcing_to_ad(grid)
-            if(grid%trace_use) call da_trace_exit("add_forcing_to_ad")
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )
@@ -440,6 +431,8 @@ call end_timing('med_auxinput3_in 2 ')
         ENDIF
       ENDIF
    END IF
+
+   if(grid%trace_use) call trace_exit("integrate_ad")
 
 END SUBROUTINE integrate_ad
 

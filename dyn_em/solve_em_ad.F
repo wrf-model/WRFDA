@@ -86,6 +86,8 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
 
    USE module_4dvaropt
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Input data.
@@ -404,11 +406,11 @@ real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                        
 
 #include <bench_solve_em_a_init.h>
 
+   if(grid%trace_use) call trace_entry("solve_em_ad")
+
 CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
 CALL module_4dvaropt_start
 
-! xyh
-!    return
 call get_ijk_from_grid( grid,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe )
 
 BENCH_START(exch1)
@@ -5717,6 +5719,8 @@ end do a_runge_kutta_loop
 
 CALL module_4dvaropt_end
 CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
+
+if(grid%trace_use) call trace_exit("solve_em_ad")
 
 end subroutine solve_em_ad
 

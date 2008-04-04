@@ -38,8 +38,8 @@ subroutine trace_entry( Name, &       ! in
       subroutineNames(tracerID) = trim(name)
    endif
 
-   write(unit=0, fmt='(3a,i4,a,f12.2)') &
-        'enter ', trim(name), ' as id:', tracerID, ', at: ', current_time
+!  write(unit=0, fmt='(3a,i4,a,f12.2)') &
+!       'enter ', trim(name), ' as id:', tracerID, ', at: ', current_time
 
 !--stop previd timer
    call trace_diff_time(tracerStartTime(previd), current_time, diff)
@@ -53,6 +53,7 @@ subroutine trace_entry( Name, &       ! in
 
 !--Just start record the time
    tracerStartTime(tracerID) = current_time
+   tracerStartElapsedTime(tracerID) = current_time
 
 !--record the caller
    NewTraceRoutine = .true.

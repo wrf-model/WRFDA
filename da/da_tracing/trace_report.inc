@@ -14,26 +14,33 @@ subroutine trace_report
    real :: totalCPUTime
    real :: percentCPUTime            !--percentage in CPU time
    real :: percentElapsedTime        !--percentage in elapsed time
+   real :: avgfactor
 
    integer :: IOStatus             ! I/O return code
-   integer :: Loop1
    character (len=200) :: TraceFile
    character (len=200) :: csvname
    character (len=10)  :: temp
 
    call trace_time(current_time)
 
-   call trace_diff_time(traceBaseTime, current_time, TotalElapsedTime)
-   call trace_diff_time(traceBaseTime, current_time, TotalCPUTime)
+   call trace_diff_time(traceBaseTime, current_time, totalElapsedTime)
+
+   totalCPUTime = totalElapsedTime - traceUsedTime
+
+   if(totalElapsedTime < 0.001) then
+      totalElapsedTime = 0.001
+   endif
+
+   if(totalCPUTime < 0.001) then
+      totalCPUTime = 0.001
+   endif
 
 !==========================================================================
 !--Sort subroutines into time order based on local Elapsed Time.
 !--All PEs should have the same sort order after the sum.
 !==========================================================================
 
-   allocate (index(totalRoutine))
-
-   call trace_real_sort(tracerElapsedTime, totalRoutine, index)
+   allocate (index(1:totalRoutine))
 
 !-----------------------------------------------------------------
 !--Open trace output file. 
@@ -91,170 +98,99 @@ subroutine trace_report
 
 !--Output timing information
 
-   write(unit=trace_unit, fmt='(a)') &
-        "<a name=local><h2>Local Timing Summary</h2></a>"
-
-   write(unit=trace_unit, fmt='(a, f12.1, a)') &
-        "(Tracing itself took ", traceUsedTime, &
-        "s CPU Time. This is not included in the times below.)<p>"
-
-   write(unit=trace_unit, fmt='(a)') &
-        "<TABLE BORDER>", &
-        "<TR>", &
-        "<TH>Routine Name<TH>Calls<TH>Elapsed Time (seconds)<TH>percentElapsed<TH>CPU Time (seconds)<TH>percentCPU", &
-        "</TR>"
-
-   do i=totalRoutine,1,-1
-      current_tracer=index(i)    
-
-      if(totalCPUTime > 0.0) then
-         percentCPUTime=100.0 * tracerCPUTime(current_tracer)/totalCPUTime
+   do j=1, 2
+      if(j == 1) then
+         call trace_real_sort(tracerCPUTime(1:totalRoutine),totalRoutine,index)
+         write(unit=trace_unit, fmt='(a)') &
+              "<a name=elapsedtime><h2>Timing Summary, Sorted in CPU Time</h2></a>"
+      else if(j == 2) then
+         call trace_real_sort(tracerElapsedTime(1:totalRoutine), totalRoutine, index)
+         write(unit=trace_unit, fmt='(a)') &
+              "<a name=elapsedtime><h2>Timing Summary, Sorted in Elapsed Time</h2></a>"
       else
-         percentCPUTime=100.0
-      end if
+         exit
+      endif
 
-      if(totalElapsedTime > 0.0) then
-         percentElapsedTime=100.0*tracerElapsedTime(current_tracer)/totalElapsedTime
-      else
-         percentElapsedTime=100.0
-      end if
-
-!------------------------------------------------------------------------
-!-----Write out results. Note the abnormally long format line is needed as
-!-----the NAG compiler complains if a quoted line is split.
-!------------------------------------------------------------------------
+      write(unit=trace_unit, fmt='(a, f12.3, a)') &
+           "(Tracing itself took ", traceUsedTime, &
+           "s CPU Time. This is not included in the times below.)<p>"
 
       write(unit=trace_unit, fmt='(a)') &
-           "<TR>"
+           "<TABLE BORDER>", &
+           "<TR>", &
+           "   <TH>Routine Name</TH>", &
+           "   <TH>Calls</TH>", &
+           "   <TH>Total Elapsed Time (seconds)</TH>", &
+           "   <TH>percentElapsed</TH>", &
+           "   <TH>Average Elapsed Time (seconds)</TH>", &
+           "   <TH>Total CPU Time (seconds)</TH>", &
+           "   <TH>percentCPU</TH>", &
+           "   <TH>Average CPU Time (seconds)</TH>", &
+           "</TR>"
 
-      write(unit=trace_unit, fmt='(7a)') &
-           "<TD><a href=", &
-           trim(Documentation_url), &
-           "/", &
-           trim(subroutineNames(current_tracer)), & ! Subroutine name
-           ".html>", &
-           trim(subroutineNames(current_tracer)), & ! Subroutine name
-           "</a>"
+      do i=totalRoutine, 1, -1
+         current_tracer=index(i)    
 
-      write(unit=trace_unit, fmt='(a,i10,10(a,f12.2))') &
-            "<TD>", tracerBeingCalled(current_tracer), &
-            "<TD>", tracerElapsedTime(current_tracer), &
-            "<TD>", percentElapsedTime, &
-            "<TD>", tracerCPUTime(current_tracer), &
-            "<TD>", percentCPUTime
-
-      if(use_csv) then
-         write(unit=trace_csv_unit, fmt='(a,2x,a40,a,2x,i8,10(a,f12.2))') &
-              'local,', &
-              trim(subroutineNames(current_tracer)), &
-              ',', tracerBeingCalled(current_tracer), &
-              ",", tracerElapsedTime(current_tracer), &
-              ",", percentElapsedTime, &
-              ",", tracerCPUTime(current_tracer), &
-              ",", percentCPUTime
-      endif
-   enddo
-
-   write(unit=trace_unit, fmt='(a,i6,a,f12.1,a,f12.1,a)') &
-      "<TR><TD><B>Total</B></TD><TD>",totalRoutine, "</TD><TD><B>", &
-      totalElapsedTime, &
-      "</B></TD><TD></TD><TD><B>", &
-      TotalCPUTime, &
-      "</B></TD><TD></TD>"
-
-   write(unit=trace_unit, fmt='(a)') &
-        "</TABLE><p><p>"
-
-   if(use_csv) then
-      write(unit=trace_csv_unit, fmt='(a)') " "
-   end if
-
-!--===================================================================================
-!-- Sort subroutines into time order based on overall Elapsed Time.
-!-- All PEs should have the same sort order after the sum. 
-!--===================================================================================
-
-   call trace_real_sort(tracerCPUTime,totalRoutine,index)
-
-!-- Output timing information
-
-   write(unit=trace_unit, &
-      fmt='("</pre><hr><a name=overall><h2>Timing Summary</h2></a>")')
-
-   write(unit=trace_unit, fmt='(a, f12.1, a)') &
-        "(Tracing itself took ", traceUsedTime, &
-        "s CPU Time. This is not included in the times below.)<p>"
-
-   write(unit=trace_unit, fmt='(a)') &
-        "<TABLE BORDER>", &
-        "<TR>", &
-        "<TH>Routine Name<TH>Calls<TH>Elapsed Time (seconds)<TH>percentElapsed<TH>CPU Time (seconds)<TH>percentCPU", &
-        "</TR>"
-
-   do i=totalRoutine,1,-1
-      current_tracer=index(i)    
-
-      if(totalCPUTime > 0.0) then
          percentCPUTime=100.0 * tracerCPUTime(current_tracer)/totalCPUTime
-      else
-         percentCPUTime=100.0
-      end if
-
-      if(totalElapsedTime > 0.0) then
          percentElapsedTime=100.0*tracerElapsedTime(current_tracer)/totalElapsedTime
-      else
-         percentElapsedTime=100.0
-      end if
 
 !------------------------------------------------------------------------
-!-----Write out results. Note the abnormally long format line is needed as
-!-----the NAG compiler complains if a quoted line is split.
+!--------Write out results. Note the abnormally long format line is needed as
+!--------the NAG compiler complains if a quoted line is split.
 !------------------------------------------------------------------------
+
+         write(unit=trace_unit, fmt='(a)') &
+              "<TR>"
+
+         write(unit=trace_unit, fmt='(7a)') &
+              "<TD><a href=", &
+              trim(Documentation_url), &
+              "/", &
+              trim(subroutineNames(current_tracer)), & ! Subroutine name
+              ".html>", &
+              trim(subroutineNames(current_tracer)), & ! Subroutine name
+              "</a>"
+
+         avgfactor = 1.0/real(tracerBeingCalled(current_tracer))
+
+         write(unit=trace_unit, fmt='(3x,a,i10,a)') &
+               "<TD>", tracerBeingCalled(current_tracer), "</TD>"
+         write(unit=trace_unit, fmt='(3x,a,f12.3,a)') &
+               "<TD>", tracerElapsedTime(current_tracer), "</TD>", &
+               "<TD>", percentElapsedTime, "</TD>", &
+               "<TD>", tracerElapsedTime(current_tracer)*avgfactor, "</TD>", &
+               "<TD>", tracerCPUTime(current_tracer), "</TD>", &
+               "<TD>", percentCPUTime, "</TD>", &
+               "<TD>", tracerCPUTime(current_tracer)*avgfactor, "</TD>"
+
+         if(use_csv) then
+            write(unit=trace_csv_unit, fmt='(a,2x,a40,a,2x,i8,10(a,f12.3))') &
+                 'local,', &
+                 trim(subroutineNames(current_tracer)), &
+                 ',', tracerBeingCalled(current_tracer), &
+                 ",", tracerElapsedTime(current_tracer), &
+                 ",", percentElapsedTime, &
+                 ",", tracerElapsedTime(current_tracer)*avgfactor, &
+                 ",", tracerCPUTime(current_tracer), &
+                 ",", tracerCPUTime(current_tracer)*avgfactor, &
+                 ",", percentCPUTime
+         endif
+      enddo
+
+      write(unit=trace_unit, fmt='(a,i6,a,f12.3,a,f12.3,a)') &
+         "<TR><TD><B>Total</B></TD><TD>",totalRoutine, "</TD><TD><B>", &
+         totalElapsedTime, &
+         "</B></TD><TD></TD><TD></TD><TD><B>", &
+         TotalCPUTime, &
+         "</B></TD><TD></TD><TD></TD>"
 
       write(unit=trace_unit, fmt='(a)') &
-           "<TR>"
-
-      write(unit=trace_unit, fmt='(7a)') &
-           "<TD><a href=", &
-           trim(Documentation_url), &
-           "/", &
-           trim(subroutineNames(current_tracer)), & ! Subroutine name
-           ".html>", &
-           trim(subroutineNames(current_tracer)), & ! Subroutine name
-           "</a>"
-
-      write(unit=trace_unit, fmt='(a,i10,10(a,f12.2))') &
-            "<TD>", tracerBeingCalled(current_tracer), &
-            "<TD>", tracerElapsedTime(current_tracer), &
-            "<TD>", percentElapsedTime, &
-            "<TD>", tracerCPUTime(current_tracer), &
-            "<TD>", percentCPUTime
+           "</TABLE><p><p>"
 
       if(use_csv) then
-         write(unit=trace_csv_unit, fmt='(a,2x,a40,a,2x,i8,10(a,f12.2))') &
-              'local,', &
-              trim(subroutineNames(current_tracer)), &
-              ',', tracerBeingCalled(current_tracer), &
-              ",", tracerElapsedTime(current_tracer), &
-              ",", percentElapsedTime, &
-              ",", tracerCPUTime(current_tracer), &
-              ",", percentCPUTime
-      endif
+         write(unit=trace_csv_unit, fmt='(a)') " "
+      end if
    enddo
-
-   write(unit=trace_unit, fmt='(a,i6,a,f12.1,a,f12.1,a)') &
-      "<TR><TD><B>Total</B></TD><TD>",totalRoutine, "</TD><TD><B>", &
-      totalElapsedTime, &
-      "</B></TD><TD></TD><TD><B>", &
-      TotalCPUTime, &
-      "</B></TD><TD></TD>"
-
-   write(unit=trace_unit, fmt='(a)') &
-        "</TABLE><p><p>"
-
-   if(use_csv) then
-      write(unit=trace_csv_unit, fmt='(a)') " "
-   endif
 
    if(trace_unit /= 0) then
       close(trace_unit)

@@ -7,9 +7,9 @@ subroutine trace_diff_time(sec1, sec2, diff)
          
    diff = sec2 - sec1
 
-   if(diff < 86400.0) then
-      diff = 86400.0 - diff
-   endif
+   do while (diff < 0.0)
+      diff = diff + 86400.0
+   enddo
 
 end subroutine trace_diff_time
 
