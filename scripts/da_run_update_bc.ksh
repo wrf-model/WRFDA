@@ -26,14 +26,8 @@ if $NL_VAR4D ; then
    if $CYCLING; then
       if [[ $CYCLE_NUMBER -gt 0 ]]; then
          if $PHASE; then
-            export YEAR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ccyy 2>/dev/null)
-            export MONTH=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f mm 2>/dev/null)
-            export DAY=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f dd 2>/dev/null)
-            export HOUR=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f hh 2>/dev/null)
-            export MINUTE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f nn 2>/dev/null)
-            export SECOND=$($BUILD_DIR/da_advance_time.exe $DATE 00 -f ss 2>/dev/null)
+            export ANALYSIS_DATE=$($BUILD_DIR/da_advance_time.exe $DATE 00 -wrf 2>/dev/null)
             export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -${CYCLE_PERIOD}s -f ccyymmddhhnnss 2>/dev/null)
-            export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:${MINUTE}:${SECOND}
             export DA_ANALYSIS=${FC_DIR}/${PREV_DATE}/wrfinput_d01_${ANALYSIS_DATE}
          else
             export DA_ANALYSIS=${DA_ANALYSIS:-$FC_DIR/$DATE/analysis}  # Input analysis.
