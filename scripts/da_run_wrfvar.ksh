@@ -789,7 +789,9 @@ else
    rm -f rand_obs_error.*
    rm -f gts_omb_oma.*
    rm -f qcstat_*.*
-   rm filtered_obs.*
+   if [[ -f filtered_obs ]]; then
+      rm filtered_obs.*
+   fi
    # No routine to merge these files across processors yet
    # rm -f inv_*.*
    # rm -f oma_*.*
