@@ -48,12 +48,9 @@ if $DUMMY; then
    echo "Dummy wps"
    LOCAL_DATE=$DATE
    while [[ $LOCAL_DATE -le $END_DATE ]]; do
-      export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
-      export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
-      export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
-      export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
+      export L_WRF_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} 0s -wrf 2>/dev/null)
       for DOMAIN in $DOMAINS; do
-         echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
+         echo Dummy wps > met_em.d${DOMAIN}.${L_WRF_DATE}.nc
       done
       LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
    done
@@ -83,7 +80,7 @@ else
    FILES=''
    while [[ $LOCAL_DATE -le $END_DATE ]]; do
       FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
+      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ}s 3>/dev/null)
    done
    $WPS_DIR/link_grib.csh $FILES
 
