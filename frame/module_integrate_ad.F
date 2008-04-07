@@ -391,7 +391,6 @@ call end_timing('med_auxinput3_in 2 ')
            CALL end_timing ( TRIM(message) )
 !         END IF
       END DO
-      CALL jcdfi_finalize
       ! Avoid double writes on nests if this is not really the last time;
       ! Do check for write if the parent domain is ending.
       IF ( grid%id .EQ. 1 ) THEN               ! head_grid
@@ -418,6 +417,7 @@ call end_timing('med_auxinput3_in 3 ')
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )
+         CALL jcdfi_finalize
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
