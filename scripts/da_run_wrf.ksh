@@ -17,7 +17,7 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 
 export NL_RUN_HOURS=$(( FCST_RANGE/3600 ))
-export NL_RUN_MINUTES=$(( (FCST_RANGE-FCST_RANGE*3600)/60 ))
+export NL_RUN_MINUTES=$(( (FCST_RANGE-NL_RUN_HOURS*3600)/60 ))
 export NL_RUN_SECONDS=$(( FCST_RANGE-NL_RUN_HOURS*3600-NL_RUN_MINUTES*60 ))
 
 # allow for ensemble members identified by CMEM
