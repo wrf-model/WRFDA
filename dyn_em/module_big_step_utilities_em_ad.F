@@ -6049,7 +6049,6 @@ real zv
 real zwt
 
 REAL, PARAMETER :: epsilon = 1.e-10
-    write(6,*)'ADJ',epsilon !zzma
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------

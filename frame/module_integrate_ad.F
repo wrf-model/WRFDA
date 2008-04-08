@@ -295,10 +295,10 @@ call end_timing('med_auxinput3_in 1 ')
 
 !-----start check non-linear input
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index+1)(1:19)) nl_date_index = nl_date_index + 1
-         write(unit=*, fmt='(2a)') &
-              'xyh AD state at ', currTime_str(1:19)
-         write(unit=*, fmt='(2a)') &
-              'xyh NL state from ', nl_date_string(nl_date_index+1)
+!        write(unit=*, fmt='(2a)') &
+!             'xyh AD state at ', currTime_str(1:19)
+!        write(unit=*, fmt='(2a)') &
+!             'xyh NL state from ', nl_date_string(nl_date_index+1)
 call start_timing
          CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
 call end_timing('med_auxinput2_in4ad')
@@ -307,10 +307,10 @@ call end_timing('med_auxinput2_in4ad')
 !--------start check adjoint input
 
          if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
-            print *, 'ad_date_index =', ad_date_index
-            write(unit=*, fmt='(2a)') &
-                 'currTime_str(1:19)=', currTime_str(1:19), &
-                 'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
+!           print *, 'ad_date_index =', ad_date_index
+!           write(unit=*, fmt='(2a)') &
+!                'currTime_str(1:19)=', currTime_str(1:19), &
+!                'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
 call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
@@ -405,10 +405,10 @@ call end_timing('med_auxinput3_in 2 ')
 
 !--------start check adjoint input
          if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
-            print *, 'ad_date_index =', ad_date_index
-            write(unit=*, fmt='(2a)') &
-                 'currTime_str(1:19)=', currTime_str(1:19), &
-                 'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
+!           print *, 'ad_date_index =', ad_date_index
+!           write(unit=*, fmt='(2a)') &
+!                'currTime_str(1:19)=', currTime_str(1:19), &
+!                'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
 call start_timing
             CALL med_auxinput3_in ( grid , config_flags )

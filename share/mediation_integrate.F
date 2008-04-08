@@ -1151,8 +1151,8 @@ SUBROUTINE med_auxinput2_in4ad ( grid , config_flags , nl_timestr )
    TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
    character(len=*),             INTENT(IN)   :: nl_timestr
 
-   write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
-   print *, 'nl_timestr=', nl_timestr
+!  write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+!  print *, 'nl_timestr=', nl_timestr
    CALL med_auxinput4ad( grid , 2 , config_flags , nl_timestr )
    RETURN
 END SUBROUTINE med_auxinput2_in4ad
@@ -1533,13 +1533,13 @@ SUBROUTINE med_auxinput4ad ( grid , stream, config_flags, nl_timestr )
      timestr = trim( nl_timestr )
      ierr = 0
 
-     write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
-     print *, 'nl_timestr=', nl_timestr
+!    write(unit=*, fmt='(3a,i6)') 'file:', __FILE__, ', line:', __LINE__
+!    print *, 'nl_timestr=', nl_timestr
 
      CALL construct_filename2a ( auxname , config_flags%auxinput2_inname , grid%id , 2 , timestr )
      WRITE(n2,'("DATASET=AUXINPUT",I1)')stream
 
-     print *, 'auxname=', auxname
+!    print *, 'auxname=', auxname
 
      WRITE ( message , '("med_auxinput_in : opening ",A," for reading. ",I3)') TRIM ( auxname ), ierr
      CALL wrf_debug( 1, message )

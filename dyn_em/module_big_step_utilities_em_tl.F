@@ -4271,7 +4271,6 @@ real zv
 real zwt
 
 REAL, PARAMETER :: epsilon = 1.e-10
-    write(6,*)'TDL',epsilon !zzma
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
