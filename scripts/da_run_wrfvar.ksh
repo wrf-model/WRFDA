@@ -682,16 +682,16 @@ else
          fi
 
          if [[ $SUBMIT == "none" ]]; then
-            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe : -np $NUM_PROCS_WRFPLUS ./ad/wrfplus.exe : -np $NUM_PROCS_WRF ./nl/wrf.exe
+            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe : -np $NUM_PROCS_WRFPLUS ./ad/wrfplus.exe : -np $NUM_PROCS_WRF ./nl/wrf.exe </dev/null
          fi
 
       else
-         $RUN_CMD ./da_wrfvar.exe
+         $RUN_CMD ./da_wrfvar.exe </dev/null
          RC=$?
       fi
    else
       # 3DVAR
-      $RUN_CMD ./da_wrfvar.exe
+      $RUN_CMD ./da_wrfvar.exe </dev/null
       RC=$?
    fi
 

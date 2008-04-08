@@ -436,7 +436,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          mkdir -p $RUN_DIR
 
          export WRF_INPUT_DIR=$RC_DIR/$DATE
-         if $RUN_UPDATE_BC && $CYCLING; then
+         if $RUN_UPDATE_BC ; then
             export WRF_INPUT_DIR=$FC_DIR/$DATE
          fi
 

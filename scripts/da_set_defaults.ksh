@@ -184,7 +184,7 @@ export NL_DEBUG_LEVEL=${NL_DEBUG_LEVEL:-0}
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-43200}          # (minutes)
+export NL_HISTORY_INTERVAL_S=${NL_HISTORY_INTERVAL_S:-21600}          # (minutes)
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
                                       " 0.922, 0.894, 0.860, 0.817, 0.766, "\
@@ -213,7 +213,7 @@ export NL_SPECIFIED=${NL_SPECIFIED:-true}          #
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-true}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrfinput_d<domain>_<date>'}
-export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-10800}
+export NL_INPUTOUT_INTERVAL_S=${NL_INPUTOUT_INTERVAL_S:-10800}
 export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$(( CYCLE_PERIOD/3600 ))} # Output input format start.
 export NL_INPUTOUT_BEGIN_M=${NL_INPUTOUT_BEGIN_M:-$(( (CYCLE_PERIOD-NL_INPUTOUT_BEGIN_H*3600)/60 ))} # Output input format start.
 export NL_INPUTOUT_BEGIN_S=${NL_INPUTOUT_BEGIN_S:-$(( CYCLE_PERIOD-NL_INPUTOUT_BEGIN_H*3600-NL_INPUTOUT_BEGIN_M*60 ))} # Output input format start.

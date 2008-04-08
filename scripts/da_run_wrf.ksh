@@ -108,7 +108,7 @@ else
    if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then
       touch wrfnl_go_ahead
    fi
-   $RUN_CMD ./wrf.exe
+   $RUN_CMD ./wrf.exe </dev/null
    if [[ -f rsl.out.0000 ]]; then
       grep -q 'SUCCESS COMPLETE WRF' rsl.out.0000 
       RC=$?
