@@ -5262,7 +5262,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 ###########################################################
 #ARCH    PC Linux x86_64 (IA64 and Opteron), PGI compiler 5.2 or higher  (Single-threaded, no nesting)
-#        Note that for 5.1.x comment out -Mpia=fast
+#        Note that PGHPF_ZMEM must be set to yes
 #
 FC              =       pgf90
 LD              =       pgf90
@@ -5272,10 +5272,9 @@ SFC             =       $(FC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =
-FCOPTIM		=	-fastsse #-Mipa=fast
+FCOPTIM		=	-fastsse -Mvect=noaltcode -mcmodel=medium -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed
 FCDEBUG		=	#-g
-#FCBASEOPTS      =       -w -byteswapio -Ktrap=fp -Mfree $(FCDEBUG)
-FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
+FCBASEOPTS      =       -w -byteswapio -Mfree -mcmodel=medium $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          CONFIGURE_NETCDF_FLAG \
@@ -5489,7 +5488,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 
 ###########################################################
 #ARCH    PC Linux x86_64 (IA64 and Opteron), PGI 5.2 or higher DM-Parallel   (RSL_LITE, MPICH, No nesting, No periodic LBCs)
-#        Note that for 5.1.x comment out -Mpia=fast
+#        Note that PGHPF_ZMEM must be set to yes
 #
 DMPARALLEL      =       1
 MAX_PROC        =       1024
@@ -5502,9 +5501,9 @@ RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
-FCOPTIM         =       -fastsse -Mflushz -Mvect=noaltcode -Mcache_align -Mdaz
+FCOPTIM         =       -fastsse -Mvect=noaltcode -mcmodel=medium -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed
 FCDEBUG		=	#-g
-FCBASEOPTS      =       -w -byteswapio -Mfree -fastsse -Mcache_align -Mflushz -Mvect=noaltcode -Mdaz $(FCDEBUG)
+FCBASEOPTS      =       -w -byteswapio -Mfree -mcmodel=medium $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
