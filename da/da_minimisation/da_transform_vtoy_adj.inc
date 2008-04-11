@@ -93,7 +93,10 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
             call da_system("touch wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
             do while (.true.)
-               open(wrf_done_unit,file="wrf_done",status="old",err=303)
+               open(wrf_done_unit,file="wrf_done",status="old",err=304)
+               close(wrf_done_unit)
+               exit
+304            open(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
                close(wrf_done_unit)
                exit
 303            continue

@@ -19,7 +19,7 @@ echo "<H1>$EXPT restore_data_grib</H1><PRE>"
 
 date
 
-export END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE 2>/dev/null)
+export END_DATE=$($BUILD_DIR/da_advance_time.exe $DATE ${FCST_RANGE}s 2>/dev/null)
 
 echo "DATE         $DATE"
 echo "END_DATE     $END_DATE"

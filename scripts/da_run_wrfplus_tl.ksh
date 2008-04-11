@@ -22,8 +22,16 @@ else
       mv -f ../namelist.input ../namelist_wrfvar.input
       cp -f namelist.input ../.
       ln -fs $WORK_DIR/tl01 $WORK_DIR/wrfinput_d01
+      if [[ $SUBMIT == "none" ]]; then
+         rm -f wrf_done
+         touch wrf_go_ahead
+         mpirun -np $NUM_PROCS_WRFPLUS ./wrfplus.exe </dev/null &
+      fi
    fi
    if [[ $arg1 == "post" ]]; then
+      if [[ $SUBMIT == "none" ]]; then
+         touch wrf_stop_now
+      fi
       mv ../namelist.output .
       mv -f ../namelist_wrfvar.input ../namelist.input
       ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d01
