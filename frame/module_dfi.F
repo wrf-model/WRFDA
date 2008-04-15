@@ -564,7 +564,7 @@ END SUBROUTINE jcdfi_tl
       implicit none
 
       integer, intent(in)                  ::  m
-      real, dimension(0:m),intent(out)     ::  window
+      real, dimension(0:2*m),intent(out)     ::  window
       integer, intent(in)                  :: mype
       real, intent(in)                     :: deltat, taus
 

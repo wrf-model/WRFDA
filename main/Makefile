@@ -28,7 +28,7 @@ $(SOLVER) : $(SOLVER).o
 	$(RANLIB) libwrflib.a
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
 
-$(SOLVER)_wrf : wrf.o nup_standalone.exe
+$(SOLVER)_wrf : wrf.o nup_standalone.exe nupdown.exe
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
 
@@ -62,6 +62,11 @@ nup_standalone.exe :
 	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) module_nup_feedback.F
 	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F
 	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
+
+nupdown.exe: 
+	$(RM) $@
+	$(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.F
+	$(LD) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
