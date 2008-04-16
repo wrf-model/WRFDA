@@ -55,7 +55,7 @@
       integer ncid, status
       integer ishape(jdim)
       integer ishape2(jdim)
-      character cval*50
+      character cval*100
       character name*31
       character (len=31),allocatable, dimension(:)      :: dname
       integer,           allocatable, dimension(:)       :: dval, dval2
@@ -205,6 +205,7 @@
 	if ( itype .eq. 2 ) then        ! characters
 	  status = nf_get_att_text (ncid, nf_global, name, cval)
           IF (debug) THEN
+            write(6,*) i,name,ilen,cval(1:ilen)
 	    write(6,'(" i = ",i2," : ",A," in = ",A," (out = ",$)') &
                   i,name,cval(1:ilen)
           ENDIF
@@ -402,12 +403,13 @@
           IF ( option == '-thin' ) THEN    
             if (idm .ge. 3) then
               IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio)
-              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &
-                   trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then
+              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or. trim(cval) == 'MAPFAC_UX' .or.  &
+                   trim(cval) == 'MAPFAC_UY' .or. trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then
                    IF (debug) write(6,*) '   Attention'
                    data2 = data(1:dims_in(1):3,2:dims_in(2):3,:,:)
-              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &
-                   trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then
+              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or. trim(cval) == 'MAPFAC_VX' .or. &
+                   trim(cval) == 'MAPFAC_VY' .or. trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' .or. &
+                   trim(cval) == 'MF_VX_INV' ) then
                    IF (debug) write(6,*) '   Attention'
                    data2 = data(2:dims_in(1):3,1:dims_in(2):3,:,:)
               else
