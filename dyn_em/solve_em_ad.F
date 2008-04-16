@@ -1891,49 +1891,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
-    if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
-!-----Save for relax_bdy_dry
-      if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mu_2,mut,mu_tend, "mu_2,mut,mu_tend")
-      call pop2restore(ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save, &
-                      "ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save")
-      if(grid%trace_use) call trace_exit("restore")
-
-!-----From: module_bc_em_ad.F
-      call a_relax_bdy_dry( config_flags,a_u_save,a_v_save,a_ph_save,a_t_save,a_w_save, &
-                            a_mu_tend,a_ru,a_rv,ph_2,a_ph_2,t_2,a_t_2, &
-                            w_2,a_w_2,a_mu_2,mut,a_mut,a_u_b,a_v_b,a_ph_b,a_t_b,a_w_b, &
-                            a_mu_b,a_u_bt,a_v_bt,a_ph_bt,a_t_bt,a_w_bt,a_mu_bt,spec_bdy_width, &
-                            spec_zone,relax_zone,dtbc,fcx,gcx, &
-                            ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
-                            its,ite,jts,jte,k_start,k_end )
-
-!-----Output: a_u_save,a_v_save,a_ph_save,a_t_save,a_w_save, &
-!             a_mu_tend,a_ru,a_rv,a_ph_2,a_t_2,a_w_2,a_mu_2,a_mut
-
-#ifdef DM_PARALLEL
-      if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
-#include "HALO_A_RELAX_BDY_DRY.inc"
-      if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
-#endif
-    endif
-
-!---------------------------------------------------------------------------------------------
-!Zhang Xiaoyan add the AD of surface_drag on 12/05/2006
-!---------------------------------------------------------------------------------------------
-  IF (rk_step == 1 ) then
-    call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, &
-                        u_2, a_u_2, v_2, a_v_2, xland, &
-                        muu, a_muu, muv, a_muv, z, &
-                        a_z, z_at_w, a_z_at_w, &
-                        ids, ide, jds, jde, kds, kde, &
-                        ims, ime, jms, jme, kms, kme, &
-                        grid%i_start(ij), grid%i_end(ij), &
-                        grid%j_start(ij), grid%j_end(ij), &
-                        k_start, k_end )
-  endif
-!---------------------------------------------------------------------------------------------
-
 !---Restore for rk_tendency
     if(grid%trace_use) call trace_entry("restore")
     call pop2restore(mu_2,mut,muu,muv, "mu_2,mut,muu,muv")
@@ -2123,6 +2080,47 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 #endif
 
 end do a_runge_kutta_loop
+
+!---------------------------------------------------------------------------------------------
+!Zhang Xiaoyan add the AD of surface_drag on 12/05/2006
+!---------------------------------------------------------------------------------------------
+    call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, &
+                        u_2, a_u_2, v_2, a_v_2, xland, &
+                        muu, a_muu, muv, a_muv, z, &
+                        a_z, z_at_w, a_z_at_w, &
+                        ids, ide, jds, jde, kds, kde, &
+                        ims, ime, jms, jme, kms, kme, &
+                        grid%i_start(ij), grid%i_end(ij), &
+                        grid%j_start(ij), grid%j_end(ij), &
+                        k_start, k_end )
+!---------------------------------------------------------------------------------------------
+
+    if(config_flags%specified .or. config_flags%nested) then
+!-----Restore for a_relax_bdy_dry
+      if(grid%trace_use) call trace_entry("restore")
+      call pop2restore(mu_2,mut,mu_tend, "mu_2,mut,mu_tend")
+      call pop2restore(ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save, &
+                      "ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save")
+      if(grid%trace_use) call trace_exit("restore")
+
+!-----From: module_bc_em_ad.F
+      call a_relax_bdy_dry( config_flags,a_u_save,a_v_save,a_ph_save,a_t_save,a_w_save, &
+                            a_mu_tend,a_ru,a_rv,ph_2,a_ph_2,t_2,a_t_2, &
+                            w_2,a_w_2,a_mu_2,mut,a_mut,a_u_b,a_v_b,a_ph_b,a_t_b,a_w_b, &
+                            a_mu_b,a_u_bt,a_v_bt,a_ph_bt,a_t_bt,a_w_bt,a_mu_bt,spec_bdy_width, &
+                            spec_zone,relax_zone,dtbc,fcx,gcx, &
+                            ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                            its,ite,jts,jte,k_start,k_end )
+
+!-----Output: a_u_save,a_v_save,a_ph_save,a_t_save,a_w_save, &
+!             a_mu_tend,a_ru,a_rv,a_ph_2,a_t_2,a_w_2,a_mu_2,a_mut
+
+#ifdef DM_PARALLEL
+      if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
+#include "HALO_A_RELAX_BDY_DRY.inc"
+      if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
+#endif
+    endif
 
 !---if(grid%trace_use) call trace_exit("solve_ad_a_runge_kutta_loop")
 

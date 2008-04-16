@@ -296,6 +296,7 @@ solve_em.o:     module_small_step_em.o \
 		../frame/module_state_description.o \
 		../frame/module_machine.o \
 		../frame/module_tiles.o \
+		../frame/module_trace.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
@@ -321,6 +322,7 @@ solve_em_tl.o:  module_small_step_em.o \
 		../frame/module_state_description.o \
 		../frame/module_machine.o \
 		../frame/module_tiles.o \
+		../frame/module_trace.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
@@ -349,6 +351,7 @@ solve_em_ad.o:  module_small_step_em.o \
 		../frame/module_state_description.o \
 		../frame/module_machine.o \
 		../frame/module_tiles.o \
+		../frame/module_trace.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
@@ -375,6 +378,7 @@ solve_em_tst.o: solve_em_ad.o \
 		../frame/module_state_description.o \
 		../frame/module_machine.o \
 		../frame/module_tiles.o \
+		../frame/module_trace.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
@@ -401,6 +405,7 @@ test_solve_em.o: solve_em_ad.o \
 		../frame/module_state_description.o \
 		../frame/module_machine.o \
 		../frame/module_tiles.o \
+		../frame/module_trace.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
 		../share/module_bc.o \
