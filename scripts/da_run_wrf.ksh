@@ -102,7 +102,7 @@ if $DUMMY; then
          echo Dummy wrf > wrfout_d${DOMAIN}_${L_WRF_DATE}
          echo Dummy wrf > wrfinput_d${DOMAIN}_${L_WRF_DATE}
       done
-      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL 2>/dev/null)
+      LOCAL_DATE=$($BUILD_DIR/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL_S 2>/dev/null)
    done
 else
    if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then

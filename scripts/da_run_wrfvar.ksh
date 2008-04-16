@@ -330,6 +330,8 @@ if $NL_VAR4D; then
 
    # nl
    # Inputs
+   export NL_HISTORY_INTERVAL_S_SAVE=$NL_HISTORY_INTERVAL_S
+   export NL_HISTORY_INTERVAL_S=99999
    export NL_RUN_HOURS_SAVE=$NL_RUN_HOURS
    export NL_RUN_MINUTES_SAVE=$NL_RUN_MINUTES
    export NL_RUN_SECONDS_SAVE=$NL_RUN_SECONDS
@@ -393,11 +395,11 @@ if $NL_VAR4D; then
    typeset -i I=2
    while [[ $I -le $NL_NUM_FGAT_TIME ]]; do
       TAG=$(printf "%2.2d" $I)
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         ln -fs nl/nl_d01_${D_WRF_DATE[$I]}-thin fg${TAG}
-      else
+#     if [[ $NL_MULTI_INC == 2 ]]; then
+#        ln -fs nl/nl_d01_${D_WRF_DATE[$I]}-thin fg${TAG}
+#     else
          ln -fs nl/nl_d01_${D_WRF_DATE[$I]} fg${TAG}
-      fi
+#     fi
       let I=I+1
    done
 
@@ -408,18 +410,18 @@ if $NL_VAR4D; then
    export NL_DYN_OPT=202
    export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
    export NL_AUXINPUT2_INNAME_SAVE=$NL_AUXINPUT2_INNAME
-   if [[ $NL_MULTI_INC == 2 ]] ; then
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
-   else
+#  if [[ $NL_MULTI_INC == 2 ]] ; then
+#     export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
+#  else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-   fi
+#  fi
    if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
       export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
-      else
+#     if [[ $NL_MULTI_INC == 2 ]]; then
+#        export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
+#     else
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
-      fi
+#     fi
    fi
    export NL_AUXINPUT2_INTERVAL_S_SAVE=$NL_AUXINPUT2_INTERVAL_S
    export NL_AUXINPUT2_BEGIN_S_SAVE=$NL_AUXINPUT2_BEGIN_S
@@ -484,18 +486,18 @@ if $NL_VAR4D; then
    # Inputs
    export NL_DYN_OPT=302
    export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
-   if [[ $NL_MULTI_INC == 2 ]]; then
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
-   else
+#  if [[ $NL_MULTI_INC == 2 ]]; then
+#     export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
+#  else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-   fi
+#  fi
    if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
       export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
-      else
+#     if [[ $NL_MULTI_INC == 2 ]]; then
+#        export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
+#     else
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
-      fi
+#     fi
    fi
    export NL_AUXINPUT3_INNAME_SAVE=$NL_AUXINPUT3_INNAME
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
@@ -527,6 +529,7 @@ if $NL_VAR4D; then
    ln -fs ad/ad_d01_${YEAR}-${MONTH}-${DAY}_${HOUR}:${MINUTE}:${SECOND} gr01
 
    # Restore values
+   export NL_HISTORY_INTERVAL_S=$NL_HISTORY_INTERVAL_S_SAVE
    export NL_RUN_HOURS=$NL_RUN_HOURS_SAVE
    export NL_RUN_MINUTES=$NL_RUN_MINUTES_SAVE
    export NL_RUN_SECONDS=$NL_RUN_SECONDS_SAVE
@@ -590,15 +593,15 @@ if [[ $NL_MULTI_INC == 2 ]] ; then
 
    mv -f $RUN_DIR/gts_omb.*  .
 
-   if $NL_VAR4D; then
-      mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
-      mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
-   fi
+#  if $NL_VAR4D; then
+#     mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
+#     mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
+#  fi
 
-   mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
-   ln -fs wrfinput_d01-thin wrfinput_d01
-   ln -fs wrfinput_d01-thin fg01
-   ln -fs wrfinput_d01-thin fg
+#  mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
+#  ln -fs wrfinput_d01-thin wrfinput_d01
+#  ln -fs wrfinput_d01-thin fg01
+#  ln -fs wrfinput_d01-thin fg
 
 fi
 
@@ -708,19 +711,19 @@ else
 
       mv -f gts_omb.*  $RUN_DIR
 
-      if $NL_VAR4D; then
-        cd nl
-        ln -fs $WRFPLUS_DIR/main/nupdown.exe .
-        ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
-        ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
-        sh thin.csh
-        cd ..
-        mv -f $WORK_DIR/nl/*-thin $RUN_DIR
-      fi
+#     if $NL_VAR4D; then
+#       cd nl
+#       ln -fs $WRFPLUS_DIR/main/nupdown.exe .
+#       ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
+#       ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
+#       sh thin.csh
+#       cd ..
+#       mv -f $WORK_DIR/nl/*-thin $RUN_DIR
+#     fi
 
-      $WRFPLUS_DIR/main/nupdown.exe wrfinput_d01 -thin 3
+#     $WRFPLUS_DIR/main/nupdown.exe wrfinput_d01 -thin 3
 
-      mv -f wrfinput_d01-thin $RUN_DIR
+#     mv -f wrfinput_d01-thin $RUN_DIR
 
       exit $RC
    fi
