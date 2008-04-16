@@ -94,7 +94,7 @@ real, intent(inout) :: t_tendf(ims:ime,kms:kme,jms:jme)
 !==============================================
 integer im
 
-  call trace_entry("g_init_zero_tendency")
+!  call trace_entry("g_init_zero_tendency")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -108,7 +108,7 @@ do im = 1, n_moist
   call g_zero_tend( moist_tendf(ims,kms,jms,im),g_moist_tendf(ims,kms,jms,im),ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 end do
 
-  call trace_exit("g_init_zero_tendency")
+!  call trace_exit("g_init_zero_tendency")
 
 end subroutine g_init_zero_tendency
 
@@ -190,7 +190,7 @@ integer i
 integer j
 integer k
 
-  call trace_entry("g_rk_addtend_dry")
+!  call trace_entry("g_rk_addtend_dry")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -250,7 +250,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-  call trace_exit("g_rk_addtend_dry")
+!  call trace_exit("g_rk_addtend_dry")
 
 end subroutine g_rk_addtend_dry
 
@@ -334,7 +334,7 @@ real, intent(in) :: xkmhd(ims:ime,kms:kme,jms:jme)
 integer im
 real kvdq
 
-  call trace_entry("g_rk_scalar_tend")
+!  call trace_entry("g_rk_scalar_tend")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -384,7 +384,7 @@ scalar_loop: do im = scs, sce
   endif diff_opt2
 end do scalar_loop
 
-  call trace_exit("g_rk_scalar_tend")
+!  call trace_exit("g_rk_scalar_tend")
 
 end subroutine g_rk_scalar_tend
 
@@ -473,7 +473,7 @@ real, intent(in) :: v(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: w(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: ww(ims:ime,kms:kme,jms:jme)
 
-  call trace_entry("g_rk_step_prep")
+!  call trace_entry("g_rk_step_prep")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -488,7 +488,7 @@ call g_calc_cq( moist,g_moist,cqu,g_cqu,cqv,g_cqv,cqw,g_cqw,n_moist,ide,jde,kde,
 call g_calc_alt( alt,g_alt,al,g_al,alb,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call g_calc_php( php,g_php,ph,g_ph,phb,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("g_rk_step_prep")
+!  call trace_exit("g_rk_step_prep")
 
 end subroutine g_rk_step_prep
 
@@ -651,7 +651,7 @@ real, intent(in) :: z_base(kms:kme)
 !==============================================
 real kvdq
 
-  call trace_entry("g_rk_tendency")
+!  call trace_entry("g_rk_tendency")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -766,7 +766,7 @@ forward_steq: if (rk_step .eq. 1) then
   endif diff_opt2
 endif forward_steq
 
-  call trace_exit("g_rk_tendency")
+!  call trace_exit("g_rk_tendency")
 
 end subroutine g_rk_tendency
 
@@ -856,7 +856,7 @@ real r_munew(its:ite)
 real sc_middle
 real tendency(its:ite,kts:kte,jts:jte)
 
-  call trace_entry("g_rk_update_scalar")
+!  call trace_entry("g_rk_update_scalar")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1023,7 +1023,7 @@ else
   end do
 endif
 
-  call trace_exit("g_rk_update_scalar")
+!  call trace_exit("g_rk_update_scalar")
 
 end subroutine g_rk_update_scalar
 

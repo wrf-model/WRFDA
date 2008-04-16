@@ -88,7 +88,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("a_calc_alt")
+!!  call trace_entry("a_calc_alt")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -108,7 +108,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_calc_alt")
+!!  call trace_exit("a_calc_alt")
 
 end subroutine a_calc_alt
 
@@ -164,7 +164,7 @@ integer k
 integer ktf
 real qtot
 
-   call trace_entry("a_calc_cq")
+!!  call trace_entry("a_calc_cq")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -309,7 +309,7 @@ else
   end do
 endif
 
-   call trace_exit("a_calc_cq")
+!!  call trace_exit("a_calc_cq")
 
 end subroutine a_calc_cq
 
@@ -356,7 +356,7 @@ integer j
 integer jm
 integer jtf
 
-   call trace_entry("a_calc_mu_uv")
+!!  call trace_entry("a_calc_mu_uv")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -566,7 +566,7 @@ else if (its .eq. ids .and. ite .eq. ide) then
   end do
 endif
 
-   call trace_exit("a_calc_mu_uv")
+!!  call trace_exit("a_calc_mu_uv")
 
 end subroutine a_calc_mu_uv
 
@@ -613,7 +613,7 @@ integer j
 integer jm
 integer jtf
 
-   call trace_entry("a_calc_mu_uv_1")
+!!  call trace_entry("a_calc_mu_uv_1")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -821,7 +821,7 @@ else if (its .eq. ids .and. ite .eq. ide) then
   end do
 endif
 
-   call trace_exit("a_calc_mu_uv_1")
+!!  call trace_exit("a_calc_mu_uv_1")
 
 end subroutine a_calc_mu_uv_1
 
@@ -904,7 +904,7 @@ real qf2
 real qtot
 real qvf
 
-   call trace_entry("a_calc_p_rho_phi")
+!!  call trace_entry("a_calc_p_rho_phi")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1252,7 +1252,7 @@ else
   endif
 endif
 
-   call trace_exit("a_calc_p_rho_phi")
+!!  call trace_exit("a_calc_p_rho_phi")
 
 end subroutine a_calc_p_rho_phi
 
@@ -1300,7 +1300,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("a_calc_php")
+!!  call trace_entry("a_calc_php")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1321,7 +1321,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_calc_php")
+!!  call trace_exit("a_calc_php")
 
 end subroutine a_calc_php
 
@@ -1388,7 +1388,7 @@ integer ktf
 real muu(its:ite+1,jts:jte+1)
 real muv(its:ite+1,jts:jte+1)
 
-   call trace_entry("a_calc_ww_cp")
+!!  call trace_entry("a_calc_ww_cp")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1463,7 +1463,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_calc_ww_cp")
+!!  call trace_exit("a_calc_ww_cp")
 
 end subroutine a_calc_ww_cp
 
@@ -1511,7 +1511,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("a_calculate_full")
+!!  call trace_entry("a_calculate_full")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1531,7 +1531,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_calculate_full")
+!!  call trace_exit("a_calculate_full")
 
 end subroutine a_calculate_full
 
@@ -1596,7 +1596,7 @@ integer k
 integer ktf
 logical specified
 
-   call trace_entry("a_coriolis")
+!!  call trace_entry("a_coriolis")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1712,7 +1712,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-   call trace_exit("a_coriolis")
+!!  call trace_exit("a_coriolis")
 
 end subroutine a_coriolis
 
@@ -1777,7 +1777,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("a_couple_momentum")
+!!  call trace_entry("a_couple_momentum")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1836,7 +1836,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_couple_momentum")
+!!  call trace_exit("a_couple_momentum")
 
 end subroutine a_couple_momentum
 
@@ -1910,7 +1910,7 @@ integer ktf
 logical specified
 real vxgm(its-1:ite,kts:kte,jts-1:jte)
 
-   call trace_entry("a_curvature")
+!!  call trace_entry("a_curvature")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -2180,7 +2180,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_curvature")
+!!  call trace_exit("a_curvature")
 
 end subroutine a_curvature
 
@@ -2241,7 +2241,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("a_diagnose_w")
+!!  call trace_entry("a_diagnose_w")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2277,7 +2277,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_diagnose_w")
+!!  call trace_exit("a_diagnose_w")
 
 end subroutine a_diagnose_w
 
@@ -2356,7 +2356,7 @@ real :: pr = 3.
 real rcoup
 logical specified
 
-   call trace_entry("a_horizontal_diffusion")
+!!  call trace_entry("a_horizontal_diffusion")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -2734,7 +2734,7 @@ else
   end do
 endif
 
-   call trace_exit("a_horizontal_diffusion")
+!!  call trace_exit("a_horizontal_diffusion")
 
 end subroutine a_horizontal_diffusion
 
@@ -2813,7 +2813,7 @@ real :: pr = 3.
 real rcoup
 logical specified
 
-   call trace_entry("a_horizontal_diffusion_3dmp")
+!!  call trace_entry("a_horizontal_diffusion_3dmp")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -2921,7 +2921,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_horizontal_diffusion_3dmp")
+!!  call trace_exit("a_horizontal_diffusion_3dmp")
 
 end subroutine a_horizontal_diffusion_3dmp
 
@@ -3012,7 +3012,7 @@ integer k
 integer ktf
 logical specified
 
-   call trace_entry("a_horizontal_pressure_gradient")
+!!  call trace_entry("a_horizontal_pressure_gradient")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -3284,7 +3284,7 @@ do j = j_start, jtf
   endif
 end do
 
-   call trace_exit("a_horizontal_pressure_gradient")
+!!  call trace_exit("a_horizontal_pressure_gradient")
 
 end subroutine a_horizontal_pressure_gradient
 
@@ -3372,7 +3372,7 @@ real wkp1
 real z_at_u
 real z_at_v
 
-   call trace_entry("a_perturbation_coriolis")
+!!  call trace_entry("a_perturbation_coriolis")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -3753,7 +3753,7 @@ do j = jts, min(jte,jde-1)+1
   end do
 end do
 
-   call trace_exit("a_perturbation_coriolis")
+!!  call trace_exit("a_perturbation_coriolis")
 
 end subroutine a_perturbation_coriolis
 
@@ -3811,7 +3811,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("a_pg_buoy_w")
+!!  call trace_entry("a_pg_buoy_w")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -3873,7 +3873,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_pg_buoy_w")
+!!  call trace_exit("a_pg_buoy_w")
 
 end subroutine a_pg_buoy_w
 
@@ -3957,7 +3957,7 @@ real z0
 real z1
 real z2
 
-   call trace_entry("a_phy_prep")
+!!  call trace_entry("a_phy_prep")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -4196,7 +4196,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_phy_prep")
+!!  call trace_exit("a_phy_prep")
 
 end subroutine a_phy_prep
 
@@ -4293,7 +4293,7 @@ real vb
 real vl
 real vr
 
-   call trace_entry("a_rhs_ph")
+!!  call trace_entry("a_rhs_ph")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5195,7 +5195,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_rhs_ph")
+!!  call trace_exit("a_rhs_ph")
 
 end subroutine a_rhs_ph
 
@@ -5257,7 +5257,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("a_vertical_diffusion")
+!!  call trace_entry("a_vertical_diffusion")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5364,7 +5364,7 @@ else if (name .eq. 'm') then
   end do
 endif
 
-   call trace_exit("a_vertical_diffusion")
+!!  call trace_exit("a_vertical_diffusion")
 
 end subroutine a_vertical_diffusion
 
@@ -5426,7 +5426,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("a_vertical_diffusion_3dmp")
+!!  call trace_entry("a_vertical_diffusion_3dmp")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5488,7 +5488,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_vertical_diffusion_3dmp")
+!!  call trace_exit("a_vertical_diffusion_3dmp")
 
 end subroutine a_vertical_diffusion_3dmp
 
@@ -5550,7 +5550,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("a_vertical_diffusion_mp")
+!!  call trace_entry("a_vertical_diffusion_mp")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5612,7 +5612,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_vertical_diffusion_mp")
+!!  call trace_exit("a_vertical_diffusion_mp")
 
 end subroutine a_vertical_diffusion_mp
 
@@ -5677,7 +5677,7 @@ integer ktf
 logical specified
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("a_vertical_diffusion_u")
+!!  call trace_entry("a_vertical_diffusion_u")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5762,7 +5762,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_vertical_diffusion_u")
+!!  call trace_exit("a_vertical_diffusion_u")
 
 end subroutine a_vertical_diffusion_u
 
@@ -5828,7 +5828,7 @@ integer ktf
 logical specified
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("a_vertical_diffusion_v")
+!!  call trace_entry("a_vertical_diffusion_v")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5915,7 +5915,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_vertical_diffusion_v")
+!!  call trace_exit("a_vertical_diffusion_v")
 
 end subroutine a_vertical_diffusion_v
 
@@ -5973,7 +5973,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("a_w_damp")
+!!  call trace_entry("a_w_damp")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -6012,7 +6012,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("a_w_damp")
+!!  call trace_exit("a_w_damp")
 
 end subroutine a_w_damp
 
@@ -6153,7 +6153,7 @@ real zwt
 
 REAL, PARAMETER :: epsilon = 1.e-10
 
-   call trace_entry("a_surface_drag")
+!!  call trace_entry("a_surface_drag")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -6403,7 +6403,7 @@ do j = j_end, max(j_start-1,jds), -1
   end do
 end do
 
-   call trace_exit("a_surface_drag")
+!!  call trace_exit("a_surface_drag")
 
 end subroutine a_surface_drag
 
@@ -6459,15 +6459,12 @@ integer, intent(in) :: jms
 integer, intent(in) :: kme
 integer, intent(in) :: kms
 real, intent(inout) :: a_al(ims:ime,kms:kme,jms:jme)
-real                :: a_alb(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_dz8w(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_h_diabatic(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_p(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_p8w(ims:ime,kms:kme,jms:jme)
-real                :: a_pb(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_pf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_ph(ims:ime,kms:kme,jms:jme)
-real                :: a_phb(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_pii(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_rho(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_t_new(ims:ime,kms:kme,jms:jme)
@@ -6527,14 +6524,7 @@ real z0
 real z1
 real z2
 
-   call trace_entry("a_moist_physics_prep_em")
-
-!----------------------------------------------
-! RESET LOCAL ADJOINT VARIABLES
-!----------------------------------------------
-a_pb(:,:,:)=0.
-a_phb(:,:,:)=0.
-a_alb(:,:,:)=0.
+!!  call trace_entry("a_moist_physics_prep_em")
 
 a_w1 = 0.
 a_w2 = 0.
@@ -6595,16 +6585,13 @@ do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
       a_p(i,k,j) = a_p(i,k,j)+a_pf(i,k,j)
-      a_pb(i,k,j) = a_pb(i,k,j)+a_pf(i,k,j)
       a_pf(i,k,j) = 0.
       a_z_at_w(i,k+1,j) = a_z_at_w(i,k+1,j)+0.5*a_z(i,k,j)
       a_z_at_w(i,k,j) = a_z_at_w(i,k,j)+0.5*a_z(i,k,j)
       a_z(i,k,j) = 0.
       a_p(i,k,j) = a_p(i,k,j)+a_pii(i,k,j)/p0*rcp*((p(i,k,j)+pb(i,k,j))/p0)**(rcp-1)
-      a_pb(i,k,j) = a_pb(i,k,j)+a_pii(i,k,j)/p0*rcp*((p(i,k,j)+pb(i,k,j))/p0)**(rcp-1)
       a_pii(i,k,j) = 0.
       a_al(i,k,j) = a_al(i,k,j)-a_rho(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+alb(i,k,j)))
-      a_alb(i,k,j) = a_alb(i,k,j)-a_rho(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+alb(i,k,j)))
       a_rho(i,k,j) = 0.
     end do
   end do
@@ -6627,13 +6614,12 @@ do j = j_start, j_end
   do k = k_start, kte
     do i = i_start, i_end
       a_ph(i,k,j) = a_ph(i,k,j)+a_z_at_w(i,k,j)/g
-      a_phb(i,k,j) = a_phb(i,k,j)+a_z_at_w(i,k,j)/g
       a_z_at_w(i,k,j) = 0.
     end do
   end do
 end do
 
-   call trace_exit("a_moist_physics_prep_em")
+!!  call trace_exit("a_moist_physics_prep_em")
 
 end subroutine a_moist_physics_prep_em
 
@@ -6715,7 +6701,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("a_moist_physics_finish_em")
+!!  call trace_entry("a_moist_physics_finish_em")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -6742,7 +6728,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_moist_physics_finish_em")
+!!  call trace_exit("a_moist_physics_finish_em")
 
 end subroutine a_moist_physics_finish_em
 

@@ -155,7 +155,7 @@ integer j_start
 integer k
 real rfield(ims:ime,kms:kme,jms:jme)
 
-  call trace_entry("g_relax_bdy_dry")
+!  call trace_entry("g_relax_bdy_dry")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -207,7 +207,7 @@ if (config_flags%nested) then
 &gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 endif
 
-  call trace_exit("g_relax_bdy_dry")
+!  call trace_exit("g_relax_bdy_dry")
 
 end subroutine g_relax_bdy_dry
 
@@ -277,7 +277,7 @@ real, intent(in) :: u_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(in) :: v_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(in) :: w_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 
-  call trace_entry("g_spec_bdy_dry")
+!  call trace_entry("g_spec_bdy_dry")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -297,7 +297,7 @@ if (config_flags%nested) then
 &jme,kms,kme,its,ite,jts,jte,kts,kte )
 endif
 
-  call trace_exit("g_spec_bdy_dry")
+!  call trace_exit("g_spec_bdy_dry")
 
 end subroutine g_spec_bdy_dry
 
@@ -345,7 +345,7 @@ real, intent(in) :: scalar_bt(ijds:ijde,kds:kde,spec_bdy_width,4)
 real, intent(out) :: scalar_tend(ims:ime,kms:kme,jms:jme)
 integer, intent(in) :: spec_zone
 
-  call trace_entry("g_spec_bdy_scalar")
+!  call trace_entry("g_spec_bdy_scalar")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -353,7 +353,7 @@ integer, intent(in) :: spec_zone
 call g_spec_bdytend( scalar_tend,g_scalar_tend,scalar_bt,g_scalar_bt,'q',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("g_spec_bdy_scalar")
+!  call trace_exit("g_spec_bdy_scalar")
 
 end subroutine g_spec_bdy_scalar
 
@@ -423,7 +423,7 @@ integer ktf
 real mu_old(its:ite,jts:jte)
 character variable
 
-  call trace_entry("g_spec_bdyupdate_ph")
+!  call trace_entry("g_spec_bdyupdate_ph")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -527,7 +527,7 @@ if (ibe-itf .lt. spec_zone) then
   end do
 endif
 
-  call trace_exit("g_spec_bdyupdate_ph")
+!  call trace_exit("g_spec_bdyupdate_ph")
 
 end subroutine g_spec_bdyupdate_ph
 

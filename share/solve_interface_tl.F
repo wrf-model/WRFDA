@@ -39,7 +39,7 @@ SUBROUTINE solve_interface_tl ( grid )
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
-   if(grid%trace_use) call trace_entry("solve_interface_tl")
+   call trace_entry("solve_interface_tl")
 
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
    CALL set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
@@ -108,7 +108,7 @@ SUBROUTINE solve_interface_tl ( grid )
      
    END IF
 
-   if(grid%trace_use) call trace_exit("solve_interface_tl")
+   call trace_exit("solve_interface_tl")
 
 END SUBROUTINE solve_interface_tl
 

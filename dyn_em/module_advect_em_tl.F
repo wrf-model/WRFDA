@@ -138,7 +138,7 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 
-   call trace_entry("g_advect_scalar")
+!!  call trace_entry("g_advect_scalar")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1028,7 +1028,7 @@ else vert_order_tesu
   write(unit=wrf_err_message,fmt=*) ' advect_scalar_6a, v_order not known ',vert_order
 endif vert_order_tesu
 
-   call trace_exit("g_advect_scalar")
+!!  call trace_exit("g_advect_scalar")
 
 end subroutine g_advect_scalar
 
@@ -1138,7 +1138,7 @@ integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
 
-   call trace_entry("g_advect_u")
+!!  call trace_entry("g_advect_u")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2171,7 +2171,7 @@ else if (vert_order .eq. 2) then vert_order_tesu
   end do
 endif vert_order_tesu
 
-   call trace_exit("g_advect_u")
+!!  call trace_exit("g_advect_u")
 
 end subroutine g_advect_u
 
@@ -2281,7 +2281,7 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 
-   call trace_entry("g_advect_v")
+!!  call trace_entry("g_advect_v")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3307,7 +3307,7 @@ else if (vert_order .eq. 2) then vert_order_tesu
   end do
 endif vert_order_tesu
 
-   call trace_exit("g_advect_v")
+!!  call trace_exit("g_advect_v")
 
 end subroutine g_advect_v
 
@@ -3409,7 +3409,7 @@ integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
 
-   call trace_entry("g_advect_w")
+!!  call trace_entry("g_advect_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4656,7 +4656,7 @@ else if (vert_order .eq. 2) then vert_order_tesu
   end do
 endif vert_order_tesu
 
-   call trace_exit("g_advect_w")
+!!  call trace_exit("g_advect_w")
 
 end subroutine g_advect_w
 

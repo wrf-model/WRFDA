@@ -138,7 +138,7 @@ real vb
 real vel
 integer vert_order
 
-   call trace_entry("a_advect_scalar")
+!!  call trace_entry("a_advect_scalar")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1642,7 +1642,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
-   call trace_exit("a_advect_scalar")
+!!  call trace_exit("a_advect_scalar")
 
 end subroutine a_advect_scalar
 
@@ -1752,7 +1752,7 @@ real vel
 integer vert_order
 real vw
 
-   call trace_entry("a_advect_u")
+!!  call trace_entry("a_advect_u")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -3606,7 +3606,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
-   call trace_exit("a_advect_u")
+!!  call trace_exit("a_advect_u")
 
 end subroutine a_advect_u
 
@@ -3716,7 +3716,7 @@ real vb
 real vel
 integer vert_order
 
-   call trace_entry("a_advect_v")
+!!  call trace_entry("a_advect_v")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5542,7 +5542,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
-   call trace_exit("a_advect_v")
+!!  call trace_exit("a_advect_v")
 
 end subroutine a_advect_v
 
@@ -5644,7 +5644,7 @@ real vel
 integer vert_order
 real vw
 
-   call trace_entry("a_advect_w")
+!!  call trace_entry("a_advect_w")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -7837,7 +7837,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
-   call trace_exit("a_advect_w")
+!!  call trace_exit("a_advect_w")
 
 end subroutine a_advect_w
 

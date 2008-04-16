@@ -29,7 +29,7 @@ MODULES =                 		\
         module_bc_tl.o                  \
         module_check.o                  \
         module_init_utilities.o         \
-        module_4dvaropt.o               \
+        module_linked_lisk.o            \
 	$(CASE_MODULE)
 
 # possible CASE_MODULE settings
@@ -342,7 +342,7 @@ solve_em_ad.o:  module_small_step_em.o \
 		module_diffusion_em_ad.o  \
 		module_big_step_utilities_em.o \
 		module_big_step_utilities_em_ad.o \
-		module_4dvaropt.o \
+		module_linked_lisk.o \
 		../frame/module_domain.o \
 		../frame/module_configure.o  \
 		../frame/module_driver_constants.o \

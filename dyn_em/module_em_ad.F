@@ -89,7 +89,7 @@ integer, intent(in) :: kts
 !==============================================
 integer im
 
-  call trace_entry("a_init_zero_tendency")
+!  call trace_entry("a_init_zero_tendency")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -103,7 +103,7 @@ call a_zero_tend( a_rw_tendf,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_rv_tendf,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_ru_tendf,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_init_zero_tendency")
+!  call trace_exit("a_init_zero_tendency")
 
 end subroutine a_init_zero_tendency
 
@@ -168,7 +168,7 @@ integer i
 integer j
 integer k
 
-  call trace_entry("a_rk_addtend_dry")
+!  call trace_entry("a_rk_addtend_dry")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -219,7 +219,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-  call trace_exit("a_rk_addtend_dry")
+!  call trace_exit("a_rk_addtend_dry")
 
 end subroutine a_rk_addtend_dry
 
@@ -300,7 +300,7 @@ real, intent(in) :: xkmhd(ims:ime,kms:kme,jms:jme)
 integer im
 real kvdq
 
-  call trace_entry("a_rk_scalar_tend")
+!  call trace_entry("a_rk_scalar_tend")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -351,7 +351,7 @@ a_scalar_loop: do im = sce, scs, -1
   call a_zero_tend( a_advect_tend(ims,kms,jms),ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 end do a_scalar_loop
 
-  call trace_exit("a_rk_scalar_tend")
+!  call trace_exit("a_rk_scalar_tend")
 
 end subroutine a_rk_scalar_tend
 
@@ -432,7 +432,7 @@ real, intent(in) :: w(ims:ime,kms:kme,jms:jme)
 !==============================================
 integer kds
 
-  call trace_entry("a_rk_step_prep")
+!  call trace_entry("a_rk_step_prep")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -451,7 +451,7 @@ call a_couple_momentum( muu,a_muu,a_ru,u,a_u,msfu,muv,a_muv,a_rv,v,a_v,msfv,mut,
 call a_calc_mu_uv( config_flags,a_mu,a_muu,a_muv,ids,ide,jds,jde,ims,ime,jms,jme,its,ite,jts,jte )
 call a_calculate_full( a_mut,a_mu,ide,jde,2,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1 )
 
-  call trace_exit("a_rk_step_prep")
+!  call trace_exit("a_rk_step_prep")
 
 end subroutine a_rk_step_prep
 
@@ -598,7 +598,7 @@ real, intent(in) :: z_base(kms:kme)
 !==============================================
 real kvdq
 
-  call trace_entry("a_rk_tendency1")
+!  call trace_entry("a_rk_tendency1")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -680,7 +680,7 @@ call a_horizontal_pressure_gradient( a_ru_tend,a_rv_tend,ph,a_ph,alt,a_alt,p,a_p
   call a_rhs_ph( a_ph_tend,u,a_u,v,a_v,ww,a_ww,ph,a_ph,ph,a_ph,phb,w,a_w,mut,a_mut,muu,a_muu,muv,a_muv,fnm,fnp,rdnw,cfn,cfn1,rdx,&
 &rdy,msft,non_hydrostatic,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_rk_tendency1")
+!  call trace_exit("a_rk_tendency1")
 
 end subroutine a_rk_tendency1
 
@@ -827,7 +827,7 @@ real, intent(in) :: z_base(kms:kme)
 !==============================================
 real kvdq
 
-  call trace_entry("a_rk_tendency2")
+!  call trace_entry("a_rk_tendency2")
 
   call a_advect_scalar( t,a_t,t,a_t,a_t_tend,ru,a_ru,rv,a_rv,ww,a_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,kde,&
 &ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
@@ -853,7 +853,7 @@ call a_zero_tend( a_rw_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_rv_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_ru_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_rk_tendency2")
+!  call trace_exit("a_rk_tendency2")
 
 end subroutine a_rk_tendency2
 
@@ -942,7 +942,7 @@ real muold(its:ite)
 real r_munew(its:ite)
 real tendency(its:ite,kts:kte,jts:jte)
 
-  call trace_entry("a_rk_update_scalar")
+!  call trace_entry("a_rk_update_scalar")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1223,7 +1223,7 @@ else
   end do
 endif
 
-  call trace_exit("a_rk_update_scalar")
+!  call trace_exit("a_rk_update_scalar")
 
 end subroutine a_rk_update_scalar
 

@@ -136,7 +136,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("a_advance_mu_t")
+!!  call trace_entry("a_advance_mu_t")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -298,7 +298,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_advance_mu_t")
+!!  call trace_exit("a_advance_mu_t")
 
 end subroutine a_advance_mu_t
 
@@ -403,7 +403,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("a_advance_uv")
+!!  call trace_entry("a_advance_uv")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -657,7 +657,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_advance_uv")
+!!  call trace_exit("a_advance_uv")
 
 end subroutine a_advance_uv
 
@@ -782,7 +782,7 @@ real keep2_w(ims:ime,kms:kme,jms:jme)
 real keep3_w(ims:ime,kms:kme,jms:jme)
 !mzz
 
-   call trace_entry("a_advance_w")
+!!  call trace_entry("a_advance_w")
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -1172,7 +1172,7 @@ end do
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
 
-   call trace_exit("a_advance_w")
+!!  call trace_exit("a_advance_w")
 
 end subroutine a_advance_w
 
@@ -1242,7 +1242,7 @@ integer j_start
 integer k
 integer k1
 
-   call trace_entry("a_calc_coef_w")
+!!  call trace_entry("a_calc_coef_w")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1382,7 +1382,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("a_calc_coef_w")
+!!  call trace_exit("a_calc_coef_w")
 
 end subroutine a_calc_coef_w
 
@@ -1459,7 +1459,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("a_calc_p_rho")
+!!  call trace_entry("a_calc_p_rho")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1571,7 +1571,7 @@ else
   end do
 endif
 
-   call trace_exit("a_calc_p_rho")
+!!  call trace_exit("a_calc_p_rho")
 
 end subroutine a_calc_p_rho
 
@@ -1664,7 +1664,7 @@ integer j_endv
 integer j_start
 integer k
 
-   call trace_entry("a_small_step_finish")
+!!  call trace_entry("a_small_step_finish")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1747,7 +1747,7 @@ do j = j_start, j_endv
   end do
 end do
 
-   call trace_exit("a_small_step_finish")
+!!  call trace_exit("a_small_step_finish")
 
 end subroutine a_small_step_finish
 
@@ -1856,7 +1856,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("a_small_step_prep")
+!!  call trace_entry("a_small_step_prep")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2167,7 +2167,7 @@ else
   end do
 endif
 
-   call trace_exit("a_small_step_prep")
+!!  call trace_exit("a_small_step_prep")
 
 end subroutine a_small_step_prep
 
@@ -2230,7 +2230,7 @@ integer i
 integer j
 integer k
 
-   call trace_entry("a_sumflux")
+!!  call trace_entry("a_sumflux")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2296,7 +2296,7 @@ if (iteration .eq. 1) then
   end do
 endif
 
-   call trace_exit("a_sumflux")
+!!  call trace_exit("a_sumflux")
 
 end subroutine a_sumflux
 

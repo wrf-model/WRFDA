@@ -13,6 +13,7 @@ MODULES =       module_driver_constants.o  \
                 module_integrate_ad.o      \
                 module_integrate_tl.o      \
                 module_integrate_tst.o     \
+                module_trace.o             \
                 module_timing.o            \
                 module_configure.o         \
                 module_tiles.o             \
@@ -30,7 +31,6 @@ OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o          \
-                fast_copy.o                \
                 microclock.o               \
 		add_forcing_to_ad.o
 
@@ -71,6 +71,7 @@ module_configure.o: \
 module_dm.o: module_machine.o module_state_description.o module_wrf_error.o \
 		module_domain.o \
 		module_driver_constants.o \
+		module_trace.o \
 		module_timing.o \
 		module_configure.o 
 
@@ -93,6 +94,7 @@ module_driver_constants.o: \
 
 module_integrate.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -101,6 +103,7 @@ module_integrate.o: module_domain.o \
 
 module_integrate_ad.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -109,6 +112,7 @@ module_integrate_ad.o: module_domain.o \
 
 module_integrate_tl.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \

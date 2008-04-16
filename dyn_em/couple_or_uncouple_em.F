@@ -59,7 +59,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 
 #include "deref_kludge.h"
 
-   call trace_entry("couple_or_uncouple_em")
+!!  call trace_entry("couple_or_uncouple_em")
 
 !  De-reference dimension information stored in the grid data structure.
 
@@ -401,7 +401,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 # include "PERIOD_EM_COUPLE_B.inc"
 #endif
 
-   call trace_exit("couple_or_uncouple_em")
+!!  call trace_exit("couple_or_uncouple_em")
 
 END SUBROUTINE couple_or_uncouple_em
 

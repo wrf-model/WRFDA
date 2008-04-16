@@ -25,7 +25,7 @@
         ! maximum number fields in any frame
         INTEGER, PARAMETER :: MAX_NUM_FIELDS=200
 
-        ! total size of all stored fields in INTEGER*8 words
+        ! total size of all stored fields in INTEGER*4 words
         INTEGER, PARAMETER :: MAX_NUM_WORDS=20000000
 
         ! start index of each stored field
@@ -49,7 +49,7 @@
         INTEGER, SAVE :: current_frame
 
         ! buffer
-        INTEGER*8 :: buffer(MAX_NUM_WORDS)
+        INTEGER*4 :: buffer(MAX_NUM_WORDS)
         ! points to next free spot in buffer
         INTEGER, SAVE :: buffer_position
 
@@ -96,7 +96,7 @@
           IF ( first_call ) THEN
             ! print out actual number of words used at end
             WRITE(msg,'(A,I10,A)') 'MODULE_4DVAROPT:  Maximum buffer size = ', &
-                                   buffer_position-1, ' INTEGER*8 words'
+                                   buffer_position-1, ' INTEGER*4 words'
             CALL wrf_message( TRIM(msg) )
             first_call = .FALSE.
           ENDIF
@@ -114,7 +114,7 @@
           USE module_4dvaropt
           IMPLICIT NONE
           INTEGER numwords
-          INTEGER*8 inbuf(*)
+          INTEGER*4 inbuf(*)
           ! Local
           INTEGER newstart, field_id
 #ifdef DEBUG_4DVAR_OPT
@@ -161,7 +161,7 @@
           USE module_4dvaropt
           IMPLICIT NONE
           INTEGER numwords
-          INTEGER*8 outbuf(*)
+          INTEGER*4 outbuf(*)
           ! Local
           INTEGER field_id, thisstart
 #ifdef DEBUG_4DVAR_OPT

@@ -253,7 +253,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
    END INTERFACE
 
-   if(grid%trace_use) call trace_entry("integrate_tl")
+   call trace_entry("integrate_tl")
 
    IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
@@ -376,7 +376,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
       ENDIF
    END IF
 
-   if(grid%trace_use) call trace_exit("integrate_tl")
+   call trace_exit("integrate_tl")
 
 END SUBROUTINE integrate_tl
 

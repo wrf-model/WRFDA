@@ -91,7 +91,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("g_calc_alt")
+!!  call trace_entry("g_calc_alt")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -108,7 +108,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_calc_alt")
+!!  call trace_exit("g_calc_alt")
 
 end subroutine g_calc_alt
 
@@ -167,7 +167,7 @@ integer k
 integer ktf
 real qtot
 
-   call trace_entry("g_calc_cq")
+!!  call trace_entry("g_calc_cq")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -253,7 +253,7 @@ else
   end do
 endif
 
-   call trace_exit("g_calc_cq")
+!!  call trace_exit("g_calc_cq")
 
 end subroutine g_calc_cq
 
@@ -305,7 +305,7 @@ integer j
 integer jm
 integer jtf
 
-   call trace_entry("g_calc_mu_uv")
+!!  call trace_entry("g_calc_mu_uv")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -447,7 +447,7 @@ else if (jts .eq. jds .and. jte .eq. jde) then
   end do
 endif
 
-   call trace_exit("g_calc_mu_uv")
+!!  call trace_exit("g_calc_mu_uv")
 
 end subroutine g_calc_mu_uv
 
@@ -498,7 +498,7 @@ integer j
 integer jm
 integer jtf
 
-   call trace_entry("g_calc_mu_uv_1")
+!!  call trace_entry("g_calc_mu_uv_1")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -638,7 +638,7 @@ else if (jts .eq. jds .and. jte .eq. jde) then
   end do
 endif
 
-   call trace_exit("g_calc_mu_uv_1")
+!!  call trace_exit("g_calc_mu_uv_1")
 
 end subroutine g_calc_mu_uv_1
 
@@ -717,7 +717,7 @@ real qf2
 real qtot
 real qvf
 
-   call trace_entry("g_calc_p_rho_phi")
+!!  call trace_entry("g_calc_p_rho_phi")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -860,7 +860,7 @@ else
   endif
 endif
 
-   call trace_exit("g_calc_p_rho_phi")
+!!  call trace_exit("g_calc_p_rho_phi")
 
 end subroutine g_calc_p_rho_phi
 
@@ -911,7 +911,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("g_calc_php")
+!!  call trace_entry("g_calc_php")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -928,7 +928,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_calc_php")
+!!  call trace_exit("g_calc_php")
 
 end subroutine g_calc_php
 
@@ -998,7 +998,7 @@ integer ktf
 real muu(its:ite+1,jts:jte+1)
 real muv(its:ite+1,jts:jte+1)
 
-   call trace_entry("g_calc_ww_cp")
+!!  call trace_entry("g_calc_ww_cp")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1045,7 +1045,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_calc_ww_cp")
+!!  call trace_exit("g_calc_ww_cp")
 
 end subroutine g_calc_ww_cp
 
@@ -1097,7 +1097,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("g_calculate_full")
+!!  call trace_entry("g_calculate_full")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1114,7 +1114,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_calculate_full")
+!!  call trace_exit("g_calculate_full")
 
 end subroutine g_calculate_full
 
@@ -1185,7 +1185,7 @@ integer k
 integer ktf
 logical specified
 
-   call trace_entry("g_coriolis")
+!!  call trace_entry("g_coriolis")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1285,7 +1285,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-   call trace_exit("g_coriolis")
+!!  call trace_exit("g_coriolis")
 
 end subroutine g_coriolis
 
@@ -1353,7 +1353,7 @@ integer jtf
 integer k
 integer ktf
 
-   call trace_entry("g_couple_momentum")
+!!  call trace_entry("g_couple_momentum")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1390,7 +1390,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_couple_momentum")
+!!  call trace_exit("g_couple_momentum")
 
 end subroutine g_couple_momentum
 
@@ -1467,7 +1467,7 @@ integer ktf
 logical specified
 real vxgm(its-1:ite,kts:kte,jts-1:jte)
 
-   call trace_entry("g_curvature")
+!!  call trace_entry("g_curvature")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1598,7 +1598,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-   call trace_exit("g_curvature")
+!!  call trace_exit("g_curvature")
 
 end subroutine g_curvature
 
@@ -1664,7 +1664,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("g_diagnose_w")
+!!  call trace_entry("g_diagnose_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1692,7 +1692,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_diagnose_w")
+!!  call trace_exit("g_diagnose_w")
 
 end subroutine g_diagnose_w
 
@@ -1772,7 +1772,7 @@ real :: pr = 3.
 real rcoup
 logical specified
 
-   call trace_entry("g_horizontal_diffusion")
+!!  call trace_entry("g_horizontal_diffusion")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1964,7 +1964,7 @@ else
   end do
 endif
 
-   call trace_exit("g_horizontal_diffusion")
+!!  call trace_exit("g_horizontal_diffusion")
 
 end subroutine g_horizontal_diffusion
 
@@ -2044,7 +2044,7 @@ real :: pr = 3.
 real rcoup
 logical specified
 
-   call trace_entry("g_horizontal_diffusion_3dmp")
+!!  call trace_entry("g_horizontal_diffusion_3dmp")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2100,7 +2100,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_horizontal_diffusion_3dmp")
+!!  call trace_exit("g_horizontal_diffusion_3dmp")
 
 end subroutine g_horizontal_diffusion_3dmp
 
@@ -2193,7 +2193,7 @@ integer k
 integer ktf
 logical specified
 
-   call trace_entry("g_horizontal_pressure_gradient")
+!!  call trace_entry("g_horizontal_pressure_gradient")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2327,7 +2327,7 @@ do j = j_start, jtf
   endif
 end do
 
-   call trace_exit("g_horizontal_pressure_gradient")
+!!  call trace_exit("g_horizontal_pressure_gradient")
 
 end subroutine g_horizontal_pressure_gradient
 
@@ -2423,7 +2423,7 @@ real wkp1
 real z_at_u
 real z_at_v
 
-   call trace_entry("g_perturbation_coriolis")
+!!  call trace_entry("g_perturbation_coriolis")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2609,7 +2609,7 @@ do j = jts, min(jte,jde-1)
   end do
 end do
 
-   call trace_exit("g_perturbation_coriolis")
+!!  call trace_exit("g_perturbation_coriolis")
 
 end subroutine g_perturbation_coriolis
 
@@ -2670,7 +2670,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("g_pg_buoy_w")
+!!  call trace_entry("g_pg_buoy_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2703,7 +2703,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_pg_buoy_w")
+!!  call trace_exit("g_pg_buoy_w")
 
 end subroutine g_pg_buoy_w
 
@@ -2811,7 +2811,7 @@ real z0
 real z1
 real z2
 
-   call trace_entry("g_phy_prep")
+!!  call trace_entry("g_phy_prep")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2897,7 +2897,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_phy_prep")
+!!  call trace_exit("g_phy_prep")
 
 end subroutine g_phy_prep
 
@@ -2996,7 +2996,7 @@ real vl
 real vr
 real wdwn(its:ite,kts:kte)
 
-   call trace_entry("g_rhs_ph")
+!!  call trace_entry("g_rhs_ph")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3571,7 +3571,7 @@ if (config_flags%open_xe .and. ite .eq. ide) then
   end do
 endif
 
-   call trace_exit("g_rhs_ph")
+!!  call trace_exit("g_rhs_ph")
 
 end subroutine g_rhs_ph
 
@@ -3634,7 +3634,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("g_vertical_diffusion")
+!!  call trace_entry("g_vertical_diffusion")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3702,7 +3702,7 @@ else if (name .eq. 'm') then
   end do j_loop_s
 endif
 
-   call trace_exit("g_vertical_diffusion")
+!!  call trace_exit("g_vertical_diffusion")
 
 end subroutine g_vertical_diffusion
 
@@ -3765,7 +3765,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("g_vertical_diffusion_3dmp")
+!!  call trace_entry("g_vertical_diffusion_3dmp")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3803,7 +3803,7 @@ j_loop_s: do j = j_start, j_end
   end do
 end do j_loop_s
 
-   call trace_exit("g_vertical_diffusion_3dmp")
+!!  call trace_exit("g_vertical_diffusion_3dmp")
 
 end subroutine g_vertical_diffusion_3dmp
 
@@ -3866,7 +3866,7 @@ integer k
 integer ktf
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("g_vertical_diffusion_mp")
+!!  call trace_entry("g_vertical_diffusion_mp")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3904,7 +3904,7 @@ j_loop_s: do j = j_start, j_end
   end do
 end do j_loop_s
 
-   call trace_exit("g_vertical_diffusion_mp")
+!!  call trace_exit("g_vertical_diffusion_mp")
 
 end subroutine g_vertical_diffusion_mp
 
@@ -3970,7 +3970,7 @@ integer ktf
 logical specified
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("g_vertical_diffusion_u")
+!!  call trace_entry("g_vertical_diffusion_u")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4026,7 +4026,7 @@ j_loop_u: do j = j_start, j_end
   end do
 end do j_loop_u
 
-   call trace_exit("g_vertical_diffusion_u")
+!!  call trace_exit("g_vertical_diffusion_u")
 
 end subroutine g_vertical_diffusion_u
 
@@ -4093,7 +4093,7 @@ integer ktf
 logical specified
 real vflux(its:ite,0:kte+1)
 
-   call trace_entry("g_vertical_diffusion_v")
+!!  call trace_entry("g_vertical_diffusion_v")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4150,7 +4150,7 @@ j_loop_v: do j = j_start, j_end
   end do
 end do j_loop_v
 
-   call trace_exit("g_vertical_diffusion_v")
+!!  call trace_exit("g_vertical_diffusion_v")
 
 end subroutine g_vertical_diffusion_v
 
@@ -4209,7 +4209,7 @@ integer j
 integer jtf
 integer k
 
-   call trace_entry("g_w_damp")
+!!  call trace_entry("g_w_damp")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4231,7 +4231,7 @@ do j = jts, jtf
   end do
 end do
 
-   call trace_exit("g_w_damp")
+!!  call trace_exit("g_w_damp")
 
 end subroutine g_w_damp
 
@@ -4375,7 +4375,7 @@ real zwt
 
 REAL, PARAMETER :: epsilon = 1.e-10
 
-   call trace_entry("g_surface_drag")
+!!  call trace_entry("g_surface_drag")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4465,7 +4465,7 @@ do j = j_start, j_endv
   end do
 end do
 
-   call trace_exit("g_surface_drag")
+!!  call trace_exit("g_surface_drag")
 
 end subroutine g_surface_drag
 
@@ -4590,7 +4590,7 @@ real z0
 real z1
 real z2
 
-   call trace_entry("g_moist_physics_prep_em")
+!!  call trace_entry("g_moist_physics_prep_em")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4645,7 +4645,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_moist_physics_prep_em")
+!!  call trace_exit("g_moist_physics_prep_em")
 
 end subroutine g_moist_physics_prep_em
 
@@ -4731,7 +4731,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("g_moist_physics_finish_em")
+!!  call trace_entry("g_moist_physics_finish_em")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4755,7 +4755,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_moist_physics_finish_em")
+!!  call trace_exit("g_moist_physics_finish_em")
 
 end subroutine g_moist_physics_finish_em
 

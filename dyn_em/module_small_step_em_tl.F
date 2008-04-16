@@ -146,7 +146,7 @@ integer k_end
 integer k_start
 real wdtn(its:ite,kts:kte)
 
-   call trace_entry("g_advance_mu_t")
+!!  call trace_entry("g_advance_mu_t")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -258,7 +258,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_advance_mu_t")
+!!  call trace_exit("g_advance_mu_t")
 
 end subroutine g_advance_mu_t
 
@@ -369,7 +369,7 @@ integer k_end
 integer k_start
 real mudf_xy(its:ite)
 
-   call trace_entry("g_advance_uv")
+!!  call trace_entry("g_advance_uv")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -527,7 +527,7 @@ v_outer_j_loop: do j = j_start, j_endv
   endif
 end do v_outer_j_loop
 
-   call trace_exit("g_advance_uv")
+!!  call trace_exit("g_advance_uv")
 
 end subroutine g_advance_uv
 
@@ -645,7 +645,7 @@ real mut_inv(its:ite)
 real rhs(its:ite,kts:kte)
 real wdwn(its:ite,kts:kte)
 
-   call trace_entry("g_advance_w")
+!!  call trace_entry("g_advance_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -789,7 +789,7 @@ j_loop_w: do j = j_start, j_end
   end do
 end do j_loop_w
 
-   call trace_exit("g_advance_w")
+!!  call trace_exit("g_advance_w")
 
 end subroutine g_advance_w
 
@@ -858,7 +858,7 @@ integer j_end
 integer j_start
 integer k
 
-   call trace_entry("g_calc_coef_w")
+!!  call trace_entry("g_calc_coef_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -921,7 +921,7 @@ outer_j_loop: do j = j_start, j_end
   end do
 end do outer_j_loop
 
-   call trace_exit("g_calc_coef_w")
+!!  call trace_exit("g_calc_coef_w")
 
 end subroutine g_calc_coef_w
 
@@ -1001,7 +1001,7 @@ integer k_end
 integer k_start
 real ptmp
 
-   call trace_entry("g_calc_p_rho")
+!!  call trace_entry("g_calc_p_rho")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1078,7 +1078,7 @@ else
   end do
 endif
 
-   call trace_exit("g_calc_p_rho")
+!!  call trace_exit("g_calc_p_rho")
 
 end subroutine g_calc_p_rho
 
@@ -1177,7 +1177,7 @@ integer j_endv
 integer j_start
 integer k
 
-   call trace_entry("g_small_step_finish")
+!!  call trace_entry("g_small_step_finish")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1255,7 +1255,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_small_step_finish")
+!!  call trace_exit("g_small_step_finish")
 
 end subroutine g_small_step_finish
 
@@ -1377,7 +1377,7 @@ integer k
 integer k_end
 integer k_start
 
-   call trace_entry("g_small_step_prep")
+!!  call trace_entry("g_small_step_prep")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1567,7 +1567,7 @@ do j = j_start, j_end
   end do
 end do
 
-   call trace_exit("g_small_step_prep")
+!!  call trace_exit("g_small_step_prep")
 
 end subroutine g_small_step_prep
 
@@ -1638,7 +1638,7 @@ integer i
 integer j
 integer k
 
-   call trace_entry("g_sumflux")
+!!  call trace_entry("g_sumflux")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1710,7 +1710,7 @@ if (iteration .eq. number_of_small_timesteps) then
   end do
 endif
 
-   call trace_exit("g_sumflux")
+!!  call trace_exit("g_sumflux")
 
 end subroutine g_sumflux
 

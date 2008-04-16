@@ -132,7 +132,7 @@ integer j_end
 integer j_start
 integer k
 
-  call trace_entry("a_relax_bdy_dry")
+!  call trace_entry("a_relax_bdy_dry")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -232,7 +232,7 @@ call a_relax_bdytend( a_rv,a_rv_tendf,a_v_b,a_v_bt,'v',spec_bdy_width,spec_zone,
 call a_relax_bdytend( a_ru,a_ru_tendf,a_u_b,a_u_bt,'u',spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_relax_bdy_dry")
+!  call trace_exit("a_relax_bdy_dry")
 
 end subroutine a_relax_bdy_dry
 
@@ -290,7 +290,7 @@ integer, intent(in) :: kte
 integer, intent(in) :: kts
 integer, intent(in) :: spec_zone
 
-  call trace_entry("a_spec_bdy_dry")
+!  call trace_entry("a_spec_bdy_dry")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -310,7 +310,7 @@ call a_spec_bdytend( a_rv_tend,a_v_bt,'v',spec_bdy_width,spec_zone,ijds,ijde,ids
 call a_spec_bdytend( a_ru_tend,a_u_bt,'u',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,&
 &ite,jts,jte,kts,kte )
 
-  call trace_exit("a_spec_bdy_dry")
+!  call trace_exit("a_spec_bdy_dry")
 
 end subroutine a_spec_bdy_dry
 
@@ -356,7 +356,7 @@ integer, intent(in) :: kte
 integer, intent(in) :: kts
 integer, intent(in) :: spec_zone
 
-  call trace_entry("a_spec_bdy_scalar")
+!  call trace_entry("a_spec_bdy_scalar")
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -364,7 +364,7 @@ integer, intent(in) :: spec_zone
 call a_spec_bdytend( a_scalar_tend,a_scalar_bt,'q',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,&
 &kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_spec_bdy_scalar")
+!  call trace_exit("a_spec_bdy_scalar")
 
 end subroutine a_spec_bdy_scalar
 
@@ -435,7 +435,7 @@ integer ktf
 real mu_old(its:ite,jts:jte)
 character variable
 
-  call trace_entry("a_spec_bdyupdate_ph")
+!  call trace_entry("a_spec_bdyupdate_ph")
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -682,7 +682,7 @@ endif
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
 
-  call trace_exit("a_spec_bdyupdate_ph")
+!  call trace_exit("a_spec_bdyupdate_ph")
 
 end subroutine a_spec_bdyupdate_ph
 

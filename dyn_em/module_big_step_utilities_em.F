@@ -3897,9 +3897,12 @@ SUBROUTINE zero_tend ( tendency,                     &
 !
 !</DESCRIPTION>
 
-      DO j = jts, jte
-      DO k = kts, kte
-      DO i = its, ite
+!     DO j = jts, jte
+!     DO k = kts, kte
+!     DO i = its, ite
+      DO j = jms, jme
+      DO k = kms, kme
+      DO i = ims, ime
         tendency(i,k,j) = 0.
       ENDDO
       ENDDO
