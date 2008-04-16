@@ -22,10 +22,10 @@ CONTAINS
   TYPE (grid_config_rec_type), intent(in) :: config_flags
   integer :: nsteps
  
-   if (mod ( INT(config_flags%interval_seconds / config_flags%dt) , 2 ).ne.0) &
+   if (mod ( INT(grid%jcdfi_tauc / config_flags%dt) , 2 ).ne.0) &
       CALL wrf_error_fatal( 'Total # of time steps should be EVEN' )
 
-   nsteps = config_flags%interval_seconds / config_flags%dt / 2 
+   nsteps = grid%jcdfi_tauc / config_flags%dt / 2 
 
    CALL JCDFI_COEF ( 0 , NSTEPS , config_flags%dt , grid%jcdfi_tauc , 7 )
 
