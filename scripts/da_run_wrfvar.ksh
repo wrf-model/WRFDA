@@ -475,7 +475,7 @@ if $NL_VAR4D; then
       ln -fs tl/tl_d01_${D_WRF_DATE[$I]} tl${TAG}
       let I=I+1
    done
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "none" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
       ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
    else
       ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
