@@ -56,7 +56,8 @@ module module_trace
    logical :: NewTraceRoutine = .true.
 
 #ifdef DM_PARALLEL
-#include 'mpif.h'
+include 'mpif.h'
+   real(kind=8) :: doubel_mpi_wtime
 #else
 #ifndef NOSYSTEMCLOCK
    integer :: start_count, current_count, clock_rate
@@ -675,7 +676,8 @@ subroutine trace_start(myid, my_html, my_csv, my_url)
    integer :: m, n
 
 #ifdef DM_PARALLEL
-   traceBaseTime = real(mpi_wtime())
+   doubel_mpi_wtime = mpi_wtime()
+   traceBaseTime = doubel_mpi_wtime
 #else
 #ifdef NOSYSTEMCLOCK
    call trace_time(traceBaseTime)
@@ -776,7 +778,8 @@ subroutine trace_time(seconds)
    real, intent(out) :: seconds
 
 #ifdef DM_PARALLEL
-   seconds = real(mpi_wtime())
+   doubel_mpi_wtime = mpi_wtime()
+   seconds = doubel_mpi_wtime
 #else
 #ifdef NOSYSTEMCLOCK
 

@@ -121,6 +121,7 @@ module_integrate_tl.o: module_domain.o \
 
 module_integrate_tst.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \

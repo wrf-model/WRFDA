@@ -91,19 +91,19 @@ clean:
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_tl.o: solve_em_tl.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_ad.o: solve_em_ad.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_tst.o: solve_em_tst.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 start_domain: start_domain_em.int ../frame/module_domain.o ../frame/module_configure.o
