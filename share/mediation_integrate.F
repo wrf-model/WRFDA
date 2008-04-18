@@ -41,7 +41,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
    INTEGER                                    :: rc
 
    IF( ESMF_AlarmIsRinging( grid%alarms( HISTORY_ALARM ), rc=rc ) ) THEN
-     CALL med_hist_out ( grid , 0, config_flags )
+!    CALL med_hist_out ( grid , 0, config_flags )
      CALL ESMF_AlarmRingerOff( grid%alarms( HISTORY_ALARM ), rc=rc )
    ENDIF
 

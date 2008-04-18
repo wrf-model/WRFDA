@@ -8403,7 +8403,7 @@ module_initialize_real.o module_dm.o mediation_integrate.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCFLAGS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-#ARCH Darwin		(single-threaded, no nesting)
+#ARCH Darwin		(single-threaded, no nesting, xlf)
 #     
 #     Using -qfloat=nomaf option can result in identical results with
 #           non-optimized and optimized results (suggested by Fovell of UCLA)
@@ -8417,7 +8417,7 @@ CC              =       cc
 SCC		=	$(CC)
 RWORDSIZE       =	8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
-CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
+CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
 FCOPTIM         =       -O2 -qarch=auto #-qfloat=nomaf
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
