@@ -6,7 +6,8 @@
 # Remove CRTM and RTTOV
 #
 find . -name .svn -exec rm -rf {} \; >/dev/null 2>&1
-rm -rf ../da/da_radiance/* ../da/da_varbc/* ../da/da_biascorr_airmass
+rm -rf ../da/da_radiance/* ../da/da_monitor
+rm -rf ../da/da_varbc/* ../da/da_biascorr_airmass
 
 cat > ../da/da_radiance/da_radiance.f90 <<EOF
 ! Stub, as CRTM and RTTOV radiance models not included in community release
