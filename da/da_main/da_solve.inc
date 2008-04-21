@@ -110,8 +110,9 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    be % cv % size_jp = 0.0
+#if defined(RTTOV) || defined(CRTM)
    if ( (use_varbc).or.(freeze_varbc) ) call da_varbc_init(iv, be)
-
+#endif
    cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
@@ -249,9 +250,9 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
       ! [8.9] Update VarBC parameters and write output file
-      
+#if defined(CRTM) || defined(RTTOV)      
       if ( (use_varbc).or.(freeze_varbc) ) call da_varbc_update(cv_size, xhat, iv)
-
+#endif
       !------------------------------------------------------------------------
       ! [8.10] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------

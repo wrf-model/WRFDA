@@ -49,6 +49,7 @@ module da_wrfvar_top
    use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
       tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
       tovs_send_start
+   use da_varbc, only : da_varbc_init,da_varbc_update
 #endif
    use da_reporting, only : message, da_warning, da_error, da_message
    use da_setup_structures, only : da_setup_obs_structures, &
@@ -57,7 +58,6 @@ module da_wrfvar_top
    use da_tools_serial, only : da_get_unit, da_free_unit
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_transfer_model, only : da_transfer_xatoanalysis,da_setup_firstguess
-   use da_varbc, only : da_varbc_init,da_varbc_update
    use da_vtox_transforms, only : da_transform_vtox, da_transform_xtoxa
    use da_wrfvar_io, only : da_med_initialdata_input, da_med_initialdata_output
    use da_tools, only : da_set_randomcv

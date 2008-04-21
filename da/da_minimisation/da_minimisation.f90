@@ -114,7 +114,9 @@ module da_minimisation
    use da_tracing, only : da_trace_entry, da_trace_exit,da_trace
    use da_transfer_model, only : da_transfer_wrftltoxa,da_transfer_xatowrftl, &
       da_transfer_xatowrftl_adj,da_setup_firstguess,da_transfer_wrftltoxa_adj
+#if defined(RTTOV) || defined(CRTM)
    use da_varbc, only : da_varbc_tl,da_varbc_adj
+#endif
    use da_vtox_transforms, only : da_transform_vtox,da_transform_vtox_adj,da_transform_xtoxa,da_transform_xtoxa_adj
    use da_wrf_interfaces, only : wrf_dm_bcast_real, wrf_get_dm_communicator
    use da_wrfvar_io, only : da_med_initialdata_input
