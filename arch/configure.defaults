@@ -8755,11 +8755,11 @@ LD              =       g95
 CC              =       cc
 SCC		=	$(CC)
 RWORDSIZE       =	8
-PROMOTION	=	-ffree-form -ffree-line-length-huge -r$(RWORDSIZE) -i4 -fendian=big
-CFLAGS          =       -DF2CSTYLE -DMACOS
-FCOPTIM         =       -O0  
+PROMOTION	=	-ffree-form -ffree-line-length-huge -r$(RWORDSIZE) -i4 -fendian=big -finteger=0 -freal=zero 
+CFLAGS          =       -DF2CSTYLE -DMACOS -DMAC_G95
+FCOPTIM         =       -O2  
 FCDEBUG         =       
-FCBASEOPTS      =       -ffree-form -ffree-line-length-huge -fstatic $(FCDEBUG) 
+FCBASEOPTS      =       -ffree-form -ffree-line-length-huge -fstatic $(FCDEBUG) -finteger=0 -freal=zero
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
