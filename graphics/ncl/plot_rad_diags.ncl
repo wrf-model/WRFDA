@@ -401,12 +401,12 @@ begin
          ;
          ; declare the arrays for OMB and OMA number, mean and rms
          ;
-         xnum  = new((/2,nchan,ntime/),integer)    ; for omb and oma
+         xnum  = new((/3,nchan,ntime/),integer)    ; for omb_nb, omb_wb, and oma
          xnum!1 = "channel"                        ; name the dimension
          xnum!2 = "date"
          xnum&channel = (/ plot_ch /)              ; define coordinate variable
          xnum&date = (/ stringtointeger(date) /)
-         xmean = new((/2,nchan,ntime/),float)
+         xmean = new((/3,nchan,ntime/),float)
          xmean!1 = "channel"
          xmean!2 = "date"
          xmean&channel = (/ plot_ch /)
@@ -555,12 +555,12 @@ begin
                if ( ip .eq. 4 ) then
                   title = info + "  OMB with BC " + npts_sele(ich,itime) + " / " + npts(ich,itime)
                   if ( npts_sele(ich,itime) .gt. 0 ) then
-                     xnum(0,ich,itime) = (/ npts_sele(ich,itime) /)
-                     xmean(0,ich,itime) = sum(data)/tofloat(npts_sele(ich,itime))
-                     xrms(0,ich,itime) = sqrt(sum(data*data)/tofloat(npts_sele(ich,itime)))
-                     xstd(0,ich,itime) = sqrt(sum((data-xmean(0,ich,itime))*(data-xmean(0,ich,itime)))/tofloat(npts_sele(ich,itime)))
-                     stats_info = "mean: "+sprintf("%8.2f",xmean(0,ich,itime))+ \
-                                  "   stdv: "+sprintf("%8.2f",xstd(0,ich,itime))
+                     xnum(1,ich,itime) = (/ npts_sele(ich,itime) /)
+                     xmean(1,ich,itime) = sum(data)/tofloat(npts_sele(ich,itime))
+                     xrms(1,ich,itime) = sqrt(sum(data*data)/tofloat(npts_sele(ich,itime)))
+                     xstd(1,ich,itime) = sqrt(sum((data-xmean(1,ich,itime))*(data-xmean(1,ich,itime)))/tofloat(npts_sele(ich,itime)))
+                     stats_info = "mean: "+sprintf("%8.2f",xmean(1,ich,itime))+ \
+                                  "   stdv: "+sprintf("%8.2f",xstd(1,ich,itime))
                   else
                      stats_info = " "
                   end if
@@ -568,12 +568,12 @@ begin
                if ( ip .eq. 5 ) then
                   title = info + "  OMA with BC " + npts_sele(ich,itime) + " / " + npts(ich,itime)
                   if ( npts_sele(ich,itime) .gt. 0 ) then
-                     xnum(1,ich,itime) = (/ npts_sele(ich,itime) /)
-                     xmean(1,ich,itime) = sum(data)/tofloat(npts_sele(ich,itime))
-                     xrms(1,ich,itime) = sqrt(sum(data*data)/tofloat(npts_sele(ich,itime)))
-                     xstd(1,ich,itime) = sqrt(sum((data-xmean(1,ich,itime))*(data-xmean(1,ich,itime)))/tofloat(npts_sele(ich,itime)))
-                     stats_info = "mean: "+sprintf("%8.2f",xmean(1,ich,itime))+ \
-                                  "   stdv: "+sprintf("%8.2f",xstd(1,ich,itime))
+                     xnum(2,ich,itime) = (/ npts_sele(ich,itime) /)
+                     xmean(2,ich,itime) = sum(data)/tofloat(npts_sele(ich,itime))
+                     xrms(2,ich,itime) = sqrt(sum(data*data)/tofloat(npts_sele(ich,itime)))
+                     xstd(2,ich,itime) = sqrt(sum((data-xmean(2,ich,itime))*(data-xmean(2,ich,itime)))/tofloat(npts_sele(ich,itime)))
+                     stats_info = "mean: "+sprintf("%8.2f",xmean(2,ich,itime))+ \
+                                  "   stdv: "+sprintf("%8.2f",xstd(2,ich,itime))
                   else
                      stats_info = " "
                   end if
@@ -1080,11 +1080,12 @@ end if
             res_stats@tmYLMajorThicknessF    = 1.0                 ; default 2.0
             res_stats@tmXBMajorThicknessF    = 1.0                 ; default 2.0
             res_stats@xyMarkLineMode         = "MarkLines"
-            res_stats@xyMarkers              = (/ 3, 2 /)
-            res_stats@xyMarkerColors         = (/ "red", "blue" /)
-            res_stats@xyMarkerSizes          = (/ 0.02, 0.02 /)    ; default 0.01
-            res_stats@xyLineThicknesses      = (/ 2.0, 2.0 /)      ; default 1.0
-            res_stats@xyLineColors           = (/ "red", "blue" /) ; change line color
+            res_stats@xyMarkers              = (/ 1, 3, 2 /)
+            res_stats@xyMarkerColors         = (/ "magenta", "red", "blue" /)
+            res_stats@xyMarkerSizes          = (/ 0.03, 0.02, 0.02 /)   ; default 0.01
+            res_stats@xyDashPatterns         = (/ 1, 0, 0 /)
+            res_stats@xyLineThicknesses      = (/ 2.0, 2.0, 2.0 /)      ; default 1.0
+            res_stats@xyLineColors           = (/ "magenta", "red", "blue" /)
             res_stats@gsnYRefLine            = 0.0
             if ( dimsizes(plot_ch) .le. 255 ) then
                res_stats@tmXBMode               = "Explicit"
@@ -1099,7 +1100,7 @@ end if
             res_stats@pmLegendWidthF         = 0.1                 ; Change width and default 0.55
             res_stats@pmLegendHeightF        = 0.1                 ; height of legend. default 0.18
             res_stats@lgLabelFontHeightF     = .015                ; change font height default 0.02
-            res_stats@xyExplicitLegendLabels = (/"OMB","OMA"/)     ; explicit labels
+            res_stats@xyExplicitLegendLabels = (/"OMB_nb", "OMB_wb", "OMA"/)    ; explicit labels
 
             res_stats@tiYAxisString = "Number"
             plot(0)  = gsn_csm_xy (wks,xnum&channel,xnum(:,:,itime),res_stats)
@@ -1162,11 +1163,12 @@ end if
             res_stats@tmYLMajorThicknessF    = 1.0                 ; default 2.0
             res_stats@tmXBMajorThicknessF    = 1.0                 ; default 2.0
             res_stats@xyMarkLineMode         = "MarkLines"
-            res_stats@xyMarkers              = (/ 3, 2 /)
-            res_stats@xyMarkerColors         = (/ "red", "blue" /)
-            res_stats@xyMarkerSizes          = (/ 0.02, 0.02 /)    ; default 0.01
-            res_stats@xyLineThicknesses      = (/ 2.0, 2.0 /)      ; default 1.0
-            res_stats@xyLineColors           = (/ "red", "blue" /) ; change line color
+            res_stats@xyMarkers              = (/ 1, 3, 2 /)
+            res_stats@xyMarkerColors         = (/ "magenta", "red", "blue" /)
+            res_stats@xyMarkerSizes          = (/ 0.03, 0.02, 0.02 /)   ; default 0.01
+            res_stats@xyDashPatterns         = (/ 1, 0, 0 /)
+            res_stats@xyLineThicknesses      = (/ 2.0, 2.0, 2.0 /)      ; default 1.0
+            res_stats@xyLineColors           = (/ "magenta", "red", "blue" /)
             res_stats@gsnYRefLine            = 0.0
             res_stats@tmXBMode               = "Explicit"
             res_stats@tmXBLabels             = mmddhh
@@ -1178,7 +1180,7 @@ end if
             res_stats@pmLegendWidthF         = 0.1                 ; Change width and default 0.55
             res_stats@pmLegendHeightF        = 0.1                 ; height of legend. default 0.18
             res_stats@lgLabelFontHeightF     = .015                ; change font height default 0.02
-            res_stats@xyExplicitLegendLabels = (/"OMB","OMA"/)     ; explicit labels
+            res_stats@xyExplicitLegendLabels = (/"OMB_nb", "OMB_wb","OMA"/)    ; explicit labels
 
             res_stats@tiYAxisString = "Number"
             plot(0)  = gsn_csm_xy (wks,xc,xnum(:,ich,:),res_stats)
