@@ -4,6 +4,8 @@
 PROGRAM wrf
 
    USE module_wrf_esmf_super
+   USE module_linked_list, only : linkedlist_initialize
+   USE module_trace, only : trace_entry, trace_exit, trace_init, trace_report
 
 !<DESCRIPTION>
 ! Main program of WRF model.  Responsible for starting up the model, reading in (and
@@ -15,9 +17,6 @@ PROGRAM wrf
 !
 !</DESCRIPTION>
 
-   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
-      da_trace_report
-      
    IMPLICIT NONE
 
    TYPE(ESMF_GridComp) :: gcomp
@@ -27,10 +26,7 @@ PROGRAM wrf
    INTEGER :: rc
 
    LOGICAL, EXTERNAL :: await_next
-!   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
    INTEGER comm
-
-write(0,*)'********* ********* *********'
 
    ! This call includes everything that must be done before ESMF_Initialize() 
    ! is called.  
@@ -46,6 +42,10 @@ write(0,*)'********* ********* *********'
 #ifdef DM_PARALLEL
    CALL init_modules(2)   ! 
 #endif
+   CALL linkedlist_initialize
+
+   call trace_init
+   call trace_entry("wrf")
 
 #ifdef DM_PARALLEL
 #ifndef STAND_ALONE
@@ -54,11 +54,9 @@ write(0,*)'********* ********* *********'
 #endif
 #endif
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
-   call da_trace_init
-   call da_trace_entry("wrf_init")
+
      CALL wrf_run( gcomp, importState, exportState, clock, rc )
-   call da_trace_exit("wrf_init")
-   call da_trace_report
+
      CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
 #ifdef DM_PARALLEL
 #ifndef STAND_ALONE
@@ -71,9 +69,14 @@ write(0,*)'********* ********* *********'
 #endif
 
 #ifdef DM_PARALLEL
+   CALL linkedlist_initialize
    CALL wrf_get_dm_communicator( comm )
    CALL MPI_BARRIER(comm,ierr)
 #endif
+
+   call trace_exit("wrf")
+   call trace_report
+
    CALL wrf_shutdown 
 
    CALL ESMF_Finalize( rc=rc )

@@ -9,6 +9,7 @@ foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
                       wrfdata whatiread rsl.* show_domain* )
 end
 
+( cd da ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
 ( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
 ( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst )
 ( cd external/RSL/RSL ; /bin/rm -f *.lst )

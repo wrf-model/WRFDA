@@ -9,6 +9,7 @@ RM      =       rm -f
 MODULES =       module_driver_constants.o  \
                 module_domain.o            \
                 module_dfi.o               \
+                module_linked_lisk.o       \
                 module_integrate.o         \
                 module_integrate_ad.o      \
                 module_integrate_tl.o      \
@@ -23,6 +24,8 @@ MODULES =       module_driver_constants.o  \
                 module_sm.o                \
                 module_io.o                \
                 module_dm.o                \
+		memory_info.o              \
+                module_trace.o             \
                 module_quilt_outbuf_ops.o  \
                 module_io_quilt.o
 
@@ -30,7 +33,7 @@ OBJS    =       wrf_num_bytes_between.o    \
                 wrf_shutdown.o             \
                 libmassv.o                 \
                 collect_on_comm.o          \
-                fast_copy.o                \
+		fast_copy.o                \
                 microclock.o               \
 		add_forcing_to_ad.o
 
@@ -63,6 +66,9 @@ md_calls.inc : md_calls.m4
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 
+memory_info.o:	memory_info.c
+		$(CC) $(CFLAGS) -c memory_info.c
+
 module_configure.o: \
 		module_state_description.o \
                 module_wrf_error.o \
@@ -93,6 +99,7 @@ module_driver_constants.o: \
 
 module_integrate.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -100,7 +107,9 @@ module_integrate.o: module_domain.o \
 		$(ESMF_MOD_DEPENDENCE)
 
 module_integrate_ad.o: module_domain.o \
+                module_linked_lisk.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -108,7 +117,9 @@ module_integrate_ad.o: module_domain.o \
 		$(ESMF_MOD_DEPENDENCE)
 
 module_integrate_tl.o: module_domain.o \
+                module_linked_lisk.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -117,6 +128,7 @@ module_integrate_tl.o: module_domain.o \
 
 module_integrate_tst.o: module_domain.o \
 		module_timing.o \
+		module_trace.o \
 		module_driver_constants.o \
 		module_state_description.o \
 		module_nesting.o \
@@ -151,6 +163,10 @@ module_tiles.o: module_domain.o \
 module_timing.o: \
 		module_state_description.o \
                 module_wrf_error.o
+
+module_trace.o: \
+		module_dm.o \
+		module_configure.o
 
 module_wrf_error.o: \
 		wrf_shutdown.o \

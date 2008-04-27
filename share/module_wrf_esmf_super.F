@@ -26,6 +26,8 @@ MODULE module_wrf_esmf_super
    USE module_dm
 #endif
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    REAL    :: time
@@ -97,10 +99,10 @@ CONTAINS
 
    !  Get the NAMELIST data for input.
 
-write(0,*)'calling init_modules'
+   call trace_entry("wrf_init")
+
    CALL init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
                           ! Phase 1 is called before ESMF starts up
-write(0,*)'back from init_modules'
 
 !<DESCRIPTION>
 ! The wrf namelist.input file is read and stored in the USE associated
@@ -269,6 +271,8 @@ write(0,*)'back from init_modules'
    ! return success status
    rc = ESMF_SUCCESS
 
+   call trace_exit("wrf_init")
+
    END SUBROUTINE wrf_init
 
    SUBROUTINE wrf_run( gcomp, importState, exportState, clock, rc )
@@ -294,7 +298,9 @@ write(0,*)'back from init_modules'
 !                       otherwise ESMF_FAILURE.
 !</DESCRIPTION>
 
-   CALL       wrf_debug ( 100 , 'wrf: calling integrate' )
+   if(head_grid%trace_use) call trace_entry("wrf_run")
+
+   CALL wrf_debug ( 100 , 'wrf: calling integrate' )
 
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
       CALL integrate ( head_grid )
@@ -319,18 +325,9 @@ write(0,*)'back from init_modules'
 ! - Look for boundary data after writing out history and restart files
       CALL med_latbound_in ( head_grid , config_flags )
 
-!XX
-!     print*,'ad_date_string = ',ad_date_string
-!XX
       CALL Setup_date_string (head_grid, ad_date_string, 'ad' )
-!XX
-!     print*,'after ad_date_string',ad_date_string
-!     print*,'nl_date_string = ',nl_date_string
-!XX
+
       CALL Setup_date_string (head_grid, nl_date_string, 'an' )
-!XX
-!     print*,'after nl_date_string', nl_date_string
-!XX
 
       nl_date_index = 1
       ad_date_index = 1
@@ -340,16 +337,17 @@ write(0,*)'back from init_modules'
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
-#if 1
+
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
-#endif
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
 
    ! return success status
    rc = ESMF_SUCCESS
+
+   if(head_grid%trace_use) call trace_exit("wrf_run")
 
    END SUBROUTINE wrf_run
 
@@ -371,6 +369,7 @@ write(0,*)'back from init_modules'
 !       rc              Return code; equals ESMF_SUCCESS if there are no errors,
 !                       otherwise ESMF_FAILURE.
 !</DESCRIPTION>
+
 
    CALL med_shutdown_io ( head_grid , config_flags )
    CALL       wrf_debug ( 100 , 'wrf: back from med_shutdown_io' )

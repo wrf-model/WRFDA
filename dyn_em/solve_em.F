@@ -38,6 +38,8 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_chem_utilities
 #endif
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Input data.
@@ -152,6 +154,8 @@ SUBROUTINE solve_em ( grid , config_flags , &
 
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
+
+   if(grid%trace_use) call trace_entry("solve_em")
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
 
@@ -2824,6 +2828,8 @@ BENCH_END(bc_2d_tim)
 ! See comment before earlier #include of this file.
 #define COPY_OUT
 #include <em_scalar_derefs.inc>
+
+   if(grid%trace_use) call trace_exit("solve_em")
 
    RETURN
 

@@ -45,6 +45,8 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    USE g_module_bc_em
    USE g_module_diffusion_em
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Input data.
@@ -248,6 +250,8 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 !</pre>
 !</DESCRIPTION>
 !**********************************************************************
+
+   if(grid%trace_use) call trace_entry("solve_em_tl")
 
 #ifdef WRF_CHEM
 !
@@ -2708,9 +2712,6 @@ BENCH_END(bc_end_tim)
  END DO Runge_Kutta_loop
 
 !----------------
-!----------------
-!  goto 6789 !zzma
-!----------------
 
 #if 0
    !$OMP PARALLEL DO   &
@@ -3076,9 +3077,8 @@ BENCH_END(bc_2d_tim)
 #include <em_scalar_derefs.inc>
 
 !----------------
-!----------------
-!6789 continue !zzma
-!----------------
+
+   if(grid%trace_use) call trace_exit("solve_em_tl")
 
    RETURN
 

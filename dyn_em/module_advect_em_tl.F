@@ -36,12 +36,15 @@ use module_model_constants
 use module_wrf_error
 use module_advect_em
 
+USE module_trace, only : trace_entry, trace_exit
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
 implicit none
 
 contains
+
 subroutine g_advect_scalar( field, g_field, field_old, g_field_old, tendency, g_tendency, ru, g_ru, rv, g_rv, rom, g_rom, &
 &config_flags, msft, fzm, fzp, rdx, rdy, rdzw, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
@@ -134,6 +137,8 @@ real vb
 real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
+
+   call trace_entry("g_advect_scalar")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -1023,6 +1028,8 @@ else vert_order_tesu
   write(unit=wrf_err_message,fmt=*) ' advect_scalar_6a, v_order not known ',vert_order
 endif vert_order_tesu
 
+   call trace_exit("g_advect_scalar")
+
 end subroutine g_advect_scalar
 
 
@@ -1130,6 +1137,8 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
+
+   call trace_entry("g_advect_u")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -2162,6 +2171,8 @@ else if (vert_order .eq. 2) then vert_order_tesu
   end do
 endif vert_order_tesu
 
+   call trace_exit("g_advect_u")
+
 end subroutine g_advect_u
 
 
@@ -2269,6 +2280,8 @@ real vb
 real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
+
+   call trace_entry("g_advect_v")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -3294,6 +3307,8 @@ else if (vert_order .eq. 2) then vert_order_tesu
   end do
 endif vert_order_tesu
 
+   call trace_exit("g_advect_v")
+
 end subroutine g_advect_v
 
 
@@ -3393,6 +3408,8 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
+
+   call trace_entry("g_advect_w")
 
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
@@ -4638,6 +4655,8 @@ else if (vert_order .eq. 2) then vert_order_tesu
     end do
   end do
 endif vert_order_tesu
+
+   call trace_exit("g_advect_w")
 
 end subroutine g_advect_w
 

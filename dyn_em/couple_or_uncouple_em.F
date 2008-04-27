@@ -21,6 +21,8 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 ! Registry generated module
    USE module_state_description
 
+   USE module_trace, only : trace_entry, trace_exit
+
    IMPLICIT NONE
 
    !  Subroutine interface block.
@@ -56,6 +58,8 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 #endif
 
 #include "deref_kludge.h"
+
+   call trace_entry("couple_or_uncouple_em")
 
 !  De-reference dimension information stored in the grid data structure.
 
@@ -396,6 +400,8 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
 # include "HALO_EM_COUPLE_B.inc"
 # include "PERIOD_EM_COUPLE_B.inc"
 #endif
+
+   call trace_exit("couple_or_uncouple_em")
 
 END SUBROUTINE couple_or_uncouple_em
 

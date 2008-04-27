@@ -7,15 +7,17 @@ CONTAINS
 
 RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
-
-
    USE module_domain
    USE module_driver_constants
    USE module_nesting
    USE module_configure
    USE module_timing
+   USE module_linked_list, only: pop2restore
    USE WRF_ESMF_MOD
+   
    USE module_dfi   
+
+   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
@@ -253,6 +255,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
    END INTERFACE
 
+   if(grid%trace_use) call trace_entry("integrate_tl")
+
    IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
       CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
@@ -296,21 +300,18 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
             CALL wrf_timetoa( grid%current_time, currTime_str )
 
-!           write(unit=*, fmt='(2a)') 'xyh TL state at ', currTime_str(1:19)
-
             if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
 
-!              write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index)
-
-!!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
+!!!!  for exactly trajectory update   08/02/2006   Xin Zhang
 !!!!           CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+!              CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+               call pop2restore(grid%moist_2,"moist_2")
+               call pop2restore(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
+               call pop2restore(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
 
                nl_date_index = nl_date_index + 1
 
             else
-
-!              write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index-1)
 
 !!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
 !!!!          CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
@@ -379,6 +380,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
         ENDIF
       ENDIF
    END IF
+
+   if(grid%trace_use) call trace_exit("integrate_tl")
 
 END SUBROUTINE integrate_tl
 

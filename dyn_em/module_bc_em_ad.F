@@ -36,12 +36,15 @@ use module_configure
 use module_wrf_error
 use module_bc_em
 
+USE module_trace, only : trace_entry, trace_exit
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
 implicit none
 
 contains
+
 subroutine a_relax_bdy_dry( config_flags, a_ru_tendf, a_rv_tendf, a_ph_tendf, a_t_tendf, a_rw_tendf, a_mu_tend, a_ru, a_rv, ph, &
 &a_ph, t, a_t, w, a_w, a_mu, mut, a_mut, a_u_b, a_v_b, a_ph_b, a_t_b, a_w_b, a_mu_b, a_u_bt, a_v_bt, a_ph_bt, a_t_bt, a_w_bt, &
 &a_mu_bt, spec_bdy_width, spec_zone, relax_zone, dtbc, fcx, gcx, ijds, ijde, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms,&
@@ -128,6 +131,8 @@ integer j
 integer j_end
 integer j_start
 integer k
+
+  call trace_entry("a_relax_bdy_dry")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -227,6 +232,8 @@ call a_relax_bdytend( a_rv,a_rv_tendf,a_v_b,a_v_bt,'v',spec_bdy_width,spec_zone,
 call a_relax_bdytend( a_ru,a_ru_tendf,a_u_b,a_u_bt,'u',spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
+  call trace_exit("a_relax_bdy_dry")
+
 end subroutine a_relax_bdy_dry
 
 
@@ -283,6 +290,8 @@ integer, intent(in) :: kte
 integer, intent(in) :: kts
 integer, intent(in) :: spec_zone
 
+  call trace_entry("a_spec_bdy_dry")
+
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -300,6 +309,8 @@ call a_spec_bdytend( a_rv_tend,a_v_bt,'v',spec_bdy_width,spec_zone,ijds,ijde,ids
 &ite,jts,jte,kts,kte )
 call a_spec_bdytend( a_ru_tend,a_u_bt,'u',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,&
 &ite,jts,jte,kts,kte )
+
+  call trace_exit("a_spec_bdy_dry")
 
 end subroutine a_spec_bdy_dry
 
@@ -345,11 +356,15 @@ integer, intent(in) :: kte
 integer, intent(in) :: kts
 integer, intent(in) :: spec_zone
 
+  call trace_entry("a_spec_bdy_scalar")
+
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
 call a_spec_bdytend( a_scalar_tend,a_scalar_bt,'q',spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,&
 &kme,its,ite,jts,jte,kts,kte )
+
+  call trace_exit("a_spec_bdy_scalar")
 
 end subroutine a_spec_bdy_scalar
 
@@ -419,6 +434,8 @@ integer k
 integer ktf
 real mu_old(its:ite,jts:jte)
 character variable
+
+  call trace_entry("a_spec_bdyupdate_ph")
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -664,6 +681,8 @@ endif
 !----------------------------------------------
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
+
+  call trace_exit("a_spec_bdyupdate_ph")
 
 end subroutine a_spec_bdyupdate_ph
 

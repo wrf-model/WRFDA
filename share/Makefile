@@ -30,7 +30,7 @@ OBJS    = 		\
         start_domain.o                  \
         init_modules.o                  \
         set_timekeeping.o               \
-        Setup_date_string.o          \
+        Setup_date_string.o    		\
         interp_fcn.o sint.o             \
         input_wrf.o                     \
         output_wrf.o                    \
@@ -91,19 +91,19 @@ clean:
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 solve_interface.o: solve_em.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_tl.o: solve_em_tl.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_ad.o: solve_em_ad.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 solve_interface_tst.o: solve_em_tst.int ../frame/module_domain.o ../frame/module_configure.o \
-		../frame/module_timing.o ../frame/module_driver_constants.o \
+		../frame/module_timing.o ../frame/module_trace.o ../frame/module_driver_constants.o \
 		../frame/module_wrf_error.o
 
 start_domain: start_domain_em.int ../frame/module_domain.o ../frame/module_configure.o
@@ -199,6 +199,7 @@ module_wrf_esmf_super.o: ../frame/module_machine.o \
 			../frame/module_configure.o \
 			../frame/module_timing.o \
 			../frame/module_wrf_error.o \
+			../frame/module_trace.o \
 			$(ESMF_MOD_DEPENDENCE)
 
 wrf_inputout.o                  : ../frame/module_domain.o \

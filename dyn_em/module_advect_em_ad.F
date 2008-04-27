@@ -36,6 +36,7 @@ use module_model_constants
 use module_wrf_error
 use module_advect_em
 
+USE module_trace, only : trace_entry, trace_exit
 
 !==============================================
 ! all entries are defined explicitly
@@ -43,6 +44,7 @@ use module_advect_em
 implicit none
 
 contains
+
 subroutine a_advect_scalar( field, a_field, field_old, a_field_old, a_tendency, ru, a_ru, rv, a_rv, rom, a_rom, config_flags, msft,&
 & fzm, fzp, rdx, rdy, rdzw, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
@@ -135,6 +137,8 @@ real ub
 real vb
 real vel
 integer vert_order
+
+   call trace_entry("a_advect_scalar")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -1638,6 +1642,8 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
+   call trace_exit("a_advect_scalar")
+
 end subroutine a_advect_scalar
 
 
@@ -1745,6 +1751,8 @@ real vb
 real vel
 integer vert_order
 real vw
+
+   call trace_entry("a_advect_u")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -3598,6 +3606,8 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
+   call trace_exit("a_advect_u")
+
 end subroutine a_advect_u
 
 
@@ -3705,6 +3715,8 @@ real uw
 real vb
 real vel
 integer vert_order
+
+   call trace_entry("a_advect_v")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -5530,6 +5542,8 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
   end do
 endif a_horizontal_order_test
 
+   call trace_exit("a_advect_v")
+
 end subroutine a_advect_v
 
 
@@ -5629,6 +5643,8 @@ real vb
 real vel
 integer vert_order
 real vw
+
+   call trace_entry("a_advect_w")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -7820,6 +7836,8 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
     end do
   end do
 endif a_horizontal_order_test
+
+   call trace_exit("a_advect_w")
 
 end subroutine a_advect_w
 

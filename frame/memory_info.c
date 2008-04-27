@@ -8,12 +8,12 @@
 #endif
 
 #ifdef NOUNDERSCORE
-void da_memory(
+void memory_info(
 #else
 #ifdef F2CSTYLE
-void da_memory__(
+void memory_info__(
 #else
-void da_memory_(
+void memory_info_(
 #endif
 #endif
 

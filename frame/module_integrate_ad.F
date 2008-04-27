@@ -7,8 +7,6 @@ CONTAINS
 
 RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
 
-
-
    USE module_domain
    USE module_driver_constants
    USE module_nesting
@@ -16,6 +14,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_timing
    USE WRF_ESMF_MOD
    USE module_dfi
+
+   USE module_linked_list, only: push4backup, pop2restore_reverse
+   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
@@ -27,6 +28,7 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    integer,                            intent(inout) :: nl_date_index
    character(len=19), dimension(1000), intent(in)    :: ad_date_string
    integer,                            intent(inout) :: ad_date_index
+   logical, save :: basic_state_1st_time = .true.
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 
@@ -248,6 +250,8 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
    END INTERFACE
 
+   if(grid%trace_use) call trace_entry("integrate_ad")
+
    print *, 'ESMF_ClockIsStartTime(grid%domain_clock ,rc=rc)=', &
              ESMF_ClockIsStartTime(grid%domain_clock ,rc=rc)
 
@@ -295,13 +299,20 @@ call end_timing('med_auxinput3_in 1 ')
 
 !-----start check non-linear input
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index+1)(1:19)) nl_date_index = nl_date_index + 1
-!        write(unit=*, fmt='(2a)') &
-!             'xyh AD state at ', currTime_str(1:19)
-!        write(unit=*, fmt='(2a)') &
-!             'xyh NL state from ', nl_date_string(nl_date_index+1)
-call start_timing
-         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
-call end_timing('med_auxinput2_in4ad')
+!        write(unit=*, fmt='(2a)') 'xyh AD state at ', currTime_str(1:19)
+!        write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index+1)
+         call start_timing
+         if (basic_state_1st_time) then
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
+            call push4backup(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
+            call push4backup(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
+            call push4backup(grid%moist_2,"moist_2")
+         else
+            call pop2restore_reverse(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
+            call pop2restore_reverse(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
+            call pop2restore_reverse(grid%moist_2,"moist_2")
+         endif
+         call end_timing('med_auxinput2_in4ad')
 !-----end check non-linear input
 
 !--------start check adjoint input
@@ -312,9 +323,10 @@ call end_timing('med_auxinput2_in4ad')
 !                'currTime_str(1:19)=', currTime_str(1:19), &
 !                'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-call start_timing
+            call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
-call end_timing('med_auxinput3_in 2 ')
+            call end_timing('med_auxinput3_in 2 ')
+
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
@@ -410,14 +422,15 @@ call end_timing('med_auxinput3_in 2 ')
 !                'currTime_str(1:19)=', currTime_str(1:19), &
 !                'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
-call start_timing
+            call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
-call end_timing('med_auxinput3_in 3 ')
+            call end_timing('med_auxinput3_in 3 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
          CALL jcdfi_add_forcing ( grid , dfi_counter )
          CALL jcdfi_finalize
+         if (basic_state_1st_time) basic_state_1st_time=.false.
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
@@ -430,6 +443,8 @@ call end_timing('med_auxinput3_in 3 ')
         ENDIF
       ENDIF
    END IF
+
+   if(grid%trace_use) call trace_exit("integrate_ad")
 
 END SUBROUTINE integrate_ad
 
