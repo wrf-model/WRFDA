@@ -4,7 +4,6 @@ module module_trace
    use mpi, only : mpi_character, mpi_integer, mpi_sum, mpi_real8
 #endif
 
-   use module_wrf_esmf_super, only : wrf_dm_on_monitor
    use module_driver_constants, only : max_domains, max_moves
 
    interface
@@ -61,7 +60,8 @@ module module_trace
    character (LEN=TraceNameLen) :: TimerNames(MaxNoRoutines) ! Subroutine names
    character (LEN=TraceNameLen) :: TraceNames(MaxNoRoutines) ! for timing and tracing
 
-   logical :: trace_write = .false., rootproc = .false.
+   logical :: trace_write = .false.
+   logical, external :: rootproc
    integer :: local_communicator, mytask, ntasks, ierr, root
 
 ! define as temporaries
@@ -85,9 +85,8 @@ subroutine trace_init
    character (len=10)  :: temp
 
    CALL mpi_comm_rank( mpi_comm_world, mytask, ierr )
-   if (wrf_dm_on_monitor()) then
+   if (rootproc()) then
       root = mytask
-      rootproc = .true.
    endif
 
 ! Statements that set the namelist vars to default vals
@@ -103,7 +102,7 @@ subroutine trace_init
    ! Open trace output file. 
    !-----------------------------------------------------------------
 
-   print*,'mytask=',mytask,ntasks,wrf_dm_on_monitor(),root,rootproc
+   print*,'mytask=',mytask,ntasks,rootproc(),root
    if (trace_write .AND. trace_unit /= 0) then
       if (use_html) then
          write(unit=temp,fmt='(I10)') mytask
@@ -135,9 +134,9 @@ subroutine trace_init
    CALL mpi_comm_size( local_communicator, ntasks, ierr )
    CALL mpi_comm_rank( local_communicator, mytask, ierr )
    root = 0
-   print*,' after mytask=',mytask,ntasks,wrf_dm_on_monitor(),root,rootproc
+   print*,' after mytask=',mytask,ntasks,rootproc(),root
 
-   if (trace_csv .and. rootproc) then
+   if (trace_csv .and. rootproc()) then
          write(unit=csvname,fmt='(I10,A)') mytask,'.csv'
       open(unit=trace_csv_unit,file="trace/"//trim(adjustl(csvname)), &
          status="replace",iostat=IOStatus)
@@ -984,7 +983,7 @@ subroutine trace_report
       call da_proc_sum_ints(MasterMaxHeap(i,:))
    end do
 
-   if (rootproc) then
+   if (rootproc()) then
 
       do j=1,MasterNoRoutines
          rtemp1(j)=sum(MasterElapsedTimeLocal(:,j))
@@ -1275,7 +1274,7 @@ subroutine trace_report
          call da_proc_sum_ints(MasterMaxHeap(:,j))
       end do
 
-      if (rootproc) then
+      if (rootproc()) then
          do j=1,MasterNoRoutines
             itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
          end do
@@ -1315,7 +1314,7 @@ subroutine trace_report
       close(trace_unit)
    end if
   
-   if (trace_csv .and. rootproc) then
+   if (trace_csv .and. rootproc()) then
       close(trace_csv_unit)
    end if
 
@@ -1398,7 +1397,7 @@ subroutine da_proc_sum_int (value)
    call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, &
       local_communicator, ierr)
 
-   if (rootproc) value = sum
+   if (rootproc()) value = sum
 
    ! if (trace_use_frequent) call trace_exit("da_proc_sum_int")
 #endif
@@ -1433,7 +1432,7 @@ subroutine da_proc_sum_ints (values)
    call mpi_reduce(values(:), sums(:), size(values), mpi_integer, mpi_sum, &
       root, local_communicator, ierr)
 
-   if (rootproc) values(:) = sums(:)
+   if (rootproc()) values(:) = sums(:)
    deallocate(sums)
 
    ! if (trace_use_frequent) call trace_exit("da_proc_sum_ints")
@@ -1469,12 +1468,23 @@ subroutine da_proc_sum_real (value)
    call mpi_reduce(value, apsum, SIZE(value), mpi_real8, mpi_sum, root, &
       local_communicator, ierr)
 
-   if (rootproc) value = apsum
+   if (rootproc()) value = apsum
 
    !if (trace_use_frequent) call trace_exit("da_proc_sum_real")
 #endif
 
 end subroutine da_proc_sum_real
 
-
 end module module_trace
+
+LOGICAL FUNCTION rootproc()
+   USE module_dm
+   IMPLICIT NONE
+   INCLUDE 'mpif.h'
+   INTEGER tsk, ierr, mpi_comm_local
+   CALL wrf_get_dm_communicator( mpi_comm_local )
+   CALL mpi_comm_rank ( mpi_comm_local, tsk , ierr )
+   rootproc = tsk .EQ. 0
+   RETURN
+END FUNCTION rootproc
+

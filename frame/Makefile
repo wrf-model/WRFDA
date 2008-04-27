@@ -166,7 +166,7 @@ module_timing.o: \
 
 module_trace.o: \
 		module_dm.o \
-		module_configure.o
+		module_driver_constants.o
 
 module_wrf_error.o: \
 		wrf_shutdown.o \
