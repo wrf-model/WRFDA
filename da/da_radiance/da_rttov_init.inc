@@ -23,7 +23,7 @@ subroutine da_rttov_init(iv,ob,nsensor,nchan)
 
    !  local arguments
    !------------------- 
-   integer   :: i, j,ichan,unit_factor_rad
+   integer   :: i, j,ichan,unit_factor_rad, n
 
    !
    !  input parameters of RTTOV_SETUP
@@ -61,7 +61,7 @@ subroutine da_rttov_init(iv,ob,nsensor,nchan)
    !  1.0 setup RTTOV instrument triplets from namelist parameter
    !--------------------------------------------------------------
 
-   mxchn           =  300
+   mxchn           =  MAXVAL(nchan)
    err_unit        =  stderr
    verbosity_level =  rtminit_print
 
@@ -73,7 +73,11 @@ subroutine da_rttov_init(iv,ob,nsensor,nchan)
    sensor (1,1:nsensor)  = rtminit_platform (1:nsensor) 
    sensor (2,1:nsensor)  = rtminit_satid    (1:nsensor)
    sensor (3,1:nsensor)  = rtminit_sensor   (1:nsensor)
-   coefs_channels(:,:)   = 0
+
+   coefs_channels(:,:) = 0
+   do n = 1, nsensor
+      coefs_channels(1:nchan(n),n) = iv%instid(n)%ichan(1:nchan(n))
+   end do
 
    if (print_detail_rad) then
       write(unit=message(1),fmt='(A,I5)') 'err_unit             = ', err_unit
@@ -95,8 +99,8 @@ subroutine da_rttov_init(iv,ob,nsensor,nchan)
       verbosity_level,  &! in
       nsensor,          &! in
       coefs,            &! out
-      sensor ) !,           &! in
-      ! coefs_channels )   ! in Optional not work with amsua+b
+      sensor,           &! in
+      coefs_channels )   ! in (Optional)
 
    if (any(errorstatus(:) /= errorstatus_success)) then
       call da_error(__FILE__,__LINE__,(/"rttov_setup fatal error"/))
