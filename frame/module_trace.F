@@ -102,7 +102,6 @@ subroutine trace_init
    ! Open trace output file. 
    !-----------------------------------------------------------------
 
-   print*,'mytask=',mytask,ntasks,rootproc(),root
    if (trace_write .AND. trace_unit /= 0) then
       if (use_html) then
          write(unit=temp,fmt='(I10)') mytask
@@ -134,7 +133,6 @@ subroutine trace_init
    CALL mpi_comm_size( local_communicator, ntasks, ierr )
    CALL mpi_comm_rank( local_communicator, mytask, ierr )
    root = 0
-   print*,' after mytask=',mytask,ntasks,rootproc(),root
 
    if (trace_csv .and. rootproc()) then
          write(unit=csvname,fmt='(I10,A)') mytask,'.csv'
