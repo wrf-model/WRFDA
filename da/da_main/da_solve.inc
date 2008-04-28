@@ -156,10 +156,7 @@ subroutine da_solve ( grid , config_flags)
                call da_system ("touch wrfnl_go_ahead")
                call da_get_unit (wrf_done_unit)
                do while ( .true. )
-                  open(wrf_done_unit,file="wrfnl_done",status="old",err=304)
-                  close(wrf_done_unit)
-                  exit
-304               open(wrf_done_unit,file="nl/wrfnl_done",status="old",err=303)
+                  open(wrf_done_unit,file="wrfnl_done",status="old",err=303)
                   close(wrf_done_unit)
                   exit
 303               continue

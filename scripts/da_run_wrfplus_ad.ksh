@@ -23,16 +23,8 @@ else
       if [[ $NL_MULTI_INC == 2 ]]; then
          ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d01
       fi
-      if [[ $SUBMIT == "none" ]]; then
-         rm -f wrf_done
-         touch wrf_go_ahead
-         mpirun -np $NUM_PROCS_WRFPLUS ./wrfplus.exe </dev/null &
-      fi
    fi
    if [[ $arg1 == "post" ]]; then
-      if [[ $SUBMIT == "none" ]]; then
-         touch wrf_stop_now
-      fi
       mv ../namelist.output .
       mv -f ../namelist_wrfvar.input ../namelist.input
       if [[ $NL_MULTI_INC == 2 ]]; then

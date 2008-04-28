@@ -348,7 +348,7 @@ if $NL_VAR4D; then
    export NL_AUXHIST2_END_S=$WINDOW_END
    export NL_AUXHIST2_OUTNAME_SAVE=$NL_AUXHIST2_OUTNAME
    export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]] ; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
    fi
    export NL_INPUTOUT_INTERVAL_SAVE=$NL_INPUTOUT_INTERVAL
@@ -368,7 +368,7 @@ if $NL_VAR4D; then
    export NL_INPUTOUT_END_S=$WINDOW_END
    export NL_INPUT_OUTNAME_SAVE=$NL_INPUT_OUTNAME
    export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
    fi
    export NL_FRAMES_PER_AUXHIST2_SAVE=$NL_FRAMES_PER_AUXHIST2
@@ -414,7 +414,7 @@ if $NL_VAR4D; then
 #  else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
 #  fi
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
 #     if [[ $NL_MULTI_INC == 2 ]]; then
 #        export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
@@ -475,7 +475,7 @@ if $NL_VAR4D; then
       ln -fs tl/tl_d01_${D_WRF_DATE[$I]} tl${TAG}
       let I=I+1
    done
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
    else
       ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
@@ -491,7 +491,7 @@ if $NL_VAR4D; then
 #  else
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
 #  fi
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
 #     if [[ $NL_MULTI_INC == 2 ]]; then
 #        export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
@@ -501,7 +501,7 @@ if $NL_VAR4D; then
    fi
    export NL_AUXINPUT3_INNAME_SAVE=$NL_AUXINPUT3_INNAME
    export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
-   if [[ $NUM_PROCS -gt 1 ]] && [[ $SUBMIT == "LSF" ]]; then
+   if [[ $NUM_PROCS -gt 1 ]] ; then
       export NL_AUXINPUT3_INNAME='./ad/auxinput3_d<domain>_<date>'
    fi
    export NL_AUXINPUT3_INTERVAL_S=$OBS_FREQ
@@ -693,7 +693,7 @@ else
          fi
 
          if [[ $SUBMIT == "none" ]]; then
-            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe </dev/null
+            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe : -np $NUM_PROCS_WRFPLUS ./ad/wrfplus.exe : -np $NUM_PROCS_WRF ./nl/wrf.exe </dev/null
          fi
 
       else

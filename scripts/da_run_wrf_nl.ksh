@@ -24,16 +24,8 @@ else
       mv ../namelist.output ../namelist_wrfvar.output
       mv -f ../namelist.input ../namelist_wrfvar.input
       cp -f namelist.input ../.
-      if [[ $SUBMIT == "none" ]]; then
-         rm -f wrfnl_done
-         touch wrfnl_go_ahead
-         mpirun -np $NUM_PROCS ./wrf.exe </dev/null &
-      fi
    fi
    if [[ $arg1 == "post" ]]; then
-      if [[ $SUBMIT == "none" ]]; then
-         touch wrfnl_stop_now
-      fi
       mv ../namelist.output .
       mv -f ../namelist_wrfvar.input ../namelist.input
    fi
