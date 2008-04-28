@@ -71,8 +71,8 @@ contains
 
 subroutine trace_init
 
-   include 'mpif.h'
    implicit none
+   include 'mpif.h'
 
    !--------------------------------------------------------------------
    ! Purpose: Initialise tracing
