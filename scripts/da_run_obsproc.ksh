@@ -119,7 +119,7 @@ cat > namelist.3dvar_obs << EOF
 /
 
 &record6
- ptop =  ${PTOP_PA},
+ ptop =  ${P_TOP_REQUESTED},
  base_pres       = ${NL_BASE_PRES},
  base_temp       = ${NL_BASE_TEMP},
  base_lapse      = ${NL_BASE_LAPSE},
