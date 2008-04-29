@@ -18,6 +18,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 
    integer :: n, icld  ! Loop counter.
    integer :: i, j, k  ! Index dimension.
+   integer :: l        ! Index dimension.
    integer :: num_levs ! Number of obs levels.
    real    :: dx, dxm  ! Interpolation weights.
    real    :: dy, dym  ! Interpolation weights.
@@ -39,14 +40,13 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    real    :: v_p(kms:kme)  ! Model value p at ob hor. location.
    real    :: model_qcw(kms:kme)
    real    :: model_rho(kms:kme)
-   real    :: model_qrn(kms:kme)
-   real    :: model_qci(kms:kme)
    real, allocatable :: model_snow(:)  ! snow water equivalent, different from model_snowh,
                                        ! used in calculating reff_water
 
    ! real    :: model_tm(kms:kme)
 
    integer :: inst, nchanl, n1,n2
+   integer :: ipred, npred, gammapred
 
    ! variables for computing clwp
    real    :: clw(kms:kme), dpf(kms:kme)
@@ -59,12 +59,15 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    type (CRTM_Atmosphere_type)   :: Atmosphere(1)
    type (CRTM_Surface_type)      :: Surface(1)
    type (CRTM_GeometryInfo_type) :: GeometryInfo(1)
+   type (CRTM_RTSolution_type), allocatable :: RTSolution_K(:,:)
+   type (CRTM_Atmosphere_type), allocatable :: Atmosphere_K(:,:)
+   type (CRTM_Surface_type),    allocatable :: Surface_K(:,:)
 
    real :: t(1), a(1)
 
 !! for crtm cloud
    real :: qcw(1),qrn(1), qci(1),qsn(1),qgr(1)
-
+   
    ! WHY? use argument it
    if (it==0) then; write(unit=stdout,fmt='(A)') "WHY? have argument it to"//__FILE__; end if
 
@@ -80,7 +83,8 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
    Atmosphere(1)%n_Clouds=0
    Atmosphere(1)%n_Aerosols=0
    if (crtm_cloud) Atmosphere(1)%n_Clouds=6
-  
+!   if (use_airs_mmr) Atmosphere(1)%n_Clouds=1
+ 
    Error_Status = CRTM_Allocate_Atmosphere( Atmosphere(1)%n_Layers, &
                                             Atmosphere(1)%n_Absorbers, &
                                             Atmosphere(1)%n_Clouds, &
@@ -93,6 +97,9 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
 
    Atmosphere(1)%Absorber_ID(1)=H2O_ID
    Atmosphere(1)%Absorber_ID(2)=O3_ID
+   Atmosphere(1)%Climatology=crtm_atmosphere
+   write(stdout,*) 'CRTM Reference profile is: ', &
+                    CLIMATOLOGY_MODEL_NAME(Atmosphere(1)%Climatology)
 
    if (crtm_cloud) then
       Atmosphere(1)%Cloud(1)%Type=WATER_CLOUD
@@ -122,7 +129,17 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
       if ( Allocate_Status /= 0 ) then
          call da_error(__FILE__,__LINE__, (/"Error in allocating RTSolution"/))
       end if
-             
+            
+      if (use_crtm_kmatrix) then
+         allocate (RTSolution_K(ChannelInfo(inst)%n_Channels,1), &
+                   Atmosphere_K(ChannelInfo(inst)%n_Channels,1), &
+                   Surface_K(ChannelInfo(inst)%n_Channels,1),    &
+                   STAT = Allocate_Status )
+         if ( Allocate_Status /= 0 ) then
+            call da_error(__FILE__,__LINE__, (/"Error in allocating RTSolution_K"/))
+         end if
+      end if
+      
       ! CRTM Surface Structure
       if (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsua') then
          wmo_sensor_id=WMO_AMSUA
@@ -213,8 +230,7 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             ! NOTE: WRF high-level q values seems too big, replaced by constants
             if (v_p(k) < 75.0) Atmosphere(1)%Absorber(kte-k+1,1) = 0.001
 
-            call da_interp_lin_2d_partial (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, qcw)
-              model_qcw(kte-k+1)=qcw(1)
+            call da_interp_lin_2d_partial (grid%xb%qcw(:,:,k), iv%instid(inst)%info,k,n,n, model_qcw(kte-k+1:kte-k+1))
             
             if (crtm_cloud) then
 
@@ -360,67 +376,153 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id 
             Surface(1)%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)
          end if
-!write (0,*) "n",n
-!write (0,*) "sum(Atmosphere(1)%Temperature)",sum(Atmosphere(1)%Temperature)
-!write (0,*) "sum(Atmosphere(1)%Absorber(:,1))",sum(Atmosphere(1)%Absorber(:,1))
-!write (0,*) "sum(Atmosphere(1)%Cloud(1)%Water_Content)",sum(Atmosphere(1)%Cloud(1)%Water_Content)
-!write (0,*) "sum(Atmosphere(1)%Cloud(2)%Water_Content)",sum(Atmosphere(1)%Cloud(2)%Water_Content)
-!write (0,*) "sum(Atmosphere(1)%Cloud(3)%Water_Content)",sum(Atmosphere(1)%Cloud(3)%Water_Content)
-!write (0,*) "sum(Atmosphere(1)%Cloud(4)%Water_Content)",sum(Atmosphere(1)%Cloud(4)%Water_Content)
-!write (0,*) "sum(Atmosphere(1)%Cloud(5)%Water_Content)",sum(Atmosphere(1)%Cloud(5)%Water_Content)
-!write (0,*) "sum(Atmosphere(1)%Level_Pressure)",sum(Atmosphere(1)%Level_Pressure)
-!write (0,*) "sum(Atmosphere(1)%Pressure)",sum(Atmosphere(1)%Pressure)
-!write (0,*) "Surface(1)%Land_Temperature)",Surface(1)%Land_Temperature
-!write (0,*) "Surface(1)%Soil_Temperature)",Surface(1)%Soil_Temperature
-!write (0,*) "Surface(1)%Snow_Temperature)",Surface(1)%Snow_Temperature
-!write (0,*) "Surface(1)%Ice_Temperature)",Surface(1)%Ice_Temperature
-!write (0,*) "Surface(1)%Wind_Speed)",Surface(1)%Wind_Speed
-!write (0,*) "Surface(1)%Vegetation_Fraction)",Surface(1)%Vegetation_Fraction
+	 
+	 ! Gamma correction from VarBC
+	 !----------------------------
+         gammapred = iv%instid(inst)%varbc_info%gammapred 
+	 do k = 1, nchanl
+	    npred = iv%instid(inst)%varbc(k)%npred
+            if (npred <= 0) cycle                                           ! VarBC channels only
+            if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle     ! Gamma channels only
+	    do ipred = 1, npred
+	       if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+	       RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
+            end do		  
+	 end do
 
-         ! [1.3] Call RTM foreward model
-         call da_crtm_direct(1, nchanl, 1, Atmosphere,   &
-            Surface,      &
-            GeometryInfo, &
-            ChannelInfo(inst:inst),  &
-            RTSolution)
+         !----------------------------------------------------------------
+         ! Compute Overcast Radiances for AIRS Cloud Detection(MMR)
+         !----------------------------------------------------------------
+         if (use_airs_mmr) then
+	    do i = 1, nchanl
+               allocate(RTSolution(i,1)%Overcast(Atmosphere(1)%n_Layers))
+	    end do		         
+	 end if   
+	
+!         if (use_airs_mmr) then
+!	    Atmosphere(1)%n_Clouds = 1
+!            do k=kts,kte
+!               if (Atmosphere(1)%pressure(k)<100.0) cycle
+!	    
+!  	       Atmosphere(1)%Cloud(1)%Water_Content(:) = 0.0
+!	       if (Atmosphere(1)%Temperature(k)>273.0) then
+!	          Atmosphere(1)%Cloud(1)%Type                = WATER_CLOUD
+!  	          Atmosphere(1)%Cloud(1)%Water_Content(k)    = 0.001
+!	          Atmosphere(1)%Cloud(1)%Effective_Radius(k) = 0.01
+!	       else if (Atmosphere(1)%Temperature(k)<243.0) then
+!	          Atmosphere(1)%Cloud(1)%Type                = ICE_CLOUD
+!  	          Atmosphere(1)%Cloud(1)%Water_Content(k)    = 0.0001
+!	          Atmosphere(1)%Cloud(1)%Effective_Radius(k) = 0.03
+!	       else
+!	          Atmosphere(1)%Cloud(1)%Type                = SNOW_CLOUD
+!  	          Atmosphere(1)%Cloud(1)%Water_Content(k)    = 0.005
+!	          Atmosphere(1)%Cloud(1)%Effective_Radius(k) = 0.6
+!	       end if
+!	    
+!  	       ! Convert from kg/kg to kg/m^2
+!	       Atmosphere(1)%Cloud(1)%Water_Content(k)=Atmosphere(1)%Cloud(1)%Water_Content(k)*&
+!	       (Atmosphere(1)%Level_pressure(k)-Atmosphere(1)%Level_Pressure(k-1))*100.0/gravity
+!	    
+!               call da_crtm_direct(1, nchanl, 1, Atmosphere,   &
+!                  Surface,      &
+!                  GeometryInfo, &
+!                  ChannelInfo(inst:inst),  &
+!                  RTSolution)
+!	       
+!  	       do i = 1, nchanl  
+!                  iv%instid(inst)%rad_ovc(i,k,n)=RTSolution(i,1)%Radiance !Brightness_Temperature
+!	       end do
+!	    end do
+!
+!   	    print*,'ACD : Clear & overcast radiances for ',n,'/',iv%instid(inst)%num_rad         
+!	    Atmosphere(1)%n_Clouds = 0
+!         end if
 
-         !Error_Status = CRTM_Forward (Atmosphere,   &
-         !   Surface,      &
-         !   GeometryInfo, &
-         !   ChannelInfo,  &
-         !   RTSolution)
-         !if (n<=10) then
-         !write(6,'(f10.3)') Atmosphere%level_pressure(0)
-         !do k=1,Atmosphere%n_layers
-         !  write(6,'(4f10.3)') Atmosphere%Level_pressure(k),Atmosphere%pressure(k), &
-         !                      Atmosphere%temperature(k),Atmosphere%absorber(k,1)
-         !enddo
-         !  write(6,'(15f8.3)') RTSolution(1:nchanl)%Brightness_Temperature
-         !  write(6,'(15f8.3)') RTSolution(1:nchanl)%surface_emissivity
-         !end if
 
-         !if ( Error_Status /= 0 ) then
-         !     call da_error(__FILE__,__LINE__, &
-         !        (/"Error in calling CRTM_Forward"/))
-         !endif
+         if (use_crtm_kmatrix) then
+   
+            ! CRTM surface/atmosphere K initialization
+            do l = 1, ChannelInfo(inst)%n_Channels
+               ! -- Copy the adjoint atmosphere structure
+               Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_K(l,:) )
 
+               if ( Error_Status /= 0 ) then
+                  call da_error(__FILE__,__LINE__,  &
+                     (/"Error copying Atmosphere_K structure"/))
+               end if
+ 
+               ! -- Copy the adjoint surface structure
+               Error_Status = CRTM_Assign_Surface( Surface, Surface_K(l,:) )
+       
+               if ( Error_Status /= 0 ) then
+                  call da_error(__FILE__,__LINE__, &
+                     (/"Error copying Surface_K structure"/))
+               end if
+            end do
+
+            ! -- Zero the Adjoint outputs
+            ! Important: adjoint variables must be initialized
+            call CRTM_Zero_Atmosphere( Atmosphere_K )
+            call CRTM_Zero_Surface( Surface_K )
+
+            ! Assign tb = R^-1 Re :
+            RTSolution_K(:,1)%brightness_temperature = 1.
+            RTSolution_K(:,1)%radiance = 0.
+	    RTSolution_K(:,1)%Gamma = 0.
+	    
+            ! [1.3] Call RTM K-Matrix model
+            call da_crtm_k(1, nchanl, 1, Atmosphere,   &
+                               Surface,      &
+                               RTSolution_K,&
+                               GeometryInfo, &
+                               ChannelInfo(inst),  &
+                               Atmosphere_K,&
+                               Surface_K,   &
+                               RTSolution) !,   &
+                               !Options = Options)
+         else
+	 
+            ! [1.3] Call RTM foreward model
+            call da_crtm_direct(1, nchanl, 1, Atmosphere,   &
+               Surface,      &
+               GeometryInfo, &
+               ChannelInfo(inst:inst),  &
+               RTSolution)
+	    
+	 end if
+
+         if (use_airs_mmr) then
+	    do i = 1, nchanl
+               iv%instid(inst)%rad_ovc(i,kts:kte,n)=RTSolution(i,1)%Overcast(:)
+	    end do		         
+	 end if   
+	
          !----------------------------------------------------------------
          ! [2.0] calculate components of innovation vector:
          !----------------------------------------------------------------
          do k = 1, nchanl
-            if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
-               iv%instid(inst)%tb_xb(k,n)  = RTSolution(k,1)%Brightness_Temperature
+            iv%instid(inst)%tb_xb(k,n)  = RTSolution(k,1)%Brightness_Temperature
+            iv%instid(inst)%rad_xb(k,n) = RTSolution(k,1)%Radiance
+            iv%instid(inst)%emiss(k,n)  = RTSolution(k,1)%surface_emissivity
+            
+	    if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
                iv%instid(inst)%tb_inv(k,n) = &
                ob%instid(inst)%tb(k,n) - RTSolution(k,1)%Brightness_Temperature
             else
-               iv%instid(inst)%tb_xb(k,n)    = RTSolution(k,1)%Brightness_Temperature
                iv%instid(inst)%tb_inv(k,n)   = missing_r
             end if
-            iv%instid(inst)%emiss(k,n) = RTSolution(k,1)%surface_emissivity
+
+            if (use_crtm_kmatrix) then
+               ! surface Jacobian
+               iv%instid(inst)%ts_jacobian(k,n) = Surface_k(k,1)%water_temperature
+               iv%instid(inst)%windspeed_jacobian(k,n) = Surface_k(k,1)%wind_speed
+               iv%instid(inst)%emiss_jacobian(k,n) = RTSolution_k(k,1)%surface_emissivity
+               iv%instid(inst)%gamma_jacobian(k,n) = RTSolution_k(k,1)%Gamma
+	    end if   
          end do
 
          !----------------------------------------------------------------
-         ! [3.0] store base state to innovation structure
+         ! [3.0] store base state (and Jacobian) to innovation structure
          !----------------------------------------------------------------
          ! full level pressures
          iv%instid(inst)%pf(0,n)  = Atmosphere(1)%level_pressure(0)
@@ -429,6 +531,15 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             iv%instid(inst)%pf(k,n)  = Atmosphere(1)%level_pressure(k)
             iv%instid(inst)%tm(k,n)  = Atmosphere(1)%temperature(k)
             iv%instid(inst)%qm(k,n)  = Atmosphere(1)%absorber(k,1)
+
+            if (use_crtm_kmatrix) then
+               ! T, Q Jacobian
+               do l=1,nchanl
+                  iv%instid(inst)%t_jacobian(l,k,n) = Atmosphere_k(l,1)%temperature(k)
+                  iv%instid(inst)%q_jacobian(l,k,n) = Atmosphere_k(l,1)%absorber(k,1)
+               end do
+	    end if
+	       
             if (crtm_cloud) then
                iv%instid(inst)%qcw(k,n) = Atmosphere(1)%cloud(1)%water_content(k)
                iv%instid(inst)%qci(k,n) = Atmosphere(1)%cloud(2)%water_content(k)
@@ -442,8 +553,48 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
                iv%instid(inst)%rsn(k,n) = Atmosphere(1)%cloud(4)%effective_radius(k)
                iv%instid(inst)%rgr(k,n) = Atmosphere(1)%cloud(5)%effective_radius(k)
                iv%instid(inst)%rhl(k,n) = Atmosphere(1)%cloud(6)%effective_radius(k)
+            
+               if (use_crtm_kmatrix) then
+	          ! Cloud Jacobian
+                  do l=1,nchanl
+                     iv%instid(inst)%water_jacobian(l,k,n) =   &
+                        Atmosphere_k(l,1)%cloud(1)%water_content(k)
+                     iv%instid(inst)%ice_jacobian(l,k,n) =     &
+                        Atmosphere_k(l,1)%cloud(2)%water_content(k)
+                     iv%instid(inst)%rain_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(3)%water_content(k)
+                     iv%instid(inst)%snow_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(4)%water_content(k)
+                     iv%instid(inst)%graupel_jacobian(l,k,n) = &
+                        Atmosphere_k(l,1)%cloud(5)%water_content(k)
+                     iv%instid(inst)%hail_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(6)%water_content(k)
+
+                     iv%instid(inst)%water_r_jacobian(l,k,n) =   &
+                        Atmosphere_k(l,1)%cloud(1)%effective_radius(k)
+                     iv%instid(inst)%ice_r_jacobian(l,k,n) =     &
+                        Atmosphere_k(l,1)%cloud(2)%effective_radius(k)
+                     iv%instid(inst)%rain_r_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(3)%effective_radius(k)
+                     iv%instid(inst)%snow_r_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(4)%effective_radius(k)
+                     iv%instid(inst)%graupel_r_jacobian(l,k,n) = &
+                        Atmosphere_k(l,1)%cloud(5)%effective_radius(k)
+                     iv%instid(inst)%hail_r_jacobian(l,k,n) =    &
+                        Atmosphere_k(l,1)%cloud(6)%effective_radius(k)
+                  end do
+	       end if	  
             end if
          end do
+
+!         print*,'GAMMA_FP',&
+!            iv%instid(inst)%info%lon(1,n), iv%instid(inst)%info%lat(1,n),&
+!            MAXLOC(iv%instid(inst)%t_jacobian(:,:,n),dim=2),&
+!	    iv%instid(inst)%gamma_jacobian(:,n)
+
+         !----------------------------------------------
+         ! [4.0] store surface information to innovation structure
+         !----------------------------------------------
          iv%instid(inst)%u10(n)       = model_u10(n)
          iv%instid(inst)%v10(n)       = model_v10(n)
          iv%instid(inst)%t2m(n)       = 0.01*missing_r !model_t2m
@@ -476,25 +627,50 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
       deallocate (model_vegfra)
       deallocate (model_smois)
 
-      deallocate( rtsolution, STAT = Allocate_Status )
-
-      if (Allocate_Status /= 0) then
+      deallocate( RTSolution, STAT = Allocate_Status )
+      if (Allocate_Status /= 0) &
          call da_error(__FILE__,__LINE__, &
             (/"Error in deallocating RTSolution"/))
-      end if
+
+      if (use_crtm_kmatrix) then
+         deallocate( RTSolution_K, STAT = Allocate_Status )
+         if (Allocate_Status /= 0) &
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocating RTSolution_K"/))
+      end if	 
 
       Error_Status = CRTM_Destroy_Surface(Surface)
-      if (Error_Status /= 0) then
+      if (Error_Status /= 0) &
          call da_error(__FILE__,__LINE__, &
             (/"Error in deallocating CRTM Surface Structure"/))
-      end if
+
+      if (use_crtm_kmatrix) then
+         Error_Status = CRTM_Destroy_Surface(Surface_K)
+         if ( Error_Status /= 0 ) &
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Surface_K Structure"/))
+      endif
+
+      if (use_crtm_kmatrix) then
+         Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_K )
+         if ( Error_Status /= 0 ) &
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Atmosphere_K Structure"/))
+      endif
+
+      if (use_crtm_kmatrix) then
+         deallocate( Atmosphere_K, Surface_K, STAT = Allocate_Status )
+         if ( Allocate_Status /= 0 ) &
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Surface_K Structure"/))
+      endif
+
    end do        ! end loop for sensor
 
    Error_Status = CRTM_Destroy_Atmosphere (Atmosphere)
-   if (Error_Status /= 0) then
+   if (Error_Status /= 0) &
        call da_error(__FILE__,__LINE__, &
          (/"Error in deallocating CRTM Atmosphere Structure"/))
-   end if   
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_crtm")
  

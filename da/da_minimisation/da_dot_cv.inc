@@ -30,9 +30,7 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, grid, mzs, lvarbc)
    dtemp1(1) = 0.0
    
    llvarbc = .false.
-   if (present(lvarbc)) then
-      if (lvarbc) llvarbc = .true.
-   end if
+   if (present(lvarbc)) llvarbc = lvarbc
    
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not

@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
+subroutine da_check_xtoy_adjoint(cv_size, cv, grid, config_flags, iv, y)
    
    !--------------------------------------------------------------------------
    ! Purpose: Test observation operator transform and adjoint for compatibility.
@@ -8,6 +8,8 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    
    implicit none
    
+   integer, intent(in)                       :: cv_size ! Size of cv array.
+   real, intent(inout)                       :: cv(1:cv_size)   ! control variables.
    type (domain),              intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
    type (iv_type),             intent(inout) :: iv    ! ob. increment vector.
@@ -141,7 +143,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
       ! [2.0] Perform y = Hx transform:
       !----------------------------------------------------------------------
    
-      call da_transform_xtoy (grid, iv, y)
+      call da_transform_xtoy (cv_size, cv, grid, iv, y)
 
       !----------------------------------------------------------------------
       ! [3.0] Calculate LHS of adjoint test equation and
@@ -180,7 +182,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
       call da_zero_x (grid%xa)
 
-      call da_transform_xtoy_adj (grid, iv, y, grid%xa)
+      call da_transform_xtoy_adj (cv_size, cv, grid, iv, y, grid%xa)
 
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &

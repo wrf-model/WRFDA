@@ -32,7 +32,8 @@ module da_rttov
       print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
-      qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme
+      qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme, &
+      use_airs_mmr
    use da_interpolation, only : da_to_zk_new, &
       da_interp_lin_2d, da_interp_lin_3d, da_interp_lin_3d_adj, da_interp_lin_2d_adj
    use da_tools_serial, only : da_get_unit, da_free_unit

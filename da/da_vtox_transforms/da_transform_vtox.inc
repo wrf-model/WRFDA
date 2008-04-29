@@ -28,7 +28,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
    else
       call da_transform_vtovv(grid, cv_size, be, cv, vv)
    end if
-
+   
    !----------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
    !----------------------------------------------------------------------
@@ -47,7 +47,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
    ! if (be % ne > 0) then
    !    vp % alpha(its:ite,jts:jte,1:be%ne) = vv%alpha(its:ite,jts:jte,1:be%ne)
    ! end if
-
+   
    !----------------------------------------------------------------------  
    ! [3.0]: Perform x = u_p vp transform::
    !----------------------------------------------------------------------

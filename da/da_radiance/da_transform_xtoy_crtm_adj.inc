@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_crtm_adj ( cv_size, cv, iv, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: transform gradient from obs space to model grid space.
@@ -15,6 +15,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
    implicit none
 
+   integer, intent(in)            :: cv_size         ! Size of cv array.
+   real, intent(inout)            :: cv(1:cv_size)   ! control variables.
    type (x_type), intent(inout)   :: jo_grad_x ! 
    type (y_type),  intent(in)     :: jo_grad_y ! H' delta_x
    type (iv_type), intent(in)     :: iv        ! O-B structure.
@@ -25,6 +27,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    integer                        :: k  ! Index dimension.
    integer                        :: num_rad  ! Number of radiance obs
    integer                        :: inst, nchanl, n
+   integer                        :: ipred, npred, gammapred, id
+   real                           :: cv_local(1:cv_size)
    real, allocatable              :: q_ad(:,:)
    real, allocatable              :: t(:,:)
    real, allocatable              :: p(:)
@@ -54,7 +58,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_crtm_adj")
-
+   
+   cv_local(:) = 0.0
+   
 !----------------------------------------------------------------------------
 ! CRTM allocation
 !
@@ -76,6 +82,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
     end if
     Atmosphere(1)%Absorber_ID(1)=H2O_ID
     Atmosphere(1)%Absorber_ID(2)=O3_ID
+    Atmosphere(1)%Climatology=crtm_atmosphere
  
     if (crtm_cloud) then
        Atmosphere(1)%Cloud(1)%Type=WATER_CLOUD
@@ -90,7 +97,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
    do inst = 1, iv%num_inst                 ! loop for sensor
       num_rad = iv%instid(inst)%info%n2 - iv%instid(inst)%info%n1 + 1
-      if ( num_rad < 1 ) cycle
+!      if ( num_rad < 1 ) cycle
       allocate (q_ad(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (t(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (p(iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
@@ -223,6 +230,19 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
      Surface(1)%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &
                                           iv%instid(inst)%tb_xb(1:nchanl,n)
      
+      ! Gamma correction from VarBC
+      !----------------------------
+      gammapred = iv%instid(inst)%varbc_info%gammapred 
+      do k = 1, nchanl
+         npred = iv%instid(inst)%varbc(k)%npred
+         if (npred <= 0) cycle                                               ! VarBC channels only
+         if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+         do ipred = 1, npred
+            if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+            RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
+	 end do
+      end do
+
       ! -- Copy the adjoint atmosphere structure
       Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_AD )
 
@@ -258,7 +278,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
          RTSolution_AD(:,1)%brightness_temperature = jo_grad_y%instid(inst)%tb(:,n)
          RTSolution_AD(:,1)%radiance = 0.0 ! must assign zero, since each call of AD model will return non-zero value
-       !if (n <= 10) write(6,'(15f8.3)') RTSolution_AD(:,1)%brightness_temperature
+	 RTSolution_AD(:,1)%Gamma    = 0.0
+!       if (n <= 1 ) write(6,'(15f8.3)') 'CRTM_ADJ',RTSolution_AD(1:nchanl,1)%Gamma
+!       if (n <= 15) write(6,'(15f8.3)') RTSolution_AD(:,1)%brightness_temperature
 
       ! [1.4] Call CRTM_AD model
 
@@ -304,7 +326,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
          end if
 
 
-            ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
+       ! [1.6] Adjoint of Interpolate horizontally from ob to grid:
 
             do k=kts,kte ! from bottom to top
 
@@ -348,8 +370,26 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
                  (/"Error in deallocatting CRTM Surface_AD Structure"/))
             end if
 
+       ! [1.7] Gamma correction to VarBC
+
+            do k = 1, nchanl
+               npred = iv%instid(inst)%varbc(k)%npred
+               if (npred <= 0) cycle                                               ! VarBC channels only
+               if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+               do ipred = 1, npred
+                  if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+	          id = iv%instid(inst)%varbc(k)%index(ipred)
+	          cv_local(id) = cv_local(id) + &
+		                 SUM(RTSolution_AD(k,1)%Gamma * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
+               end do   
+            end do	    
+
          end do       !  end loop for pixels
 
+       ! Gathering Gamma correction across processors
+       !--------------------------------------------- 
+!!!        call wrf_dm_sum_reals(cv_local, cv)
+      
         if (crtm_cloud) then
            call da_interp_lin_2d_adj_partial(jo_grad_x%qcw(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qcw)
            call da_interp_lin_2d_adj_partial(jo_grad_x%qci(:,:,kts:kte),iv%instid(inst)%info, kts,kte, qci)

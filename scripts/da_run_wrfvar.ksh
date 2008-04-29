@@ -240,6 +240,10 @@ for FILE in $DAT_DIR/*.inv; do
    fi
 done
 
+if [[ -d $EP_DIR ]]; then
+   ln -fs $EP_DIR ep
+fi
+
 if [[ -d $BIASCORR_DIR ]]; then
    ln -fs $BIASCORR_DIR biascorr
 fi

@@ -14,10 +14,10 @@
    type (iv_type), intent (inout)   :: iv             ! Innovation
 
    type (stats_rad_type), pointer   :: rad
-   integer                          :: inst, n, i, j, k, ii, jj, n1, n2
-   integer                          :: npred, npredmax, num_rad
+   integer                          :: inst, n, i, j, k, ii, jj
+   integer                          :: npred, npredmax, num_rad, num_rad_active
    real, allocatable 		    :: hessian(:,:), eignvec(:,:), eignval(:)
-   real                             :: hessian_local, bgerr_local
+   real                             :: hessian_local, bgerr_local, pred_i, pred_j
    
    if (trace_use) call da_trace_entry("da_varbc_precond")
    
@@ -27,8 +27,6 @@
 
    do inst = 1, iv%num_inst      ! loop for sensors
       npredmax = iv%instid(inst)%varbc_info%npredmax
-      n1 = iv%instid(inst)%info%n1
-      n2 = iv%instid(inst)%info%n2
  
       allocate ( hessian(npredmax, npredmax) )
       allocate ( eignvec(npredmax, npredmax) )
@@ -38,9 +36,10 @@
          npred = iv%instid(inst)%varbc(k)%npred
          if (npred   <= 0) cycle	      ! VarBC channel only     
 
-         num_rad        = COUNT( (iv%instid(inst)%info%proc_domain(1,n1:n2)) &
-	                    .AND.(iv%instid(inst)%tb_qc(k,n1:n2) > qc_varbc_bad) )
-         iv%instid(inst)%varbc(k)%nobs  = wrf_dm_sum_integer(num_rad)
+         num_rad        = iv%instid(inst)%num_rad
+         num_rad_active = COUNT( (iv%instid(inst)%info%proc_domain(1,1:num_rad)) &
+	                    .AND.(iv%instid(inst)%tb_qc(k,1:num_rad) > qc_varbc_bad) )
+         iv%instid(inst)%varbc(k)%nobs  = wrf_dm_sum_integer(num_rad_active)
 	    
          write(unit=stdout,fmt='(A,I6,3A,I5)') &
 	    'VARBC:',iv%instid(inst)%varbc(k)%nobs,' active observations for ', &
@@ -60,26 +59,37 @@
             do j = i, npred
 	       jj = iv%instid(inst)%varbc(k)%ipred(j)
 	       hessian_local = 0.0	
-               do n= n1,n2      ! loop for pixel      
+	       
+               do n= 1, num_rad      ! loop for pixel      
                   if (iv%instid(inst)%tb_qc(k,n) <= qc_varbc_bad)   cycle  ! good obs only
 	          if (.not. iv%instid(inst)%info%proc_domain(1,n))  cycle  ! do not sum up HALO data
 		  
-       	          hessian_local = hessian_local +  &
-   	                          iv%instid(inst)%varbc_info%pred(ii,n) * &
-	                          iv%instid(inst)%varbc_info%pred(jj,n) / &
+		  if (ii == iv%instid(inst)%varbc_info%gammapred) then
+		     pred_i = iv%instid(inst)%gamma_jacobian(k,n)
+		  else
+   	    	     pred_i = iv%instid(inst)%varbc_info%pred(ii,n)
+		  end if   
+
+		  if (jj == iv%instid(inst)%varbc_info%gammapred) then
+		     pred_j = iv%instid(inst)%gamma_jacobian(k,n)
+		  else
+		     pred_j = iv%instid(inst)%varbc_info%pred(jj,n)		  
+		  end if   
+			      
+       	          hessian_local = hessian_local + pred_i * pred_j / &
 	                          iv%instid(inst)%tb_error(k,n)**2				     
                end do                                               !  end loop for pixel
 	       
 	       ! Sum hessian preconditioning across processors
                hessian(i,j) = wrf_dm_sum_real(hessian_local)	
-	       hessian(j,i) = hessian(i,j)
+	       hessian(j,i) = hessian(i,j)  	       
 	    end do
          
 	   ! Background term
            !-----------------
             if (iv%instid(inst)%varbc_info%nbgerr(ii) <= 0) cycle
 	    bgerr_local = 0.0
-	    do n= n1,n2	    
+	    do n= 1, num_rad    
                if (iv%instid(inst)%tb_qc(k,n) <= qc_varbc_bad)   cycle  ! good obs only
                if (.not. iv%instid(inst)%info%proc_domain(1,n))  cycle  ! do not sum up HALO data
 

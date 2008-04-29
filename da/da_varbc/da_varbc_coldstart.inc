@@ -1,14 +1,12 @@
   subroutine da_varbc_coldstart (iv)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: [1]: Calculate mode of histogram of (uncorrected) innovations 
-   !                for each channel if a cold-start is needed
+   !  PURPOSE: [1]: If a cold-start is needed, calculate mode of histogram 
+   !                of (uncorrected) innovations for each channel
    !
-   !           [2]: Compute bias predictors
+   !           [2]: Calculate statistics (mean/std) for cold-started predictors
    !
-   !           [3]: Calculate statistics (mean/std) for cold-started predictors
-   !
-   !           [4]: Normalize predictors
+   !           [3]: Normalize predictors
    !
    !  Called from da_get_innov_vector_radiance
    !
@@ -19,7 +17,7 @@
 
    type (iv_type), intent (inout)   :: iv             ! Innovation
 
-   integer                          :: inst, k, n, i, n1, n2
+   integer                          :: inst, k, n, i
    integer                          :: npredmax, npred, num_rad, num_rad_tot
 
    integer, parameter               :: nbins   = 200                       ! Number of Hist bins.
@@ -37,13 +35,13 @@
 
    if (trace_use) call da_trace_entry("da_varbc_coldstart")   
 
-   do inst = 1, iv%num_inst                                               !! loop for sensors
+   do inst = 1, iv%num_inst                                            !! loop for sensors
 
       npredmax    = iv%instid(inst)%varbc_info%npredmax
       num_rad     = iv%instid(inst)%num_rad
-      n1          = iv%instid(inst)%info%n1
-      n2          = iv%instid(inst)%info%n2
       num_rad_tot = wrf_dm_sum_integer(num_rad)
+      
+      if (npredmax <= 0) cycle                                         !! VarBC instr only
       
       allocate( ipred(npredmax) )
     
@@ -69,7 +67,7 @@
 	 
            ! Accumulate statistics for histogram
            ! -----------------------------------
-            do n = n1,n2      !! loop for pixel      
+            do n = 1, num_rad      !! loop for pixel      
                if (iv%instid(inst)%info%proc_domain(1,n)) then ! do not count HALO
                   ibin = NINT( (iv%instid(inst)%tb_inv(k,n)+maxhist)/zbin )
  	          if ((ibin>0).AND.(ibin<=nbins)) &
@@ -92,19 +90,15 @@
 	 
 	   ! Use mode to initialize VarBC 
 	   !-----------------------------
-	    iv%instid(inst)%varbc(k)%param(1) = mode
+	    if (iv%instid(inst)%varbc(k)%ipred(1) == 1) &
+	        iv%instid(inst)%varbc(k)%param(1) = mode
 
 	    Deallocate ( hist, hist_tot )
 	 end if
       end do                                                              !  end loop for channels
 
     !---------------------------------------------------------------------------
-    ! [2]: Get bias predictors:
-    !---------------------------------------------------------------------------
-      call da_varbc_pred(inst,iv)   !! bias predictors will be used for VarBC	              
-      
-    !---------------------------------------------------------------------------
-    !  [3]: Calculate statistics for cold-started predictors 
+    !  [2]: Calculate statistics for cold-started predictors 
     !---------------------------------------------------------------------------
       global_cs = .true.
       do k = 1, iv%instid(inst)%nchan 
@@ -121,8 +115,8 @@
         ! Accumulate statistics for predictor mean/std
         ! ---------------------------------------------
          do i = 1, npredmax
-            mean(i) = SUM(iv%instid(inst)%varbc_info%pred(i,n1:n2))    
-            rms(i)  = SUM(iv%instid(inst)%varbc_info%pred(i,n1:n2)**2)
+            mean(i) = SUM(iv%instid(inst)%varbc_info%pred(i,1:num_rad))    
+            rms(i)  = SUM(iv%instid(inst)%varbc_info%pred(i,1:num_rad)**2)
          end do
   
         ! Do inter-processor communication to gather statistics
@@ -145,17 +139,18 @@
       deallocate(ipred)  	           	     	
 
     !---------------------------------------------------------------------------
-    !  [4]: Normalize predictors
+    !  [3]: Normalize predictors
     !---------------------------------------------------------------------------
       do i = 1,  npredmax
          if ( iv%instid(inst)%varbc_info%pred_std(i) <= 0 ) cycle
-         do n = n1, n2      
+         do n = 1, num_rad      
             iv%instid(inst)%varbc_info%pred(i,n) = &
           ( iv%instid(inst)%varbc_info%pred(i,n) - &
             iv%instid(inst)%varbc_info%pred_mean(i) ) / &
             iv%instid(inst)%varbc_info%pred_std(i)
 	 end do     
       end do
+      
    end do                           !  end loop for sensor
    
    if (trace_use) call da_trace_exit("da_varbc_coldstart")

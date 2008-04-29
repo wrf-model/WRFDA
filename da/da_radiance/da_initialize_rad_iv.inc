@@ -70,16 +70,19 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
    iv%instid(i)%vegtyp(n)       = 0.0
    iv%instid(i)%clwp(n)         = 0.0
    iv%instid(i)%ps(n)           = 0.0
-   iv%instid(i)%tb_xb(:,n)      = 0
+   iv%instid(i)%tb_xb(:,n)      = 0.0
    iv%instid(i)%tb_inv(:,n)     = p%tb_inv(:)
    iv%instid(i)%tb_qc(:,n)      = 0
    iv%instid(i)%tb_error(:,n)   = 500.0
+   iv%instid(i)%rad_xb(:,n)        = 0.0
+   iv%instid(i)%rad_obs(:,n)    = 0.0
+   iv%instid(i)%rad_ovc(:,:,n)  = 0.0
    iv%instid(i)%emiss(:,n)      = 0.0
    iv%instid(i)%scanpos(n)      = p%scanpos
    ! iv%instid(i)%scanline(n)    = p%scanline
    iv%instid(i)%scanline(n)     = 0
    iv%instid(i)%ifgat(n)        = p%ifgat
-   iv%instid(i)%cloud_flag(:,n) = 1        ! no cloud
+   iv%instid(i)%cloud_flag(:,n) = qc_good  ! no cloud
    iv%instid(i)%rain_flag(n)    = 0        ! no rain;  1:rain
    iv%instid(i)%satzen(n)       = p%satzen
    iv%instid(i)%satazi(n)       = p%satazi
@@ -96,6 +99,7 @@ subroutine da_initialize_rad_iv (i, n, iv, p)
          iv%instid(i)%ts_jacobian(:,n)=0.0
          iv%instid(i)%windspeed_jacobian(:,n)=0.0
          iv%instid(i)%emiss_jacobian(:,n)=0.0
+         iv%instid(i)%gamma_jacobian(:,n)=0.0
          iv%instid(i)%t_jacobian(:,:,n)=0.0
          iv%instid(i)%q_jacobian(:,:,n)=0.0
          if ( crtm_cloud ) then

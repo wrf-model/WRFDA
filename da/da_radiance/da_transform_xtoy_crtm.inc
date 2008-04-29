@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_crtm (grid, iv, y )
+subroutine da_transform_xtoy_crtm (cv_size, cv, grid, iv, y )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: transform from analysis increment to 
@@ -15,14 +15,17 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
 
    implicit none
 
-   type (domain),  intent(in)      :: grid
+   integer, intent(in)            :: cv_size         ! Size of cv array.
+   real, intent(in)               :: cv(1:cv_size)   ! control variables.
+   type (domain),  intent(in)     :: grid
    type (y_type),  intent(inout)  :: y        ! H' delta_x
    type (iv_type), intent(in)     :: iv       ! O-B structure.
 
 #ifdef CRTM
    integer                        :: k  ! Index dimension.
 
-   integer            :: inst, num_rad, nchanl, n, icld
+   integer           :: inst, num_rad, nchanl, n, icld
+   integer           :: ipred, npred, gammapred, id
    real, allocatable :: temperature(:,:)
    real, allocatable :: absorber(:,:)
    real, allocatable :: psfc(:)
@@ -64,6 +67,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
 
     Atmosphere(1)%Absorber_ID(1)=H2O_ID
     Atmosphere(1)%Absorber_ID(2)=O3_ID
+    Atmosphere(1)%Climatology=crtm_atmosphere
 
     if (crtm_cloud) then
        Atmosphere(1)%Cloud(1)%Type=WATER_CLOUD
@@ -296,6 +300,23 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
          enddo
       end if
 
+    ! Gamma correction from VarBC
+    !----------------------------
+    gammapred = iv%instid(inst)%varbc_info%gammapred 
+    do k = 1, nchanl
+       npred = iv%instid(inst)%varbc(k)%npred
+       if (npred <= 0) cycle                                               ! VarBC channels only
+       if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+       do ipred = 1, npred
+          if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+          id = iv%instid(inst)%varbc(k)%index(ipred)
+          RTSolution(k,1)%Gamma    = iv%instid(inst)%varbc(k)%param(ipred)
+          RTSolution_TL(k,1)%Gamma = SUM(cv(id) * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
+       end do	  
+    end do
+! if (n <= 1 ) write(6,'(15f8.3)') 'CRTM_TL',RTSolution_TL(1:nchanl,1)%Gamma
+
+
       ! [1.5] CRTM GeometryInfo Structure
         GeometryInfo(1)%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
         GeometryInfo(1)%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
@@ -334,7 +355,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       ! [1.7] assign Hdx :
       !-------------------------------------------------------------------
          y%instid(inst)%tb(:,n) = RTSolution_TL(:,1)%brightness_temperature
-         !if (n <= 10 ) write(6,'(15f8.3)') RTSolution_TL(:,1)%brightness_temperature
+!         if (n <= 15 ) write(6,'(15f8.3)') RTSolution_TL(:,1)%brightness_temperature
 
          Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_TL )
          if ( Error_Status /= 0 ) then
