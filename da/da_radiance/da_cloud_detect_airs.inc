@@ -224,7 +224,7 @@ REAL :: ZHOOK_HANDLE
       call da_cloud_sim_airs(0,NDIM,px,ZF,ZG,izs,RZS,DZS)
       ZDF1      = 1.e-1*ZF 
 
-      call da_n2qn1(da_cloud_sim_airs,NDIM,px,ZF,ZG,(/(ZDXMIN,jlev=1,NDIM)/),ZDF1, &
+      call inria_n2qn1(da_cloud_sim_airs,NDIM,px,ZF,ZG,(/(ZDXMIN,jlev=1,NDIM)/),ZDF1, &
                  ZEPSG,impres,io,IMODE,nit,NSIM,binf,bsup,IZ,ZRZ,izs,RZS,DZS)
   
       IF (ALLOCATED(IZ))  DEALLOCATE(IZ)       

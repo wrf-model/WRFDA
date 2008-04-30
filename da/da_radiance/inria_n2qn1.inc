@@ -696,7 +696,7 @@
       subroutine fajc1(n,nc,nr,h,w,indi)
       implicit double precision (a-h,o-z)
       integer :: indi,nr,nc,n,ik,ij,nh,nkk,nh1,nsaut,j,i,nr2,incm1,nw,nj,inc1
-      integer :: nkkmj,j,nk,ko,kom1,k,i,ii,nrr,inc,nr1
+      integer :: nkkmj,nk,ko,kom1,k,ii,nrr,inc,nr1
       double precision :: h,w
       dimension h(*),w(n),indi(n)
       inc=indi(nc)
@@ -1401,7 +1401,7 @@
       end subroutine fmc11e
       subroutine nqhess(n,imp,lp,iz,rz)
       implicit double precision(a-h,o-z)
-      integer :: lp,iz,n,imp,ni,i,n,nw,nw1,nr,nc,j1,nj,i1,j1,j,n1,k
+      integer :: lp,iz,imp,ni,i,n,nw,nw1,nr,nc,nj,i1,j1,j,n1,k
       dimension iz(*),rz(*)
  1000 format(//)
  1001 format(34h nqhess   hessienne au point final)
