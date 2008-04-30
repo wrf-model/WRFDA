@@ -1,4 +1,4 @@
-      subroutine da_n2qn1 (simul, n, x, f, g, dxmin, df1, epsabs, imp, io,&
+      subroutine inria_n2qn1 (simul, n, x, f, g, dxmin, df1, epsabs, imp, io,&
       mode, iter, nsim, binf, bsup, iz, rz, izs, rzs, dzs)
       implicit double precision (a-h,o-z)
       
@@ -113,7 +113,7 @@
       " (0: inactive, -1: binf active, +1: bsup active)",/&
       (9x,"| ",5(i5,": ",i2," |")))
       return
-      end subroutine da_n2qn1
+      end subroutine inria_n2qn1
       subroutine n2qn1a (simul,n,x,f,ga,dxmin,acc,gpmopt,&
       df1,mode,niter,nsim,iprint,lp,h,d,w,w1,g,&
       binf,bsup,indi,ibloc,iz,izs,rzs,dzs)
