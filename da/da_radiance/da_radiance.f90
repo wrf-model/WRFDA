@@ -49,11 +49,11 @@ module da_radiance
       use_pseudo_rad, pseudo_rad_platid,pseudo_rad_satid, pseudo_rad_senid, &
       pseudo_rad_ichan, pseudo_rad_tb, pseudo_rad_lat,pseudo_rad_lon, &
       pseudo_rad_err, use_simulated_rad, use_crtm_kmatrix , &
-      use_rad,crtm_cloud, DT_cloud_model, global, use_varbc, freeze_varbc
+      use_rad,crtm_cloud, DT_cloud_model, global, use_varbc, freeze_varbc, &
+      airs_warmest_fov
  
 #ifdef CRTM
-   use da_crtm, only : da_crtm_init, da_get_innov_vector_crtm, &
-      da_get_innov_vector_crtmk
+   use da_crtm, only : da_crtm_init, da_get_innov_vector_crtm
 #endif
    use da_define_structures, only : maxmin_type, iv_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
@@ -82,7 +82,8 @@ module da_radiance
       da_llxy, da_llxy_new, da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
-   use da_varbc, only : da_varbc_direct,da_varbc_coldstart,da_varbc_precond
+   use da_varbc, only : da_varbc_direct,da_varbc_coldstart,da_varbc_precond, &
+      da_varbc_pred
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
    use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max, &
                             dlat_grid,dlon_grid,thinning_grid, &

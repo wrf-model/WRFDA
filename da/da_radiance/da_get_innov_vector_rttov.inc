@@ -39,7 +39,7 @@ subroutine da_get_innov_vector_rttov (it, grid, ob, iv)
    real   , allocatable :: zasat(:), zlsat(:)
 
 ! FIX?
-real,allocatable :: temp(:)
+real,allocatable :: temp(:), temp2(:), temp3(:,:)
 
    real, allocatable :: tgrn(:)
    real, allocatable :: tsk(:)
@@ -49,6 +49,9 @@ real,allocatable :: temp(:)
 
    ! variables for computing clwp
    real, allocatable :: dpf(:,:), clw(:,:), pf(:,:)
+
+   ! variables for tb to radiance conversion
+   real :: tstore
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_rttov")
 
@@ -307,15 +310,24 @@ real,allocatable :: temp(:)
 
          ! da_rttov_direct nominally an array version, but doesn't handle arrays
          ! of surface flags properly
-allocate(temp(nchan))
-      call da_rttov_direct (inst, iv%instid(inst)%isflg(n), nchan, 1, &
-         con_vars(n:n), aux_vars(n:n), &
-         ! iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
-         temp(:), pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
-         iv%instid(inst)%emiss(:,n))
-iv%instid(inst)%tb_xb(:,n)=temp(:)
-deallocate(temp)
-end do
+         allocate(temp(nchan),temp2(nchan),temp3(nchan,kts:kte))
+         
+         !----------------------------------------------------------------
+         ! Compute Overcast Radiances for AIRS Cloud Detection(MMR)
+         !----------------------------------------------------------------
+	 call da_rttov_direct (inst, iv%instid(inst)%isflg(n), nchan, 1, &
+            con_vars(n:n), aux_vars(n:n), &
+            ! iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
+!!!            temp, pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
+            temp, temp2, temp3, pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
+            iv%instid(inst)%emiss(:,n))
+         
+	 iv%instid(inst)%tb_xb(:,n)=temp(:)
+         iv%instid(inst)%rad_xb(:,n)=temp2(:)
+         iv%instid(inst)%rad_ovc(:,:,n)=temp3(:,:)
+
+         deallocate(temp,temp2,temp3)
+      end do
 
       if (iv%instid(inst)%nchannels > nchan) then
          iv%instid(inst)%emiss(nchan+1:iv%instid(inst)%nchannels,n1:n2) = 0.0

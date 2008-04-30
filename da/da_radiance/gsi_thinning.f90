@@ -237,7 +237,7 @@ contains
                                     !.5 (at center of box)
     crit=crit1*dist1
     iuse=.false.
-
+    
     if(thinning_grid(n)%icount(itx) == 1)then
 
 !   Increment obs counter

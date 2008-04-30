@@ -32,6 +32,8 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
 
    call da_trace_entry("da_transform_vtoy_adj")
 
+   cv = 0.0
+
    if (var4d) then
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
@@ -75,7 +77,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
             iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
          end if
          call da_zero_x(grid%xa)
-         call da_transform_xtoy_adj(grid, iv, y, grid%xa)
+         call da_transform_xtoy_adj(cv_size, cv, grid, iv, y, grid%xa)
          call da_transform_xtoxa_adj(grid)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
 
@@ -124,11 +126,9 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
          iv%instid(:)%info%n2 = iv%instid(:)%num_rad
       end if
       call da_zero_x(grid%xa)
-      call da_transform_xtoy_adj(grid, iv, y,grid%xa)
+      call da_transform_xtoy_adj(cv_size, cv, grid, iv, y,grid%xa)
       call da_transform_xtoxa_adj(grid)
    end if ! var4d
-
-   cv = 0.0
    call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    !--------------------------------------------------------------
@@ -137,7 +137,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
 #if defined(RTTOV) || defined(CRTM)
    if (use_varbc) call da_varbc_adj(cv_size, cv, iv, y)
 #endif
-   call da_trace_exit("da_transform_vtoy_adj")
+   if (trace_use) call da_trace_exit("da_transform_vtoy_adj")
 
 end subroutine da_transform_vtoy_adj
 

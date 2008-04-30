@@ -222,11 +222,11 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       
       if [[ ${DA_VARBC_IN:+1} = 1 ]]; then
          if [[ -f $DA_VARBC_IN ]]; then
-            if $CYCLING; then
+#            if $CYCLING; then
                if  [[ -s ${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out ]]; then
 	          export DA_VARBC_IN=${SUITE_DIR}/${PREV_DATE}/wrfvar/working/VARBC.out
 	       fi
-	    fi
+#	    fi
          fi
       fi
 

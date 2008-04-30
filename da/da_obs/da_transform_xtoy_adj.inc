@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_adj(cv_size, cv, grid, iv, jo_grad_y, jo_grad_x)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,6 +6,8 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    
    implicit none
    
+   integer, intent(in)           :: cv_size         ! Size of cv array.
+   real, intent(inout)           :: cv(1:cv_size)   ! control variables.
    type (domain),  intent(inout) :: grid
    type (iv_type), intent(inout) :: iv          ! obs. inc vector (o-b).
    type (y_type),  intent(inout) :: jo_grad_y   ! grad_y(jo)
@@ -42,22 +44,17 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    if (iv%info(radar)%nlocal    > 0) call da_transform_xtoy_radar_adj    (grid, iv, jo_grad_y, jo_grad_x)
    if (iv%info(bogus)%nlocal    > 0) call da_transform_xtoy_bogus_adj    (grid, iv, jo_grad_y, jo_grad_x)
    if (iv%info(airsr)%nlocal    > 0) call da_transform_xtoy_airsr_adj    (iv, jo_grad_y, jo_grad_x)
-
-   if (num_pseudo            > 0) call da_transform_xtoy_pseudo_adj   (iv, jo_grad_y, jo_grad_x)
+   if (num_pseudo               > 0) call da_transform_xtoy_pseudo_adj   (iv, jo_grad_y, jo_grad_x)
 
 #if defined(CRTM) || defined(RTTOV)
    if (use_rad) then
       if (rtm_option == rtm_option_rttov) then
+#ifdef RTTOV
          call da_transform_xtoy_rttov_adj (iv, jo_grad_y, jo_grad_x)
+#endif
       elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-         !if (use_crtm_kmatrix) then
-         !   call da_transform_xtoy_crtmk_adj (iv, jo_grad_y, jo_grad_x)
-         !else if (use_crtm_kmatrix_fast) then
-         !   call da_transform_xtoy_crtmk_f_adj (iv, jo_grad_y, jo_grad_x)
-         !else
-         call da_transform_xtoy_crtm_adj (iv, jo_grad_y, jo_grad_x)
-         !end if
+         call da_transform_xtoy_crtm_adj (cv_size, cv, iv, jo_grad_y, jo_grad_x)
 #endif
       else
          call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))

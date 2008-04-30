@@ -39,7 +39,7 @@
                   if (iv%instid(inst)%tb_qc(k,n) <= qc_varbc_bad) cycle  ! good obs only
                   if (.not. iv%instid(inst)%info%proc_domain(1,n))  cycle   ! do not sum up HALO data
 	       
-	          varbc_param_adj(1:npred) = varbc_param_adj(1:npred)      + &
+		  varbc_param_adj(1:npred) = varbc_param_adj(1:npred)      + &
 	       		   		     y%instid(inst)%tb(k,n)        * &
 		                            iv%instid(inst)%varbc_info%pred( &
 					    iv%instid(inst)%varbc(k)%ipred(1:npred),n ) 
@@ -51,7 +51,8 @@
            !---------------------------------------------------------------
 	    do i = 1, npred
                cv_local = SUM(varbc_param_adj(1:npred) * iv%instid(inst)%varbc(k)%vtox(i,1:npred))
-               cv(iv%instid(inst)%varbc(k)%index(i)) = wrf_dm_sum_real(cv_local)	
+               cv(iv%instid(inst)%varbc(k)%index(i)) = cv(iv%instid(inst)%varbc(k)%index(i)) + &
+	                                               wrf_dm_sum_real(cv_local)	
             end do
 	 end do
 	 

@@ -11,6 +11,8 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
    !                  and deallocate sequential data structure
    !
    !  HISTORY: 2006/01/03 - Creation            Zhiquan Liu
+   !           2008/03/01 - VISNIR Cloud Cover  Tom Auligne
+   !           2008/04/01 - Warmest FoV         Tom Auligne
    !
    !------------------------------------------------------------------------------
 
@@ -74,7 +76,6 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
      real(r_double) :: tmbrst  ! Brightness temperature
   end type airschan_list
   
-
 ! BUFR talble file sequencial number
   character(len=512)  :: table_file
 
@@ -116,6 +117,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
   integer(i_kind)  :: i, l, n, error, airs_table_unit
   integer          :: iost, lnbufr
   real(r_kind),allocatable,dimension(:,:):: airdata_all
+  integer(i_kind)  :: tocc
 
 ! Set standard parameters
   real(r_kind)     :: POinT001 =   0.001_r_kind
@@ -286,6 +288,10 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
         cycle loop_obspoints
      end if
 
+!   3.5 Read Cloud Cover from AIRS/VISNIR
+!-------------------------------------------
+     call ufbint(lnbufr,tocc,1,1,iret,'TOCC')
+     
 !   4.0  Check observing position (lat/lon)
 !      QC1:  juge if data is in the domain, 
 !            read next record if not
@@ -307,7 +313,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
         info%lon  = airsspot%clonh 
         call da_llxy (info, loc, outside, outside_all )
         if (outside) cycle loop_obspoints
-
+	
 !  4.1  Check obs time
 !-------------------------------------
      idate5(1) = airsspot%year ! year
@@ -366,6 +372,8 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
           dlat_earth = dlat_earth*deg2rad
           dlon_earth = dlon_earth*deg2rad           
           crit = 1.0 ! 0.01_r_kind+terrain + timedif !+ 10.0_r_kind*float(iskip)
+	  if (airs_warmest_fov) &
+	     crit = 1E10 * exp(-(airschan(129)%tmbrst-220.0)/2)   ! warmest bt for window channel (10.36 micron)
           call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,luse)
           if (.not. luse) cycle loop_obspoints
        end if
@@ -401,7 +409,7 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
      iflag = .false.
   
      do l=1,nchan
-        airdata(l+nreal) = airschan(l)%tmbrst            ! brightness temerature
+        airdata(l+nreal) = airschan(l)%tmbrst            ! brightness temperature
         if( airdata(l+nreal) > 0.0_r_kind .and. airdata(l+nreal) < 500.0_r_kind )then
            iflag = .true.
         else
@@ -431,9 +439,9 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
    p%satazi           = (start + float(ifov-1)*step)  ! look angle (deg) ! airsspot%bearaz
    p%solzen           = aquaspot%soza
    p%solazi           = aquaspot%solazi
-   p%tb_inv(1:nchan) = airdata(nreal+1:nreal+nchan)
-   p%sensor_index         = inst
-   p%ifgat                = ifgat
+   p%tb_inv(1:nchan)  = airdata(nreal+1:nreal+nchan)
+   p%sensor_index     = inst
+   p%ifgat            = ifgat
 
    size = size + 1
    allocate ( p%next, stat=error)   ! add next data
@@ -529,7 +537,6 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
                prev => p
                p => p%next
             endif
-
          end do
       endif
 
@@ -582,7 +589,8 @@ subroutine da_read_obs_bufrairs(obstype,iv,infile)
    n = n + 1
 
    call da_initialize_rad_iv (inst, n, iv, p)
-
+   iv%instid(inst)%rain_flag(n) = tocc ! Temporary dumping of AIRS/VISNIR cloud cover
+   
    current => p
    p => p%next
 

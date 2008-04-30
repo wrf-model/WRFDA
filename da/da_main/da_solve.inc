@@ -103,7 +103,6 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    call da_setup_background_errors (grid%xb, be)
-   cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
    ! [5.1] Set up observation bias correction (Varbc):
@@ -111,7 +110,7 @@ subroutine da_solve ( grid , config_flags)
 
    be % cv % size_jp = 0.0
 #if defined(RTTOV) || defined(CRTM)
-   if ( (use_varbc).or.(freeze_varbc) ) call da_varbc_init(iv, be)
+   if (use_varbc.or.freeze_varbc) call da_varbc_init(iv, be)
 #endif
    cv_size = be % cv % size
 
@@ -359,6 +358,9 @@ subroutine da_solve ( grid , config_flags)
             deallocate (iv%instid(i)%tb_qc)
             deallocate (iv%instid(i)%tb_inv)
             deallocate (iv%instid(i)%tb_error)
+            deallocate (iv%instid(i)%rad_xb)
+            deallocate (iv%instid(i)%rad_obs)
+            deallocate (iv%instid(i)%rad_ovc)
             deallocate (iv%instid(i)%emiss)
             deallocate (iv%instid(i)%scanpos)
             deallocate (iv%instid(i)%scanline)
@@ -398,7 +400,8 @@ subroutine da_solve ( grid , config_flags)
                   deallocate(iv%instid(i)%q_jacobian)
                   deallocate(iv%instid(i)%windspeed_jacobian)
                   deallocate(iv%instid(i)%emiss_jacobian)
-                  if ( crtm_cloud ) then
+                  deallocate(iv%instid(i)%gamma_jacobian)
+                 if ( crtm_cloud ) then
                      deallocate(iv%instid(i)%water_jacobian)
                      deallocate(iv%instid(i)%ice_jacobian)
                      deallocate(iv%instid(i)%rain_jacobian)

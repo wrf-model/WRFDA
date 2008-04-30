@@ -35,10 +35,12 @@ module module_radiance
       o3_id, water_cloud, crtm_rtsolution_type, crtm_channelinfo_type, &
       crtm_atmosphere_type, crtm_surface_type, crtm_geometryinfo_type, &
       crtm_zero_surface, crtm_zero_atmosphere, crtm_destroy, &
-      crtm_destroy_channelinfo
+      crtm_destroy_channelinfo, climatology_model_name
 
    USE CRTM_SensorInfo
 #endif
+   USE CRTM_Planck_Functions, only : CRTM_Planck_Temperature, &
+      CRTM_Planck_Radiance
 
    use gsi_kinds      ,  only : r_kind,r_double,i_kind,r_single
    use gsi_constants  ,  only : deg2rad, rad2deg,       &

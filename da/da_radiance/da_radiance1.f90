@@ -4,8 +4,8 @@ module da_radiance1
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_radiance, only : satinfo,q2ppmv
-   use module_radiance, only : rttov_inst_name
+   use module_radiance, only : satinfo,q2ppmv,rttov_inst_name, &
+      CRTM_Planck_Radiance
 #ifdef RTTOV
    use module_radiance, only : coefs
 #endif
@@ -17,14 +17,15 @@ module da_radiance1
       rtm_option_rttov,rtm_option_crtm, radiance, only_sea_rad, &
       global, gas_constant, gravity, monitor_on,kts,kte, &
       use_pseudo_rad, pi, t_triple, crtm_cloud, DT_cloud_model,write_jacobian, &
-      use_crtm_kmatrix
+      use_crtm_kmatrix,use_airs_mmr
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       iv_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
+   use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_integer
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
    use da_reporting, only : da_error, message
    use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_residual_new
+   use da_tools, only : da_residual_new, da_eof_decomposition
    use da_tools_serial, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace_int_sort
 
@@ -208,10 +209,13 @@ contains
 #include "da_predictor_crtm.inc"
 #include "da_qc_crtm.inc"
 #endif
+#include "da_cloud_sim_airs.inc"
+#include "da_cloud_detect_airs.inc"
+#include "da_n2qn1.inc"
+#include "da_qc_airs.inc"
 #include "da_qc_amsua.inc"
 #include "da_qc_amsub.inc"
 #include "da_qc_hirs.inc"
-#include "da_qc_airs.inc"
 #include "da_qc_ssmis.inc"
 #include "da_qc_mhs.inc"
 #include "da_write_iv_rad_ascii.inc"

@@ -36,10 +36,11 @@
    ! [1] Initializations
    !--------------------------------------------------------------
    size_jp  = 0                            !! Jp Control Variable size
-   jp_start = be % cv % size_jb +  be % cv % size_je
+   jp_start = be % cv % size_jb + be % cv % size_je
  
    do n = 1, iv % num_inst
       nchan = iv%instid(n)%nchan
+      iv%instid(n)%varbc_info%npredmax = 0
       allocate ( iv%instid(n)%varbc(nchan) )
       do k = 1, nchan
          iv%instid(n)%varbc(k)%npred = 0   ! by default, do not use VarBC
@@ -167,6 +168,7 @@
    !--------------------------------------------------------------
    ! [3] Define VarBC control variable size:
    !--------------------------------------------------------------
+   use_varbc = use_varbc.and.(.not.freeze_varbc)   
    if (use_varbc) then
       be % cv % size_jp = size_jp
       be % cv % size    = be % cv % size + be % cv % size_jp

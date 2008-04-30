@@ -3,7 +3,8 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
 !                          nfrequencies, nchannels, nbtout , &
                           con_vars, aux_vars, &
 !                          tb, calcemis_out, emisv, emish, emissivity_out)
-                          tb, emisv, emish, emissivity_out)
+!!!                          tb, emisv, emish, emissivity_out)
+                          tb, rad_xb, rad_ovc, emisv, emish, emissivity_out)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: interface to the forward subroutine of RTTOV
@@ -20,6 +21,8 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
 !   real                , intent (out) :: tb(nprofiles, nchanl)
 !   real                , intent (inout) :: tb(nchanl,nprofiles)
    real                , intent (inout) :: tb(nchanl)
+   real                , intent (inout) :: rad_xb(nchanl)
+   real                , intent (inout) :: rad_ovc(nchanl,kts:kte)
 !   logical             , intent (out) :: calcemis_out(nprofiles*nchanl)
    real             ,  intent    (in) :: emisv(nprofiles*nchanl)
    real             ,  intent    (in) :: emish(nprofiles*nchanl)
@@ -27,7 +30,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
 
    ! local variables
    integer             :: nfrequencies, nchannels, nbtout
-   integer             :: n, nc, i, ichannel, pol_id
+   integer             :: n, nc, i, ichannel, pol_id, k
    Integer             :: alloc_status(40)
 
    ! RTTOV input parameters
@@ -324,6 +327,10 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
    nc = nbtout / nprofiles
    do n = 1, nprofiles
       tb(1:nc) = radiance % out_clear((n-1)*nc+1:n*nc)
+      rad_xb(1:nc) = radiance % clear((n-1)*nc+1:n*nc)
+      do k = kts, kte
+         rad_ovc(1:nc,k) = radiance % overcast(k,(n-1)*nc+1:n*nc)
+      end do	 
    end do
 !  calcemis_out  (:) = calcemis(:)
    emissivity_out(:) = emissivity(:)

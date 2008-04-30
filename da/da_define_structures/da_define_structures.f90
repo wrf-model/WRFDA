@@ -360,6 +360,7 @@ module da_define_structures
    type varbc_info_type
       integer              :: platform_id, satellite_id, sensor_id
       integer              :: npredmax
+      integer              :: gammapred
       integer              :: nchanl
       integer, pointer     :: nbgerr(:) 
       real,    pointer     :: pred(:,:)
@@ -395,6 +396,9 @@ module da_define_structures
       integer, pointer     :: tb_qc(:,:)
       real,    pointer     :: tb_error(:,:)
       real,    pointer     :: tb_xb(:,:) 
+      real,    pointer     :: rad_xb(:,:)
+      real,    pointer     :: rad_obs(:,:)
+      real,    pointer     :: rad_ovc(:,:,:)
       integer, pointer     :: scanpos(:)
       integer, pointer     :: scanline(:)
       integer, pointer     :: cloud_flag(:,:)
@@ -446,6 +450,7 @@ module da_define_structures
       real,    pointer     :: ts_jacobian(:,:) ! only over water CRTM
       real,    pointer     :: windspeed_jacobian(:,:) ! only MV and over water CRTM
       real,    pointer     :: emiss_jacobian(:,:)
+      real,    pointer     :: gamma_jacobian(:,:)
       real,    pointer     :: t_jacobian(:,:,:)
       real,    pointer     :: q_jacobian(:,:,:)
       real,    pointer     :: water_jacobian(:,:,:) ! water content jacobian

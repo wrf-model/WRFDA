@@ -80,7 +80,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          call da_zero_x(grid%xa)
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoxa(grid)
-         call da_transform_xtoy(grid, iv, y)
+         call da_transform_xtoy(cv_size, cv, grid, iv, y)
       end do
       call da_med_initialdata_input( grid , config_flags, 'fg')
       call da_setup_firstguess( xbx_tmp, grid, config_flags)
@@ -92,7 +92,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
          iv%instid(:)%info%n2 = iv%instid(:)%num_rad
       end if
       call da_transform_xtoxa(grid)
-      call da_transform_xtoy(grid, iv, y)
+      call da_transform_xtoy(cv_size, cv, grid, iv, y)
    end if ! var4d
 
    !--------------------------------------------------------------

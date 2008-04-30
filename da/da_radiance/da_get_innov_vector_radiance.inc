@@ -20,11 +20,17 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
 
    integer                        :: inst
 
+   iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
+   iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
+
+   !---------------------------------------------------------------------------
+   ! [0.0]: Get bias predictors for VarBC
+   !---------------------------------------------------------------------------
+   if (use_varbc .or. freeze_varbc) call da_varbc_pred(iv)	              
+      
    !------------------------------------------------------------------------
    ! [1.0] calculate components of innovation vector
    !------------------------------------------------------------------------
-   iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
-   iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
    if (rtm_option == rtm_option_rttov) then
 #ifdef RTTOV
       call da_get_innov_vector_rttov( it, grid, ob, iv )
@@ -34,14 +40,7 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
 #endif
    elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-      !if (use_crtm_kmatrix_fast) then
-      !   call da_get_innov_vector_crtmk( it, grid, ob, iv )
-      !else
-      if (use_crtm_kmatrix) then
-         call da_get_innov_vector_crtmk( it, grid, ob, iv )
-      else
-         call da_get_innov_vector_crtm (it, grid, ob, iv )
-      end if
+      call da_get_innov_vector_crtm (it, grid, ob, iv )
 #else
       call da_error(__FILE__,__LINE__, &
        (/"Must compile with $CRTM option for radiances"/))
@@ -53,10 +52,8 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
    !------------------------------------------------------------------------
    ! [2.0] Perform (Variational) bias correction
    !------------------------------------------------------------------------
-
-   if ( (use_varbc).or.(freeze_varbc) ) then
+   if (use_varbc .or. freeze_varbc) then
       call da_varbc_coldstart(iv)  
-      
       call da_varbc_direct(iv)      
    end if
    
@@ -71,7 +68,6 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
    !------------------------------------------------------------------------
    ! [3.0] Perform QC check
    !------------------------------------------------------------------------
-
    if (qc_rad) then
       call da_qc_rad(ob, iv)
    end if
@@ -84,7 +80,6 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
    !------------------------------------------------------------------------
    ! [5.0] Prepare (QCed) bias statistics files
    !------------------------------------------------------------------------
-
    if (biasprep) then
       do inst = 1, iv%num_inst
          write(unit=stdout,fmt='(A,A)') 'Preparing bias statistics files for ', &

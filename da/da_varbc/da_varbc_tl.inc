@@ -49,12 +49,12 @@
            !---------------------------------------------------------------
            ! TL of bias correction through linear regression
            !---------------------------------------------------------------
-	    do n = 1, num_rad                                     ! loop for pixel      
+	    do n = 1, num_rad                                         ! loop for pixel      
                if (iv%instid(inst)%tb_qc(k,n) <= qc_varbc_bad) cycle  ! good obs only
 
-  	        y%instid(inst)%tb(k,n) = y%instid(inst)%tb(k,n) + &
-		   SUM( varbc_param_tl(1:npred) * &
-		        iv%instid(inst)%varbc_info%pred( &
+  	        y%instid(inst)%tb(k,n) = y%instid(inst)%tb(k,n) +   &
+		   SUM( varbc_param_tl(1:npred) *                   &
+		        iv%instid(inst)%varbc_info%pred(            &
 		        iv%instid(inst)%varbc(k)%ipred(1:npred),n) )
             end do
          end do
