@@ -293,7 +293,7 @@
       mode=4
       go to 900
   502 continue
-      flush (lp)
+!     flush (lp)
       if (iprint.eq.3) then
       if (mod(itr-1,40).eq.0) write (lp,'(/a/a)')&
       "  iters  simuls  nactiv       f       |gp|_2/|gp0|_2",&
@@ -1205,8 +1205,8 @@
       end subroutine fcube
       subroutine fuclid (n,x,y,ps,izs,rzs,dzs)
       implicit real*8 (a-h,o-z)
-      integer :: n,izs,i
-      dimension x(n),y(n),izs(*),dzs(*)
+      integer :: n,izs(*),i
+      double precision x(n),y(n),dzs(*)
       real rzs(*)
       ps=0.d0
       do 10 i=1,n
@@ -1216,7 +1216,7 @@
       subroutine fmc11a(a,n,z,sig,w,ir,mk,eps)
       implicit double precision (a-h,o-z)
       integer :: ir,mk,n,ij,np,i,ip,mm,j
-      dimension a(*),z(n),w(n)
+      double precision a(*),z(n),w(n)
       if (n.le.1) then
       a(1)=a(1)+sig *z(1)**2
       ir=1
@@ -1328,7 +1328,7 @@
       subroutine fmc11b(a,n,ir)
       implicit double precision (a-h,o-z)
       integer :: n,ir,ii,ni,np,i,ip,jk,ij,ik
-      dimension a(*)
+      double precision a(*)
       ir=n
       if (n.gt.1)goto 100
       if (a(1).gt.0.d0)return
@@ -1365,7 +1365,7 @@
       subroutine fmc11e(a,n,z,w,ir)
       implicit double precision (a-h,o-z)
       integer :: n,ir,i,j,ij,nip,np,i1,ip,ii
-      dimension a(*),z(n),w(n)
+      double precision a(*),z(n),w(n)
       if (ir.lt.n) return
       w(1)=z(1)
       if (n.le.1) then
@@ -1401,8 +1401,8 @@
       end subroutine fmc11e
       subroutine nqhess(n,imp,lp,iz,rz)
       implicit double precision(a-h,o-z)
-      integer :: lp,iz,imp,ni,i,n,nw,nw1,nr,nc,nj,i1,j1,j,n1,k
-      dimension iz(*),rz(*)
+      integer :: lp,iz(*),imp,ni,i,n,nw,nw1,nr,nc,nj,i1,j1,j,n1,k
+      double precision rz(*)
  1000 format(//)
  1001 format(34h nqhess   hessienne au point final)
  1002 format(9h   nqhess,i4,5d12.4,/,(9h   nqhess,4x,5d12.4))
@@ -1447,7 +1447,7 @@
       subroutine f1qhes(n,ni,nj,nw,rz)
       implicit double precision(a-h,o-z)
       integer :: nj,nw,ni,n,nii,nk,nwi,nwj,k
-      dimension rz(*)
+      double precision rz(*)
       nii=ni
       nwi=nw+ni
       nwj=nw+nj
@@ -1466,7 +1466,7 @@
       subroutine f2qhes(n,ni,nw,rz)
       implicit double precision(a-h,o-z)
       integer :: n,ni,nw,k,nii
-      dimension rz(*)
+      double precision rz(*)
       nii=ni
       do 20 k=1,n
       rz(nii)=rz(nw+k)
