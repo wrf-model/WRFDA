@@ -33,6 +33,7 @@ program gen_be_etkf
    integer               :: num_members               ! Ensemble size.
    integer               :: nv                        ! Number of variables.
    integer               :: num_obs                   ! Number of observations.
+   integer               :: num_obs_save              ! Number of observations for first member.
    integer               :: naccumt1                  ! Number of previous cycles.
    integer               :: naccumt2                  ! Number of previous cycles.
    integer               :: nstartaccum1              ! Cycle from which naccumt1 cycle starts.
@@ -53,6 +54,8 @@ program gen_be_etkf
    real                  :: rhoinput                  ! Pre-specified inflation, if not using adaptive rho factor.
    real                  :: ds                        ! Grid resolution (m).
 
+   logical               :: unmodified_perts          ! Don't modify perturbations if any members
+                                                      ! have different numbers of observations.
    character(len=10)     :: cv(1:max_num_vars)        ! Default array of variable names.
    integer               :: id_var(1:max_num_vars)    ! NETCDF variable ID.
    integer               :: ndims(1:max_num_vars)     ! Number of field dimensions.
@@ -120,6 +123,7 @@ program gen_be_etkf
    write(stdout,'(/a)')' [2] Read observation information.'
 !-----------------------------------------------------------------------------------------
 
+   unmodified_perts = .false.
    do member = 1, num_members
 
       write(unit=ce,FMT='(i3.3)')member
@@ -129,9 +133,17 @@ program gen_be_etkf
 
       if ( member == 1 ) then
          write(stdout,'(a,i10)')'   Number of observations = ', num_obs
+         num_obs_save = num_obs
          allocate( y(1:num_obs,1:num_members) )
          allocate( sigma_o2(1:num_obs) )
          allocate( yo(1:num_obs) )
+      else
+!        Check that each member has the same number of obs         
+         if ( num_obs /= num_obs_save ) then
+           unmodified_perts = .true.
+           write(stdout,*) 'ob.etkf files have different numbers of observations'
+           write(stdout,*) '***** Perturbations will NOT be modified by ETKF *****'
+         end if
       end if
 
       do o = 1, num_obs
@@ -257,10 +269,11 @@ program gen_be_etkf
 !-----------------------------------------------------------------------------------------
    write(stdout,'(/a)')' [5] Call ETKF:'
 !-----------------------------------------------------------------------------------------
-
-   call da_solve_etkf( nijkv, num_members, num_obs, xf, y, sigma_o2, yo, nout, &
-                       naccumt1, naccumt2, nstartaccum1, nstartaccum2, tainflatinput, &
-                       rhoinput )
+   if (.not.unmodified_perts ) then
+      call da_solve_etkf( nijkv, num_members, num_obs, xf, y, sigma_o2, yo, nout, &
+                          naccumt1, naccumt2, nstartaccum1, nstartaccum2, tainflatinput, &
+                          rhoinput )
+   end if
 
 !  Calculate posterior ensemble standard deviation and output:
    do ijkv = 1, nijkv
