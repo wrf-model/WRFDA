@@ -79,11 +79,7 @@ subroutine da_varbc_pred(iv)
       if (npredmax >= 7) iv%instid(inst)%varbc_info%pred(7,n) = iv%instid(inst)%scanpos(n)**2
       if (npredmax >= 8) iv%instid(inst)%varbc_info%pred(8,n) = iv%instid(inst)%scanpos(n)**3
 
-    end do                       ! pixel loop
-   
-    ! CRTM Gamma Correction
-    iv%instid(inst)%varbc_info%gammapred = 9
-    
+    end do                       ! pixel loop   
   end do                         ! sensor loop
    
    if (trace_use) call da_trace_exit("da_varbc_pred")

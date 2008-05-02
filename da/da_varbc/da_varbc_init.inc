@@ -83,6 +83,8 @@
             iv%instid(n)%varbc_info%sensor_id    = sensor_id
             iv%instid(n)%varbc_info%nchanl       = nchanl
             iv%instid(n)%varbc_info%npredmax     = npredmax
+            iv%instid(n)%varbc_info%gammapred    = 9    ! CRTM Gamma Correction
+
             read(iunit, *)
             allocate ( iv%instid(n)%varbc_info%pred_mean(npredmax) )
             allocate ( iv%instid(n)%varbc_info%pred_std (npredmax) )

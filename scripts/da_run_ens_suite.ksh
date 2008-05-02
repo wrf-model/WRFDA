@@ -227,7 +227,7 @@ while test $DATE -le $FINAL_DATE; do
       export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
-         if ! $FIRST; then
+         if test $CYCLE_NUMBER -gt 0; then
             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
