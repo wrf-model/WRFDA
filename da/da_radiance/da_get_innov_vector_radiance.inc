@@ -23,11 +23,6 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
    iv%instid(:)%info%n1 = iv%instid(:)%info%plocal(iv%time-1) + 1
    iv%instid(:)%info%n2 = iv%instid(:)%info%plocal(iv%time)
 
-   !---------------------------------------------------------------------------
-   ! [0.0]: Get bias predictors for VarBC
-   !---------------------------------------------------------------------------
-   if (use_varbc .or. freeze_varbc) call da_varbc_pred(iv)	              
-      
    !------------------------------------------------------------------------
    ! [1.0] calculate components of innovation vector
    !------------------------------------------------------------------------
@@ -53,11 +48,10 @@ subroutine da_get_innov_vector_radiance (it, grid, ob, iv)
    ! [2.0] Perform (Variational) bias correction
    !------------------------------------------------------------------------
    if (use_varbc .or. freeze_varbc) then
+      call da_varbc_pred(iv)
       call da_varbc_coldstart(iv)  
       call da_varbc_direct(iv)      
-   end if
-   
-   if (biascorr) then
+   else if (biascorr) then
       do inst = 1, iv%num_inst                 ! loop for sensor
          write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
             trim(iv%instid(inst)%rttovid_string)
