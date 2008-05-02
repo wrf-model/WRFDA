@@ -783,7 +783,7 @@ else
         
       cp -f ${RC_HIGH_DIR}/${DATE}/wrfinput_d01 ${FC_DIR}/${DATE}/analysis_update
       if $CYCLING; then
-         if ! $FIRST; then
+         if [[ $CYCLE_NUMBER -gt 0 ]]; then
             cp -f ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${ANALYSIS_DATE} ${FC_DIR}/${DATE}/analysis_update
          fi
       fi
