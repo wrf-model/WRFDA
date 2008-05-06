@@ -22,7 +22,7 @@ subroutine da_transform_xtoy(cv_size, cv, grid, iv, y)
       call da_transform_xtoy_sound (grid, iv, y) 
       call da_transform_xtoy_sonde_sfc (grid, iv, y) 
    end if
-
+   if (iv%info(mtgirs)%nlocal         > 0) call da_transform_xtoy_mtgirs   (grid, iv, y)
    if (iv%info(synop)%nlocal          > 0) call da_transform_xtoy_synop    (grid, iv, y)
    if (iv%info(geoamv)%nlocal         > 0) call da_transform_xtoy_geoamv   (grid, iv, y)
    if (iv%info(polaramv)%nlocal       > 0) call da_transform_xtoy_polaramv (grid, iv, y)

@@ -87,9 +87,7 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
    ! [4.0] Set up observations (ob):
    !---------------------------------------------------------------------------
-
    call da_setup_obs_structures (grid, ob, iv)
-
    if (use_rad) then
       allocate (j % jo % rad(1:iv%num_inst))
       do i=1,iv%num_inst
@@ -200,7 +198,6 @@ subroutine da_solve ( grid , config_flags)
 
       call da_minimise_cg( grid, config_flags, it, be % cv % size, & 
          xbx, be, iv, j_grad_norm_target, xhat, cvt, re, y, j)
-
       !------------------------------------------------------------------------
 
       ! reset cv to random noise

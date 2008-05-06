@@ -19,7 +19,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    ! Adjust obs switches
 
    if (use_synopobs .OR. use_shipsobs .OR. use_metarobs .OR. use_pilotobs .OR. &
-      use_profilerobs .OR. use_buoyobs .OR. use_soundobs .OR. use_bogusobs .OR. &
+      use_profilerobs .OR. use_buoyobs .OR. use_soundobs .OR. use_mtgirsobs .OR. use_bogusobs .OR. &
       use_radarobs .OR. use_radar_rv .OR. use_radar_rf .OR. use_satemobs .OR. &
       use_geoamvobs .OR. use_polaramvobs .OR. use_airepobs .OR. &
       use_gpspwobs .OR. use_gpsrefobs .OR. use_ssmiretrievalobs .OR. &
@@ -93,6 +93,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_shipsobs         = .false.
       use_metarobs         = .false.
       use_soundobs         = .false.
+      use_mtgirsobs        = .false.
       use_bogusobs         = .false.
       use_pilotobs         = .false.
       use_airepobs         = .false.

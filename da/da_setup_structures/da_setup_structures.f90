@@ -20,7 +20,7 @@ module da_setup_structures
       use_airsobs, use_bogusobs, sfc_assi_options, use_eos_amsuaobs, &
       use_filtered_rad, use_eos_radobs, use_gpsrefobs, use_hirs2obs, &
       use_hsbobs,use_hirs3obs, use_gpspwobs, use_metarobs, use_msuobs, &
-      use_kma1dvar,use_pilotobs, use_polaramvobs, use_rad, crtm_cloud, use_soundobs, &
+      use_kma1dvar,use_pilotobs, use_polaramvobs, use_rad, crtm_cloud, use_soundobs,use_mtgirsobs, &
       use_ssmt1obs,use_ssmt2obs, use_shipsobs, use_satemobs, use_synopobs, &
       use_radar_rv,use_profilerobs, use_obsgts, use_geoamvobs, use_buoyobs, &
       alphacv_method,its,ite,jts,jte,cv_size_domain_jb, &
@@ -34,7 +34,7 @@ module da_setup_structures
       filename_len, use_ssmisobs, gravity, t_triple, use_hirs4obs, use_mhsobs, &
       ims,ime,jms,jme,kms,kme,kds, vert_corr_2, alphacv_method_xa, vert_evalue_global, &
       vert_evalue_local, obs_names, num_ob_indexes, &
-      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      sound, mtgirs, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte, &
       use_simulated_rad, use_pseudo_rad, pseudo_rad_platid, pseudo_rad_satid, &

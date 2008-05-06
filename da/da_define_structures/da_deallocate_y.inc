@@ -37,6 +37,18 @@ subroutine da_deallocate_y(y)
 
       deallocate (y % sonde_sfc)
    end if
+      
+   if (y % nlocal(mtgirs) > 0) then
+      do n = 1, y % nlocal(mtgirs)
+         deallocate (y % mtgirs(n)%u)
+         deallocate (y % mtgirs(n)%v)
+         deallocate (y % mtgirs(n)%t)
+         deallocate (y % mtgirs(n)%q)
+      end do
+
+      deallocate (y % mtgirs)
+
+   end if
 
    if (y % nlocal(pilot) > 0) then
       do n = 1, y % nlocal(pilot)
