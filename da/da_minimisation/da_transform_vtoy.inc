@@ -34,7 +34,6 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
-
       if (trace_use) call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
@@ -60,6 +59,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       end if
 #else
       call da_system("da_run_wrfplus_tl.ksh")
+
 #endif
       if (trace_use) call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
 

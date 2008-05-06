@@ -77,9 +77,9 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
       end do
    else
       iv%time = 1
-
+      print*,'scan obs ascii'
       call da_scan_obs_ascii(iv, 'ob.ascii')
-
+      print*,'end scan obs ascii'
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
@@ -96,7 +96,6 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
          iv%info(i)%ptotal(iv%time) = iv%info(i)%ntotal
       end do
    end if
-
    !--------------------------------------------------------------------------
    ! Allocate the ob based on input number of obs:
    !--------------------------------------------------------------------------

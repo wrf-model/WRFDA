@@ -22,6 +22,7 @@ OBJS_FOR_ALL =		da_memory.o             \
 			da_ships.o		\
 			da_synop.o		\
 			da_sound.o		\
+	                da_mtgirs.o             \
 			da_bogus.o		\
 			da_airep.o		\
 			da_pilot.o		\
@@ -76,7 +77,7 @@ OBJS_FOR_ALL =		da_memory.o             \
                         tqli.o                  \
                         tred2.o                 \
                         pythag.o                \
-                        module_radiance.o
+                        module_radiance.o       
 
 TARGETDIR    =  ../..
 
@@ -166,6 +167,7 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_ships.o \
 			da_synop.o \
 			da_sound.o \
+	                da_mtgirs.o \
 			da_bogus.o \
 			da_airep.o \
 			da_pilot.o \
@@ -189,7 +191,7 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_dot_cv.inc \
 			da_write_diagnostics.inc \
 			da_calculate_grady.inc   \
-			da_minimise_cg.inc
+			da_minimise_cg.inc 
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_minimisation.f90 > da_minimisation.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_minimisation.f
@@ -304,6 +306,7 @@ da_obs.o:		da_obs.f90 \
 			da_ships.o \
 			da_synop.o \
 			da_sound.o \
+	                da_mtgirs.o \
 			da_bogus.o \
 			da_pseudo.o \
 			da_qscat.o \
@@ -485,6 +488,28 @@ da_synop.o:		da_synop.f90 \
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_synop.f90 > da_synop.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_synop.f
+
+da_mtgirs.o:            da_mtgirs.f90 \
+	                da_control.o \
+	                da_par_util.o \
+	                da_define_structures.o \
+	                da_interpolation.o \
+	                da_statistics.o \
+	                da_tools.o \
+	                da_ao_stats_mtgirs.inc \
+	                da_jo_and_grady_mtgirs.inc \
+	                da_jo_mtgirs_uvtq.inc \
+	                da_residual_mtgirs.inc \
+	                da_oi_stats_mtgirs.inc \
+	                da_print_stats_mtgirs.inc \
+	                da_transform_xtoy_mtgirs.inc \
+	                da_transform_xtoy_mtgirs_adj.inc \
+	                da_check_max_iv_mtgirs.inc \
+	                da_get_innov_vector_mtgirs.inc \
+	                da_obs_diagnostics.inc \ 
+	                $(RM) $@
+	                $(CPP) $(CPPFLAGS) -I../inc da_mtgirs.f90 > da_mtgirs.f
+	                $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_mtgirs.f
 
 da_sound.o:		da_sound.f90 \
 			da_control.o \
@@ -859,7 +884,7 @@ da_physics.o:		da_physics.f90 \
 			da_filter_adj.inc \
 			da_wdt.inc        \
 			da_moist_phys_adj.inc \
-			da_moist_phys_lin.inc
+			da_moist_phys_lin.inc 
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_physics.f90 > da_physics.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_physics.f
@@ -956,6 +981,20 @@ module_radiance.o:	module_radiance.f90 \
 	$(CPP) $(CPPFLAGS) -I../inc module_radiance.f90 > module_radiance.f
 	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) -I$(RTTOV)/src \
            -I$(CRTM)/src module_radiance.f
+
+module_mp_wsm6_radar.o:  module_mp_wsm6_radar.f90 \
+                        $(CPP) $(CPPFLAGS) -I../inc module_mp_wsm6_radar.f90 > module_mp_wsm6_radar.f
+                        $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) module_mp_wsm6_radar.f
+
+g_module_mp_wsm6.o:     g_module_mp_wsm6.f90 \
+                       module_mp_wsm6_radar.o
+                       $(CPP) $(CPPFLAGS) -I../inc g_module_mp_wsm6.f90 > g_module_mp_wsm6.f
+                       $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) g_module_mp_wsm6.f
+
+a_module_mp_wsm6.o:     a_module_mp_wsm6.f90 \
+                       module_mp_wsm6_radar.o
+                       $(CPP) $(CPPFLAGS) -I../inc a_module_mp_wsm6.f90 > a_module_mp_wsm6.f
+                       $(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) a_module_m
 
 da_recursive_filter.o:	\
 			da_control.o \
@@ -1056,6 +1095,7 @@ da_test.o:		da_test.f90 \
 			da_polaramv.o \
 			da_ships.o \
 			da_sound.o \
+	                da_mtgirs.o \
 			da_bogus.o \
 			da_synop.o \
 			da_pseudo.o \
@@ -1085,6 +1125,7 @@ da_test.o:		da_test.f90 \
 			da_check_xtoy_adjoint_ships.inc \
 			da_check_xtoy_adjoint_sound.inc \
 			da_check_xtoy_adjoint_sonde_sfc.inc \
+	                da_check_xtoy_adjoint_mtgirs.inc \
 			da_check_xtoy_adjoint_bogus.inc \
 			da_check_xtoy_adjoint_synop.inc \
 			da_check_xtoy_adjoint_radar.inc \

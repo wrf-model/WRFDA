@@ -12,7 +12,7 @@ subroutine da_get_var_diagnostics( iv, j)
    integer                      :: num_stats_tot
    integer                      :: i,k
    real                         :: jo_radiance
-   real                         :: temp(63)
+   real                         :: temp(67)
 
    if (trace_use) call da_trace_entry("da_get_var_diagnostics")
 
@@ -85,6 +85,11 @@ subroutine da_get_var_diagnostics( iv, j)
    temp(61) = j % jo % buoy_q          
    temp(62) = j % jo % airsr_t         
    temp(63) = j % jo % airsr_q         
+   temp(64) = j % jo % mtgirs_t
+   temp(65) = j % jo % mtgirs_q
+   temp(66) = j % jo % mtgirs_u
+   temp(67) = j % jo % mtgirs_v
+
 
    call da_proc_sum_real(temp(:))
 
@@ -151,6 +156,11 @@ subroutine da_get_var_diagnostics( iv, j)
    j % jo % buoy_q          = temp(61) 
    j % jo % airsr_t         = temp(62) 
    j % jo % airsr_q         = temp(63) 
+
+   j % jo % mtgirs_t        = temp(64)
+   j % jo % mtgirs_q        = temp(65)
+   j % jo % mtgirs_u        = temp(66)
+   j % jo % mtgirs_v        = temp(67)
 
    if (use_rad) then
       jo_radiance = 0.0
@@ -280,6 +290,15 @@ subroutine da_get_var_diagnostics( iv, j)
                                j % jo % sonde_sfc_t, iv % synop_ef_t, &
                                j % jo % sonde_sfc_p, iv % synop_ef_p, &
                                j % jo % sonde_sfc_q, iv % synop_ef_q
+      end if
+
+      if (iv%info(mtgirs)%ntotal > 0) then
+         write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'   mtgirs obs, Jo(actual)  = ', &
+                               iv%info(mtgirs)%ntotal, iv%nstats(mtgirs), &
+                               j % jo % mtgirs_u, iv % mtgirs_ef_u, &
+                               j % jo % mtgirs_v, iv % mtgirs_ef_v, &
+                               j % jo % mtgirs_t, iv % mtgirs_ef_t, &
+                               j % jo % mtgirs_q, iv % mtgirs_ef_q, 0.0, 1.0
       end if
 
       if (iv%info(airep)%ntotal > 0) then

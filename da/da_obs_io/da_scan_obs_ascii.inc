@@ -175,9 +175,7 @@ subroutine da_scan_obs_ascii (iv, filename)
       if (global .and. (platform%loc%i < ids .or. platform%loc%i >= ide)) ndup= 2
 
       if (test_transforms) ndup = 1
-
       obs_index = fm_index(fm)
-      
       do n = 1, ndup
          select case(fm)
 
@@ -212,7 +210,11 @@ subroutine da_scan_obs_ascii (iv, filename)
             if (outside) cycle reports
             iv%info(sound)%nlocal     = iv%info(sound)%nlocal + 1
             iv%info(sonde_sfc)%nlocal = iv%info(sonde_sfc)%nlocal + 1
-
+         case (161) ;
+            if (.not.use_mtgirsobs .or. iv%info(mtgirs)%ntotal == max_mtgirs_input) cycle reports
+            if (n==1) iv%info(mtgirs)%ntotal     = iv%info(mtgirs)%ntotal + 1
+            if (outside) cycle reports
+            iv%info(mtgirs)%nlocal     = iv%info(mtgirs)%nlocal + 1
          case (86) ;
             if (.not.use_satemobs .or. iv%info(satem)%ntotal == max_satem_input) cycle reports
             ! Reject cloudy satem obs.

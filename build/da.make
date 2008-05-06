@@ -14,6 +14,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_ships.o \
    da_synop.o \
    da_sound.o \
+   da_mtgirs.o \
    da_bogus.o \
    da_airep.o \
    da_pilot.o \
@@ -165,7 +166,7 @@ WRFVAR_OBJS = da_par_util.o \
    field_routines.o \
    start_domain.o \
    interp_fcn.o \
-   couple_or_uncouple_em.o
+   couple_or_uncouple_em.o 
 
 # Aliases
 var : wrfvar

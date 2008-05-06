@@ -19,7 +19,7 @@ subroutine da_get_y_lhs_value (iv, y, partial_lhs, pertile_lhs, adj_ttl_lhs)
       call da_check_xtoy_adjoint_sound( iv, y, partial_lhs, pertile_lhs) 
       call da_check_xtoy_adjoint_sonde_sfc( iv, y, partial_lhs, pertile_lhs) 
    end if
-
+   if (iv%info(mtgirs)%nlocal         > 0) call da_check_xtoy_adjoint_mtgirs   (iv, y, partial_lhs, pertile_lhs)
    if (iv%info(synop)%nlocal          > 0) call da_check_xtoy_adjoint_synop    (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(geoamv)%nlocal         > 0) call da_check_xtoy_adjoint_geoamv   (iv, y, partial_lhs, pertile_lhs) 
    if (iv%info(polaramv)%nlocal       > 0) call da_check_xtoy_adjoint_polaramv (iv, y, partial_lhs, pertile_lhs) 
