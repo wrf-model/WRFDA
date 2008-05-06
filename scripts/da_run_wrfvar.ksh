@@ -329,6 +329,9 @@ for FILE in $OB_DIR/$DATE/*.bufr; do
 done
 
 if $NL_VAR4D; then
+   if $NL_JCDFI_USE; then
+      export NL_JCDFI_IO=true
+   fi
    # Create nl, tl, ad links structures
    mkdir nl tl ad
 
@@ -479,10 +482,12 @@ if $NL_VAR4D; then
       ln -fs tl/tl_d01_${D_WRF_DATE[$I]} tl${TAG}
       let I=I+1
    done
-   if [[ $NUM_PROCS -gt 1 ]] ; then
-      ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
-   else
-      ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
+   if $NL_JCDFI_IO; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
+         ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
+      else
+         ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:${NL_END_MINUTE}:${NL_END_SECOND} tldf
+      fi
    fi
 
    # ad
@@ -522,10 +527,10 @@ if $NL_VAR4D; then
       let I=I+1
    done
    # JRB
-   # if $NL_JCDFI_USE; then
+   if $NL_JCDFI_IO; then
       I=$NL_NUM_FGAT_TIME
       ln -fs $WORK_DIR/auxhist3_d01_${D_WRF_DATE[01]} ad/auxinput3_d01_${D_WRF_DATE[$I]}_dfi
-   # fi   
+   fi   
    ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
    mkdir ad/trace
 

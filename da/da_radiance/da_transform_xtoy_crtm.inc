@@ -180,6 +180,24 @@ subroutine da_transform_xtoy_crtm (cv_size, cv, grid, iv, y )
 
       call da_interp_lin_2d_partial (grid%xa%psfc, iv%instid(inst)%info, 1, iv%instid(inst)%info%n1, iv%instid(inst)%info%n2, psfc(:))
 
+     if ( use_varbc .or. freeze_varbc ) then
+        ! Gamma correction from VarBC
+        !----------------------------
+        gammapred = iv%instid(inst)%varbc_info%gammapred 
+        do k = 1, nchanl
+           npred = iv%instid(inst)%varbc(k)%npred
+           if (npred <= 0) cycle                                               ! VarBC channels only
+           if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+           do ipred = 1, npred
+              if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+              id = iv%instid(inst)%varbc(k)%index(ipred)
+              RTSolution(k,1)%Gamma    = iv%instid(inst)%varbc(k)%param(ipred)
+              RTSolution_TL(k,1)%Gamma = SUM(cv(id) * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
+           end do	  
+        end do
+        ! if (n <= 1 ) write(6,'(15f8.3)') 'CRTM_TL',RTSolution_TL(1:nchanl,1)%Gamma
+     end if
+
       !do n= 1, num_rad           ! loop for pixel
       do n = iv%instid(inst)%info%n1, iv%instid(inst)%info%n2 ! loop for pixel
             
@@ -299,22 +317,6 @@ subroutine da_transform_xtoy_crtm (cv_size, cv, grid, iv, y )
          enddo
          enddo
       end if
-
-    ! Gamma correction from VarBC
-    !----------------------------
-    gammapred = iv%instid(inst)%varbc_info%gammapred 
-    do k = 1, nchanl
-       npred = iv%instid(inst)%varbc(k)%npred
-       if (npred <= 0) cycle                                               ! VarBC channels only
-       if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
-       do ipred = 1, npred
-          if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
-          id = iv%instid(inst)%varbc(k)%index(ipred)
-          RTSolution(k,1)%Gamma    = iv%instid(inst)%varbc(k)%param(ipred)
-          RTSolution_TL(k,1)%Gamma = SUM(cv(id) * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
-       end do	  
-    end do
-! if (n <= 1 ) write(6,'(15f8.3)') 'CRTM_TL',RTSolution_TL(1:nchanl,1)%Gamma
 
 
       ! [1.5] CRTM GeometryInfo Structure

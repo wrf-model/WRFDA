@@ -97,7 +97,7 @@ subroutine da_transform_xtoy_crtm_adj ( cv_size, cv, iv, jo_grad_y, jo_grad_x )
 
    do inst = 1, iv%num_inst                 ! loop for sensor
       num_rad = iv%instid(inst)%info%n2 - iv%instid(inst)%info%n1 + 1
-!      if ( num_rad < 1 ) cycle
+      if ( num_rad < 1 ) cycle
       allocate (q_ad(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (t(kts:kte,iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
       allocate (p(iv%instid(inst)%info%n1:iv%instid(inst)%info%n2))
@@ -157,6 +157,21 @@ subroutine da_transform_xtoy_crtm_adj ( cv_size, cv, iv, jo_grad_y, jo_grad_x )
       !  call da_error(__FILE__,__LINE__, &
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
+
+     if ( use_varbc .or. freeze_varbc ) then
+        ! Gamma correction from VarBC
+        !----------------------------
+        gammapred = iv%instid(inst)%varbc_info%gammapred 
+        do k = 1, nchanl
+           npred = iv%instid(inst)%varbc(k)%npred
+           if (npred <= 0) cycle                                               ! VarBC channels only
+           if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+           do ipred = 1, npred
+              if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+              RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
+           end do
+        end do
+     end if
 
       !do n=1,num_rad
       do n =  iv%instid(inst)%info%n1, iv%instid(inst)%info%n2
@@ -230,19 +245,6 @@ subroutine da_transform_xtoy_crtm_adj ( cv_size, cv, iv, jo_grad_y, jo_grad_x )
      Surface(1)%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &
                                           iv%instid(inst)%tb_xb(1:nchanl,n)
      
-      ! Gamma correction from VarBC
-      !----------------------------
-      gammapred = iv%instid(inst)%varbc_info%gammapred 
-      do k = 1, nchanl
-         npred = iv%instid(inst)%varbc(k)%npred
-         if (npred <= 0) cycle                                               ! VarBC channels only
-         if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
-         do ipred = 1, npred
-            if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
-            RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
-	 end do
-      end do
-
       ! -- Copy the adjoint atmosphere structure
       Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_AD )
 
@@ -370,21 +372,22 @@ subroutine da_transform_xtoy_crtm_adj ( cv_size, cv, iv, jo_grad_y, jo_grad_x )
                  (/"Error in deallocatting CRTM Surface_AD Structure"/))
             end if
 
-       ! [1.7] Gamma correction to VarBC
-
-            do k = 1, nchanl
-               npred = iv%instid(inst)%varbc(k)%npred
-               if (npred <= 0) cycle                                               ! VarBC channels only
-               if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
-               do ipred = 1, npred
-                  if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
-	          id = iv%instid(inst)%varbc(k)%index(ipred)
-	          cv_local(id) = cv_local(id) + &
-		                 SUM(RTSolution_AD(k,1)%Gamma * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
-               end do   
-            end do	    
-
          end do       !  end loop for pixels
+
+        if ( use_varbc .or. freeze_varbc ) then
+           ! [1.7] Gamma correction to VarBC
+           do k = 1, nchanl
+              npred = iv%instid(inst)%varbc(k)%npred
+              if (npred <= 0) cycle                                               ! VarBC channels only
+              if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle         ! Gamma channels only
+              do ipred = 1, npred
+                 if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+                 id = iv%instid(inst)%varbc(k)%index(ipred)
+                 cv_local(id) = cv_local(id) + &
+                    SUM(RTSolution_AD(k,1)%Gamma * iv%instid(inst)%varbc(k)%vtox(ipred,1:npred))
+              end do   
+           end do	    
+        end if
 
        ! Gathering Gamma correction across processors
        !--------------------------------------------- 
