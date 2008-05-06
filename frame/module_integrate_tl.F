@@ -265,10 +265,12 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
       CALL print_a_timeinterval(grid%domain_clock%TimeStep)
-      CALL jcdfi_init_coef ( grid , config_flags )
-      CALL jcdfi_zero_ad ( grid )
-      dfi_counter = 0
-      CALL jcdfi_tl ( grid, dfi_counter )
+      if ( grid%jcdfi_io) then
+         CALL jcdfi_init_coef ( grid , config_flags )
+         CALL jcdfi_zero_ad ( grid )
+         dfi_counter = 0
+         CALL jcdfi_tl ( grid, dfi_counter )
+      endif
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
 !         IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
@@ -363,11 +365,15 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
 !         END IF
-         dfi_counter = dfi_counter + 1
-         CALL jcdfi_tl ( grid, dfi_counter )
+         if ( grid%jcdfi_io) then
+            dfi_counter = dfi_counter + 1
+            CALL jcdfi_tl ( grid, dfi_counter )
+         endif
       END DO
-      CALL jcdfi_output_forcing ( grid ,config_flags )
-      CALL jcdfi_finalize
+      if ( grid%jcdfi_io) then
+         CALL jcdfi_output_forcing ( grid ,config_flags )
+         CALL jcdfi_finalize
+      endif
       ! Avoid double writes on nests if this is not really the last time;
       ! Do check for write if the parent domain is ending.
 !-----Need to check how to output tl variables.
