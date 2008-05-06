@@ -241,6 +241,8 @@ export NL_CV_OPTIONS_HUM=${NL_CV_OPTIONS_HUM:-1} # Humidity control variable.
 export NL_CHECK_MAX_IV=${NL_CHECK_MAX_IV:-true} # QC on O-B differences.
 export NL_NTMAX=${NL_NTMAX:-100}         # Maximum number of inner loop iterations.
 export NL_CHECK_RH=${NL_CHECK_RH:-2}     # RH bounds check.
+export NL_JCDFI_USE=${NL_JCDFI_USE:-false} # Turn off JcDF option
+export NL_JCDFI_IO=${NL_JCDFI_IO:-false} # Turn off JcDF IO
 
 # From Update_BC:
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
