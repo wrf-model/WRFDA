@@ -260,9 +260,11 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
 
       CALL wrf_timetoa( grid%current_time, currTime_str )
 
+      if (grid%jcdfi_io) then
 !-----Check and read the dfi forcing
-      CALL jcdfi_init_coef ( grid , config_flags )
-      CALL jcdfi_input_forcing ( grid , config_flags )
+         CALL jcdfi_init_coef ( grid , config_flags )
+         CALL jcdfi_input_forcing ( grid , config_flags )
+      endif
 !-----start check adjoint input
       if(currTime_str(1:19) .eq. ad_date_string(ad_date_index)(1:19)) then
          write(unit=*, fmt='(2a)') &
@@ -318,8 +320,10 @@ call end_timing('med_auxinput3_in 2 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
-         CALL jcdfi_add_forcing ( grid , dfi_counter )
-         dfi_counter = dfi_counter + 1
+         if (grid%jcdfi_io) then
+            CALL jcdfi_add_forcing ( grid , dfi_counter )
+            dfi_counter = dfi_counter + 1
+         endif
 
 !--------end check adjoint input
 
@@ -416,8 +420,10 @@ call end_timing('med_auxinput3_in 3 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
-         CALL jcdfi_add_forcing ( grid , dfi_counter )
-         CALL jcdfi_finalize
+         if (grid%jcdfi_io) then
+            CALL jcdfi_add_forcing ( grid , dfi_counter )
+            CALL jcdfi_finalize
+         endif
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )

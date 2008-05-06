@@ -110,7 +110,7 @@ END SUBROUTINE jcdfi_tl
   integer :: jcdfi_flag
 
    jcdfi_flag = 0
-   if ( grid%jcdfi_onoff ) jcdfi_flag = 1
+   if ( grid%jcdfi_io ) jcdfi_flag = 1
    grid%em_a_u_2  = grid%em_a_u_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_u_1 
    grid%em_a_v_2  = grid%em_a_v_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_v_1
    grid%em_a_t_2  = grid%em_a_t_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_t * h(i) * grid%em_g_t_1 
