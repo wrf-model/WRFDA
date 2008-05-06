@@ -186,6 +186,30 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
       model_snow(:)   = 0.0
       model_vegfra(:) = 0.0
 
+      if ( use_varbc .or. freeze_varbc ) then
+         ! Gamma correction from VarBC
+         !----------------------------
+         gammapred = iv%instid(inst)%varbc_info%gammapred 
+         do k = 1, nchanl
+            npred = iv%instid(inst)%varbc(k)%npred
+            if (npred <= 0) cycle                                           ! VarBC channels only
+            if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle     ! Gamma channels only
+	    do ipred = 1, npred
+	       if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
+	       RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
+            end do		  
+         end do
+      end if
+
+      !----------------------------------------------------------------
+      ! Compute Overcast Radiances for AIRS Cloud Detection(MMR)
+      !----------------------------------------------------------------
+      if (use_airs_mmr) then
+         do i = 1, nchanl
+            allocate(RTSolution(i,1)%Overcast(Atmosphere(1)%n_Layers))
+         end do		         
+      end if   
+	
       do n=n1,n2
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
@@ -377,28 +401,6 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             Surface(1)%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)
          end if
 	 
-	 ! Gamma correction from VarBC
-	 !----------------------------
-         gammapred = iv%instid(inst)%varbc_info%gammapred 
-	 do k = 1, nchanl
-	    npred = iv%instid(inst)%varbc(k)%npred
-            if (npred <= 0) cycle                                           ! VarBC channels only
-            if (iv%instid(inst)%varbc(k)%pred_use(gammapred) < 0) cycle     ! Gamma channels only
-	    do ipred = 1, npred
-	       if (iv%instid(inst)%varbc(k)%ipred(ipred) /= gammapred) cycle
-	       RTSolution(k,1)%Gamma = iv%instid(inst)%varbc(k)%param(ipred)
-            end do		  
-	 end do
-
-         !----------------------------------------------------------------
-         ! Compute Overcast Radiances for AIRS Cloud Detection(MMR)
-         !----------------------------------------------------------------
-         if (use_airs_mmr) then
-	    do i = 1, nchanl
-               allocate(RTSolution(i,1)%Overcast(Atmosphere(1)%n_Layers))
-	    end do		         
-	 end if   
-	
 !         if (use_airs_mmr) then
 !	    Atmosphere(1)%n_Clouds = 1
 !            do k=kts,kte

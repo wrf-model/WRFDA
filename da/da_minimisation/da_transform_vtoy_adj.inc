@@ -39,7 +39,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt (1 , DYN_EM_TL)
 
-      if (jcdfi_use .AND. jcdf_flag ) then
+      if (jcdfi_use .AND. jcdf_flag .AND. jcdfi_io ) then
          call da_med_initialdata_input(grid , config_flags, 'tldf')
          grid%g_u_2 = - grid%g_u_2
          grid%g_v_2 = - grid%g_v_2
@@ -58,7 +58,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xbx, y, &
          grid%g_moist = 0.0
       end if
 
-      call med_hist_out(grid , 3 , config_flags)
+      if (jcdfi_io) call med_hist_out(grid , 3 , config_flags)
 
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
