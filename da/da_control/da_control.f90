@@ -437,8 +437,8 @@ module da_control
 
    integer :: trace_start_points=0   ! Number of routines to initiate trace
 
-   integer, parameter :: num_ob_indexes = 24
-
+!   integer, parameter :: num_ob_indexes = 24
+   integer, parameter :: num_ob_indexes = 25
    integer, parameter :: sound     = 1
    integer, parameter :: synop     = 2
    integer, parameter :: pilot     = 3
@@ -463,7 +463,7 @@ module da_control
    integer, parameter :: radiance  = 22
    integer, parameter :: airsr     = 23
    integer, parameter :: sonde_sfc = 24
-
+   integer, parameter :: mtgirs    = 25
    character(len=14), parameter :: obs_names(num_ob_indexes) = (/ &
       "sound         ", &
       "synop         ", &
@@ -488,7 +488,8 @@ module da_control
       "radar         ", &
       "radiance      ", &
       "airs retrieval", &
-      "sonde_sfc     "  &
+      "sonde_sfc     ", &
+      "mtgirs        " &
    /)
 
    integer, parameter :: max_no_fm = 290
@@ -536,7 +537,7 @@ module da_control
       0,profiler,airsr,0,bogus,0,0,0,0,0, & ! 131-140
       0,0,0,0,0,0,0,0,0,0,                                & ! 141-150
       0,0,0,0,0,0,0,0,0,0,                                & ! 151-160
-      0,0,0,0,0,0,0,0,0,0,                                & ! 161-170
+      mtgirs,0,0,0,0,0,0,0,0,0,                            & ! 161-170
       0,0,0,0,0,0,0,0,0,0,                                & ! 171-180
       0,0,0,0,0,0,0,0,0,0,                                & ! 181-190
       0,0,0,0,0,0,0,0,0,0,                                & ! 191-200

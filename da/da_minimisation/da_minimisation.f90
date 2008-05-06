@@ -35,7 +35,7 @@ module da_minimisation
       var_scaling4,var_scaling5,var_scaling3, jo_unit, &
       print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
       cv_size_domain_je,cv_size_domain_jb, num_pseudo, &
-      sound, sonde_sfc, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      sound, mtgirs, sonde_sfc, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, radiance, monitor_on, max_ext_its, use_crtm_kmatrix, &
       precondition_cg, precondition_factor, cv_size_domain_jp, use_varbc, varbc_factor, &
@@ -76,6 +76,12 @@ module da_minimisation
    use da_qscat, only : da_calculate_grady_qscat, da_ao_stats_qscat, &
       da_oi_stats_qscat, da_get_innov_vector_qscat, da_residual_qscat, &
       da_jo_and_grady_qscat
+   use da_mtgirs, only : da_calculate_grady_mtgirs, &
+      da_ao_stats_mtgirs, da_oi_stats_mtgirs,da_oi_stats_mtgirs, &
+      da_get_innov_vector_mtgirs, &
+      da_jo_and_grady_mtgirs, da_residual_mtgirs, &
+      da_jo_and_grady_mtgirs
+
 #if defined(RTTOV) || defined(CRTM)
    use da_radiance, only : da_calculate_grady_rad, da_write_filtered_rad, &
       da_get_innov_vector_radiance
@@ -140,5 +146,4 @@ contains
 #include "da_calculate_grady.inc"
 #include "da_transform_vtoy.inc"
 #include "da_transform_vtoy_adj.inc"
-
 end module da_minimisation

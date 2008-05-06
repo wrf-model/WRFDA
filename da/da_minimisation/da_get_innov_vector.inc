@@ -43,7 +43,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_get_innov_vector_sound     (it, grid, ob, iv)
          call da_get_innov_vector_sonde_sfc (it, grid, ob, iv)
       end if
-
+      if (iv%info(mtgirs)%nlocal         > 0) call da_get_innov_vector_mtgirs   (it, grid, ob, iv)
       if (iv%info(synop)%nlocal          > 0) call da_get_innov_vector_synop    (it, grid, ob, iv)
       if (iv%info(geoamv)%nlocal         > 0) call da_get_innov_vector_geoamv   (it, grid, ob, iv)
       if (iv%info(polaramv)%nlocal       > 0) call da_get_innov_vector_polaramv (it, grid, ob, iv)

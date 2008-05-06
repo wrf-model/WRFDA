@@ -9,7 +9,7 @@ module da_obs
    use da_bogus, only : da_transform_xtoy_bogus, da_transform_xtoy_bogus_adj
    use da_buoy, only : da_transform_xtoy_buoy,da_transform_xtoy_buoy_adj
    use da_control, only : use_shipsobs, use_synopobs, use_ssmt2obs, &
-      use_soundobs,use_satemobs, use_profilerobs, use_pilotobs, &
+      use_soundobs,use_mtgirsobs,use_satemobs, use_profilerobs, use_pilotobs, &
       use_qscatobs,use_metarobs, use_polaramvobs, use_geoamvobs, &
       use_bogusobs,use_buoyobs, use_airsretobs, trace_use, num_procs, &
       missing_r, missing, use_airepobs,use_gpspwobs,use_gpsrefobs, &
@@ -19,7 +19,7 @@ module da_obs
       pseudo_err,obs_qc_pointer,myproc,rtm_option,rtm_option_rttov, &
       rtm_option_crtm,use_rad, base_temp, base_lapse, base_pres, &
       ob_format,ob_format_ascii,filename_len, trace_use_dull, &
-      sound, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
+      sound, mtgirs, synop, profiler, gpsref, gpspw, polaramv, geoamv, ships, metar, &
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat,pseudo, num_ob_indexes, its,ite,jds,jts,jte,ids
    ! use_crtm_kmatrix,use_crtm_kmatrix_fast
@@ -47,6 +47,7 @@ module da_obs
    use da_ships,     only : da_transform_xtoy_ships, da_transform_xtoy_ships_adj
    use da_sound,     only : da_transform_xtoy_sound, da_transform_xtoy_sonde_sfc, &
       da_transform_xtoy_sound_adj, da_transform_xtoy_sonde_sfc_adj
+   use da_mtgirs,    only : da_transform_xtoy_mtgirs, da_transform_xtoy_mtgirs_adj
    use da_ssmi,      only : da_transform_xtoy_ssmt1, da_transform_xtoy_ssmt2, &
       da_transform_xtoy_ssmi_tb, da_transform_xtoy_ssmi_rv, &
       da_transform_xtoy_ssmi_tb_adj, da_transform_xtoy_ssmi_rv_adj, &

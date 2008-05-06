@@ -310,7 +310,7 @@ subroutine da_read_obs_ascii (iv, filename)
          end if
       end if
 
-      if (fm /= 86) call da_obs_proc_station(platform)
+      if (fm /= 86) call da_obs_proc_station(platform,fm)
 
       nlevels = platform%info%levels
       ! Loop over duplicating obs for global
@@ -478,6 +478,43 @@ subroutine da_read_obs_ascii (iv, filename)
             end if
 
 !            iv%sound(nlocal(sound))%info%levels = nlevels
+      
+         case (161) ;
+            if (.not. use_mtgirsobs) cycle reports
+            if (n==1) ntotal(mtgirs) = ntotal(mtgirs) + 1
+            if (outside) cycle reports
+            nlocal(mtgirs) = nlocal(mtgirs) + 1
+            if (nlocal(mtgirs) > iv%info(mtgirs)%nlocal) cycle reports
+
+            if (nlevels > 0) then
+
+               allocate (iv%mtgirs(nlocal(mtgirs))%h (1:nlevels))
+               allocate (iv%mtgirs(nlocal(mtgirs))%p (1:nlevels))
+               allocate (iv%mtgirs(nlocal(mtgirs))%u (1:nlevels))
+               allocate (iv%mtgirs(nlocal(mtgirs))%v (1:nlevels))
+               allocate (iv%mtgirs(nlocal(mtgirs))%t (1:nlevels))
+               allocate (iv%mtgirs(nlocal(mtgirs))%q (1:nlevels))
+
+               j = 0
+               do i = 1, nlevels 
+
+                  j=j+1
+
+                  iv%mtgirs(nlocal(mtgirs))%h(j) = platform%each(i)%height
+                  iv%mtgirs(nlocal(mtgirs))%p(j) = platform%each(i)%p%inv
+                  iv%mtgirs(nlocal(mtgirs))%u(j) = platform%each(i)%u
+                  iv%mtgirs(nlocal(mtgirs))%v(j) = platform%each(i)%v
+                  iv%mtgirs(nlocal(mtgirs))%t(j) = platform%each(i)%t
+                  iv%mtgirs(nlocal(mtgirs))%q(j) = platform%each(i)%q
+                 if(iv%mtgirs(nlocal(mtgirs))%q(j)%inv.ne.missing_r)then
+                 iv%mtgirs(nlocal(mtgirs))%q(j)%inv = iv%mtgirs(nlocal(mtgirs))%q(j)%inv/1000.0
+                 endif
+                 if(iv%mtgirs(nlocal(mtgirs))%q(j)%error.ne.missing_r)then
+                 iv%mtgirs(nlocal(mtgirs))%q(j)%error = iv%mtgirs(nlocal(mtgirs))%q(j)%error/1000.0/100.0
+                 endif
+
+               end do
+            end if
 
 
          case (86)    ;
