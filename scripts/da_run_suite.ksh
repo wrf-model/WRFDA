@@ -412,6 +412,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             if [[ $CYCLE_NUMBER -gt 0 ]] && $CYCLING; then
                export WRF_INPUT_DIR=$FC_DIR/$DATE
             fi
+            if [[ -f $FC_DIR/$DATE/wrfinput_d01 ]]; then
+               export WRF_INPUT_DIR=$FC_DIR/$DATE
+            fi
 
             $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
             $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1 &
@@ -437,6 +440,9 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
          export WRF_INPUT_DIR=$RC_DIR/$DATE
          if [[ $CYCLE_NUMBER -gt 0 ]] && $CYCLING; then
+            export WRF_INPUT_DIR=$FC_DIR/$DATE
+         fi
+         if [[ -f $FC_DIR/$DATE/wrfinput_d01 ]]; then
             export WRF_INPUT_DIR=$FC_DIR/$DATE
          fi
 
