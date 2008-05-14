@@ -163,7 +163,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    ob%ntotal(:) = 0
    ob%num_inst  = 0
 
-   iv%info(:)%max_lev = 0
+   iv%info(:)%max_lev = 1
 
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
