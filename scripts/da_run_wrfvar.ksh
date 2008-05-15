@@ -193,9 +193,11 @@ if [[ ! -d $OB_DIR ]]; then
    exit 1
 fi
 
-if [[ ! -r $DA_BACK_ERRORS ]]; then
+if [[ $NL_ANALYSIS_TYPE != "VERIFY" ]] ; then
+  if [[ ! -r $DA_BACK_ERRORS ]]; then
    echo "${ERR}Background Error file >$DA_BACK_ERRORS< does not exist:$END"
    exit 1
+  fi
 fi
 
 #-----------------------------------------------------------------------
@@ -231,7 +233,10 @@ if $NL_VAR4D; then
 fi
 ln -fs $DA_FIRST_GUESS fg 
 ln -fs $DA_FIRST_GUESS wrfinput_d01
-ln -fs $DA_BACK_ERRORS be.dat
+if [[ $NL_ANALYSIS_TYPE != "VERIFY" ]] ; then
+  ln -fs $DA_BACK_ERRORS be.dat
+fi
+
 
 for FILE in $DAT_DIR/*.inv; do
    if [[ -f $FILE ]]; then

@@ -41,7 +41,8 @@ module da_wrfvar_top
       da_deallocate_y
    use da_minimisation, only : da_get_innov_vector,da_minimise_cg, &
       da_write_diagnostics
-   use da_obs_io, only : da_write_filtered_obs
+   use da_obs_io, only : da_write_filtered_obs, da_write_obs, da_final_write_obs , &
+                         da_write_obs_etkf
    use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
    use da_physics, only : da_uvprho_to_w_lin
 #if defined (CRTM) || defined (RTTOV)
