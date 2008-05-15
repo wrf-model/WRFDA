@@ -49,7 +49,7 @@ subroutine da_predictor_rttov(pred,npred,temp,hum,T_skin)
 
    ! 1.0 Convert all temperatures to virtual temperatures
    ! ----------------------------------------------------
-   tv =  temp/(1.0 - 0.6*hum)
+   tv =  temp*(1.0+0.608*hum)
 
    ! 2.0 Construct averages for NESDIS thick layers
    ! ----------------------------------------------
