@@ -56,7 +56,6 @@ subroutine da_varbc_pred(iv)
              iv%instid(inst)%tm(1:nlevels,n), &
              iv%instid(inst)%qm(1:nlevels,n), &
 	     iv%instid(inst)%ts(n), &
-             iv%instid(inst)%pm(1:nlevels,n),&
 	     iv%instid(inst)%pf(0:nlevels,n))
 #endif
       end if     

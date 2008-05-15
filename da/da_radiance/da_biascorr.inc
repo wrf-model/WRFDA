@@ -15,7 +15,7 @@ subroutine da_biascorr ( i, ob, iv)
    ! Local variables
    integer   :: k,iband,iscan, n,j,npred,nlevels
    real      :: q(43),pred(4),airbias
-   real,allocatable      :: temp(:), hum(:), pm(:), pf(:)
+   real,allocatable      :: temp(:), hum(:), pf(:)
 
    if (trace_use) call da_trace_entry("da_biascorr")
 
@@ -23,7 +23,6 @@ subroutine da_biascorr ( i, ob, iv)
    nlevels=iv%instid(i)%nlevels-1
    allocate(temp(nlevels))
    allocate(hum(nlevels))
-   allocate(pm(nlevels))
    allocate(pf(0:nlevels))
 
    do n=iv%instid(i)%info%n1,iv%instid(i)%info%n2
@@ -38,10 +37,9 @@ subroutine da_biascorr ( i, ob, iv)
 ! FIX? problems with IBM AIX COMPILER
          temp(1:nlevels) = iv%instid(i)%tm(1:nlevels,n)
          hum(1:nlevels) = iv%instid(i)%qm(1:nlevels,n)
-         pm(1:nlevels) = iv%instid(i)%pm(1:nlevels,n)
          pf(0:nlevels) = iv%instid(i)%pf(0:nlevels,n)
          call da_predictor_crtm(pred(1:npred), npred, nlevels,temp, &
-            hum, iv%instid(i)%ts(n), pm, pf)
+            hum, iv%instid(i)%ts(n), pf)
 #endif
         end if
         iscan = iv%instid(i)%scanpos(n)
@@ -74,7 +72,6 @@ subroutine da_biascorr ( i, ob, iv)
 
    deallocate(temp)
    deallocate(hum)
-   deallocate(pm)
    deallocate(pf)
 
    if (trace_use) call da_trace_exit("da_biascorr")
