@@ -14,7 +14,8 @@ subroutine da_write_iv_rad_ascii (ob, iv )
    integer                        :: nlevelss ! Number of obs levels.
 
    integer            :: ios, innov_rad_unit
-   character(len=30)  :: filename
+   character(len=filename_len)  :: filename
+   character(len=7)   :: surftype
    integer            :: ndomain
 
    if (trace_use) call da_trace_entry("da_write_iv_rad_ascii")
@@ -31,11 +32,7 @@ subroutine da_write_iv_rad_ascii (ob, iv )
          end if
       end do
 
-#ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') 'inv_'//trim(iv%instid(i)%rttovid_string)//'.', myproc
-#else
-      write(unit=filename, fmt='(a)') 'inv_'//trim(iv%instid(i)%rttovid_string)
-#endif
 
       call da_get_unit(innov_rad_unit)
       open(unit=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
@@ -67,142 +64,38 @@ subroutine da_write_iv_rad_ascii (ob, iv )
                                 iv%instid(i)%satazi(n)
             select case (iv%instid(i)%isflg(n))
             case (0) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = ' SEA : '
             case (1) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = ' ICE : '
             case (2) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'LAND : '
             case (3) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'SNOW : '
             case (4) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'MSEA : '
             case (5) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'MICE : '
             case (6) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'MLND : '
             case (7) ;
-               write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', n, &
-                                iv%instid(i)%t2m(n), &
-                                iv%instid(i)%mr2m(n),   &
-                                iv%instid(i)%u10(n), &
-                                iv%instid(i)%v10(n),  &
-                                iv%instid(i)%ps(n),  &
-                                iv%instid(i)%ts(n),  &
-                                iv%instid(i)%smois(n),  &
-                                iv%instid(i)%tslb(n),  &
-                                iv%instid(i)%snowh(n), &
-                                iv%instid(i)%isflg(n), &
-                                nint(iv%instid(i)%soiltyp(n)), &
-                                nint(iv%instid(i)%vegtyp(n)), &
-                                iv%instid(i)%vegfra(n), &
-                                iv%instid(i)%elevation(n), &
-                                iv%instid(i)%clwp(n)
+               surftype = 'MSNO : '
             end select
+            write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') surftype, n, &
+                             iv%instid(i)%t2m(n), &
+                             iv%instid(i)%mr2m(n),   &
+                             iv%instid(i)%u10(n), &
+                             iv%instid(i)%v10(n),  &
+                             iv%instid(i)%ps(n),  &
+                             iv%instid(i)%ts(n),  &
+                             iv%instid(i)%smois(n),  &
+                             iv%instid(i)%tslb(n),  &
+                             iv%instid(i)%snowh(n), &
+                             iv%instid(i)%isflg(n), &
+                             nint(iv%instid(i)%soiltyp(n)), &
+                             nint(iv%instid(i)%vegtyp(n)), &
+                             iv%instid(i)%vegfra(n), &
+                             iv%instid(i)%elevation(n), &
+                             iv%instid(i)%clwp(n)
 
             write(unit=innov_rad_unit,fmt='(a)') 'OBS  : '
             write(unit=innov_rad_unit,fmt='(10f11.2)') ob%instid(i)%tb(:,n)
@@ -224,33 +117,27 @@ subroutine da_write_iv_rad_ascii (ob, iv )
             if (write_profile) then
                nlevelss  = iv%instid(i)%nlevels
                if ( rtm_option == rtm_option_rttov ) then
+                  ! first, write RTTOV levels
+                  write(unit=innov_rad_unit,fmt=*) 'RTM_level pres(mb) T(k) Q(ppmv)'
+                  do k = 1, nlevelss
+                     write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,e11.4)') &
+                        k, &                             ! RTTOV levels
+                        coefs(i) % ref_prfl_p(k) , &
+                        iv%instid(i)%t(k,n) , &
+                        iv%instid(i)%mr(k,n)
+                  end do  ! end loop RTTOV level
+                  ! second, write WRF model levels
                   write(unit=innov_rad_unit,fmt=*) &
-                     'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
+                     'WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
                   do k=kts,kte
-                     if (k <= nlevelss) then
-                        write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
-                           k, &                             ! RTTOV levels
-                           coefs(i) % ref_prfl_p(k) , &
-                           iv%instid(i)%t(k,n) , &
-                           iv%instid(i)%mr(k,n), &
-                           k,  &                     ! WRF model levels
-                           iv%instid(i)%pm(k,n) , &
-                           iv%instid(i)%tm(k,n) , &
-                           iv%instid(i)%qm(k,n)*1000 , &    
-                           iv%instid(i)%qcw(k,n)*1000.0, &
-                           iv%instid(i)%qrn(k,n)*1000.0
-                     else
-                        write(unit=innov_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
-                           iv%instid(i)%pm(k,n) , &
-                           iv%instid(i)%tm(k,n) , &
-                           iv%instid(i)%qm(k,n)*1000 , &
-                           iv%instid(i)%qcw(k,n)*1000.0, &
-                           iv%instid(i)%qrn(k,n)*1000.0
-                           ! iv%instid(i)%qci(k,n)*1000.0, &
-                           ! iv%instid(i)%qsn(k,n)*1000.0, &
-                           ! iv%instid(i)%qgr(k,n)*1000.0
-                     end if  
-                  end do ! end loop profile
+                     write(unit=innov_rad_unit,fmt='(i3,f10.2,f8.2,3e11.4)') &
+                        k,  &                     ! WRF model levels
+                        iv%instid(i)%pm(k,n) , &
+                        iv%instid(i)%tm(k,n) , &
+                        iv%instid(i)%qm(k,n)*1000 , &    
+                        iv%instid(i)%qcw(k,n)*1000.0, &
+                        iv%instid(i)%qrn(k,n)*1000.0
+                  end do ! end loop model level
                end if ! end if rtm_option_rttov
 
                if ( rtm_option == rtm_option_crtm ) then
