@@ -100,39 +100,52 @@ subroutine da_solve ( grid , config_flags)
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
 
-   call da_setup_background_errors (grid%xb, be)
+   if( .not. anal_type_verify) then
+      call da_setup_background_errors (grid%xb, be)
 
    !---------------------------------------------------------------------------
    ! [5.1] Set up observation bias correction (Varbc):
    !---------------------------------------------------------------------------
 
-   be % cv % size_jp = 0.0
+      be % cv % size_jp = 0.0
 #if defined(RTTOV) || defined(CRTM)
-   if (use_varbc.or.freeze_varbc) call da_varbc_init(iv, be)
+      if (use_varbc.or.freeze_varbc) call da_varbc_init(iv, be)
 #endif
-   cv_size = be % cv % size
+      cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
    ! [6.0] Set up ensemble perturbation input:
    !---------------------------------------------------------------------------
 
-   grid%ep % ne = be % ne
-   if (be % ne > 0) then
-      call da_setup_flow_predictors (ide, jde, kde, be % ne, grid%ep )
-   end if
+      grid%ep % ne = be % ne
+      if (be % ne > 0) then
+         call da_setup_flow_predictors (ide, jde, kde, be % ne, grid%ep )
+      end if
 
    !---------------------------------------------------------------------------
    ! [7.0] Setup control variable (cv):
    !---------------------------------------------------------------------------
 
-   allocate (cvt(1:cv_size))
-   allocate (xhat(1:cv_size))
-   call da_initialize_cv (cv_size, cvt)
-   call da_initialize_cv (cv_size, xhat)
+      allocate (cvt(1:cv_size))
+      allocate (xhat(1:cv_size))
+      call da_initialize_cv (cv_size, cvt)
+      call da_initialize_cv (cv_size, xhat)
       
-   call da_zero_vp_type (grid%vv)
-   call da_zero_vp_type (grid%vp)
+      call da_zero_vp_type (grid%vv)
+      call da_zero_vp_type (grid%vp)
 
+   else
+
+      call da_get_innov_vector (it, ob, iv, grid , config_flags)
+      call da_allocate_y (iv, re)
+      call da_write_obs(ob, iv, re)
+      call da_write_obs_etkf(ob, iv, re)
+      call da_final_write_obs(iv)
+      call da_deallocate_y(re)
+      call da_deallocate_observations (iv)
+      return
+
+   endif
    !---------------------------------------------------------------------------
    ! [8] Outerloop
    !---------------------------------------------------------------------------
