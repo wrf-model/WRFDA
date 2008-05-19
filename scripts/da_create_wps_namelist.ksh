@@ -70,7 +70,7 @@ cat >>namelist.wps <<EOF
 /
 
 &ungrib
- out_format = 'SI'
+ out_format = 'WPS'
 /
 
 &metgrid
