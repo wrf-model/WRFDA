@@ -235,9 +235,14 @@ echo "WINDOW_END            $WINDOW_END"
       exit 1
    fi
 
-   if [[ ! -r $DA_BACK_ERRORS ]]; then
-      echo "${ERR}Background Error file >$DA_BACK_ERRORS< does not exist:$END"
-      exit 1
+   #-----------------------------------------------------------------------
+   # [2.1] Don't need the background error file for verification
+   #-----------------------------------------------------------------------
+   if [[ $NL_ANALYSIS_TYPE != "VERIFY" ]] ; then
+     if [[ ! -r $DA_BACK_ERRORS ]]; then
+        echo "${ERR}Background Error file >$DA_BACK_ERRORS< does not exist:$END"
+        exit 1
+     fi
    fi
 
    #-----------------------------------------------------------------------
@@ -264,7 +269,10 @@ echo "WINDOW_END            $WINDOW_END"
    fi
    ln -fs $DA_FIRST_GUESS fg01
    ln -fs $DA_FIRST_GUESS wrfinput_d$DOMAIN
-   ln -fs $DA_BACK_ERRORS be.dat
+
+   if [[ $NL_ANALYSIS_TYPE != "VERIFY" ]] ; then
+     ln -fs $DA_BACK_ERRORS be.dat
+   fi
 
    for FILE in $DAT_DIR/*.inv; do
       if [[ -f $FILE ]]; then

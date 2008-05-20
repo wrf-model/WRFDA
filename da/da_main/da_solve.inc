@@ -102,6 +102,7 @@ subroutine da_solve ( grid , config_flags)
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
 
+   if( .not. anal_type_verify) then
    call da_setup_background_errors (grid%xb, be)
    cv_size = be % cv % size
 
@@ -125,10 +126,26 @@ subroutine da_solve ( grid , config_flags)
       
    call da_zero_vp_type (grid%vv)
    call da_zero_vp_type (grid%vp)
+   else
+   call da_get_innov_vector (it, ob, iv, grid , config_flags)
+   call da_allocate_y (iv, re)
+   call da_write_obs(ob, iv, re)
+   if ( num_procs /= 1 ) then
+            write(unit=message(1),fmt='(A)') &
+         "====> Warning: Since it is a multi-CPU run, etkf obs will not be produced correctly"
+         call da_warning(__FILE__,__LINE__,message(1:1))
+   end if
+   call da_write_obs_etkf(ob, iv, re)
+   call da_final_write_obs(iv)
+   call da_deallocate_y(re)
+   call da_deallocate_observations (iv)
+   return 
+   endif
 
    !---------------------------------------------------------------------------
    ! [8] Outerloop
    !---------------------------------------------------------------------------
+
 
    j_grad_norm_target = 1.0
    do it = 1, max_ext_its
