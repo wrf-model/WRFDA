@@ -225,6 +225,8 @@ export P_TOP_REQUESTED=${P_TOP_REQUESTED:-1000.0}
 export NL_USE_FOR=${NL_USE_FOR:-3DVAR}
 export NL_NUM_SLOTS_PAST=${NL_NUM_SLOTS_PAST:-3}
 export NL_NUM_SLOTS_AHEAD=${NL_NUM_SLOTS_AHEAD:-3}
+export TIME_WINDOW_M=${TIME_WINDOW_M:-3h}    # This is for hour, if minuted required use "m" in the place of "h".
+export TIME_WINDOW_P=${TIME_WINDOW_P:-3h}    # This is for hour, if minuted required use "m" in the place of "h".
 
 # WRF-Var (not covered above):
 export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.

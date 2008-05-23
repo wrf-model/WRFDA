@@ -24,7 +24,7 @@ export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/nu
 export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
-export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d01}
+#cmd export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d01} # It's defined in "da_run_suite.ksh".
 
 if $NL_VAR4D; then
    export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d01}
@@ -294,7 +294,18 @@ if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
       FGAT_DATE=$START_DATE
       until [[ $FGAT_DATE > $END_DATE ]]; do
          let N=$N+1
-         ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
+      	 #ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii  
+	 
+      #cmd  Linking  OBSPROC obs files for FGAT run.	      
+      # the very first hour of our fgat window, time_window_min.     
+         if [[ -s $OB_DIR/${D_DATE[01]}/ob.ascii+ ]]; then ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii; fi  
+	 # for hours not coinciding time_window_min and time_window_max.	
+	 ln -fs $OB_DIR/${D_DATE[0$N]}/ob.ascii ob0${N}.ascii	
+	  
+	 # the very last hour of our fgat window, time_window_max.     
+         if [[ -s $OB_DIR/${D_DATE[07]}/ob.ascii- ]]; then ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii; fi 	 	 	   	 
+      #cmd end of Meral's changes for FGAT mode obs.	 	 
+	 
          if [[ -s $OB_DIR/$FGAT_DATE/ob.ssmi ]]; then
             ln -fs $OB_DIR/$FGAT_DATE/ob.ssmi ob0${N}.ssmi
          fi

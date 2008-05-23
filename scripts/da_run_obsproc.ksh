@@ -62,15 +62,31 @@ export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
 
 #ln -fs $OB_DIR/$DATE/$OB_FILE .
 
-if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
-   # If compressed, unpack
-   if $DUMMY; then
-      touch ${OB_FILE}
-   else
-      cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
-      gunzip -f ${OB_FILE}.gz
-   fi
+#MD modified for compressed and uncompressed RTOBS files.
+
+if [[ -f $RTOBS_DIR/$DATE/${OB_FILE} ]]; then
+     if $DUMMY; then 
+         touch ${OB_FILE}
+       else  
+         cp $RTOBS_DIR/$DATE/$OB_FILE .
+     fi    
+  elif [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then 
+ 
+  # If compressed, unpack
+   cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
+      gunzip -f ${OB_FILE}.gz   
 fi
+
+if [[ ${NL_USE_FOR} == FGAT ]]; then
+
+#MD Added the following for FGAT tests.
+
+   export TIME_WINDOW_MIN=`$WRFVAR_DIR/da/da_advance_time.exe  $DATE  $TIME_WINDOW_M  -w  `
+   export TIME_ANALYSIS=`$WRFVAR_DIR/da/da_advance_time.exe    $DATE  0  -w  `
+   export TIME_WINDOW_MAX=`$WRFVAR_DIR/da/da_advance_time.exe  $DATE  $TIME_WINDOW_P  -w  `      
+fi
+
+#End of MD changes.
 
 #Namelist notes:
 #1. x,y reversed in namelist as MM5 i=y.
@@ -119,7 +135,7 @@ cat > namelist.3dvar_obs << EOF
 /
 
 &record6
- ptop =  ${P_TOP_REQUESTED},
+ ptop =  ${NL_P_TOP_REQUESTED},
  base_pres       = ${NL_BASE_PRES},
  base_temp       = ${NL_BASE_TEMP},
  base_lapse      = ${NL_BASE_LAPSE},

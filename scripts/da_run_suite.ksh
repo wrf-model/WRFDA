@@ -97,6 +97,18 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    if [[ $HOUR -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
    if [[ $HOUR -eq $LONG_FCST_TIME_4 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
 
+   # Check if it is "update_cycling" run:
+   
+   if $UPDATE_CYCLING; then
+        if [[ $HOUR = $LONG_FCST_TIME_1 || $HOUR = $LONG_FCST_TIME_3 ]] then
+              export CYCLING=false  # cold start
+	      export FIRST=false
+	    else
+	      export CYCLING=true   # cycling
+	      export FIRST=false
+        fi	
+   fi	# End of check for "update_cycling" 
+
    if $RUN_RESTORE_DATA_GRIB; then
       export RUN_DIR=$SUITE_DIR/$DATE/restore_data_grib
       mkdir -p $RUN_DIR
