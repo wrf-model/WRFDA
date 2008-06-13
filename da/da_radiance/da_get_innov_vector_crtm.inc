@@ -506,12 +506,19 @@ subroutine da_get_innov_vector_crtm ( it, grid, ob, iv )
             iv%instid(inst)%tb_xb(k,n)  = RTSolution(k,1)%Brightness_Temperature
             iv%instid(inst)%rad_xb(k,n) = RTSolution(k,1)%Radiance
             iv%instid(inst)%emiss(k,n)  = RTSolution(k,1)%surface_emissivity
-            
-	    if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
-               iv%instid(inst)%tb_inv(k,n) = &
-               ob%instid(inst)%tb(k,n) - RTSolution(k,1)%Brightness_Temperature
-            else
-               iv%instid(inst)%tb_inv(k,n)   = missing_r
+            if (use_pseudo_rad) then ! input is innovation
+              if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then
+                ob%instid(inst)%tb(k,n)=RTSolution(k,1)%Brightness_Temperature+iv%instid(inst)%tb_inv(k,n)
+              else
+                ob%instid(inst)%tb(k,n)   = missing_r
+              end if
+            else 
+	      if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
+                iv%instid(inst)%tb_inv(k,n) = &
+                ob%instid(inst)%tb(k,n) - RTSolution(k,1)%Brightness_Temperature
+              else
+                iv%instid(inst)%tb_inv(k,n)   = missing_r
+              end if
             end if
 
             if (use_crtm_kmatrix) then

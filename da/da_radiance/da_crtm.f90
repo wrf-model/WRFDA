@@ -26,7 +26,7 @@ module da_crtm
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
       time_window_min,num_fgat_time,rtminit_platform, &
       rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte,use_airs_mmr, &
-      crtm_atmosphere,use_crtm_kmatrix, use_varbc, freeze_varbc
+      crtm_atmosphere,use_crtm_kmatrix, use_varbc, freeze_varbc, use_pseudo_rad
    use da_interpolation, only : da_interp_lin_2d_partial,da_interp_lin_2d_adj_partial
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
