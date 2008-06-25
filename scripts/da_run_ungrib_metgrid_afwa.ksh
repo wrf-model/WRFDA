@@ -38,7 +38,7 @@ $WPS_DIR/link_grib.csh $DAT_DIR/$FG_TYPE/$DATE/*
 export FCST_RANGE=0
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 cp namelist.wps namelist.wps.$FG_TYPE
-${RUN_CMD} ./ungrib.exe
+./ungrib.exe
 
 RC=$?
 
@@ -73,7 +73,7 @@ export FCST_RANGE=0
    ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
    cp namelist.wps namelist.wps.$FG_TYPE
 
-   ${RUN_CMD} ./ungrib.exe
+   ./ungrib.exe
    RC=$?
    if test $RC != 0; then
       echo ungrib failed with error $RC
@@ -112,7 +112,7 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
 		
 	$WPS_DIR/link_grib.csh tmp/*
 	
-	${RUN_CMD} ./ungrib.exe
+	./ungrib.exe
 
 	# Need to run ungrib for every 3 hour separately, so re-organize the namelist.
 

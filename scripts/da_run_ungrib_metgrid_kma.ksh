@@ -45,7 +45,7 @@ ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/t${FCST_HOUR}  tmp/.
 
 $WPS_DIR/link_grib.csh tmp/*
 
-${RUN_CMD} ./ungrib.exe
+./ungrib.exe
 RC=$?
 if test $RC != 0; then
    echo ungrib failed with error $RC
@@ -77,7 +77,7 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
 
    $WPS_DIR/link_grib.csh tmp/*
 
-   ${RUN_CMD} ./ungrib.exe
+   ./ungrib.exe
    RC=$?
    if test $RC != 0; then
       echo ungrib failed with error $RC
