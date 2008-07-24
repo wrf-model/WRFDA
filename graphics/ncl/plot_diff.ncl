@@ -19,9 +19,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
 ;  Fix WRFVAR_DIR & location of analysis file here
 ;
 load "/ptmp/rizvi/trunk/graphics/ncl/WRF_contributed.ncl.test"
-file1 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/with_density_update/fc/2005090806/wrfinput_d01"+".nc", "r")
-;file2 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/without_density_update/fc/2005090806/wrfinput_d01"+".nc", "r")
-file2 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/rc/2005090806/wrfinput_d01"+".nc", "r")
+file1 =addfile("/ptmp/rizvi/data/ASR_240km/fc/2007120100/wrfinput_d01"+".nc", "r")
+file2 =addfile("/ptmp/rizvi/data/ASR_240km/rc/2007120100/wrfinput_d01"+".nc", "r")
+;file2 =addfile("/mmm/mmmtmp/rizvi/data/india_30km/rc/2005090806/wrfinput_d01"+".nc", "r")
 
 ;****************************************************************************
 begin
@@ -29,10 +29,11 @@ begin
    ; open file 
    ;***************************************************************************
 
-   works = "x11"
-   sigma_lev=25
-   thinning_factor = 0.025
-   vector_magnitude = 1.0
+   works = "pdf"
+   sigma_lev=10
+;   thinning_factor = 0.025
+   thinning_factor = 0.25
+   vector_magnitude = 2.0
    vector_length    = 0.05
 
 

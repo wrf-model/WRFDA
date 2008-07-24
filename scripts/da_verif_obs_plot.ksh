@@ -35,7 +35,7 @@ export EXP_LINES_COLORS=${EXP_LINES_COLORS:-'(/"blue","green", "orange"/)'}
 export PLOT_WKS=${PLOT_WKS:-x11}
 export CLEAN=${CLEAN:-false}
 export GET_OMBOMA_PLOTS=${GET_OMBOMA_PLOTS:-false}
-export FILE_PATH_STRING=${FILE_PATH_STRING:-'wrfvar/working/gts_omb_oma'}
+export FILE_PATH_STRING=${FILE_PATH_STRING:-'wrfvar/gts_omb_oma_${OUTER_ITER}'}
 
 #=========================================================
 #=========================================================
