@@ -17,7 +17,7 @@ module da_transfer_model
       ntasks, data_order_xy
    use module_comm_dm, only : halo_xa_sub, halo_init_sub, halo_psichi_uv_adj_sub
       
-   use da_control, only : ips,ipe,jps,jpe,kps,kpe, num_pseudo
+   use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
 
    use da_control, only : cos_xls, sin_xls, cos_xle, sin_xle, trace_use, &
@@ -32,7 +32,7 @@ module da_transfer_model
       use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs,ids,ide, &
       jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
       vertical_ip_sqrt_delta_p, vertical_ip_delta_p,check_rh_simple, check_rh_tpw, &
-      t_kelvin, num_fgat_time
+      t_kelvin, num_fgat_time, num_pseudo
    use da_define_structures, only : xbx_type
    use da_grid_definitions, only : da_set_map_para
    use da_par_util, only : da_patch_to_global

@@ -432,7 +432,6 @@ module da_control
    ! rtm_init setup parameter
 
    integer, parameter            :: maxsensor = 30
-   integer :: trace_start_points=0   ! Number of routines to initiate trace
 
    integer, parameter :: num_ob_indexes = 25
    integer, parameter :: npres_print = 12
