@@ -72,7 +72,9 @@ contains
 subroutine trace_init
 
    implicit none
+#ifdef DM_PARALLEL
    include 'mpif.h'
+#endif
 
    !--------------------------------------------------------------------
    ! Purpose: Initialise tracing
@@ -84,10 +86,14 @@ subroutine trace_init
    character(len=200) :: csvname
    character (len=10)  :: temp
 
+#ifdef DM_PARALLEL
    CALL mpi_comm_rank( mpi_comm_world, mytask, ierr )
    if (rootproc()) then
       root = mytask
    endif
+#else
+   root = 0
+#endif
 
 ! Statements that set the namelist vars to default vals
 #  include <namelist_defaults.inc>
@@ -129,9 +135,14 @@ subroutine trace_init
       end if
    end if
 
+#ifdef DM_PARALLEL
    CALL wrf_get_dm_communicator (local_communicator)
    CALL mpi_comm_size( local_communicator, ntasks, ierr )
    CALL mpi_comm_rank( local_communicator, mytask, ierr )
+#else
+   ntasks = 1
+   mytask = 0
+#endif
    root = 0
 
    if (trace_csv .and. rootproc()) then
@@ -947,9 +958,11 @@ subroutine trace_report
    call da_proc_sum_int(MasterNoRoutines)
    ! only PE 0 knows the result
 
+#ifdef DM_PARALLEL
    call mpi_bcast(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
                   MPI_character,trace_pe, local_communicator,ierr)
+#endif
 
    MasterElapsedTime(:,:)=0.0
    MasterCPUTime(:,:)=0.0
@@ -1478,11 +1491,17 @@ end module module_trace
 LOGICAL FUNCTION rootproc()
    USE module_dm
    IMPLICIT NONE
+#ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
+#endif
    INTEGER tsk, ierr, mpi_comm_local
+#ifdef DM_PARALLEL
    CALL wrf_get_dm_communicator( mpi_comm_local )
    CALL mpi_comm_rank ( mpi_comm_local, tsk , ierr )
    rootproc = tsk .EQ. 0
+#else
+   tsk = 0
+   rootproc = tsk .EQ. 0
+#endif
    RETURN
 END FUNCTION rootproc
-
