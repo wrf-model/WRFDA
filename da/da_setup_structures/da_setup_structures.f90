@@ -38,7 +38,9 @@ module da_setup_structures
       satem, radar, ssmi_rv, ssmi_tb, ssmt1, ssmt2, airsr, pilot, airep, &
       bogus, buoy, qscat, radiance, pseudo, trace_use_dull, kts,kte, &
       num_pseudo,pseudo_x, pseudo_y, pseudo_z, pseudo_var,pseudo_val, pseudo_err,&
-      fg_format, fg_format_kma_global
+      fg_format, fg_format_wrf_arw_regional,fg_format_wrf_nmm_regional, &
+      fg_format_wrf_arw_global, fg_format_kma_global, deg_to_rad, rad_to_deg
+
 
    use da_obs, only : da_fill_obs_structures, da_store_obs_grid_info
    use da_obs_io, only : da_scan_obs_bufr,da_read_obs_bufr,da_read_obs_radar, &
@@ -63,6 +65,7 @@ contains
 #include "da_setup_background_errors.inc"
 #include "da_setup_be_global.inc"
 #include "da_setup_be_regional.inc"
+#include "da_setup_be_nmm_regional.inc"
 #include "da_setup_cv.inc"
 #include "da_chgvres.inc"
 #include "da_setup_flow_predictors.inc"
@@ -76,6 +79,7 @@ contains
 #include "da_cumulus.inc"
 #include "da_qfrmrh.inc"
 #include "da_write_increments.inc"
+#include "da_write_increments_for_wrf_nmm_regional.inc"
 #include "da_write_kma_increments.inc"
 #include "da_get_bins_info.inc"
 #include "da_truncate_spectra.inc"

@@ -210,8 +210,10 @@ module da_control
 
 #include "version_decl"
 
-   integer, parameter :: fg_format_wrf = 1
-   integer, parameter :: fg_format_kma_global = 3
+   integer, parameter :: fg_format_wrf_arw_regional = 1
+   integer, parameter :: fg_format_wrf_nmm_regional = 2
+   integer, parameter :: fg_format_wrf_arw_global   = 3
+   integer, parameter :: fg_format_kma_global = 4
 
    integer, parameter :: ob_format_bufr = 1
    integer, parameter :: ob_format_ascii = 2
@@ -555,6 +557,7 @@ module da_control
    ! lat/long information calculated in da_setup_firstguess_wrf
 
    real, parameter :: deg_to_rad = pi/180.0
+   real, parameter :: rad_to_deg = 1.0/deg_to_rad
   
    real, allocatable :: cos_xls(:)
    real, allocatable :: sin_xls(:)

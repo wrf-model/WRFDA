@@ -31,8 +31,9 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
    !----------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv) 
-   else
+      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv)
+   else if (fg_format == fg_format_wrf_arw_regional .or. &
+            fg_format == fg_format_wrf_nmm_regional) then
       call da_transform_vtovv(grid, cv_size, be, cv, vv)
    end if
 
@@ -67,7 +68,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    do j=jts,jte
       do i=its,ite
-         if (fg_format == fg_format_wrf) then
+         if (fg_format == fg_format_wrf_arw_regional) then
             sdmd=0.0
             s1md=0.0
             do k=kts,kte
@@ -88,6 +89,12 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
                grid%xa%p(i,j,k)=0.5*(p(k)+p(k+1))
             end do
+         else if (fg_format == fg_format_wrf_nmm_regional) then
+
+         grid%xa%p(i,j,kte+1) = 0.
+         do k = kts, kte
+           grid%xa%p(i,j,k) =  grid%em_znu(k)*grid%xa%psfc(i,j)
+         end do  
          else if (fg_format == fg_format_kma_global) then
             do k=kts,kte
                if (k == kte) then
@@ -196,5 +203,4 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
    if (trace_use) call da_trace_exit("da_transform_vtox")
 
 end subroutine da_transform_vtox
-
 

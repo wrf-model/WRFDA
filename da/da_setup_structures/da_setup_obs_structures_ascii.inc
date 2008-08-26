@@ -15,6 +15,7 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
    logical                      :: outside
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
+   if (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
 
    !-------------------------------
    ! Find out if pseudo ob is local
@@ -33,6 +34,8 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
    else
       outside = .true.
    end if
+
+   if (num_pseudo > 0) then
    if (outside) then
       iv%info(pseudo)%nlocal          = 0
       ob%nlocal(pseudo)               = 0
@@ -43,6 +46,7 @@ subroutine da_setup_obs_structures_ascii( ob, iv, grid )
       ob%nlocal(pseudo)               = num_pseudo
       iv%info(pseudo)%ntotal          = num_pseudo
       iv%info(pseudo)%max_lev         = 1            
+   end if
    end if
 
    !--------------------------------------------------------------------------

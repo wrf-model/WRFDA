@@ -97,7 +97,7 @@ export RUN_CMD=${RUN_CMD:-$RUN_CMD_DEFAULT}
 # Directories:
 export REL_DIR=${REL_DIR:-$HOME/code/$RELEASE}    # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/da}     # WRF-Var executable location.
+export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}     # WRF-Var executable location.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WPB_DIR=${WPB_DIR:-$REL_DIR/wpb}           # Perturbed LBC dir.
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}           # WRF directory.

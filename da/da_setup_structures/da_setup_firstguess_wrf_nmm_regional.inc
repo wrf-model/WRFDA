@@ -1,4 +1,4 @@
-subroutine da_setup_firstguess_wrf(xbx, grid)
+subroutine da_setup_firstguess_wrf_nmm_regional(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define/allocate components of WRF model state.
@@ -11,15 +11,15 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    type (domain), intent(inout)         :: grid
 
    integer           :: map_util_project
-   real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
+   real              :: x, y, xxc, yyc, lat_cen, lon_cen
   
    real              :: buf(2)
 
    character(len=24) :: xb_date, an_date
    integer           :: len, seconds, i_grid,  j_grid, m_expand
+   real              :: latinc, loninc
 
-
-   if (trace_use) call da_trace_entry("da_setup_firstguess_wrf")
+   if (trace_use) call da_trace_entry("da_setup_firstguess_wrf_nmm_regional")
 
    !-----------------------------------------------------------------------
    ! [0.0] check the xb_date for 3DVAR
@@ -74,8 +74,10 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    call nl_get_moad_cen_lat (grid%id , grid%moad_cen_lat)
    call nl_get_stand_lon    (grid%id , grid%stand_lon)
 
-   phic = grid%moad_cen_lat
-   xlonc = grid%stand_lon
+   phic   = grid%moad_cen_lat
+   xlonc  = grid%cen_lon   
+   loninc = grid%cf1       
+   latinc = grid%cf2       
 
    truelat1_3dv = grid%truelat1
    truelat2_3dv = grid%truelat2
@@ -83,6 +85,24 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    dsm = 0.001 * grid%dx
 
    map_util_project = grid%map_proj
+   ! Set map projection in WRFSI world.
+
+   if (grid%map_proj == 0 .or. grid%map_proj == 6) then
+      map_util_project = PROJ_LATLON
+   else if (grid%map_proj == 1) then
+      map_util_project = PROJ_LC
+   else if (grid%map_proj == 2) then
+      map_util_project = PROJ_PS
+   else if (grid%map_proj == 3) then
+      map_util_project = PROJ_MERC
+   end if
+
+   call da_map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
+                real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0, &
+                grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,latinc,loninc,map_info)
+   ! Need to set map projection in WRF world.
+   map_projection = grid%map_proj
+   cone_factor = map_info%cone
 
    if (print_detail_map) then
       write(unit=stdout, fmt='(a, i6)') &
@@ -95,92 +115,21 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
            'truelat2 =', grid%truelat2, &
            'start_lat =', start_lat, &
            'start_lon =', start_lon, &
+           'latinc    =', latinc   , &
+           'loninc    =', loninc   , &
+           'cone_fact =', cone_factor, &
            'dsm      =', dsm
    end if
 
-   ! Set map projection in WRFSI world.
-   map_util_project = PROJ_LC
 
-   if (grid%map_proj == 0) then
-      map_util_project = PROJ_LATLON
-   else if (grid%map_proj == 1) then
-      map_util_project = PROJ_LC
-   else if (grid%map_proj == 2) then
-      map_util_project = PROJ_PS
-   else if (grid%map_proj == 3) then
-      map_util_project = PROJ_MERC
-   end if
+    mix = grid%xp%ide - grid%xp%ids  + 1
+    mjy = grid%xp%jde - grid% xp%jds + 1
+    mkz = grid%xp%kde - grid%xp%kds  + 1
 
-   call da_map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
-                real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0, &
-                grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,grid%truelat1,grid%stand_lon,map_info)
+   call da_transfer_wrf_nmm_regional_toxb(xbx, grid)
 
-   ! Need to set map projection in WRF world.
-   map_projection = grid%map_proj
+   if (trace_use) call da_trace_exit("da_setup_firstguess_wrf_nmm_regional")
 
-   cone_factor = map_info%cone
-
-   if (print_detail_map) then
-     
-      !----------------------------------------------------------------------
-      ! Check the ll_to_ij:
-      !----------------------------------------------------------------------
-
-      message(1)="Check the map_set correctness::::::::::::::::::::::::"
-
-      ! Domain center:
-      call  da_llxy_wrf(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
-      write(unit=message(2),fmt='("Center: latc,lonc,x,y, Xc, Yc:",6f10.3)') &
-                  grid%cen_lat, grid%cen_lon, start_x, start_y, &
-                  real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0
-
-      start_x = real(grid%xp%ide-grid%xp%ids+2)/2.0
-      start_y = real(grid%xp%jde-grid%xp%jds+2)/2.0
-      lat_cen = -999.9
-      lon_cen = -999.9
-      call  da_xyll(map_info, start_x, start_y, lat_cen, lon_cen)
-      write(unit=message(3), &
-         fmt='("Center: X, Y, latc, lonc, phic, xlonc:",6f10.3)') &
-         start_x, start_y, lat_cen, lon_cen,   &
-         grid%cen_lat, grid%cen_lon
-      call da_message(message(1:3))
-   end if
-
-   ! Setup the domain definition for use of the GRAPH:
-
-   coarse_ds = 0.001 * grid%dx
-   coarse_ix = grid%e_we - grid%s_we + 1
-   coarse_jy = grid%e_sn - grid%s_sn + 1
-   start_x = 1.0
-   start_y = 1.0
-
-   xxc = real(coarse_ix)/2.0
-   yyc = real(coarse_jy)/2.0
-
-   call da_set_map_para ! set up the map background parameters
-
-   ! call da_llxy_default(PHIC,XLONC,X,Y)
-   call da_llxy_default(grid%cen_lat,grid%cen_lon,x,y)
-
-   !--------------------------------------------------------------------------
-   ! [3.0] Interpolate WRF C-grid winds to p points of WRFVAR grid (interpolate 
-   ! u to west, v to south?
-   !---------------------------------------------------------------------------
-
-   grid%xb % mix = grid%xp%ide - grid%xp%ids + 1
-   grid%xb % mjy = grid%xp%jde - grid% xp%jds + 1
-   grid%xb % mkz = grid%xp%kde - grid%xp%kds + 1
-
-   grid%xb % ds  = 0.001 * grid%dx
-
-   mix = grid%xb % mix
-   mjy = grid%xb % mjy
-   mkz = grid%xb % mkz
-   
-   call da_transfer_wrftoxb(xbx, grid)
-
-   if (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
-
-end subroutine da_setup_firstguess_wrf
+end subroutine da_setup_firstguess_wrf_nmm_regional
 
 

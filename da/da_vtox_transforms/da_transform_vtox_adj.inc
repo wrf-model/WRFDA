@@ -87,9 +87,12 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end if
  
    call da_pt_to_rho_adj(grid)
+   
    do j=jts,jte
       do i=its,ite
-         if (fg_format == fg_format_wrf) then
+         if (fg_format == fg_format_wrf_arw_regional .or. &
+             fg_format == fg_format_wrf_arw_global ) then
+
             mu=0.0
             s1md=0.0
 
@@ -115,6 +118,11 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
                mr_a(k) = mr_a(k) + sdmd*grid%xb%dnw(k)
                grid%xa%q(i,j,k) = grid%xa%q(i,j,k) + mr_a(k)/(1.0 - grid%xb%q(i,j,k))**2
             end do
+         else if (fg_format == fg_format_wrf_nmm_regional)then
+          do k = kte,kts,-1
+          grid%xa%psfc(i,j)=grid%xa%psfc(i,j)+grid%xa%p(i,j,k)*grid%em_znu(k) 
+          enddo
+
          else if (fg_format == fg_format_kma_global)then
             do k=kts,kte
                if (k == kte) then

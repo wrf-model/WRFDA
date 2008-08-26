@@ -125,6 +125,10 @@ begin
       if (f@MAP_PROJ.eq.3) then
           res@mpProjection = "Mercator"
       end if
+      if (f@MAP_PROJ.eq.6) then
+          res@mpProjection = "Mercator"
+      print ("WRF_mapProj: rizvi is here        ")
+      end if
   else
       print ("WRF_mapProj: no MAP_PROJ attribute")
   end if

@@ -12,7 +12,6 @@ subroutine da_setup_firstguess(xbx, grid)
 
    integer :: is, ie, js, je
    real    :: ddx , ddy    
-
    if (trace_use) call da_trace_entry("da_setup_firstguess")
 
    is = grid%xp % its
@@ -23,23 +22,23 @@ subroutine da_setup_firstguess(xbx, grid)
    ! Calculate sin and cosine values used in da_get_avpoles
 
    if (global) then
-      if (grid%xp%jts == grid%xp%jds) then
+      if (grid%xp%jte == grid%xp%jds) then
 
-         allocate(cos_xls(grid%xp%its:grid%xp%ite))
-         allocate(sin_xls(grid%xp%its:grid%xp%ite))
-         cos_xls(grid%xp%its:grid%xp%ite) = & 
-            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
-         sin_xls(grid%xp%its:grid%xp%ite) = &
-            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
+         allocate(cos_xls(grid%xp%ite:grid%xp%ite))
+         allocate(sin_xls(grid%xp%ite:grid%xp%ite))
+         cos_xls(grid%xp%ite:grid%xp%ite) = & 
+            cos(deg_to_rad*grid%xlong(grid%xp%ite:grid%xp%ite,grid%xp%jte))
+         sin_xls(grid%xp%ite:grid%xp%ite) = &
+            sin(deg_to_rad*grid%xlong(grid%xp%ite:grid%xp%ite,grid%xp%jte))
       end if
 
       if (grid%xp%jte == grid%xp%jde) then 
-         allocate(cos_xle(grid%xp%its:grid%xp%ite))
-         allocate(sin_xle(grid%xp%its:grid%xp%ite))
-         cos_xle(grid%xp%its:grid%xp%ite) = &
-            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
-         sin_xle(grid%xp%its:grid%xp%ite) = &
-            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
+         allocate(cos_xle(grid%xp%ite:grid%xp%ite))
+         allocate(sin_xle(grid%xp%ite:grid%xp%ite))
+         cos_xle(grid%xp%ite:grid%xp%ite) = &
+            cos(deg_to_rad*grid%xlong(grid%xp%ite:grid%xp%ite,grid%xp%jte))
+         sin_xle(grid%xp%ite:grid%xp%ite) = &
+            sin(deg_to_rad*grid%xlong(grid%xp%ite:grid%xp%ite,grid%xp%jte))
       end if
    end if
 
@@ -47,11 +46,14 @@ subroutine da_setup_firstguess(xbx, grid)
    ! [1.0] Setup and read in fields from first guess:
    !---------------------------------------------------------------------------      
 
-   if (fg_format == fg_format_wrf) then
+   if (fg_format == fg_format_wrf_arw_regional .or. &
+       fg_format == fg_format_wrf_arw_global) then
 
       ! First guess is a WRF C-grid format file:
 
       call da_setup_firstguess_wrf(xbx, grid)
+   else if (fg_format == fg_format_wrf_nmm_regional ) then
+      call da_setup_firstguess_wrf_nmm_regional(xbx, grid)
    else if (fg_format == fg_format_kma_global) then
       ! First guess is an KMA format file:
       call da_setup_firstguess_kma(xbx, grid)
@@ -61,11 +63,17 @@ subroutine da_setup_firstguess(xbx, grid)
    ! Exchange halo region for XB arrays.
    !---------------------------------------------------------------------------
 
-   if (fg_format == fg_format_wrf) then
+   if (fg_format == fg_format_wrf_arw_regional) then
       ! Calculate multiplicative constants for PsiChi_TO_UV 
       grid%xb%coefx(is:ie,js:je) = 0.5 * grid%xb%map_factor(is:ie,js:je)/grid%xb%ds
       grid%xb%coefy(is:ie,js:je) = grid%xb%coefx(is:ie,js:je)
-      grid%xb%coefz(is:ie,js:je) = 0.5 / (grid%xb%map_factor(is:ie,js:je)*grid%xb%ds)
+   else if (fg_format == fg_format_wrf_arw_global) then
+      ! Calculate multiplicative constants for PsiChi_TO_UV 
+      grid%xb%coefx(is:ie,js:je) = 0.5 * grid%rdx * grid%msftx(is:ie,js:je)
+      grid%xb%coefy(is:ie,js:je) = 0.5 * grid%rdy * grid%msfty(is:ie,js:je)
+   else if (fg_format == fg_format_wrf_nmm_regional) then
+      grid%xb%coefx(is:ie,js:je) = 0.5/grid%em_mu0(is:ie,js:je)
+      grid%xb%coefy(is:ie,js:je) = 0.5/grid%xb%ds            
    else if (fg_format == fg_format_kma_global) then
       ! Calculate multiplicative constants for PsiChi_TO_UV 
       ddx =  earth_radius*1000 * 2.0 * pi / (grid%xb%ide-grid%xb%ids+1)
@@ -73,8 +81,7 @@ subroutine da_setup_firstguess(xbx, grid)
       grid%xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(grid%xlat(is:ie,js:je)*pi/180.))
       grid%xb% coefy(is:ie,js:je) = 0.5 /  ddy
    else
-      write(unit=message(1),fmt='(A,I5)') &
-         "Wrong choice for fg_format = ",fg_format
+      write (unit=message(1),fmt='(A,I3)') ' Wrong Choice of fg_format  = ',fg_format
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
@@ -93,11 +100,8 @@ subroutine da_setup_firstguess(xbx, grid)
    !---------------------------------------------------------------------------
 
    ! [2.1] Set up fast Fourier & Legendre transform constants:
-
    call da_setup_runconstants(grid, xbx)
 
    if (trace_use) call da_trace_exit("da_setup_firstguess")
 
 end subroutine da_setup_firstguess
-
-

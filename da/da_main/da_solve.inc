@@ -242,7 +242,8 @@ subroutine da_solve ( grid , config_flags)
          deallocate (sin_xle)
       end if
    end if
-
+!  rizvi TBD in da_transfer_wrf_nmmtoxb.inc
+   if( fg_format /= fg_format_wrf_nmm_regional ) &
    deallocate (xbx % latc_mean)
 
 #ifdef DM_PARALLEL
