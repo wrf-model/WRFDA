@@ -15,7 +15,11 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE WRF_ESMF_MOD
    USE module_dfi
 
+#ifdef DM_PARALLEL
+#ifndef DISK_IO
    USE module_linked_list, only: push4backup, pop2restore_reverse
+#endif
+#endif
    USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
@@ -304,6 +308,8 @@ call end_timing('med_auxinput3_in 1 ')
 !        write(unit=*, fmt='(2a)') 'xyh AD state at ', currTime_str(1:19)
 !        write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index+1)
          call start_timing
+#ifdef DM_PARALLEL
+#ifndef DISK_IO
          if (basic_state_1st_time) then
             CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
             call push4backup(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
@@ -314,6 +320,12 @@ call end_timing('med_auxinput3_in 1 ')
             call pop2restore_reverse(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
             call pop2restore_reverse(grid%moist_2,"moist_2")
          endif
+#else
+         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
+#endif
+#else
+         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
+#endif
          call end_timing('med_auxinput2_in4ad')
 !-----end check non-linear input
 

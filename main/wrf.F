@@ -41,8 +41,10 @@ PROGRAM wrf
    CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
 #ifdef DM_PARALLEL
    CALL init_modules(2)   ! 
-#endif
+#ifndef DISK_IO
    CALL linkedlist_initialize
+#endif
+#endif
 
    call trace_init
    call trace_entry("wrf")
@@ -69,7 +71,9 @@ PROGRAM wrf
 #endif
 
 #ifdef DM_PARALLEL
+#ifndef DISK_IO
    CALL linkedlist_initialize
+#endif
    CALL wrf_get_dm_communicator( comm )
    CALL MPI_BARRIER(comm,ierr)
 #endif

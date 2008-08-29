@@ -8852,7 +8852,7 @@ module_domain.o :
 	$(FC) -c -g $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) -qnoopt -qnohot $*.f
 
 ###########################################################
-#ARCH Darwin		(single-threaded, no nesting, G4)
+#ARCH Darwin		(single-threaded, no nesting, xlf, G4 Mac)
 #     
 #     Using -qfloat=nomaf option can result in identical results with
 #           non-optimized and optimized results (suggested by Fovell of UCLA)

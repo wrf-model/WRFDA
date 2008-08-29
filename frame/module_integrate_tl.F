@@ -12,7 +12,11 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
    USE module_nesting
    USE module_configure
    USE module_timing
+#ifdef DM_PARALLEL
+#ifndef DISK_IO
    USE module_linked_list, only: pop2restore
+#endif
+#endif
    USE WRF_ESMF_MOD
    
    USE module_dfi   
@@ -306,11 +310,17 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
 !!!!  for exactly trajectory update   08/02/2006   Xin Zhang
 !!!!           CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-!              CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+#ifdef DM_PARALLEL
+#ifndef DISK_IO
                call pop2restore(grid%moist_2,"moist_2")
                call pop2restore(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
                call pop2restore(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
-
+#else
+               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+#endif
+#else
+               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
+#endif
                nl_date_index = nl_date_index + 1
 
             else
