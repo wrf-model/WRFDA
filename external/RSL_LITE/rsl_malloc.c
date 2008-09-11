@@ -67,7 +67,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef MAC_G95
+#ifndef MACOS
 #include <malloc.h>
 #else
 #include <malloc/malloc.h>
@@ -102,7 +102,7 @@ int bbb ;
 
 static char zero_length_storage[] = "" ;
 
-#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(MAC_G95))
+#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(MACOS))
 static struct mallinfo minf ;
 #endif
 
@@ -156,7 +156,7 @@ EF_PROTECT_FREE = 1 ;
 "rsl_malloc failed allocating %d bytes, called %s, line %d, try %d\n",
        s,f,l,tries) ;
        perror(mess) ;
-#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(MAC_G95))
+#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(MACOS))
        minf = mallinfo() ;
        fprintf(stderr,"mallinfo: arena %d\n",minf.arena)  ;
        fprintf(stderr,"mallinfo: ordblks %d\n",minf.ordblks)  ;

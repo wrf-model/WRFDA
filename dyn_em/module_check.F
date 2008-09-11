@@ -16,6 +16,12 @@ MODULE module_check
    USE g_module_bc_em
    USE a_module_bc_em
 
+#ifdef DM_PARALLEL
+   include "mpif.h"
+   REAL     ::  nsum
+   INTEGER  ::  comm, ierror
+#endif
+
 
 CONTAINS
 
@@ -32,7 +38,6 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
 !  Input variables: field, field_old, tendency, ru, rv, rom, mut
 !  Output variable: tendency
 !  Contants: All others
-!  Qingnong Xiao, January 25, 2005
 
    IMPLICIT NONE
   
@@ -91,8 +96,6 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
    REAL    :: q_im3, q_im2, q_im1, q_i, q_ip1, q_ip2, ua, vel
    LOGICAL :: specified ! changed by Thomas Nehrkorn, AER
 
-!  Xiao: new definition
- 
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme )                 :: S_field,     &
                                                                       S_field_old, &
                                                                       S_ru,    &
@@ -117,8 +120,6 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme )                 :: K_tendency
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  Xiao: new definition end
 
 !  TGL test
 
@@ -328,10 +329,6 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 ! InOut variables : ru_tendf, rv_tendf, rw_tendf, t_tendf, cqw
 
 
-
-
-! Zaizhong Ma, March 18,2005
-
    IMPLICIT NONE
 
    !  Input data.
@@ -426,8 +423,6 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
    REAL    :: kdift, khdq, kvdq, cfn, cfn1, cf1, cf2, cf3
    INTEGER :: i,j,k
-
-!  zzma: new definition
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )    :: S_ru,      &
                                                          S_rv,      &
@@ -558,8 +553,6 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -724,9 +717,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &jts, jte, kts, kte )
 
    SAVE_L=0.
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       SAVE_L=SAVE_L + P_ru_tend(i,k,j)*P_ru_tend(i,k,j)  &
                     + P_rv_tend(i,k,j)*P_rv_tend(i,k,j)  &
                     + P_rw_tend(i,k,j)*P_rw_tend(i,k,j)  &
@@ -740,9 +733,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       SAVE_L=SAVE_L + P_ru_tendf(i,k,j) *P_ru_tendf(i,k,j) &
                     + P_rv_tendf(i,k,j) *P_rv_tendf(i,k,j) &
                     + P_rw_tendf(i,k,j) *P_rw_tendf(i,k,j) &
@@ -751,11 +744,17 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=ims,ime
-   do j=jms,jme
+   do i=its,ite
+   do j=jts,jte
       SAVE_L=SAVE_L + P_mu_tend(i,j) *P_mu_tend(i,j) 
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
 
    ALPHA=1.
    DO NT=1,11
@@ -833,9 +832,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 
       VAL_N=0.
-      do i=ims,ime
-      do k=kms,kme
-      do j=jms,jme
+      do i=its,ite
+      do k=kts,kte
+      do j=jts,jte
          VAL_N=VAL_N+(P_ru_tend(i,k,j)- B_ru_tend(i,k,j))*(P_ru_tend(i,k,j)- B_ru_tend(i,k,j))  &
                     +(P_rv_tend(i,k,j)- B_rv_tend(i,k,j))*(P_rv_tend(i,k,j)- B_rv_tend(i,k,j))   &
                     +(P_rw_tend(i,k,j)- B_rw_tend(i,k,j))*(P_rw_tend(i,k,j)- B_rw_tend(i,k,j))   &
@@ -850,9 +849,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
       enddo
       enddo
 
-      do i=ims,ime
-      do k=kms,kme
-      do j=jms,jme
+      do i=its,ite
+      do k=kts,kte
+      do j=jts,jte
          VAL_N=VAL_N+(P_ru_tendf(i,k,j)- B_ru_tendf(i,k,j))*(P_ru_tendf(i,k,j)- B_ru_tendf(i,k,j))  &
                     +(P_rv_tendf(i,k,j)- B_rv_tendf(i,k,j))*(P_rv_tendf(i,k,j)- B_rv_tendf(i,k,j))  &
                     +(P_rw_tendf(i,k,j)- B_rw_tendf(i,k,j))*(P_rw_tendf(i,k,j)- B_rw_tendf(i,k,j))  &
@@ -862,11 +861,17 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
       enddo
       enddo
 
-      do i=ims,ime
-      do j=jms,jme
+      do i=its,ite
+      do j=jts,jte
          VAL_N=VAL_N+(P_mu_tend(i,j)- B_mu_tend(i,j))*(P_mu_tend(i,j)- B_mu_tend(i,j))   
       enddo
       enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -1013,9 +1018,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &jts, jte, kts, kte )
 
    VAL_L=0.
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       VAL_L=VAL_L + P_ru_tend(i,k,j)*P_ru_tend(i,k,j)  &
                     + P_rv_tend(i,k,j)*P_rv_tend(i,k,j)  &
                     + P_rw_tend(i,k,j)*P_rw_tend(i,k,j)  &
@@ -1029,9 +1034,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       VAL_L=VAL_L  + P_ru_tendf(i,k,j) *P_ru_tendf(i,k,j) &
                     + P_rv_tendf(i,k,j) *P_rv_tendf(i,k,j) &
                     + P_rw_tendf(i,k,j) *P_rw_tendf(i,k,j) &
@@ -1040,11 +1045,17 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=ims,ime
-   do j=jms,jme
+   do i=its,ite
+   do j=jts,jte
       VAL_L=VAL_L + P_mu_tend(i,j) *P_mu_tend(i,j)
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
 
    do i=ims,ime
    do k=kms,kme
@@ -1109,9 +1120,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 
    VAL_A=0.
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       VAL_A=VAL_A +P_ru(i,k,j)*B_ru(i,k,j)         &  
                +P_rv(i,k,j)*B_rv(i,k,j)            &
                +P_rw(i,k,j)*B_rw(i,k,j)            &
@@ -1137,9 +1148,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
 
-   do i=ims,ime
-   do k=kms,kme
-   do j=jms,jme
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
       VAL_A=VAL_A +P_ru_tendf(i,k,j)*B_ru_tendf(i,k,j)   &
                +P_rv_tendf(i,k,j)*B_rv_tendf(i,k,j)      &
                +P_rw_tendf(i,k,j)*B_rw_tendf(i,k,j)      &
@@ -1149,14 +1160,20 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
 
-   do i=ims,ime
-   do j=jms,jme
+   do i=its,ite
+   do j=jts,jte
       VAL_A=VAL_A +P_mu(i,j)*B_mu(i,j)   &
                +P_mut(i,j)*B_mut(i,j)    &
                +P_muu(i,j)*B_muu(i,j)    &
                +P_muv(i,j)*B_muv(i,j)
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    print*, '                '
    write(6,*) 'a_rk_tendency: '
@@ -1213,37 +1230,6 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
       muv(i,j)=S_muv(i,j)
    enddo
    enddo
-
-!the result of testing rk_tendency, using em_quarter_ss
-
-!g_rk_tendency: ALPHA=.1000E+00  COEF= 0.121735E+01  VAL_N= 0.217612E+12  VAL_L= 0.178758E+12
-!g_rk_tendency: ALPHA=.1000E-01  COEF= 0.102015E+01  VAL_N= 0.182361E+10  VAL_L= 0.178758E+10
-!g_rk_tendency: ALPHA=.1000E-02  COEF= 0.100215E+01  VAL_N= 0.179143E+08  VAL_L= 0.178758E+08
-!g_rk_tendency: ALPHA=.1000E-03  COEF= 0.100113E+01  VAL_N= 0.178961E+06  VAL_L= 0.178758E+06
-!g_rk_tendency: ALPHA=.1000E-04  COEF= 0.101263E+01  VAL_N= 0.181017E+04  VAL_L= 0.178758E+04
-!g_rk_tendency: ALPHA=.1000E-05  COEF= 0.106717E+01  VAL_N= 0.190766E+02  VAL_L= 0.178758E+02
-!g_rk_tendency: ALPHA=.1000E-06  COEF= 0.170886E+01  VAL_N= 0.305473E+00  VAL_L= 0.178758E+00
-!g_rk_tendency: ALPHA=.1000E-07  COEF= 0.647516E-15  VAL_N= 0.115749E-17  VAL_L= 0.178758E-02
-!g_rk_tendency: ALPHA=.1000E-08  COEF= 0.647516E-13  VAL_N= 0.115749E-17  VAL_L= 0.178758E-04
-!g_rk_tendency: ALPHA=.1000E-09  COEF= 0.647516E-11  VAL_N= 0.115749E-17  VAL_L= 0.178758E-06
-!g_rk_tendency: ALPHA=.1000E-10  COEF= 0.647516E-09  VAL_N= 0.115749E-17  VAL_L= 0.178758E-08
-
-!a_advect_scalar:    0.1787557969920E+12   0.1787880734720E+12
-
-!g_rk_tendency: ALPHA=.1000E+00  COEF=   0.1217344191204E+01  VAL_N= 0.217614E+12  VAL_L= 0.178761E+12
-!g_rk_tendency: ALPHA=.1000E-01  COEF=   0.1020167288022E+01  VAL_N= 0.182366E+10  VAL_L= 0.178761E+10
-!g_rk_tendency: ALPHA=.1000E-02  COEF=   0.1002001638191E+01  VAL_N= 0.179119E+08  VAL_L= 0.178761E+08
-!g_rk_tendency: ALPHA=.1000E-03  COEF=   0.1000199989221E+01  VAL_N= 0.178797E+06  VAL_L= 0.178761E+06
-!g_rk_tendency: ALPHA=.1000E-04  COEF=   0.1000019972902E+01  VAL_N= 0.178765E+04  VAL_L= 0.178761E+04
-!g_rk_tendency: ALPHA=.1000E-05  COEF=   0.1000001972593E+01  VAL_N= 0.178761E+02  VAL_L= 0.178761E+02
-!g_rk_tendency: ALPHA=.1000E-06  COEF=   0.1000000174417E+01  VAL_N= 0.178761E+00  VAL_L= 0.178761E+00
-!g_rk_tendency: ALPHA=.1000E-07  COEF=   0.9999999817357E+00  VAL_N= 0.178761E-02  VAL_L= 0.178761E-02
-!g_rk_tendency: ALPHA=.1000E-08  COEF=   0.1000000166722E+01  VAL_N= 0.178761E-04  VAL_L= 0.178761E-04
-!g_rk_tendency: ALPHA=.1000E-09  COEF=   0.1000001082845E+01  VAL_N= 0.178761E-06  VAL_L= 0.178761E-06
-!g_rk_tendency: ALPHA=.1000E-10  COEF=   0.1000005202259E+01  VAL_N= 0.178762E-08  VAL_L= 0.178761E-08
-
-!a_advect_scalar:    0.1787609594770E+12   0.1787609594770E+12
-
 
 END SUBROUTINE t_rk_tendency
 
@@ -1322,8 +1308,6 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
 
    integer :: i,j,k,h
 
-!  zzma: new definition
-
 !  IN variable
 
    REAL , DIMENSION(  ims:ime , kms:kme, jms:jme )           ::  S_u,       &
@@ -1379,8 +1363,6 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -1493,6 +1475,13 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    enddo
    enddo
 
+#ifdef DM_PARALLEL      
+   call wrf_get_dm_communicator(comm)
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum        
+#endif                  
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -1563,6 +1552,12 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
                +(P_mut(i,j) - B_mut(i,j))*(P_mut(i,j) - B_mut(i,j))
       enddo
       enddo
+
+#ifdef DM_PARALLEL      
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum        
+#endif                  
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -1655,9 +1650,15 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL      
+      call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_L = nsum
+#endif  
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_u(i,k,j)=0.0
       P_v(i,k,j)=0.0
       P_w(i,k,j)=0.0
@@ -1667,9 +1668,9 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
    do h=1  ,n_moist
       P_moist(i,k,j,h)=0.0
    enddo
@@ -1677,8 +1678,8 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    enddo
    enddo
 
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu(i,j)=0.0
    enddo
    enddo
@@ -1718,6 +1719,12 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    enddo
    enddo
 
+#ifdef DM_PARALLEL      
+      call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_A = nsum
+#endif  
+
    print*, '                '
    write(6,*) 'a_rk_step_prep: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -1752,38 +1759,6 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
       mu(i,j)=S_mu(i,j)
    enddo
    enddo
-
-! the result of testing rk_step_prep, using em_quarter_ss
-
-!g_rk_step_prep: ALPHA=.1000E+00  COEF=   0.9992192983627E+00  VAL_N= 0.338343E+16  VAL_L= 0.338607E+16
-!g_rk_step_prep: ALPHA=.1000E-01  COEF=   0.9996247887611E+00  VAL_N= 0.338480E+14  VAL_L= 0.338607E+14
-!g_rk_step_prep: ALPHA=.1000E-02  COEF=   0.9993402957916E+00  VAL_N= 0.338384E+12  VAL_L= 0.338607E+12
-!g_rk_step_prep: ALPHA=.1000E-03  COEF=   0.9999324679375E+00  VAL_N= 0.338585E+10  VAL_L= 0.338607E+10
-!g_rk_step_prep: ALPHA=.1000E-04  COEF=   0.1030537486076E+01  VAL_N= 0.348948E+08  VAL_L= 0.338607E+08
-!g_rk_step_prep: ALPHA=.1000E-05  COEF=   0.1312857389450E+01  VAL_N= 0.444543E+06  VAL_L= 0.338608E+06
-!g_rk_step_prep: ALPHA=.1000E-06  COEF=   0.3907715606689E+02  VAL_N= 0.132318E+06  VAL_L= 0.338608E+04
-!g_rk_step_prep: ALPHA=.1000E-07  COEF=   0.3579903320312E+04  VAL_N= 0.121218E+06  VAL_L= 0.338608E+02
-!g_rk_step_prep: ALPHA=.1000E-08  COEF=   0.3579903125000E+06  VAL_N= 0.121218E+06  VAL_L= 0.338608E+00
-!g_rk_step_prep: ALPHA=.1000E-09  COEF=   0.3579902800000E+08  VAL_N= 0.121218E+06  VAL_L= 0.338608E-02
-!g_rk_step_prep: ALPHA=.1000E-10  COEF=   0.3579902464000E+10  VAL_N= 0.121218E+06  VAL_L= 0.338608E-04
-                 
-!a_rk_step_prep:    0.3386954569744E+16   0.3385869822067E+16
-
-
-!g_rk_step_prep: ALPHA=.1000E+00  COEF=   0.9990601883727E+00  VAL_N= 0.338407E+16  VAL_L= 0.338726E+16
-!g_rk_step_prep: ALPHA=.1000E-01  COEF=   0.9999060025300E+00  VAL_N= 0.338694E+14  VAL_L= 0.338726E+14
-!g_rk_step_prep: ALPHA=.1000E-02  COEF=   0.9999909575619E+00  VAL_N= 0.338723E+12  VAL_L= 0.338726E+12
-!g_rk_step_prep: ALPHA=.1000E-03  COEF=   0.1000034846551E+01  VAL_N= 0.338737E+10  VAL_L= 0.338726E+10
-!g_rk_step_prep: ALPHA=.1000E-04  COEF=   0.1003578564589E+01  VAL_N= 0.339938E+08  VAL_L= 0.338726E+08
-!g_rk_step_prep: ALPHA=.1000E-05  COEF=   0.1357865847341E+01  VAL_N= 0.459944E+06  VAL_L= 0.338726E+06
-!g_rk_step_prep: ALPHA=.1000E-06  COEF=   0.3678658566932E+02  VAL_N= 0.124606E+06  VAL_L= 0.338726E+04
-!g_rk_step_prep: ALPHA=.1000E-07  COEF=   0.3579658567082E+04  VAL_N= 0.121252E+06  VAL_L= 0.338726E+02
-!g_rk_step_prep: ALPHA=.1000E-08  COEF=   0.3578668567080E+06  VAL_N= 0.121219E+06  VAL_L= 0.338726E+00
-!g_rk_step_prep: ALPHA=.1000E-09  COEF=   0.3578658667078E+08  VAL_N= 0.121218E+06  VAL_L= 0.338726E-02
-!g_rk_step_prep: ALPHA=.1000E-10  COEF=   0.3578658568079E+10  VAL_N= 0.121218E+06  VAL_L= 0.338726E-04
-                 
-!a_rk_step_prep:    0.3387256544396E+16   0.3387256544395E+16
-
 
 END SUBROUTINE t_rk_step_prep
 
@@ -1822,8 +1797,6 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    INTEGER :: im, ic,i,j,k,h
 
-!  zzma: new definition
-
 ! INOUT variables
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )        :: S_ru_tendf, &
@@ -1855,8 +1828,6 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -1953,6 +1924,12 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -2008,6 +1985,12 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       if(VAL_L == 0.) then
@@ -2086,6 +2069,12 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, & 
+                       comm, IERROR )
+   VAL_L = nsum              
+#endif                 
+
 !  ADJ
 
    CALL a_init_zero_tendency( P_ru_tendf, P_rv_tendf, P_rw_tendf, P_ph_tendf, P_t_tendf, P_moist_tendf, n_moist, ims, ime, jms, &
@@ -2112,6 +2101,12 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, & 
+                       comm, IERROR )
+   VAL_A = nsum              
+#endif                 
 
    print*, '                '
    write(6,*) 'a_init_zero_tendency: '
@@ -2140,20 +2135,6 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    enddo
    enddo
    enddo
-
-!g_init_zero_tendency: ALPHA=.1000E+00  COEF=   0.1000000953674E+01  VAL_N= 0.115569E-19  VAL_L= 0.115569E-19
-!g_init_zero_tendency: ALPHA=.1000E-01  COEF=   0.1000003337860E+01  VAL_N= 0.115569E-21  VAL_L= 0.115569E-21
-!g_init_zero_tendency: ALPHA=.1000E-02  COEF=   0.1000092029572E+01  VAL_N= 0.115579E-23  VAL_L= 0.115569E-23
-!g_init_zero_tendency: ALPHA=.1000E-03  COEF=   0.9997125864029E+00  VAL_N= 0.115536E-25  VAL_L= 0.115569E-25
-!g_init_zero_tendency: ALPHA=.1000E-04  COEF=   0.9984483122826E+00  VAL_N= 0.115389E-27  VAL_L= 0.115569E-27
-!g_init_zero_tendency: ALPHA=.1000E-05  COEF=   0.8998992443085E+00  VAL_N= 0.104000E-29  VAL_L= 0.115569E-29
-!g_init_zero_tendency: ALPHA=.1000E-06  COEF=   0.1599820733070E+01  VAL_N= 0.184889E-31  VAL_L= 0.115569E-31
-!g_init_zero_tendency: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.115569E-33
-!g_init_zero_tendency: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.115569E-35
-!g_init_zero_tendency: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.115569E-37
-!g_init_zero_tendency: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.115569E-39
-
-!a_init_zero_tendency:    0.1155687153334E-19   0.1155687153334E-19
 
 END SUBROUTINE t_init_zero_tendency
 
@@ -2245,8 +2226,6 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    INTEGER :: i, j, k
    REAL    :: w1, w2, z0, z1, z2
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme )       ::       S_p,  &
@@ -2279,8 +2258,6 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -2357,6 +2334,12 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, & 
+                       comm, IERROR )
+   SAVE_L = nsum              
+#endif                 
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -2404,6 +2387,12 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
       enddo
       enddo
       enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, & 
+                       comm, IERROR )
+   VAL_N = nsum              
+#endif                 
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -2457,9 +2446,15 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_p(i,k,j)=0.0
       P_ph(i,k,j)=0.0
       P_t(i,k,j)=0.0
@@ -2483,6 +2478,12 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_phy_prep: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -2499,21 +2500,6 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    enddo
    enddo
    enddo
-
-!g_phy_prep: ALPHA=.1000E+00  COEF=   0.1000007867813E+01  VAL_N= 0.283924E+08  VAL_L= 0.283921E+08
-!g_phy_prep: ALPHA=.1000E-01  COEF=   0.1000007271767E+01  VAL_N= 0.283923E+06  VAL_L= 0.283921E+06
-!g_phy_prep: ALPHA=.1000E-02  COEF=   0.9970672726631E+00  VAL_N= 0.283089E+04  VAL_L= 0.283921E+04
-!g_phy_prep: ALPHA=.1000E-03  COEF=   0.9730178117752E+00  VAL_N= 0.276261E+02  VAL_L= 0.283921E+02
-!g_phy_prep: ALPHA=.1000E-04  COEF=   0.2119694232941E+01  VAL_N= 0.601827E+00  VAL_L= 0.283921E+00
-!g_phy_prep: ALPHA=.1000E-05  COEF=   0.9598098397255E+00  VAL_N= 0.272511E-02  VAL_L= 0.283921E-02
-!g_phy_prep: ALPHA=.1000E-06  COEF=   0.9365414977074E+00  VAL_N= 0.265904E-04  VAL_L= 0.283921E-04
-!g_phy_prep: ALPHA=.1000E-07  COEF=   0.4753468885871E-11  VAL_N= 0.134961E-17  VAL_L= 0.283921E-06
-!g_phy_prep: ALPHA=.1000E-08  COEF=   0.4753468729746E-09  VAL_N= 0.134961E-17  VAL_L= 0.283921E-08
-!g_phy_prep: ALPHA=.1000E-09  COEF=   0.4753468019203E-07  VAL_N= 0.134961E-17  VAL_L= 0.283922E-10
-!g_phy_prep: ALPHA=.1000E-10  COEF=   0.4753467692353E-05  VAL_N= 0.134961E-17  VAL_L= 0.283922E-12
-
-!a_phy_prep:    0.2839517000000E+08   0.2839852400000E+08
-
 
 END SUBROUTINE t_phy_prep
 
@@ -2575,8 +2561,6 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
     INTEGER  &
     :: i_start, i_end, j_start, j_end, ktf, i, j, k
 
-!  zzma: new definition
-
 !  IN variables
 
     REAL, DIMENSION( ims:ime , kms:kme, jms:jme )     ::  S_p8w, S_t8w, S_theta, S_t, S_p
@@ -2591,8 +2575,6 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
 !  TGL test
 
@@ -2701,6 +2683,12 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -2766,6 +2754,12 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
       enddo
       enddo
       enddo
+
+#ifdef DM_PARALLEL
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -2869,9 +2863,15 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_p8w(i,k,j)=0.0
       P_t8w(i,k,j)=0.0
       P_theta(i,k,j)=0.0
@@ -2919,6 +2919,11 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_calculate_km_kh: '
@@ -2959,20 +2964,6 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
    enddo
    enddo
 
-!g_calculate_km_kh: ALPHA=.1000E+00  COEF=   0.3474252223969E+01  VAL_N= 0.534163E-01  VAL_L= 0.153749E-01
-!g_calculate_km_kh: ALPHA=.1000E-01  COEF=   0.1000073671341E+01  VAL_N= 0.153760E-03  VAL_L= 0.153749E-03
-!g_calculate_km_kh: ALPHA=.1000E-02  COEF=   0.1000226140022E+01  VAL_N= 0.153784E-05  VAL_L= 0.153749E-05
-!g_calculate_km_kh: ALPHA=.1000E-03  COEF=   0.1000114679337E+01  VAL_N= 0.153767E-07  VAL_L= 0.153749E-07
-!g_calculate_km_kh: ALPHA=.1000E-04  COEF=   0.1005010604858E+01  VAL_N= 0.154519E-09  VAL_L= 0.153749E-09
-!g_calculate_km_kh: ALPHA=.1000E-05  COEF=   0.8787735104561E+00  VAL_N= 0.135111E-11  VAL_L= 0.153749E-11
-!g_calculate_km_kh: ALPHA=.1000E-06  COEF=   0.1789559841156E+01  VAL_N= 0.275143E-13  VAL_L= 0.153749E-13
-!g_calculate_km_kh: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.153749E-15
-!g_calculate_km_kh: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.153749E-17
-!g_calculate_km_kh: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.153749E-19
-!g_calculate_km_kh: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.153749E-21
-
-!a_calculate_km_kh:    0.1537548657507E-01   0.1537548657507E-01
-
 END SUBROUTINE t_calculate_km_kh
 
 !--------------------------------------------------------------------------------------------------------
@@ -2993,8 +2984,6 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
                               ims,ime, jms,jme, kms,kme,  & ! memory dims
                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                               its, ite, jts, jte, kts, kte)
-
-! Zaizhong Ma, March 24,2005
 
    IMPLICIT NONE
 
@@ -3040,8 +3029,6 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: rfield
    INTEGER :: i_start, i_end, j_start, j_end, i, j, k
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -3128,8 +3115,6 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
    do i=ims,ime
    do k=kms,kme
@@ -3298,6 +3283,12 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -3401,6 +3392,12 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
          VAL_N=VAL_N + (P_mu_tend(i,j)-B_mu_tend(i,j))*(P_mu_tend(i,j)-B_mu_tend(i,j))
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -3564,9 +3561,15 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_ru(i,k,j)=0.0
       P_rv(i,k,j)=0.0
       P_w(i,k,j)=0.0
@@ -3576,8 +3579,8 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    enddo
    enddo
 
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu(i,j)=0.0
       P_mut(i,j)=0.0
    enddo
@@ -3637,6 +3640,7 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
               + P_mut(i,j)*B_mut(i,j)
    enddo
    enddo
+
    do i=ijds,ijde
    do k=kds,kde
    do j=1,spec_bdy_width
@@ -3682,6 +3686,12 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
       VAL_A=VAL_A + P_mu_tend(i,j)*B_mu_tend(i,j)
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_relax_bdy_dry: '
@@ -3755,21 +3765,6 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    enddo
    enddo
 
-! method: using goto clause before if
-
-!g_relax_bdy_dry: ALPHA=.1000E+00  COEF=   0.1000000953674E+01  VAL_N= 0.577844E-20  VAL_L= 0.577844E-20
-!g_relax_bdy_dry: ALPHA=.1000E-01  COEF=   0.1000003337860E+01  VAL_N= 0.577846E-22  VAL_L= 0.577844E-22
-!g_relax_bdy_dry: ALPHA=.1000E-02  COEF=   0.1000092029572E+01  VAL_N= 0.577897E-24  VAL_L= 0.577844E-24
-!g_relax_bdy_dry: ALPHA=.1000E-03  COEF=   0.9997125864029E+00  VAL_N= 0.577678E-26  VAL_L= 0.577844E-26
-!g_relax_bdy_dry: ALPHA=.1000E-04  COEF=   0.9984483122826E+00  VAL_N= 0.576947E-28  VAL_L= 0.577844E-28
-!g_relax_bdy_dry: ALPHA=.1000E-05  COEF=   0.8998992443085E+00  VAL_N= 0.520001E-30  VAL_L= 0.577844E-30
-!g_relax_bdy_dry: ALPHA=.1000E-06  COEF=   0.1599820733070E+01  VAL_N= 0.924446E-32  VAL_L= 0.577844E-32
-!g_relax_bdy_dry: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.577844E-34
-!g_relax_bdy_dry: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.577844E-36
-!g_relax_bdy_dry: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.577844E-38
-!g_relax_bdy_dry: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.577839E-40
-
-!a_relax_bdy_dry:    0.5778436170567E-20   0.5778436170567E-20
 
 END SUBROUTINE t_relax_bdy_dry
 
@@ -3784,7 +3779,6 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
                             ips,ipe, jps,jpe, kps,kpe,                       &
                             its,ite, jts,jte, kts,kte                       )
 
-! Zaizhong Ma, March 25,2005
 
    IMPLICIT NONE
 
@@ -3822,8 +3816,6 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 
 ! Local
    INTEGER :: i, j, k
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -3891,8 +3883,6 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -4011,6 +4001,12 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -4073,6 +4069,12 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
       enddo
       enddo
       enddo
+
+#ifdef DM_PARALLEL
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -4179,9 +4181,16 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_u_save(i,k,j)=0.0
       P_v_save(i,k,j)=0.0
       P_w_save(i,k,j)=0.0
@@ -4190,8 +4199,8 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mut(i,j)=0.0
    enddo
    enddo
@@ -4236,6 +4245,12 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_rk_addtend_dry: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -4276,20 +4291,6 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    enddo
    enddo
 
-!g_rk_addtend_dry: ALPHA=.1000E+00  COEF=   0.9999989867210E+00  VAL_N= 0.198619E+11  VAL_L= 0.198619E+11
-!g_rk_addtend_dry: ALPHA=.1000E-01  COEF=   0.1000009894371E+01  VAL_N= 0.198621E+09  VAL_L= 0.198619E+09
-!g_rk_addtend_dry: ALPHA=.1000E-02  COEF=   0.1000102877617E+01  VAL_N= 0.198640E+07  VAL_L= 0.198619E+07
-!g_rk_addtend_dry: ALPHA=.1000E-03  COEF=   0.1000385403633E+01  VAL_N= 0.198696E+05  VAL_L= 0.198619E+05
-!g_rk_addtend_dry: ALPHA=.1000E-04  COEF=   0.1002598404884E+01  VAL_N= 0.199135E+03  VAL_L= 0.198619E+03
-!g_rk_addtend_dry: ALPHA=.1000E-05  COEF=   0.9058508872986E+00  VAL_N= 0.179919E+01  VAL_L= 0.198619E+01
-!g_rk_addtend_dry: ALPHA=.1000E-06  COEF=   0.1524479985237E+01  VAL_N= 0.302791E-01  VAL_L= 0.198619E-01
-!g_rk_addtend_dry: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.198619E-03
-!g_rk_addtend_dry: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.198619E-05
-!g_rk_addtend_dry: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.198619E-07
-!g_rk_addtend_dry: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.198619E-09
-                 
-!a_rk_addtend_dry:    0.1986187673600E+11   0.1986187673600E+11
-
 END SUBROUTINE t_rk_addtend_dry
 
 !---------------------------------------------------------------------------------------------------
@@ -4307,9 +4308,6 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
                              ims,ime, jms,jme, kms,kme,  & ! memory dims
                              ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                              its, ite, jts, jte, kts, kte)
-
-! Zaizhong Ma, March 25,2005
-! Qingnong Xiao, April 2005, rewritten.
 
    IMPLICIT NONE
 
@@ -4343,8 +4341,6 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
 
    REAL,  DIMENSION( ijds:ijde , 1:1 ,     spec_bdy_width, 4 ), INTENT(IN   ) :: mu_b
    REAL,  DIMENSION( ijds:ijde , 1:1 ,     spec_bdy_width, 4 )                :: mu_bt
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -4390,8 +4386,6 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,i,j,k,h
-
-!  zzma: new definition end
 
    S_u_bt(:,:,:,:)=u_bt(:,:,:,:)
    S_v_bt(:,:,:,:)=v_bt(:,:,:,:)
@@ -4487,6 +4481,12 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
                    sum(P_ph_tend(:,:,:)*P_ph_tend(:,:,:))+   &
                    sum(P_mu_tend(:,:)*P_mu_tend(:,:))
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -4534,6 +4534,12 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
                     sum((P_t_tend(:,:,:)-B_t_tend(:,:,:))*(P_t_tend(:,:,:)-B_t_tend(:,:,:)))+      &
                     sum((P_ph_tend(:,:,:)-B_ph_tend(:,:,:))*(P_ph_tend(:,:,:)-B_ph_tend(:,:,:)))+  &
                     sum((P_mu_tend(:,:)-B_mu_tend(:,:))*(P_mu_tend(:,:)-B_mu_tend(:,:)))
+
+#ifdef DM_PARALLEL
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -4608,6 +4614,12 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
                sum(P_t_bt(:,:,:,:)*P_t_bt(:,:,:,:))+ &
                sum(P_mu_bt(:,:,:,:)*P_mu_bt(:,:,:,:))
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
 !  ADJ
 
    CALL a_spec_bdy_dry( config_flags, P_ru_tend, P_rv_tend, P_ph_tend, P_t_tend, P_rw_tend, P_mu_tend, P_u_bt, P_v_bt, P_ph_bt, &
@@ -4626,6 +4638,12 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
                sum(P_t_tend(:,:,:)*B_t_tend(:,:,:))+   &
                sum(P_ph_tend(:,:,:)*B_ph_tend(:,:,:))+  &
                sum(P_mu_tend(:,:)*B_mu_tend(:,:))
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_spec_bdy_dry: '
@@ -4668,8 +4686,6 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             ids,ide, jds,jde, kds,kde,    &
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
-
-! Zaizhong Ma, March 28,2005
 
   IMPLICIT NONE  ! religion first
 
@@ -4736,8 +4752,6 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
   INTEGER :: i, j, k
   INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
   INTEGER :: i_endu, j_endv
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -4845,8 +4859,6 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -5047,6 +5059,12 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -5149,6 +5167,12 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                     + (P_mudf(i,j)- B_mudf(i,j))*(P_mudf(i,j)- B_mudf(i,j))
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -5312,6 +5336,12 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -5371,6 +5401,12 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_small_step_prep: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -5413,35 +5449,6 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
-!g_small_step_prep: ALPHA=.1000E+00  COEF=   0.1210182666779E+01  VAL_N= 0.419130E+17  VAL_L= 0.346336E+17
-!g_small_step_prep: ALPHA=.1000E-01  COEF=   0.1020382523537E+01  VAL_N= 0.353396E+15  VAL_L= 0.346336E+15
-!g_small_step_prep: ALPHA=.1000E-02  COEF=   0.1002328515053E+01  VAL_N= 0.347143E+13  VAL_L= 0.346337E+13
-!g_small_step_prep: ALPHA=.1000E-03  COEF=   0.1001530051231E+01  VAL_N= 0.346866E+11  VAL_L= 0.346337E+11
-!g_small_step_prep: ALPHA=.1000E-04  COEF=   0.1006592035294E+01  VAL_N= 0.348620E+09  VAL_L= 0.346337E+09
-!g_small_step_prep: ALPHA=.1000E-05  COEF=   0.8559100627899E+00  VAL_N= 0.296433E+07  VAL_L= 0.346337E+07
-!g_small_step_prep: ALPHA=.1000E-06  COEF=   0.1041831374168E+01  VAL_N= 0.360824E+05  VAL_L= 0.346337E+05
-!g_small_step_prep: ALPHA=.1000E-07  COEF=   0.3898711849393E-20  VAL_N= 0.135027E-17  VAL_L= 0.346337E+03
-!g_small_step_prep: ALPHA=.1000E-08  COEF=   0.3898711865549E-18  VAL_N= 0.135027E-17  VAL_L= 0.346337E+01
-!g_small_step_prep: ALPHA=.1000E-09  COEF=   0.3898711338221E-16  VAL_N= 0.135027E-17  VAL_L= 0.346337E-01
-!g_small_step_prep: ALPHA=.1000E-10  COEF=   0.3898710967644E-14  VAL_N= 0.135027E-17  VAL_L= 0.346337E-03
-                 
-!a_small_step_prep:    0.3464210455042E+17   0.3464191771935E+17
-
-
-!g_small_step_prep: ALPHA=.1000E+00  COEF=   0.1209974728298E+01  VAL_N= 0.419156E+17  VAL_L= 0.346417E+17
-!g_small_step_prep: ALPHA=.1000E-01  COEF=   0.1020097416385E+01  VAL_N= 0.353380E+15  VAL_L= 0.346417E+15
-!g_small_step_prep: ALPHA=.1000E-02  COEF=   0.1002000740908E+01  VAL_N= 0.347111E+13  VAL_L= 0.346417E+13
-!g_small_step_prep: ALPHA=.1000E-03  COEF=   0.1000199984095E+01  VAL_N= 0.346487E+11  VAL_L= 0.346417E+11
-!g_small_step_prep: ALPHA=.1000E-04  COEF=   0.1000019998524E+01  VAL_N= 0.346424E+09  VAL_L= 0.346417E+09
-!g_small_step_prep: ALPHA=.1000E-05  COEF=   0.1000002099436E+01  VAL_N= 0.346418E+07  VAL_L= 0.346417E+07
-!g_small_step_prep: ALPHA=.1000E-06  COEF=   0.1000010201248E+01  VAL_N= 0.346421E+05  VAL_L= 0.346417E+05
-!g_small_step_prep: ALPHA=.1000E-07  COEF=   0.1000999980880E+01  VAL_N= 0.346764E+03  VAL_L= 0.346417E+03
-!g_small_step_prep: ALPHA=.1000E-08  COEF=   0.1099997807301E+01  VAL_N= 0.381058E+01  VAL_L= 0.346417E+01
-!g_small_step_prep: ALPHA=.1000E-09  COEF=   0.1099973804174E+02  VAL_N= 0.381050E+00  VAL_L= 0.346417E-01
-!g_small_step_prep: ALPHA=.1000E-10  COEF=   0.1000973937427E+04  VAL_N= 0.346755E+00  VAL_L= 0.346417E-03
-                 
-!a_small_step_prep:    0.3464174588297E+17   0.3464174588296E+17
-
 END SUBROUTINE t_small_step_prep
 
 !-----------------------------------------------------------------------------------------------
@@ -5454,9 +5461,6 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its,ite, jts,jte, kts,kte    )
-
-! Zaizhong Ma, March 28,2005
-
 
   IMPLICIT NONE  ! religion first
 
@@ -5501,8 +5505,6 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
   REAL    :: ptmp
 
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme)              :: S_alt,   &
@@ -5529,8 +5531,6 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -5704,6 +5704,12 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -5751,12 +5757,12 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
                        ims, ime, jms, jme, kms, kme, &
                        its,ite, jts,jte, kts,kte    )
 
-      VAL_N=0.
-      do i=its,ite
-      do k=kts,kte
-      do j=jts,jte
-         VAL_N=VAL_N + (P_al(i,k,j)- B_al(i,k,j))*(P_al(i,k,j)- B_al(i,k,j))  &
-                     + (P_p(i,k,j) - B_p(i,k,j))*(P_p(i,k,j) - B_p(i,k,j))
+   VAL_N=0.
+   do i=its,ite
+   do k=kts,kte
+   do j=jts,jte
+      VAL_N=VAL_N + (P_al(i,k,j)- B_al(i,k,j))*(P_al(i,k,j)- B_al(i,k,j))  &
+                  + (P_p(i,k,j) - B_p(i,k,j))*(P_p(i,k,j) - B_p(i,k,j))
    enddo
    enddo
    enddo
@@ -5786,6 +5792,12 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
                   +(P_muts(i,j)-B_muts(i,j))*(P_muts(i,j)-B_muts(i,j))
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
 
       VAL_L=SAVE_L*ALPHA**2
@@ -5903,6 +5915,12 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
 !  ADJ
 
    CALL a_calc_p_rho( al, P_al, p, P_p, ph, P_ph, alt, P_alt, t_2, P_t_2, t_1, P_t_1, c2a, P_c2a, P_pm1, mu, P_mu, muts, P_muts,&
@@ -5941,6 +5959,12 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_calc_p_rho: '
@@ -5984,35 +6008,6 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    enddo
    enddo
 
-!g_calc_p_rho: ALPHA=.1000E+00  COEF=   0.1000004291534E+01  VAL_N= 0.171105E+08  VAL_L= 0.171104E+08
-!g_calc_p_rho: ALPHA=.1000E-01  COEF=   0.1000008940697E+01  VAL_N= 0.171106E+06  VAL_L= 0.171104E+06
-!g_calc_p_rho: ALPHA=.1000E-02  COEF=   0.1001088023186E+01  VAL_N= 0.171290E+04  VAL_L= 0.171104E+04
-!g_calc_p_rho: ALPHA=.1000E-03  COEF=   0.1101572036743E+01  VAL_N= 0.188484E+02  VAL_L= 0.171104E+02
-!g_calc_p_rho: ALPHA=.1000E-04  COEF=   0.1111159610748E+02  VAL_N= 0.190124E+01  VAL_L= 0.171104E+00
-!g_calc_p_rho: ALPHA=.1000E-05  COEF=   0.1011856994629E+04  VAL_N= 0.173133E+01  VAL_L= 0.171104E-02
-!g_calc_p_rho: ALPHA=.1000E-06  COEF=   0.1010873671875E+06  VAL_N= 0.172965E+01  VAL_L= 0.171104E-04
-!g_calc_p_rho: ALPHA=.1000E-07  COEF=   0.1010873600000E+08  VAL_N= 0.172965E+01  VAL_L= 0.171104E-06
-!g_calc_p_rho: ALPHA=.1000E-08  COEF=   0.1010873664000E+10  VAL_N= 0.172965E+01  VAL_L= 0.171104E-08
-!g_calc_p_rho: ALPHA=.1000E-09  COEF=   0.1010873548800E+12  VAL_N= 0.172965E+01  VAL_L= 0.171104E-10
-!g_calc_p_rho: ALPHA=.1000E-10  COEF=   0.1010873506202E+14  VAL_N= 0.172965E+01  VAL_L= 0.171104E-12
-                 
-!a_calc_p_rho:    0.1711048600000E+08   0.1711048600000E+08
-
-!g_calc_p_rho: ALPHA=.1000E+00  COEF=   0.1000000101086E+01  VAL_N= 0.171103E+08  VAL_L= 0.171103E+08
-!g_calc_p_rho: ALPHA=.1000E-01  COEF=   0.1000010108599E+01  VAL_N= 0.171105E+06  VAL_L= 0.171103E+06
-!g_calc_p_rho: ALPHA=.1000E-02  COEF=   0.1001010859867E+01  VAL_N= 0.171276E+04  VAL_L= 0.171103E+04
-!g_calc_p_rho: ALPHA=.1000E-03  COEF=   0.1101085986751E+01  VAL_N= 0.188400E+02  VAL_L= 0.171103E+02
-!g_calc_p_rho: ALPHA=.1000E-04  COEF=   0.1110859867508E+02  VAL_N= 0.190072E+01  VAL_L= 0.171103E+00
-!g_calc_p_rho: ALPHA=.1000E-05  COEF=   0.1011859867506E+04  VAL_N= 0.173133E+01  VAL_L= 0.171103E-02
-!g_calc_p_rho: ALPHA=.1000E-06  COEF=   0.1010869867506E+06  VAL_N= 0.172963E+01  VAL_L= 0.171103E-04
-!g_calc_p_rho: ALPHA=.1000E-07  COEF=   0.1010859967506E+08  VAL_N= 0.172962E+01  VAL_L= 0.171103E-06
-!g_calc_p_rho: ALPHA=.1000E-08  COEF=   0.1010859868506E+10  VAL_N= 0.172962E+01  VAL_L= 0.171103E-08
-!g_calc_p_rho: ALPHA=.1000E-09  COEF=   0.1010859867516E+12  VAL_N= 0.172962E+01  VAL_L= 0.171103E-10
-!g_calc_p_rho: ALPHA=.1000E-10  COEF=   0.1010859867506E+14  VAL_N= 0.172962E+01  VAL_L= 0.171103E-12
-                 
-!a_calc_p_rho:    0.1711034017432E+08   0.1711034017432E+08
-
-
 END SUBROUTINE t_calc_p_rho
 
 !-----------------------------------------------------------------------------------------------
@@ -6025,9 +6020,7 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
                         ims,ime, jms,jme, kms,kme,  & ! memory dims
                         its,ite, jts,jte, kts,kte  )  ! tile   dims
 
-! Zaizhong Ma, March 30,2005
-
-      IMPLICIT NONE  ! religion first
+  IMPLICIT NONE  ! religion first
 
 !  passed in through the call
 
@@ -6060,8 +6053,6 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
   INTEGER :: i, j, k, i_start, i_end, j_start, j_end, k_start, k_end
   INTEGER :: ij, ijp, ijm
 
-!  zzma: new definition
-
 !  IN variables
 
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme)     :: S_c2a, S_cqw,P_c2a, P_cqw,B_c2a, B_cqw
@@ -6074,8 +6065,6 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
 
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -6151,6 +6140,12 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
    ALPHA_M=1.
    DO NT=1,11
       ALPHA_M=0.1*ALPHA_M
@@ -6196,6 +6191,12 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA_M**2
       COEF=VAL_N/VAL_L
@@ -6268,16 +6269,22 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_c2a(i,k,j)=0.0
       P_cqw(i,k,j)=0.0
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mut(i,j)=0.0
    enddo
    enddo
@@ -6311,6 +6318,12 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_calc_coef_w: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -6342,34 +6355,6 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    enddo
    enddo
 
-!g_calc_coef_w: ALPHA=.1000E+00  COEF=   0.8264269232750E+00  VAL_N= 0.922998E+06  VAL_L= 0.111685E+07
-!g_calc_coef_w: ALPHA=.1000E-01  COEF=   0.9802830815315E+00  VAL_N= 0.109483E+05  VAL_L= 0.111685E+05
-!g_calc_coef_w: ALPHA=.1000E-02  COEF=   0.9980322718620E+00  VAL_N= 0.111466E+03  VAL_L= 0.111685E+03
-!g_calc_coef_w: ALPHA=.1000E-03  COEF=   0.1003263592720E+01  VAL_N= 0.112050E+01  VAL_L= 0.111685E+01
-!g_calc_coef_w: ALPHA=.1000E-04  COEF=   0.1013251900673E+01  VAL_N= 0.113165E-01  VAL_L= 0.111685E-01
-!g_calc_coef_w: ALPHA=.1000E-05  COEF=   0.1187977194786E+01  VAL_N= 0.132680E-03  VAL_L= 0.111685E-03
-!g_calc_coef_w: ALPHA=.1000E-06  COEF=   0.1717434310913E+02  VAL_N= 0.191812E-04  VAL_L= 0.111685E-05
-!g_calc_coef_w: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.111685E-07
-!g_calc_coef_w: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.111685E-09
-!g_calc_coef_w: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.111685E-11
-!g_calc_coef_w: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.111685E-13
-                 
-!a_calc_coef_w:    0.1116833000000E+07   0.1116870750000E+07
-
-!g_calc_coef_w: ALPHA=.1000E+00  COEF=   0.8264462829075E+00  VAL_N= 0.923009E+06  VAL_L= 0.111684E+07
-!g_calc_coef_w: ALPHA=.1000E-01  COEF=   0.9802960496253E+00  VAL_N= 0.109484E+05  VAL_L= 0.111684E+05
-!g_calc_coef_w: ALPHA=.1000E-02  COEF=   0.9980029960275E+00  VAL_N= 0.111461E+03  VAL_L= 0.111684E+03
-!g_calc_coef_w: ALPHA=.1000E-03  COEF=   0.9998000300046E+00  VAL_N= 0.111662E+01  VAL_L= 0.111684E+01
-!g_calc_coef_w: ALPHA=.1000E-04  COEF=   0.9999800002875E+00  VAL_N= 0.111682E-01  VAL_L= 0.111684E-01
-!g_calc_coef_w: ALPHA=.1000E-05  COEF=   0.9999979995651E+00  VAL_N= 0.111684E-03  VAL_L= 0.111684E-03
-!g_calc_coef_w: ALPHA=.1000E-06  COEF=   0.9999998004147E+00  VAL_N= 0.111684E-05  VAL_L= 0.111684E-05
-!g_calc_coef_w: ALPHA=.1000E-07  COEF=   0.1000000012124E+01  VAL_N= 0.111684E-07  VAL_L= 0.111684E-07
-!g_calc_coef_w: ALPHA=.1000E-08  COEF=   0.1000001026566E+01  VAL_N= 0.111684E-09  VAL_L= 0.111684E-09
-!g_calc_coef_w: ALPHA=.1000E-09  COEF=   0.1000007201550E+01  VAL_N= 0.111685E-11  VAL_L= 0.111684E-11
-!g_calc_coef_w: ALPHA=.1000E-10  COEF=   0.9999895664473E+00  VAL_N= 0.111683E-13  VAL_L= 0.111684E-13
-                 
-!a_calc_coef_w:    0.1116841252269E+07   0.1116841252269E+07
-
 END SUBROUTINE t_calc_coef_w
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
@@ -6384,8 +6369,6 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
                         ids, ide, jds, jde, kds, kde,  &
                         ims, ime, jms, jme, kms, kme,  &
                         its, ite, jts, jte, kts, kte  )
-
-! Zaizhong Ma, March 30,2005
 
       IMPLICIT NONE  ! religion first
 
@@ -6449,8 +6432,6 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
       INTEGER :: i_start_vp, i_end_vp, j_start_vp, j_end_vp
       INTEGER :: i_start_u_tend, i_end_u_tend, j_start_v_tend, j_end_v_tend
 
-!  zzma: new definition
-
 !  IN variables
 
       REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  :: S_ru_tend, &
@@ -6503,8 +6484,6 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -6601,6 +6580,12 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -6659,6 +6644,12 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
       enddo
       enddo
       enddo
+
+#ifdef DM_PARALLEL
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -6754,9 +6745,15 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_ru_tend(i,k,j)=0.0
       P_rv_tend(i,k,j)=0.0
       P_ph(i,k,j)=0.0
@@ -6769,8 +6766,8 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_muu(i,j)=0.0
       P_muv(i,j)=0.0
       P_mu(i,j)=0.0
@@ -6817,6 +6814,12 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_advance_uv: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -6856,35 +6859,6 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    enddo
    enddo
 
-!g_advance_uv: ALPHA=.1000E+00  COEF=   0.1000012874603E+01  VAL_N= 0.988534E+11  VAL_L= 0.988521E+11
-!g_advance_uv: ALPHA=.1000E-01  COEF=   0.1000010371208E+01  VAL_N= 0.988531E+09  VAL_L= 0.988521E+09
-!g_advance_uv: ALPHA=.1000E-02  COEF=   0.1000114560127E+01  VAL_N= 0.988634E+07  VAL_L= 0.988521E+07
-!g_advance_uv: ALPHA=.1000E-03  COEF=   0.1000334739685E+01  VAL_N= 0.988852E+05  VAL_L= 0.988521E+05
-!g_advance_uv: ALPHA=.1000E-04  COEF=   0.1000074028969E+01  VAL_N= 0.988594E+03  VAL_L= 0.988521E+03
-!g_advance_uv: ALPHA=.1000E-05  COEF=   0.9045659899712E+00  VAL_N= 0.894183E+01  VAL_L= 0.988521E+01
-!g_advance_uv: ALPHA=.1000E-06  COEF=   0.1374753713608E+01  VAL_N= 0.135897E+00  VAL_L= 0.988521E-01
-!g_advance_uv: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.988521E-03
-!g_advance_uv: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.988521E-05
-!g_advance_uv: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.988521E-07
-!g_advance_uv: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.988521E-09
-                 
-!a_advance_uv:    0.9885338009600E+11   0.9885322444800E+11
-
-!g_advance_uv: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.988532E+11  VAL_L= 0.988532E+11
-!g_advance_uv: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.988532E+09  VAL_L= 0.988532E+09
-!g_advance_uv: ALPHA=.1000E-02  COEF=   0.9999999999998E+00  VAL_N= 0.988532E+07  VAL_L= 0.988532E+07
-!g_advance_uv: ALPHA=.1000E-03  COEF=   0.9999999999998E+00  VAL_N= 0.988532E+05  VAL_L= 0.988532E+05
-!g_advance_uv: ALPHA=.1000E-04  COEF=   0.1000000000013E+01  VAL_N= 0.988532E+03  VAL_L= 0.988532E+03
-!g_advance_uv: ALPHA=.1000E-05  COEF=   0.9999999998322E+00  VAL_N= 0.988532E+01  VAL_L= 0.988532E+01
-!g_advance_uv: ALPHA=.1000E-06  COEF=   0.1000000001109E+01  VAL_N= 0.988532E-01  VAL_L= 0.988532E-01
-!g_advance_uv: ALPHA=.1000E-07  COEF=   0.9999999865495E+00  VAL_N= 0.988532E-03  VAL_L= 0.988532E-03
-!g_advance_uv: ALPHA=.1000E-08  COEF=   0.1000000149405E+01  VAL_N= 0.988532E-05  VAL_L= 0.988532E-05
-!g_advance_uv: ALPHA=.1000E-09  COEF=   0.1000000029187E+01  VAL_N= 0.988532E-07  VAL_L= 0.988532E-07
-!g_advance_uv: ALPHA=.1000E-10  COEF=   0.9999987059852E+00  VAL_N= 0.988531E-09  VAL_L= 0.988532E-09
-                 
-!a_advance_uv:    0.9885322606433E+11   0.9885322606433E+11
-
-
 END SUBROUTINE t_advance_uv
 
 !-----------------------------------------------------------------------------------------------
@@ -6899,8 +6873,6 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
                          ids, ide, jds, jde, kds, kde,        &
                          ims, ime, jms, jme, kms, kme,        &
                          its, ite, jts, jte, kts, kte        )
-
-! Zaizhong Ma, March 31,2005
 
   IMPLICIT NONE  ! religion first
 
@@ -6965,8 +6937,6 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
   INTEGER :: i,j,k, i_start, i_end, j_start, j_end, k_start, k_end
   INTEGER :: i_endu, j_endv
   REAL    :: acc
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -7044,8 +7014,6 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -7272,6 +7240,12 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA_M=1.
    DO NT=1,11
       ALPHA_M=0.1*ALPHA_M
@@ -7378,6 +7352,11 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA_M**2
       COEF=VAL_N/VAL_L
@@ -7529,6 +7508,11 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
 
 !  ADJ
    do i=ims,ime
@@ -7625,6 +7609,11 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_advance_mu_t: '
@@ -7677,22 +7666,6 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    enddo
    enddo
 
-
-!g_advance_mu_t: ALPHA_M=.1000E+00  COEF=   0.1077146768570E+01  VAL_N= 0.644103E+12  VAL_L= 0.597971E+12
-!g_advance_mu_t: ALPHA_M=.1000E-01  COEF=   0.1007574081421E+01  VAL_N= 0.602500E+10  VAL_L= 0.597971E+10
-!g_advance_mu_t: ALPHA_M=.1000E-02  COEF=   0.1000920295715E+01  VAL_N= 0.598521E+08  VAL_L= 0.597971E+08
-!g_advance_mu_t: ALPHA_M=.1000E-03  COEF=   0.1005400180817E+01  VAL_N= 0.601200E+06  VAL_L= 0.597971E+06
-!g_advance_mu_t: ALPHA_M=.1000E-04  COEF=   0.1377802491188E+01  VAL_N= 0.823886E+04  VAL_L= 0.597971E+04
-!g_advance_mu_t: ALPHA_M=.1000E-05  COEF=   0.1535273933411E+02  VAL_N= 0.918050E+03  VAL_L= 0.597971E+02
-!g_advance_mu_t: ALPHA_M=.1000E-06  COEF=   0.4109736633301E+03  VAL_N= 0.245750E+03  VAL_L= 0.597971E+00
-!g_advance_mu_t: ALPHA_M=.1000E-07  COEF=   0.3229349176482E-16  VAL_N= 0.193106E-18  VAL_L= 0.597971E-02
-!g_advance_mu_t: ALPHA_M=.1000E-08  COEF=   0.3229349110307E-14  VAL_N= 0.193106E-18  VAL_L= 0.597971E-04
-!g_advance_mu_t: ALPHA_M=.1000E-09  COEF=   0.3229348754553E-12  VAL_N= 0.193106E-18  VAL_L= 0.597971E-06
-!g_advance_mu_t: ALPHA_M=.1000E-10  COEF=   0.3229348385925E-10  VAL_N= 0.193106E-18  VAL_L= 0.597971E-08
-
-!a_advance_mu_t:    0.5979716976640E+12   0.5979532820480E+12
-
-
 END SUBROUTINE t_advance_mu_t
 
 !-----------------------------------------------------------------------------------------------
@@ -7735,8 +7708,6 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
   REAL, INTENT(IN   )  ::  epssm
   INTEGER   :: i,j,k
 
-!  zzma: new definition
-
 !  IN variables
 
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme)                 :: S_ru, &
@@ -7767,8 +7738,6 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -7857,6 +7826,12 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -7909,6 +7884,12 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -7997,9 +7978,15 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_ru(i,k,j)=0.0
       P_rv(i,k,j)=0.0
       P_ww(i,k,j)=0.0
@@ -8009,8 +7996,8 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_muu(i,j)=0.0
       P_muv(i,j)=0.0
    enddo
@@ -8051,6 +8038,12 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_sumflux: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -8085,34 +8078,6 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    enddo
    enddo
    enddo
-
-!g_sumflux: ALPHA=.1000E+00  COEF=   0.1102335453033E+01  VAL_N= 0.150645E+17  VAL_L= 0.136659E+17
-!g_sumflux: ALPHA=.1000E-01  COEF=   0.1010020852089E+01  VAL_N= 0.138029E+15  VAL_L= 0.136659E+15
-!g_sumflux: ALPHA=.1000E-02  COEF=   0.1001844882965E+01  VAL_N= 0.136912E+13  VAL_L= 0.136659E+13
-!g_sumflux: ALPHA=.1000E-03  COEF=   0.1002220749855E+01  VAL_N= 0.136963E+11  VAL_L= 0.136659E+11
-!g_sumflux: ALPHA=.1000E-04  COEF=   0.1009521842003E+01  VAL_N= 0.137961E+09  VAL_L= 0.136659E+09
-!g_sumflux: ALPHA=.1000E-05  COEF=   0.9413729906082E+00  VAL_N= 0.128648E+07  VAL_L= 0.136659E+07
-!g_sumflux: ALPHA=.1000E-06  COEF=   0.1890421867371E+01  VAL_N= 0.258344E+05  VAL_L= 0.136659E+05
-!g_sumflux: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.136659E+03
-!g_sumflux: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.136659E+01
-!g_sumflux: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.136659E-01
-!g_sumflux: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.136659E-03
-                 
-!a_sumflux:    0.1368172140062E+17   0.1367992825178E+17
-
-!g_sumflux: ALPHA=.1000E+00  COEF=   0.1102499259156E+01  VAL_N= 0.150786E+17  VAL_L= 0.136768E+17
-!g_sumflux: ALPHA=.1000E-01  COEF=   0.1010024927542E+01  VAL_N= 0.138139E+15  VAL_L= 0.136768E+15
-!g_sumflux: ALPHA=.1000E-02  COEF=   0.1001000242770E+01  VAL_N= 0.136905E+13  VAL_L= 0.136768E+13
-!g_sumflux: ALPHA=.1000E-03  COEF=   0.1000100001778E+01  VAL_N= 0.136782E+11  VAL_L= 0.136768E+11
-!g_sumflux: ALPHA=.1000E-04  COEF=   0.1000009999971E+01  VAL_N= 0.136769E+09  VAL_L= 0.136768E+09
-!g_sumflux: ALPHA=.1000E-05  COEF=   0.1000000999870E+01  VAL_N= 0.136768E+07  VAL_L= 0.136768E+07
-!g_sumflux: ALPHA=.1000E-06  COEF=   0.1000000101149E+01  VAL_N= 0.136768E+05  VAL_L= 0.136768E+05
-!g_sumflux: ALPHA=.1000E-07  COEF=   0.1000000009549E+01  VAL_N= 0.136768E+03  VAL_L= 0.136768E+03
-!g_sumflux: ALPHA=.1000E-08  COEF=   0.1000000163077E+01  VAL_N= 0.136768E+01  VAL_L= 0.136768E+01
-!g_sumflux: ALPHA=.1000E-09  COEF=   0.1000000280416E+01  VAL_N= 0.136768E-01  VAL_L= 0.136768E-01
-!g_sumflux: ALPHA=.1000E-10  COEF=   0.1000000491168E+01  VAL_N= 0.136768E-03  VAL_L= 0.136768E-03
-                 
-!a_sumflux:    0.1367678888613E+17   0.1367678888613E+17
 
 END SUBROUTINE t_sumflux
 !-----------------------------------------------------------------------------------------------
@@ -8200,8 +8165,6 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
       REAL, DIMENSION( its:ite, kts:kte ) :: rhs, wdwn
       INTEGER :: i,j,k, i_start, i_end, j_start, j_end, k_start, k_end
 
-!  zzma: new definition
-
 !  IN variables
 
       REAL, DIMENSION(  ims:ime , kms:kme, jms:jme ) :: &
@@ -8262,8 +8225,6 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
 
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -8378,6 +8339,12 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA_M=1.
    DO NT=1,11
       ALPHA_M=0.1*ALPHA_M
@@ -8444,6 +8411,12 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA_M**2
       COEF=VAL_N/VAL_L
@@ -8563,9 +8536,16 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_rw_tend(i,k,j)=0.0
       P_ww(i,k,j)=0.0
       P_u(i,k,j)=0.0
@@ -8583,8 +8563,8 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu1(i,j)=0.0
       P_mut(i,j)=0.0
       P_muave(i,j)=0.0
@@ -8638,6 +8618,12 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_advance_w: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -8683,34 +8669,6 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    enddo
    enddo
 
-!g_advance_w: ALPHA=.1000E+00  COEF=   0.4203023437500E+05  VAL_N= 0.447786E+18  VAL_L= 0.106539E+14
-!g_advance_w: ALPHA=.1000E-01  COEF=   0.8862628340721E+00  VAL_N= 0.944215E+11  VAL_L= 0.106539E+12
-!g_advance_w: ALPHA=.1000E-02  COEF=   0.9950740337372E+00  VAL_N= 0.106014E+10  VAL_L= 0.106539E+10
-!g_advance_w: ALPHA=.1000E-03  COEF=   0.1000316143036E+01  VAL_N= 0.106573E+08  VAL_L= 0.106539E+08
-!g_advance_w: ALPHA=.1000E-04  COEF=   0.1005530953407E+01  VAL_N= 0.107128E+06  VAL_L= 0.106539E+06
-!g_advance_w: ALPHA=.1000E-05  COEF=   0.9066505432129E+00  VAL_N= 0.965936E+03  VAL_L= 0.106539E+04
-!g_advance_w: ALPHA=.1000E-06  COEF=   0.1328220486641E+01  VAL_N= 0.141507E+02  VAL_L= 0.106539E+02
-!g_advance_w: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.106539E+00
-!g_advance_w: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.106539E-02
-!g_advance_w: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.106539E-04
-!g_advance_w: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.106539E-06
-                 
-!a_advance_w:    0.1065481876275E+14   0.2132781144474E+14
-
-!g_advance_w: ALPHA=.1000E+00  COEF=   0.4202960279442E+05  VAL_N= 0.447787E+18  VAL_L= 0.106541E+14
-!g_advance_w: ALPHA=.1000E-01  COEF=   0.8863898444207E+00  VAL_N= 0.944368E+11  VAL_L= 0.106541E+12
-!g_advance_w: ALPHA=.1000E-02  COEF=   0.9950242040299E+00  VAL_N= 0.106011E+10  VAL_L= 0.106541E+10
-!g_advance_w: ALPHA=.1000E-03  COEF=   0.9995589489485E+00  VAL_N= 0.106494E+08  VAL_L= 0.106541E+08
-!g_advance_w: ALPHA=.1000E-04  COEF=   0.9999564508007E+00  VAL_N= 0.106536E+06  VAL_L= 0.106541E+06
-!g_advance_w: ALPHA=.1000E-05  COEF=   0.9999956504520E+00  VAL_N= 0.106540E+04  VAL_L= 0.106541E+04
-!g_advance_w: ALPHA=.1000E-06  COEF=   0.9999995659454E+00  VAL_N= 0.106541E+02  VAL_L= 0.106541E+02
-!g_advance_w: ALPHA=.1000E-07  COEF=   0.9999999434296E+00  VAL_N= 0.106541E+00  VAL_L= 0.106541E+00
-!g_advance_w: ALPHA=.1000E-08  COEF=   0.1000000115664E+01  VAL_N= 0.106541E-02  VAL_L= 0.106541E-02
-!g_advance_w: ALPHA=.1000E-09  COEF=   0.1000000381680E+01  VAL_N= 0.106541E-04  VAL_L= 0.106541E-04
-!g_advance_w: ALPHA=.1000E-10  COEF=   0.1000001224183E+01  VAL_N= 0.106541E-06  VAL_L= 0.106541E-06
-                 
-!a_advance_w:    0.1065409474212E+14   0.2136289875657E+14
-
 END SUBROUTINE t_advance_w
 !-----------------------------------------------------------------------------------------------
 
@@ -8722,8 +8680,6 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
                                ims,ime, jms,jme, kms,kme,  & ! memory dims
                                ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                                its,ite, jts,jte, kts,kte )
-
-! Zaizhong Ma, April 1,2005
 
       IMPLICIT NONE
 
@@ -8749,8 +8705,6 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
 
       REAL,  DIMENSION( its:ite , jts:jte ) :: mu_old
 
-!  zzma: new definition
-
 !  IN variables
 
       REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )   :: S_field_tend, S_ph_save,P_field_tend, P_ph_save,B_field_tend, B_ph_save
@@ -8762,8 +8716,6 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -8830,6 +8782,12 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -8873,6 +8831,12 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -8932,16 +8896,23 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_field_tend(i,k,j)=0.0
       P_ph_save(i,k,j)=0.0
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu_tend(i,j)=0.0
       P_muts(i,j)=0.0
    enddo
@@ -8975,6 +8946,12 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_spec_bdyupdate_ph: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -9004,35 +8981,6 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    enddo
    enddo
 
-!g_spec_bdyupdate_ph: ALPHA=.1000E+00  COEF=   0.1000000119209E+01  VAL_N= 0.143960E+07  VAL_L= 0.143960E+07
-!g_spec_bdyupdate_ph: ALPHA=.1000E-01  COEF=   0.9999946355820E+00  VAL_N= 0.143960E+05  VAL_L= 0.143960E+05
-!g_spec_bdyupdate_ph: ALPHA=.1000E-02  COEF=   0.1000091433525E+01  VAL_N= 0.143973E+03  VAL_L= 0.143960E+03
-!g_spec_bdyupdate_ph: ALPHA=.1000E-03  COEF=   0.1000368714333E+01  VAL_N= 0.144013E+01  VAL_L= 0.143960E+01
-!g_spec_bdyupdate_ph: ALPHA=.1000E-04  COEF=   0.1002776384354E+01  VAL_N= 0.144360E-01  VAL_L= 0.143960E-01
-!g_spec_bdyupdate_ph: ALPHA=.1000E-05  COEF=   0.9063574671745E+00  VAL_N= 0.130480E-03  VAL_L= 0.143960E-03
-!g_spec_bdyupdate_ph: ALPHA=.1000E-06  COEF=   0.1363814473152E+01  VAL_N= 0.196335E-05  VAL_L= 0.143960E-05
-!g_spec_bdyupdate_ph: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.143960E-07
-!g_spec_bdyupdate_ph: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.143960E-09
-!g_spec_bdyupdate_ph: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.143960E-11
-!g_spec_bdyupdate_ph: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.143960E-13
-                 
-!a_spec_bdyupdate_ph:    0.1439602750000E+07   0.1439628875000E+07
-
-!g_spec_bdyupdate_ph: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.143976E+07  VAL_L= 0.143976E+07
-!g_spec_bdyupdate_ph: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.143976E+05  VAL_L= 0.143976E+05
-!g_spec_bdyupdate_ph: ALPHA=.1000E-02  COEF=   0.9999999999998E+00  VAL_N= 0.143976E+03  VAL_L= 0.143976E+03
-!g_spec_bdyupdate_ph: ALPHA=.1000E-03  COEF=   0.9999999999999E+00  VAL_N= 0.143976E+01  VAL_L= 0.143976E+01
-!g_spec_bdyupdate_ph: ALPHA=.1000E-04  COEF=   0.1000000000014E+01  VAL_N= 0.143976E-01  VAL_L= 0.143976E-01
-!g_spec_bdyupdate_ph: ALPHA=.1000E-05  COEF=   0.9999999998296E+00  VAL_N= 0.143976E-03  VAL_L= 0.143976E-03
-!g_spec_bdyupdate_ph: ALPHA=.1000E-06  COEF=   0.1000000001183E+01  VAL_N= 0.143976E-05  VAL_L= 0.143976E-05
-!g_spec_bdyupdate_ph: ALPHA=.1000E-07  COEF=   0.9999999881095E+00  VAL_N= 0.143976E-07  VAL_L= 0.143976E-07
-!g_spec_bdyupdate_ph: ALPHA=.1000E-08  COEF=   0.1000000163263E+01  VAL_N= 0.143976E-09  VAL_L= 0.143976E-09
-!g_spec_bdyupdate_ph: ALPHA=.1000E-09  COEF=   0.1000000083661E+01  VAL_N= 0.143976E-11  VAL_L= 0.143976E-11
-!g_spec_bdyupdate_ph: ALPHA=.1000E-10  COEF=   0.9999994281817E+00  VAL_N= 0.143976E-13  VAL_L= 0.143976E-13
-                 
-!a_spec_bdyupdate_ph:    0.1439763904620E+07   0.1439763904620E+07
-
-
 END SUBROUTINE t_spec_bdyupdate_ph
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
@@ -9040,8 +8988,6 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte )
-
-! Zaizhong Ma, April 1,2005
 
    IMPLICIT NONE
 
@@ -9060,8 +9006,6 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 
    INTEGER :: i, j, itf, jtf, im, jm
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL, DIMENSION( ims:ime , jms:jme )  :: S_mu,P_mu,B_mu
@@ -9072,8 +9016,6 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -9112,6 +9054,12 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -9128,13 +9076,19 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte )
 
-      VAL_N=0.
+   VAL_N=0.
    do i=its,ite
    do j=jts,jte
          VAL_N=VAL_N+ (P_muu(i,j)-B_muu(i,j))*(P_muu(i,j)-B_muu(i,j))    &
                     + (P_muv(i,j)-B_muv(i,j))*(P_muv(i,j)-B_muv(i,j))
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -9167,8 +9121,15 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
       VAL_L=VAL_L +P_muu(i,j)*P_muu(i,j) + P_muv(i,j)*P_muv(i,j)
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do j=jms,jme
       P_mu(i,j)=0.0
    enddo
    enddo
@@ -9184,6 +9145,12 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_calc_mu_uv_1: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -9196,35 +9163,6 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
       mu(i,j)=S_mu(i,j)
    enddo
    enddo
-
-!g_calc_mu_uv_1: ALPHA=.1000E+00  COEF=   0.5623352050781E+01  VAL_N= 0.178737E+13  VAL_L= 0.317848E+12
-!g_calc_mu_uv_1: ALPHA=.1000E-01  COEF=   0.4679619445801E+03  VAL_N= 0.148741E+13  VAL_L= 0.317848E+10
-!g_calc_mu_uv_1: ALPHA=.1000E-02  COEF=   0.4670370312500E+05  VAL_N= 0.148447E+13  VAL_L= 0.317848E+08
-!g_calc_mu_uv_1: ALPHA=.1000E-03  COEF=   0.4670370000000E+07  VAL_N= 0.148447E+13  VAL_L= 0.317848E+06
-!g_calc_mu_uv_1: ALPHA=.1000E-04  COEF=   0.4670369920000E+09  VAL_N= 0.148447E+13  VAL_L= 0.317848E+04
-!g_calc_mu_uv_1: ALPHA=.1000E-05  COEF=   0.4670369792000E+11  VAL_N= 0.148447E+13  VAL_L= 0.317848E+02
-!g_calc_mu_uv_1: ALPHA=.1000E-06  COEF=   0.4670369038336E+13  VAL_N= 0.148447E+13  VAL_L= 0.317848E+00
-!g_calc_mu_uv_1: ALPHA=.1000E-07  COEF=   0.4670369248051E+15  VAL_N= 0.148447E+13  VAL_L= 0.317848E-02
-!g_calc_mu_uv_1: ALPHA=.1000E-08  COEF=   0.4670368912507E+17  VAL_N= 0.148447E+13  VAL_L= 0.317848E-04
-!g_calc_mu_uv_1: ALPHA=.1000E-09  COEF=   0.4670368603269E+19  VAL_N= 0.148447E+13  VAL_L= 0.317848E-06
-!g_calc_mu_uv_1: ALPHA=.1000E-10  COEF=   0.4670368273416E+21  VAL_N= 0.148447E+13  VAL_L= 0.317848E-08
-                 
-!a_calc_mu_uv_1:    0.1787371847680E+13   0.3030103490560E+12
-
-!g_calc_mu_uv_1: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.303010E+12  VAL_L= 0.303010E+12
-!g_calc_mu_uv_1: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.303010E+10  VAL_L= 0.303010E+10
-!g_calc_mu_uv_1: ALPHA=.1000E-02  COEF=   0.9999999999998E+00  VAL_N= 0.303010E+08  VAL_L= 0.303010E+08
-!g_calc_mu_uv_1: ALPHA=.1000E-03  COEF=   0.1000000000001E+01  VAL_N= 0.303010E+06  VAL_L= 0.303010E+06
-!g_calc_mu_uv_1: ALPHA=.1000E-04  COEF=   0.1000000000010E+01  VAL_N= 0.303010E+04  VAL_L= 0.303010E+04
-!g_calc_mu_uv_1: ALPHA=.1000E-05  COEF=   0.9999999997959E+00  VAL_N= 0.303010E+02  VAL_L= 0.303010E+02
-!g_calc_mu_uv_1: ALPHA=.1000E-06  COEF=   0.1000000001036E+01  VAL_N= 0.303010E+00  VAL_L= 0.303010E+00
-!g_calc_mu_uv_1: ALPHA=.1000E-07  COEF=   0.9999999973814E+00  VAL_N= 0.303010E-02  VAL_L= 0.303010E-02
-!g_calc_mu_uv_1: ALPHA=.1000E-08  COEF=   0.1000000270797E+01  VAL_N= 0.303010E-04  VAL_L= 0.303010E-04
-!g_calc_mu_uv_1: ALPHA=.1000E-09  COEF=   0.1000000267344E+01  VAL_N= 0.303010E-06  VAL_L= 0.303010E-06
-!g_calc_mu_uv_1: ALPHA=.1000E-10  COEF=   0.1000003235117E+01  VAL_N= 0.303011E-08  VAL_L= 0.303010E-08
-                 
-!a_calc_mu_uv_1:    0.3030098328208E+12   0.3030098328208E+12
-
 
 END SUBROUTINE t_calc_mu_uv_1
 !-----------------------------------------------------------------------------------------------
@@ -9241,8 +9179,6 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                               ids,ide, jds,jde, kds,kde,       &
                               ims,ime, jms,jme, kms,kme,       &
                               its,ite, jts,jte, kts,kte       )
-
-! Zaizhong Ma, April 4,2005
 
   IMPLICIT NONE  ! religion first
 
@@ -9290,8 +9226,6 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
 
   INTEGER         :: i,j,k
   INTEGER :: i_start, i_end, j_start, j_end, i_endu, j_endv
-
-!  zzma: new definition
 
 ! IN variables
 
@@ -9342,8 +9276,6 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -9492,6 +9424,12 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -9568,6 +9506,12 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                     + (P_mu_save(i,j)- B_mu_save(i,j))*(P_mu_save(i,j)- B_mu_save(i,j)) 
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -9703,9 +9647,15 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_u_save(i,k,j)=0.0
       P_v_save(i,k,j)=0.0
       P_w_save(i,k,j)=0.0
@@ -9757,6 +9707,12 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_small_step_finish: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -9799,34 +9755,6 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    enddo
    enddo
 
-!g_small_step_finish: ALPHA=.1000E+00  COEF=   0.9997525215149E+00  VAL_N= 0.959912E+12  VAL_L= 0.960150E+12
-!g_small_step_finish: ALPHA=.1000E-01  COEF=   0.9998036623001E+00  VAL_N= 0.959961E+10  VAL_L= 0.960150E+10
-!g_small_step_finish: ALPHA=.1000E-02  COEF=   0.1000095129013E+01  VAL_N= 0.960241E+08  VAL_L= 0.960150E+08
-!g_small_step_finish: ALPHA=.1000E-03  COEF=   0.1000633716583E+01  VAL_N= 0.960758E+06  VAL_L= 0.960150E+06
-!g_small_step_finish: ALPHA=.1000E-04  COEF=   0.9989603161812E+00  VAL_N= 0.959152E+04  VAL_L= 0.960150E+04
-!g_small_step_finish: ALPHA=.1000E-05  COEF=   0.8403349518776E+00  VAL_N= 0.806847E+02  VAL_L= 0.960150E+02
-!g_small_step_finish: ALPHA=.1000E-06  COEF=   0.6937835216522E+00  VAL_N= 0.666136E+00  VAL_L= 0.960150E+00
-!g_small_step_finish: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.960150E-02
-!g_small_step_finish: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.960150E-04
-!g_small_step_finish: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.960150E-06
-!g_small_step_finish: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.960150E-08
-                 
-!a_small_step_finish:    0.9599120834560E+12   0.9599578931200E+12
-
-!g_small_step_finish: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.960067E+12  VAL_L= 0.960067E+12
-!g_small_step_finish: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.960067E+10  VAL_L= 0.960067E+10
-!g_small_step_finish: ALPHA=.1000E-02  COEF=   0.9999999999998E+00  VAL_N= 0.960067E+08  VAL_L= 0.960067E+08
-!g_small_step_finish: ALPHA=.1000E-03  COEF=   0.1000000000001E+01  VAL_N= 0.960067E+06  VAL_L= 0.960067E+06
-!g_small_step_finish: ALPHA=.1000E-04  COEF=   0.1000000000010E+01  VAL_N= 0.960067E+04  VAL_L= 0.960067E+04
-!g_small_step_finish: ALPHA=.1000E-05  COEF=   0.9999999997936E+00  VAL_N= 0.960067E+02  VAL_L= 0.960067E+02
-!g_small_step_finish: ALPHA=.1000E-06  COEF=   0.1000000001029E+01  VAL_N= 0.960067E+00  VAL_L= 0.960067E+00
-!g_small_step_finish: ALPHA=.1000E-07  COEF=   0.9999999976363E+00  VAL_N= 0.960067E-02  VAL_L= 0.960067E-02
-!g_small_step_finish: ALPHA=.1000E-08  COEF=   0.1000000273437E+01  VAL_N= 0.960067E-04  VAL_L= 0.960067E-04
-!g_small_step_finish: ALPHA=.1000E-09  COEF=   0.1000000269678E+01  VAL_N= 0.960067E-06  VAL_L= 0.960067E-06
-!g_small_step_finish: ALPHA=.1000E-10  COEF=   0.1000003270830E+01  VAL_N= 0.960070E-08  VAL_L= 0.960067E-08
-                 
-!a_small_step_finish:    0.9600668356832E+12   0.9600668356832E+12
-
 END SUBROUTINE t_small_step_finish
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
@@ -9843,8 +9771,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
-
-! Zaizhong Ma, April 4,2005
 
    IMPLICIT NONE
 
@@ -9905,8 +9831,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    REAL    :: khdq, kvdq, tendency
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme  )                ::     S_ru,  &
@@ -9940,8 +9864,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -10119,6 +10041,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -10205,6 +10133,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
 
@@ -10357,6 +10291,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
 !  ADJ
 
    CALL a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, scalar_old, &
@@ -10397,6 +10337,11 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_rk_scalar_tend: '
@@ -10439,34 +10384,6 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
-!g_rk_scalar_tend: ALPHA=.1000E+00  COEF=   0.9997231364250E+00  VAL_N= 0.307437E-01  VAL_L= 0.307522E-01
-!g_rk_scalar_tend: ALPHA=.1000E-01  COEF=   0.9999352693558E+00  VAL_N= 0.307502E-03  VAL_L= 0.307522E-03
-!g_rk_scalar_tend: ALPHA=.1000E-02  COEF=   0.9999766945839E+00  VAL_N= 0.307515E-05  VAL_L= 0.307522E-05
-!g_rk_scalar_tend: ALPHA=.1000E-03  COEF=   0.1000588893890E+01  VAL_N= 0.307703E-07  VAL_L= 0.307522E-07
-!g_rk_scalar_tend: ALPHA=.1000E-04  COEF=   0.1067813396454E+01  VAL_N= 0.328376E-09  VAL_L= 0.307522E-09
-!g_rk_scalar_tend: ALPHA=.1000E-05  COEF=   0.7152854919434E+01  VAL_N= 0.219966E-10  VAL_L= 0.307522E-11
-!g_rk_scalar_tend: ALPHA=.1000E-06  COEF=   0.6295269775391E+03  VAL_N= 0.193594E-10  VAL_L= 0.307522E-13
-!g_rk_scalar_tend: ALPHA=.1000E-07  COEF=   0.6282780078125E+05  VAL_N= 0.193210E-10  VAL_L= 0.307522E-15
-!g_rk_scalar_tend: ALPHA=.1000E-08  COEF=   0.6282780000000E+07  VAL_N= 0.193210E-10  VAL_L= 0.307522E-17
-!g_rk_scalar_tend: ALPHA=.1000E-09  COEF=   0.6282778880000E+09  VAL_N= 0.193210E-10  VAL_L= 0.307522E-19
-!g_rk_scalar_tend: ALPHA=.1000E-10  COEF=   0.6282778624000E+11  VAL_N= 0.193210E-10  VAL_L= 0.307522E-21
-                 
-!a_rk_scalar_tend:    0.3074371442199E-01   0.3074371442199E-01
-
-!g_rk_scalar_tend: ALPHA=.1000E+00  COEF=   0.1000000000628E+01  VAL_N= 0.307533E-01  VAL_L= 0.307533E-01
-!g_rk_scalar_tend: ALPHA=.1000E-01  COEF=   0.1000000062825E+01  VAL_N= 0.307533E-03  VAL_L= 0.307533E-03
-!g_rk_scalar_tend: ALPHA=.1000E-02  COEF=   0.1000006282450E+01  VAL_N= 0.307535E-05  VAL_L= 0.307533E-05
-!g_rk_scalar_tend: ALPHA=.1000E-03  COEF=   0.1000628245062E+01  VAL_N= 0.307726E-07  VAL_L= 0.307533E-07
-!g_rk_scalar_tend: ALPHA=.1000E-04  COEF=   0.1062824506169E+01  VAL_N= 0.326854E-09  VAL_L= 0.307533E-09
-!g_rk_scalar_tend: ALPHA=.1000E-05  COEF=   0.7282450615443E+01  VAL_N= 0.223959E-10  VAL_L= 0.307533E-11
-!g_rk_scalar_tend: ALPHA=.1000E-06  COEF=   0.6292450615583E+03  VAL_N= 0.193514E-10  VAL_L= 0.307533E-13
-!g_rk_scalar_tend: ALPHA=.1000E-07  COEF=   0.6282550615548E+05  VAL_N= 0.193209E-10  VAL_L= 0.307533E-15
-!g_rk_scalar_tend: ALPHA=.1000E-08  COEF=   0.6282451615549E+07  VAL_N= 0.193206E-10  VAL_L= 0.307533E-17
-!g_rk_scalar_tend: ALPHA=.1000E-09  COEF=   0.6282450625547E+09  VAL_N= 0.193206E-10  VAL_L= 0.307533E-19
-!g_rk_scalar_tend: ALPHA=.1000E-10  COEF=   0.6282450615649E+11  VAL_N= 0.193206E-10  VAL_L= 0.307533E-21
-                 
-!a_rk_scalar_tend:    0.3075329603091E-01   0.3075329603091E-01
-
 END SUBROUTINE t_rk_scalar_tend
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
@@ -10477,9 +10394,6 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
                           ims,ime, jms,jme, kms,kme,  & ! memory dims
                           ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
                           its, ite, jts, jte, kts, kte)
-
-! Zaizhong Ma, April 5,2005
-! Qingnong Xiao, rewritten, April 2005.
 
    IMPLICIT NONE
 
@@ -10500,8 +10414,6 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
 !Local
    INTEGER :: i,j,k
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL,  DIMENSION( ijds:ijde , kds:kde , spec_bdy_width, 4 )   :: S_scalar_bt,P_scalar_bt,B_scalar_bt
@@ -10512,8 +10424,6 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -10548,6 +10458,12 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    SAVE_L=sum(P_scalar_tend(:,:,:)*P_scalar_tend(:,:,:)) + &
           sum(P_scalar_bt(:,:,:,:)*P_scalar_bt(:,:,:,:))
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -10567,6 +10483,12 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
 
       VAL_N= sum((P_scalar_tend(:,:,:)-B_scalar_tend(:,:,:))*(P_scalar_tend(:,:,:)-B_scalar_tend(:,:,:))) + &
              sum((P_scalar_bt(:,:,:,:)-B_scalar_bt(:,:,:,:))*(P_scalar_bt(:,:,:,:)-B_scalar_bt(:,:,:,:)))
+
+#ifdef DM_PARALLEL
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -10591,6 +10513,12 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    VAL_L=sum(P_scalar_tend(:,:,:)*P_scalar_tend(:,:,:))+ &
          sum(P_scalar_bt(:,:,:,:)*P_scalar_bt(:,:,:,:))
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
 !  ADJ
 
    CALL a_spec_bdy_scalar( P_scalar_tend, P_scalar_bt, spec_bdy_width, spec_zone, ijds, ijde, ids, ide, jds, jde, kds, kde, ims,&
@@ -10598,6 +10526,12 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
 
    VAL_A=sum(P_scalar_bt(:,:,:,:)*B_scalar_bt(:,:,:,:)) + &
          sum(P_scalar_tend(:,:,:)*B_scalar_tend(:,:,:))
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
 
    print*, '                '
    write(6,*) 'a_spec_bdy_scalar: '
@@ -10622,8 +10556,6 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte  )
-
-! Zaizhong Ma, April 5,2005
 
    IMPLICIT NONE
 
@@ -10660,8 +10592,6 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    INTEGER :: i_start,i_end,j_start,j_end,k_start,k_end
    INTEGER :: i_start_spc,i_end_spc,j_start_spc,j_end_spc,k_start_spc,k_end_spc
 
-!  zzma: new definition
-
 !  IN variables
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme )    :: S_advect_tend,P_advect_tend,B_advect_tend
@@ -10675,8 +10605,6 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -10762,6 +10690,12 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -10813,6 +10747,12 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
 
@@ -10895,15 +10835,22 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_advect_tend(i,k,j)=0.0
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu_old(i,j)=0.0
       P_mu_new(i,j)=0.0
    enddo
@@ -10941,6 +10888,12 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_rk_update_scalar: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -10973,35 +10926,6 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    enddo
    enddo
 
-!g_rk_update_scalar: ALPHA=.1000E+00  COEF=   0.9997228980064E+00  VAL_N= 0.307440E-01  VAL_L= 0.307526E-01
-!g_rk_update_scalar: ALPHA=.1000E-01  COEF=   0.9999256134033E+00  VAL_N= 0.307503E-03  VAL_L= 0.307526E-03
-!g_rk_update_scalar: ALPHA=.1000E-02  COEF=   0.9999616742134E+00  VAL_N= 0.307514E-05  VAL_L= 0.307526E-05
-!g_rk_update_scalar: ALPHA=.1000E-03  COEF=   0.9997097849846E+00  VAL_N= 0.307436E-07  VAL_L= 0.307526E-07
-!g_rk_update_scalar: ALPHA=.1000E-04  COEF=   0.1002490162849E+01  VAL_N= 0.308291E-09  VAL_L= 0.307526E-09
-!g_rk_update_scalar: ALPHA=.1000E-05  COEF=   0.8739548921585E+00  VAL_N= 0.268764E-11  VAL_L= 0.307526E-11
-!g_rk_update_scalar: ALPHA=.1000E-06  COEF=   0.1635856509209E+01  VAL_N= 0.503068E-13  VAL_L= 0.307526E-13
-!g_rk_update_scalar: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.307526E-15
-!g_rk_update_scalar: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.307526E-17
-!g_rk_update_scalar: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.307526E-19
-!g_rk_update_scalar: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.307526E-21
-                 
-!a_rk_update_scalar:    0.3074402920902E-01   0.3075052797794E-01
-
-!g_rk_update_scalar: ALPHA=.1000E+00  COEF=   0.1000001003829E+01  VAL_N= 0.307535E-01  VAL_L= 0.307535E-01
-!g_rk_update_scalar: ALPHA=.1000E-01  COEF=   0.1000000096620E+01  VAL_N= 0.307535E-03  VAL_L= 0.307535E-03
-!g_rk_update_scalar: ALPHA=.1000E-02  COEF=   0.1000000009624E+01  VAL_N= 0.307535E-05  VAL_L= 0.307535E-05
-!g_rk_update_scalar: ALPHA=.1000E-03  COEF=   0.1000000000962E+01  VAL_N= 0.307535E-07  VAL_L= 0.307535E-07
-!g_rk_update_scalar: ALPHA=.1000E-04  COEF=   0.1000000000106E+01  VAL_N= 0.307535E-09  VAL_L= 0.307535E-09
-!g_rk_update_scalar: ALPHA=.1000E-05  COEF=   0.9999999999299E+00  VAL_N= 0.307535E-11  VAL_L= 0.307535E-11
-!g_rk_update_scalar: ALPHA=.1000E-06  COEF=   0.1000000001150E+01  VAL_N= 0.307535E-13  VAL_L= 0.307535E-13
-!g_rk_update_scalar: ALPHA=.1000E-07  COEF=   0.9999999881787E+00  VAL_N= 0.307535E-15  VAL_L= 0.307535E-15
-!g_rk_update_scalar: ALPHA=.1000E-08  COEF=   0.1000000050476E+01  VAL_N= 0.307535E-17  VAL_L= 0.307535E-17
-!g_rk_update_scalar: ALPHA=.1000E-09  COEF=   0.1000000785292E+01  VAL_N= 0.307535E-19  VAL_L= 0.307535E-19
-!g_rk_update_scalar: ALPHA=.1000E-10  COEF=   0.1000006304873E+01  VAL_N= 0.307537E-21  VAL_L= 0.307535E-21
-                 
-!a_rk_update_scalar:    0.3075349138757E-01   0.3075349138757E-01
-
-
 END SUBROUTINE t_rk_update_scalar
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
@@ -11012,8 +10936,6 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
                             ims, ime, jms, jme, kms, kme,  &
                             its, ite, jts, jte, kts, kte  )
 
-
-! Zaizhong Ma, April 5,2005
 
   IMPLICIT NONE
   
@@ -11050,8 +10972,6 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
   INTEGER :: i, j, k, itf, jtf, ktf, ispe
   REAL    :: qvf, qtot, qf1, qf2
 
-!  zzma: new definition
-
 !  IN variables
 
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme )   :: S_t,P_t,B_t
@@ -11068,8 +10988,6 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT,h
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -11245,6 +11163,12 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum 
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -11337,6 +11261,12 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
                   +(P_muts(i,j)-B_muts(i,j))*(P_muts(i,j)-B_muts(i,j))
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum 
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -11449,6 +11379,12 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum 
+#endif
+
 !  ADJ
 
    CALL a_calc_p_rho_phi( moist, P_moist, n_moist, al, P_al, alb, mu, P_mu, muts, P_muts, ph, P_ph, p, P_p, pb, t, P_t, p0, t0, &
@@ -11493,6 +11429,12 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum 
+#endif
+
    print*, '                '
    write(6,*) 'a_calc_p_rho_phi: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -11530,35 +11472,6 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
    enddo
    enddo
 
-!g_calc_p_rho_phi: ALPHA=.1000E+00  COEF=   0.1006161451340E+01  VAL_N= 0.101051E+11  VAL_L= 0.100433E+11
-!g_calc_p_rho_phi: ALPHA=.1000E-01  COEF=   0.1000751256943E+01  VAL_N= 0.100508E+09  VAL_L= 0.100433E+09
-!g_calc_p_rho_phi: ALPHA=.1000E-02  COEF=   0.9996134638786E+00  VAL_N= 0.100394E+07  VAL_L= 0.100433E+07
-!g_calc_p_rho_phi: ALPHA=.1000E-03  COEF=   0.9992095828056E+00  VAL_N= 0.100353E+05  VAL_L= 0.100433E+05
-!g_calc_p_rho_phi: ALPHA=.1000E-04  COEF=   0.1008291125298E+01  VAL_N= 0.101265E+03  VAL_L= 0.100433E+03
-!g_calc_p_rho_phi: ALPHA=.1000E-05  COEF=   0.2676813364029E+01  VAL_N= 0.268839E+01  VAL_L= 0.100433E+01
-!g_calc_p_rho_phi: ALPHA=.1000E-06  COEF=   0.1743072204590E+03  VAL_N= 0.175061E+01  VAL_L= 0.100433E-01
-!g_calc_p_rho_phi: ALPHA=.1000E-07  COEF=   0.1722197265625E+05  VAL_N= 0.172965E+01  VAL_L= 0.100433E-03
-!g_calc_p_rho_phi: ALPHA=.1000E-08  COEF=   0.1722197125000E+07  VAL_N= 0.172965E+01  VAL_L= 0.100433E-05
-!g_calc_p_rho_phi: ALPHA=.1000E-09  COEF=   0.1722196960000E+09  VAL_N= 0.172965E+01  VAL_L= 0.100433E-07
-!g_calc_p_rho_phi: ALPHA=.1000E-10  COEF=   0.1722196787200E+11  VAL_N= 0.172965E+01  VAL_L= 0.100433E-09
-                 
-!a_calc_p_rho_phi:    0.1004590899200E+11   0.1003517337600E+11
-
-!g_calc_p_rho_phi: ALPHA=.1000E+00  COEF=   0.1006000807140E+01  VAL_N= 0.101045E+11  VAL_L= 0.100442E+11
-!g_calc_p_rho_phi: ALPHA=.1000E-01  COEF=   0.1000601117766E+01  VAL_N= 0.100502E+09  VAL_L= 0.100442E+09
-!g_calc_p_rho_phi: ALPHA=.1000E-02  COEF=   0.1000061842375E+01  VAL_N= 0.100448E+07  VAL_L= 0.100442E+07
-!g_calc_p_rho_phi: ALPHA=.1000E-03  COEF=   0.1000178212958E+01  VAL_N= 0.100460E+05  VAL_L= 0.100442E+05
-!g_calc_p_rho_phi: ALPHA=.1000E-04  COEF=   0.1017220683002E+01  VAL_N= 0.102171E+03  VAL_L= 0.100442E+03
-!g_calc_p_rho_phi: ALPHA=.1000E-05  COEF=   0.2722008232576E+01  VAL_N= 0.273403E+01  VAL_L= 0.100442E+01
-!g_calc_p_rho_phi: ALPHA=.1000E-06  COEF=   0.1732008172974E+03  VAL_N= 0.173966E+01  VAL_L= 0.100442E-01
-!g_calc_p_rho_phi: ALPHA=.1000E-07  COEF=   0.1722108172876E+05  VAL_N= 0.172972E+01  VAL_L= 0.100442E-03
-!g_calc_p_rho_phi: ALPHA=.1000E-08  COEF=   0.1722009172880E+07  VAL_N= 0.172962E+01  VAL_L= 0.100442E-05
-!g_calc_p_rho_phi: ALPHA=.1000E-09  COEF=   0.1722008182880E+09  VAL_N= 0.172962E+01  VAL_L= 0.100442E-07
-!g_calc_p_rho_phi: ALPHA=.1000E-10  COEF=   0.1722008172980E+11  VAL_N= 0.172962E+01  VAL_L= 0.100442E-09
-                 
-!a_calc_p_rho_phi:    0.1004417776524E+11   0.1004417776524E+11
-
-
 END SUBROUTINE t_calc_p_rho_phi
 !-----------------------------------------------------------------------------------------------
 SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
@@ -11568,8 +11481,6 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
                        ims, ime, jms, jme, kms, kme,        &
                        its, ite, jts, jte, kts, kte        )
 
-
-! Zaizhong Ma, April 6,2005
 
    IMPLICIT NONE
 
@@ -11592,8 +11503,6 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    REAL, INTENT(IN   ) :: dt, cf1, cf2, cf3, rdx, rdy
 
    INTEGER :: i, j, k, itf, jtf
-
-!  zzma: new definition
 
 !  IN variables
 
@@ -11621,8 +11530,6 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -11719,6 +11626,12 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
       enddo
       enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
+
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
@@ -11773,9 +11686,16 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_u(i,k,j)=0.0
       P_v(i,k,j)=0.0
       P_ph_new(i,k,j)=0.0
@@ -11784,8 +11704,8 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       P_mu(i,j)=0.0
    enddo
    enddo
@@ -11813,6 +11733,12 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
+
    print*, '                '
    write(6,*) 'a_diagnose_w: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -11836,35 +11762,6 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
       mu(i,j)=S_mu(i,j)
    enddo
    enddo
-
-!g_diagnose_w: ALPHA=.1000E+00  COEF=   0.1000005245209E+01  VAL_N= 0.670413E+01  VAL_L= 0.670409E+01
-!g_diagnose_w: ALPHA=.1000E-01  COEF=   0.1000001430511E+01  VAL_N= 0.670410E-01  VAL_L= 0.670409E-01
-!g_diagnose_w: ALPHA=.1000E-02  COEF=   0.1000097274780E+01  VAL_N= 0.670475E-03  VAL_L= 0.670409E-03
-!g_diagnose_w: ALPHA=.1000E-03  COEF=   0.1000367045403E+01  VAL_N= 0.670656E-05  VAL_L= 0.670409E-05
-!g_diagnose_w: ALPHA=.1000E-04  COEF=   0.1005415797234E+01  VAL_N= 0.674040E-07  VAL_L= 0.670409E-07
-!g_diagnose_w: ALPHA=.1000E-05  COEF=   0.9407595992088E+00  VAL_N= 0.630694E-09  VAL_L= 0.670410E-09
-!g_diagnose_w: ALPHA=.1000E-06  COEF=   0.8932945728302E+00  VAL_N= 0.598873E-11  VAL_L= 0.670410E-11
-!g_diagnose_w: ALPHA=.1000E-07  COEF=   0.2442521740420E-08  VAL_N= 0.163749E-21  VAL_L= 0.670410E-13
-!g_diagnose_w: ALPHA=.1000E-08  COEF=   0.2442521633839E-06  VAL_N= 0.163749E-21  VAL_L= 0.670410E-15
-!g_diagnose_w: ALPHA=.1000E-09  COEF=   0.2442521326884E-04  VAL_N= 0.163749E-21  VAL_L= 0.670410E-17
-!g_diagnose_w: ALPHA=.1000E-10  COEF=   0.2442521275952E-02  VAL_N= 0.163749E-21  VAL_L= 0.670410E-19
-                 
-!a_diagnose_w:    0.6704125404358E+01   0.6704235553741E+01
-
-
-!g_diagnose_w: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.670470E+01  VAL_L= 0.670470E+01
-!g_diagnose_w: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.670470E-01  VAL_L= 0.670470E-01
-!g_diagnose_w: ALPHA=.1000E-02  COEF=   0.9999999999999E+00  VAL_N= 0.670470E-03  VAL_L= 0.670470E-03
-!g_diagnose_w: ALPHA=.1000E-03  COEF=   0.9999999999994E+00  VAL_N= 0.670470E-05  VAL_L= 0.670470E-05
-!g_diagnose_w: ALPHA=.1000E-04  COEF=   0.1000000000010E+01  VAL_N= 0.670470E-07  VAL_L= 0.670470E-07
-!g_diagnose_w: ALPHA=.1000E-05  COEF=   0.9999999998131E+00  VAL_N= 0.670470E-09  VAL_L= 0.670470E-09
-!g_diagnose_w: ALPHA=.1000E-06  COEF=   0.1000000001353E+01  VAL_N= 0.670470E-11  VAL_L= 0.670470E-11
-!g_diagnose_w: ALPHA=.1000E-07  COEF=   0.9999999833020E+00  VAL_N= 0.670470E-13  VAL_L= 0.670470E-13
-!g_diagnose_w: ALPHA=.1000E-08  COEF=   0.1000000134166E+01  VAL_N= 0.670470E-15  VAL_L= 0.670470E-15
-!g_diagnose_w: ALPHA=.1000E-09  COEF=   0.1000000233388E+01  VAL_N= 0.670470E-17  VAL_L= 0.670470E-17
-!g_diagnose_w: ALPHA=.1000E-10  COEF=   0.9999982203515E+00  VAL_N= 0.670469E-19  VAL_L= 0.670470E-19
-                 
-!a_diagnose_w:    0.6704701074044E+01   0.6704701074044E+01
 
 END SUBROUTINE t_diagnose_w
 !-----------------------------------------------------------------------------------------------
@@ -11897,8 +11794,6 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
       INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf
       INTEGER    :: b_dist
 
-!  zzma: new definition
-
 !IN variables
 
       REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )   :: S_field_tend,P_field_tend,B_field_tend
@@ -11909,8 +11804,6 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
    INTEGER :: NT
-
-!  zzma: new definition end
 
 !TGL test
 
@@ -11968,6 +11861,12 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
    ALPHA=1.
    DO NT=1,11
       ALPHA=0.1*ALPHA
@@ -11998,6 +11897,12 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    enddo
    enddo
    enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
@@ -12040,9 +11945,16 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
+
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       P_field_tend(i,k,j)=0.0
    enddo
    enddo
@@ -12069,6 +11981,12 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    enddo
    enddo
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
+
    print*, '                '
    write(6,*) 'a_spec_bdyupdate: '
    write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
@@ -12091,39 +12009,8 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    enddo
    enddo
 
-!g_spec_bdyupdate: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.494271E+11  VAL_L= 0.494271E+11
-!g_spec_bdyupdate: ALPHA=.1000E-01  COEF=   0.9999986886978E+00  VAL_N= 0.494271E+09  VAL_L= 0.494272E+09
-!g_spec_bdyupdate: ALPHA=.1000E-02  COEF=   0.1000093936920E+01  VAL_N= 0.494318E+07  VAL_L= 0.494272E+07
-!g_spec_bdyupdate: ALPHA=.1000E-03  COEF=   0.1000092506409E+01  VAL_N= 0.494317E+05  VAL_L= 0.494272E+05
-!g_spec_bdyupdate: ALPHA=.1000E-04  COEF=   0.1003426194191E+01  VAL_N= 0.495965E+03  VAL_L= 0.494272E+03
-!g_spec_bdyupdate: ALPHA=.1000E-05  COEF=   0.9386174082756E+00  VAL_N= 0.463932E+01  VAL_L= 0.494272E+01
-!g_spec_bdyupdate: ALPHA=.1000E-06  COEF=   0.1423480510712E+01  VAL_N= 0.703586E-01  VAL_L= 0.494272E-01
-!g_spec_bdyupdate: ALPHA=.1000E-07  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.494272E-03
-!g_spec_bdyupdate: ALPHA=.1000E-08  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.494272E-05
-!g_spec_bdyupdate: ALPHA=.1000E-09  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.494272E-07
-!g_spec_bdyupdate: ALPHA=.1000E-10  COEF=   0.0000000000000E+00  VAL_N= 0.000000E+00  VAL_L= 0.494272E-09
-                 
-!a_spec_bdyupdate:    0.4942713241600E+11   0.4942713241600E+11
-
-!g_spec_bdyupdate: ALPHA=.1000E+00  COEF=   0.1000000000000E+01  VAL_N= 0.494266E+11  VAL_L= 0.494266E+11
-!g_spec_bdyupdate: ALPHA=.1000E-01  COEF=   0.1000000000000E+01  VAL_N= 0.494266E+09  VAL_L= 0.494266E+09
-!g_spec_bdyupdate: ALPHA=.1000E-02  COEF=   0.9999999999998E+00  VAL_N= 0.494266E+07  VAL_L= 0.494266E+07
-!g_spec_bdyupdate: ALPHA=.1000E-03  COEF=   0.9999999999999E+00  VAL_N= 0.494266E+05  VAL_L= 0.494266E+05
-!g_spec_bdyupdate: ALPHA=.1000E-04  COEF=   0.1000000000013E+01  VAL_N= 0.494266E+03  VAL_L= 0.494266E+03
-!g_spec_bdyupdate: ALPHA=.1000E-05  COEF=   0.9999999998369E+00  VAL_N= 0.494266E+01  VAL_L= 0.494266E+01
-!g_spec_bdyupdate: ALPHA=.1000E-06  COEF=   0.1000000001169E+01  VAL_N= 0.494266E-01  VAL_L= 0.494266E-01
-!g_spec_bdyupdate: ALPHA=.1000E-07  COEF=   0.9999999879249E+00  VAL_N= 0.494266E-03  VAL_L= 0.494266E-03
-!g_spec_bdyupdate: ALPHA=.1000E-08  COEF=   0.1000000181960E+01  VAL_N= 0.494266E-05  VAL_L= 0.494266E-05
-!g_spec_bdyupdate: ALPHA=.1000E-09  COEF=   0.9999999928643E+00  VAL_N= 0.494266E-07  VAL_L= 0.494266E-07
-!g_spec_bdyupdate: ALPHA=.1000E-10  COEF=   0.9999993623163E+00  VAL_N= 0.494266E-09  VAL_L= 0.494266E-09
-                 
-!a_spec_bdyupdate:    0.4942663099544E+11   0.4942663099544E+11
-
 END SUBROUTINE t_spec_bdyupdate
 !-----------------------------------------------------------------------------------------------
-!==============================================================================
-!Zhang Xiaoyan 11/02/2006
-
 
    SUBROUTINE t_surface_drag ( ru_tendf, rv_tendf, u, v, xland,             &
                          muu, muv, z, z_at_w,                   &
@@ -12203,6 +12090,12 @@ END SUBROUTINE t_spec_bdyupdate
       SAVE_L=0.
       SAVE_L=sum(g_ru_tendf**2)+sum(g_rv_tendf**2)
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
 
  ALPHA=1.
   DO NT=1,11
@@ -12226,6 +12119,12 @@ END SUBROUTINE t_spec_bdyupdate
     VAL_N=0.
     VAL_N= sum ((P_ru_tendf-B_ru_tendf)**2)&
           +sum ((P_rv_tendf-B_rv_tendf)**2)
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
     VAL_L=SAVE_L*ALPHA**2
     COEF=VAL_N/VAL_L
@@ -12272,6 +12171,12 @@ END SUBROUTINE t_spec_bdyupdate
    VAL_L=0.0
    VAL_L=sum(P_ru_tendf**2) + sum(P_rv_tendf**2)
    
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L= nsum
+#endif
+
    P_u=0.0
    P_v=0.0
    P_muu=0.0
@@ -12288,6 +12193,12 @@ END SUBROUTINE t_spec_bdyupdate
     VAL_A= sum(P_ru_tendf*B_ru_tendf) +sum(P_rv_tendf*B_rv_tendf) &
           +sum(P_u*B_u) +sum(P_v*B_v) +sum(P_muu*B_muu) +sum(P_muv*B_muv) &
           +sum(P_z*B_z) +sum(P_z_at_w*B_z_at_w)
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    print*, '                '
    write(6,*) 'a_surface_drag: '
@@ -12307,11 +12218,6 @@ END SUBROUTINE t_spec_bdyupdate
 END SUBROUTINE t_surface_drag
 
 !=======================================================================================================
-    
-
-
-!============================================================================================================
-!Zhang Xiaoyan 12/15/2006
 
   SUBROUTINE t_lscond( th_in,p,qv_in,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC_in,RAINNCV_in, &
   ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte,caller )
@@ -12506,6 +12412,12 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
     ALPHA_TST=1.
     DO NT=1,11
       ALPHA_TST=0.1*ALPHA_TST
@@ -12619,6 +12531,12 @@ END SUBROUTINE t_surface_drag
       VAL_N = VAL_N + ((P_rainncv(i,j) - B_rainncv(i,j)) * (P_rainncv(i,j) - B_rainncv(i,j)))
     ENDDO
     ENDDO
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA_TST**2
       IF (VAL_N .EQ. VAL_L) THEN
@@ -12757,7 +12675,13 @@ END SUBROUTINE t_surface_drag
       VAL_L = VAL_L + (P_rainncv(i,j) * P_rainncv(i,j))
     ENDDO
     ENDDO
-!----------xzhang -----------
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
+
     DO j = jts,jte
     DO k = kts,kte
     DO i = its,ite
@@ -12772,7 +12696,6 @@ END SUBROUTINE t_surface_drag
       rainncv(i,j)=S_rainncv(i,j)
     ENDDO
     ENDDO
-!----------xzhang -----------
 
 
 ! ADJ
@@ -12833,6 +12756,12 @@ END SUBROUTINE t_surface_drag
       VAL_A = VAL_A + (P_rainncv(i,j) * B_rainncv(i,j))
     ENDDO
     ENDDO
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    WRITE(6,FMT='(3A,E22.13)') 'lscond_ad from ',TRIM(caller),' VAL_TL: ', VAL_L
    WRITE(6,FMT='(3A,E22.13)') 'lscond_ad from ',TRIM(caller),' VAL_AD: ', VAL_A
@@ -12895,8 +12824,6 @@ END SUBROUTINE t_surface_drag
 
    INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
    INTEGER :: i, j, k
-
-!  zzma: new definition
 
 !  IN variables
    REAL,  DIMENSION(ims:ime,kms:kme,jms:jme) ::   S_al, S_p, S_ph
@@ -12967,7 +12894,6 @@ END SUBROUTINE t_surface_drag
  B_h_diabatic =h_diabatic
  B_t_new =t_new
  B_t_old =t_old
-!print*,'sum(B_rho**2)111=',sum(B_rho**2)
 
   CALL  g_moist_physics_prep_em( K_t_new, P_t_new, K_t_old, P_t_old, t0, rho, P_rho, al, P_al, alb, p, P_p, p8w, P_p8w, p0, &
 &pb, ph, P_ph, phb, pii, P_pii, pf, P_pf, z, P_z, z_at_w, P_z_at_w, dz8w, P_dz8w, dt, K_h_diabatic, P_h_diabatic, &
@@ -12983,6 +12909,11 @@ END SUBROUTINE t_surface_drag
      ENDDO
      ENDDO
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
 
    ALPHA_TST=1.
    DO NT=1,11
@@ -13016,6 +12947,12 @@ END SUBROUTINE t_surface_drag
      ENDDO
      ENDDO
      ENDDO
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA_TST**2
       COEF=VAL_N/VAL_L
@@ -13088,6 +13025,12 @@ call a_moist_physics_prep_em( K_t_new, P_t_new, K_t_old, P_t_old, t0, rho, P_rho
      ENDDO
      ENDDO
      ENDDO
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    print*, '                '
    write(6,*) 'a_prep_em: '
@@ -13247,6 +13190,12 @@ B_RQVCUTEN =RQVCUTEN
      SAVE_L=0.
      SAVE_L= sum(P_RAINCV**2) + sum(P_RTHCUTEN **2)+ sum(P_RQVCUTEN **2)
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
+
 
    ALPHA_TST=1.
    DO NT=1,11
@@ -13284,6 +13233,12 @@ B_RQVCUTEN =RQVCUTEN
 
      VAL_N=0.
      VAL_N= sum((P_RAINCV -B_RAINCV)**2) + sum((P_RTHCUTEN -B_RTHCUTEN)**2) + sum((P_RQVCUTEN -B_RQVCUTEN)**2) 
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
 
       VAL_L=SAVE_L*ALPHA_TST**2
       COEF=VAL_N/VAL_L
@@ -13347,6 +13302,12 @@ B_rho =P_rho
      VAL_L=0.
      VAL_L= sum(P_RAINCV**2) + sum(P_RTHCUTEN **2)+ sum(P_RQVCUTEN **2)
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
+
 P_TH =0.0
 P_T =0.0
 P_QV=0.0
@@ -13373,6 +13334,12 @@ P_rho =0.0
      VAL_A= sum(P_TH*B_TH)+ sum(P_T*B_T)+ sum(P_QV*B_QV)+ sum(P_dz8w*B_dz8w)  &
             + sum(P_z*B_z)+ sum(P_Pcps*B_Pcps)+ sum(P_rho*B_rho) 
 !            + sum(P_RAINCV*B_RAINCV) +sum(P_RTHCUTEN*B_RTHCUTEN) +sum(P_RQVCUTEN*B_RQVCUTEN)
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    print*, '                '
    write(6,*) 'a_CUDU: '

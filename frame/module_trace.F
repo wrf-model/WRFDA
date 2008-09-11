@@ -371,7 +371,7 @@ subroutine trace_entry(&
          end if
          if (IOStatus /= 0) then
             call trace_error("da_tracing/trace_entry.inc",160, &
-               (/"Cannot write to trace file for "//trim(Name)/))
+               (/"Cannot write to trace file for "/))
          end if
 
          if (present(Message)) then
@@ -379,7 +379,7 @@ subroutine trace_entry(&
                pad(1:TraceDepth*TraceIndentAmount),trim(Message)
             if (IOStatus .NE. 0) then
                call trace_error("da_tracing/trace_entry.inc",168, &
-                  (/"Cannot write to trace file for "//trim(Name)/))
+                  (/"Cannot write to trace file for "/))
             end if
          end if
 
@@ -389,7 +389,7 @@ subroutine trace_entry(&
                   pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
                if (IOStatus .NE. 0) then
                   call trace_error("da_tracing/trace_entry.inc",178, &
-                     (/"Cannot write to trace file for "//trim(Name)/))
+                     (/"Cannot write to trace file for "/))
                end if
             end do ! Loop
          end if
@@ -520,7 +520,7 @@ subroutine trace(&
          end if
          if (IOStatus /= 0) then
             call trace_error("da_tracing/trace.inc",102, &
-               (/"Cannot write to trace file for "//trim(Name)/))
+               (/"Cannot write to trace file for "/))
          end if
 
          if (present(Message)) then
@@ -528,7 +528,7 @@ subroutine trace(&
                pad(1:TraceDepth*TraceIndentAmount),trim(Message)
             if (IOStatus .NE. 0) then
                call trace_error("da_tracing/trace.inc",110, &
-                  (/"Cannot write to trace file for "//trim(Name)/))
+                  (/"Cannot write to trace file for "/))
             end if
          end if
 
@@ -538,7 +538,7 @@ subroutine trace(&
                   pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
                if (IOStatus .NE. 0) then
                   call trace_error("da_tracing/trace.inc",120, &
-                     (/"Cannot write to trace file for "//trim(Name)/))
+                     (/"Cannot write to trace file for "/))
                end if
             end do ! Loop
          end if
@@ -549,7 +549,7 @@ subroutine trace(&
             pad(1:TraceDepth*TraceIndentAmount)
          if (IOStatus .NE. 0) then
             call trace_error("da_tracing/trace.inc",131, &
-              (/"Cannot write to trace file for "//trim(Name)/))
+              (/"Cannot write to trace file for "/))
          end if
       end if
    end if ! trace_write
@@ -691,7 +691,7 @@ subroutine trace_exit(&
 
          if (IOStatus /= 0) then
             call trace_error("da_tracing/trace_exit.inc",134, &
-              (/"Cannot write to trace file for "//trim(Name)/))
+              (/"Cannot write to trace file for "/))
          end if
 
          if (present(Message)) then
@@ -699,7 +699,7 @@ subroutine trace_exit(&
                pad(1:TraceDepth*TraceIndentAmount),trim(Message)
             if (IOStatus .NE. 0) then
                call trace_error("da_tracing/trace_exit.inc",142, &
-                  (/"Cannot write to trace file for "//trim(Name)/))
+                  (/"Cannot write to trace file for "/))
             end if
          end if
 
@@ -709,7 +709,7 @@ subroutine trace_exit(&
                   pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
                if (IOStatus .NE. 0) then
                   call trace_error("da_tracing/trace_exit.inc",152, &
-                     (/"Cannot write to trace file for "//trim(Name)/))
+                     (/"Cannot write to trace file for "/))
                end if
             end do ! Loop
          end if
@@ -721,7 +721,7 @@ subroutine trace_exit(&
             pad(1:TraceDepth*TraceIndentAmount)
          if (IOStatus .NE. 0) then
             call trace_error("da_tracing/trace_exit.inc",164, &
-               (/"Cannot write to trace file for "//trim(Name)/))
+               (/"Cannot write to trace file for "/))
          end if
       end if
    end if ! trace_write

@@ -31,7 +31,7 @@ int GET_TERRAIN (        float *adx,
 #include <rpc/types.h>
 #include <rpc/xdr.h>
 #include <math.h>
-#ifndef MAC_G95
+#ifndef MACOS
 # include <malloc.h>
 #else
 # include <malloc/malloc.h>

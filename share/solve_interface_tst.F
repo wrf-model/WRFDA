@@ -47,14 +47,14 @@ SUBROUTINE solve_interface_tst ( grid )
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
 
-!XIAO     CALL test_solve_em ( grid , config_flags , &
-!XIAO!
-!XIAO# include <em_actual_args.inc>
-!XIAO!
-!XIAO               )
-!XIAO
-!XIAO print *,'end solve_em'  !XIAO
-!XIAO stop !XIAO
+!     CALL test_solve_em ( grid , config_flags , &
+!
+!# include <em_actual_args.inc>
+!
+!               )
+!
+! print *,'end solve_em'  !XIAO
+! stop !XIAO
 
      CALL solve_em_tst ( grid , config_flags , &
 
