@@ -53,8 +53,8 @@ SUBROUTINE solve_interface_tst ( grid )
 !
 !               )
 !
-! print *,'end solve_em'  !XIAO
-! stop !XIAO
+! print *,'end solve_em'
+! stop 
 
      CALL solve_em_tst ( grid , config_flags , &
 
@@ -115,7 +115,4 @@ SUBROUTINE solve_interface_tst ( grid )
    END IF
 
 END SUBROUTINE solve_interface_tst
-
-
-# include  <test_solve_em.int>
 

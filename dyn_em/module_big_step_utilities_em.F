@@ -775,9 +775,6 @@ SUBROUTINE calc_ww_cp ( u, v, mup, mub, ww,              &
           divv(i,k) = msft(i,j)*dnw(k)*( rdx*(muu(i+1,j)*u(i+1,k,j)-muu(i,j)*u(i,k,j))  &
                                         +rdy*(muv(i,j+1)*v(i,k,j+1)-muv(i,j)*v(i,k,j))   )
 
-!          dmdt(i) = dmdt(i) + dnw(k)* ( rdx*(ru(i+1,k,j)-ru(i,k,j))  &
-!                                       +rdy*(rv(i,k,j+1)-rv(i,k,j))   )
-
           dmdt(i) = dmdt(i) + divv(i,k)
 
 
@@ -786,11 +783,6 @@ SUBROUTINE calc_ww_cp ( u, v, mup, mub, ww,              &
 
         DO k=2,ktf
         DO i=its,itf
-
-!           ww(i,k,j)=ww(i,k-1,j)                                       &
-!                        - dnw(k-1)* ( dmdt(i)                          &
-!                                     +rdx*(ru(i+1,k-1,j)-ru(i,k-1,j))  &
-!                                     +rdy*(rv(i,k-1,j+1)-rv(i,k-1,j)) )
 
            ww(i,k,j)=ww(i,k-1,j) - dnw(k-1)*dmdt(i) - divv(i,k-1)
 
@@ -3897,9 +3889,12 @@ SUBROUTINE zero_tend ( tendency,                     &
 !
 !</DESCRIPTION>
 
-      DO j = jts, jte
-      DO k = kts, kte
-      DO i = its, ite
+!     DO j = jts, jte
+!     DO k = kts, kte
+!     DO i = its, ite
+      DO j = jms, jme
+      DO k = kms, kme
+      DO i = ims, ime
         tendency(i,k,j) = 0.
       ENDDO
       ENDDO
@@ -4577,6 +4572,7 @@ END SUBROUTINE set_tend
     ENDDO
     ENDDO
 
+!Goto 3335
 !
     DO j = j_start, j_endv
     DO i = i_start, i_end
@@ -4614,6 +4610,7 @@ END SUBROUTINE set_tend
     ENDDO
     ENDDO
 
+!3335 continue
 
    END SUBROUTINE surface_drag
 

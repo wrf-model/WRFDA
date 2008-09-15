@@ -32,7 +32,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_cu_du , only : DUCU
    USE module_microphysics_driver
    USE module_pbl_driver
-   USE module_mp_nconvp    !Xiaoyan Zhang 11/20/2006 for Large Scale Condensation
+   USE module_mp_nconvp    
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -465,7 +465,9 @@ BENCH_START(init_zero_tend_tim)
 BENCH_END(init_zero_tend_tim)
 
 #ifdef DM_PARALLEL
+      if(dyn_opt == DYN_EM) then
 #     include "HALO_EM_PHYS_A.inc"
+      endif
 #endif
 
 !<DESCRIPTION>
@@ -485,6 +487,7 @@ BENCH_END(init_zero_tend_tim)
 
 
 BENCH_START(phy_prep_tim)
+      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
       DO ij = 1 , grid%num_tiles
@@ -510,6 +513,7 @@ BENCH_START(phy_prep_tim)
                          k_start, k_end                         )
       ENDDO
       !$OMP END PARALLEL DO
+      endif
 
 BENCH_END(phy_prep_tim)
 
@@ -659,7 +663,6 @@ BENCH_START(cu_driver_tim)
             CALL wrf_debug(100,'in du_cps')
             DO ij = 1, grid%num_tiles
 
-               Print *, 'xxxx  CALL DU_CU scheme from solve_em xxxx, ij= ',ij
                CALL DUCU(                                            &
                IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
                ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
@@ -750,7 +753,9 @@ BENCH_START(comp_diff_metrics_tim)
 BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
 #  include "PERIOD_BDY_EM_A1.inc"
+       endif
 #endif
 
 BENCH_START(tke_diff_bc_tim)
@@ -799,7 +804,9 @@ BENCH_START(tke_diff_bc_tim)
 BENCH_END(tke_diff_bc_tim)
 
 #ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
 #     include "HALO_EM_TKE_C.inc"
+       endif
 #endif
 
 BENCH_START(deform_div_tim)
@@ -828,13 +835,16 @@ BENCH_END(deform_div_tim)
 
 
 #ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
 #     include "HALO_EM_TKE_D.inc"
+       endif
 #endif
 
 
 ! calculate tke, kmh, and kmv
 
 BENCH_START(calc_tke_tim)
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -858,17 +868,22 @@ BENCH_START(calc_tke_tim)
                                 k_start    , k_end                          )
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
 #     include "HALO_EM_TKE_E.inc"
+       endif
 #endif
 
      ENDIF
 
 #ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
 #      include "PERIOD_BDY_EM_PHY_BC.inc"
 #      include "PERIOD_BDY_EM_CHEM.inc"
+       endif
 #endif
 
 BENCH_START(phy_bc_tim)
@@ -1092,24 +1107,19 @@ BENCH_START(rk_tend_tim)
                          grid%i_start(ij), grid%i_end(ij),                &
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
-!--------------------------------------------------------------------------
-!Xiaoyan Zhang---  add vertical diffusion here 12/06/2006  !
 
-  IF (rk_step == 1 ) then
-
-
-     CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
-                         muu, muv,z,z_at_w,&
-                         ids, ide, jds, jde, kds, kde,                    &
-                         ims, ime, jms, jme, kms, kme,                    &
-                         grid%i_start(ij), grid%i_end(ij),                &
-                         grid%j_start(ij), grid%j_end(ij),                &
-                         k_start, k_end                                  )
-
-  ENDIF
-
-!Xiaoyan Zhang--------------    End      ----------------------------------------
-!--------------------------------------------------------------------------
+!  IF (rk_step == 1 ) then
+!
+!
+! CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+!                         muu, muv,z,z_at_w,&
+!                         ids, ide, jds, jde, kds, kde,                    &
+!                         ims, ime, jms, jme, kms, kme,                    &
+!                         grid%i_start(ij), grid%i_end(ij),                &
+!                         grid%j_start(ij), grid%j_end(ij),                &
+!                         k_start, k_end                                  )
+!
+! ENDIF
 
    END DO
    !$OMP END PARALLEL DO
@@ -2414,6 +2424,7 @@ BENCH_END(bc_end_tim)
 
  END DO Runge_Kutta_loop
 
+
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -2784,41 +2795,41 @@ BENCH_END(bc_2d_tim)
    endif
 #endif
 
-! add diagnoses. hans_xyh huang.
+! add diagnoses. 
 
-   DO ij = 1 , grid%num_tiles
+!  DO ij = 1 , grid%num_tiles
 
-     call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
-                       avg_abs_dpsdt, dpsdt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
-     call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
-                       avg_abs_dmudt, dmudt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
+!    call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
+!                      avg_abs_dpsdt, dpsdt,             &
+!                      ids, ide, jds, jde,               &
+!                      ims, ime, jms, jme,               &
+!                      grid%i_start(ij), grid%i_end(ij), &
+!                      grid%j_start(ij), grid%j_end(ij)  )
+!    call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
+!                      avg_abs_dmudt, dmudt,             &
+!                      ids, ide, jds, jde,               &
+!                      ims, ime, jms, jme,               &
+!                      grid%i_start(ij), grid%i_end(ij), &
+!                      grid%j_start(ij), grid%j_end(ij)  )
 
-     call calc_q_conv_3d ( moist_1, moist_2, dt,             &
-                           q_conve_3d,                       &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
-     call calc_q_conv_2d ( moist_2, u_2, v_2,                &
-                           dt, DX, q_conve_2d,               &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
+!    call calc_q_conv_3d ( moist_1, moist_2, dt,             &
+!                          q_conve_3d,                       &
+!                          num_3d_m,                         &
+!                          ids, ide, jds, jde, kds, kde,     &
+!                          ims, ime, jms, jme, kms, kme,     &
+!                          grid%i_start(ij), grid%i_end(ij), &
+!                          grid%j_start(ij), grid%j_end(ij), &
+!                          k_start, k_end                    )
+!    call calc_q_conv_2d ( moist_2, u_2, v_2,                &
+!                          dt, DX, q_conve_2d,               &
+!                          num_3d_m,                         &
+!                          ids, ide, jds, jde, kds, kde,     &
+!                          ims, ime, jms, jme, kms, kme,     &
+!                          grid%i_start(ij), grid%i_end(ij), &
+!                          grid%j_start(ij), grid%j_end(ij), &
+!                          k_start, k_end                    )
 
-   ENDDO
+!  ENDDO
 
    CALL wrf_debug ( 200 , ' call end of solve_em' )
 

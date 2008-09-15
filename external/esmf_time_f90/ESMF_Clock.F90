@@ -167,6 +167,7 @@
 ! !REQUIREMENTS:
 !     TMG3.1, TMG3.4.4
 !EOP
+      rc = 0
       call c_ESMC_ClockSet(clock, TimeStep, StartTime, StopTime, &
                            RefTime, rc)
       IF ( PRESENT(TimeStep) ) clock%TimeStep = TimeStep

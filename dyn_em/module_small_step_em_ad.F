@@ -1577,7 +1577,7 @@ end subroutine a_calc_p_rho
 
 subroutine a_small_step_finish( u_2, a_u_2, v_2, a_v_2, w_2, a_w_2, t_2, a_t_2, a_ph_2, a_mu_2, mut, a_mut, muts, a_muts, muu, &
 &a_muu, muus, a_muus, muv, a_muv, muvs, a_muvs, u_save, a_u_save, v_save, a_v_save, w_save, a_w_save, t_save, a_t_save, a_ph_save, &
-&a_mu_save, msfu, msfv, msft, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte )
+&a_mu_save, msfu, msfv, msft, number_of_small_timesteps, dts, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte )
 
 !******************************************************************
 !******************************************************************
@@ -1697,10 +1697,6 @@ end do
 do j = j_start, j_end
   do k = kds, kde-1
     do i = i_start, i_end
-!zzma      a_mut(i,j) = a_mut(i,j)+a_t_2(i,k,j)*(t_save(i,k,j)/muts(i,j))
-!zzma      a_muts(i,j) = a_muts(i,j)-a_t_2(i,k,j)*((t_2(i,k,j)+t_save(i,k,j)*mut(i,j))/(muts(i,j)*muts(i,j)))
-!zzma      a_t_save(i,k,j) = a_t_save(i,k,j)+a_t_2(i,k,j)*(mut(i,j)/muts(i,j))
-!zzma      a_t_2(i,k,j) = a_t_2(i,k,j)/muts(i,j)
 
       a_mut(i,j) = a_mut(i,j)+a_t_2(i,k,j)*(- dts*number_of_small_timesteps*h_diabatic(i,k,j) +t_save(i,k,j)/muts(i,j))
       a_muts(i,j) = a_muts(i,j)-a_t_2(i,k,j)*((t_2(i,k,j)- dts*number_of_small_timesteps*mut(i,j)*h_diabatic(i,k,j) &

@@ -1084,7 +1084,7 @@ end subroutine g_calc_p_rho
 
 subroutine g_small_step_finish( u_2, g_u_2, v_2, g_v_2, w_2, g_w_2, t_2, g_t_2, ph_2, g_ph_2, ww, mu_2, g_mu_2, mut, g_mut, muts, &
 &g_muts, muu, g_muu, muus, g_muus, muv, g_muv, muvs, g_muvs, u_save, g_u_save, v_save, g_v_save, w_save, g_w_save, t_save, &
-&g_t_save, ph_save, g_ph_save, mu_save, g_mu_save, msfu, msfv, msft, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&g_t_save, ph_save, g_ph_save, mu_save, g_mu_save, msfu, msfv, msft, number_of_small_timesteps, dts, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte )
 
 !******************************************************************
@@ -1159,8 +1159,8 @@ real, intent(inout) :: ww(ims:ime,kms:kme,jms:jme)
 
   REAL,   DIMENSION(ims:ime, kms:kme, jms:jme)  ::ww1,g_ww1,g_ww
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme) :: h_diabatic
-  INTEGER                   :: number_of_small_timesteps
-  REAL                      :: dts
+  INTEGER, INTENT(IN)                 :: number_of_small_timesteps
+  REAL, INTENT(IN)                    :: dts
 
 
 
@@ -1221,10 +1221,8 @@ do j = j_start, j_end
       g_ph_2(i,k,j) = g_ph_2(i,k,j)+g_ph_save(i,k,j)
       ph_2(i,k,j) = ph_2(i,k,j)+ph_save(i,k,j)
 
-!------------------------- added in May 9 -----------------
     g_ww(i,k,j) = g_ww(i,k,j) + g_ww1(i,k,j)
     ww(i,k,j) = ww(i,k,j) + ww1(i,k,j)
-!------------------------- added in May 9 -----------------
 
     end do
   end do
@@ -1232,11 +1230,7 @@ end do
 do j = j_start, j_end
   do k = kds, kde-1
     do i = i_start, i_end
-!zzma      g_t_2(i,k,j) = g_mut(i,j)*(t_save(i,k,j)/muts(i,j))-g_muts(i,j)*((t_2(i,k,j)+t_save(i,k,j)*mut(i,j))/(muts(i,j)*muts(i,j)))+&
-!zzma&g_t_2(i,k,j)/muts(i,j)+g_t_save(i,k,j)*(mut(i,j)/muts(i,j))
-!zzma      t_2(i,k,j) = (t_2(i,k,j)+t_save(i,k,j)*mut(i,j))/muts(i,j)
 
-!------------------------- rewrited in May 9 -----------------
      g_t_2(i,k,j) = (g_t_2(i,k,j) - dts*number_of_small_timesteps*g_mut(i,j)*h_diabatic(i,k,j)            &
                     + g_t_save(i,k,j)*mut(i,j) + t_save(i,k,j)*g_mut(i,j))/muts(i,j)                      &
                     -(t_2(i,k,j) - dts*number_of_small_timesteps*mut(i,j)*h_diabatic(i,k,j)+ t_save(i,k,j)*mut(i,j))*g_muts(i,j) &
@@ -1244,7 +1238,6 @@ do j = j_start, j_end
     t_2(i,k,j) = (t_2(i,k,j) - dts*number_of_small_timesteps*mut(i,j)*h_diabatic(i,k,j) &
                   + t_save(i,k,j)*mut(i,j))/muts(i,j)
 
-!------------------------- rewrited in May 9 -----------------
     end do
   end do
 end do

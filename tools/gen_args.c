@@ -134,8 +134,7 @@ gen_args1 ( FILE * fp , char * outstr , char * structname , char * corename ,
           if ( sw_deref_kludge && sw==ACTUAL ) 
 	    sprintf(indices, "%s",index_with_firstelem("(","",t2,p,post)) ;
           /* generate argument */
-	  /* strcpy(y,structname) ; strcat(y,fname) ; strcat(y,indices) ; strcat(y,",") ; */
-	  strcpy(y,structname) ; strcat(y,fname) ; strcat(y,",") ;
+	  strcpy(y,structname) ; strcat(y,fname) ; strcat(y,indices) ; strcat(y,",") ;
 	  lenarg = strlen(y) ;
 	  if ( lenarg+*linelen > MAX_ARGLINE ) { strcat(outstr," &\n") ; *linelen = 0 ; }
 	  strcat(outstr,y) ;

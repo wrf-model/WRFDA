@@ -166,7 +166,13 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
                         ims, ime, jms, jme, kms, kme,    &
                         its, ite, jts, jte, kts, kte  )
 
-   SAVE_L=sum(P_tendency(:,:,:)*P_tendency(:,:,:))
+   SAVE_L=sum(P_tendency(its:ite,kts:kte,jts:jte)*P_tendency(its:ite,kts:kte,jts:jte))
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
+#endif
 
    ALPHA=1.
    DO NT=1,11
@@ -188,8 +194,13 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              its, ite, jts, jte, kts, kte  )
-      VAL_N=sum((P_tendency(:,:,:)-B_tendency(:,:,:))*  &
-                     (P_tendency(:,:,:)-B_tendency(:,:,:)))
+      VAL_N=sum((P_tendency(its:ite,kts:kte,jts:jte)-B_tendency(its:ite,kts:kte,jts:jte))*  &
+                     (P_tendency(its:ite,kts:kte,jts:jte)-B_tendency(its:ite,kts:kte,jts:jte)))
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
+#endif
       VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
 
@@ -237,7 +248,12 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
                         ims, ime, jms, jme, kms, kme,    &
                         its, ite, jts, jte, kts, kte  )
 
-   VAL_L=sum(P_tendency(:,:,:)*P_tendency(:,:,:))
+   VAL_L=sum(P_tendency(its:ite,kts:kte,jts:jte)*P_tendency(its:ite,kts:kte,jts:jte))
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
 
    P_field(:,:,:)=0.
    P_field_old(:,:,:)=0.
@@ -257,12 +273,17 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
                         ids, ide, jds, jde, kde,         &
                         ims, ime, jms, jme, kms, kme,    &
                         its, ite, jts, jte, kts, kte  )
-   VAL_A=sum(P_field(:,:,:)*B_field(:,:,:)) + &
-         sum(P_field_old(:,:,:)*B_field_old(:,:,:))+ &
-         sum(P_tendency(:,:,:)*B_tendency(:,:,:)) + &
-         sum(P_ru(:,:,:)*B_ru(:,:,:)) +  &
-         sum(P_rv(:,:,:)*B_rv(:,:,:))+ &
-         sum(P_rom(:,:,:)*B_rom(:,:,:))
+   VAL_A=sum(P_field(its:ite,kts:kte,jts:jte)*B_field(its:ite,kts:kte,jts:jte)) + &
+         sum(P_field_old(its:ite,kts:kte,jts:jte)*B_field_old(its:ite,kts:kte,jts:jte))+ &
+         sum(P_tendency(its:ite,kts:kte,jts:jte)*B_tendency(its:ite,kts:kte,jts:jte)) + &
+         sum(P_ru(its:ite,kts:kte,jts:jte)*B_ru(its:ite,kts:kte,jts:jte)) +  &
+         sum(P_rv(its:ite,kts:kte,jts:jte)*B_rv(its:ite,kts:kte,jts:jte))+ &
+         sum(P_rom(its:ite,kts:kte,jts:jte)*B_rom(its:ite,kts:kte,jts:jte))
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
 
    print*, '                '
    write(6,*) 'a_advect_scalar: '
@@ -1688,7 +1709,7 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
 
     CALL a_rk_step_prep( config_flags, u, P_u, v, P_v, w, P_w, P_ph, mu, P_mu, moist, P_moist, P_ru, P_rv, P_rw, P_ww, P_php, &
 &P_alt, muu, P_muu, muv, P_muv, mub, mut, P_mut, P_al, P_cqu, P_cqv, P_cqw, msfu, msfv, msft, dnw, rdx, rdy, n_moist, ids, ide, &
-&jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_A=0.
    do i=its,ite
@@ -9395,7 +9416,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    CALL g_small_step_finish( K_u_2, P_u_2, K_v_2, P_v_2, K_w_2, P_w_2, K_t_2, P_t_2, K_ph_2, P_ph_2, ww, K_mu_2, P_mu_2, & 
 &K_mut, P_mut, K_muts, &
 &P_muts, K_muu, P_muu, K_muus, P_muus, K_muv, P_muv, K_muvs, P_muvs, u_save, P_u_save, v_save, P_v_save, w_save, P_w_save, t_save, &
-&P_t_save, ph_save, P_ph_save, K_mu_save, P_mu_save, msfu, msfv, msft, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_t_save, ph_save, P_ph_save, K_mu_save, P_mu_save, msfu, msfv, msft, number_of_small_timesteps, dts, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte )
 
 
@@ -9619,7 +9640,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
 
    CALL g_small_step_finish( u_2, P_u_2, v_2, P_v_2, w_2, P_w_2, t_2, P_t_2, ph_2, P_ph_2, ww, mu_2, P_mu_2,mut, P_mut, muts, &
 &P_muts, muu, P_muu, muus, P_muus, muv, P_muv, muvs, P_muvs, u_save, P_u_save, v_save, P_v_save, w_save, P_w_save, t_save, &
-&P_t_save, ph_save, P_ph_save, mu_save, P_mu_save, msfu, msfv, msft, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
+&P_t_save, ph_save, P_ph_save, mu_save, P_mu_save, msfu, msfv, msft, number_of_small_timesteps, dts, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, &
 &jts, jte )
 
    VAL_L=0.
@@ -9669,7 +9690,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
 
   CALL a_small_step_finish(K_u_2,P_u_2, K_v_2, P_v_2, K_w_2, P_w_2, K_t_2, P_t_2, P_ph_2, P_mu_2, K_mut, P_mut, K_muts, P_muts, K_muu, &
 &P_muu,K_muus,P_muus, K_muv, P_muv, K_muvs, P_muvs, u_save, P_u_save, v_save, P_v_save, w_save, P_w_save, t_save, P_t_save, P_ph_save, &
-&P_mu_save, msfu, msfv, msft, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte )
+&P_mu_save, msfu, msfv, msft, number_of_small_timesteps, dts, ide, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte )
 
    VAL_A=0.
    do i=its,ite
@@ -10455,8 +10476,8 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    CALL g_spec_bdy_scalar( scalar_tend, P_scalar_tend, scalar_bt, P_scalar_bt, spec_bdy_width, spec_zone, ijds, ijde, ids, ide, &
 &jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
-   SAVE_L=sum(P_scalar_tend(:,:,:)*P_scalar_tend(:,:,:)) + &
-          sum(P_scalar_bt(:,:,:,:)*P_scalar_bt(:,:,:,:))
+   SAVE_L=sum(P_scalar_tend(its:ite,kts:kte,jts:jte)*P_scalar_tend(its:ite,kts:kte,jts:jte)) + &
+          sum(P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)*P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4))
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
@@ -10481,8 +10502,8 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
                           its, ite, jts, jte, kts, kte)
 
 
-      VAL_N= sum((P_scalar_tend(:,:,:)-B_scalar_tend(:,:,:))*(P_scalar_tend(:,:,:)-B_scalar_tend(:,:,:))) + &
-             sum((P_scalar_bt(:,:,:,:)-B_scalar_bt(:,:,:,:))*(P_scalar_bt(:,:,:,:)-B_scalar_bt(:,:,:,:)))
+      VAL_N= sum((P_scalar_tend(its:ite,kts:kte,jts:jte)-B_scalar_tend(its:ite,kts:kte,jts:jte))*(P_scalar_tend(its:ite,kts:kte,jts:jte)-B_scalar_tend(its:ite,kts:kte,jts:jte))) + &
+             sum((P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)-B_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4))*(P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)-B_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)))
 
 #ifdef DM_PARALLEL
       call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
@@ -10510,8 +10531,8 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    CALL g_spec_bdy_scalar( scalar_tend, P_scalar_tend, scalar_bt, P_scalar_bt, spec_bdy_width, spec_zone, ijds, ijde, ids, ide, &
 &jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
-   VAL_L=sum(P_scalar_tend(:,:,:)*P_scalar_tend(:,:,:))+ &
-         sum(P_scalar_bt(:,:,:,:)*P_scalar_bt(:,:,:,:))
+   VAL_L=sum(P_scalar_tend(its:ite,kts:kte,jts:jte)*P_scalar_tend(its:ite,kts:kte,jts:jte))+ &
+         sum(P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)*P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4))
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
@@ -10524,8 +10545,8 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    CALL a_spec_bdy_scalar( P_scalar_tend, P_scalar_bt, spec_bdy_width, spec_zone, ijds, ijde, ids, ide, jds, jde, kds, kde, ims,&
 & ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
-   VAL_A=sum(P_scalar_bt(:,:,:,:)*B_scalar_bt(:,:,:,:)) + &
-         sum(P_scalar_tend(:,:,:)*B_scalar_tend(:,:,:))
+   VAL_A=sum(P_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)*B_scalar_bt(ijds:ijde,kts:kte,1:spec_bdy_width,1:4)) + &
+         sum(P_scalar_tend(its:ite,kts:kte,jts:jte)*B_scalar_tend(its:ite,kts:kte,jts:jte))
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
@@ -13006,6 +13027,11 @@ call g_moist_physics_prep_em( t_new, P_t_new, t_old, P_t_old, t0, rho, P_rho, al
      ENDDO
      ENDDO
 
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
 
  P_al  =0.0
  P_p   =0.0

@@ -37,11 +37,15 @@ use module_configure
 use module_big_step_utilities_em
 
 USE module_trace, only : trace_entry, trace_exit
+#ifdef DM_PARALLEL
+USE module_dm
+#endif
 
 !==============================================
 ! all entries are defined explicitly
 !==============================================
 implicit none
+
 
 contains
 
@@ -355,9 +359,18 @@ integer itf
 integer j
 integer jm
 integer jtf
+#ifdef DM_PARALLEL
+integer ips, ipe, jps, jpe, kps, kpe
+#endif
 
    call trace_entry("a_calc_mu_uv")
 
+#ifdef DM_PARALLEL
+ips = its
+ipe = ite
+jps = jts
+jpe = jte
+#endif
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -365,8 +378,12 @@ itf = min(ite,ide-1)
 ! recompute : itf
 jtf = jte
 ! recompute : jtf
+#ifdef DM_PARALLEL
+! xinzhang's tuning
+#include      "HALO_ADJ_RKPREP2.inc"
+#endif
 if (jts .ne. jds .and. jte .ne. jde) then
-  do j = jts, jtf
+  do j = jts, jtf+1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
       a_mu(i,j) = a_mu(i,j)+0.5*a_muv(i,j)
@@ -387,7 +404,7 @@ else if (jts .eq. jds .and. jte .ne. jde) then
     a_mu(i,jm) = a_mu(i,jm)+0.5*a_muv(i,j)
     a_muv(i,j) = 0.
   end do
-  do j = jts+1, jtf
+  do j = jts+1, jtf+1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
       a_mu(i,j) = a_mu(i,j)+0.5*a_muv(i,j)
@@ -473,7 +490,7 @@ jtf = min(jte,jde-1)
 ! recompute vars : jtf
 if (its .ne. ids .and. ite .ne. ide) then
   do j = jts, jtf
-    do i = its, itf
+    do i = its, itf+1
       a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
       a_mu(i,j) = a_mu(i,j)+0.5*a_muu(i,j)
       a_muu(i,j) = 0.
@@ -494,7 +511,7 @@ else if (its .eq. ids .and. ite .ne. ide) then
     a_muu(i,j) = 0.
   end do
   do j = jts, jtf
-    do i = its+1, itf
+    do i = its+1, itf+1
       a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
       a_mu(i,j) = a_mu(i,j)+0.5*a_muu(i,j)
       a_muu(i,j) = 0.
@@ -1023,13 +1040,13 @@ else
         do i = its, itf
           qtot = 0.
           do ispe = param_first_scalar, n_moist
-            qtot = qtot+moist(i,ka1,j,ispe)
+            qtot = qtot+moist(i,k,j,ispe)
           end do
           qf2 = 1./(1.+qtot)
           qf1 = qtot*qf2
-          p(i,ka1,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(ka1)/qf2)
-          qvf = 1.+rvovrd*moist(i,ka1,j,p_qv)
-          al(i,ka1,j) = r_d/p1000mb*(t(i,ka1,j)+t0)*qvf*((p(i,ka1,j)+pb(i,ka1,j))/p1000mb)**cvpm-alb(i,ka1,j)
+          p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
+          qvf = 1.+rvovrd*moist(i,k,j,p_qv)
+          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
 ! recompute vars : p
         do k1 = ktf-1, k-(-1), -1
@@ -1178,9 +1195,9 @@ else
           qtot = 0.
           qf2 = 1./(1.+qtot)
           qf1 = qtot*qf2
-          p(i,ka2,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(ka2)/qf2)
+          p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
           qvf = 1.
-          al(i,ka2,j) = r_d/p1000mb*(t(i,ka2,j)+t0)*qvf*((p(i,ka2,j)+pb(i,ka2,j))/p1000mb)**cvpm-alb(i,ka2,j)
+          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
 ! recompute vars : p
         do k2 = ktf-1, k-(-1), -1
@@ -1326,7 +1343,7 @@ end do
 end subroutine a_calc_php
 
 
-subroutine a_calc_ww_cp( u, a_u, v, a_v, mup, a_mup, mub, a_ww, rdx, rdy, msft, msfu, msfv, dnw, ide, jde, kde, ims, ime, jms, jme,&
+subroutine a_calc_ww_cp( u, a_u, v, a_v, mup, a_mup, mub, a_ww, rdx, rdy, msft, msfu, msfv, dnw, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme,&
 & kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -1353,12 +1370,15 @@ real, intent(inout) :: a_u(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_v(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_ww(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: dnw(kms:kme)
+integer, intent(in) :: ids
 integer, intent(in) :: ide
 integer, intent(in) :: ite
 integer, intent(in) :: its
+integer, intent(in) :: jds
 integer, intent(in) :: jde
 integer, intent(in) :: jte
 integer, intent(in) :: jts
+integer, intent(in) :: kds
 integer, intent(in) :: kde
 integer, intent(in) :: kte
 integer, intent(in) :: kts
@@ -1380,16 +1400,27 @@ real a_dmdt(its:ite)
 real a_muu(its:ite+1,jts:jte+1)
 real a_muv(its:ite+1,jts:jte+1)
 integer i
-integer itf
+integer itl,itf
 integer j
-integer jtf
+integer jtl,jtf
 integer k
 integer ktf
 real muu(its:ite+1,jts:jte+1)
 real muv(its:ite+1,jts:jte+1)
+#ifdef DM_PARALLEL
+integer ips, ipe, jps, jpe, kps, kpe
+#endif
 
    call trace_entry("a_calc_ww_cp")
 
+#ifdef DM_PARALLEL
+ips = its
+ipe = ite
+jps = jts
+jpe = jte
+kps = kts
+kpe = kte
+#endif
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
@@ -1407,21 +1438,32 @@ ktf = min(kte,kde-1)
 ! recompute : ktf
 itf = min(ite,ide-1)
 ! recompute : itf
-do j = jts, jtf
-  do i = its, min(ite+1,ide)
+#ifdef DM_PARALLEL
+itl = max(its-1,ids)
+jtl = max(jts-1,jds)
+#else
+itl = its
+jtl = jts
+#endif
+do j = jtl, jtf
+  do i = itl, min(ite+1,ide)
     muu(i,j) = 0.5*(mup(i,j)+mub(i,j)+mup(i-1,j)+mub(i-1,j))/msfu(i,j)
   end do
 end do
 ! recompute : muu
-do j = jts, min(jte+1,jde)
-  do i = its, itf
+do j = jtl, min(jte+1,jde)
+  do i = itl, itf
     muv(i,j) = 0.5*(mup(i,j)+mub(i,j)+mup(i,j-1)+mub(i,j-1))/msfv(i,j)
   end do
 end do
 ! recompute : muv
-do j = jts, jtf
+#ifdef DM_PARALLEL
+! xinzhang's tuning
+#include      "HALO_ADJ_RKPREP.inc"
+#endif
+do j = jtl, jtf
   do k = ktf, 2, -1
-    do i = its, itf
+    do i = itl, itf
       a_divv(i,k-1) = a_divv(i,k-1)-a_ww(i,k,j)
       a_dmdt(i) = a_dmdt(i)-a_ww(i,k,j)*dnw(k-1)
       a_ww(i,k-1,j) = a_ww(i,k-1,j)+a_ww(i,k,j)
@@ -1429,7 +1471,7 @@ do j = jts, jtf
     end do
   end do
   do k = ktf, kts, -1
-    do i = its, itf
+    do i = itl, itf
       a_divv(i,k) = a_divv(i,k)+a_dmdt(i)
       a_muu(i+1,j) = a_muu(i+1,j)+a_divv(i,k)*msft(i,j)*dnw(k)*rdx*u(i+1,k,j)
       a_muu(i,j) = a_muu(i,j)-a_divv(i,k)*msft(i,j)*dnw(k)*rdx*u(i,k,j)
@@ -1442,7 +1484,7 @@ do j = jts, jtf
       a_divv(i,k) = 0.
     end do
   end do
-  do i = its, ite
+  do i = itl, ite
     a_ww(i,kte,j) = 0.
     a_ww(i,1,j) = 0.
     a_dmdt(i) = 0.
@@ -6459,15 +6501,12 @@ integer, intent(in) :: jms
 integer, intent(in) :: kme
 integer, intent(in) :: kms
 real, intent(inout) :: a_al(ims:ime,kms:kme,jms:jme)
-real                :: a_alb(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_dz8w(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_h_diabatic(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_p(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_p8w(ims:ime,kms:kme,jms:jme)
-real                :: a_pb(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_pf(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_ph(ims:ime,kms:kme,jms:jme)
-real                :: a_phb(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_pii(ims:ime,kms:kme,jms:jme)
 real, intent(out)   :: a_rho(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_t_new(ims:ime,kms:kme,jms:jme)
@@ -6532,10 +6571,6 @@ real z2
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_pb(:,:,:)=0.
-a_phb(:,:,:)=0.
-a_alb(:,:,:)=0.
-
 a_w1 = 0.
 a_w2 = 0.
 a_z0 = 0.
@@ -6595,16 +6630,13 @@ do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
       a_p(i,k,j) = a_p(i,k,j)+a_pf(i,k,j)
-      a_pb(i,k,j) = a_pb(i,k,j)+a_pf(i,k,j)
       a_pf(i,k,j) = 0.
       a_z_at_w(i,k+1,j) = a_z_at_w(i,k+1,j)+0.5*a_z(i,k,j)
       a_z_at_w(i,k,j) = a_z_at_w(i,k,j)+0.5*a_z(i,k,j)
       a_z(i,k,j) = 0.
       a_p(i,k,j) = a_p(i,k,j)+a_pii(i,k,j)/p0*rcp*((p(i,k,j)+pb(i,k,j))/p0)**(rcp-1)
-      a_pb(i,k,j) = a_pb(i,k,j)+a_pii(i,k,j)/p0*rcp*((p(i,k,j)+pb(i,k,j))/p0)**(rcp-1)
       a_pii(i,k,j) = 0.
       a_al(i,k,j) = a_al(i,k,j)-a_rho(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+alb(i,k,j)))
-      a_alb(i,k,j) = a_alb(i,k,j)-a_rho(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+alb(i,k,j)))
       a_rho(i,k,j) = 0.
     end do
   end do
@@ -6627,7 +6659,6 @@ do j = j_start, j_end
   do k = k_start, kte
     do i = i_start, i_end
       a_ph(i,k,j) = a_ph(i,k,j)+a_z_at_w(i,k,j)/g
-      a_phb(i,k,j) = a_phb(i,k,j)+a_z_at_w(i,k,j)/g
       a_z_at_w(i,k,j) = 0.
     end do
   end do

@@ -81,33 +81,19 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    INTEGER :: idum1, idum2, dynamics_option
 
    INTEGER :: rk_order, iwmax, jwmax, kwmax
-   REAL :: dt_rk, dts_rk, dtm, wmax
+   REAL :: dt_rk, dts_rk, dtm, wmat
    LOGICAL :: leapfrog
    INTEGER :: l,kte,kk
 
 !--Local variables
-!Xiaoyan Zhang add
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_h_diabatic
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainnc
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainncv
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_rainc
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)                               :: g_raincv
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rqvcuten
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rthcuten
-
-!!!!!
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_z_at_wm
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_pi_phym
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_xkmhm
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_bn2m
 
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqc_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqr_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqi_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqs_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqg_btm
-
-!JM   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: g_moist_tend
 
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -185,10 +171,9 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
-!  set leapfrog or runge-kutta solver (2nd or 3rd order)
+   call trace_entry("solve_em_tl")
 
-!xyh return to be identity operation
-!   return
+!  set leapfrog or runge-kutta solver (2nd or 3rd order)
 
    dynamics_option = config_flags%rk_ord
 
@@ -214,6 +199,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
   itimestep = itimestep + 1
 
 #ifdef DM_PARALLEL
+    if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #   include "HALO_EM_INIT_1.inc"
 #   include "HALO_EM_INIT_2.inc"
 #   include "HALO_EM_INIT_3.inc"
@@ -223,6 +209,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 #   include "HALO_EM_TL_INIT_2.inc"
 #   include "HALO_EM_TL_INIT_3.inc"
 #   include "HALO_EM_TL_INIT_5.inc"
+    if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 !**********************************************************************
@@ -250,8 +237,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 !</pre>
 !</DESCRIPTION>
 !**********************************************************************
-
-   if(grid%trace_use) call trace_entry("solve_em_tl")
 
 #ifdef WRF_CHEM
 !
@@ -290,6 +275,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
     endif
 # ifdef DM_PARALLEL
    if ( num_chem >= PARAM_FIRST_SCALAR ) then
+    if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !-----------------------------------------------------------------------
 ! see above
 !--------------------------------------------------------------
@@ -302,6 +288,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
        WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
        CALL wrf_error_fatal(TRIM(wrf_err_message))
      ENDIF
+    if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
    endif
 # endif
 !--------------------------------------------------------------
@@ -380,22 +367,7 @@ BENCH_START(step_prep_tim)
    !$OMP PRIVATE ( ij )
 
    DO ij = 1 , grid%num_tiles
-#if 0
-      CALL rk_step_prep  ( config_flags, rk_step,            &
-                           u_2, v_2, w_2, t_2, ph_2, mu_2,   &
-                           moist_2,                          &
-                           ru, rv, rw, ww, php, alt, muu, muv,   &
-                           mub, mut, phb, pb, p, al, alb,    &
-                           cqu, cqv, cqw,                    &
-                           msfu, msfv, msft,                 &
-                           fnm, fnp, dnw, rdx, rdy,          &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                   )
-#endif
+
 
       call g_rk_step_prep( config_flags,                     &
                            u_2,g_u_2,v_2,g_v_2,w_2,g_w_2,    &
@@ -419,6 +391,7 @@ BENCH_START(step_prep_tim)
 BENCH_END(step_prep_tim)
 
 #ifdef DM_PARALLEL
+    if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !-----------------------------------------------------------------------
 !  Stencils for patch communications  (WCS, 29 June 2001)
 !  Note:  the small size of this halo exchange reflects the 
@@ -451,13 +424,16 @@ BENCH_END(step_prep_tim)
 !--------------------------------------------------------------
 #    include "HALO_EM_A.inc"
 #    include "HALO_EM_TL_A.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 ! set boundary conditions on variables 
 ! from big_step_prep for use in big_step_proc
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #  include "PERIOD_BDY_EM_A.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
@@ -505,30 +481,26 @@ BENCH_START(init_zero_tend_tim)
      DO ij = 1 , grid%num_tiles
 
         CALL wrf_debug ( 200 , ' call init_zero_tendency' )
-#if 0
-        CALL init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
-                                  ph_tendf, t_tendf, tke_tend,      &
-                                  moist_tend,chem_tend,             &
-                                  num_3d_m,num_3d_c,rk_step,        &
-                                  ids, ide, jds, jde, kds, kde,     &
-                                  ims, ime, jms, jme, kms, kme,     &
-                                  grid%i_start(ij), grid%i_end(ij), &
-                                  grid%j_start(ij), grid%j_end(ij), &
-                                  k_start, k_end                   )
-#endif
-      call g_init_zero_tendency ( ru_tendf,g_ru_tendf,rv_tendf,g_rv_tendf,rw_tendf,g_rw_tendf,ph_tendf,g_ph_tendf,t_tendf,g_t_tendf,&
-                                  moist_tend,g_moist_tend,num_3d_m,  &
-                                  ims, ime, jms, jme, kms, kme,     &
-                                  grid%i_start(ij), grid%i_end(ij), &
-                                  grid%j_start(ij), grid%j_end(ij), &
-                                  k_start, k_end                   )
+
+        call g_init_zero_tendency ( ru_tendf,g_ru_tendf,rv_tendf,g_rv_tendf, &
+                                    rw_tendf,g_rw_tendf,ph_tendf,g_ph_tendf, &
+                                    t_tendf,g_t_tendf,&
+                                    moist_tend,g_moist_tend,num_3d_m,  &
+                                    ims, ime, jms, jme, kms, kme,     &
+                                    grid%i_start(ij), grid%i_end(ij), &
+                                    grid%j_start(ij), grid%j_end(ij), &
+                                    k_start, k_end                   )
      END DO
    !$OMP END PARALLEL DO
 BENCH_END(init_zero_tend_tim)
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #     include "HALO_EM_PHYS_A.inc"
 #     include "HALO_EM_PHYS_TL_A.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
 !<DESCRIPTION>
@@ -548,37 +520,27 @@ BENCH_END(init_zero_tend_tim)
 
 
 BENCH_START(phy_prep_tim)
+      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
       DO ij = 1 , grid%num_tiles
 
          CALL wrf_debug ( 200 , ' call phy_prep' )
-#if 0
-         CALL phy_prep ( config_flags,                           &
-                         mut, u_2, v_2, p, pb, alt,              &
-                         ph_2, phb, t_2, tsk, moist_2, num_3d_m, &
-                         mu_3d, rho,                             &
-                         th_phy, p_phy, pi_phy, u_phy, v_phy,    &
-                         p8w, t_phy, t8w, z, z_at_w,             &
-                         dz8w, fnm, fnp,                         &    
-                         RTHRATEN,                               &
-                         RTHBLTEN, RUBLTEN, RVBLTEN,             &
-                         RQVBLTEN, RQCBLTEN, RQIBLTEN,           &
-                         RTHCUTEN, RQVCUTEN, RQCCUTEN,           &
-                         RQRCUTEN, RQICUTEN, RQSCUTEN,           &
-                         RTHFTEN,  RQVFTEN,                      &
-                         ids, ide, jds, jde, kds, kde,           &
-                         ims, ime, jms, jme, kms, kme,           &
-                         grid%i_start(ij), grid%i_end(ij),       &
-                         grid%j_start(ij), grid%j_end(ij),       &
-                         k_start, k_end                         )
-#endif
-      call g_phy_prep( p,g_p,pb,ph_2,g_ph_2,phb,t_2,g_t_2,mu_3d,rho,th_phy,g_th_phy,p_phy,g_p_phy,pi_phy,g_pi_phym,u_phy,v_phy,p8w,&
-&g_p8w,t_phy,g_t_phy,t8w,g_t8w,z,g_z,z_at_w,g_z_at_wm,dz8w,fnm,fnp,rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,&
-&rqiblten,rthcuten,rqvcuten,rqccuten,rqrcuten,rqicuten,rqscuten,rthften,rqvften,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
+         call g_phy_prep( p,g_p,pb,ph_2,g_ph_2,phb,t_2,g_t_2, &
+                          mu_3d,rho,th_phy,g_th_phy,p_phy,g_p_phy, &
+                          pi_phy,g_pi_phy,u_phy,v_phy,p8w,&
+                          g_p8w,t_phy,g_t_phy,t8w,g_t8w, &
+                          z,g_z,z_at_w,g_z_at_w,dz8w,fnm,fnp, &
+                          rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,&
+                          rqiblten,rthcuten,rqvcuten,rqccuten, &
+                          rqrcuten,rqicuten,rqscuten,rthften,rqvften, &
+                          ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                          grid%i_start(ij),grid%i_end(ij), &
+                          grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       ENDDO
       !$OMP END PARALLEL DO
+      endif
 
 BENCH_END(phy_prep_tim)
 
@@ -726,9 +688,10 @@ BENCH_START(cu_driver_tim)
 
          IF (cu_physics .eq. 5) then            !IF for CUDU
             CALL wrf_debug(100,'in du_cps')
+            g_rqvcuten(:,:,:) = 0.0
+            g_rthcuten(:,:,:) = 0.0
             DO ij = 1, grid%num_tiles
 
-               Print *, 'xxxx  CALL TL DU_CU scheme from solve_em_tl xxxx'
                do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
                do k = k_start, min(k_end, kde-1)
                do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
@@ -848,7 +811,11 @@ BENCH_START(comp_diff_metrics_tim)
 BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #  include "PERIOD_BDY_EM_A1.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
 BENCH_START(tke_diff_bc_tim)
@@ -897,8 +864,12 @@ BENCH_START(tke_diff_bc_tim)
 BENCH_END(tke_diff_bc_tim)
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #     include "HALO_EM_TKE_C.inc"
 #     include "HALO_EM_TKE_TL_C.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
 BENCH_START(deform_div_tim)
@@ -927,53 +898,57 @@ BENCH_END(deform_div_tim)
 
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #     include "HALO_EM_TKE_D.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
 
 ! calculate tke, kmh, and kmv
 
 BENCH_START(calc_tke_tim)
+       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
        DO ij = 1 , grid%num_tiles
-#if 0
           CALL wrf_debug ( 200 , ' call calculate_km_kh' )
-          CALL calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,     &
-                                xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,               &
-                                khdif,kvdif,div,                             &
-                                defor11,defor22,defor33,defor12,             &
-                                defor13,defor23,                             &
-                                tke_2(ims,kms,jms),p8w,t8w,th_phy,           &
-                                t_phy,p_phy,moist_2,dn,dnw,                  &
-                                dx,dy,rdz,rdzw,mix_cr_len,num_3d_m,          &
-                                cf1, cf2, cf3, warm_rain,                    &
-                                kh_tke_upper_bound, kv_tke_upper_bound,      &
-                                ids,ide, jds,jde, kds,kde,                   &
-                                ims,ime, jms,jme, kms,kme,                   &
-                                grid%i_start(ij), grid%i_end(ij),            &
-                                grid%j_start(ij), grid%j_end(ij),            &
-                                k_start    , k_end                          )
-#endif
-        call g_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,g_xkmhd,xkmv,xkhh,xkhv,bn2,g_bn2m,khdif,defor11,&
-&defor22,defor33,defor12,defor13,defor23,tke_2(ims,kms,jms),p8w,g_p8w,t8w,g_t8w,th_phy,g_th_phy,t_phy,g_t_phy,p_phy,&
-&g_p_phy,moist_2,g_moist_2,dx,dy,rdz,rdzw,num_3d_m,cf1,cf2,cf3,kh_tke_upper_bound,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,&
-&kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
+          call g_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt, &
+                                  xkmh,xkmhd,g_xkmhd,xkmv,xkhh,xkhv,bn2,g_bn2,khdif, &
+                                  defor11,defor22,defor33,defor12,defor13,defor23, &
+                                  tke_2(ims,kms,jms),p8w,g_p8w,t8w,g_t8w, &
+                                  th_phy,g_th_phy,t_phy,g_t_phy,p_phy,&
+                                  g_p_phy,moist_2,g_moist_2, &
+                                  dx,dy,rdz,rdzw,num_3d_m,cf1,cf2,cf3,kh_tke_upper_bound, &
+                                  ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                  grid%i_start(ij),grid%i_end(ij), &
+                                  grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ENDDO
        !$OMP END PARALLEL DO
+       endif
 BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #     include "HALO_EM_TKE_E.inc"
 #     include "HALO_EM_TKE_TL_E.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
      ENDIF
 
 #ifdef DM_PARALLEL
+     if(dyn_opt == DYN_EM) then
+       if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #      include "PERIOD_BDY_EM_PHY_BC.inc"
 #      include "PERIOD_BDY_EM_CHEM.inc"
+       if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+     endif
 #endif
 
 BENCH_START(phy_bc_tim)
@@ -1001,6 +976,7 @@ BENCH_START(phy_bc_tim)
 BENCH_END(phy_bc_tim)
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !-----------------------------------------------------------------------
 !
 ! MPP for some physics tendency, km, kh, deformation, and divergence
@@ -1043,6 +1019,7 @@ BENCH_END(phy_bc_tim)
         WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
       ENDIF
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 BENCH_START(update_phy_ten_tim)
@@ -1174,71 +1151,57 @@ BENCH_END(hor_diff_tim)
    !$OMP PRIVATE ( ij )
    DO ij = 1 , grid%num_tiles
       CALL wrf_debug ( 200 , ' call rk_tendency' )
-#if 0
-      CALL rk_tendency ( config_flags, rk_step,                           &
-                         ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
-                         ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                         mu_tend, u_save, v_save, w_save, ph_save,        &
-                         t_save, mu_save, RTHFTEN,                        &
-                         ru, rv, rw, ww,                                  &
-                         u_2, v_2, w_2, t_2, ph_2,                        &
-                         u_1, v_1, w_1, t_1, ph_1,                        &
-                         h_diabatic, phb, t_init,                         &
-                         mu_2, mut, muu, muv, mub,                        &
-                         al, alt, p, pb, php, cqu, cqv, cqw,              &
-                         u_base, v_base, t_base, qv_base, z_base,         &
-                         msfu, msfv, msft, f, e, sina, cosa,              &
-                         fnm, fnp, rdn, rdnw,                             &
-                         dt, rdx, rdy, khdif, kvdif, xkmhd,               &
-                         cf1, cf2, cf3, cfn, cfn1, num_3d_m,              &
-                         non_hydrostatic, leapfrog,                       &
-                         ids, ide, jds, jde, kds, kde,                    &
-                         ims, ime, jms, jme, kms, kme,                    &
-                         grid%i_start(ij), grid%i_end(ij),                &
-                         grid%j_start(ij), grid%j_end(ij),                &
-                         k_start, k_end                                  )
-#endif
-
-    call g_rk_tendency( config_flags,rk_step,ru_tend,g_ru_tend,rv_tend,g_rv_tend,rw_tend,g_rw_tend,ph_tend,g_ph_tend,t_tend,&
-&g_t_tend,ru_tendf,g_ru_tendf,rv_tendf,g_rv_tendf,rw_tendf,g_rw_tendf,t_tendf,g_t_tendf,mu_tend,g_mu_tend,u_save,g_u_save,&
-&v_save,g_v_save,w_save,g_w_save,ph_save,g_ph_save,t_save,g_t_save,ru,g_ru,rv,g_rv,rw,g_rw,ww,g_ww,u_2,g_u_2,v_2,g_v_2,w_2,&
-&g_w_2,t_2,g_t_2,ph_2,g_ph_2,u_1,g_u_1,v_1,g_v_1,w_1,g_w_1,t_1,g_t_1,ph_1,g_ph_1,phb,t_init,mu_2,g_mu_2,mut,g_mut,muu,g_muu,&
-&muv,g_muv,mub,al,g_al,alt,g_alt,p,g_p,pb,php,g_php,cqu,g_cqu,cqv,g_cqv,cqw,g_cqw,u_base,v_base,z_base,msfu,msfv,msft,f,e,sina,&
-&cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog,ids,ide,jds,jde,kde,ims,&
-&ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
-
-!--------------------------------------------------------------------------
-!! Xiaoyan Zhang Add surface drag TL here 11/28/2006  !!
-!--------------------------------------------------------------------------
-   IF (rk_step == 1 ) then
-   
-#if 0
-   CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
-                         muu, muv,z,z_at_w,&
-                         ids, ide, jds, jde, kds, kde,                    &
-                         ims, ime, jms, jme, kms, kme,                    &
-                         grid%i_start(ij), grid%i_end(ij),                &
-                         grid%j_start(ij), grid%j_end(ij),                &
-                         k_start, k_end                                  )
-#endif
-   
-   
-#ifdef DM_PARALLEL
-#     include "HALO_EM_SD_TL.inc"
-#endif
-
-!call TL
-  call   g_surface_drag( ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, u_2, g_u_2, v_2, g_v_2, xland, muu, g_muu, muv, &
-  &g_muv, z, g_z, z_at_w, g_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, grid%i_start(ij), grid%i_end(ij),  grid%j_start(ij), grid%j_end(ij) , k_start, k_end )
 
 
-  ENDIF
+      call g_rk_tendency( config_flags,rk_step, &
+                          ru_tend,g_ru_tend, &
+                          rv_tend,g_rv_tend, &
+                          rw_tend,g_rw_tend, &
+                          ph_tend,g_ph_tend, &
+                          t_tend,g_t_tend, &
+                          ru_tendf,g_ru_tendf, &
+                          rv_tendf,g_rv_tendf, &
+                          rw_tendf,g_rw_tendf, &
+                          t_tendf,g_t_tendf, &
+                          mu_tend,g_mu_tend, &
+                          u_save,g_u_save,&
+                          v_save,g_v_save,w_save,g_w_save, &
+                          ph_save,g_ph_save,t_save,g_t_save, &
+                          ru,g_ru,rv,g_rv,rw,g_rw,ww,g_ww, &
+                          u_2,g_u_2,v_2,g_v_2,w_2,&
+                          g_w_2,t_2,g_t_2,ph_2,g_ph_2, &
+                          u_1,g_u_1,v_1,g_v_1,w_1,g_w_1,t_1,g_t_1,ph_1,g_ph_1,phb, &
+                          t_init,mu_2,g_mu_2,mut,g_mut,muu,g_muu,&
+                          muv,g_muv,mub, &
+                          al,g_al,alt,g_alt,p,g_p,pb,php,g_php, &
+                          cqu,g_cqu,cqv,g_cqv,cqw,g_cqw, &
+                          u_base,v_base,z_base,msfu,msfv,msft,f,e,sina,&
+                          cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy, &
+                          kvdif,xkmhd,g_xkmhd,cf1,cf2,cf3,cfn,cfn1, &
+                          non_hydrostatic,leapfrog, &
+                          ids,ide,jds,jde,kde,ims,&
+                          ime,jms,jme,kms,kme, &
+                          grid%i_start(ij),grid%i_end(ij), &
+                          grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
-!--------------------------------------------------------------------------
-! End of surface drag TL
-!--------------------------------------------------------------------------
-
-
+!   IF (rk_step == 1 ) then
+!
+!      call g_surface_drag( ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, &
+!                           u_2, g_u_2, v_2, g_v_2, xland, muu, g_muu, muv, &
+!                           g_muv, z, g_z, z_at_w, g_z_at_w, &
+!                           ids, ide, jds, jde, kds, kde, &
+!                           ims, ime, jms, jme, kms, kme, &
+!                           grid%i_start(ij), grid%i_end(ij), &
+!                           grid%j_start(ij), grid%j_end(ij), k_start, k_end )
+!   
+!#ifdef DM_PARALLEL
+!     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
+!#     include "HALO_EM_SD_TL.inc"
+!     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
+!#endif
+!
+!
+!  ENDIF
 
    END DO
    !$OMP END PARALLEL DO
@@ -1250,72 +1213,41 @@ BENCH_START(relax_bdy_dry_tim)
    DO ij = 1 , grid%num_tiles
 
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
-#if 0
-       CALL relax_bdy_dry ( config_flags,                                &
-                            u_save, v_save, ph_save, t_save,             &
-                            w_save, mu_tend,                             & 
-                            ru, rv, ph_2, t_2,                           &
-                            w_2, mu_2, mut,                              &
-                            u_b, v_b, ph_b, t_b, w_b,                    &
-                            mu_b,                                        &
-                            u_bt, v_bt, ph_bt, t_bt,                     &
-                            w_bt, mu_bt,                                 &
-                            spec_bdy_width, spec_zone, relax_zone,       &
-                            dtbc, fcx, gcx,             &
-                            ijds, ijde,                 &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            ips,ipe, jps,jpe, kps,kpe,  &
-                            grid%i_start(ij), grid%i_end(ij),            &
-                            grid%j_start(ij), grid%j_end(ij),            &
-                            k_start, k_end                              )
-#endif
-      call g_relax_bdy_dry( config_flags,u_save,g_u_save,v_save,g_v_save,ph_save,g_ph_save,t_save,g_t_save,w_save,g_w_save,mu_tend,&
-&g_mu_tend,ru,g_ru,rv,g_rv,ph_2,g_ph_2,t_2,g_t_2,w_2,g_w_2,mu_2,g_mu_2,mut,g_mut,u_b,g_u_b,v_b,g_v_b,ph_b,g_ph_b,t_b,g_t_b,&
-&w_b,g_w_b,mu_b,g_mu_b,u_bt,g_u_bt,v_bt,g_v_bt,ph_bt,g_ph_bt,t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt,spec_bdy_width,spec_zone,&
-&relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
-&j_start(ij),grid%j_end(ij),k_start,k_end )
+         call g_relax_bdy_dry( config_flags, &
+                               u_save,g_u_save,v_save,g_v_save,ph_save,g_ph_save, &
+                               t_save,g_t_save,w_save,g_w_save, &
+                               mu_tend,g_mu_tend,ru,g_ru,rv,g_rv,ph_2,g_ph_2, &
+                               t_2,g_t_2,w_2,g_w_2,mu_2,g_mu_2,mut,g_mut, &
+                               u_b,g_u_b,v_b,g_v_b,ph_b,g_ph_b,t_b,g_t_b,&
+                               w_b,g_w_b,mu_b,g_mu_b,u_bt,g_u_bt,v_bt,g_v_bt, &
+                               ph_bt,g_ph_bt,t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt, &
+                               spec_bdy_width,spec_zone,&
+                               relax_zone,dtbc,fcx,gcx, &
+                               ijds,ijde, &
+                               ids,ide,jds,jde,kds,kde, &
+                               ims,ime,jms,jme,kms,kme, &
+                               grid%i_start(ij),grid%i_end(ij), &
+                               grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
      ENDIF
-#if 0
-     CALL rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
-                          ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
-                          u_save, v_save, w_save, ph_save, t_save, rk_step,&
-                          h_diabatic, mut, msft, msfu, msfv,               &
-                          ids,ide, jds,jde, kds,kde,                       &
-                          ims,ime, jms,jme, kms,kme,                       &
-                          ips,ipe, jps,jpe, kps,kpe,                       &
-                          grid%i_start(ij), grid%i_end(ij),                &
-                          grid%j_start(ij), grid%j_end(ij),                &
-                          k_start, k_end                                  )
-#endif
-    call g_rk_addtend_dry( ru_tend,g_ru_tend,rv_tend,g_rv_tend,rw_tend,g_rw_tend,ph_tend,g_ph_tend,t_tend,g_t_tend,ru_tendf,&
-&g_ru_tendf,rv_tendf,g_rv_tendf,rw_tendf,g_rw_tendf,ph_tendf,g_ph_tendf,t_tendf,g_t_tendf,u_save,g_u_save,v_save,g_v_save,&
-&w_save,g_w_save,ph_save,g_ph_save,t_save,g_t_save,rk_step,h_diabatic,mut,g_mut,msft,msfu,msfv,ide,jde,ims,ime,jms,jme,kms,kme,&
-&grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
+     call g_rk_addtend_dry( ru_tend,g_ru_tend,rv_tend,g_rv_tend,rw_tend,g_rw_tend,ph_tend,g_ph_tend, &
+                            t_tend,g_t_tend,ru_tendf,g_ru_tendf,rv_tendf,g_rv_tendf,rw_tendf,g_rw_tendf, &
+                            ph_tendf,g_ph_tendf,t_tendf,g_t_tendf,u_save,g_u_save,v_save,g_v_save, &
+                            w_save,g_w_save,ph_save,g_ph_save,t_save,g_t_save,rk_step,h_diabatic, &
+                            mut,g_mut,msft,msfu,msfv,ide,jde,ims,ime,jms,jme,kms,kme, &
+                            grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
      IF( config_flags%specified .or. config_flags%nested ) THEN 
-#if 0
-       CALL spec_bdy_dry ( config_flags,                                    &
-                           ru_tend, rv_tend, ph_tend, t_tend,               &
-                           rw_tend, mu_tend,                                &
-                           u_b, v_b, ph_b, t_b,                             &
-                           w_b, mu_b,                                       &
-                           u_bt, v_bt, ph_bt, t_bt,                         &
-                           w_bt, mu_bt,                                     &
-                           spec_bdy_width, spec_zone,                       &
-                           ijds, ijde,                 & ! min/max(id,jd)
-                           ids,ide, jds,jde, kds,kde,  & ! domain dims
-                           ims,ime, jms,jme, kms,kme,  & ! memory dims
-                           ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                           grid%i_start(ij), grid%i_end(ij),                &
-                           grid%j_start(ij), grid%j_end(ij),                &
-                           k_start, k_end                                  )
-#endif
-      call g_spec_bdy_dry( config_flags,ru_tend,g_ru_tend,rv_tend,g_rv_tend,ph_tend,g_ph_tend,t_tend,g_t_tend,rw_tend,g_rw_tend,&
-&mu_tend,g_mu_tend,u_bt,g_u_bt,v_bt,g_v_bt,ph_bt,g_ph_bt,t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt,spec_bdy_width,spec_zone,ijds,&
-&ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
-&k_start,k_end )
+         call g_spec_bdy_dry( config_flags,ru_tend,g_ru_tend,rv_tend,g_rv_tend, &
+                              ph_tend,g_ph_tend,t_tend,g_t_tend,rw_tend,g_rw_tend, &
+                              mu_tend,g_mu_tend,u_bt,g_u_bt,v_bt,g_v_bt,ph_bt,g_ph_bt, &
+                              t_bt,g_t_bt,w_bt,g_w_bt,mu_bt,g_mu_bt,spec_bdy_width,spec_zone,ijds,ijde, &
+                              ids,ide,jds,jde,kds,kde, &
+                              ims,ime,jms,jme,kms,kme, &
+                              grid%i_start(ij),grid%i_end(ij), &
+                              grid%j_start(ij),grid%j_end(ij), &
+                              k_start,k_end )
 
      ENDIF
 
@@ -1361,73 +1293,38 @@ BENCH_START(small_step_prep_tim)
     ! predictor because we may have changed the small timestep -> dts.
 
       CALL wrf_debug ( 200 , ' call calc_coef_w' )
-#if 0
-      CALL small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,          &
-                            t_1,t_2,ph_1,ph_2,                &
-                            mub, mu_1, mu_2,                  &
-                            muu, muus, muv, muvs,             &
-                            mut, muts, mudf,                  & 
-                            u_save, v_save, w_save,           & 
-                            t_save, ph_save, mu_save,         &
-                            ww, ww1,                          &
-                            dnw, c2a, pb, p, alt,             &
-                            msfu, msfv, msft,                 &
-                            rk_step, leapfrog,                &
-                            ids, ide, jds, jde, kds, kde,     &
-                            ims, ime, jms, jme, kms, kme,     &
-                            grid%i_start(ij), grid%i_end(ij), &
-                            grid%j_start(ij), grid%j_end(ij), &
-                            k_start    , k_end               )
-      CALL calc_p_rho( al, p, ph_2,                      &
-                       alt, t_2, t_save, c2a, pm1,       &
-                       mu_2, muts, znu, t0,              &
-                       rdnw, dnw, smdiv,                 &
-                       non_hydrostatic, 0,               &
-                       ids, ide, jds, jde, kds, kde,     &
-                       ims, ime, jms, jme, kms, kme,     &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij), &
-                       k_start    , k_end               )
-#endif
-    call g_small_step_prep( u_1,g_u_1,u_2,g_u_2,v_1,g_v_1,v_2,g_v_2,w_1,g_w_1,w_2,g_w_2,t_1,g_t_1,t_2,g_t_2,ph_1,g_ph_1,ph_2,&
-&g_ph_2,mub,mu_1,g_mu_1,mu_2,g_mu_2,muu,g_muu,muus,g_muus,muv,g_muv,muvs,g_muvs,mut,g_mut,muts,g_muts,mudf,g_mudf,u_save,&
-&g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,g_mu_save,ww,g_ww,ww1,g_ww1,c2a,g_c2a,pb,p,&
-&g_p,alt,g_alt,msfu,msfv,msft,rk_step,leapfrog,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
-&j_start(ij),grid%j_end(ij),k_start,k_end )
 
-    call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt,t_2,g_t_2,t_save,g_t_save,c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
-&znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+      call g_small_step_prep( u_1,g_u_1,u_2,g_u_2,v_1,g_v_1,v_2,g_v_2,w_1,g_w_1,w_2,g_w_2, &
+                              t_1,g_t_1,t_2,g_t_2,ph_1,g_ph_1,ph_2,&
+                              g_ph_2,mub,mu_1,g_mu_1,mu_2,g_mu_2,muu,g_muu,muus,g_muus,muv,g_muv, &
+                              muvs,g_muvs,mut,g_mut,muts,g_muts,mudf,g_mudf,u_save,&
+                              g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save, &
+                              mu_save,g_mu_save,ww,g_ww,ww1,g_ww1,c2a,g_c2a,pb,p,&
+                              g_p,alt,g_alt,msfu,msfv,msft,rk_step,leapfrog, &
+                              ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                              grid%i_start(ij),grid%i_end(ij), &
+                              grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+
+      call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt,t_2,g_t_2, &
+                         t_save,g_t_save,c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
+                         znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0, &
+                         ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                         grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
+                         grid%j_end(ij),k_start,k_end )
 
       IF (non_hydrostatic) THEN
-#if 0
-      CALL calc_coef_w( a,alpha,gamma,                    &
-                        mut, cqw,                         &
-                        rdn, rdnw, c2a,                   &
-                        dts_rk, g, epssm,                 &
-                        ids, ide, jds, jde, kds, kde,     &
-                        ims, ime, jms, jme, kms, kme,     &
-                        grid%i_start(ij), grid%i_end(ij), &
-                        grid%j_start(ij), grid%j_end(ij), &
-                        k_start    , k_end               )
-#endif
-
-
-      call g_calc_coef_w( a,g_a,alpha,g_alpha,gamma,g_gamma,mut,g_mut,cqw,g_cqw,rdn,rdnw,c2a,g_c2a,dts,g,epssm,ide,jde,kde,ims,ime,&
-&jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij) )
+         call g_calc_coef_w( a,g_a,alpha,g_alpha,gamma,g_gamma,mut,g_mut, &
+                             cqw,g_cqw,rdn,rdnw,c2a,g_c2a,dts,g,epssm, &
+                             ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                             grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij) )
       ENDIF
    ENDDO
 
    !$OMP END PARALLEL DO
 BENCH_END(small_step_prep_tim)
 
-!----------------
-!----------------
-!  goto 6788 !zzma
-!----------------
-
-
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !-----------------------------------------------------------------------
 !  Stencils for patch communications  (WCS, 29 June 2001)
 !  Note:  the small size of this halo exchange reflects the 
@@ -1461,6 +1358,7 @@ BENCH_END(small_step_prep_tim)
 #      include "HALO_EM_B.inc"
 #      include "HALO_EM_TL_B.inc"
 #      include "PERIOD_BDY_EM_B.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 BENCH_START(set_phys_bc2_tim)
@@ -1552,13 +1450,14 @@ BENCH_START(set_phys_bc2_tim)
     endif
 BENCH_END(set_phys_bc2_tim)
 
-
    small_steps : DO iteration = 1 , number_of_small_timesteps
 
    ! Boundary condition time (or communication time).  
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #      include "PERIOD_BDY_EM_B.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 
@@ -1568,55 +1467,28 @@ BENCH_END(set_phys_bc2_tim)
       DO ij = 1 , grid%num_tiles
 
 BENCH_START(advance_uv_tim)
-#if 0
-         CALL advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
-                           p, pb,                            &
-                           ph_2, php, alt, al, mu_2,         &
-                           muu, cqu, muv, cqv, mudf,         &
-                           rdx, rdy, dts_rk,                 &
-                           cf1, cf2, cf3, fnm, fnp,          &
-                           emdiv,                            &
-                           rdnw, config_flags,spec_zone,     &
-                           non_hydrostatic,                  &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start    , k_end               )
-#endif
-
-      call g_advance_uv( u_2,g_u_2,ru_tend,g_ru_tend,v_2,g_v_2,rv_tend,g_rv_tend,p,g_p,pb,ph_2,g_ph_2,php,g_php,alt,g_alt,al,g_al,&
-&mu_2,g_mu_2,muu,g_muu,cqu,g_cqu,muv,g_muv,cqv,g_cqv,mudf,g_mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,emdiv,rdnw,config_flags,&
-&spec_zone,non_hydrostatic,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
-&j_end(ij),k_start,k_end )
+         call g_advance_uv( u_2,g_u_2,ru_tend,g_ru_tend,v_2,g_v_2,rv_tend,g_rv_tend, &
+                            p,g_p,pb,ph_2,g_ph_2,php,g_php,alt,g_alt,al,g_al,&
+                            mu_2,g_mu_2,muu,g_muu,cqu,g_cqu,muv,g_muv,cqv,g_cqv, &
+                            mudf,g_mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,emdiv,rdnw,config_flags,&
+                            spec_zone,non_hydrostatic, &
+                            ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                            grid%i_start(ij),grid%i_end(ij), &
+                            grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(advance_uv_tim)
 
 BENCH_START(spec_bdy_uv_tim)
          IF( config_flags%specified .or. config_flags%nested ) THEN
-#if 0
-           CALL spec_bdyupdate(u_2, ru_tend, dts_rk,      &
-                               'u'         , config_flags, &
-                               spec_zone,                  &
-                               ids,ide, jds,jde, kds,kde,  & ! domain dims
-                               ims,ime, jms,jme, kms,kme,  & ! memory dims
-                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                               grid%i_start(ij), grid%i_end(ij),         &
-                               grid%j_start(ij), grid%j_end(ij),         &
-                               k_start    , k_end             )
-           CALL spec_bdyupdate(v_2, rv_tend, dts_rk,      &
-                               'v'         , config_flags, &
-                               spec_zone,                  &
-                               ids,ide, jds,jde, kds,kde,  & ! domain dims
-                               ims,ime, jms,jme, kms,kme,  & ! memory dims
-                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                               grid%i_start(ij), grid%i_end(ij),         &
-                               grid%j_start(ij), grid%j_end(ij),         &
-                               k_start    , k_end             )
-#endif
-        call g_spec_bdyupdate( u_2,g_u_2,ru_tend,g_ru_tend,dts_rk,'u',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
-        call g_spec_bdyupdate( v_2,g_v_2,rv_tend,g_rv_tend,dts_rk,'v',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+             call g_spec_bdyupdate( u_2,g_u_2,ru_tend,g_ru_tend,dts_rk, &
+                                    'u',spec_zone, &
+                                    ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+             call g_spec_bdyupdate( v_2,g_v_2,rv_tend,g_rv_tend,dts_rk, &
+                                    'v',spec_zone, &
+                                    ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
          ENDIF
 BENCH_END(spec_bdy_uv_tim)
@@ -1625,6 +1497,7 @@ BENCH_END(spec_bdy_uv_tim)
       !$OMP END PARALLEL DO
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !
 !  Stencils for patch communications  (WCS, 29 June 2001)
 !
@@ -1637,6 +1510,7 @@ BENCH_END(spec_bdy_uv_tim)
 !
 #     include "HALO_EM_C.inc"
 #     include "HALO_EM_TL_C.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
       !$OMP PARALLEL DO   &
@@ -1647,67 +1521,34 @@ BENCH_END(spec_bdy_uv_tim)
         !  advance the mass in the column, theta, and calculate ww
 
 BENCH_START(advance_mu_t_tim)
-#if 0
-        CALL advance_mu_t( ww, ww1, u_2, u_save, v_2, v_save, &
-                           mu_2, mut, muave, muts, muu, muv,  &
-                           mudf, ru_m, rv_m, ww_m,            &
-                           t_2, t_save, t_2save, t_tend,      &
-                           mu_tend,                           &
-                           rdx, rdy, dts_rk, epssm,           &
-                           dnw, fnm, fnp, rdnw,               &
-                           msfu, msfv, msft,                  &
-                           iteration, config_flags,           &
-                           ids, ide, jds, jde, kds, kde,      &
-                           ims, ime, jms, jme, kms, kme,      &
-                           grid%i_start(ij), grid%i_end(ij),  &
-                           grid%j_start(ij), grid%j_end(ij),  &
-                           k_start    , k_end                )
-#endif
-      call g_advance_mu_t( ww,g_ww,ww1,g_ww1,u_2,g_u_2,u_save,g_u_save,v_2,g_v_2,v_save,g_v_save,mu_2,g_mu_2,mut,g_mut,muave,&
-&g_muave,muts,g_muts,muu,g_muu,muv,g_muv,mudf,g_mudf,t_2,g_t_2,t_save,g_t_save,t_2save,g_t_2save,t_tend,g_t_tend,mu_tend,&
-&g_mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw,msfu,msfv,msft,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+          call g_advance_mu_t( ww,g_ww,ww1,g_ww1,u_2,g_u_2,u_save,g_u_save,v_2,g_v_2,v_save,g_v_save, &
+                               mu_2,g_mu_2,mut,g_mut,muave,&
+                               g_muave,muts,g_muts,muu,g_muu,muv,g_muv,mudf,g_mudf, &
+                               t_2,g_t_2,t_save,g_t_save,t_2save,g_t_2save,t_tend,g_t_tend,mu_tend,&
+                               g_mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw,msfu,msfv,msft, &
+                               config_flags, &
+                               ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                               grid%i_start(ij),grid%i_end(ij), &
+                               grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(advance_mu_t_tim)
 
 BENCH_START(spec_bdy_t_tim)
          IF( config_flags%specified .or. config_flags%nested ) THEN
-#if 0
-           CALL spec_bdyupdate(t_2, t_tend, dts_rk,      &
-                               't'         , config_flags, &
-                               spec_zone,                  &
-                               ids,ide, jds,jde, kds,kde,  & ! domain dims
-                               ims,ime, jms,jme, kms,kme,  & ! memory dims
-                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                               grid%i_start(ij), grid%i_end(ij),         &
-                               grid%j_start(ij), grid%j_end(ij),         &
-                               k_start    , k_end             )
-
-           CALL spec_bdyupdate(mu_2, mu_tend, dts_rk,      &
-                               'm'         , config_flags, &
-                               spec_zone,                  &
-                               ids,ide, jds,jde, 1  ,1  ,  & ! domain dims
-                               ims,ime, jms,jme, 1  ,1  ,  & ! memory dims
-                               ips,ipe, jps,jpe, 1  ,1  ,  & ! patch  dims
-                               grid%i_start(ij), grid%i_end(ij),         &
-                               grid%j_start(ij), grid%j_end(ij),         &
-                               1    , 1             )
-
-           CALL spec_bdyupdate(muts, mu_tend, dts_rk,      &
-                               'm'         , config_flags, &
-                               spec_zone,                  &
-                               ids,ide, jds,jde, 1  ,1  ,  & ! domain dims
-                               ims,ime, jms,jme, 1  ,1  ,  & ! memory dims
-                               ips,ipe, jps,jpe, 1  ,1  ,  & ! patch  dims
-                               grid%i_start(ij), grid%i_end(ij),         &
-                               grid%j_start(ij), grid%j_end(ij),         &
-                               1    , 1             )
-#endif
-        call g_spec_bdyupdate( t_2,g_t_2,t_tend,g_t_tend,dts_rk,'t',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
-        call g_spec_bdyupdate( mu_2,g_mu_2,mu_tend,g_mu_tend,dts_rk,'m',spec_zone,ids,ide,jds,jde,1,ims,ime,jms,jme,1,1,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),1,1 )
-        call g_spec_bdyupdate( muts,g_muts,mu_tend,g_mu_tend,dts_rk,'m',spec_zone,ids,ide,jds,jde,1,ims,ime,jms,jme,1,1,grid%&
-&i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),1,1 )
+             call g_spec_bdyupdate( t_2,g_t_2,t_tend,g_t_tend,dts_rk, &
+                                    't',spec_zone,ids, &
+                                    ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+             call g_spec_bdyupdate( mu_2,g_mu_2,mu_tend,g_mu_tend,dts_rk, &
+                                    'm',spec_zone, &
+                                    ids,ide,jds,jde,1,ims,ime,jms,jme,1,1, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),1,1 )
+             call g_spec_bdyupdate( muts,g_muts,mu_tend,g_mu_tend,dts_rk, &
+                                    'm',spec_zone, &
+                                    ids,ide,jds,jde,1,ims,ime,jms,jme,1,1, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),1,1 )
          ENDIF
 BENCH_END(spec_bdy_t_tim)
 
@@ -1717,22 +1558,14 @@ BENCH_END(spec_bdy_t_tim)
          ! time averaged values gives us exact scalar conservation.
 
 BENCH_START(sumflux_tim)
-#if 0
-         CALL sumflux ( u_2, v_2, ww,                         &
-                        u_save, v_save, ww1,                  &
-                        muu, muv,                             &
-                        ru_m, rv_m, ww_m, epssm,              &
-                        msfu, msfv,                           &
-                        iteration, number_of_small_timesteps, &
-                        ids, ide, jds, jde, kds, kde,         &
-                        ims, ime, jms, jme, kms, kme,         &
-                        grid%i_start(ij), grid%i_end(ij),     &
-                        grid%j_start(ij), grid%j_end(ij),     &
-                        k_start    , k_end                   )
-#endif
-      call g_sumflux( u_2,g_u_2,v_2,g_v_2,ww,g_ww,u_save,g_u_save,v_save,g_v_save,ww1,g_ww1,muu,g_muu,muv,g_muv,ru_m,g_ru_m,rv_m,&
-&g_rv_m,ww_m,g_ww_m,msfu,msfv,iteration,number_of_small_timesteps,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
-&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+         call g_sumflux( u_2,g_u_2,v_2,g_v_2,ww,g_ww, &
+                         u_save,g_u_save,v_save,g_v_save, &
+                         ww1,g_ww1,muu,g_muu,muv,g_muv, &
+                         ru_m,g_ru_m,rv_m,g_rv_m,ww_m,g_ww_m,msfu,msfv, &
+                         iteration,number_of_small_timesteps, &
+                         ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                         grid%i_start(ij),grid%i_end(ij), &
+                         grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(sumflux_tim)
 
          ! small (acoustic) step for the vertical momentum,
@@ -1741,27 +1574,18 @@ BENCH_END(sumflux_tim)
 
 BENCH_START(advance_w_tim)
         IF ( non_hydrostatic ) THEN
-#if 0
-          CALL advance_w( w_2, rw_tend, ww, u_2, v_2,       &
-                          mu_2, mut, muave, muts,           &
-                          t_2save, t_2, t_save,             &
-                          ph_2, ph_save, phb, ph_tend,      &
-                          ht, c2a, cqw, alt, alb,           &
-                          a, alpha, gamma,                  &
-                          rdx, rdy, dts_rk, t0, epssm,      &
-                          dnw, fnm, fnp, rdnw, rdn,         &
-                          cf1, cf2, cf3, msft,              &
-                          config_flags,                     &
-                          ids,ide, jds,jde, kds,kde,        & ! domain dims
-                          ims,ime, jms,jme, kms,kme,        & ! memory dims
-                          grid%i_start(ij), grid%i_end(ij), &
-                          grid%j_start(ij), grid%j_end(ij), &
-                          k_start    , k_end               )
-#endif
-        call g_advance_w( w_2,g_w_2,rw_tend,g_rw_tend,ww,g_ww,u_2,g_u_2,v_2,g_v_2,mu_2,g_mu_2,mut,g_mut,muave,g_muave,muts,g_muts,&
-&t_2save,g_t_2save,t_2,g_t_2,t_save,g_t_save,ph_2,g_ph_2,ph_save,g_ph_save,phb,ph_tend,g_ph_tend,ht,c2a,g_c2a,cqw,g_cqw,&
-&alt,g_alt,alb,a,g_a,alpha,g_alpha,gamma,g_gamma,rdx,rdy,dts,t0,epssm,fnm,fnp,rdnw,rdn,cf1,cf2,cf3,msft,config_flags,ids,&
-&ide,jds,jde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+           call g_advance_w( w_2,g_w_2,rw_tend,g_rw_tend,ww,g_ww, &
+                             u_2,g_u_2,v_2,g_v_2,mu_2,g_mu_2, &
+                             mut,g_mut,muave,g_muave,muts,g_muts,&
+                             t_2save,g_t_2save,t_2,g_t_2,t_save,g_t_save, &
+                             ph_2,g_ph_2,ph_save,g_ph_save,phb,ph_tend,g_ph_tend,ht, &
+                             c2a,g_c2a,cqw,g_cqw,&
+                             alt,g_alt,alb,a,g_a,alpha,g_alpha,gamma,g_gamma, &
+                             rdx,rdy,dts,t0,epssm,fnm,fnp,rdnw,rdn, &
+                             cf1,cf2,cf3,msft,config_flags, &
+                             ids,ide,jds,jde,ims,ime,jms,jme,kms,kme, &
+                             grid%i_start(ij),grid%i_end(ij), &
+                             grid%j_start(ij),grid%j_end(ij),k_start,k_end )
         ENDIF
 BENCH_END(advance_w_tim)
 
@@ -1769,75 +1593,40 @@ BENCH_END(advance_w_tim)
 
 BENCH_START(spec_bdynhyd_tim)
            IF (non_hydrostatic)  THEN
-#if 0
-             CALL spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
-                                     'h'         , config_flags, &
-                                     spec_zone,                  &
-                                     ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                     ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                     ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                     grid%i_start(ij), grid%i_end(ij),         &
-                                     grid%j_start(ij), grid%j_end(ij),         &
-                                     k_start    , k_end             )
-#endif
-          call g_spec_bdyupdate_ph( ph_save,g_ph_save,ph_2,g_ph_2,ph_tend,g_ph_tend,mu_tend,g_mu_tend,muts,g_muts,dts_rk,'h',&
+              call g_spec_bdyupdate_ph( ph_save,g_ph_save,ph_2,g_ph_2,ph_tend,g_ph_tend,mu_tend,g_mu_tend,muts,g_muts,dts_rk,'h',&
 &spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
 &k_start,k_end )
              IF( config_flags%specified ) THEN
-#if 0
-               CALL zero_grad_bdy ( w_2,                        &
-                                    'w'         , config_flags, &
-                                    spec_zone,                  &
-                                    ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                    ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                    ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                    grid%i_start(ij), grid%i_end(ij),         &
-                                    grid%j_start(ij), grid%j_end(ij),         &
-                                    k_start    , k_end             )
-#endif
-               call g_zero_grad_bdy( w_2,g_w_2,'w',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
-&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start )
+                 call g_zero_grad_bdy( w_2,g_w_2,'w',spec_zone, &
+                                       ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                       grid%i_start(ij),grid%i_end(ij), &
+                                       grid%j_start(ij),grid%j_end(ij),k_start )
              ELSE
-#if 0
-               CALL spec_bdyupdate   ( w_2, rw_tend, dts_rk,       &
-                                       'h'         , config_flags, &
-                                       spec_zone,                  &
-                                       ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                       ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                       ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                       grid%i_start(ij), grid%i_end(ij),         &
-                                       grid%j_start(ij), grid%j_end(ij),         &
-                                       k_start    , k_end             )
-#endif
-            call g_spec_bdyupdate( w_2,g_w_2,rw_tend,g_rw_tend,dts_rk,'h',spec_zone,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
-&grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+                call g_spec_bdyupdate( w_2,g_w_2,rw_tend,g_rw_tend,dts_rk, &
+                                       'h',spec_zone, &
+                                       ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
+                                       grid%i_start(ij),grid%i_end(ij), &
+                                       grid%j_start(ij),grid%j_end(ij),k_start,k_end )
              ENDIF
           ENDIF
 BENCH_END(spec_bdynhyd_tim)
         ENDIF
 
 BENCH_START(cald_p_rho_tim)
-#if 0
-        CALL calc_p_rho( al, p, ph_2,                      &
-                         alt, t_2, t_save, c2a, pm1,       &
-                         mu_2, muts, znu, t0,              &
-                         rdnw, dnw, smdiv,                 &
-                         non_hydrostatic, iteration,       &
-                         ids, ide, jds, jde, kds, kde,     &
-                         ims, ime, jms, jme, kms, kme,     &
-                         grid%i_start(ij), grid%i_end(ij), &
-                         grid%j_start(ij), grid%j_end(ij), &
-                         k_start    , k_end               )
-#endif
-      call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt,t_2,g_t_2,t_save,g_t_save,c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
-&znu,t0,rdnw,dnw,smdiv,non_hydrostatic,iteration,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%&
-&j_start(ij),grid%j_end(ij),k_start,k_end )
+        call g_calc_p_rho( al,g_al,p,g_p,ph_2,g_ph_2,alt,g_alt, &
+                           t_2,g_t_2,t_save,g_t_save, &
+                           c2a,g_c2a,pm1,g_pm1,mu_2,g_mu_2,muts,g_muts,&
+                           znu,t0,rdnw,dnw,smdiv,non_hydrostatic,iteration, &
+                           ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                           grid%i_start(ij),grid%i_end(ij), &
+                           grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(cald_p_rho_tim)
 
    ENDDO
    !$OMP END PARALLEL DO
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !
 !  Stencils for patch communications  (WCS, 29 June 2001)
 !
@@ -1858,6 +1647,7 @@ BENCH_END(cald_p_rho_tim)
 #      include "HALO_EM_C2.inc"
 #      include "HALO_EM_TL_C2.inc"
 #      include "PERIOD_BDY_EM_B3.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 BENCH_START(phys_bc_tim)
@@ -1921,7 +1711,6 @@ BENCH_END(phys_bc_tim)
 
    END DO small_steps
 
-
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
 
@@ -1934,38 +1723,23 @@ BENCH_END(phys_bc_tim)
       ! first get updated mu at u and v points
 
 BENCH_START(calc_mu_uv_tim)
-#if 0
-      CALL calc_mu_uv_1 ( config_flags,                     &
-                          muts, muus, muvs,                 &
-                          ids, ide, jds, jde, kds, kde,     &
-                          ims, ime, jms, jme, kms, kme,     &
-                          grid%i_start(ij), grid%i_end(ij), &
-                          grid%j_start(ij), grid%j_end(ij), &
-                          k_start    , k_end               )
-#endif
-    call g_calc_mu_uv_1( config_flags,muts,g_muts,muus,g_muus,muvs,g_muvs,ids,ide,jds,jde,ims,ime,jms,jme,grid%i_start(ij),grid%&
-&i_end(ij),grid%j_start(ij),grid%j_end(ij) )
+      call g_calc_mu_uv_1( config_flags,muts,g_muts,muus,g_muus,muvs,g_muvs, &
+                           ids,ide,jds,jde,ims,ime,jms,jme, &
+                           grid%i_start(ij),grid%i_end(ij), &
+                           grid%j_start(ij),grid%j_end(ij) )
 BENCH_END(calc_mu_uv_tim)
+
 BENCH_START(small_step_finish_tim)
-#if 0
-      CALL small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,     &
-                              t_2, t_1, ph_2, ph_1, ww, ww1,    &
-                              mu_2, mu_1,                       &
-                              mut, muts, muu, muus, muv, muvs,  & 
-                              u_save, v_save, w_save,           &
-                              t_save, ph_save, mu_save,         &
-                              msfu, msfv, msft,                 &
-                              h_diabatic,                       &
-                              number_of_small_timesteps,dts_rk, &
-                              ids, ide, jds, jde, kds, kde,     &
-                              ims, ime, jms, jme, kms, kme,     &
-                              grid%i_start(ij), grid%i_end(ij), &
-                              grid%j_start(ij), grid%j_end(ij), &
-                              k_start    , k_end               )
-#endif
-    call g_small_step_finish( u_2,g_u_2,v_2,g_v_2,w_2,g_w_2,t_2,g_t_2,ph_2,g_ph_2,ww,mu_2,g_mu_2,mut,g_mut,muts,g_muts,muu,g_muu,&
-&muus,g_muus,muv,g_muv,muvs,g_muvs,u_save,g_u_save,v_save,g_v_save,w_save,g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,&
-&g_mu_save,msfu,msfv,msft,ide,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij) )
+      call g_small_step_finish( u_2,g_u_2,v_2,g_v_2,w_2,g_w_2,t_2,g_t_2,ph_2,g_ph_2, &
+                                ww,mu_2,g_mu_2,mut,g_mut,muts,g_muts,muu,g_muu,&
+                                muus,g_muus,muv,g_muv,muvs,g_muvs, &
+                                u_save,g_u_save,v_save,g_v_save,w_save, &
+                                g_w_save,t_save,g_t_save,ph_save,g_ph_save,mu_save,&
+                                g_mu_save,msfu,msfv,msft, &
+				number_of_small_timesteps,dts_rk, &
+                                ide,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                grid%i_start(ij),grid%i_end(ij), &
+                                grid%j_start(ij),grid%j_end(ij) )
 
 
 BENCH_END(small_step_finish_tim)
@@ -1976,6 +1750,7 @@ BENCH_END(small_step_finish_tim)
 
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !
 !  Stencils for patch communications  (WCS, 29 June 2001)
 !
@@ -1987,6 +1762,7 @@ BENCH_END(small_step_finish_tim)
 
 #  include "HALO_EM_D.inc"
 #  include "HALO_EM_TL_D.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 !<DESCRIPTION>
@@ -2014,32 +1790,19 @@ BENCH_END(small_step_finish_tim)
        CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
 
 BENCH_START(rk_scalar_tend_tim)
-#if 0
-       CALL rk_scalar_tend (  im, im, config_flags,             &
-                              rk_step, dt_rk,                   &
-                              ru_m, rv_m, ww_m,                 &
-                              mut, alt,                         &
-                              moist_1(ims,kms,jms,im),          &
-                              moist_2(ims,kms,jms,im),          &
-                              moist_tend(ims,kms,jms,im),       &
-                              advect_tend,RQVFTEN,              &
-                              qv_base, .true., fnm, fnp,        &
-                              msfu, msfv, msft,                 &
-                              rdx, rdy, rdn, rdnw, khdif,       &
-                              kvdif, xkmhd,                     &
-                              leapfrog,                         &
-                              ids, ide, jds, jde, kds, kde,     &
-                              ims, ime, jms, jme, kms, kme,     &
-                              grid%i_start(ij), grid%i_end(ij), &
-                              grid%j_start(ij), grid%j_end(ij), &
-                              k_start    , k_end               )
-#endif
 
-        call g_rk_scalar_tend( im,im,config_flags,rk_step,ru_m,g_ru_m,rv_m,g_rv_m,ww_m,g_ww_m,mut,g_mut,alt,g_alt,moist_1(ims,kms,&
-&jms,im),g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),g_moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),&
-&g_moist_tend(ims,kms,jms,im),advect_tend,g_advect_tend,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,&
-&xkmhd,g_xkmhd,leapfrog,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
-&j_end(ij),k_start,k_end )
+       call g_rk_scalar_tend( im,im,config_flags,rk_step, &
+                              ru_m,g_ru_m,rv_m,g_rv_m,ww_m,g_ww_m, &
+                              mut,g_mut,alt,g_alt,moist_1(ims,kms,jms,im), &
+                              g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im), &
+                              g_moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),&
+                              g_moist_tend(ims,kms,jms,im), &
+                              advect_tend,g_advect_tend,qv_base, &
+                               .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw, &
+                              kvdif,xkmhd,g_xkmhd,leapfrog, &
+                              ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                              grid%i_start(ij),grid%i_end(ij), &
+                              grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
 BENCH_END(rk_scalar_tend_tim)
 
@@ -2047,34 +1810,12 @@ BENCH_START(rlx_bdy_scalar_tim)
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
 
        IF(im .eq. P_QV)THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqv_b, rqv_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqv_b, rqv_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqv_bt,g_rqv_bt,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+          call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                  rqv_bt,g_rqv_bt,spec_bdy_width,spec_zone, &
+                                  ijds,ijde, &
+                                  ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                  grid%i_start(ij),grid%i_end(ij), &
+                                  grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ENDIF
 
      ENDIF
@@ -2084,156 +1825,46 @@ BENCH_START(rlx_bdy_scalar_tim)
      IF( config_flags%nested .and. (rk_step == 1) ) THEN 
 
        IF (im .eq. P_QC) THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqc_b, rqc_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqc_b, rqc_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
             g_rqc_btm(:,:,:,:) = 0.
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqc_bt,g_rqc_btm,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                    rqc_bt,g_rqc_btm,spec_bdy_width,spec_zone, &
+                                    ijds,ijde, &
+                                    ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ELSE IF (im .eq. P_QR) THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqr_b, rqr_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqr_b, rqr_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
             g_rqr_btm(:,:,:,:) = 0.
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqr_bt,g_rqr_btm,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                    rqr_bt,g_rqr_btm,spec_bdy_width,spec_zone, &
+                                    ijds,ijde, &
+                                    ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ELSE IF (im .eq. P_QI) THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqi_b, rqi_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqi_b, rqi_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
             g_rqi_btm(:,:,:,:) = 0.
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqi_bt,g_rqi_btm,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                    rqi_bt,g_rqi_btm,spec_bdy_width,spec_zone, &
+                                    ijds,ijde, &
+                                    ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ELSE IF (im .eq. P_QS) THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqs_b, rqs_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqs_b, rqs_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
             g_rqs_btm(:,:,:,:) = 0.
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqs_bt,g_rqs_btm,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                    rqs_bt,g_rqs_btm,spec_bdy_width,spec_zone, &
+                                    ijds,ijde, &
+                                    ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 
        ELSE IF (im .eq. P_QG) THEN
-#if 0
-         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            & 
-                                 moist_2(ims,kms,jms,im),  mut,         &
-                                 rqg_b, rqg_bt,                         &
-                                 spec_bdy_width, spec_zone, relax_zone, &
-                                 dtbc, fcx, gcx,             &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),      &
-                                 grid%j_start(ij), grid%j_end(ij),      &
-                                 k_start, k_end                        )
-
-         CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
-                                 rqg_b, rqg_bt,                             &
-                                 spec_bdy_width, spec_zone,                 &
-                                 ijds, ijde,                 & ! min/max(id,jd)
-                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
-                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
-                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
-                                 grid%i_start(ij), grid%i_end(ij),          &
-                                 grid%j_start(ij), grid%j_end(ij),          &
-                                 k_start, k_end                               )
-#endif
             g_rqg_btm(:,:,:,:) = 0.
-            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),rqg_bt,g_rqg_btm,spec_bdy_width,&
-&spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),&
-&grid%j_end(ij),k_start,k_end )
+            call g_spec_bdy_scalar( moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                    rqg_bt,g_rqg_btm,spec_bdy_width,spec_zone, &
+                                    ijds,ijde, &
+                                    ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
+                                    grid%i_start(ij),grid%i_end(ij), &
+                                    grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ENDIF
 
      ENDIF ! b.c test for moist nested boundary condition
@@ -2251,25 +1882,14 @@ BENCH_END(rlx_bdy_scalar_tim)
        CALL wrf_debug ( 200 , ' call rk_update_scalar' )
 
 BENCH_START(update_scal_tim)
-#if 0
-       CALL rk_update_scalar( im, im,                           &
-                              moist_1(ims,kms,jms,im),          &
-                              moist_2(ims,kms,jms,im),          &
-                              moist_tend(ims,kms,jms,im),       &
-                              advect_tend, msft,                &
-                              mu_1, mu_2, mub,                  &
-                              rk_step, dt_rk, spec_zone,        &
-                              epsts, leapfrog,config_flags,     &
-                              ids, ide, jds, jde, kds, kde,     &
-                              ims, ime, jms, jme, kms, kme,     &
-                              grid%i_start(ij), grid%i_end(ij), &
-                              grid%j_start(ij), grid%j_end(ij), &
-                              k_start    , k_end               )
-#endif
-        call g_rk_update_scalar( im,im,moist_1(ims,kms,jms,im),g_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),g_moist_2(ims,kms,&
-&jms,im),moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im),advect_tend,g_advect_tend,msft,mu_1,g_mu_1,mu_2,g_mu_2,&
-&mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
-&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+       call g_rk_update_scalar( im,im,moist_1(ims,kms,jms,im),g_moist_1(ims,kms,jms,im), &
+                                moist_2(ims,kms,jms,im),g_moist_2(ims,kms,jms,im), &
+                                moist_tend(ims,kms,jms,im),g_moist_tend(ims,kms,jms,im), &
+                                advect_tend,g_advect_tend,msft,mu_1,g_mu_1,mu_2,g_mu_2,&
+                                mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags, &
+                                ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                                grid%i_start(ij),grid%i_end(ij), &
+                                grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(update_scal_tim)
 
 BENCH_START(flow_depbdy_tim)
@@ -2302,6 +1922,7 @@ BENCH_START(tke_adv_tim)
  TKE_advance: IF (km_opt .eq. 2) then
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
       IF      ( h_mom_adv_order <= 4 ) THEN
 #       include "HALO_EM_TKE_ADVECT_3.inc"
       ELSE IF ( h_mom_adv_order <= 6 ) THEN
@@ -2310,6 +1931,7 @@ BENCH_START(tke_adv_tim)
         WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
         CALL wrf_error_fatal(TRIM(wrf_err_message))
       ENDIF
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
    !$OMP PARALLEL DO   &
@@ -2484,37 +2106,22 @@ BENCH_END(tke_adv_tim)
    DO ij = 1 , grid%num_tiles
 
 BENCH_START(calc_p_rho_tim)
-#if 0
-     CALL calc_p_rho_phi( moist_2, num_3d_m,                &
-                          al, alb, mu_2, muts,              &
-                          ph_2, p, pb, t_2,                 &
-                          p0, t0, znu, dnw, rdnw,           &
-                          rdn, non_hydrostatic,             &
-                          ids, ide, jds, jde, kds, kde,     &
-                          ims, ime, jms, jme, kms, kme,     &
-                          grid%i_start(ij), grid%i_end(ij), &
-                          grid%j_start(ij), grid%j_end(ij), &
-                          k_start    , k_end               )
-#endif
-    call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb,mu_2,g_mu_2,muts,g_muts,ph_2,g_ph_2,p,g_p,pb,t_2,g_t_2,p0,t0,dnw,&
-&rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
-&k_start,k_end )
+      call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb, &
+                             mu_2,g_mu_2,muts,g_muts,ph_2,g_ph_2,p,g_p,pb,t_2,g_t_2, &
+                             p0,t0,dnw,rdnw,rdn,non_hydrostatic, &
+                             ide,jde,kde,ims,ime,jms,jme,kms,kme, &
+                             grid%i_start(ij),grid%i_end(ij), &
+                             grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(calc_p_rho_tim)
 
 BENCH_START(diag_w_tim)
      IF (.not. non_hydrostatic) THEN
-#if 0
-     CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
-                      u_2, v_2, ht,                           &
-                      cf1, cf2, cf3, rdx, rdy, msft,          &
-                      ids, ide, jds, jde, kds, kde,           &
-                      ims, ime, jms, jme, kms, kme,           &
-                      grid%i_start(ij), grid%i_end(ij),       &
-                      grid%j_start(ij), grid%j_end(ij),       &
-                      k_start    , k_end                     )
-#endif
-      call g_diagnose_w( ph_tend,g_ph_tend,ph_2,g_ph_2,ph_1,g_ph_1,w_2,g_w_2,muts,g_muts,dt_rk,u_2,g_u_2,v_2,g_v_2,ht,cf1,cf2,cf3,&
-&rdx,rdy,msft,ide,jde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_end )
+        call g_diagnose_w( ph_tend,g_ph_tend,ph_2,g_ph_2,ph_1,g_ph_1,w_2,g_w_2, &
+                           muts,g_muts,dt_rk,u_2,g_u_2,v_2,g_v_2,ht,cf1,cf2,cf3,&
+                           rdx,rdy,msft, &
+                           ide,jde,ims,ime,jms,jme,kms,kme, &
+                           grid%i_start(ij),grid%i_end(ij), &
+                           grid%j_start(ij),grid%j_end(ij),k_end )
      ENDIF
 BENCH_END(diag_w_tim)
 
@@ -2556,6 +2163,7 @@ BENCH_END(diag_w_tim)
 ! chem_2                x
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
    IF      ( h_mom_adv_order <= 4 ) THEN
 #    include "HALO_EM_D2_3.inc"
 #    include "HALO_EM_TL_D2_3.inc"
@@ -2569,6 +2177,7 @@ BENCH_END(diag_w_tim)
 #  include "PERIOD_BDY_EM_D.inc"
 #  include "PERIOD_BDY_EM_MOIST2.inc"
 #  include "PERIOD_BDY_EM_CHEM2.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 BENCH_START(bc_end_tim)
@@ -2639,6 +2248,7 @@ BENCH_END(bc_end_tim)
 
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 
       IF      ( h_mom_adv_order <= 4 ) THEN
 #       include "HALO_EM_TKE_3.inc"
@@ -2653,6 +2263,7 @@ BENCH_END(bc_end_tim)
    IF (km_opt .eq. 2) THEN
 #      include  "HALO_EM_TKE_F.inc"
    ENDIF
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
    if ( num_moist .ge. PARAM_FIRST_SCALAR ) then
@@ -2697,12 +2308,6 @@ BENCH_END(bc_end_tim)
 
    ENDIF rk_step_1_check
 
-!----------------
-!----------------
-!6788 continue !zzma
-!----------------
-
-
 !**********************************************************
 !
 !  end of RK predictor-corrector loop
@@ -2716,6 +2321,7 @@ BENCH_END(bc_end_tim)
 #if 0
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
+
 
    DO ij = 1 , grid%num_tiles
 
@@ -2734,6 +2340,7 @@ BENCH_END(advance_ppt_tim)
    ENDDO
    !$OMP END PARALLEL DO
 #endif
+
 
 !<DESCRIPTION>
 !<pre>
@@ -2917,6 +2524,7 @@ BENCH_END(time_filt_tim)
 
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
    IF      ( h_mom_adv_order <= 4 ) THEN
 #    include "HALO_EM_D3_3.inc"
 #    include "HALO_EM_TL_D3_3.inc"
@@ -2930,6 +2538,7 @@ BENCH_END(time_filt_tim)
 #  include "PERIOD_BDY_EM_D3.inc"
 #  include "PERIOD_BDY_EM_MOIST.inc"
 #  include "PERIOD_BDY_EM_CHEM.inc"
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 !  now set physical b.c on a patch
@@ -3013,11 +2622,15 @@ BENCH_START(bc_2d_tim)
    endif
 BENCH_END(bc_2d_tim)
 
+Goto 4005
    IF( config_flags%specified .or. config_flags%nested ) THEN 
      dtbc = dtbc + dt
    ENDIF
 
+4005 continue
+
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 !-----------------------------------------------------------------------
 ! see above
 !--------------------------------------------------------------
@@ -3032,9 +2645,11 @@ BENCH_END(bc_2d_tim)
      WRITE(wrf_err_message,*)'solve_em_tl: invalid h_mom_adv_order = ',h_mom_adv_order
      CALL wrf_error_fatal(TRIM(wrf_err_message))
    ENDIF
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
 #ifdef DM_PARALLEL
+     if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
    if ( num_moist >= PARAM_FIRST_SCALAR  ) then
 !-----------------------------------------------------------------------
 ! see above
@@ -3065,9 +2680,13 @@ BENCH_END(bc_2d_tim)
        CALL wrf_error_fatal(TRIM(wrf_err_message))
      ENDIF
    endif
+     if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
 #endif
 
+
    CALL wrf_debug ( 200 , ' call end of solve_em_tl' )
+
+   call trace_exit("solve_em_tl")
 
 ! Finish timers if compiled with -DBENCH.
 #include <bench_solve_em_end.h>
@@ -3077,8 +2696,6 @@ BENCH_END(bc_2d_tim)
 #include <em_scalar_derefs.inc>
 
 !----------------
-
-   if(grid%trace_use) call trace_exit("solve_em_tl")
 
    RETURN
 

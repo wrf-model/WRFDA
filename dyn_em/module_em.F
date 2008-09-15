@@ -393,6 +393,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
      IF ( config_flags%cu_physics == GDSCHEME ) THEN
 
+         CALL wrf_error_fatal ( 'Adjoint/Tangent linear is not supported in cu_physics==GDSCHEME' )
      ! theta advection only:
 
          CALL set_tend( RTHFTEN, t_tend, msft,           &
@@ -413,6 +414,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                   its, ite, jts, jte, kts, kte      )
 
   ELSE  ! leapfrog option
+
+    CALL wrf_error_fatal ( 'Adjoint/Tangent linear is not supported in leapfrog option' )
 
     CALL advect_u ( u, u_old, ru_tend, ru, rv, ww, &
                     mut, config_flags,             &
@@ -478,6 +481,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                   its, ite, jts, jte, kts, kte   )
 
   IF(config_flags%w_damping.eq.1)THEN
+    CALL wrf_error_fatal ( 'Adjoint/Tangent linear is not supported in w_damping==1' )
     CALL w_damp   ( rw_tend, ww, w, mut, rdnw, dt,  &
                     ids, ide, jds, jde, kds, kde,   &
                     ims, ime, jms, jme, kms, kme,   &
@@ -486,6 +490,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
   IF(config_flags%pert_coriolis) THEN
 
+    CALL wrf_error_fatal ( 'Adjoint/Tangent linear is not supported in pert_coriolis' )
     CALL perturbation_coriolis ( ru, rv, rw,                   &
                                  ru_tend,  rv_tend,  rw_tend,  &
                                  config_flags,                 &
@@ -594,6 +599,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
    !  Theta tendency computations.
 
       ELSE ! leapfrog diffusion
+
+        CALL wrf_error_fatal ( 'Adjoint/Tangent linear is not supported in leapfrog option' )
 
         CALL horizontal_diffusion ('u', u_old, ru_tendf, mut, config_flags, &
                                         msfu, msfv, msft,                   &
