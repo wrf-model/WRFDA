@@ -9040,8 +9040,8 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 
 !TGL test
 
-   do i=ims,ime
    do j=jms,jme
+   do i=ims,ime
       S_mu(i,j)=mu(i,j)
       P_mu(i,j)=mu(i,j)
       B_mu(i,j)=mu(i,j)
@@ -9056,8 +9056,8 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte )
 
-   do i=its,ite
-   do j=jts,jte
+   do j=jms,jme
+   do i=ims,ime
       B_muu(i,j)=muu(i,j)
       B_muv(i,j)=muv(i,j)
    enddo
@@ -9085,8 +9085,8 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
    DO NT=1,11
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
-   do i=ims,ime
    do j=jms,jme
+   do i=ims,ime
       P_mu(i,j)=FACTOR*S_mu(i,j)
    enddo
    enddo
