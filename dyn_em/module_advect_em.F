@@ -2802,6 +2802,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
   horizontal_order_test : IF( horz_order == 6 ) THEN
 
+   CALL wrf_error_fatal ( ' horz_order == 6 does not pass AD/TL check' )
 !  determine boundary mods for flux operators
 !  We degrade the flux operators from 3rd/4rth order
 !   to second order one gridpoint in from the boundaries for
@@ -3252,6 +3253,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF( horz_order == 4 ) THEN
 
+   CALL wrf_error_fatal ( ' horz_order == 4 does not pass AD/TL check' )
    degrade_xs = .true.
    degrade_xe = .true.
    degrade_ys = .true.
@@ -3412,6 +3414,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF( horz_order == 3 ) THEN
 
+   CALL wrf_error_fatal ( ' horz_order == 3 does not pass AD/TL check' )
    degrade_xs = .true.
    degrade_xe = .true.
    degrade_ys = .true.
@@ -3571,6 +3574,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF( horz_order == 2 ) THEN
 
+      CALL wrf_error_fatal ( ' horz_order == 2 does not pass AD/TL check' )
       i_start = its
       i_end   = MIN(ite,ide-1)
       j_start = jts
@@ -3704,6 +3708,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
     vert_order_test : IF (vert_order == 6) THEN    
 
+      CALL wrf_error_fatal ( ' vert_order == 6 does not pass AD/TL check' )
       DO j = j_start, j_end
 
          DO k=kts+3,ktf-2
@@ -3745,6 +3750,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF (vert_order == 5) THEN    
 
+      CALL wrf_error_fatal ( ' vert_order == 5 does not pass AD/TL check' )
       DO j = j_start, j_end
 
          DO k=kts+3,ktf-2
@@ -3786,6 +3792,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF (vert_order == 4) THEN    
 
+      CALL wrf_error_fatal ( ' vert_order == 4 does not pass AD/TL check' )
       DO j = j_start, j_end
 
          DO k=kts+2,ktf-1
@@ -3845,6 +3852,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
 
    ELSE IF (vert_order == 2) THEN    
 
+  CALL wrf_error_fatal ( ' vert_order == 2 does not pass AD/TL check' )
   DO j = j_start, j_end
      DO k = kts+1, ktf
      DO i = i_start, i_end

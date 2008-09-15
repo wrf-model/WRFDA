@@ -151,6 +151,7 @@ ktf = min(kte,kde-1)
 horz_order = config_flags%h_sca_adv_order
 vert_order = config_flags%v_sca_adv_order
 horizontal_order_tesu: if (horz_order .eq. 6) then
+  CALL wrf_error_fatal ( ' horz_order == 6 does not pass AD/TL check' )
   degrade_xs =  .true. 
   degrade_xe =  .true. 
   degrade_ys =  .true. 
@@ -497,6 +498,7 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     end do
   end do
 else if (horz_order .eq. 4) then horizontal_order_tesu
+  CALL wrf_error_fatal ( ' horz_order == 4 does not pass AD/TL check' )
   degrade_xs =  .true. 
   degrade_xe =  .true. 
   degrade_ys =  .true. 
@@ -616,6 +618,7 @@ else if (horz_order .eq. 4) then horizontal_order_tesu
     jp0 = jtmp
   end do
 else if (horz_order .eq. 3) then horizontal_order_tesu
+  CALL wrf_error_fatal ( ' horz_order == 3 does not pass AD/TL check' )
   degrade_xs =  .true. 
   degrade_xe =  .true. 
   degrade_ys =  .true. 
@@ -740,6 +743,7 @@ else if (horz_order .eq. 3) then horizontal_order_tesu
     jp0 = jtmp
   end do
 else if (horz_order .eq. 2) then horizontal_order_tesu
+  CALL wrf_error_fatal ( ' horz_order == 2 does not pass AD/TL check' )
   i_start = its
   i_end = min(ite,ide-1)
   j_start = jts
@@ -856,6 +860,7 @@ do i = i_start, i_end
   vflux(i,kte) = 0.
 end do
 vert_order_tesu: if (vert_order .eq. 6) then
+  CALL wrf_error_fatal ( ' vert_order == 6 does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts+3, ktf-2
       do i = i_start, i_end
@@ -898,6 +903,7 @@ vert_order_tesu: if (vert_order .eq. 6) then
     end do
   end do
 else if (vert_order .eq. 5) then vert_order_tesu
+  CALL wrf_error_fatal ( ' vert_order == 5 does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts+3, ktf-2
       do i = i_start, i_end
@@ -950,6 +956,7 @@ else if (vert_order .eq. 5) then vert_order_tesu
     end do
   end do
 else if (vert_order .eq. 4) then vert_order_tesu
+  CALL wrf_error_fatal ( ' vert_order == 4 does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts+2, ktf-1
       do i = i_start, i_end
@@ -1009,6 +1016,7 @@ else if (vert_order .eq. 3) then vert_order_tesu
     end do
   end do
 else if (vert_order .eq. 2) then vert_order_tesu
+  CALL wrf_error_fatal ( ' vert_order == 2 does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts+1, ktf
       do i = i_start, i_end

@@ -166,12 +166,15 @@ horz_order = config_flags%h_sca_adv_order
 vert_order = config_flags%v_sca_adv_order
 ! recompute : vert_order
 horizontal_order_tesu: if (horz_order .eq. 6) then
+  CALL wrf_error_fatal ( ' horz_order == 6 does not pass AD/TL check' )
   ktf = min(kte,kde-1)
 else if (horz_order .eq. 5) then horizontal_order_tesu
   ktf = min(kte,kde-1)
 else if (horz_order .eq. 4) then horizontal_order_tesu
+  CALL wrf_error_fatal ( ' horz_order == 4 does not pass AD/TL check' )
   ktf = min(kte,kde-1)
 else if (horz_order .eq. 3) then horizontal_order_tesu
+  CALL wrf_error_fatal ( ' horz_order == 3 does not pass AD/TL check' )
   ktf = min(kte,kde-1)
 endif horizontal_order_tesu
 ! recompute : ktf
@@ -184,6 +187,7 @@ j_start = jts
 j_end = min(jte,jde-1)
 ! recompute : j_end
 a_vert_order_test: if (vert_order .eq. 6) then
+  CALL wrf_error_fatal ( ' vert_order == 6 does not pass AD/TL check' )
   do j = j_end, j_start, -1
     do k = kts, ktf
       do i = i_start, i_end
@@ -275,6 +279,7 @@ a_vert_order_test: if (vert_order .eq. 6) then
     end do
   end do
 else if (vert_order .eq. 5) then a_vert_order_test
+  CALL wrf_error_fatal ( ' vert_order == 5 does not pass AD/TL check' )
   do j = j_end, j_start, -1
     do k = kts, ktf
       do i = i_start, i_end
@@ -369,6 +374,7 @@ else if (vert_order .eq. 5) then a_vert_order_test
     end do
   end do
 else if (vert_order .eq. 4) then a_vert_order_test
+  CALL wrf_error_fatal ( ' vert_order == 4 does not pass AD/TL check' )
   do j = j_end, j_start, -1
     do k = kts, ktf
       do i = i_start, i_end
@@ -454,6 +460,7 @@ else if (vert_order .eq. 3) then a_vert_order_test
     end do
   end do
 else if (vert_order .eq. 2) then a_vert_order_test
+  CALL wrf_error_fatal ( ' vert_order == 2 does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts, ktf
       do i = i_start, i_end
@@ -603,6 +610,7 @@ endif
 ktf = min(kte,kde-1)
 ! recompute vars : ktf
 a_horizontal_order_test: if (horz_order .eq. 6) then
+  CALL wrf_error_fatal ( ' horz_order == 6 does not pass AD/TL check' )
   degrade_xs =  .true. 
 ! recompute : degrade_xs
   degrade_xe =  .true. 
@@ -1175,6 +1183,7 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     endif
   end do a_j_loop_y_flux_5
 else if (horz_order .eq. 4) then a_horizontal_order_test
+  CALL wrf_error_fatal ( ' horz_order == 4 does not pass AD/TL check' )
   degrade_xs =  .true. 
 ! recompute : degrade_xs
   degrade_xe =  .true. 
@@ -1368,6 +1377,7 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     end do
   end do
 else if (horz_order .eq. 3) then a_horizontal_order_test
+  CALL wrf_error_fatal ( ' horz_order == 3 does not pass AD/TL check' )
   degrade_xs =  .true. 
 ! recompute : degrade_xs
   degrade_xe =  .true. 
@@ -1562,6 +1572,7 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     end do
   end do
 else if (horz_order .eq. 2) then a_horizontal_order_test
+  CALL wrf_error_fatal ( ' horz_order == 2 does not pass AD/TL check' )
   j_start = jts
 ! recompute : j_start
   j_end = min(jte,jde-1)

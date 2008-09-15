@@ -629,6 +629,9 @@ integer itf
 integer j
 integer jm
 integer jtf
+#ifdef DM_PARALLEL
+integer ips, ipe, jps, jpe, kps, kpe
+#endif
 
    call trace_entry("a_calc_mu_uv_1")
 
@@ -639,6 +642,10 @@ itf = min(ite,ide-1)
 ! recompute : itf
 jtf = jte
 ! recompute : jtf
+#ifdef DM_PARALLEL
+! xinzhang's tuning 
+#include      "HALO_ADJ_RKPREP2.inc"
+#endif
 if (jts .ne. jds .and. jte .ne. jde) then
   do j = jts, jtf
     do i = its, itf

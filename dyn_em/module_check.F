@@ -9069,8 +9069,8 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 &jte )
 
    SAVE_L=0.
-   do i=its,ite
    do j=jts,jte
+   do i=its,ite
       SAVE_L=SAVE_L + P_muu(i,j)*P_muu(i,j) + P_muv(i,j)*P_muv(i,j)
    enddo
    enddo
@@ -9098,8 +9098,8 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
                           its, ite, jts, jte, kts, kte )
 
    VAL_N=0.
-   do i=its,ite
    do j=jts,jte
+   do i=its,ite
          VAL_N=VAL_N+ (P_muu(i,j)-B_muu(i,j))*(P_muu(i,j)-B_muu(i,j))    &
                     + (P_muv(i,j)-B_muv(i,j))*(P_muv(i,j)-B_muv(i,j))
    enddo
