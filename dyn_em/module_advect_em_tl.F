@@ -794,6 +794,7 @@ i_end = min(ite,ide-1)
 j_start = jts
 j_end = min(jte,jde-1)
 if (config_flags%open_xs .and. its .eq. ids) then
+  CALL wrf_error_fatal ( ' open_xs == true does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts, ktf
       g_ub = 0.5*g_ru(its+1,k,j)*(0.5+sign(0.5,0.-0.5*(ru(its,k,j)+ru(its+1,k,j))))+0.5*g_ru(its,k,j)*(0.5+sign(0.5,0.-0.5*(ru(its,&
@@ -808,6 +809,7 @@ if (config_flags%open_xs .and. its .eq. ids) then
   end do
 endif
 if (config_flags%open_xe .and. ite .eq. ide) then
+  CALL wrf_error_fatal ( ' open_xe == true does not pass AD/TL check' )
   do j = j_start, j_end
     do k = kts, ktf
       g_ub = 0.5*g_ru(ite-1,k,j)*(0.5+sign(0.5,0.5*(ru(ite-1,k,j)+ru(ite,k,j))-0.))+0.5*g_ru(ite,k,j)*(0.5+sign(0.5,0.5*(ru(ite-1,&
@@ -822,6 +824,7 @@ if (config_flags%open_xe .and. ite .eq. ide) then
   end do
 endif
 if (config_flags%open_ys .and. jts .eq. jds) then
+  CALL wrf_error_fatal ( ' open_ys == true does not pass AD/TL check' )
   do i = i_start, i_end
     do k = kts, ktf
       g_vb = 0.5*g_rv(i,k,jts+1)*(0.5+sign(0.5,0.-0.5*(rv(i,k,jts)+rv(i,k,jts+1))))+0.5*g_rv(i,k,jts)*(0.5+sign(0.5,0.-0.5*(rv(i,k,&
@@ -836,6 +839,7 @@ if (config_flags%open_ys .and. jts .eq. jds) then
   end do
 endif
 if (config_flags%open_ye .and. jte .eq. jde) then
+  CALL wrf_error_fatal ( ' open_ye == true does not pass AD/TL check' )
   do i = i_start, i_end
     do k = kts, ktf
       g_vb = 0.5*g_rv(i,k,jte-1)*(0.5+sign(0.5,0.5*(rv(i,k,jte-1)+rv(i,k,jte))-0.))+0.5*g_rv(i,k,jte)*(0.5+sign(0.5,0.5*(rv(i,k,&

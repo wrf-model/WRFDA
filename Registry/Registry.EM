@@ -1497,6 +1497,8 @@ state    real   a_fcx            w         misc     -       -      irh02
 state    real   a_gcx            w         misc     -       -      irh02      
 state    real   a_dtbc            -        misc     -       -      irh02      
 
+state    real   a_field          ikj     dyn_em      1       -
+state    real   a_tendency       ikj     dyn_em      1       -
 #
 
 halo HALO_ADJ_A1 dyn_em  48:ru,rv,rw,ww,php,alt,al,p,muu,muv,mut
@@ -1522,6 +1524,7 @@ cosa,xkmhd,a_xkmhd,a_moist_tend,a_advect_tend
 
 halo HALO_ADJ_RKPREP dyn_em 8:a_ww
 halo HALO_ADJ_RKPREP2 dyn_em 8:a_muu, a_muv
+halo HALO_ADJ_ADVECT_SCALAR dyn_em 48:ru,rv,a_field, a_tendency
 
 state    real   g_u              ikj     dyn_em      2       X      i013rh023
 state    real   g_ru             ikj     dyn_em      1       X      -        

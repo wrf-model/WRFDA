@@ -270,7 +270,7 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
                         msft,                            &
                         fzm, fzp,                        &
                         rdx, rdy, rdzw,                  &
-                        ids, ide, jds, jde, kde,         &
+                        ids, ide, jds, jde, kds, kde,    &
                         ims, ime, jms, jme, kms, kme,    &
                         its, ite, jts, jte, kts, kte  )
    VAL_A=sum(P_field(its:ite,kts:kte,jts:jte)*B_field(its:ite,kts:kte,jts:jte)) + &
@@ -1136,7 +1136,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, phb, &
 &t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, P_cqv, &
 &K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, P_xkmhd, &
-&cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
+&cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
 &kts, kte )
 
 
@@ -10322,7 +10322,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 
    CALL a_rk_scalar_tend( scs, sce, config_flags, rk_step, ru, P_ru, rv, P_rv, ww, P_ww, mut, P_mut, alt, P_alt, scalar_old, &
 &P_scalar_old, scalar, P_scalar, P_scalar_tends, P_advect_tend, base, moist_step, fnm, fnp, msfu, msfv, msft, rdx, rdy, rdn, rdnw, &
-&kvdif, xkmhd, P_xkmhd, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&kvdif, xkmhd, P_xkmhd, leapfrog, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
 
    VAL_A=0.

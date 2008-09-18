@@ -1463,7 +1463,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                                moist_2(ims,kms,jms,im),a_moist_2(ims,kms,jms,im), &
                                a_moist_tend(ims,kms,jms,im),a_advect_tend,qv_base, .true. , &
                                fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,kvdif,xkmhd,a_xkmhd,leapfrog, &
-                               ids,ide,jds,jde,kde,&
+                               ids,ide,jds,jde,kds,kde,&
                                ims,ime,jms,jme,kms,kme, &
                                its, ite, jts, jte, k_start,k_end )
 
@@ -2020,7 +2020,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                          msfu,msfv,msft,f,e,sina,cosa,fnm,fnp,rdn,rdnw,dt, &
                          rdx,rdy,kvdif,xkmhd,a_xkmhd, &
                          cf1,cf2,cf3,cfn,cfn1,non_hydrostatic,leapfrog, &
-                         ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
+                         ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,&
                          its,ite,jts,jte,k_start,k_end )
 
 !-----Output: a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf, &
