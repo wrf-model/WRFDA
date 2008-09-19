@@ -9914,6 +9914,15 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   do j=jms,jme
+   do i=ims,ime
+      S_mut(i,j)=mut(i,j)
+
+      P_mut(i,j)=mut(i,j)
+   enddo
+   enddo
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -9930,6 +9939,9 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   scalar_tends = 0.0
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -9967,6 +9979,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
       B_scalar_tends(i,k,j,h)=scalar_tends(i,k,j,h)
    enddo
    enddo
+   enddo
+   enddo
+
+   do j=jms,jme
+   do i=ims,ime
+      B_mut(i,j)=mut(i,j)
    enddo
    enddo
 
@@ -10008,6 +10026,13 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   do j=jms,jme
+   do i=ims,ime
+      mut(i,j)=S_mut(i,j)
+   enddo
+   enddo
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -10035,20 +10060,20 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
 &jte, kts, kte )
 
    SAVE_L=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
    do h=scs,sce
+   do j=jts,jte
+   do k=kts,kte
+   do i=its,ite
       SAVE_L=SAVE_L + P_scalar_tends(i,k,j,h)*P_scalar_tends(i,k,j,h)
    enddo
    enddo
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
    do h=scs,sce
+   do j=jts,jte
+   do k=kts,kte
+   do i=its,ite
       SAVE_L=SAVE_L + P_scalar(i,k,j,h)*P_scalar(i,k,j,h)            &
                     + P_scalar_old(i,k,j,h)*P_scalar_old(i,k,j,h)
    enddo
@@ -10056,9 +10081,10 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
+
    do j=jts,jte
+   do k=kts,kte
+   do i=its,ite
       SAVE_L=SAVE_L+P_ru(i,k,j)*P_ru(i,k,j)         &
                +P_rv(i,k,j)*P_rv(i,k,j)            &
                +P_ww(i,k,j)*P_ww(i,k,j)            &
@@ -10068,6 +10094,13 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   do j=jts,jte
+   do i=its,ite
+      SAVE_L=SAVE_L+P_mut(i,j)*P_mut(i,j)
+   enddo
+   enddo
+
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
@@ -10091,6 +10124,13 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   do j=jms,jme
+   do i=ims,ime
+      P_mut(i,j)=FACTOR*S_mut(i,j)
+   enddo
+   enddo
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -10162,6 +10202,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
+   do j=jts,jte
+   do i=its,ite
+      VAL_N=VAL_N+(P_mut(i,j)-B_mut(i,j))*(P_mut(i,j)-B_mut(i,j))
+   enddo
+   enddo
+
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
@@ -10210,6 +10256,17 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+
+   do j=jms,jme
+   do i=ims,ime
+      mut(i,j)=S_mut(i,j)
+
+      P_mut(i,j)=FACTOR*S_mut(i,j)
+
+      B_mut(i,j)=P_mut(i,j)
+   enddo
+   enddo
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -10256,6 +10313,11 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
       xkmhd(i,k,j)=S_xkmhd(i,k,j)
       alt(i,k,j)=S_alt(i,k,j)
    enddo
+   enddo
+   enddo
+   do j=jms,jme
+   do i=ims,ime
+      mut(i,j)=S_mut(i,j)
    enddo
    enddo
    do i=ims,ime
@@ -10319,6 +10381,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
 
+   do j=jts,jte
+   do i=its,ite
+      VAL_L=VAL_L+P_mut(i,j)*P_mut(i,j)
+   enddo
+   enddo
+
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
@@ -10364,6 +10432,12 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    enddo
    enddo
    enddo
+   do j=jts,jte
+   do i=its,ite
+      VAL_A=VAL_A+P_mut(i,j)*B_mut(i,j)
+   enddo
+   enddo
+
 
 #ifdef DM_PARALLEL
    call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &

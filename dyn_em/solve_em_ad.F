@@ -432,8 +432,7 @@ num_3d_c = 1
   if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
-! if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
-  if (.false.) then
+  if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
 !---Save for calculate_km_kh:
     if(grid%trace_use) call trace_entry("backup")
     call push4backup(xkmh,xkmhd,xkmv,xkhh,xkhv,bn2, "xkmh,xkmhd,xkmv,xkhh,xkhv,bn2")
@@ -2042,9 +2041,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     jts = max(grid%j_start(ij)-1,jds)
     jte = min(grid%j_end(ij)+1,jde)
 
-!   if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
-    if (.false.) then
-
+    if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
 !-------Resotore for a_calculate_km_kh:
         if(grid%trace_use) call trace_entry("restore")
         call pop2restore(moist_2, "moist_2")
@@ -2072,7 +2069,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 #include "HALO_A_CALCULATE_KM_KH.inc"
         if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
-    endif
+  endif
 
 !-Save for: phy_prep:
   if(grid%trace_use) call trace_entry("restore")

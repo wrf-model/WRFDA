@@ -916,8 +916,6 @@ BENCH_END(deform_div_tim)
 ! calculate tke, kmh, and kmv
 
 BENCH_START(calc_tke_tim)
-       if(dyn_opt == DYN_EM) then
-!      if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -960,7 +958,6 @@ BENCH_START(calc_tke_tim)
                                 k_start    , k_end                          )
        ENDDO
        !$OMP END PARALLEL DO
-       endif
 BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL

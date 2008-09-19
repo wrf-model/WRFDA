@@ -909,7 +909,6 @@ BENCH_END(deform_div_tim)
 ! calculate tke, kmh, and kmv
 
 BENCH_START(calc_tke_tim)
-       if(dyn_opt == DYN_EM) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
 
@@ -928,16 +927,13 @@ BENCH_START(calc_tke_tim)
                                   grid%j_start(ij),grid%j_end(ij),k_start,k_end )
        ENDDO
        !$OMP END PARALLEL DO
-       endif
 BENCH_END(calc_tke_tim)
 
 #ifdef DM_PARALLEL
-     if(dyn_opt == DYN_EM) then
        if(grid%trace_use) call trace_entry("solve_tl_halo_comm")
 #     include "HALO_EM_TKE_E.inc"
 #     include "HALO_EM_TKE_TL_E.inc"
        if(grid%trace_use) call trace_exit("solve_tl_halo_comm")
-     endif
 #endif
 
      ENDIF
