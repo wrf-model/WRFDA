@@ -7095,6 +7095,12 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 
    do i=ims,ime
    do j=jms,jme
+      muave(i,j)= 0.0
+   enddo
+   enddo
+
+   do i=ims,ime
+   do j=jms,jme
       S_muave(i,j)=muave(i,j)
       S_muts(i,j)=muts(i,j)
       S_mudf(i,j)=mudf(i,j)
@@ -7224,6 +7230,7 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
                     + P_mudf(i,j)*P_mudf(i,j)
    enddo
    enddo
+          
    do i=its,ite
    do k=kts,kte
    do j=jts,jte
@@ -7583,7 +7590,7 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
 
    CALL a_advance_mu_t( ww, P_ww, ww_1, P_ww_1, u, P_u, u_1, P_u_1, v, P_v, v_1, P_v_1, P_mu, P_mut, P_muave, P_muts, muu, &
 &P_muu, muv, P_muv, P_mudf, P_t, t_1, P_t_1, P_t_ave, P_ft, mu_tend, P_mu_tend, rdx, rdy, dts, epssm, dnw, fnm, fnp, rdnw, msfu, &
-&msfv, msft, config_flags, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&msfv, msft, config_flags, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_A=0.
    do i=its,ite

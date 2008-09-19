@@ -1525,6 +1525,7 @@ cosa,xkmhd,a_xkmhd,a_moist_tend,a_advect_tend
 halo HALO_ADJ_RKPREP dyn_em 8:a_ww
 halo HALO_ADJ_RKPREP2 dyn_em 8:a_muu, a_muv
 halo HALO_ADJ_ADVECT_SCALAR dyn_em 48:ru,rv,a_field, a_tendency
+halo HALO_ADJ_ADVANCE_MU_T dyn_em 48:a_mu, a_muave, a_mudf, a_muts, a_t, a_t_1, a_u, a_v, a_u_1, a_v_1
 
 state    real   g_u              ikj     dyn_em      2       X      i013rh023
 state    real   g_ru             ikj     dyn_em      1       X      -        

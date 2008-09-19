@@ -1721,7 +1721,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                            a_t_2,t_save,a_t_save,a_t_2save,a_t_tend, &
                            mu_tend,a_mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw, &
                            msfu,msfv,msft,config_flags, &
-                           ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
+                           ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
                            its,ite,jts,jte,k_start,k_end )
 
 !-----Output: a_ww,a_ww1,a_u_2,a_u_save,a_v_2,a_v_save
