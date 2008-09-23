@@ -709,6 +709,11 @@ subroutine a_advance_w( w, a_w, rw_tend, a_rw_tend, ww, a_ww, u, a_u, v, a_v, mu
 !** FastOpt: Transformation of Algorithm in Fortran, TAF 1.7.18  **
 !******************************************************************
 !******************************************************************
+
+#ifdef DM_PARALLEL
+use module_dm
+#endif
+
 !==============================================
 ! all entries are defined explicitly
 !==============================================
@@ -796,9 +801,15 @@ real, intent(in) :: ww(ims:ime,kms:kme,jms:jme)
 !==============================================
 ! declare local variables
 !==============================================
+#ifdef DM_PARALLEL
+real a_mut_inv(its-1:ite)
+real a_rhs(its-1:ite,kts:kte)
+real a_wdwn(its-1:ite,kts:kte)
+#else
 real a_mut_inv(its:ite)
 real a_rhs(its:ite,kts:kte)
 real a_wdwn(its:ite,kts:kte)
+#endif
 integer i
 integer i_end
 integer i_start
@@ -807,19 +818,38 @@ integer j_end
 integer j_start
 integer k
 integer k_end
+#ifdef DM_PARALLEL
+real msft_inv(its-1:ite)
+real mut_inv(its-1:ite)
+real rhs(its-1:ite,kts:kte)
+real wdwn(its-1:ite,kts:kte)
+#else
 real msft_inv(its:ite)
 real mut_inv(its:ite)
 real rhs(its:ite,kts:kte)
-real t_2aveh(ims:ime,kms:kme,jms:jme)
 real wdwn(its:ite,kts:kte)
+#endif
+real t_2aveh(ims:ime,kms:kme,jms:jme)
 real wh(ims:ime,kms:kme,jms:jme)
-!mzz
 real keep1_w(ims:ime,kms:kme,jms:jme)
 real keep2_w(ims:ime,kms:kme,jms:jme)
 real keep3_w(ims:ime,kms:kme,jms:jme)
-!mzz
+#ifdef DM_PARALLEL
+integer ips, ipe, jps, jpe, kps, kpe, kds, kde
+#endif
 
    call trace_entry("a_advance_w")
+
+#ifdef DM_PARALLEL
+ips = its
+ipe = ite
+jps = jts
+jpe = jte
+kps = kts
+kpe = kte
+kds = kts
+kde = kte
+#endif
 
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
@@ -857,6 +887,8 @@ endif
 ! recompute : i_end
 if ((config_flags%specified .or. config_flags%nested) .and. its .eq. ids) then
   i_start = i_start+1
+else
+  i_start = i_start-1
 endif
 ! recompute : i_start
 if ((config_flags%specified .or. config_flags%nested) .and. ite .eq. ide) then
@@ -865,11 +897,18 @@ endif
 ! recompute : i_end
 if ((config_flags%specified .or. config_flags%nested) .and. jts .eq. jds) then
   j_start = j_start+1
+else
+  j_start = j_start-1
 endif
 ! recompute : j_start
 if ((config_flags%specified .or. config_flags%nested) .and. jte .eq. jde) then
   j_end = j_end-1
 endif
+
+#ifdef DM_PARALLEL
+!xinzhang parallel tuning
+#include "HALO_ADJ_ADVANCE_W.inc" 
+#endif
 ! recompute : j_end
 do j = j_start, j_end
   DO i=i_start, i_end
@@ -931,19 +970,15 @@ do j = j_start, j_end
 ! recompute : w
   do k = 2, k_end+1
     do i = i_start, i_end
-!mzz
-    keep1_w(i,k-1,j) =w(i,k-1,j)
-    keep2_w(i,k,j) =w(i,k,j)
-!mzz
+      keep1_w(i,k-1,j) =w(i,k-1,j)
+      keep2_w(i,k,j) =w(i,k,j)
       w(i,k,j) = (w(i,k,j)-a(i,k,j)*w(i,k-1,j))*alpha(i,k,j)
     end do
   end do
 ! recompute : w
   do k = k_end, 2, -1
     do i = i_start, i_end
-!mzz
-    keep3_w(i,k+1,j) =w(i,k+1,j)  
-!mzz
+      keep3_w(i,k+1,j) =w(i,k+1,j)  
       w(i,k,j) = w(i,k,j)-gamma(i,k,j)*w(i,k+1,j)
     end do
   end do
@@ -1012,9 +1047,7 @@ do j = j_start, j_end
 #endif
   do k = 2, k_end
     do i = i_start, i_end
-!mzz
-    w(i,k+1,j) =keep3_w(i,k+1,j)  
-!mzz
+      w(i,k+1,j) =keep3_w(i,k+1,j)  
       a_gamma(i,k,j) = a_gamma(i,k,j)-a_w(i,k,j)*w(i,k+1,j)
       a_w(i,k+1,j) = a_w(i,k+1,j)-a_w(i,k,j)*gamma(i,k,j)
     end do
@@ -1065,10 +1098,8 @@ do j = j_start, j_end
 #endif
   do k = k_end+1, 2, -1
     do i = i_start, i_end
-!mzz
-     w(i,k-1,j)=keep1_w(i,k-1,j) 
-     w(i,k,j)=keep2_w(i,k,j) 
-!mzz
+      w(i,k-1,j)=keep1_w(i,k-1,j) 
+      w(i,k,j)=keep2_w(i,k,j) 
       a_a(i,k,j) = a_a(i,k,j)-a_w(i,k,j)*w(i,k-1,j)*alpha(i,k,j)
       a_alpha(i,k,j) = a_alpha(i,k,j)+a_w(i,k,j)*(w(i,k,j)-a(i,k,j)*w(i,k-1,j))
       a_w(i,k-1,j) = a_w(i,k-1,j)-a_w(i,k,j)*a(i,k,j)*alpha(i,k,j)
