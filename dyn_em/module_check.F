@@ -9053,6 +9053,9 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 
 !TGL test
 
+   P_muu = 0.0
+   P_muv = 0.0
+
    do j=jms,jme
    do i=ims,ime
       S_mu(i,j)=mu(i,j)
