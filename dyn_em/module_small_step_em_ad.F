@@ -447,10 +447,10 @@ integer j_start_vp
 integer k
 integer k_end
 integer k_start
-#ifdef DM_PARALLEL
 integer i_end_parallel, j_end_parallel
 integer i_endu_parallel, j_endv_parallel
 integer i_end_up_parallel, j_end_vp_parallel
+#ifdef DM_PARALLEL
 integer ips, ipe, jps, jpe, kps, kpe, kds, kde
 #endif
 
@@ -526,7 +526,6 @@ endif
 if ((config_flags%open_ye .or. config_flags%symmetric_ye) .and. jte .eq. jde) then
   j_end_vp = j_end_vp-1
 endif
-#ifdef DM_PARALLEL
 if (ite .eq. ide) then
    i_end_parallel = i_end
    i_endu_parallel = i_endu
@@ -545,6 +544,7 @@ else
    j_endv_parallel = j_endv+1
    j_end_vp_parallel = j_end_vp+1
 endif
+#ifdef DM_PARALLEL
 !xinzhang parallel tuning
 #include "HALO_ADJ_ADVANCE_UV.inc" 
 #endif
