@@ -451,7 +451,7 @@ integer i_end_parallel, j_end_parallel
 integer i_endu_parallel, j_endv_parallel
 integer i_end_up_parallel, j_end_vp_parallel
 #ifdef DM_PARALLEL
-integer ips, ipe, jps, jpe, kps, kpe, kds, kde
+integer ips, ipe, jps, jpe, kps, kpe, kds
 #endif
 
    call trace_entry("a_advance_uv")
@@ -464,7 +464,6 @@ jpe = jte
 kps = kts
 kpe = kte
 kds = kts
-kde = kte
 #endif
 
 !----------------------------------------------
