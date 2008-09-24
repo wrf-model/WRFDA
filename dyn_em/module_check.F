@@ -4883,6 +4883,12 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 
 !TGL test
 
+   P_muus = 0.0
+   P_muvs = 0.0
+   P_muts = 0.0
+   P_mu_save = 0.0
+   P_mudf = 0.0
+
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
