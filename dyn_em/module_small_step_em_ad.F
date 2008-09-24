@@ -417,11 +417,19 @@ integer, intent(in) :: spec_zone
 !==============================================
 ! declare local variables
 !==============================================
+#ifdef DM_PARALLEL
+real a_dpn(its:ite+1,kts:kte)
+real a_dpxy(its:ite+1,kts:kte)
+real a_mudf_xy(its:ite+1)
+real dpn(its:ite+1,kts:kte)
+real dpxy(its:ite+1,kts:kte)
+#else
 real a_dpn(its:ite,kts:kte)
 real a_dpxy(its:ite,kts:kte)
 real a_mudf_xy(its:ite)
 real dpn(its:ite,kts:kte)
 real dpxy(its:ite,kts:kte)
+#endif
 real dx
 real dy
 integer i
@@ -439,8 +447,25 @@ integer j_start_vp
 integer k
 integer k_end
 integer k_start
+#ifdef DM_PARALLEL
+integer i_end_parallel, j_end_parallel
+integer i_endu_parallel, j_endv_parallel
+integer i_end_up_parallel, j_end_vp_parallel
+integer ips, ipe, jps, jpe, kps, kpe, kds, kde
+#endif
 
    call trace_entry("a_advance_uv")
+
+#ifdef DM_PARALLEL
+ips = its
+ipe = ite
+jps = jts
+jpe = jte
+kps = kts
+kpe = kte
+kds = kts
+kde = kte
+#endif
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
@@ -501,39 +526,61 @@ endif
 if ((config_flags%open_ye .or. config_flags%symmetric_ye) .and. jte .eq. jde) then
   j_end_vp = j_end_vp-1
 endif
+#ifdef DM_PARALLEL
+if (ite .eq. ide) then
+   i_end_parallel = i_end
+   i_endu_parallel = i_endu
+   i_end_up_parallel = i_end_up
+else
+   i_end_parallel = i_end+1
+   i_endu_parallel = i_endu+1
+   i_end_up_parallel = i_end_up+1
+endif
+if (jte .eq. jde) then
+   j_end_parallel = j_end
+   j_endv_parallel = j_endv
+   j_end_vp_parallel = j_end_vp
+else
+   j_end_parallel = j_end+1
+   j_endv_parallel = j_endv+1
+   j_end_vp_parallel = j_end_vp+1
+endif
+!xinzhang parallel tuning
+#include "HALO_ADJ_ADVANCE_UV.inc" 
+#endif
 ! recompute : j_end_vp
 dx = 1./rdx
 ! recompute : dx
 dy = 1./rdy
 ! recompute : dy
-a_v_outer_j_loop: do j = j_endv, j_start, -1
-  if (j .ge. j_start_vp .and. j .le. j_end_vp) then
+a_v_outer_j_loop: do j = j_endv_parallel, j_start, -1
+  if (j .ge. j_start_vp .and. j .le. j_end_vp_parallel) then
     do k = k_start, k_end
-      do i = i_start, i_end
+      do i = i_start, i_end_parallel
         dpxy(i,k) = 0.5*rdy*muv(i,j)*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-p(i,k,j-&
 &1))+(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
       end do
     end do
 ! recompute : dpxy
     if (non_hydrostatic) then
-      do i = i_start, i_end
+      do i = i_start, i_end_parallel
         dpn(i,1) = 0.5*(cf1*(p(i,1,j)+p(i,1,j-1))+cf2*(p(i,2,j)+p(i,2,j-1))+cf3*(p(i,3,j)+p(i,3,j-1)))
         dpn(i,kde) = 0.
       end do
       do k = k_start+1, k_end
-        do i = i_start, i_end
+        do i = i_start, i_end_parallel
           dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j)+p(i,k,j-1))+fnp(k)*(p(i,k-1,j)+p(i,k-1,j-1)))
         end do
       end do
       do k = k_start, k_end
-        do i = i_start, i_end
+        do i = i_start, i_end_parallel
           dpxy(i,k) = dpxy(i,k)+rdy*(php(i,k,j)-php(i,k,j-1))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
         end do
       end do
     endif
 ! recompute : dpxy
     do k = k_start, k_end
-      do i = i_start, i_end
+      do i = i_start, i_end_parallel
         a_cqv(i,k,j) = a_cqv(i,k,j)-a_v(i,k,j)*dts*dpxy(i,k)
         a_dpxy(i,k) = a_dpxy(i,k)-a_v(i,k,j)*dts*cqv(i,k,j)
         a_mudf_xy(i) = a_mudf_xy(i)+a_v(i,k,j)
@@ -542,7 +589,7 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
     if (non_hydrostatic) then
 ! recompute : dpn
       do k = k_start, k_end
-        do i = i_start, i_end
+        do i = i_start, i_end_parallel
           a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
           a_dpn(i,k) = a_dpn(i,k)-a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
           a_mu(i,j-1) = a_mu(i,j-1)-0.5*a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))
@@ -552,7 +599,7 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
         end do
       end do
       do k = k_start+1, k_end
-        do i = i_start, i_end
+        do i = i_start, i_end_parallel
           a_p(i,k-1,j-1) = a_p(i,k-1,j-1)+0.5*a_dpn(i,k)*fnp(k)
           a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
           a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*fnm(k)
@@ -560,7 +607,7 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
           a_dpn(i,k) = 0.
         end do
       end do
-      do i = i_start, i_end
+      do i = i_start, i_end_parallel
         a_dpn(i,kde) = 0.
         a_p(i,3,j-1) = a_p(i,3,j-1)+0.5*a_dpn(i,1)*cf3
         a_p(i,3,j) = a_p(i,3,j)+0.5*a_dpn(i,1)*cf3
@@ -573,7 +620,7 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
       end do
     endif
     do k = k_start, k_end
-      do i = i_start, i_end
+      do i = i_start, i_end_parallel
         a_al(i,k,j-1) = a_al(i,k,j-1)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
         a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
         a_alt(i,k,j-1) = a_alt(i,k,j-1)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
@@ -590,44 +637,44 @@ a_v_outer_j_loop: do j = j_endv, j_start, -1
       end do
     end do
   endif
-  do i = i_start, i_end
+  do i = i_start, i_end_parallel
     a_mudf(i,j-1) = a_mudf(i,j-1)+a_mudf_xy(i)*emdiv*dy
     a_mudf(i,j) = a_mudf(i,j)-a_mudf_xy(i)*emdiv*dy
     a_mudf_xy(i) = 0.
   end do
   do k = k_start, k_end
-    do i = i_start, i_end
+    do i = i_start, i_end_parallel
       a_rv_tend(i,k,j) = a_rv_tend(i,k,j)+a_v(i,k,j)*dts
     end do
   end do
 end do a_v_outer_j_loop
-do j = j_start, j_end
+do j = j_start, j_end_parallel
   do k = k_start, k_end
-    do i = i_start_up, i_end_up
+    do i = i_start_up, i_end_up_parallel
       dpxy(i,k) = 0.5*rdx*muu(i,j)*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-p(i-1,k,j))&
 &+(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
     end do
   end do
 ! recompute : dpxy
   if (non_hydrostatic) then
-    do i = i_start_up, i_end_up
+    do i = i_start_up, i_end_up_parallel
       dpn(i,1) = 0.5*(cf1*(p(i,1,j)+p(i-1,1,j))+cf2*(p(i,2,j)+p(i-1,2,j))+cf3*(p(i,3,j)+p(i-1,3,j)))
       dpn(i,kde) = 0.
     end do
     do k = k_start+1, k_end
-      do i = i_start_up, i_end_up
+      do i = i_start_up, i_end_up_parallel
         dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j)+p(i-1,k,j))+fnp(k)*(p(i,k-1,j)+p(i-1,k-1,j)))
       end do
     end do
     do k = k_start, k_end
-      do i = i_start_up, i_end_up
+      do i = i_start_up, i_end_up_parallel
         dpxy(i,k) = dpxy(i,k)+rdx*(php(i,k,j)-php(i-1,k,j))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
       end do
     end do
   endif
 ! recompute : dpxy
   do k = k_start, k_end
-    do i = i_start_up, i_end_up
+    do i = i_start_up, i_end_up_parallel
       a_cqu(i,k,j) = a_cqu(i,k,j)-a_u(i,k,j)*dts*dpxy(i,k)
       a_dpxy(i,k) = a_dpxy(i,k)-a_u(i,k,j)*dts*cqu(i,k,j)
       a_mudf_xy(i) = a_mudf_xy(i)+a_u(i,k,j)
@@ -636,7 +683,7 @@ do j = j_start, j_end
   if (non_hydrostatic) then
 ! recompute : dpn
     do k = k_start, k_end
-      do i = i_start_up, i_end_up
+      do i = i_start_up, i_end_up_parallel
         a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
         a_dpn(i,k) = a_dpn(i,k)-a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
         a_mu(i-1,j) = a_mu(i-1,j)-0.5*a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))
@@ -646,7 +693,7 @@ do j = j_start, j_end
       end do
     end do
     do k = k_start+1, k_end
-      do i = i_start_up, i_end_up
+      do i = i_start_up, i_end_up_parallel
         a_p(i-1,k-1,j) = a_p(i-1,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
         a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
         a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*fnm(k)
@@ -654,7 +701,7 @@ do j = j_start, j_end
         a_dpn(i,k) = 0.
       end do
     end do
-    do i = i_start_up, i_end_up
+    do i = i_start_up, i_end_up_parallel
       a_dpn(i,kde) = 0.
       a_p(i-1,3,j) = a_p(i-1,3,j)+0.5*a_dpn(i,1)*cf3
       a_p(i,3,j) = a_p(i,3,j)+0.5*a_dpn(i,1)*cf3
@@ -666,7 +713,7 @@ do j = j_start, j_end
     end do
   endif
   do k = k_start, k_end
-    do i = i_start_up, i_end_up
+    do i = i_start_up, i_end_up_parallel
       a_al(i-1,k,j) = a_al(i-1,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
       a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
       a_alt(i-1,k,j) = a_alt(i-1,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
@@ -682,13 +729,13 @@ do j = j_start, j_end
       a_dpxy(i,k) = 0.
     end do
   end do
-  do i = i_start_up, i_end_up
+  do i = i_start_up, i_end_up_parallel
     a_mudf(i-1,j) = a_mudf(i-1,j)+a_mudf_xy(i)*emdiv*dx
     a_mudf(i,j) = a_mudf(i,j)-a_mudf_xy(i)*emdiv*dx
     a_mudf_xy(i) = 0.
   end do
   do k = k_start, k_end
-    do i = i_start, i_endu
+    do i = i_start, i_endu_parallel
       a_ru_tend(i,k,j) = a_ru_tend(i,k,j)+a_u(i,k,j)*dts
     end do
   end do
