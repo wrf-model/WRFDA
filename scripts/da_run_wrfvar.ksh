@@ -760,6 +760,30 @@ else
       mkdir $RUN_DIR/biasprep
       mv $RUN_DIR/working/biasprep* $RUN_DIR/biasprep
    fi
+
+# convert ASCII radiance inv output to NETCDF format
+#---------------------------------------------------
+   if (ls inv* 2>/dev/null); then
+      mkdir  $RUN_DIR/$DATE; cd $RUN_DIR
+      ln -sf $RUN_DIR/working/inv_* $RUN_DIR/$DATE
+      ln -sf $WRFVAR_DIR/build/da_rad_diags.exe $RUN_DIR/da_rad_diags.exe
+      cat > namelist.da_rad_diags << EOF
+&record1
+nproc = ${NUM_PROCS}
+instid = 'noaa-15-amsua','noaa-15-amsub','noaa-16-amsua','noaa-16-amsub','noaa-17-amsub','noaa-18-amsua','noaa-18-mhs',  'metop-2-amsua',  'metop-2-mhs','dmsp-16-ssmis','eos-2-airs','eos-2-amsua',
+file_prefix = 'inv'
+start_date = '$DATE'
+end_date   = '$DATE'
+cycle_period  = 6
+/
+EOF
+     ./da_rad_diags.exe
+     rm -rf $RUN_DIR/$DATE
+     rm -f namelist.da_rad_diags da_rad_diags.exe
+     rm -f $RUN_DIR/working/inv_*
+     cd $RUN_DIR/working
+   fi
+#----------------------------------
 # convert ASCII radiance oma output to NETCDF format
 #---------------------------------------------------
    if (ls oma* 2>/dev/null); then

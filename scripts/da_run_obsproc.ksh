@@ -106,7 +106,7 @@ cat > namelist.3dvar_obs << EOF
 /
 
 &record3
- max_number_of_obs        = 70000,
+ max_number_of_obs        = 400000,
  fatal_if_exceed_max_obs  = .TRUE.,
 /
 
