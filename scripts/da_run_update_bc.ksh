@@ -92,7 +92,7 @@ else
 fi
 
 if $CLEAN; then
-   rm -rf ${WORK_DIR}
+   cd ..; rm -rf ${WORK_DIR}
 fi
 
 date
