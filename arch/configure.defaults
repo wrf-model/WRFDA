@@ -8797,7 +8797,7 @@ module_dm.F :
 	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 wrfio_nf : 
-	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " ; \
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCFLAGS) " ; \
 	if [ $(RWORDSIZE) -eq 8 ] ; then \
 	  /bin/rm -f foo_io_flags.h; \
 	  sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
@@ -8808,11 +8808,11 @@ wrfio_nf :
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " all )
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(FC) $(PROMOTION) $(FCBASEOPTS) " all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCDEBUG) " )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(FC) $(PROMOTION) $(FCBASEOPTS) " )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
@@ -8899,7 +8899,6 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_l
                         -L../external/io_int -lwrfio_int  \
                         -L../external/io_grib1 -lio_grib1 \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time -L/usr/lib -lSystemStubs 
-# these LDFLAGS setting are only needed if OBJECT_MODE 32 (rather than 64) is used.
 LDFLAGS         =	
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP		=	/usr/bin/cpp  -C -P -xassembler-with-cpp
@@ -8921,7 +8920,7 @@ module_dm.F : ../external/RSL_LITE/module_dm.F
 	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
 
 wrfio_nf : 
-	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -w -byteswapio -Mfree" ; \
+	( cd ../external/io_netcdf ; make NETCDFPATH=CONFIGURE_NETCDF_PATH RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCFLAGS)" ; \
 	if [ $(RWORDSIZE) -eq 8 ] ; then \
 	  /bin/rm -f foo_io_flags.h; \
 	  sed -e 's/104/105/' wrf_io_flags.h > foo_io_flags.h ;\
@@ -8932,11 +8931,11 @@ wrfio_nf :
 
 wrfio_int : 
 	( cd ../external/io_int ; \
-          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -w -byteswapio -Mfree" all )
+          make CC="$(CC)" RANLIB="$(RANLIB)" CPP="$(CPP)" SFC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" all )
 
 wrfio_grib1 :
 	( cd ../external/io_grib1 ; \
-          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) -w -byteswapio -Mfree" )
+          make CC="$(SCC)" CFLAGS="$(CFLAGS)" RANLIB="$(RANLIB)" CPP="$(CPP)" FC="$(SFC) $(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" )
 
 esmf_time : 
 	( cd ../external/esmf_time_f90 ; \
@@ -8973,7 +8972,6 @@ module_start.o module_initialize.o module_initialize_b_wave.o  \
 module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
 module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
 module_initialize_real.o module_dm.o start_domain.o \
-mediation_force_domain.o \
 mediation_interp_domain.o \
 mediation_feedback_domain.o \
 solve_interface.o                                              \
@@ -8986,6 +8984,12 @@ convert_nmm.o    :
 	$(RM) $*.b
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
+mediation_force_domain.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b 
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c -O1 $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 ###########################################################
 #ARCH    Darwin (MACOS) g95 with gcc (serial)
 #     
