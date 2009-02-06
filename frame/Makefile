@@ -39,7 +39,6 @@ OBJS    =       wrf_num_bytes_between.o    \
 
 #compile as a .o but do not link into the main library
 SPECIAL =       module_internal_header_util.o pack_utils.o
-WRFVAR	=
 
 include ../configure.wrf
 
@@ -57,7 +56,7 @@ clean:
 	@ echo 'use the clean script'
 
 module_state_description.F : ../Registry/$(REGISTRY)
-		( cd .. ; tools/registry $(ARCHFLAGS) $(WRFVAR) Registry/$(REGISTRY) )
+		( cd .. ; tools/registry $(ARCHFLAGS) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
