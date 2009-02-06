@@ -55,7 +55,7 @@ SUBROUTINE solve_em_tst ( grid , config_flags , &
 
    INTEGER                         :: k_start , k_end, its, ite, jts, jte
    INTEGER                         :: ids , ide , jds , jde , kds , kde , &
-                                      ims , ime , jms , jme , kms , kme , &
+                                      ims , ime , jms , jme , kms , kme , & 
                                       ips , ipe , jps , jpe , kps , kpe
    INTEGER                         :: ij , iteration
    INTEGER                         :: im , num_3d_m , ic , num_3d_c
@@ -343,8 +343,6 @@ BENCH_START(step_prep_tim)
 
    DO ij = 1 , grid%num_tiles
 
-!zzma begining
-
       print*,'TEST_rk_step_prep = ',TEST_rk_step_prep
       if (TEST_rk_step_prep) &
       CALL t_rk_step_prep  ( config_flags, rk_step,            &
@@ -361,10 +359,6 @@ BENCH_START(step_prep_tim)
                            grid%i_start(ij), grid%i_end(ij), &
                            grid%j_start(ij), grid%j_end(ij), &
                            k_start, k_end                   )
-
-   print*,'rk_step_prep zzma01'
-!   stop
-!zzma end
 
       CALL rk_step_prep  ( config_flags, rk_step,            &
                            u_2, v_2, w_2, t_2, ph_2, mu_2,   &
@@ -473,7 +467,6 @@ BENCH_START(init_zero_tend_tim)
 
         CALL wrf_debug ( 200 , ' call init_zero_tendency' )
 
-!zzma added
         print*,'TEST_init_zero_tendency = ',TEST_init_zero_tendency
         if(TEST_init_zero_tendency) &
         CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
@@ -485,10 +478,6 @@ BENCH_START(init_zero_tend_tim)
                                   grid%i_start(ij), grid%i_end(ij), &
                                   grid%j_start(ij), grid%j_end(ij), &
                                   k_start, k_end                   )
-
-    print*, 'init_zero_tendency zzma02'
-!    stop
-!zzma added end
 
 
         CALL init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
@@ -532,7 +521,6 @@ BENCH_START(phy_prep_tim)
 
           CALL wrf_debug ( 200 , ' call phy_prep' )
 
-! zzma 
           print*,' TEST_phy_prep = ',TEST_phy_prep
           if(TEST_phy_prep) &
           CALL t_phy_prep ( config_flags,                           &
@@ -553,11 +541,6 @@ BENCH_START(phy_prep_tim)
                          grid%i_start(ij), grid%i_end(ij),       &
                          grid%j_start(ij), grid%j_end(ij),       &
                          k_start, k_end                         )
-
-    print*, 'phy_prep zzma03'
-!    stop
-!zzma added end
-
 
          CALL phy_prep ( config_flags,                           &
                          mut, u_2, v_2, p, pb, alt,              &
@@ -681,13 +664,8 @@ BENCH_END(pbl_driver_tim)
 ! cumulus para.
 
 BENCH_START(cu_driver_tim)
-!         if(dyn_opt == DYN_EM) then
-         if(dyn_opt == DYN_EM_TST) then
-         CALL wrf_debug ( 200 , ' call cumulus_driver' )
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!            Xiaoyan Zhang Add DU Cumulus  call at 7/13/2007      !!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       if(dyn_opt == DYN_EM) then
+!      if(dyn_opt == DYN_EM_TST) then
 
        DO ij = 1, grid%num_tiles
 
@@ -746,10 +724,12 @@ BENCH_START(cu_driver_tim)
                                                                 )
 
        ENDDO
-       goto 713
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!            Xiaoyan Zhang Add DU Cumulus  call at 7/13/2007      !!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+       endif
+
+       if(dyn_opt == DYN_EM) then
+         CALL wrf_debug ( 200 , ' call cumulus_driver' )
+
          CALL cumulus_driver(                                          &
                  ! Order dependent args: domain, mem, tile dims
                      ids,ide, jds,jde, kds,kde                         &
@@ -792,8 +772,7 @@ BENCH_START(cu_driver_tim)
                    , QS_CURR=moist_2(ims,kms,jms,P_QS), F_QS=F_QS      &
                    , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
                                                                        )
-713         continue
-         endif
+       endif
 BENCH_END(cu_driver_tim)
 
 ! calculate_phy_tend
@@ -944,7 +923,6 @@ BENCH_START(calc_tke_tim)
 
           CALL wrf_debug ( 200 , ' call calculate_km_kh' )
 
-!zzma
           print*,'TEST_calculate_km_kh = ',TEST_calculate_km_kh
           if(TEST_calculate_km_kh) &
           CALL t_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,     &
@@ -962,10 +940,6 @@ BENCH_START(calc_tke_tim)
                                 grid%i_start(ij), grid%i_end(ij),            &
                                 grid%j_start(ij), grid%j_end(ij),            &
                                 k_start    , k_end                          )
-
-    print*, 'calculate_km_kh zzma04'
-!    stop
-!zzma added end
 
           CALL calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,     &
                                 xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,               &
@@ -1202,7 +1176,6 @@ BENCH_START(rk_tend_tim)
 
       CALL wrf_debug ( 200 , ' call rk_tendency' )
 
-!zzma  added
       print*,'TEST_rk_tendency = ',TEST_rk_tendency
       if(TEST_rk_tendency) &
       CALL t_rk_tendency ( config_flags, rk_step,                           &
@@ -1228,9 +1201,6 @@ BENCH_START(rk_tend_tim)
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
 
-   print*,'rk_tendency zzma05'
-!stop
-!zzma added end
 
       CALL rk_tendency ( config_flags, rk_step,                           &
                          ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
@@ -1255,35 +1225,31 @@ BENCH_START(rk_tend_tim)
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
 
-!Xiaoyan Zhang added 11/29/2006
 
-         IF (rk_step == 1 ) then
-  print *, 'xyz-----, in solve_em_tst,rk_step ==', rk_step
-      if(TEST_surface_drag) &
-        CALL t_surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
-                                muu, muv,z,z_at_w,&
-                         ids, ide, jds, jde, kds, kde,                    &
-                         ims, ime, jms, jme, kms, kme,                    &
-                         grid%i_start(ij), grid%i_end(ij),                &
-                         grid%j_start(ij), grid%j_end(ij),                &
-                         k_start, k_end                                  )
-!         Stop ! xyz
-           CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
-                         muu, muv,z,z_at_w,&
-                         ids, ide, jds, jde, kds, kde,                    &
-                         ims, ime, jms, jme, kms, kme,                    &
-                         grid%i_start(ij), grid%i_end(ij),                &
-                         grid%j_start(ij), grid%j_end(ij),                &
-                         k_start, k_end                                  )
+!     IF (rk_step == 1 ) then
 
-  ENDIF
+!     print*,'TEST_surface_drag = ',TEST_surface_drag
+!     if(TEST_surface_drag) &
+!       CALL t_surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+!                               muu, muv,z,z_at_w,&
+!                        ids, ide, jds, jde, kds, kde,                    &
+!                        ims, ime, jms, jme, kms, kme,                    &
+!                        grid%i_start(ij), grid%i_end(ij),                &
+!                        grid%j_start(ij), grid%j_end(ij),                &
+!                        k_start, k_end                                  )
 
-!Xiaoyan Zhang added--    End      ----------------------------------------
-!--------------------------------------------------------------------------
+!          CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+!                        muu, muv,z,z_at_w,&
+!                        ids, ide, jds, jde, kds, kde,                    &
+!                        ims, ime, jms, jme, kms, kme,                    &
+!                        grid%i_start(ij), grid%i_end(ij),                &
+!                        grid%j_start(ij), grid%j_end(ij),                &
+!                        k_start, k_end                                  )
 
-!Xiao added
-    if(TEST_advect_scalar) &
-    CALL t_advect_scalar ( t_2, t_2, t_tend, ru, rv, ww,   &
+!     ENDIF
+
+      if(TEST_advect_scalar) &
+         CALL t_advect_scalar ( t_2, t_2, t_tend, ru, rv, ww,   &
                          mut, config_flags,            &
                          msfu, msfv, msft, fnm, fnp,   &
                          rdx, rdy, rdnw,               &
@@ -1293,9 +1259,6 @@ BENCH_START(rk_tend_tim)
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
 
-   print*,'advect_scalar extra_test' 
-   !stop
-!Xiao added end
 
    END DO
    !$OMP END PARALLEL DO
@@ -1308,7 +1271,6 @@ BENCH_START(relax_bdy_dry_tim)
 
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
 
-!zzma begining
  
        print*,'TEST_relax_bdy_dry = ',TEST_relax_bdy_dry
        if(TEST_relax_bdy_dry) &
@@ -1331,9 +1293,6 @@ BENCH_START(relax_bdy_dry_tim)
                             grid%j_start(ij), grid%j_end(ij),            &
                             k_start, k_end                              )
 
-   print*,'relax_bdy_dry zzma06'
-!   stop
-!zzma end
        CALL relax_bdy_dry ( config_flags,                                &
                             u_save, v_save, ph_save, t_save,             &
                             w_save, mu_tend,                             & 
@@ -1356,8 +1315,6 @@ BENCH_START(relax_bdy_dry_tim)
 
      ENDIF
 
-!zzma begining
-
      print*,'TEST_rk_addtend_dry = ',TEST_rk_addtend_dry
      if(TEST_rk_addtend_dry) &
      CALL t_rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
@@ -1370,10 +1327,6 @@ BENCH_START(relax_bdy_dry_tim)
                           grid%i_start(ij), grid%i_end(ij),                &
                           grid%j_start(ij), grid%j_end(ij),                &
                           k_start, k_end                                  )
-
-   print*,'rk_addtend_dry zzma07'
-!   stop
-!zzma end
 
      CALL rk_addtend_dry( ru_tend,  rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
@@ -1388,27 +1341,6 @@ BENCH_START(relax_bdy_dry_tim)
 
      IF( config_flags%specified .or. config_flags%nested ) THEN 
 
-
-!zzma begining
-
-!write(111,'(f10.5)') ru_tend(:,:,:)
-!write(112,'(f10.5)') rv_tend(:,:,:)
-!write(113,'(f10.5)') ph_tend(:,:,:)
-!write(114,'(f10.5)') t_tend(:,:,:)
-!write(115,'(f10.5)') rw_tend(:,:,:)
-!write(116,'(f10.5)') mu_tend(:,:)
-!write(117,'(f10.5)') u_bt(:,:,:,:)
-!write(118,'(f10.5)') v_bt(:,:,:,:)
-!write(119,'(f10.5)') ph_bt(:,:,:,:)
-!write(120,'(f10.5)') t_bt(:,:,:,:)
-!write(121,'(f10.5)') w_bt(:,:,:,:)
-!write(122,'(f10.5)') mu_bt(:,:,:,:)
-!write(217,'(f10.5)') u_b(:,:,:,:)
-!write(218,'(f10.5)') v_b(:,:,:,:)
-!write(219,'(f10.5)') ph_b(:,:,:,:)
-!write(220,'(f10.5)') t_b(:,:,:,:)
-!write(221,'(f10.5)') w_b(:,:,:,:)
-!write(222,'(f10.5)') mu_b(:,:,:,:)
        print*,' TEST_spec_bdy_dry = ',TEST_spec_bdy_dry
        if(TEST_spec_bdy_dry) &
        CALL t_spec_bdy_dry ( config_flags,                                    &
@@ -1426,10 +1358,6 @@ BENCH_START(relax_bdy_dry_tim)
                            grid%i_start(ij), grid%i_end(ij),                &
                            grid%j_start(ij), grid%j_end(ij),                &
                            k_start, k_end                                  )
-
-   print*,'spec_bdy_dry zzma08'
-!   stop
-!zzma end
 
        CALL spec_bdy_dry ( config_flags,                                    &
                            ru_tend, rv_tend, ph_tend, t_tend,               &
@@ -1490,7 +1418,6 @@ BENCH_START(small_step_prep_tim)
     ! predictor because we may have changed the small timestep -> dts.
 
       CALL wrf_debug ( 200 , ' call calc_coef_w' )
-!zzma begining 
       print*,' TEST_small_step_prep = ',TEST_small_step_prep
       if(TEST_small_step_prep) &
       CALL t_small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,          &
@@ -1510,10 +1437,6 @@ BENCH_START(small_step_prep_tim)
                             grid%j_start(ij), grid%j_end(ij), &
                             k_start    , k_end               )
 
-   print*,'small_step_prep zzma09'
-!   stop
-!zzma end
-
       CALL small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,          &
                             t_1,t_2,ph_1,ph_2,                &
                             mub, mu_1, mu_2,                  &
@@ -1532,8 +1455,6 @@ BENCH_START(small_step_prep_tim)
                             k_start    , k_end               )
 
 
-!zzma begining
-
       print*,' TEST_calc_p_rho = ',TEST_calc_p_rho
       if(TEST_calc_p_rho) &
       CALL t_calc_p_rho( al, p, ph_2,                      &
@@ -1547,10 +1468,6 @@ BENCH_START(small_step_prep_tim)
                        grid%j_start(ij), grid%j_end(ij), &
                        k_start    , k_end               )
 
-   print*,'calc_p_rho zzma10'
-!   stop
-!zzma end
-
       CALL calc_p_rho( al, p, ph_2,                      &
                        alt, t_2, t_save, c2a, pm1,       &
                        mu_2, muts, znu, t0,              &
@@ -1562,7 +1479,6 @@ BENCH_START(small_step_prep_tim)
                        grid%j_start(ij), grid%j_end(ij), &
                        k_start    , k_end               )
 
-!zzma begining
 
       print*,'TEST_calc_coef_w = ',TEST_calc_coef_w
       if(non_hydrostatic .and. TEST_calc_coef_w) &
@@ -1576,9 +1492,6 @@ BENCH_START(small_step_prep_tim)
                        grid%j_start(ij), grid%j_end(ij), &
                         k_start    , k_end               )
 
-   print*,'calc_coef_w zzma11'
-!   stop
-!zzma end
       IF (non_hydrostatic)                                &
       CALL calc_coef_w( a,alpha,gamma,                    &
                         mut, cqw,                         &
@@ -1737,8 +1650,6 @@ BENCH_END(set_phys_bc2_tim)
 
 BENCH_START(advance_uv_tim)
 
-!zzma begining
-
          print*,'TEST_advance_uv = ',TEST_advance_uv
          if(TEST_advance_uv) &
          CALL t_advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
@@ -1755,10 +1666,6 @@ BENCH_START(advance_uv_tim)
                            grid%i_start(ij), grid%i_end(ij), &
                            grid%j_start(ij), grid%j_end(ij), &
                            k_start    , k_end               )
-
-   print*,'advance_uv zzma12'
-!   stop
-!zzma end
 
          CALL advance_uv ( u_2, ru_tend, v_2, rv_tend,       &
                            p, pb,                            &
@@ -1779,8 +1686,6 @@ BENCH_END(advance_uv_tim)
 BENCH_START(spec_bdy_uv_tim)
          IF( config_flags%specified .or. config_flags%nested ) THEN
 
-!zzma begining
-
            print*,'TEST_spec_bdyupdate = ',TEST_spec_bdyupdate
            if(TEST_spec_bdyupdate) &
            CALL t_spec_bdyupdate(u_2, ru_tend, dts_rk,      &
@@ -1792,10 +1697,6 @@ BENCH_START(spec_bdy_uv_tim)
                                grid%i_start(ij), grid%i_end(ij),         &
                                grid%j_start(ij), grid%j_end(ij),         &
                                k_start    , k_end             )
-
-   print*,'spec_bdyupdate zzma13'
-!   stop
-!zzma end
 
            CALL spec_bdyupdate(u_2, ru_tend, dts_rk,      &
                                'u'         , config_flags, &
@@ -1846,8 +1747,6 @@ BENCH_END(spec_bdy_uv_tim)
 
 BENCH_START(advance_mu_t_tim)
 
-!zzma begining
-!
         print*,'TEST_advance_mu_t = ',TEST_advance_mu_t
         if(TEST_advance_mu_t) &
         CALL t_advance_mu_t( ww, ww1, u_2, u_save, v_2, v_save, &
@@ -1864,10 +1763,6 @@ BENCH_START(advance_mu_t_tim)
                            grid%i_start(ij), grid%i_end(ij),  &
                            grid%j_start(ij), grid%j_end(ij),  &
                            k_start    , k_end                )
-
-   print*,'advance_mu_t zzma14'
-!   stop
-!zzma end
 
         CALL advance_mu_t( ww, ww1, u_2, u_save, v_2, v_save, &
                            mu_2, mut, muave, muts, muu, muv,  &
@@ -1927,8 +1822,6 @@ BENCH_END(spec_bdy_t_tim)
 
 BENCH_START(sumflux_tim)
 
-!zzma begining
-
          print*,'TEST_sumflux = ',TEST_sumflux
          if(TEST_sumflux) &
          CALL t_sumflux ( u_2, v_2, ww,                         &
@@ -1942,10 +1835,6 @@ BENCH_START(sumflux_tim)
                         grid%i_start(ij), grid%i_end(ij),     &
                         grid%j_start(ij), grid%j_end(ij),     &
                         k_start    , k_end                   )
-
-   print*,'sumflux zzma15'
-!   stop
-!zzma end
 
          CALL sumflux ( u_2, v_2, ww,                         &
                         u_save, v_save, ww1,                  &
@@ -1967,8 +1856,6 @@ BENCH_END(sumflux_tim)
 BENCH_START(advance_w_tim)
         IF ( non_hydrostatic ) THEN
 
-!zzma begining
-
           print*,'TEST_advance_w = ',TEST_advance_w
           if(TEST_advance_w) &
           CALL t_advance_w( w_2, rw_tend, ww, u_2, v_2,       &
@@ -1986,11 +1873,6 @@ BENCH_START(advance_w_tim)
                           grid%i_start(ij), grid%i_end(ij), &
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
-
-   print*,'advance_w zzma16'
-!  stop
-!zzma end
-
 
           CALL advance_w( w_2, rw_tend, ww, u_2, v_2,       &
                           mu_2, mut, muave, muts,           &
@@ -2015,8 +1897,6 @@ BENCH_END(advance_w_tim)
 BENCH_START(spec_bdynhyd_tim)
            IF (non_hydrostatic)  THEN
 
-!zzma begining
-
              print*,'TEST_spec_bdyupdate_ph = ',TEST_spec_bdyupdate_ph
              if(TEST_spec_bdyupdate_ph) &
              CALL t_spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
@@ -2028,10 +1908,6 @@ BENCH_START(spec_bdynhyd_tim)
                                      grid%i_start(ij), grid%i_end(ij),         &
                                      grid%j_start(ij), grid%j_end(ij),         &
                                      k_start    , k_end             )
-
-   print*,'spec_bdyupdate_ph zzma17'
-!   stop
-!zzma end
 
 
              CALL spec_bdyupdate_ph( ph_save, ph_2, ph_tend, mu_tend, muts, dts_rk, &
@@ -2184,8 +2060,6 @@ BENCH_END(phys_bc_tim)
 
 BENCH_START(calc_mu_uv_tim)
 
-!zzma begining
-
       print*,'TEST_calc_mu_uv_1 = ',TEST_calc_mu_uv_1
       if(TEST_calc_mu_uv_1) &
       CALL t_calc_mu_uv_1 ( config_flags,                     &
@@ -2195,10 +2069,6 @@ BENCH_START(calc_mu_uv_tim)
                           grid%i_start(ij), grid%i_end(ij), &
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
-
-   print*,'calc_mu_uv_1 zzma18'
-!   stop
-!zzma end
 
       CALL calc_mu_uv_1 ( config_flags,                     &
                           muts, muus, muvs,                 &
@@ -2210,8 +2080,6 @@ BENCH_START(calc_mu_uv_tim)
 BENCH_END(calc_mu_uv_tim)
 BENCH_START(small_step_finish_tim)
 
-
-!zzma begining
 
       print*,'TEST_small_step_finish = ',TEST_small_step_finish
       if(TEST_small_step_finish) &
@@ -2229,10 +2097,6 @@ BENCH_START(small_step_finish_tim)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-
-   print*,'small_step_finish zzma19'
-!   stop
-!zzma end
 
       CALL small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,     &
                               t_2, t_1, ph_2, ph_1, ww, ww1,    &
@@ -2293,8 +2157,6 @@ BENCH_END(small_step_finish_tim)
 
 BENCH_START(rk_scalar_tend_tim)
 
-!zzma begining
-
        print*,'TEST_rk_scalar_tend = ',TEST_rk_scalar_tend
        if(TEST_rk_scalar_tend) &
        CALL t_rk_scalar_tend (  im, im, config_flags,             &
@@ -2315,10 +2177,6 @@ BENCH_START(rk_scalar_tend_tim)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-
-   print*,'rk_scalar_tend zzma20'
-!   stop
-!zzma end
 
        CALL rk_scalar_tend (  im, im, config_flags,             &
                               rk_step, dt_rk,                   &
@@ -2357,7 +2215,6 @@ BENCH_START(rlx_bdy_scalar_tim)
                                  grid%i_start(ij), grid%i_end(ij),      &
                                  grid%j_start(ij), grid%j_end(ij),      &
                                  k_start, k_end                        )
-!zzma begining 
 
          print*,' TEST_spec_bdy_scalar =',TEST_spec_bdy_scalar
          if(TEST_spec_bdy_scalar) &
@@ -2371,11 +2228,6 @@ BENCH_START(rlx_bdy_scalar_tim)
                                  grid%i_start(ij), grid%i_end(ij),          &
                                  grid%j_start(ij), grid%j_end(ij),          &
                                  k_start, k_end                               )
-
-   print*,'spec_bdy_scalar zzma21'
-!   stop
-!zzma end
-
 
          CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                  rqv_b, rqv_bt,                             &
@@ -2543,7 +2395,6 @@ BENCH_END(rlx_bdy_scalar_tim)
 BENCH_START(update_scal_tim)
 
 
-!zzma begining
        print*,'TEST_rk_update_scalar = ',TEST_rk_update_scalar
        if(TEST_rk_update_scalar) &
        CALL t_rk_update_scalar( im, im,                           &
@@ -2559,11 +2410,6 @@ BENCH_START(update_scal_tim)
                               grid%i_start(ij), grid%i_end(ij), &
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
-
-   print*,'rk_update_scalar zzma22'
-!   stop
-!zzma end
-
 
        CALL rk_update_scalar( im, im,                           &
                               moist_1(ims,kms,jms,im),          &
@@ -2795,7 +2641,6 @@ BENCH_END(tke_adv_tim)
 
 BENCH_START(calc_p_rho_tim)
 
-!zzma begining
      print*,'TEST_calc_p_rho_phi = ',TEST_calc_p_rho_phi
      if(TEST_calc_p_rho_phi) &
      CALL t_calc_p_rho_phi( moist_2, num_3d_m,                &
@@ -2808,11 +2653,6 @@ BENCH_START(calc_p_rho_tim)
                           grid%i_start(ij), grid%i_end(ij), &
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
-
-
-   print*,'calc_p_rho_phi zzma23'
-!   stop
-!zzma end
 
      CALL calc_p_rho_phi( moist_2, num_3d_m,                &
                           al, alb, mu_2, muts,              &
@@ -2829,8 +2669,6 @@ BENCH_END(calc_p_rho_tim)
 BENCH_START(diag_w_tim)
      IF (.not. non_hydrostatic) THEN
 
-!zzma begining
-
      print*,'TEST_diagnose_w = ',TEST_diagnose_w
      if(TEST_diagnose_w) &
      CALL t_diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
@@ -2841,11 +2679,6 @@ BENCH_START(diag_w_tim)
                       grid%i_start(ij), grid%i_end(ij),       &
                       grid%j_start(ij), grid%j_end(ij),       &
                       k_start    , k_end                     )
-
-   print*,'diagnose_w zzma24'
-!   stop
-!zzma end
-
 
      CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
                       u_2, v_2, ht,                           &
@@ -3097,6 +2930,7 @@ BENCH_END(advance_ppt_tim)
 
        CALL wrf_debug ( 200 , ' call moist_physics_prep' )
 BENCH_START(moist_physics_prep_tim)
+       print*,'TEST_moist_physics_prep_em = ',TEST_moist_physics_prep_em
        if(TEST_moist_physics_prep_em) &
        CALL t_moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
@@ -3119,12 +2953,8 @@ BENCH_START(moist_physics_prep_tim)
                                    ims, ime, jms, jme, kms, kme,     &
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!Xiaoyan Zhang Add Large-Scale Condensation call at 11/20/2006 !!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    print *, 'xyz---- call lscond TST'
-
+    print*,'TEST_lscond = ',TEST_lscond
     IF (TEST_lscond)   &
     CALL t_lscond(t_2, p_phy                                     &
                 ,moist_2(ims,kms,jms,P_QV)                           &
@@ -3140,7 +2970,6 @@ BENCH_START(moist_physics_prep_tim)
                  , 'solve_em 1')
 
 
-     Stop !xyz
       CALL lscond(t_2, p_phy                                         &
                     ,moist_2(ims,kms,jms,P_QV)                         &
                     ,rho, pi_phy,r_v, xlv, cp                          &
@@ -3467,39 +3296,39 @@ BENCH_END(bc_2d_tim)
 
 ! add diagnoses. hans_xyh huang.
 
-   DO ij = 1 , grid%num_tiles
+!  DO ij = 1 , grid%num_tiles
 
-     call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
-                       avg_abs_dpsdt, dpsdt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
-     call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
-                       avg_abs_dmudt, dmudt,             &
-                       ids, ide, jds, jde,               &
-                       ims, ime, jms, jme,               &
-                       grid%i_start(ij), grid%i_end(ij), &
-                       grid%j_start(ij), grid%j_end(ij)  )
+!    call calc_dpsdt ( itimestep, dt, psfc, psfcm, 'ps', &
+!                      avg_abs_dpsdt, dpsdt,             &
+!                      ids, ide, jds, jde,               &
+!                      ims, ime, jms, jme,               &
+!                      grid%i_start(ij), grid%i_end(ij), &
+!                      grid%j_start(ij), grid%j_end(ij)  )
+!    call calc_dpsdt ( itimestep, dt, mu_2, mu_1, 'mu',  &
+!                      avg_abs_dmudt, dmudt,             &
+!                      ids, ide, jds, jde,               &
+!                      ims, ime, jms, jme,               &
+!                      grid%i_start(ij), grid%i_end(ij), &
+!                      grid%j_start(ij), grid%j_end(ij)  )
 
-     call calc_q_conv_3d ( moist_1, moist_2, dt,             &
-                           q_conve_3d,                       &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
-     call calc_q_conv_2d ( moist_2, u_2, v_2,                &
-                           dt, DX, q_conve_2d,               &
-                           num_3d_m,                         &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           grid%i_start(ij), grid%i_end(ij), &
-                           grid%j_start(ij), grid%j_end(ij), &
-                           k_start, k_end                    )
+!    call calc_q_conv_3d ( moist_1, moist_2, dt,             &
+!                          q_conve_3d,                       &
+!                          num_3d_m,                         &
+!                          ids, ide, jds, jde, kds, kde,     &
+!                          ims, ime, jms, jme, kms, kme,     &
+!                          grid%i_start(ij), grid%i_end(ij), &
+!                          grid%j_start(ij), grid%j_end(ij), &
+!                          k_start, k_end                    )
+!    call calc_q_conv_2d ( moist_2, u_2, v_2,                &
+!                          dt, DX, q_conve_2d,               &
+!                          num_3d_m,                         &
+!                          ids, ide, jds, jde, kds, kde,     &
+!                          ims, ime, jms, jme, kms, kme,     &
+!                          grid%i_start(ij), grid%i_end(ij), &
+!                          grid%j_start(ij), grid%j_end(ij), &
+!                          k_start, k_end                    )
 
-   ENDDO
+!  ENDDO
 
    CALL wrf_debug ( 200 , ' call end of solve_em' )
 
