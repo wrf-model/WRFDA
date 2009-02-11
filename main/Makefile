@@ -67,7 +67,7 @@ nup_standalone.exe :
 	   $(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.f ; \
         else   \
 	   $(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F ; \
-        fi   \
+        fi 
 	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 nupdown.exe: 
@@ -79,7 +79,7 @@ nupdown.exe:
 	   $(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.f ; \
         else   \
 	   $(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.F ; \
-        fi   \
+        fi
 	$(LD) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :
