@@ -5482,7 +5482,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-#ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (Single-threaded, no nesting)
+#ARCH    Linux x86_64 i486 i586 i686, ifort compiler with icc (serial)
 #        
 #
 FC              =       ifort
@@ -5492,10 +5492,10 @@ SCC		=	$(CC)
 SFC             =       $(FC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
-CFLAGS          =       
-FCOPTIM         =       -O3 -ip
-FCDEBUG		=	#-g
-FCBASEOPTS      =       -zero -ftz -align all -fno-alias -assume byterecl,buffered_io,protect_parens,minus0 -fp-model precise -FR -convert big_endian $(FCDEBUG)
+CFLAGS          =       -w -O3 -ip
+FCOPTIM         =       -O3
+FCDEBUG		=	#-g -O0 -traceback
+FCBASEOPTS      =       -zero -w -ftz -align all -fno-alias -fp-model precise -FR -convert big_endian $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
@@ -5510,7 +5510,7 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_l
                         -L../external/io_grib1 -lio_grib1 \
 			-L../external/io_int -lwrfio_int \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS         =       -byteswapio
+LDFLAGS         =       -ip
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp -C -P -traditional
 POUND_DEF	=	-DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -5596,23 +5596,22 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-#ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (RSL_LITE, MPICH, No nesting, No periodic LBCs)
+#ARCH    Linux x86_64 i486 i586 i686, ifort compiler with icc (dmpar)
 #        
 #
 DMPARALLEL      =       1
 MAX_PROC        =       1024
-FC              =       mpif90
-LD              =       mpif90
-CC              =       mpicc -DMPI2_SUPPORT
 SCC		=	icc
 SFC             =       ifort
+FC              =       mpif90 -f90=$(SFC)
+LD              =       $(FC)
+CC              =       mpicc -cc=$(SCC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
-CFLAGS          =       -DDM_PARALLEL \
-                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
-FCOPTIM         =       -O3 -ip
-FCDEBUG		=	#-g
-FCBASEOPTS      =       -zero -ftz -align all -fno-alias -assume byterecl,buffered_io,protect_parens,minus0 -fp-model precise -FR -convert big_endian $(FCDEBUG)
+CFLAGS          =       -w -O3 -ip
+FCOPTIM         =       -O3
+FCDEBUG		=	#-g -O0 -traceback
+FCBASEOPTS      =       -zero -w -ftz -align all -fno-alias -fp-model precise -FR -convert big_endian $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
@@ -5627,7 +5626,7 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_l
                         -L../external/io_grib1 -lio_grib1 \
 			-L../external/io_int -lwrfio_int \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
-LDFLAGS         =       -byteswapio
+LDFLAGS         =       -ip
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
 CPP             =       /lib/cpp -C -P -traditional
 POUND_DEF	=	-DNO_RRTM_PHYSICS  -traditional $(COREDEFS) -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
@@ -5636,7 +5635,7 @@ AR              =       ar ru
 M4              =       m4
 RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
-CC_TOOLS        =       cc
+CC_TOOLS        =       $(SCC)
 
 externals : CONFIGURE_WRFIO_NF wrfio_grib1 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
 
