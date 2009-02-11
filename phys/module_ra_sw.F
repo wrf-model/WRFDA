@@ -254,11 +254,7 @@ CONTAINS
                                                           ABSTAB
 
    REAL, DIMENSION( 4    ) ::                             XMUVAL
-#ifndef MAC_G95
    REAL                                                   yssl
-#else
-   REAL*4                                                 yssl
-#endif
 
 !------------------------------------------------------------------
 
@@ -281,7 +277,7 @@ CONTAINS
       bexth2o=5.E-6
       SOLTOP=SOLCON
       yssl=1440.
-      XT24=AMOD(XTIME+RADFRQ*0.5,yssl)
+      XT24=DMOD(XTIME+RADFRQ*0.5,yssl)
       TLOCTM=GMT+XT24/60.+XLONG/15.
       HRANG=15.*(TLOCTM-12.)*DEGRAD
       XXLAT=XLAT*DEGRAD

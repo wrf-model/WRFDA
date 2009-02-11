@@ -1,13 +1,31 @@
 #!/bin/sh
 
-option=$1
+thiscmd=$0
+
+opt_level="-f"
+
+while [ $# -ge 1 ]; do
+    case $1 in
+      -d) opt_level="-d" ;;
+      -f) opt_level="-f" ;;
+      -h) print_usage="yes" ;;
+      -help) print_usage="yes" ;;
+      wrfplus) option=wrfplus ;;
+    esac
+    shift
+done
+if [ -n "$print_usage" ] ; then
+  echo usage: $thiscmd '[-d|-f] wrfplus'
+  exit
+fi
+
 
 echo option = $option
 
 if [ "$option" = "wrfplus" ] ; then
     echo "configure wrf for 4dvar"
 else
-   echo "Please type : <configure wrfplus> to compile wrf for 4dvar,"
+   echo usage: $thiscmd '[-d|-f] wrfplus'
    exit
 fi
 
@@ -313,6 +331,10 @@ if test -n "$PERL" ; then
   $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
     -compileflags=$compileflags
   /bin/cp tools/gen_wrf_io.c.model tools/gen_wrf_io.c
+  if [ "$opt_level" = "-d" ] ; then
+     sed -e 's/FCOPTIM[       ]*=/& # /' -e '/FCDEBUG[        ]*=/s/#//g' configure.wrf > configure.wrf.edit
+     /bin/mv configure.wrf.edit configure.wrf
+  fi
   echo "configure for wrfplus"
 fi
 

@@ -60,12 +60,22 @@ convert_nmm : convert_nmm.o
 
 nup_standalone.exe : 
 	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) module_nup_feedback.F
-	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+	if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           sed '/integer *, *external.*iargc/d' nup_standalone.F > nup_standalone.f  ; \
+        fi ; \
+	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.f
 	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 nupdown.exe: 
 	$(RM) $@
-	$(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.F
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+	if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           sed '/integer *, *external.*iargc/d' nupdown.F > nupdown.f  ; \
+        fi ; \
+	$(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.f
 	$(LD) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :
