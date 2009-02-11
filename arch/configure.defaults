@@ -5272,8 +5272,8 @@ SFC             =       $(FC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =	-w -O3
-FCOPTIM		=	-fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed
-FCDEBUG		=	# -g -O0
+FCOPTIM	        =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed
+FCDEBUG        	=       # -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree -mcmodel=medium $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \

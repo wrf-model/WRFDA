@@ -332,7 +332,7 @@ if test -n "$PERL" ; then
     -compileflags=$compileflags
   /bin/cp tools/gen_wrf_io.c.model tools/gen_wrf_io.c
   if [ "$opt_level" = "-d" ] ; then
-     sed -e 's/FCOPTIM[       ]*=/& # /' -e '/FCDEBUG[        ]*=/s/#//g' configure.wrf > configure.wrf.edit
+     sed -e 's/FCOPTIM[       ]*=/& # /' -e '/^FCDEBUG/s/#//g' configure.wrf > configure.wrf.edit
      /bin/mv configure.wrf.edit configure.wrf
   fi
   echo "configure for wrfplus"
