@@ -1,8 +1,9 @@
 module module_trace
 
-#ifdef DM_PARALLEL
-   use mpi, only : mpi_character, mpi_integer, mpi_sum, mpi_real8
-#endif
+!#ifdef DM_PARALLEL
+!   use mpi, only : mpi_character, mpi_integer, mpi_sum, mpi_real8
+!#endif
+
 
    use module_driver_constants, only : max_domains, max_moves
 
@@ -12,6 +13,10 @@ module module_trace
          integer, intent(out) :: memory_used
       end subroutine memory_info
    end interface
+
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
 
    integer, parameter :: TraceIndentAmount      = 2   ! default indent
    integer, parameter :: MaxNoRoutines          = 440 ! maxium number of subroutines
