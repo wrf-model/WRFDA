@@ -64,8 +64,10 @@ nup_standalone.exe :
 	if [ $$x = "gfortran" ] ; then \
            echo removing external declaration of iargc for gfortran ; \
            sed '/integer *, *external.*iargc/d' nup_standalone.F > nup_standalone.f  ; \
-        fi ; \
-	$(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.f
+	   $(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.f ; \
+        else   \
+	   $(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F ; \
+        fi   \
 	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 nupdown.exe: 
@@ -74,8 +76,10 @@ nupdown.exe:
 	if [ $$x = "gfortran" ] ; then \
            echo removing external declaration of iargc for gfortran ; \
            sed '/integer *, *external.*iargc/d' nupdown.F > nupdown.f  ; \
-        fi ; \
-	$(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.f
+	   $(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.f ; \
+        else   \
+	   $(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.F ; \
+        fi   \
 	$(LD) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 module_initialize :

@@ -5379,8 +5379,7 @@ CC              =       mpicc -cc=$(SCC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -w -O3
-FCOPTIM         =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed # -Minfo=all =Mn
-eginfo=all
+FCOPTIM         =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed # -Minfo=all =Mneginfo=all
 FCDEBUG		=	# -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
@@ -5483,7 +5482,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (Single-threaded, no nesting)
+#ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (Single-threaded, no nesting)
 #        
 #
 FC              =       ifort
@@ -5597,7 +5596,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (RSL_LITE, MPICH, No nesting, No periodic LBCs)
+#ARCH    PC Linux x86_64 (IA64 and Opteron), Intel 10.1 or higher DM-Parallel   (RSL_LITE, MPICH, No nesting, No periodic LBCs)
 #        
 #
 DMPARALLEL      =       1
