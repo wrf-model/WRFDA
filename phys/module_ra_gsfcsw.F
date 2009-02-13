@@ -147,7 +147,6 @@ CONTAINS
    REAL    :: XLAT0,XLONG0
    REAL    :: fac,latrmp
    REAL    :: xt24,tloctm,hrang,xxlat
-   real     yssl
 !
 !--------------------------------------------------------------------------------
 !   data set 1
@@ -542,9 +541,8 @@ CONTAINS
 !
 ! ... Solar zenith angle
 !
-      yssl=1440.0
       do i = its,ite
-        xt24 = dmod(xtime + radfrq * 0.5, yssl)
+        xt24 = dmod(dble(xtime + radfrq * 0.5), dble(1440.))
         tloctm = GMT + xt24 / 60. + XLONG(i,j) / 15.
         hrang = 15. * (tloctm - 12.) * degrad
         xxlat = XLAT(i,j) * degrad
