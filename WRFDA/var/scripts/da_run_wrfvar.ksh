@@ -364,7 +364,7 @@ if $NL_VAR4D; then
    export NL_AUXHIST2_OUTNAME=$NL_AUXHIST2_OUTNAME_SAVE
    export NL_FRAMES_PER_AUXHIST2=$NL_AUXHIST2_INTERVAL_SAVE
    ln -fs $WORK_DIR/*.TBL nl
-   ln -fs $WORK_DIR/RRTM_DATA nl
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA nl
    ln -fs $WORK_DIR/wrfbdy_d01 nl
    ln -fs $WORK_DIR/wrfinput_d01 nl/wrfinput_d01
    ln -fs $WRFNL_DIR/main/wrf.exe nl
@@ -434,7 +434,7 @@ if $NL_VAR4D; then
    . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input tl
    ln -fs $WORK_DIR/*.TBL tl
-   ln -fs $WORK_DIR/RRTM_DATA tl
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL tl
    ln -fs $WORK_DIR/wrfbdy_d01 tl
    ln -fs $WORK_DIR/tl01 tl/wrfinput_d01
    ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
@@ -484,7 +484,7 @@ if $NL_VAR4D; then
    . $WRFPLUS_DIR/inc/namelist_script.inc
    mv namelist.input ad
    ln -fs $WORK_DIR/*.TBL ad
-   ln -fs $WORK_DIR/RRTM_DATA ad
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL ad
    ln -fs $WORK_DIR/wrfbdy_d01 ad
    ln -fs $DA_FIRST_GUESS ad/wrfinput_d01
    for I in 01 02 03 04 05 06 07; do
