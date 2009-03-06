@@ -1,7 +1,0 @@
- To Perform the Adjoint and Tangential Check of solve_em .
-
- 1, make sure module_integrate_tst and integrate_tst in share/module_wrf_esmf_super.F are included during compilation.
-
- 2, compile wrfplus with serial configuration (1 cpu)
-
- 3, cd run, wrfplus.exe
