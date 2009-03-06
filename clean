@@ -9,13 +9,6 @@ foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
                       wrfdata whatiread rsl.* show_domain* )
 end
 
-( cd da ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
-( cd da_3dvar ; /bin/rm -f *.f *.o *.mod mpif.h *.stb .*.m *.lst )
-( cd da_3dvar/src ; /bin/rm -f *.f *.o *.mod *.stb .*.m *.lst )
-( cd external/RSL/RSL ; /bin/rm -f *.lst )
-( cd convertor ; /bin/rm -f *.f *.o *.mod *.exe *.stb .*.m *.lst )
-( cd gen_be ; /bin/rm -f *.o *.mod *.exe *.stb .*.m *.lst )
-
 ( cd tools/CodeBase ; make clean )
 
 ( cd inc ; /bin/rm -f *.inc namelist.default )
@@ -46,7 +39,6 @@ if ( "$1" == '-a' ) then
   ( cd test/exp_real ; /bin/rm -f gm* out* fort* real* )
 
   ( /bin/rm -f main/mpif.h main/*.stb )
-  ( /bin/rm -f da_3dvar/src/mpif.h )
   ( /bin/rm -f external/io_netcdf/mpif.h )
   ( /bin/rm -fr ./netcdf_links )
   ( /bin/rm -f core *.out 1 )

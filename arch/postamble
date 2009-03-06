@@ -1,10 +1,10 @@
 #
 #	Macros, these should be generic for all machines
 
-LN		=	ln -sf
+LN	=	ln -sf
 MAKE	=	make -i -r
-RM		= 	rm -f
-MV  	=   mv
+RM	=	rm -f
+MV  	=	mv
 
 #	There is probably no reason to modify these rules
 
