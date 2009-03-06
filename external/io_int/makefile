@@ -33,7 +33,13 @@ module_internal_header_util.o :
 diffwrf:                diffwrf.F ../../frame/pack_utils.o ../../frame/module_machine.o ../../frame/module_wrf_error.o libwrfio_int.a
 			if [ -f ../../frame/pack_utils.o ] ; then \
 			mv diffwrf.F diffwrf.F90    ; \
-			$(CPP1) diffwrf.F90 > diffwrf.f  ; \
+                        x=`echo "$(FC)" | awk '{print $$1}'` ; export x ; \
+                        if [ $$x = "gfortran" ] ; then \
+                          echo removing external declaration of iargc for gfortran ; \
+                          $(CPP1)  -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f  ; \
+                        else \
+                          $(CPP1)  -I../ioapi_share diffwrf.F90 > diffwrf.f  ; \
+                        fi ; \
 			$(FC) -c $(FFLAGS) diffwrf.f    ; \
 			mv diffwrf.F90 diffwrf.F ; \
 			$(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) \

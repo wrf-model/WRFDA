@@ -23,7 +23,7 @@ libwrfio_nf.a:		$(OBJS) $(CODE)
 wrf_io_flags.h:
 			/bin/rm -f wrf_io_flags.h
 			sed -e '1,/BEGINIOFLAGS/d' -e '/ENDIOFLAGS/,$$d' wrf_io.F90 > wrf_io_flags.h
-			if [ $(RWORDSIZE) -eq 8 ] ; then \
+			if [ 8 -eq 8 ] ; then \
 				/bin/rm -f foo_io_flags.h ; \
 				sed -e "s/104/105/" wrf_io_flags.h > foo_io_flags.h ; \
 				/bin/mv foo_io_flags.h wrf_io_flags.h ; fi
@@ -33,7 +33,13 @@ wrf_io.o:               wrf_io.F90 $(CODE)
 			$(FC) $(FFLAGS) -I. -c wrf_io.f
 
 diffwrf:                diffwrf.F90
-			$(CPP1) diffwrf.F90 > diffwrf.f
+	x=`echo "$(FC)" | awk '{print $$1}'` ; export x ; \
+	if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP1) -I$(NETCDFPATH)/include -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f ;\
+        else \
+           $(CPP1) -I$(NETCDFPATH)/include -I../ioapi_share diffwrf.F90 > diffwrf.f ; \
+        fi
 			$(FC) -c $(FFLAGS) diffwrf.f
 			@if [ -f ../../frame/module_wrf_error.o ] ; then \
 			echo "diffwrf is being built now. "; \
