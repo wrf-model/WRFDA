@@ -141,10 +141,6 @@ for INDEX in 01 02 03 04 05 06 07; do
    export D_HOUR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c9-10)
 done
 
-if $NL_GLOBAL; then
-   export NL_NPROC_X=1
-fi
-
 export YEAR=$(echo $DATE | cut -c1-4)
 export MONTH=$(echo $DATE | cut -c5-6)
 export DAY=$(echo $DATE | cut -c7-8)

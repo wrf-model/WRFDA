@@ -232,7 +232,6 @@ export NL_NUM_SLOTS_AHEAD=${NL_NUM_SLOTS_AHEAD:-3}
 export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.
 export NL_MULTI_INC=${NL_MULTI_INC:-0}  # Analysis type.
 export NL_VAR4D=${NL_VAR4D:-false}
-export NL_GLOBAL=${NL_GLOBAL:-false}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}                   # Background error covariance directory.
 export BIASCORR_DIR=${BIASCORR_DIR:-$WRFVAR_DIR/var/run/biascorr}
 export OBS_TUNING_DIR=${OBS_TUNING_DIR:-$WRFVAR_DIR/var/run/obs_tuning}
@@ -302,5 +301,4 @@ export NL_ALPHA_TRUNCATION=${NL_ALPHA_TRUNCATION:-0}   # Spectral truncation (gl
 export NL_ALPHA_CORR_TYPE=${NL_ALPHA_CORR_TYPE:-3}     # 1=Exponential, 2=SOAR, 3=Gaussian.
 export NL_ALPHA_CORR_SCALE=${NL_ALPHA_CORR_SCALE:-1500} # Localization lengthscale (km)
 export NL_ALPHA_STD_DEV=${NL_ALPHA_STD_DEV:-1.0}       # Alpha standard deviation.
-export NL_JB_FACTOR=${NL_JB_FACTOR:-1.0}               # Cost function multiplicative factor.
 export NL_JE_FACTOR=${NL_JE_FACTOR:-1.0}               # Cost function multiplicative factor.
