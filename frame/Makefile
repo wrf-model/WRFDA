@@ -56,7 +56,7 @@ clean:
 	@ echo 'use the clean script'
 
 module_state_description.F : ../Registry/$(REGISTRY)
-		( cd .. ; tools/registry $(ARCHFLAGS) Registry/$(REGISTRY) )
+		( cd .. ; tools/registry $(ARCHFLAGS) $(WRFVAR) Registry/$(REGISTRY) )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
