@@ -1231,7 +1231,8 @@ LD              =       mpxlf90_r
 CC              =       mpcc_r
 RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
-CFLAGS          =       -DNOUNDERSCORE
+CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 FCOPTIM         =       -O3 #-qhot
 FCDEBUG         =       # -g -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 
@@ -3832,7 +3833,8 @@ LD              =       $(FC)
 CC              =       mpicc -cc=$(SCC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
-CFLAGS          =       -w -O3
+CFLAGS          =       -w -O3 -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM         =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed # -Minfo=all =Mneginfo=all
 FCDEBUG		=	# -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
@@ -4062,7 +4064,8 @@ LD              =       $(FC)
 CC              =       mpicc -cc=$(SCC)
 RWORDSIZE       =       8
 PROMOTION	=	-r$(RWORDSIZE) -i4
-CFLAGS          =       -w -O3 -ip
+CFLAGS          =       -w -O3 -ip -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM         =       -O3
 FCDEBUG		=	#-g -O0 -traceback
 FCBASEOPTS      =       -zero -w -ftz -align all -fno-alias -fp-model precise -FR -convert big_endian $(FCDEBUG)
@@ -4280,7 +4283,8 @@ LD              =       $(FC)
 CC              =       mpicc -cc=$(SCC)
 RWORDSIZE       =       8
 PROMOTION	=	-fdefault-real-8
-CFLAGS          =       -w -O3
+CFLAGS          =       -w -O3 -DDM_PARALLEL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM         =       -O3 -ftree-vectorize -ftree-loop-linear -funroll-loops
 FCDEBUG         =       # -g -O0
 FCBASEOPTS      =       -w -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
