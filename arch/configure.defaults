@@ -4181,7 +4181,7 @@ PROMOTION	=	-fdefault-real-8
 CFLAGS          =       -w -O3
 FCOPTIM         =       -O3 -ftree-vectorize -ftree-loop-linear -funroll-loops
 FCDEBUG         =       # -g -O0
-FCBASEOPTS      =       -w -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
+FCBASEOPTS      =       -w -finit-local-zero -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          CONFIGURE_NETCDF_FLAG \
@@ -4287,7 +4287,7 @@ CFLAGS          =       -w -O3 -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -I../external/RSL_LITE
 FCOPTIM         =       -O3 -ftree-vectorize -ftree-loop-linear -funroll-loops
 FCDEBUG         =       # -g -O0
-FCBASEOPTS      =       -w -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
+FCBASEOPTS      =       -w -finit-local-zero -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
