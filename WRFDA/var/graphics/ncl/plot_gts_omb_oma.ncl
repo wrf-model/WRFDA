@@ -1194,56 +1194,58 @@ begin
          ;
          ; plot distribution for each variable
          ;
-         plot = new(4,graphic)
-         ;
-         title = otype+" U (All: "+num_u_all+")"
-         mpres = setmpres(title,"","")
-         plon = mask(lon(:),.not.ismissing(pu(:,0)),True)
-         plat = mask(lat(:),.not.ismissing(pu(:,0)),True)
-         pdata = mask(pu(:,1),.not.ismissing(pu(:,0)),True)
-         plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
-         delete(plon)
-         delete(plat)
-         delete(pdata)
-         ;
-         title = otype+" U (Used: "+num_u_qc+")"
-         mpres = setmpres(title,"","")
-         plon = mask(lon(:),pu(:,2).ge.0,True)
-         plat = mask(lat(:),pu(:,2).ge.0,True)
-         pdata = mask(pu(:,1),pu(:,2).ge.0,True)
-         plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
-         ; wmsetp("col", 2)    ; Draw in red.
-         ; wmsetp("wbs", .01)  ; Increase the size of the barb.
-         ; wmbarbmap(wks, plat, plon,  mask(pu(:,0),pu(:,2).ge.0,True), mask(pv(:,0),pv(:,2).ge.0,True))
-         delete(plon)
-         delete(plat)
-         delete(pdata)
-         ;
-         title = otype+" V (All: "+num_v_all+")"
-         mpres = setmpres(title,"","")
-         plon = mask(lon(:),.not.ismissing(pv(:,0)),True)
-         plat = mask(lat(:),.not.ismissing(pv(:,0)),True)
-         pdata = mask(pv(:,1),.not.ismissing(pv(:,0)),True)
-         plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
-         delete(plon)
-         delete(plat)
-         delete(pdata)
-         ;
-         title = otype+" V (Used: "+num_v_qc+")"
-         mpres = setmpres(title,"","")
-         plon = mask(lon(:),pv(:,2).ge.0,True)
-         plat = mask(lat(:),pv(:,2).ge.0,True)
-         pdata = mask(pv(:,1),pv(:,2).ge.0,True)
-         plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
-         delete(plon)
-         delete(plat)
-         delete(pdata)
-         pnres = True
-         pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
-         ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-         pnres@txString = date+"    "+otype+"    "+info
-         gsn_panel(wks,plot,(/2,2/),pnres)
-         delete(plot)
+         if ( otype .ne. "AIRSR" ) then
+            plot = new(4,graphic)
+            ;
+            title = otype+" U (All: "+num_u_all+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),.not.ismissing(pu(:,0)),True)
+            plat = mask(lat(:),.not.ismissing(pu(:,0)),True)
+            pdata = mask(pu(:,1),.not.ismissing(pu(:,0)),True)
+            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            ;
+            title = otype+" U (Used: "+num_u_qc+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),pu(:,2).ge.0,True)
+            plat = mask(lat(:),pu(:,2).ge.0,True)
+            pdata = mask(pu(:,1),pu(:,2).ge.0,True)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            ; wmsetp("col", 2)    ; Draw in red.
+            ; wmsetp("wbs", .01)  ; Increase the size of the barb.
+            ; wmbarbmap(wks, plat, plon,  mask(pu(:,0),pu(:,2).ge.0,True), mask(pv(:,0),pv(:,2).ge.0,True))
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            ;
+            title = otype+" V (All: "+num_v_all+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),.not.ismissing(pv(:,0)),True)
+            plat = mask(lat(:),.not.ismissing(pv(:,0)),True)
+            pdata = mask(pv(:,1),.not.ismissing(pv(:,0)),True)
+            plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            ;
+            title = otype+" V (Used: "+num_v_qc+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),pv(:,2).ge.0,True)
+            plat = mask(lat(:),pv(:,2).ge.0,True)
+            pdata = mask(pv(:,1),pv(:,2).ge.0,True)
+            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            pnres = True
+            pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
+            ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+            pnres@txString = date+"    "+otype+"    "+info
+            gsn_panel(wks,plot,(/2,2/),pnres)
+            delete(plot)
+         end if
 
          if ( otype.eq. "AIREP" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
             plot = new(4,graphic)
