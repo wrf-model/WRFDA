@@ -230,6 +230,9 @@ if $NL_VAR4D; then
    ln -fs $DA_BOUNDARIES wrfbdy_d01
    ln -fs $DA_FIRST_GUESS fg01
    ln -fs $WRFVAR_DIR/run/RRTM_DATA .
+   ln -fs $WRFVAR_DIR/run/VEGPARM.TBL .
+   ln -fs $WRFVAR_DIR/run/SOILPARM.TBL .
+   ln -fs $WRFVAR_DIR/run/GENPARM.TBL .
 fi
 ln -fs $DA_FIRST_GUESS fg 
 ln -fs $DA_FIRST_GUESS ${FILE_TYPE}_d01
