@@ -83,7 +83,7 @@ fi
 #1. x,y reversed in namelist as MM5 i=y.
 #2. Modified namelist 2 in fortran code to be lime -DBKG.
 
-cat > namelist.3dvar_obs << EOF
+cat > namelist.obsproc << EOF
 &record1
  obs_gts_filename = '$OB_FILE',
  fg_format        = 'WRF',
@@ -188,18 +188,18 @@ cat > namelist.3dvar_obs << EOF
 
 EOF
 
-cp namelist.3dvar_obs $RUN_DIR
+cp namelist.obsproc $RUN_DIR
 
 echo "Converting $WORK_DIR/$OB_FILE to"
 echo "$OB_DIR/$DATE/ob.ascii"
-echo '<A HREF="namelist.3dvar_obs">Namelist input</a>'
+echo '<A HREF="namelist.obsproc">Namelist input</a>'
 if $DUMMY; then
    echo "Dummy obsproc"
    echo "Dummy obsproc" > obs_gts.3dvar
 else
    ln -fs $WRFVAR_DIR/var/obsproc/obserr.txt .
    ln -fs $WRFVAR_DIR/var/obsproc/prepbufr_table_filename .
-   $WRFVAR_DIR/var/obsproc/3dvar_obs.exe
+   $WRFVAR_DIR/var/obsproc/obsproc.exe
    RC=$?
    echo "Ended %$RC"
 fi
