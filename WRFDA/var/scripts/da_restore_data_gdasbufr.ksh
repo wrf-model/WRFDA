@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------
 # Script da_restore_data_rtobs.ksh
 #
-# Purpose: Restore real time observation files from Jim Bresch's archive
+# Purpose: Restore GDAS BUFR observation files from Zhiquan Liu's archive
 #
 #-----------------------------------------------------------------------
 
