@@ -61,7 +61,6 @@ export FCST_RANGE=$FCST_RANGE_SAVE
 
 export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
 
-ln -fs $OB_DIR/$DATE/$OB_FILE .
 
 if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
    # If compressed, unpack
@@ -71,6 +70,13 @@ if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
       cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
       gunzip -f ${OB_FILE}.gz
    fi
+fi
+
+if [[ ${NL_USE_FOR} == FGAT ]]; then
+
+   export TIME_WINDOW_MIN=`$WRFVAR_DIR/da/da_advance_time.exe  $DATE  $TIME_WINDOW_M  -w  `
+   export TIME_ANALYSIS=`$WRFVAR_DIR/da/da_advance_time.exe    $DATE  0  -w  `
+   export TIME_WINDOW_MAX=`$WRFVAR_DIR/da/da_advance_time.exe  $DATE  $TIME_WINDOW_P  -w  `      
 fi
 
 #Namelist notes:
@@ -91,7 +97,7 @@ cat > namelist.3dvar_obs << EOF
 /
 
 &record3
- max_number_of_obs        = 70000,
+ max_number_of_obs        = 400000,
  fatal_if_exceed_max_obs  = .TRUE.,
 /
 
