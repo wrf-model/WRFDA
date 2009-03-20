@@ -139,6 +139,20 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       fi
    fi
   
+   if $RUN_RESTORE_DATA_GDASBUFR; then
+      export RUN_DIR=$SUITE_DIR/$DATE/restore_data_gdasbufr
+      mkdir -p $RUN_DIR; mkdir -p $OB_DIR
+
+      $SCRIPTS_DIR/da_trace.ksh da_restore_data_gdasbufr $RUN_DIR
+      $SCRIPTS_DIR/da_restore_data_gdasbufr.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}restore_data_gdasbufr failed with error$RC$END"
+         echo restore_data_gdasbufr > FAIL
+         break
+      fi
+   fi
+
    if $RUN_WPS; then
       export RUN_DIR=$SUITE_DIR/$DATE/wps
       mkdir -p $RUN_DIR
