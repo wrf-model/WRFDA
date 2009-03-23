@@ -40,7 +40,7 @@ export CYCLE_PERIOD=12
 #
 export REGION=amps60
 export EXPT=test1
-export NUM_PROCS=1
+export NUM_PROCS=128  # number of processors used in running WRF-Var
 export WRFVAR_DIR=/sausage/hclin/code/WRFVAR/trunk
 export BUILD_DIR=${WRFVAR_DIR}/var/da
 export EXP_DIR=/sausage/hclin/exps/$REGION/$EXPT
