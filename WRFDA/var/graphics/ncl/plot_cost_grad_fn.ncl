@@ -31,7 +31,7 @@ begin
 ; read in data
 ;************************************************
  nrow = iter+1
- ncol = 9
+ ncol = 10
  Fill_ValueF = -999.
  x    = new((/2,nrow/),float)
  cost = new((/2,nrow/),float)
