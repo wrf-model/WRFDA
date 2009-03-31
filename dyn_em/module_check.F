@@ -738,9 +738,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &jts, jte, kts, kte )
 
    SAVE_L=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       SAVE_L=SAVE_L + P_ru_tend(i,k,j)*P_ru_tend(i,k,j)  &
                     + P_rv_tend(i,k,j)*P_rv_tend(i,k,j)  &
                     + P_rw_tend(i,k,j)*P_rw_tend(i,k,j)  &
@@ -754,9 +754,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       SAVE_L=SAVE_L + P_ru_tendf(i,k,j) *P_ru_tendf(i,k,j) &
                     + P_rv_tendf(i,k,j) *P_rv_tendf(i,k,j) &
                     + P_rw_tendf(i,k,j) *P_rw_tendf(i,k,j) &
@@ -765,8 +765,8 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       SAVE_L=SAVE_L + P_mu_tend(i,j) *P_mu_tend(i,j) 
    enddo
    enddo
@@ -853,9 +853,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 
       VAL_N=0.
-      do i=its,ite
-      do k=kts,kte
-      do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
          VAL_N=VAL_N+(P_ru_tend(i,k,j)- B_ru_tend(i,k,j))*(P_ru_tend(i,k,j)- B_ru_tend(i,k,j))  &
                     +(P_rv_tend(i,k,j)- B_rv_tend(i,k,j))*(P_rv_tend(i,k,j)- B_rv_tend(i,k,j))   &
                     +(P_rw_tend(i,k,j)- B_rw_tend(i,k,j))*(P_rw_tend(i,k,j)- B_rw_tend(i,k,j))   &
@@ -870,9 +870,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
       enddo
       enddo
 
-      do i=its,ite
-      do k=kts,kte
-      do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
          VAL_N=VAL_N+(P_ru_tendf(i,k,j)- B_ru_tendf(i,k,j))*(P_ru_tendf(i,k,j)- B_ru_tendf(i,k,j))  &
                     +(P_rv_tendf(i,k,j)- B_rv_tendf(i,k,j))*(P_rv_tendf(i,k,j)- B_rv_tendf(i,k,j))  &
                     +(P_rw_tendf(i,k,j)- B_rw_tendf(i,k,j))*(P_rw_tendf(i,k,j)- B_rw_tendf(i,k,j))  &
@@ -882,8 +882,8 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
       enddo
       enddo
 
-      do i=its,ite
-      do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
          VAL_N=VAL_N+(P_mu_tend(i,j)- B_mu_tend(i,j))*(P_mu_tend(i,j)- B_mu_tend(i,j))   
       enddo
       enddo
@@ -1039,9 +1039,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &jts, jte, kts, kte )
 
    VAL_L=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_L=VAL_L + P_ru_tend(i,k,j)*P_ru_tend(i,k,j)  &
                     + P_rv_tend(i,k,j)*P_rv_tend(i,k,j)  &
                     + P_rw_tend(i,k,j)*P_rw_tend(i,k,j)  &
@@ -1055,9 +1055,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_L=VAL_L  + P_ru_tendf(i,k,j) *P_ru_tendf(i,k,j) &
                     + P_rv_tendf(i,k,j) *P_rv_tendf(i,k,j) &
                     + P_rw_tendf(i,k,j) *P_rw_tendf(i,k,j) &
@@ -1066,8 +1066,8 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       VAL_L=VAL_L + P_mu_tend(i,j) *P_mu_tend(i,j)
    enddo
    enddo
@@ -1141,9 +1141,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 
    VAL_A=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_A=VAL_A +P_ru(i,k,j)*B_ru(i,k,j)         &  
                +P_rv(i,k,j)*B_rv(i,k,j)            &
                +P_rw(i,k,j)*B_rw(i,k,j)            &
@@ -1169,9 +1169,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_A=VAL_A +P_ru_tendf(i,k,j)*B_ru_tendf(i,k,j)   &
                +P_rv_tendf(i,k,j)*B_rv_tendf(i,k,j)      &
                +P_rw_tendf(i,k,j)*B_rw_tendf(i,k,j)      &
@@ -1181,8 +1181,8 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    enddo
    enddo
 
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       VAL_A=VAL_A +P_mu(i,j)*B_mu(i,j)   &
                +P_mut(i,j)*B_mut(i,j)    &
                +P_muu(i,j)*B_muu(i,j)    &
@@ -4980,9 +4980,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       B_u_1(i,k,j)=u_1(i,k,j)
       B_v_1(i,k,j)=v_1(i,k,j)
       B_w_1(i,k,j)=w_1(i,k,j)
@@ -4996,8 +4996,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       B_mu_1(i,j)=mu_1(i,j)
       B_mu_2(i,j)=mu_2(i,j)
       B_mut(i,j)=mut(i,j)
@@ -5006,9 +5006,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       B_u_save(i,k,j)=u_save(i,k,j)
       B_v_save(i,k,j)=v_save(i,k,j)
       B_w_save(i,k,j)=w_save(i,k,j)
@@ -5019,8 +5019,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       B_muus(i,j)=muus(i,j)
       B_muvs(i,j)=muvs(i,j)
       B_muts(i,j)=muts(i,j)
@@ -5038,9 +5038,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 &ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    SAVE_L=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       SAVE_L=SAVE_L + P_u_1(i,k,j)*P_u_1(i,k,j)         &
                     + P_v_1(i,k,j)*P_v_1(i,k,j)         &
                     + P_w_1(i,k,j)*P_w_1(i,k,j)         &
@@ -5054,8 +5054,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       SAVE_L=SAVE_L + P_mu_1(i,j)*P_mu_1(i,j)           &
                     + P_mu_2(i,j)*P_mu_2(i,j)           &
                     + P_mut(i,j)*P_mut(i,j)             &
@@ -5063,9 +5063,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                     + P_muv(i,j)*P_muv(i,j)
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       SAVE_L=SAVE_L + P_u_save(i,k,j)*P_u_save(i,k,j)    &
                     + P_v_save(i,k,j)*P_v_save(i,k,j)    &
                     + P_w_save(i,k,j)*P_w_save(i,k,j)    &
@@ -5076,8 +5076,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       SAVE_L=SAVE_L + P_muus(i,j)*P_muus(i,j)            &
                     + P_muvs(i,j)*P_muvs(i,j)            &
                     + P_muts(i,j)*P_muts(i,j)            &
@@ -5147,9 +5147,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             its,ite, jts,jte, kts,kte    )
 
       VAL_N=0.
-      do i=its,ite
-      do k=kts,kte
-      do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
          VAL_N=VAL_N + (P_u_1(i,k,j)- B_u_1(i,k,j))*(P_u_1(i,k,j)- B_u_1(i,k,j))        &
                     + (P_v_1(i,k,j)- B_v_1(i,k,j))*(P_v_1(i,k,j)- B_v_1(i,k,j))         &
                     + (P_w_1(i,k,j)- B_w_1(i,k,j))*(P_w_1(i,k,j)- B_w_1(i,k,j))         &
@@ -5163,8 +5163,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
          VAL_N=VAL_N + (P_mu_1(i,j)- B_mu_1(i,j))*(P_mu_1(i,j)- B_mu_1(i,j))         &
                     + (P_mu_2(i,j)- B_mu_2(i,j))*(P_mu_2(i,j)- B_mu_2(i,j))          &
                     + (P_mut(i,j)- B_mut(i,j))*(P_mut(i,j)- B_mut(i,j))              &
@@ -5172,9 +5172,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                     + (P_muv(i,j)- B_muv(i,j))*(P_muv(i,j)- B_muv(i,j))         
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
          VAL_N=VAL_N + (P_u_save(i,k,j)- B_u_save(i,k,j))*(P_u_save(i,k,j)- B_u_save(i,k,j))        &
                     + (P_v_save(i,k,j)- B_v_save(i,k,j))*(P_v_save(i,k,j)- B_v_save(i,k,j))         &
                     + (P_w_save(i,k,j)- B_w_save(i,k,j))*(P_w_save(i,k,j)- B_w_save(i,k,j))         &
@@ -5185,8 +5185,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
          VAL_N=VAL_N + (P_muus(i,j)- B_muus(i,j))*(P_muus(i,j)- B_muus(i,j))              &
                     + (P_muvs(i,j)- B_muvs(i,j))*(P_muvs(i,j)- B_muvs(i,j))               &
                     + (P_muts(i,j)- B_muts(i,j))*(P_muts(i,j)- B_muts(i,j))               &
@@ -5314,9 +5314,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 &ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_L=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_L=VAL_L  + P_u_1(i,k,j)*P_u_1(i,k,j)         &
                     + P_v_1(i,k,j)*P_v_1(i,k,j)         &
                     + P_w_1(i,k,j)*P_w_1(i,k,j)         &
@@ -5330,8 +5330,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       VAL_L=VAL_L  + P_mu_1(i,j)*P_mu_1(i,j)           &
                     + P_mu_2(i,j)*P_mu_2(i,j)           &
                     + P_mut(i,j)*P_mut(i,j)             &
@@ -5339,9 +5339,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                     + P_muv(i,j)*P_muv(i,j)
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_L=VAL_L  + P_u_save(i,k,j)*P_u_save(i,k,j)    &
                     + P_v_save(i,k,j)*P_v_save(i,k,j)    &
                     + P_w_save(i,k,j)*P_w_save(i,k,j)    &
@@ -5353,8 +5353,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
 
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       VAL_L=VAL_L  + P_muus(i,j)*P_muus(i,j)            &
                     + P_muvs(i,j)*P_muvs(i,j)            &
                     + P_muts(i,j)*P_muts(i,j)            &
@@ -5393,18 +5393,18 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 !&ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
    VAL_A=0.
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_A=VAL_A +P_p(i,k,j)*B_p(i,k,j)      &
                   +P_alt(i,k,j)*B_alt(i,k,j)  &
                   +P_ww(i,k,j)*B_ww(i,k,j)                     
    enddo
    enddo
    enddo
-   do i=its,ite
-   do k=kts,kte
-   do j=jts,jte
+   do i=ims,ime
+   do k=kms,kme
+   do j=jms,jme
       VAL_A=VAL_A + P_u_1(i,k,j)*B_u_1(i,k,j)         &
                     + P_v_1(i,k,j)*B_v_1(i,k,j)         &
                     + P_w_1(i,k,j)*B_w_1(i,k,j)         &
@@ -5418,8 +5418,8 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    enddo
    enddo
    enddo
-   do i=its,ite
-   do j=jts,jte
+   do i=ims,ime
+   do j=jms,jme
       VAL_A=VAL_A + P_mu_1(i,j)*B_mu_1(i,j)           &
                     + P_mu_2(i,j)*B_mu_2(i,j)           &
                     + P_mut(i,j)*B_mut(i,j)             &
