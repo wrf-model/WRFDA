@@ -7,6 +7,7 @@
 
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
+$sw_usenetcdff = "" ;    # for 3.6.2 and greater, the fortran bindings might be in a separate lib file
 $sw_phdf5_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
@@ -23,6 +24,10 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
   if ( substr( $ARGV[0], 1, 7 ) eq "netcdf=" )
   {
     $sw_netcdf_path = substr( $ARGV[0], 8 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 11 ) eq "USENETCDFF=" )
+  { 
+    $sw_usenetcdff = substr( $ARGV[0], 12 ) ;
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" )
   {
@@ -123,7 +128,7 @@ while ( <CONFIGURE_DEFAULTS> )
     if ( $sw_netcdf_path ) 
       { $_ =~ s/CONFIGURE_WRFIO_NF/wrfio_nf/g ;
 	$_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
-	$_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L../external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib -lnetcdf: ;
+	$_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L../external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib $sw_usenetcdff -lnetcdf: ;
 	 }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_NF//g ;

@@ -251,8 +251,14 @@ if test -z "$PDHF5" ; then
   fi
 fi
 
+USENETCDFF="" #see below
 if [ -n "$NETCDF" ] ; then
   echo "Will use NETCDF in dir: $NETCDF"
+# for 3.6.2 and greater there might be a second library, libnetcdff.a .  Check for this and use 
+# if available
+  if [ -f "$NETCDF/lib/libnetcdff.a" ] ; then
+    USENETCDFF="-lnetcdff"
+  fi
 else
   echo "Will configure for use without NetCDF"
 fi
@@ -329,10 +335,10 @@ if test -n "$PERL" ; then
 
   echo "configure for wrfplus"
   $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -os=$os -mach=$mach -ldflags=$ldflags \
-    -compileflags=$compileflags
+    -compileflags=$compileflags -USENETCDFF=$USENETCDFF
   /bin/cp tools/gen_wrf_io.c.model tools/gen_wrf_io.c
   if [ "$opt_level" = "-d" ] ; then
-     sed -e 's/FCOPTIM[       ]*=/& # /' -e '/^FCDEBUG/s/#//g' configure.wrf > configure.wrf.edit
+     sed -e '/^FCOPTIM/s/=       /=       #/g' -e '/^FCDEBUG/s/#//g' configure.wrf > configure.wrf.edit
      /bin/mv configure.wrf.edit configure.wrf
   fi
   echo "configure for wrfplus"

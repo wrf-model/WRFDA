@@ -68,7 +68,12 @@ nup_standalone.exe :
         else   \
 	   $(SFC) -I$(NETCDFPATH)/include -c $(FCBASEOPTS) nup_standalone.F ; \
         fi 
-	$(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm
+	x=`grep netcdff ../configure.wrf | awk '{print $$1}'` ; export x ;\
+	if [ $$x ] ; then \
+	   $(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdff -lnetcdf -lm ; \
+        else \
+	   $(LD) -o nup_standalone.exe  nup_standalone.o module_nup_feedback.o -L$(NETCDFPATH)/lib -lnetcdf -lm ; \
+        fi
 
 nupdown.exe: 
 	$(RM) $@
@@ -80,7 +85,12 @@ nupdown.exe:
         else   \
 	   $(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include nupdown.F ; \
         fi
-	$(LD) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
+	x=`grep netcdff ../configure.wrf | awk '{print $$1}'` ; export x ;\
+	if [ $$x ] ; then \
+	   $(LD) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdff -lnetcdf -lm ; \
+        else \
+	   $(LD) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdf -lm ; \
+        fi
 
 module_initialize :
 	( cd ../dyn_$(SOLVER) ;  $(MAKE) module_initialize_$(IDEAL_CASE).o )
