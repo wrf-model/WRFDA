@@ -244,6 +244,39 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       export FCST_RANGE=$FCST_RANGE_SAVE
    fi
 
+
+   if $RUN_GSI; then
+       export RUN_DIR=$SUITE_DIR/$DATE/gsi
+       if [[ ! -d $RUN_DIR ]]; then
+           mkdir -p $RUN_DIR
+       else
+         rm -fr $RUN_DIR/*
+       fi
+     
+       YEAR=$(echo $DATE | cut -c1-4)
+       MONTH=$(echo $DATE | cut -c5-6)
+       DAY=$(echo $DATE | cut -c7-8)
+       HOUR=$(echo $DATE | cut -c9-10)      
+       ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
+ 
+       export DA_FIRST_GUESS=${RC_DIR}/$DATE/${FILE_TYPE}_d01
+       if $CYCLING; then
+          if [[ $CYCLE_NUMBER -gt 0 ]]; then
+             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/${FILE_TYPE}_d01_${ANALYSIS_DATE}
+          fi
+       fi
+ 
+       $SCRIPTS_DIR/da_trace.ksh  da_run_gsi $RUN_DIR
+       $SCRIPTS_DIR/da_run_gsi.ksh > $RUN_DIR/index.html 2>&1
+       RC=$?
+       if [[ $? != 0 ]]; then
+          echo $(date) "${ERR}run_gsi failed with error $RC$END"
+          echo gsi > FAIL
+          break
+       fi
+ 
+    fi
+
    if $RUN_WRFVAR; then
       export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
       mkdir -p $RUN_DIR
