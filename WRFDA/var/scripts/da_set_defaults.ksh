@@ -33,6 +33,7 @@ export RUN_WPB=${RUN_WPB:-false}
 export RUN_WPS=${RUN_WPS:-false}
 export RUN_WRF=${RUN_WRF:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
+export RUN_GSI=${RUN_GSI:-false}
 
 # Experiment details:
 export DUMMY=${DUMMY:-false}
