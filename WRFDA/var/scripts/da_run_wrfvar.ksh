@@ -754,6 +754,10 @@ else
       cp qcstat_* $RUN_DIR
    fi
 
+   if [[ -f rsl.out.0000 ]]; then
+      cp rsl.out.0000 $RUN_DIR
+   fi
+
    if [[ -f VARBC.in ]]; then
       cp VARBC.in $RUN_DIR
    fi
@@ -761,6 +765,7 @@ else
    if [[ -f VARBC.out ]]; then
       cp VARBC.out $RUN_DIR
    fi
+
 
    if (ls biasprep* 2>/dev/null); then
       mkdir $RUN_DIR/biasprep
