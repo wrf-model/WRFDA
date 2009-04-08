@@ -111,16 +111,16 @@ OBERROR=${FIXGLOBAL}/prepobs_errtable.global
 cd $WORK_DIR
 
 #    # Fixed fields
-    ${NCP:-cp} $BERROR   berror_stats
-    ${NCP:-cp} $SATANGL  satbias_angle
-    ${NCP:-cp} $SATINFO  satinfo
-    ${NCP:-cp} $RTMEMIS  EmisCoeff.bin
-    ${NCP:-cp} $RTMAERO  AerosolCoeff.bin
-    ${NCP:-cp} $RTMCLDS  CloudCoeff.bin
-    ${NCP:-cp} $CONVINFO convinfo
-    ${NCP:-cp} $OZINFO   ozinfo
-    ${NCP:-cp} $PCPINFO  pcpinfo
-    ${NPC:-cp} $OBERROR  errtable
+    ln -sf $BERROR   berror_stats
+    ln -sf $SATANGL  satbias_angle
+    ln -sf $SATINFO  satinfo
+    ln -sf $RTMEMIS  EmisCoeff.bin
+    ln -sf $RTMAERO  AerosolCoeff.bin
+    ln -sf $RTMCLDS  CloudCoeff.bin
+    ln -sf $CONVINFO convinfo
+    ln -sf $OZINFO   ozinfo
+    ln -sf $PCPINFO  pcpinfo
+    ln -sf $OBERROR  errtable
 
 #    # CRTM Spectral and Transmittance coefficients
     nsatsen=`cat satinfo | wc -l`
@@ -142,12 +142,12 @@ cd $WORK_DIR
  bufrtable=$FIXGLOBAL/prepobs_prep.bufrtable
 
 # Copy executable and fixed files to current working directory
- ${NPC:-cp} $GSI_DIR/sorc/global_gsi.fd/global_gsi  ./gsi.x
- ${NPC:-cp} $bufrtable ./prepobs_prep.bufrtable
+ ln -sf $GSI_DIR/sorc/global_gsi.fd/global_gsi  ./gsi.x
+ ln -sf $bufrtable ./prepobs_prep.bufrtable
 
 # Copy observational data to current working directory
- #${NPC:-cp} OB_DIR/$DATE/ob.bufr ./prepbufr
-   ln -sf OB_DIR/$DATE/ob.bufr ./prepbufr
+   ln -sf $OB_DIR/$DATE/ob.bufr    ./prepbufr
+   ln -sf $OB_DIR/$DATE/amsua.bufr ./amsuabufr
 
 # Copy bias correction, sigma, and surface files
 #  *** NOTE:  The regional gsi analysis is written to (over)
@@ -164,7 +164,7 @@ cd $WORK_DIR
 cat << EOF > gsiparm.anl
  &SETUP
    miter=2,niter(1)=50,niter(2)=50,
-   write_diag(1)=.true.,write_diag(2)=.false.,write_diag(3)=.true.,
+   write_diag(1)=.true.,write_diag(2)=.true.,write_diag(3)=.true.,
    qoption=1,
    gencode=78,factqmin=0.005,factqmax=0.005,deltim=$DELTIM,
    ndat=59,npred=5,iguess=-1,
@@ -282,26 +282,69 @@ cat << EOF > gsiparm.anl
  /
 EOF
 
-if $DUMMY; then
-   echo "Dummy gsi"
-   #for DOMAIN in $DOMAINS; do #right now GSI only handle one domain
-      echo Dummy gsi > wrf_inout
-   #done
-else
-   
-   if [[ -f gsiparm.anl ]]; then
-     cp gsiparm.anl $RUN_DIR
-   fi
-
   # Run gsi under Parallel Operating Environment (poe) on NCEP IBM
   ##poe hpmcount $tmpdir/gsi.x < gsiparm.anl > stdout
-  mpirun.lsf  ./gsi.x < gsiparm.anl 
-  ${NPC:-cp} ./wrf_inout $GSI_OUTPUT_DIR/wrfinput_d01 
-  
+  mpirun.lsf  ./gsi.x < gsiparm.anl > stdout
   RC=$?
+
+# save analysis result in FC_DIR
+  ${NPC:-cp} ./wrf_inout $GSI_OUTPUT_DIR/wrfinput_d01
   cd $RUN_DIR
   echo $(date +'%D %T') "Ended $RC"
-fi
+
+# rename diagnostics files with a more meaningful name
+#
+mv $WORK_DIR/fort.201        stats.ps
+mv $WORK_DIR/fort.202        stats.uv
+mv $WORK_DIR/fort.203        stats.t
+mv $WORK_DIR/fort.204        stats.q
+mv $WORK_DIR/fort.205        stats.pw
+mv $WORK_DIR/fort.206        stats.sbuv
+mv $WORK_DIR/fort.207        stats.radiance
+mv $WORK_DIR/fort.208        stats.pcp
+mv $WORK_DIR/fort.209        stats.rw
+mv $WORK_DIR/fort.210        stats.dw
+mv $WORK_DIR/fort.211        stats.srw
+mv $WORK_DIR/fort.212        stats.gps
+mv $WORK_DIR/fort.213        stats.sst
+mv $WORK_DIR/fort.220        costfn
+mv $WORK_DIR/stdout          stdout
+mv $WORK_DIR/gsiparm.anl     gsiparm.anl
+mv $WORK_DIR/satbias_in      satbias_in
+mv $WORK_DIR/satbias_out     satbias_out
+
+# Loop over first and last outer loops to generate innovation
+# diagnostic files for indicated observation types (groups)
+#
+# NOTE:  Since we set miter=2 in GSI namelist SETUP, outer
+#        loop 03 will contain innovations with respect to
+#        the analysis.  Creation of o-a innovation files
+#        is triggered by write_diag(3)=.true.  The setting
+#        write_diag(1)=.true. turns on creation of o-g
+#        innovation files.
+#
+
+loops="01 02 03"
+for loop in $loops; do
+
+case $loop in
+  01) string=ges;;
+  02) string=int;;
+  03) string=anl;;
+   *) string=$loop;;
+esac
+
+# Collect diagnostic files for obs types (groups) below
+   listall="hirs2_n14 msu_n14 sndr_g08 sndr_g10 sndr_g12 sndr_g08_prep sndr_g10_prep sndr_g12_prep sndrd1_g08 sndrd2_g08 sndrd3_g08 sndrd4_g08 sndrd1_g10 sndrd2_g10 sndrd3_g10 sndrd4_g10 sndrd1_g12 sndrd2_g12 sndrd3_g12 sndrd4_g12 hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua goes_img_g08 goes_img_g10 goes_img_g11 goes_img_g12 pcp_ssmi_dmsp pcp_tmi_trmm conv sbuv2_n16 sbuv2_n17 sbuv2_n18 omi_aura ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 amsua_n18 mhs_n18 amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_las_f16 ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16"
+   for type in $listall; do
+      count=`ls $WORK_DIR/dir.*/${type}_${loop}* | wc -l`
+      if [[ $count -gt 0 ]]; then
+         cat $WORK_DIR/dir.*/${type}_${loop}* > diag_${type}_${string}
+      fi
+   done
+done
+
+rm -f $WORK_DIR/*.bin # clean CRTM coeffs
 
 if $CLEAN; then
    rm -rf $WORK_DIR
