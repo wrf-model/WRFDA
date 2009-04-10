@@ -1,8 +1,17 @@
-#!/usr/bin/ksh
-
+#!/bin/ksh
+# 
 # NOTE:  To ensure reproducible results, must use same number of
 #        MPI tasks AND nodes for each run.  blocking=unlimited
 #        leads to roundoff differences in mpi_allreduce.
+#
+# NOTE: Zhiquan Liu, NCAR/MMM, 04/09/2009
+#       Here GSI configuration is for regional application with WRF-ARW model,
+#       Since there is not yet a mature operational application with WRF-ARW
+#       at the being time, we intend to implement a baseline config. by combining
+#       current global GDAS (e.g., use global fix files) and
+#       regional NAM config. (e.g., use most(not all) NAM namelists) 
+#       with some tunable parameters in namelist setup.
+# 
 
 # Env variables used here are: GSI_DIR, OB_DIR, RC_DIR
 
@@ -11,11 +20,11 @@
 export WORK_DIR=$RUN_DIR/working
 export GSI_OUTPUT_DIR=${GSI_OUTPUT_DIR:-$FC_DIR/$DATE}
 
+########################################################
 # Set environment variables for NCEP IBM
 export MP_SHARED_MEMORY=yes
 export MEMORY_AFFINITY=MCM
 export BIND_TASKS=yes
-
 
 # Set environment variables for threads
 export SPINLOOPTIME=10000
@@ -24,7 +33,6 @@ export AIXTHREAD_SCOPE=S
 export MALLOCMULTIHEAP=true
 export XLSMPOPTS="parthds=1:spins=0:yields=0:stack=128000000"
 
-
 # Set environment variables for user preferences
 export XLFRTEOPTS="nlwidth=80"
 export MP_LABELIO=yes
@@ -32,6 +40,10 @@ export MP_LABELIO=yes
 # Variables for debugging (don't always need)
 ##export XLFRTEOPTS="buffering=disable_all"
 ##export MP_COREFILE_FORMAT=lite
+
+######################################
+# block above to be reviewed by SE
+#####################################
 
 # Create working  directory
 rm -rf $WORK_DIR
@@ -53,29 +65,18 @@ echo "END_DATE        $END_DATE"
 echo "FCST_RANGE      $FCST_RANGE"
 echo "DOMAINS         $DOMAINS"
 
-# Set guess/analysis (i/o) file format.  Two option are available:  binary or netcdf
-#io_format=binary
-io_format=netcdf
-
-NETCDF=.false.
-FORMAT=binary
-if [[ "$io_format" = "netcdf" ]]; then
-   NETCDF=.true.
-   FORMAT=netcdf
-fi
-
-# Set resoltion and other dependent parameters
-export JCAP=62
-export LEVS=60
-export DELTIM=1200
-
 # Specify GSI fixed field and data directories.
 FIXGLOBAL=$GSI_DIR/fix
+
+#
+# is there a FIXNAM directory in vapor ?
+#
 
 #   ncp is cp replacement, currently keep as /bin/cp
 NCP=/bin/cp
 
-# Set fixed files
+# Set fixed files: basically global fix files used here for baseline test
+
 #   berror   = forecast model background error statistics
 #   specoef  = CRTM spectral coefficients
 #   trncoef  = CRTM transmittance coefficients
@@ -91,12 +92,10 @@ NCP=/bin/cp
 #   bufrtable= text file ONLY needed for single obs test (oneobstest=.true.)
 #   bftab_sst= bufr table for sst ONLY needed for sst retrieval (retrieval=.true.)
 
-# BERROR=${BERROR:-${FIXGLOBAL}/nam_regional_glb_berror.f77
-# SATANGL=${SATANGL:-${FIXGLOBAL}/global_satangbias.txt}
-BERROR=${FIXGLOBAL}/nam_regional_glb_berror.f77
-SATANGL=${FIXGLOBAL}/global_satangbias.txt
-SATINFO=${FIXGLOBAL}/global_satinfo.txt
-RTMFIX=${FIXGLOBAL}/crtm_gfsgsi
+BERROR=${FIXGLOBAL}/nam_regional_glb_berror.f77 # what is different from global and NAM BE files?
+SATANGL=${FIXGLOBAL}/global_satangbias.txt # needs this to be updated each cycle?
+SATINFO=${FIXGLOBAL}/global_satinfo.txt    # basically same between GDAS and NAM
+RTMFIX=${FIXGLOBAL}/crtm_gfsgsi            # CRTM Rev1855
 
 RTMEMIS=${RTMFIX}/EmisCoeff/Big_Endian/EmisCoeff.bin
 RTMAERO=${RTMFIX}/AerosolCoeff/Big_Endian/AerosolCoeff.bin
@@ -110,7 +109,7 @@ OBERROR=${FIXGLOBAL}/prepobs_errtable.global
 # cd run directory 
 cd $WORK_DIR
 
-#    # Fixed fields
+# link Fixed fields to working directory
     ln -sf $BERROR   berror_stats
     ln -sf $SATANGL  satbias_angle
     ln -sf $SATINFO  satinfo
@@ -140,44 +139,47 @@ cd $WORK_DIR
 
 # Only need this file for single obs test
  bufrtable=$FIXGLOBAL/prepobs_prep.bufrtable
-
-# Copy executable and fixed files to current working directory
- ln -sf $GSI_DIR/sorc/global_gsi.fd/global_gsi  ./gsi.x
  ln -sf $bufrtable ./prepobs_prep.bufrtable
+
+# Link executable to the working directory
+ ln -sf $GSI_DIR/sorc/global_gsi.fd/global_gsi  ./gsi.x
 
 # Copy observational data to current working directory
    ln -sf $OB_DIR/$DATE/ob.bufr    ./prepbufr
    ln -sf $OB_DIR/$DATE/amsua.bufr ./amsuabufr
+   ln -sf $OB_DIR/$DATE/amsub.bufr ./amsubbufr
 
-# Copy bias correction, sigma, and surface files
+# Copy bias correction file, will use BIAS correction file generated from the last cycle
+# the first cycle will start from an empty satbias_in file
+   #if [[ "$CYCLE_NUMBER" != "0" ]]; then
+   #  export PREV_DATE=$($BUILD_DIR/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+     cp $RUN_DIR/../../$PREV_DATE/gsi/satbias_out    ./satbias_in
+   #fi
+
 #  *** NOTE:  The regional gsi analysis is written to (over)
 #             the input guess field file (wrf_inout)
 
-## $ncp $datges/${prefixg}.abias              ./satbias_in
-## $ncp $datges/${prefixg}.satang             ./satbias_angle
-## $ncp $datges/wrfinput_west_mass_d01_bi     ./wrf_inout
  ${NPC:-cp} $DA_FIRST_GUESS   ./wrf_inout
-
-# cp wrf_inout wrf_ges
 
 # Make gsi namelist
 cat << EOF > gsiparm.anl
  &SETUP
    miter=2,niter(1)=50,niter(2)=50,
+   niter_no_qc(1)=${GSI_NOVARQC1:-1000000},niter_no_qc(2)=${GSI_NOVARQC2:-1000000},
    write_diag(1)=.true.,write_diag(2)=.true.,write_diag(3)=.true.,
-   qoption=1,
-   gencode=78,factqmin=0.005,factqmax=0.005,deltim=$DELTIM,
-   ndat=59,npred=5,iguess=-1,
+   qoption=2, gencode=78,
+   factqmin=${GSI_FACTQMIN:-0.005},factqmax=${GSI_FACTQMAX:-0.005},
+   deltim=${GSI_DELTIM:-1200},
+   ndat=60,npred=5,iguess=-1,
    oneobtest=.false.,retrieval=.false.,l_foto=.false.,
    use_pbl=.false.,
-   $SETUP
  /
  &GRIDOPTS
-   JCAP=$JCAP,NLAT=$NLAT,NLON=$LONA,nsig=$LEVS,hybrid=.true.,
+   jcap=${GSI_JCAP:-62},nlat=${GSI_NLAT:-180},nlon=${GSI_NLON:-360},nsig=${GSI_NSIG:-60},
+   hybrid=.true.,
    wrf_nmm_regional=.false.,wrf_mass_regional=.true.,diagnostic_reg=.false.,
    filled_grid=.false.,half_grid=.true.,netcdf=.true.,
-   regional=.true.,nlayers(63)=3,nlayers(64)=6,
-   $GRIDOPTS
+   regional=.true.,
  /
  &BKGERR
    as=0.6,0.6,0.75,0.75,0.75,0.75,1.0,1.0
@@ -185,30 +187,26 @@ cat << EOF > gsiparm.anl
    hzscl=1.7,0.8,0.5,
    hswgt=0.45,0.3,0.25,
    bw=0.0,norsp=4,
-   bkgv_flowdep=.false.,bkgv_rewgtfct=1.5
-   $BKGVERR
+   bkgv_flowdep=.false.,
+   bkgv_rewgtfct=1.5,
  /
  &ANBKGERR
    anisotropic=.false.,
-   $ANBKGERR
  /
  &JCOPTS
    jcterm=.false.,jcdivt=.false.,bamp_ext1=2.5e12,bamp_ext2=5.0e11,
    bamp_int1=2.5e13,bamp_int2=2.5e12,
-   $JCOPTS
  /
  &STRONGOPTS
-   jcstrong=.false.,nstrong=1,nvmodes_keep=8,period_max=6.,period_width=1.5,
-   jcstrong_option=2,baldiag_full=.true.,baldiag_inc=.true.,
-   $STRONGOPTS
+   jcstrong=.false.,nstrong=0,nvmodes_keep=20,period_max=3.,period_width=0.1,
+   jcstrong_option=3,baldiag_full=.true.,baldiag_inc=.true.,
  /
  &OBSQC
    dfact=0.75,dfact1=3.0,noiqc=.false.,oberrflg=.false.,c_varqc=0.02,
-   use_poq7=.true.,
-   $OBSQC
+   use_poq7=.false.,
  /
  &OBS_INPUT
-   dmesh(1)=180.0,dmesh(2)=145.0,dmesh(3)=240.0,dmesh(4)=160.0,dmesh(5)=180.0,time_window_max=3.0,
+   dmesh(1)=120.0,dmesh(2)=60.0,dmesh(3)=60.0,dmesh(4)=60.0,dmesh(5)=120.0,time_window_max=3.0,
    dfile(01)='prepbufr',  dtype(01)='ps',        dplat(01)=' ',         dsis(01)='ps',                  dval(01)=1.0,  dthin(01)=0,
    dfile(02)='prepbufr'   dtype(02)='t',         dplat(02)=' ',         dsis(02)='t',                   dval(02)=1.0,  dthin(02)=0,
    dfile(03)='prepbufr',  dtype(03)='q',         dplat(03)=' ',         dsis(03)='q',                   dval(03)=1.0,  dthin(03)=0,
@@ -240,7 +238,7 @@ cat << EOF > gsiparm.anl
    dfile(29)='amsuabufr', dtype(29)='amsua',     dplat(29)='n17',       dsis(29)='amsua_n17',           dval(29)=0.0,  dthin(29)=2,
    dfile(30)='amsuabufr', dtype(30)='amsua',     dplat(30)='n18',       dsis(30)='amsua_n18',           dval(30)=10.0, dthin(30)=2,
    dfile(31)='amsuabufr', dtype(31)='amsua',     dplat(31)='metop-a',   dsis(31)='amsua_metop-a',       dval(31)=10.0, dthin(31)=2,
-   dfile(32)='airsbufr',  dtype(32)='amsua',     dplat(32)='aqua',      dsis(32)='amsua_aqua',          dval(32)=5.0,  dthin(32)=2,
+   dfile(32)='airsbufr',  dtype(32)='amsua',     dplat(32)='aqua',      dsis(32)='amsua_aqua',          dval(32)=10.0, dthin(32)=2,
    dfile(33)='amsubbufr', dtype(33)='amsub',     dplat(33)='n15',       dsis(33)='amsub_n15',           dval(33)=3.0,  dthin(33)=3,
    dfile(34)='amsubbufr', dtype(34)='amsub',     dplat(34)='n16',       dsis(34)='amsub_n16',           dval(34)=3.0,  dthin(34)=3,
    dfile(35)='amsubbufr', dtype(35)='amsub',     dplat(35)='n17',       dsis(35)='amsub_n17',           dval(35)=3.0,  dthin(35)=3,
@@ -268,17 +266,14 @@ cat << EOF > gsiparm.anl
    dfile(57)='gsnd1bufr', dtype(57)='sndrd2',    dplat(57)='g13',       dsis(57)='sndrD2_g13',          dval(57)=1.5,  dthin(57)=5,
    dfile(58)='gsnd1bufr', dtype(58)='sndrd3',    dplat(58)='g13',       dsis(58)='sndrD3_g13',          dval(58)=1.5,  dthin(58)=5,
    dfile(59)='gsnd1bufr', dtype(59)='sndrd4',    dplat(59)='g13',       dsis(59)='sndrD4_g13',          dval(59)=1.5,  dthin(59)=5,
-
-   $OBSINPUT
+   dfile(60)='iasibufr',  dtype(60)='iasi',      dplat(60)='metop-a',   dsis(60)='iasi616_metop-a',     dval(60)=20.0, dthin(60)=1,
  /
   &SUPEROB_RADAR
-   $SUPERRAD
  /
  &SINGLEOB_TEST
    maginnov=0.1,magoberr=0.1,oneob_type='t',
    oblat=45.,oblon=180.,obpres=1000.,obdattim=${adate},
    obhourset=0.,
-   $SINGLEOB
  /
 EOF
 
@@ -335,7 +330,19 @@ case $loop in
 esac
 
 # Collect diagnostic files for obs types (groups) below
-   listall="hirs2_n14 msu_n14 sndr_g08 sndr_g10 sndr_g12 sndr_g08_prep sndr_g10_prep sndr_g12_prep sndrd1_g08 sndrd2_g08 sndrd3_g08 sndrd4_g08 sndrd1_g10 sndrd2_g10 sndrd3_g10 sndrd4_g10 sndrd1_g12 sndrd2_g12 sndrd3_g12 sndrd4_g12 hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua goes_img_g08 goes_img_g10 goes_img_g11 goes_img_g12 pcp_ssmi_dmsp pcp_tmi_trmm conv sbuv2_n16 sbuv2_n17 sbuv2_n18 omi_aura ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 amsua_n18 mhs_n18 amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_las_f16 ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16"
+
+   listall="amsua_metop-a mhs_metop-a hirs4_metop-a hirs2_n14 msu_n14 \
+          sndr_g08 sndr_g10 sndr_g12 sndr_g08_prep sndr_g10_prep sndr_g12_prep \
+          sndrd1_g08 sndrd2_g08 sndrd3_g08 sndrd4_g08 sndrd1_g10 sndrd2_g10 \
+          sndrd3_g10 sndrd4_g10 sndrd1_g12 sndrd2_g12 sndrd3_g12 sndrd4_g12 \
+          hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 \
+          amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua \
+          goes_img_g08 goes_img_g10 goes_img_g11 goes_img_g12 \
+          pcp_ssmi_dmsp pcp_tmi_trmm conv sbuv2_n16 sbuv2_n17 sbuv2_n18 \
+          omi_aura ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 amsua_n18 mhs_n18 \
+          amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_las_f16 \
+          ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16"
+
    for type in $listall; do
       count=`ls $WORK_DIR/dir.*/${type}_${loop}* | wc -l`
       if [[ $count -gt 0 ]]; then
@@ -343,6 +350,10 @@ esac
       fi
    done
 done
+
+# update radiance angle bias statistics?
+#----------------------------------------
+
 
 rm -f $WORK_DIR/*.bin # clean CRTM coeffs
 
