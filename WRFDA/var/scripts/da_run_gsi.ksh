@@ -7,7 +7,7 @@
 # NOTE: Zhiquan Liu, NCAR/MMM, 04/09/2009
 #       Here GSI configuration is for regional application with WRF-ARW model,
 #       Since there is not yet a mature operational application with WRF-ARW
-#       at the being time, we intend to implement a baseline config. by combining
+#       at the time being, we intend to implement a baseline config. by combining
 #       current global GDAS (e.g., use global fix files) and
 #       regional NAM config. (e.g., use most(not all) NAM namelists) 
 #       with some tunable parameters in namelist setup.
