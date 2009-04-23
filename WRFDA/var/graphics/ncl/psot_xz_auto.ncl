@@ -43,6 +43,11 @@
 ;       analfile="/ptmp/huishao/data/caa1/psot/fc/psot5/2006120100/analysis"
 ;  Author: 
 ;    Hui Shao NCAR/DATC 09/19/2007
+;  Updates:
+;   Syed RH Rizvi, MMM/ESSL/NCAR Date: 04/16/2009
+;   Generalized it to work with:
+;   a) GSI Single obs test
+;   b) X & Y Co-orinates may be passed as floating points
 ;********************************************************
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
@@ -56,16 +61,19 @@ begin
   first_guess     = addfile(bakfile+".nc", "r")
   analysis        = addfile(analfile+".nc", "r")
 
+  ixlat=floattointeger(xlat)
+  ixlon=floattointeger(xlon)
+
   znu  = first_guess->ZNU(0,:)
-  xlong    = first_guess->XLONG(0,xlat-1,:)
+  xlong    = first_guess->XLONG(0,ixlat-1,:)
   xlong@units = "degrees_east"
-  xlong_u    = first_guess->XLONG_U(0,xlat-1,:)
+  xlong_u    = first_guess->XLONG_U(0,ixlat-1,:)
   xlong_u@units = "degrees_east"
-  xlong_v    = first_guess->XLONG_V(0,xlat-1,:)
+  xlong_v    = first_guess->XLONG_V(0,ixlat-1,:)
   xlong_v@units = "degrees_east"
 
-  plong = first_guess->XLONG(0,xlat-1,xlon-1)
-  plat = first_guess->XLAT(0,xlat-1,xlon-1)
+  plong = first_guess->XLONG(0,ixlat-1,ixlon-1)
+  plat = first_guess->XLAT(0,ixlat-1,ixlon-1)
 
   title="PSOT"+" - "+var
   subtitle="Lon="+plong+",Lat="+plat+",Eta = "+znu(kl-1)+",Val="+omb+varunit+",Err="+err+varunit
@@ -73,41 +81,38 @@ begin
 ;********************************************************
 ; Read W at Time=6, south_north=0, convert to cm/sec
 ;********************************************************
-  fg1 = first_guess->U(0,:,xlat-1,:)              ; import data + meta info
-  an1 = analysis->U(0,:,xlat-1,:)             ; import data + meta info    
+  fg1 = first_guess->U(0,:,ixlat-1,:)              ; import data + meta info
+  an1 = analysis->U(0,:,ixlat-1,:)             ; import data + meta info    
   df1 = an1
   df1 = an1 - fg1
   df1!0 = "lev"
   df1&lev = znu
   df1!1 = "lon"
   df1&lon = xlong_u
-  print ("min U  = "+min(df1))
-  print ("max U  = "+max(df1))
+  print ("max/min U  = "+max(df1)+" "+min(df1))
 
-  fg2 = first_guess->V(0,:,xlat-1,:)              ; import data + meta info
-  an2  = analysis->V(0,:,xlat-1,:)             ; import data + meta info   
+  fg2 = first_guess->V(0,:,ixlat-1,:)              ; import data + meta info
+  an2  = analysis->V(0,:,ixlat-1,:)             ; import data + meta info   
   df2 = an2
   df2 = an2 - fg2
   df2!0 = "lev"
   df2&lev = znu
   df2!1 = "lon"
   df2&lon = xlong_v
-  print ("min V  = "+min(df2))
-  print ("max V  = "+max(df2))
+  print ("max/min V  = "+max(df2)+" "+min(df2))
 
-  fg3 = first_guess->T(0,:,xlat-1,:)              ; import data + meta info
-  an3  = analysis->T(0,:,xlat-1,:)             ; import data + meta info
+  fg3 = first_guess->T(0,:,ixlat-1,:)              ; import data + meta info
+  an3  = analysis->T(0,:,ixlat-1,:)             ; import data + meta info
   df3 = an3
   df3 =  an3 - fg3
   df3!0 = "lev"
   df3&lev = znu
   df3!1 = "lon"
   df3&lon = xlong
-  print ("min T  = "+min(df3))
-  print ("max T  = "+max(df3)) 
+  print ("max/min T  = "+max(df3)+" "+min(df3))
  
-  fg4 = first_guess->QVAPOR(0,:,xlat-1,:)              ; import data + meta info
-  an4  = analysis->QVAPOR(0,:,xlat-1,:)             ; import data + meta info
+  fg4 = first_guess->QVAPOR(0,:,ixlat-1,:)              ; import data + meta info
+  an4  = analysis->QVAPOR(0,:,ixlat-1,:)             ; import data + meta info
   df4 = an4
   df4 = an4 - fg4
   df4 = 1000.0 * df4
@@ -116,8 +121,7 @@ begin
   df4&lev = znu
   df4!1 = "lon"
   df4&lon = xlong
-  print ("min QV = "+min(df4))
-  print ("max QV = "+max(df4))
+  print ("max/min Q  = "+max(df4)+" "+min(df4))
 
 ;********************************************************
 ; create plots  

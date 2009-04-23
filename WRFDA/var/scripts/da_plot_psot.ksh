@@ -68,7 +68,7 @@ done
 iv=1
 for var in ${PSEUDO_VAR[*]}; do
 
-   expt=${EXPT}_psot$iv
+   expt=psot$iv
    xlon=${PSEUDO_X[$iv]}
    xlat=${PSEUDO_Y[$iv]}
    kl=${PSEUDO_Z[$iv]}
@@ -83,7 +83,7 @@ for var in ${PSEUDO_VAR[*]}; do
    DATE=$INITIAL_DATE
 
       export FIRST_GUESS=${RC_DIR}/${DATE}/wrfinput_d${DOMAINS}
-      export ANALYSIS=${EXP_DIR}/fc/psot$iv/$DATE/analysis     
+      export ANALYSIS=${EXP_DIR}/fc/psot$iv/$DATE/wrfinput_d${DOMAINS}
 
       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
                       'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' 'var=\"$var\"' 'date=\"$DATE\"'  \
