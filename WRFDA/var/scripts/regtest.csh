@@ -104,8 +104,7 @@ else if   ( `hostname` == bay-mmm ) then
 else if ( ( `hostname | cut -c 1-2` == be ) || ( `hostname` == tempest ) || ( `hostname | cut -c 1-2` == ln ) ) then
 	set WRFDAREGDATAEM = /mmm/users/xinzhang/WRFDA-data-EM
 	set WRFDAREGDATANMM = /mmm/users/xinzhang/WRFDA-data-NMM
-        set CASEOPTS =	( t44_prepbufr ASR_prepbufr)
-        set CASEOPTS =	( tutorial_xinzhang cv3_guo t44_liuz radar_meixu cwb_ascii afwa_t7_ssmi )
+        set CASEOPTS =	( tutorial_xinzhang cv3_guo t44_liuz radar_meixu cwb_ascii afwa_t7_ssmi t44_prepbufr ASR_prepbufr cwb_ascii_outerloop_rizvi )
 else
 	if      ( ( -d /users/gill/WRF-data-EM ) && ( -d /users/gill/WRF-data-NMM ) ) then
 		set WRFDAREGDATAEM = /users/gill/WRF-data-EM
