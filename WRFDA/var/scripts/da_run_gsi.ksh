@@ -4,7 +4,7 @@
 #        MPI tasks AND nodes for each run.  blocking=unlimited
 #        leads to roundoff differences in mpi_allreduce.
 #
-# NOTE: Zhiquan Liu, NCAR/MMM, 04/09/2009
+# NOTE: 
 #       Here GSI configuration is for regional application with WRF-ARW model,
 #       Since there is not yet a mature operational application with WRF-ARW
 #       at the time being, we intend to implement a baseline config. by combining
@@ -171,7 +171,7 @@ cat << EOF > gsiparm.anl
    factqmin=${GSI_FACTQMIN:-0.005},factqmax=${GSI_FACTQMAX:-0.005},
    deltim=${GSI_DELTIM:-1200},
    ndat=60,npred=5,iguess=-1,
-   oneobtest=.false.,retrieval=.false.,l_foto=.false.,
+   oneobtest=${ONEOBTEST:-.false.},retrieval=.false.,l_foto=.false.,
    use_pbl=.false.,
  /
  &GRIDOPTS
@@ -271,8 +271,8 @@ cat << EOF > gsiparm.anl
   &SUPEROB_RADAR
  /
  &SINGLEOB_TEST
-   maginnov=0.1,magoberr=0.1,oneob_type='t',
-   oblat=45.,oblon=180.,obpres=1000.,obdattim=${adate},
+   maginnov=${PSEUDO_VAL:-0.1},magoberr=${PSEUDO_ERR:-0.1},oneob_type='${PSEUDO_VAR:-t}',
+   oblat=${PSEUDO_LAT:-45.},oblon=${PSEUDO_LON:-180.},obpres=${PSEUDO_P:-1000.},obdattim=${DATE},
    obhourset=0.,
  /
 EOF
