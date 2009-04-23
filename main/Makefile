@@ -87,9 +87,9 @@ nupdown.exe:
         fi
 	x=`grep netcdff ../configure.wrf | awk '{print $$1}'` ; export x ;\
 	if [ $$x ] ; then \
-	   $(LD) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdff -lnetcdf -lm ; \
+	   $(SFC) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdff -lnetcdf -lm ; \
         else \
-	   $(LD) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdf -lm ; \
+	   $(SFC) -o nupdown.exe  nupdown.o -L$(NETCDFPATH)/lib -lnetcdf -lm ; \
         fi
 
 module_initialize :
