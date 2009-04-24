@@ -308,7 +308,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       $SCRIPTS_DIR/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
 
       RC=$?
-      if [[ $RC != 0 ]]; then
+      if [[ $RC != 0 ]] && [[ $NL_MULTI_INC != 1 ]]; then
          echo $(date) "${ERR}wrfvar failed with error $RC$END"
          echo wrfvar > FAIL
          break
