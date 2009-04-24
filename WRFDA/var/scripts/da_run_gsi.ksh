@@ -130,8 +130,8 @@ cd $WORK_DIR
           satsen=`head -n $isatsen satinfo | tail -1 | cut -f 2 -d" "`
           spccoeff=${satsen}.SpcCoeff.bin
           if  [[ ! -s $spccoeff ]]; then
-             ${NPC:-cp} $RTMFIX/SpcCoeff/Big_Endian/$spccoeff $spccoeff
-             ${NPC:-cp} $RTMFIX/TauCoeff/Big_Endian/${satsen}.TauCoeff.bin ${satsen}.TauCoeff.bin
+             ln -sf $RTMFIX/SpcCoeff/Big_Endian/$spccoeff $spccoeff
+             ln -sf $RTMFIX/TauCoeff/Big_Endian/${satsen}.TauCoeff.bin ${satsen}.TauCoeff.bin
           fi
        fi
        isatsen=` expr $isatsen + 1 `
@@ -147,7 +147,7 @@ cd $WORK_DIR
 # Copy observational data to current working directory
    ln -sf $OB_DIR/$DATE/ob.bufr    ./prepbufr
    ln -sf $OB_DIR/$DATE/amsua.bufr ./amsuabufr
-   ln -sf $OB_DIR/$DATE/amsub.bufr ./amsubbufr
+   #ln -sf $OB_DIR/$DATE/amsub.bufr ./amsubbufr
 
 # Copy bias correction file, will use BIAS correction file generated from the last cycle
 # the first cycle will start from an empty satbias_in file
@@ -159,7 +159,7 @@ cd $WORK_DIR
 #  *** NOTE:  The regional gsi analysis is written to (over)
 #             the input guess field file (wrf_inout)
 
- ${NPC:-cp} $DA_FIRST_GUESS   ./wrf_inout
+ ${NCP:-cp} $DA_FIRST_GUESS   ./wrf_inout
 
 # Make gsi namelist
 cat << EOF > gsiparm.anl
@@ -172,7 +172,7 @@ cat << EOF > gsiparm.anl
    deltim=${GSI_DELTIM:-1200},
    ndat=60,npred=5,iguess=-1,
    oneobtest=${ONEOBTEST:-.false.},retrieval=.false.,l_foto=.false.,
-   use_pbl=.false.,
+   use_pbl=.false., nhr_assimilation=${GSI_NHR_ASSIMILATION:-6},
  /
  &GRIDOPTS
    jcap=${GSI_JCAP:-62},nlat=${GSI_NLAT:-180},nlon=${GSI_NLON:-360},nsig=${GSI_NSIG:-60},
@@ -283,7 +283,7 @@ EOF
   RC=$?
 
 # save analysis result in FC_DIR
-  ${NPC:-cp} ./wrf_inout $GSI_OUTPUT_DIR/wrfinput_d01
+  ${NCP:-cp} ./wrf_inout $GSI_OUTPUT_DIR/wrfinput_d01
   cd $RUN_DIR
   echo $(date +'%D %T') "Ended $RC"
 
@@ -354,8 +354,13 @@ done
 # update radiance angle bias statistics?
 #----------------------------------------
 
-
 rm -f $WORK_DIR/*.bin # clean CRTM coeffs
+
+# clean up
+rm -f $WORK_DIR/obs_input.*  # obs_input.* are scratch files and their contents
+                             # can not be read outside gsi because the dimension
+                             # is unknown.
+rm -rf $WORK_DIR/dir.*       # dir.*/conv* are already cat'ed into diag_conv_*
 
 if $CLEAN; then
    rm -rf $WORK_DIR
