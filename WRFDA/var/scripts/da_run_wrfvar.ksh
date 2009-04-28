@@ -828,7 +828,7 @@ EOF
       ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
 
         
-      cp -f ${RC_HIGH_DIR}/${DATE}/wrfinput_d01 ${FC_DIR}/${DATE}/analysis_update
+      cp -f ${RC_DIR}/${DATE}/wrfinput_d01 ${FC_DIR}/${DATE}/analysis_update
       if $CYCLING; then
          if [[ $CYCLE_NUMBER -gt 0 ]]; then
             cp -f ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${ANALYSIS_DATE} ${FC_DIR}/${DATE}/analysis_update
