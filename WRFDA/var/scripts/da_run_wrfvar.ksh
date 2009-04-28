@@ -823,7 +823,7 @@ EOF
 
    if [[ $NL_MULTI_INC == 2 ]] ; then
 
-      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" wrfvar_output fg01 low_res_increment
+      ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU" wrfvar_output fg01 low_res_increment
 
       ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
 
@@ -835,7 +835,7 @@ EOF
          fi
       fi
 
-      ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
+      ncflint -A -v "U,V,W,PH,T,QVAPOR,MU" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
 
 #     rm low_res_increment low_res_increment-down
       cp -f ${FC_DIR}/${DATE}/analysis_update $DA_ANALYSIS
