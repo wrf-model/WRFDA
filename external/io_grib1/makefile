@@ -88,12 +88,12 @@ gribw.h: gribw_macros.h gribw_time.h
 gribwlib.h: pdstool.h gdstool.h gribw_time.h
 
 superclean: clean
-			/bin/rm -f *.a
+			/bin/rm *.a
 
 clean:  
 			/bin/rm -f  *.f *.o *.mod
 			( cd WGRIB ; make clean )
-			/bin/rm -f wgrib
+			/bin/rm wgrib
 
 .c.o:
 	$(CC) -c $(CFLAGS) $*.c
