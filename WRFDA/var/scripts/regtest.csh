@@ -89,6 +89,10 @@ else if   ( `hostname` == bay-mmm ) then
 else if   ( `hostname` == karri ) then
 	set argv = ( -f /karri/users/xinzhang/regtest/wrfda.tar )
 	set argv = ( -r HEAD  )
+else if   ( `hostname` == envelope2.rap.ucar.edu ) then
+	set argv = ( -f /Volumes/d1/yueliu/XIN/regtest/wrfda.tar )
+	set FAIL_MAIL = ( xinzhang@ucar.edu )
+	set GOOD_MAIL = ( xinzhang@ucar.edu )
 endif
 
 #	Where is the input data located - for a few known NCAR/MMM machines.
@@ -101,6 +105,10 @@ else if   ( `hostname` == bay-mmm ) then
 	set WRFDAREGDATAEM = /users/xinzhang/CODE/WRFDA-data-EM
 	set WRFDAREGDATANMM = /users/xinzhang/CODE/WRFDA-data-NMM
         set CASEOPTS =	( cwb_ascii )
+else if   ( `hostname` == envelope2.rap.ucar.edu ) then
+	set WRFDAREGDATAEM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-EM
+	set WRFDAREGDATANMM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-NMM
+        set CASEOPTS =	( cwb_ascii cv3_guo afwa_t7_ssmi t44_prepbufr )
 else if ( ( `hostname | cut -c 1-2` == be ) || ( `hostname` == tempest ) || ( `hostname | cut -c 1-2` == ln ) ) then
 	set WRFDAREGDATAEM = /mmm/users/xinzhang/WRFDA-data-EM
 	set WRFDAREGDATANMM = /mmm/users/xinzhang/WRFDA-data-NMM
@@ -212,6 +220,8 @@ if ( `hostname` == bay-mmm ) then
 	set LINUX_COMP = PGI
 else if ( `hostname` == karri ) then
 	set LINUX_COMP = GFORTRAN
+else if ( `hostname` == envelope2.rap.ucar.edu ) then
+	set LINUX_COMP = G95
 endif
 
 #	A separately installed version of the latest ESMF library (NOT the 
@@ -270,10 +280,14 @@ endif
 #       - To compare with a previously archived baseline, set COMPARE_BASELINE 
 #         to an existing directory that contains an archived baseline.  
 #         Set COMPARE_BASELINE = FALSE to avoid baseline comparison.  
-set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set COMPARE_BASELINE = FALSE
+set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = FALSE
+if   ( `hostname` == envelope2.rap.ucar.edu ) then
+     set GENERATE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
+     set COMPARE_BASELINE = FALSE
+endif
 
 #	Baseline generation and comparison are only done when BIT4BIT is set.  
 if ( $GENERATE_BASELINE != FALSE ) then
@@ -384,28 +398,23 @@ if ( $ARCH[1] == AIX ) then
 	echo "AIX:            " `lslpp -l | grep bos.mp | head -1 | awk '{print $1 "   " $2}'` >>! version_info
 	echo " " >>! version_info
 	setenv MP_SHARED_MEMORY yes
-else if ( $ARCH[1] == Darwin ) then
-	if      ( ( `hostname` == stink )               && ( -d /stink/gill/Regression_Tests ) ) then
-		set DEF_DIR	= /stink/gill/Regression_Tests/wrfda_regression
-		mkdir $DEF_DIR
-	else 
-		echo "We at least need a directory from which to do stuff"
-		exit ( 2 ) 
-	endif
-	set TMPDIR              = .
+else if ( ( $ARCH[1] == Darwin ) && ( `hostname` == envelope2.rap.ucar.edu ) ) then
+        set DEF_DIR             = /Volumes/d1/yueliu/XIN/regtest/wrfda_regression
+        if ( -d $DEF_DIR ) then
+                echo "${0}: ERROR::  Directory ${DEF_DIR} exists, please remove it"
+                exit ( 1 )
+        else
+                mkdir -p $DEF_DIR
+                echo "See directory ${DEF_DIR}/ for wrfdatest.output and other test results"
+        endif
+	set TMPDIR              = $DEF_DIR
 	set MAIL		= /usr/bin/mailx
 	if      ( $LINUX_COMP == PGI ) then
-		set COMPOPTS	= (  1 2  3 )
-		set ZAP_OPENMP	= FALSE
+		set COMPOPTS	= ( 1 2 )
 	else if ( $LINUX_COMP == G95 ) then
-		set COMPOPTS	= ( 13 0 14 )
-		set ZAP_OPENMP	= TRUE
+		set COMPOPTS	= ( 7 8 )
 	endif
-	set COMPOPTS_NO_NEST = 0
-	set COMPOPTS_NEST_STATIC = 1
-	set COMPOPTS_NEST_PRESCRIBED = 2
 	set Num_Procs		= 4
-	set OPENMP 		= 2
 	cat >! `pwd`/machfile << EOF
 `hostname`
 `hostname`
@@ -414,13 +423,12 @@ else if ( $ARCH[1] == Darwin ) then
 EOF
         set Mach = `pwd`/machfile
 	set SERIALRUNCOMMAND	= 
-	set OMPRUNCOMMAND	= 
 	echo "Compiler version info: " >! version_info
 	if      ( $LINUX_COMP == PGI ) then
-		set MPIRUNCOMMAND 	= ( /usr/local/mpich2-1.0.6p1-pgi/bin/mpirun -np $Num_Procs )
+		set MPIRUNCOMMAND 	= ( /Volumes/d1/yueliu/XIN/external/g95/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
 		pgf90 -V | head -2 | tail -1 >>&! version_info
 	else if ( $LINUX_COMP == G95 ) then
-		set MPIRUNCOMMAND 	= ( /stink/gill/local/bin/mpirun -np $Num_Procs )
+		set MPIRUNCOMMAND 	= ( /Volumes/d1/yueliu/XIN/external/g95/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
 		g95 -v |& grep gcc >>&! version_info
 	endif
 	echo " " >>! version_info
@@ -965,7 +973,13 @@ banner 14
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
-					../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+                                        if   ( (`hostname` == envelope2.rap.ucar.edu) && ($case_option == afwa_t7_ssmi) ) then
+#XINZHANG######### afwa_t7_ssmi can not run with single processor due to memory limit.
+					     mpirun -np 2 ../../build/da_wrfvar.exe.$COMPOPTS[2] $MPIRUNCOMMANDPOST
+                                             mv rsl.out.0000 print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+                                        else
+					     ../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+                                        endif
 				else if ( $compopt == $COMPOPTS[2] ) then
 					setenv OMP_NUM_THREADS 1
 					if ( `uname` == AIX ) then
