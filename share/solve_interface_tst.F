@@ -53,8 +53,8 @@ SUBROUTINE solve_interface_tst ( grid )
 !
 !               )
 !
-! print *,'end solve_em'
-! stop 
+!     CALL wrf_message( 'end test_solve_em' )
+!     return
 
      CALL solve_em_tst ( grid , config_flags , &
 
