@@ -1,7 +1,7 @@
  &time_control
  run_days                            = 0,
- run_hours                           = 0,
- run_minutes                         = 10,
+ run_hours                           = 6,
+ run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          = 2005, 2002, 2002,
  start_month                         = 07,   06,   06,
@@ -12,8 +12,8 @@
  end_year                            = 2005, 2002, 2002,
  end_month                           = 07,   06,   06,
  end_day                             = 16,   13,   13,
- end_hour                            = 00,   00,   00,
- end_minute                          = 10,   00,   00,
+ end_hour                            = 06,   00,   00,
+ end_minute                          = 00,   00,   00,
  end_second                          = 00,   00,   00,
  interval_seconds                    = 21600
  input_from_file                     = .true.,.false.,.false.,
@@ -106,7 +106,7 @@
  /
 
  &dynamics
- dyn_opt                             = 402,
+ dyn_opt                             = 2,
  rk_ord                              = 3,
  w_damping                           = 0,
  diff_opt                            = 1,

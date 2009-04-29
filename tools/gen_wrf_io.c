@@ -400,7 +400,8 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
 	  if ( sw_io == GEN_INPUT )
 	  {
 /*Wei's change for 4dvar*/
-            if(var)
+/*Xin's change for 4dvar*/
+/*          if(var)
             {
               if ( !strncmp( p->use, "dyn_", 4 ) )
               {
@@ -414,7 +415,8 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
             {
               if ( !strncmp( p->use, "dyn_", 4 ) )
                 fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-            }
+            } */
+/*End Xin's change for 4dvar*/
 /*End Wei's change for 4dvar*/
             if ( ok_to_collect_distribute )
 	      fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
@@ -422,10 +424,12 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
 /*Wei's change for 4dvar*/
-            if(var)
+/*Xin's change for 4dvar*/
+/*          if(var)
               fprintf(fp,"                       '%c_%s'             , &  ! Data Name \n", toupper(p->var_name[var]), dname ) ;
-            else
+            else */
               fprintf(fp,"                       '%s'               , &  ! Data Name \n", dname ) ;
+/*End Xin's change for 4dvar*/
 /*End Wei's change for 4dvar*/
             fprintf(fp,"                       %s%s%s(1,kds,1,%d)     , &  ! Field \n" , structname , core , p->name, ibdy ) ;
             fprintf(fp,"                       WRF_%s             , &  ! FieldType \n" , p->type->name ) ;
@@ -447,8 +451,10 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , node_t * node , int 
 	      fprintf(fp,"CALL wrf_dm_bcast_%s ( %s%s%s ( 1, 1 , 1 , %d ) , &\n",p->type->name, structname , core , p->name, ibdy) ;
               fprintf(fp," ((%s)-(%s)+1)*((%s)-(%s)+1)*((%s)-(%s)+1)  )\n",me1,ms1,me2,ms2,me3,ms3)  ;
             }
-	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"END IF\n" ) ;
+/*Xin's change for 4dvar*/
+/*	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+	      fprintf(fp,"END IF\n" ) ; */
+/*End Xin's change for 4dvar*/
 	  }
           else if ( sw_io == GEN_OUTPUT )
 	  {
