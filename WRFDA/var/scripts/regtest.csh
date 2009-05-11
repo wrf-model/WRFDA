@@ -109,6 +109,7 @@ else if   ( `hostname` == envelope2.rap.ucar.edu ) then
 	set WRFDAREGDATAEM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-EM
 	set WRFDAREGDATANMM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-NMM
         set CASEOPTS =	( cwb_ascii cv3_guo afwa_t7_ssmi t44_prepbufr )
+        set CASEOPTS =	( t44_prepbufr )
 else if ( ( `hostname | cut -c 1-2` == be ) || ( `hostname` == tempest ) || ( `hostname | cut -c 1-2` == ln ) ) then
 	set WRFDAREGDATAEM = /mmm/users/xinzhang/WRFDA-data-EM
 	set WRFDAREGDATANMM = /mmm/users/xinzhang/WRFDA-data-NMM
@@ -286,7 +287,9 @@ set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = FALSE
 if   ( `hostname` == envelope2.rap.ucar.edu ) then
      set GENERATE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
+     set COMPARE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
      set COMPARE_BASELINE = FALSE
+     set GENERATE_BASELINE = FALSE
 endif
 
 #	Baseline generation and comparison are only done when BIT4BIT is set.  
@@ -958,6 +961,16 @@ echo built  directory var/test/$case_option for $case_option
 banner 13
 #set ans = "$<"
 #XINZHANG###################################################
+                                if ( `uname` != AIX ) then 
+                                   foreach bufr_file ( *.bufr )
+                                      ls -la $bufr_file
+                                      cwordsh.sh unblk $bufr_file $bufr_file.unblk >& /dev/null
+                                      cwordsh.sh block $bufr_file.unblk $bufr_file.block >& /dev/null
+                                      rm -f $bufr_file.unblk
+                                      ln -fs $bufr_file.block $bufr_file
+                                      ls -la $bufr_file
+                                   end
+                                endif
 #XINZHANG###################################################
 echo link of data files, we push them elsewhere
 ls -ls *
