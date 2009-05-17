@@ -101,6 +101,7 @@ if      ( `hostname` == karri ) then
 	set WRFDAREGDATAEM = /karri/users/xinzhang/regtest/WRFDA-data-EM
 	set WRFDAREGDATANMM = /karri/users/xinzhang/regtest/WRFDA-data-NMM
         set CASEOPTS =	( cv3_guo cwb_ascii afwa_t7_ssmi )
+        set CASEOPTS =	( cv3_guo cwb_ascii afwa_t7_ssmi t44_prepbufr cwb_ascii_outerloop_rizvi )
 else if   ( `hostname` == bay-mmm ) then
 	set WRFDAREGDATAEM = /users/xinzhang/CODE/WRFDA-data-EM
 	set WRFDAREGDATANMM = /users/xinzhang/CODE/WRFDA-data-NMM
@@ -220,7 +221,7 @@ set REG_TYPE = BIT4BIT
 if ( `hostname` == bay-mmm ) then
 	set LINUX_COMP = PGI
 else if ( `hostname` == karri ) then
-	set LINUX_COMP = GFORTRAN
+	set LINUX_COMP = PGI
 else if ( `hostname` == envelope2.rap.ucar.edu ) then
 	set LINUX_COMP = G95
 endif
@@ -282,8 +283,8 @@ endif
 #         to an existing directory that contains an archived baseline.  
 #         Set COMPARE_BASELINE = FALSE to avoid baseline comparison.  
 set GENERATE_BASELINE = '/ptmp/xinzhang/BASELINE'
-set COMPARE_BASELINE = FALSE
 set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
+set COMPARE_BASELINE = FALSE
 set GENERATE_BASELINE = FALSE
 if   ( `hostname` == envelope2.rap.ucar.edu ) then
      set GENERATE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
@@ -962,13 +963,16 @@ banner 13
 #set ans = "$<"
 #XINZHANG###################################################
                                 if ( `uname` != AIX ) then 
-                                   foreach bufr_file ( *.bufr )
-                                      ls -la $bufr_file
-                                      cwordsh.sh unblk $bufr_file $bufr_file.unblk >& /dev/null
-                                      cwordsh.sh block $bufr_file.unblk $bufr_file.block >& /dev/null
-                                      rm -f $bufr_file.unblk
-                                      ln -fs $bufr_file.block $bufr_file
-                                      ls -la $bufr_file
+                                   set bufr_list=(`ls *.bufr`)
+                                   foreach bufr_file ( $bufr_list )
+                                      if ( -e $bufr_file) then
+                                         ls -la $bufr_file
+                                         cwordsh.sh unblk $bufr_file $bufr_file.unblk >& /dev/null
+                                         cwordsh.sh block $bufr_file.unblk $bufr_file.block >& /dev/null
+                                         rm -f $bufr_file.unblk
+                                         ln -fs $bufr_file.block $bufr_file
+                                         ls -la $bufr_file
+                                      endif
                                    end
                                 endif
 #XINZHANG###################################################
