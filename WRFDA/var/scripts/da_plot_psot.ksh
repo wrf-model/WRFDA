@@ -12,6 +12,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/WRFDA}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
@@ -92,15 +93,15 @@ for var in ${PSEUDO_VAR[*]}; do
 
       rm -f run1 run2 run3
 
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/var/graphics/ncl/psot_xy_auto.ncl" > run1
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot_xy_auto.ncl" > run1
       chmod +x run1
       ./run1
 
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/var/graphics/ncl/psot_xz_auto.ncl" > run2
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot_xz_auto.ncl" > run2
       chmod +x run2
       ./run2
 
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/var/graphics/ncl/psot_yz_auto.ncl" > run3
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot_yz_auto.ncl" > run3
       chmod +x run3
       ./run3
 

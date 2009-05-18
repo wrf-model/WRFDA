@@ -12,6 +12,7 @@ echo "<PRE>"
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export DATA_DIR=${DATA_DIR:-${REG_DIR}}    
@@ -245,17 +246,17 @@ for LEVEL in ${DESIRED_LEVELS} ; do
 
 NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${RUN_DIR}\"' 'exp_legends=${EXP_LEGENDS}' 'exp_line_cols=${EXP_LINES_COLORS}' 'select_levs=${LEVEL}' 'select_scores=${DESIRED_SCORES}'   'bar_label_angle=${BAR_LABEL_ANGLE}' 'verify_hour=${VERIFY_HOUR}'"
 
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_anal_time_series.ncl" > run1
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_anal_time_series.ncl" > run1
 chmod +x run1
 ./run1
 #-----------------------------------------------------------------------------------------------------------------------
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_anal_time_average.ncl" > run2
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_anal_time_average.ncl" > run2
 chmod +x run2
 ./run2
 #-----------------------------------------------------------------------------------------------------------------------
 done
 #-----------------------------------------------------------------------------------------------------------------------
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_anal_vert_profile.ncl" > run3
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_anal_vert_profile.ncl" > run3
 chmod +x run3
 ./run3
 

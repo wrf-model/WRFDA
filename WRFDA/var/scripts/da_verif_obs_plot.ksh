@@ -10,6 +10,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export NUM_EXPT=${NUM_EXPT:-2}
@@ -333,25 +334,25 @@ NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${WORK_DIR}\"' \
 
 #----------------
 if [ "$plotsfc" = "true" ] || [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_obs_time_series.ncl" > run1
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_obs_time_series.ncl" > run1
 chmod +x run1
 ./run1 > run1.log 2>&1
 fi
 #----------------
 if [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_obs_vert_profile.ncl" > run2
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_obs_vert_profile.ncl" > run2
 chmod +x run2
 ./run2 > run2.log 2>&1
 fi
 #----------------
 if [ "$plotupr" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_obs_time_average.ncl" > run3
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_obs_time_average.ncl" > run3
 chmod +x run3
 ./run3 > run3.log 2>&1
 fi
 #----------------
 if [ "$plotgpsref" = "true" ]; then
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_obs_vert_profile_gpsref.ncl" > run4
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_obs_vert_profile_gpsref.ncl" > run4
 chmod +x run4
 ./run4 > run4.log 2>&1
 fi
