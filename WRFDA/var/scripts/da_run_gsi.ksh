@@ -92,7 +92,9 @@ NCP=/bin/cp
 #   bufrtable= text file ONLY needed for single obs test (oneobstest=.true.)
 #   bftab_sst= bufr table for sst ONLY needed for sst retrieval (retrieval=.true.)
 
-BERROR=${FIXGLOBAL}/nam_regional_glb_berror.f77 # what is different from global and NAM BE files?
+BERROR=${FIXGLOBAL}/${BERROR_FILE:-nam_regional_glb_berror.f77} # what is different from global and NAM BE files?
+OBERROR=${FIXGLOBAL}/${OBERROR_FILE:-prepobs_errtable.global}
+
 SATANGL=${FIXGLOBAL}/global_satangbias.txt # needs this to be updated each cycle?
 SATINFO=${FIXGLOBAL}/global_satinfo.txt    # basically same between GDAS and NAM
 RTMFIX=${FIXGLOBAL}/crtm_gfsgsi            # CRTM Rev1855
@@ -103,8 +105,6 @@ RTMCLDS=${RTMFIX}/CloudCoeff/Big_Endian/CloudCoeff.bin
 CONVINFO=${FIXGLOBAL}/global_convinfo.txt
 OZINFO=${FIXGLOBAL}/global_ozinfo.txt
 PCPINFO=${FIXGLOBAL}/global_pcpinfo.txt
-
-OBERROR=${FIXGLOBAL}/prepobs_errtable.global
 
 # cd run directory 
 cd $WORK_DIR
@@ -146,8 +146,15 @@ cd $WORK_DIR
 
 # Copy observational data to current working directory
    ln -sf $OB_DIR/$DATE/ob.bufr    ./prepbufr
+ if ${GSI_ASS_AMSUA:-false}; then
    ln -sf $OB_DIR/$DATE/amsua.bufr ./amsuabufr
-   #ln -sf $OB_DIR/$DATE/amsub.bufr ./amsubbufr
+ fi
+ if ${GSI_ASS_AMSUB:-false}; then 
+   ln -sf $OB_DIR/$DATE/amsub.bufr ./amsubbufr
+ fi
+ if ${GSI_ASS_MHS:-false}; then
+   ln -sf $OB_DIR/$DATE/mhs.bufr ./mhsbufr
+ fi
 
 # Copy bias correction file, will use BIAS correction file generated from the last cycle
 # the first cycle will start from an empty satbias_in file
@@ -167,7 +174,7 @@ cat << EOF > gsiparm.anl
    miter=2,niter(1)=50,niter(2)=50,
    niter_no_qc(1)=${GSI_NOVARQC1:-1000000},niter_no_qc(2)=${GSI_NOVARQC2:-1000000},
    write_diag(1)=.true.,write_diag(2)=.true.,write_diag(3)=.true.,
-   qoption=2, gencode=78,
+   qoption=1, gencode=78,
    factqmin=${GSI_FACTQMIN:-0.005},factqmax=${GSI_FACTQMAX:-0.005},
    deltim=${GSI_DELTIM:-1200},
    ndat=60,npred=5,iguess=-1,
@@ -206,7 +213,7 @@ cat << EOF > gsiparm.anl
    use_poq7=.false.,
  /
  &OBS_INPUT
-   dmesh(1)=120.0,dmesh(2)=60.0,dmesh(3)=60.0,dmesh(4)=60.0,dmesh(5)=120.0,time_window_max=3.0,
+   dmesh(1)=${DMESH1:-120.0},dmesh(2)=${DMESH2:-60.0},dmesh(3)=${DMESH3:-60.0},dmesh(4)=${DMESH4:-60.0},dmesh(5)=${DMESH5:-120.0},time_window_max=${GSI_TIME_WINDOW:-3.0},
    dfile(01)='prepbufr',  dtype(01)='ps',        dplat(01)=' ',         dsis(01)='ps',                  dval(01)=1.0,  dthin(01)=0,
    dfile(02)='prepbufr'   dtype(02)='t',         dplat(02)=' ',         dsis(02)='t',                   dval(02)=1.0,  dthin(02)=0,
    dfile(03)='prepbufr',  dtype(03)='q',         dplat(03)=' ',         dsis(03)='q',                   dval(03)=1.0,  dthin(03)=0,
