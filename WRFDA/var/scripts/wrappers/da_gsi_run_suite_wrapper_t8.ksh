@@ -1,4 +1,5 @@
 #!/bin/ksh
+#This script is set to run WPS, REAL, GSI, UPDATE_BC, WRF
 set echo
 
 #Decide which stages to run (run if true):
