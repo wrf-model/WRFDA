@@ -92,7 +92,7 @@ NCP=/bin/cp
 #   bufrtable= text file ONLY needed for single obs test (oneobstest=.true.)
 #   bftab_sst= bufr table for sst ONLY needed for sst retrieval (retrieval=.true.)
 
-BERROR=${FIXGLOBAL}/${BERROR_FILE:-nam_regional_glb_berror.f77} # what is different from global and NAM BE files?
+BERROR=${FIXGLOBAL}/${BERROR_FILE:-nam_nmmstat_na_glberror} # what is different from global and NAM BE files?
 OBERROR=${FIXGLOBAL}/${OBERROR_FILE:-prepobs_errtable.global}
 
 SATANGL=${FIXGLOBAL}/global_satangbias.txt # needs this to be updated each cycle?
