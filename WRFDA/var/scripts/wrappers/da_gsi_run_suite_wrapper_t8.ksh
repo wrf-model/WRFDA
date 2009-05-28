@@ -19,7 +19,6 @@ export CYCLE_PERIOD=06
 #Time info
 export INITIAL_DATE=2007081500
 export FINAL_DATE=2007081600
-export FCST_RANGE=12
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=12
 export LONG_FCST_TIME_2=06
@@ -35,7 +34,7 @@ export        WPS_DIR=$REL_DIR/WRF3.1/trunk_wps
 export        WRF_DIR=$REL_DIR/WRF3.1/trunk_wrf
 export        WRFVAR_DIR=$REL_DIR/WRF3.1/trunk_wrfvar
 export        GSI_DIR=/ptmp/mhu/test_Q1FY09
-export        SCRIPTS_DIR=/ptmp/lir/test/wrf_var/wrapper/WRFDA/var/scripts
+export        SCRIPTS_DIR=/ptmp/lir/test/wrf_var/tools/WRFDA/var/scripts
 
 export        RUN_DIR=/ptmp/lir/test/gsi_run
 export        EXP_DIR=$RUN_DIR
@@ -103,7 +102,7 @@ export NL_PD_MOIST=TRUE
 
 # submit job info
 export NUM_PROCS=8
-export QUEUE=premium
+export QUEUE=economy
 export WALLCLOCK=360
 export PROJECT=64000510
 
