@@ -10,8 +10,8 @@
 #BSUB -J regtest_wrfda                  # job name
 #BSUB -q share                        # queue
 #BSUB -W 6:00                          # wallclock time
-##BSUB -P 64000530
-#BSUB -P 48500053
+#BSUB -P 64000510
+##BSUB -P 48500053
 
 # QSUB -q ded_4             # submit to 4 proc
 # QSUB -l mpp_p=4           # request 4 processors
@@ -382,8 +382,9 @@ if ( $ARCH[1] == AIX ) then
 	endif
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
-	set COMPOPTS    = ( 1 2 )
-	set Num_Procs		= 32
+	set COMPOPTS    = ( 1 2 3 )
+	set Num_Procs		= 4
+        set OPENMP              = $Num_Procs
         setenv MP_PROCS  $Num_Procs
         setenv MP_RMPOOL 1
 	if ( `hostname | cut -c 1-2` == be ) then
@@ -987,6 +988,7 @@ banner 14
 				rm $TMPDIR/wrfvar_output.${case_option}.$compopt >& /dev/null
 				
 				if      ( $compopt == $COMPOPTS[1] ) then
+                                        setenv OMP_NUM_THREADS 1
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
@@ -997,7 +999,13 @@ banner 14
                                         else
 					     ../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
                                         endif
-				else if ( $compopt == $COMPOPTS[2] ) then
+                                else if ( $compopt == $COMPOPTS[2] ) then
+                                        setenv OMP_NUM_THREADS $OPENMP
+                                        if ( `uname` == AIX ) then
+                                                setenv XLSMPOPTS "parthds=${OPENMP}:spins=0:yields=0:stack=128000000:schedule=static"
+                                        endif
+					../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+				else if ( $compopt == $COMPOPTS[3] ) then
 					setenv OMP_NUM_THREADS 1
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
@@ -1112,7 +1120,7 @@ banner 18
 					set RIGHT_SIZE_MPI = FALSE
 				endif
 	
-				#	Serial vs MPI
+				#	Serial vs OpenMP
 		
 				rm fort.88 fort.98 >& /dev/null
 				if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
@@ -1124,11 +1132,46 @@ banner 18
 					touch fort.88 fort.98
 				endif
 				if ( ! -e fort.88 ) then
-				        echo "SUMMARY serial vs MPI  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
+				        echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
 					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
 				else
                                         set rmse1=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $4}'`
                                         set rmse2=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $5}'`
+                                        set equal=1
+                                        set count=1
+                                        while ( $count <= $#rmse1 )
+                                                if ( $rmse1[$count] != $rmse2[$count] ) then
+                                                     set equal=0
+                                                     break
+                                                endif
+                                                @ count= $count + 1
+                                        end
+                                        if ( $equal ) then
+					     echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
+					     echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                        else
+					     echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
+					     echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                        endif
+				endif
+
+				#	Serial vs MPI
+		
+				rm fort.88 fort.98 >& /dev/null
+				if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
+				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] ) && \
+				     ( $RIGHT_SIZE_MPI == TRUE ) ) then
+					$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] \
+					         $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] >& /dev/null
+				else
+					touch fort.88 fort.98
+				endif
+				if ( ! -e fort.88 ) then
+				        echo "SUMMARY serial vs MPI  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
+					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+				else
+                                        set rmse1=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $4}'`
+                                        set rmse2=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $5}'`
                                         set equal=1
                                         set count=1
                                         while ( $count <= $#rmse1 )
