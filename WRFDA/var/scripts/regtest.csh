@@ -8,7 +8,7 @@
 #BSUB -o reg.out                        # output filename (%J to add job id)
 #BSUB -e reg.err                        # error filename
 #BSUB -J regtest_wrfda                  # job name
-#BSUB -q share                        # queue
+#BSUB -q regular                        # queue
 #BSUB -W 6:00                          # wallclock time
 #BSUB -P 64000510
 ##BSUB -P 48500053
@@ -114,7 +114,7 @@ else if   ( `hostname` == envelope2.rap.ucar.edu ) then
 else if ( ( `hostname | cut -c 1-2` == be ) || ( `hostname` == tempest ) || ( `hostname | cut -c 1-2` == ln ) ) then
 	set WRFDAREGDATAEM = /mmm/users/xinzhang/WRFDA-data-EM
 	set WRFDAREGDATANMM = /mmm/users/xinzhang/WRFDA-data-NMM
-        set CASEOPTS =	( tutorial_xinzhang cv3_guo t44_liuz radar_meixu cwb_ascii afwa_t7_ssmi t44_prepbufr ASR_prepbufr cwb_ascii_outerloop_rizvi )
+        set CASEOPTS =	( tutorial_xinzhang cv3_guo t44_liuz radar_meixu cwb_ascii afwa_t7_ssmi t44_prepbufr ASR_prepbufr cwb_ascii_outerloop_rizvi sfc_assi_2_outerloop_guo )
 else
 	if      ( ( -d /users/gill/WRF-data-EM ) && ( -d /users/gill/WRF-data-NMM ) ) then
 		set WRFDAREGDATAEM = /users/gill/WRF-data-EM
@@ -282,9 +282,9 @@ endif
 #       - To compare with a previously archived baseline, set COMPARE_BASELINE 
 #         to an existing directory that contains an archived baseline.  
 #         Set COMPARE_BASELINE = FALSE to avoid baseline comparison.  
-set GENERATE_BASELINE = '/ptmp/xinzhang/BASELINE'
-set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set COMPARE_BASELINE = FALSE
+set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
+set GENERATE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = FALSE
 if   ( `hostname` == envelope2.rap.ucar.edu ) then
      set GENERATE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
@@ -383,7 +383,7 @@ if ( $ARCH[1] == AIX ) then
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
 	set COMPOPTS    = ( 1 2 3 )
-	set Num_Procs		= 4
+	set Num_Procs		= 32
         set OPENMP              = $Num_Procs
         setenv MP_PROCS  $Num_Procs
         setenv MP_RMPOOL 1
@@ -659,6 +659,7 @@ else if ( $acquire_from == "filearg" ) then
 
 	tar xvf $thefile
 	cd WRFDA
+        set therevision = (`svnversion`)
 	clean -a
 	cd ..
 #	ftp -n ftp.ucar.edu < ftp_script_data
@@ -702,6 +703,8 @@ endif
 if ( -e ${DEF_DIR}/wrfdatest.output ) rm ${DEF_DIR}/wrfdatest.output
 echo "Architecture $ARCH[1]      machine: `hostname`" >>! ${DEF_DIR}/wrfdatest.output
 echo "WRFDA source from: $acquire_from " >>! ${DEF_DIR}/wrfdatest.output
+echo "WRFDA version: $therevision " >>! ${DEF_DIR}/wrfdatest.output
+echo "Number of OpenMP processes to use: $OPENMP" >>! ${DEF_DIR}/wrfdatest.output
 echo "Number of MPI    processes to use: $Num_Procs" >>! ${DEF_DIR}/wrfdatest.output
 if ( $ARCH[1] == Darwin ) then
 	set name = `finger $user | grep "Name:" | awk '{print $4 " " $5}'`
@@ -739,12 +742,12 @@ if ( $QUILT == TRUE ) then
 	echo " " >>! ${DEF_DIR}/wrfdatest.output
 endif
 if ( $GENERATE_BASELINE != FALSE ) then
-	echo "WRF output will be archived in baseline directory ${GENERATE_BASELINE} for some tests" >>! \
+	echo "WRFDA output will be archived in baseline directory ${GENERATE_BASELINE} for some tests" >>! \
 	     ${DEF_DIR}/wrfdatest.output
 	echo " " >>! ${DEF_DIR}/wrfdatest.output
 endif
 if ( $COMPARE_BASELINE != FALSE ) then
-	echo "WRF output will be compared with files in baseline directory ${COMPARE_BASELINE} for some tests" >>! \
+	echo "WRFDA output will be compared with files in baseline directory ${COMPARE_BASELINE} for some tests" >>! \
 	     ${DEF_DIR}/wrfdatest.output
 	echo " " >>! ${DEF_DIR}/wrfdatest.output
 endif
@@ -994,23 +997,32 @@ banner 14
 					endif
                                         if   ( (`hostname` == envelope2.rap.ucar.edu) && ($case_option == afwa_t7_ssmi) ) then
 #XINZHANG######### afwa_t7_ssmi can not run with single processor due to memory limit.
-					     mpirun -np 2 ../../build/da_wrfvar.exe.$COMPOPTS[2] $MPIRUNCOMMANDPOST
+					     mpirun -np 2 ../../build/da_wrfvar.exe.$COMPOPTS[3] $MPIRUNCOMMANDPOST
                                              mv rsl.out.0000 print.out.wrfda_Case=${case_option}_Parallel=${compopt}
                                         else
+                                             set start_seconds = (`date +%s`)
 					     ../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+                                             set end_seconds = (`date +%s`)
+                                             @ walltime_seconds = $end_seconds - $start_seconds
                                         endif
                                 else if ( $compopt == $COMPOPTS[2] ) then
                                         setenv OMP_NUM_THREADS $OPENMP
                                         if ( `uname` == AIX ) then
                                                 setenv XLSMPOPTS "parthds=${OPENMP}:spins=0:yields=0:stack=128000000:schedule=static"
                                         endif
+                                        set start_seconds = (`date +%s`)
 					../../build/da_wrfvar.exe.$compopt >! print.out.wrfda_Case=${case_option}_Parallel=${compopt}
+                                        set end_seconds = (`date +%s`)
+                                        @ walltime_seconds = $end_seconds - $start_seconds
 				else if ( $compopt == $COMPOPTS[3] ) then
 					setenv OMP_NUM_THREADS 1
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
+                                        set start_seconds = (`date +%s`)
 					$MPIRUNCOMMAND ../../build/da_wrfvar.exe.$compopt $MPIRUNCOMMANDPOST
+                                        set end_seconds = (`date +%s`)
+                                        @ walltime_seconds = $end_seconds - $start_seconds
 					mv rsl.out.0000 print.out.wrfda_Case=${case_option}_Parallel=${compopt}
 				endif
 #XINZHANG###################################################
@@ -1044,7 +1056,7 @@ banner 17
 
 					endif
 					if ( $ok == 0 ) then
-						echo "SUMMARY generate ANALYSIS  for $core case $case_option parallel $compopt $esmf_lib_str PASS" >>! ${DEF_DIR}/wrfdatest.output
+						echo "SUMMARY generate ANALYSIS  for $core case $case_option parallel $compopt $esmf_lib_str PASS in $walltime_seconds seconds" >>! ${DEF_DIR}/wrfdatest.output
 						echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
 					else
 						echo "SUMMARY generate ANALYSIS  for $core case $case_option parallel $compopt $esmf_lib_str FAIL" >>! ${DEF_DIR}/wrfdatest.output
@@ -1106,12 +1118,15 @@ banner 18
 				#	diffwrf will give a pass.  We need to root out this evil.
 	
 				if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
-				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) ) then
+				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) && \
+				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] ) ) then
 					set foo1 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] `)
 					set foo2 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] `)
+					set foo3 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] `)
 					set size1 = $foo1[6]
 					set size2 = $foo2[6]
-					if ( $size1 == $size2 ) then
+					set size3 = $foo3[6]
+					if ( ( $size1 == $size2 ) && ( $size1 == $size3 ) ) then
 						set RIGHT_SIZE_MPI = TRUE
 					else
 						set RIGHT_SIZE_MPI = FALSE
