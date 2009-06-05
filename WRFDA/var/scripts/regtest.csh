@@ -89,8 +89,9 @@ else if   ( `hostname` == bay-mmm ) then
 else if   ( `hostname` == karri ) then
 	set argv = ( -f /karri/users/xinzhang/regtest/wrfda.tar )
 	set argv = ( -r HEAD  )
-else if   ( `hostname` == envelope2.rap.ucar.edu ) then
-	set argv = ( -f /Volumes/d1/yueliu/XIN/regtest/wrfda.tar )
+else if   ( `hostname` == gum ) then
+	set argv = ( -f /Volumes/gum/xinzhang/regtest/wrfda.tar )
+	set argv = ( -r HEAD  )
 	set FAIL_MAIL = ( xinzhang@ucar.edu )
 	set GOOD_MAIL = ( xinzhang@ucar.edu )
 endif
@@ -106,11 +107,10 @@ else if   ( `hostname` == bay-mmm ) then
 	set WRFDAREGDATAEM = /users/xinzhang/CODE/WRFDA-data-EM
 	set WRFDAREGDATANMM = /users/xinzhang/CODE/WRFDA-data-NMM
         set CASEOPTS =	( cwb_ascii )
-else if   ( `hostname` == envelope2.rap.ucar.edu ) then
-	set WRFDAREGDATAEM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-EM
-	set WRFDAREGDATANMM = /Volumes/d1/yueliu/XIN/regtest/WRFDA-data-NMM
-        set CASEOPTS =	( cwb_ascii cv3_guo afwa_t7_ssmi t44_prepbufr )
-        set CASEOPTS =	( t44_prepbufr )
+else if   ( `hostname` == gum ) then
+	set WRFDAREGDATAEM = /Volumes/gum/xinzhang/regtest/WRFDA-data-EM
+	set WRFDAREGDATANMM = /Volumes/gum/xinzhang/regtest/WRFDA-data-NMM
+        set CASEOPTS =	( tutorial_xinzhang cv3_guo t44_liuz cwb_ascii afwa_t7_ssmi t44_prepbufr ASR_prepbufr cwb_ascii_outerloop_rizvi sfc_assi_2_outerloop_guo )
 else if ( ( `hostname | cut -c 1-2` == be ) || ( `hostname` == tempest ) || ( `hostname | cut -c 1-2` == ln ) ) then
 	set WRFDAREGDATAEM = /mmm/users/xinzhang/WRFDA-data-EM
 	set WRFDAREGDATANMM = /mmm/users/xinzhang/WRFDA-data-NMM
@@ -222,7 +222,7 @@ if ( `hostname` == bay-mmm ) then
 	set LINUX_COMP = PGI
 else if ( `hostname` == karri ) then
 	set LINUX_COMP = PGI
-else if ( `hostname` == envelope2.rap.ucar.edu ) then
+else if ( `hostname` == gum ) then
 	set LINUX_COMP = G95
 endif
 
@@ -286,9 +286,9 @@ set COMPARE_BASELINE = FALSE
 set COMPARE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = '/ptmp/xinzhang/BASELINE'
 set GENERATE_BASELINE = FALSE
-if   ( `hostname` == envelope2.rap.ucar.edu ) then
-     set GENERATE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
-     set COMPARE_BASELINE = '/Volumes/d1/yueliu/XIN/regtest/BASELINE'
+if   ( `hostname` == gum ) then
+     set GENERATE_BASELINE = '/Volumes/gum/xinzhang/regtest/BASELINE'
+     set COMPARE_BASELINE = '/Volumes/gum/xinzhang/regtest/BASELINE'
      set COMPARE_BASELINE = FALSE
      set GENERATE_BASELINE = FALSE
 endif
@@ -344,6 +344,7 @@ set ZAP_OPENMP          = FALSE
 set SERIALRUNCOMMAND	= 
 set OMPRUNCOMMAND	= 
 set MPIRUNCOMMANDPOST   = 
+set ZAP_SERIAL_CASES = ( )
 
 touch version_info
 if ( $ARCH[1] == AIX ) then
@@ -403,8 +404,8 @@ if ( $ARCH[1] == AIX ) then
 	echo "AIX:            " `lslpp -l | grep bos.mp | head -1 | awk '{print $1 "   " $2}'` >>! version_info
 	echo " " >>! version_info
 	setenv MP_SHARED_MEMORY yes
-else if ( ( $ARCH[1] == Darwin ) && ( `hostname` == envelope2.rap.ucar.edu ) ) then
-        set DEF_DIR             = /Volumes/d1/yueliu/XIN/regtest/wrfda_regression
+else if ( ( $ARCH[1] == Darwin ) && ( `hostname` == gum ) ) then
+        set DEF_DIR             = /Volumes/gum/xinzhang/regtest/wrfda_regression
         if ( -d $DEF_DIR ) then
                 echo "${0}: ERROR::  Directory ${DEF_DIR} exists, please remove it"
                 exit ( 1 )
@@ -415,11 +416,14 @@ else if ( ( $ARCH[1] == Darwin ) && ( `hostname` == envelope2.rap.ucar.edu ) ) t
 	set TMPDIR              = $DEF_DIR
 	set MAIL		= /usr/bin/mailx
 	if      ( $LINUX_COMP == PGI ) then
-		set COMPOPTS	= ( 1 2 )
+		set COMPOPTS	= ( 1 2 3 )
 	else if ( $LINUX_COMP == G95 ) then
-		set COMPOPTS	= ( 7 8 )
+		set COMPOPTS	= ( 13 0 14 )
+                set ZAP_OPENMP  = TRUE
 	endif
 	set Num_Procs		= 4
+	set OPENMP		= $Num_Procs
+        set ZAP_SERIAL_CASES = ( t44_liuz ASR_prepbufr afwa_t7_ssmi t44_prepbufr )
 	cat >! `pwd`/machfile << EOF
 `hostname`
 `hostname`
@@ -430,10 +434,10 @@ EOF
 	set SERIALRUNCOMMAND	= 
 	echo "Compiler version info: " >! version_info
 	if      ( $LINUX_COMP == PGI ) then
-		set MPIRUNCOMMAND 	= ( /Volumes/d1/yueliu/XIN/external/g95/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
+		set MPIRUNCOMMAND 	= ( /Volumes/gum/xinzhang/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
 		pgf90 -V | head -2 | tail -1 >>&! version_info
 	else if ( $LINUX_COMP == G95 ) then
-		set MPIRUNCOMMAND 	= ( /Volumes/d1/yueliu/XIN/external/g95/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
+		set MPIRUNCOMMAND 	= ( /Volumes/gum/xinzhang/mpich2-1.0.7/bin/mpirun -np $Num_Procs )
 		g95 -v |& grep gcc >>&! version_info
 	endif
 	echo " " >>! version_info
@@ -796,6 +800,14 @@ banner 6
 #set ans = "$<"
 #XINZHANG###################################################
 
+                #       We sometimes are interested in bypassing the OpenMP option.
+
+                if ( $compopt == $COMPOPTS[2] ) then
+                        if ( $ZAP_OPENMP == TRUE ) then
+                                goto GOT_THIS_EXEC
+                        endif
+                endif
+
 		if ( `uname` == AIX ) goto BUILD_REGARDLESS
 	
 		#	Did we already build this one?
@@ -952,7 +964,14 @@ banner 12
 #set ans = "$<"
 #XINZHANG###################################################
 
-				#
+                                #       We sometimes are interested in bypassing the OpenMP option.
+
+                                if ( $compopt == $COMPOPTS[2] ) then
+                                        if ( $ZAP_OPENMP == TRUE ) then
+                                                goto BYPASS_COMP_LOOP_REAL
+                                        endif
+                                endif
+
 				#	Create the correct directory for cases.
 				#
 
@@ -995,9 +1014,22 @@ banner 14
 					if ( `uname` == AIX ) then
 						setenv XLSMPOPTS "parthds=1"
 					endif
-                                        if   ( (`hostname` == envelope2.rap.ucar.edu) && ($case_option == afwa_t7_ssmi) ) then
-#XINZHANG######### afwa_t7_ssmi can not run with single processor due to memory limit.
+                                        set found_zap_serial = 0
+                                        if ( $#ZAP_SERIAL_CASES != 0 ) then
+                                             set count = 1
+                                             while ( $count <= $#ZAP_SERIAL_CASES )
+                                                   if ( $ZAP_SERIAL_CASES[$count] == $case_option ) then
+                                                      set found_zap_serial = 1
+                                                      break
+                                                   endif
+                                                   @ count ++
+                                             end
+                                        endif
+                                        if ( $found_zap_serial == 1 ) then
+                                             set start_seconds = (`date +%s`)
 					     mpirun -np 2 ../../build/da_wrfvar.exe.$COMPOPTS[3] $MPIRUNCOMMANDPOST
+                                             set end_seconds = (`date +%s`)
+                                             @ walltime_seconds = $end_seconds - $start_seconds
                                              mv rsl.out.0000 print.out.wrfda_Case=${case_option}_Parallel=${compopt}
                                         else
                                              set start_seconds = (`date +%s`)
@@ -1112,63 +1144,76 @@ banner 18
 		
 				pushd ${DEF_DIR}/regression_test/WRFDA/var/test/$case_option
 				set DIFFWRF = ${DEF_DIR}/regression_test/WRFDA/var/build/diffwrf
+
+                                #       Are we skipping the OpenMP runs?
+
+                                if ( $ZAP_OPENMP == TRUE ) then
+                                        goto BYPASS_OPENMP_SUMMARY1
+                                endif
+
 	
 				#	Are the files the same size?  If not, then only the initial times
 				#	will be compared.  That means, on a failure to run a forecast, the
 				#	diffwrf will give a pass.  We need to root out this evil.
 	
 				if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
-				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) && \
-				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] ) ) then
+				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) ) then
 					set foo1 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] `)
 					set foo2 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] `)
-					set foo3 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] `)
 					set size1 = $foo1[6]
 					set size2 = $foo2[6]
-					set size3 = $foo3[6]
-					if ( ( $size1 == $size2 ) && ( $size1 == $size3 ) ) then
-						set RIGHT_SIZE_MPI = TRUE
+					if ( $size1 == $size2 ) then
+						set RIGHT_SIZE_OMP = TRUE
 					else
-						set RIGHT_SIZE_MPI = FALSE
+						set RIGHT_SIZE_OMP = FALSE
 					endif
 				else
-					set RIGHT_SIZE_MPI = FALSE
+					set RIGHT_SIZE_OMP = FALSE
 				endif
-	
-				#	Serial vs OpenMP
-		
-				rm fort.88 fort.98 >& /dev/null
+
+                                BYPASS_OPENMP_SUMMARY1:
+
 				if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
-				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) && \
-				     ( $RIGHT_SIZE_MPI == TRUE ) ) then
-					$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] \
-					         $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] >& /dev/null
-				else
-					touch fort.88 fort.98
-				endif
-				if ( ! -e fort.88 ) then
-				        echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
-					echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
-				else
-                                        set rmse1=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $4}'`
-                                        set rmse2=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $5}'`
-                                        set equal=1
-                                        set count=1
-                                        while ( $count <= $#rmse1 )
-                                                if ( $rmse1[$count] != $rmse2[$count] ) then
-                                                     set equal=0
-                                                     break
-                                                endif
-                                                @ count= $count + 1
-                                        end
-                                        if ( $equal ) then
-					     echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
-					     echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+				     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] ) ) then
+					set foo1 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] `)
+					set foo3 = ( ` \ls -ls $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[3] `)
+                                        set size1 = $foo1[6]
+                                        set size3 = $foo3[6]
+                                        if ( $size1 == $size3 ) then
+                                                set RIGHT_SIZE_MPI = TRUE
                                         else
-					     echo "SUMMARY serial vs OpenMP  for case $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
-					     echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                                set RIGHT_SIZE_MPI = FALSE
                                         endif
-				endif
+                                else
+                                        set RIGHT_SIZE_MPI = FALSE
+                                endif
+
+                                #       Are we skipping the OpenMP runs?
+
+                                if ( $ZAP_OPENMP == TRUE ) then
+                                        goto BYPASS_OPENMP_SUMMARY2
+                                endif
+
+                                #       Serial vs OpenMP
+
+                                rm fort.88 fort.98 >& /dev/null
+                                if ( ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] ) && \
+                                     ( -e $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] ) && \
+                                     ( $RIGHT_SIZE_OMP == TRUE ) ) then
+                                        $DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] \
+                                                 $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] >& /dev/null
+                                else
+                                        touch fort.88 fort.98
+                                endif
+                                if ( ! -e fort.88 ) then
+                                        echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
+                                        echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                else
+                                        echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
+                                        echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                endif
+
+                                BYPASS_OPENMP_SUMMARY2:
 
 				#	Serial vs MPI
 		
