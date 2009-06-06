@@ -4,7 +4,7 @@
 # #BSUB -a mpich_gm                       # at NCAR: lightning
 # #BSUB -R "span[ptile=2]"                # how many tasks per node (1 or 2)
 #BSUB -R "span[ptile=32]"                # how many tasks per node (up to 8)
-#BSUB -n 32                             # number of total tasks
+#BSUB -n 16                             # number of total tasks
 #BSUB -o reg.out                        # output filename (%J to add job id)
 #BSUB -e reg.err                        # error filename
 #BSUB -J regtest_wrfda                  # job name
@@ -384,7 +384,7 @@ if ( $ARCH[1] == AIX ) then
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
 	set COMPOPTS    = ( 1 2 3 )
-	set Num_Procs		= 32
+	set Num_Procs		= 16
         set OPENMP              = $Num_Procs
         setenv MP_PROCS  $Num_Procs
         setenv MP_RMPOOL 1
@@ -1209,6 +1209,17 @@ banner 18
                                         echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
                                         echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
                                 else
+                                        set rmse1=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $4}'`
+                                        set rmse2=`$DIFFWRF $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[1] $TMPDIR/wrfvar_output.${case_option}.$COMPOPTS[2] | sed -e '/Just/d' -e '/Diffing/d' -e '/Next/d' -e '/Field/d' | awk '{print $5}'`
+                                        set equal=1
+                                        set count=1
+                                        while ( $count <= $#rmse1 )
+                                                if ( $rmse1[$count] != $rmse2[$count] ) then
+                                                     set equal=0
+                                                     break
+                                                endif
+                                                @ count= $count + 1
+                                        end
                                         echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
                                         echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
                                 endif
