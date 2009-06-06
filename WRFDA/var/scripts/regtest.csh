@@ -1220,8 +1220,13 @@ banner 18
                                                 endif
                                                 @ count= $count + 1
                                         end
-                                        echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
-                                        echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                        if ( $equal ) then
+                                             echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            PASS" >>! ${DEF_DIR}/wrfdatest.output
+                                             echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                        else
+                                             echo "SUMMARY serial vs OMP  for $core $case_option $esmf_lib_str            FAIL" >>! ${DEF_DIR}/wrfdatest.output
+                                             echo "-------------------------------------------------------------" >> ${DEF_DIR}/wrfdatest.output
+                                        endif
                                 endif
 
                                 BYPASS_OPENMP_SUMMARY2:
