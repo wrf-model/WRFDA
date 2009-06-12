@@ -1,0 +1,193 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_post.sh
+# Script description:  Run nam post jobs
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script runs the Nam post jobs for the 48-h Nam forecast
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-17  Brent Gordon  -- Modified for production.
+# 2007-10-03  Bradley Mabe  -- Implemented latest changes
+#
+
+set -xa
+cd $DATA 
+
+msg="$job HAS BEGUN"
+postmsg "/com/logs/jlogfile" "$msg"
+
+export SDATE=$CYCLE
+export MODELTYPE=NMM
+export OUTTYP=binarympiio
+
+for fhr in $post_times
+do
+  icnt=1
+  while [ $icnt -lt 1000 ]
+  do
+    if [ -s $FCSTDIR/fcstdone${fhr}.${tmmark} ]
+    then
+      break
+    else
+      icnt=$((icnt + 1))
+      sleep 5
+    fi
+    if [ $icnt -ge 360 ]
+    then
+      msg="ABORTING after 30 minutes of waiting for Nam FCST F${fhr} to end."
+      err_exit $msg
+    fi
+  done
+
+## Note: eta_micro_lookup.dat is hardwired in the code, I have changed it to
+##       a generic name "micro_lookup.dat" there, so change accordingly here:
+## JYZ 10-20-2004
+ # cp $FIXnam/nam_micro_lookup.dat nam_micro_lookup.dat
+   cp $FIXnam/nam_micro_lookup.dat eta_micro_lookup.dat
+
+  nposts=01
+  incpst=01
+
+  y=`expr $fhr % 3`
+
+  if [ $fhr -le 48 ] 
+  then
+    if [ $fhr -le 36 ] 
+    then
+      if [ $y -eq 0 ]
+      then
+        cp $PARMnam/nam_cntrl_cmaq.parm nam_cntrl.parm.${fhr}
+      else
+        cp $PARMnam/nam_cntrl_cmaq_hourly.parm nam_cntrl.parm.${fhr}
+      fi
+    fi
+    if [ $fhr -gt 36 ]
+    then
+      if [ $y -eq 0 ]
+      then
+        cp $PARMnam/nam_cntrl_cmaq.parm nam_cntrl.parm.${fhr}
+      else
+        cp $PARMnam/nam_cntrl_cmaqonly.parm nam_cntrl.parm.${fhr}
+      fi
+    fi
+  else
+    cp $PARMnam/nam_cntrl.parm nam_cntrl.parm.${fhr}
+  fi
+
+  if [ $fhr -gt 49 -a $y -ne 0 ] 
+  then
+    cp $PARMnam/nam_cntrl_egrd3d_hourly.parm nam_cntrl.parm.${fhr}
+  fi
+
+  if [ $fhr -eq 49 ]
+  then
+    cp $PARMnam/nam_cntrl_cmaqonly.parm nam_cntrl.parm.${fhr}
+  fi
+
+  VALDATE=`/nwprod/util/exec/ndate ${fhr} ${SDATE}`
+
+  valyr=`echo $VALDATE | cut -c1-4`
+  valmn=`echo $VALDATE | cut -c5-6`
+  valdy=`echo $VALDATE | cut -c7-8`
+  valhr=`echo $VALDATE | cut -c9-10`
+
+  timeform=${valyr}"-"${valmn}"-"${valdy}"_"${valhr}":00:00"
+
+cat > itag <<EOF
+$FCSTDIR/wrfout_d01_${timeform}
+$OUTTYP
+$timeform
+$MODELTYPE
+EOF
+
+#copy 78hr restrt file to nwges for 8-day nam extension
+if [ $fhr -eq 78 ]
+then
+   cp $FCSTDIR/wrfrst_d01_${timeform} $GESDIR/${RUN}.${cycle}.wrfrst_d01_${timeform}.f78
+## release the DGEX at this point
+   $SMSBIN/setev release_dgex
+fi
+ 
+  cp $COMOUT/nam.t${cyc}z.namelist.input.tm00 namelist.input
+
+  export pgm=nam_wrfpost
+  . prep_step
+  export XLFUNIT_14=nam_cntrl.parm.${fhr}
+
+  startmsg
+  $EXECnam/nam_wrfpost < itag >> $pgmout 2>errfile
+  export err=$?;err_chk
+
+  if [ $y -eq 0 ] 
+  then
+    mv EGRD3D${fhr}.tm00 $COMOUT/nam.${cycle}.egrd3d${fhr}.tm00
+    mv EGDAWP${fhr}.tm00 $COMOUT/nam.${cycle}.egdawp${fhr}.tm00
+    mv EGRDSF${fhr}.tm00 $COMOUT/nam.${cycle}.egrdsf${fhr}.tm00
+    if [ $fhr -le 48 ] 
+    then
+      mv EGDAQM${fhr}.tm00 $COMOUT/nam.${cycle}.egdaqm${fhr}.tm00
+      mv EGRD3D${fhr}.tm00 $COMOUT/nam.${cycle}.egrd3d${fhr}.tm00
+      mv ETAPROFILE.txt $COMOUT/nam.${cycle}.nmmprofile.${fhr}.txt
+    fi
+  fi
+
+  if [ $y -ne 0 ] 
+  then
+
+    case $cyc in
+      00) egrd3dfhr=84;;
+      06) egrd3dfhr=84;;
+      12) egrd3dfhr=84;;
+      18) egrd3dfhr=84;;
+    esac
+    if [ $fhr -le $egrd3dfhr ]
+    then
+      mv EGRD3D${fhr}.tm00 $COMOUT/nam.${cycle}.egrd3d${fhr}.tm00
+    fi
+     
+    if [ $fhr -le 36 ] 
+    then
+      mv EGDAWP${fhr}.tm00 $COMOUT/nam.${cycle}.egdawp${fhr}.tm00
+      mv EGRDSF${fhr}.tm00 $COMOUT/nam.${cycle}.egrdsf${fhr}.tm00
+      mv EGDAQM${fhr}.tm00 $COMOUT/nam.${cycle}.egdaqm${fhr}.tm00
+      mv ETAPROFILE.txt $COMOUT/nam.${cycle}.nmmprofile.${fhr}.txt
+    else
+      mv EGDAQM${fhr}.tm00 $COMOUT/nam.${cycle}.egdaqm${fhr}.tm00
+      mv ETAPROFILE.txt $COMOUT/nam.${cycle}.nmmprofile.${fhr}.txt
+    fi
+  fi
+
+  if test $SENDDBN = 'YES'
+  then
+    if [ $y -eq 0 ] 
+    then
+      $DBNROOT/bin/dbn_alert MODEL NAM_EGB3D $job $COMOUT/nam.${cycle}.egrd3d${fhr}.tm00
+    fi
+    $DBNROOT/bin/dbn_alert MODEL WRFEVAL $job $COMOUT/nam.${cycle}.egrdsf${fhr}.tm00
+  fi
+
+  echo done > $FCSTDIR/nampost.done${fhr}.${tmmark}
+
+  postmsg "/com/logs/jlogfile" "NAM POST done for F${fhr}"
+
+done
+
+#
+# If this is the on-time nam, copy the 60-hour restart file to /nwges
+# so the extension forecast can restart using this data.
+#
+#if [ $fhr -eq 60 ] ; then
+#  if [ $cyc -eq 00 -o $cyc -eq 12 ] ; then
+#    cp $DATA/restrt60.tm00 $GESDIR/${RUN}.${cycle}.restrt60.tm00
+#  fi
+#
+#fi
+
+echo EXITING $0
+exit
+#

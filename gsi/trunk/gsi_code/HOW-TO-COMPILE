@@ -1,0 +1,16 @@
+2) In src, go into Makefile.conf.AIX, you'll see this:
+
+INCcrtm = /emc2/wx20er/nextjif/nam_wrf/sorc/nam_gsi.fd/include_crtm2
+LIBcrtm = /emc2/wx20er/nextjif/nam_wrf/sorc/nam_gsi.fd/libcrtm2/libcrtm.a
+##INCcrtm = /nwprod/sorc/nam_gsi.fd/include_crtm2
+##LIBcrtm = /nwprod/sorc/nam_gsi.fd/libcrtm2/libcrtm.a
+                                                                                                                                     
+WRFPATH=/emc2/wx20er/nextjif/nam_wrf/sorc/nam_nmm_real_fcst.fd
+#WRFPATH=/nwprod/sorc/nam_nmm_real_fcst.fd
+
+As with the other codes, comment out the /emc2 paths and uncomment the /nwprod paths; make sure the WRF-NMM model code is compiled first
+
+3) type "./configure"
+
+4) type "make" which will start compiling the code
+

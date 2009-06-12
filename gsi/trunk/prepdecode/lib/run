@@ -1,0 +1,5 @@
+#mpif90 -O3 -xW -g -traceback -check bounds -assume byterecl -c *.f
+mpif90  -O3 -xW -g -traceback -assume byterecl -convert big_endian -c *.f
+ar -crv bufrlib.a *.o
+cp bufrlib.a ../../lib/libprepbufr.a
+rm -f *.o

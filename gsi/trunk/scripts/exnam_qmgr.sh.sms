@@ -1,0 +1,85 @@
+#! /bin/ksh
+#
+# Script name:         exnam_qmgr.sh.sms
+#
+#  This script monitors the progress of the nam_fcst program 
+#  and releases the quilt jobs.
+#
+
+set -x
+
+export PS4='$SECONDS + '
+export tmmark=tm00
+
+#
+# Wait for the next forecast to end before starting the quilt jobs
+#
+for fhr in $start_quilt
+do
+  icnt=1
+  while [ $icnt -lt 1000 ]
+  do
+    ls -l $DATA/fcstdone${fhr}.${tmmark}
+    err1=$?
+
+    if [ $err1 -eq 0 ] ; then
+      break
+    else
+      let "icnt=icnt+1"
+      sleep 20
+    fi
+
+    if [ $icnt -ge 540 ]
+    then
+      msg="ABORTING after 3 hours of waiting for F$fhr namfcst to end."
+      err_exit $msg
+    fi
+  done
+
+  $SMSBIN/setev release_quilt${fhr}
+
+done
+
+#######################################################
+# Wait for all quilt jobs to end before ending.
+#######################################################
+if [ $cyc -eq 00 -o $cyc -eq 12 ] ; then
+
+fhrs="00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 \
+      20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 \
+      40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 \
+      60"
+else
+
+fhrs="00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 \
+      20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 \
+      40 41 42 43 44 45 46 47 48"
+fi
+
+icnt=1
+sleep 60
+while [ $icnt -lt 1000 ]
+do
+  ferr=0
+  for fx in $fhrs
+  do
+    ls -l $GESDIR/nam.t${cyc}z.quiltdone.${fx}
+    err=$?
+    ferr=$((ferr + err))
+  done
+  if [ $ferr -eq 0 ]
+  then
+    break
+  else
+    icnt=$((icnt + 1))
+    sleep 30
+  fi
+  if [ $icnt -ge 360 ]
+  then
+    msg="ABORTING after 3 hours of waiting for all QUILT jobs to end."
+    err_exit $msg
+  fi
+done
+
+exit
+#

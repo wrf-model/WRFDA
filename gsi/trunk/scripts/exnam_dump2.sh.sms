@@ -1,0 +1,322 @@
+###########################################################################
+echo "--------------------------------------------------------------------"
+echo "exnam_dump2.sh.sms - NAM and NDAS model data dump processing (Job 2)"
+echo "--------------------------------------------------------------------"
+echo "History: Feb 28 2006 - Original script."
+###########################################################################
+
+set -x
+
+#  ADDED by KG on 07/20/07 ##############################
+export PS4='$SECONDS + '
+################# send extra output for monitoring purposes.
+
+
+# Make sure we are in the $DATA directory
+cd $DATA
+
+msg="HAS BEGUN on `hostname`"
+postmsg "$jlogfile" "$msg"
+ 
+cat break > $pgmout
+
+export COMSP=$COMOUT/$RUN.${cycle}.
+
+tmhr=`echo $tmmark|cut -c3-4`
+export dumptime=`/nwprod/util/exec/ndate -$tmhr $PDY$cyc`
+export cycp=`echo $dumptime|cut -c9-10`
+
+RUN_uc=$(echo $RUN | tr [a-z] [A-Z])
+tmmark_uc=$(echo $tmmark | tr [a-z] [A-Z])
+
+msg="$RUN_uc ANALYSIS TIME IS $PDY$cyc"
+postmsg "$jlogfile" "$msg"
+
+set +x
+echo
+echo "CENTER DATA DUMP DATE-TIME FOR $tmmark_uc $RUN_uc IS $dumptime"
+echo
+set -x
+ 
+ 
+
+err1=0
+if [ "$PROCESS_DUMP" = 'YES' ]; then
+
+#####################################
+#####################################
+#  The data "dump" script for $tmmark
+#####################################
+#####################################
+
+msg="START THE $tmmark_uc $RUN_uc DATA DUMP CENTERED ON $dumptime"
+postmsg "$jlogfile" "$msg"
+
+if [ $RUN = ndas -a -s ${COMSP}status${JOB_NUMBER}.${tmmark}.bufr_d ]; then
+   msg="**WARNING: status${JOB_NUMBER} file already exists for ${cycp}Z - \
+no data dumps produced"
+   postmsg "$jlogfile" "$msg"
+
+else
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_1; chmod +x thread_1
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=1
+
+#===========================================================================
+# Dump # 1 : NEXRAD -- TOTAL NUMBER OF SUBTYPES = 8
+#              (8)
+#            time window radius is 1.50 hours
+#===========================================================================
+
+# Dump globally since all reports over CONUS (and geographical filtering is
+#  computationally expensive)
+
+export LALO=0
+
+# NEXRAD tanks are hourly
+# Process only those hourly tanks w/i requested dump center cycle time window
+
+SKIP_006010=YES # radial wind  00Z
+SKIP_006011=YES # radial wind  01Z
+SKIP_006012=YES # radial wind  02Z
+SKIP_006013=YES # radial wind  03Z
+SKIP_006014=YES # radial wind  04Z
+SKIP_006015=YES # radial wind  05Z
+SKIP_006016=YES # radial wind  06Z
+SKIP_006017=YES # radial wind  07Z
+SKIP_006018=YES # radial wind  08Z
+SKIP_006019=YES # radial wind  09Z
+SKIP_006020=YES # radial wind  10Z
+SKIP_006021=YES # radial wind  11Z
+SKIP_006022=YES # radial wind  12Z
+SKIP_006023=YES # radial wind  13Z
+SKIP_006024=YES # radial wind  14Z
+SKIP_006025=YES # radial wind  15Z
+SKIP_006026=YES # radial wind  16Z
+SKIP_006027=YES # radial wind  17Z
+SKIP_006028=YES # radial wind  18Z
+SKIP_006029=YES # radial wind  19Z
+SKIP_006030=YES # radial wind  20Z
+SKIP_006031=YES # radial wind  21Z
+SKIP_006032=YES # radial wind  22Z
+SKIP_006033=YES # radial wind  23Z
+
+SKIP_006040=YES # reflectivity 00Z
+SKIP_006041=YES # reflectivity 01Z
+SKIP_006042=YES # reflectivity 02Z
+SKIP_006043=YES # reflectivity 03Z
+SKIP_006044=YES # reflectivity 04Z
+SKIP_006045=YES # reflectivity 05Z
+SKIP_006046=YES # reflectivity 06Z
+SKIP_006047=YES # reflectivity 07Z
+SKIP_006048=YES # reflectivity 08Z
+SKIP_006049=YES # reflectivity 09Z
+SKIP_006050=YES # reflectivity 10Z
+SKIP_006051=YES # reflectivity 11Z
+SKIP_006052=YES # reflectivity 12Z
+SKIP_006053=YES # reflectivity 13Z
+SKIP_006054=YES # reflectivity 14Z
+SKIP_006055=YES # reflectivity 15Z
+SKIP_006056=YES # reflectivity 16Z
+SKIP_006057=YES # reflectivity 17Z
+SKIP_006058=YES # reflectivity 18Z
+SKIP_006059=YES # reflectivity 19Z
+SKIP_006060=YES # reflectivity 20Z
+SKIP_006061=YES # reflectivity 21Z
+SKIP_006062=YES # reflectivity 22Z
+SKIP_006063=YES # reflectivity 23Z
+
+if [ $cycp -eq 00 ]; then   # (22.5 - 01.5 Z)
+   unset SKIP_006032 # radial wind  22Z
+   unset SKIP_006033 # radial wind  23Z
+   unset SKIP_006010 # radial wind  00Z
+   unset SKIP_006011 # radial wind  01Z
+   unset SKIP_006062 # reflectivity 22Z
+   unset SKIP_006063 # reflectivity 23Z
+   unset SKIP_006040 # reflectivity 00Z
+   unset SKIP_006041 # reflectivity 01Z
+elif [ $cycp -eq 03 ]; then # (01.5 - 04.5 Z)
+   unset SKIP_006011 # radial wind  01Z
+   unset SKIP_006012 # radial wind  02Z
+   unset SKIP_006013 # radial wind  03Z
+   unset SKIP_006014 # radial wind  04Z
+   unset SKIP_006041 # reflectivity 01Z
+   unset SKIP_006042 # reflectivity 02Z
+   unset SKIP_006043 # reflectivity 03Z
+   unset SKIP_006044 # reflectivity 04Z
+elif [ $cycp -eq 06 ]; then # (04.5 - 07.5 Z)
+   unset SKIP_006014 # radial wind  04Z
+   unset SKIP_006015 # radial wind  05Z
+   unset SKIP_006016 # radial wind  06Z
+   unset SKIP_006017 # radial wind  07Z
+   unset SKIP_006044 # reflectivity 04Z
+   unset SKIP_006045 # reflectivity 05Z
+   unset SKIP_006046 # reflectivity 06Z
+   unset SKIP_006047 # reflectivity 07Z
+elif [ $cycp -eq 09 ]; then # (07.5 - 10.5 Z)
+   unset SKIP_006017 # radial wind  07Z
+   unset SKIP_006018 # radial wind  08Z
+   unset SKIP_006019 # radial wind  09Z
+   unset SKIP_006020 # radial wind  10Z
+   unset SKIP_006047 # reflectivity 07Z
+   unset SKIP_006048 # reflectivity 08Z
+   unset SKIP_006049 # reflectivity 09Z
+   unset SKIP_006050 # reflectivity 10Z
+elif [ $cycp -eq 12 ]; then # (10.5 - 13.5 Z)
+   unset SKIP_006020 # radial wind  10Z
+   unset SKIP_006021 # radial wind  11Z
+   unset SKIP_006022 # radial wind  12Z
+   unset SKIP_006023 # radial wind  13Z
+   unset SKIP_006050 # reflectivity 10Z
+   unset SKIP_006051 # reflectivity 11Z
+   unset SKIP_006052 # reflectivity 12Z
+   unset SKIP_006053 # reflectivity 13Z
+elif [ $cycp -eq 15 ]; then # (13.5 - 16.5 Z)
+   unset SKIP_006023 # radial wind  13Z
+   unset SKIP_006024 # radial wind  14Z
+   unset SKIP_006025 # radial wind  15Z
+   unset SKIP_006026 # radial wind  16Z
+   unset SKIP_006053 # reflectivity 13Z
+   unset SKIP_006054 # reflectivity 14Z
+   unset SKIP_006055 # reflectivity 15Z
+   unset SKIP_006056 # reflectivity 16Z
+elif [ $cycp -eq 18 ]; then # (16.5 - 19.5 Z)
+   unset SKIP_006026 # radial wind  16Z
+   unset SKIP_006027 # radial wind  17Z
+   unset SKIP_006028 # radial wind  18Z
+   unset SKIP_006029 # radial wind  19Z
+   unset SKIP_006056 # reflectivity 16Z
+   unset SKIP_006057 # reflectivity 17Z
+   unset SKIP_006058 # reflectivity 18Z
+   unset SKIP_006059 # reflectivity 19Z
+elif [ $cycp -eq 21 ]; then # (19.5 - 22.5 Z)
+   unset SKIP_006029 # radial wind  19Z
+   unset SKIP_006030 # radial wind  20Z
+   unset SKIP_006031 # radial wind  21Z
+   unset SKIP_006032 # radial wind  22Z
+   unset SKIP_006059 # reflectivity 19Z
+   unset SKIP_006060 # reflectivity 20Z
+   unset SKIP_006061 # reflectivity 21Z
+   unset SKIP_006062 # reflectivity 22Z
+fi
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 nexrad
+error1=$?
+echo "$error1" > $DATA/error1
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_nexrad $job ${COMSP}nexrad.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/1.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+
+thread_1 &
+
+wait
+
+cat $DATA/1.out
+err1=`cat $DATA/error1`
+
+export STATUS=YES
+export DUMP_NUMBER=2
+$ushscript_dump/bufr_dump_obs.sh $dumptime 3.00 1 null
+
+#  endif test for existence of status file
+fi
+
+#  endif loop $PROCESS_DUMP
+fi
+
+#================================================================
+#================================================================
+
+
+if [ "$PROCESS_DUMP" = 'YES' ]; then
+
+   if [ "$err1" -gt '5' ]; then
+      for n in $err1
+      do
+         if [ "$n" -gt '5' ]; then
+            if [ "$n" -ne '11' -a "$n" -ne '22' ]; then
+
+## fatal error in dumping of BUFR obs. files
+
+               set +x
+echo
+echo " ###################################################### "
+echo " --> > 22 RETURN CODE FROM DATA DUMP, $err1 "
+echo " --> @@ F A T A L   E R R O R @@   --  ABNORMAL EXIT    "
+echo " ###################################################### "
+echo
+               set -x
+               err_exit
+               exit 9
+            fi
+         fi
+      done
+
+## a status code of 11 or 22 from dumping of BUFR obs. files
+## is non-fatal but still worth noting
+
+      set +x
+      echo
+      echo " ###################################################### "
+      echo " --> > 5 RETURN CODE FROM DATA DUMP, $err1 "
+      echo " --> NOT ALL DATA DUMP FILES ARE COMPLETE - CONTINUE    "
+      echo " ###################################################### "
+      echo
+      set -x
+   fi
+
+#  endif loop $PROCESS_DUMP
+fi
+
+
+# GOOD RUN
+set +x
+echo " "
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " "
+set -x
+
+
+# save standard output
+cat break $pgmout break > allout
+cat allout
+# rm allout
+ 
+sleep 10
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################

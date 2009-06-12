@@ -1,0 +1,114 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_sndpost.sh
+# Script description:  Trigger nam sounding post job
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script triggers the nam sounding post job, which
+#           creates a piece of the model sounding profile whose
+#           time interval is determined by the input forecast hours.
+#
+# Script history log:
+# 2000-05-16  Eric Rogers
+
+set -x
+
+cd $DATA
+
+export tmmark=tm00
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+export fhr=00
+typeset -Z2 fhr
+
+cd $DATA/postbchyb
+
+for n in 01 02 03 04 05 06
+do
+   ## changed to a generic name for hybbcwgts:
+   #cp $FIXnam/nam_hybbcwgts.hs${n} nam_hybbcwgts.${n}
+   cp $FIXnam/nam_hybbcwgts.${n} hybbcwgts.${n}
+done
+
+cp $FIXnam/nam_hgt_stdh_sm_east08    fis.01
+cp $FIXnam/nam_hgt_stdh_sm_hi08      fis.02
+cp $FIXnam/nam_hgt_stdh_sm_west08    fis.03
+cp $FIXnam/nam_hgt_stdh_sm_alaska10  fis.04
+cp $FIXnam/nam_hgt_stdh_sm_central08 fis.05
+cp $FIXnam/nam_hgt_stdh_sm_pr08      fis.06
+
+cp $FIXnam/nam_profdat nam_profdat
+cp $FIXnam/nam_deta_ldt1.60.25mb deta.0
+cp $FIXnam/nam_deta_ldt1.60.25mb_bot40m deta.01
+cp deta.01 deta.02
+cp deta.01 deta.03
+cp deta.01 deta.04
+cp deta.01 deta.05
+cp deta.01 deta.06
+cp $PARMnam/nam_bcexdata.parm.${tmmark}_hyb bcexdata.parm_hyb
+
+endfhr=60
+
+while [ $fhr -le $endfhr ]
+do
+   ic=1
+   while [ $ic -lt 1000 ]
+   do
+      if [ -s $DATA/fcstdone${fhr}.${tmmark} ]
+      then
+         break
+      else
+         let "ic=ic+1"
+         sleep 10
+      fi
+
+      if [ $ic -ge 180 ]
+      then
+         err_exit "COULD NOT LOCATE: $DATA/fcstdone${fhr}.${tmmark}"
+      fi
+   done
+
+   if [ $fhr -eq 00 ]
+   then
+      rm $DATA/sndpdone
+   fi
+
+   nposts=01
+   incpst=01
+
+   export RSTFNL=$DATA/ 
+
+   export pgm=nam_post0bchyb
+   . prep_step
+   export XLFUNIT_12=$DATA/nhb1260
+   export XLFUNIT_17=bcexdata.parm_hyb
+   export XLFUNIT_19=nam_profdat
+   export XLFUNIT_76=profilm.c1.${tmmark}
+
+   startmsg
+   $EXECnam/nam_post0bchyb << ioEOF >> $pgmout 2>errfile 
+   $fhr $nposts $incpst
+ioEOF
+   export err=$?;err_chk
+
+   echo done > $DATA/post0hyb.done${fhr}.${tmmark}
+
+   let fhr=fhr+1
+
+done
+   
+if [ $fhr -gt $endfhr ]
+then
+  mv bcnest.01 $COMOUT/${RUN}.${cycle}.bcnest.east08
+  mv bcnest.02 $COMOUT/${RUN}.${cycle}.bcnest.hi08
+  mv bcnest.03 $COMOUT/${RUN}.${cycle}.bcnest.west08
+  mv bcnest.04 $COMOUT/${RUN}.${cycle}.bcnest.alaska10
+  mv bcnest.05 $COMOUT/${RUN}.${cycle}.bcnest.central08
+  mv bcnest.06 $COMOUT/${RUN}.${cycle}.bcnest.pr08
+fi
+
+echo EXITING $0 with return code $err
+exit $err

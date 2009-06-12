@@ -1,0 +1,94 @@
+set +x
+#####################################################################
+echo "---------------------------------------------------------"
+echo "JINAMSST - FTPs Great Lakes Lab (NOAA - GLERL) Water Temp"
+echo "---------------------------------------------------------"
+echo "History: Aug 1998 - First implementation of this new script."
+#####################################################################
+set -x
+
+cd $DATA
+
+if [ -s /dcom/us007003/$PDY/wtxtbul/ncepnamgl.dat ] ; then
+  cp /dcom/us007003/$PDY/wtxtbul/ncepnamgl.dat ncepnamgl.dat
+else
+  if [ -s /dcom/us007003/$PDYm1/wtxtbul/ncepnamgl.dat ] ; then
+  cp /dcom/us007003/$PDYm1/wtxtbul/ncepnamgl.dat /dcom/us007003/$PDY/wtxtbul/ncepnamgl.dat
+  cp /dcom/us007003/$PDYm1/wtxtbul/ncepnamgl.dat ncepnamgl.dat
+  else
+    err_exit "Great Lakes SST NOT Found - Fatal Error!"
+  fi
+fi
+
+cp $COMIN/sst2dvar_grb_0.5 sst50.grib
+
+# generate a high resolution SST analysis for use by the
+# Mesoscale NAM forecast model.  A satellite generated 50km
+# ocean SST field is blended with a high resolution SST
+# field over the Great Lakes area.
+
+export pgm=$EXECsst2dv/sst2dvar_namsst
+. prep_step
+
+export XLFRTEOPTS="unit_vars=yes"
+
+export XLFUNIT_23="sst50.grib"
+export XLFUNIT_24="ncepnamgl.dat"
+export XLFUNIT_31="$FIXsst2dv/sst2dvar_lst.grid"
+export XLFUNIT_51="namsst.grid"
+
+startmsg
+$EXECsst2dv/sst2dvar_namsst >> $pgmout 2> errfile
+export err=$?
+if (( $err == 2 ))
+then
+   msg="RTG_SST file between 3 and 7 days older than Great Lakes file"
+   postmsg "$jlogfile" "$msg"
+elif (( $err == 3 ))
+then
+   msg="Great Lakes file between 3 and 7 days older than RTG_SST file"
+   postmsg "$jlogfile" "$msg"
+elif (( $err == 10 )) 
+then
+   msg="Error reading 50-km Global SST file. Program stopped."
+   postmsg "$jlogfile" "$msg"
+elif (( $err == 20 ))
+then
+   msg="RTG_SST file > 7 days older than Great Lakes file. Program stopped."
+   postmsg "$jlogfile" "$msg"
+elif (( $err == 30 ))
+then
+   msg="Great Lakes file > 7 days older than RTG_SST file. Program stopped."
+   postmsg "$jlogfile" "$msg"
+fi
+#err_chk
+
+if (( $err == 10 || $err == 20 || $err == 30 ))
+then
+   echo #####################################################
+   echo #####################################################
+   echo         !!!!   NAMRTGSST FAILED   !!!!
+   echo #####################################################
+   echo #####################################################
+   warnSUBJ=JNAMRTGSST
+   warnBODY="Todays date: ${PDY}.  ${msg}.  OPER NAM RTG_SST FAILED"
+   export warnSUBJ warnBODY
+   err_exit
+   exit
+elif (( $err == 2 || $err == 3 ))
+then
+   warnSUBJ=JNAMRTGSST
+   warnBODY="Todays date: ${PDY}.  ${msg}.  PRODUCED OPER NAM RTG_SST"
+   export warnSUBJ warnBODY
+fi
+
+if test "$SENDCOM" = 'YES'
+then
+   cp namsst.grid $COMOUT/sst2dvar.${cycle}.nam_grid
+
+   if test "$SENDDBN" = 'YES'
+   then
+      $DBNROOT/bin/dbn_alert MODEL SST_NAM_GRID namsst $COMOUT/sst2dvar.${cycle}.nam_grid
+   fi
+fi
+

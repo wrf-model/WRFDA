@@ -1,0 +1,7 @@
+  	  public :: MPI_INTEGER4
+  	  public :: MPI_OFFSET_KIND
+  	  public :: MPI_INFO_NULL
+  	  public :: MPI_MODE_RDWR
+  	  public :: MPI_BYTE
+  	  public :: MPI_SEEK_SET
+  	  public :: MPI_MODE_RDONLY

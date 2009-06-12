@@ -1,0 +1,247 @@
+#!/bin/sh
+set +xa
+##############################################################################
+echo "---------------------------------------------------------------"
+echo "exhysplit_nam12k_prep.sh.sms - Script To Convert NAM        "
+echo "                                   Grib Data into ARL Format.  "
+
+# Create ${FHR_INT}-hourly NAM archive and forecast files for hysplit.
+
+# For archive:  Archive is $LEN_ARC days' long
+#               if $LEN_ARC -gt 3 need to edit DAY_LIST below
+#               +06-h data are only used for precip and fluxes 
+#               poe is run once for each 24-h archive period
+# For forecast: Forecast is $FHR_MAX hours' long
+
+# Input files:
+#   NAM awphys +00,+03,+06 forecasts from previous forecasts to make analysis
+#   NAM awphys +00,+03,... +48 forecasts to make forecast
+
+# Output file: NAMA (analysis)
+#              NAMF (forecast)
+echo "---------------------------------------------------------------"
+echo "History: 07/23/03 - Converted to NAM awphys to ARL "
+echo "History: 08/07/07 - Added DBNet alert logic"
+##############################################################################
+
+set -xa
+date
+ 
+cd $DATA  
+ 
+msg="HAS BEGUN on `hostname`"
+postmsg "$jlogfile" "$msg"
+ 
+# make sure that there is a leading zero
+  stg=$cyc
+  indx=0
+  while [ "$stg" != '' ];
+  do
+    stg=${stg#?}
+    let indx=$indx+1
+  done
+  let len=$indx
+  if [ $len -eq 1 ];then
+    cyc="0"${cyc}
+  fi
+
+#################################################################
+#            Archive File
+#################################################################
+if [ ${LEN_ARC} -gt 0 ]
+then
+
+  let ela=${LEN_ARC}*24     # $ela in hours
+
+# day loop depends on number of hours for archive
+  if [ $ela -eq  0 ]; then DAY_LIST="$PDY"; fi
+  if [ $ela -eq 24 ]; then DAY_LIST="$PDYm1 $PDY"; fi
+  if [ $ela -eq 48 ]; then DAY_LIST="$PDYm2 $PDYm1 $PDY"; fi
+  if [ $ela -eq 72 ]; then DAY_LIST="$PDYm3 $PDYm2 $PDYm1 $PDY" ; fi
+
+  if [ $cyc -eq 00 ]; then CYC_LIST="00 06 12 18"; fi
+  if [ $cyc -eq 06 ]; then CYC_LIST="06 12 18 00"; fi
+  if [ $cyc -eq 12 ]; then CYC_LIST="12 18 00 06"; fi
+  if [ $cyc -eq 18 ]; then CYC_LIST="18 00 06 12"; fi
+
+# make poescript.1 for 1st 24-h period, poescript.2 for 2nd, etc.
+  let NPOE=0
+  for DAY in ${DAY_LIST}
+  do
+
+    let NPOE=$NPOE+1
+    rm -f poescript.$NPOE
+    for CYCLE in ${CYC_LIST}
+    do
+       if [ ${DAY}${CYCLE} -lt ${PDY}${cyc} ]
+       then
+          echo "$USHhysplit/hysplit_nam12arl_arch.sh \"$DAY\" \"$CYCLE\"" >> poescript.$NPOE
+       fi
+
+       if [ $CYCLE -eq 18 ]
+       then
+          DAY=`/nwprod/util/exec/ndate +6 ${DAY}${CYCLE}`
+          DAY=`echo $DAY | cut -c1-8`
+       fi
+    done
+
+  done
+
+# run poe to make archive file section for each cycle; loop through 24-h periods
+  let KPOE=1
+  while [ $KPOE -le $NPOE ]
+  do
+     date
+     if [ -s poescript.$KPOE ]
+     then
+        chmod 775 poescript.$KPOE
+        export MP_CMDFILE=poescript.$KPOE
+        poe
+        echo "poe $KPOE done"
+     fi
+     let KPOE=$KPOE+1
+  done
+
+# concatenate archive file sections by $DAY
+  for DAY in ${DAY_LIST}
+  do
+     echo "now concatenate for day $DAY"
+     for CYCLE in ${CYC_LIST}
+     do
+   
+        if [ ${DAY}${CYCLE} -lt ${PDY}${cyc} ]
+        then
+           if [ -s ${DAY}${CYCLE}/NAMA ]
+           then
+              cat ${DAY}${CYCLE}/NAMA >> NAMA.${DAY}
+           fi
+        fi
+
+        if [ $CYCLE -eq 18 ]
+        then
+           DAY=`/nwprod/util/exec/ndate +6 ${DAY}${CYCLE}`
+           DAY=`echo $DAY | cut -c1-8`
+        fi
+
+     done
+  done
+
+# concatenate multiple days - this is the complete archive file
+  for DAY in ${DAY_LIST}
+  do
+     if [ -s NAMA.${DAY} ]
+     then
+        cat NAMA.${DAY} >> NAMA
+     fi
+  done
+
+fi
+
+#################################################################
+#            Forecast File
+#################################################################
+
+# write 6-hour forecast from prev cycle valid at forecast init time
+
+# cycle before $PDY$cyc
+  tmp=`/nwprod/util/exec/ndate -${CYC_INT} ${PDY}${cyc}`
+  xcyc=`echo $tmp | cut -c9-10`
+  xday=`echo $tmp | cut -c1-8`
+  fhr=${CYC_INT}
+
+  NAMFILE=${COMNAMIN}/nam.${xday}/nam.t${xcyc}z.awphys${fhr}.tm00
+  INIT=1
+
+  pgm=hysplit_nam12arl
+  export pgm;. prep_step
+
+  msg="hysplit_nam12arl for hour ${xday}${xcyc}F$fhr started"
+  postmsg "$jlogfile" "$msg"
+
+  $EXEChysplit/hysplit_nam12arl ${NAMFILE} >> $pgmout 2>errfile
+  export err=$?;$DATA/err_chk
+  INIT=0
+
+# now DATA.NAM exists with data valid at start time of forecast file
+# copy to new directory 00 for overwriting by poescript of all but precip,
+# per hysplit_nam12arl.f
+  mkdir 00
+  mv DATA.NAM 00
+
+#############################################################
+# Now generate the NAMF files from the NAM forecast
+#############################################################
+
+typeset -Z2 FHR
+FHR=$FHR_START
+let NUM_HOURS=FHR_MAX/FHR_INT+1
+let SEQ_HOURS=NUM_HOURS/TASKS
+let GROUPS=$NUM_HOURS/$SEQ_HOURS
+SEQ=""
+
+rm -rf $DATA/poescript
+hour_cnt=1
+group_cnt=1
+while [ $FHR -le $FHR_MAX ]
+do
+   if [ $hour_cnt -eq 1 ]
+   then
+      SEQ="$FHR"
+   else
+      SEQ="$SEQ $FHR"
+   fi
+   if [ $hour_cnt -ge $SEQ_HOURS ]
+   then
+      if [ $group_cnt -lt $GROUPS -o $FHR -eq $FHR_MAX ]
+      then
+         echo "$USHhysplit/hysplit_nam12arl.sh \"$SEQ\"" >> $DATA/poescript
+         let group_cnt=group_cnt+1
+         let hour_cnt=0
+         SEQ=""
+      fi
+   fi
+
+   let hour_cnt=hour_cnt+1
+   let FHR=FHR+FHR_INT
+done
+
+chmod 775 $DATA/poescript
+export MP_CMDFILE=$DATA/poescript
+#
+# Execute the script.
+poe
+export err=$?; err_chk
+
+FHR=$FHR_START
+while [ $FHR -le $FHR_MAX ]
+do
+   cat $FHR/DATA.NAM >> NAMF
+   let FHR=FHR+FHR_INT
+done
+
+# copy files
+if test $SENDCOM = 'YES'
+then
+  if [ -s NAMA ]
+  then
+     cp NAMA ${COMOUT}/hysplit.t${cyc}z.nama
+  fi
+  cp NAMF ${COMOUT}/hysplit.t${cyc}z.namf
+fi
+
+# Create DBNet alert
+if test $SENDDBN = 'YES'
+then
+  if [ -s NAMA ]
+  then
+    $DBNROOT/bin/dbn_alert MODEL HYSNAMA $job $COMOUT/hysplit.t${cyc}z.nama
+  fi
+  $DBNROOT/bin/dbn_alert MODEL HYSNAMF $job ${COMOUT}/hysplit.t${cyc}z.namf
+fi
+ 
+########################################################
+ 
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+ 
+################## END OF SCRIPT #######################

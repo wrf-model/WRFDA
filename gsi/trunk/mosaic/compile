@@ -1,0 +1,6 @@
+mpif90 -c netCDFsub.f90 -traceback -I/opt/netcdf/3.6.1_intel_9.1/include
+mpif90 -c netCDFsub_geo.f90 -traceback -I/opt/netcdf/3.6.1_intel_9.1/include
+ar -r libncMosaic.a netCDFsub.o netCDFsub_geo.o
+mpif90 -c process_NSSL_mosaic.f90 -traceback -I/opt/netcdf/3.6.1_intel_9.1/include
+mpif90 -o process_NSSL_mosaic.exe process_NSSL_mosaic.o libncMosaic.a -L/opt/netcdf/3.6.1_intel_9.1/lib -lnetcdf
+# mpif90 -o process_NSSL_mosaic.exe process_NSSL_mosaic.o libncMosaic.a /whome/mhu/WRFV2_CYCLE/external/io_netcdf/libwrfio_nf.a

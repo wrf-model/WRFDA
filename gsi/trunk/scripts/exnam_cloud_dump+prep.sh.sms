@@ -1,0 +1,177 @@
+#####################################################################
+echo "----------------------------------------------------------"
+echo "exnam__cloud_dump+prep.sh.sms - Hourly Nam GOES SFOV cloud"
+echo " data dump and PREPBUFR processing"
+echo "----------------------------------------------------------"
+echo "History: Feb 19 2003 - Original script."
+#####################################################################
+
+set -x
+
+# Make sure we are in the $DATA directory
+cd $DATA
+
+msg="GOES SFOV cloud data dump and PREPBUFR processing for Nam has begun \
+on `hostname`"
+postmsg "$jlogfile" "$msg"
+ 
+cat break > $pgmout
+
+########################################################
+#  First, dump the GOES cloud data
+########################################################
+
+export dumptime=`cut -c7-16 ncepdate`
+
+set +x
+echo
+echo "CENTER DATA DUMP DATE-TIME IS $dumptime"
+echo
+set -x
+ 
+export COMSP=$COMOUT/${RUN}.${PDY}/$RUN.${cycle}.
+ 
+err1=0
+
+msg="START THE NAM SFOV CLOUD DATA DUMP CENTERED ON $dumptime"
+postmsg "$jlogfile" "$msg"
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_1; chmod +x thread_1
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=1
+
+#============================================================================
+# Dump # 1 : GOESND -- TOTAL NUMBER OF SUBTYPES = 1
+#            time window radius is -1.25 to -0.01 hours
+#            to catch most recent complete set of data from GOES-E and -W
+#============================================================================
+
+DTIM_latest_003002=-0.01
+
+# Skip GOES 5X5 soundings/radiances
+
+export SKIP_003001=YES
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.25 1 goesnd
+error1=$?
+echo "$error1" > $DATA/error1
+
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/1.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+
+thread_1
+
+cat $DATA/1.out
+err1=`cat $DATA/error1`
+
+export STATUS=YES
+export DUMP_NUMBER=2
+$ushscript_dump/bufr_dump_obs.sh $dumptime 0.50 1 null
+
+#================================================================
+#================================================================
+
+if [ "$err1" -gt '5' ]; then
+   for n in $err1
+   do
+      if [ "$n" -gt '5' ]; then
+         if [ "$n" -ne '11' -a "$n" -ne '22' ]; then
+
+## fatal error in dumping of BUFR obs. files
+
+            set +x
+echo
+echo " ###################################################### "
+echo " --> > 22 RETURN CODE FROM DATA DUMP, $err1 "
+echo " --> @@ F A T A L   E R R O R @@   --  ABNORMAL EXIT    "
+echo " ###################################################### "
+echo
+            set -x
+            err_exit
+            exit 9
+         fi
+      fi
+   done
+
+## a status code of 11 or 22 from dumping of BUFR obs. files
+## is non-fatal but still worth noting
+
+   set +x
+   echo
+   echo " ###################################################### "
+   echo " --> > 5 RETURN CODE FROM DATA DUMP, $err1 "
+   echo " --> NOT ALL DATA DUMP FILES ARE COMPLETE - CONTINUE    "
+   echo " ###################################################### "
+   echo
+   set -x
+fi
+
+
+##########################################################################
+#  Next, put the GOES cloud data into a mini-PREPBUFR file (all by itself)
+##########################################################################
+
+cdate10=$dumptime
+cycp=`echo $cdate10|cut -c9-10`
+
+# PREPBUFR error limit is 4 (allow RC=4 since no ADPUPA or ADPSFC data here)
+export errPREPDATA_limit=4
+
+msg="CENTER TIME FOR PREPBUFR PROCESSING IS $cdate10"
+postmsg "$jlogfile" "$msg"
+
+$ushscript/prepobs_makeprepbufr.sh $cdate10
+errsc=$?
+
+[ "$errsc" -ne '0' ]  &&  exit $errsc
+
+# save final form of prepbufr file in COMOUT
+cp prepda.t${cycp}z ${COMSP}prepbufr.$tmmark
+
+
+# GOOD RUN
+set +x
+echo " "
+echo " ****** CLOUD DUMP AND PREPBUFR PROCESSING COMPLETED NORMALLY"
+echo " ****** CLOUD DUMP AND PREPBUFR PROCESSING COMPLETED NORMALLY"
+echo " ****** CLOUD DUMP AND PREPBUFR PROCESSING COMPLETED NORMALLY"
+echo " ****** CLOUD DUMP AND PREPBUFR PROCESSING COMPLETED NORMALLY"
+echo " "
+set -x
+
+
+# save standard output
+cat break $pgmout break > allout
+cat allout
+# rm allout
+ 
+sleep 10
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################

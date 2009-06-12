@@ -1,0 +1,236 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_fcst.sh
+# Script description:  Run NAM forecast
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script runs the Nam forecast
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-02  Brent Gordon  - Modified for production.
+# 2006-01-13  Eric Rogers   - Modified for WRF-NMM
+#
+# SPECIAL INSTRUCTIONS : For best WRF-NMM performance, standard out and standard error
+# files for both script and model MUST be written to a separate location from that in
+# which this script runs, for example:
+#### @ output = /tmpnwprd/stdout.nam/fcstout
+#### @ error = /tmpnwprd/stderr.nam/fcsterr
+#
+
+set -xa
+cd $DATA
+
+export tmmark=tm00
+
+#
+# Get needed variables from exndas_prelim.sh.sms
+#
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+export SDATE=$CYCLE
+echo $CYCLE > cycledate
+
+### modify namelist file
+
+lasthour=`ls -1 restartdone*.tm00 | tail -1 | cut -c 12-13`
+LENGTH=84
+
+if [ -z "$lasthour" -o "$RERUN" = "YES" ] ; then
+
+### This is the "restart from non-zero forecast hour" switch which should always be set to NO here
+RESTARTNZF=NO
+
+export restval=true
+
+ rhour=$LENGTH
+ resint=`expr ${LENGTH} \* 60 `
+ rday=0
+
+ ystart=`echo $SDATE | cut -c1-4`
+ mstart=`echo $SDATE | cut -c5-6`
+ dstart=`echo $SDATE | cut -c7-8`
+ hstart=`echo $SDATE | cut -c9-10`
+
+end=$(/nwprod/util/exec/ndate +$LENGTH $SDATE)
+
+yend=`echo $end | cut -c1-4`
+mend=`echo $end | cut -c5-6`
+dend=`echo $end | cut -c7-8`
+hend=`echo $end | cut -c9-10`
+
+iy=$(echo $SDATE|cut -c1-4)
+im=$(echo $SDATE|cut -c5-6)
+id=$(echo $SDATE|cut -c7-8)
+ih=$(echo $SDATE|cut -c9-10)
+ 
+rday=3
+rhour=12
+tstart=0
+
+else
+
+### If we end up here, the "restart from non-zero forecast hour" switch which should always be set to yes
+RESTARTNZF=YES
+
+### For WRF-NMM : Since model can only be restarted if modolo(fhr,3)=0, compare last fcstdone file to last 
+### restartdone file. If they are not at the same forecast hour, delete all fcstdone files with fhr > then
+### the last restartdone file so that the restarted post and postsnd jobs are in synch with the restarted
+### model run
+
+fcstlasthr=`ls -1 fcstdone*.tm00 | tail -1 | cut -c 9-10`
+restartlasthr=`ls -1 restartdone*.tm00 | tail -1 | cut -c 12-13`
+
+if [ $fcstlasthr -gt $restartlasthr ]
+then
+   let "diffhr=fcstlasthr-restartlasthr"
+   if [ $diffhr -eq 1 ]
+   then
+     rm fcstdone${fcstlasthr}.tm00
+   fi
+   if [ $diffhr -eq 2 ]
+   then
+     let "fhrm1=fcstlasthr-1"
+     typeset -Z2 fhrm1
+     rm fcstdone${fhrm1}.tm00
+     rm fcstdone${fcstlasthr}.tm00
+   fi
+fi
+
+tstart=$lasthour
+rday=0
+let "rhour=$LENGTH-$lasthour"
+
+newstart=$(/nwprod/util/exec/ndate +$lasthour $SDATE)
+ystart=`echo $newstart | cut -c1-4`
+mstart=`echo $newstart | cut -c5-6`
+dstart=`echo $newstart | cut -c7-8`
+hstart=`echo $newstart | cut -c9-10`
+
+end=$(/nwprod/util/exec/ndate +$LENGTH $SDATE)
+yend=`echo $end | cut -c1-4`
+mend=`echo $end | cut -c5-6`
+dend=`echo $end | cut -c7-8`
+hend=`echo $end | cut -c9-10`
+
+iy=$(echo $newstart|cut -c1-4)
+im=$(echo $newstart|cut -c5-6)
+id=$(echo $newstart|cut -c7-8)
+ih=$(echo $newstart|cut -c9-10)
+
+#end last hour check
+fi
+
+if [ $cyc = 00 -o $cyc = 12 ] 
+then
+  nltype=ontime
+else
+  nltype=offtime
+fi
+
+NLNAME=nam_namelist.input_${nltype}
+
+if [ $MODE = fast ]
+then
+   NLNAME=nam_namelist.input_${nltype}_fast
+fi
+
+if [ $GUESS = GDAS ] ; then
+  if [ $RESTARTNZF = "NO" ] 
+  then
+    export restval=false
+  else
+    export restval=true
+  fi
+else
+  export restval=true
+fi
+
+cat $PARMnam/$NLNAME | sed s:RDAY:$rday: | sed s:RHOURS:$rhour: \
+ | sed s:TSTART:$tstart: | sed s:YSTART:$ystart: | sed s:MSTART:$mstart: \
+ | sed s:DSTART:$dstart: | sed s:HSTART:$hstart: | sed s:YEND:$yend: \
+ | sed s:MEND:$mend:     | sed s:DEND:$dend: | sed s:HEND:$hend:  \
+ | sed s:RESINT:$resint: | sed s:REST:$restval: > namelist.input
+
+cp namelist.input $COMOUT/${RUN}.t${cyc}z.namelist.input.${tmmark}
+
+export tmmark_prev=tm03
+
+cp $FIXnam/nam_micro_lookup.dat eta.micro_lookup.dat
+cp $FIXnam/nam_LANDUSE.TBL LANDUSE.TBL
+cp $PARMhiresw/hiresw_ETAMPNEW_DATA ETAMPNEW_DATA
+cp $FIXnam/nam_VEGPARM.TBL VEGPARM.TBL
+cp $FIXnam/nam_SOILPARM.TBL SOILPARM.TBL
+cp $FIXnam/nam_GENPARM.TBL GENPARM.TBL
+
+cp $FIXnam/nam_co2.60_hybrid_2mbtop co2.60_hybrid_2mbtop
+cp $FIXnam/nam_co2.60_hybrid_2mbtop co2_trans
+cp $FIXhiresw/hiresw_RRTM_DATA RRTM_DATA
+cp $FIXhiresw/hiresw_tr49t67 tr49t67
+cp $FIXhiresw/hiresw_tr49t85 tr49t85
+cp $FIXhiresw/hiresw_tr67t85 tr67t85
+
+export OMP_MAX_THREADS=1
+export XLSMPOPTS="parthds=1:spins=0:yields=0:stack=128000000:schedule=static"
+
+rm fort.*
+
+cp $PARMnam/nam_fcst_gribmap.txt gribmap.txt
+
+export OMP_MAX_THREADS=1
+export XLSMPOPTS="parthds=1:spins=0:yields=0:stack=128000000:schedule=static"
+
+# E.Rogers 2/2007: replace link with copy for wrfrst file since
+# the model writes out a wrfrst file at forecast hour = 0 which will
+# overwrite the wrfrst_anl file in /nwges/prod/nam.$PDY (They are not bit-identical)
+
+if [ -s $COMIN/${RUN}.t${cyc}z.wrfbdy_d01.${tmmark} ]
+then
+   ln -s -f $COMIN/${RUN}.t${cyc}z.wrfbdy_d01.${tmmark} wrfbdy_d01
+fi
+
+if [ $RESTARTNZF = "NO" ] ; then
+
+if [ $GUESS = GDAS ] ; then
+  if [ -s $GESDIR/${RUN}.t${cyc}z.wrfinput_anl.${tmmark} ] ; then
+     ln -s -f $GESDIR/${RUN}.t${cyc}z.wrfinput_anl.${tmmark} wrfinput_d01
+  fi
+else
+  if [ -s $GESDIR/${RUN}.t${cyc}z.wrfrst_anl.${tmmark} ] ; then
+     cp $GESDIR/${RUN}.t${cyc}z.wrfrst_anl.${tmmark} wrfrst_d01_${iy}-${im}-${id}_${ih}:00:00
+  fi
+fi
+
+else
+
+### If we end up here we are restarting the forecast from a non-zero forecast hour; 
+### assume file "wrfrst_d01_${iy}-${im}-${id}_${ih}:00:00" is in the working directory
+
+echo "restarting the model from ${iy}-${im}-${id}_${ih}:00:00, forecast hour=${lasthour}"
+echo "assume file wrfrst_d01_${iy}-${im}-${id}_${ih}:00:00 is in the working directory"
+
+fi
+
+ln -sf co2.60_hybrid_2mbtop fort.14
+
+export pgm=nam_wrfnmm
+. prep_step
+
+startmsg
+poe hpmcount $EXECnam/nam_wrfnmm >>$pgmout 2>>errfile
+export err=$?
+
+if [ $err -ne 0 ]
+then
+   err_chk
+else
+   msg="$pgm completed normally"
+   sh $utilscript/postmsg.sh "$jlogfile" "$msg"
+fi
+
+echo Exiting $0
+
+exit

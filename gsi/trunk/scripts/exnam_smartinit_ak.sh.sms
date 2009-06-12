@@ -1,0 +1,37 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_prdgen.sh
+# Script description:  Run nam product generator jobs
+#
+# Author:        Bradley Mabe       Org: NP11         Date: 2007-08-23
+#
+# Abstract: This script runs the Nam  Smart Init jobs
+#
+# Script history log:
+# 2007-08-23  Bradley Mabe  Created script (copied actually) to call nam_smartinit on & off
+#                          initially of Alaskan precip & snowfall
+#
+
+set -xa
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cd $DATA
+mkdir $DATA/maxminak
+
+  if [ cyc -eq 00 -o cyc -eq 12 ] ; then
+	/nw${envir}/ush/nam_smartinitak_on.sh
+  else
+	/nw${envir}/ush/nam_smartinitak_off.sh
+  fi
+
+#export err=$?; err_chk
+
+set -x
+#####################################################################
+
+echo EXITING $0
+exit
+#

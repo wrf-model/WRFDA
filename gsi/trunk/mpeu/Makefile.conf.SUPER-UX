@@ -1,0 +1,144 @@
+#!/bin/make
+#-----------------------------------------------------------------------
+#       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
+#-----------------------------------------------------------------------
+#BOP
+#
+# !ROUTINE: Makefile.conf.SUPER-UX
+# 
+# !DESCRIPTION: 
+#	An included local make configuration.  See file Makefile for
+#   detailed `make' procedure.  This shell has been built to override
+#   the default environments (including commands) defined in file 
+#   Makefile.
+#
+# !CALLING SEQUENCE:
+#
+#	% ln -s Makefile.conf.OSF1 Makefile.conf
+#	% make ...
+#
+# !SEE ALSO: Makefile
+#
+# !REVISION HISTORY: (`cvs log <>' for more)
+#	02Apr96 - J. Guo	- New make procedure
+# 	21Aug95 - J. Guo	- added the prolog
+#	28Sep98 - Jing Guo (guo@dao.gsfc.nasa.gov)
+#		- Cleaned _Dnod for this library
+#
+#EOP
+#-----------------------------------------------------------------------
+
+_Dsys		= 
+_Dnod		=
+
+# Environments
+# ============
+
+LOCAL_mpif_H=mpif.h
+
+# If use SUPER-UX implementation
+
+_LMPI		= 
+_lMPI		= 
+_Inull		=
+_IMPI		= 
+
+# If use the MPICH implementation
+
+_LMPI		= 
+_lMPI		= 
+_lMPIlog	= 
+_lMPItrace	= 
+_lMPIanime	= 
+_IMPI		= 
+
+_Iconf		= $(_IMPI)
+
+SHELL		= /bin/sh
+F77		= f90 -float0
+F90		= f90 -float0
+FC		= $(F90)
+CC		= cc -hfloat0 -Xa -h2
+
+FOPT_normal	= -C vsafe 
+FOPT_indxck	=  
+FOPT_syntax	= 
+
+FFLAGS		= $(FOPT_indxck)
+FFLAGS		= $(FOPT_normal)
+FCFLAGS		= $(FFLAGS)
+
+ZIP		= /usr/bin/compress
+ZCAT		= /usr/bin/zcat
+TAR		= /usr/bin/tar
+
+# LIBlapack_DIR contains locally built lapack/blas libs on Molotov.
+# LIBdxml_DIR contains system math libs, including lapack/blas and more
+
+LIBlapack_DIR	= -L/usr/lib
+LIBdxml_DIR	=
+
+LD		= $(FC)
+LDFLAGS		= $(FFLAGS) $(LIBlapack_DIR)
+AR		= ar cqs
+RM		= rm -f
+MKDIR           = /usr/local/gnu/bin/mkdir -p 
+
+LIBlapack32	= -llapack      -lblas
+LIBlapack64	= -llapack      -lblas_64
+
+LIBdxml		= 
+LIBprof		= -lprof
+
+LIBsys	 	= $(LIBlapack32) 
+
+#FPP		= $(FC)
+CPPFLAGS	= -P -Dunix -D__unix__
+F77PPFLAGS	= $(CPPFLAGS) -DLANGUAGE_FORTRAN -D__LANGUAGE_FORTRAN__
+F90PPFLAGS	= $(F77PPFLAGS) -DLANGUAGE_FORTRAN_90 -D__LANGUAGE_FORTRAN_90__
+FPPFLAGS	= $(F90PPFLAGS)
+
+
+.F.o:
+	$(RM) $*.f 
+	$(FPP) $(FPPFLAGS) $(_DF) $(_I) $*.F $*.f
+	$(FC) -c $(FCFLAGS) $(_I) $*.f;           \
+	  if [ $$? -ne 0 ]; then $(RM) $*.o; fi
+	$(RM) $*.f
+
+
+
+.F90.o:
+	$(RM) $*.f90
+	$(FPP) $(FPPFLAGS) $(_DF) $(_I) $*.F90 $*.f90
+	$(FC) -c $(FCFLAGS) $(_I) $*.f90;	\
+	  if [ $$? -ne 0 ]; then $(RM) $*.o; fi
+	$(RM) $*.f90
+
+#.----------------------------------------------------------------------
+
+MUPDATE		= sh LCupdate.sh
+M		= mod
+MODS_OBJ	= m_chars.o		\
+		  m_die.o		\
+		  m_dropdead.o		\
+		  m_flow.o		\
+		  m_IndexBin_char.o	\
+		  m_IndexBin_integer.o	\
+		  m_IndexBin_logical.o	\
+		  m_inpak90.o		\
+		  m_ioutil.o		\
+		  m_List.o		\
+		  m_mall.o		\
+		  m_MergeSorts.o	\
+		  m_mpif.o		\
+		  m_mpif90.o		\
+		  m_mpout.o		\
+		  m_Permuter.o		\
+		  m_rankMerge.o		\
+		  m_realkinds.o		\
+		  m_SortingTools.o	\
+		  m_stdio.o		\
+		  m_String.o		\
+		  m_StrTemplate.o	\
+		  m_zeit.o

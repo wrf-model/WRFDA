@@ -1,0 +1,177 @@
+####################################################################
+echo "------------------------------------------------"
+echo "JNAM2RUC$cyc - Transform Nam Fields onto the RUC Surface Grid"
+echo "------------------------------------------------"
+echo "History: Jun 14 1999 - Original script."
+echo "         Jan 18 2000 - RUCS version 3.10 (switched from NGM to Nam)"
+echo "         Mar 18 2002 - RUCS version 4.00"
+#####################################################################
+
+
+#
+#####################################################################
+# << NCEP_sfcnmc.run  
+# <<                                                                       
+# <<                   RUN THE SURFACE MODEL INGEST PROGRAM               
+# << 
+# <<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>
+# << 
+# << Purpose: transform background forecast model fields onto the RUC surface grid.
+# << 
+# << input file names for rucs_sfcnmc are:
+# <<        MAPTIME  model cycle time     
+# <<        LTLN     lat/lons of RUCS grid points
+# <<        MSASPTS  RUCS grdpts in background model coordinates
+# <<        f**      current background forecast model grid GRIB files 
+# <<                 **=03-15 by 3
+# <<        f**i     current background forecast model grid index files
+# <<                 **=03-15 by 3
+# << 
+# << output file names are:                                           
+# <<        PVSMD**  holds surface fields for most recent model run in RUCS 
+# <<                 format  **=03-15 by 3
+# <<        SMDL**   holds surface fields for most recent model run in RUCS 
+# <<                 format  **=03-15 by 3
+# <<        PVMD**P  holds upper-air fields for most recent model run in RUCS 
+# <<                 format  **=03-15 by 3
+# <<        MDL**P   holds upper-air fields for most recent model run in RUCS 
+# <<                 format  **=03-15 by 3
+# <<                                     
+###############################################################################
+
+set -x
+
+msg="$job Begin job for $job"
+postmsg "$jlogfile" "$msg"
+
+#set +x
+echo " "
+
+###############################################################################
+# enter the 'Execution' Directory
+###############################################################################
+
+cd $DATA
+
+###############################################################################
+# get the cycle time from /com/ncepdate
+###############################################################################
+
+cp /com/date/${cycle} NMCDATE
+#
+#  convert NMC date to MAPS date
+#
+
+export pgm=rucs_makatim
+startmsg
+
+$EXECsfcruc/rucs_makatim
+err=$?;export err; err_chk
+
+#
+date=`cat NMCDATE|cut -c7-14`
+
+# extract model time from MAPTIME 
+
+MDL_TIME=`cat MAPTIME | sed "s/^[0-9][0-9][0-9][0-9][0-9]//" | \
+       sed "s/[0-9][0-9]$//"`
+
+ATIME=`cat MAPTIME`
+
+###############################################################################
+# Acquire the files to run sfcnmc
+###############################################################################
+
+cp $FIXsfcruc/rucs_LTLN LTLN
+cp $FIXsfcruc/rucs_MSASPTS MSASPTS
+cp $FIXsfcruc/rucs_SYSSPEC SYSSPEC
+ 
+###############################################################################
+# Get the holding files from /com/nam/prod
+###############################################################################
+
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip3203.tm00 f03
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip3206.tm00 f06
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip3209.tm00 f09
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip3212.tm00 f12
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip3215.tm00 f15
+
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip32i03 f03i
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip32i06 f06i
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip32i09 f09i
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip32i12 f12i
+cp $COMIN/${model}.${date}/${model}.t${MDL_TIME}z.awip32i15 f15i
+
+###############################################################################
+# Make the local files readable and deletable
+###############################################################################
+
+chmod 666 ./f03
+chmod 666 ./f06   
+chmod 666 ./f09
+chmod 666 ./f12
+chmod 666 ./f15
+
+chmod 666 ./f03i
+chmod 666 ./f06i  
+chmod 666 ./f09i
+chmod 666 ./f12i
+chmod 666 ./f15i
+
+echo 'input files have been fetched'
+                                       
+###############################################################################
+
+export pgm=rucs_sfcnmc
+startmsg
+
+START=`date -u +%y" "%j" "%T`
+$EXECsfcruc/rucs_sfcnmc >>$pgmout
+err=$?;export err; err_chk
+FINISH=`date -u +%y" "%j" "%T`
+echo ${ATIME}"  "${START}"  "${FINISH}"  sfcnmc timing" >> $pgmout
+
+echo 'sfcnmc finished'
+
+###############################################################################
+# Copy output grids to proper location
+###############################################################################
+ 
+if (test ! -d $GESsfcruc/smdl$MDL_TIME)
+then
+    mkdir -p $GESsfcruc/smdl$MDL_TIME
+fi
+                              
+mv PVSMD03 $GESsfcruc/smdl$MDL_TIME/SMDL03
+mv PVSMD06 $GESsfcruc/smdl$MDL_TIME/SMDL06
+mv PVSMD09 $GESsfcruc/smdl$MDL_TIME/SMDL09
+mv PVSMD12 $GESsfcruc/smdl$MDL_TIME/SMDL12
+mv PVSMD15 $GESsfcruc/smdl$MDL_TIME/SMDL15
+                              
+if (test ! -d $GESsfcruc/mdl$MDL_TIME)
+then
+    mkdir -p $GESsfcruc/mdl$MDL_TIME
+fi
+
+mv PVMD03P $GESsfcruc/mdl$MDL_TIME/MDL03P
+mv PVMD06P $GESsfcruc/mdl$MDL_TIME/MDL06P
+mv PVMD09P $GESsfcruc/mdl$MDL_TIME/MDL09P
+mv PVMD12P $GESsfcruc/mdl$MDL_TIME/MDL12P
+mv PVMD15P $GESsfcruc/mdl$MDL_TIME/MDL15P
+ 
+
+#####################################################################
+# GOOD RUN
+set +x
+echo "************** $job COMPLETED NORMALLY ON THE IBM SP"
+echo "************** $job COMPLETED NORMALLY ON THE IBM SP"
+echo "************** $job COMPLETED NORMALLY ON THE IBM SP"
+set -x
+#####################################################################
+
+msg="HAS COMPLETED NORMALLY!"
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################
+
+

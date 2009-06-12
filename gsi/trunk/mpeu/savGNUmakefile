@@ -1,0 +1,165 @@
+#
+# Makefile for ESMA components.
+#
+# REVISION HISTORY:
+#
+# 3mar2004  Zaslavsky  Initial imlementation.
+# 20Oct2004  da Silva  Standardization
+#
+
+# Make sure ESMADIR is defined
+# ----------------------------
+ifndef ESMADIR
+       ESMADIR := $(PWD)/../../..
+endif
+
+# Compilation rules, flags, etc
+# -----------------------------
+  include $(ESMADIR)/Config/ESMA_base.mk  # Generic stuff
+  include $(ESMADIR)/Config/ESMA_arch.mk  # System dependencies
+
+#                  ---------------------
+#                  Standard ESMA Targets
+#                  ---------------------
+
+
+THIS = GMAO_mpeu
+THISeu = eu
+LIB  = lib$(THIS).a
+LIBeu  = lib$(THISeu).a
+
+esma_install install: $(LIB) $(LIBeu)
+	$(MKDIR) $(ESMALIB) $(ESMAETC) $(ESMAINC)/$(THIS) $(ESMABIN)
+	$(CP) -p *.a    $(ESMALIB)
+	$(CP) -p *.[Hh] $(ESMAINC)/$(THIS)
+	$(CP) -p *.[Mm][Oo][Dd] $(ESMAINC)/$(THIS)
+
+esma_clean esma_distclean clean:
+	$(RM) *~ *.[aox] *.[Mm][Oo][Dd] *.x
+	$(RM) libeu.a libmpeu.a  mpeu/*.[Mm][Oo][Dd]
+	cd mpi0; $(MAKE) clean
+esma_doc doc:
+	@echo "Target $@ not implemented yet in `pwd`"
+
+
+esma_help help:
+	@echo "Standard ESMA targets:"
+	@echo "% make esma_install    (builds and install under ESMADIR)"
+	@echo "% make esma_clean      (removes deliverables: *.[aox], etc)"
+	@echo "% make esma_distclean  (leaves in the same state as cvs co)"
+	@echo "% make esma_doc        (generates PDF, installs under ESMADIR)"
+	@echo "% make esma_help       (this message)"
+	@echo "Environment:"
+	@echo "      ESMADIR = $(ESMADIR)"
+	@echo "      BASEDIR = $(BASEDIR)"
+	@echo "         ARCH = $(ARCH)"
+	@echo "         SITE = $(SITE)"
+
+
+
+
+#                  --------------------
+#                  User Defined Targets
+#                  --------------------
+
+SRCS_C		= get_zeits.c
+
+SRCS_F		= m_mpif.F m_random.F
+
+SRCS_f90        = m_FileResolv.f90
+
+SRCS_F90	= m_IndexBin_char.F90		\
+		  m_IndexBin_integer.F90	\
+		  m_IndexBin_logical.F90	\
+		  m_List.F90			\
+		  m_MergeSorts.F90		\
+		  m_Filename.F90		\
+		  m_Group.F90			\
+		  m_Permuter.F90		\
+		  m_SortingTools.F90		\
+		  m_String.F90			\
+		  m_StrTemplate.F90		\
+		  m_chars.F90			\
+		  m_die.F90			\
+		  m_dropdead.F90		\
+		  m_flow.F90			\
+		  m_inpak90.F90			\
+		  m_intkinds.F90		\
+		  m_ioutil.F90			\
+		  m_mall.F90			\
+		  m_mergedList.F90		\
+		  m_mpif90.F90			\
+		  m_mpout.F90			\
+		  m_rankMerge.F90		\
+		  m_realkinds.F90		\
+		  m_showDistrib.F90		\
+		  m_stdio.F90			\
+		  m_zeit.F90			
+
+SRCS_ALL	= $(SRCS_f)		\
+		  $(SRCS_F)		\
+		  $(SRCS_f90)		\
+		  $(SRCS_F90)		\
+		  $(SRCS_C)
+
+OBJS_ALL	= $(SRCS_f:.f=.o)	\
+		  $(SRCS_F:.F=.o)	\
+		  $(SRCS_f90:.f90=.o)	\
+		  $(SRCS_F90:.F90=.o)	\
+		  $(SRCS_C:.c=.o)
+
+MUPDATE		= sh UCupdate.sh
+
+MODS_OBJ        = m_chars.o		\
+		  m_die.o		\
+		  m_Filename.o		\
+                  m_FileResolv.o        \
+		  m_flow.o		\
+		  m_inpak90.o 		\
+		  m_ioutil.o 		\
+		  m_List.o 		\
+		  m_MergeSorts.o	\
+		  m_mall.o		\
+		  m_mpif90.o		\
+		  m_mpout.o		\
+		  m_Permuter.o		\
+		  m_realkinds.o		\
+		  m_SortingTools.o	\
+		  m_String.o		\
+		  m_StrTemplate.o	\
+		  m_showDistrib.o	\
+		  m_stdio.o		\
+		  m_zeit.o              \
+		  assert.H
+
+FOPT = $(FOPT3)
+COPT = $(COPT3)
+
+USER_FFLAGS = $(BIG_ENDIAN) $(M). $(M)$(INC_HDF) $(M)$(INC_MPI) $(M)./jic
+USER_CFLAGS = $(BIG_ENDIAN) $(M). $(M)$(INC_HDF) $(M)$(INC_MPI) $(M)./jic
+NCGEN = $(BASEBIN)/hdfgen
+CAT		= /bin/cat
+FREAL = $(FREAL4)
+
+$(LIBeu): $(OBJS_ALL) mpi0/libmpi0.a
+	$(RM) $@
+	cp -p mpi0/libmpi0.a $@
+	@ echo $(AR) cq $@ $(OBJS_ALL)
+	@ $(AR) cq $@ $(OBJS_ALL)
+
+mpi0/libmpi0.a:
+	@( cd mpi0; $(MAKE) libmpi0.a $(MAKEFLAGS))
+
+
+
+$(LIB) lib:	$(OBJS_ALL)
+	$(RM) $@
+	@ echo $(AR) cq $@ $(OBJS_ALL)
+	@ $(AR) cq $@ $(OBJS_ALL)
+
+#                  --------------------
+#                      Dependencies
+#                  --------------------
+
+include Makefile.dependency
+#.

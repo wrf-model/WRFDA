@@ -1,0 +1,56 @@
+#!/bin/ksh
+
+#######################################################################
+#  Purpose: Produce hourly/6-hourly 4km Stage IV pcpn analysis from the 
+#           regional Stage III analyses provided by the 12 CONUS RFCs.
+#######################################################################
+#
+echo "------------------------------------------------"
+echo "JNAM_PCPN_ processing                        "
+echo "------------------------------------------------"
+echo "History: Sept 1, 2002 - First implementation of this script."
+#
+#######################################################################
+
+set -x
+msg="Begin Stage IV analysis for $job"
+postmsg "$jlogfile" "$msg"
+########################################
+
+export TZ=UTC
+JDATA=$DATA
+
+day0=`echo $pdyhh | cut -c1-8`
+hr0=`echo $pdyhh | cut -c9-10`
+#
+#check for and process any new stage 3 data
+#
+$USHnam_pcpn_anal/nam_pcpn_getstage3.sh
+
+# Perform mosaicking for the analysis hours/6-hours that had new Stage III 
+# data coming in (the hours/6hours are listed in todo4.$pdyhh):
+#
+if [ -e $COMIN/${RUN}.${day0}/todo4.$pdyhh ]; then
+  for st3anl in `cat $COMIN/${RUN}.${day0}/todo4.$pdyhh`
+  do
+    time=`echo $st3anl | cut -c 1-10`
+    ac=`echo $st3anl | cut -c 12-14`
+    $USHnam_pcpn_anal/nam_pcpn_st4mosaic.sh $time $ac
+  done
+fi 
+#
+
+if [[ $hr0 -eq 15 || $hr0 -eq 21 || $hr0 -eq 23 ]]; then
+  $USHnam_pcpn_anal/nam_pcpn_st4acc.sh ${day0}12
+fi
+
+if [ $hr0 -eq 23 ]; then
+# Run the daily log:
+  $USHnam_pcpn_anal/nam_pcpn_chkst3log.sh $pdyhh
+fi
+
+mv $DATA/$pgmout $JDATA/$pgmout.st4
+
+exit
+
+

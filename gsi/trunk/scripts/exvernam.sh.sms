@@ -1,0 +1,254 @@
+
+echo "------------------------------------------------"
+echo "J151 -  NAM QC Forecast verification"
+echo "------------------------------------------------"
+echo "History: OCT 1996 - First implementation of this new script."
+echo "History: Nov 1996 - Insert processing for WAFS, GRIB AWIPS."
+echo "History:            AWIPS GRAPHICS, FAXMAKR, AFOSMAKR,"
+echo "                    and bulletins"
+echo "History: Nov 1996 - Reset argument DIAG (=.FALSE.), YY,MM,DD,"
+echo "                    correct input arg. ($CDATM1) of second "
+echo "                    run of qcadp, modify sumac4.f for reducing"
+echo "                    output.                                 "
+echo "History: Feb 1997 - Delete old com to maintain 10 day archive"
+echo "                    and move to com."
+echo "History: Feb 1997 - Change ecm filenames to newly installed"
+echo "                    files; change setting of YY, MM, DD to"
+echo "                    correct output filename error; change"
+echo "                    NFILE number to 6 for ec forecasts to"
+echo "                    fetch 144-hour forecasts; update the"
+echo "                    verf_tab_ files to verify tropics area"  
+echo "History: Apr 1997 - Put in test for existence of nonempty"
+echo "                    ADP and ANL files."
+echo "History: Sep 1998 - Update ngm filenames to reflect name"
+echo "                    change in com."
+#####################################################################
+# 2.7)   VERIFY NAM FORECASTS AGAINST RADIOSONDES 
+#####################################################################
+
+msg="HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+echo "THIS JOB IS DOING VERIFICATION OF FORECAST AGAINST RADIOSONDE."
+
+set -x
+cd $DATA
+
+#
+#   Set current and recent 10 days's dates (DATE_n).
+#
+# List NCEP date
+
+echo "ANALYSIS DATE-TIME IS $PDY$cyl"
+
+# if runs at 00z
+ DATE_0=`sh /nwprod/util/ush/finddate.sh $PDY d-1`
+ DATE_1=`sh /nwprod/util/ush/finddate.sh $PDY d-2`
+ DATE_2=`sh /nwprod/util/ush/finddate.sh $PDY d-3`
+ DATE_3=`sh /nwprod/util/ush/finddate.sh $PDY d-4`
+ DATE_4=`sh /nwprod/util/ush/finddate.sh $PDY d-5`
+ DATE_5=`sh /nwprod/util/ush/finddate.sh $PDY d-6`
+ DATE_6=`sh /nwprod/util/ush/finddate.sh $PDY d-7`
+ DATE_7=`sh /nwprod/util/ush/finddate.sh $PDY d-8`
+ DATE_8=`sh /nwprod/util/ush/finddate.sh $PDY d-9`
+ DATE_9=`sh /nwprod/util/ush/finddate.sh $PDY d-10`
+
+ if test "$cyl" = '00'
+ then
+    # if runs at 12z
+    DATE_0=`cut -c7-14 ncepdate`
+    DATE_1=`sh /nwprod/util/ush/finddate.sh $PDY d-1`
+    DATE_2=`sh /nwprod/util/ush/finddate.sh $PDY d-2`
+    DATE_3=`sh /nwprod/util/ush/finddate.sh $PDY d-3`
+    DATE_4=`sh /nwprod/util/ush/finddate.sh $PDY d-4`
+    DATE_5=`sh /nwprod/util/ush/finddate.sh $PDY d-5`
+    DATE_6=`sh /nwprod/util/ush/finddate.sh $PDY d-6`
+    DATE_7=`sh /nwprod/util/ush/finddate.sh $PDY d-7`
+    DATE_8=`sh /nwprod/util/ush/finddate.sh $PDY d-8`
+    DATE_9=`sh /nwprod/util/ush/finddate.sh $PDY d-9`
+ fi
+
+CTM=$cyl  
+echo ${DATE_0}${cyl} > arkvdate
+
+
+export DATE_0 DATE_1 DATE_2 DATE_3 DATE_4
+export DATE_5 DATE_6 DATE_7 DATE_8 DATE_9
+export CTM    CDATIM CDATM1 YY1 MM1 DD1
+
+# Make sure needed /com directory is established
+mkdir -p $com/$RUN.${DATE_0}
+COM=$com/$RUN.${DATE_0}
+
+# Changed set value for YY, MM, DD 2/24/97
+
+CDATIM=$DATE_0$CTM
+CDATM1=$DATE_1$CTM
+
+YY=`echo  $DATE_0 | cut -c1-4`
+MM=`echo  $DATE_0 | cut -c5-6`
+DD=`echo  $DATE_0 | cut -c7-8`
+YY1=`echo $DATE_1 | cut -c1-4`
+MM1=`echo $DATE_1 | cut -c5-6`
+DD1=`echo $DATE_1 | cut -c7-8`
+
+
+if test "$CTM" != '00'
+then
+    if test "$CTM" != '12'
+    then
+
+        echo "00 OR 12 ARE ALLOWED FOR INPUT ARGUMENT."
+        echo "YOU INPUTTED $CTM, THIS IS ILLEGAL."
+        exit 1
+    fi
+fi
+
+#=========================================================================
+#
+cp $COM/qcadp.$CTM    qcadp
+
+cat <<\sumac1EOF >sm_namlst1
+    &OPTION  RPT=2, VDATE1=1998071212, VDATE2=2999123112, /
+    &OPTION  PRSTAT=.FALSE., WRSTAT=.TRUE., MINWND=0, /
+    &OPTION  MAXWND=150, DIAG=.TRUE., INTPM=1, /
+sumac1EOF
+
+#   Copy an executable objective file for SUMAC4, staion lists for
+#   verifying areas and verification table into working directory.
+
+cp $FIXarkv/arkv_subarea.dic     .
+err1=$?
+cp $FIXarkv/arkv_verf_tab_$CTM   .
+err2=$?
+tot=`expr $err1 + $err2`
+if test "$tot" -ne '0'
+   then
+   err_chk
+fi
+
+#
+#-------------------------------------------------------------------------
+#
+#     2.7> Verifying NAM forecasts.
+#
+echo "2.7  START TO VERIFY NAM FORECASTS AGAINST RADIOSONDES: "
+
+   cat <<\sumac2EOF >sm_namlst2
+    &FILES   RPT=0, NFILE=8, FHR='F000','F012','F024',
+             'F036','F048','F060','F072','F084',KRUN='REGL',
+    /
+sumac2EOF
+
+#   Set the paths of forecast fields files.
+
+FRPATH=/com/nam/prod/nam
+GRB00=nam.t00z.grbgrd
+GRB12=nam.t12z.grbgrd
+
+if test "$CTM" = '00'
+then
+
+   cp $FRPATH.$DATE_0/"$GRB00"00.tm00 F000DAT
+   cp $FRPATH.$DATE_0/"$GRB00"i00 F000NDX
+   cp $FRPATH.$DATE_1/"$GRB12"12.tm00 F012DAT
+   cp $FRPATH.$DATE_1/"$GRB12"i12 F012NDX
+   cp $FRPATH.$DATE_1/"$GRB00"24.tm00 F024DAT
+   cp $FRPATH.$DATE_1/"$GRB00"i24 F024NDX
+   cp $FRPATH.$DATE_2/"$GRB12"36.tm00 F036DAT
+   cp $FRPATH.$DATE_2/"$GRB12"i36 F036NDX
+   cp $FRPATH.$DATE_2/"$GRB00"48.tm00 F048DAT
+   cp $FRPATH.$DATE_2/"$GRB00"i48 F048NDX
+   cp $FRPATH.$DATE_3/"$GRB12"60.tm00 F060DAT
+   cp $FRPATH.$DATE_3/"$GRB12"i60 F060NDX
+   cp $FRPATH.$DATE_3/"$GRB00"72.tm00 F072DAT
+   cp $FRPATH.$DATE_3/"$GRB00"i72 F072NDX
+   cp $FRPATH.$DATE_4/"$GRB12"84.tm00 F084DAT
+   cp $FRPATH.$DATE_4/"$GRB12"i84 F084NDX
+                                                       
+
+elif test "$CTM" = '12'
+then
+
+   cp $FRPATH.$DATE_0/"$GRB12"00.tm00 F000DAT
+   cp $FRPATH.$DATE_0/"$GRB12"i00 F000NDX
+   cp $FRPATH.$DATE_0/"$GRB00"12.tm00 F012DAT
+   cp $FRPATH.$DATE_0/"$GRB00"i12 F012NDX
+   cp $FRPATH.$DATE_1/"$GRB12"24.tm00 F024DAT
+   cp $FRPATH.$DATE_1/"$GRB12"i24 F024NDX
+   cp $FRPATH.$DATE_1/"$GRB00"36.tm00 F036DAT
+   cp $FRPATH.$DATE_1/"$GRB00"i36 F036NDX
+   cp $FRPATH.$DATE_2/"$GRB12"48.tm00 F048DAT
+   cp $FRPATH.$DATE_2/"$GRB12"i48 F048NDX
+   cp $FRPATH.$DATE_2/"$GRB00"60.tm00 F060DAT
+   cp $FRPATH.$DATE_2/"$GRB00"i60 F060NDX
+   cp $FRPATH.$DATE_3/"$GRB12"72.tm00 F072DAT
+   cp $FRPATH.$DATE_3/"$GRB12"i72 F072NDX
+   cp $FRPATH.$DATE_3/"$GRB00"84.tm00 F084DAT
+   cp $FRPATH.$DATE_3/"$GRB00"i84 F084NDX
+                                                      
+
+fi
+
+#   Execute SUMAC4 for specified areas.
+
+msg="Begin to verify nam forecasts against radiosondes."
+postmsg "$jlogfile" "$msg"
+
+pgm=arkv_sumac4
+export pgm;. prep_step
+
+export XLFUNIT_7="arkv_subarea.dic"
+export XLFUNIT_8="qcadp"
+export XLFUNIT_9="sm_namlst1"
+export XLFUNIT_10="arkv_verf_tab_$CTM"
+export XLFUNIT_11="F000DAT"
+export XLFUNIT_12="F000NDX"
+export XLFUNIT_13="F012DAT"
+export XLFUNIT_14="F012NDX"
+export XLFUNIT_15="F024DAT"
+export XLFUNIT_16="F024NDX"
+export XLFUNIT_17="F036DAT"
+export XLFUNIT_18="F036NDX"
+export XLFUNIT_19="F048DAT"
+export XLFUNIT_20="F048NDX"                        
+export XLFUNIT_21="F060DAT"
+export XLFUNIT_22="F060NDX"
+export XLFUNIT_23="F072DAT"
+export XLFUNIT_24="F072NDX"
+export XLFUNIT_25="F084DAT"
+export XLFUNIT_26="F084NDX"
+export XLFUNIT_70=jetstats
+export XLFUNIT_71=dlystats
+
+$EXECarkv/arkv_sumac4 <sm_namlst2 1>sumac4_prt 
+err=$?;export err;err_chk
+ 
+#   Append SUMAC4's printout and output files 
+
+    if test "$CTM" = '00'
+then
+        ID="70"
+    elif test "$CTM" = '12'
+then
+        ID="72"
+    fi
+
+if test "$SENDCOM" = 'YES'
+then
+   cat sumac4_prt       >> $pgmout
+   cat sumac4_prt       >> $COM/sumac4_prt.$DD$CTM
+   cat dlystats   >> $COM/dlystat_dat$MM$DD$ID
+   err=$?;export err pgm;err_chk
+fi
+
+cat $pgmout
+
+msg='HAS COMPLETED NORMALLY.'
+echo $msg
+postmsg "$jlogfile" "$msg"
+
+#--------------- end script ex151_vernam.sh.sms ---------------------
+
+
+

@@ -1,0 +1,166 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_sndpost.sh
+# Script description:  Trigger nam sounding post job
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script triggers the nam sounding post job, which
+#           creates a piece of the model sounding profile whose
+#           time interval is determined by the input forecast hours.
+#
+# Script history log:
+# 2000-05-16  Eric Rogers
+#
+set -x
+
+cd $DATA
+
+export tmmark=tm00
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+for n in 01 02 03 04 05 06
+do
+  cp $FIXnam/nam_bcwgts.${n} $DATA/nam_bcwgts.${n}
+done
+
+cp $FIXnam/nam_profdat $DATA/nam_profdat
+cp $FIXnam/nam_deta_ldt1.60.25mb deta.0
+cp $FIXnam/nam_deta_ldt1.60.25mb deta.01
+cp deta.01 deta.02
+cp deta.01 deta.03
+cp deta.01 deta.04
+cp deta.01 deta.05
+cp deta.01 deta.06
+cp $PARMnam/nam_bcexdata.parm.${tmmark} bcexdata.parm
+
+export fhr=00
+typeset -Z2 fhr
+
+if [ $cyc -eq 00 -o $cyc -eq 12 ] ; then
+  endfhr=60
+else
+  endfhr=48
+fi
+
+while [ $fhr -le $endfhr ]
+do
+   ic=1
+   while [ $ic -lt 1000 ]
+   do
+      if [ -s $DATA/fcstdone${fhr}.${tmmark} ]
+      then
+         break
+      else
+         let "ic=ic+1"
+         sleep 10
+      fi
+
+      if [ $ic -ge 180 ]
+      then
+         err_exit "COULD NOT LOCATE: $DATA/fcstdone${fhr}.${tmmark}"
+      fi
+   done
+
+   if [ $fhr -eq 00 ]
+   then
+      rm $DATA/sndpdone
+   fi
+
+   nposts=01
+   incpst=01
+
+   export RSTFNL=$DATA/ 
+
+   export pgm=nam_post0bc
+   . prep_step
+   export XLFUNIT_12=$DATA/nhb1260
+   export XLFUNIT_17=$DATA/bcexdata.parm
+   export XLFUNIT_19=$DATA/nam_profdat
+   export XLFUNIT_76=$DATA/profilm.c1.${tmmark}
+
+   startmsg
+   $EXECnam/nam_post0bc << ioEOF >> $pgmout 2>errfile 
+   $fhr $nposts $incpst
+ioEOF
+   export err=$?;err_chk
+
+   echo done > $DATA/postbc.done${fhr}.${tmmark}
+   
+   if [ $fhr -ge 24 ]
+   then
+      let "fhrm=fhr-24"
+      typeset -Z2 fhrm
+      y=`expr $fhrm % 3`
+
+      if [ $y -ne 0 ]
+      then
+         ic=1
+         while [ $ic -lt 1000 ]
+         do
+            if [ -s $DATA/post0hyb.done${fhrm}.${tmmark} -a \
+                 -s $DATA/post0hs.done${fhrm}.$tmmark ]
+            then
+###MAS              rm $DATA/restrt${fhrm}.tm00
+              break
+            else
+               let "ic=ic+1"
+               sleep 10
+            fi
+            if [ $ic -ge 180 ]
+            then
+              err_exit "COULD NOT LOCATE: $DATA/post0hyb.done${fhrm}.${tmmark}"
+            fi
+         done
+      else
+         ic=1
+         while [ $ic -lt 1000 ]
+         do
+            if [ -s $DATA/nampost.done${fhrm}.${tmmark} -a \
+                 -s $DATA/sndpostdone${fhrm}.$tmmark -a \
+                 -s $DATA/post0hyb.done${fhrm}.${tmmark} -a \
+                 -s $DATA/post0hs.done${fhrm}.$tmmark ]
+            then
+               if [ $fhrm -eq 00 ] 
+               then
+###MAS                 mv $DATA/restrt${fhrm}.tm00 $GESDIR/${RUN}.${cycle}.restrt${fhrm}.init
+###MAS                 cp $DATA/restrt${fhrm}.tm00 $GESDIR/${RUN}.${cycle}.restrt${fhrm}.init
+                 echo "test" 
+                 break
+               else
+###MAS                 rm $DATA/restrt${fhrm}.tm00
+                 break
+               fi
+            else
+               let "ic=ic+1"
+               sleep 10
+            fi
+
+            if [ $ic -ge 180 ]
+            then
+              err_exit "COULD NOT LOCATE: $DATA/nampost.done${fhrm}.${tmmark}"
+            fi
+         done
+      fi
+   fi
+
+   let "fhr=fhr+1"
+   typeset -Z2 fhr
+done
+
+# Done with post0 so run sounding post if fcsthr=60
+
+if [ $fhr -gt $endfhr ]
+then
+  mv bcnest.01 $COMOUT/${RUN}.${cycle}.bcnest.east10
+  mv bcnest.02 $COMOUT/${RUN}.${cycle}.bcnest.hi10
+  mv bcnest.03 $COMOUT/${RUN}.${cycle}.bcnest.west10
+  mv bcnest.04 $COMOUT/${RUN}.${cycle}.bcnest.alaska12
+  mv bcnest.05 $COMOUT/${RUN}.${cycle}.bcnest.central10
+  mv bcnest.06 $COMOUT/${RUN}.${cycle}.bcnest.pr10
+fi
+
+echo EXITING $0 with return code $err
+exit $err

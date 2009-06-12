@@ -1,0 +1,120 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exndas_combc.sh
+# Script description:  Runs code to combine binary WRF-NMM boundary files from GDAS/GFS 
+#                      into a single WRF-format boundary file. This needs to run as a
+#                      parallel code.
+#
+# Author:        Eric Rogers       Org: NP22         Date: 2006-01-13
+#
+# Script history log:
+# 2006-01-13  Eric Rogers
+#
+                                                                                           
+set -xa
+
+export PS4='$SECONDS + '
+
+cd $DATA
+
+#
+# Get needed variables from exndas_prelim.sh.sms
+#
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+tmmark=tm00
+export SDATE=$CYCLE
+
+echo $CYCLE > cycledate
+
+### modify namelist file
+
+export restval=true
+
+LENGTH=84
+
+ rhour=$LENGTH
+ resint=`expr ${LENGTH} \* 60 `
+ rday=0
+
+ ystart=`echo $SDATE | cut -c1-4`
+ mstart=`echo $SDATE | cut -c5-6`
+ dstart=`echo $SDATE | cut -c7-8`
+ hstart=`echo $SDATE | cut -c9-10`
+
+end=$(/nwprod/util/exec/ndate +$LENGTH $SDATE)
+
+yend=`echo $end | cut -c1-4`
+mend=`echo $end | cut -c5-6`
+dend=`echo $end | cut -c7-8`
+hend=`echo $end | cut -c9-10`
+
+rday=3
+rhour=12
+
+if [ $cyc -eq 00 -o $cyc -eq 12 ] ; then
+  nltype=ontime
+else
+  nltype=offtime
+fi
+
+NLNAME=nam_namelist.input_${nltype}_combc
+
+cat $PARMnam/$NLNAME | sed s:YSTART:$ystart: | sed s:MSTART:$mstart: \
+ | sed s:DSTART:$dstart: | sed s:HSTART:$hstart: | sed s:YEND:$yend: \
+ | sed s:MEND:$mend:     | sed s:DEND:$dend: | sed s:HEND:$hend:  \
+ | sed s:RHOURS:$rhour:      | sed s:RDAY:$rday: \
+ | sed s:RESINT:$resint: | sed s:REST:$restval: > namelist.input
+
+args="0 1 2 3 4 5 6 7 8 9 10 11 12 13 14"
+
+###############
+
+for nm in $args
+do
+echo checking $nm
+while [ ! -s $DATA/mkbnddone.${nm}.${tmmark} ]
+do
+echo still not done $nm
+sleep 10
+done
+done
+
+# make boundary file 
+
+cp $PARMnam/nam_combc_gribmap.txt gribmap.txt
+
+export pgm=nam_combc
+. prep_step
+
+export XLFUNIT_11=$DATA/nambcs00_0.${tmmark}
+export XLFUNIT_12=$DATA/nambcs00_1.${tmmark}
+export XLFUNIT_13=$DATA/nambcs00_2.${tmmark}
+export XLFUNIT_14=$DATA/nambcs00_3.${tmmark}
+export XLFUNIT_15=$DATA/nambcs00_4.${tmmark}
+export XLFUNIT_16=$DATA/nambcs00_5.${tmmark}
+export XLFUNIT_17=$DATA/nambcs00_6.${tmmark}
+export XLFUNIT_18=$DATA/nambcs00_7.${tmmark}
+export XLFUNIT_19=$DATA/nambcs00_8.${tmmark}
+export XLFUNIT_20=$DATA/nambcs00_9.${tmmark}
+export XLFUNIT_21=$DATA/nambcs00_10.${tmmark}
+export XLFUNIT_22=$DATA/nambcs00_11.${tmmark}
+export XLFUNIT_23=$DATA/nambcs00_12.${tmmark}
+export XLFUNIT_24=$DATA/nambcs00_13.${tmmark}
+export XLFUNIT_25=$DATA/nambcs00_14.${tmmark}
+export XLFUNIT_51=$DATA/nambcs00.${tmmark}
+
+echo "&NUMAVN NTIMES=30,NPIECE=2" > tmpin.${tmmark}
+echo "/" >> tmpin.${tmmark}
+
+startmsg
+$EXECnam/nam_combc < tmpin.${tmmark} > $pgmout
+export err=$?;err_chk
+
+cp wrfbdy_d01 $COMOUT/${RUN}.t${cyc}z.wrfbdy_d01.${tmmark}
+cp namelist.input $COMOUT/${RUN}.t${cyc}z.namelist.input_combc.${tmmark}
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"

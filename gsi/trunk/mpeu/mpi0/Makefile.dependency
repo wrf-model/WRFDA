@@ -1,0 +1,34 @@
+m_mpi0.o:
+mpi_abort.o:
+mpi_comm_dup.o: m_mpi0.o
+mpi_comm_free.o: m_mpi0.o
+mpi_comm_rank.o: m_mpi0.o
+mpi_comm_size.o: m_mpi0.o
+mpi_error_string.o:
+mpi_finalize.o: Const_MPItype.H m_mpi0.o
+mpi_init.o: Const_MPItype.H m_mpi0.o
+mpi_initialized.o: m_mpi0.o
+mpi_isend.o: m_mpi0.o
+mpi_recv.o: m_mpi0.o
+mpi_irecv.o: m_mpi0.o
+mpi_send.o: m_mpi0.o
+mpi_waitall.o: m_mpi0.o
+mpi_wtick.o:
+mpi_wtime.o:
+mpi_barrier.o: m_mpi0.o
+mpi_bcast.o: m_mpi0.o
+mpi_gather.o: m_mpi0.o
+mpi_gatherv.o: m_mpi0.o
+mpi_scatter.o: m_mpi0.o
+mpi_scatterv.o: m_mpi0.o
+mpi_allgather.o: m_mpi0.o
+mpi_allgatherv.o: m_mpi0.o
+mpi_alltoall.o: m_mpi0.o
+mpi_alltoallv.o: m_mpi0.o
+mpi_reduce.o: m_mpi0.o
+mpi_allreduce.o: m_mpi0.o
+mpi_reduce_scatter.o: m_mpi0.o
+mpi0_copy.o: m_mpi0.o
+mpi_zzz.o: m_mpi0.o
+Const_MPItype.H:
+mpif.H:

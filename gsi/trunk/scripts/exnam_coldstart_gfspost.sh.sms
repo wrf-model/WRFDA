@@ -1,0 +1,83 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_coldstart_gfspost.sh.sms
+# Script description:  Runs GFS post for GDAS first guess sigma file to post GDAS output to 1 mb, 
+#                      so the WRF-SI/Real codes can create a GDAS-based WRF-NMM first guess
+#                      wrfinput file with the model top at 2 mb (ops GDAS pressure GRIB files
+#                      post up to 10 mb)
+#
+# Author:        Eric Rogers       Org: NP22         Date: 2006-01-13
+#
+# Script history log:
+# 2006-01-13  Eric Rogers
+#
+                                                                                           
+set -xa
+
+export PS4='$SECONDS + '
+
+mkdir -p $DATA/gfspost
+cd $DATA/gfspost
+
+#
+# Get needed variables from exnam_prelim.sh.sms
+#
+
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+export GDASDATE=`/nwprod/util/exec/ndate -06 $CYCLE`
+echo DATEXX${GDASDATE} > gdasdate
+                               
+PDYgds=`cat gdasdate | cut -c7-14`
+yygds=`cat gdasdate | cut -c7-10`
+mmgds=`cat gdasdate | cut -c11-12`
+ddgds=`cat gdasdate | cut -c13-14`
+cycgds=`cat gdasdate | cut -c15-16`
+
+export COMGDAS=/com/gfs/prod/gdas.${PDYgds}
+
+export POSTSH=/nwprod/ush/global_postgp.sh
+export FIXGLOBAL=/nwprod/fix
+export POSTGPEXEC=/nwprod/exec/global_postgp
+
+export VERBOSE=YES
+export IO=360
+export JO=181
+
+kop=36
+polist="\
+  1000.0,   975.0, 950.0, 925.0, 900.0, 875.0,\
+   850.0,   825.0, 800.0, 750.0, 700.0, 650.0,\
+   600.0,   550.0, 500.0, 450.0, 400.0, 350.0,\
+   300.0,   250.0, 200.0, 150.0, 100.0,  70.0,\
+    50.0,    40.0,  30.0,  20.0, 10.00,   8.0,\
+     7.0,     5.0,   4.0,   3.0,   2.0,   1.0"
+export POSTGPVARS="POT(51)=0.0,POT(52)=0.0,POT(153)=0.0,KPO=$kop,PO=$polist"
+
+hr=06
+
+# Need to make 6-h and 9-h GDAS files since SI/Real need 2 GRIB inputs to work properly
+
+while [ $hr -le 09 ] ; do
+
+export SIGINP=$COMGDAS/gdas1.t${cycgds}z.sf${hr}
+export FLXINP=$COMGDAS/gdas1.t${cycgds}z.sfluxgrbf${hr}
+export PGBOUT=$DATA/gfspost/gdas1mb.t${cycgds}z.pgbf${hr}
+$POSTSH
+
+if [ $SENDCOM = YES ]
+then
+   cp $DATA/gfspost/gdas1mb.t${cycgds}z.pgbf${hr} $COMOUT/.
+fi
+
+let "hr=hr+3"
+typeset -Z2 hr
+
+done
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+exit

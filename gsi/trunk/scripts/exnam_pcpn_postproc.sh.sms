@@ -1,0 +1,213 @@
+#!/bin/ksh -x
+
+#######################################################################
+#  Purpose: Post-processing of the Stage II/IV analyses
+#    Plot Stage II/IV analyses (plus the RTMA version) using GEMPAK
+#######################################################################
+#
+# Steps:
+#   0. Prep; copy over the two GEMPAK para files (coltbl.xwp.wbg and 
+#      wmogrib.tbl) 
+#   1. Plot Stage II hourly multi-sensor analysis for early/mid/late
+#   2. Plot 6h and 24h Stage II analysis (08/14/20Z only)
+#   3. Plot hourly precip RTMA
+#      - convert precip RTMA to GRIB1 (to plot using GEMPAK)
+#      - map to G218
+#      - plot
+#   4. Plot hourly/6-hourly Stage IV that are made at this hour (if any),
+#      based on the 'todo4' list.
+#   5. At 15Z, 21Z and 23Z, plot 24h Stage IV accumulations.
+
+set -x
+
+. /nwprod/gempak/.gempak
+
+if [ $# -eq 0 ]; then
+  date0=`date -u '+%Y%m%d%H'`
+else
+  date0=$1
+fi
+
+datem6h=`/nwprod/util/exec/ndate -6 $date0`
+datem18h=`/nwprod/util/exec/ndate -18 $date0`
+datem24h=`/nwprod/util/exec/ndate -24 $date0`
+
+# hh0 used to determine whether it is time to process the 6h/24h Stage II
+hh0=`echo $date0 | cut -c9-10`
+
+day0=`echo $date0 | cut -c1-8`
+daym6h=`echo $datem6h | cut -c1-8`
+daym18h=`echo $datem18h | cut -c1-8`
+daym24h=`echo $datem24h | cut -c1-8`
+
+host1=`hostname | cut -c 1-1`
+
+PLOTDIR=$DATA/plot
+
+mkdir -p $PLOTDIR
+
+cd $PLOTDIR
+sh $utilscript/setup.sh
+
+# add current dir to PATH so dummy prep_step etc. (emulating opnl in form)
+# can be called when running job in cron.  Also add imajik for 'montage' and
+# 'convert'.
+PATH="$PATH":./:/usrx/local/imajik/bin
+
+pgmout=out.$date0
+
+export XLFRTEOPTS="unit_vars=yes"
+datem24h=`/nwprod/util/exec/ndate -24 $date0`
+daym1=`echo $datem24h | cut -c1-8`
+
+# For a white background:
+cp /nwprod/gempak/fix/coltbl.xwp.wbg coltbl.xwp
+
+# Missing value for precip set to -9999. so we can distinguish zero value 
+# areas (plotted in vanilla) from no data areas (white):
+cp /nwprod/gempak/fix/wmogrib.tbl .
+
+# 1. Plot Stage II analysis:
+for date in $date0 $datem6h $datem18h 
+do 
+  day=`echo $date | cut -c1-8`
+  cp $COMIN/${RUN}.$day/multi15.$date.Z .
+  uncompress multi15.$date
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.$date st2vu.$date.gif $date 01 "Stage II Multi-Sensor"
+  cp st2vu.$date.gif $COMOUT/${RUN}.$day/.
+
+  if test $SENDDBN = 'YES'
+  then
+     $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st2vu.$date0.gif
+  fi
+done
+
+# 2. Plot 6h and 24h Stage II analysis, if made at this hour:
+if [[ $hh0 -eq 08 || $hh0 -eq 14 || $hh0 -eq 20 ]]; then
+  if [ $hh0 -le 12 ]; then
+    day=$daym24h
+  else
+    day=$day0
+  fi
+
+  daym1=`/nwprod/util/exec/ndate -24 ${day}12 | cut -c1-8`
+  cp $COMIN/${RUN}.$daym1/multi15.${daym1}18.06h.Z .
+  cp $COMIN/${RUN}.$day/multi15.${day}00.06h.Z .
+  cp $COMIN/${RUN}.$day/multi15.${day}06.06h.Z .
+  cp $COMIN/${RUN}.$day/multi15.${day}12.06h.Z .
+
+  cp $COMIN/${RUN}.$day/multi15.${day}12.24h.Z .
+
+  uncompress multi15.${daym1}18.06h.Z multi15.${day}00.06h.Z \
+               multi15.${day}06.06h.Z multi15.${day}12.06h.Z \
+               multi15.${day}12.24h 
+
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.${daym1}18.06h st2ml.${daym1}18.06h.gif ${daym1}18 06 "Stage II Multi-Sensor"
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.${day}00.06h st2ml.${day}00.06h.gif ${day}00 06 "Stage II Multi-Sensor"
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.${day}06.06h st2ml.${day}06.06h.gif ${day}06 06 "Stage II Multi-Sensor"
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.${day}12.06h st2ml.${day}12.06h.gif ${day}12 06 "Stage II Multi-Sensor"
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     multi15.${day}12.24h st2ml.${day}12.24h.gif ${day}12 24 "Stage II Multi-Sensor"
+     cp st2ml.${daym1}18.06h.gif $COMOUT/${RUN}.$daym1/.
+     cp st2ml.${day}*.gif $COMOUT/${RUN}.$day/.
+  if test $SENDDBN = 'YES'
+  then
+    $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$daym1/st2ml.${daym1}18.06h.gif
+    $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st2ml.${day}00.06h.gif
+    $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st2ml.${day}06.06h.gif
+    $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st2ml.${day}12.06h.gif
+    $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st2ml.${day}12.24h.gif
+  fi
+fi #  postproc Stage II 24h
+
+# 3. Plot precip RTMA
+NDFDFILE2=$COMIN/${RUN}.$day0/pcprtma.$date0
+NDFDFILE1=pcprtma.$date0.grib1
+NDFDFILE218=pcprtma.$date0.grib1.218
+$EXECutil/cnvgrib -g21 $NDFDFILE2 $NDFDFILE1
+$EXECutil/copygb -g 218 -i3 -x $NDFDFILE1 $NDFDFILE218
+$USHnam_pcpn_anal/nam_pcpn_plotpcp.sh $NDFDFILE218 pcprtma.$date0.gif \
+   $date0 01 "PCP RTMA"
+cp pcprtma.$date0.gif $COMOUT/${RUN}.$day0/.
+
+if test $SENDDBN = 'YES'
+then
+  $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/pcprtma.$date0.gif
+fi
+
+# 4. Stage IV: check the opnl 'todo' list for any new items for this hour.
+#    Post-process the items on the 'todo' list.
+
+todolist=$COMIN/${RUN}.$day0/todo4.$date0
+
+if [ -e $todolist ]; then
+  for item in `cat $todolist` 
+  do
+    date=`echo $item | cut -c1-10`
+    day=`echo $date | cut -c1-8`
+    ac=`echo $item | cut -c12-13`
+    cp $COMIN/${RUN}.$day/ST4.$date.${ac}h.Z .
+    
+    uncompress ST4.$date.${ac}h.Z
+
+# Map to 15km grid to plot:
+    export pgm=nam_remap
+    . prep_step   
+    export XLFUNIT_11=ST4.$date.${ac}h
+    export XLFUNIT_51=st4.$date.${ac}h.15km
+    startmsg
+    $EXECnam_pcpn_anal/nam_remap >> $DATA/$pgmout 2>errfile
+    export err=$?;err_chk
+
+# Plot:
+
+    $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+       st4.$date.${ac}h.15km st4.$date.${ac}h.gif $date \
+       $ac "Stage IV (3 mos)"
+
+    day=`echo $date | cut -c 1-8`
+    cp st4.$date.${ac}h.gif $COMOUT/${RUN}.${day}/.
+
+    if test $SENDDBN = 'YES'
+    then
+      $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day/st4.$date.${ac}h.gif
+    fi
+
+  done # finished processing ST4 to-do list
+fi # ST4 to-do list exist?
+
+# 5. At 15Z, 21Z and 23Z, process the 24h Stage IV accumulations.
+
+if [[ $hh0 -eq 15 || $hh0 -eq 21 || $hh0 -eq 23 ]]; then
+  cp $COMIN/${RUN}.$day0/ST4.${day0}12.24h.Z .
+  uncompress ST4.${day0}12.24h.Z
+
+# Map to 15km grid to plot:
+  export pgm=nam_remap
+  . prep_step
+  export XLFUNIT_11=ST4.${day0}12.24h
+  export XLFUNIT_51=st4.${day0}12.24h.15km
+  startmsg
+  $EXECnam_pcpn_anal/nam_remap >> $DATA/$pgmout 2>errfile
+  export err=$?;err_chk
+
+# Plot:
+
+  $USHnam_pcpn_anal/nam_pcpn_plotpcp.sh \
+     st4.${day0}12.24h.15km st4.${day0}12.24h.gif ${day0}12 24 \
+     "Stage IV (3 mos)"
+  cp st4.${day0}12.24h.gif $COMOUT/${RUN}.${day0}/.
+
+  if test $SENDDBN = 'YES'
+  then
+     $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.${day0}/st4.${date0}12.24h.gif
+  fi
+fi # process Stage IV 24h accumulations?
+
+exit
+

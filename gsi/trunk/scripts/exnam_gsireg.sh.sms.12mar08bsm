@@ -1,0 +1,416 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exndas_gsireg.sh.sms
+# Script description:  Runs regional GSI variational analysis and computes boundary
+#                      tendencies for NAM forecast
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-02  Brent Gordon  - Modified for production
+# 2006-01-13  Eric Rogers - Modified for WRF-NMM GSI analysis
+#
+
+set -x
+cd $DATA
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+#
+# Get needed variables from exndas_prelim.sh.sms
+#
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+DATEANL=$CYCLE
+SDATE=$CYCLE
+tmpdir=$DATA
+
+adate=$SDATE
+
+export tmmark_prev=tm03
+
+offset_prev=-`echo $tmmark_prev | cut -c 3-4`
+SDATE_PREV=`/nwprod/util/exec/ndate $offset_prev $CYCLE`
+
+# try to see in links to restart files work to avoid having to copy them to tmpnwprd
+
+# E.Rogers 2/07: Change links to copies so that file in /nwges is not overwritten by the 
+# tm00 analysis, in case the tm03 wrfrst file is used to start the next NDAS cycle
+# or PMB needs to rerun this job
+
+if test $GUESS = "NAM"
+then
+   cp $GESNDAS/ndas.t${cyc}z.wrfrst_d01.tm03 ./wrf_inout
+   cp $GESNDAS/ndas.t${cyc}z.wrfrst_d01.tm03 $COMOUT/nam.t${cyc}z.wrfrst_d01.ges &
+else
+   cp $COMIN/nam.t${cyc}z.wrfinput_d01.ges ./wrf_inout
+fi
+
+cp $COMIN/nam.t${cyc}z.prepbufr.tm00 $DATA/prepbufr
+
+# Set resolution and other dependent parameters
+export JCAP=62
+export LEVS=60
+export DELTIM=${DELTIM:-$((3600/($JCAP/20)))}
+
+# Specify fixed field and data directories.
+aday=`echo $adate | cut -c1-8`
+cya=`echo $adate | cut -c9-10`
+cday=`echo $CYCLE | cut -c1-8`
+CYC=`echo $CYCLE | cut -c9-10`
+
+# Make gsi namelist
+cat << EOF > gsiparm.anl
+ &SETUP
+   miter=2,niter(1)=50,niter(2)=50,
+   write_diag(1)=.true.,write_diag(2)=.false.,write_diag(3)=.true.,
+   gencode=78,qoption=2,
+   factqmin=1.0,factqmax=1.0,deltim=$DELTIM,
+   ndat=43,jpch=592,npred=5,iguess=-1,
+   oneobtest=.false.,retrieval=.false.,
+   nhr_assimilation=3,
+ /
+ &GRIDOPTS
+   JCAP=$JCAP,NLAT=$NLAT,NLON=$LONA,nsig=$LEVS,hybrid=.true.,
+   wrf_nmm_regional=.true.,wrf_mass_regional=.false.,diagnostic_reg=.false.,
+   filled_grid=.false.,half_grid=.true.,netcdf=.false.,
+ /
+ &BKGERR
+   as=0.7,0.7,0.5,0.7,0.7,0.5,1.0,1.0,
+   hzscl=0.373,0.746,1.50,
+   vs=1.0,bw=0.,fstat=.true.,
+ /
+ &ANBKGERR
+   anisotropic=.false.,
+ /
+ &JCOPTS
+   jcterm=.false.,damptend=0.0,
+   bamp_pse=0.0,bamp_uve=0.0,bamp_uvi=0.0,bamp_tin=0.0,
+ /
+ &OBSQC
+   dfact=0.1,
+ /
+ &OBS_INPUT
+   dmesh(1)=60.0,dmesh(2)=60.0,dmesh(3)=60.0,dmesh(4)=60.0,
+   dfile(01)='prepbufr', dtype(01)='ps',       dplat(01)=' ',      dsis(01)='ps',              dval(01)=1.0,  dthin(01)=0,time_window(1)=1.5,
+   dfile(02)='prepbufr'  dtype(02)='t',        dplat(02)=' ',      dsis(02)='t',               dval(02)=1.0,  dthin(02)=0,time_window(2)=1.5,
+   dfile(03)='prepbufr', dtype(03)='q',        dplat(03)=' ',      dsis(03)='q',               dval(03)=1.0,  dthin(03)=0,time_window(3)=1.5,
+   dfile(04)='prepbufr', dtype(04)='pw',       dplat(04)=' ',      dsis(04)='pw',              dval(04)=1.0,  dthin(04)=0,time_window(4)=1.5,
+   dfile(05)='prepbufr', dtype(05)='uv',       dplat(05)=' ',      dsis(05)='uv',              dval(05)=1.0,  dthin(05)=0,time_window(5)=1.5,
+   dfile(06)='prepbufr', dtype(06)='spd',      dplat(06)=' ',      dsis(06)='spd',             dval(06)=1.0,  dthin(06)=0,time_window(6)=1.5,
+   dfile(07)='prepbufr', dtype(07)='dw',       dplat(07)=' ',      dsis(07)='dw',              dval(07)=1.0,  dthin(07)=0,time_window(7)=1.5,
+   dfile(08)='radarbufr' dtype(08)='rw',       dplat(08)=' ',      dsis(08)='rw',              dval(08)=1.0,  dthin(08)=0,time_window(8)=1.5,
+   dfile(09)='prepbufr', dtype(09)='sst',      dplat(09)=' ',      dsis(09)='sst',             dval(09)=1.0,  dthin(09)=0,time_window(9)=1.5,
+   dfile(10)='gpsbufr',  dtype(10)='gps_ref',  dplat(10)=' ',      dsis(10)='gps_ref',         dval(10)=1.0,  dthin(10)=0,time_window(10)=1.5,
+   dfile(11)='ssmibufr', dtype(11)='pcp_ssm/i',dplat(11)='dmsp',   dsis(11)='pcp_ssmi',       dval(11)=1.0,  dthin(11)=-1,time_window(11)=1.5,
+   dfile(12)='tmibufr',  dtype(12)='pcp_tmi',  dplat(12)='trmm',   dsis(12)='pcp_tmi',        dval(12)=1.0,  dthin(12)=-1,time_window(12)=1.5,
+   dfile(13)='sbuvbufr', dtype(13)='sbuv2',    dplat(13)='n16',    dsis(13)='sbuv2_n16',       dval(13)=1.0,  dthin(13)=0,time_window(13)=1.5,
+   dfile(14)='sbuvbufr', dtype(14)='sbuv2',    dplat(14)='n17',    dsis(14)='sbuv2_n17',       dval(14)=1.0,  dthin(14)=0,time_window(14)=1.5,
+   dfile(15)='omi',      dtype(15)='omi',      dplat(15)='aura',   dsis(15)='omi_aura',        dval(15)=1.0,  dthin(15)=0,time_window(15)=1.5,
+   dfile(16)='hirs2bufr',dtype(16)='hirs2',    dplat(16)='n14',    dsis(16)='hirs2_n14',       dval(16)=6.0,  dthin(16)=1,time_window(16)=1.5,
+   dfile(17)='hirs3bufr',dtype(17)='hirs3',    dplat(17)='n16',    dsis(17)='hirs3_n16',       dval(17)=0.0,  dthin(17)=1,time_window(17)=1.5,
+   dfile(18)='hirs3bufr',dtype(18)='hirs3',    dplat(18)='n17',    dsis(18)='hirs3_n17',       dval(18)=6.0,  dthin(18)=1,time_window(18)=1.5,
+   dfile(19)='hirs4bufr',dtype(19)='hirs4',    dplat(19)='n18',    dsis(19)='hirs4_n18',       dval(19)=1.0,  dthin(19)=1,time_window(19)=1.5,
+   dfile(20)='prepbufr', dtype(20)='sndr',    dplat(20)='g10_prep',dsis(20)='sndr_g10',        dval(20)=6.0,  dthin(20)=1,time_window(20)=1.5,
+   dfile(21)='prepbufr', dtype(21)='sndr',    dplat(21)='g12_prep',dsis(21)='sndr_g12',        dval(21)=6.0,  dthin(21)=1,time_window(21)=1.5,
+   dfile(22)='goesimgbfr',dtype(22)='goesimg', dplat(22)='g10',    dsis(22)='goesimg_g10',     dval(22)=0.0,  dthin(22)=1,time_window(22)=1.5,
+   dfile(23)='goesimgbfr',dtype(23)='goesimg', dplat(23)='g12',    dsis(23)='goesimg_g12',     dval(23)=0.0,  dthin(23)=1,time_window(23)=1.5,
+   dfile(24)='airsbufr', dtype(24)='airs',   dplat(24)='aqua',   dsis(24)='airs281SUBSET_aqua',dval(24)=20.0, dthin(24)=1,time_window(24)=1.5,
+   dfile(25)='ssmisbufr',dtype(25)='ssmis_env',dplat(25)='f16',    dsis(25)='ssmis_f16',       dval(25)=1.0,  dthin(25)=4,time_window(25)=1.5,
+   dfile(26)='amsuabufr',dtype(26)='amsua',    dplat(26)='n15',    dsis(26)='amsua_n15',       dval(26)=10.0, dthin(26)=2,time_window(26)=1.5,
+   dfile(27)='amsuabufr',dtype(27)='amsua',    dplat(27)='n16',    dsis(27)='amsua_n16',       dval(27)=1.0,  dthin(27)=2,time_window(27)=1.5,
+   dfile(28)='amsuabufr',dtype(28)='amsua',    dplat(28)='n17',    dsis(28)='amsua_n17',       dval(28)=10.0, dthin(28)=2,time_window(28)=1.5,
+   dfile(29)='amsuabufr',dtype(29)='amsua',    dplat(29)='n18',    dsis(29)='amsua_n18',       dval(29)=10.0, dthin(29)=2,time_window(29)=1.5,
+   dfile(30)='airsbufr', dtype(30)='amsua',    dplat(30)='aqua',   dsis(30)='amsua_aqua',      dval(30)=10.0, dthin(30)=2,time_window(30)=1.5,
+   dfile(31)='amsubbufr',dtype(31)='amsub',    dplat(31)='n15',    dsis(31)='amsub_n15',       dval(31)=3.0,  dthin(31)=3,time_window(31)=1.5,
+   dfile(32)='amsubbufr',dtype(32)='amsub',    dplat(32)='n16',    dsis(32)='amsub_n16',       dval(32)=3.0,  dthin(32)=3,time_window(32)=1.5,
+   dfile(33)='amsubbufr',dtype(33)='amsub',    dplat(33)='n17',    dsis(33)='amsub_n17',       dval(33)=3.0,  dthin(33)=3,time_window(33)=1.5,
+   dfile(34)='mhsbufr',  dtype(34)='mhs',      dplat(34)='n18',    dsis(34)='mhs_n18',         dval(34)=3.0,  dthin(34)=3,time_window(34)=1.5,
+   dfile(35)='ssmitbufr',dtype(35)='ssmi',     dplat(35)='f13',    dsis(35)='ssmi_f13',        dval(35)=1.0,  dthin(35)=4,time_window(35)=1.5,
+   dfile(36)='ssmitbufr',dtype(36)='ssmi',     dplat(36)='f14',    dsis(36)='ssmi_f14',        dval(36)=1.0,  dthin(36)=4,time_window(36)=1.5,
+   dfile(37)='ssmitbufr',dtype(37)='ssmi',     dplat(37)='f15',    dsis(37)='ssmi_f15',        dval(37)=1.0,  dthin(37)=4,time_window(37)=1.5,
+   dfile(38)='amsrebufr',dtype(38)='amsre_low',dplat(38)='aqua',   dsis(38)='amsre_aqua',      dval(38)=1.0,  dthin(38)=4,time_window(38)=1.5,
+   dfile(39)='amsrebufr',dtype(39)='amsre_mid',dplat(39)='aqua',   dsis(39)='amsre_aqua',      dval(39)=1.0,  dthin(39)=4,time_window(39)=1.5,
+   dfile(40)='amsrebufr',dtype(40)='amsre_hig',dplat(40)='aqua',   dsis(40)='amsre_aqua',      dval(40)=1.0,  dthin(40)=4,time_window(40)=1.5,
+   dfile(41)='ssmisbufr',dtype(41)='ssmis_las',dplat(41)='f16',    dsis(41)='ssmis_f16',       dval(41)=1.0,  dthin(41)=4,time_window(41)=1.5,
+   dfile(42)='ssmisbufr',dtype(42)='ssmis_uas',dplat(42)='f16',    dsis(42)='ssmis_f16',       dval(42)=1.0,  dthin(42)=4,time_window(42)=1.5,
+   dfile(43)='ssmisbufr',dtype(43)='ssmis_img',dplat(43)='f16',    dsis(43)='ssmis_f16',       dval(43)=1.0,  dthin(43)=4,time_window(43)=1.5,
+ /
+ &SUPEROB_RADAR
+   del_azimuth=5.,del_elev=.25,del_range=5000.,del_time=.5,elev_angle_max=5.,minnum=50,range_max=100000.
+ /
+ &SINGLEOB_TEST
+   maginnov=0.1,magoberr=0.1,oneob_type='t',
+   oblat=45.,oblon=270.,obpres=850.,obdattim=${adate},
+   obhourset=0.,
+ /
+EOF
+
+berror=$FIXnam/nam_nmmstat_na
+specoef=$FIXnam/nam_CRTM_SpcCoeff.f77
+trncoef=$FIXnam/nam_CRTM_TauCoeff.f77
+emiscoef=$FIXnam/nam_CRTM_EmisCoeff.f77
+aercoef=$FIXnam/nam_CRTM_AerosolCoeff.f77
+cldcoef=$FIXnam/nam_CRTM_CldCoeff.f77
+satinfo=$FIXnam/nam_regional_satinfo.txt
+satangl=$FIXnam/nam_global_satangbias.txt
+pcpinfo=$FIXnam/nam_global_pcpinfo.txt
+ozinfo=$FIXnam/nam_global_ozinfo.txt
+errtable=$FIXnam/nam_errtable.r3dv
+convinfo=$FIXnam/nam_regional_convinfo.txt
+
+cp $berror   ./berror_stats
+cp $errtable ./errtable
+cp $specoef  ./SpcCoeff.bin
+cp $trncoef  ./TauCoeff.bin
+cp $emiscoef ./EmisCoeff.bin
+cp $aercoef  ./AerosolCoeff.bin
+cp $cldcoef  ./CloudCoeff.bin
+cp $satangl  ./satbias_angle
+cp $satinfo  ./satinfo
+cp $pcpinfo  ./pcpinfo
+cp $ozinfo   ./ozinfo
+cp $convinfo ./convinfo
+
+##############################################################
+# Get prepbufr file and satellite radiances
+###############################################################
+
+cp $COMIN/${RUN}.t${cyc}z.1bhrs2.${tmmark}.bufr_d $DATA/hirs2bufr
+cp $COMIN/${RUN}.t${cyc}z.1bhrs3.${tmmark}.bufr_d $DATA/hirs3bufr
+cp $COMIN/${RUN}.t${cyc}z.1bhrs4.${tmmark}.bufr_d $DATA/hirs4bufr
+cp $COMIN/${RUN}.t${cyc}z.1bmsu.${tmmark}.bufr_d  $DATA/msubufr
+cp $COMIN/${RUN}.t${cyc}z.1bamua.${tmmark}.bufr_d $DATA/amsuabufr
+cp $COMIN/${RUN}.t${cyc}z.1bamub.${tmmark}.bufr_d $DATA/amsubbufr
+cp $COMIN/${RUN}.t${cyc}z.1bmhs.${tmmark}.bufr_d $DATA/mhsbufr
+
+cp $COMIN/${RUN}.t${cyc}z.radwnd.${tmmark}.bufr_d $DATA/radarbufr
+cp $COMIN/${RUN}.t${cyc}z.nexrad.${tmmark}.bufr_d $DATA/l2rwbufr
+
+TM12=`/nwprod/util/exec/ndate -12 $CYCLE`
+TM06=`/nwprod/util/exec/ndate -06 $CYCLE`
+
+yyyymmdd=`echo $CYCLE | cut -c 1-8`
+hh=`echo $CYCLE | cut -c 9-10`
+
+yyyymmddm12=`echo $TM12 | cut -c 1-8`
+hh12=`echo $TM12 | cut -c 9-10`
+yyyymmddm06=`echo $TM06 | cut -c 1-8`
+
+case $cyc in
+ 00) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t00z.satbias.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t18z.satbias.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t12z.satbias.tm03;;
+ 06) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t06z.satbias.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t00z.satbias.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t18z.satbias.tm03;;
+ 12) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t12z.satbias.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t06z.satbias.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t00z.satbias.tm03;;
+ 18) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t18z.satbias.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t12z.satbias.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t06z.satbias.tm03;;
+esac
+
+if [ -s $bias1 ]
+then
+    cp $bias1 $DATA/satbias_in
+else
+   if [ -s $bias2 ]
+   then
+      cp $bias2 $DATA/satbias_in
+   else
+      if [ -s $bias3 ]
+      then
+         cp $bias3 $DATA/satbias_in
+      else
+         cp /nwges/${envir}/ndas.hold/satbias_in $DATA/satbias_in
+      fi
+   fi
+fi
+
+##########################################################
+
+case $cyc in
+ 00) ang1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t00z.satang.tm03
+     ang2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t18z.satang.tm09
+     ang3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t12z.satang.tm03;;
+ 06) ang1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t06z.satang.tm03
+     ang2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t00z.satang.tm09
+     ang3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t18z.satang.tm03;;
+ 12) ang1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t12z.satang.tm03
+     ang2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t06z.satang.tm09
+     ang3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t00z.satang.tm03;;
+ 18) ang1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t18z.satang.tm03
+     ang2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t12z.satang.tm09
+     ang3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t06z.satang.tm03;;
+esac
+
+if [ -s $ang1 ]
+then
+    cp $ang1 $DATA/satbias_angle
+else
+   if [ -s $ang2 ]
+   then
+      cp $ang2 $DATA/satbias_angle
+   else
+      if [ -s $ang3 ]
+      then
+         cp $ang3 $DATA/satbias_angle
+      else
+         cp /nwges/${envir}/ndas.hold/satbias_angle $DATA/satbias_angle
+      fi
+   fi
+fi
+
+#################################################################
+
+export pgm=nam_gsi
+. prep_step
+
+startmsg
+$EXECnam/nam_gsi < gsiparm.anl >> $pgmout 2>errfile
+export err=$?;err_chk
+
+mv fort.201 fit_p1
+mv fort.202 fit_w1
+mv fort.203 fit_t1
+mv fort.204 fit_q1
+mv fort.205 fit_pw1
+mv fort.207 fit_rad1
+mv fort.209 fit_rw1
+
+cat fit_p1 fit_w1 fit_t1 fit_q1 fit_pw1 fit_rad1 fit_rw1 > $COMOUT/${RUN}.${cycle}.fits.${tmmark}
+
+#copy 00hr restart file to nwges 
+
+if [ $GUESS = GDAS ] ; then
+   mv wrf_inout $GESDIR/${RUN}.t${cyc}z.wrfinput_anl.${tmmark}
+else
+   mv wrf_inout $GESDIR/${RUN}.t${cyc}z.wrfrst_anl.${tmmark}
+fi
+
+cp satbias_out $COMOUT/${RUN}.t${cyc}z.satbias.${tmmark}
+cp satbias_out /nwges/${envir}/ndas.hold/satbias_in
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_satbias $job $COMOUT/${RUN}.t${cyc}z.satbias.${tmmark}
+fi
+
+################################################################################
+#  Update angle dependent bias
+loops="01 03"
+for loop in $loops; do
+
+#  Collect diagnostic files for obs types (groups) below
+list="hirs2_n14 msu_n14 sndr_g08_prep sndr_g10_prep sndr_g12_prep sndrd1_g08 sndrd2_g08 \
+      sndrd3_g08 sndrd4_g08 sndrd1_g10 sndrd2_g10 sndrd3_g10 sndrd4_g10 sndrd1_g12 sndrd2_g12 \
+      sndrd3_g12 sndrd4_g12 hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 amsub_n15 \
+      amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua goesimg_g08 goesimg_g10 goesimg_g12 \
+      ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 amsua_n18 mhs_n18 amsre_low_aqua amsre_mid_aqua \
+      amsre_hig_aqua ssmis_las_f16 ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16"
+
+for type in $list; do
+      count=`ls ${tmpdir}/${type}_${loop}* | wc -l`
+      if [[ count -gt 0 ]]; then
+         cat ${tmpdir}/${type}_${loop}.* > ${tmpdir}/diag_${type}_${loop}.${SDATE}
+         if [[ "$loop" = "01" ]]; then
+            mv ${tmpdir}/diag_${type}_${loop}.${SDATE} ${tmpdir}/diag_${type}_ges.${SDATE}
+         elif [[ "$loop" = "03" ]]; then
+            mv ${tmpdir}/diag_${type}_${loop}.${SDATE} ${tmpdir}/diag_${type}_anl.${SDATE}
+         else
+            mv ${tmpdir}/diag_${type}_${loop}.${SDATE} ${tmpdir}/diag_${type}_${loop}.${SDATE}
+         fi
+      fi
+   done
+done
+
+ANGUPDATEXEC=$EXECnam/nam_global_angupdate
+
+# local input files assumed to already exist are
+
+cp ./satbias_angle ./satbias_ang.in
+
+list="hirs2_n14 msu_n14 sndr_g08_prep sndr_g10_prep sndr_g12_prep sndrd1_g08 \
+      sndrd2_g08 sndrd3_g08 sndrd4_g08 sndrd1_g10 sndrd2_g10 sndrd3_g10 sndrd4_g10 \
+      sndrd1_g12 sndrd2_g12 sndrd3_g12 sndrd4_g12 hirs3_n15 hirs3_n16 hirs3_n17 \
+      amsua_n15 amsua_n16 amsua_n17 amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua \
+      amsua_aqua goesimg_g08 goesimg_g10 goesimg_g12 ssmi_f13 ssmi_f14 ssmi_f15 hirs4_n18 \
+      amsua_n18 mhs_n18 amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_las_f16 \
+      ssmis_uas_f16 ssmis_img_f16 ssmis_env_f16"
+
+for type in $list; do
+   ln -fs ${tmpdir}/diag_${type}_ges.$SDATE  ./diag_${type}.$SDATE
+done
+
+# output files created by program are
+#   stdout.global_angupdate - not saved
+#   $SATANGO = ./satbias_ang.out
+
+iy=$(echo $SDATE|cut -c1-4)
+im=$(echo $SDATE|cut -c5-6)
+id=$(echo $SDATE|cut -c7-8)
+ih=$(echo $SDATE|cut -c9-10)
+
+cat <<EOF> input
+ &SETUP
+  jpch=592,nstep=90,nsize=1,wgtang=0.008333333,wgtlap=0.0,
+  iuseqc=1,dtmax=1.0,
+  iyy1=${iy},imm1=${im},idd1=${id},ihh1=${ih},
+  iyy2=${iy},imm2=${im},idd2=${id},ihh2=${ih},
+  dth=06,ndat=29
+ /
+ &OBS_INPUT
+  dtype(01)='hirs2',     dplat(01)='n14',       dsis(01)='hirs2_n14',
+  dtype(02)='hirs3',     dplat(02)='n16',       dsis(02)='hirs3_n16',
+  dtype(03)='hirs3',     dplat(03)='n17',       dsis(03)='hirs3_n17',
+  dtype(04)='hirs4',     dplat(04)='n18',       dsis(04)='hirs4_n18',
+  dtype(05)='sndr',      dplat(05)='g10_prep',  dsis(05)='sndr_g10',
+  dtype(06)='sndr',      dplat(06)='g12_prep',  dsis(06)='sndr_g12',
+  dtype(07)='goesimg',   dplat(07)='g10',       dsis(07)='goesimg_g10',
+  dtype(08)='goesimg',   dplat(08)='g12',       dsis(08)='goesimg_g12',
+  dtype(09)='airs',      dplat(09)='aqua',      dsis(09)='airs281SUBSET_aqua',
+  dtype(10)='msu',       dplat(10)='n14',       dsis(10)='msu_n14',
+  dtype(11)='amsua',     dplat(11)='n15',       dsis(11)='amsua_n15',
+  dtype(12)='amsua',     dplat(12)='n16',       dsis(12)='amsua_n16',
+  dtype(13)='amsua',     dplat(13)='n17',       dsis(13)='amsua_n17',
+  dtype(14)='amsua',     dplat(14)='n18',       dsis(14)='amsua_n18',
+  dtype(15)='amsua',     dplat(15)='aqua',      dsis(15)='amsua_aqua',
+  dtype(16)='amsub',     dplat(16)='n15',       dsis(16)='amsub_n15',
+  dtype(17)='amsub',     dplat(17)='n16',       dsis(17)='amsub_n16',
+  dtype(18)='amsub',     dplat(18)='n17',       dsis(18)='amsub_n17',
+  dtype(19)='mhs',       dplat(19)='n18',       dsis(19)='mhs_n18',
+  dtype(20)='ssmi',      dplat(20)='f13',       dsis(20)='ssmi_f13',
+  dtype(21)='ssmi',      dplat(21)='f14',       dsis(21)='ssmi_f14',
+  dtype(22)='ssmi',      dplat(22)='f15',       dsis(22)='ssmi_f15',
+  dtype(23)='amsre_low', dplat(23)='aqua',      dsis(23)='amsre_aqua',
+  dtype(24)='amsre_mid', dplat(24)='aqua',      dsis(24)='amsre_aqua',
+  dtype(25)='amsre_hig', dplat(25)='aqua',      dsis(25)='amsre_aqua',
+  dtype(26)='ssmis_las', dplat(26)='f16',       dsis(26)='ssmis_f16',
+  dtype(27)='ssmis_uas', dplat(27)='f16',       dsis(27)='ssmis_f16',
+  dtype(28)='ssmis_img', dplat(28)='f16',       dsis(28)='ssmis_f16',
+  dtype(29)='ssmis_env', dplat(29)='f16',       dsis(29)='ssmis_f16',
+ /
+EOF
+
+export pgm=nam_global_angupdate
+. prep_step
+
+startmsg
+$EXECnam/nam_global_angupdate < input >> $pgmout 2>errfile
+export err=$?;err_chk
+
+cp satbias_ang.out $COMOUT/${RUN}.t${cyc}z.satang.${tmmark}
+cp satbias_ang.out /nwges/${envir}/ndas.hold/satbias_angle
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+echo EXITING $0 with return code $err
+exit $err
+
+

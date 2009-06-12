@@ -1,0 +1,205 @@
+#!/bin/sh
+
+#####################################################################
+echo "NAM Post-processing -- Fax charts   exnam_fax.sh.sms  "
+echo "History: Oct 2004 - First implementation of this new script."
+echo "History: Sept 2005 - converted fax graphics to T4 format and"
+echo "sent products to TOC via the NTC              "
+echo "History: Jan 2006 - Removed 1:20 NA lagacy fax graphic."
+echo "History: MAY 2006 - Removed 1:40 NA lagacy fax graphic."
+echo "History: Jan 2007 - Removed 1:40 NA 500mb Hgts/Vort graphic"
+echo "History: APR 2008 - Removed the following postscript graphics"
+echo "as requested by the SDM:  fm2dot_00HR_850MB_HGT_TMP;"
+echo "fm2dot_00HR_700MB_HGT_TMP; fm2dot_00HR_500MB_HGT_TMP;"
+echo "fm2dot_00HR_300MB_HGT_ISO; fm2dot_00HR_200MB_HGT_ISO;"
+echo "fm2dot_00HR_250MB_HGT_ISO; fm2dot_00HR_100MB_HGT_ISO;"
+echo "and, rg250plt_250MB_plotted_data"
+#####################################################################
+
+#####################################################################
+#
+# START FLOW OF CONTROL
+#
+# 1) Generate NA Upper Air Plot for AFOS
+# 2) Run AWPUPAIR to generate upper airplot files for AWIPS.
+# 3) Generate 250mb heights/isotachs chart
+# 4) Make NAM CGRID Fax charts
+#####################################################################
+
+set -x
+msg="Begin job for $job"
+postmsg "$jlogfile" "$msg"
+
+#####################################################################
+
+cd $DATA
+fhr=$1
+
+if [ $fhr -eq 00 ]
+then
+
+###########################################################
+# Now create North American upper air plot files for AFOS.
+###########################################################
+
+   # First run plotvpap.sh to generate Label Tape:
+   plottype=ft15
+   region=""
+   plotparm='NUMF=07,CARD=ON,AFOS=ON,SEND=ON,TSW1=ON,TSW2=ON,MARG=ON'
+   sh $USHutil/plotvpap.sh "$plottype" "$plotparm" "$region"
+
+   # Then run uppafos to generate the AFOS PLOT file
+   pgm="upaafos"
+   export pgm;. prep_step
+
+   AFOSPLOT=afos.nam.upa
+   echo $cyc > upaafos.input
+
+   cp $FIXgraph/graph_pillist1 graph_pillist1
+
+   export XLFUNIT_17="graph_pillist1"
+   export XLFUNIT_19="nam.${PDY}${cyc}.upaprep"
+   export XLFUNIT_20="nam.${PDY}${cyc}.aircft"
+   export XLFUNIT_21="nam.${PDY}${cyc}.satwnd"
+   export XLFUNIT_24="$AFOSPLOT"
+
+   startmsg
+   $EXECgraph/upaafos >> $pgmout < upaafos.input  2> errfile
+   err=$?;export err; err_chk
+
+   if test $SENDDBN = 'YES'
+   then
+     cp $AFOSPLOT $pcom/$AFOSPLOT.${job}
+     $DBNROOT/bin/dbn_alert AFOS nam $job $pcom/$AFOSPLOT.${job}
+   fi
+
+##########################################
+# NOW RUN THE awpupair FILE MAKER
+##########################################
+   pgm="upawips"
+   export pgm;. prep_step
+
+   AWPLOT=awplot.nam.upa
+
+   export XLFUNIT_17="graph_pillist1"
+   export XLFUNIT_19="nam.${PDY}${cyc}.upaprep"
+   export XLFUNIT_20="nam.${PDY}${cyc}.aircft"
+   export XLFUNIT_21="nam.${PDY}${cyc}.satwnd"
+   export XLFUNIT_24="$AWPLOT"
+
+   startmsg
+   $EXECgraph/upawips >> $pgmout < upaafos.input  2> errfile
+   err=$?;export err; err_chk
+
+   if test $SENDCOM = 'YES'
+   then
+     cp $AWPLOT $pcom/$AWPLOT.${job}
+   fi
+
+   cp $PARMgraph/graph_awpupair.${model}.control awpupair.${model}.control
+
+   pgm="awpupair"
+   export pgm;. prep_step
+
+   export XLFUNIT_7="awpupair.${model}.control"
+   export XLFUNIT_18="$AWPLOT"
+   export XLFUNIT_51="awipplot.file"
+  
+   startmsg
+   $EXECgraph/awpupair PARM="P" >> $pgmout 2>errfile
+   err=$?;export err; err_chk
+
+   AWIPPLOT=awip.nam.upa
+   cp $FIXgraph/graph_awiplist awiplist
+   cp $PARMgraph/graph_awpsndal awpsndal
+
+   pgm="plotsend"
+   export pgm;. prep_step
+
+   export XLFUNIT_12="awiplist"
+   export XLFUNIT_15="awpsndal"
+   export XLFUNIT_13="awipplot.file"
+   export XLFUNIT_51="$AWIPPLOT"
+
+   startmsg
+   $EXECgraph/plotsend >> $pgmout 2>errfile
+   err=$?;export err; err_chk
+
+   if [ $SENDCOM = "YES" ] ; then
+     cp $AWIPPLOT $pcom/$AWIPPLOT.${job}
+     if test $SENDDBN = 'YES'
+     then
+        $utilities/make_ntc_bull.pl plot WMO KWBC NONE $DATA/$AWIPPLOT $pcom/$AWIPPLOT.$job
+     fi
+   fi
+
+   #################################################################
+   # This step invoke faxmakr to combine observation plot data with
+   #  contour together.
+   #################################################################
+
+   hour=$fhr
+   FAXOUT=fm2dotfx.${cyc}
+   FAXPARM=graph_faxmakr.fm2dotfx.${model}_${cycle}
+   SENDKEY=fax.fm2dotfx
+   PLOTTAPE=OLDlabel55
+
+   jobn=nam_fax_f${hour}_${cyc}
+   sh $utilscript/mkfaxb.sh "$hour" $FAXPARM $FAXOUT $SENDKEY $PLOTTAPE
+
+##########################################################################
+ FM2D01_p FM2D02_p FM2D03_p FM2D04_p FM2D05_p FM2D06_p FM2D07_p
+ The above postscript graphics were removed as requested by the SDM.
+##########################################################################
+
+   for KEYW in FM2D01_g FM2D001 FM2D02_g FM2D002 FM2D03_g FM2D003 FM2D05_g FM2D005 FM2D06_g FM2D07_g
+   do
+
+   grep $KEYW $FIXutil/identifyfax.tbl | read Keyword sub00 sub06 sub12 sub18 gif toc prt lprt name
+
+  if [ ${cyc} = '00' ]; then submn=$sub00; fi
+  if [ ${cyc} = '12' ]; then submn=$sub12; fi
+
+  export FAXOUT submn name Keyword gif toc prt jobn lprt
+  $utilscript/mk_graphics.sh
+
+  done
+
+  if [ ${cyc} = '00' ];
+  then
+
+   for KEYW in FM2D04_g FM2DA04
+   do
+
+ grep $KEYW $FIXutil/identifyfax.tbl | read Keyword sub00 sub06 sub12 sub18 gif toc prt lprt name
+
+   submn=$sub00
+
+   export FAXOUT submn name Keyword gif toc prt jobn lprt
+  $utilscript/mk_graphics.sh
+
+   done
+   fi
+
+   if [ ${cyc} = '12' ];
+   then
+
+   KEYW=FM2D04_g
+
+    grep $KEYW $FIXutil/identifyfax.tbl | read Keyword sub00 sub06 sub12 sub18 gif toc prt lprt name
+
+   submn=$sub12
+
+   export FAXOUT submn name Keyword gif toc prt jobn lprt
+   $utilscript/mk_graphics.sh
+
+   fi
+
+ fi
+
+#####################################################################
+# GOOD RUN
+set +x
+echo "**************JOB $job COMPLETED NORMALLY"
+set -x
+#####################################################################

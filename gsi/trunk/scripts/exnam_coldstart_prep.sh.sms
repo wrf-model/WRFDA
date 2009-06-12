@@ -1,0 +1,167 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_coldstart_wrfsi.sh.sms 
+# Script description:  Runs WRF standard initialization (SI) from GDAS first guess input 
+#                      to coldstart WRF-NMM NDAS
+#
+# Author:        Eric Rogers       Org: NP22         Date: 2004-07-02
+#
+# Script history log:
+# 2006-02-01  Eric Rogers - Based on HIRESW script
+
+set -x
+
+msg="JOB $job FOR WRF-NMM HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+mod=AVN
+LENGTH=3
+
+export DOMNAM=nam
+
+#
+# Get needed variables from exnam_prelim.sh.sms
+#
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+DATAROOT=$DATA
+chmod 755 $DATAROOT
+cd $DATAROOT
+rm *done*
+
+PERINSTALLROOT=$HOMEnam
+INSTALLROOT=$HOMEnam
+DATAROOT_GRIB=$DATA/wrfsi
+mkdir -p $DATA/wrfsi
+mkdir -p $DATAROOT_GRIB/extdata
+mkdir -p $DATAROOT_GRIB/log
+mkdir -p $DATAROOT_GRIB/GEOG
+mkdir -p $DATAROOT_GRIB/extprd
+mkdir -p $DATAROOT_GRIB/static
+mkdir -p $DATAROOT_GRIB/work
+PEREROOT=$HOMEnam
+
+mkdir -p cdl
+mkdir -p static
+
+cp $PARMnam/nam_wrfsi.rotlat.cdl $DATAROOT/cdl/wrfsi.rotlat.cdl
+cp $FIXnam/nam_static.wrfsi.rotlat_nonetcdf $DATAROOT/static/static.wrfsi.rotlat_nonetcdf
+
+cp $PARMnam/nam_wrf.nl $DATAROOT/static/wrf.nl
+
+cp /com/date/t${cyc}z .
+cp t${cyc}z nmcdate
+
+PDY=`cat nmcdate | cut -c7-14`
+yy=`cat nmcdate | cut -c7-10`
+mm=`cat nmcdate | cut -c11-12`
+dd=`cat nmcdate | cut -c13-14`
+cyc=`cat nmcdate | cut -c15-16`
+
+CYCLEgdas=`/nwprod/util/exec/ndate -06 ${CYCLE}`
+
+echo DATEXX${CYCLEgdas} > gdasdate
+cycgdas=`cut -c 15-16 gdasdate`
+
+whr=06
+count=0
+last=09
+incr=3
+
+while [ $whr -le $last ]
+do
+
+mkdir -p $DATA/wrfsibeta/avn
+RAWDIR=$DATA/wrfsibeta/avn
+cp $COMIN/gdas1mb.t${cycgdas}z.pgbf${whr} $DATA/wrfsibeta/avn/.
+err1=$?
+
+if [ $err1 -ne 0 ] 
+then
+  err_exit "$whr input GRIB file not found.  FATAL ERROR"
+fi
+
+whr=`expr $whr + $incr`
+
+if [ $whr -lt 10 ]
+then
+whr=0$whr
+fi
+
+done
+
+#DATE=`cat gdasdate | cut -c7-14`
+
+### Added by Julia
+CYCLEDATE=$PDY$cyc
+
+pwd
+
+$USHnam/nam_grib_prep.pl -i $INSTALLROOT -d $DATAROOT_GRIB -r $RAWDIR -l $LENGTH -s $CYCLEDATE -t 3 $mod
+
+#
+# Release the WRF-SI jobs on SMS
+#
+
+$SMSBIN/setev release_wrfsi
+
+# wait for all WRF-SI code to finish to proceed
+
+icnttest=1
+itestbrk=2
+
+ic=0
+
+while [ $ic -lt 1000 ] ; do
+
+ icntb=1
+ itest=1
+ while [ $icntb -le $icnttest ] ; do
+  ls -l $DATA/wrfsidone.$icntb
+  err1=$?
+  if [ $err1 -eq 0 ] ; then
+   let "itest=itest+1"
+  fi
+  let "icntb=icntb+1"
+ done
+
+ if [ $itest -eq $itestbrk ] ; then
+   break
+ else
+   let "ic=ic+1"
+   sleep 10
+ fi
+
+ if [ $ic -ge 1000 ] ; then
+  exit 1
+ fi
+ 
+done
+
+year=`echo $DATE | cut -c1-4`
+count=`ls $DATAROOT/real* | wc -l`
+
+echo INITIAL count is $count
+
+countck=3
+
+while [ $count -lt $countck ]
+do
+sleep 20
+count=`ls $DATAROOT/real* | wc -l`
+echo $count now
+done
+
+## bonus sleep to make sure file is completely copied to the siprd dir
+sleep 15
+
+cat $DATA/*hinterp > $COMOUT/nam.t${cyc}z.hinterp.log
+cat $DATA/*vinterp > $COMOUT/nam.t${cyc}z.vinterp.log
+cat $DATA/*wrfprep > $COMOUT/nam.t${cyc}z.wrfprep.log
+
+msg="JOB $job FOR WRF-NMM HAS COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+exit

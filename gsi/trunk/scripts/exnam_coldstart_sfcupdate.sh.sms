@@ -1,0 +1,501 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_coldstart_sfcupdate.sh.sms
+# Script description:  Update sst/snow/sea ice for NDAS run
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: Update WRF-NMM coldstart (wrfinput) file with best
+#           available SST, snow, sea-ice analyses
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-07-30  Brent Gordon  - Modified for production.
+# 2000-03-03  Eric Rogers modified scripts for 60-h NAM forecast
+# 2004-10-14  Julia Zhu	 - NAM/EDAS name changes to NAM/NDAS
+# 2006-01-12  Eric Rogers - Extensive changes for WRF-NMM
+# 2006-08-08  Eric Rogers - Switched SST step to use 0.5 deg RTG_SST file
+#                           sst2dvar_grb_0.5 instead of 1/12th RTG_SST
+#                           due to problems with hi-res SST in Alaska
+
+set -x
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cd $DATA
+
+#
+# Get needed variables from exnam_prelim.sh.sms
+#
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+export DOMAIN=nam
+
+export CYCLE=$PDY$cyc
+TM12=`/nwprod/util/exec/ndate -12 $CYCLE`
+TM09=`/nwprod/util/exec/ndate -09 $CYCLE`
+TM06=`/nwprod/util/exec/ndate -06 $CYCLE`
+TM03=`/nwprod/util/exec/ndate -03 $CYCLE`
+
+echo $CYCLE > date
+yyyymmdd=`cut -c 1-8 date`
+hh=`cut -c 9-10 date`
+
+echo $TM12 > datetm12
+yyyymmddm12=`cut -c 1-8 datetm12`
+hh12=`cut -c 9-10 datetm12`
+SDATE=`cut -c 1-10 datetm12`
+yyyymmddm09=`echo $TM09 | cut -c 1-8`
+yyyymmddm06=`echo $TM06 | cut -c 1-8`
+yyyymmddm03=`echo $TM03 | cut -c 1-8`
+
+cp /com/date/t${cyc}z nmcdate.tm00
+
+cp $GESDIR/nam.t${cyc}z.wrfinput_d01.tm00 wrfinput_d01
+
+CYCLE_TIME=`cat nmcdate.tm00 | cut -c7-16`
+CYCLE_YEAR=`echo $CYCLE_TIME | cut -c1-4`
+CYCLE_MON=`echo $CYCLE_TIME | cut -c5-6`
+CYCLE_DAY=`echo $CYCLE_TIME | cut -c7-8`
+CYCLE_HOUR=`echo $CYCLE_TIME | cut -c9-10`
+
+# How old can the NESDIS snow/ice data and SST data be?  Set the age
+# in hours below.  if older, the snow/ice/sst programs will not run
+# and the sfcupdate code will cycle these fields.  these settings
+# need to be coordinated with the CYCSICE_UPDATE and CYCSST_UPDATE
+# settings.
+
+typeset integer SICE_AGE_IN_HOURS=36    # always a positive number
+typeset integer SST_AGE_IN_HOURS=36    # always a positive number
+typeset integer AFWA_AGE_IN_HOURS=48
+
+typeset -L8 OLD_DATE_8
+typeset -L8 CHKDATE
+
+#---------------------------------------------------------------------
+#  FIXED_DIR holds the land/sea mask file and other fixed files for the domain.
+#---------------------------------------------------------------------
+
+FIXED_DIR=$FIXnam
+WORK_DIR=$DATA
+
+domain="nam"
+
+NDATE=/nwprod/util/exec/ndate
+WGRIB=/nwprod/util/exec/wgrib
+
+#---------------------------------------------------------------------
+# RUN SNOW AND SEA ICE PROGRAMS
+#
+# nesdis snow/ice data is available at 23Z the previous day, so run
+# programs for 00z cycle.
+#
+# snow program is run first.
+#
+# When cold starting NDAS update SST, snow, sea-ice regardless of 
+# tm12 valid time so comment out next test
+#---------------------------------------------------------------------
+
+##if [[ $CYCLE_HOUR = $CYCSICE_UPDATE ]]
+##then
+
+  OLD_DATE_SICE=`$NDATE -$SICE_AGE_IN_HOURS $CYCLE_TIME`  # if date in nesdis
+                                                          # grib header is
+                                                          # older than this
+                                                          # date, don't run.
+  OLD_DATE_8=$OLD_DATE_SICE
+  CHKDATE=$CYCLE_TIME
+                                                                                                                                                                                                 
+  NESDIS_FILE_NAME="imssnow96.grb"
+
+#---------------------------------------------------------------------
+# see if nesdis ims data exists.  loop back in time according
+# to value of SICE_AGE_IN_HOURS.
+#---------------------------------------------------------------------
+   
+  while (($CHKDATE >= $OLD_DATE_8)) ; do
+    NESDIS_DIR="/dcom/us007003/${CHKDATE}/wgrbbul"
+    NESDIS_FILE=${NESDIS_DIR}/${NESDIS_FILE_NAME}
+    if [[ -s $NESDIS_FILE ]]
+    then
+      break
+    fi
+    CHKDATE=`$NDATE -24 ${CHKDATE}00`
+  done
+
+#---------------------------------------------------------------------
+# nesdis ims data exists.  check date in grib header.  if ims data
+# is old, dont run program.
+#---------------------------------------------------------------------
+
+  if [[ -s $NESDIS_FILE ]]
+  then
+
+    TEMP_DATE=`$WGRIB -4yr $NESDIS_FILE | head -1`
+    typeset -L10 NESDIS_GRIB_DATE
+    NESDIS_GRIB_DATE=${TEMP_DATE#*:d=}
+
+    if ((NESDIS_GRIB_DATE >= OLD_DATE_SICE))   # current data exists.
+    then                                       # run program.
+
+#---------------------------------------------------------------------
+#     now, search for afwa data.
+#---------------------------------------------------------------------
+
+      CHKDATE=${CYCLE_TIME}
+      OLD_DATE_AFWA=`$NDATE -${AFWA_AGE_IN_HOURS} $CYCLE_TIME`
+      OLD_DATE_8=$OLD_DATE_AFWA
+      AFWA_NH_FILE_NAME="PRD.SPPROD.SNODEPH.NHMAMAP"
+      AFWA_SH_FILE_NAME="PRD.SPPROD.SNODEPH.SHMAMAP"
+      AFWA_NH_FILE=""
+      AFWA_SH_FILE=""
+
+      while ((CHKDATE >= OLD_DATE_8)) ; do
+        AFWA_DIR="/dcom/us007003/${CHKDATE}/wgrdbul/"
+        if [[ (-s ${AFWA_DIR}/${AFWA_NH_FILE_NAME}) && \
+              (-s ${AFWA_DIR}/${AFWA_SH_FILE_NAME}) ]]
+        then
+          AFWA_NH_FILE=${AFWA_DIR}/${AFWA_NH_FILE_NAME}
+          AFWA_SH_FILE=${AFWA_DIR}/${AFWA_SH_FILE_NAME}
+          break
+        fi
+        CHKDATE=`$NDATE -24 ${CHKDATE}00`
+      done
+
+      if [[ ! -n ${AFWA_NH_FILE}  && \
+            ! -n ${AFWA_SH_FILE}  ]]
+      then
+        echo NO AFWA DATA AVAILABLE.  RUN PROGRAM ANYWAY.
+      fi
+     
+      SNOW_EXEC=/nwprod/exec/snow2mdl
+
+      cat > ${WORK_DIR}/fort.81 << !
+      &source_data
+       nesdis_snow_file="${NESDIS_FILE}"
+       nesdis_lsmask_file=""
+       afwa_snow_nh_file="${AFWA_NH_FILE}"
+       afwa_snow_sh_file="${AFWA_SH_FILE}"
+       afwa_lsmask_nh_file="${FIXED_DIR}/nam_afwa_geography_nh_8"
+       afwa_lsmask_sh_file="${FIXED_DIR}/nam_afwa_geography_sh_8"
+      /
+      &model_specs
+       model_lat_file="${FIXED_DIR}/nam_hpnt_latitudes.grb"
+       model_lon_file="${FIXED_DIR}/nam_hpnt_longitudes.grb"
+       model_lsmask_file="${FIXED_DIR}/nam_slmask.grb"
+      /
+      &output_data
+       model_snow_file="${WORK_DIR}/snow.${CYCLE_TIME}.${DOMAIN}.grb"
+      /
+      &output_grib_time
+       grib_year=$CYCLE_YEAR
+       grib_month=$CYCLE_MON
+       grib_day=$CYCLE_DAY
+       grib_hour=$CYCLE_HOUR
+      /
+      &parameters
+       lat_threshold=55.0
+       min_snow_depth=0.025
+       snow_cvr_threshold=50.0
+      /
+      &glacial
+       glacier_file="${GLACIAL_FILE}"
+       snow_depth_antarctica=9999.0
+       snow_depth_greenland=9999.0
+      /
+!
+      export pgm=snow2mdl
+      . prep_step
+#
+      startmsg
+      ${SNOW_EXEC} >> $pgmout 2>errfile
+      export err=$?
+#---------------------------------------------------------------------
+#     if there is a problem in the program, don't need to abort.
+#     the sfcupdate program will run with no new snow analysis,
+#     but we want the logs to know about it!
+#---------------------------------------------------------------------
+      if [ $err -ne 0 ]
+      then
+        msg=" ABNORMAL TERMINATION IN $pgm : run without new snow analysis"
+      else
+        msg="$pgm completed normally"
+        cp ${WORK_DIR}/snow.${CYCLE_TIME}.${DOMAIN}.grb $COMOUT/nam.t${cyc}z.snowanl.grb
+      fi
+      sh $utilscript/postmsg.sh "$jlogfile" "$msg"
+
+      rm ${WORK_DIR}/fort.81
+
+#---------------------------------------------------------------------
+#     now run ice program
+#---------------------------------------------------------------------
+ 
+      cat > ${WORK_DIR}/fort.81 << !
+       &global_src
+        input_global_src_file=""
+        input_global_src_lsmask_file=""
+       /
+       &nesdis_src
+        input_nesdis_src_file="${NESDIS_FILE}"
+        input_nesdis_src_lsmask_file=""
+       /
+       &model_specs
+        model_lat_file="${FIXED_DIR}/nam_hpnt_latitudes.grb"
+        model_lon_file="${FIXED_DIR}/nam_hpnt_longitudes.grb"
+        model_lsmask_file="${FIXED_DIR}/nam_slmask.grb"
+       /
+       &output
+        output_file="${WORK_DIR}/seaice.${CYCLE_TIME}.${DOMAIN}.grb"
+       /
+       &output_grib_time
+        grib_year=$CYCLE_YEAR
+        grib_month=$CYCLE_MON
+        grib_day=$CYCLE_DAY
+        grib_hour=$CYCLE_HOUR
+       /
+!
+      export pgm=nam_ice2mdl
+      . prep_step
+#
+      startmsg
+      $EXECnam/nam_ice2mdl >> $pgmout 2>errfile
+      export err=$?
+#---------------------------------------------------------------------
+#     if there is a problem in the program, don't need to abort.
+#     the sfcupdate program will run with no new sea ice analysis,
+#     but we want the logs to know about it!
+#---------------------------------------------------------------------
+      if [ $err -ne 0 ]
+      then
+        msg=" ABNORMAL TERMINATION IN $pgm : run without new sea-ice analysis"
+      else
+        msg="$pgm completed normally"
+        cp ${WORK_DIR}/seaice.${CYCLE_TIME}.${DOMAIN}.grb $COMOUT/nam.t${cyc}z.seaiceanl.grb
+      fi
+      sh $utilscript/postmsg.sh "$jlogfile" "$msg"
+                                                                                                  
+      rm ${WORK_DIR}/fort.81
+
+   fi  # nesdis file is current
+  fi # nesdis file exists
+#fi # is cycle hour = 00Z
+
+#---------------------------------------------------------------------
+# RUN SST PROGRAM.  data are usually available by 22:30z.
+#---------------------------------------------------------------------
+#
+# When cold starting NDAS update SST, snow, sea-ice regardless of
+# tm12 valid time so comment out next check
+#---------------------------------------------------------------------
+
+##if [[ $CYCLE_HOUR = $CYCSST_UPDATE ]]
+##then
+
+  OLD_DATE_SST=`$NDATE -${SST_AGE_IN_HOURS} $CYCLE_TIME`
+  OLD_DATE_8=$OLD_DATE_SST
+  CHKDATE=$CYCLE_TIME
+  SST_GLOBAL_FILE_NAME="sst2dvar_grb_0.5"
+# SST_GLOBAL_FILE_NAME="rtgssthr_grb_0.083"
+
+  while ((CHKDATE >= OLD_DATE_8)) ; do
+     SST_DIR="/com/gfs/prod/sst.${CHKDATE}"
+     SST_GLOBAL_FILE=${SST_DIR}/${SST_GLOBAL_FILE_NAME}
+     if [[ -s $SST_GLOBAL_FILE ]]
+     then
+       echo FOUND GLOBAL SST FILE
+       break
+     fi
+     CHKDATE=`$NDATE -24 ${CHKDATE}00`
+  done
+
+  if [[ -s $SST_GLOBAL_FILE ]]
+  then
+
+    TEMP_DATE=`$WGRIB -4yr $SST_GLOBAL_FILE | head -1`
+    typeset -L10 SST_GRIB_DATE
+    SST_GRIB_DATE=${TEMP_DATE#*:d=}
+         
+    if ((SST_GRIB_DATE >= OLD_DATE_SST))   # current data exists.
+    then                                   # run program.
+         
+       echo GLOBAL SST DATA CURRENT
+         
+       SST_REG_FILE_NAME="sst2dvar.t12z.nam_grid"
+       SST_REG_FILE=""   # hi-res regional data is optional
+                         # set to zero length string to not use
+         
+       CHKDATE=$CYCLE_TIME
+       while ((CHKDATE >= OLD_DATE_8)) ; do
+          SST_DIR="/com/gfs/prod/sst.${CHKDATE}"
+          if [[ -s ${SST_DIR}/${SST_REG_FILE_NAME} ]]
+          then
+            SST_REG_FILE="${SST_DIR}/${SST_REG_FILE_NAME}"
+            break
+          fi
+          CHKDATE=`$NDATE -24 ${CHKDATE}00`
+       done
+
+       if [[ ! -n $SST_REG_FILE ]]
+       then
+         echo NO REGIONAL SST DATA AVAILABLE. RUN PROGRAM ANYWAY.
+       else
+         echo REGIONAL SST DATA AVAILABLE.
+       fi
+
+      cat > ${WORK_DIR}/fort.81 << !
+      &source_data
+       input_src_file="${SST_GLOBAL_FILE}"
+       input_src14km_file="${SST_REG_FILE}"
+      /
+      &model_specs
+       model_lat_file="${FIXED_DIR}/nam_hpnt_latitudes.grb"
+       model_lon_file="${FIXED_DIR}/nam_hpnt_longitudes.grb"
+       model_lsmask_file="${FIXED_DIR}/nam_slmask.grb"
+      /
+      &output_data
+       output_file="${WORK_DIR}/sst.${CYCLE_TIME}.${DOMAIN}.grb"
+      /
+      &parameters
+       climo_4_salt_lake=.true.
+      /
+!
+      export pgm=nam_sst2mdl
+      . prep_step
+#
+      startmsg
+      $EXECnam/nam_sst2mdl >> $pgmout 2>errfile
+      export err=$?
+
+#---------------------------------------------------------------------
+#     if there is a problem in the program, don't need to abort.
+#     the sfcupdate program will run with no new sst analysis,
+#     but we want the logs to know about it!
+#---------------------------------------------------------------------
+      if [ $err -ne 0 ]
+      then
+        msg=" ABNORMAL TERMINATION IN $pgm : run without new sst analysis"
+      else
+        msg="$pgm completed normally"
+        cp ${WORK_DIR}/sst.${CYCLE_TIME}.${DOMAIN}.grb $COMOUT/nam.t${cyc}z.sstanl.grb
+      fi
+      sh $utilscript/postmsg.sh "$jlogfile" "$msg"
+                                                                                                  
+      rm ${WORK_DIR}/fort.81
+
+    fi # grib header date in global sst file is current
+  fi # sst file exists
+##fi # is cycle hour = 00Z
+
+# Still need to run sfcupdate every cycle to update veg fraction and snowfree albedo
+
+#---------------------------------------------------------------------
+# run surface update program,  will automatically check for the
+# the existance of current sst, seaice and snow data in the rform:.  
+#
+#  $type.$CYCLE_TIME.$DOMAIN.grb
+#
+#  where type=sst, snow, seaice
+#        CYCLE_TIME=tm12 valid time
+#        DOMAIN=nam
+#
+# If these files exist, the code will use them, otherwise, it will cycle first guess
+# values.
+#
+# "first_guess_file" is the input wrf binary file
+# "output_file" is the output wrf binary file (may be the same
+#  as first_guess_file).
+#
+# sst/seaice/snow_depth_anal_dir should be set to the directory
+# where the data from the previous three programs resides.
+#---------------------------------------------------------------------
+
+export DOMAIN=nam
+
+cat > ${WORK_DIR}/fort.81 << !
+ &grid_info
+  domain_name="${DOMAIN}"
+ /
+ &cycle
+  cycle_year=$CYCLE_YEAR
+  cycle_month=$CYCLE_MON
+  cycle_day=$CYCLE_DAY
+  cycle_hour=$CYCLE_HOUR
+  fcst_hour=0.0
+ /
+ &model_flds
+  first_guess_file="${WORK_DIR}/wrfinput_d01"
+ /
+ &fixed_flds
+  lsmask_file="${FIXED_DIR}/nam_slmask.grb"
+ /
+ &time_varying_analysis_flds
+  snowfree_albedo_climo_file="${FIXED_DIR}/nam_snowfree_albedo.grb"
+  greenfrc_climo_file="${FIXED_DIR}/nam_vegfrac.grb"
+  z0_climo_file=""
+  seaice_anal_dir="${WORK_DIR}/"
+  seaice_climo_file=""
+  sst_anal_dir="${WORK_DIR}/"
+  sst_climo_file=""
+  merge_coeff_sst=0.
+  sst_anlcyc_update=.false.
+  soilm_climo_file=""
+  merge_coeff_soilm=99999.
+  snow_depth_anal_dir="${WORK_DIR}/"
+  snow_depth_climo_file=""
+  merge_coeff_snow_depth=0.
+ /
+ &output
+  output_file="${WORK_DIR}/wrfinput_d01"
+ /
+ &settings
+  thinned=.false.
+  nsoil=4
+ /
+
+ &soil_parameters
+  soil_type_src="statsgo"
+  smclow = 0.5
+  smchigh = 3.0
+  smcmax = 0.395, 0.421, 0.434, 0.476, 0.476, 0.439,
+           0.404, 0.464, 0.465, 0.406, 0.468, 0.457,
+           0.464, -9.99,  0.20, 0.421
+  beta =  4.05,  4.26,  4.74,  5.33,  5.33,  5.25,
+          6.77,  8.72,  8.17, 10.73, 10.39, 11.55,
+          5.25, -9.99,  4.05,  4.26
+  psis =  0.0350, 0.0363, 0.1413, 0.7586, 0.7586, 0.3548,
+          0.1349, 0.6166, 0.2630, 0.0977, 0.3236, 0.4677,
+          0.3548,  -9.99, 0.0350, 0.0363
+  satdk = 1.7600e-4, 1.4078e-5, 5.2304e-6, 2.8089e-6, 2.8089e-6,
+          3.3770e-6, 4.4518e-6, 2.0348e-6, 2.4464e-6, 7.2199e-6,
+          1.3444e-6, 9.7394e-7, 3.3770e-6,     -9.99, 1.4078e-5,
+          1.4078e-5
+ /
+ &veg_parameters
+  veg_type_src="usgs"
+  salp = 4.0
+  snup = 0.020, 0.020, 0.020, 0.020, 0.020, 0.020,
+         0.020, 0.020, 0.020, 0.040, 0.040, 0.040,
+         0.040, 0.040, 0.040, 0.010, 0.013, 0.020,
+         0.013, 0.020, 0.020, 0.020, 0.020, 0.013
+ /
+!
+  
+export pgm=nam_sfcupdate
+. prep_step
+#
+startmsg
+$EXECnam/nam_sfcupdate >> $pgmout 2>errfile
+export err=$?;err_chk
+
+rm -f ${WORK_DIR}/fort.81
+
+mv wrfinput_d01 $COMIN/nam.t${cyc}z.wrfinput_d01.ges
+
+#end NAMPART test
+fi
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"

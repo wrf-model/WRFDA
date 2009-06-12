@@ -1,0 +1,60 @@
+#!/bin/make
+#-----------------------------------------------------------------------
+#       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
+#-----------------------------------------------------------------------
+# !IROUTINE: Makefile.conf.Linux
+# 
+# !DESCRIPTION: 
+#	An included local make configuration.  See file Makefile for
+#   detailed `make' procedure.  This shell has been built to override
+#   the default environments (including commands) defined in file 
+#   Makefile.
+#
+#	+ `uname -a` = "OSF1 molotov V3.2 17 alpha"
+#
+# !CALLING SEQUENCE:
+#	% ln -s Makefile.OSF1 Makefile.conf
+#	% make ...
+#
+# !SEE ALSO: Makefile
+#
+# !REVISION HISTORY: (`cvs log <>' for more)
+#       01Oct99 - da Silva      - Linux with PGI version 
+#	02Apr96 - J. Guo	- New make procedure
+# 	21Aug95 - J. Guo	- added the prolog
+#
+#-----------------------------------------------------------------------
+
+# Environments
+# ============
+
+UTDDIR = /usr/people/dasilva/data
+
+SHELL		= /bin/sh
+F77		= lf95
+F90		= lf95
+FC		= $(F90)
+
+FOPT_normal	= -O -fw -Am -X9 -w -CcdRR8 -Kfast,eval,fastlib,auto
+FOPT_indxck	= -O
+FOPT_syntax	= -syntax_only
+
+
+FFLAGS		= $(FOPT_indxck)
+FFLAGS		= $(FOPT_normal)
+
+LD		= $(FC)
+LDFLAGS		= $(FFLAGS) $(LIBdxml_DIR)
+AR		= ar cqs
+RM		= rm -f
+
+CPPFLAGS	= -P -Dunix -D__unix__ 
+F77PPFLAGS	= $(FPPFLAGS) -DLANGUAGE_FORTRAN -D__LANGUAGE_FORTRAN__
+F90PPFLAGS	= $(FPPFLAGS) -DLANGUAGE_FORTRAN_90 -D__LANGUAGE_FORTRAN_90__
+
+LIBpsas_DEPS	= $(LIBpsas_MODS) $(LIBpsas_OBJS)
+LIBsys          = -llapack -lblas
+
+FDP             = fdp   # Fortran make depency script
+
+#.----------------------------------------------------------------------

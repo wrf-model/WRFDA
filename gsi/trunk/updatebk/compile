@@ -1,0 +1,6 @@
+#!/bin/sh -v
+ifort -xW -assume byterecl -traceback -I../gsi_code -I../include/wrfio_int -c save_soil_netcdf_mass.f90
+ifort -xW -assume byterecl -traceback -o save_soil.exe save_soil_netcdf_mass.o /misc/whome/mhu/WRFV3x_DFI/external/io_netcdf/libwrfio_nf.a -L/opt/netcdf/3.6.2-intel-10.1/lib -lnetcdf
+cp save_soil.exe /mnt/tg1/projects/wrfruc/mhu/DOMAINS/wrfrr13_cycle/test/.
+##ifort -xW -assume byterecl -traceback -I../gsi_code -I../include/wrfio_int -c update_SST_netcdf_mass.F90
+##ifort -xW -assume byterecl -traceback -o update_SST.exe update_SST_netcdf_mass.o /misc/whome/mhu/WRFV3x/external/io_netcdf/libwrfio_nf.a -L/opt/netcdf/3.6.2-intel-10.1/lib -lnetcdf

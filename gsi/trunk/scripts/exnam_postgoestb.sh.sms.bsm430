@@ -1,0 +1,152 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_post.sh
+# Script description:  Run nam post jobs
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script runs the Nam post jobs for the 48-h Nam forecast
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-17  Brent Gordon  -- Modified for production.
+# 20
+#
+
+set -xa
+cd $DATA 
+
+msg="$job HAS BEGUN"
+postmsg "/com/logs/jlogfile" "$msg"
+
+export SDATE=$CYCLE
+export MODELTYPE=NMM
+export OUTTYP=binarympiio
+
+export CNVGRIB=/nwprod/util/exec/cnvgrib
+export WGRIB2=/nwprod/util/exec/wgrib2
+export tmmark=tm00
+
+fhr=00
+TEND=84
+
+while [ $fhr -le $TEND ] 
+do
+
+  icnt=1
+  while [ $icnt -lt 1000 ]
+  do
+    if [ -s $FCSTDIR/fcstdone${fhr}.${tmmark} ]
+    then
+      break
+    else
+      icnt=$((icnt + 1))
+      sleep 5
+    fi
+    if [ $icnt -ge 360 ]
+    then
+      msg="ABORTING after 30 minutes of waiting for Nam FCST F${fhr} to end."
+      err_exit $msg
+    fi
+  done
+
+  cp $FIXnam/nam_micro_lookup.dat eta_micro_lookup.dat
+
+  nposts=01
+  incpst=01
+
+  y=`expr $fhr % 3`
+
+  cp $PARMnam/nam_cntrl_goestb.parm nam_cntrl_goestb.parm.${fhr}
+
+  cp $FIXnam/nam_CRTM_SpcCoeff.f77_goestb     ./SpcCoeff.bin
+  cp $FIXnam/nam_CRTM_TauCoeff.f77_goestb     ./TauCoeff.bin
+  cp $FIXnam/nam_CRTM_EmisCoeff.f77_goestb    ./EmisCoeff.bin
+  cp $FIXnam/nam_CRTM_AerosolCoeff.f77_goestb ./AerosolCoeff.bin
+  cp $FIXnam/nam_CRTM_CldCoeff.f77_goestb     ./CloudCoeff.bin
+
+  VALDATE=`/nwprod/util/exec/ndate ${fhr} ${SDATE}`
+
+  valyr=`echo $VALDATE | cut -c1-4`
+  valmn=`echo $VALDATE | cut -c5-6`
+  valdy=`echo $VALDATE | cut -c7-8`
+  valhr=`echo $VALDATE | cut -c9-10`
+
+  timeform=${valyr}"-"${valmn}"-"${valdy}"_"${valhr}":00:00"
+
+cat > itag <<EOF
+$FCSTDIR/wrfout_d01_${timeform}
+$OUTTYP
+$timeform
+$MODELTYPE
+EOF
+
+  export pgm=nam_wrfpost
+  . prep_step
+  export XLFUNIT_14=nam_cntrl_goestb.parm.${fhr}
+
+  startmsg
+  #bsm for testing $EXECnam/nam_wrfpost < itag >> $pgmout 2>errfile
+  poe hpmcount $EXECnam/nam_wrfpost < itag >> $pgmout 2>errfile
+  export err=$?;err_chk
+
+  cp $PARMnam/nam_master_goestb.ctl master_goestb${fhr}.ctl
+
+cat >input${fhr}.prd <<EOF5
+$DATA/EGGOES${fhr}.tm00
+EOF5
+
+  export pgm=nam_prdgen;. prep_step
+  export XLFUNIT_10="master_goestb${fhr}.ctl"
+  export XLFUNIT_21="$FIXnam/nam_wgt_218"
+  export XLFUNIT_22="$FIXnam/nam_wgt_221"
+  export XLFUNIT_23="$FIXnam/nam_wgt_243"
+  $EXECnam/nam_prdgen < input${fhr}.prd >> $pgmout 2>errfile
+  export err=$?;err_chk
+
+############################
+# Convert to grib2 format
+############################
+
+file="218 221 243"
+
+for grid in $file
+do
+  $CNVGRIB -g12 -p40 nam.GOES${grid}${fhr}.tm00 nam.GOES${grid}${fhr}.grib2
+  $WGRIB2 nam.GOES${grid}${fhr}.grib2 -s >nam.GOES${grid}${fhr}.grib2.idx
+done
+
+if test $SENDCOM = 'YES'
+then
+
+file="218 221 243"
+                                                                                                       
+  for grid in $file
+  do
+    $utilexec/grbindex nam.GOES${grid}${fhr}.tm00 GOES${grid}i${fhr}
+    mv GOES${grid}i${fhr} $COMOUT/${RUN}.${cycle}.goes${grid}i${fhr}
+    mv nam.GOES${grid}${fhr}.tm00 $COMOUT/${RUN}.${cycle}.goes${grid}${fhr}.tm00
+    mv nam.GOES${grid}${fhr}.grib2 $COMOUT/${RUN}.${cycle}.goes${grid}${fhr}.tm00.grib2
+    mv nam.GOES${grid}${fhr}.grib2.idx $COMOUT/${RUN}.${cycle}.goes${grid}${fhr}.tm00.grib2.idx
+  done
+
+fi
+
+postmsg "/com/logs/jlogfile" "NAM GOES POST done for F${fhr}"
+
+if [ $fhr -le 35 ] 
+then
+  let "fhr=fhr+1"
+else
+  let "fhr=fhr+3"
+fi
+
+typeset -Z2 fhr
+
+done
+
+echo EXITING $0
+exit
+#

@@ -1,0 +1,11 @@
+# Default values for IRIX 64
+# --------------------------
+FC     = xlf90
+F77    = $(FC)
+F90    = $(FC)
+_RPREC = 8
+_IPREC = 4
+FFLAGS = -O2 -qrealsize=$(_RPREC) -qintsize=$(_IPREC) -I. -b64 -qfixed
+AR     = ar -X64 -v -q
+LIBSESSL= libessl2.a libessl2_r8i8.a libessl2_r4i4.a
+LIBSESSL= libessl2.a

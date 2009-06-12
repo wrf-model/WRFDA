@@ -1,0 +1,64 @@
+#!/bin/make
+#-----------------------------------------------------------------------
+#       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
+#-----------------------------------------------------------------------
+# !IROUTINE: Makefile.conf.Linux
+# 
+# !DESCRIPTION: 
+#	An included local make configuration.  See file Makefile for
+#   detailed `make' procedure.  This shell has been built to override
+#   the default environments (including commands) defined in file 
+#   Makefile.
+#
+#	+ `uname -a` = "OSF1 molotov V3.2 17 alpha"
+#
+# !CALLING SEQUENCE:
+#	% ln -s Makefile.OSF1 Makefile.conf
+#	% make ...
+#
+# !SEE ALSO: Makefile
+#
+# !REVISION HISTORY: (`cvs log <>' for more)
+# 	11Aug2003 - R. Todling	- created based on w3/bfr
+#
+#-----------------------------------------------------------------------
+
+# Environments
+# ============
+
+SHELL		= /bin/sh
+F77		= f90
+F90		= f90
+FC		= $(F90)
+
+_RPREC		= 8
+_IPREC		= 4
+FOPT_normal	= -O -i$(_IPREC) -r$(_RPREC)
+FOPT_indxck	= -O
+FOPT_syntax	= -syntax_only
+
+
+FFLAGS		= $(FOPT_indxck)
+FFLAGS		= $(FOPT_normal)
+
+LD		= $(FC)
+LDFLAGS		= $(FFLAGS) $(LIBdxml_DIR)
+AR		= ar rv
+RM		= rm -f
+
+CPPFLAGS	= -P -Dunix -D__unix__ 
+F77PPFLAGS	= $(FPPFLAGS) -DLANGUAGE_FORTRAN -D__LANGUAGE_FORTRAN__
+F90PPFLAGS	= $(FPPFLAGS) -DLANGUAGE_FORTRAN_90 -D__LANGUAGE_FORTRAN_90__
+
+LIBsys          = -llapack -lblas
+
+FDP             = fdp   # Fortran make depency script
+
+.f.o:
+	$(FC) -c -extend_source $(XFLAGS) $(FFLAGS) $(_I) $*.f
+
+.F.o:
+	$(FC) -c -extend_source $(XFLAGS) $(FPPFLAGS) $(_DF) $(FFLAGS) $(_I) $*.F
+
+
+#.----------------------------------------------------------------------

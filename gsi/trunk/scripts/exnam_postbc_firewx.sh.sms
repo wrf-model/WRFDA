@@ -1,0 +1,145 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_sndpost.sh
+# Script description:  Trigger nam sounding post job
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script triggers the nam sounding post job, which
+#           creates a piece of the model sounding profile whose
+#           time interval is determined by the input forecast hours.
+#
+# Script history log:
+# 2000-05-16  Eric Rogers
+
+set -x
+
+cd $DATA
+
+export tmmark=tm00
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+export fhr=00
+typeset -Z2 fhr
+
+#rm done files in case of rerun
+if [ $fhr -eq 00 ]
+then
+   rm $DATA/post0fw.done*
+fi
+
+cd $DATA/postbcfw
+
+###if test $cyc -lt 12
+###then
+###  prodcyc=00
+###else
+###   prodcyc=12
+###fi
+
+
+#Has a run been requested?
+
+if [ `cat ${SDMINPUT}/run_date` -eq $PDY  ] ; then
+      # A fire wx run has been requested for this nam
+      #run.  Create the 8km bc nest.
+   export firewxmod=`cat ${SDMINPUT}/firewx_nest`
+      #send sms label
+   if test "$SENDSMS" = "YES"
+   then
+      $SMSBIN/smslabel firewx_run "requested for nest $firewxmod on $PDY"
+   fi
+
+else
+#do not run fxwire
+   firewxmod=fw99
+#send sms label and set firewx to complete
+   if test "$SENDSMS" = "YES"
+   then
+     $SMSBIN/smslabel firewx_run "NOT requested for $PDY"
+   fi
+fi
+
+# if no Fire Weather run planned create dummy done files
+# and exit script
+
+if [ $firewxmod = fw99 ] ; then
+
+  endfhr=60
+
+  while [ $fhr -le $endfhr ]
+  do
+     echo done > $DATA/post0fw.done${fhr}.${tmmark}
+     let fhr=fhr+1
+  done
+
+  echo EXITING $0 with return code $err
+  exit $err
+fi
+
+## changed to a generic name for hybbcwgts:
+#cp $FIXnam/nam_hybbcwgts.${firewxmod} nam_hybbcwgts.01
+cp $FIXnam/nam_hybbcwgts.${firewxmod} hybbcwgts.01
+cp $FIXnam/nam_hgt_stdh_sm_${firewxmod} fis.01
+cp $FIXnam/nam_profdat nam_profdat
+cp $FIXnam/nam_deta_ldt1.60.25mb deta.0
+cp $FIXnam/nam_deta_ldt1.60.25mb_bot40m deta.01
+cp $PARMnam/nam_bcexdata.parm.${tmmark}_${firewxmod} bcexdata.parm_hyb
+
+if [ $fhr -eq 00 ]
+then
+   rm $DATA/postbcfw/bcnest.01
+fi
+
+endfhr=60
+
+while [ $fhr -le $endfhr ]
+do
+   ic=1
+   while [ $ic -lt 1000 ]
+   do
+      if [ -s $DATA/fcstdone${fhr}.${tmmark} ]
+      then
+         break
+      else
+         let "ic=ic+1"
+         sleep 10
+      fi
+
+      if [ $ic -ge 180 ]
+      then
+         err_exit "COULD NOT LOCATE: $DATA/fcstdone${fhr}.${tmmark}"
+      fi
+   done
+
+   nposts=01
+   incpst=01
+
+   export RSTFNL=$DATA/ 
+
+   export pgm=nam_post0bchyb
+   . prep_step
+   export XLFUNIT_12=$DATA/nhb1260
+   export XLFUNIT_17=bcexdata.parm_hyb
+   export XLFUNIT_19=nam_profdat
+   export XLFUNIT_76=profilm.c1.${tmmark}
+
+   startmsg
+   $EXECnam/nam_post0bchyb << ioEOF >> $pgmout 2>errfile 
+   $fhr $nposts $incpst
+ioEOF
+   export err=$?;err_chk
+
+   if [ $fhr -eq 13 -o $fhr -eq 25 -o $fhr -eq 37 -o ${fhr} -eq 48 -o ${fhr} -eq 60 ] ; then
+     cp bcnest.01 $COMOUT/${RUN}.${cycle}.bcnest.${firewxmod}.f${fhr}
+   fi
+   echo done > $DATA/post0fw.done${fhr}.${tmmark}
+
+   let fhr=fhr+1
+
+done
+
+echo EXITING $0 with return code $err
+exit $err

@@ -1,0 +1,107 @@
+#!/bin/make
+#-----------------------------------------------------------------------
+#       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
+#-----------------------------------------------------------------------
+#BOP
+#
+# !ROUTINE: Makefile.conf.IRIX64
+# 
+# !DESCRIPTION: 
+#	An include file of configurations.  See Makefile for additional
+#   `make' procedures.  This include file is used to overide the default
+#   environments (including commands) defined in file Makefile.
+#
+# !INTERFACE:
+#
+#	% ln -s Makefile.conf.IRIX64 Makefile.conf
+#	% make ...
+#
+# !SEE ALSO: Makefile
+#
+# !REVISION HISTORY: (`cvs log <>' for more)
+#	02Apr96 - J. Guo	- use include for configuration files
+# 	21Aug95 - J. Guo	- added the prolog
+#	28Sep98 - Jing Guo (guo@dao.gsfc.nasa.gov)
+#		- Cleaned _Dnod for this library
+#
+#EOP
+#-----------------------------------------------------------------------
+
+_Dsys		= -DsysLinux
+_Dnod		=
+
+# Environments
+# ============
+
+# If use the MPICH implementation
+
+  ifndef BASEDIR
+BASEDIR         = /usr/local/baselibs/latest
+  endif
+
+#_LMPI		= -L$(BASEDIR)/Linux/lib 
+#_lMPI		= -lmpich
+#_IMPI		= -I$(BASEDIR)/Linux/include/mpi
+
+# The default design requirement for this library is to use the OS
+# specific default REAL kind for all its REAL type variables, while
+# supports both REAL and DOUPLE PRECISION kinds for its interfaces
+# through the Fortran 90 generic interface feature. (Jing Guo)
+
+_R		=
+_O		= -O  -assume byterecl
+
+
+_Iconf		= $(_IMPI)
+
+SHELL		= /bin/sh
+F77		= mpif90
+F90		= mpif90
+FC		= $(F90) 
+
+FFLAGS		= -O 
+FFLAGS		= $(_O)
+CFLAGS		= -O 
+
+
+LD		= mpif90
+LDFLAGS		= $(_O)
+
+LIBprof		= -lprof
+LIBsys	 	= 
+
+MUPDATE		= sh LCupdate.sh
+MODS_OBJ	= m_chars.o			\
+		  m_die.o			\
+		  m_dropdead.o			\
+		  m_Filename.o			\
+		  m_FileResolv.o		\
+		  m_flow.o			\
+		  m_IndexBin_char.o		\
+		  m_IndexBin_integer.o		\
+		  m_IndexBin_logical.o		\
+		  m_inpak90.o			\
+		  m_intkinds.o			\
+		  m_ioutil.o			\
+		  m_List.o			\
+		  m_mall.o			\
+		  m_mergedList.o		\
+		  m_MergeSorts.o		\
+		  m_mpif90.o			\
+		  m_mpif.o			\
+		  m_mpout.o			\
+		  m_Permuter.o			\
+		  m_rankMerge.o			\
+		  m_realkinds.o			\
+		  m_showDistrib.o		\
+		  m_SortingTools.o		\
+		  m_stdio.o			\
+		  m_String.o			\
+		  m_StrTemplate.o		\
+		  m_zeit.o			
+#		  assert.H
+
+FPPFLAGS	= -DLANGUAGE_FORTRAN
+
+
+#.----------------------------------------------------------------------

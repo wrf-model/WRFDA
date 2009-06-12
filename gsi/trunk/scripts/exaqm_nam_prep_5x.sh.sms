@@ -1,0 +1,105 @@
+#!/bin/ksh
+######################################################################
+#  UNIX Script Documentation Block
+#                      .
+# Script name:         exaqm_nam_prep.sh
+# Script description:  Run nam product generator for CMAQ
+#
+# Author:      Marina Tsidulko     Org: NP22       Date: 2003-07-03
+#
+# Abstract: This script runs 0-48 h NAM PRDGEN for CMAQ
+#
+# Script history log:
+# 2003-07-03    Marina Tsidulko
+# 2004-03-31    Pius Lee, netcdf independent and append gfs ozone
+# 2004-04-01    Luc, modified for production
+######################################################################
+set -xa
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cd $DATA
+
+echo "Start of NAM_prdgen Job"
+typeset -Z2 fhr
+export fhr=00
+
+if [ ${cycle} = 't00z' -o ${cycle} = 't18z' ]
+then
+   export endfhr=48
+elif [  ${cycle} = 't06z' ]
+then
+   export endfhr=48
+else
+   export endfhr=48
+fi
+
+cp $PARMaqm/aqm_CONUS12nam_138.newtables.ctl master3.ctl
+while [ $fhr -le $endfhr ]
+do
+  ic=1
+  while [ $ic -lt 1000 ]
+  do
+    if [ -s $COMNAM/nam.${cycle}.egdaqm$fhr.tm00 ]
+    then
+        ln -s -f $COMNAM/nam.${cycle}.egdaqm$fhr.tm00 EGDAQM$fhr.tm00
+   break
+    else
+          let "ic=ic+1"
+          sleep 10
+      fi
+
+      if [ $ic -ge 180 ]
+      then
+      err_exit "COULD NOT LOCATE:$COMNAM/nam.${cycle}.egdaqm$fhr.tm00"
+      fi
+    done
+
+  export pgm=aqm_nam_prep
+  . prep_step
+  export XLFRTEOPTS="unit_vars=yes"
+##export HR_CENTERED=Y
+  export XLFUNIT_10="master3.ctl"
+  export XLFUNIT_21="$FIXaqm/aqm_wgt_99k12_138"
+  export XLFUNIT_41="$PARMnam/nam_kwbx.tbl"
+  export XLFUNIT_42="$PARMnam/nam_time.tbl"
+  export XLFUNIT_43="$PARMnam/nam_parm.tbl"
+  export XLFUNIT_44="$PARMnam/nam_grid.tbl"
+  export XLFUNIT_45="$PARMnam/nam_levl.tbl"
+
+  cat <<EOF5 >input${fhr}.prd
+EGDAQM${fhr}.tm00
+EOF5
+  echo 'about to cat input'
+  cat input${fhr}.prd
+
+  startmsg
+  $EXECaqm/aqm_nam_prep_5x < input${fhr}.prd >> $pgmout 2>errfile
+  export err=$?;err_chk
+
+  if [ "$SENDCOM" = 'YES' ]
+  then
+     cp $DATA/meso.AQFNAM${fhr} $COMOUT/aqm.${cycle}.aqfnam$fhr.tm00
+    { $utilexec/cnvgrib -g12 -p40 $DATA/meso.AQFNAM$fhr $DATA/meso.AQFNAM$fhr.grb2
+    mv $DATA/meso.AQFNAM$fhr.grb2 $COMOUT/aqm.${cycle}.aqfnam$fhr.grb2.tm00
+    if [ "$SENDDBN" = 'YES' ] ; then
+      $DBNROOT/bin/dbn_alert MODEL AQM_AQFNAM_GB2 $job $COMOUT/aqm.${cycle}.aqfnam$fhr.grb2.tm00
+    fi } &
+  fi
+
+  let "fhr=fhr+1"
+  typeset -Z2 fhr
+done
+
+$USHaqm/aqm_nam_prep2_5x.sh
+
+wait
+
+echo EXITING $0
+
+########################################################
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################

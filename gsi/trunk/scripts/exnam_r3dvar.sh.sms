@@ -1,0 +1,232 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_r3dvar.sh.sms
+# Script description:  Runs nam 3-d variational analysis and computes boundary
+#                      tendencies for nam forecast
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: Run the nam 3dvar analysis and compute 3-h boundary tendencies for
+#           the nam model forecast
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-16  Brent Gordon  - Modified for production
+#
+
+set -x
+cd $DATA
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+#
+# Get needed variables from exnam_prelim.sh.sms
+#
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+export tmmark=tm00
+
+if test $GUESS = "NAM"
+then
+  ln -s -f $COMNDAS/ndas.t${cyc}z.nambcs00 $DATA/nambcs00
+  ln -s -f $COMNDAS/ndas.t${cyc}z.nhb1260 $DATA/nhb1260
+  ln -s -f $GESNDAS/ndas.t${cyc}z.restrt03.tm03 $DATA/restrt03.ges
+  cp $GESNDAS/ndas.t${cyc}z.restrt03.tm03 $COMOUT/nam.t${cyc}z.restrt03.ges
+  cp $COMNDAS/ndas.t${cyc}z.nhb1260 $COMOUT/nam.t${cyc}z.nhb1260.tm00
+else
+  ln -s -f $COMIN/nam.t${cyc}z.nambcs00 $DATA/nambcs00 
+  ln -s -f $COMIN/nam.t${cyc}z.nhb1260.tm00 $DATA/nhb1260
+  ln -s -f $GESDIR/ndas.t${cyc}z.restrt03.gdas $DATA/restrt03.ges
+  cp $GESDIR/ndas.t${cyc}z.restrt03.gdas $COMOUT/nam.t${cyc}z.restrt03.ges
+fi
+cp $COMIN/nam.t${cyc}z.prepbufr.tm00 $DATA/prepcq
+
+##########################################################
+# New Script Portion for NDAS Sat Radiances
+##########################################################
+$utilscript/getges.sh -t sigges -v $CYCLE sges.3dvar
+
+cp $FIXnam/nam_satangbias.txt $DATA/satbias_angle
+cp $FIXnam/nam_satinfo.txt $DATA/satinfo
+cp $FIXnam/nam_satcoefs.f77 $DATA/satcoefs
+
+##cp $COMIN/${RUN}.t${cyc}z.1bhrs2.${tmmark}.bufr_d $DATA/hirs2bufr
+##cp $COMIN/${RUN}.t${cyc}z.1bhrs3.${tmmark}.bufr_d $DATA/hirs3bufr
+##cp $COMIN/${RUN}.t${cyc}z.1bmsu.${tmmark}.bufr_d  $DATA/msubufr
+##cp $COMIN/${RUN}.t${cyc}z.1bamua.${tmmark}.bufr_d $DATA/amsuabufr
+##cp $COMIN/${RUN}.t${cyc}z.1bamub.${tmmark}.bufr_d $DATA/amsubbufr
+
+cp $COMIN/${RUN}.t${cyc}z.radwnd.${tmmark}.bufr_d $DATA/radwnd.ibm
+
+TM12=`/nwprod/util/exec/ndate -12 $CYCLE`
+TM06=`/nwprod/util/exec/ndate -06 $CYCLE`
+
+yyyymmdd=`echo $CYCLE | cut -c 1-8`
+hh=`echo $CYCLE | cut -c 9-10`
+
+yyyymmddm12=`echo $TM12 | cut -c 1-8`
+hh12=`echo $TM12 | cut -c 9-10`
+yyyymmddm06=`echo $TM06 | cut -c 1-8`
+
+case $cyc in
+ 00) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t00z.biascr.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t18z.biascr.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t12z.biascr.tm03;;
+ 06) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t06z.biascr.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t00z.biascr.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t18z.biascr.tm03;;
+ 12) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t12z.biascr.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t06z.biascr.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t00z.biascr.tm03;;
+ 18) bias1=/com/${NET}/${envir}/ndas.${yyyymmdd}/ndas.t18z.biascr.tm03
+     bias2=/com/${NET}/${envir}/ndas.${yyyymmddm06}/ndas.t12z.biascr.tm09
+     bias3=/com/${NET}/${envir}/ndas.${yyyymmddm12}/ndas.t06z.biascr.tm03;;
+esac
+
+if [ -s $bias1 ]
+then
+    cp $bias1 $DATA/satbias_in
+else
+   if [ -s $bias2 ]
+   then
+      cp $bias2 $DATA/satbias_in
+   else
+      if [ -s $bias3 ]
+      then
+         cp $bias3 $DATA/satbias_in
+      else
+         cp /nwges/${envir}/ndas.hold/biascr.ndas $DATA/satbias_in
+      fi
+   fi
+fi
+
+##########################################################
+
+export tmmarkb=$tmmark
+export tmmarka=$tmmark
+export restrtahr=03
+export itag=03
+
+if [ $GUESS = NAM -o $GUESS = NAMPART ]
+then
+  if [ $cycle = t00z -o $cycle = t12z ]
+  then
+    cp $PARMnam/nam_fta.${tmmark}.parm fcstdata.parm.${tmmark}
+  else
+    cp $PARMnam/nam_fta.${tmmark}.parm fcstdata.parm.${tmmark}
+  fi
+else
+  if [ $cycle = t00z -o $cycle = t12z ]
+  then
+    cp $PARMnam/nam_fta.tm00.parm fcstdata.parm.${tmmark}
+  else
+    cp $PARMnam/nam_fta.tm00.parm fcstdata.parm.${tmmark}
+  fi
+fi
+
+####/nwprod/ush/dumpjb ${DATEANL} 1.5 radwnd
+
+export pgm=nam_r3dvar
+. prep_step
+export XLFUNIT_9=$FIXnam/nam_globstats
+export XLFUNIT_11=$DATA/fcstdata.parm.${tmmark}
+export XLFUNIT_12=$DATA/nhb1260
+export XLFUNIT_13=$DATA/restrt03.ges
+if [ $MODE = "fast" ]
+then
+   export XLFUNIT_15=$PARMnam/nam_r3dvar.parm.${MODE}
+else
+   export XLFUNIT_15=$PARMnam/nam_r3dvar.parm
+fi
+export XLFUNIT_16=$DATA/sges.3dvar
+export XLFUNIT_19=$PARMnam/nam_errtable.r3dv
+export XLFUNIT_22=$FIXnam/nam_z0eff
+export XLFUNIT_47=$FIXnam/nam_namerr1780_ieee
+export XLFUNIT_51=$DATA/restrt03     
+export XLFUNIT_52=$DATA/nfc1260      
+export XLFUNIT_53=$DATA/nbc1260      
+export XLFUNIT_59=$DATA/tavg.asciic  
+export XLFUNIT_96=$DATA/bkgstatsc    
+export XLFUNIT_97=$DATA/prepqc_events
+export XLFUNIT_207=$DATA/satdata
+export XLFUNIT_1563=$DATA/namges.des
+export XLFUNIT_1564=$DATA/namges.dat
+ln -sf $DATA/prepcq prepqc
+ln -sf $DATA/radwnd.ibm bufr_radar
+ln -sf $COMIN/${RUN}.t${cyc}z.1bhrs2.${tmmark}.bufr_d hirs2bufr
+ln -sf $COMIN/${RUN}.t${cyc}z.1bhrs3.${tmmark}.bufr_d hirs3bufr
+ln -sf $COMIN/${RUN}.t${cyc}z.1bmsu.${tmmark}.bufr_d  msubufr
+ln -sf $COMIN/${RUN}.t${cyc}z.1bamua.${tmmark}.bufr_d amsuabufr
+ln -sf $COMIN/${RUN}.t${cyc}z.1bamub.${tmmark}.bufr_d amsubbufr
+ln -sf $FIXnam/nam_spectral_coefs.f77 spectral_coefficients
+ln -sf $FIXnam/nam_transmittance_coefs.f77 transmittance_coefficients
+# added for 2dvar sfc anl
+export XLFUNIT_30=$DATA/prepcq
+export XLFUNIT_31=$DATA/radwnd.ibm
+export XLFUNIT_32=$COMIN/${RUN}.t${cyc}z.1bhrs2.${tmmark}.bufr_d
+export XLFUNIT_33=$COMIN/${RUN}.t${cyc}z.1bhrs3.${tmmark}.bufr_d
+export XLFUNIT_34=$COMIN/${RUN}.t${cyc}z.1bmsu.${tmmark}.bufr_d
+export XLFUNIT_35=$COMIN/${RUN}.t${cyc}z.1bamua.${tmmark}.bufr_d
+export XLFUNIT_36=$COMIN/${RUN}.t${cyc}z.1bamub.${tmmark}.bufr_d
+export XLFUNIT_95=$PARMnam/nam_fta.${tmmark}.parm_single
+if [ $MODE = "fast" ]
+then
+   export XLFUNIT_98=$PARMnam/nam_r2dvar.parm.${MODE}
+else
+   export XLFUNIT_98=$PARMnam/nam_r2dvar.parm
+fi
+
+startmsg
+$EXECnam/nam_r3dvar >> $pgmout 2>errfile
+export err=$?;err_chk
+
+cat fith fitpw fitq fitt fitw > fits.${tmmark}
+cat fitq2 fitt2 fitw2 > fits2.${tmmark}
+cat error* > qcerror.${tmmark}
+rm prepcq fith fitpw fitq fitt fitw restrt03.ges sges.3dvar error*
+rm fitq2 fitt2 fitw2
+rm prepqc bufr_radar hirs* msu* amsu*
+
+mv fits.${tmmark} $COMOUT/${RUN}.${cycle}.fits.${tmmark}
+mv fits2.${tmmark} $COMOUT/${RUN}.${cycle}.fits2.${tmmark}
+mv nfc1260 $COMOUT/${RUN}.${cycle}.nfc1260.${tmmark}
+
+set +x
+cat radar_cut1_* > allradar_plot.${tmmark}
+rm radar_cut1*
+cat radar_remaining_* >> allradar_plot.${tmmark}
+rm radar_remaining_*
+
+cat diag_rad1* > radstats.${tmmark}
+compress -fv radstats.${tmmark}
+rm diag_rad1*
+
+cat events* > allevents.${tmmark}
+compress -fv allevents.${tmmark}
+rm events*
+set -x
+
+mv allradar_plot.${tmmark} $COMOUT/${RUN}.${cycle}.allradar_plot.${tmmark}
+mv radstats.${tmmark}.Z $COMOUT/${RUN}.${cycle}.radstats.${tmmark}.Z
+mv allevents.${tmmark}.Z $COMOUT/${RUN}.${cycle}.allevents.${tmmark}.Z
+
+cp $PARMnam/nam_bctend.parm_84 $DATA/bctend.parm
+
+export pgm=nam_bctend
+. prep_step
+export XLFUNIT_17=$DATA/nambcs00
+export XLFUNIT_18=$DATA/nbc1260
+export XLFUNIT_51=$DATA/nbcout
+startmsg
+$EXECnam/nam_bctend < $DATA/bctend.parm >> $pgmout 2>errfile
+export err=$?;err_chk
+
+cp $DATA/nbcout $COMOUT/nam.t${cyc}z.nbcout.${tmmark}
+cp $DATA/satbias_out $COMOUT/nam.t${cyc}z.biascr.${tmmark}
+cp $DATA/prepqc_events $COMOUT/nam.t${cyc}z.prepbufr_qc.${tmmark}
+mv $DATA/satdata $COMOUT/nam.t${cyc}z.satdata.${tmmark}
+
+echo EXITING $0
+

@@ -1,0 +1,317 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_prdgen.sh
+# Script description:  Run nam product generator jobs
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script runs the Nam PRDGEN jobs
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-25  Brent Gordon  Modified for production, removed here file.
+# 2003-03-21  Eric Rogers  Modified for special hourly output
+# 2006-10-31  Eric Rogers  Added 6th PRDGEN step to make NAM grids for AFWA
+#                          (3-hourly only)
+#
+
+set -xa
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cd $DATA
+
+#
+# Get needed variables from exnam_prelim.sh.sms
+#
+. $GESDIR/${RUN}.t${cyc}z.envir.sh
+
+########################################################
+# Create a script to be poe'd
+#
+
+for fhr in $fcsthrs
+do
+  ln -s -f $COMIN/${RUN}.${cycle}.egdawp${fhr}.tm00 EGDAWP${fhr}.tm00
+
+  mkdir -p $DATA/prdgen1_${fhr}
+  mkdir -p $DATA/prdgen2_${fhr}
+  mkdir -p $DATA/prdgen3_${fhr}
+  mkdir -p $DATA/prdgen4_${fhr}
+  mkdir -p $DATA/prdgen5_${fhr}
+  mkdir -p $DATA/prdgen6_${fhr}
+  mkdir -p $DATA/prdgen7_${fhr}
+
+  y=`expr $fhr % 3`
+
+# y = 0 ---> Standard 3-hourly output
+# y = 1 ---> Special hourly output for forecast hours < 36 h
+
+  if [ $y -eq 0 ] ; then
+    cp $PARMnam/nam_master1.ctl $DATA/prdgen1_${fhr}/master1.${fhr}.ctl
+    cp $PARMnam/nam_master2.ctl $DATA/prdgen2_${fhr}/master2.${fhr}.ctl
+    cp $PARMnam/nam_master3.ctl $DATA/prdgen3_${fhr}/master3.${fhr}.ctl
+    cp $PARMnam/nam_master4.ctl $DATA/prdgen4_${fhr}/master4.${fhr}.ctl
+    cp $PARMnam/nam_master5.ctl $DATA/prdgen5_${fhr}/master5.${fhr}.ctl
+    cp $PARMnam/nam_master6.ctl $DATA/prdgen6_${fhr}/master6.${fhr}.ctl
+    cp $PARMnam/nam_master7.ctl $DATA/prdgen7_${fhr}/master7.${fhr}.ctl
+  else
+    cp $PARMnam/nam_master1_hourly.ctl $DATA/prdgen1_${fhr}/master1.${fhr}.ctl
+    cp $PARMnam/nam_master2_hourly.ctl $DATA/prdgen2_${fhr}/master2.${fhr}.ctl
+    cp $PARMnam/nam_master3_hourly.ctl $DATA/prdgen3_${fhr}/master3.${fhr}.ctl
+    cp $PARMnam/nam_master4_hourly.ctl $DATA/prdgen4_${fhr}/master4.${fhr}.ctl
+    cp $PARMnam/nam_master5_hourly.ctl $DATA/prdgen5_${fhr}/master5.${fhr}.ctl
+  fi
+
+  echo "$USHnam/nam_prdgen1.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen2.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen3.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen4.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen5.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen6.sh $fhr $y" >> $DATA/poescript
+  echo "$USHnam/nam_prdgen7.sh $fhr $y" >> $DATA/poescript
+done
+chmod 775 $DATA/poescript
+export MP_PGMMODEL=mpmd
+export MP_CMDFILE=$DATA/poescript
+#
+# Execute the script.
+poe
+export err=$?; err_chk
+
+########################################################
+
+# run ICWF code for 06Z and 18Z runs
+
+if [ $cyc -eq 06 -o $cyc -eq 18 ]
+then
+   FHMAX=48
+   FHMAX2=48
+else
+   FHMAX=60
+   FHMAX2=84
+fi
+
+if [ $fcsthrs -eq $FHMAX -o $fcsthrs -eq $FHMAX2 ]
+then
+  if [ $fcsthrs -eq $FHMAX2 ]
+  then
+     FHMAX=$FHMAX2
+  fi
+  icnt=0
+  while [ $icnt -lt 1000 ]
+  do
+      fh=00
+      typeset -Z2 fh
+
+      while [ $fh -le $FHMAX ]
+      do
+         if [ -s $COMOUT/${RUN}.${cycle}.awip3d${fh}.tm00 -a \
+              -s $COMOUT/${RUN}.${cycle}.awip20${fh}.tm00 -a \
+              -s $COMOUT/${RUN}.${cycle}.awipak${fh}.tm00 -a \
+              -s $COMOUT/${RUN}.${cycle}.awp217${fh}.tm00 ]
+         then
+            let "fh=fh+3"
+            typeset -Z2 fh
+         else
+            break
+         fi
+      done
+
+      if [ $fh -gt $FHMAX ]
+      then
+         break
+      fi
+
+      let "icnt=$icnt + 1"
+      sleep 10
+
+      if [ $icnt -ge 180 ]
+      then
+         msg="ABORTING after 30 minutes of waiting for Nam Post F${fh} to end."
+         err_exit $msg
+      fi
+  done
+
+  echo $COMOUT/${RUN}.${cycle}.awip3d00.tm00 > icwf_control
+  echo $COMOUT/${RUN}.${cycle}.awip2000.tm00 > icwf_control_20
+  echo $COMOUT/${RUN}.${cycle}.awipak00.tm00 > icwf_control_ak
+  echo $COMOUT/${RUN}.${cycle}.awp21700.tm00 > icwf_control_ak20
+  fh=03
+  while [ $fh -le $FHMAX ]
+  do
+    echo $COMOUT/${RUN}.${cycle}.awip3d${fh}.tm00 >> icwf_control
+    echo $COMOUT/${RUN}.${cycle}.awip20${fh}.tm00 >> icwf_control_20
+    echo $COMOUT/${RUN}.${cycle}.awipak${fh}.tm00 >> icwf_control_ak
+    echo $COMOUT/${RUN}.${cycle}.awp217${fh}.tm00 >> icwf_control_ak20
+    let "fh=fh+3"
+    typeset -Z2 fh
+  done
+
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control
+  export err=$?;err_chk
+  rm icwf_control
+ 
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control_20
+  export err=$?;err_chk
+  rm icwf_control_20
+
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control_ak
+  export err=$?;err_chk
+  rm icwf_control_ak
+ 
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control_ak20
+  export err=$?;err_chk
+  rm icwf_control_ak20
+
+  if test "$SENDDBN" = 'YES'
+  then
+     typeset -Z2 fh
+     fh=00
+     while [ $fh -le $FHMAX ]
+     do
+       #############################
+       # Convert to grib2 format
+       #############################
+         CNVGRIB=/nwprod/util/exec/cnvgrib
+         WGRIB2=/nwprod/util/exec/wgrib2
+         $CNVGRIB -g12 -p40 $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf.grib2 
+         $WGRIB2 $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf.grib2 -s >$COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf.grib2.idx
+         $CNVGRIB -g12 -p40 $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf.grib2 
+         $WGRIB2 $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf.grib2 -s >$COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf.grib2.idx
+         $CNVGRIB -g12 -p40 $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf.grib2 
+         $WGRIB2 $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf.grib2 -s >$COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf.grib2.idx
+         $CNVGRIB -g12 -p40 $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf.grib2 
+         $WGRIB2 $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf.grib2 -s >$COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf.grib2.idx
+
+
+         # Now the ICWF 3d Grids
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW3DCWF_PARA $job $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf
+         # Now the ICWF 215 Grids
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW20CWF_PARA $job $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf
+         # Now the ICWF 216 Grids
+         $DBNROOT/bin/dbn_alert MODEL NAM_AWAKCWF_PARA $job $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf
+         # Now the ICWF 217 Grids
+         $DBNROOT/bin/dbn_alert MODEL NAM_A217CWF_PARA $job $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf
+
+         if [ $SENDDBN_GB2 = YES ]
+         then
+ 
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW3DCWF_GB2_PARA $job $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf.grib2
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW3DCWF_GB2_PARA_WIDX $job $COMOUT/${RUN}.${cycle}.awip3d$fh.tm00_icwf.grib2.idx
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW20CWF_GB2_PARA $job $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf.grib2
+         $DBNROOT/bin/dbn_alert MODEL NAM_AW20CWF_GB2_PARA_WIDX $job $COMOUT/${RUN}.${cycle}.awip20$fh.tm00_icwf.grib2.idx
+         $DBNROOT/bin/dbn_alert MODEL NAM_AWAKCWF_GB2_PARA $job $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf.grib2
+         $DBNROOT/bin/dbn_alert MODEL NAM_AWAKCWF_GB2_PARA_WIDX $job $COMOUT/${RUN}.${cycle}.awipak$fh.tm00_icwf.grib2.idx
+         $DBNROOT/bin/dbn_alert MODEL NAM_A217CWF_GB2_PARA $job $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf.grib2
+         $DBNROOT/bin/dbn_alert MODEL NAM_A217CWF_GB2_PARA_WIDX $job $COMOUT/${RUN}.${cycle}.awp217$fh.tm00_icwf.grib2.idx
+         
+         fi
+       let "fh=fh+3"
+     done
+  fi
+
+fi
+
+# block for 218 and 242
+  FHMAX=84
+if [ $fcsthrs -eq $FHMAX ]
+  then
+  icnt=0
+  while [ $icnt -lt 1000 ]
+  do
+      fh=00
+      typeset -Z2 fh
+                                                                                   
+                                                                                   
+      while [ $fh -le $FHMAX ]
+      do
+         if [ -s $COMOUT/${RUN}.${cycle}.awip12${fh}.tm00 -a \
+                 $COMOUT/${RUN}.${cycle}.awak3d${fh}.tm00 ]
+         then
+            let "fh=fh+3"
+            typeset -Z2 fh
+         else
+            break
+         fi
+      done
+             
+      if [ $fh -gt $FHMAX ]
+      then
+         break
+      fi
+             
+      let "icnt=$icnt + 1"
+      sleep 10
+
+      if [ $icnt -ge 180 ]
+      then
+         msg="ABORTING after 30 minutes of waiting for Nam Post F${fh} to end."
+         err_exit $msg
+      fi
+  done
+        
+  echo $COMOUT/${RUN}.${cycle}.awip1200.tm00 > icwf_control_12
+  echo $COMOUT/${RUN}.${cycle}.awak3d00.tm00 > icwf_control_ak
+  fh=03
+  while [ $fh -le $FHMAX ]
+  do
+    echo $COMOUT/${RUN}.${cycle}.awip12${fh}.tm00 >> icwf_control_12
+    echo $COMOUT/${RUN}.${cycle}.awak3d${fh}.tm00 >> icwf_control_ak
+    let "fh=fh+3"
+    typeset -Z2 fh
+  done
+              
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control_12
+  export err=$?;err_chk
+  rm icwf_control_12
+
+  export pgm=nam_icwf;. prep_step
+  $EXECnam/nam_icwf < icwf_control_ak
+  export err=$?;err_chk
+  rm icwf_control_ak
+
+  if test "$SENDDBN" = 'YES'
+  then
+     typeset -Z2 fh
+     fh=00
+     while [ $fh -le $FHMAX ]
+     do
+# Now the ICWF 218 Grids
+       $DBNROOT/bin/dbn_alert MODEL NAM_A218CWF_PARA $job $COMOUT/${RUN}.${cycle}.awp218$fh.tm00_icwf
+                                                                                   
+       let "fh=fh+3"
+     done
+  fi
+
+fi
+# end 218 block
+
+# Extract hourly precipitation from 00z NAM
+# 12-36 h forecast for OCONUS soil moisture adjustment
+# during NDAS
+                                                                                                                                                                    
+if [ $cyc -eq 00 ]
+then
+  ${USHnam}/nam_getpcp_nam00z.sh
+fi
+
+#####################################################################
+# GOOD RUN
+set +x
+echo "**************JOB 247 COMPLETED NORMALLY on the IBM-SP"
+echo "**************JOB 247 COMPLETED NORMALLY on the IBM-SP"
+echo "**************JOB 247 COMPLETED NORMALLY on the IBM-SP"
+set -x
+#####################################################################
+
+echo EXITING $0
+exit
+#

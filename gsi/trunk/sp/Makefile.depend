@@ -1,0 +1,9 @@
+m_obs.o: $(LIBeu) $(LIBhermes) $(LIBods) m_duplicate.o m_repack.o m_simul.o m_soqcs.o m_surf.o m_thin.o m_tovs.o
+m_thin.o: $(LIBeu) $(LIBods) m_soqcs.o m_thin2.o
+m_thin2.o: $(LIBeu) $(LIBods)
+m_tovs.o: $(LIBeu) $(LIBhermes) $(LIBods)
+m_surf.o: $(LIBeu) $(LIBhermes) $(LIBods)
+m_simul.o: $(LIBeu) $(LIBhermes) $(LIBods) m_repack.o
+m_soqcs.o: $(LIBeu) $(LIBods)
+m_repack.o:
+m_duplicate.o: $(LIBeu) $(LIBods) $(LIBpsas)

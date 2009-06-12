@@ -1,0 +1,4 @@
+mpif90 -O3 -xW -g -traceback -check bounds -assume byterecl -convert big_endian -c readpb.f 
+mpif90 -O3 -xW -g -traceback -check bounds -assume byterecl -convert big_endian readpb.o ../lib/bufrlib.a
+#mpif90 -c readpb.f
+#mpif90 readpb.o ../lib/bufrlib.a

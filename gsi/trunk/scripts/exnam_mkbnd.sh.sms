@@ -1,0 +1,58 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_mkbnd.sh
+# Script description:  Runs code to interpolate GDAS/GFS sigma files to NAM boundaries
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: Runs code to interpolate GDAS/GFS sigma files to NAM. Since boundaries
+#           are processed every 3-h, the code is run seven times simulataneously,
+#           followed by a code which "quilts" the seven boundary files into the 
+#           monolithic file needed by BCTEND
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-27  Brent Gordon  Modified for production
+# 2006-01-13  Eric Rogers   Modified for WRF-NMM NAM
+#
+
+set -x
+ipiece=$1
+mkdir -p $DATA/mkbnd.tm00/mkbndpiece.${ipiece}
+cd $DATA/mkbnd.tm00/mkbndpiece.${ipiece}
+/nwprod/util/ush/setup.sh
+export PS4='MKBND${ipiece}_T$SECONDS + '
+export tmmark=tm00
+
+let "ione=ipiece*2"
+let "itwo=ione+1"
+
+set +x
+echo "ione=$ione"
+echo "itwo=$itwo"
+set -x
+
+export pgm=nam_mkbnd
+. prep_step
+ln -sf $DATA/gfsbc${ione}.${tmmark}  fort.11
+ln -sf $DATA/gfsbc${itwo}.${tmmark}  fort.12
+export XLFUNIT_40=$FIXnam/nam_static.wrfsi.rotlat_nonetcdf
+export XLFUNIT_41=$PARMnam/nam_modtop.parm
+export XLFUNIT_42=$FIXnam/nam_deta.60.rev
+export XLFUNIT_51=$DATA/rvnamlbc_${ipiece}.${tmmark}
+export XLFUNIT_52=$DATA/nambcs00_${ipiece}.${tmmark}
+
+startmsg
+$EXECnam/nam_mkbnd < $PARMnam/nam_mkbnd.parm_2 >> $pgmout.${ipiece}.${tmmark}
+export err=$?;err_chk
+
+if [ $err -ne 0 ]
+then
+  sleep 60
+fi
+
+echo MKBND PIECE ${ipiece} DONE > $DATA/mkbnddone.${ipiece}.${tmmark}
+
+exit

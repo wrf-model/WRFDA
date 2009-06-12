@@ -1,0 +1,8 @@
+# Default values for IRIX 64
+# --------------------------
+FC     = f90
+F77    = $(FC)
+F90    = $(FC)
+_RPREC = 8
+_IPREC = 4
+FFLAGS = -O2 -r$(_RPREC) -i$(_IPREC) -I. -64

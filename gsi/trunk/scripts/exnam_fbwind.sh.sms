@@ -1,0 +1,139 @@
+#!/bin/sh
+#####################################################################
+echo "------------------------------------------------"
+echo "EXNAM_FBWIND - 24hr NAM postprocessing"
+echo "------------------------------------------------"
+echo "History: Oct 2004 - First implementation of this new script."
+echo "         FBWNDTRX (FB Winds) program for CONUS"
+#####################################################################
+
+cd $DATA
+
+######################
+# Set up Here Files.
+######################
+
+set -x
+msg="Begin job for $job"
+postmsg "$jlogfile" "$msg"
+
+export comrun=$COMIN/${model}.${cycle}
+
+echo " "
+echo "#############################################################"
+echo " Process Bulletins of fcst winds and temps for US and Canada."
+echo "#############################################################"
+echo " "
+set -x
+
+export pgm=bulls_fdwndtrx
+. prep_step
+
+cp $comrun.awip3206.tm00 awip3206.tm00
+cp $comrun.awip3212.tm00 awip3212.tm00
+cp $comrun.awip3224.tm00 awip3224.tm00
+cp $comrun.awip32i06 awip32i06
+cp $comrun.awip32i12 awip32i12
+cp $comrun.awip32i24 awip32i24
+
+export XLFUNIT_11="awip3206.tm00"
+export XLFUNIT_12="awip3212.tm00"
+export XLFUNIT_13="awip3224.tm00"
+
+#       NAM grib index files
+
+export XLFUNIT_31="awip32i06"
+export XLFUNIT_32="awip32i12"
+export XLFUNIT_33="awip32i24"
+
+#
+#   1280 byte transmission file
+#
+
+export XLFUNIT_51="tran.fbwnd_conus"
+
+startmsg
+
+$EXECbulls/fbwndtrx     < $PARMbulls/fbwnd_conus.stnlist  >> $pgmout 2> errfile
+err=$?;export err;err_chk
+
+if test "$SENDCOM" = 'YES'
+then
+    cp tran.fbwnd_conus $pcom/tran.fbwnd_conus.$job
+fi
+
+if test "$SENDDBN" = 'YES'
+then
+   $utilities/make_ntc_bull.pl  WMOBH NONE KWNO NONE tran.fbwnd_conus $pcom/tran.fbwnd_conus.$job  
+fi
+   
+##################################################################
+#
+#      Process Bulletins of OLD FD WIND at 00Z and 12Z
+#
+##################################################################
+
+if test ${cycle} = 't00z' -o ${cycle} = 't12z'
+then
+
+   set +x
+   echo " "
+   echo "#############################################################"
+   echo " Process Bulletins of fcst winds and temps for US and Canada."
+   echo "#############################################################"
+   echo " "
+   set -x
+
+   export pgm=bulls_fdwndtrx
+   . prep_step
+
+   export XLFUNIT_11="awip3206.tm00"
+   export XLFUNIT_12="awip3212.tm00"
+   export XLFUNIT_13="awip3224.tm00"
+
+   #       NAM grib index files
+
+   export XLFUNIT_31="awip32i06"
+   export XLFUNIT_32="awip32i12"
+   export XLFUNIT_33="awip32i24"
+
+   export XLFUNIT_49="ncepdate"
+
+   #
+   #   1280 byte transmission file
+   #
+
+   export XLFUNIT_51="tran.fdwnd"
+
+   startmsg
+
+   $EXECbulls/bulls_fdwndtrx < $PARMbulls/bulls_fdwnd.stnlist >> $pgmout 2> errfile
+   err=$?;export err;err_chk
+
+   if test "$SENDCOM" = 'YES'
+   then
+     cp tran.fdwnd $pcom/tran.fdwnd.$job
+   fi
+
+   if test "$SENDDBN" = 'YES'
+   then
+      $USHutil/make_ntc_bull.pl  WMOBH NONE KWNO NONE tran.fdwnd $pcom/tran.fdwnd.$job
+   fi
+
+fi
+
+#####################################################################
+# GOOD RUN
+set +x
+echo "**************EXNAM_FBWIND COMPLETED NORMALLY ON IBM-SP"
+echo "**************EXNAM_FBWIND COMPLETED NORMALLY ON IBM-SP"
+echo "**************EXNAM_FBWIND COMPLETED NORMALLY ON IBM-SP"
+set -x
+#####################################################################
+
+msg='Job completed normally.'
+echo $msg
+postmsg "$jlogfile" "$msg"
+
+############################### END OF SCRIPT #######################
+

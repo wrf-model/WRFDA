@@ -1,0 +1,123 @@
+set +x
+##############################################################################
+echo "---------------------------------------------------------------"
+echo "hysplit_prep.sh - Script To Convert NAM Grib Data into ARL Format.  "
+echo "---------------------------------------------------------------"
+echo "History:     1997 - Original Script Submitted by Roland Draxler"
+echo "         FEB 1998 - First Implementation of this script   "
+echo "                    by David Michaud"
+echo "         JUN 1999 - converted to IBM-SP"
+echo "         OCT 2001 - Modified to convert NAM into ARL format and"
+echo "                    be run eery 6 hours after the end of an NAM cycle"
+echo "                    to create a ready data set for the Hysplit model."
+##############################################################################
+set -x
+
+cd $DATA
+
+###########################################################
+# Specify the Fields to Pull Out of the 00.tm03 Ndas  Files
+###########################################################
+export WGRIB=$utilexec/wgrib
+
+WGRIB_LIST=":SOILM:0-200\ cm\ down:anl|:SHTFL:sfc:|:LHTFL:sfc:|:DSWRF:sfc:|:FRICV:sfc:anl|:APCP:sfc:0-0hr\ acc|:ACPCP:sfc:0-0hr\ acc"
+
+#############################################################
+# Create the NAMA file from the current NDAS forecast.  If
+# not availabel try to find an NAM forecast instead.
+#############################################################
+for FHR in 00.tm03 03.tm03
+do
+  NAMFILE=$NAM_DIR/ndas.$PDY/ndas.t${cyc}z.awphys${FHR}
+  if [ ! -f $NAMFILE ]
+  then
+    NPDY=`$utilexec/ndate -6 ${PDY}${cyc}`
+    TCYC=`echo $NPDY | cut -c9-10`
+    TPDY=`echo $NPDY | cut -c1-8`
+    case $FHR in
+      00.tm03)  FHR=03;;
+      03.tm03)  FHR=06;;
+    esac
+    NAMFILE=$NAM_DIR/nam.$TPDY/nam.t${TCYC}z.awphys${FHR}.tm00
+  elif [ $FHR = "00.tm03" ] ; then
+    rm tmp.grib tmp1.grib tmp2.grib
+    $WGRIB -s $NAMFILE | egrep -v "$WGRIB_LIST" | $WGRIB $NAMFILE -s -i \
+     -grib -o tmp1.grib
+    NAMFILE2=$NAM_DIR/ndas.$PDY/ndas.t${cyc}z.awphys03.tm06
+    $WGRIB -s $NAMFILE2 | egrep "$WGRIB_LIST" | $WGRIB $NAMFILE2 -s -i \
+     -grib -o tmp2.grib
+    cat tmp1.grib tmp2.grib > tmp.grib
+    NAMFILE=tmp.grib
+  fi
+
+  export pgm=hysplit_nam12arl_hls
+  . prep_step
+
+  msg="hysplit_nam12arl_hls for hour $FPDY${LCYC}F$FHR started"
+  postmsg "$jlogfile" "$msg"
+
+  $EXEChysplit/hysplit_nam12arl_hls $NAMFILE >>$pgmout 2>errfile
+  export err=$?;err_chk
+
+  cat DATA.NAM >> NAMA
+done
+
+#############################################################
+# Now generate the NAMF files fromthe NAM forecast
+#############################################################
+typeset -Z2 FHR
+FHR=$FHR_START
+let NUM_HOURS=FHR_MAX/FHR_INT+1
+let SEQ_HOURS=NUM_HOURS/TASKS
+let GROUPS=$NUM_HOURS/$SEQ_HOURS
+SEQ=""
+
+rm -rf poescript
+hour_cnt=1
+group_cnt=1
+while [ $FHR -le $FHR_MAX ]
+do
+   if [ $hour_cnt -eq 1 ]
+   then
+      SEQ="$FHR" 
+   else
+      SEQ="$SEQ $FHR" 
+   fi
+   if [ $hour_cnt -ge $SEQ_HOURS ]
+   then
+      if [ $group_cnt -lt $GROUPS -o $FHR -eq $FHR_MAX ]
+      then
+         echo "$USHhysplit/hysplit_nam12arl_hls.sh \"$SEQ\"" >> poescript
+         let group_cnt=group_cnt+1
+         let hour_cnt=0
+         SEQ=""
+      fi
+   fi
+
+   let hour_cnt=hour_cnt+1
+   let FHR=FHR+FHR_INT
+done
+
+chmod 775 $DATA/poescript
+export MP_PGMMODEL=mpmd
+export MP_CMDFILE=$DATA/poescript
+export MP_LABELIO=YES
+#
+# Execute the script.
+poe
+export err=$?; err_chk
+
+FHR=$FHR_START
+while [ $FHR -le $FHR_MAX ]
+do
+   cat $FHR/DATA.NAM >> NAMF
+   let FHR=FHR+FHR_INT
+done
+
+if test $SENDCOM = 'YES'
+then
+  cp NAMA $COMOUT/hysplit.t${cyc}z.nama
+  cp NAMF $COMOUT/hysplit.t${cyc}z.namf
+fi
+
+exit

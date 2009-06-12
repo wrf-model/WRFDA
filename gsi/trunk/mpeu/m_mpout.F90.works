@@ -1,0 +1,98 @@
+    module m_mpout
+
+      interface mpout_log;   module procedure  &
+      logunder
+   end interface
+
+
+
+      interface mpout_setflush; module procedure      &
+	setflush_; end interface
+
+  character(len=*),parameter :: myname='m_mpout'
+
+  character(len=*),parameter :: def_pfix='mpout'
+
+  integer,save :: isync=-1
+
+  integer,save :: mpout=stdout
+		! mpout is the logical unit used on a given PE
+
+  logical,save :: mpout_on=.false.
+		! mpout_on indicates if mpout is managed under this
+		! module, either by default or by user's requests
+		! through mpout_open(..).
+
+  logical,save :: mpout_initialized=.false.
+		! mpout_initialized indicates if this module has been
+		! initialized, such that that if mpout_open() is not
+		! called, this module may still be used to manage the
+		! outputs to STDOUT.
+
+  logical,save :: mpout_opened=.false.
+		! mpout_opened ensures that open()/close() calls are
+		! paired.
+
+  character(len=LEN_FILENAME-4),save :: upfix=def_pfix
+  integer,parameter :: mpout_MASK=HUGE(1)	! mask of all but PE 0
+
+  logical, save :: default_flush = .false.
+
+contains
+
+
+    subroutine open_(mask,pfix,append)
+
+end subroutine open_
+
+    subroutine close_()
+
+end subroutine close_
+
+    subroutine sync_(tag)
+
+end subroutine sync_
+
+    subroutine flush_()
+
+end subroutine flush_
+
+    function ison_()
+      implicit none
+      logical :: ison_
+
+! !REVISION HISTORY:
+! 	14Sep99	- Jing Guo <guo@dao.gsfc.nasa.gov>
+!		- initial prototype/prolog/code
+!EOP ___________________________________________________________________
+
+  character(len=*),parameter :: myname_=myname//'::ison_'
+
+end function ison_
+
+    subroutine log_(where,message,showrank,flush)
+
+end subroutine log_
+
+    subroutine logi_(where,message,num,showrank,flush)
+
+end subroutine logi_
+
+    subroutine logd_(where,message,val,showrank,flush)
+
+end subroutine logd_
+
+    subroutine logr_(where,message,val,showrank,flush)
+
+end subroutine logr_
+
+    subroutine initialize_()
+
+end subroutine initialize_
+
+
+    subroutine setflush_(flush)
+
+end subroutine setflush_
+
+end module m_mpout

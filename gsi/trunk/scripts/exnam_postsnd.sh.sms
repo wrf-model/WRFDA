@@ -1,0 +1,45 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_sndpost.sh
+# Script description:  Trigger nam sounding post job
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script triggers the nam sounding post job, which
+#           creates a piece of the model sounding profile whose
+#           time interval is determined by the input forecast hours.
+#
+# Script history log:
+# 2000-05-16  Eric Rogers
+# 2006-01-20  Eric Rogers -- extended to 84-h and modified for WRF-NMM NAM
+#
+set -x
+
+cd $DATA
+
+export tmmark=tm00
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+fhr=00
+typeset -Z2 fhr
+fcstendfhr=84
+endfhr=84
+
+rm -rf profilm.c1.$tmmark
+
+while [ $fhr -le $endfhr ]
+do
+   cat profilm.c1.${tmmark}.f${fhr} >> profilm.c1.$tmmark
+   let "fhr=fhr+1"
+   typeset -Z2 fhr
+done
+
+##
+# Run NAM bufr sounding breakout code
+##
+$USHnam/nam_namsndp.sh
+
+echo EXITING $0 with return code $err
+exit $err

@@ -1,0 +1,701 @@
+#!/bin/sh
+#####################################################################
+echo "----------------------------------------------------------"
+echo "exnam_dump_ftp.sh.sms - Nam model data dump ftp processing"
+echo "----------------------------------------------------------"
+echo "History: Oct 29 2002 - Original script."
+#####################################################################
+
+# Make sure we are in the $DATA directory
+cd $DATA
+
+set -x
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cat break > $pgmout
+
+export dumptime=`cut -c7-16 ncepdate`
+
+msg="NAM ANALYSIS TIME IS $PDY$cyc"
+postmsg "$jlogfile" "$msg"
+
+set +x
+echo
+echo "CENTER DATA DUMP DATE-TIME FOR $tmmark NAM IS $dumptime"
+echo
+set -x
+
+
+if test "$envir" = "prod" then
+    export REMOTE_HOST=prodsp
+    ntrymax=3
+    try=0
+    doftp=NO
+
+    while [ $try -lt $ntrymax ]
+    do
+      	/etc/ping $REMOTE_HOST 64 2
+      	pingerr=$?
+      	if [ $pingerr -eq 0 ] then
+            doftp=YES
+            try=$ntrymax
+        else
+            msg="Cannot Contact $REMOTE_HOST on try $try of $ntrymax"
+            postmsg "$jlogfile" "$msg"
+            ((try=try+1))
+        fi
+    done
+
+    if test "$doftp" = "NO" then
+        err_exit "Cannot Contact $REMOTE_HOST after $ntrymax try/tries"
+    fi
+else
+    err_exit "IT IS NOT PROD HOST"
+fi
+
+
+export COMSP=$COMOUT/$RUN.${cycle}.
+
+if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
+
+    #################################################
+    #  copy imssnow from $TANK_GRIBFLDS
+    #################################################
+
+    imssnow=$TANK_GRIBFLDS/$PDY/wgrbbul/imssnow.grb
+    imssold=$TANK_GRIBFLDS/$PDYm1/wgrbbul/imssnow.grb
+
+    ftp -v $REMOTE_HOST << EOF
+    prompt
+    bin
+    get $imssnow ${COMSP}imssnow.grb
+    bye
+    EOF
+
+    if [ -s ${COMSP}imssnow ]; then
+      #cp $imssnow ${COMSP}imssnow.grb
+        msg="todays IMS snow grib file located and copied to /com"
+        postmsg "$jlogfile" "$msg"
+    else
+      #cp $imssold ${COMSP}imssnow.grb
+
+	ftp -v $REMOTE_HOST << EOF
+        prompt
+        bin
+        get $imssold ${COMSP}imssnow.grb
+        bye
+        EOF
+	
+	if [ -s ${COMSP}imssnow ]; then
+            msg="**todays IMS snow grib file not located - copy 1-day old file"
+            postmsg "$jlogfile" "$msg"
+	else
+            set +x
+            echo " "
+            echo " ##########################################"
+            echo " cannot locate IMS snow grib file "
+            echo " non-fatal error (but will cause failure in"
+            echo " downstream analysis)"
+            echo " ##########################################"
+            echo " "
+            set -x
+            msg="**CANNOT LOCATE IMS SNOW GRIB FILE --> non-fatal"
+            postmsg "$jlogfile" "$msg"
+        fi
+    fi
+
+    #################################################
+    #  copy snowdepth from $TANK_GRIBFLDS
+    #################################################
+
+    snowdepth=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.grb
+    snowdeold=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.grb
+
+    # cp $snowdepth ${COMSP}snowdepth.grb
+
+    ftp -v $REMOTE_HOST << EOF
+    prompt
+    bin
+    get $snowdepth ${COMSP}snowdepth.grb
+    bye
+    EOF
+
+    if [ -s ${COMSP}snowdepth ]; then
+        msg="todays snow depth grib file located and copied to /com"
+        postmsg "$jlogfile" "$msg"
+    else
+        # cp $snowdeold ${COMSP}snowdepth.grb
+
+        ftp -v $REMOTE_HOST << EOF
+        prompt
+        bin
+        get $snowdeold ${COMSP}snowdepth.grb
+        bye
+        EOF
+
+        if [ -s ${COMSP}snowdepth ]; then
+            msg="**todays snow depth grib file not located - copy 1-day old file"
+            postmsg "$jlogfile" "$msg"
+        else
+            set +x
+            echo " "
+            echo " ##########################################"
+            echo " cannot locate snow depth grib file "
+            echo " non-fatal error (but will cause failure in"
+            echo " downstream analysis)"
+            echo " ##########################################"
+            echo " "
+            set -x
+            msg="**CANNOT LOCATE SNOW DEPTH GRIB FILE --> non-fatal"
+            postmsg "$jlogfile" "$msg"
+        fi
+    fi
+#  endif loop $PROCESS_GRIBFLDS
+fi
+
+
+if [ "$PROCESS_TROPCY" = 'YES' ]; then
+
+#########################################
+#########################################
+#  Process tcvitals for tropical cyclones
+#########################################
+#########################################
+
+   $ushscript_tropcy/syndat_qctropcy.sh $dumptime
+
+   cd $COMOUT
+   pwd
+   set +x
+   ls -ltr *syndata*
+   set -x
+   cd $ARCHSYND
+   pwd;ls -ltr
+   cat syndat_dateck
+   cd $HOMENHC
+   pwd;ls -ltr
+   cd $DATA
+
+else
+
+# Copy null files into "syndata.tcvitals" and "jtwc-fnoc.tcvitals"
+
+   cp /dev/null ${COMSP}syndata.tcvitals.$tmmark
+   cp /dev/null ${COMSP}jtwc-fnoc.tcvitals.$tmmark
+
+#  endif loop $PROCESS_TROPCY
+fi
+
+
+err1=0
+err2=0
+err3=0
+err4=0
+err5=0
+err6=0
+if [ "$PROCESS_DUMP" = 'YES' ]; then
+
+###################################
+###################################
+#  The data "dump" script for tm00
+###################################
+###################################
+
+msg="START THE $tmmark NAM DATA DUMP CENTERED ON $dumptime"
+postmsg "$jlogfile" "$msg"
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_1; chmod +x thread_1
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=1
+
+#============================================================================
+# Dump # 1 : PROFLR, VADWND, 1BHRS2, 1BAMUB
+#            -- TOTAL NUMBER OF SUBTYPES = 5
+#            time window radius is 1.50 hours
+#============================================================================
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 proflr vadwnd 1bhrs2 1bamub
+error1=$?
+echo "$error1" > $DATA/error1
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_proflr $job ${COMSP}proflr.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_vadwnd $job ${COMSP}vadwnd.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_1bhrs2 $job ${COMSP}1bhrs2.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_1bamub $job ${COMSP}1bamub.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_1
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/1.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_2; chmod +x thread_2
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_2
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=2
+
+#========================================================================
+# Dump # 2 : AIRCAR, SFCSHP, ADPSFC, GOESND, SSMIP, SSMIPN, SSMIT, 1BMSU
+#            -- TOTAL NUMBER OF SUBTYPES = 15
+#            time window radius is +/- 1.50 hours for all types except
+#            GOESND subtype 003.002 where it is -3.25 to -0.01 hours
+#            (note: ssmip and ssmipn must appear in the same
+#                   dump number if variable
+#                   "PREPSSMI_PROD_TYPE" = 'COMBINATION')
+#=======================================================================
+
+
+DTIM_earliest_003002=-3.25
+DTIM_latest_003002=-0.01
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 aircar sfcshp adpsfc \
+ goesnd ssmip ssmipn ssmit 1bmsu
+error2=$?
+echo "$error2" > $DATA/error2
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_aircar $job ${COMSP}aircar.$tmmark.bufr_d
+#  Commented out 12/03/07 SEC due to restricted data. Masked sets are being
+#  alerted as _nr
+# $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_sfcshp $job ${COMSP}sfcshp.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_adpsfc $job ${COMSP}adpsfc.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_goesnd $job ${COMSP}goesnd.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_ssmip  $job ${COMSP}ssmip.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_ssmipn $job ${COMSP}ssmipn.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_ssmit  $job ${COMSP}ssmit.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_spssmi $job ${COMSP}spssmi.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_1bmsu  $job ${COMSP}1bmsu.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_2
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/2.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_3; chmod +x thread_3
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_3
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=3
+
+#====================================================================
+# Dump # 3 : SATWND, 1BHRS3, 1BAMUA -- TOTAL NUMBER OF SUBTYPES = 12
+#            time window radius is 1.50 hours on all types
+#            except SATWND subtypes 005/064, 005/065 and 005/066
+#            where it is -1.50 to +1.49 hours
+#            (note: satwnd needs at least 1.25-hr window radius
+#                   because some NESDIS SATWND report times can
+#                   be cycle time minus 1:15)
+#====================================================================
+
+# Skip all Indian and MODIS satwnds (not in NAM domain)
+
+export SKIP_005021=YES
+export SKIP_005022=YES
+export SKIP_005023=YES
+export SKIP_005070=YES
+export SKIP_005071=YES
+
+DTIM_latest_005064=+1.49
+DTIM_latest_005065=+1.49
+DTIM_latest_005066=+1.49
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 satwnd 1bhrs3 1bamua
+error3=$?
+echo "$error3" > $DATA/error3
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_satwnd $job ${COMSP}satwnd.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_1bhrs3 $job ${COMSP}1bhrs3.$tmmark.bufr_d
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_1bamua $job ${COMSP}1bamua.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_3
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/3.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_4; chmod +x thread_4
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_4
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=4
+
+#===========================================================================
+# Dump # 4 : MSONET, GPSIPW -- TOTAL NUMBER OF SUBTYPES = 14
+#            time window radius is 1.50 hours
+#===========================================================================
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 msonet gpsipw
+error4=$?
+echo "$error4" > $DATA/error4
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_gpsipw $job ${COMSP}gpsipw.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_4
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/4.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_5; chmod +x thread_5
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_5
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=5
+
+#===========================================================================
+# Dump # 5 : AIRCFT -- TOTAL NUMBER OF SUBTYPES = 3
+#            time window radius is 3.25 hours
+#===========================================================================
+
+# Dump globally with +/- 3.25 hr time window so quality of PREPOBS_PREPACQC
+#  track check is maximized
+
+export LALO=0
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 3.25 1 aircft
+error5=$?
+echo "$error5" > $DATA/error5
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_aircft $job ${COMSP}aircft.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_5
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/5.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+cat<<\EOF>thread_6; chmod +x thread_6
+set -uax
+
+cd $DATA
+
+{ echo
+set +x
+echo "********************************************************************"
+echo Script thread_6
+echo Executing on node  `hostname`
+echo Starting time: `date`
+echo "********************************************************************"
+echo
+set -x
+
+export STATUS=NO
+export DUMP_NUMBER=6
+
+#===========================================================================
+# Dump # 6 : ADPUPA -- TOTAL NUMBER OF SUBTYPES = 6
+#            time window radius is 1.50 hours
+#            (note: adpupa is dumped last and after all other dumping has
+#                   completed in the Nam dump - ONLY- in order to maximize
+#                   availability of adpupa data for Nam network)
+#===========================================================================
+
+$ushscript_dump/bufr_dump_obs.sh $dumptime 1.5 1 adpupa
+error6=$?
+echo "$error6" > $DATA/error6
+
+if [ "$SENDDBN" = 'YES' ]; then
+ $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_adpupa $job ${COMSP}adpupa.$tmmark.bufr_d
+fi
+
+set +x
+echo "********************************************************************"
+echo Script thread_6
+echo Finished executing on node  `hostname`
+echo Ending time  : `date`
+echo "********************************************************************"
+set -x
+} > $DATA/6.out 2>&1
+EOF
+
+#----------------------------------------------------------------
+
+thread_1 &
+thread_2 &
+thread_3 &
+thread_4 &
+thread_5 &
+
+wait
+
+thread_6  # adpupa is dumped AFTER all other dump threads have run in order
+          #  to dump as late as possible and maximize data availablily in
+          #  Nam network
+
+cat $DATA/1.out $DATA/2.out $DATA/3.out $DATA/4.out $DATA/5.out $DATA/6.out
+err1=`cat $DATA/error1`
+err2=`cat $DATA/error2`
+err3=`cat $DATA/error3`
+err4=`cat $DATA/error4`
+err5=`cat $DATA/error5`
+err6=`cat $DATA/error6`
+
+export STATUS=YES
+export DUMP_NUMBER=6
+$ushscript_dump/bufr_dump_obs.sh $dumptime 3.00 1 null
+
+
+#  endif loop $PROCESS_DUMP
+fi
+
+#================================================================
+#================================================================
+
+errsat=0
+if [ "$PROCESS_satDUMP" = 'YES' ]; then
+
+##########################################################################
+##########################################################################
+#  The 1B (HIRS, MSU, AMSU-A/B) and SBUV satellite "dump" script for tm00
+##########################################################################
+##########################################################################
+
+
+   msg="START THE $tmmark NAM 1B/SBUV SATELLITE DUMP CENTERED ON $dumptime"
+   postmsg "$jlogfile" "$msg"
+
+   export STATUSsat=YES
+
+#==================================================================
+# 1B/SBUV Satellite Dump :
+#            h1bn14 : NOAA-14 HIRS 1B
+#            h1bn15 : NOAA-15 HIRS 1B
+#            h1bn16 : NOAA-16 HIRS 1B
+#            m1bn14 : NOAA-14 MSU  1B
+#            a1bn15 : NOAA-15 AMSU/A 1B
+#            a1bn16 : NOAA-16 AMSU/A 1B
+#            b1bn15 : NOAA-15 AMSU/B 1B
+#            b1bn16 : NOAA-16 AMSU/B 1B
+#   (Note: sbuv data not assimilated by 3DVAR)
+#==================================================================
+
+   $ushscript_satdump/bufr_dump_sat.sh $dumptime 1.5 1 h1bn14 h1bn15 \
+    h1bn16 m1bn14 a1bn15 a1bn16 b1bn15 b1bn16
+   errsat=$?
+
+   if [ "$SENDDBN" = 'YES' ]; then
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_h1bn14 $job \
+       ${COMSP}h1bn14.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_h1bn15 $job \
+       ${COMSP}h1bn15.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_h1bn16 $job \
+       ${COMSP}h1bn16.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_m1bn14 $job \
+       ${COMSP}m1bn14.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_a1bn15 $job \
+       ${COMSP}a1bn15.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_a1bn16 $job \
+       ${COMSP}a1bn16.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_b1bn15 $job \
+       ${COMSP}b1bn15.$tmmark.ieee_d
+      $DBNROOT/bin/dbn_alert MODEL NAM_BUFR_b1bn16 $job \
+       ${COMSP}b1bn16.$tmmark.ieee_d
+   fi
+
+#  endif loop $PROCESS_satDUMP
+fi
+
+if [ "$PROCESS_DATACOUNTS" = 'YES' ]; then
+
+#  Prepare the data counts for the SDM if requested
+#  ------------------------------------------------
+
+   $ushscript_datacount/bufr_datacount.sh
+fi
+
+#====================================================
+#====================================================
+
+
+if [ "$PROCESS_satDUMP" = 'YES' -o "$PROCESS_DUMP" = 'YES' ]; then
+
+   if [ "$errsat" -gt '0' ]; then
+
+## a non-zero status code from dumping of 1B/SBUV satellite files is
+## non-fatal but still worth noting
+
+      if [ "$errsat" -gt '22' ]; then
+         set +x
+echo
+echo " ################################################################## "
+echo " --> > 22 RETURN CODE FROM 1B/SBUV SATELLITE DUMP, $errsat          "
+echo " --> NO 1B/SBUV SATELLITE DATA OF ANY TYPE WAS DUMPED - CONTINUE    "
+echo " ################################################################## "
+echo
+         set -x
+      else
+         set +x
+echo
+echo " #################################################################### "
+echo " --> > 0 RETURN CODE FROM 1B/SBUV SATELLITE DUMP, $errsat             "
+echo " --> NOT ALL 1B/SBUV SATELLITE DATA DUMP FILES ARE COMPLETE- CONTINUE "
+echo " #################################################################### "
+echo
+         set -x
+      fi
+   fi
+
+   if [ "$err1" -gt '5' -o "$err2" -gt '5' -o "$err3" -gt '5' -o \
+    "$err4" -gt '5' -o "$err5" -gt '5' -o "$err6" -gt '5' ]; then
+      for n in $err1 $err2 $err3 $err4 $err5 $err6
+      do
+         if [ "$n" -gt '5' ]; then
+            if [ "$n" -ne '11' -a "$n" -ne '22' ]; then
+
+## fatal error in dumping of BUFR obs. files
+
+               set +x
+echo
+echo " ###################################################### "
+echo " --> > 22 RETURN CODE FROM DATA DUMP, $err1, $err2, $err3, $err4, \
+$err5, $err6 "
+echo " --> @@ F A T A L   E R R O R @@   --  ABNORMAL EXIT    "
+echo " ###################################################### "
+echo
+               set -x
+               err_exit
+               exit 9
+            fi
+         fi
+      done
+
+## a status code of 11 or 22 from dumping of BUFR obs. files
+## is non-fatal but still worth noting
+
+      set +x
+      echo
+      echo " ###################################################### "
+      echo " --> > 5 RETURN CODE FROM DATA DUMP, $err1, $err2, $err3, $err4, \
+$err5, $err6 "
+      echo " --> NOT ALL DATA DUMP FILES ARE COMPLETE - CONTINUE    "
+      echo " ###################################################### "
+      echo
+      set -x
+   fi
+
+#  endif loop $PROCESS_satDUMP/$PROCESS_DUMP
+fi
+
+
+# GOOD RUN
+set +x
+echo " "
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " "
+set -x
+
+
+# save standard output
+cat break $pgmout break > allout
+cat allout
+# rm allout
+ 
+sleep 10
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################

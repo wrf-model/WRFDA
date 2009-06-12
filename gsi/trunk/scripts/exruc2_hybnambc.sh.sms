@@ -1,0 +1,217 @@
+#!/bin/sh -xv
+#
+# Main driver for ruc boundary condition run
+#      hybnambc
+#     Interpolates Eta fields to RUC grid for
+#         lateral boundary conditions
+#  Usage: driver cycle
+#
+#
+# Go into TMPDIR where the RUC2 should run
+#
+
+set -x
+
+################################################################
+#
+# FLOW OF CONTROL
+#
+# 1)  Get the ncepdate
+#
+# 2)  MAKATIM - reads in ncepdate (file called NMCDATE) and writes
+#     out RUC formatted date (YYDDDHH00) (file called MAPTIME)
+#
+# 3)  Link to output directory
+#
+# 4)  Copy in fields from fixed fields directory
+#
+# 5)  Copy in nam forecasts
+#  
+# 6)  HYBNAMBC - reads in three hourly forecasts (00,03,06,...,30) from
+#     nam model and constructs boundary condition files for the 20-km
+#     RUC model (called RUC2)
+#
+#######################################################################
+
+# set up locations for source, executables, and output grids
+ 
+pgmout=$DATA/hybnambc.out
+
+# go where hybnambc should run
+
+cd $DATA
+
+# first, get the nam cycle time from /com/date 
+ 
+#cp /com/date/${cycle} NMCDATE 
+#
+#  convert NMC date to MAPS date
+#  makptime makes a file called MAPTIME
+#  that holds the MAPS date (YYDDDHH00)
+#
+rm MAPTIME
+
+export pgm=rucs_makatim
+startmsg
+
+$EXECsfcruc/rucs_makatim
+err=$?;export err; err_chk
+
+#
+dte=`cat NMCDATE|cut -c9-14`
+#
+# extract analysis time from MAPTIME ( 00 or 12 for Eta )
+
+# <<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>
+# <<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>
+# <<                                                                        >>
+# <<       RUN THE NAM to RUC BC and BACKGROUND INTERPOLATOR PROGRAM        >>
+# <<                                                                        >>
+# <<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>
+# <<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>
+#
+###############################################################################
+# ASSIGN THE ARGUMENTS
+###############################################################################
+ATIME='cat MAPTIME'
+
+###############################################################################
+# Link in the data directories
+###############################################################################
+# Link to output directory for hybnambc must be called EXT_DATA
+##############################################################################
+/bin/rm -f               EXT_DATA
+ln -s ${DATA}        EXT_DATA
+ 
+###############################################################################
+# This program runs every 6 hours so MAPTIME should reflect the latest
+# On-time data cycle (00Z or 12Z). 
+###############################################################################
+
+YYDDDHHNGM=`cat MAPTIME`                      #recent 00 hour NAM run
+
+###############################################################################
+# Identify the fixed Input files
+###############################################################################
+
+/bin/rm -f PTSME185
+/bin/rm -f LTLN
+/bin/rm -f TOPENVL
+/bin/rm -f NETCDLS
+/bin/rm -f HYBNMC.INI
+/bin/rm -f GRIBTABLE
+
+cp $MAPS_PARMS/ruc2_ptsme185.dat     PTSME185
+cp $MAPS_PARMS/ruc2_latlon.mps       LTLN
+cp $MAPS_PARMS/ruc2_topoenvl.dat     TOPENVL
+cp $MAPS_PARMS/ruc2_hybnambc.ini    HYBNMC.INI
+cp $MAPS_PARMS/ruc2_grib.table     GRIBTABLE
+
+###############################################################################
+# Output files
+##############################################################################
+
+# remove the files created by the previous run (24 hours ago)
+
+#/bin/rm -f ${NAM_DATA}/*${cyc}000000.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000003.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000006.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000009.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000012.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000015.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000018.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000021.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000024.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000027.grib
+#/bin/rm -f ${NAM_DATA}/*${cyc}000030.grib
+
+# remove old links to nam data
+
+rm -f AWIP*
+
+# link to the nam forecast files
+
+export WriteCOM=/com/nam/prod/nam.${PDY}
+
+ln -s $WriteCOM/nam.${cycle}.awip3d00.tm00 AWIP3D00 
+ln -s $WriteCOM/nam.${cycle}.awip3di00.tm00 AWIP3D00i 
+ln -s $WriteCOM/nam.${cycle}.awip3d03.tm00 AWIP3D03 
+ln -s $WriteCOM/nam.${cycle}.awip3di03.tm00 AWIP3D03i 
+ln -s $WriteCOM/nam.${cycle}.awip3d06.tm00 AWIP3D06
+ln -s $WriteCOM/nam.${cycle}.awip3di06.tm00 AWIP3D06i
+ln -s $WriteCOM/nam.${cycle}.awip3d09.tm00 AWIP3D09
+ln -s $WriteCOM/nam.${cycle}.awip3di09.tm00 AWIP3D09i
+ln -s $WriteCOM/nam.${cycle}.awip3d12.tm00 AWIP3D12
+ln -s $WriteCOM/nam.${cycle}.awip3di12.tm00 AWIP3D12i
+ln -s $WriteCOM/nam.${cycle}.awip3d15.tm00 AWIP3D15
+ln -s $WriteCOM/nam.${cycle}.awip3di15.tm00 AWIP3D15i
+ln -s $WriteCOM/nam.${cycle}.awip3d18.tm00 AWIP3D18
+ln -s $WriteCOM/nam.${cycle}.awip3di18.tm00 AWIP3D18i
+ln -s $WriteCOM/nam.${cycle}.awip3d21.tm00 AWIP3D21
+ln -s $WriteCOM/nam.${cycle}.awip3di21.tm00 AWIP3D21i
+ln -s $WriteCOM/nam.${cycle}.awip3d24.tm00 AWIP3D24
+ln -s $WriteCOM/nam.${cycle}.awip3di24.tm00 AWIP3D24i
+ln -s $WriteCOM/nam.${cycle}.awip3d27.tm00 AWIP3D27
+ln -s $WriteCOM/nam.${cycle}.awip3di27.tm00 AWIP3D27i
+ln -s $WriteCOM/nam.${cycle}.awip3d30.tm00 AWIP3D30
+ln -s $WriteCOM/nam.${cycle}.awip3di30.tm00 AWIP3D30i
+
+pgm=ruc2_hybnambc
+export pgm;prep_step
+
+export XLFUNIT_30="AWIP3D00"
+export XLFUNIT_31="AWIP3D03"
+export XLFUNIT_32="AWIP3D06"
+export XLFUNIT_33="AWIP3D09"
+export XLFUNIT_34="AWIP3D12"
+export XLFUNIT_35="AWIP3D15"
+export XLFUNIT_36="AWIP3D18"
+export XLFUNIT_37="AWIP3D21"
+export XLFUNIT_38="AWIP3D24"
+export XLFUNIT_39="AWIP3D27"
+export XLFUNIT_40="AWIP3D30"
+
+export XLFUNIT_50="AWIP3D00i"
+export XLFUNIT_51="AWIP3D03i"
+export XLFUNIT_52="AWIP3D06i"
+export XLFUNIT_53="AWIP3D09i"
+export XLFUNIT_54="AWIP3D12i"
+export XLFUNIT_55="AWIP3D15i"
+export XLFUNIT_56="AWIP3D18i"
+export XLFUNIT_57="AWIP3D21i"
+export XLFUNIT_58="AWIP3D24i"
+export XLFUNIT_59="AWIP3D27i"
+export XLFUNIT_60="AWIP3D30i"
+
+rm -f HYBNMC.OUT
+rm -f HYBNMC.ERR
+
+startmsg
+$EXECruc2/ruc2_hybnambc >> $pgmout 2>errfile
+err=$?;export err; err_chk
+mv *${cyc}000000.grib ${NAM_DATA}
+mv *${cyc}000003.grib ${NAM_DATA}
+mv *${cyc}000006.grib ${NAM_DATA}
+mv *${cyc}000009.grib ${NAM_DATA}
+mv *${cyc}000012.grib ${NAM_DATA}
+mv *${cyc}000015.grib ${NAM_DATA}
+mv *${cyc}000018.grib ${NAM_DATA}
+mv *${cyc}000021.grib ${NAM_DATA}
+mv *${cyc}000024.grib ${NAM_DATA}
+mv *${cyc}000027.grib ${NAM_DATA}
+mv *${cyc}000030.grib ${NAM_DATA}
+
+echo 'hybnambc finished'
+cat $pgmout
+#################################
+set -x
+if test $err -eq '0' 
+then
+   msg="HAS COMPLETED NORMALLY!"
+else
+   msg="HAS COMPLETED ABNORMALLY!******"
+fi
+echo $msg
+postmsg "$jlogfile" "$msg"
+
+############## END OF SCRIPT #######################

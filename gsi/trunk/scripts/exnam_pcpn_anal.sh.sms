@@ -1,0 +1,435 @@
+#!/bin/ksh
+
+# 9/8/97 do only one hour and change way biases are stored
+# 9/11/97 put 15km stuff back on to /nfsptmp
+# 11/26/97 use BUFR data instead of gage file on nic
+# 6/17/98  set up script on nmc
+# 2/7/00   set up script on SP
+# 2001/6/3 Streamlined for JIF'ing
+# 2001/6/11 Convert to ksh from csh
+# 2001/11/29 Save HADS hourly gauge listing (for future gauge QC)
+# 2006/3/28: Mapping ST2ml* to NDFD grid as Precip RTMA
+# 2006/8/08: Add process Precip. RTMA for AWIPS
+#######################################################################
+#  Purpose: Produce hry 4km stage2 pcpn analysis.
+#######################################################################
+#
+echo "------------------------------------------------"
+echo "JNAM_PCPN_ANAL processing                        "
+echo "------------------------------------------------"
+echo "History: JULY 1, 2001 - First implementation of this new scripts."
+#
+#######################################################################
+
+
+set -x
+
+ndate=/$EXECutil/ndate
+
+run=$1
+
+export XLFRTEOPTS="unit_vars=yes"
+
+cd $DATA
+export JDATA=$DATA 
+
+export DATA=$DATA/$run
+mkdir -p $DATA
+cd $DATA
+sh $utilscript/setup.sh
+
+#
+
+if [ $run = erly ]; then
+   date0=$pdyhh
+elif [ $run = mid ]; then
+   date0=`$ndate -6 $pdyhh`
+elif [ $run = late ]; then
+   date0=`$ndate -18 $pdyhh`
+else
+   err_exit "parm run set incorrectly"
+fi
+
+msg="Begin Stage II analysis for $run version of $date0"
+postmsg "$jlogfile" "$msg"
+########################################
+
+day0=`echo $date0 | cut -c1-8`
+hr0=`echo $date0 | cut -c9-10`
+daym1=`$ndate -1 $date0 | cut -c1-8`
+hrm1=`$ndate -1 $date0 | cut -c9-10`
+
+export ST2_ST1=$DATA/test
+export ST2_BIAS=$DATA/bias
+export ST2_PARAM=$DATA/cmp
+export ST2_OUT=$DATA/out
+export ST2_DAT=$DATA/data
+
+#
+# clean out output directories
+#
+mkdir -p $ST2_DAT
+mkdir -p $ST2_ST1
+mkdir -p $ST2_OUT
+mkdir -p $ST2_PARAM
+mkdir -p $ST2_BIAS
+#
+#  get bias (grt files)
+#
+
+cd $ST2_BIAS
+
+delt=-10
+
+
+while [ $delt -le 0 ]; do
+  dat=`$ndate $delt $date0`
+  dat1=`echo $dat |cut -c 1-8`
+  cp $COMIN/${RUN}.$dat1/tar_bias.$dat .
+  tar -xf tar_bias.$dat
+  let "delt=$delt+1"
+done
+
+#
+#  get stuff
+#
+
+cd $ST2_DAT
+
+if [ $run = erly ]; then
+   cp /com/hourly/prod/hourly.$day0/sfctbl.${hr0} sfctbl.${hr0}
+   grep AO2 sfctbl.${hr0} > ao2
+   wc -l ao2
+else
+
+   unset LALO # this was set to Nam domain in J-job (000090359220)
+
+   sh /nwprod/ush/dumpjb $date0 1 000 011 >> $DATA/$pgmout 2>&1
+   cp $DATA/000.ibm $ST2_DAT
+   cat $DATA/000.out >> $DATA/$pgmout
+fi
+
+cp $DCOM/$daym1/wtxtbul/dpa_${hrm1} .
+cp $DCOM/$day0/wtxtbul/dpa_${hr0} .
+#
+#  run stuff
+#
+cd $DATA
+
+pwd
+
+# Step 1
+# Combine two consecutive hours' DPA's into one single DPA:
+export pgm=nam_combdpa
+. prep_step
+export XLFUNIT_11=${ST2_DAT}/dpa_${hrm1}
+export XLFUNIT_12=${ST2_DAT}/dpa_${hr0}
+export XLFUNIT_51=${ST2_DAT}/dpa.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_combdpa >> $pgmout 2>errfile
+export err=$?;err_chk
+
+# Step 2
+# Decode the DPA file.  The 'inventory' option is not used.  
+# DPAs centered +/- 10 minutes around $date0 are written out in unit 52
+# one file for each DPA record (${RAD}${yyyymmddhh}Z). Unit 52 is opened 
+# in Fortran code, since we have use it over and over for each of the approx. 
+# 150 radars, and we do not know before hand which radar is present.  A 
+# list of radar sites with reports falling into the +/- 10-minute window 
+# around $date0 is written to Unit 71 ('cards.parm') for later use.
+
+export pgm=nam_decode
+. prep_step
+export INVENTORY=F
+export XLFUNIT_11=${ST2_DAT}/dpa.$date0
+export XLFUNIT_17=${FIXnam_pcpn_anal}/nam_master_radar_list
+export XLFUNIT_71=${ST2_PARAM}/cards.parm
+startmsg
+$EXECnam_pcpn_anal/nam_decode << ioEOF >> $pgmout 2>errfile
+$date0
+ioEOF
+export err=$?;err_chk
+
+# Step 3
+# Read in the hour's gauge data, group them according to which radar umbrella
+# they fall into.  Write out each individual group (there should be 150 or so
+# groups) using unit 51 (opened in Fortran code, since we won't know ahead of
+# time how many radars are present for this hour).  A list of available radars
+# is read in in 'cards.parm'.    
+#   The 'hidden' Unit 51 outputs: gage.${RAD}${yyyymmddhh}Z
+# For 'erly', the gauge data are from the hourly METAR.  For 'mid' and 'late',
+# use the gauge data from the BUFR dump of SHEF data (i.e. HADS precip data).
+
+cp /com/hourly/prod/gaugeqc/current.evalH .
+
+  if [ $run = erly ]; then
+export pgm=nam_prepmetar
+. prep_step
+export XLFUNIT_11=current.evalH
+export XLFUNIT_15=${ST2_DAT}/sfctbl.${hr0}
+export XLFUNIT_16=${ST2_DAT}/ao2
+export XLFUNIT_18=${ST2_PARAM}/cards.parm
+export XLFUNIT_52=metar_prob.$date0
+export XLFUNIT_53=metar_raw.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_prepmetar << ioEOF >> $pgmout 2>errfile
+$date0
+ioEOF
+export err=$?;err_chk
+cp metar_raw.$date0 $COMOUT/${RUN}.$day0/metar_raw.$date0
+if [ -e metar_prob.$date0 ]; then
+  cp metar_prob.$date0 $COMOUT/${RUN}.$day0/metar_prob.$date0
+fi
+  else
+
+export pgm=nam_prephads
+. prep_step
+export XLFUNIT_11=current.evalH
+export XLFUNIT_18=${ST2_PARAM}/cards.parm
+export XLFUNIT_20=$ST2_DAT/000.ibm
+export XLFUNIT_52=hads_prob.$date0
+export XLFUNIT_53=hads_raw.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_prephads << ioEOF >> $pgmout 2>errfile
+$date0
+ioEOF
+export err=$?;err_chk
+cp hads_raw.$date0 $COMOUT/${RUN}.$day0/hads_raw.$date0
+if [ -e hads_prob.$date0 ]; then
+  cp hads_prob.$date0 $COMOUT/${RUN}.$day0/hads_prob.$date0
+fi
+
+  fi
+
+# Step 4
+# Merge the radar and gauge data under each radar umbrella.  A list of 
+# available radars for this our is read in from Unit 11.  This program
+# reads in the radar and gauge data produced by 'decode' and 
+# 'prepmetar/prephads' and writes out various analysis for each available
+# radar site.  For each of the available radar sites, there are a number 
+# of I/O units opened in the Fortran code, listed below:
+# 
+#    Unit   Unit name   File
+#     31     LURAD      ${RAD}${yyyymmddhh}Z    Radar DPA data for ${RAD}
+#                                                (generated by 'decode')
+#     32     LUGAG      gage.${rad}/date//'Z'   Gage data for ${RAD}
+#                                                (generated by either 
+#                                                prepmetar or prephads)
+#     51     LUGAFD     ${RAD}gg${yyyymmddhh}z  Gage-only analysis under ${RAD}
+#     52     LUMTFD     ${RAD}ml${yyyymmddhh}z  Multi-sensor anl   under ${RAD}
+#     53     LUBIAS     ${RAD}un${yyyymmddhh}z  Gage-adjusted radar-only 
+#                                                under ${RAD} (i.e. with bias
+#                                                adjustment
+#     82     LUGRTB     ${RAD}${yyyymmddhh}.grt gage/radar data used in bias
+#                                               removal (read/write unit)
+
+export pgm=nam_stageii
+. prep_step
+export XLFUNIT_11=${ST2_PARAM}/cards.parm
+export XLFUNIT_12=${FIXnam_pcpn_anal}/nam_qual.con
+export XLFUNIT_13=${FIXnam_pcpn_anal}/nam_stat.con
+export XLFUNIT_14=${FIXnam_pcpn_anal}/nam_gageo.con
+export XLFUNIT_15=${FIXnam_pcpn_anal}/nam_mult.con
+export XLFUNIT_16=${FIXnam_pcpn_anal}/nam_flags.dat
+startmsg
+$EXECnam_pcpn_anal/nam_stageii << ioEOF >> $pgmout 2>errfile
+$date0
+ioEOF
+export err=$?;err_chk
+
+# Step 5
+# Mosaicking the gauge-only, multi-sensor, bias-adjusted radar-only and
+# radar-only analyses generated in the previous steps for each radar 
+# sites into a national product.  A list of available radars is read in
+# from unit 11.  All the individual analyses (4 x number of available radars,
+# so there are approx 600 files) are read in from unit 20 (opened in Fortran 
+# code).  The four mosaicked national products are written out in GRIB 
+# format, in unit 51-54.
+
+export pgm=nam_mosaic
+. prep_step
+export XLFUNIT_11=${ST2_PARAM}/cards.parm
+export XLFUNIT_51=${ST2_OUT}/ST2gg${date0}.Grb
+export XLFUNIT_52=${ST2_OUT}/ST2ml${date0}.Grb
+export XLFUNIT_53=${ST2_OUT}/ST2un${date0}.Grb
+export XLFUNIT_54=${ST2_OUT}/ST2rd${date0}.Grb
+startmsg
+$EXECnam_pcpn_anal/nam_mosaic << ioEOF >> $pgmout 2>errfile
+$date0
+ioEOF
+export err=$?;err_chk
+
+# Step 6
+# Map the 4km analyses to a 15km grid (a simple 3x3 mapping):
+
+export pgm=nam_nam_remap
+. prep_step
+export XLFUNIT_11=${ST2_OUT}/ST2gg$date0.Grb
+export XLFUNIT_51=${ST2_OUT}/gage15.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_remap >> $pgmout 2>errfile
+export err=$?;err_chk
+
+export pgm=nam_nam_remap
+. prep_step
+export XLFUNIT_11=${ST2_OUT}/ST2ml$date0.Grb
+export XLFUNIT_51=${ST2_OUT}/multi15.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_remap >> $pgmout 2>errfile
+export err=$?;err_chk
+
+export pgm=nam_nam_remap
+. prep_step
+export XLFUNIT_11=${ST2_OUT}/ST2un$date0.Grb
+export XLFUNIT_51=${ST2_OUT}/radunb15.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_remap >> $pgmout 2>errfile
+export err=$?;err_chk
+
+export pgm=nam_nam_remap
+. prep_step
+export XLFUNIT_11=${ST2_OUT}/ST2rd$date0.Grb
+export XLFUNIT_51=${ST2_OUT}/rad15.$date0
+startmsg
+$EXECnam_pcpn_anal/nam_remap >> $pgmout 2>errfile
+export err=$?;err_chk
+
+#######################################################################
+# Map the "early" version of ST2ml* file to NDFD grid for precip RTMA:
+
+if [ $run = erly ]; then
+  ST2file=ST2ml${date0}.Grb
+  rtmafile=pcprtma.${date0}
+  NDFDgrid="30 6 0 0 0 0 0 0 1073 689 20191999 238445999 8 25000000 265000000 5079406 5079406 0 64 25000000 25000000 0 0"
+
+# Change the generating process number, PDS(2) from 152 (Stage II) to 109 
+# (RTMA products):
+
+  ln -sf ${ST2_OUT}/$ST2file          fort.11
+  ln -sf $ST2file.chgdpds             fort.51
+
+  ${EXECnam_pcpn_anal}/pcprtma_changepds
+
+# Convert to GRIB2:
+  /nwprod/util/exec/cnvgrib -g12 $ST2file.chgdpds ${ST2file}2
+
+# Map to NDFD grid:
+  /nwprod/util/exec/copygb2 -g "$NDFDgrid" -i3 -x ${ST2file}2 ${ST2_OUT}/$rtmafile
+
+#####################################################################
+#    Process PRECIP. RTMA FOR AWIPS
+#####################################################################
+
+export pgm=tocgrib2
+. prep_step
+export XLFUNIT_11="${ST2_OUT}/$rtmafile"
+export XLFUNIT_31=" "
+export XLFUNIT_51="${ST2_OUT}/grib2.t${cyc}z.awprtmapcp.227"
+
+startmsg
+
+$EXECutil/tocgrib2 < $utilparm/grib2_rtmapcp.227 >> $pgmout 2>errfile
+export err=$?;err_chk
+
+fi # if run=erly, map ST2ml* to NDFD grid
+#######################################################################
+
+compress ${ST2_OUT}/ST2gg$date0.Grb
+compress ${ST2_OUT}/ST2ml$date0.Grb
+compress ${ST2_OUT}/ST2un$date0.Grb
+compress ${ST2_OUT}/ST2rd$date0.Grb
+
+compress ${ST2_OUT}/gage15.$date0
+compress ${ST2_OUT}/multi15.$date0
+compress ${ST2_OUT}/radunb15.$date0
+compress ${ST2_OUT}/rad15.$date0
+
+cd $ST2_BIAS
+
+rm tar_bias.$date0
+tar -cf tar_bias.$date0 *$date0.grt
+if test $SENDCOM = 'YES'
+then
+   cp tar_bias.$date0 $COMOUT/${RUN}.$day0/tar_bias.$date0
+fi
+
+cd $ST2_OUT
+rm -rf $ST2_BIAS
+
+##############if ! [ -d ${ST2_ANL}/$day0 ]; then
+############   mkdir -p ${ST2_ANL}/$day0
+################fi
+
+# COPY FILES TO COM
+#######################################################################
+
+if test $SENDCOM = 'YES'
+then
+
+   cp ST2gg$date0.Grb.Z  $COMOUT/${RUN}.$day0/ST2gg$date0.Grb.Z
+   cp ST2ml$date0.Grb.Z  $COMOUT/${RUN}.$day0/ST2ml$date0.Grb.Z
+   cp ST2un$date0.Grb.Z  $COMOUT/${RUN}.$day0/ST2un$date0.Grb.Z
+   cp ST2rd$date0.Grb.Z  $COMOUT/${RUN}.$day0/ST2rd$date0.Grb.Z
+
+   cp multi15.$date0.Z   $COMOUT/${RUN}.$day0/multi15.$date0.Z
+   cp gage15.$date0.Z    $COMOUT/${RUN}.$day0/gage15.$date0.Z
+   cp radunb15.$date0.Z  $COMOUT/${RUN}.$day0/radunb15.$date0.Z
+   cp rad15.$date0.Z     $COMOUT/${RUN}.$day0/rad15.$date0.Z
+
+   if [ $run = erly ]; then
+     cp pcprtma.${date0}   $COMOUT/${RUN}.$day0/pcprtma.${date0}
+     cp grib2.t${cyc}z.awprtmapcp.227  $pcom/grib2.t${cyc}z.awprtmapcp.227
+   fi
+fi
+
+if test $SENDDBN = 'YES'
+then
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/ST2gg$date0.Grb.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/ST2ml$date0.Grb.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/ST2un$date0.Grb.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/ST2rd$date0.Grb.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/gage15.$date0.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/multi15.$date0.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/radunb15.$date0.Z
+$DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/rad15.$date0.Z
+
+if [ $run = erly ]; then
+  $DBNROOT/bin/dbn_alert MODEL PCPNANL $job $COMOUT/${RUN}.$day0/pcprtma.${date0}
+#
+#      SEND RTMA PRECIP. GRIB@ FILE TO  AWIPS
+#
+  $DBNROOT/bin/dbn_alert GRIB_LOW $NET $job  $pcom/grib2.t${cyc}z.awprtmapcp.227
+  fi
+
+
+fi
+
+mv $DATA/$pgmout $JDATA/$pgmout.st2.$run
+
+hr=`echo $pdyhh | cut -c9-10`
+
+# Calculate the four 6-hourly accumulations
+# (12-18Z, 18-00Z, 00-06Z, 06-12Z) and the 12-12Z accumulation, for the 24h
+# period ending the previous 12Z.  Run at 14Z, 20Z and the next day's 08Z.
+# Since this script is called three times each hour (run=erly/mid/late),
+# invoke it only if $run = late (minimize the chance that the small amount
+# of time used to invoke the 'st2acc' script would have an impact on data
+# assimilation).
+
+if [[ ( $run = late ) && ( $hr -eq 14 || $hr -eq 20 || $hr -eq 08 ) ]]
+then
+  $USHnam_pcpn_anal/nam_pcpn_st2acc.sh $pdyhh
+fi
+
+#####################################################################
+# GOOD RUN
+set +x
+echo "**************JOB NAM_PCPN_ANAL COMPLETED NORMALLY ON THE IBM SP"
+echo "**************JOB NAM_PCPN_ANAL COMPLETED NORMALLY ON THE IBM SP"
+echo "**************JOB NAM_PCPN_ANAL COMPLETED NORMALLY ON THE IBM SP"
+set -x
+#####################################################################
+
+
+############## END OF SCRIPT #######################
+

@@ -1,0 +1,144 @@
+#!/bin/ksh
+################################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_prelim.sh
+# Script description:  Gets all input fields for NDAS run
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: The scripts gets all the input files needed for the Nam run
+#           and runs preliminary codes for 3dvar first guess and lateral
+#           boundary conditions. Determines if previous NDAS ran and 
+#           processes first guess accordingly.
+#
+# Script description:  If NDAS ran, gets restart file. If NDAS did not run,
+#                      script runs preliminary Nam codes (gesprep,grdeta) which
+#                      process the GDAS first guess and bring in new SST,
+#                      snow/ice. Also creates boundary condition file from GFS/GDAS
+#                      sigma coefficients using mkbnd if previous NDAS did not run.
+#
+# Script history log:
+# 1999-06-23  Eric Rogers
+# 1999-08-13  Brent Gordon  -- Modified for production on the IBM-SP.
+# 2006-01-20  Eric Rogers   -- Modified for WRF-NMM NAM
+#
+
+set -x
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+cd $DATA
+
+export CYCLE=$PDY$cyc
+echo "export CYCLE=$PDY$cyc" > $GESDIR/nam.t${cyc}z.envir.sh
+export tmmark=tm00
+
+# Get the GDAS/GFS sigma files for the NAM boundary conditions
+
+$utilscript/getgfsbc_nam.sh $CYCLE 87 $envir_getges tm00
+
+# Release the tm00 mkbnd job; needed whether NDAS ran or not
+ 
+mkdir -p $DATA/mkbnd.tm00
+$SMSBIN/setev release_mkbnd
+
+#
+# Remove old restart files from nwges directory to conserve space in /com
+#
+for oldtim in -06 -12
+do
+  oldcyc=`/nwprod/util/exec/ndate $oldtim $CYCLE`
+  echo $oldcyc > tempdate
+  yyyymmddm=`cut -c 1-8 tempdate`
+  hh=`cut -c 9-10 tempdate`
+  rm -f /nwges/${envir}/${RUN}.${yyyymmddm}/${RUN}.t${hh}z.wrfrst_d01*tm00
+done
+
+if [ -s $GESNDAS/ndas.${cycle}.wrfrst_d01.tm03 ]
+then
+  echo "  "
+  echo "=====>  NDAS RAN SUCCESSFULLY"
+  echo "  "
+  export GUESS=NAM
+  echo "export GUESS=NAM" >> $GESDIR/nam.t${cyc}z.envir.sh
+
+  msg="NDAS RAN SUCCESSFULLY - PROCEED WITH THE NAM FORECAST"
+  postmsg "$jlogfile" "$msg"
+
+else
+
+###  NDAS did not run
+
+  echo "  "
+  echo "#####>  NDAS RESTART FILE NOT FOUND"
+  echo "  "
+
+  msg="NDAS RESTART FILE NOT FOUND: DO A STATIC ANALYSIS \
+  THEN PROCEED WITH THE NAM FORECAST."
+  postmsg "$jlogfile" "$msg"
+
+  export GUESS=GDAS
+  echo "export GUESS=GDAS" >> $GESDIR/nam.t${cyc}z.envir.sh
+
+  TM18=`/nwprod/util/exec/ndate -18 $CYCLE`
+  TM12=`/nwprod/util/exec/ndate -12 $CYCLE`
+  TM09=`/nwprod/util/exec/ndate -09 $CYCLE`
+  TM06=`/nwprod/util/exec/ndate -06 $CYCLE`
+  TM03=`/nwprod/util/exec/ndate -03 $CYCLE`
+
+  echo $CYCLE > date
+  yyyymmdd=`cut -c 1-8 date`
+  hh=`cut -c 9-10 date`
+
+  echo $TM06 > datetm06
+  yyyymmddm06=`cut -c 1-8 datetm06`
+  hh06=`cut -c 9-10 datetm06`
+
+  echo $TM12 > datetm12
+  yyyymmddm12=`cut -c 1-8 datetm12`
+  hh12=`cut -c 9-10 datetm12`
+
+  echo $TM18 > datetm18
+  yyyymmddm18=`cut -c 1-8 datetm18`
+  hh18=`cut -c 9-10 datetm18`
+
+  cp /com/date/t${hh12}z nmcdate.tm12
+
+# release coldstart scripts and exit this script
+                                                                                  
+# 1) Run GFS post to get GDAS 1st guess GRIB output to 1 mb
+# 2) Run SI on GDAS GRIB files from step 1
+# 3) Run parallel real to get GDAS-based wrfinput file; run partial cycling code to get
+#    best available land states from cycled NDAS wrfrst file
+# 4) Run sfcupdate script to get latest sst,snow,sea-ice analyses
+# 5) Run GSI analysis
+# 6) Run WRF_NMM forecast
+
+rm -rf cdp_cmds
+echo "login -t 60 $SMSNODE $SMSNAME $SMSPASS" > cdp_cmds
+
+NETNAME="/$envir$cyc/nam$cyc/mkboundaries"
+echo "force -r queued $NETNAME/coldstart" >>cdp_cmds
+echo "exit" >>cdp_cmds
+
+if test "$SENDSMS" = "YES"
+then
+   $SMSBIN/cdp < cdp_cmds
+fi
+
+$SMSBIN/setev release_nam_coldstart
+
+fi
+
+# Send message to namlog w/date and origin of first guess for
+# tm00 analysis
+
+jlognam=/com/nam/$envir/namlog
+
+msg="$CYCLE $GUESS"
+postmsg "$jlognam" "$msg"
+
+echo EXITING $0
+exit 
