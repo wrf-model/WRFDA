@@ -101,8 +101,8 @@ endif
 if      ( `hostname` == karri ) then
 	set WRFDAREGDATAEM = /karri/users/xinzhang/regtest/WRFDA-data-EM
 	set WRFDAREGDATANMM = /karri/users/xinzhang/regtest/WRFDA-data-NMM
-        set CASEOPTS =	( cv3_guo cwb_ascii afwa_t7_ssmi )
         set CASEOPTS =	( cv3_guo cwb_ascii afwa_t7_ssmi t44_prepbufr cwb_ascii_outerloop_rizvi )
+        set CASEOPTS =	( tutorial_xinzhang )
 else if   ( `hostname` == bay-mmm ) then
 	set WRFDAREGDATAEM = /users/xinzhang/CODE/WRFDA-data-EM
 	set WRFDAREGDATANMM = /users/xinzhang/CODE/WRFDA-data-NMM
@@ -289,6 +289,10 @@ set GENERATE_BASELINE = FALSE
 if   ( `hostname` == gum ) then
      set GENERATE_BASELINE = '/Volumes/gum/xinzhang/regtest/BASELINE'
      set COMPARE_BASELINE = '/Volumes/gum/xinzhang/regtest/BASELINE'
+     set COMPARE_BASELINE = FALSE
+     set GENERATE_BASELINE = FALSE
+endif
+if   ( `hostname` == karri ) then
      set COMPARE_BASELINE = FALSE
      set GENERATE_BASELINE = FALSE
 endif
@@ -526,7 +530,8 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname` == karri ) ) then
 	endif
 	set MAIL		= /bin/mail
 	if      ( $LINUX_COMP == PGI ) then
-		set COMPOPTS	= ( 1 2 )
+		set COMPOPTS	= ( 1 0 3 )
+                set ZAP_OPENMP  = TRUE
 	else if ( $LINUX_COMP == GFORTRAN ) then
 		set COMPOPTS	= ( 7 8 )
 	endif
