@@ -87,8 +87,8 @@ if      ( ( `uname` == AIX ) || ( `hostname` == tempest ) || ( `hostname | cut -
 else if   ( `hostname` == bay-mmm ) then
 	set argv = ( -f /users/xinzhang/CODE/wrfda.tar )
 else if   ( `hostname` == karri ) then
-	set argv = ( -f /karri/users/xinzhang/regtest/wrfda.tar )
 	set argv = ( -r HEAD  )
+	set argv = ( -f /karri/users/xinzhang/regtest/wrfda.tar )
 else if   ( `hostname` == gum ) then
 	set argv = ( -f /Volumes/gum/xinzhang/regtest/wrfda.tar )
 	set argv = ( -r HEAD  )
@@ -101,8 +101,7 @@ endif
 if      ( `hostname` == karri ) then
 	set WRFDAREGDATAEM = /karri/users/xinzhang/regtest/WRFDA-data-EM
 	set WRFDAREGDATANMM = /karri/users/xinzhang/regtest/WRFDA-data-NMM
-        set CASEOPTS =	( cv3_guo cwb_ascii afwa_t7_ssmi t44_prepbufr cwb_ascii_outerloop_rizvi )
-        set CASEOPTS =	( tutorial_xinzhang )
+        set CASEOPTS =	( cv3_guo cwb_ascii ASR_prepbufr afwa_t7_ssmi t44_prepbufr cwb_ascii_outerloop_rizvi sfc_assi_2_outerloop_guo )
 else if   ( `hostname` == bay-mmm ) then
 	set WRFDAREGDATAEM = /users/xinzhang/CODE/WRFDA-data-EM
 	set WRFDAREGDATANMM = /users/xinzhang/CODE/WRFDA-data-NMM
@@ -521,17 +520,14 @@ else if ( ( $ARCH[1] == Linux ) && ( `hostname` == karri ) ) then
 	set job_id              = $$
 	set DEF_DIR             = /karri/users/${user}/regtest/wrfda_regression
 	set TMPDIR              = $DEF_DIR
-	if ( -d $DEF_DIR ) then
-		echo "${0}: ERROR::  Directory ${DEF_DIR} exists, please remove it"
-		exit ( 1 ) 
-	else
+	if ( ! -d $DEF_DIR ) then
 		mkdir -p $DEF_DIR
 		echo "See directory ${DEF_DIR}/ for wrfdatest.output and other test results"
 	endif
 	set MAIL		= /bin/mail
 	if      ( $LINUX_COMP == PGI ) then
-		set COMPOPTS	= ( 1 0 3 )
-                set ZAP_OPENMP  = TRUE
+		set COMPOPTS	= ( 1 2 3 )
+                set ZAP_OPENMP  = FALSE
 	else if ( $LINUX_COMP == GFORTRAN ) then
 		set COMPOPTS	= ( 7 8 )
 	endif
@@ -881,6 +877,9 @@ EOF
                 if ((`uname` == AIX) && ($REG_TYPE == BIT4BIT)) then
                      sed -e '/^LDFLAGS_LOCAL/s/-lmass -lmassv//' \
                          -e '/^ARCH_LOCAL/s/-DNATIVE_MASSV//' \
+                         configure.wrf > ! foo; /bin/mv foo configure.wrf
+                else if ((`hostname` == karri) && ($compopt == $COMPOPTS[2])) then
+                     sed -e '/^OMP/s/-mp/-mp=nonuma/' \
                          configure.wrf > ! foo; /bin/mv foo configure.wrf
                 endif
 	
