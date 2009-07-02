@@ -868,6 +868,11 @@ end if
 
                   title = info + "    " + npts_sele(ich,itime)
 
+                  ddata = data1 - data2
+                  xxmean = sum(ddata)/tofloat(npts_sele(ich,itime))
+                  xxrms  = sqrt(sum(ddata*ddata)/tofloat(npts_sele(ich,itime)))
+                  xxstd  = sqrt(sum((ddata-xxmean)*(ddata-xxmean))/tofloat(npts_sele(ich,itime)))
+
                   minXY   = min( (/ min(data1), min(data2) /) )
                   maxXY   = max( (/ max(data1), max(data2) /) )
                   xy = (/ minXY, maxXY /)
@@ -877,8 +882,8 @@ end if
                   res_scat@gsnRightString      = date(itime)
                   res_scat@tmYROn              = False 
                   res_scat@tmXTOn              = False
-                  res_scat@tmYRBorderOn        = False
-                  res_scat@tmXTBorderOn        = False
+                  res_scat@tmYRBorderOn        = True
+                  res_scat@tmXTBorderOn        = True
                   res_scat@tmYLMinorOn         = False
                   res_scat@tmXBMinorOn         = False
                   res_scat@gsnDraw             = False                 ; don't draw yet
@@ -895,6 +900,14 @@ end if
 
                   plot  = gsn_csm_xy (wks,xy,xy,res_scat)              ; plot the line
 
+                  getvalues plot
+                     "tmYLLabelFontHeightF"   : fheight
+                     "tmXBValues"             : tmXBValues
+                     "tmYLValues"             : tmYLValues
+                  end getvalues
+                  nTm  = dimsizes(tmXBValues)
+                  xint = 0.5*(tmYLValues(1)-tmYLValues(0))
+
                   res_mark                     = True
                   res_mark@gsMarkerIndex       = 0                     ; choose type of marker  
                   res_mark@gsMarkerColor       = "blue"                ; Marker color
@@ -903,10 +916,31 @@ end if
 
                   gsn_polymarker(wks,plot,data1,data2,res_mark)        ; add the markers
 
+                  res_line                     = True
+                  res_line@gsLineColor         = "red"
+                  res_line@gsLineDashPattern   = 0
+                  res_line@gsLineThicknessF    = 2.0
+                  xx = (/ tmXBValues(0),tmXBValues(nTm-1) /)
+                  yy = (/ tmYLValues(0),tmYLValues(nTm-1) /)
+                  gsn_polyline(wks,plot,xx,yy,res_line)                ; plot the diagonal line
+
+                  res_text                     = True
+                  res_text@txFontHeightF       = 0.8*fheight
+                  res_text@txFont              = 29                    ; font courier
+                  stats_info = "mean:"+sprintf("%8.3f",xxmean)
+                  text = gsn_add_text(wks,plot,stats_info,tmXBValues(2)-xint,tmYLValues(nTm-1)-xint,res_text)
+                  stats_info = "stdv:"+sprintf("%8.3f",xxstd)
+                  text = gsn_add_text(wks,plot,stats_info,tmXBValues(2)-xint,tmYLValues(nTm-1)-2.0*xint,res_text)
+                  stats_info = "rms :"+sprintf("%8.3f",xxrms)
+                  text = gsn_add_text(wks,plot,stats_info,tmXBValues(2)-xint,tmYLValues(nTm-1)-3.0*xint,res_text)
+
                   draw(plot)
                   frame(wks)
                   delete(data1)
                   delete(data2)
+                  delete(tmXBValues)
+                  delete(tmYLValues)
+
                end do
                if ( plot_split ) then
                   destroy(wks)
