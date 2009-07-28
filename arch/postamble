@@ -1,0 +1,38 @@
+#
+#	Macros, these should be generic for all machines
+
+LN	=	ln -sf
+MAKE	=	make -i -r
+RM	=	rm -f
+MV  	=	mv
+
+#	There is probably no reason to modify these rules
+
+.F.i:
+	$(RM) $@
+	$(CPP) -I../inc $(CPPFLAGS) $*.F > $@
+	mv $*.i $(DEVTOP)/pick/$*.f
+	cp $*.F $(DEVTOP)/pick
+
+.F.o:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. $*.f
+
+.F.f:
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $@
+	$(RM) $*.b
+
+.f.o:
+	$(RM) $@
+	$(FC) -c $(FCFLAGS) $(PROMOTION) $*.f
+
+.c.o:
+	$(RM) $@
+	$(CC) -c $(CFLAGS) $*.c
+
+
