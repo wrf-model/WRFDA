@@ -521,7 +521,6 @@ BENCH_END(init_zero_tend_tim)
 
 
 BENCH_START(phy_prep_tim)
-      if(dyn_opt == DYN_EM) then
       !$OMP PARALLEL DO   &
       !$OMP PRIVATE ( ij )
       DO ij = 1 , grid%num_tiles
@@ -541,7 +540,6 @@ BENCH_START(phy_prep_tim)
                           grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       ENDDO
       !$OMP END PARALLEL DO
-      endif
 
 BENCH_END(phy_prep_tim)
 
