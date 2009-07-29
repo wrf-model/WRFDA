@@ -14,7 +14,6 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
    USE module_timing
    USE WRF_ESMF_MOD
    USE module_dfi
-   USE module_io_domain, only : open_w_dataset, close_dataset, output_boundary
 
 #ifdef DM_PARALLEL
 #ifndef DISK_IO
@@ -454,13 +453,8 @@ call end_timing('med_auxinput3_in 1 ')
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
-         file_name = 'wrfbdy_ad01'
-
-         call open_w_dataset (fid, trim(file_name), grid , config_flags , &
-                              output_boundary , "DATASET=BOUNDARY", ierr )
-         
-         call output_boundary (fid, grid, config_flags, ierr)
-         call close_dataset (fid , config_flags, "DATASET=BOUNDARY")
+!--------output last gradient of LBC.
+         call med_latbound_out_lbc ( grid , config_flags )
 !--------Force output last gradient.
 !        call med_hist_out ( grid , 0 , config_flags )
       ELSE

@@ -1616,6 +1616,49 @@ SUBROUTINE med_filter_out ( grid , config_flags )
    RETURN
 END SUBROUTINE med_filter_out
 
+SUBROUTINE med_latbound_out_lbc ( grid , config_flags )
+
+  ! Driver layer
+   USE module_domain
+   USE module_io_domain
+   USE module_timing
+  ! Model layer
+   USE module_configure
+   USE module_bc_time_utilities
+   USE WRF_ESMF_MOD
+
+   IMPLICIT NONE
+
+#include <wrf_status_codes.h>
+
+  ! Arguments
+   TYPE(domain)                               :: grid
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags
+
+  ! Local data
+   INTEGER                                :: ierr, fid
+   CHARACTER (LEN=256)                    :: message
+   CHARACTER (LEN=80)                     :: bdyname
+
+#include <wrf_io_flags.h>
+
+   CALL wrf_debug ( 1 , 'in med_latbound_out_lbc' )
+
+   bdyname = 'wrfbdy_ad01'
+
+   CALL open_w_dataset (fid, trim(bdyname), grid , config_flags , &
+                       output_boundary , "DATASET=BOUNDARY", ierr )
+
+   IF ( ierr .NE. 0 ) THEN
+      WRITE( message, * ) 'med_latbound_out_lbc: error opening ',TRIM(bdyname), ' for writting. IERR = ',ierr
+      CALL WRF_ERROR_FATAL( message )
+   ENDIF
+   CALL output_boundary ( fid, grid , config_flags , ierr )
+   CALL close_dataset (fid , config_flags, "DATASET=BOUNDARY")
+
+   RETURN
+END SUBROUTINE med_latbound_out_lbc
+
 SUBROUTINE med_latbound_in ( grid , config_flags )
   ! Driver layer
    USE module_domain
@@ -1701,9 +1744,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
          CALL end_timing ( TRIM(message) )
        ENDIF
 
-!#if 0
      ENDIF
-!#endif
    ENDIF
    RETURN
 END SUBROUTINE med_latbound_in
