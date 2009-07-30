@@ -14,6 +14,7 @@ MODULES =       module_driver_constants.o  \
                 module_integrate_ad.o      \
                 module_integrate_tl.o      \
                 module_integrate_tst.o     \
+                module_integrate_tst_sub.o \
                 module_timing.o            \
                 module_configure.o         \
                 module_tiles.o             \
@@ -126,6 +127,15 @@ module_integrate_tl.o: module_domain.o \
 		$(ESMF_MOD_DEPENDENCE)
 
 module_integrate_tst.o: module_domain.o \
+		module_timing.o \
+		module_trace.o \
+		module_driver_constants.o \
+		module_state_description.o \
+		module_nesting.o \
+		module_configure.o \
+		$(ESMF_MOD_DEPENDENCE)
+
+module_integrate_tst_sub.o: module_domain.o \
 		module_timing.o \
 		module_trace.o \
 		module_driver_constants.o \

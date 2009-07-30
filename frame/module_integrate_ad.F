@@ -291,7 +291,7 @@ call end_timing('med_auxinput3_in 1 ')
 !-----end check adjoint input
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
-      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+!     CALL print_a_timeinterval(grid%domain_clock%TimeStep)
       DO WHILE ( grid%current_time .GT. grid%start_subtime )
 !         IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
@@ -308,7 +308,7 @@ call end_timing('med_auxinput3_in 1 ')
          if(currTime_str(1:19) .eq. nl_date_string(nl_date_index+1)(1:19)) nl_date_index = nl_date_index + 1
 !        write(unit=*, fmt='(2a)') 'xyh AD state at ', currTime_str(1:19)
 !        write(unit=*, fmt='(2a)') 'xyh NL state from ', nl_date_string(nl_date_index+1)
-         call start_timing
+!        call start_timing
 #ifdef DM_PARALLEL
 #ifndef DISK_IO
          if (basic_state_1st_time) then
@@ -325,9 +325,10 @@ call end_timing('med_auxinput3_in 1 ')
          CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
 #endif
 #else
-         CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
+         if ( grid%dyn_opt .ne. DYN_EM_TST ) &
+            CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
 #endif
-         call end_timing('med_auxinput2_in4ad')
+!        call end_timing('med_auxinput2_in4ad')
 !-----end check non-linear input
 
 !--------start check adjoint input

@@ -1,36 +1,26 @@
 !WRF:DRIVER_LAYER:INTEGRATION
 !
 
-MODULE module_integrate_tl
+MODULE module_integrate_tst_sub
 
 CONTAINS
 
-RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
+RECURSIVE SUBROUTINE integrate_tst_sub ( grid )
+
+
 
    USE module_domain
    USE module_driver_constants
    USE module_nesting
    USE module_configure
    USE module_timing
-#ifdef DM_PARALLEL
-#ifndef DISK_IO
-   USE module_linked_list, only: pop2restore
-#endif
-#endif
    USE WRF_ESMF_MOD
-   
-   USE module_dfi   
-
-   USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
 
    !  Input data.
 
    TYPE(domain) , POINTER :: grid
-
-   character(len=19), dimension(1000), intent(in)    :: nl_date_string
-   integer,                            intent(inout) :: nl_date_index
 
 ! module_integrate:integrate
 ! <DESCRIPTION> 
@@ -53,12 +43,11 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! (<a href="setup_timekeeping.html">setup_timekeeping</a>) at the time
 ! that the domain is initialized.
 ! The lower-level time library and the type declarations for the times
-! and time intervals used are defined in external/esmf_time_f90 which, 
-! depending on build-time options, either incorporates the embedded ESMF 
-! subset implementation contained in that directory or incorporates a 
-! site-specific installation of the ESMF library.  Note that arithmetic and 
-! comparison is performed on these data types using F90 operator overloading, 
-! also defined in that library.
+! and time intervals used are defined in external/esmf_time_f90, or, if 
+! WRF_ESMF_MOD is defined during build, a site-specific installation of the 
+! ESMF library is used.  Note that arithmetic and comparison is performed 
+! on these data types using F90 operator overloading, also defined in that 
+! library.
 ! 
 ! This routine is the lowest level of the WRF Driver Layer and for the most
 ! part the WRF routines that are called from here are in the topmost level
@@ -117,7 +106,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 ! calling <a href=med_before_solve_io.html>med_before_solve_io</a>. In WRF this is the point at which history and
 ! restart data is output.
 ! 
-! 4.f  Call <a href=solve_interface_tl.html>solve_interface_tl</a> which calls the solver that advance the domain 
+! 4.f  Call <a href=solve_interface_tst.html>solve_interface_tst</a> which calls the solver that advance the domain 
 ! one time step, then advance the domain's clock by calling ESMF_ClockAdvance.  Upon advancing the clock,
 ! the current time for the grid is updated by calling ESMF_ClockGet. The enclosing WHILE loop around
 ! this section is for handling other domains with which this domain may overlap.  It is not active in WRF 2.0 and
@@ -163,17 +152,15 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
    TYPE (grid_config_rec_type)            :: config_flags
    LOGICAL , EXTERNAL                     :: wrf_dm_on_monitor
    INTEGER                                :: idum1 , idum2 , ierr , open_status
-   INTEGER                                :: rc ,dfi_counter
-
-   CHARACTER (LEN=25)                     :: currTime_str, tmpTime_str
+   INTEGER                                :: rc
 
    ! interface
    INTERFACE
        ! mediation-supplied solver
-     SUBROUTINE solve_interface_tl ( grid )
+     SUBROUTINE solve_interface_tst ( grid )
        USE module_domain
        TYPE (domain) grid
-     END SUBROUTINE solve_interface_tl
+     END SUBROUTINE solve_interface_tst
        ! mediation-supplied routine to allow driver to pass time information
        ! down to mediation/model layer
      SUBROUTINE med_calc_model_time ( grid , config_flags )
@@ -259,26 +246,15 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
    END INTERFACE
 
-   if(grid%trace_use) call trace_entry("integrate_tl")
-
    IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
       CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
       CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
       CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG:  top of integrate_tl(),' )
-
-      CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
-!     CALL print_a_timeinterval(grid%domain_clock%TimeStep)
-      if ( grid%jcdfi_io) then
-         CALL jcdfi_init_coef ( grid , config_flags )
-         CALL jcdfi_zero_ad ( grid )
-         dfi_counter = 0
-         CALL jcdfi_tl ( grid, dfi_counter )
-      endif
+                            'DEBUG:  top of integrate(),' )
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
-!         IF ( wrf_dm_on_monitor() ) THEN
+         IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
-!         END IF
+         END IF
          CALL med_setup_step ( grid , config_flags )
          a_nest_was_opened = .false.
          ! for each nest whose time has come...
@@ -299,51 +275,19 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
          CALL med_before_solve_io ( grid , config_flags )
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
-
-            CALL wrf_debug( 100 , 'module_integrate_tl: calling solve interface _tl' )
-
-            CALL wrf_clockprint ( 150, grid%domain_clock, 'DEBUG:  integrate_tl(),' )
-
-            CALL wrf_timetoa( grid%current_time, currTime_str )
-
-            if(currTime_str(1:19) .eq. nl_date_string(nl_date_index)(1:19)) then
-
-!!!!  for exactly trajectory update   08/02/2006   Xin Zhang
-!!!!           CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index) )
-#ifdef DM_PARALLEL
-#ifndef DISK_IO
-               call pop2restore(grid%moist_2,"moist_2")
-               call pop2restore(grid%em_u_2, grid%em_v_2, grid%em_w_2, grid%em_ph_2, grid%em_t_2, "u_2, v_2, w_2, ph_2, t_2")
-               call pop2restore(grid%em_mu_2,grid%em_mu0,"mu_2, mu0")
-#else
-               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
-#endif
-#else
-               CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index) )
-#endif
-               nl_date_index = nl_date_index + 1
-
-            else
-
-!!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
-!!!!          CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
-              if ( grid%dyn_opt .ne. DYN_EM_TST ) &
-                 CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index-1) )
-
-            endif
-
-            CALL solve_interface_tl ( grid_ptr ) 
+            CALL wrf_debug( 100 , 'module_integrate: calling solve interface ' )
+            CALL solve_interface_tst ( grid_ptr ) 
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate_tl():  before ESMF_ClockAdvance,' )
+                                  'DEBUG integrate():  before ESMF_ClockAdvance,' )
             CALL ESMF_ClockAdvance( grid_ptr%domain_clock, rc=rc )
             CALL wrf_check_error( ESMF_SUCCESS, rc, &
                                   'ESMF_ClockAdvance() FAILED', &
                                   __FILE__ , &
                                   __LINE__  )
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate_tl():  after ESMF_ClockAdvance,' )
+                                  'DEBUG integrate():  after ESMF_ClockAdvance,' )
             CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
-            CALL wrf_debug( 100 , 'module_integrate_tl: back from solve interface _tl' )
+            CALL wrf_debug( 100 , 'module_integrate: back from solve interface ' )
             grid_ptr => grid_ptr%sibling
          END DO
          CALL med_calc_model_time ( grid , config_flags )
@@ -353,16 +297,16 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
             DO kid = 1, max_nests
               IF ( ASSOCIATED( grid_ptr%nests(kid)%ptr ) ) THEN
                 ! Recursive -- advance nests from previous time level to this time level.
-                CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_force ' )
+                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_force ' )
                 CALL med_nest_force ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_force ' )
+                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_force ' )
                 grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
                 grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
-                CALL integrate_tl ( grid_ptr%nests(kid)%ptr, nl_date_string, nl_date_index ) 
-                CALL wrf_debug( 100 , 'module_integrate_tl: back from recursive call to integrate_tl ' )
-                CALL wrf_debug( 100 , 'module_integrate_tl: calling med_nest_feedback ' )
+                CALL integrate_tst_sub ( grid_ptr%nests(kid)%ptr ) 
+                CALL wrf_debug( 100 , 'module_integrate: back from recursive call to integrate ' )
+                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_feedback ' )
                 CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate_tl: back from med_nest_feedback ' )
+                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_feedback ' )
 #ifdef MOVE_NESTS
                 CALL med_nest_move ( grid_ptr , grid_ptr%nests(kid)%ptr )
 #endif
@@ -371,23 +315,14 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
             grid_ptr => grid_ptr%sibling
          END DO
          !  Report on the timing for a single time step.
-!         IF ( wrf_dm_on_monitor() ) THEN
+         IF ( wrf_dm_on_monitor() ) THEN
            CALL wrf_timetoa ( grid%current_time, message2 )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
-!         END IF
-         if ( grid%jcdfi_io) then
-            dfi_counter = dfi_counter + 1
-            CALL jcdfi_tl ( grid, dfi_counter )
-         endif
+         END IF
       END DO
-      if ( grid%jcdfi_io) then
-         CALL jcdfi_output_forcing ( grid ,config_flags )
-         CALL jcdfi_finalize
-      endif
       ! Avoid double writes on nests if this is not really the last time;
       ! Do check for write if the parent domain is ending.
-!-----Need to check how to output tl variables.
       IF ( grid%id .EQ. 1 ) THEN               ! head_grid
         CALL med_last_solve_io ( grid , config_flags )
       ELSE
@@ -398,9 +333,6 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
       ENDIF
    END IF
 
-   if(grid%trace_use) call trace_exit("integrate_tl")
+END SUBROUTINE integrate_tst_sub
 
-END SUBROUTINE integrate_tl
-
-END MODULE module_integrate_tl
-
+END MODULE module_integrate_tst_sub

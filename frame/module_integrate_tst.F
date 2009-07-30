@@ -5,7 +5,7 @@ MODULE module_integrate_tst
 
 CONTAINS
 
-RECURSIVE SUBROUTINE integrate_tst ( grid )
+SUBROUTINE integrate_tst ( grid )
 
 
 
@@ -15,6 +15,9 @@ RECURSIVE SUBROUTINE integrate_tst ( grid )
    USE module_configure
    USE module_timing
    USE WRF_ESMF_MOD
+   USE module_integrate
+   USE module_integrate_ad
+   USE module_integrate_tl
 
    IMPLICIT NONE
 
@@ -22,316 +25,716 @@ RECURSIVE SUBROUTINE integrate_tst ( grid )
 
    TYPE(domain) , POINTER :: grid
 
-! module_integrate:integrate
-! <DESCRIPTION> 
-! This is a driver-level routine that controls the integration of a
-! domain and subdomains rooted at the domain. 
-! 
-! The integrate routine takes a domain pointed to by the argument
-! <em>grid</em> and advances the domain and its associated nests from the
-! grid's current time, stored as grid%current_time, to a given time
-! forward in the simulation, stored as grid%stop_subtime. The
-! stop_subtime value is arbitrary and does not have to be the same as
-! time that the domain finished integrating.  The simulation stop time
-! for the grid is known to the grid's clock (grid%domain_clock) and that
-! is checked with a call to ESMF_ClockIsStopTime prior to beginning the
-! loop over time period that is specified by the
-! current_time/stop_subtime interval.
-! 
-! The clock, the simulation stop time for the domain, and other timing
-! aspects for the grid are set up in the routine
-! (<a href="setup_timekeeping.html">setup_timekeeping</a>) at the time
-! that the domain is initialized.
-! The lower-level time library and the type declarations for the times
-! and time intervals used are defined in external/esmf_time_f90, or, if 
-! WRF_ESMF_MOD is defined during build, a site-specific installation of the 
-! ESMF library is used.  Note that arithmetic and comparison is performed 
-! on these data types using F90 operator overloading, also defined in that 
-! library.
-! 
-! This routine is the lowest level of the WRF Driver Layer and for the most
-! part the WRF routines that are called from here are in the topmost level
-! of the Mediation Layer.  Mediation layer routines typically are not 
-! defined in modules. Therefore, the routines that this routine calls
-! have explicit interfaces specified in an interface block in this routine.
-!
-! As part of the Driver Layer, this routine is intended to be non model-specific
-! and so a minimum of WRF-specific logic is coded at this level. Rather, there
-! are a number of calls to mediation layer routines that contain this logic, some
-! of which are merely stubs in WRF Mediation Layer that sits below this routine
-! in the call tree.  The routines that integrate calls in WRF are defined in
-! share/mediation_integrate.F.
-! 
-! Flow of control
-! 
-! 1. Check to see that the domain is not finished 
-! by testing the value returned by ESMF_ClockIsStopTime for the
-! domain.
-! 
-! 2. <a href=model_to_grid_config_rec.html>Model_to_grid_config_rec</a> is called to load the local config_flags
-! structure with the configuration information for the grid stored
-! in model_config_rec and indexed by the grid's unique integer id. These
-! structures are defined in frame/module_configure.F.
-! 
-! 3. The current time of the domain is retrieved from the domain's clock
-! using ESMF_ClockGet.  There is another call to ESMF_ClockGet
-! inside the WHILE loop that follows.
-! 
-! 4. Iterate forward while the current time is less than the stop subtime.
-! 
-! 4.a. Start timing for this iteration (only on node zero in distributed-memory runs)
-! 
-! 4.b. Call <a href=med_setup_step.html>med_setup_step</a> to allow the mediation layer to 
-! do anything that's needed to call the solver for this domain.  In WRF this means setting
-! the indices into the 4D tracer arrays for the domain.
-! 
-! 4.c. Check for any nests that need to be started up at this time.  This is done 
-! calling the logical function <a href=nests_to_open.html>nests_to_open</a> (defined in 
-! frame/module_nesting.F) which returns true and the index into the current domain's list
-! of children to use for the nest when one needs to be started.
-! 
-! 4.c.1  Call <a href=alloc_and_configure_domain.html>alloc_and_configure_domain</a> to allocate
-! the new nest and link it as a child of this grid.
-! 
-! 4.c.2  Call <a href=setup_Timekeeping.html>setup_Timekeeping</a> for the nest.
-! 
-! 4.c.3  Initialize the nest's arrays by calling <a href=med_nest_initial.html>med_nest_initial</a>. This will
-! either interpolate data from this grid onto the nest, read it in from a file, or both. In a restart run, this
-! is also where the nest reads in its restart file.
-! 
-! 4.d  If a nest was opened above, check for and resolve overlaps (this is not implemented in WRF 2.0, which
-! supports multiple nests on the same level but does not support overlapping).
-! 
-! 4.e  Give the mediation layer an opportunity to do something before the solver is called by
-! calling <a href=med_before_solve_io.html>med_before_solve_io</a>. In WRF this is the point at which history and
-! restart data is output.
-! 
-! 4.f  Call <a href=solve_interface_tst.html>solve_interface_tst</a> which calls the solver that advance the domain 
-! one time step, then advance the domain's clock by calling ESMF_ClockAdvance.  Upon advancing the clock,
-! the current time for the grid is updated by calling ESMF_ClockGet. The enclosing WHILE loop around
-! this section is for handling other domains with which this domain may overlap.  It is not active in WRF 2.0 and
-! only executes one trip.  
-! 
-! 4.g Call med_calc_model_time and med_after_solve_io, which are stubs in WRF.
-! 
-! 4.h Iterate over the children of this domain (<tt>DO kid = 1, max_nests</tt>) and check each child pointer to see
-! if it is associated (and therefore, active).
-! 
-! 4.h.1  Force the nested domain boundaries from this domain by calling <a href=med_nest_force.html>med_nest_force</a>.
-! 
-! 4.h.2  Setup the time period over which the nest is to run. Sine the current grid has been advanced one time step
-! and the nest has not, the start for the nest is this grid's current time minus one time step.  The nest's stop_subtime
-! is the current time, bringing the nest up the same time level as this grid, its parent.
-! 
-! 4.h.3  Recursively call this routine, integrate, to advance the nest's time.  Since it is recursive, this will
-! also advance all the domains who are nests of this nest and so on.  In other words, when this call returns, all
-! the domains rooted at the nest will be at the current time.
-! 
-! 4.h.4  Feedback data from the nested domain back onto this domain by calling <a href=med_nest_feedback.html>med_nest_feedback</a>.
-! 
-! 4.i  Write the time to compute this grid and its subtree. This marks the end of the loop begun at step 4, above.
-! 
-! 5. Give the mediation layer an opportunity to do I/O at the end of the sequence of steps that brought the
-! grid up to stop_subtime with a call to <a href=med_last_solve_io.html>med_last_solve_io</a>.  In WRF, this 
-! is used to generate the final history and/or restart output when the domain reaches the end of it's integration.
-! There is logic here to make sure this occurs correctly on a nest, since the nest may finish before its parent.
-! </DESCRIPTION>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: g_rainc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: g_raincv
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: g_rainnc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: g_rainncv
+
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: a_rainc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: a_raincv
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: a_rainnc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: a_rainncv
 
    !  Local data.
 
-   CHARACTER*32                           :: outname, rstname
-   TYPE(domain) , POINTER                 :: grid_ptr , new_nest
-   TYPE(domain)                           :: intermediate_grid
-   INTEGER                                :: step
-   INTEGER                                :: nestid , kid
-   LOGICAL                                :: a_nest_was_opened
-   INTEGER                                :: fid , rid
-   LOGICAL                                :: lbc_opened
-   REAL                                   :: time, btime, bfrq
-   CHARACTER*256                          :: message, message2
-   TYPE (grid_config_rec_type)            :: config_flags
-   LOGICAL , EXTERNAL                     :: wrf_dm_on_monitor
-   INTEGER                                :: idum1 , idum2 , ierr , open_status
-   INTEGER                                :: rc
+   INTEGER                         :: k_start , k_end, its, ite, jts, jte, i, j, k, kts, kte
+   INTEGER                         :: ids , ide , jds , jde , kds , kde , &
+                                      ims , ime , jms , jme , kms , kme , &
+                                      ips , ipe , jps , jpe , kps , kpe
 
-   ! interface
-   INTERFACE
-       ! mediation-supplied solver
-     SUBROUTINE solve_interface_tst ( grid )
-       USE module_domain
-       TYPE (domain) grid
-     END SUBROUTINE solve_interface_tst
-       ! mediation-supplied routine to allow driver to pass time information
-       ! down to mediation/model layer
-     SUBROUTINE med_calc_model_time ( grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain) grid
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_calc_model_time
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! perform I/O before the call to the solve routine
-     SUBROUTINE med_before_solve_io ( grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain) grid
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_before_solve_io
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! perform I/O after the call to the solve routine
-     SUBROUTINE med_after_solve_io ( grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain) grid
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_after_solve_io
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! perform I/O to initialize a new nest
-     SUBROUTINE med_nest_initial ( parent , grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain), POINTER ::  grid , parent
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_nest_initial
+!---------------------------------------------------------------------------------------
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_v_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_v_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_w_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_w_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ph_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ph_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_t_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_t_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mu_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mu_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_p
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_al
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_z
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: S_moist_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: S_moist_2
+real      ,DIMENSION(max(grid%ed31,grid%ed33),1,grid%spec_bdy_width,4)           :: S_mu_b
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_rainnc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_rainncv
 
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! provide parent->nest forcing
-     SUBROUTINE med_nest_force ( parent , grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain), POINTER ::  grid , parent
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_nest_force
 
-#ifdef MOVE_NESTS
-     SUBROUTINE med_nest_move ( parent , grid )
-       USE module_domain
-       USE module_configure
-       TYPE (domain), POINTER ::  grid , parent
-     END SUBROUTINE med_nest_move
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_v_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_v_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_w_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_w_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ph_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ph_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_t_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_t_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mu_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mu_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mudf
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_p
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_al
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_z
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: B_moist_1
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: B_moist_2
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rainnc
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rainncv
+
+real                                     :: dtbc_save
+!---------------------------------------------------------------------------------------
+
+   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A, nsum
+   INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror, rc
+
+   character(len=19), dimension(1000) :: nl_date_string
+   integer                            :: nl_date_index
+   character(len=19), dimension(1000) :: ad_date_string
+   integer                            :: ad_date_index
+
+
+
+!  Obtain dimension information stored in the grid data structure.
+  CALL get_ijk_from_grid (  grid ,                   &
+                            ids, ide, jds, jde, kds, kde,    &
+                            ims, ime, jms, jme, kms, kme,    &
+                            ips, ipe, jps, jpe, kps, kpe    )
+
+   its = grid%sp31-3 ; ite = grid%ep31+3
+   kts = grid%sp32 ; kte = grid%ep32
+   jts = grid%sp33-3 ; jte = grid%ep33+3
+
+   if ( ips .eq. ids ) then
+     ifs = its
+   else
+     ifs = ips
+   endif
+   if ( ipe .eq. ide ) then
+     ife = ite
+   else
+     ife = ipe
+   endif
+   if ( jps .eq. jds ) then
+     jfs = jts
+   else
+     jfs = jps
+   endif
+   if ( jpe .eq. jde ) then
+     jfe = jte
+   else
+     jfe = jpe
+   endif
+
+   print*,'ifs =',ifs
+   print*,'ife =',ife
+   print*,'jfs =',jfs
+   print*,'jfe =',jfe
+
+   print*,'its =',its
+   print*,'ite =',ite
+   print*,'ims =',ims
+   print*,'ime =',ime
+
+   print*,'jts =',jts
+   print*,'jte =',jte
+   print*,'jms =',jms
+   print*,'jme =',jme
+
+   print*,'kts =',kts
+   print*,'kte =',kte
+   print*,'num_moist =',num_moist
+   print*,'grid%sm31 grid%em31 =',grid%sm31,grid%em31
+   print*,'grid%sm32 grid%em32 =',grid%sm32,grid%em32
+   print*,'grid%sm33 grid%em33 =',grid%sm33,grid%em33
+   print*,'grid%spec_bdy_width =',grid%spec_bdy_width
+
+   dtbc_save= grid%dtbc
+
+   S_u_1 = grid%em_u_1
+   S_u_2 = grid%em_u_2
+   S_v_1 = grid%em_v_1
+   S_v_2 = grid%em_v_2
+   S_w_1 = grid%em_w_1
+   S_w_2 = grid%em_w_2
+   S_ph_1 = grid%em_ph_1
+   S_ph_2 = grid%em_ph_2
+   S_t_1 = grid%em_t_1
+   S_t_2 = grid%em_t_2
+   S_mu_1 = grid%em_mu_1
+   S_mu_2 = grid%em_mu_2
+   S_p = grid%em_p
+   S_al = grid%em_al
+   S_moist_1 = grid%moist_1
+   S_moist_2 = grid%moist_2
+   S_rainnc(:,:) = grid%rainnc(:,:)
+   S_rainncv(:,:)= grid%rainncv(:,:)
+
+!  NLM
+   CALL wrf_message( '-------------- Non-linear model ---------------' )
+
+   model_config_rec%dyn_opt = DYN_EM
+   CALL integrate ( grid )
+
+   grid%em_z=0.; grid%em_mudf=0.
+
+   do j=jts,jte
+     do k=kts,kte
+       do i=its,ite
+         B_u_1(i,k,j) = grid%em_u_1(i,k,j)
+         B_u_2(i,k,j) = grid%em_u_2(i,k,j)
+         B_v_1(i,k,j) = grid%em_v_1(i,k,j)
+         B_v_2(i,k,j) = grid%em_v_2(i,k,j)
+         B_w_1(i,k,j) = grid%em_w_1(i,k,j)
+         B_w_2(i,k,j) = grid%em_w_2(i,k,j)
+         B_ph_1(i,k,j) = grid%em_ph_1(i,k,j)
+         B_ph_2(i,k,j) = grid%em_ph_2(i,k,j)
+         B_t_1(i,k,j) = grid%em_t_1(i,k,j)
+         B_t_2(i,k,j) = grid%em_t_2(i,k,j)
+         B_p(i,k,j) = grid%em_p(i,k,j)
+         B_al(i,k,j) = grid%em_al(i,k,j)
+         B_z(i,k,j) = grid%em_z(i,k,j)
+       enddo
+     enddo
+   enddo
+
+   do j=jts,jte
+     do i=its,ite
+       B_mu_1(i,j) =grid%em_mu_1(i,j)
+       B_mu_2(i,j) =grid%em_mu_2(i,j)
+       B_mudf(i,j) =grid%em_mudf(i,j)
+       B_rainnc(i,j)=grid%rainnc(i,j)
+       B_rainncv(i,j)=grid%rainncv(i,j)
+     enddo
+   enddo
+
+   do h=1,num_moist
+     do j=jts,jte
+       do k=kts,kte
+         do i=its,ite
+           B_moist_1(i,k,j,h) =grid%moist_1(i,k,j,h)
+           B_moist_2(i,k,j,h) =grid%moist_2(i,k,j,h)
+         enddo
+       enddo
+     enddo
+   enddo
+
+!  TCL
+
+   grid%em_u_1 = S_u_1
+   grid%em_u_2 = S_u_2
+   grid%em_v_1 = S_v_1
+   grid%em_v_2 = S_v_2
+   grid%em_w_1 = S_w_1
+   grid%em_w_2 = S_w_2
+   grid%em_ph_1 = S_ph_1
+   grid%em_ph_2 = S_ph_2
+   grid%em_t_1 = S_t_1
+   grid%em_t_2 = S_t_2
+   grid%em_mu_1 = S_mu_1
+   grid%em_mu_2 = S_mu_2
+   grid%em_p = S_p
+   grid%em_al = S_al
+   grid%moist_1 = S_moist_1
+   grid%moist_2 = S_moist_2
+   grid%rainnc(:,:)=S_rainnc(:,:)
+   grid%rainncv(:,:)=S_rainncv(:,:)
+
+   grid%em_g_u_1 = grid%em_u_1
+   grid%em_g_u_2 = grid%em_u_2
+   grid%em_g_v_1 = grid%em_v_1
+   grid%em_g_v_2 = grid%em_v_2
+   grid%em_g_w_1 = grid%em_w_1
+   grid%em_g_w_2 = grid%em_w_2
+   grid%em_g_ph_1 = grid%em_ph_1
+   grid%em_g_ph_2 = grid%em_ph_2
+   grid%em_g_t_1 = grid%em_t_1
+   grid%em_g_t_2 = grid%em_t_2
+   grid%em_g_mu_1 = grid%em_mu_1
+   grid%em_g_mu_2 = grid%em_mu_2
+   grid%em_g_p = grid%em_p
+   grid%em_g_al = grid%em_al
+   grid%g_moist_1 = grid%moist_1
+   grid%g_moist_2 = grid%moist_2
+   g_rainnc(:,:)=grid%rainnc(:,:)
+   g_rainncv(:,:)=grid%rainncv(:,:)
+   grid%em_g_u_b = 0.0
+   grid%em_g_u_bt = 0.0
+   grid%em_g_v_b = 0.0
+   grid%em_g_v_bt = 0.0
+   grid%em_g_w_b = 0.0
+   grid%em_g_w_bt = 0.0
+   grid%em_g_ph_b = 0.0
+   grid%em_g_ph_bt = 0.0
+   grid%em_g_t_b = 0.0
+   grid%em_g_t_bt = 0.0
+   grid%em_g_mu_b = 0.0
+   grid%em_g_mu_bt = 0.0
+   grid%em_g_rqv_b = 0.0
+   grid%em_g_rqv_bt = 0.0
+   grid%dtbc = dtbc_save
+
+   CALL Setup_date_string (grid, nl_date_string, 'tn' )
+   nl_date_index = 1
+
+   grid%current_time = grid%start_time
+   CALL ESMF_ClockSetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+   CALL ESMF_ClockGetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+
+   CALL wrf_message( '-------------- Tangent-linear model ---------------' )
+   model_config_rec%dyn_opt = DYN_EM_TL
+   CALL integrate_tl ( grid, nl_date_string, nl_date_index )
+
+   grid%em_g_z=0.; grid%em_g_mudf=0.
+
+   SAVE_L =0.0
+
+   do j=jfs,jfe
+     do k=kts,kte
+       do i=ifs,ife
+         SAVE_L =SAVE_L + grid%em_g_u_1(i,k,j)  * grid%em_g_u_1(i,k,j)    &
+                        + grid%em_g_u_2(i,k,j)  * grid%em_g_u_2(i,k,j)    &
+                        + grid%em_g_v_1(i,k,j)  * grid%em_g_v_1(i,k,j)    &
+                        + grid%em_g_v_2(i,k,j)  * grid%em_g_v_2(i,k,j)    &
+                        + grid%em_g_w_1(i,k,j)  * grid%em_g_w_1(i,k,j)    &
+                        + grid%em_g_w_2(i,k,j)  * grid%em_g_w_2(i,k,j)    &
+                        + grid%em_g_ph_1(i,k,j)  * grid%em_g_ph_1(i,k,j)  &
+                        + grid%em_g_ph_2(i,k,j)  * grid%em_g_ph_2(i,k,j)  &
+                        + grid%em_g_t_1(i,k,j)  * grid%em_g_t_1(i,k,j)    &
+                        + grid%em_g_t_2(i,k,j)  * grid%em_g_t_2(i,k,j)    &
+                        + grid%em_g_p(i,k,j)  * grid%em_g_p(i,k,j)    &
+                        + grid%em_g_al(i,k,j)  * grid%em_g_al(i,k,j)    &
+                        + grid%em_g_z(i,k,j)  * grid%em_g_z(i,k,j)
+
+       enddo
+     enddo
+   enddo
+
+   do j=jfs,jfe
+     do i=ifs,ife
+       SAVE_L =SAVE_L + grid%em_g_mu_1(i,j)  * grid%em_g_mu_1(i,j)    &
+                      + grid%em_g_mu_2(i,j)  * grid%em_g_mu_2(i,j)    &
+                      + g_rainnc(i,j) * g_rainnc(i,j)   &
+                      + g_rainncv(i,j) * g_rainncv(i,j) &
+                      + grid%em_g_mudf(i,j)  * grid%em_g_mudf(i,j)
+     enddo
+   enddo
+
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
+           SAVE_L =SAVE_L + grid%g_moist_1(i,k,j,h)  * grid%g_moist_1(i,k,j,h)    &
+                          + grid%g_moist_2(i,k,j,h)  * grid%g_moist_2(i,k,j,h)
+         enddo
+       enddo
+     enddo
+   enddo
+
+#ifdef DM_PARALLEL
+   call wrf_get_dm_communicator(comm)
+   call MPI_ALLREDUCE( SAVE_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   SAVE_L = nsum
 #endif
 
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! provide parent->nest feedback
-     SUBROUTINE med_nest_feedback ( parent , grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain), POINTER ::  grid , parent
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_nest_feedback
+   ALPHA_M=1.
+   DO NT=1,11
 
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! perform I/O prior to the close of this call to integrate
-     SUBROUTINE med_last_solve_io ( grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain) grid
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_last_solve_io
-       ! mediation-supplied routine that gives mediation layer opportunity to 
-       ! perform setup before iteration over steps in this call to integrate
-     SUBROUTINE med_setup_step ( grid , config_flags )
-       USE module_domain
-       USE module_configure
-       TYPE (domain) grid
-       TYPE (grid_config_rec_type) config_flags
-     END SUBROUTINE med_setup_step
-       ! mediation-supplied routine that intializes the nest from the grid
-       ! by interpolation
+   ALPHA_M=0.1*ALPHA_M
+   FACTOR=1.+ALPHA_M
+   grid%em_u_1 = FACTOR*S_u_1
+   grid%em_u_2 = FACTOR*S_u_2
+   grid%em_v_1 = FACTOR*S_v_1
+   grid%em_v_2 = FACTOR*S_v_2
+   grid%em_w_1 = FACTOR*S_w_1
+   grid%em_w_2 = FACTOR*S_w_2
+   grid%em_ph_1 = FACTOR*S_ph_1
+   grid%em_ph_2 = FACTOR*S_ph_2
+   grid%em_t_1 = FACTOR*S_t_1
+   grid%em_t_2 = FACTOR*S_t_2
+   grid%em_mu_1 = FACTOR*S_mu_1
+   grid%em_mu_2 = FACTOR*S_mu_2
+   grid%em_p = FACTOR*S_p
+   grid%em_al = FACTOR*S_al
+   grid%moist_1 = FACTOR*S_moist_1
+   grid%moist_2 = FACTOR*S_moist_2
+   grid%rainnc = FACTOR*S_rainnc
+   grid%rainncv = FACTOR*S_rainncv
+   grid%dtbc = dtbc_save
 
-     SUBROUTINE Setup_Timekeeping( grid )
-       USE module_domain
-       TYPE(domain), POINTER :: grid
-     END SUBROUTINE
+   CALL wrf_message( '-------------- Non-linear model ---------------' )
+   model_config_rec%dyn_opt = DYN_EM
+   CALL integrate ( grid )
 
-   END INTERFACE
+   grid%em_z=0.; grid%em_mudf=0.
 
-   IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN
-      CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
-      CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )
-      CALL wrf_clockprint ( 150, grid%domain_clock, &
-                            'DEBUG:  top of integrate(),' )
-      DO WHILE ( grid%current_time .LT. grid%stop_subtime )
-         IF ( wrf_dm_on_monitor() ) THEN
-           CALL start_timing
-         END IF
-         CALL med_setup_step ( grid , config_flags )
-         a_nest_was_opened = .false.
-         ! for each nest whose time has come...
-         DO WHILE ( nests_to_open( grid , nestid , kid ) )
-            ! nestid is index into model_config_rec (module_configure) of the grid
-            ! to be opened; kid is index into an open slot in grid's list of children
-            a_nest_was_opened = .true.
-            CALL alloc_and_configure_domain ( domain_id  = nestid ,                          &
-                                              grid       = new_nest ,                        &
-                                              parent     = grid ,                            &
-                                              kid        = kid                               )
-            CALL Setup_Timekeeping (new_nest)
-            CALL med_nest_initial ( grid , new_nest , config_flags )
-         END DO
-         IF ( a_nest_was_opened ) THEN
-            CALL set_overlaps ( grid )   ! find overlapping and set pointers
-         END IF
-         CALL med_before_solve_io ( grid , config_flags )
-         grid_ptr => grid
-         DO WHILE ( ASSOCIATED( grid_ptr ) )
-            CALL wrf_debug( 100 , 'module_integrate: calling solve interface ' )
-            CALL solve_interface_tst ( grid_ptr ) 
-            CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate():  before ESMF_ClockAdvance,' )
-            CALL ESMF_ClockAdvance( grid_ptr%domain_clock, rc=rc )
-            CALL wrf_check_error( ESMF_SUCCESS, rc, &
-                                  'ESMF_ClockAdvance() FAILED', &
-                                  __FILE__ , &
-                                  __LINE__  )
-            CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
-                                  'DEBUG integrate():  after ESMF_ClockAdvance,' )
-            CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )
-            CALL wrf_debug( 100 , 'module_integrate: back from solve interface ' )
-            grid_ptr => grid_ptr%sibling
-         END DO
-         CALL med_calc_model_time ( grid , config_flags )
-         CALL med_after_solve_io ( grid , config_flags )
-         grid_ptr => grid
-         DO WHILE ( ASSOCIATED( grid_ptr ) )
-            DO kid = 1, max_nests
-              IF ( ASSOCIATED( grid_ptr%nests(kid)%ptr ) ) THEN
-                ! Recursive -- advance nests from previous time level to this time level.
-                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_force ' )
-                CALL med_nest_force ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_force ' )
-                grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time
-                grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time
-                CALL integrate_tst ( grid_ptr%nests(kid)%ptr ) 
-                CALL wrf_debug( 100 , 'module_integrate: back from recursive call to integrate ' )
-                CALL wrf_debug( 100 , 'module_integrate: calling med_nest_feedback ' )
-                CALL med_nest_feedback ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )
-                CALL wrf_debug( 100 , 'module_integrate: back from med_nest_feedback ' )
-#ifdef MOVE_NESTS
-                CALL med_nest_move ( grid_ptr , grid_ptr%nests(kid)%ptr )
+   VAL_N = 0.0
+
+   do j=jfs,jfe
+     do k=kts,kte
+       do i=ifs,ife
+         VAL_N=VAL_N  + (grid%em_u_1(i,k,j)  - B_u_1(i,k,j) ) *(grid%em_u_1(i,k,j)  - B_u_1(i,k,j))     &
+                      + (grid%em_u_2(i,k,j)  - B_u_2(i,k,j) ) *(grid%em_u_2(i,k,j)  - B_u_2(i,k,j))     &
+                      + (grid%em_v_1(i,k,j)  - B_v_1(i,k,j) ) *(grid%em_v_1(i,k,j)  - B_v_1(i,k,j))     &
+                      + (grid%em_v_2(i,k,j)  - B_v_2(i,k,j) ) *(grid%em_v_2(i,k,j)  - B_v_2(i,k,j))     &
+                      + (grid%em_w_1(i,k,j)  - B_w_1(i,k,j) ) *(grid%em_w_1(i,k,j)  - B_w_1(i,k,j))     &
+                      + (grid%em_w_2(i,k,j)  - B_w_2(i,k,j) ) *(grid%em_w_2(i,k,j)  - B_w_2(i,k,j))     &
+                      + (grid%em_ph_1(i,k,j)  - B_ph_1(i,k,j) ) *(grid%em_ph_1(i,k,j)  - B_ph_1(i,k,j)) &
+                      + (grid%em_ph_2(i,k,j)  - B_ph_2(i,k,j) ) *(grid%em_ph_2(i,k,j)  - B_ph_2(i,k,j)) &
+                      + (grid%em_t_1(i,k,j)  - B_t_1(i,k,j) ) *(grid%em_t_1(i,k,j)  - B_t_1(i,k,j))     &
+                      + (grid%em_t_2(i,k,j)  - B_t_2(i,k,j) ) *(grid%em_t_2(i,k,j)  - B_t_2(i,k,j))     &
+                      + (grid%em_p(i,k,j)  - B_p(i,k,j) ) *(grid%em_p(i,k,j)  - B_p(i,k,j))     &
+                      + (grid%em_al(i,k,j)  - B_al(i,k,j) ) *(grid%em_al(i,k,j)  - B_al(i,k,j))     &
+                      + (grid%em_z(i,k,j)  - B_z(i,k,j) ) *(grid%em_z(i,k,j)  - B_z(i,k,j))
+       enddo
+     enddo
+   enddo
+
+   do j=jfs,jfe
+     do i=ifs,ife
+       VAL_N=VAL_N  + (grid%em_mu_1(i,j) -B_mu_1(i,j))*(grid%em_mu_1(i,j) -B_mu_1(i,j))    &
+                    + (grid%em_mu_2(i,j) -B_mu_2(i,j))*(grid%em_mu_2(i,j) -B_mu_2(i,j))    &
+                    + (grid%rainnc(i,j) -B_rainnc(i,j))*(grid%rainnc(i,j) -B_rainnc(i,j))  &
+                    + (grid%rainncv(i,j) -B_rainncv(i,j))*(grid%rainncv(i,j)-B_rainncv(i,j))  &
+                    + (grid%em_mudf(i,j) -B_mudf(i,j))*(grid%em_mudf(i,j) -B_mudf(i,j))
+     enddo
+   enddo
+
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
+           VAL_N=VAL_N  + (grid%moist_1(i,k,j,h) -B_moist_1(i,k,j,h))*(grid%moist_1(i,k,j,h) -B_moist_1(i,k,j,h))  &
+                        + (grid%moist_2(i,k,j,h) -B_moist_2(i,k,j,h))*(grid%moist_2(i,k,j,h) -B_moist_2(i,k,j,h))
+         enddo
+       enddo
+     enddo
+   enddo
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_N = nsum
 #endif
-              END IF
-            END DO
-            grid_ptr => grid_ptr%sibling
-         END DO
-         !  Report on the timing for a single time step.
-         IF ( wrf_dm_on_monitor() ) THEN
-           CALL wrf_timetoa ( grid%current_time, message2 )
-           WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
-           CALL end_timing ( TRIM(message) )
-         END IF
-      END DO
-      ! Avoid double writes on nests if this is not really the last time;
-      ! Do check for write if the parent domain is ending.
-      IF ( grid%id .EQ. 1 ) THEN               ! head_grid
-        CALL med_last_solve_io ( grid , config_flags )
-      ELSE
-        IF ( ESMF_ClockIsStopTime(grid%domain_clock , rc=rc) .OR. &
-             ESMF_ClockIsStopTime(grid%parents(1)%ptr%domain_clock , rc=rc ) ) THEN
-           CALL med_last_solve_io ( grid , config_flags )
-        ENDIF
-      ENDIF
-   END IF
+
+   VAL_L=SAVE_L*ALPHA_M**2
+   COEF=VAL_N/VAL_L
+   WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+        'g_em_sn: ALPHA_M=',ALPHA_M,'  COEF=',COEF, &
+        '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+
+   ENDDO
+
+!  ADJ test
+
+   FACTOR=0.1
+
+   grid%em_u_1 = S_u_1
+   grid%em_u_2 = S_u_2
+   grid%em_v_1 = S_v_1
+   grid%em_v_2 = S_v_2
+   grid%em_w_1 = S_w_1
+   grid%em_w_2 = S_w_2
+   grid%em_ph_1 = S_ph_1
+   grid%em_ph_2 = S_ph_2
+   grid%em_t_1 = S_t_1
+   grid%em_t_2 = S_t_2
+   grid%em_mu_1 = S_mu_1
+   grid%em_mu_2 = S_mu_2
+   grid%em_p = S_p
+   grid%em_al = S_al
+   grid%moist_1 = S_moist_1
+   grid%moist_2 = S_moist_2
+   grid%rainnc = S_rainnc
+   grid%rainncv = S_rainncv
+
+   grid%em_g_u_1 = FACTOR*S_u_1
+   grid%em_g_u_2 = FACTOR*S_u_2
+   grid%em_g_v_1 = FACTOR*S_v_1
+   grid%em_g_v_2 = FACTOR*S_v_2
+   grid%em_g_w_1 = FACTOR*S_w_1
+   grid%em_g_w_2 = FACTOR*S_w_2
+   grid%em_g_ph_1 = FACTOR*S_ph_1
+   grid%em_g_ph_2 = FACTOR*S_ph_2
+   grid%em_g_t_1 = FACTOR*S_t_1
+   grid%em_g_t_2 = FACTOR*S_t_2
+   grid%em_g_mu_1 = FACTOR*S_mu_1
+   grid%em_g_mu_2 = FACTOR*S_mu_2
+   grid%em_g_p = FACTOR*S_p
+   grid%em_g_al = FACTOR*S_al
+   grid%g_moist_1 = FACTOR*S_moist_1
+   grid%g_moist_2 = FACTOR*S_moist_2
+   g_rainnc = FACTOR*S_rainnc
+   g_rainncv = FACTOR*S_rainncv
+
+   grid%em_g_u_b = 0.
+   grid%em_g_u_bt =0.
+   grid%em_g_v_b = 0.
+   grid%em_g_v_bt =0.
+   grid%em_g_w_b = 0.
+   grid%em_g_w_bt =0.
+   grid%em_g_ph_b =0.
+   grid%em_g_ph_bt =0.
+   grid%em_g_t_b = 0.
+   grid%em_g_t_bt =0.
+   grid%em_g_mu_b =0.
+   grid%em_g_mu_bt =0.
+   grid%em_g_rqv_b =0.
+   grid%em_g_rqv_bt =0.
+
+   B_u_1 = grid%em_g_u_1
+   B_u_2 = grid%em_g_u_2
+   B_v_1 = grid%em_g_v_1
+   B_v_2 = grid%em_g_v_2
+   B_w_1 = grid%em_g_w_1
+   B_w_2 = grid%em_g_w_2
+   B_ph_1 = grid%em_g_ph_1
+   B_ph_2 = grid%em_g_ph_2
+   B_t_1 = grid%em_g_t_1
+   B_t_2 = grid%em_g_t_2
+   B_mu_1 = grid%em_g_mu_1
+   B_mu_2 = grid%em_g_mu_2
+   B_p = grid%em_g_p
+   B_al = grid%em_g_al
+   B_moist_1 = grid%g_moist_1
+   B_moist_2 = grid%g_moist_2
+   B_rainnc = g_rainnc
+   B_rainncv = g_rainncv
+   grid%dtbc = dtbc_save
+
+   CALL Setup_date_string (grid, nl_date_string, 'tn' )
+   nl_date_index = 1
+
+   grid%current_time = grid%start_time
+   CALL ESMF_ClockSetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+   CALL ESMF_ClockGetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+
+   CALL wrf_message( '-------------- Tangent-linear model ---------------' )
+   model_config_rec%dyn_opt = DYN_EM_TL
+   CALL integrate_tl ( grid, nl_date_string, nl_date_index )
+
+   grid%em_g_z=0.; grid%em_g_mudf=0.
+
+   VAL_L =0.0
+
+   do j=jfs,jfe
+     do k=kts,kte
+       do i=ifs,ife
+         VAL_L =VAL_L + grid%em_g_u_1(i,k,j)  * grid%em_g_u_1(i,k,j)    &
+                      + grid%em_g_u_2(i,k,j)  * grid%em_g_u_2(i,k,j)    &
+                      + grid%em_g_v_1(i,k,j)  * grid%em_g_v_1(i,k,j)    &
+                      + grid%em_g_v_2(i,k,j)  * grid%em_g_v_2(i,k,j)    &
+                      + grid%em_g_w_1(i,k,j)  * grid%em_g_w_1(i,k,j)    &
+                      + grid%em_g_w_2(i,k,j)  * grid%em_g_w_2(i,k,j)    &
+                      + grid%em_g_ph_1(i,k,j)  * grid%em_g_ph_1(i,k,j)  &
+                      + grid%em_g_ph_2(i,k,j)  * grid%em_g_ph_2(i,k,j)  &
+                      + grid%em_g_t_1(i,k,j)  * grid%em_g_t_1(i,k,j)    &
+                      + grid%em_g_t_2(i,k,j)  * grid%em_g_t_2(i,k,j)    &
+                      + grid%em_g_p(i,k,j)  * grid%em_g_p(i,k,j)    &
+                      + grid%em_g_al(i,k,j)  * grid%em_g_al(i,k,j)    &
+                      + grid%em_g_z(i,k,j)  * grid%em_g_z(i,k,j)
+       enddo
+     enddo
+   enddo
+
+   do j=jfs,jfe
+     do i=ifs,ife
+       VAL_L =VAL_L + grid%em_g_mu_1(i,j)  * grid%em_g_mu_1(i,j)    &
+                    + grid%em_g_mu_2(i,j)  * grid%em_g_mu_2(i,j)    &
+                    + g_rainnc(i,j) * g_rainnc(i,j)  &
+                    + g_rainncv(i,j) * g_rainncv(i,j)  &
+                    + grid%em_g_mudf(i,j)  * grid%em_g_mudf(i,j)
+     enddo
+   enddo
+
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
+           VAL_L =VAL_L + grid%g_moist_1(i,k,j,h)  * grid%g_moist_1(i,k,j,h)    &
+                        + grid%g_moist_2(i,k,j,h)  * grid%g_moist_2(i,k,j,h)
+         enddo
+       enddo
+     enddo
+   enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_L = nsum
+#endif
+
+!  ADJ
+
+   grid%em_u_1 = S_u_1
+   grid%em_u_2 = S_u_2
+   grid%em_v_1 = S_v_1
+   grid%em_v_2 = S_v_2
+   grid%em_w_1 = S_w_1
+   grid%em_w_2 = S_w_2
+   grid%em_ph_1 = S_ph_1
+   grid%em_ph_2 = S_ph_2
+   grid%em_t_1 = S_t_1
+   grid%em_t_2 = S_t_2
+   grid%em_mu_1 = S_mu_1
+   grid%em_mu_2 = S_mu_2
+   grid%em_p = S_p
+   grid%em_al = S_al
+   grid%moist_1 = S_moist_1
+   grid%moist_2 = S_moist_2
+   grid%rainnc = S_rainnc
+   grid%rainncv = S_rainncv
+
+   grid%em_a_u_1 = 0.
+   grid%em_a_u_2 = 0.
+   grid%em_a_v_1 = 0.
+   grid%em_a_v_2 =0.
+   grid%em_a_w_1 =0.
+   grid%em_a_w_2 =0.
+   grid%em_a_ph_1 =0.
+   grid%em_a_ph_2 = 0.
+   grid%em_a_t_1 = 0.
+   grid%em_a_t_2 =0.
+   grid%em_a_mu_1 = 0.
+   grid%em_a_mu_2 =0.
+   grid%em_a_p = 0.
+   grid%em_a_al =0.
+   grid%a_moist_1 = 0.
+   grid%a_moist_2 =0.
+   a_rainnc = 0.
+   a_rainncv = 0.
+   grid%em_a_u_b = 0.
+   grid%em_a_u_bt = 0.
+   grid%em_a_v_b = 0.
+   grid%em_a_v_bt =0.
+   grid%em_a_w_b = 0.
+   grid%em_a_w_bt =0.
+   grid%em_a_ph_b =0.
+   grid%em_a_ph_bt =0.
+   grid%em_a_t_b = 0.
+   grid%em_a_t_bt =0.
+   grid%em_a_mu_b =0.
+   grid%em_a_mu_bt =0.
+   grid%em_a_rqv_b =0.
+   grid%em_a_rqv_bt =0.
+
+   grid%em_a_u_1 = grid%em_g_u_1
+   grid%em_a_u_2 = grid%em_g_u_2
+   grid%em_a_v_1 = grid%em_g_v_1
+   grid%em_a_v_2 = grid%em_g_v_2
+   grid%em_a_w_1 = grid%em_g_w_1
+   grid%em_a_w_2 = grid%em_g_w_2
+   grid%em_a_ph_1 = grid%em_g_ph_1
+   grid%em_a_ph_2 = grid%em_g_ph_2
+   grid%em_a_t_1 = grid%em_g_t_1
+   grid%em_a_t_2 = grid%em_g_t_2
+   grid%em_a_mu_1 = grid%em_g_mu_1
+   grid%em_a_mu_2 = grid%em_g_mu_2
+   grid%em_a_mudf = grid%em_g_mudf
+   grid%em_a_p = grid%em_g_p
+   grid%em_a_al = grid%em_g_al
+   grid%em_a_z = grid%em_g_z
+   grid%a_moist_1 = grid%g_moist_1
+   grid%a_moist_2 = grid%g_moist_2
+   a_rainnc = g_rainnc
+   a_rainncv = g_rainncv
+
+   grid%em_g_z=0.; grid%em_g_mudf=0.
+   grid%dtbc = dtbc_save
+
+   CALL Setup_date_string (grid, ad_date_string, 'ad' )
+
+   CALL Setup_date_string (grid, nl_date_string, 'an' )
+
+   nl_date_index = 1
+   ad_date_index = 1
+
+   grid%current_time = grid%stop_time
+   CALL ESMF_ClockSetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+   CALL ESMF_ClockGetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+
+   CALL wrf_message( '-------------- Adjoint-linear model ---------------' )
+   model_config_rec%dyn_opt = DYN_EM_AD
+   CALL integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
+
+   VAL_A=0.0
+
+   do j=jfs,jfe
+     do k=kts,kte
+       do i=ifs,ife
+         VAL_A= VAL_A + grid%em_a_u_1(i,k,j) * B_u_1(i,k,j)               &
+                      + grid%em_a_u_2(i,k,j) * B_u_2(i,k,j)               &
+                      + grid%em_a_v_1(i,k,j) * B_v_1(i,k,j)               &
+                      + grid%em_a_v_2(i,k,j) * B_v_2(i,k,j)               &
+                      + grid%em_a_w_1(i,k,j) * B_w_1(i,k,j)               &
+                      + grid%em_a_w_2(i,k,j) * B_w_2(i,k,j)               &
+                      + grid%em_a_ph_1(i,k,j) * B_ph_1(i,k,j)             &
+                      + grid%em_a_ph_2(i,k,j) * B_ph_2(i,k,j)             &
+                      + grid%em_a_t_1(i,k,j) * B_t_1(i,k,j)               &
+                      + grid%em_a_t_2(i,k,j) * B_t_2(i,k,j)               &
+                      + grid%em_a_p(i,k,j) * B_p(i,k,j)                   &
+                      + grid%em_a_al(i,k,j) * B_al(i,k,j)
+       enddo
+     enddo
+   enddo
+
+   do j=jfs,jfe
+     do i=ifs,ife
+       VAL_A= VAL_A + grid%em_a_mu_1(i,j) * B_mu_1(i,j)                 &
+                    + a_rainnc(i,j) * B_rainnc(i,j)      &
+                    + a_rainncv(i,j) * B_rainncv(i,j)     &
+                    + grid%em_a_mu_2(i,j) * B_mu_2(i,j)
+     enddo
+   enddo
+
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
+           VAL_A= VAL_A + grid%a_moist_1(i,k,j,h) * B_moist_1(i,k,j,h)   &
+                        + grid%a_moist_2(i,k,j,h) * B_moist_2(i,k,j,h)
+         enddo
+       enddo
+     enddo
+   enddo
+
+#ifdef DM_PARALLEL
+   call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                       comm, IERROR )
+   VAL_A = nsum
+#endif
+
+   print*, '                '
+   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
+   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A
+
+!  RECOVER
+
+   grid%em_u_1 = S_u_1
+   grid%em_u_2 = S_u_2
+   grid%em_v_1 = S_v_1
+   grid%em_v_2 = S_v_2
+   grid%em_w_1 = S_w_1
+   grid%em_w_2 = S_w_2
+   grid%em_ph_1 = S_ph_1
+   grid%em_ph_2 = S_ph_2
+   grid%em_t_1 = S_t_1
+   grid%em_t_2 = S_t_2
+   grid%em_mu_1 = S_mu_1
+   grid%em_mu_2 = S_mu_2
+   grid%em_p = S_p
+   grid%em_al = S_al
+   grid%em_z = S_z
+   grid%moist_1 = S_moist_1
+   grid%moist_2 = S_moist_2
+   grid%rainnc = S_rainnc
+   grid%rainncv = S_rainncv
+!  print*,"Attention:",maxval(S_mu_b),minval(S_mu_b)
+
 
 END SUBROUTINE integrate_tst
 

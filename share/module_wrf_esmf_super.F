@@ -13,9 +13,8 @@ MODULE module_wrf_esmf_super
    USE module_integrate
    USE module_integrate_ad
    USE module_integrate_tl
-#if 1
    USE module_integrate_tst
-#endif
+   USE module_integrate_tst_sub
    USE module_driver_constants
    USE module_configure
 
@@ -340,6 +339,9 @@ CONTAINS
 
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
+
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_TST_SUB ) THEN
+      CALL integrate_tst_sub ( head_grid )
    ENDIF
 
    CALL       wrf_debug ( 100 , 'wrf: back from integrate' )
