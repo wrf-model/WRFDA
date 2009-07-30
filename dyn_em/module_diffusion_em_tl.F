@@ -313,8 +313,8 @@ real g_xkmhj(ims:ime,kms:kme,jms:jme)
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
-!call g_calculate_n2( config_flags,bn2,g_bn2,moist,g_moist,theta,g_theta,t,g_t,p,g_p,p8w,g_p8w,t8w,g_t8w,rdz,rdzw,n_moist,cf1,cf2,&
-!&cf3,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+call g_calculate_n2( config_flags,bn2,g_bn2,moist,g_moist,theta,g_theta,t,g_t,p,g_p,p8w,g_p8w,t8w,g_t8w,rdz,rdzw,n_moist,cf1,cf2,&
+&cf3,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 km_coeg: select case ( config_flags%km_opt )
 case (1) km_coeg
   call g_isotropic_km( xkmh,xkmhd,g_xkmhd,xkmv,xkhh,xkhv,khdif,ide,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )

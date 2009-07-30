@@ -342,8 +342,8 @@ a_xkmhj(:,:,:) = 0.
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
-!call calculate_n2( config_flags,bn2,moist,theta,t,p,p8w,t8w,dnw,dn,rdz,rdzw,n_moist,cf1,cf2,cf3,warm_rain,ids,ide,jds,jde,kds,kde,&
-!&ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+call calculate_n2( config_flags,bn2,moist,theta,t,p,p8w,t8w,dnw,dn,rdz,rdzw,n_moist,cf1,cf2,cf3,warm_rain,ids,ide,jds,jde,kds,kde,&
+&ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 ! recompute : bn2
 km_coeg: select case ( config_flags%km_opt )
 case (1) km_coeg
@@ -376,8 +376,8 @@ case (4) a_km_coef
   call a_smag2d_km( config_flags,xkmh,a_xkmhj,a_xkmhd,defor11,defor22,defor12,dx,dy,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
 &its,ite,jts,jte,kts,kte )
 end select a_km_coef
-!call a_calculate_n2( config_flags,a_bn2,moist,a_moist,theta,a_theta,t,a_t,p,a_p,p8w,a_p8w,t8w,a_t8w,rdz,rdzw,n_moist,cf1,cf2,cf3,&
-!&ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+call a_calculate_n2( config_flags,a_bn2,moist,a_moist,theta,a_theta,t,a_t,p,a_p,p8w,a_p8w,t8w,a_t8w,rdz,rdzw,n_moist,cf1,cf2,cf3,&
+&ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
 end subroutine a_calculate_km_kh
 

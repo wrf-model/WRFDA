@@ -808,7 +808,7 @@ BENCH_END(cal_phy_tend)
      IF(diff_opt .eq. 2 .OR. diff_opt .eq. 1) THEN
 
 BENCH_START(comp_diff_metrics_tim)
-       if(dyn_opt == DYN_EM) then
+!       if(dyn_opt == DYN_EM) then
 !       if(dyn_opt == DYN_EM_TST) then
        !$OMP PARALLEL DO   &
        !$OMP PRIVATE ( ij )
@@ -825,7 +825,7 @@ BENCH_START(comp_diff_metrics_tim)
                                       k_start    , k_end                    )
        ENDDO
        !$OMP END PARALLEL DO
-       endif
+!       endif
 BENCH_END(comp_diff_metrics_tim)
 
 #ifdef DM_PARALLEL

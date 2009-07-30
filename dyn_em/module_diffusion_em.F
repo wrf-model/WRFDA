@@ -939,13 +939,13 @@
     j_start = jts
     j_end   = MIN( jte, jde-1 )
 
-!   CALL calculate_N2( config_flags, BN2, moist,           &
-!                      theta, t, p, p8w, t8w,              &
-!                      dnw, dn, rdz, rdzw,                 &
-!                      n_moist, cf1, cf2, cf3, warm_rain,  &
-!                      ids, ide, jds, jde, kds, kde,       &
-!                      ims, ime, jms, jme, kms, kme,       &
-!                      its, ite, jts, jte, kts, kte        )
+    CALL calculate_N2( config_flags, BN2, moist,           &
+                       theta, t, p, p8w, t8w,              &
+                       dnw, dn, rdz, rdzw,                 &
+                       n_moist, cf1, cf2, cf3, warm_rain,  &
+                       ids, ide, jds, jde, kds, kde,       &
+                       ims, ime, jms, jme, kms, kme,       &
+                       its, ite, jts, jte, kts, kte        )
 
 ! Select a scheme for calculating diffusion coefficients.
 
@@ -1255,11 +1255,7 @@ END SUBROUTINE cal_dampkm
     DO j = j_start, j_end
     DO k = kts+1, ktf-1
     DO i = i_start, i_end
-      if ( rdz(i,k,j) .eq. 0.0 .or. rdz(i,k+1,j) .eq. 0.0) then
-         tmpdz = 0.0
-      else
-         tmpdz = 1.0 / rdz(i,k,j) + 1.0 / rdz(i,k+1,j)
-      endif
+      tmpdz = 1.0 / rdz(i,k,j) + 1.0 / rdz(i,k+1,j)
       IF ( moist(i,k,j,P_QV) .GE. qvs(i,k,j) .OR. qctmp(i,k,j) .GE. qc_cr) THEN
         xlvqv      = XLV * moist(i,k,j,P_QV)
         coefa      = ( 1.0 + xlvqv / R_d / t(i,k,j) ) / &
