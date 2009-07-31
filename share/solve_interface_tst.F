@@ -45,7 +45,7 @@ SUBROUTINE solve_interface_tst ( grid )
    IF ( .FALSE.                         ) THEN
 
 #if (EM_CORE == 1 && DA_CORE != 1)
-   ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
+   ELSE IF ( config_flags%dyn_opt == DYN_EM_TST_SUB ) THEN
 
      CALL test_solve_em ( grid , config_flags , &
 

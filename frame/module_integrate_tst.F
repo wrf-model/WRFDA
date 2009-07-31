@@ -169,6 +169,7 @@ real                                     :: dtbc_save
    S_mu_2 = grid%em_mu_2
    S_p = grid%em_p
    S_al = grid%em_al
+   S_z = grid%em_z
    S_moist_1 = grid%moist_1
    S_moist_2 = grid%moist_2
    S_rainnc(:,:) = grid%rainnc(:,:)
@@ -206,7 +207,6 @@ real                                     :: dtbc_save
      do i=its,ite
        B_mu_1(i,j) =grid%em_mu_1(i,j)
        B_mu_2(i,j) =grid%em_mu_2(i,j)
-       B_mudf(i,j) =grid%em_mudf(i,j)
        B_rainnc(i,j)=grid%rainnc(i,j)
        B_rainncv(i,j)=grid%rainncv(i,j)
      enddo
@@ -239,6 +239,7 @@ real                                     :: dtbc_save
    grid%em_mu_2 = S_mu_2
    grid%em_p = S_p
    grid%em_al = S_al
+   grid%em_z = S_z
    grid%moist_1 = S_moist_1
    grid%moist_2 = S_moist_2
    grid%rainnc(:,:)=S_rainnc(:,:)
@@ -258,6 +259,7 @@ real                                     :: dtbc_save
    grid%em_g_mu_2 = grid%em_mu_2
    grid%em_g_p = grid%em_p
    grid%em_g_al = grid%em_al
+   grid%em_g_z = grid%em_z
    grid%g_moist_1 = grid%moist_1
    grid%g_moist_2 = grid%moist_2
    g_rainnc(:,:)=grid%rainnc(:,:)
@@ -368,7 +370,12 @@ real                                     :: dtbc_save
    grid%dtbc = dtbc_save
 
    CALL wrf_message( '-------------- Non-linear model ---------------' )
+
+   grid%current_time = grid%start_time
+   CALL ESMF_ClockSetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
+   CALL ESMF_ClockGetCurrTime( grid%domain_clock, currTime=grid%current_time, rc=rc )
    model_config_rec%dyn_opt = DYN_EM
+
    CALL integrate ( grid )
 
    grid%em_z=0.; grid%em_mudf=0.
