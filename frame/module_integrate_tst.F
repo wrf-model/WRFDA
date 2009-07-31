@@ -363,6 +363,7 @@ real                                     :: dtbc_save
    grid%em_mu_2 = FACTOR*S_mu_2
    grid%em_p = FACTOR*S_p
    grid%em_al = FACTOR*S_al
+   grid%em_z = FACTOR*S_z
    grid%moist_1 = FACTOR*S_moist_1
    grid%moist_2 = FACTOR*S_moist_2
    grid%rainnc = FACTOR*S_rainnc
@@ -454,6 +455,7 @@ real                                     :: dtbc_save
    grid%em_mu_2 = S_mu_2
    grid%em_p = S_p
    grid%em_al = S_al
+   grid%em_z = S_z
    grid%moist_1 = S_moist_1
    grid%moist_2 = S_moist_2
    grid%rainnc = S_rainnc
@@ -473,6 +475,7 @@ real                                     :: dtbc_save
    grid%em_g_mu_2 = FACTOR*S_mu_2
    grid%em_g_p = FACTOR*S_p
    grid%em_g_al = FACTOR*S_al
+   grid%em_g_z = FACTOR*S_z
    grid%g_moist_1 = FACTOR*S_moist_1
    grid%g_moist_2 = FACTOR*S_moist_2
    g_rainnc = FACTOR*S_rainnc
@@ -507,6 +510,7 @@ real                                     :: dtbc_save
    B_mu_2 = grid%em_g_mu_2
    B_p = grid%em_g_p
    B_al = grid%em_g_al
+   B_z = grid%em_g_z
    B_moist_1 = grid%g_moist_1
    B_moist_2 = grid%g_moist_2
    B_rainnc = g_rainnc
@@ -591,6 +595,7 @@ real                                     :: dtbc_save
    grid%em_mu_2 = S_mu_2
    grid%em_p = S_p
    grid%em_al = S_al
+   grid%em_z = S_z
    grid%moist_1 = S_moist_1
    grid%moist_2 = S_moist_2
    grid%rainnc = S_rainnc
@@ -610,6 +615,7 @@ real                                     :: dtbc_save
    grid%em_a_mu_2 =0.
    grid%em_a_p = 0.
    grid%em_a_al =0.
+   grid%em_a_z =0.
    grid%a_moist_1 = 0.
    grid%a_moist_2 =0.
    a_rainnc = 0.
@@ -684,7 +690,8 @@ real                                     :: dtbc_save
                       + grid%em_a_t_1(i,k,j) * B_t_1(i,k,j)               &
                       + grid%em_a_t_2(i,k,j) * B_t_2(i,k,j)               &
                       + grid%em_a_p(i,k,j) * B_p(i,k,j)                   &
-                      + grid%em_a_al(i,k,j) * B_al(i,k,j)
+                      + grid%em_a_al(i,k,j) * B_al(i,k,j)                 &
+                      + grid%em_a_z(i,k,j) * B_z(i,k,j)
        enddo
      enddo
    enddo
@@ -692,9 +699,9 @@ real                                     :: dtbc_save
    do j=jfs,jfe
      do i=ifs,ife
        VAL_A= VAL_A + grid%em_a_mu_1(i,j) * B_mu_1(i,j)                 &
-                    + a_rainnc(i,j) * B_rainnc(i,j)      &
-                    + a_rainncv(i,j) * B_rainncv(i,j)     &
-                    + grid%em_a_mu_2(i,j) * B_mu_2(i,j)
+                    + grid%em_a_mu_2(i,j) * B_mu_2(i,j)                 &
+                    + a_rainnc(i,j) * B_rainnc(i,j)                     &
+                    + a_rainncv(i,j) * B_rainncv(i,j)     
      enddo
    enddo
 
