@@ -17,7 +17,6 @@
 # Ideally, you should not need to change the code below, but if you 
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
-
 #-----------------------------------------------------------------------
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
@@ -35,6 +34,7 @@ export NL_ANALYSIS_TYPE="VERIFY"
 export DA_ANALYSIS=analysis_not_used
 export ETKF_INPUT_DIR=${ETKF_INPUT_DIR:-$FC_DIR}
 export ETKF_OUTPUT_DIR=${ETKF_OUTPUT_DIR:-$FC_DIR}
+DIRECTORY=${ETKF_INPUT_DIR}/${PREV_DATE}
 
 echo "<HTML><HEAD><TITLE>$EXPT etkf</TITLE></HEAD><BODY><H1>$EXPT etkf</H1><PRE>"
 
@@ -53,11 +53,16 @@ export MM=$(echo $DATE | cut -c5-6)
 export DD=$(echo $DATE | cut -c7-8)
 export HH=$(echo $DATE | cut -c9-10)
 export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
-export DA_FILE=$ETKF_INPUT_DIR/$PREV_DATE/${FILE_TYPE}_d01_${FILE_DATE} #JEFS test uses wrfout
+export FILENAME=${FILE_TYPE}_d01_${FILE_DATE}
+export DA_FILE=$ETKF_INPUT_DIR/$PREV_DATE/${FILENAME} #JEFS test uses wrfout
 
 #-----------------------------------------------------------------------
 # [3] Create observation files for ETKF:
 #-----------------------------------------------------------------------
+export RUN_WPB=true    # true if DA_FIRST_GUESS is set outside da_run_wrfvar.ksh
+
+echo ' Running 0-iteration var for $NUM_MEMBERS'
+date
 
 export RUN_DIR_SAVE=$RUN_DIR
 
@@ -68,7 +73,7 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10  ]]; then export CMEM=e00$MEM; fi
-   export DA_FIRST_GUESS=${DA_FILE}.${CMEM}
+   export DA_FIRST_GUESS=${DIRECTORY}.${CMEM}/${FILENAME}
 
    export RUN_DIR=$WORK_DIR/wrfvar.${CMEM}
    mkdir -p $RUN_DIR
@@ -84,17 +89,53 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
       wait # Wait for current jobs to finish
    fi
 done
+echo ' Done running 0-iteration var for $NUM_MEMBERS'
+date
 
+#-----------------------------------------------------------------------
+# [3a] Run fortran code that reads in gts_omb_oma files from 0-iteration
+#      Var and creates new gts_omb_oma and ob.etkf files that contain a 
+#      maximum subset of the observations that pass WRF-Var's quality 
+#      control.
+#-----------------------------------------------------------------------
+echo ' Running kaiser for $NUM_MEMBERS'
+
+${ETKFaid_dir}/kaiser -m ${NUM_MEMBERS} -d ${WORK_DIR} \
+                      -j > ${WORK_DIR}/kaiser.out 2>&1
+echo ' Done running kaiser for $NUM_MEMBERS'
+date
+
+#----------------------------------------------------------------------
+# Look for "SUCCESSFUL COMPLETION" message in kaiser.out file
+#----------------------------------------------------------------------
+stdOutFile=$WORK_DIR/kaiser.out
+kaiser_exec=${WRFVAR_DIR}/build/da_wrfvar.exe
+
+#CheckRSLOutput ${stdOutFile} ${self} ${kaiser_exec} ${thisensemble} \
+#               ${scriptdir} ${logfile} ${email_target} $JME_ValidDate
+
+# ${WORK_DIR}/ob.etkf*.new and ${WORK_DIR}/gts*.new files have been created
+#
+#--------- Done finding subset of obs ----------------------------------
+
+#-----------------------------------------------------------------------
+# [3b] Append the line count from the new ob.etkf*.new file.
+#      Keep ob.etkf.000 files created by Var down in the wrfvar.${CMEM}
+#      diretories; mv ob.etkf.new files to ob.etkf files
+#                  mv gts_omb_oma_01.e???.new files to gts_omb_oma_01.e???
+#-----------------------------------------------------------------------
 let MEM=1
 while [[ $MEM -le $NUM_MEMBERS ]]; do
 
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
-   export RUN_DIR=$WORK_DIR/wrfvar.${CMEM}/working
+#  export RUN_DIR=$WORK_DIR/wrfvar.${CMEM}/working
 
-   wc -l ${RUN_DIR}/ob.etkf.000 > $WORK_DIR/ob.etkf.${CMEM}
-   cat ${RUN_DIR}/ob.etkf.000 >> $WORK_DIR/ob.etkf.${CMEM}
+#JLS what to do if these files don't exist, maybe skip this loop if kaiser fails?
+   wc -l ${WORK_DIR}/ob.etkf.${CMEM}.new > $WORK_DIR/ob.etkf.${CMEM}
+   cat ${WORK_DIR}/ob.etkf.${CMEM}.new  >> $WORK_DIR/ob.etkf.${CMEM}
+   mv  ${WORK_DIR}/gts_omb_oma_01.${CMEM}.new ${WORK_DIR}/gts_omb_oma_01.${CMEM}
 
    let MEM=$MEM+1
 done
@@ -102,22 +143,33 @@ done
 cd $WORK_DIR
 
 #-----------------------------------------------------------------------
+# [3c] Clean up *.new files from Kaiser
+#-----------------------------------------------------------------------
+  rm -f ob.etkf.*.new
+
+#-----------------------------------------------------------------------
 # [4] Calculate ensemble mean:
 #-----------------------------------------------------------------------
 
-ln -s $ETKF_INPUT_DIR/$PREV_DATE/*.e* .
+#ln -s "$DIRECTORY/\*.e\*" .    This creates a link called *.e*
+
+#Copy first member as template for mean:
 
 # Initialize ensemble mean and variance with first member
-cp ${FILE_TYPE}_d01_${FILE_DATE}.e001 ${FILE_TYPE}_d01_${FILE_DATE}
-cp ${FILE_TYPE}_d01_${FILE_DATE}.e001 ${FILE_TYPE}_d01_${FILE_DATE}.vari
+cp ${DIRECTORY}.e001/${FILENAME} ${DIRECTORY}/${FILENAME}
+cp ${DIRECTORY}.e001/${FILENAME} ${DIRECTORY}/${FILENAME}.vari
 
 cat > gen_be_ensmean_nl.nl << EOF
   &gen_be_ensmean_nl
-    filestub = '${FILE_TYPE}_d01_${FILE_DATE}'
+    directory = '${DIRECTORY}'
+    filename = '${FILENAME}'
     num_members = ${NUM_MEMBERS},
     nv = ${NV},
     cv = ${CV} /
 EOF
+
+echo ' Running gen_be_ensmean for $NUM_MEMBERS'
+date
 
 ln -fs $BUILD_DIR/gen_be_ensmean.exe .
 ./gen_be_ensmean.exe > gen_be_ensmean.out 2>&1
@@ -126,11 +178,17 @@ cp gen_be_ensmean.out $RUN_DIR_SAVE
 echo
 echo '   <A HREF="gen_be_etkf.out">gen_be_ensmean.out</a>'
 
+echo ' Done running gen_be_ensmean for $NUM_MEMBERS'
+date
+
 #-----------------------------------------------------------------------
 # [5] Run Ensemble Transform Kalman Filter:
 #-----------------------------------------------------------------------
 
 #Prepare ETKF input/output files:
+
+echo ' Running ETKF for $NUM_MEMBERS'
+date
 
 ln -sf ${DA_FILE} etkf_input                     # ETKF input mean (unchanged)
 let MEM=1
@@ -139,8 +197,8 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10  ]]; then export CMEM=e00$MEM; fi
 
-   ln -sf ${DA_FILE}.${CMEM} etkf_input.${CMEM}  # ETKF input (unchanged).
-   cp ${DA_FILE}.${CMEM} etkf_output.${CMEM}     # ETKF output (overwritten).
+   ln -sf ${DIRECTORY}.${CMEM}/${FILENAME} etkf_input.${CMEM}  # ETKF input (unchanged).
+   cp ${DIRECTORY}.${CMEM}/${FILENAME} etkf_output.${CMEM}     # ETKF output (overwritten).
    let MEM=$MEM+1
 done
 
@@ -163,6 +221,9 @@ EOF
 ln -fs $BUILD_DIR/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
+echo ' Done running ETKF for $NUM_MEMBERS'
+date
+
 cp gen_be_etkf.out $RUN_DIR_SAVE
 echo
 echo '   <A HREF="gen_be_etkf.out">gen_be_etkf.out</a>'
@@ -172,8 +233,9 @@ mkdir -p $ETKF_OUTPUT_DIR/$DATE
 
 # Move ensemble mean and variance
 
-mv ${FILE_TYPE}_d01_${FILE_DATE}      $ETKF_OUTPUT_DIR/$PREV_DATE
-mv ${FILE_TYPE}_d01_${FILE_DATE}.vari $ETKF_OUTPUT_DIR/$PREV_DATE
+# JLS Don't start moving files, it's hard enough to figure out where they are
+# mv ${FILE_TYPE}_d01_${FILE_DATE}      $ETKF_OUTPUT_DIR/$PREV_DATE
+# mv ${FILE_TYPE}_d01_${FILE_DATE}.vari $ETKF_OUTPUT_DIR/$PREV_DATE
 
 # Move ensemble of analyses:
 
@@ -182,7 +244,9 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
-   mv $WORK_DIR/etkf_output.${CMEM} $ETKF_OUTPUT_DIR/$DATE/${FILE_TYPE}_d01_${FILE_DATE}.${CMEM}
+# JLS retain the name of the etkf output files for clarity
+#   mv $WORK_DIR/etkf_output.${CMEM} $ETKF_OUTPUT_DIR/$DATE/${FILE_TYPE}_d01_${FILE_DATE}.${CMEM}
+#   mv $WORK_DIR/etkf_output.${CMEM} $FC_DIR/$DATE/${FILE_TYPE}_d01_${FILE_DATE}.${CMEM}
    let MEM=$MEM+1
 done
 
@@ -190,6 +254,7 @@ if $CLEAN; then
    rm -rf $WORK_DIR
 fi
 
+date
 echo '</PRE></BODY></HTML>'
 
 exit 0
