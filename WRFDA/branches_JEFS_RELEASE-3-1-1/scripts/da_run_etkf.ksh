@@ -21,6 +21,11 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
+# name of this script
+self=$(/usr/bin/basename $0)
+
+. ${scriptdir}/JME_SharedFunctions.ksh    # To use the JME shared functions
+
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/WRFDA}
 export NUM_PROCS=1 # will not run parallel
@@ -61,8 +66,7 @@ export DA_FILE=$ETKF_INPUT_DIR/$PREV_DATE/${FILENAME} #JEFS test uses wrfout
 #-----------------------------------------------------------------------
 export RUN_WPB=true    # true if DA_FIRST_GUESS is set outside da_run_wrfvar.ksh
 
-echo ' Running 0-iteration var for $NUM_MEMBERS'
-date
+echo " \n      Running 0-iteration var for ${NUM_MEMBERS} members" $(date)
 
 export RUN_DIR_SAVE=$RUN_DIR
 
@@ -89,8 +93,7 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
       wait # Wait for current jobs to finish
    fi
 done
-echo ' Done running 0-iteration var for $NUM_MEMBERS'
-date
+echo " Done running 0-iteration var for ${NUM_MEMBERS} members" $(date)
 
 #-----------------------------------------------------------------------
 # [3a] Run fortran code that reads in gts_omb_oma files from 0-iteration
@@ -98,21 +101,20 @@ date
 #      maximum subset of the observations that pass WRF-Var's quality 
 #      control.
 #-----------------------------------------------------------------------
-echo ' Running kaiser for $NUM_MEMBERS'
+echo " \n      Running kaiser for ${NUM_MEMBERS} members" $(date)
 
 ${ETKFaid_dir}/kaiser -m ${NUM_MEMBERS} -d ${WORK_DIR} \
                       -j > ${WORK_DIR}/kaiser.out 2>&1
-echo ' Done running kaiser for $NUM_MEMBERS'
-date
+echo " Done running kaiser for ${NUM_MEMBERS} members" $(date)
 
 #----------------------------------------------------------------------
 # Look for "SUCCESSFUL COMPLETION" message in kaiser.out file
 #----------------------------------------------------------------------
 stdOutFile=$WORK_DIR/kaiser.out
-kaiser_exec=${WRFVAR_DIR}/build/da_wrfvar.exe
+kaiser_exec=${ETKFaid_dir}/kaiser
 
-#CheckRSLOutput ${stdOutFile} ${self} ${kaiser_exec} ${thisensemble} \
-#               ${scriptdir} ${logfile} ${email_target} $JME_ValidDate
+CheckRSLOutput ${stdOutFile} ${self} ${kaiser_exec} ${thisensemble} \
+               ${scriptdir} ${logfile} ${email_target} $JME_ValidDate
 
 # ${WORK_DIR}/ob.etkf*.new and ${WORK_DIR}/gts*.new files have been created
 #
@@ -132,7 +134,7 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
 #  export RUN_DIR=$WORK_DIR/wrfvar.${CMEM}/working
 
-#JLS what to do if these files don't exist, maybe skip this loop if kaiser fails?
+#JLS what to do if these files don't exist, kaiser will exit above if it fails....
    wc -l ${WORK_DIR}/ob.etkf.${CMEM}.new > $WORK_DIR/ob.etkf.${CMEM}
    cat ${WORK_DIR}/ob.etkf.${CMEM}.new  >> $WORK_DIR/ob.etkf.${CMEM}
    mv  ${WORK_DIR}/gts_omb_oma_01.${CMEM}.new ${WORK_DIR}/gts_omb_oma_01.${CMEM}
@@ -168,8 +170,7 @@ cat > gen_be_ensmean_nl.nl << EOF
     cv = ${CV} /
 EOF
 
-echo ' Running gen_be_ensmean for $NUM_MEMBERS'
-date
+echo " \n      Running gen_be_ensmean for ${NUM_MEMBERS} members" $(date)
 
 ln -fs $BUILD_DIR/gen_be_ensmean.exe .
 ./gen_be_ensmean.exe > gen_be_ensmean.out 2>&1
@@ -178,8 +179,7 @@ cp gen_be_ensmean.out $RUN_DIR_SAVE
 echo
 echo '   <A HREF="gen_be_etkf.out">gen_be_ensmean.out</a>'
 
-echo ' Done running gen_be_ensmean for $NUM_MEMBERS'
-date
+echo " Done running gen_be_ensmean for ${NUM_MEMBERS} members" $(date)
 
 #-----------------------------------------------------------------------
 # [5] Run Ensemble Transform Kalman Filter:
@@ -187,8 +187,7 @@ date
 
 #Prepare ETKF input/output files:
 
-echo ' Running ETKF for $NUM_MEMBERS'
-date
+echo " \n      Running ETKF for ${NUM_MEMBERS} members" $(date)
 
 ln -sf ${DA_FILE} etkf_input                     # ETKF input mean (unchanged)
 let MEM=1
@@ -221,8 +220,7 @@ EOF
 ln -fs $BUILD_DIR/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
-echo ' Done running ETKF for $NUM_MEMBERS'
-date
+echo " Done running ETKF for ${NUM_MEMBERS} members" $(date)
 
 cp gen_be_etkf.out $RUN_DIR_SAVE
 echo
