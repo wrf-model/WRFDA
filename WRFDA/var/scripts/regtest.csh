@@ -4,11 +4,11 @@
 # #BSUB -a mpich_gm                       # at NCAR: lightning
 # #BSUB -R "span[ptile=2]"                # how many tasks per node (1 or 2)
 #BSUB -R "span[ptile=32]"                # how many tasks per node (up to 8)
-#BSUB -n 16                             # number of total tasks
+#BSUB -n 8                          # number of total tasks
 #BSUB -o reg.out                        # output filename (%J to add job id)
 #BSUB -e reg.err                        # error filename
 #BSUB -J regtest_wrfda                  # job name
-#BSUB -q regular                        # queue
+#BSUB -q share                        # queue
 #BSUB -W 6:00                          # wallclock time
 #BSUB -P 64000510
 ##BSUB -P 48500053
@@ -82,6 +82,7 @@ if      ( ( `uname` == AIX ) || ( `hostname` == tempest ) || ( `hostname | cut -
 	set argv = ( -env )
 	set WRFDAREGFILE = /mmm/users/xinzhang/wrfda.tar
 	if ( ( `uname` == AIX ) && ( `hostname | cut -c 1-2` == be ) ) then
+	        set argv = ( -r HEAD  )
 		set argv = ( -f /mmm/users/xinzhang/wrfda.tar )
 	endif
 else if   ( `hostname` == bay-mmm ) then
@@ -387,7 +388,7 @@ if ( $ARCH[1] == AIX ) then
 	if ( ! -d $TMPDIR ) mkdir $TMPDIR
 	set MAIL                = /usr/bin/mailx
 	set COMPOPTS    = ( 1 2 3 )
-	set Num_Procs		= 16
+	set Num_Procs		= 8
         set OPENMP              = $Num_Procs
         setenv MP_PROCS  $Num_Procs
         setenv MP_RMPOOL 1
