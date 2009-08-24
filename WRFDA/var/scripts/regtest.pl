@@ -13,8 +13,8 @@ use IPC::Open2;
 
 # Constant variables
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
-my $tester = 'xinzhang';
-my $Exec = 1; # Use the current EXEs in WRFDA or not
+my $tester = $ENV{USER};
+my $Exec = 0; # Use the current EXEs in WRFDA or not
 
 # Local variables
 my $Arch;
@@ -180,6 +180,20 @@ foreach my $option (sort keys %Compile_options) {
      close ($readme);
      close ($writeme);
 
+     if ( $Arch =~ /be/i ) {
+         open FHCONF, "<configure.wrf" or die "Where is configure.wrf: $!\n"; 
+         open FH, ">configure.wrf.new" or die "Cannot open configure.wrf.new: $!\n"; 
+         while ($_ = <FHCONF>) { 
+             $_ =~ s/-lmass -lmassv//;
+             $_ =~ s/-DNATIVE_MASSV//;
+             print FH $_;
+         }
+         close (FHCONF);
+         close (FH);
+
+         rename "configure.wrf.new", "configure.wrf";
+     }
+
      # compile all_wrfvar
      printf "Compiling WRFDA with %10s for %6s ....\n", $Compiler, $Compile_options{$option};
      my $begin_time = gettimeofday();
@@ -295,8 +309,8 @@ while ($remain_exps > 0) {    # cycling until no more experiments remain
                      $Experiments{$name}{status} = "close";
                      printf "%-10s Job for %-30s was submitted with jobid: %10d \n", $par, $name, $rc;
                  } else {
-                     $Experiments{$name}{paropt}{$par}{status} = "error";
-                     $Experiments{$name}{paropt}{$par}{compare} = "diff";
+                     $Experiments{$name}{paropt}{$par}{status} = sprintf colored("%-10s",'red on_yellow blink'),"error";
+                     $Experiments{$name}{paropt}{$par}{compare} = sprintf colored("%-10s",'red on_yellow blink'), "diff";
                      $remain_jobs{$name} -- ;
                      next;   # Can not submit this job.
                  }
@@ -304,15 +318,14 @@ while ($remain_exps > 0) {    # cycling until no more experiments remain
      
              # Job is still in queue.
 
-             # Current status:
-
-             &flush_status ();
 
              my $feedback = `bjobs $Experiments{$name}{paropt}{$par}{jobid}`;
              if ( $feedback =~ m/RUN/ ) {; # Still running 
-                 $Experiments{$name}{paropt}{$par}{status} = "running";
-                 $Experiments{$name}{paropt}{$par}{starttime} = gettimeofday() 
-                     unless (defined $Experiments{$name}{paropt}{$par}{starttime}); # set the start time when we first find it is running.
+                 unless (defined $Experiments{$name}{paropt}{$par}{starttime}) { #set the start time when we first find it is running.
+                     $Experiments{$name}{paropt}{$par}{status} = "running";
+                     $Experiments{$name}{paropt}{$par}{starttime} = gettimeofday();
+                     &flush_status (); # refresh the status
+                 }
                  next;
              } elsif ( $feedback =~ m/PEND/ ) { # Still Pending
                  next;
@@ -324,10 +337,10 @@ while ($remain_exps > 0) {    # cycling until no more experiments remain
     
              unless (defined $Experiments{$name}{paropt}{$par}{starttime}) { # This job was exit mysteriously: killed or time out.
                  printf "Task %-30s is killed .\n", $name; 
-                 $Experiments{$name}{paropt}{$par}{compare} = "unknown";
+                 $Experiments{$name}{paropt}{$par}{compare} = sprintf colored("%-10s",'red on_yellow blink'),"unknown";
                  delete $Experiments{$name}{paropt}{$par}{jobid};       # Delete the jobid.
                  $remain_jobs{$name} -- ;                               # Delete the count of jobs for this experiment.
-                 $Experiments{$name}{paropt}{$par}{status} = "killed";
+                 $Experiments{$name}{paropt}{$par}{status} = sprintf colored("%-10s",'red on_yellow blink'),"killed";
              } else {
                  $Experiments{$name}{paropt}{$par}{walltime} = 
                       $Experiments{$name}{paropt}{$par}{endtime} - $Experiments{$name}{paropt}{$par}{starttime};
@@ -346,7 +359,8 @@ while ($remain_exps > 0) {    # cycling until no more experiments remain
                  if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
                      $Experiments{$name}{paropt}{$par}{compare} = "ok";
                  } else {
-                     $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? "diff" : "ok";
+                     $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
+                         sprintf colored("%-10s",'red on_yellow blink'),"diff" : "ok";
                  }
              }
 
@@ -468,7 +482,6 @@ sub compare2baseline {
              $found = 1 ;
              next;
          }
-         print "found = $found\n";
         
          next unless $found;
 
@@ -485,7 +498,7 @@ sub flush_status {
 
     @Message = &refresh_status ();   # Update the Message
     print $Clear; 
-#   print $Flush_Counter++ ,"\n";
+    # print $Flush_Counter++ ,"\n";
     print @Message;
 
 }
@@ -495,16 +508,16 @@ __DATA__
 #ARCH      SOURCE     COMPILER    CPU         PROJECT   QUEUE   DATABASE                             BASELINE
 be         SVN        XLF         32          64000420  share   /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU            PAROPT
-1        tutorial_xinzhang           32             serial|smpar|dmpar
-2        cv3_guo                     32             serial|smpar|dmpar
-3        t44_liuz                    32             serial|smpar|dmpar
-4        radar_meixu                 32             serial|smpar|dmpar
-5        cwb_ascii                   32             serial|smpar|dmpar
-6        afwa_t7_ssmi                32             serial|smpar|dmpar
-7        t44_prepbufr                32             serial|smpar|dmpar
-8        ASR_prepbufr                32             serial|smpar|dmpar
-9        cwb_ascii_outerloop_rizvi   32             serial|smpar|dmpar
-10       sfc_assi_2_outerloop_guo    32             serial|smpar|dmpar
+1        tutorial_xinzhang           32             smpar|dmpar
+#2        cv3_guo                     32             serial|smpar|dmpar
+#3        t44_liuz                    32             serial|smpar|dmpar
+#4        radar_meixu                 32             serial|smpar|dmpar
+#5        cwb_ascii                   32             serial|smpar|dmpar
+#6        afwa_t7_ssmi                32             serial|smpar|dmpar
+#7        t44_prepbufr                32             serial|smpar|dmpar
+#8        ASR_prepbufr                32             serial|smpar|dmpar
+#9        cwb_ascii_outerloop_rizvi   32             serial|smpar|dmpar
+#10       sfc_assi_2_outerloop_guo    32             serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    CPU         PROJECT   QUEUE   DATABASE                             BASELINE
 karri      SVN        PGI         32          64000420  share   /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
