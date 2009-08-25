@@ -5,16 +5,24 @@
 use strict;
 use Term::ANSIColor;
 use Time::HiRes qw(sleep gettimeofday);
+use Time::localtime;
 use Sys::Hostname;
 use File::Path;
 use File::Basename;
 use File::Compare;
 use IPC::Open2;
 
+# Start time:
+
+my $Start_time;
+my $tm = localtime;
+$Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
+        $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
+
 # Constant variables
-my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
-my $tester = $ENV{USER};
 my $Exec = 1; # Use the current EXEs in WRFDA or not
+my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
+my $Tester = getlogin();
 
 # Local variables
 my $Arch;
@@ -79,7 +87,7 @@ my %Compile_options;
 
 # What's my hostname :
 
-my $host = hostname();
+my $Host = hostname();
 
 # Parse the task table:
 
@@ -91,7 +99,7 @@ while (<DATA>) {
                split /\s+/,$_;
      }
 
-     if ( /^(\d)+/ && ($host =~ /$Arch/i) ) {
+     if ( /^(\d)+/ && ($Host =~ /$Arch/i) ) {
           $_=~ m/(\d+) \s+ (\S+) \s+ (\S+) \s+ (\S+) \s+ (\S+)/x;
           my @tasks = split /\|/, $5;
           my %task_records;
@@ -116,7 +124,7 @@ printf "%-4d     %-27s  %-8d   %-13d"."%-10s "x(keys %{$Experiments{$_}{paropt}}
 
 # Get the codes:
 
-if (! $Exec) {
+goto "SKIP_COMPILE" if $Exec;
 
 if ($Source eq 'SVN' ) {
      if ( -e 'WRFDA' && -r 'WRFDA' ) {
@@ -230,8 +238,7 @@ foreach my $option (sort keys %Compile_options) {
 
 chdir ".." or die "Cannot chdir to .. : $!\n";
 
-} #end Exec
-
+SKIP_COMPILE:
 
 # Make working directory for each Expeirments:
 
@@ -291,20 +298,102 @@ foreach my $name (keys %Experiments) {
 
 &submit_job_be if ($Arch eq "be");
 
+# End time:
+
+my $End_time;
+$tm = localtime;
+$End_time=sprintf "End   : %02d:%02d:%02d-%04d/%02d/%02d\n",
+        $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
+
+# Create the webpage:
+
+&create_webpage ();
+
 # Mail out summary:
 
 open (SENDMAIL, "|/usr/sbin/sendmail -oi -t -odq")
        or die "Can't fork for sendmail: $!\n";
 
-print SENDMAIL  "From: $tester\n";
-print SENDMAIL  "To: $tester\@ucar.edu"."\n";
+print SENDMAIL  "From: $Tester\n";
+print SENDMAIL  "To: $Tester\@ucar.edu"."\n";
 print SENDMAIL  "Subject: Regression test summary\n";
 
 print $Clear;
 print @Message;
+print SENDMAIL $Start_time."\n";
+print SENDMAIL "Source :",$Source."\n";
+#print SENDMAIL "Revision :",$Revision."\n";
+print SENDMAIL "Tester :",$Tester."\n";
+print SENDMAIL "Machine name :",$Host."\n";
+print SENDMAIL "Compiler :",$Compiler."\n";
+print SENDMAIL "Baseline :",$Baseline."\n";
 print SENDMAIL @Message;
+print SENDMAIL $End_time."\n";
 
 close(SENDMAIL);
+
+#
+#
+#
+
+sub create_webpage {
+
+    open WEBH, ">summary.html" or
+        die "Can not open a summary.html for write: $!\n";
+
+    print WEBH '<html>'."\n";
+    print WEBH '<body>'."\n";
+
+    print WEBH '<p>'."Regression Test Summary:".'</p>'."\n";
+    print WEBH '<ul>'."\n";
+    print WEBH '<li>'.$Start_time.'</li>'."\n";
+    print WEBH '<li>'."Source : $Source".'</li>'."\n";
+    print WEBH '<li>'."Tester : $Tester".'</li>'."\n";
+    print WEBH '<li>'."Machine name : $Host".'</li>'."\n";
+    print WEBH '<li>'."Compiler : $Compiler".'</li>'."\n";
+    print WEBH '<li>'."Baseline : $Baseline".'</li>'."\n";
+    print WEBH '<li>'.$End_time.'</li>'."\n";
+    print WEBH '</ul>'."\n";
+
+    print WEBH '<table border="1">'."\n";
+#   print WEBH '<caption>Regression Test Summary</caption>'."\n";
+    print WEBH '<tr>'."\n";
+    print WEBH '<th>EXPERIMENT</th>'."\n";
+    print WEBH '<th>PAROPT</th>'."\n";
+    print WEBH '<th>CPU_MPI</th>'."\n";
+    print WEBH '<th>CPU_OMP</th>'."\n";
+    print WEBH '<th>STATUS</th>'."\n";
+    print WEBH '<th>WALLTIME(S)</th>'."\n";
+    print WEBH '<th>COMPARE</th>'."\n";
+    print WEBH '</tr>'."\n";
+
+    foreach my $name (sort keys %Experiments) {
+        foreach my $par (sort keys %{$Experiments{$name}{paropt}}) {
+            print WEBH '<tr>'."\n";
+            print WEBH '<td>'.$name.'</td>'."\n";
+            print WEBH '<td>'.$par.'</td>'."\n";
+            print WEBH '<td>'.$Experiments{$name}{cpu_mpi}.'</td>'."\n";
+            print WEBH '<td>'.$Experiments{$name}{cpu_openmp}.'</td>'."\n";
+            print WEBH '<td>'.$Experiments{$name}{paropt}{$par}{status}.'</td>'."\n";
+            printf WEBH '<td>'."%7.1f".'</td>'."\n",
+                         $Experiments{$name}{paropt}{$par}{walltime};
+            print WEBH '<td>'.$Experiments{$name}{paropt}{$par}{compare}.'</td>'."\n";
+            print WEBH '</tr>'."\n";
+        }
+    }
+            print WEBH '</table>'."\n"; 
+
+    print WEBH '</body>'."\n";
+    print WEBH '</html>'."\n";
+
+    close (WEBH);
+
+# Send the summary to internet:
+
+    !system "scp","-oPort=2222", "summary.html",
+        "wrfhelp\@box.mmm.ucar.edu:/web/htdocs/people/wrfhelp/wrfvar/results/index.html" or
+        die "can not upload the summary.html: $!\n";
+}
 
 sub refresh_status {
 
@@ -617,13 +706,13 @@ sub submit_job_be {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         SVN        XLF         64000420  share   /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+be         SVN        XLF         64000510  premium /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           32      32           serial|smpar|dmpar
 2        cv3_guo                     32      32           serial|smpar|dmpar
 3        t44_liuz                    32      32           serial|smpar|dmpar
 #4        radar_meixu                 32      32           serial|smpar|dmpar
-#5        cwb_ascii                   32      32           serial|smpar|dmpar
+5        cwb_ascii                   32      32           serial|smpar|dmpar
 #6        afwa_t7_ssmi                32      32           serial|smpar|dmpar
 #7        t44_prepbufr                32      32           serial|smpar|dmpar
 #8        ASR_prepbufr                32      32           serial|smpar|dmpar
