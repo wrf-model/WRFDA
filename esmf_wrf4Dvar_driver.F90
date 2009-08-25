@@ -1,46 +1,42 @@
 !===============================================================================
-  program ConcurrentComponent
+  program esmf_wrf4dvar
 !===============================================================================
   ! ESMF Framework module
   use ESMF_Mod
 
-  use esmf_var_nl_coupler, only : var_to_nl_cpl_register, nl_to_var_cpl_register
-  use esmf_wrfvar_component, only : wrfvar_register
-  use esmf_wrfnl_component, only : wrfnl_register
-  use esmf_wrfplus_component, only : wrfplus_register
+  ! Application components
+  use esmf_wrfnl_component, only   : nl_register
+  use esmf_solver_component, only  : solver_register
+  use esmf_outerloop_coupler, only : nl2solver_register, solver2nl_register
 
   implicit none
     
   ! Local ESMF types
   type(ESMF_VM)        :: vm
   type(ESMF_Clock)     :: clock
-  type(ESMF_State)     :: c1export, c2export, c3export
-  type(ESMF_State)     :: c1import, c2import, c3import
-  type(ESMF_GridComp)  :: comp1, comp2, comp3
-  type(ESMF_CplComp)   :: cpl12, cpl21
+  type(ESMF_State)     :: nlExp, solverExp
+  type(ESMF_State)     :: nlImp, solverImp
+  type(ESMF_GridComp)  :: nlComp, solverComp
+  type(ESMF_CplComp)   :: nl2solverCpl, solver2nlCpl
 
   ! Local variables
+  integer :: iouter, nouter
   integer :: pet_id, ipet, npets, rc, localrc
-  integer :: nVarPets, nNLPets, nPlusPets
-  integer, allocatable :: var_to_nl_petlist(:), nl_to_var_petlist(:)
-  integer, allocatable :: plus_petlist(:), nl_petlist(:), var_petlist(:)
-  character(len=ESMF_MAXSTR) :: cname1, cname2, cname3
-  character(len=ESMF_MAXSTR) :: cplname12, cplname21
+  character(len=ESMF_MAXSTR) :: cname, cplname
 
   ! initialize error logging
   localrc = ESMF_FAILURE
   rc = ESMF_FAILURE
 
-  ! set distribution sizes
-  nVarPets  =  8
-  nNLPets   = 16
-  nPlusPets =  8
+  ! initialize local variables
+  nouter = 1  ! no outer loop for now!
 
-!-------------------------------------------------------------------------------
+  ! set distribution sizes
+
 !-------------------------------------------------------------------------------
 !    Create section
 !-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
   ! Initialize framework and get back default global VM
   !-----------------------------------------------------------------------------
   call ESMF_Initialize(vm=vm, rc=localrc)
@@ -48,6 +44,7 @@
      print*,'Failed ESMF Initialize'
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
+  Print*,'ESMF Initialize'
 
   !-----------------------------------------------------------------------------
   ! Get number of PETs 
@@ -57,470 +54,370 @@
      print*,'Failed to get VM'
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
+  print*,'Local Pet id:', pet_id, '  number of pets:',npets
 
   !-----------------------------------------------------------------------------
-  ! check that we are running with at least 32 PETs
+  ! check that we are running with at least 2 PETs
   !-----------------------------------------------------------------------------
-  if (npets < 32) then
-     print *, "This system test needs 32 PETS to run, current np = ", npets 
+  if (npets < 2) then
+     print *, "WRF 4D VAR needs 2 PETS to run, current np = ", npets 
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
+!-------------------------------------------------------------------------------
+! Create two  gridded components, one for the NL model and one for the 
+! concurrent component driver called solver, and an NL to solver coupler
+!-------------------------------------------------------------------------------
   !-----------------------------------------------------------------------------
-  ! set up the pet lists for each component, including couplers
+  ! Gridded Component Solver - acts as upper level driver for concurrent
+  ! component.
   !-----------------------------------------------------------------------------
-  allocate( var_petlist(nVarPets) )
-  allocate( nl_petlist(nNLPets) )
-  allocate( plus_petlist(nPlusPets) )
-  allocate( var_to_nl_petlist(nVarPets+nNLPets) )
-  allocate( nl_to_var_petlist(nVarPets+nNLPets) )
-
-  ! petlist for Var component
-  do ipet=1, nVarPets
-     var_petlist(ipet) = ipet-1
-  enddo
-  ! petlist for NL component
-  do ipet=1, nNLPets
-     nl_petlist(ipet) = nVarPets + ipet - 1 
-  enddo
-  ! petlist for Plus component
-  do ipet=1, nPlusPets
-     plus_petlist(ipet) = nVarPets + nNLPets + ipet - 1 
-  enddo
-
-  ! petlist for Var to NL coupler component
-  do ipet=1, nVarPets + nNLPets 
-     var_to_nl_petlist(ipet) = ipet-1
-     nl_to_var_petlist(ipet) = ipet-1
-  enddo
-   
-  !-----------------------------------------------------------------------------
-  ! print out pet list
-  !-----------------------------------------------------------------------------
-  print*,' Var petlist:', var_petlist(1:nVarPets)
-  print*,' NL petlist:', nl_petlist(1:nNLPets)
-  print*,' Plus petlist:', plus_petlist(1:nPlusPets)
-  print*,' Var to NL petlist:', var_to_nl_petlist(1:nVarPets+nNLPets)
-  print*,' NL to Var petlist:', nl_to_var_petlist(1:nVarPets+nNLPets)
-
-  !-----------------------------------------------------------------------------
-  ! Create the 3 model components and couplers
-  !-----------------------------------------------------------------------------
-  ! 4D Var driver
-  !-----------------------------------------------------------------------------
-  cname1 = "wrfvar"
-  comp1 = ESMF_GridCompCreate(name=cname1, petList=var_petlist, rc=localrc)
+  cname = "solver"
+  solverComp = ESMF_GridCompCreate(name=cname, petList=(/0,1/), rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Failure to create component ", trim(cname1), ", rc =", rc
+     print *, "Failure to create component ", trim(cname), ", rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", " Created component ", trim(cname)
   endif
-  print *, "Created component ", trim(cname1), "rc =", rc
 
   !-----------------------------------------------------------------------------
   ! Nonlinear Model (forward WRF)
   !-----------------------------------------------------------------------------
-  cname2 = "wrfnl"
-  comp2 = ESMF_GridCompCreate(name=cname2, petList=nl_petlist, rc=localrc)
+  cname = "nl"
+  nlComp = ESMF_GridCompCreate(name=cname, petList=(/0/), rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Failure to create component ", trim(cname2), ", rc =", rc
+     print *, "Failure to create component ", trim(cname), ", rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", " Created component ", trim(cname)
   endif
-  print *, "Created component ", trim(cname2), "rc =", rc
 
   !-----------------------------------------------------------------------------
-  ! Tangent linear and adjoint models
+  ! couplers between NL and solver components
   !-----------------------------------------------------------------------------
-  cname3 = "wrfplus"
-  comp3 = ESMF_GridCompCreate(name=cname3, petList=plus_petlist, rc=localrc)
+  cplname = "nl to solver coupler"
+  nl2solverCpl = ESMF_CplCompCreate(name=cplname,petList=(/0,1/),rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Failure to create component ", trim(cname3), ", rc =", rc
+     print *, "Failure to create component ", trim(cplname), ", rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", " Created component ", trim(cplname)
   endif
-  print *, "Created component ", trim(cname2), "rc =", rc
 
-  !-----------------------------------------------------------------------------
-  ! coupler from Variational model to Nonlinear model
-  !-----------------------------------------------------------------------------
-  cplname12 = "var to nl coupler"
-  cpl12 = ESMF_CplCompCreate(name=cplname12,petList=var_to_nl_petlist,         &
-             rc=localrc)
+  cplname = "solver to nl coupler"
+  solver2nlCpl = ESMF_CplCompCreate(name=cplname,petList=(/0,1/),rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Failure to create component ", trim(cplname12), ", rc =", rc
+     print *, "Failure to create component ", trim(cplname), ", rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", " Created component ", trim(cplname)
   endif
-  print *, "Created component ", trim(cplname12), ", rc =", rc
 
-  !-----------------------------------------------------------------------------
-  ! coupler from Nonlinear model to Variational model
-  !-----------------------------------------------------------------------------
-  cplname21 = "nl to var coupler"
-  cpl21 = ESMF_CplCompCreate(name=cplname21,petList=nl_to_var_petlist,rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Failure to create component ", trim(cplname21), ", rc =", rc
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-  print *, "Created component ", trim(cplname21), ", rc =", rc
-
-  print *, "Comp Creates finished"
+  print*, "(",pet_id,")"," Component creation completed"
 
 !-------------------------------------------------------------------------------
+!  Register section - set services
 !-------------------------------------------------------------------------------
-!  Register section
-!-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
+   print*,"(",pet_id,")","Register Components in wrf 4D var driver"
   !-----------------------------------------------------------------------------
-  ! Component 1
+  ! Component 1 - solverComp
   !-----------------------------------------------------------------------------
-  call ESMF_GridCompSetServices(comp1, wrfvar_register, localrc)
+  call ESMF_GridCompSetServices(solverComp, solver_register, localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp1 SetServices failed, rc= ", localrc
+     print *, "solverComp SetServices failed, rc= ", localrc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print *,"(",pet_id,")", " solverComp SetServices finished"
   endif
-  print *, "Comp1 SetServices finished, rc= ", localrc
 
   !-----------------------------------------------------------------------------
-  ! Component 2
+  ! Component 2 - nlComp
   !-----------------------------------------------------------------------------
-  call ESMF_GridCompSetServices(comp2, wrfnl_register, localrc)
+  call ESMF_GridCompSetServices(nlComp, nl_register, localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print*,"Comp2 Setservices failed, rc= ", localrc
+     print*,"nlComp Setservices failed, rc= ", localrc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print *,"(",pet_id,")", " nlComp SetServices finished"
   endif
-  print *, "Comp2 SetServices finished, rc= ", localrc
 
   !-----------------------------------------------------------------------------
-  ! Component 3
+  ! Coupler Component 21 - nl2solverCpl
   !-----------------------------------------------------------------------------
-  call ESMF_GridCompSetServices(comp3, wrfplus_register, localrc)
+  call ESMF_CplCompSetServices(nl2solverCpl, nl2solver_register, localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print*,"Comp3 Setservices failed, rc= ", localrc
+     print *, "nl2solverCpl SetServices failed, rc= ", localrc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print *,"(",pet_id,")", " nl2solverCpl SetServices finished"
   endif
-  print *, "Comp3 SetServices finished, rc= ", localrc
 
   !-----------------------------------------------------------------------------
-  ! Coupler Component 12
+  ! Coupler Component 12 - solver2nlCpl
   !-----------------------------------------------------------------------------
-  call ESMF_CplCompSetServices(cpl12, var_to_nl_cpl_register, localrc)
+  call ESMF_CplCompSetServices(solver2nlCpl, solver2nl_register, localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Cpl12 SetServices failed, rc= ", localrc
+     print *, "solver2nlCpl SetServices failed, rc= ", localrc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print *,"(",pet_id,")", " solver2nlCpl SetServices finished"
   endif
-  print *, "Cpl12 SetServices finished, rc= ", localrc
 
+  print *,"(",pet_id,")", " Entering Init Phase"
+
+!-------------------------------------------------------------------------------
+!  Initialization section -
+!   initialize separated into two phases,
+!   (1) create states and initialize ESMF coupling objects (in Solver, NL, CPL)
+!-------------------------------------------------------------------------------
   !-----------------------------------------------------------------------------
-  ! Coupler Component 21
+  ! solver init - phase 1
   !-----------------------------------------------------------------------------
-  call ESMF_CplCompSetServices(cpl21, nl_to_var_cpl_register, localrc)
+  solverImp = ESMF_StateCreate("solver import", ESMF_STATE_IMPORT, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Cpl21 SetServices failed, rc= ", localrc
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-  print *, "Cpl21 SetServices finished, rc= ", localrc
-
-
-!===============================================================================
-!-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-!  Init section
-!-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-  ! Var dirver component
-  !-----------------------------------------------------------------------------
-  c1import = ESMF_StateCreate("Var model import", ESMF_STATE_IMPORT, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 1 import state create failed, rc =", rc
+     print*,"(",pet_id,")","solverComp import state create failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  c1export = ESMF_StateCreate("Var model export", ESMF_STATE_EXPORT, rc=localrc)
+  solverExp = ESMF_StateCreate("solver export", ESMF_STATE_EXPORT, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 1 export state create failed, rc =", rc
+     print*,"(",pet_id,")","solverComp export state create failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_GridCompInitialize(comp1, importState=c1import, &
-        exportState=c1export, &
-                               rc=localrc)
+  ! initialize phase one - create ESMF objects for outer loop coupling
+  call ESMF_GridCompInitialize(solverComp, importState=solverImp,              &
+                               exportState=solverExp, phase=1, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 1 Initialize failed, rc =", rc
+     print*,"(",pet_id,")","solverComp Initialize phase 1 failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
                                
-  print *, "Comp 1 Initialize finished, rc =", rc
+  print*,"(",pet_id,")","solverComp phase 1 Initialize finished"
  
   !-----------------------------------------------------------------------------
-  ! Nonlinear model component
+  ! Nonlinear model component - phase 1
   !-----------------------------------------------------------------------------
-  c2import = ESMF_StateCreate("NL model import", ESMF_STATE_IMPORT, rc=localrc)
+  nlImp = ESMF_StateCreate("NL model import", ESMF_STATE_IMPORT, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 2 import state create failed, rc =", rc
+     print*,"(",pet_id,")","nlComp import state create failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
   
-  c2export = ESMF_StateCreate("NL model export", ESMF_STATE_EXPORT, rc=localrc)
+  nlExp = ESMF_StateCreate("NL model export", ESMF_STATE_EXPORT, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 2 export state create failed, rc =", rc
+     print*,"(",pet_id,")","nlComp export state create failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
   
-
-  call ESMF_GridCompInitialize(comp2, importState=c2import, & 
-          exportState=c2export, &
-          rc=localrc)
+  call ESMF_GridCompInitialize(nlComp, importState=nlImp, & 
+                               exportState=nlExp, phase=1, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 2 Initialize failed, rc =", rc
+     print*,"(",pet_id,")","nlComp Initialize phase 1 failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
-  print *, "Comp 2 Initialize finished, rc =", rc
-
+  print*,"(",pet_id,")", "nlComp Initialize phase 1 finished"
+  flush(6)
   !-----------------------------------------------------------------------------
-  ! Plus (tangent linear anf adjoint) model component
+  ! Coupler component - single phase
   !-----------------------------------------------------------------------------
-  c3import = ESMF_StateCreate("Plus model import", ESMF_STATE_IMPORT, rc=localrc)
+  ! Note: coupler's import is NL export, and export is solver's import
+  call ESMF_CplCompInitialize(nl2solverCpl, importState=nlExp,                 &
+                              exportState=solverImp,  rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 3 import state create failed, rc =", rc
+     print*,"(",pet_id,")","NL2Solver Coupler Initialize failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print *, "NL2Solver Coupler Initialize finished"
   endif
 
-  c3export = ESMF_StateCreate("Plus model export", ESMF_STATE_EXPORT, rc=localrc)
+  ! Note: coupler's import is solver's export, and export is NL import
+  call ESMF_CplCompInitialize(solver2NLCpl, importState=solverExp,             &
+                              exportState=nlImp,  rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 3 export state create failed, rc =", rc
+     print*,"(",pet_id,")","Solver2NL Coupler Initialize failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", "Solver2NL Coupler Initialize finished"
   endif
-
-  call ESMF_GridCompInitialize(comp3, importState=c3import, & 
-          exportState=c3export, &
-          rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Comp 3 Initialize failed, rc =", rc
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-  print *, "Comp 3 Initialize finished, rc =", rc
- 
-  !-----------------------------------------------------------------------------
-  ! Coupler components
-  !-----------------------------------------------------------------------------
-  ! note that the coupler's import is comp1's export
-  call ESMF_CplCompInitialize(cpl12, c1export, c2import, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Coupler 12 Initialize failed, rc =", rc
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-  print *, "Coupler 12 Initialize finished, rc =", rc
-
-    ! note that the coupler's import is comp2's export
-  call ESMF_CplCompInitialize(cpl12, c2export, c1import, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     print *, "Coupler 12 Initialize failed, rc =", rc
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-  print *, "Coupler 12 Initialize finished, rc =", rc
-
 !-------------------------------------------------------------------------------
+! Initialize - phase 2 (internal component initialization)
+!-------------------------------------------------------------------------------
+  ! NL component internal init
+  call ESMF_GridCompInitialize(nlComp, importState=nlImp, & 
+                               exportState=nlExp, phase=2, rc=localrc)
+  if(localrc /= ESMF_SUCCESS) then                                            
+     print*,"(",pet_id,")","nlComp Initialize phase 2 failed, rc =", rc
+     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")", "NL Comp phase 2 Initialize finished"
+  endif
+
+  ! Solver component internal init
+  call ESMF_GridCompInitialize(solverComp, importState=solverImp,              &
+                               exportState=solverExp, phase=2, rc=localrc)
+  if(localrc /= ESMF_SUCCESS) then                                            
+     print*,"(",pet_id,")","solverComp Initialize phase 2 failed, rc =", rc
+     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  else
+     print*,"(",pet_id,")"," SolverComp phase 2 Initialize finished"
+  endif
+  flush(6)
 !-------------------------------------------------------------------------------
 !     Run section
 !-------------------------------------------------------------------------------
+! Run:
+!     loop (outer loop)
+!        NL -  evolve full NL model to the end of the analysis window.
+!        CPL - NL 2 Solver
+!        Solver Phase 1 - receive coupling state from NL
+!        Solver Phase 2 - iterative CG solver to minimize cost function
+!     end loop
 !-------------------------------------------------------------------------------
+  ! outer loop
+! do iouter=1, nouter
+  do iouter=1, 1
+     ! run NL component
+     call ESMF_GridCompRun(nlComp, importState=nlImp, exportState=nlExp,       &
+                           rc=localrc)
+     if(localrc /= ESMF_SUCCESS) then                                            
+        print*,"(",pet_id,")", " nlComp run failed, rc =", rc
+        call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+     endif
 
-      ! Uncomment the following call to ESMF_GridCompWait() to sequentialize
-      ! comp1 and comp2. The following ESMF_GridCompWait() call will block
-      ! all PETs until comp2 has returned. Consequently comp1 will not be
-      ! run until comp2 has returned.
-      !call ESMF_GridCompWait(comp2, blockingflag=ESMF_BLOCKING, rc=localrc)
-      !print *, "Comp 2 Wait returned, rc =", localrc
-      !if (ESMF_LogMsgFoundError(localrc, ESMF_ERR_PASSTHRU, &
-      !  ESMF_CONTEXT, rcToReturn=rc)) &
-      !  call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-    
-      ! Run the first component:
-      ! After the first time thru the loop this will be running concurrently 
-      ! with the second component since comp1 and comp2 are defined on 
-      ! exclusive sets of PETs
-      !print *, "I am calling into GridCompRun(comp1)"
-  !-----------------------------------------------------------------------------
- !call ESMF_GridCompRun(comp1, exportState=c1export, clock=clock, rc=localrc)
-  !-----------------------------------------------------------------------------
- !print *, "Comp 1 Run returned, rc =", localrc
-  !-----------------------------------------------------------------------------
- !if(localrc /= ESMF_SUCCESS) then                                            
- !   call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
- !endif
+     ! couple NL component with the solver
+     call ESMF_CplCompRun(nl2solverCpl, importState=nlExp,                     &
+                          exportState=solverImp, rc=localrc)
+     if(localrc /= ESMF_SUCCESS) then                                            
+        print*,"(",pet_id,")", " nl2solver coupler run failed, rc =", rc
+        call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+     endif
 
-      ! Uncomment the following calls to ESMF_GridCompWait() to sequentialize
-      ! comp1, comp2 and the coupler. The following ESMF_GridCompWait() calls 
-      ! will block all PETs until comp1 and comp2 have returned. Consequently 
-      ! the coupler component will not be run until comp1 and comp2 have 
-      ! returned.
-      !call ESMF_GridCompWait(comp1, blockingflag=ESMF_BLOCKING, rc=localrc)
-      !print *, "Comp 1 Wait returned, rc =", localrc
-      !if (ESMF_LogMsgFoundError(localrc, ESMF_ERR_PASSTHRU, &
-      !  ESMF_CONTEXT, rcToReturn=rc)) &
-      !  call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-      !call ESMF_GridCompWait(comp2, blockingflag=ESMF_BLOCKING, rc=localrc)
-      !print *, "Comp 2 Wait returned, rc =", localrc
-      !if (ESMF_LogMsgFoundError(localrc, ESMF_ERR_PASSTHRU, &
-      !  ESMF_CONTEXT, rcToReturn=rc)) &
-      !  call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+     ! run phase 1 of solver - receive state from NL
+     call ESMF_GridCompRun(solverComp, importState=solverImp,                  &
+                           exportState=solverExp, phase=1, rc=localrc)
+     if(localrc /= ESMF_SUCCESS) then                                            
+        print*,"(",pet_id,")", " Phase 1 of solverComp run failed, rc =", rc
+        call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+     endif
 
-      ! Run the coupler:
-      ! The coupler will run in "per-PET sequential" mode because it runs on 
-      ! the union of all PETs. Depending on the per-PET runtime of comp1 and
-      ! comp2 some PETs may start/finish executing the coupler at different
-      ! times. There is no intrinsic inter PET synchronization in calling
-      ! component methods via CompI/R/F(). However, collective communication
-      ! calls contained in the user written coupler methods will indirectly
-      ! lead to inter PET synchronization of the coupler component.
-      !print *, "I am calling into CplCompRun(cpl)"
-  !-----------------------------------------------------------------------------
-  call ESMF_CplCompRun(cpl12, c1export, c2import, clock=clock, rc=localrc)
-  !-----------------------------------------------------------------------------
-  print *, "Coupler Run returned, rc =", localrc
-  !-----------------------------------------------------------------------------
-  if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
+     ! run phase 2 of solver - CG minimization of the cost function
+!    call ESMF_GridCompRun(solverComp, importState=solverImp,                  &
+!                          exportState=solverExp, phase=2, rc=localrc)
+!    if(localrc /= ESMF_SUCCESS) then                                            
+!       print*,"(",pet_id,")", " Phase 2 of solverComp run failed, rc =", rc
+!       call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+!    endif
 
-      ! Uncomment the following call to ESMF_GridCompWait() to sequentialize
-      ! comp1 and comp2. The following ESMF_GridCompWait() call will block
-      ! all PETs until comp1 has returned. Consequently comp2 will not be
-      ! run until comp2 has returned.
-      !call ESMF_GridCompWait(comp1, blockingflag=ESMF_BLOCKING, rc=localrc)
-      !print *, "Comp 1 Wait returned, rc =", localrc
-      !if (ESMF_LogMsgFoundError(localrc, ESMF_ERR_PASSTHRU, &
-      !  ESMF_CONTEXT, rcToReturn=rc)) &
-      !  call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+     ! if another outer loop, then couple the output of solver w/ NL component
+!    if( iouter < nouter ) then
+!       call ESMF_CplCompRun(solver2nlCpl, importState=solverExp,              &
+!                            exportState=nlImp, rc=localrc)
+!       if(localrc /= ESMF_SUCCESS) then                                            
+!          print*,"(",pet_id,")", " Solver2nl coupler run failed, rc =", rc
+!          call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+!       endif
+!    endif
 
-      ! Run the second component:
-      ! Since comp1 and comp2 are defined on exclusive sets of PETs those PET
-      ! that are part of comp1 will not block in the following call but proceed
-      ! to the next loop increment, executing comp1 concurrently with comp2.
-      !print *, "I am calling into GridCompRun(comp2)"
-  !-----------------------------------------------------------------------------
- !call ESMF_GridCompRun(comp2, importState=c2import, clock=clock, rc=localrc)
-  !-----------------------------------------------------------------------------
-  !print *, "Comp 2 Run returned, rc =", localrc
-  !-----------------------------------------------------------------------------
- !if(localrc /= ESMF_SUCCESS) then                                            
- !   call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
- !endif
+  enddo   ! outer loop
 
-
-      !print *, "... time step finished on PET ", pet_id, "."
- 
-!-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 !     Finalize section
 !-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-!     Print result
-
-  call ESMF_GridCompFinalize(comp1, exportState=c1export, rc=localrc)
+  ! finialize NL component
+  call ESMF_GridCompFinalize(nlComp, importState=nlImp, &
+                               exportState=nlExp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
+     print *, "NL component finialize failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
-    
-  !print *, "Comp 1 Finalize finished, rc =", rc
-
-  call ESMF_GridCompFinalize(comp2, importState=c2import, rc=localrc)
+  flush(6)  
+  ! finialize solver component
+  call ESMF_GridCompFinalize(solverComp, importState=solverImp, &
+                             exportState=solverExp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
+     print *, "Solver component finialize failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
-    
-    !print *, "Comp 2 Finalize finished, rc =", rc
-
-  call ESMF_GridCompFinalize(comp3, importState=c3import, rc=localrc)
+   flush(6) 
+  call ESMF_CplCompFinalize(nl2solverCpl, importState=nlExp, &
+                               exportState=solverImp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-
-    !print *, "Comp 3 Finalize finished, rc =", rc
-
-  call ESMF_CplCompFinalize(cpl12, c1export, c2import, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
+     print *, "NL to Solver coupler finialize failed, rc =", rc
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-    !print *, "Coupler Finalize finished, rc =", rc
+  call ESMF_CplCompFinalize(solver2nlCpl, importState=solverExp, &
+                               exportState=nlImp, rc=localrc)
+  if(localrc /= ESMF_SUCCESS) then                                            
+     print *, "Solver to NL coupler finialize failed, rc =", rc
+     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
+  endif
 
 
-    !print *, "Comp Finalize returned"
-
-!
-!-------------------------------------------------------------------------------
+  flush(6)
 !-------------------------------------------------------------------------------
 !     Destroy section
 !-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-!     Clean up
-
-  call ESMF_StateDestroy(c1export, rc=localrc)
+  !-----------------------------------------------------------------------------
+  !     Clean up states
+  !-----------------------------------------------------------------------------
+  call ESMF_StateDestroy(nlExp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_StateDestroy(c2export, rc=localrc)
+  call ESMF_StateDestroy(nlImp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_StateDestroy(c3export, rc=localrc)
+  call ESMF_StateDestroy(solverExp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_StateDestroy(c1import, rc=localrc)
+  call ESMF_StateDestroy(solverImp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_StateDestroy(c2import, rc=localrc)
+  print*,"(",pet_id,")", "All states destroyed"
+
+  !-----------------------------------------------------------------------------
+  !     Clean up components
+  !-----------------------------------------------------------------------------
+  call ESMF_GridCompDestroy(nlComp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_StateDestroy(c3import, rc=localrc)
+  call ESMF_GridCompDestroy(solverComp, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_GridCompDestroy(comp1, rc=localrc)
+  call ESMF_CplCompDestroy(nl2solverCpl, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_GridCompDestroy(comp2, rc=localrc)
+  call ESMF_CplCompDestroy(solver2nlCpl, rc=localrc)
   if(localrc /= ESMF_SUCCESS) then                                            
      call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
   endif
 
-  call ESMF_GridCompDestroy(comp3, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
+  print*,"(",pet_id,")", "All components destroyed"
 
-  call ESMF_CplCompDestroy(cpl12, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-
-  call ESMF_CplCompDestroy(cpl21, rc=localrc)
-  if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
-
-  !print *, "All Destroy routines done"
-
-!-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
+  !-----------------------------------------------------------------------------
+  ! ESMF shutdown
+  !-----------------------------------------------------------------------------
+  print*,"-----------run completed successfully--------------"
   rc = localrc
-
   
   call ESMF_Finalize(rc=localrc) 
-  if(localrc /= ESMF_SUCCESS) then                                            
-     call ESMF_Finalize(rc=localrc, terminationflag=ESMF_ABORT)
-  endif
 
-!-------------------------------------------------------------------------------
-end program ConcurrentComponent
-!-------------------------------------------------------------------------------
+!===============================================================================
+end program esmf_wrf4dvar
+!===============================================================================

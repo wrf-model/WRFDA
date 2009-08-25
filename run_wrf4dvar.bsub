@@ -1,18 +1,17 @@
 #!/bin/csh
 #
 # LSF batch script to run an MPI application
-# run using the command bsub <run_wrf4dvar
+# run using the command bsub < run_wrf4dvar.bsub
 #
 #BSUB -J wrf4dvar_mpi               # job name
 #BSUB -o wrf4dvar_mpi.%J.out        # output filename
 #BSUB -e wrf4dvar_mpi.%J.err        # error filename 
 #BSUB -P 64000510                   # project number
-#BSUB -q share                      # queue
-##BSUB -q economy                   # queue
-#BSUB -W 00:30                      # wall clock time (in hrs:mins)
-#BSUB -n 32                         # number of tasks
-#BSUB -K
-##BSUB -a poe                       # select the poe elim
+##BSUB -q share                      # queue
+#BSUB -q debug                      # queue
+#BSUB -W 00:10                      # wall clock time (in hrs:mins)
+#BSUB -n 2                          # number of tasks
+#BSUB -K                         
 
   mpirun.lsf ./wrf4dvar
 
