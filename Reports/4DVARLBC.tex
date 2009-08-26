@@ -1,0 +1,181 @@
+\documentclass[a4paper,12pt,titlepage]{article}
+\usepackage{authblk}
+
+\author{Xin Zhang}
+\author{Xiang-Yu Huang}
+\affil{ MMM, National Center for Atmospheric Research,\\Boulder,CO USA 80305}
+\author{Nils Gustafsson}
+\affil{Swedish Meteorological and Hydrological Institute,\\SE-60176 Norrk¨oping, Sweden}
+
+\title{Control of lateral boundary conditions in WRF 4D-Var}
+
+\date{\today}
+
+%\pagestyle{headings}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The Limited Area Model (LAM) forecasting problem is a lateral boundary 
+condition problem in addition to the initial condition problem. For 
+numerical weather prediction, the lateral boundary conditions are generally 
+provided by a host model, for example a global numerical weather prediction 
+model. One may argue that the available boundary conditions from the host 
+model have to be accepted (without change) for usage in the LAM. However, 
+one may use the observations close to the lateral boundaries and let these 
+influence the initial conditions. In case the initial conditions are used as the 
+lateral boundary conditions at the initial time, the subsequent forecast will 
+also be influenced by these observations. Depending on the frequency of the 
+updating of the lateral boundary conditions, the host model will gradually 
+take over the definition of the lateral boundary conditions. With application of
+ 4D-Var for the LAM forecasting, one could do a bit more, since one 
+may control the lateral boundary conditions during the period of the data 
+assimilation window. This may be particularly important for assimilation of 
+phenomena that are observed well inside the LAM domain during the later 
+part of the data assimilation window, while being propagated through the 
+lateral boundaries during the early part of the data assimilation window. 
+If we do not control the lateral boundary conditions, observed information 
+related to these phenomena may be lost. 
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Background}
+For the control of lateral boundary conditions in HIRLAM 4D-Var, we follow \cite{kawa} and we introduce the lateral boundary condition perturbations as a control variable $\delta{x_{lbc}}(t_K)$  at the end of the data assimilation window (time $t_K$).  For the lateral boundary increment $\delta{x_{lbc}}(t_0)$ at the start of the assimilation window (time $t_0$) we will use the initial condition increment $\delta{x}(t_0)$. For intermediate time-steps during the integration of the tangent linear model, we will obtain the lateral boundary conditions by the same linear time interpolation scheme that is used in the non-linear model. Once the lateral boundary conditions are defined, the same lateral boundary relaxation scheme that is used in the non-linear model \cite{Davis} can also be used in the tangent-linear model, and the adjoint of the lateral 
+boundary relaxation is also well defined, see \cite{Gusta}. Note however, that while the lateral boundary conditions are input data to the tangent linear model the lateral boundary conditions are output data from 
+the adjoint model. 
+
+Again following \cite{kawa} we will introduce a cost function term $J_{lbc}$ that will measure the distance to the un-perturbed lateral boundary conditions used in the non-linear model 
+\begin{equation}
+J_{lbc}=(\delta{x_{lbc}}(t_K))^T~B_{lbc}^{-1}~\delta{x_{lbc}}(t_K)
+\end{equation}
+where $B_{lbc}$ represents the covariance of the lateral boundary condition 
+errors. Lateral boundary conditions only need to be defined in the narrow 
+lateral boundary relaxation zone, but obviously it would be difficult to specify the proper spatial scales and balances representing the lateral boundary condition errors over such a narrow domain. We have therefore made the 
+choice to specify the lateral boundary control variable over the same total
+ model domain as the initial condition control variable. Since both of 
+these control variables represent forecast errors, albeit for different forecast 
+lengths and possibly for different models, it is clear that their respective 
+error covariance can be represented in a similar way. In a first trial to test 
+the sensitivity of the assimilation to the control of the lateral boundary 
+conditions, we will simply apply $B_{lbc} = B$. 
+
+One potential problem is that the introduction of the lateral boundary 
+condition constraint in the form described above, would worsen the conditioning of the 4D-Var minimization problem, since the lateral boundary condition errors at the end of the assimilation window would be strongly 
+correlated with the initial condition errors at the start of the assimilation 
+window, at least for the large scale and slowly varying phenomena that are 
+important for the lateral boundary conditions. One simple pre-conditioning 
+would be to subtract the lateral boundary conditions at the start of the 
+assimilation window from the lateral boundary conditions at the end of 
+the assimilation window, thus to treat the tendency of the lateral boundary 
+conditions $(\frac{\partial{\delta{x_{lbc}}}}{\partial{t}})=\frac{\delta{x_{lbc}}(t_K)-\delta{x_{lbc}}(t_0)} {t_{K}-t_0}$ as the control variable. This approach would also require the covariance of forecast tendency errors, that possibly 
+could be estimated by the NMC method from differences between forecast 
+tendencies valid at the same time. 
+
+
+\section{Formulation}
+A similar control of lateral boundary condition as developed for HIRLAM 
+4D-Var will be developed also for the WRF 4D-Var. As a starting point, the 
+lateral boundary conditions at the end of the data assimilation window will
+be used as the control variable. The main difference between the implemen- 
+tation in WRF 4D-Var and HIRLAM 4D-Var is due to the differences between 
+the lateral boundary relaxation schemes, where the WRF uses a boundary 
+relaxation applied in a ”nudging” of model tendencies, following \cite{Davis1977}
+\begin{equation}
+\frac{\partial{x}}{\partial{t}}=F_1(x_{lbc}-x)-F_2\Delta^2(x_{lbc}-x)
+\end{equation}
+where $\Delta^2$ is a 5-point smoothing operator,$ F_1$ and $F_2$ are (nudging) 
+weighting coefficients depending on the distance to the lateral boundary, $x$ 
+is any model state variable and $x_{lbc}$ is the corresponding boundary value 
+provided by the host model. $x_{lbc}$ is speciﬁed in the following form:
+\begin{equation}
+x_{lbc}(time=t)=x_{lbc}(time=t_0)+(t-t_0)\frac{\partial{x_{lbc}}}{\partial{t}}
+\end{equation}
+Considering a data assimilation window from time $t_0$ until time $t_K$ and 
+having $\delta{x}(t_0)$ and $\delta{x_{lbc}}(t_K)$ as the assimilation control variables, the quantities needed for the LBC of the tangent linear WRF model are given by
+\begin{equation}
+\delta{x}_{lbc}(t_0)=\delta{x}(t_0)
+\end{equation}
+\begin{equation}
+\frac {\partial{\delta{x}_{lbc}}} {\partial{t}}=\frac{\delta{x}_{lbc}(t_K)-\delta{x}(t_0)} {t_K-t_0}
+\end{equation}
+The lateral boundary conditions for the adjoint model, $x_{lbc}^{AD}(t_0)$ and $(\frac {\partial{x_{lbc}}} {\partial{t}})^{AD}$
+, will be initialized with zeroes at the end of the data assimilation 
+window (time $t_K$ ). After the backwards integration of the adjoint model to 
+time $t_0$ the adjoint control variables (or the error gradients) can be obtained 
+from: 
+\begin{equation}
+x^{AD}(t_0)=x_{inner}^{AD}(t_0)+x_{lbc}^{AD}(t_0)-\frac{1.}{t_K-t_0}(\frac{\partial{x_{lbc}}}{\partial{t}})^{AD}
+\end{equation}
+\begin{equation}
+x_{lbc}^{AD}(t_K)=\frac{1.}{t_K-t_0}(\frac{\partial{x_{lbc}}}{\partial{t}})^{AD}
+\end{equation}
+where $x_{inner}^{AD}(t_0)$ denotes the ”inner domain” adjoint model model variable as provided at the initial time $t_0$.
+
+Note that $x_{lbc}^{AD}(t_0)$ and $(\frac{\partial{x_{lbc}}}{\partial{t}})^{AD}$ will be defined in the boundary relaxtion 
+zone only. Consider, however, that they are full domain ﬁelds that were 
+initialized with zeroes at the the end of the data assimilation window and that the boundary relaxation will only ﬁll in values into this full domain 
+ﬁeld inside the boundary relaxtion zone.
+
+Also note that the calculation of $J_{lbc}$ and $\frac{\partial{J_{lbc}}} {\partial{v_{lbc}}}$, where $v_{lbc}$ is the lateral boundary condition control variable in control vector space, will follow exactly the same calculations as for the background error constraint. 
+
+\section{Code modification}
+
+To introduce the new control variable of lateral boundary, we made following code modification in the latest WRFDA repository :
+
+\begin{verbatim}
+M      var/da/da_control/da_control.f90
+M      var/da/da_define_structures/da_define_structures.f90
+M      var/da/da_minimisation/da_calculate_gradj.inc
+M      var/da/da_minimisation/da_calculate_j.inc
+M      var/da/da_minimisation/da_transform_vtoy_adj.inc
+M      var/da/da_minimisation/da_minimise_lz.inc
+M      var/da/da_minimisation/da_minimise_cg.inc
+M      var/da/da_minimisation/da_minimisation.f90
+M      var/da/da_minimisation/da_sensitivity.inc
+M      var/da/da_minimisation/da_transform_vtoy.inc
+M      var/da/da_minimisation/da_adjoint_sensitivity.inc
+M      var/da/da_setup_structures/da_setup_cv.inc
+M      var/da/da_setup_structures/da_setup_structures.f90
+M      var/da/da_transfer_model/da_transfer_model.f90
+M      var/da/da_transfer_model/da_transfer_wrftltoxa_adj.inc
+M      var/da/da_transfer_model/da_transfer_xatowrftl_adj.inc
+A      var/da/da_transfer_model/da_transfer_xatowrftl_adj_lbc.inc
+A      var/da/da_transfer_model/da_transfer_xatowrftl_lbc.inc
+M      var/da/da_transfer_model/da_transfer_wrftoxb.inc
+M      var/da/da_test/da_check_vtoy_adjoint.inc
+A      var/da/da_main/da_med_initialdata_input_lbc.inc
+A      var/da/da_main/da_med_initialdata_output_lbc.inc
+M      var/da/da_main/da_wrfvar_init2.inc
+M      var/da/da_main/da_wrfvar_io.f90
+M      var/da/da_main/da_med_initialdata_input.inc
+M      var/da/da_main/da_solve.inc
+M      Registry/Registry.wrfvar
+\end{verbatim}
+
+\section{Verification}
+
+\begin{thebibliography}{99}
+
+\bibitem{Davis} Davies, H. C., 1983: Limitations of some common lateral boundary schemes 
+used in NWP models.  \sl{Mon. Wea. Rev.}, \bf111\rm, 1002–1012.
+
+\bibitem{Davis1977}Davies, H. C., and R. E. Turner, 1977: Updating prediction model by 
+dynamical relaxation: An examination of the technique.  \sl{Quart. J. Roy. Meteor. Soc.}, \bf103\rm, 225-245.
+
+\bibitem{Gusta} Gustafsson, N., E. Kallen and S. Thorsteinsson, 1998: Sensitivity of 
+forecast errors to initial and lateral boundary conditions.  \sl{Tellus}, \bf50A\rm, 167- 185. 
+
+\bibitem{kawa} Kawabata, T., Seko, H., Saito, K., Kuroda, T., Tamiya, K., Tsuyuki, 
+T., Honda, Y. and Wakazuki, Y., 2007: An assimilation and forecasting 
+Experiment of the Nerima Heavy rainfall with a cloud-resolving nonhydro- 
+static 4-dimensional variational data assimilation system. \sl{J. Meteor. Soc. 
+of Japan}, \bf85\rm, 255-276.
+
+\end{thebibliography}
+
+\end{document}
