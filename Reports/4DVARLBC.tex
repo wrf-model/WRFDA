@@ -127,33 +127,102 @@ Also note that the calculation of $J_{lbc}$ and $\frac{\partial{J_{lbc}}} {\part
 
 To introduce the new control variable of lateral boundary, we made following code modification in the latest WRFDA repository :
 
+Add some variables definition for LBC 4DVAR.
 \begin{verbatim}
 M      var/da/da_control/da_control.f90
 M      var/da/da_define_structures/da_define_structures.f90
+\end{verbatim}
+Update the output gradient function print out and the subroutine interface.
+\begin{verbatim}
 M      var/da/da_minimisation/da_calculate_gradj.inc
+\end{verbatim}
+Update the output cost function print out.
+\begin{verbatim}
 M      var/da/da_minimisation/da_calculate_j.inc
+\end{verbatim}
+Add calling \textsl{da\_transfer\_xatowrftl\_adj\_lbc} and \textsl{da\_transform\_vtox\_adj}
+\begin{verbatim}
 M      var/da/da_minimisation/da_transform_vtoy_adj.inc
+\end{verbatim}
+Update the subroutines' interface due to changes.
+\begin{verbatim}
 M      var/da/da_minimisation/da_minimise_lz.inc
 M      var/da/da_minimisation/da_minimise_cg.inc
+\end{verbatim}
+Update the USE statements to accomodate the changes.
+\begin{verbatim}
 M      var/da/da_minimisation/da_minimisation.f90
-M      var/da/da_minimisation/da_sensitivity.inc
+\end{verbatim}
+Add statements to call \textsl{da\_transform\_vtox} for 6-hour control variables.\\
+Add statements to call \textsl{da\_transfer\_xatowrftl\_lbc}.
+\begin{verbatim}
 M      var/da/da_minimisation/da_transform_vtoy.inc
-M      var/da/da_minimisation/da_adjoint_sensitivity.inc
+\end{verbatim}
+Change cv\_size initialization due to $J_{lbc}$.
+\begin{verbatim}
 M      var/da/da_setup_structures/da_setup_cv.inc
+\end{verbatim}
+Minor changes to include more namelist variables in USE statement.
+\begin{verbatim}
 M      var/da/da_setup_structures/da_setup_structures.f90
+\end{verbatim}
+Include the new subroutines.
+\begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_model.f90
+\end{verbatim}
+Add calling statement to output \textsl{wrfbdy\_af07}.
+\begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_wrftltoxa_adj.inc
+\end{verbatim}
+Add the adjoint of converting WRFTL variables to analysis increments at boundary.
+\begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_xatowrftl_adj.inc
+\end{verbatim}
+Adjoint of converting 6-hour analysis increments into WRFTL increments.
+\begin{verbatim}
 A      var/da/da_transfer_model/da_transfer_xatowrftl_adj_lbc.inc
+\end{verbatim}
+Convert 6-hour analysis increments into WRFTL increments.
+\begin{verbatim}
 A      var/da/da_transfer_model/da_transfer_xatowrftl_lbc.inc
+\end{verbatim}
+Clean-up.
+\begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_wrftoxb.inc
+\end{verbatim}
+Change the subroutines' interface due to changes happen elsewhere.
+\begin{verbatim}
 M      var/da/da_test/da_check_vtoy_adjoint.inc
+M      var/da/da_minimisation/da_adjoint_sensitivity.inc
+M      var/da/da_minimisation/da_sensitivity.inc
+\end{verbatim}
+Input \textsl{wrfbdy\_ad01}, which is the output of the adoint model.
+\begin{verbatim}
 A      var/da/da_main/da_med_initialdata_input_lbc.inc
+\end{verbatim}
+Output \textsl{wrfbdy\_af07}, which is the LBC forcing for the adoint model.
+\begin{verbatim}
 A      var/da/da_main/da_med_initialdata_output_lbc.inc
+\end{verbatim}
+Read in \textsl{wrfbdy\_d01} when 4DVAR.
+\begin{verbatim}
 M      var/da/da_main/da_wrfvar_init2.inc
+\end{verbatim}
+Include the new subroutines \textsl{da\_med\_initialdata\_input\_lbc.inc} and \textsl{da\_med\_initialdata\_output\_lbc.inc}
+\begin{verbatim}
 M      var/da/da_main/da_wrfvar_io.f90
+\end{verbatim}
+Add statements to read \textsl{wrfbdy\_ad01} output from adjoint model.
+\begin{verbatim}
 M      var/da/da_main/da_med_initialdata_input.inc
+\end{verbatim}
+Initialize 6-hour $vv$ and $vp$.
+\begin{verbatim}
 M      var/da/da_main/da_solve.inc
+\end{verbatim}
+Add namelist variables to switch on/off LBC control of 4DVAR.\\
+Add control variables space: $xa$, $vv$ and $vp$ for 6-hour.
+\begin{verbatim}
 M      Registry/Registry.wrfvar
 \end{verbatim}
 
