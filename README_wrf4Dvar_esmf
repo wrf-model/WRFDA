@@ -1,0 +1,53 @@
+README for the single executable version of the WRF 4D var system. 
+
+DESCRIPTION:
+The single executable version of the WRF 4D var system uses the ESMF framework to couple 
+the three WRF 4D var components, WRFDA, WRFNL, and WRFPLUS. This directory contains the 
+superstructure for combining the three components into a single executable.
+
+This directory consists of six Fortran F95 files, a makefile and a run script for the NCAR IBM
+Bluefire. The default makefile target builds an executable called "wrf4dvar" which is the 
+single executable version of the WRF 4D var system. The Fortran files consist of a top level
+driver (esmf_wrf4Dvar_driver.F90) and five ESMF components. Three of these components
+(esmf_wrfnl_component.F90, esmf_solver_component.F90 and esmf_outerloop_coupler.F90) form 
+the outer loop of the variational model, while the remaining two components 
+(esmf_wrfplus_component.F90 and esmf_wrfvar_component.F90) act as the inner loop and 
+iteratively minimize the cost function. 
+
+The outer loop consists of two gridded components (esmf_wrfnl_component.F90 and 
+esmf_solver_component.F90) and a coupler component (esmf_outerloop_coupler.F90) which
+connects them. The first gridded component (esmf_wrfnl_component.F90) wraps the WRF nonlinear 
+forward model, WRFNL. The second gridded component (esmf_solver_component.F90) acts as a driver
+for the iterative solver. Its orchestrates the calls to the variational (WRFDA) and the Plus
+(WRFPLUS) codes to iterate the inner loop minimization.
+
+
+REQUIREMENTS:
+To build the single executable version of the WRF 4D var system, the following is required: 
+1. The three 4D var components, WRFDA, WRFNL, WRFPLUS, at version 3.1.
+2. The usual support libraries needed to build the WRF components. 
+3. The ESMF framework version 3.1.0rp2
+
+BUILD:
+The single executable superstructure does not include any of the WRF 4D var code. Building the
+single executable superstructure requires access to the modules and object files generated
+in each component of the WRF 4D var build directories. For example, the WRFDA component's 
+build directory (/WRFDA/var/build) contains the library file libwrfvar.a and the associated 
+module files. The WRFNL component's build directory (/WRFNL/main/) contains the library 
+libwrflib.a and the module file module_wrf_top.mod. Lastly, the WRFPLUS component's build 
+directory (/WRFPLUS/main/) contains the library libwrflib.a. Each of the components, should be 
+built using the configuration option of linking with an external ESMF library and no parallelism.
+
+The paths to these build objects must be set in the superstructure makefile. This is achieved
+through use of the following environment variables:
+WRFDA_HOME   = /ptmp/$USER/WRF
+WRFNL_HOME   = $(WRFDA_HOME)/WRFNL/main
+WRFNL_LIB    = -L$(WRFNL_HOME) -lwrfnl
+WRFVAR_HOME  = $(WRFDA_HOME)/WRFDA/var/da
+WRFVAR_LIB   = -L$(WRFVAR_HOME) -lwrfvar
+WRFPLUS_HOME   = $(WRFDA_HOME)/WRFPLUS/main
+WRFPLUS_LIB    = -L$(WRFNL_HOME) -lwrflib
+Notice that the library generated for the nonlinear component and the PLUS component have the 
+same name. To avoid naming conflicts, we choose to rename the nonlinear component library to 
+libwrfnl.a from libwrflib.a.
+
