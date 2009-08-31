@@ -126,11 +126,12 @@ printf "%-4d     %-27s  %-8d   %-13d"."%-10s "x(keys %{$Experiments{$_}{paropt}}
 
 goto "SKIP_COMPILE" if $Exec;
 
+if ( -e 'WRFDA' && -r 'WRFDA' ) {
+     printf "Deleting the old WRFDA directory ... \n";
+     rmtree ('WRFDA') or die "Can not rmtree WRFDA :$!\n";
+}
+
 if ($Source=~/SVN/i) {
-     if ( -e 'WRFDA' && -r 'WRFDA' ) {
-          printf "Deleting the old WRFDA directory ... \n";
-          rmtree ('WRFDA') or die "Can not rmtree WRFDA :$!\n";
-     }
      print "Getting the code from repository $SVN_REP to WRFDA...\n";
      open (my $fh,"-|","svn","export",$SVN_REP,"WRFDA")
           or die " Can't run svn export: $!\n";
@@ -150,7 +151,7 @@ chdir "WRFDA" or die "Cannot chdir to WRFDA: $!\n";
 
 # Check the revision number:
 
-$Revision =`svnversion` unless defined $Revision;
+$Revision =chomp(`svnversion`) unless defined $Revision;
 
 # Locate the compile options base on the $compiler:
 
@@ -714,7 +715,7 @@ sub submit_job_be {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         SVN        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+be         /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 #1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
