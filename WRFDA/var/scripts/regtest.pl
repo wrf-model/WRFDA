@@ -20,7 +20,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 # Constant variables
-my $Exec = 1; # Use the current EXEs in WRFDA or not
+my $Exec = 0; # Use the current EXEs in WRFDA or not
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
 my $Tester = getlogin();
 
@@ -126,7 +126,7 @@ printf "%-4d     %-27s  %-8d   %-13d"."%-10s "x(keys %{$Experiments{$_}{paropt}}
 
 goto "SKIP_COMPILE" if $Exec;
 
-if ($Source eq 'SVN' ) {
+if ($Source=~/SVN/i) {
      if ( -e 'WRFDA' && -r 'WRFDA' ) {
           printf "Deleting the old WRFDA directory ... \n";
           rmtree ('WRFDA') or die "Can not rmtree WRFDA :$!\n";
@@ -139,11 +139,18 @@ if ($Source eq 'SVN' ) {
      }
      close ($fh);
      printf "Revision %5d is exported to WRFDA.\n",$Revision;
+} else {
+     print "Getting the code from $Source to WRFDA...\n";
+     ! system("tar", "xf", $Source) or die "Can not open $Source: $!\n",;
 }
 
 # Change the working directory to WRFDA:
 
 chdir "WRFDA" or die "Cannot chdir to WRFDA: $!\n";
+
+# Check the revision number:
+
+$Revision =`svnversion` unless defined $Revision;
 
 # Locate the compile options base on the $compiler:
 
@@ -322,7 +329,7 @@ print $Clear;
 print @Message;
 print SENDMAIL $Start_time."\n";
 print SENDMAIL "Source :",$Source."\n";
-#print SENDMAIL "Revision :",$Revision."\n";
+print SENDMAIL "Revision :",$Revision."\n";
 print SENDMAIL "Tester :",$Tester."\n";
 print SENDMAIL "Machine name :",$Host."\n";
 print SENDMAIL "Compiler :",$Compiler."\n";
@@ -348,6 +355,7 @@ sub create_webpage {
     print WEBH '<ul>'."\n";
     print WEBH '<li>'.$Start_time.'</li>'."\n";
     print WEBH '<li>'."Source : $Source".'</li>'."\n";
+    print WEBH '<li>'."Revision : $Revision".'</li>'."\n";
     print WEBH '<li>'."Tester : $Tester".'</li>'."\n";
     print WEBH '<li>'."Machine name : $Host".'</li>'."\n";
     print WEBH '<li>'."Compiler : $Compiler".'</li>'."\n";
@@ -706,30 +714,30 @@ sub submit_job_be {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         SVN        XLF         64000510  premium /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+be         SVN        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-1        tutorial_xinzhang           32      32           serial|smpar|dmpar
-2        cv3_guo                     32      32           serial|smpar|dmpar
-3        t44_liuz                    32      32           serial|smpar|dmpar
-#4        radar_meixu                 32      32           serial|smpar|dmpar
-5        cwb_ascii                   32      32           serial|smpar|dmpar
-#6        afwa_t7_ssmi                32      32           serial|smpar|dmpar
-#7        t44_prepbufr                32      32           serial|smpar|dmpar
-#8        ASR_prepbufr                32      32           serial|smpar|dmpar
-#9        cwb_ascii_outerloop_rizvi   32      32           serial|smpar|dmpar
-#10       sfc_assi_2_outerloop_guo    32      32           serial|smpar|dmpar
+#1        tutorial_xinzhang           16      16           serial|smpar|dmpar
+2        cv3_guo                     16      16           serial|smpar|dmpar
+3        t44_liuz                    16      16           serial|smpar|dmpar
+#4        radar_meixu                 16      16           serial|smpar|dmpar
+5        cwb_ascii                   16      16           serial|smpar|dmpar
+#6        afwa_t7_ssmi                16      16           serial|smpar|dmpar
+#7        t44_prepbufr                16      16           serial|smpar|dmpar
+#8        ASR_prepbufr                16      16           serial|smpar|dmpar
+#9        cwb_ascii_outerloop_rizvi   16      16           serial|smpar|dmpar
+#10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 karri      SVN        PGI         64000420  share   /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-1        tutorial_xinzhang           16      4            serial|smpar|dmpar
-2        cv3_guo                     32      4            serial|smpar|dmpar
-3        t44_liuz                    32      4            serial|smpar|dmpar
-4        radar_meixu                 32      4            serial|smpar|dmpar
-5        cwb_ascii                   32      4            serial|smpar|dmpar
-6        afwa_t7_ssmi                32      4            serial|smpar|dmpar
-7        t44_prepbufr                32      4            serial|smpar|dmpar
-8        ASR_prepbufr                32      4            serial|smpar|dmpar
-9        cwb_ascii_outerloop_rizvi   32      4            serial|smpar|dmpar
-10       sfc_assi_2_outerloop_guo    32      4            serial|smpar|dmpar
+1        tutorial_xinzhang           4       4            serial|smpar|dmpar
+2        cv3_guo                     4       4            serial|smpar|dmpar
+3        t44_liuz                    4       4            serial|smpar|dmpar
+4        radar_meixu                 4       4            serial|smpar|dmpar
+5        cwb_ascii                   4       4            serial|smpar|dmpar
+6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
+7        t44_prepbufr                4       4            serial|smpar|dmpar
+8        ASR_prepbufr                4       4            serial|smpar|dmpar
+9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
+10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
 ###########################################################################################
