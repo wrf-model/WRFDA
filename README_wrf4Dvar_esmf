@@ -36,7 +36,8 @@ build directory (/WRFDA/var/build) contains the library file libwrfvar.a and the
 module files. The WRFNL component's build directory (/WRFNL/main/) contains the library 
 libwrflib.a and the module file module_wrf_top.mod. Lastly, the WRFPLUS component's build 
 directory (/WRFPLUS/main/) contains the library libwrflib.a. Each of the components, should be 
-built using the configuration option of linking with an external ESMF library and no parallelism.
+built using the configuration option of linking with an external ESMF library and mpi parallelism.
+In addition, the WRFNL component must be built with REAL 8 rather than the REAL 4.
 
 The paths to these build objects must be set in the superstructure makefile. This is achieved
 through use of the following environment variables:
