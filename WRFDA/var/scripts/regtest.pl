@@ -133,7 +133,7 @@ if ( -e 'WRFDA' && -r 'WRFDA' ) {
 
 if ($Source=~/SVN/i) {
      print "Getting the code from repository $SVN_REP to WRFDA...\n";
-     open (my $fh,"-|","svn","export",$SVN_REP,"WRFDA")
+     open (my $fh,"-|","svn","co",$SVN_REP,"WRFDA")
           or die " Can't run svn export: $!\n";
      while (<$fh>) {
          $Revision = $1 if ( /revision \s+ (\d+)/x); 
@@ -149,10 +149,6 @@ if ($Source=~/SVN/i) {
 
 chdir "WRFDA" or die "Cannot chdir to WRFDA: $!\n";
 
-# Check the revision number:
-
-$Revision =chomp(`svnversion`) unless defined $Revision;
-
 # Locate the compile options base on the $compiler:
 
 my $pid = open2(my $readme, my $writeme, './configure','-d','wrfda');
@@ -166,7 +162,7 @@ close ($writeme);
 $Par =~ s/\+/\\+/g;
 
 foreach (@output) {
-     if ($_=~ m/(\d+)\. .*$Compiler .* ($Par) .*/ix) {
+     if ( ($_=~ m/(\d+)\. .*$Compiler .* ($Par) .*/ix) && ! ($_=~/Cray/i) ) {
          $Compile_options{$1} = $2;
      }
 }
@@ -177,12 +173,39 @@ die "WRFDA does not support compiler : $Compiler.\n" if ( (keys %Compile_options
 
 # Set the envir. variables:
 
-unless ( exists $ENV{CRTM} && exists $ENV{RTTOV} && exists $ENV{NETCDF} ) {
-     if ($Arch eq "be") {   # bluefire
-         $ENV{CRTM} ='/blhome/wrfhelp/external/crtm/CRTM_02_03_09_REL_1_2/ibm_powerpc';
-         $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
-         $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
-     }
+if ($Arch eq "be") {   # bluefire
+    $ENV{CRTM} ='/blhome/wrfhelp/external/crtm/CRTM_02_03_09_REL_1_2/ibm_powerpc';
+    $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
+    $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
+}
+
+if ($Arch eq "karri") {   # karri
+    if ($Compiler=~/pgi/i) {   # PGI
+        $ENV{CRTM} ='/karri/users/xinzhang/external/pgi_web/crtm';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/pgi_web/rttov87';
+        $ENV{NETCDF} ='/karri/users/xinzhang/external/pgi_web/netcdf-3.6.1';
+        $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/pgi_x86_64/bin:'.$ENV{PATH};
+    }
+    if ($Compiler=~/gfortran/i) {   # GFORTRAN
+        $ENV{CRTM} ='/karri/users/xinzhang/external/gfortran_web/crtm';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/gfortran_web/rttov87';
+        $ENV{NETCDF} ='/karri/users/xinzhang/external/gfortran_web/netcdf-3.6.1';
+        $ENV{PATH} ='/karri/users/xinzhang/bin/gcc-4.3/bin:/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/gfortran_x86_64/bin:'.$ENV{PATH};
+        $ENV{LD_LIBRARY_PATH} ='/karri/users/xinzhang/bin/gcc-4.3/lib64:'.$ENV{LD_LIBRARY_PATH};
+        # the libc.so.6 is version 2.5 , can not support OpenMP yet.
+        foreach my $key (keys %Compile_options) {
+            if ($Compile_options{$key} =~/sm/i) {
+                print "Note: shared-memory option $Compile_options{$key} was deleted for gfortran.\n";
+                foreach my $name (keys %Experiments) {
+                    foreach my $par (keys %{$Experiments{$name}{paropt}}) {
+                        delete $Experiments{$name}{paropt}{$par} if $par eq $Compile_options{$key} ;
+                        next ;
+                    }
+                }
+                delete $Compile_options{$key};
+            }
+        }
+    }
 }
 
 # Compile the code:
@@ -204,6 +227,17 @@ foreach my $option (sort keys %Compile_options) {
          while ($_ = <FHCONF>) { 
              $_ =~ s/-lmass -lmassv//;
              $_ =~ s/-DNATIVE_MASSV//;
+             print FH $_;
+         }
+         close (FHCONF);
+         close (FH);
+
+         rename "configure.wrf.new", "configure.wrf";
+     } elsif (($Arch eq "karri") && ($Compiler =~ /pgi/i) && ($Compile_options{$option} =~ /sm/i)) {
+         open FHCONF, "<configure.wrf" or die "Where is configure.wrf: $!\n"; 
+         open FH, ">configure.wrf.new" or die "Cannot open configure.wrf.new: $!\n"; 
+         while ($_ = <FHCONF>) { 
+             $_ =~ s/-mp/-mp=nonuma/;
              print FH $_;
          }
          close (FHCONF);
@@ -247,6 +281,11 @@ foreach my $option (sort keys %Compile_options) {
 chdir ".." or die "Cannot chdir to .. : $!\n";
 
 SKIP_COMPILE:
+
+# Check the revision number:
+
+$Revision = `svnversion WRFDA` unless defined $Revision;
+chomp($Revision);
 
 # Make working directory for each Expeirments:
 
@@ -304,7 +343,7 @@ foreach my $name (keys %Experiments) {
 
 # submit job:
 
-&submit_job_be if ($Arch eq "be");
+($Arch eq "be") ? &submit_job_be : &submit_job ;
 
 # End time:
 
@@ -409,6 +448,7 @@ sub refresh_status {
     my @mes; 
 
     push @mes, "Experiment                  Paropt      CPU_MPI  CPU_OMP  Status    Walltime(s)    Compare\n";
+    push @mes, "==========================================================================================\n";
 
     foreach my $name (sort keys %Experiments) {
         foreach my $par (sort keys %{$Experiments{$name}{paropt}}) {
@@ -421,10 +461,42 @@ sub refresh_status {
         }
     }
 
+    push @mes, "==========================================================================================\n";
     return @mes;
 }
 
 sub new_job {
+     
+     my ($nam, $com, $par, $cpun, $cpum) = @_;
+
+     # Enter into the experiment working directory:
+
+     chdir "$nam" or die "Cannot chdir to $nam : $!\n";
+
+     # Submit the job :
+
+     delete $ENV{OMP_NUM_THREADS};
+     $ENV{OMP_NUM_THREADS}=$cpum if ($par=~/sm/i);
+
+     if ($par=~/dm/i) { 
+         system ("mpdallexit>/dev/null");
+         system ("mpd&");
+         sleep (0.1);
+         `mpirun -np $cpun ../WRFDA/var/build/da_wrfvar.exe.$com.$par`;
+     } else {
+         `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$nam.$par`; 
+     }
+
+     rename "rsl.out.0000", "print.out.$nam.$par" if (($par=~/dm/i) && (-f "rsl.out.0000"));
+
+     # Back to the upper directory:
+
+     chdir ".." or die "Cannot chdir to .. : $!\n";
+
+     return (-f "$nam/wrfvar_output") ? 1 : undef;
+}
+
+sub new_job_be {
      
      my ($nam, $com, $par, $cpun, $cpum) = @_;
 
@@ -521,99 +593,47 @@ sub flush_status {
 
 sub submit_job {
 
-    while ($remain_exps > 0) {    # cycling until no more experiments remain
+    foreach my $name (keys %Experiments) {
 
-         foreach my $name (keys %Experiments) {
-
-             next if ($Experiments{$name}{status} eq "done") ;  # skip this experiment if it is done.
-         
-             foreach my $par (sort keys %{$Experiments{$name}{paropt}}) {
+        foreach my $par (sort keys %{$Experiments{$name}{paropt}}) {
    
-                 next if ( $Experiments{$name}{paropt}{$par}{status} eq "done"  ||      # go to next job if it is done already..
-                           $Experiments{$name}{paropt}{$par}{status} eq "killed" ||
-                           $Experiments{$name}{paropt}{$par}{status} eq "error" );
+            $Experiments{$name}{paropt}{$par}{starttime} = gettimeofday();
+            $Experiments{$name}{paropt}{$par}{status} = "running";
+            &flush_status (); # refresh the status
+            my $rc = &new_job ( $name, $Compiler, $par, $Experiments{$name}{cpu_mpi},
+                                $Experiments{$name}{cpu_openmp} );
+            if (defined $rc) { 
+                $Experiments{$name}{paropt}{$par}{endtime} = gettimeofday(); # set the end time for this job.
+                $Experiments{$name}{paropt}{$par}{walltime} = 
+                    $Experiments{$name}{paropt}{$par}{endtime} - $Experiments{$name}{paropt}{$par}{starttime};
+                printf "%-10s Job for %-30s was finished within %5d seconds. \n", $par, $name, $Experiments{$name}{paropt}{$par}{walltime};
+            } else {
+                $Experiments{$name}{paropt}{$par}{status} = sprintf colored("%-10s",'red on_yellow blink'),"error";
+                $Experiments{$name}{paropt}{$par}{compare} = sprintf colored("%-10s",'red on_yellow blink'), "diff";
+                next;   # Can not submit this job.
+            }
 
-                 unless ( defined $Experiments{$name}{paropt}{$par}{jobid} ) {      #  to be submitted .
+            $Experiments{$name}{paropt}{$par}{status} = "done";
 
-                     next if $Experiments{$name}{status} eq "close";      #  skip if this experiment close to submit job .
+            # Wrap-up this job:
 
-                     my $rc = &new_job ( $name, $Compiler, $par, $Experiments{$name}{cpu_mpi},
-                                         $Experiments{$name}{cpu_openmp} );
-                     if (defined $rc) { 
-                         $Experiments{$name}{paropt}{$par}{jobid} = $rc ;    # assign the jobid.
-                         delete $Experiments{$name}{paropt}{$par}{starttime}; # reset the timer for this job.
-                         delete $Experiments{$name}{paropt}{$par}{endtime}; 
-                         $Experiments{$name}{status} = "close";
-                         printf "%-10s Job for %-30s was submitted with jobid: %10d \n", $par, $name, $rc;
-                     } else {
-                         $Experiments{$name}{paropt}{$par}{status} = sprintf colored("%-10s",'red on_yellow blink'),"error";
-                         $Experiments{$name}{paropt}{$par}{compare} = sprintf colored("%-10s",'red on_yellow blink'), "diff";
-                         $remain_jobs{$name} -- ;
-                         next;   # Can not submit this job.
-                     }
-                 } 
-     
-                 # Job is still in queue.
+            rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par";
 
+            # Compare the wrfvar_output with the BASELINE:
 
-                 my $feedback = `bjobs $Experiments{$name}{paropt}{$par}{jobid}`;
-                 if ( $feedback =~ m/RUN/ ) {; # Still running 
-                     unless (defined $Experiments{$name}{paropt}{$par}{starttime}) { #set the start time when we first find it is running.
-                         $Experiments{$name}{paropt}{$par}{status} = "running";
-                         $Experiments{$name}{paropt}{$par}{starttime} = gettimeofday();
-                         &flush_status (); # refresh the status
-                     }
-                     next;
-                 } elsif ( $feedback =~ m/PEND/ ) { # Still Pending
-                     next;
-                 }
+            unless ($Baseline =~ /none/i) {
+                if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
+                    $Experiments{$name}{paropt}{$par}{compare} = "ok";
+                } else {
+                    $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
+                        sprintf colored("%-10s",'red on_yellow blink'),"diff" : "ok";
+                }
+            }
 
-                 # Job is finished.
+        }
 
-                 $Experiments{$name}{paropt}{$par}{endtime} = gettimeofday(); # set the end time for this job.
-    
-                 unless (defined $Experiments{$name}{paropt}{$par}{starttime}) { # This job was exit mysteriously: killed or time out.
-                     printf "Task %-30s is killed .\n", $name; 
-                     $Experiments{$name}{paropt}{$par}{compare} = sprintf colored("%-10s",'red on_yellow blink'),"unknown";
-                     delete $Experiments{$name}{paropt}{$par}{jobid};       # Delete the jobid.
-                     $remain_jobs{$name} -- ;                               # Delete the count of jobs for this experiment.
-                     $Experiments{$name}{paropt}{$par}{status} = sprintf colored("%-10s",'red on_yellow blink'),"killed";
-                 } else {
-                     $Experiments{$name}{paropt}{$par}{walltime} = 
-                          $Experiments{$name}{paropt}{$par}{endtime} - $Experiments{$name}{paropt}{$par}{starttime};
-                     printf "%-10s Job for %-30s was finished within %5d seconds. \n", $par, $name, $Experiments{$name}{paropt}{$par}{walltime};
-
-                     delete $Experiments{$name}{paropt}{$par}{jobid};       # Delete the jobid.
-                     $remain_jobs{$name} -- ;                               # Delete the count of jobs for this experiment.
-                     $Experiments{$name}{paropt}{$par}{status} = "done";    # Done this job.
-
-                     # Wrap-up this job:
-
-                     rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par";
-
-                     # Compare the wrfvar_output with the BASELINE:
-
-                     if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
-                         $Experiments{$name}{paropt}{$par}{compare} = "ok";
-                     } else {
-                         $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
-                             sprintf colored("%-10s",'red on_yellow blink'),"diff" : "ok";
-                     }
-                 }
-
-                 if ($remain_jobs{$name} == 0) {                        # if all jobs in this experiment are done, done this experiment.
-                     $Experiments{$name}{status} = "done";
-                     $remain_exps -- ; 
-                 } else {
-                     $Experiments{$name}{status} = "open";              # Since this experiment is not done yet, open to submit job.
-                 }
-
-                 &flush_status ();
-             }
-
-         }
-         sleep (2.); 
     }
+    &flush_status (); # refresh the status
 }
 
 sub submit_job_be {
@@ -634,7 +654,7 @@ sub submit_job_be {
 
                      next if $Experiments{$name}{status} eq "close";      #  skip if this experiment close to submit job .
 
-                     my $rc = &new_job ( $name, $Compiler, $par, $Experiments{$name}{cpu_mpi},
+                     my $rc = &new_job_be ( $name, $Compiler, $par, $Experiments{$name}{cpu_mpi},
                                          $Experiments{$name}{cpu_openmp} );
                      if (defined $rc) { 
                          $Experiments{$name}{paropt}{$par}{jobid} = $rc ;    # assign the jobid.
@@ -690,11 +710,13 @@ sub submit_job_be {
 
                      # Compare the wrfvar_output with the BASELINE:
 
-                     if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
-                         $Experiments{$name}{paropt}{$par}{compare} = "ok";
-                     } else {
-                         $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
-                             sprintf colored("%-10s",'red on_yellow blink'),"diff" : "ok";
+                     unless ($Baseline =~ /none/i) {
+                         if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
+                             $Experiments{$name}{paropt}{$par}{compare} = "ok";
+                         } else {
+                             $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
+                                 sprintf colored("%-10s",'red on_yellow blink'),"diff" : "ok";
+                         }
                      }
                  }
 
@@ -729,16 +751,16 @@ be         /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 #10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-karri      SVN        PGI         64000420  share   /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-1        tutorial_xinzhang           4       4            serial|smpar|dmpar
+#1        tutorial_xinzhang           4       4            serial|smpar|dmpar
 2        cv3_guo                     4       4            serial|smpar|dmpar
 3        t44_liuz                    4       4            serial|smpar|dmpar
-4        radar_meixu                 4       4            serial|smpar|dmpar
+#4        radar_meixu                 4       4            serial|smpar|dmpar
 5        cwb_ascii                   4       4            serial|smpar|dmpar
 6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
 7        t44_prepbufr                4       4            serial|smpar|dmpar
-8        ASR_prepbufr                4       4            serial|smpar|dmpar
-9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
-10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
+#8        ASR_prepbufr                4       4            serial|smpar|dmpar
+#9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
+#10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
 ###########################################################################################
