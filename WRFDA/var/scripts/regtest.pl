@@ -11,6 +11,7 @@ use File::Path;
 use File::Basename;
 use File::Compare;
 use IPC::Open2;
+use Net::FTP;
 
 # Start time:
 
@@ -20,7 +21,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 # Constant variables
-my $Exec = 0; # Use the current EXEs in WRFDA or not
+my $Exec = 1; # Use the current EXEs in WRFDA or not
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
 my $Tester = getlogin();
 
@@ -186,6 +187,12 @@ if ($Arch eq "karri") {   # karri
         $ENV{NETCDF} ='/karri/users/xinzhang/external/pgi_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/pgi_x86_64/bin:'.$ENV{PATH};
     }
+    if ($Compiler=~/ifort/i) {   # INTEL
+        $ENV{CRTM} ='/karri/users/xinzhang/external/intel_web/crtm';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/intel_web/rttov87';
+        $ENV{NETCDF} ='/karri/users/xinzhang/external/intel_web/netcdf-3.6.1';
+        $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/intel_x86_64/bin:'.$ENV{PATH};
+    }
     if ($Compiler=~/gfortran/i) {   # GFORTRAN
         $ENV{CRTM} ='/karri/users/xinzhang/external/gfortran_web/crtm';
         $ENV{RTTOV} ='/karri/users/xinzhang/external/gfortran_web/rttov87';
@@ -337,6 +344,52 @@ foreach my $name (keys %Experiments) {
     } 
 } 
 
+# Build cwordsh:
+
+if ( $Arch ne "be" ) {
+    my $ucarftp = Net::FTP->new("ftp.ucar.edu") 
+        or die "Cannot connect to ftp.ucar.edu: $@";
+    $ucarftp->login("anonymous",'-anonymous@')
+        or die "Can not login ",$ucarftp->message;
+    $ucarftp->cwd("/pub/mmm/xinzhang")
+        or die "Cannot change working directory ", $ucarftp->message;
+    $ucarftp->get("BUFRLIB.tar")
+        or die "get failed ", $ucarftp->message;
+    $ucarftp->get("cwordsh.tar")
+        or die "get failed ", $ucarftp->message;
+    $ucarftp->quit;
+    
+    if ( -e "bufr") {
+          rmtree ("bufr") or die "Can not rmtree bufr :$!\n";
+    }
+    mkdir "bufr", 0755 or warn "Cannot make bufr directory: $!\n";
+    chdir "bufr" or die "Cannot change directory to bufr: $!\n";
+    system("tar","xf","../BUFRLIB.tar");
+
+    my @sfc;
+    my @scc;
+
+    open FHCONF, "<../WRFDA/configure.wrf" or die "Where is configure.wrf: $!\n"; 
+    while (my $line = <FHCONF>) { 
+        @sfc = split /\s+=\s+/,$line if $line=~/^SFC/;
+        @scc = split /\s+=\s+/,$line if $line=~/^SCC/;
+    }
+    close (FHCONF);
+    chomp($sfc[1]);
+    chomp($scc[1]);
+    system($sfc[1],"-c",$_) for glob("*.f");
+    system($sfc[1],"-c",$_) for glob("*.F");
+    system($scc[1],"-c",$_) for glob("*.c");
+    system("ar","cr","libbufr.a",$_) for glob("*.o");
+    die "libbufr.a was not created.\n" if !-f "libbufr.a";
+    system("tar","xf","../cwordsh.tar");
+    system($sfc[1],"-o","cwordsh.x","cwordsh.f","libbufr.a");
+    die "cwordsh.x was not created.\n" if !-f "cwordsh.x";
+    exit;
+    chdir ".." or die "Cannot change directory to ..: $!\n";
+}
+
+
 # Initail Status:
 
 &flush_status ();
@@ -473,6 +526,17 @@ sub new_job {
 
      chdir "$nam" or die "Cannot chdir to $nam : $!\n";
 
+     # unblk and block bufr files if there are:
+
+     foreach my $bufr_file (glob("*.bufr")) {
+         `cwordsh.sh unblk $bufr_file $bufr_file.unblk >& /dev/null`;
+         `cwordsh.sh block $bufr_file.unblk $bufr_file.block >& /dev/null`;
+         unlink "$bufr_file.unblk";
+         unlink $bufr_file;
+         symlink "$bufr_file.block",$bufr_file or
+              die "Cannot link $bufr_file.block to $bufr_file: $!\n";
+     }
+     
      # Submit the job :
 
      delete $ENV{OMP_NUM_THREADS};
@@ -751,15 +815,15 @@ be         /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 #10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
+karri      wrfda.tar        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-#1        tutorial_xinzhang           4       4            serial|smpar|dmpar
-2        cv3_guo                     4       4            serial|smpar|dmpar
-3        t44_liuz                    4       4            serial|smpar|dmpar
+1        tutorial_xinzhang           4       4            serial|smpar|dmpar
+#2        cv3_guo                     4       4            serial|smpar|dmpar
+#3        t44_liuz                    4       4            serial|smpar|dmpar
 #4        radar_meixu                 4       4            serial|smpar|dmpar
-5        cwb_ascii                   4       4            serial|smpar|dmpar
-6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
-7        t44_prepbufr                4       4            serial|smpar|dmpar
+#5        cwb_ascii                   4       4            serial|smpar|dmpar
+#6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
+#7        t44_prepbufr                4       4            serial|smpar|dmpar
 #8        ASR_prepbufr                4       4            serial|smpar|dmpar
 #9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
 #10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
