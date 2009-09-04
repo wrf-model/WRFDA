@@ -316,9 +316,17 @@ foreach my $name (keys %Experiments) {
      }
      printf "The directory for %-30s is ready.\n",$name;
 
+     my @files = glob("*.bufr");
+
      # Back to the upper directory:
 
      chdir ".." or die "Cannot chdir to .. : $!\n";
+
+     # buile cwordsh if bufr file found:
+
+     if (( @files > 0 ) && ( ! -e "bufr/cwordsh.x")) {
+         &build_cwordsh;
+     }
 }
 
 # Submit the jobs for each task and check the status of each task recursively:
@@ -343,52 +351,6 @@ foreach my $name (keys %Experiments) {
         $Experiments{$name}{paropt}{$par}{walltime} = 0;
     } 
 } 
-
-# Build cwordsh:
-
-if ( $Arch ne "be" ) {
-    my $ucarftp = Net::FTP->new("ftp.ucar.edu") 
-        or die "Cannot connect to ftp.ucar.edu: $@";
-    $ucarftp->login("anonymous",'-anonymous@')
-        or die "Can not login ",$ucarftp->message;
-    $ucarftp->cwd("/pub/mmm/xinzhang")
-        or die "Cannot change working directory ", $ucarftp->message;
-    $ucarftp->get("BUFRLIB.tar")
-        or die "get failed ", $ucarftp->message;
-    $ucarftp->get("cwordsh.tar")
-        or die "get failed ", $ucarftp->message;
-    $ucarftp->quit;
-    
-    if ( -e "bufr") {
-          rmtree ("bufr") or die "Can not rmtree bufr :$!\n";
-    }
-    mkdir "bufr", 0755 or warn "Cannot make bufr directory: $!\n";
-    chdir "bufr" or die "Cannot change directory to bufr: $!\n";
-    system("tar","xf","../BUFRLIB.tar");
-
-    my @sfc;
-    my @scc;
-
-    open FHCONF, "<../WRFDA/configure.wrf" or die "Where is configure.wrf: $!\n"; 
-    while (my $line = <FHCONF>) { 
-        @sfc = split /\s+=\s+/,$line if $line=~/^SFC/;
-        @scc = split /\s+=\s+/,$line if $line=~/^SCC/;
-    }
-    close (FHCONF);
-    chomp($sfc[1]);
-    chomp($scc[1]);
-    system($sfc[1],"-c",$_) for glob("*.f");
-    system($sfc[1],"-c",$_) for glob("*.F");
-    system($scc[1],"-c",$_) for glob("*.c");
-    system("ar","cr","libbufr.a",$_) for glob("*.o");
-    die "libbufr.a was not created.\n" if !-f "libbufr.a";
-    system("tar","xf","../cwordsh.tar");
-    system($sfc[1],"-o","cwordsh.x","cwordsh.f","libbufr.a");
-    die "cwordsh.x was not created.\n" if !-f "cwordsh.x";
-    exit;
-    chdir ".." or die "Cannot change directory to ..: $!\n";
-}
-
 
 # Initail Status:
 
@@ -529,8 +491,11 @@ sub new_job {
      # unblk and block bufr files if there are:
 
      foreach my $bufr_file (glob("*.bufr")) {
-         `cwordsh.sh unblk $bufr_file $bufr_file.unblk >& /dev/null`;
-         `cwordsh.sh block $bufr_file.unblk $bufr_file.block >& /dev/null`;
+         next if -e $bufr_file."block";
+         chdir "../bufr" or die "Cannot chdir to ../bufr : $!\n";
+         `cwordsh.sh unblk ../$nam/$bufr_file ../$nam/$bufr_file.unblk >& /dev/null`;
+         `cwordsh.sh block ../$nam/$bufr_file.unblk ../$nam/$bufr_file.block >& /dev/null`;
+         chdir "../$nam" or die "Cannot chdir to ../$nam : $!\n";
          unlink "$bufr_file.unblk";
          unlink $bufr_file;
          symlink "$bufr_file.block",$bufr_file or
@@ -551,13 +516,13 @@ sub new_job {
          `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$nam.$par`; 
      }
 
-     rename "rsl.out.0000", "print.out.$nam.$par" if (($par=~/dm/i) && (-f "rsl.out.0000"));
+     rename "rsl.out.0000", "print.out.$nam.$par" if (($par=~/dm/i) && (-e "rsl.out.0000"));
 
      # Back to the upper directory:
 
      chdir ".." or die "Cannot chdir to .. : $!\n";
 
-     return (-f "$nam/wrfvar_output") ? 1 : undef;
+     return (-e "$nam/wrfvar_output") ? 1 : undef;
 }
 
 sub new_job_be {
@@ -798,6 +763,114 @@ sub submit_job_be {
          sleep (2.); 
     }
 }
+
+sub endiantest {
+    my $cc = $_[0];
+    
+    open CF, ">endiantest.c" or die "Can not open endiantest.c to write :$!\n";
+
+    print CF << "EOF";
+#define Order(x)	fill((char *)&x, sizeof(x)); 	for (i=1; i<=sizeof(x); i++) { 	    c=((x>>(byte_size*(sizeof(x)-i)))&mask); 	    putchar(c==0 ? '?' : (char)c); 	} 	printf("\\n");
+
+void fill(p, size) char *p; int size; {
+	char *ab= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int i;
+
+	for (i=0; i<size; i++) p[i]= ab[i];
+}
+
+void endian(byte_size) int byte_size; {
+	int j=0;
+	unsigned int mask, i, c;
+
+	mask=0;
+	for (i=1; i<=(unsigned)byte_size; i++) mask= (mask<<1)|1;
+	Order(j);
+}
+
+int cprop() {
+	/* Properties of type char */
+	char c;
+	int byte_size;
+
+	c=1; byte_size=0;
+	do { c<<=1; byte_size++; } while(c!=0);
+
+	return byte_size;
+}
+
+main()
+{
+	int byte_size;
+
+	byte_size= cprop();
+	endian(byte_size);
+}
+EOF
+
+    close (CF);
+
+    ! system("$cc","-o","endiantest","endiantest.c") or die "Error to compile endiantest.c.\n";
+    return (-e "endiantest") ? `endiantest`: undef ;
+
+}
+
+
+sub build_cwordsh {
+
+# Build cwordsh:
+
+    if ( $Arch ne "be" && 0 ) {
+        my $ucarftp = Net::FTP->new("ftp.ucar.edu") 
+            or die "Cannot connect to ftp.ucar.edu: $@";
+        $ucarftp->login("anonymous",'-anonymous@')
+            or die "Can not login ",$ucarftp->message;
+        $ucarftp->cwd("/pub/mmm/xinzhang")
+            or die "Cannot change working directory ", $ucarftp->message;
+        $ucarftp->get("BUFRLIB.tar")
+            or die "get failed ", $ucarftp->message;
+        $ucarftp->get("cwordsh.tar")
+            or die "get failed ", $ucarftp->message;
+        $ucarftp->quit;
+    
+        if ( -e "bufr") {
+              rmtree ("bufr") or die "Can not rmtree bufr :$!\n";
+        }
+        mkdir "bufr", 0755 or warn "Cannot make bufr directory: $!\n";
+        chdir "bufr" or die "Cannot change directory to bufr: $!\n";
+        system("tar","xf","../BUFRLIB.tar");
+
+        my @sfc;
+        my @scc;
+
+        open FHCONF, "<../WRFDA/configure.wrf" or die "Where is configure.wrf: $!\n"; 
+        while (my $line = <FHCONF>) { 
+            @sfc = split /\s+=\s+/,$line if $line=~/^SFC/;
+            @scc = split /\s+=\s+/,$line if $line=~/^SCC/;
+        }
+        close (FHCONF);
+        chomp($sfc[1]);
+        chomp($scc[1]);
+
+        #Determine the byte-ordering scheme:
+
+        my $response = &endiantest($scc[1]);
+        my $byte_order = ($response =~/^A/) ? "-DBIG_ENDIAN" : "-DLITTLE_ENDIAN";    
+
+        my $underscore = "-DUNDERSCORE";  # if ($Compiler =~/ifort/i); 
+
+        system($sfc[1],"-c",$byte_order,$underscore,$_) for glob("*.f");
+        system($sfc[1],"-c",$byte_order,$underscore,$_) for glob("*.F");
+        system($scc[1],"-c",$byte_order,$underscore,$_) for glob("*.c");
+        system("ar","cr","libbufr.a",$_) for glob("*.o");
+        die "libbufr.a was not created.\n" if !-e "libbufr.a";
+        system("tar","xf","../cwordsh.tar");
+        system($sfc[1],"-o","cwordsh.x","cwordsh.f","libbufr.a");
+        die "cwordsh.x was not created.\n" if !-e "cwordsh.x";
+        chdir ".." or die "Cannot change directory to ..: $!\n";
+    }
+}
+
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
@@ -815,16 +888,16 @@ be         /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 #10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-karri      wrfda.tar        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
+karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-1        tutorial_xinzhang           4       4            serial|smpar|dmpar
-#2        cv3_guo                     4       4            serial|smpar|dmpar
-#3        t44_liuz                    4       4            serial|smpar|dmpar
+#1        tutorial_xinzhang           4       4            serial|smpar|dmpar
+2        cv3_guo                     4       4            serial|smpar|dmpar
+3        t44_liuz                    4       4            serial|smpar|dmpar
 #4        radar_meixu                 4       4            serial|smpar|dmpar
-#5        cwb_ascii                   4       4            serial|smpar|dmpar
-#6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
+5        cwb_ascii                   4       4            serial|smpar|dmpar
+6        afwa_t7_ssmi                4       4            serial|smpar|dmpar
 #7        t44_prepbufr                4       4            serial|smpar|dmpar
 #8        ASR_prepbufr                4       4            serial|smpar|dmpar
-#9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
-#10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
+9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
+10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
 ###########################################################################################
