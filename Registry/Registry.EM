@@ -1142,6 +1142,7 @@ rconfig   real    seaice_threshold        namelist,physics	1            271     
 # Dynamics
 # dynamics option (see package definitions, below)
 rconfig   integer dyn_opt                 namelist,dynamics	1             1       irh   "dyn_opt"               ""      ""
+rconfig   real    tl_perturbation         namelist,dynamics	1             1       irh   "tl_perturbation"       ""      ""
 rconfig   integer rk_ord                  namelist,dynamics	1             3       irh   "rk_order"               ""      ""
 rconfig   integer w_damping               namelist,dynamics	1             0       irh    "w_damping"             ""      ""
 # diff_opt 1=old diffusion, 2=new

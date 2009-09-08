@@ -1114,8 +1114,8 @@ SCC		=	$(CC)
 RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE
-FCOPTIM         =       -O3
-FCDEBUG         =       # -g -qnoopt -qfullpath
+FCOPTIM         =       # -O3
+FCDEBUG         =       -g -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
@@ -1123,7 +1123,7 @@ INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../exter
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DYYY -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNATIVE_MASSV
+			-DLIMIT_ARGS -DNATIVE_MASSV 
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv \

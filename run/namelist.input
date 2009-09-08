@@ -107,6 +107,7 @@
 
  &dynamics
  dyn_opt                             = 402,
+ tl_perturbation                     = .04,
  rk_ord                              = 3,
  w_damping                           = 0,
  diff_opt                            = 1,

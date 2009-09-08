@@ -22,7 +22,10 @@ MODULE module_check
    INTEGER  ::  comm, ierror
 #endif
 
-
+   ! bp - 090904; Initial ALPHA value in computing TL test perturbation
+   real, parameter :: alphaInit = 1.0 
+   ! bp - 090904; Numer of iterations in TL differencing test
+   integer, parameter :: Ndx = 11 
 CONTAINS
 
 !------------------------------------------------------------------------
@@ -119,6 +122,7 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme )                 :: B_tendency
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme )                 :: K_tendency
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION                 ! bp 090903 - perturbation value specified in namelist.input
    INTEGER :: NT
 
 !  TGL test
@@ -174,8 +178,9 @@ SUBROUTINE t_advect_scalar ( field, field_old, tendency, ru, rv, rom, &
    SAVE_L = nsum
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
       P_field(:,:,:)=FACTOR*S_field(:,:,:)
@@ -573,6 +578,7 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -777,8 +783,9 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
    SAVE_L = nsum
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -1383,6 +1390,7 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
                                                                B_mut
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -1503,8 +1511,9 @@ SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    SAVE_L = nsum        
 #endif                  
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
 
@@ -1848,6 +1857,7 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                                                             K_moist_tendf
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -1951,8 +1961,9 @@ SUBROUTINE t_init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
    SAVE_L = nsum
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
 
@@ -2278,6 +2289,7 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
                                                                 B_z_at_w
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -2361,8 +2373,9 @@ SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    SAVE_L = nsum              
 #endif                 
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
       do i=ims,ime
@@ -2595,6 +2608,7 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
     REAL, DIMENSION( ims:ime, kms:kme, jms:jme )      :: S_xkmhd,S_BN2,P_xkmhd,P_BN2,B_xkmhd,B_BN2,K_xkmhd,K_BN2
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 !  TGL test
@@ -2710,8 +2724,9 @@ SUBROUTINE t_calculate_km_kh( config_flags, dt,                        &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
       do i=ims,ime
@@ -3135,6 +3150,7 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    REAL , DIMENSION( ims:ime , jms:jme  )  :: S_mu_tend,P_mu_tend,K_mu_tend,B_mu_tend
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
    do i=ims,ime
@@ -3310,8 +3326,9 @@ SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -3903,6 +3920,7 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
 
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -4028,8 +4046,9 @@ SUBROUTINE t_rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -4406,6 +4425,7 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
    REAL , DIMENSION( ims:ime , jms:jme  )  :: S_mu_tend,P_mu_tend,B_mu_tend
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,i,j,k,h
 
    S_u_bt(:,:,:,:)=u_bt(:,:,:,:)
@@ -4508,8 +4528,9 @@ SUBROUTINE t_spec_bdy_dry ( config_flags,                        &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
       P_u_bt(:,:,:,:)=FACTOR*S_u_bt(:,:,:,:)
@@ -4879,6 +4900,7 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                                                                B_mudf
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -5092,8 +5114,9 @@ SUBROUTINE t_small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -5557,6 +5580,7 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme)   :: P_al, P_p,B_al, B_p,S_al,S_p
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -5737,8 +5761,9 @@ SUBROUTINE t_calc_p_rho( al, p, ph,                    &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -6090,7 +6115,8 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme)  :: S_alpha,S_gamma,S_a,P_alpha,P_gamma,P_a,  &
                                                  K_alpha,K_gamma,K_a,B_alpha,B_gamma,B_a
 
-   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: SAVE_L, COEF, ALPHA_P, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -6173,10 +6199,11 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    SAVE_L = nsum
 #endif
 
-   ALPHA_M=1.
-   DO NT=1,11
-      ALPHA_M=0.1*ALPHA_M
-      FACTOR=1.+ALPHA_M
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA_P= alphaInit + PERTURBATION
+   DO NT=1, Ndx
+      ALPHA_P=0.1*ALPHA_P
+      FACTOR=1.+ALPHA_P
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -6225,10 +6252,10 @@ SUBROUTINE t_calc_coef_w( a,alpha,gamma,              &
    VAL_N = nsum 
 #endif
 
-      VAL_L=SAVE_L*ALPHA_M**2
+      VAL_L=SAVE_L*ALPHA_P**2
       COEF=VAL_N/VAL_L
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'g_calc_coef_w: ALPHA=',ALPHA_M,'  COEF=',COEF, &
+         'g_calc_coef_w: ALPHA_P=',ALPHA_P,'  COEF=',COEF, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
    ENDDO
 
@@ -6510,6 +6537,7 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
       REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  :: S_u, S_v,P_u, P_v,K_u, K_v,B_u, B_v
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -6613,8 +6641,9 @@ SUBROUTINE t_advance_uv ( u, ru_tend, v, rv_tend,        &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -7039,7 +7068,8 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
   REAL, DIMENSION( ims:ime , jms:jme ) :: S_muave, S_muts, S_mudf,K_muave, K_muts, K_mudf
 
 
-   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -7280,10 +7310,11 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    SAVE_L = nsum 
 #endif
 
-   ALPHA_M=1.
-   DO NT=1,11
-      ALPHA_M=0.1*ALPHA_M
-      FACTOR=1.+ALPHA_M
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
+      ALPHA=0.1*ALPHA
+      FACTOR=1.+ALPHA
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -7392,10 +7423,10 @@ SUBROUTINE t_advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
    VAL_N = nsum 
 #endif
 
-      VAL_L=SAVE_L*ALPHA_M**2
+      VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'g_advance_mu_t: ALPHA_M=',ALPHA_M,'  COEF=',COEF, &
+         'g_advance_mu_t: ALPHA=',ALPHA,'  COEF=',COEF, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
    ENDDO
 
@@ -7771,6 +7802,7 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
   REAL, DIMENSION(ims:ime, kms:kme, jms:jme)  :: K_ru_m, K_rv_m, K_ww_m,B_ru_m, B_rv_m, B_ww_m
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -7866,8 +7898,9 @@ SUBROUTINE t_sumflux ( ru, rv, ww,                             &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -8257,7 +8290,8 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
 
 
 
-   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: SAVE_L, COEF, ALPHA_P, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -8379,10 +8413,11 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    SAVE_L = nsum 
 #endif
 
-   ALPHA_M=1.
-   DO NT=1,11
-      ALPHA_M=0.1*ALPHA_M
-      FACTOR=1.+ALPHA_M
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA_P= alphaInit + PERTURBATION
+   DO NT=1, Ndx
+      ALPHA_P=0.1*ALPHA_P
+      FACTOR=1.+ALPHA_P
    do i=ims,ime
    do k=kms,kme
    do j=jms,jme
@@ -8452,10 +8487,10 @@ SUBROUTINE t_advance_w( w, rw_tend, ww, u, v,       &
    VAL_N = nsum 
 #endif
 
-      VAL_L=SAVE_L*ALPHA_M**2
+      VAL_L=SAVE_L*ALPHA_P**2
       COEF=VAL_N/VAL_L
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'g_advance_w: ALPHA=',ALPHA_M,'  COEF=',COEF, &
+         'g_advance_w: ALPHA_P=',ALPHA_P,'  COEF=',COEF, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
    ENDDO
 
@@ -8749,6 +8784,7 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
       REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ) :: S_field,P_field,B_field,K_field
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -8822,8 +8858,9 @@ SUBROUTINE t_spec_bdyupdate_ph( ph_save, field,      &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -9049,6 +9086,7 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
    REAL, DIMENSION( ims:ime , jms:jme )  :: P_muu, P_muv,B_muu, B_muv
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -9097,8 +9135,9 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do j=jms,jme
@@ -9312,6 +9351,7 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
   REAL,   DIMENSION(ims:ime, jms:jme) :: B_muus, B_muvs,B_mu_2,B_mut, B_muts,B_muu, B_muv, B_mu_save
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -9467,8 +9507,9 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -9900,6 +9941,7 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce )  :: P_scalar_tends,B_scalar_tends,S_scalar_tends
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 !TGL test
@@ -10117,8 +10159,9 @@ SUBROUTINE t_rk_scalar_tend ( scs, sce, config_flags,    &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -10534,6 +10577,7 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )   :: S_scalar_tend,P_scalar_tend,B_scalar_tend
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 !TGL test
@@ -10575,8 +10619,9 @@ SUBROUTINE t_spec_bdy_scalar ( scalar_tend,    &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
       P_scalar_bt(:,:,:,:)=FACTOR*S_scalar_bt(:,:,:,:)
@@ -10715,6 +10760,7 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
 
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 !TGL test
@@ -10807,8 +10853,9 @@ SUBROUTINE t_rk_update_scalar( scs, sce,                      &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -11098,6 +11145,7 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) :: P_al, P_p,B_al, B_p,S_al,S_p
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 !TGL test
@@ -11280,8 +11328,9 @@ SUBROUTINE t_calc_p_rho_phi ( moist, n_moist,                &
    SAVE_L = nsum 
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -11640,6 +11689,7 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    REAL, DIMENSION( ims:ime, kms:kme , jms:jme )        :: P_w,B_w
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -11700,8 +11750,9 @@ SUBROUTINE t_diagnose_w( ph_tend, ph_new, ph_old, w, mu, dt,  &
    enddo
    enddo
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -11914,6 +11965,7 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
       REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )   :: S_field,P_field,B_field,K_field
 
    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT
 
 !TGL test
@@ -11978,8 +12030,9 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
    SAVE_L = nsum
 #endif
 
-   ALPHA=1.
-   DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
       ALPHA=0.1*ALPHA
       FACTOR=1.+ALPHA
    do i=ims,ime
@@ -12144,6 +12197,7 @@ END SUBROUTINE t_spec_bdyupdate
    INTEGER :: i, j, i_start, i_end, i_endu, j_start, j_end, j_endv, k
 
    REAL :: SAVE_L, ALPHA, FACTOR, VAL_N, VAL_L, COEF,VAL_A
+   REAL :: PERTURBATION
 
    REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: K_ru_tendf,K_rv_tendf
 
@@ -12208,8 +12262,9 @@ END SUBROUTINE t_spec_bdyupdate
 #endif
 
 
- ALPHA=1.
-  DO NT=1,11
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+  DO NT=1, Ndx
     ALPHA=0.1*ALPHA
     FACTOR=1.+ALPHA
 
@@ -12412,7 +12467,8 @@ END SUBROUTINE t_surface_drag
 
   ! Other local declarations
 
-    REAL :: SAVE_L, COEF_TST, ALPHA_TST, FACTOR_TST, VAL_N, VAL_L, VAL_A
+    REAL :: SAVE_L, COEF_TST, ALPHA, FACTOR_TST, VAL_N, VAL_L, VAL_A
+    REAL :: PERTURBATION
     INTEGER :: NT
     INTEGER :: i, j, k, n, s
     INTEGER :: i1, i2, i3, i4, i5, i6, i7
@@ -12529,10 +12585,11 @@ END SUBROUTINE t_surface_drag
    SAVE_L = nsum
 #endif
 
-    ALPHA_TST=1.
-    DO NT=1,11
-      ALPHA_TST=0.1*ALPHA_TST
-      FACTOR_TST=1.+ALPHA_TST
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+    DO NT=1, Ndx
+      ALPHA=0.1*ALPHA
+      FACTOR_TST=1.+ALPHA
     DO j = jts,jte
     DO k = kts,kte
     DO i = its,ite
@@ -12649,14 +12706,14 @@ END SUBROUTINE t_surface_drag
    VAL_N = nsum
 #endif
 
-      VAL_L=SAVE_L*ALPHA_TST**2
+      VAL_L=SAVE_L*ALPHA**2
       IF (VAL_N .EQ. VAL_L) THEN
         COEF_TST=1.0   ! handle case where VAL_N==VAL_L==0.0
       ELSE
         COEF_TST=VAL_N/VAL_L
       ENDIF
       WRITE(6, fmt='(3A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'lscond_tl from ',TRIM(caller),': ALPHA=',ALPHA_TST,'  COEF=',COEF_TST, &
+         'lscond_tl from ',TRIM(caller),': ALPHA=',ALPHA,'  COEF=',COEF_TST, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
     ENDDO
 
@@ -12953,7 +13010,8 @@ END SUBROUTINE t_surface_drag
    REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  ::  K_h_diabatic, K_t_new, K_t_old
 
 
-   REAL :: SAVE_L, COEF, ALPHA_TST, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
     i_start = its
@@ -13026,10 +13084,11 @@ END SUBROUTINE t_surface_drag
    SAVE_L = nsum
 #endif
 
-   ALPHA_TST=1.
-   DO NT=1,11
-      ALPHA_TST=0.1*ALPHA_TST
-      FACTOR=1.+ALPHA_TST
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
+      ALPHA=0.1*ALPHA
+      FACTOR=1.+ALPHA
       P_al  =FACTOR*S_al
       P_p   =FACTOR*S_p
       P_ph  =FACTOR*S_ph
@@ -13065,11 +13124,11 @@ END SUBROUTINE t_surface_drag
    VAL_N = nsum
 #endif
 
-      VAL_L=SAVE_L*ALPHA_TST**2
+      VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
 
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'g_prep_em: ALPHA=',ALPHA_TST,'  COEF=',COEF, &
+         'g_prep_em: ALPHA=',ALPHA,'  COEF=',COEF, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
    ENDDO
 
@@ -13236,7 +13295,8 @@ END SUBROUTINE t_moist_physics_prep_em
    REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  B_RTHCUTEN, B_RQVCUTEN
    REAL, DIMENSION( ims:ime , kms:kme , jms:jme ) ::  K_RTHCUTEN, K_RQVCUTEN
 
-   REAL :: SAVE_L, COEF, ALPHA_TST, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+   REAL :: PERTURBATION
    INTEGER :: NT,h
 
 S_TH =TH
@@ -13313,10 +13373,11 @@ B_RQVCUTEN =RQVCUTEN
 #endif
 
 
-   ALPHA_TST=1.
-   DO NT=1,11
-      ALPHA_TST=0.1*ALPHA_TST
-      FACTOR=1.+ALPHA_TST
+   call nl_get_tl_perturbation( 1, PERTURBATION )  
+   ALPHA= alphaInit + PERTURBATION
+   DO NT=1, Ndx
+      ALPHA=0.1*ALPHA
+      FACTOR=1.+ALPHA
 
 	P_TH =FACTOR*S_TH
 	P_T =FACTOR*S_T
@@ -13356,11 +13417,11 @@ B_RQVCUTEN =RQVCUTEN
    VAL_N = nsum
 #endif
 
-      VAL_L=SAVE_L*ALPHA_TST**2
+      VAL_L=SAVE_L*ALPHA**2
       COEF=VAL_N/VAL_L
 
       WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-         'g_cudu: ALPHA=',ALPHA_TST,'  COEF=',COEF, &
+         'g_cudu: ALPHA=',ALPHA,'  COEF=',COEF, &
          '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
    ENDDO
 
