@@ -534,11 +534,12 @@ IMPLICIT NONE
           ENDIF
         ENDIF
 
-        time2%MM = daym( diy )
 
         IF ( nfeb(time2%YR) == 29 ) THEN
+          time2%MM = daymleap( diy )
           time2%DD = diy - mdayleapcum(time2%MM-1)
         ELSE
+          time2%MM = daym( diy )
           time2%DD = diy - mdaycum(time2%MM-1)
         ENDIF
 
