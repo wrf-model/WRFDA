@@ -1,0 +1,164 @@
+\documentclass[a4paper,12pt,titlepage]{article}
+\usepackage{amsmath}
+\begin{document}
+
+\section{Basic formulations}
+\begin{equation}
+J_b(\mathbf{x}_0)=-\frac{1}{2}[(\mathbf{x}_0-\mathbf{x}_b)^T\mathbf{B}^-1(\mathbf{x}_0-\mathbf{x}_b)]
+\end{equation}
+\begin{align}
+J_o(\mathbf{x}_0)=-\frac{1}{2}\sum_{k=1}^N[(\mathbf{H}_k\mathbf{x}_k-\mathbf{y}_k)^T\mathbf{O}^-1(\mathbf{H}_k\mathbf{x}_k-\mathbf{y}_k)] \nonumber \\
+ =-\frac{1}{2}\sum_{k=1}^N[(\mathbf{H}_kM_k(\mathbf{x}_0)-\mathbf{y}_k)^T\mathbf{O}^-1(\mathbf{H}_kM_k(\mathbf{x}_0)-\mathbf{y}_k)]
+\end{align}
+\\*
+Introduce: $\mathbf{v}=\delta\mathbf{x}_0=\mathbf{x}_0-\mathbf{x}_b$, $\mathbf{U}=\mathbf{B}^{1/2}$, and $\mathbf{v}=\mathbf{U}^{-1}\delta\mathbf{x}_0$\\
+$S_{v-w}$: Var space to WRF space transform; $\mathbf{S}_{v-w}$: tangent linear; $\mathbf{S}^T_{v-w}$: adjoint.\\
+$S_{w-v}$: WRF space to VAR space transform; $\mathbf{S}_{w-v}$: tangent linear; $\mathbf{S}^T_{w-v}$: adjoint
+\\*
+\begin{align}
+J_b(\mathbf{v})=-\frac{1}{2}[\mathbf{v}^T\mathbf{v}]
+\end{align}
+\begin{align}
+J_o(v)=-\frac{1}{2}[(H_kS_{w-v}M_k(x_0)-y_k)^TO^{-1}(H_kS_{w-v}M_k(X_b)-y_k)] \nonumber \\
+=-\frac{1}{2}[(H_kS_{w-v}M_k(x_b)+H_kS_{w-v}M_kS_{v-w}Uv-y_k)^TO^{-1} \nonumber \\
+  \qquad (H_kS_{w-v}M_k(X_b)+H_kS_{w-v}M_kS_{v-w}Uv-y_k)] \nonumber \\
+  =-\frac{1}{2}[(H_kS_{w-v}M_k(x_b)-y_k+H_kS_{w-v}M_kS_{v-w}Uv)^TO^{-1} \nonumber \\
+  (H_kS_{w-v}M_k(X_b)-y_k+H_kS_{w-v}M_kS_{v-w}Uv)]
+\end{align}
+
+
+Gradient:
+
+
+\section{Variable index}
+\begin{tabular}{|l|c|c|}
+\hline
+\emph{Name} & \emph{Type} & \emph{Description}\\
+\hline
+\hline
+$cv$ & Array & Inner loop Control variables\\
+\hline
+$ghat, fhat$  & Array  & Gradient $J^{'}_o(v)$\\
+\hline
+$iv$ &  & Innovation $H_kS_{w-v}M_k(x_b)-y_k$\\
+\hline
+$jo$ & $jo\_type$ & \\
+\hline
+$jo\_grad\_y$ & $y\_type$ &$O^-1(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)$\\
+\hline
+$phat$ & Array & Gradient $-J^{'}_o(v)$\\
+\hline
+$re$ & & Residual $H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k$\\
+\hline
+$xhat$ & & Outer loop control variables\\
+\hline
+$y$ &  $y\_type$ &$H_kS_{w-v}M_kS_{v-w}Uv$\\
+\hline
+\end{tabular}
+
+\section{Subroutine index}
+\begin{verbatim}
+da_allocate_y :
+ \end{verbatim}
+ 
+\begin{verbatim}
+da_calculate_gradj :
+ \end{verbatim} 
+\[
+U^TS^T_{w-v}H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\] 
+
+\begin{verbatim}
+da_calculate_residual :
+ \end{verbatim} 
+\[
+H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k
+\] 
+ 
+ 
+\begin{verbatim}
+da_calculate_j :
+ \end{verbatim}
+ 
+\begin{verbatim}
+da_jo_and_grady :
+ \end{verbatim} 
+\[
+O^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\] 
+\[
+\frac{1}{2}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\] 
+
+\begin{verbatim}
+da_transform_xtoy:
+ \end{verbatim} 
+\[
+(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\]
+
+\begin{verbatim}
+da_transform_xtoy_adj:
+ \end{verbatim} 
+\[
+H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\]
+
+\begin{verbatim}
+da_transform_vtoy:
+ \end{verbatim} 
+\[
+H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\]
+
+\begin{verbatim}
+da_transform_vtoy_adj:
+ \end{verbatim} 
+\[
+J^{'}_o(v)
+\] 
+
+\begin{verbatim}
+da_transfer_wrftltoxa:
+\end{verbatim} 
+\[
+S_{w-v}M_kS_{v-w}Uv
+\] 
+
+\begin{verbatim}
+da_transfer_wrftltoxa_adj:
+\end{verbatim} 
+\[
+S^T_{w-v}
+\] 
+
+\begin{verbatim}
+da_transfer_xatowrftl:
+\end{verbatim} 
+\[
+S_{v-w}Uv
+\] 
+
+\begin{verbatim}
+da_transfer_xatowrftl_adj:
+\end{verbatim} 
+\[
+S^T_{v-w}
+\] 
+
+\begin{verbatim}
+da_transform_vtox:
+\end{verbatim} 
+\[
+Uv
+\] 
+
+\begin{verbatim}
+da_transform_vtox_adj:
+\end{verbatim} 
+\[
+U^T
+\] 
+
+ 
+\end{document}
