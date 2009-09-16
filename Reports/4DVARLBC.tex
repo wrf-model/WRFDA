@@ -209,7 +209,7 @@ Read in \textsl{wrfbdy\_d01} when 4DVAR.
 \begin{verbatim}
 M      var/da/da_main/da_wrfvar_init2.inc
 \end{verbatim}
-Include the new subroutines \textsl{da\_med\_initialdata\_input\_lbc.inc} and \textsl{da\_med\_initialdata\_output\_lbc.inc}
+Include the new subroutines \textsl{da\_med\_initialdata\_input\_lbc.inc} \\and \textsl{da\_med\_initialdata\_output\_lbc.inc}
 \begin{verbatim}
 M      var/da/da_main/da_wrfvar_io.f90
 \end{verbatim}
@@ -228,11 +228,18 @@ M      Registry/Registry.wrfvar
 \end{verbatim}
 
 \section{Verification}
-\begin{figure}
+Case 1: Single observation far away from the boundary
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth, viewport=50 260 600 900, clip]{center}\\
+\caption{{\bf Center obs. without LBC control }}
+%\label{default}
+\hfill
+\\
 %\centering
-\includegraphics[scale=0.9]{lbc_2}
-\caption{{\bf With LBC Control }}
-\label{default}
+\includegraphics[width=0.7\textwidth, viewport=50 260 600 800, clip]{center_lbc}
+\caption{{\bf Center obs. with LBC control }}
+%\label{default}
 \end{figure}
 
 

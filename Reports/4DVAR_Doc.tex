@@ -3,56 +3,101 @@
 \begin{document}
 
 \section{Basic formulations}
-\begin{equation}
-J_b(\mathbf{x}_0)=-\frac{1}{2}[(\mathbf{x}_0-\mathbf{x}_b)^T\mathbf{B}^-1(\mathbf{x}_0-\mathbf{x}_b)]
-\end{equation}
+
+Define:\\
+$\mathbf{x}_k$ : Model state vector at $k^{th}$ time step;\\
+$\mathbf{y}_k$ : Observation vector at $k^{th}$ time step;\\
+$\mathbf{B}$ : Background error covariance matrix;\\
+$\mathbf{O}$: Observational error covariance matrix;\\
+$M_k$ : Nonlinear model at $k^{th}$ time step, $\mathbf{x}_k=M_k(\mathbf{x}_0)$;\\
+$\mathbf{M}_k$ : Tangent linear model at;\\
+$\mathbf{M}^T_k$ : Adjoint model at;\\
+$H_k$: Observational operator at $k^{th}$ time step;\\
+$\mathbf{H}_k$: Tangent linear observational operator;\\
+$\mathbf{H}^T_k$: Adjoint observational operator.\\
 \begin{align}
-J_o(\mathbf{x}_0)=-\frac{1}{2}\sum_{k=1}^N[(\mathbf{H}_k\mathbf{x}_k-\mathbf{y}_k)^T\mathbf{O}^-1(\mathbf{H}_k\mathbf{x}_k-\mathbf{y}_k)] \nonumber \\
- =-\frac{1}{2}\sum_{k=1}^N[(\mathbf{H}_kM_k(\mathbf{x}_0)-\mathbf{y}_k)^T\mathbf{O}^-1(\mathbf{H}_kM_k(\mathbf{x}_0)-\mathbf{y}_k)]
+J_b(\mathbf{x}_0) &=-\frac{1}{2}[(\mathbf{x}_0-\mathbf{x}_b)^T\mathbf{B}^{-1}(\mathbf{x}_0-\mathbf{x}_b)]
+\end{align}
+\begin{align}
+\begin{split}
+J_o(\mathbf{x}_0) &=-\frac{1}{2}\sum_{k=1}^N[(H_k\mathbf{x}_k-\mathbf{y}_k)^T\mathbf{O}^{-1}(H_k\mathbf{x}_k-\mathbf{y}_k)]  \\
+& =-\frac{1}{2}\sum_{k=1}^N[(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)^T\mathbf{O}^{-1}(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)]
+\end{split}
 \end{align}
 \\*
-Introduce: $\mathbf{v}=\delta\mathbf{x}_0=\mathbf{x}_0-\mathbf{x}_b$, $\mathbf{U}=\mathbf{B}^{1/2}$, and $\mathbf{v}=\mathbf{U}^{-1}\delta\mathbf{x}_0$\\
-$S_{v-w}$: Var space to WRF space transform; $\mathbf{S}_{v-w}$: tangent linear; $\mathbf{S}^T_{v-w}$: adjoint.\\
-$S_{w-v}$: WRF space to VAR space transform; $\mathbf{S}_{w-v}$: tangent linear; $\mathbf{S}^T_{w-v}$: adjoint
+Introduce: \\
+$\mathbf{v}=\delta\mathbf{x}_0=\mathbf{x}_0-\mathbf{x}_b$;\\
+$\mathbf{U}=\mathbf{B}^{1/2}$;\\
+$\mathbf{v}=\mathbf{U}^{-1}\delta\mathbf{x}_0$;\\
+$S_{v-w}$: Var space to WRF space transform; \\
+$\mathbf{S}_{v-w}$: tangent linear; \\
+$\mathbf{S}^T_{v-w}$: adjoint.\\
+$S_{w-v}$: WRF space to VAR space transform; \\
+$\mathbf{S}_{w-v}$: tangent linear; \\
+$\mathbf{S}^T_{w-v}$: adjoint
 \\*
 \begin{align}
-J_b(\mathbf{v})=-\frac{1}{2}[\mathbf{v}^T\mathbf{v}]
+J_b(\mathbf{v})&=-\frac{1}{2}[\mathbf{v}^T\mathbf{v}]
 \end{align}
 \begin{align}
-J_o(v)=-\frac{1}{2}[(H_kS_{w-v}M_k(x_0)-y_k)^TO^{-1}(H_kS_{w-v}M_k(X_b)-y_k)] \nonumber \\
-=-\frac{1}{2}[(H_kS_{w-v}M_k(x_b)+H_kS_{w-v}M_kS_{v-w}Uv-y_k)^TO^{-1} \nonumber \\
-  \qquad (H_kS_{w-v}M_k(X_b)+H_kS_{w-v}M_kS_{v-w}Uv-y_k)] \nonumber \\
-  =-\frac{1}{2}[(H_kS_{w-v}M_k(x_b)-y_k+H_kS_{w-v}M_kS_{v-w}Uv)^TO^{-1} \nonumber \\
-  (H_kS_{w-v}M_k(X_b)-y_k+H_kS_{w-v}M_kS_{v-w}Uv)]
+\begin{split}
+J_o(\mathbf{v})& =-\frac{1}{2}[(H_kS_{w-v}M_k(\mathbf{x}_0)-\mathbf{y}_k)^T\mathbf{O}^{-1}(H_kS_{w-v}M_k(\mathbf{x}_0)-\mathbf{y}_k)]  \\
+& =-\frac{1}{2}[(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k(\mathbf{x}_b)+H_kS_{w-v}M_kS_{v-w}\mathbf{Uv}-\mathbf{y}_k)^T\mathbf{O}^{-1}  \\
+&  \qquad (\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k(\mathbf{x}_b)+H_kS_{w-v}M_kS_{v-w}\mathbf{Uv}-\mathbf{y}_k)]  \\
+& =-\frac{1}{2}[(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k(\mathbf{x}_b)-\mathbf{y}_k+H_kS_{w-v}M_kS_{v-w}\mathbf{Uv})^T\mathbf{O}^{-1}  \\
+&  \qquad (\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k(\mathbf{x}_b)-\mathbf{y}_k+H_kS_{w-v}M_kS_{v-w}\mathbf{Uv})]
+\end{split}
 \end{align}
-
-
+\\*
 Gradient:
-
+\begin{align}
+J^{'}_b(\mathbf{v}) & =-\mathbf{v}
+\end{align}
+\begin{align}
+\begin{split}
+J^{'}_o(\mathbf{v}) & =-\sum_{k=K}^1[\mathbf{U}^T\mathbf{S}^T_{v-w}\mathbf{M}^T_k\mathbf{S}^T_{w-v}\mathbf{H}^T_k\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}\\
+& \qquad +H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k)]\\
+& =-\mathbf{U}^T\mathbf{S}^T_{v-w}\sum_{k=K}^1[\mathbf{M}^T_k\mathbf{S}^T_{w-v}\mathbf{H}^T_k\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}\\
+& \qquad +H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k)]\\
+\end{split}
+\end{align}
+\begin{align}
+J^{'}_c(\mathbf{v})&=
+\end{align}
 
 \section{Variable index}
 \begin{tabular}{|l|c|c|}
 \hline
-\emph{Name} & \emph{Type} & \emph{Description}\\
+\textbf{Name} & \textbf{Type} & \textbf{Description}\\
 \hline
 \hline
-$cv$ & Array & Inner loop Control variables\\
+$be$ & $be\_type$ & Background Error $\mathbf{O}$\\
 \hline
-$ghat, fhat$  & Array  & Gradient $J^{'}_o(v)$\\
+$cvt, cv$ & vector & Outer loop Control variables\\
 \hline
-$iv$ &  & Innovation $H_kS_{w-v}M_k(x_b)-y_k$\\
+$ghat, fhat$  & vector  & Gradient $J^{'}_o(\mathbf{v})$\\
 \hline
-$jo$ & $jo\_type$ & \\
+$iv$ &  $iv\_type$ & Innovation $H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k$\\
 \hline
-$jo\_grad\_y$ & $y\_type$ &$O^-1(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)$\\
+$j$ & $j\_type$ & Cost function\\
 \hline
-$phat$ & Array & Gradient $-J^{'}_o(v)$\\
+$jo$ & $jo\_type$ & Cost function $J_o(\mathbf{v})$\\
 \hline
-$re$ & & Residual $H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k$\\
+$jo\_grad\_x, grid\%xa$ & $x\_type$ & $\mathbf{H}_k^T\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k)$\\
 \hline
-$xhat$ & & Outer loop control variables\\
+$jo\_grad\_y$ & $y\_type$ &$\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k)$\\
 \hline
-$y$ &  $y\_type$ &$H_kS_{w-v}M_kS_{v-w}Uv$\\
+$phat$ & vector & Reverse gradient: $-J^{'}_o(\mathbf{v})$\\
+\hline
+$re$ & $y\_type$ & Residual $\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k$\\
+\hline
+$vv$ & & \\
+\hline
+$vp$ & & \\
+\hline
+$xhat$ & & Inner loop control variables: $\mathbf{v}$\\
+\hline
+$y$ &  $y\_type$ &$\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}$\\
 \hline
 \end{tabular}
 
@@ -66,6 +111,13 @@ da_calculate_gradj :
  \end{verbatim} 
 \[
 U^TS^T_{w-v}H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\] 
+
+\begin{verbatim}
+da_calculate_grady :
+ \end{verbatim} 
+\[
+\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(x_b)-y_k)
 \] 
 
 \begin{verbatim}
@@ -91,59 +143,91 @@ O^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
 \] 
 
 \begin{verbatim}
-da_transform_xtoy:
- \end{verbatim} 
+da_transform_xtoxa:
+\end{verbatim} 
+
+\begin{verbatim}
+da_transform_xtoxa_adj:
+\end{verbatim} 
+input: $grid$\\
+output: $grid\%xa$\\
+
+\begin{verbatim}
+da_transform_vtox:
+\end{verbatim} 
 \[
-(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\mathbf{U}
+\]
+
+\begin{verbatim}
+da_transform_vtox_adj:
+\end{verbatim} 
+\[
+\mathbf{U}_T
+\]
+ 
+\begin{verbatim}
+da_transform_xtoy:
+\end{verbatim} 
+input: $grid$\\
+output: $grid\%xa$\\
+\[
+\mathbf{H}_k
 \]
 
 \begin{verbatim}
 da_transform_xtoy_adj:
- \end{verbatim} 
+ \end{verbatim}
+input: $iv, jo\_grad\_y$\\
+output: $jo\_grad\_x (grid\%xa)$\\
 \[
-H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+\mathbf{H}_k^T\mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(\mathbf{x}_b)-\mathbf{y}_k)
 \]
 
 \begin{verbatim}
 da_transform_vtoy:
- \end{verbatim} 
+\end{verbatim} 
+input: $xhat$\\
+output: $y$
 \[
-H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
+output=\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{U}input
 \]
 
 \begin{verbatim}
 da_transform_vtoy_adj:
- \end{verbatim} 
-\[
-J^{'}_o(v)
-\] 
+\end{verbatim} 
+input: $y (jo\_grad\_y)$\\
+output: $cv ,cv\_jl (grad\_jo, grad\_jl)$
+\begin{align*}
+output=-\mathbf{U}^T\mathbf{S}^T_{v-w}\sum_{k=K}^1[\mathbf{M}^T_k\mathbf{S}^T_{w-v}\mathbf{H}^T_kinput]
+\end{align*}
 
 \begin{verbatim}
 da_transfer_wrftltoxa:
 \end{verbatim} 
 \[
-S_{w-v}M_kS_{v-w}Uv
+\mathbf{S}_{w-v}
 \] 
 
 \begin{verbatim}
 da_transfer_wrftltoxa_adj:
 \end{verbatim} 
 \[
-S^T_{w-v}
+\mathbf{S}^T_{w-v}
 \] 
 
 \begin{verbatim}
 da_transfer_xatowrftl:
 \end{verbatim} 
 \[
-S_{v-w}Uv
+\mathbf{S}_{v-w}
 \] 
 
 \begin{verbatim}
 da_transfer_xatowrftl_adj:
 \end{verbatim} 
 \[
-S^T_{v-w}
+\mathbf{S}^T_{v-w}
 \] 
 
 \begin{verbatim}
