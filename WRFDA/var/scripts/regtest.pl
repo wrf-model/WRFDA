@@ -21,7 +21,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 # Constant variables
-my $Exec = 1; # Use the current EXEs in WRFDA or not
+my $Exec = 0; # Use the current EXEs in WRFDA or not
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
 my $Tester = getlogin();
 
@@ -212,6 +212,20 @@ if ($Arch eq "karri") {   # karri
                 delete $Compile_options{$key};
             }
         }
+    }
+}
+if ($Arch eq "gum") {   # gum
+    if ($Compiler=~/g95/i) {   # G95
+        $ENV{CRTM} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
+        $ENV{RTTOV} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/rttov/rttov87';
+        $ENV{NETCDF} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
+        $ENV{PATH} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
+    }
+    if ($Compiler=~/pgi/i) {   # PGI
+        $ENV{CRTM} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
+        $ENV{RTTOV} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/rttov/rttov87';
+        $ENV{NETCDF} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
+        $ENV{PATH} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
 }
 
@@ -492,10 +506,10 @@ sub new_job {
 
      foreach my $bufr_file (glob("*.bufr")) {
          next if -e $bufr_file."block";
-         chdir "../bufr" or die "Cannot chdir to ../bufr : $!\n";
+         #chdir "../bufr" or die "Cannot chdir to ../bufr : $!\n";
          `cwordsh.sh unblk ../$nam/$bufr_file ../$nam/$bufr_file.unblk >& /dev/null`;
          `cwordsh.sh block ../$nam/$bufr_file.unblk ../$nam/$bufr_file.block >& /dev/null`;
-         chdir "../$nam" or die "Cannot chdir to ../$nam : $!\n";
+         #chdir "../$nam" or die "Cannot chdir to ../$nam : $!\n";
          unlink "$bufr_file.unblk";
          unlink $bufr_file;
          symlink "$bufr_file.block",$bufr_file or
@@ -508,9 +522,9 @@ sub new_job {
      $ENV{OMP_NUM_THREADS}=$cpum if ($par=~/sm/i);
 
      if ($par=~/dm/i) { 
-         system ("mpdallexit>/dev/null");
-         system ("mpd&");
-         sleep (0.1);
+#        system ("mpdallexit>/dev/null");
+#        system ("mpd&");
+#        sleep (0.1);
          `mpirun -np $cpun ../WRFDA/var/build/da_wrfvar.exe.$com.$par`;
      } else {
          `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$nam.$par`; 
@@ -900,4 +914,18 @@ karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinz
 #8        ASR_prepbufr                4       4            serial|smpar|dmpar
 9        cwb_ascii_outerloop_rizvi   4       4            serial|smpar|dmpar
 10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
+###########################################################################################
+#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
+gum        wrfda.tar        g95         64000420  share   /Volumes/gum/xinzhang/regtest/WRFDA-data-EM    none
+#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
+1        tutorial_xinzhang           4       4            serial|dmpar
+2        cv3_guo                     4       4            serial|dmpar
+3        t44_liuz                    4       4            dmpar
+#4        radar_meixu                 4       4            serial|dmpar
+5        cwb_ascii                   4       4            serial|dmpar
+6        afwa_t7_ssmi                4       4            dmpar
+7        t44_prepbufr                4       4            dmpar
+8        ASR_prepbufr                4       4            dmpar
+9        cwb_ascii_outerloop_rizvi   4       4            serial|dmpar
+10       sfc_assi_2_outerloop_guo    4       4            serial|dmpar
 ###########################################################################################
