@@ -1,6 +1,7 @@
 \documentclass[a4paper,12pt,titlepage]{article}
 \usepackage{authblk}
-\usepackage{graphicx}
+\usepackage[pdftex]{graphicx}
+\usepackage{subfigure}
 
 \author{Xin Zhang}
 \author{Xiang-Yu Huang}
@@ -13,6 +14,10 @@
 \date{\today}
 
 %\pagestyle{headings}
+
+\setlength{\textheight}{23cm} % just some personal perferences for
+			      % page layout.
+\setlength{\textwidth}{13.7cm}
 
 \begin{document}
 
@@ -229,18 +234,20 @@ M      Registry/Registry.wrfvar
 
 \section{Verification}
 Case 1: Single observation far away from the boundary
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth, viewport=50 260 600 900, clip]{center}\\
-\caption{{\bf Center obs. without LBC control }}
+\begin{figure}[htp]
+\begin{center}
+\subfigure[Without LBC control]{
+\includegraphics[width=0.45\textwidth, viewport=50 200 600 900, clip]{center}}
+%\caption{{\bf Center obs. without LBC control }}
 %\label{default}
-\hfill
-\\
 %\centering
-\includegraphics[width=0.7\textwidth, viewport=50 260 600 800, clip]{center_lbc}
+\subfigure[With LBC control]{
+\includegraphics[width=0.45\textwidth, viewport=50 200 600 900, clip]{center_lbc}}
+\end{center}
 \caption{{\bf Center obs. with LBC control }}
 %\label{default}
 \end{figure}
+%\hspace{0.3in}
 
 
 \begin{thebibliography}{99}
