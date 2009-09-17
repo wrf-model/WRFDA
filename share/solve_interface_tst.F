@@ -1,5 +1,7 @@
 !WRF:MEDIATION_LAYER:ADT_BARRIER
 !
+! 090915 bp; Change name of some_em_tst() to test_tladj_routines() to better differentiate and better describe
+! 090915 bp; include both call to test_solve_em() and test_tladj_routines()
 
 SUBROUTINE solve_interface_tst ( grid )
 
@@ -47,16 +49,16 @@ SUBROUTINE solve_interface_tst ( grid )
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
 
-!     CALL test_solve_em ( grid , config_flags , &
-!
-!# include <em_actual_args.inc>
-!
-!               )
-!
-!     CALL wrf_message( 'end test_solve_em' )
+     CALL test_solve_em ( grid , config_flags , &
+
+# include <em_actual_args.inc>
+
+               )
+
+     CALL wrf_message( 'end test_solve_em' )
 !     return
 
-     CALL solve_em_tst ( grid , config_flags , &
+     CALL test_tladj_routines( grid , config_flags , &
 
 # include <em_actual_args.inc>
 

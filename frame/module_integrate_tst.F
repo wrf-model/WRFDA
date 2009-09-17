@@ -275,7 +275,7 @@ RECURSIVE SUBROUTINE integrate_tst ( grid )
          CALL med_before_solve_io ( grid , config_flags )
          grid_ptr => grid
          DO WHILE ( ASSOCIATED( grid_ptr ) )
-            CALL wrf_debug( 100 , 'module_integrate: calling solve interface ' )
+            CALL wrf_debug( 100 , 'module_integrate: calling solve_interface_tst ' )
             CALL solve_interface_tst ( grid_ptr ) 
             CALL wrf_clockprint ( 150, grid_ptr%domain_clock, &
                                   'DEBUG integrate():  before ESMF_ClockAdvance,' )

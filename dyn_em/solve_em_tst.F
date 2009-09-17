@@ -1,6 +1,6 @@
 !WRF:MEDIATION_LAYER:SOLVER
 
-SUBROUTINE solve_em_tst ( grid , config_flags , &
+SUBROUTINE test_tladj_routines ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
 !
@@ -3343,5 +3343,5 @@ BENCH_END(bc_2d_tim)
 
 #endif
 
-END SUBROUTINE solve_em_tst
+END SUBROUTINE test_tladj_routines
 

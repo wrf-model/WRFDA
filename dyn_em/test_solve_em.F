@@ -121,6 +121,8 @@ real                                     :: dtbc_save
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A, nsum
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
 
+  print*,"test_solve_em(): "
+
 !  Obtain dimension information stored in the grid data structure.
   CALL get_ijk_from_grid (  grid ,                   &
                             ids, ide, jds, jde, kds, kde,    &
@@ -742,7 +744,7 @@ real                                     :: dtbc_save
    moist_2 = S_moist_2
    rainnc = S_rainnc
    rainncv = S_rainncv
-!  print*,"Attention:",maxval(S_mu_b),minval(S_mu_b)
+  print*,"test_solve_em(): Attention:",maxval(S_mu_b),minval(S_mu_b)
 
 
 
