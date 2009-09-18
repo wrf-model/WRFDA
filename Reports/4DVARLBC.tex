@@ -232,55 +232,69 @@ Add control variables space: $xa$, $vv$ and $vp$ for 6-hour.
 M      Registry/Registry.wrfvar
 \end{verbatim}
 
-\section{Verification}
-Case 1: Single observation far away from the boundary. see Figure ~\ref{fig:center_obs_0h}
-\\*
-Single observation experiment is a good tool to investigate the impact of data assimilation.
+\section{Verification with single observation}
 
+Analysis increments due to a single observation produced by a data assimilation system implicitly provide the effective background error covariance matrix $\mathbf{B}$ and How the tangent linear and adjoint model propagate the observational information , see \cite{Huang}. After the any new capability for WRF 4D-Var system was developed,the single observation experiment is an effective and clean way to show the impact of the new capability.
+
+From Figure 3 in \cite{Huang}, given a single temperature observation at the end of the time window of 4D-Var (6 h),we knew that the 4D-Var increments have a temporal dimension, the increments at 6 h give a graphic representation of the background error covariance matrix at 6 h $\mathbf{MBM}^T$. The $\mathbf{M}$, $\mathbf{M}^T$ are the WRF tangent linear and adjoint model respectively. For WRF 4D-Var, WRF is a regional model, both initial condition and boundary condition determine the future trajectory of the forecast. Specifically, the trajectory of the 5-point boundary relaxation region is also depend on the tendency from boundary condition. Therefore, in the 4D-Var, the observations close to or within the boundary relaxation region should not only impact the initial condition but also the boundary condition.
+
+To illustrate and verify the correctness of the new capability of adding lateral boundary condition (LBC) into the control variable in 4D-Var, we design 2 single observation experiments similar to that in paper \cite{Huang}: The first experiment has a single observation at 6 h, which far from the lateral boundary and the tendency from LBC should have trivial or no impact on the observation location at 6 h, which means assimilating this observation with or without LBC control should make little/no difference on the analysis at 0 h; The second experiment has a single observation at 6 h, which is close to the lateral boundary and the tendency from LBC should have significant impact on the observation location at 6 h, which means assimilating this observation with or without LBC control should make big difference on the analysis at 0 h.
+
+
+Experiment 1: Single observation far away from the lateral boundary:
+We still utilize the case in \cite{Huang},  which is a severe winter storm case that occurred at 0000 UTC 25 January 2000. We used a 6-h forecast valid at 0000 UTC 25 January 2000 as the background for both experiments. A single temperature observation at 0600 UTC is placed at $32.5\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, the red cross in Figure ~\ref{fig:center_0h}. Figure~\ref{fig:center_0h} show the analysis increments due to the 6 h temperature observation with and without LBC control. There are some difference between Figure~\ref{fig:center_0h} (a) and (b), but they are quite similar and the main responses are located on the upstream of the observation. We integrated the increments forward to 6 hour, Figure~\ref{fig:center_6h} and Figure~\ref{fig:center_lbc_6h} show the similar development of the increments without and with LBC control too, which confirm the assumption that the LBC control does not have too much impact on the assimilation of the observation which far away from the LBC during the 4D-Var time window.
 \begin{figure}[htp]
 \begin{center}
 \subfigure[Without LBC control]{
-\includegraphics[width=0.45\textwidth, viewport=50 100 600 730, clip]{center}}
+\includegraphics[width=0.45\textwidth, viewport=20 100 600 730, clip]{center}}
 \subfigure[With LBC control]{
-\includegraphics[width=0.45\textwidth, viewport=50 100 600 730, clip]{center_lbc}}
+\includegraphics[width=0.45\textwidth, viewport=20 100 600 730, clip]{center_lbc}}
 \end{center}
-\caption{0-hour 500 hPa T increment respond to a 6th hour single T observation at 500 hPa, the red cross is the location of the T observation at 6th hour}\label{fig:center_obs_0h}
+\caption{0 h potential temperature perturbation}\label{fig:center_0h}
 \end{figure}
 %\hspace{0.3in}
 \begin{figure}[htp]
 \begin{center}
-\subfigure[Without LBC control]{
-\includegraphics[angle=90, width=0.9\textwidth, viewport=220 50 580 650, clip]{center_6h}}
-\subfigure[With LBC control]{
-\includegraphics[angle=90, width=0.9\textwidth, viewport=180 50 580 650, clip]{center_lbc_6h}}
+\includegraphics[width=1.0\textwidth, viewport=20 50 580 750, clip]{center_6h}
 \end{center}
-\caption{0-6 hour 500 hPa T increment respond to a 6th hour single T observation at 500 hPa.}\label{fig:center_obs_6h}
+\caption{1-6 hour potential temperature perturbation without LBC control.}\label{fig:center_6h}
+\end{figure}
+\begin{figure}[htp]
+\begin{center}
+\includegraphics[width=1.0\textwidth, viewport=20 50 580 750, clip]{center_lbc_6h}
+\end{center}
+\caption{1-6 hour potential temperature perturbation with LBC control.}\label{fig:center_lbc_6h}
 \end{figure}
 
-Case 2: Single observation close to the boundary. 
+
+Experiment 2: Single observation close to the lateral boundary:
+We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, as the red cross in Figure ~\ref{fig:boundary_0h}. Figure~\ref{fig:boundary_0h} show the analysis increments due to the 6 h temperature observation with and without LBC control. Because the observation is within the boundary relaxation region, the upstream response 6h before should outside the domain, which means the analysis response at 0 h should be in the tendency of boundary condition, it is the case in Figure\ref{fig:boundary_0h}(b), there is no significant response in initial condition when the LBC control was turned on. However, if the LBC control was turned off, then the minimization have to produce some unrealistic responses in initial condition to decrease the innovation. That is why some significant responses can be found upstream along the south boundary in Figure \ref{fig:boundary_0h}(a).  Then, we integrated the increments forward to 6 hour. The perturbation development in Figure ~\ref{fig:boundary_6h} shows that the original perturbation along south boundary almost doesn't change during the 6 hours, the positive perturbation was developed locally, which means there is no/very few perturbation propagated from LBC tendency. However, in Figure ~\ref{fig:boundary_lbc_6h}, the perturbation along south boundary was developed from scratch and became stronger and stronger, apparently, the LBC tendency did the job. Finally, compare the increments at 6 h in both figures, the increment in experiment with LBC control fit the observation location much better than that in the experiment without LBC control. All the results confirm the assumption that the LBC control has significant impact on the assimilation of the observation which close to the LBC during the 4D-Var time window.
+
+Above two experiments also confirm the correctness of implementation of the LBC control in minimization.
 \\*
 \begin{figure}[htp]
 \begin{center}
 \subfigure[Without LBC control]{
-\includegraphics[width=0.45\textwidth, viewport=50 100 600 730, clip]{boundary}}
+\includegraphics[width=0.45\textwidth, viewport=40 100 600 730, clip]{boundary}}
 \subfigure[With LBC control]{
-\includegraphics[width=0.45\textwidth, viewport=50 100 600 730, clip]{boundary_lbc}}
+\includegraphics[width=0.45\textwidth, viewport=40 100 600 730, clip]{boundary_lbc}}
 \end{center}
-\caption{0-hour 500 hPa T increment respond to a 6th hour single T observation at 500 hPa, the red cross is the location of the T observation at 6th hour}\label{fig:boundary_obs_0h}
+\caption{0 h potential temperature perturbation.}\label{fig:boundary_0h}
 \end{figure}
-
 \begin{figure}[htp]
 \begin{center}
-\subfigure[Without LBC control]{
-\includegraphics[angle=90, width=0.9\textwidth, viewport=220 50 580 650, clip]{boundary_6h}}
-\subfigure[With LBC control]{
-\includegraphics[angle=90, width=0.9\textwidth, viewport=180 50 580 650, clip]{boundary_lbc_6h}}
+\includegraphics[width=1.0\textwidth, viewport=20 50 580 750, clip]{boundary_6h}
 \end{center}
-\caption{0-6 hour 500 hPa T increment respond to a 6th hour single T observation at 500 hPa.}\label{fig:boundary_obs_6h}
+\caption{1-6 hour potential temperature perturbation without LBC control.}\label{fig:boundary_6h}
 \end{figure}
-%
-\newpage
+\begin{figure}[htp]
+\begin{center}
+\includegraphics[width=1.0\textwidth, viewport=20 50 580 750, clip]{boundary_lbc_6h}
+\end{center}
+\caption{1-6 hour potential temperature perturbation with LBC control.}\label{fig:boundary_lbc_6h}
+\end{figure}
 
+\section{Verification with real cases}
 
 \begin{thebibliography}{99}
 
@@ -292,6 +306,8 @@ dynamical relaxation: An examination of the technique.  \sl{Quart. J. Roy. Meteo
 
 \bibitem{Gusta} Gustafsson, N., E. Kallen and S. Thorsteinsson, 1998: Sensitivity of 
 forecast errors to initial and lateral boundary conditions.  \sl{Tellus}, \bf50A\rm, 167- 185. 
+
+\bibitem{Huang} Huang, X.-Y., Q. Xiao, D. M. Barker, Xin Zhang, J. Michalakes, W. Huang, T. Henderson, J. Bray, Y. Chen, Z. Ma, J. Dudhia, Y. Guo, Xiaoyan Zhang, D.-J. Won, H.-C. Lin, Y.-H. Kuo, 2009. Four-Dimensional Variational Data Assimilation for WRF: Formulation and Preliminary Results.  \sl{Mon. Wea. Rev.}, \bf137\rm, 299-314.
 
 \bibitem{kawa} Kawabata, T., Seko, H., Saito, K., Kuroda, T., Tamiya, K., Tsuyuki, 
 T., Honda, Y. and Wakazuki, Y., 2007: An assimilation and forecasting 
