@@ -143,15 +143,15 @@ related to these phenomena may be lost.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \section{Background}
-For the control of lateral boundary conditions in HIRLAM 4D-Var, we follow \cite{Kawa2007} and we introduce the lateral boundary condition perturbations as a control variable $\delta{\mathbf{x}_{lbc}}(t_k)$  at the end of the data assimilation window (time $t_k$).  For the lateral boundary increment $\delta{\mathbf{x}_{lbc}}(t_0)$ at the start of the assimilation window (time $t_0$) we will use the initial condition increment $\delta{\mathbf{x}}(t_0)$. For intermediate time-steps during the integration of the tangent linear model, we will obtain the lateral boundary conditions by the same linear time interpolation scheme that is used in the non-linear model. Once the lateral boundary conditions are defined, the same lateral boundary relaxation scheme that is used in the non-linear model \cite{Davis1983} can also be used in the tangent-linear model, and the adjoint of the lateral 
+For the control of lateral boundary conditions in HIRLAM 4D-Var, we follow \cite{Kawa2007} and we introduce the lateral boundary condition perturbations as a control variable $\delta{\mathbf{x}_\mathrm{lbc}}(t_k)$  at the end of the data assimilation window (time $t_k$).  For the lateral boundary increment $\delta{\mathbf{x}_\mathrm{lbc}}(t_0)$ at the start of the assimilation window (time $t_0$) we will use the initial condition increment $\delta{\mathbf{x}}(t_0)$. For intermediate time-steps during the integration of the tangent linear model, we will obtain the lateral boundary conditions by the same linear time interpolation scheme that is used in the non-linear model. Once the lateral boundary conditions are defined, the same lateral boundary relaxation scheme that is used in the non-linear model \cite{Davis1983} can also be used in the tangent-linear model, and the adjoint of the lateral 
 boundary relaxation is also well defined, see \cite{Gusta1998}. Note however, that while the lateral boundary conditions are input data to the tangent linear model the lateral boundary conditions are output data from 
 the adjoint model. 
 
-Again following \cite{Kawa2007} we will introduce a cost function term $J_{lbc}$ that will measure the distance to the un-perturbed lateral boundary conditions used in the non-linear model 
+Again following \cite{Kawa2007} we will introduce a cost function term $J_\mathrm{lbc}$ that will measure the distance to the un-perturbed lateral boundary conditions used in the non-linear model 
 \begin{equation}
-J_{lbc}=(\delta{\mathbf{x}_{lbc}}(t_k))^T\bm{\mathsf{B}}_{lbc}^{-1}\delta{\mathbf{x}_{lbc}}(t_k)
+J_\mathrm{lbc}=(\delta{\mathbf{x}_\mathrm{lbc}}(t_k))^T\bm{\mathsf{B}}_\mathrm{lbc}^{-1}\delta{\mathbf{x}_\mathrm{lbc}}(t_k)
 \end{equation}
-where $\bm{\mathsf{B}}_{lbc}$ represents the covariance of the lateral boundary condition 
+where $\bm{\mathsf{B}}_\mathrm{lbc}$ represents the covariance of the lateral boundary condition 
 errors. Lateral boundary conditions only need to be defined in the narrow 
 lateral boundary relaxation zone, but obviously it would be difficult to specify the proper spatial scales and balances representing the lateral boundary condition errors over such a narrow domain. We have therefore made the 
 choice to specify the lateral boundary control variable over the same total
@@ -160,7 +160,7 @@ these control variables represent forecast errors, albeit for different forecast
 lengths and possibly for different models, it is clear that their respective 
 error covariance can be represented in a similar way. In a first trial to test 
 the sensitivity of the assimilation to the control of the lateral boundary 
-conditions, we will simply apply $\bm{\mathsf{B}}_{lbc}=\bm{\mathsf{B}}$. 
+conditions, we will simply apply $\bm{\mathsf{B}}_\mathrm{lbc}=\bm{\mathsf{B}}$. 
 
 One potential problem is that the introduction of the lateral boundary 
 condition constraint in the form described above, would worsen the conditioning of the 4D-Var minimization problem, since the lateral boundary condition errors at the end of the assimilation window would be strongly 
@@ -172,7 +172,7 @@ assimilation window from the lateral boundary conditions at the end of
 the assimilation window, thus to treat the tendency of the lateral boundary 
 conditions 
 \begin{displaymath}
-(\frac{\partial{\delta{\mathbf{x}_{lbc}}}}{\partial{t}})=\frac{\delta{\mathbf{x}_{lbc}}(t_k)-\delta{\mathbf{x}_{lbc}}(t_0)} {t_{k}-t_0}
+(\frac{\partial{\delta{\mathbf{x}_\mathrm{lbc}}}}{\partial{t}})=\frac{\delta{\mathbf{x}_\mathrm{lbc}}(t_k)-\delta{\mathbf{x}_\mathrm{lbc}}(t_0)} {t_{k}-t_0}
 \end{displaymath}
 as the control variable. This approach would also require the covariance of forecast tendency errors, that possibly 
 could be estimated by the NMC method from differences between forecast 
@@ -187,42 +187,42 @@ tation in WRF 4D-Var and HIRLAM 4D-Var is due to the differences between
 the lateral boundary relaxation schemes, where the WRF uses a boundary 
 relaxation applied in a ”nudging” of model tendencies, following \cite{Davis1977}
 \begin{equation}
-\frac{\partial{\mathbf{x}}}{\partial{t}}=F_1(\mathbf{x}_{lbc}-\mathbf{x})-F_2\Delta^2(\mathbf{x}_{lbc}-\mathbf{x})
+\frac{\partial{\mathbf{x}}}{\partial{t}}=F_1(\mathbf{x}_\mathrm{lbc}-\mathbf{x})-F_2\Delta^2(\mathbf{x}_\mathrm{lbc}-\mathbf{x})
 \end{equation}
 where $\Delta^2$ is a 5-point smoothing operator,$ F_1$ and $F_2$ are (nudging) 
 weighting coefficients depending on the distance to the lateral boundary, $\mathbf{x}$ 
-is any model state variable and $\mathbf{x}_{lbc}$ is the corresponding boundary value 
-provided by the host model. $\mathbf{x}_{lbc}$ is speciﬁed in the following form:
+is any model state variable and $\mathbf{x}_\mathrm{lbc}$ is the corresponding boundary value 
+provided by the host model. $\mathbf{x}_\mathrm{lbc}$ is speciﬁed in the following form:
 \begin{equation}
-\mathbf{x}_{lbc}(time=t)=\mathbf{x}_{lbc}(time=t_0)+(t-t_0)\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}}
+\mathbf{x}_\mathrm{lbc}(time=t)=\mathbf{x}_\mathrm{lbc}(time=t_0)+(t-t_0)\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}}
 \end{equation}
 Considering a data assimilation window from time $t_0$ until time $t_k$ and 
-having $\delta{\mathbf{x}}(t_0)$ and $\delta{\mathbf{x}_{lbc}}(t_k)$ as the assimilation control variables, the quantities needed for the LBC of the tangent linear WRF model are given by
+having $\delta{\mathbf{x}}(t_0)$ and $\delta{\mathbf{x}_\mathrm{lbc}}(t_k)$ as the assimilation control variables, the quantities needed for the LBC of the tangent linear WRF model are given by
 \begin{equation}
-\delta{\mathbf{x}}_{lbc}(t_0)=\delta{\mathbf{x}}(t_0)
+\delta{\mathbf{x}}_\mathrm{lbc}(t_0)=\delta{\mathbf{x}}(t_0)
 \end{equation}
 \begin{equation}
-\frac {\partial{\delta{\mathbf{x}}_{lbc}}} {\partial{t}}=\frac{\delta{\mathbf{x}}_{lbc}(t_k)-\delta{\mathbf{x}}(t_0)} {t_k-t_0}
+\frac {\partial{\delta{\mathbf{x}}_\mathrm{lbc}}} {\partial{t}}=\frac{\delta{\mathbf{x}}_\mathrm{lbc}(t_k)-\delta{\mathbf{x}}(t_0)} {t_k-t_0}
 \end{equation}
-The lateral boundary conditions for the adjoint model, $\mathbf{x}_{lbc}^{AD}(t_0)$ and $(\frac {\partial{\mathbf{x}}_{lbc}} {\partial{t}})^{AD}$
+The lateral boundary conditions for the adjoint model, $\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)$ and $(\frac {\partial{\mathbf{x}}_\mathrm{lbc}} {\partial{t}})^\mathrm{AD}$
 , will be initialized with zeroes at the end of the data assimilation 
 window (time $t_k$ ). After the backwards integration of the adjoint model to 
 time $t_0$ the adjoint control variables (or the error gradients) can be obtained 
 from: 
 \begin{equation}
-\mathbf{x}^{AD}(t_0)=\mathbf{x}_{inner}^{AD}(t_0)+\mathbf{x}_{lbc}^{AD}(t_0)-\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^{AD}
+\mathbf{x}^\mathrm{AD}(t_0)=\mathbf{x}_\mathrm{inner}^\mathrm{AD}(t_0)+\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)-\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}})^\mathrm{AD}
 \end{equation}
 \begin{equation}
-\mathbf{x}_{lbc}^{AD}(t_k)=\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^{AD}
+\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_k)=\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^\mathrm{AD}
 \end{equation}
-where $\mathbf{x}_{inner}^{AD}(t_0)$ denotes the ”inner domain” adjoint model model variable as provided at the initial time $t_0$.
+where $\mathbf{x}_\mathrm{inner}^\mathrm{AD}(t_0)$ denotes the ”inner domain” adjoint model model variable as provided at the initial time $t_0$.
 
-Note that $\mathbf{x}_{lbc}^{AD}(t_0)$ and $(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^{AD}$ will be defined in the boundary relaxtion 
+Note that $\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)$ and $(\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}})^\mathrm{AD}$ will be defined in the boundary relaxtion 
 zone only. Consider, however, that they are full domain ﬁelds that were 
 initialized with zeroes at the the end of the data assimilation window and that the boundary relaxation will only ﬁll in values into this full domain 
 ﬁeld inside the boundary relaxtion zone.
 
-Also note that the calculation of $J_{lbc}$ and $\frac{\partial{J_{lbc}}} {\partial{\mathbf{v}_{lbc}}}$, where $\mathbf{v}_{lbc}$ is the lateral boundary condition control variable in control vector space, will follow exactly the same calculations as for the background error constraint. 
+Also note that the calculation of $J_\mathrm{lbc}$ and $\frac{\partial{J_\mathrm{lbc}}} {\partial{\mathbf{v}_\mathrm{lbc}}}$, where $\mathbf{v}_\mathrm{lbc}$ is the lateral boundary condition control variable in control vector space, will follow exactly the same calculations as for the background error constraint. 
 
 \section{Code modification}
 To introduce the new control variable of lateral boundary, we made following code modification in the latest WRFDA repository :
@@ -257,7 +257,7 @@ Add statements to call \textsl{da\_transfer\_xatowrftl\_lbc}}
 \begin{verbatim}
 M      var/da/da_minimisation/da_transform_vtoy.inc
 \end{verbatim}
-\subsubsection{Change cv\_size initialization due to $J_{lbc}$}
+\subsubsection{Change cv\_size initialization due to $J_\mathrm{lbc}$}
 \begin{verbatim}
 M      var/da/da_setup_structures/da_setup_cv.inc
 \end{verbatim}
