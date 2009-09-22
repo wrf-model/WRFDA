@@ -148,6 +148,8 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 
 #include "deref_kludge.h"
 
+   LOGICAL ::  solverDisabled
+   
 #define COPY_IN
 #include <em_scalar_derefs.inc>
 #ifdef DM_PARALLEL
@@ -191,6 +193,13 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 !</DESCRIPTION>
 
    if(grid%trace_use) call trace_entry("solve_em_ad")
+
+   ! 090921 bp; 
+   solverDisabled = .false.
+   call nl_get_disable_solver( 1, solverDisabled )
+   if(solverDisabled) then
+      return
+   endif
 
    CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
    CALL linkedlist_initialize

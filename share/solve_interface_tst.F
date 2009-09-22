@@ -1,5 +1,7 @@
 !WRF:MEDIATION_LAYER:ADT_BARRIER
 !
+! 090922 bp; Bypass test_solve_em(), and test_tladj_routines() if
+!     disableSolver namelist variable is T
 ! 090915 bp; Change name of some_em_tst() to test_tladj_routines() to better differentiate and better describe
 ! 090915 bp; include both call to test_solve_em() and test_tladj_routines()
 
@@ -39,6 +41,8 @@ SUBROUTINE solve_interface_tst ( grid )
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
 
+   LOGICAL :: solverDisabled           ! return without doing anything if namelist entry set true
+
    CALL model_to_grid_config_rec ( grid%id , model_config_rec , config_flags )
    CALL set_scalar_indices_from_config ( grid%id , idum1 , idum2 )
 
@@ -48,6 +52,13 @@ SUBROUTINE solve_interface_tst ( grid )
 
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
+
+      ! 090921 bp; 
+      solverDisabled = .false.
+      call nl_get_disable_solver( 1, solverDisabled )
+      if(solverDisabled) then
+         return
+      endif
 
      CALL test_solve_em ( grid , config_flags , &
 

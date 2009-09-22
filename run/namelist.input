@@ -3,18 +3,18 @@
  run_hours                           = 0,
  run_minutes                         = 10,
  run_seconds                         = 0,
- start_year                          = 2008, 2002, 2002,
- start_month                         = 07,   06,   06,
- start_day                           = 16,   12,   12,
- start_hour                          = 00,   12,   12,
- start_minute                        = 00,   00,   00,
- start_second                        = 00,   00,   00,
- end_year                            = 2008, 2002, 2002,
- end_month                           = 07,   06,   06,
- end_day                             = 16,   13,   13,
- end_hour                            = 00,   00,   00,
- end_minute                          = 10,   00,   00,
- end_second                          = 00,   00,   00,
+ start_year                          = 2008,
+ start_month                         = 07,  
+ start_day                           = 16,  
+ start_hour                          = 00,  
+ start_minute                        = 00, 
+ start_second                        = 00,
+ end_year                            = 2008,
+ end_month                           = 07, 
+ end_day                             = 16,
+ end_hour                            = 00,
+ end_minute                          = 10,
+ end_second                          = 00,
  interval_seconds                    = 21600
  input_from_file                     = .true.,.false.,.false.,
  history_interval                    = 180,  60,   60,
@@ -25,7 +25,7 @@
  io_form_restart                     = 2
  io_form_input                       = 2
  io_form_boundary                    = 2
- debug_level                         = 101
+ debug_level                         = 0
  /
 
  &domains
@@ -51,34 +51,34 @@
  feedback                            = 1,
  smooth_option                       = 0
  TEST_rk_step_prep          = .true.,
- TEST_init_zero_tendency    = .false.,
- TEST_phy_prep              = .false.
- TEST_calculate_km_kh       = .false.,
- TEST_rk_tendency           = .false.,
- TEST_surface_drag          = .false.,
- TEST_lscond                = .false.,
- TEST_moist_physics_prep_em = .false.,
- TEST_advect_scalar         = .false.,
- TEST_relax_bdy_dry         = .false.,
- TEST_rk_addtend_dry        = .false.,
- TEST_spec_bdy_dry          = .false.,
- TEST_small_step_prep       = .false.,
- TEST_calc_p_rho            = .false.,
- TEST_calc_coef_w           = .false.,
- TEST_advance_uv            = .false.,
- TEST_spec_bdyupdate        = .false.,
- TEST_advance_mu_t          = .false.,
- TEST_sumflux               = .false.,
- TEST_advance_w             = .false.,
- TEST_spec_bdyupdate_ph     = .false.,
- TEST_calc_mu_uv_1          = .false.,
- TEST_small_step_finish     = .false.,
- TEST_rk_scalar_tend        = .false.,
- TEST_spec_bdy_scalar       = .false.,
- TEST_rk_update_scalar      = .false.,
- TEST_calc_p_rho_phi        = .false.,
- TEST_diagnose_w            = .false.,
- TEST_cudu                  = .false.
+ TEST_init_zero_tendency    = .true.,
+ TEST_phy_prep              = .true.
+ TEST_calculate_km_kh       = .true.,
+ TEST_rk_tendency           = .true.,
+ TEST_surface_drag          = .true.,
+ TEST_lscond                = .true.,
+ TEST_moist_physics_prep_em = .true.,
+ TEST_advect_scalar         = .true.,
+ TEST_relax_bdy_dry         = .true.,
+ TEST_rk_addtend_dry        = .true.,
+ TEST_spec_bdy_dry          = .true.,
+ TEST_small_step_prep       = .true.,
+ TEST_calc_p_rho            = .true.,
+ TEST_calc_coef_w           = .true.,
+ TEST_advance_uv            = .true.,
+ TEST_spec_bdyupdate        = .true.,
+ TEST_advance_mu_t          = .true.,
+ TEST_sumflux               = .true.,
+ TEST_advance_w             = .true.,
+ TEST_spec_bdyupdate_ph     = .true.,
+ TEST_calc_mu_uv_1          = .true.,
+ TEST_small_step_finish     = .true.,
+ TEST_rk_scalar_tend        = .true.,
+ TEST_spec_bdy_scalar       = .true.,
+ TEST_rk_update_scalar      = .true.,
+ TEST_calc_p_rho_phi        = .true.,
+ TEST_diagnose_w            = .true.,
+ TEST_cudu                  = .true.
  /
 
  &physics
@@ -108,6 +108,7 @@
  &dynamics
  dyn_opt                             = 402,
  tl_perturbation                     = .04,
+ disable_solver                      = .false.
  rk_ord                              = 3,
  w_damping                           = 0,
  diff_opt                            = 1,

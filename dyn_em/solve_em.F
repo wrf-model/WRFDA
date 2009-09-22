@@ -1,5 +1,7 @@
 !WRF:MEDIATION_LAYER:SOLVER
 
+! 090922 bp; Return from solver immediately, if disableSolver namelist variable is enabled
+
 SUBROUTINE solve_em ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
@@ -85,6 +87,8 @@ SUBROUTINE solve_em ( grid , config_flags , &
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
+   LOGICAL :: solverDisabled           ! return without doing anything if namelist entry set true
+
 ! Define benchmarking timers if -DBENCH is compiled
 #include <bench_solve_em_def.h>
 
@@ -156,6 +160,13 @@ SUBROUTINE solve_em ( grid , config_flags , &
 #include <bench_solve_em_init.h>
 
    if(grid%trace_use) call trace_entry("solve_em")
+
+   ! 090921 bp; 
+   solverDisabled = .false.
+   call nl_get_disable_solver( 1, solverDisabled )
+   if(solverDisabled) then
+      return
+   endif
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
 

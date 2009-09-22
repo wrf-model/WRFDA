@@ -121,8 +121,6 @@ real                                     :: dtbc_save
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A, nsum
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
 
-  print*,"test_solve_em(): "
-
 !  Obtain dimension information stored in the grid data structure.
   CALL get_ijk_from_grid (  grid ,                   &
                             ids, ide, jds, jde, kds, kde,    &
@@ -720,8 +718,8 @@ real                                     :: dtbc_save
 #endif
 
    print*, '                '
-   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
-   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL: ', VAL_L
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD: ', VAL_A
 
 !  RECOVER
 
