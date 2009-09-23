@@ -871,15 +871,15 @@ EOF
    if [[ $NL_MULTI_INC == 0 ]] ; then
       if [[ -f wrfvar_output ]]; then
          if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
-            rm wrfvar_output
-            echo "ncks -v G_U,G_V...",tl01,"  wrfinput_tmp"
-            ncks -v G_U,G_V,G_PH,G_MU,G_QVAPOR,G_T tl01 wrfinput_tmp
-            echo "ncrename -v G_U,U...  wrfinput_tmp"
-            ncrename -v G_U,U -v G_V,V -v G_PH,PH -v G_MU,MU -v G_QVAPOR,QVAPOR -v G_T,T wrfinput_tmp
-            echo "ncflint -w 1, 1  wrfinput_tmp wrfinput_d01 wrfvar_output"
-            cp wrfinput_d01 wrfvar_output 
-            ncflint -A -v U,V,T,MU,PH,QVAPOR -w 1,1 wrfinput_tmp wrfinput_d01 wrfvar_output 
-            echo "cp wrfvar_output ",$DA_ANALYSIS
+#           rm wrfvar_output
+#           echo "ncks -v G_U,G_V...",tl01,"  wrfinput_tmp"
+#           ncks -v G_U,G_V,G_PH,G_MU,G_QVAPOR,G_T tl01 wrfinput_tmp
+#           echo "ncrename -v G_U,U...  wrfinput_tmp"
+#           ncrename -v G_U,U -v G_V,V -v G_PH,PH -v G_MU,MU -v G_QVAPOR,QVAPOR -v G_T,T wrfinput_tmp
+#           echo "ncflint -w 1, 1  wrfinput_tmp wrfinput_d01 wrfvar_output"
+#           cp wrfinput_d01 wrfvar_output 
+#           ncflint -A -v U,V,T,MU,PH,QVAPOR -w 1,1 wrfinput_tmp wrfinput_d01 wrfvar_output 
+#           echo "cp wrfvar_output ",$DA_ANALYSIS
             cp wrfvar_output $DA_ANALYSIS
             if $NL_VAR4D_LBC; then
                echo "cp wrfbdy_tl01 ",$BDYOUT_TL
