@@ -1,27 +1,151 @@
-\documentclass[a4paper,12pt,titlepage]{article}
-\usepackage{amsmath}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%																															 %
+%				USE THIS TEMPLATE, AMETSOC.STY, AND AMETSOC.BST				 %
+%			        OR YOUR TEX FILES WILL NOT BE USED				  		 %
+%																															 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREAMBLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% The following two commands will generate a PDF that follows all the requirements for submission
+% and peer review.  Uncomment these commands to generate this output (and comment out the two lines below.)
+%
+% DOUBLE SPACE VERSION FOR SUBMISSION TO THE AMS
+\documentclass[12pt]{article}
+\usepackage{ametsoc}
+%
+% The following two commands will generate a single space, double column paper that closely
+% matches an AMS journal page.  Uncomment these commands to generate this output (and comment
+% out the two lines above. FOR AUTHOR USE ONLY. PAPERS SUBMITTED IN THIS FORMAT WILL BE RETURNED
+% TO THE AUTHOR for submission with the correct formatting.
+%
+% TWO COLUMN JOURNAL PAGE LAYOUT FOR AUTHOR USE ONLY
+%\documentclass[10pt]{article}
+%\usepackage{ametsoc2col}
+\usepackage{subfigure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABSTRACT
+%
+% Enter your Abstract here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\myabstract}{The Limited Area Model (LAM) forecasting problem is a lateral boundary 
+condition problem in addition to the initial condition problem. For 
+numerical weather prediction, the lateral boundary conditions are generally 
+provided by a host model, for example a global numerical weather prediction 
+model. One may argue that the available boundary conditions from the host 
+model have to be accepted (without change) for usage in the LAM. However, 
+one may use the observations close to the lateral boundaries and let these 
+influence the initial conditions. In case the initial conditions are used as the 
+lateral boundary conditions at the initial time, the subsequent forecast will 
+also be influenced by these observations. Depending on the frequency of the 
+updating of the lateral boundary conditions, the host model will gradually 
+take over the definition of the lateral boundary conditions. With application of
+ 4D-Var for the LAM forecasting, one could do a bit more, since one 
+may control the lateral boundary conditions during the period of the data 
+assimilation window. This may be particularly important for assimilation of 
+phenomena that are observed well inside the LAM domain during the later 
+part of the data assimilation window, while being propagated through the 
+lateral boundaries during the early part of the data assimilation window. 
+If we do not control the lateral boundary conditions, observed information 
+related to these phenomena may be lost.}
+%
 \begin{document}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%
+% Enter your TITLE here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\textbf{\large{A Description of the WRF 3/4D-Var}}}
+%
+% Author names, with corresponding author information. 
+% [Update and move the \thanks{...} block as appropriate.]
+%
+\author{\textsc{Xin Zhang}
+				\thanks{\textit{Corresponding author address:} 
+				Dr. Xin Zhang, NCAR/MMM, P.O. Box 3000, 
+				 Boulder, CO 80307. 
+				\newline{E-mail: xinzhang@ucar.edu}}
+             \textsc{and Xiang-Yu Huang}\\
+\textit{\footnotesize{MMM, National Center for Atmospheric Research, Boulder, CO 80305}}
+%\and 
+%\centerline{\textsc{Nils Gustafsson}}\\% Add additional authors, different insitution
+%\centerline{\textit{\footnotesize{Swedish Meteorological and Hydrological Institute, SE-60176 Norrk¬oping, Sweden}}}
+}
+%
+% The following block of code will handle the formatting of the title page depnding on whether
+% we are formatting a double column (dc) author draft or a single column paper for submission.
+% AUTHORS SHOULD SKIP OVER THIS... There is nothing to do in this section of code.
+\ifthenelse{\boolean{dc}}
+{
+\twocolumn[
+\begin{@twocolumnfalse}
+\amstitle
+
+% Start Abstract (Enter your Abstract above.  Do not enter any text here)
+\begin{center}
+\begin{minipage}{13.0cm}
+\begin{abstract}
+	\myabstract
+	\newline
+	\begin{center}
+		\rule{38mm}{0.2mm}
+	\end{center}
+\end{abstract}
+\end{minipage}
+\end{center}
+\end{@twocolumnfalse}
+]
+}
+{
+\amstitle
+\begin{abstract}
+\myabstract
+\end{abstract}
+\newpage
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAIN BODY OF PAPER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 
 \section{Basic formulations}
 
+The WRF 4D-Var algorithm  takes the incremental 4D-Var formulation that is commonly used in operational systems. The incremental approach is designed to find the analysis increment that minimizes a cost function defined as a function of the analysis increment instead of the analysis itself. In the incremental 4D-Var, the tangent linear and adjoint models usually derived from a simplified forward model are used in the inner-loop minimization, while the evolution of the background is predicted with the full for ward model. 
+
+Mathematically WRF 4D-Var minimizes a cost function $J$:
+\begin{align}
+J=J_b+J_o+J_c
+\end{align}
+which includes quadratic measure of distance to the background, observation, and balanced solution. The background cost function term $J_b$ is\\
 Define:\\
 $\mathbf{x}_k$ : Model state vector at $k^{th}$ time step;\\
 $\mathbf{y}_k$ : Observation vector at $k^{th}$ time step;\\
-$\mathbf{B}$ : Background error covariance matrix;\\
-$\mathbf{O}$: Observational error covariance matrix;\\
+$\bm{\mathsf{B}}$ : Background error covariance matrix;\\
+$\bm{\mathsf{O}}$: Observational error covariance matrix;\\
 $M_k$ : Nonlinear model at $k^{th}$ time step, $\mathbf{x}_k=M_k(\mathbf{x}_0)$;\\
-$\mathbf{M}_k$ : Tangent linear model at;\\
-$\mathbf{M}^T_k$ : Adjoint model at;\\
+$\bm{\mathsf{M}}_k$ : Tangent linear model at $k^{th}$ time step;\\
+$\bm{\mathsf{M}}^T_k$ : Adjoint model at $k^{th}$ time step;\\
 $H_k$: Observational operator at $k^{th}$ time step;\\
-$\mathbf{H}_k$: Tangent linear observational operator;\\
-$\mathbf{H}^T_k$: Adjoint observational operator.\\
-\begin{align}
-J_b(\mathbf{x}_0) &=-\frac{1}{2}[(\mathbf{x}_0-\mathbf{x}_b)^T\mathbf{B}^{-1}(\mathbf{x}_0-\mathbf{x}_b)]
-\end{align}
+$\bm{\mathsf{H}}_k$: Tangent linear observational operator;\\
+$\bm{\mathsf{H}}^T_k$: Adjoint observational operator.\\
 \begin{align}
 \begin{split}
-J_o(\mathbf{x}_0) &=-\frac{1}{2}\sum_{k=1}^N[(H_k\mathbf{x}_k-\mathbf{y}_k)^T\mathbf{O}^{-1}(H_k\mathbf{x}_k-\mathbf{y}_k)]  \\
-& =-\frac{1}{2}\sum_{k=1}^N[(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)^T\mathbf{O}^{-1}(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)]
+J_b &=-\frac{1}{2}(\mathbf{x}^n-\mathbf{x}^b)^T\bm{\mathsf{B}}^{-1}(\mathbf{x}^n-\mathbf{x}^b) \\
+&=-\frac{1}{2}[(\mathbf{x}^n-\mathbf{x}^{n-1})+(\mathbf{x}^{n-1}-\mathbf{x}^b)]^T\bm{\mathsf{B}}^{-1}[(\mathbf{x}^n-\mathbf{x}^{n-1})+(\mathbf{x}^{n-1}-\mathbf{x}^b)] \\
+&=-\frac{1}{2}[(\mathbf{x}^n-\mathbf{x}^{n-1})+\sum_{i=1}^{n-1}{(\mathbf{x}^{i}-\mathbf{x}^{i-1})}]^T\bm{\mathsf{B}}^{-1}[(\mathbf{x}^n-\mathbf{x}^{n-1})+\sum_{i=1}^{n-1}(\mathbf{x}^{i}-\mathbf{x}^{i-1})]
+\end{split}
+\end{align}
+where superscripts $-1$ and $T$ denote inverse and adjoint of a matrix or a linear operator. Here $\bm{\mathsf{B}}$ is the background error covariance matrix, which is typically climatological estimates, but it may also be derived from prior or ensemble-based flow-dependent estimates or, with slightly different formulation, combination of both climatological and ensemble estimates.  In a slight abuse of notation,
+\begin{align}
+\begin{split}
+J_o &=-\frac{1}{2}\sum_{k=1}^N[(H_k\mathbf{x}_k-\mathbf{y}_k)^T\bm{\mathsf{O}}^{-1}(H_k\mathbf{x}_k-\mathbf{y}_k)]  \\
+& =-\frac{1}{2}\sum_{k=1}^N[(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)^T\bm{\mathsf{O}}^{-1}(H_kM_k(\mathbf{x}_0)-\mathbf{y}_k)]
 \end{split}
 \end{align}
 \\*
@@ -102,20 +226,17 @@ $y$ &  $y\_type$ &$\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\math
 \end{tabular}
 
 \section{Subroutine index}
-\begin{verbatim}
-da_allocate_y :
- \end{verbatim}
- 
-\begin{verbatim}
-da_calculate_gradj :
- \end{verbatim} 
+
+\subsection*{da\_allocate\_y:}
+
+\subsection*{da\_calculate\_gradj:}
 \[
 U^TS^T_{w-v}H_k^TO^{-1}(H_kS_{w-v}M_kS_{v-w}Uv+H_kS_{w-v}M_k(x_b)-y_k)
 \] 
 
 \begin{verbatim}
 da_calculate_grady :
- \end{verbatim} 
+\end{verbatim} 
 \[
 \mathbf{O}^{-1}(\mathbf{H}_k\mathbf{S}_{w-v}\mathbf{M}_k\mathbf{S}_{v-w}\mathbf{Uv}+H_kS_{w-v}M_k(x_b)-y_k)
 \] 
@@ -152,9 +273,9 @@ da_transform_xtoxa_adj:
 input: $grid$\\
 output: $grid\%xa$\\
 
-\begin{verbatim}
-da_transform_vtox:
-\end{verbatim} 
+\subsection*{da\_transform\_vtox:}
+input: $\mathbf{cv} (\mathbf{xhat})$\\
+output: $grid\%xa)$\\
 \[
 \mathbf{U}
 \]
