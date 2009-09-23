@@ -19,7 +19,12 @@ SUBROUTINE integrate_tst ( grid )
    USE module_integrate_ad
    USE module_integrate_tl
 
+
    IMPLICIT NONE
+
+#ifdef DM_PARALLEL
+    include "mpif.h"
+#endif
 
    !  Input data.
 
