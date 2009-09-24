@@ -352,7 +352,7 @@ We still utilize the case in \cite{Huang2009},  which is a severe winter storm c
 
 
 \subsection{Experiment 2: Single observation close to the lateral boundary}
-We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, as the red cross in Fig.~\ref{fig:boundary_0h}. Fig.~\ref{fig:boundary_0h} show the analysis increments due to the 6 h temperature observation with and without LBC control. Because the observation is within the lateral boundary relaxation region, the upstream response of 6 h before should be outside the domain, which means the analysis response at 0 h should be in the tendency of boundary condition. This is the case in Fig.~\ref{fig:boundary_0h}(b), there is no significant response in initial condition when the LBC control was turned on. However, if the LBC control was turned off, then the minimization have to produce some unrealistic responses in initial condition to decrease the innovation. That is why some significant responses can be found upstream along the south boundary in Fig.~\ref{fig:boundary_0h}(a).  Then, we integrated the increments forward from 0 hour to 6 hour. The perturbation development in Fig.~\ref{fig:boundary_6h} shows that the original perturbation along south boundary almost doesn't change during the 6 hours, the positive perturbation was developed locally, which means there is no/very few perturbation propagated from LBC tendency. However, in Fig.~\ref{fig:boundary_lbc_6h}, the perturbation along south boundary was developed from scratch and became stronger and stronger, apparently, the LBC tendency did the job. Finally, comparing the increments at 6 h in both figures, we found that the increment in experiment with LBC control fit the observation location much better than that that in the experiment without LBC control. All the results confirm the assumption that the LBC control has significant impact on the assimilation of the observation which close to the LBC during the 4D-Var time window.
+We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, as the red cross in Fig.~\ref{fig:boundary_0h}. Fig.~\ref{fig:boundary_0h} show the analysis increments due to the 6 h temperature observation with and without LBC control. Because the observation is within the lateral boundary relaxation region, the upstream response of 6 h before should be outside the domain, which means the analysis response at 0 h should be in the tendency of boundary condition. This is the case in Fig.~\ref{fig:boundary_0h}(b), there is no significant response in initial condition when the LBC control was turned on. However, if the LBC control was turned off, then the minimization have to produce some unrealistic or overestimated responses in initial condition to decrease the innovation. That is why some significant responses can be found upstream along the south boundary in Fig.~\ref{fig:boundary_0h}(a).  Then, we integrated the increments forward from 0 hour to 6 hour. The perturbation development in Fig.~\ref{fig:boundary_6h} shows that the original perturbation along south boundary almost doesn't change during the 6 hours, the positive perturbation was developed locally, which means there is no/very few perturbation propagated from LBC tendency. However, in Fig.~\ref{fig:boundary_lbc_6h}, the perturbation along south boundary was developed from scratch and became stronger and stronger, apparently, the LBC tendency did the job. Finally, comparing the increments at 6 h in both figures, we found that the increment in experiment with LBC control fit the observation location much better than that that in the experiment without LBC control. All the results confirm the assumption that the LBC control has significant impact on the assimilation of the observation which close to the LBC during the 4D-Var time window.
 \begin{figure}[t]
 \subfigure[Without LBC control]{
 \noindent\includegraphics[width=19pc, viewport=40 100 600 730, clip]{./figures/boundary}}
@@ -373,7 +373,34 @@ We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{
 
 Above two experiments also confirm the correctness of implementation of the LBC control in minimization.   
 
+\section{Real case}
+We randomly pick up the period from July 15 to July 18, 2005 of the Typhoon Haitang case. It is the same case as \cite{Huang2009}, in which detail information about the case configuration can be found. We run the 4D-Var as well as the subsequent 24 hours forecast every 12 hours.
 
+Unlike the single observation experiment, in which the minimization can converge in 1-3 iterations, in real case, there are so many observational data distributed in the three-dimensional model space and along the time window, moreover, the number of iteration of real case is usually more than 50, which will spread the impact of LBC control all over the domain, the impact of LBC control can not be easily identified by the analysis increments as what we did in section 4.
+
+From the discussion in section 4, we know that the minimization will produce fake or overestimated analysis increments to fit the downstream observations close to boundary relaxation region if LBC were not include in the minimization. Additionally including LBC in minimization will reduce the fake or overestimated analysis increments in IC, because some of the analysis response due to the observations close to boundary will be redirected to LBC increments.  The IC analysis increments combining with the LBC increments will produce a better observation fitting. In general senses, we could expect that the experiments with LBC control should end with a smaller $J_b$ and $J_o$ than which in experiments without LBC control. Note: This expectation should only be treated as a high probability phenomenon, it is not a definite conclusion since the $J_b$ and $J_o$ are the mixed and together index of the changes of the background.  Table \ref{t1} list the final $J_b$ and $J_o$ in each experiments. The red numbers in Tab. \ref{t1} are two exceptions , all other cases confirm our expectation. Especially, all $J_o$ with LBC control become smaller, which means that during the 6-hour time window, the new model trajectory fits observations better than which without LBC control. 
+\begin{table}[t]
+\caption{Final $J_b$ and $J_o$ comparison.}\label{t1}
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+\hline\hline
+\multicolumn{3}{c}{$J_b$} \vline & \multicolumn{2}{c}{$J_o$}\\
+\hline
+Date & w LBC & w/o LBC &  w LBC &  w/o LBC\\
+\hline
+ 1500 & \textcolor{red}{1913} & 1903 & 15326 & 15607 \\
+ 1512 & 2031 & 2097 & 15904 & 16101 \\
+ 1600 & 2787 & 2885 & 27237 & 27583 \\
+ 1612 & 2561 & 2622 & 28084 & 28371 \\
+ 1700 & \textcolor{red}{3463} & 3458 & 37099 & 37482 \\
+ 1712 & 2505 & 2590 & 32515 & 32760 \\
+ 1800 & 2883 & 2911 & 33824 & 34337 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Next, we will show the verification scores of the 6--24 hour forecast upon the observations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
