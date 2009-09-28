@@ -888,18 +888,18 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+be         SVN        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-#1        tutorial_xinzhang           16      16           serial|smpar|dmpar
+1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
 3        t44_liuz                    16      16           serial|smpar|dmpar
-#4        radar_meixu                 16      16           serial|smpar|dmpar
+4        radar_meixu                 16      16           serial|smpar|dmpar
 5        cwb_ascii                   16      16           serial|smpar|dmpar
-#6        afwa_t7_ssmi                16      16           serial|smpar|dmpar
-#7        t44_prepbufr                16      16           serial|smpar|dmpar
-#8        ASR_prepbufr                16      16           serial|smpar|dmpar
-#9        cwb_ascii_outerloop_rizvi   16      16           serial|smpar|dmpar
-#10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
+6        afwa_t7_ssmi                16      16           serial|smpar|dmpar
+7        t44_prepbufr                16      16           serial|smpar|dmpar
+8        ASR_prepbufr                16      16           serial|smpar|dmpar
+9        cwb_ascii_outerloop_rizvi   16      16           serial|smpar|dmpar
+10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
