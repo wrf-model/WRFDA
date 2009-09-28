@@ -101,7 +101,7 @@ related to these phenomena may be lost.}
 				Dr. Xiang-Yu Huang, NCAR/MMM, P.O. Box 3000, 
 				 Boulder, CO 80307. 
 				\newline{E-mail: huangx@ucar.edu}}\\
-\textit{\footnotesize{MMM, National Center for Atmospheric Research, Boulder, CO 80305}}
+\textit{\footnotesize{National Center for Atmospheric Research, Boulder, Colorado 80307}}
 \and 
 \centerline{\textsc{Nils Gustafsson}}\\% Add additional authors, different insitution
 \centerline{\textit{\footnotesize{Swedish Meteorological and Hydrological Institute, SE-60176 Norrk¨oping, Sweden}}}
@@ -143,15 +143,14 @@ related to these phenomena may be lost.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \section{Background}
-For the control of lateral boundary conditions in WRF 4D-Var, we follow \cite{Kawa2007} and we introduce the lateral boundary condition perturbations as a control variable $\delta{\mathbf{x}_\mathrm{lbc}}(t_k)$  at the end of the data assimilation window (time $t_k$).  For the lateral boundary increment $\delta{\mathbf{x}_\mathrm{lbc}}(t_0)$ at the start of the assimilation window (time $t_0$) we will use the initial condition increment $\delta{\mathbf{x}}(t_0)$. For intermediate time-steps during the integration of the tangent linear model, we will obtain the lateral boundary conditions by the same linear time interpolation scheme that is used in the non-linear model. Once the lateral boundary conditions are defined, the same lateral boundary relaxation scheme, see \cite{Davis1983}, that is used in the non-linear model can also be used in the tangent-linear model, and the adjoint of the lateral 
-boundary relaxation is also well defined, see \cite{Gusta1998}. Note however, that while the lateral boundary conditions are input data to the tangent linear model, the lateral boundary conditions are output data from 
-the adjoint model. 
+For the control of lateral boundary conditions in WRF 4D-Var, we follow \cite{Kawa2007} and introduce the lateral boundary condition perturbations as a control variable $\delta{\mathbf{x}_\mathrm{lbc}}(t_k)$  at the end of the data assimilation window (time $t_k$).  For the lateral boundary increment $\delta{\mathbf{x}_\mathrm{lbc}}(t_0)$ at the start of the assimilation window (time $t_0$) we will use the initial condition increment $\delta{\mathbf{x}}(t_0)$. For intermediate time-steps during the integration of the tangent linear model, we will obtain the lateral boundary conditions by the same linear time interpolation scheme that is used in the non-linear model. Once the lateral boundary conditions are defined, the same lateral boundary relaxation scheme, see \cite{Davis1983}, that is used in the non-linear model can also be used in the tangent-linear model, and the adjoint of the lateral 
+boundary relaxation is well defined, see \cite{Gusta1998}. Note however, that while the lateral boundary conditions are input data to the tangent linear model, the lateral boundary conditions are output data from the adjoint model. 
 
 Again following \cite{Kawa2007} we will introduce a cost function term $J_\mathrm{lbc}$ that will measure the distance to the un-perturbed lateral boundary conditions used in the non-linear model 
 \begin{equation}
-J_\mathrm{lbc}=(\delta{\mathbf{x}_\mathrm{lbc}}(t_k))^T\bm{\mathsf{B}}_\mathrm{lbc}^{-1}\delta{\mathbf{x}_\mathrm{lbc}}(t_k)
+J_\mathrm{lbc}=\frac{1}{2}(\delta{\mathbf{x}_\mathrm{lbc}}(t_k))^T\bm{\mathbf{B}}_\mathrm{lbc}^{-1}\delta{\mathbf{x}_\mathrm{lbc}}(t_k)
 \end{equation}
-where $\bm{\mathsf{B}}_\mathrm{lbc}$ represents the covariance of the lateral boundary condition 
+where $\bm{\mathbf{B}}_\mathrm{lbc}$ represents the covariance of the lateral boundary condition 
 errors. Lateral boundary conditions only need to be defined in the narrow 
 lateral boundary relaxation zone, but obviously it would be difficult to specify the proper spatial scales and balances representing the lateral boundary condition errors over such a narrow domain. We have therefore made the 
 choice to specify the lateral boundary control variable over the same total
@@ -160,7 +159,7 @@ these control variables represent forecast errors, albeit for different forecast
 lengths and possibly for different models, it is clear that their respective 
 error covariance can be represented in a similar way. In a first trial to test 
 the sensitivity of the assimilation to the control of the lateral boundary 
-conditions, we will simply apply $\bm{\mathsf{B}}_\mathrm{lbc}=\bm{\mathsf{B}}$. 
+conditions, we will simply apply $\bm{\mathbf{B}}_\mathrm{lbc}=\bm{\mathbf{B}}$. 
 
 One potential problem is that the introduction of the lateral boundary 
 condition constraint in the form described above, would worsen the conditioning of the 4D-Var minimization problem, since the lateral boundary condition errors at the end of the assimilation window would be strongly 
@@ -179,11 +178,12 @@ could be estimated by the NMC method from differences between forecast
 tendencies valid at the same time. 
 
 \section{Formulation}
-A similar control of lateral boundary condition as developed for HIRLAM 
-4D-Var will be developed also for the WRF 4D-Var. As a starting point, the 
-lateral boundary conditions at the end of the data assimilation window will
-be used as the control variable. The main difference between the implementation in WRF 4D-Var and HIRLAM 4D-Var is due to the differences between 
-the lateral boundary relaxation schemes, where the WRF uses a boundary 
+% A similar control of lateral boundary condition as developed for HIRLAM 
+%4D-Var will be developed also for the WRF 4D-Var. As a starting point, the 
+%lateral boundary conditions at the end of the data assimilation window will
+%be used as the control variable. The main difference between the implementation in WRF 4D-Var and HIRLAM 4D-Var is due to the differences between 
+%the lateral boundary relaxation schemes, where 
+The WRF uses a boundary 
 relaxation applied in a ”nudging” of model tendencies, following \cite{Davis1977}
 \begin{equation}
 \frac{\partial{\mathbf{x}}}{\partial{t}}=F_1(\mathbf{x}_\mathrm{lbc}-\mathbf{x})-F_2\Delta^2(\mathbf{x}_\mathrm{lbc}-\mathbf{x})
@@ -209,15 +209,15 @@ window (time $t_k$ ). After the backwards integration of the adjoint model to
 time $t_0$ the adjoint control variables (or the error gradients) can be obtained 
 from: 
 \begin{equation}
-\mathbf{x}^\mathrm{AD}(t_0)=\mathbf{x}_\mathrm{inner}^\mathrm{AD}(t_0)+\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)-\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}})^\mathrm{AD}
+\mathbf{x}^\mathrm{AD}(t_0)=\mathbf{x}_\mathrm{inner}^\mathrm{AD}(t_0)+\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)-\frac{1}{t_k-t_0}(\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}})^\mathrm{AD}
 \end{equation}
 \begin{equation}
-\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_k)=\frac{1.}{t_k-t_0}(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^\mathrm{AD}
+\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_k)=\frac{1}{t_k-t_0}(\frac{\partial{\mathbf{x}_{lbc}}}{\partial{t}})^\mathrm{AD}
 \end{equation}
 where $\mathbf{x}_\mathrm{inner}^\mathrm{AD}(t_0)$ denotes the ”inner domain” adjoint model model variable as provided at the initial time $t_0$.
 
 Note that $\mathbf{x}_\mathrm{lbc}^\mathrm{AD}(t_0)$ and $(\frac{\partial{\mathbf{x}_\mathrm{lbc}}}{\partial{t}})^\mathrm{AD}$ will be defined in the boundary relaxtion 
-zone only. Consider, however, that they are full domain ﬁelds that were 
+zone only. Consider, however, that they are full domain fields that were 
 initialized with zeroes at the the end of the data assimilation window and that the boundary relaxation will only fill in values into this full domain 
 field inside the boundary relaxtion zone.
 
@@ -238,7 +238,7 @@ M      var/da/da_minimisation/da_calculate_gradj.inc
 \begin{verbatim}
 M      var/da/da_minimisation/da_calculate_j.inc
 \end{verbatim}
-\subsubsection{Add calling \textsl{da\_transfer\_xatowrftl\_adj\_lbc} and \textsl{da\_transform\_vtox\_adj}}
+\subsubsection{Add calls to \textsl{da\_transfer\_xatowrftl\_adj\_lbc} and \textsl{da\_transform\_vtox\_adj}}
 \begin{verbatim}
 M      var/da/da_minimisation/da_transform_vtoy_adj.inc
 \end{verbatim}
@@ -272,7 +272,7 @@ M      var/da/da_transfer_model/da_transfer_model.f90
 \begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_wrftltoxa_adj.inc
 \end{verbatim}
-\subsubsection{Add the adjoint of converting WRFTL variables to analysis increments at boundary}
+\subsubsection{Add the adjoint of converting WRFTL variables to analysis increments at boundaries}
 \begin{verbatim}
 M      var/da/da_transfer_model/da_transfer_xatowrftl_adj.inc
 \end{verbatim}
@@ -327,11 +327,15 @@ M      Registry/Registry.wrfvar
 
 \section{Validation with single observation}
 \label{sec:single}
-Analysis increments due to a single observation produced by a data assimilation system implicitly provide the effective background error covariance matrix $\bm{\mathsf{B}}$ and describe how the tangent linear and adjoint model propagate the observational information , see \cite{Huang2009}. After any new capability for WRF 4D-Var system was developed, the single observation experiment is an effective and clean way to show the impact of the new capability on the analysis.
-As in Fig. 3 of \cite{Huang2009}, given a single temperature observation at the end of the time window of 4D-Var, we knew that the 4D-Var increments have a temporal dimension, the increments at 6 h give a graphic representation of the background error covariance matrix at 6 h, transformed by $\bm{\mathsf{MBM}}^T$. The $\bm{\mathsf{M}}$, $\bm{\mathsf{M}}^T$ are the WRF tangent linear and adjoint model respectively. For current WRF 4D-Var version, WRF is a regional model, and both initial condition and boundary condition determine the future trajectory of the model. Specifically, the trajectory of the 5-point boundary relaxation region is also depend on the tendency from lateral boundary condition. Therefore, in the 4D-Var, the observations close to or within the lateral boundary relaxation region should not only impact the initial condition but also the boundary condition.
-To illustrate and verify the correctness of the new capability of adding lateral boundary condition (LBC) into the control variable in 4D-Var, we design 2 single observation experiments similar to that in paper \cite{Huang2009}: The first experiment has a single observation at 6 h, which is far from the lateral boundary and the tendency from LBC should have trivial or no impact on the observation location at 6 h, which means assimilating this observation either with or without LBC control should make little/no difference on the analysis at 0 h; The second experiment also has a single observation at 6 h, but close to the lateral boundary and the tendency from LBC should have significant impact on the observation location at 6 h, which means assimilating this observation with or without LBC control should make big difference on the analysis at 0 h.
+Analysis increments due to a single observation produced by a data assimilation system implicitly provide the effective background error covariance matrix $\mathbf{B}$ and describe how the tangent linear and adjoint model propagate the observational information, see \cite{Huang2009}. After any new capability for WRF 4D-Var system was developed, a single observation experiment is an effective and clean way to show the impact of the new capability on the analysis.
+As in Fig. 3 of \cite{Huang2009}, given a single temperature observation at the end of the time window of 4D-Var, we knew that the 4D-Var increments have a temporal dimension, the increments at 6 h give a graphic representation of the background error covariance matrix at 6 h, $\mathbf{MBM}^T$, where $\mathbf{M}$ and $\mathbf{M}^T$ are the WRF tangent linear model and adjoint model respectively. For current WRF 4D-Var version, WRF is a regional model, and both initial condition and boundary condition determine the future trajectory of the model. Therefore, the observations close to or within the lateral boundary relaxation region should not only impact the initial condition but also the boundary condition.
+To illustrate and verify the correctness of the new capability of adding lateral boundary condition (LBC) into the control variable in 4D-Var, we design 2 single observation experiments similar to that in paper \cite{Huang2009}: 
+
+%The first experiment has a single observation at 6 h, which is far from the lateral boundary and the tendency from LBC should have trivial or no impact on the observation location at 6 h, which means assimilating this observation either with or without LBC control should make little/no difference on the analysis at 0 h. The second experiment also has a single observation at 6 h, but close to the lateral boundary and the tendency from LBC should have significant impact on the observation location at 6 h, which means assimilating this observation with or without LBC control should make big difference on the analysis at 0 h.
 
 \subsection{Experiment 1: Single observation far away from the lateral boundary}
+
+
 We still utilize the case in \cite{Huang2009},  which is a severe winter storm case that occurred at 0000 UTC 25 January 2000. We used a 6-h forecast valid at 0000 UTC 25 January 2000 as the background for both experiments. A single temperature observation at 0600 UTC is placed at $32.5\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, the red cross in Fig.~\ref{fig:center_0h}. Fig.~\ref{fig:center_0h} shows the analysis increments due to the 6 h temperature observation with and without LBC control. There are some difference between Fig.~\ref{fig:center_0h} (a) and (b), but they are quite similar and the main responses are located on the upstream of the observation. We integrated the increments forward from 0 hour to 6 hour, Fig.~\ref{fig:center_6h} and Fig.~\ref{fig:center_lbc_6h} show the similar development of the increments without and with LBC control too, which confirm the assumption that the LBC control does not have too much impact on the assimilation of the observation which far away from the LBC during the 4D-Var time window.
 \begin{figure}[t]
 \subfigure[Without LBC control]{
@@ -352,7 +356,16 @@ We still utilize the case in \cite{Huang2009},  which is a severe winter storm c
 
 
 \subsection{Experiment 2: Single observation close to the lateral boundary}
-We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, as the red cross in Fig.~\ref{fig:boundary_0h}. Fig.~\ref{fig:boundary_0h} show the analysis increments due to the 6 h temperature observation with and without LBC control. Because the observation is within the lateral boundary relaxation region, the upstream response of 6 h before should be outside the domain, which means the analysis response at 0 h should be in the tendency of boundary condition. This is the case in Fig.~\ref{fig:boundary_0h}(b), there is no significant response in initial condition when the LBC control was turned on. However, if the LBC control was turned off, then the minimization have to produce some unrealistic or overestimated responses in initial condition to decrease the innovation. That is why some significant responses can be found upstream along the south boundary in Fig.~\ref{fig:boundary_0h}(a).  Then, we integrated the increments forward from 0 hour to 6 hour. The perturbation development in Fig.~\ref{fig:boundary_6h} shows that the original perturbation along south boundary almost doesn't change during the 6 hours, the positive perturbation was developed locally, which means there is no/very few perturbation propagated from LBC tendency. However, in Fig.~\ref{fig:boundary_lbc_6h}, the perturbation along south boundary was developed from scratch and became stronger and stronger, apparently, the LBC tendency did the job. Finally, comparing the increments at 6 h in both figures, we found that the increment in experiment with LBC control fit the observation location much better than that that in the experiment without LBC control. All the results confirm the assumption that the LBC control has significant impact on the assimilation of the observation which close to the LBC during the 4D-Var time window.
+We moved the single temperature observation at 0600 UTC to
+$28\,^{\circ}\mathrm{N}$, $75\,^{\circ}\mathrm{W}$, as the red cross in
+Fig.~\ref{fig:boundary_0h}. Fig.~\ref{fig:boundary_0h} show the analysis
+increments due to the 6 h temperature observation with and without LBC control.
+Because the observation is within the lateral boundary relaxation region, the
+upstream response of 6 h before should be outside the domain, which means the
+analysis response at 0 h should be in the tendency of boundary condition. This
+is the case in Fig.~\ref{fig:boundary_0h}(b), there is no significant response
+in initial condition when the LBC control was turned on. However, if the LBC
+control was turned off,  4D-Var has to produce some unrealistic responses in initial condition to fit the observation, as shown in Fig.~\ref{fig:boundary_0h}(a).  Then, we integrated the increments forward from 0 hour to 6 hour. The perturbation development in Fig.~\ref{fig:boundary_6h} shows that the original perturbation along south boundary almost doesn't change during the 6 hours, the positive perturbation was developed locally, which means there is no/very few perturbation propagated from LBC tendency. However, in Fig.~\ref{fig:boundary_lbc_6h}, the perturbation along south boundary was developed from scratch and became stronger and stronger, apparently, the LBC tendency did the job. Finally, comparing the increments at 6 h in both figures, we found that the increment in experiment with LBC control fit the observation location much better than that that in the experiment without LBC control. All the results confirm the assumption that the LBC control has significant impact on the assimilation of the observation which close to the LBC during the 4D-Var time window.
 \begin{figure}[t]
 \subfigure[Without LBC control]{
 \noindent\includegraphics[width=19pc, viewport=40 100 600 730, clip]{./figures/boundary}}
@@ -372,14 +385,19 @@ We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{
 \caption{1-6 hour potential temperature perturbation with LBC control.}\label{fig:boundary_lbc_6h}
 \end{figure}
 
-Above two experiments also confirm the correctness of implementation of the LBC control in minimization.   
+The above two experiments also confirm the correctness of implementation of the LBC control in 4D-Var.   
 
-\section{Real case}
-We randomly pick up the period from April 1 to 5, 2008 of the CONUS domain. The domain size is $43\times31\times28$, grid distance is $135km$. We run the 4D-Var as well as the subsequent 24 hours forecast every 12 hours.
+\section{Real data experiment}
 
-Unlike the single observation experiment, in which the minimization can converge in 1-3 iterations, in real case, there are so many observational data distributed in the three-dimensional model space and along the time window, moreover, the number of iteration of real case is usually more than 50, which will spread the impact of LBC control all over the domain, the impact of LBC control can not be easily identified by the analysis increments as what we did in section \ref{sec:single}.
+We randomly selected a period, 1-5 April 2008, for the real data experiments over the CONUS domain. The domain size is $43\times31\times28$, grid distance is $135km$. We run the 4D-Var as well as the subsequent 24 hours forecast every 12 hours.
 
-From the discussion in section \ref{sec:single}, we know that the minimization will produce fake or overestimated analysis increments to fit the downstream observations close to boundary relaxation region if LBC were not include in the minimization. Additionally including LBC in minimization will reduce the fake or overestimated analysis increments in IC, because some of the analysis response due to the observations close to boundary will be redirected to LBC increments.  The IC analysis increments combining with the LBC increments will produce a better observation fitting. In general senses, we could expect that the experiments with LBC control should end with a smaller $J_b$ and $J_o$ than which in experiments without LBC control. Note: This expectation should only be treated as a high probability phenomenon, it is not a definite conclusion since the $J_b$ and $J_o$ are the mixed and together index of the changes of the background.  Table \ref{t1} list the final $J_b$ and $J_o$ in each experiments. The red numbers in Tab. \ref{t1} are two exceptions , all other cases confirm our expectation. Especially, all $J_o$ with LBC control become smaller, which means that during the 6-hour time window, the new model trajectory fits observations better than which without LBC control. 
+%Unlike the single observation experiment, in which the minimization can converge in 1-3 iterations, in real case, there are so many observational data distributed in the three-dimensional model space and along the time window, moreover, the number of iteration of real case is usually more than 50, which will spread the impact of LBC control all over the domain, the impact of LBC control can not be easily identified by the analysis increments as what we did in section \ref{sec:single}.
+
+From the discussion in section \ref{sec:single}, we know that the 4D-Var could produce unrealistic  analysis increments to fit the downstream observations close to boundary relaxation region if LBC were not included as control variables. 
+%Additionally including LBC in 4D-Var will reduce the fake or overestimated analysis increments in IC, because some of the analysis response due to the observations close to boundary will be redirected to LBC increments.  
+The IC analysis increments combining with the LBC increments will produce a better observation fitting. In general, we could expect that the experiments with LBC control should end with a smaller $J_b$ and $J_o$ than which in experiments without LBC control. 
+%Note: This expectation should only be treated as a high probability phenomenon, it is not a definite conclusion since the $J_b$ and $J_o$ are the mixed and together index of the changes of the background.  
+Table~\ref{t1} list the final $J_b$ and $J_o$ in each experiments. The red numbers in Table~\ref{t1} are two exceptions , all other cases confirm our expectation. Especially, all $J_o$ with LBC control become smaller, which means that during the 6-hour time window, the model trajectory fits observations better than that in experiment without LBC control. 
 \begin{table}[t]
 \caption{Final $J_b$ and $J_o$ comparison.}\label{t1}
 \begin{center}
@@ -401,7 +419,8 @@ Date & w LBC & w/o LBC &  w LBC &  w/o LBC\\
 \end{center}
 \end{table}
 
-Next, we will show the verification scores of the 12 and 24 hour forecast upon the observations. Fig.~\ref{fig:bias_12h}, ~\ref{fig:rmse_12h} and Fig.~\ref{fig:bias_24h}, ~\ref{fig:rmse_24h} are the BIAS and RMSE profiles of the 12 and 24 hours forecast verified against the observations respectively. Basically, the verification results are quite mixed, even the 24 hour V component forecast with LBC control shows some degrade. It is hard to make a definite conclusion of which experiment is better since the period of experiments is very limited. According to the personal communication with the developers of HIRLAM system, the improvement due to the LBC control is very trivial and unnoticeable even in a long time operational parallel experiments. Therefore, long time parallel run is needed to evaluate the impact of the LBC control on the forecast.
+Next, we will show the verification scores of the 12 and 24 hour forecast upon the observations. Figs.~\ref{fig:bias_12h}, ~\ref{fig:rmse_12h} and Figs.~\ref{fig:bias_24h}, ~\ref{fig:rmse_24h} are the BIAS and RMSE profiles of the 12 and 24 hours forecast verified against the observations respectively. Basically, the verification results are quite similar with or without LBC control. According to the personal communication with the developers of HIRLAM system which has similar formulation of the LBC control, the forecast score improvement due to the LBC control is difficult to be shown over by pre-operational parallel experiments. Sensitive cases may need to be accumulated to document the impact of the LBC control.
+
 \begin{figure}[t]
 \begin{center}
 \noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_BIAS_12}
@@ -434,14 +453,19 @@ Next, we will show the verification scores of the 12 and 24 hour forecast upon t
 \label{fig:rmse_24h}
 \end{figure}
 
+% \section{Future works}
 
-\section{Future works}
-
-In current WRF/WRFDA configuration, there is a boundary updating procedure between data assimilation and the subsequent forecast because the data assimilation will changes the initial condition which lead to the changes in the boundary tendency from 0 to 6 hour. Once the LBC of the time window was included in the 4DVar minimization, the tendency of the 0--6 hour LBC  will be updated automatically after the analysis, which also means the state at the end of the time window will be changed too. Then, not only the 0--6 hour LBC tendency should be updated, the 6--12 hour LBC tendency should be updated, this capability should be developed.
+We noticed minor degradations on the $v$ scores and will continue the work to
+refine the experiment configuration. The current WRF/WRFDA setup has a boundary
+updating procedure between data assimilation and the subsequent forecast to
+account for the initial condition changes due to data assimilation. The update
+only applies on the boundary tendencies from 0 to 6 hour. Once the LBC of the
+time window was included in the 4D-Var minimization, the tendency of the 0--6 hour LBC  will be updated automatically after the analysis, which also means the state at the end of the time window will be changed too. Then, not only the 0--6 hour LBC tendency should be updated, the 6--12 hour LBC tendency should be updated, this capability should be developed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{acknowledgment}
 The National Center for Atmospheric Research is sponsored by the National
 Science Foundation.  This work was supported by the Air Force Weather Agency.
