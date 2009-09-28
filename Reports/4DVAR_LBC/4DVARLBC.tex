@@ -326,6 +326,7 @@ M      Registry/Registry.wrfvar
 
 
 \section{Validation with single observation}
+\label{sec:single}
 Analysis increments due to a single observation produced by a data assimilation system implicitly provide the effective background error covariance matrix $\bm{\mathsf{B}}$ and describe how the tangent linear and adjoint model propagate the observational information , see \cite{Huang2009}. After any new capability for WRF 4D-Var system was developed, the single observation experiment is an effective and clean way to show the impact of the new capability on the analysis.
 As in Fig. 3 of \cite{Huang2009}, given a single temperature observation at the end of the time window of 4D-Var, we knew that the 4D-Var increments have a temporal dimension, the increments at 6 h give a graphic representation of the background error covariance matrix at 6 h, transformed by $\bm{\mathsf{MBM}}^T$. The $\bm{\mathsf{M}}$, $\bm{\mathsf{M}}^T$ are the WRF tangent linear and adjoint model respectively. For current WRF 4D-Var version, WRF is a regional model, and both initial condition and boundary condition determine the future trajectory of the model. Specifically, the trajectory of the 5-point boundary relaxation region is also depend on the tendency from lateral boundary condition. Therefore, in the 4D-Var, the observations close to or within the lateral boundary relaxation region should not only impact the initial condition but also the boundary condition.
 To illustrate and verify the correctness of the new capability of adding lateral boundary condition (LBC) into the control variable in 4D-Var, we design 2 single observation experiments similar to that in paper \cite{Huang2009}: The first experiment has a single observation at 6 h, which is far from the lateral boundary and the tendency from LBC should have trivial or no impact on the observation location at 6 h, which means assimilating this observation either with or without LBC control should make little/no difference on the analysis at 0 h; The second experiment also has a single observation at 6 h, but close to the lateral boundary and the tendency from LBC should have significant impact on the observation location at 6 h, which means assimilating this observation with or without LBC control should make big difference on the analysis at 0 h.
@@ -359,7 +360,8 @@ We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{
 \noindent\includegraphics[width=19pc, viewport=40 100 600 730, clip]{./figures/boundary_lbc}}
 \caption{0 hour potential temperature perturbation.}\label{fig:boundary_0h}
 \end{figure}
-\begin{figure}[htp]
+
+\begin{figure}[t]
 \begin{center}
 \noindent\includegraphics[width=39pc, viewport=20 50 580 750, clip]{./figures/boundary_6h}
 \end{center}
@@ -373,11 +375,11 @@ We moved the single temperature observation at 0600 UTC to $28\,^{\circ}\mathrm{
 Above two experiments also confirm the correctness of implementation of the LBC control in minimization.   
 
 \section{Real case}
-We randomly pick up the period from July 15 to July 18, 2005 of the Typhoon Haitang case. It is the same case as \cite{Huang2009}, in which detail information about the case configuration can be found. We run the 4D-Var as well as the subsequent 24 hours forecast every 12 hours.
+We randomly pick up the period from April 1 to 5, 2008 of the CONUS domain. The domain size is $43\times31\times28$, grid distance is $135km$. We run the 4D-Var as well as the subsequent 24 hours forecast every 12 hours.
 
-Unlike the single observation experiment, in which the minimization can converge in 1-3 iterations, in real case, there are so many observational data distributed in the three-dimensional model space and along the time window, moreover, the number of iteration of real case is usually more than 50, which will spread the impact of LBC control all over the domain, the impact of LBC control can not be easily identified by the analysis increments as what we did in section 4.
+Unlike the single observation experiment, in which the minimization can converge in 1-3 iterations, in real case, there are so many observational data distributed in the three-dimensional model space and along the time window, moreover, the number of iteration of real case is usually more than 50, which will spread the impact of LBC control all over the domain, the impact of LBC control can not be easily identified by the analysis increments as what we did in section \ref{sec:single}.
 
-From the discussion in section 4, we know that the minimization will produce fake or overestimated analysis increments to fit the downstream observations close to boundary relaxation region if LBC were not include in the minimization. Additionally including LBC in minimization will reduce the fake or overestimated analysis increments in IC, because some of the analysis response due to the observations close to boundary will be redirected to LBC increments.  The IC analysis increments combining with the LBC increments will produce a better observation fitting. In general senses, we could expect that the experiments with LBC control should end with a smaller $J_b$ and $J_o$ than which in experiments without LBC control. Note: This expectation should only be treated as a high probability phenomenon, it is not a definite conclusion since the $J_b$ and $J_o$ are the mixed and together index of the changes of the background.  Table \ref{t1} list the final $J_b$ and $J_o$ in each experiments. The red numbers in Tab. \ref{t1} are two exceptions , all other cases confirm our expectation. Especially, all $J_o$ with LBC control become smaller, which means that during the 6-hour time window, the new model trajectory fits observations better than which without LBC control. 
+From the discussion in section \ref{sec:single}, we know that the minimization will produce fake or overestimated analysis increments to fit the downstream observations close to boundary relaxation region if LBC were not include in the minimization. Additionally including LBC in minimization will reduce the fake or overestimated analysis increments in IC, because some of the analysis response due to the observations close to boundary will be redirected to LBC increments.  The IC analysis increments combining with the LBC increments will produce a better observation fitting. In general senses, we could expect that the experiments with LBC control should end with a smaller $J_b$ and $J_o$ than which in experiments without LBC control. Note: This expectation should only be treated as a high probability phenomenon, it is not a definite conclusion since the $J_b$ and $J_o$ are the mixed and together index of the changes of the background.  Table \ref{t1} list the final $J_b$ and $J_o$ in each experiments. The red numbers in Tab. \ref{t1} are two exceptions , all other cases confirm our expectation. Especially, all $J_o$ with LBC control become smaller, which means that during the 6-hour time window, the new model trajectory fits observations better than which without LBC control. 
 \begin{table}[t]
 \caption{Final $J_b$ and $J_o$ comparison.}\label{t1}
 \begin{center}
@@ -399,7 +401,27 @@ Date & w LBC & w/o LBC &  w LBC &  w/o LBC\\
 \end{center}
 \end{table}
 
-Next, we will show the verification scores of the 6--24 hour forecast upon the observations.
+Next, we will show the verification scores of the 12 and 24 hour forecast upon the observations. Fig.~\ref{fig:bias_12h} and Fig.~\ref{fig:bias_24h} are the bias profiles of the 12 and 24 hours forecast verify against the observations. Basically, the verification results are quite mixed, it is hard to decide which experiment is better than other one since the period of experiments is very limited. According to the personal communication with the developers of HIRLAM system, the improvement due to the LBC control is very trivial and unnoticeable even in a long time operational parallel experiments. Therefore, long time parallel run is needed to evaluate the impact of the LBC control on the forecast.
+\begin{figure}[t]
+\begin{center}
+\noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_BIAS_12}
+\end{center}
+\caption{12 hour bias profiles of forecast verified against observations. \textcolor{blue}{Blue} lines is the experiments with LBC control;  \textcolor{red}{Red} lines is the experiments without LBC control.}
+\label{fig:bias_12h}
+\end{figure}
+
+\begin{figure}[t]
+\begin{center}
+\noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_BIAS_24}
+\end{center}
+\caption{24 hour bias profiles of forecast verified against observations. \textcolor{blue}{Blue} lines is the experiments with LBC control;  \textcolor{red}{Red} lines is the experiments without LBC control.}
+\label{fig:bias_24h}
+\end{figure}
+
+\section{Future works}
+
+In current WRF/WRFDA configuration, there is a boundary updating procedure between data assimilation and the subsequent forecast because the data assimilation will changes the initial condition which lead to the changes in the boundary tendency from 0 to 6 hour. Once the LBC of the time window was included in the 4DVar minimization, the tendency of the 0--6 hour LBC  will be updated automatically after the analysis, which also means the state at the end of the time window will be changed too. Then, not only the 0--6 hour LBC tendency should be updated, the 6--12 hour LBC tendency should be updated, this capability should be developed.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ACKNOWLEDGMENTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
