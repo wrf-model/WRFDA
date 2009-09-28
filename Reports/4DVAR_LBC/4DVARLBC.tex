@@ -401,7 +401,7 @@ Date & w LBC & w/o LBC &  w LBC &  w/o LBC\\
 \end{center}
 \end{table}
 
-Next, we will show the verification scores of the 12 and 24 hour forecast upon the observations. Fig.~\ref{fig:bias_12h} and Fig.~\ref{fig:bias_24h} are the bias profiles of the 12 and 24 hours forecast verify against the observations. Basically, the verification results are quite mixed, it is hard to decide which experiment is better than other one since the period of experiments is very limited. According to the personal communication with the developers of HIRLAM system, the improvement due to the LBC control is very trivial and unnoticeable even in a long time operational parallel experiments. Therefore, long time parallel run is needed to evaluate the impact of the LBC control on the forecast.
+Next, we will show the verification scores of the 12 and 24 hour forecast upon the observations. Fig.~\ref{fig:bias_12h}, ~\ref{fig:rmse_12h} and Fig.~\ref{fig:bias_24h}, ~\ref{fig:rmse_24h} are the BIAS and RMSE profiles of the 12 and 24 hours forecast verified against the observations respectively. Basically, the verification results are quite mixed, even the 24 hour V component forecast with LBC control shows some degrade. It is hard to make a definite conclusion of which experiment is better since the period of experiments is very limited. According to the personal communication with the developers of HIRLAM system, the improvement due to the LBC control is very trivial and unnoticeable even in a long time operational parallel experiments. Therefore, long time parallel run is needed to evaluate the impact of the LBC control on the forecast.
 \begin{figure}[t]
 \begin{center}
 \noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_BIAS_12}
@@ -412,11 +412,28 @@ Next, we will show the verification scores of the 12 and 24 hour forecast upon t
 
 \begin{figure}[t]
 \begin{center}
+\noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_RMSE_12}
+\end{center}
+\caption{12 hour RMSE profiles of forecast verified against observations. \textcolor{blue}{Blue} lines is the experiments with LBC control;  \textcolor{red}{Red} lines is the experiments without LBC control.}
+\label{fig:rmse_12h}
+\end{figure}
+
+\begin{figure}[t]
+\begin{center}
 \noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_BIAS_24}
 \end{center}
 \caption{24 hour bias profiles of forecast verified against observations. \textcolor{blue}{Blue} lines is the experiments with LBC control;  \textcolor{red}{Red} lines is the experiments without LBC control.}
 \label{fig:bias_24h}
 \end{figure}
+
+\begin{figure}[t]
+\begin{center}
+\noindent\includegraphics[width=39pc, viewport=20 250 580 750, clip]{./figures/Profile_RMSE_24}
+\end{center}
+\caption{24 hour RMSE profiles of forecast verified against observations. \textcolor{blue}{Blue} lines is the experiments with LBC control;  \textcolor{red}{Red} lines is the experiments without LBC control.}
+\label{fig:rmse_24h}
+\end{figure}
+
 
 \section{Future works}
 
