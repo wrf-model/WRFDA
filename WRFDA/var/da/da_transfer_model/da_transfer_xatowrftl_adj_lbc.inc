@@ -35,14 +35,7 @@ subroutine da_transfer_xatowrftl_adj_lbc(grid, config_flags, filnam)
    ! [7.0] Adjoint of outPUT (inPUT)
    !---------------------------------------------------------------------------
 
-   ndynopt      = grid%dyn_opt
-   grid%dyn_opt = DYN_EM_AD
-   call nl_set_dyn_opt (1 , DYN_EM_AD)
-
-   call da_med_initialdata_input_lbc(grid , config_flags, filnam)
-
-   grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt (1 , DYN_EM)
+   call da_med_boundary_input(grid , config_flags, "wrfbdy_ad01")
 
    !---------------------------------------------------------------------------
    ! [6.5] Add adjoint from LBC

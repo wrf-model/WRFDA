@@ -16,6 +16,10 @@ export WORK_DIR=$RUN_DIR/working
 if [[ ! -d $DAT_DIR ]]; then mkdir $DAT_DIR; fi
 if [[ ! -d $RTOBS_DIR ]]; then mkdir $RTOBS_DIR; fi
 
+if [[ $NL_USE_FOR == 4DVAR ]]; then
+   export OBS_FREQ=3
+fi
+
 echo "<HTML><HEAD><TITLE>$EXPT restore_data_rtobs</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
 

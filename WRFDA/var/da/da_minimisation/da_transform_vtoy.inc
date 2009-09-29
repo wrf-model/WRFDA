@@ -45,6 +45,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, vp6, vv6, xbx, &
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
+      call da_system("ncks -A wrfinput_d01 tl01")
       if (var4d_lbc) then
           call da_med_initialdata_input( grid , config_flags, &
              'fg07')

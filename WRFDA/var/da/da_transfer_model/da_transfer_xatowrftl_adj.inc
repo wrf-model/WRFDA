@@ -14,7 +14,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
 
    ! Local variables
 
-   integer :: i, j, k
+   integer :: i, j, k, bid, ierr
    real    :: sdmd, s1md
    real    :: rho_cgrid
 
@@ -35,16 +35,12 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    ! [7.0] Adjoint of outPUT (inPUT)
    !---------------------------------------------------------------------------
 
-   ndynopt      = grid%dyn_opt
-   grid%dyn_opt = DYN_EM_AD
-   call nl_set_dyn_opt (1 , DYN_EM_AD)
-
-   call da_med_initialdata_input(grid , config_flags, filnam)
-
-   grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt (1 , DYN_EM)
+   call da_med_hist_in6 (grid , config_flags, filnam)
 
    if (var4d_lbc) then
+
+      call da_med_boundary_input (grid , config_flags, "wrfbdy_ad01")
+
    !---------------------------------------------------------------------------
    ! [6.5] Add adjoint from LBC
    !---------------------------------------------------------------------------

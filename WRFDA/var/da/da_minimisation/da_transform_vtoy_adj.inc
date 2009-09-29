@@ -130,9 +130,6 @@ subroutine da_transform_vtoy_adj(iter, cv_size, &
          call da_setup_firstguess( xbx_tmp, grid, config_flags)
       end if
 
-      if (num_fgat_time > 1) then ! Recover the firstguess fields touched by reading gr01
-         call da_med_initialdata_input( grid , config_flags, 'fg')
-      end if
    else  ! not var4d
       iv%info(:)%n1 = 1
       iv%info(:)%n2 = iv%info(:)%nlocal

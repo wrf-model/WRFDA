@@ -295,14 +295,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
    ! [7.0] output
    !---------------------------------------------------------------------------
 
-   ndynopt      = grid%dyn_opt
-   grid%dyn_opt = DYN_EM_TL
-   call nl_set_dyn_opt (1 , DYN_EM_TL)
-
-   call da_med_initialdata_output(grid , config_flags, filnam)
-
-   grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt (1 , DYN_EM)
+   call da_med_hist_out4(grid , config_flags, filnam)
 
    if (trace_use) call da_trace_exit("da_transfer_xatowrftl")
 

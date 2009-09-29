@@ -36,14 +36,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
 
    allocate (g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme))
 
-   ndynopt      = grid%dyn_opt
-   grid%dyn_opt = DYN_EM_TL
-   call nl_set_dyn_opt (1 , DYN_EM_TL)
-
-   call da_med_initialdata_input(grid , config_flags, filnam)
-
-   grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt (1 , DYN_EM)
+   call da_med_hist_in4(grid , config_flags, filnam)
 
    !---------------------------------------------------------------------------
    ! [1.0] Get the specific humidity increments from mixing ratio increments

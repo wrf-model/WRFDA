@@ -12,8 +12,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
    character(*),  intent (in)                 :: filename
    character(*),  intent (in),  optional      :: in_date
 
-   integer                 :: fid , bid, status, n, nsave
-   character(len=80)                          :: in_name
+   integer                 :: fid , status, n, nsave
 
    integer :: julyr, julday
    real    :: gmt
@@ -103,20 +102,6 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   if (trim(filename) .eq. 'gr01'.and. var4d_lbc) then
-      
-      in_name = 'wrfbdy_ad01'
-      call open_r_dataset (bid, trim(in_name), grid , config_flags , &
-         "DATASET=BOUNDARY", ierr)
-
-      if (ierr .NE. 0) then
-         write(unit=message(1),fmt='(A,A,A,I5)') 'Error opening ', &
-           trim(in_name),' for reading ierr=',ierr
-         call da_error(__FILE__,__LINE__,message(1:1))
-      end if
-
-   end if
-
    if (present(in_date)) then
       do n=1, nsave
          call da_message((/"current_date="//current_date// &
@@ -128,12 +113,6 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
    call input_model_input (fid ,   grid , config_flags , ierr)
 
    call close_dataset (fid , config_flags , "DATASET=INPUT")
-
-   if (trim(filename) .eq. 'gr01'.and. var4d_lbc) then
-      call input_boundary (bid ,   grid , config_flags , ierr)
-
-      call close_dataset (bid , config_flags , "DATASET=BOUNDARY")
-   end if
 
    if (trace_use) call da_trace_exit("da_med_initialdata_input")
 

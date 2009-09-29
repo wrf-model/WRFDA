@@ -48,29 +48,65 @@ else
 fi
 
 export FCST_RANGE_SAVE=$FCST_RANGE
-export FCST_RANGE=-$MAX_OB_RANGE
-. $SCRIPTS_DIR/da_get_date_range.ksh
-export TIME_WINDOW_MIN=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
-export FCST_RANGE=$MAX_OB_RANGE
-. $SCRIPTS_DIR/da_get_date_range.ksh
-export TIME_WINDOW_MAX=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
-export FCST_RANGE=0
-. $SCRIPTS_DIR/da_get_date_range.ksh
-export TIME_ANALYSIS=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
-export FCST_RANGE=$FCST_RANGE_SAVE
 
-export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
-
-
-if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
-   # If compressed, unpack
-   if $DUMMY; then
-      touch ${OB_FILE}
-   else
+if [[ ${NL_USE_FOR} == 4DVAR ]]; then
+   export FCST_RANGE=0
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_WINDOW_MIN=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
+   export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
+   if [[ -f $RTOBS_DIR/${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}/${OB_FILE}.gz ]]; then
       cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
       gunzip -f ${OB_FILE}.gz
    fi
+
+   export FCST_RANGE=`expr $MAX_OB_RANGE \+ $MAX_OB_RANGE`
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_WINDOW_MAX=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+   export OB_FILE1=obs.${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}
+   if [[ -f $RTOBS_DIR/${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}/${OB_FILE1}.gz ]]; then
+      cp $RTOBS_DIR/${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}/$OB_FILE1.gz .
+      gunzip -f ${OB_FILE1}.gz
+      cat ${OB_FILE1} >> ${OB_FILE}
+   fi
+
+   export FCST_RANGE=$MAX_OB_RANGE
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_ANALYSIS=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+   export OB_FILE2=obs.${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}
+   if [[ -f $RTOBS_DIR/${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}/${OB_FILE2}.gz ]]; then
+      cp $RTOBS_DIR/${END_YEAR}${END_MONTH}${END_DAY}${END_HOUR}/$OB_FILE2.gz .
+      gunzip -f ${OB_FILE2}.gz
+      cat ${OB_FILE2} >> ${OB_FILE}
+   fi
+
+else
+
+   export FCST_RANGE=-$MAX_OB_RANGE
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_WINDOW_MIN=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+
+   export FCST_RANGE=$MAX_OB_RANGE
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_WINDOW_MAX=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
+
+   export FCST_RANGE=0
+   . $SCRIPTS_DIR/da_get_date_range.ksh
+   export TIME_ANALYSIS=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
+   export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
+
+   if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
+      # If compressed, unpack
+      if $DUMMY; then
+         touch ${OB_FILE}
+      else
+         cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
+         gunzip -f ${OB_FILE}.gz
+      fi
+   fi
+
 fi
+
+export FCST_RANGE=$FCST_RANGE_SAVE
 
 if [[ ${NL_USE_FOR} == FGAT ]]; then
 
