@@ -76,8 +76,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=jts,jte
          do i=1, grid%spec_bdy_width
-            grid%a_u_2(i,j,k) = grid%a_u_2(i,j,k) + grid%jlbc_gama*(grid%a_u_bxs(j,k,i) - grid%a_u_btxs(j,k,i)/21600.)*muu(i,j)/grid%msfu(i,j)
-            grid%a_u_2(ite-grid%spec_bdy_width+1+i,j,k) = grid%a_u_2(ite-grid%spec_bdy_width+1+i,j,k) + grid%jlbc_gama*(grid%a_u_bxe(j,k,i) - grid%a_u_btxe(j,k,i)/21600.)* &
+            grid%a_u_2(i,j,k) = grid%a_u_2(i,j,k) + (grid%a_u_bxs(j,k,i) - grid%a_u_btxs(j,k,i)/21600.)*muu(i,j)/grid%msfu(i,j)
+            grid%a_u_2(ite-grid%spec_bdy_width+1+i,j,k) = grid%a_u_2(ite-grid%spec_bdy_width+1+i,j,k) + (grid%a_u_bxe(j,k,i) - grid%a_u_btxe(j,k,i)/21600.)* &
                                                           muu(ite-grid%spec_bdy_width+1+i,j)/grid%msfu(ite-grid%spec_bdy_width+1+i,j)
          end do
       end do
@@ -89,8 +89,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=1,grid%spec_bdy_width
          do i=its,ite+1
-            grid%a_u_2(i,j,k) = grid%a_u_2(i,j,k) + grid%jlbc_gama*(grid%a_u_bys(i,k,j) - grid%a_u_btys(i,k,j)/21600.)*muu(i,j)/grid%msfu(i,j)
-            grid%a_u_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_u_2(i,jte-grid%spec_bdy_width+j,k) + grid%jlbc_gama*(grid%a_u_bye(i,k,j) - grid%a_u_btye(i,k,j)/21600.)* &
+            grid%a_u_2(i,j,k) = grid%a_u_2(i,j,k) + (grid%a_u_bys(i,k,j) - grid%a_u_btys(i,k,j)/21600.)*muu(i,j)/grid%msfu(i,j)
+            grid%a_u_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_u_2(i,jte-grid%spec_bdy_width+j,k) + (grid%a_u_bye(i,k,j) - grid%a_u_btye(i,k,j)/21600.)* &
                                                         muu(i,jte-grid%spec_bdy_width+j)/grid%msfu(i,jte-grid%spec_bdy_width+j)
          end do
       end do
@@ -105,8 +105,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=jts,jte+1
          do i=1, grid%spec_bdy_width
-            grid%a_v_2(i,j,k) = grid%a_v_2(i,j,k) + grid%jlbc_gama*(grid%a_v_bxs(j,k,i) - grid%a_v_btxs(j,k,i)/21600.)*muv(i,j)/grid%msfv(i,j)
-            grid%a_v_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_v_2(ite-grid%spec_bdy_width+i,j,k) + grid%jlbc_gama*(grid%a_v_bxe(j,k,i) - grid%a_v_btxe(j,k,i)/21600.)* &
+            grid%a_v_2(i,j,k) = grid%a_v_2(i,j,k) + (grid%a_v_bxs(j,k,i) - grid%a_v_btxs(j,k,i)/21600.)*muv(i,j)/grid%msfv(i,j)
+            grid%a_v_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_v_2(ite-grid%spec_bdy_width+i,j,k) + (grid%a_v_bxe(j,k,i) - grid%a_v_btxe(j,k,i)/21600.)* &
                                                         muv(ite-grid%spec_bdy_width+i,j)/grid%msfv(ite-grid%spec_bdy_width+i,j)
          end do
       end do
@@ -118,8 +118,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=1, grid%spec_bdy_width
          do i=its,ite
-            grid%a_v_2(i,j,k) = grid%a_v_2(i,j,k) + grid%jlbc_gama*(grid%a_v_bys(i,k,j) - grid%a_v_btys(i,k,j)/21600.)*muv(i,j)/grid%msfv(i,j)
-            grid%a_v_2(i,jte-grid%spec_bdy_width+1+j,k) = grid%a_v_2(i,jte-grid%spec_bdy_width+1+j,k) + grid%jlbc_gama*(grid%a_v_bye(i,k,j) - grid%a_v_btye(i,k,j)/21600.)* &
+            grid%a_v_2(i,j,k) = grid%a_v_2(i,j,k) + (grid%a_v_bys(i,k,j) - grid%a_v_btys(i,k,j)/21600.)*muv(i,j)/grid%msfv(i,j)
+            grid%a_v_2(i,jte-grid%spec_bdy_width+1+j,k) = grid%a_v_2(i,jte-grid%spec_bdy_width+1+j,k) + (grid%a_v_bye(i,k,j) - grid%a_v_btye(i,k,j)/21600.)* &
                                                           muv(i,jte-grid%spec_bdy_width+1+j)/grid%msfv(i,jte-grid%spec_bdy_width+1+j)
          end do
       end do
@@ -134,8 +134,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=jts,jte
          do i=1,grid%spec_bdy_width
-            grid%a_t_2(i,j,k) = grid%a_t_2(i,j,k) + grid%jlbc_gama*(grid%a_t_bxs(j,k,i) - grid%a_t_btxs(j,k,i)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_t_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_t_2(ite-grid%spec_bdy_width+i,j,k) + grid%jlbc_gama*(grid%a_t_bxe(j,k,i) - grid%a_t_btxe(j,k,i)/21600.) * &
+            grid%a_t_2(i,j,k) = grid%a_t_2(i,j,k) + (grid%a_t_bxs(j,k,i) - grid%a_t_btxs(j,k,i)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_t_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_t_2(ite-grid%spec_bdy_width+i,j,k) + (grid%a_t_bxe(j,k,i) - grid%a_t_btxe(j,k,i)/21600.) * &
                                                         (grid%mu_2(ite-grid%spec_bdy_width+i,j)+grid%mub(ite-grid%spec_bdy_width+i,j))
          end do
       end do
@@ -147,8 +147,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=1, grid%spec_bdy_width
          do i=its,ite
-            grid%a_t_2(i,j,k) = grid%a_t_2(i,j,k) + grid%jlbc_gama*(grid%a_t_bys(i,k,j) - grid%a_t_btys(i,k,j)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_t_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_t_2(i,jte-grid%spec_bdy_width+j,k) + grid%jlbc_gama*(grid%a_t_bye(i,k,j) - grid%a_t_btye(i,k,j)/21600.) * &
+            grid%a_t_2(i,j,k) = grid%a_t_2(i,j,k) + (grid%a_t_bys(i,k,j) - grid%a_t_btys(i,k,j)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_t_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_t_2(i,jte-grid%spec_bdy_width+j,k) + (grid%a_t_bye(i,k,j) - grid%a_t_btye(i,k,j)/21600.) * &
                                                         (grid%mu_2(i,jte-grid%spec_bdy_width+j)+grid%mub(i,jte-grid%spec_bdy_width+j))
          end do
       end do
@@ -163,8 +163,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=jts,jte
          do i=1, grid%spec_bdy_width
-            grid%a_ph_2(i,j,k) = grid%a_ph_2(i,j,k) + grid%jlbc_gama*(grid%a_ph_bxs(j,k,i) - grid%a_ph_btxs(j,k,i)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_ph_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_ph_2(ite-grid%spec_bdy_width+i,j,k) + grid%jlbc_gama*(grid%a_ph_bxe(j,k,i) - grid%a_ph_btxe(j,k,i)/21600.)* &
+            grid%a_ph_2(i,j,k) = grid%a_ph_2(i,j,k) + (grid%a_ph_bxs(j,k,i) - grid%a_ph_btxs(j,k,i)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_ph_2(ite-grid%spec_bdy_width+i,j,k) = grid%a_ph_2(ite-grid%spec_bdy_width+i,j,k) + (grid%a_ph_bxe(j,k,i) - grid%a_ph_btxe(j,k,i)/21600.)* &
                                                          (grid%mu_2(ite-grid%spec_bdy_width+i,j)+grid%mub(ite-grid%spec_bdy_width+i,j))
          end do
       end do
@@ -176,8 +176,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=1, grid%spec_bdy_width
          do i=its,ite
-            grid%a_ph_2(i,j,k) = grid%a_ph_2(i,j,k) + grid%jlbc_gama*(grid%a_ph_bys(i,k,j) - grid%a_ph_btys(i,k,j)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_ph_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_ph_2(i,jte-grid%spec_bdy_width+j,k) + grid%jlbc_gama*(grid%a_ph_bye(i,k,j) - grid%a_ph_btye(i,k,j)/21600.)* &
+            grid%a_ph_2(i,j,k) = grid%a_ph_2(i,j,k) + (grid%a_ph_bys(i,k,j) - grid%a_ph_btys(i,k,j)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_ph_2(i,jte-grid%spec_bdy_width+j,k) = grid%a_ph_2(i,jte-grid%spec_bdy_width+j,k) + (grid%a_ph_bye(i,k,j) - grid%a_ph_btye(i,k,j)/21600.)* &
                                                          (grid%mu_2(i,jte-grid%spec_bdy_width+j)+grid%mub(i,jte-grid%spec_bdy_width+j))
          end do
       end do
@@ -191,8 +191,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
 
    do j=jts,jte
       do i=1, grid%spec_bdy_width
-         grid%a_mu_2(i,j) = grid%a_mu_2(i,j) + grid%jlbc_gama*(grid%a_mu_bxs(j,1,i) - grid%a_mu_btxs(j,1,i)/21600.)
-         grid%a_mu_2(ite-grid%spec_bdy_width+i,j) = grid%a_mu_2(ite-grid%spec_bdy_width+i,j) + grid%jlbc_gama*(grid%a_mu_bxe(j,1,i) - grid%a_mu_btxe(j,1,i)/21600.)
+         grid%a_mu_2(i,j) = grid%a_mu_2(i,j) + (grid%a_mu_bxs(j,1,i) - grid%a_mu_btxs(j,1,i)/21600.)
+         grid%a_mu_2(ite-grid%spec_bdy_width+i,j) = grid%a_mu_2(ite-grid%spec_bdy_width+i,j) + (grid%a_mu_bxe(j,1,i) - grid%a_mu_btxe(j,1,i)/21600.)
       end do
    end do
    grid%a_mu_bxs = 0.0
@@ -201,8 +201,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    grid%a_mu_btxe = 0.0
    do j=1,grid%spec_bdy_width
       do i=its,ite
-         grid%a_mu_2(i,j) = grid%a_mu_2(i,j) + grid%jlbc_gama*(grid%a_mu_bys(i,1,j) - grid%a_mu_btys(i,1,j)/21600.)
-         grid%a_mu_2(i,jte-grid%spec_bdy_width+j) = grid%a_mu_2(i,jte-grid%spec_bdy_width+j) - grid%jlbc_gama*(grid%a_mu_bye(i,1,j) - grid%a_mu_btye(i,1,j)/21600.)
+         grid%a_mu_2(i,j) = grid%a_mu_2(i,j) + (grid%a_mu_bys(i,1,j) - grid%a_mu_btys(i,1,j)/21600.)
+         grid%a_mu_2(i,jte-grid%spec_bdy_width+j) = grid%a_mu_2(i,jte-grid%spec_bdy_width+j) - (grid%a_mu_bye(i,1,j) - grid%a_mu_btye(i,1,j)/21600.)
       end do
    end do
    grid%a_mu_bys = 0.0
@@ -215,8 +215,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=jts,jte
          do i=1, grid%spec_bdy_width
-            grid%a_moist(i,j,k,P_A_QV) = grid%a_moist(i,j,k,P_A_QV) + grid%jlbc_gama*(grid%a_moist_bxs(j,k,i,P_A_QV) - grid%a_moist_btxs(j,k,i,P_A_QV)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_moist(ite-grid%spec_bdy_width+i,j,k,P_A_QV) = grid%a_moist(ite-grid%spec_bdy_width+i,j,k,P_A_QV) + grid%jlbc_gama*(grid%a_moist_bxe(j,k,i,P_A_QV) - grid%a_moist_btxe(j,k,i,P_A_QV)/21600.)* &
+            grid%a_moist(i,j,k,P_A_QV) = grid%a_moist(i,j,k,P_A_QV) + (grid%a_moist_bxs(j,k,i,P_A_QV) - grid%a_moist_btxs(j,k,i,P_A_QV)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_moist(ite-grid%spec_bdy_width+i,j,k,P_A_QV) = grid%a_moist(ite-grid%spec_bdy_width+i,j,k,P_A_QV) + (grid%a_moist_bxe(j,k,i,P_A_QV) - grid%a_moist_btxe(j,k,i,P_A_QV)/21600.)* &
                                                                  (grid%mu_2(ite-grid%spec_bdy_width+i,j)+grid%mub(ite-grid%spec_bdy_width+i,j))
          end do
       end do
@@ -228,8 +228,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=kts,kte
       do j=1,grid%spec_bdy_width
          do i=its,ite
-            grid%a_moist(i,j,k,P_A_QV) = grid%a_moist(i,j,k,P_A_QV) + grid%jlbc_gama*(grid%a_moist_bys(i,k,j,P_A_QV) - grid%a_moist_btys(i,k,j,P_A_QV)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
-            grid%a_moist(i,jte-grid%spec_bdy_width+j,k,P_A_QV) = grid%a_moist(i,jte-grid%spec_bdy_width+j,k,P_A_QV) + grid%jlbc_gama*(grid%a_moist_bye(i,k,j,P_A_QV) - grid%a_moist_btye(i,k,j,P_A_QV)/21600.)* &
+            grid%a_moist(i,j,k,P_A_QV) = grid%a_moist(i,j,k,P_A_QV) + (grid%a_moist_bys(i,k,j,P_A_QV) - grid%a_moist_btys(i,k,j,P_A_QV)/21600.)*(grid%mu_2(i,j)+grid%mub(i,j))
+            grid%a_moist(i,jte-grid%spec_bdy_width+j,k,P_A_QV) = grid%a_moist(i,jte-grid%spec_bdy_width+j,k,P_A_QV) + (grid%a_moist_bye(i,k,j,P_A_QV) - grid%a_moist_btye(i,k,j,P_A_QV)/21600.)* &
                                                                  (grid%mu_2(i,jte-grid%spec_bdy_width+j)+grid%mub(i,jte-grid%spec_bdy_width+j))
          end do
       end do

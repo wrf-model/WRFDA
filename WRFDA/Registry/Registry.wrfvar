@@ -1300,6 +1300,7 @@ rconfig   real      len_scaling3            namelist,wrfvar7  1  1.0      - "len
 rconfig   real      len_scaling4            namelist,wrfvar7  1  1.0      - "len_scaling4"             ""  ""
 rconfig   real      len_scaling5            namelist,wrfvar7  1  1.0      - "len_scaling5"             ""  ""
 rconfig   real      je_factor               namelist,wrfvar7  1  1.0      - "je_factor"                ""  ""
+rconfig   real      jl_factor               namelist,wrfvar7  1  1.0      - "jl_factor"                ""  ""
 rconfig   real      power_truncation        namelist,wrfvar7  1  1.0      - "power_truncation"         ""  ""
 
 rconfig   logical   def_sub_domain          namelist,wrfvar8  1  .false.  - "def_sub_domain"           ""  ""
@@ -1437,7 +1438,6 @@ rconfig   real    jcdfi_error_wind          namelist,wrfvar23     1             
 rconfig   real    jcdfi_error_t             namelist,wrfvar23     1              1.      rh   "jcdfi_error_t"    "Temp. Error for JcDFI"      "K"
 rconfig   real    jcdfi_error_q             namelist,wrfvar23     1              0.001   rh   "jcdfi_error_q"    "Moist Error for JcDFI"      "kg/kg"
 rconfig   real    jcdfi_error_mu            namelist,wrfvar23     1              1000.   rh   "jcdfi_error_mu"    "Pert. Pres. Error for JcDFI"      "Pa"
-rconfig   real    jlbc_gama                 namelist,wrfvar23     1              1.      rh   "jlbc_gama"    "Weighting for Jlbc"      ""
 
 # Time Control
 rconfig   integer run_days                namelist,time_control		1             0       irh   "run_days"              "NUMBER OF DAYS TO RUN"

@@ -170,9 +170,11 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
 
       cv_xhat_jl(1:cv_size_jl) = cv_jl(1:cv_size_jl) + xhat_jl(1:cv_size_jl)
 
-      j % jl = 0.5 * grid%jlbc_gama*da_dot_cv(cv_size_jl, cv_size_domain_jl, &
+      j % jl = 0.5 * da_dot_cv(cv_size_jl, cv_size_domain_jl, &
           cv_xhat_jl, cv_xhat_jl, grid, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+
+      j % jl = jl_factor * j % jl
 
    endif
 
