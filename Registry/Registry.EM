@@ -1144,8 +1144,9 @@ rconfig   real    seaice_threshold        namelist,physics	1            271     
 rconfig   integer dyn_opt                 namelist,dynamics	1             1       irh   "dyn_opt"               ""      ""
 rconfig   real    tl_perturbation         namelist,dynamics	1             1       irh   "tl_perturbation"       ""      ""
 rconfig   logical disable_solver          namelist,dynamics	1             .false. irh   "disable_solver"       ""      ""
-rconfig   integer rk_ord                  namelist,dynamics	1             3       irh   "rk_order"               ""      ""
-rconfig   integer w_damping               namelist,dynamics	1             0       irh    "w_damping"             ""      ""
+rconfig   logical stop_on_error           namelist,dynamics	1             .false. irh   "stop_on_error"        ""      ""
+rconfig   integer rk_ord                  namelist,dynamics	1             3       irh   "rk_order"             ""      ""
+rconfig   integer w_damping               namelist,dynamics	1             0       irh    "w_damping"           ""      ""
 # diff_opt 1=old diffusion, 2=new
 rconfig   integer diff_opt                namelist,dynamics	1             1       irh    "diff_opt"              ""      ""
 # km_opt   1=old coefs, 2=tke, 3=Smagorinksy
