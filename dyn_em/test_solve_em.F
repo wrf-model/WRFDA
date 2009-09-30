@@ -18,7 +18,7 @@ SUBROUTINE test_solve_em ( grid , config_flags , &
    USE module_model_constants
 ! Registry generated module
    USE module_state_description
-
+   
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
@@ -35,7 +35,6 @@ SUBROUTINE test_solve_em ( grid , config_flags , &
    TYPE (grid_config_rec_type) , INTENT(IN)          :: config_flags
 
    ! Local data
-
    INTEGER                         :: k_start , k_end, its, ite, jts, jte
    INTEGER                         :: ids , ide , jds , jde , kds , kde , &
                                       ims , ime , jms , jme , kms , kme , &
@@ -120,14 +119,18 @@ real                                     :: dtbc_save
 
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A, nsum
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
+   INTEGER, PARAMETER :: tladj_steps = 6    ! 090923 bp; to enable multiple steps in tladj test
+   LOGICAL :: stopOnError                   ! 090924 bp; halt program execution on tladj test failure
 
 !  Obtain dimension information stored in the grid data structure.
-  CALL get_ijk_from_grid (  grid ,                   &
+   CALL get_ijk_from_grid (  grid ,                   &
                             ids, ide, jds, jde, kds, kde,    &
                             ims, ime, jms, jme, kms, kme,    &
                             ips, ipe, jps, jpe, kps, kpe    )
 
 
+   CALL nl_get_stop_on_error( 1, stopOnError )
+ 
    its = grid%sp31-3 ; ite = grid%ep31+3
    kts = grid%sp32 ; kte = grid%ep32
    jts = grid%sp33-3 ; jte = grid%ep33+3
@@ -362,95 +365,94 @@ real                                     :: dtbc_save
 #endif
 
    ALPHA_M=1.
-   DO NT=1,11
+   test_loop: DO NT=1,11
 
-   ALPHA_M=0.1*ALPHA_M
-   FACTOR=1.+ALPHA_M
-   u_1 = FACTOR*S_u_1 
-   u_2 = FACTOR*S_u_2 
-   v_1 = FACTOR*S_v_1 
-   v_2 = FACTOR*S_v_2 
-   w_1 = FACTOR*S_w_1 
-   w_2 = FACTOR*S_w_2 
-   ph_1 = FACTOR*S_ph_1 
-   ph_2 = FACTOR*S_ph_2 
-   t_1 = FACTOR*S_t_1 
-   t_2 = FACTOR*S_t_2 
-   mu_1 = FACTOR*S_mu_1 
-   mu_2 = FACTOR*S_mu_2 
-   p = FACTOR*S_p 
-   al = FACTOR*S_al 
-   moist_1 = FACTOR*S_moist_1 
-   moist_2 = FACTOR*S_moist_2 
-   rainnc = FACTOR*S_rainnc
-   rainncv = FACTOR*S_rainncv
-   grid%dtbc = dtbc_save
+      ALPHA_M=0.1*ALPHA_M
+      FACTOR=1.+ALPHA_M
+      u_1 = FACTOR*S_u_1 
+      u_2 = FACTOR*S_u_2 
+      v_1 = FACTOR*S_v_1 
+      v_2 = FACTOR*S_v_2 
+      w_1 = FACTOR*S_w_1 
+      w_2 = FACTOR*S_w_2 
+      ph_1 = FACTOR*S_ph_1 
+      ph_2 = FACTOR*S_ph_2 
+      t_1 = FACTOR*S_t_1 
+      t_2 = FACTOR*S_t_2 
+      mu_1 = FACTOR*S_mu_1 
+      mu_2 = FACTOR*S_mu_2 
+      p = FACTOR*S_p 
+      al = FACTOR*S_al 
+      moist_1 = FACTOR*S_moist_1 
+      moist_2 = FACTOR*S_moist_2 
+      rainnc = FACTOR*S_rainnc
+      rainncv = FACTOR*S_rainncv
+      grid%dtbc = dtbc_save
 
-   CALL solve_em ( grid , config_flags , &
+      CALL solve_em ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
 !
-                    )
+                       )
 
-   z=0.; mudf=0. 
+      z=0.; mudf=0. 
 
-   VAL_N = 0.0
+      VAL_N = 0.0
 
-   do i=ifs,ife
-     do k=kts,kte
-       do j=jfs,jfe
-         VAL_N=VAL_N  + (u_1(i,k,j)  - B_u_1(i,k,j) ) *(u_1(i,k,j)  - B_u_1(i,k,j))     &
-                      + (u_2(i,k,j)  - B_u_2(i,k,j) ) *(u_2(i,k,j)  - B_u_2(i,k,j))     &
-                      + (v_1(i,k,j)  - B_v_1(i,k,j) ) *(v_1(i,k,j)  - B_v_1(i,k,j))     &
-                      + (v_2(i,k,j)  - B_v_2(i,k,j) ) *(v_2(i,k,j)  - B_v_2(i,k,j))     &
-                      + (w_1(i,k,j)  - B_w_1(i,k,j) ) *(w_1(i,k,j)  - B_w_1(i,k,j))     &
-                      + (w_2(i,k,j)  - B_w_2(i,k,j) ) *(w_2(i,k,j)  - B_w_2(i,k,j))     &
-                      + (ph_1(i,k,j)  - B_ph_1(i,k,j) ) *(ph_1(i,k,j)  - B_ph_1(i,k,j)) &
-                      + (ph_2(i,k,j)  - B_ph_2(i,k,j) ) *(ph_2(i,k,j)  - B_ph_2(i,k,j)) &
-                      + (t_1(i,k,j)  - B_t_1(i,k,j) ) *(t_1(i,k,j)  - B_t_1(i,k,j))     &
-                      + (t_2(i,k,j)  - B_t_2(i,k,j) ) *(t_2(i,k,j)  - B_t_2(i,k,j))     &
-                      + (p(i,k,j)  - B_p(i,k,j) ) *(p(i,k,j)  - B_p(i,k,j))     &
-                      + (al(i,k,j)  - B_al(i,k,j) ) *(al(i,k,j)  - B_al(i,k,j))     &
-                      + (z(i,k,j)  - B_z(i,k,j) ) *(z(i,k,j)  - B_z(i,k,j))     
-       enddo
-     enddo
-   enddo
+      do i=ifs,ife
+        do k=kts,kte
+          do j=jfs,jfe
+            VAL_N=VAL_N  + (u_1(i,k,j)  - B_u_1(i,k,j) ) *(u_1(i,k,j)  - B_u_1(i,k,j))     &
+                         + (u_2(i,k,j)  - B_u_2(i,k,j) ) *(u_2(i,k,j)  - B_u_2(i,k,j))     &
+                         + (v_1(i,k,j)  - B_v_1(i,k,j) ) *(v_1(i,k,j)  - B_v_1(i,k,j))     &
+                         + (v_2(i,k,j)  - B_v_2(i,k,j) ) *(v_2(i,k,j)  - B_v_2(i,k,j))     &
+                         + (w_1(i,k,j)  - B_w_1(i,k,j) ) *(w_1(i,k,j)  - B_w_1(i,k,j))     &
+                         + (w_2(i,k,j)  - B_w_2(i,k,j) ) *(w_2(i,k,j)  - B_w_2(i,k,j))     &
+                         + (ph_1(i,k,j)  - B_ph_1(i,k,j) ) *(ph_1(i,k,j)  - B_ph_1(i,k,j)) &
+                         + (ph_2(i,k,j)  - B_ph_2(i,k,j) ) *(ph_2(i,k,j)  - B_ph_2(i,k,j)) &
+                         + (t_1(i,k,j)  - B_t_1(i,k,j) ) *(t_1(i,k,j)  - B_t_1(i,k,j))     &
+                         + (t_2(i,k,j)  - B_t_2(i,k,j) ) *(t_2(i,k,j)  - B_t_2(i,k,j))     &
+                         + (p(i,k,j)  - B_p(i,k,j) ) *(p(i,k,j)  - B_p(i,k,j))     &
+                         + (al(i,k,j)  - B_al(i,k,j) ) *(al(i,k,j)  - B_al(i,k,j))     &
+                         + (z(i,k,j)  - B_z(i,k,j) ) *(z(i,k,j)  - B_z(i,k,j))     
+          enddo
+        enddo
+      enddo
 
-   do i=ifs,ife
-     do j=jfs,jfe
-       VAL_N=VAL_N  + (mu_1(i,j) -B_mu_1(i,j))*(mu_1(i,j) -B_mu_1(i,j))    &
-                    + (mu_2(i,j) -B_mu_2(i,j))*(mu_2(i,j) -B_mu_2(i,j))    &
-                    + (rainnc(i,j) -B_rainnc(i,j))*(rainnc(i,j) -B_rainnc(i,j))  &
-                    + (rainncv(i,j) -B_rainncv(i,j))*(rainncv(i,j)-B_rainncv(i,j))  &
-                    + (mudf(i,j) -B_mudf(i,j))*(mudf(i,j) -B_mudf(i,j))  
-     enddo
-   enddo
+      do i=ifs,ife
+        do j=jfs,jfe
+          VAL_N=VAL_N  + (mu_1(i,j) -B_mu_1(i,j))*(mu_1(i,j) -B_mu_1(i,j))    &
+                       + (mu_2(i,j) -B_mu_2(i,j))*(mu_2(i,j) -B_mu_2(i,j))    &
+                       + (rainnc(i,j) -B_rainnc(i,j))*(rainnc(i,j) -B_rainnc(i,j))  &
+                       + (rainncv(i,j) -B_rainncv(i,j))*(rainncv(i,j)-B_rainncv(i,j))  &
+                       + (mudf(i,j) -B_mudf(i,j))*(mudf(i,j) -B_mudf(i,j))  
+        enddo
+      enddo
 
-   do i=ifs,ife
-     do k=kts,kte
-       do j=jfs,jfe
-         do h=1,num_moist
-           VAL_N=VAL_N  + (moist_1(i,k,j,h) -B_moist_1(i,k,j,h))*(moist_1(i,k,j,h) -B_moist_1(i,k,j,h))  &
-                        + (moist_2(i,k,j,h) -B_moist_2(i,k,j,h))*(moist_2(i,k,j,h) -B_moist_2(i,k,j,h))
-         enddo
-       enddo
-     enddo
-   enddo
+      do i=ifs,ife
+        do k=kts,kte
+          do j=jfs,jfe
+            do h=1,num_moist
+              VAL_N=VAL_N  + (moist_1(i,k,j,h) -B_moist_1(i,k,j,h))*(moist_1(i,k,j,h) -B_moist_1(i,k,j,h))  &
+                           + (moist_2(i,k,j,h) -B_moist_2(i,k,j,h))*(moist_2(i,k,j,h) -B_moist_2(i,k,j,h))
+            enddo
+          enddo
+        enddo
+      enddo
 
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
-                       comm, IERROR )
-   VAL_N = nsum
+      call MPI_ALLREDUCE( VAL_N, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
+                          comm, IERROR )
+      VAL_N = nsum
 #endif
 
-   VAL_L=SAVE_L*ALPHA_M**2
-   COEF=VAL_N/VAL_L
-   WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
-        'g_em_sn: ALPHA_M=',ALPHA_M,'  COEF=',COEF, &
-        '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+      VAL_L=SAVE_L*ALPHA_M**2
+      COEF=VAL_N/VAL_L
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+           'g_em_sn: ALPHA_M=',ALPHA_M,'  COEF=',COEF, &
+           '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
 
-   ENDDO
-
+   ENDDO test_loop   ! end perturbation loop
 
 !  ADJ test
 
@@ -720,6 +722,8 @@ real                                     :: dtbc_save
    print*, '                '
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL: ', VAL_L
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD: ', VAL_A
+   !  Halt execution if specified in namelist
+   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL - VAL_AD) = ', abs(VAL_L - VAL_A)
 
 !  RECOVER
 
@@ -742,7 +746,8 @@ real                                     :: dtbc_save
    moist_2 = S_moist_2
    rainnc = S_rainnc
    rainncv = S_rainncv
-  print*,"test_solve_em(): Attention:",maxval(S_mu_b),minval(S_mu_b)
+! ??
+ ! print*,"test_solve_em(): Attention:",maxval(S_mu_b),minval(S_mu_b)
 
 
 
