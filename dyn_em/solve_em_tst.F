@@ -1,5 +1,7 @@
 !WRF:MEDIATION_LAYER:SOLVER
 
+! 091001 bp; enable cumulus tl/ad check function, i.e. t_DUCU
+ 
 SUBROUTINE test_tladj_routines ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
@@ -664,8 +666,8 @@ BENCH_END(pbl_driver_tim)
 ! cumulus para.
 
 BENCH_START(cu_driver_tim)
-       if(dyn_opt == DYN_EM) then
-!      if(dyn_opt == DYN_EM_TST) then
+!       if(dyn_opt == DYN_EM) then
+      if(dyn_opt == DYN_EM_TST) then
 
        DO ij = 1, grid%num_tiles
 
