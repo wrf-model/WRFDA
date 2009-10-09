@@ -117,7 +117,11 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
 real                                     :: dtbc_save
 !---------------------------------------------------------------------------------------
 
-   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A, nsum
+   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, nsum
+   REAL :: VAL_N, VAL_L, VAL_A
+   REAL :: VAL_L_UVW, VAL_A_UVW  ! 091002 bp; separate velocities, ...
+   REAL :: VAL_L_T, VAL_A_T    ! temperature
+   REAL :: VAL_L_MU, VAL_A_MU  ! pressure
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
    INTEGER, PARAMETER :: tladj_steps = 6    ! 090923 bp; to enable multiple steps in tladj test
    LOGICAL :: stopOnError                   ! 090924 bp; halt program execution on tladj test failure
@@ -156,23 +160,20 @@ real                                     :: dtbc_save
      jfe = jpe
    endif
 
-   print*,'ifs =',ifs
-   print*,'ife =',ife
-   print*,'jfs =',jfs
-   print*,'jfe =',jfe
+   print*,'ips =', ips, ' ipe= ', ipe
+   print*,'ids =', ids, ' ide= ', ide
+   print*,'jps =', jps, ' jpe= ', jpe
+   print*,'jds =', jds, ' jde= ', jde
+   print*,'ims =',ims, ' ime =',ime
+   print*,'jms =',jms, ' jme =',jme
 
-   print*,'its =',its
-   print*,'ite =',ite
-   print*,'ims =',ims
-   print*,'ime =',ime
+   print*,'ifs =',ifs,' ife =',ife
+   print*,'jfs =',jfs,' jfe =',jfe
 
-   print*,'jts =',jts
-   print*,'jte =',jte
-   print*,'jms =',jms
-   print*,'jme =',jme
+   print*,'its =',its,' ite =',ite
+   print*,'jts =',jts,' jte =',jte
+   print*,'kts =',kts,' kte =',kte
 
-   print*,'kts =',kts
-   print*,'kte =',kte
    print*,'num_moist =',num_moist
    print*,'grid%sm31 grid%em31 =',grid%sm31,grid%em31
    print*,'grid%sm32 grid%em32 =',grid%sm32,grid%em32
@@ -540,10 +541,21 @@ real                                     :: dtbc_save
    g_z=0.; g_mudf=0. 
 
    VAL_L =0.0
+   VAL_L_UVW =0.0
+   VAL_L_T =0.0
+   VAL_L_MU =0.0
 
    do i=ifs,ife
      do k=kts,kte
        do j=jfs,jfe
+         VAL_L_UVW =VAL_L_UVW + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
+                      + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
+                      + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
+                      + g_v_2(i,k,j)  * g_v_2(i,k,j)    &
+                      + g_w_1(i,k,j)  * g_w_1(i,k,j)    &
+                      + g_w_2(i,k,j)  * g_w_2(i,k,j)    
+         VAL_L_T = + g_t_1(i,k,j)  * g_t_1(i,k,j)    &
+                      + g_t_2(i,k,j)  * g_t_2(i,k,j)    
          VAL_L =VAL_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
                       + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
                       + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
@@ -563,6 +575,8 @@ real                                     :: dtbc_save
 
    do i=ifs,ife
      do j=jfs,jfe
+       VAL_L_MU =VAL_L_MU + g_mu_1(i,j)  * g_mu_1(i,j)    &
+                    + g_mu_2(i,j)  * g_mu_2(i,j)  
        VAL_L =VAL_L + g_mu_1(i,j)  * g_mu_1(i,j)    &
                     + g_mu_2(i,j)  * g_mu_2(i,j)    &
                     + g_rainnc(i,j) * g_rainnc(i,j)  &
@@ -586,6 +600,7 @@ real                                     :: dtbc_save
    call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
    VAL_L = nsum
+   !! bp, might be issue when using VAL_L_UVW
 #endif
 
 !  ADJ
@@ -672,17 +687,28 @@ real                                     :: dtbc_save
 !
                  )
 
-   VAL_A=0.0
+   VAL_A = 0.0
+   VAL_A_UVW =0.0
+   VAL_A_T = 0.0
+   VAL_A_MU = 0.0
 
    do i=ifs,ife
      do k=kts,kte
        do j=jfs,jfe
-         VAL_A= VAL_A + a_u_1(i,k,j) * B_u_1(i,k,j)               &
+         VAL_A_UVW = VAL_A_UVW + a_u_1(i,k,j) * B_u_1(i,k,j)               &
                       + a_u_2(i,k,j) * B_u_2(i,k,j)               &
                       + a_v_1(i,k,j) * B_v_1(i,k,j)               &
                       + a_v_2(i,k,j) * B_v_2(i,k,j)               &
                       + a_w_1(i,k,j) * B_w_1(i,k,j)               &
-                      + a_w_2(i,k,j) * B_w_2(i,k,j)               &
+                      + a_w_2(i,k,j) * B_w_2(i,k,j)               
+         VAL_A_T = + a_t_1(i,k,j) * B_t_1(i,k,j)               &
+                      + a_t_2(i,k,j) * B_t_2(i,k,j)          
+         VAL_A = VAL_A + a_u_1(i,k,j) * B_u_1(i,k,j)               &
+                      + a_u_2(i,k,j) * B_u_2(i,k,j)               &
+                      + a_v_1(i,k,j) * B_v_1(i,k,j)               &
+                      + a_v_2(i,k,j) * B_v_2(i,k,j)               &
+                      + a_w_1(i,k,j) * B_w_1(i,k,j)               &
+                      + a_w_2(i,k,j) * B_w_2(i,k,j)               & 
                       + a_ph_1(i,k,j) * B_ph_1(i,k,j)             &
                       + a_ph_2(i,k,j) * B_ph_2(i,k,j)             &
                       + a_t_1(i,k,j) * B_t_1(i,k,j)               &
@@ -695,6 +721,8 @@ real                                     :: dtbc_save
 
    do i=ifs,ife
      do j=jfs,jfe
+       VAL_A_MU = a_mu_1(i,j) * B_mu_1(i,j)                 &
+                    + a_mu_2(i,j) * B_mu_2(i,j)        
        VAL_A= VAL_A + a_mu_1(i,j) * B_mu_1(i,j)                 &
                     + a_rainnc(i,j) * B_rainnc(i,j)      &
                     + a_rainncv(i,j) * B_rainncv(i,j)     &
@@ -717,13 +745,23 @@ real                                     :: dtbc_save
    call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
    VAL_A = nsum
+   !! bp; might be issue with VAL_A_UVW
 #endif
 
    print*, '                '
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_UVW: ', VAL_L_UVW
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_UVW: ', VAL_A_UVW
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_T: ', VAL_L_T
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_T: ', VAL_A_T
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_MU: ', VAL_L_MU
+   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_MU: ', VAL_A_MU
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL: ', VAL_L
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD: ', VAL_A
    !  Halt execution if specified in namelist
-   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL - VAL_AD) = ', abs(VAL_L - VAL_A)
+   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_UVW - VAL_AD_UVW) = ', abs(VAL_L_UVW - VAL_A_UVW)
+   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_T - VAL_AD_T)     = ', abs(VAL_L_T - VAL_A_T)
+   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_MU - VAL_AD_MU)   = ', abs(VAL_L_MU - VAL_A_MU)
+   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL - VAL_AD)         = ', abs(VAL_L - VAL_A)
 
 !  RECOVER
 
@@ -746,9 +784,8 @@ real                                     :: dtbc_save
    moist_2 = S_moist_2
    rainnc = S_rainnc
    rainncv = S_rainncv
-! ??
+! bp; ??
  ! print*,"test_solve_em(): Attention:",maxval(S_mu_b),minval(S_mu_b)
-
 
 
 END SUBROUTINE test_solve_em
