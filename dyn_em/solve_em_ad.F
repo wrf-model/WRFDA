@@ -122,6 +122,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER :: rk_order
    REAL    :: dt_rk, dts_rk, dtm
    LOGICAL :: leapfrog
+   LOGICAL ::  solverDisabled  ! 091012 bp; aix allowed declaration after statements; correcting for PGI
 
 real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4) :: a_rqc_bth
 real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4) :: a_rqr_bth
@@ -148,7 +149,6 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 
 #include "deref_kludge.h"
 
-   LOGICAL ::  solverDisabled
    
 #define COPY_IN
 #include <em_scalar_derefs.inc>
