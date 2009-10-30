@@ -64,8 +64,8 @@ begin
    num_vars = dimsizes(varnames)/2
    if( iob .eq. 1 .and. num_vars .gt. 4 ) then
    print(" Currently Upper air variables are "+num_vars)               
-   print(" Cannot plot more than four variables in one panel")
-   exit
+   ; print(" Cannot plot more than four variables in one panel")
+   ; exit
    end if
    if( iob .eq. 2 .and. num_vars .gt. 6 ) then
    print(" Currently Surface variables are "+num_vars)               
@@ -238,7 +238,7 @@ begin
      gsn_panel(wks,plts,(/2,2/),resP)       ; now draw as one plot
     end if
     if( num_vars .gt. 4 ) then
-     gsn_panel(wks,plts,(/3,2/),resP)       ; now draw as one plot
+     gsn_panel(wks,plts,(/2,3/),resP)       ; now draw as one plot
     end if
    ;-------------------------------------------------------------------------------------
  

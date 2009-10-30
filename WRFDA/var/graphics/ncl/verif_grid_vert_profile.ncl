@@ -12,8 +12,8 @@
 ;=============================================================;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"   
-load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"   
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"   
 ;=============================================================;
 begin
    ;=============================================================;
@@ -227,7 +227,7 @@ begin
      gsn_panel(wks,plts,(/2,2/),resP)       ; now draw as one plot
     end if
     if( num_vars .gt. 4 ) then
-     gsn_panel(wks,plts,(/3,2/),resP)       ; now draw as one plot
+     gsn_panel(wks,plts,(/3,3/),resP)       ; now draw as one plot
     end if
    ;-------------------------------------------------------------------------------------
 
