@@ -51,7 +51,7 @@ export EXP_LINES_COLORS=${EXP_LINES_COLORS:-'(/"blue","green", "orange"/)'}
 export NUM3D=${NUM3D:-6}
 export VAR3D=${VAR3D:-"U  V  T  QVAPOR  Z WV"}
 export NUM2D=${NUM2D:-6}
-export VAR2D=${VAR2D:-"SLP PSFC U10M V10M T2M Q2M"}
+export VAR2D=${VAR2D:-"MU PSFC U10M V10M T2M Q2M"}
 #--------------------------------------------------------------------------------------
 #=========================================================
 # BELOW THIS LINE NO CHABGES ARE REQUIRED                 
@@ -244,6 +244,8 @@ for vn in $VAR2D   ; do
         ob_unit='T2M (K)' 
      elif [[ "$vn" = "Q2M" ]]; then
         ob_unit='Q2M (g/Kg)' 
+     elif [[ "$vn" = "MU" ]]; then
+        ob_unit='MU (Pascal)' 
      else
         echo "Unknown Surface variable " $vn ":-Don't know what to do??"
      exit
