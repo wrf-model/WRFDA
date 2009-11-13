@@ -1,4 +1,17 @@
- &time_control
+! wrf+ namelist.input
+!
+! Entries documented with "WRF" have equivalent functionality, and more
+!	detailed documentation for those entries can be found the in the WRF user guide
+! Entries documented with "wrf+" are unique to wrfplus and are documented herein
+! Namelist entries that are not used in the distribution are marked as "unused"
+!
+! See the wrfplus wiki site below for additional documentation, test notes, 
+!	and developer resources
+! https://wiki.ucar.edu/display/mmm/WRFPLUS
+!
+!
+
+ &time_control  ! WRF:  All time_control entries function the same as WRF
  run_days                            = 0,
  run_hours                           = 0,
  run_minutes                         = 10,
@@ -15,10 +28,10 @@
  end_hour                            = 00,
  end_minute                          = 10,
  end_second                          = 00,
- interval_seconds                    = 21600
- input_from_file                     = .true.,.false.,.false.,
+ interval_seconds                    = 21600                      ! unused
+ input_from_file                     = .true.,.false.,.false.,    ! unused
  history_interval                    = 180,  60,   60,
- frames_per_outfile                  = 1000, 1000, 1000,
+ frames_per_outfile                  = 1000, 1000, 1000,          ! unused
  restart                             = .false.,
  restart_interval                    = 9000,
  io_form_history                     = 2
@@ -29,130 +42,143 @@
  /
 
  &domains
- time_step                           = 600,
- time_step_fract_num                 = 0,
- time_step_fract_den                 = 1,
- max_dom                             = 1,
- s_we                                = 1,     1,     1,
- e_we                                = 31,    112,   94,
- s_sn                                = 1,     1,     1,
- e_sn                                = 25,    97,    91,
- s_vert                              = 1,     1,     1,
- e_vert                              = 17,    28,    28,
- dx                                  = 135000,  3333,  1111,
- dy                                  = 135000,  3333,  1111,
- grid_id                             = 1,     2,     3,
- level                               = 1,     2,     3,
- parent_id                           = 0,     1,     2,
- i_parent_start                      = 0,     30,    30,
- j_parent_start                      = 0,     20,    30,
- parent_grid_ratio                   = 1,     3,     3,
- parent_time_step_ratio              = 1,     3,     3,
- feedback                            = 1,
- smooth_option                       = 0
+ time_step                           = 600,                       ! WRF
+ time_step_fract_num                 = 0,                         ! WRF
+ time_step_fract_den                 = 1,                         ! WRF
+ max_dom                             = 1,                         ! WRF
+ s_we                                = 1,     1,     1,           ! WRF
+ e_we                                = 31,    112,   94,          ! WRF
+ s_sn                                = 1,     1,     1,           ! WRF
+ e_sn                                = 25,    97,    91,          ! WRF
+ s_vert                              = 1,     1,     1,           ! WRF
+ e_vert                              = 17,    28,    28,          ! WRF
+ dx                                  = 135000,  3333,  1111,      ! WRF unused
+ dy                                  = 135000,  3333,  1111,      ! WRF
+ grid_id                             = 1,     2,     3,           ! WRF unused
+ level                               = 1,     2,     3,           ! wrf+: unused 
+ parent_id                           = 0,     1,     2,           ! WRF
+ i_parent_start                      = 0,     30,    30,          ! WRF
+ j_parent_start                      = 0,     20,    30,          ! WRF
+ parent_grid_ratio                   = 1,     3,     3,           ! WRF
+ parent_time_step_ratio              = 1,     3,     3,           ! WRF unused
+ feedback                            = 1,                         ! WRF
+ smooth_option                       = 0                          ! WRF
+! wrf+:  Each of the following logical-valued TEST_* namelist entries
+! enable an individual routine tangent linear and adjoint test. 
+! All of these tests are called from dyn_em/solve_em_tst.F : test_tladj_routines()
+! The test routines are defined in dyn_em/module_check.F
+! 
  TEST_rk_step_prep          = .true.,
- TEST_init_zero_tendency    = .true.,
- TEST_phy_prep              = .true.
- TEST_calculate_km_kh       = .true.,
- TEST_rk_tendency           = .true.,
- TEST_surface_drag          = .true.,
- TEST_lscond                = .true.,
- TEST_moist_physics_prep_em = .true.,
- TEST_advect_scalar         = .true.,
- TEST_relax_bdy_dry         = .true.,
- TEST_rk_addtend_dry        = .true.,
- TEST_spec_bdy_dry          = .true.,
- TEST_small_step_prep       = .true.,
- TEST_calc_p_rho            = .true.,
- TEST_calc_coef_w           = .true.,
- TEST_advance_uv            = .true.,
- TEST_spec_bdyupdate        = .true.,
- TEST_advance_mu_t          = .true.,
- TEST_sumflux               = .true.,
- TEST_advance_w             = .true.,
- TEST_spec_bdyupdate_ph     = .true.,
- TEST_calc_mu_uv_1          = .true.,
- TEST_small_step_finish     = .true.,
- TEST_rk_scalar_tend        = .true.,
- TEST_spec_bdy_scalar       = .true.,
- TEST_rk_update_scalar      = .true.,
- TEST_calc_p_rho_phi        = .true.,
- TEST_diagnose_w            = .true.,
- TEST_cudu                  = .true.
+ TEST_init_zero_tendency    = .false.,
+ TEST_phy_prep              = .false.,
+ TEST_calculate_km_kh       = .false.,
+ TEST_rk_tendency           = .false.,
+ TEST_surface_drag          = .false.,
+ TEST_lscond                = .false.,
+ TEST_moist_physics_prep_em = .false.,
+ TEST_advect_scalar         = .false.,
+ TEST_relax_bdy_dry         = .false.,
+ TEST_rk_addtend_dry        = .false.,
+ TEST_spec_bdy_dry          = .false.,
+ TEST_small_step_prep       = .false.,
+ TEST_calc_p_rho            = .false.,
+ TEST_calc_coef_w           = .false.,
+ TEST_advance_uv            = .false.,
+ TEST_spec_bdyupdate        = .false.,
+ TEST_advance_mu_t          = .false.,
+ TEST_sumflux               = .false.,
+ TEST_advance_w             = .false.,
+ TEST_spec_bdyupdate_ph     = .false.,
+ TEST_calc_mu_uv_1          = .false.,
+ TEST_small_step_finish     = .false.,
+ TEST_rk_scalar_tend        = .false.,
+ TEST_spec_bdy_scalar       = .false.,
+ TEST_rk_update_scalar      = .false.,
+ TEST_calc_p_rho_phi        = .false.,
+ TEST_diagnose_w            = .false.,
+ TEST_cudu                  = .false.
  /
 
  &physics
- mp_physics                          = 0,     2,     2,
- ra_lw_physics                       = 0,     1,     1,
- ra_sw_physics                       = 0,     1,     1,
- radt                                = 00,    10,    10,
- sf_sfclay_physics                   = 0,     1,     1,
- sf_surface_physics                  = 0,     2,     2,
- bl_pbl_physics                      = 0,     1,     1,
- bldt                                = 0,     0,     0,
- cu_physics                          = 5,     1,     0,
- cudt                                = 0,     5,     5,
- isfflx                              = 0,
- ifsnow                              = 0,
- icloud                              = 0,
- surface_input_source                = 1,
- num_soil_layers                     = 4,
- mp_zero_out                         = 0,
- maxiens                             = 1,
- maxens                              = 3,
- maxens2                             = 3,
- maxens3                             = 16,
- ensdim                              = 144,
+ mp_physics                          = 0,     2,     2,          ! WRF
+ ra_lw_physics                       = 0,     1,     1,          ! WRF
+ ra_sw_physics                       = 0,     1,     1,          ! WRF
+ radt                                = 00,    10,    10,         ! WRF unused
+ sf_sfclay_physics                   = 0,     1,     1,          ! WRF
+ sf_surface_physics                  = 0,     2,     2,          ! WRF
+ bl_pbl_physics                      = 0,     1,     1,          ! WRF
+ bldt                                = 0,     0,     0,          ! WRF unused
+ cu_physics                          = 5,     1,     0,          ! WRF
+ cudt                                = 0,     5,     5,          ! WRF unused
+ isfflx                              = 0,                        ! WRF unused
+ ifsnow                              = 0,                        ! WRF unused
+ icloud                              = 0,                        ! WRF unused
+ surface_input_source                = 1,                        ! WRF unused
+ num_soil_layers                     = 4,                        ! WRF unused
+ mp_zero_out                         = 0,                        ! WRF unused
+ maxiens                             = 1,                        ! WRF unused
+ maxens                              = 3,                        ! WRF unused
+ maxens2                             = 3,                        ! WRF unused
+ maxens3                             = 16,                       ! WRF unused
+ ensdim                              = 144,                      ! WRF unused
  /
 
  &dynamics
- dyn_opt                             = 402,
- tl_perturbation                     = .0,
+ dyn_opt                             = 402,                      ! wrf+: 
+! Valid dynamics option values: (see Registry.EM) for additional details
+! dyn_nodyn    dyn_opt==0         
+! dyn_em       dyn_opt==2              
+! dyn_em_sn    dyn_opt==102           
+! dyn_em_tl    dyn_opt==202           
+! dyn_em_ad    dyn_opt==302     
+! dyn_em_tst   dyn_opt==402      
+! dyn_em_var   dyn_opt==502   
+ tl_perturbation                     = .0,                       ! wrf+: Value added to tl/adj perturbation in tlad tests
  disable_solver                      = .false.                   ! wrf+: exit solve_em without executing code.
- stop_on_error                       = .false.                    ! wrf+: stop execution on tl/adj test error
- rk_ord                              = 3,
- w_damping                           = 0,
- diff_opt                            = 1,
- km_opt                              = 1,
- damp_opt                            = 0,
- base_temp                           = 290.
- zdamp                               = 5000.,  5000.,  5000.,
- dampcoef                            = 0.2,    0.2,    0.2
- khdif                               = 0,      0,      0,
- kvdif                               = 0,      0,      0,
- smdiv                               = 0.1,    0.1,    0.1,
- emdiv                               = 0.01,   0.01,   0.01,
- epssm                               = 0.1,    0.1,    0.1
- non_hydrostatic                     = .true., .true., .true.,
- time_step_sound                     = 4,      4,      4,
- h_mom_adv_order                     = 5,      5,      5,
- v_mom_adv_order                     = 3,      3,      3,
- h_sca_adv_order                     = 5,      5,      5,
- v_sca_adv_order                     = 3,      3,      3,
+ stop_on_error                       = .false.                   ! wrf+: stop execution on tl/adj test error
+ rk_ord                              = 3,                        ! WRF unused
+ w_damping                           = 0,                        ! WRF unused 
+ diff_opt                            = 1,                        ! WRF
+ km_opt                              = 1,                        ! WRF
+ damp_opt                            = 0,                        ! WRF
+ base_temp                           = 290.                      ! WRF
+ zdamp                               = 5000.,  5000.,  5000.,    ! WRF unused
+ dampcoef                            = 0.2,    0.2,    0.2       ! WRF unused
+ khdif                               = 0,      0,      0,        ! WRF
+ kvdif                               = 0,      0,      0,        ! WRF
+ smdiv                               = 0.1,    0.1,    0.1,      ! WRF unused
+ emdiv                               = 0.01,   0.01,   0.01,     ! WRF unused
+ epssm                               = 0.1,    0.1,    0.1       ! WRF unused
+ non_hydrostatic                     = .true., .true., .true.,   ! WRF unused
+ time_step_sound                     = 4,      4,      4,        ! WRF unused
+ h_mom_adv_order                     = 5,      5,      5,        ! WRF unused
+ v_mom_adv_order                     = 3,      3,      3,        ! WRF unused
+ h_sca_adv_order                     = 5,      5,      5,        ! WRF
+ v_sca_adv_order                     = 3,      3,      3,        ! WRF unused
  /
 
  &bdy_control
- spec_bdy_width                      = 5,
- spec_zone                           = 1,
- relax_zone                          = 4,
- specified                           = .true., .false.,.false.,
- periodic_x                          = .false.,.false.,.false.,
- symmetric_xs                        = .false.,.false.,.false.,
- symmetric_xe                        = .false.,.false.,.false.,
- open_xs                             = .false.,.false.,.false.,
- open_xe                             = .false.,.false.,.false.,
- periodic_y                          = .false.,.false.,.false.,
- symmetric_ys                        = .false.,.false.,.false.,
- symmetric_ye                        = .false.,.false.,.false.,
- open_ys                             = .false.,.false.,.false.,
- open_ye                             = .false.,.false.,.false.,
- nested                              = .false., .true., .true.,
+ spec_bdy_width                      = 5,                         ! WRF
+ spec_zone                           = 1,                         ! WRF
+ relax_zone                          = 4,                         ! WRF
+ specified                           = .true., .false.,.false.,   ! WRF unused
+ periodic_x                          = .false.,.false.,.false.,   ! WRF unused
+ symmetric_xs                        = .false.,.false.,.false.,   ! WRF unused
+ symmetric_xe                        = .false.,.false.,.false.,   ! WRF unused
+ open_xs                             = .false.,.false.,.false.,   ! WRF unused
+ open_xe                             = .false.,.false.,.false.,   ! WRF unused
+ periodic_y                          = .false.,.false.,.false.,   ! WRF unused
+ symmetric_ys                        = .false.,.false.,.false.,   ! WRF unused
+ symmetric_ye                        = .false.,.false.,.false.,   ! WRF unused
+ open_ys                             = .false.,.false.,.false.,   ! WRF unused
+ open_ye                             = .false.,.false.,.false.,   ! WRF unused
+ nested                              = .false., .true., .true.,   ! WRF unused
  /
 
  &namelist_quilt
- nio_tasks_per_group = 0,
- nio_groups = 1,
+ nio_tasks_per_group = 0,               ! WRF
+ nio_groups = 1,                        ! WRF unused
  /
 
- &wrfvar
+ &wrfvar  ! wrf+
  /
