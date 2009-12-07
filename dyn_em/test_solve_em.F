@@ -68,8 +68,6 @@ SUBROUTINE test_solve_em ( grid , config_flags , &
 
 ! Define benchmarking timers if -DBENCH is compiled
 
-
-
 !---------------------------------------------------------------------------------------
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_1
 real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_2
@@ -119,12 +117,17 @@ real                                     :: dtbc_save
 
    REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, nsum
    REAL :: VAL_N, VAL_L, VAL_A
-   REAL :: VAL_L_UVW, VAL_A_UVW  ! 091002 bp; separate velocities, ...
-   REAL :: VAL_L_T, VAL_A_T    ! temperature
-   REAL :: VAL_L_MU, VAL_A_MU  ! pressure
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
-   INTEGER, PARAMETER :: tladj_steps = 6    ! 090923 bp; to enable multiple steps in tladj test
+   INTEGER, PARAMETER :: tladj_steps = 1    ! 090923 bp; to enable multiple steps in tladj test
    LOGICAL :: stopOnError                   ! 090924 bp; halt program execution on tladj test failure
+   INTEGER :: isolationVariable             ! 091113 bp; isolate selected vars 
+                                            ! 0 = none, 1 = u,v,w, 2 = ph, 3 = t, 4 = mu
+                                            ! 5 = moist_1,moist_2; 6 = rainnc, rainncv; 7 = p (pressure); 8 = al (inverse density)
+
+! Get isolationVariable from namelist
+   isolationVariable = 0 
+   call nl_get_isolation_variable(1, isolationVariable)
+   if( isolationVariable < 0 .or. isolationVariable > 8 ) call wrf_error_fatal('Invalid isolationVariable value') 
 
 !  Obtain dimension information stored in the grid data structure.
    CALL get_ijk_from_grid (  grid ,                   &
@@ -134,6 +137,7 @@ real                                     :: dtbc_save
 
 
    CALL nl_get_stop_on_error( 1, stopOnError )
+   if( stopOnError ) STOP 'stopOnError not yet implemented for test_solve_em()'
  
    its = grid%sp31-3 ; ite = grid%ep31+3
    kts = grid%sp32 ; kte = grid%ep32
@@ -187,6 +191,7 @@ real                                     :: dtbc_save
    S_v_2 = v_2 
    S_w_1 = w_1 
    S_w_2 = w_2 
+
    S_ph_1 = ph_1 
    S_ph_2 = ph_2 
    S_t_1 = t_1 
@@ -306,11 +311,30 @@ real                                     :: dtbc_save
    g_rqv_bt = 0.0 
    grid%dtbc = dtbc_save
 
+! Isolate selected variable
+   call isolateVars(isolationVariable, grid, &
+      g_u_1, g_u_2, g_v_1, g_v_2, g_w_1, g_w_2, &
+      g_ph_1, g_ph_2, &
+      g_t_1, g_t_2, &
+      g_mu_1, g_mu_2, &
+      g_p, g_al, &
+      g_moist_1, g_moist_2, &
+      g_rainnc, g_rainncv)
+
    CALL solve_em_tl ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
 !
                     )
+
+   call isolateVars(isolationVariable, grid, &
+      g_u_1, g_u_2, g_v_1, g_v_2, g_w_1, g_w_2, &
+      g_ph_1, g_ph_2, &
+      g_t_1, g_t_2, &
+      g_mu_1, g_mu_2, &
+      g_p, g_al, &
+      g_moist_1, g_moist_2, &
+      g_rainnc, g_rainncv)
 
    g_z=0.; g_mudf=0. 
 
@@ -390,11 +414,304 @@ real                                     :: dtbc_save
       rainncv = FACTOR*S_rainncv
       grid%dtbc = dtbc_save
 
+! isolation of selected variable test
+      select case (isolationVariable)
+      case (0)    ! no isolation
+      case (1)    ! isolate u,v,w
+         write(*,*) 'In loop: Isolate variables U,V,W'
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         p = S_p 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(2)
+         write(*,*) 'In loop: Isolate variables ph'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         p = S_p 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(3)
+         write(*,*) 'In loop: Isolate variables T'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         p = S_p 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(4)
+         write(*,*) 'In loop: Isolate variables mu'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         p = S_p 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(5)
+         write(*,*) 'In loop: Isolate variables moist_1, moist_2'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         p = S_p 
+         al = S_al 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(6)
+         write(*,*) 'In loop: Isolate variables rainnc, rainncv'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         p = S_p 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+      case(7)
+         write(*,*) 'In loop: Isolate variables p (pressure)'
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         al = S_al 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      case(8)
+         write(*,*) 'In loop: Isolate variables al (inverse density?)'  
+         u_1 = S_u_1
+         u_2 = S_u_2
+         v_1 = S_v_1
+         v_2 = S_v_2
+         w_1 = S_w_1
+         w_2 = S_w_2
+         ph_1 = S_ph_1 
+         ph_2 = S_ph_2 
+         mu_1 = S_mu_1 
+         mu_2 = S_mu_2 
+         t_1 = S_t_1 
+         t_2 = S_t_2 
+         p = S_p 
+         moist_1 = S_moist_1 
+         moist_2 = S_moist_2 
+         rainnc(:,:) = S_rainnc(:,:) 
+         rainncv(:,:)= S_rainncv(:,:)
+      end select
+   
       CALL solve_em ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
 !
                        )
+! isolation of selected variable test
+      select case (isolationVariable)
+      case (0)    ! no isolation
+      case (1)    ! isolate u,v,w
+         write(*,*) 'In loop: Isolate variables U,V,W 2'
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(2)
+         write(*,*) 'In loop: Isolate variables ph 2'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(3)
+         write(*,*) 'In loop: Isolate variables T 2'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(4)
+         write(*,*) 'In loop: Isolate variables mu 2'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         p = B_p 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(5)
+         write(*,*) 'In loop: Isolate variables moist_1, moist_2'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         al = B_al 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(6)
+         write(*,*) 'In loop: Isolate variables rainnc, rainncv'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+      case(7)
+         write(*,*) 'In loop: Isolate variables p (pressure)'
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         al = B_al 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      case(8)
+         write(*,*) 'In loop: Isolate variables al (inverse density?) '
+         u_1 = B_u_1
+         u_2 = B_u_2
+         v_1 = B_v_1
+         v_2 = B_v_2
+         w_1 = B_w_1
+         w_2 = B_w_2
+         t_1 = B_t_1 
+         t_2 = B_t_2 
+         ph_1 = B_ph_1 
+         ph_2 = B_ph_2 
+         mu_1 = B_mu_1 
+         mu_2 = B_mu_2 
+         p = B_p 
+         moist_1 = B_moist_1 
+         moist_2 = B_moist_2 
+         rainnc(:,:) = B_rainnc(:,:) 
+         rainncv(:,:)= B_rainncv(:,:)
+      end select
 
       z=0.; mudf=0. 
 
@@ -512,6 +829,17 @@ real                                     :: dtbc_save
    g_rqv_b =0.
    g_rqv_bt =0.
 
+! Variable isolation
+   call isolateVars(isolationVariable, grid, &
+      g_u_1, g_u_2, g_v_1, g_v_2, g_w_1, g_w_2, &
+      g_ph_1, g_ph_2, &
+      g_t_1, g_t_2, &
+      g_mu_1, g_mu_2, &
+      g_p, g_al, &
+      g_moist_1, g_moist_2, &
+      g_rainnc, g_rainncv)
+   g_z=0.; g_mudf=0. 
+
    B_u_1 = g_u_1 
    B_u_2 = g_u_2 
    B_v_1 = g_v_1 
@@ -538,24 +866,22 @@ real                                     :: dtbc_save
 !
                     )
 
+! Variable isolation
+   call isolateVars(isolationVariable, grid, &
+      g_u_1, g_u_2, g_v_1, g_v_2, g_w_1, g_w_2, &
+      g_ph_1, g_ph_2, &
+      g_t_1, g_t_2, &
+      g_mu_1, g_mu_2, &
+      g_p, g_al, &
+      g_moist_1, g_moist_2, &
+      g_rainnc, g_rainncv)
    g_z=0.; g_mudf=0. 
 
    VAL_L =0.0
-   VAL_L_UVW =0.0
-   VAL_L_T =0.0
-   VAL_L_MU =0.0
 
    do i=ifs,ife
      do k=kts,kte
        do j=jfs,jfe
-         VAL_L_UVW =VAL_L_UVW + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
-                      + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
-                      + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
-                      + g_v_2(i,k,j)  * g_v_2(i,k,j)    &
-                      + g_w_1(i,k,j)  * g_w_1(i,k,j)    &
-                      + g_w_2(i,k,j)  * g_w_2(i,k,j)    
-         VAL_L_T = + g_t_1(i,k,j)  * g_t_1(i,k,j)    &
-                      + g_t_2(i,k,j)  * g_t_2(i,k,j)    
          VAL_L =VAL_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
                       + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
                       + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
@@ -575,8 +901,6 @@ real                                     :: dtbc_save
 
    do i=ifs,ife
      do j=jfs,jfe
-       VAL_L_MU =VAL_L_MU + g_mu_1(i,j)  * g_mu_1(i,j)    &
-                    + g_mu_2(i,j)  * g_mu_2(i,j)  
        VAL_L =VAL_L + g_mu_1(i,j)  * g_mu_1(i,j)    &
                     + g_mu_2(i,j)  * g_mu_2(i,j)    &
                     + g_rainnc(i,j) * g_rainnc(i,j)  &
@@ -600,7 +924,6 @@ real                                     :: dtbc_save
    call MPI_ALLREDUCE( VAL_L, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
    VAL_L = nsum
-   !! bp, might be issue when using VAL_L_UVW
 #endif
 
 !  ADJ
@@ -688,21 +1011,10 @@ real                                     :: dtbc_save
                  )
 
    VAL_A = 0.0
-   VAL_A_UVW =0.0
-   VAL_A_T = 0.0
-   VAL_A_MU = 0.0
 
    do i=ifs,ife
      do k=kts,kte
        do j=jfs,jfe
-         VAL_A_UVW = VAL_A_UVW + a_u_1(i,k,j) * B_u_1(i,k,j)               &
-                      + a_u_2(i,k,j) * B_u_2(i,k,j)               &
-                      + a_v_1(i,k,j) * B_v_1(i,k,j)               &
-                      + a_v_2(i,k,j) * B_v_2(i,k,j)               &
-                      + a_w_1(i,k,j) * B_w_1(i,k,j)               &
-                      + a_w_2(i,k,j) * B_w_2(i,k,j)               
-         VAL_A_T = + a_t_1(i,k,j) * B_t_1(i,k,j)               &
-                      + a_t_2(i,k,j) * B_t_2(i,k,j)          
          VAL_A = VAL_A + a_u_1(i,k,j) * B_u_1(i,k,j)               &
                       + a_u_2(i,k,j) * B_u_2(i,k,j)               &
                       + a_v_1(i,k,j) * B_v_1(i,k,j)               &
@@ -721,8 +1033,6 @@ real                                     :: dtbc_save
 
    do i=ifs,ife
      do j=jfs,jfe
-       VAL_A_MU = a_mu_1(i,j) * B_mu_1(i,j)                 &
-                    + a_mu_2(i,j) * B_mu_2(i,j)        
        VAL_A= VAL_A + a_mu_1(i,j) * B_mu_1(i,j)                 &
                     + a_rainnc(i,j) * B_rainnc(i,j)      &
                     + a_rainncv(i,j) * B_rainncv(i,j)     &
@@ -745,23 +1055,12 @@ real                                     :: dtbc_save
    call MPI_ALLREDUCE( VAL_A, nsum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                        comm, IERROR )
    VAL_A = nsum
-   !! bp; might be issue with VAL_A_UVW
 #endif
 
    print*, '                '
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_UVW: ', VAL_L_UVW
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_UVW: ', VAL_A_UVW
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_T: ', VAL_L_T
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_T: ', VAL_A_T
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL_MU: ', VAL_L_MU
-   write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD_MU: ', VAL_A_MU
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_TL: ', VAL_L
    write(6,fmt='(A,E22.13)') '      g_em_sn: VAL_AD: ', VAL_A
    !  Halt execution if specified in namelist
-   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_UVW - VAL_AD_UVW) = ', abs(VAL_L_UVW - VAL_A_UVW)
-   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_T - VAL_AD_T)     = ', abs(VAL_L_T - VAL_A_T)
-   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL_MU - VAL_AD_MU)   = ', abs(VAL_L_MU - VAL_A_MU)
-   WRITE(6,fmt='(A,E22.13)') '      g_em_sn: abs(VAL_TL - VAL_AD)         = ', abs(VAL_L - VAL_A)
 
 !  RECOVER
 
@@ -790,3 +1089,194 @@ real                                     :: dtbc_save
 
 END SUBROUTINE test_solve_em
 
+!
+! Isolate selected variable. 
+!
+subroutine isolateVars(isolationVar, &
+   grid, &
+   u_1, u_2, v_1, v_2, w_1, w_2, &
+   ph_1, ph_2, &
+   t_1, t_2, &
+   mu_1, mu_2, &
+   p, al, &
+   moist_1, moist_2 , &
+   rainnc, rainncv &
+   )
+
+   USE module_domain
+
+   IMPLICIT NONE
+
+   TYPE(domain) , TARGET          :: grid
+   integer, intent(in) :: isolationVar
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: u_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: u_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: v_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: v_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: w_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: w_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: ph_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: ph_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: t_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: t_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: p
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: al
+   real , dimension(grid%sm31:grid%em31,grid%sm33:grid%em33) :: mu_1 
+   real , dimension(grid%sm31:grid%em31,grid%sm33:grid%em33) :: mu_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: moist_1
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: moist_2
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: rainnc
+   real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: rainncv
+
+
+   write(*,*) 'isolateVars() ' , isolationVar
+
+   select case ( isolationVar )
+   case (0)    ! no isolation
+   case (1)    ! isolate u,v,w
+      write(*,*) 'Isolate variables U,V,W'
+      ph_1 = 0. 
+      ph_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      mu_1 = 0.
+      mu_2 = 0.
+      p = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case (2)   ! ph
+      write(*,*) 'Isolate variables ph'
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      t_1 = 0. 
+      t_2 = 0. 
+      mu_1 = 0.
+      mu_2 = 0.
+      p = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case (3)   ! T
+      write(*,*) 'Isolate variables T'
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      mu_1 = 0.
+      mu_2 = 0.
+      p = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case (4)   ! mu 
+      write(*,*) 'Isolate variables mu'
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      p = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case (5)   ! moist_1, moist_2 
+      write(*,*) 'Isolate moist_* '
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      mu_1 = 0.
+      mu_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      p = 0. 
+      al = 0. 
+      rainnc = 0.
+      rainncv= 0.
+   case (6)   ! rainnc, rainncv
+      write(*,*) 'Isolate rainnc, rainncv '
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      mu_1 = 0.
+      mu_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      p = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+   case (7)   ! pressure 
+      write(*,*) 'Isolate p'
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      mu_1 = 0.
+      mu_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      al = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case (8)   ! al (inverse density) 
+      write(*,*) 'Isolate al'
+      u_1 = 0. 
+      u_2 = 0. 
+      v_1 = 0. 
+      v_2 = 0. 
+      w_1 = 0. 
+      w_2 = 0. 
+      ph_1 = 0. 
+      ph_2 = 0.
+      mu_1 = 0.
+      mu_2 = 0.
+      t_1 = 0. 
+      t_2 = 0. 
+      p = 0. 
+      moist_1 = 0.
+      moist_2 = 0.
+      rainnc = 0.
+      rainncv= 0.
+   case default
+      call wrf_error_fatal('Invalid isolation variable in isolateVars')
+   end select
+   
+end subroutine isolateVars

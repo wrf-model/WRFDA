@@ -68,7 +68,7 @@
 ! All of these tests are called from dyn_em/solve_em_tst.F : test_tladj_routines()
 ! The test routines are defined in dyn_em/module_check.F
 ! 
- TEST_rk_step_prep          = .true.,
+ TEST_rk_step_prep          = .false.,
  TEST_init_zero_tendency    = .false.,
  TEST_phy_prep              = .false.,
  TEST_calculate_km_kh       = .false.,
@@ -136,6 +136,9 @@
  tl_perturbation                     = .0,                       ! wrf+: Value added to tl/adj perturbation in tlad tests
  disable_solver                      = .false.                   ! wrf+: exit solve_em without executing code.
  stop_on_error                       = .false.                   ! wrf+: stop execution on tl/adj test error
+ isolation_variable                  = 6                         ! wrf+: to isolate selected variables in test_solve_em()
+                                                                 ! 0 = no isolation; 1 = u,v,w; 2 = ph; 3 = T; 4 = mu
+							         ! 5 = moist_1,moist_2; 6 = rainnc, rainncv; 7 = p (pressure); 8 = al (inverse density)
  rk_ord                              = 3,                        ! WRF unused
  w_damping                           = 0,                        ! WRF unused 
  diff_opt                            = 1,                        ! WRF
