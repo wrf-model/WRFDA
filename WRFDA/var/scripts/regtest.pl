@@ -217,13 +217,13 @@ if ($Arch eq "karri") {   # karri
 if ($Arch eq "gum") {   # gum
     if ($Compiler=~/g95/i) {   # G95
         $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
-        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov/rttov87';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/pgi/i) {   # PGI
         $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
-        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov/rttov87';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
