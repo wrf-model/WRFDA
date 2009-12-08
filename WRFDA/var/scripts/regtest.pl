@@ -216,16 +216,16 @@ if ($Arch eq "karri") {   # karri
 }
 if ($Arch eq "gum") {   # gum
     if ($Compiler=~/g95/i) {   # G95
-        $ENV{CRTM} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
-        $ENV{RTTOV} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/rttov/rttov87';
-        $ENV{NETCDF} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
-        $ENV{PATH} ='/data3a/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
+        $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov/rttov87';
+        $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
+        $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/pgi/i) {   # PGI
-        $ENV{CRTM} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
-        $ENV{RTTOV} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/rttov/rttov87';
-        $ENV{NETCDF} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
-        $ENV{PATH} ='/data3a/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
+        $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov/rttov87';
+        $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
+        $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
 }
 
@@ -916,7 +916,7 @@ karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinz
 10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-gum        wrfda.tar        g95         64000420  share   /Volumes/gum/xinzhang/regtest/WRFDA-data-EM    none
+gum        SVN        PGI         64000420  share   /Volumes/gum/xinzhang/regtest/WRFDA-data-EM    none
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           4       4            serial|dmpar
 2        cv3_guo                     4       4            serial|dmpar
