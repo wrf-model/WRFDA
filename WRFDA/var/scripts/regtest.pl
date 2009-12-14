@@ -20,8 +20,10 @@ my $tm = localtime;
 $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
-# Constant variables
 my $Exec = 0; # Use the current EXEs in WRFDA or not
+my $Revision = 'HEAD'; # Revision Number
+
+# Constant variables
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
 my $Tester = getlogin();
 
@@ -34,7 +36,6 @@ my $Queue;
 my $Database;
 my $Baseline;
 my @Message;
-my $Revision;
 my $Par="";
 my $Clear = `clear`;
 my $Flush_Counter = 1;
@@ -134,7 +135,7 @@ if ( -e 'WRFDA' && -r 'WRFDA' ) {
 
 if ($Source=~/SVN/i) {
      print "Getting the code from repository $SVN_REP to WRFDA...\n";
-     open (my $fh,"-|","svn","co",$SVN_REP,"WRFDA")
+     open (my $fh,"-|","svn","co","-r",$Revision,$SVN_REP,"WRFDA")
           or die " Can't run svn export: $!\n";
      while (<$fh>) {
          $Revision = $1 if ( /revision \s+ (\d+)/x); 
@@ -888,7 +889,7 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         SVN        XLF         64000510  share /mmm/users/xinzhang/WRFDA-data-EM    /ptmp/xinzhang/BASELINE
+be         svn        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
