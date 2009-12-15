@@ -21,7 +21,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 my $Exec = 0; # Use the current EXEs in WRFDA or not
-my $Revision = 'HEAD'; # Revision Number
+my $Revision = 4028; # 'HEAD'; # Revision Number
 
 # Constant variables
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
@@ -90,6 +90,7 @@ my %Compile_options;
 # What's my hostname :
 
 my $Host = hostname();
+my $System = `uname -s`;;
 
 # Parse the task table:
 
@@ -101,7 +102,7 @@ while (<DATA>) {
                split /\s+/,$_;
      }
 
-     if ( /^(\d)+/ && ($Host =~ /$Arch/i) ) {
+     if ( /^(\d)+/ && ($System =~ /$Arch/i) ) {
           $_=~ m/(\d+) \s+ (\S+) \s+ (\S+) \s+ (\S+) \s+ (\S+)/x;
           my @tasks = split /\|/, $5;
           my %task_records;
@@ -175,13 +176,13 @@ die "WRFDA does not support compiler : $Compiler.\n" if ( (keys %Compile_options
 
 # Set the envir. variables:
 
-if ($Arch eq "be") {   # bluefire
+if ($Arch eq "AIX") {   # bluefire
     $ENV{CRTM} ='/blhome/wrfhelp/external/crtm/CRTM_02_03_09_REL_1_2/ibm_powerpc';
     $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
     $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
 }
 
-if ($Arch eq "karri") {   # karri
+if ($Arch eq "Linux") {   # for karri
     if ($Compiler=~/pgi/i) {   # PGI
         $ENV{CRTM} ='/karri/users/xinzhang/external/pgi_web/crtm';
         $ENV{RTTOV} ='/karri/users/xinzhang/external/pgi_web/rttov87';
@@ -215,7 +216,7 @@ if ($Arch eq "karri") {   # karri
         }
     }
 }
-if ($Arch eq "gum") {   # gum
+if ($Arch eq "Darwin") {   # Darwin
     if ($Compiler=~/g95/i) {   # G95
         $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
         $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov87';
@@ -243,7 +244,7 @@ foreach my $option (sort keys %Compile_options) {
      close ($readme);
      close ($writeme);
 
-     if ( $Arch eq "be" ) {
+     if ( $Arch eq "AIX" ) {
          open FHCONF, "<configure.wrf" or die "Where is configure.wrf: $!\n"; 
          open FH, ">configure.wrf.new" or die "Cannot open configure.wrf.new: $!\n"; 
          while ($_ = <FHCONF>) { 
@@ -255,7 +256,7 @@ foreach my $option (sort keys %Compile_options) {
          close (FH);
 
          rename "configure.wrf.new", "configure.wrf";
-     } elsif (($Arch eq "karri") && ($Compiler =~ /pgi/i) && ($Compile_options{$option} =~ /sm/i)) {
+     } elsif (($Arch eq "Linux") && ($Compiler =~ /pgi/i) && ($Compile_options{$option} =~ /sm/i)) {
          open FHCONF, "<configure.wrf" or die "Where is configure.wrf: $!\n"; 
          open FH, ">configure.wrf.new" or die "Cannot open configure.wrf.new: $!\n"; 
          while ($_ = <FHCONF>) { 
@@ -373,7 +374,7 @@ foreach my $name (keys %Experiments) {
 
 # submit job:
 
-($Arch eq "be") ? &submit_job_be : &submit_job ;
+($Arch eq "AIX") ? &submit_job_be : &submit_job ;
 
 # End time:
 
@@ -402,6 +403,7 @@ print SENDMAIL "Source :",$Source."\n";
 print SENDMAIL "Revision :",$Revision."\n";
 print SENDMAIL "Tester :",$Tester."\n";
 print SENDMAIL "Machine name :",$Host."\n";
+print SENDMAIL "Operating system :",$System."\n";
 print SENDMAIL "Compiler :",$Compiler."\n";
 print SENDMAIL "Baseline :",$Baseline."\n";
 print SENDMAIL @Message;
@@ -428,6 +430,7 @@ sub create_webpage {
     print WEBH '<li>'."Revision : $Revision".'</li>'."\n";
     print WEBH '<li>'."Tester : $Tester".'</li>'."\n";
     print WEBH '<li>'."Machine name : $Host".'</li>'."\n";
+    print WEBH '<li>'."Operating system : $System".'</li>'."\n";
     print WEBH '<li>'."Compiler : $Compiler".'</li>'."\n";
     print WEBH '<li>'."Baseline : $Baseline".'</li>'."\n";
     print WEBH '<li>'.$End_time.'</li>'."\n";
@@ -835,7 +838,7 @@ sub build_cwordsh {
 
 # Build cwordsh:
 
-    if ( $Arch ne "be" && 0 ) {
+    if ( $Arch ne "AIX" && 0 ) {
         my $ucarftp = Net::FTP->new("ftp.ucar.edu") 
             or die "Cannot connect to ftp.ucar.edu: $@";
         $ucarftp->login("anonymous",'-anonymous@')
@@ -889,7 +892,7 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-be         svn        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
+AIX        svn        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
@@ -903,7 +906,7 @@ be         svn        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-
 10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
+Linux      wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    none
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 #1        tutorial_xinzhang           4       4            serial|smpar|dmpar
 2        cv3_guo                     4       4            serial|smpar|dmpar
@@ -917,7 +920,7 @@ karri      wrfda.tar        gfortran         64000420  share   /karri/users/xinz
 10       sfc_assi_2_outerloop_guo    4       4            serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-gum        SVN        PGI         64000420  share   /Volumes/gum/xinzhang/regtest/WRFDA-data-EM    none
+Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           4       4            serial|dmpar
 2        cv3_guo                     4       4            serial|dmpar
