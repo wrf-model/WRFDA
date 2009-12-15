@@ -21,7 +21,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 my $Exec = 0; # Use the current EXEs in WRFDA or not
-my $Revision = 4028; # 'HEAD'; # Revision Number
+my $Revision = HEAD'; # Revision Number
 
 # Constant variables
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
@@ -607,6 +607,8 @@ sub compare2baseline {
    
      my ($name, $par) = @_;
 
+     return 1 unless ( -e "$name/wrfvar_output.$name.$par");
+
      my @output = `WRFDA/var/build/diffwrf $name/wrfvar_output.$name.$par $Baseline/wrfvar_output.$name`;
      
      my $found = 0;
@@ -703,6 +705,7 @@ sub submit_job_be {
 
                      my $rc = &new_job_be ( $name, $Compiler, $par, $Experiments{$name}{cpu_mpi},
                                          $Experiments{$name}{cpu_openmp} );
+
                      if (defined $rc) { 
                          $Experiments{$name}{paropt}{$par}{jobid} = $rc ;    # assign the jobid.
                          delete $Experiments{$name}{paropt}{$par}{starttime}; # reset the timer for this job.
@@ -892,7 +895,7 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-AIX        svn        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
+AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
