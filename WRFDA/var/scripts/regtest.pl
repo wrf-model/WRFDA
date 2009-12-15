@@ -21,7 +21,7 @@ $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
 my $Exec = 0; # Use the current EXEs in WRFDA or not
-my $Revision = HEAD'; # Revision Number
+my $Revision = 'HEAD'; # Revision Number
 
 # Constant variables
 my $SVN_REP = 'https://svn-wrf-model.cgd.ucar.edu/trunk';
