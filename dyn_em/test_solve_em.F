@@ -127,7 +127,7 @@ real                                     :: dtbc_save
 ! Get isolationVariable from namelist
    isolationVariable = 0 
    call nl_get_isolation_variable(1, isolationVariable)
-   if( isolationVariable < 0 .or. isolationVariable > 8 ) call wrf_error_fatal('Invalid isolationVariable value') 
+   if( isolationVariable < 0 .or. isolationVariable > 9 ) call wrf_error_fatal('Invalid isolationVariable value') 
 
 !  Obtain dimension information stored in the grid data structure.
    CALL get_ijk_from_grid (  grid ,                   &
@@ -559,6 +559,10 @@ real                                     :: dtbc_save
          moist_2 = S_moist_2 
          rainnc(:,:) = S_rainnc(:,:) 
          rainncv(:,:)= S_rainncv(:,:)
+      case(9)
+         write(*,*) 'In loop: isolate all variables except al and P'
+         al = S_al 
+         p = S_p 
       end select
    
       CALL solve_em ( grid , config_flags , &
@@ -711,6 +715,10 @@ real                                     :: dtbc_save
          moist_2 = B_moist_2 
          rainnc(:,:) = B_rainnc(:,:) 
          rainncv(:,:)= B_rainncv(:,:)
+      case(9)
+         write(*,*) 'In loop: Isolate all variables except al and P'
+         al = B_al 
+         p = B_p 
       end select
 
       z=0.; mudf=0. 
@@ -1275,6 +1283,9 @@ subroutine isolateVars(isolationVar, &
       moist_2 = 0.
       rainnc = 0.
       rainncv= 0.
+   case (9) !  Isolate all except P and al
+      al = 0. 
+      p = 0. 
    case default
       call wrf_error_fatal('Invalid isolation variable in isolateVars')
    end select

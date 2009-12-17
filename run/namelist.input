@@ -68,35 +68,35 @@
 ! All of these tests are called from dyn_em/solve_em_tst.F : test_tladj_routines()
 ! The test routines are defined in dyn_em/module_check.F
 ! 
- TEST_rk_step_prep          = .false.,
- TEST_init_zero_tendency    = .false.,
- TEST_phy_prep              = .false.,
- TEST_calculate_km_kh       = .false.,
- TEST_rk_tendency           = .false.,
- TEST_surface_drag          = .false.,
- TEST_lscond                = .false.,
- TEST_moist_physics_prep_em = .false.,
- TEST_advect_scalar         = .false.,
- TEST_relax_bdy_dry         = .false.,
- TEST_rk_addtend_dry        = .false.,
- TEST_spec_bdy_dry          = .false.,
- TEST_small_step_prep       = .false.,
- TEST_calc_p_rho            = .false.,
- TEST_calc_coef_w           = .false.,
- TEST_advance_uv            = .false.,
- TEST_spec_bdyupdate        = .false.,
- TEST_advance_mu_t          = .false.,
- TEST_sumflux               = .false.,
- TEST_advance_w             = .false.,
- TEST_spec_bdyupdate_ph     = .false.,
- TEST_calc_mu_uv_1          = .false.,
- TEST_small_step_finish     = .false.,
- TEST_rk_scalar_tend        = .false.,
- TEST_spec_bdy_scalar       = .false.,
- TEST_rk_update_scalar      = .false.,
- TEST_calc_p_rho_phi        = .false.,
- TEST_diagnose_w            = .false.,
- TEST_cudu                  = .false.
+ TEST_rk_step_prep          = .true.,
+ TEST_init_zero_tendency    = .true.,
+ TEST_phy_prep              = .true.,
+ TEST_calculate_km_kh       = .true.,
+ TEST_rk_tendency           = .true.,
+ TEST_surface_drag          = .true.,
+ TEST_lscond                = .true.,
+ TEST_moist_physics_prep_em = .true.,
+ TEST_advect_scalar         = .true.,
+ TEST_relax_bdy_dry         = .true.,
+ TEST_rk_addtend_dry        = .true.,
+ TEST_spec_bdy_dry          = .true.,
+ TEST_small_step_prep       = .true.,
+ TEST_calc_p_rho            = .true.,
+ TEST_calc_coef_w           = .true.,
+ TEST_advance_uv            = .true.,
+ TEST_spec_bdyupdate        = .true.,
+ TEST_advance_mu_t          = .true.,
+ TEST_sumflux               = .true.,
+ TEST_advance_w             = .true.,
+ TEST_spec_bdyupdate_ph     = .true.,
+ TEST_calc_mu_uv_1          = .true.,
+ TEST_small_step_finish     = .true.,
+ TEST_rk_scalar_tend        = .true.,
+ TEST_spec_bdy_scalar       = .true.,
+ TEST_rk_update_scalar      = .true.,
+ TEST_calc_p_rho_phi        = .true.,
+ TEST_diagnose_w            = .true.,
+ TEST_cudu                  = .true.
  /
 
  &physics
@@ -136,9 +136,10 @@
  tl_perturbation                     = .0,                       ! wrf+: Value added to tl/adj perturbation in tlad tests
  disable_solver                      = .false.                   ! wrf+: exit solve_em without executing code.
  stop_on_error                       = .false.                   ! wrf+: stop execution on tl/adj test error
- isolation_variable                  = 0                         ! wrf+: to isolate selected variables in test_solve_em()
+ isolation_variable                  = 9                         ! wrf+: to isolate selected variables in test_solve_em()
                                                                  ! 0 = no isolation; 1 = u,v,w; 2 = ph; 3 = T; 4 = mu
 							         ! 5 = moist_1,moist_2; 6 = rainnc, rainncv; 7 = p (pressure); 8 = al (inverse density)
+                                                                 ! 9 = Isolate all except p (7) and al (8)
  rk_ord                              = 3,                        ! WRF unused
  w_damping                           = 0,                        ! WRF unused 
  diff_opt                            = 1,                        ! WRF
