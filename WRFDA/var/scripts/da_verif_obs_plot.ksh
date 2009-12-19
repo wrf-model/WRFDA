@@ -181,15 +181,15 @@ else
    while read ob_fname
    do
       if [[ "$ob_fname" == "surface_p_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='"hPa"'
+         ob_unit='"Ps (hPa)"'
       elif [[ "$ob_fname" == "surface_t_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='T (Degree)'
+         ob_unit='T2M (Degree)'
       elif [[ "$ob_fname" == "surface_u_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='U (m/s)' 
+         ob_unit='U10 (m/s)' 
       elif [[ "$ob_fname" == "surface_v_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='V (m/s)' 
+         ob_unit='V10 (m/s)' 
       elif [[ "$ob_fname" == "surface_q_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='Q (gm/Kg)' 
+         ob_unit='Q2M (g/Kg)' 
       else
          echo "Unknown surface variable:-Don't know what to do??"
       fi
@@ -222,7 +222,7 @@ else
       elif [[ "$ob_fname" == "upr_v_${DIAG_VAR1}.diag" ]]; then
          ob_unit='V (m/s)' 
       elif [[ "$ob_fname" == "upr_q_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='Q (gm/Kg)' 
+         ob_unit='Q (g/Kg)' 
       else
          echo "Unknown upper-air variable:-Don't know what to do??"
       fi
@@ -255,7 +255,7 @@ else
       elif [ "$ob_fname" = "gupr_v_${DIAG_VAR1}.diag" ]; then
          ob_unit='V (m/s)'
       elif [ "$ob_fname" = "gupr_q_${DIAG_VAR1}.diag" ]; then
-         ob_unit='Q (gm/Kg)'
+         ob_unit='Q (g/Kg)'
       else
          echo "Unknown upper-air veritcal (gupr) variable:-Don't know what to do??"
       fi

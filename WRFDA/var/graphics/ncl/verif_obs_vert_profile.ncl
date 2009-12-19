@@ -1,4 +1,4 @@
-;============================================================;
+2;============================================================;
 ; Purpose:  Plots vertical profiles 
 ;============================================================;
 ; Author: Ananda Kumar Das (Visiting Scientist)
@@ -95,7 +95,7 @@ end do
 
 ;----------------------------------------------------------------------------------------
  out_name = "Profile_"+omboma_string
- q_level = 9
+ q_level = 16
  nv = num_vars
 ;
  data_omb = new ((/nv,num_expt,ncol/),"float",Fill_ValueF)
@@ -135,12 +135,16 @@ do idtype =1, num_d_scor   ;loop for score
   diag_name=diag_names(Type-1)
 ;----------------------------------------------------------------------------------------
  x = new((/nv,nexp,nlev/),"float",Fill_ValueF)
+ number = new((/nv,nexp,nlev/),"float",Fill_ValueF)
  bar = new((/nv,nexp,nlev/),"float",Fill_ValueF)
  sigt = new((/nv,nexp,nlev/),"float",Fill_ValueF)
 
+
+  print("nv = " + nv)
   do iv = 1, nv
   do iexp = 1, num_expt
     do ilev = 1 , nlev
+     number((iv-1),(iexp-1),(ilev-1))  = data_omb(iv-1,iexp-1,1+(ilev-1)*6)
      if( omboma .eq. 1) then
       x(iv-1,2*iexp-2,ilev-1)    = data_omb(iv-1,iexp-1,1+(ilev-1)*6+Type)
       bar(iv-1,2*iexp-2,ilev-1)  = data_omb(iv-1,iexp-1,5+(ilev-1)*6)
@@ -151,6 +155,7 @@ do idtype =1, num_d_scor   ;loop for score
       sigt(iv-1,2*iexp-1,ilev-1) = data_oma(iv-1,iexp-1,6+(ilev-1)*6)
      else
       x((iv-1),(iexp-1),(ilev-1)) = data_omb((iv-1),(iexp-1),(1+(ilev-1)*6+Type))
+      print(number(iv-1,iexp-1,ilev-1))
       bar((iv-1),(iexp-1),(ilev-1)) = data_omb((iv-1),(iexp-1),5+(ilev-1)*6)
       sigt((iv-1),(iexp-1),(ilev-1)) = data_omb((iv-1),(iexp-1),6+(ilev-1)*6)
      end if
@@ -165,7 +170,9 @@ do idtype =1, num_d_scor   ;loop for score
  plts  = new (nv,"graphic")
  y = new((/nlev/),"integer",Fill_ValueI)
  y = ispan(0,nlev-1,1)
-
+ 
+ print("Louis")
+ print(y) 
  centers=new((/nv,nexp,nlev/),graphic)
  error_bar = new((/nv,nexp,nlev/),graphic)
 ;----------------------------------------------------------------------------------------
@@ -184,15 +191,20 @@ do iv =1, nv   ;loop for variable
  res@tmXTBorderOn           = True                    ; set up the top border
  res@tmXTOn                 = False                   ; set the top tickmark
 
-;res@tmYRBorderOn           = False                   ; set up the Right border
-;9999 res@tmYRLabelsOn           = True               ; set the Right axis
- res@tmYRLabelsOn           = False                   ; setup right axis label
-;9999 res@tmYROn                 = True                    ; set the Right tickmark
- res@tmYROn                 = False                    ; set the Right tickmark
- res@tmYRMode               = "Explicit"
+ res@tmYUseLeft             = False
+; res@tmYRBorderOn           = False                   ; set up the Right border
+ res@tmYROn                 = True                    ; set the Right tickmark
+;9999 res@tmYROn                 = False                    ; set the Right tickmark
+ res@tmYRMode               = "Explicit"	
+ res@tmYRLabelsOn           = True               ; set the Right axis
+; res@tmYRLabelsOn           = False                   ; setup right axis label
+ res@tmYRValues             = y;                       ; an array of tick locations (must be monotonic)
+ res@tmYRLabels             = number(iv-1,0,:)            ; an array of strings
+
+
  res@tmYLMode               = "Explicit"
  res@tmLabelAutoStride      = True 
- res@tmYUseLeft             = False
+ 
 
 
  res@tiXAxisFont            = "Times-roman"           ; Font for X axis label
@@ -206,7 +218,7 @@ do iv =1, nv   ;loop for variable
  res@tiYAxisString   = " Pressure (hPa)"              ; Label for the X axis
 
  res@tmYLValues  = y                              ; Assign y-axis labels
- res@tmYRValues  = y
+; res@tmYRValues  = y
  res@tmYLLabels  = plevels
 
  res@tiXAxisString   = varunits(iv-1)             ; Label for the Y axis
@@ -243,15 +255,15 @@ do iv =1, nv   ;loop for variable
   if (.not. ismissing(x(iv-1,iexp-1,ilev-1))) then
    polyres@gsMarkerColor     = legend_line_cols(iexp-1)                         ; color
    polyres@gsLineColor = legend_line_cols(iexp-1)
-   error_bar(iv-1,iexp-1,ilev-1)=gsn_add_polyline(wks,plts(iv-1), \
-                               (/x(iv-1,iexp-1,ilev-1)+\
-                               bar(iv-1,iexp-1,ilev-1),\
-                               x(iv-1,iexp-1,ilev-1)-bar(iv-1,iexp-1,ilev-1)/),\
-                               (/y(ilev-1),y(ilev-1)/), polyres)
-    if(sigt(iv-1,iexp-1,ilev-1) .gt. 0 ) then
+   ;error_bar(iv-1,iexp-1,ilev-1)=gsn_add_polyline(wks,plts(iv-1), \
+   ;                            (/x(iv-1,iexp-1,ilev-1)+\
+   ;                            bar(iv-1,iexp-1,ilev-1),\
+   ;                            x(iv-1,iexp-1,ilev-1)-bar(iv-1,iexp-1,ilev-1)/),\
+   ;                            (/y(ilev-1),y(ilev-1)/), polyres)
+   ; if(sigt(iv-1,iexp-1,ilev-1) .gt. 0 ) then
      centers(iv-1,iexp-1,ilev-1)= \
      gsn_add_polymarker(wks,plts(iv-1),x(iv-1,iexp-1,ilev-1),y(ilev-1), polyres)
-    end if
+   ; end if
   end if
  end do
  end do

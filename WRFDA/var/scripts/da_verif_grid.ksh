@@ -49,7 +49,7 @@ export DESIRED_SCORES=${DESIRED_SCORES:-'(/"RMSE","BIAS","ABIAS"/)'}
 export EXP_LINES_COLORS=${EXP_LINES_COLORS:-'(/"blue","green", "orange"/)'}
 
 export NUM3D=${NUM3D:-6}
-export VAR3D=${VAR3D:-"U  V  T  QVAPOR  Z WV"}
+export VAR3D=${VAR3D:-"U  V  WV T  Z QVAPOR"}
 export NUM2D=${NUM2D:-6}
 export VAR2D=${VAR2D:-"MU PSFC U10M V10M T2M Q2M"}
 #--------------------------------------------------------------------------------------

@@ -167,7 +167,7 @@ begin
    do iv = 1, num_vars
      var=stringtocharacter(varfiles(iv-1))
       do iexp = 1, nexp
-           if (var(0:5) .eq. "QVAPOR") then
+           if (var(0:5) .eq. "QVAPOR" .or. var(0:2) .eq. "Q2M" ) then
            y_bar(iv-1,iexp-1) = 1000.0*avg(data((iv-1),(iexp-1),:,(1+(level-1)*4+Type)))
            else
            y_bar(iv-1,iexp-1) = avg(data((iv-1),(iexp-1),:,(1+(level-1)*4+Type)))
