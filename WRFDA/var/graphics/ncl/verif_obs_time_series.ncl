@@ -92,7 +92,7 @@ begin
    varunits = new((/num_vars/),"string")
    anal_var = new((/num_vars/),"string")
    if( num_vars .eq. 5) then
-   anal_var =(/"U","V","T","Q","Ps"/)
+   anal_var =(/"U10","V10","T2M","Q2M","Ps"/)
    else
    anal_var =(/"U","V","T","Q"/)
    end if

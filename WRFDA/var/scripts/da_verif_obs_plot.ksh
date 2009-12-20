@@ -181,7 +181,7 @@ else
    while read ob_fname
    do
       if [[ "$ob_fname" == "surface_p_${DIAG_VAR1}.diag" ]]; then
-         ob_unit='"Ps (hPa)"'
+         ob_unit='Ps (hPa)'
       elif [[ "$ob_fname" == "surface_t_${DIAG_VAR1}.diag" ]]; then
          ob_unit='T2M (Degree)'
       elif [[ "$ob_fname" == "surface_u_${DIAG_VAR1}.diag" ]]; then
