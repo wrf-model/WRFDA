@@ -1,17 +1,17 @@
-#!/bin/ksh
+#!/bin/ksh  -aeux
 #########################################################################
 # Script: da_plot_psot.ksh
 #
-# Purpose:  A script to plot pseudo single observation test
-#          
-# By Hui Shao, NCAR DATC 08/27/2007
+# Purpose: Ploting script for single obs tests (works both for GSI & WRFDA)
+# Author : Syed RH Rizvi, MMM/ESSL/NCAR,  Date:04/15/2009
 #########################################################################
 #------------------------------------------------------------------------
 #Set defaults for required environment variables
 #------------------------------------------------------------------------
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/WRFDA}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
@@ -68,43 +68,50 @@ done
 iv=1
 for var in ${PSEUDO_VAR[*]}; do
 
-   expt=${EXPT}_psot$iv
-   xlon=${PSEUDO_X[$iv]}
-   xlat=${PSEUDO_Y[$iv]}
+   expt=psot$iv
+   xlon=${PSEUDO_X[$iv]} 
+   xlat=${PSEUDO_Y[$iv]} 
    kl=${PSEUDO_Z[$iv]}
-   omb=${PSEUDO_VAL[$iv]}
-   err=${PSEUDO_ERR[$iv]}
-
-   if [[ $var = u ]]; then unit="m s-1"; fi
-   if [[ $var = v ]]; then unit="m s-1"; fi
-   if [[ $var = t ]]; then unit="K"; fi
-   if [[ $var = q ]]; then unit="kg kg-1"; fi
-
-   DATE=$INITIAL_DATE
-
-      export FIRST_GUESS=${EXP_DIR}/run/$DATE/wrfvar_psot${iv}/working/wrfinput_d${DOMAINS}
-      export ANALYSIS=${EXP_DIR}/fc/psot${iv}/$DATE/analysis
 
 
+   export ANALYSIS=${EXP_DIR}/fc/psot$iv/$INITIAL_DATE/wrfinput_d${DOMAINS}
+   export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$INITIAL_DATE/wrfinput_d01}
+
+   if $RUN_PSOT_GSI ; then 
+     if $ONEOB_ONGRID ; then 
+       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
+                'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' \
+                'bakfile=\"$DA_FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot.ncl" > run_psot_ncl
+     else 
+      iz=0
+      for var in $PSEUDO_LAT_LIST; do
+      (( iz=iz+1 ))
+       export PSEUDO_LAT[$iz]=$var
+      done
+      iz=0
+      for var in $PSEUDO_LON_LIST; do
+      (( iz=iz+1 ))
+       export PSEUDO_LON[$iz]=$var
+      done
+
+       xlat=${PSEUDO_LAT[$iv]} 
+       xlon=${PSEUDO_LON[$iv]} 
+       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
+                'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' \
+                'bakfile=\"$DA_FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot_gsi_on_latlon.ncl" > run_psot_ncl
+     fi
+   fi
+   if $RUN_PSOT_WRFVAR ; then 
       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
-                      'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' 'var=\"$var\"' 'date=\"$DATE\"'  \
-                      'omb=\"$omb\"' 'err=\"$err\"' 'varunit=\"$unit\"' \
-                      'bakfile=\"$FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
-
-      rm -f run1 run2 run3
-
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/graphics/ncl/psot_xy_auto.ncl" > run1
-      chmod +x run1
-      ./run1
-
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/graphics/ncl/psot_xz_auto.ncl" > run2
-      chmod +x run2
-      ./run2
-
-      echo "ncl ${NCL_COMMAND_LINE} $WRFVAR_DIR/graphics/ncl/psot_yz_auto.ncl" > run3
-      chmod +x run3
-      ./run3
-
+            'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' \
+            'bakfile=\"$DA_FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot.ncl" > run_psot_ncl
+   fi
+       chmod +x run_psot_ncl
+       ./run_psot_ncl
+       rm -f run_psot_ncl
    (( iv=iv+1 ))
 done
 

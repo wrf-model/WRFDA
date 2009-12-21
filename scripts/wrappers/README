@@ -1,7 +1,7 @@
 
 Please note that the following directory setting: 
 
-WRFVAR_DIR/scripts 
+WRFVAR_DIR/var/scripts 
 
 has been changed to
 
@@ -11,10 +11,26 @@ to allow users to make use of tehir version scripts
 if they want to.
 
 It is default setting is: 
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts} 
 in da_set_defaults.ksh
 
 If the user desires to use a different script directory
 can do so in hir/her wrapper. See the below given example:
 
 export SCRIPTS_DIR=/rap/datc/demirtas/experiments/afwa/t46/da_scripts
+
+New procedure for running PSOT either with GSI or WRFDA
+--------------------------------------------------------
+
+By designing suitable arapper one can achieve an end-to-end
+running psot test including graphics.
+
+Details about how to build a suitabl;e wrapper may be seen at
+
+https://wiki.ucar/edu/display/mmm/Syed+Rizvi
+
+
+A sample wraaper scripts (wrapper_run_psot_katrina.ksh) for "katrina" domain 
+is availabe in this directory
+
+
