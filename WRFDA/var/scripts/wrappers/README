@@ -18,3 +18,19 @@ If the user desires to use a different script directory
 can do so in hir/her wrapper. See the below given example:
 
 export SCRIPTS_DIR=/rap/datc/demirtas/experiments/afwa/t46/da_scripts
+
+New procedure for running PSOT either with GSI or WRFDA
+--------------------------------------------------------
+
+By designing suitable arapper one can achieve an end-to-end
+running psot test including graphics.
+
+Details about how to build a suitabl;e wrapper may be seen at
+
+https://wiki.ucar/edu/display/mmm/Syed+Rizvi
+
+
+A sample wraaper scripts (wrapper_run_psot_katrina.ksh) for "katrina" domain 
+is availabe in this directory
+
+
