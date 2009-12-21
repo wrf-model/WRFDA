@@ -143,7 +143,7 @@ while [[ $iv -le $PSEUDO_VAR_SIZE ]]; do
       export RUN_DIR=$EXP_DIR/run/$DATE/psot$iv
       mkdir -p $RUN_DIR
  
-      export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAINS}
+      export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$DATE/wrfinput_d${DOMAINS}}
       export DA_ANALYSIS=$FC_DIR/$DATE/wrfinput_d${DOMAINS}
 
       #-----------------------------------------------------------------------
