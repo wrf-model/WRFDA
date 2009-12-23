@@ -115,8 +115,22 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_rai
 real                                     :: dtbc_save
 !---------------------------------------------------------------------------------------
 
-   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, nsum
-   REAL :: VAL_N, VAL_L, VAL_A
+   ! TLM Diagnostics
+   REAL :: ALPHA_M    ! Perturbation value that is added to the NLM input values in each step of the test loop 
+   REAL :: VAL_N      ! L2 norm of the perturbations as computed from the perturbed NLM solution, i.e. the difference vector
+   REAL :: VAL_L      ! SAVE_L * ALPHA_M**2,
+   REAL :: SAVE_L     ! Sum of all values, for g_* ^2 (i..e. all TLM solution values squared)
+                      ! L2 norm of the perturbations as computed from the TLM solution
+                      ! (the TLM, since it's linear, only has to be computed once, and then the result multiplied by 
+		      ! the square of the scaling factor, since the L2 norm is proportional to the square of the perturbations, 
+		      ! and the perturbations are proportional to the scaling factor.)
+   REAL :: COEF       ! VAL_L / VAL_N; Ratio of the NLM to TLM L2 norm; this should asymptote to unity.
+
+   ! ADM Diagnostics   
+   REAL :: VAL_A      ! I.e., VAL_AD in output; Sum of all values; (a_*) * (a_* - 1) 
+   ! For ADM, VAL_L is VAL_TL, i.e. Sum of all values, for g_* ^2 (i..e. all TLM solution values squared) 
+   
+   REAL :: FACTOR, nsum
    INTEGER :: NT,h, ifs, ife, jfs, jfe, comm, ierror
    INTEGER, PARAMETER :: tladj_steps = 1    ! 090923 bp; to enable multiple steps in tladj test
    LOGICAL :: stopOnError                   ! 090924 bp; halt program execution on tladj test failure

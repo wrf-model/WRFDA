@@ -6,12 +6,13 @@
 #
 
 set fName = ModulesOutline.txt   # output text file
-rm $fName 
+#rm $fName 
 echo "Create Module Outline: " $fName " for  .F files in: " `pwd`
 echo "Create Module Outline: " $fName " for  .F files in: " `pwd` >> $fName
 
 set wrfpDirs = "dyn_em dyn_exp external frame inc main phys Registry run share"
 
+echo "go"
 foreach d ( `echo $wrfpDirs` )
    foreach f ( `find $d -name "*.F" -print` )
       echo $f

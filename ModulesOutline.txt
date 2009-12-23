@@ -1,6 +1,8 @@
-Create Module Outline:  ModulesOutline.txt  for  .F files in:  /users/paisley/WRF/wrfplus2.0
+Create Module Outline:  ModulesOutline.txt  for  .F files in:  /blhome/paisley/WRF/wrfplus2.0
 Filename::::  dyn_em/module_initialize_hill2d_x.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
@@ -9,13 +11,17 @@ Filename::::  dyn_em/module_initialize_hill2d_x.F
  
 Filename::::  dyn_em/module_advect_em.F
 ==================================================
+MODULE module_advect_em
  
 Filename::::  dyn_em/module_bc_ad.F
 ==================================================
+module     a_module_bc
    subroutine a_zero_grad_bdy( a_field, variable_in, spec_zone, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
  
 Filename::::  dyn_em/module_initialize_grav2d_x.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
@@ -24,10 +30,14 @@ Filename::::  dyn_em/module_initialize_grav2d_x.F
  
 Filename::::  dyn_em/module_em_tl.F
 ==================================================
+module g_module_em
    subroutine g_rk_step_prep( config_flags, u, g_u, v, g_v, w, g_w, ph, g_ph, mu, g_mu, moist, g_moist, ru, g_ru, rv, g_rv, rw, g_rw, &
  
 Filename::::  dyn_em/module_initialize_real.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE const_module_initialize ( p00 , t00 , a ) 
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE const_module_initialize ( p00 , t00 , a ) 
@@ -37,10 +47,12 @@ Filename::::  dyn_em/module_initialize_real.F
  
 Filename::::  dyn_em/module_em_ad.F
 ==================================================
+module     a_module_em
    subroutine a_rk_step_prep( config_flags, u, a_u, v, a_v, w, a_w, a_ph, mu, a_mu, moist, a_moist, a_ru, a_rv, a_rw, a_ww, a_php, &
  
 Filename::::  dyn_em/module_bc_em.F
 ==================================================
+MODULE module_bc_em
    SUBROUTINE spec_bdyupdate_ph( ph_save, field,      &
    SUBROUTINE relax_bdy_dry ( config_flags,                                    &
    SUBROUTINE spec_bdy_dry ( config_flags,                        &
@@ -53,6 +65,7 @@ Filename::::  dyn_em/module_bc_em.F
  
 Filename::::  dyn_em/module_diffusion_em.F
 ==================================================
+MODULE module_diffusion_em
    SUBROUTINE isotropic_km( config_flags,                                         &
    SUBROUTINE smag_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,BN2,                &
    SUBROUTINE smag2d_km( config_flags,xkmh,xkmhd,xkmv,xkhh,xkhv,                  &
@@ -62,10 +75,12 @@ Filename::::  dyn_em/module_diffusion_em.F
  
 Filename::::  dyn_em/init_modules_em.F
 ==================================================
+SUBROUTINE init_modules_em
    SUBROUTINE init_modules_em
  
 Filename::::  dyn_em/module_big_step_utilities_em_tl.F
 ==================================================
+module g_module_big_step_utilities_em
    subroutine g_couple_momentum( muu, g_muu, ru, g_ru, u, g_u, msfu, muv, g_muv, rv, g_rv, v, g_v, msfv, mut, g_mut, rw, g_rw, w, g_w,&
    subroutine g_phy_prep( p, g_p, pb, ph, g_ph, phb, t, g_t, mu_3d, rho, th_phy, g_th_phy, p_phy, g_p_phy, pi_phy, g_pi_phy, u_phy, &
    subroutine g_moist_physics_prep_em( t_new, g_t_new, t_old, g_t_old, t0, rho, g_rho, al, g_al, alb, p, g_p, p8w, g_p8w, p0, &
@@ -79,6 +94,8 @@ Filename::::  dyn_em/nest_init_utils.F
  
 Filename::::  dyn_em/module_big_step_utilities_em.F
 ==================================================
+MODULE module_big_step_utilities_em
+SUBROUTINE init_module_big_step
    SUBROUTINE couple_momentum ( muu, ru, u, msfu,              &
    SUBROUTINE couple ( mu, mub, rfield, field, name, &
    SUBROUTINE decouple ( rr, rfield, field, name, config_flags, &
@@ -89,6 +106,7 @@ Filename::::  dyn_em/module_big_step_utilities_em.F
  
 Filename::::  dyn_em/module_big_step_utilities_em_ad.F
 ==================================================
+module     a_module_big_step_utilities_em
    subroutine a_couple_momentum( muu, a_muu, a_ru, u, a_u, msfu, muv, a_muv, a_rv, v, a_v, msfv, mut, a_mut, a_rw, w, a_w, msft, ide, &
    subroutine a_phy_prep( p, a_p, pb, ph, a_ph, phb, t, a_t, th_phy, a_th_phy, p_phy, a_p_phy, pi_phy, a_pi_phy, a_p8w, t_phy, &
    subroutine a_moist_physics_prep_em( t_new, a_t_new, t_old, a_t_old, t0, rho, a_rho, al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
@@ -100,6 +118,7 @@ Filename::::  dyn_em/couple_or_uncouple_em.F
  
 Filename::::  dyn_em/module_solvedebug_em.F
 ==================================================
+MODULE module_solvedebug_em
    SUBROUTINE var_min_max( u,v,w,t,r,                  &
    SUBROUTINE var1_min_max( u, &
    SUBROUTINE var_print ( u, &
@@ -107,6 +126,7 @@ Filename::::  dyn_em/module_solvedebug_em.F
  
 Filename::::  dyn_em/module_small_step_em_tl.F
 ==================================================
+module     g_module_small_step_em
    subroutine g_advance_mu_t( ww, g_ww, ww_1, g_ww_1, u, g_u, u_1, g_u_1, v, g_v, v_1, g_v_1, mu, g_mu, mut, g_mut, muave, g_muave, &
    subroutine g_small_step_finish( u_2, g_u_2, v_2, g_v_2, w_2, g_w_2, t_2, g_t_2, ph_2, g_ph_2, ww, mu_2, g_mu_2, mut, g_mut, muts, &
    subroutine g_small_step_prep( u_1, g_u_1, u_2, g_u_2, v_1, g_v_1, v_2, g_v_2, w_1, g_w_1, w_2, g_w_2, t_1, g_t_1, t_2, g_t_2, ph_1,&
@@ -114,6 +134,8 @@ Filename::::  dyn_em/module_small_step_em_tl.F
  
 Filename::::  dyn_em/module_initialize_b_wave.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
@@ -123,6 +145,8 @@ Filename::::  dyn_em/module_initialize_b_wave.F
  
 Filename::::  dyn_em/module_small_step_em.F
 ==================================================
+MODULE module_small_step_em
+SUBROUTINE init_module_small_step
    SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
    SUBROUTINE small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
    SUBROUTINE advance_mu_t( ww, ww_1, u, u_1, v, v_1,            &
@@ -131,9 +155,19 @@ Filename::::  dyn_em/module_small_step_em.F
  
 Filename::::  dyn_em/module_advect_em_tl.F
 ==================================================
+module     g_module_advect_em
+ 
+Filename::::  dyn_em/solve_em_tst.F
+==================================================
+   SUBROUTINE test_tladj_routines ( grid , config_flags , &
+ 
+Filename::::  dyn_em/module_bc_em_ad.F
+==================================================
+module     a_module_bc_em
  
 Filename::::  dyn_em/module_small_step_em_ad.F
 ==================================================
+module     a_module_small_step_em
    subroutine a_advance_mu_t( ww, a_ww, ww_1, a_ww_1, u, a_u, u_1, a_u_1, v, a_v, v_1, a_v_1, a_mu, a_mut, a_muave, a_muts, muu, &
    subroutine a_small_step_finish( u_2, a_u_2, v_2, a_v_2, w_2, a_w_2, t_2, a_t_2, a_ph_2, a_mu_2, mut, a_mut, muts, a_muts, muu, &
    subroutine a_small_step_prep( u_1, a_u_1, u_2, a_u_2, v_1, a_v_1, v_2, a_v_2, w_1, a_w_1, w_2, a_w_2, t_1, a_t_1, t_2, a_t_2, &
@@ -141,16 +175,16 @@ Filename::::  dyn_em/module_small_step_em_ad.F
  
 Filename::::  dyn_em/module_advect_em_ad.F
 ==================================================
+module     a_module_advect_em
  
 Filename::::  dyn_em/module_init_utilities.F
 ==================================================
- 
-Filename::::  dyn_em/solve_em_tst.F
-==================================================
-   SUBROUTINE solve_em_tst ( grid , config_flags , &
+MODULE module_init_utilities
  
 Filename::::  dyn_em/module_initialize_squall2d_x.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
@@ -159,6 +193,8 @@ Filename::::  dyn_em/module_initialize_squall2d_x.F
  
 Filename::::  dyn_em/module_initialize_squall2d_y.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
@@ -167,6 +203,7 @@ Filename::::  dyn_em/module_initialize_squall2d_y.F
  
 Filename::::  dyn_em/module_em.F
 ==================================================
+MODULE module_em
    SUBROUTINE rk_step_prep  ( config_flags, rk_step,           &
    SUBROUTINE time_filter  ( u_1, u_2, u_save,             &
    SUBROUTINE dump_data( a, field, io_unit,            &
@@ -180,6 +217,7 @@ Filename::::  dyn_em/solve_em_tl.F
 Filename::::  dyn_em/test_solve_em.F
 ==================================================
    SUBROUTINE test_solve_em ( grid , config_flags , &
+   subroutine isolateVars(isolationVar, &
  
 Filename::::  dyn_em/interp_domain_em.F
 ==================================================
@@ -189,32 +227,33 @@ Filename::::  dyn_em/interp_domain_em.F
  
 Filename::::  dyn_em/module_bc_em_tl.F
 ==================================================
+module     g_module_bc_em
  
 Filename::::  dyn_em/solve_em.F
 ==================================================
    SUBROUTINE solve_em ( grid , config_flags , &
  
+Filename::::  dyn_em/solve_em_ad.F
+==================================================
+   SUBROUTINE solve_em_ad ( grid , config_flags , &
+ 
 Filename::::  dyn_em/module_diffusion_em_tl.F
 ==================================================
+module     g_module_diffusion_em
    subroutine g_isotropic_km( xkmh, xkmhd, g_xkmhd, xkmv, xkhh, xkhv, khdif, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
    subroutine g_smag2d_km( config_flags, xkmh, g_xkmh, xkmhd, g_xkmhd, xkmv, xkhh, xkhv, defor11, defor22, defor12, dx, dy, ids, ide, &
    subroutine g_smag_km( config_flags, xkmh, g_xkmh, xkmhd, g_xkmhd, xkmv, xkhh, xkhv, bn2, g_bn2, defor11, defor22, defor33, defor12,&
    subroutine g_tke_km( config_flags, xkmh, g_xkmh, xkmhd, g_xkmhd, xkmv, xkhh, xkhv, bn2, g_bn2, tke, rdzw, dx, dy, &
  
-Filename::::  dyn_em/solve_em_ad.F
-==================================================
-   SUBROUTINE solve_em_ad ( grid , config_flags , &
- 
 Filename::::  dyn_em/module_initialize_quarter_ss.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_domain_rk ( grid, &
    SUBROUTINE init_module_initialize
    subroutine get_sounding( zk, p, p_dry, theta, rho, &
    subroutine read_sounding( ps,ts,qvs,h,th,qv,u,v,n,nl,debug )
- 
-Filename::::  dyn_em/module_bc_em_ad.F
-==================================================
  
 Filename::::  dyn_em/start_em.F
 ==================================================
@@ -222,6 +261,7 @@ Filename::::  dyn_em/start_em.F
  
 Filename::::  dyn_em/module_linked_lisk2.F
 ==================================================
+module module_linked_list2
    subroutine linkedlist_initialize
    subroutine check_linkedlist
    subroutine push_1_array(a1, varname)
@@ -315,6 +355,7 @@ Filename::::  dyn_em/module_linked_lisk2.F
  
 Filename::::  dyn_em/module_diffusion_em_ad.F
 ==================================================
+module     a_module_diffusion_em
    subroutine a_isotropic_km( a_xkmhd, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
    subroutine a_smag2d_km( config_flags, xkmh, a_xkmh, a_xkmhd, defor11, defor22, defor12, dx, dy, ids, ide, jds, jde, kde, ims, ime, &
    subroutine a_smag_km( config_flags, xkmh, a_xkmh, a_xkmhd, bn2, a_bn2, defor11, defor22, defor33, defor12, defor13, defor23, rdzw, &
@@ -325,6 +366,7 @@ Filename::::  dyn_em/addroutines.F
  
 Filename::::  dyn_em/module_check.F
 ==================================================
+MODULE module_check
    SUBROUTINE t_rk_step_prep  ( config_flags, rk_step,           &
    SUBROUTINE t_phy_prep ( config_flags,                                &  ! input
    SUBROUTINE t_relax_bdy_dry ( config_flags,                                    &
@@ -341,15 +383,23 @@ Filename::::  dyn_em/module_check.F
  
 Filename::::  dyn_em/module_bc_tl.F
 ==================================================
+module     g_module_bc
    subroutine g_zero_grad_bdy( field, g_field, variable_in, spec_zone, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, &
+ 
+Filename::::  dyn_em/test_solve_em_TN.F
+==================================================
+   SUBROUTINE test_solve_em ( grid , config_flags , &
  
 Filename::::  dyn_exp/module_exp.F
 ==================================================
+MODULE module_exp
    SUBROUTINE relax_1_into_2  ( x1, x2,                        &
    SUBROUTINE copy_2_into_1  ( x2, x1,                        &
  
 Filename::::  dyn_exp/module_initialize_exp.F
 ==================================================
+MODULE module_initialize
+SUBROUTINE init_module_initialize
    SUBROUTINE init_domain_exp ( grid, &
    SUBROUTINE init_domain ( grid )
    SUBROUTINE init_module_initialize
@@ -360,10 +410,12 @@ Filename::::  dyn_exp/solve_exp.F
  
 Filename::::  dyn_exp/init_modules_exp.F
 ==================================================
+SUBROUTINE init_modules_exp
    SUBROUTINE init_modules_exp
  
 Filename::::  external/io_int/module_internal_header_util.F
 ==================================================
+MODULE module_internal_header_util
    SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
    SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
    SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
@@ -391,6 +443,7 @@ Filename::::  external/io_int/module_internal_header_util.F
  
 Filename::::  external/io_int/diffwrf.F
 ==================================================
+module read_util_module
    subroutine getarg(i, harg)
    subroutine arguments(v2file, lmore)
    subroutine help
@@ -405,6 +458,8 @@ Filename::::  external/RSL_LITE/f_pack.F
  
 Filename::::  external/RSL_LITE/module_dm.F
 ==================================================
+MODULE module_dm
+SUBROUTINE init_module_dm
    SUBROUTINE MPASPECT( P, MINM, MINN, PROCMIN_M, PROCMIN_N )
    SUBROUTINE wrf_dm_initialize
    SUBROUTINE patch_domain_rsl_lite( id  , parent, parent_id, &
@@ -482,6 +537,7 @@ Filename::::  external/RSL_LITE/module_dm.F
  
 Filename::::  frame/module_integrate_ad.F
 ==================================================
+MODULE module_integrate_ad
    RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
    SUBROUTINE solve_interface_ad ( grid )
    SUBROUTINE med_before_solve_io ( grid , config_flags )
@@ -494,12 +550,305 @@ Filename::::  frame/module_integrate_ad.F
    SUBROUTINE med_setup_step ( grid , config_flags )
    SUBROUTINE Setup_Timekeeping( grid )
  
+Filename::::  frame/add_forcing_to_ad.F
+==================================================
+   SUBROUTINE add_forcing_to_ad(grid)
+ 
+Filename::::  frame/module_dfi.F
+==================================================
+MODULE module_dfi
+   SUBROUTINE jcdfi_init_coef ( grid , config_flags )
+   SUBROUTINE jcdfi_zero_ad ( grid )
+   SUBROUTINE jcdfi_tl ( grid ,i)
+   SUBROUTINE jcdfi_output_forcing ( grid , config_flags )
+   SUBROUTINE jcdfi_add_forcing ( grid ,i )
+   SUBROUTINE jcdfi_input_forcing ( grid ,config_flags )
+   SUBROUTINE jcdfi_finalize
+   SUBROUTINE JCDFI_COEF (MYPE,NSTEPS,DT,TAUC,NFILT)
+   SUBROUTINE NORMLZ(HH,NMAX)
+   subroutine debug(nsteps, ww)
+   SUBROUTINE UNIFORM(NSTEPS,WW)
+   SUBROUTINE LANCZOS(NSTEPS,WW)
+   SUBROUTINE HAMMING(NSTEPS,WW)
+   SUBROUTINE BLACKMAN(NSTEPS,WW)
+   SUBROUTINE KAISER(NSTEPS,WW)
+   SUBROUTINE POTTER2(NSTEPS,WW)
+   SUBROUTINE  DOLPHWIN(M,WINDOW)
+   SUBROUTINE  DOLPH(MYPE, DELTAT, TAUS, M, WINDOW)
+   SUBROUTINE CHEBY(T,N,X)
+   SUBROUTINE RHOFIL(DT,TAUC,NORDER,NSTEP,ICTYPE,FROW,NOSIZE)
+   SUBROUTINE RHOCOF(NORD,NOMAX,MUC,CA,CB)
+ 
+Filename::::  frame/protomain.F
+==================================================
+ 
+Filename::::  frame/module_machine.F
+==================================================
+MODULE module_machine
+SUBROUTINE init_module_machine
+   RECURSIVE SUBROUTINE rlocproc(p,maxi,nproc,ml,mr,ret)
+   SUBROUTINE patchmap( res, y, x, py, px )
+   SUBROUTINE least_aspect( nparts, minparts_y, minparts_x, nparts_y, nparts_x )
+   SUBROUTINE init_module_machine
+   SUBROUTINE wrf_sizeof_integer( retval )
+   SUBROUTINE wrf_sizeof_real( retval )
+   SUBROUTINE wrf_sizeof_doubleprecision( retval )
+ 
+Filename::::  frame/wrf_shutdown.F
+==================================================
+   SUBROUTINE wrf_shutdown
+ 
+Filename::::  frame/xxx_template_ioapi.F
+==================================================
+   SUBROUTINE ext_xxx_ioinit( SysDepInfo,Status )
+   SUBROUTINE ext_xxx_inquiry( Inquiry, Result,Status )
+   SUBROUTINE ext_xxx_ioexit( Status )
+   SUBROUTINE ext_xxx_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInfo, &
+   SUBROUTINE ext_xxx_open_for_write_commit( DataHandle , Status )
+   SUBROUTINE ext_xxx_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
+   SUBROUTINE ext_xxx_inquire_opened ( DataHandle, FileName , FileStatus, Status )
+   SUBROUTINE ext_xxx_inquire_filename ( DataHandle, FileName , FileStatus, Status )
+   SUBROUTINE ext_xxx_iosync ( DataHandle, Status )
+   SUBROUTINE ext_xxx_ioclose ( DataHandle, Status )
+   SUBROUTINE ext_xxx_get_next_time ( DataHandle, DateStr, Status )
+   SUBROUTINE ext_xxx_set_time ( DataHandle, DateStr, Status )
+   SUBROUTINE ext_xxx_get_next_var ( DataHandle, VarName, Status )
+   SUBROUTINE ext_xxx_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
+   SUBROUTINE ext_xxx_put_dom_ti_char ( DataHandle,Element,   Data,  Status )
+   SUBROUTINE ext_xxx_get_dom_td_real ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
+   SUBROUTINE ext_xxx_put_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
+   SUBROUTINE ext_xxx_get_var_ti_real ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_ti_integer ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
+   SUBROUTINE ext_xxx_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
+   SUBROUTINE ext_xxx_get_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+   SUBROUTINE ext_xxx_put_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE ext_xxx_get_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
+   SUBROUTINE ext_xxx_put_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
+   SUBROUTINE ext_xxx_read_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm &
+   SUBROUTINE ext_xxx_write_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm , &
+   SUBROUTINE ext_xxx_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagger , &
+   SUBROUTINE ext_xxx_error_str( Code, ReturnString, Status)
+   SUBROUTINE ext_xxx_get_previous_time(DataHandle, DateStr, Status)
+   SUBROUTINE ext_xxx_open_for_read_begin( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status)
+   SUBROUTINE ext_xxx_open_for_read_commit(DataHandle, Status)
+   SUBROUTINE ext_xxx_open_for_update( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status)
+   SUBROUTINE ext_xxx_open_for_write (DatasetName, Comm1, Comm2, &
+   SUBROUTINE ext_xxx_warning_str( Code, ReturnString, Status)
+ 
+Filename::::  frame/module_quilt_outbuf_ops.F
+==================================================
+MODULE module_quilt_outbuf_ops
+   SUBROUTINE init_outbuf
+   SUBROUTINE write_outbuf ( DataHandle , io_form_arg )
+   SUBROUTINE store_patch_in_outbuf( inbuf_r, inbuf_i, DateStr, VarName , FieldType, MemoryOrder, Stagger, DimNames, &
+   SUBROUTINE add_to_bufsize_for_field( VarName, Nbytes )
+   SUBROUTINE store_piece_of_field( inbuf, VarName, Nbytes )
+   SUBROUTINE retrieve_pieces_of_field( outbuf, VarName, obufsz, Nbytes_tot, lret )
+ 
+Filename::::  frame/module_nesting.F
+==================================================
+MODULE module_nesting
+SUBROUTINE init_module_nesting
+   SUBROUTINE set_overlaps ( grid )
+   SUBROUTINE init_module_nesting
+ 
+Filename::::  frame/internal_header_util.F
+==================================================
+   SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
+   SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
+   SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_handle_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_handle_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_noop_header ( hdrbuf, hdrbufsize, itypesize )
+   SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
+   SUBROUTINE int_pack_string ( str, buf, n )
+   SUBROUTINE int_unpack_string ( str, buf, n )
+ 
+Filename::::  frame/module_sm.F
+==================================================
+MODULE module_sm
+SUBROUTINE init_module_sm
+   SUBROUTINE omp_info
+   SUBROUTINE init_module_sm
+ 
+Filename::::  frame/module_internal_header_util.F
+==================================================
+MODULE module_internal_header_util
+   SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
+   SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
+   SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_handle_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_handle_header( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_td_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_get_td_header_char( hdrbuf, hdrbufsize, itypesize, &
+   SUBROUTINE int_gen_td_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_td_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_td_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_get_td_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
+   SUBROUTINE int_gen_noop_header ( hdrbuf, hdrbufsize, itypesize )
+   SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
+   SUBROUTINE int_pack_string ( str, buf, n )
+   SUBROUTINE int_unpack_string ( str, buf, n )
+ 
+Filename::::  frame/module_integrate.F
+==================================================
+MODULE module_integrate
+   RECURSIVE SUBROUTINE integrate ( grid )
+   SUBROUTINE solve_interface ( grid )
+   SUBROUTINE med_before_solve_io ( grid , config_flags )
+   SUBROUTINE med_after_solve_io ( grid , config_flags )
+   SUBROUTINE med_nest_initial ( parent , grid , config_flags )
+   SUBROUTINE med_nest_force ( parent , grid , config_flags )
+   SUBROUTINE med_nest_move ( parent , grid )
+   SUBROUTINE med_nest_feedback ( parent , grid , config_flags )
+   SUBROUTINE med_last_solve_io ( grid , config_flags )
+   SUBROUTINE med_setup_step ( grid , config_flags )
+   SUBROUTINE Setup_Timekeeping( grid )
+ 
+Filename::::  frame/module_io_quilt.F
+==================================================
+MODULE module_wrf_quilt
+SUBROUTINE init_module_wrf_quilt
+   SUBROUTINE int_get_fresh_handle( retval )
+   SUBROUTINE setup_quilt_servers ( nio_tasks_per_group,     &
+   SUBROUTINE quilt
+   SUBROUTINE init_module_wrf_quilt
+   SUBROUTINE disable_quilting
+   SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInfo, &
+   SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
+   SUBROUTINE wrf_quilt_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
+   SUBROUTINE wrf_quilt_inquire_opened ( DataHandle, FileName , FileStatus, Status )
+   SUBROUTINE wrf_quilt_inquire_filename ( DataHandle, FileName , FileStatus, Status )
+   SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
+   SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
+   SUBROUTINE wrf_quilt_ioexit( Status )
+   SUBROUTINE wrf_quilt_get_next_time ( DataHandle, DateStr, Status )
+   SUBROUTINE wrf_quilt_get_previous_time ( DataHandle, DateStr, Status )
+   SUBROUTINE wrf_quilt_set_time ( DataHandle, Data,  Status )
+   SUBROUTINE wrf_quilt_get_next_var ( DataHandle, VarName, Status )
+   SUBROUTINE wrf_quilt_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
+   SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
+   SUBROUTINE wrf_quilt_get_dom_td_real ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
+   SUBROUTINE wrf_quilt_put_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
+   SUBROUTINE wrf_quilt_get_var_ti_real ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_var_ti_integer ( DataHandle,Element,  Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
+   SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
+   SUBROUTINE wrf_quilt_get_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
+   SUBROUTINE wrf_quilt_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount,Status)
+   SUBROUTINE wrf_quilt_put_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
+   SUBROUTINE wrf_quilt_get_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
+   SUBROUTINE wrf_quilt_put_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
+   SUBROUTINE wrf_quilt_read_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm, &
+   SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm,  &
+   SUBROUTINE wrf_quilt_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagger , &
+   SUBROUTINE get_mpi_comm_io_groups( retval, isrvr )
+   SUBROUTINE get_nio_tasks_in_group( retval )
+ 
+Filename::::  frame/module_dm.F
+==================================================
+MODULE module_dm
+SUBROUTINE init_module_dm
+   SUBROUTINE init_module_dm
+   SUBROUTINE wrf_dm_maxval ( val, idex, jdex )
+   SUBROUTINE wrf_get_myproc( myproc )
+   SUBROUTINE wrf_get_nproc( nprocs )
+   SUBROUTINE wrf_get_nprocx( nprocs )
+   SUBROUTINE wrf_get_nprocy( nprocs )
+   SUBROUTINE wrf_dm_bcast_string ( buf , size )
+   SUBROUTINE wrf_dm_bcast_bytes ( buf , size )
+   SUBROUTINE wrf_dm_bcast_integer( BUF, N1 )
+   SUBROUTINE wrf_dm_bcast_real( BUF, N1 )
+   SUBROUTINE wrf_dm_halo ( domdesc , comms , stencil_id )
+   SUBROUTINE wrf_dm_boundary ( domdesc , comms , period_id , &
+   SUBROUTINE wrf_dm_xpose_z2x ( domdesc , comms , xpose_id  )
+   SUBROUTINE wrf_dm_xpose_x2y ( domdesc , comms , xpose_id  )
+   SUBROUTINE wrf_dm_xpose_y2z ( domdesc , comms , xpose_id  )
+   SUBROUTINE wrf_dm_define_comms ( grid )
+   SUBROUTINE wrf_get_dm_communicator ( communicator )
+   SUBROUTINE wrf_get_dm_iocommunicator ( iocommunicator )
+   SUBROUTINE wrf_dm_shutdown
+   SUBROUTINE wrf_abort
+   SUBROUTINE wrf_patch_to_global_real (buf,globbuf,domdesc,ndim,&
+   SUBROUTINE wrf_global_to_patch_real (globbuf,buf,domdesc,ndim,&
+   SUBROUTINE wrf_patch_to_global_double (buf,globbuf,domdesc,ndim,&
+   SUBROUTINE wrf_global_to_patch_double (globbuf,buf,domdesc,ndim,&
+   SUBROUTINE wrf_patch_to_global_integer (buf,globbuf,domdesc,ndim,&
+   SUBROUTINE wrf_global_to_patch_integer (globbuf,buf,domdesc,ndim,&
+ 
+Filename::::  frame/module_state_description.F
+==================================================
+MODULE module_state_description
+SUBROUTINE init_module_state_description
+   SUBROUTINE init_module_state_description
+ 
 Filename::::  frame/module_driver_constants.F
 ==================================================
+MODULE module_driver_constants
+SUBROUTINE init_module_driver_constants
    SUBROUTINE init_module_driver_constants
  
 Filename::::  frame/module_linked_lisk.F
 ==================================================
+module module_linked_list
    subroutine linkedlist_initialize
    subroutine check_linkedlist
    subroutine push_1_array(a1, varname)
@@ -597,6 +946,7 @@ Filename::::  frame/module_linked_lisk.F
  
 Filename::::  frame/module_trace.F
 ==================================================
+module module_trace
    subroutine memory_info(memory_used)
    integer, parameter :: MaxNoRoutines          = 440 ! maxium number of subroutines
    character (LEN=TraceNameLen) :: TraceStartedBy  ! Subroutine name 
@@ -618,47 +968,6 @@ Filename::::  frame/module_trace.F
    subroutine da_proc_sum_int (value)
    subroutine da_proc_sum_ints (values)
    subroutine da_proc_sum_real (value)
- 
-Filename::::  frame/add_forcing_to_ad.F
-==================================================
-   SUBROUTINE add_forcing_to_ad(grid)
- 
-Filename::::  frame/module_dfi.F
-==================================================
-   SUBROUTINE jcdfi_init_coef ( grid , config_flags )
-   SUBROUTINE jcdfi_zero_ad ( grid )
-   SUBROUTINE jcdfi_tl ( grid ,i)
-   SUBROUTINE jcdfi_output_forcing ( grid , config_flags )
-   SUBROUTINE jcdfi_add_forcing ( grid ,i )
-   SUBROUTINE jcdfi_input_forcing ( grid ,config_flags )
-   SUBROUTINE jcdfi_finalize
-   SUBROUTINE JCDFI_COEF (MYPE,NSTEPS,DT,TAUC,NFILT)
-   SUBROUTINE NORMLZ(HH,NMAX)
-   subroutine debug(nsteps, ww)
-   SUBROUTINE UNIFORM(NSTEPS,WW)
-   SUBROUTINE LANCZOS(NSTEPS,WW)
-   SUBROUTINE HAMMING(NSTEPS,WW)
-   SUBROUTINE BLACKMAN(NSTEPS,WW)
-   SUBROUTINE KAISER(NSTEPS,WW)
-   SUBROUTINE POTTER2(NSTEPS,WW)
-   SUBROUTINE  DOLPHWIN(M,WINDOW)
-   SUBROUTINE  DOLPH(MYPE, DELTAT, TAUS, M, WINDOW)
-   SUBROUTINE CHEBY(T,N,X)
-   SUBROUTINE RHOFIL(DT,TAUC,NORDER,NSTEP,ICTYPE,FROW,NOSIZE)
-   SUBROUTINE RHOCOF(NORD,NOMAX,MUC,CA,CB)
- 
-Filename::::  frame/protomain.F
-==================================================
- 
-Filename::::  frame/module_machine.F
-==================================================
-   RECURSIVE SUBROUTINE rlocproc(p,maxi,nproc,ml,mr,ret)
-   SUBROUTINE patchmap( res, y, x, py, px )
-   SUBROUTINE least_aspect( nparts, minparts_y, minparts_x, nparts_y, nparts_x )
-   SUBROUTINE init_module_machine
-   SUBROUTINE wrf_sizeof_integer( retval )
-   SUBROUTINE wrf_sizeof_real( retval )
-   SUBROUTINE wrf_sizeof_doubleprecision( retval )
  
 Filename::::  frame/libmassv.F
 ==================================================
@@ -705,6 +1014,8 @@ Filename::::  frame/libmassv.F
  
 Filename::::  frame/module_configure.F
 ==================================================
+MODULE module_configure
+SUBROUTINE init_module_configure
    SUBROUTINE initial_config
    SUBROUTINE get_config_as_buffer( buffer, buflen, ncopied )
    SUBROUTINE set_config_as_buffer( buffer, buflen )
@@ -715,84 +1026,17 @@ Filename::::  frame/module_configure.F
    SUBROUTINE nl_get_mminlu ( idum , retval )
    SUBROUTINE nl_set_mminlu ( idum, inval )
  
-Filename::::  frame/wrf_shutdown.F
-==================================================
-   SUBROUTINE wrf_shutdown
- 
 Filename::::  frame/module_timing.F
 ==================================================
+MODULE module_timing
+SUBROUTINE init_module_timing
    SUBROUTINE init_module_timing
    SUBROUTINE start_timing
  
-Filename::::  frame/xxx_template_ioapi.F
-==================================================
-   SUBROUTINE ext_xxx_ioinit( SysDepInfo,Status )
-   SUBROUTINE ext_xxx_inquiry( Inquiry, Result,Status )
-   SUBROUTINE ext_xxx_ioexit( Status )
-   SUBROUTINE ext_xxx_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInfo, &
-   SUBROUTINE ext_xxx_open_for_write_commit( DataHandle , Status )
-   SUBROUTINE ext_xxx_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
-   SUBROUTINE ext_xxx_inquire_opened ( DataHandle, FileName , FileStatus, Status )
-   SUBROUTINE ext_xxx_inquire_filename ( DataHandle, FileName , FileStatus, Status )
-   SUBROUTINE ext_xxx_iosync ( DataHandle, Status )
-   SUBROUTINE ext_xxx_ioclose ( DataHandle, Status )
-   SUBROUTINE ext_xxx_get_next_time ( DataHandle, DateStr, Status )
-   SUBROUTINE ext_xxx_set_time ( DataHandle, DateStr, Status )
-   SUBROUTINE ext_xxx_get_next_var ( DataHandle, VarName, Status )
-   SUBROUTINE ext_xxx_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
-   SUBROUTINE ext_xxx_put_dom_ti_char ( DataHandle,Element,   Data,  Status )
-   SUBROUTINE ext_xxx_get_dom_td_real ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
-   SUBROUTINE ext_xxx_put_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
-   SUBROUTINE ext_xxx_get_var_ti_real ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_ti_integer ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
-   SUBROUTINE ext_xxx_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
-   SUBROUTINE ext_xxx_get_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-   SUBROUTINE ext_xxx_put_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE ext_xxx_get_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
-   SUBROUTINE ext_xxx_put_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
-   SUBROUTINE ext_xxx_read_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm &
-   SUBROUTINE ext_xxx_write_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-   SUBROUTINE ext_xxx_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagger , &
-   SUBROUTINE ext_xxx_error_str( Code, ReturnString, Status)
-   SUBROUTINE ext_xxx_get_previous_time(DataHandle, DateStr, Status)
-   SUBROUTINE ext_xxx_open_for_read_begin( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status)
-   SUBROUTINE ext_xxx_open_for_read_commit(DataHandle, Status)
-   SUBROUTINE ext_xxx_open_for_update( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status)
-   SUBROUTINE ext_xxx_open_for_write (DatasetName, Comm1, Comm2, &
-   SUBROUTINE ext_xxx_warning_str( Code, ReturnString, Status)
- 
-Filename::::  frame/module_quilt_outbuf_ops.F
-==================================================
-   SUBROUTINE init_outbuf
-   SUBROUTINE write_outbuf ( DataHandle , io_form_arg )
-   SUBROUTINE store_patch_in_outbuf( inbuf_r, inbuf_i, DateStr, VarName , FieldType, MemoryOrder, Stagger, DimNames, &
-   SUBROUTINE add_to_bufsize_for_field( VarName, Nbytes )
-   SUBROUTINE store_piece_of_field( inbuf, VarName, Nbytes )
-   SUBROUTINE retrieve_pieces_of_field( outbuf, VarName, obufsz, Nbytes_tot, lret )
- 
 Filename::::  frame/module_wrf_error.F
 ==================================================
+MODULE module_wrf_error
+SUBROUTINE init_module_wrf_error
    SUBROUTINE init_module_wrf_error
    SUBROUTINE set_wrf_debug_level ( level )
    SUBROUTINE get_wrf_debug_level ( level )
@@ -803,13 +1047,10 @@ Filename::::  frame/module_wrf_error.F
    SUBROUTINE wrf_error_fatal( str )
    SUBROUTINE wrf_check_error( expected, actual, str, file_str, line )
  
-Filename::::  frame/module_nesting.F
-==================================================
-   SUBROUTINE set_overlaps ( grid )
-   SUBROUTINE init_module_nesting
- 
 Filename::::  frame/module_io.F
 ==================================================
+MODULE module_io
+SUBROUTINE init_module_io
    SUBROUTINE wrf_ioinit( Status )
    SUBROUTINE wrf_ioexit( Status )
    SUBROUTINE wrf_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInfo, &
@@ -843,6 +1084,8 @@ Filename::::  frame/module_io.F
  
 Filename::::  frame/module_domain.F
 ==================================================
+MODULE module_domain
+SUBROUTINE init_module_domain
    SUBROUTINE adjust_domain_dims_for_move( grid , dx, dy )
    SUBROUTINE get_ijk_from_grid (  grid ,                   &
    SUBROUTINE wrf_patch_domain( id , domdesc , parent, parent_id , parent_domdesc , &
@@ -855,6 +1098,7 @@ Filename::::  frame/module_domain.F
  
 Filename::::  frame/module_integrate_tst.F
 ==================================================
+MODULE module_integrate_tst
    RECURSIVE SUBROUTINE integrate_tst ( grid )
    SUBROUTINE solve_interface_tst ( grid )
    SUBROUTINE med_before_solve_io ( grid , config_flags )
@@ -867,34 +1111,10 @@ Filename::::  frame/module_integrate_tst.F
    SUBROUTINE med_setup_step ( grid , config_flags )
    SUBROUTINE Setup_Timekeeping( grid )
  
-Filename::::  frame/internal_header_util.F
-==================================================
-   SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
-   SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
-   SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_handle_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_handle_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_ti_header( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_td_header( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_noop_header ( hdrbuf, hdrbufsize, itypesize )
-   SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
-   SUBROUTINE int_pack_string ( str, buf, n )
-   SUBROUTINE int_unpack_string ( str, buf, n )
- 
-Filename::::  frame/module_sm.F
-==================================================
-   SUBROUTINE omp_info
-   SUBROUTINE init_module_sm
- 
 Filename::::  frame/module_tiles.F
 ==================================================
+MODULE module_tiles
+SUBROUTINE init_module_tiles
    SUBROUTINE set_tiles1 ( grid , ids , ide , jds , jde , bdyw )
    SUBROUTINE set_tiles2 ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
    SUBROUTINE set_tiles3 ( grid , imask, ims, ime, jms, jme, ips, ipe, jps, jpe )
@@ -903,6 +1123,8 @@ Filename::::  frame/module_tiles.F
  
 Filename::::  frame/module_dm_stubs.F
 ==================================================
+MODULE module_dm
+SUBROUTINE init_module_dm
    SUBROUTINE init_module_dm
    SUBROUTINE wrf_dm_maxval ( val, idex, jdex )
    SUBROUTINE wrf_get_myproc( myproc )
@@ -930,35 +1152,9 @@ Filename::::  frame/module_dm_stubs.F
    SUBROUTINE wrf_patch_to_global_integer (buf,globbuf,domdesc,ndim,&
    SUBROUTINE wrf_global_to_patch_integer (globbuf,buf,domdesc,ndim,&
  
-Filename::::  frame/module_internal_header_util.F
-==================================================
-   SUBROUTINE int_gen_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
-   SUBROUTINE int_get_write_field_header ( hdrbuf, hdrbufsize, itypesize, ftypesize, &
-   SUBROUTINE int_gen_ofr_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ofr_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ofwb_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_handle_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_handle_header( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_ti_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_ti_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_ti_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_td_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_get_td_header_char( hdrbuf, hdrbufsize, itypesize, &
-   SUBROUTINE int_gen_td_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_td_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_td_header_integer( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_get_td_header_real( hdrbuf, hdrbufsize, itypesize, typesize, &
-   SUBROUTINE int_gen_noop_header ( hdrbuf, hdrbufsize, itypesize )
-   SUBROUTINE int_get_noop_header( hdrbuf, hdrbufsize, itypesize )
-   SUBROUTINE int_pack_string ( str, buf, n )
-   SUBROUTINE int_unpack_string ( str, buf, n )
- 
 Filename::::  frame/module_integrate_tl.F
 ==================================================
+MODULE module_integrate_tl
    RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
    SUBROUTINE solve_interface_tl ( grid )
    SUBROUTINE med_before_solve_io ( grid , config_flags )
@@ -976,112 +1172,9 @@ Filename::::  frame/fast_copy.F
    SUBROUTINE fast_copy_lint ( outbuf, inbuf, n )
    SUBROUTINE fast_zero_lint ( outbuf, n )
  
-Filename::::  frame/module_integrate.F
-==================================================
-   RECURSIVE SUBROUTINE integrate ( grid )
-   SUBROUTINE solve_interface ( grid )
-   SUBROUTINE med_before_solve_io ( grid , config_flags )
-   SUBROUTINE med_after_solve_io ( grid , config_flags )
-   SUBROUTINE med_nest_initial ( parent , grid , config_flags )
-   SUBROUTINE med_nest_force ( parent , grid , config_flags )
-   SUBROUTINE med_nest_move ( parent , grid )
-   SUBROUTINE med_nest_feedback ( parent , grid , config_flags )
-   SUBROUTINE med_last_solve_io ( grid , config_flags )
-   SUBROUTINE med_setup_step ( grid , config_flags )
-   SUBROUTINE Setup_Timekeeping( grid )
- 
-Filename::::  frame/module_io_quilt.F
-==================================================
-   SUBROUTINE int_get_fresh_handle( retval )
-   SUBROUTINE setup_quilt_servers ( nio_tasks_per_group,     &
-   SUBROUTINE quilt
-   SUBROUTINE init_module_wrf_quilt
-   SUBROUTINE disable_quilting
-   SUBROUTINE wrf_quilt_open_for_write_begin( FileName , Comm_compute, Comm_io, SysDepInfo, &
-   SUBROUTINE wrf_quilt_open_for_write_commit( DataHandle , Status )
-   SUBROUTINE wrf_quilt_open_for_read ( FileName , Comm_compute, Comm_io, SysDepInfo, &
-   SUBROUTINE wrf_quilt_inquire_opened ( DataHandle, FileName , FileStatus, Status )
-   SUBROUTINE wrf_quilt_inquire_filename ( DataHandle, FileName , FileStatus, Status )
-   SUBROUTINE wrf_quilt_iosync ( DataHandle, Status )
-   SUBROUTINE wrf_quilt_ioclose ( DataHandle, Status )
-   SUBROUTINE wrf_quilt_ioexit( Status )
-   SUBROUTINE wrf_quilt_get_next_time ( DataHandle, DateStr, Status )
-   SUBROUTINE wrf_quilt_get_previous_time ( DataHandle, DateStr, Status )
-   SUBROUTINE wrf_quilt_set_time ( DataHandle, Data,  Status )
-   SUBROUTINE wrf_quilt_get_next_var ( DataHandle, VarName, Status )
-   SUBROUTINE wrf_quilt_get_dom_ti_real ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_ti_real ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_ti_double ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_ti_double ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_ti_integer ( DataHandle,Element,   Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_ti_integer ( DataHandle,Element,   Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_ti_char ( DataHandle,Element,   Data,  Status )
-   SUBROUTINE wrf_quilt_put_dom_ti_char ( DataHandle, Element,  Data,  Status )
-   SUBROUTINE wrf_quilt_get_dom_td_real ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_td_real ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_td_double ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_td_double ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_dom_td_integer ( DataHandle,Element, DateStr,  Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
-   SUBROUTINE wrf_quilt_put_dom_td_char ( DataHandle,Element, DateStr,  Data,  Status )
-   SUBROUTINE wrf_quilt_get_var_ti_real ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_var_ti_real ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_ti_double ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_var_ti_double ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_ti_integer ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_var_ti_integer ( DataHandle,Element,  Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
-   SUBROUTINE wrf_quilt_put_var_ti_char ( DataHandle,Element,  Varname, Data,  Status )
-   SUBROUTINE wrf_quilt_get_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_var_td_real ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )
-   SUBROUTINE wrf_quilt_put_var_td_double ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount,Status)
-   SUBROUTINE wrf_quilt_put_var_td_integer ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )
-   SUBROUTINE wrf_quilt_get_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
-   SUBROUTINE wrf_quilt_put_var_td_char ( DataHandle,Element,  DateStr,Varname, Data,  Status )
-   SUBROUTINE wrf_quilt_read_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm, &
-   SUBROUTINE wrf_quilt_write_field ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm,  &
-   SUBROUTINE wrf_quilt_get_var_info ( DataHandle , VarName , NDim , MemoryOrder , Stagger , &
-   SUBROUTINE get_mpi_comm_io_groups( retval, isrvr )
-   SUBROUTINE get_nio_tasks_in_group( retval )
- 
-Filename::::  frame/module_dm.F
-==================================================
-   SUBROUTINE init_module_dm
-   SUBROUTINE wrf_dm_maxval ( val, idex, jdex )
-   SUBROUTINE wrf_get_myproc( myproc )
-   SUBROUTINE wrf_get_nproc( nprocs )
-   SUBROUTINE wrf_get_nprocx( nprocs )
-   SUBROUTINE wrf_get_nprocy( nprocs )
-   SUBROUTINE wrf_dm_bcast_string ( buf , size )
-   SUBROUTINE wrf_dm_bcast_bytes ( buf , size )
-   SUBROUTINE wrf_dm_bcast_integer( BUF, N1 )
-   SUBROUTINE wrf_dm_bcast_real( BUF, N1 )
-   SUBROUTINE wrf_dm_halo ( domdesc , comms , stencil_id )
-   SUBROUTINE wrf_dm_boundary ( domdesc , comms , period_id , &
-   SUBROUTINE wrf_dm_xpose_z2x ( domdesc , comms , xpose_id  )
-   SUBROUTINE wrf_dm_xpose_x2y ( domdesc , comms , xpose_id  )
-   SUBROUTINE wrf_dm_xpose_y2z ( domdesc , comms , xpose_id  )
-   SUBROUTINE wrf_dm_define_comms ( grid )
-   SUBROUTINE wrf_get_dm_communicator ( communicator )
-   SUBROUTINE wrf_get_dm_iocommunicator ( iocommunicator )
-   SUBROUTINE wrf_dm_shutdown
-   SUBROUTINE wrf_abort
-   SUBROUTINE wrf_patch_to_global_real (buf,globbuf,domdesc,ndim,&
-   SUBROUTINE wrf_global_to_patch_real (globbuf,buf,domdesc,ndim,&
-   SUBROUTINE wrf_patch_to_global_double (buf,globbuf,domdesc,ndim,&
-   SUBROUTINE wrf_global_to_patch_double (globbuf,buf,domdesc,ndim,&
-   SUBROUTINE wrf_patch_to_global_integer (buf,globbuf,domdesc,ndim,&
-   SUBROUTINE wrf_global_to_patch_integer (globbuf,buf,domdesc,ndim,&
- 
-Filename::::  frame/module_state_description.F
-==================================================
-   SUBROUTINE init_module_state_description
- 
 Filename::::  main/module_nup_feedback.F
 ==================================================
+MODULE module_nup_feedback
    SUBROUTINE copy_fcn_real ( cfld,                                 &  ! CD field
    SUBROUTINE copy_fcn_double ( cfld,                                 &  ! CD field
    SUBROUTINE copy_fcnm_real (  cfld,                                 &  ! CD field
@@ -1113,6 +1206,7 @@ Filename::::  main/da_3dvar.F
  
 Filename::::  main/real_em.F
 ==================================================
+SUBROUTINE start_domain ( grid , allowed_to_read )  ! comes from module_start in appropriate dyn_ directory
    SUBROUTINE Setup_Timekeeping( grid )
    SUBROUTINE med_sidata_input ( grid , config_flags )
    SUBROUTINE start_domain ( grid , allowed_to_read )  ! comes from module_start in appropriate dyn_ directory
@@ -1133,18 +1227,19 @@ Filename::::  main/convert_nmm.F
 Filename::::  main/wrf_ESMFApp.F
 ==================================================
  
-Filename::::  main/nup_standalone.F
+Filename::::  main/nupdown.F
 ==================================================
    subroutine handle_err(status)
    subroutine help_info
  
-Filename::::  main/nupdown.F
+Filename::::  main/nup_standalone.F
 ==================================================
    subroutine handle_err(status)
    subroutine help_info
  
 Filename::::  main/real_nmm.F
 ==================================================
+SUBROUTINE start_domain ( grid , allowed_to_read )  ! comes from module_start in appropriate dyn_ directory
    SUBROUTINE Setup_Timekeeping( grid )
    SUBROUTINE med_sidata_input ( grid , config_flags )
    SUBROUTINE start_domain ( grid , allowed_to_read )  ! comes from module_start in appropriate dyn_ directory
@@ -1152,6 +1247,7 @@ Filename::::  main/real_nmm.F
  
 Filename::::  phys/module_sf_lsm_nmm.F
 ==================================================
+MODULE MODULE_SF_LSM_NMM
    SUBROUTINE NMMLSM(DZ8W,QV3D,P8W3D,RHO3D,                          &
    SUBROUTINE SURFCE(J,ZA,QV,P8W,PSFC,RHO,T,TH,TSK,CHS,PREC,HFX,QFX,   &
    SUBROUTINE SFLX (                                                 &
@@ -1179,6 +1275,7 @@ Filename::::  phys/module_sf_lsm_nmm.F
  
 Filename::::  phys/module_bl_gfs.F
 ==================================================
+MODULE module_bl_gfs
    SUBROUTINE BL_GFS(U3D,V3D,TH3D,T3D,QV3D,QC3D,QI3D,P3D,PI3D,     &
    SUBROUTINE gfsinit(RUBLTEN,RVBLTEN,RTHBLTEN,RQVBLTEN,           &
    SUBROUTINE MONINP(IX,IM,KM,ntrac,DV,DU,TAU,RTG,                   &
@@ -1188,6 +1285,7 @@ Filename::::  phys/module_bl_gfs.F
  
 Filename::::  phys/module_bl_ysu.F
 ==================================================
+module module_bl_ysu
    subroutine ysu(u3d,v3d,th3d,t3d,qv3d,qc3d,qi3d,p3d,pi3d,        &
    subroutine ysu2d(j,ux,vx,tx,qx,qcx,qix,p2d,                     &
    subroutine tridin(cl,cm,cu,r1,r2,au,f1,f2,                   &
@@ -1195,12 +1293,14 @@ Filename::::  phys/module_bl_ysu.F
  
 Filename::::  phys/module_mp_nconvp.F
 ==================================================
+MODULE module_mp_nconvp
    SUBROUTINE lscond( th, p, qv, rho, pii                       &
    subroutine g_lscond( th, g_th, p, g_p, qv, g_qv, rho, g_rho, pii, g_pii, r_v, xlv, cp, ep2, svp1, svp2, svp3, svpt0, dz8w, g_dz8w, &
    subroutine a_lscond( th, a_th, p, a_p, qv, a_qv, rho, a_rho, pii, a_pii, r_v, xlv, cp, ep2, svp1, svp2, svp3, svpt0, dz8w, a_dz8w, &
  
 Filename::::  phys/module_cu_bmj.F
 ==================================================
+MODULE MODULE_CU_BMJ
    SUBROUTINE BMJDRV(                                                &
    SUBROUTINE BMJ                                &
    SUBROUTINE TTBLEX                            &
@@ -1209,6 +1309,7 @@ Filename::::  phys/module_cu_bmj.F
  
 Filename::::  phys/module_cu_du.F
 ==================================================
+MODULE module_cu_du
    SUBROUTINE DUCU(                                          &
    SUBROUTINE DUCU1D (I, J,                           &
    SUBROUTINE ducuinit(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,      &
@@ -1219,6 +1320,7 @@ Filename::::  phys/module_cu_du.F
  
 Filename::::  phys/module_bl_mrf.F
 ==================================================
+MODULE module_bl_mrf
    SUBROUTINE MRF(U3D,V3D,TH3D,T3D,QV3D,QC3D,QI3D,P3D,PI3D,        &
    SUBROUTINE MRF2D(J,U2D,V2D,T2D,QV2D,QC2D,QI2D,P2D,              &
    SUBROUTINE TRIDI2(CL,CM,CU,R1,R2,AU,A1,A2,                   &
@@ -1226,34 +1328,41 @@ Filename::::  phys/module_bl_mrf.F
  
 Filename::::  phys/module_mp_kessler.F
 ==================================================
+MODULE module_mp_kessler
    SUBROUTINE kessler( t, qv, qc, qcold, qr, qrold, rho, pii,   &
  
 Filename::::  phys/module_cumulus_driver.F
 ==================================================
+MODULE module_cumulus_driver
    SUBROUTINE cumulus_driver(                                         &
  
 Filename::::  phys/module_gfs_constants.F
 ==================================================
+module module_gfs_constants
    subroutine gpvs
  
 Filename::::  phys/module_sf_sfcdiags.F
 ==================================================
+MODULE module_sf_sfcdiags
    SUBROUTINE SFCDIAGS(HFX,QFX,TSK,QSFC,CHS2,CQS2,T2,TH2,Q2,       &
  
 Filename::::  phys/module_cu_sas.F
 ==================================================
+MODULE module_cu_sas
    SUBROUTINE CU_SAS(                                        &
    SUBROUTINE sasinit(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQICUTEN,              &
    SUBROUTINE SASCNV(IM,IX,KM,JCAP,DELT,DEL,PRSL,PS,PHIL,QL,         &
  
 Filename::::  phys/module_mp_lin.F
 ==================================================
+MODULE module_mp_lin
    SUBROUTINE lin_et_al(th, qv, ql, qr, qi, qs, qg,                 &
    SUBROUTINE clphy1d(dt, qvz, qlz, qrz, qiz, qsz, qgz,                &
    SUBROUTINE satadj(qvz, qlz, qiz, prez, theiz, thz, tothz,      &
  
 Filename::::  phys/module_cu_gd.F
 ==================================================
+MODULE module_cu_gd
    SUBROUTINE GRELLDRV(                                         &
    SUBROUTINE CUP_enss(OUTQC,J,AAEQ,T,Q,Z1,                            &
    SUBROUTINE cup_dd_aa0(edt,ierr,aa0,jmin,gamma_cup,t_cup, &
@@ -1282,23 +1391,27 @@ Filename::::  phys/module_cu_gd.F
  
 Filename::::  phys/module_radiation_driver.F
 ==================================================
+MODULE module_radiation_driver
    SUBROUTINE radiation_driver (itimestep,dt,                            &
    SUBROUTINE radconst(XTIME,DECLIN,SOLCON,GMT,JULDAY,               &
  
 Filename::::  phys/module_mp_wsm3.F
 ==================================================
+MODULE module_mp_wsm3
    SUBROUTINE wsm3(th, q, qci, qrs,                                 &
    SUBROUTINE wsm32D(t, q, qci, qrs,w, den, p, delz, rain,          &
    SUBROUTINE wsm3init(den0,denr,dens,cl,cpv,allowed_to_read)
  
 Filename::::  phys/module_mp_wsm5.F
 ==================================================
+MODULE module_mp_wsm5
    SUBROUTINE wsm5(th, q, qc, qr, qi, qs,                           &
    SUBROUTINE wsm52D(t, q, qci, qrs, w, den, p, delz, rain,         &
    SUBROUTINE wsm5init(den0,denr,dens,cl,cpv,allowed_to_read)
  
 Filename::::  phys/module_cu_kf.F
 ==================================================
+MODULE module_cu_kf
    SUBROUTINE KFCPS(                                         &
    SUBROUTINE KFPARA (I, J,                                &
    SUBROUTINE CONDLOAD(QLIQ,QICE,WTW,DZ,BOTERM,ENTERM,RATE,QNEWLQ,     & 
@@ -1310,10 +1423,12 @@ Filename::::  phys/module_cu_kf.F
  
 Filename::::  phys/module_microphysics_driver.F
 ==================================================
+MODULE module_microphysics_driver
    SUBROUTINE microphysics_driver(th_phy, moist_new, moist_old, w,        &
  
 Filename::::  phys/module_ra_gfdleta.F
 ==================================================
+MODULE MODULE_RA_GFDLETA
    SUBROUTINE GFDLETAINIT(SFULL,SHALF,PPTOP,JULYR,MONTH,IDAY,GMT,    &
    SUBROUTINE ETARA(DT,THRATEN,THRATENLW,THRATENSW,PI3D              & 
    SUBROUTINE RADTN(DT,T,Q,QCW,QICE,                                 &
@@ -1347,16 +1462,19 @@ Filename::::  phys/module_ra_gfdleta.F
  
 Filename::::  phys/module_pbl_driver.F
 ==================================================
+MODULE module_pbl_driver
    SUBROUTINE pbl_driver(itimestep,dt,u_frame,v_frame,            &
  
 Filename::::  phys/module_mp_wsm6.F
 ==================================================
+MODULE module_mp_wsm6
    SUBROUTINE wsm6(th, q, qc, qr, qi, qs, qg,                       &
    SUBROUTINE wsm62D(t, q, qci, qrs, w, den, p, delz, rain,         &
    SUBROUTINE wsm6init(den0,denr,dens,cl,cpv,allowed_to_read)
  
 Filename::::  phys/module_sf_noahlsm.F
 ==================================================
+MODULE module_sf_noahlsm
    SUBROUTINE lsm(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    SUBROUTINE LSMINIT(VEGFRA,SNOW,SNOWC,SNOWH,CANWAT,SMSTAV,    &
    SUBROUTINE LSM_PARM_INIT
@@ -1393,6 +1511,7 @@ Filename::::  phys/module_sf_noahlsm.F
  
 Filename::::  phys/module_sf_ruclsm.F
 ==================================================
+MODULE module_sf_ruclsm
    SUBROUTINE LSMRUC(                                           &
    SUBROUTINE SFCTMP (delt,ktau,conflx,i,j,                      &
    SUBROUTINE SOIL (                                    &
@@ -1410,16 +1529,19 @@ Filename::::  phys/module_sf_ruclsm.F
  
 Filename::::  phys/module_mp_ncloud3.F
 ==================================================
+MODULE module_mp_ncloud3
    SUBROUTINE ncloud3(th, q, qci, qrs,                              &
    SUBROUTINE ncloud32D(t, q, qci, qrs,w, den, p, delz, rain,       &
    SUBROUTINE ncloud3init(den0,denr,dens,cl,cpv,allowed_to_read)
  
 Filename::::  phys/module_surface_driver.F
 ==================================================
+MODULE module_surface_driver
    SUBROUTINE surface_driver(                                         &
  
 Filename::::  phys/module_physics_init.F
 ==================================================
+MODULE module_physics_init
    SUBROUTINE phy_init ( grid,                                   &
    SUBROUTINE landuse_init(lu_index, snowc, albedo, albbck, mavail, emiss,  &
    SUBROUTINE ra_init(grid,STEPRA,RADT,DT,RTHRATEN,RTHRATENLW,       & 
@@ -1430,12 +1552,14 @@ Filename::::  phys/module_physics_init.F
  
 Filename::::  phys/module_mp_ncloud5.F
 ==================================================
+MODULE module_mp_ncloud5
    SUBROUTINE ncloud5(th, q, qc, qr, qi, qs,                        &
    SUBROUTINE ncloud52D(t, q, qci, qrs,w, den, p, delz, rain,       &
    SUBROUTINE ncloud5init(den0,denr,dens,cl,cpv,allowed_to_read)
  
 Filename::::  phys/module_ra_rrtm.F
 ==================================================
+MODULE module_ra_rrtm
    SUBROUTINE RRTMLWRAD(RTHRATEN,GLW,EMISS,                       &
    SUBROUTINE RRTM(TTEN,GLW,TSFC,CLDFRA,T,Tw,QV,QC,                  &
    SUBROUTINE CMBGB1(abscoefL, abscoefH, SELFREF,                       &
@@ -1489,18 +1613,21 @@ Filename::::  phys/module_physics_addtendc.F
  
 Filename::::  phys/module_sf_sfclay.F
 ==================================================
+MODULE module_sf_sfclay
    SUBROUTINE SFCLAY(U3D,V3D,T3D,QV3D,P3D,dz8w,                    &
    SUBROUTINE SFCLAY1D(J,UX,VX,T1D,QV1D,P1D,dz8w1d,                &
    SUBROUTINE sfclayinit( allowed_to_read )         
  
 Filename::::  phys/module_sf_slab.F
 ==================================================
+MODULE module_sf_slab
    SUBROUTINE SLAB(T3D,QV3D,P3D,FLHC,FLQC,                      &
    SUBROUTINE SLAB1D(J,T1D,QV1D,P1D,FLHC,FLQC,                  &
    SUBROUTINE slabinit(TSK,TMN,                                 &
  
 Filename::::  phys/module_bl_myjpbl.F
 ==================================================
+MODULE MODULE_BL_MYJPBL
    SUBROUTINE MYJPBL(DT,STEPBL,HT,DZ                                &
    SUBROUTINE MIXLEN                            &
    SUBROUTINE PRODQ2                            &
@@ -1512,12 +1639,14 @@ Filename::::  phys/module_bl_myjpbl.F
  
 Filename::::  phys/module_ra_sw.F
 ==================================================
+MODULE module_ra_sw
    SUBROUTINE SWRAD(dt,RTHRATEN,GSW,XLAT,XLONG,ALBEDO,            &
    SUBROUTINE SWPARA(TTEN,GSW,XLAT,XLONG,ALBEDO,                  &
    SUBROUTINE swinit(RTHRATEN,RTHRATENSW,restart,                   &
  
 Filename::::  phys/module_ra_gsfcsw.F
 ==================================================
+MODULE module_ra_gsfcsw
    SUBROUTINE GSFCSWRAD(RTHRATEN,GSW,XLAT,XLONG,                  &
    subroutine sorad (m,n,ndim,np,pl,ta,wa,oa,                        &
    subroutine soluv (m,n,ndim,np,oh,dp,overcast,cldwater,            &
@@ -1531,6 +1660,7 @@ Filename::::  phys/module_ra_gsfcsw.F
  
 Filename::::  phys/module_mp_etanew.F
 ==================================================
+MODULE module_mp_etanew
    SUBROUTINE ETAMP_NEW (itimestep,DT,DX,DY,RAINNC,RAINNCV,          &
    SUBROUTINE EGCP01DRV(                                             &
    SUBROUTINE EGCP01COLUMN ( ARAIN, ASNOW, DTPH, I_index, J_index,   &
@@ -1540,6 +1670,7 @@ Filename::::  phys/module_mp_etanew.F
  
 Filename::::  phys/module_cu_kfeta.F
 ==================================================
+MODULE module_cu_kfeta
    SUBROUTINE KF_eta_CPS(                                    &
    SUBROUTINE KF_eta_PARA (I, J,                           &
    SUBROUTINE TPMIX2(p,thes,tu,qu,qliq,qice,qnewlq,qnewic,XLV1,XLV0)
@@ -1553,16 +1684,23 @@ Filename::::  phys/module_cu_kfeta.F
  
 Filename::::  phys/module_sf_myjsfc.F
 ==================================================
+MODULE MODULE_SF_MYJSFC
    SUBROUTINE MYJSFC(ITIMESTEP,HT,DZ                                & 
    SUBROUTINE SFCDIF(NTSD,SEAMASK,THS,QS,PSFC                       &
    SUBROUTINE MYJSFCINIT(LOWLYR,USTAR,Z0                            &
  
-Filename::::  share/init_modules.F
+Filename::::  run/Isolation091117/test_solve_em.F
 ==================================================
-   SUBROUTINE init_modules( phase )
+   SUBROUTINE test_solve_em ( grid , config_flags , &
+ 
+Filename::::  run/Isolation091204/test_solve_em.F
+==================================================
+   SUBROUTINE test_solve_em ( grid , config_flags , &
+   subroutine isolateVars(isolationVar, &
  
 Filename::::  share/mediation_wrfmain.F
 ==================================================
+SUBROUTINE start_domain ( grid , allowed_to_read )  ! comes from module_start in appropriate dyn_ directory
    SUBROUTINE med_initialdata_input_ptr ( grid , config_flags )
    SUBROUTINE med_initialdata_input ( grid , config_flags )
    SUBROUTINE med_initialdata_input ( grid , config_flags )
@@ -1574,23 +1712,9 @@ Filename::::  share/module_interp_fcn.F
 ==================================================
    SUBROUTINE interp_fcn ( cfld,                                 &  ! CD field
  
-Filename::::  share/module_optional_si_input.F
-==================================================
-   SUBROUTINE init_module_optional_si_input ( grid , config_flags ) 
-   SUBROUTINE optional_si_input ( grid , fid )
-   SUBROUTINE optional_moist ( grid , fid , &
-   SUBROUTINE optional_sst ( grid , fid , &
-   SUBROUTINE optional_snowh ( grid , fid , &
-   SUBROUTINE optional_lsm ( grid , fid , &
-   SUBROUTINE optional_lsm_levels ( grid , fid , &
- 
 Filename::::  share/wrf_inputout.F
 ==================================================
    SUBROUTINE wrf_inputout ( fid , grid , config_flags, switch , &
- 
-Filename::::  share/wrf_auxinput3out.F
-==================================================
-   SUBROUTINE wrf_auxinput3out ( fid , grid , config_flags, switch , &
  
 Filename::::  share/solve_interface_tl.F
 ==================================================
@@ -1604,10 +1728,6 @@ Filename::::  share/set_timekeeping.F
 ==================================================
    SUBROUTINE Setup_Timekeeping ( grid )
  
-Filename::::  share/input_wrf.F
-==================================================
-   SUBROUTINE input_wrf ( fid , grid , config_flags , switch , ierr )
- 
 Filename::::  share/sint.F
 ==================================================
    SUBROUTINE SINT(XF,                        &
@@ -1617,10 +1737,6 @@ Filename::::  share/wrf_histout.F
 ==================================================
    SUBROUTINE wrf_histout ( fid , grid , config_flags, switch , &
  
-Filename::::  share/wrf_auxhist5out.F
-==================================================
-   SUBROUTINE wrf_auxhist5out ( fid , grid , config_flags, switch , &
- 
 Filename::::  share/mediation_interp_domain.F
 ==================================================
    SUBROUTINE med_interp_domain ( parent_grid , nested_grid )
@@ -1629,49 +1745,32 @@ Filename::::  share/mediation_interp_domain.F
  
 Filename::::  share/module_wrf_setservices.F
 ==================================================
+MODULE module_wrf_setservices
    SUBROUTINE wrf_register(gcomp, rc)
- 
-Filename::::  share/wrf_bdyout.F
-==================================================
-   SUBROUTINE wrf_bdyout ( fid , grid , config_flags, switch , &
  
 Filename::::  share/module_wrf_esmf_super.F
 ==================================================
+MODULE module_wrf_esmf_super
    SUBROUTINE Setup_Timekeeping( grid )
    SUBROUTINE wrf_init( gcomp, importState, exportState, clock, rc )
    SUBROUTINE wrf_run( gcomp, importState, exportState, clock, rc )
    SUBROUTINE wrf_finalize( gcomp, importState, exportState, clock, rc )
  
-Filename::::  share/module_date_time.F
-==================================================
-   SUBROUTINE geth_julgmt(julyr,julday, gmt)
-   SUBROUTINE geth_idts (ndate, odate, idts)
-   SUBROUTINE geth_newdate (ndate, odate, idt)
-   SUBROUTINE split_date_char ( date , century_year , month , day , hour , minute , second , ten_thousandth)
-   SUBROUTINE init_module_date_time
-   SUBROUTINE wrf_atotime ( str, time )
-   SUBROUTINE wrf_timetoa ( time, str )
-   SUBROUTINE wrf_clockprint ( level, clock, pre_str )
- 
 Filename::::  share/module_model_constants.F
 ==================================================
+MODULE module_model_constants
+SUBROUTINE init_module_model_constants
    SUBROUTINE init_module_model_constants
- 
-Filename::::  share/solve_interface_tst.F
-==================================================
-   SUBROUTINE solve_interface_tst ( grid )
  
 Filename::::  share/module_bc_time_utilities.F
 ==================================================
+MODULE module_bc_time_utilities
    SUBROUTINE set_time_to_read_again ( newtime )
    SUBROUTINE get_time_to_read_again ( newtime )
  
-Filename::::  share/wrf_auxinput1in.F
-==================================================
-   SUBROUTINE wrf_auxinput1in ( fid , grid , config_flags , switch , ierr )
- 
 Filename::::  share/module_io_domain.F
 ==================================================
+MODULE module_io_domain
    SUBROUTINE open_r_dataset ( id , fname , grid , config_flags , sysdepinfo, ierr )
    SUBROUTINE open_w_dataset ( id , fname , grid , config_flags , outsub , sysdepinfo, ierr )
    SUBROUTINE open_u_dataset ( id , fname , grid , config_flags , insub , sysdepinfo, ierr )
@@ -1716,72 +1815,21 @@ Filename::::  share/wrf_auxinput2in.F
 ==================================================
    SUBROUTINE wrf_auxinput2in ( fid , grid , config_flags , switch , ierr )
  
-Filename::::  share/mediation_feedback_domain.F
-==================================================
-   SUBROUTINE med_feedback_domain ( parent_grid , nested_grid )
-   SUBROUTINE feedback_domain_em_part1 ( grid, nested_grid, config_flags ,  &
-   SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid , nested_grid, config_flags ,  &
- 
 Filename::::  share/wrf_auxinput3in.F
 ==================================================
    SUBROUTINE wrf_auxinput3in ( fid , grid , config_flags , switch , ierr )
- 
-Filename::::  share/wrf_auxinput4in.F
-==================================================
-   SUBROUTINE wrf_auxinput4in ( fid , grid , config_flags , switch , ierr )
- 
-Filename::::  share/module_get_file_names.F
-==================================================
-   SUBROUTINE system(cmd)
-   SUBROUTINE unix_ls ( root , id )
-   SUBROUTINE all_spaces ( command , length_of_char ) 
-   SUBROUTINE init_module_get_file_names
- 
-Filename::::  share/wrf_auxinput5in.F
-==================================================
-   SUBROUTINE wrf_auxinput5in ( fid , grid , config_flags , switch , ierr )
  
 Filename::::  share/wrf_auxinput4out.F
 ==================================================
    SUBROUTINE wrf_auxinput4out ( fid , grid , config_flags, switch , &
  
-Filename::::  share/wrf_ext_read_field.F
-==================================================
-   SUBROUTINE wrf_ext_read_field( DataHandle,DateStr,Var,Field,FieldType,Comm,IOComm, &
- 
-Filename::::  share/wrf_auxhist2out.F
-==================================================
-   SUBROUTINE wrf_auxhist2out ( fid , grid , config_flags, switch , &
- 
-Filename::::  share/Setup_date_string.F
-==================================================
-   SUBROUTINE Setup_date_string ( grid, date_string, adantn )
-   subroutine advance_ccyymmddhhmmss(current_y, current_mo, current_d, current_h, current_m, current_s, &
-   subroutine change_date( ccyy, mm, dd, delta )
- 
 Filename::::  share/start_domain.F
 ==================================================
    SUBROUTINE start_domain ( grid , allowed_to_read )
  
-Filename::::  share/wrf_restartout.F
-==================================================
-   SUBROUTINE wrf_restartout ( fid , grid , config_flags, switch , &
- 
-Filename::::  share/mediation_wrf_da.F
-==================================================
-   SUBROUTINE med_shutdown_io ( grid , config_flags )
-   SUBROUTINE med_add_config_info_to_grid ( grid )
- 
-Filename::::  share/module_MPP.F
-==================================================
- 
 Filename::::  share/wrf_auxinput1out.F
 ==================================================
    SUBROUTINE wrf_auxinput1out ( fid , grid , config_flags, switch , &
- 
-Filename::::  share/wrf_inputin.F
-==================================================
-   SUBROUTINE wrf_inputin ( fid , grid , config_flags , switch , ierr )
  
 Filename::::  share/wrf_auxinput5out.F
 ==================================================
@@ -1801,6 +1849,7 @@ Filename::::  share/wrf_auxhist3out.F
  
 Filename::::  share/module_bdyzone.F
 ==================================================
+MODULE module_bdyzone
    SUBROUTINE get_time_to_read_again ( newtime )
    SUBROUTINE set_time_to_read_again ( newtime )
    SUBROUTINE get_bdyzone_x ( bzx )
@@ -1810,14 +1859,6 @@ Filename::::  share/module_bdyzone.F
 Filename::::  share/wrf_restartin.F
 ==================================================
    SUBROUTINE wrf_restartin ( fid , grid , config_flags , switch , ierr )
- 
-Filename::::  share/wrf_ext_write_field.F
-==================================================
-   SUBROUTINE wrf_ext_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm,IOComm, &
- 
-Filename::::  share/wrf_auxinput2out.F
-==================================================
-   SUBROUTINE wrf_auxinput2out ( fid , grid , config_flags, switch , &
  
 Filename::::  share/solve_interface.F
 ==================================================
@@ -1874,10 +1915,6 @@ Filename::::  share/wrf_auxhist2in.F
 ==================================================
    SUBROUTINE wrf_auxhist2in ( fid , grid , config_flags , switch , ierr )
  
-Filename::::  share/wrf_auxhist3in.F
-==================================================
-   SUBROUTINE wrf_auxhist3in ( fid , grid , config_flags , switch , ierr )
- 
 Filename::::  share/wrf_auxhist4in.F
 ==================================================
    SUBROUTINE wrf_auxhist4in ( fid , grid , config_flags , switch , ierr )
@@ -1889,20 +1926,14 @@ Filename::::  share/mediation_force_domain.F
    SUBROUTINE force_domain_em_part2 ( grid, nested_grid, config_flags ,  &
    SUBROUTINE couple_or_uncouple_em ( grid, config_flags , couple,  &
  
-Filename::::  share/output_wrf.F
-==================================================
-   SUBROUTINE output_wrf ( fid , grid , config_flags, switch , ierr )
- 
-Filename::::  share/wrf_auxhist5in.F
-==================================================
-   SUBROUTINE wrf_auxhist5in ( fid , grid , config_flags , switch , ierr )
- 
 Filename::::  share/wrf_auxhist4out.F
 ==================================================
    SUBROUTINE wrf_auxhist4out ( fid , grid , config_flags, switch , &
  
 Filename::::  share/module_soil_pre.F
 ==================================================
+MODULE module_soil_pre
+MODULE module_soil_pre
    SUBROUTINE adjust_for_seaice_pre ( xice , landmask , tsk , ivgtyp , vegcat , lu_index , &
    SUBROUTINE adjust_for_seaice_post ( xice , landmask , tsk_old , tsk , ivgtyp , vegcat , lu_index , &
    SUBROUTINE process_percent_cat_new ( landmask ,  &
@@ -1936,6 +1967,134 @@ Filename::::  share/wrf_bdyin.F
 ==================================================
    SUBROUTINE wrf_bdyin ( fid , grid , config_flags , switch , ierr )
  
+Filename::::  share/init_modules.F
+==================================================
+SUBROUTINE init_modules( phase )
+   SUBROUTINE init_modules( phase )
+ 
+Filename::::  share/module_optional_si_input.F
+==================================================
+MODULE module_optional_si_input
+SUBROUTINE init_module_optional_si_input ( grid , config_flags ) 
+   SUBROUTINE init_module_optional_si_input ( grid , config_flags ) 
+   SUBROUTINE optional_si_input ( grid , fid )
+   SUBROUTINE optional_moist ( grid , fid , &
+   SUBROUTINE optional_sst ( grid , fid , &
+   SUBROUTINE optional_snowh ( grid , fid , &
+   SUBROUTINE optional_lsm ( grid , fid , &
+   SUBROUTINE optional_lsm_levels ( grid , fid , &
+ 
+Filename::::  share/wrf_auxinput3out.F
+==================================================
+   SUBROUTINE wrf_auxinput3out ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/input_wrf.F
+==================================================
+   SUBROUTINE input_wrf ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/wrf_auxhist5out.F
+==================================================
+   SUBROUTINE wrf_auxhist5out ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/wrf_bdyout.F
+==================================================
+   SUBROUTINE wrf_bdyout ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/module_date_time.F
+==================================================
+MODULE module_date_time
+SUBROUTINE init_module_date_time
+   SUBROUTINE geth_julgmt(julyr,julday, gmt)
+   SUBROUTINE geth_idts (ndate, odate, idts)
+   SUBROUTINE geth_newdate (ndate, odate, idt)
+   SUBROUTINE split_date_char ( date , century_year , month , day , hour , minute , second , ten_thousandth)
+   SUBROUTINE init_module_date_time
+   SUBROUTINE wrf_atotime ( str, time )
+   SUBROUTINE wrf_timetoa ( time, str )
+   SUBROUTINE wrf_clockprint ( level, clock, pre_str )
+ 
+Filename::::  share/solve_interface_tst.F
+==================================================
+   SUBROUTINE solve_interface_tst ( grid )
+ 
+Filename::::  share/wrf_auxinput1in.F
+==================================================
+   SUBROUTINE wrf_auxinput1in ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/mediation_feedback_domain.F
+==================================================
+   SUBROUTINE med_feedback_domain ( parent_grid , nested_grid )
+   SUBROUTINE feedback_domain_em_part1 ( grid, nested_grid, config_flags ,  &
+   SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid , nested_grid, config_flags ,  &
+ 
+Filename::::  share/wrf_auxinput4in.F
+==================================================
+   SUBROUTINE wrf_auxinput4in ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/module_get_file_names.F
+==================================================
+MODULE module_get_file_names
+SUBROUTINE init_module_get_file_names
+   SUBROUTINE system(cmd)
+   SUBROUTINE unix_ls ( root , id )
+   SUBROUTINE all_spaces ( command , length_of_char ) 
+   SUBROUTINE init_module_get_file_names
+ 
+Filename::::  share/wrf_auxinput5in.F
+==================================================
+   SUBROUTINE wrf_auxinput5in ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/wrf_ext_read_field.F
+==================================================
+   SUBROUTINE wrf_ext_read_field( DataHandle,DateStr,Var,Field,FieldType,Comm,IOComm, &
+ 
+Filename::::  share/wrf_auxhist2out.F
+==================================================
+   SUBROUTINE wrf_auxhist2out ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/Setup_date_string.F
+==================================================
+   SUBROUTINE Setup_date_string ( grid, date_string, adantn )
+   subroutine advance_ccyymmddhhmmss(current_y, current_mo, current_d, current_h, current_m, current_s, &
+   subroutine change_date( ccyy, mm, dd, delta )
+ 
+Filename::::  share/wrf_restartout.F
+==================================================
+   SUBROUTINE wrf_restartout ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/mediation_wrf_da.F
+==================================================
+   SUBROUTINE med_shutdown_io ( grid , config_flags )
+   SUBROUTINE med_add_config_info_to_grid ( grid )
+ 
+Filename::::  share/module_MPP.F
+==================================================
+MODULE MODULE_MPP
+ 
+Filename::::  share/wrf_inputin.F
+==================================================
+   SUBROUTINE wrf_inputin ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/wrf_ext_write_field.F
+==================================================
+   SUBROUTINE wrf_ext_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm,IOComm, &
+ 
+Filename::::  share/wrf_auxinput2out.F
+==================================================
+   SUBROUTINE wrf_auxinput2out ( fid , grid , config_flags, switch , &
+ 
+Filename::::  share/wrf_auxhist3in.F
+==================================================
+   SUBROUTINE wrf_auxhist3in ( fid , grid , config_flags , switch , ierr )
+ 
+Filename::::  share/output_wrf.F
+==================================================
+   SUBROUTINE output_wrf ( fid , grid , config_flags, switch , ierr )
+ 
+Filename::::  share/wrf_auxhist5in.F
+==================================================
+   SUBROUTINE wrf_auxhist5in ( fid , grid , config_flags , switch , ierr )
+ 
 Filename::::  share/interp_fcn.F
 ==================================================
    SUBROUTINE interp_fcn ( cfld,                                 &  ! CD field
@@ -1956,6 +2115,8 @@ Filename::::  share/interp_fcn.F
  
 Filename::::  share/module_bc.F
 ==================================================
+MODULE module_bc
+SUBROUTINE init_module_bc
    SUBROUTINE boundary_condition_check ( config_flags, bzone, error, gn )
    SUBROUTINE init_module_bc
    SUBROUTINE spec_bdyupdate(  field,      &
@@ -1968,6 +2129,8 @@ Filename::::  share/module_bc.F
  
 Filename::::  share/module_io_wrf.F
 ==================================================
+MODULE module_io_wrf
+SUBROUTINE init_module_io_wrf
    SUBROUTINE init_module_io_wrf
    SUBROUTINE debug_io_wrf ( msg , date, ds , de , ps , pe , ms , me )
  
