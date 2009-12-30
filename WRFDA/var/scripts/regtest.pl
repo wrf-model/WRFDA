@@ -622,6 +622,8 @@ sub compare2baseline {
         
          next unless $found;
 
+         return 1 if ( $_=~/error/i);
+
          my @values = split /\s+/, $_;
 
          return 1 unless ($values[4] == $values[5]) ;   #compare RMS (1) and RMS (2) , return immediately once diff found.
@@ -900,7 +902,7 @@ AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
 3        t44_liuz                    16      16           serial|smpar|dmpar
-4        radar_meixu                 16      16           serial|smpar|dmpar
+#4        radar_meixu                 16      16           serial|smpar|dmpar
 5        cwb_ascii                   16      16           serial|smpar|dmpar
 6        afwa_t7_ssmi                16      16           serial|smpar|dmpar
 7        t44_prepbufr                16      16           serial|smpar|dmpar
