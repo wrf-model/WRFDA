@@ -1086,6 +1086,7 @@ rconfig   logical TEST_calculate_km_kh    namelist,domains          1      .fals
 rconfig   logical TEST_rk_tendency        namelist,domains          1      .false. -     "TEST_rk_tendency"            ""      ""
 rconfig   logical TEST_surface_drag       namelist,domains          1      .false. -     "TEST_surface_drag"           ""      ""
 rconfig   logical TEST_lscond             namelist,domains          1      .false. -     "TEST_lscond"                 ""      ""
+rconfig   logical TEST_kessler            namelist,domains          1      .false. -     "TEST_kessler"                 ""      ""
 rconfig   logical TEST_cudu               namelist,domains          1      .false. -     "TEST_cudu"                   ""      ""
 rconfig   logical TEST_moist_physics_prep_em  namelist,domains      1      .false. -     "TEST_moist_physics_prep_em"  ""      ""
 rconfig   logical TEST_advect_scalar      namelist,domains          1      .false. -     "TEST_advect_scalar"          ""      ""

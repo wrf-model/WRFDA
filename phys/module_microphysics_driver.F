@@ -23,7 +23,7 @@ SUBROUTINE microphysics_driver(th_phy, moist_new, moist_old, w,        &
 
 ! *** add new modules of schemes here
 
-   USE module_mp_kessler
+   USE module_mp_kessler_db
    USE module_mp_lin
    USE module_mp_ncloud3
    USE module_mp_ncloud5
@@ -223,19 +223,30 @@ SUBROUTINE microphysics_driver(th_phy, moist_new, moist_old, w,        &
 
         CASE (KESSLERSCHEME)
              CALL wrf_debug ( 100 , 'microphysics_driver: calling kessler' )
-             CALL kessler( th_phy,                       &
-                     moist_new(ims,kms,jms,P_QV),        &
-                     moist_new(ims,kms,jms,P_QC),        &
-                     moist_old(ims,kms,jms,P_QC),        &
-                     moist_new(ims,kms,jms,P_QR),        &
-                     moist_old(ims,kms,jms,P_QR),        &
-                     rho, pi_phy, RAINNC,                &
-                     RAINNCV, dt, z, xlv, cp,            &
-                     EP_2,SVP1,SVP2,SVP3,SVPT0,rhowater, &
-                     dz8w,                               &
-                     ids,ide, jds,jde, kds,kde,          &
+             print*,'ids,ide, jds,jde, kds,kde,'          
+             print*,'ims,ime, jms,jme, kms,kme,'         
+             print*,'its,ite, jts,jte, kts,kte'
+            print*,  ids,ide, jds,jde, kds,kde,          &
                      ims,ime, jms,jme, kms,kme,          &
-                     its,ite, jts,jte, kts,kte           )
+                     its,ite, jts,jte, kts,kte
+  call KESSLER(th_phy,moist_new(ims,kms,jms,P_QV),moist_new(ims,kms,jms,P_QC),moist_new(ims,kms,jms,P_QR), rho,p_phy, pi_phy, dt&
+&    , z, xlv, cp, ep_2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+
+!             CALL kessler( th_phy,                       &
+!                     moist_new(ims,kms,jms,P_QV),        &
+!                     moist_new(ims,kms,jms,P_QC),        &
+!                     moist_old(ims,kms,jms,P_QC),        &
+!                     moist_new(ims,kms,jms,P_QR),        &
+!                     moist_old(ims,kms,jms,P_QR),        &
+!                     rho, pi_phy, RAINNC,                &
+!                     RAINNCV, dt, z, xlv, cp,            &
+!                     EP_2,SVP1,SVP2,SVP3,SVPT0,rhowater, &
+!                     dz8w,                               &
+!                     ids,ide, jds,jde, kds,kde,          &
+!                     ims,ime, jms,jme, kms,kme,          &
+!                     its,ite, jts,jte, kts,kte           )
 
         CASE (LINSCHEME)
              CALL wrf_debug ( 100 , 'microphysics_driver: calling lin_et_al' )

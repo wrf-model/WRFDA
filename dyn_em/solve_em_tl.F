@@ -1,5 +1,5 @@
 !WRF:MEDIATION_LAYER:SOLVER
-
+!2009-12-28 Hongli Wang - finish the Kessler warm rain scheme
 SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
@@ -33,6 +33,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp !Xiaoyan Zhang 11/2006
+   USE MODULE_MP_KESSLER_DB   
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -174,7 +175,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 #include <bench_solve_em_init.h>
 
    call trace_entry("solve_em_tl")
-
    ! 090921 bp; 
    solverDisabled = .false.
    call nl_get_disable_solver( 1, solverDisabled )
@@ -696,6 +696,7 @@ BENCH_START(cu_driver_tim)
          endif
 
          IF (cu_physics .eq. 5) then            !IF for CUDU
+          print*,'call cudu'
             CALL wrf_debug(100,'in du_cps')
             g_rqvcuten(:,:,:) = 0.0
             g_rthcuten(:,:,:) = 0.0
@@ -2363,7 +2364,8 @@ BENCH_END(advance_ppt_tim)
 
 ij = 1
 
-  IF (config_flags%mp_physics == 0)  then
+!whl
+  IF (config_flags%mp_physics >= 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2387,8 +2389,24 @@ BENCH_START(moist_physics_prep_tim)
                                    max(grid%j_start(ij),jds+sz),          &
                                    min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 BENCH_END(moist_physics_prep_tim)
-
-
+!whl
+!     print*,'config_flags%mp_physics in tl ', config_flags%mp_physics
+  if ( config_flags%mp_physics == 1) then
+!   print*,'call kessler_d'
+   call kessler_d(t_2, g_t_2, moist_2(ims,kms,jms,P_QV),  g_moist_2(ims,kms,jms,P_QV),&
+&                             moist_2(ims,kms,jms,P_QC),  g_moist_2(ims,kms,jms,P_QC),&
+&                             moist_2(ims,kms,jms,P_QR),  g_moist_2(ims,kms,jms,P_QR),&
+&     rho,g_rho, p_phy, g_p_phy, pi_phy, g_pi_phy, dtm&
+&    , z, xlv, cp, ep_2,svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    g_rainnc, rainncv, g_rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, &
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)         )
+!    print*,'tl kessler_d ',sum(g_rainnc*g_rainnc)
+  elseif(config_flags%mp_physics == 0)then
+!    print*, 'call g_lscond'
     CALL g_lscond ( t_2,g_t_2,p_phy,g_p_phy,moist_2(ims,kms,jms,P_QV),    &
                     g_moist_2(ims,kms,jms,P_QV),rho,g_rho,                &
                     pi_phy,g_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0, &
@@ -2398,6 +2416,10 @@ BENCH_END(moist_physics_prep_tim)
                     min(grid%i_end(ij),ide-1-sz),          &
                     max(grid%j_start(ij),jds+sz),          &
                     min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)    )
+!  print*,'tl ',sum(g_rainnc*g_rainnc)
+  else
+  print*, ' no rain process'
+  endif
 
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )
 BENCH_START(moist_phys_end_tim)
@@ -2410,7 +2432,7 @@ BENCH_START(moist_phys_end_tim)
                                         max(grid%j_start(ij),jds+sz),          &
                                         min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 
-    call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb,mu_2,   &
+       call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb,mu_2,   &
                            g_mu_2,muts,g_muts,ph_2,g_ph_2,p,g_p,pb,t_2,g_t_2,p0,t0,dnw,&
                            rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
                            max(grid%i_start(ij),ids+sz),          &
@@ -2429,8 +2451,7 @@ BENCH_START(moist_phys_end_tim)
       ENDIF
 
 BENCH_END(moist_phys_end_tim)
-
-  ENDIF
+  ENDIF  !mp==0
 
    scalar_tile_loop_2: DO ij = 1 , grid%num_tiles
 
@@ -2626,7 +2647,8 @@ BENCH_START(bc_2d_tim)
    !$OMP END PARALLEL DO
    endif
 BENCH_END(bc_2d_tim)
-
+!whl
+! g_p=0.0
 Goto 4005
    IF( config_flags%specified .or. config_flags%nested ) THEN 
      dtbc = dtbc + dt
@@ -2701,7 +2723,6 @@ Goto 4005
 #include <em_scalar_derefs.inc>
 
 !----------------
-
    RETURN
 
 END SUBROUTINE solve_em_tl

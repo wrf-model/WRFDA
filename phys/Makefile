@@ -17,6 +17,7 @@ MODULES = \
 	module_cu_sas.o \
         module_cu_du.o \
 	module_mp_kessler.o \
+	module_mp_kessler_db.o \
 	module_mp_ncloud5.o \
 	module_mp_lin.o  \
 	module_mp_ncloud3.o \

@@ -2914,7 +2914,7 @@ BENCH_END(advance_ppt_tim)
 !</pre>
 !</DESCRIPTION>
 
-  IF (config_flags%mp_physics == 0)  then
+  IF (config_flags%mp_physics >= 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2955,8 +2955,28 @@ BENCH_START(moist_physics_prep_tim)
                                    ims, ime, jms, jme, kms, kme,     &
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
+!    if (config_flags%mp_physics == 1)then
+    if (TEST_kessler)then
+    print*,'TEST_kessler = ',TEST_kessler
+    print*,ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, &
+                 its, ite, jts, jte,               &
+                 k_start, min(k_end,kde-1) 
+
+    CALL t_kessler(t_2, moist_2(ims,kms,jms,P_QV),  &
+&                             moist_2(ims,kms,jms,P_QC),  &
+&                             moist_2(ims,kms,jms,P_QR),  &
+&     rho, p_phy, pi_phy, dtm,&
+&    z, xlv, cp, ep_2,svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, &
+                 its, ite, jts, jte,               &
+                 k_start, min(k_end,kde-1) )
+
 
     print*,'TEST_lscond = ',TEST_lscond
+    endif
+    if (config_flags%mp_physics == 0)then
     IF (TEST_lscond)   &
     CALL t_lscond(t_2, p_phy                                     &
                 ,moist_2(ims,kms,jms,P_QV)                           &
@@ -2984,7 +3004,7 @@ BENCH_START(moist_physics_prep_tim)
                     ,its, ite, jts, jte                                &
                     ,k_start, min(k_end,kde-1)                         )
 
-
+     endif
 
 BENCH_END(moist_physics_prep_tim)
    END DO scalar_tile_loop_1a

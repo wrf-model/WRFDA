@@ -12382,7 +12382,194 @@ END SUBROUTINE t_spec_bdyupdate
    z=S_z
    z_at_w=S_z_at_w
 END SUBROUTINE t_surface_drag
+!======================
+  SUBROUTINE t_kessler(t, qv, qc, qr, rho, p, pii, dt_in&
+&    , z, xlv, cp, ep2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncv,  ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+    use MODULE_MP_KESSLER_DB
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: ids, ide, jds, jde, kds, kde, ims, ime, jms, &
+&    jme, kms, kme, its, ite, jts, jte, kts, kte
+    REAL, INTENT(IN) :: xlv, cp
+    REAL, INTENT(IN) :: ep2, svp1, svp2, svp3, svpt0
+    REAL, INTENT(IN) :: rhowater
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT) :: t, qv, &
+&    qc, qr
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT) :: rho, p, pii, &
+&    dz8w
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN) :: z
+    REAL, INTENT(IN) :: dt_in
+    REAL, DIMENSION(ims:ime, jms:jme), INTENT(INOUT) :: rainnc, rainncv
 
+! local perturbation 
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme) :: td, qvd, qcd, qrd, rhod, piid,pd
+    REAL, DIMENSION(ims:ime, jms:jme) :: rainncd, rainncvd 
+! save the input of every linear run
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme) :: s_td, s_qvd, s_qcd, s_qrd,s_rhod,s_piid,s_pd
+    REAL, DIMENSION(ims:ime, jms:jme) :: s_rainncd, s_rainncvd
+
+!! save the input and output of first nonlinear run
+! save the  inout variable
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme) :: b_t, b_qv, b_qc, b_qr,b_rho,b_pii,b_p 
+    REAL, DIMENSION(ims:ime, jms:jme) :: b_rainnc, b_rainncv
+! save the output of inout variable
+    REAL, DIMENSION(ims:ime, kms:kme, jms:jme) :: b2_t, b2_qv, b2_qc, b2_qr,b2_rho,b2_pii,b2_p
+    REAL, DIMENSION(ims:ime, jms:jme) :: b2_rainnc, b2_rainncv
+!
+    REAL :: SAVE_L, COEF, ALPHA, FACTOR, VAL_N, VAL_L, VAL_A
+!
+    INTEGER :: NT
+!!!!!!!!!!!
+! tangent linear test
+!
+! first nonlinear run
+! How to data qc and qr?
+  qc=qv
+  qr=qv
+
+  b_t=t
+  b_qv=qv
+  b_qc=qc
+  b_qr=qr
+  b_p=p
+  b_rho=rho
+  b_pii=pii
+  b_rainnc=rainnc
+  b_rainncv=rainncv
+! call kessler()
+  call KESSLER(t, qv, qc, qr, rho, p, pii, dt_in, z, xlv, cp, ep2, &
+&    svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, rainncv, ids, ide, &
+&    jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte&
+&    , kts, kte)
+
+  b2_t=t
+  b2_qv=qv
+  b2_qc=qc
+  b2_qr=qr
+  b2_p=p
+  b2_rho=rho
+  b2_pii=pii
+  b2_rainnc=rainnc
+  b2_rainncv=rainncv
+
+!
+  alpha=10.0 
+ DO NT=1, Ndx 
+! generate perturbation
+  alpha=alpha*0.1
+  s_td=alpha*0.005*b_t  !(300K*0.005=1.5)
+  s_qvd=1.0*alpha*0.005*b_qv !(20g/kg*0.01=1.0)
+  s_qcd=1.0*alpha*0.005*b_qc !(may random )
+  s_qrd=1.0*alpha*0.005*b_qr !
+  s_pd=1.0*alpha*0.005*b_p
+  s_piid=1.0*alpha*0.005*b_pii
+  s_rhod=1.0*alpha*0.005*b_rho
+  s_rainncd=0.0*alpha*0.005*b_rainnc
+  s_rainncvd=0.0*alpha*0.005*b_rainncv
+  t=b_t+s_td
+  qv=b_qv+s_qvd
+  qc=b_qc+s_qcd
+  qr=b_qr+s_qrd
+  p=b_p+s_pd
+  pii=b_pii+s_piid
+  rho=b_rho+s_rhod
+  rainnc=b_rainnc+s_rainncd
+  rainncv=b_rainncv+s_rainncvd
+! call kessler
+
+  call KESSLER(t, qv, qc, qr, rho,p, pii, dt_in, z, xlv, cp, ep2, &
+&    svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, rainncv, ids, ide, &
+&    jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte&
+&    , kts, kte)
+
+  td=t-b2_t
+  qvd=qv-b2_qv
+  qcd=qc-b2_qc
+  qrd=qr-b2_qr
+  pd=p-b2_p
+  piid=pii-b2_pii
+  rhod=rho-b2_rho
+  rainncd=rainnc-b2_rainnc
+  rainncvd=rainncv-b2_rainncv
+! calculate val_n
+  VAL_N=0.
+  VAL_N= sum (td**2.0)+sum (qvd**2.0)+sum (qcd**2.0)+sum (qrd**2.0)&
+        +sum (rainncd**2.0)+sum (rainncvd**2.0)
+  VAL_N= VAL_N + sum (pd*pd  )+sum(piid*piid)+sum(rhod*rhod)
+  t=b_t
+  qv=b_qv
+  qc=b_qc
+  qr=b_qr
+  p=b_p
+  pii=b_pii
+  rho=b_rho
+  rainnc=b_rainnc
+  rainncv=b_rainncv
+!
+  td=s_td
+  qvd=s_qvd
+  qcd=s_qcd
+  qrd=s_qrd
+  pd=s_pd
+  piid=s_piid
+  rhod=s_rhod
+  rainncd=s_rainncd
+  rainncvd=s_rainncvd
+! linear run
+! call kessler_d
+  call  KESSLER_D(t, td, qv, qvd, qc, qcd, qr, qrd, rho,rhod,p,pd, pii,piid, dt_in&
+&    , z, xlv, cp, ep2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncd, rainncv, rainncvd, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+
+! calculate val_l
+  VAL_L=0.
+  VAL_L= sum (td**2.0)+sum (qvd**2.0)+sum (qcd**2.0)+sum (qrd**2.0)&
+        +sum (rainncd**2.0)+sum (rainncvd**2.0)
+  VAL_L=VAL_L + sum(pd*pd)+sum(piid*piid)+sum(rhod*rhod)
+!  write out val_n,val_l,val_n/val_l
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E22.13,A,E22.13)') &
+           'Kessler TLM CHK: ALPHA_M=',alpha,'  COEF=',VAL_N/VAL_L, &
+           '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+
+  ! write(*,*)'VAL_N and VAL_L='
+  !write(*,*)VAL_N,VAL_L
+
+!
+  if(nt==1)then
+  t=b_t
+  qv=b_qv
+  qc=b_qc
+  qr=b_qr
+  rho=b_rho
+  p=b_p
+  pii=b_pii
+  rainnc=b_rainnc
+  rainncv=b_rainncv
+! adjoint run
+!  call kessler_b
+
+  call  KESSLER_B(t, td, qv, qvd, qc, qcd, qr, qrd, rho,rhod,p,pd, pii, piid,dt_in&
+&    , z, xlv, cp, ep2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncd, rainncv, rainncvd, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, its, ite, jts, jte, kts, kte)
+
+! calculate val_a=s_td*td
+  VAL_A=0.
+  VAL_A= sum (td*s_td)+sum (qvd*s_qvd)+sum (qcd*s_qcd)+sum (qrd*s_qrd)&
+        +sum (rainncd*s_rainncd)+sum (rainncvd*s_rainncvd)
+  VAL_A=VAL_A + sum(pd*s_pd)+sum(piid*s_piid)+sum(rhod*s_rhod)
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E22.13,A,E22.13)') &
+           'Kessler ADM CHK: ALPHA_M=',alpha,'  COEF=',VAL_A/VAL_L, &
+           '  VAL_A=',VAL_A,'  VAL_L=',VAL_L
+!  write(*,*)'VAL_A and VAL_L='
+!  write(*,*)VAL_A,VAL_L
+! write val_a;val_l  
+ endif
+ ENDDO ! NT 
+
+END SUBROUTINE t_kessler
 !=======================================================================================================
 
   SUBROUTINE t_lscond( th_in,p,qv_in,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC_in,RAINNCV_in, &

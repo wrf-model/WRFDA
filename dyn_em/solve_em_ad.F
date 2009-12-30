@@ -11,7 +11,7 @@
 !                          in order to save compuational cost of the solve_em_ad.F
 ! 2008-08-18 Zaizhong Ma - finish adjoint check of simplified code
 ! 2008-08-19 Xin Zhang and Zaizhong Ma - make parallel 
-
+! 2009-12-28 Hongli Wang - finish the Kessler warm rain scheme
 !***********************************************************
 !***********************************************************
 !
@@ -60,7 +60,6 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_small_step_em
    USE module_em
    USE module_big_step_utilities_em
-   USE module_bc
    USE module_bc_em
    USE module_solvedebug_em
    USE module_physics_addtendc
@@ -74,6 +73,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp   !Xiaoyan Zhang
+   USE module_mp_kessler_db  
 #ifdef WRF_CHEM
    USE module_input_chem_data
 #endif
@@ -268,7 +268,6 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
     a_rqvcuten = 0.0
     a_rthcuten = 0.0
     a_php = 0.0
-
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -1189,15 +1188,102 @@ num_3d_c = 1
     endif
 
 end do runge_kutta_looq
+!whl save the basic state for the mp and large scale rain. 
+!
+  if (config_flags%mp_physics >= 0) then
+   IF( config_flags%specified .or. config_flags%nested ) THEN
+     sz = spec_zone
+   ELSE
+     sz = 0
+   ENDIF
+
+       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+                                   al, alb, p, p8w, p0, pb,          &
+                                   ph_2, phb, pi_phy, p_phy,         &
+                                   z, z_at_w, dz8w,                  &
+                                   dtm, h_diabatic,                  &
+                                   config_flags,fnm, fnp,            &
+                                   ids, ide, jds, jde, kds, kde,     &
+                                   ims, ime, jms, jme, kms, kme,     &
+                                   max(grid%i_start(ij),ids+sz),  &
+                                   min(grid%i_end(ij),ide-1-sz),    &
+                                   max(grid%j_start(ij),jds+sz),  &
+                                   min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+    call push4backup(moist_2, "moist_2")
+    call push4backup(rho, "rho")
+    call push4backup(p_phy, "p_phy")
+    call push4backup(pi_phy, "pi_phy")
+    call push4backup(th_phy, "th_phy")
+    call push4backup(t_2, "t_2")
+    call push4backup(z, "z")
+    call push4backup(dz8w, "dz8w")
+
+     if(config_flags%mp_physics == 1)then  
+
+      call kessler(t_2,moist_2(ims,kms,jms,P_QV),moist_2(ims,kms,jms,P_QC),moist_2(ims,kms,jms,P_QR), rho, p_phy,pi_phy, dt&
+&      , z, xlv, cp, ep_2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&       rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&       jms, jme, kms, kme, &
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)         )
+     elseif(config_flags%mp_physics == 0)then
+        CALL lscond(t_2, p_phy                                         &
+                    ,moist_2(ims,kms,jms,P_QV)                         &
+                    ,rho, pi_phy,r_v, xlv, cp                          &
+                    ,ep_2, svp1, svp2                                  &
+                    ,svp3, svpt0                                       &
+                    ,dz8w                                              &
+                    ,rainnc, rainncv                                   &
+                    ,ids, ide, jds, jde, kds, kde                      &
+                    ,ims, ime, jms, jme, kms, kme                      &
+                    ,its, ite, jts, jte                                &
+                    ,k_start, min(k_end,kde-1)                         )
+     endif
+
+        CALL moist_physics_finish_em( t_2, t_1, t0, muts,              &
+                                     h_diabatic, dtm, config_flags,    &
+                                     ids, ide, jds, jde, kds, kde,     &
+                                     ims, ime, jms, jme, kms, kme,     &
+                                     max(grid%i_start(ij),ids+sz),     &
+                                     min(grid%i_end(ij),ide-1-sz),     &
+                                     max(grid%j_start(ij),jds+sz),     &
+                                     min(grid%j_end(ij),jde-1-sz),     &
+                                     k_start    , k_end               )
+
+    call push4backup(ph_2,t_2, "ph_2,t_2")
+    call push4backup(mu_2,muts, "mu_2,muts")
+    call push4backup(moist_2, "moist_2")
+    call push4backup(al,p, "al,p")
+
+    call calc_p_rho_phi( moist_2,num_3d_m,al,alb,mu_2,muts,ph_2,p,pb,t_2,p0,t0, &
+                         znu,dnw,rdnw,rdn,non_hydrostatic, &
+                         ids,ide,jds,jde,kds,kde, &
+                         ims,ime,jms,jme,kms,kme, &
+                         grid%i_start(ij),grid%i_end(ij), &
+                         grid%j_start(ij),grid%j_end(ij), &
+                         k_start,k_end )
+
+!-----Save for diagnose_w:
+      if(grid%trace_use) call trace_entry("backup")
+      call push4backup(ph_tend, "ph_tend")
+      call push4backup(muts, "muts")
+      if(grid%trace_use) call trace_exit("backup")
+!whl diagnose_w
+  endif 
+
 
 !-if(grid%trace_use) call trace_exit("solve_ad_runge_kutta_looq")
-
-  if (config_flags%mp_physics == 0) then
+  if (config_flags%mp_physics >= 0) then
     if (config_flags%specified .or. config_flags%nested) then
       sz = spec_zone
     else
       sz = 0
     endif
+
+      call pop2restore(muts, "muts")
+      call pop2restore(ph_tend, "ph_tend")
 
    if ( .not. non_hydrostatic) then
       call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,&
@@ -1209,6 +1295,13 @@ end do runge_kutta_looq
                      min(grid%j_end(ij),jde-1-sz),k_end )
 
     endif
+
+    if(grid%trace_use) call trace_entry("restore")
+    call pop2restore(al,p, "al,p")
+    call pop2restore(moist_2, "moist_2")
+    call pop2restore(mu_2,muts, "mu_2,muts")
+    call pop2restore(ph_2,t_2, "ph_2,t_2")
+    if(grid%trace_use) call trace_exit("restore")
 
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,&
                       a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
@@ -1229,28 +1322,52 @@ end do runge_kutta_looq
                                     its, ite, jts, jte, k_start,k_end )
 
 
-       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
-                                   al, alb, p, p8w, p0, pb,          &
-                                   ph_2, phb, pi_phy, p_phy,         &
-                                   z, z_at_w, dz8w,                  &
-                                   dtm, h_diabatic,                  &
-                                   config_flags,fnm, fnp,            &
-                                   ids, ide, jds, jde, kds, kde,     &
-                                   ims, ime, jms, jme, kms, kme,     &
-                                   max(grid%i_start(ij),ids+sz),  &
-                                   min(grid%i_end(ij),ide-1-sz),    &
-                                   max(grid%j_start(ij),jds+sz),  &
-                                   min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+!       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+!                                   al, alb, p, p8w, p0, pb,          &
+!                                   ph_2, phb, pi_phy, p_phy,         &
+!                                   z, z_at_w, dz8w,                  &
+!                                   dtm, h_diabatic,                  &
+!                                   config_flags,fnm, fnp,            &
+!                                   ids, ide, jds, jde, kds, kde,     &
+!                                   ims, ime, jms, jme, kms, kme,     &
+!                                   max(grid%i_start(ij),ids+sz),  &
+!                                   min(grid%i_end(ij),ide-1-sz),    &
+!                                   max(grid%j_start(ij),jds+sz),  &
+!                                   min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
 !---Restore for lscond:
+    call pop2restore(dz8w, "dz8w")
+    call pop2restore(z, "z")
+    call pop2restore(t_2, "t_2")
+    call pop2restore(th_phy, "th_phy")
+    call pop2restore(pi_phy, "pi_phy")
+    call pop2restore(p_phy, "p_phy")
+    call pop2restore(rho, "rho")
+    call pop2restore(moist_2, "moist_2")
+!whl
+!     print*,'config_flags%mp_physics in ad ',config_flags%mp_physics
 
-!---From: ../phys/module_mp_nconvp.F
+  if (config_flags%mp_physics ==1)then
+   call kessler_b(t_2, a_t_2, moist_2(ims,kms,jms,P_QV),  a_moist_2(ims,kms,jms,P_QV),&
+&                             moist_2(ims,kms,jms,P_QC),  a_moist_2(ims,kms,jms,P_QC),&
+&                             moist_2(ims,kms,jms,P_QR),  a_moist_2(ims,kms,jms,P_QR),&
+&     rho, a_rho, p_phy, a_p_phy, pi_phy, a_pi_phy, dtm&
+&    , z, xlv, cp, ep_2,svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    a_rainnc, rainncv, a_rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, &
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)        )
+  elseif(config_flags%mp_physics ==0)then
     call a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
                     a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
                     pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
                     rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme, &
                     its, ite, jts, jte, min(k_end,kde-1) )
-
+  else
+  print*,'no rain process'
+  endif
 !-----Output: a_t_2,a_p_phy,a_moist_2,a_rho,a_pi_phy,a_rainnc,a_rainncv,a_dz8w
 
 
@@ -1265,7 +1382,7 @@ end do runge_kutta_looq
 
 !-----Output: a_t_2,a_t_1,a_rho,a_al,a_p,a_p8w,a_ph_2,a_pi_phy,a_p_phy,a_z,a_z_at_w,a_dz8w,a_h_diabatic
 
-endif
+endif  ! micro phy
 !------------------------------
 
 !-if(grid%trace_use) call trace_entry("solve_ad_a_runge_kutta_loop")
@@ -2145,14 +2262,13 @@ end do a_runge_kutta_loop
 #include "HALO_A_PHY_PREP.inc"
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
-
   CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
 
   if(grid%trace_use) call trace_exit("solve_em_ad")
 
   RETURN
 
-end subroutine solve_em_ad
+end SUBROUTINE solve_em_ad
 
 !---------------------------------
 !!!!  Add CUDU Here   !!!!!!!!

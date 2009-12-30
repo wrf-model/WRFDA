@@ -1,7 +1,7 @@
 !WRF:MEDIATION_LAYER:SOLVER
 
 ! 090922 bp; Return from solver immediately, if disableSolver namelist variable is enabled
-
+! 2009-12-28 Hongli Wang - finish the Kessler warm rain scheme
 SUBROUTINE solve_em ( grid , config_flags , &
 ! Actual arguments generated from Registry
 #include "em_dummy_args.inc"
@@ -35,6 +35,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_microphysics_driver
    USE module_pbl_driver
    USE module_mp_nconvp    
+   USE module_mp_kessler_db
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -160,7 +161,6 @@ SUBROUTINE solve_em ( grid , config_flags , &
 #include <bench_solve_em_init.h>
 
    if(grid%trace_use) call trace_entry("solve_em")
-
    ! 090921 bp; 
    solverDisabled = .false.
    call nl_get_disable_solver( 1, solverDisabled )
@@ -2467,9 +2467,9 @@ BENCH_END(advance_ppt_tim)
 !     quantities pressure and density.
 !</pre>
 !</DESCRIPTION>
-
-  IF (config_flags%mp_physics == 0)  then
-
+!whl
+  IF (config_flags%mp_physics >= 0)  then
+!   print*,'config_flags%mp_physics in nl == ',config_flags%mp_physics
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
    ELSE
@@ -2496,7 +2496,16 @@ BENCH_START(moist_physics_prep_tim)
                                    ims, ime, jms, jme, kms, kme,     &
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
-        
+
+
+     if(config_flags%mp_physics == 1)then
+!        print*, 'call kessler in nl'        
+ call kessler(t_2,moist_2(ims,kms,jms,P_QV),moist_2(ims,kms,jms,P_QC),moist_2(ims,kms,jms,P_QR), rho, p_phy,pi_phy, dt&
+&    , z, xlv, cp, ep_2, svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+&    rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+&    jms, jme, kms, kme, its, ite, jts, jte, k_start,min(k_end,kde-1))
+     elseif(config_flags%mp_physics == 0)then
+!        print*, 'call lscond in nl'
         CALL lscond(t_2, p_phy                                         &
                     ,moist_2(ims,kms,jms,P_QV)                         &
                     ,rho, pi_phy,r_v, xlv, cp                          &
@@ -2508,8 +2517,10 @@ BENCH_START(moist_physics_prep_tim)
                     ,ims, ime, jms, jme, kms, kme                      &
                     ,its, ite, jts, jte                                &
                     ,k_start, min(k_end,kde-1)                         )
+     else
+     print*,'no large scale rain and microphysics'
 
-
+     endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 BENCH_END(moist_physics_prep_tim)
@@ -2561,7 +2572,7 @@ BENCH_START(moist_phys_end_tim)
    !$OMP END PARALLEL DO
 BENCH_END(moist_phys_end_tim)
 
-  ENDIF
+  ENDIF  !mp
 
    scalar_tile_loop_2: DO ij = 1 , grid%num_tiles
 
