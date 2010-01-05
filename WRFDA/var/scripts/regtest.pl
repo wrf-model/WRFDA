@@ -609,7 +609,7 @@ sub compare2baseline {
 
      return 1 unless ( -e "$name/wrfvar_output.$name.$par");
 
-     my @output = `WRFDA/var/build/diffwrf $name/wrfvar_output.$name.$par $Baseline/wrfvar_output.$name`;
+     my @output = `WRFDA/var/build/diffwrf $name/wrfvar_output.$name.$par $Baseline/wrfvar_output.$name.$par`;
      
      my $found = 0;
 
