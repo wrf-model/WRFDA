@@ -669,12 +669,12 @@ sub submit_job {
 
             # Wrap-up this job:
 
-            rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par";
+            rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par.$Compiler";
 
             # Compare the wrfvar_output with the BASELINE:
 
             unless ($Baseline =~ /none/i) {
-                if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
+                if (compare ("$name/wrfvar_output.$name.$par.$Compiler","$Baseline/wrfvar_output.$name.$par.$Compiler") == 0) {
                     $Experiments{$name}{paropt}{$par}{compare} = "ok";
                 } else {
                     $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
@@ -759,12 +759,12 @@ sub submit_job_be {
 
                      # Wrap-up this job:
 
-                     rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par";
+                     rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par.$Compiler";
 
                      # Compare the wrfvar_output with the BASELINE:
 
                      unless ($Baseline =~ /none/i) {
-                         if (compare ("$name/wrfvar_output.$name.$par","$Baseline/wrfvar_output.$name") == 0) {
+                         if (compare ("$name/wrfvar_output.$name.$par.$Compiler","$Baseline/wrfvar_output.$name.$par.$Compiler") == 0) {
                              $Experiments{$name}{paropt}{$par}{compare} = "ok";
                          } else {
                              $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
