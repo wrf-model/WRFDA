@@ -1114,8 +1114,8 @@ SCC		=	$(CC)
 RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE
-FCOPTIM         =       # -O3
-FCDEBUG         =       -g -qnoopt -qfullpath
+FCOPTIM         =       -O3
+FCDEBUG         =       # -g -qnoopt -qfullpath -qflttrap=zerodivide:invalid:enable -qsigtrap -C -qinitauto=7FF7FFFF
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
@@ -1233,8 +1233,8 @@ RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE  -I../external/RSL_LITE -DDM_PARALLEL \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-FCOPTIM         =       -O3 #-qhot
-FCDEBUG         =       # -g -qnoopt -qfullpath
+FCOPTIM         =       -O3 
+FCDEBUG         =       # -g -qnoopt -qfullpath -qflttrap=zerodivide:invalid:enable -qsigtrap -C -qinitauto=7FF7FFFF
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
