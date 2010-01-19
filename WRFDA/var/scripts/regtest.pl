@@ -531,10 +531,10 @@ sub new_job {
 #        sleep (0.1);
          `mpirun -np $cpun ../WRFDA/var/build/da_wrfvar.exe.$com.$par`;
      } else {
-         `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$nam.$par`; 
+         `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$Arch.$nam.$par.$Compiler`; 
      }
 
-     rename "rsl.out.0000", "print.out.$nam.$par" if (($par=~/dm/i) && (-e "rsl.out.0000"));
+     rename "rsl.out.0000", "print.out.$Arch.$nam.$par.$Compiler" if (($par=~/dm/i) && (-e "rsl.out.0000"));
 
      # Back to the upper directory:
 
@@ -607,10 +607,10 @@ sub compare2baseline {
    
      my ($name, $par) = @_;
 
-     return 1 unless ( -e "$name/wrfvar_output.$name.$par.$Compiler");
-     return 1 unless ( -e "$Baseline/wrfvar_output.$name.$par.$Compiler");
+     return 1 unless ( -e "$name/wrfvar_output.$Arch.$name.$par.$Compiler");
+     return 1 unless ( -e "$Baseline/wrfvar_output.$Arch.$name.$par.$Compiler");
 
-     my @output = `WRFDA/var/build/diffwrf $name/wrfvar_output.$name.$par.$Compiler $Baseline/wrfvar_output.$name.$par.$Compiler`;
+     my @output = `WRFDA/var/build/diffwrf $name/wrfvar_output.$Arch.$name.$par.$Compiler $Baseline/wrfvar_output.$Arch.$name.$par.$Compiler`;
      
      my $found = 0;
 
@@ -669,12 +669,12 @@ sub submit_job {
 
             # Wrap-up this job:
 
-            rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par.$Compiler";
+            rename "$name/wrfvar_output", "$name/wrfvar_output.$Arch.$name.$par.$Compiler";
 
             # Compare the wrfvar_output with the BASELINE:
 
             unless ($Baseline =~ /none/i) {
-                if (compare ("$name/wrfvar_output.$name.$par.$Compiler","$Baseline/wrfvar_output.$name.$par.$Compiler") == 0) {
+                if (compare ("$name/wrfvar_output.$Arch.$name.$par.$Compiler","$Baseline/wrfvar_output.$Arch.$name.$par.$Compiler") == 0) {
                     $Experiments{$name}{paropt}{$par}{compare} = "ok";
                 } else {
                     $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
@@ -759,12 +759,12 @@ sub submit_job_be {
 
                      # Wrap-up this job:
 
-                     rename "$name/wrfvar_output", "$name/wrfvar_output.$name.$par.$Compiler";
+                     rename "$name/wrfvar_output", "$name/wrfvar_output.$Arch.$name.$par.$Compiler";
 
                      # Compare the wrfvar_output with the BASELINE:
 
                      unless ($Baseline =~ /none/i) {
-                         if (compare ("$name/wrfvar_output.$name.$par.$Compiler","$Baseline/wrfvar_output.$name.$par.$Compiler") == 0) {
+                         if (compare ("$name/wrfvar_output.$Arch.$name.$par.$Compiler","$Baseline/wrfvar_output.$Arch.$name.$par.$Compiler") == 0) {
                              $Experiments{$name}{paropt}{$par}{compare} = "ok";
                          } else {
                              $Experiments{$name}{paropt}{$par}{compare} = &compare2baseline ($name,$par) ? 
