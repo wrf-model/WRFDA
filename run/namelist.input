@@ -124,7 +124,7 @@
  /
 
  &dynamics
- dyn_opt                             = 202,                      ! wrf+: 
+ dyn_opt                             = 402,                      ! wrf+: 
 ! Valid dynamics option values: (see Registry.EM) for additional details
 ! dyn_nodyn    dyn_opt==0         
 ! dyn_em       dyn_opt==2              
