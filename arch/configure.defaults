@@ -1108,7 +1108,6 @@ module_initialize_real.o module_dm.o start_domain.o :
 #
 FC              =       xlf90_r
 SFC		=	$(FC)
-FC77            =       xlf
 LD              =       xlf90_r
 CC              =       cc_r
 SCC		=	$(CC)

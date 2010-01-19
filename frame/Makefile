@@ -37,9 +37,7 @@ OBJS    =       wrf_num_bytes_between.o    \
 		adStack.o                  \
 		adBuffer.o                 \
                 microclock.o               \
-		add_forcing_to_ad.o        \
-	        adBuffer.o                 \
-	        adStack.o
+		add_forcing_to_ad.o
 
 #compile as a .o but do not link into the main library
 SPECIAL =       module_internal_header_util.o pack_utils.o
@@ -56,11 +54,6 @@ $(LIBTARGET) :  $(MODULES) $(EXTRAMODULES) $(OBJS) $(SPECIAL)
 wrf_num_bytes_between.o :
 	$(CC) -c $(CFLAGS) wrf_num_bytes_between.c
 
-adBuffer.o:     adBuffer.F
-	        $(FC77) -c adBuffer.F
-adStack.o:      adStack.c
-	        $(CC) -c adStack.c
-
 clean:
 	@ echo 'use the clean script'
 
@@ -72,6 +65,7 @@ md_calls.inc : md_calls.m4
 
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+
 
 adStack.o:	adStack.c
 		$(CC) $(CFLAGS) -c adStack.c
