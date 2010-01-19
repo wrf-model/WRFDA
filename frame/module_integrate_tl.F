@@ -268,7 +268,7 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
                             'DEBUG:  top of integrate_tl(),' )
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_tl.', rc)
-      CALL print_a_timeinterval(grid%domain_clock%TimeStep)
+!     CALL print_a_timeinterval(grid%domain_clock%TimeStep)
       if ( grid%jcdfi_io) then
          CALL jcdfi_init_coef ( grid , config_flags )
          CALL jcdfi_zero_ad ( grid )
@@ -327,7 +327,8 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
 
 !!!!  for Non-exactly trajectory update   08/02/2006   Xin Zhang
 !!!!          CALL med_auxinput2_in ( grid , config_flags , nl_date_string(nl_date_index-1) )
-              CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index-1) )
+              if ( grid%dyn_opt .ne. DYN_EM_TST ) &
+                 CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index-1) )
 
             endif
 

@@ -1179,6 +1179,8 @@ integer k
 
    call trace_entry("g_small_step_finish")
 
+ww1 = 0.0; g_ww1=0.0; g_ww =0.0
+h_diabatic = 0.0
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------

@@ -61,11 +61,11 @@ SUBROUTINE Setup_date_string ( grid, date_string, adantn )
    CALL nl_get_end_minute(1,end_minute)
    CALL nl_get_end_second(1,end_second)
 
-   print *, 'start_year,start_month,start_day,start_hour,start_minute,start_second=', &
-             start_year,start_month,start_day,start_hour,start_minute,start_second
+!  print *, 'start_year,start_month,start_day,start_hour,start_minute,start_second=', &
+!            start_year,start_month,start_day,start_hour,start_minute,start_second
 
-   print *, 'end_year,end_month,end_day,end_hour,end_minute,end_second=', &
-             end_year,end_month,end_day,end_hour,end_minute,end_second
+!  print *, 'end_year,end_month,end_day,end_hour,end_minute,end_second=', &
+!            end_year,end_month,end_day,end_hour,end_minute,end_second
 
 ! AUXINPUT3_ INTERVAL
 ! auxinput3_interval is left there (and means minutes) for consistency, but

@@ -1780,6 +1780,8 @@ integer k
 
    call trace_entry("a_small_step_finish")
 
+ww1 = 0.0; a_ww1=0.0; a_ww=0.0
+h_diabatic = 0.0
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------

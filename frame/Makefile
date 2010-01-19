@@ -34,6 +34,8 @@ OBJS    =       wrf_num_bytes_between.o    \
                 libmassv.o                 \
                 collect_on_comm.o          \
 		fast_copy.o                \
+		adStack.o                  \
+		adBuffer.o                 \
                 microclock.o               \
 		add_forcing_to_ad.o
 
@@ -65,8 +67,19 @@ md_calls.inc : md_calls.m4
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 
+adStack.o:	adStack.c
+		$(CC) $(CFLAGS) -c adStack.c
+
 memory_info.o:	memory_info.c
 		$(CC) $(CFLAGS) -c memory_info.c
+
+adBuffer.o:	adBuffer.F
+		$(RM) $@
+		$(SED_FTN) $*.F > $*.b
+		$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+		$(RM) $*.b
+		$(RM) $@
+		$(FC) -c $(FCFLAGS) $(FORMAT_FIXED) $(PROMOTION) $*.f
 
 module_configure.o: \
 		module_state_description.o \
