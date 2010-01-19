@@ -442,15 +442,14 @@ call calculate_full( mut,mub,mu,ids,ide,jds,jde,1,2,ims,ime,jms,jme,1,1,its,ite,
 ! recompute : mut
 call calc_mu_uv( config_flags,mu,mub,muu,muv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 ! recompute : muu,muv
-call a_calc_php( a_php,a_ph,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-call a_calc_alt( a_alt,a_al,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-call a_calc_cq( moist,a_moist,a_cqu,a_cqv,a_cqw,n_moist,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-call a_calc_ww_cp( u,a_u,v,a_v,mu,a_mu,mub,a_ww,rdx,rdy,msft,msfu,msfv,dnw,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,&
-&kte )
+call a_calc_php( a_php,a_ph,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte ) !optimized
+call a_calc_alt( a_alt,a_al,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte ) !optimized
+call a_calc_cq( moist,a_moist,a_cqu,a_cqv,a_cqw,n_moist,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte ) !ok
+call a_calc_ww_cp( u,a_u,v,a_v,mu,a_mu,mub,a_ww,rdx,rdy,msft,msfu,msfv,dnw,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )  !ok
 call a_couple_momentum( muu,a_muu,a_ru,u,a_u,msfu,muv,a_muv,a_rv,v,a_v,msfv,mut,a_mut,a_rw,w,a_w,msft,ide,jde,kde,ims,ime,jms,jme,&
-&kms,kme,its,ite,jts,jte,kts,kte )
-call a_calc_mu_uv( config_flags,a_mu,a_muu,a_muv,ids,ide,jds,jde,ims,ime,jms,jme,its,ite,jts,jte )
-call a_calculate_full( a_mut,a_mu,ide,jde,2,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1 )
+&kms,kme,its,ite,jts,jte,kts,kte ) !ok
+call a_calc_mu_uv( config_flags,a_mu,a_muu,a_muv,ids,ide,jds,jde,ims,ime,jms,jme,its,ite,jts,jte )  !ok
+call a_calculate_full( a_mut,a_mu,ide,jde,2,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1 )  !optimized
 
   call trace_exit("a_rk_step_prep")
 
@@ -598,6 +597,10 @@ real, intent(in) :: z_base(kms:kme)
 ! declare local variables
 !==============================================
 real kvdq
+!!Real*4 :: Stime(2)
+!!Double Precision, Save :: TimeStart(32)
+!!Data TimeStart /32*0./
+!!Double Precision :: TimeEnd(32), Etime
 
   call trace_entry("a_rk_tendency1")
 
@@ -611,9 +614,15 @@ a_forward_step: if (rk_step .eq. 1) then
         kvdq = 3.*kvdif
 ! recompute : kvdq
 
+!!TimeStart(11)=Etime(Stime)-TimeStart(11)
         call a_vertical_diffusion_3dmp( t,a_t,a_t_tendf,t_init,alt,a_alt,mut,a_mut,rdn,rdnw,kvdq,ide,jde,kde,ims,ime,jms,jme,kms,&
 &kme,its,ite,jts,jte,kts,kte )
+
+!!TimeEnd(11)=Etime(Stime); TimeStart(11)=TimeEnd(11)-TimeStart(11)
+!!Print*, '<<<<<<<Time cost of a_vertical_diffusion_3dmp(11)', TimeStart(11)
+
         if (non_hydrostatic) then
+!!TimeStart(12)=Etime(Stime)-TimeStart(12)
           call a_vertical_diffusion( 'w',w,a_w,a_rw_tendf,alt,a_alt,mut,a_mut,rdn,rdnw,kvdif,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
 &its,ite,jts,jte,kts,kte )
         endif
@@ -630,7 +639,12 @@ a_forward_step: if (rk_step .eq. 1) then
 &jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       call a_horizontal_diffusion( 'u',u,a_u,a_ru_tendf,mut,a_mut,config_flags,msfu,msfv,msft,xkmhd,a_xkmhd,rdx,rdy,ids,ide,jds,&
 &jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+!!TimeEnd(12)=Etime(Stime); TimeStart(12)=TimeEnd(12)-TimeStart(12)
+!!Print*, '<<<<<<<<<<Time cost of a_horizontal_diffusion(12)', TimeStart(12)
+
     else a_leapfrog_test
+!!TimeStart(13)=Etime(Stime)-TimeStart(13)
       a_pbl_test_lf: if (config_flags%bl_pbl_physics .eq. 0) then
         kvdq = 3.*kvdif
 ! recompute : kvdq
@@ -645,6 +659,11 @@ a_forward_step: if (rk_step .eq. 1) then
         call a_vertical_diffusion_u( u_old,a_u_old,a_ru_tendf,config_flags,u_base,alt,a_alt,muu,a_muu,rdn,rdnw,kvdif,ids,ide,jde,&
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       endif a_pbl_test_lf
+
+!!TimeEnd(13)=Etime(Stime); TimeStart(13)=TimeEnd(13)-TimeStart(13)
+!!Print*, '<<<<<<<<<<<<Time cost of a_vertical_diffusion(13)', TimeStart(13)
+
+!!TimeStart(14)=Etime(Stime)-TimeStart(14)
       call a_horizontal_diffusion_3dmp( t_old,a_t_old,a_t_tendf,mut,a_mut,config_flags,t_init,msfu,msfv,msft,xkmhd,a_xkmhd,rdx,rdy,&
 &ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       if (non_hydrostatic) then
@@ -655,13 +674,23 @@ a_forward_step: if (rk_step .eq. 1) then
 &ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       call a_horizontal_diffusion( 'u',u_old,a_u_old,a_ru_tendf,mut,a_mut,config_flags,msfu,msfv,msft,xkmhd,a_xkmhd,rdx,rdy,ids,&
 &ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+!!TimeEnd(14)=Etime(Stime); TimeStart(14)=TimeEnd(14)-TimeStart(14)
+!!Print*, '<<<<<<<<<<Time cost of a_horizontal_diffusion(14)', TimeStart(14)
+
     endif a_leapfrog_test
   endif a_diff_opt1
 endif a_forward_step
 
+!!TimeStart(15)=Etime(Stime)-TimeStart(15)
 call a_curvature( ru,a_ru,rv,a_rv,rw,a_rw,u,a_u,v,a_v,a_ru_tend,a_rv_tend,a_rw_tend,config_flags,msfu,msfv,fnm,fnp,rdx,rdy,ids,ide,&
 &jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
+!!TimeEnd(15)=Etime(Stime); TimeStart(15)=TimeEnd(15)-TimeStart(15)
+!!Print*, '<<<<<<<<<<<<<<<<<<<<<Time cost of a_curvature(15)', TimeStart(15)
+
+
+!!TimeStart(16)=Etime(Stime)-TimeStart(16)
 if (config_flags%pert_coriolis) then
   call a_perturbation_coriolis( a_ru,a_rv,a_rw,a_ru_tend,a_rv_tend,a_rw_tend,config_flags,u_base,v_base,z_base,muu,a_muu,muv,a_muv,&
 &phb,ph,a_ph,f,e,sina,cosa,fnm,fnp,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
@@ -675,11 +704,25 @@ endif
 if (non_hydrostatic) then
   call a_pg_buoy_w( a_rw_tend,p,a_p,cqw,a_cqw,a_mu,mub,rdnw,rdn,g,msft,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte )
 endif
+
+!!TimeEnd(16)=Etime(Stime); TimeStart(16)=TimeEnd(16)-TimeStart(16)
+!!Print*, '<<<<<<<<<<<<<<<<<<Time cost of a_rk_tendency1(16)', TimeStart(16)
+
+!!TimeStart(17)=Etime(Stime)-TimeStart(17)
 call a_horizontal_pressure_gradient( a_ru_tend,a_rv_tend,ph,a_ph,alt,a_alt,p,a_p,pb,al,a_al,php,a_php,cqu,a_cqu,cqv,a_cqv,muu,&
 &a_muu,muv,a_muv,mu,a_mu,fnm,fnp,rdnw,cf1,cf2,cf3,rdx,rdy,config_flags,non_hydrostatic,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
 &its,ite,jts,jte,kte )
+
+!!TimeEnd(17)=Etime(Stime); TimeStart(17)=TimeEnd(17)-TimeStart(17)
+!!Print*, '<<Time cost of a_horizontal_pressure_gradient(17)', TimeStart(17)
+
+!!TimeStart(18)=Etime(Stime)-TimeStart(18)
   call a_rhs_ph( a_ph_tend,u,a_u,v,a_v,ww,a_ww,ph,a_ph,ph,a_ph,phb,w,a_w,mut,a_mut,muu,a_muu,muv,a_muv,fnm,fnp,rdnw,cfn,cfn1,rdx,&
 &rdy,msft,non_hydrostatic,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+
+!!TimeEnd(18)=Etime(Stime); TimeStart(18)=TimeEnd(18)-TimeStart(18)
+!!Print*, '<<<<<<<<<<<<<<<<<<<<<<<<Time cost of a_rhs_ph(18)', TimeStart(18)
 
   call trace_exit("a_rk_tendency1")
 
@@ -829,20 +872,42 @@ real, intent(in) :: z_base(kms:kme)
 !==============================================
 real kvdq
 
-  call trace_entry("a_rk_tendency2")
+!Real*4 :: Stime(2)
+!Double Precision, Save :: TimeStart(32)
+!Data TimeStart /32*0./
+!Double Precision :: TimeEnd(32), Etime
 
-  call a_advect_scalar( t,a_t,t,a_t,a_t_tend,ru,a_ru,rv,a_rv,ww,a_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,kds,kde,&
+call trace_entry("a_rk_tendency2")
+
+!TimeStart(21)=Etime(Stime)-TimeStart(21)
+call a_advect_scalar( t,a_t,t,a_t,a_t_tend,ru,a_ru,rv,a_rv,ww,a_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  if (non_hydrostatic) then
-    call a_advect_w( w,a_w,w,a_w,a_rw_tend,ru,a_ru,rv,a_rv,ww,a_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdn,ids,ide,jds,jde,kde,ims,&
+!TimeEnd(21)=Etime(Stime); TimeStart(21)=TimeEnd(21)-TimeStart(21)
+!Print*, '>>>>>>>>>>>>>>>>>>Time cost of a_advect_scalar(21)', TimeStart(21)
+
+!TimeStart(22)=Etime(Stime)-TimeStart(22)
+if (non_hydrostatic) then
+call a_advect_w( w,a_w,w,a_w,a_rw_tend,ru,a_ru,rv,a_rv,ww,a_ww,config_flags,msft,fnm,fnp,rdx,rdy,rdn,ids,ide,jds,jde,kde,ims,&
 &ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
-  endif
-  call a_advect_v( v,a_v,v,a_v,a_rv_tend,ru,a_ru,rv,a_rv,ww,a_ww,mut,a_mut,config_flags,msfv,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,&
+endif
+!TimeEnd(22)=Etime(Stime); TimeStart(22)=TimeEnd(22)-TimeStart(22)
+!Print*, '>>>>>>>>>>>>>>>>>>>>>>>Time cost of a_advect_w(22)', TimeStart(22)
+
+!TimeStart(23)=Etime(Stime)-TimeStart(23)
+call a_advect_v( v,a_v,v,a_v,a_rv_tend,ru,a_ru,rv,a_rv,ww,a_ww,mut,a_mut,config_flags,msfv,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,&
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call a_advect_u( u,a_u,u,a_u,a_ru_tend,ru,a_ru,rv,a_rv,ww,a_ww,mut,a_mut,config_flags,msfu,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,&
+!TimeEnd(23)=Etime(Stime); TimeStart(23)=TimeEnd(23)-TimeStart(23)
+!Print*, '>>>>>>>>>>>>>>>>>>>>>>>Time cost of a_advect_v(23)', TimeStart(23)
+
+!TimeStart(24)=Etime(Stime)-TimeStart(24)
+call a_advect_u( u,a_u,u,a_u,a_ru_tend,ru,a_ru,rv,a_rv,ww,a_ww,mut,a_mut,config_flags,msfu,fnm,fnp,rdx,rdy,rdnw,ids,ide,jds,jde,&
 &kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
+!TimeEnd(24)=Etime(Stime); TimeStart(24)=TimeEnd(24)-TimeStart(24)
+!Print*, '>>>>>>>>>>>>>>>>>>>>>>>Time cost of a_advect_u(24)', TimeStart(24)
+
+!TimeStart(25)=Etime(Stime)-TimeStart(25)
 call a_zero_tend( a_mu_tend,ims,ime,jms,jme,1,1,its,ite,jts,jte,1,1 )
 call a_zero_tend( a_t_save,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_ph_save,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
@@ -855,7 +920,10 @@ call a_zero_tend( a_rw_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_rv_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 call a_zero_tend( a_ru_tend,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-  call trace_exit("a_rk_tendency2")
+call trace_exit("a_rk_tendency2")
+
+!TimeEnd(25)=Etime(Stime); TimeStart(25)=TimeEnd(25)-TimeStart(25)
+!Print*, '>>>>>>>>>>>>>>>>>>>>>>Time cost of a_zero_tend(25)', TimeStart(25)
 
 end subroutine a_rk_tendency2
 

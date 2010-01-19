@@ -49,6 +49,10 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
+
    !  Input data.
 
    TYPE(domain) , TARGET          :: grid
@@ -103,6 +107,11 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 
 ! Define benchmarking timers if -DBENCH is compiled
 #include <bench_solve_em_def.h>
+
+Double Precision, Save :: TimeStart,TimeEnd,TotalTL
+Integer , Save :: NumberofTL
+Data NumberofTL/0/
+Data TotalTL /0./
 
 !----------------------
 ! Executable statements
@@ -171,6 +180,9 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 #include <em_i1_init.inc>
+
+TimeStart=MPI_Wtime()
+!Print*, '111111111111111+++++++++++++++++++++++++TL CODE TESTING'
 
    call trace_entry("solve_em_tl")
 
@@ -1287,6 +1299,7 @@ BENCH_START(small_step_prep_tim)
 
       CALL wrf_debug ( 200 , ' call calc_coef_w' )
 
+!Print*, '2222222222222222222+++++++++++++++++++++++++TL CODE TESTING'
       call g_small_step_prep( u_1,g_u_1,u_2,g_u_2,v_1,g_v_1,v_2,g_v_2,w_1,g_w_1,w_2,g_w_2, &
                               t_1,g_t_1,t_2,g_t_2,ph_1,g_ph_1,ph_2,&
                               g_ph_2,mub,mu_1,g_mu_1,mu_2,g_mu_2,muu,g_muu,muus,g_muus,muv,g_muv, &
@@ -1443,6 +1456,7 @@ BENCH_START(set_phys_bc2_tim)
     endif
 BENCH_END(set_phys_bc2_tim)
 
+!Print*, '333333333333333333333333333+++++++++++++++++++++++++TL CODE TESTING'
    small_steps : DO iteration = 1 , number_of_small_timesteps
 
    ! Boundary condition time (or communication time).  
@@ -1703,6 +1717,7 @@ BENCH_START(phys_bc_tim)
 BENCH_END(phys_bc_tim)
 
    END DO small_steps
+!Print*, '44444444444444444444444444444++++++++++++++++++++++++TL CODE TESTING'
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
@@ -2681,6 +2696,7 @@ Goto 4005
 
    call trace_exit("solve_em_tl")
 
+!Print*, '5555555555555555555555555555555555++++++++++++++++++++++++TL CODE TESTING'
 ! Finish timers if compiled with -DBENCH.
 #include <bench_solve_em_end.h>
 
@@ -2689,6 +2705,13 @@ Goto 4005
 #include <em_scalar_derefs.inc>
 
 !----------------
+
+TimeEnd=MPI_Wtime()
+NumberofTL=NumberofTL+1
+TotalTL=TotalTL+(TimeEnd-TimeStart)
+Print*, ''
+Print*, 'NumberofTL=',NumberofTL,'TotalTL=%',TotalTL,'AverageTL=',TotalTL/DBLE(NumberofTL)
+Print*, ''
 
    RETURN
 

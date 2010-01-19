@@ -103,16 +103,20 @@ jtf = min(jte,jde-1)
 ! recompute : jtf
 ktf = min(kte,kde-1)
 ! recompute : ktf
-do j = jts, jtf
-  do k = kts, ktf
-    do i = its, itf
-      a_al(i,k,j) = a_al(i,k,j)+a_alt(i,k,j)
-      a_alt(i,k,j) = 0.
-    end do
-  end do
-end do
 
-   call trace_exit("a_calc_alt")
+!do j = jts, jtf
+!  do k = kts, ktf
+!    do i = its, itf
+!      a_al(i,k,j) = a_al(i,k,j)+a_alt(i,k,j)
+!      a_alt(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+
+a_al(its:itf,kts:ktf,jts:jtf) = a_al(its:itf,kts:ktf,jts:jtf)+a_alt(its:itf,kts:ktf,jts:jtf)
+a_alt(its:itf,kts:ktf,jts:jtf)  = 0.
+
+call trace_exit("a_calc_alt")
 
 end subroutine a_calc_alt
 
@@ -363,7 +367,7 @@ integer jtf
 integer ips, ipe, jps, jpe, kps, kpe
 #endif
 
-   call trace_entry("a_calc_mu_uv")
+call trace_entry("a_calc_mu_uv")
 
 #ifdef DM_PARALLEL
 ips = its
@@ -382,14 +386,16 @@ jtf = jte
 ! xinzhang's tuning
 #include      "HALO_ADJ_RKPREP2.inc"
 #endif
+
 if (jts .ne. jds .and. jte .ne. jde) then
   do j = jts, jtf+1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
-      a_mu(i,j) = a_mu(i,j)+0.5*a_muv(i,j)
-      a_muv(i,j) = 0.
+      a_mu(i,j)   = a_mu(i,j)+0.5*a_muv(i,j)
+      a_muv(i,j)  = 0.
     end do
   end do
+
 else if (jts .eq. jds .and. jte .ne. jde) then
   j = jts
 ! recompute : j
@@ -404,6 +410,7 @@ else if (jts .eq. jds .and. jte .ne. jde) then
     a_mu(i,jm) = a_mu(i,jm)+0.5*a_muv(i,j)
     a_muv(i,j) = 0.
   end do
+
   do j = jts+1, jtf+1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
@@ -411,6 +418,7 @@ else if (jts .eq. jds .and. jte .ne. jde) then
       a_muv(i,j) = 0.
     end do
   end do
+
 else if (jts .ne. jds .and. jte .eq. jde) then
   j = jte
 ! recompute : j
@@ -420,13 +428,15 @@ else if (jts .ne. jds .and. jte .eq. jde) then
     jm = jte
   endif
 ! recompute : jm
+
   do i = its, itf
     a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
     a_mu(i,jm) = a_mu(i,jm)+0.5*a_muv(i,j)
-    a_muv(i,j) = 0.
-    a_mu(i,j-1) = a_mu(i,j-1)+a_muv(i,j)
+!   a_muv(i,j) = 0.
+!   a_mu(i,j-1) = a_mu(i,j-1)+a_muv(i,j)
     a_muv(i,j) = 0.
   end do
+
   do j = jts, jtf-1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
@@ -434,20 +444,24 @@ else if (jts .ne. jds .and. jte .eq. jde) then
       a_muv(i,j) = 0.
     end do
   end do
+
 else if (jts .eq. jds .and. jte .eq. jde) then
   j = jte
 ! recompute : j
   jm = jte-1
 ! recompute : jm
+
   if (config_flags%periodic_y) then
     jm = jte
   endif
+
 ! recompute : jm
   do i = its, itf
     a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
     a_mu(i,jm) = a_mu(i,jm)+0.5*a_muv(i,j)
     a_muv(i,j) = 0.
   end do
+
 ! recdepend vars : jts
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:150
 ! recompute vars : j
@@ -461,23 +475,27 @@ else if (jts .eq. jds .and. jte .eq. jde) then
 ! recdepend vars : config_flags,j,jm,jts
 ! recompute pos : IF_STMT module_big_step_utilities_em.f90:152
 ! recompute vars : jm
+
   if (config_flags%periodic_y) then
     jm = jts-1
   endif
+
 ! recompute vars : jm
   do i = its, itf
-    a_mu(i,j) = a_mu(i,j)+0.5*a_muv(i,j)
+    a_mu(i,j)  = a_mu(i,j) +0.5*a_muv(i,j)
     a_mu(i,jm) = a_mu(i,jm)+0.5*a_muv(i,j)
     a_muv(i,j) = 0.
   end do
+
   do j = jts+1, jtf-1
     do i = its, itf
       a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_muv(i,j)
-      a_mu(i,j) = a_mu(i,j)+0.5*a_muv(i,j)
-      a_muv(i,j) = 0.
+      a_mu(i,j)   = a_mu(i,j)+0.5*a_muv(i,j)
+      a_muv(i,j)  = 0.
     end do
   end do
 endif
+
 ! recdepend vars : ite
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:46
 ! recompute vars : itf
@@ -506,10 +524,11 @@ else if (its .eq. ids .and. ite .ne. ide) then
   endif
 ! recompute : im
   do j = jts, jtf
-    a_mu(i,j) = a_mu(i,j)+0.5*a_muu(i,j)
+    a_mu(i,j)  = a_mu(i,j)+0.5*a_muu(i,j)
     a_mu(im,j) = a_mu(im,j)+0.5*a_muu(i,j)
     a_muu(i,j) = 0.
   end do
+
   do j = jts, jtf
     do i = its+1, itf+1
       a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
@@ -531,6 +550,7 @@ else if (its .ne. ids .and. ite .eq. ide) then
     a_mu(im,j) = a_mu(im,j)+0.5*a_muu(i,j)
     a_muu(i,j) = 0.
   end do
+
   do j = jts, jtf
     do i = its, itf-1
       a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
@@ -546,6 +566,7 @@ else if (its .eq. ids .and. ite .eq. ide) then
   if (config_flags%periodic_x) then
     im = ite
   endif
+
 ! recompute : im
   do j = jts, jtf
     a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
@@ -565,15 +586,18 @@ else if (its .eq. ids .and. ite .eq. ide) then
 ! recdepend vars : config_flags,i,im,its
 ! recompute pos : IF_STMT module_big_step_utilities_em.f90:91
 ! recompute vars : im
+
   if (config_flags%periodic_x) then
     im = its-1
   endif
+
 ! recompute vars : im
   do j = jts, jtf
     a_mu(i,j) = a_mu(i,j)+0.5*a_muu(i,j)
     a_mu(im,j) = a_mu(im,j)+0.5*a_muu(i,j)
     a_muu(i,j) = 0.
   end do
+
   do j = jts, jtf
     do i = its+1, itf-1
       a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_muu(i,j)
@@ -583,7 +607,7 @@ else if (its .eq. ids .and. ite .eq. ide) then
   end do
 endif
 
-   call trace_exit("a_calc_mu_uv")
+call trace_exit("a_calc_mu_uv")
 
 end subroutine a_calc_mu_uv
 
@@ -927,114 +951,100 @@ real qf1
 real qf2
 real qtot
 real qvf
+real walls(5)
 
    call trace_entry("a_calc_p_rho_phi")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_qf1 = 0.
-a_qf2 = 0.
-a_qtot = 0.
-a_qvf = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
 itf = min(ite,ide-1)
-! recompute : itf
 jtf = min(jte,jde-1)
-! recompute : jtf
 ktf = min(kte,kde-1)
-! recompute : ktf
 if (non_hydrostatic) then
   if (n_moist .ge. param_first_scalar) then
     do j = jts, jtf
       do k = kts, ktf
+        walls(1)=rdnw(k)
         do i = its, itf
-          a_qvf = 0.
           qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-! recompute : qvf
-          al(i,k,j) = -(1./muts(i,j)*(alb(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j))))
-! recompute : al
-!xyh          if(j.eq.60) write(100+k,*)'i,a_al,a_p=', i,a_al(i,k,j),a_p(i,k,j)
-          a_al(i,k,j) = a_al(i,k,j)-a_p(i,k,j)*r_d*(t0+t(i,k,j))*qvf*p0/(p0*(al(i,k,j)+alb(i,k,j))*p0*(al(i,k,j)+alb(i,k,j)))*&
-&cpovcv*(r_d*(t0+t(i,k,j))*qvf/(p0*(al(i,k,j)+alb(i,k,j))))**(cpovcv-1)*p0
-          a_qvf = a_qvf+a_p(i,k,j)*r_d*(t0+t(i,k,j))/(p0*(al(i,k,j)+alb(i,k,j)))*cpovcv*(r_d*(t0+t(i,k,j))*qvf/(p0*(al(i,k,j)+&
-&alb(i,k,j))))**(cpovcv-1)*p0
-          a_t(i,k,j) = a_t(i,k,j)+a_p(i,k,j)*r_d*qvf/(p0*(al(i,k,j)+alb(i,k,j)))*cpovcv*(r_d*(t0+t(i,k,j))*qvf/(p0*(al(i,k,j)+&
-&alb(i,k,j))))**(cpovcv-1)*p0
-          a_p(i,k,j) = 0.
-          a_mu(i,j) = a_mu(i,j)-a_al(i,k,j)*1./muts(i,j)*alb(i,k,j)
-          a_muts(i,j) = a_muts(i,j)+a_al(i,k,j)/(muts(i,j)*muts(i,j))*(alb(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j)))
-          a_ph(i,k+1,j) = a_ph(i,k+1,j)-a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-          a_ph(i,k,j) = a_ph(i,k,j)+a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-          a_al(i,k,j) = 0.
-          a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+a_qvf*rvovrd
-          a_qvf = 0.
+          walls(2)=alb(i,k,j)*mu(i,j)+walls(1)*(ph(i,k+1,j)-ph(i,k,j))
+          walls(3)=p0*(al(i,k,j)+alb(i,k,j))
+          walls(4)=(r_d*(t0+t(i,k,j))*qvf/walls(3))**(cpovcv-1)
+!         al(i,k,j) = -walls(2)/muts(i,j)
+          a_al(i,k,j) = a_al(i,k,j)-a_p(i,k,j)*r_d*(t0+t(i,k,j))*qvf*p0/(walls(3)*walls(3))*cpovcv*walls(4)*p0
+          walls(5)=a_al(i,k,j)/muts(i,j)
+          a_muts(i,j) = a_muts(i,j)+walls(5)/muts(i,j)*walls(2)
+          a_t(i,k,j) = a_t(i,k,j)+a_p(i,k,j)*r_d*qvf/walls(3)*cpovcv*walls(4)*p0
+          a_mu(i,j) = a_mu(i,j)-walls(5)*alb(i,k,j)
+          a_ph(i,k+1,j) = a_ph(i,k+1,j)-walls(5)*walls(1)
+          a_ph(i,k,j) = a_ph(i,k,j)+walls(5)*walls(1)
+          a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+(a_p(i,k,j)*r_d*(t0+t(i,k,j))/walls(3)*cpovcv*walls(4)*p0)*rvovrd
         end do
       end do
     end do
+    a_p(its:itf,kts:ktf,jts:jtf)  = 0.
+    a_al(its:itf,kts:ktf,jts:jtf) = 0.
   else
     do j = jts, jtf
       do k = kts, ktf
+        walls(1)=rdnw(k)
         do i = its, itf
-          al(i,k,j) = -(1./muts(i,j)*(alb(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j))))
+          walls(2)=alb(i,k,j)*mu(i,j)+walls(1)*(ph(i,k+1,j)-ph(i,k,j))
+          walls(3)=p0*(al(i,k,j)+alb(i,k,j))
+          walls(4)=a_p(i,k,j)*p0*r_d*cpovcv/walls(3)*(r_d*(t0+t(i,k,j))/walls(3))**(cpovcv-1)
+!         al(i,k,j) = -walls(2)/muts(i,j)
 ! recompute : al
-          a_al(i,k,j) = a_al(i,k,j)-a_p(i,k,j)*p0*r_d*(t0+t(i,k,j))*p0/(p0*(al(i,k,j)+alb(i,k,j))*p0*(al(i,k,j)+alb(i,k,j)))*&
-&cpovcv*(r_d*(t0+t(i,k,j))/(p0*(al(i,k,j)+alb(i,k,j))))**(cpovcv-1)
-          a_t(i,k,j) = a_t(i,k,j)+a_p(i,k,j)*p0*r_d/(p0*(al(i,k,j)+alb(i,k,j)))*cpovcv*(r_d*(t0+t(i,k,j))/(p0*(al(i,k,j)+alb(i,k,j)&
-&)))**(cpovcv-1)
-          a_p(i,k,j) = 0.
-          a_mu(i,j) = a_mu(i,j)-a_al(i,k,j)*1./muts(i,j)*alb(i,k,j)
-          a_muts(i,j) = a_muts(i,j)+a_al(i,k,j)/(muts(i,j)*muts(i,j))*(alb(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j)))
-          a_ph(i,k+1,j) = a_ph(i,k+1,j)-a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-          a_ph(i,k,j) = a_ph(i,k,j)+a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-          a_al(i,k,j) = 0.
+          a_al(i,k,j) = a_al(i,k,j)-(t0+t(i,k,j))*p0/walls(3)*walls(4)
+          walls(5)=a_al(i,k,j)/muts(i,j)
+          a_muts(i,j) = a_muts(i,j)+walls(5)/muts(i,j)*walls(2)
+          a_t(i,k,j) = a_t(i,k,j)+walls(4)
+          a_mu(i,j) = a_mu(i,j)-walls(5)*alb(i,k,j)
+          a_ph(i,k+1,j) = a_ph(i,k+1,j)-walls(5)*walls(1)
+          a_ph(i,k,j) = a_ph(i,k,j)+walls(5)*walls(1)
         end do
       end do
     end do
+    a_p(its:itf,kts:ktf,jts:jtf)  = 0.
+    a_al(its:itf,kts:ktf,jts:jtf) = 0.
   endif
 else
   if (n_moist .ge. param_first_scalar) then
     do j = jts, jtf
-      a_qf1 = 0.
-      a_qf2 = 0.
-      a_qtot = 0.
-      a_qvf = 0.
       k = ktf
 ! recompute : k
+      walls(1)=rdnw(k)
       do i = its, itf
         qtot = 0.
         do ispe = param_first_scalar, n_moist
           qtot = qtot+moist(i,k,j,ispe)
         end do
-        qf2 = 1./(1.+qtot)
-        qf1 = qtot*qf2
-        p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-        qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-        al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+        p(i,k,j) = -0.5*(mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(1)
+!       al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*(1.+rvovrd*moist(i,k,j,p_qv))*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
       end do
 ! recompute : p
       do k = ktf-1, kts, -1
+        walls(1)=rdn(k+1)
         do i = its, itf
           qtot = 0.
           do ispe = param_first_scalar, n_moist
             qtot = qtot+0.5*(moist(i,k,j,ispe)+moist(i,k+1,j,ispe))
           end do
-          qf2 = 1./(1.+qtot)
-          qf1 = qtot*qf2
-          p(i,k,j) = p(i,k+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k+1)
-          qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+          p(i,k,j) = p(i,k+1,j)-(mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(1)
+          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*(1.+rvovrd*moist(i,k,j,p_qv))*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
       end do
 ! recompute : al
       do k = ktf+1, 2, -1
+        walls(1)=dnw(k-1) 
         do i = its, itf
-          a_al(i,k-1,j) = a_al(i,k-1,j)-a_ph(i,k,j)*dnw(k-1)*muts(i,j)
-          a_mu(i,j) = a_mu(i,j)-a_ph(i,k,j)*dnw(k-1)*alb(i,k-1,j)
-          a_muts(i,j) = a_muts(i,j)-a_ph(i,k,j)*dnw(k-1)*al(i,k-1,j)
+          a_al(i,k-1,j) = a_al(i,k-1,j)-a_ph(i,k,j)*walls(1)*muts(i,j)
+          a_mu(i,j) = a_mu(i,j)-a_ph(i,k,j)*walls(1)*alb(i,k-1,j)
+          a_muts(i,j) = a_muts(i,j)-a_ph(i,k,j)*walls(1)*al(i,k-1,j)
           a_ph(i,k-1,j) = a_ph(i,k-1,j)+a_ph(i,k,j)
           a_ph(i,k,j) = 0.
         end do
@@ -1043,152 +1053,104 @@ else
 !  recdepend vars : alb,cvpm,itf,its,j,k,moist,mu,muts,n_moist,p1000mb,p
 ! _qv,param_first_scalar,pb,r_d,rdnw,rvovrd,t,t0
 ! recompute pos : DOLOOP_STMT module_big_step_utilities_em.f90:1077
-! recompute vars : p
+        walls(1)=rdnw(k)
+        walls(2)=rdn(k+1)
         do i = its, itf
           qtot = 0.
           do ispe = param_first_scalar, n_moist
             qtot = qtot+moist(i,k,j,ispe)
           end do
-          qf2 = 1./(1.+qtot)
-          qf1 = qtot*qf2
-          p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-          qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+          p(i,k,j) = -0.5*(mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(1)
+!         al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*(1.+rvovrd*moist(i,k,j,p_qv))*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
-! recompute vars : p
         do k1 = ktf-1, k-(-1), -1
           do i = its, itf
             qtot = 0.
             do ispe = param_first_scalar, n_moist
               qtot = qtot+0.5*(moist(i,k1,j,ispe)+moist(i,k1+1,j,ispe))
             end do
-            qf2 = 1./(1.+qtot)
-            qf1 = qtot*qf2
-            p(i,k1,j) = p(i,k1+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k1+1)
+            p(i,k1,j) = p(i,k1+1,j)-(mu(i,j)+qtot*muts(i,j))/rdn(k1+1)
           end do
         end do
         do i = its, itf
-          a_qf1 = 0.
-          a_qf2 = 0.
-          a_qtot = 0.
-          a_qvf = 0.
           qtot = 0.
-! recompute : qtot
           do ispe = param_first_scalar, n_moist
             qtot = qtot+0.5*(moist(i,k,j,ispe)+moist(i,k+1,j,ispe))
           end do
-! recompute : qtot
-          qf2 = 1./(1.+qtot)
-! recompute : qf2
-          qf1 = qtot*qf2
-! recompute : qf1
-          p(i,k,j) = p(i,k+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k+1)
-! recompute : p
-          qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-! recompute : qvf
-          a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*qvf/p1000mb*cvpm*((p(i,k,j)+pb(i,k,j))/p1000mb)**(cvpm-1)
-          a_qvf = a_qvf+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-          a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-          a_al(i,k,j) = 0.
-          a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+a_qvf*rvovrd
-          a_qvf = 0.
-          a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*(1/qf2/rdn(k+1))
-          a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*(qf1/qf2/rdn(k+1))
+          walls(2)=((p(i,k,j)+pb(i,k,j))/p1000mb)
+          walls(3)=walls(2)**(cvpm-1)
+          p(i,k,j) = p(i,k+1,j)-(mu(i,j)+qtot*muts(i,j))/walls(2)
+          qvf = (1.+rvovrd*moist(i,k,j,p_qv))/p1000mb
+          a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d*qvf*walls(3)*walls(2)
+          walls(4)=a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*walls(3)
+          a_p(i,k,j) = a_p(i,k,j)+walls(4)*qvf*cvpm
+          a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+walls(4)*walls(2)*rvovrd
+          a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*walls(2)*(1.+qtot)
+          a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*qtot/walls(2)
           a_p(i,k+1,j) = a_p(i,k+1,j)+a_p(i,k,j)
-          a_qf1 = a_qf1-a_p(i,k,j)*(muts(i,j)/qf2/rdn(k+1))
-          a_qf2 = a_qf2+a_p(i,k,j)*((mu(i,j)+qf1*muts(i,j))/(qf2*qf2)/rdn(k+1))
-          a_p(i,k,j) = 0.
-          a_qf2 = a_qf2+a_qf1*qtot
-          a_qtot = a_qtot+a_qf1*qf2
-          a_qf1 = 0.
-          a_qtot = a_qtot-a_qf2/((1.+qtot)*(1.+qtot))
-          a_qf2 = 0.
-          do ispe = param_first_scalar, n_moist
-            a_moist(i,k+1,j,ispe) = a_moist(i,k+1,j,ispe)+0.5*a_qtot
-            a_moist(i,k,j,ispe) = a_moist(i,k,j,ispe)+0.5*a_qtot
-          end do
-          a_qtot = 0.
+          a_qf1 = -a_p(i,k,j)*muts(i,j)/walls(2)
+          a_qtot = 0.5*(a_qf1-(a_p(i,k,j)*((mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(2))+a_qf1*qtot)/(1.+qtot))
+!         do ispe = param_first_scalar, n_moist
+!           a_moist(i,k+1,j,ispe) = a_moist(i,k+1,j,ispe)+a_qtot
+!           a_moist(i,k,j,ispe) = a_moist(i,k,j,ispe)+a_qtot
+!         end do
+          a_moist(i,k+1,j,param_first_scalar:n_moist) = a_moist(i,k+1,j,param_first_scalar:n_moist)+a_qtot
+          a_moist(i,k,j,param_first_scalar:n_moist) = a_moist(i,k,j,param_first_scalar:n_moist)+a_qtot
         end do
+        a_al(its:itf,k,j) = 0.
+        a_p(its:itf,k,j) = 0.
       end do
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:1076
 ! recompute vars : k
       k = ktf
-! recompute vars : k
+      walls(1)=rdnw(k)
       do i = its, itf
-        a_qf1 = 0.
-        a_qf2 = 0.
-        a_qtot = 0.
-        a_qvf = 0.
         qtot = 0.
-! recompute : qtot
         do ispe = param_first_scalar, n_moist
           qtot = qtot+moist(i,k,j,ispe)
         end do
-! recompute : qtot
-        qf2 = 1./(1.+qtot)
-! recompute : qf2
-        qf1 = qtot*qf2
-! recompute : qf1
-        p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-! recompute : p
-        qvf = 1.+rvovrd*moist(i,k,j,p_qv)
-! recompute : qvf
-        a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*qvf/p1000mb*cvpm*((p(i,k,j)+pb(i,k,j))/p1000mb)**(cvpm-1)
-        a_qvf = a_qvf+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-        a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-        a_al(i,k,j) = 0.
-        a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+a_qvf*rvovrd
-        a_qvf = 0.
-        a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*(0.5/rdnw(k)/qf2)
-        a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*(0.5*qf1/rdnw(k)/qf2)
-        a_qf1 = a_qf1-a_p(i,k,j)*(0.5*muts(i,j)/rdnw(k)/qf2)
-        a_qf2 = a_qf2+a_p(i,k,j)*(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/(qf2*qf2))
-        a_p(i,k,j) = 0.
-        a_qf2 = a_qf2+a_qf1*qtot
-        a_qtot = a_qtot+a_qf1*qf2
-        a_qf1 = 0.
-        a_qtot = a_qtot-a_qf2/((1.+qtot)*(1.+qtot))
-        a_qf2 = 0.
-        do ispe = param_first_scalar, n_moist
-          a_moist(i,k,j,ispe) = a_moist(i,k,j,ispe)+a_qtot
-        end do
-        a_qtot = 0.
+        walls(2)=(p(i,k,j)+pb(i,k,j))/p1000mb
+        walls(3)=walls(2)**(cvpm-1)
+        p(i,k,j) = -0.5*(mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(1)
+        qvf = (1.+rvovrd*moist(i,k,j,p_qv))/p1000mb
+        a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d*qvf*walls(3)*walls(2)
+        walls(4)=a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*walls(3)
+        a_p(i,k,j) = a_p(i,k,j)+walls(4)*qvf*cvpm
+        a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+walls(4)*walls(2)*rvovrd
+        a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*(0.5/walls(1)*(1.+qtot))
+        a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*0.5*qtot/walls(1)
+        a_qf1 = -a_p(i,k,j)*0.5*muts(i,j)/walls(1)
+        a_qtot = a_qf1-(a_p(i,k,j)*0.5*(mu(i,j)*(1.+qtot)+qtot*muts(i,j))/walls(1)+a_qf1*qtot)/(1.+qtot)
+        a_moist(i,k,j,param_first_scalar:n_moist) = a_moist(i,k,j,param_first_scalar:n_moist)+a_qtot
       end do
+      a_al(its:itf,k,j) = 0.
+      a_p(its:itf,k,j) = 0.
     end do
   else
     do j = jts, jtf
-      a_qf1 = 0.
-      a_qf2 = 0.
-      a_qtot = 0.
-      a_qvf = 0.
       k = ktf
+      walls(1)=rdnw(k)
 ! recompute : k
       do i = its, itf
-        qtot = 0.
-        qf2 = 1./(1.+qtot)
-        qf1 = qtot*qf2
-        p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-        qvf = 1.
-        al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+        p(i,k,j) = -0.5*mu(i,j)/walls(1)
+!       al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
       end do
 ! recompute : p
       do k = ktf-1, kts, -1
+        walls(1)=rdn(k+1)
         do i = its, itf
-          qtot = 0.
-          qf2 = 1./(1.+qtot)
-          qf1 = qtot*qf2
-          p(i,k,j) = p(i,k+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k+1)
-          qvf = 1.
-          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+          p(i,k,j) = p(i,k+1,j)-mu(i,j)/walls(1)
+          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
       end do
 ! recompute : al
       do k = ktf+1, 2, -1
+        walls(1)=dnw(k-1)
         do i = its, itf
-          a_al(i,k-1,j) = a_al(i,k-1,j)-a_ph(i,k,j)*dnw(k-1)*muts(i,j)
-          a_mu(i,j) = a_mu(i,j)-a_ph(i,k,j)*dnw(k-1)*alb(i,k-1,j)
-          a_muts(i,j) = a_muts(i,j)-a_ph(i,k,j)*dnw(k-1)*al(i,k-1,j)
+          a_al(i,k-1,j) = a_al(i,k-1,j)-a_ph(i,k,j)*walls(1)*muts(i,j)
+          a_mu(i,j) = a_mu(i,j)-a_ph(i,k,j)*walls(1)*alb(i,k-1,j)
+          a_muts(i,j) = a_muts(i,j)-a_ph(i,k,j)*walls(1)*al(i,k-1,j)
           a_ph(i,k-1,j) = a_ph(i,k-1,j)+a_ph(i,k,j)
           a_ph(i,k,j) = 0.
         end do
@@ -1198,80 +1160,52 @@ else
 ! 0
 ! recompute pos : DOLOOP_STMT module_big_step_utilities_em.f90:1131
 ! recompute vars : p
+        walls(1)=rdnw(k)
+        walls(4)=rdn(k+1)
         do i = its, itf
-          qtot = 0.
-          qf2 = 1./(1.+qtot)
-          qf1 = qtot*qf2
-          p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-          qvf = 1.
-          al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
+          p(i,k,j) = -0.5*mu(i,j)/walls(1)
+!         al(i,k,j) = r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm-alb(i,k,j)
         end do
 ! recompute vars : p
         do k2 = ktf-1, k-(-1), -1
           do i = its, itf
-            qtot = 0.
-            qf2 = 1./(1.+qtot)
-            qf1 = qtot*qf2
-            p(i,k2,j) = p(i,k2+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k2+1)
+            p(i,k2,j) = p(i,k2+1,j)-mu(i,j)/rdn(k2+1)
           end do
         end do
         do i = its, itf
-          a_qf1 = 0.
-          a_qf2 = 0.
-          a_qtot = 0.
-          a_qvf = 0.
-          qtot = 0.
-! recompute : qtot
-          qf2 = 1./(1.+qtot)
-! recompute : qf2
-          qf1 = qtot*qf2
-! recompute : qf1
-          p(i,k,j) = p(i,k+1,j)-(mu(i,j)+qf1*muts(i,j))/qf2/rdn(k+1)
-! recompute : p
-          qvf = 1.
-! recompute : qvf
-          a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*qvf/p1000mb*cvpm*((p(i,k,j)+pb(i,k,j))/p1000mb)**(cvpm-1)
-          a_qvf = a_qvf+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-          a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-          a_al(i,k,j) = 0.
-          a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*(1/qf2/rdn(k+1))
-          a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*(qf1/qf2/rdn(k+1))
+          walls(2)=((p(i,k,j)+pb(i,k,j))/p1000mb)
+          walls(3)=walls(2)**(cvpm-1)
+          p(i,k,j) = p(i,k+1,j)-mu(i,j)/walls(4)
+          a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)/p1000mb*cvpm*walls(3)
+!         a_qvf = a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*walls(3)*walls(2)
+          a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*walls(3)*walls(2)
+          a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)/walls(4)
           a_p(i,k+1,j) = a_p(i,k+1,j)+a_p(i,k,j)
-          a_qf1 = a_qf1-a_p(i,k,j)*(muts(i,j)/qf2/rdn(k+1))
-          a_qf2 = a_qf2+a_p(i,k,j)*((mu(i,j)+qf1*muts(i,j))/(qf2*qf2)/rdn(k+1))
-          a_p(i,k,j) = 0.
+!         a_qf1 = -a_p(i,k,j)*muts(i,j)/walls(4)
+!         a_qf2 = a_p(i,k,j)*mu(i,j)/walls(4)
         end do
+        a_p(its:itf,k,j) = 0.
+        a_al(its:itf,k,j) = 0.
       end do
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:1130
 ! recompute vars : k
       k = ktf
 ! recompute vars : k
+      walls(1)=rdnw(k)
       do i = its, itf
-        a_qf1 = 0.
-        a_qf2 = 0.
-        a_qtot = 0.
-        a_qvf = 0.
-        qtot = 0.
-! recompute : qtot
-        qf2 = 1./(1.+qtot)
-! recompute : qf2
-        qf1 = qtot*qf2
-! recompute : qf1
-        p(i,k,j) = -(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/qf2)
-! recompute : p
-        qvf = 1.
-! recompute : qvf
-        a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*qvf/p1000mb*cvpm*((p(i,k,j)+pb(i,k,j))/p1000mb)**(cvpm-1)
-        a_qvf = a_qvf+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-        a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*qvf*((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm
-        a_al(i,k,j) = 0.
-        a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*(0.5/rdnw(k)/qf2)
-        a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*(0.5*qf1/rdnw(k)/qf2)
-        a_qf1 = a_qf1-a_p(i,k,j)*(0.5*muts(i,j)/rdnw(k)/qf2)
-        a_qf2 = a_qf2+a_p(i,k,j)*(0.5*(mu(i,j)+qf1*muts(i,j))/rdnw(k)/(qf2*qf2))
-        a_p(i,k,j) = 0.
+        walls(2)=((p(i,k,j)+pb(i,k,j))/p1000mb)
+        walls(3)=walls(2)**(cvpm-1)
+        p(i,k,j) = -0.5*mu(i,j)/walls(1)
+        a_p(i,k,j) = a_p(i,k,j)+a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)/p1000mb*cvpm*walls(3)
+!       a_qvf = a_al(i,k,j)*r_d/p1000mb*(t(i,k,j)+t0)*walls(3)*walls(2)
+        a_t(i,k,j) = a_t(i,k,j)+a_al(i,k,j)*r_d/p1000mb*walls(3)*walls(2)
+        a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*0.5/walls(1)
+!       a_qf1 = -a_p(i,k,j)*0.5*muts(i,j)/walls(1)
+!       a_qf2 = a_p(i,k,j)*0.5*mu(i,j)/walls(1)
       end do
+      a_p(its:itf,k,j) = 0.
+      a_al(its:itf,k,j) = 0.
     end do
   endif
 endif
@@ -1335,17 +1269,22 @@ jtf = min(jte,jde-1)
 ! recompute : jtf
 ktf = min(kte,kde-1)
 ! recompute : ktf
-do j = jts, jtf
-  do k = kts, ktf
-    do i = its, itf
-      a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_php(i,k,j)
-      a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_php(i,k,j)
-      a_php(i,k,j) = 0.
-    end do
-  end do
-end do
 
-   call trace_exit("a_calc_php")
+!do j = jts, jtf
+!  do k = kts, ktf
+!    do i = its, itf
+!      a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_php(i,k,j)
+!      a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_php(i,k,j)
+!      a_php(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+
+a_ph(its:itf,kts+1:ktf+1,jts:jtf) = a_ph(its:itf,kts+1:ktf+1,jts:jtf)+0.5*a_php(its:itf,kts:ktf,jts:jtf)
+a_ph(its:itf,kts:ktf,jts:jtf)     = a_ph(its:itf,kts:ktf,jts:jtf)+0.5*a_php(its:itf,kts:ktf,jts:jtf)
+a_php(its:itf,kts:ktf,jts:jtf)    = 0.
+
+call trace_exit("a_calc_php")
 
 end subroutine a_calc_php
 
@@ -1402,18 +1341,25 @@ real, intent(in) :: v(ims:ime,kms:kme,jms:jme)
 !==============================================
 ! declare local variables
 !==============================================
-real a_divv(its:ite,kts:kte)
-real a_dmdt(its:ite)
-real a_muu(its:ite+1,jts:jte+1)
-real a_muv(its:ite+1,jts:jte+1)
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+real a_divv(its-1:ite+1,kts-1:kte+1) !REVISED BY WALLS
+real a_dmdt(its-1:ite+1)  !REVISED BY WALLS
+real a_muu(its-1:ite+2,jts-1:jte+2)  !REVISED BY WALLS
+real a_muv(its-1:ite+2,jts-1:jte+2)  !REVISED BY WALLS
 integer i
 integer itl,itf
 integer j
 integer jtl,jtf
 integer k
 integer ktf
-real muu(its:ite+1,jts:jte+1)
-real muv(its:ite+1,jts:jte+1)
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+real muu(its-1:ite+2,jts-1:jte+2) !REVISED BY WALLS
+real muv(its-1:ite+2,jts-1:jte+2) !REVISED BY WALLS
+real gwalls(ims-1:ime+1),walls(2)  !REVISED BY WALLS
 #ifdef DM_PARALLEL
 integer ips, ipe, jps, jpe, kps, kpe
 #endif
@@ -1454,6 +1400,9 @@ jtl = jts
 #endif
 do j = jtl, jtf
   do i = itl, min(ite+1,ide)
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
+!print*,'XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS'
     muu(i,j) = 0.5*(mup(i,j)+mub(i,j)+mup(i-1,j)+mub(i-1,j))/msfu(i,j)
   end do
 end do
@@ -1470,27 +1419,35 @@ end do
 #endif
 do j = jtl, jtf
   do k = ktf, 2, -1
+    walls(1)=dnw(k-1)
     do i = itl, itf
       a_divv(i,k-1) = a_divv(i,k-1)-a_ww(i,k,j)
-      a_dmdt(i) = a_dmdt(i)-a_ww(i,k,j)*dnw(k-1)
+      a_dmdt(i) = a_dmdt(i)-a_ww(i,k,j)*walls(1)
       a_ww(i,k-1,j) = a_ww(i,k-1,j)+a_ww(i,k,j)
       a_ww(i,k,j) = 0.
     end do
   end do
+
   do k = ktf, kts, -1
+    walls(1)=dnw(k)*rdx
+    walls(2)=dnw(k)*rdy
+    a_divv(itl:itf,k) = a_divv(itl:itf,k)+a_dmdt(itl:itf)
     do i = itl, itf
-      a_divv(i,k) = a_divv(i,k)+a_dmdt(i)
-      a_muu(i+1,j) = a_muu(i+1,j)+a_divv(i,k)*msft(i,j)*dnw(k)*rdx*u(i+1,k,j)
-      a_muu(i,j) = a_muu(i,j)-a_divv(i,k)*msft(i,j)*dnw(k)*rdx*u(i,k,j)
-      a_muv(i,j+1) = a_muv(i,j+1)+a_divv(i,k)*msft(i,j)*dnw(k)*rdy*v(i,k,j+1)
-      a_muv(i,j) = a_muv(i,j)-a_divv(i,k)*msft(i,j)*dnw(k)*rdy*v(i,k,j)
-      a_u(i+1,k,j) = a_u(i+1,k,j)+a_divv(i,k)*msft(i,j)*dnw(k)*rdx*muu(i+1,j)
-      a_u(i,k,j) = a_u(i,k,j)-a_divv(i,k)*msft(i,j)*dnw(k)*rdx*muu(i,j)
-      a_v(i,k,j+1) = a_v(i,k,j+1)+a_divv(i,k)*msft(i,j)*dnw(k)*rdy*muv(i,j+1)
-      a_v(i,k,j) = a_v(i,k,j)-a_divv(i,k)*msft(i,j)*dnw(k)*rdy*muv(i,j)
-      a_divv(i,k) = 0.
+      gwalls(i)=a_divv(i,k)*msft(i,j)
+    end do
+    do i = itl, itf
+      a_muu(i+1,j) = a_muu(i+1,j)+gwalls(i)*walls(1)*u(i+1,k,j)
+      a_muu(i,j) = a_muu(i,j)-gwalls(i)*walls(1)*u(i,k,j)
+      a_muv(i,j+1) = a_muv(i,j+1)+gwalls(i)*walls(2)*v(i,k,j+1)
+      a_muv(i,j) = a_muv(i,j)-gwalls(i)*walls(2)*v(i,k,j)
+      a_u(i+1,k,j) = a_u(i+1,k,j)+gwalls(i)*walls(1)*muu(i+1,j)
+      a_u(i,k,j) = a_u(i,k,j)-gwalls(i)*walls(1)*muu(i,j)
+      a_v(i,k,j+1) = a_v(i,k,j+1)+gwalls(i)*walls(2)*muv(i,j+1)
+      a_v(i,k,j) = a_v(i,k,j)-gwalls(i)*walls(2)*muv(i,j)
     end do
   end do
+  a_divv(itl:itf,kts:ktf) = 0.
+
   do i = itl, ite
     a_ww(i,kte,j) = 0.
     a_ww(i,1,j) = 0.
@@ -1499,15 +1456,17 @@ do j = jtl, jtf
 end do
 do j = jts, min(jte+1,jde)
   do i = its, itf
-    a_mup(i,j-1) = a_mup(i,j-1)+a_muv(i,j)*(0.5/msfv(i,j))
-    a_mup(i,j) = a_mup(i,j)+a_muv(i,j)*(0.5/msfv(i,j))
+    walls(1)=a_muv(i,j)*(0.5/msfv(i,j))
+    a_mup(i,j-1) = a_mup(i,j-1)+walls(1)
+    a_mup(i,j) = a_mup(i,j)+walls(1)
     a_muv(i,j) = 0.
   end do
 end do
 do j = jts, jtf
   do i = its, min(ite+1,ide)
-    a_mup(i-1,j) = a_mup(i-1,j)+a_muu(i,j)*(0.5/msfu(i,j))
-    a_mup(i,j) = a_mup(i,j)+a_muu(i,j)*(0.5/msfu(i,j))
+    walls(1)=a_muu(i,j)*(0.5/msfu(i,j))
+    a_mup(i-1,j) = a_mup(i-1,j)+walls(1)
+    a_mup(i,j) = a_mup(i,j)+walls(1)
     a_muu(i,j) = 0.
   end do
 end do
@@ -1571,16 +1530,20 @@ jtf = min(jte,jde-1)
 ! recompute : jtf
 ktf = min(kte,kde-1)
 ! recompute : ktf
-do j = jts, jtf
-  do k = kts, ktf
-    do i = its, itf
-      a_rfieldp(i,k,j) = a_rfieldp(i,k,j)+a_rfield(i,k,j)
-      a_rfield(i,k,j) = 0.
-    end do
-  end do
-end do
 
-   call trace_exit("a_calculate_full")
+!do j = jts, jtf
+!  do k = kts, ktf
+!    do i = its, itf
+!      a_rfieldp(i,k,j) = a_rfieldp(i,k,j)+a_rfield(i,k,j)
+!      a_rfield(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+
+a_rfieldp(its:itf,kts:ktf,jts:jtf) = a_rfieldp(its:itf,kts:ktf,jts:jtf)+a_rfield(its:itf,kts:ktf,jts:jtf)
+a_rfield(its:itf,kts:ktf,jts:jtf)  = 0.
+
+call trace_exit("a_calculate_full")
 
 end subroutine a_calculate_full
 
@@ -1958,6 +1921,7 @@ integer k
 integer ktf
 logical specified
 real vxgm(its-1:ite,kts:kte,jts-1:jte)
+real walls(4)
 
    call trace_entry("a_curvature")
 
@@ -2063,73 +2027,72 @@ endif
 ! recompute : j_end
 do j = jts, min(jte,jde-1)
   do k = max(2,kts), ktf
+    walls(3)=fzp(k)
+    walls(4)=fzm(k)
     do i = its, min(ite,ide-1)
-      a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*fzp(k)*(fzm(k)*(u(i,k,j)+u(i+1,k,j))+fzp(k)*(u(i,k-1,j)+u(i+&
-&1,k-1,j)))
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*fzp(k)*(fzm(k)*(u(i,k,j)+u(i+1,k,j))+fzp(k)*(u(i,k-1,j)+u(i+1,k-&
-&1,j)))
-      a_ru(i+1,k,j) = a_ru(i+1,k,j)+0.25*a_rw_tend(i,k,j)*reradius*fzm(k)*(fzm(k)*(u(i,k,j)+u(i+1,k,j))+fzp(k)*(u(i,k-1,j)+u(i+1,k-&
-&1,j)))
-      a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_rw_tend(i,k,j)*reradius*fzm(k)*(fzm(k)*(u(i,k,j)+u(i+1,k,j))+fzp(k)*(u(i,k-1,j)+u(i+1,k-1,j)&
-&))
-      a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)+0.25*a_rw_tend(i,k,j)*reradius*fzp(k)*(fzm(k)*(v(i,k,j)+v(i,k,j+1))+fzp(k)*(v(i,k-1,j)+v(i,&
-&k-1,j+1)))
-      a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*fzp(k)*(fzm(k)*(v(i,k,j)+v(i,k,j+1))+fzp(k)*(v(i,k-1,j)+v(i,k-1,&
-&j+1)))
-      a_rv(i,k,j+1) = a_rv(i,k,j+1)+0.25*a_rw_tend(i,k,j)*reradius*fzm(k)*(fzm(k)*(v(i,k,j)+v(i,k,j+1))+fzp(k)*(v(i,k-1,j)+v(i,k-1,&
-&j+1)))
-      a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_rw_tend(i,k,j)*reradius*fzm(k)*(fzm(k)*(v(i,k,j)+v(i,k,j+1))+fzp(k)*(v(i,k-1,j)+v(i,k-1,j+1)&
-&))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(ru(i,k,j)+ru(i+1,k,j))+fzp(k)*(ru(i,k-1,j)+ru(i+1,k-&
-&1,j)))*fzp(k)
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(ru(i,k,j)+ru(i+1,k,j))+fzp(k)*(ru(i,k-1,j)+ru(i+1,k-1,j))&
-&)*fzp(k)
-      a_u(i+1,k,j) = a_u(i+1,k,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(ru(i,k,j)+ru(i+1,k,j))+fzp(k)*(ru(i,k-1,j)+ru(i+1,k-1,j))&
-&)*fzm(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(ru(i,k,j)+ru(i+1,k,j))+fzp(k)*(ru(i,k-1,j)+ru(i+1,k-1,j)))*&
-&fzm(k)
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(rv(i,k,j)+rv(i,k,j+1))+fzp(k)*(rv(i,k-1,j)+rv(i,k-1,&
-&j+1)))*fzp(k)
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(rv(i,k,j)+rv(i,k,j+1))+fzp(k)*(rv(i,k-1,j)+rv(i,k-1,j+1))&
-&)*fzp(k)
-      a_v(i,k,j+1) = a_v(i,k,j+1)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(rv(i,k,j)+rv(i,k,j+1))+fzp(k)*(rv(i,k-1,j)+rv(i,k-1,j+1))&
-&)*fzm(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.25*a_rw_tend(i,k,j)*reradius*(fzm(k)*(rv(i,k,j)+rv(i,k,j+1))+fzp(k)*(rv(i,k-1,j)+rv(i,k-1,j+1)))*&
-&fzm(k)
+      walls(1)=0.25*a_rw_tend(i,k,j)*reradius
+      walls(2)=walls(1)*(walls(4)*(u(i,k,j)+u(i+1,k,j))+walls(3)*(u(i,k-1,j)+u(i+1,k-1,j)))
+      a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)+walls(3)*walls(2)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(3)*walls(2)
+      a_ru(i+1,k,j) = a_ru(i+1,k,j)+walls(4)*walls(2)
+      a_ru(i,k,j) = a_ru(i,k,j)+walls(4)*walls(2)
+      walls(2)=walls(1)*(walls(4)*(v(i,k,j)+v(i,k,j+1))+walls(3)*(v(i,k-1,j)+v(i,k-1,j+1)))
+      a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)+walls(3)*walls(2)
+      a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(3)*walls(2)
+      a_rv(i,k,j+1) = a_rv(i,k,j+1)+walls(4)*walls(2)
+      a_rv(i,k,j) = a_rv(i,k,j)+walls(4)*walls(2)
+      walls(2)=walls(1)*(walls(4)*(ru(i,k,j)+ru(i+1,k,j))+walls(3)*(ru(i,k-1,j)+ru(i+1,k-1,j)))
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)+walls(2)*walls(3)
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(2)*walls(3)
+      a_u(i+1,k,j) = a_u(i+1,k,j)+walls(2)*walls(4)
+      a_u(i,k,j) = a_u(i,k,j)+walls(2)*walls(4)
+      walls(2)=walls(1)*(walls(4)*(rv(i,k,j)+rv(i,k,j+1))+walls(3)*(rv(i,k-1,j)+rv(i,k-1,j+1)))
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)+walls(2)*walls(3)
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(2)*walls(3)
+      a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)*walls(4)
+      a_v(i,k,j) = a_v(i,k,j)+walls(2)*walls(4)
     end do
   end do
 end do
 do j = j_start, j_end
   do k = kts, ktf
     do i = its, min(ite,ide-1)
-      a_ru(i+1,k,j-1) = a_ru(i+1,k,j-1)-0.125*a_rv_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i,k,j-1))
-      a_ru(i,k,j-1) = a_ru(i,k,j-1)-0.125*a_rv_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i,k,j-1))
-      a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.125*a_rv_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i,k,j-1))
-      a_ru(i,k,j) = a_ru(i,k,j)-0.125*a_rv_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i,k,j-1))
-      a_rw(i,k+1,j-1) = a_rw(i,k+1,j-1)+0.25*a_rv_tend(i,k,j)*v(i,k,j)*reradius
-      a_rw(i,k+1,j) = a_rw(i,k+1,j)+0.25*a_rv_tend(i,k,j)*v(i,k,j)*reradius
-      a_rw(i,k,j-1) = a_rw(i,k,j-1)+0.25*a_rv_tend(i,k,j)*v(i,k,j)*reradius
-      a_rw(i,k,j) = a_rw(i,k,j)+0.25*a_rv_tend(i,k,j)*v(i,k,j)*reradius
-      a_v(i,k,j) = a_v(i,k,j)+0.25*a_rv_tend(i,k,j)*reradius*(rw(i,k+1,j-1)+rw(i,k,j-1)+rw(i,k+1,j)+rw(i,k,j))
-      a_vxgm(i,k,j-1) = a_vxgm(i,k,j-1)-0.125*a_rv_tend(i,k,j)*(ru(i,k,j)+ru(i+1,k,j)+ru(i,k,j-1)+ru(i+1,k,j-1))
-      a_vxgm(i,k,j) = a_vxgm(i,k,j)-0.125*a_rv_tend(i,k,j)*(ru(i,k,j)+ru(i+1,k,j)+ru(i,k,j-1)+ru(i+1,k,j-1))
+      walls(2)=a_rv_tend(i,k,j)
+      walls(1)=0.125*a_rv_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i,k,j-1))
+      a_ru(i+1,k,j-1) = a_ru(i+1,k,j-1)-walls(1)
+      a_ru(i,k,j-1) = a_ru(i,k,j-1)-walls(1)
+      a_ru(i+1,k,j) = a_ru(i+1,k,j)-walls(1)
+      a_ru(i,k,j) = a_ru(i,k,j)-walls(1)
+      walls(1)=0.25*walls(2)*v(i,k,j)*reradius
+      a_rw(i,k+1,j-1) = a_rw(i,k+1,j-1)+walls(1)
+      a_rw(i,k+1,j) = a_rw(i,k+1,j)+walls(1)
+      a_rw(i,k,j-1) = a_rw(i,k,j-1)+walls(1)
+      a_rw(i,k,j) = a_rw(i,k,j)+walls(1)
+      a_v(i,k,j) = a_v(i,k,j)+0.25*walls(2)*reradius*(rw(i,k+1,j-1)+rw(i,k,j-1)+rw(i,k+1,j)+rw(i,k,j))
+      walls(1)=0.125*walls(2)*(ru(i,k,j)+ru(i+1,k,j)+ru(i,k,j-1)+ru(i+1,k,j-1))
+      a_vxgm(i,k,j-1) = a_vxgm(i,k,j-1)-walls(1)
+      a_vxgm(i,k,j) = a_vxgm(i,k,j)-walls(1)
     end do
   end do
 end do
 do j = jts, min(jde-1,jte)
   do k = kts, ktf
     do i = i_start, i_end
-      a_rv(i-1,k,j+1) = a_rv(i-1,k,j+1)+0.125*a_ru_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i-1,k,j))
-      a_rv(i,k,j+1) = a_rv(i,k,j+1)+0.125*a_ru_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i-1,k,j))
-      a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.125*a_ru_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i-1,k,j))
-      a_rv(i,k,j) = a_rv(i,k,j)+0.125*a_ru_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i-1,k,j))
-      a_rw(i-1,k+1,j) = a_rw(i-1,k+1,j)-0.25*a_ru_tend(i,k,j)*u(i,k,j)*reradius
-      a_rw(i,k+1,j) = a_rw(i,k+1,j)-0.25*a_ru_tend(i,k,j)*u(i,k,j)*reradius
-      a_rw(i-1,k,j) = a_rw(i-1,k,j)-0.25*a_ru_tend(i,k,j)*u(i,k,j)*reradius
-      a_rw(i,k,j) = a_rw(i,k,j)-0.25*a_ru_tend(i,k,j)*u(i,k,j)*reradius
-      a_u(i,k,j) = a_u(i,k,j)-0.25*a_ru_tend(i,k,j)*reradius*(rw(i-1,k+1,j)+rw(i-1,k,j)+rw(i,k+1,j)+rw(i,k,j))
-      a_vxgm(i-1,k,j) = a_vxgm(i-1,k,j)+0.125*a_ru_tend(i,k,j)*(rv(i-1,k,j+1)+rv(i,k,j+1)+rv(i-1,k,j)+rv(i,k,j))
-      a_vxgm(i,k,j) = a_vxgm(i,k,j)+0.125*a_ru_tend(i,k,j)*(rv(i-1,k,j+1)+rv(i,k,j+1)+rv(i-1,k,j)+rv(i,k,j))
+      walls(2)=a_ru_tend(i,k,j)
+      walls(1)=0.125*a_ru_tend(i,k,j)*(vxgm(i,k,j)+vxgm(i-1,k,j))
+      a_rv(i-1,k,j+1) = a_rv(i-1,k,j+1)+walls(1)
+      a_rv(i,k,j+1) = a_rv(i,k,j+1)+walls(1)
+      a_rv(i-1,k,j) = a_rv(i-1,k,j)+walls(1)
+      a_rv(i,k,j) = a_rv(i,k,j)+walls(1)
+      walls(1)=0.25*walls(2)*u(i,k,j)*reradius
+      a_rw(i-1,k+1,j) = a_rw(i-1,k+1,j)-walls(1)
+      a_rw(i,k+1,j) = a_rw(i,k+1,j)-walls(1)
+      a_rw(i-1,k,j) = a_rw(i-1,k,j)-walls(1)
+      a_rw(i,k,j) = a_rw(i,k,j)-walls(1)
+      a_u(i,k,j) = a_u(i,k,j)-0.25*walls(2)*reradius*(rw(i-1,k+1,j)+rw(i-1,k,j)+rw(i,k+1,j)+rw(i,k,j))
+      walls(1)=0.125*walls(2)*(rv(i-1,k,j+1)+rv(i,k,j+1)+rv(i-1,k,j)+rv(i,k,j))
+      a_vxgm(i-1,k,j) = a_vxgm(i-1,k,j)+walls(1)
+      a_vxgm(i,k,j) = a_vxgm(i,k,j)+walls(1)
     end do
   end do
 end do
@@ -2220,14 +2183,16 @@ endif
 do j = j_start, j_end
   do k = kts, ktf
     do i = i_start, i_end
-      a_u(i+1,k,j) = a_u(i+1,k,j)+0.5*a_vxgm(i,k,j)*(msfv(i,j+1)-msfv(i,j))*rdy
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vxgm(i,k,j)*(msfv(i,j+1)-msfv(i,j))*rdy
-      a_v(i,k,j+1) = a_v(i,k,j+1)-0.5*a_vxgm(i,k,j)*(msfu(i+1,j)-msfu(i,j))*rdx
-      a_v(i,k,j) = a_v(i,k,j)-0.5*a_vxgm(i,k,j)*(msfu(i+1,j)-msfu(i,j))*rdx
-      a_vxgm(i,k,j) = 0.
+      walls(1)=0.5*a_vxgm(i,k,j)*(msfv(i,j+1)-msfv(i,j))*rdy
+      a_u(i+1,k,j) = a_u(i+1,k,j)+walls(1)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)
+      walls(1)=0.5*a_vxgm(i,k,j)*(msfu(i+1,j)-msfu(i,j))*rdx
+      a_v(i,k,j+1) = a_v(i,k,j+1)-walls(1)
+      a_v(i,k,j) = a_v(i,k,j)-walls(1)
     end do
   end do
 end do
+a_vxgm(i_start:i_end,kts:ktf,j_start:j_end) = 0.
 
    call trace_exit("a_curvature")
 
@@ -2403,6 +2368,7 @@ real mrdx
 real mrdy
 real :: pr = 3.
 real rcoup
+real walls(7)
 logical specified
 
    call trace_entry("a_horizontal_diffusion")
@@ -2410,11 +2376,6 @@ logical specified
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_mkrdxm = 0.
-a_mkrdxp = 0.
-a_mkrdym = 0.
-a_mkrdyp = 0.
-a_rcoup = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2453,65 +2414,51 @@ if (name .eq. 'u') then
   endif
 ! recompute : j_end
   do j = j_start, j_end
-    a_mkrdxm = 0.
-    a_mkrdxp = 0.
-    a_mkrdym = 0.
-    a_mkrdyp = 0.
-    a_rcoup = 0.
     do k = kts, ktf
-      a_mkrdxm = 0.
-      a_mkrdxp = 0.
-      a_mkrdym = 0.
-      a_mkrdyp = 0.
-      a_rcoup = 0.
       do i = i_start, i_end
-        a_mkrdxm = 0.
-        a_mkrdxp = 0.
-        a_mkrdym = 0.
-        a_mkrdyp = 0.
-        a_rcoup = 0.
+        walls(5)=0.125*(msfu(i,j)+msfu(i,j+1))*rdy
+        walls(6)=0.125*(msfu(i,j)+msfu(i,j-1))*rdy
         mkrdxm = msft(i-1,j)*xkmhd(i-1,k,j)*rdx
 ! recompute : mkrdxm
         mkrdxp = msft(i,j)*xkmhd(i,k,j)*rdx
 ! recompute : mkrdxp
         mrdx = msfu(i,j)*rdx
 ! recompute : mrdx
-        mkrdym = 0.5*(msfu(i,j)+msfu(i,j-1))*0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))*rdy
+        mkrdym = walls(6)*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))
 ! recompute : mkrdym
-        mkrdyp = 0.5*(msfu(i,j)+msfu(i,j+1))*0.25*(xkmhd(i,k,j)+xkmhd(i,k,j+1)+xkmhd(i-1,k,j+1)+xkmhd(i-1,k,j))*rdy
+        mkrdyp = walls(5)*(xkmhd(i,k,j)+xkmhd(i,k,j+1)+xkmhd(i-1,k,j+1)+xkmhd(i-1,k,j))
 ! recompute : mkrdyp
         mrdy = msfu(i,j)*rdy
 ! recompute : mrdy
         rcoup = 0.5*(mu(i,j)+mu(i-1,j))
 ! recompute : rcoup
-        a_field(i,k,j-1) = a_field(i,k,j-1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdym
-        a_field(i,k,j+1) = a_field(i,k,j+1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdyp
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxm
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxp
-        a_field(i,k,j) = a_field(i,k,j)+a_tendency(i,k,j)*rcoup*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
-        a_mkrdxm = a_mkrdxm-a_tendency(i,k,j)*rcoup*mrdx*(field(i,k,j)-field(i-1,k,j))
-        a_mkrdxp = a_mkrdxp+a_tendency(i,k,j)*rcoup*mrdx*(field(i+1,k,j)-field(i,k,j))
-        a_mkrdym = a_mkrdym-a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j)-field(i,k,j-1))
-        a_mkrdyp = a_mkrdyp+a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j+1)-field(i,k,j))
-        a_rcoup = a_rcoup+a_tendency(i,k,j)*(mrdx*(mkrdxp*(field(i+1,k,j)-field(i,k,j))-mkrdxm*(field(i,k,j)-field(i-1,k,j)))+mrdy*&
-&(mkrdyp*(field(i,k,j+1)-field(i,k,j))-mkrdym*(field(i,k,j)-field(i,k,j-1))))
+        walls(1)=field(i+1,k,j)-field(i,k,j)
+        walls(2)=field(i,k,j)-field(i-1,k,j)
+        walls(3)=field(i,k,j)-field(i,k,j-1)
+        walls(4)=field(i,k,j+1)-field(i,k,j)
+        walls(7)=a_tendency(i,k,j)*rcoup
+        a_field(i,k,j-1) = a_field(i,k,j-1)+walls(7)*mrdy*mkrdym
+        a_field(i,k,j+1) = a_field(i,k,j+1)+walls(7)*mrdy*mkrdyp
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(7)*mrdx*mkrdxm
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(7)*mrdx*mkrdxp
+        a_field(i,k,j) = a_field(i,k,j)+walls(7)*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
+        a_mkrdxm = -walls(7)*mrdx*walls(2)
+        a_mkrdxp = walls(7)*mrdx*walls(1)
+        a_mkrdym = -walls(7)*mrdy*walls(3)
+        a_mkrdyp = walls(7)*mrdy*walls(4)
+        a_rcoup = a_tendency(i,k,j)*(mrdx*(mkrdxp*walls(1)-mkrdxm*walls(2))+mrdy*(mkrdyp*walls(4)-mkrdym*walls(3)))
         a_mu(i-1,j) = a_mu(i-1,j)+0.5*a_rcoup
         a_mu(i,j) = a_mu(i,j)+0.5*a_rcoup
-        a_rcoup = 0.
-        a_xkmhd(i-1,k,j+1) = a_xkmhd(i-1,k,j+1)+0.125*a_mkrdyp*(msfu(i,j)+msfu(i,j+1))*rdy
-        a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+0.125*a_mkrdyp*(msfu(i,j)+msfu(i,j+1))*rdy
-        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.125*a_mkrdyp*(msfu(i,j)+msfu(i,j+1))*rdy
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.125*a_mkrdyp*(msfu(i,j)+msfu(i,j+1))*rdy
-        a_mkrdyp = 0.
-        a_xkmhd(i-1,k,j-1) = a_xkmhd(i-1,k,j-1)+0.125*a_mkrdym*(msfu(i,j)+msfu(i,j-1))*rdy
-        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.125*a_mkrdym*(msfu(i,j)+msfu(i,j-1))*rdy
-        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.125*a_mkrdym*(msfu(i,j)+msfu(i,j-1))*rdy
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.125*a_mkrdym*(msfu(i,j)+msfu(i,j-1))*rdy
-        a_mkrdym = 0.
+        a_xkmhd(i-1,k,j+1) = a_xkmhd(i-1,k,j+1)+a_mkrdyp*walls(5)
+        a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+a_mkrdyp*walls(5)
+        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+a_mkrdyp*walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdyp*walls(5)
+        a_xkmhd(i-1,k,j-1) = a_xkmhd(i-1,k,j-1)+a_mkrdym*walls(6)
+        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+a_mkrdym*walls(6)
+        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+a_mkrdym*walls(6)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdym*walls(6)
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdxp*msft(i,j)*rdx
-        a_mkrdxp = 0.
         a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+a_mkrdxm*msft(i-1,j)*rdx
-        a_mkrdxm = 0.
       end do
     end do
   end do
@@ -2541,26 +2488,13 @@ else if (name .eq. 'v') then
   endif
 ! recompute : j_end
   do j = j_start, j_end
-    a_mkrdxm = 0.
-    a_mkrdxp = 0.
-    a_mkrdym = 0.
-    a_mkrdyp = 0.
-    a_rcoup = 0.
     do k = kts, ktf
-      a_mkrdxm = 0.
-      a_mkrdxp = 0.
-      a_mkrdym = 0.
-      a_mkrdyp = 0.
-      a_rcoup = 0.
       do i = i_start, i_end
-        a_mkrdxm = 0.
-        a_mkrdxp = 0.
-        a_mkrdym = 0.
-        a_mkrdyp = 0.
-        a_rcoup = 0.
-        mkrdxm = 0.5*(msfv(i,j)+msfv(i-1,j))*0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))*rdx
+        walls(5)=0.125*(msfv(i,j)+msfv(i+1,j))*rdx
+        walls(6)=0.125*(msfv(i,j)+msfv(i-1,j))*rdx
+        mkrdxm = walls(6)*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i-1,k,j-1)+xkmhd(i-1,k,j))
 ! recompute : mkrdxm
-        mkrdxp = 0.5*(msfv(i,j)+msfv(i+1,j))*0.25*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i+1,k,j-1)+xkmhd(i+1,k,j))*rdx
+        mkrdxp = walls(5)*(xkmhd(i,k,j)+xkmhd(i,k,j-1)+xkmhd(i+1,k,j-1)+xkmhd(i+1,k,j))
 ! recompute : mkrdxp
         mrdx = msfv(i,j)*rdx
 ! recompute : mrdx
@@ -2572,34 +2506,33 @@ else if (name .eq. 'v') then
 ! recompute : mrdy
         rcoup = 0.5*(mu(i,j)+mu(i,j-1))
 ! recompute : rcoup
-        a_field(i,k,j-1) = a_field(i,k,j-1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdym
-        a_field(i,k,j+1) = a_field(i,k,j+1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdyp
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxm
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxp
-        a_field(i,k,j) = a_field(i,k,j)+a_tendency(i,k,j)*rcoup*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
-        a_mkrdxm = a_mkrdxm-a_tendency(i,k,j)*rcoup*mrdx*(field(i,k,j)-field(i-1,k,j))
-        a_mkrdxp = a_mkrdxp+a_tendency(i,k,j)*rcoup*mrdx*(field(i+1,k,j)-field(i,k,j))
-        a_mkrdym = a_mkrdym-a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j)-field(i,k,j-1))
-        a_mkrdyp = a_mkrdyp+a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j+1)-field(i,k,j))
-        a_rcoup = a_rcoup+a_tendency(i,k,j)*(mrdx*(mkrdxp*(field(i+1,k,j)-field(i,k,j))-mkrdxm*(field(i,k,j)-field(i-1,k,j)))+mrdy*&
-&(mkrdyp*(field(i,k,j+1)-field(i,k,j))-mkrdym*(field(i,k,j)-field(i,k,j-1))))
+        walls(1)=field(i+1,k,j)-field(i,k,j)
+        walls(2)=field(i,k,j)-field(i-1,k,j)
+        walls(3)=field(i,k,j)-field(i,k,j-1)
+        walls(4)=field(i,k,j+1)-field(i,k,j)
+        walls(7)=a_tendency(i,k,j)*rcoup
+        a_field(i,k,j-1) = a_field(i,k,j-1)+walls(7)*mrdy*mkrdym
+        a_field(i,k,j+1) = a_field(i,k,j+1)+walls(7)*mrdy*mkrdyp
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(7)*mrdx*mkrdxm
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(7)*mrdx*mkrdxp
+        a_field(i,k,j) = a_field(i,k,j)+walls(7)*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
+        a_mkrdxm = -walls(7)*mrdx*walls(2)
+        a_mkrdxp = walls(7)*mrdx*walls(1)
+        a_mkrdym = -walls(7)*mrdy*walls(3)
+        a_mkrdyp = walls(7)*mrdy*walls(4)
+        a_rcoup = a_tendency(i,k,j)*(mrdx*(mkrdxp*walls(1)-mkrdxm*walls(2))+mrdy*(mkrdyp*walls(4)-mkrdym*walls(3)))
         a_mu(i,j-1) = a_mu(i,j-1)+0.5*a_rcoup
         a_mu(i,j) = a_mu(i,j)+0.5*a_rcoup
-        a_rcoup = 0.
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdyp*msft(i,j)*rdy
-        a_mkrdyp = 0.
         a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+a_mkrdym*msft(i,j-1)*rdy
-        a_mkrdym = 0.
-        a_xkmhd(i+1,k,j-1) = a_xkmhd(i+1,k,j-1)+0.125*a_mkrdxp*(msfv(i,j)+msfv(i+1,j))*rdx
-        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.125*a_mkrdxp*(msfv(i,j)+msfv(i+1,j))*rdx
-        a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+0.125*a_mkrdxp*(msfv(i,j)+msfv(i+1,j))*rdx
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.125*a_mkrdxp*(msfv(i,j)+msfv(i+1,j))*rdx
-        a_mkrdxp = 0.
-        a_xkmhd(i-1,k,j-1) = a_xkmhd(i-1,k,j-1)+0.125*a_mkrdxm*(msfv(i,j)+msfv(i-1,j))*rdx
-        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.125*a_mkrdxm*(msfv(i,j)+msfv(i-1,j))*rdx
-        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.125*a_mkrdxm*(msfv(i,j)+msfv(i-1,j))*rdx
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.125*a_mkrdxm*(msfv(i,j)+msfv(i-1,j))*rdx
-        a_mkrdxm = 0.
+        a_xkmhd(i+1,k,j-1) = a_xkmhd(i+1,k,j-1)+a_mkrdxp*walls(5)
+        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+a_mkrdxp*walls(5)
+        a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+a_mkrdxp*walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdxp*walls(5)
+        a_xkmhd(i-1,k,j-1) = a_xkmhd(i-1,k,j-1)+a_mkrdxm*walls(6)
+        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+a_mkrdxm*walls(6)
+        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+a_mkrdxm*walls(6)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+a_mkrdxm*walls(6)
       end do
     end do
   end do
@@ -2629,23 +2562,8 @@ else if (name .eq. 'w') then
   endif
 ! recompute : j_end
   do j = j_start, j_end
-    a_mkrdxm = 0.
-    a_mkrdxp = 0.
-    a_mkrdym = 0.
-    a_mkrdyp = 0.
-    a_rcoup = 0.
     do k = kts+1, ktf
-      a_mkrdxm = 0.
-      a_mkrdxp = 0.
-      a_mkrdym = 0.
-      a_mkrdyp = 0.
-      a_rcoup = 0.
       do i = i_start, i_end
-        a_mkrdxm = 0.
-        a_mkrdxp = 0.
-        a_mkrdym = 0.
-        a_mkrdyp = 0.
-        a_rcoup = 0.
         mkrdxm = msfu(i,j)*0.25*(xkmhd(i,k,j)+xkmhd(i-1,k,j)+xkmhd(i,k-1,j)+xkmhd(i-1,k-1,j))*rdx
 ! recompute : mkrdxm
         mkrdxp = msfu(i+1,j)*0.25*(xkmhd(i+1,k,j)+xkmhd(i,k,j)+xkmhd(i+1,k-1,j)+xkmhd(i,k-1,j))*rdx
@@ -2660,39 +2578,42 @@ else if (name .eq. 'w') then
 ! recompute : mrdy
         rcoup = 0.5*(mu(i,j)+mu(i,j))
 ! recompute : rcoup
-        a_field(i,k,j-1) = a_field(i,k,j-1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdym
-        a_field(i,k,j+1) = a_field(i,k,j+1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdyp
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxm
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxp
-        a_field(i,k,j) = a_field(i,k,j)+a_tendency(i,k,j)*rcoup*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
-        a_mkrdxm = a_mkrdxm-a_tendency(i,k,j)*rcoup*mrdx*(field(i,k,j)-field(i-1,k,j))
-        a_mkrdxp = a_mkrdxp+a_tendency(i,k,j)*rcoup*mrdx*(field(i+1,k,j)-field(i,k,j))
-        a_mkrdym = a_mkrdym-a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j)-field(i,k,j-1))
-        a_mkrdyp = a_mkrdyp+a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j+1)-field(i,k,j))
-        a_rcoup = a_rcoup+a_tendency(i,k,j)*(mrdx*(mkrdxp*(field(i+1,k,j)-field(i,k,j))-mkrdxm*(field(i,k,j)-field(i-1,k,j)))+mrdy*&
-&(mkrdyp*(field(i,k,j+1)-field(i,k,j))-mkrdym*(field(i,k,j)-field(i,k,j-1))))
+        walls(1)=field(i+1,k,j)-field(i,k,j)
+        walls(2)=field(i,k,j)-field(i-1,k,j)
+        walls(3)=field(i,k,j)-field(i,k,j-1)
+        walls(4)=field(i,k,j+1)-field(i,k,j)
+        walls(6)=a_tendency(i,k,j)*rcoup
+        a_field(i,k,j-1) = a_field(i,k,j-1)+walls(6)*mrdy*mkrdym
+        a_field(i,k,j+1) = a_field(i,k,j+1)+walls(6)*mrdy*mkrdyp
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(6)*mrdx*mkrdxm
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(6)*mrdx*mkrdxp
+        a_field(i,k,j) = a_field(i,k,j)+walls(6)*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
+        a_mkrdxm = -walls(6)*mrdx*walls(2)
+        a_mkrdxp = walls(6)*mrdx*walls(1)
+        a_mkrdym = -walls(6)*mrdy*walls(3)
+        a_mkrdyp = walls(6)*mrdy*walls(4)
+        a_rcoup = a_tendency(i,k,j)*(mrdx*(mkrdxp*walls(1)-mkrdxm*walls(2))+mrdy*(mkrdyp*walls(4)-mkrdym*walls(3)))
         a_mu(i,j) = a_mu(i,j)+a_rcoup
-        a_rcoup = 0.
-        a_xkmhd(i,k-1,j+1) = a_xkmhd(i,k-1,j+1)+0.25*a_mkrdyp*msfv(i,j+1)*rdy
-        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+0.25*a_mkrdyp*msfv(i,j+1)*rdy
-        a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+0.25*a_mkrdyp*msfv(i,j+1)*rdy
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.25*a_mkrdyp*msfv(i,j+1)*rdy
-        a_mkrdyp = 0.
-        a_xkmhd(i,k-1,j-1) = a_xkmhd(i,k-1,j-1)+0.25*a_mkrdym*msfv(i,j)*rdy
-        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+0.25*a_mkrdym*msfv(i,j)*rdy
-        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.25*a_mkrdym*msfv(i,j)*rdy
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.25*a_mkrdym*msfv(i,j)*rdy
-        a_mkrdym = 0.
-        a_xkmhd(i+1,k-1,j) = a_xkmhd(i+1,k-1,j)+0.25*a_mkrdxp*msfu(i+1,j)*rdx
-        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+0.25*a_mkrdxp*msfu(i+1,j)*rdx
-        a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+0.25*a_mkrdxp*msfu(i+1,j)*rdx
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.25*a_mkrdxp*msfu(i+1,j)*rdx
-        a_mkrdxp = 0.
-        a_xkmhd(i-1,k-1,j) = a_xkmhd(i-1,k-1,j)+0.25*a_mkrdxm*msfu(i,j)*rdx
-        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+0.25*a_mkrdxm*msfu(i,j)*rdx
-        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.25*a_mkrdxm*msfu(i,j)*rdx
-        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.25*a_mkrdxm*msfu(i,j)*rdx
-        a_mkrdxm = 0.
+        walls(5)=0.25*a_mkrdyp*msfv(i,j+1)*rdy
+        a_xkmhd(i,k-1,j+1) = a_xkmhd(i,k-1,j+1)+walls(5)
+        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+walls(5)
+        a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+walls(5)
+        walls(5)=0.25*a_mkrdym*msfv(i,j)*rdy
+        a_xkmhd(i,k-1,j-1) = a_xkmhd(i,k-1,j-1)+walls(5)
+        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+walls(5)
+        a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+walls(5)
+        walls(5)=0.25*a_mkrdxp*msfu(i+1,j)*rdx
+        a_xkmhd(i+1,k-1,j) = a_xkmhd(i+1,k-1,j)+walls(5)
+        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+walls(5)
+        a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+walls(5)
+        walls(5)=0.25*a_mkrdxm*msfu(i,j)*rdx
+        a_xkmhd(i-1,k-1,j) = a_xkmhd(i-1,k-1,j)+walls(5)
+        a_xkmhd(i,k-1,j) = a_xkmhd(i,k-1,j)+walls(5)
+        a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+walls(5)
+        a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+walls(5)
       end do
     end do
   end do
@@ -2722,23 +2643,8 @@ else
   endif
 ! recompute : j_end
   do j = j_start, j_end
-    a_mkrdxm = 0.
-    a_mkrdxp = 0.
-    a_mkrdym = 0.
-    a_mkrdyp = 0.
-    a_rcoup = 0.
     do k = kts, ktf
-      a_mkrdxm = 0.
-      a_mkrdxp = 0.
-      a_mkrdym = 0.
-      a_mkrdyp = 0.
-      a_rcoup = 0.
       do i = i_start, i_end
-        a_mkrdxm = 0.
-        a_mkrdxp = 0.
-        a_mkrdym = 0.
-        a_mkrdyp = 0.
-        a_rcoup = 0.
         mkrdxm = msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*rdx*pr
 ! recompute : mkrdxm
         mkrdxp = msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*rdx*pr
@@ -2753,31 +2659,30 @@ else
 ! recompute : mrdy
         rcoup = mu(i,j)
 ! recompute : rcoup
-        a_field(i,k,j-1) = a_field(i,k,j-1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdym
-        a_field(i,k,j+1) = a_field(i,k,j+1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdyp
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxm
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxp
-        a_field(i,k,j) = a_field(i,k,j)+a_tendency(i,k,j)*rcoup*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
-        a_mkrdxm = a_mkrdxm-a_tendency(i,k,j)*rcoup*mrdx*(field(i,k,j)-field(i-1,k,j))
-        a_mkrdxp = a_mkrdxp+a_tendency(i,k,j)*rcoup*mrdx*(field(i+1,k,j)-field(i,k,j))
-        a_mkrdym = a_mkrdym-a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j)-field(i,k,j-1))
-        a_mkrdyp = a_mkrdyp+a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j+1)-field(i,k,j))
-        a_rcoup = a_rcoup+a_tendency(i,k,j)*(mrdx*(mkrdxp*(field(i+1,k,j)-field(i,k,j))-mkrdxm*(field(i,k,j)-field(i-1,k,j)))+mrdy*&
-&(mkrdyp*(field(i,k,j+1)-field(i,k,j))-mkrdym*(field(i,k,j)-field(i,k,j-1))))
+        walls(1)=field(i+1,k,j)-field(i,k,j)
+        walls(2)=field(i,k,j)-field(i-1,k,j)
+        walls(3)=field(i,k,j)-field(i,k,j-1)
+        walls(4)=field(i,k,j+1)-field(i,k,j)
+        walls(5)=a_tendency(i,k,j)*rcoup
+        a_field(i,k,j-1) = a_field(i,k,j-1)+walls(5)*mrdy*mkrdym
+        a_field(i,k,j+1) = a_field(i,k,j+1)+walls(5)*mrdy*mkrdyp
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(5)*mrdx*mkrdxm
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(5)*mrdx*mkrdxp
+        a_field(i,k,j) = a_field(i,k,j)+walls(5)*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
+        a_mkrdxm = -walls(5)*mrdx*walls(2)
+        a_mkrdxp = walls(5)*mrdx*walls(1)
+        a_mkrdym = -walls(5)*mrdy*walls(3)
+        a_mkrdyp = walls(5)*mrdy*walls(4)
+        a_rcoup = a_tendency(i,k,j)*(mrdx*(mkrdxp*walls(1)-mkrdxm*walls(2))+mrdy*(mkrdyp*walls(4)-mkrdym*walls(3)))
         a_mu(i,j) = a_mu(i,j)+a_rcoup
-        a_rcoup = 0.
         a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+0.5*a_mkrdyp*msfv(i,j+1)*rdy*pr
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdyp*msfv(i,j+1)*rdy*pr
-        a_mkrdyp = 0.
         a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.5*a_mkrdym*msfv(i,j)*rdy*pr
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdym*msfv(i,j)*rdy*pr
-        a_mkrdym = 0.
         a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+0.5*a_mkrdxp*msfu(i+1,j)*rdx*pr
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdxp*msfu(i+1,j)*rdx*pr
-        a_mkrdxp = 0.
         a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.5*a_mkrdxm*msfu(i,j)*rdx*pr
         a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdxm*msfu(i,j)*rdx*pr
-        a_mkrdxm = 0.
       end do
     end do
   end do
@@ -2860,6 +2765,7 @@ real mrdx
 real mrdy
 real :: pr = 3.
 real rcoup
+real walls(5)
 logical specified
 
    call trace_entry("a_horizontal_diffusion_3dmp")
@@ -2867,11 +2773,6 @@ logical specified
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_mkrdxm = 0.
-a_mkrdxp = 0.
-a_mkrdym = 0.
-a_mkrdyp = 0.
-a_rcoup = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -2909,23 +2810,8 @@ if (config_flags%open_ye .or. specified) then
 endif
 ! recompute : j_end
 do j = j_start, j_end
-  a_mkrdxm = 0.
-  a_mkrdxp = 0.
-  a_mkrdym = 0.
-  a_mkrdyp = 0.
-  a_rcoup = 0.
   do k = kts, ktf
-    a_mkrdxm = 0.
-    a_mkrdxp = 0.
-    a_mkrdym = 0.
-    a_mkrdyp = 0.
-    a_rcoup = 0.
     do i = i_start, i_end
-      a_mkrdxm = 0.
-      a_mkrdxp = 0.
-      a_mkrdym = 0.
-      a_mkrdyp = 0.
-      a_rcoup = 0.
       mkrdxm = msfu(i,j)*0.5*(xkmhd(i,k,j)+xkmhd(i-1,k,j))*rdx*pr
 ! recompute : mkrdxm
       mkrdxp = msfu(i+1,j)*0.5*(xkmhd(i+1,k,j)+xkmhd(i,k,j))*rdx*pr
@@ -2940,32 +2826,30 @@ do j = j_start, j_end
 ! recompute : mrdy
       rcoup = mu(i,j)
 ! recompute : rcoup
-      a_field(i,k,j-1) = a_field(i,k,j-1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdym
-      a_field(i,k,j+1) = a_field(i,k,j+1)+a_tendency(i,k,j)*rcoup*mrdy*mkrdyp
-      a_field(i-1,k,j) = a_field(i-1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxm
-      a_field(i+1,k,j) = a_field(i+1,k,j)+a_tendency(i,k,j)*rcoup*mrdx*mkrdxp
-      a_field(i,k,j) = a_field(i,k,j)+a_tendency(i,k,j)*rcoup*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
-      a_mkrdxm = a_mkrdxm-a_tendency(i,k,j)*rcoup*mrdx*(field(i,k,j)-field(i-1,k,j)-base_3d(i,k,j)+base_3d(i-1,k,j))
-      a_mkrdxp = a_mkrdxp+a_tendency(i,k,j)*rcoup*mrdx*(field(i+1,k,j)-field(i,k,j)-base_3d(i+1,k,j)+base_3d(i,k,j))
-      a_mkrdym = a_mkrdym-a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j)-field(i,k,j-1)-base_3d(i,k,j)+base_3d(i,k,j-1))
-      a_mkrdyp = a_mkrdyp+a_tendency(i,k,j)*rcoup*mrdy*(field(i,k,j+1)-field(i,k,j)-base_3d(i,k,j+1)+base_3d(i,k,j))
-      a_rcoup = a_rcoup+a_tendency(i,k,j)*(mrdx*(mkrdxp*(field(i+1,k,j)-field(i,k,j)-base_3d(i+1,k,j)+base_3d(i,k,j))-mkrdxm*&
-&(field(i,k,j)-field(i-1,k,j)-base_3d(i,k,j)+base_3d(i-1,k,j)))+mrdy*(mkrdyp*(field(i,k,j+1)-field(i,k,j)-base_3d(i,k,j+1)+&
-&base_3d(i,k,j))-mkrdym*(field(i,k,j)-field(i,k,j-1)-base_3d(i,k,j)+base_3d(i,k,j-1))))
+      walls(1)=field(i+1,k,j)-field(i,k,j)-base_3d(i+1,k,j)+base_3d(i,k,j)
+      walls(2)=field(i,k,j)-field(i-1,k,j)-base_3d(i,k,j)+base_3d(i-1,k,j)
+      walls(3)=field(i,k,j)-field(i,k,j-1)-base_3d(i,k,j)+base_3d(i,k,j-1)
+      walls(4)=field(i,k,j+1)-field(i,k,j)-base_3d(i,k,j+1)+base_3d(i,k,j)
+      walls(5)=a_tendency(i,k,j)*rcoup
+      a_field(i,k,j-1) = a_field(i,k,j-1)+walls(5)*mrdy*mkrdym
+      a_field(i,k,j+1) = a_field(i,k,j+1)+walls(5)*mrdy*mkrdyp
+      a_field(i-1,k,j) = a_field(i-1,k,j)+walls(5)*mrdx*mkrdxm
+      a_field(i+1,k,j) = a_field(i+1,k,j)+walls(5)*mrdx*mkrdxp
+      a_field(i,k,j) = a_field(i,k,j)+walls(5)*((-(mrdx*(mkrdxp+mkrdxm)))-mrdy*(mkrdyp+mkrdym))
+      a_mkrdxm = -walls(5)*mrdx*walls(2)
+      a_mkrdxp = walls(5)*mrdx*walls(1)
+      a_mkrdym = -walls(5)*mrdy*walls(3)
+      a_mkrdyp = walls(5)*mrdy*walls(4)
+      a_rcoup = a_tendency(i,k,j)*(mrdx*(mkrdxp*walls(1)-mkrdxm*walls(2))+mrdy*(mkrdyp*walls(4)-mkrdym*walls(3)))
       a_mu(i,j) = a_mu(i,j)+a_rcoup
-      a_rcoup = 0.
       a_xkmhd(i,k,j+1) = a_xkmhd(i,k,j+1)+0.5*a_mkrdyp*msfv(i,j+1)*rdy*pr
       a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdyp*msfv(i,j+1)*rdy*pr
-      a_mkrdyp = 0.
       a_xkmhd(i,k,j-1) = a_xkmhd(i,k,j-1)+0.5*a_mkrdym*msfv(i,j)*rdy*pr
       a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdym*msfv(i,j)*rdy*pr
-      a_mkrdym = 0.
       a_xkmhd(i+1,k,j) = a_xkmhd(i+1,k,j)+0.5*a_mkrdxp*msfu(i+1,j)*rdx*pr
       a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdxp*msfu(i+1,j)*rdx*pr
-      a_mkrdxp = 0.
       a_xkmhd(i-1,k,j) = a_xkmhd(i-1,k,j)+0.5*a_mkrdxm*msfu(i,j)*rdx*pr
       a_xkmhd(i,k,j) = a_xkmhd(i,k,j)+0.5*a_mkrdxm*msfu(i,j)*rdx*pr
-      a_mkrdxm = 0.
     end do
   end do
 end do
@@ -3042,9 +2926,12 @@ real, intent(in) :: rdnw(kms:kme)
 real, intent(in) :: rdx
 real, intent(in) :: rdy
 
+real  :: keep_ph(ims:ime,kms:kme)
+
 !==============================================
 ! declare local variables
 !==============================================
+real walls(7)
 real a_dpn(ims:ime,kms:kme)
 real a_dpx
 real a_dpy
@@ -3067,8 +2954,6 @@ logical specified
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
 a_dpn(:,:) = 0.
-a_dpx = 0.
-a_dpy = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -3098,102 +2983,122 @@ if ((config_flags%open_xe .or. specified .or. config_flags%nested) .and. ite .eq
 endif
 ! recompute : itf
 do j = j_start, jtf
-  a_dpx = 0.
+  keep_ph(i_start:itf,1:ktf)=ph(i_start:itf,2:ktf+1,j)-ph(i_start-1:itf-1,2:ktf+1,j)+ph(i_start:itf,1:ktf,j)-ph(i_start-1:itf-1,1:ktf,j)
   if (non_hydrostatic) then
     k = 1
 ! recompute : k
-    do i = i_start, itf
-      dpn(i,k) = 0.5*(cf1*(p(i-1,k,j)+p(i,k,j))+cf2*(p(i-1,k+1,j)+p(i,k+1,j))+cf3*(p(i-1,k+2,j)+p(i,k+2,j)))
-      dpn(i,kde) = 0.
-    end do
+!   do i = i_start, itf
+!     dpn(i,k) = 0.5*(cf1*(p(i-1,k,j)+p(i,k,j))+cf2*(p(i-1,k+1,j)+p(i,k+1,j))+cf3*(p(i-1,k+2,j)+p(i,k+2,j)))
+!   end do
+    dpn(i_start:itf,k) = 0.5*(cf1*(p(i_start-1:itf-1,k,j)+p(i_start:itf,k,j))+cf2*(p(i_start-1:itf-1,k+1,j)+p(i_start:itf,k+1,j))&
+&+cf3*(p(i_start-1:itf-1,k+2,j)+p(i_start:itf,k+2,j)))
+    dpn(i_start:itf,kde) = 0.
     do k = 2, ktf
-      do i = i_start, itf
-        dpn(i,k) = 0.5*(fnm(k)*(p(i-1,k,j)+p(i,k,j))+fnp(k)*(p(i-1,k-1,j)+p(i,k-1,j)))
-      end do
+!     do i = i_start, itf
+!       dpn(i,k) = 0.5*(fnm(k)*(p(i-1,k,j)+p(i,k,j))+fnp(k)*(p(i-1,k-1,j)+p(i,k-1,j)))
+!     end do
+      dpn(i_start:itf,k) = 0.5*(fnm(k)*(p(i_start-1:itf-1,k,j)+p(i_start:itf,k,j))+fnp(k)*(p(i_start-1:itf-1,k-1,j)+p(i_start:itf,k-1,j)))
     end do
+
 ! recompute : dpn
     do k = 1, ktf
-      a_dpx = 0.
+      walls(1)=rdnw(k)
       do i = i_start, itf
-        a_dpx = 0.
-        dpx = 0.5*rdx*muu(i,j)*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-p(i-1,k,j))+&
-&(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
+        walls(2)=php(i,k,j)-php(i-1,k,j)
+        walls(3)=pb(i,k,j)-pb(i-1,k,j)
+        walls(4)=alt(i,k,j)+alt(i-1,k,j)
+        walls(5)=rdx*(walls(1)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
+        walls(6)=keep_ph(i,k)+walls(4)*(p(i,k,j)-p(i-1,k,j))+(al(i,k,j)+al(i-1,k,j))*walls(3)
+        dpx = 0.5*rdx*muu(i,j)*walls(6)
 ! recompute : dpx
-        dpx = dpx+rdx*(php(i,k,j)-php(i-1,k,j))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
+        dpx = dpx+walls(2)*walls(5)
 ! recompute : dpx
         a_cqu(i,k,j) = a_cqu(i,k,j)-a_ru_tend(i,k,j)*dpx
-        a_dpx = a_dpx-a_ru_tend(i,k,j)*cqu(i,k,j)
-        a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpx*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
-        a_dpn(i,k) = a_dpn(i,k)-a_dpx*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
-        a_mu(i-1,j) = a_mu(i-1,j)-0.5*a_dpx*rdx*(php(i,k,j)-php(i-1,k,j))
-        a_mu(i,j) = a_mu(i,j)-0.5*a_dpx*rdx*(php(i,k,j)-php(i-1,k,j))
-        a_php(i-1,k,j) = a_php(i-1,k,j)-a_dpx*rdx*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
-        a_php(i,k,j) = a_php(i,k,j)+a_dpx*rdx*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
-        a_al(i-1,k,j) = a_al(i-1,k,j)+0.5*a_dpx*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-        a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-        a_alt(i-1,k,j) = a_alt(i-1,k,j)+0.5*a_dpx*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-        a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-        a_muu(i,j) = a_muu(i,j)+0.5*a_dpx*rdx*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-&
-&p(i-1,k,j))+(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
-        a_p(i-1,k,j) = a_p(i-1,k,j)-0.5*a_dpx*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-        a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpx*rdx*muu(i,j)
-        a_dpx = 0.
+        a_dpx = -a_ru_tend(i,k,j)*cqu(i,k,j)
+        a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpx*rdx*walls(2)*walls(1)
+        a_dpn(i,k) = a_dpn(i,k)-a_dpx*rdx*walls(2)*walls(1)
+        a_mu(i-1,j) = a_mu(i-1,j)-0.5*a_dpx*rdx*walls(2)
+        a_mu(i,j) = a_mu(i,j)-0.5*a_dpx*rdx*walls(2)
+        walls(2)=a_dpx*walls(5)
+        walls(5)=0.5*a_dpx*rdx*muu(i,j)
+        a_php(i-1,k,j) = a_php(i-1,k,j)-walls(2)
+        a_php(i,k,j)   = a_php(i,k,j)  +walls(2)
+        a_al(i-1,k,j) = a_al(i-1,k,j)+walls(5)*walls(3)
+        a_al(i,k,j) = a_al(i,k,j)+walls(5)*walls(3)
+        walls(2)=walls(5)*(p(i,k,j)-p(i-1,k,j))
+        a_alt(i-1,k,j) = a_alt(i-1,k,j)+walls(2)
+        a_alt(i,k,j)   = a_alt(i,k,j)  +walls(2)
+        a_muu(i,j) = a_muu(i,j)+0.5*a_dpx*rdx*walls(6)
+        a_p(i-1,k,j) = a_p(i-1,k,j)-walls(5)*walls(4)
+        a_p(i,k,j) = a_p(i,k,j)+walls(5)*walls(4)
+        a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-walls(5)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(5)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-walls(5)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(5)
       end do
     end do
     do k = 2, ktf
-      do i = i_start, itf
-        a_p(i-1,k-1,j) = a_p(i-1,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*fnm(k)
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
-        a_dpn(i,k) = 0.
-      end do
+!     do i = i_start, itf
+!       a_p(i-1,k-1,j) = a_p(i-1,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
+!       a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
+!       a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*fnm(k)
+!       a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
+!     end do
+      a_p(i_start-1:itf-1,k-1,j) = a_p(i_start-1:itf-1,k-1,j)+0.5*a_dpn(i_start:itf,k)*fnp(k)
+      a_p(i_start:itf,k-1,j) = a_p(i_start:itf,k-1,j)+0.5*a_dpn(i_start:itf,k)*fnp(k)
+      a_p(i_start-1:itf-1,k,j) = a_p(i_start-1:itf-1,k,j)+0.5*a_dpn(i_start:itf,k)*fnm(k)
+      a_p(i_start:itf,k,j) = a_p(i_start:itf,k,j)+0.5*a_dpn(i_start:itf,k)*fnm(k)
     end do
+    a_dpn(i_start:itf,2:ktf) = 0.
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:2001
 ! recompute vars : k
     k = 1
 ! recompute vars : k
-    do i = i_start, itf
-      a_dpn(i,kde) = 0.
-      a_p(i-1,k+2,j) = a_p(i-1,k+2,j)+0.5*a_dpn(i,k)*cf3
-      a_p(i,k+2,j) = a_p(i,k+2,j)+0.5*a_dpn(i,k)*cf3
-      a_p(i-1,k+1,j) = a_p(i-1,k+1,j)+0.5*a_dpn(i,k)*cf2
-      a_p(i,k+1,j) = a_p(i,k+1,j)+0.5*a_dpn(i,k)*cf2
-      a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*cf1
-      a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*cf1
-      a_dpn(i,k) = 0.
-    end do
+    a_dpn(i_start:itf,kde) = 0.
+!   do i = i_start, itf
+!     a_p(i-1,k+2,j) = a_p(i-1,k+2,j)+0.5*a_dpn(i,k)*cf3
+!     a_p(i,k+2,j) = a_p(i,k+2,j)+0.5*a_dpn(i,k)*cf3
+!     a_p(i-1,k+1,j) = a_p(i-1,k+1,j)+0.5*a_dpn(i,k)*cf2
+!     a_p(i,k+1,j) = a_p(i,k+1,j)+0.5*a_dpn(i,k)*cf2
+!     a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*cf1
+!     a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*cf1
+!   end do
+    a_p(i_start-1:itf-1,k+2,j) = a_p(i_start-1:itf-1,k+2,j)+0.5*a_dpn(i_start:itf,k)*cf3
+    a_p(i_start:itf,k+2,j) = a_p(i_start:itf,k+2,j)+0.5*a_dpn(i_start:itf,k)*cf3
+    a_p(i_start-1:itf-1,k+1,j) = a_p(i_start-1:itf-1,k+1,j)+0.5*a_dpn(i_start:itf,k)*cf2
+    a_p(i_start:itf,k+1,j) = a_p(i_start:itf,k+1,j)+0.5*a_dpn(i_start:itf,k)*cf2
+    a_p(i_start-1:itf-1,k,j) = a_p(i_start-1:itf-1,k,j)+0.5*a_dpn(i_start:itf,k)*cf1
+    a_p(i_start:itf,k,j) = a_p(i_start:itf,k,j)+0.5*a_dpn(i_start:itf,k)*cf1
+    a_dpn(i_start:itf,k) = 0.
+
   else
+
     do k = 1, ktf
-      a_dpx = 0.
       do i = i_start, itf
-        a_dpx = 0.
-        dpx = 0.5*rdx*muu(i,j)*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-p(i-1,k,j))+&
-&(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
+        walls(3)=pb(i,k,j)-pb(i-1,k,j)
+        walls(4)=alt(i,k,j)+alt(i-1,k,j)
+        walls(2)=rdx*(keep_ph(i,k)+walls(4)*(p(i,k,j)-p(i-1,k,j))+(al(i,k,j)+al(i-1,k,j))*walls(3))
+        dpx = 0.5*muu(i,j)*walls(2)
 ! recompute : dpx
         a_cqu(i,k,j) = a_cqu(i,k,j)-a_ru_tend(i,k,j)*dpx
-        a_dpx = a_dpx-a_ru_tend(i,k,j)*cqu(i,k,j)
-        a_al(i-1,k,j) = a_al(i-1,k,j)+0.5*a_dpx*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-        a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-        a_alt(i-1,k,j) = a_alt(i-1,k,j)+0.5*a_dpx*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-        a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-        a_muu(i,j) = a_muu(i,j)+0.5*a_dpx*rdx*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-&
-&p(i-1,k,j))+(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
-        a_p(i-1,k,j) = a_p(i-1,k,j)-0.5*a_dpx*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpx*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-        a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-0.5*a_dpx*rdx*muu(i,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpx*rdx*muu(i,j)
-        a_dpx = 0.
+        a_dpx = -a_ru_tend(i,k,j)*cqu(i,k,j)
+        walls(5)=0.5*a_dpx*rdx*muu(i,j)
+        a_al(i-1,k,j) = a_al(i-1,k,j)+walls(5)*walls(3)
+        a_al(i,k,j) = a_al(i,k,j)+walls(5)*walls(3)
+        a_alt(i-1,k,j) = a_alt(i-1,k,j)+walls(5)*(p(i,k,j)-p(i-1,k,j))
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(5)*(p(i,k,j)-p(i-1,k,j))
+        a_muu(i,j) = a_muu(i,j)+0.5*a_dpx*walls(2)
+        a_p(i-1,k,j) = a_p(i-1,k,j)-walls(5)*walls(4)
+        a_p(i,k,j) = a_p(i,k,j)+walls(5)*walls(4)
+        a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-walls(5)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(5)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-walls(5)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(5)
       end do
     end do
   endif
 end do
+
 ! recdepend vars : ide,ite
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:1927
 ! recompute vars : itf
@@ -3235,99 +3140,118 @@ if ((config_flags%open_ye .or. specified .or. config_flags%nested) .and. jte .eq
   jtf = jtf-1
 endif
 ! recompute vars : jtf
+
 do j = j_start, jtf
-  a_dpy = 0.
+  keep_ph(i_start:itf,1:ktf)=ph(i_start:itf,2:ktf+1,j)-ph(i_start:itf,2:ktf+1,j-1)+ph(i_start:itf,1:ktf,j)-ph(i_start:itf,1:ktf,j-1)
   if (non_hydrostatic) then
     k = 1
 ! recompute : k
-    do i = i_start, itf
-      dpn(i,k) = 0.5*(cf1*(p(i,k,j-1)+p(i,k,j))+cf2*(p(i,k+1,j-1)+p(i,k+1,j))+cf3*(p(i,k+2,j-1)+p(i,k+2,j)))
-      dpn(i,kde) = 0.
-    end do
+!   do i = i_start, itf
+!     dpn(i,k) = 0.5*(cf1*(p(i,k,j-1)+p(i,k,j))+cf2*(p(i,k+1,j-1)+p(i,k+1,j))+cf3*(p(i,k+2,j-1)+p(i,k+2,j)))
+!   end do
+    dpn(i_start:itf,k) = 0.5*(cf1*(p(i_start:itf,k,j-1)+p(i_start:itf,k,j))+cf2*(p(i_start:itf,k+1,j-1)+p(i_start:itf,k+1,j))&
+&+cf3*(p(i_start:itf,k+2,j-1)+p(i_start:itf,k+2,j)))
+    dpn(i_start:itf,kde) = 0.
     do k = 2, ktf
-      do i = i_start, itf
-        dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j-1)+p(i,k,j))+fnp(k)*(p(i,k-1,j-1)+p(i,k-1,j)))
-      end do
+!     do i = i_start, itf
+!       dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j-1)+p(i,k,j))+fnp(k)*(p(i,k-1,j-1)+p(i,k-1,j)))
+!     end do
+      dpn(i_start:itf,k) = 0.5*(fnm(k)*(p(i_start:itf,k,j-1)+p(i_start:itf,k,j))+fnp(k)*(p(i_start:itf,k-1,j-1)+p(i_start:itf,k-1,j)))
     end do
 ! recompute : dpn
     do k = 1, ktf
-      a_dpy = 0.
+      walls(1)=rdnw(k)
       do i = i_start, itf
-        a_dpy = 0.
-        dpy = 0.5*rdy*muv(i,j)*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-p(i,k,j-1))+&
-&(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
+        walls(2)=php(i,k,j)-php(i,k,j-1)
+        walls(3)=pb(i,k,j)-pb(i,k,j-1)
+        walls(4)=p(i,k,j)-p(i,k,j-1)
+        walls(5)=alt(i,k,j)+alt(i,k,j-1)
+        walls(6)=keep_ph(i,k)+walls(5)*walls(4)+(al(i,k,j)+al(i,k,j-1))*walls(3)
+        dpy = 0.5*rdy*muv(i,j)*walls(6)
 ! recompute : dpy
-        dpy = dpy+rdy*(php(i,k,j)-php(i,k,j-1))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
+        dpy = dpy+rdy*walls(2)*(walls(1)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
 ! recompute : dpy
         a_cqv(i,k,j) = a_cqv(i,k,j)-a_rv_tend(i,k,j)*dpy
-        a_dpy = a_dpy-a_rv_tend(i,k,j)*cqv(i,k,j)
-        a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpy*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
-        a_dpn(i,k) = a_dpn(i,k)-a_dpy*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
-        a_mu(i,j-1) = a_mu(i,j-1)-0.5*a_dpy*rdy*(php(i,k,j)-php(i,k,j-1))
-        a_mu(i,j) = a_mu(i,j)-0.5*a_dpy*rdy*(php(i,k,j)-php(i,k,j-1))
-        a_php(i,k,j-1) = a_php(i,k,j-1)-a_dpy*rdy*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
-        a_php(i,k,j) = a_php(i,k,j)+a_dpy*rdy*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
-        a_al(i,k,j-1) = a_al(i,k,j-1)+0.5*a_dpy*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_alt(i,k,j-1) = a_alt(i,k,j-1)+0.5*a_dpy*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_muv(i,j) = a_muv(i,j)+0.5*a_dpy*rdy*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-&
-&p(i,k,j-1))+(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
-        a_p(i,k,j-1) = a_p(i,k,j-1)-0.5*a_dpy*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpy*rdy*muv(i,j)
-        a_dpy = 0.
+        a_dpy = -a_rv_tend(i,k,j)*cqv(i,k,j)
+        walls(7)=0.5*a_dpy*rdy*muv(i,j)
+        a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpy*rdy*walls(2)*walls(1)
+        a_dpn(i,k) = a_dpn(i,k)-a_dpy*rdy*walls(2)*walls(1)
+        a_mu(i,j-1) = a_mu(i,j-1)-0.5*a_dpy*rdy*walls(2)
+        a_mu(i,j) = a_mu(i,j)-0.5*a_dpy*rdy*walls(2)
+        walls(2)=a_dpy*rdy*(walls(1)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
+        a_php(i,k,j-1) = a_php(i,k,j-1)-walls(2)
+        a_php(i,k,j) = a_php(i,k,j)+walls(2)
+        a_al(i,k,j-1) = a_al(i,k,j-1)+walls(7)*walls(3)
+        a_al(i,k,j) = a_al(i,k,j)+walls(7)*walls(3)
+        a_alt(i,k,j-1) = a_alt(i,k,j-1)+walls(7)*walls(4)
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(7)*walls(4)
+        a_muv(i,j) = a_muv(i,j)+0.5*a_dpy*rdy*walls(6)
+        a_p(i,k,j-1) = a_p(i,k,j-1)-walls(7)*walls(5)
+        a_p(i,k,j) = a_p(i,k,j)+walls(7)*walls(5)
+        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-walls(7)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(7)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-walls(7)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(7)
       end do
     end do
     do k = 2, ktf
-      do i = i_start, itf
-        a_p(i,k-1,j-1) = a_p(i,k-1,j-1)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*fnm(k)
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
-        a_dpn(i,k) = 0.
-      end do
+!     do i = i_start, itf
+!       a_p(i,k-1,j-1) = a_p(i,k-1,j-1)+0.5*a_dpn(i,k)*fnp(k)
+!       a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
+!       a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*fnm(k)
+!       a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
+!     end do
+      a_p(i_start:itf,k-1,j-1) = a_p(i_start:itf,k-1,j-1)+0.5*a_dpn(i_start:itf,k)*fnp(k)
+      a_p(i_start:itf,k-1,j) = a_p(i_start:itf,k-1,j)+0.5*a_dpn(i_start:itf,k)*fnp(k)
+      a_p(i_start:itf,k,j-1) = a_p(i_start:itf,k,j-1)+0.5*a_dpn(i_start:itf,k)*fnm(k)
+      a_p(i_start:itf,k,j) = a_p(i_start:itf,k,j)+0.5*a_dpn(i_start:itf,k)*fnm(k)
+      a_dpn(i_start:itf,k) = 0.
     end do
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:1941
 ! recompute vars : k
     k = 1
 ! recompute vars : k
-    do i = i_start, itf
-      a_dpn(i,kde) = 0.
-      a_p(i,k+2,j-1) = a_p(i,k+2,j-1)+0.5*a_dpn(i,k)*cf3
-      a_p(i,k+2,j) = a_p(i,k+2,j)+0.5*a_dpn(i,k)*cf3
-      a_p(i,k+1,j-1) = a_p(i,k+1,j-1)+0.5*a_dpn(i,k)*cf2
-      a_p(i,k+1,j) = a_p(i,k+1,j)+0.5*a_dpn(i,k)*cf2
-      a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*cf1
-      a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*cf1
-      a_dpn(i,k) = 0.
-    end do
+    a_dpn(i_start:itf,kde) = 0.
+!   do i = i_start, itf
+!     a_p(i,k+2,j-1) = a_p(i,k+2,j-1)+0.5*a_dpn(i,k)*cf3
+!     a_p(i,k+2,j) = a_p(i,k+2,j)+0.5*a_dpn(i,k)*cf3
+!     a_p(i,k+1,j-1) = a_p(i,k+1,j-1)+0.5*a_dpn(i,k)*cf2
+!     a_p(i,k+1,j) = a_p(i,k+1,j)+0.5*a_dpn(i,k)*cf2
+!     a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*cf1
+!     a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*cf1
+!   end do
+    a_p(i_start:itf,k+2,j-1) = a_p(i_start:itf,k+2,j-1)+0.5*a_dpn(i_start:itf,k)*cf3
+    a_p(i_start:itf,k+2,j) = a_p(i_start:itf,k+2,j)+0.5*a_dpn(i_start:itf,k)*cf3
+    a_p(i_start:itf,k+1,j-1) = a_p(i_start:itf,k+1,j-1)+0.5*a_dpn(i_start:itf,k)*cf2
+    a_p(i_start:itf,k+1,j) = a_p(i_start:itf,k+1,j)+0.5*a_dpn(i_start:itf,k)*cf2
+    a_p(i_start:itf,k,j-1) = a_p(i_start:itf,k,j-1)+0.5*a_dpn(i_start:itf,k)*cf1
+    a_p(i_start:itf,k,j) = a_p(i_start:itf,k,j)+0.5*a_dpn(i_start:itf,k)*cf1
+    a_dpn(i_start:itf,k) = 0.
+
   else
+
     do k = 1, ktf
-      a_dpy = 0.
       do i = i_start, itf
-        a_dpy = 0.
-        dpy = 0.5*rdy*muv(i,j)*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-p(i,k,j-1))+&
-&(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
+        walls(3)=pb(i,k,j)-pb(i,k,j-1)
+        walls(4)=p(i,k,j)-p(i,k,j-1)
+        walls(5)=alt(i,k,j)+alt(i,k,j-1)
+        walls(6)=keep_ph(i,k)+walls(5)*walls(4)+(al(i,k,j)+al(i,k,j-1))*walls(3)
+        dpy = 0.5*rdy*muv(i,j)*walls(6)
 ! recompute : dpy
         a_cqv(i,k,j) = a_cqv(i,k,j)-a_rv_tend(i,k,j)*dpy
-        a_dpy = a_dpy-a_rv_tend(i,k,j)*cqv(i,k,j)
-        a_al(i,k,j-1) = a_al(i,k,j-1)+0.5*a_dpy*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_alt(i,k,j-1) = a_alt(i,k,j-1)+0.5*a_dpy*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_muv(i,j) = a_muv(i,j)+0.5*a_dpy*rdy*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-&
-&p(i,k,j-1))+(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
-        a_p(i,k,j-1) = a_p(i,k,j-1)-0.5*a_dpy*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpy*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-0.5*a_dpy*rdy*muv(i,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpy*rdy*muv(i,j)
-        a_dpy = 0.
+        a_dpy = -a_rv_tend(i,k,j)*cqv(i,k,j)
+        walls(7)=0.5*a_dpy*rdy*muv(i,j)
+        a_al(i,k,j-1) = a_al(i,k,j-1)+walls(7)*walls(3)
+        a_al(i,k,j) = a_al(i,k,j)+walls(7)*walls(3)
+        a_alt(i,k,j-1) = a_alt(i,k,j-1)+walls(7)*walls(4)
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(7)*walls(4)
+        a_muv(i,j) = a_muv(i,j)+0.5*a_dpy*rdy*walls(6)
+        a_p(i,k,j-1) = a_p(i,k,j-1)-walls(7)*walls(5)
+        a_p(i,k,j) = a_p(i,k,j)+walls(7)*walls(5)
+        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-walls(7)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(7)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-walls(7)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(7)
       end do
     end do
   endif
@@ -3986,6 +3910,7 @@ real, intent(out) :: z_at_w(ims:ime,kms:kme,jms:jme)
 !==============================================
 ! declare local variables
 !==============================================
+real walls(6)
 real a_w1
 real a_w2
 real a_z0
@@ -4011,11 +3936,6 @@ real z2
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_w1 = 0.
-a_w2 = 0.
-a_z0 = 0.
-a_z1 = 0.
-a_z2 = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -4032,79 +3952,74 @@ k_start = kts
 ! recompute : k_start
 k_end = min(kte,kde-1)
 ! recompute : k_end
+
+th_phy(i_start:i_end,k_start:k_end,j_start:j_end) = t(i_start:i_end,k_start:k_end,j_start:j_end)+t0
+p_phy(i_start:i_end,k_start:k_end,j_start:j_end) = p(i_start:i_end,k_start:k_end,j_start:j_end)+pb(i_start:i_end,k_start:k_end,j_start:j_end)
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
-      th_phy(i,k,j) = t(i,k,j)+t0
-      p_phy(i,k,j) = p(i,k,j)+pb(i,k,j)
       pi_phy(i,k,j) = (p_phy(i,k,j)/p1000mb)**rcp
       t_phy(i,k,j) = th_phy(i,k,j)*pi_phy(i,k,j)
     end do
   end do
 end do
 ! recompute : p_phy,t_phy
-do j = j_start, j_end
-  do k = k_start, kte
-    do i = i_start, i_end
-      z_at_w(i,k,j) = (phb(i,k,j)+ph(i,k,j))/g
-    end do
-  end do
-end do
+
+z_at_w(i_start:i_end,k_start:kte,j_start:j_end)=(phb(i_start:i_end,k_start:kte,j_start:j_end)+ph(i_start:i_end,k_start:kte,j_start:j_end))/g
+!do j = j_start, j_end
+!  do k = k_start, kte
+!    do i = i_start, i_end
+!      z_at_w(i,k,j) = (phb(i,k,j)+ph(i,k,j))/g
+!    end do
+!  end do
+!end do
 ! recompute : z_at_w
-do j = j_start, j_end
-  do k = k_start, k_end
-    do i = i_start, i_end
-      z(i,k,j) = 0.5*(z_at_w(i,k,j)+z_at_w(i,k+1,j))
-    end do
-  end do
-end do
+
+z(i_start:i_end,k_start:k_end,j_start:j_end) = 0.5*(z_at_w(i_start:i_end,k_start:k_end,j_start:j_end)&
+&+z_at_w(i_start:i_end,k_start+1:k_end+1,j_start:j_end))
+!do j = j_start, j_end
+!  do k = k_start, k_end
+!    do i = i_start, i_end
+!      z(i,k,j) = 0.5*(z_at_w(i,k,j)+z_at_w(i,k+1,j))
+!    end do
+!  end do
+!end do
+
 ! recompute : z
 do j = j_start, j_end
-  a_w1 = 0.
-  a_w2 = 0.
-  a_z0 = 0.
-  a_z1 = 0.
-  a_z2 = 0.
   do i = i_start, i_end
-    a_w1 = 0.
-    a_w2 = 0.
-    a_z0 = 0.
-    a_z1 = 0.
-    a_z2 = 0.
     z0 = z_at_w(i,kte,j)
 ! recompute : z0
     z1 = z(i,k_end,j)
 ! recompute : z1
     z2 = z(i,k_end-1,j)
 ! recompute : z2
-    w1 = (z0-z2)/(z1-z2)
+    walls(1)=z1-z2
+    w1 = (z0-z2)/walls(1)
 ! recompute : w1
     w2 = 1.-w1
 ! recompute : w2
+    walls(2)=log(p_phy(i,kde-1,j))
+    walls(3)=log(p_phy(i,kde-2,j))
+    walls(4)=exp(w1*walls(2)+w2*walls(3))*a_p8w(i,kde,j)
+
     a_t_phy(i,kde-2,j) = a_t_phy(i,kde-2,j)+a_t8w(i,kde,j)*w2
     a_t_phy(i,kde-1,j) = a_t_phy(i,kde-1,j)+a_t8w(i,kde,j)*w1
-    a_w1 = a_w1+a_t8w(i,kde,j)*t_phy(i,kde-1,j)
-    a_w2 = a_w2+a_t8w(i,kde,j)*t_phy(i,kde-2,j)
+    a_w1 = a_t8w(i,kde,j)*t_phy(i,kde-1,j)
+    a_w2 = a_t8w(i,kde,j)*t_phy(i,kde-2,j)
     a_t8w(i,kde,j) = 0.
-    a_p_phy(i,kde-2,j) = a_p_phy(i,kde-2,j)+a_p8w(i,kde,j)*w2*(1./p_phy(i,kde-2,j))*exp(w1*log(p_phy(i,kde-1,j))+w2*log(p_phy(i,&
-&kde-2,j)))
-    a_p_phy(i,kde-1,j) = a_p_phy(i,kde-1,j)+a_p8w(i,kde,j)*w1*(1./p_phy(i,kde-1,j))*exp(w1*log(p_phy(i,kde-1,j))+w2*log(p_phy(i,&
-&kde-2,j)))
-    a_w1 = a_w1+a_p8w(i,kde,j)*exp(w1*log(p_phy(i,kde-1,j))+w2*log(p_phy(i,kde-2,j)))*log(p_phy(i,kde-1,j))
-    a_w2 = a_w2+a_p8w(i,kde,j)*exp(w1*log(p_phy(i,kde-1,j))+w2*log(p_phy(i,kde-2,j)))*log(p_phy(i,kde-2,j))
+    a_p_phy(i,kde-2,j) = a_p_phy(i,kde-2,j)+w2*(1./p_phy(i,kde-2,j))*walls(4)
+    a_p_phy(i,kde-1,j) = a_p_phy(i,kde-1,j)+w1*(1./p_phy(i,kde-1,j))*walls(4)
+    a_w1 = a_w1+walls(4)*walls(2)
+    a_w2 = a_w2+walls(4)*walls(3)
     a_p8w(i,kde,j) = 0.
     a_w1 = a_w1-a_w2
-    a_w2 = 0.
-    a_z0 = a_z0+a_w1/(z1-z2)
-    a_z1 = a_z1-a_w1*((z0-z2)/((z1-z2)*(z1-z2)))
-    a_z2 = a_z2+a_w1*((-1)/(z1-z2)+(z0-z2)/((z1-z2)*(z1-z2)))
-    a_w1 = 0.
+    a_z0 = a_w1/walls(1)
+    a_z1 = a_w1*((z0-z2)/(walls(1)*walls(1)))
+    a_z2 = a_w1*((-1)/walls(1)+(z0-z2)/(walls(1)*walls(1)))
     a_z(i,k_end-1,j) = a_z(i,k_end-1,j)+a_z2
-    a_z2 = 0.
     a_z(i,k_end,j) = a_z(i,k_end,j)+a_z1
-    a_z1 = 0.
     a_z_at_w(i,kte,j) = a_z_at_w(i,kte,j)+a_z0
-    a_z0 = 0.
 ! recdepend vars : i,j,z_at_w
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:4092
 ! recompute vars : z0
@@ -4132,8 +4047,8 @@ do j = j_start, j_end
 ! recompute vars : w2
     a_t_phy(i,2,j) = a_t_phy(i,2,j)+a_t8w(i,1,j)*w2
     a_t_phy(i,1,j) = a_t_phy(i,1,j)+a_t8w(i,1,j)*w1
-    a_w1 = a_w1+a_t8w(i,1,j)*t_phy(i,1,j)
-    a_w2 = a_w2+a_t8w(i,1,j)*t_phy(i,2,j)
+    a_w1 = a_t8w(i,1,j)*t_phy(i,1,j)
+    a_w2 = a_t8w(i,1,j)*t_phy(i,2,j)
     a_t8w(i,1,j) = 0.
 ! recdepend vars : i,j,z_at_w
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:4092
@@ -4166,7 +4081,6 @@ do j = j_start, j_end
     a_w2 = a_w2+a_p8w(i,1,j)*p_phy(i,2,j)
     a_p8w(i,1,j) = 0.
     a_w1 = a_w1-a_w2
-    a_w2 = 0.
 ! recdepend vars : i,j,z_at_w
 ! recompute pos : ASSIGN_STMT module_big_step_utilities_em.f90:4092
 ! recompute vars : z0
@@ -4182,16 +4096,13 @@ do j = j_start, j_end
 ! recompute vars : z2
     z2 = z(i,2,j)
 ! recompute vars : z2
-    a_z0 = a_z0+a_w1/(z1-z2)
-    a_z1 = a_z1-a_w1*((z0-z2)/((z1-z2)*(z1-z2)))
-    a_z2 = a_z2+a_w1*((-1)/(z1-z2)+(z0-z2)/((z1-z2)*(z1-z2)))
-    a_w1 = 0.
+    walls(1)=z1-z2
+    a_z0 = a_w1/walls(1)
+    a_z1 = -a_w1*((z0-z2)/(walls(1)*walls(1)))
+    a_z2 = a_w1*((-1)/walls(1)+(z0-z2)/(walls(1)*walls(1)))
     a_z(i,2,j) = a_z(i,2,j)+a_z2
-    a_z2 = 0.
     a_z(i,1,j) = a_z(i,1,j)+a_z1
-    a_z1 = 0.
     a_z_at_w(i,1,j) = a_z_at_w(i,1,j)+a_z0
-    a_z0 = 0.
   end do
 end do
 do j = j_start, j_end
@@ -4206,36 +4117,45 @@ do j = j_start, j_end
     end do
   end do
 end do
-do j = j_start, j_end
-  do k = k_start, k_end
-    do i = i_start, i_end
-      a_z_at_w(i,k+1,j) = a_z_at_w(i,k+1,j)+0.5*a_z(i,k,j)
-      a_z_at_w(i,k,j) = a_z_at_w(i,k,j)+0.5*a_z(i,k,j)
-      a_z(i,k,j) = 0.
-    end do
-  end do
-end do
-do j = j_start, j_end
-  do k = k_start, kte
-    do i = i_start, i_end
-      a_ph(i,k,j) = a_ph(i,k,j)+a_z_at_w(i,k,j)/g
-      a_z_at_w(i,k,j) = 0.
-    end do
-  end do
-end do
+!do j = j_start, j_end
+!  do k = k_start, k_end
+!    do i = i_start, i_end
+!      a_z_at_w(i,k+1,j) = a_z_at_w(i,k+1,j)+0.5*a_z(i,k,j)
+!      a_z_at_w(i,k,j) = a_z_at_w(i,k,j)+0.5*a_z(i,k,j)
+!      a_z(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+a_z_at_w(i_start:i_end,k_start+1:k_end+1,j_start:j_end) = a_z_at_w(i_start:i_end,k_start+1:k_end+1,j_start:j_end)&
+&+0.5*a_z(i_start:i_end,k_start:k_end,j_start:j_end)
+a_z_at_w(i_start:i_end,k_start:k_end,j_start:j_end) = a_z_at_w(i_start:i_end,k_start:k_end,j_start:j_end)&
+&+0.5*a_z(i_start:i_end,k_start:k_end,j_start:j_end)
+a_z(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
+
+!do j = j_start, j_end
+!  do k = k_start, kte
+!    do i = i_start, i_end
+!      a_ph(i,k,j) = a_ph(i,k,j)+a_z_at_w(i,k,j)/g
+!      a_z_at_w(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+a_ph(i_start:i_end,k_start:kte,j_start:j_end)=a_ph(i_start:i_end,k_start:kte,j_start:j_end)+a_z_at_w(i_start:i_end,k_start:kte,j_start:j_end)/g
+a_z_at_w(i_start:i_end,k_start:kte,j_start:j_end) = 0.
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
       th_phy(i,k,j) = t(i,k,j)+t0
 ! recompute : th_phy
       p_phy(i,k,j) = p(i,k,j)+pb(i,k,j)
-! recompute : p_phy
-      pi_phy(i,k,j) = (p_phy(i,k,j)/p1000mb)**rcp
+! recompute : p_phy2
+      walls(1)=p_phy(i,k,j)/p1000mb
+      walls(2)=walls(1)**(rcp-1)
 ! recompute : pi_phy
       a_pi_phy(i,k,j) = a_pi_phy(i,k,j)+a_t_phy(i,k,j)*th_phy(i,k,j)
-      a_th_phy(i,k,j) = a_th_phy(i,k,j)+a_t_phy(i,k,j)*pi_phy(i,k,j)
+      a_th_phy(i,k,j) = a_th_phy(i,k,j)+a_t_phy(i,k,j)*walls(2)*walls(1)
       a_t_phy(i,k,j) = 0.
-      a_p_phy(i,k,j) = a_p_phy(i,k,j)+a_pi_phy(i,k,j)/p1000mb*rcp*(p_phy(i,k,j)/p1000mb)**(rcp-1)
+      a_p_phy(i,k,j) = a_p_phy(i,k,j)+a_pi_phy(i,k,j)/p1000mb*rcp*walls(2)
       a_pi_phy(i,k,j) = 0.
       a_p(i,k,j) = a_p(i,k,j)+a_p_phy(i,k,j)
       a_p_phy(i,k,j) = 0.
@@ -4319,11 +4239,7 @@ real, intent(in) :: ww(ims:ime,kms:kme,jms:jme)
 ! declare local variables
 !==============================================
 real a_ub
-real a_ul
-real a_ur
 real a_vb
-real a_vl
-real a_vr
 real a_wdwn(its:ite,kts:kte)
 integer advective_order
 integer i
@@ -4341,18 +4257,13 @@ real ur
 real vb
 real vl
 real vr
+real walls(6)
 
    call trace_entry("a_rhs_ph")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_ub = 0.
-a_ul = 0.
-a_ur = 0.
-a_vb = 0.
-a_vl = 0.
-a_vr = 0.
 a_wdwn(:,:) = 0.
 
 !----------------------------------------------
@@ -4385,17 +4296,12 @@ if (config_flags%open_xe .and. ite .eq. ide) then
     a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdx*ur*(ph_old(i,k,j)-ph_old(i-1,k,j))
     a_ph_old(i-1,k,j) = a_ph_old(i-1,k,j)+a_ph_tend(i,k,j)*rdx*mut(i,j)*ur
     a_ph_old(i,k,j) = a_ph_old(i,k,j)-a_ph_tend(i,k,j)*rdx*mut(i,j)*ur
-    a_ur = a_ur-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i,k,j)-ph_old(i-1,k,j))
-    a_ub = a_ub+a_ur*(0.5+sign(0.5,ub-0.))
-    a_ur = 0.
-    a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+0.5*a_ub*fnp(kz)
-    a_u(i,kz-1,j) = a_u(i,kz-1,j)+0.5*a_ub*fnp(kz)
-    a_u(i+1,kz,j) = a_u(i+1,kz,j)+0.5*a_ub*fnm(kz)
-    a_u(i,kz,j) = a_u(i,kz,j)+0.5*a_ub*fnm(kz)
-    a_ub = 0.
+    a_ub = 0.5*(-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i,k,j)-ph_old(i-1,k,j)))*(0.5+sign(0.5,ub-0.))
+    a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+a_ub*fnp(kz)
+    a_u(i,kz-1,j) = a_u(i,kz-1,j)+a_ub*fnp(kz)
+    a_u(i+1,kz,j) = a_u(i+1,kz,j)+a_ub*fnm(kz)
+    a_u(i,kz,j) = a_u(i,kz,j)+a_ub*fnm(kz)
     do k = 2, kde-1
-      a_ub = 0.
-      a_ur = 0.
       kz = k
 ! recompute : kz
       ub = 0.5*(fnm(kz)*(u(i+1,kz,j)+u(i,kz,j))+fnp(kz)*(u(i+1,kz-1,j)+u(i,kz-1,j)))
@@ -4405,14 +4311,11 @@ if (config_flags%open_xe .and. ite .eq. ide) then
       a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdx*ur*(ph_old(i,k,j)-ph_old(i-1,k,j))
       a_ph_old(i-1,k,j) = a_ph_old(i-1,k,j)+a_ph_tend(i,k,j)*rdx*mut(i,j)*ur
       a_ph_old(i,k,j) = a_ph_old(i,k,j)-a_ph_tend(i,k,j)*rdx*mut(i,j)*ur
-      a_ur = a_ur-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i,k,j)-ph_old(i-1,k,j))
-      a_ub = a_ub+a_ur*(0.5+sign(0.5,ub-0.))
-      a_ur = 0.
-      a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+0.5*a_ub*fnp(kz)
-      a_u(i,kz-1,j) = a_u(i,kz-1,j)+0.5*a_ub*fnp(kz)
-      a_u(i+1,kz,j) = a_u(i+1,kz,j)+0.5*a_ub*fnm(kz)
-      a_u(i,kz,j) = a_u(i,kz,j)+0.5*a_ub*fnm(kz)
-      a_ub = 0.
+      a_ub = 0.5*(-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i,k,j)-ph_old(i-1,k,j)))*(0.5+sign(0.5,ub-0.))
+      a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+a_ub*fnp(kz)
+      a_u(i,kz-1,j) = a_u(i,kz-1,j)+a_ub*fnp(kz)
+      a_u(i+1,kz,j) = a_u(i+1,kz,j)+a_ub*fnm(kz)
+      a_u(i,kz,j) = a_u(i,kz,j)+a_ub*fnm(kz)
     end do
   end do
 endif
@@ -4431,17 +4334,12 @@ if (config_flags%open_xs .and. its .eq. ids) then
     a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdx*ul*(ph_old(i+1,k,j)-ph_old(i,k,j))
     a_ph_old(i+1,k,j) = a_ph_old(i+1,k,j)-a_ph_tend(i,k,j)*rdx*mut(i,j)*ul
     a_ph_old(i,k,j) = a_ph_old(i,k,j)+a_ph_tend(i,k,j)*rdx*mut(i,j)*ul
-    a_ul = a_ul-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i+1,k,j)-ph_old(i,k,j))
-    a_ub = a_ub+a_ul*(0.5+sign(0.5,0.-ub))
-    a_ul = 0.
-    a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+0.5*a_ub*fnp(kz)
-    a_u(i,kz-1,j) = a_u(i,kz-1,j)+0.5*a_ub*fnp(kz)
-    a_u(i+1,kz,j) = a_u(i+1,kz,j)+0.5*a_ub*fnm(kz)
-    a_u(i,kz,j) = a_u(i,kz,j)+0.5*a_ub*fnm(kz)
-    a_ub = 0.
+    a_ub = 0.5*(-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i+1,k,j)-ph_old(i,k,j)))*(0.5+sign(0.5,0.-ub))
+    a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+a_ub*fnp(kz)
+    a_u(i,kz-1,j) = a_u(i,kz-1,j)+a_ub*fnp(kz)
+    a_u(i+1,kz,j) = a_u(i+1,kz,j)+a_ub*fnm(kz)
+    a_u(i,kz,j) = a_u(i,kz,j)+a_ub*fnm(kz)
     do k = 2, kde-1
-      a_ub = 0.
-      a_ul = 0.
       kz = k
 ! recompute : kz
       ub = 0.5*(fnm(kz)*(u(i+1,kz,j)+u(i,kz,j))+fnp(kz)*(u(i+1,kz-1,j)+u(i,kz-1,j)))
@@ -4451,14 +4349,11 @@ if (config_flags%open_xs .and. its .eq. ids) then
       a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdx*ul*(ph_old(i+1,k,j)-ph_old(i,k,j))
       a_ph_old(i+1,k,j) = a_ph_old(i+1,k,j)-a_ph_tend(i,k,j)*rdx*mut(i,j)*ul
       a_ph_old(i,k,j) = a_ph_old(i,k,j)+a_ph_tend(i,k,j)*rdx*mut(i,j)*ul
-      a_ul = a_ul-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i+1,k,j)-ph_old(i,k,j))
-      a_ub = a_ub+a_ul*(0.5+sign(0.5,0.-ub))
-      a_ul = 0.
-      a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+0.5*a_ub*fnp(kz)
-      a_u(i,kz-1,j) = a_u(i,kz-1,j)+0.5*a_ub*fnp(kz)
-      a_u(i+1,kz,j) = a_u(i+1,kz,j)+0.5*a_ub*fnm(kz)
-      a_u(i,kz,j) = a_u(i,kz,j)+0.5*a_ub*fnm(kz)
-      a_ub = 0.
+      a_ub = 0.5*(-a_ph_tend(i,k,j)*rdx*mut(i,j)*(ph_old(i+1,k,j)-ph_old(i,k,j)))*(0.5+sign(0.5,0.-ub))
+      a_u(i+1,kz-1,j) = a_u(i+1,kz-1,j)+a_ub*fnp(kz)
+      a_u(i,kz-1,j) = a_u(i,kz-1,j)+a_ub*fnp(kz)
+      a_u(i+1,kz,j) = a_u(i+1,kz,j)+a_ub*fnm(kz)
+      a_u(i,kz,j) = a_u(i,kz,j)+a_ub*fnm(kz)
     end do
   end do
 endif
@@ -4466,13 +4361,9 @@ if (config_flags%open_ye .and. jte .eq. jde) then
   j = jte-1
 ! recompute : j
   do k = 2, kde
-    a_vb = 0.
-    a_vr = 0.
     kz = min(k,kde-1)
 ! recompute : kz
     do i = its, itf
-      a_vb = 0.
-      a_vr = 0.
       vb = 0.5*(fnm(kz)*(v(i,kz,j+1)+v(i,kz,j))+fnp(kz)*(v(i,kz-1,j+1)+v(i,kz-1,j)))
 ! recompute : vb
       vr = amax1(vb,0.)
@@ -4480,14 +4371,11 @@ if (config_flags%open_ye .and. jte .eq. jde) then
       a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdy*vr*(ph_old(i,k,j)-ph_old(i,k,j-1))
       a_ph_old(i,k,j-1) = a_ph_old(i,k,j-1)+a_ph_tend(i,k,j)*rdy*mut(i,j)*vr
       a_ph_old(i,k,j) = a_ph_old(i,k,j)-a_ph_tend(i,k,j)*rdy*mut(i,j)*vr
-      a_vr = a_vr-a_ph_tend(i,k,j)*rdy*mut(i,j)*(ph_old(i,k,j)-ph_old(i,k,j-1))
-      a_vb = a_vb+a_vr*(0.5+sign(0.5,vb-0.))
-      a_vr = 0.
-      a_v(i,kz-1,j+1) = a_v(i,kz-1,j+1)+0.5*a_vb*fnp(kz)
-      a_v(i,kz-1,j) = a_v(i,kz-1,j)+0.5*a_vb*fnp(kz)
-      a_v(i,kz,j+1) = a_v(i,kz,j+1)+0.5*a_vb*fnm(kz)
-      a_v(i,kz,j) = a_v(i,kz,j)+0.5*a_vb*fnm(kz)
-      a_vb = 0.
+      a_vb = 0.5*(-a_ph_tend(i,k,j)*rdy*mut(i,j)*(ph_old(i,k,j)-ph_old(i,k,j-1)))*(0.5+sign(0.5,vb-0.))
+      a_v(i,kz-1,j+1) = a_v(i,kz-1,j+1)+a_vb*fnp(kz)
+      a_v(i,kz-1,j) = a_v(i,kz-1,j)+a_vb*fnp(kz)
+      a_v(i,kz,j+1) = a_v(i,kz,j+1)+a_vb*fnm(kz)
+      a_v(i,kz,j) = a_v(i,kz,j)+a_vb*fnm(kz)
     end do
   end do
 endif
@@ -4495,13 +4383,9 @@ if (config_flags%open_ys .and. jts .eq. jds) then
   j = jts
 ! recompute : j
   do k = 2, kde
-    a_vb = 0.
-    a_vl = 0.
     kz = min(k,kde-1)
 ! recompute : kz
     do i = its, itf
-      a_vb = 0.
-      a_vl = 0.
       vb = 0.5*(fnm(kz)*(v(i,kz,j+1)+v(i,kz,j))+fnp(kz)*(v(i,kz-1,j+1)+v(i,kz-1,j)))
 ! recompute : vb
       vl = amin1(vb,0.)
@@ -4509,14 +4393,11 @@ if (config_flags%open_ys .and. jts .eq. jds) then
       a_mut(i,j) = a_mut(i,j)-a_ph_tend(i,k,j)*rdy*vl*(ph_old(i,k,j+1)-ph_old(i,k,j))
       a_ph_old(i,k,j+1) = a_ph_old(i,k,j+1)-a_ph_tend(i,k,j)*rdy*mut(i,j)*vl
       a_ph_old(i,k,j) = a_ph_old(i,k,j)+a_ph_tend(i,k,j)*rdy*mut(i,j)*vl
-      a_vl = a_vl-a_ph_tend(i,k,j)*rdy*mut(i,j)*(ph_old(i,k,j+1)-ph_old(i,k,j))
-      a_vb = a_vb+a_vl*(0.5+sign(0.5,0.-vb))
-      a_vl = 0.
-      a_v(i,kz-1,j+1) = a_v(i,kz-1,j+1)+0.5*a_vb*fnp(kz)
-      a_v(i,kz-1,j) = a_v(i,kz-1,j)+0.5*a_vb*fnp(kz)
-      a_v(i,kz,j+1) = a_v(i,kz,j+1)+0.5*a_vb*fnm(kz)
-      a_v(i,kz,j) = a_v(i,kz,j)+0.5*a_vb*fnm(kz)
-      a_vb = 0.
+      a_vb = 0.5*(-a_ph_tend(i,k,j)*rdy*mut(i,j)*(ph_old(i,k,j+1)-ph_old(i,k,j)))*(0.5+sign(0.5,0.-vb))
+      a_v(i,kz-1,j+1) = a_v(i,kz-1,j+1)+a_vb*fnp(kz)
+      a_v(i,kz-1,j) = a_v(i,kz-1,j)+a_vb*fnp(kz)
+      a_v(i,kz,j+1) = a_v(i,kz,j+1)+a_vb*fnm(kz)
+      a_v(i,kz,j) = a_v(i,kz,j)+a_vb*fnm(kz)
     end do
   end do
 endif
@@ -4541,32 +4422,33 @@ if (advective_order .le. 2) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muu(i+1,j) = a_muu(i+1,j)-0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,&
-&j)-ph(i,k,j))
-      a_muu(i,j) = a_muu(i,j)-0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,&
-&k,j))
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)+0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))
-      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))
-      a_ph(i,k,j) = a_ph(i,k,j)-0.5*a_ph_tend(i,k,j)*rdx*((-(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))))+muu(i,j)*(cfn*u(i,k-&
-&1,j)+cfn1*u(i,k-2,j)))
-      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn1*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j))
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn1*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)-0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j))
+      walls(1)=phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j)
+      walls(2)=0.5*a_ph_tend(i,k,j)*rdx
+      walls(3)=phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j)
+      a_muu(i+1,j) = a_muu(i+1,j)-walls(2)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*walls(1)
+      a_muu(i,j) = a_muu(i,j)-walls(2)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*walls(3)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)+walls(2)*muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))
+      a_ph(i+1,k,j) = a_ph(i+1,k,j)-walls(2)*muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))
+      a_ph(i,k,j) = a_ph(i,k,j)-walls(2)*((-(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))))+muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
+      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-walls(2)*muu(i+1,j)*cfn1*walls(1)
+      a_u(i,k-2,j) = a_u(i,k-2,j)-walls(2)*muu(i,j)*cfn1*walls(3)
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-walls(2)*muu(i+1,j)*cfn*walls(1)
+      a_u(i,k-1,j) = a_u(i,k-1,j)-walls(2)*muu(i,j)*cfn*walls(3)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muu(i+1,j) = a_muu(i+1,j)-0.25*a_ph_tend(i,k,j)*rdx*(u(i+1,k,j)+u(i+1,k-1,j))*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,&
-&k,j))
-        a_muu(i,j) = a_muu(i,j)-0.25*a_ph_tend(i,k,j)*rdx*(u(i,k,j)+u(i,k-1,j))*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j))
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)+0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(u(i,k,j)+u(i,k-1,j))
-        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))
-        a_ph(i,k,j) = a_ph(i,k,j)-0.25*a_ph_tend(i,k,j)*rdx*((-(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))))+muu(i,j)*(u(i,k,j)+u(i,k-1,&
-&j)))
-        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j))
-        a_u(i,k-1,j) = a_u(i,k-1,j)-0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j))
-        a_u(i,k,j) = a_u(i,k,j)-0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j))
+        walls(1)=(phb(i+1,k,j)-phb(i,k,j)+ph(i+1,k,j)-ph(i,k,j))
+        walls(2)=0.25*a_ph_tend(i,k,j)*rdx
+        walls(3)=phb(i,k,j)-phb(i-1,k,j)+ph(i,k,j)-ph(i-1,k,j)
+        a_muu(i+1,j) = a_muu(i+1,j)-walls(2)*(u(i+1,k,j)+u(i+1,k-1,j))*walls(1)
+        a_muu(i,j) = a_muu(i,j)-walls(2)*(u(i,k,j)+u(i,k-1,j))*walls(3)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)+walls(2)*muu(i,j)*(u(i,k,j)+u(i,k-1,j))
+        a_ph(i+1,k,j) = a_ph(i+1,k,j)-walls(2)*muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))
+        a_ph(i,k,j) = a_ph(i,k,j)-walls(2)*((-(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))))+muu(i,j)*(u(i,k,j)+u(i,k-1,j)))
+        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k-1,j) = a_u(i,k-1,j)-walls(2)*muu(i,j)*walls(3)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k,j) = a_u(i,k,j)-walls(2)*muu(i,j)*walls(3)
       end do
     end do
   end do
@@ -4608,32 +4490,34 @@ if (advective_order .le. 2) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muv(i,j+1) = a_muv(i,j+1)-0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+&
-&1)-ph(i,k,j))
-      a_muv(i,j) = a_muv(i,j)-0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,&
-&j-1))
-      a_ph(i,k,j-1) = a_ph(i,k,j-1)+0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))
-      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))
-      a_ph(i,k,j) = a_ph(i,k,j)-0.5*a_ph_tend(i,k,j)*rdy*((-(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))))+muv(i,j)*(cfn*v(i,k-&
-&1,j)+cfn1*v(i,k-2,j)))
-      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn1*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j))
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn1*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1))
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)-0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1))
+      walls(1)=cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1)
+      walls(2)=phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1)
+      walls(4)=0.5*a_ph_tend(i,k,j)*rdy
+      walls(5)=phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j)
+      a_muv(i,j+1) = a_muv(i,j+1)-walls(4)*walls(1)*walls(5)
+      a_muv(i,j) = a_muv(i,j)-walls(4)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*walls(2)
+      a_ph(i,k,j-1) = a_ph(i,k,j-1)+walls(4)*muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))
+      a_ph(i,k,j+1) = a_ph(i,k,j+1)-walls(4)*muv(i,j+1)*walls(1)
+      a_ph(i,k,j) = a_ph(i,k,j)-walls(4)*((-(muv(i,j+1)*walls(1)))+muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
+      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-walls(4)*muv(i,j+1)*cfn1*walls(5)
+      a_v(i,k-2,j) = a_v(i,k-2,j)-walls(4)*muv(i,j)*cfn1*walls(2)
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-walls(4)*muv(i,j+1)*cfn*walls(5)
+      a_v(i,k-1,j) = a_v(i,k-1,j)-walls(4)*muv(i,j)*cfn*walls(2)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muv(i,j+1) = a_muv(i,j+1)-0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j+1)+v(i,k-1,j+1))*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,&
-&k,j))
-        a_muv(i,j) = a_muv(i,j)-0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j)+v(i,k-1,j))*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1))
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)+0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(v(i,k,j)+v(i,k-1,j))
-        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))
-        a_ph(i,k,j) = a_ph(i,k,j)-0.25*a_ph_tend(i,k,j)*rdy*((-(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))))+muv(i,j)*(v(i,k,j)+v(i,k-1,&
-&j)))
-        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j))
-        a_v(i,k-1,j) = a_v(i,k-1,j)-0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j))
-        a_v(i,k,j) = a_v(i,k,j)-0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1))
+        walls(2)=phb(i,k,j)-phb(i,k,j-1)+ph(i,k,j)-ph(i,k,j-1)
+        walls(3) =0.25*a_ph_tend(i,k,j)*rdy
+        walls(5)=phb(i,k,j+1)-phb(i,k,j)+ph(i,k,j+1)-ph(i,k,j)
+        a_muv(i,j+1) = a_muv(i,j+1)-walls(3)*(v(i,k,j+1)+v(i,k-1,j+1))*walls(5)
+        a_muv(i,j) = a_muv(i,j)-walls(3)*(v(i,k,j)+v(i,k-1,j))*walls(2)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)+walls(3)*muv(i,j)*(v(i,k,j)+v(i,k-1,j))
+        a_ph(i,k,j+1) = a_ph(i,k,j+1)-walls(3)*muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))
+        a_ph(i,k,j) = a_ph(i,k,j)-walls(3)*((-(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))))+muv(i,j)*(v(i,k,j)+v(i,k-1,j)))
+        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-walls(3)*muv(i,j+1)*walls(5)
+        a_v(i,k-1,j) = a_v(i,k-1,j)-walls(3)*muv(i,j)*walls(2)
+        a_v(i,k,j+1) = a_v(i,k,j+1)-walls(3)*muv(i,j+1)*walls(5)
+        a_v(i,k,j) = a_v(i,k,j)-walls(3)*muv(i,j)*walls(2)
       end do
     end do
   end do
@@ -4658,49 +4542,34 @@ else if (advective_order .le. 4) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-&
-&1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_muu(i,j) = a_muu(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+      walls(1)=8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j))
+      walls(2)=0.5*a_ph_tend(i,k,j)*rdx
+      walls(3)=walls(2)*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
+      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*walls(1)
+      a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*walls(1)
+      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*walls(2)*muu(i+1,j)*cfn1*walls(1)
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)*muu(i,j)*cfn1*walls(1)
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*cfn*walls(1)
+      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*cfn*walls(1)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i+1,k,j)+u(i+1,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_muu(i,j) = a_muu(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i,k,j)+u(i,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,&
-&k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,&
-&j)+u(i,k-1,j)))
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)&
-&+u(i,k-1,j)))
-        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)&
-&-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-&
-&2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k,j) = a_u(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,&
-&j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+        walls(2)=0.25*a_ph_tend(i,k,j)*rdx
+        walls(3)=walls(2)*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,k-1,j)))
+        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(u(i+1,k,j)+u(i+1,k-1,j))*walls(1)
+        a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(u(i,k,j)+u(i,k-1,j))*walls(1)
+        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k,j) = a_u(i,k,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
       end do
     end do
   end do
@@ -4742,49 +4611,35 @@ else if (advective_order .le. 4) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))*(8.*(ph(i,k,j+1)-ph(i,&
-&k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_muv(i,j) = a_muv(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+      walls(1)=cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1)
+      walls(2)=8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2))
+      walls(4)=0.5*a_ph_tend(i,k,j)*rdy
+      walls(3)=walls(4)*(muv(i,j+1)*walls(1)+muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
+      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(4)*walls(1)*walls(2)
+      a_muv(i,j) = a_muv(i,j)-0.083333333*walls(4)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*walls(2)
+      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(3)
+      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(3)
+      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(3)
+      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(3)
+      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn1*walls(2)
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(4)*muv(i,j)*cfn1*walls(2)
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(4)*muv(i,j)*cfn*walls(2)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j+1)+v(i,k-1,j+1))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_muv(i,j) = a_muv(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j)+v(i,k-1,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,&
-&j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,&
-&j)+v(i,k-1,j)))
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)&
-&+v(i,k-1,j)))
-        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)&
-&-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,&
-&k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j) = a_v(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-&
-&2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+        walls(3) =0.25*a_ph_tend(i,k,j)*rdy
+        walls(1)=walls(3)*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,k-1,j)))
+        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(3)*(v(i,k,j+1)+v(i,k-1,j+1))*walls(2)
+        a_muv(i,j) = a_muv(i,j)-0.083333333*walls(3)*(v(i,k,j)+v(i,k-1,j))*walls(2)
+        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(1)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(1)
+        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(1)
+        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(1)
+        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
+        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
       end do
     end do
   end do
@@ -4811,47 +4666,32 @@ else if (advective_order .le. 6) then
     do j = jtf, j_start, -1
       k = kte
 ! recompute : k
-      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-&
-&1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_muu(i,j) = a_muu(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+      walls(1)=8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j))
+      walls(2)=0.5*a_ph_tend(i,k,j)*rdx
+      walls(3)=walls(2)*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
+      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*walls(1)
+      a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*walls(1)
+      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*walls(2)*muu(i+1,j)*cfn1*walls(1)
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)*muu(i,j)*cfn1*walls(1)
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*cfn*walls(1)
+      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*cfn*walls(1)
       do k = 2, kte-1
-        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i+1,k,j)+u(i+1,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_muu(i,j) = a_muu(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i,k,j)+u(i,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,&
-&k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,&
-&j)+u(i,k-1,j)))
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)&
-&+u(i,k-1,j)))
-        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)&
-&-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-&
-&2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k,j) = a_u(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,&
-&j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+        walls(2)=0.25*a_ph_tend(i,k,j)*rdx
+        walls(3)=walls(2)*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,k-1,j)))
+        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(u(i+1,k,j)+u(i+1,k-1,j))*walls(1)
+        a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(u(i,k,j)+u(i,k-1,j))*walls(1)
+        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k,j) = a_u(i,k,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
       end do
     end do
   endif
@@ -4861,47 +4701,32 @@ else if (advective_order .le. 6) then
     do j = jtf, j_start, -1
       k = kte
 ! recompute : k
-      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-&
-&1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_muu(i,j) = a_muu(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn1*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,&
-&j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+      walls(1)=8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j))
+      walls(2)=0.5*a_ph_tend(i,k,j)*rdx
+      walls(3)=walls(2)*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
+      a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*walls(1)
+      a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*walls(1)
+      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.083333333*walls(2)*muu(i+1,j)*cfn1*walls(1)
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)*muu(i,j)*cfn1*walls(1)
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*cfn*walls(1)
+      a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*cfn*walls(1)
       do k = 2, kte-1
-        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i+1,k,j)+u(i+1,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&(ph(i+2,k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_muu(i,j) = a_muu(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(u(i,k,j)+u(i,k-1,j))*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,&
-&k,j)-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,&
-&j)+u(i,k-1,j)))
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)&
-&+u(i,k-1,j)))
-        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)&
-&-ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-&
-&2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-&
-&ph(i-2,k,j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
-        a_u(i,k,j) = a_u(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(8.*(ph(i+1,k,j)-ph(i-1,k,j))-(ph(i+2,k,j)-ph(i-2,k,&
-&j))+8.*(phb(i+1,k,j)-phb(i-1,k,j))-(phb(i+2,k,j)-phb(i-2,k,j)))
+        walls(2)=0.25*a_ph_tend(i,k,j)*rdx
+        walls(3)=walls(2)*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,k-1,j)))
+        a_muu(i+1,j) = a_muu(i+1,j)-0.083333333*walls(2)*(u(i+1,k,j)+u(i+1,k-1,j))*walls(1)
+        a_muu(i,j) = a_muu(i,j)-0.083333333*walls(2)*(u(i,k,j)+u(i,k-1,j))*walls(1)
+        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.083333333*walls(3)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.66666667)*walls(3)
+        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.083333333)*walls(3)
+        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.66666667*walls(3)
+        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k-1,j) = a_u(i,k-1,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k,j) = a_u(i,k,j)-0.083333333*walls(2)*muu(i,j)*walls(1)
       end do
     end do
   endif
@@ -4909,63 +4734,39 @@ else if (advective_order .le. 6) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muu(i+1,j) = a_muu(i+1,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*(45.*(ph(i+1,k,j)-ph(i-&
-&1,k,j))-9.*(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+&
-&phb(i+3,k,j)-phb(i-3,k,j))
-      a_muu(i,j) = a_muu(i,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&9.*(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,&
-&k,j)-phb(i-3,k,j))
-      a_ph(i-3,k,j) = a_ph(i-3,k,j)-(-0.016666667)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,&
-&j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.15*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*&
-&u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.75)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+3,k,j) = a_ph(i+3,k,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.15)*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*&
-&(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.75*0.5*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*&
-&u(i,k-1,j)+cfn1*u(i,k-2,j)))
-      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn1*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+&
-&2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-&
-&phb(i-3,k,j))
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn1*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)&
-&-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
-      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*cfn*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+&
-&2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-&
-&phb(i-3,k,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdx*muu(i,j)*cfn*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)-&
-&ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
+      walls(1)=45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j)
+      walls(2)=0.5*a_ph_tend(i,k,j)*rdx
+      walls(3)=walls(2)*(muu(i+1,j)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))+muu(i,j)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j)))
+      a_muu(i+1,j) = a_muu(i+1,j)-0.016666667*walls(2)*(cfn*u(i+1,k-1,j)+cfn1*u(i+1,k-2,j))*walls(1)
+      a_muu(i,j) = a_muu(i,j)-0.016666667*walls(2)*(cfn*u(i,k-1,j)+cfn1*u(i,k-2,j))*walls(1)
+      a_ph(i-3,k,j) = a_ph(i-3,k,j)-(-0.016666667)*walls(3)
+      a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.15*walls(3)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.75)*walls(3)
+      a_ph(i+3,k,j) = a_ph(i+3,k,j)-0.016666667*walls(3)
+      a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.15)*walls(3)
+      a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.75*walls(3)
+      a_u(i+1,k-2,j) = a_u(i+1,k-2,j)-0.016666667*walls(2)*muu(i+1,j)*cfn1*walls(1)
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.016666667*walls(2)*muu(i,j)*cfn1*walls(1)
+      a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.016666667*walls(2)*muu(i+1,j)*cfn*walls(1)
+      a_u(i,k-1,j) = a_u(i,k-1,j)-0.016666667*walls(2)*muu(i,j)*cfn*walls(1)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muu(i+1,j) = a_muu(i+1,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*(u(i+1,k,j)+u(i+1,k-1,j))*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-&
-&9.*(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+&
-&3,k,j)-phb(i-3,k,j))
-        a_muu(i,j) = a_muu(i,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*(u(i,k,j)+u(i,k-1,j))*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*&
-&(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,&
-&k,j)-phb(i-3,k,j))
-        a_ph(i-3,k,j) = a_ph(i-3,k,j)-(-0.016666667)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,&
-&k,j)+u(i,k-1,j)))
-        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.15*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,&
-&k-1,j)))
-        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.75)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+&
-&u(i,k-1,j)))
-        a_ph(i+3,k,j) = a_ph(i+3,k,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,&
-&j)+u(i,k-1,j)))
-        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.15)*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+&
-&u(i,k-1,j)))
-        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.75*0.25*a_ph_tend(i,k,j)*rdx*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,&
-&k-1,j)))
-        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,&
-&k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
-        a_u(i,k-1,j) = a_u(i,k-1,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)-&
-&ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*muu(i+1,j)*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)&
-&-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
-        a_u(i,k,j) = a_u(i,k,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdx*muu(i,j)*(45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)-ph(i-&
-&2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j))
+      walls(1)=45.*(ph(i+1,k,j)-ph(i-1,k,j))-9.*(ph(i+2,k,j)-ph(i-2,k,j))+ph(i+3,k,j)-ph(i-3,k,j)+45.*(phb(i+1,k,j)-phb(i-1,k,j))-9.*(phb(i+2,k,j)-phb(i-2,k,j))+phb(i+3,k,j)-phb(i-3,k,j)
+      walls(2)=0.25*a_ph_tend(i,k,j)*rdx
+      walls(3)=walls(2)*(muu(i+1,j)*(u(i+1,k,j)+u(i+1,k-1,j))+muu(i,j)*(u(i,k,j)+u(i,k-1,j)))
+        a_muu(i+1,j) = a_muu(i+1,j)-0.016666667*walls(2)*(u(i+1,k,j)+u(i+1,k-1,j))*walls(1)
+        a_muu(i,j) = a_muu(i,j)-0.016666667*walls(2)*(u(i,k,j)+u(i,k-1,j))*walls(1)
+        a_ph(i-3,k,j) = a_ph(i-3,k,j)-(-0.016666667)*walls(3)
+        a_ph(i-2,k,j) = a_ph(i-2,k,j)-0.15*walls(3)
+        a_ph(i-1,k,j) = a_ph(i-1,k,j)-(-0.75)*walls(3)
+        a_ph(i+3,k,j) = a_ph(i+3,k,j)-0.016666667*walls(3)
+        a_ph(i+2,k,j) = a_ph(i+2,k,j)-(-0.15)*walls(3)
+        a_ph(i+1,k,j) = a_ph(i+1,k,j)-0.75*walls(3)
+        a_u(i+1,k-1,j) = a_u(i+1,k-1,j)-0.016666667*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k-1,j) = a_u(i,k-1,j)-0.016666667*walls(2)*muu(i,j)*walls(1)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.016666667*walls(2)*muu(i+1,j)*walls(1)
+        a_u(i,k,j) = a_u(i,k,j)-0.016666667*walls(2)*muu(i,j)*walls(1)
       end do
     end do
   end do
@@ -4985,49 +4786,35 @@ else if (advective_order .le. 6) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))*(8.*(ph(i,k,j+1)-ph(i,&
-&k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_muv(i,j) = a_muv(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+      walls(1)=cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1)
+      walls(2)=8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2))
+      walls(4)=0.5*a_ph_tend(i,k,j)*rdy
+      walls(3)=walls(4)*(muv(i,j+1)*walls(1)+muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
+      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(4)*walls(1)*walls(2)
+      a_muv(i,j) = a_muv(i,j)-0.083333333*walls(4)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*walls(2)
+      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(3)
+      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(3)
+      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(3)
+      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(3)
+      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn1*walls(2)
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(4)*muv(i,j)*cfn1*walls(2)
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(4)*muv(i,j)*cfn*walls(2)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j+1)+v(i,k-1,j+1))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_muv(i,j) = a_muv(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j)+v(i,k-1,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,&
-&j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,&
-&j)+v(i,k-1,j)))
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)&
-&+v(i,k-1,j)))
-        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)&
-&-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,&
-&k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j) = a_v(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-&
-&2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+        walls(3) =0.25*a_ph_tend(i,k,j)*rdy
+        walls(1)=walls(3)*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,k-1,j)))
+        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(3)*(v(i,k,j+1)+v(i,k-1,j+1))*walls(2)
+        a_muv(i,j) = a_muv(i,j)-0.083333333*walls(3)*(v(i,k,j)+v(i,k-1,j))*walls(2)
+        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(1)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(1)
+        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(1)
+        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(1)
+        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
+        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
       end do
     end do
   endif
@@ -5047,49 +4834,35 @@ else if (advective_order .le. 6) then
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))*(8.*(ph(i,k,j+1)-ph(i,&
-&k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_muv(i,j) = a_muv(i,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn1*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+&
-&2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+      walls(1)=cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1)
+      walls(2)=8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2))
+      walls(4)=0.5*a_ph_tend(i,k,j)*rdy
+      walls(3)=walls(4)*(muv(i,j+1)*walls(1)+muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
+      a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(4)*walls(1)*walls(2)
+      a_muv(i,j) = a_muv(i,j)-0.083333333*walls(4)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*walls(2)
+      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(3)
+      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(3)
+      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(3)
+      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(3)
+      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn1*walls(2)
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(4)*muv(i,j)*cfn1*walls(2)
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(4)*muv(i,j+1)*cfn*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(4)*muv(i,j)*cfn*walls(2)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j+1)+v(i,k-1,j+1))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&(ph(i,k,j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_muv(i,j) = a_muv(i,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j)+v(i,k-1,j))*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,&
-&j+2)-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,&
-&j)+v(i,k-1,j)))
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)&
-&+v(i,k-1,j)))
-        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)&
-&-ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,&
-&k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-&
-&ph(i,k,j-2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
-        a_v(i,k,j) = a_v(i,k,j)-0.083333333*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(8.*(ph(i,k,j+1)-ph(i,k,j-1))-(ph(i,k,j+2)-ph(i,k,j-&
-&2))+8.*(phb(i,k,j+1)-phb(i,k,j-1))-(phb(i,k,j+2)-phb(i,k,j-2)))
+        walls(3) =0.25*a_ph_tend(i,k,j)*rdy
+        walls(1)=walls(3)*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,k-1,j)))
+        a_muv(i,j+1) = a_muv(i,j+1)-0.083333333*walls(3)*(v(i,k,j+1)+v(i,k-1,j+1))*walls(2)
+        a_muv(i,j) = a_muv(i,j)-0.083333333*walls(3)*(v(i,k,j)+v(i,k-1,j))*walls(2)
+        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.083333333*walls(1)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.66666667)*walls(1)
+        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.083333333)*walls(1)
+        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.66666667*walls(1)
+        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
+        a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)-0.083333333*walls(3)*muv(i,j)*walls(2)
       end do
     end do
   endif
@@ -5127,70 +4900,50 @@ else if (advective_order .le. 6) then
   if (config_flags%open_ye .or. specified) then
     jtf = min(jtf,jde-3)
   endif
+
 ! recompute vars : jtf
   do j = jtf, j_start, -1
+
     k = kte
 ! recompute : k
     do i = i_start, itf
-      a_muv(i,j+1) = a_muv(i,j+1)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))*(45.*(ph(i,k,j+1)-ph(i,&
-&k,j-1))-9.*(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+&
-&phb(i,k,j+3)-phb(i,k,j-3))
-      a_muv(i,j) = a_muv(i,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&9.*(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,&
-&j+3)-phb(i,k,j-3))
-      a_ph(i,k,j-3) = a_ph(i,k,j-3)-(-0.016666667)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,&
-&j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.15*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*(cfn*&
-&v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.75)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+3) = a_ph(i,k,j+3)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.15)*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*&
-&(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.75*0.5*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1))+muv(i,j)*(cfn*&
-&v(i,k-1,j)+cfn1*v(i,k-2,j)))
-      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn1*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,&
-&k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-&
-&phb(i,k,j-3))
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn1*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)&
-&-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
-      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*cfn*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,&
-&k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-&
-&phb(i,k,j-3))
-      a_v(i,k-1,j) = a_v(i,k-1,j)-0.016666667*0.5*a_ph_tend(i,k,j)*rdy*muv(i,j)*cfn*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)-&
-&ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
+      walls(1)=cfn*v(i,k-1,j+1)+cfn1*v(i,k-2,j+1)
+      walls(2)=45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3)
+      walls(4)=0.5*a_ph_tend(i,k,j)*rdy
+      walls(3)=walls(4)*(muv(i,j+1)*walls(1)+muv(i,j)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j)))
+      a_muv(i,j+1) = a_muv(i,j+1)-0.016666667*walls(4)*walls(1)*walls(2)
+      a_muv(i,j) = a_muv(i,j)-0.016666667*walls(4)*(cfn*v(i,k-1,j)+cfn1*v(i,k-2,j))*walls(2)
+      a_ph(i,k,j-3) = a_ph(i,k,j-3)-(-0.016666667)*walls(3)
+      a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.15*walls(3)
+      a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.75)*walls(3)
+      a_ph(i,k,j+3) = a_ph(i,k,j+3)-0.016666667*walls(3)
+      a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.15)*walls(3)
+      a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.75*walls(3)
+      a_v(i,k-2,j+1) = a_v(i,k-2,j+1)-0.016666667*walls(4)*muv(i,j+1)*cfn1*walls(2)
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.016666667*walls(4)*muv(i,j)*cfn1*walls(2)
+      a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.016666667*walls(4)*muv(i,j+1)*cfn*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)-0.016666667*walls(4)*muv(i,j)*cfn*walls(2)
     end do
     do k = 2, kte-1
       do i = i_start, itf
-        a_muv(i,j+1) = a_muv(i,j+1)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j+1)+v(i,k-1,j+1))*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-&
-&9.*(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,&
-&k,j+3)-phb(i,k,j-3))
-        a_muv(i,j) = a_muv(i,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*(v(i,k,j)+v(i,k-1,j))*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*&
-&(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,&
-&j+3)-phb(i,k,j-3))
-        a_ph(i,k,j-3) = a_ph(i,k,j-3)-(-0.016666667)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,&
-&k,j)+v(i,k-1,j)))
-        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.15*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,&
-&k-1,j)))
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.75)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+&
-&v(i,k-1,j)))
-        a_ph(i,k,j+3) = a_ph(i,k,j+3)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,&
-&j)+v(i,k-1,j)))
-        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.15)*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+&
-&v(i,k-1,j)))
-        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.75*0.25*a_ph_tend(i,k,j)*rdy*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,&
-&k-1,j)))
-        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,&
-&j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
-        a_v(i,k-1,j) = a_v(i,k-1,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)-&
-&ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j+1)*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)&
-&-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
-        a_v(i,k,j) = a_v(i,k,j)-0.016666667*0.25*a_ph_tend(i,k,j)*rdy*muv(i,j)*(45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)-ph(i,&
-&k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3))
+      walls(2)=45.*(ph(i,k,j+1)-ph(i,k,j-1))-9.*(ph(i,k,j+2)-ph(i,k,j-2))+ph(i,k,j+3)-ph(i,k,j-3)+45.*(phb(i,k,j+1)-phb(i,k,j-1))-9.*(phb(i,k,j+2)-phb(i,k,j-2))+phb(i,k,j+3)-phb(i,k,j-3)
+        walls(3) =0.25*a_ph_tend(i,k,j)*rdy
+        walls(1)=walls(3)*(muv(i,j+1)*(v(i,k,j+1)+v(i,k-1,j+1))+muv(i,j)*(v(i,k,j)+v(i,k-1,j)))
+        a_muv(i,j+1) = a_muv(i,j+1)-0.016666667*walls(3)*(v(i,k,j+1)+v(i,k-1,j+1))*walls(2)
+        a_muv(i,j) = a_muv(i,j)-0.016666667*walls(3)*(v(i,k,j)+v(i,k-1,j))*walls(2)
+        a_ph(i,k,j-3) = a_ph(i,k,j-3)-(-0.016666667)*walls(1)
+        a_ph(i,k,j-2) = a_ph(i,k,j-2)-0.15*walls(1)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-(-0.75)*walls(1)
+        a_ph(i,k,j+3) = a_ph(i,k,j+3)-0.016666667*walls(1)
+        a_ph(i,k,j+2) = a_ph(i,k,j+2)-(-0.15)*walls(1)
+        a_ph(i,k,j+1) = a_ph(i,k,j+1)-0.75*walls(1)
+        a_v(i,k-1,j+1) = a_v(i,k-1,j+1)-0.016666667*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)-0.016666667*walls(3)*muv(i,j)*walls(2)
+        a_v(i,k,j+1) = a_v(i,k,j+1)-0.016666667*walls(3)*muv(i,j+1)*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)-0.016666667*walls(3)*muv(i,j)*walls(2)
       end do
     end do
+
   end do
 endif
 ! recdepend vars : ide,ite
@@ -5211,9 +4964,7 @@ if (non_hydrostatic) then
         a_w(i,k,j) = a_w(i,k,j)+a_ph_tend(i,k,j)*(mut(i,j)*g/msft(i,j))
       end do
     end do
-    do i = its, itf
-      a_ph_tend(i,kde,j) = 0.
-    end do
+    a_ph_tend(its:itf,kde,j) = 0.
   end do
 endif
 ! recdepend vars : ide,ite
@@ -5228,10 +4979,12 @@ jtf = min(jte,jde-1)
 ! recompute vars : jtf
 do j = jts, jtf
   do k = 2, kte-1
-    do i = its, itf
-      a_wdwn(i,k+1) = a_wdwn(i,k+1)-a_ph_tend(i,k,j)*fnm(k)
-      a_wdwn(i,k) = a_wdwn(i,k)-a_ph_tend(i,k,j)*fnp(k)
-    end do
+!   do i = its, itf
+!     a_wdwn(i,k+1) = a_wdwn(i,k+1)-a_ph_tend(i,k,j)*fnm(k)
+!     a_wdwn(i,k) = a_wdwn(i,k)-a_ph_tend(i,k,j)*fnp(k)
+!   end do
+    a_wdwn(its:itf,k+1) = a_wdwn(its:itf,k+1)-a_ph_tend(its:itf,k,j)*fnm(k)
+    a_wdwn(its:itf,k) = a_wdwn(its:itf,k)-a_ph_tend(its:itf,k,j)*fnp(k)
   end do
   do k = 2, kte
     do i = its, itf
@@ -5239,9 +4992,9 @@ do j = jts, jtf
       a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_wdwn(i,k)*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)
       a_ww(i,k-1,j) = a_ww(i,k-1,j)+0.5*a_wdwn(i,k)*rdnw(k-1)*(ph(i,k,j)-ph(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
       a_ww(i,k,j) = a_ww(i,k,j)+0.5*a_wdwn(i,k)*rdnw(k-1)*(ph(i,k,j)-ph(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
-      a_wdwn(i,k) = 0.
     end do
   end do
+  a_wdwn(its:itf,2:kte) = 0.
 end do
 
    call trace_exit("a_rhs_ph")
@@ -6107,13 +5860,16 @@ integer k
 !----------------------------------------------
 ! TBH:  Fill in halos since we know what they must be to avoid 
 ! TBH:  halo updates.  
-do j = jms, jme
-  do k = kms, kme
-    do i = ims, ime
-      a_tendency(i,k,j) = 0.
-    end do
-  end do
-end do
+
+!do j = jms, jme
+!  do k = kms, kme
+!    do i = ims, ime
+!      a_tendency(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+
+a_tendency(ims:ime,kms:kme,jms:jme) = 0.
 
 end subroutine a_zero_tend
 

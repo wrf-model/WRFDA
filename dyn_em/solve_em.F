@@ -42,6 +42,10 @@ SUBROUTINE solve_em ( grid , config_flags , &
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
+
    !  Input data.
 
    TYPE(domain) , TARGET          :: grid
@@ -84,6 +88,11 @@ SUBROUTINE solve_em ( grid , config_flags , &
    INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
+
+Double Precision, Save :: TimeStart,TimeEnd,TotalNoN
+Integer , Save :: NumberofNoN
+Data NumberofNoN/0/
+Data TotalNoN /0./
 
 ! Define benchmarking timers if -DBENCH is compiled
 #include <bench_solve_em_def.h>
@@ -156,6 +165,8 @@ SUBROUTINE solve_em ( grid , config_flags , &
 #include <bench_solve_em_init.h>
 #include <em_i1_init.inc>
 
+TimeStart=MPI_Wtime()
+
    if(grid%trace_use) call trace_entry("solve_em")
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
@@ -214,6 +225,9 @@ SUBROUTINE solve_em ( grid , config_flags , &
 !    prepare chem aerosols for advection before communication
 !    so far only for RADM2/SORGAM choice
 !
+
+!  Print*, 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+!  Stop
 
    kte=min(k_end,kde-1)
 !
@@ -408,6 +422,7 @@ BENCH_END(step_prep_tim)
 
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
 
+!WALLS_001
 BENCH_START(set_phys_bc_tim)
    if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
@@ -2836,6 +2851,13 @@ BENCH_END(bc_2d_tim)
 #include <em_scalar_derefs.inc>
 
    if(grid%trace_use) call trace_exit("solve_em")
+
+TimeEnd=MPI_Wtime()
+NumberofNoN=NumberofNoN+1
+TotalNoN=TotalNoN+(TimeEnd-TimeStart)
+Print*, ''
+Print*, 'NumberofNoN=',NumberofNoN,'TotalNoN=%',TotalNoN,'AverageNoN=',TotalNoN/DBLE(NumberofNoN)
+Print*, ''
 
    RETURN
 

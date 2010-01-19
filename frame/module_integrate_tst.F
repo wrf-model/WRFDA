@@ -294,7 +294,9 @@ real                                     :: dtbc_save
 
    CALL wrf_message( '-------------- Tangent-linear model ---------------' )
    model_config_rec%dyn_opt = DYN_EM_TL
+!Print*, 'CALLING integrate_tl rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
    CALL integrate_tl ( grid, nl_date_string, nl_date_index )
+!Print*, 'CALLING integrate_tl sssssssssssssssssssssssssssssssssssssssssssssssssssssssss'
 
    grid%em_g_z=0.; grid%em_g_mudf=0.
 
@@ -677,7 +679,11 @@ real                                     :: dtbc_save
 
    CALL wrf_message( '-------------- Adjoint-linear model ---------------' )
    model_config_rec%dyn_opt = DYN_EM_AD
+
+!ADDED BY WALLS, Nov 24, 2009
+Print*, 'CALLING integrate_ad yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
    CALL integrate_ad ( grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
+Print*, 'CALLING integrate_ad zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'
 
    VAL_A=0.0
 

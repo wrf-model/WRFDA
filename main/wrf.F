@@ -18,6 +18,7 @@ PROGRAM wrf
 !</DESCRIPTION>
 
    IMPLICIT NONE
+   INCLUDE 'mpif.h'
 
    TYPE(ESMF_GridComp) :: gcomp
    TYPE(ESMF_State)    :: importState, exportState
@@ -27,6 +28,11 @@ PROGRAM wrf
 
    LOGICAL, EXTERNAL :: await_next
    INTEGER comm
+
+Double Precision, Save :: TimeStart,TimeEnd,TotalWRFPLUS
+Integer , Save :: NumberofWRFPLUS
+Data NumberofWRFPLUS/0/
+Data TotalWRFPLUS /0./
 
    ! This call includes everything that must be done before ESMF_Initialize() 
    ! is called.  
@@ -48,6 +54,7 @@ PROGRAM wrf
 
    call trace_init
    call trace_entry("wrf")
+TimeStart=MPI_Wtime()
 
 #ifdef DM_PARALLEL
 #ifndef STAND_ALONE
@@ -69,6 +76,13 @@ PROGRAM wrf
    ENDDO
 #endif
 #endif
+
+TimeEnd=MPI_Wtime()
+NumberofWRFPLUS=NumberofWRFPLUS+1
+TotalWRFPLUS=TotalWRFPLUS+(TimeEnd-TimeStart)
+Print*, ''
+Print*, 'NumberofWRFPLUS=',NumberofWRFPLUS,'TotalWRFPLUS=%',TotalWRFPLUS,'AverageWRFPLUS=',TotalWRFPLUS/DBLE(NumberofWRFPLUS)
+Print*, ''
 
 #ifdef DM_PARALLEL
 #ifndef DISK_IO

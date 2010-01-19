@@ -3496,6 +3496,7 @@ SUBROUTINE advect_scalar   ( field, field_old, tendency,    &
         DO i = i_start, i_end
           mrdx=msft(i,j)*rdx
           tendency(i,k,j) = tendency(i,k,j) - mrdx*(fqx(i+1,k)-fqx(i,k))
+! XXXXXXXXXXXXXXXXXXXXXXX
         ENDDO
         ENDDO
 

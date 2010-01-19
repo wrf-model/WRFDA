@@ -301,6 +301,12 @@ CONTAINS
 
    CALL wrf_debug ( 100 , 'wrf: calling integrate' )
 
+!ADDED BY WALLS, Nov 24, 2009
+!Print*, 'CALLING integrate_tst xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+!CALL integrate_tst ( head_grid )
+!Print*, 'CALLING integrate_tst yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
+!Stop
+
    IF ( config_flags%dyn_opt == DYN_EM ) THEN
       CALL integrate ( head_grid )
    ELSE IF ( config_flags%dyn_opt == DYN_EM_SN ) THEN

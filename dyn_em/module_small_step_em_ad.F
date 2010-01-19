@@ -121,6 +121,7 @@ real, intent(in) :: v(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: v_1(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: ww(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: ww_1(ims:ime,kms:kme,jms:jme)
+real gwalls(ims:ime),walls(3)
 
 !==============================================
 ! declare local variables
@@ -166,9 +167,9 @@ kpe = kte
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_dmdt(:) = 0.
-a_dvdxi(:,:) = 0.
-a_wdtn(:,:) = 0.
+!a_dvdxi(:,:) = 0.
+!a_wdtn(:,:)  = 0.
+a_dmdt(:)    = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -216,124 +217,208 @@ if ((config_flags%specified .or. config_flags%nested) .and. jte .eq. jde) then
 else
   j_end = j_end+1
 endif
+
+!a_dvdxi(:,kts:1) = 0.
+a_dvdxi(:,k_end:kte) = 0.
+
 ! recompute : j_end
 #ifdef DM_PARALLEL
 !xinzhang parallel tuning
 #include "HALO_ADJ_ADVANCE_MU_T.inc" 
 #endif
+!!!do j = j_start, j_end
+!!!! do i = i_start, i_end
+!!!!   dmdt(i) = 0.
+!!!! end do
+!!!  dmdt(i_start:i_end) = 0.
+
+!!!  do k = k_start, k_end
+!!!!   walls(1)=dnw(k)
+!!!    do i = i_start, i_end
+!!!      dvdxi(i,k) = msft(i,j)*msft(i,j)*(rdy*(v(i,k,j+1)+muv(i,j+1)*v_1(i,k,j+1)/msfv(i,j+1)-(v(i,k,j)+muv(i,j)*v_1(i,k,j)/msfv(i,j)&
+!!!&))+rdx*(u(i+1,k,j)+muu(i+1,j)*u_1(i+1,k,j)/msfu(i+1,j)-(u(i,k,j)+muu(i,j)*u_1(i,k,j)/msfu(i,j))))
+!!!!     dmdt(i) = dmdt(i)+walls(1)*dvdxi(i,k)
+!!!    end do
+!!!    dmdt(i_start:i_end) = dmdt(i_start:i_end)+dnw(k)*dvdxi(i_start:i_end,k)
+!!!  end do
+!!!  do k = 2, k_end
+!!!    walls(1)=dnw(k-1)
+!!!    do i = i_start, i_end
+!!!      ww(i,k,j) = ww(i,k-1,j)-walls(1)*(dmdt(i)+dvdxi(i,k-1)+mu_tend(i,j))/msft(i,j)
+!!!    end do
+!!!  end do
+!!!! do k = 1, k_end
+!!!!   do i = i_start, i_end
+!!!!     ww(i,k,j) = ww(i,k,j)-ww_1(i,k,j)
+!!!!   end do
+!!!! end do
+!!!  ww(i_start:i_end,1:k_end,j) =ww(i_start:i_end,1:k_end,j)-ww_1(i_start:i_end,1:k_end,j)
+!!!end do
+!!!! recompute : ww
+
+!print*, i_start, i_end, j_start, j_end
+!print*, ims,ime,jms,jme
+!!real, intent(in) :: msfv(ims:ime,jms:jme)
+
 do j = j_start, j_end
-  do i = i_start, i_end
-    dmdt(i) = 0.
-  end do
-  do k = k_start, k_end
-    do i = i_start, i_end
-      dvdxi(i,k) = msft(i,j)*msft(i,j)*(rdy*(v(i,k,j+1)+muv(i,j+1)*v_1(i,k,j+1)/msfv(i,j+1)-(v(i,k,j)+muv(i,j)*v_1(i,k,j)/msfv(i,j)&
-&))+rdx*(u(i+1,k,j)+muu(i+1,j)*u_1(i+1,k,j)/msfu(i+1,j)-(u(i,k,j)+muu(i,j)*u_1(i,k,j)/msfu(i,j))))
-      dmdt(i) = dmdt(i)+dnw(k)*dvdxi(i,k)
-    end do
-  end do
-  do k = 2, k_end
-    do i = i_start, i_end
-      ww(i,k,j) = ww(i,k-1,j)-dnw(k-1)*(dmdt(i)+dvdxi(i,k-1)+mu_tend(i,j))/msft(i,j)
-    end do
-  end do
+  a_wdtn(:,:)  = 0.
   do k = 1, k_end
+    walls(2)=rdnw(k)
     do i = i_start, i_end
-      ww(i,k,j) = ww(i,k,j)-ww_1(i,k,j)
+      gwalls(i)=0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)
+    end do
+    do i = i_start, i_end
+      walls(3)=a_t(i,k,j)*dts*msft(i,j)*walls(2)
+      a_wdtn(i,k+1)  = a_wdtn(i,k+1)-walls(3)
+      a_wdtn(i,k)    = a_wdtn(i,k)+walls(3)
+      a_t_1(i,k,j-1) = a_t_1(i,k,j-1)+gwalls(i)*rdy*v(i,k,j)
+      a_t_1(i,k,j+1) = a_t_1(i,k,j+1)-gwalls(i)*rdy*v(i,k,j+1)
+      a_t_1(i-1,k,j) = a_t_1(i-1,k,j)+gwalls(i)*rdx*u(i,k,j)
+      a_t_1(i+1,k,j) = a_t_1(i+1,k,j)-gwalls(i)*rdx*u(i+1,k,j)
+      a_t_1(i,k,j) = a_t_1(i,k,j)-gwalls(i)*(rdy*(v(i,k,j+1)-v(i,k,j))+rdx*(u(i+1,k,j)-u(i,k,j)))
+    end do
+    do i = i_start, i_end
+      a_u(i+1,k,j) = a_u(i+1,k,j)-gwalls(i)*rdx*(t_1(i+1,k,j)+t_1(i,k,j))
+      a_u(i,k,j) = a_u(i,k,j)+gwalls(i)*rdx*(t_1(i,k,j)+t_1(i-1,k,j))
+      a_v(i,k,j+1) = a_v(i,k,j+1)-gwalls(i)*rdy*(t_1(i,k,j+1)+t_1(i,k,j))
+      a_v(i,k,j) = a_v(i,k,j)+gwalls(i)*rdy*(t_1(i,k,j)+t_1(i,k,j-1))
     end do
   end do
-end do
-! recompute : ww
-do j = j_start, j_end
-  do k = 1, k_end
-    do i = i_start, i_end
-      a_t_1(i,k,j-1) = a_t_1(i,k,j-1)+0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdy*v(i,k,j)
-      a_t_1(i,k,j+1) = a_t_1(i,k,j+1)-0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdy*v(i,k,j+1)
-      a_t_1(i-1,k,j) = a_t_1(i-1,k,j)+0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdx*u(i,k,j)
-      a_t_1(i+1,k,j) = a_t_1(i+1,k,j)-0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdx*u(i+1,k,j)
-      a_t_1(i,k,j) = a_t_1(i,k,j)-a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*(0.5*rdy*(v(i,k,j+1)-v(i,k,j))+0.5*rdx*(u(i+1,k,j)-u(i,k,j)))
-      a_u(i+1,k,j) = a_u(i+1,k,j)-0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdx*(t_1(i+1,k,j)+t_1(i,k,j))
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdx*(t_1(i,k,j)+t_1(i-1,k,j))
-      a_v(i,k,j+1) = a_v(i,k,j+1)-0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdy*(t_1(i,k,j+1)+t_1(i,k,j))
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_t(i,k,j)*dts*msft(i,j)*msft(i,j)*rdy*(t_1(i,k,j)+t_1(i,k,j-1))
-      a_wdtn(i,k+1) = a_wdtn(i,k+1)-a_t(i,k,j)*dts*msft(i,j)*rdnw(k)
-      a_wdtn(i,k) = a_wdtn(i,k)+a_t(i,k,j)*dts*msft(i,j)*rdnw(k)
-    end do
-  end do
+
   do k = 2, k_end
+    walls(1)=fnp(k); walls(2)=fnm(k)
+    gwalls(i_start:i_end)=walls(2)*t_1(i_start:i_end,k,j)+walls(1)*t_1(i_start:i_end,k-1,j)
     do i = i_start, i_end
-      a_t_1(i,k-1,j) = a_t_1(i,k-1,j)+a_wdtn(i,k)*ww(i,k,j)*fnp(k)
-      a_t_1(i,k,j) = a_t_1(i,k,j)+a_wdtn(i,k)*ww(i,k,j)*fnm(k)
-      a_ww(i,k,j) = a_ww(i,k,j)+a_wdtn(i,k)*(fnm(k)*t_1(i,k,j)+fnp(k)*t_1(i,k-1,j))
-      a_wdtn(i,k) = 0.
+      a_t_1(i,k-1,j) = a_t_1(i,k-1,j)+a_wdtn(i,k)*ww(i,k,j)*walls(1)
+      a_t_1(i,k,j)   = a_t_1(i,k,j)  +a_wdtn(i,k)*ww(i,k,j)*walls(2)
+      a_ww(i,k,j)    = a_ww(i,k,j)   +a_wdtn(i,k)*gwalls(i)
+!     a_wdtn(i,k)    = 0.
     end do
+!   a_wdtn(i_start:i_end,k)    = 0.
   end do
-  do i = i_start, i_end
-    a_wdtn(i,kde) = 0.
-    a_wdtn(i,1) = 0.
-  end do
+
+! do i = i_start, i_end
+!   a_wdtn(i,kde) = 0.
+!   a_wdtn(i,1)   = 0.
+! end do
+! a_wdtn(i_start:i_end,kde) = 0.
+! a_wdtn(i_start:i_end,1)   = 0.
 end do
+
 
 do j = j_start, j_end
   do k = 1, k_end
     do i = i_start, i_end
       a_ft(i,k,j) = a_ft(i,k,j)+a_t(i,k,j)*msft(i,j)*dts
-      a_t(i,k,j) = a_t(i,k,j)+a_t_ave(i,k,j)
-      a_t_ave(i,k,j) = 0.
+!     a_t_ave(i,k,j) = 0.
     end do
   end do
 end do
+a_t(i_start:i_end,1:k_end,j_start:j_end)=a_t(i_start:i_end,1:k_end,j_start:j_end)+a_t_ave(i_start:i_end,1:k_end,j_start:j_end)
+a_t_ave(i_start:i_end,1:k_end,j_start:j_end) = 0.
+
+
+!print*, 'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR'
+
 do j = j_start, j_end
-  do k = 1, k_end
-    do i = i_start, i_end
-      a_ww_1(i,k,j) = a_ww_1(i,k,j)-a_ww(i,k,j)
-    end do
-  end do
+! do k = 1, k_end
+!   do i = i_start, i_end
+!     a_ww_1(i,k,j) = a_ww_1(i,k,j)-a_ww(i,k,j)
+!   end do
+! end do
+  a_ww_1(i_start:i_end,1:k_end,j) =a_ww_1(i_start:i_end,1:k_end,j)-a_ww(i_start:i_end,1:k_end,j)
+
   do k = k_end, 2, -1
+    walls(1)=dnw(k-1)
     do i = i_start, i_end
-      a_dmdt(i) = a_dmdt(i)-a_ww(i,k,j)*(dnw(k-1)/msft(i,j))
-      a_dvdxi(i,k-1) = a_dvdxi(i,k-1)-a_ww(i,k,j)*(dnw(k-1)/msft(i,j))
-      a_mu_tend(i,j) = a_mu_tend(i,j)-a_ww(i,k,j)*(dnw(k-1)/msft(i,j))
-      a_ww(i,k-1,j) = a_ww(i,k-1,j)+a_ww(i,k,j)
-      a_ww(i,k,j) = 0.
+      walls(2)=a_ww(i,k,j)*(walls(1)/msft(i,j))
+      a_dmdt(i) = a_dmdt(i)-walls(2)
+!     a_dvdxi(i,k-1) = a_dvdxi(i,k-1)-walls(2)
+      a_dvdxi(i,k-1) = -walls(2)
+      a_mu_tend(i,j) = a_mu_tend(i,j)-walls(2)
+      a_ww(i,k-1,j)  = a_ww(i,k-1,j)+a_ww(i,k,j)
+!     a_ww(i,k,j)    = 0.
     end do
+    a_ww(i_start:i_end,k,j) = 0.
   end do
+
+  walls(1)=0.5*(1+epssm)
+  walls(2)=0.5*(1.-epssm)
   do i = i_start, i_end
-    a_mu(i,j) = a_mu(i,j)+0.5*a_muave(i,j)*(1+epssm)
-    a_muave(i,j) = 0.5*a_muave(i,j)*(1.-epssm)
+    a_mu(i,j) = a_mu(i,j)+walls(1)*a_muave(i,j)
+    a_muave(i,j) = walls(2)*a_muave(i,j)
     a_mu(i,j) = a_mu(i,j)+a_muts(i,j)
     a_mut(i,j) = a_mut(i,j)+a_muts(i,j)
-    a_muts(i,j) = 0.
     a_dmdt(i) = a_dmdt(i)+a_mudf(i,j)
     a_mu_tend(i,j) = a_mu_tend(i,j)+a_mudf(i,j)
-    a_mudf(i,j) = 0.
     a_dmdt(i) = a_dmdt(i)+a_mu(i,j)*dts
     a_mu_tend(i,j) = a_mu_tend(i,j)+a_mu(i,j)*dts
     a_mu(i,j) = a_mu(i,j)+a_muave(i,j)
-    a_muave(i,j) = 0.
   end do
+
+! a_mu(i_start:i_end,j) = a_mu(i_start:i_end,j)+0.5*(1+epssm)*a_muave(i_start:i_end,j)
+! a_muave(i_start:i_end,j) = 0.5*(1.-epssm)*a_muave(i_start:i_end,j)
+! a_mu(i_start:i_end,j) = a_mu(i_start:i_end,j)+a_muts(i_start:i_end,j)
+! a_mut(i_start:i_end,j) = a_mut(i_start:i_end,j)+a_muts(i_start:i_end,j)
+! a_dmdt(i_start:i_end) = a_dmdt(i_start:i_end)+a_mudf(i_start:i_end,j)
+! a_mu_tend(i_start:i_end,j) = a_mu_tend(i_start:i_end,j)+a_mudf(i_start:i_end,j)
+! a_dmdt(i_start:i_end) = a_dmdt(i_start:i_end)+a_mu(i_start:i_end,j)*dts
+! a_mu_tend(i_start:i_end,j) = a_mu_tend(i_start:i_end,j)+a_mu(i_start:i_end,j)*dts
+! a_mu(i_start:i_end,j) = a_mu(i_start:i_end,j)+a_muave(i_start:i_end,j)
+
+  a_muts(i_start:i_end,j) = 0.
+  a_muave(i_start:i_end,j)= 0.
+  a_mudf(i_start:i_end,j) = 0.
+
   do k = k_end, k_start, -1
+    walls(1)=dnw(k)
     do i = i_start, i_end
-      a_dvdxi(i,k) = a_dvdxi(i,k)+a_dmdt(i)*dnw(k)
-      a_muu(i+1,j) = a_muu(i+1,j)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx*(u_1(i+1,k,j)/msfu(i+1,j))
-      a_muu(i,j) = a_muu(i,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx*(u_1(i,k,j)/msfu(i,j))
-      a_muv(i,j+1) = a_muv(i,j+1)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy*(v_1(i,k,j+1)/msfv(i,j+1))
-      a_muv(i,j) = a_muv(i,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy*(v_1(i,k,j)/msfv(i,j))
-      a_u(i+1,k,j) = a_u(i+1,k,j)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx
-      a_u(i,k,j) = a_u(i,k,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx
-      a_u_1(i+1,k,j) = a_u_1(i+1,k,j)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx*(muu(i+1,j)/msfu(i+1,j))
-      a_u_1(i,k,j) = a_u_1(i,k,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdx*(muu(i,j)/msfu(i,j))
-      a_v(i,k,j+1) = a_v(i,k,j+1)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy
-      a_v(i,k,j) = a_v(i,k,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy
-      a_v_1(i,k,j+1) = a_v_1(i,k,j+1)+a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy*(muv(i,j+1)/msfv(i,j+1))
-      a_v_1(i,k,j) = a_v_1(i,k,j)-a_dvdxi(i,k)*msft(i,j)*msft(i,j)*rdy*(muv(i,j)/msfv(i,j))
-      a_dvdxi(i,k) = 0.
+      gwalls(i)=(a_dvdxi(i,k)+a_dmdt(i)*walls(1))*msft(i,j)*msft(i,j)
     end do
+    do i = i_start, i_end
+      walls(1)=gwalls(i)*rdx
+      walls(2)=gwalls(i)*rdy
+
+!     print*, msfu(i+1,j),msfv(i,j+1)
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+
+      IF(msfu(i+1,j).NE.0.0) THEN   !ADDED BY WALLS
+      a_muu(i+1,j) = a_muu(i+1,j)+walls(1)*(u_1(i+1,k,j)/msfu(i+1,j))
+      a_u_1(i+1,k,j) = a_u_1(i+1,k,j)+walls(1)*(muu(i+1,j)/msfu(i+1,j))
+      END IF   !ADDED BY WALLS
+
+      a_muu(i,j)   = a_muu(i,j)-walls(1)*(u_1(i,k,j)/msfu(i,j))
+      a_u_1(i,k,j) = a_u_1(i,k,j)-walls(1)*(muu(i,j)/msfu(i,j))
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+      IF(msfv(i,j+1).NE.0.0) THEN   !ADDED BY WALLS
+      a_muv(i,j+1) = a_muv(i,j+1)+walls(2)*(v_1(i,k,j+1)/msfv(i,j+1))
+      a_v_1(i,k,j+1) = a_v_1(i,k,j+1)+walls(2)*(muv(i,j+1)/msfv(i,j+1))
+      END IF   !ADDED BY WALLS
+
+      a_u(i+1,k,j) = a_u(i+1,k,j)+walls(1)
+      a_u(i,k,j)   = a_u(i,k,j)-walls(1)
+      a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)
+      a_v(i,k,j)   = a_v(i,k,j)-walls(2)
+      a_v_1(i,k,j)   = a_v_1(i,k,j)-walls(2)*(muv(i,j)/msfv(i,j))
+      a_muv(i,j)   = a_muv(i,j)-walls(2)*(v_1(i,k,j)/msfv(i,j))
+    end do
+!   a_dvdxi(i_start:i_end,k) = 0.
+!A12
   end do
-  do i = i_start, i_end
-    a_dmdt(i) = 0.
-  end do
+! do i = i_start, i_end
+!   a_dmdt(i) = 0.
+! end do
+  a_dmdt(i_start:i_end) = 0.
 end do
+
+!print*, '0000000000000000000000000000000000000000000'
+!print*, 'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR'
 
    call trace_exit("a_advance_mu_t")
 
@@ -413,6 +498,9 @@ real, intent(in) :: rdnw(kms:kme)
 real, intent(in) :: rdx
 real, intent(in) :: rdy
 integer, intent(in) :: spec_zone
+real walls(5)
+real gwalls(ims:ime,kms:kme)
+real kwalls(ims:ime,kms:kme)
 
 !==============================================
 ! declare local variables
@@ -430,6 +518,13 @@ real a_mudf_xy(its:ite)
 real dpn(its:ite,kts:kte)
 real dpxy(its:ite,kts:kte)
 #endif
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+real keep_ph1(its-1:ite+1,kts-1:kte+1)   !REVISED BY WALLS
+real keep_ph2(its-1:ite+1,kts-1:kte+1)   !REVISED BY WALLS
+real keep_pb1(its-1:ite+1,kts-1:kte+1)   !REVISED BY WALLS
+real keep_alt1(its-1:ite+1,kts-1:kte+1)  !REVISED BY WALLS
 real dx
 real dy
 integer i
@@ -470,7 +565,7 @@ kds = kts
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
 a_dpn(:,:) = 0.
-a_dpxy(:,:) = 0.
+!a_dpxy(:,:) = 0.
 a_mudf_xy(:) = 0.
 
 !----------------------------------------------
@@ -552,28 +647,49 @@ dx = 1./rdx
 ! recompute : dx
 dy = 1./rdy
 ! recompute : dy
+
 a_v_outer_j_loop: do j = j_endv_parallel, j_start, -1
-  if (j .ge. j_start_vp .and. j .le. j_end_vp_parallel) then
+  if (j .ge. j_start_vp .and. j .le. j_end_vp_parallel) then   !AAA-IF-START
+
+! keep_ph1(i,k)=ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)
+  keep_ph1(i_start_up:i_end_up_parallel,k_start:k_end)=ph(i_start_up:i_end_up_parallel,k_start+1:k_end+1,j)&
+&-ph(i_start_up:i_end_up_parallel,k_start+1:k_end+1,j-1)+ph(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&-ph(i_start_up:i_end_up_parallel,k_start:k_end,j-1)
+  keep_pb1(i_start_up:i_end_up_parallel,k_start:k_end)=pb(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&-pb(i_start_up:i_end_up_parallel,k_start:k_end,j-1)
+  keep_alt1(i_start_up:i_end_up_parallel,k_start:k_end)=alt(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&+alt(i_start_up:i_end_up_parallel,k_start:k_end,j-1)
+
+    kwalls(i_start_up:i_end_up_parallel,k_start:k_end)=p(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&-p(i_start_up:i_end_up_parallel,k_start:k_end,j-1)
+    gwalls(i_start_up:i_end_up_parallel,k_start:k_end)=al(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&+al(i_start_up:i_end_up_parallel,k_start:k_end,j-1)
+
     do k = k_start, k_end
       do i = i_start, i_end_parallel
-        dpxy(i,k) = 0.5*rdy*muv(i,j)*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*(p(i,k,j)-p(i,k,j-&
-&1))+(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
+        dpxy(i,k) = 0.5*rdy*muv(i,j)*(keep_ph1(i,k)+keep_alt1(i,k)*kwalls(i,k)+gwalls(i,k)*keep_pb1(i,k))
       end do
     end do
 ! recompute : dpxy
     if (non_hydrostatic) then
-      do i = i_start, i_end_parallel
-        dpn(i,1) = 0.5*(cf1*(p(i,1,j)+p(i,1,j-1))+cf2*(p(i,2,j)+p(i,2,j-1))+cf3*(p(i,3,j)+p(i,3,j-1)))
-        dpn(i,kde) = 0.
-      end do
+!     do i = i_start, i_end_parallel
+!       dpn(i,1) = 0.5*(cf1*(p(i,1,j)+p(i,1,j-1))+cf2*(p(i,2,j)+p(i,2,j-1))+cf3*(p(i,3,j)+p(i,3,j-1)))
+!     end do
+      dpn(i_start:i_end_parallel,1) = 0.5*(cf1*(p(i_start:i_end_parallel,1,j)+p(i_start:i_end_parallel,1,j-1))&
+&+cf2*(p(i_start:i_end_parallel,2,j)+p(i_start:i_end_parallel,2,j-1))+cf3*(p(i_start:i_end_parallel,3,j)&
+&+p(i_start:i_end_parallel,3,j-1)))
+      dpn(i_start:i_end_parallel,kde) = 0.
       do k = k_start+1, k_end
-        do i = i_start, i_end_parallel
-          dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j)+p(i,k,j-1))+fnp(k)*(p(i,k-1,j)+p(i,k-1,j-1)))
-        end do
+!       do i = i_start, i_end_parallel
+!         dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j)+p(i,k,j-1))+fnp(k)*(p(i,k-1,j)+p(i,k-1,j-1)))
+!       end do
+        dpn(i_start:i_end_parallel,k) = 0.5*(fnm(k)*(p(i_start:i_end_parallel,k,j)+p(i_start:i_end_parallel,k,j-1))&
+&+fnp(k)*(p(i_start:i_end_parallel,k-1,j)+p(i_start:i_end_parallel,k-1,j-1)))
       end do
       do k = k_start, k_end
+        walls(1)=rdnw(k)
         do i = i_start, i_end_parallel
-          dpxy(i,k) = dpxy(i,k)+rdy*(php(i,k,j)-php(i,k,j-1))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
+          dpxy(i,k) = dpxy(i,k)+rdy*(php(i,k,j)-php(i,k,j-1))*(walls(1)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
         end do
       end do
     endif
@@ -581,76 +697,99 @@ a_v_outer_j_loop: do j = j_endv_parallel, j_start, -1
     do k = k_start, k_end
       do i = i_start, i_end_parallel
         a_cqv(i,k,j) = a_cqv(i,k,j)-a_v(i,k,j)*dts*dpxy(i,k)
-        a_dpxy(i,k) = a_dpxy(i,k)-a_v(i,k,j)*dts*cqv(i,k,j)
-        a_mudf_xy(i) = a_mudf_xy(i)+a_v(i,k,j)
+!       a_dpxy(i,k)  = a_dpxy(i,k)-a_v(i,k,j)*dts*cqv(i,k,j)
+        a_dpxy(i,k)  = -a_v(i,k,j)*dts*cqv(i,k,j)
       end do
+      a_mudf_xy(i_start:i_end_parallel) = a_mudf_xy(i_start:i_end_parallel)+a_v(i_start:i_end_parallel,k,j)
     end do
     if (non_hydrostatic) then
 ! recompute : dpn
       do k = k_start, k_end
+        walls(2)=rdnw(k)
         do i = i_start, i_end_parallel
-          a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
-          a_dpn(i,k) = a_dpn(i,k)-a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))*rdnw(k)
-          a_mu(i,j-1) = a_mu(i,j-1)-0.5*a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))
-          a_mu(i,j) = a_mu(i,j)-0.5*a_dpxy(i,k)*rdy*(php(i,k,j)-php(i,k,j-1))
-          a_php(i,k,j-1) = a_php(i,k,j-1)-a_dpxy(i,k)*rdy*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
-          a_php(i,k,j) = a_php(i,k,j)+a_dpxy(i,k)*rdy*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
+          walls(1)=a_dpxy(i,k)*rdy
+          walls(3)=walls(1)*(php(i,k,j)-php(i,k,j-1))
+          a_dpn(i,k+1) = a_dpn(i,k+1)+walls(3)*walls(2)
+          a_dpn(i,k) = a_dpn(i,k)-walls(3)*walls(2)
+          a_mu(i,j-1) = a_mu(i,j-1)-0.5*walls(3)
+          a_mu(i,j) = a_mu(i,j)-0.5*walls(3)
+          walls(3)=walls(1)*(walls(2)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i,j-1)+mu(i,j)))
+          a_php(i,k,j-1) = a_php(i,k,j-1)-walls(3)
+          a_php(i,k,j)   = a_php(i,k,j)  +walls(3)
         end do
       end do
+
       do k = k_start+1, k_end
+        walls(1)=fnp(k)
+        walls(2)=fnm(k)
         do i = i_start, i_end_parallel
-          a_p(i,k-1,j-1) = a_p(i,k-1,j-1)+0.5*a_dpn(i,k)*fnp(k)
-          a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-          a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*fnm(k)
-          a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
-          a_dpn(i,k) = 0.
+          a_p(i,k-1,j-1) = a_p(i,k-1,j-1)+0.5*a_dpn(i,k)*walls(1)
+          a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*walls(1)
+          a_p(i,k,j-1) = a_p(i,k,j-1)+0.5*a_dpn(i,k)*walls(2)
+          a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*walls(2)
         end do
       end do
+      a_dpn(i_start:i_end_parallel,k_start+1:k_end) = 0.
+
+      a_dpn(i_start:i_end_parallel,kde) = 0.
       do i = i_start, i_end_parallel
-        a_dpn(i,kde) = 0.
         a_p(i,3,j-1) = a_p(i,3,j-1)+0.5*a_dpn(i,1)*cf3
         a_p(i,3,j) = a_p(i,3,j)+0.5*a_dpn(i,1)*cf3
         a_p(i,2,j-1) = a_p(i,2,j-1)+0.5*a_dpn(i,1)*cf2
         a_p(i,2,j) = a_p(i,2,j)+0.5*a_dpn(i,1)*cf2
         a_p(i,1,j-1) = a_p(i,1,j-1)+0.5*a_dpn(i,1)*cf1
         a_p(i,1,j) = a_p(i,1,j)+0.5*a_dpn(i,1)*cf1
-
-        a_dpn(i,1) = 0.
       end do
+      a_dpn(i_start:i_end_parallel,1) = 0.
     endif
     do k = k_start, k_end
       do i = i_start, i_end_parallel
-        a_al(i,k,j-1) = a_al(i,k,j-1)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(pb(i,k,j)-pb(i,k,j-1))
-        a_alt(i,k,j-1) = a_alt(i,k,j-1)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(p(i,k,j)-p(i,k,j-1))
-        a_muv(i,j) = a_muv(i,j)+0.5*a_dpxy(i,k)*rdy*(ph(i,k+1,j)-ph(i,k+1,j-1)+ph(i,k,j)-ph(i,k,j-1)+(alt(i,k,j)+alt(i,k,j-1))*&
-&(p(i,k,j)-p(i,k,j-1))+(al(i,k,j)+al(i,k,j-1))*(pb(i,k,j)-pb(i,k,j-1)))
-        a_p(i,k,j-1) = a_p(i,k,j-1)-0.5*a_dpxy(i,k)*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)*(alt(i,k,j)+alt(i,k,j-1))
-        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-0.5*a_dpxy(i,k)*rdy*muv(i,j)
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)
-        a_ph(i,k,j-1) = a_ph(i,k,j-1)-0.5*a_dpxy(i,k)*rdy*muv(i,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpxy(i,k)*rdy*muv(i,j)
-        a_dpxy(i,k) = 0.
+        walls(1)=0.5*a_dpxy(i,k)*rdy*muv(i,j)
+        walls(2)=keep_pb1(i,k)
+        walls(4)=keep_alt1(i,k)
+        a_muv(i,j) = a_muv(i,j)+0.5*a_dpxy(i,k)*rdy*(keep_ph1(i,k)+walls(4)*kwalls(i,k)+gwalls(i,k)*walls(2))
+        a_al(i,k,j-1) = a_al(i,k,j-1)+walls(1)*walls(2)
+        a_al(i,k,j) = a_al(i,k,j)+walls(1)*walls(2)
+        a_alt(i,k,j-1) = a_alt(i,k,j-1)+walls(1)*kwalls(i,k)
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(1)*kwalls(i,k)
+        a_p(i,k,j-1) = a_p(i,k,j-1)-walls(1)*walls(4)
+        a_p(i,k,j) = a_p(i,k,j)+walls(1)*walls(4)
+        a_ph(i,k+1,j-1) = a_ph(i,k+1,j-1)-walls(1)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(1)
+        a_ph(i,k,j-1) = a_ph(i,k,j-1)-walls(1)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(1)
+!       a_dpxy(i,k) = 0.
       end do
     end do
-  endif
+  endif    !AAA-IF-START
+
   do i = i_start, i_end_parallel
     a_mudf(i,j-1) = a_mudf(i,j-1)+a_mudf_xy(i)*emdiv*dy
     a_mudf(i,j) = a_mudf(i,j)-a_mudf_xy(i)*emdiv*dy
-    a_mudf_xy(i) = 0.
   end do
-  do k = k_start, k_end
-    do i = i_start, i_end_parallel
-      a_rv_tend(i,k,j) = a_rv_tend(i,k,j)+a_v(i,k,j)*dts
-    end do
-  end do
+  a_mudf_xy(i_start:i_end_parallel) = 0.
+!  do k = k_start, k_end
+!    do i = i_start, i_end_parallel
+!      a_rv_tend(i,k,j) = a_rv_tend(i,k,j)+a_v(i,k,j)*dts
+!    end do
+!  end do
+   a_rv_tend(i_start:i_end_parallel,k_start:k_end,j) =a_rv_tend(i_start:i_end_parallel,k_start:k_end,j)&
+&+a_v(i_start:i_end_parallel,k_start:k_end,j)*dts
+
 end do a_v_outer_j_loop
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 do j = j_start, j_end_parallel
+! keep_ph2(i,k)=ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)
+  keep_ph2(i_start_up:i_end_up_parallel,k_start:k_end)=ph(i_start_up:i_end_up_parallel,k_start+1:k_end+1,j)&
+&-ph(i_start_up-1:i_end_up_parallel-1,k_start+1:k_end+1,j)+ph(i_start_up:i_end_up_parallel,k_start:k_end,j)&
+&-ph(i_start_up-1:i_end_up_parallel-1,k_start:k_end,j)
+
   do k = k_start, k_end
     do i = i_start_up, i_end_up_parallel
-      dpxy(i,k) = 0.5*rdx*muu(i,j)*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-p(i-1,k,j))&
+      dpxy(i,k) = 0.5*rdx*muu(i,j)*(keep_ph2(i,k)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,k,j)-p(i-1,k,j))&
 &+(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
     end do
   end do
@@ -661,13 +800,23 @@ do j = j_start, j_end_parallel
       dpn(i,kde) = 0.
     end do
     do k = k_start+1, k_end
+      walls(1)=fnp(k)
+      walls(2)=fnm(k)
       do i = i_start_up, i_end_up_parallel
-        dpn(i,k) = 0.5*(fnm(k)*(p(i,k,j)+p(i-1,k,j))+fnp(k)*(p(i,k-1,j)+p(i-1,k-1,j)))
+        dpn(i,k) = 0.5*(walls(2)*(p(i,k,j)+p(i-1,k,j))+walls(1)*(p(i,k-1,j)+p(i-1,k-1,j)))
       end do
     end do
+
+    do k = k_start, k_end
+      walls(1)=rdnw(k)
+      do i = i_start_up, i_end_up_parallel
+        gwalls(i,k)=(walls(1)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
+      end do
+    end do
+
     do k = k_start, k_end
       do i = i_start_up, i_end_up_parallel
-        dpxy(i,k) = dpxy(i,k)+rdx*(php(i,k,j)-php(i-1,k,j))*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
+        dpxy(i,k) = dpxy(i,k)+rdx*(php(i,k,j)-php(i-1,k,j))*gwalls(i,k)
       end do
     end do
   endif
@@ -675,69 +824,91 @@ do j = j_start, j_end_parallel
   do k = k_start, k_end
     do i = i_start_up, i_end_up_parallel
       a_cqu(i,k,j) = a_cqu(i,k,j)-a_u(i,k,j)*dts*dpxy(i,k)
-      a_dpxy(i,k) = a_dpxy(i,k)-a_u(i,k,j)*dts*cqu(i,k,j)
-      a_mudf_xy(i) = a_mudf_xy(i)+a_u(i,k,j)
+!     a_dpxy(i,k) = a_dpxy(i,k)-a_u(i,k,j)*dts*cqu(i,k,j)
+      a_dpxy(i,k) = -a_u(i,k,j)*dts*cqu(i,k,j)
     end do
+    a_mudf_xy(i_start_up:i_end_up_parallel) = a_mudf_xy(i_start_up:i_end_up_parallel)+a_u(i_start_up:i_end_up_parallel,k,j)
   end do
   if (non_hydrostatic) then
 ! recompute : dpn
     do k = k_start, k_end
+      walls(3)=rdnw(k)
       do i = i_start_up, i_end_up_parallel
-        a_dpn(i,k+1) = a_dpn(i,k+1)+a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
-        a_dpn(i,k) = a_dpn(i,k)-a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))*rdnw(k)
-        a_mu(i-1,j) = a_mu(i-1,j)-0.5*a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))
-        a_mu(i,j) = a_mu(i,j)-0.5*a_dpxy(i,k)*rdx*(php(i,k,j)-php(i-1,k,j))
-        a_php(i-1,k,j) = a_php(i-1,k,j)-a_dpxy(i,k)*rdx*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
-        a_php(i,k,j) = a_php(i,k,j)+a_dpxy(i,k)*rdx*(rdnw(k)*(dpn(i,k+1)-dpn(i,k))-0.5*(mu(i-1,j)+mu(i,j)))
+        walls(1)=a_dpxy(i,k)*rdx; walls(2)=walls(1)*(php(i,k,j)-php(i-1,k,j))
+        a_dpn(i,k+1) = a_dpn(i,k+1)+walls(2)*walls(3)
+        a_dpn(i,k) = a_dpn(i,k)-walls(2)*walls(3)
+        a_mu(i-1,j) = a_mu(i-1,j)-0.5*walls(2)
+        a_mu(i,j) = a_mu(i,j)-0.5*walls(2)
+        a_php(i-1,k,j) = a_php(i-1,k,j)-walls(1)*gwalls(i,k)
+        a_php(i,k,j) = a_php(i,k,j)+walls(1)*gwalls(i,k)
       end do
     end do
     do k = k_start+1, k_end
+      walls(1)=fnp(k)
+      walls(2)=fnm(k)
       do i = i_start_up, i_end_up_parallel
-        a_p(i-1,k-1,j) = a_p(i-1,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)*fnp(k)
-        a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*fnm(k)
-        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*fnm(k)
-        a_dpn(i,k) = 0.
+        a_p(i-1,k-1,j) = a_p(i-1,k-1,j)+0.5*a_dpn(i,k)* walls(1)
+        a_p(i,k-1,j) = a_p(i,k-1,j)+0.5*a_dpn(i,k)* walls(1)
+        a_p(i-1,k,j) = a_p(i-1,k,j)+0.5*a_dpn(i,k)*walls(2)
+        a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpn(i,k)*walls(2)
       end do
+      a_dpn(i_start_up:i_end_up_parallel,k) = 0.
     end do
+    a_dpn(i_start_up:i_end_up_parallel,kde) = 0.
     do i = i_start_up, i_end_up_parallel
-      a_dpn(i,kde) = 0.
       a_p(i-1,3,j) = a_p(i-1,3,j)+0.5*a_dpn(i,1)*cf3
       a_p(i,3,j) = a_p(i,3,j)+0.5*a_dpn(i,1)*cf3
       a_p(i-1,2,j) = a_p(i-1,2,j)+0.5*a_dpn(i,1)*cf2
       a_p(i,2,j) = a_p(i,2,j)+0.5*a_dpn(i,1)*cf2
       a_p(i-1,1,j) = a_p(i-1,1,j)+0.5*a_dpn(i,1)*cf1
       a_p(i,1,j) = a_p(i,1,j)+0.5*a_dpn(i,1)*cf1
-      a_dpn(i,1) = 0.
     end do
+    a_dpn(i_start_up:i_end_up_parallel,1) = 0.
   endif
+
   do k = k_start, k_end
     do i = i_start_up, i_end_up_parallel
-      a_al(i-1,k,j) = a_al(i-1,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-      a_al(i,k,j) = a_al(i,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(pb(i,k,j)-pb(i-1,k,j))
-      a_alt(i-1,k,j) = a_alt(i-1,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-      a_alt(i,k,j) = a_alt(i,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(p(i,k,j)-p(i-1,k,j))
-      a_muu(i,j) = a_muu(i,j)+0.5*a_dpxy(i,k)*rdx*(ph(i,k+1,j)-ph(i-1,k+1,j)+ph(i,k,j)-ph(i-1,k,j)+(alt(i,k,j)+alt(i-1,k,j))*(p(i,&
-&k,j)-p(i-1,k,j))+(al(i,k,j)+al(i-1,k,j))*(pb(i,k,j)-pb(i-1,k,j)))
-      a_p(i-1,k,j) = a_p(i-1,k,j)-0.5*a_dpxy(i,k)*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-      a_p(i,k,j) = a_p(i,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)*(alt(i,k,j)+alt(i-1,k,j))
-      a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-0.5*a_dpxy(i,k)*rdx*muu(i,j)
-      a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)
-      a_ph(i-1,k,j) = a_ph(i-1,k,j)-0.5*a_dpxy(i,k)*rdx*muu(i,j)
-      a_ph(i,k,j) = a_ph(i,k,j)+0.5*a_dpxy(i,k)*rdx*muu(i,j)
-      a_dpxy(i,k) = 0.
+      walls(1)=0.5*a_dpxy(i,k)*rdx; a_dpxy(i,k)=0.; walls(2)=walls(1)*muu(i,j)
+      walls(3)=alt(i,k,j)+alt(i-1,k,j)
+      walls(4)=pb(i,k,j)-pb(i-1,k,j)
+      walls(5)=p(i,k,j)-p(i-1,k,j)
+      a_muu(i,j) = a_muu(i,j)+walls(1)*(keep_ph2(i,k)+walls(3)*walls(5)+(al(i,k,j)+al(i-1,k,j))*walls(4))
+      a_al(i-1,k,j) = a_al(i-1,k,j)+walls(2)*walls(4)
+      a_al(i,k,j) = a_al(i,k,j)+walls(2)*walls(4)
+      a_alt(i-1,k,j) = a_alt(i-1,k,j)+walls(2)*walls(5)
+      a_alt(i,k,j) = a_alt(i,k,j)+walls(2)*walls(5)
+      a_p(i-1,k,j) = a_p(i-1,k,j)-walls(2)*walls(3)
+      a_p(i,k,j) = a_p(i,k,j)+walls(2)*walls(3)
+      a_ph(i-1,k+1,j) = a_ph(i-1,k+1,j)-walls(2)
+      a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(2)
+      a_ph(i-1,k,j) = a_ph(i-1,k,j)-walls(2)
+      a_ph(i,k,j) = a_ph(i,k,j)+walls(2)
+!     a_dpxy(i,k) = 0.
     end do
   end do
-  do i = i_start_up, i_end_up_parallel
-    a_mudf(i-1,j) = a_mudf(i-1,j)+a_mudf_xy(i)*emdiv*dx
-    a_mudf(i,j) = a_mudf(i,j)-a_mudf_xy(i)*emdiv*dx
-    a_mudf_xy(i) = 0.
-  end do
-  do k = k_start, k_end
-    do i = i_start, i_endu_parallel
-      a_ru_tend(i,k,j) = a_ru_tend(i,k,j)+a_u(i,k,j)*dts
-    end do
-  end do
+
+! a_dpxy(i_start_up:i_end_up_paralle,k_start:k_end) = 0.
+! a_dpxy = 0.
+
+! do i = i_start_up, i_end_up_parallel
+!   a_mudf(i-1,j) = a_mudf(i-1,j)+a_mudf_xy(i)*emdiv*dx
+!   a_mudf(i,j)   = a_mudf(i,j)-a_mudf_xy(i)*emdiv*dx
+! end do
+
+  a_mudf(i_start_up-1:i_end_up_parallel-1,j)=a_mudf(i_start_up-1:i_end_up_parallel-1,j)&
+&+a_mudf_xy(i_start_up:i_end_up_parallel)*emdiv*dx
+  a_mudf(i_start_up:i_end_up_parallel,j) = a_mudf(i_start_up:i_end_up_parallel,j)-a_mudf_xy(i_start_up:i_end_up_parallel)*emdiv*dx
+
+  a_mudf_xy(i_start_up:i_end_up_parallel) = 0.
+
+! do k = k_start, k_end
+!   do i = i_start, i_endu_parallel
+!     a_ru_tend(i,k,j) = a_ru_tend(i,k,j)+a_u(i,k,j)*dts
+!   end do
+! end do
+  a_ru_tend(i_start:i_endu_parallel,k_start:k_end,j) = a_ru_tend(i_start:i_endu_parallel,k_start:k_end,j)&
+&+a_u(i_start:i_endu_parallel,k_start:k_end,j)*dts
+
 end do
 
    call trace_exit("a_advance_uv")
@@ -843,6 +1014,7 @@ real, intent(in) :: u(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: v(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: w(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: ww(ims:ime,kms:kme,jms:jme)
+real walls(8)
 
 !==============================================
 ! declare local variables
@@ -875,11 +1047,20 @@ real mut_inv(its:ite)
 real rhs(its:ite,kts:kte)
 real wdwn(its:ite,kts:kte)
 #endif
-real t_2aveh(ims:ime,kms:kme,jms:jme)
-real wh(ims:ime,kms:kme,jms:jme)
-real keep1_w(ims:ime,kms:kme,jms:jme)
-real keep2_w(ims:ime,kms:kme,jms:jme)
-real keep3_w(ims:ime,kms:kme,jms:jme)
+!real t_2aveh(ims:ime,kms:kme,jms:jme)
+!real wh(ims:ime,kms:kme,jms:jme)
+real t_2aveh(ims:ime,kms:kme)
+real wh(ims:ime,kms:kme)
+real keep1_w(ims:ime,kms:kme)
+real keep2_w(ims:ime,kms:kme)
+real keep3_w(ims:ime,kms:kme)
+real keep4_alpha_a(ims:ime,kms:kme)
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+real keep_ph_rhs1(its-1:ite+1,kts-1:kte+1)  !REVISED BY WALLS
+real keep_ph_rhs2(its-1:ite+1,kts-1:kte+1)  !REVISED BY WALLS
+real keep_ph_foure(its-1:ite+1,kts-1:kte+1) !REVISED BY WALLS
 #ifdef DM_PARALLEL
 integer ips, ipe, jps, jpe, kps, kpe, kds, kde
 #endif
@@ -900,14 +1081,14 @@ kde = kte
 !----------------------------------------------
 ! SAVE REQUIRED INPUT VARIABLES
 !----------------------------------------------
-wh(:,:,:) = w(:,:,:)
-t_2aveh(:,:,:) = t_2ave(:,:,:)
+!wh(:,:,:) = w(:,:,:)
+!t_2aveh(:,:,:) = t_2ave(:,:,:)
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_mut_inv(:) = 0.
-a_rhs(:,:) = 0.
+!a_mut_inv(:) = 0.
+!a_rhs(:,:) = 0.
 a_wdwn(:,:) = 0.
 
 !----------------------------------------------
@@ -957,198 +1138,161 @@ endif
 #endif
 ! recompute : j_end
 do j = j_start, j_end
-  DO i=i_start, i_end
-    rhs(i,1) = 0.
-  ENDDO
+  wh(:,:) = w(:,:,j)
+  t_2aveh(:,:) = t_2ave(:,:,j)
+
+! DO i=i_start, i_end
+!   rhs(i,1) = 0.
+! ENDDO
+  rhs(i_start:i_end,1) = 0.
+
   do i = i_start, i_end
     mut_inv(i) = 1./mut(i,j)
     msft_inv(i) = 1./msft(i,j)
   end do
 ! recompute : msft_inv,mut_inv
+
   do k = 1, k_end
     do i = i_start, i_end
-      t_2ave(i,k,j) = 0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))
-      t_2ave(i,k,j) = (t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))
+!     t_2ave(i,k,j) = 0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))
+!     t_2ave(i,k,j) = (t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))
+      t_2ave(i,k,j) = (0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))-mu1(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))
     end do
   end do
 ! recompute : t_2ave
+
+! keep_ph_foure(i,k)=ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j)
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+  keep_ph_foure(i_start:i_end,2:k_end+1)=ph_1(i_start:i_end,2:k_end+1,j)-ph_1(i_start:i_end,1:k_end,j)&
+&                                       +phb(i_start:i_end,2:k_end+1,j) -phb(i_start:i_end,1:k_end,j)
+
   do k = 2, k_end+1
+    walls(1)=rdnw(k-1)
     do i = i_start, i_end
-      wdwn(i,k) = 0.5*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)*(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
+      wdwn(i,k) = 0.5*(ww(i,k,j)+ww(i,k-1,j))*walls(1)*keep_ph_foure(i,k)
       rhs(i,k) = dts*(ph_tend(i,k,j)+0.5*g*(1.-epssm)*w(i,k,j))
     end do
   end do
 ! recompute : rhs,wdwn
   do k = 2, k_end
-    do i = i_start, i_end
-      rhs(i,k) = rhs(i,k)-dts*(fnm(k)*wdwn(i,k+1)+fnp(k)*wdwn(i,k))
-    end do
+    walls(1)=dts*fnm(k); walls(2)=dts*fnp(k)
+!   do i = i_start, i_end
+!     rhs(i,k) = rhs(i,k)-walls(1)*wdwn(i,k+1)-walls(2)*wdwn(i,k)
+!   end do
+    rhs(i_start:i_end,k) = rhs(i_start:i_end,k)-walls(1)*wdwn(i_start:i_end,k+1)-walls(2)*wdwn(i_start:i_end,k)
   end do
 ! recompute : rhs
+
+! do k = 2, k_end+1
+!   do i = i_start, i_end
+!     keep_ph(i,k) = (1.-epssm)*(ph(i,k,j)-ph(i,k-1,j))
+!   end do
+! end do
+! keep_ph(i_start:i_end,2:k_end+1) = (1.-epssm)*(ph(i_start:i_end,2:k_end+1,j)-ph(i_start:i_end,1:k_end,j))
+
   do k = 2, k_end+1
     do i = i_start, i_end
       rhs(i,k) = ph(i,k,j)+msft(i,j)*rhs(i,k)*mut_inv(i)
     end do
   end do
+! do k = 2, k_end+1
+!   do i = i_start, i_end
+!     keep_rhs(i,k) = (1.+epssm)*(rhs(i,k)-rhs(i,k-1))
+!   end do
+! end do
+  keep_ph_rhs1(i_start:i_end,2:k_end+1) = (1.+epssm)*(rhs(i_start:i_end,2:k_end+1)-rhs(i_start:i_end, 1:k_end)) &
+&                                       + (1.-epssm)*(ph(i_start:i_end, 2:k_end+1,j)-ph(i_start:i_end,1:k_end,j))
+  keep_ph_rhs2(i_start:i_end,2:k_end)   = (1.+epssm)*(rhs(i_start:i_end,3:k_end+1)-rhs(i_start:i_end, 2:k_end)) &
+&                                       + (1.-epssm)*(ph(i_start:i_end, 3:k_end+1,j)-ph(i_start:i_end,2:k_end,j))
 ! recompute : rhs
+
   do i = i_start, i_end
-    w(i,1,j) = 0.5*rdy*((ht(i,j+1)-ht(i,j))*(cf1*v(i,1,j+1)+cf2*v(i,2,j+1)+cf3*v(i,3,j+1))+(ht(i,j)-ht(i,j-1))*(cf1*v(i,1,j)+cf2*&
-&v(i,2,j)+cf3*v(i,3,j)))+0.5*rdx*((ht(i+1,j)-ht(i,j))*(cf1*u(i+1,1,j)+cf2*u(i+1,2,j)+cf3*u(i+1,3,j))+(ht(i,j)-ht(i-1,j))*(cf1*&
-&u(i,1,j)+cf2*u(i,2,j)+cf3*u(i,3,j)))
+    w(i,1,j) = 0.5*rdy*((ht(i,j+1)-ht(i,j))*(cf1*v(i,1,j+1)+cf2*v(i,2,j+1)+cf3*v(i,3,j+1))&
+&  +(ht(i,j)-ht(i,j-1))*(cf1*v(i,1,j)+cf2*v(i,2,j)+cf3*v(i,3,j)))&
+&  +0.5*rdx*((ht(i+1,j)-ht(i,j))*(cf1*u(i+1,1,j)+cf2*u(i+1,2,j)+cf3*u(i+1,3,j))&
+&  +(ht(i,j)-ht(i-1,j))*(cf1*u(i,1,j)+cf2*u(i,2,j)+cf3*u(i,3,j)))
   end do
 ! recompute : w
+
   do k = 2, k_end
+    walls(1)=rdnw(k-1)
+    walls(2)=rdnw(k)
+    walls(3)=rdn(k)
     do i = i_start, i_end
-      w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*cqw(i,k,j)*0.5*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*((1.+epssm)*&
-&(rhs(i,k+1)-rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))-c2a(i,k-1,j)*rdnw(k-1)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-&
-&epssm)*(ph(i,k,j)-ph(i,k-1,j))))+dts*g*msft_inv(i)*(rdn(k)*(c2a(i,k,j)*alt(i,k,j)*t_2ave(i,k,j)-c2a(i,k-1,j)*alt(i,k-1,j)*&
-&t_2ave(i,k-1,j))+(rdn(k)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*mut_inv(i)-1.)*muave(i,j))
+      w(i,k,j) = w(i,k,j) +dts*rw_tend(i,k,j) +dts*g*msft_inv(i)*(&
+
+&cqw(i,k,j)*0.5*mut_inv(i)*walls(3)*(c2a(i,k,j)*walls(2)*keep_ph_rhs2(i,k)-c2a(i,k-1,j)*walls(1)*keep_ph_rhs1(i,k))&
+
+&+& !AAAAA
+
+&walls(3)*(c2a(i,k,j)*alt(i,k,j)*t_2ave(i,k,j)-c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j))&
+&+(walls(3)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*mut_inv(i)-1.)*muave(i,j)&
+
+&) !AAAAA
     end do
   end do
 ! recompute : w
   k = k_end+1
 ! recompute : k
+  walls(1) =2.0*rdnw(k-1)
   do i = i_start, i_end
-    w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*((-(0.5*dts*g*mut_inv(i)*rdnw(k-1)**2*2.*c2a(i,k-1,j)*((1.+epssm)*(rhs(i,k)-&
-&rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)-ph(i,k-1,j)))))-dts*g*(2.*rdnw(k-1)*c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j)+(1.+2.*rdnw(k-&
-&1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))*muave(i,j)))
+    w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*((-(0.5*dts*g*mut_inv(i)*0.5*walls(1)*walls(1)*c2a(i,k-1,j)*keep_ph_rhs1(i,k)))&
+&-dts*g*(walls(1)*c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j)+(1.+walls(1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))*muave(i,j)))
   end do
 ! recompute : w
   do k = 2, k_end+1
     do i = i_start, i_end
-      keep1_w(i,k-1,j) =w(i,k-1,j)
-      keep2_w(i,k,j) =w(i,k,j)
-      w(i,k,j) = (w(i,k,j)-a(i,k,j)*w(i,k-1,j))*alpha(i,k,j)
+      keep1_w(i,k-1) =w(i,k-1,j)*alpha(i,k,j)
+      keep2_w(i,k) =w(i,k,j)-a(i,k,j)*w(i,k-1,j)
+      keep4_alpha_a(i,k) =a(i,k,j)*alpha(i,k,j)
+      w(i,k,j) = keep2_w(i,k)*alpha(i,k,j)
     end do
   end do
 ! recompute : w
   do k = k_end, 2, -1
     do i = i_start, i_end
-      keep3_w(i,k+1,j) =w(i,k+1,j)  
+      keep3_w(i,k+1) =w(i,k+1,j)  
       w(i,k,j) = w(i,k,j)-gamma(i,k,j)*w(i,k+1,j)
     end do
   end do
 ! recompute : w
+  walls(1)=0.5*dts*g*(1.+epssm)
   do k = 2, k_end+1
     do i = i_start, i_end
-      a_muts(i,j) = a_muts(i,j)-a_ph(i,k,j)*(0.5*msft(i,j)*dts*g*(1.+epssm)*w(i,k,j)/(muts(i,j)*muts(i,j)))
-      a_rhs(i,k) = a_rhs(i,k)+a_ph(i,k,j)
-      a_w(i,k,j) = a_w(i,k,j)+a_ph(i,k,j)*(0.5*msft(i,j)*dts*g*(1.+epssm)/muts(i,j))
-      a_ph(i,k,j) = 0.
+      walls(2)=a_ph(i,k,j)*walls(1)*msft(i,j)/muts(i,j)
+      a_muts(i,j) = a_muts(i,j)-walls(2)*w(i,k,j)/muts(i,j)
+!     a_rhs(i,k) = a_rhs(i,k)+a_ph(i,k,j)
+!     a_rhs(i,k) = a_ph(i,k,j)
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)
+!     a_ph(i,k,j) = 0.
     end do
   end do
-#ifdef ADJOINT_NO_OPTIMIZE
-! recdepend vars : cf1,cf2,cf3,ht,i_end,i_start,j,rdx,rdy,u,v
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1361
-! recompute vars : w
 
-  do i = i_start, i_end
-    w(i,1,j) = 0.5*rdy*((ht(i,j+1)-ht(i,j))*(cf1*v(i,1,j+1)+cf2*v(i,2,j+1)+cf3*v(i,3,j+1))+(ht(i,j)-ht(i,j-1))*(cf1*v(i,1,j)+cf2*&
-&v(i,2,j)+cf3*v(i,3,j)))+0.5*rdx*((ht(i+1,j)-ht(i,j))*(cf1*u(i+1,1,j)+cf2*u(i+1,2,j)+cf3*u(i+1,3,j))+(ht(i,j)-ht(i-1,j))*(cf1*&
-&u(i,1,j)+cf2*u(i,2,j)+cf3*u(i,3,j)))
-  end do
-! recompute vars : w
-!  recdepend vars : alb,alt,c2a,cqw,dts,epssm,g,i_end,i_start,j,k_end,ms
-! ft_inv,muave,mut_inv,ph,rdn,rdnw,rhs,rw_tend,t_2ave,w
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1382
-! recompute vars : w
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+! a_rhs(i_start:i_end,2:k_end+1) = a_ph(i_start:i_end,2:k_end+1,j)
+  a_rhs(i_start:i_end,1:k_end+1) = a_ph(i_start:i_end,1:k_end+1,j)  !REVISED BY WALLS
+! a_ph(i_start:i_end,2:k_end+1,j) = 0.
+  a_ph(i_start:i_end,1:k_end+1,j) = 0.   !REVISED BY WALLS
+
   do k = 2, k_end
     do i = i_start, i_end
-      w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*cqw(i,k,j)*0.5*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*((1.+epssm)*&
-&(rhs(i,k+1)-rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))-c2a(i,k-1,j)*rdnw(k-1)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-&
-&epssm)*(ph(i,k,j)-ph(i,k-1,j))))+dts*g*msft_inv(i)*(rdn(k)*(c2a(i,k,j)*alt(i,k,j)*t_2ave(i,k,j)-c2a(i,k-1,j)*alt(i,k-1,j)*&
-&t_2ave(i,k-1,j))+(rdn(k)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*mut_inv(i)-1.)*muave(i,j))
+!     w(i,k+1,j) =keep3_w(i,k+1)  
+      a_gamma(i,k,j) = a_gamma(i,k,j)-a_w(i,k,j)*keep3_w(i,k+1)
+      a_w(i,k+1,j)   = a_w(i,k+1,j)-a_w(i,k,j)*gamma(i,k,j)
     end do
   end do
-! recompute vars : w
-! recdepend vars : k_end,w
-! recompute pos : ASSIGN_STMT module_small_step_em.f90:1404
-! recompute vars : k
-  k = k_end+1
-! recompute vars : k
-!  recdepend vars : alb,alt,c2a,dts,epssm,g,i_end,i_start,j,k,msft_inv,m
-! uave,mut_inv,ph,rdnw,rhs,rw_tend,t_2ave,w
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1406
-! recompute vars : w
-  do i = i_start, i_end
-    w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*((-(0.5*dts*g*mut_inv(i)*rdnw(k-1)**2*2.*c2a(i,k-1,j)*((1.+epssm)*(rhs(i,k)-&
-&rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)-ph(i,k-1,j)))))-dts*g*(2.*rdnw(k-1)*c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j)+(1.+2.*rdnw(k-&
-&1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))*muave(i,j)))
-  end do
-! recompute vars : w
-! recdepend vars : a,alpha,i_end,i_start,j,k_end,w
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1418
-! recompute vars : w
-  do k = 2, k_end+1
-    do i = i_start, i_end
-      w(i,k,j) = (w(i,k,j)-a(i,k,j)*w(i,k-1,j))*alpha(i,k,j)
-    end do
-  end do
-! recompute vars : w
-  do k = k_end, 3, -1
-    do i = i_start, i_end
-      w(i,k,j) = w(i,k,j)-gamma(i,k,j)*w(i,k+1,j)
-    end do
-  end do
-#endif
-  do k = 2, k_end
-    do i = i_start, i_end
-      w(i,k+1,j) =keep3_w(i,k+1,j)  
-      a_gamma(i,k,j) = a_gamma(i,k,j)-a_w(i,k,j)*w(i,k+1,j)
-      a_w(i,k+1,j) = a_w(i,k+1,j)-a_w(i,k,j)*gamma(i,k,j)
-    end do
-  end do
-#ifdef ADJOINT_NO_OPTIMIZE
-! recdepend vars : cf1,cf2,cf3,ht,i_end,i_start,j,rdx,rdy,u,v
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1361
-! recompute vars : w
-  do i = i_start, i_end
-    w(i,1,j) = 0.5*rdy*((ht(i,j+1)-ht(i,j))*(cf1*v(i,1,j+1)+cf2*v(i,2,j+1)+cf3*v(i,3,j+1))+(ht(i,j)-ht(i,j-1))*(cf1*v(i,1,j)+cf2*&
-&v(i,2,j)+cf3*v(i,3,j)))+0.5*rdx*((ht(i+1,j)-ht(i,j))*(cf1*u(i+1,1,j)+cf2*u(i+1,2,j)+cf3*u(i+1,3,j))+(ht(i,j)-ht(i-1,j))*(cf1*&
-&u(i,1,j)+cf2*u(i,2,j)+cf3*u(i,3,j)))
-  end do
-! recompute vars : w
-!  recdepend vars : alb,alt,c2a,cqw,dts,epssm,g,i_end,i_start,j,k_end,ms
-! ft_inv,muave,mut_inv,ph,rdn,rdnw,rhs,rw_tend,t_2ave,w
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1382
-! recompute vars : w
-  do k = 2, k_end
-    do i = i_start, i_end
-      w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*cqw(i,k,j)*0.5*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*((1.+epssm)*&
-&(rhs(i,k+1)-rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))-c2a(i,k-1,j)*rdnw(k-1)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-&
-&epssm)*(ph(i,k,j)-ph(i,k-1,j))))+dts*g*msft_inv(i)*(rdn(k)*(c2a(i,k,j)*alt(i,k,j)*t_2ave(i,k,j)-c2a(i,k-1,j)*alt(i,k-1,j)*&
-&t_2ave(i,k-1,j))+(rdn(k)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*mut_inv(i)-1.)*muave(i,j))
-    end do
-  end do
-! recompute vars : w
-! recdepend vars : k_end,w
-! recompute pos : ASSIGN_STMT module_small_step_em.f90:1404
-! recompute vars : k
-  k = k_end+1
-! recompute vars : k
-!  recdepend vars : alb,alt,c2a,dts,epssm,g,i_end,i_start,j,k,msft_inv,m
-! uave,mut_inv,ph,rdnw,rhs,rw_tend,t_2ave,w
-! recompute pos : DOLOOP_STMT module_small_step_em.f90:1406
-! recompute vars : w
-  do i = i_start, i_end
-    w(i,k,j) = w(i,k,j)+dts*rw_tend(i,k,j)+msft_inv(i)*((-(0.5*dts*g*mut_inv(i)*rdnw(k-1)**2*2.*c2a(i,k-1,j)*((1.+epssm)*(rhs(i,k)-&
-&rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)-ph(i,k-1,j)))))-dts*g*(2.*rdnw(k-1)*c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j)+(1.+2.*rdnw(k-&
-&1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))*muave(i,j)))
-  end do
-! recompute vars : w
-  do k = 2, k_end
-    do i = i_start, i_end
-      w(i,k,j) = (w(i,k,j)-a(i,k,j)*w(i,k-1,j))*alpha(i,k,j)
-    end do
-  end do
-#endif
+
   do k = k_end+1, 2, -1
     do i = i_start, i_end
-      w(i,k-1,j)=keep1_w(i,k-1,j) 
-      w(i,k,j)=keep2_w(i,k,j) 
-      a_a(i,k,j) = a_a(i,k,j)-a_w(i,k,j)*w(i,k-1,j)*alpha(i,k,j)
-      a_alpha(i,k,j) = a_alpha(i,k,j)+a_w(i,k,j)*(w(i,k,j)-a(i,k,j)*w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)-a_w(i,k,j)*a(i,k,j)*alpha(i,k,j)
+!     w(i,k-1,j)=keep1_w(i,k-1) 
+!     w(i,k,j)=keep2_w(i,k) 
+      a_a(i,k,j) = a_a(i,k,j)-a_w(i,k,j)*keep1_w(i,k-1)
+      a_alpha(i,k,j) = a_alpha(i,k,j)+a_w(i,k,j)*keep2_w(i,k)
+      a_w(i,k-1,j) = a_w(i,k-1,j)-a_w(i,k,j)*keep4_alpha_a(i,k)
       a_w(i,k,j) = a_w(i,k,j)*alpha(i,k,j)
     end do
   end do
@@ -1158,127 +1302,177 @@ do j = j_start, j_end
 ! recompute vars : k
   k = k_end+1
 ! recompute vars : k
+  walls(1)=rdnw(k-1)
   do i = i_start, i_end
-    a_alt(i,k-1,j) = a_alt(i,k-1,j)-2*a_w(i,k,j)*msft_inv(i)*dts*g*rdnw(k-1)*c2a(i,k-1,j)*t_2ave(i,k-1,j)
-    a_c2a(i,k-1,j) = a_c2a(i,k-1,j)-a_w(i,k,j)*msft_inv(i)*dts*g*(mut_inv(i)*rdnw(k-1)**2*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-&
-&epssm)*(ph(i,k,j)-ph(i,k-1,j)))+2*rdnw(k-1)*alt(i,k-1,j)*t_2ave(i,k-1,j)+2*rdnw(k-1)*alb(i,k-1,j)*mut_inv(i)*muave(i,j))
-    a_muave(i,j) = a_muave(i,j)-a_w(i,k,j)*msft_inv(i)*dts*g*(1+2.*rdnw(k-1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))
-    a_mut_inv(i) = a_mut_inv(i)-a_w(i,k,j)*msft_inv(i)*(dts*g*rdnw(k-1)**2*c2a(i,k-1,j)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-&
-&epssm)*(ph(i,k,j)-ph(i,k-1,j)))+2*dts*g*rdnw(k-1)*c2a(i,k-1,j)*alb(i,k-1,j)*muave(i,j))
-    a_ph(i,k-1,j) = a_ph(i,k-1,j)+a_w(i,k,j)*msft_inv(i)*dts*g*mut_inv(i)*rdnw(k-1)**2*c2a(i,k-1,j)*(1.-epssm)
-    a_ph(i,k,j) = a_ph(i,k,j)-a_w(i,k,j)*msft_inv(i)*dts*g*mut_inv(i)*rdnw(k-1)**2*c2a(i,k-1,j)*(1.-epssm)
-    a_rhs(i,k-1) = a_rhs(i,k-1)+a_w(i,k,j)*msft_inv(i)*dts*g*mut_inv(i)*rdnw(k-1)**2*c2a(i,k-1,j)*(1.+epssm)
-    a_rhs(i,k) = a_rhs(i,k)-a_w(i,k,j)*msft_inv(i)*dts*g*mut_inv(i)*rdnw(k-1)**2*c2a(i,k-1,j)*(1+epssm)
+    walls(3)=a_w(i,k,j)*msft_inv(i)*dts*g
     a_rw_tend(i,k,j) = a_rw_tend(i,k,j)+a_w(i,k,j)*dts
-    a_t_2ave(i,k-1,j) = a_t_2ave(i,k-1,j)-2*a_w(i,k,j)*msft_inv(i)*dts*g*rdnw(k-1)*c2a(i,k-1,j)*alt(i,k-1,j)
+
+    walls(4)=walls(3)*mut_inv(i)*walls(1)*walls(1)*c2a(i,k-1,j)
+    walls(5)=alb(i,k-1,j)
+    walls(6)=c2a(i,k-1,j)
+    a_alt(i,k-1,j) = a_alt(i,k-1,j)-2*walls(3)*walls(1)*walls(6)*t_2ave(i,k-1,j)
+    a_c2a(i,k-1,j) = a_c2a(i,k-1,j)-walls(3)*(mut_inv(i)*walls(1)*walls(1)*keep_ph_rhs1(i,k)&
+&+2*walls(1)*(alt(i,k-1,j)*t_2ave(i,k-1,j)+walls(5)*mut_inv(i)*muave(i,j)))
+    a_muave(i,j) = a_muave(i,j)-walls(3)*(1+2.*walls(1)*walls(6)*walls(5)*mut_inv(i))
+    a_mut_inv(i) = -walls(3)*walls(6)*(walls(1)*walls(1)*keep_ph_rhs1(i,k)&
+&+2*walls(1)*walls(5)*muave(i,j))
+    a_ph(i,k-1,j) = a_ph(i,k-1,j)+walls(4)*(1.-epssm)
+    a_ph(i,k,j) = a_ph(i,k,j)-walls(4)*(1.-epssm)
+    a_rhs(i,k-1) = a_rhs(i,k-1)+walls(4)*(1.+epssm)
+    a_rhs(i,k) = a_rhs(i,k)-walls(4)*(1+epssm)
+    a_t_2ave(i,k-1,j) = a_t_2ave(i,k-1,j)-2*walls(3)*walls(1)*walls(6)*alt(i,k-1,j)
   end do
+
+! print*, 'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR'
   do k = 2, k_end
+    walls(3)=rdnw(k-1)
+    walls(4) =rdn(k)
+    walls(5) =rdnw(k)
     do i = i_start, i_end
-      a_alt(i,k-1,j) = a_alt(i,k-1,j)-a_w(i,k,j)*dts*g*msft_inv(i)*rdn(k)*c2a(i,k-1,j)*t_2ave(i,k-1,j)
-      a_alt(i,k,j) = a_alt(i,k,j)+a_w(i,k,j)*dts*g*msft_inv(i)*rdn(k)*c2a(i,k,j)*t_2ave(i,k,j)
-      a_c2a(i,k-1,j) = a_c2a(i,k-1,j)+a_w(i,k,j)*((-(0.5*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*rdnw(k-1)*((1.+epssm)*&
-&(rhs(i,k)-rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)-ph(i,k-1,j)))))+dts*g*msft_inv(i)*((-(rdn(k)*alt(i,k-1,j)*t_2ave(i,k-1,j)))-&
-&rdn(k)*alb(i,k-1,j)*mut_inv(i)*muave(i,j)))
-      a_c2a(i,k,j) = a_c2a(i,k,j)+a_w(i,k,j)*(0.5*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*rdnw(k)*((1.+epssm)*(rhs(i,k+1)-&
-&rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))+dts*g*msft_inv(i)*rdn(k)*(alt(i,k,j)*t_2ave(i,k,j)+alb(i,k,j)*mut_inv(i)*muave(i,j)))
-      a_cqw(i,k,j) = a_cqw(i,k,j)+0.5*a_w(i,k,j)*msft_inv(i)*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*((1.+epssm)*(rhs(i,k+1)-&
-&rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))-c2a(i,k-1,j)*rdnw(k-1)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)&
-&-ph(i,k-1,j))))
-      a_muave(i,j) = a_muave(i,j)+a_w(i,k,j)*dts*g*msft_inv(i)*((-1)+rdn(k)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*&
-&mut_inv(i))
-      a_mut_inv(i) = a_mut_inv(i)+a_w(i,k,j)*(0.5*msft_inv(i)*cqw(i,k,j)*dts*g*rdn(k)*(c2a(i,k,j)*rdnw(k)*((1.+epssm)*(rhs(i,k+1)-&
-&rhs(i,k))+(1.-epssm)*(ph(i,k+1,j)-ph(i,k,j)))-c2a(i,k-1,j)*rdnw(k-1)*((1.+epssm)*(rhs(i,k)-rhs(i,k-1))+(1.-epssm)*(ph(i,k,j)&
-&-ph(i,k-1,j))))+dts*g*msft_inv(i)*rdn(k)*(c2a(i,k,j)*alb(i,k,j)-c2a(i,k-1,j)*alb(i,k-1,j))*muave(i,j))
-      a_ph(i,k-1,j) = a_ph(i,k-1,j)+0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*c2a(i,k-1,j)*rdnw(k-1)*(1.-epssm)
-      a_ph(i,k+1,j) = a_ph(i,k+1,j)+0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*c2a(i,k,j)*rdnw(k)*(1.-epssm)
-      a_ph(i,k,j) = a_ph(i,k,j)-0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*(1.-epssm)+c2a(i,&
-&k-1,j)*rdnw(k-1)*(1.-epssm))
-      a_rhs(i,k-1) = a_rhs(i,k-1)+0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*c2a(i,k-1,j)*rdnw(k-1)*(1.+epssm)
-      a_rhs(i,k+1) = a_rhs(i,k+1)+0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*c2a(i,k,j)*rdnw(k)*(1+epssm)
-      a_rhs(i,k) = a_rhs(i,k)-0.5*a_w(i,k,j)*msft_inv(i)*cqw(i,k,j)*dts*g*mut_inv(i)*rdn(k)*(c2a(i,k,j)*rdnw(k)*(1.+epssm)+c2a(i,k-&
-&1,j)*rdnw(k-1)*(1+epssm))
+      walls(8)=a_w(i,k,j)*msft_inv(i)
       a_rw_tend(i,k,j) = a_rw_tend(i,k,j)+a_w(i,k,j)*dts
-      a_t_2ave(i,k-1,j) = a_t_2ave(i,k-1,j)-a_w(i,k,j)*dts*g*msft_inv(i)*rdn(k)*c2a(i,k-1,j)*alt(i,k-1,j)
-      a_t_2ave(i,k,j) = a_t_2ave(i,k,j)+a_w(i,k,j)*dts*g*msft_inv(i)*rdn(k)*c2a(i,k,j)*alt(i,k,j)
+
+      walls(6)=cqw(i,k,j)*dts*g
+      walls(2)=0.5*walls(8)*walls(6)*mut_inv(i)*walls(4)
+      walls(7)=c2a(i,k,j)
+      walls(1)=c2a(i,k-1,j)
+
+      a_muave(i,j) = a_muave(i,j)+walls(8)*dts*g*(-1.0+walls(4)*(walls(7)*alb(i,k,j)-walls(1)*alb(i,k-1,j))*mut_inv(i))
+
+      walls(8)=walls(8)*walls(4)
+
+      a_c2a(i,k-1,j) = a_c2a(i,k-1,j)  +walls(8)*(&
+&-0.5*walls(6)*mut_inv(i)*walls(3)*keep_ph_rhs1(i,k)&
+&-dts*g*(alt(i,k-1,j)*t_2ave(i,k-1,j) +alb(i,k-1,j)*mut_inv(i)*muave(i,j)) )
+
+      a_c2a(i,k,j) = a_c2a(i,k,j)  +walls(8)*(&
+&0.5*walls(6)*mut_inv(i)*walls(5)*keep_ph_rhs2(i,k)&
+&+dts*g*(alt(i,k,j)*t_2ave(i,k,j)+alb(i,k,j)*mut_inv(i)*muave(i,j)))
+
+      a_mut_inv(i) = a_mut_inv(i)  +walls(8)*(&
+&0.5*walls(6)*(walls(7)*walls(5)*keep_ph_rhs2(i,k)&
+&-walls(1)*walls(3)*keep_ph_rhs1(i,k))&
+&+dts*g*(walls(7)*alb(i,k,j)-walls(1)*alb(i,k-1,j))*muave(i,j))
+
+      a_ph(i,k-1,j) = a_ph(i,k-1,j)+walls(2)*walls(1)*walls(3)*(1.-epssm)
+      a_ph(i,k+1,j) = a_ph(i,k+1,j)+walls(2)*walls(7)*walls(5)*(1.-epssm)
+      a_ph(i,k,j) = a_ph(i,k,j)-walls(2)*(walls(7)*walls(5)*(1.-epssm)+walls(1)*walls(3)*(1.-epssm))
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!     print*, a_rhs(i,k-1), i, k-1
+      a_rhs(i,k-1) = a_rhs(i,k-1)+walls(2)*walls(1)*walls(3)*(1.+epssm)
+
+      a_rhs(i,k+1) = a_rhs(i,k+1)+walls(2)*walls(7)*walls(5)*(1+epssm)
+      a_rhs(i,k) = a_rhs(i,k)-walls(2)*(walls(7)*walls(5)*(1.+epssm)+walls(1)*walls(3)*(1+epssm))
+
+      walls(8)=walls(8)*dts*g
+
+      a_cqw(i,k,j) = a_cqw(i,k,j)+0.5*walls(8)*mut_inv(i)*(walls(7)*walls(5)*(&
+&keep_ph_rhs2(i,k))-walls(1)*walls(3)*keep_ph_rhs1(i,k))
+
+      a_t_2ave(i,k-1,j) = a_t_2ave(i,k-1,j)-walls(8)*walls(1)*alt(i,k-1,j)
+      a_t_2ave(i,k,j) = a_t_2ave(i,k,j)+walls(8)*walls(7)*alt(i,k,j)
+
+      a_alt(i,k-1,j) = a_alt(i,k-1,j)-walls(8)*walls(1)*t_2ave(i,k-1,j)
+      a_alt(i,k,j)   = a_alt(i,k,j)+walls(8)*walls(7)*t_2ave(i,k,j)
     end do
   end do
   do i = i_start, i_end
-    a_u(i+1,3,j) = a_u(i+1,3,j)+0.5*a_w(i,1,j)*rdx*(ht(i+1,j)-ht(i,j))*cf3
-    a_u(i,3,j) = a_u(i,3,j)+0.5*a_w(i,1,j)*rdx*(ht(i,j)-ht(i-1,j))*cf3
-    a_u(i+1,2,j) = a_u(i+1,2,j)+0.5*a_w(i,1,j)*rdx*(ht(i+1,j)-ht(i,j))*cf2
-    a_u(i,2,j) = a_u(i,2,j)+0.5*a_w(i,1,j)*rdx*(ht(i,j)-ht(i-1,j))*cf2
-    a_u(i+1,1,j) = a_u(i+1,1,j)+0.5*a_w(i,1,j)*rdx*(ht(i+1,j)-ht(i,j))*cf1
-    a_u(i,1,j) = a_u(i,1,j)+0.5*a_w(i,1,j)*rdx*(ht(i,j)-ht(i-1,j))*cf1
-    a_v(i,3,j+1) = a_v(i,3,j+1)+0.5*a_w(i,1,j)*rdy*(ht(i,j+1)-ht(i,j))*cf3
-    a_v(i,3,j) = a_v(i,3,j)+0.5*a_w(i,1,j)*rdy*(ht(i,j)-ht(i,j-1))*cf3
-    a_v(i,2,j+1) = a_v(i,2,j+1)+0.5*a_w(i,1,j)*rdy*(ht(i,j+1)-ht(i,j))*cf2
-    a_v(i,2,j) = a_v(i,2,j)+0.5*a_w(i,1,j)*rdy*(ht(i,j)-ht(i,j-1))*cf2
-    a_v(i,1,j+1) = a_v(i,1,j+1)+0.5*a_w(i,1,j)*rdy*(ht(i,j+1)-ht(i,j))*cf1
-    a_v(i,1,j) = a_v(i,1,j)+0.5*a_w(i,1,j)*rdy*(ht(i,j)-ht(i,j-1))*cf1
-    a_w(i,1,j) = 0.
+    walls(1)=0.5*a_w(i,1,j)*rdx*(ht(i+1,j)-ht(i,j))
+    walls(2)=0.5*a_w(i,1,j)*rdx*(ht(i,j)-ht(i-1,j))
+    walls(3)=0.5*a_w(i,1,j)*rdy*(ht(i,j+1)-ht(i,j))
+    walls(4)=0.5*a_w(i,1,j)*rdy*(ht(i,j)-ht(i,j-1))
+    a_u(i+1,3,j) = a_u(i+1,3,j)+walls(1)*cf3
+    a_u(i+1,2,j) = a_u(i+1,2,j)+walls(1)*cf2
+    a_u(i+1,1,j) = a_u(i+1,1,j)+walls(1)*cf1
+    a_u(i,3,j) = a_u(i,3,j)+walls(2)*cf3
+    a_u(i,2,j) = a_u(i,2,j)+walls(2)*cf2
+    a_u(i,1,j) = a_u(i,1,j)+walls(2)*cf1
+    a_v(i,3,j+1) = a_v(i,3,j+1)+walls(3)*cf3
+    a_v(i,2,j+1) = a_v(i,2,j+1)+walls(3)*cf2
+    a_v(i,1,j+1) = a_v(i,1,j+1)+walls(3)*cf1
+    a_v(i,3,j) = a_v(i,3,j)+walls(4)*cf3
+    a_v(i,2,j) = a_v(i,2,j)+walls(4)*cf2
+    a_v(i,1,j) = a_v(i,1,j)+walls(4)*cf1
   end do
-  w(:,:,:) = wh(:,:,:)
+  a_w(i_start:i_end,1,j) = 0.
+
+! w(:,:,:) = wh(:,:,:)
+! w(:,:,j) = wh(:,:)
 ! recdepend vars : dts,epssm,g,i_end,i_start,j,k_end,ph_tend,w
 ! recompute pos : DOLOOP_STMT module_small_step_em.f90:1335
 ! recompute vars : rhs
   do k = 2, k_end+1
-    do i = i_start, i_end
-      rhs(i,k) = dts*(ph_tend(i,k,j)+0.5*g*(1.-epssm)*w(i,k,j))
-    end do
+!   do i = i_start, i_end
+!     rhs(i,k) = dts*(ph_tend(i,k,j)+0.5*g*(1.-epssm)*w(i,k,j))
+!   end do
+    rhs(i_start:i_end,k) = dts*(ph_tend(i_start:i_end,k,j)+0.5*g*(1.-epssm)*wh(i_start:i_end,k))
   end do
 ! recompute vars : rhs
 ! recdepend vars : dts,fnm,fnp,i_end,i_start,k_end,rhs,wdwn
 ! recompute pos : DOLOOP_STMT module_small_step_em.f90:1343
 ! recompute vars : rhs
   do k = 2, k_end
+    walls(1) =fnm(k)
+    walls(2) =fnp(k)
     do i = i_start, i_end
-      rhs(i,k) = rhs(i,k)-dts*(fnm(k)*wdwn(i,k+1)+fnp(k)*wdwn(i,k))
+      rhs(i,k) = rhs(i,k)-dts*(walls(1)*wdwn(i,k+1)+walls(2)*wdwn(i,k))
     end do
   end do
 ! recompute vars : rhs
   do k = 2, k_end+1
     do i = i_start, i_end
       a_mut_inv(i) = a_mut_inv(i)+a_rhs(i,k)*msft(i,j)*rhs(i,k)
-      a_ph(i,k,j) = a_ph(i,k,j)+a_rhs(i,k)
-      a_rhs(i,k) = a_rhs(i,k)*msft(i,j)*mut_inv(i)
+      a_ph(i,k,j)  = a_ph(i,k,j)+a_rhs(i,k)
+      a_rhs(i,k)   = a_rhs(i,k)*msft(i,j)*mut_inv(i)
     end do
   end do
   do k = 2, k_end
+    walls(1) =dts*fnm(k)
+    walls(2) =dts*fnp(k)
     do i = i_start, i_end
-      a_wdwn(i,k+1) = a_wdwn(i,k+1)-a_rhs(i,k)*dts*fnm(k)
-      a_wdwn(i,k) = a_wdwn(i,k)-a_rhs(i,k)*dts*fnp(k)
+      a_wdwn(i,k+1) = a_wdwn(i,k+1)-a_rhs(i,k)*walls(1)
+      a_wdwn(i,k)   = a_wdwn(i,k)-a_rhs(i,k)*walls(2)
     end do
   end do
   do k = 2, k_end+1
+    walls(2)=rdnw(k-1)
     do i = i_start, i_end
       a_ph_tend(i,k,j) = a_ph_tend(i,k,j)+a_rhs(i,k)*dts
       a_w(i,k,j) = a_w(i,k,j)+0.5*a_rhs(i,k)*dts*g*(1.-epssm)
-      a_rhs(i,k) = 0.
-      a_ph_1(i,k-1,j) = a_ph_1(i,k-1,j)-0.5*a_wdwn(i,k)*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)
-      a_ph_1(i,k,j) = a_ph_1(i,k,j)+0.5*a_wdwn(i,k)*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)
-      a_ww(i,k-1,j) = a_ww(i,k-1,j)+0.5*a_wdwn(i,k)*rdnw(k-1)*(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
-      a_ww(i,k,j) = a_ww(i,k,j)+0.5*a_wdwn(i,k)*rdnw(k-1)*(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
-      a_wdwn(i,k) = 0.
+!     a_rhs(i,k) = 0.
+      walls(1)=0.5*a_wdwn(i,k)*walls(2)
+!     a_wdwn(i,k) = 0.
+      a_ph_1(i,k-1,j) = a_ph_1(i,k-1,j)-walls(1)*(ww(i,k,j)+ww(i,k-1,j))
+      a_ph_1(i,k,j) = a_ph_1(i,k,j)+walls(1)*(ww(i,k,j)+ww(i,k-1,j))
+      a_ww(i,k-1,j) = a_ww(i,k-1,j)+walls(1)*keep_ph_foure(i,k)
+      a_ww(i,k,j) = a_ww(i,k,j)+walls(1)*keep_ph_foure(i,k)
     end do
   end do
-  t_2ave(:,:,:) = t_2aveh(:,:,:)
+  a_wdwn(i_start:i_end,2:k_end+1) = 0.
+
+! t_2ave(:,:,:) = t_2aveh(:,:,:)
+! t_2ave(:,:,j) = t_2aveh(:,:)
   do k = 1, k_end
     do i = i_start, i_end
-      t_2ave(i,k,j) = 0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))
+!     t_2ave(i,k,j) = 0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))
+      walls(1) = 0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2aveh(i,k))
+      walls(2) = (t0+t_1(i,k,j))*muts(i,j)
 ! recompute : t_2ave
-      a_mu1(i,j) = a_mu1(i,j)-a_t_2ave(i,k,j)*(t_1(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j))))
-      a_muts(i,j) = a_muts(i,j)-a_t_2ave(i,k,j)*((t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j))*(t0+t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j))*&
-&muts(i,j)*(t0+t_1(i,k,j))))
-      a_t_1(i,k,j) = a_t_1(i,k,j)-a_t_2ave(i,k,j)*(mu1(i,j)/(muts(i,j)*(t0+t_1(i,k,j)))+(t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j))*muts(i,&
-&j)/(muts(i,j)*(t0+t_1(i,k,j))*muts(i,j)*(t0+t_1(i,k,j))))
-      a_t_2ave(i,k,j) = a_t_2ave(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j)))
+      a_mu1(i,j) = a_mu1(i,j)-a_t_2ave(i,k,j)*t_1(i,k,j)/walls(2)
+      a_muts(i,j) = a_muts(i,j)-a_t_2ave(i,k,j)*((walls(1)-mu1(i,j)*t_1(i,k,j))/(muts(i,j)*walls(2)))
+      a_t_1(i,k,j) = a_t_1(i,k,j)-a_t_2ave(i,k,j)*(mu1(i,j)/walls(2)+(walls(1)-mu1(i,j)*t_1(i,k,j))*muts(i,&
+&j)/(walls(2)*walls(2)))
+      a_t_2ave(i,k,j) = a_t_2ave(i,k,j)/walls(2)
       a_t_2(i,k,j) = a_t_2(i,k,j)+0.5*a_t_2ave(i,k,j)*(1+epssm)
       a_t_2ave(i,k,j) = 0.5*a_t_2ave(i,k,j)*(1.-epssm)
     end do
   end do
+
   do i = i_start, i_end
     a_mut(i,j) = a_mut(i,j)-a_mut_inv(i)/(mut(i,j)*mut(i,j))
-    a_mut_inv(i) = 0.
+!   a_mut_inv(i) = 0.
   end do
 end do
 
@@ -1337,6 +1531,7 @@ integer, intent(in) :: kde
 real, intent(in) :: mut(ims:ime,jms:jme)
 real, intent(in) :: rdn(kms:kme)
 real, intent(in) :: rdnw(kms:kme)
+real gwalls
 
 !==============================================
 ! declare local variables
@@ -1364,7 +1559,7 @@ integer k1
 a_b = 0.
 a_c = 0.
 a_cof(:) = 0.
-
+gwalls =0.5*dts*g*(1.+epssm)
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -1388,9 +1583,9 @@ do j = j_start, j_end
   a_b = 0.
   a_c = 0.
   do i = i_start, i_end
-    cof(i) = (0.5*dts*g*(1.+epssm)/mut(i,j))**2
+    cof(i) = (gwalls/mut(i,j))*(gwalls/mut(i,j))
     a(i,2,j) = 0.
-    a(i,kde,j) = -(2.*cof(i)*rdnw(kde-1)**2*c2a(i,kde-1,j))
+    a(i,kde,j) = -(2.*cof(i)*rdnw(kde-1)*rdnw(kde-1)*c2a(i,kde-1,j))
     gamma(i,1,j) = 0.
   end do
 ! recompute : cof,gamma
@@ -1412,7 +1607,7 @@ do j = j_start, j_end
   do i = i_start, i_end
     a_b = 0.
     a_c = 0.
-    b = 1.+2.*cof(i)*rdnw(kde-1)**2*c2a(i,kde-1,j)
+    b = 1.+2.*cof(i)*rdnw(kde-1)*rdnw(kde-1)*c2a(i,kde-1,j)
 ! recompute : b
     c = 0.
 ! recompute : c
@@ -1428,8 +1623,8 @@ do j = j_start, j_end
 &kde-1,j))))
     a_alpha(i,kde,j) = 0.
     a_c = 0.
-    a_c2a(i,kde-1,j) = a_c2a(i,kde-1,j)+2*a_b*cof(i)*rdnw(kde-1)**2
-    a_cof(i) = a_cof(i)+2*a_b*rdnw(kde-1)**2*c2a(i,kde-1,j)
+    a_c2a(i,kde-1,j) = a_c2a(i,kde-1,j)+2*a_b*cof(i)*rdnw(kde-1)*rdnw(kde-1)
+    a_cof(i) = a_cof(i)+2*a_b*rdnw(kde-1)*rdnw(kde-1)*c2a(i,kde-1,j)
     a_b = 0.
   end do
   do k = kde-1, 2, -1
@@ -1484,14 +1679,14 @@ do j = j_start, j_end
     end do
   end do
   do i = i_start, i_end
-    cof(i) = (0.5*dts*g*(1.+epssm)/mut(i,j))**2
+!   cof(i) = (gwalls/mut(i,j))**2
 ! recompute : cof
     a_gamma(i,1,j) = 0.
-    a_c2a(i,kde-1,j) = a_c2a(i,kde-1,j)-2*a_a(i,kde,j)*cof(i)*rdnw(kde-1)**2
-    a_cof(i) = a_cof(i)-2*a_a(i,kde,j)*rdnw(kde-1)**2*c2a(i,kde-1,j)
+    a_c2a(i,kde-1,j) = a_c2a(i,kde-1,j)-2*a_a(i,kde,j)*cof(i)*rdnw(kde-1)*rdnw(kde-1)
+    a_cof(i) = a_cof(i)-2*a_a(i,kde,j)*rdnw(kde-1)*rdnw(kde-1)*c2a(i,kde-1,j)
     a_a(i,kde,j) = 0.
     a_a(i,2,j) = 0.
-    a_mut(i,j) = a_mut(i,j)-2*a_cof(i)*0.5*dts*g*(1.+epssm)/(mut(i,j)*mut(i,j))*(0.5*dts*g*(1.+epssm)/mut(i,j))
+    a_mut(i,j) = a_mut(i,j)-2*a_cof(i)*gwalls/(mut(i,j)*mut(i,j))*(gwalls/mut(i,j))
     a_cof(i) = 0.
   end do
 end do
@@ -1558,11 +1753,11 @@ real, intent(in) :: t0
 real, intent(in) :: t_1(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: t_2(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: znu(kms:kme)
+real walls(8)
 
 !==============================================
 ! declare local variables
 !==============================================
-real a_ptmp
 integer i
 integer i_end
 integer i_start
@@ -1578,7 +1773,6 @@ integer k_start
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_ptmp = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1604,27 +1798,24 @@ if (j_end .eq. jde) then
 endif
 ! recompute : j_end
 if (step .eq. 0) then
-  do j = j_start, j_end
-    do k = k_start, k_end
-      do i = i_start, i_end
-        a_p(i,k,j) = a_p(i,k,j)+a_pm1(i,k,j)
-        a_pm1(i,k,j) = 0.
-      end do
-    end do
-  end do
+! do j = j_start, j_end
+!   do k = k_start, k_end
+!     do i = i_start, i_end
+!       a_p(i,k,j) = a_p(i,k,j)+a_pm1(i,k,j)
+!       a_pm1(i,k,j) = 0.
+!     end do
+!   end do
+! end do
+  a_p(i_start:i_end,k_start:k_end,j_start:j_end) = a_p(i_start:i_end,k_start:k_end,j_start:j_end)&
+&+a_pm1(i_start:i_end,k_start:k_end,j_start:j_end)
+  a_pm1(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
 else
   do j = j_start, j_end
-    a_ptmp = 0.
     do k = k_start, k_end
-      a_ptmp = 0.
       do i = i_start, i_end
-        a_ptmp = 0.
-        a_ptmp = a_ptmp+a_pm1(i,k,j)
-        a_pm1(i,k,j) = 0.
-        a_pm1(i,k,j) = a_pm1(i,k,j)-a_p(i,k,j)*smdiv
-        a_p(i,k,j) = a_p(i,k,j)*(1+smdiv)
-        a_p(i,k,j) = a_p(i,k,j)+a_ptmp
-        a_ptmp = 0.
+        walls(1)     = a_pm1(i,k,j)
+        a_pm1(i,k,j) = -a_p(i,k,j)*smdiv
+        a_p(i,k,j)   = a_p(i,k,j)*(1+smdiv)+walls(1)
       end do
     end do
   end do
@@ -1632,57 +1823,65 @@ endif
 if (non_hydrostatic) then
   do j = j_start, j_end
     do k = k_start, k_end
+      walls(1)=rdnw(k)
       do i = i_start, i_end
-        al(i,k,j) = -(1./muts(i,j)*(alt(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j))))
-! recompute : al
-        a_al(i,k,j) = a_al(i,k,j)-a_p(i,k,j)*c2a(i,k,j)
-        a_alt(i,k,j) = a_alt(i,k,j)+a_p(i,k,j)*c2a(i,k,j)*((t_2(i,k,j)-mu(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_c2a(i,k,j) = a_c2a(i,k,j)+a_p(i,k,j)*(alt(i,k,j)*(t_2(i,k,j)-mu(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))-al(i,k,j))
-        a_mu(i,j) = a_mu(i,j)-a_p(i,k,j)*c2a(i,k,j)*(alt(i,k,j)*t_1(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_muts(i,j) = a_muts(i,j)-a_p(i,k,j)*c2a(i,k,j)*(alt(i,k,j)*(t_2(i,k,j)-mu(i,j)*t_1(i,k,j))*(t0+t_1(i,k,j))/(muts(i,j)*(t0+&
-&t_1(i,k,j))*muts(i,j)*(t0+t_1(i,k,j))))
-        a_t_1(i,k,j) = a_t_1(i,k,j)-a_p(i,k,j)*c2a(i,k,j)*(alt(i,k,j)*mu(i,j)/(muts(i,j)*(t0+t_1(i,k,j)))+alt(i,k,j)*(t_2(i,k,j)-&
-&mu(i,j)*t_1(i,k,j))*muts(i,j)/(muts(i,j)*(t0+t_1(i,k,j))*muts(i,j)*(t0+t_1(i,k,j))))
-        a_t_2(i,k,j) = a_t_2(i,k,j)+a_p(i,k,j)*c2a(i,k,j)*(alt(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_p(i,k,j) = 0.
-        a_alt(i,k,j) = a_alt(i,k,j)-a_al(i,k,j)*1./muts(i,j)*mu(i,j)
-        a_mu(i,j) = a_mu(i,j)-a_al(i,k,j)*1./muts(i,j)*alt(i,k,j)
-        a_muts(i,j) = a_muts(i,j)+a_al(i,k,j)/(muts(i,j)*muts(i,j))*(alt(i,k,j)*mu(i,j)+rdnw(k)*(ph(i,k+1,j)-ph(i,k,j)))
-        a_ph(i,k+1,j) = a_ph(i,k+1,j)-a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-        a_ph(i,k,j) = a_ph(i,k,j)+a_al(i,k,j)*1./muts(i,j)*rdnw(k)
-        a_al(i,k,j) = 0.
+        walls(2) = t_1(i,k,j)
+        walls(3) = (t0+walls(2))*muts(i,j)
+        walls(4) = muts(i,j)
+        walls(5) = (t_2(i,k,j)-mu(i,j)*walls(2))/walls(3)
+        walls(6) = a_p(i,k,j)*c2a(i,k,j)
+        walls(8) = alt(i,k,j)
+        walls(7) = (walls(8)*mu(i,j)+walls(1)*(ph(i,k+1,j)-ph(i,k,j)))/walls(4)
+        al(i,k,j) = -walls(7)
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(6)*walls(5)
+        a_c2a(i,k,j) = a_c2a(i,k,j)+a_p(i,k,j)*(walls(8)*walls(5)-al(i,k,j))
+        a_mu(i,j) = a_mu(i,j)-walls(6)*(walls(8)*walls(2)/walls(3))
+        a_muts(i,j) = a_muts(i,j)-walls(6)*(walls(8)*walls(5)*(t0+walls(2))/(walls(4)*(t0+walls(2))))
+        a_t_1(i,k,j) = a_t_1(i,k,j)-walls(6)*walls(8)*(mu(i,j)+walls(5)*walls(4))/walls(3)
+        a_t_2(i,k,j) = a_t_2(i,k,j)+walls(6)*(walls(8)/walls(3))
+        walls(5) = (a_al(i,k,j)-walls(6))/walls(4)
+        a_alt(i,k,j) = a_alt(i,k,j)-walls(5)*mu(i,j)
+        a_mu(i,j) = a_mu(i,j)-walls(5)*walls(8)
+        a_muts(i,j) = a_muts(i,j)+walls(5)*walls(7)
+        a_ph(i,k+1,j) = a_ph(i,k+1,j)-walls(5)*walls(1)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(5)*walls(1)
       end do
     end do
   end do
+  a_p(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
+  a_al(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
 else
   do j = j_start, j_end
     do k = k_end, k_start, -1
+      walls(1)=znu(k)
+      walls(2)=dnw(k)
       do i = i_start, i_end
-        p(i,k,j) = mu(i,j)*znu(k)
-! recompute : p
-        al(i,k,j) = alt(i,k,j)*(t_2(i,k,j)-mu(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))-p(i,k,j)/c2a(i,k,j)
-! recompute : al
-        a_al(i,k,j) = a_al(i,k,j)-a_ph(i,k+1,j)*dnw(k)*muts(i,j)
-        a_alt(i,k,j) = a_alt(i,k,j)-a_ph(i,k+1,j)*dnw(k)*mu(i,j)
-        a_mu(i,j) = a_mu(i,j)-a_ph(i,k+1,j)*dnw(k)*alt(i,k,j)
-        a_muts(i,j) = a_muts(i,j)-a_ph(i,k+1,j)*dnw(k)*al(i,k,j)
-        a_ph(i,k,j) = a_ph(i,k,j)+a_ph(i,k+1,j)
-        a_ph(i,k+1,j) = 0.
-        a_alt(i,k,j) = a_alt(i,k,j)+a_al(i,k,j)*((t_2(i,k,j)-mu(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_c2a(i,k,j) = a_c2a(i,k,j)+a_al(i,k,j)*(p(i,k,j)/(c2a(i,k,j)*c2a(i,k,j)))
-        a_mu(i,j) = a_mu(i,j)-a_al(i,k,j)*(alt(i,k,j)*t_1(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_muts(i,j) = a_muts(i,j)-a_al(i,k,j)*(alt(i,k,j)*(t_2(i,k,j)-mu(i,j)*t_1(i,k,j))*(t0+t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)&
-&)*muts(i,j)*(t0+t_1(i,k,j))))
-        a_p(i,k,j) = a_p(i,k,j)-a_al(i,k,j)/c2a(i,k,j)
-        a_t_1(i,k,j) = a_t_1(i,k,j)-a_al(i,k,j)*(alt(i,k,j)*mu(i,j)/(muts(i,j)*(t0+t_1(i,k,j)))+alt(i,k,j)*(t_2(i,k,j)-mu(i,j)*&
-&t_1(i,k,j))*muts(i,j)/(muts(i,j)*(t0+t_1(i,k,j))*muts(i,j)*(t0+t_1(i,k,j))))
-        a_t_2(i,k,j) = a_t_2(i,k,j)+a_al(i,k,j)*(alt(i,k,j)/(muts(i,j)*(t0+t_1(i,k,j))))
-        a_al(i,k,j) = 0.
-        a_mu(i,j) = a_mu(i,j)+a_p(i,k,j)*znu(k)
-        a_p(i,k,j) = 0.
+        walls(3) = a_ph(i,k+1,j)
+        walls(4) = muts(i,j)*t0+t_1(i,k,j)
+        walls(5) = (t_2(i,k,j)-mu(i,j)*t_1(i,k,j))/walls(4)
+        walls(6) = mu(i,j)/c2a(i,k,j)
+        walls(7) = alt(i,k,j)
+        walls(8) = a_al(i,k,j)-walls(3)*walls(2)*muts(i,j)
+        a_alt(i,k,j) = a_alt(i,k,j)-walls(3)*walls(2)*mu(i,j)
+        a_mu(i,j) = a_mu(i,j)-walls(3)*walls(2)*walls(7)
+        a_muts(i,j) = a_muts(i,j)-walls(3)*walls(2)*al(i,k,j)*walls(5)-walls(1)*walls(6)
+        a_ph(i,k,j) = a_ph(i,k,j)+walls(3)
+        walls(3) = t0+t_1(i,k,j)
+        a_alt(i,k,j) = a_alt(i,k,j)+walls(8)*walls(5)
+        a_c2a(i,k,j) = a_c2a(i,k,j)+walls(8)*walls(1)*walls(6)*walls(6)/mu(i,j)
+        walls(7) =walls(8)*walls(7)/walls(4)
+        a_mu(i,j) = a_mu(i,j)-walls(7)*t_1(i,k,j)
+        a_muts(i,j) = a_muts(i,j)-walls(7)*walls(5)*walls(3)
+        a_p(i,k,j) = a_p(i,k,j)-walls(8)/c2a(i,k,j)
+        a_t_1(i,k,j) = a_t_1(i,k,j)-walls(7)*(mu(i,j)+walls(4)*walls(5)/walls(3))
+        a_t_2(i,k,j) = a_t_2(i,k,j)+walls(7)
+        a_mu(i,j) = a_mu(i,j)+a_p(i,k,j)*walls(1)
       end do
+      a_ph(i_start:i_end,k+1,j) = 0.
     end do
   end do
+  a_al(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
+  a_p(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
 endif
 
    call trace_exit("a_calc_p_rho")
@@ -1768,6 +1967,7 @@ real, intent(in) :: w_save(ims:ime,kms:kme,jms:jme)
 !==============================================
 ! declare local variables
 !==============================================
+real walls(4),gwalls(ims:ime)
 integer i
 integer i_end
 integer i_endu
@@ -1805,56 +2005,61 @@ if (j_end .eq. jde) then
   j_end = j_end-1
 endif
 ! recompute : j_end
-do j = j_start, j_end
-  do i = i_start, i_end
-    a_mu_save(i,j) = a_mu_save(i,j)+a_mu_2(i,j)
-  end do
-end do
+!do j = j_start, j_end
+!  do i = i_start, i_end
+!    a_mu_save(i,j) = a_mu_save(i,j)+a_mu_2(i,j)
+!  end do
+!end do
+a_mu_save(i_start:i_end,j_start:j_end) = a_mu_save(i_start:i_end,j_start:j_end)+a_mu_2(i_start:i_end,j_start:j_end)
+
+walls(1)=dts*number_of_small_timesteps
 do j = j_start, j_end
   do k = kds, kde-1
+    gwalls(i_start:i_end)=walls(1)*h_diabatic(i_start:i_end,k,j)
     do i = i_start, i_end
-
-      a_mut(i,j) = a_mut(i,j)+a_t_2(i,k,j)*(- dts*number_of_small_timesteps*h_diabatic(i,k,j) +t_save(i,k,j)/muts(i,j))
-      a_muts(i,j) = a_muts(i,j)-a_t_2(i,k,j)*((t_2(i,k,j)- dts*number_of_small_timesteps*mut(i,j)*h_diabatic(i,k,j) &
-                    +t_save(i,k,j)*mut(i,j))/(muts(i,j)*muts(i,j)))
-      a_t_save(i,k,j) = a_t_save(i,k,j)+a_t_2(i,k,j)*(mut(i,j)/muts(i,j))
-      a_t_2(i,k,j) = a_t_2(i,k,j)/muts(i,j)
-
+      walls(2)=a_t_2(i,k,j)/muts(i,j)
+      a_mut(i,j) = a_mut(i,j)+walls(2)*(-gwalls(i)*muts(i,j)+t_save(i,k,j))
+      a_muts(i,j) = a_muts(i,j)-walls(2)*(t_2(i,k,j)-gwalls(i)*mut(i,j)+t_save(i,k,j)*mut(i,j))/muts(i,j)
+      a_t_save(i,k,j) = a_t_save(i,k,j)+walls(2)*mut(i,j)
+      a_t_2(i,k,j) = walls(2)
     end do
   end do
 end do
+
+a_ww1(i_start:i_end,kds:kde,j_start:j_end) =a_ww1(i_start:i_end,kds:kde,j_start:j_end) +a_ww(i_start:i_end,kds:kde,j_start:j_end)
+a_ph_save(i_start:i_end,kds:kde,j_start:j_end) = a_ph_save(i_start:i_end,kds:kde,j_start:j_end)+a_ph_2(i_start:i_end,kds:kde,j_start:j_end)
+
 do j = j_start, j_end
   do k = kds, kde
     do i = i_start, i_end
-!------------------------- added in May 9 -----------------
-      a_ww1(i,k,j) =a_ww1(i,k,j) +a_ww(i,k,j)
-!------------------------- added in May 9 -----------------
-
-      a_ph_save(i,k,j) = a_ph_save(i,k,j)+a_ph_2(i,k,j)
-      a_mut(i,j) = a_mut(i,j)+a_w_2(i,k,j)*(w_save(i,k,j)/muts(i,j))
-      a_muts(i,j) = a_muts(i,j)-a_w_2(i,k,j)*((msft(i,j)*w_2(i,k,j)+w_save(i,k,j)*mut(i,j))/(muts(i,j)*muts(i,j)))
-      a_w_save(i,k,j) = a_w_save(i,k,j)+a_w_2(i,k,j)*(mut(i,j)/muts(i,j))
-      a_w_2(i,k,j) = a_w_2(i,k,j)*(msft(i,j)/muts(i,j))
+      walls(1)=a_w_2(i,k,j)
+      walls(2)=w_save(i,k,j)/muts(i,j)
+      a_mut(i,j) = a_mut(i,j)+walls(1)*walls(2)
+      a_muts(i,j) = a_muts(i,j)-walls(1)*(msft(i,j)/muts(i,j)*w_2(i,k,j)+walls(2)*mut(i,j))/muts(i,j)
+      a_w_save(i,k,j) = a_w_save(i,k,j)+walls(1)*(mut(i,j)/muts(i,j))
+      a_w_2(i,k,j) = walls(1)*(msft(i,j)/muts(i,j))
     end do
   end do
 end do
 do j = j_start, j_end
   do k = kds, kde-1
     do i = i_start, i_endu
-      a_muu(i,j) = a_muu(i,j)+a_u_2(i,k,j)*(u_save(i,k,j)/muus(i,j))
-      a_muus(i,j) = a_muus(i,j)-a_u_2(i,k,j)*((msfu(i,j)*u_2(i,k,j)+u_save(i,k,j)*muu(i,j))/(muus(i,j)*muus(i,j)))
-      a_u_save(i,k,j) = a_u_save(i,k,j)+a_u_2(i,k,j)*(muu(i,j)/muus(i,j))
-      a_u_2(i,k,j) = a_u_2(i,k,j)*(msfu(i,j)/muus(i,j))
+      walls(1)=a_u_2(i,k,j)/muus(i,j)
+      a_muu(i,j) = a_muu(i,j)+walls(1)*u_save(i,k,j)
+      a_muus(i,j) = a_muus(i,j)-walls(1)*((msfu(i,j)*u_2(i,k,j)+u_save(i,k,j)*muu(i,j))/muus(i,j))
+      a_u_save(i,k,j) = a_u_save(i,k,j)+walls(1)*muu(i,j)
+      a_u_2(i,k,j) = walls(1)*msfu(i,j)
     end do
   end do
 end do
 do j = j_start, j_endv
   do k = kds, kde-1
     do i = i_start, i_end
-      a_muv(i,j) = a_muv(i,j)+a_v_2(i,k,j)*(v_save(i,k,j)/muvs(i,j))
-      a_muvs(i,j) = a_muvs(i,j)-a_v_2(i,k,j)*((msfv(i,j)*v_2(i,k,j)+v_save(i,k,j)*muv(i,j))/(muvs(i,j)*muvs(i,j)))
-      a_v_save(i,k,j) = a_v_save(i,k,j)+a_v_2(i,k,j)*(muv(i,j)/muvs(i,j))
-      a_v_2(i,k,j) = a_v_2(i,k,j)*(msfv(i,j)/muvs(i,j))
+      walls(1)=a_v_2(i,k,j)/muvs(i,j)
+      a_muv(i,j) = a_muv(i,j)+walls(1)*v_save(i,k,j)
+      a_muvs(i,j) = a_muvs(i,j)-walls(1)*((msfv(i,j)*v_2(i,k,j)+v_save(i,k,j)*muv(i,j))/muvs(i,j))
+      a_v_save(i,k,j) = a_v_save(i,k,j)+walls(1)*muv(i,j)
+      a_v_2(i,k,j) = walls(1)*msfv(i,j)
     end do
   end do
 end do
@@ -1967,6 +2172,7 @@ integer j_start
 integer k
 integer k_end
 integer k_start
+real    walls(4)
 
    call trace_entry("a_small_step_prep")
 
@@ -2054,7 +2260,9 @@ if (rk_step .eq. 1 .and. ( .not. leapfrog)) then
       muvs(i,j) = muv(i,j)
     end do
   end do
+
 else
+
   do j = j_start, j_end
     do i = i_start, i_end
       muts(i,j) = mub(i,j)+mu_1(i,j)
@@ -2063,97 +2271,105 @@ else
       muus(i,j) = 0.5*(mub(i,j)+mu_1(i,j)+mub(i-1,j)+mu_1(i-1,j))
     end do
   end do
+
   do j = j_start, j_endv
     do i = i_start, i_end
       muvs(i,j) = 0.5*(mub(i,j)+mu_1(i,j)+mub(i,j-1)+mu_1(i,j-1))
     end do
   end do
 
-!--------- added by zzma -----------
     DO j=j_start, j_end
       DO i=i_start, i_end
         mu_2(i,j)=mu_1(i,j)-mu_2(i,j)
       ENDDO
     ENDDO
-!--------- added by zzma -----------
 
 endif
-! recompute : muts,muus,muvs,t_1,u_1,v_1,w_1
-do j = j_start, j_end
-  do k = k_start, kde
-    do i = i_start, i_end
-      a_ww(i,k,j) = a_ww(i,k,j)+a_ww_save(i,k,j)
-      a_ww_save(i,k,j) = 0.
-    end do
-  end do
-end do
+
+!do j = j_start, j_end
+!  do k = k_start, kde
+!    do i = i_start, i_end
+!      a_ww(i,k,j) = a_ww(i,k,j)+a_ww_save(i,k,j)
+!      a_ww_save(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+a_ww(i_start:i_end,k_start:kde,j_start:j_end) = a_ww(i_start:i_end,k_start:kde,j_start:j_end)+a_ww_save(i_start:i_end,k_start:kde,j_start:j_end)
+a_ww_save(i_start:i_end,k_start:kde,j_start:j_end) = 0.
+
 do j = j_start, j_end
   do k = k_start, kde
     do i = i_start, i_end
       a_ph_1(i,k,j) = a_ph_1(i,k,j)+a_ph_2(i,k,j)
-      a_ph_2(i,k,j) = -a_ph_2(i,k,j)
-      a_ph_2(i,k,j) = a_ph_2(i,k,j)+a_ph_save(i,k,j)
-      a_ph_save(i,k,j) = 0.
-      a_mut(i,j) = a_mut(i,j)-a_w_2(i,k,j)*(w_2(i,k,j)/msft(i,j))
-      a_muts(i,j) = a_muts(i,j)+a_w_2(i,k,j)*(w_1(i,k,j)/msft(i,j))
-      a_w_1(i,k,j) = a_w_1(i,k,j)+a_w_2(i,k,j)*(muts(i,j)/msft(i,j))
-      a_w_2(i,k,j) = -(a_w_2(i,k,j)*(mut(i,j)/msft(i,j)))
-      a_w_2(i,k,j) = a_w_2(i,k,j)+a_w_save(i,k,j)
-      a_w_save(i,k,j) = 0.
+      a_ph_2(i,k,j) = -a_ph_2(i,k,j)+a_ph_save(i,k,j)
+      walls(1)=a_w_2(i,k,j)/msft(i,j)
+      a_mut(i,j) = a_mut(i,j)-walls(1)*w_2(i,k,j)
+      a_muts(i,j) = a_muts(i,j)+walls(1)*w_1(i,k,j)
+      a_w_1(i,k,j) = a_w_1(i,k,j)+walls(1)*muts(i,j)
+      a_w_2(i,k,j) = -walls(1)*mut(i,j)+a_w_save(i,k,j)
     end do
   end do
 end do
+a_ph_save(i_start:i_end,k_start:kde,j_start:j_end) = 0.
+a_w_save(i_start:i_end,k_start:kde,j_start:j_end) = 0.
+
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
-      a_mut(i,j) = a_mut(i,j)-a_t_2(i,k,j)*t_2(i,k,j)
-      a_muts(i,j) = a_muts(i,j)+a_t_2(i,k,j)*t_1(i,k,j)
-      a_t_1(i,k,j) = a_t_1(i,k,j)+a_t_2(i,k,j)*muts(i,j)
-      a_t_2(i,k,j) = -(a_t_2(i,k,j)*mut(i,j))
-      a_t_2(i,k,j) = a_t_2(i,k,j)+a_t_save(i,k,j)
-      a_t_save(i,k,j) = 0.
+      walls(1)=a_t_2(i,k,j)
+      a_mut(i,j) = a_mut(i,j)-walls(1)*t_2(i,k,j)
+      a_muts(i,j) = a_muts(i,j)+walls(1)*t_1(i,k,j)
+      a_t_1(i,k,j) = a_t_1(i,k,j)+walls(1)*muts(i,j)
+      a_t_2(i,k,j) = -walls(1)*mut(i,j)+a_t_save(i,k,j)
     end do
   end do
 end do
+a_t_save(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
+
 do j = j_start, j_endv
   do k = k_start, k_end
     do i = i_start, i_end
-      a_muv(i,j) = a_muv(i,j)-a_v_2(i,k,j)*(v_2(i,k,j)/msfv(i,j))
-      a_muvs(i,j) = a_muvs(i,j)+a_v_2(i,k,j)*(v_1(i,k,j)/msfv(i,j))
-      a_v_1(i,k,j) = a_v_1(i,k,j)+a_v_2(i,k,j)*(muvs(i,j)/msfv(i,j))
-      a_v_2(i,k,j) = -(a_v_2(i,k,j)*(muv(i,j)/msfv(i,j)))
-      a_v_2(i,k,j) = a_v_2(i,k,j)+a_v_save(i,k,j)
-      a_v_save(i,k,j) = 0.
+      walls(1)=a_v_2(i,k,j)/msfv(i,j)
+      a_muv(i,j) = a_muv(i,j)-walls(1)*v_2(i,k,j)
+      a_muvs(i,j) = a_muvs(i,j)+walls(1)*v_1(i,k,j)
+      a_v_1(i,k,j) = a_v_1(i,k,j)+walls(1)*muvs(i,j)
+      a_v_2(i,k,j) = -walls(1)*muv(i,j)+a_v_save(i,k,j)
     end do
   end do
 end do
+a_v_save(i_start:i_end,k_start:k_end,j_start:j_endv) = 0.
+
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_endu
-      a_muu(i,j) = a_muu(i,j)-a_u_2(i,k,j)*(u_2(i,k,j)/msfu(i,j))
-      a_muus(i,j) = a_muus(i,j)+a_u_2(i,k,j)*(u_1(i,k,j)/msfu(i,j))
-      a_u_1(i,k,j) = a_u_1(i,k,j)+a_u_2(i,k,j)*(muus(i,j)/msfu(i,j))
-      a_u_2(i,k,j) = -(a_u_2(i,k,j)*(muu(i,j)/msfu(i,j)))
-      a_u_2(i,k,j) = a_u_2(i,k,j)+a_u_save(i,k,j)
-      a_u_save(i,k,j) = 0.
+      walls(1)=a_u_2(i,k,j)/msfu(i,j)
+      a_muu(i,j) = a_muu(i,j)-walls(1)*u_2(i,k,j)
+      a_muus(i,j) = a_muus(i,j)+walls(1)*u_1(i,k,j)
+      a_u_1(i,k,j) = a_u_1(i,k,j)+walls(1)*muus(i,j)
+      a_u_2(i,k,j) = -walls(1)*muu(i,j)+a_u_save(i,k,j)
     end do
   end do
 end do
+a_u_save(i_start:i_endu,k_start:k_end,j_start:j_end) = 0.
+
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
-      a_alt(i,k,j) = a_alt(i,k,j)-a_c2a(i,k,j)*(cpovcv*(pb(i,k,j)+p(i,k,j))/(alt(i,k,j)*alt(i,k,j)))
-      a_p(i,k,j) = a_p(i,k,j)+a_c2a(i,k,j)*(cpovcv/alt(i,k,j))
-      a_c2a(i,k,j) = 0.
+      walls(1)=a_c2a(i,k,j)*cpovcv/alt(i,k,j)
+      a_alt(i,k,j) = a_alt(i,k,j)-walls(1)*(pb(i,k,j)+p(i,k,j))/alt(i,k,j)
+      a_p(i,k,j) = a_p(i,k,j)+walls(1)
     end do
   end do
 end do
+a_c2a(i_start:i_end,k_start:k_end,j_start:j_end) = 0.
+
 do j = j_start, j_end
   do i = i_start, i_end
     a_ww_save(i,1,j) = 0.
     a_ww_save(i,kde,j) = 0.
   end do
 end do
+
 if (rk_step .eq. 1 .and. ( .not. leapfrog)) then
   do j = j_start, j_end
     do i = i_start, i_end
@@ -2223,21 +2439,21 @@ if (rk_step .eq. 1 .and. ( .not. leapfrog)) then
   end do
 else
 !---------- zzma -----------
-  do j = j_start, j_end
-    do i = i_start, i_end
+!  do j = j_start, j_end
+!    do i = i_start, i_end
 !      a_mu_1(i,j) = 0.0
-    end do
-  end do
-  do j = j_start, j_endv
-    do i = i_start, i_end
+!    end do
+!  end do
+!  do j = j_start, j_endv
+!    do i = i_start, i_end
 !      a_mu_1(i,j) = 0.0
-    end do
-  end do
-  do j = j_start, j_endv
-    do i = i_start, i_endu
+!    end do
+!  end do
+!  do j = j_start, j_endv
+!    do i = i_start, i_endu
 !      a_mu_1(i,j) = 0.0
-    end do
-  end do
+!    end do
+!  end do
 
 !   a_mu_1=0
 !   a_u_1=0
@@ -2277,6 +2493,10 @@ else
       a_muts(i,j) = 0.
     end do
   end do
+  a_mu_save(i_start:i_end,j_start:j_end) = 0.
+  a_muvs(i_start:i_end,j_start:j_endv) = 0.
+  a_muus(i_start:i_endu,j_start:j_end) = 0.
+  a_muts(i_start:i_end,j_start:j_end) = 0.
 endif
 
    call trace_exit("a_small_step_prep")
