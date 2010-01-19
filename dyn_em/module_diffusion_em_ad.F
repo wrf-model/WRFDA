@@ -444,7 +444,6 @@ real a_es
 real a_qctmp(its:ite,kts:kte,jts:jte)
 real a_qvs(its:ite,kts:kte,jts:jte)
 real a_qvsfc
-real a_tc
 real a_thetaem1
 real a_thetaep1
 real a_thetaesfc
@@ -474,23 +473,19 @@ real thetaesfc
 real thetasfc
 real tmpdz
 real xlvqv
+real walls(7)
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+a_thetasfc=0.  !ADDED BY WALLS
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_coefa = 0.
-a_es = 0.
 a_qctmp(:,:,:) = 0.
 a_qvs(:,:,:) = 0.
-a_qvsfc = 0.
-a_tc = 0.
-a_thetaem1 = 0.
-a_thetaep1 = 0.
 a_thetaesfc = 0.
-a_thetasfc = 0.
 a_tmp1(:,:,:) = 0.
 a_tmp1sfc(:,:) = 0.
-a_xlvqv = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -544,8 +539,7 @@ endif
 do j = j_start, j_end
   do k = kts, ktf
     do i = i_start, i_end
-      tc = t(i,k,j)-svpt0
-      es = 1000.*svp1*exp(svp2*tc/(t(i,k,j)-svp3))
+      es = 1000.*svp1*exp(svp2*(t(i,k,j)-svpt0)/(t(i,k,j)-svp3))
       qvs(i,k,j) = ep_2*es/(p(i,k,j)-es)
     end do
   end do
@@ -560,171 +554,133 @@ do j = j_start, j_end
   end do
 end do
 do j = j_start, j_end
-  a_coefa = 0.
-  a_qvsfc = 0.
-  a_thetaep1 = 0.
-  a_thetaesfc = 0.
-  a_thetasfc = 0.
-  a_xlvqv = 0.
   do i = i_start, i_end
-    a_coefa = 0.
-    a_qvsfc = 0.
-    a_thetaep1 = 0.
-    a_thetaesfc = 0.
-    a_thetasfc = 0.
-    a_xlvqv = 0.
     tmpdz = 1./rdz(i,k+1,j)+0.5/rdzw(i,k,j)
 ! recompute : tmpdz
-    thetasfc = t8w(i,kts,j)/(p8w(i,k,j)/p1000mb)**(r_d/cp)
+    walls(3)= p8w(i,k,j)/p1000mb
+    walls(2)= walls(3)**(r_d/cp)
+    walls(5)=t(i,k,j)
+    walls(6)=t8w(i,kts,j)
+    walls(7)=theta(i,k,j)
+    thetasfc = walls(6)/walls(2)
 ! recompute : thetasfc
     if (moist(i,k,j,p_qv) .ge. qvs(i,k,j) .or. qctmp(i,k,j) .ge. qc_cr) then
       qvsfc = cf1*qvs(i,1,j)+cf2*qvs(i,2,j)+cf3*qvs(i,3,j)
 ! recompute : qvsfc
       xlvqv = xlv*moist(i,k,j,p_qv)
 ! recompute : xlvqv
-      coefa = (1.+xlvqv/r_d/t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))/theta(i,k,j)
+      walls(1)=1.+xlvqv/r_d/walls(5)
+      walls(4)=1.+xlv*xlvqv/cp/r_v/walls(5)/walls(5)
+      coefa = a_bn2(i,k,j)*walls(1)/walls(4)/walls(7)*g/tmpdz
 ! recompute : coefa
       thetaep1 = theta(i,k+1,j)*(1.+xlv*qvs(i,k+1,j)/cp/t(i,k+1,j))
 ! recompute : thetaep1
-      thetaesfc = thetasfc*(1.+xlv*qvsfc/cp/t8w(i,kts,j))
+      thetaesfc = thetasfc*(1.+xlv*qvsfc/cp/walls(6))
 ! recompute : thetaesfc
-      a_coefa = a_coefa+a_bn2(i,k,j)*g*((thetaep1-thetaesfc)/tmpdz)
-      a_thetaep1 = a_thetaep1+a_bn2(i,k,j)*g*(coefa/tmpdz)
-      a_thetaesfc = a_thetaesfc-a_bn2(i,k,j)*g*(coefa/tmpdz)
-      a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*(g/tmpdz)
-      a_tmp1sfc(i,j) = a_tmp1sfc(i,j)+a_bn2(i,k,j)*(g/tmpdz)
+      a_coefa = a_bn2(i,k,j)*((thetaep1-thetaesfc)*g/tmpdz)
+      a_thetaep1 = coefa
+      a_thetaesfc = -coefa
+      a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*g/tmpdz
+      a_tmp1sfc(i,j) = a_tmp1sfc(i,j)+a_bn2(i,k,j)*g/tmpdz
       a_bn2(i,k,j) = 0.
-      a_qvsfc = a_qvsfc+a_thetaesfc*thetasfc*(xlv/cp/t8w(i,kts,j))
-      a_t8w(i,kts,j) = a_t8w(i,kts,j)-a_thetaesfc*thetasfc*(xlv*qvsfc/cp/(t8w(i,kts,j)*t8w(i,kts,j)))
-      a_thetasfc = a_thetasfc+a_thetaesfc*(1+xlv*qvsfc/cp/t8w(i,kts,j))
-      a_thetaesfc = 0.
+      a_qvsfc = a_thetaesfc*thetasfc*xlv/cp/walls(6)
+      a_t8w(i,kts,j) = a_t8w(i,kts,j)-a_thetaesfc*thetasfc*xlv*qvsfc/cp/(walls(6)*walls(6))
+      a_thetasfc = a_thetaesfc*(1+xlv*qvsfc/cp/walls(6))
       a_qvs(i,k+1,j) = a_qvs(i,k+1,j)+a_thetaep1*theta(i,k+1,j)*(xlv/cp/t(i,k+1,j))
       a_t(i,k+1,j) = a_t(i,k+1,j)-a_thetaep1*theta(i,k+1,j)*(xlv*qvs(i,k+1,j)/cp/(t(i,k+1,j)*t(i,k+1,j)))
       a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_thetaep1*(1+xlv*qvs(i,k+1,j)/cp/t(i,k+1,j))
-      a_thetaep1 = 0.
-      a_t(i,k,j) = a_t(i,k,j)+a_coefa*(((-(xlvqv/r_d/(t(i,k,j)*t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))+(1.+xlvqv/r_d/&
-&t(i,k,j))*(xlv*xlvqv/cp/r_v/(t(i,k,j)*t(i,k,j))/t(i,k,j)+xlv*xlvqv/cp/r_v/t(i,k,j)/(t(i,k,j)*t(i,k,j)))/((1.+xlv*xlvqv/cp/&
-&r_v/t(i,k,j)/t(i,k,j))*(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))/theta(i,k,j))
-      a_theta(i,k,j) = a_theta(i,k,j)-a_coefa*((1.+xlvqv/r_d/t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))/(theta(i,k,j)*&
-&theta(i,k,j)))
-      a_xlvqv = a_xlvqv+a_coefa*((1/r_d/t(i,k,j)/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))-(1.+xlvqv/r_d/t(i,k,j))*(xlv/cp/r_v/t(i,k,&
-&j)/t(i,k,j))/((1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))*(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))/theta(i,k,j))
-      a_coefa = 0.
+      a_t(i,k,j) = a_t(i,k,j)+a_coefa*(-xlvqv/r_d/walls(5)+2.*walls(1)*(walls(4)-1.)/walls(4))/walls(5)/walls(7)/walls(4)
+      a_theta(i,k,j) = a_theta(i,k,j)-a_coefa*walls(1)/walls(4)/(walls(7)*walls(7))
+      a_xlvqv = a_coefa*(1/r_d-walls(1)*xlv/cp/r_v/walls(5)/walls(4))/walls(5)/walls(4)/walls(7)
       a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+a_xlvqv*xlv
-      a_xlvqv = 0.
       a_qvs(i,3,j) = a_qvs(i,3,j)+a_qvsfc*cf3
       a_qvs(i,2,j) = a_qvs(i,2,j)+a_qvsfc*cf2
       a_qvs(i,1,j) = a_qvs(i,1,j)+a_qvsfc*cf1
-      a_qvsfc = 0.
     else
       tmpdz = 1./rdzw(i,k,j)
 ! recompute : tmpdz
-      a_moist(i,k+1,j,p_qv) = a_moist(i,k+1,j,p_qv)+a_bn2(i,k,j)*g*(1.61/tmpdz)
-      a_qvsfc = a_qvsfc+a_bn2(i,k,j)*g*((-1.61)/tmpdz)
-      a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_bn2(i,k,j)*g*(1/theta(i,k,j)/tmpdz)
-      a_theta(i,k,j) = a_theta(i,k,j)+a_bn2(i,k,j)*g*(((-1)/theta(i,k,j)-(theta(i,k+1,j)-theta(i,k,j))/(theta(i,k,j)*theta(i,k,j)))&
-&/tmpdz)
-      a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*(g/tmpdz)
-      a_tmp1sfc(i,j) = a_tmp1sfc(i,j)+a_bn2(i,k,j)*(g/tmpdz)
+      a_moist(i,k+1,j,p_qv) = a_moist(i,k+1,j,p_qv)+a_bn2(i,k,j)*(1.61*g/tmpdz)
+      a_qvsfc = a_bn2(i,k,j)*((-1.61)*g/tmpdz)
+      a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_bn2(i,k,j)*(1/walls(7)*g/tmpdz)
+      a_theta(i,k,j) = a_theta(i,k,j)+a_bn2(i,k,j)*((-1)/walls(7)-(theta(i,k+1,j)-walls(7))/(walls(7)*walls(7)))*g/tmpdz
+      a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*g/tmpdz
+      a_tmp1sfc(i,j) = a_tmp1sfc(i,j)+a_bn2(i,k,j)*g/tmpdz
       a_bn2(i,k,j) = 0.
       a_moist(i,3,j,p_qv) = a_moist(i,3,j,p_qv)+a_qvsfc*cf3
       a_moist(i,2,j,p_qv) = a_moist(i,2,j,p_qv)+a_qvsfc*cf2
       a_moist(i,1,j,p_qv) = a_moist(i,1,j,p_qv)+a_qvsfc*cf1
-      a_qvsfc = 0.
     endif
-    a_p8w(i,k,j) = a_p8w(i,k,j)-a_thetasfc*(t8w(i,kts,j)/p1000mb*r_d/cp*(p8w(i,k,j)/p1000mb)**(r_d/cp-1)/((p8w(i,k,j)/p1000mb)**&
-&(r_d/cp)*(p8w(i,k,j)/p1000mb)**(r_d/cp)))
-    a_t8w(i,kts,j) = a_t8w(i,kts,j)+a_thetasfc/(p8w(i,k,j)/p1000mb)**(r_d/cp)
-    a_thetasfc = 0.
+    if(a_thetasfc.ne.0.) then  !ADDED BY WALLS
+      a_p8w(i,k,j) = a_p8w(i,k,j)-a_thetasfc*(walls(6)/p1000mb*r_d/cp/walls(3)/walls(2))
+      a_t8w(i,kts,j) = a_t8w(i,kts,j)+a_thetasfc/walls(2)
+    end if  !ADDED BY WALLS
   end do
 end do
 do j = j_start, j_end
-  a_coefa = 0.
-  a_thetaem1 = 0.
-  a_thetaep1 = 0.
-  a_xlvqv = 0.
   do k = kts+1, ktf-1
-    a_coefa = 0.
-    a_thetaem1 = 0.
-    a_thetaep1 = 0.
-    a_xlvqv = 0.
     do i = i_start, i_end
-      a_coefa = 0.
-      a_thetaem1 = 0.
-      a_thetaep1 = 0.
-      a_xlvqv = 0.
-      tmpdz = 1./rdz(i,k,j)+1./rdz(i,k+1,j)
+      tmpdz = g/(1./rdz(i,k,j)+1./rdz(i,k+1,j))
+      walls(2)=theta(i,k,j)
 ! recompute : tmpdz
       if (moist(i,k,j,p_qv) .ge. qvs(i,k,j) .or. qctmp(i,k,j) .ge. qc_cr) then
         xlvqv = xlv*moist(i,k,j,p_qv)
 ! recompute : xlvqv
-        coefa = (1.+xlvqv/r_d/t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))/theta(i,k,j)
+        walls(3)=t(i,k,j)
+        walls(1)=1.+xlvqv/r_d/walls(3)
+        walls(4)=1.+xlv*xlvqv/cp/r_v/walls(3)/walls(3)
+        walls(5)=t(i,k+1,j)
+        coefa = walls(1)/walls(4)/walls(2)
 ! recompute : coefa
-        thetaep1 = theta(i,k+1,j)*(1.+xlv*qvs(i,k+1,j)/cp/t(i,k+1,j))
+        thetaep1 = theta(i,k+1,j)*(1.+xlv*qvs(i,k+1,j)/cp/walls(5))
 ! recompute : thetaep1
         thetaem1 = theta(i,k-1,j)*(1.+xlv*qvs(i,k-1,j)/cp/t(i,k-1,j))
 ! recompute : thetaem1
-        a_coefa = a_coefa+a_bn2(i,k,j)*g*((thetaep1-thetaem1)/tmpdz)
-        a_thetaem1 = a_thetaem1-a_bn2(i,k,j)*g*(coefa/tmpdz)
-        a_thetaep1 = a_thetaep1+a_bn2(i,k,j)*g*(coefa/tmpdz)
-        a_tmp1(i,k-1,j) = a_tmp1(i,k-1,j)+a_bn2(i,k,j)*(g/tmpdz)
-        a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*(g/tmpdz)
+        a_coefa = a_bn2(i,k,j)*(thetaep1-thetaem1)*tmpdz
+        a_thetaem1 = -a_bn2(i,k,j)*coefa*tmpdz
+        a_thetaep1 = a_bn2(i,k,j)*coefa*tmpdz
+        a_tmp1(i,k-1,j) = a_tmp1(i,k-1,j)+a_bn2(i,k,j)*tmpdz
+        a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*tmpdz
         a_bn2(i,k,j) = 0.
         a_qvs(i,k-1,j) = a_qvs(i,k-1,j)+a_thetaem1*theta(i,k-1,j)*(xlv/cp/t(i,k-1,j))
         a_t(i,k-1,j) = a_t(i,k-1,j)-a_thetaem1*theta(i,k-1,j)*(xlv*qvs(i,k-1,j)/cp/(t(i,k-1,j)*t(i,k-1,j)))
         a_theta(i,k-1,j) = a_theta(i,k-1,j)+a_thetaem1*(1+xlv*qvs(i,k-1,j)/cp/t(i,k-1,j))
-        a_thetaem1 = 0.
-        a_qvs(i,k+1,j) = a_qvs(i,k+1,j)+a_thetaep1*theta(i,k+1,j)*(xlv/cp/t(i,k+1,j))
-        a_t(i,k+1,j) = a_t(i,k+1,j)-a_thetaep1*theta(i,k+1,j)*(xlv*qvs(i,k+1,j)/cp/(t(i,k+1,j)*t(i,k+1,j)))
-        a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_thetaep1*(1+xlv*qvs(i,k+1,j)/cp/t(i,k+1,j))
-        a_thetaep1 = 0.
-        a_t(i,k,j) = a_t(i,k,j)+a_coefa*(((-(xlvqv/r_d/(t(i,k,j)*t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))+(1.+xlvqv/r_d/&
-&t(i,k,j))*(xlv*xlvqv/cp/r_v/(t(i,k,j)*t(i,k,j))/t(i,k,j)+xlv*xlvqv/cp/r_v/t(i,k,j)/(t(i,k,j)*t(i,k,j)))/((1.+xlv*xlvqv/cp/&
-&r_v/t(i,k,j)/t(i,k,j))*(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))/theta(i,k,j))
-        a_theta(i,k,j) = a_theta(i,k,j)-a_coefa*((1.+xlvqv/r_d/t(i,k,j))/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))/(theta(i,k,j)*&
-&theta(i,k,j)))
-        a_xlvqv = a_xlvqv+a_coefa*((1/r_d/t(i,k,j)/(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))-(1.+xlvqv/r_d/t(i,k,j))*(xlv/cp/r_v/t(i,&
-&k,j)/t(i,k,j))/((1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))*(1.+xlv*xlvqv/cp/r_v/t(i,k,j)/t(i,k,j))))/theta(i,k,j))
-        a_coefa = 0.
+        a_qvs(i,k+1,j) = a_qvs(i,k+1,j)+a_thetaep1*theta(i,k+1,j)*xlv/cp/walls(5)
+        a_t(i,k+1,j) = a_t(i,k+1,j)-a_thetaep1*theta(i,k+1,j)*(xlv*qvs(i,k+1,j)/cp/(walls(5)*walls(5)))
+        a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_thetaep1*(1+xlv*qvs(i,k+1,j)/cp/walls(5))
+        a_t(i,k,j) = a_t(i,k,j)+a_coefa*(-xlvqv/r_d/walls(3)+2.*walls(1)*(walls(4)-1.)/walls(4))/walls(3)/walls(4)/walls(2)
+        a_theta(i,k,j) = a_theta(i,k,j)-a_coefa*(walls(1)/walls(4)/(walls(2)*walls(2)))
+        a_xlvqv = a_coefa*((1./r_d-walls(1)*xlv/cp/r_v/walls(3)/walls(4))/walls(2))/walls(3)/walls(4)
         a_moist(i,k,j,p_qv) = a_moist(i,k,j,p_qv)+a_xlvqv*xlv
-        a_xlvqv = 0.
       else
-        a_moist(i,k-1,j,p_qv) = a_moist(i,k-1,j,p_qv)+a_bn2(i,k,j)*g*((-1.61)/tmpdz)
-        a_moist(i,k+1,j,p_qv) = a_moist(i,k+1,j,p_qv)+a_bn2(i,k,j)*g*(1.61/tmpdz)
-        a_theta(i,k-1,j) = a_theta(i,k-1,j)+a_bn2(i,k,j)*g*((-1)/theta(i,k,j)/tmpdz)
-        a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_bn2(i,k,j)*g*(1/theta(i,k,j)/tmpdz)
-        a_theta(i,k,j) = a_theta(i,k,j)-a_bn2(i,k,j)*g*((theta(i,k+1,j)-theta(i,k-1,j))/(theta(i,k,j)*theta(i,k,j))/tmpdz)
-        a_tmp1(i,k-1,j) = a_tmp1(i,k-1,j)+a_bn2(i,k,j)*(g/tmpdz)
-        a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*(g/tmpdz)
+        a_moist(i,k-1,j,p_qv) = a_moist(i,k-1,j,p_qv)+a_bn2(i,k,j)*(-1.61*tmpdz)
+        a_moist(i,k+1,j,p_qv) = a_moist(i,k+1,j,p_qv)+a_bn2(i,k,j)*(1.61*tmpdz)
+        a_theta(i,k-1,j) = a_theta(i,k-1,j)+a_bn2(i,k,j)*((-1)/walls(2)*tmpdz)
+        a_theta(i,k+1,j) = a_theta(i,k+1,j)+a_bn2(i,k,j)*(1/walls(2)*tmpdz)
+        a_theta(i,k,j) = a_theta(i,k,j)-a_bn2(i,k,j)*((theta(i,k+1,j)-theta(i,k-1,j))/(walls(2)*walls(2))*tmpdz)
+        a_tmp1(i,k-1,j) = a_tmp1(i,k-1,j)+a_bn2(i,k,j)*tmpdz
+        a_tmp1(i,k+1,j) = a_tmp1(i,k+1,j)-a_bn2(i,k,j)*tmpdz
         a_bn2(i,k,j) = 0.
       endif
     end do
   end do
 end do
 do j = j_start, j_end
-  a_es = 0.
-  a_tc = 0.
   do k = kts, ktf
-    a_es = 0.
-    a_tc = 0.
     do i = i_start, i_end
-      a_es = 0.
-      a_tc = 0.
-      tc = t(i,k,j)-svpt0
+      tc = svp2*(t(i,k,j)-svpt0)
 ! recompute : tc
-      es = 1000.*svp1*exp(svp2*tc/(t(i,k,j)-svp3))
+      es = 1000.*svp1*exp(tc/(t(i,k,j)-svp3))
+      walls(2)=t(i,k,j)-svp3
+      walls(1)=p(i,k,j)-es
 ! recompute : es
-      a_es = a_es+a_qvs(i,k,j)*(ep_2/(p(i,k,j)-es)+ep_2*es/((p(i,k,j)-es)*(p(i,k,j)-es)))
-      a_p(i,k,j) = a_p(i,k,j)-a_qvs(i,k,j)*(ep_2*es/((p(i,k,j)-es)*(p(i,k,j)-es)))
-      a_qvs(i,k,j) = 0.
-      a_t(i,k,j) = a_t(i,k,j)-1000.*a_es*svp1*(svp2*tc/((t(i,k,j)-svp3)*(t(i,k,j)-svp3)))*exp(svp2*tc/(t(i,k,j)-svp3))
-      a_tc = a_tc+1000.*a_es*svp1*(svp2/(t(i,k,j)-svp3))*exp(svp2*tc/(t(i,k,j)-svp3))
-      a_es = 0.
-      a_t(i,k,j) = a_t(i,k,j)+a_tc
-      a_tc = 0.
+      a_es = a_qvs(i,k,j)*(ep_2+ep_2*es/walls(1))/walls(1)
+      a_p(i,k,j) = a_p(i,k,j)-a_qvs(i,k,j)*ep_2*es/(walls(1)*walls(1))
+      a_t(i,k,j) = a_t(i,k,j)-a_es*tc/(walls(2)*walls(2))*es
+      a_t(i,k,j) = a_t(i,k,j)+a_es*svp2/walls(2)*es
     end do
   end do
 end do
+a_qvs(i_start:i_end,kts:ktf,j_start:j_end) = 0.
 do ispe = n_moist, param_first_scalar, -1
   if (ispe .eq. p_qv .or. ispe .eq. p_qc .or. ispe .eq. p_qi) then
     do j = j_start, j_end
@@ -880,7 +836,6 @@ integer j_start
 integer k
 integer ktf
 real mlen_h
-real tmp
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -895,46 +850,46 @@ j_start = jts
 ! recompute : j_start
 j_end = min(jte,jde-1)
 ! recompute : j_end
-if (config_flags%open_xs .or. config_flags%specified .or. config_flags%nested) then
-  i_start = max(ids+1,its)
-endif
+!if (config_flags%open_xs .or. config_flags%specified .or. config_flags%nested) then
+!  i_start = max(ids+1,its)
+!endif
 ! recompute : i_start
-if (config_flags%open_xe .or. config_flags%specified .or. config_flags%nested) then
-  i_end = min(ide-2,ite)
-endif
+!if (config_flags%open_xe .or. config_flags%specified .or. config_flags%nested) then
+!  i_end = min(ide-2,ite)
+!endif
 ! recompute : i_end
-if (config_flags%open_ys .or. config_flags%specified .or. config_flags%nested) then
-  j_start = max(jds+1,jts)
-endif
-! recompute : j_start
-if (config_flags%open_ye .or. config_flags%specified .or. config_flags%nested) then
-  j_end = min(jde-2,jte)
-endif
+!if (config_flags%open_ys .or. config_flags%specified .or. config_flags%nested) then
+!  j_start = max(jds+1,jts)
+!endif
+!! recompute : j_start
+!if (config_flags%open_ye .or. config_flags%specified .or. config_flags%nested) then
+!  j_end = min(jde-2,jte)
+!endif
 ! recompute : j_end
-do j = j_start, j_end
-  do k = kts, ktf
-    do i = i_start, i_end
-      def2(i,k,j) = 0.25*(defor11(i,k,j)-defor22(i,k,j))**2+defor12(i,k,j)*defor12(i,k,j)
-    end do
-  end do
-end do
+!do j = j_start, j_end
+!  do k = kts, ktf
+!    do i = i_start, i_end
+!      def2(i,k,j) = 0.25*(defor11(i,k,j)-defor22(i,k,j))**2+defor12(i,k,j)*defor12(i,k,j)
+!    end do
+!  end do
+!end do
 ! recompute : def2
 mlen_h = sqrt(dx*dy)
 ! recompute : mlen_h
-do j = j_start, j_end
-  do k = kts, ktf
-    do i = i_start, i_end
-      tmp = def2(i,k,j)**0.5
-! recompute : tmp
-      xkmh(i,k,j) = c_s*c_s*mlen_h*mlen_h*tmp
-! recompute : xkmh
-      a_xkmh(i,k,j) = a_xkmh(i,k,j)+a_xkmhd(i,k,j)
-      a_xkmhd(i,k,j) = 0.
-      a_xkmh(i,k,j) = a_xkmh(i,k,j)*(0.5+sign(0.5,10.*mlen_h-xkmh(i,k,j)))
-      a_xkmh(i,k,j) = 0.
-    end do
-  end do
-end do
+!do j = j_start, j_end
+!  do k = kts, ktf
+!    do i = i_start, i_end
+!      xkmh(i,k,j) = c_s*c_s*mlen_h*mlen_h*def2(i,k,j)**0.5
+!      a_xkmh(i,k,j) = a_xkmh(i,k,j)+a_xkmhd(i,k,j)
+!      a_xkmhd(i,k,j) = 0.
+!      a_xkmh(i,k,j) = a_xkmh(i,k,j)*(0.5+sign(0.5,10.*mlen_h-xkmh(i,k,j)))
+!      a_xkmh(i,k,j) = 0.
+!    end do
+!  end do
+!end do
+
+!TO BE CHECKED CAREFULLY, WALLS
+a_xkmhd(i_start:i_end,kts:ktf,j_start:j_end) = 0.
 
 end subroutine a_smag2d_km
 
@@ -1010,7 +965,6 @@ real tmp
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_tmp = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1084,40 +1038,28 @@ if (dx .gt. cr_len) then
   mlen_h = sqrt(dx*dy)
 ! recompute : mlen_h
   do j = j_start, j_end
-    a_tmp = 0.
     do k = kts, ktf
-      a_tmp = 0.
       do i = i_start, i_end
-        a_tmp = 0.
-        tmp = max(0.,def2(i,k,j)-bn2(i,k,j)/pr)
-! recompute : tmp
-        tmp = tmp**0.5
+        tmp = (max(0.,def2(i,k,j)-bn2(i,k,j)/pr))**0.5
 ! recompute : tmp
         xkmh(i,k,j) = max(c_s*c_s*mlen_h*mlen_h*tmp,1.e-6*mlen_h*mlen_h)
 ! recompute : xkmh
         a_xkmh(i,k,j) = a_xkmh(i,k,j)+a_xkmhd(i,k,j)
         a_xkmhd(i,k,j) = 0.
         a_xkmh(i,k,j) = a_xkmh(i,k,j)*(0.5+sign(0.5,10.*mlen_h-xkmh(i,k,j)))
-        a_tmp = a_tmp+a_xkmh(i,k,j)*(0.5+sign(0.5,c_s*c_s*mlen_h*mlen_h*tmp-1.e-6*mlen_h*mlen_h))*c_s*c_s*mlen_h*mlen_h
+        a_tmp = a_xkmh(i,k,j)*(0.5+sign(0.5,c_s*c_s*mlen_h*mlen_h*tmp-1.e-6*mlen_h*mlen_h))*c_s*c_s*mlen_h*mlen_h
         a_xkmh(i,k,j) = 0.
 ! recdepend vars : bn2,def2,i,j,k,pr
 ! recompute pos : ASSIGN_STMT module_diffusion_em.f90:1516
-! recompute vars : tmp
-        tmp = max(0.,def2(i,k,j)-bn2(i,k,j)/pr)
-! recompute vars : tmp
-        a_tmp = 0.5*a_tmp*tmp**(-0.5)
+        a_tmp = 0.5*a_tmp*(max(0.,def2(i,k,j)-bn2(i,k,j)/pr))**(-0.5)
         a_bn2(i,k,j) = a_bn2(i,k,j)-a_tmp*((0.5-sign(0.5,0.-(def2(i,k,j)-bn2(i,k,j)/pr)))/pr)
-        a_tmp = 0.
       end do
     end do
   end do
 else
   do j = j_start, j_end
-    a_tmp = 0.
     do k = kts, ktf
-      a_tmp = 0.
       do i = i_start, i_end
-        a_tmp = 0.
         deltas = (dx*dy/rdzw(i,k,j))**0.33333333
 ! recompute : deltas
         tmp = max(0.,def2(i,k,j)-bn2(i,k,j)/pr)
@@ -1129,7 +1071,7 @@ else
         a_xkmh(i,k,j) = a_xkmh(i,k,j)+a_xkmhd(i,k,j)
         a_xkmhd(i,k,j) = 0.
         a_xkmh(i,k,j) = a_xkmh(i,k,j)*(0.5+sign(0.5,10.*deltas-xkmh(i,k,j)))
-        a_tmp = a_tmp+a_xkmh(i,k,j)*(0.5+sign(0.5,c_s*c_s*deltas*deltas*tmp-1.e-6*deltas*deltas))*c_s*c_s*deltas*deltas
+        a_tmp = a_xkmh(i,k,j)*(0.5+sign(0.5,c_s*c_s*deltas*deltas*tmp-1.e-6*deltas*deltas))*c_s*c_s*deltas*deltas
         a_xkmh(i,k,j) = 0.
 ! recdepend vars : bn2,def2,i,j,k,pr
 ! recompute pos : ASSIGN_STMT module_diffusion_em.f90:1533
@@ -1138,7 +1080,6 @@ else
 ! recompute vars : tmp
         a_tmp = 0.5*a_tmp*tmp**(-0.5)
         a_bn2(i,k,j) = a_bn2(i,k,j)-a_tmp*((0.5-sign(0.5,0.-(def2(i,k,j)-bn2(i,k,j)/pr)))/pr)
-        a_tmp = 0.
       end do
     end do
   end do

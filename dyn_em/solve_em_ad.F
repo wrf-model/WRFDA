@@ -76,6 +76,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_mp_kessler_db  
 #ifdef WRF_CHEM
    USE module_input_chem_data
+!  USE module_chem_utilities   !by walls
 #endif
 
    USE a_module_small_step_em
@@ -90,6 +91,10 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_trace, only : trace_entry, trace_exit
 
    IMPLICIT NONE
+
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
 
    !  Input data.
 
@@ -118,11 +123,19 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
 
-   INTEGER :: number_of_small_timesteps, rk_step
-   INTEGER :: rk_order
-   REAL    :: dt_rk, dts_rk, dtm
+   INTEGER :: rc   !by walls
+   INTEGER :: number_of_small_timesteps, rk_step  
+   INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    !by walls
+   INTEGER :: idum1, idum2, dynamics_option   !by walls
+
+   INTEGER :: rk_order, iwmax, jwmax, kwmax  !by walls
+   REAL    :: dt_rk, dts_rk, dtm, wmax   !by walls
    LOGICAL :: leapfrog
    LOGICAL ::  solverDisabled  ! 091012 bp; aix allowed declaration after statements; correcting for PGI
+   INTEGER :: l,kte,kk  !by walls
+   INTEGER :: kts   !by walls
+
+   INTEGER :: walls_open  !by walls
 
 real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4) :: a_rqc_bth
 real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4) :: a_rqr_bth
@@ -146,6 +159,9 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
    INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
    INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
 #endif
+
+! Define benchmarking timers if -DBENCH is compiled   !by walls
+!#include <bench_solve_em_def.h>  !by walls
 
 #include "deref_kludge.h"
 
@@ -192,6 +208,9 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 !</pre>
 !</DESCRIPTION>
 
+!#include <bench_solve_em_init.h>   !by walls
+!#include <em_i1_init.inc>
+
    if(grid%trace_use) call trace_entry("solve_em_ad")
 
    ! 090921 bp; 
@@ -206,6 +225,9 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 
 !  call check_linkedlist
 
+!  set leapfrog or runge-kutta solver (2nd or 3rd order)
+   dynamics_option = config_flags%rk_ord   !by walls
+
    call get_ijk_from_grid( grid,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe )
 
    ij = 1
@@ -213,6 +235,8 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++001++++++++++++++++++++++++++++++++++++++++++++++++++'
     a_a = 0.0
     a_advect_tend = 0.0
     a_alpha = 0.0
@@ -268,6 +292,7 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
     a_rqvcuten = 0.0
     a_rthcuten = 0.0
     a_php = 0.0
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++002++++++++++++++++++++++++++++++++++++++++++++++++++'
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -304,14 +329,21 @@ relax_zone = grid%relax_zone
 
 k_start = kps
 k_end = kpe
+
 ijds = min(ids,jds)
 ijde = max(ide,jde)
 
 num_3d_m = num_moist
-num_3d_c = 1
+!num_3d_c = 1    !revised by walls
+num_3d_c        = num_chem    !by walls
+
+!  Compute these starting and stopping locations for each tile and number of tiles.
+!  See: http://www.mmm.ucar.edu/wrf/WG2/topics/settiles
 
   call set_tiles( grid,ids,ide,jds,jde,ips,ipe,jps,jpe )
   if ( grid%num_tiles > 1 ) call wrf_error_fatal( "Adjoint code is not thread safe" )
+
+  itimestep = itimestep + 1  !by walls
 
 #ifdef DM_PARALLEL
     if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
@@ -328,17 +360,16 @@ num_3d_c = 1
 #endif
 
   rk_order = config_flags%rk_ord
-
   leapfrog =  .false. 
 
   dts = dt/float(time_step_sound)
 
-  if (rk_ord .eq. 1) then
-    leapfrog =  .true. 
-  endif
+  IF(rk_ord == 1) leapfrog = .true.
 
 !-if(grid%trace_use) call trace_entry("solve_ad_runge_kutta_looq")
 !------------------------------
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++003++++++++++++++++++++++++++++++++++++++++++++++++++'
  runge_kutta_looq: do rk_step = 1, rk_order
   dtm=dt
   if (rk_order .eq. 1) then
@@ -376,16 +407,17 @@ num_3d_c = 1
       dts_rk = dts
       number_of_small_timesteps = time_step_sound
     endif
+  else  !by walls
+      write(wrf_err_message,*)' unknown solver, error exit for dynamics_option = ',dynamics_option  !by walls
+      CALL wrf_error_fatal( wrf_err_message )  !by walls
   endif
 
 !---Save for rk_step_prep
     if(grid%trace_use) call trace_entry("backup")
-    call push4backup(muu,muv,mub,mut, "muu,muv,mub,mut")
-    call push4backup(u_2,v_2,w_2,t_2,ph_2,p,al, "u_2,v_2,w_2,t_2,ph_2,p,al")
-    call push4backup(mu_2, "mu_2")
-    call push4backup(moist_2, "moist_2")
+    call push4backup(muu,muv, "muu,muv")
     if(grid%trace_use) call trace_exit("backup")
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++004++++++++++++++++++++++++++++++++++++++++++++++++++'
 !---From: module_em.F
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2, &
                        ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
@@ -398,13 +430,43 @@ num_3d_c = 1
 !-----Output: ru,rv,rw,ww,php,cqu,cqv,cqw,alt,muu,muv,mut
 
 #ifdef DM_PARALLEL
+#    include "HALO_EM_A.inc"     !by walls
+#  include "PERIOD_BDY_EM_A.inc" !by walls
       if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 #include "HALO_RK_STEP_PREP.inc"
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
+!by walls
+   if(dyn_opt == DYN_EM) then
+   !$OMP PARALLEL DO   &
+   !$OMP PRIVATE ( ij )
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++005++++++++++++++++++++++++++++++++++++++++++++++++++'
+!      CALL wrf_debug ( 200 , ' call rk_phys_bc_dry_1' )
+       CALL rk_phys_bc_dry_1( config_flags, ru, rv, rw, ww,      &
+                               muu, muv, mut, php, alt, p,        &
+                               ids, ide, jds, jde, kds, kde,      &
+                               ims, ime, jms, jme, kms, kme,      &
+                               ips, ipe, jps, jpe, kps, kpe,      &
+                               grid%i_start(ij), grid%i_end(ij),  &
+                               grid%j_start(ij), grid%j_end(ij),  &
+                               k_start, k_end                )
+
+       CALL set_physical_bc3d( ph_2, 'w', config_flags,            &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                               grid%i_start(ij), grid%i_end(ij),        &
+                               grid%j_start(ij), grid%j_end(ij),        &
+                               k_start, k_end                )
+
+   endif
+!by walls
+
   rk_step_is_ong: if (rk_step .eq. 1) then
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++006++++++++++++++++++++++++++++++++++++++++++++++++++'
   call init_zero_tendency( ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend, &
                            num_3d_m,num_3d_c,rk_step,&
                            ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
@@ -412,15 +474,21 @@ num_3d_c = 1
                            grid%j_start(ij),grid%j_end(ij), &
                            k_start,k_end )
 
+!by walls
+#ifdef DM_PARALLEL
+      if(dyn_opt == DYN_EM) then
+#     include "HALO_EM_PHYS_A.inc"
+      endif
+#endif
+!by walls
+
 !-Save for: phy_prep:
   if(grid%trace_use) call trace_entry("backup")
-  call push4backup(p, u_2, v_2, alt, ph_2, t_2, "p, u_2, v_2, alt, ph_2, t_2")
-  call push4backup(tsk, mut, "tsk, mut")
-  call push4backup(z,z_at_w, "z,z_at_w")
-  call push4backup(th_phy,p_phy,pi_phy,t_phy, "th_phy,p_phy,pi_phy,t_phy")
+  call push4backup(z, "z")
   if(grid%trace_use) call trace_exit("backup")
 
 !-From module_big_step_utilities_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++007++++++++++++++++++++++++++++++++++++++++++++++++++'
   call phy_prep( config_flags,mut,u_2,v_2,p,pb,alt,ph_2,phb,t_2,tsk,moist_2,num_3d_m,mu_3d,rho, &
                  th_phy,p_phy,pi_phy,u_phy,v_phy,p8w,t_phy,t8w,z,z_at_w,dz8w,fnm,fnp, &
                  rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,rqiblten,rthcuten, &
@@ -434,23 +502,281 @@ num_3d_c = 1
 !         rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,rqiblten,rthcuten
 !         rqvcuten,rqccuten,rqrcuten,rqicuten,rqscuten,rthften,rqvften
 
+!by walls
+         if(dyn_opt == DYN_EM) then
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++008++++++++++++++++++++++++++++++++++++++++++++++++++'
+         CALL radiation_driver(itimestep,dt,AER_DRY,AER_WATER,       &
+                    RTHRATENLW,RTHRATENSW,RTHRATEN,GLW,GSW,          &
+                    SWDOWN,                                          &
+                    XLAT,XLONG,ALBEDO,CLDFRA,EMISS,                  &
+                    rho,moist_2,num_3d_m,                            &
+                    p8w,p_phy,pb,pi_phy,dz8w,t_phy,t8w,              &
+                    GMT,JULDAY,config_flags,RADT,STEPRA,ICLOUD,      &
+                    taucldi,taucldc,warm_rain,                       &
+                    XLAND,TSK,HTOP,HBOT,CUPPT,VEGFRA,SNOW,           &
+                    julyr,                                           &
+                    1   ,                                            &
+                    TOTSWDN,TOTLWDN,RSWTOA,RLWTOA,CZMEAN,            &
+                    CFRACL,CFRACM,CFRACH,                            &
+                    ACFRST,NCFRST,ACFRCV,NCFRCV,                     &
+                    ids,ide, jds,jde, kds,kde,                       &
+                    ims,ime, jms,jme, kms,kme,                       &
+                    grid%i_start, min(grid%i_end, ide-1),            &
+                    grid%j_start, min(grid%j_end, jde-1),            &
+                    k_start    , min(k_end,kde-1) , grid%num_tiles   )
+         endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++009++++++++++++++++++++++++++++++++++++++++++++++++++'
+      if(dyn_opt == DYN_EM) then
+      CALL wrf_debug ( 200 , ' call surface_driver' )
+      CALL surface_driver(                                          &
+     &           ACSNOM,ACSNOW,AKHS,AKMS,ALBEDO,BR,CANWAT,CAPG        &
+     &          ,CHKLOWQ,CONFIG_FLAGS,DT,DX,DZ8W,DZS,EMISS,GLW        &
+     &          ,GRDFLX,GSW,GZ1OZ0,HFX,HOL,HT,IFSNOW,ISFFLX           &
+     &          ,ISLTYP,ITIMESTEP,IVGTYP,LOWLYR,MAVAIL,MOIST_2,MOL,RMOL&
+     &          ,NUM_SOIL_LAYERS,NUM_3D_M,P8W,PBLH,PI_PHY,PSHLTR,PSIH &
+     &          ,PSIM,P_PHY,Q10,Q2,QFX,QSFC,QSHLTR,QZ0,RAINBL         &
+     &          ,RAINCV,RAINNCV,REGIME,RHO,SFCEVP,SFCEXC,SFCRUNOFF    &
+     &          ,SMOIS,SMSTAV,SMSTOT,SNOALB,SNOW,SNOWC,SNOWH,STEPBL   &
+     &          ,T2,TH10,TH2,THC,THZ0,TH_PHY,TMN,TSHLTR,TSK,TSLB      &
+     &          ,T_PHY,U10,UDRUNOFF,UST,UZ0,U_FRAME,U_PHY,V10,VEGFRA  &
+     &          ,VZ0,V_FRAME,V_PHY,WARM_RAIN,WSPD,XICE,XLAND,Z,ZNT,ZS &
+     &          ,CT,TKE_MYJ                                           &
+     &          ,ALBBCK,LH,SH2O,SHDMAX,SHDMIN,Z0                      &
+     &          ,flqc,flhc,qsg,qvg,qcg,soilt1,tsnav                   & ! for RUC LSM
+     &          ,SMFR3D,KEEPFR3DFLAG                                  &
+     &          ,PSFC                                                 &
+     &          ,ids,ide, jds,jde, kds,kde                            &
+     &          ,ims,ime, jms,jme, kms,kme                            &
+     &          ,grid%i_start, min(grid%i_end, ide-1)                 &
+     &          ,grid%j_start, min(grid%j_end, jde-1)                 &
+     &          ,k_start    , min(k_end,kde-1) , grid%num_tiles       )
+      endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++010++++++++++++++++++++++++++++++++++++++++++++++++++'
+      if(dyn_opt == DYN_EM) then
+      CALL wrf_debug ( 200 , ' call pbl_driver' )
+      CALL pbl_driver(itimestep,dt,u_frame,v_frame                    &
+     &           ,RUBLTEN,RVBLTEN,RTHBLTEN                            &
+     &           ,RQVBLTEN,RQCBLTEN,RQIBLTEN                          &
+     &           ,TSK,XLAND,ZNT,HT                                    &
+     &           ,UST,HOL,MOL,PBLH                                    &
+     &           ,HFX,QFX,REGIME,GRDFLX                               &
+     &           ,u_phy,v_phy,th_phy,rho,moist_2                      &
+     &           ,p_phy,pi_phy,p8w,t_phy,dz8w,z                       &
+     &           ,TKE_MYJ,EXCH_H,AKHS,AKMS                            &
+     &           ,THZ0,QZ0,UZ0,VZ0,QSFC,LOWLYR                        &
+     &           ,PSIM, PSIH, GZ1OZ0, WSPD, BR, CHKLOWQ               &
+     &           ,config_flags,DX,num_3d_m                            &
+     &           ,STEPBL,warm_rain                                    &
+     &           ,KPBL,CT,LH,SNOW,XICE                                &
+     &           ,ids,ide, jds,jde, kds,kde                           &
+     &           ,ims,ime, jms,jme, kms,kme                           &
+     &           ,grid%i_start, min(grid%i_end,ide-1)                 &
+     &           ,grid%j_start, min(grid%j_end,jde-1)                 &
+     &           ,k_start    , min(k_end,kde-1) , grid%num_tiles  )
+      endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++011++++++++++++++++++++++++++++++++++++++++++++++++++'
+        if(dyn_opt == DYN_EM) then
+         CALL wrf_debug ( 200 , ' call cumulus_driver' )
+         CALL cumulus_driver(                                          &
+                 ! Order dependent args: domain, mem, tile dims
+                     ids,ide, jds,jde, kds,kde                         &
+                   , ims,ime, jms,jme, kms,kme                         &
+                   , grid%i_start, min(grid%i_end, ide-1)              &
+                   , grid%j_start, min(grid%j_end, jde-1)              &
+                   , k_start  , min(k_end,kde-1) , grid%num_tiles      &
+                 ! Prognostic variables
+                   , U=u_phy   ,V=v_phy   ,TH=th_phy  ,T=t_phy         &
+                   , W=w_2     ,P=p_phy   ,PI=pi_phy  ,RHO=rho         &
+                 ! Other arguments
+                   , ITIMESTEP=itimestep ,DT=dt      ,DX=dx            &
+                   , RAINC=rainc   ,RAINCV=raincv   ,NCA=nca           &
+                   , HTOP=htop     ,HBOT=hbot       ,KPBL=kpbl         &
+                   , DZ8W=dz8w     ,P8W=p8w                            &
+                   , W0AVG=w0avg   ,STEPCU=stepcu                      &
+                   , CLDEFI=cldefi ,LOWLYR=lowlyr ,XLAND=xland         &
+                   , APR_GR=apr_gr ,APR_W=apr_w   ,APR_MC=apr_mc       &
+                   , APR_ST=apr_st ,APR_AS=apr_as ,APR_CAPMA=apr_capma &
+                   , APR_CAPME=apr_capme          ,APR_CAPMI=apr_capmi &
+                   , MASS_FLUX=mass_flux          ,XF_ENS=xf_ens       &
+                   , PR_ENS=pr_ens ,HT=ht                              &
+                   , ENSDIM=ensdim ,MAXIENS=maxiens ,MAXENS=maxens     &
+                   , MAXENS2=maxens2                ,MAXENS3=maxens3   &
+                   , CU_ACT_FLAG=cu_act_flag   ,WARM_RAIN=warm_rain    &
+                 ! Selection flag
+                   , CU_PHYSICS=config_flags%cu_physics                &
+                 ! Moisture tendency arguments
+                   , RQVCUTEN=rqvcuten , RQCCUTEN=rqccuten             &
+                   , RQRCUTEN=rqrcuten , RQVBLTEN=rqvblten             &
+                   , RQVFTEN=rqvften                                   &
+                 ! Other tendency arguments
+                   , RTHRATEN=rthraten , RTHBLTEN=rthblten             &
+                   , RTHCUTEN=rthcuten , RTHFTEN=rthften               &
+                 ! Moisture tracer arguments
+                   , QV_CURR=moist_2(ims,kms,jms,P_QV), F_QV=F_QV      &
+                   , QC_CURR=moist_2(ims,kms,jms,P_QC), F_QC=F_QC      &
+                   , QR_CURR=moist_2(ims,kms,jms,P_QR), F_QR=F_QR      &
+                   , QI_CURR=moist_2(ims,kms,jms,P_QI), F_QI=F_QI      &
+                   , QS_CURR=moist_2(ims,kms,jms,P_QS), F_QS=F_QS      &
+                   , QG_CURR=moist_2(ims,kms,jms,P_QG), F_QG=F_QG      &
+                                                                       )
+         endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++012++++++++++++++++++++++++++++++++++++++++++++++++++'
+         IF (cu_physics .eq. 5) then            !IF for CUDU
+            CALL wrf_debug(100,'in du_cps')
+               CALL DUCU(                                            &
+               IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
+               ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
+               ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
+               ,KTS=k_start,KTE=min(k_end, kde-1) &
+               ,DT=dt ,KTAU=itimestep ,DX=dx                    &
+               ,RHO=rho,RAINCV=raincv, NCA=nca                  &
+               ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
+               ,DZ8W=dz8w               &
+               ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
+               ,XLV=XLV                                         &
+               ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
+               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
+               ,STEPCU=stepcu                                   &
+               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
+               ,CUTOP=HTOP,CUBOT=HBOT                           &
+               ,QV=moist_2(ims,kms,jms,P_QV)                                                 &
+              ! optionals
+               ,RTHCUTEN=rthcuten                               &
+               ,RQVCUTEN=rqvcuten                               &
+                                                                )
+
+               do j = grid%j_start(ij), min(grid%j_end(ij), jde-1)
+               do i = grid%i_start(ij), min(grid%i_end(ij), ide-1)
+                  do k = k_start, min(k_end, kde-1)
+                     t_tendf(I,K,J) = t_tendf(I,K,J) + rthcuten(I,K,J) * mut(I,J)
+                     moist_tend(I,K,J,P_QV) = moist_tend(I,K,J,P_QV) + rqvcuten(I,K,J) * mut(I,J)
+                  end do
+                  rainc(I,J) = rainc(I,J) + raincv(I,J)
+               end do
+               end do
+         ENDIF
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++013++++++++++++++++++++++++++++++++++++++++++++++++++'
+      if(dyn_opt == DYN_EM) then
+          CALL wrf_debug ( 200 , ' call calculate_phy_tend' )
+          CALL calculate_phy_tend (config_flags,mut,pi_phy,            &
+                     RTHRATEN,                                         &
+                     RUBLTEN,RVBLTEN,RTHBLTEN,                         &
+                     RQVBLTEN,RQCBLTEN,RQIBLTEN,                       &
+                     RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,              &
+                     RQICUTEN,RQSCUTEN,                                &
+                     ids,ide, jds,jde, kds,kde,                        &
+                     ims,ime, jms,jme, kms,kme,                        &
+                     grid%i_start(ij), min(grid%i_end(ij),ide-1),      &
+                     grid%j_start(ij), min(grid%j_end(ij),jde-1),      &
+                     k_start    , min(k_end,kde-1)                     )
+      endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++014++++++++++++++++++++++++++++++++++++++++++++++++++'
+IF(diff_opt .eq. 2 .OR. diff_opt .eq. 1) THEN
+
+          CALL wrf_debug ( 200 , ' call compute_diff_metrics ' )
+          CALL compute_diff_metrics ( config_flags, ph_2, phb, z, rdz, rdzw, &
+                                      zx, zy, rdx, rdy,                      &
+                                      ids, ide, jds, jde, kds, kde,          &
+                                      ims, ime, jms, jme, kms, kme,          &
+                                      grid%i_start(ij), grid%i_end(ij),      &
+                                      grid%j_start(ij), grid%j_end(ij),      &
+                                      k_start    , k_end                    )
+#ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
+#  include "PERIOD_BDY_EM_A1.inc"
+       endif
+#endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++015++++++++++++++++++++++++++++++++++++++++++++++++++'
+       if(dyn_opt == DYN_EM) then
+
+          CALL wrf_debug ( 200 , ' call bc for diffusion_metrics ' )
+          CALL set_physical_bc3d( rdzw , 'w', config_flags,           &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  ips, ipe, jps, jpe, kps, kpe,       &
+                                  grid%i_start(ij), grid%i_end(ij),   &
+                                  grid%j_start(ij), grid%j_end(ij),   &
+                                  k_start    , k_end                 )
+          CALL set_physical_bc3d( rdz , 'w', config_flags,           &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  ips, ipe, jps, jpe, kps, kpe,       &
+                                  grid%i_start(ij), grid%i_end(ij),   &
+                                  grid%j_start(ij), grid%j_end(ij),   &
+                                  k_start    , k_end                 )
+          CALL set_physical_bc3d( z , 'w', config_flags,           &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  ips, ipe, jps, jpe, kps, kpe,       &
+                                  grid%i_start(ij), grid%i_end(ij),   &
+                                  grid%j_start(ij), grid%j_end(ij),   &
+                                  k_start    , k_end                 )
+          CALL set_physical_bc3d( zx , 'w', config_flags,           &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  ips, ipe, jps, jpe, kps, kpe,       &
+                                  grid%i_start(ij), grid%i_end(ij),   &
+                                  grid%j_start(ij), grid%j_end(ij),   &
+                                  k_start    , k_end                 )
+          CALL set_physical_bc3d( zy , 'w', config_flags,           &
+                                  ids, ide, jds, jde, kds, kde,       &
+                                  ims, ime, jms, jme, kms, kme,       &
+                                  ips, ipe, jps, jpe, kps, kpe,       &
+                                  grid%i_start(ij), grid%i_end(ij),   &
+                                  grid%j_start(ij), grid%j_end(ij),   &
+                                  k_start    , k_end                 )
+       endif
+
+#ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
+#     include "HALO_EM_TKE_C.inc"
+       endif
+#endif
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++016++++++++++++++++++++++++++++++++++++++++++++++++++'
+       if(dyn_opt == DYN_EM) then
+
+          CALL wrf_debug ( 200 , ' call cal_deform_and_div' )
+          CALL cal_deform_and_div ( config_flags,u_2,v_2,w_2,div,        &
+                                    defor11,defor22,defor33,defor12,     &
+                                    defor13,defor23,                     &
+                                    u_base, v_base,msfu,msfv,msft,       &
+                                    rdx, rdy, dn, dnw, rdz, rdzw,        &
+                                    fnm,fnp,cf1,cf2,cf3,zx,zy,           &
+                                    ids, ide, jds, jde, kds, kde,        &
+                                    ims, ime, jms, jme, kms, kme,        &
+                                    grid%i_start(ij), grid%i_end(ij),    &
+                                    grid%j_start(ij), grid%j_end(ij),    &
+                                    k_start    , k_end                  )
+       endif
+
+
+#ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
+#     include "HALO_EM_TKE_D.inc"
+       endif
+#endif
+
+!by walls
+
 #ifdef DM_PARALLEL
   if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 #include "HALO_PHY_PREP.inc"
   if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
-  if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
+!   if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then  !by walls
 !---Save for calculate_km_kh:
-    if(grid%trace_use) call trace_entry("backup")
-    call push4backup(xkmh,xkmhd,xkmv,xkhh,xkhv,bn2, "xkmh,xkmhd,xkmv,xkhh,xkhv,bn2")
-    call push4backup(defor11,defor22,defor33,defor12,defor13,defor23, &
-                    "defor11,defor22,defor33,defor12,defor13,defor23")
-    call push4backup(div,tke_2,p8w,t8w,th_phy,t_phy,p_phy,rdz,rdzw, &
-                    "div,tke_2,p8w,t8w,th_phy,t_phy,p_phy,rdz,rdzw")
-    call push4backup(moist_2, "moist_2")
-    if(grid%trace_use) call trace_exit("backup")
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++017++++++++++++++++++++++++++++++++++++++++++++++++++'
 !---From: module_diffusion_em.F
     call calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,xkmv,xkhh,xkhv,bn2, &
                           khdif,kvdif,div,defor11,defor22,defor33,defor12,defor13,defor23, &
@@ -468,23 +794,202 @@ num_3d_c = 1
 #include "HALO_CALCULATE_KM_KH.inc"
     if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
-  endif
+
+!by walls
+#ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
+#     include "HALO_EM_TKE_E.inc"
+       endif
+#endif
+
+     ENDIF
+
+#ifdef DM_PARALLEL
+       if(dyn_opt == DYN_EM) then
+#      include "PERIOD_BDY_EM_PHY_BC.inc"
+#      include "PERIOD_BDY_EM_CHEM.inc"
+       endif
+#endif
+!by walls
+
+! endif  !by walls
+
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++018++++++++++++++++++++++++++++++++++++++++++++++++++'
+!by walls
+     if(dyn_opt == DYN_EM) then
+
+       CALL wrf_debug ( 200 , ' call phy_bc' )
+       CALL phy_bc (config_flags,div,defor11,defor22,defor33,            &
+                            defor12,defor13,defor23,                     &
+                            xkmh,xkmhd,xkmv,xkhh,xkhv,                   &   
+                            tke_2(ims,kms,jms),                          &
+                            RUBLTEN, RVBLTEN,                            &
+                            ids, ide, jds, jde, kds, kde,                &
+                            ims, ime, jms, jme, kms, kme,                &
+                            ips, ipe, jps, jpe, kps, kpe,                &
+                            grid%i_start(ij), grid%i_end(ij),                      &
+                            grid%j_start(ij), grid%j_end(ij),                      &
+                            k_start    , k_end                           )
+     endif
+
+
+#ifdef DM_PARALLEL
+!-----------------------------------------------------------------------
+!
+! MPP for some physics tendency, km, kh, deformation, and divergence
+!
+!               *                     *
+!             * + *      * + *        +
+!               *                     *
+!
+! (for PBL)
+! RUBLTEN                  x
+! RVBLTEN                             x
+!
+! (for diff_opt >= 1)
+! defor11                  x
+! defor22                             x
+! defor12       x
+! defor13                  x
+! defor23                             x
+! div           x
+! xkmv          x
+! xkmh          x
+! xkmhd         x
+! xkhv          x
+! xkhh          x
+! tke           x
+!
+!-----------------------------------------------------------------------
+      IF ( bl_pbl_physics .ge. 1 ) THEN
+#      include "HALO_EM_PHYS_PBL.inc"
+      ENDIF
+      IF ( diff_opt .ge. 1 ) THEN
+#      include "HALO_EM_PHYS_DIFFUSION.inc"
+      ENDIF
+
+      IF      ( h_mom_adv_order <= 4 ) THEN
+#       include "HALO_EM_TKE_3.inc"
+      ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#       include "HALO_EM_TKE_5.inc"
+      ELSE
+        WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+        CALL wrf_error_fatal(TRIM(wrf_err_message))
+      ENDIF
+#endif
+
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++019++++++++++++++++++++++++++++++++++++++++++++++++++'
+      if(dyn_opt == DYN_EM) then
+
+        CALL wrf_debug ( 200 , ' call update_phy_ten' )
+        CALL update_phy_ten(t_tendf, ru_tendf, rv_tendf,moist_tend,        &
+                          RTHRATEN,RTHBLTEN,RTHCUTEN,RUBLTEN,RVBLTEN,  &
+                          RQVBLTEN,RQCBLTEN,RQIBLTEN,                  &
+                          RQVCUTEN,RQCCUTEN,RQRCUTEN,RQICUTEN,RQSCUTEN,&
+                          num_3d_m,config_flags,rk_step,              &
+                          ids, ide, jds, jde, kds, kde,                &
+                          ims, ime, jms, jme, kms, kme,                &
+                          grid%i_start(ij), grid%i_end(ij),                      &
+                          grid%j_start(ij), grid%j_end(ij),                      &
+                          k_start, k_end                               )
+      endif
+
+
+     IF( diff_opt .eq. 2 .and. km_opt .eq. 2 ) THEN
+
+       if(dyn_opt == DYN_EM) then
+
+          CALL tke_rhs  ( tke_tend,BN2,                               &
+                          config_flags,defor11,defor22,defor33,       &
+                          defor12,defor13,defor23,u_2,v_2,w_2,div,    &
+                          tke_2(ims,kms,jms),mut,                     &
+                          th_phy,p_phy,p8w,t8w,z,fnm,fnp,             &
+                          cf1,cf2,cf3,msft,xkmh,xkmv,xkhv,rdx,rdy,    &
+                          dx,dy,dt,zx,zy,rdz,rdzw,dn,dnw,mix_cr_len,  &
+                          ids, ide, jds, jde, kds, kde,               &
+                          ims, ime, jms, jme, kms, kme,               &
+                          grid%i_start(ij), grid%i_end(ij),           &
+                          grid%j_start(ij), grid%j_end(ij),           &
+                          k_start    , k_end                         )
+
+       endif
+     ENDIF
+
+
+
+
+! calculate vertical diffusion first and then horizontal
+! (keep this order)
+
+     IF(diff_opt .eq. 2) THEN
+       IF (bl_pbl_physics .eq. 0) THEN
+
+
+         if(dyn_opt == DYN_EM) then
+
+           CALL wrf_debug ( 200 , ' call vertical_diffusion_2 ' )
+           CALL vertical_diffusion_2( ru_tendf, rv_tendf, rw_tendf,              &
+                                      t_tendf, tke_tend,                         &
+                                      moist_tend, num_3d_m,                      &
+                                      chem_tend, num_3d_c,                       &
+                                      u_2, v_2,                                  &
+                                      t_2,u_base,v_base,t_base,qv_base,          &
+                                      mut,tke_2,config_flags,                    &
+                                      defor13,defor23,defor33,                   &
+                                      div, moist_2, chem_2, xkmv, xkhv, km_opt,  &
+                                      fnm, fnp, dn, dnw, rdz, rdzw,              &
+                                      ids, ide, jds, jde, kds, kde,              &
+                                      ims, ime, jms, jme, kms, kme,              &
+                                      grid%i_start(ij), grid%i_end(ij),          &
+                                      grid%j_start(ij), grid%j_end(ij),          &
+                                      k_start    , k_end                        )
+
+         endif
+
+       ENDIF
+
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++020++++++++++++++++++++++++++++++++++++++++++++++++++'
+       if(dyn_opt == DYN_EM) then
+         CALL wrf_debug ( 200 , ' call horizontal_diffusion_2' )
+         CALL horizontal_diffusion_2( t_tendf, ru_tendf, rv_tendf, rw_tendf, &
+                                      tke_tend,                              &
+                                      moist_tend, num_3d_m,                  &
+                                      chem_tend, num_3d_c,                   &
+                                      t_2, th_phy,                           &
+                                      mut, tke_2, config_flags,              &
+                                      defor11, defor22, defor12,             &
+                                      defor13, defor23, div,                 &
+                                      moist_2, chem_2,                       &
+                                      msfu, msfv, msft, xkmhd, xkhh, km_opt, &
+                                      rdx, rdy, rdz, rdzw,                   &
+                                      fnm, fnp, cf1, cf2, cf3,               &
+                                      zx, zy, dn, dnw,                       &
+                                      ids, ide, jds, jde, kds, kde,          &
+                                      ims, ime, jms, jme, kms, kme,          &
+                                      grid%i_start(ij), grid%i_end(ij),      &
+                                      grid%j_start(ij), grid%j_end(ij),      &
+                                      k_start    , k_end                    )
+       endif
+
+     ENDIF
+
+!by walls
 
   endif rk_step_is_ong
 
+
 !---Save for rk_tendency
     if(grid%trace_use) call trace_entry("backup")
-    call push4backup(u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1, &
-                    "u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1")
-    call push4backup(ru,rv,rw,ww,t_init,al,alt,p, &
-                    "ru,rv,rw,ww,t_init,al,alt,p")
-    call push4backup(cqu,cqv,cqw,xkmhd,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf, &
-                    "cqu,cqv,cqw,xkmhd,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf")
-    call push4backup(mu_2,mut,muu,muv, "mu_2,mut,muu,muv")
-!    call push4backup(php, "php")
+    call push4backup(ru,rv,rw,ww,al, "ru,rv,rw,ww,al")
+    call push4backup(cqu,cqv,cqw, "cqu,cqv,cqw")
+    call push4backup(mu_2, "mu_2")
     if(grid%trace_use) call trace_exit("backup")
 
 !---From: module_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++021++++++++++++++++++++++++++++++++++++++++++++++++++'
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend, &
                       ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,mu_tend, &
                       u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww, &
@@ -509,13 +1014,6 @@ num_3d_c = 1
 #endif
 
 !  IF (rk_step == 1 ) then
-!
-!    if(grid%trace_use) call trace_entry("backup")
-!    call push4backup(z, "z")
-!    call push4backup(ru_tendf,rv_tendf,u_2,v_2,z_at_w, "ru_tendf,rv_tendf,u_2,v_2,z_at_w")
-!    call push4backup(muu,muv, "muu,muv")
-!    if(grid%trace_use) call trace_exit("backup")
-!
 !      CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &    
 !                         muu, muv,z,z_at_w,&
 !                         ids, ide, jds, jde, kds, kde,                    &    
@@ -528,12 +1026,6 @@ num_3d_c = 1
 
   if( (config_flags%specified .or. config_flags%nested) .and. rk_step==1 ) then
 !-----Save for relax_bdy_dry
-      if(grid%trace_use) call trace_entry("backup")
-      call push4backup(ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save, &
-                      "ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save")
-      call push4backup(mu_2,mut,mu_tend, "mu_2,mut,mu_tend")
-      if(grid%trace_use) call trace_exit("backup")
-
 !-----From: module_bc_em.F
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend, &
                           ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,w_b,mu_b, &
@@ -556,15 +1048,8 @@ num_3d_c = 1
 
   endif
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++022++++++++++++++++++++++++++++++++++++++++++++++++++'
 !---Save for rk_addtend_dry:
-    if(grid%trace_use) call trace_entry("backup")
-    call push4backup(ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf, &
-                    "ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf")
-    call push4backup(u_save,v_save,w_save,ph_save,t_save,h_diabatic, &
-                    "u_save,v_save,w_save,ph_save,t_save,h_diabatic")
-    call push4backup(mut,mu_tend, "mut,mu_tend")
-    if(grid%trace_use) call trace_exit("backup")
-
 !---From: module_em.F
     call rk_addtend_dry( ru_tend,rv_tend,rw_tend,ph_tend,t_tend, &
                          ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf, &
@@ -608,13 +1093,14 @@ num_3d_c = 1
 
 !---Save for small_step_prep
     if(grid%trace_use) call trace_entry("backup")
-    call push4backup(u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2, &
-                    "u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2")
-    call push4backup(p,alt,ww, "p,alt,ww,")
+    call push4backup(u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_2, &
+                    "u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_2")
+    call push4backup(p, "p")
     call push4backup(mu_1,mu_2,muu,muv,mut, "mu_1,mu_2,muu,muv,mut")
     if(grid%trace_use) call trace_exit("backup")
 
 !---From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++023++++++++++++++++++++++++++++++++++++++++++++++++++'
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2, &
                           mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf, &
                           u_save,v_save,w_save,t_save,ph_save,mu_save,ww,ww1, &
@@ -636,11 +1122,12 @@ num_3d_c = 1
 
 !---Save for calc_p_rho:
     if(grid%trace_use) call trace_entry("backup")
-    call push4backup(ph_2,alt,t_2,t_save,c2a,pm1, "ph_2,alt,t_2,t_save,c2a,pm1")
-    call push4backup(mu_2,muts, "mu_2,muts")
+    call push4backup(ph_2,t_2, "ph_2,t_2")
+    call push4backup(muts, "muts")
     if(grid%trace_use) call trace_exit("backup")
 
 !---From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++024++++++++++++++++++++++++++++++++++++++++++++++++++'
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts, &
                      znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0, &
                      ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
@@ -658,12 +1145,8 @@ num_3d_c = 1
 
     if (non_hydrostatic) then
 !-----Save for calc_coef_w:
-      if(grid%trace_use) call trace_entry("backup")
-      call push4backup(a,alpha,gamma,cqw,c2a, "a,alpha,gamma,cqw,c2a")
-      call push4backup(mut, "mut")
-      if(grid%trace_use) call trace_exit("backup")
-
 !-----From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++025++++++++++++++++++++++++++++++++++++++++++++++++++'
       call calc_coef_w( a,alpha,gamma,mut,cqw,rdn,rdnw,c2a,dts,g,epssm, &
                         ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme, &
                         grid%i_start(ij),grid%i_end(ij), &
@@ -673,25 +1156,116 @@ num_3d_c = 1
 !-----Output: a,alpha,gamma
 
 #ifdef DM_PARALLEL
+#      include "HALO_EM_B.inc"   !by walls
+#      include "PERIOD_BDY_EM_B.inc"   !by walls
       if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 #include "HALO_CALC_COEF_W.inc"
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
     endif
 
+!by walls
+   if(dyn_opt == DYN_EM) then
+
+         CALL set_physical_bc3d( ru_tend, 'u', config_flags,          &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( rv_tend, 'v', config_flags,            &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( ph_2, 'w', config_flags,          &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( al, 'p', config_flags,            &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( p, 'p', config_flags,             &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( t_1, 'p', config_flags,             &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc3d( t_save, 't', config_flags,             &
+                                 ids, ide, jds, jde, kds, kde, &
+                                 ims, ime, jms, jme, kms, kme, &
+                                 ips, ipe, jps, jpe, kps, kpe, &
+                           grid%i_start(ij), grid%i_end(ij),                 &
+                           grid%j_start(ij), grid%j_end(ij),                 &
+                           k_start    , k_end                     )
+
+         CALL set_physical_bc2d( mu_1, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+         CALL set_physical_bc2d( mu_2, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+         CALL set_physical_bc2d( mudf, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+    endif
+!by walls
+
+
 !-if(grid%trace_use) call trace_entry("solve_ad_small_stepu")
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++026++++++++++++++++++++++++++++++++++++++++++++++++++'
   small_stepu: do iteration = 1, number_of_small_timesteps
 
       WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepu, iteration = ',iteration
       CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
+!by walls
+#ifdef DM_PARALLEL
+#      include "PERIOD_BDY_EM_B.inc"
+#endif
+!by walls
+
 !-----Save for advance_uv
       if(grid%trace_use) call trace_entry("backup")
-      call push4backup(php, "php")
-      call push4backup(u_2,ru_tend,v_2,rv_tend,p,ph_2,alt,al,cqu,cqv, &
-                      "u_2,ru_tend,v_2,rv_tend,p,ph_2,alt,al,cqu,cqv")
-      call push4backup(mu_2,muu,muv,mudf, "mu_2,muu,muv,mudf")
+      call push4backup(p,al, "p,al")
+      call push4backup(mu_2, "mu_2")
       if(grid%trace_use) call trace_exit("backup")
 
 !-----From: module_small_step_em.F
@@ -714,10 +1288,6 @@ num_3d_c = 1
 
       if (config_flags%specified .or. config_flags%nested) then
 !-------Save for spec_bdyupdate:
-        if(grid%trace_use) call trace_entry("backup")
-        call push4backup(u_2,ru_tend,v_2,rv_tend, "u_2,ru_tend,v_2,rv_tend")
-        if(grid%trace_use) call trace_exit("backup")
-
 !-------From: ../share/module_bc.F
         call spec_bdyupdate( u_2,ru_tend,dts_rk,'u',config_flags,spec_zone, &
                              ids,ide,jds,jde,kds,kde, &
@@ -735,6 +1305,7 @@ num_3d_c = 1
                              k_start,k_end )
 !-----Output: u_2,v_2
 
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027++++++++++++++++++++++++++++++++++++++++++++++++++'
 !ifdef DM_PARALLEL
 !     if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 !include "HALO_SPEC_BDYUPDATE_UV.inc"
@@ -748,16 +1319,27 @@ num_3d_c = 1
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
+
+!by walls
+#ifdef DM_PARALLEL
+!
+!  Stencils for patch communications  (WCS, 29 June 2001)
+!
+!         *                     *
+!       * + *      * + *        +
+!         *                     *
+!
+!  u_2               x
+!  v_2                          x
+!
+#     include "HALO_EM_C.inc"
+#endif
+!by walls
+
+
 !-----Save for advance_mu_t
-      if(grid%trace_use) call trace_entry("backup")
-      call push4backup(ww,ww1,u_2,u_save,v_2,v_save,ru_m,rv_m,ww_m, &
-                      "ww,ww1,u_2,u_save,v_2,v_save,ru_m,rv_m,ww_m")
-      call push4backup(t_2,t_save,t_2save,t_tend, &
-                      "t_2,t_save,t_2save,t_tend")
-      call push4backup(mu_2,mut,muu,muv,mu_tend, "mu_2,mut,muu,muv,mu_tend")
-      if(grid%trace_use) call trace_exit("backup")
-               
 !-----From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-01A++++++++++++++++++++++++++++++++++++++++++++++++++'
       call advance_mu_t( ww,ww1,u_2,u_save,v_2,v_save,mu_2,mut,muave,muts,muu,muv,mudf, &
                          ru_m,rv_m,ww_m,t_2,t_save,t_2save,t_tend,mu_tend, &
                          rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw, &
@@ -767,6 +1349,7 @@ num_3d_c = 1
                          grid%i_start(ij),grid%i_end(ij), &
                          grid%j_start(ij),grid%j_end(ij), &
                          k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-01B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-----Output: ww,ww1,ru_m,rv_m,ww_m,t_2,t_2save,mu_2,muave,muts,mudf
 
@@ -778,12 +1361,8 @@ num_3d_c = 1
 
       if (config_flags%specified .or. config_flags%nested) then
 !-------Save for spec_bdyupdate:
-        if(grid%trace_use) call trace_entry("backup")
-        call push4backup(t_2,t_tend, "t_2,t_tend")
-        call push4backup(mu_2,mu_tend,muts,mu_tend, "mu_2,mu_tend,muts,mu_tend")
-        if(grid%trace_use) call trace_exit("backup")
-
 !-------From: ../share/module_bc.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-02A++++++++++++++++++++++++++++++++++++++++++++++++++'
         call spec_bdyupdate( t_2,t_tend,dts_rk,'t',config_flags,spec_zone, &
                              ids,ide,jds,jde,kds,kde, &
                              ims,ime,jms,jme,kms,kme, &
@@ -803,6 +1382,7 @@ num_3d_c = 1
                              ips,ipe,jps,jpe,1,1, &
                              grid%i_start(ij),grid%i_end(ij), &
                              grid%j_start(ij),grid%j_end(ij),1,1 )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-02B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-------Output: t_2, mu_2, muts
 
@@ -814,12 +1394,8 @@ num_3d_c = 1
       endif
 
 !-----Save for sumflux
-      if(grid%trace_use) call trace_entry("backup")
-      call push4backup(u_2,v_2,ww,u_save,v_save,ww1,ru_m,rv_m,ww_m, "u_2,v_2,ww,u_save,v_save,ww1,ru_m,rv_m,ww_m")
-      call push4backup(muu,muv, "muu,muv")
-      if(grid%trace_use) call trace_exit("backup")
-
 !-----From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-03A++++++++++++++++++++++++++++++++++++++++++++++++++'
       call sumflux( u_2,v_2,ww,u_save,v_save,ww1,muu,muv, &
                     ru_m,rv_m,ww_m,epssm,msfu,msfv,iteration, &
                     number_of_small_timesteps,ids,&
@@ -828,6 +1404,7 @@ num_3d_c = 1
                     grid%i_start(ij),grid%i_end(ij), &
                     grid%j_start(ij),grid%j_end(ij), &
                     k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-03B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-----Output: ru_m,rv_m,ww_m
 
@@ -840,14 +1417,13 @@ num_3d_c = 1
       if (non_hydrostatic) then
 !-------Save for advance_w:
         if(grid%trace_use) call trace_entry("backup")
-        call push4backup(w_2,rw_tend,ww,u_2,v_2,t_2save,t_2,t_save, &
-                        "w_2,rw_tend,ww,u_2,v_2,t_2save,t_2,t_save")
-        call push4backup(ph_2,ph_save,ph_tend,c2a,cqw,alt,alb,a,alpha,gamma, &
-                        "ph_2,ph_save,ph_tend,c2a,cqw,alt,alb,a,alpha,gamma")
-        call push4backup(mu_2,mut,muave,muts, "mu_2,mut,muave,muts")
+        call push4backup(w_2,ww,u_2,v_2,t_2save, "w_2,ww,u_2,v_2,t_2save")
+        call push4backup(ph_2,"ph_2")
+        call push4backup(muave, "muave")
         if(grid%trace_use) call trace_exit("backup")
 
 !-------From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-04A++++++++++++++++++++++++++++++++++++++++++++++++++'
         call advance_w( w_2,rw_tend,ww,u_2,v_2,mu_2,mut,muave,muts, &
                         t_2save,t_2,t_save,ph_2,ph_save, &
                         phb,ph_tend,ht,c2a,cqw,alt,alb,a,alpha,gamma, &
@@ -858,6 +1434,7 @@ num_3d_c = 1
                         grid%i_start(ij),grid%i_end(ij), &
                         grid%j_start(ij),grid%j_end(ij), &
                         k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-04B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-----Output: w_2,t_2save,ph_2
 
@@ -872,11 +1449,11 @@ num_3d_c = 1
         if (non_hydrostatic) then
 !---------Save for spec_bdyupdate_ph
           if(grid%trace_use) call trace_entry("backup")
-          call push4backup(ph_save,ph_2,ph_tend, "ph_save,ph_2,ph_tend")
-          call push4backup(mu_tend,muts, "mu_tend,muts")
+          call push4backup(ph_2, "ph_2")
           if(grid%trace_use) call trace_exit("backup")
 
 !---------From: module_bc_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-05A++++++++++++++++++++++++++++++++++++++++++++++++++'
           call spec_bdyupdate_ph( ph_save,ph_2,ph_tend,mu_tend,muts,dts_rk, &
                                   'h',config_flags,spec_zone, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -885,6 +1462,7 @@ num_3d_c = 1
                                   grid%i_start(ij),grid%i_end(ij), &
                                   grid%j_start(ij),grid%j_end(ij), &
                                   k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-05B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !---------Output: ph_2
 
@@ -905,11 +1483,8 @@ num_3d_c = 1
 !-----------Output: w_2
           else
 !-----------Save for spec_bdyupdate:
-            if(grid%trace_use) call trace_entry("backup")
-            call push4backup(w_2,rw_tend, "w_2,rw_tend")
-            if(grid%trace_use) call trace_exit("backup")
-
 !-----------From: ../share/module_bc.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-06A++++++++++++++++++++++++++++++++++++++++++++++++++'
             call spec_bdyupdate( w_2,rw_tend,dts_rk,'h',config_flags,spec_zone, &
                                  ids,ide,jds,jde,kds,kde, &
                                  ims,ime,jms,jme,kms,kme, &
@@ -917,6 +1492,7 @@ num_3d_c = 1
                                  grid%i_start(ij),grid%i_end(ij), &
                                  grid%j_start(ij),grid%j_end(ij), &
                                  k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-06B++++++++++++++++++++++++++++++++++++++++++++++++++'
 !-----------Output: w_2
           endif
 
@@ -930,11 +1506,12 @@ num_3d_c = 1
 
 !-----Save for calc_p_rho:
       if(grid%trace_use) call trace_entry("backup")
-      call push4backup(al,p,ph_2,alt,t_2,t_save,c2a,pm1, "al,p,ph_2,alt,t_2,t_save,c2a,pm1")
+      call push4backup(ph_2,t_2, "ph_2,t_2")
       call push4backup(mu_2,muts, "mu_2,muts")
       if(grid%trace_use) call trace_exit("backup")
 
 !-----From: module_small_step_em.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-07A++++++++++++++++++++++++++++++++++++++++++++++++++'
       call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu, &
                        t0,rdnw,dnw,smdiv,non_hydrostatic,iteration, &
                        ids,ide,jds,jde,kds,kde, &
@@ -942,6 +1519,7 @@ num_3d_c = 1
                        grid%i_start(ij),grid%i_end(ij), &
                        grid%j_start(ij),grid%j_end(ij), &
                        k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++027-07B++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-----Output: al,p,ph_2,pm1
 
@@ -951,13 +1529,87 @@ num_3d_c = 1
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
+!by walls
+#ifdef DM_PARALLEL
+!
+!  Stencils for patch communications  (WCS, 29 June 2001)
+!
+!         *                     *
+!       * + *      * + *        +
+!         *                     *
+!
+!  ph_2   x
+!  al     x
+!  p      x
+!
+!  2D variables (x,y)
+!
+!  mu_2   x
+!  muts   x
+!  mudf   x
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++028++++++++++++++++++++++++++++++++++++++++++++++++++'
+#      include "HALO_EM_C2.inc"
+#      include "PERIOD_BDY_EM_B3.inc"
+#endif
+
+      if(dyn_opt == DYN_EM) then
+
+        ! boundary condition set for next small timestep
+
+         CALL set_physical_bc3d( ph_2, 'w', config_flags,          &
+                                 ids, ide, jds, jde, kds, kde,     &
+                                 ims, ime, jms, jme, kms, kme,     &
+                                 ips, ipe, jps, jpe, kps, kpe,     &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij), &
+                                 k_start    , k_end               )
+
+         CALL set_physical_bc3d( al, 'p', config_flags,            &
+                                 ids, ide, jds, jde, kds, kde,     &
+                                 ims, ime, jms, jme, kms, kme,     &
+                                 ips, ipe, jps, jpe, kps, kpe,     &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij), &
+                                 k_start    , k_end               )
+
+         CALL set_physical_bc3d( p, 'p', config_flags,             &
+                                 ids, ide, jds, jde, kds, kde,     &
+                                 ims, ime, jms, jme, kms, kme,     &
+                                 ips, ipe, jps, jpe, kps, kpe,     &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij), &
+                                 k_start    , k_end               )
+
+         CALL set_physical_bc2d( muts, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+         CALL set_physical_bc2d( mu_2, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+         CALL set_physical_bc2d( mudf, 't', config_flags,          &
+                                 ids, ide, jds, jde,               &
+                                 ims, ime, jms, jme,               &
+                                 ips, ipe, jps, jpe,               &
+                                 grid%i_start(ij), grid%i_end(ij), &
+                                 grid%j_start(ij), grid%j_end(ij) )
+
+      endif
+!by walls
+
   end do small_stepu
 
 !-if(grid%trace_use) call trace_exit("solve_ad_small_stepu")
 
 !---Save for calc_mu_uv_1: (Will backup next)
-!   call push4backup(muts, "muts")
-
 !---From: module_big_step_utilities_em.F
     call calc_mu_uv_1( config_flags,muts,muus,muvs, &
                        ids,ide,jds,jde,kds,kde, &
@@ -976,13 +1628,18 @@ num_3d_c = 1
 
 !-----Save for small_step_finish:
       if(grid%trace_use) call trace_entry("backup")
-      call push4backup(u_2,u_1,v_2,v_1,w_2,w_1,t_2,t_1,ph_2,ph_1, &
-                      "u_2,u_1,v_2,v_1,w_2,w_1,t_2,t_1,ph_2,ph_1")
-      call push4backup(ww,ww1,u_save,v_save,w_save,t_save,ph_save,h_diabatic, &
-                      "ww,ww1,u_save,v_save,w_save,t_save,ph_save,h_diabatic")
-      call push4backup(mu_2,mu_1,mut,muts,muu,muus,muv,muvs,mu_save, &
-                      "mu_2,mu_1,mut,muts,muu,muus,muv,muvs,mu_save")
-
+      call push4backup(u_2,v_2,w_2,t_2, "u_2,v_2,w_2,t_2")
+      call push4backup(ww1,u_save,v_save,w_save,t_save,ph_save, &
+                      "ww1,u_save,v_save,w_save,t_save,ph_save")
+      call push4backup(mut,muu,muus,muv,muvs, "mut,muu,muus,muv,muvs")
+      call push4backup(cqu,cqv,cqw,"cqu,cqv,cqw")  !ADDED BY WALLS
+      call push4backup(php, "php")  !ADDED BY WALLS
+      call push4backup(mu_tend, "mu_tend")  !ADDED BY WALLS
+      call push4backup(gamma, "gamma")  !ADDED BY WALLS
+      call push4backup(alpha, "alpha")  !ADDED BY WALLS
+      call push4backup(a, "a")  !ADDED BY WALLS
+      call push4backup(c2a, "c2a")  !ADDED BY WALLS
+      call push4backup(ph_tend,rw_tend, "ph_tend,rw_tend")  !ADDED BY WALLS
       if(grid%trace_use) call trace_exit("backup")
 
 !-----From: module_small_step_em.F
@@ -1009,17 +1666,29 @@ num_3d_c = 1
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
+!by walls
+#ifdef DM_PARALLEL
+!
+!  Stencils for patch communications  (WCS, 29 June 2001)
+!
+!
+! ru_m      x
+! rv_m      x
+!
+!--------------------------------------------------------------
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++029++++++++++++++++++++++++++++++++++++++++++++++++++'
+#  include "HALO_EM_D.inc"
+#endif
+!by walls
+
   moist_scalar_advancg: if (num_3d_m .ge. param_first_scalar) then
 
     moist_variable_loor1: do im = param_first_scalar, num_3d_m
 
 !---Save for rk_scalar_tend:
     if(grid%trace_use) call trace_entry("backup")
-    call push4backup(xkmhd, "xkmhd")
-    call push4backup(ru_m,rv_m,ww_m,alt,advect_tend, &
-                    "ru_m,rv_m,ww_m,alt,advect_tend")
-    call push4backup(mut, "mut")
-    call push4backup(moist_1,moist_2, "moist_1,moist_2")
+    call push4backup(ru_m,rv_m,ww_m,alt, "ru_m,rv_m,ww_m,alt")
     if(grid%trace_use) call trace_exit("backup")
 
 !-------From: module_em.F
@@ -1040,6 +1709,26 @@ num_3d_c = 1
 
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
+
+!by walls
+
+walls_open=0
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqv_b, rqv_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+end if
+!by walls
+
 !-----------From: module_bc_em.F
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
@@ -1054,6 +1743,22 @@ num_3d_c = 1
         endif
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (im .eq. p_qc) then
+!by walls
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqc_b, rqc_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+end if
+!by walls
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -1063,6 +1768,23 @@ num_3d_c = 1
                                   grid%j_start(ij),grid%j_end(ij), &
                                   k_start,k_end )
           else if (im .eq. p_qr) then
+!by walls
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqr_b, rqr_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+
+end if
+!by walls
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -1072,6 +1794,22 @@ num_3d_c = 1
                                   grid%j_start(ij),grid%j_end(ij), &
                                   k_start,k_end )
           else if (im .eq. p_qi) then
+!by walls
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqi_b, rqi_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+end if
+!by walls
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -1081,6 +1819,22 @@ num_3d_c = 1
                                   grid%j_start(ij),grid%j_end(ij), &
                                   k_start,k_end )
           else if (im .eq. p_qs) then
+!by walls
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqs_b, rqs_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+end if
+!by walls
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -1090,6 +1844,22 @@ num_3d_c = 1
                                   grid%j_start(ij),grid%j_end(ij), &
                                   k_start,k_end )
           else if (im .eq. p_qg) then
+!by walls
+if(walls_open.eq.1) then
+         CALL relax_bdy_scalar ( moist_tend(ims,kms,jms,im),            &
+                                 moist_2(ims,kms,jms,im),  mut,         &
+                                 rqg_b, rqg_bt,                         &
+                                 spec_bdy_width, spec_zone, relax_zone, &
+                                 dtbc, fcx, gcx,             &
+                                 ijds, ijde,                 & ! min/max(id,jd)
+                                 ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                 ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                 ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                 grid%i_start(ij), grid%i_end(ij),      &
+                                 grid%j_start(ij), grid%j_end(ij),      &
+                                 k_start, k_end                        )
+end if
+!by walls
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone, &
                                   ijds,ijde, &
                                   ids,ide,jds,jde,kds,kde, &
@@ -1112,8 +1882,7 @@ num_3d_c = 1
 !---Save for rk_update_scalar:
     if(grid%trace_use) call trace_entry("backup")
     call push4backup(advect_tend, "advect_tend")
-    call push4backup(mu_1,mu_2, "mu_1,mu_2")
-    call push4backup(moist_1,moist_2,moist_tend, "moist_1,moist_2,moist_tend")
+    call push4backup(moist_1,moist_2, "moist_1,moist_2")
     if(grid%trace_use) call trace_exit("backup")
 
 !-------From: module_em.F
@@ -1128,6 +1897,25 @@ num_3d_c = 1
                                k_start,k_end )
 
 !-------Output: moist_1,moist_2,moist_tend
+
+!by walls
+       if(dyn_opt == DYN_EM) then
+       IF( config_flags%specified ) THEN
+         IF(im .ne. P_QV)THEN
+           CALL flow_dep_bdy  (  moist_2(ims,kms,jms,im),                     &
+                               ru_m, rv_m, config_flags, &
+                               spec_zone,                  &
+                               ids,ide, jds,jde, kds,kde,  & ! domain dims
+                               ims,ime, jms,jme, kms,kme,  & ! memory dims
+                               ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                               grid%i_start(ij), grid%i_end(ij),                      &
+                               grid%j_start(ij), grid%j_end(ij),                      &
+                               k_start, k_end                               )
+         ENDIF
+       ENDIF
+       endif
+!by walls
+
     end do moist_variable_loor1
 
 #ifdef DM_PARALLEL
@@ -1137,12 +1925,160 @@ num_3d_c = 1
 #endif
   endif moist_scalar_advancg
 
+
+!by walls
+ if(dyn_opt == DYN_EM) then
+ TKE_advance: IF (km_opt .eq. 2) then
+
+#ifdef DM_PARALLEL
+      IF      ( h_mom_adv_order <= 4 ) THEN
+#       include "HALO_EM_TKE_ADVECT_3.inc"
+      ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#       include "HALO_EM_TKE_ADVECT_5.inc"
+      ELSE
+        WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+        CALL wrf_error_fatal(TRIM(wrf_err_message))
+      ENDIF
+#endif
+
+     CALL wrf_debug ( 200 , ' call rk_scalar_tend for tke' )
+     CALL rk_scalar_tend ( 1, 1, config_flags,               &
+                           rk_step, dt_rk,                   &
+                           ru_m, rv_m, ww_m,                 &
+                           mut, alt,                         &
+                           tke_1(ims,kms,jms),               &
+                           tke_2(ims,kms,jms),               &
+                           tke_tend(ims,kms,jms),            &
+                           advect_tend,RQVFTEN,              &
+                           qv_base, .false., fnm, fnp,       &
+                           msfu, msfv, msft,                 &
+                           rdx, rdy, rdn, rdnw, khdif,       &
+                           kvdif, xkmhd,                     &
+                           leapfrog,                         &
+                           ids, ide, jds, jde, kds, kde,     &
+                           ims, ime, jms, jme, kms, kme,     &
+                           grid%i_start(ij), grid%i_end(ij), &
+                           grid%j_start(ij), grid%j_end(ij), &
+                           k_start    , k_end               )
+
+
+     CALL wrf_debug ( 200 , ' call rk_update_scalar' )
+     CALL rk_update_scalar( 1, 1,                             &
+                            tke_1(ims,kms,jms),               &
+                            tke_2(ims,kms,jms),               &
+                            tke_tend(ims,kms,jms),            &
+                            advect_tend,msft,                 &
+                            mu_1, mu_2, mub,                  &
+                            rk_step, dt_rk, spec_zone,        &
+                            epsts, leapfrog,config_flags,     &
+                            ids, ide, jds, jde, kds, kde,     &
+                            ims, ime, jms, jme, kms, kme,     &
+                            grid%i_start(ij), grid%i_end(ij), &
+                            grid%j_start(ij), grid%j_end(ij), &
+                            k_start    , k_end               )
+
+! bound the tke (greater than 0, less than tke_upper_bound)
+
+     CALL bound_tke( tke_2(ims,kms,jms), tke_upper_bound, &
+                     ids, ide, jds, jde, kds, kde,        &
+                     ims, ime, jms, jme, kms, kme,        &
+                     grid%i_start(ij), grid%i_end(ij),    &
+                     grid%j_start(ij), grid%j_end(ij),    &
+                     k_start    , k_end                  )
+
+     IF( config_flags%specified .or. config_flags%nested ) THEN
+         CALL flow_dep_bdy (  tke_2(ims,kms,jms),                     &
+                              ru_m, rv_m, config_flags,               &
+                              spec_zone,                              &
+                              ids,ide, jds,jde, kds,kde,  & ! domain dims
+                              ims,ime, jms,jme, kms,kme,  & ! memory dims
+                              ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                              grid%i_start(ij), grid%i_end(ij),       &
+                              grid%j_start(ij), grid%j_end(ij),       &
+                              k_start, k_end                               )
+     ENDIF
+
+   END IF TKE_advance
+   endif
+
+  chem_scalar_advance: IF (num_3d_c >= PARAM_FIRST_SCALAR)  THEN
+
+   chem_variable_loop: do ic = PARAM_FIRST_SCALAR, num_3d_c
+
+       CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
+       CALL rk_scalar_tend ( ic, ic, config_flags,                  &
+                             rk_step, dt_rk,                   &
+                             ru_m, rv_m, ww_m,                 &
+                             mut, alt,                         &
+                             chem_1(ims,kms,jms,ic),           &
+                             chem_2(ims,kms,jms,ic),           &
+                             chem_tend(ims,kms,jms,ic),        &
+                             advect_tend,RQVFTEN,              &
+                             qv_base, .false., fnm, fnp,       &
+                             msfu, msfv, msft,                 &
+                             rdx, rdy, rdn, rdnw,              &
+                             khdif, kvdif, xkmhd,              &
+                             leapfrog,                         &
+                             ids, ide, jds, jde, kds, kde,     &
+                             ims, ime, jms, jme, kms, kme,     &
+                             grid%i_start(ij), grid%i_end(ij), &
+                             grid%j_start(ij), grid%j_end(ij), &
+                             k_start    , k_end               )
+
+       CALL wrf_debug ( 200 , ' call rk_update_scalar' )
+       CALL rk_update_scalar( ic, ic,                           &
+                              chem_1(ims,kms,jms,ic),           &
+                              chem_2(ims,kms,jms,ic),           &
+                              chem_tend(ims,kms,jms,ic),        &
+                              advect_tend, msft,                &
+                              mu_1, mu_2, mub,                  &
+                              rk_step, dt_rk, spec_zone,        &
+                              epsts, leapfrog,config_flags,     &
+                              ids, ide, jds, jde, kds, kde,     &
+                              ims, ime, jms, jme, kms, kme,     &
+                              grid%i_start(ij), grid%i_end(ij), &
+                              grid%j_start(ij), grid%j_end(ij), &
+                              k_start    , k_end               )
+
+       IF( config_flags%specified ) THEN
+! come back to this and figure out why two different routines are needed. JM 20041203
+#ifndef WRF_CHEM
+           CALL flow_dep_bdy  ( chem_2(ims,kms,jms,ic),     &
+                                ru_m, rv_m, config_flags,   &
+                                spec_zone,                  &
+                                ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                grid%i_start(ij), grid%i_end(ij),  &
+                                grid%j_start(ij), grid%j_end(ij),  &
+                                k_start, k_end                    )
+#else
+           CALL flow_dep_bdy_chem( chem_2(ims,kms,jms,ic),z,&
+                                ru_m, rv_m, config_flags,alt,   &
+                                t_1,pb,p,t0,p1000mb,rcp,ph_2,phb,g, &
+                                spec_zone,ic,               &
+                                ids,ide, jds,jde, kds,kde,  & ! domain dims
+                                ims,ime, jms,jme, kms,kme,  & ! memory dims
+                                ips,ipe, jps,jpe, kps,kpe,  & ! patch  dims
+                                grid%i_start(ij), grid%i_end(ij),  &
+                                grid%j_start(ij), grid%j_end(ij),  &
+                                k_start, k_end                    )
+#endif
+       ENDIF
+
+
+   ENDDO chem_variable_loop
+
+ ENDIF chem_scalar_advance
+!by walls
+
+
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++030++++++++++++++++++++++++++++++++++++++++++++++++++'
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS001++++++++++++++++++++++++++++++++++++++++++++++'
 !---Save for calc_p_rho_phi:
     if(grid%trace_use) call trace_entry("backup")
     call push4backup(ph_2,t_2, "ph_2,t_2")
     call push4backup(mu_2,muts, "mu_2,muts")
-    call push4backup(moist_2, "moist_2")
-    call push4backup(al,p, "al,p")
     if(grid%trace_use) call trace_exit("backup")
 
 !---From: module_big_step_utilities_em.F
@@ -1166,9 +2102,9 @@ num_3d_c = 1
 !-----Save for diagnose_w:
       if(grid%trace_use) call trace_entry("backup")
       call push4backup(ph_tend, "ph_tend")
-      call push4backup(muts, "muts")
       if(grid%trace_use) call trace_exit("backup")
 
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS002++++++++++++++++++++++++++++++++++++++++++++++'
 !---From: module_big_step_utilities_em.F
       call diagnose_w( ph_tend,ph_2,ph_1,w_2,muts,dt_rk,u_2,v_2,ht, &
                        cf1,cf2,cf3,rdx,rdy,msft, &
@@ -1187,6 +2123,171 @@ num_3d_c = 1
 #endif
     endif
 
+!by walls
+   rk_step_1_check: IF ( rk_step < rk_order ) THEN
+
+!-----------------------------------------------------------
+!  Stencils for patch communications  (WCS, 29 June 2001)
+!
+!  here's where we need a wide comm stencil - these are the 
+!  uncoupled variables so are used for high order calc in
+!  advection and mixong routines.
+!
+!                              * * * * *
+!            *        * * *    * * * * *
+!          * + *      * + *    * * + * * 
+!            *        * * *    * * * * *
+!                              * * * * *
+!
+!
+! u_2                              x
+! v_2                              x
+! w_2                              x
+! t_2                              x
+! ph_2                             x
+! al         x
+!
+!  2D variable
+! mu_2       x
+!
+!  4D variable
+! moist_2               x
+! chem_2                x
+
+#ifdef DM_PARALLEL
+   IF      ( h_mom_adv_order <= 4 ) THEN
+#    include "HALO_EM_D2_3.inc"
+   ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#    include "HALO_EM_D2_5.inc"
+   ELSE
+     WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+     CALL wrf_error_fatal(TRIM(wrf_err_message))
+   ENDIF
+#  include "PERIOD_BDY_EM_D.inc"
+#  include "PERIOD_BDY_EM_MOIST2.inc"
+#  include "PERIOD_BDY_EM_CHEM2.inc"
+#endif
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS003++++++++++++++++++++++++++++++++++++++++++++++'
+   if(dyn_opt == DYN_EM) then
+
+      CALL wrf_debug ( 200 , ' call rk_phys_bc_dry_2' )
+
+      CALL rk_phys_bc_dry_2( config_flags,                         &
+                             u_2, v_2, w_2,                    &
+                             t_2, ph_2, mu_2,                  &
+                             ids, ide, jds, jde, kds, kde,     &
+                             ims, ime, jms, jme, kms, kme,     &
+                             ips, ipe, jps, jpe, kps, kpe,     &
+                             grid%i_start(ij), grid%i_end(ij), &
+                             grid%j_start(ij), grid%j_end(ij), &
+                             k_start    , k_end               )
+
+      IF (num_3d_m >= PARAM_FIRST_SCALAR) THEN
+
+        moisture_loop_bdy_1 : DO im = PARAM_FIRST_SCALAR , num_3d_m
+
+          CALL set_physical_bc3d( moist_2(ims,kms,jms,im), 'p', config_flags,   &
+                                   ids, ide, jds, jde, kds, kde,             &
+                                   ims, ime, jms, jme, kms, kme,             &
+                                   ips, ipe, jps, jpe, kps, kpe,             &
+                                   grid%i_start(ij), grid%i_end(ij),                   &
+                                   grid%j_start(ij), grid%j_end(ij),                   &
+                                   k_start    , k_end                       )
+         END DO moisture_loop_bdy_1
+
+      ENDIF
+
+      IF (num_3d_c >= PARAM_FIRST_SCALAR) THEN
+
+        chem_species_bdy_loop_1 : DO ic = PARAM_FIRST_SCALAR , num_3d_c
+
+          CALL set_physical_bc3d( chem_2(ims,kms,jms,ic), 'p', config_flags,   &
+                                  ids, ide, jds, jde, kds, kde,            &
+                                  ims, ime, jms, jme, kms, kme,            &
+                                  ips, ipe, jps, jpe, kps, kpe,            &
+                                  grid%i_start(ij), grid%i_end(ij),                  &
+                                  grid%j_start(ij), grid%j_end(ij),                  &
+                                  k_start    , k_end-1                    )
+
+        END DO chem_species_bdy_loop_1
+
+      END IF
+
+      IF (km_opt .eq. 2) THEN
+
+        CALL set_physical_bc3d( tke_2(ims,kms,jms) , 'p', config_flags,  &
+                                ids, ide, jds, jde, kds, kde,            &
+                                ims, ime, jms, jme, kms, kme,            &
+                                ips, ipe, jps, jpe, kps, kpe,            &
+                                grid%i_start(ij), grid%i_end(ij),        &
+                                grid%j_start(ij), grid%j_end(ij),        &
+                                k_start    , k_end                      )
+      END IF
+
+   endif
+
+#ifdef DM_PARALLEL
+
+      IF      ( h_mom_adv_order <= 4 ) THEN
+#       include "HALO_EM_TKE_3.inc"
+      ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#       include "HALO_EM_TKE_5.inc"
+      ELSE
+        WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+        CALL wrf_error_fatal(TRIM(wrf_err_message))
+      ENDIF
+
+#if 0
+   IF (km_opt .eq. 2) THEN
+#      include  "HALO_EM_TKE_F.inc"
+   ENDIF
+#endif
+
+   if ( num_moist .ge. PARAM_FIRST_SCALAR ) then
+
+!                           * * * * *
+!         *        * * *    * * * * *
+!       * + *      * + *    * * + * *
+!         *        * * *    * * * * *
+!                           * * * * *
+
+! moist_2                       x
+
+     IF      ( h_mom_adv_order <= 4 ) THEN
+#      include "HALO_EM_MOIST_E_3.inc"
+     ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#      include "HALO_EM_MOIST_E_5.inc"
+     ELSE
+       WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+       CALL wrf_error_fatal(TRIM(wrf_err_message))
+     ENDIF
+   endif
+   if ( num_chem >= PARAM_FIRST_SCALAR ) then
+
+!                           * * * * *
+!         *        * * *    * * * * *
+!       * + *      * + *    * * + * *
+!         *        * * *    * * * * *
+!                           * * * * *
+
+! chem_2                        x
+
+     IF      ( h_mom_adv_order <= 4 ) THEN
+#      include "HALO_EM_CHEM_E_3.inc"
+     ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#      include "HALO_EM_CHEM_E_5.inc"
+     ELSE
+       WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+       CALL wrf_error_fatal(TRIM(wrf_err_message))
+     ENDIF
+   endif
+
+#endif
+
+   ENDIF rk_step_1_check
+!by walls
+
 end do runge_kutta_looq
 !whl save the basic state for the mp and large scale rain. 
 !
@@ -1197,6 +2298,38 @@ end do runge_kutta_looq
      sz = 0
    ENDIF
 
+!by walls
+!by walls
+walls_open=0
+if(walls_open.eq.1) then
+      CALL wrf_debug ( 200 , ' call advance_ppt' )
+      CALL advance_ppt(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN, &
+                     RQICUTEN,RQSCUTEN,RAINC,RAINCV,NCA,    &
+                     CUPPT, config_flags,                   &
+                     ids,ide, jds,jde, kds,kde,             &
+                     ims,ime, jms,jme, kms,kme,             &
+                     grid%i_start(ij), grid%i_end(ij),      &
+                     grid%j_start(ij), grid%j_end(ij),      &
+                     k_start    , k_end                    )
+
+
+
+ IF (config_flags%mp_physics == 0)  then   !marked by 11AAA
+
+   IF( config_flags%specified .or. config_flags%nested ) THEN
+     sz = spec_zone
+   ELSE
+     sz = 0
+   ENDIF
+
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS005++++++++++++++++++++++++++++++++++++++++++++++'
+       its = max(grid%i_start(ij),ids+sz)
+       ite = min(grid%i_end(ij),ide-1-sz)
+       jts = max(grid%j_start(ij),jds+sz)
+       jte = min(grid%j_end(ij),jde-1-sz)
+
+       CALL wrf_debug ( 200 , ' call moist_physics_prep' )
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &
@@ -1209,6 +2342,7 @@ end do runge_kutta_looq
                                    min(grid%i_end(ij),ide-1-sz),    &
                                    max(grid%j_start(ij),jds+sz),  &
                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+
     call push4backup(moist_2, "moist_2")
     call push4backup(rho, "rho")
     call push4backup(p_phy, "p_phy")
@@ -1229,6 +2363,7 @@ end do runge_kutta_looq
                                    max(grid%j_start(ij),jds+sz),          &
                                    min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)         )
      elseif(config_flags%mp_physics == 0)then
+
         CALL lscond(t_2, p_phy                                         &
                     ,moist_2(ims,kms,jms,P_QV)                         &
                     ,rho, pi_phy,r_v, xlv, cp                          &
@@ -1257,22 +2392,221 @@ end do runge_kutta_looq
     call push4backup(moist_2, "moist_2")
     call push4backup(al,p, "al,p")
 
-    call calc_p_rho_phi( moist_2,num_3d_m,al,alb,mu_2,muts,ph_2,p,pb,t_2,p0,t0, &
-                         znu,dnw,rdnw,rdn,non_hydrostatic, &
-                         ids,ide,jds,jde,kds,kde, &
-                         ims,ime,jms,jme,kms,kme, &
-                         grid%i_start(ij),grid%i_end(ij), &
-                         grid%j_start(ij),grid%j_end(ij), &
-                         k_start,k_end )
+       CALL calc_p_rho_phi( moist_2, num_3d_m,                &
+                            al, alb, mu_2, muts,              &
+                            ph_2, p, pb, t_2,                 &
+                            p0, t0, znu, dnw, rdnw,           &
+                            rdn, non_hydrostatic,             &
+                            ids, ide, jds, jde, kds, kde,     &
+                            ims, ime, jms, jme, kms, kme,     &
+                            its, ite, jts, jte,               &
+                            k_start    , k_end               )
 
-!-----Save for diagnose_w:
-      if(grid%trace_use) call trace_entry("backup")
       call push4backup(ph_tend, "ph_tend")
       call push4backup(muts, "muts")
-      if(grid%trace_use) call trace_exit("backup")
-!whl diagnose_w
-  endif 
 
+END IF
+
+       IF (.not. non_hydrostatic)                               &
+       CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
+                        u_2, v_2, ht,                           &
+                        cf1, cf2, cf3, rdx, rdy, msft,          &
+                        ids, ide, jds, jde, kds, kde,           &
+                        ims, ime, jms, jme, kms, kme,           &
+                        its, ite, jts, jte,                     &
+                        k_start    , k_end                     )
+
+  ENDIF   !marked by 11AAA
+
+
+          CALL wrf_debug ( 200 , ' call scalar_tile_loop_2' )
+
+     IF ( num_3d_c >= PARAM_FIRST_SCALAR ) then
+
+!
+!  tiled chemistry not here, it is called from solve_interface, and found in chem_driver
+!
+
+     END IF
+
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS007++++++++++++++++++++++++++++++++++++++++++++++'
+   if(dyn_opt == DYN_EM) then
+   IF (leapfrog ) THEN
+
+    ! do time filter and switch for the dry variables
+
+      call time_filter( u_1, u_2, u_save,                 &
+                        v_1, v_2, v_save,                 &
+                        w_1, w_2, w_save,                 &
+                        t_1, t_2, t_save,                 &
+                        ph_1, ph_2, ph_save,              &
+                        mu_1, mu_2, mu_save,              &
+                        epsts,                            &
+                        ids, ide, jds, jde, kds, kde,     &
+                        ims, ime, jms, jme, kms, kme,     &
+                        grid%i_start(ij), grid%i_end(ij), &
+                        grid%j_start(ij), grid%j_end(ij), &
+                        k_start    , k_end               )
+
+    END IF
+    endif
+
+#ifdef DM_PARALLEL
+   IF      ( h_mom_adv_order <= 4 ) THEN
+#    include "HALO_EM_D3_3.inc"
+   ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#    include "HALO_EM_D3_5.inc"
+   ELSE
+     WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+     CALL wrf_error_fatal(TRIM(wrf_err_message))
+   ENDIF
+#  include "PERIOD_BDY_EM_D3.inc"
+#  include "PERIOD_BDY_EM_MOIST.inc"
+#  include "PERIOD_BDY_EM_CHEM.inc"
+#endif
+
+!  now set physical b.c on a patch
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS008++++++++++++++++++++++++++++++++++++++++++++++'
+   if(dyn_opt == DYN_EM) then
+   !$OMP PARALLEL DO   &
+   !$OMP PRIVATE ( ij )
+
+     CALL wrf_debug ( 200 , ' call set_phys_bc_dry_2' )
+
+     CALL set_phys_bc_dry_2( config_flags,                           &
+                             u_1, u_2, v_1, v_2, w_1, w_2,           &
+                             t_1, t_2, ph_1, ph_2, mu_1, mu_2,       &
+                             ids, ide, jds, jde, kds, kde,           &
+                             ims, ime, jms, jme, kms, kme,           &
+                             ips, ipe, jps, jpe, kps, kpe,           &
+                             grid%i_start(ij), grid%i_end(ij),       &
+                             grid%j_start(ij), grid%j_end(ij),       &
+                             k_start    , k_end                     )
+
+     CALL set_physical_bc3d( tke_1(ims,kms,jms), 'p', config_flags,   &
+                             ids, ide, jds, jde, kds, kde,            &
+                             ims, ime, jms, jme, kms, kme,            &
+                             ips, ipe, jps, jpe, kps, kpe,            &
+                             grid%i_start(ij), grid%i_end(ij),        &
+                             grid%j_start(ij), grid%j_end(ij),        &
+                             k_start    , k_end-1                    )
+     CALL set_physical_bc3d( tke_2(ims,kms,jms) , 'p', config_flags,  &
+                             ids, ide, jds, jde, kds, kde,            &
+                             ims, ime, jms, jme, kms, kme,            &
+                             ips, ipe, jps, jpe, kps, kpe,            &
+                             grid%i_start(ij), grid%i_end(ij),        &
+                             grid%j_start(ij), grid%j_end(ij),        &
+                             k_start    , k_end                      )
+
+     moisture_loop_bdy_2 : DO im = PARAM_FIRST_SCALAR , num_3d_m
+
+       CALL set_physical_bc3d( moist_1(ims,kms,jms,im), 'p',           &
+                               config_flags,                           &
+                               ids, ide, jds, jde, kds, kde,           &
+                               ims, ime, jms, jme, kms, kme,           &
+                               ips, ipe, jps, jpe, kps, kpe,           &
+                               grid%i_start(ij), grid%i_end(ij),       &
+                               grid%j_start(ij), grid%j_end(ij),       &
+                               k_start    , k_end                     )
+       CALL set_physical_bc3d( moist_2(ims,kms,jms,im), 'p',           &
+                               config_flags,                           &
+                               ids, ide, jds, jde, kds, kde,           &
+                               ims, ime, jms, jme, kms, kme,           &
+                               ips, ipe, jps, jpe, kps, kpe,           &
+                               grid%i_start(ij), grid%i_end(ij),       &
+                               grid%j_start(ij), grid%j_end(ij),       &
+                               k_start    , k_end                     )
+
+     END DO moisture_loop_bdy_2
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS009++++++++++++++++++++++++++++++++++++++++++++++'
+     chem_species_bdy_loop_2 : DO ic = PARAM_FIRST_SCALAR , num_3d_c
+
+       CALL set_physical_bc3d( chem_1(ims,kms,jms,ic), 'p', config_flags,   &
+                               ids, ide, jds, jde, kds, kde,            &
+                               ims, ime, jms, jme, kms, kme,            &
+                               ips, ipe, jps, jpe, kps, kpe,            &
+                               grid%i_start(ij), grid%i_end(ij),                  &
+                               grid%j_start(ij), grid%j_end(ij),                  &
+                               k_start    , k_end                    )
+       CALL set_physical_bc3d( chem_2(ims,kms,jms,ic) , 'p', config_flags,  &
+                               ids, ide, jds, jde, kds, kde,            &
+                               ims, ime, jms, jme, kms, kme,            &
+                               ips, ipe, jps, jpe, kps, kpe,            &
+                               grid%i_start(ij), grid%i_end(ij),                  &
+                               grid%j_start(ij), grid%j_end(ij),                  &
+                               k_start    , k_end                      )
+
+     END DO chem_species_bdy_loop_2
+
+   endif
+
+   IF( config_flags%specified .or. config_flags%nested ) THEN
+     dtbc = dtbc + dt
+   ENDIF
+
+#ifdef DM_PARALLEL
+!-----------------------------------------------------------------------
+! see above
+!--------------------------------------------------------------
+   CALL wrf_debug ( 200 , ' call HALO_RK_E' )
+   IF      ( h_mom_adv_order <= 4 ) THEN
+#    include "HALO_EM_E_3.inc"
+   ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#    include "HALO_EM_E_5.inc"
+   ELSE
+     WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+     CALL wrf_error_fatal(TRIM(wrf_err_message))
+   ENDIF
+#endif
+
+#ifdef DM_PARALLEL
+   if ( num_moist >= PARAM_FIRST_SCALAR  ) then
+!-----------------------------------------------------------------------
+! see above
+!--------------------------------------------------------------
+     CALL wrf_debug ( 200 , ' call HALO_RK_MOIST' )
+     IF      ( h_mom_adv_order <= 4 ) THEN
+#      include "HALO_EM_MOIST_E_3.inc"
+     ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#      include "HALO_EM_MOIST_E_5.inc"
+     ELSE
+       WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+       CALL wrf_error_fatal(TRIM(wrf_err_message))
+     ENDIF
+   endif
+   if ( num_chem >= PARAM_FIRST_SCALAR ) then
+!-----------------------------------------------------------------------
+! see above
+!--------------------------------------------------------------
+     CALL wrf_debug ( 200 , ' call HALO_RK_CHEM' )
+     IF      ( h_mom_adv_order <= 4 ) THEN
+#      include "HALO_EM_CHEM_E_3.inc"
+     ELSE IF ( h_mom_adv_order <= 6 ) THEN
+#      include "HALO_EM_CHEM_E_5.inc"
+     ELSE
+       WRITE(wrf_err_message,*)'solve_em: invalid h_mom_adv_order = ',h_mom_adv_order
+       CALL wrf_error_fatal(TRIM(wrf_err_message))
+     ENDIF
+   endif
+#endif
+
+   CALL wrf_debug ( 200 , ' call end of solve_em' )
+
+! Finish timers if compiled with -DBENCH.
+!#include <bench_solve_em_end.h>
+
+! See comment before earlier #include of this file.
+#define COPY_OUT
+#include <em_scalar_derefs.inc>
+
+end if 
+!by walls
+!by walls
+
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS010++++++++++++++++++++++++++++++++++++++++++++++'
 
 !-if(grid%trace_use) call trace_exit("solve_ad_runge_kutta_looq")
   if (config_flags%mp_physics >= 0) then
@@ -1296,13 +2630,6 @@ end do runge_kutta_looq
 
     endif
 
-    if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(al,p, "al,p")
-    call pop2restore(moist_2, "moist_2")
-    call pop2restore(mu_2,muts, "mu_2,muts")
-    call pop2restore(ph_2,t_2, "ph_2,t_2")
-    if(grid%trace_use) call trace_exit("restore")
-
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,&
                       a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
                       rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
@@ -1316,10 +2643,12 @@ end do runge_kutta_looq
        jts = max(grid%j_start(ij),jds+sz)
        jte = min(grid%j_end(ij),jde-1-sz)
 
+!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS012++++++++++++++++++++++++++++++++++++++++++++++'
     call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                                     a_h_diabatic, dtm, ide, jde, kde, &
                                     ims, ime, jms, jme, kms, kme, &
                                     its, ite, jts, jte, k_start,k_end )
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++031++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 
 !       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
@@ -1370,6 +2699,7 @@ end do runge_kutta_looq
   endif
 !-----Output: a_t_2,a_p_phy,a_moist_2,a_rho,a_pi_phy,a_rainnc,a_rainncv,a_dz8w
 
+!print*, '+++++++11111111111111111111111111111111111111111111'
 
 !---From: module_big_step_utilities_em_ad.F
     call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, &
@@ -1430,11 +2760,11 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
     if ( .not. non_hydrostatic) then
 !-----Restore for diagnose_w:
       if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(muts, "muts")
       call pop2restore(ph_tend, "ph_tend")
       if(grid%trace_use) call trace_exit("restore")
 
 !-----From: module_big_step_utilities_em_ad.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++032++++++++++++++++++++++++++++++++++++++++++++++++++'
       call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,a_w_2,muts,a_muts,dt_rk, &
                          a_u_2,a_v_2,ht,cf1,cf2,cf3,rdx,rdy,msft, &
                          ide,jde,ims,ime,jms,jme,kms,kme, &
@@ -1452,13 +2782,12 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---Restore for calc_p_rho_phi:
     if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(al,p, "al,p")
-    call pop2restore(moist_2, "moist_2")
     call pop2restore(mu_2,muts, "mu_2,muts")
     call pop2restore(ph_2,t_2, "ph_2,t_2")
     if(grid%trace_use) call trace_exit("restore")
 
 !---From: module_big_step_utilities_em_ad.F
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++033++++++++++++++++++++++++++++++++++++++++++++++++++'
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2, &
                            a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0, &
                            dnw,rdnw,rdn,non_hydrostatic, &
@@ -1482,8 +2811,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---Restore for a_rk_update_scalar:
     if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(moist_1,moist_2,moist_tend, "moist_1,moist_2,moist_tend")
-    call pop2restore(mu_1,mu_2, "mu_1,mu_2")
+    call pop2restore(moist_1,moist_2, "moist_1,moist_2")
     call pop2restore(advect_tend, "advect_tend")
     if(grid%trace_use) call trace_exit("restore")
 
@@ -1569,11 +2897,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---Restore for a_rk_scalar_tend:
     if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(moist_1,moist_2, "moist_1,moist_2")
-    call pop2restore(mut, "mut")
-    call pop2restore(ru_m,rv_m,ww_m,alt,advect_tend, &
-                    "ru_m,rv_m,ww_m,alt,advect_tend")
-    call pop2restore(xkmhd, "xkmhd")
+    call pop2restore(ru_m,rv_m,ww_m,alt, "ru_m,rv_m,ww_m,alt")
     if(grid%trace_use) call trace_exit("restore")
 
         its = max(grid%i_start(ij)-3,ids)
@@ -1592,6 +2916,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                                ims,ime,jms,jme,kms,kme, &
                                its, ite, jts, jte, k_start,k_end )
 
+
 !-------Output: a_ru_m,a_rv_m,a_ww_m,a_mut,a_alt,a_moist_1,a_moist_2,a_moist_tend,a_advect_tend,a_xkmhd
 
     end do a_moist_variable_loop2
@@ -1604,16 +2929,22 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
   endif a_moist_scalar_advance
 
 !------------------------------
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++034+++++++++++++++++++++++++++++++++++++++++++++++++'
 
 !---Restore for a_small_step_finish:
     if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(mu_2,mu_1,mut,muts,muu,muus,muv,muvs,mu_save, &
-                    "mu_2,mu_1,mut,muts,muu,muus,muv,muvs,mu_save")
-    call pop2restore(ww,ww1,u_save,v_save,w_save,t_save,ph_save,h_diabatic, &
-                    "ww,ww1,u_save,v_save,w_save,t_save,ph_save,h_diabatic")
-    call pop2restore(u_2,u_1,v_2,v_1,w_2,w_1,t_2,t_1,ph_2,ph_1, &
-                    "u_2,u_1,v_2,v_1,w_2,w_1,t_2,t_1,ph_2,ph_1")
-
+    call pop2restore(ph_tend,rw_tend, "ph_tend,rw_tend")  !ADDED BY WALLS
+    call pop2restore(c2a, "c2a")  !ADDED BY WALLS
+    call pop2restore(a, "a")  !ADDED BY WALLS
+    call pop2restore(alpha, "alpha")  !ADDED BY WALLS
+    call pop2restore(gamma, "gamma")  !ADDED BY WALLS
+    call pop2restore(mu_tend, "mu_tend")  !ADDED BY WALLS
+    call pop2restore(php, "php")  !ADDED BY WALLS
+    call pop2restore(cqu,cqv,cqw,"cqu,cqv,cqw")  !ADDED BY WALLS
+    call pop2restore(mut,muu,muus,muv,muvs, "mut,muu,muus,muv,muvs")
+    call pop2restore(ww1,u_save,v_save,w_save,t_save,ph_save, &
+                    "ww1,u_save,v_save,w_save,t_save,ph_save")
+    call pop2restore(u_2,v_2,w_2,t_2, "u_2,v_2,w_2,t_2")
     if(grid%trace_use) call trace_exit("restore")
 
     its = max(grid%i_start(ij)-1,ids)
@@ -1641,7 +2972,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 #endif
 
 !---Restore for a_calc_mu_uv_1: (Already restored above)
-!---call pop2restore(muts, "muts")
 
     its = max(grid%i_start(ij)-1,ids)
     ite = min(grid%i_end(ij)+1,ide)
@@ -1669,7 +2999,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 !-----Restore for a_calc_p_rho:
       if(grid%trace_use) call trace_entry("restore")
       call pop2restore(mu_2,muts, "mu_2,muts")
-      call pop2restore(al,p,ph_2,alt,t_2,t_save,c2a,pm1, "al,p,ph_2,alt,t_2,t_save,c2a,pm1")
+      call pop2restore(ph_2,t_2, "ph_2,t_2")
       if(grid%trace_use) call trace_exit("restore")
 
       its = max(grid%i_start(ij)-1,ids)
@@ -1685,6 +3015,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                          its,ite,jts,jte,k_start,k_end )
 
 !-----Output: a_al,a_p,a_ph_2,a_alt,a_t_2,a_t_save,a_c2a,a_pm1,a_mu_2,a_muts
+!print*, '++++++++++++++++++++++++++++++++++++++++++++++035+++++++++++++++++++++++++++++++++++++++++++++++++'
 
 #ifdef DM_PARALLEL
       if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
@@ -1701,9 +3032,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                                   its,ite,jts,jte,k_start)
           else
 !-----------Restore for a_spec_bdyupdate:
-            if(grid%trace_use) call trace_entry("restore")
-            call pop2restore(w_2,rw_tend, "w_2,rw_tend")
-            if(grid%trace_use) call trace_exit("restore")
 
             call a_spec_bdyupdate( a_w_2,a_rw_tend,dts_rk,'h',spec_zone, &
                                    ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,&
@@ -1720,8 +3048,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---------Restore for a_spec_bdyupdate_ph:
           if(grid%trace_use) call trace_entry("restore")
-          call pop2restore(mu_tend,muts, "mu_tend,muts")
-          call pop2restore(ph_save,ph_2,ph_tend, "ph_save,ph_2,ph_tend")
+          call pop2restore(ph_2, "ph_2")
           if(grid%trace_use) call trace_exit("restore")
 
 !---------From: module_bc_em_ad.F
@@ -1744,11 +3071,9 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !-------Restore for a_advance_w:
         if(grid%trace_use) call trace_entry("restore")
-        call pop2restore(mu_2,mut,muave,muts, "mu_2,mut,muave,muts")
-        call pop2restore(ph_2,ph_save,ph_tend,c2a,cqw,alt,alb,a,alpha,gamma, &
-                        "ph_2,ph_save,ph_tend,c2a,cqw,alt,alb,a,alpha,gamma")
-        call pop2restore(w_2,rw_tend,ww,u_2,v_2,t_2save,t_2,t_save, &
-                        "w_2,rw_tend,ww,u_2,v_2,t_2save,t_2,t_save")
+        call pop2restore(muave, "muave")
+        call pop2restore(ph_2, "ph_2")
+        call pop2restore(w_2,ww,u_2,v_2,t_2save, "w_2,ww,u_2,v_2,t_2save")
         if(grid%trace_use) call trace_exit("restore")
 
 !-------From: module_small_step_em_ad.F
@@ -1776,11 +3101,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       endif
 
 !-----Restore for a_sumflux:
-      if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(muu,muv, "muu,muv")
-      call pop2restore(u_2,v_2,ww,u_save,v_save,ww1,ru_m,rv_m,ww_m, "u_2,v_2,ww,u_save,v_save,ww1,ru_m,rv_m,ww_m")
-      if(grid%trace_use) call trace_exit("restore")
-
 !-----From: module_small_step_em_ad.F
       call a_sumflux( a_u_2,a_v_2,a_ww,u_save,a_u_save,v_save,a_v_save,a_ww1, &
                       muu,a_muu,muv,a_muv,a_ru_m,a_rv_m,a_ww_m,msfu,msfv,&
@@ -1798,11 +3118,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
       if (config_flags%specified .or. config_flags%nested) then
 !-------Restore for spec_bdyupdate:
-        if(grid%trace_use) call trace_entry("restore")
-        call pop2restore(mu_2,mu_tend,muts,mu_tend, "mu_2,mu_tend,muts,mu_tend")
-        call pop2restore(t_2,t_tend, "t_2,t_tend")
-        if(grid%trace_use) call trace_exit("restore")
-
 !-------From: module_bc_ad.F
         call a_spec_bdyupdate( a_muts,a_mu_tend,dts_rk,'m',spec_zone, &
                                ids,ide,jds,jde,1,ims,ime,jms,jme,1,1, &
@@ -1827,14 +3142,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       endif
 
 !-----Restore for a_advance_mu_t:
-      if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mu_2,mut,muu,muv,mu_tend, "mu_2,mut,muu,muv,mu_tend")
-      call pop2restore(t_2,t_save,t_2save,t_tend, &
-                      "t_2,t_save,t_2save,t_tend")
-      call pop2restore(ww,ww1,u_2,u_save,v_2,v_save,ru_m,rv_m,ww_m, &
-                      "ww,ww1,u_2,u_save,v_2,v_save,ru_m,rv_m,ww_m")
-      if(grid%trace_use) call trace_exit("restore")
-
       its = max(grid%i_start(ij)-2,ids)
       ite = min(grid%i_end(ij)+2,ide)
       jts = max(grid%j_start(ij)-2,jds)
@@ -1861,10 +3168,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
       if (config_flags%specified .or. config_flags%nested) then
 !-------Restore for a_spec_bdyupdate:
-        if(grid%trace_use) call trace_entry("restore")
-        call pop2restore(u_2,ru_tend,v_2,rv_tend, "u_2,ru_tend,v_2,rv_tend")
-        if(grid%trace_use) call trace_exit("restore")
-
 !-------From: module_bc_ad.F
         if(grid%trace_use) call trace_entry("restore")
         call a_spec_bdyupdate( a_v_2,a_rv_tend,dts_rk,'v',spec_zone, &
@@ -1888,10 +3191,8 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !-----Restore for a_advance_uv:
       if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mu_2,muu,muv,mudf, "mu_2,muu,muv,mudf")
-      call pop2restore(u_2,ru_tend,v_2,rv_tend,p,ph_2,alt,al,cqu,cqv, &
-                      "u_2,ru_tend,v_2,rv_tend,p,ph_2,alt,al,cqu,cqv")
-      call pop2restore(php, "php")
+      call pop2restore(mu_2, "mu_2")
+      call pop2restore(p,al, "p,al")
       if(grid%trace_use) call trace_exit("restore")
 
 !-----From: module_small_step_em_ad.F
@@ -1911,6 +3212,8 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
   end do a_small_steps
+!print*, '+++++++2222222222222222222222222222222222222222222222'
+
 
 !-if(grid%trace_use) call trace_exit("solve_ad_a_small_steps")
 
@@ -1918,10 +3221,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
     if (non_hydrostatic) then
 !-----Restore for a_calc_coef_w:
-      if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mut, "mut")
-      call pop2restore(a,alpha,gamma,cqw,c2a, "a,alpha,gamma,cqw,c2a")
-      if(grid%trace_use) call trace_exit("restore")
 
       its = max(grid%i_start(ij)-1,ids)
       ite = min(grid%i_end(ij)+1,ide)
@@ -1945,8 +3244,8 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !-----Restore for a_calc_p_rho:
       if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mu_2,muts, "mu_2,muts")
-      call pop2restore(ph_2,alt,t_2,t_save,c2a,pm1, "ph_2,alt,t_2,t_save,c2a,pm1")
+      call pop2restore(muts, "muts")
+      call pop2restore(ph_2,t_2, "ph_2,t_2")
       if(grid%trace_use) call trace_exit("restore")
 
 !-----From: module_small_step_em_ad.F
@@ -1967,9 +3266,9 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 !---Restore for small_step_prep
     if(grid%trace_use) call trace_entry("restore")
     call pop2restore(mu_1,mu_2,muu,muv,mut, "mu_1,mu_2,muu,muv,mut")
-    call pop2restore(p,alt,ww, "p,alt,ww,")
-    call pop2restore(u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2, &
-                    "u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2")
+    call pop2restore(p, "p")
+    call pop2restore(u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_2, &
+                    "u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_2")
     if(grid%trace_use) call trace_exit("restore")
 
 !---From: module_small_step_em_ad.F
@@ -2018,13 +3317,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---From: module_em_ad.F
 !---Restore for a_rk_addtend_dry:
-    if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(mut,mu_tend, "mut,mu_tend")
-    call pop2restore(u_save,v_save,w_save,ph_save,t_save,h_diabatic, &
-                    "u_save,v_save,w_save,ph_save,t_save,h_diabatic")
-    call pop2restore(ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf, &
-                    "ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf")
-    if(grid%trace_use) call trace_exit("restore")
 
       its = max(grid%i_start(ij)-2,ids)
       ite = min(grid%i_end(ij)+2,ide)
@@ -2050,11 +3342,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
     if( (config_flags%specified .or. config_flags%nested) .and. rk_step==1 ) then
 !-----Restore for a_relax_bdy_dry
-      if(grid%trace_use) call trace_entry("restore")
-      call pop2restore(mu_2,mut,mu_tend, "mu_2,mut,mu_tend")
-      call pop2restore(ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save, &
-                      "ru,rv,ph_2,t_2,w_2,u_save,v_save,ph_save,t_save,w_save")
-      if(grid%trace_use) call trace_exit("restore")
 
       its = max(grid%i_start(ij)-2,ids)
       ite = min(grid%i_end(ij)+2,ide)
@@ -2082,11 +3369,6 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 
 !  IF (rk_step == 1 ) then
-!    if(grid%trace_use) call trace_entry("restore")
-!    call pop2restore(muu,muv, "muu,muv")
-!    call pop2restore(ru_tendf,rv_tendf,u_2,v_2,z_at_w, "ru_tendf,rv_tendf,u_2,v_2,z_at_w")
-!    call pop2restore(z, "z")
-!    if(grid%trace_use) call trace_exit("restore")
 !
 !    call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, &
 !                        u_2, a_u_2, v_2, a_v_2, xland, &
@@ -2100,16 +3382,12 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 !   ENDIF
 !---------------------------------------------------------------------------------------------
 !
+
 !---Restore for rk_tendency
     if(grid%trace_use) call trace_entry("restore")
-!    call pop2restore(php, "php")
-    call pop2restore(mu_2,mut,muu,muv, "mu_2,mut,muu,muv")
-    call pop2restore(cqu,cqv,cqw,xkmhd,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf, &
-                    "cqu,cqv,cqw,xkmhd,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf")
-    call pop2restore(ru,rv,rw,ww,t_init,al,alt,p, &
-                    "ru,rv,rw,ww,t_init,al,alt,p")
-    call pop2restore(u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1, &
-                    "u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1")
+    call pop2restore(mu_2, "mu_2")
+    call pop2restore(cqu,cqv,cqw, "cqu,cqv,cqw")
+    call pop2restore(ru,rv,rw,ww,al, "ru,rv,rw,ww,al")
     if(grid%trace_use) call trace_exit("restore")
 
     its = max(grid%i_start(ij)-3,ids)
@@ -2119,6 +3397,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 
 !---From: module_em_ad.F
+
     call a_rk_tendency1( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend, &
                          a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf, &
                          a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save, &
@@ -2148,6 +3427,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                          ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,&
                          its,ite,jts,jte,k_start,k_end )
 
+
 !-----Output: a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf, &
 !             a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save, &
 !             a_t_save,a_ru,a_rv,a_rw,a_ww,a_u_2,a_v_2,a_w_2,a_t_2,a_ph_2, &
@@ -2160,6 +3440,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
 #endif
 
+
   a_rk_step_is_one: if (rk_step .eq. 1) then
 
     its = max(grid%i_start(ij)-1,ids)
@@ -2169,16 +3450,8 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
 !-------Resotore for a_calculate_km_kh:
-        if(grid%trace_use) call trace_entry("restore")
-        call pop2restore(moist_2, "moist_2")
-        call pop2restore(div,tke_2,p8w,t8w,th_phy,t_phy,p_phy,rdz,rdzw, &
-                        "div,tke_2,p8w,t8w,th_phy,t_phy,p_phy,rdz,rdzw")
-        call pop2restore(defor11,defor22,defor33,defor12,defor13,defor23, &
-                        "defor11,defor22,defor33,defor12,defor13,defor23")
-        call pop2restore(xkmh,xkmhd,xkmv,xkhh,xkhv,bn2, "xkmh,xkmhd,xkmv,xkhh,xkhv,bn2")
-        if(grid%trace_use) call trace_exit("restore")
-
 !-------From: module_diffusion_em_ad.F
+
         call a_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt, &
                                 xkmh,xkmhd,a_xkmhd,xkmv,xkhh,xkhv,bn2,a_bn2,khdif,div,&
                                 defor11,defor22,defor33,defor12,defor13,defor23, &
@@ -2186,7 +3459,11 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
                                 p_phy,a_p_phy,moist_2,a_moist_2,dn,dnw,dx,dy,rdz,rdzw,num_3d_m, &
                                 cf1,cf2,cf3,kh_tke_upper_bound, &
                                 ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
-                                its,ite,jts,jte,k_start,k_end )
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!                               its,ite,jts,jte,k_start,k_end)  !REVISED BY WALLS
+                          grid%i_start(ij),grid%i_end(ij), &    !ADDED BY WALLS
+                          grid%j_start(ij),grid%j_end(ij), &    !ADDED BY WALLS
+                          k_start,k_end )    !ADDED BY WALLS
 
 !-------Output: a_p8w,a_t8w,a_th_phy,a_t_phy,a_p_phy,a_moist_2,a_bn2
 
@@ -2199,10 +3476,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !-Save for: phy_prep:
   if(grid%trace_use) call trace_entry("restore")
-  call pop2restore(th_phy,p_phy,pi_phy,t_phy, "th_phy,p_phy,pi_phy,t_phy")
-  call pop2restore(z,z_at_w, "z,z_at_w")
-  call pop2restore(tsk, mut, "tsk, mut")
-  call pop2restore(p, u_2, v_2, alt, ph_2, t_2, "p, u_2, v_2, alt, ph_2, t_2")
+  call pop2restore(z, "z")
   if(grid%trace_use) call trace_exit("restore")
 
 !-From module_big_step_utilities_em_ad.F
@@ -2225,10 +3499,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 !---Restore for a_rk_step_prep
     if(grid%trace_use) call trace_entry("restore")
-    call pop2restore(moist_2, "moist_2")
-    call pop2restore(mu_2, "mu_2")
-    call pop2restore(u_2,v_2,w_2,t_2,ph_2,p,al, "u_2,v_2,w_2,t_2,ph_2,p,al")
-    call pop2restore(muu,muv,mub,mut, "muu,muv,mub,mut")
+    call pop2restore(muu,muv, "muu,muv")
     if(grid%trace_use) call trace_exit("restore")
 
     its = max(grid%i_start(ij)-1,ids)
@@ -2254,6 +3525,7 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 #endif
 
 end do a_runge_kutta_loop
+!print*, '+++++++333333333333333333333333333333333333333333333333333++++++++'
 
 !---if(grid%trace_use) call trace_exit("solve_ad_a_runge_kutta_loop")
 
@@ -2266,9 +3538,9 @@ end do a_runge_kutta_loop
 
   if(grid%trace_use) call trace_exit("solve_em_ad")
 
-  RETURN
+RETURN
 
-end SUBROUTINE solve_em_ad
+end subroutine solve_em_ad
 
 !---------------------------------
 !!!!  Add CUDU Here   !!!!!!!!

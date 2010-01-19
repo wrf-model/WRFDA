@@ -352,17 +352,29 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = g_rv(i,k,j)
           vel = rv(i,k,j)
-          g_fqy(i,k,jp1) = g_field(i,k,j-3)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_field(i,k,j-2)*vel*((-0.13333333)-&
-&0.083333333*sign(1.,vel))+g_field(i,k,j-1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_field(i,k,j+2)*vel*&
-&(0.016666667-0.016666667*sign(1.,vel))+g_field(i,k,j+1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_field(i,k,j)*&
-&vel*(0.61666667-0.16666667*sign(1.,vel))+g_vel*(0.61666667*(field(i,k,j)+field(i,k,j-1))-0.13333333*(field(i,k,j+1)+&
-&field(i,k,j-2))+0.016666667*(field(i,k,j+2)+field(i,k,j-3))-0.016666667*(field(i,k,j+2)-field(i,k,j-3)-5.*(field(i,k,j+&
-&1)-field(i,k,j-2))+10.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,vel))
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
           fqy(i,k,jp1) = vel*(37./60.*(field(i,k,j)+field(i,k,j-1))-2./15.*(field(i,k,j+1)+field(i,k,j-2))+1./60.*(field(i,k,j+2)+&
 &field(i,k,j-3))-sign(1.,vel)*(1./60.)*(field(i,k,j+2)-field(i,k,j-3)-5.*(field(i,k,j+1)-field(i,k,j-2))+10.*(field(i,k,&
 &j)-field(i,k,j-1))))
+
+          g_fqy(i,k,jp1) = vel*(g_field(i,k,j-3)*(0.016666667-(-0.016666667)*sign(1.,vel))+g_field(i,k,j-2)*((-0.13333333)-&
+&0.083333333*sign(1.,vel))+g_field(i,k,j-1)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_field(i,k,j+2)*&
+&(0.016666667-0.016666667*sign(1.,vel))+g_field(i,k,j+1)*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_field(i,k,j)*&
+&(0.61666667-0.16666667*sign(1.,vel)))+g_rv(i,k,j)*fqy(i,k,jp1)/vel
+
+else
+          fqy(i,k,jp1) = 0.
+          g_fqy(i,k,jp1) = g_rv(i,k,j)*(37./60.*(field(i,k,j)+field(i,k,j-1))&
+&-2./15.*(field(i,k,j+1)+field(i,k,j-2))+1./60.*(field(i,k,j+2)+&
+&field(i,k,j-3))-sign(1.,vel)*(1./60.)*(field(i,k,j+2)-field(i,k,j-3)-5.*(field(i,k,j+1)-field(i,k,j-2))+10.*(field(i,k,&
+&j)-field(i,k,j-1))))
+
+end if
         end do
       end do
     else if (j .eq. jds+1) then
@@ -375,14 +387,21 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jds+2) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = g_rv(i,k,j)
           vel = rv(i,k,j)
-          g_fqy(i,k,jp1) = g_field(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_field(i,k,j-1)*vel*(0.58333333+0.25*&
-&sign(1.,vel))+g_field(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_field(i,k,j)*vel*(0.58333333+(-0.25)*&
-&sign(1.,vel))+g_vel*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2))+0.083333333*&
-&(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
           fqy(i,k,jp1) = vel*(7./12.*(field(i,k,j)+field(i,k,j-1))-1./12.*(field(i,k,j+1)+field(i,k,j-2))+sign(1.,vel)*(1./12.)*&
 &(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1))))
+          g_fqy(i,k,jp1) = vel*(g_field(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_field(i,k,j-1)*(0.58333333+0.25*&
+&sign(1.,vel))+g_field(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_field(i,k,j)*(0.58333333+(-0.25)*&
+&sign(1.,vel)))+g_rv(i,k,j)*fqy(i,k,jp1)/vel
+else
+  fqy(i,k,jp1) =0.
+  g_fqy(i,k,jp1) =g_rv(i,k,j)*(7./12.*(field(i,k,j)+field(i,k,j-1))-1./12.*(field(i,k,j+1)+field(i,k,j-2))+sign(1.,vel)*(1./12.)*&
+&(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1))))
+end if
         end do
       end do
     else if (j .eq. jde-1) then
@@ -436,17 +455,24 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
   do j = j_start, j_end
     do k = kts, ktf
       do i = i_start_f, i_end_f
-        g_vel = g_ru(i,k,j)
         vel = ru(i,k,j)
-        g_fqx(i,k) = g_field(i-3,k,j)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_field(i-2,k,j)*vel*((-0.13333333)-&
-&0.083333333*sign(1.,vel))+g_field(i-1,k,j)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_field(i+2,k,j)*vel*(0.016666667-&
-&0.016666667*sign(1.,vel))+g_field(i+1,k,j)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_field(i,k,j)*vel*(0.61666667-&
-&0.16666667*sign(1.,vel))+g_vel*(0.61666667*(field(i,k,j)+field(i-1,k,j))-0.13333333*(field(i+1,k,j)+field(i-2,k,j))+&
-&0.016666667*(field(i+2,k,j)+field(i-3,k,j))-0.016666667*(field(i+2,k,j)-field(i-3,k,j)-5.*(field(i+1,k,j)-field(i-2,k,j))+&
-&10.*(field(i,k,j)-field(i-1,k,j)))*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(37./60.*(field(i,k,j)+field(i-1,k,j))-2./15.*(field(i+1,k,j)+field(i-2,k,j))+1./60.*(field(i+2,k,j)+&
 &field(i-3,k,j))-sign(1.,vel)*(1./60.)*(field(i+2,k,j)-field(i-3,k,j)-5.*(field(i+1,k,j)-field(i-2,k,j))+10.*(field(i,k,j)-&
 &field(i-1,k,j))))
+        g_fqx(i,k) = g_field(i-3,k,j)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_field(i-2,k,j)*vel*((-0.13333333)-&
+&0.083333333*sign(1.,vel))+g_field(i-1,k,j)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_field(i+2,k,j)*vel*(0.016666667-&
+&0.016666667*sign(1.,vel))+g_field(i+1,k,j)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_field(i,k,j)*vel*(0.61666667-&
+&0.16666667*sign(1.,vel))+g_ru(i,k,j)*fqx(i,k)/vel
+else
+fqx(i,k) =0.
+g_fqx(i,k) =g_ru(i,k,j)*(37./60.*(field(i,k,j)+field(i-1,k,j))-2./15.*(field(i+1,k,j)+field(i-2,k,j))+1./60.*(field(i+2,k,j)+&
+&field(i-3,k,j))-sign(1.,vel)*(1./60.)*(field(i+2,k,j)-field(i-3,k,j)-5.*(field(i+1,k,j)-field(i-2,k,j))+10.*(field(i,k,j)-&
+&field(i-1,k,j))))
+endif
       end do
     end do
     if (degrade_xs) then
@@ -479,14 +505,21 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
       endif
       i = ide-2
       do k = kts, ktf
-        g_vel = g_ru(i,k,j)
         vel = ru(i,k,j)
-        g_fqx(i,k) = g_field(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_field(i-1,k,j)*vel*(0.58333333+0.25*&
-&sign(1.,vel))+g_field(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_field(i,k,j)*vel*(0.58333333+(-0.25)*&
-&sign(1.,vel))+g_vel*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+0.083333333*&
-&(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(7./12.*(field(i,k,j)+field(i-1,k,j))-1./12.*(field(i+1,k,j)+field(i-2,k,j))+sign(1.,vel)*(1./12.)*(field(i+&
 &1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j))))
+        g_fqx(i,k) = g_field(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_field(i-1,k,j)*vel*(0.58333333+0.25*&
+&sign(1.,vel))+g_field(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_field(i,k,j)*vel*(0.58333333+(-0.25)*&
+&sign(1.,vel))+g_ru(i,k,j)*fqx(i,k)/vel
+else 
+fqx(i,k) =0.
+g_fqx(i,k) =g_ru(i,k,j)*(7./12.*(field(i,k,j)+field(i-1,k,j))-1./12.*(field(i+1,k,j)+field(i-2,k,j))+sign(1.,vel)*(1./12.)*(field(i+&
+&1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j))))
+end if
       end do
     endif
     do k = kts, ktf
@@ -711,7 +744,7 @@ else if (horz_order .eq. 3) then horizontal_order_tesu
     else if (j .gt. j_end_f .and. degrade_ye) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = 0.5*g_field(i,k,j_end+1)*rv(i,k,j_end+1)+0.5*g_field(i,k,j_end)*rv(i,k,j_end+1)+0.5*g_rv(i,k,j_end+1)*&
+  g_fqy(i,k,jp1) = 0.5*g_field(i,k,j_end+1)*rv(i,k,j_end+1)+0.5*g_field(i,k,j_end)*rv(i,k,j_end+1)+0.5*g_rv(i,k,j_end+1)*&
 &(field(i,k,j_end+1)+field(i,k,j_end))
           fqy(i,k,jp1) = 0.5*rv(i,k,j_end+1)*(field(i,k,j_end+1)+field(i,k,j_end))
         end do
@@ -719,12 +752,12 @@ else if (horz_order .eq. 3) then horizontal_order_tesu
     else
       do k = kts, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = g_field(i,k,j-2)*rv(i,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,rv(i,k,j)))+g_field(i,k,j-1)*rv(i,k,j)&
+g_fqy(i,k,jp1) = g_field(i,k,j-2)*rv(i,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,rv(i,k,j)))+g_field(i,k,j-1)*rv(i,k,j)&
 &*(0.58333333+0.25*sign(1.,rv(i,k,j)))+g_field(i,k,j+1)*rv(i,k,j)*((-0.083333333)+0.083333333*sign(1.,rv(i,k,j)))+&
 &g_field(i,k,j)*rv(i,k,j)*(0.58333333+(-0.25)*sign(1.,rv(i,k,j)))+g_rv(i,k,j)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-&
 &0.083333333*(field(i,k,j+1)+field(i,k,j-2))+0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))&
 &*sign(1.,rv(i,k,j)))
-          fqy(i,k,jp1) = rv(i,k,j)*(7./12.*(field(i,k,j)+field(i,k,j-1))-1./12.*(field(i,k,j+1)+field(i,k,j-2))+sign(1.,rv(i,k,j))*&
+fqy(i,k,jp1) = rv(i,k,j)*(7./12.*(field(i,k,j)+field(i,k,j-1))-1./12.*(field(i,k,j+1)+field(i,k,j-2))+sign(1.,rv(i,k,j))*&
 &(1./12.)*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1))))
         end do
       end do
@@ -948,7 +981,7 @@ else if (vert_order .eq. 5) then vert_order_tesu
       vflux(i,k) = vel*(7./12.*(field(i,k,j)+field(i,k-1,j))-1./12.*(field(i,k+1,j)+field(i,k-2,j))+sign(1.,-vel)*(1./12.)*&
 &(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j))))
       k = ktf
-      g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
+  g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
 &field(i,k-1,j))
       vflux(i,k) = rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
     end do
@@ -992,23 +1025,30 @@ else if (vert_order .eq. 3) then vert_order_tesu
   do j = j_start, j_end
     do k = kts+2, ktf-1
       do i = i_start, i_end
-        g_vel = g_rom(i,k,j)
         vel = rom(i,k,j)
-        g_vflux(i,k) = g_field(i,k-2,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_field(i,k-1,j)*vel*(0.58333333+0.25*&
-&sign(1.,-vel))+g_field(i,k+1,j)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))+g_field(i,k,j)*vel*(0.58333333+(-0.25)*&
-&sign(1.,-vel))+g_vel*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+0.083333333*&
-&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*sign(1.,-vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         vflux(i,k) = vel*(7./12.*(field(i,k,j)+field(i,k-1,j))-1./12.*(field(i,k+1,j)+field(i,k-2,j))+sign(1.,-vel)*(1./12.)*&
 &(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j))))
+        g_vflux(i,k) = vel*(g_field(i,k-2,j)*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_field(i,k-1,j)*(0.58333333+0.25*&
+&sign(1.,-vel))+g_field(i,k+1,j)*((-0.083333333)+0.083333333*sign(1.,-vel))+g_field(i,k,j)*(0.58333333+(-0.25)*&
+&sign(1.,-vel)))+g_rom(i,k,j)*vflux(i,k)/vel
+else
+        vflux(i,k)=0.
+g_vflux(i,k) =g_rom(i,k,j)*(7./12.*(field(i,k,j)+field(i,k-1,j))-1./12.*(field(i,k+1,j)+field(i,k-2,j))+sign(1.,-vel)*(1./12.)*&
+&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j))))
+endif
       end do
     end do
     do i = i_start, i_end
       k = kts+1
-      g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
+    g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
 &field(i,k-1,j))
       vflux(i,k) = rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
       k = ktf
-      g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
+    g_vflux(i,k) = g_field(i,k-1,j)*rom(i,k,j)*fzp(k)+g_field(i,k,j)*rom(i,k,j)*fzm(k)+g_rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*&
 &field(i,k-1,j))
       vflux(i,k) = rom(i,k,j)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
     end do
@@ -1149,6 +1189,7 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
+real walls(4)
 
    call trace_entry("g_advect_u")
 
@@ -1205,12 +1246,16 @@ horizontal_order_tesu: if (horz_order .eq. 6) then
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i-1,k,j)+0.5*g_rv(i,k,j)
+          g_vel = 0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
+
+          walls(1)=0.61666667*(u(i,k,j)+u(i,k,j-1))
+          walls(2)=0.13333333*(u(i,k,j+1)+u(i,k,j-2))
+          walls(3)=0.016666667*(u(i,k,j+2)+u(i,k,j-3))
+
           g_fqy(i,k,jp1) = 0.016666667*g_u(i,k,j-3)*vel-0.13333333*g_u(i,k,j-2)*vel+0.61666667*g_u(i,k,j-1)*vel+0.016666667*g_u(i,&
-&k,j+2)*vel-0.13333333*g_u(i,k,j+1)*vel+0.61666667*g_u(i,k,j)*vel+g_vel*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*&
-&(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)+u(i,k,j-3)))
-          fqy(i,k,jp1) = vel*(37./60.*(u(i,k,j)+u(i,k,j-1))-2./15.*(u(i,k,j+1)+u(i,k,j-2))+1./60.*(u(i,k,j+2)+u(i,k,j-3)))
+&k,j+2)*vel-0.13333333*g_u(i,k,j+1)*vel+0.61666667*g_u(i,k,j)*vel+g_vel*(walls(1)-walls(2)+walls(3))
+          fqy(i,k,jp1) = vel*(walls(1)-walls(2)+walls(3))
         end do
       end do
     else if (j .eq. jds+1) then
@@ -1387,21 +1432,31 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i-1,k,j)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
-          g_fqy(i,k,jp1) = g_u(i,k,j-3)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_u(i,k,j-2)*vel*((-0.13333333)-0.083333333*&
-&sign(1.,vel))+g_u(i,k,j-1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_u(i,k,j+2)*vel*(0.016666667-0.016666667*&
-&sign(1.,vel))+g_u(i,k,j+1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_u(i,k,j)*vel*(0.61666667-0.16666667*&
-&sign(1.,vel))+g_vel*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)+u(i,k,&
-&j-3))-0.016666667*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1)))*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(37./60.*(u(i,k,j)+u(i,k,j-1))-2./15.*(u(i,k,j+1)+u(i,k,j-2))+1./60.*(u(i,k,j+2)+u(i,k,j-3))-sign(1.,&
-&vel)*(1./60.)*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1))))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+          fqy(i,k,jp1) = vel*(37./60.*(u(i,k,j)+u(i,k,j-1))-2./15.*(u(i,k,j+1)+u(i,k,j-2))+1./60.*(u(i,k,j+2)&
+&+u(i,k,j-3))-sign(1.,vel)*(1./60.)*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1))))
+          g_fqy(i,k,jp1) = vel*(g_u(i,k,j-3)*(0.016666667&
+&-(-0.016666667)*sign(1.,vel))+g_u(i,k,j-2)*((-0.13333333)-0.083333333*&
+&sign(1.,vel))+g_u(i,k,j-1)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_u(i,k,j+2)*(0.016666667-0.016666667*&
+&sign(1.,vel))+g_u(i,k,j+1)*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_u(i,k,j)*(0.61666667-0.16666667*&
+&sign(1.,vel)))+0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+fqy(i,k,jp1)=0.
+g_fqy(i,k,jp1) =0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*(37./60.*(u(i,k,j)+u(i,k,j-1))&
+&-2./15.*(u(i,k,j+1)+u(i,k,j-2))+1./60.*(u(i,k,j+2)&
+&+u(i,k,j-3))-sign(1.,vel)*(1./60.)*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1))))
+endif
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = 0.25*g_rv(i-1,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_rv(i,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_u(i,k,j-1)*(rv(i,&
+          g_fqy(i,k,jp1) = 0.25*g_rv(i-1,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_rv(i,k,j)*(u(i,k,j)&
+&+u(i,k,j-1))+0.25*g_u(i,k,j-1)*(rv(i,&
 &k,j)+rv(i-1,k,j))+0.25*g_u(i,k,j)*(rv(i,k,j)+rv(i-1,k,j))
           fqy(i,k,jp1) = 0.25*(rv(i,k,j)+rv(i-1,k,j))*(u(i,k,j)+u(i,k,j-1))
         end do
@@ -1409,20 +1464,30 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jds+2) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i-1,k,j)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
-          g_fqy(i,k,jp1) = g_u(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i,k,j-1)*vel*(0.58333333+0.25*sign(1.,&
-&vel))+g_u(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+1)-u(i,k,j-2)-3.*(u(i,k,j)-&
-&u(i,k,j-1)))*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)+u(i,k,j-2))+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqy(i,k,jp1) = vel*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)+u(i,k,j-2))+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,&
 &j-2)-3.*(u(i,k,j)-u(i,k,j-1))))
+
+g_fqy(i,k,jp1) = vel*(g_u(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i,k,j-1)*(0.58333333+0.25*sign(1.,&
+&vel))+g_u(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+fqy(i,k,jp1)=0.
+g_fqy(i,k,jp1) =0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)&
+&+u(i,k,j-2))+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,&
+&j-2)-3.*(u(i,k,j)-u(i,k,j-1))))
+endif
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = 0.25*g_rv(i-1,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_rv(i,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_u(i,k,j-1)*(rv(i,&
+          g_fqy(i,k,jp1) = 0.25*g_rv(i-1,k,j)*(u(i,k,j)+u(i,k,j-1))+0.25*g_rv(i,k,j)*(u(i,k,j)&
+&+u(i,k,j-1))+0.25*g_u(i,k,j-1)*(rv(i,&
 &k,j)+rv(i-1,k,j))+0.25*g_u(i,k,j)*(rv(i,k,j)+rv(i-1,k,j))
           fqy(i,k,jp1) = 0.25*(rv(i,k,j)+rv(i-1,k,j))*(u(i,k,j)+u(i,k,j-1))
         end do
@@ -1430,14 +1495,22 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jde-2) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i-1,k,j)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
-          g_fqy(i,k,jp1) = g_u(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i,k,j-1)*vel*(0.58333333+0.25*sign(1.,&
-&vel))+g_u(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+1)-u(i,k,j-2)-3.*(u(i,k,j)-&
-&u(i,k,j-1)))*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)+u(i,k,j-2))+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqy(i,k,jp1) = vel*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)+u(i,k,j-2))+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,&
 &j-2)-3.*(u(i,k,j)-u(i,k,j-1))))
+
+g_fqy(i,k,jp1) = vel*(g_u(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i,k,j-1)*(0.58333333+0.25*sign(1.,&
+&vel))+g_u(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+fqy(i,k,jp1)=0.
+g_fqy(i,k,jp1) =0.5*(g_rv(i-1,k,j)+g_rv(i,k,j))*(7./12.*(u(i,k,j)+u(i,k,j-1))-1./12.*(u(i,k,j+1)+u(i,k,j-2))&
+&+sign(1.,vel)*(1./12.)*(u(i,k,j+1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1))))
+endif
         end do
       end do
     endif
@@ -1471,15 +1544,25 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
   do j = j_start, j_end
     do k = kts, ktf
       do i = i_start_f, i_end_f
-        g_vel = 0.5*g_ru(i-1,k,j)+0.5*g_ru(i,k,j)
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
-        g_fqx(i,k) = g_u(i-3,k,j)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_u(i-2,k,j)*vel*((-0.13333333)-0.083333333*&
-&sign(1.,vel))+g_u(i-1,k,j)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_u(i+2,k,j)*vel*(0.016666667-0.016666667*sign(1.,&
-&vel))+g_u(i+1,k,j)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_u(i,k,j)*vel*(0.61666667-0.16666667*sign(1.,vel))+&
-&g_vel*(0.61666667*(u(i,k,j)+u(i-1,k,j))-0.13333333*(u(i+1,k,j)+u(i-2,k,j))+0.016666667*(u(i+2,k,j)+u(i-3,k,j))-&
-&0.016666667*(u(i+2,k,j)-u(i-3,k,j)-5.*(u(i+1,k,j)-u(i-2,k,j))+10.*(u(i,k,j)-u(i-1,k,j)))*sign(1.,vel))
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(37./60.*(u(i,k,j)+u(i-1,k,j))-2./15.*(u(i+1,k,j)+u(i-2,k,j))+1./60.*(u(i+2,k,j)+u(i-3,k,j))-sign(1.,vel)*&
 &(1./60.)*(u(i+2,k,j)-u(i-3,k,j)-5.*(u(i+1,k,j)-u(i-2,k,j))+10.*(u(i,k,j)-u(i-1,k,j))))
+
+        g_fqx(i,k) = vel*(g_u(i-3,k,j)*(0.016666667-(-0.016666667)*sign(1.,vel))+g_u(i-2,k,j)*((-0.13333333)-0.083333333*&
+&sign(1.,vel))+g_u(i-1,k,j)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_u(i+2,k,j)*(0.016666667-0.016666667*sign(1.,&
+&vel))+g_u(i+1,k,j)*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_u(i,k,j)*(0.61666667-0.16666667*sign(1.,vel)))+&
+&0.5*(g_ru(i-1,k,j)+g_ru(i,k,j))*fqx(i,k)/vel
+else
+        fqx(i,k)=0.
+g_fqx(i,k) =0.5*(g_ru(i-1,k,j)+g_ru(i,k,j))*(37./60.*(u(i,k,j)+u(i-1,k,j))-2./15.*(u(i+1,k,j)&
+&+u(i-2,k,j))+1./60.*(u(i+2,k,j)+u(i-3,k,j))-sign(1.,vel)*&
+&(1./60.)*(u(i+2,k,j)-u(i-3,k,j)-5.*(u(i+1,k,j)-u(i-2,k,j))+10.*(u(i,k,j)-u(i-1,k,j))))
+endif
       end do
     end do
     if (degrade_xs) then
@@ -1526,14 +1609,23 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
       endif
       do k = kts, ktf
         i = ide-1
-        g_vel = 0.5*g_ru(i-1,k,j)+0.5*g_ru(i,k,j)
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
-        g_fqx(i,k) = g_u(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i-1,k,j)*vel*(0.58333333+0.25*sign(1.,vel))+&
-&g_u(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-2,k,j)-3.*(u(i,k,j)-u(i-&
-&1,k,j)))*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(7./12.*(u(i,k,j)+u(i-1,k,j))-1./12.*(u(i+1,k,j)+u(i-2,k,j))+sign(1.,vel)*(1./12.)*(u(i+1,k,j)-u(i-2,k,j)-&
 &3.*(u(i,k,j)-u(i-1,k,j))))
+
+        g_fqx(i,k) = vel*(g_u(i-2,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_u(i-1,k,j)*(0.58333333+0.25*sign(1.,vel))+&
+&g_u(i+1,k,j)*((-0.083333333)+0.083333333*sign(1.,vel))+g_u(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_ru(i-1,k,j)+g_ru(i,k,j))*fqx(i,k)/vel
+else
+        fqx(i,k)=0.
+g_fqx(i,k) =0.5*(g_ru(i-1,k,j)+g_ru(i,k,j))*(7./12.*(u(i,k,j)+u(i-1,k,j))-1./12.*(u(i+1,k,j)+u(i-2,k,j))&
+&+sign(1.,vel)*(1./12.)*(u(i+1,k,j)-u(i-2,k,j)-&
+&3.*(u(i,k,j)-u(i-1,k,j))))
+endif
       end do
     endif
     do k = kts, ktf
@@ -2138,14 +2230,24 @@ else if (vert_order .eq. 3) then vert_order_tesu
   do j = j_start, j_end
     do k = kts+2, ktf-1
       do i = i_start, i_end
-        g_vel = 0.5*g_rom(i-1,k,j)+0.5*g_rom(i,k,j)
         vel = 0.5*(rom(i-1,k,j)+rom(i,k,j))
-        g_vflux(i,k) = g_u(i,k-2,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_u(i,k-1,j)*vel*(0.58333333+0.25*sign(1.,-&
-&vel))+g_u(i,k+1,j)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))+g_u(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,-vel))+g_vel*&
-&(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-u(i,k-2,j)-3.*(u(i,k,j)-u(i,&
-&k-1,j)))*sign(1.,-vel))
-        vflux(i,k) = vel*(7./12.*(u(i,k,j)+u(i,k-1,j))-1./12.*(u(i,k+1,j)+u(i,k-2,j))+sign(1.,-vel)*(1./12.)*(u(i,k+1,j)-u(i,k-2,j)&
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+        vflux(i,k) = vel*(7./12.*(u(i,k,j)+u(i,k-1,j))-1./12.*(u(i,k+1,j)&
+&+u(i,k-2,j))+sign(1.,-vel)*(1./12.)*(u(i,k+1,j)-u(i,k-2,j)&
 &-3.*(u(i,k,j)-u(i,k-1,j))))
+
+        g_vflux(i,k) = vel*(g_u(i,k-2,j)*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_u(i,k-1,j)*(0.58333333+0.25*sign(1.,-&
+&vel))+g_u(i,k+1,j)*((-0.083333333)+0.083333333*sign(1.,-vel))+g_u(i,k,j)*(0.58333333+(-0.25)*sign(1.,-vel)))&
+&+0.5*(g_rom(i-1,k,j)+g_rom(i,k,j))*vflux(i,k)/vel
+else
+        vflux(i,k)=0.
+g_vflux(i,k) =0.5*(g_rom(i-1,k,j)+g_rom(i,k,j))*(7./12.*(u(i,k,j)+u(i,k-1,j))-1./12.*(u(i,k+1,j)+u(i,k-2,j))&
+&+sign(1.,-vel)*(1./12.)*(u(i,k+1,j)-u(i,k-2,j)-3.*(u(i,k,j)-u(i,k-1,j))))
+endif
       end do
     end do
     do i = i_start, i_end
@@ -2525,15 +2627,24 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i,k,j-1)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
-          g_fqy(i,k,jp1) = g_v(i,k,j-3)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_v(i,k,j-2)*vel*((-0.13333333)-0.083333333*&
-&sign(1.,vel))+g_v(i,k,j-1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_v(i,k,j+2)*vel*(0.016666667-0.016666667*&
-&sign(1.,vel))+g_v(i,k,j+1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_v(i,k,j)*vel*(0.61666667-0.16666667*&
-&sign(1.,vel))+g_vel*(0.61666667*(v(i,k,j)+v(i,k,j-1))-0.13333333*(v(i,k,j+1)+v(i,k,j-2))+0.016666667*(v(i,k,j+2)+v(i,k,&
-&j-3))-0.016666667*(v(i,k,j+2)-v(i,k,j-3)-5.*(v(i,k,j+1)-v(i,k,j-2))+10.*(v(i,k,j)-v(i,k,j-1)))*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(37./60.*(v(i,k,j)+v(i,k,j-1))-2./15.*(v(i,k,j+1)+v(i,k,j-2))+1./60.*(v(i,k,j+2)+v(i,k,j-3))-sign(1.,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqy(i,k,jp1) = vel*(37./60.*(v(i,k,j)+v(i,k,j-1))-2./15.*(v(i,k,j+1)+v(i,k,j-2))+1./60.*(v(i,k,j+2)+v(i,k,j-3))-sign(1.,&
 &vel)*(1./60.)*(v(i,k,j+2)-v(i,k,j-3)-5.*(v(i,k,j+1)-v(i,k,j-2))+10.*(v(i,k,j)-v(i,k,j-1))))
+
+g_fqy(i,k,jp1) = vel*(g_v(i,k,j-3)*(0.016666667-(-0.016666667)*sign(1.,vel))+g_v(i,k,j-2)*((-0.13333333)-0.083333333*&
+&sign(1.,vel))+g_v(i,k,j-1)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_v(i,k,j+2)*(0.016666667-0.016666667*&
+&sign(1.,vel))+g_v(i,k,j+1)*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_v(i,k,j)*(0.61666667-0.16666667*&
+&sign(1.,vel))) +0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+        fqy(i,k,jp1)=0.
+        g_fqy(i,k,jp1) =0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*(37./60.*(v(i,k,j)+v(i,k,j-1))&
+&-2./15.*(v(i,k,j+1)+v(i,k,j-2))+1./60.*(v(i,k,j+2)+v(i,k,j-3))-sign(1.,&
+&vel)*(1./60.)*(v(i,k,j+2)-v(i,k,j-3)-5.*(v(i,k,j+1)-v(i,k,j-2))+10.*(v(i,k,j)-v(i,k,j-1))))
+endif
         end do
       end do
     else if (j .eq. jds+1) then
@@ -2553,14 +2664,23 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jds+2) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i,k,j-1)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
-          g_fqy(i,k,jp1) = g_v(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i,k,j-1)*vel*(0.58333333+0.25*sign(1.,&
-&vel))+g_v(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+1)-v(i,k,j-2)-3.*(v(i,k,j)-&
-&v(i,k,j-1)))*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(7./12.*(v(i,k,j)+v(i,k,j-1))-1./12.*(v(i,k,j+1)+v(i,k,j-2))+sign(1.,vel)*(1./12.)*(v(i,k,j+1)-v(i,k,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqy(i,k,jp1) = vel*(7./12.*(v(i,k,j)+v(i,k,j-1))-1./12.*(v(i,k,j+1)+v(i,k,j-2))+sign(1.,vel)*(1./12.)*(v(i,k,j+1)-v(i,k,&
 &j-2)-3.*(v(i,k,j)-v(i,k,j-1))))
+
+g_fqy(i,k,jp1) = vel*(g_v(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i,k,j-1)*(0.58333333+0.25*sign(1.,&
+&vel))+g_v(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+          fqy(i,k,jp1)=0.
+          g_fqy(i,k,jp1) =0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*(7./12.*(v(i,k,j)+v(i,k,j-1))&
+&-1./12.*(v(i,k,j+1)+v(i,k,j-2))+sign(1.,vel)*(1./12.)*(v(i,k,j+1)-v(i,k,&
+&j-2)-3.*(v(i,k,j)-v(i,k,j-1)))) 
+endif
         end do
       end do
     else if (j .eq. jde) then
@@ -2580,14 +2700,24 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          g_vel = 0.5*g_rv(i,k,j-1)+0.5*g_rv(i,k,j)
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
-          g_fqy(i,k,jp1) = g_v(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i,k,j-1)*vel*(0.58333333+0.25*sign(1.,&
-&vel))+g_v(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+1)-v(i,k,j-2)-3.*(v(i,k,j)-&
-&v(i,k,j-1)))*sign(1.,vel))
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
           fqy(i,k,jp1) = vel*(7./12.*(v(i,k,j)+v(i,k,j-1))-1./12.*(v(i,k,j+1)+v(i,k,j-2))+sign(1.,vel)*(1./12.)*(v(i,k,j+1)-v(i,k,&
 &j-2)-3.*(v(i,k,j)-v(i,k,j-1))))
+
+          g_fqy(i,k,jp1) = vel*(g_v(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i,k,j-1)*(0.58333333+0.25*sign(1.,&
+&vel))+g_v(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*fqy(i,k,jp1)/vel
+else
+          fqy(i,k,jp1)=0.
+          g_fqy(i,k,jp1) =0.5*(g_rv(i,k,j-1)+g_rv(i,k,j))*(7./12.*(v(i,k,j)+v(i,k,j-1))&
+&-1./12.*(v(i,k,j+1)+v(i,k,j-2))+sign(1.,vel)*(1./12.)*(v(i,k,j+1)-v(i,k,&
+&j-2)-3.*(v(i,k,j)-v(i,k,j-1))))
+endif
         end do
       end do
     endif
@@ -2627,15 +2757,25 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
   do j = j_start, j_end
     do k = kts, ktf
       do i = i_start_f, i_end_f
-        g_vel = 0.5*g_ru(i,k,j-1)+0.5*g_ru(i,k,j)
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
-        g_fqx(i,k) = g_v(i-3,k,j)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_v(i-2,k,j)*vel*((-0.13333333)-0.083333333*&
-&sign(1.,vel))+g_v(i-1,k,j)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_v(i+2,k,j)*vel*(0.016666667-0.016666667*sign(1.,&
-&vel))+g_v(i+1,k,j)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_v(i,k,j)*vel*(0.61666667-0.16666667*sign(1.,vel))+&
-&g_vel*(0.61666667*(v(i,k,j)+v(i-1,k,j))-0.13333333*(v(i+1,k,j)+v(i-2,k,j))+0.016666667*(v(i+2,k,j)+v(i-3,k,j))-&
-&0.016666667*(v(i+2,k,j)-v(i-3,k,j)-5.*(v(i+1,k,j)-v(i-2,k,j))+10.*(v(i,k,j)-v(i-1,k,j)))*sign(1.,vel))
-        fqx(i,k) = vel*(37./60.*(v(i,k,j)+v(i-1,k,j))-2./15.*(v(i+1,k,j)+v(i-2,k,j))+1./60.*(v(i+2,k,j)+v(i-3,k,j))-sign(1.,vel)*&
+
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqx(i,k) = vel*(37./60.*(v(i,k,j)+v(i-1,k,j))-2./15.*(v(i+1,k,j)+v(i-2,k,j))+1./60.*(v(i+2,k,j)+v(i-3,k,j))-sign(1.,vel)*&
 &(1./60.)*(v(i+2,k,j)-v(i-3,k,j)-5.*(v(i+1,k,j)-v(i-2,k,j))+10.*(v(i,k,j)-v(i-1,k,j))))
+
+        g_fqx(i,k) = vel*(g_v(i-3,k,j)*(0.016666667-(-0.016666667)*sign(1.,vel))+g_v(i-2,k,j)*((-0.13333333)-0.083333333*&
+&sign(1.,vel))+g_v(i-1,k,j)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_v(i+2,k,j)*(0.016666667-0.016666667*sign(1.,&
+&vel))+g_v(i+1,k,j)*((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_v(i,k,j)*(0.61666667-0.16666667*sign(1.,vel)))+&
+&0.5*(g_ru(i,k,j-1)+g_ru(i,k,j))*fqx(i,k)/vel
+else
+        fqx(i,k)=0.
+        g_fqx(i,k) =0.5*(g_ru(i,k,j-1)+g_ru(i,k,j))*(37./60.*(v(i,k,j)+v(i-1,k,j))-2./15.*(v(i+1,k,j)&
+&+v(i-2,k,j))+1./60.*(v(i+2,k,j)+v(i-3,k,j))-sign(1.,vel)*&
+&(1./60.)*(v(i+2,k,j)-v(i-3,k,j)-5.*(v(i+1,k,j)-v(i-2,k,j))+10.*(v(i,k,j)-v(i-1,k,j))))
+endif
       end do
     end do
     if (degrade_xs) then
@@ -2670,14 +2810,22 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
       endif
       i = ide-2
       do k = kts, ktf
-        g_vel = 0.5*g_ru(i,k,j-1)+0.5*g_ru(i,k,j)
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
-        g_fqx(i,k) = g_v(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i-1,k,j)*vel*(0.58333333+0.25*sign(1.,vel))+&
-&g_v(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))+g_vel*&
-&(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-2,k,j)-3.*(v(i,k,j)-v(i-&
-&1,k,j)))*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(7./12.*(v(i,k,j)+v(i-1,k,j))-1./12.*(v(i+1,k,j)+v(i-2,k,j))+sign(1.,vel)*(1./12.)*(v(i+1,k,j)-v(i-2,k,j)-&
 &3.*(v(i,k,j)-v(i-1,k,j))))
+        g_fqx(i,k) = vel*(g_v(i-2,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_v(i-1,k,j)*(0.58333333+0.25*sign(1.,vel))+&
+&g_v(i+1,k,j)*((-0.083333333)+0.083333333*sign(1.,vel))+g_v(i,k,j)*(0.58333333+(-0.25)*sign(1.,vel)))&
+&+0.5*(g_ru(i,k,j-1)+g_ru(i,k,j))*fqx(i,k)/vel
+else
+        fqx(i,k)=0.
+        g_fqx(i,k) =0.5*(g_ru(i,k,j-1)+g_ru(i,k,j))*(7./12.*(v(i,k,j)+v(i-1,k,j))&
+&-1./12.*(v(i+1,k,j)+v(i-2,k,j))+sign(1.,vel)*(1./12.)*(v(i+1,k,j)-v(i-2,k,j)-&
+&3.*(v(i,k,j)-v(i-1,k,j))))
+endif
       end do
     endif
     do k = kts, ktf
@@ -3274,14 +3422,22 @@ else if (vert_order .eq. 3) then vert_order_tesu
   do j = j_start, j_end
     do k = kts+2, ktf-1
       do i = i_start, i_end
-        g_vel = 0.5*g_rom(i,k,j-1)+0.5*g_rom(i,k,j)
         vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
-        g_vflux(i,k) = g_v(i,k-2,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_v(i,k-1,j)*vel*(0.58333333+0.25*sign(1.,-&
-&vel))+g_v(i,k+1,j)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))+g_v(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,-vel))+g_vel*&
-&(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-v(i,k-2,j)-3.*(v(i,k,j)-v(i,&
-&k-1,j)))*sign(1.,-vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         vflux(i,k) = vel*(7./12.*(v(i,k,j)+v(i,k-1,j))-1./12.*(v(i,k+1,j)+v(i,k-2,j))+sign(1.,-vel)*(1./12.)*(v(i,k+1,j)-v(i,k-2,j)&
 &-3.*(v(i,k,j)-v(i,k-1,j))))
+        g_vflux(i,k) = vel*(g_v(i,k-2,j)*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_v(i,k-1,j)*(0.58333333+0.25*sign(1.,-&
+&vel))+g_v(i,k+1,j)*((-0.083333333)+0.083333333*sign(1.,-vel))+g_v(i,k,j)*(0.58333333+(-0.25)*sign(1.,-vel)))&
+&+0.5*(g_rom(i,k,j-1)+g_rom(i,k,j))*vflux(i,k)/vel
+else
+        vflux(i,k)=0.
+        g_vflux(i,k) =0.5*(g_rom(i,k,j-1)+g_rom(i,k,j))*(7./12.*(v(i,k,j)+v(i,k-1,j))-1./12.*(v(i,k+1,j)+v(i,k-2,j))&
+&+sign(1.,-vel)*(1./12.)*(v(i,k+1,j)-v(i,k-2,j)&
+&-3.*(v(i,k,j)-v(i,k-1,j))))
+endif
       end do
     end do
     do i = i_start, i_end
@@ -3420,6 +3576,7 @@ real vel
 integer vert_order
 real vflux(its:ite,kts:kte)
 real vw
+real walls(4)
 
    call trace_entry("g_advect_w")
 
@@ -3490,9 +3647,10 @@ horizontal_order_tesu: if (horz_order .eq. 6) then
     else if (j .eq. jds+1) then
       do k = kts+1, ktf
         do i = i_start, i_end
+          walls(1)=fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
           g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_rv(i,k,j)*fzm(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_w(i,k,&
-&j-1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))+0.5*g_w(i,k,j)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          fqy(i,k,jp1) = 0.5*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))*(w(i,k,j)+w(i,k,j-1))
+&j-1)*walls(1)+0.5*g_w(i,k,j)*walls(1)
+          fqy(i,k,jp1) = 0.5*walls(1)*(w(i,k,j)+w(i,k,j-1))
         end do
       end do
       k = ktf+1
@@ -3522,9 +3680,10 @@ horizontal_order_tesu: if (horz_order .eq. 6) then
     else if (j .eq. jde-1) then
       do k = kts+1, ktf
         do i = i_start, i_end
+          walls(1)=fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
           g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_rv(i,k,j)*fzm(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_w(i,k,&
-&j-1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))+0.5*g_w(i,k,j)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          fqy(i,k,jp1) = 0.5*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))*(w(i,k,j)+w(i,k,j-1))
+&j-1)*walls(1)+0.5*g_w(i,k,j)*walls(1)
+          fqy(i,k,jp1) = 0.5*walls(1)*(w(i,k,j)+w(i,k,j-1))
         end do
       end do
       k = ktf+1
@@ -3700,15 +3859,24 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts+1, ktf
         do i = i_start, i_end
-          g_vel = g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k)
           vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
-          g_fqy(i,k,jp1) = g_vel*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)+w(i,&
-&k,j-3))-0.016666667*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))+g_w(i,k,&
-&j-3)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))+g_w(i,k,j-2)*vel*((-0.13333333)-0.083333333*sign(1.,vel))+g_w(i,k,j-&
-&1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))+g_w(i,k,j+2)*vel*(0.016666667-0.016666667*sign(1.,vel))+g_w(i,k,j+1)*vel*&
-&((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_w(i,k,j)*vel*(0.61666667-0.16666667*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
           fqy(i,k,jp1) = vel*(37./60.*(w(i,k,j)+w(i,k,j-1))-2./15.*(w(i,k,j+1)+w(i,k,j-2))+1./60.*(w(i,k,j+2)+w(i,k,j-3))-sign(1.,&
 &vel)*(1./60.)*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1))))
+
+          g_fqy(i,k,jp1) = (g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k))*fqy(i,k,jp1)/vel&
+&+vel*(g_w(i,k,j-3)*(0.016666667-(-0.016666667)*sign(1.,vel))+g_w(i,k,j-2)*((-0.13333333)-0.083333333*sign(1.,vel))+g_w(i,k,j-&
+&1)*(0.61666667-(-0.16666667)*sign(1.,vel))+g_w(i,k,j+2)*(0.016666667-0.016666667*sign(1.,vel))+g_w(i,k,j+1)*&
+&((-0.13333333)-(-0.083333333)*sign(1.,vel))+g_w(i,k,j)*(0.61666667-0.16666667*sign(1.,vel)))
+else
+        fqy(i,k,jp1)=0.
+        g_fqy(i,k,jp1) =(g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k))*(37./60.*(w(i,k,j)&
+&+w(i,k,j-1))-2./15.*(w(i,k,j+1)+w(i,k,j-2))+1./60.*(w(i,k,j+2)+w(i,k,j-3))-sign(1.,&
+&vel)*(1./60.)*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1))))
+endif
         end do
       end do
       k = ktf+1
@@ -3726,28 +3894,42 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jds+1) then
       do k = kts+1, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_rv(i,k,j)*fzm(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_w(i,k,&
-&j-1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))+0.5*g_w(i,k,j)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          fqy(i,k,jp1) = 0.5*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))*(w(i,k,j)+w(i,k,j-1))
+          walls(1)=fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          walls(2)=w(i,k,j)+w(i,k,j-1)
+          g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*walls(2)+0.5*g_rv(i,k,j)*fzm(k)*walls(2)+0.5*g_w(i,k,&
+&j-1)*walls(1)+0.5*g_w(i,k,j)*walls(1)
+          fqy(i,k,jp1) = 0.5*walls(1)*walls(2)
         end do
       end do
       k = ktf+1
       do i = i_start, i_end
-        g_fqy(i,k,jp1) = (-(0.5*g_rv(i,k-2,j)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))))+0.5*g_rv(i,k-1,j)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))&
-&+0.5*g_w(i,k,j-1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))+0.5*g_w(i,k,j)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        fqy(i,k,jp1) = 0.5*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))*(w(i,k,j)+w(i,k,j-1))
+        walls(2)=w(i,k,j)+w(i,k,j-1)
+        g_fqy(i,k,jp1) = (-(0.5*g_rv(i,k-2,j)*fzp(k-1)*walls(2)))+0.5*g_rv(i,k-1,j)*(2-fzm(k-1))*walls(2)&
+&+0.5*g_w(i,k,j-1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))&
+&+0.5*g_w(i,k,j)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
+        fqy(i,k,jp1) = 0.5*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))*walls(2)
       end do
+
     else if (j .eq. jds+2) then
       do k = kts+1, ktf
         do i = i_start, i_end
           g_vel = g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k)
           vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
-          g_fqy(i,k,jp1) = g_vel*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-w(i,&
-&k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))+g_w(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-&
-&1)*vel*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*&
-&(0.58333333+(-0.25)*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+   fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
 &j-2)-3.*(w(i,k,j)-w(i,k,j-1))))
+   g_fqy(i,k,jp1) = g_vel*fqy(i,k,jp1)/vel&
+&+vel*(g_w(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-&
+&1)*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*&
+&(0.58333333+(-0.25)*sign(1.,vel)))
+else
+   fqy(i,k,jp1)=0.
+   g_fqy(i,k,jp1) =g_vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
+&j-2)-3.*(w(i,k,j)-w(i,k,j-1))))
+endif
         end do
       end do
       k = ktf+1
@@ -3764,42 +3946,68 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
     else if (j .eq. jde-1) then
       do k = kts+1, ktf
         do i = i_start, i_end
-          g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_rv(i,k,j)*fzm(k)*(w(i,k,j)+w(i,k,j-1))+0.5*g_w(i,k,&
-&j-1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))+0.5*g_w(i,k,j)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          fqy(i,k,jp1) = 0.5*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))*(w(i,k,j)+w(i,k,j-1))
+          walls(1)=fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          walls(2)=w(i,k,j)+w(i,k,j-1)
+          g_fqy(i,k,jp1) = 0.5*g_rv(i,k-1,j)*fzp(k)*walls(2)+0.5*g_rv(i,k,j)*fzm(k)*walls(2)+0.5*g_w(i,k,&
+&j-1)*walls(1)+0.5*g_w(i,k,j)*walls(1)
+          fqy(i,k,jp1) = 0.5*walls(1)*walls(2)
         end do
       end do
       k = ktf+1
       do i = i_start, i_end
-        g_fqy(i,k,jp1) = (-(0.5*g_rv(i,k-2,j)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))))+0.5*g_rv(i,k-1,j)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))&
-&+0.5*g_w(i,k,j-1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))+0.5*g_w(i,k,j)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        fqy(i,k,jp1) = 0.5*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))*(w(i,k,j)+w(i,k,j-1))
+        walls(1)=(2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        walls(2)=w(i,k,j)+w(i,k,j-1)
+        g_fqy(i,k,jp1) = (-(0.5*g_rv(i,k-2,j)*fzp(k-1)*walls(2)))+0.5*g_rv(i,k-1,j)*(2-fzm(k-1))*walls(2)&
+&+0.5*g_w(i,k,j-1)*walls(1)+0.5*g_w(i,k,j)*walls(1)
+        fqy(i,k,jp1) = 0.5*walls(1)*walls(2)
       end do
     else if (j .eq. jde-2) then
       do k = kts+1, ktf
         do i = i_start, i_end
-          g_vel = g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k)
           vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
-          g_fqy(i,k,jp1) = g_vel*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-w(i,&
-&k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))+g_w(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-&
-&1)*vel*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*&
-&(0.58333333+(-0.25)*sign(1.,vel))
-          fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+          fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)&
+&+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
 &j-2)-3.*(w(i,k,j)-w(i,k,j-1))))
+          g_fqy(i,k,jp1) = (g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k))*fqy(i,k,jp1)/vel&
+&+vel*(g_w(i,k,j-2)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-&
+&1)*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*&
+&(0.58333333+(-0.25)*sign(1.,vel)))
+else
+        fqy(i,k,jp1)=0.
+        g_fqy(i,k,jp1) =(g_rv(i,k-1,j)*fzp(k)+g_rv(i,k,j)*fzm(k))*(7./12.*(w(i,k,j)&
+&+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,&
+&j-2)-3.*(w(i,k,j)-w(i,k,j-1))))
+endif
         end do
       end do
       k = ktf+1
       do i = i_start, i_end
         g_vel = (-(g_rv(i,k-2,j)*fzp(k-1)))+g_rv(i,k-1,j)*(2-fzm(k-1))
         vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
-        g_fqy(i,k,jp1) = g_vel*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-w(i,k,&
-&j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))+g_w(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-1)*&
-&vel*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*(0.58333333+&
-&(-0.25)*sign(1.,vel))
-        fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,j-&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqy(i,k,jp1) = vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)&
+&+w(i,k,j-2))+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,j-&
 &2)-3.*(w(i,k,j)-w(i,k,j-1))))
+        g_fqy(i,k,jp1) = g_vel*fqy(i,k,jp1)/vel&
+&+g_w(i,k,j-2)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i,k,j-1)*&
+&vel*(0.58333333+0.25*sign(1.,vel))+g_w(i,k,j+1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))&
+&+g_w(i,k,j)*vel*(0.58333333+(-0.25)*sign(1.,vel))
+else
+        fqy(i,k,jp1)=0.
+        g_fqy(i,k,jp1) =g_vel*(7./12.*(w(i,k,j)+w(i,k,j-1))-1./12.*(w(i,k,j+1)+w(i,k,j-2))&
+&+sign(1.,vel)*(1./12.)*(w(i,k,j+1)-w(i,k,j-&
+&2)-3.*(w(i,k,j)-w(i,k,j-1))))
+endif
       end do
     endif
+
     if (j .gt. j_start) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
@@ -3832,60 +4040,93 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
       do i = i_start_f, i_end_f
         g_vel = g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k)
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
-        g_fqx(i,k) = g_vel*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,k,j))&
-&-0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))+g_w(i-3,k,j)*vel*&
-&(0.016666667-(-0.016666667)*sign(1.,vel))+g_w(i-2,k,j)*vel*((-0.13333333)-0.083333333*sign(1.,vel))+g_w(i-1,k,j)*vel*&
-&(0.61666667-(-0.16666667)*sign(1.,vel))+g_w(i+2,k,j)*vel*(0.016666667-0.016666667*sign(1.,vel))+g_w(i+1,k,j)*vel*((-&
-&0.13333333)-(-0.083333333)*sign(1.,vel))+g_w(i,k,j)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        fqx(i,k) = vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+fqx(i,k) = vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*&
 &(1./60.)*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j))))
+g_fqx(i,k) = g_vel*fqx(i,k)/vel&
+&+vel*(g_w(i-3,k,j)*(0.016666667-(-0.016666667)*sign(1.,vel))&
+&+g_w(i-2,k,j)*((-0.13333333)-0.083333333*sign(1.,vel))+g_w(i-1,k,j)*&
+&(0.61666667-(-0.16666667)*sign(1.,vel))+g_w(i+2,k,j)*(0.016666667-0.016666667*sign(1.,vel))+g_w(i+1,k,j)*((-&
+&0.13333333)-(-0.083333333)*sign(1.,vel))+g_w(i,k,j)*(0.61666667-0.16666667*sign(1.,vel)))
+else
+        fqx(i,k)=0.
+        g_fqx(i,k) = g_vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))&
+&+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*&
+&(1./60.)*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j))))
+endif
       end do
     end do
     k = ktf+1
     do i = i_start_f, i_end_f
       g_vel = (-(g_ru(i,k-2,j)*fzp(k-1)))+g_ru(i,k-1,j)*(2-fzm(k-1))
       vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
-      g_fqx(i,k) = g_vel*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,k,j))-&
-&0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))+g_w(i-3,k,j)*vel*&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+      fqx(i,k) = vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))&
+&+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*(1./&
+&60.)*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j))))
+      g_fqx(i,k) = g_vel*fqx(i,k)/vel&
+&+g_w(i-3,k,j)*vel*&
 &(0.016666667-(-0.016666667)*sign(1.,vel))+g_w(i-2,k,j)*vel*((-0.13333333)-0.083333333*sign(1.,vel))+g_w(i-1,k,j)*vel*&
 &(0.61666667-(-0.16666667)*sign(1.,vel))+g_w(i+2,k,j)*vel*(0.016666667-0.016666667*sign(1.,vel))+g_w(i+1,k,j)*vel*((-&
 &0.13333333)-(-0.083333333)*sign(1.,vel))+g_w(i,k,j)*vel*(0.61666667-0.16666667*sign(1.,vel))
-      fqx(i,k) = vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*(1./&
+else
+fqx(i,k)=0.
+g_fqx(i,k) =g_vel*(37./60.*(w(i,k,j)+w(i-1,k,j))-2./15.*(w(i+1,k,j)+w(i-2,k,j))&
+&+1./60.*(w(i+2,k,j)+w(i-3,k,j))-sign(1.,vel)*(1./&
 &60.)*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j))))
+endif
     end do
     if (degrade_xs) then
       if (i_start .eq. ids+1) then
         i = ids+1
         do k = kts+1, ktf
-          g_fqx(i,k) = 0.5*g_ru(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i-1,k,j))+0.5*g_ru(i,k,j)*fzm(k)*(w(i,k,j)+w(i-1,k,j))+0.5*g_w(i-1,k,j)&
+g_fqx(i,k) = 0.5*g_ru(i,k-1,j)*fzp(k)*(w(i,k,j)+w(i-1,k,j))+0.5*g_ru(i,k,j)*fzm(k)*(w(i,k,j)&
+&+w(i-1,k,j))+0.5*g_w(i-1,k,j)&
 &*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))+0.5*g_w(i,k,j)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
           fqx(i,k) = 0.5*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))*(w(i,k,j)+w(i-1,k,j))
         end do
         k = ktf+1
-        g_fqx(i,k) = (-(0.5*g_ru(i,k-2,j)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))))+0.5*g_ru(i,k-1,j)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))+&
-&0.5*g_w(i-1,k,j)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))+0.5*g_w(i,k,j)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
+g_fqx(i,k) = (-(0.5*g_ru(i,k-2,j)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))))+0.5*g_ru(i,k-1,j)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))+&
+&0.5*g_w(i-1,k,j)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))&
+&+0.5*g_w(i,k,j)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
         fqx(i,k) = 0.5*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))*(w(i,k,j)+w(i-1,k,j))
       endif
       i = i_start+1
       do k = kts+1, ktf
-        g_vel = g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k)
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
-        g_fqx(i,k) = g_vel*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,k,j)&
-&-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))+g_w(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i-1,k,j)*vel*&
-&(0.58333333+0.25*sign(1.,vel))+g_w(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*(0.58333333+(-&
-&0.25)*sign(1.,vel))
-        fqx(i,k) = vel*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-&
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
+        fqx(i,k) = vel*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)&
+&+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-&
 &3.*(w(i,k,j)-w(i-1,k,j))))
+        g_fqx(i,k) = (g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k))*fqx(i,k)/vel&
+&+vel*(g_w(i-2,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i-1,k,j)*&
+&(0.58333333+0.25*sign(1.,vel))+g_w(i+1,k,j)*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*(0.58333333+(-&
+&0.25)*sign(1.,vel)))
+else
+        fqx(i,k)=0.
+        g_fqx(i,k) =(g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k))*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)&
+&+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-3.*(w(i,k,j)-w(i-1,k,j))))
+endif
       end do
       k = ktf+1
       g_vel = (-(g_ru(i,k-2,j)*fzp(k-1)))+g_ru(i,k-1,j)*(2-fzm(k-1))
       vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
-      g_fqx(i,k) = g_vel*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,k,j)-&
+      g_fqx(i,k) = g_vel*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)&
+&+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,k,j)-&
 &3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))+g_w(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i-1,k,j)*vel*&
 &(0.58333333+0.25*sign(1.,vel))+g_w(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*(0.58333333+(-0.25)&
 &*sign(1.,vel))
-      fqx(i,k) = vel*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-3.*&
-&(w(i,k,j)-w(i-1,k,j))))
+      fqx(i,k) = vel*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)+w(i-2,k,j))&
+&+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-3.*(w(i,k,j)-w(i-1,k,j))))
     endif
     if (degrade_xe) then
       if (i_end .eq. ide-2) then
@@ -3902,14 +4143,22 @@ else if (horz_order .eq. 5) then horizontal_order_tesu
       endif
       i = ide-2
       do k = kts+1, ktf
-        g_vel = g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k)
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
-        g_fqx(i,k) = g_vel*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,k,j)&
-&-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))+g_w(i-2,k,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i-1,k,j)*vel*&
-&(0.58333333+0.25*sign(1.,vel))+g_w(i+1,k,j)*vel*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*vel*(0.58333333+(-&
-&0.25)*sign(1.,vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         fqx(i,k) = vel*(7./12.*(w(i,k,j)+w(i-1,k,j))-1./12.*(w(i+1,k,j)+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-&
 &3.*(w(i,k,j)-w(i-1,k,j))))
+        g_fqx(i,k) = (g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k))*fqx(i,k)/vel&
+&+vel*(g_w(i-2,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,vel))+g_w(i-1,k,j)*&
+&(0.58333333+0.25*sign(1.,vel))+g_w(i+1,k,j)*((-0.083333333)+0.083333333*sign(1.,vel))+g_w(i,k,j)*(0.58333333+(-&
+&0.25)*sign(1.,vel)))
+else
+        fqx(i,k)=0.
+        g_fqx(i,k) = (g_ru(i,k-1,j)*fzp(k)+g_ru(i,k,j)*fzm(k))*(7./12.*(w(i,k,j)+w(i-1,k,j))&
+&-1./12.*(w(i+1,k,j)+w(i-2,k,j))+sign(1.,vel)*(1./12.)*(w(i+1,k,j)-w(i-2,k,j)-3.*(w(i,k,j)-w(i-1,k,j))))
+endif
       end do
       k = ktf+1
       g_vel = (-(g_ru(i,k-2,j)*fzp(k-1)))+g_ru(i,k-1,j)*(2-fzm(k-1))
@@ -4318,10 +4567,11 @@ else if (horz_order .eq. 2) then horizontal_order_tesu
     do k = kts+1, ktf
       do i = i_start, i_end
         mrdy = msft(i,j)*rdy
+        walls(1)=fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
         g_tendency(i,k,j) = (-(0.5*g_rv(i,k-1,j+1)*mrdy*fzp(k)*(w(i,k,j+1)+w(i,k,j))))+0.5*g_rv(i,k-1,j)*mrdy*fzp(k)*(w(i,k,j)+w(i,&
 &k,j-1))-0.5*g_rv(i,k,j+1)*mrdy*fzm(k)*(w(i,k,j+1)+w(i,k,j))+0.5*g_rv(i,k,j)*mrdy*fzm(k)*(w(i,k,j)+w(i,k,j-1))+&
-&g_tendency(i,k,j)+0.5*g_w(i,k,j-1)*mrdy*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))-0.5*g_w(i,k,j+1)*mrdy*(fzm(k)*rv(i,k,j+1)+&
-&fzp(k)*rv(i,k-1,j+1))-0.5*g_w(i,k,j)*mrdy*(fzm(k)*rv(i,k,j+1)+fzp(k)*rv(i,k-1,j+1)-(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)))
+&g_tendency(i,k,j)+0.5*g_w(i,k,j-1)*mrdy*walls(1)-0.5*g_w(i,k,j+1)*mrdy*(fzm(k)*rv(i,k,j+1)+&
+&fzp(k)*rv(i,k-1,j+1))-0.5*g_w(i,k,j)*mrdy*(fzm(k)*rv(i,k,j+1)+fzp(k)*rv(i,k-1,j+1)-walls(1))
         tendency(i,k,j) = tendency(i,k,j)-mrdy*0.5*((fzm(k)*rv(i,k,j+1)+fzp(k)*rv(i,k-1,j+1))*(w(i,k,j+1)+w(i,k,j))-(fzm(k)*rv(i,k,&
 &j)+fzp(k)*rv(i,k-1,j))*(w(i,k,j)+w(i,k,j-1)))
       end do
@@ -4613,14 +4863,22 @@ else if (vert_order .eq. 3) then vert_order_tesu
   do j = j_start, j_end
     do k = kts+2, ktf
       do i = i_start, i_end
-        g_vel = 0.5*g_rom(i,k-1,j)+0.5*g_rom(i,k,j)
         vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
-        g_vflux(i,k) = g_vel*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-w(i,k-2,&
-&j)-3.*(w(i,k,j)-w(i,k-1,j)))*sign(1.,-vel))+g_w(i,k-2,j)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_w(i,k-1,j)*&
-&vel*(0.58333333+0.25*sign(1.,-vel))+g_w(i,k+1,j)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))+g_w(i,k,j)*vel*&
-&(0.58333333+(-0.25)*sign(1.,-vel))
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+if(vel.ne.0.) then
         vflux(i,k) = vel*(7./12.*(w(i,k,j)+w(i,k-1,j))-1./12.*(w(i,k+1,j)+w(i,k-2,j))+sign(1.,-vel)*(1./12.)*(w(i,k+1,j)-w(i,k-2,j)&
 &-3.*(w(i,k,j)-w(i,k-1,j))))
+        g_vflux(i,k) = 0.5*(g_rom(i,k-1,j)+g_rom(i,k,j))*vflux(i,k)/vel&
+&+vel*(g_w(i,k-2,j)*((-0.083333333)+(-0.083333333)*sign(1.,-vel))+g_w(i,k-1,j)*&
+&(0.58333333+0.25*sign(1.,-vel))+g_w(i,k+1,j)*((-0.083333333)+0.083333333*sign(1.,-vel))+g_w(i,k,j)*&
+&(0.58333333+(-0.25)*sign(1.,-vel)))
+else
+        vflux(i,k)=0.
+        g_vflux(i,k) =0.5*(g_rom(i,k-1,j)+g_rom(i,k,j))*(7./12.*(w(i,k,j)+w(i,k-1,j))-1./12.*(w(i,k+1,j)&
+&+w(i,k-2,j))+sign(1.,-vel)*(1./12.)*(w(i,k+1,j)-w(i,k-2,j)-3.*(w(i,k,j)-w(i,k-1,j))))
+endif
       end do
     end do
     do i = i_start, i_end

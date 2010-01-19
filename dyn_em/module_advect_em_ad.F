@@ -152,6 +152,9 @@ integer i_start_l, i_end_l
 integer i_start_f_l, i_end_f_l
 integer j_start_l, j_end_l
 integer j_start_f_l, j_end_f_l
+real walls(7),gwalls
+real iwalls(ims:ime)
+real kwalls(kms:kme)
 
    call trace_entry("a_advect_scalar")
 
@@ -169,11 +172,7 @@ kpe = kte
 !----------------------------------------------
 a_fqx(:,:) = 0.
 a_fqy(:,:,:) = 0.
-a_ub = 0.
-a_vb = 0.
-a_vel = 0.
 a_vflux(:,:) = 0.
-
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
@@ -213,42 +212,54 @@ j_end = min(jte,jde-1)
 a_vert_order_test: if (vert_order .eq. 6) then
   CALL wrf_error_fatal ( ' vert_order == 6 does not pass AD/TL check' )
   do j = j_end, j_start, -1
+
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k)   = a_vflux(i,k)  +a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(ktf); walls(4)=fzm(ktf)
+    walls(5)=fzp(kts+1); walls(6)=fzm(kts+1)
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf-1
 ! recompute : k
       vel = rom(i,k,j)
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(3)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(4)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*field(i,k,j)+walls(3)*field(i,k-1,j))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3728
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*walls(2)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*walls(2)
+      a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*walls(2)
+      a_field(i,k,j)   = a_field(i,k,j)+0.58333333*walls(2)
+      a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3728
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
       a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-      a_vel = 0.
+!     
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3723
 ! recompute vars : k
@@ -259,89 +270,113 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : vel
       vel = rom(i,k,j)
 ! recompute vars : vel
-      a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*walls(2)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*walls(2)
+      a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*walls(2)
+      a_field(i,k,j)   = a_field(i,k,j)+0.58333333*walls(2)
+      a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3723
 ! recompute vars : k
       k = kts+2
 ! recompute vars : k
       a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-      a_vel = 0.
+!     
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3720
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(5)
+      a_field(i,k,j)   = a_field(i,k,j)+walls(2)*walls(6)
+      a_rom(i,k,j)     = a_rom(i,k,j)+walls(1)*(walls(6)*field(i,k,j)+walls(5)*field(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
-        vel = rom(i,k,j)
+!       vel = rom(i,k,j)
 ! recompute : vel
-        a_field(i,k-3,j) = a_field(i,k-3,j)+0.016666667*a_vflux(i,k)*vel
-        a_field(i,k-2,j) = a_field(i,k-2,j)-0.13333333*a_vflux(i,k)*vel
-        a_field(i,k-1,j) = a_field(i,k-1,j)+0.61666667*a_vflux(i,k)*vel
-        a_field(i,k+2,j) = a_field(i,k+2,j)+0.016666667*a_vflux(i,k)*vel
-        a_field(i,k+1,j) = a_field(i,k+1,j)-0.13333333*a_vflux(i,k)*vel
-        a_field(i,k,j) = a_field(i,k,j)+0.61666667*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(field(i,k,j)+field(i,k-1,j))-0.13333333*(field(i,k+1,j)+field(i,k-2,j))+&
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*rom(i,k,j)
+
+        a_field(i,k-3,j) = a_field(i,k-3,j)+0.016666667*walls(2)
+        a_field(i,k-2,j) = a_field(i,k-2,j)-0.13333333*walls(2)
+        a_field(i,k-1,j) = a_field(i,k-1,j)+0.61666667*walls(2)
+        a_field(i,k+2,j) = a_field(i,k+2,j)+0.016666667*walls(2)
+        a_field(i,k+1,j) = a_field(i,k+1,j)-0.13333333*walls(2)
+        a_field(i,k,j)   = a_field(i,k,j)+0.61666667*walls(2)
+        a_vel = walls(1)*(0.61666667*(field(i,k,j)+field(i,k-1,j))-0.13333333*(field(i,k+1,j)+field(i,k-2,j))+&
 &0.016666667*(field(i,k+2,j)+field(i,k-3,j)))
-        a_vflux(i,k) = 0.
         a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-        a_vel = 0.
       end do
     end do
+
+  a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
+
   end do
+
 else if (vert_order .eq. 5) then a_vert_order_test
   CALL wrf_error_fatal ( ' vert_order == 5 does not pass AD/TL check' )
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k)   = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(ktf); walls(4)=fzm(ktf)
+    walls(5)=fzp(kts+1); walls(6)=fzm(kts+1)
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf-1
 ! recompute : k
       vel = rom(i,k,j)
+      walls(7)=sign(1.,-vel)
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(3)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(4)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*field(i,k,j)+walls(3)*field(i,k-1,j))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3769
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_field(i,k-2,j) = a_field(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_field(i,k+1,j) = a_field(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+0.083333333*&
-&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_field(i,k-2,j) = a_field(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(7))
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(7))
+      a_field(i,k+1,j) = a_field(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(7))
+      a_field(i,k,j)   = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(7))
+      a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+0.083333333*&
+&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*walls(7))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3769
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
       a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-      a_vel = 0.
+!     
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3764
 ! recompute vars : k
@@ -352,154 +387,216 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : vel
       vel = rom(i,k,j)
 ! recompute vars : vel
-      a_field(i,k-2,j) = a_field(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_field(i,k+1,j) = a_field(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+0.083333333*&
-&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(7)=sign(1.,-vel)
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_field(i,k-2,j) = a_field(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(7))
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(7))
+      a_field(i,k+1,j) = a_field(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(7))
+      a_field(i,k,j)   = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(7))
+      a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+0.083333333*&
+&(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*walls(7))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3764
 ! recompute vars : k
       k = kts+2
 ! recompute vars : k
       a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-      a_vel = 0.
+!     
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3761
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(5)
+      a_field(i,k,j)   = a_field(i,k,j)+walls(2)*walls(6)
+      a_rom(i,k,j)     = a_rom(i,k,j)+walls(1)*(walls(6)*field(i,k,j)+walls(5)*field(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = rom(i,k,j)
 ! recompute : vel
-        a_field(i,k-3,j) = a_field(i,k-3,j)+a_vflux(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,-vel))
-        a_field(i,k-2,j) = a_field(i,k-2,j)+a_vflux(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,-vel))
-        a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,-vel))
-        a_field(i,k+2,j) = a_field(i,k+2,j)+a_vflux(i,k)*vel*(0.016666667-0.016666667*sign(1.,-vel))
-        a_field(i,k+1,j) = a_field(i,k+1,j)+a_vflux(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,-vel))
-        a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*vel*(0.61666667-0.16666667*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(field(i,k,j)+field(i,k-1,j))-0.13333333*(field(i,k+1,j)+field(i,k-2,j))+&
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i,k-3,j) = a_field(i,k-3,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_field(i,k-2,j) = a_field(i,k-2,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_field(i,k+2,j) = a_field(i,k+2,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_field(i,k+1,j) = a_field(i,k+1,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel = walls(1)*(0.61666667*(field(i,k,j)+field(i,k-1,j))-0.13333333*(field(i,k+1,j)+field(i,k-2,j))+&
 &0.016666667*(field(i,k+2,j)+field(i,k-3,j))-0.016666667*(field(i,k+2,j)-field(i,k-3,j)-5.*(field(i,k+1,j)-field(i,k-2,j))+&
-&10.*(field(i,k,j)-field(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+&10.*(field(i,k,j)-field(i,k-1,j)))*walls(3))
         a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-        a_vel = 0.
+!       
       end do
     end do
+
+  a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
+
   end do
 else if (vert_order .eq. 4) then a_vert_order_test
   CALL wrf_error_fatal ( ' vert_order == 4 does not pass AD/TL check' )
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(4)=fzp(kts+1); walls(7)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(5)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(6)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*field(i,k,j)+walls(5)*field(i,k-1,j))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3802
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(4)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(7)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(7)*field(i,k,j)+walls(4)*field(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = rom(i,k,j)
 ! recompute : vel
-        a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-        a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-        a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-        a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
-        a_vflux(i,k) = 0.
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i,k-2,j) = a_field(i,k-2,j)-0.083333333*walls(2)
+        a_field(i,k-1,j) = a_field(i,k-1,j)+0.58333333*walls(2)
+        a_field(i,k+1,j) = a_field(i,k+1,j)-0.083333333*walls(2)
+        a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+        a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j)))
         a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 3) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+       gwalls=rdzw(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(4)=fzp(kts+1); walls(7)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(5)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(6)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*field(i,k,j)+walls(5)*field(i,k-1,j))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:3831
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-      a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-      a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*rom(i,k,j)
+      a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(4)
+      a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(7)
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(7)*field(i,k,j)+walls(4)*field(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = rom(i,k,j)
 ! recompute : vel
-        a_field(i,k-2,j) = a_field(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-        a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-        a_field(i,k+1,j) = a_field(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-        a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+&
-&0.083333333*(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i,k-2,j) = a_field(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_field(i,k+1,j) = a_field(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i,k-1,j))-0.083333333*(field(i,k+1,j)+field(i,k-2,j))+&
+&0.083333333*(field(i,k+1,j)-field(i,k-2,j)-3.*(field(i,k,j)-field(i,k-1,j)))*walls(3))
         a_rom(i,k,j) = a_rom(i,k,j)+a_vel
-        a_vel = 0.
       end do
     end do
+
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 2) then a_vert_order_test
   CALL wrf_error_fatal ( ' vert_order == 2 does not pass AD/TL check' )
+
   do j = j_start, j_end
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+       gwalls=rdzw(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
+
     end do
+
     do k = kts+1, ktf
+      walls(3)=fzp(k); walls(4)=fzm(k)
       do i = i_start, i_end
-        a_field(i,k-1,j) = a_field(i,k-1,j)+a_vflux(i,k)*rom(i,k,j)*fzp(k)
-        a_field(i,k,j) = a_field(i,k,j)+a_vflux(i,k)*rom(i,k,j)*fzm(k)
-        a_rom(i,k,j) = a_rom(i,k,j)+a_vflux(i,k)*(fzm(k)*field(i,k,j)+fzp(k)*field(i,k-1,j))
-        a_vflux(i,k) = 0.
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*rom(i,k,j)
+        a_field(i,k-1,j) = a_field(i,k-1,j)+walls(2)*walls(3)
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*walls(4)
+        a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*field(i,k,j)+walls(3)*field(i,k-1,j))
       end do
     end do
+
+    a_vflux(i_start:i_end,kts+1:ktf) = 0.
+
   end do
 endif a_vert_order_test
 ! recdepend vars : its
@@ -519,21 +616,22 @@ j_end = min(jte,jde-1)
 ! recompute vars : j_end
 if (config_flags%open_ye .and. jte .eq. jde) then
   CALL wrf_error_fatal ( ' open_ye == true does not pass AD/TL check' )
-  do i = i_start, i_end
-    a_vb = 0.
-    do k = kts, ktf
-      a_vb = 0.
-      vb = max(0.5*(rv(i,k,jte-1)+rv(i,k,jte)),0.)
+  do k = kts, ktf
+    do i = i_start, i_end
+      walls(2)=0.5*(rv(i,k,jte-1)+rv(i,k,jte))
+      vb = max(walls(2),0.)
 ! recompute : vb
-      a_field(i,k,j_end) = a_field(i,k,j_end)-a_tendency(i,k,j_end)*rdy*(rv(i,k,jte)-rv(i,k,jte-1))
-      a_field_old(i,k,j_end-1) = a_field_old(i,k,j_end-1)+a_tendency(i,k,j_end)*rdy*vb
-      a_field_old(i,k,j_end) = a_field_old(i,k,j_end)-a_tendency(i,k,j_end)*rdy*vb
-      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+a_tendency(i,k,j_end)*rdy*field(i,k,j_end)
-      a_rv(i,k,jte) = a_rv(i,k,jte)-a_tendency(i,k,j_end)*rdy*field(i,k,j_end)
-      a_vb = a_vb-a_tendency(i,k,j_end)*rdy*(field_old(i,k,j_end)-field_old(i,k,j_end-1))
-      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+0.5*a_vb*(0.5+sign(0.5,0.5*(rv(i,k,jte-1)+rv(i,k,jte))-0.))
-      a_rv(i,k,jte) = a_rv(i,k,jte)+0.5*a_vb*(0.5+sign(0.5,0.5*(rv(i,k,jte-1)+rv(i,k,jte))-0.))
-      a_vb = 0.
+      walls(1)=a_tendency(i,k,j_end)*rdy
+      a_field(i,k,j_end) = a_field(i,k,j_end)-walls(1)*(rv(i,k,jte)-rv(i,k,jte-1))
+      a_field_old(i,k,j_end-1) = a_field_old(i,k,j_end-1)+walls(1)*vb
+      a_field_old(i,k,j_end) = a_field_old(i,k,j_end)-walls(1)*vb
+      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+walls(1)*field(i,k,j_end)
+      a_rv(i,k,jte) = a_rv(i,k,jte)-walls(1)*field(i,k,j_end)
+      a_vb = -walls(1)*(field_old(i,k,j_end)-field_old(i,k,j_end-1))
+   
+      walls(1)=0.5*a_vb*(0.5+sign(0.5,walls(2)))
+      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+walls(1)
+      a_rv(i,k,jte)   = a_rv(i,k,jte)  +walls(1)
     end do
   end do
 endif
@@ -549,21 +647,22 @@ i_end = min(ite,ide-1)
 ! recompute vars : i_end
 if (config_flags%open_ys .and. jts .eq. jds) then
   CALL wrf_error_fatal ( ' open_ys == true does not pass AD/TL check' )
-  do i = i_start, i_end
-    a_vb = 0.
-    do k = kts, ktf
-      a_vb = 0.
-      vb = min(0.5*(rv(i,k,jts)+rv(i,k,jts+1)),0.)
+  do k = kts, ktf
+    do i = i_start, i_end
+      walls(2)=0.5*(rv(i,k,jts)+rv(i,k,jts+1))
+      vb = min(walls(2),0.)
 ! recompute : vb
-      a_field(i,k,jts) = a_field(i,k,jts)-a_tendency(i,k,jts)*rdy*(rv(i,k,jts+1)-rv(i,k,jts))
-      a_field_old(i,k,jts+1) = a_field_old(i,k,jts+1)-a_tendency(i,k,jts)*rdy*vb
-      a_field_old(i,k,jts) = a_field_old(i,k,jts)+a_tendency(i,k,jts)*rdy*vb
-      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)-a_tendency(i,k,jts)*rdy*field(i,k,jts)
-      a_rv(i,k,jts) = a_rv(i,k,jts)+a_tendency(i,k,jts)*rdy*field(i,k,jts)
-      a_vb = a_vb-a_tendency(i,k,jts)*rdy*(field_old(i,k,jts+1)-field_old(i,k,jts))
-      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)+0.5*a_vb*(0.5+sign(0.5,0.-0.5*(rv(i,k,jts)+rv(i,k,jts+1))))
-      a_rv(i,k,jts) = a_rv(i,k,jts)+0.5*a_vb*(0.5+sign(0.5,0.-0.5*(rv(i,k,jts)+rv(i,k,jts+1))))
-      a_vb = 0.
+      walls(1)=a_tendency(i,k,jts)*rdy
+      a_field(i,k,jts) = a_field(i,k,jts)-walls(1)*(rv(i,k,jts+1)-rv(i,k,jts))
+      a_field_old(i,k,jts+1) = a_field_old(i,k,jts+1)-walls(1)*vb
+      a_field_old(i,k,jts)   = a_field_old(i,k,jts)+walls(1)*vb
+      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)-walls(1)*field(i,k,jts)
+      a_rv(i,k,jts)   = a_rv(i,k,jts)+walls(1)*field(i,k,jts)
+      a_vb = -walls(1)*(field_old(i,k,jts+1)-field_old(i,k,jts))
+
+      walls(1)=0.5*a_vb*(0.5+sign(0.5,0.-walls(2)))
+      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)+walls(1)
+      a_rv(i,k,jts) = a_rv(i,k,jts)    +walls(1)
     end do
   end do
 endif
@@ -584,21 +683,23 @@ j_end = min(jte,jde-1)
 ! recompute vars : j_end
 if (config_flags%open_xe .and. ite .eq. ide) then
   CALL wrf_error_fatal ( ' open_xe == true does not pass AD/TL check' )
+
   do j = j_start, j_end
-    a_ub = 0.
     do k = kts, ktf
-      a_ub = 0.
-      ub = max(0.5*(ru(ite-1,k,j)+ru(ite,k,j)),0.)
+      walls(2)=0.5*(ru(ite-1,k,j)+ru(ite,k,j))
+      ub = max(walls(2),0.)
 ! recompute : ub
-      a_field(i_end,k,j) = a_field(i_end,k,j)-a_tendency(i_end,k,j)*rdx*(ru(ite,k,j)-ru(ite-1,k,j))
-      a_field_old(i_end-1,k,j) = a_field_old(i_end-1,k,j)+a_tendency(i_end,k,j)*rdx*ub
-      a_field_old(i_end,k,j) = a_field_old(i_end,k,j)-a_tendency(i_end,k,j)*rdx*ub
-      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+a_tendency(i_end,k,j)*rdx*field(i_end,k,j)
-      a_ru(ite,k,j) = a_ru(ite,k,j)-a_tendency(i_end,k,j)*rdx*field(i_end,k,j)
-      a_ub = a_ub-a_tendency(i_end,k,j)*rdx*(field_old(i_end,k,j)-field_old(i_end-1,k,j))
-      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+0.5*a_ub*(0.5+sign(0.5,0.5*(ru(ite-1,k,j)+ru(ite,k,j))-0.))
-      a_ru(ite,k,j) = a_ru(ite,k,j)+0.5*a_ub*(0.5+sign(0.5,0.5*(ru(ite-1,k,j)+ru(ite,k,j))-0.))
-      a_ub = 0.
+      walls(1)=a_tendency(i_end,k,j)*rdx
+      a_field(i_end,k,j) = a_field(i_end,k,j)-walls(1)*(ru(ite,k,j)-ru(ite-1,k,j))
+      a_field_old(i_end-1,k,j) = a_field_old(i_end-1,k,j)+walls(1)*ub
+      a_field_old(i_end,k,j) = a_field_old(i_end,k,j)-walls(1)*ub
+      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+walls(1)*field(i_end,k,j)
+      a_ru(ite,k,j) = a_ru(ite,k,j)-walls(1)*field(i_end,k,j)
+      a_ub =-walls(1)*(field_old(i_end,k,j)-field_old(i_end-1,k,j))
+
+      walls(1)=0.5*a_ub*(0.5+sign(0.5,walls(2)))
+      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+walls(1)
+      a_ru(ite,k,j) = a_ru(ite,k,j)    +walls(1)
     end do
   end do
 endif
@@ -614,21 +715,23 @@ j_end = min(jte,jde-1)
 ! recompute vars : j_end
 if (config_flags%open_xs .and. its .eq. ids) then
   CALL wrf_error_fatal ( ' open_xs == true does not pass AD/TL check' )
+
   do j = j_start, j_end
-    a_ub = 0.
     do k = kts, ktf
-      a_ub = 0.
-      ub = min(0.5*(ru(its,k,j)+ru(its+1,k,j)),0.)
+      walls(2)=0.5*(ru(its,k,j)+ru(its+1,k,j))
+      ub = min(walls(2),0.)
 ! recompute : ub
-      a_field(its,k,j) = a_field(its,k,j)-a_tendency(its,k,j)*rdx*(ru(its+1,k,j)-ru(its,k,j))
-      a_field_old(its+1,k,j) = a_field_old(its+1,k,j)-a_tendency(its,k,j)*rdx*ub
-      a_field_old(its,k,j) = a_field_old(its,k,j)+a_tendency(its,k,j)*rdx*ub
-      a_ru(its+1,k,j) = a_ru(its+1,k,j)-a_tendency(its,k,j)*rdx*field(its,k,j)
-      a_ru(its,k,j) = a_ru(its,k,j)+a_tendency(its,k,j)*rdx*field(its,k,j)
-      a_ub = a_ub-a_tendency(its,k,j)*rdx*(field_old(its+1,k,j)-field_old(its,k,j))
-      a_ru(its+1,k,j) = a_ru(its+1,k,j)+0.5*a_ub*(0.5+sign(0.5,0.-0.5*(ru(its,k,j)+ru(its+1,k,j))))
-      a_ru(its,k,j) = a_ru(its,k,j)+0.5*a_ub*(0.5+sign(0.5,0.-0.5*(ru(its,k,j)+ru(its+1,k,j))))
-      a_ub = 0.
+      walls(1)=a_tendency(its,k,j)*rdx
+      a_field(its,k,j) = a_field(its,k,j)-walls(1)*(ru(its+1,k,j)-ru(its,k,j))
+      a_field_old(its+1,k,j) = a_field_old(its+1,k,j)-walls(1)*ub
+      a_field_old(its,k,j) = a_field_old(its,k,j)+walls(1)*ub
+      a_ru(its+1,k,j) = a_ru(its+1,k,j)-walls(1)*field(its,k,j)
+      a_ru(its,k,j) = a_ru(its,k,j)+walls(1)*field(its,k,j)
+      a_ub =-walls(1)*(field_old(its+1,k,j)-field_old(its,k,j))
+
+      walls(1)=0.5*a_ub*(0.5+sign(0.5,0.-walls(2)))
+      a_ru(its+1,k,j) = a_ru(its+1,k,j)+walls(1)
+      a_ru(its,k,j) = a_ru(its,k,j)    +walls(1)
     end do
   end do
 endif
@@ -715,75 +818,89 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       i = ide-2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*walls(2)
+        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*walls(2)
+        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*walls(2)
+        a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+        a_vel = walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
+      a_fqx(ide-2,kts:ktf) = 0.
+
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
+        kwalls(kts:ktf)=ru(ide-1,kts:ktf,j)
         do k = kts, ktf
-          a_field(i-1,k,j) = a_field(i-1,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*(field(i,k,j)+field(i-1,k,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_field(i-1,k,j) = a_field(i-1,k,j)+walls(1)*kwalls(k)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*kwalls(k)
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(field(i,k,j)+field(i-1,k,j))
         end do
+        a_fqx(ide-1,kts:ktf) = 0.
+
       endif
     endif
+
     if (degrade_xs) then
       i = ids+2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*walls(2)
+        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*walls(2)
+        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*walls(2)
+        a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
+      a_fqx(ids+2,kts:ktf) = 0.
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         do k = kts, ktf
-          a_field(i-1,k,j) = a_field(i-1,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*(field(i,k,j)+field(i-1,k,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_field(i-1,k,j) = a_field(i-1,k,j)+walls(1)*ru(i,k,j)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*ru(i,k,j)
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(field(i,k,j)+field(i-1,k,j))
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
+
       endif
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-3,k,j) = a_field(i-3,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_field(i-2,k,j) = a_field(i-2,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_field(i-1,k,j) = a_field(i-1,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_field(i+2,k,j) = a_field(i+2,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_field(i+1,k,j) = a_field(i+1,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_field(i,k,j) = a_field(i,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(field(i,k,j)+field(i-1,k,j))-0.13333333*(field(i+1,k,j)+field(i-2,k,j))+0.016666667*&
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_field(i-3,k,j) = a_field(i-3,k,j)+0.016666667*walls(2)
+        a_field(i-2,k,j) = a_field(i-2,k,j)-0.13333333*walls(2)
+        a_field(i-1,k,j) = a_field(i-1,k,j)+0.61666667*walls(2)
+        a_field(i+2,k,j) = a_field(i+2,k,j)+0.016666667*walls(2)
+        a_field(i+1,k,j) = a_field(i+1,k,j)-0.13333333*walls(2)
+        a_field(i,k,j) = a_field(i,k,j)+0.61666667*walls(2)
+        a_vel =walls(1)*(0.61666667*(field(i,k,j)+field(i-1,k,j))-0.13333333*(field(i+1,k,j)+field(i-2,k,j))+0.016666667*&
 &(field(i+2,k,j)+field(i-3,k,j)))
-        a_fqx(i,k) = 0.
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts:ktf) = 0.
+
   end do
 ! recdepend vars : its
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2833
@@ -838,83 +955,74 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-3) = a_field(i,k,j-3)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j-2) = a_field(i,k,j-2)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j+2) = a_field(i,k,j+2)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j+1) = a_field(i,k,j+1)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j) = a_field(i,k,j)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(field(i,k,j)+field(i,k,j-1))-0.13333333*(field(i,k,j+1)+field(i,k,j-2))+&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_field(i,k,j-3) = a_field(i,k,j-3)+0.016666667*walls(2)
+          a_field(i,k,j-2) = a_field(i,k,j-2)-0.13333333*walls(2)
+          a_field(i,k,j-1) = a_field(i,k,j-1)+0.61666667*walls(2)
+          a_field(i,k,j+2) = a_field(i,k,j+2)+0.016666667*walls(2)
+          a_field(i,k,j+1) = a_field(i,k,j+1)-0.13333333*walls(2)
+          a_field(i,k,j) = a_field(i,k,j)+0.61666667*walls(2)
+          a_vel =walls(1)*(0.61666667*(field(i,k,j)+field(i,k,j-1))-0.13333333*(field(i,k,j+1)+field(i,k,j-2))+&
 &0.016666667*(field(i,k,j+2)+field(i,k,j-3)))
-          a_fqy(i,k,jp1) = 0.
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*(field(i,k,j)+field(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(1)*rv(i,k,j)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*rv(i,k,j)
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(field(i,k,j)+field(i,k,j-1))
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*walls(2)
+          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*walls(2)
+          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*walls(2)
+          a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2)))
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*(field(i,k,j)+field(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(1)*rv(i,k,j)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*rv(i,k,j)
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(field(i,k,j)+field(i,k,j-1))
         end do
       end do
     else if (j .eq. jde-2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*walls(2)
+          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*walls(2)
+          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*walls(2)
+          a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2)))
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     endif
@@ -944,6 +1052,7 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     degrade_ye =  .false. 
   endif
 ! recompute : degrade_ye
+! ktf=MIN(kte,kde-1)  !ADDED BY WALLS
 ! recompute : ktf
   j_start = jts
 ! recompute : j_start
@@ -954,10 +1063,12 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
   j_end_f = j_end+1
 ! recompute : j_end_f
   if (degrade_ys) then
+!   j_start = MAX(jts,jds+1)     !ADDED BY WALLS
     j_start_f = jds+3
   endif
 ! recompute : j_start_f
   if (degrade_ye) then
+!   j_end = MIN(jte,jde-2)   !ADDED BY WALLS
     j_end_f = jde-3
   endif
 ! recompute : j_end_f
@@ -973,6 +1084,7 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
 ! recompute : i_start_f
   i_end_f = i_end+1
 ! recompute : i_end_f
+
   if (degrade_xs) then
     i_start = max(ids+1,its)
     i_start_f = i_start+2
@@ -982,6 +1094,7 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     i_start_l = i_start - 3
     i_start_f_l = i_start_f - 2
   endif
+
 ! recompute : i_start,i_start_f
   if (degrade_xe) then
     i_end = min(ide-2,ite)
@@ -997,89 +1110,109 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
 #include "HALO_ADJ_ADVECT_SCALAR.inc"
 #endif
 ! recompute : i_end,i_end_f
+
+
+
+
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start_l, i_end_l
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!     do i = i_start_l, i_end_l
+      do i = i_start, i_end   !ADDED BY WALLS
         mrdx = msft(i,j)*rdx
 ! recompute : mrdx
         a_fqx(i+1,k) = a_fqx(i+1,k)-a_tendency(i,k,j)*mrdx
         a_fqx(i,k) = a_fqx(i,k)+a_tendency(i,k,j)*mrdx
       end do
     end do
+
+
+
     if (degrade_xe) then
       i = ide-2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-2,k,j) = a_field(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_field(i,k,j) = a_field(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+0.083333333*&
-&(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_field(i-2,k,j) = a_field(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+0.083333333*&
+&(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*walls(3))
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
+        kwalls(kts:ktf)=ru(ide-1,kts:ktf,j)
         do k = kts, ktf
-          a_field(i-1,k,j) = a_field(i-1,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*(field(i,k,j)+field(i-1,k,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_field(i-1,k,j) = a_field(i-1,k,j)+walls(1)*kwalls(k)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*kwalls(k)
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(field(i,k,j)+field(i-1,k,j))
         end do
+        a_fqx(ide-1,kts:ktf) = 0.
+
       endif
     endif
     if (degrade_xs) then
       i = ids+2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-2,k,j) = a_field(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_field(i,k,j) = a_field(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+0.083333333*&
-&(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_field(i-2,k,j) = a_field(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+0.083333333*&
+&(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*walls(3))
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
+        kwalls(kts:ktf)=ru(ids+1,kts:ktf,j)
         do k = kts, ktf
-          a_field(i-1,k,j) = a_field(i-1,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqx(i,k)*ru(i,k,j)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*(field(i,k,j)+field(i-1,k,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_field(i-1,k,j) = a_field(i-1,k,j)+walls(1)*kwalls(k)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*kwalls(k)
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(field(i,k,j)+field(i-1,k,j))
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
+
       endif
     endif
     do k = kts, ktf
-      a_vel = 0.
-      do i = i_start_f_l, i_end_f_l
-        a_vel = 0.
+!     do i = i_start_f_l, i_end_f_l
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+        DO i = i_start_f, i_end_f  !ADDED BY WALLS
         vel = ru(i,k,j)
 ! recompute : vel
-        a_field(i-3,k,j) = a_field(i-3,k,j)+a_fqx(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-        a_field(i-2,k,j) = a_field(i-2,k,j)+a_fqx(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_fqx(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-        a_field(i+2,k,j) = a_field(i+2,k,j)+a_fqx(i,k)*vel*(0.016666667-0.016666667*sign(1.,vel))
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_fqx(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-        a_field(i,k,j) = a_field(i,k,j)+a_fqx(i,k)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(field(i,k,j)+field(i-1,k,j))-0.13333333*(field(i+1,k,j)+field(i-2,k,j))+0.016666667*&
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_field(i-3,k,j) = a_field(i-3,k,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_field(i-2,k,j) = a_field(i-2,k,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_field(i+2,k,j) = a_field(i+2,k,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel =walls(1)*(0.61666667*(field(i,k,j)+field(i-1,k,j))-0.13333333*(field(i+1,k,j)+field(i-2,k,j))+0.016666667*&
 &(field(i+2,k,j)+field(i-3,k,j))-0.016666667*(field(i+2,k,j)-field(i-3,k,j)-5.*(field(i+1,k,j)-field(i-2,k,j))+10.*&
-&(field(i,k,j)-field(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+&(field(i,k,j)-field(i-1,k,j)))*walls(3))
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel
-        a_vel = 0.
       end do
     end do
   end do
@@ -1146,86 +1279,83 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
-    if (j .ge. j_start_f_l .and. j .le. j_end_f_l) then
+!   if (j .ge. j_start_f_l .and. j .le. j_end_f_l) then
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+!XXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLSXXXWALLS
+    if (j .ge. j_start_f .and. j .le. j_end_f) then    !ADDED BY WALLS
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-3) = a_field(i,k,j-3)+a_fqy(i,k,jp1)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-          a_field(i,k,j-2) = a_field(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-          a_field(i,k,j-1) = a_field(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-          a_field(i,k,j+2) = a_field(i,k,j+2)+a_fqy(i,k,jp1)*vel*(0.016666667-0.016666667*sign(1.,vel))
-          a_field(i,k,j+1) = a_field(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-          a_field(i,k,j) = a_field(i,k,j)+a_fqy(i,k,jp1)*vel*(0.61666667-0.16666667*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(field(i,k,j)+field(i,k,j-1))-0.13333333*(field(i,k,j+1)+field(i,k,j-2))+&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_field(i,k,j-3) = a_field(i,k,j-3)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+          a_field(i,k,j-2) = a_field(i,k,j-2)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+          a_field(i,k,j+2) = a_field(i,k,j+2)+walls(2)*(0.016666667-0.016666667*walls(3))
+          a_field(i,k,j+1) = a_field(i,k,j+1)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+          a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+          a_vel =walls(1)*(0.61666667*(field(i,k,j)+field(i,k,j-1))-0.13333333*(field(i,k,j+1)+field(i,k,j-2))+&
 &0.016666667*(field(i,k,j+2)+field(i,k,j-3))-0.016666667*(field(i,k,j+2)-field(i,k,j-3)-5.*(field(i,k,j+1)-field(i,k,j-2)&
-&)+10.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+&)+10.*(field(i,k,j)-field(i,k,j-1)))*walls(3))
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*(field(i,k,j)+field(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(1)*rv(i,k,j)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*rv(i,k,j)
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(field(i,k,j)+field(i,k,j-1))
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-2) = a_field(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_field(i,k,j-1) = a_field(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_field(i,k,j+1) = a_field(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_field(i,k,j) = a_field(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2))+&
-&0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_field(i,k,j-2) = a_field(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_field(i,k,j+1) = a_field(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2))+&
+&0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*walls(3))
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.5*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*(field(i,k,j)+field(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(1)*rv(i,k,j)
+          a_field(i,k,j) = a_field(i,k,j)+walls(1)*rv(i,k,j)
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(field(i,k,j)+field(i,k,j-1))
         end do
       end do
     else if (j .eq. jde-2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = rv(i,k,j)
 ! recompute : vel
-          a_field(i,k,j-2) = a_field(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_field(i,k,j-1) = a_field(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_field(i,k,j+1) = a_field(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_field(i,k,j) = a_field(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2))+&
-&0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_field(i,k,j-2) = a_field(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_field(i,k,j+1) = a_field(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,j-2))+&
+&0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*walls(3))
           a_rv(i,k,j) = a_rv(i,k,j)+a_vel
-          a_vel = 0.
         end do
       end do
     endif
@@ -1315,41 +1445,41 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j_start-1) = a_field(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_start)
-          a_field(i,k,j_start) = a_field(i,k,j_start)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_start)
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.5*a_fqy(i,k,jp1)*(field(i,k,j_start)+field(i,k,j_start-1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j_start-1) = a_field(i,k,j_start-1)+walls(1)*rv(i,k,j_start)
+          a_field(i,k,j_start) = a_field(i,k,j_start)+walls(1)*rv(i,k,j_start)
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+walls(1)*(field(i,k,j_start)+field(i,k,j_start-1))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j_end+1) = a_field(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_end+1)
-          a_field(i,k,j_end) = a_field(i,k,j_end)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_end+1)
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*(field(i,k,j_end+1)+field(i,k,j_end))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j_end+1) = a_field(i,k,j_end+1)+walls(1)*rv(i,k,j_end+1)
+          a_field(i,k,j_end) = a_field(i,k,j_end)+walls(1)*rv(i,k,j_end+1)
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+walls(1)*(field(i,k,j_end+1)+field(i,k,j_end))
         end do
       end do
     else
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqy(i,k,jp1)*rv(i,k,j)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*rv(i,k,j)
+          a_field(i,k,j-2) = a_field(i,k,j-2)-0.083333333*walls(2)
+          a_field(i,k,j-1) = a_field(i,k,j-1)+0.58333333*walls(2)
+          a_field(i,k,j+1) = a_field(i,k,j+1)-0.083333333*walls(2)
+          a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,&
 &j-2)))
-          a_fqy(i,k,jp1) = 0.
         end do
       end do
     endif
@@ -1398,29 +1528,31 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
       end do
     end do
     if (degrade_xe) then
+      kwalls(kts:ktf)=ru(i_end+1,kts:ktf,j)
       do k = kts, ktf
-        a_field(i_end+1,k,j) = a_field(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*ru(i_end+1,k,j)
-        a_field(i_end,k,j) = a_field(i_end,k,j)+0.5*a_fqx(i_end+1,k)*ru(i_end+1,k,j)
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*(field(i_end+1,k,j)+field(i_end,k,j))
-        a_fqx(i_end+1,k) = 0.
+        walls(1) =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+        a_field(i_end+1,k,j) = a_field(i_end+1,k,j)+walls(1)*kwalls(k)
+        a_field(i_end,k,j) = a_field(i_end,k,j)+walls(1)*kwalls(k)
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+walls(1)*(field(i_end+1,k,j)+field(i_end,k,j))
       end do
     endif
     if (degrade_xs) then
+      kwalls(kts:ktf)=ru(i_start,kts:ktf,j)
       do k = kts, ktf
-        a_field(i_start-1,k,j) = a_field(i_start-1,k,j)+0.5*a_fqx(i_start,k)*ru(i_start,k,j)
-        a_field(i_start,k,j) = a_field(i_start,k,j)+0.5*a_fqx(i_start,k)*ru(i_start,k,j)
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.5*a_fqx(i_start,k)*(field(i_start,k,j)+field(i_start-1,k,j))
-        a_fqx(i_start,k) = 0.
+        walls(1) =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_field(i_start-1,k,j) = a_field(i_start-1,k,j)+walls(1)*kwalls(k)
+        a_field(i_start,k,j) = a_field(i_start,k,j)+walls(1)*kwalls(k)
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+walls(1)*(field(i_start,k,j)+field(i_start-1,k,j))
       end do
     endif
     do k = kts, ktf
       do i = i_start_f, i_end_f
-        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*a_fqx(i,k)*ru(i,k,j)
-        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*a_fqx(i,k)*ru(i,k,j)
-        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*a_fqx(i,k)*ru(i,k,j)
-        a_field(i,k,j) = a_field(i,k,j)+0.58333333*a_fqx(i,k)*ru(i,k,j)
-        a_ru(i,k,j) = a_ru(i,k,j)+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*ru(i,k,j)
+        a_field(i-2,k,j) = a_field(i-2,k,j)-0.083333333*walls(2)
+        a_field(i-1,k,j) = a_field(i-1,k,j)+0.58333333*walls(2)
+        a_field(i+1,k,j) = a_field(i+1,k,j)-0.083333333*walls(2)
+        a_field(i,k,j) = a_field(i,k,j)+0.58333333*walls(2)
+        a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j)))
       end do
     end do
   end do
@@ -1509,41 +1641,41 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j_start-1) = a_field(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_start)
-          a_field(i,k,j_start) = a_field(i,k,j_start)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_start)
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.5*a_fqy(i,k,jp1)*(field(i,k,j_start)+field(i,k,j_start-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j_start-1) = a_field(i,k,j_start-1)+gwalls*rv(i,k,j_start)
+          a_field(i,k,j_start) = a_field(i,k,j_start)+gwalls*rv(i,k,j_start)
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+gwalls*(field(i,k,j_start)+field(i,k,j_start-1))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j_end+1) = a_field(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_end+1)
-          a_field(i,k,j_end) = a_field(i,k,j_end)+0.5*a_fqy(i,k,jp1)*rv(i,k,j_end+1)
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*(field(i,k,j_end+1)+field(i,k,j_end))
-          a_fqy(i,k,jp1) = 0.
+          gwalls =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_field(i,k,j_end+1) = a_field(i,k,j_end+1)+gwalls*rv(i,k,j_end+1)
+          a_field(i,k,j_end) = a_field(i,k,j_end)+gwalls*rv(i,k,j_end+1)
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+gwalls*(field(i,k,j_end+1)+field(i,k,j_end))
         end do
       end do
     else
       do k = kts, ktf
         do i = i_start, i_end
-          a_field(i,k,j-2) = a_field(i,k,j-2)+a_fqy(i,k,jp1)*rv(i,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,rv(i,k,j)))
-          a_field(i,k,j-1) = a_field(i,k,j-1)+a_fqy(i,k,jp1)*rv(i,k,j)*(0.58333333+0.25*sign(1.,rv(i,k,j)))
-          a_field(i,k,j+1) = a_field(i,k,j+1)+a_fqy(i,k,jp1)*rv(i,k,j)*((-0.083333333)+0.083333333*sign(1.,rv(i,k,j)))
-          a_field(i,k,j) = a_field(i,k,j)+a_fqy(i,k,jp1)*rv(i,k,j)*(0.58333333+(-0.25)*sign(1.,rv(i,k,j)))
-          a_rv(i,k,j) = a_rv(i,k,j)+a_fqy(i,k,jp1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*rv(i,k,j)
+          a_field(i,k,j-2) = a_field(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*sign(1.,rv(i,k,j)))
+          a_field(i,k,j-1) = a_field(i,k,j-1)+walls(2)*(0.58333333+0.25*sign(1.,rv(i,k,j)))
+          a_field(i,k,j+1) = a_field(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*sign(1.,rv(i,k,j)))
+          a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*sign(1.,rv(i,k,j)))
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*(0.58333333*(field(i,k,j)+field(i,k,j-1))-0.083333333*(field(i,k,j+1)+field(i,k,&
 &j-2))+0.083333333*(field(i,k,j+1)-field(i,k,j-2)-3.*(field(i,k,j)-field(i,k,j-1)))*sign(1.,rv(i,k,j)))
-          a_fqy(i,k,jp1) = 0.
         end do
       end do
     endif
@@ -1592,30 +1724,32 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
       end do
     end do
     if (degrade_xe) then
+      kwalls(kts:ktf)=ru(i_end+1,kts:ktf,j)
       do k = kts, ktf
-        a_field(i_end+1,k,j) = a_field(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*ru(i_end+1,k,j)
-        a_field(i_end,k,j) = a_field(i_end,k,j)+0.5*a_fqx(i_end+1,k)*ru(i_end+1,k,j)
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*(field(i_end+1,k,j)+field(i_end,k,j))
-        a_fqx(i_end+1,k) = 0.
+        gwalls =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+        a_field(i_end+1,k,j) = a_field(i_end+1,k,j)+gwalls*kwalls(k)
+        a_field(i_end,k,j) = a_field(i_end,k,j)+gwalls*kwalls(k)
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+gwalls*(field(i_end+1,k,j)+field(i_end,k,j))
       end do
     endif
     if (degrade_xs) then
+      kwalls(kts:ktf)=ru(i_start,kts:ktf,j)
       do k = kts, ktf
-        a_field(i_start-1,k,j) = a_field(i_start-1,k,j)+0.5*a_fqx(i_start,k)*ru(i_start,k,j)
-        a_field(i_start,k,j) = a_field(i_start,k,j)+0.5*a_fqx(i_start,k)*ru(i_start,k,j)
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.5*a_fqx(i_start,k)*(field(i_start,k,j)+field(i_start-1,k,j))
-        a_fqx(i_start,k) = 0.
+        gwalls =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_field(i_start-1,k,j) = a_field(i_start-1,k,j)+gwalls*kwalls(k)
+        a_field(i_start,k,j) = a_field(i_start,k,j)+gwalls*kwalls(k)
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+gwalls*(field(i_start,k,j)+field(i_start-1,k,j))
       end do
     endif
     do k = kts, ktf
       do i = i_start_f, i_end_f
-        a_field(i-2,k,j) = a_field(i-2,k,j)+a_fqx(i,k)*ru(i,k,j)*((-0.083333333)+(-0.083333333)*sign(1.,ru(i,k,j)))
-        a_field(i-1,k,j) = a_field(i-1,k,j)+a_fqx(i,k)*ru(i,k,j)*(0.58333333+0.25*sign(1.,ru(i,k,j)))
-        a_field(i+1,k,j) = a_field(i+1,k,j)+a_fqx(i,k)*ru(i,k,j)*((-0.083333333)+0.083333333*sign(1.,ru(i,k,j)))
-        a_field(i,k,j) = a_field(i,k,j)+a_fqx(i,k)*ru(i,k,j)*(0.58333333+(-0.25)*sign(1.,ru(i,k,j)))
-        a_ru(i,k,j) = a_ru(i,k,j)+a_fqx(i,k)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+&
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*ru(i,k,j)
+        a_field(i-2,k,j) = a_field(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*sign(1.,ru(i,k,j)))
+        a_field(i-1,k,j) = a_field(i-1,k,j)+walls(2)*(0.58333333+0.25*sign(1.,ru(i,k,j)))
+        a_field(i+1,k,j) = a_field(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*sign(1.,ru(i,k,j)))
+        a_field(i,k,j) = a_field(i,k,j)+walls(2)*(0.58333333+(-0.25)*sign(1.,ru(i,k,j)))
+        a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*(0.58333333*(field(i,k,j)+field(i-1,k,j))-0.083333333*(field(i+1,k,j)+field(i-2,k,j))+&
 &0.083333333*(field(i+1,k,j)-field(i-2,k,j)-3.*(field(i,k,j)-field(i-1,k,j)))*sign(1.,ru(i,k,j)))
-        a_fqx(i,k) = 0.
       end do
     end do
   end do
@@ -1642,11 +1776,12 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdy = msft(i,j)*rdy
 ! recompute : mrdy
-        a_field(i,k,j-1) = a_field(i,k,j-1)+0.5*a_tendency(i,k,j)*mrdy*rv(i,k,j)
-        a_field(i,k,j+1) = a_field(i,k,j+1)-0.5*a_tendency(i,k,j)*mrdy*rv(i,k,j+1)
-        a_field(i,k,j) = a_field(i,k,j)-0.5*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)-rv(i,k,j))
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.5*a_tendency(i,k,j)*mrdy*(field(i,k,j+1)+field(i,k,j))
-        a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_tendency(i,k,j)*mrdy*(field(i,k,j)+field(i,k,j-1))
+        gwalls=0.5*a_tendency(i,k,j)*mrdy
+        a_field(i,k,j-1) = a_field(i,k,j-1)+gwalls*rv(i,k,j)
+        a_field(i,k,j+1) = a_field(i,k,j+1)-gwalls*rv(i,k,j+1)
+        a_field(i,k,j) = a_field(i,k,j)-gwalls*(rv(i,k,j+1)-rv(i,k,j))
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-gwalls*(field(i,k,j+1)+field(i,k,j))
+        a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(field(i,k,j)+field(i,k,j-1))
       end do
     end do
   end do
@@ -1691,11 +1826,12 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdx = msft(i,j)*rdx
 ! recompute : mrdx
-        a_field(i-1,k,j) = a_field(i-1,k,j)+0.5*a_tendency(i,k,j)*mrdx*ru(i,k,j)
-        a_field(i+1,k,j) = a_field(i+1,k,j)-0.5*a_tendency(i,k,j)*mrdx*ru(i+1,k,j)
-        a_field(i,k,j) = a_field(i,k,j)-0.5*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)-ru(i,k,j))
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.5*a_tendency(i,k,j)*mrdx*(field(i+1,k,j)+field(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_tendency(i,k,j)*mrdx*(field(i,k,j)+field(i-1,k,j))
+        gwalls=0.5*a_tendency(i,k,j)*mrdx
+        a_field(i-1,k,j) = a_field(i-1,k,j)+gwalls*ru(i,k,j)
+        a_field(i+1,k,j) = a_field(i+1,k,j)-gwalls*ru(i+1,k,j)
+        a_field(i,k,j) = a_field(i,k,j)-gwalls*(ru(i+1,k,j)-ru(i,k,j))
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-gwalls*(field(i+1,k,j)+field(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(field(i,k,j)+field(i-1,k,j))
       end do
     end do
   end do
@@ -1810,21 +1946,18 @@ real vb
 real vel
 integer vert_order
 real vw
+real walls(7),gwalls
+real iwalls(ims:ime)
+real kwalls(kms:kme)
 
    call trace_entry("a_advect_u")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_dvm = 0.
-a_dvp = 0.
 a_fqx(:,:) = 0.
 a_fqy(:,:,:) = 0.
-a_ub = 0.
-a_vb = 0.
-a_vel = 0.
 a_vflux(:,:) = 0.
-a_vw = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -1872,35 +2005,47 @@ endif
 a_vert_order_test: if (vert_order .eq. 6) then
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
+
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
-      a_vel = 0.
+      
       k = ktf-1
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i-1,k,j))
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(5)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(6)
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1251
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)
+      a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*walls(2)
+      a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*walls(2)
+      a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+      a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1251
 ! recompute vars : k
@@ -1908,7 +2053,7 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1246
 ! recompute vars : k
@@ -1919,12 +2064,14 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i-1,k,j))
 ! recompute vars : vel
-      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)
+      a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*walls(2)
+      a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*walls(2)
+      a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+      a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1246
 ! recompute vars : k
@@ -1932,72 +2079,88 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1243
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(3)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i-1,k,j)+rom(i,k,j))
 ! recompute : vel
-        a_u(i,k-3,j) = a_u(i,k-3,j)+0.016666667*a_vflux(i,k)*vel
-        a_u(i,k-2,j) = a_u(i,k-2,j)-0.13333333*a_vflux(i,k)*vel
-        a_u(i,k-1,j) = a_u(i,k-1,j)+0.61666667*a_vflux(i,k)*vel
-        a_u(i,k+2,j) = a_u(i,k+2,j)+0.016666667*a_vflux(i,k)*vel
-        a_u(i,k+1,j) = a_u(i,k+1,j)-0.13333333*a_vflux(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.61666667*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(u(i,k,j)+u(i,k-1,j))-0.13333333*(u(i,k+1,j)+u(i,k-2,j))+0.016666667*(u(i,k+2,j)+&
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i,k-3,j) = a_u(i,k-3,j)+0.016666667*walls(2)
+        a_u(i,k-2,j) = a_u(i,k-2,j)-0.13333333*walls(2)
+        a_u(i,k-1,j) = a_u(i,k-1,j)+0.61666667*walls(2)
+        a_u(i,k+2,j) = a_u(i,k+2,j)+0.016666667*walls(2)
+        a_u(i,k+1,j) = a_u(i,k+1,j)-0.13333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.61666667*walls(2)
+        a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i,k-1,j))-0.13333333*(u(i,k+1,j)+u(i,k-2,j))+0.016666667*(u(i,k+2,j)+&
 &u(i,k-3,j)))
-        a_vflux(i,k) = 0.
         a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
   end do
 else if (vert_order .eq. 5) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(4)=fzp(kts+1); walls(7)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf-1
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i-1,k,j))
+      walls(3)=sign(1.,-vel)
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(5)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(6)
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1291
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_u(i,k-2,j) = a_u(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_u(i,k+1,j) = a_u(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_u(i,k,j) = a_u(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-u(i,&
-&k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_u(i,k-2,j) = a_u(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_u(i,k+1,j) = a_u(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-u(i,&
+&k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*walls(3))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1291
 ! recompute vars : k
@@ -2005,7 +2168,7 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1286
 ! recompute vars : k
@@ -2016,13 +2179,16 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i-1,k,j))
 ! recompute vars : vel
-      a_u(i,k-2,j) = a_u(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_u(i,k+1,j) = a_u(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_u(i,k,j) = a_u(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-u(i,&
-&k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(3)=sign(1.,-vel)
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_u(i,k-2,j) = a_u(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_u(i,k+1,j) = a_u(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-u(i,&
+&k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*walls(3))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1286
 ! recompute vars : k
@@ -2030,147 +2196,195 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1283
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(7)*u(i,k,j)+walls(4)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(7)*u(i,k,j)+walls(4)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(4)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(7)
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i-1,k,j)+rom(i,k,j))
 ! recompute : vel
-        a_u(i,k-3,j) = a_u(i,k-3,j)+a_vflux(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,-vel))
-        a_u(i,k-2,j) = a_u(i,k-2,j)+a_vflux(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,-vel))
-        a_u(i,k-1,j) = a_u(i,k-1,j)+a_vflux(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,-vel))
-        a_u(i,k+2,j) = a_u(i,k+2,j)+a_vflux(i,k)*vel*(0.016666667-0.016666667*sign(1.,-vel))
-        a_u(i,k+1,j) = a_u(i,k+1,j)+a_vflux(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,-vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_vflux(i,k)*vel*(0.61666667-0.16666667*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(u(i,k,j)+u(i,k-1,j))-0.13333333*(u(i,k+1,j)+u(i,k-2,j))+0.016666667*(u(i,k+2,j)+&
-&u(i,k-3,j))-0.016666667*(u(i,k+2,j)-u(i,k-3,j)-5.*(u(i,k+1,j)-u(i,k-2,j))+10.*(u(i,k,j)-u(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i,k-3,j) = a_u(i,k-3,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_u(i,k-2,j) = a_u(i,k-2,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_u(i,k-1,j) = a_u(i,k-1,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_u(i,k+2,j) = a_u(i,k+2,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_u(i,k+1,j) = a_u(i,k+1,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i,k-1,j))-0.13333333*(u(i,k+1,j)+u(i,k-2,j))+0.016666667*(u(i,k+2,j)+&
+&u(i,k-3,j))-0.016666667*(u(i,k+2,j)-u(i,k-3,j)-5.*(u(i,k+1,j)-u(i,k-2,j))+10.*(u(i,k,j)-u(i,k-1,j)))*walls(3))
         a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
+
   end do
 else if (vert_order .eq. 4) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(5)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(6)
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1323
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(3)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i-1,k,j)+rom(i,k,j))
 ! recompute : vel
-        a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-        a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-        a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
-        a_vflux(i,k) = 0.
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i,k-2,j) = a_u(i,k-2,j)-0.083333333*walls(2)
+        a_u(i,k-1,j) = a_u(i,k-1,j)+0.58333333*walls(2)
+        a_u(i,k+1,j) = a_u(i,k+1,j)-0.083333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j)))
         a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 3) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*u(i,k,j)+walls(5)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(5)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(6)
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1353
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-      a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-      a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+      a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(3)
+      a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i-1,k,j)+rom(i,k,j))
 ! recompute : vel
-        a_u(i,k-2,j) = a_u(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-        a_u(i,k-1,j) = a_u(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-        a_u(i,k+1,j) = a_u(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-&
-&u(i,k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i,k-2,j) = a_u(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_u(i,k-1,j) = a_u(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_u(i,k+1,j) = a_u(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k-1,j))-0.083333333*(u(i,k+1,j)+u(i,k-2,j))+0.083333333*(u(i,k+1,j)-&
+&u(i,k-2,j)-3.*(u(i,k,j)-u(i,k-1,j)))*walls(3))
         a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 2) then a_vert_order_test
   do j = j_start, j_end
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
     do k = kts+1, ktf
+      walls(3)=fzp(k); walls(4)=fzm(k)
       do i = i_start, i_end
-        a_rom(i-1,k,j) = a_rom(i-1,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-        a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*u(i,k,j)+fzp(k)*u(i,k-1,j))
-        a_u(i,k-1,j) = a_u(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzp(k)
-        a_u(i,k,j) = a_u(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i-1,k,j))*fzm(k)
-        a_vflux(i,k) = 0.
+        walls(1)=0.5*a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        a_rom(i-1,k,j) = a_rom(i-1,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+        a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*u(i,k,j)+walls(3)*u(i,k-1,j))
+        a_u(i,k-1,j) = a_u(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(3)
+        a_u(i,k,j) = a_u(i,k,j)+walls(1)*(rom(i,k,j)+rom(i-1,k,j))*walls(4)
       end do
     end do
+
+    a_vflux(i_start:i_end,kts+1:ktf) = 0.
+
   end do
 endif a_vert_order_test
 ! recdepend vars : its
@@ -2198,11 +2412,7 @@ if (config_flags%open_xe) then
 endif
 ! recompute vars : i_end
 if (config_flags%open_ye .and. jte .eq. jde) then
-  do i = i_start, i_end
-    a_dvm = 0.
-    a_dvp = 0.
-    a_vb = 0.
-    a_vw = 0.
+  do i = i_start, i_end  !!! How to swap i,k circulations?
     mrdy = msfu(i,jte-1)*rdy
 ! recompute : mrdy
     ip = min(imax,i)
@@ -2210,10 +2420,6 @@ if (config_flags%open_ye .and. jte .eq. jde) then
     im = max(imin,i-1)
 ! recompute : im
     do k = kts, ktf
-      a_dvm = 0.
-      a_dvp = 0.
-      a_vb = 0.
-      a_vw = 0.
       vw = 0.5*(rv(ip,k,jte)+rv(im,k,jte))
 ! recompute : vw
       vb = max(vw,0.)
@@ -2222,23 +2428,20 @@ if (config_flags%open_ye .and. jte .eq. jde) then
 ! recompute : dvm
       dvp = rv(im,k,jte)-rv(im,k,jte-1)
 ! recompute : dvp
-      a_dvm = a_dvm-0.5*a_tendency(i,k,jte-1)*mrdy*u(i,k,jte-1)
-      a_dvp = a_dvp-0.5*a_tendency(i,k,jte-1)*mrdy*u(i,k,jte-1)
-      a_u(i,k,jte-1) = a_u(i,k,jte-1)-0.5*a_tendency(i,k,jte-1)*mrdy*(dvm+dvp)
-      a_u_old(i,k,jte-2) = a_u_old(i,k,jte-2)+a_tendency(i,k,jte-1)*mrdy*vb
-      a_u_old(i,k,jte-1) = a_u_old(i,k,jte-1)-a_tendency(i,k,jte-1)*mrdy*vb
-      a_vb = a_vb-a_tendency(i,k,jte-1)*mrdy*(u_old(i,k,jte-1)-u_old(i,k,jte-2))
+      gwalls=a_tendency(i,k,jte-1)*mrdy
+      a_dvm = -0.5*gwalls*u(i,k,jte-1)
+      a_dvp = -0.5*gwalls*u(i,k,jte-1)
+      a_u(i,k,jte-1) = a_u(i,k,jte-1)-0.5*gwalls*(dvm+dvp)
+      a_u_old(i,k,jte-2) = a_u_old(i,k,jte-2)+gwalls*vb
+      a_u_old(i,k,jte-1) = a_u_old(i,k,jte-1)-gwalls*vb
+      a_vb = -gwalls*(u_old(i,k,jte-1)-u_old(i,k,jte-2))
       a_rv(im,k,jte-1) = a_rv(im,k,jte-1)-a_dvp
       a_rv(im,k,jte) = a_rv(im,k,jte)+a_dvp
-      a_dvp = 0.
       a_rv(ip,k,jte-1) = a_rv(ip,k,jte-1)-a_dvm
       a_rv(ip,k,jte) = a_rv(ip,k,jte)+a_dvm
-      a_dvm = 0.
-      a_vw = a_vw+a_vb*(0.5+sign(0.5,vw-0.))
-      a_vb = 0.
-      a_rv(im,k,jte) = a_rv(im,k,jte)+0.5*a_vw
-      a_rv(ip,k,jte) = a_rv(ip,k,jte)+0.5*a_vw
-      a_vw = 0.
+      a_vw = 0.5*a_vb*(0.5+sign(0.5,vw-0.))
+      a_rv(im,k,jte) = a_rv(im,k,jte)+a_vw
+      a_rv(ip,k,jte) = a_rv(ip,k,jte)+a_vw
     end do
   end do
 endif
@@ -2268,10 +2471,6 @@ endif
 ! recompute vars : i_end
 if (config_flags%open_ys .and. jts .eq. jds) then
   do i = i_start, i_end
-    a_dvm = 0.
-    a_dvp = 0.
-    a_vb = 0.
-    a_vw = 0.
     mrdy = msfu(i,jts)*rdy
 ! recompute : mrdy
     ip = min(imax,i)
@@ -2279,10 +2478,6 @@ if (config_flags%open_ys .and. jts .eq. jds) then
     im = max(imin,i-1)
 ! recompute : im
     do k = kts, ktf
-      a_dvm = 0.
-      a_dvp = 0.
-      a_vb = 0.
-      a_vw = 0.
       vw = 0.5*(rv(ip,k,jts)+rv(im,k,jts))
 ! recompute : vw
       vb = min(vw,0.)
@@ -2291,23 +2486,20 @@ if (config_flags%open_ys .and. jts .eq. jds) then
 ! recompute : dvm
       dvp = rv(im,k,jts+1)-rv(im,k,jts)
 ! recompute : dvp
-      a_dvm = a_dvm-0.5*a_tendency(i,k,jts)*mrdy*u(i,k,jts)
-      a_dvp = a_dvp-0.5*a_tendency(i,k,jts)*mrdy*u(i,k,jts)
-      a_u(i,k,jts) = a_u(i,k,jts)-0.5*a_tendency(i,k,jts)*mrdy*(dvm+dvp)
-      a_u_old(i,k,jts+1) = a_u_old(i,k,jts+1)-a_tendency(i,k,jts)*mrdy*vb
-      a_u_old(i,k,jts) = a_u_old(i,k,jts)+a_tendency(i,k,jts)*mrdy*vb
-      a_vb = a_vb-a_tendency(i,k,jts)*mrdy*(u_old(i,k,jts+1)-u_old(i,k,jts))
+      gwalls=a_tendency(i,k,jts)
+      a_dvm = -0.5*gwalls*mrdy*u(i,k,jts)
+      a_dvp = -0.5*gwalls*mrdy*u(i,k,jts)
+      a_u(i,k,jts) = a_u(i,k,jts)-0.5*gwalls*mrdy*(dvm+dvp)
+      a_u_old(i,k,jts+1) = a_u_old(i,k,jts+1)-gwalls*mrdy*vb
+      a_u_old(i,k,jts) = a_u_old(i,k,jts)+gwalls*mrdy*vb
+      a_vb = -gwalls*mrdy*(u_old(i,k,jts+1)-u_old(i,k,jts))
       a_rv(im,k,jts+1) = a_rv(im,k,jts+1)+a_dvp
       a_rv(im,k,jts) = a_rv(im,k,jts)-a_dvp
-      a_dvp = 0.
       a_rv(ip,k,jts+1) = a_rv(ip,k,jts+1)+a_dvm
       a_rv(ip,k,jts) = a_rv(ip,k,jts)-a_dvm
-      a_dvm = 0.
-      a_vw = a_vw+a_vb*(0.5+sign(0.5,0.-vw))
-      a_vb = 0.
-      a_rv(im,k,jts) = a_rv(im,k,jts)+0.5*a_vw
-      a_rv(ip,k,jts) = a_rv(ip,k,jts)+0.5*a_vw
-      a_vw = 0.
+      a_vw = 0.5*a_vb*(0.5+sign(0.5,0.-vw))
+      a_rv(im,k,jts) = a_rv(im,k,jts)+a_vw
+      a_rv(ip,k,jts) = a_rv(ip,k,jts)+a_vw
     end do
   end do
 endif
@@ -2317,17 +2509,17 @@ if (config_flags%open_xe .and. ite .eq. ide) then
   j_end = min(jte,jde-1)
 ! recompute : j_end
   do j = j_start, j_end
-    a_ub = 0.
     do k = kts, ktf
-      a_ub = 0.
       ub = max(ru(ite,k,j)+cb*mut(ite-1,j),0.)
 ! recompute : ub
-      a_u_old(ite-1,k,j) = a_u_old(ite-1,k,j)+a_tendency(ite,k,j)*rdx*ub
-      a_u_old(ite,k,j) = a_u_old(ite,k,j)-a_tendency(ite,k,j)*rdx*ub
-      a_ub = a_ub-a_tendency(ite,k,j)*rdx*(u_old(ite,k,j)-u_old(ite-1,k,j))
-      a_mut(ite-1,j) = a_mut(ite-1,j)+a_ub*(0.5+sign(0.5,ru(ite,k,j)+cb*mut(ite-1,j)-0.))*cb
-      a_ru(ite,k,j) = a_ru(ite,k,j)+a_ub*(0.5+sign(0.5,ru(ite,k,j)+cb*mut(ite-1,j)-0.))
-      a_ub = 0.
+      gwalls=a_tendency(ite,k,j)*rdx
+      a_u_old(ite-1,k,j) = a_u_old(ite-1,k,j)+gwalls*ub
+      a_u_old(ite,k,j) = a_u_old(ite,k,j)-gwalls*ub
+      a_ub =-gwalls*(u_old(ite,k,j)-u_old(ite-1,k,j))
+
+      gwalls=a_ub*(0.5+sign(0.5,ru(ite,k,j)+cb*mut(ite-1,j)-0.))
+      a_mut(ite-1,j) = a_mut(ite-1,j)+gwalls*cb
+      a_ru(ite,k,j)  = a_ru(ite,k,j) +gwalls
     end do
   end do
 endif
@@ -2337,17 +2529,17 @@ if (config_flags%open_xs .and. its .eq. ids) then
   j_end = min(jte,jde-1)
 ! recompute : j_end
   do j = j_start, j_end
-    a_ub = 0.
     do k = kts, ktf
-      a_ub = 0.
       ub = min(ru(its,k,j)-cb*mut(its,j),0.)
 ! recompute : ub
-      a_u_old(its+1,k,j) = a_u_old(its+1,k,j)-a_tendency(its,k,j)*rdx*ub
-      a_u_old(its,k,j) = a_u_old(its,k,j)+a_tendency(its,k,j)*rdx*ub
-      a_ub = a_ub-a_tendency(its,k,j)*rdx*(u_old(its+1,k,j)-u_old(its,k,j))
-      a_mut(its,j) = a_mut(its,j)-a_ub*(0.5+sign(0.5,0.-(ru(its,k,j)-cb*mut(its,j))))*cb
-      a_ru(its,k,j) = a_ru(its,k,j)+a_ub*(0.5+sign(0.5,0.-(ru(its,k,j)-cb*mut(its,j))))
-      a_ub = 0.
+      gwalls=a_tendency(its,k,j)*rdx
+      a_u_old(its+1,k,j) = a_u_old(its+1,k,j)-gwalls*ub
+      a_u_old(its,k,j)   = a_u_old(its,k,j)+gwalls*ub
+      a_ub =-gwalls*(u_old(its+1,k,j)-u_old(its,k,j))
+
+      gwalls=a_ub*(0.5+sign(0.5,0.-(ru(its,k,j)-cb*mut(its,j))))
+      a_mut(its,j)  = a_mut(its,j) -gwalls*cb
+      a_ru(its,k,j) = a_ru(its,k,j)+gwalls
     end do
   end do
 endif
@@ -2424,109 +2616,118 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       end do
     end do
     if (degrade_xe) then
-      do k = kts, ktf
-        a_vel = 0.
-        i = ide-1
+      i = ide-1
 ! recompute : i
+      do k = kts, ktf
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*walls(2)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*walls(2)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+      a_fqx(ide-1,kts:ktf) = 0.
+
       if (i_end .eq. ide-1) then
         i = ide
 ! recompute : i
         do k = kts, ktf
-          a_ub = 0.
           ub = u(i,k,j)
 ! recompute : ub
           if (specified .and. u(i-1,k,j) .gt. 0.) then
             ub = u(i-1,k,j)
           endif
 ! recompute : ub
-          a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-          a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i-1,k,j)+ub)
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i-1,k,j)+ub)
+          a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+          a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
           if (specified .and. u(i-1,k,j) .gt. 0.) then
             a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-            a_ub = 0.
+          else
+            a_u(i,k,j) = a_u(i,k,j)+a_ub
           endif
-          a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
         end do
+        a_fqx(ide,kts:ktf) = 0.
+
       endif
     endif
     if (degrade_xs) then
       i = ids+2
+!     kwalls(kts:ktf)=0.5*(ru(ids+2,kts:ktf,j)+ru(ids+1,kts:ktf,j))
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*walls(2)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*walls(2)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+      a_fqx(ids+2,kts:ktf) = 0.
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         do k = kts, ktf
-          a_ub = 0.
           ub = u(i-1,k,j)
 ! recompute : ub
           if (specified .and. u(i,k,j) .lt. 0.) then
             ub = u(i,k,j)
           endif
 ! recompute : ub
-          a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+ub)
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i,k,j)+ub)
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+          a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
           if (specified .and. u(i,k,j) .lt. 0.) then
             a_u(i,k,j) = a_u(i,k,j)+a_ub
-            a_ub = 0.
+          else
+            a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
           endif
-          a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-          a_ub = 0.
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
+
       endif
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-3,k,j) = a_u(i-3,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_u(i+2,k,j) = a_u(i+2,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(u(i,k,j)+u(i-1,k,j))-0.13333333*(u(i+1,k,j)+u(i-2,k,j))+0.016666667*(u(i+2,k,j)+u(i-&
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i-3,k,j) = a_u(i-3,k,j)+0.016666667*walls(2)
+        a_u(i-2,k,j) = a_u(i-2,k,j)-0.13333333*walls(2)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+0.61666667*walls(2)
+        a_u(i+2,k,j) = a_u(i+2,k,j)+0.016666667*walls(2)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.13333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.61666667*walls(2)
+        a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i-1,k,j))-0.13333333*(u(i+1,k,j)+u(i-2,k,j))+0.016666667*(u(i+2,k,j)+u(i-&
 &3,k,j)))
-        a_fqx(i,k) = 0.
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts:ktf) = 0.
+
   end do
 ! recdepend vars : its
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:249
@@ -2595,88 +2796,79 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfu(i,j-1)*rdy
+          mrdy = msfu(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-3) = a_u(i,k,j-3)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j+2) = a_u(i,k,j+2)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j+1) = a_u(i,k,j+1)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j) = a_u(i,k,j)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_u(i,k,j-3) = a_u(i,k,j-3)+0.016666667*walls(2)
+          a_u(i,k,j-2) = a_u(i,k,j-2)-0.13333333*walls(2)
+          a_u(i,k,j-1) = a_u(i,k,j-1)+0.61666667*walls(2)
+          a_u(i,k,j+2) = a_u(i,k,j+2)+0.016666667*walls(2)
+          a_u(i,k,j+1) = a_u(i,k,j+1)-0.13333333*walls(2)
+          a_u(i,k,j) = a_u(i,k,j)+0.61666667*walls(2)
+          a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)&
 &+u(i,k,j-3)))
-          a_fqy(i,k,jp1) = 0.
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j) = a_rv(i-1,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*walls(2)
+          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*walls(2)
+          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*walls(2)
+          a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j) = a_rv(i-1,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
         end do
       end do
     else if (j .eq. jde-2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*walls(2)
+          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*walls(2)
+          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*walls(2)
+          a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     endif
@@ -2755,108 +2947,108 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     end do
     if (degrade_xe) then
       do k = kts, ktf
-        a_vel = 0.
         i = ide-1
 ! recompute : i
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_u(i+1,k,j) = a_u(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
-&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_u(i-2,k,j) = a_u(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_u(i+1,k,j) = a_u(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
+&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*walls(3))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+
       if (i_end .eq. ide-1) then
         i = ide
 ! recompute : i
         do k = kts, ktf
-          a_ub = 0.
           ub = u(i,k,j)
 ! recompute : ub
           if (specified .and. u(i-1,k,j) .gt. 0.) then
             ub = u(i-1,k,j)
           endif
 ! recompute : ub
-          a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-          a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i-1,k,j)+ub)
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i-1,k,j)+ub)
+          a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+          a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
           if (specified .and. u(i-1,k,j) .gt. 0.) then
             a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-            a_ub = 0.
+          else
+            a_u(i,k,j) = a_u(i,k,j)+a_ub
           endif
-          a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
         end do
+        a_fqx(ide,kts:ktf) = 0.
+
       endif
     endif
     if (degrade_xs) then
       i = ids+2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_u(i+1,k,j) = a_u(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
-&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_u(i-2,k,j) = a_u(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_u(i+1,k,j) = a_u(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
+&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*walls(3))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         do k = kts, ktf
-          a_ub = 0.
           ub = u(i-1,k,j)
 ! recompute : ub
           if (specified .and. u(i,k,j) .lt. 0.) then
             ub = u(i,k,j)
           endif
 ! recompute : ub
-          a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+ub)
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i,k,j)+ub)
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+          a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
           if (specified .and. u(i,k,j) .lt. 0.) then
             a_u(i,k,j) = a_u(i,k,j)+a_ub
-            a_ub = 0.
+          else
+            a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
           endif
-          a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-          a_ub = 0.
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
+
       endif
     endif
     do k = kts, ktf
-      a_vel = 0.
+      
       do i = i_start_f, i_end_f
-        a_vel = 0.
+        
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-3,k,j) = a_u(i-3,k,j)+a_fqx(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-        a_u(i-2,k,j) = a_u(i-2,k,j)+a_fqx(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_fqx(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-        a_u(i+2,k,j) = a_u(i+2,k,j)+a_fqx(i,k)*vel*(0.016666667-0.016666667*sign(1.,vel))
-        a_u(i+1,k,j) = a_u(i+1,k,j)+a_fqx(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_fqx(i,k)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(u(i,k,j)+u(i-1,k,j))-0.13333333*(u(i+1,k,j)+u(i-2,k,j))+0.016666667*(u(i+2,k,j)+u(i-&
-&3,k,j))-0.016666667*(u(i+2,k,j)-u(i-3,k,j)-5.*(u(i+1,k,j)-u(i-2,k,j))+10.*(u(i,k,j)-u(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_u(i-3,k,j) = a_u(i-3,k,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_u(i-2,k,j) = a_u(i-2,k,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_u(i+2,k,j) = a_u(i+2,k,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_u(i+1,k,j) = a_u(i+1,k,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i-1,k,j))-0.13333333*(u(i+1,k,j)+u(i-2,k,j))+0.016666667*(u(i+2,k,j)+u(i-&
+&3,k,j))-0.016666667*(u(i+2,k,j)-u(i-3,k,j)-5.*(u(i+1,k,j)-u(i-2,k,j))+10.*(u(i,k,j)-u(i-1,k,j)))*walls(3))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
+        
       end do
     end do
   end do
@@ -2927,90 +3119,83 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfu(i,j-1)*rdy
+          mrdy = msfu(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-3) = a_u(i,k,j-3)+a_fqy(i,k,jp1)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-          a_u(i,k,j-2) = a_u(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-          a_u(i,k,j+2) = a_u(i,k,j+2)+a_fqy(i,k,jp1)*vel*(0.016666667-0.016666667*sign(1.,vel))
-          a_u(i,k,j+1) = a_u(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-          a_u(i,k,j) = a_u(i,k,j)+a_fqy(i,k,jp1)*vel*(0.61666667-0.16666667*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)&
-&+u(i,k,j-3))-0.016666667*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_u(i,k,j-3) = a_u(i,k,j-3)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+          a_u(i,k,j-2) = a_u(i,k,j-2)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+          a_u(i,k,j+2) = a_u(i,k,j+2)+walls(2)*(0.016666667-0.016666667*walls(3))
+          a_u(i,k,j+1) = a_u(i,k,j+1)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+          a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+          a_vel =walls(1)*(0.61666667*(u(i,k,j)+u(i,k,j-1))-0.13333333*(u(i,k,j+1)+u(i,k,j-2))+0.016666667*(u(i,k,j+2)&
+&+u(i,k,j-3))-0.016666667*(u(i,k,j+2)-u(i,k,j-3)-5.*(u(i,k,j+1)-u(i,k,j-2))+10.*(u(i,k,j)-u(i,k,j-1)))*walls(3))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j) = a_rv(i-1,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_u(i,k,j+1) = a_u(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_u(i,k,j) = a_u(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
-&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_u(i,k,j-2) = a_u(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_u(i,k,j+1) = a_u(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
+&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*walls(3))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(u(i,k,j)+u(i,k,j-1))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i-1,k,j))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j) = a_rv(i-1,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
+          a_u(i,k,j) = a_u(i,k,j)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
         end do
       end do
     else if (j .eq. jde-2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_u(i,k,j+1) = a_u(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_u(i,k,j) = a_u(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
-&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_u(i,k,j-2) = a_u(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_u(i,k,j+1) = a_u(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
+&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*walls(3))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     endif
@@ -3106,49 +3291,46 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfu(i,j-1)*rdy
+          mrdy = msfu(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j_start) = a_rv(i-1,k,j_start)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_start)+u(i,k,j_start-1))
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_start)+u(i,k,j_start-1))
-          a_u(i,k,j_start-1) = a_u(i,k,j_start-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_start)+rv(i-1,k,j_start))
-          a_u(i,k,j_start) = a_u(i,k,j_start)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_start)+rv(i-1,k,j_start))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j_start) = a_rv(i-1,k,j_start)+gwalls*(u(i,k,j_start)+u(i,k,j_start-1))
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+gwalls*(u(i,k,j_start)+u(i,k,j_start-1))
+          a_u(i,k,j_start-1) = a_u(i,k,j_start-1)+gwalls*(rv(i,k,j_start)+rv(i-1,k,j_start))
+          a_u(i,k,j_start) = a_u(i,k,j_start)+gwalls*(rv(i,k,j_start)+rv(i-1,k,j_start))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j_end+1) = a_rv(i-1,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_end+1)+u(i,k,j_end))
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_end+1)+u(i,k,j_end))
-          a_u(i,k,j_end+1) = a_u(i,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
-          a_u(i,k,j_end) = a_u(i,k,j_end)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j_end+1) = a_rv(i-1,k,j_end+1)+gwalls*(u(i,k,j_end+1)+u(i,k,j_end))
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+gwalls*(u(i,k,j_end+1)+u(i,k,j_end))
+          a_u(i,k,j_end+1) = a_u(i,k,j_end+1)+gwalls*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
+          a_u(i,k,j_end) = a_u(i,k,j_end)+gwalls*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
         end do
       end do
     else
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_u(i,k,j-2) = a_u(i,k,j-2)-0.083333333*walls(2)
+          a_u(i,k,j-1) = a_u(i,k,j-1)+0.58333333*walls(2)
+          a_u(i,k,j+1) = a_u(i,k,j+1)-0.083333333*walls(2)
+          a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2)))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     endif
@@ -3196,71 +3378,75 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
         a_fqx(i,k) = a_fqx(i,k)+a_tendency(i,k,j)*mrdx
       end do
     end do
+
     if (degrade_xe) then
       i = i_end+1
 ! recompute : i
       do k = kts, ktf
-        a_ub = 0.
         ub = u(i,k,j)
 ! recompute : ub
         if (specified .and. u(i-1,k,j) .gt. 0.) then
           ub = u(i-1,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-        a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_fqx(i,k) = 0.
+        gwalls=0.25*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i-1,k,j)+ub)
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i-1,k,j)+ub)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
         if (specified .and. u(i-1,k,j) .gt. 0.) then
           a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i,k,j) = a_u(i,k,j)+a_ub
         endif
-        a_u(i,k,j) = a_u(i,k,j)+a_ub
-        a_ub = 0.
       end do
+      a_fqx(i_end+1,kts:ktf) = 0.
     endif
+
     if (degrade_xs) then
       i = i_start
 ! recompute : i
       do k = kts, ktf
-        a_ub = 0.
         ub = u(i-1,k,j)
 ! recompute : ub
         if (specified .and. u(i,k,j) .lt. 0.) then
           ub = u(i,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-        a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-        a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_fqx(i,k) = 0.
+        gwalls=0.25*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+ub)
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i,k,j)+ub)
+        a_u(i,k,j) = a_u(i,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
         if (specified .and. u(i,k,j) .lt. 0.) then
           a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
         endif
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-        a_ub = 0.
       end do
+      a_fqx(i_start,kts:ktf) = 0.
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_u(i,k,j) = a_u(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_u(i-2,k,j) = a_u(i-2,k,j)-0.083333333*walls(2)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+0.58333333*walls(2)
+        a_u(i+1,k,j) = a_u(i+1,k,j)-0.083333333*walls(2)
+        a_u(i,k,j) = a_u(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j)))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts:ktf) = 0.
+
   end do
 else if (horz_order .eq. 3) then a_horizontal_order_test
   degrade_xs =  .true. 
@@ -3353,50 +3539,47 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfu(i,j-1)*rdy
+          mrdy = msfu(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j_start) = a_rv(i-1,k,j_start)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_start)+u(i,k,j_start-1))
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_start)+u(i,k,j_start-1))
-          a_u(i,k,j_start-1) = a_u(i,k,j_start-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_start)+rv(i-1,k,j_start))
-          a_u(i,k,j_start) = a_u(i,k,j_start)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_start)+rv(i-1,k,j_start))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j_start) = a_rv(i-1,k,j_start)+gwalls*(u(i,k,j_start)+u(i,k,j_start-1))
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+gwalls*(u(i,k,j_start)+u(i,k,j_start-1))
+          a_u(i,k,j_start-1) = a_u(i,k,j_start-1)+gwalls*(rv(i,k,j_start)+rv(i-1,k,j_start))
+          a_u(i,k,j_start) = a_u(i,k,j_start)+gwalls*(rv(i,k,j_start)+rv(i-1,k,j_start))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       do k = kts, ktf
         do i = i_start, i_end
-          a_rv(i-1,k,j_end+1) = a_rv(i-1,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_end+1)+u(i,k,j_end))
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(u(i,k,j_end+1)+u(i,k,j_end))
-          a_u(i,k,j_end+1) = a_u(i,k,j_end+1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
-          a_u(i,k,j_end) = a_u(i,k,j_end)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i-1,k,j_end+1) = a_rv(i-1,k,j_end+1)+gwalls*(u(i,k,j_end+1)+u(i,k,j_end))
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+gwalls*(u(i,k,j_end+1)+u(i,k,j_end))
+          a_u(i,k,j_end+1) = a_u(i,k,j_end+1)+gwalls*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
+          a_u(i,k,j_end) = a_u(i,k,j_end)+gwalls*(rv(i,k,j_end+1)+rv(i-1,k,j_end+1))
         end do
       end do
     else
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i-1,k,j))
 ! recompute : vel
-          a_u(i,k,j-2) = a_u(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_u(i,k,j-1) = a_u(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_u(i,k,j+1) = a_u(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_u(i,k,j) = a_u(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
-&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_u(i,k,j-2) = a_u(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_u(i,k,j-1) = a_u(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_u(i,k,j+1) = a_u(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i,k,j-1))-0.083333333*(u(i,k,j+1)+u(i,k,j-2))+0.083333333*(u(i,k,j+&
+&1)-u(i,k,j-2)-3.*(u(i,k,j)-u(i,k,j-1)))*walls(3))
           a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
         end do
       end do
     endif
@@ -3444,70 +3627,71 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
         a_fqx(i,k) = a_fqx(i,k)+a_tendency(i,k,j)*mrdx
       end do
     end do
+
     if (degrade_xe) then
       i = i_end+1
 ! recompute : i
       do k = kts, ktf
-        a_ub = 0.
         ub = u(i,k,j)
 ! recompute : ub
         if (specified .and. u(i-1,k,j) .gt. 0.) then
           ub = u(i-1,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-        a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i-1,k,j)+ub)
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_fqx(i,k) = 0.
+        gwalls=0.25*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i-1,k,j)+ub)
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i-1,k,j)+ub)
+        a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
         if (specified .and. u(i-1,k,j) .gt. 0.) then
           a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i,k,j) = a_u(i,k,j)+a_ub
         endif
-        a_u(i,k,j) = a_u(i,k,j)+a_ub
-        a_ub = 0.
       end do
+      a_fqx(i_end+1,kts:ktf) = 0.
     endif
+
     if (degrade_xs) then
       i = i_start
 ! recompute : i
       do k = kts, ktf
-        a_ub = 0.
         ub = u(i-1,k,j)
 ! recompute : ub
         if (specified .and. u(i,k,j) .lt. 0.) then
           ub = u(i,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-        a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(u(i,k,j)+ub)
-        a_u(i,k,j) = a_u(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_ub = a_ub+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i-1,k,j))
-        a_fqx(i,k) = 0.
+        gwalls=0.25*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+ub)
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(u(i,k,j)+ub)
+        a_u(i,k,j) = a_u(i,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
         if (specified .and. u(i,k,j) .lt. 0.) then
           a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
         endif
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-        a_ub = 0.
       end do
+      a_fqx(i_start,kts:ktf) = 0.
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i-1,k,j))
 ! recompute : vel
-        a_u(i-2,k,j) = a_u(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_u(i+1,k,j) = a_u(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_u(i,k,j) = a_u(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
-&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_u(i-2,k,j) = a_u(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_u(i+1,k,j) = a_u(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_u(i,k,j) = a_u(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(u(i,k,j)+u(i-1,k,j))-0.083333333*(u(i+1,k,j)+u(i-2,k,j))+0.083333333*(u(i+1,k,j)-u(i-&
+&2,k,j)-3.*(u(i,k,j)-u(i-1,k,j)))*walls(3))
         a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
+        
       end do
     end do
   end do
@@ -3549,13 +3733,14 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdy = msfu(i,j)*rdy
 ! recompute : mrdy
-        a_rv(i-1,k,j+1) = a_rv(i-1,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(u(i,k,j+1)+u(i,k,j))
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(u(i,k,j+1)+u(i,k,j))
-        a_rv(i-1,k,j) = a_rv(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdy*(u(i,k,j)+u(i,k,j-1))
-        a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_tendency(i,k,j)*mrdy*(u(i,k,j)+u(i,k,j-1))
-        a_u(i,k,j-1) = a_u(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j)+rv(i-1,k,j))
-        a_u(i,k,j+1) = a_u(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i-1,k,j+1))
-        a_u(i,k,j) = a_u(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i-1,k,j+1)-(rv(i,k,j)+rv(i-1,k,j)))
+        gwalls=0.25*a_tendency(i,k,j)*mrdy
+        a_rv(i-1,k,j+1) = a_rv(i-1,k,j+1)-gwalls*(u(i,k,j+1)+u(i,k,j))
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-gwalls*(u(i,k,j+1)+u(i,k,j))
+        a_rv(i-1,k,j) = a_rv(i-1,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+        a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(u(i,k,j)+u(i,k,j-1))
+        a_u(i,k,j-1) = a_u(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i-1,k,j))
+        a_u(i,k,j+1) = a_u(i,k,j+1)-gwalls*(rv(i,k,j+1)+rv(i-1,k,j+1))
+        a_u(i,k,j) = a_u(i,k,j)-gwalls*(rv(i,k,j+1)+rv(i-1,k,j+1)-(rv(i,k,j)+rv(i-1,k,j)))
       end do
     end do
   end do
@@ -3571,9 +3756,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
 ! recompute vars : j_end
   if (specified .and. ite .ge. ide-1) then
     do j = j_start, j_end
-      a_ub = 0.
       do k = kts, ktf
-        a_ub = 0.
         i = ide-1
 ! recompute : i
         mrdx = msfu(i,j)*rdx
@@ -3584,18 +3767,18 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
           ub = u(i,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(u(i,k,j)+u(i-1,k,j))
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ub+u(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ub+u(i,k,j)-(u(i,k,j)+u(i-1,k,j)))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(ru(i,k,j)+ru(i-1,k,j))
-        a_u(i,k,j) = a_u(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
-        a_ub = a_ub-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j))
+        gwalls=0.25*a_tendency(i,k,j)*mrdx
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+u(i-1,k,j))
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-gwalls*(ub+u(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)-gwalls*(ub+u(i,k,j)-(u(i,k,j)+u(i-1,k,j)))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_u(i,k,j) = a_u(i,k,j)-gwalls*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
+        a_ub =-gwalls*(ru(i+1,k,j)+ru(i,k,j))
         if (u(i,k,j) .gt. 0.) then
           a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i+1,k,j) = a_u(i+1,k,j)+a_ub
         endif
-        a_u(i+1,k,j) = a_u(i+1,k,j)+a_ub
-        a_ub = 0.
       end do
     end do
   endif
@@ -3611,9 +3794,9 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
 ! recompute vars : j_end
   if (specified .and. its .le. ids+1) then
     do j = j_start, j_end
-      a_ub = 0.
+      
       do k = kts, ktf
-        a_ub = 0.
+        
         i = ids+1
 ! recompute : i
         mrdx = msfu(i,j)*rdx
@@ -3624,18 +3807,18 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
           ub = u(i,k,j)
         endif
 ! recompute : ub
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(u(i,k,j)+ub)
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(u(i+1,k,j)+u(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(u(i+1,k,j)+u(i,k,j)-(u(i,k,j)+ub))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j))
-        a_u(i,k,j) = a_u(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
-        a_ub = a_ub+0.25*a_tendency(i,k,j)*mrdx*(ru(i,k,j)+ru(i-1,k,j))
+        gwalls=0.25*a_tendency(i,k,j)*mrdx
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+ub)
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-gwalls*(u(i+1,k,j)+u(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)-gwalls*(u(i+1,k,j)+u(i,k,j)-(u(i,k,j)+ub))
+        a_u(i+1,k,j) = a_u(i+1,k,j)-gwalls*(ru(i+1,k,j)+ru(i,k,j))
+        a_u(i,k,j) = a_u(i,k,j)-gwalls*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
+        a_ub =gwalls*(ru(i,k,j)+ru(i-1,k,j))
         if (u(i,k,j) .lt. 0.) then
           a_u(i,k,j) = a_u(i,k,j)+a_ub
-          a_ub = 0.
+        else
+          a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
         endif
-        a_u(i-1,k,j) = a_u(i-1,k,j)+a_ub
-        a_ub = 0.
       end do
     end do
   endif
@@ -3654,12 +3837,13 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdx = msfu(i,j)*rdx
 ! recompute : mrdx
-        a_ru(i-1,k,j) = a_ru(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(u(i,k,j)+u(i-1,k,j))
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(u(i+1,k,j)+u(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(u(i+1,k,j)+u(i,k,j)-(u(i,k,j)+u(i-1,k,j)))
-        a_u(i-1,k,j) = a_u(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(ru(i,k,j)+ru(i-1,k,j))
-        a_u(i+1,k,j) = a_u(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j))
-        a_u(i,k,j) = a_u(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
+        gwalls=0.25*a_tendency(i,k,j)*mrdx
+        a_ru(i-1,k,j) = a_ru(i-1,k,j)+gwalls*(u(i,k,j)+u(i-1,k,j))
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-gwalls*(u(i+1,k,j)+u(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)-gwalls*(u(i+1,k,j)+u(i,k,j)-(u(i,k,j)+u(i-1,k,j)))
+        a_u(i-1,k,j) = a_u(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i-1,k,j))
+        a_u(i+1,k,j) = a_u(i+1,k,j)-gwalls*(ru(i+1,k,j)+ru(i,k,j))
+        a_u(i,k,j) = a_u(i,k,j)-gwalls*(ru(i+1,k,j)+ru(i,k,j)-(ru(i,k,j)+ru(i-1,k,j)))
       end do
     end do
   end do
@@ -3774,20 +3958,17 @@ real uw
 real vb
 real vel
 integer vert_order
+real walls(7),gwalls
+real iwalls(ims:ime)
+real kwalls(kms:kme)
 
    call trace_entry("a_advect_v")
 
 !----------------------------------------------
 ! RESET LOCAL ADJOINT VARIABLES
 !----------------------------------------------
-a_dum = 0.
-a_dup = 0.
 a_fqx(:,:) = 0.
 a_fqy(:,:,:) = 0.
-a_ub = 0.
-a_uw = 0.
-a_vb = 0.
-a_vel = 0.
 a_vflux(:,:) = 0.
 
 !----------------------------------------------
@@ -3844,35 +4025,45 @@ endif
 a_vert_order_test: if (vert_order .eq. 6) then
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf-1
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(5)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(6)
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2544
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*walls(2)
+      a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*walls(2)
+      a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+      a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2544
 ! recompute vars : k
@@ -3880,7 +4071,7 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2539
 ! recompute vars : k
@@ -3891,12 +4082,14 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute vars : vel
-      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(2)
+      a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*walls(2)
+      a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*walls(2)
+      a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+      a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2539
 ! recompute vars : k
@@ -3904,72 +4097,89 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2536
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(3)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute : vel
-        a_v(i,k-3,j) = a_v(i,k-3,j)+0.016666667*a_vflux(i,k)*vel
-        a_v(i,k-2,j) = a_v(i,k-2,j)-0.13333333*a_vflux(i,k)*vel
-        a_v(i,k-1,j) = a_v(i,k-1,j)+0.61666667*a_vflux(i,k)*vel
-        a_v(i,k+2,j) = a_v(i,k+2,j)+0.016666667*a_vflux(i,k)*vel
-        a_v(i,k+1,j) = a_v(i,k+1,j)-0.13333333*a_vflux(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.61666667*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(v(i,k,j)+v(i,k-1,j))-0.13333333*(v(i,k+1,j)+v(i,k-2,j))+0.016666667*(v(i,k+2,j)+&
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i,k-3,j) = a_v(i,k-3,j)+0.016666667*walls(2)
+        a_v(i,k-2,j) = a_v(i,k-2,j)-0.13333333*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)+0.61666667*walls(2)
+        a_v(i,k+2,j) = a_v(i,k+2,j)+0.016666667*walls(2)
+        a_v(i,k+1,j) = a_v(i,k+1,j)-0.13333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.61666667*walls(2)
+        a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i,k-1,j))-0.13333333*(v(i,k+1,j)+v(i,k-2,j))+0.016666667*(v(i,k+2,j)+&
 &v(i,k-3,j)))
-        a_vflux(i,k) = 0.
         a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
+
   end do
 else if (vert_order .eq. 5) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(7)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf-1
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
+      walls(3)=sign(1.,-vel)
 ! recompute : vel
       k = ktf
 ! recompute : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(5)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(6)
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2587
 ! recompute vars : k
       k = ktf-1
 ! recompute vars : k
-      a_v(i,k-2,j) = a_v(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_v(i,k+1,j) = a_v(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_v(i,k,j) = a_v(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-v(i,&
-&k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_v(i,k-2,j) = a_v(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_v(i,k+1,j) = a_v(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-v(i,&
+&k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*walls(3))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2587
 ! recompute vars : k
@@ -3977,7 +4187,7 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2582
 ! recompute vars : k
@@ -3988,13 +4198,16 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute vars : vel
-      a_v(i,k-2,j) = a_v(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_v(i,k+1,j) = a_v(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_v(i,k,j) = a_v(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-v(i,&
-&k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(3)=sign(1.,-vel)
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_v(i,k-2,j) = a_v(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_v(i,k+1,j) = a_v(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-v(i,&
+&k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*walls(3))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2582
 ! recompute vars : k
@@ -4002,147 +4215,195 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2579
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(4)*v(i,k,j)+walls(7)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*v(i,k,j)+walls(7)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(7)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf-1:ktf) = 0.
+
     do k = kts+3, ktf-2
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute : vel
-        a_v(i,k-3,j) = a_v(i,k-3,j)+a_vflux(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,-vel))
-        a_v(i,k-2,j) = a_v(i,k-2,j)+a_vflux(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,-vel))
-        a_v(i,k-1,j) = a_v(i,k-1,j)+a_vflux(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,-vel))
-        a_v(i,k+2,j) = a_v(i,k+2,j)+a_vflux(i,k)*vel*(0.016666667-0.016666667*sign(1.,-vel))
-        a_v(i,k+1,j) = a_v(i,k+1,j)+a_vflux(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,-vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_vflux(i,k)*vel*(0.61666667-0.16666667*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(v(i,k,j)+v(i,k-1,j))-0.13333333*(v(i,k+1,j)+v(i,k-2,j))+0.016666667*(v(i,k+2,j)+&
-&v(i,k-3,j))-0.016666667*(v(i,k+2,j)-v(i,k-3,j)-5.*(v(i,k+1,j)-v(i,k-2,j))+10.*(v(i,k,j)-v(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i,k-3,j) = a_v(i,k-3,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_v(i,k-2,j) = a_v(i,k-2,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_v(i,k-1,j) = a_v(i,k-1,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_v(i,k+2,j) = a_v(i,k+2,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_v(i,k+1,j) = a_v(i,k+1,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i,k-1,j))-0.13333333*(v(i,k+1,j)+v(i,k-2,j))+0.016666667*(v(i,k+2,j)+&
+&v(i,k-3,j))-0.016666667*(v(i,k+2,j)-v(i,k-3,j)-5.*(v(i,k+1,j)-v(i,k-2,j))+10.*(v(i,k,j)-v(i,k-1,j)))*walls(3))
         a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-2) = 0.
+
   end do
 else if (vert_order .eq. 4) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(5)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(6)
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2622
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(3)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute : vel
-        a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-        a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-        a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_vflux(i,k)*vel
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
-        a_vflux(i,k) = 0.
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i,k-2,j) = a_v(i,k-2,j)-0.083333333*walls(2)
+        a_v(i,k-1,j) = a_v(i,k-1,j)+0.58333333*walls(2)
+        a_v(i,k+1,j) = a_v(i,k+1,j)-0.083333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j)))
         a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 3) then a_vert_order_test
   do j = j_end, j_start, -1
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
+    walls(3)=fzp(kts+1); walls(4)=fzm(kts+1)
+    walls(5)=fzp(ktf); walls(6)=fzm(ktf)
+
     do i = i_start, i_end
       k = ktf
 ! recompute : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(6)*v(i,k,j)+walls(5)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(5)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(6)
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:2655
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-      a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-      a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-      a_vflux(i,k) = 0.
+      walls(1)=0.5*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(4)*v(i,k,j)+walls(3)*v(i,k-1,j))
+      a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(3)
+      a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(4)
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf) = 0.
+
     do k = kts+2, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k,j-1))
 ! recompute : vel
-        a_v(i,k-2,j) = a_v(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-        a_v(i,k-1,j) = a_v(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-        a_v(i,k+1,j) = a_v(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-&
-&v(i,k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i,k-2,j) = a_v(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_v(i,k-1,j) = a_v(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_v(i,k+1,j) = a_v(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k-1,j))-0.083333333*(v(i,k+1,j)+v(i,k-2,j))+0.083333333*(v(i,k+1,j)-&
+&v(i,k-2,j)-3.*(v(i,k,j)-v(i,k-1,j)))*walls(3))
         a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 2) then a_vert_order_test
   do j = j_start, j_end
     do k = kts, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzw(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzw(k)
-      end do
+      gwalls=rdzw(k)
+!     do i = i_start, i_end
+!       a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!       a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!     end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*gwalls
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*gwalls
     end do
+
     do k = kts+1, ktf
+      walls(2)=fzp(k); walls(3)=fzm(k)
       do i = i_start, i_end
-        a_rom(i,k,j-1) = a_rom(i,k,j-1)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-        a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vflux(i,k)*(fzm(k)*v(i,k,j)+fzp(k)*v(i,k-1,j))
-        a_v(i,k-1,j) = a_v(i,k-1,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzp(k)
-        a_v(i,k,j) = a_v(i,k,j)+0.5*a_vflux(i,k)*(rom(i,k,j)+rom(i,k,j-1))*fzm(k)
-        a_vflux(i,k) = 0.
+        walls(1)=0.5*a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        a_rom(i,k,j-1) = a_rom(i,k,j-1)+walls(1)*(walls(3)*v(i,k,j)+walls(2)*v(i,k-1,j))
+        a_rom(i,k,j) = a_rom(i,k,j)+walls(1)*(walls(3)*v(i,k,j)+walls(2)*v(i,k-1,j))
+        a_v(i,k-1,j) = a_v(i,k-1,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+walls(1)*(rom(i,k,j)+rom(i,k,j-1))*walls(3)
       end do
     end do
+
+    a_vflux(i_start:i_end,kts+1:ktf) = 0.
+
   end do
 endif a_vert_order_test
 ! recdepend vars : jts
@@ -4171,10 +4432,6 @@ endif
 ! recompute vars : j_end
 if (config_flags%open_xe .and. ite .eq. ide) then
   do j = j_start, j_end
-    a_dum = 0.
-    a_dup = 0.
-    a_ub = 0.
-    a_uw = 0.
     mrdx = msfv(ite-1,j)*rdx
 ! recompute : mrdx
     jp = min(jmax,j)
@@ -4182,10 +4439,6 @@ if (config_flags%open_xe .and. ite .eq. ide) then
     jm = max(jmin,j-1)
 ! recompute : jm
     do k = kts, ktf
-      a_dum = 0.
-      a_dup = 0.
-      a_ub = 0.
-      a_uw = 0.
       uw = 0.5*(ru(ite,k,jp)+ru(ite,k,jm))
 ! recompute : uw
       ub = max(uw,0.)
@@ -4194,23 +4447,20 @@ if (config_flags%open_xe .and. ite .eq. ide) then
 ! recompute : dup
       dum = ru(ite,k,jm)-ru(ite-1,k,jm)
 ! recompute : dum
-      a_dum = a_dum-0.5*a_tendency(ite-1,k,j)*mrdx*v(ite-1,k,j)
-      a_dup = a_dup-0.5*a_tendency(ite-1,k,j)*mrdx*v(ite-1,k,j)
-      a_ub = a_ub-a_tendency(ite-1,k,j)*mrdx*(v_old(ite-1,k,j)-v_old(ite-2,k,j))
+      a_dum = -0.5*a_tendency(ite-1,k,j)*mrdx*v(ite-1,k,j)
+      a_dup = -0.5*a_tendency(ite-1,k,j)*mrdx*v(ite-1,k,j)
+      a_ub =-a_tendency(ite-1,k,j)*mrdx*(v_old(ite-1,k,j)-v_old(ite-2,k,j))
       a_v(ite-1,k,j) = a_v(ite-1,k,j)-0.5*a_tendency(ite-1,k,j)*mrdx*(dup+dum)
       a_v_old(ite-2,k,j) = a_v_old(ite-2,k,j)+a_tendency(ite-1,k,j)*mrdx*ub
       a_v_old(ite-1,k,j) = a_v_old(ite-1,k,j)-a_tendency(ite-1,k,j)*mrdx*ub
       a_ru(ite-1,k,jm) = a_ru(ite-1,k,jm)-a_dum
       a_ru(ite,k,jm) = a_ru(ite,k,jm)+a_dum
-      a_dum = 0.
       a_ru(ite-1,k,jp) = a_ru(ite-1,k,jp)-a_dup
       a_ru(ite,k,jp) = a_ru(ite,k,jp)+a_dup
-      a_dup = 0.
-      a_uw = a_uw+a_ub*(0.5+sign(0.5,uw-0.))
-      a_ub = 0.
+      a_uw = a_ub*(0.5+sign(0.5,uw-0.))
+      
       a_ru(ite,k,jm) = a_ru(ite,k,jm)+0.5*a_uw
       a_ru(ite,k,jp) = a_ru(ite,k,jp)+0.5*a_uw
-      a_uw = 0.
     end do
   end do
 endif
@@ -4240,10 +4490,6 @@ endif
 ! recompute vars : j_end
 if (config_flags%open_xs .and. its .eq. ids) then
   do j = j_start, j_end
-    a_dum = 0.
-    a_dup = 0.
-    a_ub = 0.
-    a_uw = 0.
     mrdx = msfv(its,j)*rdx
 ! recompute : mrdx
     jp = min(jmax,j)
@@ -4251,10 +4497,6 @@ if (config_flags%open_xs .and. its .eq. ids) then
     jm = max(jmin,j-1)
 ! recompute : jm
     do k = kts, ktf
-      a_dum = 0.
-      a_dup = 0.
-      a_ub = 0.
-      a_uw = 0.
       uw = 0.5*(ru(its,k,jp)+ru(its,k,jm))
 ! recompute : uw
       ub = min(uw,0.)
@@ -4263,23 +4505,21 @@ if (config_flags%open_xs .and. its .eq. ids) then
 ! recompute : dup
       dum = ru(its+1,k,jm)-ru(its,k,jm)
 ! recompute : dum
-      a_dum = a_dum-0.5*a_tendency(its,k,j)*mrdx*v(its,k,j)
-      a_dup = a_dup-0.5*a_tendency(its,k,j)*mrdx*v(its,k,j)
-      a_ub = a_ub-a_tendency(its,k,j)*mrdx*(v_old(its+1,k,j)-v_old(its,k,j))
-      a_v(its,k,j) = a_v(its,k,j)-0.5*a_tendency(its,k,j)*mrdx*(dup+dum)
-      a_v_old(its+1,k,j) = a_v_old(its+1,k,j)-a_tendency(its,k,j)*mrdx*ub
-      a_v_old(its,k,j) = a_v_old(its,k,j)+a_tendency(its,k,j)*mrdx*ub
+      gwalls=a_tendency(its,k,j)*mrdx
+      a_dum = -0.5*gwalls*v(its,k,j)
+      a_dup = -0.5*gwalls*v(its,k,j)
+      a_ub =-gwalls*(v_old(its+1,k,j)-v_old(its,k,j))
+      a_v(its,k,j) = a_v(its,k,j)-0.5*gwalls*(dup+dum)
+      a_v_old(its+1,k,j) = a_v_old(its+1,k,j)-gwalls*ub
+      a_v_old(its,k,j) = a_v_old(its,k,j)+gwalls*ub
       a_ru(its+1,k,jm) = a_ru(its+1,k,jm)+a_dum
       a_ru(its,k,jm) = a_ru(its,k,jm)-a_dum
-      a_dum = 0.
       a_ru(its+1,k,jp) = a_ru(its+1,k,jp)+a_dup
       a_ru(its,k,jp) = a_ru(its,k,jp)-a_dup
-      a_dup = 0.
-      a_uw = a_uw+a_ub*(0.5+sign(0.5,0.-uw))
-      a_ub = 0.
+      a_uw = a_ub*(0.5+sign(0.5,0.-uw))
+      
       a_ru(its,k,jm) = a_ru(its,k,jm)+0.5*a_uw
       a_ru(its,k,jp) = a_ru(its,k,jp)+0.5*a_uw
-      a_uw = 0.
     end do
   end do
 endif
@@ -4288,18 +4528,15 @@ if (config_flags%open_ye .and. jte .eq. jde) then
 ! recompute : i_start
   i_end = min(ite,ide-1)
 ! recompute : i_end
-  do i = i_start, i_end
-    a_vb = 0.
-    do k = kts, ktf
-      a_vb = 0.
+  do k = kts, ktf
+    do i = i_start, i_end
       vb = max(rv(i,k,jte)+cb*mut(i,jte-1),0.)
 ! recompute : vb
       a_v_old(i,k,jte-1) = a_v_old(i,k,jte-1)+a_tendency(i,k,jte)*rdy*vb
       a_v_old(i,k,jte) = a_v_old(i,k,jte)-a_tendency(i,k,jte)*rdy*vb
-      a_vb = a_vb-a_tendency(i,k,jte)*rdy*(v_old(i,k,jte)-v_old(i,k,jte-1))
+      a_vb = -a_tendency(i,k,jte)*rdy*(v_old(i,k,jte)-v_old(i,k,jte-1))
       a_mut(i,jte-1) = a_mut(i,jte-1)+a_vb*(0.5+sign(0.5,rv(i,k,jte)+cb*mut(i,jte-1)-0.))*cb
       a_rv(i,k,jte) = a_rv(i,k,jte)+a_vb*(0.5+sign(0.5,rv(i,k,jte)+cb*mut(i,jte-1)-0.))
-      a_vb = 0.
     end do
   end do
 endif
@@ -4308,18 +4545,16 @@ if (config_flags%open_ys .and. jts .eq. jds) then
 ! recompute : i_start
   i_end = min(ite,ide-1)
 ! recompute : i_end
-  do i = i_start, i_end
-    a_vb = 0.
-    do k = kts, ktf
-      a_vb = 0.
+  do k = kts, ktf
+    do i = i_start, i_end
       vb = min(rv(i,k,jts)-cb*mut(i,jts),0.)
 ! recompute : vb
-      a_v_old(i,k,jts+1) = a_v_old(i,k,jts+1)-a_tendency(i,k,jts)*rdy*vb
-      a_v_old(i,k,jts) = a_v_old(i,k,jts)+a_tendency(i,k,jts)*rdy*vb
-      a_vb = a_vb-a_tendency(i,k,jts)*rdy*(v_old(i,k,jts+1)-v_old(i,k,jts))
+      gwalls=a_tendency(i,k,jts)*rdy
+      a_v_old(i,k,jts+1) = a_v_old(i,k,jts+1)-gwalls*vb
+      a_v_old(i,k,jts) = a_v_old(i,k,jts)+gwalls*vb
+      a_vb = -gwalls*(v_old(i,k,jts+1)-v_old(i,k,jts))
       a_mut(i,jts) = a_mut(i,jts)-a_vb*(0.5+sign(0.5,0.-(rv(i,k,jts)-cb*mut(i,jts))))*cb
       a_rv(i,k,jts) = a_rv(i,k,jts)+a_vb*(0.5+sign(0.5,0.-(rv(i,k,jts)-cb*mut(i,jts))))
-      a_vb = 0.
     end do
   end do
 endif
@@ -4413,80 +4648,92 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
       i = ide-2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*walls(2)
+        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*walls(2)
+        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+      a_fqx(ide-2,kts:ktf) = 0.
+
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
         do k = kts, ktf
-          a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+0.25*a_fqx(i,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-          a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.25*a_fqx(i,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-          a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+0.25*a_fqx(i,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-          a_v(i_end,k,j) = a_v(i_end,k,j)+0.25*a_fqx(i,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+          a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+          a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
+          a_v(i_end,k,j) = a_v(i_end,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
         end do
+        a_fqx(ide-1,kts:ktf) = 0.
       endif
+
     endif
     if (degrade_xs) then
       i = ids+2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*walls(2)
+        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*walls(2)
+        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+      a_fqx(ids+2,kts:ktf) = 0.
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         do k = kts, ktf
-          a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.25*a_fqx(i,k)*(v(i,k,j)+v(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(v(i,k,j)+v(i-1,k,j))
-          a_v(i-1,k,j) = a_v(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i,k,j-1))
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i,k,j-1))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k,j-1) = a_ru(i,k,j-1)+gwalls*(v(i,k,j)+v(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(v(i,k,j)+v(i-1,k,j))
+          a_v(i-1,k,j) = a_v(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i,k,j-1))
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(ru(i,k,j)+ru(i,k,j-1))
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
       endif
+
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-3,k,j) = a_v(i-3,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_v(i-1,k,j) = a_v(i-1,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_v(i+2,k,j) = a_v(i+2,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_v(i+1,k,j) = a_v(i+1,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(v(i,k,j)+v(i-1,k,j))-0.13333333*(v(i+1,k,j)+v(i-2,k,j))+0.016666667*(v(i+2,k,j)+v(i-&
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i-3,k,j) = a_v(i-3,k,j)+0.016666667*walls(2)
+        a_v(i-2,k,j) = a_v(i-2,k,j)-0.13333333*walls(2)
+        a_v(i-1,k,j) = a_v(i-1,k,j)+0.61666667*walls(2)
+        a_v(i+2,k,j) = a_v(i+2,k,j)+0.016666667*walls(2)
+        a_v(i+1,k,j) = a_v(i+1,k,j)-0.13333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.61666667*walls(2)
+        a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i-1,k,j))-0.13333333*(v(i+1,k,j)+v(i-2,k,j))+0.016666667*(v(i+2,k,j)+v(i-&
 &3,k,j)))
-        a_fqx(i,k) = 0.
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts:ktf) = 0.
+
   end do
 ! recdepend vars : its
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1530
@@ -4541,116 +4788,104 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfv(i,j-1)*rdy
+          mrdy = msfv(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-3) = a_v(i,k,j-3)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j+2) = a_v(i,k,j+2)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j+1) = a_v(i,k,j+1)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j) = a_v(i,k,j)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(v(i,k,j)+v(i,k,j-1))-0.13333333*(v(i,k,j+1)+v(i,k,j-2))+0.016666667*(v(i,k,j+2)&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_v(i,k,j-3) = a_v(i,k,j-3)+0.016666667*walls(2)
+          a_v(i,k,j-2) = a_v(i,k,j-2)-0.13333333*walls(2)
+          a_v(i,k,j-1) = a_v(i,k,j-1)+0.61666667*walls(2)
+          a_v(i,k,j+2) = a_v(i,k,j+2)+0.016666667*walls(2)
+          a_v(i,k,j+1) = a_v(i,k,j+1)-0.13333333*walls(2)
+          a_v(i,k,j) = a_v(i,k,j)+0.61666667*walls(2)
+          a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i,k,j-1))-0.13333333*(v(i,k,j+1)+v(i,k,j-2))+0.016666667*(v(i,k,j+2)&
 &+v(i,k,j-3)))
-          a_fqy(i,k,jp1) = 0.
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j-1)
 ! recompute : vb
           if (specified .and. v(i,k,j) .lt. 0.) then
             vb = v(i,k,j)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+vb)
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(v(i,k,j)+vb)
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j) .lt. 0.) then
             a_v(i,k,j) = a_v(i,k,j)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
           endif
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*walls(2)
+          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*walls(2)
+          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(2)
+          a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     else if (j .eq. jde) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j)
 ! recompute : vb
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             vb = v(i,k,j-1)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(vb+v(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(vb+v(i,k,j-1))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j) = a_v(i,k,j)+a_vb
           endif
-          a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*walls(2)
+          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*walls(2)
+          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(2)
+          a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     endif
@@ -4739,80 +4974,82 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       i = ide-2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_v(i-1,k,j) = a_v(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_v(i+1,k,j) = a_v(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
-&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_v(i-2,k,j) = a_v(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_v(i-1,k,j) = a_v(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_v(i+1,k,j) = a_v(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
+&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*walls(3))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
+
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
         do k = kts, ktf
-          a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+0.25*a_fqx(i,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-          a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.25*a_fqx(i,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-          a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+0.25*a_fqx(i,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-          a_v(i_end,k,j) = a_v(i_end,k,j)+0.25*a_fqx(i,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+          a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+          a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
+          a_v(i_end,k,j) = a_v(i_end,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
         end do
+        a_fqx(ide-1,kts:ktf) = 0.
       endif
+
     endif
     if (degrade_xs) then
       i = ids+2
 ! recompute : i
       do k = kts, ktf
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_v(i-1,k,j) = a_v(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_v(i+1,k,j) = a_v(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
-&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_v(i-2,k,j) = a_v(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_v(i-1,k,j) = a_v(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_v(i+1,k,j) = a_v(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
+&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*walls(3))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
+        
       end do
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         do k = kts, ktf
-          a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.25*a_fqx(i,k)*(v(i,k,j)+v(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_fqx(i,k)*(v(i,k,j)+v(i-1,k,j))
-          a_v(i-1,k,j) = a_v(i-1,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i,k,j-1))
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqx(i,k)*(ru(i,k,j)+ru(i,k,j-1))
-          a_fqx(i,k) = 0.
+          gwalls=0.25*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k,j-1) = a_ru(i,k,j-1)+gwalls*(v(i,k,j)+v(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(v(i,k,j)+v(i-1,k,j))
+          a_v(i-1,k,j) = a_v(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i,k,j-1))
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(ru(i,k,j)+ru(i,k,j-1))
         end do
+        a_fqx(ids+1,kts:ktf) = 0.
       endif
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-3,k,j) = a_v(i-3,k,j)+a_fqx(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-        a_v(i-2,k,j) = a_v(i-2,k,j)+a_fqx(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-        a_v(i-1,k,j) = a_v(i-1,k,j)+a_fqx(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-        a_v(i+2,k,j) = a_v(i+2,k,j)+a_fqx(i,k)*vel*(0.016666667-0.016666667*sign(1.,vel))
-        a_v(i+1,k,j) = a_v(i+1,k,j)+a_fqx(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_fqx(i,k)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(v(i,k,j)+v(i-1,k,j))-0.13333333*(v(i+1,k,j)+v(i-2,k,j))+0.016666667*(v(i+2,k,j)+v(i-&
-&3,k,j))-0.016666667*(v(i+2,k,j)-v(i-3,k,j)-5.*(v(i+1,k,j)-v(i-2,k,j))+10.*(v(i,k,j)-v(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel) 
+        a_v(i-3,k,j) = a_v(i-3,k,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_v(i-2,k,j) = a_v(i-2,k,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_v(i-1,k,j) = a_v(i-1,k,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_v(i+2,k,j) = a_v(i+2,k,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_v(i+1,k,j) = a_v(i+1,k,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i-1,k,j))-0.13333333*(v(i+1,k,j)+v(i-2,k,j))+0.016666667*(v(i+2,k,j)+v(i-&
+&3,k,j))-0.016666667*(v(i+2,k,j)-v(i-3,k,j)-5.*(v(i+1,k,j)-v(i-2,k,j))+10.*(v(i,k,j)-v(i-1,k,j)))*walls(3))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
+        
       end do
     end do
   end do
@@ -4869,118 +5106,106 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfv(i,j-1)*rdy
+          mrdy = msfv(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-3) = a_v(i,k,j-3)+a_fqy(i,k,jp1)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-          a_v(i,k,j-2) = a_v(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-          a_v(i,k,j+2) = a_v(i,k,j+2)+a_fqy(i,k,jp1)*vel*(0.016666667-0.016666667*sign(1.,vel))
-          a_v(i,k,j+1) = a_v(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-          a_v(i,k,j) = a_v(i,k,j)+a_fqy(i,k,jp1)*vel*(0.61666667-0.16666667*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(v(i,k,j)+v(i,k,j-1))-0.13333333*(v(i,k,j+1)+v(i,k,j-2))+0.016666667*(v(i,k,j+2)&
-&+v(i,k,j-3))-0.016666667*(v(i,k,j+2)-v(i,k,j-3)-5.*(v(i,k,j+1)-v(i,k,j-2))+10.*(v(i,k,j)-v(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_v(i,k,j-3) = a_v(i,k,j-3)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+          a_v(i,k,j-2) = a_v(i,k,j-2)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+          a_v(i,k,j+2) = a_v(i,k,j+2)+walls(2)*(0.016666667-0.016666667*walls(3))
+          a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+          a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+          a_vel =walls(1)*(0.61666667*(v(i,k,j)+v(i,k,j-1))-0.13333333*(v(i,k,j+1)+v(i,k,j-2))+0.016666667*(v(i,k,j+2)&
+&+v(i,k,j-3))-0.016666667*(v(i,k,j+2)-v(i,k,j-3)-5.*(v(i,k,j+1)-v(i,k,j-2))+10.*(v(i,k,j)-v(i,k,j-1)))*walls(3))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     else if (j .eq. jds+1) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j-1)
 ! recompute : vb
           if (specified .and. v(i,k,j) .lt. 0.) then
             vb = v(i,k,j)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+vb)
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(v(i,k,j)+vb)
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j) .lt. 0.) then
             a_v(i,k,j) = a_v(i,k,j)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
           endif
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. jds+2) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_v(i,k,j+1) = a_v(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_v(i,k,j) = a_v(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
-&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_v(i,k,j-2) = a_v(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
+&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*walls(3))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     else if (j .eq. jde) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j)
 ! recompute : vb
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             vb = v(i,k,j-1)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(vb+v(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(vb+v(i,k,j-1))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j) = a_v(i,k,j)+a_vb
           endif
-          a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. jde-1) then
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_v(i,k,j+1) = a_v(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_v(i,k,j) = a_v(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
-&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_v(i,k,j-2) = a_v(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
+&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*walls(3))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     endif
@@ -5042,7 +5267,6 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
   endif
 ! recompute : i_end,i_end_f
   do j = j_start, j_end
-    a_vel = 0.
     do k = kts, ktf
       do i = i_start, i_end
         mrdx = msfv(i,j)*rdx
@@ -5053,39 +5277,41 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     end do
     if (degrade_xe) then
       do k = kts, ktf
-        a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+0.25*a_fqx(i_end+1,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.25*a_fqx(i_end+1,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-        a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+0.25*a_fqx(i_end+1,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-        a_v(i_end,k,j) = a_v(i_end,k,j)+0.25*a_fqx(i_end+1,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-        a_fqx(i_end+1,k) = 0.
+        gwalls=0.25*a_fqx(i_end+1,k); a_fqx(i_end+1,k)=0.
+        a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+        a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
+        a_v(i_end,k,j) = a_v(i_end,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
       end do
     endif
     if (degrade_xs) then
       do k = kts, ktf
-        a_ru(i_start,k,j-1) = a_ru(i_start,k,j-1)+0.25*a_fqx(i_start,k)*(v(i_start,k,j)+v(i_start-1,k,j))
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.25*a_fqx(i_start,k)*(v(i_start,k,j)+v(i_start-1,k,j))
-        a_v(i_start-1,k,j) = a_v(i_start-1,k,j)+0.25*a_fqx(i_start,k)*(ru(i_start,k,j)+ru(i_start,k,j-1))
-        a_v(i_start,k,j) = a_v(i_start,k,j)+0.25*a_fqx(i_start,k)*(ru(i_start,k,j)+ru(i_start,k,j-1))
-        a_fqx(i_start,k) = 0.
+        gwalls=0.25*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_ru(i_start,k,j-1) = a_ru(i_start,k,j-1)+gwalls*(v(i_start,k,j)+v(i_start-1,k,j))
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+gwalls*(v(i_start,k,j)+v(i_start-1,k,j))
+        a_v(i_start-1,k,j) = a_v(i_start-1,k,j)+gwalls*(ru(i_start,k,j)+ru(i_start,k,j-1))
+        a_v(i_start,k,j) = a_v(i_start,k,j)+gwalls*(ru(i_start,k,j)+ru(i_start,k,j-1))
       end do
     endif
+
     do k = kts, ktf
-      a_vel = 0.
       do i = i_start_f, i_end_f
-        a_vel = 0.
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_v(i-2,k,j) = a_v(i-2,k,j)-0.083333333*walls(2)
+        a_v(i-1,k,j) = a_v(i-1,k,j)+0.58333333*walls(2)
+        a_v(i+1,k,j) = a_v(i+1,k,j)-0.083333333*walls(2)
+        a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j)))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts:ktf) = 0.
+
   end do
 ! recdepend vars : its
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:1998
@@ -5140,77 +5366,68 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfv(i,j-1)*rdy
+          mrdy = msfv(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .eq. j_start .and. degrade_ys) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j-1)
 ! recompute : vb
           if (specified .and. v(i,k,j) .lt. 0.) then
             vb = v(i,k,j)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+vb)
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(v(i,k,j)+vb)
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j) .lt. 0.) then
             a_v(i,k,j) = a_v(i,k,j)+a_vb
-            a_vb = 0.
           endif
           a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. j_end+1 .and. degrade_ye) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j)
 ! recompute : vb
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             vb = v(i,k,j-1)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(vb+v(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(vb+v(i,k,j-1))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j) = a_v(i,k,j)+a_vb
           endif
-          a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
         end do
       end do
     else
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_v(i,k,j) = a_v(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_v(i,k,j-2) = a_v(i,k,j-2)-0.083333333*walls(2)
+          a_v(i,k,j-1) = a_v(i,k,j-1)+0.58333333*walls(2)
+          a_v(i,k,j+1) = a_v(i,k,j+1)-0.083333333*walls(2)
+          a_v(i,k,j) = a_v(i,k,j)+0.58333333*walls(2)
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2)))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     endif
@@ -5272,7 +5489,6 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
   endif
 ! recompute : i_end,i_end_f
   do j = j_start, j_end
-    a_vel = 0.
     do k = kts, ktf
       do i = i_start, i_end
         mrdx = msfv(i,j)*rdx
@@ -5283,38 +5499,38 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     end do
     if (degrade_xe) then
       do k = kts, ktf
-        a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+0.25*a_fqx(i_end+1,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.25*a_fqx(i_end+1,k)*(v(i_end+1,k,j)+v(i_end,k,j))
-        a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+0.25*a_fqx(i_end+1,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-        a_v(i_end,k,j) = a_v(i_end,k,j)+0.25*a_fqx(i_end+1,k)*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
-        a_fqx(i_end+1,k) = 0.
+        gwalls=0.25*a_fqx(i_end+1,k); a_fqx(i_end+1,k)=0.
+        a_ru(i_end+1,k,j-1) = a_ru(i_end+1,k,j-1)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+gwalls*(v(i_end+1,k,j)+v(i_end,k,j))
+        a_v(i_end+1,k,j) = a_v(i_end+1,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
+        a_v(i_end,k,j) = a_v(i_end,k,j)+gwalls*(ru(i_end+1,k,j)+ru(i_end+1,k,j-1))
       end do
     endif
     if (degrade_xs) then
       do k = kts, ktf
-        a_ru(i_start,k,j-1) = a_ru(i_start,k,j-1)+0.25*a_fqx(i_start,k)*(v(i_start,k,j)+v(i_start-1,k,j))
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.25*a_fqx(i_start,k)*(v(i_start,k,j)+v(i_start-1,k,j))
-        a_v(i_start-1,k,j) = a_v(i_start-1,k,j)+0.25*a_fqx(i_start,k)*(ru(i_start,k,j)+ru(i_start,k,j-1))
-        a_v(i_start,k,j) = a_v(i_start,k,j)+0.25*a_fqx(i_start,k)*(ru(i_start,k,j)+ru(i_start,k,j-1))
-        a_fqx(i_start,k) = 0.
+        gwalls=0.25*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_ru(i_start,k,j-1) = a_ru(i_start,k,j-1)+gwalls*(v(i_start,k,j)+v(i_start-1,k,j))
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+gwalls*(v(i_start,k,j)+v(i_start-1,k,j))
+        a_v(i_start-1,k,j) = a_v(i_start-1,k,j)+gwalls*(ru(i_start,k,j)+ru(i_start,k,j-1))
+        a_v(i_start,k,j) = a_v(i_start,k,j)+gwalls*(ru(i_start,k,j)+ru(i_start,k,j-1))
       end do
     endif
     do k = kts, ktf
-      a_vel = 0.
+      
       do i = i_start_f, i_end_f
-        a_vel = 0.
+        
         vel = 0.5*(ru(i,k,j)+ru(i,k,j-1))
 ! recompute : vel
-        a_v(i-2,k,j) = a_v(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_v(i-1,k,j) = a_v(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_v(i+1,k,j) = a_v(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_v(i,k,j) = a_v(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
-&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_v(i-2,k,j) = a_v(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_v(i-1,k,j) = a_v(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_v(i+1,k,j) = a_v(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i-1,k,j))-0.083333333*(v(i+1,k,j)+v(i-2,k,j))+0.083333333*(v(i+1,k,j)-v(i-&
+&2,k,j)-3.*(v(i,k,j)-v(i-1,k,j)))*walls(3))
         a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.5*a_vel
         a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_vel
-        a_vel = 0.
+        
       end do
     end do
   end do
@@ -5371,78 +5587,70 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts, ktf
         do i = i_start, i_end
-          mrdy = msfv(i,j-1)*rdy
+          mrdy = msfv(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .eq. j_start .and. degrade_ys) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j-1)
 ! recompute : vb
           if (specified .and. v(i,k,j) .lt. 0.) then
             vb = v(i,k,j)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(v(i,k,j)+vb)
-          a_v(i,k,j) = a_v(i,k,j)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+vb)
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(v(i,k,j)+vb)
+          a_v(i,k,j) = a_v(i,k,j)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j) .lt. 0.) then
             a_v(i,k,j) = a_v(i,k,j)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
           endif
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-          a_vb = 0.
         end do
       end do
     else if (j .eq. j_end+1 .and. degrade_ye) then
       do k = kts, ktf
-        a_vb = 0.
         do i = i_start, i_end
-          a_vb = 0.
           vb = v(i,k,j)
 ! recompute : vb
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             vb = v(i,k,j-1)
           endif
 ! recompute : vb
-          a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.25*a_fqy(i,k,jp1)*(vb+v(i,k,j-1))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_vb = a_vb+0.25*a_fqy(i,k,jp1)*(rv(i,k,j)+rv(i,k,j-1))
-          a_fqy(i,k,jp1) = 0.
+          gwalls=0.25*a_fqy(i,k,jp1); a_fqy(i,k,jp1) = 0.
+          a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(vb+v(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+gwalls*(vb+v(i,k,j-1))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+          a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
           if (specified .and. v(i,k,j-1) .gt. 0.) then
             a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-            a_vb = 0.
+          else
+            a_v(i,k,j) = a_v(i,k,j)+a_vb
           endif
-          a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
         end do
       end do
     else
       do k = kts, ktf
-        a_vel = 0.
         do i = i_start, i_end
-          a_vel = 0.
           vel = 0.5*(rv(i,k,j)+rv(i,k,j-1))
 ! recompute : vel
-          a_v(i,k,j-2) = a_v(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_v(i,k,j-1) = a_v(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_v(i,k,j+1) = a_v(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_v(i,k,j) = a_v(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
-&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_v(i,k,j-2) = a_v(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_v(i,k,j-1) = a_v(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_v(i,k,j+1) = a_v(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_v(i,k,j) = a_v(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_vel =walls(1)*(0.58333333*(v(i,k,j)+v(i,k,j-1))-0.083333333*(v(i,k,j+1)+v(i,k,j-2))+0.083333333*(v(i,k,j+&
+&1)-v(i,k,j-2)-3.*(v(i,k,j)-v(i,k,j-1)))*walls(3))
           a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.5*a_vel
           a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_vel
-          a_vel = 0.
+          
         end do
       end do
     endif
@@ -5485,13 +5693,14 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdx = msfv(i,j)*rdx
 ! recompute : mrdx
-        a_ru(i+1,k,j-1) = a_ru(i+1,k,j-1)-0.25*a_tendency(i,k,j)*mrdx*(v(i+1,k,j)+v(i,k,j))
-        a_ru(i,k,j-1) = a_ru(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdx*(v(i,k,j)+v(i-1,k,j))
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(v(i+1,k,j)+v(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)+0.25*a_tendency(i,k,j)*mrdx*(v(i,k,j)+v(i-1,k,j))
-        a_v(i-1,k,j) = a_v(i-1,k,j)+0.25*a_tendency(i,k,j)*mrdx*(ru(i,k,j)+ru(i,k,j-1))
-        a_v(i+1,k,j) = a_v(i+1,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i+1,k,j-1))
-        a_v(i,k,j) = a_v(i,k,j)-0.25*a_tendency(i,k,j)*mrdx*(ru(i+1,k,j)+ru(i+1,k,j-1)-(ru(i,k,j)+ru(i,k,j-1)))
+        gwalls=0.25*a_tendency(i,k,j)*mrdx
+        a_ru(i+1,k,j-1) = a_ru(i+1,k,j-1)-gwalls*(v(i+1,k,j)+v(i,k,j))
+        a_ru(i,k,j-1) = a_ru(i,k,j-1)+gwalls*(v(i,k,j)+v(i-1,k,j))
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-gwalls*(v(i+1,k,j)+v(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)+gwalls*(v(i,k,j)+v(i-1,k,j))
+        a_v(i-1,k,j) = a_v(i-1,k,j)+gwalls*(ru(i,k,j)+ru(i,k,j-1))
+        a_v(i+1,k,j) = a_v(i+1,k,j)-gwalls*(ru(i+1,k,j)+ru(i+1,k,j-1))
+        a_v(i,k,j) = a_v(i,k,j)-gwalls*(ru(i+1,k,j)+ru(i+1,k,j-1)-(ru(i,k,j)+ru(i,k,j-1)))
       end do
     end do
   end do
@@ -5509,9 +5718,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
     j = jde-1
 ! recompute : j
     do k = kts, ktf
-      a_vb = 0.
       do i = i_start, i_end
-        a_vb = 0.
         mrdy = msfv(i,j)*rdy
 ! recompute : mrdy
         vb = v(i,k,j+1)
@@ -5520,18 +5727,18 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
           vb = v(i,k,j)
         endif
 ! recompute : vb
-        a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j)+v(i,k,j-1))
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(vb+v(i,k,j))
-        a_rv(i,k,j) = a_rv(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(vb+v(i,k,j)-(v(i,k,j)+v(i,k,j-1)))
-        a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j)+rv(i,k,j-1))
-        a_v(i,k,j) = a_v(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
-        a_vb = a_vb-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j))
+        gwalls=0.25*a_tendency(i,k,j)*mrdy
+        a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+v(i,k,j-1))
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-gwalls*(vb+v(i,k,j))
+        a_rv(i,k,j) = a_rv(i,k,j)-gwalls*(vb+v(i,k,j)-(v(i,k,j)+v(i,k,j-1)))
+        a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+        a_v(i,k,j) = a_v(i,k,j)-gwalls*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
+        a_vb = -gwalls*(rv(i,k,j+1)+rv(i,k,j))
         if (v(i,k,j) .gt. 0.) then
           a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
+        else
+          a_v(i,k,j+1) = a_v(i,k,j+1)+a_vb
         endif
-        a_v(i,k,j+1) = a_v(i,k,j+1)+a_vb
-        a_vb = 0.
       end do
     end do
   endif
@@ -5549,9 +5756,7 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
     j = jds+1
 ! recompute : j
     do k = kts, ktf
-      a_vb = 0.
       do i = i_start, i_end
-        a_vb = 0.
         mrdy = msfv(i,j)*rdy
 ! recompute : mrdy
         vb = v(i,k,j-1)
@@ -5560,18 +5765,18 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
           vb = v(i,k,j)
         endif
 ! recompute : vb
-        a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j)+vb)
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j+1)+v(i,k,j))
-        a_rv(i,k,j) = a_rv(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j+1)+v(i,k,j)-(v(i,k,j)+vb))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j))
-        a_v(i,k,j) = a_v(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
-        a_vb = a_vb+0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j)+rv(i,k,j-1))
+        gwalls=0.25*a_tendency(i,k,j)*mrdy
+        a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+vb)
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-gwalls*(v(i,k,j+1)+v(i,k,j))
+        a_rv(i,k,j) = a_rv(i,k,j)-gwalls*(v(i,k,j+1)+v(i,k,j)-(v(i,k,j)+vb))
+        a_v(i,k,j+1) = a_v(i,k,j+1)-gwalls*(rv(i,k,j+1)+rv(i,k,j))
+        a_v(i,k,j) = a_v(i,k,j)-gwalls*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
+        a_vb = gwalls*(rv(i,k,j)+rv(i,k,j-1))
         if (v(i,k,j) .lt. 0.) then
           a_v(i,k,j) = a_v(i,k,j)+a_vb
-          a_vb = 0.
+        else
+          a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
         endif
-        a_v(i,k,j-1) = a_v(i,k,j-1)+a_vb
-        a_vb = 0.
       end do
     end do
   endif
@@ -5590,12 +5795,13 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
       do i = i_start, i_end
         mrdy = msfv(i,j)*rdy
 ! recompute : mrdy
-        a_rv(i,k,j-1) = a_rv(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j)+v(i,k,j-1))
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j+1)+v(i,k,j))
-        a_rv(i,k,j) = a_rv(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(v(i,k,j+1)+v(i,k,j)-(v(i,k,j)+v(i,k,j-1)))
-        a_v(i,k,j-1) = a_v(i,k,j-1)+0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j)+rv(i,k,j-1))
-        a_v(i,k,j+1) = a_v(i,k,j+1)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j))
-        a_v(i,k,j) = a_v(i,k,j)-0.25*a_tendency(i,k,j)*mrdy*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
+        gwalls=0.25*a_tendency(i,k,j)*mrdy
+        a_rv(i,k,j-1) = a_rv(i,k,j-1)+gwalls*(v(i,k,j)+v(i,k,j-1))
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-gwalls*(v(i,k,j+1)+v(i,k,j))
+        a_rv(i,k,j) = a_rv(i,k,j)-gwalls*(v(i,k,j+1)+v(i,k,j)-(v(i,k,j)+v(i,k,j-1)))
+        a_v(i,k,j-1) = a_v(i,k,j-1)+gwalls*(rv(i,k,j)+rv(i,k,j-1))
+        a_v(i,k,j+1) = a_v(i,k,j+1)-gwalls*(rv(i,k,j+1)+rv(i,k,j))
+        a_v(i,k,j) = a_v(i,k,j)-gwalls*(rv(i,k,j+1)+rv(i,k,j)-(rv(i,k,j)+rv(i,k,j-1)))
       end do
     end do
   end do
@@ -5702,6 +5908,9 @@ real vb
 real vel
 integer vert_order
 real vw
+real walls(7),gwalls
+real iwalls(ims:ime)
+real kwalls(kms:kme)
 
    call trace_entry("a_advect_w")
 
@@ -5710,12 +5919,7 @@ real vw
 !----------------------------------------------
 a_fqx(:,:) = 0.
 a_fqy(:,:,:) = 0.
-a_ub = 0.
-a_uw = 0.
-a_vb = 0.
-a_vel = 0.
 a_vflux(:,:) = 0.
-a_vw = 0.
 
 !----------------------------------------------
 ! ROUTINE BODY
@@ -5746,44 +5950,54 @@ i_end = min(ite,ide-1)
 j_start = jts
 ! recompute : j_start
 j_end = min(jte,jde-1)
-! recompute : j_end
+! recompute : j_end; revised by walls
 a_vert_order_test: if (vert_order .eq. 6) then
   do j = j_end, j_start, -1
-    k = ktf+1
+!   k = ktf+1
 ! recompute : k
-    do i = i_start, i_end
-      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
-    end do
+!   do i = i_start, i_end
+!     a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
+!   end do
+
+    a_vflux(i_start:i_end,ktf+1) = a_vflux(i_start:i_end,ktf+1)+2*a_tendency(i_start:i_end,ktf+1,j)*rdzu(ktf)
+
     do k = kts+1, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzu(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzu(k)
-      end do
+!      gwalls=rdzu(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*rdzu(k)
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*rdzu(k)
     end do
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute : vel
       k = ktf+1
 ! recompute : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5204
 ! recompute vars : k
       k = ktf
 ! recompute vars : k
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
-      a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
+      a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*walls(2)
+      a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*walls(2)
+      a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5204
 ! recompute vars : k
@@ -5791,7 +6005,7 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5198
 ! recompute vars : k
@@ -5802,12 +6016,14 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute vars : vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
-      a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-      a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_vflux(i,k)*vel
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
+      a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*walls(2)
+      a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*walls(2)
+      a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5198
 ! recompute vars : k
@@ -5815,77 +6031,95 @@ a_vert_order_test: if (vert_order .eq. 6) then
 ! recompute vars : k
       a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5195
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf:ktf+1) = 0.
+
     do k = kts+3, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute : vel
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(w(i,k,j)+w(i,k-1,j))-0.13333333*(w(i,k+1,j)+w(i,k-2,j))+0.016666667*(w(i,k+2,j)+&
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k-1,j))-0.13333333*(w(i,k+1,j)+w(i,k-2,j))+0.016666667*(w(i,k+2,j)+&
 &w(i,k-3,j)))
-        a_w(i,k-3,j) = a_w(i,k-3,j)+0.016666667*a_vflux(i,k)*vel
-        a_w(i,k-2,j) = a_w(i,k-2,j)-0.13333333*a_vflux(i,k)*vel
-        a_w(i,k-1,j) = a_w(i,k-1,j)+0.61666667*a_vflux(i,k)*vel
-        a_w(i,k+2,j) = a_w(i,k+2,j)+0.016666667*a_vflux(i,k)*vel
-        a_w(i,k+1,j) = a_w(i,k+1,j)-0.13333333*a_vflux(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.61666667*a_vflux(i,k)*vel
-        a_vflux(i,k) = 0.
+        a_w(i,k-3,j) = a_w(i,k-3,j)+0.016666667*walls(2)
+        a_w(i,k-2,j) = a_w(i,k-2,j)-0.13333333*walls(2)
+        a_w(i,k-1,j) = a_w(i,k-1,j)+0.61666667*walls(2)
+        a_w(i,k+2,j) = a_w(i,k+2,j)+0.016666667*walls(2)
+        a_w(i,k+1,j) = a_w(i,k+1,j)-0.13333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.61666667*walls(2)
         a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 5) then a_vert_order_test
   do j = j_end, j_start, -1
-    k = ktf+1
-! recompute : k
-    do i = i_start, i_end
-      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
-    end do
+!   k = ktf+1
+! recompute : k; revised by walls
+!   gwalls=rdzu(k-1)
+!   do i = i_start, i_end
+!     a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*gwalls
+!   end do
+
+    a_vflux(i_start:i_end,ktf+1) =a_vflux(i_start:i_end,ktf+1)+2*a_tendency(i_start:i_end,ktf+1,j)*rdzu(ktf)
+
     do k = kts+1, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzu(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzu(k)
-      end do
+!      gwalls=rdzu(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k)   = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*rdzu(k)
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*rdzu(k)
     end do
+
     do i = i_start, i_end
-      a_vel = 0.
       k = ktf
 ! recompute : k
       vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
+      walls(3)=sign(1.,-vel)
 ! recompute : vel
       k = ktf+1
 ! recompute : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5252
 ! recompute vars : k
       k = ktf
 ! recompute vars : k
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-w(i,&
-&k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*sign(1.,-vel))
-      a_w(i,k-2,j) = a_w(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_w(i,k+1,j) = a_w(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-w(i,&
+&k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*walls(3))
+      a_w(i,k-2,j) = a_w(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_w(i,k+1,j) = a_w(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5252
 ! recompute vars : k
@@ -5893,7 +6127,7 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5247
 ! recompute vars : k
@@ -5904,13 +6138,16 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : vel
       vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute vars : vel
-      a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-w(i,&
-&k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*sign(1.,-vel))
-      a_w(i,k-2,j) = a_w(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-      a_w(i,k+1,j) = a_w(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-      a_vflux(i,k) = 0.
+      walls(3)=sign(1.,-vel)
+      walls(1)=a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-w(i,&
+&k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*walls(3))
+      a_w(i,k-2,j) = a_w(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_w(i,k+1,j) = a_w(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5247
 ! recompute vars : k
@@ -5918,162 +6155,212 @@ else if (vert_order .eq. 5) then a_vert_order_test
 ! recompute vars : k
       a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
       a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-      a_vel = 0.
+      
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5244
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1:kts+2) = 0.
+    a_vflux(i_start:i_end,ktf:ktf+1) = 0.
+
     do k = kts+3, ktf-1
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute : vel
-        a_vel = a_vel+a_vflux(i,k)*(0.61666667*(w(i,k,j)+w(i,k-1,j))-0.13333333*(w(i,k+1,j)+w(i,k-2,j))+0.016666667*(w(i,k+2,j)+&
-&w(i,k-3,j))-0.016666667*(w(i,k+2,j)-w(i,k-3,j)-5.*(w(i,k+1,j)-w(i,k-2,j))+10.*(w(i,k,j)-w(i,k-1,j)))*sign(1.,-vel))
-        a_w(i,k-3,j) = a_w(i,k-3,j)+a_vflux(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,-vel))
-        a_w(i,k-2,j) = a_w(i,k-2,j)+a_vflux(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,-vel))
-        a_w(i,k-1,j) = a_w(i,k-1,j)+a_vflux(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,-vel))
-        a_w(i,k+2,j) = a_w(i,k+2,j)+a_vflux(i,k)*vel*(0.016666667-0.016666667*sign(1.,-vel))
-        a_w(i,k+1,j) = a_w(i,k+1,j)+a_vflux(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,-vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_vflux(i,k)*vel*(0.61666667-0.16666667*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k-1,j))-0.13333333*(w(i,k+1,j)+w(i,k-2,j))+0.016666667*(w(i,k+2,j)+&
+&w(i,k-3,j))-0.016666667*(w(i,k+2,j)-w(i,k-3,j)-5.*(w(i,k+1,j)-w(i,k-2,j))+10.*(w(i,k,j)-w(i,k-1,j)))*walls(3))
+        a_w(i,k-3,j) = a_w(i,k-3,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_w(i,k-2,j) = a_w(i,k-2,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_w(i,k-1,j) = a_w(i,k-1,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_w(i,k+2,j) = a_w(i,k+2,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_w(i,k+1,j) = a_w(i,k+1,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
         a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+3:ktf-1) = 0.
+
   end do
 else if (vert_order .eq. 4) then a_vert_order_test
   do j = j_end, j_start, -1
-    k = ktf+1
-! recompute : k
-    do i = i_start, i_end
-      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
-    end do
+!   k = ktf+1
+! recompute : k; revised by walls
+!   do i = i_start, i_end
+!     a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
+!   end do
+
+    a_vflux(i_start:i_end,ktf+1) = a_vflux(i_start:i_end,ktf+1)+2*a_tendency(i_start:i_end,ktf+1,j)*rdzu(ktf)
+
     do k = kts+1, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzu(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzu(k)
-      end do
+!      gwalls=rdzu(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*rdzu(k)
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*rdzu(k)
     end do
+
     do i = i_start, i_end
       k = ktf+1
 ! recompute : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5292
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf+1) = 0.
+
     do k = kts+2, ktf
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute : vel
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
-        a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*a_vflux(i,k)*vel
-        a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*a_vflux(i,k)*vel
-        a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*a_vflux(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_vflux(i,k)*vel
-        a_vflux(i,k) = 0.
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j)))
+        a_w(i,k-2,j) = a_w(i,k-2,j)-0.083333333*walls(2)
+        a_w(i,k-1,j) = a_w(i,k-1,j)+0.58333333*walls(2)
+        a_w(i,k+1,j) = a_w(i,k+1,j)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
         a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf) = 0.
+
   end do
 else if (vert_order .eq. 3) then a_vert_order_test
   do j = j_end, j_start, -1
-    k = ktf+1
+!    k = ktf+1
 ! recompute : k
-    do i = i_start, i_end
-      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
-    end do
+!    do i = i_start, i_end
+!      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
+!    end do
+
+    a_vflux(i_start:i_end,ktf+1) = a_vflux(i_start:i_end,ktf+1)+2*a_tendency(i_start:i_end,ktf+1,j)*rdzu(ktf)
+
     do k = kts+1, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzu(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzu(k)
-      end do
+!      gwalls=rdzu(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*rdzu(k)
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*rdzu(k)
     end do
+
     do i = i_start, i_end
       k = ktf+1
 ! recompute : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j)   = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j)   = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j)     = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
 ! recdepend vars : kts
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:5328
 ! recompute vars : k
       k = kts+1
 ! recompute vars : k
-      a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-      a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-      a_vflux(i,k) = 0.
+      gwalls=0.25*a_vflux(i,k)
+!     a_vflux(i,k) = 0.
+      a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_rom(i,k,j)   = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+      a_w(i,k-1,j)   = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+      a_w(i,k,j)     = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
     end do
+
+    a_vflux(i_start:i_end,kts+1) = 0.
+    a_vflux(i_start:i_end,ktf+1) = 0.
+
     do k = kts+2, ktf
-      a_vel = 0.
       do i = i_start, i_end
-        a_vel = 0.
         vel = 0.5*(rom(i,k,j)+rom(i,k-1,j))
 ! recompute : vel
-        a_vel = a_vel+a_vflux(i,k)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-&
-&w(i,k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*sign(1.,-vel))
-        a_w(i,k-2,j) = a_w(i,k-2,j)+a_vflux(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,-vel))
-        a_w(i,k-1,j) = a_w(i,k-1,j)+a_vflux(i,k)*vel*(0.58333333+0.25*sign(1.,-vel))
-        a_w(i,k+1,j) = a_w(i,k+1,j)+a_vflux(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,-vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_vflux(i,k)*vel*(0.58333333+(-0.25)*sign(1.,-vel))
-        a_vflux(i,k) = 0.
+        walls(3)=sign(1.,-vel)
+        walls(1)=a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k-1,j))-0.083333333*(w(i,k+1,j)+w(i,k-2,j))+0.083333333*(w(i,k+1,j)-&
+&w(i,k-2,j)-3.*(w(i,k,j)-w(i,k-1,j)))*walls(3))
+        a_w(i,k-2,j) = a_w(i,k-2,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i,k-1,j) = a_w(i,k-1,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i,k+1,j) = a_w(i,k+1,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
         a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.5*a_vel
         a_rom(i,k,j) = a_rom(i,k,j)+0.5*a_vel
-        a_vel = 0.
       end do
     end do
+    a_vflux(i_start:i_end,kts+2:ktf) = 0.
+
   end do
 else if (vert_order .eq. 2) then a_vert_order_test
   do j = j_end, j_start, -1
-    k = ktf+1
+!    k = ktf+1
 ! recompute : k
-    do i = i_start, i_end
-      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
-    end do
+!    do i = i_start, i_end
+!      a_vflux(i,k) = a_vflux(i,k)+2*a_tendency(i,k,j)*rdzu(k-1)
+!    end do
+
+    a_vflux(i_start:i_end,ktf+1) = a_vflux(i_start:i_end,ktf+1)+2*a_tendency(i_start:i_end,ktf+1,j)*rdzu(ktf)
+
     do k = kts+1, ktf
-      do i = i_start, i_end
-        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*rdzu(k)
-        a_vflux(i,k) = a_vflux(i,k)+a_tendency(i,k,j)*rdzu(k)
-      end do
+!      gwalls=rdzu(k)
+!      do i = i_start, i_end
+!        a_vflux(i,k+1) = a_vflux(i,k+1)-a_tendency(i,k,j)*gwalls
+!        a_vflux(i,k)   = a_vflux(i,k)+a_tendency(i,k,j)*gwalls
+!      end do
+
+      a_vflux(i_start:i_end,k+1) = a_vflux(i_start:i_end,k+1)-a_tendency(i_start:i_end,k,j)*rdzu(k)
+      a_vflux(i_start:i_end,k)   = a_vflux(i_start:i_end,k)+a_tendency(i_start:i_end,k,j)*rdzu(k)
     end do
+
     do k = kts+1, ktf+1
       do i = i_start, i_end
-        a_rom(i,k-1,j) = a_rom(i,k-1,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-        a_rom(i,k,j) = a_rom(i,k,j)+0.25*a_vflux(i,k)*(w(i,k,j)+w(i,k-1,j))
-        a_w(i,k-1,j) = a_w(i,k-1,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.25*a_vflux(i,k)*(rom(i,k,j)+rom(i,k-1,j))
-        a_vflux(i,k) = 0.
+        gwalls=0.25*a_vflux(i,k)
+!       a_vflux(i,k) = 0.
+        a_rom(i,k-1,j) = a_rom(i,k-1,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+        a_rom(i,k,j) = a_rom(i,k,j)+gwalls*(w(i,k,j)+w(i,k-1,j))
+        a_w(i,k-1,j) = a_w(i,k-1,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
+        a_w(i,k,j) = a_w(i,k,j)+gwalls*(rom(i,k,j)+rom(i,k-1,j))
       end do
     end do
+
+    a_vflux(i_start:i_end,kts+1:ktf+1) = 0.
+
   end do
 endif a_vert_order_test
 ! recdepend vars : its
@@ -6094,56 +6381,50 @@ j_end = min(jte,jde-1)
 if (config_flags%open_ye .and. jte .eq. jde) then
   k = ktf+1
 ! recompute : k
+  walls(5)=fzm(k-1); walls(6)=fzp(k-1)
   do i = i_start, i_end
-    a_vb = 0.
-    a_vw = 0.
-    vw = 0.5*((2.-fzm(k-1))*(rv(i,k-1,jte-1)+rv(i,k-1,jte))-fzp(k-1)*(rv(i,k-2,jte-1)+rv(i,k-2,jte)))
+    vw = 0.5*((2.-walls(5))*(rv(i,k-1,jte-1)+rv(i,k-1,jte))-walls(6)*(rv(i,k-2,jte-1)+rv(i,k-2,jte)))
 ! recompute : vw
     vb = max(vw,0.)
 ! recompute : vb
-    a_rv(i,k-2,jte-1) = a_rv(i,k-2,jte-1)-a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzp(k-1)
-    a_rv(i,k-2,jte) = a_rv(i,k-2,jte)+a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzp(k-1)
-    a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*(2.-fzm(k-1))
-    a_rv(i,k-1,jte) = a_rv(i,k-1,jte)-a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*(2-fzm(k-1))
-    a_vb = a_vb-a_tendency(i,k,j_end)*rdy*(w_old(i,k,j_end)-w_old(i,k,j_end-1))
-    a_w(i,k,j_end) = a_w(i,k,j_end)-a_tendency(i,k,j_end)*rdy*((2.-fzm(k-1))*(rv(i,k-1,jte)-rv(i,k-1,jte-1))-fzp(k-1)*(rv(i,k-2,&
+    walls(1)=a_tendency(i,k,j_end)*rdy
+    a_rv(i,k-2,jte-1) = a_rv(i,k-2,jte-1)-walls(1)*w(i,k,j_end)*walls(6)
+    a_rv(i,k-2,jte) = a_rv(i,k-2,jte)+walls(1)*w(i,k,j_end)*walls(6)
+    a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+walls(1)*w(i,k,j_end)*(2.-walls(5))
+    a_rv(i,k-1,jte) = a_rv(i,k-1,jte)-walls(1)*w(i,k,j_end)*(2-walls(5))
+    a_vb = -walls(1)*(w_old(i,k,j_end)-w_old(i,k,j_end-1))
+    a_w(i,k,j_end) = a_w(i,k,j_end)-walls(1)*((2.-walls(5))*(rv(i,k-1,jte)-rv(i,k-1,jte-1))-walls(6)*(rv(i,k-2,&
 &jte)-rv(i,k-2,jte-1)))
-    a_w_old(i,k,j_end-1) = a_w_old(i,k,j_end-1)+a_tendency(i,k,j_end)*rdy*vb
-    a_w_old(i,k,j_end) = a_w_old(i,k,j_end)-a_tendency(i,k,j_end)*rdy*vb
-    a_vw = a_vw+a_vb*(0.5+sign(0.5,vw-0.))
-    a_vb = 0.
-    a_rv(i,k-2,jte-1) = a_rv(i,k-2,jte-1)-0.5*a_vw*fzp(k-1)
-    a_rv(i,k-2,jte) = a_rv(i,k-2,jte)-0.5*a_vw*fzp(k-1)
-    a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+0.5*a_vw*(2-fzm(k-1))
-    a_rv(i,k-1,jte) = a_rv(i,k-1,jte)+0.5*a_vw*(2-fzm(k-1))
-    a_vw = 0.
+    a_w_old(i,k,j_end-1) = a_w_old(i,k,j_end-1)+walls(1)*vb
+    a_w_old(i,k,j_end) = a_w_old(i,k,j_end)-walls(1)*vb
+    a_vw = 0.5*a_vb*(0.5+sign(0.5,vw-0.))
+    a_rv(i,k-2,jte-1) = a_rv(i,k-2,jte-1)-a_vw*walls(6)
+    a_rv(i,k-2,jte) = a_rv(i,k-2,jte)-a_vw*walls(6)
+    a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+a_vw*(2-walls(5))
+    a_rv(i,k-1,jte) = a_rv(i,k-1,jte)+a_vw*(2-walls(5))
   end do
   do i = i_start, i_end
-    a_vb = 0.
-    a_vw = 0.
     do k = kts+1, ktf
-      a_vb = 0.
-      a_vw = 0.
-      vw = 0.5*(fzm(k)*(rv(i,k,jte-1)+rv(i,k,jte))+fzp(k)*(rv(i,k-1,jte-1)+rv(i,k-1,jte)))
+      walls(2)=fzp(k); walls(3)=fzm(k)
+      vw = 0.5*(walls(3)*(rv(i,k,jte-1)+rv(i,k,jte))+walls(2)*(rv(i,k-1,jte-1)+rv(i,k-1,jte)))
 ! recompute : vw
       vb = max(vw,0.)
 ! recompute : vb
-      a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzp(k)
-      a_rv(i,k-1,jte) = a_rv(i,k-1,jte)-a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzp(k)
-      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzm(k)
-      a_rv(i,k,jte) = a_rv(i,k,jte)-a_tendency(i,k,j_end)*rdy*w(i,k,j_end)*fzm(k)
-      a_vb = a_vb-a_tendency(i,k,j_end)*rdy*(w_old(i,k,j_end)-w_old(i,k,j_end-1))
-      a_w(i,k,j_end) = a_w(i,k,j_end)-a_tendency(i,k,j_end)*rdy*(fzm(k)*(rv(i,k,jte)-rv(i,k,jte-1))+fzp(k)*(rv(i,k-1,jte)-rv(i,k-1,&
+      walls(1)=a_tendency(i,k,j_end)*rdy
+      a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+walls(1)*w(i,k,j_end)*walls(2)
+      a_rv(i,k-1,jte) = a_rv(i,k-1,jte)-walls(1)*w(i,k,j_end)*walls(2)
+      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+walls(1)*w(i,k,j_end)*walls(3)
+      a_rv(i,k,jte) = a_rv(i,k,jte)-walls(1)*w(i,k,j_end)*walls(3)
+      a_vb = -walls(1)*(w_old(i,k,j_end)-w_old(i,k,j_end-1))
+      a_w(i,k,j_end) = a_w(i,k,j_end)-walls(1)*(walls(3)*(rv(i,k,jte)-rv(i,k,jte-1))+walls(2)*(rv(i,k-1,jte)-rv(i,k-1,&
 &jte-1)))
-      a_w_old(i,k,j_end-1) = a_w_old(i,k,j_end-1)+a_tendency(i,k,j_end)*rdy*vb
-      a_w_old(i,k,j_end) = a_w_old(i,k,j_end)-a_tendency(i,k,j_end)*rdy*vb
-      a_vw = a_vw+a_vb*(0.5+sign(0.5,vw-0.))
-      a_vb = 0.
-      a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+0.5*a_vw*fzp(k)
-      a_rv(i,k-1,jte) = a_rv(i,k-1,jte)+0.5*a_vw*fzp(k)
-      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+0.5*a_vw*fzm(k)
-      a_rv(i,k,jte) = a_rv(i,k,jte)+0.5*a_vw*fzm(k)
-      a_vw = 0.
+      a_w_old(i,k,j_end-1) = a_w_old(i,k,j_end-1)+walls(1)*vb
+      a_w_old(i,k,j_end) = a_w_old(i,k,j_end)-walls(1)*vb
+      a_vw = 0.5*a_vb*(0.5+sign(0.5,vw-0.))
+      a_rv(i,k-1,jte-1) = a_rv(i,k-1,jte-1)+a_vw*walls(2)
+      a_rv(i,k-1,jte) = a_rv(i,k-1,jte)+a_vw*walls(2)
+      a_rv(i,k,jte-1) = a_rv(i,k,jte-1)+a_vw*walls(3)
+      a_rv(i,k,jte) = a_rv(i,k,jte)+a_vw*walls(3)
     end do
   end do
 endif
@@ -6160,56 +6441,50 @@ i_end = min(ite,ide-1)
 if (config_flags%open_ys .and. jts .eq. jds) then
   k = ktf+1
 ! recompute : k
+  walls(5)=fzm(k-1); walls(6)=fzp(k-1)
   do i = i_start, i_end
-    a_vb = 0.
-    a_vw = 0.
-    vw = 0.5*((2.-fzm(k-1))*(rv(i,k-1,jts)+rv(i,k-1,jts+1))-fzp(k-1)*(rv(i,k-2,jts)+rv(i,k-2,jts+1)))
+    vw = 0.5*((2.-walls(5))*(rv(i,k-1,jts)+rv(i,k-1,jts+1))-walls(6)*(rv(i,k-2,jts)+rv(i,k-2,jts+1)))
 ! recompute : vw
     vb = min(vw,0.)
 ! recompute : vb
-    a_rv(i,k-2,jts+1) = a_rv(i,k-2,jts+1)+a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzp(k-1)
-    a_rv(i,k-2,jts) = a_rv(i,k-2,jts)-a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzp(k-1)
-    a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)-a_tendency(i,k,jts)*rdy*w(i,k,jts)*(2-fzm(k-1))
-    a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+a_tendency(i,k,jts)*rdy*w(i,k,jts)*(2.-fzm(k-1))
-    a_vb = a_vb-a_tendency(i,k,jts)*rdy*(w_old(i,k,jts+1)-w_old(i,k,jts))
-    a_w(i,k,jts) = a_w(i,k,jts)-a_tendency(i,k,jts)*rdy*((2.-fzm(k-1))*(rv(i,k-1,jts+1)-rv(i,k-1,jts))-fzp(k-1)*(rv(i,k-2,jts+1)-&
+    walls(1)=a_tendency(i,k,jts)*rdy
+    a_rv(i,k-2,jts+1) = a_rv(i,k-2,jts+1)+walls(1)*w(i,k,jts)*walls(6)
+    a_rv(i,k-2,jts) = a_rv(i,k-2,jts)-walls(1)*w(i,k,jts)*walls(6)
+    a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)-walls(1)*w(i,k,jts)*(2-walls(5))
+    a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+walls(1)*w(i,k,jts)*(2.-walls(5))
+    a_vb = -walls(1)*(w_old(i,k,jts+1)-w_old(i,k,jts))
+    a_w(i,k,jts) = a_w(i,k,jts)-walls(1)*((2.-walls(5))*(rv(i,k-1,jts+1)-rv(i,k-1,jts))-walls(6)*(rv(i,k-2,jts+1)-&
 &rv(i,k-2,jts)))
-    a_w_old(i,k,jts+1) = a_w_old(i,k,jts+1)-a_tendency(i,k,jts)*rdy*vb
-    a_w_old(i,k,jts) = a_w_old(i,k,jts)+a_tendency(i,k,jts)*rdy*vb
-    a_vw = a_vw+a_vb*(0.5+sign(0.5,0.-vw))
-    a_vb = 0.
-    a_rv(i,k-2,jts+1) = a_rv(i,k-2,jts+1)-0.5*a_vw*fzp(k-1)
-    a_rv(i,k-2,jts) = a_rv(i,k-2,jts)-0.5*a_vw*fzp(k-1)
-    a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)+0.5*a_vw*(2-fzm(k-1))
-    a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+0.5*a_vw*(2-fzm(k-1))
-    a_vw = 0.
+    a_w_old(i,k,jts+1) = a_w_old(i,k,jts+1)-walls(1)*vb
+    a_w_old(i,k,jts) = a_w_old(i,k,jts)+walls(1)*vb
+    a_vw = 0.5*a_vb*(0.5+sign(0.5,0.-vw))
+    a_rv(i,k-2,jts+1) = a_rv(i,k-2,jts+1)-a_vw*walls(6)
+    a_rv(i,k-2,jts) = a_rv(i,k-2,jts)-a_vw*walls(6)
+    a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)+a_vw*(2-walls(5))
+    a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+a_vw*(2-walls(5))
   end do
   do i = i_start, i_end
-    a_vb = 0.
-    a_vw = 0.
     do k = kts+1, ktf
-      a_vb = 0.
-      a_vw = 0.
-      vw = 0.5*(fzm(k)*(rv(i,k,jts)+rv(i,k,jts+1))+fzp(k)*(rv(i,k-1,jts)+rv(i,k-1,jts+1)))
+      walls(2)=fzp(k); walls(3)=fzm(k)
+      vw = 0.5*(walls(3)*(rv(i,k,jts)+rv(i,k,jts+1))+walls(2)*(rv(i,k-1,jts)+rv(i,k-1,jts+1)))
 ! recompute : vw
       vb = min(vw,0.)
 ! recompute : vb
-      a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)-a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzp(k)
-      a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzp(k)
-      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)-a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzm(k)
-      a_rv(i,k,jts) = a_rv(i,k,jts)+a_tendency(i,k,jts)*rdy*w(i,k,jts)*fzm(k)
-      a_vb = a_vb-a_tendency(i,k,jts)*rdy*(w_old(i,k,jts+1)-w_old(i,k,jts))
-      a_w(i,k,jts) = a_w(i,k,jts)-a_tendency(i,k,jts)*rdy*(fzm(k)*(rv(i,k,jts+1)-rv(i,k,jts))+fzp(k)*(rv(i,k-1,jts+1)-rv(i,k-1,jts)&
+      walls(1)=a_tendency(i,k,jts)*rdy
+      a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)-walls(1)*w(i,k,jts)*walls(2)
+      a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+walls(1)*w(i,k,jts)*walls(2)
+      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)-walls(1)*w(i,k,jts)*walls(3)
+      a_rv(i,k,jts) = a_rv(i,k,jts)+walls(1)*w(i,k,jts)*walls(3)
+      a_vb = -walls(1)*(w_old(i,k,jts+1)-w_old(i,k,jts))
+      a_w(i,k,jts) = a_w(i,k,jts)-walls(1)*(walls(3)*(rv(i,k,jts+1)-rv(i,k,jts))+walls(2)*(rv(i,k-1,jts+1)-rv(i,k-1,jts)&
 &))
-      a_w_old(i,k,jts+1) = a_w_old(i,k,jts+1)-a_tendency(i,k,jts)*rdy*vb
-      a_w_old(i,k,jts) = a_w_old(i,k,jts)+a_tendency(i,k,jts)*rdy*vb
-      a_vw = a_vw+a_vb*(0.5+sign(0.5,0.-vw))
-      a_vb = 0.
-      a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)+0.5*a_vw*fzp(k)
-      a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+0.5*a_vw*fzp(k)
-      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)+0.5*a_vw*fzm(k)
-      a_rv(i,k,jts) = a_rv(i,k,jts)+0.5*a_vw*fzm(k)
-      a_vw = 0.
+      a_w_old(i,k,jts+1) = a_w_old(i,k,jts+1)-walls(1)*vb
+      a_w_old(i,k,jts) = a_w_old(i,k,jts)+walls(1)*vb
+      a_vw = 0.5*a_vb*(0.5+sign(0.5,0.-vw))
+      a_rv(i,k-1,jts+1) = a_rv(i,k-1,jts+1)+a_vw*walls(2)
+      a_rv(i,k-1,jts) = a_rv(i,k-1,jts)+a_vw*walls(2)
+      a_rv(i,k,jts+1) = a_rv(i,k,jts+1)+a_vw*walls(3)
+      a_rv(i,k,jts) = a_rv(i,k,jts)+a_vw*walls(3)
     end do
   end do
 endif
@@ -6231,56 +6506,53 @@ j_end = min(jte,jde-1)
 if (config_flags%open_xe .and. ite .eq. ide) then
   k = ktf+1
 ! recompute : k
+  walls(5)=fzm(k-1); walls(6)=fzp(k-1)
   do j = j_start, j_end
-    a_ub = 0.
-    a_uw = 0.
-    uw = 0.5*((2.-fzm(k-1))*(ru(ite-1,k-1,j)+ru(ite,k-1,j))-fzp(k-1)*(ru(ite-1,k-2,j)+ru(ite,k-2,j)))
+    
+    uw = 0.5*((2.-walls(5))*(ru(ite-1,k-1,j)+ru(ite,k-1,j))-walls(6)*(ru(ite-1,k-2,j)+ru(ite,k-2,j)))
 ! recompute : uw
     ub = max(uw,0.)
 ! recompute : ub
-    a_ru(ite-1,k-2,j) = a_ru(ite-1,k-2,j)-a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzp(k-1)
-    a_ru(ite,k-2,j) = a_ru(ite,k-2,j)+a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzp(k-1)
-    a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*(2.-fzm(k-1))
-    a_ru(ite,k-1,j) = a_ru(ite,k-1,j)-a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*(2-fzm(k-1))
-    a_ub = a_ub-a_tendency(i_end,k,j)*rdx*(w_old(i_end,k,j)-w_old(i_end-1,k,j))
-    a_w(i_end,k,j) = a_w(i_end,k,j)-a_tendency(i_end,k,j)*rdx*((2.-fzm(k-1))*(ru(ite,k-1,j)-ru(ite-1,k-1,j))-fzp(k-1)*(ru(ite,k-2,&
+    walls(1)=a_tendency(i_end,k,j)*rdx
+    a_ru(ite-1,k-2,j) = a_ru(ite-1,k-2,j)-walls(1)*w(i_end,k,j)*walls(6)
+    a_ru(ite,k-2,j) = a_ru(ite,k-2,j)+walls(1)*w(i_end,k,j)*walls(6)
+    a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+walls(1)*w(i_end,k,j)*(2.-walls(5))
+    a_ru(ite,k-1,j) = a_ru(ite,k-1,j)-walls(1)*w(i_end,k,j)*(2-walls(5))
+    a_ub =-walls(1)*(w_old(i_end,k,j)-w_old(i_end-1,k,j))
+    a_w(i_end,k,j) = a_w(i_end,k,j)-walls(1)*((2.-walls(5))*(ru(ite,k-1,j)-ru(ite-1,k-1,j))-walls(6)*(ru(ite,k-2,&
 &j)-ru(ite-1,k-2,j)))
-    a_w_old(i_end-1,k,j) = a_w_old(i_end-1,k,j)+a_tendency(i_end,k,j)*rdx*ub
-    a_w_old(i_end,k,j) = a_w_old(i_end,k,j)-a_tendency(i_end,k,j)*rdx*ub
-    a_uw = a_uw+a_ub*(0.5+sign(0.5,uw-0.))
-    a_ub = 0.
-    a_ru(ite-1,k-2,j) = a_ru(ite-1,k-2,j)-0.5*a_uw*fzp(k-1)
-    a_ru(ite,k-2,j) = a_ru(ite,k-2,j)-0.5*a_uw*fzp(k-1)
-    a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+0.5*a_uw*(2-fzm(k-1))
-    a_ru(ite,k-1,j) = a_ru(ite,k-1,j)+0.5*a_uw*(2-fzm(k-1))
-    a_uw = 0.
+    a_w_old(i_end-1,k,j) = a_w_old(i_end-1,k,j)+walls(1)*ub
+    a_w_old(i_end,k,j) = a_w_old(i_end,k,j)-walls(1)*ub
+    a_uw = a_ub*(0.5+sign(0.5,uw-0.))
+    
+    a_ru(ite-1,k-2,j) = a_ru(ite-1,k-2,j)-0.5*a_uw*walls(6)
+    a_ru(ite,k-2,j) = a_ru(ite,k-2,j)-0.5*a_uw*walls(6)
+    a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+0.5*a_uw*(2-walls(5))
+    a_ru(ite,k-1,j) = a_ru(ite,k-1,j)+0.5*a_uw*(2-walls(5))
   end do
   do j = j_start, j_end
-    a_ub = 0.
-    a_uw = 0.
     do k = kts+1, ktf
-      a_ub = 0.
-      a_uw = 0.
-      uw = 0.5*(fzm(k)*(ru(ite-1,k,j)+ru(ite,k,j))+fzp(k)*(ru(ite-1,k-1,j)+ru(ite,k-1,j)))
+      walls(2)=fzp(k); walls(3)=fzm(k)
+      uw = 0.5*(walls(3)*(ru(ite-1,k,j)+ru(ite,k,j))+walls(2)*(ru(ite-1,k-1,j)+ru(ite,k-1,j)))
 ! recompute : uw
       ub = max(uw,0.)
 ! recompute : ub
-      a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzp(k)
-      a_ru(ite,k-1,j) = a_ru(ite,k-1,j)-a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzp(k)
-      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzm(k)
-      a_ru(ite,k,j) = a_ru(ite,k,j)-a_tendency(i_end,k,j)*rdx*w(i_end,k,j)*fzm(k)
-      a_ub = a_ub-a_tendency(i_end,k,j)*rdx*(w_old(i_end,k,j)-w_old(i_end-1,k,j))
-      a_w(i_end,k,j) = a_w(i_end,k,j)-a_tendency(i_end,k,j)*rdx*(fzm(k)*(ru(ite,k,j)-ru(ite-1,k,j))+fzp(k)*(ru(ite,k-1,j)-ru(ite-1,&
+      walls(1)=a_tendency(i_end,k,j)*rdx
+      a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+walls(1)*w(i_end,k,j)*walls(2)
+      a_ru(ite,k-1,j) = a_ru(ite,k-1,j)-walls(1)*w(i_end,k,j)*walls(2)
+      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+walls(1)*w(i_end,k,j)*walls(3)
+      a_ru(ite,k,j) = a_ru(ite,k,j)-walls(1)*w(i_end,k,j)*walls(3)
+      a_ub =-walls(1)*(w_old(i_end,k,j)-w_old(i_end-1,k,j))
+      a_w(i_end,k,j) = a_w(i_end,k,j)-walls(1)*(walls(3)*(ru(ite,k,j)-ru(ite-1,k,j))+walls(2)*(ru(ite,k-1,j)-ru(ite-1,&
 &k-1,j)))
-      a_w_old(i_end-1,k,j) = a_w_old(i_end-1,k,j)+a_tendency(i_end,k,j)*rdx*ub
-      a_w_old(i_end,k,j) = a_w_old(i_end,k,j)-a_tendency(i_end,k,j)*rdx*ub
-      a_uw = a_uw+a_ub*(0.5+sign(0.5,uw-0.))
-      a_ub = 0.
-      a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+0.5*a_uw*fzp(k)
-      a_ru(ite,k-1,j) = a_ru(ite,k-1,j)+0.5*a_uw*fzp(k)
-      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+0.5*a_uw*fzm(k)
-      a_ru(ite,k,j) = a_ru(ite,k,j)+0.5*a_uw*fzm(k)
-      a_uw = 0.
+      a_w_old(i_end-1,k,j) = a_w_old(i_end-1,k,j)+walls(1)*ub
+      a_w_old(i_end,k,j) = a_w_old(i_end,k,j)-walls(1)*ub
+      a_uw = a_ub*(0.5+sign(0.5,uw-0.))
+      
+      a_ru(ite-1,k-1,j) = a_ru(ite-1,k-1,j)+0.5*a_uw*walls(2)
+      a_ru(ite,k-1,j) = a_ru(ite,k-1,j)+0.5*a_uw*walls(2)
+      a_ru(ite-1,k,j) = a_ru(ite-1,k,j)+0.5*a_uw*walls(3)
+      a_ru(ite,k,j) = a_ru(ite,k,j)+0.5*a_uw*walls(3)
     end do
   end do
 endif
@@ -6297,56 +6569,53 @@ j_end = min(jte,jde-1)
 if (config_flags%open_xs .and. its .eq. ids) then
   k = ktf+1
 ! recompute : k
+  walls(5)=fzm(k-1); walls(6)=fzp(k-1)
   do j = j_start, j_end
-    a_ub = 0.
-    a_uw = 0.
-    uw = 0.5*((2.-fzm(k-1))*(ru(its,k-1,j)+ru(its+1,k-1,j))-fzp(k-1)*(ru(its,k-2,j)+ru(its+1,k-2,j)))
+    
+    uw = 0.5*((2.-walls(5))*(ru(its,k-1,j)+ru(its+1,k-1,j))-walls(6)*(ru(its,k-2,j)+ru(its+1,k-2,j)))
 ! recompute : uw
     ub = min(uw,0.)
 ! recompute : ub
-    a_ru(its+1,k-2,j) = a_ru(its+1,k-2,j)+a_tendency(its,k,j)*rdx*w(its,k,j)*fzp(k-1)
-    a_ru(its,k-2,j) = a_ru(its,k-2,j)-a_tendency(its,k,j)*rdx*w(its,k,j)*fzp(k-1)
-    a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)-a_tendency(its,k,j)*rdx*w(its,k,j)*(2-fzm(k-1))
-    a_ru(its,k-1,j) = a_ru(its,k-1,j)+a_tendency(its,k,j)*rdx*w(its,k,j)*(2.-fzm(k-1))
-    a_ub = a_ub-a_tendency(its,k,j)*rdx*(w_old(its+1,k,j)-w_old(its,k,j))
-    a_w(its,k,j) = a_w(its,k,j)-a_tendency(its,k,j)*rdx*((2.-fzm(k-1))*(ru(its+1,k-1,j)-ru(its,k-1,j))-fzp(k-1)*(ru(its+1,k-2,j)-&
+    walls(1)=a_tendency(its,k,j)*rdx
+    a_ru(its+1,k-2,j) = a_ru(its+1,k-2,j)+walls(1)*w(its,k,j)*walls(6)
+    a_ru(its,k-2,j) = a_ru(its,k-2,j)-walls(1)*w(its,k,j)*walls(6)
+    a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)-walls(1)*w(its,k,j)*(2-walls(5))
+    a_ru(its,k-1,j) = a_ru(its,k-1,j)+walls(1)*w(its,k,j)*(2.-walls(5))
+    a_ub =-walls(1)*(w_old(its+1,k,j)-w_old(its,k,j))
+    a_w(its,k,j) = a_w(its,k,j)-walls(1)*((2.-walls(5))*(ru(its+1,k-1,j)-ru(its,k-1,j))-walls(6)*(ru(its+1,k-2,j)-&
 &ru(its,k-2,j)))
-    a_w_old(its+1,k,j) = a_w_old(its+1,k,j)-a_tendency(its,k,j)*rdx*ub
-    a_w_old(its,k,j) = a_w_old(its,k,j)+a_tendency(its,k,j)*rdx*ub
-    a_uw = a_uw+a_ub*(0.5+sign(0.5,0.-uw))
-    a_ub = 0.
-    a_ru(its+1,k-2,j) = a_ru(its+1,k-2,j)-0.5*a_uw*fzp(k-1)
-    a_ru(its,k-2,j) = a_ru(its,k-2,j)-0.5*a_uw*fzp(k-1)
-    a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)+0.5*a_uw*(2-fzm(k-1))
-    a_ru(its,k-1,j) = a_ru(its,k-1,j)+0.5*a_uw*(2-fzm(k-1))
-    a_uw = 0.
+    a_w_old(its+1,k,j) = a_w_old(its+1,k,j)-walls(1)*ub
+    a_w_old(its,k,j) = a_w_old(its,k,j)+walls(1)*ub
+    a_uw = a_ub*(0.5+sign(0.5,0.-uw))
+    
+    a_ru(its+1,k-2,j) = a_ru(its+1,k-2,j)-0.5*a_uw*walls(6)
+    a_ru(its,k-2,j) = a_ru(its,k-2,j)-0.5*a_uw*walls(6)
+    a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)+0.5*a_uw*(2-walls(5))
+    a_ru(its,k-1,j) = a_ru(its,k-1,j)+0.5*a_uw*(2-walls(5))
   end do
   do j = j_start, j_end
-    a_ub = 0.
-    a_uw = 0.
     do k = kts+1, ktf
-      a_ub = 0.
-      a_uw = 0.
-      uw = 0.5*(fzm(k)*(ru(its,k,j)+ru(its+1,k,j))+fzp(k)*(ru(its,k-1,j)+ru(its+1,k-1,j)))
+      walls(2)=fzp(k); walls(3)=fzm(k)
+      uw = 0.5*(walls(3)*(ru(its,k,j)+ru(its+1,k,j))+walls(2)*(ru(its,k-1,j)+ru(its+1,k-1,j)))
 ! recompute : uw
       ub = min(uw,0.)
 ! recompute : ub
-      a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)-a_tendency(its,k,j)*rdx*w(its,k,j)*fzp(k)
-      a_ru(its,k-1,j) = a_ru(its,k-1,j)+a_tendency(its,k,j)*rdx*w(its,k,j)*fzp(k)
-      a_ru(its+1,k,j) = a_ru(its+1,k,j)-a_tendency(its,k,j)*rdx*w(its,k,j)*fzm(k)
-      a_ru(its,k,j) = a_ru(its,k,j)+a_tendency(its,k,j)*rdx*w(its,k,j)*fzm(k)
-      a_ub = a_ub-a_tendency(its,k,j)*rdx*(w_old(its+1,k,j)-w_old(its,k,j))
-      a_w(its,k,j) = a_w(its,k,j)-a_tendency(its,k,j)*rdx*(fzm(k)*(ru(its+1,k,j)-ru(its,k,j))+fzp(k)*(ru(its+1,k-1,j)-ru(its,k-1,j)&
+      walls(1)=a_tendency(its,k,j)*rdx
+      a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)-walls(1)*w(its,k,j)*walls(2)
+      a_ru(its,k-1,j) = a_ru(its,k-1,j)+walls(1)*w(its,k,j)*walls(2)
+      a_ru(its+1,k,j) = a_ru(its+1,k,j)-walls(1)*w(its,k,j)*walls(3)
+      a_ru(its,k,j) = a_ru(its,k,j)+walls(1)*w(its,k,j)*walls(3)
+      a_ub =-walls(1)*(w_old(its+1,k,j)-w_old(its,k,j))
+      a_w(its,k,j) = a_w(its,k,j)-walls(1)*(walls(3)*(ru(its+1,k,j)-ru(its,k,j))+walls(2)*(ru(its+1,k-1,j)-ru(its,k-1,j)&
 &))
-      a_w_old(its+1,k,j) = a_w_old(its+1,k,j)-a_tendency(its,k,j)*rdx*ub
-      a_w_old(its,k,j) = a_w_old(its,k,j)+a_tendency(its,k,j)*rdx*ub
-      a_uw = a_uw+a_ub*(0.5+sign(0.5,0.-uw))
-      a_ub = 0.
-      a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)+0.5*a_uw*fzp(k)
-      a_ru(its,k-1,j) = a_ru(its,k-1,j)+0.5*a_uw*fzp(k)
-      a_ru(its+1,k,j) = a_ru(its+1,k,j)+0.5*a_uw*fzm(k)
-      a_ru(its,k,j) = a_ru(its,k,j)+0.5*a_uw*fzm(k)
-      a_uw = 0.
+      a_w_old(its+1,k,j) = a_w_old(its+1,k,j)-walls(1)*ub
+      a_w_old(its,k,j) = a_w_old(its,k,j)+walls(1)*ub
+      a_uw = a_ub*(0.5+sign(0.5,0.-uw))
+      
+      a_ru(its+1,k-1,j) = a_ru(its+1,k-1,j)+0.5*a_uw*walls(2)
+      a_ru(its,k-1,j) = a_ru(its,k-1,j)+0.5*a_uw*walls(2)
+      a_ru(its+1,k,j) = a_ru(its+1,k,j)+0.5*a_uw*walls(3)
+      a_ru(its,k,j) = a_ru(its,k,j)+0.5*a_uw*walls(3)
     end do
   end do
 endif
@@ -6427,164 +6696,187 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
         a_fqx(i,k) = a_fqx(i,k)+a_tendency(i,k,j)*mrdx
       end do
     end do
+
     if (degrade_xe) then
       i = ide-2
 ! recompute : i
       k = ktf+1
 ! recompute : k
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
-! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
+! recompute : vel 
+      walls(1)=a_fqx(i,k)
+!     a_fqx(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
       do k = kts+1, ktf
-        a_vel = 0.
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
         a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
       end do
+      a_fqx(ide-2,kts+1:ktf+1) = 0.
+
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
         k = ktf+1
+        walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-        a_ru(i,k-2,j) = a_ru(i,k-2,j)-0.5*a_fqx(i,k)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_fqx(i,k) = 0.
+        walls(1)=0.5*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i,k-2,j) = a_ru(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i-1,k,j))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i-1,k,j))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
         do k = kts+1, ktf
-          a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
-          a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_fqx(i,k) = 0.
+          gwalls=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k-1,j) = a_ru(i,k-1,j)+gwalls*fzp(k)*(w(i,k,j)+w(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+gwalls*fzm(k)*(w(i,k,j)+w(i-1,k,j))
+          a_w(i-1,k,j) = a_w(i-1,k,j)+gwalls*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+gwalls*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
         end do
+        a_fqx(ide-1,kts+1:ktf+1) = 0.
+
       endif
     endif
+
     if (degrade_xs) then
-      do k = kts+1, ktf
-        i = i_start+1
-      end do
-! recompute : i
-      k = ktf+1
-! recompute : k
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
-! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
-      k = ktf
       i = i_start+1
 ! recompute : i
+      k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
+! recompute : k
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
+! recompute : vel
+      walls(1)=a_fqx(i,k)
+!     a_fqx(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
+      
+      k = ktf
       vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_fqx(i,k) = 0.
+      walls(1)=a_fqx(i,k)
+!     a_fqx(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
       a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
       a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-      a_vel = 0.
+      
       do k = kts+1, ktf-1
-        a_vel = 0.
-        i = i_start+1
-! recompute : i
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
         a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
       end do
+      a_fqx(i_start+1,kts+1:ktf+1) = 0.
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         k = ktf+1
+        walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-        a_ru(i,k-2,j) = a_ru(i,k-2,j)-0.5*a_fqx(i,k)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_fqx(i,k) = 0.
+        walls(1)=0.5*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i,k-2,j) = a_ru(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i-1,k,j))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i-1,k,j))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
         do k = kts+1, ktf
-          a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
-          a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
+          a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
         end do
+        a_fqx(ids+1,kts+1:ktf+1) = 0.
+
       endif
     endif
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:4174
 ! recompute vars : k
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute vars : k
+
     do i = i_start_f, i_end_f
-      a_vel = 0.
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,&
+      walls(1)=a_fqx(i,k)
+!     a_fqx(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,&
 &k,j)))
-      a_w(i-3,k,j) = a_w(i-3,k,j)+0.016666667*a_fqx(i,k)*vel
-      a_w(i-2,k,j) = a_w(i-2,k,j)-0.13333333*a_fqx(i,k)*vel
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.61666667*a_fqx(i,k)*vel
-      a_w(i+2,k,j) = a_w(i+2,k,j)+0.016666667*a_fqx(i,k)*vel
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.13333333*a_fqx(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.61666667*a_fqx(i,k)*vel
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      a_w(i-3,k,j) = a_w(i-3,k,j)+0.016666667*walls(2)
+      a_w(i-2,k,j) = a_w(i-2,k,j)-0.13333333*walls(2)
+      a_w(i-1,k,j) = a_w(i-1,k,j)+0.61666667*walls(2)
+      a_w(i+2,k,j) = a_w(i+2,k,j)+0.016666667*walls(2)
+      a_w(i+1,k,j) = a_w(i+1,k,j)-0.13333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.61666667*walls(2)
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
     end do
+    a_fqx(i_start_f:i_end_f,ktf+1) = 0.
+
     do k = kts+1, ktf
-      a_vel = 0.
+      walls(3)=fzp(k); walls(4)=fzm(k)
       do i = i_start_f, i_end_f
-        a_vel = 0.
-        vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
+        vel = walls(4)*ru(i,k,j)+walls(3)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-&
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-&
 &3,k,j)))
-        a_w(i-3,k,j) = a_w(i-3,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_w(i-2,k,j) = a_w(i-2,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_w(i+2,k,j) = a_w(i+2,k,j)+0.016666667*a_fqx(i,k)*vel
-        a_w(i+1,k,j) = a_w(i+1,k,j)-0.13333333*a_fqx(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.61666667*a_fqx(i,k)*vel
-        a_fqx(i,k) = 0.
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
-        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
+        a_w(i-3,k,j) = a_w(i-3,k,j)+0.016666667*walls(2)
+        a_w(i-2,k,j) = a_w(i-2,k,j)-0.13333333*walls(2)
+        a_w(i-1,k,j) = a_w(i-1,k,j)+0.61666667*walls(2)
+        a_w(i+2,k,j) = a_w(i+2,k,j)+0.016666667*walls(2)
+        a_w(i+1,k,j) = a_w(i+1,k,j)-0.13333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.61666667*walls(2)
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*walls(3)
+        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*walls(4)
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts+1:ktf) = 0.
+
   end do
 ! recdepend vars : its
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:4000
@@ -6639,157 +6931,167 @@ a_horizontal_order_test: if (horz_order .eq. 6) then
     if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)+&
+        walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)+&
 &w(i,k,j-3)))
-        a_w(i,k,j-3) = a_w(i,k,j-3)+0.016666667*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j-2) = a_w(i,k,j-2)-0.13333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.61666667*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j+2) = a_w(i,k,j+2)+0.016666667*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j+1) = a_w(i,k,j+1)-0.13333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.61666667*a_fqy(i,k,jp1)*vel
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+        a_w(i,k,j-3) = a_w(i,k,j-3)+0.016666667*walls(2)
+        a_w(i,k,j-2) = a_w(i,k,j-2)-0.13333333*walls(2)
+        a_w(i,k,j-1) = a_w(i,k,j-1)+0.61666667*walls(2)
+        a_w(i,k,j+2) = a_w(i,k,j+2)+0.016666667*walls(2)
+        a_w(i,k,j+1) = a_w(i,k,j+1)-0.13333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.61666667*walls(2)
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          
+          vel = walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)&
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)&
 &+w(i,k,j-3)))
-          a_w(i,k,j-3) = a_w(i,k,j-3)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j-2) = a_w(i,k,j-2)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j+2) = a_w(i,k,j+2)+0.016666667*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j+1) = a_w(i,k,j+1)-0.13333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j) = a_w(i,k,j)+0.61666667*a_fqy(i,k,jp1)*vel
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          a_w(i,k,j-3) = a_w(i,k,j-3)+0.016666667*walls(2)
+          a_w(i,k,j-2) = a_w(i,k,j-2)-0.13333333*walls(2)
+          a_w(i,k,j-1) = a_w(i,k,j-1)+0.61666667*walls(2)
+          a_w(i,k,j+2) = a_w(i,k,j+2)+0.016666667*walls(2)
+          a_w(i,k,j+1) = a_w(i,k,j+1)-0.13333333*walls(2)
+          a_w(i,k,j) = a_w(i,k,j)+0.61666667*walls(2)
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(3)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     else if (j .eq. jds+1) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i,k,j-1))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j)+w(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j)+w(i,k,j-1))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*walls(3)*(w(i,k,j)+w(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*walls(4)*(w(i,k,j)+w(i,k,j-1))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
         end do
       end do
     else if (j .eq. jds+2) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-        a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+        a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*walls(2)
+        a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*walls(2)
+        a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          
+          vel = walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*walls(2)
+          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*walls(2)
+          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*walls(2)
+          a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(3)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     else if (j .eq. jde-1) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i,k,j-1))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j)+w(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j)+w(i,k,j-1))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*walls(3)*(w(i,k,j)+w(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*walls(4)*(w(i,k,j)+w(i,k,j-1))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
         end do
       end do
     else if (j .eq. jde-2) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-        a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+        a_w(i,k,j-2)  = a_w(i,k,j-2)-0.083333333*walls(2)
+        a_w(i,k,j-1)  = a_w(i,k,j-1)+0.58333333*walls(2)
+        a_w(i,k,j+1)  = a_w(i,k,j+1)-0.083333333*walls(2)
+        a_w(i,k,j)    = a_w(i,k,j)+0.58333333*walls(2)
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          
+          vel = walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*walls(2)
+          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*walls(2)
+          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*walls(2)
+          a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(3)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     endif
@@ -6870,144 +7172,158 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
       i = ide-2
 ! recompute : i
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
-&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-      a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-      a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-      a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
+&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+      a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
+      
       do k = kts+1, ktf
-        a_vel = 0.
+        
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
-&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-        a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
+&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+        a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
         a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
       end do
+
       if (i_end .eq. ide-2) then
         i = ide-1
 ! recompute : i
         k = ktf+1
+        walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-        a_ru(i,k-2,j) = a_ru(i,k-2,j)-0.5*a_fqx(i,k)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_fqx(i,k) = 0.
+        walls(1)=0.5*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i,k-2,j) = a_ru(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i-1,k,j))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i-1,k,j))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
         do k = kts+1, ktf
-          a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
-          a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
+          a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
         end do
+        a_fqx(ide-1,kts+1:ktf+1) = 0.
       endif
     endif
+
     if (degrade_xs) then
       i = i_start+1
 ! recompute : i
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
-&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-      a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-      a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-      a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
+&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+      a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
+      
       do k = kts+1, ktf
-        a_vel = 0.
+        
         vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
-&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-        a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqx(i,k) = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
+&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+        a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
         a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
         a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
       end do
+
       if (i_start .eq. ids+1) then
         i = ids+1
 ! recompute : i
         k = ktf+1
+        walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-        a_ru(i,k-2,j) = a_ru(i,k-2,j)-0.5*a_fqx(i,k)*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-        a_fqx(i,k) = 0.
+        walls(1)=0.5*a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        a_ru(i,k-2,j) = a_ru(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i-1,k,j))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i-1,k,j))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
         do k = kts+1, ktf
-          a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_fqx(i,k)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
-          a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_fqx(i,k)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
-          a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqx(i,k)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-          a_fqx(i,k) = 0.
+          walls(1)=0.5*a_fqx(i,k)
+!         a_fqx(i,k) = 0.
+          a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*fzp(k)*(w(i,k,j)+w(i-1,k,j))
+          a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*fzm(k)*(w(i,k,j)+w(i-1,k,j))
+          a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
         end do
+        a_fqx(ids+1,kts+1:ktf+1) = 0.
+
       endif
     endif
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:4456
 ! recompute vars : k
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute vars : k
     do i = i_start_f, i_end_f
-      a_vel = 0.
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,&
-&k,j))-0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-      a_w(i-3,k,j) = a_w(i-3,k,j)+a_fqx(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-      a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-      a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-      a_w(i+2,k,j) = a_w(i+2,k,j)+a_fqx(i,k)*vel*(0.016666667-0.016666667*sign(1.,vel))
-      a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.61666667-0.16666667*sign(1.,vel))
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+      a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-3,&
+&k,j))-0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+      a_w(i-3,k,j) = a_w(i-3,k,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+      a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+      a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+      a_w(i+2,k,j) = a_w(i+2,k,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+      a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
+      
     end do
     do k = kts+1, ktf
-      a_vel = 0.
+      
+      walls(5)=fzp(k); walls(4)=fzm(k)
       do i = i_start_f, i_end_f
-        a_vel = 0.
-        vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
+        
+        vel = walls(4)*ru(i,k,j)+walls(5)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-&
-&3,k,j))-0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-        a_w(i-3,k,j) = a_w(i-3,k,j)+a_fqx(i,k)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-        a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-        a_w(i+2,k,j) = a_w(i+2,k,j)+a_fqx(i,k)*vel*(0.016666667-0.016666667*sign(1.,vel))
-        a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        a_fqx(i,k) = 0.
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
-        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
+        walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i-1,k,j))-0.13333333*(w(i+1,k,j)+w(i-2,k,j))+0.016666667*(w(i+2,k,j)+w(i-&
+&3,k,j))-0.016666667*(w(i+2,k,j)-w(i-3,k,j)-5.*(w(i+1,k,j)-w(i-2,k,j))+10.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+        a_w(i-3,k,j) = a_w(i-3,k,j)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_w(i+2,k,j) = a_w(i+2,k,j)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*walls(5)
+        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*walls(4)
+        
       end do
     end do
   end do
@@ -7064,161 +7380,166 @@ else if (horz_order .eq. 5) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .ge. j_start_f .and. j .le. j_end_f) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)+&
-&w(i,k,j-3))-0.016666667*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-        a_w(i,k,j-3) = a_w(i,k,j-3)+a_fqy(i,k,jp1)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-        a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-        a_w(i,k,j+2) = a_w(i,k,j+2)+a_fqy(i,k,jp1)*vel*(0.016666667-0.016666667*sign(1.,vel))
-        a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.61666667-0.16666667*sign(1.,vel))
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)+&
+&w(i,k,j-3))-0.016666667*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+        a_w(i,k,j-3) = a_w(i,k,j-3)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+        a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+        a_w(i,k,j+2) = a_w(i,k,j+2)+walls(2)*(0.016666667-0.016666667*walls(3))
+        a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        
+        walls(5)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          
+          vel = walls(4)*rv(i,k,j)+walls(5)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)&
-&+w(i,k,j-3))-0.016666667*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-          a_w(i,k,j-3) = a_w(i,k,j-3)+a_fqy(i,k,jp1)*vel*(0.016666667-(-0.016666667)*sign(1.,vel))
-          a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.13333333)-0.083333333*sign(1.,vel))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.61666667-(-0.16666667)*sign(1.,vel))
-          a_w(i,k,j+2) = a_w(i,k,j+2)+a_fqy(i,k,jp1)*vel*(0.016666667-0.016666667*sign(1.,vel))
-          a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.13333333)-(-0.083333333)*sign(1.,vel))
-          a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.61666667-0.16666667*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_vel =walls(1)*(0.61666667*(w(i,k,j)+w(i,k,j-1))-0.13333333*(w(i,k,j+1)+w(i,k,j-2))+0.016666667*(w(i,k,j+2)&
+&+w(i,k,j-3))-0.016666667*(w(i,k,j+2)-w(i,k,j-3)-5.*(w(i,k,j+1)-w(i,k,j-2))+10.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+          a_w(i,k,j-3) = a_w(i,k,j-3)+walls(2)*(0.016666667-(-0.016666667)*walls(3))
+          a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.13333333)-0.083333333*walls(3))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.61666667-(-0.16666667)*walls(3))
+          a_w(i,k,j+2) = a_w(i,k,j+2)+walls(2)*(0.016666667-0.016666667*walls(3))
+          a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.13333333)-(-0.083333333)*walls(3))
+          a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.61666667-0.16666667*walls(3))
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(5)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     else if (j .eq. jds+1) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i,k,j-1))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j)+w(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j)+w(i,k,j-1))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*walls(3)*(w(i,k,j)+w(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*walls(4)*(w(i,k,j)+w(i,k,j-1))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
         end do
       end do
     else if (j .eq. jds+2) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
-&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-        a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
+&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+        a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        walls(5)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          vel = walls(4)*rv(i,k,j)+walls(5)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
-&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-          a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
+&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+          a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(5)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
         end do
       end do
     else if (j .eq. jde-1) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i,k,j-1))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
+        a_w(i,k,j) = a_w(i,k,j)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j)+w(i,k,j-1))
-          a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j)+w(i,k,j-1))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_w(i,k,j) = a_w(i,k,j)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*walls(3)*(w(i,k,j)+w(i,k,j-1))
+          a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*walls(4)*(w(i,k,j)+w(i,k,j-1))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
+          a_w(i,k,j) = a_w(i,k,j)+walls(1)*(walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j))
         end do
       end do
     else if (j .eq. jde-2) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
-&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-        a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
+&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+        a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        
+        walls(5)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          
+          vel = walls(4)*rv(i,k,j)+walls(5)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
-&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-          a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
+&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+          a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(5)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     endif
@@ -7307,83 +7628,85 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       k = ktf+1
 ! recompute : k
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
       do i = i_start, i_end
-        a_rv(i,k-2,j_start) = a_rv(i,k-2,j_start)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j_start)+w(i,k,j_start-1))
-        a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j_start)+w(i,k,j_start-1))
-        a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_start)-fzp(k-1)*rv(i,k-2,j_start))
-        a_w(i,k,j_start) = a_w(i,k,j_start)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_start)-fzp(k-1)*rv(i,k-2,j_start))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j_start) = a_rv(i,k-2,j_start)-walls(1)*walls(6)*(w(i,k,j_start)+w(i,k,j_start-1))
+        a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+walls(1)*(2-walls(5))*(w(i,k,j_start)+w(i,k,j_start-1))
+        a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j_start)-walls(6)*rv(i,k-2,j_start))
+        a_w(i,k,j_start) = a_w(i,k,j_start)+walls(1)*((2.-walls(5))*rv(i,k-1,j_start)-walls(6)*rv(i,k-2,j_start))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j_start)+w(i,k,j_start-1))
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j_start)+w(i,k,j_start-1))
-          a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_start)+fzp(k)*rv(i,k-1,j_start))
-          a_w(i,k,j_start) = a_w(i,k,j_start)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_start)+fzp(k)*rv(i,k-1,j_start))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+walls(1)*walls(3)*(w(i,k,j_start)+w(i,k,j_start-1))
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+walls(1)*walls(4)*(w(i,k,j_start)+w(i,k,j_start-1))
+          a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+walls(1)*(walls(4)*rv(i,k,j_start)+walls(3)*rv(i,k-1,j_start))
+          a_w(i,k,j_start) = a_w(i,k,j_start)+walls(1)*(walls(4)*rv(i,k,j_start)+walls(3)*rv(i,k-1,j_start))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       k = ktf+1
 ! recompute : k
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
       do i = i_start, i_end
-        a_rv(i,k-2,j_end+1) = a_rv(i,k-2,j_end+1)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j_end+1)+w(i,k,j_end))
-        a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j_end+1)+w(i,k,j_end))
-        a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_end+1)-fzp(k-1)*rv(i,k-2,j_end+1))
-        a_w(i,k,j_end) = a_w(i,k,j_end)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_end+1)-fzp(k-1)*rv(i,k-2,j_end+1))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j_end+1) = a_rv(i,k-2,j_end+1)-walls(1)*walls(6)*(w(i,k,j_end+1)+w(i,k,j_end))
+        a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+walls(1)*(2-walls(5))*(w(i,k,j_end+1)+w(i,k,j_end))
+        a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+walls(1)*((2.-walls(5))*rv(i,k-1,j_end+1)-walls(6)*rv(i,k-2,j_end+1))
+        a_w(i,k,j_end) = a_w(i,k,j_end)+walls(1)*((2.-walls(5))*rv(i,k-1,j_end+1)-walls(6)*rv(i,k-2,j_end+1))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j_end+1)+w(i,k,j_end))
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j_end+1)+w(i,k,j_end))
-          a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_end+1)+fzp(k)*rv(i,k-1,j_end+1))
-          a_w(i,k,j_end) = a_w(i,k,j_end)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_end+1)+fzp(k)*rv(i,k-1,j_end+1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+walls(1)*walls(3)*(w(i,k,j_end+1)+w(i,k,j_end))
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+walls(1)*walls(4)*(w(i,k,j_end+1)+w(i,k,j_end))
+          a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+walls(1)*(walls(4)*rv(i,k,j_end+1)+walls(3)*rv(i,k-1,j_end+1))
+          a_w(i,k,j_end) = a_w(i,k,j_end)+walls(1)*(walls(4)*rv(i,k,j_end+1)+walls(3)*rv(i,k-1,j_end+1))
         end do
       end do
     else
       k = ktf+1
 ! recompute : k
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-        a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+        a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*walls(2)
+        a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*walls(2)
+        a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          vel = walls(4)*rv(i,k,j)+walls(3)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
-          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*a_fqy(i,k,jp1)*vel
-          a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqy(i,k,jp1)*vel
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2)))
+          a_w(i,k,j-2) = a_w(i,k,j-2)-0.083333333*walls(2)
+          a_w(i,k,j-1) = a_w(i,k,j-1)+0.58333333*walls(2)
+          a_w(i,k,j+1) = a_w(i,k,j+1)-0.083333333*walls(2)
+          a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(3)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(4)
+          
         end do
       end do
     endif
@@ -7433,72 +7756,79 @@ else if (horz_order .eq. 4) then a_horizontal_order_test
     end do
     if (degrade_xe) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      a_ru(i_end+1,k-2,j) = a_ru(i_end+1,k-2,j)-0.5*a_fqx(i_end+1,k)*fzp(k-1)*(w(i_end+1,k,j)+w(i_end,k,j))
-      a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+0.5*a_fqx(i_end+1,k)*(2-fzm(k-1))*(w(i_end+1,k,j)+w(i_end,k,j))
-      a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*((2.-fzm(k-1))*ru(i_end+1,k-1,j)-fzp(k-1)*ru(i_end+1,k-2,j))
-      a_w(i_end,k,j) = a_w(i_end,k,j)+0.5*a_fqx(i_end+1,k)*((2.-fzm(k-1))*ru(i_end+1,k-1,j)-fzp(k-1)*ru(i_end+1,k-2,j))
-      a_fqx(i_end+1,k) = 0.
+      walls(1) =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+      a_ru(i_end+1,k-2,j) = a_ru(i_end+1,k-2,j)-walls(1)*walls(6)*(w(i_end+1,k,j)+w(i_end,k,j))
+      a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+walls(1)*(2-walls(5))*(w(i_end+1,k,j)+w(i_end,k,j))
+      a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+walls(1)*((2.-walls(5))*ru(i_end+1,k-1,j)-walls(6)*ru(i_end+1,k-2,j))
+      a_w(i_end,k,j) = a_w(i_end,k,j)+walls(1)*((2.-walls(5))*ru(i_end+1,k-1,j)-walls(6)*ru(i_end+1,k-2,j))
       do k = kts+1, ktf
-        a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+0.5*a_fqx(i_end+1,k)*fzp(k)*(w(i_end+1,k,j)+w(i_end,k,j))
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*fzm(k)*(w(i_end+1,k,j)+w(i_end,k,j))
-        a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
-        a_w(i_end,k,j) = a_w(i_end,k,j)+0.5*a_fqx(i_end+1,k)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
-        a_fqx(i_end+1,k) = 0.
+        walls(1) =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+        a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+walls(1)*fzp(k)*(w(i_end+1,k,j)+w(i_end,k,j))
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+walls(1)*fzm(k)*(w(i_end+1,k,j)+w(i_end,k,j))
+        a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+walls(1)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
+        a_w(i_end,k,j) = a_w(i_end,k,j)+walls(1)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
       end do
     endif
     if (degrade_xs) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      a_ru(i_start,k-2,j) = a_ru(i_start,k-2,j)-0.5*a_fqx(i_start,k)*fzp(k-1)*(w(i_start,k,j)+w(i_start-1,k,j))
-      a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+0.5*a_fqx(i_start,k)*(2-fzm(k-1))*(w(i_start,k,j)+w(i_start-1,k,j))
-      a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+0.5*a_fqx(i_start,k)*((2.-fzm(k-1))*ru(i_start,k-1,j)-fzp(k-1)*ru(i_start,k-2,j))
-      a_w(i_start,k,j) = a_w(i_start,k,j)+0.5*a_fqx(i_start,k)*((2.-fzm(k-1))*ru(i_start,k-1,j)-fzp(k-1)*ru(i_start,k-2,j))
-      a_fqx(i_start,k) = 0.
+      walls(1) =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+      a_ru(i_start,k-2,j) = a_ru(i_start,k-2,j)-walls(1)*walls(6)*(w(i_start,k,j)+w(i_start-1,k,j))
+      a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+walls(1)*(2-walls(5))*(w(i_start,k,j)+w(i_start-1,k,j))
+      a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+walls(1)*((2.-walls(5))*ru(i_start,k-1,j)-walls(6)*ru(i_start,k-2,j))
+      a_w(i_start,k,j) = a_w(i_start,k,j)+walls(1)*((2.-walls(5))*ru(i_start,k-1,j)-walls(6)*ru(i_start,k-2,j))
       do k = kts+1, ktf
-        a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+0.5*a_fqx(i_start,k)*fzp(k)*(w(i_start,k,j)+w(i_start-1,k,j))
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.5*a_fqx(i_start,k)*fzm(k)*(w(i_start,k,j)+w(i_start-1,k,j))
-        a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+0.5*a_fqx(i_start,k)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
-        a_w(i_start,k,j) = a_w(i_start,k,j)+0.5*a_fqx(i_start,k)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
-        a_fqx(i_start,k) = 0.
+        walls(1) =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+walls(1)*fzp(k)*(w(i_start,k,j)+w(i_start-1,k,j))
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+walls(1)*fzm(k)*(w(i_start,k,j)+w(i_start-1,k,j))
+        a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+walls(1)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
+        a_w(i_start,k,j) = a_w(i_start,k,j)+walls(1)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
       end do
     endif
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:4594
 ! recompute vars : k
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute vars : k
     do i = i_start_f, i_end_f
-      a_vel = 0.
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-      a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(1)=a_fqx(i,k)
+!     a_fqx(i,k) = 0.
+      walls(2)=walls(1)*vel
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+      a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+      a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+      a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+      a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
     end do
+    a_fqx(i_start_f:i_end_f,ktf+1) = 0.
+
     do k = kts+1, ktf
-      a_vel = 0.
+      walls(3)=fzp(k); walls(4)=fzm(k)
       do i = i_start_f, i_end_f
-        a_vel = 0.
-        vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
+        vel = walls(4)*ru(i,k,j)+walls(3)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
-        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*a_fqx(i,k)*vel
-        a_w(i,k,j) = a_w(i,k,j)+0.58333333*a_fqx(i,k)*vel
-        a_fqx(i,k) = 0.
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
-        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
+        walls(1)=a_fqx(i,k)
+!       a_fqx(i,k) = 0.
+        walls(2)=walls(1)*vel
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j)))
+        a_w(i-2,k,j) = a_w(i-2,k,j)-0.083333333*walls(2)
+        a_w(i-1,k,j) = a_w(i-1,k,j)+0.58333333*walls(2)
+        a_w(i+1,k,j) = a_w(i+1,k,j)-0.083333333*walls(2)
+        a_w(i,k,j) = a_w(i,k,j)+0.58333333*walls(2)
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*walls(3)
+        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*walls(4)
       end do
     end do
+    a_fqx(i_start_f:i_end_f,kts+1:ktf) = 0.
+
   end do
 else if (horz_order .eq. 3) then a_horizontal_order_test
   degrade_xs =  .true. 
@@ -7584,85 +7914,88 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     if (j .gt. jds+1) then
       do k = kts+1, ktf+1
         do i = i_start, i_end
-          mrdy = msft(i,j-1)*rdy
+          mrdy = msft(i,j-1)*a_tendency(i,k,j-1)*rdy
 ! recompute : mrdy
-          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+a_tendency(i,k,j-1)*mrdy
-          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-a_tendency(i,k,j-1)*mrdy
+          a_fqy(i,k,jp0) = a_fqy(i,k,jp0)+mrdy
+          a_fqy(i,k,jp1) = a_fqy(i,k,jp1)-mrdy
         end do
       end do
     endif
     if (j .lt. j_start_f .and. degrade_ys) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j_start) = a_rv(i,k-2,j_start)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j_start)+w(i,k,j_start-1))
-        a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j_start)+w(i,k,j_start-1))
-        a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_start)-fzp(k-1)*rv(i,k-2,j_start))
-        a_w(i,k,j_start) = a_w(i,k,j_start)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_start)-fzp(k-1)*rv(i,k-2,j_start))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j_start) = a_rv(i,k-2,j_start)-walls(1)*walls(6)*(w(i,k,j_start)+w(i,k,j_start-1))
+        a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+walls(1)*(2-walls(5))*(w(i,k,j_start)+w(i,k,j_start-1))
+        a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j_start)-walls(6)*rv(i,k-2,j_start))
+        a_w(i,k,j_start) = a_w(i,k,j_start)+walls(1)*((2.-walls(5))*rv(i,k-1,j_start)-walls(6)*rv(i,k-2,j_start))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j_start)+w(i,k,j_start-1))
-          a_rv(i,k,j_start) = a_rv(i,k,j_start)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j_start)+w(i,k,j_start-1))
-          a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_start)+fzp(k)*rv(i,k-1,j_start))
-          a_w(i,k,j_start) = a_w(i,k,j_start)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_start)+fzp(k)*rv(i,k-1,j_start))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j_start) = a_rv(i,k-1,j_start)+walls(1)*walls(3)*(w(i,k,j_start)+w(i,k,j_start-1))
+          a_rv(i,k,j_start) = a_rv(i,k,j_start)+walls(1)*walls(4)*(w(i,k,j_start)+w(i,k,j_start-1))
+          a_w(i,k,j_start-1) = a_w(i,k,j_start-1)+walls(1)*(walls(4)*rv(i,k,j_start)+walls(3)*rv(i,k-1,j_start))
+          a_w(i,k,j_start) = a_w(i,k,j_start)+walls(1)*(walls(4)*rv(i,k,j_start)+walls(3)*rv(i,k-1,j_start))
         end do
       end do
     else if (j .gt. j_end_f .and. degrade_ye) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_rv(i,k-2,j_end+1) = a_rv(i,k-2,j_end+1)-0.5*a_fqy(i,k,jp1)*fzp(k-1)*(w(i,k,j_end+1)+w(i,k,j_end))
-        a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+0.5*a_fqy(i,k,jp1)*(2-fzm(k-1))*(w(i,k,j_end+1)+w(i,k,j_end))
-        a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_end+1)-fzp(k-1)*rv(i,k-2,j_end+1))
-        a_w(i,k,j_end) = a_w(i,k,j_end)+0.5*a_fqy(i,k,jp1)*((2.-fzm(k-1))*rv(i,k-1,j_end+1)-fzp(k-1)*rv(i,k-2,j_end+1))
-        a_fqy(i,k,jp1) = 0.
+        walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+        a_rv(i,k-2,j_end+1) = a_rv(i,k-2,j_end+1)-walls(1)*walls(6)*(w(i,k,j_end+1)+w(i,k,j_end))
+        a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+walls(1)*(2-walls(5))*(w(i,k,j_end+1)+w(i,k,j_end))
+        a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+walls(1)*((2.-walls(5))*rv(i,k-1,j_end+1)-walls(6)*rv(i,k-2,j_end+1))
+        a_w(i,k,j_end) = a_w(i,k,j_end)+walls(1)*((2.-walls(5))*rv(i,k-1,j_end+1)-walls(6)*rv(i,k-2,j_end+1))
       end do
       do k = kts+1, ktf
+        walls(3)=fzp(k); walls(4)=fzm(k)
         do i = i_start, i_end
-          a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+0.5*a_fqy(i,k,jp1)*fzp(k)*(w(i,k,j_end+1)+w(i,k,j_end))
-          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*fzm(k)*(w(i,k,j_end+1)+w(i,k,j_end))
-          a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_end+1)+fzp(k)*rv(i,k-1,j_end+1))
-          a_w(i,k,j_end) = a_w(i,k,j_end)+0.5*a_fqy(i,k,jp1)*(fzm(k)*rv(i,k,j_end+1)+fzp(k)*rv(i,k-1,j_end+1))
-          a_fqy(i,k,jp1) = 0.
+          walls(1) =0.5*a_fqy(i,k,jp1); a_fqy(i,k,jp1) =0.
+          a_rv(i,k-1,j_end+1) = a_rv(i,k-1,j_end+1)+walls(1)*walls(3)*(w(i,k,j_end+1)+w(i,k,j_end))
+          a_rv(i,k,j_end+1) = a_rv(i,k,j_end+1)+walls(1)*walls(4)*(w(i,k,j_end+1)+w(i,k,j_end))
+          a_w(i,k,j_end+1) = a_w(i,k,j_end+1)+walls(1)*(walls(4)*rv(i,k,j_end+1)+walls(3)*rv(i,k-1,j_end+1))
+          a_w(i,k,j_end) = a_w(i,k,j_end)+walls(1)*(walls(4)*rv(i,k,j_end+1)+walls(3)*rv(i,k-1,j_end+1))
         end do
       end do
     else
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
       do i = i_start, i_end
-        a_vel = 0.
-        vel = (2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j)
+        
+        vel = (2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
-&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-        a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqy(i,k,jp1) = 0.
-        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*fzp(k-1)
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-fzm(k-1))
-        a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+1)-&
+&w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+        a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_rv(i,k-2,j) = a_rv(i,k-2,j)-a_vel*walls(6)
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*(2-walls(5))
+        
       end do
       do k = kts+1, ktf
-        a_vel = 0.
+        walls(4)=fzp(k); walls(5)=fzm(k)
         do i = i_start, i_end
-          a_vel = 0.
-          vel = fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j)
+          vel = walls(5)*rv(i,k,j)+walls(4)*rv(i,k-1,j)
 ! recompute : vel
-          a_vel = a_vel+a_fqy(i,k,jp1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
-&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*sign(1.,vel))
-          a_w(i,k,j-2) = a_w(i,k,j-2)+a_fqy(i,k,jp1)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-          a_w(i,k,j-1) = a_w(i,k,j-1)+a_fqy(i,k,jp1)*vel*(0.58333333+0.25*sign(1.,vel))
-          a_w(i,k,j+1) = a_w(i,k,j+1)+a_fqy(i,k,jp1)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-          a_w(i,k,j) = a_w(i,k,j)+a_fqy(i,k,jp1)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-          a_fqy(i,k,jp1) = 0.
-          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*fzp(k)
-          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*fzm(k)
-          a_vel = 0.
+          walls(1)=a_fqy(i,k,jp1); a_fqy(i,k,jp1)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+          a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i,k,j-1))-0.083333333*(w(i,k,j+1)+w(i,k,j-2))+0.083333333*(w(i,k,j+&
+&1)-w(i,k,j-2)-3.*(w(i,k,j)-w(i,k,j-1)))*walls(3))
+          a_w(i,k,j-2) = a_w(i,k,j-2)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+          a_w(i,k,j-1) = a_w(i,k,j-1)+walls(2)*(0.58333333+0.25*walls(3))
+          a_w(i,k,j+1) = a_w(i,k,j+1)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+          a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+          a_rv(i,k-1,j) = a_rv(i,k-1,j)+a_vel*walls(4)
+          a_rv(i,k,j) = a_rv(i,k,j)+a_vel*walls(5)
         end do
       end do
     endif
@@ -7712,74 +8045,75 @@ else if (horz_order .eq. 3) then a_horizontal_order_test
     end do
     if (degrade_xe) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      a_ru(i_end+1,k-2,j) = a_ru(i_end+1,k-2,j)-0.5*a_fqx(i_end+1,k)*fzp(k-1)*(w(i_end+1,k,j)+w(i_end,k,j))
-      a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+0.5*a_fqx(i_end+1,k)*(2-fzm(k-1))*(w(i_end+1,k,j)+w(i_end,k,j))
-      a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*((2.-fzm(k-1))*ru(i_end+1,k-1,j)-fzp(k-1)*ru(i_end+1,k-2,j))
-      a_w(i_end,k,j) = a_w(i_end,k,j)+0.5*a_fqx(i_end+1,k)*((2.-fzm(k-1))*ru(i_end+1,k-1,j)-fzp(k-1)*ru(i_end+1,k-2,j))
-      a_fqx(i_end+1,k) = 0.
+      walls(1) =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+      a_ru(i_end+1,k-2,j) = a_ru(i_end+1,k-2,j)-walls(1)*walls(6)*(w(i_end+1,k,j)+w(i_end,k,j))
+      a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+walls(1)*(2-walls(5))*(w(i_end+1,k,j)+w(i_end,k,j))
+      a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+walls(1)*((2.-walls(5))*ru(i_end+1,k-1,j)-walls(6)*ru(i_end+1,k-2,j))
+      a_w(i_end,k,j) = a_w(i_end,k,j)+walls(1)*((2.-walls(5))*ru(i_end+1,k-1,j)-walls(6)*ru(i_end+1,k-2,j))
       do k = kts+1, ktf
-        a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+0.5*a_fqx(i_end+1,k)*fzp(k)*(w(i_end+1,k,j)+w(i_end,k,j))
-        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*fzm(k)*(w(i_end+1,k,j)+w(i_end,k,j))
-        a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+0.5*a_fqx(i_end+1,k)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
-        a_w(i_end,k,j) = a_w(i_end,k,j)+0.5*a_fqx(i_end+1,k)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
-        a_fqx(i_end+1,k) = 0.
+        walls(1) =0.5*a_fqx(i_end+1,k); a_fqx(i_end+1,k)= 0.
+        a_ru(i_end+1,k-1,j) = a_ru(i_end+1,k-1,j)+walls(1)*fzp(k)*(w(i_end+1,k,j)+w(i_end,k,j))
+        a_ru(i_end+1,k,j) = a_ru(i_end+1,k,j)+walls(1)*fzm(k)*(w(i_end+1,k,j)+w(i_end,k,j))
+        a_w(i_end+1,k,j) = a_w(i_end+1,k,j)+walls(1)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
+        a_w(i_end,k,j) = a_w(i_end,k,j)+walls(1)*(fzm(k)*ru(i_end+1,k,j)+fzp(k)*ru(i_end+1,k-1,j))
       end do
     endif
     if (degrade_xs) then
       k = ktf+1
+      walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
-      a_ru(i_start,k-2,j) = a_ru(i_start,k-2,j)-0.5*a_fqx(i_start,k)*fzp(k-1)*(w(i_start,k,j)+w(i_start-1,k,j))
-      a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+0.5*a_fqx(i_start,k)*(2-fzm(k-1))*(w(i_start,k,j)+w(i_start-1,k,j))
-      a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+0.5*a_fqx(i_start,k)*((2.-fzm(k-1))*ru(i_start,k-1,j)-fzp(k-1)*ru(i_start,k-2,j))
-      a_w(i_start,k,j) = a_w(i_start,k,j)+0.5*a_fqx(i_start,k)*((2.-fzm(k-1))*ru(i_start,k-1,j)-fzp(k-1)*ru(i_start,k-2,j))
-      a_fqx(i_start,k) = 0.
+      walls(1) =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+      a_ru(i_start,k-2,j) = a_ru(i_start,k-2,j)-walls(1)*walls(6)*(w(i_start,k,j)+w(i_start-1,k,j))
+      a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+walls(1)*(2-walls(5))*(w(i_start,k,j)+w(i_start-1,k,j))
+      a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+walls(1)*((2.-walls(5))*ru(i_start,k-1,j)-walls(6)*ru(i_start,k-2,j))
+      a_w(i_start,k,j) = a_w(i_start,k,j)+walls(1)*((2.-walls(5))*ru(i_start,k-1,j)-walls(6)*ru(i_start,k-2,j))
       do k = kts+1, ktf
-        a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+0.5*a_fqx(i_start,k)*fzp(k)*(w(i_start,k,j)+w(i_start-1,k,j))
-        a_ru(i_start,k,j) = a_ru(i_start,k,j)+0.5*a_fqx(i_start,k)*fzm(k)*(w(i_start,k,j)+w(i_start-1,k,j))
-        a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+0.5*a_fqx(i_start,k)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
-        a_w(i_start,k,j) = a_w(i_start,k,j)+0.5*a_fqx(i_start,k)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
-        a_fqx(i_start,k) = 0.
+        walls(1) =0.5*a_fqx(i_start,k); a_fqx(i_start,k) = 0.
+        a_ru(i_start,k-1,j) = a_ru(i_start,k-1,j)+walls(1)*fzp(k)*(w(i_start,k,j)+w(i_start-1,k,j))
+        a_ru(i_start,k,j) = a_ru(i_start,k,j)+walls(1)*fzm(k)*(w(i_start,k,j)+w(i_start-1,k,j))
+        a_w(i_start-1,k,j) = a_w(i_start-1,k,j)+walls(1)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
+        a_w(i_start,k,j) = a_w(i_start,k,j)+walls(1)*(fzm(k)*ru(i_start,k,j)+fzp(k)*ru(i_start,k-1,j))
       end do
     endif
 ! recdepend vars : ktf
 ! recompute pos : ASSIGN_STMT module_advect_em.f90:4790
 ! recompute vars : k
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute vars : k
     do i = i_start_f, i_end_f
-      a_vel = 0.
-      vel = (2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j)
+      vel = (2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j)
 ! recompute : vel
-      a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
-&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-      a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-      a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-      a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-      a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-      a_fqx(i,k) = 0.
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*fzp(k-1)
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-fzm(k-1))
-      a_vel = 0.
+      walls(1)=a_fqx(i,k); a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+      a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-2,&
+&k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+      a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+      a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+      a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+      a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-a_vel*walls(6)
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*(2-walls(5))
     end do
+
     do k = kts+1, ktf
-      a_vel = 0.
+      walls(5)=fzp(k); walls(6)=fzm(k)
       do i = i_start_f, i_end_f
-        a_vel = 0.
-        vel = fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j)
+        vel = walls(6)*ru(i,k,j)+walls(5)*ru(i,k-1,j)
 ! recompute : vel
-        a_vel = a_vel+a_fqx(i,k)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
-&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*sign(1.,vel))
-        a_w(i-2,k,j) = a_w(i-2,k,j)+a_fqx(i,k)*vel*((-0.083333333)+(-0.083333333)*sign(1.,vel))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+a_fqx(i,k)*vel*(0.58333333+0.25*sign(1.,vel))
-        a_w(i+1,k,j) = a_w(i+1,k,j)+a_fqx(i,k)*vel*((-0.083333333)+0.083333333*sign(1.,vel))
-        a_w(i,k,j) = a_w(i,k,j)+a_fqx(i,k)*vel*(0.58333333+(-0.25)*sign(1.,vel))
-        a_fqx(i,k) = 0.
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*fzp(k)
-        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*fzm(k)
-        a_vel = 0.
+        walls(1)=a_fqx(i,k)*vel; a_fqx(i,k)=0.; walls(2)=walls(1)*vel; walls(3)=sign(1.,vel)
+        a_vel =walls(1)*(0.58333333*(w(i,k,j)+w(i-1,k,j))-0.083333333*(w(i+1,k,j)+w(i-2,k,j))+0.083333333*(w(i+1,k,j)-w(i-&
+&2,k,j)-3.*(w(i,k,j)-w(i-1,k,j)))*walls(3))
+        a_w(i-2,k,j) = a_w(i-2,k,j)+walls(2)*((-0.083333333)+(-0.083333333)*walls(3))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(2)*(0.58333333+0.25*walls(3))
+        a_w(i+1,k,j) = a_w(i+1,k,j)+walls(2)*((-0.083333333)+0.083333333*walls(3))
+        a_w(i,k,j) = a_w(i,k,j)+walls(2)*(0.58333333+(-0.25)*walls(3))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+a_vel*walls(5)
+        a_ru(i,k,j) = a_ru(i,k,j)+a_vel*walls(6)
       end do
     end do
+
   end do
 else if (horz_order .eq. 2) then a_horizontal_order_test
   j_start = jts
@@ -7800,30 +8134,34 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
 ! recompute : j_end
   do j = j_end, j_start, -1
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
     do i = i_start, i_end
       mrdy = msft(i,j)*rdy
 ! recompute : mrdy
-      a_rv(i,k-2,j+1) = a_rv(i,k-2,j+1)+0.5*a_tendency(i,k,j)*mrdy*fzp(k-1)*(w(i,k,j+1)+w(i,k,j))
-      a_rv(i,k-2,j) = a_rv(i,k-2,j)-0.5*a_tendency(i,k,j)*mrdy*fzp(k-1)*(w(i,k,j)+w(i,k,j-1))
-      a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)-0.5*a_tendency(i,k,j)*mrdy*(2-fzm(k-1))*(w(i,k,j+1)+w(i,k,j))
-      a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_tendency(i,k,j)*mrdy*(2-fzm(k-1))*(w(i,k,j)+w(i,k,j-1))
-      a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_tendency(i,k,j)*mrdy*((2.-fzm(k-1))*rv(i,k-1,j)-fzp(k-1)*rv(i,k-2,j))
-      a_w(i,k,j+1) = a_w(i,k,j+1)-0.5*a_tendency(i,k,j)*mrdy*((2.-fzm(k-1))*rv(i,k-1,j+1)-fzp(k-1)*rv(i,k-2,j+1))
-      a_w(i,k,j) = a_w(i,k,j)-0.5*a_tendency(i,k,j)*mrdy*((2.-fzm(k-1))*rv(i,k-1,j+1)-fzp(k-1)*rv(i,k-2,j+1)-((2.-fzm(k-1))*rv(i,k-&
-&1,j)-fzp(k-1)*rv(i,k-2,j)))
+      walls(1)=0.5*a_tendency(i,k,j)*mrdy
+      a_rv(i,k-2,j+1) = a_rv(i,k-2,j+1)+walls(1)*walls(6)*(w(i,k,j+1)+w(i,k,j))
+      a_rv(i,k-2,j) = a_rv(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+      a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)-walls(1)*(2-walls(5))*(w(i,k,j+1)+w(i,k,j))
+      a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i,k,j-1))
+      a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*((2.-walls(5))*rv(i,k-1,j)-walls(6)*rv(i,k-2,j))
+      a_w(i,k,j+1) = a_w(i,k,j+1)-walls(1)*((2.-walls(5))*rv(i,k-1,j+1)-walls(6)*rv(i,k-2,j+1))
+      a_w(i,k,j) = a_w(i,k,j)-walls(1)*((2.-walls(5))*rv(i,k-1,j+1)-walls(6)*rv(i,k-2,j+1)-((2.-walls(5))*rv(i,k-&
+&1,j)-walls(6)*rv(i,k-2,j)))
     end do
     do k = kts+1, ktf
+      walls(5)=fzp(k); walls(6)=fzm(k)
       do i = i_start, i_end
         mrdy = msft(i,j)*rdy
 ! recompute : mrdy
-        a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)-0.5*a_tendency(i,k,j)*mrdy*fzp(k)*(w(i,k,j+1)+w(i,k,j))
-        a_rv(i,k-1,j) = a_rv(i,k-1,j)+0.5*a_tendency(i,k,j)*mrdy*fzp(k)*(w(i,k,j)+w(i,k,j-1))
-        a_rv(i,k,j+1) = a_rv(i,k,j+1)-0.5*a_tendency(i,k,j)*mrdy*fzm(k)*(w(i,k,j+1)+w(i,k,j))
-        a_rv(i,k,j) = a_rv(i,k,j)+0.5*a_tendency(i,k,j)*mrdy*fzm(k)*(w(i,k,j)+w(i,k,j-1))
-        a_w(i,k,j-1) = a_w(i,k,j-1)+0.5*a_tendency(i,k,j)*mrdy*(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,k-1,j))
-        a_w(i,k,j+1) = a_w(i,k,j+1)-0.5*a_tendency(i,k,j)*mrdy*(fzm(k)*rv(i,k,j+1)+fzp(k)*rv(i,k-1,j+1))
-        a_w(i,k,j) = a_w(i,k,j)-0.5*a_tendency(i,k,j)*mrdy*(fzm(k)*rv(i,k,j+1)+fzp(k)*rv(i,k-1,j+1)-(fzm(k)*rv(i,k,j)+fzp(k)*rv(i,&
+        walls(1)=0.5*a_tendency(i,k,j)*mrdy
+        a_rv(i,k-1,j+1) = a_rv(i,k-1,j+1)-walls(1)*walls(5)*(w(i,k,j+1)+w(i,k,j))
+        a_rv(i,k-1,j) = a_rv(i,k-1,j)+walls(1)*walls(5)*(w(i,k,j)+w(i,k,j-1))
+        a_rv(i,k,j+1) = a_rv(i,k,j+1)-walls(1)*walls(6)*(w(i,k,j+1)+w(i,k,j))
+        a_rv(i,k,j) = a_rv(i,k,j)+walls(1)*walls(6)*(w(i,k,j)+w(i,k,j-1))
+        a_w(i,k,j-1) = a_w(i,k,j-1)+walls(1)*(walls(6)*rv(i,k,j)+walls(5)*rv(i,k-1,j))
+        a_w(i,k,j+1) = a_w(i,k,j+1)-walls(1)*(walls(6)*rv(i,k,j+1)+walls(5)*rv(i,k-1,j+1))
+        a_w(i,k,j) = a_w(i,k,j)-walls(1)*(walls(6)*rv(i,k,j+1)+walls(5)*rv(i,k-1,j+1)-(walls(6)*rv(i,k,j)+walls(5)*rv(i,&
 &k-1,j)))
       end do
     end do
@@ -7866,30 +8204,34 @@ else if (horz_order .eq. 2) then a_horizontal_order_test
 ! recompute vars : i_end
   do j = j_end, j_start, -1
     k = ktf+1
+    walls(5)=fzm(k-1); walls(6)=fzp(k-1)
 ! recompute : k
     do i = i_start, i_end
       mrdx = msft(i,j)*rdx
 ! recompute : mrdx
-      a_ru(i+1,k-2,j) = a_ru(i+1,k-2,j)+0.5*a_tendency(i,k,j)*mrdx*fzp(k-1)*(w(i+1,k,j)+w(i,k,j))
-      a_ru(i,k-2,j) = a_ru(i,k-2,j)-0.5*a_tendency(i,k,j)*mrdx*fzp(k-1)*(w(i,k,j)+w(i-1,k,j))
-      a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)-0.5*a_tendency(i,k,j)*mrdx*(2-fzm(k-1))*(w(i+1,k,j)+w(i,k,j))
-      a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_tendency(i,k,j)*mrdx*(2-fzm(k-1))*(w(i,k,j)+w(i-1,k,j))
-      a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_tendency(i,k,j)*mrdx*((2.-fzm(k-1))*ru(i,k-1,j)-fzp(k-1)*ru(i,k-2,j))
-      a_w(i+1,k,j) = a_w(i+1,k,j)-0.5*a_tendency(i,k,j)*mrdx*((2.-fzm(k-1))*ru(i+1,k-1,j)-fzp(k-1)*ru(i+1,k-2,j))
-      a_w(i,k,j) = a_w(i,k,j)-0.5*a_tendency(i,k,j)*mrdx*((2.-fzm(k-1))*ru(i+1,k-1,j)-fzp(k-1)*ru(i+1,k-2,j)-((2.-fzm(k-1))*ru(i,k-&
-&1,j)-fzp(k-1)*ru(i,k-2,j)))
+      walls(1)=0.5*a_tendency(i,k,j)*mrdx
+      a_ru(i+1,k-2,j) = a_ru(i+1,k-2,j)+walls(1)*walls(6)*(w(i+1,k,j)+w(i,k,j))
+      a_ru(i,k-2,j) = a_ru(i,k-2,j)-walls(1)*walls(6)*(w(i,k,j)+w(i-1,k,j))
+      a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)-walls(1)*(2-walls(5))*(w(i+1,k,j)+w(i,k,j))
+      a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*(2-walls(5))*(w(i,k,j)+w(i-1,k,j))
+      a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*((2.-walls(5))*ru(i,k-1,j)-walls(6)*ru(i,k-2,j))
+      a_w(i+1,k,j) = a_w(i+1,k,j)-walls(1)*((2.-walls(5))*ru(i+1,k-1,j)-walls(6)*ru(i+1,k-2,j))
+      a_w(i,k,j) = a_w(i,k,j)-walls(1)*((2.-walls(5))*ru(i+1,k-1,j)-walls(6)*ru(i+1,k-2,j)-((2.-walls(5))*ru(i,k-&
+&1,j)-walls(6)*ru(i,k-2,j)))
     end do
     do k = kts+1, ktf
+      walls(2)=fzp(k); walls(3)=fzm(k)
       do i = i_start, i_end
         mrdx = msft(i,j)*rdx
 ! recompute : mrdx
-        a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)-0.5*a_tendency(i,k,j)*mrdx*fzp(k)*(w(i+1,k,j)+w(i,k,j))
-        a_ru(i,k-1,j) = a_ru(i,k-1,j)+0.5*a_tendency(i,k,j)*mrdx*fzp(k)*(w(i,k,j)+w(i-1,k,j))
-        a_ru(i+1,k,j) = a_ru(i+1,k,j)-0.5*a_tendency(i,k,j)*mrdx*fzm(k)*(w(i+1,k,j)+w(i,k,j))
-        a_ru(i,k,j) = a_ru(i,k,j)+0.5*a_tendency(i,k,j)*mrdx*fzm(k)*(w(i,k,j)+w(i-1,k,j))
-        a_w(i-1,k,j) = a_w(i-1,k,j)+0.5*a_tendency(i,k,j)*mrdx*(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,k-1,j))
-        a_w(i+1,k,j) = a_w(i+1,k,j)-0.5*a_tendency(i,k,j)*mrdx*(fzm(k)*ru(i+1,k,j)+fzp(k)*ru(i+1,k-1,j))
-        a_w(i,k,j) = a_w(i,k,j)-0.5*a_tendency(i,k,j)*mrdx*(fzm(k)*ru(i+1,k,j)+fzp(k)*ru(i+1,k-1,j)-(fzm(k)*ru(i,k,j)+fzp(k)*ru(i,&
+        walls(1)=0.5*a_tendency(i,k,j)*mrdx
+        a_ru(i+1,k-1,j) = a_ru(i+1,k-1,j)-walls(1)*walls(2)*(w(i+1,k,j)+w(i,k,j))
+        a_ru(i,k-1,j) = a_ru(i,k-1,j)+walls(1)*walls(2)*(w(i,k,j)+w(i-1,k,j))
+        a_ru(i+1,k,j) = a_ru(i+1,k,j)-walls(1)*walls(3)*(w(i+1,k,j)+w(i,k,j))
+        a_ru(i,k,j) = a_ru(i,k,j)+walls(1)*walls(3)*(w(i,k,j)+w(i-1,k,j))
+        a_w(i-1,k,j) = a_w(i-1,k,j)+walls(1)*(walls(3)*ru(i,k,j)+walls(2)*ru(i,k-1,j))
+        a_w(i+1,k,j) = a_w(i+1,k,j)-walls(1)*(walls(3)*ru(i+1,k,j)+walls(2)*ru(i+1,k-1,j))
+        a_w(i,k,j) = a_w(i,k,j)-walls(1)*(walls(3)*ru(i+1,k,j)+walls(2)*ru(i+1,k-1,j)-(walls(3)*ru(i,k,j)+walls(2)*ru(i,&
 &k-1,j)))
       end do
     end do
@@ -7899,7 +8241,6 @@ endif a_horizontal_order_test
    call trace_exit("a_advect_w")
 
 end subroutine a_advect_w
-
 
 end module     a_module_advect_em
 

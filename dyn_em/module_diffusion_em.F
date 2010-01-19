@@ -1176,11 +1176,17 @@ END SUBROUTINE cal_dampkm
     IF ( config_flags%open_xs .OR. config_flags%specified .OR. &
          config_flags%nested) i_start = MAX( ids+1, its )
     IF ( config_flags%open_xe .OR. config_flags%specified .OR. &
-         config_flags%nested) i_end   = MIN( ide-2, ite )
+         config_flags%nested) then
+         i_end   = MIN( ide-2, ite )
+!        print*, 'ICCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',ide-2,ite,i_end
+end if
     IF ( config_flags%open_ys .OR. config_flags%specified .OR. &
          config_flags%nested) j_start = MAX( jds+1, jts )
     IF ( config_flags%open_ye .OR. config_flags%specified .OR. &
-         config_flags%nested) j_end   = MIN( jde-2 ,jte )
+         config_flags%nested) then
+      j_end   = MIN( jde-2 ,jte )
+!     print*, 'JXXXXXXXXXXXXXXXXXXXXXXX',jde-2 ,jte,j_end
+    end if
  
     IF ( P_QC .GT. PARAM_FIRST_SCALAR) THEN
       DO j = j_start, j_end
@@ -1241,6 +1247,7 @@ END SUBROUTINE cal_dampkm
     END DO
 
 ! Calculate saturation mixing ratio.
+!print*, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', i_start, i_end,kts+1, ktf-1,j_start, j_end, ite ,jte
 
     DO j = j_start, j_end
     DO k = kts, ktf
@@ -1255,7 +1262,12 @@ END SUBROUTINE cal_dampkm
     DO j = j_start, j_end
     DO k = kts+1, ktf-1
     DO i = i_start, i_end
+      if(rdz(i,k,j)*rdz(i,k+1,j).eq.0.) then
+        print*, 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBXXXXXXXX', rdz(i,k,j), rdz(i,k+1,j),i,k,j
+      end if
+
       tmpdz = 1.0 / rdz(i,k,j) + 1.0 / rdz(i,k+1,j)
+
       IF ( moist(i,k,j,P_QV) .GE. qvs(i,k,j) .OR. qctmp(i,k,j) .GE. qc_cr) THEN
         xlvqv      = XLV * moist(i,k,j,P_QV)
         coefa      = ( 1.0 + xlvqv / R_d / t(i,k,j) ) / &
@@ -1328,6 +1340,7 @@ END SUBROUTINE cal_dampkm
     END DO
     END DO   
 ! end of MARTA/WCS change
+
 
     END SUBROUTINE calculate_N2
 

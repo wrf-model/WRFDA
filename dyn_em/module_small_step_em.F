@@ -1284,6 +1284,9 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
       REAL, DIMENSION( its:ite, kts:kte ) :: rhs, wdwn
       INTEGER :: i,j,k, i_start, i_end, j_start, j_end, k_start, k_end
 
+real walls(4)
+real keep_ph_foure(its:ite,kts:kte)
+
 !<DESCRIPTION>
 !
 !  advance_w advances the implicit w and geopotential equations.
@@ -1319,9 +1322,10 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
 
 ! calculation of phi and w equations
 
-    DO i=i_start, i_end
-      rhs(i,1) = 0.
-    ENDDO
+!   DO i=i_start, i_end
+!     rhs(i,1) = 0.
+!   ENDDO
+    rhs(i_start:i_end,1) = 0.
 
   j_loop_w:  DO j = j_start, j_end
     DO i=i_start, i_end
@@ -1330,26 +1334,27 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
     ENDDO
     DO k=1, k_end
     DO i=i_start, i_end
-      t_2ave(i,k,j)=.5*((1.+epssm)*t_2(i,k,j)       &
-                    +(1.-epssm)*t_2ave(i,k,j))
-      t_2ave(i,k,j)=(t_2ave(i,k,j)-mu1(i,j)*t_1(i,k,j)) &
-                    /(muts(i,j)*(t0+t_1(i,k,j)))
+       t_2ave(i,k,j)=(0.5*((1.+epssm)*t_2(i,k,j)+(1.-epssm)*t_2ave(i,k,j))-mu1(i,j)*t_1(i,k,j))/(muts(i,j)*(t0+t_1(i,k,j)))
     ENDDO
     ENDDO
 
+keep_ph_foure(i_start:i_end,2:k_end+1)=ph_1(i_start:i_end,2:k_end+1,j)-ph_1(i_start:i_end,1:k_end,j)&
+&                                     +phb(i_start:i_end,2:k_end+1,j) -phb(i_start:i_end,1:k_end,j)
 
     DO k=2,k_end+1
+    walls(1)=rdnw(k-1)
     DO i=i_start, i_end
-      wdwn(i,k)=.5*(ww(i,k,j)+ww(i,k-1,j))*rdnw(k-1)    &
-           *(ph_1(i,k,j)-ph_1(i,k-1,j)+phb(i,k,j)-phb(i,k-1,j))
-      rhs(i,k) = dts*(ph_tend(i,k,j) + .5*g*(1.-epssm)*w(i,k,j))
+      wdwn(i,k)=.5*(ww(i,k,j)+ww(i,k-1,j))*walls(1)*keep_ph_foure(i,k)
+!     rhs(i,k) = dts*(ph_tend(i,k,j) + .5*g*(1.-epssm)*w(i,k,j))
     ENDDO
+    rhs(i_start:i_end,k) = dts*(ph_tend(i_start:i_end,k,j)+0.5*g*(1.-epssm)*w(i_start:i_end,k,j))
     ENDDO
 
     DO k=2,k_end
+    walls(1) =fnm(k)
+    walls(2) =fnp(k)
     DO i=i_start, i_end
-       rhs(i,k) = rhs(i,k)-dts*( fnm(k)*wdwn(i,k+1)  &
-                                +fnp(k)*wdwn(i,k  ) )
+       rhs(i,k) = rhs(i,k)-dts*(walls(1)*wdwn(i,k+1)+walls(2)*wdwn(i,k))
     ENDDO
     ENDDO
 
@@ -1386,38 +1391,41 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
 ! (left a blank line where the other two k/i-loops were)
 !
     DO k=2,k_end
+      walls(1)=rdnw(k-1)
+      walls(2)=rdnw(k)
+      walls(3)=rdn(k)
       DO i=i_start, i_end
         w(i,k,j)=w(i,k,j)+dts*rw_tend(i,k,j)                       &
 
                  + msft_inv(i)*cqw(i,k,j)*(                        &
-            +.5*dts*g*mut_inv(i)*rdn(k)*                           &
-             (c2a(i,k  ,j)*rdnw(k  )                               &
+            +.5*dts*g*mut_inv(i)*walls(3)*                           &
+             (c2a(i,k  ,j)*walls(2)                               &
         *((1.+epssm)*(rhs(i,k+1  )-rhs(i,k    ))                   &
          +(1.-epssm)*(ph(i,k+1,j)-ph(i,k  ,j)))                    &
-             -c2a(i,k-1,j)*rdnw(k-1)                               &
+             -c2a(i,k-1,j)*walls(1)                               &
         *((1.+epssm)*(rhs(i,k    )-rhs(i,k-1  ))                   &
          +(1.-epssm)*(ph(i,k  ,j)-ph(i,k-1,j)))))                  &
 
-                +dts*g*msft_inv(i)*(rdn(k)*                        &
+                +dts*g*msft_inv(i)*(walls(3)*                        &
              (c2a(i,k  ,j)*alt(i,k  ,j)*t_2ave(i,k  ,j)            &
              -c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j))           &
-               +(rdn(k)*(c2a(i,k  ,j)*alb(i,k  ,j)                 &
+               +(walls(3)*(c2a(i,k  ,j)*alb(i,k  ,j)                 &
                         -c2a(i,k-1,j)*alb(i,k-1,j))*mut_inv(i)-1.) &
                      *muave(i,j))
       ENDDO
     ENDDO
 
     K=k_end+1
-
+    walls(1)=rdnw(k-1)
     DO i=i_start, i_end
        w(i,k,j)=w(i,k,j)+dts*rw_tend(i,k,j)                         &
            +msft_inv(i)*(                                        &
-         -.5*dts*g*mut_inv(i)*rdnw(k-1)**2*2.*c2a(i,k-1,j)            &
+         -.5*dts*g*mut_inv(i)*walls(1)*walls(1)*2.*c2a(i,k-1,j)            &
              *((1.+epssm)*(rhs(i,k  )-rhs(i,k-1  ))                 &
               +(1.-epssm)*(ph(i,k,j)-ph(i,k-1,j)))                  &
-         -dts*g*(2.*rdnw(k-1)*                                      &
+         -dts*g*(2.*walls(1)*                                      &
                    c2a(i,k-1,j)*alt(i,k-1,j)*t_2ave(i,k-1,j)        &
-             +(1.+2.*rdnw(k-1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))  &
+             +(1.+2.*walls(1)*c2a(i,k-1,j)*alb(i,k-1,j)*mut_inv(i))  &
                         *muave(i,j)) )
     ENDDO
 
@@ -1437,10 +1445,11 @@ SUBROUTINE advance_w( w, rw_tend, ww, u, v,       &
 !        but the tendency is, so...
 !        we must multiply tendency by msft here
 
+    walls(1)=.5*dts*g*(1.+epssm)
+
     DO k=2,k_end+1
     DO i=i_start, i_end
-      ph(i,k,j) = rhs(i,k)+msft(i,j)*.5*dts*g*(1.+epssm) &
-                      *w(i,k,j)/muts(i,j)
+      ph(i,k,j) = rhs(i,k)+msft(i,j)*walls(1)*w(i,k,j)/muts(i,j)
     ENDDO
     ENDDO
 

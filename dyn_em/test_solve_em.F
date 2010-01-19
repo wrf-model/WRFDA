@@ -229,9 +229,9 @@ real                                     :: dtbc_save
 
    z=0.; mudf=0.  
 
-   do i=its,ite
+   do j=jts,jte
      do k=kts,kte
-       do j=jts,jte
+       do i=its,ite
          B_u_1(i,k,j) = u_1(i,k,j)
          B_u_2(i,k,j) = u_2(i,k,j) 
          B_v_1(i,k,j) = v_1(i,k,j)
@@ -249,8 +249,8 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=its,ite
-     do j=jts,jte
+   do j=jts,jte
+     do i=its,ite
        B_mu_1(i,j) =mu_1(i,j)
        B_mu_2(i,j) =mu_2(i,j)
        B_mudf(i,j) =mudf(i,j)
@@ -259,10 +259,10 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=its,ite
-     do k=kts,kte
-       do j=jts,jte
-         do h=1,num_moist
+   do h=1,num_moist
+     do j=jts,jte
+       do k=kts,kte
+         do i=its,ite
            B_moist_1(i,k,j,h) =moist_1(i,k,j,h)
            B_moist_2(i,k,j,h) =moist_2(i,k,j,h)
          enddo
@@ -354,9 +354,9 @@ real                                     :: dtbc_save
 
    SAVE_L =0.0
 
-   do i=ifs,ife
+   do j=jfs,jfe
      do k=kts,kte
-       do j=jfs,jfe
+       do i=ifs,ife
          SAVE_L =SAVE_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
                         + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
                         + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
@@ -375,8 +375,8 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do j=jfs,jfe
+   do j=jfs,jfe
+     do i=ifs,ife
        SAVE_L =SAVE_L + g_mu_1(i,j)  * g_mu_1(i,j)    &
                       + g_mu_2(i,j)  * g_mu_2(i,j)    &
                       + g_rainnc(i,j) * g_rainnc(i,j)   &
@@ -385,10 +385,10 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do k=kts,kte
-       do j=jfs,jfe
-         do h=1,num_moist
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
            SAVE_L =SAVE_L + g_moist_1(i,k,j,h)  * g_moist_1(i,k,j,h)    &
                           + g_moist_2(i,k,j,h)  * g_moist_2(i,k,j,h) 
          enddo
@@ -758,7 +758,6 @@ real                                     :: dtbc_save
           enddo
         enddo
       enddo
-
       do i=ifs,ife
         do j=jfs,jfe
           VAL_N=VAL_N  + (mu_1(i,j) -B_mu_1(i,j))*(mu_1(i,j) -B_mu_1(i,j))    &
@@ -901,9 +900,9 @@ real                                     :: dtbc_save
 
    VAL_L =0.0
 
-   do i=ifs,ife
+   do j=jfs,jfe
      do k=kts,kte
-       do j=jfs,jfe
+       do i=ifs,ife
          VAL_L =VAL_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &
                       + g_u_2(i,k,j)  * g_u_2(i,k,j)    &
                       + g_v_1(i,k,j)  * g_v_1(i,k,j)    &
@@ -921,8 +920,8 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do j=jfs,jfe
+   do j=jfs,jfe
+     do i=ifs,ife
        VAL_L =VAL_L + g_mu_1(i,j)  * g_mu_1(i,j)    &
                     + g_mu_2(i,j)  * g_mu_2(i,j)    &
                     + g_rainnc(i,j) * g_rainnc(i,j)  &
@@ -931,10 +930,10 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do k=kts,kte
-       do j=jfs,jfe
-         do h=1,num_moist
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
            VAL_L =VAL_L + g_moist_1(i,k,j,h)  * g_moist_1(i,k,j,h)    &
                         + g_moist_2(i,k,j,h)  * g_moist_2(i,k,j,h)
          enddo
@@ -1034,9 +1033,9 @@ real                                     :: dtbc_save
 
    VAL_A = 0.0
 
-   do i=ifs,ife
+   do j=jfs,jfe
      do k=kts,kte
-       do j=jfs,jfe
+       do i=ifs,ife
          VAL_A = VAL_A + a_u_1(i,k,j) * B_u_1(i,k,j)               &
                       + a_u_2(i,k,j) * B_u_2(i,k,j)               &
                       + a_v_1(i,k,j) * B_v_1(i,k,j)               &
@@ -1053,8 +1052,8 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do j=jfs,jfe
+   do j=jfs,jfe
+     do i=ifs,ife
        VAL_A= VAL_A + a_mu_1(i,j) * B_mu_1(i,j)                 &
                     + a_rainnc(i,j) * B_rainnc(i,j)      &
                     + a_rainncv(i,j) * B_rainncv(i,j)     &
@@ -1062,10 +1061,10 @@ real                                     :: dtbc_save
      enddo
    enddo
 
-   do i=ifs,ife
-     do k=kts,kte
-       do j=jfs,jfe
-         do h=1,num_moist
+   do h=1,num_moist
+     do j=jfs,jfe
+       do k=kts,kte
+         do i=ifs,ife
            VAL_A= VAL_A + a_moist_1(i,k,j,h) * B_moist_1(i,k,j,h)   &
                         + a_moist_2(i,k,j,h) * B_moist_2(i,k,j,h)   
          enddo
@@ -1107,7 +1106,6 @@ real                                     :: dtbc_save
    rainncv = S_rainncv
 ! bp; ??
  ! print*,"test_solve_em(): Attention:",maxval(S_mu_b),minval(S_mu_b)
-
 
 END SUBROUTINE test_solve_em
 

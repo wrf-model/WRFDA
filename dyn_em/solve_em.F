@@ -45,6 +45,10 @@ SUBROUTINE solve_em ( grid , config_flags , &
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL
+   INCLUDE 'mpif.h'
+#endif
+
    !  Input data.
 
    TYPE(domain) , TARGET          :: grid
@@ -160,6 +164,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
 ! Initialize timers if compiled with -DBENCH
 #include <bench_solve_em_init.h>
 
+
    if(grid%trace_use) call trace_entry("solve_em")
    ! 090921 bp; 
    solverDisabled = .false.
@@ -224,6 +229,9 @@ SUBROUTINE solve_em ( grid , config_flags , &
 !    prepare chem aerosols for advection before communication
 !    so far only for RADM2/SORGAM choice
 !
+
+!  Print*, 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+!  Stop
 
    kte=min(k_end,kde-1)
 !
@@ -418,6 +426,7 @@ BENCH_END(step_prep_tim)
 
 !   CALL set_tiles ( grid , ids , ide , jds , jde , ips-1 , ipe+1 , jps-1 , jpe+1 )
 
+!WALLS_001
 BENCH_START(set_phys_bc_tim)
    if(dyn_opt == DYN_EM) then
    !$OMP PARALLEL DO   &
