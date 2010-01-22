@@ -316,7 +316,7 @@ CONTAINS
       qrr = prodk(k)*0.001*rhok(k)
       arg1 = rhok(1)/rhok(k)
       vtden(k) = SQRT(arg1)
-      IF (qrr .GE. 1d-6) THEN
+      IF (qrr .GE. 1d-5) THEN
         vt(k) = 36.34*qrr**0.1364*vtden(k)
       ELSE
         vt(k) = 0.0
@@ -372,7 +372,7 @@ CONTAINS
       CALL PUSHREAL8(arg1)
       arg1 = rhok(1)/rhok(k)
       vtden(k) = SQRT(arg1)
-      IF (qrr .GE. 1d-8) THEN
+      IF (qrr .GE. 1d-5) THEN
         vt(k) = 36.34*qrr**0.1364*vtden(k)
         CALL PUSHINTEGER4(1)
       ELSE
@@ -490,7 +490,7 @@ CONTAINS
       qrr = prodk(k)*0.001*rhok(k)
       arg1 = rhok(1)/rhok(k)
       vtden(k) = SQRT(arg1)
-      IF (qrr .GE. 1d-8) THEN
+      IF (qrr .GE. 1d-5) THEN
         vt(k) = 36.34*qrr**0.1364*vtden(k)
       ELSE
         vt(k) = 0.0
@@ -1164,7 +1164,7 @@ CONTAINS
         vtdend(k) = arg1d/(2.0*SQRT(arg1))
       END IF
       vtden(k) = SQRT(arg1)
-      IF (qrr .GE. 1d-8) THEN
+      IF (qrr .GE. 1d-5) THEN
         vtd(k) = 36.34*(0.1364*qrr**(-0.8636)*qrrd*vtden(k)+qrr**0.1364*&
 &          vtdend(k))
         vt(k) = 36.34*qrr**0.1364*vtden(k)
