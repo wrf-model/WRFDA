@@ -904,13 +904,15 @@ AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 1        tutorial_xinzhang           32      32           serial|smpar|dmpar
 2        cv3_guo                     32      32           serial|smpar|dmpar
 3        t44_liuz                    32      32           serial|smpar|dmpar
-#4        radar_meixu                 32      32           serial|smpar|dmpar
+4        radar_meixu                 32      32           serial|smpar|dmpar
 5        cwb_ascii                   32      32           serial|smpar|dmpar
 6        afwa_t7_ssmi                32      32           serial|smpar|dmpar
 7        t44_prepbufr                32      32           serial|smpar|dmpar
 8        ASR_prepbufr                32      32           serial|smpar|dmpar
 9        cwb_ascii_outerloop_rizvi   32      32           serial|smpar|dmpar
 10       sfc_assi_2_outerloop_guo    32      32           serial|smpar|dmpar
+11       outerloop_bench_guo         32      32           serial|smpar|dmpar
+12       outerloop_ztd_bench_guo     32      32           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
