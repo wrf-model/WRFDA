@@ -4,6 +4,141 @@ static char adSid[]="$Id: adStack.c 2158 2007-10-24 11:51:52Z llh $";
 #include <stdio.h>
 #include <string.h>
 
+#ifndef CRAY
+# ifdef NOUNDERSCORE
+#      define PUSHCHARACTERARRAY  pushcharacterarray
+#      define POPCHARACTERARRAY  popcharacterarray
+#      define LOOKCHARACTERARRAY  lookcharacterarray
+#      define PUSHBOOLEANARRAY  pushbooleanarray
+#      define POPBOOLEANARRAY  popbooleanarray
+#      define LOOKBOOLEANARRAY  lookbooleanarray
+
+#      define PUSHINTEGER4ARRAY  pushinteger4array
+#      define POPINTEGER4ARRAY   popinteger4array
+#      define LOOKINTEGER4ARRAY  lookinteger4array
+#      define PUSHINTEGER8ARRAY  pushinteger8array
+#      define POPINTEGER8ARRAY   popinteger8array
+#      define LOOKINTEGER8ARRAY  lookinteger8array
+#      define PUSHINTEGER16ARRAY  pushinteger16array
+#      define POPINTEGER16ARRAY   popinteger16array
+#      define LOOKINTEGER16ARRAY  lookinteger16array
+
+#      define PUSHREAL4ARRAY  pushreal4array
+#      define POPREAL4ARRAY   popreal4array
+#      define LOOKREAL4ARRAY  lookreal4array
+#      define PUSHREAL8ARRAY  pushreal8array
+#      define POPREAL8ARRAY   popreal8array
+#      define LOOKREAL8ARRAY  lookreal8array
+#      define PUSHREAL16ARRAY  pushreal16array
+#      define POPREAL16ARRAY   popreal16array
+#      define LOOKREAL16ARRAY  lookreal16array
+#      define PUSHREAL32ARRAY  pushreal32array
+#      define POPREAL32ARRAY   popreal32array
+#      define LOOKREAL32ARRAY  lookreal32array
+
+#      define PUSHCOMPLEX4ARRAY  pushcomplex4array
+#      define POPCOMPLEX4ARRAY   popcomplex4array
+#      define LOOKCOMPLEX4ARRAY  lookcomplex4array
+#      define PUSHCOMPLEX8ARRAY  pushcomplex8array
+#      define POPCOMPLEX8ARRAY   popcomplex8array
+#      define LOOKCOMPLEX8ARRAY  lookcomplex8array
+#      define PUSHCOMPLEX16ARRAY  pushcomplex16array
+#      define POPCOMPLEX16ARRAY   popcomplex16array
+#      define LOOKCOMPLEX16ARRAY  lookcomplex16array
+#      define PUSHCOMPLEX32ARRAY  pushcomplex32array
+#      define POPCOMPLEX32ARRAY   popcomplex32array
+#      define LOOKCOMPLEX32ARRAY  lookcomplex32array
+# else
+#   ifdef F2CSTYLE
+#      define PUSHCHARACTERARRAY  pushcharacterarray__
+#      define POPCHARACTERARRAY  popcharacterarray__
+#      define LOOKCHARACTERARRAY  lookcharacterarray__
+#      define PUSHBOOLEANARRAY  pushbooleanarray__
+#      define POPBOOLEANARRAY  popbooleanarray__
+#      define LOOKBOOLEANARRAY  lookbooleanarray__
+
+#      define PUSHINTEGER4ARRAY  pushinteger4array__
+#      define POPINTEGER4ARRAY   popinteger4array__
+#      define LOOKINTEGER4ARRAY  lookinteger4array__
+#      define PUSHINTEGER8ARRAY  pushinteger8array__
+#      define POPINTEGER8ARRAY   popinteger8array__
+#      define LOOKINTEGER8ARRAY  lookinteger8array__
+#      define PUSHINTEGER16ARRAY  pushinteger16array__
+#      define POPINTEGER16ARRAY   popinteger16array__
+#      define LOOKINTEGER16ARRAY  lookinteger16array__
+
+#      define PUSHREAL4ARRAY  pushreal4array__
+#      define POPREAL4ARRAY   popreal4array__
+#      define LOOKREAL4ARRAY  lookreal4array__
+#      define PUSHREAL8ARRAY  pushreal8array__
+#      define POPREAL8ARRAY   popreal8array__
+#      define LOOKREAL8ARRAY  lookreal8array__
+#      define PUSHREAL16ARRAY  pushreal16array__
+#      define POPREAL16ARRAY   popreal16array__
+#      define LOOKREAL16ARRAY  lookreal16array__
+#      define PUSHREAL32ARRAY  pushreal32array__
+#      define POPREAL32ARRAY   popreal32array__
+#      define LOOKREAL32ARRAY  lookreal32array__
+
+#      define PUSHCOMPLEX4ARRAY  pushcomplex4array__
+#      define POPCOMPLEX4ARRAY   popcomplex4array__
+#      define LOOKCOMPLEX4ARRAY  lookcomplex4array__
+#      define PUSHCOMPLEX8ARRAY  pushcomplex8array__
+#      define POPCOMPLEX8ARRAY   popcomplex8array__
+#      define LOOKCOMPLEX8ARRAY  lookcomplex8array__
+#      define PUSHCOMPLEX16ARRAY  pushcomplex16array__
+#      define POPCOMPLEX16ARRAY   popcomplex16array__
+#      define LOOKCOMPLEX16ARRAY  lookcomplex16array__
+#      define PUSHCOMPLEX32ARRAY  pushcomplex32array__
+#      define POPCOMPLEX32ARRAY   popcomplex32array__
+#      define LOOKCOMPLEX32ARRAY  lookcomplex32array__
+#   else
+#      define PUSHCHARACTERARRAY  pushcharacterarray_
+#      define POPCHARACTERARRAY  popcharacterarray_
+#      define LOOKCHARACTERARRAY  lookcharacterarray_
+#      define PUSHBOOLEANARRAY  pushbooleanarray_
+#      define POPBOOLEANARRAY  popbooleanarray_
+#      define LOOKBOOLEANARRAY  lookbooleanarray_
+
+#      define PUSHINTEGER4ARRAY  pushinteger4array_
+#      define POPINTEGER4ARRAY   popinteger4array_
+#      define LOOKINTEGER4ARRAY  lookinteger4array_
+#      define PUSHINTEGER8ARRAY  pushinteger8array_
+#      define POPINTEGER8ARRAY   popinteger8array_
+#      define LOOKINTEGER8ARRAY  lookinteger8array_
+#      define PUSHINTEGER16ARRAY  pushinteger16array_
+#      define POPINTEGER16ARRAY   popinteger16array_
+#      define LOOKINTEGER16ARRAY  lookinteger16array_
+
+#      define PUSHREAL4ARRAY  pushreal4array_
+#      define POPREAL4ARRAY   popreal4array_
+#      define LOOKREAL4ARRAY  lookreal4array_
+#      define PUSHREAL8ARRAY  pushreal8array_
+#      define POPREAL8ARRAY   popreal8array_
+#      define LOOKREAL8ARRAY  lookreal8array_
+#      define PUSHREAL16ARRAY  pushreal16array_
+#      define POPREAL16ARRAY   popreal16array_
+#      define LOOKREAL16ARRAY  lookreal16array_
+#      define PUSHREAL32ARRAY  pushreal32array_
+#      define POPREAL32ARRAY   popreal32array_
+#      define LOOKREAL32ARRAY  lookreal32array_
+
+#      define PUSHCOMPLEX4ARRAY  pushcomplex4array_
+#      define POPCOMPLEX4ARRAY   popcomplex4array_
+#      define LOOKCOMPLEX4ARRAY  lookcomplex4array_
+#      define PUSHCOMPLEX8ARRAY  pushcomplex8array_
+#      define POPCOMPLEX8ARRAY   popcomplex8array_
+#      define LOOKCOMPLEX8ARRAY  lookcomplex8array_
+#      define PUSHCOMPLEX16ARRAY  pushcomplex16array_
+#      define POPCOMPLEX16ARRAY   popcomplex16array_
+#      define LOOKCOMPLEX16ARRAY  lookcomplex16array_
+#      define PUSHCOMPLEX32ARRAY  pushcomplex32array_
+#      define POPCOMPLEX32ARRAY   popcomplex32array_
+#      define LOOKCOMPLEX32ARRAY  lookcomplex32array_
+#   endif
+# endif
+#endif
+
 #define ONE_BLOCK_SIZE 16384
 #ifndef STACK_SIZE_TRACING
 #define STACK_SIZE_TRACING 1
@@ -159,133 +294,133 @@ void lookNarray(char *x, unsigned int nbChars) {
 
 /****** Exported PUSH/POP/LOOK functions for ARRAYS: ******/
 
-void pushcharacterarray_(char *x, unsigned int *n) {
+void PUSHCHARACTERARRAY(char *x, unsigned int *n) {
   pushNarray(x,*n) ;
 }
-void popcharacterarray_(char *x, unsigned int *n) {
+void POPCHARACTERARRAY(char *x, unsigned int *n) {
   popNarray(x,*n) ;
 }
-void lookcharacterarray_(char *x, unsigned int *n) {
+void LOOKCHARACTERARRAY(char *x, unsigned int *n) {
   lookNarray(x,*n) ;
 }
 
-void pushbooleanarray_(char *x, unsigned int *n) {
+void PUSHBOOLEANARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*4)) ;
 }
-void popbooleanarray_(char *x, unsigned int *n) {
+void POPBOOLEANARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*4)) ;
 }
-void lookbooleanarray_(char *x, unsigned int *n) {
+void LOOKBOOLEANARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*4)) ;
 }
 
-void pushinteger4array(char *x, unsigned int *n) {
+void PUSHINTEGER4ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*4)) ;
 }
-void popinteger4array(char *x, unsigned int *n) {
+void POPINTEGER4ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*4)) ;
 }
-void lookinteger4array_(char *x, unsigned int *n) {
+void LOOKINTEGER4ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*4)) ;
 }
 
-void pushinteger8array_(char *x, unsigned int *n) {
+void PUSHINTEGER8ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*8)) ;
 }
-void popinteger8array_(char *x, unsigned int *n) {
+void POPINTEGER8ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*8)) ;
 }
-void lookinteger8array_(char *x, unsigned int *n) {
+void LOOKINTEGER8ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*8)) ;
 }
 
-void pushinteger16array_(char *x, unsigned int *n) {
+void PUSHINTEGER16ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*16)) ;
 }
-void popinteger16array_(char *x, unsigned int *n) {
+void POPINTEGER16ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*16)) ;
 }
-void lookinteger16array_(char *x, unsigned int *n) {
+void LOOKINTEGER16ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*16)) ;
 }
 
-void pushreal4array(char *x, unsigned int *n) {
+void PUSHREAL4ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*4)) ;
 }
-void popreal4array(char *x, unsigned int *n) {
+void POPREAL4ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*4)) ;
 }
-void lookreal4array_(char *x, unsigned int *n) {
+void LOOKREAL4ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*4)) ;
 }
 
-void pushreal8array(char *x, unsigned int *n) {
+void PUSHREAL8ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*8)) ;
 }
-void popreal8array(char *x, unsigned int *n) {
+void POPREAL8ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*8)) ;
 }
-void lookreal8array_(char *x, unsigned int *n) {
+void LOOKREAL8ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*8)) ;
 }
 
-void pushreal16array_(char *x, unsigned int *n) {
+void PUSHREAL16ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*16)) ;
 }
-void popreal16array_(char *x, unsigned int *n) {
+void POPREAL16ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*16)) ;
 }
-void lookreal16array_(char *x, unsigned int *n) {
+void LOOKREAL16ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*16)) ;
 }
 
-void pushreal32array_(char *x, unsigned int *n) {
+void PUSHREAL32ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*32)) ;
 }
-void popreal32array_(char *x, unsigned int *n) {
+void POPREAL32ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*32)) ;
 }
-void lookreal32array_(char *x, unsigned int *n) {
+void LOOKREAL32ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*32)) ;
 }
 
-void pushcomplex4array_(char *x, unsigned int *n) {
+void PUSHCOMPLEX4ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*4)) ;
 }
-void popcomplex4array_(char *x, unsigned int *n) {
+void POPCOMPLEX4ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*4)) ;
 }
-void lookcomplex4array_(char *x, unsigned int *n) {
+void LOOKCOMPLEX4ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*4)) ;
 }
 
-void pushcomplex8array_(char *x, unsigned int *n) {
+void PUSHCOMPLEX8ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*8)) ;
 }
-void popcomplex8array_(char *x, unsigned int *n) {
+void POPCOMPLEX8ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*8)) ;
 }
-void lookcomplex8array_(char *x, unsigned int *n) {
+void LOOKCOMPLEX8ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*8)) ;
 }
 
-void pushcomplex16array_(char *x, unsigned int *n) {
+void PUSHCOMPLEX16ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*16)) ;
 }
-void popcomplex16array_(char *x, unsigned int *n) {
+void POPCOMPLEX16ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*16)) ;
 }
-void lookcomplex16array_(char *x, unsigned int *n) {
+void LOOKCOMPLEX16ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*16)) ;
 }
 
-void pushcomplex32array_(char *x, unsigned int *n) {
+void PUSHCOMPLEX32ARRAY(char *x, unsigned int *n) {
   pushNarray(x,(*n*32)) ;
 }
-void popcomplex32array_(char *x, unsigned int *n) {
+void POPCOMPLEX32ARRAY(char *x, unsigned int *n) {
   popNarray(x,(*n*32)) ;
 }
-void lookcomplex32array_(char *x, unsigned int *n) {
+void LOOKCOMPLEX32ARRAY(char *x, unsigned int *n) {
   lookNarray(x,(*n*32)) ;
 }
 

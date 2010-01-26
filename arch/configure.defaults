@@ -3066,6 +3066,7 @@ CFLAGS          =
 FCOPTIM        	=       -O2 -fast
 FCDEBUG        	=       # -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG) 
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          CONFIGURE_NETCDF_FLAG \
@@ -3170,6 +3171,7 @@ CFLAGS          =       -DDM_PARALLEL \
 FCOPTIM	        =       -O2 -fast
 FCDEBUG        	=       #-g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG) 
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
@@ -3279,6 +3281,7 @@ CFLAGS          =	-w -O3
 FCOPTIM	        =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed
 FCDEBUG        	=       # -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree -mcmodel=medium $(FCDEBUG)
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          CONFIGURE_NETCDF_FLAG \
@@ -3387,6 +3390,7 @@ CFLAGS          =       -w -O3 -DDM_PARALLEL \
 FCOPTIM         =       -fastsse -Mvect=noaltcode -Msmartalloc -Mprefetch=distance:8 -Mfprelaxed # -Minfo=all =Mneginfo=all
 FCDEBUG		=	# -g -O0
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
@@ -6105,6 +6109,7 @@ CFLAGS          =       -DMACOS
 FCOPTIM         =       -O2 -fast 
 FCDEBUG         =       # -g -O0 
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG) 
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../inc
@@ -6226,6 +6231,7 @@ CFLAGS          =       -DMACOS  \
 FCOPTIM         =       -O2 -fast
 FCDEBUG         =       # -g -O0       
 FCBASEOPTS      =       -w -byteswapio -Mfree $(FCDEBUG)
+FORMAT_FIXED	=	-Mfixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
