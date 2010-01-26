@@ -50,6 +50,9 @@ if [[ $NL_MULTI_INC == 2 ]]; then
 fi
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
+if [[ $NL_CV_OPTIONS == 3 ]]; then
+   export DA_BACK_ERRORS=$WRFVAR_DIR/var/run/be.dat.cv3
+fi
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:- }
@@ -340,6 +343,8 @@ if $NL_VAR4D; then
    export NL_HISTORY_INTERVAL=9999
    export NL_AUXHIST2_OUTNAME_SAVE=$NL_AUXHIST2_OUTNAME
    export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
+   export NL_IO_FORM_AUXHIST2=2
+   export NL_FRAMES_PER_AUXHIST2=1
    if [[ $NUM_PROCS -gt 1 ]]; then
       export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
    fi
