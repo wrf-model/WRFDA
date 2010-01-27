@@ -125,7 +125,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
 
    INTEGER :: rc   !by walls
    INTEGER :: number_of_small_timesteps, rk_step  
-   INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    !by walls
+   INTEGER :: klevel,ijm,ijp,size1,size2    !by walls
    INTEGER :: idum1, idum2, dynamics_option   !by walls
 
    INTEGER :: rk_order, iwmax, jwmax, kwmax  !by walls

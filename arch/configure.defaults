@@ -3505,8 +3505,9 @@ CFLAGS          =       -w -O3 -ip
 FCOPTIM         =       -O3
 FCDEBUG		=	#-g -O0 -traceback
 FCBASEOPTS      =       -zero -w -ftz -align all -fno-alias -fp-model precise -FR -convert big_endian $(FCDEBUG)
+FORMAT_FIXED	=	-fixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
-ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
+ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
                         -DTRIEDNTRUE   \
 			-DLIMIT_ARGS
@@ -3515,7 +3516,7 @@ INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int -I../extern
 EXTRAMODULES    =       
 PERL            =       perl
 REGISTRY        =       Registry
-LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_lite \
+LIB             =       CONFIGURE_NETCDF_LIB_PATH  \
                         -L../external/io_grib1 -lio_grib1 \
 			-L../external/io_int -lwrfio_int \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
@@ -3530,14 +3531,14 @@ RANLIB          =       ranlib
 NETCDFPATH	=	CONFIGURE_NETCDF_PATH
 CC_TOOLS        =       cc
 
-externals : CONFIGURE_WRFIO_NF wrfio_grib1 ../external/RSL_LITE/librsl_lite.a wrfio_int gen_comms.c module_dm.F esmf_time
+externals : CONFIGURE_WRFIO_NF wrfio_grib1 wrfio_int gen_comms.c module_dm.F esmf_time
 
 gen_comms.c : ../external/RSL_LITE/gen_comms.c
 	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
           cat ../external/RSL_LITE/gen_comms.c >> ../tools/gen_comms.c )
 
-module_dm.F : ../external/RSL_LITE/module_dm.F
-	( /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL_LITE/module_dm.F >> module_dm.F )
+module_dm.F :
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
 
 io_flags:
 	( cd ../external/io_netcdf ; make flags_only ; \
@@ -3622,6 +3623,7 @@ CFLAGS          =       -w -O3 -ip -DDM_PARALLEL \
 FCOPTIM         =       -O3
 FCDEBUG		=	#-g -O0 -traceback
 FCBASEOPTS      =       -zero -w -ftz -align all -fno-alias -fp-model precise -FR -convert big_endian $(FCDEBUG)
+FORMAT_FIXED	=	-fixed
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DYYY -DINTIO -DDM_PARALLEL \
                         -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 CONFIGURE_NETCDF_FLAG \
