@@ -1262,10 +1262,6 @@ end if
     DO j = j_start, j_end
     DO k = kts+1, ktf-1
     DO i = i_start, i_end
-      if(rdz(i,k,j)*rdz(i,k+1,j).eq.0.) then
-        print*, 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBXXXXXXXX', rdz(i,k,j), rdz(i,k+1,j),i,k,j
-      end if
-
       tmpdz = 1.0 / rdz(i,k,j) + 1.0 / rdz(i,k+1,j)
 
       IF ( moist(i,k,j,P_QV) .GE. qvs(i,k,j) .OR. qctmp(i,k,j) .GE. qc_cr) THEN

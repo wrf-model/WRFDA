@@ -2643,59 +2643,55 @@ end if
        jts = max(grid%j_start(ij),jds+sz)
        jte = min(grid%j_end(ij),jde-1-sz)
 
-!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS012++++++++++++++++++++++++++++++++++++++++++++++'
-    call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
+       call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                                     a_h_diabatic, dtm, ide, jde, kde, &
                                     ims, ime, jms, jme, kms, kme, &
                                     its, ite, jts, jte, k_start,k_end )
-!print*, '++++++++++++++++++++++++++++++++++++++++++++++031++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 
-!       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
-!                                   al, alb, p, p8w, p0, pb,          &
-!                                   ph_2, phb, pi_phy, p_phy,         &
-!                                   z, z_at_w, dz8w,                  &
-!                                   dtm, h_diabatic,                  &
-!                                   config_flags,fnm, fnp,            &
-!                                   ids, ide, jds, jde, kds, kde,     &
-!                                   ims, ime, jms, jme, kms, kme,     &
-!                                   max(grid%i_start(ij),ids+sz),  &
-!                                   min(grid%i_end(ij),ide-1-sz),    &
-!                                   max(grid%j_start(ij),jds+sz),  &
-!                                   min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+                                    al, alb, p, p8w, p0, pb,          &
+                                    ph_2, phb, pi_phy, p_phy,         &
+                                    z, z_at_w, dz8w,                  &
+                                    dtm, h_diabatic,                  &
+                                    config_flags,fnm, fnp,            &
+                                    ids, ide, jds, jde, kds, kde,     &
+                                    ims, ime, jms, jme, kms, kme,     &
+                                    max(grid%i_start(ij),ids+sz),  &
+                                    min(grid%i_end(ij),ide-1-sz),    &
+                                    max(grid%j_start(ij),jds+sz),  &
+                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
 !---Restore for lscond:
-    call pop2restore(dz8w, "dz8w")
-    call pop2restore(z, "z")
-    call pop2restore(t_2, "t_2")
-    call pop2restore(th_phy, "th_phy")
-    call pop2restore(pi_phy, "pi_phy")
-    call pop2restore(p_phy, "p_phy")
-    call pop2restore(rho, "rho")
-    call pop2restore(moist_2, "moist_2")
+!   call pop2restore(dz8w, "dz8w")
+!   call pop2restore(z, "z")
+!   call pop2restore(t_2, "t_2")
+!   call pop2restore(th_phy, "th_phy")
+!   call pop2restore(pi_phy, "pi_phy")
+!   call pop2restore(p_phy, "p_phy")
+!   call pop2restore(rho, "rho")
+!   call pop2restore(moist_2, "moist_2")
 !whl
 !     print*,'config_flags%mp_physics in ad ',config_flags%mp_physics
 
   if (config_flags%mp_physics ==1)then
-   call kessler_b(t_2, a_t_2, moist_2(ims,kms,jms,P_QV),  a_moist_2(ims,kms,jms,P_QV),&
-&                             moist_2(ims,kms,jms,P_QC),  a_moist_2(ims,kms,jms,P_QC),&
-&                             moist_2(ims,kms,jms,P_QR),  a_moist_2(ims,kms,jms,P_QR),&
-&     rho, a_rho, p_phy, a_p_phy, pi_phy, a_pi_phy, dtm&
-&    , z, xlv, cp, ep_2,svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
-&    a_rainnc, rainncv, a_rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
-&    jms, jme, kms, kme, &
-                                   max(grid%i_start(ij),ids+sz),          &
-                                   min(grid%i_end(ij),ide-1-sz),          &
-                                   max(grid%j_start(ij),jds+sz),          &
-                                   min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)        )
+     call kessler_b(t_2, a_t_2, moist_2(ims,kms,jms,P_QV),  a_moist_2(ims,kms,jms,P_QV),&
+                              moist_2(ims,kms,jms,P_QC),  a_moist_2(ims,kms,jms,P_QC),&
+                              moist_2(ims,kms,jms,P_QR),  a_moist_2(ims,kms,jms,P_QR),&
+                              rho, a_rho, p_phy, a_p_phy, pi_phy, a_pi_phy, dtm&
+                              , z, xlv, cp, ep_2,svp1, svp2, svp3, svpt0, rhowater, dz8w, rainnc, &
+                              a_rainnc, rainncv, a_rainncv, ids, ide, jds, jde, kds, kde, ims, ime, &
+                              jms, jme, kms, kme, &
+                              max(grid%i_start(ij),ids+sz),          &
+                              min(grid%i_end(ij),ide-1-sz),          &
+                              max(grid%j_start(ij),jds+sz),          &
+                              min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)        )
   elseif(config_flags%mp_physics ==0)then
-    call a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
+        call a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
                     a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
                     pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
                     rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme, &
                     its, ite, jts, jte, min(k_end,kde-1) )
-  else
-  print*,'no rain process'
   endif
 !-----Output: a_t_2,a_p_phy,a_moist_2,a_rho,a_pi_phy,a_rainnc,a_rainncv,a_dz8w
 
