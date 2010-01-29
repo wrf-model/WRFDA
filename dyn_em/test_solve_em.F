@@ -1149,8 +1149,6 @@ subroutine isolateVars(isolationVar, &
    real , dimension(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: rainncv
 
 
-   write(*,*) 'isolateVars() ' , isolationVar
-
    select case ( isolationVar )
    case (0)    ! no isolation
    case (1)    ! isolate u,v,w
