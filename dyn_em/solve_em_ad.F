@@ -2312,10 +2312,10 @@ endif
      sz = 0
    ENDIF
 
-!       its = max(grid%i_start(ij),ids+sz)
-!       ite = min(grid%i_end(ij),ide-1-sz)
-!       jts = max(grid%j_start(ij),jds+sz)
-!       jte = min(grid%j_end(ij),jde-1-sz)
+       its = max(grid%i_start(ij),ids+sz)
+       ite = min(grid%i_end(ij),ide-1-sz)
+       jts = max(grid%j_start(ij),jds+sz)
+       jte = min(grid%j_end(ij),jde-1-sz)
 
        CALL wrf_debug ( 200 , ' call moist_physics_prep' )
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &

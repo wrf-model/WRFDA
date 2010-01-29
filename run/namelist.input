@@ -96,8 +96,8 @@
  TEST_rk_update_scalar      = .true.,
  TEST_calc_p_rho_phi        = .true.,
  TEST_diagnose_w            = .true.,
- TEST_cudu                  = .true.,
- TEST_kessler               = .true.
+ TEST_cudu                  = .false.,
+ TEST_kessler               = .true.,
  /
 
  &physics

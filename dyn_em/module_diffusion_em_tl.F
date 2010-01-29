@@ -521,7 +521,11 @@ end do
 do j = j_start, j_end
   do k = kts+1, ktf-1
     do i = i_start, i_end
-      tmpdz = 1./rdz(i,k,j)+1./rdz(i,k+1,j)
+      if ( rdz(i,k,j) .lt. 1.0e-30 .or. rdz(i,k+1,j) .lt. 1.0E-30) then
+          tmpdz = 0.0
+      else
+          tmpdz = 1./rdz(i,k,j)+1./rdz(i,k+1,j)
+      end if
       if (moist(i,k,j,p_qv) .ge. qvs(i,k,j) .or. qctmp(i,k,j) .ge. qc_cr) then
         g_xlvqv = g_moist(i,k,j,p_qv)*xlv
         xlvqv = xlv*moist(i,k,j,p_qv)
@@ -538,15 +542,25 @@ do j = j_start, j_end
         g_thetaem1 = g_qvs(i,k-1,j)*theta(i,k-1,j)*(xlv/cp/t(i,k-1,j))-g_t(i,k-1,j)*theta(i,k-1,j)*(xlv*qvs(i,k-1,j)/cp/(t(i,k-1,j)&
 &*t(i,k-1,j)))+g_theta(i,k-1,j)*(1+xlv*qvs(i,k-1,j)/cp/t(i,k-1,j))
         thetaem1 = theta(i,k-1,j)*(1.+xlv*qvs(i,k-1,j)/cp/t(i,k-1,j))
-        g_bn2(i,k,j) = g_coefa*g*((thetaep1-thetaem1)/tmpdz)-g_thetaem1*g*(coefa/tmpdz)+g_thetaep1*g*(coefa/tmpdz)+g_tmp1(i,k-1,j)*&
+        if (tmpdz .lt. 1.0E-30) then
+           g_bn2(i,k,j) = 0.0
+           bn2(i,k,j) = 0.0
+        else
+           g_bn2(i,k,j) = g_coefa*g*((thetaep1-thetaem1)/tmpdz)-g_thetaem1*g*(coefa/tmpdz)+g_thetaep1*g*(coefa/tmpdz)+g_tmp1(i,k-1,j)*&
 &(g/tmpdz)-g_tmp1(i,k+1,j)*(g/tmpdz)
-        bn2(i,k,j) = g*(coefa*(thetaep1-thetaem1)/tmpdz-(tmp1(i,k+1,j)-tmp1(i,k-1,j))/tmpdz)
+           bn2(i,k,j) = g*(coefa*(thetaep1-thetaem1)/tmpdz-(tmp1(i,k+1,j)-tmp1(i,k-1,j))/tmpdz)
+        endif
       else
-        g_bn2(i,k,j) = g_moist(i,k-1,j,p_qv)*g*((-1.61)/tmpdz)+g_moist(i,k+1,j,p_qv)*g*(1.61/tmpdz)+g_theta(i,k-1,j)*g*((-1)/&
+        if (tmpdz .lt. 1.0E-30) then
+           g_bn2(i,k,j) = 0.0
+           bn2(i,k,j) = 0.0
+        else
+           g_bn2(i,k,j) = g_moist(i,k-1,j,p_qv)*g*((-1.61)/tmpdz)+g_moist(i,k+1,j,p_qv)*g*(1.61/tmpdz)+g_theta(i,k-1,j)*g*((-1)/&
 &theta(i,k,j)/tmpdz)+g_theta(i,k+1,j)*g*(1/theta(i,k,j)/tmpdz)-g_theta(i,k,j)*g*((theta(i,k+1,j)-theta(i,k-1,j))/(theta(i,&
 &k,j)*theta(i,k,j))/tmpdz)+g_tmp1(i,k-1,j)*(g/tmpdz)-g_tmp1(i,k+1,j)*(g/tmpdz)
-        bn2(i,k,j) = g*((theta(i,k+1,j)-theta(i,k-1,j))/theta(i,k,j)/tmpdz+1.61*(moist(i,k+1,j,p_qv)-moist(i,k-1,j,p_qv))/tmpdz-&
+           bn2(i,k,j) = g*((theta(i,k+1,j)-theta(i,k-1,j))/theta(i,k,j)/tmpdz+1.61*(moist(i,k+1,j,p_qv)-moist(i,k-1,j,p_qv))/tmpdz-&
 &(tmp1(i,k+1,j)-tmp1(i,k-1,j))/tmpdz)
+        endif
       endif
     end do
   end do

@@ -49,7 +49,7 @@ CONTAINS
 !----------------------------------------------------------------
 
    DO j = jts, jte
-   DO k = 1, kte
+   DO k = kts, kte
    DO i = its,ite
       TTEMP = PII(I,K,J)*TH(I,K,J)
       ES1 = 1000.*SVP1*EXP(SVP2*(TTEMP-SVPT0)/(TTEMP-SVP3))

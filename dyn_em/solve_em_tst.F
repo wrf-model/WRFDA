@@ -701,29 +701,28 @@ BENCH_START(cu_driver_tim)
          endif
          print *, 'Finishing Check the DUCU, TEST_cudu'
 
-         CALL  DUCU(                                            &
-               IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
-               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
-               ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
-               ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
-               ,KTS=k_start,KTE=min(k_end, kde-1) &
-               ,DT=dt ,KTAU=itimestep ,DX=dx                    &
-               ,RHO=rho,RAINCV=raincv, NCA=nca                  &
-               ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
-               ,DZ8W=dz8w               &
-               ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
-               ,XLV=XLV                                         &
-               ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
-               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
-               ,STEPCU=stepcu                                   &
-               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
-               ,CUTOP=HTOP,CUBOT=HBOT                           &
-               ,QV=moist_2(ims,kms,jms,P_QV)                                                 &
-              ! optionals
-               ,RTHCUTEN=rthcuten                               &
-               ,RQVCUTEN=rqvcuten                               &
-
-                                                                )
+!        CALL  DUCU(                                            &
+!              IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &
+!              ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &
+!              ,ITS=grid%i_start(ij),ITE=min(grid%i_end(ij), ide-1)      &
+!              ,JTS=grid%j_start(ij),JTE= min(grid%j_end(ij), jde-1)    &
+!              ,KTS=k_start,KTE=min(k_end, kde-1) &
+!              ,DT=dt ,KTAU=itimestep ,DX=dx                    &
+!              ,RHO=rho,RAINCV=raincv, NCA=nca                  &
+!              ,U=u_phy ,V=v_phy ,TH=th_phy ,T=t_phy ,W=w_2    &
+!              ,DZ8W=dz8w               &
+!              ,Z=z, PCPS=p_phy, PI=pi_phy ,W0AVG=grid%W0AVG                 &
+!              ,XLV=XLV                                         &
+!              ,CP=CP ,RD=R_d ,RV=R_v ,G=G ,EP2=EP_2             &
+!              ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &
+!              ,STEPCU=stepcu                                   &
+!              ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &
+!              ,CUTOP=HTOP,CUBOT=HBOT                           &
+!              ,QV=moist_2(ims,kms,jms,P_QV)                                                 &
+!             ! optionals
+!              ,RTHCUTEN=rthcuten                               &
+!              ,RQVCUTEN=rqvcuten                               &
+!                                                               )
 
        ENDDO
 
