@@ -3737,6 +3737,7 @@ CFLAGS          =       -w -O3
 FCOPTIM         =       -O3 -ftree-vectorize -ftree-loop-linear -funroll-loops
 FCDEBUG         =       # -g -O0
 FCBASEOPTS      =       -w -finit-local-zero -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
+FORMAT_FIXED	=	-ffixed-form
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 ARCHFLAGS       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                          CONFIGURE_NETCDF_FLAG \
@@ -3749,6 +3750,7 @@ PERL            =       perl
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH \
                         -L../external/io_grib1 -lio_grib1 \
+			-L../external/io_int -lwrfio_int \
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
 LDFLAGS         =
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
@@ -3843,6 +3845,7 @@ CFLAGS          =       -w -O3 -DDM_PARALLEL \
 FCOPTIM         =       -O3 -ftree-vectorize -ftree-loop-linear -funroll-loops
 FCDEBUG         =       # -g -O0
 FCBASEOPTS      =       -w -finit-local-zero -fconvert=big-endian -frecord-marker=4 -ffree-form -ffree-line-length-none $(FCDEBUG) 
+FORMAT_FIXED	=	-ffixed-form
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
                         -I../frame -I../share -I../phys -I../chem -I../inc
@@ -3858,7 +3861,7 @@ LIB             =       CONFIGURE_NETCDF_LIB_PATH -L../external/RSL_LITE -lrsl_l
 			../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time
 LDFLAGS         =	
 ENVCOMPDEFS	=	CONFIGURE_COMPILEFLAGS
-CPP		=	/usr/bin/cpp  -C -P -xassembler-with-cpp
+CPP		=	/usr/bin/cpp  -C -P -traditional
 POUND_DEF	=	-DMAC_OS -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
 CPPFLAGS	=	-I$(LIBINCLUDE) $(ARCHFLAGS) $(COREDEFS) $(ENVCOMPDEFS) $(POUND_DEF)
 MAX_PROC        =       1024
@@ -3943,7 +3946,7 @@ convert_nmm.o    :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
+#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
 #
 OMP             =
 OMPCPP          =
@@ -4053,7 +4056,7 @@ module_initialize_real.o module_dm.o  start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    Intel xeon i686 ia32 Xeon Linux, ifort compiler  (single threaded, supports nesting using RSL without MPI)
+#ARCH    Intel xeon i686 ia32 Xeon Linux, ifort compiler  (single threaded, supports nesting using RSL without MPI)
 #
 # Note: if you use ifort 8.0, please remove option -xW (for vectorization). This option 
 #       has been identified to produce wrong results occationally.
@@ -4171,7 +4174,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH   Intel xeon i686 ia32 Xeon Linux, ifort compiler (OpenMP)
+#ARCH   Intel xeon i686 ia32 Xeon Linux, ifort compiler (OpenMP)
 #
 # Note: if you use ifort 8.0, please remove option -xW (for vectorization). This option 
 #       has been identified to produce wrong results occationally.
@@ -4278,7 +4281,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    Intel xeon i686 ia32 Xeon Linux, ifort compiler SM-Parallel (OpenMP, supports nesting using RSL without MPI)
+#ARCH    Intel xeon i686 ia32 Xeon Linux, ifort compiler SM-Parallel (OpenMP, supports nesting using RSL without MPI)
 #
 # Note: if you use ifort 8.0, please remove option -xW (for vectorization). This option 
 #       has been identified to produce wrong results occationally.
@@ -4397,7 +4400,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    Intel xeon i686 ia32 Xeon Linux, ifort+icc compiler  DM-Parallel (RSL, MPICH, supports nesting)
+#ARCH    Intel xeon i686 ia32 Xeon Linux, ifort+icc compiler  DM-Parallel (RSL, MPICH, supports nesting)
 #
 # Note: if you use ifort 8.0, please remove option -xW (for vectorization). This option 
 #       has been identified to produce wrong results occationally.
@@ -4513,7 +4516,7 @@ module_initialize_real.o module_dm.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    Intel xeon i686 ia32 Xeon Linux, ifort+gcc compiler  DM-Parallel (RSL, MPICH, supports nesting)
+#ARCH    Intel xeon i686 ia32 Xeon Linux, ifort+gcc compiler  DM-Parallel (RSL, MPICH, supports nesting)
 #
 # Note: if you use ifort 8.0, please remove option -xW (for vectorization). This option 
 #       has been identified to produce wrong results occationally.
@@ -5980,7 +5983,7 @@ module_initialize_real.o module_dm.o mediation_integrate.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCFLAGS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    Darwin (MACOS) xlf  (serial)
+#ARCH    Darwin (MACOS) xlf  (serial)
 #     
 FC              =       xlf90_r
 SFC		=	$(FC)
@@ -6573,7 +6576,7 @@ convert_nmm.o    :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    PC Linux i486 i586 i686, G95 compiler  (single-threaded, no nesting, g95 compiler)
+#ARCH    PC Linux i486 i586 i686, G95 compiler  (single-threaded, no nesting, g95 compiler)
 #     
 FC              =       g95
 SFC		=	$(FC)
@@ -6690,7 +6693,7 @@ mediation_force_domain.o start_domain.o :
 	$(FC) -c $(PROMOTION) $(FCBASEOPTS) $(MODULE_DIRS) $*.f
 
 ###########################################################
-##ARCH    PC Linux i486 i586 i686, G95 compiler  (RSL_LITE, no nesting, g95 compiler)
+#ARCH    PC Linux i486 i586 i686, G95 compiler  (RSL_LITE, no nesting, g95 compiler)
 #
 DMPARALLEL      =       1
 SFC             =       mpif90

@@ -76,7 +76,6 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_mp_kessler_db  
 #ifdef WRF_CHEM
    USE module_input_chem_data
-!  USE module_chem_utilities   !by walls
 #endif
 
    USE a_module_small_step_em
@@ -161,7 +160,7 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 #endif
 
 ! Define benchmarking timers if -DBENCH is compiled   !by walls
-!#include <bench_solve_em_def.h>  !by walls
+!#include <bench_solve_em_def.h>  
 
 #include "deref_kludge.h"
 
@@ -208,7 +207,7 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 !</pre>
 !</DESCRIPTION>
 
-!#include <bench_solve_em_init.h>   !by walls
+!#include <bench_solve_em_init.h>   
 !#include <em_i1_init.inc>
 
    if(grid%trace_use) call trace_entry("solve_em_ad")
@@ -226,7 +225,7 @@ real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width
 !  call check_linkedlist
 
 !  set leapfrog or runge-kutta solver (2nd or 3rd order)
-   dynamics_option = config_flags%rk_ord   !by walls
+   dynamics_option = config_flags%rk_ord   
 
    call get_ijk_from_grid( grid,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe )
 
@@ -334,7 +333,6 @@ ijds = min(ids,jds)
 ijde = max(ide,jde)
 
 num_3d_m = num_moist
-!num_3d_c = 1    !revised by walls
 num_3d_c        = num_chem    !by walls
 
 !  Compute these starting and stopping locations for each tile and number of tiles.
@@ -430,8 +428,8 @@ num_3d_c        = num_chem    !by walls
 !-----Output: ru,rv,rw,ww,php,cqu,cqv,cqw,alt,muu,muv,mut
 
 #ifdef DM_PARALLEL
-#    include "HALO_EM_A.inc"     !by walls
-#  include "PERIOD_BDY_EM_A.inc" !by walls
+#    include "HALO_EM_A.inc"     
+#  include "PERIOD_BDY_EM_A.inc" 
       if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 #include "HALO_RK_STEP_PREP.inc"
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
@@ -1156,8 +1154,8 @@ IF(diff_opt .eq. 2 .OR. diff_opt .eq. 1) THEN
 !-----Output: a,alpha,gamma
 
 #ifdef DM_PARALLEL
-#      include "HALO_EM_B.inc"   !by walls
-#      include "PERIOD_BDY_EM_B.inc"   !by walls
+#      include "HALO_EM_B.inc"   
+#      include "PERIOD_BDY_EM_B.inc"   
       if(grid%trace_use) call trace_entry("solve_ad_halo_comm")
 #include "HALO_CALC_COEF_W.inc"
       if(grid%trace_use) call trace_exit("solve_ad_halo_comm")
