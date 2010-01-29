@@ -96,11 +96,12 @@
  TEST_rk_update_scalar      = .true.,
  TEST_calc_p_rho_phi        = .true.,
  TEST_diagnose_w            = .true.,
- TEST_cudu                  = .true.
+ TEST_cudu                  = .true.,
+ TEST_kessler               = .true.
  /
 
  &physics
- mp_physics                          = 0,     2,     2,          ! WRF
+ mp_physics                          = 1,     2,     2,          ! WRF
  ra_lw_physics                       = 0,     1,     1,          ! WRF
  ra_sw_physics                       = 0,     1,     1,          ! WRF
  radt                                = 00,    10,    10,         ! WRF unused

@@ -2289,14 +2289,6 @@ end if
 !by walls
 
 end do runge_kutta_looq
-!whl save the basic state for the mp and large scale rain. 
-!
-  if (config_flags%mp_physics >= 0) then
-   IF( config_flags%specified .or. config_flags%nested ) THEN
-     sz = spec_zone
-   ELSE
-     sz = 0
-   ENDIF
 
 !by walls
 !by walls
@@ -2312,9 +2304,9 @@ if(walls_open.eq.1) then
                      grid%j_start(ij), grid%j_end(ij),      &
                      k_start    , k_end                    )
 
-
-
- IF (config_flags%mp_physics == 0)  then   !marked by 11AAA
+endif
+! for microphysics basic state
+ IF (config_flags%mp_physics >= 0)  then   
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2322,12 +2314,10 @@ if(walls_open.eq.1) then
      sz = 0
    ENDIF
 
-
-!print*, '+++++++++++++++++++++++++++++++++++++++++++XXXWALLS005++++++++++++++++++++++++++++++++++++++++++++++'
-       its = max(grid%i_start(ij),ids+sz)
-       ite = min(grid%i_end(ij),ide-1-sz)
-       jts = max(grid%j_start(ij),jds+sz)
-       jte = min(grid%j_end(ij),jde-1-sz)
+!       its = max(grid%i_start(ij),ids+sz)
+!       ite = min(grid%i_end(ij),ide-1-sz)
+!       jts = max(grid%j_start(ij),jds+sz)
+!       jte = min(grid%j_end(ij),jde-1-sz)
 
        CALL wrf_debug ( 200 , ' call moist_physics_prep' )
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
@@ -2405,8 +2395,6 @@ if(walls_open.eq.1) then
       call push4backup(ph_tend, "ph_tend")
       call push4backup(muts, "muts")
 
-END IF
-
        IF (.not. non_hydrostatic)                               &
        CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
                         u_2, v_2, ht,                           &
@@ -2416,9 +2404,9 @@ END IF
                         its, ite, jts, jte,                     &
                         k_start    , k_end                     )
 
-  ENDIF   !marked by 11AAA
+  ENDIF   !mp
 
-
+if(walls_open.eq.1) then
           CALL wrf_debug ( 200 , ' call scalar_tile_loop_2' )
 
      IF ( num_3d_c >= PARAM_FIRST_SCALAR ) then
@@ -2630,6 +2618,11 @@ end if
 
     endif
 
+    call pop2restore(al,p, "al,p")
+    call pop2restore(moist_2, "moist_2")
+    call pop2restore(mu_2,muts, "mu_2,muts")
+    call pop2restore(ph_2,t_2, "ph_2,t_2")
+
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,&
                       a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
                       rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
@@ -2649,30 +2642,28 @@ end if
                                     its, ite, jts, jte, k_start,k_end )
 
 
-        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
-                                    al, alb, p, p8w, p0, pb,          &
-                                    ph_2, phb, pi_phy, p_phy,         &
-                                    z, z_at_w, dz8w,                  &
-                                    dtm, h_diabatic,                  &
-                                    config_flags,fnm, fnp,            &
-                                    ids, ide, jds, jde, kds, kde,     &
-                                    ims, ime, jms, jme, kms, kme,     &
-                                    max(grid%i_start(ij),ids+sz),  &
-                                    min(grid%i_end(ij),ide-1-sz),    &
-                                    max(grid%j_start(ij),jds+sz),  &
-                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+!        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+!                                    al, alb, p, p8w, p0, pb,          &
+!                                    ph_2, phb, pi_phy, p_phy,         &
+!                                    z, z_at_w, dz8w,                  &
+!                                    dtm, h_diabatic,                  &
+!                                    config_flags,fnm, fnp,            &
+!                                    ids, ide, jds, jde, kds, kde,     &
+!                                    ims, ime, jms, jme, kms, kme,     &
+!                                    max(grid%i_start(ij),ids+sz),  &
+!                                    min(grid%i_end(ij),ide-1-sz),    &
+!                                    max(grid%j_start(ij),jds+sz),  &
+!                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
 !---Restore for lscond:
-!   call pop2restore(dz8w, "dz8w")
-!   call pop2restore(z, "z")
-!   call pop2restore(t_2, "t_2")
-!   call pop2restore(th_phy, "th_phy")
-!   call pop2restore(pi_phy, "pi_phy")
-!   call pop2restore(p_phy, "p_phy")
-!   call pop2restore(rho, "rho")
-!   call pop2restore(moist_2, "moist_2")
-!whl
-!     print*,'config_flags%mp_physics in ad ',config_flags%mp_physics
+   call pop2restore(dz8w, "dz8w")
+   call pop2restore(z, "z")
+   call pop2restore(t_2, "t_2")
+   call pop2restore(th_phy, "th_phy")
+   call pop2restore(pi_phy, "pi_phy")
+   call pop2restore(p_phy, "p_phy")
+   call pop2restore(rho, "rho")
+   call pop2restore(moist_2, "moist_2")
 
   if (config_flags%mp_physics ==1)then
      call kessler_b(t_2, a_t_2, moist_2(ims,kms,jms,P_QV),  a_moist_2(ims,kms,jms,P_QV),&
