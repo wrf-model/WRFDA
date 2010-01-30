@@ -16,13 +16,13 @@
  run_hours                           = 0,
  run_minutes                         = 10,
  run_seconds                         = 0,
- start_year                          = 2008,
+ start_year                          = 2005,
  start_month                         = 07,  
  start_day                           = 16,  
  start_hour                          = 00,  
  start_minute                        = 00, 
  start_second                        = 00,
- end_year                            = 2008,
+ end_year                            = 2005,
  end_month                           = 07, 
  end_day                             = 16,
  end_hour                            = 00,
@@ -51,7 +51,7 @@
  s_sn                                = 1,     1,     1,           ! WRF
  e_sn                                = 25,    97,    91,          ! WRF
  s_vert                              = 1,     1,     1,           ! WRF
- e_vert                              = 17,    28,    28,          ! WRF
+ e_vert                              = 28,    28,    28,          ! WRF
  dx                                  = 135000,  3333,  1111,      ! WRF unused
  dy                                  = 135000,  3333,  1111,      ! WRF
  grid_id                             = 1,     2,     3,           ! WRF unused
