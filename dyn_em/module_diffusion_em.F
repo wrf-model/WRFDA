@@ -1262,7 +1262,7 @@ end if
     DO j = j_start, j_end
     DO k = kts+1, ktf-1
     DO i = i_start, i_end
-      tmpdz = 1.0 / rdz(i,k,j) + 1.0 / rdz(i,k+1,j)
+      tmpdz = 1.0 / (rdz(i,k,j) + epsilon) + 1.0  / (rdz(i,k+1,j) + epsilon)   !  bp100203 ensure non div by 0.
 
       IF ( moist(i,k,j,P_QV) .GE. qvs(i,k,j) .OR. qctmp(i,k,j) .GE. qc_cr) THEN
         xlvqv      = XLV * moist(i,k,j,P_QV)
@@ -1289,7 +1289,7 @@ end if
     k = kts
     DO j = j_start, j_end
     DO i = i_start, i_end
-      tmpdz     = 1.0 / rdz(i,k+1,j) + 0.5 / rdzw(i,k,j)
+      tmpdz     = 1.0 / (rdz(i,k+1,j) + epsilon) + 0.5 / (rdzw(i,k,j) + epsilon)
       thetasfc  = T8w(i,kts,j) / ( p8w(i,k,j) / p1000mb )**( R_d / Cp )
       IF ( moist(i,k,j,P_QV) .GE. qvs(i,k,j) .OR. qctmp(i,k,j) .GE. qc_cr) THEN
         qvsfc     = cf1 * qvs(i,1,j) +  &
@@ -1316,7 +1316,7 @@ end if
 !                     ( tmp1(i,k+1,j) - tmp1sfc(i,j) ) / tmpdz  )
 !...... MARTA: change in computation of BN2 at the surface, WCS 040331
 
-        tmpdz= 1./rdzw(i,k,j) ! controlare come calcola rdzw
+        tmpdz= 1./(rdzw(i,k,j)+epsilon) ! controlare come calcola rdzw
         BN2(i,k,j) = g * ( ( theta(i,k+1,j) - theta(i,k,j)) /  &
                      theta(i,k,j) / tmpdz +  &
                      1.61 * ( moist(i,k+1,j,P_QV) - qvsfc ) /  &

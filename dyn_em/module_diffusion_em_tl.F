@@ -568,7 +568,7 @@ end do
 k = kts
 do j = j_start, j_end
   do i = i_start, i_end
-    tmpdz = 1./rdz(i,k+1,j)+0.5/rdzw(i,k,j)
+    tmpdz = 1./(rdz(i,k+1,j)+epsilon) + 0.5/(rdzw(i,k,j) + epsilon)
     g_thetasfc = (-(g_p8w(i,k,j)*(t8w(i,kts,j)/p1000mb*r_d/cp*(p8w(i,k,j)/p1000mb)**(r_d/cp-1)/((p8w(i,k,j)/p1000mb)**(r_d/cp)*&
 &(p8w(i,k,j)/p1000mb)**(r_d/cp)))))+g_t8w(i,kts,j)/(p8w(i,k,j)/p1000mb)**(r_d/cp)
     thetasfc = t8w(i,kts,j)/(p8w(i,k,j)/p1000mb)**(r_d/cp)
@@ -596,7 +596,7 @@ do j = j_start, j_end
     else
       g_qvsfc = g_moist(i,3,j,p_qv)*cf3+g_moist(i,2,j,p_qv)*cf2+g_moist(i,1,j,p_qv)*cf1
       qvsfc = cf1*moist(i,1,j,p_qv)+cf2*moist(i,2,j,p_qv)+cf3*moist(i,3,j,p_qv)
-      tmpdz = 1./rdzw(i,k,j)
+      tmpdz = 1./(rdzw(i,k,j)+epsilon)
       g_bn2(i,k,j) = g_moist(i,k+1,j,p_qv)*g*(1.61/tmpdz)+g_qvsfc*g*((-1.61)/tmpdz)+g_theta(i,k+1,j)*g*(1/theta(i,k,j)/tmpdz)+&
 &g_theta(i,k,j)*g*(((-1)/theta(i,k,j)-(theta(i,k+1,j)-theta(i,k,j))/(theta(i,k,j)*theta(i,k,j)))/tmpdz)-g_tmp1(i,k+1,j)*(g/&
 &tmpdz)+g_tmp1sfc(i,j)*(g/tmpdz)
