@@ -285,7 +285,7 @@ foreach my $option (sort keys %Compile_options) {
 
      my @exefiles = glob ("var/build/*.exe");
 
-     die "The number of exe files is less than 31. \n" if (@exefiles < 31);
+     die "The number of exe files is less than 32. \n" if (@exefiles < 32);
 
      foreach ( @exefiles ) {
          warn "The exe file $_ has problem. \n" unless -s ;
@@ -899,7 +899,7 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
+AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  premium /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           32      32           serial|smpar|dmpar
 2        cv3_guo                     32      32           serial|smpar|dmpar
