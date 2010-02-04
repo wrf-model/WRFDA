@@ -31,18 +31,13 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
    integer          :: jl_start, jl_end             ! Start/end indices of Je.
    real             :: jo_partial                   ! jo for this processor
    type (y_type)    :: jo_grad_y ! Grad_y(jo)
-   real             :: cv_jb(1:cv_size_jb)          ! Jb control variable.
-   real             :: xhat_jb(1:cv_size_jb)        ! Jb control variable.
-   real             :: cv_je(1:cv_size_je)          ! Je control variable.
-   real             :: xhat_je(1:cv_size_je)        ! Je control variable.
-   real             :: cv_jl(1:cv_size_jl)          ! Jl control variable.
-   real             :: xhat_jl(1:cv_size_jl)        ! Jl control variable.
-   real, allocatable, dimension(:) :: cv_xhat_jb, cv_xhat_je, cv_xhat_jl
+   real             :: cv_xhat_jb(cv_size_jb), cv_xhat_je(cv_size_je), &
+                       cv_xhat_jl(cv_size_jl)
    integer          :: ndynopt, is, ie, js, je, ks, ke
    real             :: dtemp1x
 
    ! Variables for VarBC background constraint
-   real , allocatable, dimension(:)  :: cv_xhat_jp ! Jp control variable.
+   real :: cv_xhat_jp(cv_size_jp), xhat_jp(cv_size_jp)    ! Jp control variable.
    integer                           :: jp_start, jp_end       ! Start/end indices of Jp.
    integer                           :: inst, ichan, npred, ipred, id
    real                              :: bgerr, gnorm_jp  
@@ -53,16 +48,13 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
    
    if (trace_use) call da_trace_entry("da_calculate_j")
 
-   allocate(cv_xhat_jb(cv_size_jb))
-   allocate(cv_xhat_je(cv_size_je))
-   allocate(cv_xhat_jp(cv_size_jp))
-   allocate(cv_xhat_jl(cv_size_jl))
-
-
    je_start = cv_size_jb + 1
-   je_end = cv_size_jb + cv_size_je
+   je_end   = cv_size_jb + cv_size_je
    jl_start = cv_size_jb + cv_size_je + 1
    jl_end = cv_size_jb + cv_size_je + cv_size_jl
+
+   jp_start = cv_size_jb + cv_size_je + 1
+   jp_end   = cv_size_jb + cv_size_je + cv_size_jp
 
    call da_allocate_y(iv, jo_grad_y)
 
@@ -132,10 +124,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
    ! [2.0] calculate jb:
    !-------------------------------------------------------------------------
 
-   cv_jb(1:cv_size_jb) = cv (1:cv_size_jb)
-   xhat_jb(1:cv_size_jb) = xhat (1:cv_size_jb)
-
-   cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
+   cv_xhat_jb(1:cv_size_jb) = cv(1:cv_size_jb) + xhat(1:cv_size_jb)
 
    j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
        cv_xhat_jb, cv_xhat_jb, grid, &
@@ -149,9 +138,8 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
 
    j % je = 0.0
    if (be % ne > 0) then
-      cv_je(1:cv_size_je) = cv(je_start:je_end)
-      xhat_je(1:cv_size_je) = xhat(je_start:je_end)
-      cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
+      cv_xhat_je(1:cv_size_je) = cv(je_start:je_end) + xhat(je_start:je_end)
+
       j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
           cv_xhat_je, cv_xhat_je, grid, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
@@ -163,12 +151,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
    !-------------------------------------------------------------------------
    j % jl = 0.0
    if ( var4d ) then
-      jl_start                 = cv_size_jb + cv_size_je + cv_size_jp + 1
-      jl_end                   = cv_size_jb + cv_size_je + cv_size_jp + cv_size_jl
-      cv_jl(1:cv_size_jl) = cv (jl_start:jl_end)
-      xhat_jl(1:cv_size_jl) = xhat(jl_start:jl_end)
-
-      cv_xhat_jl(1:cv_size_jl) = cv_jl(1:cv_size_jl) + xhat_jl(1:cv_size_jl)
+      cv_xhat_jl(1:cv_size_jl) = cv (jl_start:jl_end) + xhat(jl_start:jl_end)
 
       j % jl = 0.5 * da_dot_cv(cv_size_jl, cv_size_domain_jl, &
           cv_xhat_jl, cv_xhat_jl, grid, &
@@ -182,12 +165,11 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
    ! [5.0] calculate jp:
    !-------------------------------------------------------------------------
    j % jp = 0.0
+#if defined(RTTOV) || defined(CRTM)
    if (use_varbc) then
-      jp_start                 = cv_size_jb + cv_size_je + 1
-      jp_end                   = cv_size_jb + cv_size_je + cv_size_jp 
-      cv_xhat_jp(1:cv_size_jp) = 0.0
       do inst = 1, iv % num_inst   
          do ichan = 1, iv%instid(inst)%nchan
+            if (satinfo(inst)%iuse(ichan) <= 0) cycle
             npred    = iv%instid(inst)%varbc(ichan)%npred
             if (npred <= 0) cycle               !! VarBC channels only	 
             do ipred = 1, npred
@@ -202,6 +184,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
       end do
       j % jp = 0.5 * da_dot(cv_size_jp, cv_xhat_jp, cv_xhat_jp)
    end if
+#endif
 
    !-------------------------------------------------------------------------
    ! [6.0] calculate js:
@@ -296,13 +279,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size_jp,
          it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je, j % jp, j%js, j%jl
    end if
 
-   deallocate(cv_xhat_jb)
-   deallocate(cv_xhat_je)
-   deallocate(cv_xhat_jp)
-   deallocate(cv_xhat_jl)
-
    if (trace_use) call da_trace_exit("da_calculate_j")
 
 end subroutine da_calculate_j
-
 

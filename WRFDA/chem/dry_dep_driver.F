@@ -1,7 +1,7 @@
 !
-!   WRF-chem V3.1 : Original version of dry_dep_driver written by Georg Grell (ESRL/GSD)
+!   WRF-chem V3.2 : Original version of dry_dep_driver written by Georg Grell (ESRL/GSD)
 !                   VERTMX was originally developed by Mariusz Pagowski and modified by
-!                   Richard C. Easter (PNNL) 
+!                   Richard C. Easter (PNNL)
 !
 !WRF:MODEL_LAYER:CHEMICS
 !
@@ -12,14 +12,15 @@ CONTAINS
 
     subroutine dry_dep_driver(id,curr_secs,ktau,dtstep,config_flags,      &
                gmt,julday,t_phy,moist,scalar,p8w,t8w,w,alt,               &
-               p_phy,chem,rho_phy,dz8w,exch_h,hfx,dx,                     &
+               p_phy,chem,tracer,rho_phy,dz8w,exch_h,hfx,dx,              &
                cldfra, cldfra_old,raincv,                                 &
                ccn1, ccn2, ccn3, ccn4, ccn5, ccn6, nsource,               &
                ivgtyp,tsk,gsw,vegfra,pbl,rmol,ust,znt,xlat,xlong,z,z_at_w,&
                xland,h2oaj,h2oai,nu3,ac3,cor3,asulf,ahno3,                &
                anh3,cvaro1,cvaro2,   &
                cvalk1,cvole1,cvapi1,cvapi2,cvlim1,cvlim2,dep_vel_o3,      &
-               e_co,kemit,sf_urban_physics,numgas,current_month,          &
+               e_co,kemit,sf_urban_physics,numgas,current_month,dvel,     &
+               snowh,                                                     &
                ids,ide, jds,jde, kds,kde,                                 &
                ims,ime, jms,jme, kms,kme,                                 &
                its,ite, jts,jte, kts,kte                                  )
@@ -27,6 +28,7 @@ CONTAINS
   USE module_model_constants
   USE module_configure
   USE module_state_description
+  USE module_domain_type, only : domain
   USE module_dep_simple
   USE module_vertmx_wrf
   USE module_data_sorgam
@@ -35,7 +37,10 @@ CONTAINS
   USE module_gocart_drydep
   USE module_mosaic_drydep, only:  mosaic_drydep_driver
   USE module_mixactivate_wrappers, only: mosaic_mixactivate, sorgam_mixactivate
+  USE module_aer_drydep, only:  aer_drydep_driver
   IMPLICIT NONE
+
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags
 
    INTEGER,      INTENT(IN   ) :: id,julday,                    &
                                   sf_urban_physics,             &
@@ -52,13 +57,16 @@ CONTAINS
          INTENT(INOUT ) ::                               scalar
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme, num_chem ),         &
          INTENT(INOUT ) ::                                 chem
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme, num_tracer ),         &
+         INTENT(INOUT ) ::                                 tracer
 
    INTEGER,      INTENT(IN   ) :: kemit
    REAL, DIMENSION( ims:ime, kms:kemit, jms:jme ),            &
          INTENT(IN ) ::                                                    &
           e_co
 
-
+   REAL, DIMENSION( ims:ime, config_flags%kdvel, jms:jme, num_dvel ), &
+         INTENT(INOUT ) ::                                   dvel
 
 
    REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )         ,    &
@@ -88,6 +96,7 @@ CONTAINS
                                                      hfx,       &
                                                      xlat,      &
                                                      xlong,     &
+                                                     snowh,     &
                                           xland,znt,raincv
    REAL,  DIMENSION( ims:ime , kms:kme , jms:jme )         ,        &
           INTENT(INOUT ) ::                                     &
@@ -111,7 +120,7 @@ CONTAINS
 
       INTEGER :: iland, iprt, iseason, jce, jcs,  &
                  n, nr, ipr, jpr, nvr,   &
-                 idrydep_onoff
+                 idrydep_onoff, aer_mech_id
 
       LOGICAL :: highnh3, rainflag, vegflag, wetflag
 ! ..
@@ -128,9 +137,10 @@ CONTAINS
 !
 ! necessary for aerosols (module dependent)
 !
-   REAL, DIMENSION( its:ite, jts:jte ) ::   aer_res
+   REAL, DIMENSION( its:ite, jts:jte ) ::   aer_res, aer_res_def, aer_res_zcen
 
-   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags
+
+   real, parameter :: m2cm = 100.
 
 
 ! ..
@@ -141,7 +151,7 @@ CONTAINS
 ! compute dry deposition velocities = ddvel
 !
 ! 28-jun-2005 rce - initialize ddvel=0; call aerosol drydep routine
-!           only when drydep_opt == WESELY
+!           only when gas_drydep_opt == WESELY
 !       the wesely_driver routine computes aer_res, and currently
 !	    you cannot compute aerosol drydep without it !!
 ! 08-jul-2005 rce - pass idrydep_onoff to mixactivate routines
@@ -149,11 +159,11 @@ CONTAINS
    ddvel(:,:,:) = 0.0
    idrydep_onoff = 0
 
-   drydep_select: SELECT CASE(config_flags%drydep_opt)
+   drydep_select: SELECT CASE(config_flags%gas_drydep_opt)
 
      CASE ( WESELY )
 !
-! drydep_opt == WESELY means 
+! gas_drydep_opt == WESELY means 
 !     wesely for gases 
 !     other (appropriate) routine for aerosols
 !
@@ -164,21 +174,77 @@ CONTAINS
            config_flags%chem_opt /= GOCART_SIMPLE  .and.                 &
            config_flags%chem_opt /= GOCARTRACM_KPP )THEN
           call wesely_driver(id,ktau,dtstep,                              &
-               config_flags,                                              &
+               config_flags,current_month,                                &
                gmt,julday,t_phy,moist,p8w,t8w,raincv,                     &
-               p_phy,chem,rho_phy,dz8w,ddvel,aer_res,                     &
+               p_phy,chem,rho_phy,dz8w,ddvel,aer_res_def,aer_res_zcen,    &
                ivgtyp,tsk,gsw,vegfra,pbl,rmol,ust,znt,xlat,xlong,z,z_at_w,&
-               numgas,                                                    &
+               snowh,numgas,                                              &
                ids,ide, jds,jde, kds,kde,                                 &
                ims,ime, jms,jme, kms,kme,                                 &
                its,ite, jts,jte, kts,kte                                  )
+!-----------------------------------------------------------------
+! this does aerosol species (dust,seas, bc,oc) for gocart only
+!-----------------------------------------------------------------
+          IF ( config_flags%chem_opt == MOZCART_KPP ) then
+            call gocart_drydep_driver( dtstep,                            &
+                  config_flags, numgas,                                   &
+                  t_phy, moist, p8w, t8w,                                 &
+                  p_phy, chem, rho_phy, dz8w, ddvel, xland, hfx,          &
+                  ivgtyp, tsk, vegfra, pbl, ust, znt, xlat, xlong,        &
+                  ids,ide, jds,jde, kds,kde,                              &
+                  ims,ime, jms,jme, kms,kme,                              &
+                  its,ite, jts,jte, kts,kte )
+            if(config_flags%diagnostic_chem == DEPVEL1) then
+               do j = jts,jte
+                  dvel(its:ite,1,j,p_dvel_o3) = m2cm*ddvel(its:ite,j,p_o3)
+                  dvel(its:ite,1,j,p_dvel_no) = m2cm*ddvel(its:ite,j,p_no)
+                  dvel(its:ite,1,j,p_dvel_no2) = m2cm*ddvel(its:ite,j,p_no2)
+                  dvel(its:ite,1,j,p_dvel_nh3) = m2cm*ddvel(its:ite,j,p_nh3)
+                  dvel(its:ite,1,j,p_dvel_hno3) = m2cm*ddvel(its:ite,j,p_hno3)
+                  dvel(its:ite,1,j,p_dvel_hno4) = m2cm*ddvel(its:ite,j,p_hno4)
+                  dvel(its:ite,1,j,p_dvel_h2o2) = m2cm*ddvel(its:ite,j,p_h2o2)
+                  dvel(its:ite,1,j,p_dvel_co) = m2cm*ddvel(its:ite,j,p_co)
+                  dvel(its:ite,1,j,p_dvel_ch3ooh) = m2cm*ddvel(its:ite,j,p_ch3ooh)
+                  dvel(its:ite,1,j,p_dvel_hcho) = m2cm*ddvel(its:ite,j,p_hcho)
+                  dvel(its:ite,1,j,p_dvel_ch3oh) = m2cm*ddvel(its:ite,j,p_ch3oh)
+                  dvel(its:ite,1,j,p_dvel_eo2) = m2cm*ddvel(its:ite,j,p_eo2)
+                  dvel(its:ite,1,j,p_dvel_ald) = m2cm*ddvel(its:ite,j,p_ald)
+                  dvel(its:ite,1,j,p_dvel_ch3cooh) = m2cm*ddvel(its:ite,j,p_ch3cooh)
+                  dvel(its:ite,1,j,p_dvel_acet) = m2cm*ddvel(its:ite,j,p_acet)
+                  dvel(its:ite,1,j,p_dvel_mgly) = m2cm*ddvel(its:ite,j,p_mgly)
+                  dvel(its:ite,1,j,p_dvel_paa) = m2cm*ddvel(its:ite,j,p_paa)
+                  dvel(its:ite,1,j,p_dvel_pooh) = m2cm*ddvel(its:ite,j,p_c3h6ooh)
+                  dvel(its:ite,1,j,p_dvel_mpan) = m2cm*ddvel(its:ite,j,p_mpan)
+                  dvel(its:ite,1,j,p_dvel_mco3) = m2cm*ddvel(its:ite,j,p_mco3)
+                  dvel(its:ite,1,j,p_dvel_mvkooh) = m2cm*ddvel(its:ite,j,p_mvkooh)
+                  dvel(its:ite,1,j,p_dvel_c2h5oh) = m2cm*ddvel(its:ite,j,p_c2h5oh)
+                  dvel(its:ite,1,j,p_dvel_etooh) = m2cm*ddvel(its:ite,j,p_etooh)
+                  dvel(its:ite,1,j,p_dvel_prooh) = m2cm*ddvel(its:ite,j,p_prooh)
+                  dvel(its:ite,1,j,p_dvel_acetp) = m2cm*ddvel(its:ite,j,p_acetp)
+                  dvel(its:ite,1,j,p_dvel_onit) = m2cm*ddvel(its:ite,j,p_onit)
+                  dvel(its:ite,1,j,p_dvel_onitr) = m2cm*ddvel(its:ite,j,p_onitr)
+                  dvel(its:ite,1,j,p_dvel_isooh) = m2cm*ddvel(its:ite,j,p_isooh)
+                  dvel(its:ite,1,j,p_dvel_acetol) = m2cm*ddvel(its:ite,j,p_acetol)
+                  dvel(its:ite,1,j,p_dvel_glyald) = m2cm*ddvel(its:ite,j,p_glyald)
+                  dvel(its:ite,1,j,p_dvel_hydrald) = m2cm*ddvel(its:ite,j,p_hydrald)
+                  dvel(its:ite,1,j,p_dvel_alkooh) = m2cm*ddvel(its:ite,j,p_alkooh)
+                  dvel(its:ite,1,j,p_dvel_mekooh) = m2cm*ddvel(its:ite,j,p_mekooh)
+                  dvel(its:ite,1,j,p_dvel_tolooh) = m2cm*ddvel(its:ite,j,p_tolooh)
+                  dvel(its:ite,1,j,p_dvel_xooh) = m2cm*ddvel(its:ite,j,p_xooh)
+                  dvel(its:ite,1,j,p_dvel_so2) = m2cm*ddvel(its:ite,j,p_so2)
+                  dvel(its:ite,1,j,p_dvel_so4) = m2cm*ddvel(its:ite,j,p_so4)
+                  dvel(its:ite,1,j,p_dvel_pan) = m2cm*ddvel(its:ite,j,p_pan)
+                  dvel(its:ite,1,j,p_dvel_terpooh) = m2cm*ddvel(its:ite,j,p_terpooh)
+               enddo
+            endif
+          ENDIF
        ELSEIF ( config_flags%chem_opt == GOCART_SIMPLE ) then
           call wesely_driver(id,ktau,dtstep,                              &
-               config_flags,                                              &
+               config_flags,current_month,                                &
                gmt,julday,t_phy,moist,p8w,t8w,raincv,                     &
-               p_phy,chem,rho_phy,dz8w,ddvel,aer_res,                     &
+               p_phy,chem,rho_phy,dz8w,ddvel,aer_res_def,aer_res_zcen,    & 
                ivgtyp,tsk,gsw,vegfra,pbl,rmol,ust,znt,xlat,xlong,z,z_at_w,&
-               numgas,                                                    &
+               snowh, numgas,                                             &
                ids,ide, jds,jde, kds,kde,                                 &
                ims,ime, jms,jme, kms,kme,                                 &
                its,ite, jts,jte, kts,kte                                  )
@@ -199,11 +265,11 @@ CONTAINS
 ! this does aerosol species (dust,seas, bc,oc) for gocart only
 !
           call wesely_driver(id,ktau,dtstep,                              &
-               config_flags,                                              &
+               config_flags,current_month,                                &
                gmt,julday,t_phy,moist,p8w,t8w,raincv,                     &
-               p_phy,chem,rho_phy,dz8w,ddvel,aer_res,                     &
+               p_phy,chem,rho_phy,dz8w,ddvel,aer_res_def,aer_res_zcen,    &
                ivgtyp,tsk,gsw,vegfra,pbl,rmol,ust,znt,xlat,xlong,z,z_at_w,&
-               numgas,                                                    &
+               snowh, numgas,                                             &
                ids,ide, jds,jde, kds,kde,                                 &
                ims,ime, jms,jme, kms,kme,                                 &
                its,ite, jts,jte, kts,kte                                  )
@@ -222,13 +288,44 @@ CONTAINS
           ddvel(:,:,:) = 0.
        END IF
 
-       idrydep_onoff = 1
+       if (config_flags%aer_aerodynres_opt == 2) then
+          ! use aerodynamic resistance from center of layer kts to surface
+          aer_res(:,:) = aer_res_zcen(:,:)
+       else
+          ! this is the default -- use aerodynamic resistance from 
+          ! "default reference height" (currently 2 m) to surface
+          aer_res(:,:) = aer_res_def(:,:)
+       end if
 
+       idrydep_onoff = 1
+       aer_mech_id_select: SELECT CASE(config_flags%chem_opt)
+          CASE (RADM2SORG,RADM2SORG_AQ,RADM2SORG_KPP,RACM_ESRLSORG_KPP)
+             aer_mech_id = 1
+          CASE (RACMSORG_AQ,RACMSORG_KPP)
+             aer_mech_id = 2
+          CASE ( CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, CBMZ_MOSAIC_4BIN_AQ, CBMZ_MOSAIC_8BIN_AQ)
+             aer_mech_id = 3
+          CASE DEFAULT
+             aer_mech_id = 0
+       END SELECT aer_mech_id_select
+!  config_flags%aer_drydep_opt <= 0   -- aerosol depositon velocities are set to zero
+!  config_flags%aer_drydep_opt >= 100 -- aerosol depvels are calculated in subr aer_depvel_driver
+!                                        (see module_aer_drydep.F for details)
+!  config_flags%aer_drydep_opt == 1   -- SORGAM chem packages use subr vdvg_2 of module_aerosols_sorgam.F
+!                                        MOSAIC chem packages subr aerosol_depvel_2 of module_mosaic_drydep.F
+!  config_flags%aer_drydep_opt == 11  -- SORGAM chem packages use subr vdvg of module_aerosols_sorgam.F
+
+
+       if ((config_flags%aer_drydep_opt <= 0) .or. (aer_mech_id <= 0)) then
+          CALL wrf_debug(15,'AEROSOL DRY DEP VELOCITIES  = 0.0')
+
+
+       else if (config_flags%aer_drydep_opt <= 99) then
 
    adrydep_select: SELECT CASE(config_flags%chem_opt)
-     CASE (RADM2SORG,RADM2SORG_AQ,RADM2SORG_KPP)
+     CASE (RADM2SORG,RADM2SORG_AQ,RADM2SORG_KPP,RACM_ESRLSORG_KPP)
        CALL wrf_debug(15,'DOING DRY DEP VELOCITIES FOR AEROSOLS/RADM')
-       call sorgam_depdriver (id,ktau,dtstep,                           &
+       call sorgam_depdriver (id,config_flags,ktau,dtstep,              &
                ust,t_phy,moist,p8w,t8w,rmol,znt,pbl,                    &
                alt,p_phy,chem,rho_phy,dz8w,z,z_at_w,                    &
                h2oaj,h2oai,nu3,ac3,cor3,asulf,ahno3,anh3,cvaro1,cvaro2, &
@@ -240,7 +337,7 @@ CONTAINS
                its,ite, jts,jte, kts,kte                                )
      CASE (RACMSORG_AQ,RACMSORG_KPP)
        CALL wrf_debug(15,'DOING DRY DEP VELOCITIES FOR AEROSOLS/RACM')
-       call sorgam_depdriver (id,ktau,dtstep,                           &
+       call sorgam_depdriver (id,config_flags,ktau,dtstep,              &
                ust,t_phy,moist,p8w,t8w,rmol,znt,pbl,                    &
                alt,p_phy,chem,rho_phy,dz8w,z,z_at_w,                    &
                h2oaj,h2oai,nu3,ac3,cor3,asulf,ahno3,anh3,cvaro1,cvaro2, &
@@ -263,7 +360,31 @@ CONTAINS
                its,ite, jts,jte, kts,kte                                )
      CASE DEFAULT
                                                      
-   END SELECT adrydep_select
+     END SELECT adrydep_select
+   else ! (config_flags%aer_drydep_opt > 99)
+              CALL wrf_debug(15,'DOING DRY DEP VELOCITIES THRU AER_DRYDEP_DRIVER')
+              call aer_drydep_driver(                                          &
+                      id, ktau, dtstep, config_flags, aer_mech_id,           &
+                      gmt, julday,                                             &
+                      t_phy, rho_phy, p_phy,                                   &
+                      alt, p8w, t8w, dz8w, z, z_at_w,                          &
+                      ust, aer_res, ivgtyp, vegfra, pbl, rmol, znt,            &
+                      moist, chem, ddvel,                                      &
+                      h2oai, h2oaj, numgas,                                    &
+                      ids,ide, jds,jde, kds,kde,                               &
+                      ims,ime, jms,jme, kms,kme,                               &
+                      its,ite, jts,jte, kts,kte                                )
+   end if
+       if (config_flags%aer_drydep_opt > 0) then
+          if ((aer_mech_id > 0) .and. (aer_mech_id <= 3)) then
+             ! limit aerosol ddvels to <= 0.5 m/s
+             ! drydep routines occasionally produce unrealistically-large particle
+             !    diameter leading to unrealistically-large sedimentation velocity
+             ddvel(:,:,numgas+1:num_chem) = min( 0.50, ddvel(:,:,numgas+1:num_chem) )
+          end if
+       end if
+
+
 
      CASE DEFAULT 
                                                      
@@ -330,7 +451,6 @@ CONTAINS
                            zzfull,zz,ddvel(i,j,nv),kts,kte)
 
             endif
-!        CASE (PRESCRIBE_AEROSOL)
 
          CASE DEFAULT
             call vertmx(dtstep,pblst,ekmfull,dryrho_1d, &
@@ -342,6 +462,27 @@ CONTAINS
             chem(i,k,j,nv)=max(epsilc,pblst(k))
          enddo
       enddo
+       tracer_select: SELECT CASE(config_flags%tracer_opt)
+!
+! only mixing one fire(smoke) scalar array
+!
+       CASE (TRACER_SMOKE,TRACER_TEST1,TRACER_TEST2)
+        CALL wrf_debug(15,'DOING TRACER MIXING, 1 SPECIE ONLY')
+        do nv=2,num_tracer
+         do k=kts,kte
+            pblst(k)=max(epsilc,tracer(i,k,j,nv))
+         enddo
+
+               call vertmx(dtstep,pblst,ekmfull,dryrho_1d, &
+                           zzfull,zz,0.,kts,kte)
+         do k=kts,kte-1
+            tracer(i,k,j,nv)=max(epsilc,pblst(k))
+         enddo
+        enddo
+       CASE DEFAULT
+       CALL wrf_debug(15,'NOT YET DEFINED')
+       END SELECT tracer_select
+
 100   continue
 !
 !  vertical mixing and activation of aerosol
@@ -381,7 +522,7 @@ CONTAINS
    CASE DEFAULT
    END SELECT mixactivate_select
    settling_select: SELECT CASE(config_flags%chem_opt)
-   CASE (GOCART_SIMPLE,GOCARTRACM_KPP)
+   CASE (GOCART_SIMPLE,GOCARTRACM_KPP,MOZCART_KPP)
        CALL wrf_debug(15,'call gocart settling routine')
          call gocart_settling_driver(dtstep,config_flags,t_phy,moist,  &
          chem,rho_phy,dz8w,p8w,p_phy,         &

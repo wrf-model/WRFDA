@@ -43,7 +43,7 @@ include registry.dimspec
 
 #### 7. Edit the Registry file and create the state data assocaited with this
 ####    solver.  Single entry:
-state real x ikj dyn_exp 2 - ih "TOYVAR"
+state real x ikj dyn_exp 2 - irh "TOYVAR"
 ####
 
 #############
@@ -138,8 +138,19 @@ state    real   hlat_gc        ij       dyn_nmm      1     -     i1      "XLAT_M
 #
 # pdb is only 2d but registry doesn't support 2d bdy arrays right now...
 
+state integer julyr_rst      -     dyn_nmm     1      -    r  "JULYR_RST" "JULYR for restart moving nest "
+state integer julday_rst     -     dyn_nmm     1      -    r  "JULDAY_RST" "JULDAY for restart moving nest "
+state real    gmt_rst        -     dyn_nmm     1      -    r  "GMT_RST" "GMT for restart moving nest "
+state integer NTIME0         -     dyn_nmm     1      -    r  "NTIME0" "COUNT FOR PREVIOUS MOVING NEST"
+
 # flag for nest movement
 state  logical moved       -     misc       1      -     -
+
+state   real   ducudt       ijk     misc        1         -    rh  "UMMIX" "U TENDENCY  MOMENTUM MIXING IN SAS"
+state   real   dvcudt       ijk     misc        1         -    rh  "VMMIX" "V TENDENCY  MOMENTUM MIXING IN SAS"
+# For random number in SAS convection in HWRF
+
+state real store_rand        ij     dyn_nmm     1      -    rh  "RANDOM" "RANDOM NUMBER FOR SAS"
 
 #
 # module_MASKS
@@ -246,8 +257,8 @@ state  real   cuprec    ij    dyn_nmm   1    -     rh       "CUPREC"   "Accumula
 state  real   lspa      ij    dyn_nmm   1    -     h        "LSPA"     "Land Surface Precipitation Accumulation"   "kg m-2"
 state  real   ddata     ij    dyn_nmm   1    -     -        "DDATA"    "Observed precip to each physics timestep"  "kg m-2"
 state  real   accliq    ij    dyn_nmm   1    -     r
-state  real   sno       ij    dyn_nmm   1    -     irh      "SNO"      "Liquid water snow amount"             "m"
-state  real   si        ij    dyn_nmm   1    -     irh      "SI"       "Snow depth"                           "m"
+state  real   sno       ij    dyn_nmm   1    -     irh      "SNO"      "Liquid water eqiv of snow on ground"  "kg m-2"
+state  real   si        ij    dyn_nmm   1    -     irh      "SI"       "Depth of snow on ground"              "mm"
 state  real   cldefi    ij    dyn_nmm   1    -     rh       "CLDEFI"   "Convective cloud efficiency"          ""
 state  real   deep      ij    dyn_nmm   1    -     r        "DEEP"     "Deep convection =>.TRUE."             ""
 state  real   rf        ij    dyn_nmm   1    -     r
@@ -501,15 +512,15 @@ state   real   soilcbot            isj   misc          1     Z     -      ""    
 #-------------------------------------------------------------------------------------------------------------------------------
 
 # Time series variables
-state    real   ts_hour         ?!       misc      -         -      r        "TS_HOUR"        "Model integration time, hours"
-state    real   ts_u            ?!       misc      -         -      r        "TS_U"           "Surface wind U-component, earth-relative"
-state    real   ts_v            ?!       misc      -         -      r        "TS_V"           "Surface wind V-component, earth-relative"
-state    real   ts_q            ?!       misc      -         -      r        "TS_Q"           "Surface mixing ratio"
-state    real   ts_t            ?!       misc      -         -      r        "TS_T"           "Surface temperature"
-state    real   ts_psfc         ?!       misc      -         -      r        "TS_PSFC"        "Surface pressure"
-state    real   ts_tsk          ?!       misc      -         -      r        "TS_TSK"         "Skin temperature"
-state    real   ts_tslb         ?!       misc      -         -      r        "TS_TSLB"        "Soil temperature"
-state    real   ts_clw          ?!       misc      -         -      r        "TS_CLW"         "Column integrated cloud water"
+state    real   ts_hour         ?!       misc      -         -      -        "TS_HOUR"        "Model integration time, hours"
+state    real   ts_u            ?!       misc      -         -      -        "TS_U"           "Surface wind U-component, earth-relative"
+state    real   ts_v            ?!       misc      -         -      -        "TS_V"           "Surface wind V-component, earth-relative"
+state    real   ts_q            ?!       misc      -         -      -        "TS_Q"           "Surface mixing ratio"
+state    real   ts_t            ?!       misc      -         -      -        "TS_T"           "Surface temperature"
+state    real   ts_psfc         ?!       misc      -         -      -        "TS_PSFC"        "Surface pressure"
+state    real   ts_tsk          ?!       misc      -         -      -        "TS_TSK"         "Skin temperature"
+state    real   ts_tslb         ?!       misc      -         -      -        "TS_TSLB"        "Soil temperature"
+state    real   ts_clw          ?!       misc      -         -      -        "TS_CLW"         "Column integrated cloud water"
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -527,6 +538,8 @@ state   real    qr             ijkft   moist       1         -     rh      "QRAI
 state   real    qi             ijkft   moist       1         -     rh      "QICE"             "Ice mixing ratio"              "kg kg-1"
 state   real    qs             ijkft   moist       1         -     rh      "QSNOW"            "Snow mixing ratio"             "kg kg-1"
 state   real    qg             ijkft   moist       1         -     rh      "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    qh             ijkft   moist       1         -     rh      "QHAIL"            "Hail mixing ratio"             "kg kg-1" 
+
 #                                               
 # Other Scalars
 state   real    -              ijkftb  scalar      1         -     -    -
@@ -534,6 +547,8 @@ state   real    qni            ijkftb  scalar      1         -     i01rusdf=(bdy
 state   real    qns            ijkftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNS"              "Snow Number concentration" "# kg(-1)"
 state   real    qnr            ijkftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNR"              "Rain Number concentration" "# kg(-1)"
 state   real    qng            ijkftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNG"              "Graupel Number concentration" "# kg(-1)"
+state   real    qnh            ijkftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNHAIL"            "Hail Number concentration" "# kg(-1)" 
+
 state   real    qnn            ikjftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNCCN"            "CCN Number concentration" "# kg(-1)"
 state   real    qnc            ikjftb  scalar      1         -     i01rusdf=(bdy_interp:dt)       "QNCLOUD"          "cloud water Number concentration" "# kg(-1)"
 
@@ -564,6 +579,7 @@ state   real    -              ikjft   chem        1         -     -    -
 # lsm State Variables
 
 state    real   SMOIS            ilj     -          1         Z     rh       "SMOIS"                "SOIL MOISTURE" ""
+state    real   SMCREL           ilj     -          1         Z     r        "SMCREL"               "RELATIVE SOIL MOISTURE" ""
 state    real   TSLB             ilj     -          1         Z     r       "TSLB" "SOIL TEMPERATURE" ""
 
 
@@ -631,13 +647,13 @@ state    real   GRDFLX           ij     misc        1         -     irh     "GRD
 state    real   ALBBCK           ij     misc        1         -     i0124r   "ALBBCK"          "BACKGROUND ALBEDO"        "NA"
 state    real   SFCEXC           ij     misc        1         -     irh     "SFCEXC "              "SURFACE EXCHANGE COEFFICIENT"         ""
 state    real   SNOTIME          ij     misc        1         -     r        "SNOTIME"              "SNOTIME"                             ""
-state    real   ACSNOW           ij     misc        1         -     irh       "ACSNOW"               "ACCUMULATED SNOW" ""
-state    real   ACSNOM           ij     misc        1         -     irh       "ACSNOM"               "ACCUMULATED MELTED SNOW"         ""
+state    real   ACSNOW           ij     misc        1         -     irh       "ACSNOW"               "ACCUMULATED SNOW"      "kg m-2"
+state    real   ACSNOM           ij     misc        1         -     irh       "ACSNOM"               "ACCUMULATED MELTED SNOW"         "kg m-2"
 state    real   RMOL             ij     misc        1         -     ir       "RMOL"               ""         ""
-state    real   SNOW             ij     misc        1         -     i01rh       "SNOW"                 "SNOW WATER EQUIVALENT"         ""
+state    real   SNOW             ij     misc        1         -     i01rh       "SNOW"                 "SNOW WATER EQUIVALENT"         "kg m-2"
 state    real   CANWAT           ij     misc        1         -     i01rh       "CANWAT"               "CANOPY WATER" ""
 state    real   SST              ij     misc        1         -     i014rh       "SST"                  "SEA SURFACE TEMPERATURE" "K"
-state    real   WEASD            ij     misc        1         -     i01rh       "WEASD"                "WATER EQUIVALENT OF ACCUMULATED SNOW" ""
+state    real   WEASD            ij     misc        1         -     i01rh       "WEASD"                "WATER EQUIVALENT OF ACCUMULATED SNOW" "kg m-2"
 state    real  ZNT              ij      misc        1         -     ir        "ZNT"                   "TIME-VARYING ROUGHNESS LENGTH"
 state    real  MOL              ij      misc        1         -     ir        "MOL"                   "T* IN SIMILARITY THEORY"                      "K"
 state    real  NOAHRES          ij      misc        1         -     rh        "NOAHRES"               "RESIDUAL OF THE NOAH SURFACE ENERGY BUDGET" "W m{-2}"
@@ -697,7 +713,7 @@ state    real  pr_ens           ije     misc        1         Z      r        "P
 
 state    real  RTHFTEN          ikj     misc        1         -      r       "RTHFTEN"               "TEMPERATURE TENDENCY USED IN GRELL CUMULUS SCHEME"         "K/sec"
 state    real  RQVFTEN          ikj     misc        1         -      r       "RQVFTEN"               "MOISTURE TENDENCY USED IN GRELL CUMULUS SCHEME"            "kg/sec"
-state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)      "SNOWH"                 "PHYSICAL SNOW DEPTH"  ""
+state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)      "SNOWH"                 "PHYSICAL SNOW DEPTH"  "m"
 state    real   RHOSN            ij     misc        1         -     i01rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "RHOSN"            " SNOW DENSITY"      "kg m-3"
 state    real   SMFR3D           ilj    misc        1         Z      rh       "SMFR3D"               "SOIL ICE" ""
 state    real   KEEPFR3DFLAG     ilj    misc        1         Z      r         "KEEPFR3DFLAG"          "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
@@ -838,6 +854,8 @@ rconfig   real    p_top_requested   namelist,domains    1               5000    
 
 # Physics
 rconfig   integer     mp_physics          namelist,physics	max_domains    0       rh       "mp_physics"            ""      ""
+rconfig   real        mommix              namelist,physics     max_domains  0.7       irh    "MOMENTUM MIXING FOR SAS CONVECTION SCHEME"
+rconfig   logical     disheat             namelist,physics      max_domains  .true.    irh    "nmm input 7"
 rconfig   integer     ra_lw_physics       namelist,physics	max_domains    0       rh       "ra_lw_physics"         ""      ""
 rconfig   integer     ra_sw_physics       namelist,physics	max_domains    0       rh       "ra_sw_physics"         ""      ""
 rconfig   real    radt                    namelist,physics	max_domains    0       h    "RADT"          ""      ""
@@ -1009,15 +1027,18 @@ package   etampnew      mp_physics==5                -             moist:qv,qc,q
 package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
 package   gsfcgcescheme mp_physics==7                -             moist:qv,qc,qr,qi,qs,qg
 package   thompson      mp_physics==8                -             moist:qv,qc,qr,qi,qs,qg;scalar:qni,qnr
+package   milbrandt2mom mp_physics==9                -             moist:qv,qc,qr,qi,qs,qg,qh;scalar:qnc,qnr,qni,qns,qng,qnh
 package   morr_two_moment  mp_physics==10            -             moist:qv,qc,qr,qi,qs,qg;scalar:qni,qns,qnr,qng
 package   wdm5scheme    mp_physics==14               -             moist:qv,qc,qr,qi,qs;scalar:qnn,qnc,qnr
 package   wdm6scheme    mp_physics==16               -             moist:qv,qc,qr,qi,qs,qg;scalar:qnn,qnc,qnr
 package   thompson07    mp_physics==98               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
+package   etamp_hwrf    mp_physics==85               -             moist:qv,qc,qr,qi,qs
 
 package   rrtmscheme    ra_lw_physics==1             -             -
 package   camlwscheme   ra_lw_physics==3             -             -
 package   rrtmg_lwscheme  ra_lw_physics==4           -             -
 package   gfdllwscheme  ra_lw_physics==99            -             -
+package   hwrflwscheme  ra_lw_physics==98
 package   heldsuarez    ra_lw_physics==31            -             -
 
 package   swradscheme   ra_sw_physics==1             -             -
@@ -1025,6 +1046,7 @@ package   gsfcswscheme  ra_sw_physics==2             -             -
 package   camswscheme   ra_sw_physics==3             -             -
 package   rrtmg_swscheme  ra_sw_physics==4           -             -
 package   gfdlswscheme  ra_sw_physics==99            -             -
+package   hwrfswscheme  ra_sw_physics==98
 
 package   sfclayscheme   sf_sfclay_physics==1        -             -
 package   myjsfcscheme   sf_sfclay_physics==2        -             -
@@ -1141,4 +1163,6 @@ halo      HALO_NMM_MG3 dyn_nmm 8:p_gc
 halo      HALO_NMM_TURBL_A  dyn_nmm 8:uz0h,vz0h,hbm2
 halo      HALO_NMM_TURBL_B  dyn_nmm 8:dudt,dvdt
 
+halo      HALO_NMM_SAS_A  dyn_nmm 24:uz0h,vz0h,hbm2
+halo      HALO_NMM_SAS_B  dyn_nmm 24:ducudt,dvcudt
 halo      HALO_TRACERS dyn_nmm 48:szj,s1z,spz,tcs

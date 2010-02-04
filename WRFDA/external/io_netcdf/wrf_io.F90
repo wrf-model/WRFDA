@@ -40,7 +40,7 @@ module wrf_data
   integer                , parameter      :: WARN             = 1
   integer                , parameter      :: WrfDataHandleMax = 99
   integer                , parameter      :: MaxDims          = 2000 ! = NF_MAX_VARS
-  integer                , parameter      :: MaxVars          = 2000
+  integer                , parameter      :: MaxVars          = 3000
   integer                , parameter      :: MaxTimes         = 900000
   integer                , parameter      :: DateStrLen       = 19
   integer                , parameter      :: VarNameLen       = 31
@@ -2966,6 +2966,8 @@ subroutine ext_ncd_get_next_time(DataHandle, DateStr, Status)
     Status = WRF_NO_ERR
   else
     Status = WRF_ERR_FATAL_BAD_FILE_STATUS
+    write(msg,*) 'DH%FileStatus ',DH%FileStatus
+    call wrf_debug ( FATAL , msg)
     write(msg,*) 'Fatal error BAD FILE STATUS in ',__FILE__,', line', __LINE__ 
     call wrf_debug ( FATAL , msg)
   endif

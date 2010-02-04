@@ -972,40 +972,40 @@ CONTAINS
 
 !---------------------------------------------------------------------
 
-  SUBROUTINE set_w_surface( config_flags, znw,                           &
+  SUBROUTINE set_w_surface( config_flags, znw, fill_w_flag,              &
                             w, ht, u, v, cf1, cf2, cf3, rdx, rdy,        &
                             msftx, msfty,                                &
                             ids, ide, jds, jde, kds, kde,                &
-                            ips, ipe, jps, jpe, kps, kpe,                &
-                            its, ite, jts, jte, kts, kte,                &
-                            ims, ime, jms, jme, kms, kme                )
-  implicit none
+                            ims, ime, jms, jme, kms, kme,                &
+                            its, ite, jts, jte, kts, kte                 )
+     implicit none
 
-  TYPE( grid_config_rec_type ) config_flags
+     TYPE( grid_config_rec_type ) config_flags
 
-  INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
-                                   ims, ime, jms, jme, kms, kme, &
-                                   its, ite, jts, jte, kts, kte, &
-                                   ips, ipe, jps, jpe, kps, kpe
+     INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
+                                      ims, ime, jms, jme, kms, kme, &
+                                      its, ite, jts, jte, kts, kte
 
-   REAL :: rdx, rdy, cf1, cf2, cf3
+     REAL :: rdx, rdy, cf1, cf2, cf3
+
+     REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &
+                                                 INTENT(IN   ) ::  u,       &
+                                                                   v
+
+     REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &
+                                              INTENT(INOUT) ::  w
+
+     REAL , DIMENSION(  ims:ime , jms:jme ) , INTENT(IN   ) ::  ht,         &
+                                                                msftx,      &
+                                                                msfty
+     REAL , DIMENSION( kms:kme ) , INTENT(IN   ) ::  znw
+  
+     LOGICAL, INTENT(IN   ) :: fill_w_flag
 
 
-   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &
-                                               INTENT(IN   ) ::  u,       &
-                                                                 v
-
-   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &
-                                               INTENT(INOUT) ::  w
-
-   REAL , DIMENSION(  ims:ime , jms:jme ) , INTENT(IN   ) ::  ht,         &
-                                                              msftx,      &
-                                                              msfty
-   REAL , DIMENSION( kms:kme ) , INTENT(IN   ) ::  znw
-
-
-   INTEGER :: i,j,k
-   INTEGER :: ip1,im1,jp1,jm1
+     INTEGER :: i,j,k
+     INTEGER :: ip1,im1,jp1,jm1
+     INTEGER :: ip1_limit,im1_limit,jp1_limit,jm1_limit
 
 !  set kinematic lower boundary condition on W
 
@@ -1020,12 +1020,29 @@ CONTAINS
 !  [NB - cf1, cf2 and cf3 do vertical weighting of u or v values
 !   nearest the surface]
 
+! get indices for points next to edge of domain 
+
+     jm1_limit = jds        ! No periodic BC's
+     jp1_limit = jde-1
+     im1_limit = ids
+     ip1_limit = ide-1
+
+     IF ( config_flags%periodic_x ) THEN
+       im1_limit = ids-1
+       ip1_limit = ide
+     ENDIF
+
+     IF ( config_flags%periodic_y ) THEN
+       jm1_limit = jds-1
+       jp1_limit = jde
+     ENDIF
+
      DO j = jts,min(jte,jde-1)
-       jm1 = max(j-1,jds)
-       jp1 = min(j+1,jde-1)
+       jm1 = max(j-1, jm1_limit)
+       jp1 = min(j+1, jp1_limit)
      DO i = its,min(ite,ide-1)
-       im1 = max(i-1,ids)
-       ip1 = min(i+1,ide-1)
+       im1 = max(i-1, im1_limit)
+       ip1 = min(i+1, ip1_limit)
 
          w(i,1,j)=  msfty(i,j)*                              &
                   .5*rdy*(                                   &
@@ -1044,14 +1061,15 @@ CONTAINS
       ENDDO
 
 ! Fill the atmospheric w field with smoothly decaying values
-
-     DO j = jts,min(jte,jde-1)
-     DO k = kts+1,kte
-     DO i = its,min(ite,ide-1)
-         w(i,k,j) = w(i,1,j)*znw(k)*znw(k)
-     ENDDO
-     ENDDO
-     ENDDO
+      IF (fill_w_flag) THEN
+        DO j = jts,min(jte,jde-1)
+        DO k = kts+1,kte
+        DO i = its,min(ite,ide-1)
+          w(i,k,j) = w(i,1,j)*znw(k)*znw(k)
+        ENDDO
+        ENDDO
+        ENDDO
+      ENDIF
 
   END SUBROUTINE set_w_surface
 

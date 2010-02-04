@@ -332,11 +332,11 @@ SUBROUTINE setup_gasprofile_maps(chem_opt, numgas)
 
   select case(chem_opt)
   case (RADM2, RADM2_KPP, RADM2SORG, RADM2SORG_AQ, RADM2SORG_KPP, &
-        RACM_KPP, RACMPM_KPP, RACM_MIM_KPP, RACMSORG_AQ, RACMSORG_KPP, &
+        RACM_KPP, RACMPM_KPP, RACM_MIM_KPP, RACMSORG_AQ, RACM_ESRLSORG_KPP, RACMSORG_KPP, &
         GOCARTRACM_KPP, GOCARTRADM2,GOCARTRADM2_KPP,CHEM_TRACER, CHEM_TRACE2)
      call setup_gasprofile_map_radm_racm
 
-  case (CBMZ, CBMZ_BB, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, &
+  case (CBMZ, CBMZ_BB, CBMZ_BB_KPP, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, &
         CBMZ_MOSAIC_4BIN_AQ, CBMZ_MOSAIC_8BIN_AQ)
      call setup_gasprofile_map_cbmz(numgas)
 
@@ -1289,7 +1289,7 @@ SUBROUTINE input_chem_profile (si_grid)
 ! we have to treat it separately. (wig, 2-May-2007)
 !
       SELECT CASE(chem_opt)
-      CASE (CBMZ,CBMZ_BB,CBMZ_MOSAIC_4BIN,CBMZ_MOSAIC_8BIN, &
+      CASE (CBMZ,CBMZ_BB,CBMZ_BB_KPP,CBMZ_MOSAIC_4BIN,CBMZ_MOSAIC_8BIN, &
             CBMZ_MOSAIC_4BIN_AQ,CBMZ_MOSAIC_8BIN_AQ)
          do j = ny1,ny2
          do k = nz1,nz2
@@ -1855,6 +1855,7 @@ SUBROUTINE input_chem_profile (si_grid)
         if (config_flags%chem_opt == RACM_KPP .or.          &
             config_flags%chem_opt == GOCARTRACM_KPP .or.      &
             config_flags%chem_opt == RACMSORG_KPP .or.      &
+            config_flags%chem_opt == RACM_ESRLSORG_KPP .or.      &
             config_flags%chem_opt == RACM_MIM_KPP .or.      &
             config_flags%chem_opt == RACMSORG_KPP ) then
           i_bdy_method = 9
@@ -2173,6 +2174,7 @@ SUBROUTINE input_chem_profile (si_grid)
         if (config_flags%chem_opt == RACM_KPP .or.          &
             config_flags%chem_opt == GOCARTRACM_KPP .or.      &
             config_flags%chem_opt == RACMSORG_KPP .or.      &
+            config_flags%chem_opt == RACM_ESRLSORG_KPP .or.      &
             config_flags%chem_opt == RACM_MIM_KPP .or.      &
             config_flags%chem_opt == RACMSORG_KPP ) then
           i_bdy_method = 9
@@ -2785,14 +2787,14 @@ SUBROUTINE input_chem_profile (si_grid)
         get_last_gas = 0
 
      case (RADM2, RADM2_KPP, RADM2SORG, RADM2SORG_AQ, RADM2SORG_KPP, &
-           RACM_KPP, RACMPM_KPP, RACM_MIM_KPP, RACMSORG_AQ, RACMSORG_KPP, &
+           RACM_KPP, RACMPM_KPP, RACM_MIM_KPP, RACMSORG_AQ, RACM_ESRLSORG_KPP, RACMSORG_KPP, &
 	       GOCARTRACM_KPP,GOCARTRADM2,GOCARTRADM2_KPP)
         get_last_gas = p_ho2
 
      case (CBMZ)
         get_last_gas = p_mtf
 
-     case (CBMZ_BB,CBMZ_MOSAIC_4BIN,CBMZ_MOSAIC_8BIN,CBMZ_MOSAIC_4BIN_AQ,CBMZ_MOSAIC_8BIN_AQ)
+     case (CBMZ_BB,CBMZ_BB_KPP,CBMZ_MOSAIC_4BIN,CBMZ_MOSAIC_8BIN,CBMZ_MOSAIC_4BIN_AQ,CBMZ_MOSAIC_8BIN_AQ)
         get_last_gas = p_isopo2
 
      case (CHEM_TRACER)

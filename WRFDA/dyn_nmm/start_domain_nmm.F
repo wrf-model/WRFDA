@@ -17,7 +17,14 @@
       USE MODULE_WRF_ERROR
       USE MODULE_MPP
       USE MODULE_CTLBLK
+#ifdef DM_PARALLEL
+      USE MODULE_DM,                    ONLY : LOCAL_COMMUNICATOR       &
+                                              ,MYTASK,NTASKS,NTASKS_X   &
+                                              ,NTASKS_Y
+      USE MODULE_COMM_DM
+#else
       USE MODULE_DM
+#endif
 !
       USE MODULE_IGWAVE_ADJUST,ONLY: PDTE, PFDHT, DDAMP
       USE MODULE_ADVECTION,    ONLY: ADVE, VAD2, HAD2
@@ -59,6 +66,9 @@
 !***
 !***  LOCAL DATA
 !***
+#ifdef HWRF
+  LOGICAL :: ANAL   !zhang's doing, added for analysis option
+#endif
       INTEGER :: IDS,IDE,JDS,JDE,KDS,KDE                               &
      &          ,IMS,IME,JMS,JME,KMS,KME                                &
      &          ,IPS,IPE,JPS,JPE,KPS,KPE
@@ -96,6 +106,11 @@
 !!!   REAL :: BLDT,CWML,EXNSFC,G_INV,PLYR,PSFC,ROG,SFCZ,THSIJ,TL
       REAL :: CWML,EXNSFC,G_INV,PLYR,PSURF,ROG,SFCZ,THSIJ,TL,ZOQING
       REAL :: TEND
+#ifdef HWRF
+!zhang's doing 
+      REAL :: TSTART
+!zhang's doing ends
+#endif
 
 !
 !!!   REAL,ALLOCATABLE,DIMENSION(:,:) :: RAINBL,RAINNC,RAINNC           &
@@ -184,6 +199,11 @@
      &                             ,config_flags)
 !
         RESTRT=config_flags%restart
+#ifdef HWRF
+!zhang's doing added for analysis option
+        ANAL=config_flags%analysis                ! gopal's doing
+!zhang's doing ends
+#endif
 
 #if 1
       IF(IME>NMM_MAX_DIM )THEN
@@ -436,7 +456,13 @@
       JFE=MIN(JPE,JDE-1)
       IFE=MIN(IPE,IDE-1)
 !
+#ifdef HWRF
+!zhang's doing
+  IF((.NOT.RESTRT .AND. .NOT.ANAL) .OR. .NOT.allowed_to_read)THEN
+!end of zhang's doing
+#else
       IF(.NOT.RESTRT)THEN
+#endif
         DO J=JFS,JFE
         DO I=IFS,IFE
           grid%pdsl(I,J)  =grid%pd(I,J)*grid%res(I,J)
@@ -685,6 +711,11 @@
 
       TSPH=3600./GRID%DT ! needed?
       grid%nphs0=GRID%NPHS
+#ifdef HWRF
+!zhang's doing
+      tstart = grid%TSTART
+!zhang's doing ends
+#endif
 
       IF(MYPE==0)THEN
         WRITE( wrf_err_message, * )' start_nmm TSTART=',grid%tstart
@@ -719,6 +750,11 @@
       grid%nrdsw  = INT(grid%TRDSW *TSPH+0.5)
       grid%nrdlw  = INT(grid%TRDLW *TSPH+0.5)
       grid%nsrfc  = INT(grid%TSRFC *TSPH+0.5)
+#ifdef HWRF
+!zhang's dong for analysis option:
+      grid%NCNVC0  = grid%NCNVC
+      grid%NPHS0   = grid%NPHS
+#endif
 !
 !----------------------------------------------------------------------
 !
@@ -1044,7 +1080,13 @@
 !***
 !*** SET ZERO-VALUE FOR SOME OUTPUT DIAGNOSTIC ARRAYS
 !***
+#ifdef HWRF
+!zhang'sdoing       IF(NSTART.EQ.0)THEN
+      IF(NSTART.EQ.0 .or. .not.allowed_to_read )THEN
+!zhang's doing ends
+#else
       IF(NSTART.EQ.0)THEN
+#endif
 !
          GRID%NSOIL= GRID%NUM_SOIL_LAYERS
         DO J=JFS,JFE
@@ -1189,7 +1231,15 @@
 !***
 !***  TRY A SIMPLE LINEAR INTERP TO GET 2/10 M VALUES
 !***
-        grid%pdsl(I,J)=grid%pd(I,J)*grid%res(I,J)
+#ifdef HWRF
+!zhang's doing
+        IF(.NOT.RESTRT .OR. .NOT.allowed_to_read) then
+        grid%PDSL(I,J)=grid%PD(I,J)*grid%RES(I,J)
+        endif
+!end of zhang's doing
+#else
+        grid%PDSL(I,J)=grid%PD(I,J)*grid%RES(I,J)
+#endif
 !
         ULM=grid%u(I,J,KTS)
         VLM=grid%v(I,J,KTS)
@@ -1210,7 +1260,13 @@
           FAC2=0.
         ENDIF
 !
+#ifdef HWRF
+!zhang's doing
+        IF(.NOT.RESTRT .OR. .NOT.allowed_to_read)THEN
+!end of zhang's doing
+#else
         IF(.NOT.RESTRT)THEN
+#endif
           grid%th10(I,J)=FAC2*grid%ths(I,J)+FAC1*THLM
           grid%q10(I,J)=FAC2*grid%qsh(I,J)+FAC1*QLM
 #ifdef HWRF
@@ -1282,7 +1338,12 @@
 !***  INITIALIZE TAU-1 VALUES FOR ADAMS-BASHFORTH 
 !----------------------------------------------------------------------
 !
+#ifdef HWRF
+!zhang's doing
+      IF(.NOT.RESTRT .OR. .NOT.allowed_to_read)THEN !zhang's doing
+#else
       IF(.NOT.RESTRT)THEN
+#endif
         DO K=KPS,KPE
           DO J=JFS,JFE
           DO I=ifs,ife
@@ -1310,6 +1371,9 @@
         ENDDO
       ENDIF
 !***
+#ifdef HWRF
+      IF(.NOT.RESTRT .OR. .NOT.allowed_to_read) THEN !zhang's doing
+#endif
       IF(GRID%SIGMA==1)THEN
         DO J=JFS,JFE
         DO I=IFS,IFE
@@ -1323,6 +1387,9 @@
         ENDDO
         ENDDO
       ENDIF
+#ifdef HWRF
+      ENDIF !zhang's doing
+#endif
 !
 !***
 !
@@ -1333,8 +1400,13 @@
         CALL wrf_debug( 0, TRIM(wrf_err_message) )
       WRITE( wrf_err_message, * )' grid%pdtop=',grid%pdtop,' grid%pt=',grid%pt
         CALL wrf_debug( 0, TRIM(wrf_err_message) )
-
+#ifdef HWRF
+!zhang's doing
+        IF(.NOT.RESTRT.OR.NEST .OR. .NOT.allowed_to_read)THEN
+!end of zhang's doing
+#else
       IF(.NOT.RESTRT.OR.NEST)THEN
+#endif
         DO K=KPS,KPE
         DO J=JFS,JFE
         DO I=IFS,IFE
@@ -1345,6 +1417,10 @@
         ENDDO
         ENDDO
       ENDIF
+#ifdef HWRF
+!zhang's doing
+      IF(.NOT.RESTRT.OR.NEST .OR. .NOT.allowed_to_read)THEN
+#endif
 
         DO K=KTS,KTE-1
         DO J=JFS,JFE
@@ -1354,6 +1430,9 @@
         ENDDO
         ENDDO
         ENDDO
+#ifdef HWRF
+      ENDIF    !zhang 
+#endif
 
 #ifndef NO_RESTRICT_ACCEL
 !----------------------------------------------------------------------
@@ -1501,7 +1580,15 @@
       DO I=MYIS,MYIE
         SFCZ=grid%fis(I,J)*G_INV
         ZINT(I,KTS,J)=SFCZ
+#ifdef HWRF
+!zhang's doing
+        IF(.NOT.RESTRT .OR. .NOT.allowed_to_read) then
+        grid%PDSL(I,J)=grid%PD(I,J)*grid%RES(I,J)
+        endif
+!end of zhang's doing
+#else
         grid%pdsl(I,J)=grid%pd(I,J)*grid%res(I,J)
+#endif
         PSURF=grid%pint(I,J,KTS)
         EXNSFC=(1.E5/PSURF)**CAPA
         grid%xland(I,J)=grid%sm(I,J)+1.
@@ -1549,7 +1636,13 @@
 !
 !-----------------------------------------------------------------------
 
+#ifdef HWRF
+!zhang's doing
+      if(.NOT.RESTRT .OR. .NOT.allowed_to_read)grid%LU_INDEX=grid%IVGTYP
+!end of zhang's doing
+#else
       grid%lu_index=grid%ivgtyp
+#endif
 
       IF(.NOT.RESTRT)THEN
         DO J=MYJS,MYJE
@@ -1589,12 +1682,20 @@
       CALL domain_setgmtetc( GRID, START_OF_SIMULATION )
 
       if(restrt) then
+#ifdef HWRF
+!zhang 
+     CALL nl_get_julyr (grid%id, grid%julyr)
+     CALL nl_get_julday (grid%id, grid%julday)
+     CALL nl_get_gmt (grid%id, grid%gmt)
+!zhang end
+#else
         CALL domain_clock_get( grid, current_time=currentTime )
         CALL WRFU_TimeGet( currentTime, YY=grid%julyr, dayOfYear=grid%julday, &
                            H=hr, M=mn, S=sec, MS=ms, rc=rc)
         grid%gmt=hr+real(mn)/60.+real(sec)/3600.+real(ms)/(1000*3600)
         WRITE( wrf_err_message , * ) 'DEBUG start_domain_nmm():  gmt = ',grid%gmt
         CALL wrf_debug( 150, TRIM(wrf_err_message) )
+#endif
       endif
 
 ! Several arguments are RCONFIG entries in Registry.NMM. Registry no longer
@@ -1635,6 +1736,7 @@
      &             ,GRID%GMT,GRID%JULYR,GRID%JULDAY                     &
      &             ,GRID%LEVSIZ, NUM_OZMIXM, NUM_AEROSOLC, GRID%PAERLEV &
      &             ,TMN,grid%xland,grid%znt,grid%z0,grid%ustar,grid%mol,grid%pblh,grid%tke_myj             &
+     &             ,grid%DUCUDT, grid%DVCUDT                                      &
      &             ,grid%exch_h,THC,SNOWC,grid%mavail,HFX,QFX,RAINBL              &
      &             ,grid%stc,ZS,DZS,GRID%NUM_SOIL_LAYERS,WARM_RAIN           &
      &             ,ADV_MOIST_COND                                      &
@@ -1655,6 +1757,13 @@
      &             ,NUM_URBAN_LAYERS                                    &
      &                )
 
+#ifdef HWRF
+!zhang's doing
+      grid%julyr_rst=grid%julyr_rst
+      grid%julday_rst=grid%julday_rst
+      grid%gmt_rst=grid%gmt_rst
+!end of zhang's doing
+#endif
 !-----------------------------------------------------------------------
 !---- Initialization for gravity wave drag (GWD) & mountain blocking (MB)
 !
@@ -1677,7 +1786,11 @@
 
 !-----------------------------------------------------------------------
 !
-      IF(NSTART==0)THEN
+#ifdef HWRF
+      IF(NSTART.EQ.0 .or. .not.allowed_to_read )THEN
+#else
+       IF(NSTART==0)THEN
+#endif
 
         DO J=JMS,JME
         DO I=IMS,IME
@@ -1699,10 +1812,12 @@
 !
 !mp replace F*_PHY with values defined in module_initialize_real.F?
 #ifdef HWRF
+      IF (.NOT. RESTRT) THEN   !zhang
         moist = 0.0
         grid%f_ice = grid%f_ice_phy
         grid%f_rimef = grid%f_rimef_phy
         grid%f_rain = grid%f_rain_phy
+      ENDIF                  !zhang
 #endif
 
       IF (.NOT. RESTRT) THEN
@@ -1825,7 +1940,12 @@
         ENDIF
       ENDIF
 
+#ifdef HWRF
+      if(.NOT. RESTRT .OR. .NOT.allowed_to_read) then !zhang's doing
+!zhang's doing
+#else
       IF(.NOT.RESTRT)THEN
+#endif
         DO J=JMS,JME
         DO I=IMS,IME
           grid%aprec(I,J)=RAINNC(I,J)*1.E-3

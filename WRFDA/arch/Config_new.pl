@@ -316,6 +316,9 @@ while ( <CONFIGURE_DEFAULTS> )
     $_ =~ s/CONFIGURE_COMMS_LIB/$sw_comms_lib/g ;
     $_ =~ s/CONFIGURE_COMMS_INCLUDE/$sw_comms_include/g ;
     $_ =~ s/CONFIGURE_COMMS_EXTERNAL/$sw_comms_external/g ;
+    if ( $sw_os ne "CYGWIN_NT" ) {
+      $_ =~ s/#NOWIN// ;
+    }
     $_ =~ s/CONFIGURE_DMPARALLEL/$sw_dmparallelflag/g ;
     $_ =~ s/CONFIGURE_STUBMPI/$sw_stubmpi/g ;
     $_ =~ s/CONFIGURE_NESTOPT/$sw_nest_opt/g ;
@@ -465,7 +468,7 @@ while ( <CONFIGURE_DEFAULTS> )
              $response = 1 ;
           } elsif ( $ENV{HWRF} ) {
              printf "HWRF requires moving nests";
-             $response = 2;
+             $response = "2\n";
           } else {
              $response = <STDIN> ;
           } 

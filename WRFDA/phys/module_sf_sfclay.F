@@ -355,7 +355,7 @@ CONTAINS
       REAL    ::  PL,THCON,TVCON,E1
       REAL    ::  ZL,TSKV,DTHVDZ,DTHVM,VCONV,RZOL,RZOL2,RZOL10,ZOL2,ZOL10
       REAL    ::  DTG,PSIX,DTTHX,PSIX10,PSIT,PSIT2,PSIQ,PSIQ2,PSIQ10
-      REAL    ::  FLUXC,VSGD,Z0Q,VISC,RESTAR,CZIL
+      REAL    ::  FLUXC,VSGD,Z0Q,VISC,RESTAR,CZIL,RESTAR2
 !-------------------------------------------------------------------
       KL=kte
 
@@ -689,6 +689,20 @@ CONTAINS
               PSIQ10=ALOG(10./Z0Q)-PSIH10(I)
               PSIT2=PSIQ2
            ENDIF
+           IF ( ISFTCFLX.EQ.2 .AND. (XLAND(I)-1.5).GE.0. ) THEN
+! AHW: Garratt formula: Calculate roughness Reynolds number
+!        Kinematic viscosity of air (linear approc to
+!                 temp dependence at sea levle)
+              VISC=(1.32+0.009*(SCR3(I)-273.15))*1.E-5
+!!            VISC=1.5E-5
+              RESTAR=UST(I)*ZNT(I)/VISC
+              RESTAR2=2.48*SQRT(SQRT(RESTAR))-2.
+              PSIT=GZ1OZ0(I)-PSIH(I)+RESTAR2
+              PSIQ=GZ1OZ0(I)-PSIH(I)+2.28*SQRT(SQRT(RESTAR))-2.
+              PSIT2=GZ2OZ0(I)-PSIH2(I)+RESTAR2
+              PSIQ2=GZ2OZ0(I)-PSIH2(I)+2.28*SQRT(SQRT(RESTAR))-2.
+              PSIQ2=PSIT2
+           ENDIF
         ENDIF
         IF(PRESENT(ck) .and. PRESENT(cd) .and. PRESENT(cka) .and. PRESENT(cda)) THEN
            Ck(I)=(karman/psix10)*(karman/psiq10)
@@ -759,7 +773,7 @@ CONTAINS
           ZNT(I)=CZO*UST(I)*UST(I)/G+OZO                                   
 ! AHW: change roughness length, and hence the drag coefficients Ck and Cd
           IF ( PRESENT(ISFTCFLX) ) THEN
-             IF ( ISFTCFLX.EQ.1 ) THEN
+             IF ( ISFTCFLX.NE.0 ) THEN
                 ZNT(I)=10.*exp(-9.*UST(I)**(-.3333))
                 ZNT(I)=MIN(ZNT(I),2.85e-3)
                 ZNT(I)=ZNT(I) + 0.11*1.5E-5/AMAX1(UST(I),0.01)
@@ -800,6 +814,12 @@ CONTAINS
       DO 400 I=its,ite
         IF(XLAND(I)-1.5.GT.0.)THEN                                           
           HFX(I)=FLHC(I)*(THGB(I)-THX(I))                                
+          IF ( PRESENT(ISFTCFLX) ) THEN
+             IF ( ISFTCFLX.NE.0 ) THEN
+! AHW: add dissipasive heating term
+                HFX(I)=HFX(I)+RHOX(I)*USTM(I)*USTM(I)*WSPDI(I)
+             ENDIF
+          ENDIF
         ELSEIF(XLAND(I)-1.5.LT.0.)THEN                                       
           HFX(I)=FLHC(I)*(THGB(I)-THX(I))                                
           HFX(I)=AMAX1(HFX(I),-250.)                                       

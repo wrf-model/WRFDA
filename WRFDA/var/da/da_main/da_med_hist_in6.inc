@@ -24,7 +24,7 @@ subroutine da_med_hist_in6 (grid, config_flags, filename)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   call input_aux_hist6 (fid , grid , config_flags , ierr)
+   call input_auxhist6 (fid , grid , config_flags , ierr)
 
    call close_dataset (fid , config_flags , "DATASET=AUXINPUT6")
 

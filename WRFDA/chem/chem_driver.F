@@ -38,7 +38,7 @@
   USE module_dep_simple
   USE module_bioemi_simple
   USE module_phot_mad
-!  USE module_ftuv_driver, only : ftuv_timestep_init
+  USE module_ftuv_driver, only : ftuv_timestep_init
   USE module_aerosols_sorgam
   USE module_chem_utilities
   USE module_gocart_so2so4
@@ -47,6 +47,7 @@
   USE module_convtrans_prep
   USE module_dry_dep_driver
   USE module_emissions_driver
+  USE module_input_tracer, only: set_tracer
   USE module_wetscav_driver, only: wetscav_driver
   USE module_input_chem_data, only: last_chem_time, &
 #if (defined(CHEM_DBG_I) && defined(CHEM_DBG_J) && defined(CHEM_DBG_K))
@@ -372,6 +373,9 @@
      CASE (RACM_MIM_KPP)
        CALL wrf_debug(15,'calling racm_mim_kpp from chem_driver')
        haveaer = .false.
+     CASE (RACM_ESRLSORG_KPP)
+       CALL wrf_debug(15,'calling racmsorgesrl_kpp aerosols driver from chem_driver')
+       haveaer = .false.
      CASE (RACMSORG_KPP)
        CALL wrf_debug(15,'calling racmsorg_kpp aerosols driver from chem_driver')
        haveaer = .false.
@@ -393,6 +397,9 @@
      CASE (CBMZ_BB)
        CALL wrf_debug(15,'calling cbmz_bb from chem_driver')
        haveaer = .false.
+     CASE (CBMZ_BB_KPP)
+       CALL wrf_debug(15,'calling cbmz_bb_kpp from chem_driver')
+       haveaer = .false.
      CASE (CBMZ_MOSAIC_4BIN)
        CALL wrf_debug(15,'calling cbmz_mosaic_4bin aerosols driver from chem_driver')
        haveaer = .true.
@@ -412,8 +419,23 @@
     CASE (CHEM_TRACER,CHEM_TRACE2)
        CALL wrf_debug(15,'tracer mode: only doing emissions and dry dep in chem_driver')
      CASE DEFAULT
+       if(config_flags%tracer_opt > 0 )then
+       CALL wrf_debug(15,'only doing tracer transport in chem_driver')
+       else
        CALL wrf_debug(15,'calling chem_opt=? from chem_driver')
+       endif
    END SELECT chem_select                              
+   tracer_select: SELECT CASE(config_flags%tracer_opt)
+    CASE (TRACER_SMOKE)
+       CALL wrf_debug(15,'tracer mode: 1 tracer for fires')
+    CASE (TRACER_TEST1)
+       CALL wrf_debug(15,'tracer mode: 8 tracers')
+    CASE (TRACER_TEST2)
+       CALL wrf_debug(15,'tracer mode: 8 tracers')
+     CASE DEFAULT
+       CALL wrf_debug(15,'calling chem_opt=? from chem_driver')
+   END SELECT tracer_select
+
 !
 !
 !
@@ -537,7 +559,7 @@
       enddo
       select case (config_flags%chem_opt)
       case (RADM2SORG, RADM2SORG_AQ, RADM2SORG_KPP, &
-                        RACMSORG_AQ,  RACMSORG_KPP)
+            RACM_ESRLSORG_KPP,RACMSORG_AQ,  RACMSORG_KPP)
          do j=jps,jpe
             do k=kps,kpe
                do i=ips,ipe
@@ -572,6 +594,13 @@
             pbl_h(i,j)=grid%pblh(i,j)
          enddo
       enddo
+
+!------------------------------------------------------------------------
+! setup ftuv column density timing
+!------------------------------------------------------------------------
+      if( config_flags%phot_opt == FTUV ) then
+         CALL ftuv_timestep_init( grid%julday )
+      end if
 
 !------------------------------------------------------------------------
 ! Main chemistry tile loop
@@ -652,7 +681,8 @@
 #if (EM_CORE == 1 )
               grid%gmt,grid%julday,rri,t_phy,moist,p8w,t8w,u_phy,v_phy,vvel,               &
 #endif
-              grid%e_bio,p_phy,chem,rho,dz8w,grid%ne_area,emis_ant,grid%tsk,grid%erod,g,emis_seas,emis_dust, &
+              grid%e_bio,p_phy,chem,rho,dz8w,grid%ne_area,emis_ant,grid%tsk,               &
+              grid%erod,g,emis_seas,emis_dust,tracer, &
               ebu , ebu_in,grid%mean_fct_agtf,grid%mean_fct_agef,grid%mean_fct_agsv,       &
               grid%mean_fct_aggr,grid%firesize_agtf, &
               grid%firesize_agef,grid%firesize_agsv,grid%firesize_aggr,                    &
@@ -695,6 +725,8 @@
               grid%lflash_data, grid%ic_flshrate, grid%cg_flshrate,                        &
               grid%flashrate_factor, grid%flashrate_method, grid%iccg_method,              &
               grid%cellcount_method,                                                       &
+         ! stuff for aircraft emissions
+              emis_aircraft,                                                               &   
               ids,ide, jds,jde, kds,kde,                                                   &
               ims,ime, jms,jme, kms,kme,                                                   &
               its,ite,jts,jte,kts,kte)
@@ -814,9 +846,9 @@
 #if (EM_CORE == 1)
                  grid%gmt,grid%julday,t_phy,moist,scalar,p8w,t8w,vvel,                &
 #endif
-                 rri,p_phy,chem,rho,dz8w,grid%exch_h,grid%hfx,grid%dx,                &
+                 rri,p_phy,chem,tracer,rho,dz8w,grid%exch_h,grid%hfx,grid%dx,         &
                  grid%cldfra, grid%cldfra_old,grid%raincv_b,                          &
-	             grid%ccn1, grid%ccn2, grid%ccn3, grid%ccn4, grid%ccn5, grid%ccn6,    &
+	         grid%ccn1, grid%ccn2, grid%ccn3, grid%ccn4, grid%ccn5, grid%ccn6,    &
                  grid%qndropsource,grid%ivgtyp,grid%tsk,grid%gsw,grid%vegfra,pbl_h,   &
                  grid%rmol,grid%ust,grid%znt,grid%xlat,grid%xlong,                    &
                  zmid,z_at_w,grid%xland,                                              &
@@ -824,7 +856,7 @@
                  grid%ahno3,grid%anh3,grid%cvaro1,grid%cvaro2,grid%cvalk1,grid%cvole1,&
                  grid%cvapi1,grid%cvapi2,grid%cvlim1,grid%cvlim2,grid%dep_vel_o3,     &
                  emis_ant(ims,kms,jms,p_e_co),config_flags%kemit,                     &
-                 config_flags%sf_urban_physics,numgas,current_month,                  &
+                 config_flags%sf_urban_physics,numgas,current_month,dvel,grid%snowh,  &
                  ids,ide, jds,jde, kds,kde,                                           &
                  ims,ime, jms,jme, kms,kme,                                           &
                  its,ite,jts,jte,kts,kte)
@@ -862,8 +894,9 @@
 !
 !
      if( config_flags%cu_physics>0 .and. config_flags%chem_conv_tr>0)then
-        call wrf_debug(15,'calling conv transport')
-        call grelldrvct(grid%DT,ktau,grid%DX,grid%id,config_flags,                    &
+        call wrf_debug(15,'calling conv transport for chemical species')
+        if(config_flags%chem_opt >0 )then
+        call grelldrvct(grid%DT,ktau,grid%DX,                                         &
              rho,grid%RAINCV_B,chem,                                                  &
 #if (NMM_CORE == 1)
              U_phy,V_phy,t_phy,moist_trans,dz8w,                                      &
@@ -872,19 +905,39 @@
              U_phy,V_phy,t_phy,moist,dz8w,                                            &
 #endif
              p_phy,XLV,CP,G,r_v,                                                      &
-             z_at_w,                                                                  &
-             grid%cu_co_ten,                                                          &
-             numgas,config_flags%chem_opt,                                            &
+             z_at_w,grid%cu_co_ten,                                                   &
+             grid%k22_shallow,grid%kbcon_shallow,grid%ktop_shallow,grid%xmb_shallow,  &
+             config_flags%ishallow,num_moist,numgas,num_chem,config_flags%chem_opt,0, &
              ids,ide, jds,jde, kds,kde,                                               &
              ims,ime, jms,jme, kms,kme,                                               &
              its,ite,jts,jte,kts,k_end)
-        if( config_flags%chem_opt == MOZART_KPP .or. &
-            config_flags%chem_opt == MOZCART_KPP ) then
-           call mozcart_lbc_set( chem, num_chem, &
+             if( config_flags%chem_opt == MOZART_KPP .or. &
+                 config_flags%chem_opt == MOZCART_KPP ) then
+                     call mozcart_lbc_set( chem, num_chem, &
                                  ims, ime, jms, jme, kms, kme,    &
                                  its, ite, jts, jte, kts )
-        end if
+             end if
+        endif
+        if (config_flags%tracer_opt > 0)then
+        call wrf_debug(15,'calling conv transport for tracers')
+        call grelldrvct(grid%DT,ktau,grid%DX,                    &
+             rho,grid%RAINCV_B,tracer,                               &
+#if (NMM_CORE == 1)
+             U_phy,V_phy,t_phy,moist_trans,dz8w,                                      &
+#endif         
+#if (EM_CORE == 1)
+             U_phy,V_phy,t_phy,moist,dz8w,                                            &
+#endif
+             p_phy,XLV,CP,G,r_v,                                                      &
+             z_at_w, grid%cu_co_ten,                                                  &
+             grid%k22_shallow,grid%kbcon_shallow,grid%ktop_shallow,grid%xmb_shallow,  &
+             config_flags%ishallow,num_moist,0,num_tracer,0,config_flags%tracer_opt,  &
+             ids,ide, jds,jde, kds,kde,                                               &
+             ims,ime, jms,jme, kms,kme,                                               &
+             its,ite,jts,jte,kts,k_end)
 
+
+          end if
      end if
 !
 !
@@ -1153,6 +1206,16 @@ end if !Chemistry time step check
 
 
    endif
+   tracer2: SELECT CASE(config_flags%tracer_opt)
+    CASE (TRACER_TEST1, TRACER_TEST2)
+       CALL wrf_debug(15,'tracer mode: reset some tracers')
+       call set_tracer(grid%dt,ktau,pbl_h,tracer,t_phy,         &
+                        config_flags%tracer_opt,num_tracer,     &
+                       zmid,grid%ht,ids,ide, jds,jde, kds,kde,  & ! domain dims
+                               ims,ime, jms,jme, kms,kme,       & ! memory dims
+                               its,ite, jts,jte, kts,kte )
+   END SELECT tracer2
+
 
 # if ( EM_CORE == 1 ) 
    END DO chem_tile_loop_1
@@ -1179,4 +1242,5 @@ end if !Chemistry time step check
     deallocate(moist_trans)
     deallocate(scalar_trans)
 #endif
+
     END subroutine chem_driver

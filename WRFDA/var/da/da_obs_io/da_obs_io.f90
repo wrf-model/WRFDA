@@ -22,11 +22,12 @@ module da_obs_io
       obs_names, num_ob_indexes, fm_index, ids,ide, ite, jte, &
       sound, mtgirs,synop, pilot, satem, geoamv, polaramv, airep, gpspw, gpsref, &
       tamdar, tamdar_sfc, metar, ships, ssmi_rv, ssmi_tb, ssmt1, ssmt2, qscat, profiler, buoy, bogus, pseudo, &
-      radar, radiance, airsr, sonde_sfc, trace_use_dull, num_fgat_time, time_slots, myproc
+      radar, radiance, airsr, sonde_sfc, trace_use_dull, num_fgat_time, time_slots, myproc, &
+      qmarker_retain, anal_type_verify
 
-   use da_define_structures, only : iv_type, multi_level_type, &
+   use da_define_structures, only : iv_type, multi_level_type, multi_level_type_BUFR, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
-      radar_each_level_type, info_type, model_loc_type
+      radar_each_level_type, info_type, model_loc_type,gpsref_type
    use da_grid_definitions, only : da_ffdduv
    use da_obs, only : da_count_filtered_obs,da_check_missing,da_obs_proc_station
    use da_par_util1, only : da_proc_sum_int
@@ -74,9 +75,7 @@ contains
 #include "da_write_modified_filtered_obs.inc"
 #include "da_write_y.inc"
 #include "da_read_obs_bufr.inc"
-#include "da_scan_obs_bufr.inc"
 #include "da_read_obs_bufrgpsro.inc"
-#include "da_scan_obs_bufrgpsro.inc"
 #include "da_final_write_obs.inc"
 #include "da_final_write_y.inc"
 #include "da_read_y_unit.inc"

@@ -24,7 +24,7 @@
    USE module_state_description
    USE module_phot_mad
 
-!  USE module_ftuv_driver, only : ftuv_init
+   USE module_ftuv_driver, only : ftuv_init
    USE module_aerosols_sorgam
    USE module_dep_simple
    USE module_data_gocart_dust
@@ -306,10 +306,10 @@ call wrf_message("**************************************************************
                ids,ide, jds,jde, kds,kde,                            &
                ims,ime, jms,jme, kms,kme,                            &
                its,ite, jts,jte, kts,kte                             )
-!     CASE (FTUV)
-!     CALL wrf_debug(00,'call ftuv phot initialization')
-!       call ftuv_init( its, ite, jts, jte, kte, &
-!                       ide, jde, config_flags%chem_opt )
+      CASE (FTUV)
+      CALL wrf_debug(00,'call ftuv phot initialization')
+        call ftuv_init( its, ite, jts, jte, kte, &
+                        ide, jde, config_flags%chem_opt )
 
   END SELECT phot_select
 !
@@ -336,7 +336,7 @@ call wrf_message("**************************************************************
 
    if( .NOT. config_flags%restart ) then
    kpp_select: SELECT CASE(config_flags%chem_opt)
-     CASE (GOCARTRACM_KPP,RACM_KPP,RACMPM_KPP,RACMSORG_KPP, RACM_MIM_KPP)
+     CASE (GOCARTRACM_KPP,RACM_KPP,RACMPM_KPP,RACMSORG_KPP, RACM_MIM_KPP,RACM_ESRLSORG_KPP)
         if(config_flags%chem_in_opt == 0 )then
           do j=jts,jte
              do k=kts,kte
@@ -361,6 +361,16 @@ call wrf_message("**************************************************************
              do k=kts,kte
                 do i=its,ite
                    chem(i,k,j,p_co2)=370.
+                   chem(i,k,j,p_ch4)=1.7
+                enddo
+             enddo
+          enddo
+        endif
+        CASE (CBMZ_BB_KPP)
+        if(config_flags%chem_in_opt == 0 )then
+          do j=jts,jte
+             do k=kts,kte
+                do i=its,ite
                    chem(i,k,j,p_ch4)=1.7
                 enddo
              enddo
@@ -470,7 +480,7 @@ call wrf_message("**************************************************************
         CALL wrf_debug(15,'MOZCART dust initialization')
         ch_dust(:,:) = 0.8e-9_8
 
-     CASE (RADM2SORG, RADM2SORG_AQ, RACMSORG_AQ, RADM2SORG_KPP, RACMSORG_KPP)
+     CASE (RADM2SORG, RADM2SORG_AQ, RACMSORG_AQ, RADM2SORG_KPP, RACMSORG_KPP,RACM_ESRLSORG_KPP)
        CALL wrf_debug(15,'call MADE/SORGAM aerosols initialization')
 
        call aerosols_sorgam_init(chem,convfac,z_at_w,                &
@@ -530,17 +540,18 @@ call wrf_message("**************************************************************
 !
 ! initialization for wesely (gas) dry deposition
 !
-   drydep_select: SELECT CASE(config_flags%drydep_opt)
+   drydep_select: SELECT CASE(config_flags%gas_drydep_opt)
      CASE (WESELY)
        CALL wrf_debug(15,'initializing dry dep (wesely)')
-       call dep_init(id,config_flags,numgas)
+       call dep_init( id, config_flags, numgas, &
+                      its, ite, jts, jte, ide, jde )
 
    END SELECT drydep_select
 !
 ! initialization for cbmz gas-phase chemistry
 !
    cbmz_select: SELECT CASE(config_flags%chem_opt)
-     CASE (CBMZ, CBMZ_BB, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, &
+     CASE (CBMZ, CBMZ_BB, CBMZ_BB_KPP, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, &
            CBMZ_MOSAIC_4BIN_AQ, CBMZ_MOSAIC_8BIN_AQ)
        CALL wrf_debug(15,'initializing cbmz gas-phase chemistry')
        if(config_flags%chem_in_opt == 0 )then
@@ -661,7 +672,7 @@ subroutine print_chem_species_index( chem_opt )
      print*,p_iso,"iso"
      print*,p_ho,"ho"
      print*,p_ho2,"ho2"
-  case (RACMSORG_AQ, RACM_KPP, RACMPM_KPP, RACMSORG_KPP)
+  case (RACMSORG_AQ, RACM_KPP, RACMPM_KPP, RACMSORG_KPP,RACM_ESRLSORG_KPP)
      print*,p_so2,"so2"
      print*,p_sulf,"sulf"
      print*,p_no2,"no2"
@@ -784,7 +795,7 @@ subroutine print_chem_species_index( chem_opt )
      print*,p_ch3so2oo,"ch3so2oo"
      print*,p_ch3so2ch2oo,"ch3so2ch2oo"
      print*,p_mtf,"mtf"
-  case (CBMZ_BB, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, CBMZ_MOSAIC_4BIN_AQ, CBMZ_MOSAIC_8BIN_AQ)
+  case (CBMZ_BB, CBMZ_BB_KPP, CBMZ_MOSAIC_4BIN, CBMZ_MOSAIC_8BIN, CBMZ_MOSAIC_4BIN_AQ, CBMZ_MOSAIC_8BIN_AQ)
      print*,p_so2,"so2"
      print*,p_sulf,"sulf"
      print*,p_no2,"no2"
@@ -807,6 +818,7 @@ subroutine print_chem_species_index( chem_opt )
      print*,p_hc5,"hc5"
      print*,p_hc8,"hc8"
      print*,p_eth,"eth"
+     print*,p_ch4,"ch4"
      print*,p_co,"co"
      print*,p_ol2,"ol2"
      print*,p_olt,"olt"
@@ -851,7 +863,7 @@ subroutine print_chem_species_index( chem_opt )
 ! Aerosol species...
 !
   select case (chem_opt)
-  case (RADM2SORG, RADM2SORG_AQ, RADM2SORG_KPP, RACMSORG, RACMSORG_AQ, RACMSORG_KPP)
+  case (RADM2SORG, RADM2SORG_AQ, RADM2SORG_KPP, RACMSORG, RACMSORG_AQ, RACMSORG_KPP,RACM_ESRLSORG_KPP)
      print*,p_so4aj,"so4aj"
      print*,p_so4ai,"so4ai"
      print*,p_nh4aj,"nh4aj"
