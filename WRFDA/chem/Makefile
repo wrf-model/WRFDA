@@ -9,9 +9,9 @@ MODULES =                           \
   module_chem_utilities.o           \
   module_data_radm2.o               \
   module_data_sorgam.o              \
-  module_input_chem_emissopt3.o     \
   module_plumerise1.o     \
   module_add_emiss_burn.o     \
+  module_aer_opt_out.o     \
   module_zero_plumegen_coms.o     \
   module_chem_plumerise_scalar.o     \
   module_data_cbmz.o                \
@@ -79,6 +79,8 @@ MODULES =                           \
   module_cmu_bulkaqchem.o           \
   module_mosaic_cloudchem.o         \
   module_wetscav_driver.o           \
+  module_lightning_driver.o         \
+  module_ltng_crm.o                 \
   module_mixactivate_wrappers.o
 
 
@@ -105,6 +107,10 @@ clean:
 	@ echo 'use the clean script'
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
+
+module_lightning_driver.o: module_ltng_crm.o
+
+module_ltng_crm.o:
 
 module_mixactivate_wrappers.o: ../phys/module_mixactivate.o
 
@@ -170,8 +176,6 @@ module_wave_data.o:
 
 module_input_chem_data.o: module_aerosols_sorgam.o
 
-module_input_chem_emissopt3.o: 
-
 module_input_chem_bioemiss.o: 
 
 module_input_dust_errosion.o:
@@ -181,6 +185,8 @@ module_input_gocart_dms.o:
 module_dep_simple.o: 
 
 module_bioemi_simple.o: 
+
+module_aer_opt_out.o: 
 
 module_data_megan2.o: 
 
@@ -194,7 +200,7 @@ module_emissions_anthropogenics.o:
 
 module_data_sorgam.o: 
 
-module_aerosols_sorgam.o: 
+module_aerosols_sorgam.o:
 
 module_cbmz_lsodes_solver.o: 
 
@@ -256,7 +262,7 @@ photolysis_driver.o: module_phot_mad.o module_phot_fastj.o module_ftuv_driver.o
 
 mechanism_driver.o: module_data_radm2.o module_radm.o module_aerosols_sorgam.o module_data_cbmz.o module_cbmz.o
 
-emissions_driver.o: module_add_emiss_burn.o module_data_radm2.o module_radm.o module_bioemi_simple.o module_bioemi_beis313.o module_bioemi_megan2.o module_emissions_anthropogenics.o module_cbmz_addemiss.o module_mosaic_addemiss.o module_aerosols_sorgam.o module_plumerise1.o module_gocart_dust.o module_gocart_seasalt.o
+emissions_driver.o: module_add_emiss_burn.o module_data_radm2.o module_radm.o module_bioemi_simple.o module_bioemi_beis313.o module_bioemi_megan2.o module_emissions_anthropogenics.o module_cbmz_addemiss.o module_mosaic_addemiss.o module_aerosols_sorgam.o module_plumerise1.o module_gocart_dust.o module_gocart_seasalt.o module_lightning_driver.o
 
 dry_dep_driver.o: module_data_radm2.o module_dep_simple.o module_aerosols_sorgam.o module_mosaic_drydep.o ../phys/module_mixactivate.o
 

@@ -896,7 +896,7 @@
       IDUMMY=0
       ISFFLX=1
       DX=0.
-      SST_UPDATE=0
+      SST_UPDATE=config_flags%SST_UPDATE
 !
 !$omp parallel do                                                       &
 !$omp& private(i,j)
@@ -1206,7 +1206,7 @@
      &          ,SF_SFCLAY_PHYSICS=CONFIG_FLAGS%SF_SFCLAY_PHYSICS       &
      &          ,SF_SURFACE_PHYSICS=CONFIG_FLAGS%SF_SURFACE_PHYSICS     &
      &          ,RA_LW_PHYSICS=CONFIG_FLAGS%RA_LW_PHYSICS               &
-     &          ,LAI=GRID%LAI                                           &
+     &          ,LAI=GRID%LAI,IZ0TLND=CONFIG_FLAGS%IZ0TLND              &
      &          ,SF_URBAN_PHYSICS=SF_URBAN_PHYSICS                      &
 !     &          ,GMT=GMT,XLAT=XLAT,XLONG=XLONG,JULDAY=JULDAY            &
      &          ,NUM_URBAN_LAYERS=NUM_URBAN_LAYERS                      &

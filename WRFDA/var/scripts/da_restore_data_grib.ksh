@@ -38,7 +38,7 @@ while [[ $LOCAL_DATE -le $END_DATE ]]; do
    DAY=$(echo $LOCAL_DATE | cut -c7-8)
    HOUR=$(echo $LOCAL_DATE | cut -c9-10)
    
-   FILE=fnl_${YY}${MONTH}${DAY}_${HOUR}_00
+   FILE=fnl_20${YY}${MONTH}${DAY}_${HOUR}_00
    DIR=${GRIB_DIR}/$LOCAL_DATE
    mkdir -p ${DIR}
 

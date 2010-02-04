@@ -106,7 +106,7 @@ subroutine da_calculate_gradj(it, iter, cv_size, cv_size_jb, cv_size_je, cv_size
    !-------------------------------------------------------------------------
    ! [3.5] calculate grad_v (jl):
    !-------------------------------------------------------------------------
-   if (cv_size_jl > 0) grad_jl(jl_start:jl_end) = jl_factor * xhat(jl_start:jl_end)
+   if (cv_size_jl > 0) grad_jl(jl_start:jl_end) = jl_factor * grad_jl(jl_start:jl_end)
 
    !-------------------------------------------------------------------------
    ! [4.0] calculate grad_v (jp):

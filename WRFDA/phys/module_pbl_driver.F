@@ -708,16 +708,15 @@ CONTAINS
               ,RQCBLTEN=rqcblten,RQIBLTEN=rqiblten                  &
               ,FLAG_QI=flag_qi                                      &
               ,CP=cp,G=g,ROVCP=rcp,RD=r_D,ROVG=rovg                 &
-              ,DZ8W=dz8w,Z=z,XLV=XLV,RV=r_v,PSFC=PSFC               &
+              ,DZ8W=dz8w,XLV=XLV,RV=r_v,PSFC=PSFC                   &
               ,ZNU=znu,ZNW=znw,MUT=mut,P_TOP=p_top                  &
-              ,ZNT=znt,UST=ust,ZOL=zol,HOL=hol,HPBL=pblh            &
+              ,ZNT=znt,UST=ust,HPBL=pblh                            &
               ,PSIM=psim,PSIH=psih,XLAND=xland                      &
-              ,HFX=hfx,QFX=qfx,TSK=tskold,GZ1OZ0=gz1oz0             &
+              ,HFX=hfx,QFX=qfx,GZ1OZ0=gz1oz0                        &
               ,U10=u10,V10=v10                                      &
-              ,WSPD=wspd,BR=br,DT=dtbl,DTMIN=dtmin,KPBL2D=kpbl      &
-              ,SVP1=svp1,SVP2=svp2,SVP3=svp3,SVPT0=svpt0            &
-              ,EP1=ep_1,EP2=ep_2,KARMAN=karman,EOMEG=eomeg          &
-              ,STBOLT=stbolt,EXCH_H=exch_h,REGIME=regime            &
+              ,WSPD=wspd,BR=br,DT=dtbl,KPBL2D=kpbl                  &
+              ,EP1=ep_1,EP2=ep_2,KARMAN=karman                      &
+              ,EXCH_H=exch_h,REGIME=regime                          &
               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde      &
               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme      &
               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte      &
@@ -996,6 +995,7 @@ CONTAINS
               ,VAR2D=var2d,OC12D=oc12d     &
               ,OA2D1=oa1,OA2D2=oa2,OA2D3=oa3,OA2D4=oa4  &
               ,OL2D1=ol1,OL2D2=ol2,OL2D3=ol3,OL2D4=ol4  &
+              ,ZNU=znu,ZNW=znw,MUT=mut,P_TOP=p_top                  &
               ,CP=cp,G=g,RD=r_d                           &
               ,RV=r_v,EP1=ep_1,PI=3.141592653                        &
               ,DT=dtbl,DX=dx,KPBL2D=kpbl,ITIMESTEP=itimestep      &

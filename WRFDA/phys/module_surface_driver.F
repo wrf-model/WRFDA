@@ -59,7 +59,7 @@ CONTAINS
      &          ,capg,hol,mol                                         &
      &          ,rainncv,rainbl,regime,thc                            &
      &          ,qsg,qvg,qcg,soilt1,tsnav                             &
-     &          ,smfr3d,keepfr3dflag                                  &
+     &          ,smfr3d,keepfr3dflag,dew                              &
              !  Other optionals (more or less nmm specific)
      &          ,potevp,snopcx,soiltb,sr                              &
              !  Optional observation PX LSM surface nudging
@@ -71,7 +71,7 @@ CONTAINS
              !  Optional simple oml model
      &          ,omlcall,oml_hml0,oml_gamma                           &
      &          ,tml,t0ml,hml,h0ml,huml,hvml,f                        &
-     &          ,ustm,ck,cka,cd,cda,isftcflx                          &
+     &          ,ustm,ck,cka,cd,cda,isftcflx,iz0tlnd                  &
      &         ,isurban, mminlu                                       &
      &          ,snotime                                              &
      &           ,rdlai2d                                             &
@@ -140,6 +140,7 @@ CONTAINS
    USE module_sf_slab
 !
    USE module_sf_sfcdiags
+   USE module_sf_sfcdiags_ruclsm
    USE module_sf_sstskin
    USE module_sf_tmnupdate
 !
@@ -498,7 +499,7 @@ CONTAINS
 #endif
 
 
-   INTEGER, OPTIONAL, INTENT(IN )::   ISFTCFLX
+   INTEGER, OPTIONAL, INTENT(IN )::   ISFTCFLX,IZ0TLND
    INTEGER, OPTIONAL, INTENT(IN )::   OMLCALL
    REAL   , OPTIONAL, INTENT(IN )::   OML_HML0
    REAL   , OPTIONAL, INTENT(IN )::   OML_GAMMA
@@ -563,6 +564,7 @@ CONTAINS
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   qsg
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   qvg
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   qcg
+   REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   dew
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   soilt1
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   tsnav
    REAL, DIMENSION( ims:ime, jms:jme ), OPTIONAL, INTENT(INOUT)::   potevp ! NMM LSM
@@ -764,6 +766,9 @@ CONTAINS
           IVGTYP(I,J) = ISWATER
           ISLTYP(I,J) = 14
           VEGFRA(I,J) = 0.
+          SNOW(I,J)  = 0.
+          SNOWC(I,J) = 0.
+          SNOWH(I,J) = 0.
           TMN(I,J) = SST(I,J)
           DO nk = 1, num_soil_layers
             TSLB(I,NK,J) = SST(I,J)
@@ -773,27 +778,35 @@ CONTAINS
         ENDIF
       ENDDO
       ENDDO
-    IF(PRESENT(SST_SKIN))THEN
+    ENDDO
+    !$OMP END PARALLEL DO
+  ENDIF
+
+  IF(PRESENT(SST_SKIN))THEN
     IF (sst_skin .EQ. 1) THEN
- ! Calculate skin sst based on Zeng and Beljaars (2005)
-        CALL wrf_debug( 100, 'in SST_UPDATE' )
+! Calculate skin sst based on Zeng and Beljaars (2005)
+        CALL wrf_debug( 100, 'in SST_SKIN_UPDATE' )
         CALL sst_skin_update(xland,glw,gsw,hfx,qfx,tsk,ust,         &
                 emiss,dtw,sstsk,dt,stbolt,                          &
                 ids, ide, jds, jde, kds, kde,                       &
                 ims, ime, jms, jme, kms, kme,                       &
                 i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte   )
+    !$OMP PARALLEL DO   &
+    !$OMP PRIVATE ( ij, i, j, k )
+    DO ij = 1 , num_tiles
         DO j=j_start(ij),j_end(ij)
           DO i=i_start(ij),i_end(ij)
             IF(XLAND(i,j) .GT. 1.5)TSK(i,j)=SSTSK(i,j)
           ENDDO
         ENDDO
-    ENDIF
-    ENDIF
     ENDDO
     !$OMP END PARALLEL DO
+    ENDIF
   ENDIF
+
   IF(PRESENT(TMN_UPDATE))THEN
   IF (tmn_update .EQ. 1) THEN
+      CALL wrf_debug( 100, 'in TMN_UPDATE' )
       CALL tmnupdate(tsk,tmn,tlag,tyr,tyra,tdly,nday,nyear,lagday, &
                 julian_in, dt, yr,                                  &
                 ids, ide, jds, jde, kds, kde,                       &
@@ -802,8 +815,6 @@ CONTAINS
 
   ENDIF
   ENDIF
-
-
 !
 ! Modified for adaptive time step
 !
@@ -927,7 +938,7 @@ CONTAINS
                  ids,ide, jds,jde, kds,kde,                          &
                  ims,ime, jms,jme, kms,kme,                          &
                  i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte,    &
-                 ustm,ck,cka,cd,cda,isftcflx                         )
+                 ustm,ck,cka,cd,cda,isftcflx,iz0tlnd                 )
          ELSE
          CALL SFCLAY(u_phytmp,v_phytmp,t_phy,qv_curr,&
                p_phy,dz8w,cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm, &
@@ -940,7 +951,7 @@ CONTAINS
                ids,ide, jds,jde, kds,kde,                          &
                ims,ime, jms,jme, kms,kme,                          &
                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte,    &
-               ustm,ck,cka,cd,cda,isftcflx                         )
+               ustm,ck,cka,cd,cda,isftcflx,iz0tlnd                 )
 #if ( EM_CORE==1)
            DO j = j_start(ij),j_end(ij)
            DO i = i_start(ij),i_end(ij)
@@ -1006,7 +1017,7 @@ CONTAINS
                 u_phy,v_phy,tke_myj,                                 &
                 tsk,qsfc,thz0,qz0,uz0,vz0,                           &
                 lowlyr,                                              &
-                xland,                                               &
+                xland,ivgtyp,isurban,iz0tlnd,                        &
                 XICE_THRESHOLD,                                      & ! Extra for wrapper.
                 XICE, SST,                                           & ! Extra for wrapper.
                 CHS_SEA, CHS2_SEA, CQS2_SEA, CPM_SEA,            &
@@ -1029,7 +1040,7 @@ CONTAINS
               u_phy,v_phy,tke_myj,                                 &
               tsk,qsfc,thz0,qz0,uz0,vz0,                           &
               lowlyr,                                              &
-              xland,                                               &
+              xland,ivgtyp,isurban,iz0tlnd,                        &
               ust,znt,z0,pblh,mavail,rmol,                         &
               akhs,akms,                                           &
               br,                                                 &
@@ -1461,6 +1472,7 @@ CONTAINS
            PRESENT(qcg)        .AND.  PRESENT(soilt1)  .AND.    &
            PRESENT(tsnav)      .AND.  PRESENT(smfr3d)  .AND.    &
            PRESENT(keepfr3dflag) .AND. PRESENT(rainbl) .AND.    &
+           PRESENT(dew)                                .AND.    &
                                                       .TRUE. ) THEN
 
            IF( PRESENT(sr) ) THEN
@@ -1507,10 +1519,11 @@ CONTAINS
                 dz8w,p8w,t_phy,qv_curr,qc_curr,rho,             & !p8w in [pa]
                 glw,gsw,emiss,chklowq,                          &
                 chs,flqc,flhc,mavail,canwat,vegfra,albedo,znt,  &
-                snoalb, albbck,                                 &   !new
-                qsfc,qsg,qvg,qcg,soilt1,tsnav,                  &
-                tmn,ivgtyp,isltyp,xland,xice,                   &
-                cp,g,xlv,stbolt,                                &
+                z0,snoalb, albbck,                              &   !new
+                qsfc,qsg,qvg,qcg,dew,soilt1,tsnav,              &
+                tmn,ivgtyp,isltyp,xland,                        &
+                isice,xice,xice_threshold,                      &
+                cp,rovcp,g,xlv,stbolt,                          &
                 smois,sh2o,smstav,smstot,tslb,tsk,hfx,qfx,lh,   &
                 sfcrunoff,udrunoff,sfcexc,                      &
                 sfcevp,grdflx,acsnow,acsnom,                    &
@@ -1556,14 +1569,13 @@ CONTAINS
                  ENDDO
               endif
            ENDIF
-!tgs     IF(.not. MYJ) then
-             
-          CALL SFCDIAGS(HFX,QFX,TSK,QVG,CHS2,CQS2,T2,TH2,Q2,      &
-                     PSFC,CP,R_d,RCP,                              &
-                     ids,ide, jds,jde, kds,kde,                    &
-                     ims,ime, jms,jme, kms,kme,                    &
-             i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
-!tgs     ENDIF
+
+          CALL SFCDIAGS_RUCLSM(HFX,QFX,TSK,QSFC,CHS2,CQS2,T2,TH2,Q2,      &
+                     T_PHY,QV_CURR,RHO,P8W,                              &
+                     PSFC,CP,R_d,RCP,                                    &
+                     ids,ide, jds,jde, kds,kde,                          &
+                     ims,ime, jms,jme, kms,kme,                          &
+                     i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
 
 
        ELSE
@@ -1723,7 +1735,7 @@ CONTAINS
    subroutine myjsfc_seaice_wrapper(ITIMESTEP,HT,DZ,      &
         &     PMID,PINT,TH,T,QV,QC,U,V,Q2,                &
         &     TSK,QSFC,THZ0,QZ0,UZ0,VZ0,                  &
-        &     LOWLYR,XLAND,                               &
+        &     LOWLYR,XLAND,IVGTYP,ISURBAN,IZ0TLND,        &
         &     XICE_THRESHOLD,                             &  ! Extra for wrapper
         &     XICE,SST,                                   &  ! Extra for wrapper
         &     CHS_SEA, CHS2_SEA, CQS2_SEA, CPM_SEA,       &  ! Extra for wrapper
@@ -1768,6 +1780,9 @@ CONTAINS
      REAL,DIMENSION(IMS:IME,JMS:JME),        INTENT(INOUT) :: VZ0
      INTEGER,DIMENSION(IMS:IME,JMS:JME),     INTENT(IN)    :: LOWLYR
      REAL,DIMENSION(IMS:IME,JMS:JME),        INTENT(IN)    :: XLAND
+     INTEGER,DIMENSION(IMS:IME,JMS:JME),     INTENT(IN)    :: IVGTYP
+     INTEGER                                               :: ISURBAN
+     INTEGER                                               :: IZ0TLND
      REAL,DIMENSION(IMS:IME,JMS:JME),        INTENT(IN)    :: XICE       ! Extra for wrapper
      ! REAL,DIMENSION(IMS:IME,JMS:JME),        INTENT(IN)    :: SST        ! Extra for wrapper
      REAL,DIMENSION(IMS:IME,JMS:JME),        INTENT(INOUT) :: SST        ! Extra for wrapper
@@ -1992,7 +2007,7 @@ CONTAINS
      CALL MYJSFC ( ITIMESTEP, HT, DZ,                              &  ! I,I,I,
           &        PMID, PINT, TH, T, QV, QC, U, V, Q2,            &  ! I,I,I,I,I,I,I,I,I,
           &        TSK, QSFC, THZ0, QZ0, UZ0, VZ0,                 &  ! I,IO,IO,IO,IO,IO,
-          &        LOWLYR, XLAND,                                  &  ! I,I,
+          &        LOWLYR, XLAND, IVGTYP, ISURBAN, IZ0TLND,        &  ! I,I,I,I,I
           &        USTAR, ZNT, Z0BASE, PBLH, MAVAIL, RMOL,         &  ! IO,IO,I,IO,I,IO,
           &        AKHS, AKMS,                                     &  ! IO,IO,
           &        BR,                                             &  ! O
@@ -2047,7 +2062,7 @@ CONTAINS
      CALL MYJSFC ( ITIMESTEP, HT, DZ,                                                          & ! I,I,I,
           &        PMID, PINT, TH, T, QV, QC, U, V, Q2,                                        & ! I,I,I,I,I,I,I,I,I,
           &        TSK_SEA, QSFC_SEA, THZ0_SEA, QZ0_SEA, UZ0_SEA, VZ0_SEA,                     & ! I,IO,IO,IO,IO,IO,
-          &        LOWLYR, XLAND_SEA,                                                    & ! I,I,
+          &        LOWLYR, XLAND_SEA, IVGTYP, ISURBAN, IZ0TLND,                                & ! I,I,I,I,I,
           &        USTAR_SEA, ZNT_SEA, Z0BASE_SEA, PBLH_SEA, MAVAIL_SEA, RMOL_SEA,             & ! IO,IO,I,IO,I,IO,
           &        AKHS_SEA, AKMS_SEA,                                                         & ! IO,IO,
           &        BR_SEA,                                                                     & ! dummy space holder
@@ -2426,7 +2441,7 @@ ITIMESTEP,XICE_THRESHOLD,                                          &
                      ids,ide, jds,jde, kds,kde,                    &
                      ims,ime, jms,jme, kms,kme,                    &
                      its,ite, jts,jte, kts,kte,                    &
-                     ustm,ck,cka,cd,cda,isftcflx                   )
+                     ustm,ck,cka,cd,cda,isftcflx,iz0tlnd           )
      USE module_sf_sfclay
      implicit none
 
@@ -2498,7 +2513,7 @@ ITIMESTEP,XICE_THRESHOLD,                                          &
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme )              , &
                INTENT(OUT)     ::              ck,cka,cd,cda,ustm
 
-     INTEGER,  OPTIONAL,  INTENT(IN )   ::     ISFTCFLX
+     INTEGER,  OPTIONAL,  INTENT(IN )   ::     ISFTCFLX,IZ0TLND
 
 !--------------------------------------------------------------------
 !    New for wrapper
@@ -2579,7 +2594,7 @@ ITIMESTEP,XICE_THRESHOLD,                                          &
       ! SVP1,SVP2,SVP3,SVPT0
       ! EP1,EP2,KARMAN,EOMEG,STBOLT
       ! CP,G,ROVCP,R,XLV,DX
-      ! ISFTCFLX
+      ! ISFTCFLX,IZ0TLND
       ! P1000
       ! dz8w
       ! QV3D
@@ -2681,7 +2696,7 @@ ITIMESTEP,XICE_THRESHOLD,                                          &
                  ids,ide, jds,jde, kds,kde,                    &
                  ims,ime, jms,jme, kms,kme,                    &
                  its,ite, jts,jte, kts,kte,                    &
-                 ustm,ck,cka,cd,cda,isftcflx                   )
+                 ustm,ck,cka,cd,cda,isftcflx,iz0tlnd           )
 
      ! Set up for open-water call
      DO j = JTS , JTE
@@ -2746,7 +2761,7 @@ ITIMESTEP,XICE_THRESHOLD,                                          &
                  ids,ide, jds,jde, kds,kde,                    &
                  ims,ime, jms,jme, kms,kme,                    &
                  its,ite, jts,jte, kts,kte,                    & ! 0
-                 ustm_sea,ck_sea,cka_sea,cd_sea,cda_sea,isftcflx   )
+                 ustm_sea,ck_sea,cka_sea,cd_sea,cda_sea,isftcflx,iz0tlnd )
 
      DO j = JTS , JTE
         DO i = ITS, ITE

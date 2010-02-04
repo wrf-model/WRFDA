@@ -237,6 +237,7 @@ SUBROUTINE med_before_solve_io ( grid , config_flags )
 ! - Look for boundary data after writing out history and restart files
    CALL med_latbound_in ( grid , config_flags )
 
+
    RETURN
 END SUBROUTINE med_before_solve_io
 
@@ -2115,9 +2116,6 @@ SUBROUTINE med_read_wrf_chem_emiss ( grid , config_flags )
                WRITE( message , * ) 'med_read_wrf_chem_emissions: error opening ', TRIM( inpname )
                CALL wrf_error_fatal( TRIM( message ) )
             ENDIF
-          ELSE 
-             WRITE( message , '(A,I10)' ) 'med_read_wrf_chem_emissions: error in emissions file time ', ihr
-             CALL wrf_error_fatal( TRIM( message ) )
           ENDIF
 
          WRITE( message, '(A,2F10.1)' ) ' HOURLY EMISSIONS UPDATE TIME ',time,mod(time,3600.)

@@ -45,6 +45,10 @@
       call nl_get_base_temp  ( 1 , base_temp )
       call nl_get_base_lapse ( 1 , base_lapse )
       call nl_get_iso_temp   ( 1 , iso_temp )
+      grid%p00   = base_pres
+      grid%t00   = base_temp
+      grid%tlp   = base_lapse
+      grid%tiso  = iso_temp
    else
       base_pres  = grid%p00
       base_temp  = grid%t00
@@ -312,6 +316,14 @@
                coarse_ix, coarse_jy, start_x, start_y)
           end if     
          end if     
+      end if
+
+      ! [8.7.1] Write Ascii radar OMB and OMA file
+
+      if (use_radarobs) then
+         write(unit=stdout,fmt='(A)')  'Writing radar OMB and OMA ascii file'
+         write(unit=stdout,fmt=*)  " "
+         call da_write_oa_radar_ascii (ob,iv,re)
       end if
 
       ! [8.3] Interpolate x_g to low resolution grid

@@ -239,26 +239,8 @@ subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
 
 #else
 
-!  do j=jts,jte
-!     do k=kts,kte
-!        do i=its,ite+1
-!           grid%xa%u(i,j,k) = grid%u_2(i,j,k)
-!        end do
-!     end do
-!  end do
-
-!  do j=jts,jte+1
-!     do k=kts,kte
-!        do i=its,ite
-!           grid%xa%v(i,j,k) = grid%v_2(i,j,k)
-!        end do
-!     end do
-!  end do
-
-   ! Fill the halo region for u and v.
-
 #ifdef DM_PARALLEL
-#include "HALO_PSICHI_UV_ADJ.inc"
+#include "HALO_EM_C.inc"
 #endif
 
 #endif
@@ -345,6 +327,10 @@ subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
       ! Adapted the code from WRF module_big_step_utilitites_em.F ----
       !         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
 
+      ! NOTE: as of V3.1, P (pressure perturbation) and PB (base state pressure)
+      ! are included in the wrfinput file. However, P and PB are still
+      ! re-calculated here.
+
       cvpm =  - (1.0 - gas_constant/cp)
       cpovcv = cp / (cp - gas_constant)
 
@@ -352,6 +338,7 @@ subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
          do i=its,ite
             ! The base specific volume (from real.init.code)
             ppb  = grid%znu(k) * grid%mub(i,j) + ptop
+            grid%pb(i,j,k) = ppb
             temp = MAX ( iso_temp, base_temp + base_lapse*log(ppb/base_pres) )
             ttb  = temp * (base_pres/ppb)**kappa
             ! ttb  = (base_temp + base_lapse*log(ppb/base_pres)) * &
@@ -376,15 +363,12 @@ subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
       do k=kts,kte+1
          do i=its,ite
             grid%xb%hf(i,j,k) = (grid%phb(i,j,k)+grid%ph_2(i,j,k))/gravity
-!           grid%xa%w (i,j,k) = grid%w_2(i,j,k)
             grid%xb%w (i,j,k) = grid%w_2(i,j,k)
          end do
       end do
 
       do k=kts,kte
          do i=its,ite
-!           grid%xb%u(i,j,k) = 0.5*(grid%xa%u(i,j,k)+grid%xa%u(i+1,j,k))
-!           grid%xb%v(i,j,k) = 0.5*(grid%xa%v(i,j,k)+grid%xa%v(i,j+1,k))
             grid%xb%u(i,j,k) = 0.5*(grid%u_2(i,j,k)+grid%u_2(i+1,j,k))
             grid%xb%v(i,j,k) = 0.5*(grid%v_2(i,j,k)+grid%v_2(i,j+1,k))
             grid%xb%wh(i,j,k)= 0.5*(grid%xb%w(i,j,k)+grid%xb%w(i,j,k+1))
@@ -397,8 +381,8 @@ subroutine da_transfer_wrftoxb(xbx, grid, config_flags)
 
             ! Convert to specific humidity from mixing ratio of water vapor:
             grid%xb%q(i,j,k)=grid%xb%q(i,j,k)/(1.0+grid%xb%q(i,j,k))
-            if (num_pseudo == 0 .and. grid%xb%q(i,j,k) < 1.0e-6) &
-               grid%xb%q(i,j,k) = 1.0e-6
+            if (num_pseudo == 0 .and. grid%xb%q(i,j,k) < 1.0e-9) &
+               grid%xb%q(i,j,k) = 1.0e-9
    
             ! Background qrn needed for radar radial velocity assmiilation:
 

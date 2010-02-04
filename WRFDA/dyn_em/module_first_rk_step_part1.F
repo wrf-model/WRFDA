@@ -132,6 +132,10 @@ CONTAINS
 
    CHARACTER (LEN=256) :: mminlu
 
+#if ( WRF_DFI_RADAR == 1 )
+    INTEGER  do_capsupress   ! =1 do CAP supress, other = don't
+#endif
+
   CALL get_ijk_from_subgrid (  grid ,                   &
                             sids, side, sjds, sjde, skds, skde,    &
                             sims, sime, sjms, sjme, skms, skme,    &
@@ -390,7 +394,7 @@ BENCH_START(surf_driver_tim)
      &        ,ZS=grid%zs              ,XICEM=grid%xicem   ,ISICE=grid%landuse_isice&
      &        ,USTM=grid%ustm          ,CK=grid%ck         ,CKA=grid%cka            &
      &                                 ,CD=grid%cd         ,CDA=grid%cda            &
-     &        ,ISFTCFLX=config_flags%isftcflx                                       &
+     &        ,ISFTCFLX=config_flags%isftcflx, IZ0TLND=config_flags%iz0tlnd         &
      &        ,OMLCALL=config_flags%omlcall ,OML_HML0=config_flags%oml_hml0 ,OML_GAMMA=config_flags%oml_gamma &
      &        ,TML=grid%tml, T0ML=grid%t0ml, HML=grid%hml, H0ML=grid%h0ml, HUML=grid%huml, HVML=grid%hvml, F=grid%f &
      &        ,ISWATER=iswater &
@@ -460,16 +464,16 @@ BENCH_START(surf_driver_tim)
      &        ,QI_CURR=moist(ims,kms,jms,P_QI), F_QI=F_QI                 &
      &        ,QS_CURR=moist(ims,kms,jms,P_QS), F_QS=F_QS                 &
      &        ,QG_CURR=moist(ims,kms,jms,P_QG), F_QG=F_QG                 &
-     &        ,CAPG=grid%capg, EMISS=grid%emiss, HOL=hol,MOL=grid%mol                    &
+     &        ,CAPG=grid%capg, EMISS=grid%emiss, HOL=hol,MOL=grid%mol     &
      &        ,T2OBS=grid%t2obs, Q2OBS=grid%q2obs                         &
      &        ,RAINBL=grid%rainbl,SR=grid%sr                                              &
-     &        ,RAINNCV=grid%rainncv,REGIME=grid%regime,T2=grid%t2,THC=grid%thc                &
-     &        ,QSG=grid%qsg,QVG=grid%qvg,QCG=grid%qcg,SOILT1=grid%soilt1,TSNAV=grid%tsnav          & ! ruc lsm
-     &        ,SMFR3D=grid%smfr3d,KEEPFR3DFLAG=grid%keepfr3dflag                    & ! ruc lsm
-     &        ,POTEVP=grid%POTEVP, SNOPCX=grid%SNOPCX, SOILTB=grid%SOILTB                & ! ruc lsm
+     &        ,RAINNCV=grid%rainncv,REGIME=grid%regime,T2=grid%t2,THC=grid%thc            &
+     &        ,QSG=grid%qsg,QVG=grid%qvg,QCG=grid%qcg,SOILT1=grid%soilt1,TSNAV=grid%tsnav & ! ruc lsm
+     &        ,SMFR3D=grid%smfr3d,KEEPFR3DFLAG=grid%keepfr3dflag,DEW=grid%dew             & ! ruc lsm
+     &        ,POTEVP=grid%POTEVP, SNOPCX=grid%SNOPCX, SOILTB=grid%SOILTB                 & ! ruc lsm
      &        ,ISURBAN=isurban, MMINLU=TRIM(mminlu)                       &
-     &        ,SNOTIME = grid%SNOTIME &
-     &        ,RDLAI2D=config_flags%rdlai2d                                   &
+     &        ,SNOTIME = grid%SNOTIME                                     &
+     &        ,RDLAI2D=config_flags%rdlai2d                               &
      &        ,usemonalb=config_flags%usemonalb                           &
      &        ,NOAHRES=grid%noahres                                       &
 !mynn mp@
@@ -580,6 +584,13 @@ BENCH_END(fire_driver_tim)
 
       CALL wrf_debug ( 200 , ' call cumulus_driver' )
 
+#if ( WRF_DFI_RADAR == 1 )
+      do_capsupress=0
+      if (config_flags%dfi_radar == 1) then
+         if(grid%dfi_stage == DFI_FWD ) do_capsupress=1
+         if(grid%itimestep <= 31 .and. grid%dfi_stage == DFI_FST ) do_capsupress=1
+      endif
+#endif
 
 BENCH_START(cu_driver_tim)
       CALL cumulus_driver(grid                                             &
@@ -635,7 +646,10 @@ BENCH_START(cu_driver_tim)
      &             ,QS_CURR=moist(ims,kms,jms,P_QS), F_QS=F_QS            &
      &             ,QG_CURR=moist(ims,kms,jms,P_QG), F_QG=F_QG            &
 #ifdef WRF_CHEM
-     &             ,GD_CLOUD=grid%GD_CLOUD,GD_CLOUD2=grid%GD_CLOUD2                          &
+     &             ,GD_CLOUD=grid%GD_CLOUD,GD_CLOUD2=grid%GD_CLOUD2       &
+#endif
+#if ( WRF_DFI_RADAR == 1 )
+     &             ,DO_CAPSUPPRESS=do_capsupress                          &
 #endif
      &                                                          )
 BENCH_END(cu_driver_tim)
@@ -651,7 +665,8 @@ BENCH_END(cu_driver_tim)
      &             ,scm_vert_adv=config_flags%scm_vert_adv                &
      &             ,u_base=grid%u_base,v_base=grid%v_base                 &
      &             ,z_base=grid%z_base                                    &
-     &             ,z_force=grid%z_force,u_g=grid%u_g,v_g=grid%v_g        &
+     &             ,z_force=grid%z_force,z_force_tend=grid%z_force_tend   &
+     &             ,u_g=grid%u_g,v_g=grid%v_g                             &
      &             ,u_g_tend=grid%u_g_tend,v_g_tend=grid%v_g_tend         &
      &             ,w_subs=grid%w_subs, w_subs_tend=grid%w_subs_tend      &
      &             ,th_upstream_x=grid%th_upstream_x                      &
@@ -670,6 +685,10 @@ BENCH_END(cu_driver_tim)
      &             ,v_upstream_x_tend=grid%v_upstream_x_tend              &
      &             ,v_upstream_y=grid%v_upstream_y                        &
      &             ,v_upstream_y_tend=grid%v_upstream_y_tend              &
+     &             ,tau_x=grid%tau_x                                      &
+     &             ,tau_x_tend=grid%tau_x_tend                            &
+     &             ,tau_y=grid%tau_y                                      &
+     &             ,tau_y_tend=grid%tau_y_tend                            &
      &             ,z=grid%z,z_at_w=grid%z_at_w                           &
      &             ,th=th_phy, qv=moist(ims,kms,jms,P_QV)                 &
      &             ,u=u_phy, v=v_phy                                      &
