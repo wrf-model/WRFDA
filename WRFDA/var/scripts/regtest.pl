@@ -927,8 +927,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        ifort         64000420  share 
 #8        ASR_prepbufr                8       8            serial|dmpar
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|smpar|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
@@ -943,8 +943,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        gfortran         64000420  sha
 #8        ASR_prepbufr                8       8            serial|dmpar
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|smpar|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
@@ -959,8 +959,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 8        ASR_prepbufr                8       8            serial|dmpar
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|smpar|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     /users/xinzhang/wrfda.tar        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
@@ -975,8 +975,8 @@ Darwin     /users/xinzhang/wrfda.tar        pgi         64000420  share   /data3
 8        ASR_prepbufr                4       4            dmpar
 9        cwb_ascii_outerloop_rizvi   4       4            serial|dmpar
 10       sfc_assi_2_outerloop_guo    4       4            serial|dmpar
-11       outerloop_bench_guo         4       4            serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     4       4            serial|smpar|dmpar
+11       outerloop_bench_guo         4       4            serial|dmpar
+12       outerloop_ztd_bench_guo     4       4            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     /users/xinzhang/wrfda.tar        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
@@ -991,6 +991,6 @@ Darwin     /users/xinzhang/wrfda.tar        g95         64000420  share   /data3
 8        ASR_prepbufr                4       4            dmpar
 9        cwb_ascii_outerloop_rizvi   4       4            serial|dmpar
 10       sfc_assi_2_outerloop_guo    4       4            serial|dmpar
-11       outerloop_bench_guo         4       4            serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     4       4            serial|smpar|dmpar
+11       outerloop_bench_guo         4       4            serial|dmpar
+12       outerloop_ztd_bench_guo     4       4            serial|dmpar
 ###########################################################################################
