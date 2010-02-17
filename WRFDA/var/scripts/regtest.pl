@@ -963,7 +963,7 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-Darwin     /users/xinzhang/wrfda.tar        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
+Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           4       4            serial|dmpar
 2        cv3_guo                     4       4            serial|dmpar
@@ -974,12 +974,12 @@ Darwin     /users/xinzhang/wrfda.tar        pgi         64000420  share   /data3
 7        t44_prepbufr                4       4            dmpar
 8        ASR_prepbufr                4       4            dmpar
 9        cwb_ascii_outerloop_rizvi   4       4            serial|dmpar
-10       sfc_assi_2_outerloop_guo    4       4            serial|dmpar
+10       sfc_assi_2_outerloop_guo    4       4            dmpar
 11       outerloop_bench_guo         4       4            serial|dmpar
 12       outerloop_ztd_bench_guo     4       4            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-Darwin     /users/xinzhang/wrfda.tar        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
+Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 #1        tutorial_xinzhang           4       4            serial
 2        cv3_guo                     4       4            serial|dmpar
