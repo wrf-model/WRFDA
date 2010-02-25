@@ -12,6 +12,7 @@ use File::Basename;
 use File::Compare;
 use IPC::Open2;
 use Net::FTP;
+use Getopt::Long;
 
 # Start time:
 
@@ -20,6 +21,9 @@ my $tm = localtime;
 $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
+my $Compiler_defined;
+GetOptions( "compiler=s" => \$Compiler_defined);
+die "A compiler (xlf,pgi,g95,ifort,gfortran) need to be given as --compiler=pgi\n" unless defined $Compiler_defined;
 my $Exec = 0; # Use the current EXEs in WRFDA or not
 my $Revision = 'HEAD'; # Revision Number
 
@@ -103,6 +107,7 @@ while (<DATA>) {
      }
 
      if ( /^(\d)+/ && ($System =~ /$Arch/i) ) {
+       if ( ($Compiler =~ /$Compiler_defined/i) ) {
           $_=~ m/(\d+) \s+ (\S+) \s+ (\S+) \s+ (\S+) \s+ (\S+)/x;
           my @tasks = split /\|/, $5;
           my %task_records;
@@ -116,6 +121,7 @@ while (<DATA>) {
           );
           $Experiments{$2} = \%record;
           $Par = $5 unless ($Par =~ /$5/);
+       }; 
      }; 
 }
 
@@ -125,6 +131,7 @@ printf "%-4d     %-27s  %-8d   %-13d"."%-10s "x(keys %{$Experiments{$_}{paropt}}
      $Experiments{$_}{index}, $_, $Experiments{$_}{cpu_mpi},$Experiments{$_}{cpu_openmp},
          keys%{$Experiments{$_}{paropt}} for (keys %Experiments);
 
+die "Compiler $Compiler_defined is not supported on this $Arch machine. \n" unless (keys %Experiments) > 0 ; 
 # Get the codes:
 
 goto "SKIP_COMPILE" if $Exec;
