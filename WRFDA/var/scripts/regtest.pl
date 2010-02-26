@@ -21,9 +21,19 @@ my $tm = localtime;
 $Start_time=sprintf "Begin : %02d:%02d:%02d-%04d/%02d/%02d\n",
         $tm->hour, $tm->min, $tm->sec, $tm->year+1900, $tm->mon+1, $tm->mday;
 
+my $Upload="no";
 my $Compiler_defined;
-GetOptions( "compiler=s" => \$Compiler_defined);
-die "A compiler (xlf,pgi,g95,ifort,gfortran) need to be given as --compiler=pgi\n" unless defined $Compiler_defined;
+my $Source_defined;
+GetOptions( "compiler=s" => \$Compiler_defined,
+            "source:s" => \$Source_defined, 
+            "upload:s" => \$Upload );
+
+unless ( defined $Compiler_defined ) {
+  print "Usage : regtest.pl --compiler=pgi --source=wrfda.tar/SVN --upload=[no]/yes \n";
+  print "Please note:\n";
+  die "A compiler (xlf,pgi,g95,ifort,gfortran) need to be given as --compiler=pgi\n" unless defined $Compiler_defined;
+};
+
 my $Exec = 0; # Use the current EXEs in WRFDA or not
 my $Revision = 'HEAD'; # Revision Number
 
@@ -124,6 +134,8 @@ while (<DATA>) {
        }; 
      }; 
 }
+
+$Source = $Source_defined if defined $Source_defined;
 
 printf "Finish parsing the table, the experiments are : \n";
 printf "#INDEX   EXPERIMENT                   CPU_MPI    CPU_OPENMP   PAROPT\n";
@@ -479,9 +491,11 @@ sub create_webpage {
 
 # Send the summary to internet:
 
-    !system "scp","-oPort=2222", "summary.html",
-        "wrfhelp\@box.mmm.ucar.edu:/web/htdocs/people/wrfhelp/wrfvar/results/index.html" or
-        die "can not upload the summary.html: $!\n";
+    if ( $Upload =~ /yes/i ) {
+      !system "scp","-oPort=2222", "summary.html",
+          "wrfhelp\@box.mmm.ucar.edu:/web/htdocs/people/wrfhelp/wrfvar/results/index.html" or
+          die "can not upload the summary.html: $!\n";
+    }
 }
 
 sub refresh_status {
