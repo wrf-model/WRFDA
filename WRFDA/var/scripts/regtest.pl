@@ -934,6 +934,8 @@ AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  premium /m
 10       sfc_assi_2_outerloop_guo    32      32           serial|smpar|dmpar
 11       outerloop_bench_guo         32      32           serial|smpar|dmpar
 12       outerloop_ztd_bench_guo     32      32           serial|smpar|dmpar
+13       tutorial_xinzhang_kmatrix   32      32           serial|smpar|dmpar
+14       tutorial_xinzhang_rttov     32      32           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
@@ -950,6 +952,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        ifort         64000420  share 
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+#13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+#14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
@@ -966,6 +970,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        gfortran         64000420  sha
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+#13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+#14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
@@ -982,6 +988,8 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
@@ -998,6 +1006,8 @@ Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFD
 10       sfc_assi_2_outerloop_guo    4       4            dmpar
 11       outerloop_bench_guo         4       4            serial|dmpar
 12       outerloop_ztd_bench_guo     4       4            serial|dmpar
+13       tutorial_xinzhang_kmatrix   4       4            serial|dmpar
+14       tutorial_xinzhang_rttov     4       4            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
@@ -1014,4 +1024,6 @@ Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFD
 10       sfc_assi_2_outerloop_guo    4       4            serial|dmpar
 11       outerloop_bench_guo         4       4            serial|dmpar
 12       outerloop_ztd_bench_guo     4       4            serial|dmpar
+#13       tutorial_xinzhang_kmatrix   4       4            serial
+#14       tutorial_xinzhang_rttov     4       4            serial
 ###########################################################################################
