@@ -548,9 +548,9 @@ sub new_job {
      $ENV{OMP_NUM_THREADS}=$cpum if ($par=~/sm/i);
 
      if ($par=~/dm/i) { 
-         system ("mpdallexit>/dev/null");
-         system ("mpd&");
-         sleep (0.1);
+         # system ("mpdallexit>/dev/null");
+         # system ("mpd&");
+         # sleep (0.1);
          `mpirun -np $cpun ../WRFDA/var/build/da_wrfvar.exe.$com.$par`;
      } else {
          `../WRFDA/var/build/da_wrfvar.exe.$com.$par > print.out.$Arch.$nam.$par.$Compiler`; 
