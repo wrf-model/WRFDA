@@ -384,7 +384,7 @@ jtf = jte
 ! recompute : jtf
 #ifdef DM_PARALLEL
 ! xinzhang's tuning
-#include      "HALO_ADJ_RKPREP2.inc"
+!#include      "HALO_ADJ_RKPREP2.inc"
 #endif
 
 if (jts .ne. jds .and. jte .ne. jde) then
@@ -668,7 +668,7 @@ jtf = jte
 ! recompute : jtf
 #ifdef DM_PARALLEL
 ! xinzhang's tuning 
-#include      "HALO_ADJ_RKPREP2.inc"
+!#include      "HALO_ADJ_RKPREP2.inc"
 #endif
 if (jts .ne. jds .and. jte .ne. jde) then
   do j = jts, jtf
@@ -1415,7 +1415,7 @@ end do
 ! recompute : muv
 #ifdef DM_PARALLEL
 ! xinzhang's tuning
-#include      "HALO_ADJ_RKPREP.inc"
+!#include      "HALO_ADJ_RKPREP.inc"
 #endif
 do j = jtl, jtf
   do k = ktf, 2, -1
