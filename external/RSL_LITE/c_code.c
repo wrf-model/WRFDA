@@ -20,10 +20,10 @@ RSL_LITE_ERROR_DUP1 ( int *me )
     gethostname( hostname, 256 ) ;
 
 /* redirect standard out*/
-    sprintf(filename,"rsl.out.%04d",*me) ;
+    sprintf(filename,"plus.rsl.out.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-        perror("error_dup: cannot open rsl.out.nnnn") ;
+        perror("error_dup: cannot open plus.rsl.out.nnnn") ;
         fprintf(stderr,"...sending output to standard output and continuing.\n") ;
         return ;
     }
@@ -36,10 +36,10 @@ RSL_LITE_ERROR_DUP1 ( int *me )
     }
 
 /* redirect standard error */
-    sprintf(filename,"rsl.error.%04d",*me) ;
+    sprintf(filename,"plus.rsl.error.%04d",*me) ;
     if ((newfd = open( filename, O_CREAT | O_WRONLY, 0666 )) < 0 )
     {
-        perror("error_dup: cannot open rsl.error.log") ;
+        perror("error_dup: cannot open plus.rsl.error.log") ;
         fprintf(stderr,"...sending error to standard error and continuing.\n") ;
         return ;
     }
