@@ -370,6 +370,7 @@ if $NL_VAR4D; then
    export NL_FRAMES_PER_AUXHIST2=$NL_AUXHIST2_INTERVAL_SAVE
    ln -fs $WORK_DIR/*.TBL nl
    ln -fs $WRFVAR_DIR/run/RRTM_DATA nl
+   ln -fs $WRFVAR_DIR/run/ETAMPNEW_DATA nl
    ln -fs $WORK_DIR/wrfbdy_d01 nl
    ln -fs $WORK_DIR/wrfinput_d01 nl/wrfinput_d01
    ln -fs $WRFNL_DIR/main/wrf.exe nl
