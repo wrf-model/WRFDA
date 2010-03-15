@@ -21,10 +21,10 @@
 ; two different y-axes has also been changed for a better display.
 ;
 ; (2) Note that the veritcal height levels have been hard-wired here as
-; 0.2-25km with 0.2 vertical interval (125 levels totally). 
+; 0.2-30km with 0.2 vertical interval (150 levels totally). 
 ;
-; (3)Data Format:  In each row total (1 + 125 x 4 = 501 = ncol) values for gpsref
-; One value for date, 125 for total level number and
+; (3)Data Format:  In each row total (1 + 150 x 4 = 601 = ncol) values for gpsref
+; One value for date, 150 for total level number and
 ; for each level, there are 4 types of number, i.e.,
 ; NUM of obs at that level, BIAS, Absolute BIAS & RMSE
 ;
@@ -39,6 +39,9 @@ begin
  Fill_ValueI = -99
 ;-----------------------------------------------------------
 ;=============================================================;
+ htop = 25.0    ; users can specifiy the top level (in km) of the plot
+                ; Note: 29.8 km is the current plotting upper limit
+ plot_error_bar = True
 run_dir = run_dir+"/"
 plot_dir = run_dir
 read_headers = asciiread(run_dir+"header_main",-1,"string")
@@ -96,13 +99,14 @@ end do
  do iob = 1, num_obs
   if ( fnames_obs(iob-1) .eq. gpsref_file ) then
       file_names =  fnames_obs(iob-1)
-      nlev = 125   ; number of vertial levels (hard-wired for future improvement)
-      hlevels = fspan(0.2,25,125) ; veritcal levels (height, km) (hard-wired for improvement)
-                                  ; 0.2-25 km, 125 levels , 0.2 km interval
-      htop = 20    ; top level to put in the figure (hard-wired for improvement) 
-      htopid = floattointeger((htop-0.2)/0.2+1)
   end if 
  end do
+ nlev = 150   ; number of vertial levels (hard-wired for future improvement)
+              ; it should be consistent with the nstdh value in 
+              ; var/da/da_verif_obs/da_verif_obs_control.f90
+ hlevels = fspan(0.2,30,150) ; veritcal levels (height, km) (hard-wired for improvement)
+                             ; 0.2-30 km, 150 levels , 0.2 km interval
+ htopid = floattointeger((htop-0.2)/0.2+1)
 
 ;----------------------------------------------------------
  varheads = asciiread(run_dir+file_names,-1,"string")
@@ -148,6 +152,7 @@ do idtype =1, num_d_scor ;loop for different diag_typs
   diag_name=diag_names(Type-1)
 ;
  x = new((/nv,nexp,htopid+1/),"float",Fill_ValueF)
+ number = new((/nv,nexp,htopid+1/),"float",Fill_ValueF)
  bar = new((/nv,nexp,htopid+1/),"float",Fill_ValueF)
  sigt = new((/nv,nexp,htopid+1/),"float",Fill_ValueF)
  ob_tot = new((/nv,htopid+1/),"float",Fill_ValueF)
@@ -155,6 +160,7 @@ do idtype =1, num_d_scor ;loop for different diag_typs
 do iv = 1, nv
   do iexp = 1, num_expt
     do ilev = 1 , htopid+1
+     number((iv-1),(iexp-1),(ilev-1))  = data_omb(iv-1,iexp-1,1+(ilev-1)*6)
      if( omboma .eq. 1) then
       x(iv-1,2*iexp-2,ilev-1)    = data_omb(iv-1,iexp-1,1+(ilev-1)*6+Type)
       bar(iv-1,2*iexp-2,ilev-1)  = data_omb(iv-1,iexp-1,5+(ilev-1)*6)
@@ -176,9 +182,6 @@ do iv = 1, nv
      ob_tot((iv-1),(ilev-1)) = sum(data_omb((iv-1),0,(1+(ilev-1)*6)))
    end do
 end do
-
-
-;
 ;
 ; instead of the lowest height level (=0.2), start from 0km
 ; instead of the top standard height level (25km), end at htop (20km)
@@ -187,9 +190,15 @@ end do
 
  levid=htopid-1
  y = ispan(0,htopid,1)
-; hnumber(0)="0"
+ ;hnumber(0)="0"
  hlevel(0)="0"
- hlevel(1:)=flt2string(hlevels(:levid))
+ ;hcl hlevel(1:)=flt2string(hlevels(:levid))
+ hlevel(1:)= sprintf("%4.1f", (hlevels(:levid)))
+
+ ylabels = new((/htopid+1/),"string")
+ ylabels(0) = "0"
+ ylabels(1:) = flt2string(number(0,0,:levid))
+ 
 do iv =1, nv   ;loop for variable
 
  centers=new((/nexp,htopid+1/),graphic)
@@ -224,19 +233,27 @@ pnumber = flt2string(ob_tot(iv-1,:))
  res@tmXTOn                 = False                   ; set the top tickmark
 
 ; res@tmYRBorderOn           = False                   ; set up the Right border
-; res@tmYRLabelsOn           = False   
-; res@tmYROn                 = True                    ; set the Right tickmark
+ res@tmYRLabelsOn           = True
+ res@tmYROn                 = True                    ; set the Right tickmark
  res@tmYRMode               = "Explicit"
  res@tmYLMode               = "Explicit"
- res@tmLabelAutoStride      = True 
+ ; res@tmLabelAutoStride      = True
+ res@tmLabelAutoStride      = False
+ res@tmYRLabelStride        = 5      ; to make one label per km
+ res@tmYLLabelStride        = 5      ; to make one label per km
  res@tmYUseLeft             = False
+ res@tmYLValues             = y
+ res@tmYRValues             = y
+ res@tmYRLabels             = ylabels(:)
+ res@tmYRMajorLengthF       = 0.0
+ res@tmYLMajorLengthF       = 0.0
 
  res@tiXAxisFont            = "Times-roman"           ; Font for X axis label
  res@tiYAxisFont            = "Times-roman"           ; Font for Y axis label
  res@tiXAxisFontThicknessF  = 3.0
  res@tiYAxisFontThicknessF  = 3.0
- res@tiXAxisFontHeightF     = 0.03                    ; Change the font size.
- res@tiYAxisFontHeightF     = 0.03
+ res@tiXAxisFontHeightF     = 0.02                    ; Change the font size.
+ res@tiYAxisFontHeightF     = 0.02
  res@tiXAxisFontAspectF     = 1.5
  res@tiYAxisFontAspectF     = 1.5
  res@tiYAxisString          = " Height (km)"              ; Label for the Y axis
@@ -254,6 +271,8 @@ pnumber = flt2string(ob_tot(iv-1,:))
  res@tmYRValues  = y
 ; res@tmYRLabels  = hnumber
  res@tmYLLabels  = hlevel
+ res@tmYLLabelFontHeightF = 0.015
+ res@tmYRLabelFontHeightF = 0.015
 
  res@tiXAxisString   = varunits             ; Label for the X axis
 
@@ -277,9 +296,11 @@ pnumber = flt2string(ob_tot(iv-1,:))
  if (.not. ismissing(x(iv-1,iexp-1,ilev-1))) then
  polyres@gsMarkerColor     = legend_line_cols(iexp-1)                         ; color
  polyres@gsLineColor = legend_line_cols(iexp-1)
+ if ( plot_error_bar ) then
  error_bar(iexp-1,ilev-1)=gsn_add_polyline(wks,plts, \
   (/x(iv-1,iexp-1,ilev-1)+bar(iv-1,iexp-1,ilev-1),x(iv-1,iexp-1,ilev-1)-bar(iv-1,iexp-1,ilev-1)/),\
   (/y(ilev-1) ,y(ilev-1)/), polyres)
+ end if
 ;removed the center significance marker since the error bar already indicate that 
 ;markers at each level make the figure crowded. Hui 04/01/2008
 ; if(sigt(iv-1,iexp-1,ilev-1) .gt. 0 ) then
@@ -326,7 +347,7 @@ end do  ;loop for variable
 ;
 ; Close workstation
 ;
- frame(wks)
+; frame(wks)
  delete(wks)
 
 end do ;loop for different diag_types

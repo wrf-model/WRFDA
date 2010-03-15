@@ -170,6 +170,17 @@ do idtype =1, num_d_scor   ;loop for score
  plts  = new (nv,"graphic")
  y = new((/nlev/),"integer",Fill_ValueI)
  y = ispan(0,nlev-1,1)
+
+ if (omboma .eq. 1 .and. num_expt .eq. 2 ) then
+    connector = new((/nv,nlev/),"string")
+    do iv = 0, nv-1
+       connector(iv,:) = where(number(iv,1,:).ge.number(iv,0,:), " + ", " - ")
+    end do
+    ylabels = sprintf("%5.0f",number(:,0,:))+connector(:,:)+ \
+              sprintf("%-5.0f",abs((number(:,1,:)-number(:,0,:))))
+ else
+    ylabels = sprintf("%5.0f",number(:,0,:))
+ end if
  
  print("Louis")
  print(y) 
@@ -199,7 +210,7 @@ do iv =1, nv   ;loop for variable
  res@tmYRLabelsOn           = True               ; set the Right axis
 ; res@tmYRLabelsOn           = False                   ; setup right axis label
  res@tmYRValues             = y;                       ; an array of tick locations (must be monotonic)
- res@tmYRLabels             = number(iv-1,0,:)            ; an array of strings
+ res@tmYRLabels             = ylabels(iv-1,:)            ; an array of strings
 
 
  res@tmYLMode               = "Explicit"
