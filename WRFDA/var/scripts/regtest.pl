@@ -240,13 +240,13 @@ if ($Arch eq "Darwin") {   # Darwin
         $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
         $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
-        $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
+        $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/pgi/i) {   # PGI
         $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
         $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
-        $ENV{PATH} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
+        $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
 }
 
@@ -995,7 +995,7 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           4       4            serial|dmpar
-2        cv3_guo                     4       4            serial|dmpar
+2        cv3_guo                     4       4            dmpar
 3        t44_liuz                    4       4            dmpar
 #4        radar_meixu                 4       4            serial|dmpar
 5        cwb_ascii                   4       4            serial|dmpar
@@ -1007,7 +1007,7 @@ Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFD
 11       outerloop_bench_guo         4       4            serial|dmpar
 12       outerloop_ztd_bench_guo     4       4            serial|dmpar
 13       tutorial_xinzhang_kmatrix   4       4            serial|dmpar
-14       tutorial_xinzhang_rttov     4       4            serial|dmpar
+#14       tutorial_xinzhang_rttov     4       4            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
