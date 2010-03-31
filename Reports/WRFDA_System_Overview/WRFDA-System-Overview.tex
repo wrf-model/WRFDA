@@ -6,6 +6,11 @@
 % email: xinzhang@ucar.edu
 
 \documentclass{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[a4paper, landscape,border shrink=10mm]
+\usepackage{amsmath,amssymb}
+\usepackage{times}
+\setbeamercovered{dynamic}
 \setbeamertemplate{navigation symbols}{}
 \usetheme{AnnArbor}
 \usepackage{graphics}
@@ -14,14 +19,13 @@
 \usepackage{hyperref}
 \usetikzlibrary{shapes,arrows}
 \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
-\defverb\payback!http://www.loyaltypartner.com/de/download/Studie_Verbraucher_Okt03.pdf!
 \begin{document}
 
-\title{WRF Data Assimilation System Overview}
+\title[WRFDA System]{WRF Data Assimilation System Overview}
 
-\author[Xin Zhang et al.]{Xin Zhang, S. R. Rizvi, M. Duda and H. Huang}
-\institute{NCAR}
-\date{4th East Asia WRF Tutorial}
+\author[Xin Zhang et al.]{Xin Zhang \and S. R. Rizvi \and M. Duda \and H. Huang}
+\institute[NCAR]{National Center for Atmospheric Research, Boulder, CO USA}
+\date{The 4th East Asia WRF Tutorial}
 \logo{\includegraphics[scale=0.13]{ncar_logo}}
 
 % Define block styles
@@ -102,7 +106,7 @@
 J(\bf{x})=\frac{1}{2}(\bf{x}-\bf{x}^b)^T{\color{red}\bf{B}^{-1}}(\bf{x}-\bf{x}^b)+\frac{1}{2}(\bf{y}-\textsl{H}(\bf{x}))^T\bf{R}^{-1}(\bf{y}-\textsl{H}(\bf{x}))
 \end{equation*}
 \begin{itemize}
-\item Nominally, {\color{red}\boldmath{$B$}} is the background error covariance \pause
+\item Nominally, {\color{red}$\mathbf{B}$} is the background error covariance \pause
 \item For initial testing, default background error statistics may
 be used \pause 
 \begin{itemize}
@@ -111,7 +115,7 @@ with the domain from online tutorial \pause
 \item be.dat.cv3 (CV option 3) from source code tar file can be used for
 general test domains 
 \end{itemize} \pause
-\item Ultimately, {\color{red}\boldmath{$B$}} should be specific to the particular
+\item Ultimately, {\color{red}$\mathbf{B}$} should be specific to the particular
 model domain (and season)
 \end{itemize}
 \end{frame}

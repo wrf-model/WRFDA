@@ -1,0 +1,147 @@
+% WRF4DVar LBC
+% March 2010 
+% Autor: Xin Zhang 
+% MMM, National Center for Atmospheric Research
+% www.mmm.ucar.edu
+% email: xinzhang@ucar.edu
+
+\documentclass{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[a4paper, landscape,border shrink=10mm]
+\usepackage{amsmath,amssymb}
+\usepackage{times}
+\setbeamercovered{dynamic}
+\setbeamertemplate{navigation symbols}{}
+\usepackage[english]{babel}
+\usetheme{Warsaw}
+\usepackage{graphics}
+\usepackage{hyperref}
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+\begin{document}
+
+\title[LBC control in WRF 4D-Var]{Development of Lateral Boundary Control \\in WRF 4D-Var System}
+
+\author[Xin Zhang et al.]{Xin Zhang\inst{1} \and Hans Huang\inst{1} \and Nils Gustafsson\inst{2}}
+\institute[NCAR]{\inst{1} National Center for Atmospheric Research, Boulder, CO USA \and \inst{2} Swedish Meteorological and Hydrological Institute, Norrkoping, Sweden}
+\date{The 4th East Asia WRF Workshop}
+\logo{\includegraphics[scale=0.13]{ncar_logo}}
+
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline} 
+\tableofcontents
+\end{frame}
+
+\section{WRFDA in WRF Modeling System}
+
+\begin{frame}
+\frametitle{WRFDA in WRF Modeling System}
+\end{frame}
+
+\subsection{Prepare the BE}
+\begin{frame}
+\frametitle{Prepare the BE}
+\begin{equation*}
+J(\bf{x})=\frac{1}{2}(\bf{x}-\bf{x}^b)^T{\color{red}\bf{B}^{-1}}(\bf{x}-\bf{x}^b)+\frac{1}{2}(\bf{y}-\textsl{H}(\bf{x}))^T\bf{R}^{-1}(\bf{y}-\textsl{H}(\bf{x}))
+\end{equation*}
+\begin{itemize}
+\item Nominally, {\color{red}$\mathbf{B}$} is the background error covariance \pause
+\item For initial testing, default background error statistics may
+be used \pause 
+\begin{itemize}
+\item be.dat file (CV option 5) from test case tar file can only be used
+with the domain from online tutorial \pause
+\item be.dat.cv3 (CV option 3) from source code tar file can be used for
+general test domains 
+\end{itemize} \pause
+\item Ultimately, {\color{red}$\mathbf{B}$} should be specific to the particular
+model domain (and season)
+\end{itemize}
+\end{frame}
+
+\subsection{Prepare the Background}
+\begin{frame}
+\frametitle{Prepare the Background}
+\begin{equation*}
+J(\bf{x})=\frac{1}{2}(\bf{x}-{\color{red}\bf{x}^b})^T{\color{blue}\bf{B}^{-1}}(\bf{x}-{\color{red}\bf{x}^b})+\frac{1}{2}(\bf{y}-\textsl{H}(\bf{x}))^T\bf{R}^{-1}(\bf{y}-\textsl{H}(\bf{x}))
+\end{equation*}
+\begin{itemize}
+\item In “cold-start” mode: accomplished by running the
+WPS and real programs \pause
+\begin{itemize}
+\item The background is essentially the wrfinput\_d01 file
+\end{itemize} \pause
+\item In “cycling” mode: the output of the WRF model \pause
+\begin{itemize}
+\item WRF can output wrfinput-formatted files used for cycling 
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Prepare the Observations}
+\begin{frame}
+\frametitle{Prepare the Observations and Assign the Observational Error}
+\begin{equation*}
+J(\bf{x})=\frac{1}{2}(\bf{x}-{\color{blue}\bf{x}^b})^T{\color{blue}\bf{B}^{-1}}(\bf{x}-{\color{blue}\bf{x}^b})+\frac{1}{2}({\color{red}\bf{y}}-\textsl{H}(\bf{x}))^T{\color{red}\bf{R}^{-1}}({\color{red}\bf{y}}-\textsl{H}(\bf{x}))
+\end{equation*}
+\begin{itemize}
+\item Conventional observation input for WRFDA is supplied through \pause
+\begin{itemize}
+\item Little\_R format, observation preprocessor, OBSPROC \pause
+\item  Prepbufr format data directly \pause
+\end{itemize} \pause
+\item Observation error covariance also provided by OBSPROC (R is a diagonal matrix) \pause
+\item \alert{Separate input file (ASCII) for radar, both reflectivity and radial velocity} \pause
+\item \alert{Separate input file for satellite radiances, BUFR format} 
+\end{itemize}
+\end{frame}
+
+\subsection{Run WRFDA}
+\begin{frame}
+\frametitle{Run WRFDA}
+\begin{equation*}
+J(\bf{x})=\frac{1}{2}(\bf{x}-{\color{blue}\bf{x}^b})^T{\color{blue}\bf{B}^{-1}}(\bf{x}-{\color{blue}\bf{x}^b})+\frac{1}{2}({\color{blue}\bf{y}}-\textsl{H}(\bf{x}))^T{\color{blue}\bf{R}^{-1}}({\color{blue}\bf{y}}-\textsl{H}(\bf{x}))
+\end{equation*}
+\begin{itemize}
+\item $H$ is the observational operator, which calculate the counterpart of observations in model space \pause
+\item Conjuagate gradient method
+\item Try to find a $\mathbf{x}^a$ , which make the $J$ minimal
+\end{itemize}
+\end{frame}
+
+\subsection{Run UPDATE\_BC}
+\begin{frame}
+\frametitle{Update Boundary Condition}
+\begin{itemize}
+\item After creating an analysis, $\bf{x^a}$, we have changed
+the initial conditions for the model \pause
+\item However, tendencies in wrfbdy\_d01 file are valid for background, $\bf{x^b}$ \pause
+\item The update\_bc program adjusts these tendencies
+based on the difference $\bf{x^a - x^b}$ \pause
+\item Of course, if $\bf{x^a}$ was produced for reasons other
+than running WRF, there is probably not a need to
+update boundary conditions
+\end{itemize}
+\end{frame}
+
+\subsection{FAQ}
+\begin{frame}
+\frametitle{Frequently Asked Question}
+\begin{itemize}
+\item Q: What background errors are best for my application? \pause
+\item \alert{A: With gen\_be, create your own once you have run your
+system for a few weeks to a month, Implement, tune, and iterate}
+\end{itemize}
+\end{frame}
+
+
+\section{Question}
+\begin{frame}
+\frametitle{Question?}
+\begin{center}
+Questions and Comments ?
+\end{center}
+\end{frame}
+\end{document}
