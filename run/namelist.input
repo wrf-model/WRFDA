@@ -5,10 +5,6 @@
 ! Entries documented with "wrf+" are unique to wrfplus and are documented herein
 ! Namelist entries that are not used in the distribution are marked as "unused"
 !
-! See the wrfplus wiki site below for additional documentation, test notes, 
-!	and developer resources
-! https://wiki.ucar.edu/display/mmm/WRFPLUS
-!
 !
 
  &time_control  ! WRF:  All time_control entries function the same as WRF
