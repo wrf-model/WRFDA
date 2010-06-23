@@ -304,7 +304,7 @@ foreach my $option (sort keys %Compile_options) {
 
      my @exefiles = glob ("var/build/*.exe");
 
-     die "The number of exe files is less than 32. \n" if (@exefiles < 32);
+     die "The number of exe files is less than 40. \n" if (@exefiles < 40);
 
      foreach ( @exefiles ) {
          warn "The exe file $_ has problem. \n" unless -s ;
