@@ -34,7 +34,7 @@ unless ( defined $Compiler_defined ) {
   die "A compiler (xlf,pgi,g95,ifort,gfortran) need to be given as --compiler=pgi\n" unless defined $Compiler_defined;
 };
 
-my $Exec = 1; # Use the current EXEs in WRFDA or not
+my $Exec = 0; # Use the current EXEs in WRFDA or not
 my $Revision = 'HEAD'; # Revision Number
 
 # Constant variables
