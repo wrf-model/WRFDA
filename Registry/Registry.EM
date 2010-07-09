@@ -1463,7 +1463,7 @@ i1       real   a_rainc           ij     dyn_em      1       -
 i1       real   a_raincv          ij     dyn_em      1       -     
 i1       real   a_rainnc          ij     dyn_em      1       -     
 i1       real   a_rainncv         ij     dyn_em      1       -     
-state    real   a_p              ikj     dyn_em      1       -      rh02 
+state    real   a_p              ikj     dyn_em      1       -      i013rh023
 state    real   a_al             ikj     dyn_em      1       -      rh02
 state    real   a_alt            ikj     dyn_em      1       -      rh02
 i1       real   a_advect_tend    ikj     dyn_em      1       -                                          

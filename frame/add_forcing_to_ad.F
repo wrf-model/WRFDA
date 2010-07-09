@@ -19,5 +19,6 @@ integer ims,ime,jms,jme,i,j
    grid%em_a_mu_2 = grid%em_a_mu_2 + grid%em_g_mu_2
 !  grid%a_moist_1 = grid%a_moist_1 + grid%g_moist_1
    grid%a_moist_2 = grid%a_moist_2 + grid%g_moist_2
+   grid%em_a_p    = grid%em_a_p    + grid%em_g_p
 #endif
 END SUBROUTINE add_forcing_to_ad
