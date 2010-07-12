@@ -995,15 +995,15 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           8       8            dmpar
-2        cv3_guo                     8       8            dmpar
-3        t44_liuz                    8       8            dmpar
-#4        radar_meixu                 8       8            serial|dmpar
+2        cv3_guo                     8       8            serial|dmpar
+3        t44_liuz                    8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
 5        cwb_ascii                   8       8            serial|dmpar
-6        afwa_t7_ssmi                8       8            dmpar
-7        t44_prepbufr                8       8            dmpar
+6        afwa_t7_ssmi                8       8            serial|dmpar
+7        t44_prepbufr                8       8            serial|dmpar
 8        ASR_prepbufr                8       8            dmpar
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
-10       sfc_assi_2_outerloop_guo    8       8            dmpar
+10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
