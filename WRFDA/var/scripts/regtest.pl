@@ -196,26 +196,22 @@ die "WRFDA does not support compiler : $Compiler.\n" if ( (keys %Compile_options
 # Set the envir. variables:
 
 if ($Arch eq "AIX") {   # bluefire
-    $ENV{CRTM} ='/blhome/wrfhelp/external/crtm/CRTM_02_03_09_REL_1_2/ibm_powerpc';
     $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
     $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
 }
 
 if ($Arch eq "Linux") {   # for karri
     if ($Compiler=~/pgi/i) {   # PGI
-        $ENV{CRTM} ='/karri/users/xinzhang/external/pgi_web/crtm';
         $ENV{RTTOV} ='/karri/users/xinzhang/external/pgi_web/rttov87';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/pgi_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/pgi_x86_64/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/ifort/i) {   # INTEL
-        $ENV{CRTM} ='/karri/users/xinzhang/external/intel_web/crtm';
         $ENV{RTTOV} ='/karri/users/xinzhang/external/intel_web/rttov87';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/intel_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/intel_x86_64/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/gfortran/i) {   # GFORTRAN
-        $ENV{CRTM} ='/karri/users/xinzhang/external/gfortran_web/crtm';
         $ENV{RTTOV} ='/karri/users/xinzhang/external/gfortran_web/rttov87';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/gfortran_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/bin/gcc-4.3/bin:/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/gfortran_x86_64/bin:'.$ENV{PATH};
@@ -237,16 +233,19 @@ if ($Arch eq "Linux") {   # for karri
 }
 if ($Arch eq "Darwin") {   # Darwin
     if ($Compiler=~/g95/i) {   # G95
-        $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/crtm';
         $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/pgi/i) {   # PGI
-        $ENV{CRTM} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/crtm';
         $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov87';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
+    }
+    if ($Compiler=~/gfortran/i) {   # GFORTRAN
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/rttov87';
+        $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/netcdf-3.6.1';
+        $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
 }
 
@@ -286,6 +285,17 @@ foreach my $option (sort keys %Compile_options) {
          close (FH);
 
          rename "configure.wrf.new", "configure.wrf";
+     } elsif (($Arch eq "Darwin") && ($Compiler =~ /gfortran/i)) {
+         open FHCONF, "<configure.wrf" or die "Where is configure.wrf: $!\n"; 
+         open FH, ">configure.wrf.new" or die "Cannot open configure.wrf.new: $!\n"; 
+         while ($_ = <FHCONF>) { 
+             $_ =~ s/-O3/-O0/;
+             print FH $_;
+         }
+         close (FHCONF);
+         close (FH);
+
+         rename "configure.wrf.new", "configure.wrf";
      }
 
      # compile all_wrfvar
@@ -304,7 +314,11 @@ foreach my $option (sort keys %Compile_options) {
 
      my @exefiles = glob ("var/build/*.exe");
 
-     die "The number of exe files is less than 40. \n" if (@exefiles < 40);
+     if (($Arch eq "Darwin") && ($Compiler =~ /gfortran/i)) {
+       die "The number of exe files is less than 40. \n" if (@exefiles < 39);
+     } else {
+       die "The number of exe files is less than 40. \n" if (@exefiles < 40);
+    }
 
      foreach ( @exefiles ) {
          warn "The exe file $_ has problem. \n" unless -s ;
@@ -546,6 +560,10 @@ sub new_job {
 
      delete $ENV{OMP_NUM_THREADS};
      $ENV{OMP_NUM_THREADS}=$cpum if ($par=~/sm/i);
+
+     $ENV{GFORTRAN_CONVERT_UNIT}='little_endian:96-99' if ($Compiler=~/gfortran/i) ;
+
+     $ENV{F_UFMTENDIAN}='little:96-99' if ($Compiler=~/ifort/i) ;
 
      if ($par=~/dm/i) { 
          # system ("mpdallexit>/dev/null");
@@ -994,36 +1012,54 @@ Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-1        tutorial_xinzhang           8       8            dmpar
-2        cv3_guo                     8       8            serial|dmpar
-3        t44_liuz                    8       8            serial|dmpar
-4        radar_meixu                 8       8            serial|dmpar
-5        cwb_ascii                   8       8            serial|dmpar
-6        afwa_t7_ssmi                8       8            serial|dmpar
-7        t44_prepbufr                8       8            serial|dmpar
-8        ASR_prepbufr                8       8            dmpar
-9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
-10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+1        cv3_guo                     8       8            serial|dmpar
+2        t44_liuz                    8       8            serial|dmpar
+3        radar_meixu                 8       8            serial|dmpar
+4        cwb_ascii                   8       8            serial|dmpar
+5        afwa_t7_ssmi                8       8            serial|dmpar
+6        t44_prepbufr                8       8            serial|dmpar
+7        ASR_prepbufr                8       8            dmpar
+8        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
+9        sfc_assi_2_outerloop_guo    8       8            serial|dmpar
+10       outerloop_bench_guo         8       8            serial|dmpar
+11       outerloop_ztd_bench_guo     8       8            serial|dmpar
+12       tutorial_xinzhang           8       8            dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
 Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-#1        tutorial_xinzhang           8       8            serial
+#1        tutorial_xinzhang           8       8            serial|dmpar        #   dsyev stalls with g95
 2        cv3_guo                     8       8            serial|dmpar
-3        t44_liuz                    8       8            dmpar
-#4        radar_meixu                 8       8            serial|dmpar
+3        t44_liuz                    8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
 5        cwb_ascii                   8       8            serial|dmpar
-6        afwa_t7_ssmi                8       8            dmpar
-7        t44_prepbufr                8       8            dmpar
-8        ASR_prepbufr                8       8            dmpar
+6        afwa_t7_ssmi                8       8            serial|dmpar
+7        t44_prepbufr                8       8            serial|dmpar
+#8        ASR_prepbufr                8       8            serial|dmpar        #   dsyev stalls with g95
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
 12       outerloop_ztd_bench_guo     8       8            serial|dmpar
-#13       tutorial_xinzhang_kmatrix   8       8            serial
-#14       tutorial_xinzhang_rttov     8       8            serial
+#13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar        #   dsyev stalls with g95
+#14       tutorial_xinzhang_rttov     8       8            serial|dmpar        #   dsyev stalls with g95
+###########################################################################################
+#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
+Darwin     SVN        gfortran         64000420  share   /data3/mp/wrfhelp/data//WRFDA-data-EM    /data3/mp/wrfhelp/data//BASELINE
+#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
+1        tutorial_xinzhang           8       8            serial|dmpar
+2        cv3_guo                     8       8            serial|dmpar
+3        t44_liuz                    8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
+5        cwb_ascii                   8       8            serial|dmpar
+6        afwa_t7_ssmi                8       8            serial|dmpar
+7        t44_prepbufr                8       8            serial|dmpar
+#8        ASR_prepbufr                8       8            serial|dmpar         # Unknown reason  
+9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
+10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
