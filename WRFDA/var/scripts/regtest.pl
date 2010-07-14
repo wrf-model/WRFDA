@@ -1038,7 +1038,7 @@ Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFD
 5        cwb_ascii                   8       8            serial|dmpar
 6        afwa_t7_ssmi                8       8            serial|dmpar
 7        t44_prepbufr                8       8            serial|dmpar
-#8        ASR_prepbufr                8       8            serial|dmpar        #   dsyev stalls with g95
+8        ASR_prepbufr                8       8            serial|dmpar
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
