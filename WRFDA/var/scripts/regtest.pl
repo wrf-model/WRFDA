@@ -195,6 +195,7 @@ die "WRFDA does not support compiler : $Compiler.\n" if ( (keys %Compile_options
 
 # Set the envir. variables:
 
+$ENV{CRTM} =1;
 if ($Arch eq "AIX") {   # bluefire
     $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
     $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
@@ -956,48 +957,48 @@ AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 14       tutorial_xinzhang_rttov     16      16           serial|smpar|dmpar
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-Linux      /karri/users/xinzhang/wrfda.tar        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
-#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-#1        tutorial_xinzhang           8       8            serial|dmpar
-2        cv3_guo                     8       8            serial|dmpar
-3        t44_liuz                    8       8            serial|dmpar
-#4        radar_meixu                 8       8            serial|dmpar
-5        cwb_ascii                   8       8            serial|dmpar
-6        afwa_t7_ssmi                8       8            serial|dmpar
-#7        t44_prepbufr                8       8            serial|dmpar
-#8        ASR_prepbufr                8       8            serial|dmpar
-9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
-10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
-#13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
-#14       tutorial_xinzhang_rttov     8       8            serial|dmpar
-###########################################################################################
-#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-Linux      /karri/users/xinzhang/wrfda.tar        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
-#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
-#1        tutorial_xinzhang           8       8            serial|dmpar
-2        cv3_guo                     8       8            serial|dmpar
-3        t44_liuz                    8       8            serial|dmpar
-#4        radar_meixu                 8       8            serial|dmpar
-5        cwb_ascii                   8       8            serial|dmpar
-6        afwa_t7_ssmi                8       8            serial|dmpar
-#7        t44_prepbufr                8       8            serial|dmpar
-#8        ASR_prepbufr                8       8            serial|dmpar
-9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
-10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
-11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
-#13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
-#14       tutorial_xinzhang_rttov     8       8            serial|dmpar
-###########################################################################################
-#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-Linux      /karri/users/xinzhang/wrfda.tar        pgi         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
+Linux      SVN        ifort         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           8       8            serial|dmpar
 2        cv3_guo                     8       8            serial|dmpar
 3        t44_liuz                    8       8            serial|dmpar
-#4        radar_meixu                 8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
+5        cwb_ascii                   8       8            serial|dmpar
+6        afwa_t7_ssmi                8       8            serial|dmpar
+7        t44_prepbufr                8       8            serial|dmpar
+8        ASR_prepbufr                8       8            serial|dmpar
+9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
+10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+14       tutorial_xinzhang_rttov     8       8            serial|dmpar
+###########################################################################################
+#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
+Linux      SVN        gfortran         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
+#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
+1        tutorial_xinzhang           8       8            serial|dmpar
+2        cv3_guo                     8       8            serial|dmpar
+3        t44_liuz                    8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
+5        cwb_ascii                   8       8            serial|dmpar
+6        afwa_t7_ssmi                8       8            serial|dmpar
+7        t44_prepbufr                8       8            serial|dmpar
+8        ASR_prepbufr                8       8            serial|dmpar
+9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
+10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
+11       outerloop_bench_guo         8       8            serial|dmpar
+12       outerloop_ztd_bench_guo     8       8            serial|dmpar
+13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
+14       tutorial_xinzhang_rttov     8       8            serial|dmpar
+###########################################################################################
+#ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
+Linux      SVN        pgi         64000420  share   /karri/users/xinzhang/regtest/WRFDA-data-EM    /karri/users/xinzhang/regtest/BASELINE
+#INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
+1        tutorial_xinzhang           8       8            serial|dmpar
+2        cv3_guo                     8       8            serial|dmpar
+3        t44_liuz                    8       8            serial|dmpar
+4        radar_meixu                 8       8            serial|dmpar
 5        cwb_ascii                   8       8            serial|dmpar
 6        afwa_t7_ssmi                8       8            serial|dmpar
 7        t44_prepbufr                8       8            serial|dmpar
