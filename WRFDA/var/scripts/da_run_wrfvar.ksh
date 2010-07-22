@@ -265,6 +265,10 @@ if [[ -f $DA_VARBC_IN ]]; then
    ln -fs $DA_VARBC_IN "VARBC.in"
 fi
 
+if [[ -f $ADJOINT_SENSITIVITY ]]; then
+   ln -fs $ADJOINT_SENSITIVITY "gr01"
+fi
+
 export RADIANCE_INFO_DIR=${RADIANCE_INFO_DIR:-$WRFVAR_DIR/var/run/radiance_info}
 ln -fs $RADIANCE_INFO_DIR radiance_info
 
@@ -709,8 +713,8 @@ else
    for INDEX in 01 02 03 04 05 06 07 08 09 10; do
       if [[ -f rej_obs_conv_$INDEX.000 ]]; then
          cat rej_obs_conv_$INDEX.* > rej_obs_conv_$INDEX
+         cp rej_obs_conv_$INDEX $RUN_DIR
       fi
-     cp rej_obs_conv_$INDEX $RUN_DIR
 
      if [[ -f qcstat_conv_$INDEX ]]; then
      cp qcstat_conv_$INDEX $RUN_DIR
@@ -863,7 +867,9 @@ EOF
    if [[ $NL_MULTI_INC == 0 ]] ; then
       if [[ -f wrfvar_output ]]; then
          if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
-            cp wrfvar_output $DA_ANALYSIS
+            if ! $RUN_ADJ_SENS; then
+               cp wrfvar_output $DA_ANALYSIS
+            fi
          fi
       fi
    fi

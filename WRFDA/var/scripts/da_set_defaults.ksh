@@ -34,6 +34,9 @@ export RUN_WPS=${RUN_WPS:-false}
 export RUN_WRF=${RUN_WRF:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
 export RUN_GSI=${RUN_GSI:-false}
+export RUN_ADJ_SENS=${RUN_ADJ_SENS:-false}
+export RUN_OBS_IMPACT=${RUN_OBS_IMPACT:-false}
+export RUN_TL_TEST=${RUN_TL_TEST:-false}
 
 # Experiment details:
 export DUMMY=${DUMMY:-false}
@@ -117,6 +120,7 @@ export OB_DIR=${OB_DIR:-$EXP_DIR/ob}              # Observation data dir.
 export RC_DIR=${RC_DIR:-$EXP_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
 export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 export VTABLE_DIR=${VTABLE_DIR:-$WPS_DIR/ungrib/Variable_Tables}
@@ -304,3 +308,16 @@ export NL_ALPHA_CORR_TYPE=${NL_ALPHA_CORR_TYPE:-3}     # 1=Exponential, 2=SOAR, 
 export NL_ALPHA_CORR_SCALE=${NL_ALPHA_CORR_SCALE:-1500} # Localization lengthscale (km)
 export NL_ALPHA_STD_DEV=${NL_ALPHA_STD_DEV:-1.0}       # Alpha standard deviation.
 export NL_JE_FACTOR=${NL_JE_FACTOR:-1.0}               # Cost function multiplicative factor.
+
+# Adjoint Sensitivity and Observation Impact
+export ADJ_RUN_NL=${ADJ_RUN_NL:-true}     # Whether WRFNL is run
+export ADJ_RUN_PLUS=${ADJ_RUN_PLUS:-true} # Whether WRFPLUS is run
+export ADJ_REF=${ADJ_REF:-2}              # Reference analysis: 1: 3DVAR analysis, 2. NCEP analysis, 3. observations
+export ADJ_MEASURE=${ADJ_MEASURE:-4}      # 1. first order, 2. second order, 3. third order, 4. variant of third order
+export NL_ADJ_SENS=${NL_ADJ_SENS:-false}
+export ADJ_ISTART=${ADJ_ISTART:-1}
+export ADJ_IEND=${ADJ_IEND:-$NL_E_WE}
+export ADJ_JSTART=${ADJ_JSTART:-1}
+export ADJ_JEND=${ADJ_JEND:-$NL_E_SN}
+export ADJ_KSTART=${ADJ_KSTART:-1}
+export ADJ_KEND=${ADJ_KEND:-$NL_E_VERT}

@@ -8,7 +8,7 @@
 # The da_run_suite.ksh script is designed for end-to-end real data 
 # testing of the following components of the WRF system:
 #
-# WRF_REAL, OBSPROC, WRFVAR, UPDATE_BC, NDOWN, NUP, ETKF and WRF.
+# WRF_REAL, OBSPROC, WRFVAR, UPDATE_BC, NDOWN, NUP, ETKF, ADJ_SENS and WRF.
 #
 # Any stage can be switched on/off via environment variables as
 # described below. The da_run_suite.ksh script can also cycle the
@@ -244,7 +244,45 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       export FCST_RANGE=$FCST_RANGE_SAVE
    fi
 
+   if $RUN_TL_TEST; then
+      export RUN_DIR=$EXP_DIR/$DATE/tltest
+      export NL_WRFVAR_MEM_MODEL=2
+      mkdir -p $RUN_DIR
 
+      $SCRIPTS_DIR/da_trace.ksh da_run_tltest $RUN_DIR
+      $SCRIPTS_DIR/da_run_tltest.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $? != 0 ]]; then
+         echo $(date) "${ERR}tltest failed with error $RC$END"
+         echo tltest > FAIL
+         break
+      fi
+   fi
+
+   if $RUN_ADJ_SENS; then
+      export RUN_DIR=$EXP_DIR/$DATE/sensitivity
+      export NL_ADJ_SENS=true
+      mkdir -p $RUN_DIR
+
+      $SCRIPTS_DIR/da_trace.ksh da_run_sensitivity $RUN_DIR
+      $SCRIPTS_DIR/da_run_sensitivity.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $? != 0 ]]; then
+         echo $(date) "${ERR}sensitivity failed with error $RC$END"
+         echo sensitivity > FAIL
+         break
+      fi
+   fi
+
+   if $RUN_OBS_IMPACT; then
+      export RUN_WRFVAR=true
+      export NL_ANALYSIS_TYPE=QC-OBS
+      export NL_USE_LANCZOS=true
+      export NL_SENSITIVITY_OPTION=0
+      export NL_WRFVAR_MEM_MODEL=2
+      export ADJOINT_SENSITIVITY=$FC_DIR/$DATE/ad_d01_$DATE
+   fi
+   
    if $RUN_GSI; then
        export RUN_DIR=$SUITE_DIR/$DATE/gsi
        if [[ ! -d $RUN_DIR ]]; then
@@ -279,6 +317,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
    if $RUN_WRFVAR; then
       export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
+      if $RUN_OBS_IMPACT; then export RUN_DIR=$SUITE_DIR/$DATE/obsimpact; fi
       mkdir -p $RUN_DIR
 
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/${FILE_TYPE}_d01
@@ -287,6 +326,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/${FILE_TYPE}_d01_${ANALYSIS_DATE}
          fi
       fi
+
       export EP_DIR=$FC_DIR/$DATE/ep
       export DA_ANALYSIS=$FC_DIR/$DATE/${FILE_TYPE}_d01
       
@@ -392,7 +432,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
             if [[ $MEM -lt 10  ]]; then export CMEM=e00$MEM; fi
 
-            export RUN_DIR=$EXP_DIR/run/$DATE/update_bc.${CMEM}
+            export RUN_DIR=$EXP_DIR/$DATE/update_bc.${CMEM}
             export PHASE=false
             mkdir -p $RUN_DIR
 
@@ -420,7 +460,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
             sleep 1 # Leave 1s gap between job start
          done
       else
-         export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
+         export RUN_DIR=$EXP_DIR/$DATE/update_bc
          export PHASE=false
          mkdir -p $RUN_DIR
 
