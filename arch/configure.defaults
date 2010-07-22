@@ -6354,6 +6354,7 @@ PROMOTION	=	-r$(RWORDSIZE) -i4
 CFLAGS          =       -DF2CSTYLE -DMACOS 
 FCOPTIM         =       -O2  
 FCDEBUG         =       #-g -O0
+FORMAT_FIXED    =       -ffixed-form
 FCBASEOPTS      =       -Wno=101,139,155,158 -ffree-form -ffree-line-length-huge $(FCDEBUG) -fendian=big -finteger=0 -freal=zero
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
@@ -6475,6 +6476,7 @@ CFLAGS          =       -DF2CSTYLE -DMACOS  \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
 FCOPTIM         =       -O2 
 FCDEBUG         =       # -g -O0
+FORMAT_FIXED    =       -ffixed-form
 FCBASEOPTS      =       -Wno=101,139,155,158 -ffree-form -ffree-line-length-huge $(FCDEBUG) -fendian=big -finteger=0 -freal=zero
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90 \
