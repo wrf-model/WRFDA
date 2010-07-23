@@ -17,14 +17,14 @@
 ;  xlat   -- Co-ordinale in SN direction
 ;  bakfile - Full path of First Guess file
 ;  analfile- Full path of Analysis file
-;  WRFVAR_DIR -- WRFDA path
+;  GRAPHICS_DIR -- Full path GRAPHICS_DIR path 
 ;#########################################################################
 ;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
-load "$WRFVAR_DIR/var/graphics/ncl/WRF_contributed.ncl.test"
+load "$GRAPHICS_DIR/WRF_contributed.ncl.test"
 begin
 ;*************************************************************************
 ; open file 
