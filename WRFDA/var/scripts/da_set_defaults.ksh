@@ -37,6 +37,10 @@ export RUN_GSI=${RUN_GSI:-false}
 export RUN_ADJ_SENS=${RUN_ADJ_SENS:-false}
 export RUN_OBS_IMPACT=${RUN_OBS_IMPACT:-false}
 export RUN_TL_TEST=${RUN_TL_TEST:-false}
+export GSI_QOPTION=${GSI_QOPTION:-1}
+export GSI_JCAP=${GSI_JCAP:-62}
+export PLOT_ANAL_INC=${PLOT_ANAL_INC:-true}
+
 
 # Experiment details:
 export DUMMY=${DUMMY:-false}

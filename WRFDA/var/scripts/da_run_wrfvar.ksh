@@ -723,7 +723,16 @@ else
      if [[ -f gts_omb_oma_$INDEX ]]; then
      cp gts_omb_oma_$INDEX $RUN_DIR
      fi
+
+     if [[ -f filtered_obs_$INDEX ]]; then
+        cp filtered_obs_$INDEX $RUN_DIR
+     fi
+
    done 
+
+   if [[ -f analysis_increments ]]; then
+      cp analysis_increments $RUN_DIR
+   fi
 
    if [[ -f cost_fn ]]; then 
       cp cost_fn $RUN_DIR

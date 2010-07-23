@@ -2,8 +2,13 @@
 #########################################################################
 # Script: da_plot_psot.ksh
 #
+# Author : Syed RH Rizvi, NCAR/NESL/MMM/DAS,  Date:04/15/2009
 # Purpose: Ploting script for single obs tests (works both for GSI & WRFDA)
-# Author : Syed RH Rizvi, MMM/ESSL/NCAR,  Date:04/15/2009
+#
+# Update : Syed RH Rizvi, NCAR/NESL/MMM/DAS,  Date:07/22/2010
+#          plots directly WRFDA analysis_incremets produced with
+#          WRITE_INCREMENTS=true for PSOT test
+#
 #########################################################################
 #------------------------------------------------------------------------
 #Set defaults for required environment variables
@@ -76,6 +81,8 @@ for var in ${PSEUDO_VAR[*]}; do
 
    export ANALYSIS=${EXP_DIR}/fc/psot$iv/$INITIAL_DATE/wrfinput_d${DOMAINS}
    export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${RC_DIR}/$INITIAL_DATE/wrfinput_d01}
+   export ANAL_INCREMENTS=${EXP_DIR}/run/$INITIAL_DATE/psot$iv/analysis_increments
+
 
    if $RUN_PSOT_GSI ; then 
      if $ONEOB_ONGRID ; then 
@@ -104,10 +111,17 @@ for var in ${PSEUDO_VAR[*]}; do
      fi
    fi
    if $RUN_PSOT_WRFVAR ; then 
+     if $PLOT_ANAL_INC ; then 
+      NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
+            'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' \
+            'bakfile=\"$DA_FIRST_GUESS\"' 'anal_inc_file=\"$ANAL_INCREMENTS\"'"
+      echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/plot_anal_inc.ncl" > run_psot_ncl
+     else
       NCL_COMMAND_LINE="'works=\"${PLOT_WKS}\"' 'expt=\"$expt\"'  \
             'kl=$kl' 'xlon=$xlon' 'xlat=$xlat' \
             'bakfile=\"$DA_FIRST_GUESS\"' 'analfile=\"$ANALYSIS\"'"
       echo "ncl ${NCL_COMMAND_LINE} $GRAPHICS_DIR/psot.ncl" > run_psot_ncl
+     fi
    fi
        chmod +x run_psot_ncl
        ./run_psot_ncl

@@ -44,7 +44,7 @@ export RUN_WRFVAR=true
 export CYCLING=false  #cold start only
 
 # wrfvar namelist
-export NL_WRITE_INCREMENTS=${NL_WRITE_INCREMENTS:-true}
+export NL_WRITE_INCREMENTS=true
 export NL_CHECK_RH=0
 export NL_NUM_PSEUDO=1                           #single-obs test
 
