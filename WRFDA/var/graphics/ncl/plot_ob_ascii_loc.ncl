@@ -30,6 +30,7 @@ proc_qscat = True
 proc_bogus = True
 proc_airsr = True
 proc_gpsrf = True
+proc_radar = True
 ;***********************************************************************
 ; end of user-defined settings
 ;***********************************************************************
@@ -151,6 +152,7 @@ begin  ; main script
    nqscat = 0
    nprofl = 0
    nairsr = 0
+   nradar = 0
 
    ; find out the number of each observation type
    do n = 0, nline-1  ; loop1 of parsing the file line by line
@@ -198,6 +200,9 @@ begin  ; main script
       end if
       if ( cdata(n,0:5) .eq. "FM-133" ) then
          nairsr = nairsr + 1
+      end if
+      if ( cdata(n,0:5) .eq. "FM-128" ) then
+         nradar = nradar + 1
       end if
    end do  ; end loop1 of parsing the file line by line
 
@@ -261,6 +266,10 @@ begin  ; main script
       airsr_lat = new(nairsr, float)
       airsr_lon = new(nairsr, float)
    end if
+   if ( nradar .gt. 0  )then
+      radar_lat = new(nradar, float)
+      radar_lon = new(nradar, float)
+   end if
 
    isynop = 0
    imetar = 0
@@ -277,6 +286,7 @@ begin  ; main script
    iqscat = 0
    iprofl = 0
    iairsr = 0
+   iradar = 0
 
    do n = 0, nline-1  ; loop2 of parsing the file line by line
       if ( cdata(n,0:5) .eq. "FM-12 " ) then
@@ -353,6 +363,11 @@ begin  ; main script
          airsr_lat(iairsr) = stringtofloat(charactertostring(cdata(n,80:91)))
          airsr_lon(iairsr) = stringtofloat(charactertostring(cdata(n,103:114)))
          iairsr = iairsr + 1
+      end if
+      if ( cdata(n,0:5) .eq. "FM-128" ) then
+         radar_lat(iradar) = stringtofloat(charactertostring(cdata(n,36:47)))
+         radar_lon(iradar) = stringtofloat(charactertostring(cdata(n,50:61)))
+         iradar = iradar + 1
       end if
    end do  ; end loop2 of parsing the file line by line
 
@@ -522,6 +537,17 @@ begin  ; main script
       gsres@gsMarkerColor  = "navy"
       gsres@gsMarkerSizeF  = markersize1          ; default 0.007
       dummy = gsn_add_polymarker(wks,map,airsr_lon(:),airsr_lat(:),gsres)
+      draw(map)
+      frame(wks)
+      delete(dummy)
+   end if
+   if ( proc_radar .and. nradar .gt. 0 ) then
+      mpres = setmpres("RADAR",date,nradar+"")
+      map = gsn_csm_map(wks,mpres)
+      gsres@gsMarkerIndex = 16                    ; Use filled dots for markers.
+      gsres@gsMarkerColor  = "navy"
+      gsres@gsMarkerSizeF  = markersize1          ; default 0.007
+      dummy = gsn_add_polymarker(wks,map,radar_lon(:),radar_lat(:),gsres)
       draw(map)
       frame(wks)
       delete(dummy)
