@@ -18,11 +18,12 @@ begin
     vc = a->$vNames(n)$
 
     vc = 0.
-    do j = lbc, dims(2)-lbc-1
-       do i = lbc, dims(3)-lbc-1
-          vc(0,:,j,i) = va(0,:,j,i) + vb(0,:,j,i) 
-       end do
-    end do
+;    do j = lbc, dims(2)-lbc-1
+;       do i = lbc, dims(3)-lbc-1
+;          vc(0,:,j,i) = va(0,:,j,i) + vb(0,:,j,i) 
+;       end do
+;    end do
+    vc = va + vb
     a->$vNames(n)$ = vc
 
     delete(va)

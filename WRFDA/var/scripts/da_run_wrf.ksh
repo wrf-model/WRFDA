@@ -21,7 +21,6 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 export NL_RUN_HOURS=$FCST_RANGE
-#let NL_RUN_SECONDS=$FCST_RANGE*3600
 
 # allow for ensemble members identified by CMEM
 export FC_DIR_DATE=$FC_DIR/$DATE
@@ -51,7 +50,7 @@ else
    
 #----- WRFNL -----
    if   [[ $WRF_CONF == "NL" ]]; then
-      export EXEC_DIR=$WRFNL_DIR
+      export EXEC_DIR=$WRF_DIR
       export EXEC_FILE="wrf.exe"
       export NL_INPUT_OUTNAME="./nl_d<domain>_<date>"
       export NL_WRITE_INPUT=false
@@ -60,11 +59,18 @@ else
       export NL_AUXHIST2_END_H=$FCST_RANGE
       export NL_AUXHIST2_INTERVAL=$TIME_STEP_MINUTE
       export NL_IO_FORM_AUXHIST2=2
+      export NL_IOFIELDS_FILENAME="${DAT_DIR}/trajectory.io_config"
+      export NL_IGNORE_IOFIELDS_WARNING=true
 
 #----- WRFPLUS -----
    else
       export EXEC_DIR=$WRFPLUS_DIR
       export EXEC_FILE="wrfplus.exe"
+      export RUN_CMD=" " # Temporarily disable multi-proc WRF+
+      echo 'Run WRFPLUS on single proc'
+      if [[ $NUM_PROCS -gt 1 ]]; then touch wrf_go_ahead; fi
+#      if [[ -d wrf_done ]]; then rm wrf_done; fi
+      
       if [[ $WRF_CONF == "TL" ]]; then 
          export NL_INPUT_OUTNAME="./tl_d<domain>_<date>"
          export NL_DYN_OPT=202
@@ -73,7 +79,7 @@ else
          export NL_DYN_OPT=302
       fi	
       if [[ $WRF_CONF == "AD" ]]; then 
-         export NL_AUXINPUT3_INNAME="./auxinput3_d<domain>_<date>"
+         export NL_AUXINPUT3_INNAME="./wrfout_d<domain>_<date>" #"./auxinput3_d<domain>_<date>"
          let NL_AUXINPUT3_INTERVAL_S=$FCST_RANGE*3600      
          export NL_INPUTOUT_INTERVAL_S=3600 
          export NL_AUXINPUT2_BEGIN_S=0 
@@ -92,8 +98,8 @@ else
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
       export NL_RADT=0
-      export NL_SF_SFCLAY_PHYSICS=0
-      export NL_SF_SURFACE_PHYSICS=0
+#      export NL_SF_SFCLAY_PHYSICS=0
+#      export NL_SF_SURFACE_PHYSICS=0
       export NL_BL_PBL_PHYSICS=0
       export NL_CU_PHYSICS=0
       export NL_CUDT=0
@@ -184,11 +190,11 @@ if $DUMMY; then
    done
 else
    if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then touch wrfnl_go_ahead; fi
-   if $RUN_ADJ_SENS && [[ $NUM_PROCS -gt 1 ]]; then touch wrfnl_go_ahead; touch wrf_go_ahead; fi
-   if $RUN_TL_TEST && [[ $NUM_PROCS -gt 1 ]];  then touch wrfnl_go_ahead; touch wrf_go_ahead; fi
 
    $RUN_CMD $EXEC_FILE
-   
+  
+#   if [[ $WRF_CONF -ne "" ]] && [[ $NUM_PROCS -gt 1 ]]; then touch wrf_stop_now; fi
+ 
    if [[ -f rsl.out.0000 ]]; then
       grep -q 'SUCCESS COMPLETE ' $EXEC_FILE rsl.out.0000 
       RC=$?

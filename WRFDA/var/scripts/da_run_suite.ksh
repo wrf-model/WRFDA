@@ -245,7 +245,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_TL_TEST; then
-      export RUN_DIR=$EXP_DIR/$DATE/tltest
+      export RUN_DIR=$SUITE_DIR/$DATE/tltest
       export NL_WRFVAR_MEM_MODEL=2
       mkdir -p $RUN_DIR
 
@@ -260,7 +260,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
    fi
 
    if $RUN_ADJ_SENS; then
-      export RUN_DIR=$EXP_DIR/$DATE/sensitivity
+      export RUN_DIR=$SUITE_DIR/$DATE/sensitivity
       export NL_ADJ_SENS=true
       mkdir -p $RUN_DIR
 
@@ -276,11 +276,12 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
    if $RUN_OBS_IMPACT; then
       export RUN_WRFVAR=true
-      export NL_ANALYSIS_TYPE=QC-OBS
       export NL_USE_LANCZOS=true
+      export NL_ADJ_SENS=true
+      export NL_ANALYSIS_TYPE=QC-OBS
       export NL_SENSITIVITY_OPTION=0
       export NL_WRFVAR_MEM_MODEL=2
-      export ADJOINT_SENSITIVITY=$FC_DIR/$DATE/ad_d01_$DATE
+      export ADJOINT_SENSITIVITY=$SUITE_DIR/$DATE/sensitivity/ad_d01_$DATE
    fi
    
    if $RUN_GSI; then

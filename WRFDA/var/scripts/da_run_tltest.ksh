@@ -13,8 +13,8 @@
 export DATE_R=$($BUILD_DIR/da_advance_time.exe $DATE 00 -w 2>/dev/null)
 export DATE_P=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -w 2>/dev/null)
 export DATE_C=$($BUILD_DIR/da_advance_time.exe $DATE $FCST_RANGE -f ccyymmddhh 2>/dev/null)
-export RUN_DIR1=$EXP_DIR/$DATE/tltest/wrf1
-export RUN_DIR2=$EXP_DIR/$DATE/tltest/wrf2
+export RUN_DIR1=$EXP_DIR/$DATE/tltest/wrf_xb
+export RUN_DIR2=$EXP_DIR/$DATE/tltest/wrf_xa
 
 mkdir -p $RUN_DIR1 $RUN_DIR2 
 
@@ -26,8 +26,8 @@ date
 echo 'REL_DIR        <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'         
 echo 'RUN_DIR        <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'         
 echo 'RC_DIR         <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'           
-echo 'WRF1        <A HREF="file:'$RUN_DIR1'">'$RUN_DIR1'</a>'         
-echo 'WRF2        <A HREF="file:'$RUN_DIR2'">'$RUN_DIR2'</a>'         
+echo 'WRF_XB         <A HREF="file:'$RUN_DIR1'">'$RUN_DIR1'</a>'         
+echo 'WRF_XA         <A HREF="file:'$RUN_DIR2'">'$RUN_DIR2'</a>'         
 echo "DATE_R    = ${DATE_R}"
 echo "DATE_P    = ${DATE_P}"
 echo "PREV_DATE = ${PREV_DATE}"
