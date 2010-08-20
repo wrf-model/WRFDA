@@ -608,8 +608,9 @@ sub new_job_be {
      print FH "#BSUB -e job_${nam}_$par.error"."\n";
      print FH "#BSUB -W 360"."\n";
      print FH "#BSUB -P $Project"."\n";
-     printf FH "#BSUB -R span[ptile=%d]"."\n", ($par eq 'serial' || $par eq 'smpar') ?
-                                                1 : 32;
+     #printf FH "#BSUB -R span[ptile=%d]"."\n", ($par eq 'serial' || $par eq 'smpar') ?
+     #                                           1 : 32;
+     printf FH "#BSUB -R span[ptile=%d]"."\n", 32;
      print FH "\n";
      print FH ( $par eq 'smpar' || $par eq 'dm+sm') ? 
          "setenv OMP_NUM_THREADS $cpum\n" :"\n"; 
