@@ -27,9 +27,9 @@ CFLAGS          =    $(CFLAGS_LOCAL) CONFIGURE_DMPARALLEL CONFIGURE_STUBMPI \
                       -DMAX_HISTORY=$(MAX_HISTORY)
 FCFLAGS         =    $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =    $(MODULE_SRCH_FLAG) \
-                      -I$(WRFDA_SRC_ROOT_DIR)/external/io_netcdf \
-                      -I$(WRFDA_SRC_ROOT_DIR)/external/io_int \
-                      -I$(WRFDA_SRC_ROOT_DIR)/var/build \
+                      -I$(WRFDA_DIR)/external/io_netcdf \
+                      -I$(WRFDA_DIR)/external/io_int \
+                      -I$(WRFDA_DIR)/var/build \
                       -I$(NETCDFPATH)/include
 REGISTRY        =    Registry
 

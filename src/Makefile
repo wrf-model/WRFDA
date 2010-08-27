@@ -7,18 +7,18 @@ RM      =       rm -f
 include ../configure.gen_be
 
 
-GEN_BE_OBJS = $(WRFDA_SRC_ROOT_DIR)/var/build/da_etkf.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_blas.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_lapack.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_gen_be.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_control.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_be_spectral.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/module_wrf_error.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/module_driver_constants.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_memory.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_reporting.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/da_tools_serial.o \
-	$(WRFDA_SRC_ROOT_DIR)/var/build/module_ffts.o 
+GEN_BE_OBJS = $(WRFDA_DIR)/var/build/da_etkf.o \
+	$(WRFDA_DIR)/var/build/da_blas.o \
+	$(WRFDA_DIR)/var/build/da_lapack.o \
+	$(WRFDA_DIR)/var/build/da_gen_be.o \
+	$(WRFDA_DIR)/var/build/da_control.o \
+	$(WRFDA_DIR)/var/build/da_be_spectral.o \
+	$(WRFDA_DIR)/var/build/module_wrf_error.o \
+	$(WRFDA_DIR)/var/build/module_driver_constants.o \
+	$(WRFDA_DIR)/var/build/da_memory.o \
+	$(WRFDA_DIR)/var/build/da_reporting.o \
+	$(WRFDA_DIR)/var/build/da_tools_serial.o \
+	$(WRFDA_DIR)/var/build/module_ffts.o 
 
 be : \
 	gen_be_stage0_wrf.exe \
@@ -51,7 +51,7 @@ be : \
 	gen_be_ensmean.exe 
 
 
-GEN_BE_LIBS = $(WRFDA_SRC_ROOT_DIR)/external/io_netcdf/libwrfio_nf.a
+GEN_BE_LIBS = $(WRFDA_DIR)/external/io_netcdf/libwrfio_nf.a
 GEN_BE_LIB = $(LIB_EXTERNAL) -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack
 
 gen_be_stage0_wrf.exe : gen_be_stage0_wrf.o  $(GEN_BE_LIBS)

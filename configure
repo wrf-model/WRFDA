@@ -256,12 +256,10 @@ if  test -z "$NETCDF"  ; then
   fi
 fi
 
-# Look for WRFDA_SRC_ROOT_DIR
+# Look for WRFDA_DIR
 if test -n "$WRFDA_DIR" ; then
    if [ -d "$WRFDA_DIR" ] ; then
-      WRFDA_SRC_ROOT_DIR=$WRFDA_DIR
-      export WRFDA_SRC_ROOT_DIR
-      echo "Will use WRFDA_DIR in dir: $WRFDA_SRC_ROOT_DIR"  
+      echo "Will use WRFDA_DIR in dir: $WRFDA_DIR"  
    else
        echo '** ERROR: No path to WRFDA_DIR .'
        exit
