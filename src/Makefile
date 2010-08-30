@@ -14,8 +14,6 @@ GEN_BE_OBJS = $(WRFDA_DIR)/var/build/da_etkf.o \
 	$(WRFDA_DIR)/var/build/da_control.o \
 	$(WRFDA_DIR)/var/build/da_be_spectral.o \
 	$(WRFDA_DIR)/var/build/module_wrf_error.o \
-	$(WRFDA_DIR)/var/build/module_driver_constants.o \
-	$(WRFDA_DIR)/var/build/da_memory.o \
 	$(WRFDA_DIR)/var/build/da_reporting.o \
 	$(WRFDA_DIR)/var/build/da_tools_serial.o \
 	$(WRFDA_DIR)/var/build/module_ffts.o 
