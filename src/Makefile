@@ -53,15 +53,42 @@ GEN_BE_LIBS = $(WRFDA_DIR)/external/io_netcdf/libwrfio_nf.a
 GEN_BE_LIB = $(LIB_EXTERNAL) -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack
 
 gen_be_stage0_wrf.exe : gen_be_stage0_wrf.o  $(GEN_BE_LIBS)
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_wrf.F | sed '/integer *, *external.*iargc/d' > gen_be_stage0_wrf.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_wrf.F > gen_be_stage0_wrf.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_stage0_wrf.f90
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o $(GEN_BE_LIB)
 
 gen_be_stage0_gsi.exe : gen_be_stage0_gsi.o $(GEN_BE_OBJS) $(GEN_BE_LIBS)
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_gsi.F | sed '/integer *, *external.*iargc/d' > gen_be_stage0_gsi.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_gsi.F > gen_be_stage0_gsi.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_stage0_gsi.f90
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_gsi.o $(GEN_BE_LIB)
 
 gen_be_ep1.exe     : gen_be_ep1.o $(GEN_BE_OBJS) $(GEN_BE_LIBS)
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_ep1.o $(GEN_BE_LIB)
 
 gen_be_ep2.exe     : gen_be_ep2.o $(GEN_BE_OBJS) $(GEN_BE_LIBS)
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_ep2.F | sed '/integer *, *external.*iargc/d' > gen_be_ep2.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_ep2.F > gen_be_ep2.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_ep2.f90
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_ep2.o $(GEN_BE_LIB)
 
 gen_be_stage1.exe : gen_be_stage1.o $(GEN_BE_OBJS) $(GEN_BE_LIBS)
