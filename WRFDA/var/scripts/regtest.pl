@@ -197,7 +197,7 @@ die "WRFDA does not support compiler : $Compiler.\n" if ( (keys %Compile_options
 
 $ENV{CRTM} =1;
 if ($Arch eq "AIX") {   # bluefire
-    $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov87/ibm_powerpc';
+    $ENV{RTTOV} ='/blhome/wrfhelp/external/rttov/rttov93/ibm_powerpc';
     $ENV{NETCDF} ='/blhome/wrfhelp/external/netcdf/netcdf-3.6.1/ibm_powerpc';
 }
 
@@ -940,7 +940,7 @@ sub build_cwordsh {
 __DATA__
 ###########################################################################################
 #ARCH      SOURCE     COMPILER    PROJECT   QUEUE   DATABASE                             BASELINE
-AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
+AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  premium /mmm/users/wrfhelp/data/WRFDA-data-EM  /mmm/users/wrfhelp/data/BASELINE
 #INDEX   EXPERIMENT                  CPU     OPENMP       PAROPT
 1        tutorial_xinzhang           16      16           serial|smpar|dmpar
 2        cv3_guo                     16      16           serial|smpar|dmpar
@@ -953,7 +953,6 @@ AIX        /mmm/users/xinzhang/wrfda.tar        XLF         64000510  share /mmm
 9        cwb_ascii_outerloop_rizvi   16      16           serial|smpar|dmpar
 10       sfc_assi_2_outerloop_guo    16      16           serial|smpar|dmpar
 11       outerloop_bench_guo         16      16           serial|smpar|dmpar
-12       outerloop_ztd_bench_guo     16      16           serial|smpar|dmpar
 13       tutorial_xinzhang_kmatrix   16      16           serial|smpar|dmpar
 14       tutorial_xinzhang_rttov     16      16           serial|smpar|dmpar
 ###########################################################################################
@@ -971,7 +970,6 @@ Linux      SVN        ifort         64000420  share   /karri/users/xinzhang/regt
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
@@ -989,7 +987,6 @@ Linux      SVN        gfortran         64000420  share   /karri/users/xinzhang/r
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
@@ -1007,7 +1004,6 @@ Linux      SVN        pgi         64000420  share   /karri/users/xinzhang/regtes
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
@@ -1024,7 +1020,6 @@ Darwin     SVN        pgi         64000420  share   /data3/mp/wrfhelp/data//WRFD
 8        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 9        sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 10       outerloop_bench_guo         8       8            serial|dmpar
-11       outerloop_ztd_bench_guo     8       8            serial|dmpar
 12       tutorial_xinzhang           8       8            dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
@@ -1043,7 +1038,6 @@ Darwin     SVN        g95         64000420  share   /data3/mp/wrfhelp/data//WRFD
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 #13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar        #   dsyev stalls with g95
 #14       tutorial_xinzhang_rttov     8       8            serial|dmpar        #   dsyev stalls with g95
 ###########################################################################################
@@ -1061,7 +1055,6 @@ Darwin     SVN        gfortran         64000420  share   /data3/mp/wrfhelp/data/
 9        cwb_ascii_outerloop_rizvi   8       8            serial|dmpar
 10       sfc_assi_2_outerloop_guo    8       8            serial|dmpar
 11       outerloop_bench_guo         8       8            serial|dmpar
-12       outerloop_ztd_bench_guo     8       8            serial|dmpar
 13       tutorial_xinzhang_kmatrix   8       8            serial|dmpar
 14       tutorial_xinzhang_rttov     8       8            serial|dmpar
 ###########################################################################################
