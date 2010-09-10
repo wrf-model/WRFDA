@@ -21,26 +21,27 @@ export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/wrf}
 export WORK_DIR=$RUN_DIR/working
 export NL_RUN_HOURS=$FCST_RANGE
+export FC_DIR_DATE=${FC_DIR_DATE:-$FC_DIR/$DATE}
 
 # allow for ensemble members identified by CMEM
-export FC_DIR_DATE=$FC_DIR/$DATE
-if [[ ! -z $CMEM ]]; then
-   export FC_DIR_DATE=$FC_DIR/${DATE}.$CMEM
-fi
+#if [[ ! -z $CMEM ]]; then
+#   export FC_DIR_DATE=$FC_DIR/${DATE}.$CMEM
+#fi
 
 if [[ ! -d $FC_DIR_DATE ]]; then mkdir -p $FC_DIR_DATE; fi
 if [[ $WRF_CONF == "" ]]; then rm -rf $WORK_DIR; fi
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
+export NL_INPUTOUT_BEGIN_H=0
+export NL_INPUTOUT_END_H=$FCST_RANGE
+export NL_INPUTOUT_INTERVAL=60
+
 #----- WRF -----
 if [[ $WRF_CONF == "" ]]; then
    export EXEC_DIR=$WRF_DIR
    export EXEC_FILE="wrf.exe"   
 else
-   export NL_INPUTOUT_BEGIN_H=0
-   export NL_INPUTOUT_END_H=$FCST_RANGE
-   export NL_INPUTOUT_INTERVAL=60 
    export NL_HISTORY_INTERVAL=60
    export NL_FRAMES_PER_AUXHIST2=1
    
@@ -66,10 +67,9 @@ else
    else
       export EXEC_DIR=$WRFPLUS_DIR
       export EXEC_FILE="wrfplus.exe"
-      export RUN_CMD=" " # Temporarily disable multi-proc WRF+
-      echo 'Run WRFPLUS on single proc'
       if [[ $NUM_PROCS -gt 1 ]]; then touch wrf_go_ahead; fi
-#      if [[ -d wrf_done ]]; then rm wrf_done; fi
+      if [[ -d wrf_done ]]; then rm wrf_done; fi
+      if [[ -d wrf_stop_now ]]; then rm wrf_stop_now; fi
       
       if [[ $WRF_CONF == "TL" ]]; then 
          export NL_INPUT_OUTNAME="./tl_d<domain>_<date>"
@@ -98,8 +98,6 @@ else
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
       export NL_RADT=0
-#      export NL_SF_SFCLAY_PHYSICS=0
-#      export NL_SF_SURFACE_PHYSICS=0
       export NL_BL_PBL_PHYSICS=0
       export NL_CU_PHYSICS=0
       export NL_CUDT=0
@@ -191,10 +189,19 @@ if $DUMMY; then
 else
    if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then touch wrfnl_go_ahead; fi
 
+   if [[ $WRF_CONF == "TL" || $WRF_CONF == "AD" ]] && [[ $NUM_PROCS -gt 1 ]]; then 
+      cat > check4start << EOF
+         while [[ ! -f plus.rsl.out.0000 ]]; do
+            sleep 5
+         done
+         touch wrf_stop_now
+EOF
+      chmod 755 check4start
+      nohup check4start > /dev/null 2>&1& 
+   fi
+      
    $RUN_CMD $EXEC_FILE
-  
-#   if [[ $WRF_CONF -ne "" ]] && [[ $NUM_PROCS -gt 1 ]]; then touch wrf_stop_now; fi
- 
+
    if [[ -f rsl.out.0000 ]]; then
       grep -q 'SUCCESS COMPLETE ' $EXEC_FILE rsl.out.0000 
       RC=$?

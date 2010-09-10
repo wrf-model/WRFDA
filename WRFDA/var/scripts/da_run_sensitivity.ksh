@@ -45,21 +45,21 @@ echo ""
         echo '**** Running WRFNL ****' 
 #------------------- First WRFNL run (from Xb) --------------------
         export RUN_DIR=$RUN_DIR1
-	if $CYCLING && [[ $CYCLE_NUMBER -gt 0 ]]; then
-	   export WRF_INPUT_DIR=${FC_DIR}/${PREV_DATE}
+        if $CYCLING && [[ $CYCLE_NUMBER -gt 0 ]]; then
+           export WRF_INPUT_DIR=${FC_DIR}/${PREV_DATE}
     	else
-	   export WRF_INPUT_DIR=${RC_DIR}/${DATE}
+           export WRF_INPUT_DIR=${RC_DIR}/${DATE}
         fi
       		
         $SCRIPTS_DIR/da_run_wrf.ksh "NL" > $RUN_DIR/WRFNL.html 2>&1
          
 #------------------- Second WRFNL run (from Xa) --------------------
-	if [[ $ADJ_MEASURE -ne 1 ]]; then
+#        if [[ $ADJ_MEASURE -ne 1 ]]; then
            export RUN_DIR=$RUN_DIR2
-   	   export WRF_INPUT_DIR=${FC_DIR}/${DATE}
+           export WRF_INPUT_DIR=${FC_DIR}/${DATE}
 	   	   
            $SCRIPTS_DIR/da_run_wrf.ksh "NL" > $RUN_DIR/WRFNL.html 2>&1         
-	fi
+#        fi
      else    
         echo '**** WRFNL is not run ****' 
      fi
@@ -80,31 +80,33 @@ echo ""
      fi
 
      #--------- First Forecast Norm: (Xbf - Xt)
+     export RUN_DIR=$RUN_DIR1
      if [[ $ADJ_REF -ne 3 ]]; then
-	cd $RUN_DIR1/working
+        cd $RUN_DIR/working
         cp wrfout_d${DOMAINS}_${DATE_P} fcst
         ln -fs $XREF xref
         ncl $RUN_DIR1/adj_forcing.ncl > $RUN_DIR1/Fcerr.html 2>&1
      else
-        export RUN_DIR=$RUN_DIR1/ObsFcErr
-	    mkdir -p $RUN_DIR
+        export RUN_DIR=$RUN_DIR/ObsFcErr
+        mkdir -p $RUN_DIR
         DATE_TMP=$DATE
         DATE=$DATE_C
         $SCRIPTS_DIR/da_trace.ksh da_run_wrfvar $RUN_DIR
         $SCRIPTS_DIR/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1    
         DATE=$DATE_TMP		
      fi   
-     cp $RUN_DIR1/working/fcst $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P}
+     cp $RUN_DIR/working/fcst $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P}
 
      #--------- Second Forecast Norm: (Xaf - Xt)
+     export RUN_DIR=$RUN_DIR2
      if [[ $ADJ_MEASURE -ne 1 ]]; then
-	if [[ $ADJ_REF -ne 3 ]]; then
-	   cd $RUN_DIR2/working
+        if [[ $ADJ_REF -ne 3 ]]; then
+           cd $RUN_DIR/working
            cp wrfout_d${DOMAINS}_${DATE_P} fcst
            ln -fs $XREF xref
            ncl $RUN_DIR1/adj_forcing.ncl > $RUN_DIR2/Fcerr.html 2>&1
 	else
-           export RUN_DIR=$RUN_DIR2/ObsFcErr
+           export RUN_DIR=$RUN_DIR/ObsFcErr
            mkdir -p $RUN_DIR
            DATE_TMP=$DATE
            DATE=$DATE_C
@@ -112,7 +114,7 @@ echo ""
            $SCRIPTS_DIR/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1    		      
            DATE=$DATE_TMP		
         fi   
-        mv $RUN_DIR2/working/fcst $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P}
+        mv $RUN_DIR/working/fcst $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P}
      fi
 
 ############################## Run WRF+ #################################
@@ -127,30 +129,30 @@ echo ""
 
 #------------------- First WRF+ run --------------------
         export RUN_DIR=$RUN_DIR1
-	
+
         if [[ $ADJ_MEASURE -ne 2 ]]; then
-	   ln -sf $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}	   
-	else 
+           ln -sf $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}	   
+        else 
            ln -sf $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
-	fi
-	   
+        fi
+   
         $SCRIPTS_DIR/da_run_wrf.ksh "AD" > $RUN_DIR/WRFAD.html 2>&1
-	
-	mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
+
+        mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
 
 #------------------- Second WRF+ run --------------------
-	if [[ $ADJ_MEASURE -ne 1 ]]; then
+        if [[ $ADJ_MEASURE -ne 1 ]]; then
            export RUN_DIR=$RUN_DIR2
-	   
+
            if [[ $ADJ_MEASURE == 2 ]]; then
               ln -sf $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
-	   else   
+           else   
               ln -sf $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
-	   fi
-	          
+           fi
+
            $SCRIPTS_DIR/da_run_wrf.ksh "AD" > $RUN_DIR/WRFAD.html 2>&1
 
-   	   mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
+           mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
         fi        
      else    
         echo '**** WRFPlus is not run ****' 
@@ -163,10 +165,14 @@ echo ""
    cp $RUN_DIR1/init_sens_d${DOMAINS}_${DATE_R} a
    if [[ $ADJ_MEASURE -ne 1 ]]; then
       ln -fs $RUN_DIR2/init_sens_d${DOMAINS}_${DATE_R} b
-      ncl $GRAPHICS_DIR/wrf_sum.ncl 
-      rm b
-   fi
+   else
+      cp a b
+   fi   
+   
+   ncl $GRAPHICS_DIR/wrf_sum.ncl 
+   
    mv a ad_d${DOMAINS}_$DATE
+   rm b
      
 #------------------- Diagnostics --------------------
    echo "**** Running Diagnostics ****"
