@@ -191,7 +191,7 @@ else
 
    if [[ $WRF_CONF == "TL" || $WRF_CONF == "AD" ]] && [[ $NUM_PROCS -gt 1 ]]; then 
       cat > check4start << EOF
-         while [[ ! -f plus.rsl.out.0000 ]]; do
+         while [[ ! -f wrf_done ]]; do
             sleep 5
          done
          touch wrf_stop_now
@@ -206,7 +206,7 @@ EOF
       grep -q 'SUCCESS COMPLETE ' $EXEC_FILE rsl.out.0000 
       RC=$?
    fi
-
+   
    cp namelist.output $RUN_DIR/namelist.output
    cp namelist.output $RUN_DIR/namelist.output$WRF_CONF
    echo '<A HREF="namelist.output">Namelist output</a>'
