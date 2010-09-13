@@ -203,17 +203,17 @@ if ($Arch eq "AIX") {   # bluefire
 
 if ($Arch eq "Linux") {   # for karri
     if ($Compiler=~/pgi/i) {   # PGI
-        $ENV{RTTOV} ='/karri/users/xinzhang/external/pgi_web/rttov87';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/pgi_web/rttov93';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/pgi_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/pgi_x86_64/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/ifort/i) {   # INTEL
-        $ENV{RTTOV} ='/karri/users/xinzhang/external/intel_web/rttov87';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/intel_web/rttov93';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/intel_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/intel_x86_64/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/gfortran/i) {   # GFORTRAN
-        $ENV{RTTOV} ='/karri/users/xinzhang/external/gfortran_web/rttov87';
+        $ENV{RTTOV} ='/karri/users/xinzhang/external/gfortran_web/rttov93';
         $ENV{NETCDF} ='/karri/users/xinzhang/external/gfortran_web/netcdf-3.6.1';
         $ENV{PATH} ='/karri/users/xinzhang/bin/gcc-4.3/bin:/karri/users/xinzhang/external/mpi/mpich2-1.0.6p1/gfortran_x86_64/bin:'.$ENV{PATH};
         $ENV{LD_LIBRARY_PATH} ='/karri/users/xinzhang/bin/gcc-4.3/lib64:'.$ENV{LD_LIBRARY_PATH};
@@ -234,17 +234,17 @@ if ($Arch eq "Linux") {   # for karri
 }
 if ($Arch eq "Darwin") {   # Darwin
     if ($Compiler=~/g95/i) {   # G95
-        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov87';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/rttov93';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_G95/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_G95/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/pgi/i) {   # PGI
-        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov87';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/rttov93';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_PGI/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_PGI/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
     if ($Compiler=~/gfortran/i) {   # GFORTRAN
-        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/rttov87';
+        $ENV{RTTOV} ='/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/rttov93';
         $ENV{NETCDF} ='/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/netcdf-3.6.1';
         $ENV{PATH} ='/data3/mp/wrfhelp/bin/MAC_INTEL_PGI:/data3/mp/wrfhelp/external/MAC_INTEL_GFORTRAN/mpich2-1.0.7/bin:'.$ENV{PATH};
     }
