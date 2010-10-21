@@ -20,10 +20,10 @@
 #-----------------------------------------------------------------------
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
+export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE_DIR/scripts}
 
-. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi
 if [[ ! -d $STAGE0_DIR ]]; then mkdir -p $STAGE0_DIR; fi
@@ -42,7 +42,7 @@ for CV in $CONTROL_VARIABLES; do mkdir -p $CV; done
 
 echo 
 echo $(date) "Start"
-echo "WRFVAR_DIR is" $WRFVAR_DIR $(svnversion $WRFVAR_DIR)
+echo "GEN_BE_DIR is" $GEN_BE_DIR $(svnversion $GEN_BE_DIR)
 
 if $RUN_GEN_BE_STAGE0; then
    echo "---------------------------------------------------------------"
@@ -51,8 +51,7 @@ if $RUN_GEN_BE_STAGE0; then
 
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
-
-   $SCRIPTS_DIR/gen_be/gen_be_stage0_wrf.ksh
+   $SCRIPTS_DIR/gen_be_stage0_wrf.ksh
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 0 for WRF failed with error" $RC
@@ -243,14 +242,14 @@ if $RUN_GEN_BE_STAGE4; then
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
 
-      ${SCRIPTS_DIR}/gen_be/gen_be_stage4_global.ksh > gen_be_stage4_global.log 2>&1
+      ${SCRIPTS_DIR}/gen_be_stage4_global.ksh > gen_be_stage4_global.log 2>&1
 
    else
       echo "---------------------------------------------------------------"
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${SCRIPTS_DIR}/gen_be/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
+      ${SCRIPTS_DIR}/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 4 failed with error" $RC
@@ -318,7 +317,7 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=chi_u
    export VARIABLE2=chi
 
-   $SCRIPTS_DIR/gen_be/gen_be_cov3d.ksh
+   $SCRIPTS_DIR/gen_be_cov3d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -331,7 +330,7 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=t_u
    export VARIABLE2=t
 
-   $SCRIPTS_DIR/gen_be/gen_be_cov3d.ksh
+   $SCRIPTS_DIR/gen_be_cov3d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -344,12 +343,24 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=ps_u
    export VARIABLE2=ps
 
-   $SCRIPTS_DIR/gen_be/gen_be_cov2d.ksh
+   $SCRIPTS_DIR/gen_be_cov2d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "gen_be_cov2d failed with error" $RC
       echo gen_be_cov2d > $RUN_DIR/FAIL
+      exit 1
+   fi
+fi
+
+if $RUN_GEN_BE_GRAPHICS; then
+
+   $SCRIPTS_DIR/gen_be_graphics.ksh
+
+   RC=$?
+   if [[ $RC != 0 ]]; then
+      echo "gen_be_graphics failed with error" $RC
+      echo "gen_be_graphics" > $RUN_DIR/FAIL
       exit 1
    fi
 fi

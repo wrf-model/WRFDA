@@ -12,9 +12,9 @@ begin
    works = getenv("GRAPHIC_WORKS")
 
    region = getenv("REGION")
-   dir    = getenv("BE_DIR")
+   dir    = getenv("WORK_DIR")
    nrow   = stringtointeger(getenv("BE_NROW"))
-   resolution = stringtofloat(getenv("RESOLUTION"))
+   resolution = stringtofloat(getenv("RESOLUTION_KM"))
 
    ncol = 2
 

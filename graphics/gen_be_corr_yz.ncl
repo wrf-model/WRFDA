@@ -12,7 +12,7 @@ begin
    works = getenv("GRAPHIC_WORKS")
 
    region = getenv("REGION")
-   dir    = getenv("BE_DIR")
+   dir    = getenv("WORK_DIR")
    nk   = stringtointeger(getenv("NUM_LEVELS"))
    ni   = stringtointeger(getenv("NUM_WE"))
    nj   = stringtointeger(getenv("NUM_SN"))

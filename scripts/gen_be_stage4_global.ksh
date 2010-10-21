@@ -18,10 +18,10 @@ export BEGIN_CPU=$(date)
 echo "Beginning CPU time: ${BEGIN_CPU}"
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
+export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE_DIR/scripts}
 
-. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
 
 for CV in $CONTROL_VARIABLES; do
    if [[ ! -d ${WORK_DIR}/$CV ]]; then

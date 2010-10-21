@@ -15,8 +15,10 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-# Decide which stages to run (run if true):
+# External libraries:
+export NCARG_ROOT=${NCARG_ROOT:-/usr/local/ncarg}    # NCAR graphics (required only for plots).
 
+# Decide which stages to run (run if true):
 export RUN_GEN_BE_STAGE0=${RUN_GEN_BE_STAGE0:-false} # Run stage 0 (create perturbation files).
 export RUN_GEN_BE_STAGE1=${RUN_GEN_BE_STAGE1:-false} # Run stage 1 (Remove mean, split variables).
 export RUN_GEN_BE_STAGE2=${RUN_GEN_BE_STAGE2:-false} # Run stage 2 (Regression coefficients).
@@ -25,14 +27,14 @@ export RUN_GEN_BE_STAGE3=${RUN_GEN_BE_STAGE3:-false} # Run stage 3 (Vertical Cov
 export RUN_GEN_BE_STAGE4=${RUN_GEN_BE_STAGE4:-false} # Run stage 4 (Horizontal Covariances).
 export RUN_GEN_BE_DIAGS=${RUN_GEN_BE_DIAGS:-false}   # Run gen_be diagnostics.
 export RUN_GEN_BE_DIAGS_READ=${RUN_GEN_BE_DIAGS_READ:-false}   # Run gen_be diagnostics_read.
-export RUN_GEN_BE_MULTICOV=${RUN_GEN_BE_MULTICOV:-false} # Set to calculate multi-corr for MBE         
-export RUN_GEN_BE_HISTOG=${RUN_GEN_BE_HISTOG:-false} # Set to calculate Hitograms for MBE          
-export RUN_GEN_BE_MULTICOV_CONTRIB=${RUN_GEN_BE_MULTICOV_CONTRIB:-false} # Set to calculate contrib for MBE          
-export RUN_GEN_BE_GSI_STAGE0=${RUN_GEN_BE_GSI_STAGE0:-false} # Run stage 0 (create perturbation files).
-export RUN_GEN_BE_GSI_STAGE1=${RUN_GEN_BE_GSI_STAGE1:-false} # Run stage 1 (Remove mean, split variables).
-export RUN_GEN_BE_GSI_STAGE2=${RUN_GEN_BE_GSI_STAGE2:-false} # Run stage 2 (Regression coefficients).
-export BY_LEVELS=${BY_LEVELS:-True} 
-
+export RUN_GEN_BE_MULTICOV=${RUN_GEN_BE_MULTICOV:-false} # Set to calculate multivariate correlations.
+export RUN_GEN_BE_GRAPHICS=${RUN_GEN_BE_GRAPHICS:-false} # Set to produce graphics.
+#export RUN_GEN_BE_HISTOG=${RUN_GEN_BE_HISTOG:-false} # Set to calculate Hitograms for MBE          
+#export RUN_GEN_BE_MULTICOV_CONTRIB=${RUN_GEN_BE_MULTICOV_CONTRIB:-false} # Set to calculate contrib for MBE          
+#export RUN_GEN_BE_GSI_STAGE0=${RUN_GEN_BE_GSI_STAGE0:-false} # Run stage 0 (create perturbation files).
+#export RUN_GEN_BE_GSI_STAGE1=${RUN_GEN_BE_GSI_STAGE1:-false} # Run stage 1 (Remove mean, split variables).
+#export RUN_GEN_BE_GSI_STAGE2=${RUN_GEN_BE_GSI_STAGE2:-false} # Run stage 2 (Regression coefficients).
+#export BY_LEVELS=${BY_LEVELS:-True} 
 
 export DOMAIN=${DOMAIN:-01}                          # domain id.
 export START_DATE=${START_DATE:-2003010200}          # Time of first perturbation.
@@ -58,6 +60,8 @@ export RF_SCALE=${RF_SCALE:-1.0}                     # Recursive filter scale.
 export USE_GLOBAL_EOFS=${USE_GLOBAL_EOFS:-.true.}    # Use domain-averaged EOFS for stage3.
 export DATA_ON_LEVELS=${DATA_ON_LEVELS:-.false.}     # False if fields projected onto modes.
 export GLOBAL=${GLOBAL:-false}                       # Global or regional models
+export NUM_WE=${NUM_WE:-100}                         # Hard-wired for now....
+export NUM_SN=${NUM_SN:-100}                         # Hard-wired for now....
 export NUM_LEVELS=${NUM_LEVELS:-27}                  # Hard-wired for now....
 export N_SMTH_SL=${N_SMTH_SL:-2}                     # Amount of lengthscale smoothing (0=none).
 export STRIDE=${STRIDE:-1}                           # Calculate correlation evert STRIDE point (stage4 regional).
@@ -78,11 +82,13 @@ export CLEAN=false
 export FILE_TYPE=${FILE_TYPE:-wrfout}
 export RESOLUTION_KM=${RESOLUTION_KM:-200.}
 export NL_CV_OPTIONS=${NL_CV_OPTIONS:-5}
+export GRAPHIC_WORKS=${GRAPHIC_WORKS:-pdf}
 
 # Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
-export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/var/da} # WRF-Var code build directory.
+export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}  # gen_be code directory.
+export BUILD_DIR=${BUILD_DIR:-$GEN_BE_DIR/src}    # gen_be code build directory.
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$GEN_BE_DIR/graphics} # gen_be NCL graphics directory.
 export DAT_DIR=${DAT_DIR:-${HOME}/data}           # Top-level data directory.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
@@ -90,11 +96,10 @@ export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/gen_be$BIN_TYPE} # Run dir.
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Working directory
 export STAGE0_DIR=${STAGE0_DIR:-$WORK_DIR/stage0} # Output for stage0.
-export STAGE0_GSI_DIR=${STAGE0_GSI_DIR:-$EXP_DIR/stage0_gsi} # Output for GSI stage0.
-export STAGE1_GSI_DIR=${STAGE1_GSI_DIR:-$EXP_DIR/stage1_gsi} # Output for GSI stage0.
-export LESS_Q_FROM_TOP=${LESS_Q_FROM_TOP:-0}
-export LAT_BINS_IN_DEG=${LAT_BINS_IN_DEG:-1.0}
-
+#export STAGE0_GSI_DIR=${STAGE0_GSI_DIR:-$EXP_DIR/stage0_gsi} # Output for GSI stage0.
+#export STAGE1_GSI_DIR=${STAGE1_GSI_DIR:-$EXP_DIR/stage1_gsi} # Output for GSI stage0.
+#export LESS_Q_FROM_TOP=${LESS_Q_FROM_TOP:-0}
+#export LAT_BINS_IN_DEG=${LAT_BINS_IN_DEG:-1.0}
 
 if $GLOBAL; then
    export UH_METHOD=power

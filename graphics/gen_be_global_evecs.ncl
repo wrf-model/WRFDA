@@ -12,7 +12,7 @@ begin
    works = getenv("GRAPHIC_WORKS")
 
    region = getenv("REGION")
-   dir    = getenv("BE_DIR")
+   dir    = getenv("WORK_DIR")
    nrow   = stringtointeger(getenv("BE_NROW"))
 
    ncol = 6
