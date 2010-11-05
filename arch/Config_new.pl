@@ -166,9 +166,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
   $sw_fc = "\$(DM_FC)" ;
   $sw_cc = "\$(DM_CC)" ;
   $sw_dmparallelflag = "-DDM_PARALLEL" ;
-  $sw_comms_lib = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a" ;
-  $sw_comms_external = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
-  $sw_comms_include = "-I\$(WRFDA_DIR)/external/RSL_LITE" ;
+  $sw_comms_lib = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a" ;
+  $sw_comms_external = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
+  $sw_comms_include = "-I\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE" ;
  }
 
 # The jasper library is required to build Grib2 I/O.  User must set 
@@ -311,9 +311,9 @@ while ( <CONFIGURE_DEFAULTS> )
       { $_ =~ s/CONFIGURE_WRFIO_NF/wrfio_nf/g ;
 	$_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
         if ( $sw_os == Interix ) {
-	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:\$\(WRFDA_DIR\)/external/io_netcdf/libwrfio_nf.a -L$sw_netcdf_path/lib $sw_usenetcdff -lnetcdf : ;
+	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_netcdf/libwrfio_nf.a -L$sw_netcdf_path/lib $sw_usenetcdff -lnetcdf : ;
         } else {
-	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L\$\(WRFDA_DIR\)/external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib $sw_usenetcdff -lnetcdf : ;
+	  $_ =~ s:CONFIGURE_NETCDF_LIB_PATH:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_netcdf -lwrfio_nf -L$sw_netcdf_path/lib $sw_usenetcdff -lnetcdf : ;
         }
 	 }
     else                   
@@ -326,9 +326,9 @@ while ( <CONFIGURE_DEFAULTS> )
       { $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
 	$_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF: ;
         if ( $sw_os == Interix ) {
-	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:\$\(WRFDA_DIR\)/external/io_pnetcdf/libwrfio_pnf.a -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_pnetcdf/libwrfio_pnf.a -L$sw_pnetcdf_path/lib -lpnetcdf: ;
         } else {
-	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:-L\$\(WRFDA_DIR\)/external/io_pnetcdf -lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+	  $_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_pnetcdf -lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
         }
 	 }
     else                   
@@ -341,7 +341,7 @@ while ( <CONFIGURE_DEFAULTS> )
 
       { $_ =~ s/CONFIGURE_WRFIO_PHDF5/wrfio_phdf5/g ;
 	$_ =~ s:CONFIGURE_PHDF5_FLAG:-DPHDF5: ;
-	$_ =~ s:CONFIGURE_PHDF5_LIB_PATH:-L\$\(WRFDA_DIR\)/external/io_phdf5 -lwrfio_phdf5 -L$sw_phdf5_path/lib -lhdf5_fortran -lhdf5 -lm -lz -L$sw_phdf5_path/lib -lsz: ;
+	$_ =~ s:CONFIGURE_PHDF5_LIB_PATH:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_phdf5 -lwrfio_phdf5 -L$sw_phdf5_path/lib -lhdf5_fortran -lhdf5 -lm -lz -L$sw_phdf5_path/lib -lsz: ;
 	 }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_PHDF5//g ;
@@ -353,7 +353,7 @@ while ( <CONFIGURE_DEFAULTS> )
       { $_ =~ s/CONFIGURE_WRFIO_GRIB2/wrfio_grib2/g ;
         $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
         $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
-        $_ =~ s:CONFIGURE_GRIB2_LIB:-L\$\(WRFDA_DIR\)/external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
+        $_ =~ s:CONFIGURE_GRIB2_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
       }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_GRIB2//g ;
@@ -367,8 +367,8 @@ while ( <CONFIGURE_DEFAULTS> )
     if ( $sw_esmflib_path && $sw_esmfinc_path )
       {
       $_ =~ s:CONFIGURE_ESMF_FLAG:-DESMFIO:g ;
-      $_ =~ s:ESMFIOLIB:-L$sw_esmflib_path -lesmf -L\$\(WRFDA_DIR\)/external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
-      $_ =~ s:ESMFIOEXTLIB:-L$sw_esmflib_path -lesmf -L\$\(WRFDA_DIR\)/external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
+      $_ =~ s:ESMFIOLIB:-L$sw_esmflib_path -lesmf -L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
+      $_ =~ s:ESMFIOEXTLIB:-L$sw_esmflib_path -lesmf -L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
       $_ =~ s:ESMFLIBFLAG:\$\(ESMF_LDFLAG\):g ;
       }
     else
@@ -376,17 +376,17 @@ while ( <CONFIGURE_DEFAULTS> )
         $_ =~ s:CONFIGURE_ESMF_FLAG::g ;
         $_ =~ s:ESMFLIBFLAG::g ;
         if ( $sw_os == Interix ) {
-           $_ =~ s:ESMFIOLIB:\$\(WRFDA_DIR\)/external/esmf_time_f90/libesmf_time.a:g ;
-           $_ =~ s:ESMFIOEXTLIB:-L\$\(WRFDA_DIR\)/external/esmf_time_f90/libesmf_time.a:g ;
+           $_ =~ s:ESMFIOLIB:\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90/libesmf_time.a:g ;
+           $_ =~ s:ESMFIOEXTLIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90/libesmf_time.a:g ;
         } else {
-           $_ =~ s:ESMFIOLIB:-L\$\(WRFDA_DIR\)/external/esmf_time_f90 -lesmf_time:g ;
-           $_ =~ s:ESMFIOEXTLIB:-L\$\(WRFDA_DIR\)/external/esmf_time_f90 -lesmf_time:g ;
+           $_ =~ s:ESMFIOLIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90 -lesmf_time:g ;
+           $_ =~ s:ESMFIOEXTLIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90 -lesmf_time:g ;
         }
       }
      if ( $ENV{HWRF} )
        {
-        $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(WRFDA_DIR\)/external/atm_pom  -latm_pom:g ;
-        $_ =~ s:CONFIGURE_ATMPOM_INC:-I\$\(WRFDA_DIR\)/external/atm_pom:g;
+        $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom  -latm_pom:g ;
+        $_ =~ s:CONFIGURE_ATMPOM_INC:-I\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom:g;
         $_ =~ s/CONFIGURE_ATMPOM/atm_pom/g ;
        }
      else
@@ -441,11 +441,11 @@ while ( <CONFIGURE_DEFAULTS> )
           if ( ( $paropt eq 'serial' || $paropt eq 'smpar' ) ) {   # nesting without MPI
             $sw_stubmpi = "-DSTUBMPI" ;
             if ( $sw_os ne "CYGWIN_NT" ) {
-              $sw_comms_lib = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a" ;
+              $sw_comms_lib = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a" ;
             } else {
               $sw_comms_lib = "../external/RSL_LITE/librsl_lite.a" ;
             }
-            $sw_comms_external = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
+            $sw_comms_external = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
             $sw_dmparallel = "RSL_LITE" ;
             $sw_dmparallelflag = "-DDM_PARALLEL" ;
           }
@@ -453,11 +453,11 @@ while ( <CONFIGURE_DEFAULTS> )
         if ( $paropt eq 'smpar' || $paropt eq 'dm+sm' ) { $sw_ompparallel = "OMP" ; }
         if ( $paropt eq 'dmpar' || $paropt eq 'dm+sm' ) {
           if ( $sw_os ne "CYGWIN_NT" ) {
-            $sw_comms_lib = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a" ;
+            $sw_comms_lib = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a" ;
           } else {
             $sw_comms_lib = "../external/RSL_LITE/librsl_lite.a" ;
           }
-          $sw_comms_external = "\$(WRFDA_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
+          $sw_comms_external = "\$(GEN_BE_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite" ;
           $sw_dmparallel = "RSL_LITE" ;
           $sw_dmparallelflag = "-DDM_PARALLEL" ;
           $sw_fc = "\$(DM_FC)" ;
@@ -488,24 +488,24 @@ while ( <ARCH_PREAMBLE> )
   if ( $sw_esmflib_path && $sw_esmfinc_path )
     {
     $_ =~ s/ESMFCOUPLING/1/g ;
-    $_ =~ s:ESMFMODDEPENDENCE:\$\(WRFDA_DIR\)/external/io_esmf/module_utility.o:g ;
-    $_ =~ s:ESMFMODINC:-I$sw_esmfinc_path -I\$\(WRFDA_DIR\)/main:g ;
-    $_ =~ s:ESMFIOINC:-I\$\(WRFDA_DIR\)/external/io_esmf:g ;
+    $_ =~ s:ESMFMODDEPENDENCE:\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_esmf/module_utility.o:g ;
+    $_ =~ s:ESMFMODINC:-I$sw_esmfinc_path -I\$\(GEN_BE_SRC_ROOT_DIR\)/main:g ;
+    $_ =~ s:ESMFIOINC:-I\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_esmf:g ;
     $_ =~ s:ESMFIODEFS:-DESMFIO:g ;
     $_ =~ s:ESMFTARGET:wrfio_esmf:g ;
     }
   else
     {
     $_ =~ s/ESMFCOUPLING/0/g ;
-    $_ =~ s:ESMFMODDEPENDENCE:\$\(WRFDA_DIR\)/external/esmf_time_f90/module_utility.o:g ;
+    $_ =~ s:ESMFMODDEPENDENCE:\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90/module_utility.o:g ;
     $_ =~ s:ESMFMODINC::g ;
-    $_ =~ s:ESMFIOINC:-I\$\(WRFDA_DIR\)/external/esmf_time_f90:g ;
+    $_ =~ s:ESMFIOINC:-I\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90:g ;
     $_ =~ s:ESMFIODEFS::g ;
     $_ =~ s:ESMFTARGET:esmf_time:g ;
     }
   if ( $ENV{HWRF} )
     {
-    $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(WRFDA_DIR\)/external/atm_pom  -latm_pom:g ;
+    $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom  -latm_pom:g ;
     $_ =~ s/CONFIGURE_ATMPOM/atm_pom/g ;
     }
   else

@@ -256,19 +256,6 @@ if  test -z "$NETCDF"  ; then
   fi
 fi
 
-# Look for WRFDA_DIR
-if test -n "$WRFDA_DIR" ; then
-   if [ -d "$WRFDA_DIR" ] ; then
-      echo "Will use WRFDA_DIR in dir: $WRFDA_DIR"  
-   else
-       echo '** ERROR: No path to WRFDA_DIR .'
-       exit
-   fi
-else
-   echo '** ERROR: Environment variable WRFDA_DIR not set.'
-   exit
-fi
-
 USENETCDFF=""  # see below
 if [ -n "$NETCDF" ] ; then
   echo "Will use NETCDF in dir: $NETCDF"

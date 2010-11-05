@@ -38,11 +38,6 @@ How to compile and run?
 
         setenv NETCDF /usr/local/netcdf-pgi
 
-- GEN_BE requires environmental variable WRFDA_DIR to pinter to a compiled WRFDA 
-  directory. For example,
-
-        setenv WRFDA_DIR /ptmp/wrfhelp/WRFDA
-
 - To compile gen_be,
 
         ./configure [-d]

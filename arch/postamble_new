@@ -12,8 +12,6 @@ ARCHFLAGS       =    $(COREDEFS) -DIWORDSIZE=$(IWORDSIZE) -DDWORDSIZE=$(DWORDSIZ
                       CONFIGURE_PNETCDF_FLAG \
                       CONFIGURE_ESMF_FLAG \
                       CONFIGURE_GRIB2_FLAG \
-                      CONFIGURE_RTTOV_FLAG \
-                      CONFIGURE_CRTM_FLAG \
                       CONFIGURE_NESTOPT \
                       -DUSE_ALLOCATABLES \
                       -DGRIB1 \
@@ -27,9 +25,10 @@ CFLAGS          =    $(CFLAGS_LOCAL) CONFIGURE_DMPARALLEL CONFIGURE_STUBMPI \
                       -DMAX_HISTORY=$(MAX_HISTORY)
 FCFLAGS         =    $(FCOPTIM) $(FCBASEOPTS)
 INCLUDE_MODULES =    $(MODULE_SRCH_FLAG) \
-                      -I$(WRFDA_DIR)/external/io_netcdf \
-                      -I$(WRFDA_DIR)/external/io_int \
-                      -I$(WRFDA_DIR)/var/build \
+                      -I$(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf \
+                      -I$(GEN_BE_SRC_ROOT_DIR)/external/lapack \
+                      -I$(GEN_BE_SRC_ROOT_DIR)/external/blas \
+                      -I$(GEN_BE_SRC_ROOT_DIR)/external/tools \
                       -I$(NETCDFPATH)/include
 REGISTRY        =    Registry
 
@@ -53,11 +52,30 @@ CPPFLAGS        =    $(ARCHFLAGS) $(ENVCOMPDEFS) -I$(LIBINCLUDE) $(TRADFLAG) CON
 NETCDFPATH      =    CONFIGURE_NETCDF_PATH
 PNETCDFPATH     =    CONFIGURE_PNETCDF_PATH
 
-bundled:  fftpack CONFIGURE_ATMPOM
-external:  
+bundled:  ioapi_includes blas lapack fftpack CONFIGURE_ATMPOM
+external: tools io_nf  
 
 ######################
 externals: bundled external
+
+tools : lapack
+	( cd $(GEN_BE_SRC_ROOT_DIR)/external/tools ; \
+	make $(J) FC="$(SFC)" CPP="$(CPP)" OMPCPP="$(OMPCPP)" FCFLAGS="$(PROMOTION) $(FCDEBUG) $(FCBASEOPTS)" \
+        CPPFLAGS="$(CPPFLAGS)" RANLIB="$(RANLIB)" AR="$(AR)" ARFLAGS="$(ARFLAGS)" )
+
+io_nf : ioapi_includes
+	( cd $(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf ; \
+          make NETCDFPATH="$(NETCDFPATH)" RANLIB="$(RANLIB)" CPP="$(CPP)" \
+          CC="$(SCC)" CFLAGS="$(CFLAGS)" \
+          FC="$(SFC) $(PROMOTION) $(FCFLAGS)" TRADFLAG="$(TRADFLAG)" AR="$(AR)" ARFLAGS="$(ARFLAGS)" )
+
+blas :
+	( cd $(GEN_BE_SRC_ROOT_DIR)/external/blas ; \
+	make $(J) FC="$(SFC)" CPP="$(CPP)" OMPCPP="$(OMPCPP)" FCFLAGS="$(FCDEBUG) $(FCBASEOPTS)" CPPFLAGS="$(CPPFLAGS)")
+
+lapack : blas
+	( cd $(GEN_BE_SRC_ROOT_DIR)/external/lapack ; \
+	make $(J) FC="$(SFC)" CPP="$(CPP)" OMPCPP="$(OMPCPP)" FCFLAGS="$(FCDEBUG) $(FCBASEOPTS)" CPPFLAGS="$(CPPFLAGS)")
 
 fftpack :
 	( cd $(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 ; \
@@ -69,6 +87,12 @@ fftpack :
 LN	=	ln -sf
 MAKE	=	make -i -r
 RM	= 	rm -f
+
+# These sub-directory builds are identical across all architectures
+
+ioapi_includes :
+	( cd $(GEN_BE_SRC_ROOT_DIR)/external/ioapi_share ; \
+          $(MAKE) NATIVE_RWORDSIZE="$(NATIVE_RWORDSIZE)" RWORDSIZE="$(RWORDSIZE)" AR="$(AR)" ARFLAGS="$(ARFLAGS)" )
 
 #	There is probably no reason to modify these rules
 
