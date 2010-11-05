@@ -21,7 +21,7 @@ da_be_spectral.o : da_be_spectral.f90 da_control.o da_reporting.o da_tools_seria
 .f90.o :
 	rm -f  $@
 	$(CPP) $(CPPFLAGS) $(OMPCPP) $*.f90  > $*.f
-	$(FC) -o $@ -c -I../lapack $(FCFLAGS) $*.f
+	$(FC) -o $@ -c -I../blas -I../lapack $(FCFLAGS) $*.f
 
 clean:
 	rm -f $(OBJ) $(TARGET) *.f *.mod
