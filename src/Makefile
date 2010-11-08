@@ -38,10 +38,23 @@ be : \
 	gen_be_hist.exe \
 	gen_be_ensrf.exe \
 	gen_be_etkf.exe \
-	gen_be_ensmean.exe 
+	gen_be_ensmean.exe \
+	da_advance_time.exe 
 
 
 GEN_BE_LIB = $(LIB_EXTERNAL) $(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf/libwrfio_nf.a -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack -L$(GEN_BE_SRC_ROOT_DIR)/external/tools -ltools
+
+da_advance_time.exe : da_advance_time.o
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) da_advance_time.F | sed '/integer *, *external.*iargc/d' > da_advance_time.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) da_advance_time.F > da_advance_time.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) da_advance_time.f90
+	$(SFC) $(LDFLAGS) -o $@ da_advance_time.o
 
 gen_be_stage0_wrf.exe : gen_be_stage0_wrf.o
 	$(RM) $@
