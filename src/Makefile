@@ -42,7 +42,7 @@ be : \
 	da_advance_time.exe 
 
 
-GEN_BE_LIB = $(LIB_EXTERNAL) $(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf/libwrfio_nf.a -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack -L$(GEN_BE_SRC_ROOT_DIR)/external/tools -ltools
+GEN_BE_LIB = $(GEN_BE_SRC_ROOT_DIR)/external/tools/libtools.a -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack $(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf/libwrfio_nf.a $(LIB_EXTERNAL)
 
 da_advance_time.exe : da_advance_time.o
 	$(RM) $@
