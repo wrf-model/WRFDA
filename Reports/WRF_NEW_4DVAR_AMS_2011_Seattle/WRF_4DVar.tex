@@ -18,22 +18,20 @@
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
 \title{Recently upgrades and improvements of WRF 4D-Var system}
-\author[Zhang, Pan, Cheng and Huang]{Xin Zhang \and 
-\and Ning Pan \and Qiang Cheng \and
-Xiang-Yu Huang}
+\author[Zhang et al.]{Xin Zhang \and 
+\and Ning Pan \and Qiang Cheng \and \\
+Xiang-Yu Huang \and Junmei Ban}
 
 \date{~\\
 ~\\91st AMS Annual Meeting, Seattle,WA\\
-  ~\\
   ~\\
   ~\\
  \tiny{NCAR is sponsored by the National Science Foundation}
 }
 
 \institute[NCAR Earth System Laboratory]{
-%  \url{mailto:xinzhang@ucar.edu} \\
+% \url{xinzhang@ucar.edu} \\
    NCAR Earth System Laboratory \\
-  ~\\
 %  \url{ook@ucw.cz}\\
 %  Charles University, Prague
 }
@@ -235,7 +233,7 @@ lateral boundary control is obtained through
 
 \fst{Observations used by 4D-Var}{
 \begin{itemize}
-	\item Conventional observational data
+	\item Conventional observational data (little\_r, prepbufr)
 	\item Radar radial velocity
 	\item Radiance satellite data
 \end{itemize}
@@ -364,20 +362,20 @@ To investigate the impact of including boundary condition in data assimilation, 
 	\item NODA -----  Both initial condition and boundary condition from NCEP GFS data.\pause
 	\item 3DVAR -----3DVAR analysis at 2002061301Z used as the initial condition, and  
                            boundary condition from NCEP GFS. Only Radar radial velocity at  
-                           2002061301Z assimilated (total data points = 65,195).\pause
+                           2002061301Z assimilated (total data points = 97,033), 3 outer loops.\pause
 	\item 4DVAR ----- 4DVAR analysis at 2002061301Z used as initial condition, and 
                            boundary condition from NCEP GFS. The radar radial velocity at 4  
                            times: 200206130100, 05, 10, and 15, are assimilated (total
-                           data points = 262,445).
+                           data points = 262,445), 3 outer loops.
 \end{itemize}
 }
 
 
-\fst{OSSE 3h precipitation simulation}{
-
-\begin{center}
-\includegraphics[scale=0.25]{radar_3h}
-\end{center}
+\fst{OSSE 3rd hour precipitation simulation}{
+\begin{tabular}{l r}
+\includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_truth} & \includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_control} \\
+\includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar} & \includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar}
+\end{tabular}
 }
 
 
@@ -388,8 +386,17 @@ To investigate the impact of including boundary condition in data assimilation, 
 \frametitle{Summary}
 \begin{itemize}
 	\item The single executable WRF 4DVar system was developed.
-	\item The new WRF 4DVar system has the capability to assimilate conventional observational data (little\_r or prepbufr format),radiance bufr format and radar data.
+	\item Parallelization of WRF tangent linear code has been done.
+	\item The new WRF 4DVar system has the capability to assimilate conventional observational data (little\_r or prepbufr format),radiance in bufr format and radar data.
 	\item The new WRF 4DVar system is able to consider lateral boundary condition as control variable and digital filter can be used as a weak constraint to suppress the high frequency noise.
+\end{itemize}
+}
+
+\frame{
+\frametitle{Under development}
+\begin{itemize}
+	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified moist cumulus scheme, as well as a radiation scheme.
+	\item Parallelization of WRF adjoint codes.
 \end{itemize}
 }
 
