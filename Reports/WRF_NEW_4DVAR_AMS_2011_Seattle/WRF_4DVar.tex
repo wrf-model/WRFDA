@@ -266,6 +266,7 @@ lateral boundary control is obtained through
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is turned on}
 	\item \tiny{Initial perturbation is on the upstream of the obs.}
@@ -284,6 +285,7 @@ lateral boundary control is obtained through
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is {\color{red}turned off}}
 	\item \tiny{LBC control is turned on}
 	\item \tiny{Lots of noise compared to the exp. w/ JcDF.}
@@ -306,6 +308,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is {\color{red}turned off}}
 	\item \tiny{$Jb:0.174; Jo:3.166; Jl:0.000$}
@@ -325,6 +328,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is {\color{red}turned on}}
 	\item \tiny{$Jb:0.025; Jo:3.174; Jl:0.224$}
@@ -345,6 +349,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is {\color{red}turned off}}
 	\item \tiny{LBC control is turned on}
 	\item \tiny{Noise development dominant the domain, the perturbation development is totally different, hard to see the impact of boundary.}
@@ -373,8 +378,17 @@ To investigate the impact of including boundary condition in data assimilation, 
 \fst{OSSE 3rd hour precipitation simulation}{
 \begin{tabular}{l r}
 \includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_truth} & \includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_control} \\
-\includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar} & \includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar}
+\includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar} & \includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_4dvar}
 \end{tabular}
+}
+
+\frame{
+\frametitle{Discussion}
+\begin{itemize}
+	\item Obviously, 4DVAR reproduce the best squall line precipitation band.
+	\item However, the coverage and intensity of 3rd hour precipitation forecasted 4DVAR are more than the observation.
+	\item Possible reason: The new WRFPLUS is a dynamic-only model, PBL and microphysics are needed.
+\end{itemize}
 }
 
 
