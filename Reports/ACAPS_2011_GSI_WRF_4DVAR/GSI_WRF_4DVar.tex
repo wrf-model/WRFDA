@@ -18,7 +18,7 @@
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
 \title{Report on the development of \\GSI/WRF 4DVAR capability}
-\author[Zhang]{Xin Zhang}
+\author[Zhang, Huang and Auligne]{Xin Zhang \and Xiang-Yu Huang \and Thomas Auligne}
 
 \date{~\\
 ~\\ACAPS Project Report\\
@@ -60,11 +60,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Upgrades of WRFPLUS}
 
-\fst{Major Improvements}{
+\fst{Major Improvements of WRFPLUS}{
 \begin{itemize}
    	\item New WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
 	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel). \pause
-	\item Add capability to do tangent linear and adjoint test over any length of time window. \pause 
+	\item Add capability to do tangent linear check and adjoint test over any length of time window. \pause 
 	\item Add option to control if all inputs and outputs were happen in disk or memory, so WRFPLUS can be used as a standalone tool or as a component in 4DVAR system.
 \end{itemize}
 }
@@ -95,7 +95,7 @@
 \section{Upgrades of GSI}
 
 \begin{frame}[fragile]
-\frametitle{Modification}
+\frametitle{Modification of GSI}
 GSI Boulder repository revision 572, 2011-01-14
 \setbeamercolor{postit}{fg=black, bg=yellow}
 \begin{beamerboxesrounded}[ lower=postit,shadow=true]{}
@@ -131,7 +131,7 @@ M       src/main/obsmod.F90
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{wrf\_pertmod}
+\frametitle{The New Module wrf\_pertmod}
 The coupler and utilities used to couple GSI and WRFPLUS.
 \setbeamercolor{postit}{fg=black, bg=yellow}
 \begin{beamerboxesrounded}[ lower=postit,shadow=true]{}
@@ -191,27 +191,57 @@ end module wrf_pertmod
 \begin{itemize}
 	\item \tiny{Initial perturbation is on the upstream of the obs.}
 	\item \tiny{Evolved perturbation at 6h hit the obs. location}
+	\item \tiny{Very obviously flow dependent characteristics}
 \end{itemize}
 \end{columns}
 }
 
 
-\fst{Tutorial case}{
+\subsection{Tutorial case}
 
-\begin{itemize}
-	\item TRUTH ----- Initial condition from TRUTH (13-h forecast initialized at 	   
-                           2002061212Z from AWIPS 3-h analysis) run cutted by ndown, 	     
-                           boundary condition from NCEP GFS data. \pause
-	\item NODA -----  Both initial condition and boundary condition from NCEP GFS data.\pause
-	\item 3DVAR -----3DVAR analysis at 2002061301Z used as the initial condition, and  
-                           boundary condition from NCEP GFS. Only Radar radial velocity at  
-                           2002061301Z assimilated (total data points = 97,033), 3 outer loops.\pause
-	\item 4DVAR ----- 4DVAR analysis at 2002061301Z used as initial condition, and 
-                           boundary condition from NCEP GFS. The radar radial velocity at 4  
-                           times: 200206130100, 05, 10, and 15, are assimilated (total
-                           data points = 262,445), 3 outer loops.
-\end{itemize}
+\begin{frame}[fragile]
+\frametitle{Tutorial case -- Observation Usage}
+\begin{center}
+\includegraphics[scale=0.40, trim=25 200 50 150, clip]{obs_usage} 
+\end{center}\pause
+\begin{columns}[c]
+\column{5cm}
+\setbeamercolor{postit}{fg=black, bg=yellow}
+\begin{beamerboxesrounded}[ lower=postit,shadow=true]{3DVAR}
+{\tiny
+\begin{verbatim}
+   0:OBS_PARA: ps                       13842
+   0:OBS_PARA: t                        20114
+   0:OBS_PARA: q                        18743
+   0:OBS_PARA: uv                       30894
+   0:OBS_PARA: spd                         48
+   0:OBS_PARA: sst                        503
+   0:OBS_PARA: pw                         880
+\end{verbatim}
 }
+\end{beamerboxesrounded}
+\column{5cm}
+\setbeamercolor{postit}{fg=black, bg=yellow}
+\begin{beamerboxesrounded}[ lower=postit,shadow=true]{4DVAR}
+{\tiny
+\begin{verbatim}
+   0:OBS_PARA: ps                       13585
+   0:OBS_PARA: t                        20639
+   0:OBS_PARA: q                        19180
+   0:OBS_PARA: uv                       28802
+   0:OBS_PARA: spd                         80
+   0:OBS_PARA: sst                        494
+   0:OBS_PARA: pw                         766
+   ------------------------------
+   0:OBS_PARA: ps                          10
+   0:OBS_PARA: t                          552
+   0:OBS_PARA: q                          490
+   0:OBS_PARA: uv                         568
+\end{verbatim}
+}
+\end{beamerboxesrounded}
+\end{columns}
+\end{frame}
 
 
 \frame{
@@ -237,28 +267,7 @@ end module wrf_pertmod
 \end{tabular}
 }
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Summary}
-
-\frame{
-\frametitle{Summary}
-\begin{itemize}
-	\item The single executable WRF 4DVar system was developed.
-	\item Parallelization of WRF tangent linear code has been done.
-	\item The new WRF 4DVar system has the capability to assimilate conventional observational data (little\_r or prepbufr format),radiance in bufr format and radar data.
-	\item The new WRF 4DVar system is able to consider lateral boundary condition as control variable and digital filter can be used as a weak constraint to suppress the high frequency noise.
-\end{itemize}
-}
-
-\frame{
-\frametitle{Under development}
-\begin{itemize}
-	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified moist cumulus scheme, as well as a radiation scheme.
-	\item Parallelization of WRF adjoint codes.
-\end{itemize}
-}
-
+\subsection{Quick Start}
 \begin{frame}[fragile]
 \frametitle{Quick Start}
 Install WRFPLUS and GSI
@@ -279,6 +288,29 @@ Install WRFPLUS and GSI
 		\end{verbatim}
     \end{itemize}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Summary}
+
+\frame{
+\frametitle{Summary}
+\begin{itemize}
+	\item The GSI/WRF 4DVAR system was developed with minimum codes intervention.
+	\item The single observation exp. preliminarily confirm that the system is valid and is able to produce flow dependent increments.
+	\item The increments produced by 4DVAR run with tutorial case are comparable with the 3DVAR run.
+\end{itemize}
+}
+
+\frame{
+\frametitle{Under development}
+\begin{itemize}
+	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified cumulus scheme, as well as a radiation scheme.
+	\item Parallelization of WRF adjoint codes.
+	\item Polishing the boundary condition treatment during minimization.
+	\item Finalize the adjoint check and gradient check for GSI/WRF 4DVAR. 
+	\item Conduct real data experiment to confirm the performance.
+\end{itemize}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \fst{}{
