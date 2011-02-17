@@ -272,7 +272,7 @@ lateral boundary control is obtained through
 	\item Initial time: $2000\_01\_25\_00:00:00$
 	\item Ending time: $2000\_01\_25\_06:00:00$
 	\item Observation: 500 mb Temperature at {\color{red}ending time} \\
-	          $O-B=-2.55K$
+	          $O-B=-1.168K$
 	\item To investigate the difference at {\color{red}ending time} between the forecast from analysis and from background.
 \end{itemize}
 }
@@ -323,17 +323,16 @@ To investigate the impact of including boundary condition in data assimilation, 
 \begin{columns}[c]
 \column{5cm}
 \includemovie[
-  controls,autoresume,poster,
-  text={\small(Loading boundarylbcjcdf.mpeg)}
+  controls,poster={boundarylbcjcdf.pdf},
+  text={\large(Click to start the movie)\hspace*{400pt}}
 ]{6.0cm}{7.5cm}{boundarylbcjcdf.mpeg}
 \column[c]{3.5cm}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is turned on}
+	\item \tiny{$O-B=-0.95K$}
 	\item \tiny{LBC control is {\color{red}turned on}}
-	\item \tiny{$Jb:0.025; Jo:3.174; Jl:0.224$}
-	\item {\color{gray}w/o LBC control \\ \tiny{$Jb:0.174; Jo:3.166; Jl:0.000$}}
 	\item \tiny{Main initial perturbation is in the boundary condition other than in the initial condition ( south boundary, invisible here)}
 	\item \tiny{Evolved perturbation is coming from boundary, pay attention to some positive increments along south boundary}
 \end{itemize}
@@ -353,7 +352,6 @@ To investigate the impact of including boundary condition in data assimilation, 
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is {\color{red}turned off}}
-	\item \tiny{$Jb:0.174; Jo:3.166; Jl:0.000$}
 	\item \tiny{Main Initial perturbation is in the location of the obs., it is fake}
 	\item \tiny{Evolved perturbation at 6h is moving out from the obs. location}
 \end{itemize}
