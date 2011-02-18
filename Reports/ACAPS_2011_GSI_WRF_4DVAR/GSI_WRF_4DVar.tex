@@ -55,7 +55,10 @@
 
 \frame{
 \frametitle{Acknowledgement}
-\large{\textit{Sincere thanks to Dr. Ricardo Todling, Dr. Thomas Auligne and Dr. Junmei Ban for their help and encouragement}}
+\large{\textit{Sincere thanks to {\bf{Dr. Ricardo Todling}} for his help to kick off the project.}}
+~\\
+~\\
+\large{\textit{Sincere thanks to {\bf{Dr. Thomas Auligne, Dr. Junmei Ban and Mrs. Xiaoyan Zhang}} for their help and encouragement}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -326,6 +329,7 @@ Install WRFPLUS and GSI
 	\item Period: 2007091000-2007091300 @0Z,6Z,12Z,18Z
 	\item First guess is the 12h forecast from NCEP FNL
 	\item 48h forecast from FG, 3DVAR and 4DVAR
+	\item Verified against NCAR archived little\_r format data, filtered by FNL.
 \end{itemize}
 \begin{center}
 \includegraphics[scale=0.25, trim=0 0 50 0, clip, angle=90]{domain.pdf} 
@@ -412,7 +416,7 @@ Install WRFPLUS and GSI
 \begin{itemize}
 	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified cumulus scheme, as well as a radiation scheme. \pause
 	\item Parallelization of WRF adjoint codes. \pause
-	\item The observation processing for 4DVAR mode is still black box for me, need to be investigated. \pause
+	\item The observation processing for 4DVAR mode is still a black box for us, need to be investigated. \pause
 	\item Adjoint check achieved 5-digital identical, need to debug the code to find the bugs. \pause
 	\item Multiple outer loops for 4DVAR. \pause
 	\item Assimilation of radiance data. \pause
