@@ -5,19 +5,23 @@
 %\pgfpageslogicalpageoptions{2}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{3}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{4}{border code=\pgfusepath{stroke}}
-\documentclass{beamer}
-\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
+\documentclass[10pt]{beamer}
+%\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
+\usetheme{Warsaw}
+\usecolortheme{default}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
 \usepackage{url}
 \usepackage{movie15}
 \usepackage{verbatim}
+\usefonttheme{serif}
+\usepackage{fancybox}
 
 % Make a new command that will make a new subsection and a frame with the same title
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
-\title{Report on the development of \\GSI-based WRF 4DVAR}
+\title{Report on the development of \\ GSI-based WRF 4DVAR}
 \author[Zhang and Huang]{Xin Zhang \and Xiang-Yu Huang}
 
 \date{~\\
@@ -35,7 +39,8 @@
 }
 
 % We want the NSF department logo
-\logo{\includegraphics[height=.5in]{nsf1.jpg}}
+%\logo{\includegraphics[height=.5in]{nsf1.jpg}}
+\logo{\includegraphics[height=.4in]{NESL.jpg}}
 
 
 \begin{document}
@@ -43,6 +48,7 @@
 % The title page
 \frame{\titlepage}
 
+\begin{frame}\frametitle{Outline}\tableofcontents[pausesections]\end{frame}
 
 \frame{
 \frametitle{Acknowledgement}
@@ -65,7 +71,8 @@ Sincere thanks to Dr. Ricardo Todling who helped us to kick off the project.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Upgrades of WRFPLUS}
 
-\fst{Major Improvements of WRFPLUS}{
+\frame{
+\frametitle{Major Improvements of WRFPLUS}
 \begin{itemize}
    	\item New WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
 	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel). \pause
@@ -193,22 +200,23 @@ end module wrf_pertmod
 
 \frame{
 \begin{columns}[c]
-\column{5cm}
+\column{6cm}
 \includemovie[
-  controls,autoresume,poster,
-  text={\small(Loading gsiwrf4dvar.mpeg)}
+  poster=single1.pdf,
+  text={}
 ]{6.0cm}{7.5cm}{gsiwrf4dvar.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
 	\item \tiny{Initial perturbation is on the upstream of the obs.}
 	\item \tiny{Evolved perturbation at 6h hit the obs. location}
-	\item \tiny{Very obviously flow dependent characteristics}
+	\item \tiny{Very obvious flow dependent characteristics}
 \end{itemize}
+\end{block}
 \end{columns}
 }
-
 
 \subsection{Tutorial case}
 
@@ -230,6 +238,8 @@ end module wrf_pertmod
    0:OBS_PARA: spd                         48
    0:OBS_PARA: sst                        503
    0:OBS_PARA: pw                         880
+   ----------------Total--------------------
+   47675
 \end{verbatim}
 }
 \end{beamerboxesrounded}
@@ -250,6 +260,8 @@ end module wrf_pertmod
    0:OBS_PARA: t                          552
    0:OBS_PARA: q                          490
    0:OBS_PARA: uv                         568
+   ----------------Total-------------------
+   45040 ???
 \end{verbatim}
 }
 \end{beamerboxesrounded}
@@ -280,6 +292,85 @@ end module wrf_pertmod
 \end{tabular}
 }
 
+\subsection{Real case}
+
+\frame{
+\frametitle{Domain}
+\begin{itemize}
+	\item Grids: 47x32x28L
+	\item Resolution: 135km
+	\item Period: 2007091000-2007091300 @0Z,6Z,12Z,18Z
+	\item First guess is the 12h forecast from NCEP FNL
+	\item 48h forecast from FG, 3DVAR and 4DVAR
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.25, trim=0 0 50 0, clip, angle=90]{domain.pdf} 
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---00h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_0.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---06h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_6.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---12h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_12.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---18h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_18.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---24h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_24.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---30h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_30.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---36h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_36.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---42h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_42.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{RMSE Verification---48h}
+\begin{center}
+\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_48.pdf}
+\end{center}
+}
+
 \subsection{Quick Start}
 \begin{frame}[fragile]
 \frametitle{Quick Start}
@@ -308,7 +399,7 @@ Install WRFPLUS and GSI
 \frame{
 \frametitle{Summary}
 \begin{itemize}
-	\item The GSI/WRF 4DVAR system was developed with minimum codes intervention.
+	\item The basic GSI/WRF 4DVAR system was developed with minimum codes modification.
 	\item The single observation exp. preliminarily confirm that the system is valid and is able to produce flow dependent increments.
 	\item The increments produced by 4DVAR run with tutorial case are comparable with the 3DVAR run.
 \end{itemize}
@@ -319,17 +410,17 @@ Install WRFPLUS and GSI
 \begin{itemize}
 	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified cumulus scheme, as well as a radiation scheme. \pause
 	\item Parallelization of WRF adjoint codes. \pause
-	\item Not sure if the observation processing for 4DVAR mode is correct ?
+	\item The observation processing for 4DVAR mode is still black box for me, need to be investigated. \pause
 	\item Adjoint check achieved 5-digital identical, need to debug the code to find the bugs. \pause
 	\item Multiple outer loops for 4DVAR. \pause
 	\item Assimilation of radiance data. \pause
-	\item Adopt gradient check for GSI-based WRF 4DVAR. \pause
-	\item Adopt digital filter as a weak constrain for GSI-based WRF 4DVAR.
+	\item Adapt gradient check for GSI-based WRF 4DVAR. \pause
+	\item Adapt digital filter as a weak constrain for GSI-based WRF 4DVAR.
 \end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\fst{}{
+\frame{
 \begin{center}
 ~\\
 ~\\
