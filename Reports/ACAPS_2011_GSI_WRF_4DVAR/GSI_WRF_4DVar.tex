@@ -48,11 +48,14 @@
 % The title page
 \frame{\titlepage}
 
-\begin{frame}\frametitle{Outline}\tableofcontents[pausesections]\end{frame}
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[pausesections]
+\end{frame}
 
 \frame{
 \frametitle{Acknowledgement}
-Sincere thanks to Dr. Ricardo Todling who helped us to kick off the project.
+\large{\textit{Sincere thanks to Dr. Ricardo Todling, Dr. Thomas Auligne and Dr. Junmei Ban for their help and encouragement}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,6 +188,27 @@ end module wrf_pertmod
 \end{beamerboxesrounded}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Quick Start}
+Install WRFPLUS and GSI
+   \begin{itemize}
+        	\item WRFPLUS : WRF adjoint and tangent linear codes
+		\begin{verbatim}
+	         > configure [-d] wrfplus
+	         > compile em_real
+	         \end{verbatim}
+	\item Set the the $WRF\_DIR$ environmental variable
+		\begin{verbatim} 
+		> setenv WRF_DIR full_path_of_wrfplus  
+		\end{verbatim}
+	\item GSI
+		\begin{verbatim}
+		> configure
+		> compile
+		\end{verbatim}
+    \end{itemize}
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \section{GSI/WRF 4DVAR System Validation}
 
@@ -311,87 +335,65 @@ end module wrf_pertmod
 \frame{
 \frametitle{RMSE Verification---00h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_0.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_0.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---06h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_6.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_6.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---12h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_12.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_12.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---18h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_18.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_18.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---24h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_24.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_24.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---30h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_30.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_30.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---36h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_36.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_36.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---42h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_42.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_42.pdf}
 \end{center}
 }
 
 \frame{
 \frametitle{RMSE Verification---48h}
 \begin{center}
-\includegraphics[scale=0.35, trim=0 220 25 80, clip]{Profile_RMSE_48.pdf}
+\includegraphics[scale=0.33, trim=0 0 0 80, clip]{Profile_RMSE_48.pdf}
 \end{center}
 }
-
-\subsection{Quick Start}
-\begin{frame}[fragile]
-\frametitle{Quick Start}
-Install WRFPLUS and GSI
-   \begin{itemize}
-        	\item WRFPLUS : WRF adjoint and tangent linear codes
-		\begin{verbatim}
-	         > configure [-d] wrfplus
-	         > compile em_real
-	         \end{verbatim}
-	\item Set the the $WRF\_DIR$ environmental variable
-		\begin{verbatim} 
-		> setenv WRF_DIR full_path_of_wrfplus  
-		\end{verbatim}
-	\item GSI
-		\begin{verbatim}
-		> configure
-		> compile
-		\end{verbatim}
-    \end{itemize}
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
@@ -399,8 +401,8 @@ Install WRFPLUS and GSI
 \frame{
 \frametitle{Summary}
 \begin{itemize}
-	\item The basic GSI/WRF 4DVAR system was developed with minimum codes modification.
-	\item The single observation exp. preliminarily confirm that the system is valid and is able to produce flow dependent increments.
+	\item The basic GSI/WRF 4DVAR system was developed with minimum codes modification. \pause
+	\item The single observation exp. preliminarily confirm that the system is valid and is able to produce flow dependent increments. \pause
 	\item The increments produced by 4DVAR run with tutorial case are comparable with the 3DVAR run.
 \end{itemize}
 }
