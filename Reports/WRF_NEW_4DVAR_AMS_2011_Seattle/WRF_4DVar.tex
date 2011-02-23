@@ -6,12 +6,14 @@
 %\pgfpageslogicalpageoptions{3}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{4}{border code=\pgfusepath{stroke}}
 \documentclass{beamer}
-\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
+%\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
+\usetheme{Warsaw}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
 \usepackage{url}
 \usepackage{movie15}
 \usepackage{verbatim}
+\usefonttheme{serif}
 
 % Make a new command that will make a new subsection and a frame with the same title
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
@@ -281,10 +283,11 @@ lateral boundary control is obtained through
 \begin{columns}[c]
 \column{5cm}
 \includemovie[
-  controls,autoresume,poster,
-  text={\small(Loading centerlbcjcdf.mpeg)}
+  controls,poster={centerlbcjcdf.pdf},
+  text={\large(Click to start the movie)\hspace*{400pt}}
 ]{6.0cm}{7.5cm}{centerlbcjcdf.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
@@ -293,6 +296,7 @@ lateral boundary control is obtained through
 	\item \tiny{Initial perturbation is on the upstream of the obs.}
 	\item \tiny{Evolved perturbation at 6h hit the obs. location}
 \end{itemize}
+\end{block}
 \end{columns}
 }
 
@@ -300,17 +304,18 @@ lateral boundary control is obtained through
 \begin{columns}[c]
 \column{5cm}
 \includemovie[
-  controls,autoresume,poster,
-  text={\small(Loading centerlbcnojcdf.mpeg)}
-]{6.0cm}{7.5cm}{centerlbcnojcdf.mpeg}
+  controls,poster={centernolbcjcdf.pdf},
+  text={\large(Click to start the movie)\hspace*{400pt}}
+]{6.0cm}{7.5cm}{centernolbcjcdf.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
-	\item \tiny{JcDF is {\color{red}turned off}}
-	\item \tiny{LBC control is turned on}
-	\item \tiny{Lots of noise compared to the exp. w/ JcDF.}
-\end{itemize}
+	\item \tiny{JcDF is turned on}
+	\item \tiny{LBC control is  {\color{red}turned off}}
+	\end{itemize}
+\end{block}
 \end{columns}
 }
 
@@ -327,6 +332,7 @@ To investigate the impact of including boundary condition in data assimilation, 
   text={\large(Click to start the movie)\hspace*{400pt}}
 ]{6.0cm}{7.5cm}{boundarylbcjcdf.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
@@ -336,6 +342,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 	\item \tiny{Main initial perturbation is in the boundary condition other than in the initial condition ( south boundary, invisible here)}
 	\item \tiny{Evolved perturbation is coming from boundary, pay attention to some positive increments along south boundary}
 \end{itemize}
+\end{block}
 \end{columns}
 }
 
@@ -343,10 +350,11 @@ To investigate the impact of including boundary condition in data assimilation, 
 \begin{columns}[c]
 \column{5cm}
 \includemovie[
-  controls,autoresume,poster,
-  text={\small(Loading boundarynolbcjcdf.mpeg)}
+  controls,poster={boundarynolbcjcdf.pdf},
+  text={\large(Click to start the movie)\hspace*{400pt}}
 ]{6.0cm}{7.5cm}{boundarynolbcjcdf.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
@@ -355,6 +363,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 	\item \tiny{Main Initial perturbation is in the location of the obs., it is fake}
 	\item \tiny{Evolved perturbation at 6h is moving out from the obs. location}
 \end{itemize}
+\end{block}
 \end{columns}
 }
 
@@ -367,6 +376,7 @@ To investigate the impact of including boundary condition in data assimilation, 
   text={\small(Loading boundarylbcnojcdf.mpeg)}
 ]{6.0cm}{7.5cm}{boundarylbcnojcdf.mpeg}
 \column[c]{3.5cm}
+\begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
@@ -374,6 +384,7 @@ To investigate the impact of including boundary condition in data assimilation, 
 	\item \tiny{LBC control is turned on}
 	\item \tiny{Noise development dominate the domain, the perturbation development is totally different, hard to see the impact of boundary.}
 \end{itemize}
+\end{block}
 \end{columns}
 }
 \end{comment}
