@@ -15,6 +15,10 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;==============================================================================
 ;
 plotscatter  = True
+write_netcdf = False
+input_source = "ascii"   ; reading data from gts_omb_oma_01
+;input_source = "netcdf"  ; reading data from the output of write_netcdf
+nc_datdir    = "./"
 out_type     = "pdf"    ; or ncgm
 plotdir      = "/ptmp/hclin/con200/plot/"
 datdir1      = "/ptmp/hclin/con200/var/"        ; the path before DATE
@@ -52,23 +56,52 @@ hlevs  = (/ (/2000., 5000./), (/5000., 8500./) /)
 ; method 2: set a 1-D array of fixed height levels in meters
 ;  hlevs  = (/ 1000., 2000., 3000., 4000., 5000., 6000., 7000., 8000., 10000. /)
 
-proc_synop     = True
-proc_metar     = True
-proc_ships     = True
-proc_buoy      = True
-proc_sonde_sfc = True
-proc_geoamv    = True
-proc_polaramv  = True
-proc_gpspw     = True
-proc_sound     = True
-proc_airep     = True
-proc_pilot     = True
-proc_profiler  = True
-proc_ssmir     = True
-proc_qscat     = True
-proc_bogus     = True
-proc_airsr     = True
-proc_gpsref    = True
+;
+; turn on/off the observation types to plot
+;
+proc_surface_types = True
+proc_upper_types   = True
+
+proc_synop     = False
+proc_metar     = False
+proc_ships     = False
+proc_buoy      = False
+proc_sonde_sfc = False
+proc_gpspw     = False
+proc_geoamv    = False
+proc_polaramv  = False
+proc_sound     = False
+proc_airep     = False
+proc_pilot     = False
+proc_profiler  = False
+proc_ssmir     = False
+proc_qscat     = False
+proc_bogus     = False
+proc_airsr     = False
+proc_gpsref    = False
+
+if ( proc_surface_types ) then
+   proc_synop     = True
+   proc_metar     = True
+   proc_ships     = True
+   proc_buoy      = True
+   proc_sonde_sfc = True
+   proc_gpspw     = True
+   proc_qscat     = True
+   proc_ssmir     = True
+end if
+
+if ( proc_upper_types ) then
+   proc_geoamv    = True
+   proc_polaramv  = True
+   proc_sound     = True
+   proc_airep     = True
+   proc_pilot     = True
+   proc_profiler  = True
+   proc_bogus     = True
+   proc_airsr     = True
+   proc_gpsref    = True
+end if
 
 ; mapinfo_from_file = False
   mapinfo_from_file = True
@@ -100,6 +133,10 @@ if ( (.not.mapinfo_from_file) .and. (.not.subdomain) ) then
    lat_ur = 37.62015
    lon_ur = 100.7379
 end if
+
+plot_gts = True
+plot_radar = False
+prefix_radar   = "oma_radar"
 
 system("mkdir -p "+plotdir)
 
@@ -155,6 +192,7 @@ if ( mapinfo_from_file .and. isfilepresent(fname) ) then
       truelat1 = wrf_file@TRUELAT1
       truelat2 = wrf_file@TRUELAT2
       clon     = wrf_file@CEN_LON
+      ;clon     = wrf_file@STAND_LON
       clat     = wrf_file@CEN_LAT
    end if
    if ( wrf_file@MAP_PROJ .eq. 3 ) then
@@ -184,55 +222,58 @@ nhlevs = dimsizes(hlevs)
 nplevs = dimsizes(plevs)
 rank_hlevs = dimsizes(dimsizes(hlevs))
 rank_plevs = dimsizes(dimsizes(plevs))
-;
-; define and setup the lablebar colors (used by radar plots)
-;
-wks = gsn_open_wks("ncgm","tmp")
-gsn_define_colormap(wks,colormap)                 ; define colormap
-cmap = gsn_retrieve_colormap(wks)                 ; retreive colormap
-if ( colormap .eq. "rainbow+gray" ) then
-   num_bins = 208      ; rainbow+gray colormap has 239 colors, use 16-223
-   colors = new(num_bins,integer)
-   colors(0) = 16
-   colors(num_bins-1) = 223
-   do i = 1, num_bins-2
-       colors(i) = colors(0) + i
+
+if ( plot_radar ) then
+   ;
+   ; define and setup the lablebar colors (used by radar plots)
+   ;
+   wks = gsn_open_wks("ncgm","tmp")
+   gsn_define_colormap(wks,colormap)                 ; define colormap
+   cmap = gsn_retrieve_colormap(wks)                 ; retreive colormap
+   if ( colormap .eq. "rainbow+gray" ) then
+      num_bins = 208      ; rainbow+gray colormap has 239 colors, use 16-223
+      colors = new(num_bins,integer)
+      colors(0) = 16
+      colors(num_bins-1) = 223
+      do i = 1, num_bins-2
+          colors(i) = colors(0) + i
+      end do
+   end if
+   if ( colormap .eq. "rainbow" ) then
+      num_bins = 175      ; rainbow colormap has 190 colors, use 15-189
+      colors = new(num_bins,integer)
+      colors(0) = 15
+      colors(num_bins-1) = 189
+      do i = 1, num_bins-2
+          colors(i) = colors(0) + i
+      end do
+   end if
+   if ( colormap .eq. "gui_default" ) then
+      num_bins = 22       ; gui_default colormap has 24 colors, use 2-23
+      colors = new(num_bins,integer)
+      colors(0) = 2
+      colors(num_bins-1) = 22
+      do i = 1, num_bins-2
+         colors(i) = colors(0) + i
+      end do
+   end if
+   if ( colormap .eq. "BkBlAqGrYeOrReViWh200" ) then
+      num_bins = 200       ; BlAqGrYeOrReVi200 colormap has 202 colors, use 2-201
+      colors = new(num_bins,integer)
+      colors(0) = 2
+      colors(num_bins-1) = 201
+      do i = 1, num_bins-2
+         colors(i) = colors(0) + i
+      end do
+   end if
+   ; set label bar RGB color triplets
+   labelbarcolors        = new((/num_bins,3/),float)
+   do n = 0, num_bins-1
+      labelbarcolors(n,:) = cmap(colors(n),:)
    end do
-end if
-if ( colormap .eq. "rainbow" ) then
-   num_bins = 175      ; rainbow colormap has 190 colors, use 15-189
-   colors = new(num_bins,integer)
-   colors(0) = 15
-   colors(num_bins-1) = 189
-   do i = 1, num_bins-2
-       colors(i) = colors(0) + i
-   end do
-end if
-if ( colormap .eq. "gui_default" ) then
-   num_bins = 22       ; gui_default colormap has 24 colors, use 2-23
-   colors = new(num_bins,integer)
-   colors(0) = 2
-   colors(num_bins-1) = 22
-   do i = 1, num_bins-2
-      colors(i) = colors(0) + i
-   end do
-end if
-if ( colormap .eq. "BkBlAqGrYeOrReViWh200" ) then
-   num_bins = 200       ; BlAqGrYeOrReVi200 colormap has 202 colors, use 2-201
-   colors = new(num_bins,integer)
-   colors(0) = 2
-   colors(num_bins-1) = 201
-   do i = 1, num_bins-2
-      colors(i) = colors(0) + i
-   end do
-end if
-; set label bar RGB color triplets
-labelbarcolors        = new((/num_bins,3/),float)
-do n = 0, num_bins-1
-   labelbarcolors(n,:) = cmap(colors(n),:)
-end do
-destroy(wks)
-system("\rm -f tmp.ncgm")
+   destroy(wks)
+   system("\rm -f tmp.ncgm")
+end if  ; end if plot_radar, setting up labelbarcolors
 ;---------------------------------------------------------------------------
 ; functions and procedures
 ;---------------------------------------------------------------------------
@@ -244,7 +285,8 @@ function setmpres(title:string, str1:string, str2:string)
 begin
    mpres                         = True
    mpres@gsnPaperOrientation     = "portrait"
-   mpres@gsnMaximize             = False            ; Maximize plot in frame.
+   ;mpres@gsnMaximize             = False            ; Maximize plot in frame.
+   mpres@gsnMaximize             = True            ; Maximize plot in frame.
    mpres@gsnDraw                 = False
    mpres@gsnFrame                = False            ; Don't advance the frame
 
@@ -275,23 +317,26 @@ begin
 
    mpres@pmTickMarkDisplayMode   = "Always"
    ; mpres@tmYROn                  = False
-   ; mpres@tmXBOn                  = False
+   mpres@tmXBOn                  = False
+   mpres@tmXTOn                  = False
    mpres@tmXTMajorLengthF        = 0
    mpres@tmYLMajorLengthF        = 0
    mpres@tmXBMajorLengthF        = 0
    mpres@tmYRMajorLengthF        = 0
    mpres@mpOutlineBoundarySets   = "GeophysicalAndUSStates" ; state boundaries
-   ; mpres@mpFillOn = False
-   mpres@mpFillOn = True
-   mpres@mpLandFillColor = "gray"
+   ; mpres@mpFillOn                = False
+   mpres@mpFillOn                = True
+   mpres@mpLandFillColor         = "gray"
    mpres@tfDoNDCOverlay          = True
 
-   mpres@mpUSStateLineColor = "gray"
-   mpres@mpNationalLineColor = "gray"
+   mpres@mpUSStateLineColor      = "gray"
+   mpres@mpNationalLineColor     = "gray"
    mpres@mpGeophysicalLineColor  = "gray"
    mpres@mpGridAndLimbOn         = True
    mpres@mpGridLineDashPattern   = 2
    mpres@mpGridLineDashSegLenF   = 0.06            ; default 0.15
+   mpres@mpGridLatSpacingF       = 10.0
+   mpres@mpGridLonSpacingF       = 10.0
 
    mpres@mpDataBaseVersion       = "MediumRes"
 
@@ -339,13 +384,23 @@ begin
 end
 
 undef("do_invplot")
-function do_invplot(wks,data,lat,lon,subdomain,mpres)
+function do_invplot(wks,data,lat,lon,subdomain,mpres,var)
 local data,xmax,xmin,lat,lon,colors,lbcolors,nbin,subdomain,mpres,gsres,lbres
 begin
 ;   colors = (/ 15, 35, 50, 80, 95, 110, 160, 175, 185, 190, 200, 210, 35, 15, 2/)
 ;   colors = (/ 201, 194, 5, 20, 30, 85, 95, 100, 120, 140, 150, 170, 194, 201, 0/)
-   colors = (/ 180, 175, 15, 20, 35, 75, 90, 110, 120, 140, 160, 170, 175, 180, 2/)
-   lbdata = (/ -10.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0 /)
+   ;colors = (/ 180, 175, 15, 20, 35, 75, 90, 110, 120, 140, 160, 170, 175, 180, 2/)
+   colors = (/ 15, 20, 35, 45, 50, 65, 95, 100, 115, 125, 135, 150, 165, 175, 2/)
+   if ( var .eq. "Q" ) then
+      lbdata = (/ -1.5, -1.0, -0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5 /)
+   end if
+   if ( var .eq. "P" ) then
+      lbdata = (/ -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0 /)
+   end if
+   if ( var .ne. "Q" .and. var .ne. "P" ) then
+      lbdata = (/ -10.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0 /)
+   end if
+   msizes = (/ 0.012, 0.011, 0.010, 0.008, 0.006, 0.004, 0.002, 0.002, 0.004, 0.006, 0.008, 0.010, 0.011, 0.012, 0.003 /)
    nbin = dimsizes(lbdata)+1
    labels = new(nbin+1,string)  ; Labels for legend, extra one for x=0.0
    legends = new(nbin+1,string)  ; Labels for legend, extra one for x=0.0
@@ -383,6 +438,17 @@ begin
       end if
       delete(indexes)
    end do
+
+   npts = num(.not.ismissing(data))
+   info = " "     
+   if ( npts .gt. 0 ) then
+      xmean = sum(data)/tofloat(npts)
+      xrms  = sqrt(sum(data*data)/tofloat(npts))
+      xstd  = sqrt(sum((data-xmean)*(data-xmean))/tofloat(npts))
+      info  = "mean: "+sprintf("%10.4f",xmean)+"   rms: "+sprintf("%10.4f",xrms)+"   std: "+sprintf("%10.4f",xstd)
+      mpres@gsnLeftString = info
+   end if
+
    ; mpres@gsnMaximize             = True                ; Maximize plot in frame.
    if ( subdomain )
       plot = gsn_csm_map_ce(wks,mpres)
@@ -404,16 +470,19 @@ begin
    do i = 0, nbin
       if (.not.ismissing(lat_new(i,0)))
          gsres@gsMarkerColor  = colors(i)
-         gsres@gsMarkerSizeF  = 0.003          ; default 0.007
+         ; gsres@gsMarkerSizeF  = 0.003          ; default 0.007
+         gsres@gsMarkerSizeF  = msizes(i)          ; default 0.007
          str = unique_string("polymarker")
          plot@$str$ = gsn_add_polymarker(wks,plot,lon_new(i,:),lat_new(i,:),gsres)
          ; gsn_polymarker(wks,map,lon_new(i,:),lat_new(i,:),gsres)
          ; Add marker and text for the legend.
-         gsres@gsMarkerSizeF  = 0.010          ; default 0.007
+         ;gsres@gsMarkerSizeF  = 0.010          ; default 0.007
+         gsres@gsMarkerSizeF  = msizes(i)
          gsn_polymarker_ndc(wks,xleg(i),yleg(i),gsres)
          gsn_text_ndc(wks,legends(i),xtxt(i),ytxt(i),txres)
       end if
    end do
+
    return(plot)
    delete(lat_new)
    delete(lon_new)
@@ -593,7 +662,7 @@ begin  ; begin of procedure plot_sfc
          ; plot distribution for each variable
          ;
          plot = new(4,graphic)
-         title = otype+" U (All: "+num_u_all+")"
+         title = "OMB  "+otype+" U (All: "+num_u_all+")"
          mpres = setmpres(title,"","")
          if ( otype .eq. "QSCAT" ) then
             gsres@gsMarkerSizeF  = markersize2          ; default 0.007
@@ -603,115 +672,169 @@ begin  ; begin of procedure plot_sfc
          plon = mask(lon(:),.not.ismissing(u(:,0)),True)
          plat = mask(lat(:),.not.ismissing(u(:,0)),True)
          pdata = mask(u(:,1),.not.ismissing(u(:,0)),True)
-         plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+         plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
+         draw(plot(0))
+         frame(wks)
          delete(plon)
          delete(plat)
          delete(pdata)
          ;
-         title = otype+" U (Used: "+num_u_qc+")"
+         title = "OMB  "+otype+" U (Used: "+num_u_qc+")"
          mpres = setmpres(title,"","")
          plon = mask(lon(:),u(:,2).ge.0,True)
          plat = mask(lat(:),u(:,2).ge.0,True)
          pdata = mask(u(:,1),u(:,2).ge.0,True)
-         plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+         plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
+         delete(pdata)
+         draw(plot(1))
+         frame(wks)
+         title = "OMA  "+otype+" U (Used: "+num_u_qc+")"
+         mpres = setmpres(title,"","")
+         pdata = mask(u(:,4),u(:,2).ge.0,True)
+         plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
+         draw(plot(1))
+         frame(wks)
          delete(plon)
          delete(plat)
-         delete(pdata)
          ;
-         title = otype+" V (All: "+num_v_all+")"
+         title = "OMB  "+otype+" V (All: "+num_v_all+")"
          mpres = setmpres(title,"","")
          plon = mask(lon(:),.not.ismissing(v(:,0)),True)
          plat = mask(lat(:),.not.ismissing(v(:,0)),True)
          pdata = mask(v(:,1),.not.ismissing(v(:,0)),True)
-         plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+         plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+         draw(plot(2))
+         frame(wks)
          delete(plon)
          delete(plat)
          delete(pdata)
          ;
-         title = otype+" V (Used: "+num_v_qc+")"
+         title = "OMB  "+otype+" V (Used: "+num_v_qc+")"
          mpres = setmpres(title,"","")
          plon = mask(lon(:),v(:,2).ge.0,True)
          plat = mask(lat(:),v(:,2).ge.0,True)
          pdata = mask(v(:,1),v(:,2).ge.0,True)
-         plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+         plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+         delete(pdata)
+         draw(plot(3))
+         frame(wks)
+         title = "OMA  "+otype+" V (Used: "+num_v_qc+")"
+         mpres = setmpres(title,"","")
+         pdata = mask(v(:,4),v(:,2).ge.0,True)
+         plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+         draw(plot(3))
+         frame(wks)
          delete(plon)
          delete(plat)
          delete(pdata)
          pnres = True
-         pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
-         pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-         gsn_panel(wks,plot,(/2,2/),pnres)
+         ;pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
+         ;pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+         ;gsn_panel(wks,plot,(/2,2/),pnres)
          delete(plot)
          ;
          if ( otype.ne."QSCAT" ) then
             plot = new(4,graphic)
             ;
-            title = otype+" T (All: "+num_t_all+")"
+            title = "OMB  "+otype+" T (All: "+num_t_all+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),.not.ismissing(t(:,0)),True)
             plat = mask(lat(:),.not.ismissing(t(:,0)),True)
             pdata = mask(t(:,1),.not.ismissing(t(:,0)),True)
-            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
+            draw(plot(0))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" T (Used: "+num_t_qc+")"
+            title = "OMB  "+otype+" T (Used: "+num_t_qc+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),t(:,2).ge.0,True)
             plat = mask(lat(:),t(:,2).ge.0,True)
             pdata = mask(t(:,1),t(:,2).ge.0,True)
-            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
+            delete(pdata)
+            draw(plot(1))
+            frame(wks)
+            title = "OMA  "+otype+" T (Used: "+num_t_qc+")"
+            mpres = setmpres(title,"","")
+            pdata = mask(t(:,4),t(:,2).ge.0,True)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
+            draw(plot(1))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" Q (All: "+num_q_all+")"
+            title = "OMB  "+otype+" Q (All: "+num_q_all+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),.not.ismissing(q(:,0)),True)
             plat = mask(lat(:),.not.ismissing(q(:,0)),True)
             pdata = mask(q(:,1)*1000.0,.not.ismissing(q(:,0)),True)
-            plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
+            draw(plot(2))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" Q (Used: "+num_q_qc+")"
+            title = "OMB  "+otype+" Q (Used: "+num_q_qc+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),q(:,2).ge.0,True)
             plat = mask(lat(:),q(:,2).ge.0,True)
             pdata = mask(q(:,1)*1000.0,q(:,2).ge.0,True)
-            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
+            delete(pdata)
+            draw(plot(3))
+            frame(wks)
+            title = "OMA  "+otype+" Q (Used: "+num_q_qc+")"
+            mpres = setmpres(title,"","")
+            pdata = mask(q(:,4)*1000.0,q(:,2).ge.0,True)
+            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
+            draw(plot(3))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
-            pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-            gsn_panel(wks,plot,(/2,2/),pnres)
+            ;pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+            ;gsn_panel(wks,plot,(/2,2/),pnres)
             delete(plot)
             ;
             plot = new(4,graphic)
             ;
-            title = otype+" P (All: "+num_p_all+")"
+            title = "OMB  "+otype+" P (All: "+num_p_all+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),.not.ismissing(p(:,0)),True)
             plat = mask(lat(:),.not.ismissing(p(:,0)),True)
             pdata = mask(p(:,1)*0.01,.not.ismissing(p(:,0)),True)
-            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"P")
+            draw(plot(0))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" P (Used: "+num_p_qc+")"
+            title = "OMB  "+otype+" P (Used: "+num_p_qc+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),p(:,2).ge.0,True)
             plat = mask(lat(:),p(:,2).ge.0,True)
             pdata = mask(p(:,1)*0.01,p(:,2).ge.0,True)
-            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"P")
+            delete(plot(1))
+            draw(plot(1))
+            frame(wks)
+            title = "OMA  "+otype+" P (Used: "+num_p_qc+")"
+            mpres = setmpres(title,"","")
+            pdata = mask(p(:,4)*0.01,p(:,2).ge.0,True)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"P")
+            draw(plot(1))
+            frame(wks)
             delete(plon)
             delete(plat)
             delete(pdata)
-            pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-            gsn_panel(wks,plot,(/2,2/),pnres)
+            ;pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+            ;gsn_panel(wks,plot,(/2,2/),pnres)
             delete(plot)
 
          end if  ; end of if otype .ne. QSCAT
@@ -722,61 +845,41 @@ begin  ; begin of procedure plot_sfc
             ;
             ; OBS and BAK(Background) scatter plots
             ;
-            ombplot = new(4,graphic)
-            data1 = u(:,0)               ; OBS
-            data2 = u(:,0)-u(:,1)        ; BAK = OBS - OMB
-            ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
-                            "All  "+num(.not.ismissing(data2)),               \
-                            markertype1, markersize2, markercolor1, linesize, linecolor)
-            delete(data1)
-            delete(data2)
+            plot = new(4,graphic)
             data1 = mask(u(:,0),u(:,2).ge.0,True)               ; OBS
             data2 = mask(u(:,0)-u(:,1),u(:,2).ge.0,True)        ; BAK
-            ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
-                             "Used  "+num(.not.ismissing(data2)),              \
-                             markertype1, markersize1, markercolor2, linesize, linecolor)
-            delete(data1)
-            delete(data2)
-            data1 = v(:,0)               ; OBS
-            data2 = v(:,0)-v(:,1)        ; BAK
-            ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
-                             "All  "+num(.not.ismissing(data2)),               \
-                             markertype1, markersize1, markercolor1, linesize, linecolor)
+            plot(0) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
+                          "Used  "+num(.not.ismissing(data2)),              \
+                          markertype1, markersize1, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(v(:,0),v(:,2).ge.0,True)               ; OBS
             data2 = mask(v(:,0)-v(:,1),v(:,2).ge.0,True)        ; BAK
-            ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
-                             "Used  "+num(.not.ismissing(data2)),              \
-                             markertype1, markersize1, markercolor2, linesize, linecolor)
+            plot(2) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
+                          "Used  "+num(.not.ismissing(data2)),              \
+                          markertype1, markersize1, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
-            pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-            gsn_panel(wks,ombplot,(/2,2/),pnres)
             ;
             ; OBS and ANA(Analysis) scatter plots
             ;
-            omaplot = new(4,graphic)
-            omaplot(0) = ombplot(1)
             data1 = mask(u(:,0),u(:,2).ge.0,True)               ; OBS
             data2 = mask(u(:,0)-u(:,4),u(:,2).ge.0,True)        ; ANA = OBS - OMA
-            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
-                             "Used  "+num(.not.ismissing(data2)),              \
-                             markertype1, markersize1, markercolor3, linesize, linecolor)
+            plot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
+                          "Used  "+num(.not.ismissing(data2)),              \
+                          markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
-            omaplot(2) = ombplot(3)
             data1 = mask(v(:,0),v(:,2).ge.0,True)               ; OBS
             data2 = mask(v(:,0)-v(:,4),v(:,2).ge.0,True)        ; ANA = OBS - OMA
-            omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
-                             "Used  "+num(.not.ismissing(data2)),              \
-                             markertype1, markersize1, markercolor3, linesize, linecolor)
+            plot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
+                          "Used  "+num(.not.ismissing(data2)),              \
+                          markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
             pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-            gsn_panel(wks,omaplot,(/2,2/),pnres)
-            delete(ombplot)
-            delete(omaplot)
+            gsn_panel(wks,plot,(/2,2/),pnres)
+            delete(plot)
          end if
 
          if ( otype.ne."QSCAT" ) then
@@ -784,106 +887,73 @@ begin  ; begin of procedure plot_sfc
             ; OBS and BAK(Background) scatter plots
             ;
             if ( plotscatter .and. num_t_all.gt.1 .and. num_t_qc.gt.1 ) then
-               ombplot = new(4,graphic)
-               data1 = t(:,0)               ; OBS
-               data2 = t(:,0)-t(:,1)        ; BAK
-               ombplot(0) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                                "All  "+num(.not.ismissing(data2)),               \
-                                markertype1, markersize1, markercolor1, linesize, linecolor)
-               delete(data1)
-               delete(data2)
+               plot = new(4,graphic)
                data1 = mask(t(:,0),t(:,2).ge.0,True)               ; OBS
                data2 = mask(t(:,0)-t(:,1),t(:,2).ge.0,True)        ; BAK
-               ombplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                                "Used  "+num(.not.ismissing(data2)),              \
-                                markertype1, markersize1, markercolor2, linesize, linecolor)
+               plot(0) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
+                             "Used  "+num(.not.ismissing(data2)),              \
+                             markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
             end if
 
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
-               if ( .not.isvar("ombplot") ) then
-                  ombplot = new(4,graphic)
+               if ( .not.isvar("plot") ) then
+                  plot = new(4,graphic)
                end if
-               data1 = 1000.0*q(:,0)               ; OBS
-               data2 = 1000.0*(q(:,0)-q(:,1))      ; BAK
-               ombplot(2) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q",  \
-                                "All  "+num(.not.ismissing(data2)),               \
-                                markertype1, markersize1, markercolor1, linesize, linecolor)
-               delete(data1)
-               delete(data2)
                data1 = mask(1000.0*q(:,0),q(:,2).ge.0,True)               ; OBS
                data2 = mask(1000.0*(q(:,0)-q(:,1)),q(:,2).ge.0,True)      ; BAK
-               ombplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q",  \
-                                "Used  "+num(.not.ismissing(data2)),              \
-                                markertype1, markersize1, markercolor2, linesize, linecolor)
+               plot(2) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q",  \
+                             "Used  "+num(.not.ismissing(data2)),              \
+                             markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
-            end if
-
-            if ( isvar("ombplot") ) then
-               pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-               gsn_panel(wks,ombplot,(/2,2/),pnres)
             end if
             ;
             ; OBS and ANA(Analysis) scatter plots
             ;
             if ( plotscatter .and. num_t_all.gt.1 .and. num_t_qc.gt.1 ) then
-               omaplot = new(4,graphic)
-               omaplot(0) = ombplot(1)
                data1 = mask(t(:,0),t(:,2).ge.0,True)               ; OBS
                data2 = mask(t(:,0)-t(:,4),t(:,2).ge.0,True)        ; ANA = OBS - OMA
-               omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T",  \
-                                "Used  "+num(.not.ismissing(data2)),              \
-                                markertype1, markersize1, markercolor3, linesize, linecolor)
+               plot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T",  \
+                             "Used  "+num(.not.ismissing(data2)),              \
+                             markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
                delete(data2)
             end if
 
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
-               if ( .not.isvar("omaplot") )  then
-                  omaplot = new(4,graphic)
-               end if
-               omaplot(2) = ombplot(3)
                data1 = mask(1000.0*q(:,0),q(:,2).ge.0,True)               ; OBS
                data2 = mask(1000.0*(q(:,0)-q(:,4)),q(:,2).ge.0,True)      ; ANA = OBS - OMA
-               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "ANA Q",  \
-                                "Used  "+num(.not.ismissing(data2)),              \
-                                markertype1, markersize1, markercolor3, linesize, linecolor)
+               plot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "ANA Q",  \
+                             "Used  "+num(.not.ismissing(data2)),              \
+                             markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
                delete(data2)
             end if
 
-            if ( isvar("omaplot") ) then
+            if ( isvar("plot") ) then
                pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-               gsn_panel(wks,omaplot,(/2,2/),pnres)
-               delete(ombplot)
-               delete(omaplot)
+               gsn_panel(wks,plot,(/2,2/),pnres)
+               delete(plot)
             end if
 
          end if  ; end of if otype .ne. QSCAT
          ;
          if ( plotscatter .and. otype .ne. "QSCAT" .and. num_p_all.gt.1 .and. num_p_qc.gt.1 ) then
             plot = new(4,graphic)
-            data1 = 0.01*p(:,0)               ; OBS
-            data2 = 0.01*(p(:,0)-p(:,1))      ; BAK
-            plot(0) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "BAK P",  \
-                          "All  "+num(.not.ismissing(data2)),               \
-                          markertype1, markersize1, markercolor1, linesize, linecolor)
-            delete(data1)
-            delete(data2)
             data1 = 0.01*(mask(p(:,0),p(:,2).ge.0,True))              ; OBS
             data2 = 0.01*(mask(p(:,0)-p(:,1),p(:,2).ge.0,True))       ; BAK
-            plot(1) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "BAK P",  \
+            plot(0) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "BAK P",  \
                           "Used  "+num(.not.ismissing(data2)),              \
-                          markertype1, markersize1, markercolor2, linesize, linecolor)
+                          markertype1, markersize1, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = 0.01*mask(p(:,0),p(:,2).ge.0,True)               ; OBS
             data2 = 0.01*mask(p(:,0)-p(:,4),p(:,2).ge.0,True)        ; ANA = OBS - OMA
-            plot(3) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "ANA P",  \
+            plot(1) =  do_scatterplot(wks, data1, data2, "OBS P  (hPa)", "ANA P",  \
                           "Used  "+num(.not.ismissing(data2)),              \
-                          markertype1, markersize1, markercolor3, linesize, linecolor)
+                          markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
             pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
@@ -909,7 +979,7 @@ begin  ; begin of procedure plot_sfc
          plot = new(4,graphic)
          dummy = new(4,graphic)
          ;
-         title = otype+" TPW (All: "+num_tpw_all+")"
+         title = "OMB  "+otype+" TPW (All: "+num_tpw_all+")"
          mpres = setmpres(title,"","")
          if ( subdomain ) then
             plot(0) = gsn_csm_map_ce(wks,mpres)
@@ -948,25 +1018,18 @@ begin  ; begin of procedure plot_sfc
 
          if ( plotscatter .and. num_tpw_all .gt. 1 .and. num_tpw_qc .gt. 1  ) then
             plot = new(4,graphic)
-            data1 = tpw(:,0)               ; OBS
-            data2 = tpw(:,0)-tpw(:,1)      ; BAK
+            data1 = mask(tpw(:,0),tpw(:,2).ge.0,True)               ; OBS
+            data2 = mask(tpw(:,0)-tpw(:,1),tpw(:,2).ge.0,True)      ; BAK
             plot(0) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "BAK TPW",  \
-                         "All  "+num(.not.ismissing(data2)),                   \
+                         "Used  "+num(.not.ismissing(data2)),                  \
                          markertype1, markersize2, markercolor1, linesize, linecolor)
             delete(data1)
             delete(data2)
             data1 = mask(tpw(:,0),tpw(:,2).ge.0,True)               ; OBS
-            data2 = mask(tpw(:,0)-tpw(:,1),tpw(:,2).ge.0,True)      ; BAK
-            plot(1) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "BAK TPW",  \
+            data2 = mask(tpw(:,0)-tpw(:,4),tpw(:,2).ge.0,True)      ; ANA
+            plot(1) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "ANA TPW",  \
                          "Used  "+num(.not.ismissing(data2)),                  \
                          markertype1, markersize2, markercolor2, linesize, linecolor)
-            delete(data1)
-            delete(data2)
-            data1 = mask(tpw(:,0),tpw(:,2).ge.0,True)               ; OBS
-            data2 = mask(tpw(:,0)-tpw(:,4),tpw(:,2).ge.0,True)      ; ANA
-            plot(3) = do_scatterplot(wks, data1, data2, "OBS TPW  (cm)", "ANA TPW",  \
-                         "Used  "+num(.not.ismissing(data2)),                  \
-                         markertype1, markersize2, markercolor3, linesize, linecolor)
             delete(data1)
             delete(data2)
             pnres = True
@@ -1197,22 +1260,22 @@ begin
          if ( otype .ne. "AIRSR" ) then
             plot = new(4,graphic)
             ;
-            title = otype+" U (All: "+num_u_all+")"
+            title = "OMB  "+otype+" U (All: "+num_u_all+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),.not.ismissing(pu(:,0)),True)
             plat = mask(lat(:),.not.ismissing(pu(:,0)),True)
             pdata = mask(pu(:,1),.not.ismissing(pu(:,0)),True)
-            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
             delete(plon)
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" U (Used: "+num_u_qc+")"
+            title = "OMB  "+otype+" U (Used: "+num_u_qc+")"
             mpres = setmpres(title,"","")
             plon = mask(lon(:),pu(:,2).ge.0,True)
             plat = mask(lat(:),pu(:,2).ge.0,True)
             pdata = mask(pu(:,1),pu(:,2).ge.0,True)
-            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
             ; wmsetp("col", 2)    ; Draw in red.
             ; wmsetp("wbs", .01)  ; Increase the size of the barb.
             ; wmbarbmap(wks, plat, plon,  mask(pu(:,0),pu(:,2).ge.0,True), mask(pv(:,0),pv(:,2).ge.0,True))
@@ -1220,22 +1283,12 @@ begin
             delete(plat)
             delete(pdata)
             ;
-            title = otype+" V (All: "+num_v_all+")"
+            title = "OMA  "+otype+" U (Used: "+num_u_qc+")"
             mpres = setmpres(title,"","")
-            plon = mask(lon(:),.not.ismissing(pv(:,0)),True)
-            plat = mask(lat(:),.not.ismissing(pv(:,0)),True)
-            pdata = mask(pv(:,1),.not.ismissing(pv(:,0)),True)
-            plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
-            delete(plon)
-            delete(plat)
-            delete(pdata)
-            ;
-            title = otype+" V (Used: "+num_v_qc+")"
-            mpres = setmpres(title,"","")
-            plon = mask(lon(:),pv(:,2).ge.0,True)
-            plat = mask(lat(:),pv(:,2).ge.0,True)
-            pdata = mask(pv(:,1),pv(:,2).ge.0,True)
-            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+            plon = mask(lon(:),pu(:,2).ge.0,True)
+            plat = mask(lat(:),pu(:,2).ge.0,True)
+            pdata = mask(pu(:,4),pu(:,2).ge.0,True)
+            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"U")
             delete(plon)
             delete(plat)
             delete(pdata)
@@ -1244,19 +1297,58 @@ begin
             ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
             pnres@txString = date+"    "+otype+"    "+info
             gsn_panel(wks,plot,(/2,2/),pnres)
+            delete(pnres)
+            delete(plot)
+            ;
+            plot = new(4,graphic)
+            title = "OMB  "+otype+" V (All: "+num_v_all+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),.not.ismissing(pv(:,0)),True)
+            plat = mask(lat(:),.not.ismissing(pv(:,0)),True)
+            pdata = mask(pv(:,1),.not.ismissing(pv(:,0)),True)
+            plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            ;
+            title = "OMB  "+otype+" V (Used: "+num_v_qc+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),pv(:,2).ge.0,True)
+            plat = mask(lat(:),pv(:,2).ge.0,True)
+            pdata = mask(pv(:,1),pv(:,2).ge.0,True)
+            plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            ;
+            title = "OMA  "+otype+" V (Used: "+num_v_qc+")"
+            mpres = setmpres(title,"","")
+            plon = mask(lon(:),pv(:,2).ge.0,True)
+            plat = mask(lat(:),pv(:,2).ge.0,True)
+            pdata = mask(pv(:,4),pv(:,2).ge.0,True)
+            plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"V")
+            delete(plon)
+            delete(plat)
+            delete(pdata)
+            pnres = True
+            pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
+            ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+            pnres@txString = date+"    "+otype+"    "+info
+            gsn_panel(wks,plot,(/2,2/),pnres)
+            delete(pnres)
             delete(plot)
          end if
 
          if ( otype.eq. "AIREP" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
-            plot = new(4,graphic)
             ;
             if ( num_t_all.gt.0 .or. num_t_qc.gt.0 ) then
-               title = otype+" T (All: "+num_t_all+")"
+               plot = new(4,graphic)
+               title = "OMB  "+otype+" T (All: "+num_t_all+")"
                mpres = setmpres(title,"","")
                plon = mask(lon(:),.not.ismissing(pt(:,0)),True)
                plat = mask(lat(:),.not.ismissing(pt(:,0)),True)
                pdata = mask(pt(:,1),.not.ismissing(pt(:,0)),True)
-               plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+               plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
                if ( otype .eq. "AIRSR" ) then
                   gsres@gsMarkerSizeF  = markersize2          ; default 0.007
                else
@@ -1266,44 +1358,74 @@ begin
                delete(plat)
                delete(pdata)
                ;
-               title = otype+" T (Used: "+num_t_qc+")"
+               title = "OMB  "+otype+" T (Used: "+num_t_qc+")"
                mpres = setmpres(title,"","")
                plon = mask(lon(:),pt(:,2).ge.0,True)
                plat = mask(lat(:),pt(:,2).ge.0,True)
                pdata = mask(pt(:,1),pt(:,2).ge.0,True)
-               plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+               plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
                delete(plon)
                delete(plat)
                delete(pdata)
                ;
+               title = "OMA  "+otype+" T (Used: "+num_t_qc+")"
+               mpres = setmpres(title,"","")
+               plon = mask(lon(:),pt(:,2).ge.0,True)
+               plat = mask(lat(:),pt(:,2).ge.0,True)
+               pdata = mask(pt(:,4),pt(:,2).ge.0,True)
+               plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"T")
+               delete(plon)
+               delete(plat)
+               delete(pdata)
+               pnres = True
+               pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
+               ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+               pnres@txString = date+"    "+otype+"    "+info
+               gsn_panel(wks,plot,(/2,2/),pnres)
+               delete(pnres)
+               delete(plot)
+               ;
                if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
                   if ( num_q_all.gt.0 .or. num_q_qc.gt.0 ) then
-                     title = otype+" Q (All: "+num_q_all+")"
+                     plot = new(4,graphic)
+                     title = "OMB  "+otype+" Q (All: "+num_q_all+")"
                      mpres = setmpres(title,"","")
                      plon = mask(lon(:),.not.ismissing(pq(:,0)),True)
                      plat = mask(lat(:),.not.ismissing(pq(:,0)),True)
                      pdata = mask(pq(:,1)*1000.0,.not.ismissing(pq(:,0)),True)
-                     plot(2) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+                     plot(0) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
                      delete(plon)
                      delete(plat)
                      delete(pdata)
                      ;
-                     title = otype+" Q (Used: "+num_q_qc+")"
+                     title = "OMB  "+otype+" Q (Used: "+num_q_qc+")"
                      mpres = setmpres(title,"","")
                      plon = mask(lon(:),pq(:,2).ge.0,True)
                      plat = mask(lat(:),pq(:,2).ge.0,True)
                      pdata = mask(pq(:,1)*1000.0,pq(:,2).ge.0,True)
-                     plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres)
+                     plot(1) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
                      delete(plon)
                      delete(plat)
                      delete(pdata)
+                     ;
+                     title = "OMA  "+otype+" Q (Used: "+num_q_qc+")"
+                     mpres = setmpres(title,"","")
+                     plon = mask(lon(:),pq(:,2).ge.0,True)
+                     plat = mask(lat(:),pq(:,2).ge.0,True)
+                     pdata = mask(pq(:,4)*1000.0,pq(:,2).ge.0,True)
+                     plot(3) = do_invplot(wks,pdata,plat,plon,subdomain,mpres,"Q")
+                     delete(plon)
+                     delete(plat)
+                     delete(pdata)
+                     pnres = True
+                     pnres@gsnPanelBottom = 0.06              ; add some space at bottom 
+                     ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
+                     pnres@txString = date+"    "+otype+"    "+info
+                     gsn_panel(wks,plot,(/2,2/),pnres)
+                     delete(pnres)
+                     delete(plot)
                   end if
                end if
-               pnres = True
-               ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-               pnres@txString = date+"    "+otype+"    "+info
-               gsn_panel(wks,plot,(/2,2/),pnres)
-               delete(plot)
             end if
          end if
       end if
@@ -1312,31 +1434,25 @@ begin
       ;
       if ( plotscatter .and. otype .eq. "BOGUS" .and. num_slp_all.gt.1 .and. num_slp_qc.gt.1 ) then
          plot = new(4,graphic)
-         data1 = pslp(:,0)               ; OBS
-         data2 = pslp(:,0)-pslp(:,1)     ; BAK
-         plot(0) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "BAK SLP",  \
-                      "All  "+num(.not.ismissing(data2)),                   \
-                      markertype1, markersize2, markercolor1, linesize, linecolor)
-         delete(data1)
-         delete(data2)
          data1 = mask(pslp_qc(:,0),pslp_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pslp_qc(:,0)-pslp_qc(:,1),pslp_qc(:,2).ge.0,True)  ; BAK
-         plot(1) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "BAK SLP",  \
+         plot(0) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "BAK SLP",  \
                       "Used  "+num(.not.ismissing(data2)),                  \
-                      markertype1, markersize2, markercolor2, linesize, linecolor)
+                      markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pslp(:,0),pslp(:,2).ge.0,True)               ; OBS
          data2 = mask(pslp(:,0)-pslp(:,4),pslp(:,2).ge.0,True)     ; ANA
-         plot(3) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "ANA SLP",  \
+         plot(1) = do_scatterplot(wks, data1, data2, "OBS SLP  (hPa)", "ANA SLP",  \
                       "Used  "+num(.not.ismissing(data2)),                  \
-                      markertype1, markersize2, markercolor3, linesize, linecolor)
+                      markertype1, markersize2, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
          pnres = True
          ; pnres@gsnPanelBottom = 0.08              ; add some space at bottom 
          pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
          gsn_panel(wks,plot,(/2,2/),pnres)
+         delete(pnres)
          delete(plot)
       end if
 
@@ -1344,64 +1460,45 @@ begin
          ;
          ; OBS and BAK(Background) scatter plot
          ;
-         ombplot = new(4,graphic)
+         plot = new(4,graphic)
          ;
-         data1 = pu(:,0)               ; OBS
-         data2 = pu(:,0)-pu(:,1)       ; BAK
-         ombplot(0) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
-                         "All  "+num(.not.ismissing(data2)),               \
-                         markertype1, markersize2, markercolor1, linesize, linecolor)
-         delete(data1)
-         delete(data2)
          data1 = mask(pu_qc(:,0),pu_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pu_qc(:,0)-pu_qc(:,1),pu_qc(:,2).ge.0,True)    ; BAK
-         ombplot(1) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
-                         "Used  "+num(.not.ismissing(data2)),              \
-                         markertype1, markersize2, markercolor2, linesize, linecolor)
-         delete(data1)
-         delete(data2)
-         data1 = pv(:,0)               ; OBS
-         data2 = pv(:,0)-pv(:,1)       ; BAK
-         ombplot(2) = do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
-                         "All  "+num(.not.ismissing(data2)),               \
-                         markertype1, markersize2, markercolor1, linesize, linecolor)
+         plot(0) = do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "BAK U",  \
+                      "Used  "+num(.not.ismissing(data2)),              \
+                      markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pv_qc(:,0),pv_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pv_qc(:,0)-pv_qc(:,1),pv_qc(:,2).ge.0,True)    ; BAK
-         ombplot(3) = do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
-                         "Used  "+num(.not.ismissing(data2)),              \
-                         markertype1, markersize2, markercolor2, linesize, linecolor)
+         plot(2) = do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "BAK V",  \
+                      "Used  "+num(.not.ismissing(data2)),              \
+                      markertype1, markersize2, markercolor1, linesize, linecolor)
          delete(data1)
          delete(data2)
-         ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-         pnres@txString = date+"    "+otype+"    "+info
-         gsn_panel(wks,ombplot,(/2,2/),pnres)
          ;
          ; OBS and ANA(Analysis) scatter plot
          ;
-         omaplot = new(4,graphic)
-         omaplot(0) = ombplot(1)
          data1 = mask(pu_qc(:,0),pu_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pu_qc(:,0)-pu_qc(:,4),pu_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-         omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
-                          "Used  "+num(.not.ismissing(data2)),              \
-                          markertype1, markersize1, markercolor3, linesize, linecolor)
+         plot(1) =  do_scatterplot(wks, data1, data2, "OBS U  (m/s)", "ANA U",  \
+                       "Used  "+num(.not.ismissing(data2)),              \
+                       markertype1, markersize1, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
-         omaplot(2) = ombplot(3)
          data1 = mask(pv_qc(:,0),pv_qc(:,2).ge.0,True)               ; OBS
          data2 = mask(pv_qc(:,0)-pv_qc(:,4),pv_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-         omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
-                          "Used  "+num(.not.ismissing(data2)),              \
-                          markertype1, markersize1, markercolor3, linesize, linecolor)
+         plot(3) =  do_scatterplot(wks, data1, data2, "OBS V  (m/s)", "ANA V",  \
+                       "Used  "+num(.not.ismissing(data2)),              \
+                       markertype1, markersize1, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
+         pnres = True
          ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
          pnres@txString = date+"    "+otype+"    "+info
-         gsn_panel(wks,omaplot,(/2,2/),pnres)
-         delete(ombplot)
-         delete(omaplot)
+         gsn_panel(wks,plot,(/2,2/),pnres)
+         delete(pnres)
+         delete(plot)
       end if
 
       if ( otype.eq. "AIREP" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
@@ -1409,30 +1506,17 @@ begin
          ; OBS and BAK(Background) scatter plot
          ;
          if ( plotscatter .and. num_t_all.gt.1 .and. num_t_qc.gt.1 ) then
-            ombplot = new(4,graphic)
-            data1 = pt(:,0)               ; OBS
-            data2 = pt(:,0)-pt(:,1)       ; BAK
-            if ( otype .eq. "AIRSR" ) then
-               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                               "All  "+num(.not.ismissing(data2)),               \
-                               markertype1, markersize1, markercolor1, linesize, linecolor)
-            else
-               ombplot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                               "All  "+num(.not.ismissing(data2)),               \
-                               markertype1, markersize2, markercolor1, linesize, linecolor)
-            end if
-            delete(data1)
-            delete(data2)
+            plot = new(4,graphic)
             data1 = mask(pt_qc(:,0),pt_qc(:,2).ge.0,True)               ; OBS
             data2 = mask(pt_qc(:,0)-pt_qc(:,1),pt_qc(:,2).ge.0,True)    ; BAK
             if ( otype .eq. "AIRSR" ) then
-               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                               "Used  "+num(.not.ismissing(data2)), \
-                               markertype1, markersize1, markercolor2, linesize, linecolor)
+               plot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
+                            "Used  "+num(.not.ismissing(data2)), \
+                            markertype1, markersize1, markercolor1, linesize, linecolor)
             else
-               ombplot(1) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
-                               "Used  "+num(.not.ismissing(data2)),              \
-                               markertype1, markersize2, markercolor2, linesize, linecolor)
+               plot(0) = do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "BAK T",  \
+                            "Used  "+num(.not.ismissing(data2)),              \
+                            markertype1, markersize2, markercolor1, linesize, linecolor)
             end if
             delete(data1)
             delete(data2)
@@ -1440,68 +1524,50 @@ begin
 
          if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
-               if ( .not.isvar("ombplot") ) then
-                  ombplot = new(4,graphic)
+               if ( .not.isvar("plot") ) then
+                  plot = new(4,graphic)
                end if
-               data1 = 1000.0*pq(:,0)               ; OBS
-               data2 = 1000.0*(pq(:,0)-pq(:,1))     ; BAK
-               ombplot(2) = do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q", \
-                               "All  "+num(.not.ismissing(data2)),              \
-                               markertype1, markersize1, markercolor1, linesize, linecolor)
-               delete(data1)
-               delete(data2)
                data1 = mask(1000.0*pq_qc(:,0),pq_qc(:,2).ge.0,True)               ; OBS
                data2 = mask(1000.0*(pq_qc(:,0)-pq_qc(:,1)),pq_qc(:,2).ge.0,True)    ; BAK
-               ombplot(3) = do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q", \
-                               "Used  "+num(.not.ismissing(data2)),             \
-                               markertype1, markersize1, markercolor2, linesize, linecolor)
+               plot(2) = do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "BAK Q", \
+                            "Used  "+num(.not.ismissing(data2)),             \
+                            markertype1, markersize1, markercolor1, linesize, linecolor)
                delete(data1)
                delete(data2)
             end if
-         end if
-
-         if ( isvar("ombplot") ) then
-            ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
-            pnres@txString = date+"    "+otype+"    "+info
-            gsn_panel(wks,ombplot,(/2,2/),pnres)
          end if
          ;
          ; OBS and ANA(Analysis) scatter plot
          ;
          if ( plotscatter .and. num_t_all.gt.1 .and. num_t_qc.gt.1 ) then
-            omaplot = new(4,graphic)
-            omaplot(0) = ombplot(1)
             data1 = mask(pt_qc(:,0),pt_qc(:,2).ge.0,True)               ; OBS
             data2 = mask(pt_qc(:,0)-pt_qc(:,4),pt_qc(:,2).ge.0,True)    ; ANA = OBS - OMA
-            omaplot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T", \
-                             "Used  "+num(.not.ismissing(data2)),             \
-                             markertype1, markersize1, markercolor3, linesize, linecolor)
+            plot(1) =  do_scatterplot(wks, data1, data2, "OBS T  (degree K)", "ANA T", \
+                          "Used  "+num(.not.ismissing(data2)),             \
+                          markertype1, markersize1, markercolor2, linesize, linecolor)
             delete(data1)
             delete(data2)
          end if
 
          if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
-               if ( .not.isvar("omaplot") ) then
-                  omaplot = new(4,graphic)
-               end if
-               omaplot(2) = ombplot(3)
                data1 = mask(1000.0*pq_qc(:,0),pq_qc(:,2).ge.0,True)               ; OBS
                data2 = mask(1000.0*(pq_qc(:,0)-pq_qc(:,4)),pq_qc(:,2).ge.0,True)  ; ANA = OBS - OMA
-               omaplot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "ANA Q", \
-                                "Used  "+num(.not.ismissing(data2)),             \
-                                markertype1, markersize1, markercolor3, linesize, linecolor)
+               plot(3) =  do_scatterplot(wks, data1, data2, "OBS Q  (g/kg)", "ANA Q", \
+                             "Used  "+num(.not.ismissing(data2)),             \
+                             markertype1, markersize1, markercolor2, linesize, linecolor)
                delete(data1)
                delete(data2)
             end if
          end if
 
-         if ( isvar("omaplot") ) then
+         if ( isvar("plot") ) then
+            pnres = True
             ; pnres@txString = date+"    "+otype+"    "+nobs+" / "+num_qc
             pnres@txString = date+"    "+otype+"    "+info
-            gsn_panel(wks,omaplot,(/2,2/),pnres)
-            delete(ombplot)
-            delete(omaplot)
+            gsn_panel(wks,plot,(/2,2/),pnres)
+            delete(pnres)
+            delete(plot)
          end if
 
       end if
@@ -1913,23 +1979,16 @@ begin
       ;
       if ( num_ref_all.gt.1 .and. num_ref_qc.gt.1 ) then
          plot = new(4,graphic)
-         data1 = pref(:,0)               ; OBS
-         data2 = pref(:,0)-pref(:,1)      ; BAK
-         plot(0) = do_scatterplot(wks, data1, data2, "OBS REF", "BAK REF",  \
-                      "All  "+num(.not.ismissing(data2)),                   \
-                      markertype1, markersize2, markercolor1, linesize, linecolor)
-         delete(data1)
-         delete(data2)
          data1 = mask(pref(:,0),pref(:,2).ge.0,True)               ; OBS
          data2 = mask(pref(:,0)-pref(:,1),pref(:,2).ge.0,True)      ; BAK
-         plot(1) = do_scatterplot(wks, data1, data2, "OBS REF", "BAK REF",  \
+         plot(0) = do_scatterplot(wks, data1, data2, "OBS REF", "BAK REF",  \
                       "Used  "+num(.not.ismissing(data2)),                  \
                       markertype1, markersize2, markercolor2, linesize, linecolor)
          delete(data1)
          delete(data2)
          data1 = mask(pref(:,0),pref(:,2).ge.0,True)               ; OBS
          data2 = mask(pref(:,0)-pref(:,4),pref(:,2).ge.0,True)      ; ANA
-         plot(3) = do_scatterplot(wks, data1, data2, "OBS REF", "ANA REF",  \
+         plot(1) = do_scatterplot(wks, data1, data2, "OBS REF", "ANA REF",  \
                       "Used  "+num(.not.ismissing(data2)),                  \
                       markertype1, markersize2, markercolor3, linesize, linecolor)
          delete(data1)
@@ -2191,9 +2250,201 @@ begin
    newdatestr = sprinti("%0.8i",newday) + sprinti("%0.2i",hh)
    return(newdatestr)
 end
-plot_gts = True
-plot_radar = False
-prefix_radar   = "oma_radar"
+
+undef("write_nc")
+procedure write_nc(otype:string, vert_coord:string, vert_values:float, nobs, nlevels, \
+                   date, id:string, lat:float, lon:float, \
+                   u:float, v:float, t:float, p:float, q:float, tpw:float, spd:float, \
+                   ref:float, prefix:string)
+local is,ie
+begin
+   char_len = 5  ;8
+   nlevels_max = max(nlevels)
+   out_fullname = prefix+otype+"_"+date+".nc"
+
+
+   u_valid = False
+   v_valid = False
+   t_valid = False
+   p_valid = False
+   q_valid = False
+   ref_valid = False
+   if ( .not. all(ismissing(u)) ) then
+      u_valid = True
+   end if
+   if ( .not. all(ismissing(v)) ) then
+      v_valid = True
+   end if
+   if ( .not. all(ismissing(t)) ) then
+      t_valid = True
+   end if
+   if ( .not. all(ismissing(p)) ) then
+      p_valid = True
+   end if
+   if ( .not. all(ismissing(q)) ) then
+      q_valid = True
+   end if
+   if ( .not. all(ismissing(ref)) ) then
+      ref_valid = True
+   end if
+
+   system("/bin/rm -f "+out_fullname)    ; remove if it exists
+   fout = addfile (out_fullname, "c")    ; open output file
+
+   setfileoption(fout,"DefineMode",True)
+
+   ; create global attributes of the file
+   fAtt               = True            ; assign file attributes
+   fAtt@ob_date       = date
+   fAtt@title         = otype
+   fAtt@creation_date = systemfunc ("date")        
+   fileattdef( fout, fAtt )            ; copy file attributes    
+
+   ; predefine the coordinate variables and their dimensionality
+   dimNames = (/"nobs", "char_len", "nlevels_max" /)
+   dimSizes = (/ nobs,  char_len,   nlevels_max   /)
+   dimUnlim = (/ False, False,      False       /)
+   filedimdef(fout,dimNames,dimSizes,dimUnlim)
+
+   filevardef(fout,"NLEV", "integer", (/ "nobs" /))   ; Declare varialbes in netCDF file and assign dimensions of the variables
+   filevardef(fout,"LATS", "float", (/ "nobs" /))
+   filevardef(fout,"LONS", "float", (/ "nobs"/))
+   filevardef(fout,"STID", "character", (/ "nobs", "char_len" /))
+   if ( vert_coord .eq. "p" ) then
+      vertvar = "PRES"
+   else
+      vertvar = "HEIT"
+   end if
+   if ( nlevels_max .gt. 1 ) then
+      filevardef(fout, vertvar, "float", (/ "nobs", "nlevels_max" /))
+   else
+      filevardef(fout, vertvar, "float", (/ "nobs"/))
+   end if
+
+   ; explicitly exit file definition mode. **NOT REQUIRED**
+   setfileoption(fout,"DefineMode",False)
+
+   is = new(nobs, "integer")
+   ie = new(nobs, "integer")
+   is(0) = 0
+   ie(0) = nlevels(0)-1
+   do n = 1, nobs-1
+      is(n) = sum(nlevels(0:n-1))
+      ie(n) = is(n)+nlevels(n)-1
+   end do
+
+   tmp1 = new((/2,nobs/),"float")
+   tmp2 = new((/nobs,nlevels_max/),"float")
+   tmpc = new((/nobs,char_len+1/),"character")
+   do n = 0, nobs-1
+      tmp1(0,n) = lat(is(n))
+      tmp1(1,n) = lon(is(n))
+      tmpc(n,:)   = stringtochar(id(is(n)))
+      tmp2(n,0:nlevels(n)-1) = vert_values(is(n):ie(n))
+   end do
+
+   fout->NLEV = (/nlevels/)       ; Write data to netCDF variables without meta-data
+   fout->LATS = (/tmp1(0,:)/)
+   fout->LONS = (/tmp1(1,:)/)
+   fout->STID = (/tmpc(:,0:char_len-1)/)
+   fout->$vertvar$ = (/tmp2/)
+   delete(tmp1)
+   delete(tmp2)
+   delete(tmpc)
+
+   ;fout->NLEV = (/nlevels/)       ; Write data to netCDF variables without meta-data
+   ;fout->LATS = (/lat/)
+   ;fout->LONS = (/lon/)
+   ;tmp = stringtochar(id)
+   ;delete(tmp@_FillValue)
+   ;fout->STID = (/tmp(:,0:char_len-1)/)
+   ;delete(tmp)
+   ;;fout->STID = (/id/)
+   ;fout->$vertvar$ = (/vert_values/)
+
+   uvars = (/ "UOBS","UOMB","UQCF","UERR","UOMA" /)   ; Names of the variables in netCDF file
+   vvars = (/ "VOBS","VOMB","VQCF","VERR","VOMA" /)
+   tvars = (/ "TOBS","TOMB","TQCF","TERR","TOMA" /)
+   qvars = (/ "QOBS","QOMB","QQCF","QERR","QOMA" /)
+   pvars = (/ "POBS","POMB","PQCF","PERR","POMA" /)
+   refvars = (/ "REFOBS","REFOMB","REFQCF","REFERR","REFOMA" /)
+
+   if ( otype .ne. "gpsref" ) then
+      tmp = new((/5,nobs,nlevels_max/),"float")
+      do i = 0,4   ; Loop over the different parameters (obs, omb, qc, oma, err)
+         if ( nlevels_max .gt. 1 ) then
+            do n = 0, nobs-1
+               tmp(0,n,0:nlevels(n)-1) = u(is(n):ie(n),i)
+               tmp(1,n,0:nlevels(n)-1) = v(is(n):ie(n),i)
+               tmp(2,n,0:nlevels(n)-1) = t(is(n):ie(n),i)
+               tmp(3,n,0:nlevels(n)-1) = q(is(n):ie(n),i)
+               tmp(4,n,0:nlevels(n)-1) = p(is(n):ie(n),i)
+            end do
+            if ( u_valid ) then
+               filevardef(fout, uvars(i), "float", (/ "nobs", "nlevels_max" /))
+               fout->$uvars(i)$ = (/tmp(0,:,:)/)
+            end if
+            if ( v_valid ) then
+               filevardef(fout, vvars(i), "float", (/ "nobs", "nlevels_max" /))
+               fout->$vvars(i)$ = (/tmp(1,:,:)/)
+            end if
+            if ( t_valid ) then
+               filevardef(fout, tvars(i), "float", (/ "nobs", "nlevels_max" /))
+               fout->$tvars(i)$ = (/tmp(2,:,:)/)
+            end if
+            if ( q_valid ) then
+               filevardef(fout, qvars(i), "float", (/ "nobs", "nlevels_max" /))
+               fout->$qvars(i)$ = (/tmp(3,:,:)/)
+            end if
+            if ( p_valid ) then
+               filevardef(fout, pvars(i), "float", (/ "nobs", "nlevels_max" /))
+               fout->$pvars(i)$ = (/tmp(4,:,:)/)
+            end if
+         else
+            if ( u_valid ) then
+               filevardef(fout, uvars(i), "float", (/ "nobs" /))
+               fout->$uvars(i)$ = (/u(:,i)/)
+            end if
+            if ( v_valid ) then
+               filevardef(fout, vvars(i), "float", (/ "nobs" /))
+               fout->$vvars(i)$ = (/v(:,i)/)
+            end if
+            if ( t_valid ) then
+               filevardef(fout, tvars(i), "float", (/ "nobs" /))
+               fout->$tvars(i)$ = (/t(:,i)/)
+            end if
+            if ( q_valid ) then
+               filevardef(fout, qvars(i), "float", (/ "nobs" /))
+               fout->$qvars(i)$ = (/q(:,i)/)
+            end if
+            if ( p_valid ) then
+               filevardef(fout, pvars(i), "float", (/ "nobs" /))
+               fout->$pvars(i)$ = (/p(:,i)/)
+            end if
+         end if
+      end do
+      delete(tmp)
+   end if
+
+   if ( otype .eq. "gpsref" ) then
+      tmp = new((/nobs,nlevels_max/),"float")
+      do i = 0,4   ; Loop over the different parameters (obs, omb, qc, oma, err)
+         if ( nlevels_max .gt. 1 ) then
+            filevardef(fout,refvars(i), "float", (/ "nobs", "nlevels_max" /))
+            do n = 0, nobs-1
+               tmp(n,0:nlevels(n)-1) = ref(is(n):ie(n),i)
+            end do
+            fout->$refvars(i)$ = (/tmp(:,:)/)
+         else
+            filevardef(fout,refvars(i), "float", (/ "nobs" /))
+            fout->$refvars(i)$ = (/ref(:,i)/)
+         end if
+      end do
+      delete(tmp)
+   end if
+
+   delete(fout)
+end ;procedure write_nc
 ;---------------------------------------------------------------------------
 ; main script
 ;---------------------------------------------------------------------------
@@ -2289,7 +2540,7 @@ begin;  begin of the main script
          end if   ; end of if found oma_radar* files
       end if   ; end of if plot_radar
 
-      if ( plot_gts ) then
+      if ( plot_gts .and. input_source .eq. "ascii" ) then
          gts_fullname = datdir1+date+datdir2+filename_gts
          if ( .not. isfilepresent(gts_fullname) ) then
             print("Can not find the file "+gts_fullname+"  Will skip it")
@@ -2321,228 +2572,303 @@ begin;  begin of the main script
                nairsr = 0
                ngpsref = 0
                nssmir = 0
-               do n = 0, nline-1    ; loop of parsing the file line by line
-                  if ( cdata(n,0:19) .eq. "               synop" ) then
-                     nsynop = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     isynop = n                                                  ; line index
-                     nlevel_synop = new(nsynop,integer)
-                     ilevel_synop = new(nsynop,integer)
-                     ilevel_synop(0) = isynop+1
-                     nlevel_synop(0) = stringtointeger(charactertostring(cdata(ilevel_synop(0),0:7)))
-                     do k = 1, nsynop-1
-                        ilevel_synop(k) = ilevel_synop(k-1)+nlevel_synop(k-1)+1
-                        nlevel_synop(k) = stringtointeger(charactertostring(cdata(ilevel_synop(k),0:7)))
-                     end do
+               if ( proc_synop ) then
+                  ob_string = "               synop"
+                  isynop = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(isynop) ) then
+                     nsynop = stringtointeger(charactertostring(cdata(isynop,20:27))) ; number of obs
+                     if ( nsynop .gt. 0 ) then
+                        nlevel_synop = new(nsynop,integer)
+                        ilevel_synop = new(nsynop,integer)
+                        ilevel_synop(0) = isynop+1
+                        nlevel_synop(0) = stringtointeger(charactertostring(cdata(ilevel_synop(0),0:7)))
+                        do k = 1, nsynop-1
+                           ilevel_synop(k) = ilevel_synop(k-1)+nlevel_synop(k-1)+1
+                           nlevel_synop(k) = stringtointeger(charactertostring(cdata(ilevel_synop(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               metar" ) then
-                     nmetar = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     imetar = n                                                  ; line index
-                     nlevel_metar = new(nmetar,integer)
-                     ilevel_metar = new(nmetar,integer)
-                     ilevel_metar(0) = imetar+1
-                     nlevel_metar(0) = stringtointeger(charactertostring(cdata(ilevel_metar(0),0:7)))
-                     do k = 1, nmetar-1
-                        ilevel_metar(k) = ilevel_metar(k-1)+nlevel_metar(k-1)+1
-                        nlevel_metar(k) = stringtointeger(charactertostring(cdata(ilevel_metar(k),0:7)))
-                     end do
+               end if
+               if ( proc_metar ) then
+                  ob_string = "               metar"
+                  imetar = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(imetar) ) then
+                     nmetar = stringtointeger(charactertostring(cdata(imetar,20:27))) ; number of obs
+                     if ( nmetar .gt. 0 ) then
+                        nlevel_metar = new(nmetar,integer)
+                        ilevel_metar = new(nmetar,integer)
+                        ilevel_metar(0) = imetar+1
+                        nlevel_metar(0) = stringtointeger(charactertostring(cdata(ilevel_metar(0),0:7)))
+                        do k = 1, nmetar-1
+                           ilevel_metar(k) = ilevel_metar(k-1)+nlevel_metar(k-1)+1
+                           nlevel_metar(k) = stringtointeger(charactertostring(cdata(ilevel_metar(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               ships" ) then
-                     nships = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     iships = n                                                  ; line index
-                     nlevel_ships = new(nships,integer)
-                     ilevel_ships = new(nships,integer)
-                     ilevel_ships(0) = iships+1
-                     nlevel_ships(0) = stringtointeger(charactertostring(cdata(ilevel_ships(0),0:7)))
-                     do k = 1, nships-1
-                        ilevel_ships(k) = ilevel_ships(k-1)+nlevel_ships(k-1)+1
-                        nlevel_ships(k) = stringtointeger(charactertostring(cdata(ilevel_ships(k),0:7)))
-                     end do
+               end if
+               if ( proc_ships ) then
+                  ob_string = "               ships"
+                  iships = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(iships) ) then
+                     nships = stringtointeger(charactertostring(cdata(iships,20:27))) ; number of obs
+                     if ( nships .gt. 0 ) then
+                        nlevel_ships = new(nships,integer)
+                        ilevel_ships = new(nships,integer)
+                        ilevel_ships(0) = iships+1
+                        nlevel_ships(0) = stringtointeger(charactertostring(cdata(ilevel_ships(0),0:7)))
+                        do k = 1, nships-1
+                           ilevel_ships(k) = ilevel_ships(k-1)+nlevel_ships(k-1)+1
+                           nlevel_ships(k) = stringtointeger(charactertostring(cdata(ilevel_ships(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "                buoy" ) then
-                     nbuoy = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     ibuoy = n                                                  ; line index
-                     nlevel_buoy = new(nbuoy,integer)
-                     ilevel_buoy = new(nbuoy,integer)
-                     ilevel_buoy(0) = ibuoy+1
-                     nlevel_buoy(0) = stringtointeger(charactertostring(cdata(ilevel_buoy(0),0:7)))
-                     do k = 1, nbuoy-1
-                        ilevel_buoy(k) = ilevel_buoy(k-1)+nlevel_buoy(k-1)+1
-                        nlevel_buoy(k) = stringtointeger(charactertostring(cdata(ilevel_buoy(k),0:7)))
-                     end do
+               end if
+               if ( proc_buoy ) then
+                  ob_string = "                buoy"
+                  ibuoy = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(ibuoy) ) then
+                     nbuoy = stringtointeger(charactertostring(cdata(ibuoy,20:27))) ; number of obs
+                     if ( nbuoy .gt. 0 ) then
+                        nlevel_buoy = new(nbuoy,integer)
+                        ilevel_buoy = new(nbuoy,integer)
+                        ilevel_buoy(0) = ibuoy+1
+                        nlevel_buoy(0) = stringtointeger(charactertostring(cdata(ilevel_buoy(0),0:7)))
+                        do k = 1, nbuoy-1
+                           ilevel_buoy(k) = ilevel_buoy(k-1)+nlevel_buoy(k-1)+1
+                           nlevel_buoy(k) = stringtointeger(charactertostring(cdata(ilevel_buoy(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "           sonde_sfc" ) then
-                     nsonde_sfc = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     isonde_sfc = n                                                  ; line index
-                     nlevel_sonde_sfc = new(nsonde_sfc,integer)
-                     ilevel_sonde_sfc = new(nsonde_sfc,integer)
-                     ilevel_sonde_sfc(0) = isonde_sfc+1
-                     nlevel_sonde_sfc(0) = stringtointeger(charactertostring(cdata(ilevel_sonde_sfc(0),0:7)))
-                     do k = 1, nsonde_sfc-1
-                        ilevel_sonde_sfc(k) = ilevel_sonde_sfc(k-1)+nlevel_sonde_sfc(k-1)+1
-                        nlevel_sonde_sfc(k) = stringtointeger(charactertostring(cdata(ilevel_sonde_sfc(k),0:7)))
-                     end do
+               end if
+               if ( proc_sonde_sfc ) then
+                  ob_string = "           sonde_sfc"
+                  isonde_sfc = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(isonde_sfc) ) then
+                     nsonde_sfc = stringtointeger(charactertostring(cdata(isonde_sfc,20:27))) ; number of obs
+                     if ( nsonde_sfc .gt. 0 ) then
+                        nlevel_sonde_sfc = new(nsonde_sfc,integer)
+                        ilevel_sonde_sfc = new(nsonde_sfc,integer)
+                        ilevel_sonde_sfc(0) = isonde_sfc+1
+                        nlevel_sonde_sfc(0) = stringtointeger(charactertostring(cdata(ilevel_sonde_sfc(0),0:7)))
+                        do k = 1, nsonde_sfc-1
+                           ilevel_sonde_sfc(k) = ilevel_sonde_sfc(k-1)+nlevel_sonde_sfc(k-1)+1
+                           nlevel_sonde_sfc(k) = stringtointeger(charactertostring(cdata(ilevel_sonde_sfc(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "              geoamv" ) then
-                     ngeoamv = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     igeoamv = n                                                  ; line index
-                     nlevel_geoamv = new(ngeoamv,integer)  ; number of levels of each obs
-                     ilevel_geoamv = new(ngeoamv,integer)  ; starting line index of each obs
-                     ilevel_geoamv(0) = igeoamv+1
-                     nlevel_geoamv(0) = stringtointeger(charactertostring(cdata(ilevel_geoamv(0),0:7)))
-                     do k = 1, ngeoamv-1
-                        ilevel_geoamv(k) = ilevel_geoamv(k-1)+nlevel_geoamv(k-1)+1
-                        nlevel_geoamv(k) = stringtointeger(charactertostring(cdata(ilevel_geoamv(k),0:7)))
-                     end do
+               end if
+               if ( proc_geoamv ) then
+                  ob_string = "              geoamv"
+                  igeoamv = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(igeoamv) ) then
+                     ngeoamv = stringtointeger(charactertostring(cdata(igeoamv,20:27))) ; number of obs
+                     if ( ngeoamv .gt. 0 ) then
+                        nlevel_geoamv = new(ngeoamv,integer)  ; number of levels of each obs
+                        ilevel_geoamv = new(ngeoamv,integer)  ; starting line index of each obs
+                        ilevel_geoamv(0) = igeoamv+1
+                        nlevel_geoamv(0) = stringtointeger(charactertostring(cdata(ilevel_geoamv(0),0:7)))
+                        do k = 1, ngeoamv-1
+                           ilevel_geoamv(k) = ilevel_geoamv(k-1)+nlevel_geoamv(k-1)+1
+                           nlevel_geoamv(k) = stringtointeger(charactertostring(cdata(ilevel_geoamv(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "            polaramv" ) then
-                     npolaramv = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     ipolaramv = n                                                  ; line index
-                     nlevel_polaramv = new(npolaramv,integer)
-                     ilevel_polaramv = new(npolaramv,integer)
-                     ilevel_polaramv(0) = ipolaramv+1
-                     nlevel_polaramv(0) = stringtointeger(charactertostring(cdata(ilevel_polaramv(0),0:7)))
-                     do k = 1, npolaramv-1
-                        ilevel_polaramv(k) = ilevel_polaramv(k-1)+nlevel_polaramv(k-1)+1
-                        nlevel_polaramv(k) = stringtointeger(charactertostring(cdata(ilevel_polaramv(k),0:7)))
-                     end do
+               end if
+               if ( proc_polaramv ) then
+                  ob_string = "            polaramv"
+                  ipolaramv = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(ipolaramv) ) then
+                     npolaramv = stringtointeger(charactertostring(cdata(ipolaramv,20:27))) ; number of obs
+                     if ( npolaramv .gt. 0 ) then
+                        nlevel_polaramv = new(npolaramv,integer)
+                        ilevel_polaramv = new(npolaramv,integer)
+                        ilevel_polaramv(0) = ipolaramv+1
+                        nlevel_polaramv(0) = stringtointeger(charactertostring(cdata(ilevel_polaramv(0),0:7)))
+                        do k = 1, npolaramv-1
+                           ilevel_polaramv(k) = ilevel_polaramv(k-1)+nlevel_polaramv(k-1)+1
+                           nlevel_polaramv(k) = stringtointeger(charactertostring(cdata(ilevel_polaramv(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               gpspw" ) then
-                     ngpspw = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     igpspw = n                                                  ; line index
-                     nlevel_gpspw = new(ngpspw,integer)
-                     ilevel_gpspw = new(ngpspw,integer)
-                     ilevel_gpspw(0) = igpspw+1
-                     nlevel_gpspw(0) = stringtointeger(charactertostring(cdata(ilevel_gpspw(0),0:7)))
-                     do k = 1, ngpspw-1
-                        ilevel_gpspw(k) = ilevel_gpspw(k-1)+nlevel_gpspw(k-1)+1
-                        nlevel_gpspw(k) = stringtointeger(charactertostring(cdata(ilevel_gpspw(k),0:7)))
-                     end do
+               end if
+               if ( proc_gpspw ) then
+                  ob_string = "               gpspw"
+                  igpspw = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(igpspw) ) then
+                     ngpspw = stringtointeger(charactertostring(cdata(igpspw,20:27))) ; number of obs
+                     if ( ngpspw .gt. 0 ) then
+                        nlevel_gpspw = new(ngpspw,integer)
+                        ilevel_gpspw = new(ngpspw,integer)
+                        ilevel_gpspw(0) = igpspw+1
+                        nlevel_gpspw(0) = stringtointeger(charactertostring(cdata(ilevel_gpspw(0),0:7)))
+                        do k = 1, ngpspw-1
+                           ilevel_gpspw(k) = ilevel_gpspw(k-1)+nlevel_gpspw(k-1)+1
+                           nlevel_gpspw(k) = stringtointeger(charactertostring(cdata(ilevel_gpspw(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               sound" ) then
-                     nsound = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     isound = n                                                  ; line index
-                     nlevel_sound = new(nsound,integer)
-                     ilevel_sound = new(nsound,integer)
-                     ilevel_sound(0) = isound+1
-                     nlevel_sound(0) = stringtointeger(charactertostring(cdata(ilevel_sound(0),0:7)))
-                     do k = 1, nsound-1
-                        ilevel_sound(k) = ilevel_sound(k-1)+nlevel_sound(k-1)+1
-                        nlevel_sound(k) = stringtointeger(charactertostring(cdata(ilevel_sound(k),0:7)))
-                     end do
+               end if
+               if ( proc_sound ) then
+                  ob_string = "               sound"
+                  isound = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(isound) ) then
+                     nsound = stringtointeger(charactertostring(cdata(isound,20:27))) ; number of obs
+                     if ( nsound .gt. 0 ) then
+                        nlevel_sound = new(nsound,integer)
+                        ilevel_sound = new(nsound,integer)
+                        ilevel_sound(0) = isound+1
+                        nlevel_sound(0) = stringtointeger(charactertostring(cdata(ilevel_sound(0),0:7)))
+                        do k = 1, nsound-1
+                           ilevel_sound(k) = ilevel_sound(k-1)+nlevel_sound(k-1)+1
+                           nlevel_sound(k) = stringtointeger(charactertostring(cdata(ilevel_sound(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               airep" ) then
-                     nairep = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     iairep = n                                                  ; line index
-                     nlevel_airep = new(nairep,integer)
-                     ilevel_airep = new(nairep,integer)
-                     ilevel_airep(0) = iairep+1
-                     nlevel_airep(0) = stringtointeger(charactertostring(cdata(ilevel_airep(0),0:7)))
-                     do k = 1, nairep-1
-                        ilevel_airep(k) = ilevel_airep(k-1)+nlevel_airep(k-1)+1
-                        nlevel_airep(k) = stringtointeger(charactertostring(cdata(ilevel_airep(k),0:7)))
-                     end do
+               end if
+               if ( proc_airep ) then
+                  ob_string = "               airep"
+                  iairep = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(iairep) ) then
+                     nairep = stringtointeger(charactertostring(cdata(iairep,20:27))) ; number of obs
+                     if ( nairep .gt. 0 ) then
+                        nlevel_airep = new(nairep,integer)
+                        ilevel_airep = new(nairep,integer)
+                        ilevel_airep(0) = iairep+1
+                        nlevel_airep(0) = stringtointeger(charactertostring(cdata(ilevel_airep(0),0:7)))
+                        do k = 1, nairep-1
+                           ilevel_airep(k) = ilevel_airep(k-1)+nlevel_airep(k-1)+1
+                           nlevel_airep(k) = stringtointeger(charactertostring(cdata(ilevel_airep(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               pilot" ) then
-                     npilot = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     ipilot = n                                                  ; line index
-                     nlevel_pilot = new(npilot,integer)
-                     ilevel_pilot = new(npilot,integer)
-                     ilevel_pilot(0) = ipilot+1
-                     nlevel_pilot(0) = stringtointeger(charactertostring(cdata(ilevel_pilot(0),0:7)))
-                     do k = 1, npilot-1
-                        ilevel_pilot(k) = ilevel_pilot(k-1)+nlevel_pilot(k-1)+1
-                        nlevel_pilot(k) = stringtointeger(charactertostring(cdata(ilevel_pilot(k),0:7)))
-                     end do
+               end if
+               if ( proc_pilot ) then
+                  ob_string = "               pilot"
+                  ipilot = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(ipilot) ) then
+                     npilot = stringtointeger(charactertostring(cdata(ipilot,20:27))) ; number of obs
+                     if ( npilot .gt. 0 ) then
+                        nlevel_pilot = new(npilot,integer)
+                        ilevel_pilot = new(npilot,integer)
+                        ilevel_pilot(0) = ipilot+1
+                        nlevel_pilot(0) = stringtointeger(charactertostring(cdata(ilevel_pilot(0),0:7)))
+                        do k = 1, npilot-1
+                           ilevel_pilot(k) = ilevel_pilot(k-1)+nlevel_pilot(k-1)+1
+                           nlevel_pilot(k) = stringtointeger(charactertostring(cdata(ilevel_pilot(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "            profiler" ) then
-                     nprofiler = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     iprofiler = n                                                  ; line index
-                     nlevel_profiler = new(nprofiler,integer)
-                     ilevel_profiler = new(nprofiler,integer)
-                     ilevel_profiler(0) = iprofiler+1
-                     nlevel_profiler(0) = stringtointeger(charactertostring(cdata(ilevel_profiler(0),0:7)))
-                     do k = 1, nprofiler-1
-                        ilevel_profiler(k) = ilevel_profiler(k-1)+nlevel_profiler(k-1)+1
-                        nlevel_profiler(k) = stringtointeger(charactertostring(cdata(ilevel_profiler(k),0:7)))
-                     end do
+               end if
+               if ( proc_profiler ) then
+                  ob_string = "            profiler"
+                  iprofiler = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(iprofiler) ) then
+                     nprofiler = stringtointeger(charactertostring(cdata(iprofiler,20:27))) ; number of obs
+                     if ( nprofiler .gt. 0 ) then
+                        nlevel_profiler = new(nprofiler,integer)
+                        ilevel_profiler = new(nprofiler,integer)
+                        ilevel_profiler(0) = iprofiler+1
+                        nlevel_profiler(0) = stringtointeger(charactertostring(cdata(ilevel_profiler(0),0:7)))
+                        do k = 1, nprofiler-1
+                           ilevel_profiler(k) = ilevel_profiler(k-1)+nlevel_profiler(k-1)+1
+                           nlevel_profiler(k) = stringtointeger(charactertostring(cdata(ilevel_profiler(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               ssmir" ) then
-                     nssmir = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     issmir = n                                                  ; line index
-                     nlevel_ssmir = new(nssmir,integer)
-                     ilevel_ssmir = new(nssmir,integer)
-                     ilevel_ssmir(0) = issmir+1
-                     nlevel_ssmir(0) = stringtointeger(charactertostring(cdata(ilevel_ssmir(0),0:7)))
-                     do k = 1, nssmir-1
-                        ilevel_ssmir(k) = ilevel_ssmir(k-1)+nlevel_ssmir(k-1)+1
-                        nlevel_ssmir(k) = stringtointeger(charactertostring(cdata(ilevel_ssmir(k),0:7)))
-                     end do
+               end if
+               if ( proc_ssmir ) then
+                  ob_string = "               ssmir"
+                  issmir = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(issmir) ) then
+                     nssmir = stringtointeger(charactertostring(cdata(issmir,20:27))) ; number of obs
+                     if ( nssmir .gt. 0 ) then
+                        nlevel_ssmir = new(nssmir,integer)
+                        ilevel_ssmir = new(nssmir,integer)
+                        ilevel_ssmir(0) = issmir+1
+                        nlevel_ssmir(0) = stringtointeger(charactertostring(cdata(ilevel_ssmir(0),0:7)))
+                        do k = 1, nssmir-1
+                           ilevel_ssmir(k) = ilevel_ssmir(k-1)+nlevel_ssmir(k-1)+1
+                           nlevel_ssmir(k) = stringtointeger(charactertostring(cdata(ilevel_ssmir(k),0:7)))
+                        end do
+                     end if
                   end if
-                  ; if ( cdata(n,0:19) .eq. "               ssmiT" ) then
-                  ;   nssmiT = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                  ;   issmiT = n                                                  ; line index
-                  ; end if
-                  ; if ( cdata(n,0:19) .eq. "               satem" ) then
-                  ;   nsatem = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                  ;   isatem = n                                                  ; line index
-                  ; end if
-                  ; if ( cdata(n,0:19) .eq. "               ssmt1" ) then
-                  ;   nssmt1 = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                  ;   issmt1 = n                                                  ; line index
-                  ; end if
-                  ; if ( cdata(n,0:19) .eq. "               ssmt2" ) then
-                  ;   nssmt2 = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                  ;   issmt2 = n                                                  ; line index
-                  ; end if
-                  if ( cdata(n,0:19) .eq. "               qscat" ) then
-                     nqscat = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     iqscat = n                                                  ; line index
-                     nlevel_qscat = new(nqscat,integer)
-                     ilevel_qscat = new(nqscat,integer)
-                     ilevel_qscat(0) = iqscat+1
-                     nlevel_qscat(0) = stringtointeger(charactertostring(cdata(ilevel_qscat(0),0:7)))
-                     do k = 1, nqscat-1
-                        ilevel_qscat(k) = ilevel_qscat(k-1)+nlevel_qscat(k-1)+1
-                        nlevel_qscat(k) = stringtointeger(charactertostring(cdata(ilevel_qscat(k),0:7)))
-                     end do
+               end if
+               if ( proc_qscat ) then
+                  ob_string = "               qscat"
+                  iqscat = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(iqscat) ) then
+                     nqscat = stringtointeger(charactertostring(cdata(iqscat,20:27))) ; number of obs
+                     if ( nqscat .gt. 0 ) then
+                        nlevel_qscat = new(nqscat,integer)
+                        ilevel_qscat = new(nqscat,integer)
+                        ilevel_qscat(0) = iqscat+1
+                        nlevel_qscat(0) = stringtointeger(charactertostring(cdata(ilevel_qscat(0),0:7)))
+                        do k = 1, nqscat-1
+                           ilevel_qscat(k) = ilevel_qscat(k-1)+nlevel_qscat(k-1)+1
+                           nlevel_qscat(k) = stringtointeger(charactertostring(cdata(ilevel_qscat(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               bogus" ) then
-                     nbogus = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     ibogus = n                                                  ; line index
-                     nlevel_bogus = new(nbogus,integer)
-                     ilevel_bogus = new(nbogus,integer)
-                     ilevel_bogus(0) = ibogus+3          ; one bogus has two parts: slp and upper-level
-                     nlevel_bogus(0) = stringtointeger(charactertostring(cdata(ilevel_bogus(0),0:7)))
-                     do k = 1, nbogus-1
-                        ilevel_bogus(k) = ilevel_bogus(k-1)+nlevel_bogus(k-1)+3
-                        nlevel_bogus(k) = stringtointeger(charactertostring(cdata(ilevel_bogus(k),0:7)))
-                     end do
+               end if
+               if ( proc_bogus ) then
+                  ob_string = "               bogus"
+                  ibogus = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(ibogus) ) then
+                     nbogus = stringtointeger(charactertostring(cdata(ibogus,20:27))) ; number of obs
+                     if ( nbogus .gt. 0 ) then
+                        nlevel_bogus = new(nbogus,integer)
+                        ilevel_bogus = new(nbogus,integer)
+                        ilevel_bogus(0) = ibogus+3          ; one bogus has two parts: slp and upper-level
+                        nlevel_bogus(0) = stringtointeger(charactertostring(cdata(ilevel_bogus(0),0:7)))
+                        do k = 1, nbogus-1
+                           ilevel_bogus(k) = ilevel_bogus(k-1)+nlevel_bogus(k-1)+3
+                           nlevel_bogus(k) = stringtointeger(charactertostring(cdata(ilevel_bogus(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "               airsr" ) then
-                     nairsr = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     iairsr = n                                                  ; line index
-                     nlevel_airsr = new(nairsr,integer)
-                     ilevel_airsr = new(nairsr,integer)
-                     ilevel_airsr(0) = iairsr+1
-                     nlevel_airsr(0) = stringtointeger(charactertostring(cdata(ilevel_airsr(0),0:7)))
-                     do k = 1, nairsr-1
-                        ilevel_airsr(k) = ilevel_airsr(k-1)+nlevel_airsr(k-1)+1
-                        nlevel_airsr(k) = stringtointeger(charactertostring(cdata(ilevel_airsr(k),0:7)))
-                     end do
+               end if
+               if ( proc_airsr ) then
+                  ob_string = "               airsr"
+                  iairsr = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(iairsr) ) then
+                     nairsr = stringtointeger(charactertostring(cdata(iairsr,20:27))) ; number of obs
+                     if ( nairsr .gt. 0 ) then
+                        nlevel_airsr = new(nairsr,integer)
+                        ilevel_airsr = new(nairsr,integer)
+                        ilevel_airsr(0) = iairsr+1
+                        nlevel_airsr(0) = stringtointeger(charactertostring(cdata(ilevel_airsr(0),0:7)))
+                        do k = 1, nairsr-1
+                           ilevel_airsr(k) = ilevel_airsr(k-1)+nlevel_airsr(k-1)+1
+                           nlevel_airsr(k) = stringtointeger(charactertostring(cdata(ilevel_airsr(k),0:7)))
+                        end do
+                     end if
                   end if
-                  if ( cdata(n,0:19) .eq. "              gpsref" ) then
-                     ngpsref = stringtointeger(charactertostring(cdata(n,20:27))) ; number of obs
-                     igpsref = n                                                  ; line index
-                     nlevel_gpsref = new(ngpsref,integer)
-                     ilevel_gpsref = new(ngpsref,integer)
-                     ilevel_gpsref(0) = igpsref+1
-                     nlevel_gpsref(0) = stringtointeger(charactertostring(cdata(ilevel_gpsref(0),0:7)))
-                     do k = 1, ngpsref-1
-                        ilevel_gpsref(k) = ilevel_gpsref(k-1)+nlevel_gpsref(k-1)+1
-                        nlevel_gpsref(k) = stringtointeger(charactertostring(cdata(ilevel_gpsref(k),0:7)))
-                     end do
+               end if
+               if ( proc_gpsref ) then
+                  ob_string = "              gpsref"
+                  igpsref = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(igpsref) ) then
+                     ngpsref = stringtointeger(charactertostring(cdata(igpsref,20:27))) ; number of obs
+                     if ( ngpsref .gt. 0 ) then
+                        nlevel_gpsref = new(ngpsref,integer)
+                        ilevel_gpsref = new(ngpsref,integer)
+                        ilevel_gpsref(0) = igpsref+1
+                        nlevel_gpsref(0) = stringtointeger(charactertostring(cdata(ilevel_gpsref(0),0:7)))
+                        do k = 1, ngpsref-1
+                           ilevel_gpsref(k) = ilevel_gpsref(k-1)+nlevel_gpsref(k-1)+1
+                           nlevel_gpsref(k) = stringtointeger(charactertostring(cdata(ilevel_gpsref(k),0:7)))
+                        end do
+                     end if
                   end if
-               end do  ; end loop of parsing the file line by line
+               end if
+
+               if ( write_netcdf ) then
+                  if ( expt .ne. "" ) then
+                     prefix = nc_datdir+"/"+expt+"_gts_omb_oma_"   ; synop_"+date+".nc"
+                  else
+                     prefix = nc_datdir+"/gts_omb_oma_"   ; synop_"+date+".nc"
+                  end if
+               end if
 
                if ( proc_synop .and. nsynop .gt. 0 ) then
                   synop_id  = read_info(nsynop, isynop, cdata, nlevel_synop, ilevel_synop, "id")
@@ -2554,13 +2880,23 @@ begin;  begin of the main script
                   synop_t   = read_data(nsynop, isynop, cdata, nlevel_synop, ilevel_synop, "synop", "t")
                   synop_p   = read_data(nsynop, isynop, cdata, nlevel_synop, ilevel_synop, "synop", "p")
                   synop_q   = read_data(nsynop, isynop, cdata, nlevel_synop, ilevel_synop, "synop", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"synop_"+date)
+                  dum = synop_u
+                  dum = synop_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("synop", "p", synop_pre, nsynop, nlevel_synop, date, \
+                              synop_id, synop_lat, synop_lon, \
+                              synop_u, synop_v, synop_t, synop_p, synop_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_synop_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/synop_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = synop_u
                   plot_sfc("SYNOP",wks,nsynop,date,synop_lat,synop_lon,synop_u,synop_v,synop_t,synop_p,synop_q,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_synop)
                   delete(nlevel_synop)
                   delete(synop_id)
@@ -2584,13 +2920,23 @@ begin;  begin of the main script
                   metar_t   = read_data(nmetar, imetar, cdata, nlevel_metar, ilevel_metar, "metar", "t")
                   metar_p   = read_data(nmetar, imetar, cdata, nlevel_metar, ilevel_metar, "metar", "p")
                   metar_q   = read_data(nmetar, imetar, cdata, nlevel_metar, ilevel_metar, "metar", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"metar_"+date)
+                  dum = metar_u
+                  dum = metar_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("metar", "p", metar_pre, nmetar, nlevel_metar, date, \
+                              metar_id, metar_lat, metar_lon, \
+                              metar_u, metar_v, metar_t, metar_p, metar_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_metar_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/metar_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = metar_u
                   plot_sfc("METAR",wks,nmetar,date,metar_lat,metar_lon,metar_u,metar_v,metar_t,metar_p,metar_q,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_metar)
                   delete(nlevel_metar)
                   delete(metar_id)
@@ -2614,13 +2960,23 @@ begin;  begin of the main script
                   ships_t   = read_data(nships, iships, cdata, nlevel_ships, ilevel_ships, "ships", "t")
                   ships_p   = read_data(nships, iships, cdata, nlevel_ships, ilevel_ships, "ships", "p")
                   ships_q   = read_data(nships, iships, cdata, nlevel_ships, ilevel_ships, "ships", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"ships_"+date)
+                  dum = ships_u
+                  dum = ships_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("ships", "p", ships_pre, nships, nlevel_ships, date, \
+                              ships_id, ships_lat, ships_lon, \
+                              ships_u, ships_v, ships_t, ships_p, ships_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_ships_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/ships_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = ships_u
                   plot_sfc("SHIPS",wks,nships,date,ships_lat,ships_lon,ships_u,ships_v,ships_t,ships_p,ships_q,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_ships)
                   delete(nlevel_ships)
                   delete(ships_id)
@@ -2644,13 +3000,23 @@ begin;  begin of the main script
                   buoy_t   = read_data(nbuoy, ibuoy, cdata, nlevel_buoy, ilevel_buoy, "buoy", "t")
                   buoy_p   = read_data(nbuoy, ibuoy, cdata, nlevel_buoy, ilevel_buoy, "buoy", "p")
                   buoy_q   = read_data(nbuoy, ibuoy, cdata, nlevel_buoy, ilevel_buoy, "buoy", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"buoy_"+date)
+                  dum = buoy_u
+                  dum = buoy_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("buoy", "p", buoy_pre, nbuoy, nlevel_buoy, date, \
+                              buoy_id, buoy_lat, buoy_lon, \
+                              buoy_u, buoy_v, buoy_t, buoy_p, buoy_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_buoy_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/buoy_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = buoy_u
                   plot_sfc("BUOY",wks,nbuoy,date,buoy_lat,buoy_lon,buoy_u,buoy_v,buoy_t,buoy_p,buoy_q,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_buoy)
                   delete(nlevel_buoy)
                   delete(buoy_id)
@@ -2674,14 +3040,24 @@ begin;  begin of the main script
                   sonde_sfc_t   = read_data(nsonde_sfc, isonde_sfc, cdata, nlevel_sonde_sfc, ilevel_sonde_sfc, "sonde_sfc", "t")
                   sonde_sfc_p   = read_data(nsonde_sfc, isonde_sfc, cdata, nlevel_sonde_sfc, ilevel_sonde_sfc, "sonde_sfc", "p")
                   sonde_sfc_q   = read_data(nsonde_sfc, isonde_sfc, cdata, nlevel_sonde_sfc, ilevel_sonde_sfc, "sonde_sfc", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"sonde_sfc_"+date)
+                  dum = sonde_sfc_u
+                  dum = sonde_sfc_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("sonde_sfc", "p", sonde_sfc_pre, nsonde_sfc, nlevel_sonde_sfc, date, \
+                              sonde_sfc_id, sonde_sfc_lat, sonde_sfc_lon, \
+                              sonde_sfc_u, sonde_sfc_v, sonde_sfc_t, sonde_sfc_p, sonde_sfc_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_sonde_sfc_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/sonde_sfc_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = sonde_sfc_u
                   plot_sfc("SONDE_SFC",wks,nsonde_sfc,date,sonde_sfc_lat,sonde_sfc_lon,\
                                        sonde_sfc_u,sonde_sfc_v,sonde_sfc_t,sonde_sfc_p,sonde_sfc_q,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_sonde_sfc)
                   delete(nlevel_sonde_sfc)
                   delete(sonde_sfc_id)
@@ -2702,10 +3078,20 @@ begin;  begin of the main script
                   geoamv_pre = read_info(ngeoamv, igeoamv, cdata, nlevel_geoamv, ilevel_geoamv, "pre")
                   geoamv_u   = read_data(ngeoamv, igeoamv, cdata, nlevel_geoamv, ilevel_geoamv, "geoamv", "u")
                   geoamv_v   = read_data(ngeoamv, igeoamv, cdata, nlevel_geoamv, ilevel_geoamv, "geoamv", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"geoamv_"+date)
+                  dum = geoamv_u
+                  dum = geoamv_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("geoamv", "p", geoamv_pre, ngeoamv, nlevel_geoamv, date, \
+                              geoamv_id, geoamv_lat, geoamv_lon, \
+                              geoamv_u, geoamv_v, dum, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_geoamv_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/geoamv_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = geoamv_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("GEOAMV",wks,ngeoamv,date,plevs(k),plevs(k),geoamv_pre,geoamv_lat,geoamv_lon,\
@@ -2720,8 +3106,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_geoamv)
                   delete(nlevel_geoamv)
                   delete(geoamv_id)
@@ -2739,10 +3125,20 @@ begin;  begin of the main script
                   polaramv_pre = read_info(npolaramv, ipolaramv, cdata, nlevel_polaramv, ilevel_polaramv, "pre")
                   polaramv_u   = read_data(npolaramv, ipolaramv, cdata, nlevel_polaramv, ilevel_polaramv, "polaramv", "u")
                   polaramv_v   = read_data(npolaramv, ipolaramv, cdata, nlevel_polaramv, ilevel_polaramv, "polaramv", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"polaramv_"+date)
+                  dum = polaramv_u
+                  dum = polaramv_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("polaramv", "p", polaramv_pre, npolaramv, nlevel_polaramv, date, \
+                              polaramv_id, polaramv_lat, polaramv_lon, \
+                              polaramv_u, polaramv_v, dum, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_polaramv_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/polaramv_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = polaramv_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("POLARAMV",wks,npolaramv,date,plevs(k),plevs(k),polaramv_pre,polaramv_lat,polaramv_lon,\
@@ -2757,8 +3153,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_polaramv)
                   delete(nlevel_polaramv)
                   delete(polaramv_id)
@@ -2777,7 +3173,11 @@ begin;  begin of the main script
                   ngpspw_tpw_all = num(.not.ismissing(gpspw_tpw(:,0)))
                   ngpspw_tpw_qc  = num(.not.ismissing(mask(gpspw_tpw(:,0),gpspw_tpw(:,2).ge.0,True)))
                   ngpspw_qc      = ngpspw_tpw_qc
-                  wks = gsn_open_wks(out_type,plotdir+"gpspw_"+date)
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_gpspw_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/gpspw_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
                   dum = gpspw_tpw
@@ -2801,10 +3201,20 @@ begin;  begin of the main script
                   sound_v   = read_data(nsound, isound, cdata, nlevel_sound, ilevel_sound, "sound", "v")
                   sound_t   = read_data(nsound, isound, cdata, nlevel_sound, ilevel_sound, "sound", "t")
                   sound_q   = read_data(nsound, isound, cdata, nlevel_sound, ilevel_sound, "sound", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"sound_"+date)
+                  dum = sound_u
+                  dum = sound_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("sound", "p", sound_pre, nsound, nlevel_sound, date, \
+                              sound_id, sound_lat, sound_lon, \
+                              sound_u, sound_v, sound_t, dum, sound_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_sound_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/sound_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = sound_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("SOUND",wks,nsound,date,plevs(k),plevs(k),sound_pre,sound_lat,sound_lon,\
@@ -2819,8 +3229,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_sound)
                   delete(nlevel_sound)
                   delete(sound_id)
@@ -2841,10 +3251,20 @@ begin;  begin of the main script
                   airep_u   = read_data(nairep, iairep, cdata, nlevel_airep, ilevel_airep, "airep", "u")
                   airep_v   = read_data(nairep, iairep, cdata, nlevel_airep, ilevel_airep, "airep", "v")
                   airep_t   = read_data(nairep, iairep, cdata, nlevel_airep, ilevel_airep, "airep", "t")
-                  wks = gsn_open_wks(out_type,plotdir+"airep_"+date)
+                  dum = airep_u
+                  dum = airep_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("airep", "p", airep_pre, nairep, nlevel_airep, date, \
+                              airep_id, airep_lat, airep_lon, \
+                              airep_u, airep_v, airep_t, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_airep_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/airep_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = airep_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("AIREP",wks,nairep,date,plevs(k),plevs(k),airep_pre,airep_lat,airep_lon,\
@@ -2859,8 +3279,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_airep)
                   delete(nlevel_airep)
                   delete(airep_id)
@@ -2879,10 +3299,20 @@ begin;  begin of the main script
                   pilot_pre = read_info(npilot, ipilot, cdata, nlevel_pilot, ilevel_pilot, "pre")
                   pilot_u   = read_data(npilot, ipilot, cdata, nlevel_pilot, ilevel_pilot, "pilot", "u")
                   pilot_v   = read_data(npilot, ipilot, cdata, nlevel_pilot, ilevel_pilot, "pilot", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"pilot_"+date)
+                  dum = pilot_u
+                  dum = pilot_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("pilot", "p", pilot_pre, npilot, nlevel_pilot, date, \
+                              pilot_id, pilot_lat, pilot_lon, \
+                              pilot_u, pilot_v, dum, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_pilot_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/pilot_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = pilot_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("PILOT",wks,npilot,date,plevs(k),plevs(k),pilot_pre,pilot_lat,pilot_lon,\
@@ -2897,8 +3327,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_pilot)
                   delete(nlevel_pilot)
                   delete(pilot_id)
@@ -2916,10 +3346,20 @@ begin;  begin of the main script
                   profiler_pre = read_info(nprofiler, iprofiler, cdata, nlevel_profiler, ilevel_profiler, "pre")
                   profiler_u   = read_data(nprofiler, iprofiler, cdata, nlevel_profiler, ilevel_profiler, "profiler", "u")
                   profiler_v   = read_data(nprofiler, iprofiler, cdata, nlevel_profiler, ilevel_profiler, "profiler", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"profiler_"+date)
+                  dum = profiler_u
+                  dum = profiler_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("profiler", "p", profiler_pre, nprofiler, nlevel_profiler, date, \
+                              profiler_id, profiler_lat, profiler_lon, \
+                              profiler_u, profiler_v, dum, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_profiler_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/profiler_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = profiler_u
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("PROFILER",wks,nprofiler,date,plevs(k),plevs(k),profiler_pre,profiler_lat,profiler_lon,\
@@ -2934,8 +3374,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_profiler)
                   delete(nlevel_profiler)
                   delete(profiler_id)
@@ -2954,7 +3394,11 @@ begin;  begin of the main script
                   nssmir_spd_all = num(.not.ismissing(ssmir_spd(:,0)))
                   nssmir_spd_qc  = num(.not.ismissing(mask(ssmir_spd(:,0),ssmir_spd(:,2).ge.0,True)))
                   nssmir_qc      = nssmir_spd_qc
-                  wks = gsn_open_wks(out_type,plotdir+"ssmir_"+date)
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_ssmir_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/ssmir_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
                   dum = ssmir_spd
@@ -2976,13 +3420,23 @@ begin;  begin of the main script
                   qscat_pre = read_info(nqscat, iqscat, cdata, nlevel_qscat, ilevel_qscat, "pre")
                   qscat_u   = read_data(nqscat, iqscat, cdata, nlevel_qscat, ilevel_qscat, "qscat", "u")
                   qscat_v   = read_data(nqscat, iqscat, cdata, nlevel_qscat, ilevel_qscat, "qscat", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"qscat_"+date)
+                  dum = qscat_u
+                  dum = qscat_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("qscat", "p", qscat_pre, nqscat, nlevel_qscat, date, \
+                              qscat_id, qscat_lat, qscat_lon, \
+                              qscat_u, qscat_v, dum, dum, dum, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_qscat_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/qscat_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = qscat_u
                   plot_sfc("QSCAT",wks,nqscat,date,qscat_lat,qscat_lon,qscat_u,qscat_v,dum,dum,dum,dum,dum)
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_qscat)
                   delete(nlevel_qscat)
                   delete(qscat_id)
@@ -3001,7 +3455,11 @@ begin;  begin of the main script
                   bogus_slp = read_bogus_slp(nbogus, ibogus, cdata, nlevel_bogus, ilevel_bogus, "bogus", "slp")
                   bogus_u   = read_data(nbogus, ibogus, cdata, nlevel_bogus, ilevel_bogus, "bogus", "u")
                   bogus_v   = read_data(nbogus, ibogus, cdata, nlevel_bogus, ilevel_bogus, "bogus", "v")
-                  wks = gsn_open_wks(out_type,plotdir+"bogus_"+date)
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_bogus_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/bogus_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
                   dum = bogus_u
@@ -3039,10 +3497,20 @@ begin;  begin of the main script
                   airsr_pre = read_info(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "pre")
                   airsr_t   = read_data(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "airsr", "t")
                   airsr_q   = read_data(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "airsr", "q")
-                  wks = gsn_open_wks(out_type,plotdir+"airsr_"+date)
+                  dum = airsr_t
+                  dum = airsr_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("airsr", "p", airsr_pre, nairsr, nlevel_airsr, date, \
+                              airsr_id, airsr_lat, airsr_lon, \
+                              dum, dum, airsr_t, dum, airsr_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_airsr_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/airsr_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = airsr_t
                   if ( rank_plevs .eq. 1 ) then
                      do k = 0, nplevs(0)-1
                         plot_upr("AIRSR",wks,nairsr,date,plevs(k),plevs(k),airsr_pre,airsr_lat,airsr_lon,\
@@ -3057,8 +3525,8 @@ begin;  begin of the main script
                         end if
                      end do
                   end if
-                  delete(dum)
                   destroy(wks)
+                  delete(dum)
                   delete(ilevel_airsr)
                   delete(nlevel_airsr)
                   delete(airsr_id)
@@ -3075,10 +3543,20 @@ begin;  begin of the main script
                   gpsref_lon = read_info(ngpsref, igpsref, cdata, nlevel_gpsref, ilevel_gpsref, "lon")
                   gpsref_hgt = read_info(ngpsref, igpsref, cdata, nlevel_gpsref, ilevel_gpsref, "hgt")
                   gpsref_ref = read_data(ngpsref, igpsref, cdata, nlevel_gpsref, ilevel_gpsref, "gpsref", "ref")
-                  wks = gsn_open_wks(out_type,plotdir+"gpsref_"+date)
+                  dum = gpsref_ref
+                  dum = gpsref_ref@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("gpsref", "h", gpsref_hgt, ngpsref, nlevel_gpsref, date, \
+                              gpsref_id, gpsref_lat, gpsref_lon, \
+                              dum, dum, dum, dum, dum, dum, dum, gpsref_ref, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_gpsref_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/gpsref_"+date)
+                  end if
                   gsn_define_colormap(wks,colormap)
                   nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
-                  dum = gpsref_ref
                   if ( rank_hlevs .eq. 1 ) then
                      do k = 0, nhlevs(0)-1
                         plot_upr_h("GPSREF",wks,ngpsref,date,hlevs(k),hlevs(k),gpsref_hgt,gpsref_lat,gpsref_lon,\
@@ -3109,7 +3587,231 @@ begin;  begin of the main script
 
             end if   ; end of if file contains data
          end if   ; end of if file exist
-      end if   ; end of if plot_gts
+      end if   ; end of if plot_gts and input_source=ascii
+
+      if ( plot_gts .and. input_source .eq. "netcdf" ) then
+         ob_types_uc = (/ "SYNOP", "METAR", "SHIPS", "BUOY", "SONDE_SFC", \
+                       "GPSPW", "GEOAMV", "POLARAMV", "SOUND", "AIREP", \
+                       "PROFILER", "SSMIR", "QSCAT", "AIRSR", "GPSREF" /)
+         ob_types_lc = (/ "synop", "metar", "ships", "buoy", "sonde_sfc", \
+                       "gpspw", "geoamv", "polaramv", "sound", "airep", \
+                       "profiler", "ssmir", "qscat", "airsr", "gpsref" /)
+         ntype = dimsizes(ob_types_uc)
+         uvars = (/ "UOBS","UOMB","UQCF","UERR","UOMA" /)   ; Names of the variables in netCDF file
+         vvars = (/ "VOBS","VOMB","VQCF","VERR","VOMA" /)
+         tvars = (/ "TOBS","TOMB","TQCF","TERR","TOMA" /)
+         qvars = (/ "QOBS","QOMB","QQCF","QERR","QOMA" /)
+         pvars = (/ "POBS","POMB","PQCF","PERR","POMA" /)
+         refvars = (/ "REFOBS","REFOMB","REFQCF","REFERR","REFOMA" /)
+         if ( expt .ne. "" ) then
+            nc_prefix = nc_datdir+"/"+expt+"_gts_omb_oma_"   ; synop_"+date+".nc"
+         else
+            nc_prefix = nc_datdir+"/gts_omb_oma_"   ; synop_"+date+".nc"
+         end if
+         do n = 0, ntype-1
+            process_it = False
+            u_valid = False
+            v_valid = False
+            t_valid = False
+            p_valid = False
+            q_valid = False
+            ref_valid = False
+            tpw_valid = False
+            spd_valid = False
+            if ( (n .eq. 0 .and. proc_synop) .or. \
+                 (n .eq. 1 .and. proc_metar) .or. \
+                 (n .eq. 2 .and. proc_ships) .or. \
+                 (n .eq. 3 .and. proc_buoy)  .or. \
+                 (n .eq. 4 .and. proc_sonde_sfc)    ) then
+               plot_type = "sfc"
+               process_it = True
+               u_valid = True
+               v_valid = True
+               t_valid = True
+               p_valid = True
+               q_valid = True
+            end if
+            if ( (n .eq. 6  .and. proc_geoamv)   .or. \
+                 (n .eq. 7  .and. proc_polaramv) .or. \
+                 (n .eq. 10 .and. proc_profiler)        ) then
+               plot_type = "upr"
+               process_it = True
+               u_valid = True
+               v_valid = True
+            end if
+            if ( n .eq. 8 .and. proc_sound ) then
+               plot_type = "upr"
+               process_it = True
+               u_valid = True
+               v_valid = True
+               t_valid = True
+               q_valid = True
+            end if
+            if ( n .eq. 9  .and. proc_airep ) then
+               plot_type = "upr"
+               process_it = True
+               u_valid = True
+               v_valid = True
+               t_valid = True
+            end if
+            if ( n .eq. 12  .and. proc_qscat ) then
+               plot_type = "sfc"
+               process_it = True
+               u_valid = True
+               v_valid = True
+            end if
+            if ( n .eq. 13 .and. proc_airsr ) then
+               plot_type = "upr"
+               process_it = True
+               t_valid = True
+               q_valid = True
+            end if
+            if ( n .eq. 14 .and. proc_gpsref ) then
+               plot_type = "upr"
+               process_it = True
+               ref_valid = True
+            end if
+            if ( process_it ) then
+               nc_fullname = nc_prefix+ob_types_lc(n)+"_"+date+".nc"
+               if ( isfilepresent(nc_fullname) ) then
+                  nc_fin = addfile(nc_fullname, "r")
+                  dims = getfiledimsizes(nc_fin)
+                  nobs = dims(0)
+                  nlevels_max = dims(2)
+                  dum = new((/nobs*nlevels_max/),"float")
+                  if ( nobs .gt. 0 ) then
+                     lat = new((/nobs*nlevels_max/),"float")
+                     lon = new((/nobs*nlevels_max/),"float")
+                     u = new((/nobs*nlevels_max,5/),"float")
+                     v = new((/nobs*nlevels_max,5/),"float")
+                     t = new((/nobs*nlevels_max,5/),"float")
+                     q = new((/nobs*nlevels_max,5/),"float")
+                     p = new((/nobs*nlevels_max,5/),"float")
+                     ref = new((/nobs*nlevels_max,5/),"float")
+                     tpw = new((/nobs*nlevels_max,5/),"float")
+                     spd = new((/nobs*nlevels_max,5/),"float")
+                     slp = new((/nobs*nlevels_max,5/),"float")
+                     iloc = ispan(0,nlevels_max*(nobs-1),nlevels_max)
+                     ; read data from netcdf file
+                     lat(iloc) = nc_fin->LATS
+                     lon(iloc) = nc_fin->LONS
+                     if ( nlevels_max .gt. 1 ) then
+                        do i = 0, nobs-1
+                           lat(iloc(i)+1:iloc(i)+nlevels_max-1) = lat(iloc(i))
+                           lon(iloc(i)+1:iloc(i)+nlevels_max-1) = lon(iloc(i))
+                        end do
+                     end if
+                     if ( ob_types_lc(n) .ne. "gpsref" ) then
+                        pre = ndtooned(nc_fin->PRES)
+                     else
+                        hgt = ndtooned(nc_fin->HEIT)
+                     end if
+                     do i = 0, 4
+                        if ( u_valid ) then
+                           u(:,i) = ndtooned(nc_fin->$uvars(i)$)
+                        else
+                           u(:,i) = dum
+                        end if
+                        if ( v_valid ) then
+                           v(:,i) = ndtooned(nc_fin->$vvars(i)$)
+                        else
+                           v(:,i) = dum
+                        end if
+                        if ( t_valid ) then
+                           t(:,i) = ndtooned(nc_fin->$tvars(i)$)
+                        else
+                           t(:,i) = dum
+                        end if
+                        if ( q_valid ) then
+                           q(:,i) = ndtooned(nc_fin->$qvars(i)$)
+                        else
+                           q(:,i) = dum
+                        end if
+                        if ( p_valid ) then
+                           p(:,i) = ndtooned(nc_fin->$pvars(i)$)
+                        else
+                           p(:,i) = dum
+                        end if
+                        if ( ref_valid ) then
+                           ref(:,i) = ndtooned(nc_fin->$refvars(i)$)
+                        else
+                           ref(:,i) = dum
+                        end if
+                        tpw(:,i) = dum
+                        spd(:,i) = dum
+                        slp(:,i) = dum
+                     end do
+                     if ( expt .ne. "" ) then
+                        wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_"+ob_types_lc(n)+"_"+date)
+                     else
+                        wks = gsn_open_wks(out_type,plotdir+"/"+ob_types_lc(n)+"_"+date)
+                     end if
+                     gsn_define_colormap(wks,colormap)
+                     nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
+                     if ( plot_type .eq. "sfc" ) then
+                        plot_sfc(ob_types_uc(n),wks,nobs,date,lat,lon,u,v,t,p,q,tpw,spd)
+                     end if
+                     if ( (plot_type .eq. "upr") .and. (ob_types_lc(n) .ne. "gpsref") ) then
+                        if ( rank_plevs .eq. 1 ) then
+                           do k = 0, nplevs(0)-1
+                              plot_upr(ob_types_uc(n),wks,nobs,date,plevs(k),plevs(k),pre,lat,lon,\
+                                          u,v,t,q,ref,slp)
+                           end do
+                        end if
+                        if ( rank_plevs .eq. 2 ) then
+                           do k = 0, nplevs(0)-1
+                              if ( .not.ismissing(plevs(k,0)) .and. .not.ismissing(plevs(k,1)) ) then
+                                 plot_upr(ob_types_uc(n),wks,nobs,date,plevs(k,0),plevs(k,1),pre,lat,lon,\
+                                             u,v,t,q,ref,slp)
+                              end if
+                           end do
+                        end if
+                     end if
+                     if ( (plot_type .eq. "upr") .and. (ob_types_lc(n) .eq. "gpsref") ) then
+                        dum1 = ref@_FillValue
+                        if ( rank_hlevs .eq. 1 ) then
+                           do k = 0, nhlevs(0)-1
+                              plot_upr_h(ob_types_uc(n),wks,nobs,date,hlevs(k),hlevs(k),hgt,lat,lon,\
+                                         dum1,dum1,ref)
+                           end do
+                        end if
+                        if ( rank_hlevs .eq. 2 ) then
+                           do k = 0, nhlevs(0)-1
+                              if ( .not.ismissing(hlevs(k,0)) .and. .not.ismissing(hlevs(k,1)) ) then
+                                 plot_upr_h(ob_types_uc(n),wks,nobs,date,hlevs(k,0),hlevs(k,1),hgt,lat,lon,\
+                                            dum1,dum1,ref)
+                              end if
+                           end do
+                        end if
+                     end if
+                     destroy(wks)
+                     delete(dum)
+                     delete(lat)
+                     delete(lon)
+                     if ( ob_types_lc(n) .ne. "gpsref") then
+                        delete(pre)
+                     else
+                        delete(hgt)
+                        delete(dum1)
+                     end if
+                     delete(u)
+                     delete(v)
+                     delete(t)
+                     delete(q)
+                     delete(p)
+                     delete(ref)
+                     delete(tpw)
+                     delete(spd)
+                     delete(slp)
+                     delete(iloc)
+                  end if
+               else
+                  print("Can not find the file "+nc_fullname+"  Will skip it")
+               end if
+            end if  ; end of if process_it
+         end do
+
+      end if  ; end of if plot_gts and input_source=netcdf
 
       date = advance_cymdh(date,cycle_period)
 
