@@ -3,9 +3,8 @@
 ;
 ; Purpose: to read in gts_omb_oma (from WRF-Var V2.2) or 
 ;          gts_omb_oma_01 (from WRF-Var V3.1) to
-;          plot geographical distributions (before and after QC),
-;               OBS vs BAK scatter plots (before and after QC), 
-;               OBS vs ANA scatter plots
+;          plot geographical distributions (OMB before QC, OMB and OMA),
+;               scatter plots (OBS vs BAK and OBS vs ANA)
 ;
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
@@ -21,6 +20,7 @@ input_source = "ascii"   ; reading data from gts_omb_oma_01
 nc_datdir    = "./"
 out_type     = "pdf"    ; or ncgm
 plotdir      = "/ptmp/hclin/con200/plot/"
+expt         = ""  ; for output naming purpose
 datdir1      = "/ptmp/hclin/con200/var/"        ; the path before DATE
 datdir2      = "/working/"                      ; the path after  DATE
 filename_gts   = "gts_omb_oma_01"
