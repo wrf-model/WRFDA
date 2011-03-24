@@ -317,7 +317,7 @@ begin
 
    mpres@pmTickMarkDisplayMode   = "Always"
    ; mpres@tmYROn                  = False
-   mpres@tmXBOn                  = False
+   mpres@tmXBOn                  = True
    mpres@tmXTOn                  = False
    mpres@tmXTMajorLengthF        = 0
    mpres@tmYLMajorLengthF        = 0
@@ -3498,7 +3498,7 @@ begin;  begin of the main script
                   airsr_t   = read_data(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "airsr", "t")
                   airsr_q   = read_data(nairsr, iairsr, cdata, nlevel_airsr, ilevel_airsr, "airsr", "q")
                   dum = airsr_t
-                  dum = airsr_u@_FillValue
+                  dum = airsr_t@_FillValue
                   if ( write_netcdf ) then
                      write_nc("airsr", "p", airsr_pre, nairsr, nlevel_airsr, date, \
                               airsr_id, airsr_lat, airsr_lon, \

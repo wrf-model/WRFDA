@@ -54,3 +54,7 @@ A list of the NCL scripts that have been used recently.
 10. (radiance data) plot time series of radiance Variational Bias Correction parameters.
       var/graphics/ncl/plot_rad_varbc_param.ncl
       var/graphics/ncl/advance_cymdh.ncl (loaded by plot_rad_varbc_param.ncl)
+
+11. (conventional data) convert gts_omb_oma_01 to be in netCDF format
+      var/graphics/ncl/convert_gts_omb_oma_to_netcdf.ncl
+
