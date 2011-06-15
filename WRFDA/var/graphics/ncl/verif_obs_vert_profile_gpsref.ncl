@@ -195,9 +195,20 @@ end do
  ;hcl hlevel(1:)=flt2string(hlevels(:levid))
  hlevel(1:)= sprintf("%4.1f", (hlevels(:levid)))
 
- ylabels = new((/htopid+1/),"string")
- ylabels(0) = "0"
- ylabels(1:) = flt2string(number(0,0,:levid))
+ ylabels = new((/nv,htopid+1/),"string")
+ ylabels(:,0) = sprintf("%5.0f",0.0)
+ ylabels(:,1:) = sprintf("%5.0f",number(:,0,:levid))
+ if ( num_expt .eq. 2 ) then
+    if ( omboma .eq. 1 .or. \
+         sum(number(0,0,:)).ne.sum(number(0,1,:)) ) then
+       connector = new((/nv,htopid+1/),"string")
+       do iv = 0, nv-1
+          connector(iv,:) = where(number(iv,1,:).ge.number(iv,0,:), " + ", " - ")
+       end do
+       ylabels(:,1:) = sprintf("%5.0f",number(:,0,:levid))+connector(:,:levid)+ \
+                       sprintf("%-5.0f",abs((number(:,1,:levid)-number(:,0,:levid))))
+    end if
+ end if
  
 do iv =1, nv   ;loop for variable
 
@@ -248,7 +259,7 @@ pnumber = flt2string(ob_tot(iv-1,:))
  res@tmYUseLeft             = False
  res@tmYLValues             = y
  res@tmYRValues             = y
- res@tmYRLabels             = ylabels(:)
+ res@tmYRLabels             = ylabels(iv-1,:)
  res@tmYRMajorLengthF       = 0.0
  res@tmYLMajorLengthF       = 0.0
 
