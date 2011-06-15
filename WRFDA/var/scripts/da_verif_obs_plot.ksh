@@ -345,7 +345,7 @@ chmod +x run2
 ./run2 > run2.log 2>&1
 fi
 #----------------
-if [ "$plotupr" = "true" ]; then
+if [ "$plotsfc" = "true" ] || [ "$plotupr" = "true" ]; then
 echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_obs_time_average.ncl" > run3
 chmod +x run3
 ./run3 > run3.log 2>&1
