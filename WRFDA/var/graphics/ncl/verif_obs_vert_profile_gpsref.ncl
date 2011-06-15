@@ -39,9 +39,9 @@ begin
  Fill_ValueI = -99
 ;-----------------------------------------------------------
 ;=============================================================;
- htop = 25.0    ; users can specifiy the top level (in km) of the plot
-                ; Note: 29.8 km is the current plotting upper limit
- plot_error_bar = True
+ htop = 29.8    ; users can specifiy the top level (in km) of the plot
+                ; current upper limit is 29.8km
+ plot_error_bar = False
 run_dir = run_dir+"/"
 plot_dir = run_dir
 read_headers = asciiread(run_dir+"header_main",-1,"string")
@@ -215,9 +215,13 @@ pnumber = flt2string(ob_tot(iv-1,:))
 ; Resources
 ;
  res          = True                              ; plot mods desired
- res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,4.0,4.0,4.0,4.0/)            ; make 2nd lines thicker
+ res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)            ; make 2nd lines thicker
  res@xyLineColors      = legend_line_cols                               ; change line color
- res@xyDashPatterns    = (/0,1,0,1,0,1,0,1,0,1/) 
+ if ( omboma .eq. 1 ) then
+    res@xyDashPatterns    = (/0,1,0,0,0,0,0,0,0,0/) 
+ else
+    res@xyDashPatterns    = (/0,0,0,0,0,0,0,0,0,0/) 
+ end if
  res@xyMarkers         = (/2,2,2,2,2,2,2,2/)                            ; (none, dot, asterisk)
  res@xyMarkerColors    = res@xyLineColors             ; Marker colors
  res@xyMarkerSizeF          = 0.01                    ; Marker size (default is 0.01)
@@ -334,6 +338,11 @@ draw ( plts(iv-1) )
   "lgLineColors"             : legend_line_cols
   "lgMonoLineLabelFontColor" : True                    ; one label color
  end create
+   if ( omboma .eq. 0 ) then
+      setvalues legend
+         "lgDashIndexes"       : (/0,0,0,0,0,0,0,0,0,0,0,0/)             ; line paters
+      end setvalues
+   end if
 
  draw(legend)
 frame(wks)

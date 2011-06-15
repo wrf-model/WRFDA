@@ -228,7 +228,11 @@ begin
     res@gsnFrame              = False                ; (b) do not advance 'frame'
     res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)    ; make lines thicker
     res@xyLineColors      = legend_line_cols                              ; change line color
-    res@xyDashPatterns    = (/0,1,0,1,0,1,0,1,0,1,0,1/)                   ; choose dash patterns
+    if ( omboma .eq. 1 ) then
+       res@xyDashPatterns    = (/0,1,0,1,0,1,0,1,0,1,0,1/)                   ; choose dash patterns
+    else
+       res@xyDashPatterns    = (/0,0,0,0,0,0,0,0,0,0,0,0/)                   ; choose dash patterns
+    end if
     res@xyMarkers         = (/2,2,2,2,2,2,2,2,2,2,2,2/)                   ; (none, dot, asterisk)
     res@xyMarkerColors   = res@xyLineColors          ; Marker colors
     res@xyMarkerSizeF   = 0.01                       ; Marker size (default is 0.01)
@@ -340,6 +344,11 @@ begin
     "lgLineColors"             : legend_line_cols
     "lgMonoLineLabelFontColor" : True                    ; one label color
    end create
+   if ( omboma .eq. 0 ) then
+      setvalues legend
+         "lgDashIndexes"       : (/0,0,0,0,0,0,0,0,0,0,0,0/)             ; line paters
+      end setvalues
+   end if
    draw(legend)
    if ( idtype .eq. 1)then
    frame(wks)

@@ -1,4 +1,4 @@
-2;============================================================;
+;============================================================;
 ; Purpose:  Plots vertical profiles 
 ;============================================================;
 ; Author: Ananda Kumar Das (Visiting Scientist)
@@ -95,7 +95,7 @@ end do
 
 ;----------------------------------------------------------------------------------------
  out_name = "Profile_"+omboma_string
- q_level = 16
+ q_level = 7
  nv = num_vars
 ;
  data_omb = new ((/nv,num_expt,ncol/),"float",Fill_ValueF)
@@ -171,15 +171,17 @@ do idtype =1, num_d_scor   ;loop for score
  y = new((/nlev/),"integer",Fill_ValueI)
  y = ispan(0,nlev-1,1)
 
- if (omboma .eq. 1 .and. num_expt .eq. 2 ) then
-    connector = new((/nv,nlev/),"string")
-    do iv = 0, nv-1
-       connector(iv,:) = where(number(iv,1,:).ge.number(iv,0,:), " + ", " - ")
-    end do
-    ylabels = sprintf("%5.0f",number(:,0,:))+connector(:,:)+ \
-              sprintf("%-5.0f",abs((number(:,1,:)-number(:,0,:))))
- else
-    ylabels = sprintf("%5.0f",number(:,0,:))
+ ylabels = sprintf("%5.0f",number(:,0,:))
+ if ( num_expt .eq. 2 ) then
+    if ( omboma .eq. 1 .or. \
+         sum(number(0,0,:)).ne.sum(number(0,1,:)) ) then
+       connector = new((/nv,nlev/),"string")
+       do iv = 0, nv-1
+          connector(iv,:) = where(number(iv,1,:).ge.number(iv,0,:), " + ", " - ")
+       end do
+       ylabels = sprintf("%5.0f",number(:,0,:))+connector(:,:)+ \
+                 sprintf("%-5.0f",abs((number(:,1,:)-number(:,0,:))))
+    end if
  end if
  
  print("Louis")
@@ -190,10 +192,14 @@ do idtype =1, num_d_scor   ;loop for score
 do iv =1, nv   ;loop for variable
 ;----------------------------------------------------------------------------------------
  res          = True                              ; plot mods desired
- res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,4.0,4.0,4.0,4.0/)            ; make 2nd lines thicker
+ res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)            ; make 2nd lines thicker
  res@xyLineColors      = legend_line_cols                               ; change line color
- res@xyDashPatterns    = (/0,1,0,1,0,1,0,1,0,1/)                        ; choose dash patterns
- res@xyMarkers         = (/2,2,2,2,4,4,5,5/)                            ; (none, dot, asterisk)
+ if ( omboma .eq. 1 ) then
+    res@xyDashPatterns    = (/0,1,0,1,0,1,0,1,0,1/)                        ; choose dash patterns
+ else
+    res@xyDashPatterns    = (/0,0,0,0,0,0,0,0,0,0/)                        ; choose dash patterns
+ end if
+ res@xyMarkers         = (/2,2,2,2,2,2,2,2/)                            ; (none, dot, asterisk)
  res@xyMarkerColors    = res@xyLineColors             ; Marker colors
  res@xyMarkerSizeF          = 0.01                    ; Marker size (default is 0.01)
  res@xyLineLabelFontHeightF = 0.02                    ; Font size and color
@@ -210,6 +216,7 @@ do iv =1, nv   ;loop for variable
  res@tmYRLabelsOn           = True               ; set the Right axis
 ; res@tmYRLabelsOn           = False                   ; setup right axis label
  res@tmYRValues             = y;                       ; an array of tick locations (must be monotonic)
+;hcl res@tmYRLabels             = number(iv-1,0,:)            ; an array of strings
  res@tmYRLabels             = ylabels(iv-1,:)            ; an array of strings
 
 
@@ -298,6 +305,11 @@ end do  ;loop for variable (iv)
     "lgLineColors"             : legend_line_cols
     "lgMonoLineLabelFontColor" : True                    ; one label color
   end create
+   if ( omboma .eq. 0 ) then
+      setvalues legend
+         "lgDashIndexes"       : (/0,0,0,0,0,0,0,0,0,0,0,0/)             ; line paters
+      end setvalues
+   end if
 ;--------------------------------------------------------------------
 ;  panel: panel plots have their own set of resources
 ;----------------------------------------------------------------------------------------
