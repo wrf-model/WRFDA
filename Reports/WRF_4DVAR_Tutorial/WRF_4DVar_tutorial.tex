@@ -22,7 +22,7 @@
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
-\title[WRF 4D-Var V3.3, WRFDA Tutorial]{\small{WRF Four-dimensional variational data assimilation \\Tutorial for V3.3}}
+\title[WRF 4D-Var V3.3, WRFDA Tutorial]{\small{WRF Four-dimensional variational data assimilation system\\Tutorial for V3.3}}
 \author[Zhang and Huang, Boulder, July 2011]{Xin Zhang \and Xiang-Yu Huang}
 
 \date{\tiny{Presented in July 2011, WRFDA Tutorial} \\
@@ -81,6 +81,7 @@
 \end{itemize}
 }
 
+\begin{comment}
 \fst{Incremental 4D-Var formulation}{
 \begin{equation*}
 J=J_b+J_o
@@ -110,6 +111,7 @@ To find the $\delta\bf{x}$ which lead the $J$ to minimal:
 $M_k$ : Model integration from step 0 to step k. \\ \pause
 $\mathbf{M}_k$ : tangent linear model and ${\mathbf{M}_k}^T$ : adjoint model are needed
 }
+\end{comment}
 
 \fst{Weak constraint with digital filter}{
 \begin{tabular}{l p{2in}}
@@ -301,7 +303,8 @@ We have tested the WRF 4D-Var V3.3 on following systems:
    	\item Linux with PGI compiler V8.0-4 64-bit \pause
 	\item Linux with INTEL compiler V11.1 \pause
 	\item Mac with PGI compiler V10.3-0 64-bit \pause
-	\item Mac with GFORTRAN compiler V4.4.0  
+	\item Mac with GFORTRAN compiler V4.4.0  \pause
+	\item Mac with G95 compiler V4.0.3 (please download the patch on WRFDA home page)
 \end{itemize}
 }
 
@@ -404,7 +407,7 @@ More detail information and GSI codes download, please refer to \\ {\tiny\url{ht
 \end{itemize}
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WRF 4D-Var run}
+\section{WRF 4D-Var Run}
 
 
 \fst{Important namelist variables for 4D-Var run}{
@@ -487,8 +490,12 @@ da_check_xtoy_adjoint: Test Finished:
 \frame{
 \frametitle{Symmetric 4D-Var window}
 \begin{center}
-\includegraphics[scale=0.50,trim=1 200 1 180, clip]{obs_usage0}
+\includegraphics[scale=0.40,trim=1 120 1 120, clip]{obs_usage0}
 \end{center}
+\begin{itemize}
+	\item IC \& BC for 3D-Var is valid for 00Z
+	\item IC \& BC for 4D-Var is valid for 21Z
+\end{itemize}
 }
 
 \frame{
@@ -520,11 +527,9 @@ da_check_xtoy_adjoint: Test Finished:
 \frame[containsverbatim]{
 \frametitle{Assimilate satellite radiance data}
 refer to WRFDA Users' guide Chapter 6: \\
-\tiny{\url{http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.3/users_guide_chap6.htm#_Radiance_Data_Assimilations}}
-\begin{itemize}
-	\item link/copy amsua data as $amsua.bufr$
-	\item link/copy amsub data as $amsub.bufr$
-\item Modify namelist.input for radiance data :
+\tiny{\url{http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.3/users_guide_chap6.htm#_Radiance_Data_Assimilations}} \\
+~\\
+Modify namelist.input for radiance data :
 \tiny
 \begin{verbatim}
 &wrfvar4
@@ -542,7 +547,6 @@ refer to WRFDA Users' guide Chapter 6: \\
 	use_varbc=true,
 	use_crtm_kmatrix=true,
 \end{verbatim}
-\end{itemize}
 }
 
 \frame{
@@ -558,14 +562,14 @@ refer to WRFDA Users' guide Chapter 6: \\
 \frame{
 \frametitle{One-side 4D-Var window}
 \begin{center}
-\includegraphics[scale=0.30,trim=1 200 1 180, clip]{obs_usage}
+\includegraphics[scale=0.30,trim=1 120 1 120, clip]{obs_usage}
 \end{center}
 \pause
 \begin{itemize}
-	\item link/copy prepbufr data at 00Z as $ob01.bufr$
-	\item link/copy prepbufr data at 06Z as $ob02.bufr$\pause
-	\item link/copy amsua data at 00Z as $amsua01.bufr$
-	\item link/copy amsua data at 06Z as $amsua02.bufr$
+	\item link/copy prepbufr data at \alert{00}Z as $ob\alert{01}.bufr$
+	\item link/copy prepbufr data at \alert{06}Z as $ob\alert{02}.bufr$\pause
+	\item link/copy amsua data at \alert{00}Z as $amsua\alert{01}.bufr$
+	\item link/copy amsua data at \alert{06}Z as $amsua\alert{02}.bufr$
 	\item \dots
 \end{itemize}
 }
@@ -596,12 +600,12 @@ refer to WRFDA Users' guide Chapter 6: \\
 	\end{block}
 	}}
 \begin{itemize}
-	\item Solution: It might be a bug, under investigation. Please try with another compiler.
+	\item Solution: Please go to WRFDA home page to download the fixes.
 \end{itemize}
 
 }
 
-\section{Future developments}
+\section{Future Developments}
 
 \frame{
 \frametitle{Developments after V3.3}
