@@ -25,9 +25,9 @@
 \author[Zhang and Huang]{Xin Zhang \and Xiang-Yu Huang}
 
 \date{~\\
-~\\ \today\\
+~\\ \tiny{June 28 2011, GSI Workshop, Boulder, CO}\\
   ~\\
-  ~\\
+   ~\\
  \tiny{NCAR is sponsored by the National Science Foundation}
 }
 
@@ -67,46 +67,60 @@
 \frame{
 \frametitle{Current Status}
 \begin{itemize}
-	\item This presentation reports the status of the development of GSI-based WRF 4DVAR as implemented in Boulder's version of May 2011\pause
+	\item This presentation reports the status of the development of GSI-based WRF 4D Var as implemented in Boulder's version of May 2011\pause
 	\item The Major development in GSI had finished, GSI codes has been coupled with the WRF tangent linear and adjoint model \pause
-	\item The WRF tangent linear and adjoint codes V3.3 (hereafter, WRFPLUSV3)  has been re-written from scratch to be consistent with the latest WRF repository codes \pause
-	\item Because the parallelization of the latest WRFPLUSV3 is still on going, only 1 processor parallel run is doable at this moment
+	\item The WRF tangent linear and adjoint codes V3.3 (hereafter, WRFPLUS V3.3)  has been re-written from scratch to be consistent with the latest WRF repository codes \pause
+	\item Because the parallelization of the latest WRFPLUS V3.3 is still on going, only 1 processor parallel run is doable at this moment
 	\end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{New WRFPLUSV3}
+\section{WRFPLUS V3.3}
 
 \frame{
-\frametitle{Major Improvements of WRFPLUSV3}
+\frametitle{Major Improvements of WRFPLUS V3.3}
 \begin{itemize}
-   	\item Re-written WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
+   	\item Re-developed WRF adjoint and tangent linear codes from scratch based on the latest WRF repository codes. \pause
 	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel, gfortran). \pause
 	\item Adding capability to do tangent linear check and adjoint test over any length of time window. \pause 
-	\item Adding option to control if all inputs and outputs were happen in disk or memory, so WRFPLUSV3 can be used as a standalone tool or as a component in 4DVAR system.
+	\item Adding option to control if all inputs and outputs were happen in disk or memory, so WRFPLUS V3.3 can be used as a standalone tool or as a component in 4D-Var system.
 \end{itemize}
 }
 
 \begin{frame}[fragile]
 \frametitle{Sample 6h Tangent Linear and Adjoint Check }
 \setbeamercolor{postit}{fg=black, bg=yellow}
+\tiny{
+Taylor formula:
+\begin{equation*}
+\lim_{\alpha \to 0}\frac{M(x+\alpha\delta\mathbf{x})-M(x)}{M^{'}({\alpha\delta\mathbf{x}})}=1
+\end{equation*}
 \begin{beamerboxesrounded}[ lower=postit,shadow=true]{Tangent linear check}
 \begin{verbatim}
- ...
- tl_check: alpha=.1000E-04  coef=0.10000447262220E+01  
- tl_check: alpha=.1000E-05  coef=0.99999981575068E+00
- tl_check: alpha=.1000E-06  coef=0.99999998152933E+00
- tl_check: alpha=.1000E-07  coef=0.99999990980017E+00
- tl_check: alpha=.1000E-08  coef=0.99999956711797E+00
- ...
+alpha_m=.1000E+00  coef=   0.98250076417818E+00  val_n= 0.3628649E+11  val_l= 0.3693279E+11
+alpha_m=.1000E-01  coef=   0.99781045126907E+00  val_n= 0.3685192E+09  val_l= 0.3693279E+09
+alpha_m=.1000E-02  coef=   0.99949153238165E+00  val_n= 0.3691401E+07  val_l= 0.3693279E+07
+alpha_m=.1000E-03  coef=   0.10002560538015E+01  val_n= 0.3694225E+05  val_l= 0.3693279E+05
+alpha_m=.1000E-04  coef=   0.99981685944643E+00  val_n= 0.3692603E+03  val_l= 0.3693279E+03
+alpha_m=.1000E-05  coef=   0.10000972073298E+01  val_n= 0.3693638E+01  val_l= 0.3693279E+01
+alpha_m=.1000E-06  coef=   0.99996624597337E+00  val_n= 0.3693154E-01  val_l= 0.3693279E-01
+alpha_m=.1000E-07  coef=   0.99999992233716E+00  val_n= 0.3693279E-03  val_l= 0.3693279E-03
+alpha_m=.1000E-08  coef=   0.10000017668820E+01  val_n= 0.3693285E-05  val_l= 0.3693279E-05
+alpha_m=.1000E-09  coef=   0.10000050602279E+01  val_n= 0.3693298E-07  val_l= 0.3693279E-07
+alpha_m=.1000E-10  coef=   0.10000451984913E+01  val_n= 0.3693446E-09  val_l= 0.3693279E-09
 \end{verbatim}
-\end{beamerboxesrounded}
+\end{beamerboxesrounded}}
+Adjoint identity:
+\begin{equation*}
+\forall\mathbf{x}, \forall\mathbf{y} : \langle{M^{'}.\mathbf{x},\mathbf{y}}\rangle =  \langle{\mathbf{x},\mathbf{M^{*}}.\mathbf{y}}\rangle
+\end{equation*}
+\tiny{
 \begin{beamerboxesrounded}[ lower=postit,shadow=true]{Adjoint check}
 \begin{verbatim}
  ad_check: VAL_TL:    0.42476489986911E+11
  ad_check: VAL_AD:    0.42476489986912E+11
 \end{verbatim}
-\end{beamerboxesrounded}
+\end{beamerboxesrounded}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +130,7 @@
 \frametitle{Modification in GSI}
 \begin{itemize}
 	\item Modified the capabilities to read and process multiple first guess and process obs. data for multiple time slots \pause
-	\item Added a new module which serves the hub between GSI and WRFPLUSV3 \pause
+	\item Added a new module which serves the hub between GSI and WRFPLUS V3.3 \pause
 	\item Added WRF TL/AD subroutines callable interfaces in model\_tl and model\_ad \pause
 	\item Added capability to do adjoint test with WRF AD/TL.
 \end{itemize}
@@ -359,7 +373,7 @@ Install WRFPLUS and GSI
 \subsection{Real case}
 
 \frame{
-\frametitle{Domain}
+\frametitle{Experiment configuration}
 \begin{itemize}
 	\item Grids: 105x72x28L
 	\item Resolution: 60km
