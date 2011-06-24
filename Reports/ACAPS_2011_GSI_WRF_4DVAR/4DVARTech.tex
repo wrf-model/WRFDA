@@ -34,7 +34,7 @@
 %
 % Enter your Abstract here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\myabstract}{The Boulder repository GSI code is coupled with the WRF tangent linear adjoint model and the GSI-based WRF 4DVAR has been developed. Several experiments are conducted to validate this 4DVAR system and all results confirm the performance of the GSI-based 4DVAR system.}
+\newcommand{\myabstract}{ The regional GSI-based WRF 4D-Var has been developed via the coupling of the latest Boulder repository GSI code with the newly developed WRF tangent linear and adjoint model (WRFPLUSV3). To compile GSI-based WRF 4D-Var, the WRFPLUSV3 replaces WRF as the required pre-built package, the pre-built WRFPLUSV3 not only provides WRF IO interfaces to GSI , but also it is served as a library to provide the interfaces of nonlinear WRF model, tangent linear and adjoint model, as well as utilities to deal with  basic states, perturbation and adjoint forcing. The single observation experiment confirms the basic function of this 4D-Var system, which is able to produce the flow-dependent increment with minimization including tangent linear and adjoint models. 15-day CONUS domain partial cycling real-data experiments are conducted to further validate this 4DVAR system and all verification scores confirm the performance of the regional GSI-based 4D-Var system over regional GSI system.}
 %
 \begin{document}
 %
@@ -43,7 +43,7 @@
 %
 % Enter your TITLE here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{\textbf{\large{Report on the Development of GSI-based WRF 4DVAR \\ ACAPS 2010 SoW Task 3.1.b}}}
+\title{\textbf{\large{Report on the Development of Regional GSI-based WRF 4DVAR \\ ACAPS 2010 SoW Task 3.1.b}}}
 %
 % Author names, with corresponding author information. 
 % [Update and move the \thanks{...} block as appropriate.]
@@ -115,7 +115,7 @@ At this moment, the GSI-based WRF 4DVAR can run with 1-processor parallel run du
 4DVAR approach has the capability to implicitly evolve the static background error statistics. Single observation is the best way to demonstrate the  property of 4DVAR. The analysis time is 2000-01-25-00 and the 4DVAR time window is 6 hours. A single 500mb temperature at (32.5,-72, marked as a red star) is assimilated at the end of the time window on 2000-01-25-06. Figure \ref{single} shows the hourly increments between the 6-hour control run (from first guess) and analysis run (from 4DVAR analysis).
 
 \begin{figure}
-\includegraphics[scale=0.8]{single1.pdf}
+\includegraphics[scale=0.8]{center.pdf}
 \caption{Hourly increment evolution from 0h to 6h}
 \label{single}
 \end{figure}

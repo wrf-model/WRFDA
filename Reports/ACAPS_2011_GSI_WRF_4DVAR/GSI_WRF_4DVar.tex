@@ -21,7 +21,7 @@
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
-\title{Report on the development of \\ GSI-based WRF 4DVAR}
+\title{Development of regional GSI-based \\ WRF 4D-Var}
 \author[Zhang and Huang]{Xin Zhang \and Xiang-Yu Huang}
 
 \date{~\\
@@ -67,23 +67,23 @@
 \frame{
 \frametitle{Current Status}
 \begin{itemize}
-	\item This presentation reports the status of the development of GSI-based WRF 4DVAR as implemented in Boulder's version of February 2011\pause
-	\item The Major development in GSI had finished, GSI codes had been coupled with the WRF tangent linear and adjoint model \pause
-	\item The WRF tangent linear and adjoint codes (hereafter, WRFPLUS)  have been updated to be consistent with the latest WRF repository codes \pause
-	\item Because the parallelization of the latest WRFPLUS is still on going, only 1 processor parallel run is doable at this moment
+	\item This presentation reports the status of the development of GSI-based WRF 4DVAR as implemented in Boulder's version of May 2011\pause
+	\item The Major development in GSI had finished, GSI codes has been coupled with the WRF tangent linear and adjoint model \pause
+	\item The WRF tangent linear and adjoint codes V3.3 (hereafter, WRFPLUSV3)  has been re-written from scratch to be consistent with the latest WRF repository codes \pause
+	\item Because the parallelization of the latest WRFPLUSV3 is still on going, only 1 processor parallel run is doable at this moment
 	\end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Upgrades of WRFPLUS}
+\section{New WRFPLUSV3}
 
 \frame{
-\frametitle{Major Improvements of WRFPLUS}
+\frametitle{Major Improvements of WRFPLUSV3}
 \begin{itemize}
-   	\item New WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
-	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel). \pause
-	\item Add capability to do tangent linear check and adjoint test over any length of time window. \pause 
-	\item Add option to control if all inputs and outputs were happen in disk or memory, so WRFPLUS can be used as a standalone tool or as a component in 4DVAR system.
+   	\item Re-written WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
+	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel, gfortran). \pause
+	\item Adding capability to do tangent linear check and adjoint test over any length of time window. \pause 
+	\item Adding option to control if all inputs and outputs were happen in disk or memory, so WRFPLUSV3 can be used as a standalone tool or as a component in 4DVAR system.
 \end{itemize}
 }
 
@@ -115,9 +115,9 @@
 \frame{
 \frametitle{Modification in GSI}
 \begin{itemize}
-	\item Modified the capabilities to read and process multiple first guess and process obs. data for multiple time slots (?) \pause
-	\item Added a new module which serves the hub between GSI and WRFPLUS \pause
-	\item Added WRF TL/AD subroutines calling interface in model\_tl and model\_ad \pause
+	\item Modified the capabilities to read and process multiple first guess and process obs. data for multiple time slots \pause
+	\item Added a new module which serves the hub between GSI and WRFPLUSV3 \pause
+	\item Added WRF TL/AD subroutines callable interfaces in model\_tl and model\_ad \pause
 	\item Added capability to do adjoint test with WRF AD/TL.
 \end{itemize}
 }
@@ -215,12 +215,12 @@ Install WRFPLUS and GSI
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \section{GSI/WRF 4DVAR System Validation}
 
-\fst{Single observation exp.}{
+\fst{Single observation exp. I}{
 \begin{itemize}
 	\item Initial time: $2000\_01\_25\_00:00:00$
 	\item Ending time: $2000\_01\_25\_06:00:00$
 	\item Observation: 500 mb Temperature at {\color{red}ending time} \\
-	          $O-B=-1.17K$
+	          $O-B=-1.15K$
 	\item To investigate the difference at {\color{red}ending time} between the forecast from analysis and from background.
 \end{itemize}
 }
@@ -229,9 +229,9 @@ Install WRFPLUS and GSI
 \begin{columns}[c]
 \column{6cm}
 \includemovie[
-  poster=single1.pdf,
+  poster=center.pdf,
   text={}
-]{6.0cm}{7.5cm}{gsiwrf4dvar.mpeg}
+]{6.0cm}{7.5cm}{gsiwrf4dvar_center.mpeg}
 \column[c]{3.5cm}
 \begin{block}{Remarks}
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
@@ -250,6 +250,36 @@ Install WRFPLUS and GSI
 \begin{tabular}{l r}
 \includegraphics[scale=0.25, trim=10 5 10 10, clip]{gsi4dvar.pdf} & \includegraphics[scale=0.25, trim=10 5 10 10, clip]{gsi3dvar.pdf}
 \end{tabular}
+}
+
+\fst{Single observation exp. II}{
+\begin{itemize}
+	\item Initial time: $2000\_01\_25\_00:00:00$
+	\item Ending time: $2000\_01\_25\_06:00:00$
+	\item Observation: 500 mb Temperature at {\color{red}ending time} \\
+	          $O-B=-1.04K$
+	\item To investigate the impact of an observation close to boundary.
+\end{itemize}
+}
+
+\frame{
+\begin{columns}[c]
+\column{6cm}
+\includemovie[
+  poster=boundary.pdf,
+  text={}
+]{6.0cm}{7.5cm}{gsiwrf4dvar_boundary.mpeg}
+\column[c]{3.5cm}
+\begin{block}{Remarks}
+\tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
+\begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
+	\item \tiny{Initial perturbation is on the upstream of the obs.}
+	\item \tiny{Evolved perturbation at 6h miss the obs. location}
+	\item \tiny{Without LBC control, it is hard to fit the obs.}
+\end{itemize}
+\end{block}
+\end{columns}
 }
 
 \subsection{Tutorial case}
@@ -295,7 +325,7 @@ Install WRFPLUS and GSI
    0:OBS_PARA: q                          490
    0:OBS_PARA: uv                         568
    ----------------Total-------------------
-   45040 ???
+   45040
 \end{verbatim}
 }
 \end{beamerboxesrounded}
@@ -331,9 +361,9 @@ Install WRFPLUS and GSI
 \frame{
 \frametitle{Domain}
 \begin{itemize}
-	\item Grids: 47x32x28L
-	\item Resolution: 135km
-	\item Period: 2007091000-2007091300 @0Z,6Z,12Z,18Z
+	\item Grids: 105x72x28L
+	\item Resolution: 60km
+	\item Period: 2007091100-2007092600 @0Z,6Z,12Z,18Z
 	\item First guess is the 12h forecast from NCEP FNL
 	\item 48h forecast from FG, 3DVAR and 4DVAR
 	\item Verified against NCAR archived little\_r format data, filtered by FNL.
@@ -412,26 +442,37 @@ Install WRFPLUS and GSI
 \frame{
 \frametitle{Summary}
 \begin{itemize}
-	\item The basic GSI/WRF 4DVAR system was developed with minimum codes modification. \pause
-	\item The single observation exp. preliminarily confirm that the system is valid and is able to produce flow dependent increments. \pause
-	\item The increments produced by 4DVAR run with tutorial case are comparable with the 3DVAR run.\pause
-	\item The real case shows the desirable performance of 4DVAR.
+	\item The basic GSI/WRF 4D-Var system was developed. \pause
+	\item The single observation exp.  confirms that the system is valid and is able to produce flow dependent increments. \pause
+	\item The increments produced by 4D-Var run with tutorial case are comparable with the 3D-Var run.\pause
+	\item The real case shows the desirable performance of 4D-Var.
 \end{itemize}
 }
 
 \frame{
-\frametitle{Under development}
+\frametitle{Latest achivements}
 \begin{itemize}
-	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified cumulus scheme, as well as a radiation scheme. \pause
-	\item Parallelization of WRF adjoint codes. \pause
-	\item The observation processing for 4DVAR mode is still a black box for us, need to be investigated. \pause
-	\item Adjoint check achieved 5-digital identical, need to debug the code to find the bugs. \pause
-	\item Multiple outer loops for 4DVAR. \pause
-	\item Assimilation of radiance data. \pause
-	\item Adapt gradient check for GSI-based WRF 4DVAR. \pause
-	\item Adapt digital filter as a weak constrain for GSI-based WRF 4DVAR.
+	\item Implementation of the simplified physics packages into WRFPLUSV3 is done: surface drag(bl\_pbl\_physics=98), large scale condensation(mp\_physics=98) and a simplified cumulus scheme(cu\_physics=98). \pause	
+	\item Parallelization of WRF tangent linear model is done. \pause
 \end{itemize}
+\begin{columns}[c]
+\column{6cm}
+\begin{center}
+\includegraphics[scale=0.33, trim=0 0 0 0, clip]{wrftl_performance.png}
+\end{center}
+\column[c]{3.5cm}
+\begin{block}{One-time step timing}
+\begin{itemize}
+	\item \tiny{350x250x57L @27KM, time\_step=150s}
+	\item Intel(R) Xeon(R) X7560 @ 2.27GHz
+	\item 64G Memory
+	\item 8 Processors , 8 cores/processor
+	\item PGI 8.0-4 64-bit compiler.
+\end{itemize}
+\end{block}
+\end{columns}
 }
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \frame{

@@ -14,19 +14,19 @@
 \usepackage{movie15}
 \usepackage{verbatim}
 \usefonttheme{serif}
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 
 % Make a new command that will make a new subsection and a frame with the same title
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
-\title{Recent upgrades and improvements of WRF 4D-Var system}
-\author[Zhang et al.]{Xin Zhang \and 
-\and Ning Pan \and Qiang Cheng \and \\
-Xiang-Yu Huang \and Junmei Ban}
+\title[Upgrades of WRF 4D-Var V3.3]{Recent upgrades and improvements of WRF 4D-Var V3.3}
+\author[Zhang and Huang]{Xin Zhang \and
+Xiang-Yu Huang}
 
 \date{~\\
 ~\\
-~\\\tiny{91st AMS Annual Meeting, Seattle,WA}\\
+~\\\tiny{12th WRF Users' Workshop, Boulder, CO}\\
   ~\\
   ~\\
   ~\\
@@ -41,7 +41,7 @@ Xiang-Yu Huang \and Junmei Ban}
 }
 
 % We want the NSF department logo
-\logo{\includegraphics[height=.5in]{nsf1.jpg}}
+\logo{\includegraphics[height=.25in]{NSF_NESL.jpg}}
 
 
 \begin{document}
@@ -50,9 +50,9 @@ Xiang-Yu Huang \and Junmei Ban}
 \frame{\titlepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Current Status of WRF 4D-Var}
-
 \begin{comment}
+\section{Status of WRF 4D-Var V3.2}
+
 \frame{
 \frametitle{4D-Var versus 3D-Var\\(Adopted from ECMWF training Course 2008)}
 \begin{itemize}
@@ -63,9 +63,8 @@ Xiang-Yu Huang \and Junmei Ban}
 	\item 4D-Var propagates information horizontally and vertically in a meteorologically more consistent way
 \end{itemize}
 }
-\end{comment}
 
-\fst{Current WRF 4D-Var}{
+\fst{WRF 4D-Var V3.2}{
 \begin{itemize}
 	\item WRF 4D-Var was firstly released in April, 2009 with V3.1. \pause
 	\item WRF adjoint and tangent linear codes (WRFPLUS) were developed based on WRF V2.0.2 around 2005. \pause
@@ -77,30 +76,31 @@ Xiang-Yu Huang \and Junmei Ban}
 
 \fst{Why upgrade ?}{
 \begin{itemize}
-	\item Numerous bug fixes, upgrades and improvements in WRF model since 2005. V3.3 is coming\dots.\pause
+	\item Numerous bug fixes, upgrades and improvements in WRF model since 2005. V3.3 was released.\pause
 	\item Particularly, WRF infrastructure changes invalid some interfaces in WRFPLUS, such as the boundary variables can not be read in anymore.\pause
 	\item MPMD WRF 4D-Var is too complicate, most of the community users could not get it run without help. \pause
 	\item Very high disk IO overhead associated with the number of processors.\pause
 	\item Only runs good on IBM machines; unstable on other platforms and compilers.\pause
-	\item 4D-Var support for Prepbufr and radiance bufr data is not clear. \pause
 	\item Hard to do a complete adjoint check due to initial design of framework.
 \end{itemize}
 }
-
+\end{comment}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Next generation WRF 4D-Var}
+\section{What's new in WRF 4D-Var V3.3}
 
-\fst{Upgrading WRFPLUS}{
+\fst{New features}{
 \begin{itemize}
-   	\item New WRF adjoint and tangent linear codes based on the latest WRF repository codes. \pause
-	\item Constructed interfaces through which other applications can call WRF adjoint and tangent linear model directly. \pause 
-	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel, gfortran). \pause
-	\item Capability to do tangent linear and adjoint test over any length of time window. \pause 
-	\item New WRFPLUS can be used as a standalone tool or as a component in 4D-Var system.
+   	\item New WRF tangent linear and adjoint codes (WRFPLUS V3.3) based on the latest WRF repository codes. \pause
+	\item WRFPLUS V3.3 can be used as a standalone tool , such as in application of forecast sensitivity to observation. \pause
+	\item Accurate tangent linear and adjoint check. \pause
+	\item WRF model, WRF tangent linear model and adjoint model are compiled as a library and callable subroutines in WRFDA framework. \pause
+	\item Customized coupler to couple WRFDA, WRF and WRFPLUS as a single executable system. \pause 
+	\item Robust WRF 4D-Var system across various  platforms and compilers ( IBM, Linux, Mac : xlf, pgi, intel, gfortran). 
 \end{itemize}
 }
 
+\subsection{New WRFPLUS V3.3}
 \begin{frame}[fragile]
 \frametitle{Sample Tangent Linear and Adjoint Check of WRFPLUS }
 \setbeamercolor{postit}{fg=black, bg=yellow}
@@ -121,6 +121,7 @@ alpha_m=.1000E-10  coef=   0.99996176999678E+00  val_n= 0.3793882E-09  val_l= 0.
 \end{verbatim}
 }
 \end{beamerboxesrounded}
+\pause
 \begin{beamerboxesrounded}[ lower=postit,shadow=true]{Adjoint check: 6 hours}
 {\tiny
 \begin{verbatim}
@@ -131,6 +132,7 @@ alpha_m=.1000E-10  coef=   0.99996176999678E+00  val_n= 0.3793882E-09  val_l= 0.
 \end{beamerboxesrounded}
 \end{frame}
 
+\begin{comment}
 \subsection{Single executable 4D-Var}
 \begin{frame}[fragile]
 \frametitle{Single executable 4D-Var}
@@ -181,17 +183,19 @@ call push_ad_forcing (timestr)
 \end{verbatim}
 \end{beamerboxesrounded}
 \end{frame}
+\end{comment}
 
+\subsection{Parallel performance}
 \frame{
-\frametitle{Parallel run using all processors}
-4D-Var is a sequential algorithm. However, the current parallel WRF 4D-Var constructed on the Multiple Program Multiple Data mode, which have to split the total processors into 3 subsets for DA, NL and AD/TL. Lots of CPU time are wasted
+\frametitle{WRF 4D-Var V3.2: Parallel run using part of processors}
+4D-Var is a sequential algorithm. However, the old WRF 4D-Var constructed on the Multiple Program Multiple Data mode, which have to split the total processors into 3 subsets for DA, NL and AD/TL. Lots of CPU time are wasted
 \begin{center}
 \includegraphics[scale=0.5]{mpmd_wrf4dvar}
 \end{center}
 }
 
 \frame{
-\frametitle{Parallel run using all processors}
+\frametitle{WRF 4D-Var V3.3: Parallel run using all processors}
 Benefit from the single executable framework, every CPU is working at any time. No IDLE any more.
 \begin{center}
 \includegraphics[scale=0.5]{single_exe_wrf4dvar}
@@ -200,7 +204,7 @@ Benefit from the single executable framework, every CPU is working at any time. 
 
 \begin{comment}
 \frame{
-\frametitle{Performance improvement WRF 4DVar framework only}
+\frametitle{Performance improvement WRF 4D-Var framework}
 \begin{itemize}
 	\item $90x60x41@60km$, 6h window, 1h obs\_bin
 	\item 27 iterations FGAT, NCAR bluefire (IBM P6)
@@ -212,10 +216,10 @@ Benefit from the single executable framework, every CPU is working at any time. 
 \end{comment}
 
 \frame{
-\frametitle{Performance improvement WRF 4DVar framework only}
+\frametitle{Performance improvement WRF 4D-Var framework}
 \begin{itemize}
 	\item $270x180x41@20km$,6h window, 1h obs\_bin, 10 iterations
-	\item 10 iterations FGAT, NCAR bluefire (IBM P6)
+	\item 10 iterations FGAT (identity TL/AD model), NCAR bluefire (IBM P6)
 \end{itemize}
 \begin{center}
 \includegraphics[scale=0.5]{big_case_performance}
@@ -237,21 +241,6 @@ Benefit from the single executable framework, every CPU is working at any time. 
 }
 \end{comment}
 
-\fst{Consider Lateral boundary condition as control variable}{
-\begin{equation*}
-J=J_b+J_o+J_c+\color{red}J_{lbc}
-\end{equation*}
-\begin{eqnarray*}
-J_{lbc} & = & \frac{1}{2}(\mathbf{x}(t_k)-\mathbf{x}_b(t_k))^T\mathbf{B}^{-1}(\mathbf{x}(t_k)-\mathbf{x}_b(t_k))\\
-& = & \frac{1}{2}\delta\mathbf{x}(t_k)^T\mathbf{B}^{-1}\delta\mathbf{x}({t_k})
-\end{eqnarray*}
-$J_{lbc}$ is the $J_b$ at the end of the assimilation window \\
-lateral boundary control is obtained through
-\begin{eqnarray*}
-\frac {\partial{\delta{\mathbf{x}}_{lbc}}} {\partial{t}}=\frac{\delta\mathbf{x}(t_k)-\delta\mathbf{x}(t_0)}{t_k-t_0}
-\end{eqnarray*}
-}
-
 \begin{comment}
 \fst{Observations used by 4D-Var}{
 \begin{itemize}
@@ -269,13 +258,13 @@ lateral boundary control is obtained through
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WRF 4D-Var System Validation}
 
-\fst{Single observation experiments}{
+\fst{Single observation experiment I}{
 \begin{itemize}
 	\item Initial time: $2000\_01\_25\_00:00:00$
 	\item Ending time: $2000\_01\_25\_06:00:00$
-	\item Observation: 500 mb Temperature at {\color{red}ending time} \\
+	\item Observation: 500 mb temperature at {\color{red}ending time} \\
 	          $O-B=-1.168K$
-	\item To investigate the difference at {\color{red}ending time} between the forecast from analysis and from background.
+	\item Plotting the difference at {\color{red}ending time} between the forecast from analysis and from background to investigate the impact of 6h obs. on IC.
 \end{itemize}
 }
 
@@ -291,8 +280,6 @@ lateral boundary control is obtained through
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
-	\item \tiny{JcDF is turned on}
-	\item \tiny{LBC control is turned on}
 	\item \tiny{Initial perturbation is on the upstream of the obs.}
 	\item \tiny{Evolved perturbation at 6h hit the obs. location}
 \end{itemize}
@@ -300,6 +287,7 @@ lateral boundary control is obtained through
 \end{columns}
 }
 
+\begin{comment}
 \frame{
 \begin{columns}[c]
 \column{5cm}
@@ -312,38 +300,39 @@ lateral boundary control is obtained through
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
-	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is  {\color{red}turned off}}
 	\end{itemize}
 \end{block}
 \end{columns}
 }
+\end{comment}
 
 \frame{
-\frametitle{Additional experiments design\\Observation close to boundary}
-To investigate the impact of including boundary condition in data assimilation, the 6h observation is close to boundary and downstream of the boundary, we expect that the analysis response at 0h should be in boundary condition other than initial condition.
+\frametitle{What we learn:}
+\begin{itemize}
+	\item WRF 4D-Var has the capability to assimilate the observations within a time window.
+	\item WRF 4D-Var produces the flow-dependent analysis increments.
+\end{itemize}
+}
+
+\fst{Consider Lateral boundary condition as control variable}{
+\begin{equation*}
+J=J_b+J_o+J_c+\color{red}J_{lbc}
+\end{equation*}
+\begin{eqnarray*}
+J_{lbc} & = & \frac{1}{2}(\mathbf{x}(t_k)-\mathbf{x}_b(t_k))^T\mathbf{B}^{-1}(\mathbf{x}(t_k)-\mathbf{x}_b(t_k))\\
+& = & \frac{1}{2}\delta\mathbf{x}(t_k)^T\mathbf{B}^{-1}\delta\mathbf{x}({t_k})
+\end{eqnarray*}
+$J_{lbc}$ is the $J_b$ at the end of the assimilation window and the
+lateral boundary control is obtained through
+\begin{eqnarray*}
+\frac {\partial{\delta{\mathbf{x}}_{lbc}}} {\partial{t}}=\frac{\delta\mathbf{x}(t_k)-\delta\mathbf{x}(t_0)}{t_k-t_0}
+\end{eqnarray*}
 }
 
 \frame{
-\begin{columns}[c]
-\column{5cm}
-\includemovie[
-  controls,poster={boundarylbcjcdf.pdf},
-  text={\large(Click to start the movie)\hspace*{400pt}}
-]{6.0cm}{7.5cm}{boundarylbcjcdf.mpeg}
-\column[c]{3.5cm}
-\begin{block}{Remarks}
-\tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
-\begin{itemize}
-	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
-	\item \tiny{JcDF is turned on}
-	\item \tiny{$O-B=-0.95K$}
-	\item \tiny{LBC control is {\color{red}turned on}}
-	\item \tiny{Main initial perturbation is in the boundary condition other than in the initial condition ( south boundary, invisible here)}
-	\item \tiny{Evolved perturbation is coming from boundary}
-\end{itemize}
-\end{block}
-\end{columns}
+\frametitle{Single observation experiment II}
+To investigate the impact of lateral boundary control, the 6h observation is placed close to boundary and downstream of the boundary inflow, we expect that the major analysis increments at 0h should be in boundary condition and outside of domain.
 }
 
 \frame{
@@ -358,13 +347,38 @@ To investigate the impact of including boundary condition in data assimilation, 
 \tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
 \begin{itemize}
 	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
-	\item \tiny{JcDF is turned on}
 	\item \tiny{LBC control is {\color{red}turned off}}
-	\item \tiny{Main Initial perturbation is in the location of the obs., it is fake}
-	\item \tiny{Evolved perturbation at 6h is moving out from the obs. location}
 \end{itemize}
 \end{block}
 \end{columns}
+}
+
+\frame{
+\begin{columns}[c]
+\column{5cm}
+\includemovie[
+  controls,poster={boundarylbcjcdf.pdf},
+  text={\large(Click to start the movie)\hspace*{400pt}}
+]{6.0cm}{7.5cm}{boundarylbcjcdf.mpeg}
+\column[c]{3.5cm}
+\begin{block}{Remarks}
+\tiny{Forecasted 500mb T difference \\(DA forecast - reference forecast)}
+\begin{itemize}
+	\item {\color{red}$\star$} is the location of obs. at the ending time (6h).
+	\item \tiny{$O-B=-0.95K$}
+	\item \tiny{LBC control is {\color{red}turned on}}
+\end{itemize}
+\end{block}
+\end{columns}
+}
+
+\frame{
+\frametitle{What we learn:}
+\begin{itemize}
+	\item The major increment is in the boundary condition( south boundary, invisible here)
+	\item Increment in initial condition alone is hard to fit the observation.
+	\item For observations close to in-flow boundary, the impact of LBC control is important.
+\end{itemize}
 }
 
 \begin{comment}
@@ -389,25 +403,25 @@ To investigate the impact of including boundary condition in data assimilation, 
 }
 \end{comment}
 
-\fst{An OSSE radar data assimilation with WRF 4D-Var \small{ (Yongrun Guo and Jenny Sun) }}{
+\fst{An OSSE radar data assimilation with WRF 4D-Var}{
 
 \begin{itemize}
-	\item TRUTH ----- Initial condition from TRUTH (13-h forecast initialized at 	   
+	\item \small{TRUTH ----- Initial condition from TRUTH (13-h forecast initialized at 	   
                            2002061212Z from AWIPS 3-h analysis) run cutted by ndown, 	     
-                           boundary condition from NCEP GFS data. \pause
-	\item NODA -----  Both initial condition and boundary condition from NCEP GFS data.\pause
-	\item 3DVAR -----3DVAR analysis at 2002061301Z used as the initial condition, and  
+                           boundary condition from NCEP GFS data.} \pause
+	\item \small{NODA -----  Both initial condition and boundary condition from NCEP GFS data.}\pause
+	\item \small{3DVAR -----3DVAR analysis at 2002061301Z used as the initial condition, and  
                            boundary condition from NCEP GFS. Only Radar radial velocity at  
-                           2002061301Z assimilated (total data points = 97,033), 3 outer loops.\pause
-	\item 4DVAR ----- 4DVAR analysis at 2002061301Z used as initial condition, and 
+                           2002061301Z assimilated (total data points = 97,033), 3 outer loops.}\pause
+	\item \small{4DVAR ----- 4DVAR analysis at 2002061301Z used as initial condition, and 
                            boundary condition from NCEP GFS. The radar radial velocity at 4  
                            times: 200206130100, 05, 10, and 15, are assimilated (total
-                           data points = 384,304), 3 outer loops.
+                           data points = 384,304), 3 outer loops.}
 \end{itemize}
 }
 
-
-\fst{OSSE 3rd hour precipitation simulation}{
+\frame{
+\frametitle{OSSE 3rd hour precipitation simulation}
 \begin{tabular}{l r}
 \includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_truth} & \includegraphics[scale=0.20, trim=1 240 3 100, clip]{radar_control} \\
 \includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_3dvar} & \includegraphics[scale=0.20, trim=1 160 3 130, clip]{radar_4dvar}
@@ -419,10 +433,47 @@ To investigate the impact of including boundary condition in data assimilation, 
 \begin{itemize}
 	\item Obviously, 4DVar reproduce the best squall line precipitation band.\pause
 	\item However, the coverage and intensity of the precipitation are more than the observation.\pause
-	\item Possible reason: The new WRFPLUS is a dynamic-only model, PBL and microphysics are needed.
+	\item Possible improvement: The WRFPLUS V3.3 is a dynamic-only dry model, PBL and microphysics are needed.
 \end{itemize}
 }
 
+\subsection{Real case}
+
+\frame{
+\frametitle{Experiment configration}
+\begin{itemize}
+	\item \tiny{Grids: 105x72x28L}
+	\item Resolution: 60km
+	\item Period: 2010091100-2010092600 @0Z,6Z,12Z,18Z
+	\item First guess is the 12h forecast from NCEP FNL
+	\item 48h forecasts from FG (control), 3DVAR and 4DVAR
+	\item Verified against NCEP GDAS prepbufr data
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.25, trim=0 0 50 0, clip, angle=90]{domain.pdf} 
+\end{center}
+}
+
+\frame{
+\frametitle{Averaged RMSE of 24H forecast verification}
+\begin{center}
+\includegraphics[scale=0.30, trim=0 100 0 55, clip]{Profile_RMSE_24H.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{Averaged RMSE of 36H forecast verification}
+\begin{center}
+\includegraphics[scale=0.30, trim=0 100 0 55, clip]{Profile_RMSE_36H.pdf}
+\end{center}
+}
+
+\frame{
+\frametitle{Averaged RMSE of 48H forecast verification}
+\begin{center}
+\includegraphics[scale=0.30, trim=0 100 0 55, clip]{Profile_RMSE_48H.pdf}
+\end{center}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
@@ -430,18 +481,21 @@ To investigate the impact of including boundary condition in data assimilation, 
 \frame{
 \frametitle{Summary}
 \begin{itemize}
-	\item The single executable WRF 4DVar system was developed and has showed promising performance.\\
-	         Poster 541: "Evaluation of WRFDA 4D-VAR through Month-long Run and Case Study" by Xiaoyan Zhang et al. \pause 
-	\item The new WRF 4DVar system has the capability to assimilate conventional observational data (little\_r or prepbufr format),radiance in bufr format and radar data. \pause
-	\item The new WRF 4DVar system is able to consider lateral boundary condition as control variable and digital filter can be used as a weak constraint to suppress the high frequency noise.
+	\item The single executable WRF 4D-Var system was developed and has showed promising performance. \pause 
+	\item The new WRF 4D-Var system has the capability to assimilate conventional observational data (little\_r or prepbufr format),radiance in bufr format and radar data. \pause
+	\item The new WRF 4D-Var system is able to consider lateral boundary condition as control variable and digital filter can be used as a weak constraint to suppress the high frequency noise. \pause
+	\item Multiple outer loops for 4D-Var.
 \end{itemize}
 }
 
 \frame{
-\frametitle{Under development}
+\frametitle{Development after V3.3}
 \begin{itemize}
-	\item Add simplified physics packages into WRFPLUS: surface drag, large scale condensation, a simplified moist cumulus scheme, as well as a radiation scheme.\pause
-	\item Parallelization of WRF tangent linear code has been done. We are working on the parallelization of WRF adjoint codes.
+	\item Add simplified physics packages into WRFPLUS: surface drag(\alert{done}), large scale condensation(\alert{done}), a simplified cumulus scheme(\alert{done}), as well as a radiation scheme (GSFC). \pause
+	\item Parallelization of WRF tangent linear codes (\alert{done}) \pause
+	\item Parallelization of WRF adjoint codes. \pause
+	\item Multi-incremental 4D-Var configuration.\pause
+	\item Add precipitation observation to the forcing term.
 \end{itemize}
 }
 
@@ -468,8 +522,18 @@ Install WRFPLUS and WRFPLUS
 \end{frame}
 \end{comment}
 
+\frame{
+\frametitle{Upcoming}
+A hand-on tutorial for WRF 4D-Var V3.3 will be presented on June 24, Friday morning 8:30AM-10:00AM
+\begin{itemize}
+	\item Overview
+	\item Installation
+	\item Setup
+	\item Run
+\end{itemize}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\fst{}{
+\frame{
 \begin{center}
 ~\\
 ~\\
