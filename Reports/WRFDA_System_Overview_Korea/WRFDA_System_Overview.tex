@@ -19,10 +19,9 @@
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
 \title{WRF Data Assimilation System}
-\author[Zhang and Huang]{Xin Zhang \and Xiang-Yu Huang}
+\author[Zhang, Lin and Huang, , Boulder, July 2011]{Xin Zhang \and Hui-Chuan Lin \and Xiang-Yu Huang}
 
-\date{April 16, 2011\\
-5th East Asia WRF Tutorial
+\date{Presented in July 2011, WRFDA Tutorial
   ~\\
   ~\\
   ~\\
@@ -60,16 +59,16 @@
 
 \newcommand{\wrfdaFlow}{
     % Place node
-    \node [block] (setupFrame) (setupFrame){Setup\\Frame};
-    \node [block, right of=setupFrame] (readNml) {Read\\namelist};
-    \node [cloud, above of=readNml] (nml) {namelist};
-    \node [block, right of=readNml] (setupBg) {Setup\\Background};
+    \node [block] (readNml) {Read\\namelist};
+    \node [block, right of=readNml] (setupFrame) (setupFrame){Setup\\Frame};
+    \node [cloud, above of=setupFrame] (nml) {namelist};
+    \node [block, right of=setupFrame] (setupBg) {Setup\\Background};
     \node [cloud, above of=setupBg] (xb) {$\mathbf{x}_b$};
-    \node [block, right of=setupBg] (setupBE) {Setup\\Background\\Error};
-    \node [cloud, above of=setupBE] (b0) {$\mathbf{B}$};
-    \node [block, right of=setupBE] (setupOb){Setup\\Observations\\ \& Errors};
+    \node [block, right of=setupBg] (setupOb){Setup\\Obs.\\ \& Errors};
     \node [cloud, above of=setupOb] (yo) {$\mathbf{y}$};
-    \node [block, below of=setupOb] (calInnov){Calculate\\$\mathbf{y}-H(\mathbf{x}$)};
+    \node [block, right of=setupOb] (setupBE) {Setup\\Background\\Error};
+    \node [cloud, above of=setupBE] (b0) {$\mathbf{B}$};
+    \node [block, below of=setupBE] (calInnov){Calculate\\$\mathbf{y}-H(\mathbf{x}$)};
     \node [minim, left of=calInnov] (minim){Minimize Cost Function};
     \node [ana, left of=minim] (ana){Compute\\Analysis};
     \node [block, below of=ana] (calDia){Calculate\\Diagnostics};
@@ -78,16 +77,16 @@
     \node [cloud, below of=output] (xa) {$\mathbf{x}^a$};
     \node [block, right of=output] (tidyUp){Tidy Up};
     % Draw edges
-    \path [line] (setupFrame) -- (readNml);
+    \path [line] (readNml) -- (setupFrame);
     \path [line] (nml) -- (setupFrame);
     \path [line] (nml) -- (readNml);
-    \path [line] (readNml) -- (setupBg);
+    \path [line] (setupFrame) -- (setupBg);
     \path [line] (xb) -- (setupBg);
-    \path [line] (setupBg) -- (setupBE);
+    \path [line] (setupBg) -- (setupOb);
     \path [line] (b0) -- (setupBE);
-    \path [line] (setupBE) -- (setupOb);
+    \path [line] (setupOb) -- (setupBE);
     \path [line] (yo) -- (setupOb);
-    \path [line] (setupOb) -- (calInnov);
+    \path [line] (setupBE) -- (calInnov);
     \path [line] (calInnov) -- (minim);
     \path [line] (minim) -- (ana);
     \path [line] (ana) -- (calDia);
@@ -216,7 +215,7 @@ $\mathbf{x}_a=\delta\mathbf{x}+\mathbf{x}_{n-1}$
 \end{frame}
 
 \begin{frame}
-For one outer loop, $\mathbf{x}_0=\mathbf{x}_b$ and $\mathbf{d}=\mathbf{y}_o-\textsl{H}(\mathbf{x}_b)$
+For first outer loop, $\mathbf{x}_0=\mathbf{x}_b$ and $\mathbf{d}=\mathbf{y}_o-\textsl{H}(\mathbf{x}_b)$
 \begin{equation*}
 J = \frac{1}{2}\delta\mathbf{x}^T{\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})
 \end{equation*} \pause
@@ -228,16 +227,58 @@ J = \frac{1}{2}\delta\mathbf{x}^T{\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}(\
 \end{equation*}
 \end{frame}
 
+\begin{frame}
+\frametitle{ $\mathbf{B}$ in WRFDA}
+\begin{itemize}
+\item Partly for preconditioning reasons: \\
+$\mathbf{B} =\mathbf{U}\mathbf{U}^{T}$ with $\mathbf{U}=\mathbf{U}_{p}$ \pause
+\item Horizontal transform $(\mathbf{U}_{h})$ is via
+	\begin{itemize}
+	\item Regional - recursive filters
+	\item Glocal - power spectrum
+	\end{itemize} \pause
+\item Vertical transform $(\mathbf{U}_{v})$ is via
+	\begin{itemize}
+	\item cv3 - recursive filters
+	\item cv5\&6 - via EOF
+	\end{itemize} \pause	
+\item Physical transformation $(\mathbf{U}_{p})$ depends upon the choice of
+the analysis control variable
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{ Cost function in WRFDA}
+\begin{itemize}
+\item Define: $\delta\mathbf{x}=\mathbf{U}\mathbf{v}$ \pause
+\item $\mathbf{v}$ is the analysis increment in control variable space
+	\begin{itemize}
+	\item streamfunction
+	\item unbalanced velocity potential
+	\item unbalanced temperature
+	\item RH
+	\item unbalanced surface pressure
+	\end{itemize} \pause
+\item The actual cost function in WRFDA : 
+\begin{equation*}
+J = \frac{1}{2}\mathbf{v}^T\mathbf{v}+\frac{1}{2}(\mathbf{d}-\mathbf{H}\mathbf{U}\mathbf{v})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}\mathbf{U}\mathbf{v})
+\end{equation*} 
+\begin{equation*}
+\mathbf{x}_a=\mathbf{U}\mathbf{v}+\mathbf{x}_{n-1}
+\end{equation*} 
+\end{itemize}
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WRFDA Overview}
 
 \fst{Prepare the BE}{
 
 \begin{equation*}
-J = \frac{1}{2}\delta\mathbf{x}^T{\color{red}\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})
+J = \frac{1}{2}\mathbf{v}^T\mathbf{v}+\frac{1}{2}(\mathbf{d}-\mathbf{H}{\color{red}\mathbf{U}}\mathbf{v})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}{\color{red}\mathbf{U}}\mathbf{v})
 \end{equation*} \pause
 \begin{itemize}
-\item Nominally, {\color{red}$\mathbf{B}$} is the background error covariance \pause
+\item Nominally, $\color{red}\mathbf{B}=\mathbf{U}\mathbf{U}^{T}$ is the background error covariance \pause
 \item For initial testing, default background error statistics may
 be used \pause 
 \begin{itemize}
@@ -255,10 +296,10 @@ model domain (and season)
 \fst{Prepare the Background}{
 
 \begin{equation*}
-J = \frac{1}{2}\delta\mathbf{x}^T{\color{blue}\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})
+J = \frac{1}{2}\mathbf{v}^T\mathbf{v}+\frac{1}{2}(\mathbf{d}-\mathbf{H}{\color{blue}\mathbf{U}}\mathbf{v})^T\mathbf{R}^{-1}(\mathbf{d}-\mathbf{H}{\color{blue}\mathbf{U}}\mathbf{v})
 \end{equation*} 
 \begin{center}
-$\delta\mathbf{x}=\mathbf{x}-{\color{red}\mathbf{x}_b}$
+${\color{blue}\mathbf{U}}\mathbf{v}=\mathbf{x}-{\color{red}\mathbf{x}_b}$
 \end{center} \pause
 \begin{itemize}
 \item In âcold-start mode: accomplished by running the
@@ -277,10 +318,10 @@ WPS and real programs \pause
 \fst{Prepare the Observations \& Errors}{
 
 \begin{equation*}
-J = \frac{1}{2}\delta\mathbf{x}^T{\color{blue}\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}({\color{red}\mathbf{d}}-\mathbf{H}\delta\mathbf{x})^T{\color{red}\mathbf{R}^{-1}}(\mathbf{d}-\mathbf{H}\delta\mathbf{x})
-\end{equation*}
+J = \frac{1}{2}\mathbf{v}^T\mathbf{v}+\frac{1}{2}({\color{red}\mathbf{d}}-\mathbf{H}{\color{blue}\mathbf{U}}\mathbf{v})^T{\color{red}\mathbf{R}^{-1}}({\color{red}\mathbf{d}}-\mathbf{H}{\color{blue}\mathbf{U}}\mathbf{v})
+\end{equation*} 
 \begin{center}
-$\mathbf{d}={\color{red}\mathbf{y}}-\textsl{H}({\color{blue}\mathbf{x}_b})$
+${\color{red}\mathbf{d}}={\color{red}\mathbf{y}}-\textsl{H}({\color{blue}\mathbf{x}_b})$
 \end{center} \pause
 \begin{itemize}
 \item Conventional observation input for WRFDA is supplied through \pause
@@ -298,12 +339,12 @@ $\mathbf{d}={\color{red}\mathbf{y}}-\textsl{H}({\color{blue}\mathbf{x}_b})$
 \fst{Run WRFDA}{
 
 \begin{equation*}
-J = \frac{1}{2}\delta\mathbf{x}^T{\color{blue}\mathbf{B}^{-1}}\delta\mathbf{x}+\frac{1}{2}({\color{blue}\mathbf{d}}-\mathbf{H}\delta\mathbf{x})^T{\color{blue}\mathbf{R}^{-1}}({\color{blue}\mathbf{d}}-\mathbf{H}\delta\mathbf{x})
+J = \frac{1}{2}\mathbf{v}^T\mathbf{v}+\frac{1}{2}({\color{blue}\mathbf{d}}-{\color{blue}\mathbf{H}}{\color{blue}\mathbf{U}}\mathbf{v})^T{\color{blue}\mathbf{R}^{-1}}({\color{blue}\mathbf{d}}-{\color{blue}\mathbf{H}}{\color{blue}\mathbf{U}}\mathbf{v})
 \end{equation*}
 \begin{itemize}
 \item $H$ is the observational operator, which calculate the counterpart of observations in model space \pause
 \item Conjuagate gradient method
-\item Try to find a $\delta\mathbf{x}^a$ , which minimizes $J$ and then $\mathbf{x}^a=\mathbf{x}^b + \delta\mathbf{x}^a$
+\item Try to find a $\mathbf{v}$ , which minimizes $J$ and then $\mathbf{x}_a=\mathbf{U}\mathbf{v}+\mathbf{x}_{n-1}$
 \end{itemize}
 
 }
@@ -311,12 +352,12 @@ J = \frac{1}{2}\delta\mathbf{x}^T{\color{blue}\mathbf{B}^{-1}}\delta\mathbf{x}+\
 \fst{Update Boundary Condition}{
 
 \begin{itemize}
-\item After creating an analysis, $\mathbf{x}^a$, we have changed
+\item After creating an analysis, $\mathbf{x}_{a}$, we have changed
 the initial conditions for the model \pause
 \item However, tendencies in wrfbdy\_d01 file are valid for background, $\mathbf{x}_b$ \pause
 \item The update\_bc program adjusts these tendencies
-based on the difference $\mathbf{x}^a - \mathbf{x}_b$ \pause
-\item Of course, if $\mathbf{x}^a$ was produced for reasons other
+based on the difference $\mathbf{x}_{a} - \mathbf{x}_b$ \pause
+\item Of course, if $\mathbf{x}_{a}$ was produced for reasons other
 than running WRF, there is probably not a need to
 update boundary conditions
 \end{itemize}
@@ -330,74 +371,100 @@ update boundary conditions
 \begin{frame}
 \begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
 \wrfdaFlow
-\node [runningblock] (setupFrame) {Setup\\Frame};
+\node [runningblock] (readNml) {Read\\namelist};
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
-\frametitle{Setup Frame}
-\begin{itemize}
-\item Reads grid dimensions from â$namelist.input$ file \pause
-\item Use WRF frameworkâ distributed memory capability to initialize tile, memory, patch dimensions, etc.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
-\wrfdaFlow
-\node [runningblock, right of=setupFrame] (readNml) {Read\\namelist};
-\end{tikzpicture}
-\end{frame}
-
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Read namelist}
 \begin{itemize}
-\item Reads WRFDA data assimilation options from â€œnamelist.inputâ€ file\pause
+\item Reads WRFDA data assimilation options from â$namelist.input$ file\pause
 \item Performs consistency checks between namelist options.
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_init1, da_wrfvar_init2 ==> call initial_config
+	\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_init1.inc, da_wrfvar_init2.inc ==> module_configure.F
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
 \begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
 \wrfdaFlow
-\node [runningblock, right of=readNml] (setupBg) {Setup\\Background};
+\node [runningblock,right of=readNml] (setupFrame) {Setup\\Frame};
 \end{tikzpicture}
 \end{frame}
 
+\begin{frame}[containsverbatim]
+\frametitle{Setup Frame}
+\begin{itemize}
+\item Use WRF frameworkâ distributed memory capability to initialize tile, memory, patch dimensions, etc.
+\end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_init2 ==> call alloc_and_configure_domain
+	da_wrfvar_main ==> call da_wrfvar_run.inc ==> call da_wrfvar_interface ==> call da_solve
+	 ==> call da_solve_init
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_init2.inc ==> module_domain.F
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==> da_solve_init.inc
+\end{verbatim}
+}
+\end{frame}
+
 \begin{frame}
+\begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
+\wrfdaFlow
+\node [runningblock, right of=setupFrame] (setupBg) {Setup\\Background};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}[containsverbatim]
 \frametitle{Setup Background}
 \begin{itemize}
 \item Reads the first-guess file \pause
 \item Extracts fields used by WRFDA \pause
 \item Creates background FORTRAN 90 derived data type $xb$ etc.
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_init2 ==> call da_med_initialdata_input
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_setup_firstguess
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_init2.inc ==> da_med_initialdata_input.inc
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_setup_firstguess.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
 \begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
 \wrfdaFlow
-\node [runningblock, right of=setupBg] (setupBE) {Setup\\Background\\Error};
+\node [runningblock, right of=setupBg] (setupOb) {Setup\\Obs.\\ \& Errors};
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
-\frametitle{Setup Background Error}
-\begin{itemize}
-\item Reads in background error statistics \pause
-\item Extracts necessary quantities: eigenvectors, eigenvalues, lengthscales, regression coefficients, etc.\pause
-\item Creates background error FORTRAN 90 derived data type $be$
-\item Reference :\href{http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html}{{\bf{Online BE Documents}}}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
-\wrfdaFlow
-\node [runningblock, right of=setupBE] (setupOb) {Setup\\Observations\\ \& Errors};
-\end{tikzpicture}
-\end{frame}
-
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Setup Observations \& Errors}
 \begin{itemize}
 \item Reads in observations \pause
@@ -405,22 +472,81 @@ update boundary conditions
 \item Creates observation FORTRAN 90 derived data type $ob$ \pause
 \item Domain and time check
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_setup_obs_structures
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_setup_obs_structures.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
 \begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
 \wrfdaFlow
-\node [runningblock, below of=setupOb] (calInnov) {Calculate\\$\mathbf{y}-H(\mathbf{x})$};
+\node [runningblock, right of=setupOb] (setupBE) {Setup\\Background\\Error};
 \end{tikzpicture}
 \end{frame}
 
+\begin{frame}[containsverbatim]
+\frametitle{Setup Background Error}
+\begin{itemize}
+\item Reads in background error statistics \pause
+\item Extracts necessary quantities: eigenvectors, eigenvalues, lengthscales, regression coefficients, etc.\pause
+\item Creates background error FORTRAN 90 derived data type $be$
+\item Reference :\href{http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html}{{\bf{Online BE Documents}}}
+\end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_setup_background_errors
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_setup_background_errors.inc
+\end{verbatim}
+}
+\end{frame}
+
 \begin{frame}
+\begin{tikzpicture}[scale=1, node distance = 2.0cm, auto, font=\scriptsize]
+\wrfdaFlow
+\node [runningblock, below of=setupBE] (calInnov) {Calculate\\$\mathbf{y}-H(\mathbf{x})$};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}[containsverbatim]
 \frametitle{Calculate Innovation}
 \begin{itemize}
 \item Calculates model equivalent of observations through interpolation and change of variable \pause
 \item Computes observation minus first guess ($\mathbf{y}-H(\mathbf{x})$) value \pause
 \item Creates innovation vector FORTRAN 90 derived data type $iv$
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_get_innov_vector, da_allocate_y
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_get_innov_vector.inc, da_allocate_y.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
@@ -430,7 +556,7 @@ update boundary conditions
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Minimization}
 Use conjugate gradient method \pause
 \begin{itemize}
@@ -439,6 +565,20 @@ Use conjugate gradient method \pause
 \item Computes gradient of cost function \pause
 \item Uses cost function and gradient to calculate new value of analysis control variable
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_minimise_cg
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_minimise_cg.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
@@ -448,7 +588,7 @@ Use conjugate gradient method \pause
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Compute Analysis}
 \begin{itemize}
 \item Once WRFDA has found a converged control variable, convert control variable to model space analysis increments \pause
@@ -457,6 +597,20 @@ Use conjugate gradient method \pause
 \item Performs consistency checks, e.g., remove negative humidity etc. \pause 
 \item Optionally, do outer loop
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==>call da_transfer_xatoanalysis
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==>da_transfer_xatoanalysis.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
@@ -466,13 +620,27 @@ Use conjugate gradient method \pause
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Calculate Diagnostics}
 \begin{itemize}
 \item Output $\mathbf{y}-H(\mathbf{x}_b)$, $\mathbf{y}-H(\mathbf{x}^a)$ statistics for all observation types and variables \pause
 \item Compute $\mathbf{x}^a-\mathbf{x}_b$ (analysis increment) statistics for all model variables and levels \pause
 \item Statistics include minimum, maximum (and their locations), mean and standard deviation.
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==> call da_write_diagnostics
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==> da_write_diagnostics.inc
+\end{verbatim}
+}
 \end{frame}
 
 \begin{frame}
@@ -482,11 +650,25 @@ Use conjugate gradient method \pause
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Output Analysis}
 \begin{itemize}
 \item Outputs analysis in native model format.
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling order:
+	da_wrfvar_main ==> call da_wrfvar_run ==> call da_wrfvar_interface ==> call da_solve
+	==> call da_med_initialdata_output
+\end{verbatim}
+}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==> da_med_initialdata_output.inc
+\end{verbatim}
+}
 \end{frame}
 
 
@@ -497,13 +679,20 @@ Use conjugate gradient method \pause
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[containsverbatim]
 \frametitle{Tidy Up}
 \begin{itemize}
 \item Deallocate dynamically-allocated arrays, structures, etc.\pause
 \item Timing information \pause
 \item Clean end to WRFDA
 \end{itemize}
+\tiny{
+\begin{verbatim}
+Calling subroutines:
+	da_wrfvar_main.f90 ==> da_wrfvar_run.inc ==> da_wrfvar_interface.inc ==> da_solve.inc 
+	==> deallocate ....
+\end{verbatim}
+}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -565,6 +754,111 @@ Use conjugate gradient method \pause
 \end{block}
 \end{columns}
 \end{frame}
+
+\subsection{How to add a new observation in WRFDA}
+
+\begin{frame}[containsverbatim]
+\frametitle{How to add a new observation in WRFDA}
+A example of adding TAMDAR data, contributed by Dr. Hongli Wang
+\tiny{
+\begin{verbatim}
+1. define_structures
+      da/da_define_structures/da_deallocate_y.inc
+      da/da_define_structures/da_zero_y.inc
+      da/da_define_structures/da_deallocate_observations.inc
+      da/da_define_structures/da_allocate_y.inc
+      da/da_define_structures/da_allocate_observations.inc
+      da/da_define_structures/da_define_structures.f90
+      da/da_setup_structures/da_setup_obs_structures.inc
+      da/da_setup_structures/da_setup_structures.f90
+2. da_obs_io
+      da/da_obs_io/da_search_obs.inc
+      da/da_obs_io/da_write_filtered_obs.inc
+      da/da_obs_io/da_read_obs_ascii.inc
+      da/da_obs_io/da_scan_obs_ascii.inc
+      da/da_obs_io/da_obs_io.f90
+3. da_obs
+      da/da_obs/da_random_omb_all.inc
+      da/da_obs/da_add_noise_to_ob.inc
+      da/da_obs/da_obs.f90
+      da/da_obs/da_count_filtered_obs.inc
+      da/da_obs/da_transform_xtoy_adj.inc
+      da/da_obs/da_use_obs_errfac.inc
+      da/da_obs/da_fm_decoder.inc
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+\frametitle{How to add a new observation in WRFDA, cont'd}
+\tiny{
+\begin{verbatim}
+      da/da_obs/da_fill_obs_structures.inc
+      da/da_obs/da_transform_xtoy.inc
+4. da_tamdar
+      da/da_tamdar/da_ao_stats_tamdar.inc
+      da/da_tamdar/da_calculate_grady_tamdar.inc
+      da/da_tamdar/da_check_max_iv_tamdar.inc
+      da/da_tamdar/da_get_innov_vector_tamdar.inc
+      da/da_tamdar/da_jo_and_grady_tamdar.inc
+      da/da_tamdar/da_jo_tamdar_uvtq.inc
+      da/da_tamdar/da_oi_stats_tamdar.inc
+      da/da_tamdar/da_print_stats_tamdar.inc
+      da/da_tamdar/da_residual_tamdar.inc
+      da/da_tamdar/da_tamdar.f90
+      da/da_tamdar/da_transform_xtoy_tamdar.inc
+      da/da_tamdar/da_transform_xtoy_tamdar_adj.inc
+5. da_minimisation
+      da/da_minimisation/da_calculate_grady.inc
+      da/da_minimisation/da_calculate_residual.inc
+      da/da_minimisation/da_minimisation.f90
+      da/da_minimisation/da_get_innov_vector.inc
+      da/da_minimisation/da_get_var_diagnostics.inc
+      da/da_minimisation/da_jo_and_grady.inc
+      da/da_minimisation/da_write_diagnostics.inc
+ 6. control/regestry/compile
+      da/da_control/da_control.f90
+      Registry/Registry.wrfvar
+      da/Makefile
+      build/da.make
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+\frametitle{How to add a new observation in WRFDA, cont'd}
+\tiny{
+\begin{verbatim}
+7. da_test
+      da/da_test/da_check_xtoy_adjoint_tamdar.inc
+      da/da_test/da_test.f90
+      da/da_test/da_check_xtoy_adjoint.inc
+      da/da_test/da_get_y_lhs_value.inc
+8. obsproc
+      obsproc/src/3dvar_obs.F90
+      obsproc/src/fm_decoder.F90
+      obsproc/src/sort_platform.F90
+      obsproc/src/module_decoded.F90
+      obsproc/src/module_write.F90
+      obsproc/src/module_complete.F90
+      obsproc/src/module_duplicate.F90
+      obsproc/src/platform_interface.inc
+      obsproc/src/module_namelist.F90
+      obsproc/src/module_err_afwa.F90
+      obsproc/src/module_per_type.F90
+      obsproc/src/module_qc.F90
+      Registry/Registry.wrfvar
+tamdar_sfc
+      da/da_define_structures/da_define_structures.f90
+      da/da_control/da_control.f90
+      da/da_define_structures/da_allocate_y.inc
+      da/da_define_structures/da_deallocate_observations.inc
+      da/da_define_structures/da_deallocate_y.inc
+      da/da_define_structures/da_zero_y.inc
+\end{verbatim}
+}
+\end{frame}
+
 
 \fst{Quick Start}{
 \begin{itemize}

@@ -68,9 +68,9 @@
 \frametitle{Current Status}
 \begin{itemize}
 	\item This presentation reports the status of the development of GSI-based WRF 4D Var as implemented in Boulder's version of May 2011\pause
-	\item The Major development in GSI had finished, GSI codes has been coupled with the WRF tangent linear and adjoint model \pause
 	\item The WRF tangent linear and adjoint codes V3.3 (hereafter, WRFPLUS V3.3)  has been re-written from scratch to be consistent with the latest WRF repository codes \pause
-	\item Because the parallelization of the latest WRFPLUS V3.3 is still on going, only 1 processor parallel run is doable at this moment
+	\item The Major development in GSI had finished, GSI codes has been coupled with the WRF tangent linear and adjoint model \pause
+	\item Because the parallelization of the latest WRFPLUS V3.3 is still on going, only 1 processor parallel run is allowed at this moment
 	\end{itemize}
 }
 
@@ -83,7 +83,7 @@
    	\item Re-developed WRF adjoint and tangent linear codes from scratch based on the latest WRF repository codes. \pause
 	\item Testing the code on various  platforms and compilers ( IBM, Linux, Mac : xlf, g95, pgi, intel, gfortran). \pause
 	\item Adding capability to do tangent linear check and adjoint test over any length of time window. \pause 
-	\item Adding option to control if all inputs and outputs were happen in disk or memory, so WRFPLUS V3.3 can be used as a standalone tool or as a component in 4D-Var system.
+	\item Adding option to control where are the inputs and outputs (disk or memory), so WRFPLUS V3.3 can be used as a standalone tool or as a component in 4D-Var system.
 \end{itemize}
 }
 
@@ -130,8 +130,9 @@ Adjoint identity:
 \frametitle{Modification in GSI}
 \begin{itemize}
 	\item Modified the capabilities to read and process multiple first guess and process obs. data for multiple time slots \pause
-	\item Added a new module which serves the hub between GSI and WRFPLUS V3.3 \pause
-	\item Added WRF TL/AD subroutines callable interfaces in model\_tl and model\_ad \pause
+	\item Added a new module which served as a coupler between GSI and WRFPLUS V3.3 \pause
+	\item WRF tangent linear and adjoint models are compiled as a library and callable subroutines. \pause
+	\item Added subroutine interfaces in model\_tl and model\_ad to call WRF tangent linear and adjoint model directly.\pause
 	\item Added capability to do adjoint test with WRF AD/TL.
 \end{itemize}
 }
