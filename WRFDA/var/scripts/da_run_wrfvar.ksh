@@ -267,6 +267,17 @@ fi
 
 if [[ -f $ADJOINT_SENSITIVITY ]]; then
    ln -fs $ADJOINT_SENSITIVITY "gr01"
+   export NL_USE_LANCZOS=true
+   export NL_ADJ_SENS=true
+   export NL_ANALYSIS_TYPE=QC-OBS
+   export NL_SENSITIVITY_OPTION=0
+   export NL_AUXINPUT17_INNAME="./gr01"
+   export NL_IO_FORM_AUXINPUT17=2
+   export NL_IOFIELDS_FILENAME="${WRFVAR_DIR}/var/run/fso.io_config"
+   if [[ -f $SUITE_DIR/$DATE/wrfvar/lanczos_eigenpairs* ]]; then
+      cp $SUITE_DIR/$DATE/wrfvar/lanczos_eigenpairs* $RUN_DIR
+      export NL_READ_LANCZOS=true
+   fi
 fi
 
 export RADIANCE_INFO_DIR=${RADIANCE_INFO_DIR:-$WRFVAR_DIR/var/run/radiance_info}

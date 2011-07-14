@@ -244,26 +244,10 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       export FCST_RANGE=$FCST_RANGE_SAVE
    fi
 
-   if $RUN_TL_TEST; then
-      export RUN_DIR=$SUITE_DIR/$DATE/tltest
-      export NL_WRFVAR_MEM_MODEL=2
-      mkdir -p $RUN_DIR
-
-      $SCRIPTS_DIR/da_trace.ksh da_run_tltest $RUN_DIR
-      $SCRIPTS_DIR/da_run_tltest.ksh > $RUN_DIR/index.html 2>&1
-      RC=$?
-      if [[ $? != 0 ]]; then
-         echo $(date) "${ERR}tltest failed with error $RC$END"
-         echo tltest > FAIL
-         break
-      fi
-   fi
-
-   if $RUN_ADJ_SENS; then
+   if $RUN_ADJ_SENS || $RUN_TL_TEST; then
       export RUN_DIR=$SUITE_DIR/$DATE/sensitivity
       export NL_ADJ_SENS=true
       mkdir -p $RUN_DIR
-
       $SCRIPTS_DIR/da_trace.ksh da_run_sensitivity $RUN_DIR
       $SCRIPTS_DIR/da_run_sensitivity.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
@@ -272,16 +256,6 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          echo sensitivity > FAIL
          break
       fi
-   fi
-
-   if $RUN_OBS_IMPACT; then
-      export RUN_WRFVAR=true
-      export NL_USE_LANCZOS=true
-      export NL_ADJ_SENS=true
-      export NL_ANALYSIS_TYPE=QC-OBS
-      export NL_SENSITIVITY_OPTION=0
-      export NL_WRFVAR_MEM_MODEL=2
-      export ADJOINT_SENSITIVITY=$SUITE_DIR/$DATE/sensitivity/ad_d01_$DATE
    fi
    
    if $RUN_GSI; then
@@ -316,9 +290,13 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
  
     fi
 
-   if $RUN_WRFVAR; then
-      export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
-      if $RUN_OBS_IMPACT; then export RUN_DIR=$SUITE_DIR/$DATE/obsimpact; fi
+   if $RUN_WRFVAR || $RUN_OBS_IMPACT; then
+      if $RUN_OBS_IMPACT; then 
+         export RUN_DIR=$SUITE_DIR/$DATE/obsimpact
+         export ADJOINT_SENSITIVITY=$SUITE_DIR/$DATE/sensitivity/ad_d01_$DATE
+      else
+         export RUN_DIR=$SUITE_DIR/$DATE/wrfvar
+      fi
       mkdir -p $RUN_DIR
 
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/${FILE_TYPE}_d01
@@ -331,17 +309,13 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
       export EP_DIR=$FC_DIR/$DATE/ep
       export DA_ANALYSIS=$FC_DIR/$DATE/${FILE_TYPE}_d01
       
-      if [[ ${DA_VARBC_IN:+1} = 1 ]]; then
-         if [[ -f $DA_VARBC_IN ]]; then
-               if  [[ -f ${SUITE_DIR}/${VARBC_PREV_DATE}/wrfvar/VARBC.out ]]; then
-	          export DA_VARBC_IN=${SUITE_DIR}/${VARBC_PREV_DATE}/wrfvar/VARBC.out
-               else
-                  if [[ $CYCLE_NUMBER -gt 0 ]]; then
-                     echo $(date) "VARBC failed to find VARBC.in file"
-                     echo varbc > FAIL
-                     break
-                  fi
-	       fi
+      if $NL_USE_VARBC; then
+         if  [[ -f ${SUITE_DIR}/${VARBC_PREV_DATE}/wrfvar/VARBC.out ]]; then
+	    export DA_VARBC_IN=${SUITE_DIR}/${VARBC_PREV_DATE}/wrfvar/VARBC.out
+         elif [[ $CYCLE_NUMBER -gt 0 ]]; then
+            echo $(date) "VARBC failed to find VARBC.in file"
+            echo varbc > FAIL
+            break
          fi
       fi
 

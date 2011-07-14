@@ -43,7 +43,6 @@ if [[ $WRF_CONF == "" ]]; then
    export EXEC_FILE="wrf.exe"   
 else
    export NL_HISTORY_INTERVAL=60
-   export NL_FRAMES_PER_AUXHIST2=1
    
    let TIME_STEP_MINUTE=$NL_TIME_STEP/60
    if [[ -f $WORK_DIR/namelist.input ]];  then rm -rf $WORK_DIR/namelist.input;  fi
@@ -51,22 +50,30 @@ else
    
 #----- WRFNL -----
    if   [[ $WRF_CONF == "NL" ]]; then
-      export EXEC_DIR=$WRF_DIR
+      
+      export EXEC_DIR=$WRFPLUS_DIR
       export EXEC_FILE="wrf.exe"
-      export NL_INPUT_OUTNAME="./nl_d<domain>_<date>"
+      export NL_DYN_OPT=2
+      export NL_TRAJECTORY_IO=false
+      ln -fs $EXEC_DIR/run/RRTM_DATA_DBL RRTM_DATA
+      ln -fs $EXEC_DIR/run/ETAMPNEW_DATA_DBL ETAMPNEW_DATA
       export NL_WRITE_INPUT=false
-      export NL_AUXHIST2_OUTNAME="./auxhist2_d<domain>_<date>"
-      export NL_AUXHIST2_BEGIN_H=0
-      export NL_AUXHIST2_END_H=$FCST_RANGE
-      export NL_AUXHIST2_INTERVAL=$TIME_STEP_MINUTE
-      export NL_IO_FORM_AUXHIST2=2
-      export NL_IOFIELDS_FILENAME="${DAT_DIR}/trajectory.io_config"
+      export NL_AUXHIST6_OUTNAME="./auxhist6_d<domain>_<date>"
+      export NL_AUXHIST6_BEGIN_H=0
+      export NL_AUXHIST6_END_H=$FCST_RANGE
+      export NL_AUXHIST6_INTERVAL=$TIME_STEP_MINUTE
+      export NL_IO_FORM_AUXHIST6=2
+      export NL_FRAMES_PER_AUXHIST6=1
+
+      export NL_IOFIELDS_FILENAME="${WRFVAR_DIR}/var/run/plus.io_config"
       export NL_IGNORE_IOFIELDS_WARNING=true
+
+      unset NL_INPUT_OUTNAME
 
 #----- WRFPLUS -----
    else
       export EXEC_DIR=$WRFPLUS_DIR
-      export EXEC_FILE="wrfplus.exe"
+      export EXEC_FILE="wrf.exe"
       if [[ $NUM_PROCS -gt 1 ]]; then touch wrf_go_ahead; fi
       if [[ -d wrf_done ]]; then rm wrf_done; fi
       if [[ -d wrf_stop_now ]]; then rm wrf_stop_now; fi
@@ -74,24 +81,55 @@ else
       if [[ $WRF_CONF == "TL" ]]; then 
          export NL_INPUT_OUTNAME="./tl_d<domain>_<date>"
          export NL_DYN_OPT=202
+         export NL_IO_FORM_AUXINPUT6=2
+         export NL_AUXINPUT6_INNAME="./auxhist6_d<domain>_<date>"
+         export NL_AUXINPUT6_INTERVAL=$TIME_STEP_MINUTE
+         export NL_FRAMES_PER_AUXINPUT6=1
+         export NL_IOFIELDS_FILENAME="${WRFVAR_DIR}/var/run/plus.io_config"
+         export NL_IGNORE_IOFIELDS_WARNING=true
+         export NL_TRAJECTORY_IO=false
+         export NL_WRITE_INPUT=false
+         export NL_IO_FORM_AUXHIST8=2
+         export NL_FRAMES_PER_AUXHIST8=1
+         export NL_AUXHIST8_OUTNAME="./tl_d<domain>_<date>"
+         let NL_AUXHIST8_INTERVAL_S=3600
+         export NL_FRAMS_PER_AUXHIS8=1
+         unset NL_HISTORY_INTERVAL
+
       elif [[ $WRF_CONF == "AD" ]]; then 
          export NL_INPUT_OUTNAME="./ad_d<domain>_<date>"
          export NL_DYN_OPT=302
       fi	
       if [[ $WRF_CONF == "AD" ]]; then 
-         export NL_AUXINPUT3_INNAME="./wrfout_d<domain>_<date>" #"./auxinput3_d<domain>_<date>"
-         let NL_AUXINPUT3_INTERVAL_S=$FCST_RANGE*3600      
-         export NL_INPUTOUT_INTERVAL_S=3600 
-         export NL_AUXINPUT2_BEGIN_S=0 
-         let NL_AUXINPUT2_END_S=$FCST_RANGE*3600
-         export NL_INTERVAL_SECONDS=3600
-         export NL_IO_FORM_AUXINPUT3=2
+       
+         export NL_IO_FORM_AUXINPUT6=2
+         export NL_AUXINPUT6_INNAME="./auxhist6_d<domain>_<date>"
+         export NL_AUXINPUT6_INTERVAL=$TIME_STEP_MINUTE
+         export NL_FRAMES_PER_AUXINPUT6=1
+         export NL_IO_FORM_AUXINPUT7=2
+         export NL_AUXINPUT7_INNAME="./wrfout_d<domain>_<date>" 
+         let NL_AUXINPUT7_INTERVAL_S=$FCST_RANGE*3600
+         export NL_IO_FORM_AUXHIST7=2
+         export NL_FRAMES_PER_AUXHIST7=1
+         export NL_FRAMES_PER_AUXINPUT7=1
+         export NL_AUXHIST7_OUTNAME="./ad_d<domain>_<date>"
+         let NL_AUXHIST7_INTERVAL_S=$FCST_RANGE*3600
+         export NL_FRAMS_PER_AUXHIS7=1
+         export NL_IOFIELDS_FILENAME="${WRFVAR_DIR}/var/run/plus.io_config"
+         export NL_IGNORE_IOFIELDS_WARNING=true
+         export NL_WRITE_INPUT=false
+         export NL_TRAJECTORY_IO=false
+         
+         unset NL_INPUTOUT_BEGIN_H
+         unset NL_INPUTOUT_END_H
+         unset NL_INPUTOUT_INTERVAL
+         unset NL_HISTORY_INTERVAL
+         unset NL_INPUT_OUTNAME
+         unset NL_FRAMES_PER_OUTFILE
+
       else
          export NL_INPUTOUT_INTERVAL=60	 
       fi
-      export NL_AUXINPUT2_INNAME="./auxhist2_d<domain>_<date>"
-      export NL_AUXINPUT2_INTERVAL=$TIME_STEP_MINUTE
-      export NL_IO_FORM_AUXINPUT2=2
 
       export NL_NPROC_X=0            # Parallelization
       export NL_MP_PHYSICS=0         # Physics
