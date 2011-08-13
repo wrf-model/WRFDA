@@ -31,10 +31,26 @@ begin
    var4="rh"
    filename4 = "fort.186"
 
+   var5="qcloud"
+   filename5="fort.190"
+
+   var6="qrain"
+   filename6="fort.194"
+
+   var7="qice"
+   filename7 = "fort.198"
+
+   var8="qsnow"
+   filename8 = "fort.202"
+
    data1=asciiread(dir+"/"+filename1,(/nrow,ncol/),"float")
    data2=asciiread(dir+"/"+filename2,(/nrow,ncol/),"float")
    data3=asciiread(dir+"/"+filename3,(/nrow,ncol/),"float")
    data4=asciiread(dir+"/"+filename4,(/nrow,ncol/),"float")
+   data5=asciiread(dir+"/"+filename5,(/nrow,ncol/),"float")
+   data6=asciiread(dir+"/"+filename6,(/nrow,ncol/),"float")
+   data7=asciiread(dir+"/"+filename7,(/nrow,ncol/),"float")
+   data8=asciiread(dir+"/"+filename8,(/nrow,ncol/),"float")
 
    ;************************************************
    ; plotting parameters
@@ -74,7 +90,7 @@ begin
    res@pmLegendWidthF         = 0.2                 ; Change width and
    res@pmLegendHeightF        = 0.2                 ; height of legend.
 
-   plts                      = new (4,"graphic")
+   plts                      = new (8,"graphic")
 
    res@gsnDraw               = False            ; (a) do not draw
    res@gsnFrame              = False            ; (b) do not advance 'frame'
@@ -115,13 +131,57 @@ begin
    res@tiMainString     = var4         ; add title
    plts(3) = gsn_csm_xy (wks,x,y,res) ; create plot
 
+
+   y(:)   = data5(:,0)
+   x(0,:) = data5(:,1)
+   x(1,:) = data5(:,2)
+   x(2,:) = data5(:,3)
+   x(3,:) = data5(:,4)
+   x(4,:) = data5(:,5)
+   res@tiMainString     = var5         ; add title
+   plts(4) = gsn_csm_xy (wks,x,y,res) ; create plot
+
+   y(:)   = data6(:,0)
+   x(0,:) = data6(:,1)
+   x(1,:) = data6(:,2)
+   x(2,:) = data6(:,3)
+   x(3,:) = data6(:,4)
+   x(4,:) = data6(:,5)
+   res@tiMainString     = var6         ; add title
+   plts(5) = gsn_csm_xy (wks,x,y,res) ; create plot
+
+   y(:)   = data7(:,0)
+   x(0,:) = data7(:,1)
+   x(1,:) = data7(:,2)
+   x(2,:) = data7(:,3)
+   x(3,:) = data7(:,4)
+   x(4,:) = data7(:,5)
+   res@tiMainString     = var7         ; add title
+   plts(6) = gsn_csm_xy (wks,x,y,res) ; create plot
+
+   y(:)   = data8(:,0)
+   x(0,:) = data8(:,1)
+   x(1,:) = data8(:,2)
+   x(2,:) = data8(:,3)
+   x(3,:) = data8(:,4)
+   x(4,:) = data8(:,5)
+   res@tiMainString     = var8         ; add title
+   plts(7) = gsn_csm_xy (wks,x,y,res) ; create plot
+
+   ;************************************************
    ;************************************************
    ; create panel: panel plots have their own set of resources
    ;************************************************
-    resP                  = True                   ; modify the panel plot
-   ;  resP@txString         = directory
-   ; resP@gsnMaximize      = True                   ; maximize panel area
-   resP@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
-   gsn_panel(wks,plts,(/2,2/),resP)               ; now draw as one plot
+    resP1                  = True                   ; modify the panel plot
+   ;  resP1@txString         = directory
+   ; resP1@gsnMaximize      = True                   ; maximize panel area
+   resP1@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
+   gsn_panel(wks,plts(0:3),(/2,2/),resP1)               ; now draw as one plot
+
+    resP2                  = True                   ; modify the panel plot
+   ;  resP2@txString         = directory
+   ; resP2@gsnMaximize      = True                   ; maximize panel area
+   resP2@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
+   gsn_panel(wks,plts(4:7),(/2,2/),resP2)               ; now draw as one plot
 
 end

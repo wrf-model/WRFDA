@@ -30,12 +30,13 @@ program gen_be_stage0_wrf
    integer :: gen_be_iunit, gen_be_ounit
 
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
+   real   , parameter    :: rsmall = 10.0e-30          ! small number to assign with hydrometeor 
 
    character (len=filename_len)   :: filestub                  ! General filename stub.
    character (len=filename_len)   :: input_file                ! Input file. 
    character (len=filename_len)   :: output_file               ! Output file. 
    character (len=10)    :: date                      ! Character date.
-   character (len=10)    :: var                       ! Variable to search for.
+   character (len=12)    :: var                       ! Variable to search for.
    character (len=3)     :: be_method                 ! "NMC" or "ENS".
    character (len=3)     :: cne                       ! Ensemble size.
    character (len=3)     :: ce                        ! Member index -> character.
@@ -91,6 +92,10 @@ program gen_be_stage0_wrf
    real, allocatable     :: chi(:,:,:)                ! Velocity Potential.
    real, allocatable     :: temp(:,:,:)               ! Temperature.
    real, allocatable     :: rh(:,:,:)                 ! Relative humidity.
+   real, allocatable     :: qcloud(:,:,:)             ! Cloud Water mixing ratio
+   real, allocatable     :: qrain(:,:,:)              ! Cloud Rain  mixing ratio
+   real, allocatable     :: qice(:,:,:)               ! Cloud Ice   mixing ratio
+   real, allocatable     :: qsnow(:,:,:)              ! Cloud Snow  mixing ratio
    real, allocatable     :: psfc(:,:)                 ! Surface pressure.
    real, allocatable     :: height(:,:,:)             ! Height.
    real, allocatable     :: psi_mean(:,:,:)           ! Streamfunction.
@@ -98,6 +103,10 @@ program gen_be_stage0_wrf
    real, allocatable     :: temp_mean(:,:,:)          ! Temperature.
    real, allocatable     :: rh_mean(:,:,:)            ! Relative humidity.
    real, allocatable     :: psfc_mean(:,:)            ! Surface pressure.
+   real, allocatable     :: qcloud_mean(:,:,:)        ! Cloud Water mixing ratio
+   real, allocatable     :: qrain_mean(:,:,:)         ! Cloud Rain  mixing ratio
+   real, allocatable     :: qice_mean(:,:,:)          ! Cloud Ice   mixing ratio
+   real, allocatable     :: qsnow_mean(:,:,:)         ! Cloud Snow  mixing ratio
 
 
    stderr = 0
@@ -198,17 +207,30 @@ program gen_be_stage0_wrf
    allocate( rh(1:dim1,1:dim2,1:dim3) )
    allocate( psfc(1:dim1,1:dim2) )
    allocate( height(1:dim1,1:dim2,1:dim3) )
+   allocate( qcloud(1:dim1,1:dim2,1:dim3) )
+   allocate( qrain(1:dim1,1:dim2,1:dim3) )
+   allocate( qice(1:dim1,1:dim2,1:dim3) )
+   allocate( qsnow(1:dim1,1:dim2,1:dim3) )
 
    allocate( psi_mean(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
    allocate( chi_mean(1:dim1,1:dim2,1:dim3) )
    allocate( temp_mean(1:dim1,1:dim2,1:dim3) )
    allocate( rh_mean(1:dim1,1:dim2,1:dim3) )
    allocate( psfc_mean(1:dim1,1:dim2) )
+   allocate( qcloud_mean(1:dim1,1:dim2,1:dim3) ) 
+   allocate( qrain_mean(1:dim1,1:dim2,1:dim3) ) 
+   allocate( qice_mean(1:dim1,1:dim2,1:dim3) ) 
+   allocate( qsnow_mean(1:dim1,1:dim2,1:dim3) ) 
+
    psi_mean = 0.0
    chi_mean = 0.0
    temp_mean = 0.0
    rh_mean = 0.0
    psfc_mean = 0.0
+   qcloud_mean = 0.0
+   qrain_mean = 0.0
+   qice_mean = 0.0
+   qsnow_mean = 0.0
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [3] Convert WRF forecast fields to standard fields and output' 
@@ -260,6 +282,7 @@ program gen_be_stage0_wrf
             call da_sor( dim1, dim2, ds, div, chi2d )
          end if
 
+
          if ( test_inverse .and. k == ktest .and. member == 1 ) then
             call da_test_inverse( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
                                   n1, n2, fft_method, ifax1, ifax2, trigs1, trigs2, fft_coeffs, &
@@ -274,6 +297,8 @@ program gen_be_stage0_wrf
                                      psi2d(i,j+1) + psi2d(i+1,j+1) )
             end do
          end do
+! rizvi fix for chi Southern zero value boundary
+         chi2d(:,1) = chi2d(:,2) 
          chi(:,:,k) = chi2d(:,:)
 
 !        Read mass fields, and convert to T and rh:
@@ -282,7 +307,36 @@ program gen_be_stage0_wrf
          temp(:,:,k) = temp2d(:,:)
          rh(:,:,k) = 0.01 * rh2d(:,:) ! *0.01 to conform with WRF-Var units.
 
+         var = "QCLOUD"
+         call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, temp2d )
+         qcloud(:,:,k) = temp2d(:,:)/ (1.0 + temp2d(:,:))
+
+         var = "QRAIN"
+         call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, temp2d )
+         qrain(:,:,k) = temp2d(:,:)/ (1.0 + temp2d(:,:))
+
+         var = "QICE"
+         call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, temp2d )
+         qice(:,:,k) = temp2d(:,:)/ (1.0 + temp2d(:,:))
+
+         var = "QSNOW"
+         call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, temp2d )
+         qsnow(:,:,k) = temp2d(:,:)/ (1.0 + temp2d(:,:))
+
       end do
+! Make sure that Cloud hydrometeor are non-negative
+      where(qcloud(:,:,:).le.0.0)
+         qcloud(:,:,:)=rsmall
+      end where
+      where(qsnow(:,:,:).le.0.0)
+         qsnow(:,:,:)=rsmall
+      end where
+      where(qice(:,:,:).le.0.0)
+         qice(:,:,:)=rsmall
+      end where
+      where(qrain(:,:,:).le.0.0)
+         qrain(:,:,:)=rsmall
+      end where
 
       call da_get_height( input_file, dim1, dim2, dim3, height )
 
@@ -298,9 +352,14 @@ program gen_be_stage0_wrf
       write(gen_be_ounit)chi
       write(gen_be_ounit)temp
       write(gen_be_ounit)rh
+      write(gen_be_ounit)qcloud
+      write(gen_be_ounit)qrain  
+      write(gen_be_ounit)qice   
+      write(gen_be_ounit)qsnow  
       write(gen_be_ounit)psfc
       write(gen_be_ounit)height
       write(gen_be_ounit)xlat
+      write(gen_be_ounit)mapfac_m
       close(gen_be_ounit)
 
 !     Calculate accumulating mean:
@@ -310,6 +369,10 @@ program gen_be_stage0_wrf
       chi_mean = ( real( member-1 ) * chi_mean + chi ) * member_inv
       temp_mean = ( real( member-1 ) * temp_mean + temp ) * member_inv
       rh_mean = ( real( member-1 ) * rh_mean + rh ) * member_inv
+      qcloud_mean = ( real( member-1 ) * qcloud_mean + qcloud ) * member_inv
+      qrain_mean = ( real( member-1 ) * qrain_mean + qrain ) * member_inv
+      qice_mean = ( real( member-1 ) * qice_mean + qice ) * member_inv
+      qsnow_mean = ( real( member-1 ) * qsnow_mean + qsnow  ) * member_inv
       psfc_mean = ( real( member-1 ) * psfc_mean + psfc ) * member_inv
 
    end do
@@ -338,9 +401,14 @@ program gen_be_stage0_wrf
       read(gen_be_iunit)chi
       read(gen_be_iunit)temp
       read(gen_be_iunit)rh
+      read(gen_be_iunit)qcloud 
+      read(gen_be_iunit)qrain  
+      read(gen_be_iunit)qice  
+      read(gen_be_iunit)qsnow  
       read(gen_be_iunit)psfc
       read(gen_be_iunit)height
       read(gen_be_iunit)xlat
+      read(gen_be_iunit)mapfac_m
       close(gen_be_iunit)
       call da_free_unit(gen_be_iunit)
 
@@ -352,9 +420,14 @@ program gen_be_stage0_wrf
       read(gen_be_iunit)chi_mean
       read(gen_be_iunit)temp_mean
       read(gen_be_iunit)rh_mean
+      read(gen_be_iunit)qcloud_mean 
+      read(gen_be_iunit)qrain_mean  
+      read(gen_be_iunit)qice_mean  
+      read(gen_be_iunit)qsnow_mean  
       read(gen_be_iunit)psfc_mean
       read(gen_be_iunit)height
       read(gen_be_iunit)xlat
+      read(gen_be_iunit)mapfac_m
       close(gen_be_iunit)
 
 !     Take forecast difference:
@@ -362,6 +435,10 @@ program gen_be_stage0_wrf
       chi = chi - chi_mean
       temp = temp - temp_mean
       rh  = rh - rh_mean
+      qcloud  = qcloud - qcloud_mean
+      qsnow   = qsnow  - qsnow_mean
+      qice   = qice  - qice_mean
+      qrain   = qrain  - qrain_mean
       psfc = psfc - psfc_mean
 
 !     Write out NMC-method standard perturbations:
@@ -372,9 +449,14 @@ program gen_be_stage0_wrf
       write(gen_be_ounit)chi
       write(gen_be_ounit)temp
       write(gen_be_ounit)rh
+      write(gen_be_ounit)qcloud
+      write(gen_be_ounit)qrain
+      write(gen_be_ounit)qice
+      write(gen_be_ounit)qsnow 
       write(gen_be_ounit)psfc
       write(gen_be_ounit)height
       write(gen_be_ounit)xlat
+      write(gen_be_ounit)mapfac_m
       close(gen_be_ounit)
 
 !     Restore mean (1 member only for NMC-method):
@@ -382,6 +464,10 @@ program gen_be_stage0_wrf
       chi_mean = chi
       temp_mean = temp
       rh_mean  = rh
+      qcloud_mean  = qcloud
+      qrain_mean  = qrain
+      qice_mean  = qice
+      qsnow_mean  = qsnow
       psfc_mean = psfc
 
    else ! be_method = "ENS"
@@ -399,17 +485,25 @@ program gen_be_stage0_wrf
          read(gen_be_iunit)chi
          read(gen_be_iunit)temp
          read(gen_be_iunit)rh
+         read(gen_be_iunit)qcloud 
+         read(gen_be_iunit)qrain  
+         read(gen_be_iunit)qice  
+         read(gen_be_iunit)qsnow  
          read(gen_be_iunit)psfc
          read(gen_be_iunit)height
          read(gen_be_iunit)xlat
+         read(gen_be_iunit)mapfac_m
          close(gen_be_iunit)
 
          psi = psi - psi_mean
          chi = chi - chi_mean
          temp = temp - temp_mean
          rh  = rh - rh_mean
+         qcloud  = qcloud - qcloud_mean
+         qsnow   = qsnow  - qsnow_mean
+         qice   = qice  - qice_mean
+         qrain   = qrain  - qrain_mean
          psfc = psfc - psfc_mean
-
 !        Write out standard perturbations for this member:
          output_file = 'pert.'//date(1:10)//'.e'//ce  
          open (gen_be_ounit, file = output_file, form='unformatted')
@@ -418,9 +512,14 @@ program gen_be_stage0_wrf
          write(gen_be_ounit)chi
          write(gen_be_ounit)temp
          write(gen_be_ounit)rh
+         write(gen_be_ounit)qcloud
+         write(gen_be_ounit)qrain
+         write(gen_be_ounit)qice
+         write(gen_be_ounit)qsnow 
          write(gen_be_ounit)psfc
-         write(gen_be_ounit)height ! Full height
-         write(gen_be_ounit)xlat   ! Full latitude
+         write(gen_be_ounit)height     ! Full height
+         write(gen_be_ounit)xlat       ! Full latitude
+         write(gen_be_ounit)mapfac_m   ! Map factor 
          close(gen_be_ounit)
       end do
 
@@ -452,6 +551,30 @@ program gen_be_stage0_wrf
    write(gen_be_ounit)rh_mean
    close(gen_be_ounit)
 
+   output_file = 'qcloud/'//date(1:10)//'.qcloud.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)qcloud_mean
+   close(gen_be_ounit)
+
+   output_file = 'qrain/'//date(1:10)//'.qrain.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)qrain_mean
+   close(gen_be_ounit)
+
+   output_file = 'qice/'//date(1:10)//'.qice.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)qice_mean
+   close(gen_be_ounit)
+
+   output_file = 'qsnow/'//date(1:10)//'.qsnow.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)qsnow_mean
+   close(gen_be_ounit)
+
    output_file = 'ps/'//date(1:10)//'.ps.mean'
    open (gen_be_ounit, file = output_file, form='unformatted')
    write(gen_be_ounit)dim1, dim2, dim3
@@ -465,10 +588,15 @@ program gen_be_stage0_wrf
    deallocate( psfc )
    deallocate( height )
    deallocate( xlat )
+   deallocate( mapfac_m )
    deallocate( psi_mean )
    deallocate( chi_mean )
    deallocate( temp_mean )
    deallocate( rh_mean )
+   deallocate( qcloud_mean )
+   deallocate( qrain_mean )
+   deallocate( qice_mean )
+   deallocate( qsnow_mean )
    deallocate( psfc_mean )
 
 CONTAINS

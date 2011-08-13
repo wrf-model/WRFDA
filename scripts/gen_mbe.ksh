@@ -129,7 +129,7 @@ if $RUN_GEN_BE_STAGE2; then
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     ne = ${NE},
-    cv_options   = ${NL_CV_OPTIONS},
+    cv_options   = ${CV_OPTIONS},
     testing_eofs = ${TESTING_EOFS},
     num_passes = ${NUM_PASSES},
     rf_scale = ${RF_SCALE} /
@@ -240,7 +240,7 @@ if $RUN_GEN_BE_DIAGS; then
 
    cat > gen_be_diags_nl.nl << EOF
 &gen_be_diags_nl
-   cv_options = ${NL_CV_OPTIONS},
+   cv_options = ${CV_OPTIONS},
    uh_method = '${UH_METHOD}',
    n_smth_sl = ${N_SMTH_SL}, /
 EOF

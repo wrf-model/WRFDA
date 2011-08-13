@@ -25,7 +25,7 @@ program gen_be_ep2
    character (len=filename_len)   :: input_file                ! Input file. 
    character (len=filename_len)   :: output_file               ! Output file. 
    character (len=10)    :: date                      ! Character date.
-   character (len=10)    :: var                       ! Variable to search for.
+   character (len=12)    :: var                       ! Variable to search for.
    character (len=3)     :: cne                       ! Ensemble size.
    character (len=3)     :: ce                        ! Member index -> character.
 

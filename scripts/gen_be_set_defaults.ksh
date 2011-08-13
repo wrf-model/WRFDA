@@ -27,6 +27,7 @@ export RUN_GEN_BE_STAGE3=${RUN_GEN_BE_STAGE3:-false} # Run stage 3 (Vertical Cov
 export RUN_GEN_BE_STAGE4=${RUN_GEN_BE_STAGE4:-false} # Run stage 4 (Horizontal Covariances).
 export RUN_GEN_BE_DIAGS=${RUN_GEN_BE_DIAGS:-false}   # Run gen_be diagnostics.
 export RUN_GEN_BE_DIAGS_READ=${RUN_GEN_BE_DIAGS_READ:-false}   # Run gen_be diagnostics_read.
+export RUN_GEN_BE_HOLM_VARIANCE=${RUN_GEN_BE_HOLM_VARIANCE:-false}   # Run gen_be holm Variance     
 export RUN_GEN_BE_MULTICOV=${RUN_GEN_BE_MULTICOV:-false} # Set to calculate multivariate correlations.
 export RUN_GEN_BE_GRAPHICS=${RUN_GEN_BE_GRAPHICS:-false} # Set to produce graphics.
 #export RUN_GEN_BE_HISTOG=${RUN_GEN_BE_HISTOG:-false} # Set to calculate Hitograms for MBE          
@@ -67,6 +68,7 @@ export N_SMTH_SL=${N_SMTH_SL:-2}                     # Amount of lengthscale smo
 export STRIDE=${STRIDE:-1}                           # Calculate correlation evert STRIDE point (stage4 regional).
 export NBINS=${NBINS:-1}                             # Number of latitude bins for length scale computation
 export IBIN=${IBIN:-1}                               # Index of latitude bin to compute length scale for
+export SL_METHOD=${SL_METHOD:-1}                     # Sl method =1 (Gaussian curve fitting) =2 (Laplacian) 
 export TESTING_SPECTRAL=${TESTING_SPECTRAL:-.false.} # True if performing spectral tests.
 export LOCAL=${LOCAL:-true}                          # True if local machine.
 export NUM_JOBS=${NUM_JOBS:-1}                       # Number of jobs to run (stage4 regional)).
@@ -81,25 +83,45 @@ export VARIABLE2=${VARIABLE2:-chi}                # For cov3d
 export CLEAN=false
 export FILE_TYPE=${FILE_TYPE:-wrfout}
 export RESOLUTION_KM=${RESOLUTION_KM:-200.}
-export NL_CV_OPTIONS=${NL_CV_OPTIONS:-5}
+export CV_OPTIONS=${CV_OPTIONS:-5}
 export GRAPHIC_WORKS=${GRAPHIC_WORKS:-pdf}
 
+export MODEL=${MODEL:-WRF}
+export MASSCV=${MASSCV:-temp}
+export HUMCV=${HUMCV:-rh}
+export CUT=${CUT:-0}
+export BALPRES=${BALPRES:-purestats}
+export NOBALDIV=${NOBALDIV:-.false.}
+export VERTICAL_IP=${VERTICAL_IP:-0}              # Use inner product in EOF: 0=No, 1=Yes
+export HORIZVAR=${HORIZVAR:-covar}            # Variable to compute horizontal shape = 'covar' or 'correl'
+export HORIZFUNCT=${HORIZFUNCT:-gaus}             # Correlation function = 'gaus' or 'soar'
+export FILEPLEV=${FILEPLEV:-"/ptmp/rizvi/SUK_plevel.txt"}
+export FILETLEV=${FILETLEV:-"/ptmp/rizvi/SUK_tlevel.txt"}
+export UMRUN=${UMRUN:-Q1}
+export UMTAG=${UMTAG:-qwainga}
+export UM_NPOLE_LAT=${UM_NPOLE_LAT:-37.5}
+export UM_NPOLE_LON=${UM_NPOLE_LON:-177.5}
+export UM_LAT_SW_CORNER=${UM_LAT_SW_CORNER:--2.63}
+export UM_LON_SW_CORNER=${UM_LON_SW_CORNER:-357.8}
+export UM_DX_DEG=${UM_DX_DEG:-0.0135}
+
 # Directories:
-export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
-export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}  # gen_be code directory.
-export BUILD_DIR=${BUILD_DIR:-$GEN_BE_DIR/src}    # gen_be code build directory.
-export GRAPHICS_DIR=${GRAPHICS_DIR:-$GEN_BE_DIR/graphics} # gen_be NCL graphics directory.
-export DAT_DIR=${DAT_DIR:-${HOME}/data}           # Top-level data directory.
+export REL_DIR=${REL_DIR:-$HOME/trunk}                      # Directory containing codes.
+export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}            # gen_be code directory.
+export BUILD_DIR=${BUILD_DIR:-$GEN_BE_DIR/src}              # gen_be code build directory.
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE_DIR/scripts}      # gen_be scripts directory.
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$GEN_BE_DIR/graphics}   # gen_be NCL graphics directory.
+export DAT_DIR=${DAT_DIR:-${HOME}/data}                     # Top-level data directory.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/gen_be$BIN_TYPE} # Run dir.
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Working directory
 export STAGE0_DIR=${STAGE0_DIR:-$WORK_DIR/stage0} # Output for stage0.
-#export STAGE0_GSI_DIR=${STAGE0_GSI_DIR:-$EXP_DIR/stage0_gsi} # Output for GSI stage0.
-#export STAGE1_GSI_DIR=${STAGE1_GSI_DIR:-$EXP_DIR/stage1_gsi} # Output for GSI stage0.
-#export LESS_Q_FROM_TOP=${LESS_Q_FROM_TOP:-0}
-#export LAT_BINS_IN_DEG=${LAT_BINS_IN_DEG:-1.0}
+export STAGE0_GSI_DIR=${STAGE0_GSI_DIR:-$EXP_DIR/stage0_gsi} # Output for GSI stage0.
+export STAGE1_GSI_DIR=${STAGE1_GSI_DIR:-$EXP_DIR/stage1_gsi} # Output for GSI stage0.
+export LESS_LEVELS_FROM_TOP=${LESS_LEVELS_FROM_TOP:-0}
+export LAT_BINS_IN_DEG=${LAT_BINS_IN_DEG:-1.0}
 
 if $GLOBAL; then
    export UH_METHOD=power
@@ -107,7 +129,7 @@ else
    export UH_METHOD=scale
 fi
 
-if [[ $NL_CV_OPTIONS == 6 ]]; then
+if [[ $CV_OPTIONS == 6 ]]; then
 export CONTROL_VARIABLES=${CONTROL_VARIABLES:-" psi chi_u t_u rh_u ps_u "}
 export RUN_GEN_BE_STAGE2A=false
 else

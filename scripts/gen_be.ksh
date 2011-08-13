@@ -31,10 +31,24 @@ if [[ ! -d $STAGE0_DIR ]]; then mkdir -p $STAGE0_DIR; fi
 mkdir -p $WORK_DIR
 cd $WORK_DIR
 
+# List of standard variables:
+if [[ $MASSCV == "temp" ]]; then
+    STANDARD_VARIABLES="fullflds psi chi t rh ps"
+else
+    if [[ $BALPRES == "purestats" ]]; then
+        STANDARD_VARIABLES="fullflds psi chi p rh"
+    else
+        STANDARD_VARIABLES="fullflds psi chi p lbp rh"
+    fi
+fi
+for SV in $STANDARD_VARIABLES; do mkdir -p $SV; done
+
 # List of control variables:
-for SV in fullflds psi chi t rh ps; do mkdir -p $SV; done
 
 for CV in $CONTROL_VARIABLES; do mkdir -p $CV; done
+
+# quick add !--ym--!
+for CV in raincl qcloud qrain qsnow qice rh_psu rhm qcondm qcond vor div; do mkdir -p $CV; done
 
 #------------------------------------------------------------------------
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
@@ -51,10 +65,19 @@ if $RUN_GEN_BE_STAGE0; then
 
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
-   $SCRIPTS_DIR/gen_be_stage0_wrf.ksh
+
+   if [ $MODEL = "WRF" ]; then
+       $SCRIPTS_DIR/gen_be_stage0_wrf.ksh
+   elif [ $MODEL = "UM" ]; then
+       $SCRIPTS_DIR/gen_be_stage0_um.ksh
+   else
+       echo "Error in the model name" > $RUN_DIR/FAIL
+       exit 1
+   fi
+
    RC=$?
    if [[ $RC != 0 ]]; then
-      echo "Stage 0 for WRF failed with error" $RC
+      echo "Stage 0 for $MODEL failed with error" $RC
       echo "stage 0" > $RUN_DIR/FAIL
       exit 1
    fi
@@ -91,7 +114,12 @@ if $RUN_GEN_BE_STAGE1; then
     hgt_min = ${HGT_MIN},
     hgt_max = ${HGT_MAX},
     binwidth_hgt = ${BINWIDTH_HGT},
-    dat_dir = '${STAGE0_DIR}' /
+    dat_dir = '${STAGE0_DIR}',
+    masscv = '${MASSCV}',
+    balpres = '${BALPRES}',
+    vertical_ip =  ${VERTICAL_IP},
+    model = '${MODEL}',
+    N_holm_bins = ${N_HOLM_BINS}/
 EOF
 
    ./gen_be_stage1.exe > gen_be_stage1.log 2>&1
@@ -126,6 +154,9 @@ if $RUN_GEN_BE_STAGE2; then
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     ne = ${NE},
+    masscv = '${MASSCV}',
+    balpres = '${BALPRES}',
+    nobaldiv = ${NOBALDIV},
     testing_eofs = ${TESTING_EOFS} /
 EOF
 
@@ -161,7 +192,11 @@ if $RUN_GEN_BE_STAGE2A; then
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     ne = ${NE},
+    bin_type = ${BIN_TYPE},
+    cv_options = ${CV_OPTIONS},
     num_passes = ${NUM_PASSES},
+    masscv = '${MASSCV}',
+    balpres = '${BALPRES}',
     rf_scale = ${RF_SCALE} /
 EOF
 
@@ -313,46 +348,65 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_MULTICOV; then
-   # Calculate chi diagnostics:
-   export VARIABLE1=chi_u
-   export VARIABLE2=chi
 
+   export VARIABLE1=t
+   export VARIABLE2=rh
+   export HREF=2
+   
    $SCRIPTS_DIR/gen_be_cov3d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
-      echo "gen_be_cov3d (chi) failed with error" $RC
-      echo "gen_be_cov3d (chi)" > $RUN_DIR/FAIL
+      echo "gen_be_cov3d failed with error" $RC
+      echo "gen_be_cov3d " > $RUN_DIR/FAIL
       exit 1
    fi
 
-   # Calculate T diagnostics:
-   export VARIABLE1=t_u
-   export VARIABLE2=t
-
-   $SCRIPTS_DIR/gen_be_cov3d.ksh
-
-   RC=$?
-   if [[ $RC != 0 ]]; then
-      echo "gen_be_cov3d (T) failed with error" $RC
-      echo "gen_be_cov3d (T)" > $RUN_DIR/FAIL
-      exit 1
-   fi
-
-   # Calculate ps diagnostics:
-   export VARIABLE1=ps_u
-   export VARIABLE2=ps
-
-   $SCRIPTS_DIR/gen_be_cov2d.ksh
-
-   RC=$?
-   if [[ $RC != 0 ]]; then
-      echo "gen_be_cov2d failed with error" $RC
-      echo gen_be_cov2d > $RUN_DIR/FAIL
-      exit 1
-   fi
 fi
+#------------------------------------------------------------------------
+#  Calculate histogram diagnostics:
+#------------------------------------------------------------------------
+if $RUN_GEN_BE_HISTOG; then
+   echo "---------------------------------------------------------------"
+   echo "Run Hist: Diagnose pdf for perturbations"
+   echo "---------------------------------------------------------------"
 
+   export BEGIN_CPU=$(date)
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${BUILD_DIR}/gen_be_hist.exe .
+
+   for CV in t rh rhm qcond qcondm; do
+   export HREF=2
+#      for HREF in 1 2 3 4 5 6; do
+      	cat > gen_be_hist_nl.nl << EOF
+&gen_be_hist_nl
+    start_date = '${START_DATE}',
+    end_date = '${END_DATE}', 
+    interval = ${INTERVAL},
+    variable = '${CV}',
+    ne = ${NE},
+    Nstdev = 5,
+    N_dim_hist = 20,
+    holm_reference = $HREF,
+    N_holm_bins = $N_HOLM_BINS/
+EOF
+
+      	./gen_be_hist.exe > gen_be_hist.${CV}.log 2>&1
+
+      	RC=$?
+      	if [[ $RC != 0 ]]; then
+         	echo "Hist for $CV failed with error" $RC
+         	echo "Hist" > $RUN_DIR/FAIL
+         	exit 1
+      	fi
+      done
+#   done
+
+   export END_CPU=$(date)
+   echo "Ending CPU time: ${END_CPU}"
+fi
+#------------------------------------------------------------------------
 if $RUN_GEN_BE_GRAPHICS; then
 
    $SCRIPTS_DIR/gen_be_graphics.ksh
@@ -366,9 +420,12 @@ if $RUN_GEN_BE_GRAPHICS; then
 fi
 
 # Preserve the interesting log files
-cp $WORK_DIR/*log $RUN_DIR
-cp $STAGE0_DIR/*log $RUN_DIR
-cp $WORK_DIR/be.dat $RUN_DIR
+mv $WORK_DIR/*log $RUN_DIR
+mv $STAGE0_DIR/*log $RUN_DIR
+mv $WORK_DIR/be.dat $RUN_DIR
+mv $WORK_DIR/*.pdf  $RUN_DIR
+mv $WORK_DIR/*.dat  $RUN_DIR
+mv $WORK_DIR/fort.* $RUN_DIR
 
 if $CLEAN; then rm -rf $WORK_DIR; fi
 

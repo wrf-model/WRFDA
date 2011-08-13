@@ -1,7 +1,21 @@
 program gen_be_stage2a
+!---------------------------------------------------------------------- 
+! Purpose: Compute the unbalanced componenet of the control variables 
+!          using the regression coefficients from stage 2.
+!
+! History:
+! Date     Author & Comment
+! -------- ----------------
+! dd/mm/yy Dale Barker
+!          Initial version
+! 01/04/11 J.-F. Caron (Met Office)
+!          Adaptation for the UK MetO model and variational system
+! -------- End History
+!
+!----------------------------------------------------------------------
 
-   use da_control, only : stderr, stdout, filename_len
-   use da_gen_be, only : da_filter_regcoeffs
+   use da_control, only : stderr, stdout, filename_len, cv_options
+   use da_gen_be, only : da_filter_regcoeffs, da_perform_2drf
    use da_tools_serial, only : da_get_unit, da_advance_cymdh
 
    implicit none
@@ -11,6 +25,9 @@ program gen_be_stage2a
    character*10        :: variable             ! Variable name
    character(len=filename_len)        :: filename             ! Input filename.
    character*3         :: ce                   ! Member index -> character.
+   character (len=4)   :: masscv               ! Mass ctrl variable = pres or temp
+   character (len=10)  :: balpres              ! Balance pressure = purestats or linestats
+
    integer             :: ni, nj, nk, nkdum    ! Grid dimensions.
    integer             :: i, j, k, member      ! Loop counters.
    integer             :: b                    ! Bin marker.
@@ -30,6 +47,8 @@ program gen_be_stage2a
    real, allocatable   :: psi(:,:,:)           ! psi.
    real, allocatable   :: chi(:,:,:)           ! chi.
    real, allocatable   :: temp(:,:,:)          ! Temperature.
+   real, allocatable   :: pres(:,:,:)          ! Pressure.
+   real, allocatable   :: lbpres(:,:,:)        ! Linear Balance Pressure.
    real, allocatable   :: ps(:,:)              ! Surface pressure.
    integer, allocatable:: bin(:,:,:)           ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)           ! Bin assigned to each 2D point.
@@ -37,9 +56,11 @@ program gen_be_stage2a
    real, allocatable   :: regcoeff1(:)         ! psi/chi regression cooefficient
    real, allocatable   :: regcoeff2(:,:)       ! psi/ps regression cooefficient.
    real, allocatable   :: regcoeff3(:,:,:)     ! psi/T regression cooefficient.
+   real, allocatable   :: regcoeff3p(:,:,:)    ! psi/p or (pg/p) regression cooefficient
 
    namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
-                                  ne, num_passes, rf_scale
+                                  ne, num_passes, rf_scale, cv_options, &
+                                  masscv, balpres
 
    integer :: ounit,iunit,namelist_unit
 
@@ -60,6 +81,9 @@ program gen_be_stage2a
    ne = 1
    num_passes = 0
    rf_scale = 1.0
+   cv_options = 5
+   masscv = ""
+   balpres = ""
 
    open(unit=namelist_unit, file='gen_be_stage2a_nl.nl', &
         form='formatted', status='old', action='read')
@@ -76,8 +100,24 @@ program gen_be_stage2a
    date = start_date
    cdate = sdate
 
+   print*,"masscv  = ", masscv
+   print*,"balpres = ", balpres
+
+   if (masscv.eq."temp") then
+      write(UNIT=6,FMT='(a)') " masscv = Temperature"
+   else
+      write(UNIT=6,FMT='(a)') " masscv = Pressure"
+   endif
+   if (balpres.eq."purestats") then
+      write(UNIT=6,FMT='(a)') &
+      " balpres = Purely statistical: Psi-(P or T) regression)"
+   else
+      write(UNIT=6,FMT='(a)') &
+      " balpres = linear balance and Pb-P regression"
+   endif
+
 !---------------------------------------------------------------------------------------------
-   write(6,'(2a)')' [2] Read regression coefficients and bin information:'
+   write(6,'(2a)')'      [2] Read regression coefficients and bin information:'
 !--------------------------------------------------------------------------------------------- 
 
    filename = 'gen_be_stage2.dat'
@@ -90,14 +130,24 @@ program gen_be_stage2a
    allocate( psi(1:ni,1:nj,1:nk) )
    allocate( chi(1:ni,1:nj,1:nk) )
    allocate( temp(1:ni,1:nj,1:nk) )
+   allocate( pres(1:ni,1:nj,1:nk) )
+   allocate( lbpres(1:ni,1:nj,1:nk) )
    allocate( ps(1:ni,1:nj) )
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
    allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
+   allocate( regcoeff3p(1:nk,1:nk,1:num_bins2d) )
 
    read(iunit)regcoeff1
-   read(iunit)regcoeff2
-   read(iunit)regcoeff3
+   if (masscv.eq."temp") then
+      read(iunit)regcoeff2
+      read(iunit)regcoeff3
+      regcoeff3p=0.0
+   else
+      read(iunit)regcoeff3p
+      regcoeff2=0.0
+      regcoeff3=0.0
+   endif
    close(iunit)
 
 !  Read bin info:
@@ -114,16 +164,19 @@ program gen_be_stage2a
    if ( num_passes > 0 ) then
 
 !---------------------------------------------------------------------------------------------
-      write(6,'(a,i4,a)')' [3] Apply ', num_passes, ' pass recursive filter to regression coefficients:'
+   write(6,'(a,i4,a)') '[3] Apply ', &
+      num_passes, ' pass recursive filter to regression coefficients:'
 !---------------------------------------------------------------------------------------------
       call da_filter_regcoeffs( ni, nj, nk, num_bins, num_bins2d, num_passes, rf_scale, bin, &
-                                regcoeff1, regcoeff2, regcoeff3 )
+!rizvi                                regcoeff1, regcoeff2, regcoeff3, regcoeff3p )
+                                regcoeff1, regcoeff2, regcoeff3)
    else
-      write(6,'(a)')' [3] num_passes = 0. Bypassing recursive filtering.'
+      write(6,'(a)') &
+      ' [3] num_passes = 0. Bypassing recursive filtering.'
    end if
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(a)')' [4] Read standard fields, and compute control variable fields:'
+   write(6,'(a)')'   [4] Read standard fields, and compute control variable fields:'
 !---------------------------------------------------------------------------------------------
 
    date = start_date
@@ -144,6 +197,17 @@ program gen_be_stage2a
          read(iunit)ni, nj, nk
          read(iunit)psi
          close(iunit)
+
+         if (balpres.ne."purestats") then
+!           Read lbp predictor:
+            variable = 'lbp'
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+            open (iunit, file = filename, form='unformatted')
+            read(iunit)ni, nj, nk
+            read(iunit)lbpres
+            close(iunit)
+         endif
 
 !        Calculate unbalanced chi:
          variable = 'chi'
@@ -172,31 +236,59 @@ program gen_be_stage2a
          close(ounit)
 
 !        Calculate unbalanced T:
-         variable = 't'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nk
-         read(iunit)temp
-         close(iunit)
-
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               do k = 1, nk
-                  temp(i,j,k) = temp(i,j,k) - SUM(regcoeff3(k,1:nk,b) * psi(i,j,1:nk))
+         if (masscv.eq."temp") then
+            variable = 't'
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+            open (iunit, file = filename, form='unformatted')
+            read(iunit)ni, nj, nk
+            read(iunit)temp
+            close(iunit)
+            do j = 1, nj
+               do i = 1, ni
+                  b = bin2d(i,j)
+                  do k = 1, nk
+                     temp(i,j,k) = temp(i,j,k) - SUM(regcoeff3(k,1:nk,b) * psi(i,j,1:nk))
+                  end do
                end do
             end do
-         end do
+            variable = 't_u'
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+            open (ounit, file = filename, form='unformatted')
+            write(ounit)ni, nj, nk
+            write(ounit)temp
+            close(ounit)
+         else
+            variable = 'p'
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+            open (iunit, file = filename, form='unformatted')
+            read(iunit)ni, nj, nk
+            read(iunit)pres
+            close(iunit)
+            do j = 1, nj
+               do i = 1, ni
+                  b = bin2d(i,j)
+                  do k = 1, nk
+                     if (balpres.eq."purestats") then
+                     pres(i,j,k) = pres(i,j,k) - SUM(regcoeff3p(k,1:nk,b) * psi(i,j,1:nk))
+                     else
+                     pres(i,j,k) = pres(i,j,k) - SUM(regcoeff3p(k,1:nk,b) * lbpres(i,j,1:nk))
+                     endif
+                  end do
+               end do
+            end do
+            variable = 'p_u'
+            filename = trim(variable)//'/'//date(1:10)
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+            open (ounit, file = filename, form='unformatted')
+            write(ounit)ni, nj, nk
+            write(ounit)pres
+            close(ounit)
+         endif
 
-         variable = 't_u'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
-         open (ounit, file = filename, form='unformatted')
-         write(ounit)ni, nj, nk
-         write(ounit)temp
-         close(ounit)
-
+         if (masscv.eq."temp") then
 !        Calculate unbalanced ps:
          variable = 'ps'
          filename = trim(variable)//'/'//date(1:10)
@@ -205,14 +297,12 @@ program gen_be_stage2a
          read(iunit)ni, nj, nkdum
          read(iunit)ps
          close(iunit)
-
          do j = 1, nj
             do i = 1, ni
                b = bin2d(i,j)
                ps(i,j) = ps(i,j) - SUM(regcoeff2(1:nk,b) * psi(i,j,1:nk))
             end do
          end do
-
          variable = 'ps_u'
          filename = trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
@@ -220,6 +310,8 @@ program gen_be_stage2a
          write(ounit)ni, nj, 1
          write(ounit)ps
          close(ounit)
+
+         endif
 
       end do  ! End loop over ensemble members.
 
@@ -230,4 +322,3 @@ program gen_be_stage2a
    end do     ! End loop over times.
 
 end program gen_be_stage2a
-

@@ -19,31 +19,55 @@ begin
    ncol = 2
 
    var1="psi"
-   filename1 = "fort.194"
+   filename1 = "fort.210"
    data1=asciiread(dir+"/"+filename1,(/nrow,ncol/),"float")
 
    var2="chi_u"
-   filename2 = "fort.195"
+   filename2 = "fort.211"
    data2=asciiread(dir+"/"+filename2,(/nrow,ncol/),"float")
 
    var3="t_u"
-   filename3 = "fort.196"
+   filename3 = "fort.212"
    data3=asciiread(dir+"/"+filename3,(/nrow,ncol/),"float")
 
    var4="rh"
-   filename4 = "fort.197"
+   filename4 = "fort.213"
    data4=asciiread(dir+"/"+filename4,(/nrow,ncol/),"float")
+
+   var5="qcloud"
+   filename5 = "fort.214"
+   data5=asciiread(dir+"/"+filename5,(/nrow,ncol/),"float")
+
+   var6="qrain"
+   filename6 = "fort.215"
+   data6=asciiread(dir+"/"+filename6,(/nrow,ncol/),"float")
+
+   var7="qice"
+   filename7 = "fort.216"
+   data7=asciiread(dir+"/"+filename7,(/nrow,ncol/),"float")
+
+   var8="qsnow"
+   filename8 = "fort.217"
+   data8=asciiread(dir+"/"+filename8,(/nrow,ncol/),"float")
 
    y1 = new((/nrow/),float)
    y2 = new((/nrow/),float)
    y3 = new((/nrow/),float)
    y4 = new((/nrow/),float)
+   y5 = new((/nrow/),float)
+   y6 = new((/nrow/),float)
+   y7 = new((/nrow/),float)
+   y8 = new((/nrow/),float)
    x  = new((/nrow/),float)
    x = ispan(1,nrow,1)
    y1(:) = resolution * data1(:,1)
    y2(:) = resolution * data2(:,1)
    y3(:) = resolution * data3(:,1)
    y4(:) = resolution * data4(:,1)
+   y5(:) = resolution * data5(:,1)
+   y6(:) = resolution * data6(:,1)
+   y7(:) = resolution * data7(:,1)
+   y8(:) = resolution * data8(:,1)
 
    ;************************************************
    ; plotting parameters
@@ -74,15 +98,15 @@ begin
 
    res@lgPerimOn              = False               ; turn off box around
    res@lgLabelFontHeightF     = .02                 ; label font height
-   res@xyExplicitLegendLabels = (/"","NMC","50km","m=5"/)         ; create explicit labels
-   res@pmLegendDisplayMode    = "Always"            ; turn on legend
-   res@pmLegendSide           = "Bottom"               ; Change location of 
-   res@pmLegendParallelPosF   = 0.75                ; move units right
-   res@pmLegendOrthogonalPosF = -1.2                 ; move units down
-   res@pmLegendWidthF         = 0.2                 ; Change width and
-   res@pmLegendHeightF        = 0.2                 ; height of legend.
+;   res@xyExplicitLegendLabels = (/"","NMC","50km","m=5"/)         ; create explicit labels
+;   res@pmLegendDisplayMode    = "Always"            ; turn on legend
+;   res@pmLegendSide           = "Bottom"               ; Change location of 
+;   res@pmLegendParallelPosF   = 0.75                ; move units right
+;   res@pmLegendOrthogonalPosF = -1.2                 ; move units down
+;   res@pmLegendWidthF         = 0.2                 ; Change width and
+;   res@pmLegendHeightF        = 0.2                 ; height of legend.
 
-   plts                      = new (4,"graphic")
+   plts                      = new (8,"graphic")
 
    res@gsnDraw               = False            ; (a) do not draw
    res@gsnFrame              = False            ; (b) do not advance 'frame'
@@ -103,13 +127,35 @@ begin
    res@trYMaxF  =  max(y4)           ; max value on y-axis
    plts(3) = gsn_csm_xy (wks,x,y4,res) ; create plot
 
+   res@tiMainString     = var5         ; add title
+   res@trYMaxF  =  max(y5)           ; max value on y-axis
+   plts(4) = gsn_csm_xy (wks,x,y5,res) ; create plot
+
+   res@tiMainString     = var6         ; add title
+   res@trYMaxF  =  max(y6)           ; max value on y-axis
+   plts(5) = gsn_csm_xy (wks,x,y6,res) ; create plot
+
+   res@tiMainString     = var7         ; add title
+   res@trYMaxF  =  max(y7)           ; max value on y-axis
+   plts(6) = gsn_csm_xy (wks,x,y7,res) ; create plot
+
+   res@tiMainString     = var8         ; add title
+   res@trYMaxF  =  max(y8)           ; max value on y-axis
+   plts(7) = gsn_csm_xy (wks,x,y8,res) ; create plot
+
    ;************************************************
    ; create panel: panel plots have their own set of resources
    ;************************************************
-   resP                  = True                   ; modify the panel plot
-   ;  resP@txString         = directory
-   ; resP@gsnMaximize      = True                   ; maximize panel area
-   resP@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
-   gsn_panel(wks,plts,(/2,2/),resP)               ; now draw as one plot
+   resP1                  = True                   ; modify the panel plot
+   ;  resP1@txString         = directory
+   ; resP1@gsnMaximize      = True                   ; maximize panel area
+   resP1@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
+   gsn_panel(wks,plts(0:3),(/2,2/),resP1)               ; now draw as one plot
+
+   resP2                  = True                   ; modify the panel plot
+   ;  resP2@txString         = directory
+   ; resP2@gsnMaximize      = True                   ; maximize panel area
+   resP2@gsnPanelRowSpec  = True                   ; specify 1 top, 2 lower level
+   gsn_panel(wks,plts(4:7),(/2,2/),resP2)               ; now draw as one plot
 
 end

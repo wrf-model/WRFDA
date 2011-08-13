@@ -50,7 +50,7 @@ program gen_be_ensrf
    character (len=filename_len)   :: filestub                  ! General filename stub.
    character (len=filename_len)   :: input_file                ! Input file. 
    character (len=filename_len)   :: output_file               ! Output file. 
-   character (len=10)    :: var                       ! Variable to search for.
+   character (len=12)    :: var                       ! Variable to search for.
    character (len=3)     :: ce                        ! Member index -> character.
 
    integer               :: num_members               ! Ensemble size.
@@ -89,7 +89,7 @@ program gen_be_ensrf
 
    type (ob_type),pointer:: ob(:)
 
-   character(len=10),allocatable :: varr(:)          ! Variable name.
+   character(len=12),allocatable :: varr(:)          ! Variable name.
    integer, allocatable  :: nkk(:)              ! Vertical dimension of field.
    integer, allocatable  :: xstart(:)           ! Starting position of variable..
 

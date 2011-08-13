@@ -18,8 +18,9 @@ cat > gen_be_cov3d_nl.nl << EOF
     interval = ${INTERVAL},
     ne = ${NE},
     variable1 = '${VARIABLE1}',
-    variable2 = '${VARIABLE2}'
-  /
+    variable2 = '${VARIABLE2}',
+    holm_reference = $HREF,
+    N_holm_bins = 10/
 EOF
 
 ./gen_be_cov3d.exe > gen_be_cov3d.$VARIABLE1.$VARIABLE2.log 2>&1

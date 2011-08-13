@@ -62,6 +62,7 @@ for VARIABLE in $CONTROL_VARIABLES; do
     stride = ${STRIDE},
     nbins = ${NBINS},
     ibin = ${IBIN},
+    sl_method = ${SL_METHOD},
     run_dir = '${WORK_DIR}' /
 EOF
  
@@ -72,31 +73,70 @@ EOF
       else
          export MACHINE=${MACHINES[$JOB]}
          echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on $MACHINE"
-         (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1") &
+   bsub -a poe -n $NUM_PROCS -o mod_reg.out -e mod_reg.err -J mod_reg -q $QUEUE -W $WALL_CLOCK -P $PROJECT mpirun.lsf ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &
+
+#
+#         (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1") &
 
          sleep 2 # Create small gap between submissions to avoid overwriting output.
       fi
 
-      let JOB=$JOB+1
-      let VINDEX=$VINDEX+1
+      if [[ $SL_METHOD -le 1 ]] ; then
+         let VINDEX=$VINDEX+1
+         let JOB=$JOB+1
+      else
+         let VINDEX=$VINDEX+$MAX_VINDEX
+      fi
 
       if [[ $JOB -gt $NUM_JOBS || $VINDEX -gt $MAX_VINDEX ]]; then
          wait # Wait for current jobs to finish.
          let JOB=1
       fi
+ 
    done  # End loop over VINDEX.
+done     # End loop over VARIABLE.
 
-   # Collect files together: 
+for VARIABLE in $CONTROL_VARIABLES; do
 
+   if [[ $VARIABLE == "ps" || $VARIABLE == "ps_u" || $VARIABLE == "ps_b" ]]; then
+      let MAX_VINDEX=1
+   else
+      let MAX_VINDEX=$NUM_LEVELS
+   fi
+
+   if [[ $SL_METHOD -le 1 ]] ; then
+    if [[ $VARIABLE == "ps" || $VARIABLE == "ps_u" ]]; then
+    SL_FILE=${TMP_DIR}/dir.${VARIABLE}${MAX_VINDEX}/sl_print.${VARIABLE}.0${MAX_VINDEX}
+    else
+    SL_FILE=${TMP_DIR}/dir.${VARIABLE}${MAX_VINDEX}/sl_print.${VARIABLE}.${MAX_VINDEX}
+    fi  
+   else
+   SL_FILE=${TMP_DIR}/dir.${VARIABLE}1/sl_print.${VARIABLE}
+   fi
+   
+   if [[ $SL_METHOD -le 1 ]] ; then
+      while [[ ! -s ${SL_FILE} ]] ; do
+      echo "Waiting for sl file: " ${SL_FILE}
+      sleep 60
+      done  # End loop over Waiting for lat sl
+   fi
+   
    let VINDEX=1
+   if [[ $SL_METHOD -le 1 ]] ; then
    cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+   else
+   cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_print.${VARIABLE} ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+   fi
 
+   if [[ $SL_METHOD -le 1 ]] ; then
+   # Collect files together:
    if [[ $MAX_VINDEX -gt 1 ]]; then
       let VINDEX=2
       while [[ $VINDEX -le $MAX_VINDEX ]]; do
          cat ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* >> ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
          let VINDEX=$VINDEX+1
       done
+   fi
    fi
 
 done     # End loop over VARIABLE.

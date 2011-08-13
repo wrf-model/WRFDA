@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh 
 #-----------------------------------------------------------------------
 # Purpose: To calculate ensemble perturbations in "standard fields".
 #          For Stage1 gen_be_gsi
@@ -21,7 +21,7 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
 
-. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
 if [[ ! -d $STAGE0_GSI_DIR ]]; then mkdir $STAGE0_GSI_DIR; fi

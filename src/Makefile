@@ -1,4 +1,4 @@
-# gen_be
+# gen_be --ym--
 
 LN      =       ln -sf
 MAKE    =       make -i -r
@@ -13,6 +13,8 @@ GEN_BE_OBJS = \
 be : \
 	gen_be_stage0_wrf.exe \
 	gen_be_stage0_gsi.exe \
+	gen_be_stage0.exe \
+	gen_be_stage0_um.exe \
 	gen_be_ep1.exe \
 	gen_be_ep2.exe \
 	gen_be_stage1.exe \
@@ -26,6 +28,7 @@ be : \
 	gen_be_stage2a.exe \
 	gen_be_stage3.exe \
 	gen_be_stage4_global.exe \
+	gen_be_holm_variance.exe \
 	gen_be_stage4_regional.exe \
 	gen_be_cov2d.exe \
 	gen_be_cov3d.exe \
@@ -39,8 +42,7 @@ be : \
 	gen_be_ensrf.exe \
 	gen_be_etkf.exe \
 	gen_be_ensmean.exe \
-	da_advance_time.exe 
-
+	da_advance_time.exe
 
 GEN_BE_LIB = $(GEN_BE_SRC_ROOT_DIR)/external/tools/libtools.a -L$(GEN_BE_SRC_ROOT_DIR)/external/fftpack/fftpack5 -lfftpack $(GEN_BE_SRC_ROOT_DIR)/external/io_netcdf/libwrfio_nf.a $(LIB_EXTERNAL)
 
@@ -80,6 +82,30 @@ gen_be_stage0_gsi.exe : gen_be_stage0_gsi.o
 	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_stage0_gsi.f90
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_gsi.o $(GEN_BE_LIB)
 
+gen_be_stage0.exe : gen_be_stage0.o
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0.F | sed '/integer *, *external.*iargc/d' > gen_be_stage0.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0.F > gen_be_stage0.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_stage0.f90
+	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0.o $(GEN_BE_LIB)
+	
+gen_be_stage0_um.exe : gen_be_stage0_um.o
+	$(RM) $@
+	x=`echo "$(SFC)" | awk '{print $$1}'` ; export x ; \
+        if [ $$x = "gfortran" ] ; then \
+           echo removing external declaration of iargc for gfortran ; \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_um.F | sed '/integer *, *external.*iargc/d' > gen_be_stage0_um.f90 ;\
+        else \
+           $(CPP) $(CPPFLAGS) $(OMPCPP) -I$(NETCDFPATH)/include gen_be_stage0_um.F > gen_be_stage0_um.f90 ; \
+        fi
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $(FCSUFFIX) gen_be_stage0_um.f90
+	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_um.o $(GEN_BE_LIB)
+
 gen_be_ep1.exe     : gen_be_ep1.o  
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_ep1.o $(GEN_BE_LIB)
 
@@ -109,11 +135,11 @@ gen_be_stage2.exe : gen_be_stage2.o
 
 gen_be_stage2_gsi.exe : gen_be_stage2_gsi.o
 	if [ -n "$(DMPARALLEL)" ] ;   then \
-	$(DM_FC) -o gen_be_stage2_gsi.exe $(LDFLAGS)  gen_be_stage2_gsi.o ;\
+	$(DM_FC) -o gen_be_stage2_gsi.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage2_gsi.o $(GEN_BE_LIB);\
 	else \
-	$(SFC) -o gen_be_stage2_gsi.exe $(LDFLAGS)  gen_be_stage2_gsi.o ;\
+	$(SFC) -o gen_be_stage2_gsi.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage2_gsi.o $(GEN_BE_LIB);\
 	fi
-	
+
 gen_mbe_stage2.exe : gen_mbe_stage2.o
 	$(SFC) -o gen_mbe_stage2.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_mbe_stage2.o $(GEN_BE_LIB)
 
@@ -128,6 +154,13 @@ gen_be_stage3.exe : gen_be_stage3.o
 
 gen_be_stage4_global.exe : gen_be_stage4_global.o
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage4_global.o  $(GEN_BE_LIB)
+
+gen_be_holm_variance.exe : gen_be_holm_variance.o
+	if [ -n "$(DMPARALLEL)" ] ;   then \
+	$(DM_FC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_holm_variance.o $(GEN_BE_LIB);\
+	else \
+	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_holm_variance.o $(GEN_BE_LIB);\
+	fi
 
 gen_be_stage4_regional.exe : gen_be_stage4_regional.o
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage4_regional.o $(GEN_BE_LIB)
@@ -171,5 +204,9 @@ gen_be_hist.exe : gen_be_hist.o
 gen_be_vertloc.exe     : gen_be_vertloc.o
 	$(SFC) -o $@ $(LDFLAGS) $(GEN_BE_OBJS)  gen_be_vertloc.o $(GEN_BE_LIB)
 
+basicclean:
+	$(RM) *.f90 *.o
+
 superclean:
 	$(RM) *.f *.o *.mod *.exe
+

@@ -64,6 +64,18 @@ program gen_be_diags
    if( cv_options == 6) variable = 'rh_u'
    call da_readwrite_be_stage3( ounit, nk, variable )
 
+   variable = 'qcloud'
+   call da_readwrite_be_stage3( ounit, nk, variable )
+
+   variable = 'qrain'
+   call da_readwrite_be_stage3( ounit, nk, variable )
+
+   variable = 'qice'
+   call da_readwrite_be_stage3( ounit, nk, variable )
+
+   variable = 'qsnow'
+   call da_readwrite_be_stage3( ounit, nk, variable )
+
    ! To keep the dimension nk for 3d fields:
    nk_3d = nk
 
@@ -82,21 +94,43 @@ program gen_be_diags
    nk = nk_3d
 
    variable = 'psi'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
    call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
 
    variable = 'chi_u'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
    call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
 
    variable = 't_u'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
    call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
 
    variable = 'rh'
    if( cv_options == 6) variable = 'rh_u'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
+   call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
+
+   variable = 'qcloud'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
+   call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
+
+   variable = 'qrain'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
+   call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
+
+   variable = 'qice'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
+   call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
+
+   variable = 'qsnow'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
    call da_readwrite_be_stage4( ounit, nk, uh_method, n_smth_sl, variable )
 
    variable = 'ps_u'
+    write(6,*)' rizvi writing scale length for ',trim(variable)
    call da_readwrite_be_stage4( ounit, 1, uh_method, n_smth_sl, variable )
 
+    write(6,*)' rizvi writing scale length finished'             
    close(ounit)
 
 end program gen_be_diags

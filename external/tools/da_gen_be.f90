@@ -6,7 +6,8 @@ module da_gen_be
    use da_reporting, only : da_error, message
    use da_tools_serial, only : da_get_unit, da_free_unit, da_array_print
    use da_lapack, only : dsyev
-
+   use da_recursive_filters, only: da_perform_2drf, da_recursive_filter_1d
+   
    implicit none
 
    real, parameter :: base_pres = 100000.0 
@@ -267,6 +268,17 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d
       num_bins2d = 1
       bin(:,:,:) = 1
       bin2d(:,:) = 1
+      
+   else if (bin_type == 7) then    ! rain/no-rain bins based on bin 5
+
+      num_bins = 4*nk
+      num_bins2d = 4
+
+      do k = 1, nk
+         bin(:,:,k) = k
+      end do
+      bin2d(:,:) = 1
+      
    end if
 
 end subroutine da_create_bins
@@ -1700,7 +1712,7 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3,k,field)
       parameter (fildoub = 9.9692099683868690e+36)
    
    character(len=200), intent(in)  :: input_file       ! 1 file nane.
-   character(len=10),  intent(in)  :: var              ! Variable to search for.
+   character(len=12),  intent(in)  :: var              ! Variable to search for.
    integer,            intent(in)  :: field_dims       ! # Dimensions of field. 
    integer,            intent(in)  :: dim1             ! Dimension 1 of field. 
    integer,            intent(in)  :: dim2             ! Dimension 2 of field. 
@@ -1774,7 +1786,7 @@ subroutine da_get_height( input_file, dim1, dim2, dim3, height)
    integer,            intent(in)  :: dim1, dim2, dim3          ! Dimensions.
    real,               intent(out) :: height(1:dim1,1:dim2,1:dim3) ! Height.
 
-   character(len=10) :: var                            ! Variable to search for.
+   character(len=12) :: var                            ! Variable to search for.
    integer           :: k                              ! Loop counter.
    real              :: gravity_inv                    ! 1/gravity.
    real              :: phb(1:dim1,1:dim2)             ! Base state geopotential.
@@ -1813,7 +1825,7 @@ subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh )
    real,               intent(out) :: temp(1:dim1,1:dim2)       ! Temperature.
    real,               intent(out) :: rh(1:dim1,1:dim2)         ! Relative humidity.
 
-   character(len=10) :: var                       ! Variable to search for. var = "T"
+   character(len=12) :: var                       ! Variable to search for. var = "T"
    integer           :: i, j                      ! Loop counters.
 
    real              :: thetap(1:dim1,1:dim2)     ! Perturbation potential temperature.
@@ -1961,10 +1973,9 @@ subroutine da_print_be_stats_p(outunit, ni, nj, nk, num_bins, num_bins2d, bin, &
 
    integer             :: k1, k2, i, k, j, b, number      ! Loop counters.
 
-   write(unit=stdout,fmt='(a,i5)')' psi/chi regression coefficient in unit ', outunit
+   write(unit=stdout,fmt='(a,i5)')' da_print_be_stats_p psi/chi regression coefficient in unit ', outunit
 
    open(unit=outunit)
-   write(unit=outunit,fmt='(a,i5)')' psi/chi regression coefficient in unit ', outunit
    do b = 1, num_bins
       number = 0
       do i = 1,ni
@@ -2155,7 +2166,6 @@ subroutine da_readwrite_be_stage2(outunit, nk)
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    integer             :: interval                   ! Period between dates (hours).
    integer             :: ne                         ! Number of ensemble members.
-   logical             :: testing_eofs               ! True if testing EOF decomposition.
    real                :: rf_scale                   ! Recursive filter scale.
    integer             :: num_passes                 ! Recursive filter passes.
  
@@ -2194,16 +2204,21 @@ subroutine da_readwrite_be_stage2(outunit, nk)
    real, allocatable   :: regcoeff_chi_u_rh(:,:,:)   ! rh/chi_u regression coefficient
    real, allocatable   :: regcoeff_t_u_rh(:,:,:)     ! rh/t_u regression coefficient
 
+   character (len=4)   :: masscv                     ! Mass ctrl variable = press or temp.
+   character (len=10)  :: balpres                    ! Balance pressure = purestats or linestats
+   logical             :: nobaldiv                   ! True means chi_u = chi.
+
+
    integer :: iunit, namelist_unit
 
-   namelist / gen_be_stage2_nl / start_date, end_date, interval, &
-                                 ne, testing_eofs, num_passes, rf_scale, cv_options
+   namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
+                                 ne, num_passes, rf_scale, cv_options, &
+                                 masscv, balpres, nobaldiv
 
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
    ne = 1
-   testing_eofs = .true.
    num_passes = 0
    rf_scale = 1.0
    cv_options = 5
@@ -2211,9 +2226,9 @@ subroutine da_readwrite_be_stage2(outunit, nk)
    call da_get_unit(namelist_unit)
 
    ! Reading Namelist:            
-   open(unit=namelist_unit, file='gen_be_stage2_nl.nl', &
+   open(unit=namelist_unit, file='gen_be_stage2a_nl.nl', &
         form='formatted', status='old', action='read')
-   read(namelist_unit, gen_be_stage2_nl)
+   read(namelist_unit, gen_be_stage2a_nl)
    close(namelist_unit)
   
    ! Read in the coefficients:
@@ -3920,7 +3935,7 @@ subroutine da_stage0_initialize(input_file, var, dim1, dim2, dim3, ds)
       parameter (fildoub = 9.9692099683868690e+36)
 
    character (len=200), intent(in):: input_file       ! 1 file name.
-   character (len=10), intent(in) :: var              ! Variable to search for.
+   character (len=12), intent(in) :: var              ! Variable to search for.
    integer, intent(out)           :: dim1             ! Dimensions of field. 
    integer, intent(out)           :: dim2             ! Dimensions of field. 
    integer, intent(out)           :: dim3             ! Dimensions of field. 
@@ -4202,116 +4217,337 @@ subroutine da_eof_decomposition_test (kz, bx, e, l)
 
 end subroutine da_eof_decomposition_test
 
+! -- gen_be I/O additionnal routines -- //
 
-subroutine da_perform_2drf(ni, nj, num_passes, rf_scale, field)
+  !------------------------------------------------------------------------------------
+  ! Read a 3D field
+  !------------------------------------------------------------------------------------
+  subroutine read_3d_field(variable, date, ce, iunit, ni, nj, nk, field_3d)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   !-----------------------------------------------------------------------
+    character*10, intent(in)    :: variable         ! Variable name
+    character*10, intent(in)    :: date             ! Current date (ccyymmddhh).
+    character*3 , intent(in)    :: ce               ! Member index -> character.
+    integer     , intent(in)    :: iunit            ! Unit where fiels is read
+    integer     , intent(inout) :: ni, nj, nk       ! Grid dimensions.
+    real        , intent(inout) :: field_3d(:,:,:)  ! Field 3D
 
-   implicit none
+    character(len=filename_len)    :: filename      ! Input filename.
 
-   integer, intent(in)    :: ni               ! Array dimension 1.
-   integer, intent(in)    :: nj               ! Array dimension 2.
-   integer, intent(in)    :: num_passes       ! Number of passes of RF.
-   real,    intent(in)    :: rf_scale         ! Recursive filter scaling parameter.
-   real*8,  intent(inout) :: field(1:ni,1:nj) ! Field to be filtered.
+    filename = trim(variable)//'/'//date(1:10)
+    filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+    open (iunit, file = filename, form='unformatted')
+    read(iunit)ni, nj, nk
+    read(iunit)field_3d
+    close(iunit)
 
-   integer               :: i, j, pass       ! Loop counters.
-   real*8                :: e, alpha         ! Recursive filter parameters.
-   real                  :: mean_field       ! Mean field.
+  end subroutine read_3d_field
+  !------------------------------------------------------------------------------------
+  ! Read a 2D field
+  !------------------------------------------------------------------------------------
+  subroutine read_2d_field(variable, date, ce, iunit, ni, nj, nkdum, field_2d)
 
-   e = 0.25 * num_passes / (rf_scale * rf_scale)
-   alpha = 1 + e - sqrt(e * (e + 2.0))
+    character*10, intent(in)    :: variable         ! Variable name
+    character*10, intent(in)    :: date             ! Current date (ccyymmddhh).
+    character*3 , intent(in)    :: ce               ! Member index -> character.
+    integer     , intent(in)    :: iunit            ! Unit where fiels is read
+    integer     , intent(inout) :: ni, nj, nkdum    ! Grid dimensions.
+    real        , intent(inout) :: field_2d(:,:)    ! Field 2D
 
-   mean_field = sum(field(1:ni,1:nj)) / real(ni*nj)
+    character(len=filename_len)    :: filename      ! Input filename.
 
-   do pass = 1, num_passes
-      ! Perform filter in I-direction:
-      do j = 1, nj
-         call da_recursive_filter_1d(pass, alpha, field(1:ni,j), ni)
-      end do
+    filename = trim(variable)//'/'//date(1:10)
+    filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+    open (iunit, file = filename, form='unformatted')
+    read(iunit)ni, nj, nkdum
+    read(iunit)field_2d
+    close(iunit)
 
-      ! Perform filter in J-direction:
-      do i = 1, ni
-         call da_recursive_filter_1d(pass, alpha, field(i,1:nj), nj)
-      end do
-   end do
+  end subroutine read_2d_field
 
-end subroutine da_perform_2drf
+  !------------------------------------------------------------------------------------
+  ! Write a 3D field
+  !------------------------------------------------------------------------------------
+  subroutine write_3d_field(variable, date, ce, ounit, ni, nj, nk, field_3d)
 
+    character*10, intent(in)    :: variable         ! Variable name
+    character*10, intent(in)    :: date             ! Current date (ccyymmddhh).
+    character*3 , intent(in)    :: ce               ! Member index -> character.
+    integer     , intent(in)    :: ounit            ! Unit where fiels is read
+    integer     , intent(in)    :: ni, nj, nk       ! Grid dimensions.
+    real        , intent(in)    :: field_3d(:,:,:)  ! Field 3D
 
-subroutine da_recursive_filter_1d(pass, alpha, field, n)
+    character(len=filename_len)    :: filename      ! Input filename.
 
-   !---------------------------------------------------------------------------
-   ! Purpose: Perform one pass of recursive filter on 1D array.
-   !
-   ! Method:  Perform right-moving filter followed by left-moving filter.
-   !---------------------------------------------------------------------------
+    filename = trim(variable)//'/'//date(1:10)
+    filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+    open (ounit, file = filename, form='unformatted')
+    write(ounit)ni, nj, nk
+    write(ounit)field_3d
+    close(ounit)
 
-   implicit none
+  end subroutine write_3d_field
+  !------------------------------------------------------------------------------------
+  ! Write a 2D field
+  !------------------------------------------------------------------------------------
+  subroutine write_2d_field(variable, date, ce, ounit, ni, nj, nkdum, field_2d)
 
-   integer, intent(in)    :: pass           ! Current pass of filter.
-   real*8,  intent(in)    :: alpha          ! Alpha coefficient for RF.
-   real*8,  intent(inout) :: field(:)       ! Array to be filtered.
-   integer, intent(in)    :: n              ! Size of field array.
+    character*10, intent(in)    :: variable         ! Variable name
+    character*10, intent(in)    :: date             ! Current date (ccyymmddhh).
+    character*3 , intent(in)    :: ce               ! Member index -> character.
+    integer     , intent(in)    :: ounit            ! Unit where fiels is read
+    integer     , intent(in)    :: ni, nj, nkdum    ! Grid dimensions.
+    real        , intent(in)    :: field_2d(:,:)    ! Field 2D
 
-   integer :: j              ! Loop counter.
-   real    :: one_alpha      ! 1 - alpha.
-   real    :: a(1:n)         ! Input field.
-   real    :: b(1:n)         ! Field after left-right pass.
-   real    :: c(1:n)         ! Field after right-left pass.
+    character(len=filename_len)    :: filename      ! Input filename.
 
-   !-------------------------------------------------------------------------
-   ! [1.0] Initialise:
-   !-------------------------------------------------------------------------
+    filename = trim(variable)//'/'//date(1:10)
+    filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+    open (ounit, file = filename, form='unformatted')
+    write(ounit)ni, nj, nkdum
+    write(ounit)field_2d
+    close(ounit)
 
-   one_alpha = 1.0 - alpha
+  end subroutine write_2d_field
+  
+  !---------------------------------------------------------------------------------------------
+  ! Update Rainy bins: uses I/O to read rain class, then updates bin and bin2d accordingly
+  !---------------------------------------------------------------------------------------------
+  subroutine update_rain_bin(ni, nj, nk, ce, date, bin2d, bin, dat_dir)
+
+    implicit none
+
+    integer, intent(inout)         :: ni
+    integer, intent(inout)         :: nj
+    integer, intent(inout)         :: nk
+    character*3 ,    intent(in)    :: ce                         ! Member index -> character.
+    character*10,    intent(in)    :: date
+    integer, intent(inout)         :: bin2d(1:ni,1:nj)
+    integer, intent(inout)         :: bin(1:ni,1:nj,1:nk)
+    character(len=filename_len), intent(in), optional :: dat_dir
+    
+    integer             :: i, j, k, nkdum, member, k1, k2, k3, m ! Loop counters.
+    integer             :: b, b2, b3                  ! Bin marker.
+    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
+    integer             :: interval                   ! Period between dates (hours).
+    integer             :: ne                         ! Number of ensemble members.
+    integer             :: mmax                       ! Maximum mode (after variance truncation)..
+    integer             :: bin_type                   ! Type of bin to average over.
+    integer             :: num_bins                   ! Number of bins (3D fields).
+    integer             :: num_bins2d                 ! Number of bins (2D fields).
+    integer             :: iunit
+    
+    real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
+    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
+    real                :: binwidth_lon               ! Used if bin_type = 9/10
+    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
+    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    
-   a(1:n) = field(1:n)
+    character*10        :: start_date, end_date       ! Starting and ending dates.
+    character*10        :: variable                   ! Variable name
 
-   !-------------------------------------------------------------------------
-   ! [2.0] Perform right-moving filter:
-   !-------------------------------------------------------------------------
+    character(len=filename_len)    :: filename                   ! Input filename.
+!!!DALE    character*3         :: ce                         ! Member index -> character.
 
-   ! use turning conditions as in the appendix of Hayden & Purser (1995):
+    integer             :: rain_class(1:ni,1:nj)
 
-   if (pass == 1) then
-      b(1) = one_alpha * a(1)
-   else if (pass == 2) then
-      b(1) = a(1) / (1.0 + alpha)
-   else
-      b(1) = one_alpha * (a(1) - alpha**3 * a(2)) / (1.0 - alpha**2)**2
-   end if
+    !        Read rain_class:
+    variable = 'raincl'
+    if (present(dat_dir)) then
+    	filename = trim(dat_dir)//'/'//trim(variable)//'/'//date(1:10)
+    else
+    	filename = trim(variable)//'/'//date(1:10)
+    end if
+    filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+    open (iunit, file = filename, form='unformatted')
+    read(iunit)ni, nj, nkdum
+    read(iunit)rain_class
+    close(iunit)
+    !           bin depends on rain class of perturbation - hard coded number of rain bins
+    !           re-read bin info:
+    if (present(dat_dir)) then
+    	filename = trim(dat_dir)//'/bin.data'
+    else
+    	filename = 'bin.data'
+    end if
+    open (iunit, file = filename, form='unformatted')
+    read(iunit)bin_type
+    read(iunit)lat_min, lat_max, binwidth_lat
+    read(iunit)hgt_min, hgt_max, binwidth_hgt
+    read(iunit)num_bins, num_bins2d
+    read(iunit)bin(1:ni,1:nj,1:nk)
+    read(iunit)bin2d(1:ni,1:nj)
+    close(iunit)
+    ! update it 2D
+    do j = 1, nj
+       do i = 1, ni
+          bin2d(i,j)=rain_class(i,j)*num_bins2d/4+bin2d(i,j)
+       end do
+    end do
+    ! update it 3D
+    do k = 1, nk
+       do j = 1, nj
+          do i = 1, ni
+             bin(i,j,k)=rain_class(i,j)*num_bins/4+bin(i,j,k)
+          end do
+       end do
+    end do
+  end subroutine update_rain_bin
+!-------------------------------------------------------------------------------------------------------!
+subroutine da_invert_var(var_inv, var, num_bins2d, nk, testing_eofs)
 
-   ! [2.2] Perform pass left to right:
+!---------------------------------------------------------------------- 
+! Purpose: Invert a 2D matrix
+!
+! History:
+! Date     Author & Comment
+! -------- ----------------
+! dd/mm/yy Dale Barker
+!          Initial version
+! -------- End History
+!
+!---------------------------------------------------------------------
+   
+   implicit none
 
-   do j = 2, n
-      b(j) = alpha * b(j-1) + one_alpha * a(j)
+   real, intent(in)   :: var(1:nk,1:nk,1:num_bins2d)          ! 2D variance matrix
+   real, intent(out)  :: var_inv(1:nk,1:nk,1:num_bins2d)      ! inverse 2D variance matrix
+
+   logical, intent(in) :: testing_eofs               ! True if testing EOF decomposition.
+
+   integer, intent(in)   :: nk                       ! Square matric size
+   integer, intent(in)   :: num_bins2d               ! Bin numbers
+
+   real, parameter     :: variance_threshold = 1e-6  ! Percentage of <psi psi> variance discarded.
+
+   logical             :: testing_eofs_t
+
+   integer             :: k, k2, m
+   integer             :: mmax                       ! Maximum mode (after variance truncation)..
+   integer             :: b                          ! Bin marker.
+   real                :: total_variance             ! Total variance of <psi psi> matrix.
+   real                :: cumul_variance             ! Cumulative variance of <psi psi> matrix.
+   real                :: summ                       ! Summation dummy.
+
+   real*8, allocatable :: eval(:)                    ! Gridpoint sqrt(eigenvalues).
+   real*8, allocatable :: evec(:,:)                  ! Gridpoint eigenvectors.
+   real, allocatable   :: work(:,:)                  ! EOF work array.
+   real, allocatable   :: LamInvET(:,:)              ! ET/sqrt(Eigenvalue).
+
+   allocate( work(1:nk,1:nk) )
+   allocate( evec(1:nk,1:nk) )
+   allocate( eval(1:nk) )
+   allocate( LamInvET(1:nk,1:nk) )
+
+   testing_eofs_t = testing_eofs
+
+   do b = 1, num_bins2d   
+      LamInvET(:,:) = 0.0
+      work(1:nk,1:nk) = var(1:nk,1:nk,b)
+      call da_eof_decomposition( nk, work, evec, eval )
+
+      if ( testing_eofs_t ) then
+         call da_eof_decomposition_test( nk, work, evec, eval )
+         testing_eofs_t = .false.
+      end if
+
+!     Truncate eigenvalues to ensure inverse is not dominated by rounding error:
+      summ = 0.0
+      do m = 1, nk
+         summ = summ + eval(m)
+      end do
+      total_variance = summ
+
+      cumul_variance = 0.0
+      mmax = nk
+      do m = 1, nk
+         cumul_variance = cumul_variance + eval(m) / total_variance
+         if ( cumul_variance > 1.0 - variance_threshold ) then
+            mmax = m - 1
+            exit
+         end if
+      end do
+      mmax=max(1,mmax)
+      write(6,'(2(a,i6),2(a,1pe11.5))') &
+      ' Bin = ', b, ', truncation = ', mmax, &
+      ', Total Variance = ', total_variance, &
+      ', Condition number = ', eval(1) / eval(mmax)
+
+!     Lam{-1} . E^T:
+      do k = 1, nk
+         do m = 1, mmax
+            LamInvET(m,k) = evec(k,m) / eval(m)
+         end do
+      end do
+
+!     <psi psi>^{-1} = E . Lam{-1} . E^T:
+
+      do k = 1, nk
+         do k2 = 1, k
+            summ = 0.0
+            do m = 1, nk
+               summ = summ + evec(k,m) * LamInvET(m,k2)
+            end do
+            var_inv(k,k2,b) = summ
+         end do
+      end do
+
+      do k = 1, nk
+         do k2 = k+1, nk ! Symmetry.
+            var_inv(k,k2,b) = var_inv(k2,k,b)
+         end do
+      end do
    end do
 
-   !-------------------------------------------------------------------------
-   ! [3.0] Perform left-moving filter:
-   !-------------------------------------------------------------------------
+   deallocate( work )
+   deallocate( evec )
+   deallocate( eval )
+   deallocate( LamInvET )
 
-   ! use turning conditions as in the appendix of Hayden & Purser (1995):
+end subroutine da_invert_var
+subroutine da_transform_vptovv_bin7(evec,eval,vertical_wgt,vp,vv,nb,ni,nj,nk,bin2d)
 
-   if (pass == 1) then
-      c(n) = b(n) / (1.0 + alpha)
-   else
-      c(n) = one_alpha * (b(n) - alpha**3 * b(n-1)) / (1.0 - alpha**2)**2
-   end if
+   !---------------------------------------------------------------------------
+   ! Purpose: Transform from fields on vertical levels to fields on vertical 
+   ! EOFS.
+   !
+   ! Method: Perform vv(i,j,k) = L^{-1/2} E^{T} vp(i,j,k) transform.
+   !---------------------------------------------------------------------------
 
-   ! [3.2] Perform pass left to right:
+   implicit none
 
-   do j = n-1, 1, -1
-      c(j) = alpha * c(j+1) + one_alpha * b(j)
+   integer, intent(in)    :: nb, ni, nj, nk                ! Dimensions
+   real,    intent(in)    :: evec(1:nb,1:nk,1:nk)          ! Eigenvectors.
+   real,    intent(in)    :: eval(1:nb,1:nk)               ! Eigenvalues.
+   real,    intent(in)    :: vertical_wgt(1:ni,1:nj,1:nk)  ! Weighting.
+   integer, intent(in)    :: bin2d(1:ni,1:nj)              ! Binning
+   real,    intent(inout) :: vp(1:ni,1:nj,1:nk)            ! CV in level space.
+   real,    intent(out)   :: vv(1:ni,1:nj,1:nk)            ! CV in EOF space.
+   
+   integer :: i, j, k, b                 ! Loop counters.
+   real    :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
+   
+   !-------------------------------------------------------------------
+   ! [1.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0
+   !------------------------------------------------------------------- 
+
+!   if (vertical_ip /= vertical_ip_0) then
+      vp(1:ni,1:nj,1:nk) = vp(1:ni,1:nj,1:nk) * &
+                                    vertical_wgt(1:ni,1:nj,1:nk)
+!   end if
+
+   !-------------------------------------------------------------------
+   ! [2.0] Perform vv(i,j,k) = L^{-1/2} E^T vp(i,j,k) transform:
+   !-------------------------------------------------------------------
+
+   do k = 1, nk
+      do j = 1, nj
+         do i = 1, ni
+            b = bin2d(i,j)
+            ETVp = sum(evec(b,1:nk,k)*vp(i,j,1:nk))
+            vv(i,j,k) = ETVp / eval(b,k)
+         end do
+      end do
    end do
-        
-   field(1:n) = c(1:n)
 
-end subroutine da_recursive_filter_1d
-
-
-
+end subroutine da_transform_vptovv_bin7
 end module da_gen_be

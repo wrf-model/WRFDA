@@ -7,12 +7,12 @@
 
 #[1] Define job by overriding default environment variables:
 
-#export RUN_GEN_BE_STAGE0=true
-#export RUN_GEN_BE_STAGE1=true
-#export RUN_GEN_BE_STAGE2=true
-#export RUN_GEN_BE_STAGE2A=true
-#export RUN_GEN_BE_STAGE3=true
-#export RUN_GEN_BE_STAGE4=true
+export RUN_GEN_BE_STAGE0=true
+export RUN_GEN_BE_STAGE1=true
+export RUN_GEN_BE_STAGE2=true
+export RUN_GEN_BE_STAGE2A=true
+export RUN_GEN_BE_STAGE3=true
+export RUN_GEN_BE_STAGE4=true
 export RUN_GEN_BE_DIAGS=true
 export RUN_GEN_BE_DIAGS_READ=true
 export RUN_GEN_BE_MULTICOV=true

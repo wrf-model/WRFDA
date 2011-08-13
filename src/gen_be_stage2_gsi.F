@@ -3,9 +3,10 @@ program gen_be_stage2_gsi
 ! Purpose: Creating WRF-ARW BE statistics for GSI                        
 ! 
 ! Author: Syed RH Rizvi,  NCAR/ESSL/MMM/DAG  08/06/2009
-! Please acknowledge author/institute in work that uses this code.
 !-----------------------------------------------------------------------
-!
+  
+   use da_gen_be, only : read_3d_field
+   
    implicit none
 
 #ifdef DM_PARALLEL
@@ -24,7 +25,7 @@ program gen_be_stage2_gsi
    integer              :: nx,ny,nz,ni,nj,nk,dim1,dim2,dim3,ncat
    integer              :: nml_unit,ncases,ncount,member
    real                 :: lat_bins_in_deg
-   integer              :: less_q_from_top, debug
+   integer              :: less_levels_from_top, debug
    real                 :: ds, angle,ncount_inv,min_xlat 
    logical              :: fstat
 
@@ -36,7 +37,7 @@ program gen_be_stage2_gsi
    integer              :: i,j,n, ierror, npes, mype
 !
    namelist /gen_be_stage2_gsi_nl/debug,stage1_gsi_dir,nx,ny,nz, fstat,&
-             less_q_from_top, lat_bins_in_deg
+             less_levels_from_top, lat_bins_in_deg
 !---------------------------------------------------------------------------------
 !--------
 ! MPI setup
@@ -54,7 +55,7 @@ program gen_be_stage2_gsi
 
     stage1_gsi_dir = '/ptmp/rizvi/data/con200/run_gen_be_gsi/working/stage1_gsi'
     nx = 44 ; ny = 44 ; nz = 27 ; lat_bins_in_deg = 1.0
-    less_q_from_top = 0 ; fstat= .false. ; debug = 0
+    less_levels_from_top = 0 ; fstat= .false. ; debug = 0
 !
    deg2rad=atan(1.)/45.
    rad2deg=1.0/deg2rad
@@ -160,7 +161,7 @@ program gen_be_stage2_gsi
 
     if( debug > 0  .and. mype==0)write(6,*)'calling compute_variance_and_len_scale'
      call compute_variance_and_len_scales(nx,ny,nz,ncat,&
-         npes,mype,debug, ncases, less_q_from_top,filen, &
+         npes,mype,debug, ncases, less_levels_from_top,filen, &
          mapfac_x,mapfac_y, ds, rlat, xlat,xlon,sigl,f,anew,bnew,wnew, nlat,count)
 
 #ifdef DM_PARALLEL
@@ -171,8 +172,86 @@ program gen_be_stage2_gsi
     deallocate(sigl,mapfac_x,mapfac_y,xlat,xlon,nlat)
     deallocate(wnew,bnew,anew)
 
-    stop
-    end
+end program gen_be_stage2_gsi
+    
+subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
+
+   use da_gen_be, only : read_3d_field
+
+   implicit none
+
+   character(len=*), intent(in)      :: filename
+
+   integer, intent(inout)   :: nx, ny, nz
+   integer, intent(in)      :: mype
+
+   real, intent(out)        :: sf(1:nx,1:ny,1:nz)
+   real, intent(out)        :: vp(1:nx,1:ny,1:nz)
+   real, intent(out)        :: t(1:nx,1:ny,1:nz)
+   real, intent(out)        :: q(1:nx,1:ny,1:nz)
+   real, intent(out)        :: qm(1:nx,1:ny,1:nz)
+   real, intent(out)        :: p(1:nx,1:ny)
+   
+   character (len=10) :: date
+   character (len=10) :: variable
+   character (len=3) :: ce
+   ! filename is pert.gsi.'date'.e'ce'
+   integer :: iunit
+   
+   date = filename(11:21)
+   ce = filename(24:26)
+   iunit = 24
+   
+   !        Read psi:
+   variable = 'psi'
+   call read_3d_field(variable, date, ce, iunit, nx, ny, nz, sf)
+   !        Read chi:
+   variable = 'chi'
+   call read_3d_field(variable, date, ce, iunit, nx, ny, nz, vp)
+   ! Fill zero vp fileds with adjacent value (probably some Rizvi fix)
+   vp(:,1,:) =2*vp(:,2,:) - vp(:,3,:) 
+   vp(1,:,:) =2*vp(2,:,:) - vp(3,:,:) 
+   !        Read temp:
+   variable = 't'
+   call read_3d_field(variable, date, ce, iunit, nx, ny, nz, t)
+   !        Read moisture:
+   variable = 'rh'
+   call read_3d_field(variable, date, ce, iunit, nx, ny, nz, q)
+   !        Read modified moisture:
+   variable = 'rhm'
+   call read_3d_field(variable, date, ce, iunit, nx, ny, nz, qm) 
+!
+!   nrec = 1
+!    open(unit=24,file=trim(filename),form='unformatted', &
+!            status='old', action='read')
+! Psi
+!   read(24,err=100,end=99)sf  
+!   nrec=nrec+1
+! Chi
+!   read(24,err=100,end=99)vp 
+!   nrec=nrec+1
+! Fill zero vp fileds with adjacent value
+!   vp(:,1,:) =2*vp(:,2,:) - vp(:,3,:) 
+!   vp(1,:,:) =2*vp(2,:,:) - vp(3,:,:) 
+! Temp
+!   read(24,err=100,end=99)t  
+!   nrec=nrec+1
+! Moisture
+!   read(24,err=100,end=99)q   
+!   nrec=nrec+1
+! Moisturer_2
+!   read(24,err=100,end=99)qm  
+!   nrec=nrec+1
+! Surface pressure (in whatever units it is writtenn stage0_gsi) 
+!   read(24,err=100,end=99)p    
+!   close (24)
+!
+!   return
+!99  write(6,*)'Unexpected end of file ',trim(filename),' in read_wrf_arw record recs: ',nrec
+!   stop
+!100 write(6,*)'read error in ',trim(filename),' in read_wrf_arw record recs: ',nrec
+!   stop
+   end subroutine read_wrf_arw
 
     subroutine compute_reg_coeff &
               (nx,ny,nz,ncat,npes,mype,debug, ncases,filen, &
@@ -252,7 +331,6 @@ program gen_be_stage2_gsi
     call vert_corr(nx,ny,nz,ncases,ncat,npes,mype,&
                    func,funcs,p8,filen,nlat,count,sigl)
 
-
 !!!!!!!!!!!!!
 
     vudt=0.
@@ -278,7 +356,7 @@ program gen_be_stage2_gsi
       mean_field = sum(sf(1:nx,1:ny,k)) * inv_nxny
       sf(1:nx,1:ny,k) = sf(1:nx,1:ny,k) - mean_field
       mean_field = sum(vp(1:nx,1:ny,k)) * inv_nxny
-      t1(1:nx,1:ny,k) = t1(1:nx,1:ny,k) - mean_field
+      vp(1:nx,1:ny,k) = vp(1:nx,1:ny,k) - mean_field
       mean_field = sum(t1(1:nx,1:ny,k)) * inv_nxny
       t1(1:nx,1:ny,k) = t1(1:nx,1:ny,k) - mean_field
       mean_field = sum(q(1:nx,1:ny,k)) * inv_nxny
@@ -467,7 +545,6 @@ anew=0.
 !
 !rizvi 
 
-    if( debug > 0  .and. mype==0)write(6,*)' calling choldc'       
     call choldc(biga8,nz,p88,ierror)
 
 !        get bigbhat, the pressure expansion coefs
@@ -481,7 +558,6 @@ anew=0.
 !        <psi_coeff,psi_coeff> * x8 = <psi_coef,ps>  No lat variation
 ! After solving x8-array holds reg_psi_coeff_ps coeffs
 !rizvi
-    if( debug > 0  .and. mype==0)write(6,*)' calling cholsl'       
     call cholsl(biga8,nz,p88,b8,x8)
 
 !rizvi
@@ -552,7 +628,7 @@ anew=0.
  
 
   subroutine compute_variance_and_len_scales(nx,ny,nz,ncat, &
-              npes,mype,debug, ncases, less_q_from_top, filen, &
+              npes,mype,debug, ncases, less_levels_from_top, filen, &
               mapfac_x,mapfac_y, ds,rlat, &
               xlat,xlon,sigl,f,anew,bnew,wnew, nlat,count)
 !
@@ -570,7 +646,7 @@ anew=0.
    real, parameter           :: rbig = 100000000., rsmall = 0.00000001
 
    integer, intent(in)       :: nx,ny,nz,ncat
-   integer, intent(in)       :: npes,mype,debug,ncases,less_q_from_top
+   integer, intent(in)       :: npes,mype,debug,ncases,less_levels_from_top
    character(120), intent(in):: filen(ncases)
    integer, intent(in)       :: nlat(1:nx,1:ny)
    real,    intent(in)       :: mapfac_x(1:nx,1:ny),mapfac_y(1:nx,1:ny)
@@ -609,7 +685,7 @@ anew=0.
    integer                   :: ierror, npeloop, moop, loop 
    integer                   :: nz2,nz3,nz4,nz5,nz6
 
-   integer                   :: i,j,jb,l,lq,ld,lt,ll,m,n
+   integer                   :: i,j,jb,l,lq,ld,lt,ll,m,n, jj
    integer                   :: k,k1,k2,kb,km,kn,kp,kz,kv,kd,kt,kq,kq2,kvd,kvp,kvt,kvq
    real                      :: rncas, rnorm, a, b, c
    real                      :: xmax, xmin
@@ -623,6 +699,24 @@ anew=0.
    real*4, allocatable  :: vz(:,:),vd(:,:),vt(:,:),vq(:,:)
    real*4, allocatable  :: corz(:,:),cord(:,:),corh(:,:),corq(:,:),corq2(:,:)
    real*4, allocatable  :: hwll(:,:,:),hwllp(:),corp(:)
+!----------------------------------------------------------------------------
+   integer, parameter   :: len_vars_out = 5 
+   integer, parameter   :: nvars = 5
+   integer, allocatable :: nsig(:) 
+   real*4, allocatable  :: stds(:,:,:), vzs(:,:,:) 
+   character(len=len_vars_out), allocatable :: vars(:) 
+   
+
+!----------------------------------------------------------------------------
+
+     allocate(vars(1:nvars) )  
+     allocate(nsig(1:nvars) ) 
+
+   vars(1)='sf';vars(2)='vp'; vars(3)='t'; vars(4)='q'; vars(5)='ps'
+   nsig(1)= nz ; nsig(2)=nz ; nsig(3)=nz ; nsig(4)=nz ; nsig(5)=1
+   allocate( stds(4,ncat,nz) )
+   allocate( vzs(4,nz,0:ncat+1) )
+
 !----------------------------------------------------------------------------
 
     amp =0. ; qcount=0. ; hl=0. ; vorr=0. ; bms=0.
@@ -773,7 +867,7 @@ anew=0.
 
    enddo
 !!!!!!!!!!!!q
-   do l=1,nz- less_q_from_top
+   do l=1,nz- less_levels_from_top
         kq=nz*4+1+l
           do j=1,ny
           do i=1,nx
@@ -786,7 +880,7 @@ anew=0.
           end do
    end do
 
-   do l=1,nz- less_q_from_top
+   do l=1,nz- less_levels_from_top
        kq=nz*3+1+l
        lq=nz*3+l
           do j=1,ny
@@ -827,7 +921,7 @@ ENDDO   ! LOOP
        hlt = hlt/float(ncases)
 #endif
 
-   do l= nz - less_q_from_top +1 , nz
+   do l= nz - less_levels_from_top +1 , nz
        kq2=nz*4+1+l
        kq=nz*3+1+l
        lq=nz*3+l
@@ -854,8 +948,9 @@ ENDDO   ! LOOP
 !  ampt(ncat,      2 to   nz+1) Horizontal covar       of sf
 !  ampt(ncat,   nz+2 to 2*nz+1) Horizontal covar unbal of vp
 !  ampt(ncat, 2*nz+2 to 3*nz+1) Horizontal covar unbal of t
+!  ampt(ncat, 3*nz+2 to 4*nz+1) Horizontal covar       of q
+!  ampt(ncat, 4*nz+2 to 5*nz+1) Horizontal covar of RH in 5% mean RH bins 
 !  vorrt(1:2,      1 :   nz )   covar with one level below and var of nz level psi
-!  ampt(ncat, 4*nz+2 to 5*nz+1) Horizontal covar       of q2
 ! Structure of hlt array
 !  hlt(ncat,    1 to     1)   Lengthscale for unbal ps
 !  hlt(ncat,    2 to  nz+1)   Lengthscale for full  sf
@@ -914,11 +1009,11 @@ ENDDO   ! LOOP
 ! Now fix vert corr for q
   l = 4    
   ll=(l-1)*nz
-  do k=1,nz-less_q_from_top
+  do k=1,nz-less_levels_from_top
   kp=k+1
   km=k
   if(k==1)km=2
-  if(kp==nz-less_q_from_top+1)kp=nz-less_q_from_top-1
+  if(kp==nz-less_levels_from_top+1)kp=nz-less_levels_from_top-1
   km=km+ll
   kp=kp+ll
   if( abs(2.-vorrt(1,km)-vorrt(1,kp) ) > 0 ) then
@@ -1092,14 +1187,44 @@ ENDDO   ! LOOP
     call statww4(bv ,(ncat+2)*nz)
     call statww4(wgv,(ncat+2)*nz)
 
-   open(333,file='wrf-arw-gsi_be',form='unformatted')
+   stds(1,:,:) = corz  ! 'sf'
+   stds(2,:,:) = cord  ! 'vp'
+   stds(3,:,:) = corh  ! 't'
+   stds(4,:,:) = corq  ! 'q'
+   vzs(1,:,:) = vz  ! 'sf'
+   vzs(2,:,:) = vd  ! 'vp'
+   vzs(3,:,:) = vt  ! 't'
+   vzs(4,:,:) = vq  ! 'q'
+
+   open(333,file='wrf-arw-gsi_be.gcv',form='unformatted')
      rewind 333
      write(333)nz,ncat
      write(333)rlat4,sigl4
-     write(333)corz,cord,corh,corq,corp,corq2
-     write(333)hwll,hwllp
-     write(333)vz,vd,vt,vq
      write(333)agv,bv,wgv
+
+   do jj = 1, 5                           
+      write(333)vars(jj),nsig(jj)
+
+      if ( trim(vars(jj)).eq.'q' ) then
+         write(333)corq,corq2
+      else if ( trim(vars(jj)).eq.'ps' ) then
+         write(333)corp
+      else
+         write(333)stds(jj,:,:) !corz,cord,corh,corp, ! needs to correspond with vars
+      endif
+
+      if ( nsig(jj) == 1 ) then
+         write(333)hwllp  
+      else
+         write(333)hwll(:,:,jj)  
+         write(333)vzs(jj,:,:)
+      endif
+   end do
+
+!     write(333)corz,cord,corh,corq,corp,corq2
+!     write(333)hwll,hwllp
+!     write(333)vz,vd,vt,vq
+
      close(333)
 
 !============================================================
@@ -1550,58 +1675,6 @@ subroutine cholsl(a,n,p,b,x)
   return
   end subroutine psi_tilde
 
-   subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
-   implicit none
-
-   character(len=*), intent(in)      :: filename       
-   integer, intent(in)      :: nx, ny, nz, mype
-
-   real, intent(out)        :: sf(1:nx,1:ny,1:nz)
-   real, intent(out)        :: vp(1:nx,1:ny,1:nz)
-   real, intent(out)        :: t(1:nx,1:ny,1:nz)
-   real, intent(out)        :: q(1:nx,1:ny,1:nz)
-   real, intent(out)        :: qm(1:nx,1:ny,1:nz)
-   real, intent(out)        :: p(1:nx,1:ny)
-
-   real                     :: ds          
-   character (len=10) :: date 
-   integer            :: nrec
-
-   integer            :: i,j,k
-!
-   nrec = 1
-    open(unit=24,file=trim(filename),form='unformatted', &
-             status='old', action='read')
-
-! Psi
-   read(24,err=100,end=99)sf  
-   nrec=nrec+1
-! Chi
-   read(24,err=100,end=99)vp 
-   nrec=nrec+1
-! Fill zero vp fileds with adjacent value
-   vp(:,1,:) =2*vp(:,2,:) - vp(:,3,:) 
-   vp(1,:,:) =2*vp(2,:,:) - vp(3,:,:) 
-! Temp
-   read(24,err=100,end=99)t  
-   nrec=nrec+1
-! Moisture
-   read(24,err=100,end=99)q   
-   nrec=nrec+1
-! Moisturer_2
-   read(24,err=100,end=99)qm  
-   nrec=nrec+1
-! Surface pressure (in whatever units it is writtenn stage0_gsi) 
-   read(24,err=100,end=99)p    
-   close (24)
-
-   return
-99  write(6,*)'Unexpected end of file ',trim(filename),' in read_wrf_arw record recs: ',nrec
-   stop
-100 write(6,*)'read error in ',trim(filename),' in read_wrf_arw record recs: ',nrec
-   stop
-   end subroutine read_wrf_arw
-
     subroutine vert_corr(nx,ny,nz,ncases,ncat,npes,mype,&
               vng,bigxkm,p8,filen,nlat,count,sigl)
 
@@ -1704,9 +1777,7 @@ subroutine cholsl(a,n,p,b,x)
      lm=max(1,l-1) 
      rlen(l)=rlen(l)*(zsig(lp)-zsig(lm))/float(lp-lm)
    enddo
-
    call get_basis(nz,rlen,zsig,bigxkm,vng,p8)
 
   return
   end subroutine vert_corr
-

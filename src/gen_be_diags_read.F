@@ -210,6 +210,42 @@ program gen_be_diags_read
    call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
                              e_vec, e_val, e_vec_loc, e_val_loc )
 
+   read(iunit)variable
+   read(iunit)nk, num_bins2d
+   read(iunit)e_vec
+   read(iunit)e_val
+   read(iunit)e_vec_loc
+   read(iunit)e_val_loc
+   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                             e_vec, e_val, e_vec_loc, e_val_loc )
+
+   read(iunit)variable
+   read(iunit)nk, num_bins2d
+   read(iunit)e_vec
+   read(iunit)e_val
+   read(iunit)e_vec_loc
+   read(iunit)e_val_loc
+   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                             e_vec, e_val, e_vec_loc, e_val_loc )
+
+   read(iunit)variable
+   read(iunit)nk, num_bins2d
+   read(iunit)e_vec
+   read(iunit)e_val
+   read(iunit)e_vec_loc
+   read(iunit)e_val_loc
+   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                             e_vec, e_val, e_vec_loc, e_val_loc )
+
+   read(iunit)variable
+   read(iunit)nk, num_bins2d
+   read(iunit)e_vec
+   read(iunit)e_val
+   read(iunit)e_vec_loc
+   read(iunit)e_val_loc
+   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                             e_vec, e_val, e_vec_loc, e_val_loc )
+
    deallocate( e_vec )
    deallocate( e_val )
    deallocate( e_vec_loc )
@@ -306,10 +342,29 @@ program gen_be_diags_read
       read(iunit) scale_length
       call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
+      ! qcloud:
+      read(iunit) variable
+      read(iunit) scale_length
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+      ! qrain:
+      read(iunit) variable
+      read(iunit) scale_length
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+      ! qice:
+      read(iunit) variable
+      read(iunit) scale_length
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
+      ! qsnow:
+      read(iunit) variable
+      read(iunit) scale_length
+      call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
+
       ! ps_u:
       read(iunit) variable
       read(iunit) scale_length_ps_u
-      write(6,'(3a,i5)')' Scale length for variable ', trim(variable), ' in unit ', outunit
       write(outunit,'(a,i4,1pe15.5)')trim(variable), 1, scale_length_ps_u
       outunit = outunit + 1
       write(6,*)

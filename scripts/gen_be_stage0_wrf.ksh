@@ -15,7 +15,7 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE/scripts}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE_DIR/scripts}
 
 . ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
 
@@ -33,13 +33,13 @@ while [[ $DATE -le $END_DATE_STAGE0 ]]; do
    mkdir ${TMP_DIR}  2>/dev/null
    cd ${TMP_DIR}
 
-   for SV in psi chi t rh ps; do
+   for SV in psi chi vor div t rh rhm ps qcloud qrain qice qsnow raincl; do
       if [[ ! -d $SV ]]; then mkdir $SV; fi
    done
 
    #  Create file dates:
    export FCST_TIME=$(${BUILD_DIR}/da_advance_time.exe $DATE $FCST_RANGE1)
-   echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
+   echo "gen_be_stage0: Calculating standard perturbation fields valid at time " $FCST_TIME
 
    export YYYY=$(echo $FCST_TIME | cut -c1-4)
    export MM=$(echo $FCST_TIME | cut -c5-6)
@@ -65,13 +65,22 @@ while [[ $DATE -le $END_DATE_STAGE0 ]]; do
       done
    fi
 
-   ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
-   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE1 > gen_be_stage0_wrf.${FCST_TIME}.log 2>&1
+cat > gen_be_stage0_nl.nl <<EOF
+  &gen_be_stage0_nl
+    use_mean_ens = .false.,
+    bin_type = $BIN_TYPE,
+    model = '${MODEL}'/
+EOF
+
+   ln -fs ${BUILD_DIR}/gen_be_stage0.exe .
+   ./gen_be_stage0.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE1 > gen_be_stage0.${FCST_TIME}.log 2>&1
 
    #  Tidy:
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
-   # mv mean.${FCST_TIME}* ${STAGE0_DIR}
-   mv gen_be_stage0_wrf.${FCST_TIME}.log ${STAGE0_DIR}
+   mv fixed_flds ${WORK_DIR}
+   mv fullflds.${FCST_TIME}* ${WORK_DIR}/fullflds/
+   mv raincl/raincl.${FCST_TIME}* ${WORK_DIR}/raincl/
+   mv gen_be_stage0.${FCST_TIME}.log ${STAGE0_DIR}
    # rm -rf $TMP_DIR 2> /dev/null
 
    echo $DATE $FILE ${FC_DIR}/${NEXT_DATE}/wrfout_d${DOMAIN}_${FILE_DATE}

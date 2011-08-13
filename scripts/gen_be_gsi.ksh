@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------
-#! /bin/ksh 
+#! /bin/ksh -aeux
 #-----------------------------------------------------------------------
 #
 # Purpose: Creating WRF-ARW BE statistics for GSI                        
@@ -24,7 +24,7 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/var/scripts}
 
-. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi
 
@@ -47,7 +47,7 @@ if $RUN_GEN_BE_GSI_STAGE0; then
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $SCRIPTS_DIR/gen_be/gen_be_stage0_gsi.ksh
+   $SCRIPTS_DIR/gen_be_stage0_gsi.ksh
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 0 for WRF failed with error" $RC
@@ -100,6 +100,38 @@ EOF
 fi
 
 #------------------------------------------------------------------------
+#  Run GSI Holm_Variance 
+#------------------------------------------------------------------------
+
+if $RUN_GEN_BE_HOLM_VARIANCE; then
+
+   export BEGIN_CPU=$(date)
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${BUILD_DIR}/gen_be_holm_variance.exe .
+
+   cat > gen_be_holm_variance_nl.nl << EOF
+&gen_be_holm_variance_nl
+    stage1_gsi_dir = '${STAGE1_GSI_DIR}',
+    nx = ${NUM_WE},
+    ny = ${NUM_SN},
+    nz = ${NUM_LEVELS},
+    lat_bins_in_deg  = ${LAT_BINS_IN_DEG},
+    less_levels_from_top  = ${LESS_LEVELS_FROM_TOP},
+    debug  = ${DEBUG} /
+EOF
+
+   export JJ=gen_be_holm_variance
+   bsub -a poe -R "span[ptile=16]" -n ${NUM_PROCS} -o ${JJ}.out -e ${JJ}.err -J ${JJ} -q ${QUEUE} -W ${WALL_CLOCK} -P ${PROJECT} mpirun.lsf ./gen_be_holm_variance.exe
+   
+   HOLM_VARIANCE_FILE=${WORK_DIR}/holm_variance.dat         
+   while [[ ! -s ${HOLM_VARIANCE_FILE} ]] ; do
+   echo "Waiting for file: " ${HOLM_VARIANCE_FILE}
+   sleep 60
+   done
+fi
+   
+#------------------------------------------------------------------------
 #  Run GSI Stage 2: Calculate final BE statistics for GSI
 #------------------------------------------------------------------------
 
@@ -109,7 +141,6 @@ if $RUN_GEN_BE_GSI_STAGE2; then
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage2_gsi.exe .
-#   ln -sf /mmm/users/rizvi/code/Regional_Be/gen_be_stage2_gsi.exe .
 
    cat > gen_be_stage2_gsi_nl.nl << EOF
 &gen_be_stage2_gsi_nl
@@ -118,15 +149,14 @@ if $RUN_GEN_BE_GSI_STAGE2; then
     ny = ${NUM_SN},
     nz = ${NUM_LEVELS},
     lat_bins_in_deg  = ${LAT_BINS_IN_DEG},
-    less_q_from_top  = ${LESS_Q_FROM_TOP},
+    less_levels_from_top  = ${LESS_LEVELS_FROM_TOP},
     debug  = ${DEBUG} /
 EOF
 
-    export JJ=gen_be_stage2_gsi
-    bsub -a poe -R "span[ptile=16]" -n ${NUM_PROCS} -o ${JJ}.out -e ${JJ}.err -J ${JJ} -q ${QUEUE} -W ${WALL_CLOCK} -P ${PROJECT} mpirun.lsf gen_be_stage2_gsi.exe
-  
+   export JJ=gen_be_stage2_gsi
+   bsub -a poe -R "span[ptile=16]" -n ${NUM_PROCS} -o ${JJ}.out -e ${JJ}.err -J ${JJ} -q ${QUEUE} -W ${WALL_CLOCK} -P ${PROJECT} mpirun.lsf ./gen_be_stage2_gsi.exe 
    
-   GSI_BE_FILE=${WORK_DIR}/wrf-arw-gsi_be            
+   GSI_BE_FILE=${WORK_DIR}/wrf-arw-gsi_be.gcv            
    while [[ ! -s ${GSI_BE_FILE} ]] ; do
    echo "Waiting for file: " ${GSI_BE_FILE}
    sleep 60
@@ -144,7 +174,7 @@ EOF
 fi
 
 
-cp $WORK_DIR/wrf-arw-gsi_be $RUN_DIR
+cp $GSI_BE_FILE $RUN_DIR
 cp $WORK_DIR/*.dat   $RUN_DIR
 cp $WORK_DIR/fort.*  $RUN_DIR
 
