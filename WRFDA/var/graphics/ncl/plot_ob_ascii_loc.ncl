@@ -10,9 +10,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;***********************************************************************
 ; user-defined settings
 ;***********************************************************************
-date = "2007010200"
-obfile = "/data1/class13/test/obsproc/obs_gts_2007-01-02_00:00:00.3DVAR"
-fgfile = "/wrfhelp/DATA/VAR/Con200/rc/2007010200/wrfinput_d01"   ; for retrieving mapping info
+date = "2010060100"
+obfile = "/ptmp/xzhang/RUN_FSO/FengG/ob/2010060100/ob.ascii"
+fgfile = "/ptmp/xzhang/RUN_FSO/FengG/rc/2010060100/wrfinput_d01"   ; for retrieving mapping info
 out_type = "pdf"
 plotname = "./obsloc"+date
 proc_synop = True
@@ -24,6 +24,7 @@ proc_satob = True
 proc_gpspw = True
 proc_sound = True
 proc_airep = True
+proc_tamdar = True
 proc_pilot = True
 proc_profl = True
 proc_qscat = True
@@ -144,6 +145,7 @@ begin  ; main script
    nbogus = 0
    nsound = 0
    nairep = 0
+   ntamdar = 0
    npilot = 0
    nsatem = 0
    nsatob = 0
@@ -176,6 +178,9 @@ begin  ; main script
       end if
       if ( cdata(n,0:5) .eq. "FM-42 " .or. cdata(n,0:5) .eq. "FM-97 ") then
          nairep = nairep + 1
+      end if
+      if ( cdata(n,0:5) .eq. "FM-101" ) then
+         ntamdar = ntamdar + 1
       end if
       if ( cdata(n,0:5) .eq. "FM-32 " ) then
          npilot = npilot + 1
@@ -234,6 +239,10 @@ begin  ; main script
       airep_lat = new(nairep, float)
       airep_lon = new(nairep, float)
    end if
+   if ( ntamdar .gt. 0  )then
+      tamdar_lat = new(ntamdar, float)
+      tamdar_lon = new(ntamdar, float)
+   end if
    if ( npilot .gt. 0  )then
       pilot_lat = new(npilot, float)
       pilot_lon = new(npilot, float)
@@ -278,6 +287,7 @@ begin  ; main script
    ibogus = 0
    isound = 0
    iairep = 0
+   itamdar = 0
    ipilot = 0
    isatem = 0
    isatob = 0
@@ -323,6 +333,11 @@ begin  ; main script
          airep_lat(iairep) = stringtofloat(charactertostring(cdata(n,80:91)))
          airep_lon(iairep) = stringtofloat(charactertostring(cdata(n,103:114)))
          iairep = iairep + 1
+      end if
+      if ( cdata(n,0:5) .eq. "FM-101" ) then
+         tamdar_lat(itamdar) = stringtofloat(charactertostring(cdata(n,80:91)))
+         tamdar_lon(itamdar) = stringtofloat(charactertostring(cdata(n,103:114)))
+         itamdar = itamdar + 1
       end if
       if ( cdata(n,0:5) .eq. "FM-32 " ) then
          pilot_lat(ipilot) = stringtofloat(charactertostring(cdata(n,80:91)))
@@ -449,6 +464,17 @@ begin  ; main script
       gsres@gsMarkerColor  = "navy"
       gsres@gsMarkerSizeF  = markersize1          ; default 0.007
       dummy = gsn_add_polymarker(wks,map,airep_lon(:),airep_lat(:),gsres)
+      draw(map)
+      frame(wks)
+      delete(dummy)
+   end if
+   if (proc_tamdar .and. ntamdar .gt. 0 ) then
+      mpres = setmpres("TAMDAR",date,ntamdar+"")
+      map = gsn_csm_map(wks,mpres)
+      gsres@gsMarkerIndex = 16                    ; Use filled dots for markers.
+      gsres@gsMarkerColor  = "navy"
+      gsres@gsMarkerSizeF  = markersize1          ; default 0.007
+      dummy = gsn_add_polymarker(wks,map,tamdar_lon(:),tamdar_lat(:),gsres)
       draw(map)
       frame(wks)
       delete(dummy)
