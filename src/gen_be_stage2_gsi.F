@@ -298,7 +298,6 @@ subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
     real                       :: p8(1:nz),p88(1:nz),b8(1:nz),x8(1:nz)
 
 !   
-    real                       :: mean_field, inv_nxny
     integer                    :: npeloop, moop, loop 
     integer                    :: i,j,l,ll,n, ierror
     integer                    :: k,k2,km,kn,kp,kz,kv,kd,kt,kq,kq2,kvd,kvp,kvt,kvq
@@ -348,22 +347,6 @@ subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
     if( debug > 0  .and. mype==0)write(6,*)' calling read_wrf_arw for case: ',moop 
    call read_wrf_arw(trim(filen(loop)),nx,ny,nz,mype,sf,vp,t1,q,q2,p)
 
-
-    ! Remove mean field:
-      mean_field = sum(p(1:nx,1:ny)) * inv_nxny
-      p(1:nx,1:ny) = p(1:nx,1:ny) - mean_field
-    do k = 1, nz
-      mean_field = sum(sf(1:nx,1:ny,k)) * inv_nxny
-      sf(1:nx,1:ny,k) = sf(1:nx,1:ny,k) - mean_field
-      mean_field = sum(vp(1:nx,1:ny,k)) * inv_nxny
-      vp(1:nx,1:ny,k) = vp(1:nx,1:ny,k) - mean_field
-      mean_field = sum(t1(1:nx,1:ny,k)) * inv_nxny
-      t1(1:nx,1:ny,k) = t1(1:nx,1:ny,k) - mean_field
-      mean_field = sum(q(1:nx,1:ny,k)) * inv_nxny
-      q(1:nx,1:ny,k) = q(1:nx,1:ny,k) - mean_field
-      mean_field = sum(q2(1:nx,1:ny,k)) * inv_nxny
-      q2(1:nx,1:ny,k) = q2(1:nx,1:ny,k) - mean_field
-    end do
 
 ! rizvi
 ! compute <psi,chi> and <psi,psi> covariance matrix
@@ -643,7 +626,7 @@ anew=0.
 !   real, parameter           :: mpi_rtype=mpi_real8
 #endif
 
-   real, parameter           :: rbig = 100000000., rsmall = 0.00000001
+   real, parameter           :: rbig = 1.0e30, rsmall = 1.0e-30    
 
    integer, intent(in)       :: nx,ny,nz,ncat
    integer, intent(in)       :: npes,mype,debug,ncases,less_levels_from_top
