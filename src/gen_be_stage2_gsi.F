@@ -304,7 +304,6 @@ subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
 !
 
     if( debug > 0  .and. mype==0)write(6,*)'in compute_reg_coef'
-   inv_nxny= 1.0/float(nx*ny)
 
 !if(mype==3)then
 !tmp4=f
