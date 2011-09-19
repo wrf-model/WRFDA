@@ -56,19 +56,22 @@ echo "DATE           $DATE"
 echo "DA_REAL_OUTPUT $DA_REAL_OUTPUT"
 echo "BDYIN          $BDYIN"
 echo "DA_ANALYSIS    $DA_ANALYSIS"
+echo "DA_BDY_ANALYSIS    $DA_BDY_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
 cp -f $DA_REAL_OUTPUT real_output 
 cp -f $BDYIN wrfbdy_d01
 ln -sf $DA_ANALYSIS wrfvar_output
+ln -sf $DA_BDY_ANALYSIS wrfvar_bdyout
 
 cat > parame.in << EOF
 &control_param
+ da_bdy_file        = 'wrfvar_bdyout'
  wrfvar_output_file = 'wrfvar_output'
  wrf_bdy_file       = 'wrfbdy_d01'
  wrf_input          = 'real_output'
-
+ var4d = .${NL_VAR4D}.
  cycling = .${CYCLING}.
  debug   = .true.
  low_bdy_only = .${NL_LOW_BDY_ONLY}. 

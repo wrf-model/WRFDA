@@ -125,7 +125,7 @@ fi
         $SCRIPTS_DIR/da_trace.ksh da_run_wrfvar $RUN_DIR
         $SCRIPTS_DIR/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1    
      fi   
-     mv $RUN_DIR/working/fcst $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P}
+     mv $RUN_DIR/working/fcst $RUN_DIR1/final_sens_d01
 
      #--------- Second Forecast Norm: (Xaf - Xt)
      if [[ $ADJ_MEASURE -ne 1 ]]; then
@@ -142,7 +142,7 @@ fi
            $SCRIPTS_DIR/da_trace.ksh da_run_wrfvar $RUN_DIR
            $SCRIPTS_DIR/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1    		      
         fi   
-        mv $RUN_DIR/working/fcst $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P}
+        mv $RUN_DIR/working/fcst $RUN_DIR2/final_sens_d01
      fi   
      
      if [[ $ADJ_REF == 3 ]]; then; DATE=$DATE_TMP; fi
@@ -162,18 +162,28 @@ fi
         fi
    
         if [[ $ADJ_MEASURE == 4 ]]; then        
-           ln -sf $RUN_DIR2/working/auxhist* $RUN_DIR1/working/.
+           if  $NL_TRAJECTORY_IO; then
+              export WRF_INPUT_DIR=${FC_DIR}/${DATE}
+           else
+              export WRF_INPUT_DIR=${FC_DIR}/${DATE}
+              ln -sf $RUN_DIR2/working/auxhist* $RUN_DIR1/working/.
+           fi
         elif [[ $ADJ_MEASURE == 5 ]]; then        
-           ln -sf $RUN_DIR1/working/auxhist* $RUN_DIR2/working/.
+           if  $NL_TRAJECTORY_IO; then
+              export WRF_INPUT_DIR=${RC_DIR}/${DATE}
+           else
+              export WRF_INPUT_DIR=${RC_DIR}/${DATE}
+              ln -sf $RUN_DIR1/working/auxhist* $RUN_DIR2/working/.
+           fi
         fi
 	   
 #------------------- First WRF+ run --------------------
         export RUN_DIR=$RUN_DIR1
 
         if [[ $ADJ_MEASURE -ne 2 ]]; then
-           ln -sf $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}	   
+           ln -sf $RUN_DIR1/final_sens_d${DOMAINS} $RUN_DIR/working/final_sens_d${DOMAINS}
         else 
-           ln -sf $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
+           ln -sf $RUN_DIR2/final_sens_d${DOMAINS} $RUN_DIR/working/final_sens_d${DOMAINS}
         fi
        
         $SCRIPTS_DIR/da_run_wrf.ksh $WRFPLUS_OPTION > $RUN_DIR/WRF$WRFPLUS_OPTION.html 2>&1
@@ -181,7 +191,7 @@ fi
         if $RUN_TL_TEST; then
            cp $RUN_DIR/working/tl_d${DOMAINS}_${DATE_P} $RUN_DIR/final_pert_d${DOMAINS}_${DATE_P}	
 	else
-           mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
+           mv $RUN_DIR/working/gradient_wrfplus_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
         fi
 	
 #------------------- Second WRF+ run --------------------
@@ -189,14 +199,14 @@ fi
            export RUN_DIR=$RUN_DIR2
 
            if [[ $ADJ_MEASURE == 2 ]]; then
-              ln -sf $RUN_DIR1/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
+              ln -sf $RUN_DIR1/final_sens_d${DOMAINS} $RUN_DIR/working/final_sens_d${DOMAINS}
            else   
-              ln -sf $RUN_DIR2/final_sens_d${DOMAINS}_${DATE_P} $RUN_DIR/working/wrfout_d${DOMAINS}_${DATE_P}
+              ln -sf $RUN_DIR2/final_sens_d${DOMAINS} $RUN_DIR/working/final_sens_d${DOMAINS}
            fi
 
            $SCRIPTS_DIR/da_run_wrf.ksh $WRFPLUS_OPTION > $RUN_DIR/WRF$WRFPLUS_OPTION.html 2>&1
 
-           mv $RUN_DIR/working/ad_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
+           mv $RUN_DIR/working/gradient_wrfplus_d${DOMAINS}_${DATE_R} $RUN_DIR/init_sens_d${DOMAINS}_${DATE_R}
         fi        
      else    
         echo '**** WRFPlus is not run ****' 

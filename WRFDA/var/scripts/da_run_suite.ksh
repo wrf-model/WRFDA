@@ -308,6 +308,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
 
       export EP_DIR=$FC_DIR/$DATE/ep
       export DA_ANALYSIS=$FC_DIR/$DATE/${FILE_TYPE}_d01
+      export DA_BDY_ANALYSIS=$FC_DIR/$DATE/wrfvar_bdyout
       
       if $NL_USE_VARBC; then
          if  [[ -f ${SUITE_DIR}/${VARBC_PREV_DATE}/wrfvar/VARBC.out ]]; then
@@ -442,6 +443,7 @@ while [[ $DATE -le $FINAL_DATE ]] ; do
          export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d01
          export BDYIN=$RC_DIR/$DATE/wrfbdy_d01
          export DA_ANALYSIS=$FC_DIR/$DATE/${FILE_TYPE}_d01
+         export DA_BDY_ANALYSIS=$FC_DIR/$DATE/wrfvar_bdyout
          export BDYOUT=$FC_DIR/$DATE/wrfbdy_d01
 
          $SCRIPTS_DIR/da_trace.ksh da_run_update_bc $RUN_DIR

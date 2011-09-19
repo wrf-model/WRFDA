@@ -43,7 +43,7 @@ begin
        vc = vc * (1./300.)^2       ;(1/RHO*Cs)**2, RHO=1kg/m^3, Cs=300m/s
     end if
     
-    gName = "G_"+vNames(n) 
+    gName = "A_"+vNames(n) 
     A->$gName$ = vc
     delete(va)
     delete(vb)

@@ -49,6 +49,7 @@ if [[ $NL_MULTI_INC == 2 ]]; then
    export DA_BOUNDARIES=${RC_DIR}/$DATE/wrfbdy_d01
 fi
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
+export DA_BDY_ANALYSIS=${DA_BDY_ANALYSIS:-wrfvar_bdyout}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 if [[ $NL_CV_OPTIONS == 3 ]]; then
    export DA_BACK_ERRORS=$WRFVAR_DIR/var/run/be.dat.cv3
@@ -98,7 +99,6 @@ date
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 if $NL_VAR4D; then
-   echo 'WRFNL_DIR             <A HREF="file:'$WRFNL_DIR'">'$WRFNL_DIR'</a>' $WRFNL_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
@@ -124,6 +124,7 @@ echo 'EP_DIR                <A HREF="file:'$EP_DIR'">'$EP_DIR'</a>'
 echo 'RUN_DIR               <A HREF="file:'.'">'$RUN_DIR'</a>'
 echo 'WORK_DIR              <A HREF="file:'${WORK_DIR##$RUN_DIR/}'">'$WORK_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
+echo "DA_BDY_ANALYSIS       $DA_BDY_ANALYSIS"
 echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
@@ -232,7 +233,7 @@ export PATH=$WRFVAR_DIR/var/scripts:$PATH
 if $NL_VAR4D; then
    ln -fs $DA_BOUNDARIES wrfbdy_d01
    ln -fs $DA_FIRST_GUESS fg01
-   ln -fs $WRFVAR_DIR/run/RRTM_DATA .
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
    ln -fs $WRFVAR_DIR/run/VEGPARM.TBL .
    ln -fs $WRFVAR_DIR/run/SOILPARM.TBL .
    ln -fs $WRFVAR_DIR/run/GENPARM.TBL .
@@ -344,222 +345,11 @@ for FILE in $OB_DIR/$DATE/*.bufr; do
    fi
 done
 
-if $NL_VAR4D; then
-   if $NL_JCDFI_USE; then
-      export NL_JCDFI_IO=true
-   fi
-   # Create nl, tl, ad links structures
-   mkdir nl tl ad
-
-   # nl
-
-   # Inputs
-   export NL_HISTORY_INTERVAL_SAVE=$NL_HISTORY_INTERVAL
-   export NL_HISTORY_INTERVAL=9999
-   export NL_AUXHIST2_OUTNAME_SAVE=$NL_AUXHIST2_OUTNAME
-   export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
-   export NL_IO_FORM_AUXHIST2=2
-   export NL_FRAMES_PER_AUXHIST2=1
-   if [[ $NUM_PROCS -gt 1 ]]; then
-      export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
-   fi
-   export NL_DYN_OPT_SAVE=$NL_DYN_OPT
-   export NL_DYN_OPT=2
-   export NL_INPUT_OUTNAME_SAVE=$NL_INPUT_OUTNAME
-   export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
-   if [[ $NUM_PROCS -gt 1 ]]; then
-      export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
-   fi
-   export NL_INPUTOUT_INTERVAL_SAVE=$NL_INPUTOUT_INTERVAL
-   export NL_INPUTOUT_INTERVAL=60
-   export NL_AUXHIST2_INTERVAL_SAVE=$NL_INPUTOUT_INTERVAL
-   let NL_AUXHIST2_INTERVAL=$NL_TIME_STEP/60
-   export NL_FRAMES_PER_AUXHIST2_SAVE=$NL_FRAMES_PER_AUXHIST2
-   export NL_FRAMES_PER_AUXHIST2=1
-
-   export NL_TIME_STEP_SOUND_SAVE=$NL_TIME_STEP_SOUND
-   export NL_TIME_STEP_SOUND=4
-   . $WRFNL_DIR/inc/namelist_script.inc 
-   mv namelist.input nl
-   export NL_AUXHIST2_OUTNAME=$NL_AUXHIST2_OUTNAME_SAVE
-   export NL_FRAMES_PER_AUXHIST2=$NL_AUXHIST2_INTERVAL_SAVE
-   ln -fs $WORK_DIR/*.TBL nl
-   ln -fs $WRFVAR_DIR/run/RRTM_DATA nl
-   ln -fs $WRFVAR_DIR/run/ETAMPNEW_DATA nl
-   ln -fs $WORK_DIR/wrfbdy_d01 nl
-   ln -fs $WORK_DIR/wrfinput_d01 nl/wrfinput_d01
-   ln -fs $WRFNL_DIR/main/wrf.exe nl
-
-   # Outputs
-   for I in 02 03 04 05 06 07; do
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00-thin fg$I
-      else
-         ln -fs nl/nl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
-      fi
-   done
-
-   # tl
-
-   # Inputs
-
-   export NL_DYN_OPT=202
-   export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
-   export NL_AUXINPUT2_INNAME_SAVE=$NL_AUXINPUT2_INNAME
-   if [[ $NL_MULTI_INC == 2 ]]; then
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
-   else
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-   fi
-   if [[ $NUM_PROCS -gt 1 ]]; then
-      export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
-      else
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
-      fi
-   fi
-   export NL_AUXINPUT2_INTERVAL_SAVE=$NL_AUXINPUT2_INTERVAL
-   let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
-   unset NL_AUXHIST2_INTERVAL
-   export NL_MP_PHYSICS_SAVE=$NL_MP_PHYSICS
-   export NL_MP_PHYSICS=0
-   export NL_RA_LW_PHYSICS_SAVE=$NL_RA_LW_PHYSICS
-   export NL_RA_LW_PHYSICS=0
-   export NL_RA_SW_PHYSICS_SAVE=$NL_RA_SW_PHYSICS
-   export NL_RA_SW_PHYSICS=0
-   export NL_RADT_SAVE=$NL_RADT
-   export NL_RADT=0
-   export NL_SF_SFCLAY_PHYSICS_SAVE=$NL_SF_SFCLAY_PHYSICS
-   export NL_SF_SFCLAY_PHYSICS=0
-   export NL_BL_PBL_PHYSICS_SAVE=$NL_BL_PBL_PHYSICS
-   export NL_BL_PBL_PHYSICS=0
-   export NL_BLDT_SAVE=$NL_BLDT_SAVE
-   export NL_BLDT=0
-   export NL_CU_PHYSICS_SAVE=$NL_CU_PHYSICS
-   export NL_CU_PHYSICS=0
-   export NL_CUDT_SAVE=$NL_CUDT
-   export NL_CUDT=0
-   export NL_ISFFLX_SAVE=$NL_ISFFLX
-   export NL_ISFFLX=0
-   export NL_ICLOUD_SAVE=$NL_ICLOUD
-   export NL_ICLOUD=0
-   export NL_W_DAMPING_SAVE=$NL_W_DAMPING
-   export NL_W_DAMPING=0
-   export NL_DIFF_OPT_SAVE=$NL_DIFF_OPT
-   export NL_DIFF_OPT=1
-   export NL_DAMPCOEF_SAVE=$NL_DAMPCOEF
-   export NL_DAMPCOEF=0.2
-   . $WRFPLUS_DIR/inc/namelist_script.inc
-   mv namelist.input tl
-   ln -fs $WORK_DIR/*.TBL tl
-   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL tl
-   ln -fs $WORK_DIR/wrfbdy_d01 tl
-   ln -fs $WORK_DIR/tl01 tl/wrfinput_d01
-   ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
-   mkdir tl/trace
-
-   # Outputs
-   for I in 02 03 04 05 06 07; do
-      ln -fs tl/tl_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
-   done
-   if $NL_JCDFI_IO; then
-      if [[ $NUM_PROCS -gt 1 ]]; then
-         ln -fs auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
-      else
-         ln -fs tl/auxhist3_d01_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
-      fi
-   fi
-
-   # ad
-
-   # Inputs
-   export NL_DYN_OPT=302
-   export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
-   if [[ $NL_MULTI_INC == 2 ]]; then
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>-thin'
-   else
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-   fi
-   if [[ $NUM_PROCS -gt 1 ]]; then
-      export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
-      if [[ $NL_MULTI_INC == 2 ]]; then
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>-thin'
-      else
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
-      fi
-   fi
-   let NL_AUXINPUT2_INTERVAL=$NL_TIME_STEP/60
-   export NL_AUXINPUT3_INNAME_SAVE=$NL_AUXINPUT3_INNAME
-   export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
-   if [[ $NUM_PROCS -gt 1 ]]; then
-      export NL_AUXINPUT3_INNAME='./ad/auxinput3_d<domain>_<date>'
-   fi
-   export NL_AUXINPUT3_INTERVAL_SAVE=$NL_AUXINPUT3_INTERVAL
-   export NL_AUXINPUT3_INTERVAL=60
-   export NL_AUXHIST3_INTERVAL_SAVE=$NL_AUXHIST3_INTERVAL
-   export NL_AUXHIST3_INTERVAL=60
-   export NL_INPUTOUT_INTERVAL=60
-   . $WRFPLUS_DIR/inc/namelist_script.inc
-   mv namelist.input ad
-   ln -fs $WORK_DIR/*.TBL ad
-   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL ad
-   ln -fs $WORK_DIR/wrfbdy_d01 ad
-   ln -fs $DA_FIRST_GUESS ad/wrfinput_d01
-   for I in 01 02 03 04 05 06 07; do
-      ln -fs $WORK_DIR/af$I ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
-   done
-   # JRB
-   if $NL_JCDFI_IO; then
-      ln -fs $WORK_DIR/auxhist3_d01_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d01_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
-   fi   
-   ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
-   mkdir ad/trace
-
-   # Outputs
-   ln -fs ad/ad_d01_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
-
-   # Restore values
-   export NL_HISTORY_INTERVAL=$NL_HISTORY_INTERVAL_SAVE
-   export NL_AUXINPUT2_INTERVAL=$NL_AUXINPUT2_INTERVAL_SAVE
-   export NL_AUXINPUT2_INNAME=$NL_AUXINPUT2_INNAME_SAVE
-   export NL_AUXINPUT3_INTERVAL=$NL_AUXINPUT3_INTERVAL_SAVE
-   export NL_AUXINPUT3_INNAME=$NL_AUXINPUT3_INNAME_SAVE
-   export NL_AUXHIST2_INTERVAL=$NL_AUXHIST2_INTERVAL_SAVE
-   export NL_AUXHIST3_INTERVAL=$NL_AUXHIST3_INTERVAL_SAVE
-   export NL_INPUTOUT_INTERVAL=$NL_INPUTOUT_INTERVAL_SAVE
-   export NL_INPUT_OUTNAME=$NL_INPUT_OUTNAME_SAVE
-   export NL_FRAMES_PER_AUXHIST2=$NL_FRAMES_PER_AUXHIST2_SAVE
-   export NL_DYN_OPT=$NL_DYN_OPT_SAVE
-   export NL_MP_PHYSICS=$NL_MP_PHYSICS_SAVE
-   export NL_RA_LW_PHYSICS=$NL_RA_LW_PHYSICS_SAVE
-   export NL_RA_SW_PHYSICS=$NL_RA_SW_PHYSICS_SAVE
-   export NL_SF_SFCLAY_PHYSICS=$NL_SF_SFCLAY_PHYSICS_SAVE
-   export NL_BL_PBL_PHYSICS=$NL_BL_PBL_PHYSICS_SAVE
-   export NL_BLDT=$NL_BLDT_SAVE
-   export NL_CU_PHYSICS=$NL_CU_PHYSICS_SAVE
-   export NL_CUDT=$NL_CUDT_SAVE
-   export NL_ISFFLX=$NL_ISFFLX_SAVE
-   export NL_ICLOUD=$NL_ICLOUD_SAVE
-   export NL_RADT=$NL_RADT_SAVE
-   export NL_TIME_STEP_SOUND=$NL_TIME_STEP_SOUND_SAVE
-   export NL_W_DAMPING=$NL_W_DAMPING_SAVE
-   export NL_DIFF_OPT=$NL_DIFF_OPT_SAVE
-   export NL_DAMPCOEF=$NL_DAMPCOEF_SAVE
-
-fi
-
 . $WRFVAR_DIR/inc/namelist_script.inc 
 
 if $NL_VAR4D; then
    cp namelist.input $RUN_DIR/namelist_wrfvar.input
-   cp nl/namelist.input $RUN_DIR/namelist_nl.input
-   cp tl/namelist.input $RUN_DIR/namelist_tl.input
-   cp ad/namelist.input $RUN_DIR/namelist_ad.input
    echo '<A HREF="namelist_wrfvar.input">WRFVAR namelist.input</a>'
-   echo '<A HREF="namelist_nl.input">NL namelist.input</a>'
-   echo '<A HREF="namelist_tl.input">TL namelist.input</a>'
-   echo '<A HREF="namelist_ad.input">AD namelist.input</a>'
 else
    cp namelist.input $RUN_DIR
    echo '<A HREF="namelist.input">Namelist.input</a>'
@@ -598,87 +388,14 @@ else
    if $NL_VAR4D; then
       if [[ $NUM_PROCS -gt 1 ]]; then
          # JRB kludge until we work out what we are doing here
-         if [[ $NUM_PROCS -lt 3 ]]; then
-            echo "Need at least 3 processors for 4dvar in parallel mode"
-            exit 1
-         fi
-         export NUM_PROCS_VAR=`expr $NUM_PROCS \/ 4`
-         export NUM_PROCS_WRF=`expr $NUM_PROCS \/ 4`
-         export NUM_PROCS_WRFPLUS=`expr $NUM_PROCS \/ 2`
-         export LSF_PTILE=${LSF_PTILE:-$NUM_PROCS}
-         export NUM_4DVAR_NODES=`expr $NUM_PROCS \/ $LSF_PTILE`
-         if [[ $NUM_4DVAR_NODES -lt 1 ]] ; then
-            export NUM_4DVAR_NODES=1
-         fi
-         export NUM_PROCS_VAR_PER_NODE=`expr $NUM_PROCS_VAR \/ $NUM_4DVAR_NODES`
-         export NUM_PROCS_WRF_PER_NODE=`expr $NUM_PROCS_WRF \/ $NUM_4DVAR_NODES`
-         export NUM_PROCS_WRFPLUS_PER_NODE=`expr $NUM_PROCS_WRFPLUS \/ $NUM_4DVAR_NODES`
-         if [[ $NUM_4DVAR_NODES -gt 1 ]] ; then
-            if [[ $NUM_PROCS_VAR_PER_NODE+$NUM_PROCS_WRF_PER_NODE+$NUM_PROCS_WRFPLUS_PER_NODE -ne $LSF_PTILE ]] ; then
-               echo $NUM_PROCS_VAR_PER_NODE+$NUM_PROCS_WRF_PER_NODE+$NUM_PROCS_WRFPLUS_PER_NODE
-               echo "Wrong processors distribution", $NUM_PROCS_VAR_PER_NODE, $NUM_PROCS_WRF_PER_NODE, $NUM_PROCS_WRFPLUS_PER_NODE, $LSF_PTILE
-               exit 1
-            fi
-         fi
-         if [[ $NL_MULTI_INC == 1 ]] ; then
-            export NUM_PROCS_VAR=1
-            export NUM_PROCS_WRF=`expr $NUM_PROCS - 1`
-            export NUM_PROCS_WRFPLUS=0
-         fi
-         if [[ $NUM_PROCS -eq 3 ]]; then
-            export NUM_PROCS_VAR=1
-            export NUM_PROCS_WRF=1
-            export NUM_PROCS_WRFPLUS=1
-         fi
-         echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
-         echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
-         echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
-
          if [[ $SUBMIT == "LSF" ]]; then
-            export MP_PGMMODEL=mpmd
-            export MP_CMDFILE=poe.cmdfile
-            rm -f $MP_CMDFILE
-
-            if [[ $NL_MULTI_INC == 1 ]] ; then
-               let I=0
-               while [[ $I -lt $NUM_PROCS_VAR ]]; do
-                  echo "da_wrfvar.exe" >> $MP_CMDFILE
-                  let I=$I+1
-               done
-               let I=0
-               while [[ $I -lt $NUM_PROCS_WRF ]]; do
-                  echo "./nl/wrf.exe" >> $MP_CMDFILE
-                  let I=$I+1
-               done
-            else
-               let INode=1
-               while [[ $INode -le $NUM_4DVAR_NODES ]]; do
-                  let I=0
-                  while [[ $I -lt $NUM_PROCS_VAR_PER_NODE ]]; do
-                     echo "da_wrfvar.exe" >> $MP_CMDFILE
-                     let I=$I+1
-                  done
-                  let I=0
-                  while [[ $I -lt $NUM_PROCS_WRFPLUS_PER_NODE ]]; do
-                     echo "./ad/wrfplus.exe" >> $MP_CMDFILE
-                     let I=$I+1
-                  done
-                  let I=0
-                  while [[ $I -lt $NUM_PROCS_WRF_PER_NODE ]]; do
-                     echo "./nl/wrf.exe" >> $MP_CMDFILE
-                     let I=$I+1
-                  done
-                  let INode=$INode+1
-               done
-            fi
-
-         mpirun.lsf -cmdfile  $MP_CMDFILE
+         mpirun.lsf ./da_wrfvar.exe
          RC=$?
 
          fi
 
          if [[ $SUBMIT == "none" ]]; then
-            mpirun -np $NUM_PROCS_VAR ./da_wrfvar.exe : -np $NUM_PROCS_WRFPLUS ./ad/wrfplus.exe : -np $NUM_PROCS_WRF ./nl/wrf.exe
+            $RUN_CMD ./da_wrfvar.exe
          fi
 
       else
@@ -889,6 +606,9 @@ EOF
          if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
             if ! $RUN_ADJ_SENS; then
                cp wrfvar_output $DA_ANALYSIS
+               if [[ -f wrfvar_bdyout ]]; then
+                  cp wrfvar_bdyout $DA_BDY_ANALYSIS
+               fi
             fi
          fi
       fi
@@ -896,13 +616,7 @@ EOF
 
    if $NL_VAR4D; then
       cp $WORK_DIR/namelist_wrfvar.output $RUN_DIR/namelist_wrfvar.output
-      cp $WORK_DIR/nl/namelist.output     $RUN_DIR/namelist_nl.output
-      cp $WORK_DIR/tl/namelist.output     $RUN_DIR/namelist_tl.output
-      cp $WORK_DIR/ad/namelist.output     $RUN_DIR/namelist_ad.output
       echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
-      echo '<A HREF="namelist_nl.output">NL namelist.output</a>'
-      echo '<A HREF="namelist_tl.output">TL namelist.output</a>'
-      echo '<A HREF="namelist_ad.output">AD namelist.output</a>'
    else
       cp $WORK_DIR/namelist.output $RUN_DIR
       echo '<A HREF="namelist.output">Namelist.output</a>'
