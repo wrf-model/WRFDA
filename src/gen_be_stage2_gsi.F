@@ -196,7 +196,7 @@ subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
    character (len=10) :: variable
    character (len=3) :: ce
    ! filename is pert.gsi.'date'.e'ce'
-   integer :: iunit
+   integer :: iunit, nkdum
    
    date = filename(11:21)
    ce = filename(24:26)
@@ -220,6 +220,9 @@ subroutine read_wrf_arw(filename,nx,ny,nz,mype, sf,vp,t,q,qm,p)
    !        Read modified moisture:
    variable = 'rhm'
    call read_3d_field(variable, date, ce, iunit, nx, ny, nz, qm) 
+   variable = 'ps_u'
+   call read_2d_field(variable, date, ce, iunit, nx, ny, nkdum, p)  
+!
 !
 !   nrec = 1
 !    open(unit=24,file=trim(filename),form='unformatted', &
