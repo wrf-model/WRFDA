@@ -19,18 +19,18 @@ input_source = "ascii"   ; reading data from gts_omb_oma_01
 ;input_source = "netcdf"  ; reading data from the output of write_netcdf
 nc_datdir    = "./"
 out_type     = "pdf"    ; or ncgm
-plotdir      = "/ptmp/hclin/con200/plot/"
+plotdir      = "/ptmp/xzhang/RUN_FSO/CONUS/ncl_plot/"
 expt         = ""  ; for output naming purpose
-datdir1      = "/ptmp/hclin/con200/var/"        ; the path before DATE
-datdir2      = "/working/"                      ; the path after  DATE
+datdir1      = "/ptmp/xzhang/RUN_FSO/CONUS/run/"        ; the path before DATE
+datdir2      = "/obsimpact/working/"                      ; the path after  DATE
 filename_gts   = "gts_omb_oma_01"
 ; NOTE: actual file to read is gts_fullname
 ; gts_fullname = datdir1+date+datdir2+filename_gts will be defined later in the main script
 ; search for gts_fullname and modify it for your own directory structure
-fname = "/ptmp/hclin/con200/rc/2007010200/wrfinput_d01"  ; for retrieving mapping info
-start_date   = "2007010200"
-end_date     = "2007010200"
-cycle_period = 12
+fname = "/ptmp/xzhang/RUN_FSO/CONUS/rc/2010060106/wrfinput_d01"  ; for retrieving mapping info
+start_date   = "2010060118"
+end_date     = "2010060118"
+cycle_period = 6
 ;
 ; set pressure levels for plotting AIREP, GEOAMV, POLARAMV, PILOT, PROFILER, SOUND, BOGUS, AIRSR
 ; method 1: set a 2-D array of bounded pressure levels in hPa
@@ -59,7 +59,7 @@ hlevs  = (/ (/2000., 5000./), (/5000., 8500./) /)
 ;
 ; turn on/off the observation types to plot
 ;
-proc_surface_types = True
+proc_surface_types = False;True
 proc_upper_types   = True
 
 proc_synop     = False
@@ -72,6 +72,7 @@ proc_geoamv    = False
 proc_polaramv  = False
 proc_sound     = False
 proc_airep     = False
+proc_tamdar    = False
 proc_pilot     = False
 proc_profiler  = False
 proc_ssmir     = False
@@ -92,15 +93,16 @@ if ( proc_surface_types ) then
 end if
 
 if ( proc_upper_types ) then
-   proc_geoamv    = True
-   proc_polaramv  = True
+   proc_geoamv    = False ;True
+   proc_polaramv  = False ;True
    proc_sound     = True
-   proc_airep     = True
-   proc_pilot     = True
-   proc_profiler  = True
-   proc_bogus     = True
-   proc_airsr     = True
-   proc_gpsref    = True
+   proc_airep     = True ;True
+   proc_tamdar    = True
+   proc_pilot     = False ;True
+   proc_profiler  = False ;True
+   proc_bogus     = False ;True
+   proc_airsr     = False ;True
+   proc_gpsref    = False ;True
 end if
 
 ; mapinfo_from_file = False
@@ -1140,7 +1142,7 @@ begin
                pv(:,k) = mask(v(:,k), pres.le.p1.and.pres.ge.p2, True)
             end if
          end if
-         if ( otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."AIRSR" ) then
+         if ( otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
             if ( subdomain ) then
                pt(:,k) = mask(t(:,k), pres.le.p1.and.pres.ge.p2.and.              \
                                       lon(:).ge.minlon.and.lon(:).le.maxlon.and.  \
@@ -1149,7 +1151,7 @@ begin
                pt(:,k) = mask(t(:,k), pres.le.p1.and.pres.ge.p2, True)
             end if
          end if
-         if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+         if ( otype.eq."SOUND" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
             if ( subdomain ) then
                pq(:,k) = mask(q(:,k), pres.le.p1.and.pres.ge.p2.and.              \
                                       lon(:).ge.minlon.and.lon(:).le.maxlon.and.  \
@@ -1169,13 +1171,13 @@ begin
          num_v_all = num(.not.ismissing(pv(:,0)))
          num_v_qc  = num(.not.ismissing(pv_qc(:,0)))
       end if
-      if ( otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."AIRSR" ) then
+      if ( otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
          pt_qc = pt
          pt_qc(:,0) = mask(pt(:,0),pt(:,2).ge.0,True)
          num_t_all = num(.not.ismissing(pt(:,0)))
          num_t_qc  = num(.not.ismissing(pt_qc(:,0)))
       end if
-      if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+      if ( otype.eq."SOUND" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
          pq_qc = pq
          pq_qc(:,0) = mask(pq(:,0),pq(:,2).ge.0,True)
          num_q_all = num(.not.ismissing(pq(:,0)))
@@ -1203,6 +1205,11 @@ begin
          plon = mask(lon(:),pu(:,2).ge.0.or.pv(:,2).ge.0.or.pt(:,2).ge.0,True)
          plat = mask(lat(:),pu(:,2).ge.0.or.pv(:,2).ge.0.or.pt(:,2).ge.0,True)
       end if
+      if ( otype.eq."TAMDAR" ) then
+         num_qc = num(.not.ismissing(pu_qc(:,2).ge.0.and.pv_qc(:,2).ge.0.and.pt_qc(:,2).ge.0.and.pq_qc(:,2).ge.0))
+         plon = mask(lon(:),pu(:,2).ge.0.or.pv(:,2).ge.0.or.pt(:,2).ge.0.or.pq(:,2).ge.0,True)
+         plat = mask(lat(:),pu(:,2).ge.0.or.pv(:,2).ge.0.or.pt(:,2).ge.0.or.pq(:,2).ge.0,True)
+      end if
       if ( otype.eq."AIRSR" ) then
          num_qc = num(.not.ismissing(pt_qc(:,2).ge.0.and.pq_qc(:,2).ge.0))
          plon = mask(lon(:),pt(:,2).ge.0.or.pq(:,2).ge.0,True)
@@ -1227,7 +1234,7 @@ begin
          end if
          ; plon = mask(lon(:),pu(:,2).ge.0.or.pv(:,2).ge.0,True)
          ; plat = mask(lat(:),pu(:,2).ge.0.or.pv(:,2).ge.0,True)
-         if ( plotwnd .and. (otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."AIRSR") ) then
+         if ( plotwnd .and. (otype.eq."SOUND" .or. otype.eq."AIREP" .or. otype.eq."TAMDAR".or. otype.eq."AIRSR") ) then
             txres               = True
             txres@txFontHeightF = 0.010
             txres@txFont        = "helvetica"
@@ -1339,7 +1346,7 @@ begin
             delete(plot)
          end if
 
-         if ( otype.eq. "AIREP" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+         if ( otype.eq. "AIREP" .or. otype.eq."TAMDAR" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
             ;
             if ( num_t_all.gt.0 .or. num_t_qc.gt.0 ) then
                plot = new(4,graphic)
@@ -1385,7 +1392,7 @@ begin
                delete(pnres)
                delete(plot)
                ;
-               if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+               if ( otype.eq."SOUND" .or. otype .eq."TAMDAR" .or. otype.eq."AIRSR" ) then
                   if ( num_q_all.gt.0 .or. num_q_qc.gt.0 ) then
                      plot = new(4,graphic)
                      title = "OMB  "+otype+" Q (All: "+num_q_all+")"
@@ -1501,7 +1508,7 @@ begin
          delete(plot)
       end if
 
-      if ( otype.eq. "AIREP" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+      if ( otype.eq. "AIREP" .or. otype.eq."TAMDAR" .or. otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
          ;
          ; OBS and BAK(Background) scatter plot
          ;
@@ -1522,7 +1529,7 @@ begin
             delete(data2)
          end if
 
-         if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+         if ( otype.eq."SOUND" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
                if ( .not.isvar("plot") ) then
                   plot = new(4,graphic)
@@ -1549,7 +1556,7 @@ begin
             delete(data2)
          end if
 
-         if ( otype.eq."SOUND" .or. otype.eq."AIRSR" ) then
+         if ( otype.eq."SOUND" .or. otype.eq."TAMDAR" .or. otype.eq."AIRSR" ) then
             if ( plotscatter .and. num_q_all.gt.1 .and. num_q_qc.gt.1 ) then
                data1 = mask(1000.0*pq_qc(:,0),pq_qc(:,2).ge.0,True)               ; OBS
                data2 = mask(1000.0*(pq_qc(:,0)-pq_qc(:,4)),pq_qc(:,2).ge.0,True)  ; ANA = OBS - OMA
@@ -2149,6 +2156,24 @@ begin ; begin of function read_data
          iend = (/224,241,249,266,283/)
       end if
    end if
+   if ( otype .eq. "tamdar" ) then
+      if ( field .eq. "u" )  then
+         ibeg = (/56,73,90,98,115/)
+         iend = (/72,89,97,114,131/)
+      end if
+      if ( field .eq. "v" )  then
+         ibeg = (/132,149,166,174,191/)
+         iend = (/148,165,173,190,207/)
+      end if
+      if ( field .eq. "t" )  then
+         ibeg = (/208,225,242,250,267/)
+         iend = (/224,241,249,266,283/)
+      end if
+      if ( field .eq. "q" )  then
+         ibeg = (/284,301,318,326,343/)
+         iend = (/300,317,325,342,359/)
+      end if
+   end if
    if ( otype .eq. "radar" ) then
       if ( field .eq. "rv" )  then
          ibeg = (/56,73,90,98,115/)
@@ -2564,6 +2589,7 @@ begin;  begin of the main script
                ngpspw = 0
                nsound = 0
                nairep = 0
+               ntamdar = 0
                npilot = 0
                nprofiler = 0
                nssmir = 0
@@ -2738,6 +2764,24 @@ begin;  begin of the main script
                         do k = 1, nairep-1
                            ilevel_airep(k) = ilevel_airep(k-1)+nlevel_airep(k-1)+1
                            nlevel_airep(k) = stringtointeger(charactertostring(cdata(ilevel_airep(k),0:7)))
+                        end do
+                     end if
+                  end if
+               end if
+               if ( proc_tamdar ) then
+                  ob_string = "              tamdar"
+                  itamdar = ind(chartostring(cdata(:,0:19)).eq.ob_string)
+                  if ( .not.ismissing(itamdar) ) then
+                     ntamdar = stringtointeger(charactertostring(cdata(itamdar,20:27))) ; number of obs
+                     print(ntamdar)
+                     if ( ntamdar .gt. 0 ) then
+                        nlevel_tamdar = new(ntamdar,integer)
+                        ilevel_tamdar = new(ntamdar,integer)
+                        ilevel_tamdar(0) = itamdar+1
+                        nlevel_tamdar(0) = stringtointeger(charactertostring(cdata(ilevel_tamdar(0),0:7)))
+                        do k = 1, ntamdar-1
+                           ilevel_tamdar(k) = ilevel_tamdar(k-1)+nlevel_tamdar(k-1)+1
+                           nlevel_tamdar(k) = stringtointeger(charactertostring(cdata(ilevel_tamdar(k),0:7)))
                         end do
                      end if
                   end if
@@ -3292,6 +3336,57 @@ begin;  begin of the main script
                   delete(airep_t)
                end if   ; end of nairep check
 
+               if ( proc_tamdar .and.  ntamdar .gt. 0 ) then
+                  tamdar_id  = read_info(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "id")
+                  tamdar_lat = read_info(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "lat")
+                  tamdar_lon = read_info(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "lon")
+                  tamdar_pre = read_info(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "pre")
+                  tamdar_u   = read_data(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "tamdar", "u")
+                  tamdar_v   = read_data(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "tamdar", "v")
+                  tamdar_t   = read_data(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "tamdar", "t")
+                  tamdar_q   = read_data(ntamdar, itamdar, cdata, nlevel_tamdar, ilevel_tamdar, "tamdar", "q")
+                  dum = tamdar_u
+                  dum = tamdar_u@_FillValue
+                  if ( write_netcdf ) then
+                     write_nc("tamdar", "p", tamdar_pre, ntamdar, nlevel_tamdar, date, \
+                              tamdar_id, tamdar_lat, tamdar_lon, \
+                              tamdar_u, tamdar_v, tamdar_t, dum, tamdar_q, dum, dum, dum, prefix)
+                  end if
+                  if ( expt .ne. "" ) then
+                     wks = gsn_open_wks(out_type,plotdir+"/"+expt+"_tamdar_"+date)
+                  else
+                     wks = gsn_open_wks(out_type,plotdir+"/tamdar_"+date)
+                  end if
+                  gsn_define_colormap(wks,colormap)
+                  nc1 = NhlNewColor(wks,.8,.8,.8)  ; add light gray to colormap
+                  if ( rank_plevs .eq. 1 ) then
+                     do k = 0, nplevs(0)-1
+                        plot_upr("TAMDAR",wks,ntamdar,date,plevs(k),plevs(k),tamdar_pre,tamdar_lat,tamdar_lon,\
+                                         tamdar_u,tamdar_v,tamdar_t,tamdar_q,dum,dum)
+                     end do
+                  end if
+                  if ( rank_plevs .eq. 2 ) then
+                     do k = 0, nplevs(0)-1
+                        if ( .not.ismissing(plevs(k,0)) .and. .not.ismissing(plevs(k,1)) ) then
+                           plot_upr("TAMDAR",wks,ntamdar,date,plevs(k,0),plevs(k,1),tamdar_pre,tamdar_lat,tamdar_lon,\
+                                            tamdar_u,tamdar_v,tamdar_t,tamdar_q,dum,dum)
+                        end if
+                     end do
+                  end if
+                  destroy(wks)
+                  delete(dum)
+                  delete(ilevel_tamdar)
+                  delete(nlevel_tamdar)
+                  delete(tamdar_id)
+                  delete(tamdar_lat)
+                  delete(tamdar_lon)
+                  delete(tamdar_pre)
+                  delete(tamdar_u)
+                  delete(tamdar_v)
+                  delete(tamdar_t)
+                  delete(tamdar_q)
+               end if   ; end of ntamdar check
+
                if ( proc_pilot .and. npilot .gt. 0 ) then
                   pilot_id  = read_info(npilot, ipilot, cdata, nlevel_pilot, ilevel_pilot, "id")
                   pilot_lat = read_info(npilot, ipilot, cdata, nlevel_pilot, ilevel_pilot, "lat")
@@ -3592,10 +3687,12 @@ begin;  begin of the main script
       if ( plot_gts .and. input_source .eq. "netcdf" ) then
          ob_types_uc = (/ "SYNOP", "METAR", "SHIPS", "BUOY", "SONDE_SFC", \
                        "GPSPW", "GEOAMV", "POLARAMV", "SOUND", "AIREP", \
-                       "PROFILER", "SSMIR", "QSCAT", "AIRSR", "GPSREF" /)
+                       "PROFILER", "SSMIR", "QSCAT", "AIRSR", "GPSREF", \
+                       "TAMDAR" /)
          ob_types_lc = (/ "synop", "metar", "ships", "buoy", "sonde_sfc", \
                        "gpspw", "geoamv", "polaramv", "sound", "airep", \
-                       "profiler", "ssmir", "qscat", "airsr", "gpsref" /)
+                       "profiler", "ssmir", "qscat", "airsr", "gpsref", \
+                       "tamdar" /)
          ntype = dimsizes(ob_types_uc)
          uvars = (/ "UOBS","UOMB","UQCF","UERR","UOMA" /)   ; Names of the variables in netCDF file
          vvars = (/ "VOBS","VOMB","VQCF","VERR","VOMA" /)
@@ -3653,6 +3750,14 @@ begin;  begin of the main script
                u_valid = True
                v_valid = True
                t_valid = True
+            end if
+            if ( n .eq. 15  .and. proc_tamdar ) then  
+               plot_type = "upr"
+               process_it = True
+               u_valid = True
+               v_valid = True
+               t_valid = True
+               q_valid = True
             end if
             if ( n .eq. 12  .and. proc_qscat ) then
                plot_type = "sfc"
@@ -3824,6 +3929,7 @@ end
 ; 'gpspw'
 ; 'sound'
 ; 'airep'
+; 'tamdar'
 ; 'pilot' , 'profiler'
 ; 'ssmir'
 ; 'ssmiT'
