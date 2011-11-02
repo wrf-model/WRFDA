@@ -17,7 +17,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 ;============================================================
 
   start_date   = "2010010200"
-  end_date     = "2010013000"
+  end_date     = "2010010300"
   cycle_period = 24
   date         = start_date
   datdir1      = "/glade/scratch/xzhang/fso_run/"        ; the path before DATE
@@ -239,40 +239,44 @@ begin
   res2@tmXTOn                      = True    ; Turn on Top labels
   res2@tmXTLabelsOn                = True    ; Turn on Top labels
   res2@tmXTLabels                  = otype    ; Turn on bottom labels
-  res2@tmXTValues                  = ispan(0,dimsizes(otype)-1,1)
+  res2@tmXTLabelJust               = "CenterCenter"
+;  res2@tmXTValues                  = ispan(0,dimsizes(otype)-1,1)
+  res2@tmXTValues                  = ispan(1,dimsizes(otype),1)
   res2@tmXTLabelFontHeightF        = 0.012   ; Increase font height
+  res2@trXMinF               = 0                    ; adds space on either end
+  res2@trXMaxF               = dimsizes(otype)+1                    ; of the 1st and last bars
   res2@tmXTLabelDeltaF             = 0.1     ; Increase space b/w ticks and labels
   res2@tmXTMajorLengthF            = 0.01
-  res2@tmXTLabelAngleF             = 45
+  res2@tmXTLabelAngleF             = 90
   res2@tmXBOn                      = False   ; Turn off top tickmarks
   res2@tmXBLabelsOn                = False    ; Turn on Top labels
   res2@tiYAxisString = "Forecast error contribution (x10000 J/kg)"  ; yaxis string
-  res2@tiYAxisFontHeightF          = 0.02
+  res2@tiYAxisFontHeightF          = 0.016
 ;  res2@tiXAxisString = "Obs Types"  ; xaxis string
   res2@tiXAxisString = "Impact of observation on 24h WRF 60km forecast error - dry energy norm"  ; xaxis string
-  res2@tiXAxisFontHeightF          = 0.02
+  res2@tiXAxisFontHeightF          = 0.014 ; 0.02
   res2@tiYAxisAngleF               = 90
   res2@xyLineThicknesses           = 2.0               ; make 2nd lines thicker
-  res2@xyLineColors                = "blue"          ; change line color
+  res2@xyLineColors                = "black"          ; change line color
 ;---Put variable labels on Y axis
 ;  res2@tmYLMode                    = "Explicit"
 ;  res2@tmYLOn                      = True   ; Turn off left tickmarks
 ;  res2@tmYLLabelsOn                = True   ; Turn off left labels
 ;  res2@tmYLLabelFontHeightF        = 0.015   ; Increase font height
-;  res2@tmYLLabelDeltaF             = 0.1     ; Increase space b/w ticks and labels
+;  res2@tmYLLabelDeltaF             = 0.12     ; Increase space b/w ticks and labels
 ;  res2@tmYLValues                  = ispan(1,nlevs(0),1)
 ;  res2@tmYLLabels                  = pressure
   res2@gsnYRefLine           = 0.              ; reference line
   res2@gsnXYBarChart         = True            ; create bar chart
   res2@gsnXYBarChartBarWidth = 0.55                 ; change bar widths
   res2@gsnAboveYRefLineColor = "red"           ; above ref line fill red
-  res2@gsnBelowYRefLineColor = "lightblue"          ; below ref line fill blue
+  res2@gsnBelowYRefLineColor = "blue"          ; below ref line fill blue
   x = new(dimsizes(otype),integer) 
-  do i = 0,dimsizes(otype)-1
-    x(i) = i
+  do i = 0,dimsizes(otype) -1
+    x(i) = i+1
   end do
   res2@tiMainString                = mainstring 
-  res2@tiMainFontHeightF           = 0.020
+  res2@tiMainFontHeightF           = 0.015; 0.020
   plot = gsn_csm_xy(wks,x(:),all_impact(:)/10000,res2) 
 ;  draw(plot)
 ;  frame(wks)
