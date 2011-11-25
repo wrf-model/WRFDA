@@ -67,11 +67,11 @@ ln -sf $DA_BDY_ANALYSIS wrfvar_bdyout
 
 cat > parame.in << EOF
 &control_param
- da_bdy_file        = 'wrfvar_bdyout'
+ da_file            = 'ana02'
  wrfvar_output_file = 'wrfvar_output'
  wrf_bdy_file       = 'wrfbdy_d01'
  wrf_input          = 'real_output'
- var4d = .${NL_VAR4D}.
+ var4d_lbc = .${NL_VAR4D}.
  cycling = .${CYCLING}.
  debug   = .true.
  low_bdy_only = .${NL_LOW_BDY_ONLY}. 

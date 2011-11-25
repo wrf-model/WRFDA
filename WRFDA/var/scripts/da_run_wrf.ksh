@@ -42,8 +42,7 @@ if [[ $WRF_CONF == "" ]]; then
    export EXEC_DIR=$WRF_DIR
    export EXEC_FILE="wrf.exe"   
 else
-   unset NL_HISTORY_INTERVAL
-   export NL_HISTORY_INTERVAL_H=$FCST_RANGE
+   let NL_HISTORY_INTERVAL=$FCST_RANGE*60
    
    let TIME_STEP_MINUTE=$NL_TIME_STEP/60
    if [[ -f $WORK_DIR/namelist.input ]];  then rm -rf $WORK_DIR/namelist.input;  fi
@@ -52,7 +51,7 @@ else
 #----- WRFNL -----
    if   [[ $WRF_CONF == "NL" ]]; then
       
-      export EXEC_DIR=$WRF_DIR
+      export EXEC_DIR=$WRFNL_DIR
       export EXEC_FILE="wrf.exe"
       export NL_DYN_OPT=2
       ln -fs $EXEC_DIR/run/RRTM_DATA RRTM_DATA

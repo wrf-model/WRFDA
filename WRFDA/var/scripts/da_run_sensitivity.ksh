@@ -48,7 +48,7 @@ fi
 
 ############################## Run WRFNL #################################
      if $ADJ_RUN_NL; then
-        echo '**** Running WRFNL ****' 
+        echo '**** Running WRFNL from Xb ****' 
 #------------------- First WRFNL run (from Xb) --------------------
         export RUN_DIR=$RUN_DIR1
         if $CYCLING && [[ $CYCLE_NUMBER -gt 0 ]]; then
@@ -60,6 +60,7 @@ fi
         $SCRIPTS_DIR/da_run_wrf.ksh "NL" > $RUN_DIR/WRFNL.html 2>&1
          
 #------------------- Second WRFNL run (from Xa) --------------------
+        echo '**** Running WRFNL from Xa ****' 
         export RUN_DIR=$RUN_DIR2
         export WRF_INPUT_DIR=${FC_DIR}/${DATE}
 	   	   
@@ -178,6 +179,8 @@ fi
         fi
 	   
 #------------------- First WRF+ run --------------------
+        echo '**** Running WRFPlus along Xb ****' 
+
         export RUN_DIR=$RUN_DIR1
 
         if [[ $ADJ_MEASURE -ne 2 ]]; then
@@ -196,6 +199,7 @@ fi
 	
 #------------------- Second WRF+ run --------------------
         if [[ $ADJ_MEASURE -ne 1 ]]; then
+           echo '**** Running WRFPlus along Xa ****' 
            export RUN_DIR=$RUN_DIR2
 
            if [[ $ADJ_MEASURE == 2 ]]; then
