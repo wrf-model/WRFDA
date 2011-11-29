@@ -226,7 +226,7 @@ if $DUMMY; then
    done
 else
 
-   $RUN_CMD $EXEC_FILE
+   $RUN_CMD ./$EXEC_FILE
 
    if [[ -f rsl.out.0000 ]]; then
       grep -q 'SUCCESS COMPLETE ' $EXEC_FILE rsl.out.0000 
