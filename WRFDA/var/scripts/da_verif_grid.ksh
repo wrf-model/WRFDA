@@ -17,6 +17,7 @@ echo "<PRE>"
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
+export GRAPHICS_DIR=${GRAPHICS_DIR:-$WRFVAR_DIR/var/graphics/ncl}
 . ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export PLOT_WKS=${PLOT_WKS:-pdf}
@@ -52,6 +53,12 @@ export NUM3D=${NUM3D:-6}
 export VAR3D=${VAR3D:-"U  V  WV T  Z QVAPOR"}
 export NUM2D=${NUM2D:-6}
 export VAR2D=${VAR2D:-"MU PSFC U10M V10M T2M Q2M"}
+
+export ISTART=${ISTART:-1}
+export IEND=${IEND:-10000}
+export JSTART=${JSTART:-1}
+export JEND=${JEND:-10000}
+
 #--------------------------------------------------------------------------------------
 #=========================================================
 # BELOW THIS LINE NO CHABGES ARE REQUIRED                 
@@ -126,6 +133,12 @@ cat > namelist.in << EOF
  num2dvar = ${NUM2D},
  var2d    = ${VAR2D_LISTS}
 /
+&sub_domain
+ istart = ${ISTART}
+ iend   = ${IEND}
+ jstart = ${JSTART}
+ jend   = ${JEND}
+/
 EOF
 #------------
 #--------------------------------------------------
@@ -160,7 +173,7 @@ done
 #--------------------------------------------------
 #---- Create control file for NCL script
 #-----------------------------------------
-DIAG_VAR=time_series_${VERIFY_HOUR}
+DIAG_VAR=${DIAG_VAR:-time_series_$VERIFY_HOUR}
 
 echo "$Verify_Date_Range" > header_main
 #-----------------
@@ -198,7 +211,7 @@ cd $OLDPWD
    echo $ncol >> $WORK_DIR/fnames_upr     
 
 for vn in $VAR3D   ; do
-     echo ${vn}_time_series_${VERIFY_HOUR} >> $WORK_DIR/fnames_upr
+     echo ${vn}_${DIAG_VAR} >> $WORK_DIR/fnames_upr
      if   [[ "$vn" = "T" ]]; then
         ob_unit='T (K)'
      elif [[ "$vn" = "U" ]]; then
@@ -229,7 +242,7 @@ done
 
 
 for vn in $VAR2D   ; do
-     echo ${vn}_time_series_${VERIFY_HOUR} >> $WORK_DIR/fnames_sfc
+     echo ${vn}_${DIAG_VAR} >> $WORK_DIR/fnames_sfc
      if   [[ "$vn" = "SLP" ]]; then
         ob_unit='SLP (Pascal)'
      elif [[ "$vn" = "PSFC" ]]; then
@@ -262,18 +275,18 @@ for LEVEL in ${DESIRED_LEVELS} ; do
 
 NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${RUN_DIR}\"' 'exp_legends=${EXP_LEGENDS}' 'exp_line_cols=${EXP_LINES_COLORS}' 'select_levs=${LEVEL}' 'select_scores=${DESIRED_SCORES}'   'bar_label_angle=${BAR_LABEL_ANGLE}' 'verify_hour=${VERIFY_HOUR}' 'p_top=${TOP_HPA_LEVEL_FOR_VERT_PROFILES}'"
 
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_grid_time_series.ncl" > run1
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_grid_time_series.ncl" > run1
 chmod +x run1
 ./run1
 #-----------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_grid_time_average.ncl" > run2
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_grid_time_average.ncl" > run2
 chmod +x run2
 ./run2
 #-----------------------------------------------------------------------------------------------------------------------
 done
 #-----------------------------------------------------------------------------------------------------------------------
-echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/var/graphics/ncl/verif_grid_vert_profile.ncl" > run3
+echo "ncl ${NCL_COMMAND_LINE} ${GRAPHICS_DIR}/verif_grid_vert_profile.ncl" > run3
 chmod +x run3
 ./run3
 #-----------------------------------------------------------------------------------------------------------------------

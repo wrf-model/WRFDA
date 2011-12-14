@@ -38,6 +38,11 @@ export PLOT_WKS=${PLOT_WKS:-x11}
 export CLEAN=${CLEAN:-false}
 export GET_OMBOMA_PLOTS=${GET_OMBOMA_PLOTS:-false}
 export FILE_PATH_STRING=${FILE_PATH_STRING:-'wrfvar/gts_omb_oma_'${OUTER_ITER}}
+export WRF_FILE=${WRF_FILE:-'fg'}
+export ISTART=${ISTART:-1}
+export IEND=${IEND:-10000}
+export JSTART=${JSTART:-1}
+export JEND=${JEND:-10000}
 
 #=========================================================
 #=========================================================
@@ -95,6 +100,13 @@ echo '/' >> namelist.plot_diag
 cat >> namelist.plot_diag << EOF
 &record5
    file_path_string = '${FILE_PATH_STRING}' /
+&record6
+   wrf_file = '${WRF_FILE}'
+   istart = ${ISTART},
+   iend = ${IEND},
+   jstart = ${JSTART},
+   jend = ${JEND},
+/
 EOF
 
 ln -sf $BUILD_DIR/da_verif_obs.exe .
