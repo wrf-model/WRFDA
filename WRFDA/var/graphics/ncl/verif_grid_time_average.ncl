@@ -115,6 +115,7 @@ begin
 
    nexp = num_expt
    data = new ((/num_vars,nexp,nrow,ncol/),"float")
+   data@_FillValue = Fill_ValueF
 
    do iexp = 1, nexp
    do iv = 1, num_vars
@@ -162,7 +163,6 @@ begin
     y_bar = new((/num_vars,nexp/),"float")
 
     x = ispan(1,nexp,1)
-    data@_FillValue = Fill_ValueF
    ;----------------------------------------------------------
    do iv = 1, num_vars
      var=stringtocharacter(varfiles(iv-1))

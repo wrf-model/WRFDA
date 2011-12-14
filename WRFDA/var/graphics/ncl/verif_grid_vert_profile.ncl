@@ -96,6 +96,7 @@ begin
     end if
     nexp = num_expt
     data = new ((/num_vars,nexp,nrow,ncol/),"float")
+    data@_FillValue = Fill_ValueF
 
     do iexp = 1, nexp
     do iv = 1, num_vars
@@ -114,7 +115,6 @@ begin
    ;-----------------------------------------------------------
     xavg = new((/num_vars,nexp,top_level/),"float")
     ob_tot = new((/num_vars,top_level/),"float")
-    data@_FillValue = Fill_ValueF
    
    do iv = 1, num_vars
      var=stringtocharacter(varfiles(iv-1))

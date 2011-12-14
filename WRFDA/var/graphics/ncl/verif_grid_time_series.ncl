@@ -98,6 +98,7 @@ begin
    nexp = num_expt
    ;
    data = new ((/num_vars,nexp,nrow,ncol/),"float")
+   data@_FillValue = Fill_ValueF
 
    do iexp = 1, nexp
    do iv = 1, num_vars
