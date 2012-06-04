@@ -1,11 +1,11 @@
-\documentclass[handout]{beamer}
+%\documentclass[handout,gray]{beamer}
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper, landscape, border shrink=5mm]
 %\pgfpageslogicalpageoptions{1}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{2}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{3}{border code=\pgfusepath{stroke}}
 %\pgfpageslogicalpageoptions{4}{border code=\pgfusepath{stroke}}
-%\documentclass{beamer}
+\documentclass{beamer}
 %\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
 \usetheme{Warsaw}
 \usepackage{tikz}
@@ -256,8 +256,11 @@ To investigate the impact of including boundary condition control in data assimi
 \frame{
 \frametitle{Download and setup test dataset for this tutorial}
 \begin{itemize}
-	\item download the WRFDA and WRFPLUSV3 codes from :\\
+	\item download the WRFDAcodes from :\\
 		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html}}\pause
+	\item download the WRFPLUSV3 codes  and the patch from :\\
+		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfplus.html}}
+		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob_V3_3.html}}\pause
 	\item enter into WRFDA/var/test/4dvar \pause
 	\item get the test dataset from :\\
 		{\tiny\url{ftp://ftp.ucar.edu/pub/mmm/xinzhang/WRF4DVar_V3.3_Tutorial/2008020521}}\pause
@@ -321,7 +324,7 @@ We have tested the WRF 4D-Var V3.3 on following systems:
 \begin{itemize}
    	\item After WRFPLUS compilation, It is a good practice to run tangent linear model test and adjoint model test with you own case IC and BC.  \pause
 	\item Under $WRFPLUSV3/test/em\_real$ directory, a test case are setup to let users test the tangent linear model and adjoint model. \pause
-	\item In $namelist.input$, turn on $check\_TL$ or $check\_AD$ in $\&perturbation$ to run tangent linear check or adjoint check.
+	\item In $namelist.input$, turn on $check\_TL$ and/or $check\_AD$ in $\&perturbation$ to run tangent linear check or adjoint check.
 \end{itemize}
 }
 
@@ -370,6 +373,16 @@ adjoint identity:
 \begin{itemize}
    	\item Although the tangent linear model might be imperfect.
 	\item The adjoint test must be perfect. otherwise, there are bugs in the adjoint model.
+\end{itemize}
+}
+
+\frame{
+\frametitle{Answers to frequently asked questions regarding to WRFPLUS}
+\begin{itemize}
+	\item WRFPLUS only works with regional ARW core, not for NMM core or global WRF. \pause 
+   	\item WRFPLUS only works with single domain, not for nested domains.  \pause
+	\item WRFPLUS can not work with Adaptive Time Stepping options. \pause
+	\item WRFPLUS only has three simplified physics processes: surface drag (bl\_pbl\_physics=9); large scale condensate (mp\_physics=98);a simplified cumulus scheme (cu\_physics=98)
 \end{itemize}
 }
 
