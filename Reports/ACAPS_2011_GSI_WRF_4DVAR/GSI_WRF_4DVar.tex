@@ -16,6 +16,7 @@
 \usepackage{verbatim}
 \usefonttheme{serif}
 \usepackage{fancybox}
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 
 % Make a new command that will make a new subsection and a frame with the same title
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
@@ -40,7 +41,7 @@
 
 % We want the NSF department logo
 %\logo{\includegraphics[height=.5in]{nsf1.jpg}}
-\logo{\includegraphics[height=.4in]{NESL.jpg}}
+\logo{\includegraphics[height=.25in]{NSF_NESL.jpg}}
 
 
 \begin{document}
@@ -50,15 +51,15 @@
 
 \begin{frame}
 \frametitle{Outline}
-\tableofcontents[pausesections]
+\tableofcontents
 \end{frame}
 
 \frame{
 \frametitle{Acknowledgement}
-\large{\textit{Sincere thanks to {\bf{Dr. Ricardo Todling}} for his help to kick off the project.}}
+\small{\textit{Sincere thanks to {\bf{Dr. Ricardo Todling}} for his help to kick off the project.}}
 ~\\
 ~\\
-\large{\textit{Sincere thanks to {\bf{Dr. Thomas Auligne, Dr. Junmei Ban, Mrs. Xiaoyan Zhang and Mr. Feng Gao}} for their help and encouragement}}
+\small{\textit{Sincere thanks to {\bf{Dr. Thomas Auligne and Dr. Junmei Ban}} for their help and encouragement}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,7 +68,7 @@
 \frame{
 \frametitle{Current Status}
 \begin{itemize}
-	\item This presentation reports the status of the development of GSI-based WRF 4D Var as implemented in Boulder's version of May 2011\pause
+	\item The development of GSI-based WRF 4D Var has been implemented in GSI Boulder's version of May 2011\pause
 	\item The WRF tangent linear and adjoint codes V3.3 (hereafter, WRFPLUS V3.3)  has been re-written from scratch to be consistent with the latest WRF repository codes \pause
 	\item The Major development in GSI had finished, GSI codes has been coupled with the WRF tangent linear and adjoint model \pause
 	\item Because the parallelization of the latest WRFPLUS V3.3 is still on going, only 1 processor parallel run is allowed at this moment
@@ -124,7 +125,7 @@ Adjoint identity:
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{New developments in GSI}
+\section{Developments in GSI}
 
 \frame{
 \frametitle{Modification in GSI}
@@ -209,7 +210,7 @@ end module wrf_pertmod
 \begin{frame}[fragile]
 \frametitle{Quick Start}
 Install WRFPLUS and GSI
-   \begin{itemize}
+   \begin{enumerate}
         	\item WRFPLUS : WRF adjoint and tangent linear codes
 		\begin{verbatim}
 	         > configure [-d] wrfplus
@@ -224,7 +225,7 @@ Install WRFPLUS and GSI
 		> configure
 		> compile
 		\end{verbatim}
-    \end{itemize}
+    \end{enumerate}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -457,7 +458,7 @@ Install WRFPLUS and GSI
 \frame{
 \frametitle{Summary}
 \begin{itemize}
-	\item The basic GSI/WRF 4D-Var system was developed. \pause
+	\item The basic GSI-based WRF 4D-Var system was developed. \pause
 	\item The single observation exp.  confirms that the system is valid and is able to produce flow dependent increments. \pause
 	\item The increments produced by 4D-Var run with tutorial case are comparable with the 3D-Var run.\pause
 	\item The real case shows the desirable performance of 4D-Var.
@@ -465,10 +466,10 @@ Install WRFPLUS and GSI
 }
 
 \frame{
-\frametitle{Latest achivements}
+\frametitle{Latest achievements}
 \begin{itemize}
 	\item Implementation of the simplified physics packages into WRFPLUSV3 is done: surface drag(bl\_pbl\_physics=98), large scale condensation(mp\_physics=98) and a simplified cumulus scheme(cu\_physics=98). \pause	
-	\item Parallelization of WRF tangent linear model is done. \pause
+	\item Parallelization of WRF tangent linear model is done. 
 \end{itemize}
 \begin{columns}[c]
 \column{6cm}

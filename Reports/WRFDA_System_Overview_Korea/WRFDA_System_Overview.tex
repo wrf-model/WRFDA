@@ -8,20 +8,23 @@
 %\documentclass{beamer}
 %\usetheme{nesl}  % Now it's a beamer presentation with the NESL theme!
 \usetheme{Warsaw}
+\setbeamercolor{background canvas}{bg=white,fg=black}
+\usebeamercolor[fg]{background canvas}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
 \usepackage{url}
 \usepackage{verbatim}
 \usefonttheme{serif}
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 
 % Make a new command that will make a new subsection and a frame with the same title
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
 \title{WRF Data Assimilation System}
-\author[Zhang, Lin and Huang, , Boulder, July 2011]{Xin Zhang \and Hui-Chuan Lin \and Xiang-Yu Huang}
+\author[Zhang and Huang, , SNU, April 2012]{Xin Zhang \and Xiang-Yu Huang}
 
-\date{Presented in July 2011, WRFDA Tutorial
+\date{6th East Asia WRF Tutorial, SNU
   ~\\
   ~\\
   ~\\
@@ -235,7 +238,7 @@ $\mathbf{B} =\mathbf{U}\mathbf{U}^{T}$ with $\mathbf{U}=\mathbf{U}_{p}$ \pause
 \item Horizontal transform $(\mathbf{U}_{h})$ is via
 	\begin{itemize}
 	\item Regional - recursive filters
-	\item Glocal - power spectrum
+	\item Global - power spectrum
 	\end{itemize} \pause
 \item Vertical transform $(\mathbf{U}_{v})$ is via
 	\begin{itemize}
@@ -895,7 +898,7 @@ tamdar_sfc
 	\item ./clean -a\pause
 	\item ./configure {\color{red}(-d)} wrfda {\color{red} (-d : compile with debug mode)}\pause
 	\item ./compile all\_wrfvar\pause
-	\item 41 executables should be generated under var/build directory
+	\item 42 executables should be generated under var/build directory
 \end{itemize}
 \end{frame}
 
@@ -905,7 +908,7 @@ tamdar_sfc
 	\item PGI (v10.3.0, 64-bit), G95(v4.0.3, 32-bit), GFORTRAN(v4.4.0, default is 32-bit, '-m64' needed for 64-bit) have been tested. \pause
 	\item gcc, g++ are verision 4.2.1, default is 64-bit, '-m32' needed for 32-bit. \pause
 	\item NetCDF library should be re-install with appropriate compiler and option. \pause
-        \item V3.3 configure is able to produce configure.wrf for PGI and G95. \pause
+        \item V3.4 configure is able to produce configure.wrf for PGI and G95. \pause
         \item For GFORTRAN compiler, '-m64' should be added to SFC,SCC, CCOMP in configure.wrf manually.\pause
         \item Prepbufr and Bufr format data have problem to be read on Snow Leopard system.
 \end{itemize}
