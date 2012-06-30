@@ -1,0 +1,334 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% amspaper.tex --  LaTeX2e-based template for submissions to American 
+% Meteorological Society Journals, including
+%
+% JAS 	-- Journal of the Atmospheric Sciences
+% JAMC 	-- Journal of Applied Meteorology and Climatology
+% JPO 	-- Journal of Physical Oceanography
+% MWR 	-- Monthly Weather Review
+% JTECH -- Journal of Atmospheric and Oceanic Technology
+% WAF 	-- Weather and Forecasting
+% JCLI 	-- Journal of Climate
+% JHM 	-- Journal of Hydrometeorology
+% JAM 	-- Journal of Applied Meteorology
+%
+% Template developed by B. Papa and S. Cooley, AMS. 
+% Email questions to latex@ametsoc.org.
+%
+% August 12, 2008 (SRC)
+%	- Clarified/added header notes, comments throughout
+%	- Improved title page
+%	- Edited text of document for clarity
+%	- Altered list styles to adhere to AMS style, added comments
+%	- Removed incorrect commands (i.e., \catcode) (corrects umlaut bug)
+%	- Moved non-template commands to ametsoc.sty
+%
+% August, 2008 - B. Papa
+% - Updated to handle two column journal page output
+% - Updated text with new/modified instructions
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%																															 %
+%				USE THIS TEMPLATE, AMETSOC.STY, AND AMETSOC.BST				 %
+%			        OR YOUR TEX FILES WILL NOT BE USED				  		 %
+%																															 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREAMBLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% The following two commands will generate a PDF that follows all the requirements for submission
+% and peer review.  Uncomment these commands to generate this output (and comment out the two lines below.)
+%
+% DOUBLE SPACE VERSION FOR SUBMISSION TO THE AMS
+\documentclass[12pt]{article}
+\usepackage{ametsoc}
+%
+% The following two commands will generate a single space, double column paper that closely
+% matches an AMS journal page.  Uncomment these commands to generate this output (and comment
+% out the two lines above. FOR AUTHOR USE ONLY. PAPERS SUBMITTED IN THIS FORMAT WILL BE RETURNED
+% TO THE AUTHOR for submission with the correct formatting.
+%
+% TWO COLUMN JOURNAL PAGE LAYOUT FOR AUTHOR USE ONLY
+%\documentclass[10pt]{article}
+%\usepackage{ametsoc2col}
+\usepackage{subfigure}
+\usepackage{comment}
+\usepackage{verbatim}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABSTRACT
+%
+% Enter your Abstract here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\myabstract}{The tangent linear and adjoint of the Weather Research and Forecasting (WRF) Model with its Advanced Research WRF (WRW)  dynamic core have been re-developed based on the latest WRF model. The automatic differentiation engine (TAPENADE) has been mainly used in the development;  There are three key improvements over the earlier model: accuracy, modularity and efficiency. 
+\begin{itemize}
+\item A set of subroutine interfaces have been constructed for easily coupling tangent linear and adjoint of the WRF ARW model (WRFPLUS)with other applications, such as four-dimensional variational data assimilation, forecast sensitivity to observation etc.;
+\item To develop the parallel version of the WRFPLUS model, an innovative technique based on the nature duality that existed between MPI communication routines is adopted in the WRF software framework, the Registry in WRF is extended to automatically generate the tangent linear and adjoint of the required communication operations (halo exchange). This approach dramatically speeds up and simplify the software development cycle of the parallel tangent linear and adjoint codes and the parallel efficiency of the derived codes is impressive compared the its predecessor. 
+\item The tangent linear and adjoint code for tracer are developed as well to prepare the potential application in chemistry data assimilation.
+\end{itemize}
+ }
+%
+\begin{document}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%
+% Enter your TITLE here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\textbf{\large{The Upgraded Development of the Tangent Linear and Adjoint of Weather Research and Forecasting (WRF) Modeling System}}}
+%
+% Author names, with corresponding author information. 
+% [Update and move the \thanks{...} block as appropriate.]
+%
+\author{\textsc{Xin Zhang}
+				\thanks{\textit{Corresponding author address:} 
+				Dr. Xin Zhang, NCAR/MMM, P.O. Box 3000, 
+				 Boulder, CO 80307. 
+				\newline{E-mail: xinzhang@ucar.edu}}\\
+\textit{\footnotesize{National Center for Atmospheric Research, Boulder, Colorado 80307}}
+\and 
+\centerline{\textsc{Xiang-Yu Huang}}\\% Add additional authors, different institution
+\centerline{\textit{\footnotesize{National Center for Atmospheric Research, Boulder, Colorado 80307}}}
+}
+%
+% The following block of code will handle the formatting of the title page depending on whether
+% we are formatting a double column (dc) author draft or a single column paper for submission.
+% AUTHORS SHOULD SKIP OVER THIS... There is nothing to do in this section of code.
+\ifthenelse{\boolean{dc}}
+{
+\twocolumn[
+\begin{@twocolumnfalse}
+\amstitle
+
+% Start Abstract (Enter your Abstract above.  Do not enter any text here)
+\begin{center}
+\begin{minipage}{13.0cm}
+\begin{abstract}
+	\myabstract
+	\newline
+	\begin{center}
+		\rule{38mm}{0.2mm}
+	\end{center}
+\end{abstract}
+\end{minipage}
+\end{center}
+\end{@twocolumnfalse}
+]
+}
+{
+\amstitle
+\begin{abstract}
+\myabstract
+\end{abstract}
+\newpage
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAIN BODY OF PAPER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\section{Introduction}
+
+During the past two decades, the use of adjoint technique in meteorology and oceanography has been rapidly increasing.  The adjoint models is a powerful tools in many applications, such as data assimilation, parameter estimation, sensitivity analysis etc.. (\cite{Errico1992};\cite{Rabier1996};\cite{Langland1999};\cite{Li1999};\cite{Xiao2002};\cite{Xiao2008};\cite{Kleist2005a};\cite{Kleist2005b})
+
+The Weather Research and Forecasting (WRF) model is a numerical weather prediction (NWP) and atmospheric simulation system designed for both research and operational applications. WRF is supported as a common tool for the university/research and operational communities to promote closer ties between them and to address the needs of both.
+
+WRF is maintained and supported as a community model to facilitate wide use internationally, for research, operations, and teaching. It is suitable for a broad span of applications across scales ranging from large-eddy to global simulations. Such applications include real-time NWP, data assimilation development and studies, parameterized-physics research, regional cli- mate simulations, air quality modeling, atmosphere-ocean coupling, and idealized simulations. As of this writing, the number of registered WRF users exceeds 6000, and WRF is in operational and research use around the world.
+
+The first version of adiabatic WRF tangent linear and adjoint model system (WAMS) was developed by NCAR around 2007 (\cite{Xiao2008}), it have been used in the adjoint sensitivity analysis and four-dimensional variational data assimilation (4D-Var) (\cite{Huang2009}). However, in past few years, due to very tight available resources, WAMS has failed to follow the rapid development of WRF model and WRF data assimilation system (WRFDA), the growing inconsistency between WAMS and WRF/WRFDA makes WAMS inconvenient to be used with other systems; Furthermore, because WASM is employing the disk input/output for data exchanging , the parallel efficiency is very frustrate, especially, in 4D-Var application.  
+ 
+Recently, encouraged by the urgent request from the developments of  4D-Var, cloud analysis, forecast sensitivity to observations and chemistry data assimilation, we re-developed the WRF tangent linear model and adjoint model based on the latest repository WRF. Compared to the previous version of the WRF tangent linear and adjoint models in \cite{Xiao2008}, \cite{Huang2009}, the new system is an all-in-one system which includes the WRF full-physics forward model, tangent linear model and adjoint model; it also include the restrict tangent linear check and adjoint check procedure; A set of module interfaces are developed to let other system easily couple with WRFPLUS to use one of the models; The lateral boundary condition (LBC) scheme has been carefully investigated and coded with the corresponding tangent linear and adjoint LBC schemes.  An innovative approach was applied to develop the parallel code which dramatically reduce the software development cycle of parallel tangent linear and adjoint codes, and the derived parallel tangent linear and adjoint models have much better parallel efficiency compared to the forward model.
+
+The purpose of this paper is to describe the implementation and impact of the LBC control in the WRF 4D-Var system. The brief introduction of the WRF tangent linear and adjoint models are presented in section 2, followed by an example of implicit dynamic structure functions using single observation experiments in section 3 to demonstrate the validation of the LBC control in WRF 4D-Var. A comparison of forecasting performance for real observation data assimilation of a winter storm are described in section 4 in order to demonstrate the impact of the LBC control. The computational efficiency of the newly developed WRF 4D-Var is discussed in section 5 and some concluding remarks are given in section 6.
+
+\section{Description of the WRF tangent linear and adjoint model}
+
+The development of the Weather Research and Forecasting (WRF) modeling system is a multi-agency effort intended to provide a next-generation mesoscale forecast model and data assimilation system to advance both the understanding and prediction of mesoscale weather and accelerate the transfer of research advances into operations. The model was developed as a collaborative effort among the NCAR Mesoscale and Microscale Meteorology (MMM) Division, the National Oceanic and Atmospheric Administration’s (NOAA) National Centers for Environmental Prediction (NCEP) and Forecast System Laboratory (FSL), the Department of Defense’s Air Force Weather Agency (AFWA) and Naval Research Laboratory (NRL), the Center for
+Analysis and Prediction of Storms (CAPS) at the University of Oklahoma, and the Federal Aviation Administration (FAA), along with the participation of a number of university scientists.
+
+The WRF model is designed to be an efficient massively parallel computing code to be able to take advantage	of advanced high-performance computing systems. The code can be configured for both research and operations and offers numerous physics options. WRF is maintained and supported as a community model to facilitate wide use, and is suitable for use in a broad spectrum of applications across scales ranging from meters to thousands of kilometers. Such applications include research and operational NWP, data assimilation and parameterized-physics research, downscaling climate simulations, driving air quality models, atmosphere-ocean coupling, and idealized simulations.
+
+\subsection{Brief description of WRF tangent linear and adjoint model}
+
+NCAR started to develop its first version of the tangent linear and adjoint models for the WRF ARW around 2005 and research based on this version has been conducted and published such as in \cite{Xiao2008} and \cite{Huang2009}. In the past few years, the WRF model and the WRF data assimilation (WRFDA) system have experienced extensive changes. However, the first version of WRF tangent linear and adjoint model failed to catch up with the developments of the WRF and WRFDA systems and the obsolete tangent linear and adjoint models lead to many problems when they were coupled with the latest WRF and WRFDA systems to become a 4D-Var system.
+
+From the WRF model version 3.2 release, we started to re-develop the tangent linear and adjoint models of WRF ARW core based on the latest WRF model. Compared to its first version, the new version has following improvements: 1) Consistent with the latest WRF development, the current tangent linear and adjoint codes are always kept up with the latest WRF changes; 2) Improved physics packages, in addition to vertical diffusion and surface drag, we also include a simplified microphysics scheme and a cumulus scheme;  3) More accurate and complete tangent-linear and adjoint checks are included to make sure that the existing codes and new developed codes are error free; 4) For the purpose of the lateral boundary control in regional 4D-Var and adjoint sensitivity analysis, the lateral boundary scheme was investigated carefully and its associated tangent-linear and adjoint codes were developed and checked, for details see Zhang et al. 2011.
+
+\section{Implementation of an inline coupling interface in the WRFPLUS model}
+
+One of the motivations to upgrade the WRF tangent linear and adjoint model is to improve the computational performance of WRF 4D-Var. The WRF 4D-Var system already contains a two-way coupling between WRFDA and WAMS (\cite{Huang2009}). It communicates information between WRFDA  and WAMS via files. During the coupling, the exchanges data are written to disk and a signal file is prepared to inform the other component that data were ready to be read. Exchange of a field between WRFDA and WAMS consists of gathering and scattering operations across the processors which are very inefficient on modern distributed supercomputers. This limits the number of processors that can be used for high resolution modeling.
+
+Since both WRFDA and WAMS share the same software infrastructure including parallelisation, field definition, WRF I/O, Registry etc., it is very straightforward to couple WRFDA and WRFPLUS to a single executable 4D-Var system. In order for this to work three major developments were needed:
+\begin{enumerate}
+        \item Enable the WRFPLUS model to be callable from WRFDA with a simple application programming interface consisting of:
+        \begin{enumerate}
+		\item Initialization of the WRFPLUS model. 
+		\item Advance one of the WRFPLUS model components (eg. forward model, tangent linear model and adjoint model) . 
+		\item Finalize the WRFPLUS model.
+	\end{enumerate}
+	\item Development of a set of regridding routines that can interpolate data on the WRFPLUS grid to the WRFDA grid (and vice versa), which can be called by the WRFDA in full MPI parallel mode. 
+	\item Modify the WRFDA to allow it to call WRFPLUS with forcing data from the WRFDA and retrieve field data from WRFPLUS (e.g. gradients).
+\end{enumerate}
+In this paper we only discuss the first development, the other two developments will be introduced in a separated paper. 
+
+The WRF model already has a well defined routine for forward model that advances the model, which makes it fairly straightforward to be able to call it from an external model. New initialization and finalization routines had to be coded mostly to deal with tangent linear model and adjoint model. A namelist option $dyn\_opt$ was borrowed to allow WRFDA to decide which component in WRFPLUS will be advanced.
+
+The full implemented interface as seen from WRFDA point of view is given in figure \ref{f1}. These interfaces are written not only for the coupling with WRFDA and they are designed for general coupling purpose. In the initial effort, we have successfully coupled WRFPLUS with the Community Grid Statistical Interpolation system(GSI) to construct a GSI-based WRF 4D-Var (\cite{Zhang2012}).
+
+
+\section{Linearity test and adjoint test}
+
+We started to develop the WRFPLUS system follow the same three phases proposed by \cite{Xiao2008}. Firstly, numerical experiments were conducted to make sure the adiabatic version of WRF with simple diffusion and surface drag can produce the major feathers that the full-physics model does. Secondly, the tangent linear model and its adjoint model were generated by TAPENADE and manually intervention to improve the codes is always needed.
+
+After the the codes are ready, it is important and necessary to test the tangent linear model consistency with the forward model and test the adjoint model consistency with the tangent linear model in the final step, before the tangent linear and the adjoint codes being used in any real application ( \cite{Vukicevic1991}; \cite{Errico1992}; \cite{Gilmour2001}). We developed the tangent linear and adjoint check procedure following the method of \cite{Navon1992}.
+
+Let $\mathbf{f}(\mathbf{x})$ denotes a forward model and $g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x})$ and $a\_\mathbf{f}(\mathbf{x},a\_\mathbf{x})$ denote the tangent linear and adjoint model respectively. The correctness of tangent linear model can be tested as:
+\begin{equation}
+\lim_{g\_\mathbf{x} \rightarrow 0}{\frac{\mathbf{f}(\mathbf{x}+g\_\mathbf{x})-\mathbf{f}(\mathrm{x})}{{g\_\mathbf{x}}^T\cdot{g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x})}}}=1
+\end{equation}
+
+The adjoint relation is tested by :
+\begin{equation}
+\langle g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}) \rangle = \langle a\_\mathbf{f}(\mathbf{x},g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{x} \rangle
+\end{equation}
+
+If the tangent linear codes and adjoint codes are correct, the above two relations should be held up to the machine accuracy. Because different model variables have different value magnitudes, to avoid the potential mistakes related to small magnitude variable computation (such as water vapor field) hidden by big magnitude variable (such as pressure), we design the capability to perform checks on individual variables. We performed the tangent linear and adjoint check with the Fukushima demonstration case.
+
+
+\section{Parallelisation of WRFPLUS model}
+
+\subsection{WRF software }
+\label{sec:single}
+Tools for automatic generation of application code from user-specified tables provide significant software productivity benefits in development and maintenance of large applications, such as WRF. In WRF model, hundreds of thousands of lines of WRF code are automatically generated from a user-edited table, called the Registry.  The Registry provides a high-level single-point-of-control over the fundamental structure of the model data, and thus provides considerable utility for developers and maintainers.  It contains lists describing state data fields and their attributes:  dimensionality, binding to particular solvers, association with WRF I/O streams, communication operations, and run time configuration options (namelist elements and their bindings to model control structures).  Adding or modifying a state variable to WRF involves modifying a single line of a single file; this single change is then automatically propagated to scores of locations in the source code the next time the code is compiled.
+
+The WRF Registry has two components: the Registry file and the Registry program.
+
+\subsection{The duality of MPI communication operations}
+The following code snippet from the WRF illustrate the message exchanges occurring between different CPUs:
+
+In the above code segment, XX are simply wrapper routines for stand MPI calls MPI\_SEND and MPI\_RECV. The above code signal each cpu to send the appropriate slab of the array to its west neighbor, which then placed this slab into its proper destination. Similar types of communication exist in particularly all parallel programs. An important observation to be noted here is that the communication routines are linear operations, hence as matrices, the adjoint is simply the transpose, which is the dual operator. In the code above, we see an efficient characterization of the relationships between domain, cpu, communication task to be performed, and array indices, in their respective order as a chain of pointers. Once this chain of relationships is established, adjointing the code is very simply.
+
+Now the duality between MPI\_SEND and MPI\_RECV calls is now apparent. In the adjoint code, we send where we receive before, and received where we send previously. 
+
+\subsection{The implementation of the adjoint MPI communication operations in WRFPLUS}
+
+In general, automatic differentiation tools (such as TAPENADE) have few problems to generate adjoint reverse codes, however, they still have some difficulties to generate adjoint parallel communication operation inside a huge model. WRF 
+
+\section{Parallel performance}
+
+To demonstrate the parallel efficiency of the WRFPLUS codes, we prepare the initial condition and boundary conditions from NCEP FNL  for a 15-km Asia domain ( not shown). There are $665\times363$ grid points on the horizontal and $45$ levels in the vertical direction and the time step is $90s$. We tested this case on NCAR's two supercomputers: Lynx and Bluefire. Lynx is a single cabinet Cray XT5m supercomputer, comprised of 76 compute nodes, each with 12 processors on two hex-core AMD 2.2 GHz Opteron chips, with a total of 912 compute processors. Each Lynx compute node has 16 gigabytes of memory, for 1.33 gigabytes per processor, and totaling 1.216 terabytes of memory in the system; Bluefire is an IBM clustered Symmetric MultiProcessing (SMP) system, comprised of 4,096 Power 6 processors; The 4,096 processors are deployed in 128 nodes, each containing 32 processors; Nodes are interconnected with an InfiniBand switch for parallel processing using MPI. We use the default compilation options and the default processors topology provided by WRF model. We did not do any advanced optimization and tunning to get the best performance. Therefore, the following results do not mean they are the best performance on the specific supercomputer.
+
+We executed WRFPLUS on $16$, $32$, $64$, $128$, $256$, $512$, $1024$ and $2048$ processors of Bluefire and measured the parallel performance. Table \ref{bluefire} shows the results for the average parallel wall clock time for one time step integration and speedup for forward model (FWM), tangent linear model (TLM) and adjoint model (ADM) respectively. Speedup for $N$ processors was calculated as the wall clock time using 16 processors divided by the wall clock time using $N$ processors. The computing times for all models are considerably reduced with increased number of processors up to $2048$. In general, the TLM has a better speedup than FWM and the ADM has slightly better or comparable speedup with TLM and the results confirm the successful implementation of the parallel approach. Please note that the timing results for FWM is different from the standard WRF run, the standard WRF is compiled with 4 bytes long real size and in WRFPLUS, the WRF is compiled with 8 bytes long real size, which is required by data assimilation application. In general, due to the higher precision required in WRFPLUS, the actual computational performance of FWM is about $50\%$ slower than standard WRF. 
+
+We also executed WRFPLUS on $16$, $32$, $64$, $128$, $256$ and $512$ processors of Lynx and measured the parallel performance. Table \ref{lynx} shows the results for the average parallel wall clock time for one time step integration and speedup. We could draw similar conclusion with the data collected on Lynx shows and further confirm the high efficiency of the parallelisation strategy if WRFPLUS code.  
+
+\section{Tangent linear and adjoint of tracer advection}
+
+
+\section{Conclusion}
+
+The technical implementation of the initial implementation of a single executable WRF 4D-Var system has been discussed. The system has been implemented starting from WRFDA version 3.3.1 and carried forward into later versions, but most of the developments have been done in the interface layer which couples the models together and few changes are made to the models themselves.
+In the single executable coupled system all information (grid and fluxes) from the atmospheric model is passed as arguments to the coupling interface so it is possible to apply the approach to a different data assimilation system; the code, therefore, could be shared with other institutions. Technically the initial implementation works reasonably well and it already replaced the old WRF 4D-Var system since the run times much better. Beyond the performance benefit seen there are other advantages for the approach compared to the old WRF 4D-Var system. The execution on of the new 4D-Var is simpler since we do not need to launch a multiple program multiple data (MPMD) collection of different executables. We also believe that it will be easier to implement a fully coupled GSI-based WRF 4D-Var data assimilation system with the new system.
+
+\section{Figures and tables}
+
+\subsection{Figures}
+The insertion of a sample figure (Fig. \ref{f1}) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[t]
+\fbox {
+    \parbox{\linewidth}{
+    \begin{itemize}
+    	\item {\bf{Components routines :}} The  interfaces to active forward, tangent linear and adjoint model
+		\begin{itemize}
+			\item {\bf{wrf\_run :}} Existed, interface to run forward (nonlinear) model
+			\item {\bf{wrf\_run\_tl :}} Interface to run tangent linear model
+			\item {\bf{wrf\_run\_ad :}} Interface to run adjoint model
+		\end{itemize}
+	\item {\bf{Data exchange routines :}} The interfaces to exchange data between WRFDA and WRFPLUS
+		\begin{itemize}
+			\item {\bf{read\_xtraj :}} Read the trajectories from FWM integration
+			\item {\bf{save\_xtraj :}} Save the trajectories from FWM integration
+			\item {\bf{read\_tl\_pert :}} Read initial perturbation for TLM  integration
+			\item {\bf{save\_tl\_pert :}} Save trajectories of perturbation from TLM integration.
+			\item {\bf{read\_ad\_forcing :}} Read adjoint forcing for ADM integration
+			\item {\bf{save\_ad\_forcing :}} Save initial adjoint forcing from ADM integration
+		\end{itemize}
+    \end{itemize}
+    }
+}
+  \caption{Interface routines for inline coupling to the WRFPLUS model..}\label{f1}
+\end{figure}
+
+\subsection{Tables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TABLES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[t]
+\caption{Parallel performance for one time step integration on Bluefire: ${Wallclock}/{Speedup}$. $Linear$: Linear speedup; $FWM$: Forward model; $TLM$: Tangent linear model; $ADM$: Adjoint model.}\label{bluefire}
+\begin{center}
+\begin{tabular}{cccccrcrc}
+\hline\hline
+$Processors$ & $Linear$ & $FWM$ & $TLM$ & $ADM$ \\
+\hline
+16 & 1 & 4.99s/1.0 & 10.42s/1.0 & 25.91s/1.0 \\
+32 & 2 & 2.49s/2.0 & 5.28s/1.97 & 12.93s/2.0 \\
+64 & 4 & 1.32s/3.78 & 2.74s/3.80 & 6.73s/3.85 \\
+128 & 8 & 0.68s/7.34 & 1.40s/7.44 & 3.55s/7.30 \\
+256 & 16 & 0.42s/11.88 & 0.86s/12.12 & 2.13s/12.16 \\
+512 & 32 & 0.28s/17.82 & 0.49s/21.27 & 1.20s/21.60 \\
+1024 & 64 & 0.15s/33.27 & 0.29s/35.93 & 0.94s/27.56 \\
+2048 & 128 & 0.11s/45.36 & 0.20s/52.10 & 0.50s/51.82 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%
+\begin{table}[t]
+\caption{Parallel performance for one time step integration on Lynx: ${Wallclock}/{Speedup}$. $Linear$: Linear speedup; $FWM$: Forward model; $TLM$: Tangent linear model; $ADM$: Adjoint model..}\label{lynx}
+\begin{center}
+\begin{tabular}{cccccrcrc}
+\hline\hline
+$Processors$ & $Linear$ & $FWM$ & $TLM$ & $ADM$ \\
+\hline
+16 & 1 & 6.52s/1.0 & 15.80s/1.0 & 33.20s/1.0 \\
+32 & 2  & 3.37s/1.93  & 7.78s/2.03 & 16.63s/2.0 \\
+64 & 4 & 2.04s/3.20 & 4.70s/3.36 & 10.12s/3.29 \\
+128 & 8 & 1.50s/4.35 & 3.24s/4.88 & 7.20s/4.63 \\
+256 & 16 & 1.13s/5.77 & 2.43s/6.75 & 5.53s/6.02 \\
+512 & 32 & 0.93s/7.01 & 1.80s/8.78 & 3.50s/9.51 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ACKNOWLEDGMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{acknowledgment}
+The National Center for Atmospheric Research is sponsored by the National
+Science Foundation.  This work was supported by the Air Force Weather Agency.
+\end{acknowledgment}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REFERENCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create a bibliography directory and place your .bib file there.
+\ifthenelse{\boolean{dc}}
+{}
+{\clearpage}
+\bibliographystyle{ametsoc}
+\bibliography{../bibliography/references}
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% END OF TEMPLATE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
