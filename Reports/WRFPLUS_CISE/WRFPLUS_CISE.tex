@@ -58,15 +58,16 @@
 \usepackage{subfigure}
 \usepackage{comment}
 \usepackage{verbatim}
+\usepackage{fancyvrb}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ABSTRACT
 %
 % Enter your Abstract here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\myabstract}{The tangent linear and adjoint of the Weather Research and Forecasting (WRF) Model with its Advanced Research WRF (WRW)  dynamic core have been re-developed based on the latest WRF model. The automatic differentiation engine (TAPENADE) has been mainly used in the development;  There are three key improvements over the earlier model: accuracy, modularity and efficiency. 
+\newcommand{\myabstract}{The tangent linear and adjoint of the Weather Research and Forecasting (WRF) Model with its Advanced Research WRF (ARW)  dynamic core have been re-developed based on the latest WRF model. The automatic differentiation engine (TAPENADE) has been mainly used in the development;  There are three key improvements: accuracy, modularity and efficiency. 
 \begin{itemize}
-\item A set of subroutine interfaces have been constructed for easily coupling tangent linear and adjoint of the WRF ARW model (WRFPLUS)with other applications, such as four-dimensional variational data assimilation, forecast sensitivity to observation etc.;
+\item A set of subroutine interfaces have been constructed for easily coupling tangent linear and adjoint of the WRF ARW model (WRFPLUS) with other applications, such as four-dimensional variational data assimilation, forecast sensitivity to observation etc.;
 \item To develop the parallel version of the WRFPLUS model, an innovative technique based on the nature duality that existed between MPI communication routines is adopted in the WRF software framework, the Registry in WRF is extended to automatically generate the tangent linear and adjoint of the required communication operations (halo exchange). This approach dramatically speeds up and simplify the software development cycle of the parallel tangent linear and adjoint codes and the parallel efficiency of the derived codes is impressive compared the its predecessor. 
 \item The tangent linear and adjoint code for tracer are developed as well to prepare the potential application in chemistry data assimilation.
 \end{itemize}
@@ -79,7 +80,7 @@
 %
 % Enter your TITLE here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{\textbf{\large{The Upgraded Development of the Tangent Linear and Adjoint of Weather Research and Forecasting (WRF) Modeling System}}}
+\title{\textbf{\large{The Development of the Upgraded Tangent Linear and Adjoint of Weather Research and Forecasting (WRF) Modeling System}}}
 %
 % Author names, with corresponding author information. 
 % [Update and move the \thanks{...} block as appropriate.]
@@ -151,11 +152,11 @@ Analysis and Prediction of Storms (CAPS) at the University of Oklahoma, and the 
 
 The WRF model is designed to be an efficient massively parallel computing code to be able to take advantage	of advanced high-performance computing systems. The code can be configured for both research and operations and offers numerous physics options. WRF is maintained and supported as a community model to facilitate wide use, and is suitable for use in a broad spectrum of applications across scales ranging from meters to thousands of kilometers. Such applications include research and operational NWP, data assimilation and parameterized-physics research, downscaling climate simulations, driving air quality models, atmosphere-ocean coupling, and idealized simulations.
 
-\subsection{Brief description of WRF tangent linear and adjoint model}
-
 NCAR started to develop its first version of the tangent linear and adjoint models for the WRF ARW around 2005 and research based on this version has been conducted and published such as in \cite{Xiao2008} and \cite{Huang2009}. In the past few years, the WRF model and the WRF data assimilation (WRFDA) system have experienced extensive changes. However, the first version of WRF tangent linear and adjoint model failed to catch up with the developments of the WRF and WRFDA systems and the obsolete tangent linear and adjoint models lead to many problems when they were coupled with the latest WRF and WRFDA systems to become a 4D-Var system.
 
-From the WRF model version 3.2 release, we started to re-develop the tangent linear and adjoint models of WRF ARW core based on the latest WRF model. Compared to its first version, the new version has following improvements: 1) Consistent with the latest WRF development, the current tangent linear and adjoint codes are always kept up with the latest WRF changes; 2) Improved physics packages, in addition to vertical diffusion and surface drag, we also include a simplified microphysics scheme and a cumulus scheme;  3) More accurate and complete tangent-linear and adjoint checks are included to make sure that the existing codes and new developed codes are error free; 4) For the purpose of the lateral boundary control in regional 4D-Var and adjoint sensitivity analysis, the lateral boundary scheme was investigated carefully and its associated tangent-linear and adjoint codes were developed and checked, for details see Zhang et al. 2011.
+From the WRF model version 3.2 release, with the help of free AD tool---TAPENADE (\cite{Hascoet2004T2u}), we started to re-develop the tangent linear and adjoint models of WRF ARW core based on the latest WRF model. TAPENADE is a source-to-source transformation AD tool for programs written in Fortran 77-95, i.e. TAPENADE generates a TLM or ADM from the source code of a given model. Compared to its first version, the new version has following improvements: 1) Consistent with the latest WRF development, the current tangent linear and adjoint codes are always kept up with the latest WRF changes; 2) Significant improved parallelization strategy and efficiency; ;  3) More accurate and complete tangent-linear and adjoint checks are included to make sure that the existing codes and new developed codes are error free; 4) For the purpose of the lateral boundary control in regional 4D-Var and adjoint sensitivity analysis, the lateral boundary scheme was investigated carefully and its associated tangent-linear and adjoint codes were developed and checked, for details see \cite{Zhang2012}.
+
+TAPENADE (\cite{Hascoet2004T2u}) is a source-to-source transformation AD tool for programs written in Fortran 77-95, i.e. TAPENADE generates a TLM or ADM from the source code of a given model. 
 
 \section{Implementation of an inline coupling interface in the WRFPLUS model}
 
@@ -187,35 +188,93 @@ After the the codes are ready, it is important and necessary to test the tangent
 
 Let $\mathbf{f}(\mathbf{x})$ denotes a forward model and $g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x})$ and $a\_\mathbf{f}(\mathbf{x},a\_\mathbf{x})$ denote the tangent linear and adjoint model respectively. The correctness of tangent linear model can be tested as:
 \begin{equation}
-\lim_{g\_\mathbf{x} \rightarrow 0}{\frac{\mathbf{f}(\mathbf{x}+g\_\mathbf{x})-\mathbf{f}(\mathrm{x})}{{g\_\mathbf{x}}^T\cdot{g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x})}}}=1
+\label{tlcheckf}
+\lim_{\lambda \rightarrow 0}{\frac{\mathbf{f}(\mathbf{x}+{\lambda}g\_\mathbf{x})-\mathbf{f}(\mathrm{x})}{{g\_\mathbf{f}(\mathbf{x},{\lambda}g\_\mathbf{x})}}}=1
 \end{equation}
 
 The adjoint relation is tested by :
 \begin{equation}
+\label{adcheck}
 \langle g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}) \rangle = \langle a\_\mathbf{f}(\mathbf{x},g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{x} \rangle
 \end{equation}
 
-If the tangent linear codes and adjoint codes are correct, the above two relations should be held up to the machine accuracy. Because different model variables have different value magnitudes, to avoid the potential mistakes related to small magnitude variable computation (such as water vapor field) hidden by big magnitude variable (such as pressure), we design the capability to perform checks on individual variables. We performed the tangent linear and adjoint check with the Fukushima demonstration case.
+If the tangent linear codes and adjoint codes are correct, the above two relations should be held up to the machine accuracy. Because different model variables have different value magnitudes, to avoid the potential mistakes related to small magnitude variable computation (such as water vapor field) hidden by big magnitude variable (such as pressure), we design the capability to perform checks on individual variables. We performed the tangent linear and adjoint check with the test case, which is similar with the check in \cite{Xiao2008}. We sequentially reduced the initial perturbations by a factor of $10^{-1}$ and repeated the calculate the left-hand side of Eqs. (\ref{tlcheckf}). The testing is performed on NCAR IBM machine with 64 bits precision. Table \ref{tlcheck} shows the ratios of norms between the 24-h tangent linear forecasts and the differences of two nonlinear forecasts over the whole domain. The norm in the table is defined as the summation of the squares of all variables (perturbations of tangent linear model and difference of two nonlinear models) over the whole domain at 24 h. It indicated that the tangent linear forecast approximates the difference of two nonlinear forecasts as the initial perturbations decrease and approach zero.
+
+The adjoint code of ADM also passed the adjoint check. In the adjoint relation Eqs. (\ref{adcheck}), the left-hand side (lhs) involves only the tangent linear code, while the right-hand side (rhs) involves also the adjoint code. If lhs and rhs have the same value with machine accuracy, the adjoint code is correct compared with the tangent linear code. Using NCAR IBM machine with 64 bits precision, lhs and rhs for the test case are 0.14182720729878E+14 and 0.14182720729883E+14, respectively. This indicates that the adjoint code is right.
 
 
-\section{Parallelisation of WRFPLUS model}
+\section{Parallelization of WRFPLUS model}
 
-\subsection{WRF software }
-\label{sec:single}
-Tools for automatic generation of application code from user-specified tables provide significant software productivity benefits in development and maintenance of large applications, such as WRF. In WRF model, hundreds of thousands of lines of WRF code are automatically generated from a user-edited table, called the Registry.  The Registry provides a high-level single-point-of-control over the fundamental structure of the model data, and thus provides considerable utility for developers and maintainers.  It contains lists describing state data fields and their attributes:  dimensionality, binding to particular solvers, association with WRF I/O streams, communication operations, and run time configuration options (namelist elements and their bindings to model control structures).  Adding or modifying a state variable to WRF involves modifying a single line of a single file; this single change is then automatically propagated to scores of locations in the source code the next time the code is compiled.
+TAPENADE has few problems to generate tangent linear and adjoint codes from sequential forward codes, however, it still has some ways to go forward to derive tangent linear and adjoint of parallel communication routines inside a parallel forward model. However, It was observed that in general atmospheric and oceanic model, the communication routines due to finite differential are linear operators, hence as matrices, the adjoint is simply the transpose, which is the dual operator and the tangent linear is the original linear operator acting on the perturbations (\cite{Cheng2006ADb}).  
 
-The WRF Registry has two components: the Registry file and the Registry program.
+With the proper coding structure and available parallel communication routines in forward codes, it is very straightforward to even manually write communication routines for tangent linear model. We only need to use the same parallel communication templates in forward codes and add the corresponding perturbation variables. In the adjoint code, due to the duality between $MPI\_SEND$ and $MPI\_RECV$ calls, we send where we receive before, and received where we send previously. Please note that in adjoint codes, we communicate adjoint variables. 
 
-\subsection{The duality of MPI communication operations}
-The following code snippet from the WRF illustrate the message exchanges occurring between different CPUs:
+In WRF model, hundreds of thousands of lines of WRF code are automatically generated from a user-edited table, called the Registry.  The Registry provides a high-level single-point-of-control over the fundamental structure of the model data, and thus provides considerable utility for developers and maintainers.  It contains lists describing state data fields and their attributes:  dimensionality, binding to particular solvers, association with WRF I/O streams, communication operations, and run time configuration options (namelist elements and their bindings to model control structures).  Adding or modifying a state variable to WRF involves modifying a single line of a single file; this single change is then automatically propagated to scores of locations in the source code the next time the code is compiled (\cite{John2004}).
 
-In the above code segment, XX are simply wrapper routines for stand MPI calls MPI\_SEND and MPI\_RECV. The above code signal each cpu to send the appropriate slab of the array to its west neighbor, which then placed this slab into its proper destination. Similar types of communication exist in particularly all parallel programs. An important observation to be noted here is that the communication routines are linear operations, hence as matrices, the adjoint is simply the transpose, which is the dual operator. In the code above, we see an efficient characterization of the relationships between domain, cpu, communication task to be performed, and array indices, in their respective order as a chain of pointers. Once this chain of relationships is established, adjointing the code is very simply.
+Halo entries in the registry define communication operations in the model. Halo entries specify halo updates around a patch horizontally. A typical halo entry is :
+\begin{Verbatim}[frame=single]
+halo      HALO_EM_C     dyn_em    4:u_2,v_2
+\end{Verbatim}
+The first field is the keyword "halo". The second entry "HALO\_EM\_C" is the name that will be used to refer to the communication operation being defined. The third entry denoting the associated solver. The fourth entry is a list of information about the operation. This example specifies that 4 points (one cell in N,S,E, and W) of the stencil to be used in updating the state arrays for fields $u\_2$ and $v\_2$. WRF registry will automatically generate a code segment based on this halo entry: 
+\begin{Verbatim}[frame=single]
+...
+CALL HALO_EM_C_sub ( grid, local_communicator, ...)
+...
+\end{Verbatim}
+This is the code snippet will be included in the place where the communications are needed. At the same time, the registry also generates the actual subroutine "HALO\_EM\_C\_sub":
+\begin{Verbatim}[frame=single]
+...
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,0,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,0,...
+CALL RSL_LITE_EXCH_Y
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,1,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,1,...
+...
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,0,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,0,...
+CALL RSL_LITE_EXCH_X
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,1,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,1,...
+...
+\end{Verbatim}
+In the above code segment, firstly, the outgoing slices of $u\_2$ and $v\_2$ for Y direction (South-North) exchanging are packed by "RSL\_LITE\_PACK" into a temporary array. Followed by calling "RSL\_LITE\_EXCH\_Y" to finished the exchanges on south-north direction. Once each processor received the incoming data, "RSL\_LITE\_PACK" will be called again with different arguments to unpack the data to receiving slices.  The same operations will be ran on the X direction (East-West).
 
-Now the duality between MPI\_SEND and MPI\_RECV calls is now apparent. In the adjoint code, we send where we receive before, and received where we send previously. 
+In the code above, we see an efficient chain of relationships established, then adjointing the code is relatively simple. We added a new entry "halo\_nta" in WRF registry as:
+\begin{Verbatim}[frame=single]
+halo_nta      HALO_EM_C     dyn_em     4:u_2,v_2
+\end{Verbatim}
+We also modified the registry source code to enable registry to generate the corresponding tangent linear and adjoint communication codes automatically. With this entry, the registry will not only generate "HALO\_EM\_C\_sub", but also generate "HALO\_EM\_C\_TL\_sub" for tangent linear codes and "HALO\_EM\_C\_AD\_sub" for adjoint codes. The subroutine "HALO\_EM\_C\_TL\_sub" looks like:
+\begin{Verbatim}[frame=single]
+...
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,0,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,0,...
+CALL RSL_LITE_PACK ( local_communicator, grid%g_u_2, ...,0,...
+CALL RSL_LITE_PACK ( local_communicator, grid%g_v_2, ...,0,...
+CALL RSL_LITE_EXCH_Y
+CALL RSL_LITE_PACK ( local_communicator, grid%u_2, ...,1,...
+CALL RSL_LITE_PACK ( local_communicator, grid%v_2, ...,1,...
+CALL RSL_LITE_PACK ( local_communicator, grid%g_u_2, ...,1,...
+CALL RSL_LITE_PACK ( local_communicator, grid%g_v_2, ...,1,...
+...
+! for X direction
+\end{Verbatim}
+In tangent linear codes, in addition to the basic state fields ($u\_2$ and $v\_2$) need to be exchanged, the perturbation fields ($g\_u\_2$ and $g\_v\_2$) are exchanged as well, this is required by tangent linear model. 
 
-\subsection{The implementation of the adjoint MPI communication operations in WRFPLUS}
+The adjoint codes "HALO\_EM\_C\_TL\_sub" looks like:
+\begin{Verbatim}[frame=single]
+...
+CALL RSL_LITE_PACK_AD ( local_communicator, grid%a_u_2, ...,0,...
+CALL RSL_LITE_PACK_AD ( local_communicator, grid%a_v_2, ...,0,...
+CALL RSL_LITE_EXCH_Y
+CALL RSL_LITE_PACK_AD ( local_communicator, grid%a_u_2, ...,1,...
+CALL RSL_LITE_PACK_AD ( local_communicator, grid%a_v_2, ...,1,...
+...
+! for X direction
+\end{Verbatim}
+In adjoint communication codes, only the adjoint variables ($a\_u\_2$ and $a\_v\_2$) need to be exchanged and the new subroutines "RSL\_LITE\_PACK\_AD" will pack the data slices where we receive before for sending and unpack the received data to the slices where we send before. 
 
-In general, automatic differentiation tools (such as TAPENADE) have few problems to generate adjoint reverse codes, however, they still have some difficulties to generate adjoint parallel communication operation inside a huge model. WRF 
+With the help of the upgraded registry, all tangent linear and adjoint communication routines are generated easily and automatically during compilation. It is very convenient to manually insert the tangent linear and adjoint parallel communication interfaces to where they are in forward model. 
+
 
 \section{Parallel performance}
 
@@ -232,6 +291,8 @@ We also executed WRFPLUS on $16$, $32$, $64$, $128$, $256$ and $512$ processors 
 
 The technical implementation of the initial implementation of a single executable WRF 4D-Var system has been discussed. The system has been implemented starting from WRFDA version 3.3.1 and carried forward into later versions, but most of the developments have been done in the interface layer which couples the models together and few changes are made to the models themselves.
 In the single executable coupled system all information (grid and fluxes) from the atmospheric model is passed as arguments to the coupling interface so it is possible to apply the approach to a different data assimilation system; the code, therefore, could be shared with other institutions. Technically the initial implementation works reasonably well and it already replaced the old WRF 4D-Var system since the run times much better. Beyond the performance benefit seen there are other advantages for the approach compared to the old WRF 4D-Var system. The execution on of the new 4D-Var is simpler since we do not need to launch a multiple program multiple data (MPMD) collection of different executables. We also believe that it will be easier to implement a fully coupled GSI-based WRF 4D-Var data assimilation system with the new system.
+
+Adjointing a complicated piece of code is normally a tedious task, especially if done manually. Recent developments in automatic differentiation tools have aided greatly in reducing the coding time. However, as of the moment, there are still some major shortcomings with regards to the adjointing of parallel codes. We have shown that with the proper coding structure and setup, such a task can be done with ease and may be incorporated into future versions of automatic code transformation programs by taking advantage of the natural duality that exists between parallel communication routines.
 
 \section{Figures and tables}
 
@@ -262,13 +323,37 @@ The insertion of a sample figure (Fig. \ref{f1})
     \end{itemize}
     }
 }
-  \caption{Interface routines for inline coupling to the WRFPLUS model..}\label{f1}
+  \caption{Interface routines of WRFPLUS for inline coupling.}\label{f1}
 \end{figure}
 
 \subsection{Tables}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TABLES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[t]
+\caption{Ratio of norms between the tangent linear forecasts and the differences of the two nonlinear model forecasts at 24 h. The norm is defined as the summation of the squares of all variables (perturbations of tangent linear model and difference of two nonlinear models) over the whole domain at 24 h. Here $\lambda$ is the perturbation scaling factors of the initial perturbation.}\label{tlcheck}
+\begin{center}
+\begin{tabular}{cccccrcrc}
+\hline\hline
+$\lambda$ & $Ratio$ \\
+\hline
+.1000E+0 & 0.10114281198481E+01 \\
+.1000E-01  & 0.10008545240448E+01 \\
+.1000E-02  &  0.10000832484054E+01 \\
+.1000E-03  &  0.10000095806229E+01 \\
+.1000E-04  &  0.10000007503957E+01 \\
+.1000E-05  &  0.10000001743469E+01 \\
+.1000E-06  &  0.10000000344215E+01 \\
+.1000E-07  &  0.99999998551913E+00 \\
+.1000E-08  &  0.10000001453468E+01 \\
+.1000E-09  &  0.10000007302081E+01 \\
+.1000E-10  &  0.10000775631370E+01 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
 \begin{table}[t]
 \caption{Parallel performance for one time step integration on Bluefire: ${Wallclock}/{Speedup}$. $Linear$: Linear speedup; $FWM$: Forward model; $TLM$: Tangent linear model; $ADM$: Adjoint model.}\label{bluefire}
 \begin{center}
