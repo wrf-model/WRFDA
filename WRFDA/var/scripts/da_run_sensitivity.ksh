@@ -146,7 +146,7 @@ fi
         mv $RUN_DIR/working/fcst $RUN_DIR2/final_sens_d01
      fi   
      
-     if [[ $ADJ_REF == 3 ]]; then; DATE=$DATE_TMP; fi
+     if [[ $ADJ_REF == 3 ]]; then DATE=$DATE_TMP; fi
    fi
 
 ############################## Run WRF+ #################################
