@@ -1,0 +1,115 @@
+\begin{thebibliography}{20}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Barker et~al.(2012)}]{Barker2012}
+Barker, D., et~al., 2012: The weather research and forecasting (wrf) model's
+  community variational/ensemble data assimilation system: Wrfda. \textit{Bull.
+  Amer. Meteor. Soc.}, \textbf{93}, 831--843.
+
+\bibitem[{Cheng(2006)}]{Cheng2006ADb}
+Cheng, B., 2006: A duality between forward and adjoint {MPI} communication
+  routines. \textit{Computational Methods in Science and Technology}, Polish
+  Academy of Sciences, 23--24.
+
+\bibitem[{Errico(1997)}]{Errico1997}
+Errico, R., 1997: What is an adjoint model? \textit{BAMS}, \textbf{78},
+  2577--2591.
+
+\bibitem[{Errico and Vukicevic(1992)}]{Errico1992}
+Errico, R.~M. and T.~Vukicevic, 1992: Sensitivity analysis using of the
+  psu-ncar mesoscale model. \textit{Mon. Wea. Rev.}, \textbf{120}, 1644--1660.
+
+\bibitem[{Gilmour et~al.(2001)Gilmour, Smith, and Buizza}]{Gilmour2001}
+Gilmour, I., L.~Smith, and R.~Buizza, 2001: Linear regime duration: Is 24 hours
+  a long time in synoptic weather forecasting? \textit{J. Atmos. Sci.},
+  \textbf{58}, 3525--3539.
+
+\bibitem[{Hasco\"et and Pascual(2004)}]{Hascoet2004T2u}
+Hasco\"et, L. and V.~Pascual, 2004: Tapenade 2.1 user's guide. Technical Report
+  0300, INRIA. \urlprefix\url{http://www.inria.fr/rrrt/rt-0300.html}.
+
+\bibitem[{Huang et~al.(2009)}]{Huang2009}
+Huang, X.-Y., et~al., 2009: Four-dimensional variational data assimilation for
+  wrf: Formulation and preliminary results. \textit{Mon. Wea. Rev.},
+  \textbf{137}, 299--314.
+
+\bibitem[{Kleist and Morgan(2005a)}]{Kleist2005a}
+Kleist, D.~T. and M.~C. Morgan, 2005a: Interpretation of the stucture and
+  evolution of adjoint-derived forecast sensitivity gradients. \textit{Mon.
+  Wea. Rev.}, \textbf{133}, 466--484.
+
+\bibitem[{Kleist and Morgan(2005b)}]{Kleist2005b}
+Kleist, D.~T. and M.~C. Morgan, 2005b: Application of adjoint-derived forecast
+  sensitivities to the 24Ð25 january 2000 u.s. east coast snowstorm.
+  \textit{Mon. Wea. Rev.}, \textbf{133}, 3148Ð3175.
+
+\bibitem[{Langland et~al.(1999)Langland, Gelaro, Rohaly, and
+  Shapiro}]{Langland1999}
+Langland, R.~H., R.~Gelaro, G.~D. Rohaly, and M.~A. Shapiro, 1999: Target
+  observations in fastex: Adjoint based targeting procedure and data impact
+  experiments in iop17 and iop18. \textit{Quart. J. Roy. Meteor. Soc.},
+  \textbf{125}, 3241--3270.
+
+\bibitem[{Li et~al.(1999)Li, Barcilon, and Navon}]{Li1999}
+Li, Z., A.~Barcilon, and I.~M. Navon, 1999: Study of block onset using
+  sensitivity perturbations in climatological flows. \textit{Mon. Wea. Rev.},
+  \textbf{127}, 879--900.
+
+\bibitem[{Michalakes and Schaffer(2004)}]{John2004}
+Michalakes, J. and D.~Schaffer, 2004: Wrf tiger team documentation: The
+  registry. Technical report, INRIA.
+  \urlprefix\url{http://www.mmm.ucar.edu/wrf/WG2/software_2.0/registry_schaffer.pdf}.
+
+\bibitem[{Navon et~al.(1992)Navon, Zou, Derber, and Sela}]{Navon1992}
+Navon, I.~M., X.~Zou, J.~Derber, and J.~Sela, 1992: Variational data
+  assimilation with an adiabatic version of the nmc spectral model.
+  \textit{Mon. Wea. Rev.}, \textbf{120}, 1433--1446.
+
+\bibitem[{Rabier et~al.(1996)Rabier, Klinker, Courtier, and
+  Hollingsworth}]{Rabier1996}
+Rabier, F., E.~Klinker, P.~Courtier, and A.~Hollingsworth, 1996: Sensitivity of
+  forecast errors to initial conditions. \textit{Quart. J. Roy. Meteor. Soc.},
+  \textbf{122}, 121--150.
+
+\bibitem[{Skamarock et~al.(2005)Skamarock, Klemp, Dudhia, Gill, Barker, Wang,
+  and Powers}]{Skamarock2005}
+Skamarock, W.~C., J.~B. Klemp, J.~Dudhia, D.~O. Gill, D.~M. Barker, W.~Wang,
+  and J.~G. Powers, 2005: A description of the advanced research wrf version 2.
+  Technical report, NCAR Tech. Note NCAR/TN-468+STR, 100 pp. [Available from
+  UCAR communications, P. O. Box 3000, Boulder, Co 80307-3000.].
+
+\bibitem[{Utke et~al.(2009)Utke, Hasco{\"e}t, Heimbach, Hill, Hovland, and
+  Naumann}]{Utke2009TAM}
+Utke, J., L.~Hasco{\"e}t, P.~Heimbach, C.~Hill, P.~Hovland, and U.~Naumann,
+  2009: Toward adjoinable mpi. \textit{Proceedings of the 10th IEEE
+  International Workshop on Parallel and Distributed Scientific and
+  Engineering, PDSEC'09}.
+
+\bibitem[{Vukicevic(1991)}]{Vukicevic1991}
+Vukicevic, T., 1991: Nonlinear and linear evolution of initial forecast errors.
+  \textit{Mon. Wea. Rev.}, \textbf{119}, 1602--1611.
+
+\bibitem[{Xiao et~al.(2002)Xiao, Zou, Pondeca, Shapiro, and Velden}]{Xiao2002}
+Xiao, Q., X.~Zou, M.~Pondeca, M.~A. Shapiro, and C.~S. Velden, 2002: Impact of
+  gms-5 and goes-9 satellite-derived winds on the prediction of a norpex
+  extratropical cyclone. \textit{Mon. Wea. Rev.}, \textbf{130}, 507--528.
+
+\bibitem[{Xiao et~al.(2008)}]{Xiao2008}
+Xiao, Q., et~al., 2008: Application of an adiabatic wrf adjoint to the
+  investigation of the may 2004 mcmurdo, antarctica, severe wind event.
+  \textit{Mon. Wea. Rev.}, \textbf{136}, 3696--3713.
+
+\bibitem[{Zhang and Huang(2012)}]{Zhang2012}
+Zhang, X. and X.-Y. Huang, 2012: The development of regional wrf tangent linear
+  and adjoint models and its applications in wrf 4d-var system and gsi based
+  wrf 4d-var system. \textit{92nd American Meteorological Society Annual
+  Meeting}, New Orelean, USA, 000--000.
+
+\end{thebibliography}
