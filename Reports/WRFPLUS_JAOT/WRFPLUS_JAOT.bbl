@@ -106,10 +106,9 @@ Xiao, Q., et~al., 2008: Application of an adiabatic wrf adjoint to the
   investigation of the may 2004 mcmurdo, antarctica, severe wind event.
   \textit{Mon. Wea. Rev.}, \textbf{136}, 3696--3713.
 
-\bibitem[{Zhang and Huang(2012)}]{Zhang2012}
-Zhang, X. and X.-Y. Huang, 2012: The development of regional wrf tangent linear
-  and adjoint models and its applications in wrf 4d-var system and gsi based
-  wrf 4d-var system. \textit{92nd American Meteorological Society Annual
-  Meeting}, New Orelean, USA, 000--000.
+\bibitem[{Zhang and Huang(2013)}]{Zhang2013}
+Zhang, X. and X.-Y. Huang, 2013: Development of gsi-based wrf 4d-var system.
+  \textit{93rd American Meteorological Society Annual Meeting}, Austin, TX,
+  USA, 000--000.
 
 \end{thebibliography}
