@@ -1,0 +1,253 @@
+
+% ----------------------------------------------------------------------
+%                   LATEX TEMPLATE FOR PhD THESIS
+% ----------------------------------------------------------------------
+
+% based on Harish Bhanderi's PhD/MPhil template, then Uni Cambridge
+% http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/ThesisStyle/
+% corrected and extended in 2007 by Jakob Suckale, then MPI-CBG PhD programme
+% and made available through OpenWetWare.org - the free biology wiki
+
+
+%: Style file for Latex
+% Most style definitions are in the external file PhDthesisPSnPDF.
+% In this template package, it can be found in ./Latex/Classes/
+\documentclass[twoside,11pt]{Latex/Classes/PhDthesisPSnPDF}
+
+\usepackage{fancyvrb}
+
+%: Macro file for Latex
+% Macros help you summarise frequently repeated Latex commands.
+% Here, they are placed in an external file /Latex/Macros/MacroFile1.tex
+% An macro that you may use frequently is the figuremacro (see introduction.tex)
+\include{Latex/Macros/MacroFile1}
+
+
+
+%: ----------------------------------------------------------------------
+%:                  TITLE PAGE: name, degree,..
+% ----------------------------------------------------------------------
+% below is to generate the title page with crest and author name
+
+%if output to PDF then put the following in PDF header
+\ifpdf  
+    \pdfinfo { /Title  (Technical Description and User's Guide of the Tangent Linear and Adjoint Codes for WRF)
+               /Author (Xin Zhang xinzhang@ucar.edu)
+               /CreationDate (D:YYYYMMDDhhmmss)  %format D:YYYYMMDDhhmmss
+               /ModDate (D:YYYYMMDDhhmm)
+               /Subject (xyz)
+               /Keywords (add, your, keywords, here) }
+    \pdfcatalog { /PageMode (/UseOutlines)
+                  /OpenAction (fitbh)  }
+\fi
+
+
+\title{Technical Description and User's Guide of the Tangent Linear and Adjoint Codes for WRF}
+
+
+
+% ----------------------------------------------------------------------
+% The section below defines www links/email for author and institutions
+% They will appear on the title page of the PDF and can be clicked
+\ifpdf
+  \author{\href{mailto:xinzhang@ucar.edu}{Xin Zhang and Xiang-Yu Huang}}
+%  \cityofbirth{born in XYZ} % uncomment this if your university requires this
+%  % If city of birth is required, also uncomment 2 sections in PhDthesisPSnPDF
+%  % Just search for the "city" and you'll find them.
+  \collegeordept{\href{http://www.mmm.ucar.edu/}{NESL's MMM Division}}
+  \university{\href{http://www.ucar.edu}{National Center for Atmospheric Research}}
+
+  % The crest is a graphics file of the logo of your research institution.
+  % Place it in ./0_frontmatter/figures and specify the width
+  \crest{\includegraphics[width=4cm]{logo}}
+  
+% If you are not creating a PDF then use the following. The default is PDF.
+\else
+  \author{Xin Zhang}
+%  \cityofbirth{born in XYZ}
+  \collegeordept{NESL}
+  \university{National Center for Atmospheric Research}
+  \crest{\includegraphics[width=4cm]{logo}}
+\fi
+
+%\renewcommand{\submittedtext}{change the default text here if needed}
+\degree{TBD,..}
+\degreedate{year month}
+
+
+% ----------------------------------------------------------------------
+       
+% turn of those nasty overfull and underfull hboxes
+\hbadness=10000
+\hfuzz=50pt
+
+
+%: --------------------------------------------------------------
+%:                  FRONT MATTER: dedications, abstract,..
+% --------------------------------------------------------------
+
+\begin{document}
+
+%\language{english}
+
+% sets line spacing
+\renewcommand\baselinestretch{1.2}
+\baselineskip=18pt plus1pt
+
+
+%: ----------------------- generate cover page ------------------------
+
+\maketitle  % command to print the title page with above variables
+
+
+%: ----------------------- cover page back side ------------------------
+% Your research institution may require reviewer names, etc.
+% This cover back side is required by Dresden Med Fac; uncomment if needed.
+
+\newpage
+\vspace{10mm}
+1. Reviewer: Name
+
+\vspace{10mm}
+2. Reviewer: 
+
+\vspace{20mm}
+Day of the publish:
+
+\vspace{20mm}
+\hspace{70mm}Signature from head of division committee:
+
+
+
+%: ----------------------- abstract ------------------------
+
+% Your institution may have specific regulations if you need an abstract and where it is to be placed in the document. The default here is just after title.
+
+\include{0_frontmatter/abstract}
+
+% The original template provides and abstractseparate environment, if your institution requires them to be separate. I think it's easier to print the abstract from the complete thesis by restricting printing to the relevant page.
+% \begin{abstractseparate}
+%   \input{Abstract/abstract}
+% \end{abstractseparate}
+
+
+%: ----------------------- tie in front matter ------------------------
+
+\frontmatter
+\include{0_frontmatter/dedication}
+\include{0_frontmatter/acknowledgement}
+
+
+%: ----------------------- contents ------------------------
+
+\setcounter{secnumdepth}{3} % organisational level that receives a numbers
+\setcounter{tocdepth}{3}    % print table of contents for level 3
+\tableofcontents            % print the table of contents
+% levels are: 0 - chapter, 1 - section, 2 - subsection, 3 - subsection
+
+
+%: ----------------------- list of figures/tables ------------------------
+
+\listoffigures	% print list of figures
+
+\listoftables  % print list of tables
+
+
+%: ----------------------- glossary ------------------------
+
+% Tie in external source file for definitions: /0_frontmatter/glossary.tex
+% Glossary entries can also be defined in the main text. See glossary.tex
+\include{0_frontmatter/glossary} 
+
+\begin{multicols}{2} % \begin{multicols}{#columns}[header text][space]
+\begin{footnotesize} % scriptsize(7) < footnotesize(8) < small (9) < normal (10)
+
+\printnomenclature[1.5cm] % [] = distance between entry and description
+\label{nom} % target name for links to glossary
+
+\end{footnotesize}
+\end{multicols}
+
+
+
+%: --------------------------------------------------------------
+%:                  MAIN DOCUMENT SECTION
+% --------------------------------------------------------------
+
+% the main text starts here with the introduction, 1st chapter,...
+\mainmatter
+
+\renewcommand{\chaptername}{} % uncomment to print only "1" not "Chapter 1"
+
+
+%: ----------------------- subdocuments ------------------------
+
+% Parts of the thesis are included below. Rename the files as required.
+% But take care that the paths match. You can also change the order of appearance by moving the include commands.
+
+\include{1_introduction/introduction}	% background information
+\include{2_tangent_linear/tangent linear}			
+\include{3_adjoint/adjoint}	
+\include{4_wrfplus/wrfplus}
+%\include{5/XYZ}
+%\include{6/discussion}               % discussion of results
+
+%\include{8/materials_methods}        % description of lab methods
+
+
+
+
+% --------------------------------------------------------------
+%:                  BACK MATTER: appendices, refs,..
+% --------------------------------------------------------------
+
+% the back matter: appendix and references close the thesis
+
+
+%: ----------------------- bibliography ------------------------
+
+% The section below defines how references are listed and formatted
+% The default below is 2 columns, small font, complete author names.
+% Entries are also linked back to the page number in the text and to external URL if provided in the BibTex file.
+
+% PhDbiblio-url2 = names small caps, title bold & hyperlinked, link to page 
+\begin{multicols}{2} % \begin{multicols}{ # columns}[ header text][ space]
+\begin{tiny} % tiny(5) < scriptsize(7) < footnotesize(8) < small (9)
+
+\bibliographystyle{Latex/Classes/PhDbiblio-url2} % Title is link if provided
+\renewcommand{\bibname}{References} % changes the header; default: Bibliography
+
+\bibliography{9_backmatter/references} % adjust this to fit your BibTex file
+
+\end{tiny}
+\end{multicols}
+
+% --------------------------------------------------------------
+% Various bibliography styles exit. Replace above style as desired.
+
+% in-text refs: (1) (1; 2)
+% ref list: alphabetical; author(s) in small caps; initials last name; page(s)
+%\bibliographystyle{Latex/Classes/PhDbiblio-case} % title forced lower case
+%\bibliographystyle{Latex/Classes/PhDbiblio-bold} % title as in bibtex but bold
+%\bibliographystyle{Latex/Classes/PhDbiblio-url} % bold + www link if provided
+
+%\bibliographystyle{Latex/Classes/jmb} % calls style file jmb.bst
+% in-text refs: author (year) without brackets
+% ref list: alphabetical; author(s) in normal font; last name, initials; page(s)
+
+%\bibliographystyle{plainnat} % calls style file plainnat.bst
+% in-text refs: author (year) without brackets
+% (this works with package natbib)
+
+
+% --------------------------------------------------------------
+
+% according to Dresden med fac summary has to be at the end
+%\include{0_frontmatter/abstract}
+
+%: Declaration of originality
+\include{9_backmatter/declaration}
+
+
+
+\end{document}

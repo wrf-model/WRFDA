@@ -1,0 +1,67 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Davies and Turner(1977)}]{Davis1977}
+Davies, H.~C. and R.~E. Turner, 1977: Updating prediction model by dynamical
+  relaxation: An examination of the technique. \textit{Quart. J. Roy. Meteor.
+  Soc.}, \textbf{103}, 225--245.
+
+\bibitem[{Errico et~al.(1993)Errico, Vukicevic, and Reader}]{Errico1993}
+Errico, R.~M., T.~Vukicevic, and K.~Reader, 1993: Comparison of initial and
+  lateral boundary condition sensitivity for limited-area model.
+  \textit{Tellus}, \textbf{45A}, 539--557.
+
+\bibitem[{Gustafsson(2011)}]{Gusta2011}
+Gustafsson, N., 2011: Control of lateral boundary conditions in 4-dimensional
+  variational data assimilation for limited area models. \textit{Tellus},
+  \textbf{XXX}, XXX--XXX.
+
+\bibitem[{Gustafsson et~al.(1998)Gustafsson, Kallen, and
+  Thorsteinsson}]{Gusta1998}
+Gustafsson, N., E.~Kallen, and S.~Thorsteinsson, 1998: Sensitivity of forecast
+  errors to initial and lateral boundary conditions. \textit{Tellus},
+  \textbf{50A}, 167--185.
+
+\bibitem[{Gustafsson et~al.(2011)Gustafsson, X.-Y, Yang, Mogensen, Lindskog,
+  Vignes, Wilhelmsson, and Thorsteinsson}]{Gustafd2011}
+Gustafsson, N., H.~X.-Y, X.~Yang, K.~Mogensen, M.~Lindskog, O.~Vignes,
+  T.~Wilhelmsson, and S.~Thorsteinsson, 2011: Four-dimensional variational data
+  assimilation for a limited area model. \textit{Tellus}, \textbf{XXX},
+  XXX--XXX.
+
+\bibitem[{Huang et~al.(2009)}]{Huang2009}
+Huang, X.-Y., et~al., 2009: Four-dimensional variational data assimilation for
+  wrf: Formulation and preliminary results. \textit{Mon. Wea. Rev.},
+  \textbf{137}, 299--314.
+
+\bibitem[{Kawabata et~al.(2007)Kawabata, Seko, Saito, Kuroda, Tamiya, Tsuyuki,
+  Honda, and Wakazuki}]{Kawa2007}
+Kawabata, T., H.~Seko, K.~Saito, T.~Kuroda, K.~Tamiya, T.~Tsuyuki, Y.~Honda,
+  and Y.~Wakazuki, 2007: An assimilation and forecasting experiment of the
+  nerima heavy rainfall with a cloud-resolving nonhydrostatic 4-dimensional
+  variational data assimilation system. \textit{J. Meteor. Soc. of Japan},
+  \textbf{85}, 255--276.
+
+\bibitem[{Uppala et~al.(2005)}]{Uppala2005}
+Uppala, S.~M., et~al., 2005: The era-40 re-analysis. \textit{Quarterly Journal
+  of the Royal Meteorological Society}, \textbf{131~(612)}, 2961--3012,
+  \doi{10.1256/qj.04.176}, \urlprefix\url{http://dx.doi.org/10.1256/qj.04.176}.
+
+\bibitem[{Xiao et~al.(2008)}]{Xiao2008}
+Xiao, Q., et~al., 2008: Application of an adiabatic wrf adjoint to the
+  investigation of the may 2004 mcmurdo, antarctica, severe wind event.
+  \textit{Mon. Wea. Rev.}, \textbf{136}, 3696--3713.
+
+\bibitem[{Zhang and Huang(2012)}]{Zhangxin2012}
+Zhang, X. and X.-Y. Huang, 2012: Development of the upgraded tangent linear and
+  adjoint of the weather research and forecasting (wrf) modeling system.
+  \textit{XXX.}, \textbf{XXX}, XXX--XXX.
+
+\end{thebibliography}
