@@ -1,13 +1,13 @@
 \ProvidesPackage{ametsoc2col}
-% AMS Latex Style File Version 3.0
+% AMS Latex Style File Version 3.2
 % 
 % LaTeX style file for AUTHOR USE ONLY
 % Produces two column, single spaced journal page layout.
 %
-%************************************************************************************
+%*************************************************************************************************
 %****************************FOR AUTHOR'S PERSONAL USE ONLY!!!***********************
-%********************** NOT TO BE USED FOR SUBMISSION TO THE AMS!!!******************
-%************************************************************************************
+%********************** NOT TO BE USED FOR SUBMISSION TO THE AMS!!! ****************
+%*************************************************************************************************
 %* This file can be used with amspaper.tex to generate a double column, single spaced
 %* PDF that closely resembles AMS journal page layout.  This is for author use ONLY!
 %* PAPERS SUBMITTED IN THIS FORMAT WILL BE RETURNED TO THE AUTHOR! To submit a paper
@@ -17,6 +17,9 @@
 %
 % August, 2008 - Developed by Brian Papa - American Meteorological Society
 % - A modified version of ametsoc.sty
+%
+% February, 2011 - Updated with EM instructions
+%
 %
 \RequirePackage{graphicx}
 %
@@ -30,6 +33,7 @@
 % Use times font in URLs
 \RequirePackage{url}
 
+%
 % Define a light gray color for use in the title page header
 \RequirePackage{color}
 \definecolor{lightgray}{gray}{0.50}
@@ -50,7 +54,7 @@
 %Ensure both text and captions are double spaced following AMS requirements
 \ifthenelse{\boolean{dc}}
 {}
-{\renewcommand{\baselinestretch}{2.0}}
+{\renewcommand{\baselinestretch}{1.67}}
 
 % Corrected labels to roman numbers for lists
 \renewcommand{\labelenumi}{\roman{enumi}.}
@@ -170,7 +174,7 @@
    \date{}% No date
    \maketitle%Make the title
    \thispagestyle{fancy}% title page doesn't have page number
-   \lhead{\textcolor{lightgray}{\footnotesize{Draft to be submitted to MWR}}}
+   \lhead{\textcolor{lightgray}{\footnotesize{Generated using V3.2 of the official AMS \LaTeX\ template--journal page layout FOR AUTHOR USE ONLY, NOT FOR SUBMISSION!}}}
    \newpage%Title page is separate from rest of article
    \pagenumbering{arabic}%Start pagination from this point
    \newpage%Title page is separate from rest of article

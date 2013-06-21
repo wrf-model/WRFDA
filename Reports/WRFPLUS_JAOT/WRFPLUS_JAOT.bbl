@@ -9,9 +9,9 @@
 \providecommand{\eprint}[2][]{\url{#2}}
 
 \bibitem[{Barker et~al.(2012)}]{Barker2012}
-Barker, D., et~al., 2012: The weather research and forecasting (wrf) model's
-  community variational/ensemble data assimilation system: Wrfda. \textit{Bull.
-  Amer. Meteor. Soc.}, \textbf{93}, 831--843.
+Barker, D.~M., et~al., 2012: The weather research and forecasting ({WRF})
+  model's community variational/ensemble data assimilation system: {WRFDA}.
+  \textit{Bull. Amer. Meteor. Soc.}, \textbf{93}, 831--843.
 
 \bibitem[{Cheng(2006)}]{Cheng2006ADb}
 Cheng, B., 2006: A duality between forward and adjoint {MPI} communication
@@ -37,7 +37,7 @@ Hasco\"et, L. and V.~Pascual, 2004: Tapenade 2.1 user's guide. Technical Report
 
 \bibitem[{Huang et~al.(2009)}]{Huang2009}
 Huang, X.-Y., et~al., 2009: Four-dimensional variational data assimilation for
-  wrf: Formulation and preliminary results. \textit{Mon. Wea. Rev.},
+  {WRF}: Formulation and preliminary results. \textit{Mon. Wea. Rev.},
   \textbf{137}, 299--314.
 
 \bibitem[{Kleist and Morgan(2005a)}]{Kleist2005a}
@@ -63,7 +63,7 @@ Li, Z., A.~Barcilon, and I.~M. Navon, 1999: Study of block onset using
   \textbf{127}, 879--900.
 
 \bibitem[{Michalakes and Schaffer(2004)}]{John2004}
-Michalakes, J. and D.~Schaffer, 2004: Wrf tiger team documentation: The
+Michalakes, J. and D.~Schaffer, 2004: {WRF} tiger team documentation: The
   registry. Technical report, INRIA.
   \urlprefix\url{http://www.mmm.ucar.edu/wrf/WG2/software_2.0/registry_schaffer.pdf}.
 
@@ -78,12 +78,11 @@ Rabier, F., E.~Klinker, P.~Courtier, and A.~Hollingsworth, 1996: Sensitivity of
   forecast errors to initial conditions. \textit{Quart. J. Roy. Meteor. Soc.},
   \textbf{122}, 121--150.
 
-\bibitem[{Skamarock et~al.(2005)Skamarock, Klemp, Dudhia, Gill, Barker, Wang,
-  and Powers}]{Skamarock2005}
-Skamarock, W.~C., J.~B. Klemp, J.~Dudhia, D.~O. Gill, D.~M. Barker, W.~Wang,
-  and J.~G. Powers, 2005: A description of the advanced research wrf version 2.
-  Technical report, NCAR Tech. Note NCAR/TN-468+STR, 100 pp. [Available from
-  UCAR communications, P. O. Box 3000, Boulder, Co 80307-3000.].
+\bibitem[{Skamarock et~al.(2008)}]{Skamarock2008}
+Skamarock, W.~C., et~al., 2008: A description of the advanced research {WRF}
+  version 3. Technical report, NCAR Tech. Note NCAR/TN-475+STR, 113 pp.
+  [Available from UCAR communications, P. O. Box 3000, Boulder, Co
+  80307-3000.].
 
 \bibitem[{Utke et~al.(2009)Utke, Hasco{\"e}t, Heimbach, Hill, Hovland, and
   Naumann}]{Utke2009TAM}
@@ -98,17 +97,17 @@ Vukicevic, T., 1991: Nonlinear and linear evolution of initial forecast errors.
 
 \bibitem[{Xiao et~al.(2002)Xiao, Zou, Pondeca, Shapiro, and Velden}]{Xiao2002}
 Xiao, Q., X.~Zou, M.~Pondeca, M.~A. Shapiro, and C.~S. Velden, 2002: Impact of
-  gms-5 and goes-9 satellite-derived winds on the prediction of a norpex
+  {GMS-5} and {GOES-9} satellite-derived winds on the prediction of a {NORPEX}
   extratropical cyclone. \textit{Mon. Wea. Rev.}, \textbf{130}, 507--528.
 
 \bibitem[{Xiao et~al.(2008)}]{Xiao2008}
-Xiao, Q., et~al., 2008: Application of an adiabatic wrf adjoint to the
-  investigation of the may 2004 mcmurdo, antarctica, severe wind event.
+Xiao, Q., et~al., 2008: Application of an adiabatic {WRF} adjoint to the
+  investigation of the may 2004 mc{M}urdo, antarctica, severe wind event.
   \textit{Mon. Wea. Rev.}, \textbf{136}, 3696--3713.
 
 \bibitem[{Zhang and Huang(2013)}]{Zhang2013}
-Zhang, X. and X.-Y. Huang, 2013: Development of gsi-based wrf 4d-var system.
-  \textit{93rd American Meteorological Society Annual Meeting}, Austin, TX,
-  USA, 000--000.
+Zhang, X. and X.-Y. Huang, 2013: Development of {GSI-based} {WRF} {4D-Var}
+  system. \textit{93rd American Meteorological Society Annual Meeting}, Austin,
+  TX, USA, 000--000.
 
 \end{thebibliography}

@@ -1,17 +1,9 @@
 \ProvidesPackage{ametsoc}
-% AMS Latex Style File Version 3.0
+% AMS Latex Style File Version 3.2
 % 
 % LaTeX style file for American Meteorological Society publications
 % (not including BAMS).
-%
-%************************************************************************
-%********************** DO NOT MODIFY THIS FILE!!! **********************
-%************************************************************************
-%* ANY CHANGES MADE WILL BE LOST UPON UPLOADING YOUR MANUSCRIPT.        *
-%* THIS STYLE FILE IS KEPT ON THE UPLOAD SYSTEM AND IS USED TO          *
-%* CREATE YOUR MANUSCRIPT.  ANY STYLE FILE YOU UPLOAD WILL NOT BE USED  *
-%************************************************************************
-%
+%%
 % Developed by Brian Papa - American Meteorological Society
 %
 % Based on the initial style file from Lakshmanan, 
@@ -62,6 +54,19 @@
 % - Created header for first page to indicate use of Official AMS LaTeX template
 % - Corrected usepackage commands to Requirepackage
 %
+% Februray, 2011 -- Brian Papa, AMS
+% - Updated for use with EM.
+%
+% March, 2011 -- Brian Papa, AMS
+% -Added use of the lineno package
+%
+% June, 2011 -- Brian Papa, AMS
+% -Reordered calls to lineno and amsmath so lineno was after amsmath due to conflicts between
+% the two packages.
+%
+% July, 2012 - J. Creilson
+% - Added line numbering fix when using {equation} and other amsmath environments
+%
 \RequirePackage{graphicx}
 %
 % Seup the page layout using the geometry package
@@ -81,6 +86,9 @@
 % Provide the amsmath, fonts, symbol, and boldface math packages for use
 \RequirePackage{amsmath,amsfonts,amssymb,bm}
 
+% Line numbers needed
+\RequirePackage{lineno}
+
 %Use the indent first package to ensure the first paragraph after each
 %section is indented.
 \RequirePackage{indentfirst}
@@ -93,7 +101,7 @@
 %Ensure both text and captions are double spaced following AMS requirements
 \ifthenelse{\boolean{dc}}
 {}
-{\renewcommand{\baselinestretch}{2.0}}
+{\renewcommand{\baselinestretch}{1.66}}
 
 \renewcommand{\labelenumi}{\roman{enumi}.}
 % All the figures and tables should be at the end on their own pages
@@ -219,7 +227,7 @@
    \date{}% No date
    \maketitle%Make the title
    \thispagestyle{fancy}% title page doesn't have page number
-   \lhead{\textcolor{lightgray}{\footnotesize{Project report submitted to AFWA}}}
+   \lhead{\textcolor{lightgray}{\footnotesize{Generated using version 3.2 of the official AMS \LaTeX\ template}}}
    \newpage%Title page is separate from rest of article
    \pagenumbering{arabic}%Start pagination from this point
    \newpage%Title page is separate from rest of article
@@ -238,7 +246,7 @@
 %Change the way the list of figures and tables operates
 \renewcommand\listoffigures{
     \section*{\listfigurename}%
-    \renewcommand{\baselinestretch}{2.0}
+    \renewcommand{\baselinestretch}{1.66}
     \small\normalsize
     \@starttoc{lof}%
 }
@@ -248,8 +256,29 @@
 
 \renewcommand\listoftables{
     \section*{\listtablename}%
-    \renewcommand{\baselinestretch}{2.0}
+    \renewcommand{\baselinestretch}{1.66}
     \small\normalsize
     \@starttoc{lot} \renewcommand*\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
 \renewcommand{\@dotsep}{1000}
+}
+% The following section defines a new command that helps to resolve the issue of missing line numbers preceding some 
+% equations when using various math display environments
+%
+\newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+  \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+  \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+  \renewenvironment{#1}%
+     {\linenomath\csname old#1\endcsname}%
+     {\csname oldend#1\endcsname\endlinenomath}}% 
+\newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+  \patchAmsMathEnvironmentForLineno{#1}%
+  \patchAmsMathEnvironmentForLineno{#1*}}%
+\AtBeginDocument{%
+\patchBothAmsMathEnvironmentsForLineno{equation}%
+\patchBothAmsMathEnvironmentsForLineno{align}%
+\patchBothAmsMathEnvironmentsForLineno{flalign}%
+\patchBothAmsMathEnvironmentsForLineno{alignat}%
+\patchBothAmsMathEnvironmentsForLineno{gather}%
+\patchBothAmsMathEnvironmentsForLineno{multline}%
+\patchBothAmsMathEnvironmentsForLineno{eqnarray}%
 }

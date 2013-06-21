@@ -140,7 +140,7 @@
 
 During the past two decades, the use of the adjoint technique in meteorology and oceanography rapidly increased.  The adjoint model is a powerful tool in many applications, such as data assimilation, parameter estimation, and sensitivity analysis. (\cite{Errico1992}; \cite{Errico1997}; \cite{Rabier1996}; \cite{Langland1999}; \cite{Li1999}; \cite{Xiao2002}; \cite{Xiao2008}; \cite{Kleist2005a}; \cite{Kleist2005b})
 
-The Weather Research and Forecasting (WRF) Modeling System (\cite{Skamarock2005}) is a multi-agency effort to provide a next-generation mesoscale forecast model and data assimilation system that will advance both the understanding and the prediction of mesoscale weather as well as accelerate the transfer of research advances into operations. The WRF model was designed to be an efficient massively parallel computing code to take advantage of advanced high-performance computing systems. The code, which can be configured for both research and operations, also offers numerous physics options. The WRF model is maintained and supported as a community model to facilitate wide use internationally, for research, operations, and teaching. The model is suitable for a broad span of applications across scales ranging from large-eddy to global simulations. Such applications include real-time numerical weather prediction, data assimilation development and studies, parameterized-physics research, regional climate simulations, air-quality modeling, atmosphere-ocean coupling, and idealized simulations. As of this writing, the WRF model is in operational and research use around the world, and the number of registered WRF users exceeds 20000.
+The Weather Research and Forecasting (WRF) Modeling System (\cite{Skamarock2008}) is a multi-agency effort to provide a next-generation mesoscale forecast model and data assimilation system that will advance both the understanding and the prediction of mesoscale weather as well as accelerate the transfer of research advances into operations. The WRF model was designed to be an efficient massively parallel computing code to take advantage of advanced high-performance computing systems. The code, which can be configured for both research and operations, also offers numerous physics options. The WRF model is maintained and supported as a community model to facilitate wide use internationally, for research, operations, and teaching. The model is suitable for a broad span of applications across scales ranging from large-eddy to global simulations. Such applications include real-time numerical weather prediction, data assimilation development and studies, parameterized-physics research, regional climate simulations, air-quality modeling, atmosphere-ocean coupling, and idealized simulations. As of this writing, the WRF model is in operational and research use around the world, and the number of registered WRF users exceeds 20000.
 
 The first version of the adiabatic WRF tangent linear model (TLM) and adjoint model (ADM) system (WAMS) was developed by National Center for Atmospheric Research (NCAR) around 2007 (\cite{Xiao2008}). The WAMS is used in the adjoint sensitivity analysis (\cite{Xiao2008}) and Four-Dimensional Variational Data Assimilation (4D-Var) (\cite{Huang2009}). It took us more than one year to complete the parallelization of the WAMS by following the traditional incremental and iteraive parallelization procedures, which include algorithm analysis, identifying the time-consuming hotspot, data dependency analysis, locating the halo exchange and manually writing the communication routines for data exchanging. In the past few years, due to the tremendous time required for hand-coding parallellization, the WAMS has failed to repeat the rapid development pattern of the WRF model and the WRF Data Assimilation System (WRFDA)(\cite{Barker2012}). The growing gap between the WAMS and the WRF/WRFDA makes the WAMS inconvenient to use with other systems. One example was that the WRF 4D-Var system could not read the WRF boundary conditions of later versions because the WAMS was left behind and it does not  include the upgrades of the boundary condition data structure in the WRF. Furthermore, because the WAMS uses the disk input/output (I/O) for storing/reading basic states trajectory and exchanging data among the FWM, TLM and ADM, the parallel efficiency is unsatisfactory on modern high-performance computers with distributed memory parallelization, especially for 4D-Var applications.  
  
@@ -152,7 +152,7 @@ The purpose of this paper is to describe the technical aspects of the newly deve
 
 After the release of the WRF model version 3.2, we started to use TAPENADE (\cite{Hascoet2004T2u}) to redevelop the TLM and the ADM of the WRF Advanced Research WRF (ARW) core based on the latest WRF model. The development of WRFPLUS model follows the same three phases proposed by \cite{Xiao2008}. First, numerical experiments were conducted to make sure that the adiabatic version of the WRF model with simplified physics paramterization routines can produce the major features that the full-physics model does. Second, the TLM and its ADM were generated by TAPENADE and modified manually whenever necessary. The third step was to verify the correctness of the TLM and the ADM.
 
-TAPENADE is a source-to-source automatic differentiation (AD) tool for programs written in Fortran 77-95, i.e., TAPENADE generates a TLM or an ADM from the source code of a given model. Like other AD tools, TAPENADE struggles with such complicated codes as WRFÕs third-order Runge-Kutta large timesteps and small acoustic timesteps (\cite{Xiao2008}).  Checking and improving TAPENADE-generated code can necessitate manual intervention (i) to represent first-order physical effects on the model evolution, (ii) to minimize code length so that developing its adjoint is simple, and (iii) to allow the code to run quickly in the iterations required to lower costs.  We also adopted three simplified physics packages that have maximum impact on a forecast compared to a no-physics model: surface friction, cumulus parmeterization, and large-scale condensation. These were developed by Jimy Dudhia (personal communication) and are similar to the physics packages in the WAMS (\cite{Xiao2008}).
+TAPENADE is a source-to-source automatic differentiation (AD) tool for programs written in Fortran 77-95, i.e., TAPENADE generates a TLM or an ADM from the source code of a given model. Like other AD tools, TAPENADE struggles with such complicated codes as WRFÕs third-order Runge-Kutta large timesteps and small acoustic timesteps (\cite{Xiao2008}).  Checking and improving TAPENADE-generated code can necessitate manual intervention (i) to represent first-order physical effects on the model evolution, (ii) to minimize code length so that developing its adjoint is simple, and (iii) to allow the code to run quickly in the iterations required to lower costs.  We also adopted three simplified physics packages that have maximum impact on a forecast compared to a no-physics model: surface friction, cumulus parmeterization, and large-scale condensation. These were developed by Jimy Dudhia (2012, personal communication) and are similar to the physics packages in the WAMS (\cite{Xiao2008}).
 
 \section{Linearity test and adjoint test}
 
@@ -167,7 +167,7 @@ where $\|\|$ denotes the norm of the vector.
 The adjoint relation is tested by :
 \begin{equation}
 \label{adcheck}
-\langle g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}) \rangle = \langle a\_\mathbf{f}(\mathbf{x},g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{x} \rangle
+\langle g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}),g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x}) \rangle = \langle a\_\mathbf{f}(\mathbf{x},g\_\mathbf{f}(\mathbf{x},g\_\mathbf{x})),g\_\mathbf{x} \rangle
 \end{equation}
 If the tangent linear and adjoint codes are correct, the above two relations should hold up to the machine accuracy. Because different model variables have different magnitudes, we also designed the capability to perform checks on individual variables separately. We performed the tangent linear and adjoint checks with the test case being integrated up to 24h. We sequentially reduced the initial perturbations by a factor ($\lambda$) of $10$ and repeatedly calculated $\Phi(\lambda)$ in Eqs. (\ref{tlcheckf}) on NCAR's IBM machine with 64-bit precision. Table \ref{tlcheck} shows the value of $\Phi(\lambda)$ from the tangent linear forecasts and the differences between two nonlinear forecasts over the whole domain. This indicated that the tangent linear forecast approximates the difference between two nonlinear forecasts as the initial perturbations decrease and approach zero.
 
@@ -246,7 +246,7 @@ CALL RSL_LITE_PACK_AD ( local_communicator, grid%a_v_2, ...,1,...
 \end{Verbatim}
 The ADM also has the same exchange stencil as the FWM and the TLM, but the data flow is reversed. On each processor, the entire patch of basic state variables (including halo) is stored in the memory stack during the forward recomputation stage and will be restored from the memory stack during the adjoint calculation. Therefore, in adjoint communication codes, only the adjoint variables ($a\_u\_2$ and $a\_v\_2$) need to be exchanged and the new subroutines "RSL\_LITE\_PACK\_AD" will pack the data slices from where we receive data in the FWM and the TLM for sending and unpack the received data to the slices where we send out data in the FWM and the TLM. 
 
-With the upgraded WRF Registry, all tangent linear and adjoint communication routines are generated automatically during compilation. To manually insert the tangent linear and adjoint communication interfaces into the TLM and the ADM is straightforward. In the TLM,  the tangent linear communication routines are inserted into the same locations where the forward communication routines reside in the FWM. In the ADM, the calling sequence of the adjoint communication routines is the reverse of that in the FWM and the TLM. From the code snippets presented above, we found that because both basic state variables and perturbation variables are packed together, although the amount of data to communicate is doubled in the TLM, the communication overhead is kept the same as in the FWM. This is highly desirable for a modern distributed memory parallel computer system with high bandwidth. In the ADM, in general, there are two stages: the first is the forward recomputation part, which propagates the basic states within one timestep and has the same communication overhead and amount of data to communicate with the FWM; The second is the adjoint backward part, which has the same communication overhead and amount as the first. Therefore, the total communication overhead and amount of data to communicate are doubled in the ADM. However, due to the fact that the adjoint code may has three to four times the amount of computation code than the forward code and the computations to communications ratio is still large, the communication overhead is not substantial and should not impact the parallel scalability of the ADM.
+With the upgraded WRF Registry, all tangent linear and adjoint communication routines are generated automatically during compilation. To manually insert the tangent linear and adjoint communication interfaces into the TLM and the ADM is straightforward. In the TLM,  the tangent linear communication routines are inserted into the same locations where the forward communication routines reside in the FWM. In the ADM, the calling sequence of the adjoint communication routines is the reverse of that in the FWM and the TLM. From the code snippets presented above, we found that because both basic state variables and perturbation variables are packed together, although the amount of data to communicate is doubled in the TLM, the communication latency is kept the same as in the FWM. This is highly desirable for a modern distributed memory parallel computer system with high bandwidth. In the ADM, in general, there are two stages: the first is the forward recomputation part, which propagates the basic states within one timestep and has the same communication latency and amount of data to communicate with the FWM; The second is the adjoint backward part, which has the same communication latency and amount as the first. Therefore, the total communication latency and amount of data to communicate are doubled in the ADM. However, due to the fact that the adjoint code may has three to four times the amount of computation code than the forward code and the computations to communications ratio is still large, the communication overhead is not substantial and should not impact the parallel scalability of the ADM.
 
 \section{Parallel performance}
 
@@ -316,19 +316,19 @@ In this paper we describe the implemented technique of the new tangent linear an
 \begin{figure}[t]
      \begin{center}
 %
-        \subfigure[Halo exchange between two neighbor processors in forward model]{%
+        \subfigure{%
             \label{fig:fwm_mpi}
             \includegraphics[trim=0cm 4cm 0cm 0cm, clip=true,width=0.8\textwidth]{fwm_mpi.pdf}
         }%
         \\
-        \subfigure[Adjoint of halo exchange between two neighbor processors in adjoint model]{%
+        \subfigure{%
            \label{fig:adm_mpi}
            \includegraphics[trim=0cm 4cm 0cm 0cm, clip=true,width=0.8\textwidth]{adm_mpi.pdf}
         }\\ %  ------- End of the first row ----------------------%
 %
     \end{center}
     \caption{%
-        Schematic diagram of the halo communication in the FWM and the ADM. Gray area denotes the entire model domain; Green zone denotes the ghost area; white zone is the computational patch for each processor; U denotes the basic state variable in the FWM and a\_U denotes the adjoint variable in the ADM.
+        Schematic diagram for (a) halo exchange between two neighbor processors in FWM and (b) adjoint of halo exchange between two neighbor processors in ADM. Gray area denotes the entire model domain; Green zone denotes the ghost area; white zone is the computational patch for each processor; U denotes the basic state variable in the FWM and a\_U denotes the adjoint variable in the ADM.
      }%
    \label{fig:mpi}
 \end{figure}
@@ -336,19 +336,19 @@ In this paper we describe the implemented technique of the new tangent linear an
 \begin{figure}[t]
      \begin{center}
 %
-        \subfigure[Wallclock time for one-timestep integration]{%
+        \subfigure{%
             \label{fig:bf_a}
             \includegraphics[width=0.7\textwidth]{bluefiretime.pdf}
         }%
         \\
-        \subfigure[Parallel speedup]{%
+        \subfigure{%
            \label{fig:bf_b}
            \includegraphics[width=0.8\textwidth]{bluefire_wrfplus_performance.pdf}
         }\\ %  ------- End of the first row ----------------------%
 %
     \end{center}
     \caption{%
-        Parallel performance for one-timestep integration on Bluefire
+        Parallel performance for one-timestep integration on Bluefire in terms of (a) wallclock time and (b) parallel speedup.
      }%
    \label{fig:bluefire}
 \end{figure}
@@ -356,19 +356,19 @@ In this paper we describe the implemented technique of the new tangent linear an
 \begin{figure}[t]
      \begin{center}
 %
-        \subfigure[Wallclock time for one-timestep integration]{%
+        \subfigure{%
             \label{fig:lx_a}
             \includegraphics[width=0.7\textwidth]{lynxtime.pdf}
         }%
         \\
-        \subfigure[Parallel speedup]{%
+        \subfigure{%
            \label{fig:lx_b}
            \includegraphics[width=0.8\textwidth]{lynx_wrfplus_performance.pdf}
         }\\ %  ------- End of the first row ----------------------%
 %
     \end{center}
     \caption{%
-        Parallel performance for one-timestep integration on Lynx
+        Parallel performance for one-timestep integration on Lynx in terms of (a) Wallclock time and (b) parallel speedup.
      }%
    \label{fig:lynx}
 \end{figure}

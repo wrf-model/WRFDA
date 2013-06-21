@@ -1332,7 +1332,6 @@ FUNCTION {misc}
   format.book.pages output
   howpublished "howpublished" bibinfo.check output
   format.doi output
-  format.note output
   format.eprint output
   fin.entry
 }
