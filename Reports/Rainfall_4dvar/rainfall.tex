@@ -67,7 +67,7 @@
 % substitute the initials of the journal for "jgrga" below.)
 
 \documentclass[grl]{AGUTeX}
-%\documentclass[grl]{AGUTeX}
+%\documentclass[draft,grl]{AGUTeX}
 
 % To create numbered lines:
 
@@ -176,17 +176,17 @@ Direct four-dimensional variational data assimilation (4D-Var) approach is used 
 
 \section{Introduction}
 
-A proper description of the hydrological cycle is vital for short-period forecasting with regional operational Numerical Weather Prediction (NWP) models \citep{Macpherson}. Meanwhile, the accuracy of short-range NWP is largely affected by the model initial condition. Many studies [Zupanski and Mesinger, 1995; Zou and Kuo, 1996; Tsuyuki 1996a, 1996b, 1997; Guo et al., 2000; Xiao et al., 2000] indicate that the assimilation of precipitation observations can provide accurate mesoscale initial states, and hence, it is expected to improve the skill of short-range forecasts.
+A proper description of the hydrological cycle is vital for short-period forecasting with regional operational Numerical Weather Prediction (NWP) models \citep{Macpherson}. Meanwhile, the accuracy of short-range NWP is largely affected by the model initial condition. Many studies \citep{Zupanski,Zou,Tsuyuki,Xiao,Guo} indicate that the assimilation of precipitation observations can provide accurate mesoscale initial states, and hence, it is expected to improve the skill of short-range forecasts.
 
 %In the past few decades, several approaches to assimilation of precipitation observations in NWP models have been developed.
 %The first approach is initialization scheme (or “reverse” scheme), such as the dynamical initialization (Fiorino and Warner 1981), physical initialization(Krishnamurti et al. 1991, 1993; ) and cumulus convection initialization (Kasahara et al. 1992;Donner, 1988).The papers mentioned above all showed that an improved forecast could be obtained after incorporation of the observed rainfall rate. However, it is an indirect way of using precipitation data, and the shortcoming of the technique is that it does not guarantee dynamically consistent initial conditions (Zou et al. 1996).
 %The second method is to use nudging technique (Carr and Baldwin, 1991; Kuo et al, 1993; Manobianco et al. 1994; Chang and Holt 1994; Lin et al. 1999; Falkovich et al. 2000; Macpherson 2001). Although it is one of the simplest methods of data assimilation and computationally much more economical, the nudging-generated initial conditions, like the first method, are also dynamically inconsistent(Zou et al. 1996, Bao and Errico, 1997).
 %The third approach is to use variational data assimilation, such as, 1D-Var, 3D-Var, 1D-Var+4D-Var, and 4D-Var. We will not go into many details about 1D-Var and 3D-Var assimilating rainfall data, and more information can be found in the following papers (1D-Var: Hou et al. 2004; 3D-Var, Treadon et al. 2002). 
 
-The first attempt to assimilate precipitation observations using 4D-Var approach was made by Zupanski and Mesinger in 1995. They demonstrated the technical feasibility of the approach and showed an improvement of precipitation forecast in mid-latitudes by using a regional NMC eta forecast model and an incomplete adjoint model. Later, many studyies [Zou and Kuo 1996; Tsuyuki 1996a,b, 1997; Guo et al. 2000; Xiao et al. 2000] indicated that the precipitation assimilation leads to a reduction in the spin-up time, improves the moisture distributions in model initial conditions and improves the skill of short-range forecasts. Some operational weather services also assimilate precipitation operationally using 4D-Var method, including Japan Meteorological Agency (JMA) [Tsuyuki et al. 2002] and European Centre for Medium-Range Weather Forecasts (ECMWF) [Lopez 2011]. Although the results of studies mentioned above are encouraging, the precipitation assimilation in 4D-Var is still a challenging issue. %Just as Errico et al. [2000] mentioned that the assimilation of precipitation-related observations is potentially very different than that of more conventional observation types for a variety of fundamental and practical considerations. In order to use precipitation data in 4D-Var, it is necessary to include parameterization schemes of moist processes into tangent linear model and corresponding adjoint model. However these processes are strongly nonlinear and contain discontinuous (non-differentiable) on/off switches, especially in the case of a cumulus convection parameterization. This makes the tangent linear approximation less valid for a linearized model with physics than for the same model without physics (Tsuyuki, 1997). Thus, development of techniques of the 4DVAR data assimilation with realistic, ‘full-physics’ forecast models must be related to examining and solving these problems first (Zupanski and Mesinger, 1995).
+The first attempt to assimilate precipitation observations using 4D-Var approach was made by Zupanski and Mesinger in 1995. They demonstrated the technical feasibility of the approach and showed an improvement of precipitation forecast in mid-latitudes by using a regional NMC eta forecast model and an incomplete adjoint model. Later, many studyies \citep{Zupanski,Zou,Tsuyuki,Xiao,Guo} indicated that the precipitation assimilation leads to a reduction in the spin-up time, improves the moisture distributions in model initial conditions and improves the skill of short-range forecasts. Some operational weather services also assimilate precipitation operationally using 4D-Var method, including Japan Meteorological Agency (JMA) \citep{Koizumi} and European Centre for Medium-Range Weather Forecasts (ECMWF)  \citep{Lopez}. Although the results of studies mentioned above are encouraging, the precipitation assimilation in 4D-Var is still a challenging issue. %Just as Errico et al. [2000] mentioned that the assimilation of precipitation-related observations is potentially very different than that of more conventional observation types for a variety of fundamental and practical considerations. In order to use precipitation data in 4D-Var, it is necessary to include parameterization schemes of moist processes into tangent linear model and corresponding adjoint model. However these processes are strongly nonlinear and contain discontinuous (non-differentiable) on/off switches, especially in the case of a cumulus convection parameterization. This makes the tangent linear approximation less valid for a linearized model with physics than for the same model without physics (Tsuyuki, 1997). Thus, development of techniques of the 4DVAR data assimilation with realistic, ‘full-physics’ forecast models must be related to examining and solving these problems first (Zupanski and Mesinger, 1995).
 %Compare to the initialization scheme, the 4D-Var can assimilate precipitation data directly, and the major advantages of 4D-Var is that it uses the full model dynamics to adjust the model variables to the observed precipitation (Tsuyuki 1996).
 
-The assimilation of precipitation-related observations is potentially very different than that of more conventional observation types for a variety of fundamental and practical considerations [Errico et al. 2000]. In order to use precipitation data in 4D-Var, it is necessary to include parameterization schemes of moist processes into tangent linear model and corresponding adjoint model. However these processes are strongly nonlinear and contain discontinuous (non-differentiable) on/off switches, especially in the case of a cumulus convection parameterization. This makes the tangent linear approximation less valid for a linearized model with physics than for the same model without physics [Tsuyuki, 1997]. Thus, development of techniques of the 4DVAR data assimilation with realistic, ‘full-physics’ forecast models must be related to examining and solving these problems first [Zupanski and Mesinger, 1995]. 
+The assimilation of precipitation-related observations is potentially very different than that of more conventional observation types for a variety of fundamental and practical considerations \citep{Errico}. In order to use precipitation data in 4D-Var, it is necessary to include parameterization schemes of moist processes into tangent linear model and corresponding adjoint model. However these processes are strongly nonlinear and contain discontinuous (non-differentiable) on/off switches, especially in the case of a cumulus convection parameterization. This makes the tangent linear approximation less valid for a linearized model with physics than for the same model without physics \citep{Tsuyuki}. Thus, development of techniques of the 4DVAR data assimilation with realistic, ‘full-physics’ forecast models must be related to examining and solving these problems first \citep{Zupanski}. 
 Zhang et al. [2013] reports that the tangent linear and adjoint codes of the WRF model (WRFPLUS) have been redeveloped. It includes all major model physics (e.g., the parameterizations for cumulus, microphysics, and radiation). Moreover, a simple boundary layer process, horizontal and vertical diffusions are also incorporated into the model. Taking advantage of the redeveloped WRFPLUS, it is possible and natural extension to assimilate precipitation data using 4D-Var method in WRF Data Assimilation System (WRFDA) \citep{Barker}. 
 
 This study explores for the first time the feasibility and the impact of the 4D-Var assimilation of precipitation data in WRFDA system. Considering the compute resource saving, multi-incremental method is employed to reduce the cost. Conventional data and NCEP stage IV 6-hourly accumulated precipitation are assimilated.  A 14-day period from 1 to 14 June 2010 has been selected to evaluate the impact of precipitation assimilation on short-range forecasts. 
@@ -226,10 +226,9 @@ J(\delta x) &= J_{b}(\delta x)+J_{o}(\delta x)+J_{c}(\delta x) \nonumber \\
 $ \delta x=x_{0}-x_{0}^{b} $  is the analysis increment relative to the model state $ (x_{0}) $ and background $ (x_{0}^{b}) $  at time $k$. $K$ is the total number of time slots on which observation are available. $ \mathbf{B} $ and $ \mathbf{R} $ are covariance matrices for background error and observation error. $ \mathbf{H} $ is the linear approximation of the observation operator $H$  in the vicinity of $ x_{0}^{b} $. $ \mathbf{M} $  is the tangent linear model.  $ d_{k}=y_{k}^{0}-H_k\left[M_k(x_{0}^{b})\right]$ is the innovation vector between observed precipitation $y_{k}^{0}$  and model precipitation at time $k$ . The model precipitation includes non-convective and convective precipitation. The sum of the two part of precipitation is linear interpolated to observation location and compared with the observations to generate the innovations. $H$  and $M$  are the nonlinear observation operator and simplified WRF nonlinear model respectively. $J_{c}$  is a balancing term. It measures the quadratic distance between the analysis and a balanced state.
 
 \section{Experiments design and verification methods}
-
 \subsection{Experiments design}
 
-A 14-day period from 0000 UTC 1 to 1200 UTC 14 June 2010 has been selected for running the experiments. This period is chosen because it is characterized by many precipitation events of both convective and stratiform nature. WRF-ARW model \citep{Skamarock} is used as the forecast model. The integration domain of the model covers the North American continent and the surrounding oceans. The horizontal resolution is 30km and there are 40 vertical levels with the model top at 50hPa. WSM 5-class microphysics scheme [Hong et al. 2004], Kain-Fritsch cumulus convection scheme [Kain and Fristsch], and YSU boundary layer parameterization [Hong et al. 2006] are used. 
+A 14-day period from 0000 UTC 1 to 1200 UTC 14 June 2010 has been selected for running the experiments. This period is chosen because it is characterized by many precipitation events of both convective and stratiform nature. WRF-ARW model \citep{Skamarock} is used as the forecast model. The integration domain of the model covers the North American continent and the surrounding oceans. The horizontal resolution is 30km and there are 40 vertical levels with the model top at 50hPa. WSM 5-class microphysics scheme  \citep{Hong}, Kain-Fritsch cumulus convection scheme \citep{KainFristsch}, and YSU boundary layer parameterization \citep{Hong2006} are used. 
 
 A 6-h spin-up run is conducted using NCEP FNL data (horizontal spatial resolution of 1.0 x 1.0 degree) and the output from the spin-up is used as the initial condition of the COTROL experiment as well as the first guess field for the 4D-Var experiments (GTS and GTS+RAIN). The CONTROL experiment is 24-h forecast, and it serves as the benchmark for evaluating the assimilation experiments. In the second experiment (GTS), conventional observations are assimilated. The third experiment (GTS+RAIN) is the same as the second, except NCEP Stage IV 6-hourly accumulated precipitation data is also used. The assimilation window is 6 hours. 2 mm precipitation error is assigned for 6-h accumulated rainfall assimilation. The National Meteorological Center (NMC) method [Parrish and Derber, 1992] in the WRFDA package is adopted for background error calculation.
 
@@ -241,19 +240,23 @@ The Model Evaluation Tool (MET) developed by Developmental Testbed Center (DTC) 
 
 Two datasets have been used to assess the analyses and forecasts. One dataset is the upper air sounding observations, which is used to evaluate model longitudinal and meridian winds, temperature, and relative humidity. Root-mean square errors (RMSEs) are used as the verification metric.
 
-The other source of data is NCEP Stage IV precipitation data. The original precipitation accumulations are available on a 4-km resolution polar-stereographic grid. It has been regrided to 30 km lambert conformal grid before verification. We acquire 12-h and 24-h accumulated precipitation by summing of NCEP Stage IV 6-hourly accumulated precipitation. After interpolating and summing, verification are done by using a grid-to-grid comparison. The Gilbert Skill Score (GSS) [Gilbert, 1884] is used as the precipitation verification metric. 
+The other source of data is NCEP Stage IV precipitation data. The original precipitation accumulations are available on a 4-km resolution polar-stereographic grid. It has been regrided to 30 km lambert conformal grid before verification. We acquire 12-h and 24-h accumulated precipitation by summing of NCEP Stage IV 6-hourly accumulated precipitation. After interpolating and summing, verification are done by using a grid-to-grid comparison. The Gilbert Skill Score (GSS) \citep{Gilbert} is used as the precipitation verification metric. 
 
 RMSEs and precipitation scores in section 5 have been calculated for the entire 14-day period of the experiments.
 
-
 %------------------------------------------------
 
-\section{Results}
+\section{Results} %\label{text}
+%The impacts of the precipitation assimilation on the initial fields and forecasts are analyzed in this section through the comparison of the three experiments and with NCEP Stage IV observation.
 
 \subsection{Profile verification}
 
 In order to evaluate how atmospheric variables are affected by the precipitation assimilation, RMSEs are computed for U-and V-component of the vector wind, temperature and relative humidity on different pressure levels.  
-Figure 1 and Figure 2 give the vertical profiles of U-and V-component of the vector wind RMSE for three experiments. The confidence intervals are added to help visualize the uncertainty, and the horizontal bars represent the confidence intervals at the 95 confidence level. The U-and V-component of the vector wind RMSE of GTS+RAIN is almost the same as that of GTS at analysis time (Figure 1a and Figure 2a), and the analyses have statistically significant lower RMSE then CONTROL for all levels. It indicates that 4D-Var much improved the analysis. For 12h and 24h forecast, GTS+RAIN reduced the errors slightly in the lower troposphere contrast to GTS. For temperature RMSEs, GTS+RAIN reduced the errors for analysis, 12-h and 24-h forecast in lower troposphere, but the results are not statistically significant. Figure 4 shows the vertical profiles of relative humidity RMSE. GTS+RAIN has statistically significant lower RMSE than GTS and CONTROL at analysis time and 12-h forecast at 1000hpa. \citet{Guo} also reported that humidity was much improved in precipitation assimilation experiment using MMM5 data assimilation system.
+Figure 1 and Figure 2 give the vertical profiles of U-and V-component of the vector wind RMSE for three experiments. 
+%The confidence intervals are added to help visualize the uncertainty, and the horizontal bars represent the confidence intervals at the 95 confidence level. The U-and V-component of the vector wind RMSE of GTS+RAIN is almost the same as that of GTS at analysis time (Figure 1a and Figure 2a), and the analyses have statistically significant lower RMSE then CONTROL for all levels. It indicates that 4D-Var much improved the analysis. For 12h and 24h forecast, GTS+RAIN reduced the errors slightly in the lower troposphere contrast to GTS. For temperature RMSEs, GTS+RAIN reduced the errors for analysis, 12-h and 24-h forecast in lower troposphere, but the results are not statistically significant. Figure 4 shows the vertical profiles of relative humidity RMSE. GTS+RAIN has statistically significant lower RMSE than GTS and CONTROL at analysis time and 12-h forecast at 1000hpa. \citet{Guo} also reported that humidity was much improved in precipitation assimilation experiment using MMM5 data assimilation system.
+The U-and V-component of the vector wind RMSE of GTS+RAIN and GTS almost overlapped at analysis time (Figure 1a and Figure 2a), and they have significant lower RMSE then CONTROL for all levels. For 12h and 24h forecast, although U- and V-component RMSE of three experiments are very close, the results of GTS+RAIN and GTS still better the CONTROL, meanwhile, GTS+RAIN reduced the errors slightly in the middle and lower levels contrast to GTS and CONTROL experiment.    
+
+
 
 \subsection{Precipitation verification}
 
@@ -380,13 +383,23 @@ Brown, B.~G., J.~H. Gotway, R. Bullock, E. Gilleland, and D. Ahijevych  (2009),
 Community tools for forecast evaluation,
 \textit{Bull. Amer. Meteor. Soc.}, \textit{56}(193), 119--139.
 
+\bibitem[{\textit{Errico et~al}(2000)}]{Errico}
+Errico, R. M., L. Fillion, D. Nychka, and Z.-Q. Lu (2000),
+Some statistical considerations associated with the data assimilation of precipitation observations.
+\textit{Quart. J. Roy. Meteor. Soc.}, \textit{126A}, 339-359.
+
+\bibitem[{\textit{Gilbert}(1884)}]{Gilbert}
+Gilbert, G. K. (1884),
+Finley’s tornado predictions.
+\textit{Amer. Meteor. J}, \textit{1}, 166-172.
+
 \bibitem[{\textit{Guo et~al.}(2000)}]{Guo}
 Guo, Y.-R., Y.-H. Kuo, J. Dudhia, D. Parsons, and C. Rocken (2000), 
 Four-dimensional variational assimilation of heterogeneous mesoscale 
 observations for a strong convective case,
 \textit{Mon. Wea. Rev.}, \textit{128}, 619-643.
 
-\bibitem[{\textit{Hong et~al.}(2004)}]{Hong2004}
+\bibitem[{\textit{Hong et~al.}(2004)}]{Hong}
 Hong, S.-Y., J. Dudhia, and S.-H. Chen (2004), 
 A revised approach to ice microphysical processes for the bulk 
 parameterization of clouds and precipitation,
@@ -410,10 +423,20 @@ A one-dimensional entraining/detraining plume model and
 its application in convective parameterization,
 \textit{J. Atmos. Sci.}, \textit{47}, 2784-2802.
 
+\bibitem[{\textit{Koizumi et~al}(2005)}]{Koizumi}
+Koizumi, K., Y. Ishikawa, and T. Tsuyuki (2005),
+Assimilation of precipitation data to JMA mesoscale model with a four-dimensional variational method and its impact on precipitation forecasts.
+\textit{SOLA}, \textit{1}, 45-48.
+
 \bibitem[{\textit{Lin and Mitchell}(2005)}]{LinMitchell}
 Lin, Y., and K.~E. Mitchell (2005), The NCEP stage II/IV hourly precipitation 
 analyses: Development and applications,
  \textit{56}(193), 119--139.
+
+\bibitem[{\textit{Lopez}(2011)}]{Lopez}
+Lopez P. (2011),
+Direct 4D-Var Assimilation of NCEP Stage IV Radar and Gauge Precipitation Data at ECMWF.
+\textit{Mon. Weather Rev.}, \textit{139}, 2098-2116.
 
 \bibitem[{\textit{Macpherson}(2001)}]{Macpherson}
 Macpherson, B. (2001),
@@ -427,7 +450,44 @@ A description of the advanced research WRF version 3,
 \textit{Meteor. Atmos. Phys.}, \textit{76}, 3-8.
 %NCAR Tech. Note TN-475+STR, 113 pp.
 
+\bibitem[{\textit{Tsuyuki}(1996a,b,1997)}]{Tsuyuki}
+Tsuyuki, T. (1996a),
+Variational data assimilation in the tropics using precipitation data Part I: column model. 
+\textit{Meteor. Atmos. Phys.}, \textit{60}, 87-104.
 
+\bibitem[{\textit{Tsuyuki}(1996a,b,1997)}]{Tsuyuki}
+Tsuyuki, T. (1996a),
+Variational data assimilation in the tropics using precipitation data Part II: 3-D model. 
+\textit{Meteor. Atmos. Phys.}, \textit{124}, 2545-2561.
+
+\bibitem[{\textit{Tsuyuki}(1996a,b,1997)}]{Tsuyuki}
+Tsuyuki, T. (1996a),
+Variational data assimilation in the tropics using precipitation data Part III: assimilation of SSM/I precipitation rates. 
+\textit{Meteor. Atmos. Phys.}, \textit{125}, 1447-1464.
+
+\bibitem[{\textit{Xiao et~al.}(2000)}]{Xiao}
+Xiao, Q., X. Zou and Y.-H. Kuo (2000),
+Incorporating the SSM/I-derived precipitable water and rainfall rate into a numerical model: a case study for the ERICA IOP- 4 cyclone. 
+\textit{Mon. Weather Rev.}, \textit{128}, 87-108.
+
+\bibitem[{\textit{Zou and Kuo}(1996)}]{Zou}
+Zou, X., and Y.-H. Kuo (1996),
+Rainfall assimilation through an optimal control of initial and boundary conditions in a limited-area mesoscale model. 
+\textit{Mon. Weather Rev.}, \textit{124}, 2859-2882.
+
+\bibitem[{\textit{Zupanski and Mesinger}(1995)}]{Zupanski}
+Zupanski, D., and F. Mesinger (1995),
+Four-dimensional variational assimilation of precipitation data.
+\textit{Mon. Weather Rev.}, \textit{123}, 1112-1127.
+
+%\bibitem[{\textit{Xu et~al.}(2006)}]{Xu}
+%Xu, J., Q. Xiao, X. Gao, and S. Sorooshian (2006),
+%Influence of assimilating rainfall derived from WSR-88D radar on the rainstorm forecasts over the southwestern United States.
+%\textit{J. Geophys. Res.}, \textit{111}, D13105, doi:10.1029/2005JD006650.
+
+%Xu, J., Q. Xiao, X. Gao, and S. Sorooshian (2006), Influence of assimilating rainfall derived from WSR-88D radar on the rainstorm forecasts over the southwestern United States, J. Geophys. Res., 111, D13105, doi:10.1029/2005JD006650.
+
+%Zhang, X., Huang, X. Y., and Pan, N.: Development of the Upgraded Tangent Linear and Adjoint of the Weather Research and Forecasting (WRF) Model, JTECH, 2013.
 
 \end{thebibliography}
 
@@ -496,24 +556,79 @@ A description of the advanced research WRF version 3,
 % See below for how to make sideways figures or tables.
 
 \newpage
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{./figures/u_00.eps}
 
-%\begin{figure}
-%\includegraphics[width=0.4\linewidth]{placeholder.jpg}
-%\caption{Figure caption}\label{placeholder}
-%\end{figure}
+\includegraphics[width=0.5\linewidth]{./figures/u_12.eps}
 
-\begin{table}
-\caption{Table caption}\label{sampletable}
-\begin{tabular}{l l l}
-\hline
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\hline
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\hline
-\end{tabular}
-\end{table}
+\includegraphics[width=0.5\linewidth]{./figures/u_24.eps}
+\caption{Vertical profile of RMSE in U-component of the vector wind for experiments CONTROL, GTS and GTS+RAIN for analysis (a), 12h forecast(b) and 24h forecast(c) aggregated over 14-day period of cases verified against upper air sounding data.}\label{u_00}
+\end{figure}
+
+\newpage
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{./figures/v_00.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/v_12.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/v_24.eps}
+\caption{Same as Figure 1 but for V-component of the vector wind. }\label{v_00}
+\end{figure}
+
+\newpage
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{./figures/tmp_00.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/tmp_12.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/tmp_24.eps}
+\caption{Same as Figure 1 but for temperature. }\label{tmp_00}
+\end{figure}
+
+\newpage
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{./figures/rh_00.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/rh_12.eps}
+
+\includegraphics[width=0.5\linewidth]{./figures/rh_24.eps}
+\caption{Same as Figure 1 but for relative humidity.}\label{rh_00}
+\end{figure}
+
+\newpage
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{./figures/GSS_12.eps}
+\includegraphics[width=0.5\linewidth]{./figures/GSS_24.eps}
+\caption{Threshold series of GSS for 12-h (a) and 24-h (b) accumulated precipitation from the experiment CONTROL, GTS, GTS+RAIN. }\label{gss_12h}
+\includegraphics[width=0.8\linewidth]{./figures/GSS_timeser.eps}
+\caption{Time series of Gilberty Skill Score (GSS) from 0000 UTC 1 to 1200 UTC 14 June 2010. The 12-h accumulated precipitation from the experiment CONTROL, GTS, GTS+RAIN are verified against NCEP Stage IV gridded precipitation at different thresholds (a) 5.0mm, (b) 10.0 mm and (c) 20.0 mm. }\label{timeser}
+\end{figure}
+
+\newpage
+\begin{figure}
+\includegraphics[width=0.4\linewidth]{./figures/st4_copy.pdf}
+
+\includegraphics[width=0.4\linewidth]{./figures/control_copy.pdf}
+
+\includegraphics[width=0.4\linewidth]{./figures/gts_copy.pdf}
+
+\includegraphics[width=0.4\linewidth]{./figures/gts+rain_copy.pdf}
+%\includegraphics[width=0.4\linewidth]{gts+rain.eps}
+\caption{12-h accumulated precipitation (mm) from 0000 UTC to 1200 UTC 10 June 2010. (a) NCEP Stage-IV (b) CONTROL (c) GTS (d) GTS+RAIN. }\label{rainfall}
+\end{figure}
+
+%\begin{table}
+%\caption{Table caption}\label{sampletable}
+%\begin{tabular}{l l l}
+%\hline
+%\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+%\hline
+%Treatment 1 & 0.0003262 & 0.562 \\
+%Treatment 2 & 0.0015681 & 0.910 \\
+%Treatment 3 & 0.0009271 & 0.296 \\
+%\hline
+%\end{tabular}
+%\end{table}
 
 \end{document}
 
