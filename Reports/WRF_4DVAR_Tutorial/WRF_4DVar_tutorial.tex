@@ -333,7 +333,7 @@ We have tested the WRF 4D-Var V3.5 on following systems:
 \frametitle{Test for tangent linear model}
 Taylor formula:
 \begin{equation*}
-\lim_{\alpha \to 0}\frac{M(x+\alpha\delta\mathbf{x})-M(x)}{(\alpha{\delta\mathbf{x}^T)}{\cdot}M^{'}(x,\alpha\delta\mathbf{x})}=1
+\lim_{\alpha \to 0}\frac{\|M(x+\alpha\delta\mathbf{x})-M(x)\|}{\|\mathbf{M}(\alpha\delta\mathbf{x})\|}=1
 \end{equation*}
 \begin{block}{check results}
 {\tiny{
@@ -361,7 +361,7 @@ alpha_m=.1000E-10  coef=   0.10000451984913E+01  val_n= 0.3693446E-09  val_l= 0.
 \frametitle{Test for adjoint model}
 adjoint identity:
 \begin{equation*}
-\forall\mathbf{x}, \forall\mathbf{y} : \langle{M^{'}.\mathbf{x},\mathbf{y}}\rangle =  \langle{\mathbf{x},\mathbf{M^{*}}.\mathbf{y}}\rangle
+\forall\mathbf{x}, \forall\mathbf{y} : \langle{\mathbf{M}\cdot\mathbf{x},\mathbf{y}}\rangle =  \langle{\mathbf{x},\mathbf{M^{*}}\cdot\mathbf{y}}\rangle
 \end{equation*}
 \begin{block}{check results}
 {\tiny{
