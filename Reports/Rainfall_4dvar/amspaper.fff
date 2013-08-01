@@ -1,0 +1,8 @@
+\begin{figure*}
+[t]
+  \noindent\includegraphics[width=19pc,angle=0]{figure01.pdf}\\
+  \caption{Enter the caption for your figure here.  Repeat as
+  necessary for each of your figures. Figure from \protect\cite{Knutti2008}.}\label{f1}
+\end{figure*}
+\efloatseparator
+ 
