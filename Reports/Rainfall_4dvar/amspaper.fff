@@ -1,8 +1,49 @@
 \begin{figure*}
+
+  \noindent\includegraphics[width=19pc,angle=0]{wind_00.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{wind_12.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{wind_24.eps}\\
+  \caption{Vertical profiles of the RMSEs of wind speed for experiments CONTROL, GTS, RAIN and GTS+RAIN for analysis (a), 12-h forecast(b) and 24-h forecast(c) aggregated over 10-day period of the case verified against upper air sounding data.}
+\label{f1}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}
+
+  \noindent\includegraphics[width=19pc,angle=0]{tmp_00.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{tmp_12.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{tmp_24.eps}\\
+   \caption{Same as Figure 1 but for temperature.}
+   \label{f2}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}
 [t]
-  \noindent\includegraphics[width=19pc,angle=0]{figure01.pdf}\\
-  \caption{Enter the caption for your figure here.  Repeat as
-  necessary for each of your figures. Figure from \protect\cite{Knutti2008}.}\label{f1}
+  \noindent\includegraphics[width=19pc,angle=0]{rh_00.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{rh_12.eps}\\
+  \noindent\includegraphics[width=19pc,angle=0]{rh_24.eps}\\
+   \caption{Same as Figure 1 but for relative humidity. }
+ \label{f3}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}
+[t]
+  \noindent\includegraphics[width=19pc,angle=0]{gss_24h_error.eps}\\
+   \caption{Threshold series of the GSS for 24-h accumulated precipitation using 1mm, 2mm, 3mm and 4mm precipitation observation error respectively. }
+   \label{f4}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}
+[t]
+  \noindent\includegraphics[width=15pc,angle=0]{GSS_06.eps}\\
+  \noindent\includegraphics[width=15pc,angle=0]{GSS_12.eps}\\
+  \noindent\includegraphics[width=15pc,angle=0]{GSS_18.eps}\\
+  \noindent\includegraphics[width=15pc,angle=0]{GSS_24.eps}\\
+   \caption{Threshold series of the GSS for 6-h (a), 12-h (b), 18-h (c), and 24-h (d) accumulated precipitation from the experiment CONTROL, GTS, RAIN, GTS+RAIN.}
+   \label{f5}
 \end{figure*}
 \efloatseparator
  

@@ -80,7 +80,7 @@
 
 \author{\textsc{Junmei Ban, Xin Zhang}
             \thanks{\textit{Corresponding author address:} 
-            Dr Xin Zhang, National Center for Atmospheric Research, 
+            Dr. Xin Zhang, National Center for Atmospheric Research, 
             P. O. Box 3000, Boulder, CO 80307. 
             \newline{E-mail: xinzhang@ucar.edu}}\quad\textsc{and Xiang-Yu Huang}\\
 \textit{\footnotesize{National Center for Atmospheric Research}}
@@ -154,7 +154,7 @@ The vertical profiles of the temperature RMSEs for all experiments are shown in 
 
 The vertical profiles of the relative humidity RMSEs for all experiments are shown in Figure 3. The RMSE in GTS has been much reduced from CONTROL except at 1000hpa for 12-h and 24-h forecasts (Figure 3b,3c), where RAIN has positive impact on it. When combining the conventional data to precipitation assimilation, the RMSEs of relative humidity in GTS+RAIN significantly reduced at all levels. The result is consistent with \cite{Zou}, which pointed that a standard procedure for precipitation assimilation should include sufficient moisture-related data to reduces the model's freedom in adjusting the moisture field. For GTS+RAIN includes the moisture-related observation, it produces better results than only assimilating precipitation or conventional data.
 
-\subsection{Impact on precipitation forecast}
+\subsection{Impact on precipitation forecasts}
 When dealing with the new type of observations, it is very important to estimate the observations error. According to previous studies, many authors assigned the observation error of accumulated precipitation empirically according to their cases. For example, \cite{Zupanski} used an observed precipitation error of only 0.001 mm for 24-h accumulated precipitation. \cite{Zou} using 0.045mm for 3-h accumulated precipitation. \cite{Guo} used the error of 3 mm for 1-h accumulated precipitation. For the information about the observation error on the NCEP Stage IV precipitation data were not available, the sensitivity of the precipitation forecast to the choice of precipitation error in assimilation experiments was tested. We assigned a series of the observation error by the value of 1, 2, 3, 4mm for 6-h accumulated precipitation. Figure 4 shows the GSSs for 24-h accumulated precipitation using the different precipitation error in assimilation experiment. For a perfect forecast, GSS is 1. The results show that the GSS is the highest at the 1mm and 5mm thresholds when the precipitation assimilation experiment uses 1mm observation error. However, the advantage is disappeared when threshold is greater than 10mm.  It indicates that the improvement on the small or moderate rain area is limited if we employ a larger error like 4mm or a smaller error like 1mm. Therefore, 2 mm precipitation error for 6-h accumulated precipitation is used in RAIN and GTS+RAIN experiments.
 
 Figure 5 shows the threshold series of the GSS for 6-h (Figure 5a), 12-h (Figure 5b), 18-h (Figure 5c) and 24-h (Figure 5d) accumulated precipitation for the experiments CONTROL, GTS, RAIN and GTS+RAIN. In Figure 5a-d, the GSS in CONTROL is lowest among four experiments, except 6-h precipitation forecast for the threshold lower than 7.5mm, where GTS is worse than CONTROL.  For 12-h, 18-h and 24-h accumulated precipitation forecasts(Figure 5b,c,d), the GSSs in GTS are better than CONTROL but worse than GTS+RAIN, and it should be noticed that the GSSs in GTS have slightly improved from CONTROL for the thresholds lower than 5mm. 
