@@ -70,7 +70,7 @@ do iob = 1, num_obs
 fnames_obs(iob-1)= read_headers(num_expt+4+iob-1)
 end do
 ;----------------------------------------------------------------------------------------
- upper_air_file="fnames_upr"
+ upper_air_file="fnames_gupr"
  do iob = 1, num_obs
   if ( fnames_obs(iob-1) .eq. upper_air_file ) then
       file_names =  fnames_obs(iob-1)

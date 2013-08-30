@@ -95,7 +95,7 @@ fnames_obs(iob-1)= read_headers(num_expt+4+iob-1)
 end do
 ;-----------------------------------------------------------
 
- gpsref_file="fnames_gpsref"
+ gpsref_file="fnames_ggpsref"
  do iob = 1, num_obs
   if ( fnames_obs(iob-1) .eq. gpsref_file ) then
       file_names =  fnames_obs(iob-1)
